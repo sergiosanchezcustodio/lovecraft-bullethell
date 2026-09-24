@@ -2,10 +2,28 @@
 
 Documento de contexto del proyecto. Recoge las decisiones tomadas en la fase de exploración y el pipeline de arte que ya funciona. Es el punto de partida para cualquier sesión de trabajo (claude.ai o Claude Code).
 
+## Documentación del juego
+
+Léela al empezar cada sesión:
+- `docs/PROMPT_juego_lovecraft.md`: especificación original del juego y reglas de trabajo por hitos (plan antes de programar, verificación visual, datos antes que código). No se modifica.
+- `docs/GDD.md`: documento de diseño vivo. Recoge la especificación más las decisiones tomadas después (`D-xx`, sección 12). Si discrepa de la especificación, prevalece el GDD.
+- `docs/ROADMAP.md`: fases, criterios de aceptación, estado y decisiones que bloquean cada fase.
+
+## Estado actual
+
+*Actualizado: 24-09-2026.*
+
+- **Fase 0 (documentación y decisiones): hecha.** GDD y hoja de ruta creados. Resueltas las nueve decisiones que bloqueaban las fases 1 y 2: D-02, D-03, D-05, D-07 y D-14 a D-18.
+- **Hecho también:** entorno (Godot 4.4.1, Python 3.12), pipeline de arte verificado con una captura del Acechador, repositorio privado en GitHub.
+- **Todavía no hay código de juego:** solo el visor `scenes/preview.tscn` y los generadores de modelos.
+- **El proyecto sigue en Compatibility:** el paso a Forward+ (D-15) se hará en la fase 1.
+- **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
+- **Siguiente:** presentar el plan de la fase 1 y esperar aprobación antes de programar.
+
 ## Decisiones cerradas
 
 - **Motor:** Godot 4.4.
-- **Género:** bullet hell. El resto del diseño de juego está por concretar.
+- **Género:** bullet hell con disparo automático y progresión tipo "survivors", cooperativo local de 1 a 4 jugadores. Diseño completo en `docs/GDD.md`.
 - **Ambientación:** mitos de H. P. Lovecraft. Son de dominio público en España y la UE; solo hay que evitar el nombre comercial "Call of Cthulhu" (marca de Chaosium).
 - **Cámara:** ortográfica isométrica fija (rotación -30° en X, 45° en Y).
 - **Estilo gráfico:** voxel 3D detallado, "Minecraft mejorado", a 32 voxels por metro de juego (`VOXEL = 0.03125`).
@@ -55,8 +73,8 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Rendimiento de los generadores:** nunca buscar superficies recorriendo todo el diccionario de voxels. Hay que recorrer la columna directamente (`front()` / `top()` en `gen_acechador.py`); la versión ingenua superó los 5 minutos.
 - **Púas finas:** por debajo de ~0,5 unidades base de radio en la punta se fragmentan en puntos sueltos a esta resolución.
 - **Colores de vértice:** en estilos no voxel hubo que marcar `vertex_color_is_srgb`. En voxel los valores actuales ya están calibrados.
-- **Renderizado:** las capturas se generan con el renderizador Compatibility (OpenGL 3.3), elegido en su día para poder capturar sin GPU. En este PC corre sobre la RTX 3070 Ti. Forward+ daría niebla volumétrica y mejores sombras sobre los mismos modelos.
+- **Renderizado:** las capturas se generan con el renderizador Compatibility (OpenGL 3.3), elegido en su día para poder capturar sin GPU. En este PC corre sobre la RTX 3070 Ti. Se ha decidido pasar a Forward+ en la fase 1 (D-15) por la niebla volumétrica, las sombras y el número de luces; Compatibility queda como reserva con `--rendering-method gl_compatibility`.
 
 ## Por definir
 
-Mecánicas del bullet hell, personaje del jugador, escenarios, resto del bestiario (incluidos jefes), armas, progresión, música y sonido, plataforma de distribución.
+Las decisiones abiertas están en `docs/GDD.md` (sección 12), con la fase a la que bloquea cada una. Música y sonido solo tienen pautas sueltas (el susurro de los ataques mentales); el audio llega en la fase 8.
