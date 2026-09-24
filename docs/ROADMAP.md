@@ -16,7 +16,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | Fase | Nombre | Estado | Decisiones que la bloquean |
 |---|---|---|---|
 | 0 | Documentación y decisiones | **Hecha** (24-09-2026) | — |
-| 1 | Prototipo jugable (*vertical slice*) | Pendiente de plan y aprobación | Ninguna (D-02, D-03, D-05, D-14, D-15 y D-16, resueltas) |
+| 1 | Prototipo jugable (*vertical slice*) | **En curso** (plan aprobado) | Ninguna (D-02, D-03, D-05, D-14, D-15 y D-16, resueltas) |
 | 2 | Cooperativo local | Pendiente | Ninguna (D-03, D-07, D-16, D-17 y D-18, resueltas) |
 | 3 | Pipeline de contenido | Pendiente | D-06 |
 | 4 | Parte 1 completa | Pendiente | D-04, D-19 |
@@ -50,6 +50,20 @@ Crear `docs/GDD.md` y `docs/ROADMAP.md` a partir de la especificación, enlazarl
 - Cambio del renderizador a Forward+ y revisión del aspecto de los modelos existentes (D-15).
 
 **Aceptación:** una partida de 5 minutos jugable de principio a fin; prueba de carga con 150 enemigos y 1.000 balas medida y documentada, en Forward+ y en Compatibility como referencia.
+
+### Hitos de la fase 1
+
+Cada hito cierra con tests en verde, capturas revisadas y commit. ⏸ = parada para revisión.
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 1.1 ⏸ | Base técnica: Forward+ y entorno recalibrado, GUT, caché de mallas, capturas por tiempo, primera medición de rendimiento | Hecho, pendiente de revisión |
+| 1.2 ⏸ | Modelos nuevos: `voxlib.py`, Dyer, pingüino, fragmento, atrezo del campamento y sus animaciones | Pendiente |
+| 1.3 | Jugador, entrada y cámara: capa de entrada (teclado, mando, bot), movimiento, esquive, arena provisional | Pendiente |
+| 1.4 | Balas, daño y armas: gestor de balas, rejilla espacial, lenguaje visual de los daños, revólver y dinamita | Pendiente |
+| 1.5 | Enemigos y nivel: datos, comportamientos, oleadas por pesos, evento final del Acechador | Pendiente |
+| 1.6 | Progresión, cordura y HUD: experiencia, mejoras, parálisis, HUD del J1, muerte y reinicio, pausa | Pendiente |
+| 1.7 ⏸ | Rendimiento y cierre: prueba de carga, optimizaciones si hacen falta, partida de 5 minutos jugada por ti | Pendiente |
 
 ## Fase 2: Cooperativo local
 

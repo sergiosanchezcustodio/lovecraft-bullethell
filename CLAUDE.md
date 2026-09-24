@@ -13,12 +13,12 @@ Léela al empezar cada sesión:
 
 *Actualizado: 24-09-2026.*
 
-- **Fase 0 (documentación y decisiones): hecha.** GDD y hoja de ruta creados. Resueltas las nueve decisiones que bloqueaban las fases 1 y 2: D-02, D-03, D-05, D-07 y D-14 a D-18.
-- **Hecho también:** entorno (Godot 4.4.1, Python 3.12), pipeline de arte verificado con una captura del Acechador, repositorio privado en GitHub.
-- **Todavía no hay código de juego:** solo el visor `scenes/preview.tscn` y los generadores de modelos.
-- **El proyecto sigue en Compatibility:** el paso a Forward+ (D-15) se hará en la fase 1.
+- **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
+- **Fase 1: en curso**, con el plan aprobado (subhitos en `docs/ROADMAP.md`).
+  - **Hito 1.1 (base técnica): hecho**, pendiente de tu revisión visual. El proyecto ya usa Forward+ con el entorno recalibrado; GUT 9.4.0 instalado con los primeros tests; caché de mallas en `VoxelBuilder`; capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`). Primera medición en `docs/RENDIMIENTO.md`.
+  - **Siguiente: hito 1.2**, los modelos nuevos (Dyer, pingüino, fragmento y atrezo del campamento).
+- **Todavía no hay código de juego:** solo el visor, la escena de rendimiento y los generadores de modelos.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
-- **Siguiente:** presentar el plan de la fase 1 y esperar aprobación antes de programar.
 
 ## Decisiones cerradas
 
@@ -38,7 +38,7 @@ Léela al empezar cada sesión:
 
 1. **Generador en Python** (`tools/`): construye el personaje como un conjunto de voxels a partir de primitivas (elipsoides, cápsulas, conos), luego colorea (degradado dorsal/flanco/vientre, escamas, manchas por ruido) y talla detalles sobre la superficie real (boca, dientes, ojos, agallas, cresta).
 2. **Salida JSON** (`models/*.json`): `voxels` = lista de `[x, y, z, parte, r, g, b, glow]` y `pivots` = pivote por parte, en coordenadas voxel.
-3. **`scripts/voxel_builder.gd`**: convierte el JSON en mallas con eliminación de caras ocultas y oclusión ambiental por vértice. Crea un nodo por parte con su pivote (`torso`, `head`, `arm_l`, `arm_r`, `leg_l`, `leg_r`) y separa los voxels `glow=1` en una capa sin sombreado (ojos, bioluminiscencia, brillos).
+3. **`scripts/voxel_builder.gd`**: convierte el JSON en mallas con eliminación de caras ocultas y oclusión ambiental por vértice. Crea un nodo por parte con su pivote (`torso`, `head`, `arm_l`, `arm_r`, `leg_l`, `leg_r`) y separa los voxels `glow=1` en una capa sin sombreado (ojos, bioluminiscencia, brillos). Las mallas se construyen una vez por modelo y todas las instancias las comparten; la primera construcción del Acechador tarda unos 200 ms.
 4. **Animación:** rotando los nodos-parte desde código (sin rigging). Ejemplos en `scripts/preview.gd`: `_animate` (andar), `_idle` (acecho) y `_pounce` (salto de ataque).
 
 Entorno de desarrollo (Windows 11 + Git Bash):
@@ -50,11 +50,18 @@ Uso desde la raíz del proyecto, en Git Bash:
 ```
 python tools/gen_acechador.py       # regenera models/acechador.json
 python tools/gen_variantes.py       # regenera clasico, bruto, acechador (versión simple) y abisal
-godot --headless --path . --import                # reconstruye la caché de .godot/ (primera vez o tras borrarla)
+godot --headless --path . --import                # reconstruye la caché de .godot/ (primera vez, tras borrarla o al crear un class_name)
 godot --path . -- still <yaw> <modelo>            # captura en shots/<modelo>_<yaw>.png
 godot --path . -- anim <yaw> <modelo> <idle|pounce|walk>
 godot --path . -- still 0 lineup                  # los cuatro juntos
+godot --path . -- still 0 lineup fog_density=0.03 moon.light_energy=0.6 tag=prueba   # ajustes de entorno y luces al vuelo
+godot --headless --path . -s addons/gut/gut_cmdln.gd                                 # tests (GUT 9.4.0, configuración en .gutconfig.json)
+godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count=150 model=acechador   # rendimiento (docs/RENDIMIENTO.md)
 ```
+- **Capturas:** van a `shots/`, que Godot ignora (`.gdignore`) y git también. Añade `--rendering-method gl_compatibility` a cualquier comando para usar el renderizador de reserva.
+- **Argumentos:** las escenas leen lo que va detrás de `--` con `LaunchArgs` (`scripts/core/launch_args.gd`): posicionales, `clave=valor` y banderas `--clave`.
+- **Encadenar comandos:** un `godot ... | grep error` devuelve 1 cuando no hay errores, así que no lo encadenes con `&&`.
+
 Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobrescribiría el detallado. Ejecuta `gen_acechador.py` después, o renombra la salida.
 
 ## Bestiario actual
@@ -72,8 +79,11 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Caché de clases:** si se borra `.godot/`, hay que ejecutar `godot --headless --path . --import` antes de lanzar; si no, `VoxelBuilder` aparece como no declarado.
 - **Rendimiento de los generadores:** nunca buscar superficies recorriendo todo el diccionario de voxels. Hay que recorrer la columna directamente (`front()` / `top()` en `gen_acechador.py`); la versión ingenua superó los 5 minutos.
 - **Púas finas:** por debajo de ~0,5 unidades base de radio en la punta se fragmentan en puntos sueltos a esta resolución.
-- **Colores de vértice:** en estilos no voxel hubo que marcar `vertex_color_is_srgb`. En voxel los valores actuales ya están calibrados.
-- **Renderizado:** las capturas se generan con el renderizador Compatibility (OpenGL 3.3), elegido en su día para poder capturar sin GPU. En este PC corre sobre la RTX 3070 Ti. Se ha decidido pasar a Forward+ en la fase 1 (D-15) por la niebla volumétrica, las sombras y el número de luces; Compatibility queda como reserva con `--rendering-method gl_compatibility`.
+- **Colores de vértice:** los colores de los modelos se calibraron en Compatibility, que no convierte sRGB a lineal. En Forward+ hay que marcar `vertex_color_is_srgb`, o todo sale el doble de claro y lavado. `VoxelBuilder.colors_are_srgb()` lo decide según el renderizador; úsalo en cualquier material con colores de vértice.
+- **Renderizado:** el juego usa Forward+ (D-15). Compatibility queda como reserva con `--rendering-method gl_compatibility`. El entorno sale de `Atmosphere.make_environment()`, que tiene valores distintos por renderizador:
+  - En Forward+, Filmic levanta los negros y lava los colores. ACES con exposición 1,6, sin bloom y con niebla de 0,02 reproduce el aspecto aprobado.
+  - Con 150 modelos, Forward+ rinde el doble que Compatibility (`docs/RENDIMIENTO.md`).
+- **Niebla volumétrica y cámara ortográfica:** la niebla volumétrica global no sirve con nuestra cámara. Solo oscurece la escena y no dispersa la luz de los faroles, una limitación conocida de Godot con cámaras cenitales u ortográficas. Queda por probar con volúmenes de niebla locales (`FogVolume`) en el hito 1.3.
 
 ## Por definir
 

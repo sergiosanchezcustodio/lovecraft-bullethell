@@ -9,9 +9,16 @@ var yaw := 0.0
 var mname := "clasico"
 var anim_kind := "walk"
 var nframes := 24
+var tag := ""   # sufijo del nombre de captura (opción tag=...)
 
 func _ready() -> void:
-	var args := OS.get_cmdline_user_args()
+	# Argumentos posicionales + opciones clave=valor para ajustar entorno y luces
+	# (p. ej. fog_density=0.02, moon.light_energy=0.6, tag=prueba)
+	var args: Array[String] = []
+	var opts := {}
+	for a in OS.get_cmdline_user_args():
+		if "=" in a: opts[a.get_slice("=", 0)] = a.get_slice("=", 1)
+		else: args.append(a)
 	if args.size() > 0: mode = args[0]
 	if args.size() > 1: yaw = float(args[1])
 	if args.size() > 2: mname = args[2]
@@ -19,19 +26,7 @@ func _ready() -> void:
 	if anim_kind == "pounce": nframes = 36
 	if anim_kind == "idle": nframes = 32
 	# Entorno
-	var env := Environment.new()
-	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color(0.03, 0.04, 0.05)
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.35, 0.4, 0.45)
-	env.ambient_light_energy = 0.35
-	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	env.glow_enabled = true
-	env.glow_intensity = 0.9
-	env.glow_bloom = 0.05
-	env.fog_enabled = true
-	env.fog_light_color = Color(0.05, 0.09, 0.09)
-	env.fog_density = 0.04
+	var env := Atmosphere.make_environment()
 	var we := WorldEnvironment.new(); we.environment = env; add_child(we)
 	# Cámara isométrica ortográfica
 	var cam := Camera3D.new()
@@ -55,6 +50,15 @@ func _ready() -> void:
 	rim.position = Vector3(-1.2, 2.2, -1.5); rim.light_color = Color(0.4, 0.95, 0.75)
 	rim.light_energy = 1.2; rim.omni_range = 4.0
 	add_child(rim)
+	var targets := {"moon": moon, "lamp": lamp, "rim": rim}
+	for k: String in opts:
+		if k == "tag": tag = "_" + opts[k]; continue
+		var obj: Object = env
+		var prop := k
+		if "." in k:
+			obj = targets[k.get_slice(".", 0)]
+			prop = k.get_slice(".", 1)
+		obj.set(prop, str_to_var(opts[k]))
 	# Suelo: losas húmedas voxel
 	_floor()
 	if mname == "lineup":
@@ -81,6 +85,7 @@ func _ready() -> void:
 func _floor() -> void:
 	var rng := RandomNumberGenerator.new(); rng.seed = 3
 	var mat := StandardMaterial3D.new(); mat.vertex_color_use_as_albedo = true; mat.roughness = 0.3
+	mat.vertex_color_is_srgb = VoxelBuilder.colors_are_srgb()
 	var st := SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var tile := 0.5
 	for i in range(-9, 9):
@@ -113,7 +118,7 @@ func _process(delta: float) -> void:
 	else:
 		if frame == 8:
 			await RenderingServer.frame_post_draw
-			get_viewport().get_texture().get_image().save_png("res://shots/%s_%d.png" % [mname, int(yaw)])
+			get_viewport().get_texture().get_image().save_png("res://shots/%s_%d%s.png" % [mname, int(yaw), tag])
 			get_tree().quit()
 
 func _animate(time: float) -> void:

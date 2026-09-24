@@ -13,42 +13,79 @@ const FACES := [
 	[Vector3i(0,0,-1), [Vector3(0,0,0),Vector3(0,1,0),Vector3(1,1,0),Vector3(1,0,0)]],
 ]
 
+## Mallas ya construidas por ruta de modelo: todas las instancias de un modelo
+## comparten mallas y materiales, y cada JSON se procesa una sola vez.
+static var _cache := {}
+static var _mat: StandardMaterial3D
+static var _glow_mat: StandardMaterial3D
+
+## Devuelve una instancia nueva del modelo: un nodo por parte con su pivote.
 static func load_model(path: String) -> Node3D:
+	var model: Dictionary = _get_model(path)
+	var root := Node3D.new()
+	root.name = path.get_file().get_basename()
+	root.set_meta("pivots", model.pivots)
+	for layer: Dictionary in model.layers:
+		var pname: String = layer.part
+		var pivot_node: Node3D = root.get_node_or_null(pname)
+		if pivot_node == null:
+			pivot_node = Node3D.new()
+			pivot_node.name = pname
+			pivot_node.position = layer.pivot * VOXEL
+			root.add_child(pivot_node)
+		var mi := MeshInstance3D.new()
+		mi.mesh = layer.mesh
+		mi.material_override = _glow_mat if layer.glow else _mat
+		pivot_node.add_child(mi)
+	return root
+
+static func is_cached(path: String) -> bool:
+	return _cache.has(path)
+
+static func clear_cache() -> void:
+	_cache.clear()
+
+static func _get_model(path: String) -> Dictionary:
+	if _cache.has(path): return _cache[path]
+	_ensure_materials()
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
 	var all := {}            # ocupación global -> AO y cullado entre partes
 	var parts := {}          # nombre -> Array de [pos, color]
-	for v in data.voxels:
+	for v: Array in data.voxels:
 		var p := Vector3i(int(v[0]), int(v[1]), int(v[2]))
 		all[p] = true
 		var key: String = v[3] + ("#glow" if v.size() > 7 and v[7] == 1 else "")
 		if not parts.has(key): parts[key] = []
 		parts[key].append([p, Color(v[4], v[5], v[6])])
-	var root := Node3D.new()
-	root.name = "Profundo"
-	root.set_meta("pivots", data.pivots)
-	var mat := StandardMaterial3D.new()
-	mat.vertex_color_use_as_albedo = true
-	mat.roughness = 0.38   # piel húmeda
-	mat.metallic_specular = 0.6
-	var glow_mat := StandardMaterial3D.new()
-	glow_mat.vertex_color_use_as_albedo = true
-	glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	var keys := parts.keys()
 	keys.sort()   # partes base antes que sus capas "#glow"
-	for key in keys:
-		var pname: String = key.split("#")[0]
-		var pivot := Vector3(data.pivots[pname][0], data.pivots[pname][1], data.pivots[pname][2])
-		var pivot_node: Node3D = root.get_node_or_null(pname)
-		if pivot_node == null:
-			pivot_node = Node3D.new()
-			pivot_node.name = pname
-			pivot_node.position = pivot * VOXEL
-			root.add_child(pivot_node)
-		var mi := MeshInstance3D.new()
-		mi.mesh = _build(parts[key], all, pivot)
-		mi.material_override = glow_mat if key.ends_with("#glow") else mat
-		pivot_node.add_child(mi)
-	return root
+	var layers: Array[Dictionary] = []
+	for key: String in keys:
+		var pname := key.get_slice("#", 0)
+		var pv: Array = data.pivots[pname]
+		var pivot := Vector3(pv[0], pv[1], pv[2])
+		layers.append({"part": pname, "pivot": pivot, "glow": key.ends_with("#glow"),
+			"mesh": _build(parts[key], all, pivot)})
+	var model := {"pivots": data.pivots, "layers": layers}
+	_cache[path] = model
+	return model
+
+static func _ensure_materials() -> void:
+	if _mat != null: return
+	_mat = StandardMaterial3D.new()
+	_mat.vertex_color_use_as_albedo = true
+	_mat.vertex_color_is_srgb = colors_are_srgb()
+	_mat.roughness = 0.38   # piel húmeda
+	_mat.metallic_specular = 0.6
+	_glow_mat = StandardMaterial3D.new()
+	_glow_mat.vertex_color_use_as_albedo = true
+	_glow_mat.vertex_color_is_srgb = colors_are_srgb()
+	_glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+
+## Los colores de los modelos se calibraron en Compatibility, que no convierte
+## sRGB a lineal. En Forward+ hay que declararlos sRGB para que se vean igual.
+static func colors_are_srgb() -> bool:
+	return RenderingServer.get_current_rendering_method() != "gl_compatibility"
 
 static func _build(voxels: Array, all: Dictionary, pivot: Vector3) -> ArrayMesh:
 	var st := SurfaceTool.new()

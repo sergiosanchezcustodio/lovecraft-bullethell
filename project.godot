@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Lovecraft Bullet Hell"
 run/main_scene="res://scenes/preview.tscn"
-config/features=PackedStringArray("4.4")
+config/features=PackedStringArray("4.4", "Forward Plus")
 
 [display]
 
@@ -21,5 +21,9 @@ window/size/viewport_height=1000
 
 [rendering]
 
-renderer/rendering_method="gl_compatibility"
+renderer/rendering_method="forward_plus"
 anti_aliasing/quality/msaa_3d=2
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")

@@ -1,3 +1,5 @@
 .godot/
-shots/*.png
+shots/**
+!shots/.gitkeep
+!shots/.gdignore
 __pycache__/
