@@ -57,8 +57,8 @@ Cada hito cierra con tests en verde, capturas revisadas y commit. ⏸ = parada p
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 1.1 ⏸ | Base técnica: Forward+ y entorno recalibrado, GUT, caché de mallas, capturas por tiempo, primera medición de rendimiento | Hecho, pendiente de revisión |
-| 1.2 ⏸ | Modelos nuevos: `voxlib.py`, Dyer, pingüino, fragmento, atrezo del campamento y sus animaciones | Pendiente |
+| 1.1 ⏸ | Base técnica: Forward+ y entorno recalibrado, GUT, caché de mallas, capturas por tiempo, primera medición de rendimiento | **Hecho y aprobado** |
+| 1.2 ⏸ | Modelos nuevos: `voxlib.py`, Dyer, pingüino, fragmento, atrezo del campamento y sus animaciones | Hecho, pendiente de revisión |
 | 1.3 | Jugador, entrada y cámara: capa de entrada (teclado, mando, bot), movimiento, esquive, arena provisional | Pendiente |
 | 1.4 | Balas, daño y armas: gestor de balas, rejilla espacial, lenguaje visual de los daños, revólver y dinamita | Pendiente |
 | 1.5 | Enemigos y nivel: datos, comportamientos, oleadas por pesos, evento final del Acechador | Pendiente |

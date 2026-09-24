@@ -24,3 +24,16 @@ Opciones: `count`, `model` (lista separada por comas), `secs`, `warmup`, `anim=f
 - **Forward+ rinde el doble que Compatibility** con el mismo contenido. Agrupa automáticamente las instancias que comparten malla, y por eso hace muchas menos llamadas de dibujo.
 - **El cuello de botella es la GPU, por la cantidad de triángulos:** unos 70.000 por Acechador contando las pasadas de sombra. En una GPU de gama media, varias veces más lenta que esta, los 4,4 ms podrían acercarse al límite de 16,7 ms de los 60 FPS cuando se sumen balas y escenario.
 - **La fusión de caras (optimización 1) servirá poco con los modelos actuales:** los generadores añaden un ruido de color distinto a cada voxel, y dos caras vecinas casi nunca comparten color.
+
+## Hito 1.2: horda de pingüinos y fragmentos (24-09-2026)
+
+Misma escena, ahora animada con `Anims.pose(..., "walk", ...)`: 75 pingüinos (8.600 voxels) y 75 fragmentos (9.500 voxels), mezclados.
+
+| Contenido | Media | 1 % peor | GPU | CPU de render | Llamadas de dibujo | Primitivas |
+|---|---|---|---|---|---|---|
+| 150 pingüinos y fragmentos | 4,43 ms (226 FPS) | 5,57 ms (180 FPS) | 2,26 ms | 1,12 ms | 564 | 4,2 M |
+| 150 Acechadores (referencia, con `Anims`) | 4,97 ms (201 FPS) | 7,43 ms (135 FPS) | 4,21 ms | 1,36 ms | 551 | 10,9 M |
+
+- **Las criaturas de horda cuestan la mitad de GPU** que el Acechador: unos 28.000 triángulos cada una contando sombras, frente a 70.000.
+- **Con la horda, el límite pasa a la CPU.** La GPU tarda 2,3 ms, pero el fotograma completo tarda 4,4 ms: pesa más animar 150 modelos en GDScript (`Anims.reset` más `pose` en cada fotograma) que dibujarlos. Primer candidato a optimizar en el hito 1.7: guardar en caché las posiciones de reposo y no reponer las partes que la animación no toca.
+- **Construcción de mallas:** 83 ms el pingüino y 86 ms el fragmento, una vez por modelo.

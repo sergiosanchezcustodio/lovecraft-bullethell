@@ -15,8 +15,9 @@ Léela al empezar cada sesión:
 
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: en curso**, con el plan aprobado (subhitos en `docs/ROADMAP.md`).
-  - **Hito 1.1 (base técnica): hecho**, pendiente de tu revisión visual. El proyecto ya usa Forward+ con el entorno recalibrado; GUT 9.4.0 instalado con los primeros tests; caché de mallas en `VoxelBuilder`; capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`). Primera medición en `docs/RENDIMIENTO.md`.
-  - **Siguiente: hito 1.2**, los modelos nuevos (Dyer, pingüino, fragmento y atrezo del campamento).
+  - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
+  - **Hito 1.2 (modelos nuevos): hecho, pendiente de tu revisión de arte.** Dyer, pingüino albino ciego, fragmento protoplásmico y atrezo del campamento, con sus animaciones en `scripts/anim/`. Hojas de revisión en `shots/revision_1_2_modelos.png` y `shots/revision_1_2_animaciones.png` (se regeneran; `shots/` no va a git).
+  - **Siguiente: hito 1.3**, jugador, entrada, cámara y arena provisional.
 - **Todavía no hay código de juego:** solo el visor, la escena de rendimiento y los generadores de modelos.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
@@ -36,10 +37,16 @@ Léela al empezar cada sesión:
 
 ## Pipeline de arte
 
-1. **Generador en Python** (`tools/`): construye el personaje como un conjunto de voxels a partir de primitivas (elipsoides, cápsulas, conos), luego colorea (degradado dorsal/flanco/vientre, escamas, manchas por ruido) y talla detalles sobre la superficie real (boca, dientes, ojos, agallas, cresta).
-2. **Salida JSON** (`models/*.json`): `voxels` = lista de `[x, y, z, parte, r, g, b, glow]` y `pivots` = pivote por parte, en coordenadas voxel.
+1. **Generador en Python** (`tools/`): construye el personaje como un conjunto de voxels a partir de primitivas (elipsoides, cápsulas, conos), luego colorea (degradado dorsal/flanco/vientre, escamas, manchas por ruido) y talla detalles sobre la superficie real (boca, dientes, ojos, agallas, cresta). Los generadores nuevos usan **`tools/voxlib.py`**:
+   - Clase `Model` con las primitivas (`ell`, `sell`, `capsule`, `cone`, `box`, `line`), búsqueda de superficie por columna (`front`, `top`, `exposed`), ruido y `export`.
+   - Se modela en unidades base (1 ub = 1/16 m) y la resolución es el parámetro `S`: 2 voxels por ub = 32 voxels/m.
+   - El superelipsoide `sell` (p≈2,5–3) da caras planas para ropa, madera y piedra.
+2. **Salida JSON** (`models/*.json`): `voxels` = lista de `[x, y, z, parte, r, g, b, glow]`, `pivots` = pivote por parte, en coordenadas voxel, y `voxel_size` (metros por voxel, opcional; por defecto 1/32). Un pivote sin voxels, como `light` en el farol, sirve para marcar puntos.
 3. **`scripts/voxel_builder.gd`**: convierte el JSON en mallas con eliminación de caras ocultas y oclusión ambiental por vértice. Crea un nodo por parte con su pivote (`torso`, `head`, `arm_l`, `arm_r`, `leg_l`, `leg_r`) y separa los voxels `glow=1` en una capa sin sombreado (ojos, bioluminiscencia, brillos). Las mallas se construyen una vez por modelo y todas las instancias las comparten; la primera construcción del Acechador tarda unos 200 ms.
-4. **Animación:** rotando los nodos-parte desde código (sin rigging). Ejemplos en `scripts/preview.gd`: `_animate` (andar), `_idle` (acecho) y `_pounce` (salto de ataque).
+4. **Animación:** rotando los nodos-parte desde código (sin rigging).
+   - Cada tipo de modelo tiene su script en `scripts/anim/` (`anim_profundo`, `anim_humano`, `anim_pinguino`, `anim_fragmento`), con funciones estáticas por animación y la constante `DURATION`.
+   - Se aplican con `Anims.pose(modelo, animación, nodo, t)`, con t de 0 a 1. `Anims.reset()` devuelve todas las partes al reposo, incluida la raíz del modelo.
+   - Por eso el giro y la posición de un modelo van siempre en un nodo contenedor, nunca en la raíz.
 
 Entorno de desarrollo (Windows 11 + Git Bash):
 - **Godot 4.4.1** en `C:\Tools\Godot\`. El comando `godot` ejecuta `Godot_v4.4.1-stable_win64_console.exe`, para que la salida aparezca en la terminal. En Git Bash lo resuelve el lanzador `~/bin/godot`; en PowerShell y cmd, `C:\Tools\Godot\godot.cmd` (la carpeta está en el PATH de usuario).
@@ -50,10 +57,13 @@ Uso desde la raíz del proyecto, en Git Bash:
 ```
 python tools/gen_acechador.py       # regenera models/acechador.json
 python tools/gen_variantes.py       # regenera clasico, bruto, acechador (versión simple) y abisal
+python tools/gen_dyer.py            # Dyer (personaje jugable); igual gen_pinguino.py y gen_fragmento.py
+python tools/gen_atrezo_campamento.py   # models/atrezo_{tienda,caja,bidon,farol,roca,hielo}.json
 godot --headless --path . --import                # reconstruye la caché de .godot/ (primera vez, tras borrarla o al crear un class_name)
-godot --path . -- still <yaw> <modelo>            # captura en shots/<modelo>_<yaw>.png
-godot --path . -- anim <yaw> <modelo> <idle|pounce|walk>
-godot --path . -- still 0 lineup                  # los cuatro juntos
+godot --path . -- still <yaw> <modelo>            # captura en shots/<modelo>_<yaw>.png (encuadre automático)
+godot --path . -- anim <yaw> <modelo> <animación>  # fotogramas en shots/<modelo>_<animación>_NNN.png
+godot --path . -- still 0 lineup                  # los cuatro profundos juntos
+godot --path . -- still 0 dyer,pinguino,fragmento,acechador   # cualquier grupo, separado por comas
 godot --path . -- still 0 lineup fog_density=0.03 moon.light_energy=0.6 tag=prueba   # ajustes de entorno y luces al vuelo
 godot --headless --path . -s addons/gut/gut_cmdln.gd                                 # tests (GUT 9.4.0, configuración en .gutconfig.json)
 godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count=150 model=acechador   # rendimiento (docs/RENDIMIENTO.md)
@@ -64,10 +74,18 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
 
 Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobrescribiría el detallado. Ejecuta `gen_acechador.py` después, o renombra la salida.
 
+## Personajes jugables modelados
+
+| Personaje | Estado | Concepto |
+|---|---|---|
+| **William Dyer** | Hito 1.2 (`gen_dyer.py`), 5.500 voxels | Parka de lona con capucha forrada de piel, cara con barba y gafas de nieve en la frente, bufanda roja, cinturón con martillo de geólogo y cartuchos de dinamita, zurrón y botas de piel. Animaciones: reposo, andar, esquive y lanzar. |
+
 ## Bestiario actual
 
 | Enemigo | Estado | Concepto |
 |---|---|---|
+| **Pingüino albino ciego** | Hito 1.2 (`gen_pinguino.py`), 8.600 voxels | 1,5 m, plumaje blanco frío, cuencas vacías de piel rosada, pico pesado y curvado, aletas con punta rosada. Animaciones: reposo (escucha), andar bamboleándose y carga con picotazo. |
+| **Fragmento protoplásmico** | Hito 1.2 (`gen_fragmento.py`), 9.500 voxels | Masa negra iridiscente con brillos verdes y violetas, seis ojos verdosos brillantes, boca que silba y dos pseudópodos. Partes: `body`, `top`, `pod_l`, `pod_r`. Animaciones: reposo, reptar y ráfaga. |
 | **Acechador** | Elegido y detallado (`gen_acechador.py`) | Agazapado como rana, manos apoyadas delante, ojos enormes arriba con pupila de rendija, colmillos entrelazados, cresta de púas color hueso con membrana, agallas en volante. Animaciones de acecho y salto. |
 | Clásico | Prototipo | Hombre-pez escuálido y encorvado, ojos amarillentos laterales, púas dorsales. |
 | Bruto | Prototipo | Masivo, mandíbula enorme con boca caída, ojos pequeños bajo el ceño, verrugas. Candidato a tanque o mini-jefe. |
@@ -83,6 +101,10 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Renderizado:** el juego usa Forward+ (D-15). Compatibility queda como reserva con `--rendering-method gl_compatibility`. El entorno sale de `Atmosphere.make_environment()`, que tiene valores distintos por renderizador:
   - En Forward+, Filmic levanta los negros y lava los colores. ACES con exposición 1,6, sin bloom y con niebla de 0,02 reproduce el aspecto aprobado.
   - Con 150 modelos, Forward+ rinde el doble que Compatibility (`docs/RENDIMIENTO.md`).
+- **Superficies escalonadas:** los elipsoides grandes dejan un escalón en cada capa de voxels, y la luz cenital los convierte en motas. Para ropa, madera y piedra usa `sell` (superelipsoide), que da caras planas.
+- **Detalles que apuntan a la cámara:** en vista isométrica, lo que apunta justo hacia la cámara desaparece en la proyección (el pico del pingüino de frente). Comprueba cada modelo a varios giros.
+- **Ojos brillantes:** una esfera `glow` dentro de un párpado oscuro tiene que asomar lo suficiente (desplazada ~0,75 ub hacia fuera), o solo se ven motas sueltas.
+- **Rutas en Python desde Git Bash:** las rutas `/c/...` solo se traducen cuando van como argumento. Dentro del código Python usa `C:/...`.
 - **Niebla volumétrica y cámara ortográfica:** la niebla volumétrica global no sirve con nuestra cámara. Solo oscurece la escena y no dispersa la luz de los faroles, una limitación conocida de Godot con cámaras cenitales u ortográficas. Queda por probar con volúmenes de niebla locales (`FogVolume`) en el hito 1.3.
 
 ## Por definir

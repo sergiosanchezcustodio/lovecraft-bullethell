@@ -4,6 +4,7 @@ extends Node3D
 ## Opciones: count, model (lista separada por comas), secs, warmup, anim (true/false), shot (true/false)
 
 var models: Array[Node3D] = []
+var model_names: Array[String] = []
 var args: LaunchArgs
 var _t := 0.0
 var _frames_usec: Array[int] = []
@@ -35,12 +36,16 @@ func _ready() -> void:
 	var spacing := 1.7
 	var rows := int(ceil(count / float(cols)))
 	for i in count:
-		var m := VoxelBuilder.load_model("res://models/%s.json" % names[i % names.size()])
-		m.position = Vector3((i % cols - (cols - 1) * 0.5) * spacing, 0, (i / cols - (rows - 1) * 0.5) * spacing)
-		m.rotation.y = randf() * TAU
+		var n: String = names[i % names.size()]
+		var m := VoxelBuilder.load_model("res://models/%s.json" % n)
+		var holder := Node3D.new()   # el giro y la posición van en el contenedor; Anims toca el modelo
+		holder.position = Vector3((i % cols - (cols - 1) * 0.5) * spacing, 0, (i / cols - (rows - 1) * 0.5) * spacing)
+		holder.rotation.y = randf() * TAU
+		holder.add_child(m)
 		m.set_meta("phase", randf())
-		add_child(m)
+		add_child(holder)
 		models.append(m)
+		model_names.append(n)
 	# Suelo, luces y cámara isométrica que encuadra toda la rejilla
 	var floor_mi := MeshInstance3D.new()
 	var pm := PlaneMesh.new(); pm.size = Vector2(cols * spacing + 6, rows * spacing + 6); floor_mi.mesh = pm
@@ -70,13 +75,10 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_t += delta
 	if _animate:
-		for m in models:
-			var w: float = (_t + float(m.get_meta("phase"))) * TAU
-			m.get_node("head").rotation.y = sin(w * 0.5) * 0.3
-			m.get_node("arm_l").rotation.x = sin(w) * 0.2
-			m.get_node("arm_r").rotation.x = -sin(w) * 0.2
-			m.get_node("leg_l").rotation.x = -sin(w) * 0.2
-			m.get_node("leg_r").rotation.x = sin(w) * 0.2
+		for i in models.size():
+			var n := model_names[i]
+			var ph := fposmod(_t / Anims.duration(n, "walk") + float(models[i].get_meta("phase")), 1.0)
+			Anims.pose(n, "walk", models[i], ph)
 	var now := Time.get_ticks_usec()
 	if _t > _warmup and _last_usec > 0:
 		_frames_usec.append(now - _last_usec)

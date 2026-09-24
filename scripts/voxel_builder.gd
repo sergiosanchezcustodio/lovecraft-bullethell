@@ -25,13 +25,14 @@ static func load_model(path: String) -> Node3D:
 	var root := Node3D.new()
 	root.name = path.get_file().get_basename()
 	root.set_meta("pivots", model.pivots)
+	root.set_meta("voxel_size", model.voxel_size)
 	for layer: Dictionary in model.layers:
 		var pname: String = layer.part
 		var pivot_node: Node3D = root.get_node_or_null(pname)
 		if pivot_node == null:
 			pivot_node = Node3D.new()
 			pivot_node.name = pname
-			pivot_node.position = layer.pivot * VOXEL
+			pivot_node.position = layer.pivot * model.voxel_size
 			root.add_child(pivot_node)
 		var mi := MeshInstance3D.new()
 		mi.mesh = layer.mesh
@@ -59,14 +60,15 @@ static func _get_model(path: String) -> Dictionary:
 		parts[key].append([p, Color(v[4], v[5], v[6])])
 	var keys := parts.keys()
 	keys.sort()   # partes base antes que sus capas "#glow"
+	var vs: float = data.get("voxel_size", VOXEL)   # escala propia por modelo (jefes colosales, LOD)
 	var layers: Array[Dictionary] = []
 	for key: String in keys:
 		var pname := key.get_slice("#", 0)
 		var pv: Array = data.pivots[pname]
 		var pivot := Vector3(pv[0], pv[1], pv[2])
 		layers.append({"part": pname, "pivot": pivot, "glow": key.ends_with("#glow"),
-			"mesh": _build(parts[key], all, pivot)})
-	var model := {"pivots": data.pivots, "layers": layers}
+			"mesh": _build(parts[key], all, pivot, vs)})
+	var model := {"pivots": data.pivots, "layers": layers, "voxel_size": vs}
 	_cache[path] = model
 	return model
 
@@ -87,7 +89,7 @@ static func _ensure_materials() -> void:
 static func colors_are_srgb() -> bool:
 	return RenderingServer.get_current_rendering_method() != "gl_compatibility"
 
-static func _build(voxels: Array, all: Dictionary, pivot: Vector3) -> ArrayMesh:
+static func _build(voxels: Array, all: Dictionary, pivot: Vector3, vs: float) -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for item in voxels:
@@ -106,7 +108,7 @@ static func _build(voxels: Array, all: Dictionary, pivot: Vector3) -> ArrayMesh:
 			for i in idx:
 				st.set_normal(Vector3(n))
 				st.set_color(col * shades[i])
-				st.add_vertex((Vector3(p) + corners[i] - pivot) * VOXEL)
+				st.add_vertex((Vector3(p) + corners[i] - pivot) * vs)
 	return st.commit()
 
 static func _ao(p: Vector3i, n: Vector3i, corner: Vector3, all: Dictionary) -> float:
