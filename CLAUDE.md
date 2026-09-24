@@ -24,7 +24,7 @@ Documento de contexto del proyecto. Recoge las decisiones tomadas en la fase de 
 4. **Animación:** rotando los nodos-parte desde código (sin rigging). Ejemplos en `scripts/preview.gd`: `_animate` (andar), `_idle` (acecho) y `_pounce` (salto de ataque).
 
 Entorno de desarrollo (Windows 11 + Git Bash):
-- **Godot 4.4.1** en `C:\Tools\Godot\`. El comando `godot` es un lanzador en `~/bin/godot` (ya en el PATH de Git Bash) que ejecuta `Godot_v4.4.1-stable_win64_console.exe`, para que la salida aparezca en la terminal. Desde PowerShell no existe `godot`: usa Git Bash o la ruta completa del `.exe`.
+- **Godot 4.4.1** en `C:\Tools\Godot\`. El comando `godot` ejecuta `Godot_v4.4.1-stable_win64_console.exe`, para que la salida aparezca en la terminal. En Git Bash lo resuelve el lanzador `~/bin/godot`; en PowerShell y cmd, `C:\Tools\Godot\godot.cmd` (la carpeta está en el PATH de usuario).
 - **Python 3.12** como `python`. En Windows, `python3` abre la Microsoft Store en lugar de ejecutar el script.
 - No hace falta xvfb: las capturas abren una ventana un momento y se cierran solas.
 
