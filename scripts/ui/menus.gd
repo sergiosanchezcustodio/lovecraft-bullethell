@@ -6,12 +6,16 @@ extends RefCounted
 
 
 ## Subida de nivel: tres tarjetas; se elige con las flechas o la cruceta y
-## confirmar (Intro / A), con las teclas 1-3 o con el ratón.
+## confirmar (Intro / A), con las teclas 1-3 o con el ratón. Durante el primer medio
+## segundo no acepta pulsaciones, para no elegir sin querer mientras se esquiva o se
+## dispara a la carrera.
 class LevelUpMenu extends CanvasLayer:
 	signal chosen(option: PlayerProgress.Option)
 	var options: Array[PlayerProgress.Option] = []
 	var title := ""
 	var _buttons: Array[Button] = []
+	var _ready_to_pick := false
+	const INPUT_DELAY := 0.5
 
 	func _init(p_options: Array[PlayerProgress.Option], p_title: String) -> void:
 		options = p_options
@@ -48,7 +52,11 @@ class LevelUpMenu extends CanvasLayer:
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(hint)
 		box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
-		if not _buttons.is_empty(): _buttons[0].grab_focus.call_deferred()
+		for b in _buttons: b.disabled = true
+		get_tree().create_timer(INPUT_DELAY, true, false, true).timeout.connect(func() -> void:
+			_ready_to_pick = true
+			for b in _buttons: b.disabled = false
+			if not _buttons.is_empty(): _buttons[0].grab_focus())
 
 	func _accent(o: PlayerProgress.Option) -> Color:
 		match o.kind:
@@ -65,11 +73,13 @@ class LevelUpMenu extends CanvasLayer:
 	func _unhandled_input(event: InputEvent) -> void:
 		if event is InputEventKey and event.pressed and not event.echo:
 			var k := (event as InputEventKey).keycode
-			if k >= KEY_1 and k <= KEY_3 and k - KEY_1 < options.size():
+			if _ready_to_pick and k >= KEY_1 and k <= KEY_3 and k - KEY_1 < options.size():
 				_pick(k - KEY_1)
 				get_viewport().set_input_as_handled()
 
 	func _pick(i: int) -> void:
+		if not _ready_to_pick: return
+		_ready_to_pick = false
 		chosen.emit(options[i])
 		queue_free()
 

@@ -126,6 +126,7 @@ Todas las acciones se pueden reasignar desde el menú de opciones.
 ## 4. Mecánicas
 
 ### 4.1 Núcleo
+- **Disparo continuo:** el personaje siempre está disparando. Sin ningún enemigo a tiro, cada arma dispara hacia donde mira el personaje.
 - **Disparo automático (D-05):** cada arma dispara sola según su cadencia y patrón, y define en sus datos cómo elige objetivo: el enemigo más cercano, la zona más densa, alrededor del personaje, en arco… Por defecto, el más cercano. De momento el jugador no tiene opción de apuntado; como es un dato, podría añadirse más adelante.
 - **Esquive:** impulso corto en la dirección de movimiento, con fotogramas de invulnerabilidad y tiempo de recarga. Es la herramienta principal para atravesar cortinas de balas.
 - **Telegrafía:** todo ataque fuerte se anuncia con un aviso visual (marca en el suelo, brillo, animación de carga) proporcional a su daño.
@@ -141,8 +142,10 @@ Cada ataque tiene además un tipo de daño (sección 4.4).
 
 | Enemigo | Escalón | Movimiento | Ataques | Daño |
 |---|---|---|---|---|
-| Pingüino albino ciego | 1 | Va hacia donde oyó al jugador por última vez y corrige cada ~1 s, así que esquivar de lado funciona. De cerca se echa atrás y embiste | Picotazo en la carga (contacto ×1,6) y abanico de 3 esquirlas de hielo | Físico |
-| Fragmento protoplásmico | 1 | Repta a tirones, al ritmo de su animación; se para al escupir | Glóbulos que silban "¡Tekeli-li!": dos ráfagas radiales lentas de 8 | Mixto (y contacto mixto) |
+| Pingüino albino ciego (1,2 m) | 1 | Va hacia donde oyó al jugador por última vez y corrige cada ~1 s, así que esquivar de lado funciona. De cerca se echa atrás y embiste | Solo cuerpo a cuerpo: picotazo en la carga (contacto ×1,6) | Físico |
+| Fragmento protoplásmico | 1 | Repta a tirones, al ritmo de su animación; se para al escupir | Glóbulos que silban "¡Tekeli-li!": dos ráfagas radiales lentas de 8, cada ~7 s | Mixto (y contacto mixto) |
+
+Tras la primera partida de prueba (25-09-2026), no todos los enemigos disparan: los de horda más sencillos atacan solo cuerpo a cuerpo, y los del escalón 1 aparecen en poco número al principio.
 | Acechador (élite de prueba, evento final) | 3 | Ronda al jugador a unos 6 m | Salto: marca roja en el suelo, 0,9 s de aviso, impacto en 1,7 m y anillo de 14 balas. Croar: aviso violeta y onda mental de 30 balas con tres huecos para atravesarla | Físico y mental |
 
 ### 4.3 Progresión dentro de la partida
@@ -247,7 +250,7 @@ Todos proceden de relatos de Lovecraft y cada parte tiene al menos un personaje 
 
 | Personaje | Relato | Arma inicial | Rasgo pasivo | Perfil |
 |---|---|---|---|---|
-| William Dyer, geólogo | *En las montañas de la locura* (parte 1) | Cartuchos de dinamita | Resistencia al frío y a los efectos de ralentización (D-19) | Mucha cordura |
+| William Dyer, geólogo | *En las montañas de la locura* (parte 1) | Cartuchos de dinamita (en la fase 1, además, el revólver) | Resistencia al frío y a los efectos de ralentización (D-19) | Mucha cordura |
 | Robert Olmstead, narrador de Innsmouth | *La sombra sobre Innsmouth* (parte 2) | Revólver .38 | Esquive más largo; "sangre de Innsmouth": resistencia al daño de criaturas marinas | Equilibrado |
 | Inspector John R. Legrasse | *La llamada de Cthulhu* (parte 3) | Escopeta de dos cañones | Más daño contra cultistas y enemigos humanos (D-19) | Equilibrado |
 | Gustaf Johansen, marinero | *La llamada de Cthulhu* (parte 3) | Machete | Más vida; inmunidad al empuje (D-19) | Mucha vida |

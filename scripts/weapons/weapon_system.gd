@@ -46,22 +46,23 @@ func _physics_process(delta: float) -> void:
 	for w in weapons:
 		w.timer -= delta
 		if w.timer > 0.0: continue
-		w.timer = w.stat("cooldown") if _fire(w) else 0.1     # sin objetivo: reintenta pronto
+		_fire(w)
+		w.timer = w.stat("cooldown")
 
-## Elige objetivo según el arma y dispara. Devuelve false si no había a quién.
+## Elige objetivo según el arma y dispara. Sin nadie a tiro, dispara igualmente hacia
+## donde mira el personaje: el jugador siempre está disparando.
 func _fire(w: Weapon) -> bool:
 	var origin := player.global_position
 	var rng := w.stat("range")
+	var ahead := origin + player.motor.facing * rng * 0.55
 	var target_pos := Vector3.ZERO
 	match w.data.targeting:
 		WeaponData.Targeting.NEAREST:
 			var t := world.nearest_enemy(origin, rng)
-			if t == null: return false
-			target_pos = t.global_position
+			target_pos = t.global_position if t != null else ahead
 		WeaponData.Targeting.DENSEST:
 			var t := world.densest_enemy(origin, rng, maxf(w.stat("aoe_radius"), 1.0))
-			if t == null: return false
-			target_pos = t.global_position
+			target_pos = t.global_position if t != null else ahead
 		WeaponData.Targeting.MOVE_DIR:
 			target_pos = origin + player.motor.facing * rng
 		WeaponData.Targeting.AROUND:

@@ -39,7 +39,7 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	root.add_child(_walls(size))
 	return root
 
-## Suelo de nieve en losas de 0,5 m: nieve azulada de noche, placas de hielo,
+## Suelo de nieve en losas de 0,5 m: nieve blanca (se ve gris azulada con la luz de luna), placas de hielo,
 ## roca asomando y nieve pisada alrededor del campamento. Por detrás (norte y oeste)
 ## se prolonga bajo los acantilados; por delante (sur y este) acaba en la orilla.
 static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
@@ -63,12 +63,12 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 			var cx := x + tile * 0.5; var cz := z + tile * 0.5
 			var n := noise.get_noise_2d(cx, cz)
 			var f := fine.get_noise_2d(cx, cz)
-			var c := Color(0.30, 0.34, 0.40).lerp(Color(0.36, 0.40, 0.46), f * 0.5 + 0.5)   # nieve de noche
-			if n > 0.42: c = Color(0.20, 0.28, 0.34).lerp(Color(0.25, 0.33, 0.39), f * 0.5 + 0.5)  # hielo
-			elif n < -0.55: c = Color(0.14, 0.14, 0.15).lerp(Color(0.19, 0.18, 0.18), f * 0.5 + 0.5)  # roca
+			var c := Color(0.80, 0.84, 0.89).lerp(Color(0.88, 0.91, 0.95), f * 0.5 + 0.5)   # nieve
+			if n > 0.42: c = Color(0.60, 0.72, 0.80).lerp(Color(0.66, 0.77, 0.84), f * 0.5 + 0.5)  # hielo
+			elif n < -0.55: c = Color(0.30, 0.30, 0.31).lerp(Color(0.38, 0.37, 0.36), f * 0.5 + 0.5)  # roca
 			var d := Vector2(cx, cz).length()
 			if d < 14.0 and fine.get_noise_2d(cx * 0.4, cz * 0.4) > 0.05 - (14.0 - d) * 0.02:
-				c = c.lerp(Color(0.26, 0.27, 0.29), 0.55)                                    # nieve pisada
+				c = c.lerp(Color(0.70, 0.71, 0.74), 0.55)                                    # nieve pisada
 			# losas contiguas (sin juntas: los huecos dibujaban una cuadrícula y dejaban ver el mar)
 			var q := [Vector3(x, 0, z), Vector3(x, 0, z + tile), Vector3(x + tile, 0, z + tile), Vector3(x + tile, 0, z)]
 			for k in [0, 2, 1, 0, 3, 2]:
@@ -76,7 +76,7 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 				st.set_color(c)
 				st.add_vertex(q[k])
 	# Frente de la plataforma de hielo en la orilla (sur y este)
-	var edge := Color(0.20, 0.27, 0.33)
+	var edge := Color(0.55, 0.66, 0.74)
 	var lvl: float = data.sea.level
 	for seg in [[Vector3(x0, 0, z1), Vector3(x1, 0, z1), Vector3(0, 0, 1)], [Vector3(x1, 0, z1), Vector3(x1, 0, z0), Vector3(1, 0, 0)]]:
 		var a: Vector3 = seg[0]; var b: Vector3 = seg[1]; var nrm: Vector3 = seg[2]

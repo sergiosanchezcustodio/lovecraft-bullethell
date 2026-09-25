@@ -19,7 +19,9 @@ extends Resource
 @export_group("Otros")
 @export var luck := 1.0                      ## suerte en las mejoras
 @export var pickup_radius := 2.2             ## a qué distancia empiezan a volar las gemas hacia él
-@export var starting_weapon := &"dinamita"   ## hito 1.4
+## Armas con las que empieza. El GDD da una por personaje; en la fase 1 Dyer empieza
+## con la suya y el revólver, como pide la especificación del prototipo.
+@export var starting_weapons: Array[StringName] = [&"dinamita"]
 @export var collision_radius := 0.32         ## choque con el decorado
 @export var hurt_radius := 0.25              ## radio de impacto de las balas: pequeño, como en todo bullet hell
 @export var hit_iframes := 0.6               ## s de invulnerabilidad tras recibir un golpe

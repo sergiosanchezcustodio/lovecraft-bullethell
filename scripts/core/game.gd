@@ -46,6 +46,7 @@ var _rng := RandomNumberGenerator.new()
 func _ready() -> void:
 	args = LaunchArgs.from_cmdline()
 	Prof.enabled = args.get_bool("prof")
+	UiInput.configure()
 	var env := Atmosphere.make_environment()
 	# Los volúmenes de niebla solo existen en Forward+ (Compatibility da error)
 	var fogvol := args.get_bool("fogvol", true) and RenderingServer.get_current_rendering_method() != "gl_compatibility"
@@ -84,10 +85,16 @@ func _ready() -> void:
 		player.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
 	player.progress.leveled_up.connect(func(_l: int) -> void: _open_level_up.call_deferred())
 	player.downed.connect(_on_downed)
+	if args.get_bool("log"):
+		player.damaged.connect(func(d: Damage) -> void:
+			var src := "bala" if d.source == null else String((d.source as Enemy).data.id) + (" (carga)" if d.physical > 8.0 else "")
+			print("  golpe t=%.1f  -%d vida -%d cordura  de %s  -> vida %d" % [director.time if director else 0.0, d.physical, d.mental, src, player.health]))
 	player.sanity_state.crisis_started.connect(func(_k: StringName) -> void: announce("Crisis de locura", 1.5))
 	player.weapons = WeaponSystem.new().setup(player, world)
 	player.add_child(player.weapons)
-	var wlist := args.get_str("weapons", String(player.data.starting_weapon)).split(",", false)
+	var start := PackedStringArray()
+	for wid in player.data.starting_weapons: start.append(String(wid))
+	var wlist: PackedStringArray = args.get_str("weapons", ",".join(start)).split(",", false)
 	for wid in wlist:
 		var w := player.weapons.add_weapon(load("res://data/weapons/%s.tres" % wid))
 		w.level = clampi(args.get_int("wlevel", 1), 1, w.data.max_level)

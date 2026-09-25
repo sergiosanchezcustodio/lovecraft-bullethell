@@ -97,6 +97,7 @@ func _physics_process(delta: float) -> void:
 	if _hurt_time >= 0.0: _hurt_time += delta
 
 func _process(delta: float) -> void:
+	_xray.set_shader_parameter("center_world", global_position + Vector3(0, 0.85, 0))
 	# Girar el modelo hacia donde mira (el modelo mira hacia +Z)
 	var target := atan2(motor.facing.x, motor.facing.z)
 	visual.rotation.y = lerp_angle(visual.rotation.y, target, 1.0 - exp(-data.turn_speed * delta))
