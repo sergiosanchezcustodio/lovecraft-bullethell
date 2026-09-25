@@ -56,12 +56,10 @@ Léela al empezar cada sesión:
   - Estructura de menús, tienda con progresión permanente y compañeros al estilo de Extremadura Survivors (D-09, D-20; GDD 8.1).
   - Portada animada en Godot (D-21; GDD 7.1).
   - Orden: cerrar la fase 1 con tu partida, después el cooperativo (fase 2) y luego la fase 5.
-- **Portada (adelantada de la fase 5), en curso:** plan aprobado en cuatro hitos:
-  - P.1: escenario, luz y tormenta. Hecho; **el fondo se replanteará con tus ideas**.
-  - P.3: título voxel con tentáculos. **Hecho (adelantado a petición tuya), pendiente de tu revisión.**
-  - P.2: criaturas de alta calidad, a la espera de tus ideas para el fondo.
-  - P.4: integración.
-  - Se abre con `godot --path . -- title` y hay vídeo en `shots/portada_titulo.mp4`.
+- **Pantalla de título (adelantada de la fase 5): hecha, pendiente de tu revisión.**
+  - Es tu ilustración de la biblioteca, animada en 2D, con tu imagen del título encima.
+  - Se abre con `godot --path .` sin argumentos o con `-- title`; hay vídeo en `shots/portada_2d.mp4`.
+  - La portada 3D anterior (montañas y título voxel) se quitó; queda en el historial de git (commit `4809adb`).
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
 ## Decisiones cerradas
@@ -152,19 +150,25 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
 
 Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobrescribiría el detallado. Ejecuta `gen_acechador.py` después, o renombra la salida.
 
-## Portada (`scenes/title.tscn`, `scripts/title/`)
+## Pantalla de título (`scenes/title.tscn`, `scripts/title/`)
 
-- **Escena 3D en perspectiva**, sin los límites de rendimiento de la partida: 199 FPS en calidad alta y 359 en `quality=low`.
-- **Entorno:** niebla volumétrica, SDFGI, SSR (reflejos en el lago helado), SSAO y profundidad de campo lejana. Sin bloom general: solo brilla lo que supera el umbral (ojos, farol y relámpagos).
-- **Terreno:** `tools/gen_portada_terreno.py` genera cinco modelos con el tamaño de voxel creciendo con la distancia: primer término a 0,25 m, llanura y lago a 0,5 m, colinas en terrazas a 1 m y cordillera a 1,5 m. La cordillera tiene picos colocados para el encuadre, cárcavas, contorno de agujas y alguna formación cúbica, con un collado central para Cthulhu.
-- **Tormenta:** cielo por shader (`storm_sky.gdshader`) con nubes que se desplazan y se iluminan desde dentro con cada relámpago. `TitleLightning` genera rayos quebrados con ramas, cada 5,5 a 11 s, con una réplica como máximo y la intensidad regulable (accesibilidad).
-- **Luces:** luna rasante desde la izquierda; contraluz de tormenta y luz del rayo que se encienden con cada descarga.
-- **Detalles:** bancos de niebla que derivan (`mist.gdshader`), nieve con partículas y farol cálido que titila en el campamento.
-- **Título** (`TitleLogo`, modelos de `tools/gen_titulo.py`):
-  - Letras rasterizadas con fuentes OFL (`tools/fonts/`, con sus licencias) y extruidas con bisel escalonado: "Lovecraft Library:" en oro viejo (IM Fell English SC) y "Surviving Cthulhu" en piedra color hueso con grietas y verdín (Cinzel Decorative Black).
-  - Tentáculos troceados en segmentos (`tX_00`…) que `TitleLogo` encadena y mece más cuanto más cerca de la punta. Cada segmento se solapa con el anterior para que no se abran huecos al girar.
-  - Va unido a la cámara, en la franja superior, y se aleja si la pantalla es estrecha. Tiene capa de render propia (bit 2) con luces propias: principal cálida, relleno verdoso y contraluz que se enciende con los relámpagos. Las luces de la escena no lo tocan y su material ignora la niebla.
-- **Opciones:** `quality=low`, `shots=`, `tag=`, `strike=s` (fuerza un relámpago), `nolightning=true`, `noplaceholders=true`, `nologo=true` y `perf=N`.
+Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_definitivo.png` (en realidad a 4K, con mipmaps activados en su `.import`) y `Texto_titulo.png`. `fondo_con_titulo_completo.png` es solo la referencia de composición.
+
+- **Máscaras** (`tools/gen_mascaras_portada.py`, a 1920×1080; revisión en `shots/mascaras_revision.png`):
+  - `mascara_luces.png`: R, núcleo de cada llama (207 detectadas; los reflejos del suelo, a media intensidad); G, fase propia de cada llama, extendida a la zona que ilumina; B, luz proyectada.
+  - `mascara_zonas.png`: R, cielo con nubes (sin la tracería ni Cthulhu); G, niebla del suelo; B, cristal del ventanal.
+  - **Si cambia la ilustración, vuelve a ejecutar el script.** Las posiciones de la luna y los ojos están en la configuración.
+- **Capas** (todas en un "escenario" de 1920×1080 que cubre la pantalla conservando la proporción):
+  - `background.gdshader`: velas que parpadean con fase propia, bailoteo de la llama y luz proyectada que oscila con ella.
+  - `floor_fog.gdshader`: jirones de niebla.
+  - `window_sky.gdshader`: nubes, halo de la luna, relámpago y ojos.
+  - Motas de polvo con `GPUParticles2D`.
+  - El título (`title_halo.gdshader`, con halo de niebla y entrada en dos tiempos) y el aviso van fuera del escenario, así que el acercamiento no les afecta.
+- **Configuración por efecto** (`data/title/portada.tres`, `TitleScreenConfig`): cada efecto tiene su interruptor y sus parámetros. Son velas, niebla, nubes, luna, relámpago, ojos, acercamiento, motas, título, halo y aviso.
+  - Para compararlos sin tocar la configuración: `godot --path . -- title off=niebla,motas`.
+  - Otras opciones: `shots=`, `tag=`, `t=` (empezar en ese segundo), `strike=` (relámpago), `eyes=` (brillo de ojos) y `perf=`.
+- **Controles:** Intro, Espacio, A o Start saltan la presentación. Con el aviso visible, entran en la partida hasta que existan los menús.
+- **Variación medida** (desviación típica en % del brillo): llamas 6,4 %, paredes iluminadas 4,4 %, cielo 2,3 %, niebla 1-2 % y resto por debajo del 1 %. Sutil a propósito. Coste: menos de 1 ms por fotograma.
 
 ## Arquitectura del juego
 
@@ -282,8 +286,10 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Bloom general y partículas pequeñas:** con `glow_bloom` > 0 cada punto claro se convierte en una bola borrosa. En la portada, el bloom es 0 y el brillo sale solo del umbral HDR.
 - **Relámpagos y luz ambiental:** si el ambiente sale del cielo, cada relámpago ilumina el valle como si fuera de día. Usa ambiente de color fijo y deja el destello al cielo, a un contraluz rasante y a una luz puntual.
 - **Montañas voxel:** un cono con pendiente uniforme o bloques aplanados se ven como pirámides escalonadas. Hacen falta cárcavas, un contorno quebrado de agujas (ruido de crestas de celda pequeña) y pocas mesetas.
-- **Texto en voxel:** los tentáculos enroscados en trazos finos (I, T, L) tapan la letra entera. Basta una sola vuelta que pase por delante en la parte baja, y solo en letras cuyas puntas no crucen otra línea. Para un título, luz propia en su capa: con la luz fría de la escena, la piedra y el oro salían plateados.
 - **NumPy y JSON:** los enteros de NumPy (`int64`) no se pueden serializar; conviértelos con `int()` o `float()` antes de `json.dump`.
+- **Animar una ilustración:** se genera un mapa de máscaras y se modula la imagen con él en un shader, sin pintar nada nuevo encima. Una llama es un blob cálido y brillante; su luz, ese blob difuminado; y el cielo son los píxeles azules y claros dentro del ventanal. Las formas oscuras (tracería, silueta) quedan fuera solas. Mide la variación por zonas antes de darla por buena: a ojo se sobrestima lo sutil que es.
+- **Shaders de canvas:** `TEXTURE` solo existe dentro de `fragment()`; para usarla en una función auxiliar hay que pasarla como `sampler2D`. Para superponer un halo bajo un texto que aparece, usa la composición "encima" con los colores ponderados por su alfa; una mezcla simple tiñe el texto con el color del halo mientras es transparente.
+- **Texturas 4K mostradas a 1080p:** activa `mipmaps/generate=true` en su `.import` y usa `TEXTURE_FILTER_LINEAR_WITH_MIPMAPS`, o saldrán dientes de sierra y brillos que bailan al hacer zoom.
 - **Tests y datos de equilibrio:** los tests no deben comprobar valores que se retocan al equilibrar (ritmos, experiencia, vida). Cuando haga falta, que construyan sus propios datos. Si un test falla tras un ajuste de equilibrio, el que está mal es el test.
 - **Controles de los menús:** el `ui_accept` de Godot no trae ningún botón del mando y sí trae Espacio, que es la tecla de esquivar. `UiInput.configure()` añade A (aceptar) y B (volver) y quita Espacio. El menú de mejoras ignora las pulsaciones durante su primer medio segundo.
 - **Élites ahogadas en la horda:** las armas apuntan al más cercano o a la zona más densa, así que una élite rodeada de la oleada casi no recibe disparos. `LevelData.final_spawn_scale` (0,3) reduce las apariciones durante el evento final.

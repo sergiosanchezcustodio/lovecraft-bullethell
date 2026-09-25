@@ -288,14 +288,15 @@ El estilo general (voxel detallado a 32 voxels por metro, atmósfera y pipeline)
 
 - **Personajes jugables:** proporciones humanas, ropa de época, paleta más cálida que la de los enemigos y siempre con el anillo de color del jugador.
 - **Estilo de los personajes humanos** (jugables, cultistas e híbridos): voxel a bloques limpios, con volúmenes rectos de aristas suavizadas, detalles pintados sobre superficies planas, cara dibujada sin relieve y poco ruido de color. Decidido el 25-09-2026, a partir del rediseño de Dyer. Las criaturas pueden ser orgánicas y con más relieve.
-### 7.1 Portada (D-21)
+### 7.1 Pantalla de título (D-21)
 
-Escena 3D animada en Godot, de calidad muy superior a la de la partida (no tiene que cumplir sus límites de rendimiento):
-- **Cámara y luz:** cámara en perspectiva (la niebla volumétrica sí funciona con ella), niebla con haces de luz, sombras, reflejos en hielo y roca mojada e iluminación global.
-- **Composición:** montañas; entre ellas, en la tormenta, la silueta enorme de Cthulhu, iluminada solo por los relámpagos y con los ojos apenas encendidos. Más cerca, criaturas grandes con más detalle y color, hechas con los mismos generadores voxel a más resolución (64 a 128 voxels por metro).
-- **Animación sutil:** niebla que se desplaza, nieve, relámpagos espaciados, criaturas que respiran y parpadean, faroles que titilan y un avance lento de la cámara.
-- **Accesibilidad:** relámpagos suaves y espaciados, nunca estroboscópicos, y regulables con el deslizador de distorsiones.
-- **Imagen fija:** la de las tiendas (itch, Steam) sale de la misma escena renderizada a 4K.
+Ilustración de la biblioteca (tuya, en `resources/PantallasMenus/`) con animaciones sutiles hechas en Godot:
+- **Ambiente:** velas y faroles que parpadean, cada uno a su ritmo, y su luz en paredes y suelo mojado; niebla que deriva sobre el suelo.
+- **Ventanal:** nubes pasando por detrás de la tracería y de la silueta de Cthulhu, halo de la luna que respira, relámpago tenue y espaciado, y los ojos de Cthulhu encendiéndose despacio.
+- **Detalles:** motas de polvo en la luz de las velas y un acercamiento lento del 3 % durante la presentación.
+- **Secuencia:** fundido desde negro; unos segundos de biblioteca viva; entrada del título (primero su halo fino de niebla y después las letras); aviso de pulsar. Se puede saltar.
+- Cada efecto se ajusta o se quita por separado (`data/title/portada.tres`).
+- **Accesibilidad:** sin destellos estroboscópicos; el relámpago es tenue y regulable.
 
 - **Regla de contenido** (modelos, textos y diálogos): nada racista, sexista ni homófobo. Los cultistas son de géneros y edades variados, sin rasgos étnicos marcados que asocien un grupo real al mal; los identifica su culto. Los relatos originales contienen estereotipos de su época que no se reproducen.
 
