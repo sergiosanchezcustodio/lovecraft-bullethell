@@ -45,8 +45,11 @@ var _rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
 	args = LaunchArgs.from_cmdline()
+	Prof.enabled = args.get_bool("prof")
 	var env := Atmosphere.make_environment()
-	if args.get_bool("fogvol", true):
+	# Los volúmenes de niebla solo existen en Forward+ (Compatibility da error)
+	var fogvol := args.get_bool("fogvol", true) and RenderingServer.get_current_rendering_method() != "gl_compatibility"
+	if fogvol:
 		env.volumetric_fog_enabled = true
 		env.volumetric_fog_density = 0.0      # solo los volúmenes locales
 	var we := WorldEnvironment.new(); we.environment = env; add_child(we)
@@ -58,7 +61,7 @@ func _ready() -> void:
 	moon.shadow_enabled = true
 	moon.directional_shadow_max_distance = 60.0
 	add_child(moon)
-	arena = ArenaBuilder.build("res://data/arenas/campamento.json", args.get_bool("fogvol", true))
+	arena = ArenaBuilder.build("res://data/arenas/campamento.json", fogvol)
 	add_child(arena)
 	world = CombatWorld.new()
 	var size: Vector2 = arena.get_meta("size")
@@ -282,6 +285,9 @@ func _demo_crowd(n: int) -> void:
 func _process(delta: float) -> void:
 	_t += delta
 	if args.get_bool("debug") and fmod(_t, 0.5) < delta: print("t=%.1f jugador=%s" % [_t, player.global_position])
+	if args.get_bool("log") and director != null and fmod(director.time, 30.0) < delta:
+		print("t=%3d s  vivos=%d  abatidos=%d  nivel=%d  vida=%d  cordura=%d  balas=%d" % [director.time, director.alive.size(),
+			kills, player.progress.level, player.health, player.sanity, world.bullets.count])
 	if args.has("perf"): _perf(delta)
 	if args.get_int("bullet_rain") > 0: _bullet_rain(args.get_int("bullet_rain"))
 	for i in _demo.size():
@@ -290,21 +296,33 @@ func _process(delta: float) -> void:
 		Anims.pose(kind, anim, _demo[i], fposmod(_t / Anims.duration(kind, anim) + float(_demo[i].get_meta("phase")), 1.0))
 
 var _frames: Array[float] = []
+var _phys_ms := 0.0
+var _proc_ms := 0.0
+var _peak_enemies := 0
+var _peak_bullets := 0
 
 ## Medición sencilla de tiempos de fotograma (para docs/RENDIMIENTO.md).
 func _perf(delta: float) -> void:
-	if _t < 2.0: return
+	if _t < 2.0:
+		Prof.totals.clear()
+		return
 	_frames.append(delta * 1000.0)
+	_phys_ms += Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0
+	_proc_ms += Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0
+	_peak_enemies = maxi(_peak_enemies, world.enemies.size())
+	_peak_bullets = maxi(_peak_bullets, world.bullets.count)
 	if _t < 2.0 + args.get_float("perf", 10.0): return
 	_frames.sort()
 	var avg := 0.0
 	for f in _frames: avg += f
 	avg /= _frames.size()
 	var p99 := _frames[int(_frames.size() * 0.99)]
-	print("RENDIMIENTO fotogramas=%d media=%.2f ms (%.0f FPS) 1%% peor=%.2f ms (%.0f FPS) draw calls=%d primitivas=%d" % [
-		_frames.size(), avg, 1000.0 / avg, p99, 1000.0 / p99,
+	var n := float(_frames.size())
+	print("RENDIMIENTO fotogramas=%d media=%.2f ms (%.0f FPS) 1%% peor=%.2f ms (%.0f FPS) física=%.2f ms proceso=%.2f ms enemigos=%d balas=%d draw calls=%d primitivas=%d" % [
+		_frames.size(), avg, 1000.0 / avg, p99, 1000.0 / p99, _phys_ms / n, _proc_ms / n, _peak_enemies, _peak_bullets,
 		RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
 		RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)])
+	if Prof.enabled: print("PERFIL (ms por fotograma) ", Prof.report(_frames.size()))
 	get_tree().quit()
 
 ## Lluvia de balas para la prueba de carga: repone balas de los tres tipos alrededor

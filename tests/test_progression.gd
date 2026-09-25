@@ -23,7 +23,7 @@ func _player() -> Player:
 
 # ---------------- experiencia ----------------
 func test_curva_de_experiencia_creciente() -> void:
-	assert_eq(rules.xp_to_next(1), 5.0)
+	assert_eq(rules.xp_to_next(1), rules.xp_base)
 	var prev := 0.0
 	for lv in range(1, 15):
 		var need := rules.xp_to_next(lv)

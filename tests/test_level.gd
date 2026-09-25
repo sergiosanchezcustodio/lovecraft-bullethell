@@ -34,7 +34,9 @@ func test_pesos_de_aparicion() -> void:
 	assert_eq(LevelData.weight(4, 3), 0.0, "escalones por encima del nivel no aparecen")
 
 func test_ritmo_interpolado() -> void:
-	var l := _level()
+	# Datos propios: los del nivel se retocan al equilibrar y el test no debe depender de ellos
+	var l := LevelData.new()
+	l.spawn_rate = [Vector2(0, 0.6), Vector2(60, 1.1), Vector2(300, 3.0)] as Array[Vector2]
 	assert_almost_eq(l.rate_at(0.0), 0.6, 0.001)
 	assert_almost_eq(l.rate_at(30.0), 0.85, 0.001)
 	assert_almost_eq(l.rate_at(999.0), 3.0, 0.001)

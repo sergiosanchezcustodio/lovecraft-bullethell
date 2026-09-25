@@ -20,6 +20,8 @@ extends Resource
 @export var final_time := 240.0
 @export var final_enemy: EnemyData
 @export var final_wave := 25                   ## enemigos extra que acompañan al evento
+@export var final_spawn_scale := 0.3           ## tras el evento, el ritmo normal se multiplica por esto
+                                               ## (el duelo con la élite no debe ahogarse en la horda)
 @export var final_text := "Algo acecha entre las tiendas…"
 
 ## Peso de aparición de un enemigo de escalón t en el nivel N: 2^(N - t) (GDD 2.1).

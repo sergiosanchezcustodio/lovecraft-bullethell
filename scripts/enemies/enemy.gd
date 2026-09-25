@@ -90,6 +90,7 @@ func _die() -> void:
 
 func _physics_process(delta: float) -> void:
 	if not is_alive(): return
+	var t0 := Prof.start()
 	_spawn_t += delta
 	var target := target_player()
 	velocity = behavior.update(self, target, delta)
@@ -123,8 +124,10 @@ func _physics_process(delta: float) -> void:
 			runner.fire(data.attack, func() -> Vector3: return target.global_position if is_instance_valid(target) else global_position)
 			if data.attack_anim != "": behavior.play_attack_anim(self, data.attack_anim)
 			_attack_timer = data.attack_cooldown * randf_range(0.85, 1.15)
+	Prof.stop("enemigos_fisica", t0)
 
 func _process(delta: float) -> void:
+	var t0 := Prof.start()
 	visual.rotation.y = atan2(facing.x, facing.z)
 	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0)       # aparece creciendo
 	if not anim_hold:
@@ -136,3 +139,4 @@ func _process(delta: float) -> void:
 		_flash_on = flashing
 		for mi: MeshInstance3D in model.get_meta("meshes"):
 			mi.material_overlay = _flash_mat if flashing else null
+	Prof.stop("enemigos_anim", t0)

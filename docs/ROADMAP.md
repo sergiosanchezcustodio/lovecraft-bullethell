@@ -63,7 +63,7 @@ Cada hito cierra con tests en verde, capturas revisadas y commit. ⏸ = parada p
 | 1.4 | Balas, daño y armas: gestor de balas, rejilla espacial, lenguaje visual de los daños, revólver y dinamita | **Hecho** |
 | 1.5 | Enemigos y nivel: datos, comportamientos, oleadas por pesos, evento final del Acechador | **Hecho** |
 | 1.6 | Progresión, cordura y HUD: experiencia, mejoras, parálisis, HUD del J1, muerte y reinicio, pausa | **Hecho** |
-| 1.7 ⏸ | Rendimiento y cierre: prueba de carga, optimizaciones si hacen falta, partida de 5 minutos jugada por ti | Pendiente |
+| 1.7 ⏸ | Rendimiento y cierre: prueba de carga, optimizaciones si hacen falta, partida de 5 minutos jugada por ti | Prueba de carga hecha; **pendiente de tu partida** |
 
 ## Fase 2: Cooperativo local
 

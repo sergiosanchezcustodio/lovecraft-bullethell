@@ -42,7 +42,8 @@ func _physics_process(delta: float) -> void:
 			var d := pick()
 			if d != null: spawn(d, spawn_point(d.body_radius))
 		final_event.emit(_final)
-	_acc += level.rate_at(time) * delta
+	var scale := level.final_spawn_scale if _final_done else 1.0
+	_acc += level.rate_at(time) * scale * delta
 	while _acc >= 1.0:
 		if alive.size() >= max_alive():
 			_acc = 1.0

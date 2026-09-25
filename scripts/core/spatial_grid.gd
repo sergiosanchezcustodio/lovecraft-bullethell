@@ -45,17 +45,16 @@ func radius_of(id: int) -> float:
 ## Índices cuyos círculos tocan el círculo (pos, r), sin repetidos.
 func query_circle(pos: Vector2, r: float) -> PackedInt32Array:
 	var out := PackedInt32Array()
-	var seen := {}
 	var c0 := _key(pos - Vector2(r, r))
 	var c1 := _key(pos + Vector2(r, r))
 	for x in range(c0.x, c1.x + 1):
 		for y in range(c0.y, c1.y + 1):
 			var list: PackedInt32Array = _cells.get(Vector2i(x, y), PackedInt32Array())
 			for id in list:
-				if seen.has(id): continue
-				seen[id] = true
 				var rr := r + _rad[id]
-				if _pos[id].distance_squared_to(pos) <= rr * rr: out.append(id)
+				# un objetivo grande puede estar en varias celdas: se evita repetirlo buscando en
+				# la propia lista, que casi siempre es corta (más barato que crear un diccionario)
+				if _pos[id].distance_squared_to(pos) <= rr * rr and not out.has(id): out.append(id)
 	return out
 
 ## Índice más cercano a pos dentro de max_r (o -1). Busca por anillos de celdas.

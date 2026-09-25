@@ -107,3 +107,50 @@ Misma prueba que en el hito 1.5 (150 enemigos, dinamita y revólver a nivel 3), 
 | 150 enemigos + gemas + HUD | 6,08 ms (164 FPS) | 9,09 ms (110 FPS) | 366 | 4,5 M |
 
 Los sistemas nuevos apenas se notan: unos 0,2 ms más que en el hito 1.5.
+
+## Hito 1.7: prueba de carga de la fase 1 (25-09-2026)
+
+Criterio de aceptación de la fase 1: 150 enemigos y 1.000 balas a la vez.
+
+**Comando:**
+```
+godot --path . --disable-vsync -- bot=circle god=true autopick=true weapons=dinamita,revolver wlevel=3 spawn_rate=40 max_alive=150 final_at=9999 bullet_rain=1000 perf=15 prof=true
+```
+Añade `--rendering-method gl_compatibility` para medir Compatibility.
+
+**Escena:** 150 enemigos vivos con su comportamiento completo, entre 1.000 y 1.700 balas (la lluvia de prueba mantiene 1.000 y los enemigos disparan las suyas), dinamita y revólver a nivel 3, gemas, HUD y arena completa. 1920×1080.
+
+| Renderizador | Media | 1 % peor | Llamadas de dibujo | Primitivas |
+|---|---|---|---|---|
+| Forward+ | 7,77 ms (129 FPS) | 11,58 ms (86 FPS) | 328 | 4,7 M |
+| Compatibility | 9,26 ms (108 FPS) | 13,33 ms (75 FPS) | 2.339 | 4,2 M |
+
+**Partida normal** (sin trucos de carga, final del nivel: ritmo 3/s, entre 45 y 55 enemigos vivos y unas 300 balas):
+
+| Configuración | Media | 1 % peor |
+|---|---|---|
+| Con vsync (monitor de 120 Hz) | 8,39 ms (119 FPS, estable) | 9,09 ms (110 FPS) |
+| Sin vsync | 2,14 ms (468 FPS) | 2,78 ms (360 FPS) |
+
+**Reparto del tiempo de CPU** en la prueba de carga (`prof=true`, ms por fotograma):
+
+| Sistema | ms |
+|---|---|
+| Animación de enemigos | 2,1 |
+| Lógica de enemigos | 1,2 |
+| Balas: buffer del MultiMesh | 0,65 |
+| Balas: simulación | 0,4 |
+| Rejilla | 0,25 |
+| Gemas | 0,01 |
+
+El resto es trabajo del motor: dibujo, transformaciones de unos 1.000 nodos y física de los cuerpos.
+
+**Conclusiones:**
+- **Criterio cumplido en este equipo**, con margen: 129 FPS de media y 86 en el 1 % peor en Forward+.
+- **El límite es la CPU (GDScript), no la GPU.** Si un procesador de gama media es entre 1,5 y 2 veces más lento, la prueba de carga rondaría entre 65 y 85 FPS de media, con bajadas por debajo de 60 en los picos. La partida normal tiene mucho más margen.
+- **Optimizaciones para cuando haga falta**, de menos a más invasiva:
+  1. Animar a los enemigos lejanos o fuera de cámara a menor frecuencia.
+  2. Animar por MultiMesh por parte del cuerpo (optimización 2 del plan), que ahorra los nodos por enemigo.
+  3. Llevar balas y enemigos a C# o GDExtension. **Consultar antes.**
+- **Probado y sin efecto:** sustituir `get_node("parte")` por un diccionario de partes (se mantiene porque es más limpio), y quitar el diccionario de repetidos en las consultas de la rejilla.
+- **Aún no aplicado:** la optimización 1 del plan, la fusión de caras. Ahorraría triángulos (GPU), y la GPU no es el límite.

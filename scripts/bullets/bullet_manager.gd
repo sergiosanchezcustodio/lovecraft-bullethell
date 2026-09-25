@@ -84,6 +84,7 @@ func clear() -> void:
 	count = 0
 
 func _physics_process(delta: float) -> void:
+	var t0 := Prof.start()
 	var b := world.bounds if world != null else Rect2(-100, -100, 200, 200)
 	var i := 0
 	while i < count:
@@ -96,6 +97,7 @@ func _physics_process(delta: float) -> void:
 			_remove(i)          # la última ocupa su hueco: no avanzar i
 		else:
 			i += 1
+	Prof.stop("balas", t0)
 
 func _collide_enemy_bullet(i: int) -> bool:
 	var p := Vector2(_pos[i].x, _pos[i].z)
@@ -130,6 +132,7 @@ func _remove(i: int) -> void:
 	count = last
 
 func _process(_delta: float) -> void:
+	var t0 := Prof.start()
 	# Buffer del MultiMesh: por instancia, transformación 3x4 (fila a fila) y 4 datos propios:
 	# estilo, fase de animación, edad y radio visual.
 	for i in count:
@@ -145,3 +148,4 @@ func _process(_delta: float) -> void:
 		_buffer[o + 14] = _age[i]; _buffer[o + 15] = s
 	RenderingServer.multimesh_set_buffer(_mm.get_rid(), _buffer)
 	_mm.visible_instance_count = count
+	Prof.stop("balas_buffer", t0)

@@ -29,6 +29,11 @@ static func pose(model_name: String, anim: String, m: Node3D, t: float) -> void:
 	if has_anim(model_name, anim):
 		BY_MODEL[model_name].call(anim, m, t)
 
+## Nodo de una parte del modelo. Más rápido que get_node(), que convierte el texto en
+## NodePath en cada llamada (importa con 150 enemigos animados).
+static func part(m: Node3D, name: String) -> Node3D:
+	return m.get_meta("part_nodes")[name]
+
 ## Posición de reposo de una parte (su pivote), en metros. VoxelBuilder la guarda al crear el modelo.
 static func rest(m: Node3D, part: String) -> Vector3:
 	return m.get_meta("rest_by_name")[part]

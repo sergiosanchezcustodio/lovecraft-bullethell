@@ -42,16 +42,19 @@ static func load_model(path: String) -> Node3D:
 	var parts: Array[Node3D] = []
 	var rest: Array[Vector3] = []
 	var rest_by_name := {}
+	var part_nodes := {}
 	var meshes: Array[MeshInstance3D] = []
 	for c: Node in root.get_children():
 		var n := c as Node3D
 		parts.append(n)
 		rest.append(n.position)
 		rest_by_name[n.name] = n.position
+		part_nodes[String(n.name)] = n
 		for m: Node in n.get_children(): meshes.append(m as MeshInstance3D)
 	root.set_meta("parts", parts)
 	root.set_meta("rest", rest)
 	root.set_meta("rest_by_name", rest_by_name)
+	root.set_meta("part_nodes", part_nodes)
 	root.set_meta("meshes", meshes)
 	return root
 

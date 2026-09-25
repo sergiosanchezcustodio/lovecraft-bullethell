@@ -66,6 +66,7 @@ func drop(pos: Vector3, value: float) -> void:
 		count += 1
 
 func _physics_process(delta: float) -> void:
+	var t0 := Prof.start()
 	var i := 0
 	while i < count:
 		_age[i] += delta
@@ -96,6 +97,7 @@ func _physics_process(delta: float) -> void:
 			_vel[i] = Vector3.ZERO
 		_pos[i] = p
 		i += 1
+	Prof.stop("gemas", t0)
 
 func _remove(i: int) -> void:
 	var last := count - 1

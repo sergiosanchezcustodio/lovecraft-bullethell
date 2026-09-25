@@ -4,3 +4,4 @@
 
 [resource]
 script = ExtResource("1")
+xp_base = 4.0

@@ -31,7 +31,10 @@ Léela al empezar cada sesión:
     - Cordura con recuperación pasiva y crisis de parálisis intermitente.
     - HUD del J1 con retrato, vida, cordura, experiencia, armas y recarga del esquive, más reloj y objetivo arriba.
     - Pausa con Esc o Start, pantalla de caída y de nivel superado, y reinicio.
-  - **Siguiente: hito 1.7**, prueba de carga completa, cierre de la fase y partida de 5 minutos jugada por ti.
+  - **Hito 1.7 (rendimiento y cierre): prueba de carga hecha, pendiente de que juegues tú.**
+    - 150 enemigos y más de 1.000 balas a 129 FPS de media en Forward+ (86 en el 1 % peor) y a 108 en Compatibility (`docs/RENDIMIENTO.md`).
+    - Ritmo ajustado con un bot: el nivel se supera en unos 5,5 minutos.
+    - **Falta el criterio de aceptación de la fase 1:** que juegues tú una partida de 5 minutos, con doble clic en `jugar.cmd` o con `godot --path .`.
 - **Todavía no hay código de juego:** solo el visor, la escena de rendimiento y los generadores de modelos.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
@@ -74,6 +77,7 @@ Entorno de desarrollo (Windows 11 + Git Bash):
 
 Uso desde la raíz del proyecto, en Git Bash:
 ```
+./jugar.cmd                         # o doble clic en jugar.cmd: partida sin consola
 godot --path .                      # partida (escena principal: scenes/main.tscn, que elige la escena según el primer argumento)
 godot --path . -- bot=circle dodge_every=2 demo=14 shots=1,3 tag=prueba   # partida con bot, criaturas de muestra y capturas
 godot --path . --write-movie shots/mov/f.png --fixed-fps 30 --quit-after 240 -- bot=circle   # vídeo en fotogramas PNG
@@ -114,6 +118,8 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `autopick=true`: elige sola la primera mejora (para bots y capturas).
   - `xp=`, `hp=` y `san=`: experiencia, vida y cordura iniciales.
   - `autorestart=N`: en la pantalla final, reintenta sola tras N s.
+  - `log=true`: cada 30 s de juego imprime vivos, abatidos, nivel, vida, cordura y balas.
+  - `prof=true` (junto con `perf=`): reparto del tiempo de CPU por sistema (`Prof`).
 - **Encadenar comandos:** un `godot ... | grep error` devuelve 1 cuando no hay errores, así que no lo encadenes con `&&`.
 
 Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobrescribiría el detallado. Ejecuta `gen_acechador.py` después, o renombra la salida.
@@ -215,6 +221,8 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Coste por fotograma en GDScript:** con 150 enemigos, llamar a `find_children` y reasignar materiales en cada fotograma, y recalcular las posiciones de reposo leyendo metadatos, bajaba la partida de 170 a 81 FPS. `VoxelBuilder` guarda en metadatos las partes, las posiciones de reposo y las mallas de cada modelo (`parts`, `rest`, `rest_by_name`, `meshes`), y los materiales solo se tocan cuando cambia el estado.
 - **Referencias a objetos liberados:** copiar un objeto ya liberado dentro de un array tipado (`Array[Object]`) da error. Para recordar un objetivo que puede morir en cualquier momento, guarda su `get_instance_id()`.
 - **Aviso `ObjectDB instances leaked` al salir:** aparece si se fuerza la salida (`--quit-after`) mientras una corrutina espera un temporizador. No pasa al jugar normalmente.
+- **Tests y datos de equilibrio:** los tests no deben comprobar valores que se retocan al equilibrar (ritmos, experiencia, vida). Cuando haga falta, que construyan sus propios datos. Si un test falla tras un ajuste de equilibrio, el que está mal es el test.
+- **Élites ahogadas en la horda:** las armas apuntan al más cercano o a la zona más densa, así que una élite rodeada de la oleada casi no recibe disparos. `LevelData.final_spawn_scale` (0,3) reduce las apariciones durante el evento final.
 - **`cat` sin entrada:** un `cat > fichero` sin heredoc se queda esperando la entrada estándar para siempre.
 
 ## Por definir

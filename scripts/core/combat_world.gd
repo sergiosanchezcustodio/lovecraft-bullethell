@@ -40,6 +40,7 @@ func _physics_process(_delta: float) -> void:
 	rebuild_grid()
 
 func rebuild_grid() -> void:
+	var t0 := Prof.start()
 	grid.clear()
 	_grid_targets.clear()
 	for e in enemies:
@@ -47,6 +48,7 @@ func rebuild_grid() -> void:
 		var p := e.global_position
 		grid.insert(Vector2(p.x, p.z), e.hit_radius)
 		_grid_targets.append(e)
+	Prof.stop("rejilla", t0)
 
 func target_at(grid_id: int) -> Node3D:
 	return _grid_targets[grid_id]
