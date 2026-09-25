@@ -21,6 +21,7 @@ var frame := 0
 var tag := ""
 
 func _ready() -> void:
+	get_window().size = Vector2i(1000, 1000)   # las capturas del visor son cuadradas; el juego va a 1920x1080
 	var la := LaunchArgs.from_cmdline()
 	var pos := la.positional
 	if pos.size() > 0: mode = pos[0]
@@ -60,7 +61,7 @@ func _ready() -> void:
 	var ry := _range(up)
 	var center := right * (rx.x + rx.y) * 0.5 + up * (ry.x + ry.y) * 0.5
 	var margin := 1.3 if mode == "anim" else 1.12
-	var aspect := get_viewport().get_visible_rect().size.aspect()
+	var aspect := 1.0
 	cam.size = maxf(ry.y - ry.x, (rx.y - rx.x) / aspect) * margin
 	cam.position = center + cam.transform.basis.z * 20.0
 	cam.far = 60.0

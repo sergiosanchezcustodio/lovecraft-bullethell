@@ -1,0 +1,1131 @@
+{
+ "name": "Campamento base en la costa del mar de Ross",
+ "size": [
+  64.0,
+  64.0
+ ],
+ "spawn": [
+  0.0,
+  0.0
+ ],
+ "ground": {
+  "seed": 5,
+  "tile": 0.5,
+  "margin_back": 12.0
+ },
+ "sea": {
+  "sides": [
+   "south",
+   "east"
+  ],
+  "level": -0.45
+ },
+ "lamp": {
+  "color": [
+   1.0,
+   0.72,
+   0.4
+  ],
+  "energy": 2.2,
+  "range": 8.0
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "cylinder",
+   "radius": 1.15
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  }
+ },
+ "props": [
+  {
+   "model": "atrezo_tienda",
+   "pos": [
+    -7.5,
+    -6.0
+   ],
+   "rot": 15,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_tienda",
+   "pos": [
+    6.5,
+    -8.5
+   ],
+   "rot": -20,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_tienda",
+   "pos": [
+    -9.0,
+    6.0
+   ],
+   "rot": 35,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_tienda",
+   "pos": [
+    8.5,
+    7.0
+   ],
+   "rot": -40,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    -3.8,
+    -9.5
+   ],
+   "rot": 10,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    -3.0,
+    -10.4
+   ],
+   "rot": 40,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    -2.2,
+    -9.2
+   ],
+   "rot": 75,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    11.2,
+    -3.5
+   ],
+   "rot": 5,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    11.6,
+    -2.5
+   ],
+   "rot": 30,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    -11.8,
+    1.2
+   ],
+   "rot": 60,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    3.5,
+    11.0
+   ],
+   "rot": 20,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    4.3,
+    11.6
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_bidon",
+   "pos": [
+    -5.5,
+    -10.5
+   ],
+   "rot": 278.5,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_bidon",
+   "pos": [
+    12.0,
+    -5.2
+   ],
+   "rot": 321.6,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_bidon",
+   "pos": [
+    -12.5,
+    2.6
+   ],
+   "rot": 141.3,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_bidon",
+   "pos": [
+    5.2,
+    12.2
+   ],
+   "rot": 356.5,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_bidon",
+   "pos": [
+    5.9,
+    11.3
+   ],
+   "rot": 304.6,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    9.09,
+    5.25
+   ],
+   "rot": 60.0,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    0.0,
+    10.5
+   ],
+   "rot": 0.0,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    -9.09,
+    5.25
+   ],
+   "rot": -60.0,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    -9.09,
+    -5.25
+   ],
+   "rot": -120.0,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    -0.0,
+    -10.5
+   ],
+   "rot": -180.0,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    9.09,
+    -5.25
+   ],
+   "rot": -240.0,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    -20.0,
+    -18.0
+   ],
+   "rot": 45,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    19.0,
+    17.0
+   ],
+   "rot": 225,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.77,
+    -34.76
+   ],
+   "rot": 321.5,
+   "scale": 2.82
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.41,
+    -34.14
+   ],
+   "rot": 100.8,
+   "scale": 3.29
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -29.57,
+    -33.91
+   ],
+   "rot": 130.0,
+   "scale": 2.4
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.94,
+    -30.6
+   ],
+   "rot": 117.6,
+   "scale": 3.13
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -27.72,
+    -33.5
+   ],
+   "rot": 340.9,
+   "scale": 2.65
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -34.29,
+    -26.95
+   ],
+   "rot": 38.1,
+   "scale": 2.84
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -23.77,
+    -34.81
+   ],
+   "rot": 95.3,
+   "scale": 2.69
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -34.11,
+    -22.92
+   ],
+   "rot": 194.1,
+   "scale": 3.35
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -20.14,
+    -34.26
+   ],
+   "rot": 334.9,
+   "scale": 2.87
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.54,
+    -21.05
+   ],
+   "rot": 294.9,
+   "scale": 2.97
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -15.98,
+    -33.66
+   ],
+   "rot": 50.5,
+   "scale": 2.43
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -34.42,
+    -16.64
+   ],
+   "rot": 107.9,
+   "scale": 2.61
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -11.99,
+    -34.98
+   ],
+   "rot": 317.3,
+   "scale": 2.89
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -34.93,
+    -12.54
+   ],
+   "rot": 157.3,
+   "scale": 3.11
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -9.9,
+    -33.27
+   ],
+   "rot": 210.8,
+   "scale": 2.68
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -34.76,
+    -9.15
+   ],
+   "rot": 261.6,
+   "scale": 2.87
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -6.4,
+    -34.09
+   ],
+   "rot": 235.2,
+   "scale": 3.24
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.44,
+    -5.1
+   ],
+   "rot": 210.6,
+   "scale": 2.73
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -1.08,
+    -33.83
+   ],
+   "rot": 196.6,
+   "scale": 2.55
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.9,
+    -1.76
+   ],
+   "rot": 149.3,
+   "scale": 3.2
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    1.85,
+    -34.52
+   ],
+   "rot": 253.8,
+   "scale": 2.5
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.68,
+    1.67
+   ],
+   "rot": 296.2,
+   "scale": 3.15
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    5.1,
+    -34.41
+   ],
+   "rot": 339.6,
+   "scale": 2.47
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.38,
+    5.96
+   ],
+   "rot": 238.4,
+   "scale": 3.34
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    9.28,
+    -34.56
+   ],
+   "rot": 300.3,
+   "scale": 2.72
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -34.06,
+    8.83
+   ],
+   "rot": 109.8,
+   "scale": 3.36
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    13.18,
+    -34.37
+   ],
+   "rot": 286.0,
+   "scale": 2.41
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -34.44,
+    14.1
+   ],
+   "rot": 293.8,
+   "scale": 3.01
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    16.4,
+    -33.38
+   ],
+   "rot": 314.7,
+   "scale": 2.66
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.35,
+    17.36
+   ],
+   "rot": 256.3,
+   "scale": 3.11
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    21.36,
+    -34.86
+   ],
+   "rot": 340.7,
+   "scale": 2.45
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.86,
+    19.93
+   ],
+   "rot": 119.1,
+   "scale": 3.3
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    25.0,
+    -34.76
+   ],
+   "rot": 103.2,
+   "scale": 2.51
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -34.58,
+    23.59
+   ],
+   "rot": 312.8,
+   "scale": 2.72
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    29.3,
+    -33.27
+   ],
+   "rot": 83.1,
+   "scale": 3.06
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.64,
+    29.48
+   ],
+   "rot": 213.3,
+   "scale": 3.27
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    32.59,
+    -34.6
+   ],
+   "rot": 140.5,
+   "scale": 3.08
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -34.45,
+    32.23
+   ],
+   "rot": 51.2,
+   "scale": 2.49
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    34.98,
+    -34.02
+   ],
+   "rot": 320.7,
+   "scale": 2.92
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -33.97,
+    34.43
+   ],
+   "rot": 265.1,
+   "scale": 2.83
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    -32.35,
+    35.81
+   ],
+   "rot": 357.8,
+   "scale": 1.83
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    36.88,
+    -31.46
+   ],
+   "rot": 298.3,
+   "scale": 1.47
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    -26.62,
+    36.52
+   ],
+   "rot": 43.8,
+   "scale": 2.3
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    36.35,
+    -27.53
+   ],
+   "rot": 152.0,
+   "scale": 2.31
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    -21.65,
+    35.2
+   ],
+   "rot": 231.6,
+   "scale": 1.6
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    35.08,
+    -21.68
+   ],
+   "rot": 262.7,
+   "scale": 1.54
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    -18.6,
+    34.64
+   ],
+   "rot": 288.0,
+   "scale": 2.41
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    36.36,
+    -18.18
+   ],
+   "rot": 335.1,
+   "scale": 2.5
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    -13.25,
+    33.94
+   ],
+   "rot": 319.9,
+   "scale": 1.98
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    36.51,
+    -12.88
+   ],
+   "rot": 89.8,
+   "scale": 2.58
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    -9.55,
+    34.04
+   ],
+   "rot": 120.0,
+   "scale": 1.69
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    36.66,
+    -9.02
+   ],
+   "rot": 126.6,
+   "scale": 1.67
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    -4.6,
+    34.04
+   ],
+   "rot": 354.7,
+   "scale": 1.9
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    36.06,
+    -3.86
+   ],
+   "rot": 250.5,
+   "scale": 1.68
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    1.29,
+    36.56
+   ],
+   "rot": 71.5,
+   "scale": 1.89
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    36.97,
+    2.0
+   ],
+   "rot": 84.4,
+   "scale": 2.32
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    7.64,
+    34.06
+   ],
+   "rot": 295.7,
+   "scale": 1.84
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    34.95,
+    9.17
+   ],
+   "rot": 92.4,
+   "scale": 1.86
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    12.59,
+    35.82
+   ],
+   "rot": 26.9,
+   "scale": 2.4
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    36.26,
+    12.69
+   ],
+   "rot": 354.3,
+   "scale": 2.46
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    18.25,
+    34.77
+   ],
+   "rot": 115.9,
+   "scale": 2.17
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    33.14,
+    18.58
+   ],
+   "rot": 270.2,
+   "scale": 2.47
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    25.28,
+    36.06
+   ],
+   "rot": 19.5,
+   "scale": 2.45
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    35.55,
+    25.93
+   ],
+   "rot": 102.3,
+   "scale": 2.27
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    30.37,
+    35.14
+   ],
+   "rot": 59.6,
+   "scale": 1.64
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    35.7,
+    30.53
+   ],
+   "rot": 188.1,
+   "scale": 2.11
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -13.27,
+    -21.91
+   ],
+   "rot": 281.2,
+   "scale": 0.95
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -22.6,
+    24.85
+   ],
+   "rot": 143.6,
+   "scale": 1.55
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -20.98,
+    -28.84
+   ],
+   "rot": 245.0,
+   "scale": 1.06
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -25.18,
+    15.91
+   ],
+   "rot": 267.0,
+   "scale": 1.24
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    13.69,
+    -18.29
+   ],
+   "rot": 2.5,
+   "scale": 1.39
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    25.82,
+    -22.53
+   ],
+   "rot": 124.7,
+   "scale": 1.25
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    0.91,
+    -27.75
+   ],
+   "rot": 151.0,
+   "scale": 1.35
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -16.65,
+    17.49
+   ],
+   "rot": 264.4,
+   "scale": 1.61
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    21.35,
+    27.67
+   ],
+   "rot": 22.0,
+   "scale": 1.65
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    -24.8,
+    -9.31
+   ],
+   "rot": 96.5,
+   "scale": 1.16
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    22.32,
+    -21.89
+   ],
+   "rot": 72.7,
+   "scale": 0.93
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    21.35,
+    -12.28
+   ],
+   "rot": 219.5,
+   "scale": 1.71
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    10.11,
+    22.73
+   ],
+   "rot": 271.0,
+   "scale": 0.96
+  },
+  {
+   "model": "atrezo_roca",
+   "pos": [
+    14.78,
+    11.6
+   ],
+   "rot": 166.7,
+   "scale": 1.28
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    -2.26,
+    -13.98
+   ],
+   "rot": 83.7,
+   "scale": 0.96
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    28.54,
+    -0.6
+   ],
+   "rot": 79.7,
+   "scale": 1.57
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    -8.67,
+    -18.92
+   ],
+   "rot": 118.4,
+   "scale": 1.19
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    0.91,
+    25.48
+   ],
+   "rot": 196.4,
+   "scale": 0.82
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    23.11,
+    5.8
+   ],
+   "rot": 297.6,
+   "scale": 1.1
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    26.88,
+    26.89
+   ],
+   "rot": 128.2,
+   "scale": 0.92
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    -3.4,
+    28.44
+   ],
+   "rot": 277.3,
+   "scale": 1.13
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    19.96,
+    0.03
+   ],
+   "rot": 341.0,
+   "scale": 1.49
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    20.53,
+    21.98
+   ],
+   "rot": 312.3,
+   "scale": 1.38
+  },
+  {
+   "model": "atrezo_hielo",
+   "pos": [
+    25.25,
+    23.03
+   ],
+   "rot": 78.5,
+   "scale": 1.48
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    12.85,
+    -13.42
+   ],
+   "rot": 57.3,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    -26.45,
+    -17.08
+   ],
+   "rot": 104.5,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    -26.33,
+    22.31
+   ],
+   "rot": 0.6,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    -22.99,
+    4.47
+   ],
+   "rot": 352.2,
+   "scale": 1.0
+  }
+ ]
+}

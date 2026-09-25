@@ -65,3 +65,12 @@ Estimación con fusión voraz 2D por planos, sin tener en cuenta la oclusión am
 - **Lo que cambia es que la fusión de caras pasa a merecer la pena.** Dyer usa 248 colores frente a 3.445. Si se suprime el ruido de color por voxel, la fusión quitaría hasta el 73 % de sus caras.
 - **En las criaturas orgánicas apenas sirve.**
 - **Tiempo de generación:** despreciable en todos los casos. Dyer tarda 0,17 s, el pingüino 0,18 s, el fragmento 0,32 s y el Acechador 0,62 s.
+
+## Hito 1.3: la partida (25-09-2026)
+
+Arena del campamento completa (119 piezas, 8 faroles con luz), Dyer con el bot en círculos y esquivando, y 14 criaturas de muestra animadas. 1920×1080, sin vsync.
+
+| Configuración | Media | 1 % peor | Llamadas de dibujo | Primitivas |
+|---|---|---|---|---|
+| Con halos de niebla (por defecto) | 1,76 ms (568 FPS) | 2,08 ms (480 FPS) | 193 | 1,7 M |
+| Sin halos (`fogvol=false`) | 1,63 ms (612 FPS) | 1,85 ms (540 FPS) | 193 | 1,7 M |

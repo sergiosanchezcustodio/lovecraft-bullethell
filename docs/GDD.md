@@ -117,7 +117,8 @@ Todas las acciones se pueden reasignar desde el menú de opciones.
 - Paneles compactos y semitransparentes para no tapar balas; el área de juego se ajusta para que ningún jugador quede detrás de un panel.
 
 ### 3.4 Cámara
-- Ortográfica isométrica fija (rotación −30° en X, 45° en Y).
+- Ortográfica isométrica fija (rotación −30° en X, 45° en Y). Altura visible por defecto: 15 m (ajustable por datos).
+- **Legibilidad del jugador:** anillo de color bajo los pies, un pequeño farol propio que lo ilumina a él y a lo que tiene cerca, y su silueta en el color del jugador cuando lo tapa el decorado.
 - **Cooperativo local:** pantalla compartida. La cámara encuadra a todos los jugadores ajustando el zoom ortográfico entre un mínimo y un máximo; al llegar al máximo, los jugadores no pueden separarse más.
 
 ---

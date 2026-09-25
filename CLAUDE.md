@@ -19,7 +19,8 @@ Léela al empezar cada sesión:
   - **Hito 1.2 (modelos nuevos): segunda versión, pendiente de revisión.** Dyer, pingüino albino ciego, fragmento protoplásmico y atrezo del campamento, con sus animaciones en `scripts/anim/`.
     - Rechazados en la primera revisión: Dyer ("ni siquiera parece una persona": demasiado relieve y cara horrible) y el pingüino ("no parece un pingüino"). Rehechos con el enfoque de las lecciones "Personajes humanos" e "Identidad de un animal".
     - Hojas de revisión en `shots/revision_1_2_modelos_v2.png` y `shots/revision_1_2_animaciones_v2.png`, y GIF en `shots/anim_*_v2.gif` (se regeneran; `shots/` no va a git).
-  - **Siguiente: hito 1.3**, jugador, entrada, cámara y arena provisional.
+  - **Hito 1.3 (jugador, entrada, cámara y arena): hecho.** Ya se puede jugar a moverse y esquivar por el campamento con `godot --path .`: teclado (WASD o flechas, espacio para esquivar) o mando (stick izquierdo o cruceta, A para esquivar). Todavía no hay enemigos activos, disparos ni menús; para salir, cierra la ventana.
+  - **Siguiente: hito 1.4**, balas, daño y armas.
 - **Todavía no hay código de juego:** solo el visor, la escena de rendimiento y los generadores de modelos.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
@@ -62,6 +63,10 @@ Entorno de desarrollo (Windows 11 + Git Bash):
 
 Uso desde la raíz del proyecto, en Git Bash:
 ```
+godot --path .                      # partida (escena principal: scenes/main.tscn, que elige la escena según el primer argumento)
+godot --path . -- bot=circle dodge_every=2 demo=14 shots=1,3 tag=prueba   # partida con bot, criaturas de muestra y capturas
+godot --path . --write-movie shots/mov/f.png --fixed-fps 30 --quit-after 240 -- bot=circle   # vídeo en fotogramas PNG
+godot --path . --disable-vsync -- bot=circle demo=14 perf=8                 # rendimiento de la partida
 python tools/gen_acechador.py       # regenera models/acechador.json
 python tools/gen_variantes.py       # regenera clasico, bruto, acechador (versión simple) y abisal
 python tools/gen_dyer.py            # Dyer (personaje jugable); igual gen_pinguino.py y gen_fragmento.py
@@ -77,9 +82,33 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
 ```
 - **Capturas:** van a `shots/`, que Godot ignora (`.gdignore`) y git también. Añade `--rendering-method gl_compatibility` a cualquier comando para usar el renderizador de reserva.
 - **Argumentos:** las escenas leen lo que va detrás de `--` con `LaunchArgs` (`scripts/core/launch_args.gd`): posicionales, `clave=valor` y banderas `--clave`.
+- **Opciones de la partida** (`scripts/core/game.gd`):
+  - `bot=circle|zigzag|idle` y `dodge_every=` (s): jugador automático.
+  - `shots=` y `tag=`: capturas.
+  - `cam=`: altura visible en m (por defecto 15).
+  - `demo=N`: criaturas de muestra quietas.
+  - `pos=x,z`: posición inicial del jugador.
+  - `perf=N`: mide el rendimiento N segundos.
+  - `fogvol=false`: quita los halos de niebla.
+  - `--debug`: imprime la posición del jugador.
 - **Encadenar comandos:** un `godot ... | grep error` devuelve 1 cuando no hay errores, así que no lo encadenes con `&&`.
 
 Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobrescribiría el detallado. Ejecuta `gen_acechador.py` después, o renombra la salida.
+
+## Arquitectura del juego
+
+- **Entrada** (`scripts/input/`): los personajes nunca leen `Input`. Cada jugador tiene un `PlayerInput`:
+  - `KeyboardInput`, `JoypadInput(dispositivo)` o `BotInput(patrón)`, y `CombinedInput` para unir varias fuentes (J1 = teclado + mando 0).
+  - Se leen los dispositivos directamente, sin las acciones globales de Godot, que mezclarían los mandos en local.
+  - Las teclas y botones son datos: `InputBindings`, en `data/input/bindings_default.tres`.
+- **Jugador** (`scripts/player/`):
+  - `CharacterData` (`.tres` en `data/characters/`) guarda el perfil del personaje.
+  - `PlayerMotor` es la lógica pura de movimiento relativo a la cámara y del esquive (impulso, invulnerabilidad y recarga), con tests.
+  - `Player` (un `CharacterBody3D`) aplica esa lógica, orienta y anima el modelo, dibuja el anillo de color, lleva un farol propio (`CarryLight`) y muestra su silueta cuando lo tapa el decorado (`occluded_silhouette.gdshader`).
+- **Cámara** (`GameCamera`): ortográfica isométrica que sigue a sus objetivos, con 15 m de altura visible por defecto.
+- **Arena** (`scripts/level/arena_builder.gd`):
+  - Monta un JSON de `data/arenas/` (generado por `tools/gen_arena_campamento.py`) con el suelo de nieve, el mar, las piezas con su colisión, una luz y un halo de niebla por farol, y los límites invisibles.
+  - Capa 1: mundo. Capa 2: jugadores.
 
 ## Personajes jugables modelados
 
@@ -116,7 +145,16 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Ojos brillantes:** una esfera `glow` dentro de un párpado oscuro tiene que asomar lo suficiente (desplazada ~0,75 ub hacia fuera), o solo se ven motas sueltas.
 - **Capturas abiertas en el visor de fotos:** Windows bloquea el fichero y Python no puede sobrescribirlo (`OSError: Invalid argument`). Guarda con otro nombre.
 - **Rutas en Python desde Git Bash:** las rutas `/c/...` solo se traducen cuando van como argumento. Dentro del código Python usa `C:/...`.
-- **Niebla volumétrica y cámara ortográfica:** la niebla volumétrica global no sirve con nuestra cámara. Solo oscurece la escena y no dispersa la luz de los faroles, una limitación conocida de Godot con cámaras cenitales u ortográficas. Queda por probar con volúmenes de niebla locales (`FogVolume`) en el hito 1.3.
+- **Niebla volumétrica y cámara ortográfica:** la niebla volumétrica global no sirve con nuestra cámara: solo oscurece la escena y no dispersa la luz de los faroles (limitación conocida con cámaras cenitales u ortográficas).
+  - **Lo que sí funciona:** volúmenes locales (`FogVolume` elipsoidal, densidad 0,35) alrededor de cada farol, con la niebla volumétrica activada y la densidad global a 0. Dan halos cálidos y cuestan unos 0,13 ms por fotograma.
+- **Legibilidad del jugador:** con luz de luna, la parka marrón de Dyer se funde con el suelo oscuro. Se resuelve con tres cosas:
+  - Un farol propio (luz cálida de 4,5 m de alcance que también ilumina a las criaturas cercanas).
+  - Un anillo de color grueso.
+  - Una silueta cuando lo tapa el decorado. El shader descarta lo que no está tapado y exige que el obstáculo esté al menos 0,5 m por delante, medido en distancia real; si no, un brazo delante del torso cuenta como obstáculo.
+- **Suelo sin juntas:** unos huecos de 1 cm entre losas dibujaban una cuadrícula y dejaban ver el mar que pasa por debajo, con destellos de los faroles. Las losas van contiguas.
+- **Colisión al aparecer:** si un `CharacterBody3D` aparece dentro de una colisión, `move_and_slide` lo expulsa.
+- **Bot con esquive:** el bot no debe esquivar en el primer fotograma. Si lo hace, sale disparado hacia delante y parece que no respeta la posición inicial.
+- **`cat` sin entrada:** un `cat > fichero` sin heredoc se queda esperando la entrada estándar para siempre.
 
 ## Por definir
 
