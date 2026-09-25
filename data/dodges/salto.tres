@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DodgeStyle" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/dodge_style.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"salto"
+display_name = "Salto"
+anim = "jump"
+speed = 9.5
+duration = 0.42
+iframes = 0.42
+cooldown = 1.3
+snow_spray = false

@@ -42,6 +42,7 @@ static func rest(m: Node3D, part: String) -> Vector3:
 static func reset(m: Node3D) -> void:
 	m.position = Vector3.ZERO
 	m.rotation = Vector3.ZERO
+	m.scale = Vector3.ONE
 	var parts: Array[Node3D] = m.get_meta("parts")
 	var rest_pos: Array[Vector3] = m.get_meta("rest")
 	for i in parts.size():
@@ -52,7 +53,7 @@ static func reset(m: Node3D) -> void:
 
 ## Captura la pose actual del modelo (raíz y partes) para fundirla con otra.
 static func snapshot(m: Node3D) -> Array:
-	var out: Array = [m.position, m.rotation]
+	var out: Array = [m.position, m.rotation, m.scale]
 	for n: Node3D in m.get_meta("parts"):
 		out.append_array([n.position, n.rotation, n.scale])
 	return out
@@ -62,10 +63,11 @@ static func blend_from(m: Node3D, snap: Array, w: float) -> void:
 	if w >= 1.0: return
 	m.position = (snap[0] as Vector3).lerp(m.position, w)
 	m.rotation = (snap[1] as Vector3).lerp(m.rotation, w)
+	m.scale = (snap[2] as Vector3).lerp(m.scale, w)
 	var parts: Array[Node3D] = m.get_meta("parts")
 	for i in parts.size():
 		var n := parts[i]
-		var o := 2 + i * 3
+		var o := 3 + i * 3
 		n.position = (snap[o] as Vector3).lerp(n.position, w)
 		n.rotation = (snap[o + 1] as Vector3).lerp(n.rotation, w)
 		n.scale = (snap[o + 2] as Vector3).lerp(n.scale, w)

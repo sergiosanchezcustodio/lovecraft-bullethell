@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/deslizar.tres" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -16,6 +17,7 @@ dodge_duration = 0.32
 dodge_iframes = 0.36
 dodge_cooldown = 1.2
 dodge_anim = "slide"
+dodge_style = ExtResource("2")
 luck = 1.0
 starting_weapons = Array[StringName]([&"dinamita", &"revolver"])
 collision_radius = 0.32

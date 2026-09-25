@@ -30,6 +30,7 @@ var _override := ""              ## gesto del tren superior (lanzar) que se suma
 var _override_t := 0.0
 var _action := ""                ## animación de acción en curso (el esquive) y su tiempo
 var _action_t := 0.0
+var _ghost_t := 0.0
 var _blend_snap: Array = []      ## pose de la que se parte al cambiar de animación
 var _blend_t := 1.0
 var _blend_len := 0.0
@@ -42,6 +43,7 @@ var _xray: ShaderMaterial
 
 func setup(p_data: CharacterData, p_input: PlayerInput, p_color: Color) -> Player:
 	data = p_data.duplicate()        # copia propia: las mejoras pasivas la modifican
+	if data.dodge_style != null: apply_dodge_style(data.dodge_style)
 	input = p_input
 	color = p_color
 	motor = PlayerMotor.new(data)
@@ -134,7 +136,18 @@ func _process(delta: float) -> void:
 	# Parpadeo durante la invulnerabilidad tras un golpe
 	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
 	_animate(delta)
-	_snow.emitting = _action != ""
+	var style := data.dodge_style
+	_snow.emitting = _action != "" and (style == null or style.snow_spray)
+	# Destello: el modelo desaparece en su tramo y deja una estela de imágenes fantasma
+	if _action != "" and style != null:
+		var u := _action_t / Anims.duration(data.model, _action)
+		if u >= style.hidden_from and u < style.hidden_to:
+			visual.visible = false
+		if style.afterimages and u >= 0.1 and u < style.hidden_to:       # estela breve y tenue
+			_ghost_t -= delta
+			if _ghost_t <= 0.0 and world != null:
+				_ghost_t = 0.05
+				world.fx.add_child(Afterimage.new().setup(model, color.lerp(Color(0.85, 0.95, 1.0), 0.6), 0.28))
 
 ## Animación por capas: una base (reposo, andar o esquive) que se funde al cambiar y,
 ## encima, el gesto de lanzar solo en brazos y torso, con entrada y salida suaves.
@@ -149,7 +162,7 @@ func _animate(delta: float) -> void:
 	if _action != "": anim = _action
 	elif motor.velocity.length() > 0.1: anim = "walk"
 	if anim != _anim:
-		var was_action := _anim in ["slide", "roll"]
+		var was_action := _anim in ["slide", "roll", "dive", "jump", "flash"]
 		_blend_snap = Anims.snapshot(model)
 		_blend_t = 0.0
 		# entrar en el esquive, rápido; salir de él (incorporarse), algo más lento
@@ -213,6 +226,16 @@ func _make_snow_spray() -> GPUParticles3D:
 	box.material = bm
 	p.draw_pass_1 = box
 	return p
+
+## Aplica un estilo de esquive (animación, velocidad, duración, invulnerabilidad, recarga
+## y efectos). Lo usa la creación del jugador y la tecla F1 de pruebas.
+func apply_dodge_style(style: DodgeStyle) -> void:
+	data.dodge_style = style
+	data.dodge_anim = style.anim
+	data.dodge_speed = style.speed
+	data.dodge_duration = style.duration
+	data.dodge_iframes = style.iframes
+	data.dodge_cooldown = style.cooldown
 
 func is_invulnerable() -> bool:
 	return motor.is_invulnerable() or (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes)

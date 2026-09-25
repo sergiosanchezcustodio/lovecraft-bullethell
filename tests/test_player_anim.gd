@@ -42,6 +42,12 @@ func test_sin_saltos_deslizamiento() -> void:
 func test_sin_saltos_voltereta() -> void:
 	await _sin_saltos("roll")
 
+func test_sin_saltos_plancha() -> void:
+	await _sin_saltos("dive")
+
+func test_sin_saltos_salto() -> void:
+	await _sin_saltos("jump")
+
 func _sin_saltos(dodge_anim: String) -> void:
 	var world := CombatWorld.new()
 	add_child_autofree(world)

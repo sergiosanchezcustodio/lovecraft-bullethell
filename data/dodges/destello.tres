@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DodgeStyle" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/dodge_style.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"destello"
+display_name = "Destello"
+anim = "flash"
+speed = 26.0
+duration = 0.13
+iframes = 0.22
+cooldown = 1.1
+snow_spray = false
+afterimages = true
+hidden_from = 0.22
+hidden_to = 0.62

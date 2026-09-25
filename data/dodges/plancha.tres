@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DodgeStyle" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/dodge_style.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"plancha"
+display_name = "Plancha de pingüino"
+anim = "dive"
+speed = 12.5
+duration = 0.36
+iframes = 0.38
+cooldown = 1.3
+snow_spray = true

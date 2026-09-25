@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DodgeStyle" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/dodge_style.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"deslizar"
+display_name = "Deslizamiento"
+anim = "slide"
+speed = 11.5
+duration = 0.32
+iframes = 0.36
+cooldown = 1.2
+snow_spray = true
