@@ -16,6 +16,9 @@ extends Resource
 @export var dodge_duration := 0.25           ## s de impulso
 @export var dodge_iframes := 0.32            ## s de invulnerabilidad desde que empieza
 @export var dodge_cooldown := 1.2            ## s desde que empieza hasta poder repetir
+## Animación del esquive: "slide" (deslizamiento sobre la nieve) o "roll" (voltereta).
+## Cada personaje puede tener la suya; la animación puede durar algo más que el impulso.
+@export var dodge_anim := "slide"
 @export_group("Otros")
 @export var luck := 1.0                      ## suerte en las mejoras
 @export var pickup_radius := 2.2             ## a qué distancia empiezan a volar las gemas hacia él

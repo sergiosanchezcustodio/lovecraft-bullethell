@@ -1,7 +1,7 @@
 extends GutTest
 
 const CASES := {
-	"dyer": ["idle", "walk", "dodge", "throw"],
+	"dyer": ["idle", "walk", "slide", "roll", "throw"],
 	"pinguino": ["idle", "walk", "charge"],
 	"fragmento": ["idle", "walk", "burst"],
 	"acechador": ["idle", "walk", "pounce"],

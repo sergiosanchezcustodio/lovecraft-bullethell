@@ -50,6 +50,7 @@ Léela al empezar cada sesión:
       - Tiendas verdes grisáceas de cumbrera.
       - Iglú, cabaña de troncos y bloques de hielo en el campamento.
       - Carga de la partida en 0,17 s gracias a la caché de mallas.
+    - **Esquive con voltereta** como alternativa al deslizamiento: F1 en partida o `dodge=roll`. Pendiente de decidir cuál lleva cada personaje (`CharacterData.dodge_anim`).
 - **Todavía no hay código de juego:** solo el visor, la escena de rendimiento y los generadores de modelos.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
@@ -122,6 +123,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `perf=N`: mide el rendimiento N segundos.
   - `fogvol=false`: quita los halos de niebla.
   - `--debug`: imprime la posición del jugador.
+  - `dodge=roll|slide`: animación del esquive (F1 la alterna en partida).
   - `dummies=N`: muñecos de práctica que reciben daño.
   - `emitters=true`: tres emisores de prueba, uno por tipo de daño.
   - `weapons=dinamita,revolver` y `wlevel=N`: armas iniciales y su nivel.
@@ -154,7 +156,7 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
   - Al aparecer, `reset_physics_interpolation()`.
   - **Todo lo visual debe avanzar con el reloj de fotograma, no con contadores de física:** el esquive usaba `motor.dodge_time` y la pose avanzaba a saltos.
   - Métrica de suavidad: `jitter=true` con `bot=right` o `bot=up`. Sin interpolación daba 1,00; con ella, 0,03.
-- **Animación del jugador:** capas. Una base (reposo, andar o esquive) con fundido de 0,06 a 0,22 s al cambiar (`Anims.snapshot` y `blend_from`), y encima el gesto de lanzar solo en brazos y torso (`Anims.overlay`). La cadencia de andar es proporcional a la velocidad real, para que los pies no patinen. El esquive es un deslizamiento que frena progresivamente hasta la velocidad de andar. `tests/test_player_anim.gd` comprueba que ninguna parte salte entre fotogramas.
+- **Animación del jugador:** capas. Una base (reposo, andar o esquive) con fundido de 0,06 a 0,22 s al cambiar (`Anims.snapshot` y `blend_from`), y encima el gesto de lanzar solo en brazos y torso (`Anims.overlay`). La cadencia de andar es proporcional a la velocidad real, para que los pies no patinen. El esquive (`slide` o `roll`, según `CharacterData.dodge_anim`) es una acción que dura lo que su animación, que puede ser más que el impulso: la voltereta termina de rodar ya a velocidad de andar. El impulso frena progresivamente hasta la velocidad de andar. Para comprobar la fluidez se comparan posiciones reales de puntos del cuerpo, no ángulos, que en una voltereta pasan de +180° a −180°. `tests/test_player_anim.gd` comprueba que ninguna parte salte entre fotogramas.
 - **Jugador** (`scripts/player/`):
   - `CharacterData` (`.tres` en `data/characters/`) guarda el perfil del personaje.
   - `PlayerMotor` es la lógica pura de movimiento relativo a la cámara y del esquive (impulso, invulnerabilidad y recarga), con tests.

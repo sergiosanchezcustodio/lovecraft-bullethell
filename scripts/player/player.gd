@@ -28,6 +28,8 @@ var _anim_t := 0.0
 var _hurt_time := -1.0           ## tiempo desde el último golpe (-1 = nunca)
 var _override := ""              ## gesto del tren superior (lanzar) que se suma a la animación
 var _override_t := 0.0
+var _action := ""                ## animación de acción en curso (el esquive) y su tiempo
+var _action_t := 0.0
 var _blend_snap: Array = []      ## pose de la que se parte al cambiar de animación
 var _blend_t := 1.0
 var _blend_len := 0.0
@@ -104,7 +106,10 @@ func _physics_process(delta: float) -> void:
 	velocity = motor.step(delta, input.move, input.just_pressed(InputBindings.DODGE))
 	move_and_slide()
 	position.y = 0.0
-	if motor.is_dodging() and not was_dodging: dodged.emit()
+	if motor.is_dodging() and not was_dodging:
+		_action = data.dodge_anim         # la animación del esquive empieza con el impulso
+		_action_t = 0.0
+		dodged.emit()
 	if _hurt_time >= 0.0: _hurt_time += delta
 
 func _process(delta: float) -> void:
@@ -129,27 +134,31 @@ func _process(delta: float) -> void:
 	# Parpadeo durante la invulnerabilidad tras un golpe
 	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
 	_animate(delta)
-	_snow.emitting = motor.is_dodging()
+	_snow.emitting = _action != ""
 
 ## Animación por capas: una base (reposo, andar o esquive) que se funde al cambiar y,
 ## encima, el gesto de lanzar solo en brazos y torso, con entrada y salida suaves.
 func _animate(delta: float) -> void:
+	# El esquive dura lo que su animación (una voltereta necesita algo más que el impulso)
+	if _action != "":
+		# reloj propio a ritmo de fotograma: motor.dodge_time avanza en pasos de física
+		# (60 Hz) y en monitores más rápidos la pose iría a saltos
+		_action_t += delta
+		if _action_t >= Anims.duration(data.model, _action): _action = ""
 	var anim := "idle"
-	if motor.is_dodging(): anim = "dodge"
+	if _action != "": anim = _action
 	elif motor.velocity.length() > 0.1: anim = "walk"
 	if anim != _anim:
+		var was_action := _anim in ["slide", "roll"]
 		_blend_snap = Anims.snapshot(model)
 		_blend_t = 0.0
 		# entrar en el esquive, rápido; salir de él (incorporarse), algo más lento
-		_blend_len = 0.06 if anim == "dodge" else (0.22 if _anim == "dodge" else 0.15)
+		_blend_len = 0.06 if anim == _action and _action != "" else (0.22 if was_action else 0.15)
 		_anim = anim
 		if anim != "walk": _anim_t = 0.0
 	var t: float
-	if anim == "dodge":
-		# Reloj propio a ritmo de fotograma: motor.dodge_time avanza en pasos de física
-		# (60 Hz) y en monitores más rápidos la pose iría a saltos.
-		_anim_t += delta
-		t = _anim_t / data.dodge_duration
+	if _action != "":
+		t = _action_t / Anims.duration(data.model, _action)
 	elif anim == "walk":
 		# cadencia proporcional a la velocidad real: los pies no patinan
 		_anim_t += delta * (motor.velocity.length() / data.move_speed) / Anims.duration(data.model, "walk")
@@ -165,7 +174,7 @@ func _animate(delta: float) -> void:
 		_override_t += delta / Anims.duration(data.model, _override)
 		if _override_t >= 1.0:
 			_override = ""
-		elif not motor.is_dodging():
+		elif _action == "":
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
 

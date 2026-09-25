@@ -3,7 +3,9 @@ extends RefCounted
 
 ## walk: ciclo a la velocidad base del personaje. Player lo reproduce más deprisa o más
 ## despacio según la velocidad real, para que los pies no patinen.
-const DURATION := {"idle": 2.0, "walk": 0.5, "dodge": 0.32, "throw": 0.55}
+## Esquives: "slide" (deslizamiento) y "roll" (voltereta). Cada personaje elige el suyo en
+## CharacterData.dodge_anim; la animación puede durar más que el impulso del esquive.
+const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.32, "roll": 0.42, "throw": 0.55}
 
 ## Reposo: respiración y un leve vistazo alrededor.
 static func idle(m: Node3D, t: float) -> void:
@@ -33,7 +35,7 @@ static func walk(m: Node3D, t: float) -> void:
 ## la nieve y la otra delante para equilibrarse; la cabeza mira al frente. Entra en el
 ## primer 40 % (unas 0,13 s) y se mantiene: al acabar, Player funde la pose con la de andar
 ## (incorporarse).
-static func dodge(m: Node3D, t: float) -> void:
+static func slide(m: Node3D, t: float) -> void:
 	var k := Anims.ease(t / 0.4)
 	var lean := -0.5 * k
 	m.rotation.x = lean
@@ -44,6 +46,26 @@ static func dodge(m: Node3D, t: float) -> void:
 	Anims.part(m, "arm_r").rotation = Vector3(-0.55 * k, 0.0, 0.5 * k)     # brazo abierto para equilibrarse
 	Anims.part(m, "head").rotation.x = 0.42 * k                            # mira al frente
 	Anims.part(m, "torso").rotation.z = 0.06 * k
+
+## Esquive: voltereta hacia delante. Se encoge (piernas al pecho, brazos abrazándolas,
+## barbilla metida), da una vuelta completa girando sobre el centro de la bola que forma
+## el cuerpo, tocando la nieve con la espalda, y se despliega al acabar.
+##   0-0,18 se encoge | 0,06-0,86 gira 360° | 0,78-1 se despliega
+static func roll(m: Node3D, t: float) -> void:
+	var k := Anims.ease(t / 0.18) * (1.0 - Anims.ease((t - 0.78) / 0.22))
+	var spin := TAU * Anims.ease((t - 0.06) / 0.8)
+	var angle := wrapf(0.5 * k + spin, -PI, PI)           # inclinación al encogerse + la vuelta
+	# Girar alrededor del centro de la bola (no de los pies) y bajarla hasta rozar el suelo
+	var center := Vector3(0, 1.0, 0.22 * k)
+	var basis := Basis(Vector3.RIGHT, angle)
+	m.rotation.x = angle
+	# centro de la bola a ~0,55 m: rueda pegada a la nieve (si roza, se hunde un poco en ella)
+	m.position = center - basis * center + Vector3(0, -0.45 * k, 0)
+	Anims.part(m, "leg_l").rotation = Vector3(-1.75 * k, 0.0, 0.06 * k)   # rodillas al pecho
+	Anims.part(m, "leg_r").rotation = Vector3(-1.75 * k, 0.0, -0.06 * k)
+	Anims.part(m, "arm_l").rotation = Vector3(-1.45 * k, 0.0, 0.18 * k)   # abrazando las piernas
+	Anims.part(m, "arm_r").rotation = Vector3(-1.45 * k, 0.0, -0.18 * k)
+	Anims.part(m, "head").rotation.x = 0.55 * k                            # barbilla metida
 
 ## Lanzamiento de dinamita con el brazo derecho por encima del hombro.
 ## Se suma por encima de andar (Player.play_once la aplica solo a brazos y torso).

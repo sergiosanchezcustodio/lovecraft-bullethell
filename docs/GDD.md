@@ -131,6 +131,7 @@ Todas las acciones se pueden reasignar desde el menú de opciones.
 - **Esquive:** impulso corto en la dirección de movimiento, con fotogramas de invulnerabilidad y tiempo de recarga. Es la herramienta principal para atravesar cortinas de balas.
   - En los personajes de la parte 1 es un **deslizamiento sobre la nieve**: pies por delante, cuerpo echado atrás y nieve que salta. Frena progresivamente hasta la velocidad de andar y se funde con el paso al incorporarse.
   - Valores de Dyer: 0,32 s, de 11,5 a 4,5 m/s, 0,36 s de invulnerabilidad y 1,2 s de recarga.
+  - **Estilo de esquive por personaje** (`CharacterData.dodge_anim`): `slide` (deslizamiento) o `roll` (voltereta: se encoge, rueda 360° pegado a la nieve y se despliega; 0,42 s de animación sobre el mismo impulso). Están en prueba para decidir cuál lleva cada personaje; en partida, F1 alterna entre ellos.
   - Principio general: **toda acción del personaje enlaza con fluidez con el movimiento normal**. Los gestos de ataque se suman a la animación de andar, nunca la interrumpen.
 - **Telegrafía:** todo ataque fuerte se anuncia con un aviso visual (marca en el suelo, brillo, animación de carga) proporcional a su daño.
 

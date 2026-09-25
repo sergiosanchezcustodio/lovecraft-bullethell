@@ -18,8 +18,17 @@ class ScriptedInput extends PlayerInput:
 			if t >= d and t < d + 0.03: return true
 		return false
 
+## Posición (en metros, respecto al jugador) de dos puntos de cada parte: su pivote y un
+## punto a 40 cm a lo largo de ella. Con posiciones reales, y no con ángulos, una voltereta
+## que pasa de +180° a -180° no cuenta como salto.
 func _pose(p: Player) -> Array:
-	return Anims.snapshot(p.model)
+	var out: Array = []
+	var root: Transform3D = p.model.transform
+	for n: Node3D in p.model.get_meta("parts"):
+		var xf := root * n.transform
+		out.append(xf.origin)
+		out.append(xf * Vector3(0, -0.4, 0))
+	return out
 
 func _max_jump(a: Array, b: Array) -> float:
 	var worst := 0.0
@@ -27,12 +36,19 @@ func _max_jump(a: Array, b: Array) -> float:
 		worst = maxf(worst, ((a[i] as Vector3) - (b[i] as Vector3)).length())
 	return worst
 
-func test_sin_saltos_al_esquivar_parar_y_lanzar() -> void:
+func test_sin_saltos_deslizamiento() -> void:
+	await _sin_saltos("slide")
+
+func test_sin_saltos_voltereta() -> void:
+	await _sin_saltos("roll")
+
+func _sin_saltos(dodge_anim: String) -> void:
 	var world := CombatWorld.new()
 	add_child_autofree(world)
 	var inp := ScriptedInput.new()
 	inp.dodge_at = [0.5, 1.7] as Array[float]
 	var p := Player.new().setup(load("res://data/characters/dyer.tres"), inp, Color.YELLOW)
+	p.data.dodge_anim = dodge_anim
 	p.world = world
 	world.add_child(p)
 	world.add_player(p)
@@ -54,9 +70,9 @@ func test_sin_saltos_al_esquivar_parar_y_lanzar() -> void:
 			worst_t = t
 		prev = cur
 		t += DT
-	# Andar mueve hasta ~0,08 por fotograma a 120 Hz; entrar en el esquive, algo más.
-	# Un salto de animación (pasar de golpe de una pose a otra) supera con mucho 0,3.
-	assert_lt(worst, 0.22, "mayor cambio entre fotogramas: %.3f en t=%.2f s" % [worst, worst_t])
+	# Andar mueve un punto hasta ~5 cm por fotograma a 120 Hz; la voltereta, unos 15 cm en
+	# el momento de más giro. Un salto de animación (cambiar de pose de golpe) supera 0,3 m.
+	assert_lt(worst, 0.2, "%s: mayor desplazamiento entre fotogramas %.3f m en t=%.2f s" % [dodge_anim, worst, worst_t])
 
 func test_al_lanzar_las_piernas_siguen_andando() -> void:
 	var world := CombatWorld.new()

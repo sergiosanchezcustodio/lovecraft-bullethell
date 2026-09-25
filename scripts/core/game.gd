@@ -19,6 +19,7 @@ extends Node3D
 ##   spawn_rate=20           ritmo de aparición fijo (enemigos por segundo)
 ##   fogvol=false            sin los halos de niebla de los faroles
 ##   pos=x,z                 posición inicial del jugador
+##   dodge=roll|slide        animación del esquive (en partida, F1 la alterna para compararlas)
 ##   tag=nombre              sufijo de las capturas
 ##   autopick=true           elige sola la primera mejora al subir de nivel (bot, capturas)
 ##   xp=40                   experiencia inicial (probar el menú de mejoras)
@@ -78,6 +79,7 @@ func _ready() -> void:
 	var p := args.get_floats("pos")
 	if p.size() == 2: player.position = Vector3(p[0], 0, p[1])
 	player.god = args.get_bool("god")
+	if args.has("dodge"): player.data.dodge_anim = args.get_str("dodge")
 	player.world = world
 	add_child(player)
 	world.add_player(player)
@@ -388,3 +390,10 @@ func _jitter(delta: float) -> void:
 		# y también el movimiento aparente respecto a la cámara (lo que ve el ojo)
 		print("JITTER fotogramas=%d  px/s medio=%.0f  variación=%.2f  fps=%.0f" % [_jit_rates.size(), m, sd / m, Engine.get_frames_per_second()])
 		get_tree().quit()
+
+## F1: alterna la animación del esquive (deslizamiento / voltereta) para compararlas.
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_F1:
+		player.data.dodge_anim = "roll" if player.data.dodge_anim == "slide" else "slide"
+		announce("Esquive: " + ("voltereta" if player.data.dodge_anim == "roll" else "deslizamiento"), 1.2)
+		get_viewport().set_input_as_handled()

@@ -15,6 +15,7 @@ dodge_speed = 11.5
 dodge_duration = 0.32
 dodge_iframes = 0.36
 dodge_cooldown = 1.2
+dodge_anim = "slide"
 luck = 1.0
 starting_weapons = Array[StringName]([&"dinamita", &"revolver"])
 collision_radius = 0.32
