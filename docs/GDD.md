@@ -137,6 +137,14 @@ Cada tipo combina dos elementos de diseño independientes, definidos por datos y
 
 Cada ataque tiene además un tipo de daño (sección 4.4).
 
+**Enemigos de la fase 1 (implementados en el hito 1.5):**
+
+| Enemigo | Escalón | Movimiento | Ataques | Daño |
+|---|---|---|---|---|
+| Pingüino albino ciego | 1 | Va hacia donde oyó al jugador por última vez y corrige cada ~1 s, así que esquivar de lado funciona. De cerca se echa atrás y embiste | Picotazo en la carga (contacto ×1,6) y abanico de 3 esquirlas de hielo | Físico |
+| Fragmento protoplásmico | 1 | Repta a tirones, al ritmo de su animación; se para al escupir | Glóbulos que silban "¡Tekeli-li!": dos ráfagas radiales lentas de 8 | Mixto (y contacto mixto) |
+| Acechador (élite de prueba, evento final) | 3 | Ronda al jugador a unos 6 m | Salto: marca roja en el suelo, 0,9 s de aviso, impacto en 1,7 m y anillo de 14 balas. Croar: aviso violeta y onda mental de 30 balas con tres huecos para atravesarla | Físico y mental |
+
 ### 4.3 Progresión dentro de la partida
 - Los enemigos sueltan experiencia. Al subir de nivel, el jugador elige **1 de 3 mejoras** al azar: arma nueva, subir de nivel un arma o mejora pasiva. La elección pausa la partida (D-16).
 - Cada arma tiene niveles del 1 al 5 (propuesta). Evoluciones o combinaciones: D-06.

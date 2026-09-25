@@ -85,3 +85,15 @@ Partida con 1.000 balas enemigas vivas (`bullet_rain=1000`, de los tres tipos), 
 
 - **Coste de las balas:** respecto a la partida sin balas del hito 1.3, cuestan en torno a 0,3 ms. El MultiMesh es una sola llamada de dibujo.
 - **Dónde está el coste:** en la simulación en GDScript (integración y colisiones), no en el dibujo.
+
+## Hito 1.5: 150 enemigos reales (25-09-2026)
+
+150 enemigos vivos (pingüinos y fragmentos) con su comportamiento completo: separación, rodeo del decorado, contacto y disparos. Dinamita y revólver a nivel 3, bot en círculos. Opciones: `spawn_rate=40 max_alive=150`. 1920×1080, sin vsync.
+
+| Versión | Media | 1 % peor | Llamadas de dibujo | Primitivas |
+|---|---|---|---|---|
+| Primera versión | 12,36 ms (81 FPS) | 16,82 ms (59 FPS) | 349 | 4,6 M |
+| Con partes, reposo y mallas en caché | 5,89 ms (170 FPS) | 8,33 ms (120 FPS) | 359 | 4,7 M |
+
+- **Qué se optimizó:** buscar las mallas con `find_children` y reasignar el material de destello en cada fotograma, y recalcular las posiciones de reposo, costaban más que todo lo demás. Ahora se guardan al crear el modelo y el material solo se toca cuando cambia.
+- **Dónde está el límite:** en la CPU (GDScript), no en la GPU. La prueba de carga completa del hito 1.7 sumará las 1.000 balas.
