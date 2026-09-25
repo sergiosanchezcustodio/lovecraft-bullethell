@@ -21,7 +21,13 @@ Léela al empezar cada sesión:
     - Hojas de revisión en `shots/revision_1_2_modelos_v2.png` y `shots/revision_1_2_animaciones_v2.png`, y GIF en `shots/anim_*_v2.gif` (se regeneran; `shots/` no va a git).
   - **Hito 1.3 (jugador, entrada, cámara y arena): hecho.** Ya se puede jugar a moverse y esquivar por el campamento con `godot --path .`: teclado (WASD o flechas, espacio para esquivar) o mando (stick izquierdo o cruceta, A para esquivar). Todavía no hay enemigos activos, disparos ni menús; para salir, cierra la ventana.
   - **Hito 1.4 (balas, daño y armas): hecho.** Balas en arrays con un único MultiMesh, lenguaje visual de los tres tipos de daño, revólver y dinamita con apuntado por datos, patrones de disparo enemigos como datos, avisos en el suelo, explosiones y muñecos de práctica. Clip en `shots/combate_1_4.gif`.
-  - **Siguiente: hito 1.5**, enemigos y nivel.
+  - **Hito 1.5 (enemigos y nivel): hecho.** `godot --path .` ya juega el nivel 1 de la parte 1:
+    - Oleadas de pingüinos y fragmentos que aparecen fuera de cámara, persiguen y disparan.
+    - En el minuto 4, el Acechador como evento final: ronda, salta con aviso y croa.
+    - El nivel se supera al matarlo.
+    - Todavía no hay experiencia, mejoras, HUD ni muerte del jugador (hito 1.6).
+    - Clip en `shots/evento_final_1_5.gif`.
+  - **Siguiente: hito 1.6**, progresión, cordura y HUD.
 - **Todavía no hay código de juego:** solo el visor, la escena de rendimiento y los generadores de modelos.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
@@ -97,6 +103,10 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `weapons=dinamita,revolver` y `wlevel=N`: armas iniciales y su nivel.
   - `god=true`: el jugador no recibe daño.
   - `bullet_rain=N`: mantiene N balas enemigas vivas (prueba de carga).
+  - `level=p1_n1`: nivel a jugar (por defecto). `nolevel=true` deja el campo de pruebas sin oleadas.
+  - `timescale=N`: acelera el juego. Las capturas de `shots=` usan tiempo de juego.
+  - `final_at=s`: adelanta el evento final.
+  - `max_alive=N` y `spawn_rate=N`: tope de vivos y ritmo de aparición fijo (pruebas de carga).
 - **Encadenar comandos:** un `godot ... | grep error` devuelve 1 cuando no hay errores, así que no lo encadenes con `&&`.
 
 Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobrescribiría el detallado. Ejecuta `gen_acechador.py` después, o renombra la salida.
@@ -121,6 +131,16 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
   - Los patrones enemigos también son datos (`BulletPattern`, en `data/patterns/`): radial o en abanico, ráfagas, giro y aviso previo. `PatternRunner` los ejecuta.
   - Efectos: `Telegraph` (aviso en el suelo) y `Explosion`.
   - Para pruebas: `TrainingDummy` (objetivo de práctica) y `TestEmitter` (dispara un patrón).
+- **Enemigos** (`scripts/enemies/`):
+  - `EnemyData` (`.tres` en `data/enemies/`) define cuerpo, contacto, comportamiento con sus parámetros, patrón de ataque y escalón.
+  - `Enemy` lo aplica: separación de los demás, rodeo del decorado con `ObstacleMap` (sin cuerpo físico), daño por contacto, disparo, destello, retroceso y muerte con `DeathBurst`.
+  - Los comportamientos son clases de `EnemyBehavior`:
+    - `CrawlBehavior` (fragmento): persigue a tirones.
+    - `BlindBehavior` (pingüino): va hacia donde oyó al jugador y embiste.
+    - `StalkBehavior` (Acechador): ronda, salta con aviso y croa.
+- **Nivel** (`scripts/level/`):
+  - `LevelData` (`.tres` en `data/levels/`) define arena, grupo de enemigos, ritmo de aparición por tiempo, topes y evento final. Pesos 2^(N−t).
+  - `WaveDirector` hace aparecer enemigos fuera de cámara, lanza el evento final y emite `level_completed` al morir su enemigo.
 - **Arena** (`scripts/level/arena_builder.gd`):
   - Monta un JSON de `data/arenas/` (generado por `tools/gen_arena_campamento.py`) con el suelo de nieve, el mar, las piezas con su colisión, una luz y un halo de niebla por farol, y los límites invisibles.
   - Capa 1: mundo. Capa 2: jugadores.
@@ -172,6 +192,9 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Packed arrays en GDScript:** un `PackedInt32Array` sacado de un diccionario o metido en otro array es una copia. `(dic[k] as PackedInt32Array).append(x)` y `for a in [arr1, arr2]: a.resize(n)` no cambian el original. Hay que volver a guardarlo, o trabajar con la variable miembro directamente. Pasó dos veces en el hito 1.4.
 - **`POSITION` en un shader de vértices:** si una rama lo escribe, hay que escribirlo en todas. En las que no, el vértice queda sin posición y la malla desaparece sin ningún error.
 - **Colores sin iluminar y tonemapper:** ACES con exposición 1,6 también procesa los materiales `unshaded` y quema los colores saturados, de modo que el violeta sale blanco. Balas y avisos multiplican su color por un factor menor que 1 (`exposure_comp`).
+- **Clases internas de GDScript:** no son nombres globales. Un `class X extends Y:` dentro de otro fichero solo se alcanza como `Fichero.X`. Si otras clases las crean por nombre, cada una va en su fichero con `class_name`.
+- **Arrays tipados en `.tres`:** un `Array[EnemyData]` se escribe `Array[ExtResource("id_del_script")]([...])`, no `Array[Resource]`.
+- **Coste por fotograma en GDScript:** con 150 enemigos, llamar a `find_children` y reasignar materiales en cada fotograma, y recalcular las posiciones de reposo leyendo metadatos, bajaba la partida de 170 a 81 FPS. `VoxelBuilder` guarda en metadatos las partes, las posiciones de reposo y las mallas de cada modelo (`parts`, `rest`, `rest_by_name`, `meshes`), y los materiales solo se tocan cuando cambia el estado.
 - **`cat` sin entrada:** un `cat > fichero` sin heredoc se queda esperando la entrada estándar para siempre.
 
 ## Por definir

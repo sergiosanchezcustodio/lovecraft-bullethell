@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/pinguino.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/fragmento.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/acechador.tres" id="4"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = &"p1_n1"
+display_name = "Campamento base en la costa del mar de Ross"
+part = 1
+number = 1
+arena = "res://data/arenas/campamento.json"
+duration = 300.0
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3")])
+spawn_rate = Array[Vector2]([Vector2(0, 0.6), Vector2(60, 1.1), Vector2(150, 1.8), Vector2(240, 2.4), Vector2(300, 3.0)])
+max_alive = 90
+elite_cap = 2
+final_time = 240.0
+final_enemy = ExtResource("4")
+final_wave = 25
+final_text = "Algo acecha entre las tiendas…"

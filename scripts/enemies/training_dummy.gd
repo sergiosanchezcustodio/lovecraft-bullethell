@@ -13,6 +13,7 @@ var world: CombatWorld
 var model: Node3D
 var _flash_mat: StandardMaterial3D
 var _flash := 0.0
+var _flash_on := false
 var _dead_t := -1.0
 var _t := 0.0
 var _home := Vector3.ZERO
@@ -63,6 +64,8 @@ func _process(delta: float) -> void:
 	var anim := "idle" if kind == "acechador" else "walk"
 	Anims.pose(kind, anim, model, fposmod(_t / Anims.duration(kind, anim), 1.0))
 	_flash -= delta
-	var overlay: Material = _flash_mat if _flash > 0.0 else null
-	for mi in model.find_children("*", "MeshInstance3D", true, false):
-		(mi as MeshInstance3D).material_overlay = overlay
+	var flashing := _flash > 0.0
+	if flashing != _flash_on:          # solo se toca el material al cambiar
+		_flash_on = flashing
+		for mi: MeshInstance3D in model.get_meta("meshes"):
+			mi.material_overlay = _flash_mat if flashing else null

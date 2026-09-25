@@ -6,7 +6,8 @@ extends RefCounted
 const LAYER_WORLD := 1
 
 ## Devuelve el nodo raíz de la arena. Metadatos: "spawn" (Vector3), "size" (Vector2),
-## "lights" (Array de OmniLight3D de los faroles).
+## "lights" (Array de OmniLight3D de los faroles) y "obstacles" (ObstacleMap, para que los
+## enemigos rodeen el decorado sin cuerpo físico).
 static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
 	var root := Node3D.new()
@@ -17,6 +18,8 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	root.add_child(_ground(data, size))
 	root.add_child(_sea(data, size))
 	var lights: Array[OmniLight3D] = []
+	var obstacles := ObstacleMap.new()
+	obstacles.bounds = Rect2(-size * 0.5, size)
 	var props := Node3D.new()
 	props.name = "Props"
 	root.add_child(props)
@@ -28,10 +31,11 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 		var m := VoxelBuilder.load_model("res://models/%s.json" % p.model)
 		holder.add_child(m)
 		props.add_child(holder)
-		_collider(holder, m, data.colliders.get(p.model, {}))
+		_collider(holder, m, data.colliders.get(p.model, {}), obstacles)
 		if (m.get_meta("pivots") as Dictionary).has("light"):
 			lights.append(_lamp(holder, m, data.lamp, fog_volumes))
 	root.set_meta("lights", lights)
+	root.set_meta("obstacles", obstacles)
 	root.add_child(_walls(size))
 	return root
 
@@ -108,7 +112,7 @@ static func _sea(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	mi.material_override = mat
 	return mi
 
-static func _collider(holder: Node3D, m: Node3D, def: Dictionary) -> void:
+static func _collider(holder: Node3D, m: Node3D, def: Dictionary, obstacles: ObstacleMap) -> void:
 	if def.is_empty() or def.get("type", "none") == "none": return
 	var body := StaticBody3D.new()
 	body.collision_layer = LAYER_WORLD
@@ -121,12 +125,15 @@ static func _collider(holder: Node3D, m: Node3D, def: Dictionary) -> void:
 		cyl.height = maxf(aabb.size.y, 1.0)
 		cs.shape = cyl
 		cs.position.y = cyl.height * 0.5
+		obstacles.add_circle(Vector2(holder.position.x, holder.position.z), cyl.radius * holder.scale.x)
 	else:
 		var box := BoxShape3D.new()
 		var k: float = def.get("shrink", 1.0)
 		box.size = Vector3(aabb.size.x * k, aabb.size.y, aabb.size.z * k)
 		cs.shape = box
 		cs.position = aabb.get_center()
+		var c := holder.transform * aabb.get_center()
+		obstacles.add_circle(Vector2(c.x, c.z), maxf(box.size.x, box.size.z) * 0.5 * holder.scale.x)
 	body.add_child(cs)
 	holder.add_child(body)
 

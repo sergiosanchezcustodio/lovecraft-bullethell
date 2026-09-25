@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"acechador_croar"
+shape = 0
+count = 30
+speed = 3.6
+radius = 0.15
+size = 0.3
+damage_physical = 0.0
+damage_mental = 10.0
+lifetime = 6.0
+bursts = 2
+burst_interval = 0.55
+spin_deg = 6.0
+aimed = true
+gap_count = 3
+gap_width = 3
+telegraph_time = 0.5
+telegraph_radius = 1.4

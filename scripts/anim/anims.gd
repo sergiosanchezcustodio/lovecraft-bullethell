@@ -29,18 +29,19 @@ static func pose(model_name: String, anim: String, m: Node3D, t: float) -> void:
 	if has_anim(model_name, anim):
 		BY_MODEL[model_name].call(anim, m, t)
 
-## Posición de reposo de una parte (su pivote), en metros.
+## Posición de reposo de una parte (su pivote), en metros. VoxelBuilder la guarda al crear el modelo.
 static func rest(m: Node3D, part: String) -> Vector3:
-	var a: Array = m.get_meta("pivots")[part]
-	return Vector3(a[0], a[1], a[2]) * float(m.get_meta("voxel_size", VoxelBuilder.VOXEL))
+	return m.get_meta("rest_by_name")[part]
 
 ## Devuelve todas las partes a su pose de reposo.
 static func reset(m: Node3D) -> void:
 	m.position = Vector3.ZERO
 	m.rotation = Vector3.ZERO
-	for c: Node in m.get_children():
-		var n := c as Node3D
-		n.position = rest(m, n.name)
+	var parts: Array[Node3D] = m.get_meta("parts")
+	var rest_pos: Array[Vector3] = m.get_meta("rest")
+	for i in parts.size():
+		var n := parts[i]
+		n.position = rest_pos[i]
 		n.rotation = Vector3.ZERO
 		n.scale = Vector3.ONE
 

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/esquirlas_hielo.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"pinguino"
+display_name = "Pingüino albino ciego"
+model = "pinguino"
+tier = 1
+elite = false
+tags = Array[StringName]([&"marina"])
+max_health = 26.0
+hit_radius = 0.45
+body_radius = 0.45
+move_speed = 2.4
+xp = 1.0
+contact_physical = 7.0
+contact_mental = 0.0
+movement = &"blind"
+params = {"charge_cooldown": 3.0, "charge_range": 3.5, "charge_speed": 9.0, "charge_time": 0.35, "hear_interval": 1.0, "hear_noise": 0.8}
+attack = ExtResource("2")
+attack_cooldown = 4.0
+attack_range = 8.0
+attack_anim = ""

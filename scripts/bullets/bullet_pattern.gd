@@ -19,6 +19,8 @@ enum Shape { RADIAL, FAN }
 @export var burst_interval := 0.15
 @export var spin_deg := 0.0              ## giro entre ráfagas (espirales)
 @export var aimed := true                ## centrado hacia el objetivo
+@export var gap_count := 0               ## huecos en un patrón radial (para atravesarlo)
+@export var gap_width := 2               ## balas que faltan en cada hueco
 @export var telegraph_time := 0.0        ## aviso previo en el suelo (s); 0 = sin aviso
 @export var telegraph_radius := 1.2
 
@@ -43,5 +45,6 @@ func directions(aim: Vector3, burst: int) -> Array[Vector3]:
 			a = base + (0.0 if count == 1 else lerpf(-spread * 0.5, spread * 0.5, k / float(count - 1)))
 		else:
 			a = base + TAU * k / count
+			if gap_count > 0 and (k % maxi(count / gap_count, 1)) < gap_width: continue
 		out.append(Vector3(sin(a), 0, cos(a)))
 	return out

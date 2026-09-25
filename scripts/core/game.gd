@@ -12,6 +12,11 @@ extends Node3D
 ##   wlevel=3                nivel inicial de esas armas
 ##   god=true                el jugador no recibe daño
 ##   bullet_rain=1000        mantiene N balas enemigas vivas alrededor (prueba de carga)
+##   level=p1_n1             nivel a jugar (por defecto); nolevel=true: campo de pruebas sin oleadas
+##   timescale=4             acelera el tiempo de juego (verificar el evento final)
+##   final_at=20             adelanta el evento final a ese segundo
+##   max_alive=150           cambia el tope de enemigos vivos
+##   spawn_rate=20           ritmo de aparición fijo (enemigos por segundo)
 ##   fogvol=false            sin los halos de niebla de los faroles
 ##   pos=x,z                 posición inicial del jugador
 ##   tag=nombre              sufijo de las capturas
@@ -23,6 +28,9 @@ var arena: Node3D
 var player: Player
 var camera: GameCamera
 var world: CombatWorld
+var level: LevelData
+var director: WaveDirector
+var announcer: Label
 
 func _ready() -> void:
 	args = LaunchArgs.from_cmdline()
@@ -62,12 +70,51 @@ func _ready() -> void:
 	camera.view_size = args.get_float("cam", 15.0)
 	camera.targets.append(player)
 	add_child(camera)
+	_make_announcer()
+	if not args.get_bool("nolevel"):
+		level = load("res://data/levels/%s.tres" % args.get_str("level", "p1_n1")).duplicate()
+		if args.has("final_at"): level.final_time = args.get_float("final_at")
+		if args.has("spawn_rate"): level.spawn_rate = [Vector2(0, args.get_float("spawn_rate"))] as Array[Vector2]
+		var enemies_root := Node3D.new()
+		enemies_root.name = "Enemies"
+		add_child(enemies_root)
+		director = WaveDirector.new().setup(level, world, arena.get_meta("obstacles"), camera, enemies_root)
+		if args.has("max_alive"): director.max_alive_override = args.get_int("max_alive")
+		director.final_event.connect(func(_e: Enemy) -> void: announce(level.final_text, 3.5))
+		director.level_completed.connect(func() -> void: announce("Nivel superado", 6.0))
+		add_child(director)
+		announce(level.display_name, 3.0)
+	Engine.time_scale = args.get_float("timescale", 1.0)
 	if args.get_int("demo") > 0: _demo_crowd(args.get_int("demo"))
 	if args.get_int("dummies") > 0: _dummies(args.get_int("dummies"))
 	if args.get_bool("emitters"): _emitters()
 	if args.has("shots"):
 		var tag := ("_" + args.get_str("tag")) if args.has("tag") else ""
 		add_child(ShotTaker.new(args.get_floats("shots"), "res://shots/game%s" % tag))
+
+## Rótulo central provisional (el HUD completo llega en el hito 1.6).
+func _make_announcer() -> void:
+	var layer := CanvasLayer.new()
+	add_child(layer)
+	announcer = Label.new()
+	announcer.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	announcer.position.y = 140
+	announcer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	announcer.add_theme_font_size_override("font_size", 38)
+	announcer.add_theme_color_override("font_color", Color(0.92, 0.88, 0.8))
+	announcer.add_theme_color_override("font_outline_color", Color(0.02, 0.02, 0.03))
+	announcer.add_theme_constant_override("outline_size", 10)
+	announcer.modulate.a = 0.0
+	layer.add_child(announcer)
+
+func announce(text: String, seconds: float) -> void:
+	announcer.text = text
+	announcer.size.x = 0
+	announcer.position.x = (get_viewport().get_visible_rect().size.x - announcer.get_minimum_size().x) * 0.5
+	var tw := create_tween()
+	tw.tween_property(announcer, "modulate:a", 1.0, 0.4)
+	tw.tween_interval(seconds)
+	tw.tween_property(announcer, "modulate:a", 0.0, 0.8)
 
 func _make_input() -> PlayerInput:
 	if args.has("bot"):

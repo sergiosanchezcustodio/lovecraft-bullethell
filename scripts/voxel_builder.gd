@@ -38,6 +38,21 @@ static func load_model(path: String) -> Node3D:
 		mi.mesh = layer.mesh
 		mi.material_override = _glow_mat if layer.glow else model.material
 		pivot_node.add_child(mi)
+	# Para animar sin buscar ni recalcular en cada fotograma (Anims.reset/rest)
+	var parts: Array[Node3D] = []
+	var rest: Array[Vector3] = []
+	var rest_by_name := {}
+	var meshes: Array[MeshInstance3D] = []
+	for c: Node in root.get_children():
+		var n := c as Node3D
+		parts.append(n)
+		rest.append(n.position)
+		rest_by_name[n.name] = n.position
+		for m: Node in n.get_children(): meshes.append(m as MeshInstance3D)
+	root.set_meta("parts", parts)
+	root.set_meta("rest", rest)
+	root.set_meta("rest_by_name", rest_by_name)
+	root.set_meta("meshes", meshes)
 	return root
 
 static func is_cached(path: String) -> bool:

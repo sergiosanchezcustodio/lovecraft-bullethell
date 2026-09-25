@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"globulos_tekeli"
+shape = 0
+count = 8
+speed = 3.2
+radius = 0.14
+size = 0.27
+damage_physical = 4.0
+damage_mental = 4.0
+lifetime = 5.0
+bursts = 2
+burst_interval = 0.3
+spin_deg = 22.5
+aimed = false
