@@ -249,6 +249,7 @@ El estilo general (voxel detallado a 32 voxels por metro, atmósfera y pipeline)
 | Culto de Cthulhu (parte 3) | El ídolo (cabeza de pulpo con tentáculos, cuerpo escamoso, alas rudimentarias) en piedra verdinegra, jeroglíficos desconocidos, la invocación "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn". Cultistas del pantano con túnicas oscuras, amuletos del ídolo, máscaras con tentáculos y antorchas; tripulación del *Alert* con ropa de marinero y símbolos del culto | Negro verdoso, hueso, resplandor de hogueras |
 
 - **Personajes jugables:** proporciones humanas, ropa de época, paleta más cálida que la de los enemigos y siempre con el anillo de color del jugador.
+- **Estilo de los personajes humanos** (jugables, cultistas e híbridos): voxel a bloques limpios, con volúmenes rectos de aristas suavizadas, detalles pintados sobre superficies planas, cara dibujada sin relieve y poco ruido de color. Decidido el 25-09-2026, a partir del rediseño de Dyer. Las criaturas pueden ser orgánicas y con más relieve.
 - **Regla de contenido** (modelos, textos y diálogos): nada racista, sexista ni homófobo. Los cultistas son de géneros y edades variados, sin rasgos étnicos marcados que asocien un grupo real al mal; los identifica su culto. Los relatos originales contienen estereotipos de su época que no se reproducen.
 
 ---

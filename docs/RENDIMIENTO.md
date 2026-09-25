@@ -50,3 +50,18 @@ Cambios que afectan a la medición:
 |---|---|---|---|---|
 | 150 Acechadores | 5,06 ms (198 FPS) | 7,30 ms (137 FPS) | 4,41 ms | 11,0 M |
 | 150 pingüinos y fragmentos | 4,34 ms (231 FPS) | 5,59 ms (179 FPS) | 2,07 ms | 3,6 M |
+
+### Potencial de la fusión de caras según el estilo (25-09-2026)
+
+Estimación con fusión voraz 2D por planos, sin tener en cuenta la oclusión ambiental. Es una cota optimista.
+
+| Modelo | Caras | Con los colores actuales | Sin ruido de color por voxel |
+|---|---|---|---|
+| Dyer (a bloques) | 4.114 | 3.747 (−9 %) | 1.113 (−73 %) |
+| Pingüino | 3.668 | 3.463 (−6 %) | 2.287 (−38 %) |
+| Acechador (orgánico) | 10.739 | 10.662 (−1 %) | 8.867 (−17 %) |
+
+- **El estilo a bloques no reduce los triángulos por sí solo:** el primer Dyer y el actual tienen los mismos, unas 4.100 caras.
+- **Lo que cambia es que la fusión de caras pasa a merecer la pena.** Dyer usa 248 colores frente a 3.445. Si se suprime el ruido de color por voxel, la fusión quitaría hasta el 73 % de sus caras.
+- **En las criaturas orgánicas apenas sirve.**
+- **Tiempo de generación:** despreciable en todos los casos. Dyer tarda 0,17 s, el pingüino 0,18 s, el fragmento 0,32 s y el Acechador 0,62 s.
