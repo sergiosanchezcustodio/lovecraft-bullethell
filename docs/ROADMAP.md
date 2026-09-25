@@ -20,7 +20,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 2 | Cooperativo local | Pendiente | Ninguna (D-03, D-07, D-16, D-17 y D-18, resueltas) |
 | 3 | Pipeline de contenido | Pendiente | D-06 |
 | 4 | Parte 1 completa | Pendiente | D-04, D-19 |
-| 5 | Guardado local y menús | Pendiente | D-09 |
+| 5 | Guardado, menús, tienda y portada | Pendiente | D-01 (título, para el logo de la portada) |
 | 6 | Parte 2 completa | Pendiente | D-04, D-13, enfoque de jefes colosales |
 | 7 | Parte 3 completa | Pendiente | Ángulos devoradores, enfoque de jefes colosales |
 | 8 | Pulido y distribución | Pendiente | D-01, D-12 |
@@ -89,9 +89,13 @@ Cinco niveles, sus diez criaturas y el shoggoth primigenio.
 
 **Aceptación:** la parte 1 se puede completar en cooperativo.
 
-## Fase 5: Guardado local y menús
+## Fase 5: Guardado, menús, tienda y portada
 
-Menú principal, selección de personaje, opciones, guardado y carga. Queda por asignar en qué fase se modelan Legrasse, Johansen, Armitage y West (GDD, sección 13).
+Estructura tomada de Extremadura Survivors (GDD 8.1), con el estilo de este juego:
+- **Arranque y portada:** ficha del proyecto, intro, y portada animada en Godot (GDD 7.1, D-21).
+- **Menús:** menú principal, selección de personaje en carrusel 3D, elección de compañero (D-20) y mapa de niveles con el relato de cada uno.
+- **Tienda y progresión permanente** (D-09): potenciadores, compañeros y personajes.
+- **Guardado:** opciones, reasignación de controles y tres huecos de guardado. Queda por asignar en qué fase se modelan Legrasse, Johansen, Armitage y West (GDD, sección 13).
 
 ## Fase 6: Parte 2 completa (*La sombra sobre Innsmouth*)
 

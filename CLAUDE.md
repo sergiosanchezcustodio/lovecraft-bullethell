@@ -52,6 +52,10 @@ Léela al empezar cada sesión:
       - Carga de la partida en 0,17 s gracias a la caché de mallas.
     - **Cinco estilos de esquive**, uno por personaje: deslizamiento, voltereta, plancha de pingüino, salto y destello, con datos en `data/dodges/` (`DodgeStyle`). F1 los recorre en partida y `dodge=<id>` elige uno al arrancar. Pendiente de decidir cuál lleva cada personaje.
 - **Todavía no hay código de juego:** solo el visor, la escena de rendimiento y los generadores de modelos.
+- **Decidido el 25-09-2026 para la fase 5:**
+  - Estructura de menús, tienda con progresión permanente y compañeros al estilo de Extremadura Survivors (D-09, D-20; GDD 8.1).
+  - Portada animada en Godot (D-21; GDD 7.1).
+  - Orden: cerrar la fase 1 con tu partida, después el cooperativo (fase 2) y luego la fase 5.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
 ## Decisiones cerradas

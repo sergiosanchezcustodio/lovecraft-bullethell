@@ -288,14 +288,38 @@ El estilo general (voxel detallado a 32 voxels por metro, atmósfera y pipeline)
 
 - **Personajes jugables:** proporciones humanas, ropa de época, paleta más cálida que la de los enemigos y siempre con el anillo de color del jugador.
 - **Estilo de los personajes humanos** (jugables, cultistas e híbridos): voxel a bloques limpios, con volúmenes rectos de aristas suavizadas, detalles pintados sobre superficies planas, cara dibujada sin relieve y poco ruido de color. Decidido el 25-09-2026, a partir del rediseño de Dyer. Las criaturas pueden ser orgánicas y con más relieve.
+### 7.1 Portada (D-21)
+
+Escena 3D animada en Godot, de calidad muy superior a la de la partida (no tiene que cumplir sus límites de rendimiento):
+- **Cámara y luz:** cámara en perspectiva (la niebla volumétrica sí funciona con ella), niebla con haces de luz, sombras, reflejos en hielo y roca mojada e iluminación global.
+- **Composición:** montañas; entre ellas, en la tormenta, la silueta enorme de Cthulhu, iluminada solo por los relámpagos y con los ojos apenas encendidos. Más cerca, criaturas grandes con más detalle y color, hechas con los mismos generadores voxel a más resolución (64 a 128 voxels por metro).
+- **Animación sutil:** niebla que se desplaza, nieve, relámpagos espaciados, criaturas que respiran y parpadean, faroles que titilan y un avance lento de la cámara.
+- **Accesibilidad:** relámpagos suaves y espaciados, nunca estroboscópicos, y regulables con el deslizador de distorsiones.
+- **Imagen fija:** la de las tiendas (itch, Steam) sale de la misma escena renderizada a 4K.
+
 - **Regla de contenido** (modelos, textos y diálogos): nada racista, sexista ni homófobo. Los cultistas son de géneros y edades variados, sin rasgos étnicos marcados que asocien un grupo real al mal; los identifica su culto. Los relatos originales contienen estereotipos de su época que no se reproducen.
 
 ---
 
-## 8. Guardado
+## 8. Guardado y progresión permanente
 
 - **Local:** archivo en `user://` con versión de formato. Guarda la configuración (controles, audio, vídeo), las estadísticas históricas y la partida en curso al terminar cada nivel, para poder salir y retomarla desde el nivel siguiente.
 - **Nube (fase 10, D-11):** el formato local debe ser serializable y versionado desde el principio, para poder subirlo más adelante sin cambios.
+
+### 8.1 Estructura de menús y progresión permanente (D-09, D-20)
+
+Tomada de Extremadura Survivors (`github.com/sergiosanchezcustodio/extremadura-survivors`), con el estilo de este juego. Se adopta la estructura de menús y de progreso, **no** sus sistemas de partida (corazones, cofres con ruleta): aquí siguen la caída, la reanimación y el vial de West.
+
+- **Arranque:** ficha del proyecto (con qué está hecho, licencia y aviso del uso de IA), intro que presenta el juego y portada animada (sección 7.1), que espera a que se pulse una tecla o un botón concretos (no cualquiera). Los relatos se saltan manteniendo pulsado.
+- **Menú principal:** quieto a propósito. El fondo se mueve poco, porque lo importante es qué opción está señalada.
+- **Selección de personaje:** carrusel con los modelos voxel en 3D. Los bloqueados se ven en penumbra con su precio. En cooperativo, cada jugador elige el suyo.
+- **Compañeros** (D-20): se elige uno antes de empezar, acompaña toda la partida y sube de nivel contigo. Unos dan una estadística y otros actúan. Sacados de los relatos, por ejemplo los perros de trineo de la expedición de Lake o un gato de Ulthar. Por diseñar.
+- **Mapa de niveles:** las 3 partes × 5 niveles a la vista, con los bloqueados apagados; cada nivel se abre al ganar el anterior. Al elegir uno se cuenta su relato antes de jugarlo.
+- **Tienda:** la moneda sobrevive a la muerte (propuesta: fondos de la Fundación Pickman, que financia la expedición del relato; por decidir). Tres secciones:
+  - Potenciadores permanentes de valores pequeños, cinco niveles cada uno.
+  - Compañeros.
+  - Personajes.
+- **Guardado:** tres huecos de partida, configuración y ficha del jugador.
 
 ---
 
@@ -351,7 +375,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-06 | Evoluciones de armas | Fase 3 (modelo de datos de armas) | Pendiente |
 | D-07 | Experiencia en cooperativo | Fase 2 | **Resuelta** |
 | D-08 | Cordura | — | Resuelta: se incluye. Valores numéricos por ajustar en pruebas |
-| D-09 | Desbloqueos y acceso al modo *Por partes* | Fase 5 | Pendiente |
+| D-09 | Desbloqueos y acceso al modo *Por partes* | Fase 5 | **Resuelta** (progresión permanente con tienda) |
 | D-10 | Modelo online | Fase 9 | Pendiente |
 | D-11 | Guardado en la nube | Fase 10 | Pendiente |
 | D-12 | Plataforma de distribución | Fase 8; condiciona D-10 y D-11 | Pendiente |
@@ -362,6 +386,8 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-17 | Paranoia frente a "sin fuego amigo" | Fase 2 | **Resuelta** |
 | D-18 | Personajes disponibles en la fase 2 | Fase 2 | **Resuelta** |
 | D-19 | Pasivos que dependen de mecánicas sin definir | Fase 4 | Pendiente |
+| D-20 | Compañeros (equivalente a las mascotas de Extremadura Survivors) | Fase 5 | **Resuelta**: sí, sacados de los relatos |
+| D-21 | Portada | Fase 5 | **Resuelta**: escena animada en Godot |
 
 D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherencias y huecos detectados al redactar este documento (sección 13). Las decisiones bloqueantes de las fases 1 y 2 se resolvieron el 24-09-2026.
 
@@ -378,6 +404,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
   *Resuelta:* compartida. Todos suben de nivel a la vez y cada uno elige su mejora. Curva escalada por número de jugadores.
 - **D-08 — Cordura.** Resuelta: se incluye. Quedan por ajustar los valores numéricos.
 - **D-09 — Desbloqueos.** ¿Hay desbloqueos permanentes (personajes, armas)? ¿El modo *Por partes* exige haber llegado antes a esa parte en la campaña?
+  *Resuelta (25-09-2026):* progresión permanente con tienda, como en Extremadura Survivors (sección 8.1). La subida de nivel dentro de la partida sigue empezando de cero en cada partida. Queda por concretar si *Por partes* exige haber llegado a esa parte.
 - **D-10 — Modelo online.** Anfitrión y clientes con ENet, red de Steam o WebRTC; cómo se conectan los jugadores; si se mezclan jugadores locales y remotos; cámara propia por jugador remoto.
 - **D-11 — Guardado en la nube.** Gist privado del jugador mediante el flujo de autorización por dispositivo de GitHub, servidor propio o guardado en la nube de la plataforma de distribución.
 - **D-12 — Plataforma de distribución.** itch.io, Steam u otra.
@@ -392,6 +419,8 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
   *Resuelta:* los disparos del paranoico restan cordura, no vida, con daño muy reducido (dato). Es la única excepción a "sin fuego amigo". *A vigilar en las pruebas de la fase 2:* el riesgo de crisis en cadena entre jugadores.
 - **D-18 — Personajes en la fase 2.** El cooperativo llega en la fase 2, pero la selección de personaje llega en la fase 5 y la fase 1 solo modela a Dyer. ¿Con qué juegan los jugadores 2 a 4?
   *Resuelta:* en la fase 2 hay dos personajes, William Dyer y Robert Olmstead (revólver, esquive más largo y "sangre de Innsmouth"), distinguidos además por el color de cada jugador. Cómo se asigna cada uno y cómo se marcan las criaturas marinas para su pasivo se concretará en el plan de la fase 2. El resto de personajes y la selección completa, en la fase 5.
+- **D-20 — Compañeros.** *Resuelta:* sí, sacados de los relatos (sección 8.1).
+- **D-21 — Portada.** *Resuelta:* escena 3D animada en Godot (sección 7.1). De ella sale también la imagen fija para las tiendas. Necesita el título del juego (D-01), que pasa a ser necesario para la fase 5.
 - **D-19 — Pasivos sin mecánica.** El pasivo de Dyer (frío y ralentización) y el de Johansen (inmunidad al empuje) dependen de efectos sobre el jugador que no están definidos, y el de Legrasse necesita saber si los híbridos de Innsmouth cuentan como "enemigos humanos".
 
 ---
