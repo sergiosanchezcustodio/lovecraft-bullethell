@@ -3,6 +3,7 @@ extends Node
 ##   godot --path .                          -> partida
 ##   godot --path . -- still|anim ...        -> visor de modelos (scenes/preview.tscn)
 ##   godot --path . -- bench ...             -> prueba de rendimiento (scenes/bench.tscn)
+##   godot --path . -- title ...             -> portada (scenes/title.tscn)
 
 func _ready() -> void:
 	var la := LaunchArgs.from_cmdline()
@@ -11,4 +12,5 @@ func _ready() -> void:
 	match first:
 		"still", "anim": scene = "res://scenes/preview.tscn"
 		"bench": scene = "res://scenes/bench.tscn"
+		"title": scene = "res://scenes/title.tscn"
 	get_tree().change_scene_to_file.call_deferred(scene)

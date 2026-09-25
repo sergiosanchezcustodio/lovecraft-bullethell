@@ -1,6 +1,6 @@
 # Documento de diseño (GDD)
 
-**Título:** provisional, *Lovecraft Bullet Hell* (pendiente, D-01).
+**Título:** *Lovecraft Library: Surviving Cthulhu* (D-01, decidido el 25-09-2026).
 **Versión:** 0.2 · fase 0 cerrada · 24-09-2026.
 
 Documento vivo de diseño. Parte de la especificación original, [`PROMPT_juego_lovecraft.md`](PROMPT_juego_lovecraft.md), que se conserva sin cambios, e incorpora las decisiones tomadas después (sección 12). Si una decisión cambia algo de la especificación, prevalece lo que diga este documento.
@@ -367,7 +367,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 
 | ID | Tema | Bloquea | Estado |
 |---|---|---|---|
-| D-01 | Título del juego | Publicación (fase 8) | Pendiente |
+| D-01 | Título del juego | Publicación (fase 8) | **Resuelta**: *Lovecraft Library: Surviving Cthulhu* |
 | D-02 | Objetivo y duración de cada nivel | Fase 1 | **Resuelta** |
 | D-03 | Tamaño y forma de los escenarios | Fases 1 y 2 | **Resuelta** |
 | D-04 | Escalones 4 y 5 y seres únicos | Fases 4 y 6 | Pendiente (la fase 1 usa un tope de élites configurable) |
@@ -391,7 +391,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 
 D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherencias y huecos detectados al redactar este documento (sección 13). Las decisiones bloqueantes de las fases 1 y 2 se resolvieron el 24-09-2026.
 
-- **D-01 — Título del juego.**
+- **D-01 — Título del juego.** *Resuelta:* **Lovecraft Library: Surviving Cthulhu**. En la portada, "Lovecraft Library:" en letra pequeña, centrado, y justo debajo, mucho más grande y rodeado de tentáculos, "Surviving Cthulhu". Letras voxel 3D integradas en la escena.
 - **D-02 — Objetivo de cada nivel.** ¿Sobrevivir un tiempo, eliminar un número de enemigos o llegar a un punto del mapa? ¿Cuánto dura un nivel?
   *Resuelta:* supervivencia por oleadas de 8–10 minutos. Solo el último nivel de cada parte (el 5) termina con jefe; los niveles 1 a 4 terminan con un evento final sin jefe. El tipo de objetivo es un dato del nivel. En la fase 1, versión de 5 minutos con el Acechador como élite en el evento final.
 - **D-03 — Tamaño y forma de los escenarios.** El botón de mapa implica escenarios mayores que la pantalla. ¿Arena abierta o recorrido?

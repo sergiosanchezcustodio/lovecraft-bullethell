@@ -1,4 +1,4 @@
-# Lovecraft Bullet Hell: documento de arranque
+# Lovecraft Library: Surviving Cthulhu — documento de arranque
 
 Documento de contexto del proyecto. Recoge las decisiones tomadas en la fase de exploración y el pipeline de arte que ya funciona. Es el punto de partida para cualquier sesión de trabajo (claude.ai o Claude Code).
 
@@ -56,6 +56,12 @@ Léela al empezar cada sesión:
   - Estructura de menús, tienda con progresión permanente y compañeros al estilo de Extremadura Survivors (D-09, D-20; GDD 8.1).
   - Portada animada en Godot (D-21; GDD 7.1).
   - Orden: cerrar la fase 1 con tu partida, después el cooperativo (fase 2) y luego la fase 5.
+- **Portada (adelantada de la fase 5), en curso:** plan aprobado en cuatro hitos:
+  - P.1: escenario, luz y tormenta. **Hecho, pendiente de tu revisión.**
+  - P.2: criaturas de alta calidad.
+  - P.3: título voxel con tentáculos.
+  - P.4: integración.
+  - Se abre con `godot --path . -- title` y hay vídeo en `shots/portada_p1.mp4`.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
 ## Decisiones cerradas
@@ -145,6 +151,16 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
 - **Encadenar comandos:** un `godot ... | grep error` devuelve 1 cuando no hay errores, así que no lo encadenes con `&&`.
 
 Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobrescribiría el detallado. Ejecuta `gen_acechador.py` después, o renombra la salida.
+
+## Portada (`scenes/title.tscn`, `scripts/title/`)
+
+- **Escena 3D en perspectiva**, sin los límites de rendimiento de la partida: 199 FPS en calidad alta y 359 en `quality=low`.
+- **Entorno:** niebla volumétrica, SDFGI, SSR (reflejos en el lago helado), SSAO y profundidad de campo lejana. Sin bloom general: solo brilla lo que supera el umbral (ojos, farol y relámpagos).
+- **Terreno:** `tools/gen_portada_terreno.py` genera cinco modelos con el tamaño de voxel creciendo con la distancia: primer término a 0,25 m, llanura y lago a 0,5 m, colinas en terrazas a 1 m y cordillera a 1,5 m. La cordillera tiene picos colocados para el encuadre, cárcavas, contorno de agujas y alguna formación cúbica, con un collado central para Cthulhu.
+- **Tormenta:** cielo por shader (`storm_sky.gdshader`) con nubes que se desplazan y se iluminan desde dentro con cada relámpago. `TitleLightning` genera rayos quebrados con ramas, cada 5,5 a 11 s, con una réplica como máximo y la intensidad regulable (accesibilidad).
+- **Luces:** luna rasante desde la izquierda; contraluz de tormenta y luz del rayo que se encienden con cada descarga.
+- **Detalles:** bancos de niebla que derivan (`mist.gdshader`), nieve con partículas y farol cálido que titila en el campamento.
+- **Opciones:** `quality=low`, `shots=`, `tag=`, `strike=s` (fuerza un relámpago), `nolightning=true`, `noplaceholders=true` y `perf=N`.
 
 ## Arquitectura del juego
 
@@ -258,6 +274,10 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Edificios en voxel:** a 32 voxels por metro, un edificio macizo tendría cientos de miles de voxels. Se hacen huecos (paredes de 2-3 voxels, tejado de 1 más 2 de nieve), y el iglú como cáscara esférica de grosor uniforme; medirla en horizontal dejaba un agujero en la cúspide. Aun así, la cabaña tiene unos 100.000 voxels: la caché de mallas es imprescindible.
 - **Rampas a 45° en voxel:** la tienda piramidal (escalones de un voxel) se veía rayada. Se rehízo como tienda de cumbrera, con faldones más empinados y color uniforme por paños.
 - **Scripts largos en la herramienta de Bash:** un heredoc muy largo se corta ("unexpected EOF while looking for matching"). Para ediciones grandes, escribe el script en el scratchpad y ejecútalo.
+- **Partículas con billboard:** `BILLBOARD_PARTICLES` descarta la escala de cada partícula si no se activa `billboard_keep_scale`. Todos los copos de nieve medían 1 m.
+- **Bloom general y partículas pequeñas:** con `glow_bloom` > 0 cada punto claro se convierte en una bola borrosa. En la portada, el bloom es 0 y el brillo sale solo del umbral HDR.
+- **Relámpagos y luz ambiental:** si el ambiente sale del cielo, cada relámpago ilumina el valle como si fuera de día. Usa ambiente de color fijo y deja el destello al cielo, a un contraluz rasante y a una luz puntual.
+- **Montañas voxel:** un cono con pendiente uniforme o bloques aplanados se ven como pirámides escalonadas. Hacen falta cárcavas, un contorno quebrado de agujas (ruido de crestas de celda pequeña) y pocas mesetas.
 - **Tests y datos de equilibrio:** los tests no deben comprobar valores que se retocan al equilibrar (ritmos, experiencia, vida). Cuando haga falta, que construyan sus propios datos. Si un test falla tras un ajuste de equilibrio, el que está mal es el test.
 - **Controles de los menús:** el `ui_accept` de Godot no trae ningún botón del mando y sí trae Espacio, que es la tecla de esquivar. `UiInput.configure()` añade A (aceptar) y B (volver) y quita Espacio. El menú de mejoras ignora las pulsaciones durante su primer medio segundo.
 - **Élites ahogadas en la horda:** las armas apuntan al más cercano o a la zona más densa, así que una élite rodeada de la oleada casi no recibe disparos. `LevelData.final_spawn_scale` (0,3) reduce las apariciones durante el evento final.
