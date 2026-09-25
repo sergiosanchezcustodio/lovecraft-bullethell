@@ -17,7 +17,8 @@ extends Resource
 @export var dodge_iframes := 0.32            ## s de invulnerabilidad desde que empieza
 @export var dodge_cooldown := 1.2            ## s desde que empieza hasta poder repetir
 @export_group("Otros")
-@export var luck := 1.0                      ## suerte en las mejoras (fase 1.6)
+@export var luck := 1.0                      ## suerte en las mejoras
+@export var pickup_radius := 2.2             ## a qué distancia empiezan a volar las gemas hacia él
 @export var starting_weapon := &"dinamita"   ## hito 1.4
 @export var collision_radius := 0.32         ## choque con el decorado
 @export var hurt_radius := 0.25              ## radio de impacto de las balas: pequeño, como en todo bullet hell

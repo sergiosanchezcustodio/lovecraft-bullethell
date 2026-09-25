@@ -20,6 +20,10 @@ extends Node3D
 ##   fogvol=false            sin los halos de niebla de los faroles
 ##   pos=x,z                 posición inicial del jugador
 ##   tag=nombre              sufijo de las capturas
+##   autopick=true           elige sola la primera mejora al subir de nivel (bot, capturas)
+##   xp=40                   experiencia inicial (probar el menú de mejoras)
+##   hp=10 san=5             vida y cordura iniciales (probar la muerte y la crisis)
+##   autorestart=2           en la pantalla final, reintenta sola tras N s (probar el reinicio)
 
 const PLAYER_COLORS: Array[Color] = [Color(1.0, 0.82, 0.3), Color(0.35, 0.75, 1.0), Color(0.55, 1.0, 0.45), Color(1.0, 0.45, 0.8)]
 
@@ -31,6 +35,13 @@ var world: CombatWorld
 var level: LevelData
 var director: WaveDirector
 var announcer: Label
+var gems: GemManager
+var hud: Hud
+var kills := 0
+var _menu_open := false
+var _ended := false
+var _pause: Menus.PauseMenu
+var _rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
 	args = LaunchArgs.from_cmdline()
@@ -53,13 +64,24 @@ func _ready() -> void:
 	var size: Vector2 = arena.get_meta("size")
 	world.bounds = Rect2(-size * 0.5 - Vector2(6, 6), size + Vector2(12, 12))
 	add_child(world)
+	gems = GemManager.new()
+	gems.world = world
+	gems.rules = load("res://data/progression/default.tres")
+	world.add_child(gems)
 	player = Player.new().setup(load("res://data/characters/dyer.tres"), _make_input(), PLAYER_COLORS[0])
 	player.position = arena.get_meta("spawn")
 	var p := args.get_floats("pos")
 	if p.size() == 2: player.position = Vector3(p[0], 0, p[1])
 	player.god = args.get_bool("god")
+	player.world = world
 	add_child(player)
 	world.add_player(player)
+	player.progress.weapon_pool = [load("res://data/weapons/dinamita.tres"), load("res://data/weapons/revolver.tres")] as Array[WeaponData]
+	for f in ["velocidad", "vida", "cordura", "reflejos", "iman"]:
+		player.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
+	player.progress.leveled_up.connect(func(_l: int) -> void: _open_level_up.call_deferred())
+	player.downed.connect(_on_downed)
+	player.sanity_state.crisis_started.connect(func(_k: StringName) -> void: announce("Crisis de locura", 1.5))
 	player.weapons = WeaponSystem.new().setup(player, world)
 	player.add_child(player.weapons)
 	var wlist := args.get_str("weapons", String(player.data.starting_weapon)).split(",", false)
@@ -81,16 +103,107 @@ func _ready() -> void:
 		director = WaveDirector.new().setup(level, world, arena.get_meta("obstacles"), camera, enemies_root)
 		if args.has("max_alive"): director.max_alive_override = args.get_int("max_alive")
 		director.final_event.connect(func(_e: Enemy) -> void: announce(level.final_text, 3.5))
-		director.level_completed.connect(func() -> void: announce("Nivel superado", 6.0))
+		director.level_completed.connect(_on_level_completed)
+		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
 		add_child(director)
 		announce(level.display_name, 3.0)
 	Engine.time_scale = args.get_float("timescale", 1.0)
+	hud = Hud.new().setup(player, director)
+	add_child(hud)
+	var pause_watch := Node.new()                  # sigue atento a Esc/Start con la partida en pausa
+	pause_watch.process_mode = Node.PROCESS_MODE_ALWAYS
+	pause_watch.set_script(preload("res://scripts/ui/pause_watch.gd"))
+	pause_watch.set("game", self)
+	add_child(pause_watch)
+	if args.get_float("xp") > 0.0: player.progress.add_xp(args.get_float("xp"))
+	if args.has("hp"): player.health = args.get_float("hp")
+	if args.has("san"): player.sanity = args.get_float("san")
 	if args.get_int("demo") > 0: _demo_crowd(args.get_int("demo"))
 	if args.get_int("dummies") > 0: _dummies(args.get_int("dummies"))
 	if args.get_bool("emitters"): _emitters()
 	if args.has("shots"):
 		var tag := ("_" + args.get_str("tag")) if args.has("tag") else ""
 		add_child(ShotTaker.new(args.get_floats("shots"), "res://shots/game%s" % tag))
+
+# ---------------- flujo de la partida ----------------
+func _on_enemy_died(e: Enemy) -> void:
+	kills += 1
+	gems.drop(e.global_position, e.data.xp)
+
+## Subida de nivel: pausa y elige una de tres mejoras (D-16). Si hay varias subidas
+## pendientes, se encadenan.
+func _open_level_up() -> void:
+	if _menu_open or _ended or player.progress.pending <= 0: return
+	var options := player.progress.roll_options(player.weapons, _rng)
+	if options.is_empty():
+		player.progress.pending = 0
+		return
+	if args.get_bool("autopick"):
+		player.progress.choose(options[0], player)
+		_open_level_up.call_deferred()
+		return
+	_menu_open = true
+	get_tree().paused = true
+	var title := "Nivel %d" % (player.progress.level - player.progress.pending + 1)
+	var menu := Menus.LevelUpMenu.new(options, title)
+	menu.chosen.connect(func(o: PlayerProgress.Option) -> void:
+		player.progress.choose(o, player)
+		_menu_open = false
+		get_tree().paused = false
+		_open_level_up.call_deferred())
+	add_child(menu)
+
+func toggle_pause() -> void:
+	if _menu_open or _ended: return
+	if _pause != null:
+		_pause.queue_free()
+		_pause = null
+		get_tree().paused = false
+		return
+	_pause = Menus.PauseMenu.new()
+	_pause.resume.connect(toggle_pause)
+	_pause.restart.connect(_restart)
+	_pause.quit.connect(func() -> void: get_tree().quit())
+	add_child(_pause)
+	get_tree().paused = true
+
+func _summary() -> PackedStringArray:
+	var t := int(director.time) if director != null else 0
+	return PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills,
+		"Nivel alcanzado: %d" % player.progress.level])
+
+func _on_downed() -> void:
+	if _ended: return
+	_ended = true
+	Engine.time_scale = 0.35                       # la caída, a cámara lenta un momento
+	await get_tree().create_timer(0.6, true, false, true).timeout
+	Engine.time_scale = 1.0
+	get_tree().paused = true
+	_end_screen("Has caído", Color(0.86, 0.22, 0.18))
+
+func _on_level_completed() -> void:
+	if _ended: return
+	_ended = true
+	announce("Nivel superado", 2.0)
+	await get_tree().create_timer(2.5).timeout
+	get_tree().paused = true
+	_end_screen("Nivel superado", UiKit.GOLD)
+
+func _end_screen(title: String, accent: Color) -> void:
+	var s := Menus.EndScreen.new(title, _summary(), accent)
+	s.restart.connect(_restart)
+	s.quit.connect(func() -> void: get_tree().quit())
+	add_child(s)
+	if args.has("autorestart"):
+		print("fin de partida: ", title)
+		await get_tree().create_timer(args.get_float("autorestart"), true, false, true).timeout
+		_restart()
+
+func _restart() -> void:
+	print("reinicio")
+	get_tree().paused = false
+	Engine.time_scale = 1.0
+	get_tree().reload_current_scene()
 
 ## Rótulo central provisional (el HUD completo llega en el hito 1.6).
 func _make_announcer() -> void:

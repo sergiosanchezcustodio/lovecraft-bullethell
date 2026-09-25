@@ -149,6 +149,12 @@ Cada ataque tiene además un tipo de daño (sección 4.4).
 - Los enemigos sueltan experiencia. Al subir de nivel, el jugador elige **1 de 3 mejoras** al azar: arma nueva, subir de nivel un arma o mejora pasiva. La elección pausa la partida (D-16).
 - Cada arma tiene niveles del 1 al 5 (propuesta). Evoluciones o combinaciones: D-06.
 - La progresión se conserva entre los niveles de la misma partida y se pierde al empezar una partida nueva.
+- **Implementado en la fase 1:**
+  - Las gemas de experiencia son cian (un color que no usa ningún tipo de daño) y vuelan hacia el jugador dentro de su radio de recogida.
+  - La curva de experiencia es 5 × 1,22^(n−1) + 2(n−1) por nivel.
+  - Hay cinco pasivas: velocidad, vida máxima, cordura máxima, recarga del esquive y radio de recogida. Cada una llega hasta nivel 5, y las de vida y cordura rellenan lo ganado.
+  - Cada subida de nivel ofrece tres opciones distintas entre armas nuevas, subidas de arma y pasivas que no estén al máximo.
+- **Crisis en la fase 1:** solo la parálisis. Mientras dura, el anillo del jugador late en violeta; cada congelación se avisa con un temblor y tiñe al personaje de violeta.
 
 ### 4.4 Vida y cordura
 Cada personaje tiene dos recursos, **vida** y **cordura**, con valores base propios (sección 6). Los valores numéricos se ajustarán en pruebas (D-08).

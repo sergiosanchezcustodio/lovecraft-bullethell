@@ -97,3 +97,13 @@ Partida con 1.000 balas enemigas vivas (`bullet_rain=1000`, de los tres tipos), 
 
 - **Qué se optimizó:** buscar las mallas con `find_children` y reasignar el material de destello en cada fotograma, y recalcular las posiciones de reposo, costaban más que todo lo demás. Ahora se guardan al crear el modelo y el material solo se toca cuando cambia.
 - **Dónde está el límite:** en la CPU (GDScript), no en la GPU. La prueba de carga completa del hito 1.7 sumará las 1.000 balas.
+
+## Hito 1.6: partida completa (25-09-2026)
+
+Misma prueba que en el hito 1.5 (150 enemigos, dinamita y revólver a nivel 3), ahora con gemas de experiencia, HUD, cordura y subidas de nivel automáticas (`autopick=true`).
+
+| Contenido | Media | 1 % peor | Llamadas de dibujo | Primitivas |
+|---|---|---|---|---|
+| 150 enemigos + gemas + HUD | 6,08 ms (164 FPS) | 9,09 ms (110 FPS) | 366 | 4,5 M |
+
+Los sistemas nuevos apenas se notan: unos 0,2 ms más que en el hito 1.5.

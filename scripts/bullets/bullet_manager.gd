@@ -26,7 +26,8 @@ var _ment := PackedFloat32Array()
 var _team := PackedByteArray()
 var _style := PackedByteArray()
 var _pierce := PackedInt32Array()
-var _last_hit: Array[Object] = []            ## último objetivo tocado (para las que atraviesan)
+var _last_hit := PackedInt64Array()          ## id del último objetivo tocado (para las que atraviesan);
+                                             ## id y no referencia: el objetivo puede liberarse antes que la bala
 
 var _mm: MultiMesh
 var _buffer := PackedFloat32Array()
@@ -76,7 +77,7 @@ func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, 
 	_team[i] = team
 	_style[i] = style
 	_pierce[i] = pierce
-	_last_hit[i] = null
+	_last_hit[i] = 0
 	count += 1
 
 func clear() -> void:
@@ -111,11 +112,11 @@ func _collide_enemy_bullet(i: int) -> bool:
 func _collide_player_bullet(i: int) -> bool:
 	for id in world.grid.query_circle(Vector2(_pos[i].x, _pos[i].z), _radius[i]):
 		var t := world.target_at(id)
-		if t == _last_hit[i] or not t.is_alive(): continue
+		if t.get_instance_id() == _last_hit[i] or not t.is_alive(): continue
 		var d := Damage.new(_phys[i], _ment[i])
 		d.knockback = _vel[i].normalized()
 		t.take_damage(d)
-		_last_hit[i] = t
+		_last_hit[i] = t.get_instance_id()
 		_pierce[i] -= 1
 		if _pierce[i] < 0: return true
 	return false
@@ -126,7 +127,6 @@ func _remove(i: int) -> void:
 		_pos[i] = _pos[last]; _vel[i] = _vel[last]; _radius[i] = _radius[last]; _size[i] = _size[last]
 		_life[i] = _life[last]; _age[i] = _age[last]; _phys[i] = _phys[last]; _ment[i] = _ment[last]
 		_team[i] = _team[last]; _style[i] = _style[last]; _pierce[i] = _pierce[last]; _last_hit[i] = _last_hit[last]
-	_last_hit[last] = null
 	count = last
 
 func _process(_delta: float) -> void:

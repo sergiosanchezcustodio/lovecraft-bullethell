@@ -5,6 +5,7 @@ extends CharacterBody3D
 
 signal dodged
 signal damaged(d: Damage)
+signal downed                    ## vida a cero
 
 const LAYER_WORLD := 1
 const LAYER_PLAYERS := 2
@@ -18,20 +19,30 @@ var model: Node3D
 var health := 0.0
 var sanity := 0.0
 var weapons: WeaponSystem
+var world: CombatWorld
+var progress: PlayerProgress
+var sanity_state: SanityState
 var god := false                 ## depuración: no recibe daño
 var _anim := "idle"
 var _anim_t := 0.0
 var _hurt_time := -1.0           ## tiempo desde el último golpe (-1 = nunca)
 var _override := ""              ## animación puntual (lanzar) que se impone un momento
 var _override_t := 0.0
+var _ring_mat: StandardMaterial3D
+var _frozen_mat: StandardMaterial3D
+var _frozen_on := false
+var _xray: ShaderMaterial
 
 func setup(p_data: CharacterData, p_input: PlayerInput, p_color: Color) -> Player:
-	data = p_data
+	data = p_data.duplicate()        # copia propia: las mejoras pasivas la modifican
 	input = p_input
 	color = p_color
 	motor = PlayerMotor.new(data)
 	health = data.max_health
 	sanity = data.max_sanity
+	var rules: ProgressionData = load("res://data/progression/default.tres")
+	progress = PlayerProgress.new(rules)
+	sanity_state = SanityState.new(rules)
 	name = "Player_%s" % data.id
 	return self
 
@@ -52,12 +63,16 @@ func _ready() -> void:
 	model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
 	visual.add_child(model)
 	# Silueta del color del jugador cuando lo tapa el decorado
-	var xray := ShaderMaterial.new()
-	xray.shader = preload("res://scripts/player/occluded_silhouette.gdshader")
-	xray.set_shader_parameter("color", Color(color, 0.6))
-	for mi in model.find_children("*", "MeshInstance3D", true, false):
-		(mi as MeshInstance3D).material_overlay = xray
+	_xray = ShaderMaterial.new()
+	_xray.shader = preload("res://scripts/player/occluded_silhouette.gdshader")
+	_xray.set_shader_parameter("color", Color(color, 0.6))
+	for mi: MeshInstance3D in model.get_meta("meshes"):
+		mi.material_overlay = _xray
 	add_child(_make_ring())
+	_frozen_mat = StandardMaterial3D.new()          # tinte violeta durante las congelaciones
+	_frozen_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_frozen_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_frozen_mat.albedo_color = Color(UiKit.SANITY * 0.6, 0.45)
 	# Farol propio: luz cálida y corta que destaca al jugador en la oscuridad (pilar de legibilidad)
 	var lamp := OmniLight3D.new()
 	lamp.name = "CarryLight"
@@ -69,7 +84,11 @@ func _ready() -> void:
 	add_child(lamp)
 
 func _physics_process(delta: float) -> void:
+	if health <= 0.0: return
 	input.update(delta)
+	var near := world != null and world.nearest_enemy(global_position, sanity_state.rules.horror_radius) != null
+	sanity = sanity_state.update(delta, sanity, data.max_sanity, near)
+	motor.locked = sanity_state.is_frozen()
 	var was_dodging := motor.is_dodging()
 	velocity = motor.step(delta, input.move, input.just_pressed(InputBindings.DODGE))
 	move_and_slide()
@@ -82,6 +101,19 @@ func _process(delta: float) -> void:
 	var target := atan2(motor.facing.x, motor.facing.z)
 	visual.rotation.y = lerp_angle(visual.rotation.y, target, 1.0 - exp(-data.turn_speed * delta))
 	# Animación según el estado
+	# Crisis de locura: anillo violeta que late y tinte violeta en cada congelación
+	var ss := sanity_state
+	if ss.in_crisis:
+		_ring_mat.albedo_color = UiKit.SANITY.lerp(Color.WHITE, 0.25 + 0.25 * sin(Time.get_ticks_msec() * 0.012))
+	else:
+		_ring_mat.albedo_color = color
+	var frozen := ss.is_frozen()
+	if frozen != _frozen_on:
+		_frozen_on = frozen
+		for mi: MeshInstance3D in model.get_meta("meshes"):
+			mi.material_overlay = _frozen_mat if frozen else _xray
+	# Temblor de aviso antes de cada congelación de la parálisis
+	visual.position = Vector3(randf_range(-0.04, 0.04), 0, randf_range(-0.04, 0.04)) if sanity_state.is_trembling() else Vector3.ZERO
 	# Parpadeo durante la invulnerabilidad tras un golpe
 	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
 	var anim := "idle"
@@ -115,9 +147,14 @@ func is_hittable() -> bool:
 func take_damage(d: Damage) -> void:
 	if not is_hittable(): return
 	health = maxf(0.0, health - d.physical)
-	sanity = maxf(0.0, sanity - d.mental)
+	if d.mental > 0.0:
+		sanity = maxf(0.0, sanity - d.mental)
+		sanity_state.on_mental_damage()
 	_hurt_time = 0.0
 	damaged.emit(d)
+	if health <= 0.0:
+		motor.locked = true
+		downed.emit()
 
 ## Reproduce una animación puntual (p. ej. "throw") por encima de andar o estar quieto.
 func play_once(anim: String) -> void:
@@ -141,11 +178,11 @@ func _make_ring() -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	mi.name = "Ring"
 	mi.mesh = st.commit()
-	var mat := StandardMaterial3D.new()
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = color
-	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	mi.material_override = mat
+	_ring_mat = StandardMaterial3D.new()
+	_ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_ring_mat.albedo_color = color
+	_ring_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mi.material_override = _ring_mat
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mi.position.y = 0.03
 	return mi

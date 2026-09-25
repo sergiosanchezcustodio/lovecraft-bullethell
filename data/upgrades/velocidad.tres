@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/upgrade_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"velocidad"
+display_name = "Botas de nieve"
+description = "+8 % de velocidad al andar"
+stat = "move_speed"
+multiply = 1.08
+add = 0.0
+max_level = 5
+color = Color(0.55, 0.8, 1, 1)

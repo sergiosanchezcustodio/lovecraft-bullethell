@@ -25,9 +25,13 @@ Léela al empezar cada sesión:
     - Oleadas de pingüinos y fragmentos que aparecen fuera de cámara, persiguen y disparan.
     - En el minuto 4, el Acechador como evento final: ronda, salta con aviso y croa.
     - El nivel se supera al matarlo.
-    - Todavía no hay experiencia, mejoras, HUD ni muerte del jugador (hito 1.6).
     - Clip en `shots/evento_final_1_5.gif`.
-  - **Siguiente: hito 1.6**, progresión, cordura y HUD.
+  - **Hito 1.6 (progresión, cordura y HUD): hecho.** La partida ya es completa:
+    - Gemas de experiencia que se recogen al acercarse, subida de nivel con elección de 1 entre 3 mejoras (la partida se pausa) y cinco pasivas.
+    - Cordura con recuperación pasiva y crisis de parálisis intermitente.
+    - HUD del J1 con retrato, vida, cordura, experiencia, armas y recarga del esquive, más reloj y objetivo arriba.
+    - Pausa con Esc o Start, pantalla de caída y de nivel superado, y reinicio.
+  - **Siguiente: hito 1.7**, prueba de carga completa, cierre de la fase y partida de 5 minutos jugada por ti.
 - **Todavía no hay código de juego:** solo el visor, la escena de rendimiento y los generadores de modelos.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
@@ -107,6 +111,9 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `timescale=N`: acelera el juego. Las capturas de `shots=` usan tiempo de juego.
   - `final_at=s`: adelanta el evento final.
   - `max_alive=N` y `spawn_rate=N`: tope de vivos y ritmo de aparición fijo (pruebas de carga).
+  - `autopick=true`: elige sola la primera mejora (para bots y capturas).
+  - `xp=`, `hp=` y `san=`: experiencia, vida y cordura iniciales.
+  - `autorestart=N`: en la pantalla final, reintenta sola tras N s.
 - **Encadenar comandos:** un `godot ... | grep error` devuelve 1 cuando no hay errores, así que no lo encadenes con `&&`.
 
 Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobrescribiría el detallado. Ejecuta `gen_acechador.py` después, o renombra la salida.
@@ -141,6 +148,17 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Nivel** (`scripts/level/`):
   - `LevelData` (`.tres` en `data/levels/`) define arena, grupo de enemigos, ritmo de aparición por tiempo, topes y evento final. Pesos 2^(N−t).
   - `WaveDirector` hace aparecer enemigos fuera de cámara, lanza el evento final y emite `level_completed` al morir su enemigo.
+- **Progresión** (`scripts/progression/`):
+  - `ProgressionData` (`data/progression/default.tres`) define la curva de experiencia y los parámetros de cordura y crisis.
+  - `PlayerProgress` lleva nivel, experiencia, subidas pendientes, las tres opciones al azar y su aplicación.
+  - Las mejoras pasivas son `UpgradeData` (`data/upgrades/`) y cambian una estadística de la copia del `CharacterData` de cada jugador (`Player.setup` la duplica).
+  - `GemManager` gestiona las gemas con arrays y un MultiMesh, como las balas.
+- **Cordura** (`SanityState`): recuperación pasiva lejos de enemigos y sin daño mental reciente; crisis a cero; parálisis intermitente que bloquea el `PlayerMotor`; al terminar, recupera el 30 %.
+- **Interfaz** (`scripts/ui/`):
+  - `UiKit`: estilo común y barras con estela.
+  - `Hud`: panel del J1 y cabecera. El retrato sale de un `SubViewport` que renderiza la cabeza del modelo.
+  - `Menus`: subida de nivel, pausa y pantalla final.
+  - `pause_watch.gd` atiende Esc o Start también con la partida en pausa.
 - **Arena** (`scripts/level/arena_builder.gd`):
   - Monta un JSON de `data/arenas/` (generado por `tools/gen_arena_campamento.py`) con el suelo de nieve, el mar, las piezas con su colisión, una luz y un halo de niebla por farol, y los límites invisibles.
   - Capa 1: mundo. Capa 2: jugadores.
@@ -195,6 +213,8 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Clases internas de GDScript:** no son nombres globales. Un `class X extends Y:` dentro de otro fichero solo se alcanza como `Fichero.X`. Si otras clases las crean por nombre, cada una va en su fichero con `class_name`.
 - **Arrays tipados en `.tres`:** un `Array[EnemyData]` se escribe `Array[ExtResource("id_del_script")]([...])`, no `Array[Resource]`.
 - **Coste por fotograma en GDScript:** con 150 enemigos, llamar a `find_children` y reasignar materiales en cada fotograma, y recalcular las posiciones de reposo leyendo metadatos, bajaba la partida de 170 a 81 FPS. `VoxelBuilder` guarda en metadatos las partes, las posiciones de reposo y las mallas de cada modelo (`parts`, `rest`, `rest_by_name`, `meshes`), y los materiales solo se tocan cuando cambia el estado.
+- **Referencias a objetos liberados:** copiar un objeto ya liberado dentro de un array tipado (`Array[Object]`) da error. Para recordar un objetivo que puede morir en cualquier momento, guarda su `get_instance_id()`.
+- **Aviso `ObjectDB instances leaked` al salir:** aparece si se fuerza la salida (`--quit-after`) mientras una corrutina espera un temporizador. No pasa al jugar normalmente.
 - **`cat` sin entrada:** un `cat > fichero` sin heredoc se queda esperando la entrada estándar para siempre.
 
 ## Por definir
