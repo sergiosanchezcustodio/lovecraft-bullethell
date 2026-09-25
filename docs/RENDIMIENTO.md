@@ -74,3 +74,14 @@ Arena del campamento completa (119 piezas, 8 faroles con luz), Dyer con el bot e
 |---|---|---|---|---|
 | Con halos de niebla (por defecto) | 1,76 ms (568 FPS) | 2,08 ms (480 FPS) | 193 | 1,7 M |
 | Sin halos (`fogvol=false`) | 1,63 ms (612 FPS) | 1,85 ms (540 FPS) | 193 | 1,7 M |
+
+## Hito 1.4: 1.000 balas (25-09-2026)
+
+Partida con 1.000 balas enemigas vivas (`bullet_rain=1000`, de los tres tipos), 12 muñecos de práctica, Dyer con dinamita y revólver disparando, y el bot moviéndose. 1920×1080, sin vsync.
+
+| Contenido | Media | 1 % peor | Llamadas de dibujo | Primitivas |
+|---|---|---|---|---|
+| 1.000 balas + 12 muñecos + armas | 2,07 ms (483 FPS) | 2,78 ms (360 FPS) | 191 | 1,8 M |
+
+- **Coste de las balas:** respecto a la partida sin balas del hito 1.3, cuestan en torno a 0,3 ms. El MultiMesh es una sola llamada de dibujo.
+- **Dónde está el coste:** en la simulación en GDScript (integración y colisiones), no en el dibujo.

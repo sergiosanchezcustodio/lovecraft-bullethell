@@ -18,3 +18,5 @@ dodge_cooldown = 1.2
 luck = 1.0
 starting_weapon = &"dinamita"
 collision_radius = 0.32
+hurt_radius = 0.25
+hit_iframes = 0.6

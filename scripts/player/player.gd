@@ -4,6 +4,7 @@ extends CharacterBody3D
 ## y dibuja el anillo del color del jugador bajo sus pies.
 
 signal dodged
+signal damaged(d: Damage)
 
 const LAYER_WORLD := 1
 const LAYER_PLAYERS := 2
@@ -14,14 +15,23 @@ var motor: PlayerMotor
 var color := Color(1.0, 0.82, 0.3)
 var visual: Node3D          ## contenedor que gira hacia donde mira; dentro, el modelo voxel
 var model: Node3D
+var health := 0.0
+var sanity := 0.0
+var weapons: WeaponSystem
+var god := false                 ## depuración: no recibe daño
 var _anim := "idle"
 var _anim_t := 0.0
+var _hurt_time := -1.0           ## tiempo desde el último golpe (-1 = nunca)
+var _override := ""              ## animación puntual (lanzar) que se impone un momento
+var _override_t := 0.0
 
 func setup(p_data: CharacterData, p_input: PlayerInput, p_color: Color) -> Player:
 	data = p_data
 	input = p_input
 	color = p_color
 	motor = PlayerMotor.new(data)
+	health = data.max_health
+	sanity = data.max_sanity
 	name = "Player_%s" % data.id
 	return self
 
@@ -65,15 +75,24 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	position.y = 0.0
 	if motor.is_dodging() and not was_dodging: dodged.emit()
+	if _hurt_time >= 0.0: _hurt_time += delta
 
 func _process(delta: float) -> void:
 	# Girar el modelo hacia donde mira (el modelo mira hacia +Z)
 	var target := atan2(motor.facing.x, motor.facing.z)
 	visual.rotation.y = lerp_angle(visual.rotation.y, target, 1.0 - exp(-data.turn_speed * delta))
 	# Animación según el estado
+	# Parpadeo durante la invulnerabilidad tras un golpe
+	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
 	var anim := "idle"
 	if motor.is_dodging(): anim = "dodge"
 	elif motor.velocity.length() > 0.1: anim = "walk"
+	if _override != "":
+		_override_t += delta / Anims.duration(data.model, _override)
+		if _override_t >= 1.0: _override = ""
+		elif not motor.is_dodging():
+			Anims.pose(data.model, _override, model, _override_t)
+			return
 	if anim != _anim:
 		_anim = anim
 		_anim_t = 0.0
@@ -86,7 +105,25 @@ func _process(delta: float) -> void:
 	Anims.pose(data.model, anim, model, t)
 
 func is_invulnerable() -> bool:
-	return motor.is_invulnerable()
+	return motor.is_invulnerable() or (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes)
+
+## ¿Puede recibir un impacto ahora?
+func is_hittable() -> bool:
+	return health > 0.0 and not god and not is_invulnerable()
+
+## Recibe un ataque: la parte física resta vida y la mental, cordura.
+func take_damage(d: Damage) -> void:
+	if not is_hittable(): return
+	health = maxf(0.0, health - d.physical)
+	sanity = maxf(0.0, sanity - d.mental)
+	_hurt_time = 0.0
+	damaged.emit(d)
+
+## Reproduce una animación puntual (p. ej. "throw") por encima de andar o estar quieto.
+func play_once(anim: String) -> void:
+	if Anims.has_anim(data.model, anim):
+		_override = anim
+		_override_t = 0.0
 
 ## Anillo plano del color del jugador, sin sombreado, para distinguirlo siempre.
 func _make_ring() -> MeshInstance3D:

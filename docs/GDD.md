@@ -152,6 +152,12 @@ Cada personaje tiene dos recursos, **vida** y **cordura**, con valores base prop
 | **Mixto** | Ambas | El grito "¡Tekeli-li!" del shoggoth, Cthulhu | Combina los dos lenguajes |
 
 - **Pauta:** los escalones bajos hacen sobre todo daño físico; cuanto más alto el escalón, más daño mental. Los jefes combinan ambos.
+- **Lenguaje visual implementado (hito 1.4):** todas las balas enemigas son redondas y tienen contorno oscuro para destacar sobre la nieve y en la oscuridad. Las balas se dibujan siempre por encima del decorado. Los avisos en el suelo usan el color del tipo de daño.
+  - *Físico:* núcleo color hueso con borde rojo anaranjado, sólido y quieto.
+  - *Mental:* anillo violeta que ondula y gira, con el centro oscuro.
+  - *Mixto:* núcleo físico dentro de un anillo mental.
+  - *Jugador:* trazadoras doradas alargadas y translúcidas, que no se confunden con las enemigas.
+- **Radio de impacto del jugador:** 0,25 m, mucho menor que su silueta, como es habitual en el género. El radio de colisión de las balas es algo menor que el visual.
 - **Legibilidad obligatoria:** los ataques mentales se distinguen de los físicos al instante, por forma, color y sonido. El jugador debe poder decidir en décimas de segundo qué esquivar primero según el estado de sus barras.
 - **Otras pérdidas de cordura:**
   - *Presencia:* élites y jefes emiten un aura que drena cordura mientras el jugador está dentro de su radio.

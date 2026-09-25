@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"prueba_espiral_mixto"
+shape = 0
+count = 6
+speed = 4.0
+damage_physical = 5.0
+damage_mental = 5.0
+bursts = 12
+burst_interval = 0.12
+spin_deg = 17.0
+aimed = false
