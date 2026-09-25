@@ -14,6 +14,8 @@ var sky_mat: ShaderMaterial
 var lightning: TitleLightning
 var storm_light: DirectionalLight3D
 var bolt_light: OmniLight3D
+var logo: TitleLogo
+const ALL_BUT_TITLE := 0xFFFFF & ~(1 << (TitleLogo.LAYER - 1))   ## las luces de la escena no tocan el título
 var _t := 0.0
 # Encuadre: el título ocupa la franja superior (cielo); debajo, Cthulhu en el collado;
 # el lago en el centro y el campamento abajo a la izquierda.
@@ -38,6 +40,11 @@ func _ready() -> void:
 	camera.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(camera)
 	_place_camera(0.0)
+	if not args.get_bool("nologo"):
+		logo = TitleLogo.new()
+		camera.add_child(logo)
+	for l in find_children("*", "Light3D", true, false):
+		if not (l.get_parent() is TitleLogo): (l as Light3D).light_cull_mask = ALL_BUT_TITLE
 	lightning = TitleLightning.new()
 	lightning.camera = camera
 	lightning.strength = 0.0 if args.get_bool("nolightning") else 1.0
@@ -140,6 +147,7 @@ func _on_flash(k: float, at: Vector3) -> void:
 	storm_light.light_energy = 0.9 * k
 	bolt_light.position = at + Vector3(0, 40, 30)
 	bolt_light.light_energy = 5.0 * k
+	if logo != null: logo.flash(k)
 
 # ---------------- terreno y atrezo ----------------
 func _prop(model: String, pos: Vector3, rot_y: float = 0.0, scale: float = 1.0) -> Node3D:

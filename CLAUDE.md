@@ -57,11 +57,11 @@ Léela al empezar cada sesión:
   - Portada animada en Godot (D-21; GDD 7.1).
   - Orden: cerrar la fase 1 con tu partida, después el cooperativo (fase 2) y luego la fase 5.
 - **Portada (adelantada de la fase 5), en curso:** plan aprobado en cuatro hitos:
-  - P.1: escenario, luz y tormenta. **Hecho, pendiente de tu revisión.**
-  - P.2: criaturas de alta calidad.
-  - P.3: título voxel con tentáculos.
+  - P.1: escenario, luz y tormenta. Hecho; **el fondo se replanteará con tus ideas**.
+  - P.3: título voxel con tentáculos. **Hecho (adelantado a petición tuya), pendiente de tu revisión.**
+  - P.2: criaturas de alta calidad, a la espera de tus ideas para el fondo.
   - P.4: integración.
-  - Se abre con `godot --path . -- title` y hay vídeo en `shots/portada_p1.mp4`.
+  - Se abre con `godot --path . -- title` y hay vídeo en `shots/portada_titulo.mp4`.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
 ## Decisiones cerradas
@@ -160,7 +160,11 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Tormenta:** cielo por shader (`storm_sky.gdshader`) con nubes que se desplazan y se iluminan desde dentro con cada relámpago. `TitleLightning` genera rayos quebrados con ramas, cada 5,5 a 11 s, con una réplica como máximo y la intensidad regulable (accesibilidad).
 - **Luces:** luna rasante desde la izquierda; contraluz de tormenta y luz del rayo que se encienden con cada descarga.
 - **Detalles:** bancos de niebla que derivan (`mist.gdshader`), nieve con partículas y farol cálido que titila en el campamento.
-- **Opciones:** `quality=low`, `shots=`, `tag=`, `strike=s` (fuerza un relámpago), `nolightning=true`, `noplaceholders=true` y `perf=N`.
+- **Título** (`TitleLogo`, modelos de `tools/gen_titulo.py`):
+  - Letras rasterizadas con fuentes OFL (`tools/fonts/`, con sus licencias) y extruidas con bisel escalonado: "Lovecraft Library:" en oro viejo (IM Fell English SC) y "Surviving Cthulhu" en piedra color hueso con grietas y verdín (Cinzel Decorative Black).
+  - Tentáculos troceados en segmentos (`tX_00`…) que `TitleLogo` encadena y mece más cuanto más cerca de la punta. Cada segmento se solapa con el anterior para que no se abran huecos al girar.
+  - Va unido a la cámara, en la franja superior, y se aleja si la pantalla es estrecha. Tiene capa de render propia (bit 2) con luces propias: principal cálida, relleno verdoso y contraluz que se enciende con los relámpagos. Las luces de la escena no lo tocan y su material ignora la niebla.
+- **Opciones:** `quality=low`, `shots=`, `tag=`, `strike=s` (fuerza un relámpago), `nolightning=true`, `noplaceholders=true`, `nologo=true` y `perf=N`.
 
 ## Arquitectura del juego
 
@@ -278,6 +282,8 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 - **Bloom general y partículas pequeñas:** con `glow_bloom` > 0 cada punto claro se convierte en una bola borrosa. En la portada, el bloom es 0 y el brillo sale solo del umbral HDR.
 - **Relámpagos y luz ambiental:** si el ambiente sale del cielo, cada relámpago ilumina el valle como si fuera de día. Usa ambiente de color fijo y deja el destello al cielo, a un contraluz rasante y a una luz puntual.
 - **Montañas voxel:** un cono con pendiente uniforme o bloques aplanados se ven como pirámides escalonadas. Hacen falta cárcavas, un contorno quebrado de agujas (ruido de crestas de celda pequeña) y pocas mesetas.
+- **Texto en voxel:** los tentáculos enroscados en trazos finos (I, T, L) tapan la letra entera. Basta una sola vuelta que pase por delante en la parte baja, y solo en letras cuyas puntas no crucen otra línea. Para un título, luz propia en su capa: con la luz fría de la escena, la piedra y el oro salían plateados.
+- **NumPy y JSON:** los enteros de NumPy (`int64`) no se pueden serializar; conviértelos con `int()` o `float()` antes de `json.dump`.
 - **Tests y datos de equilibrio:** los tests no deben comprobar valores que se retocan al equilibrar (ritmos, experiencia, vida). Cuando haga falta, que construyan sus propios datos. Si un test falla tras un ajuste de equilibrio, el que está mal es el test.
 - **Controles de los menús:** el `ui_accept` de Godot no trae ningún botón del mando y sí trae Espacio, que es la tecla de esquivar. `UiInput.configure()` añade A (aceptar) y B (volver) y quita Espacio. El menú de mejoras ignora las pulsaciones durante su primer medio segundo.
 - **Élites ahogadas en la horda:** las armas apuntan al más cercano o a la zona más densa, así que una élite rodeada de la oleada casi no recibe disparos. `LevelData.final_spawn_scale` (0,3) reduce las apariciones durante el evento final.
