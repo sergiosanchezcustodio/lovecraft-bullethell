@@ -26,8 +26,11 @@ def free(x, z, r):
     return True
 
 # ---------- Campamento (centro) ----------
-for x, z, r in ((-7.5, -6.0, 15), (6.5, -8.5, -20), (-9.0, 6.0, 35), (8.5, 7.0, -40)):
-    add("atrezo_tienda", x, z, r)
+# Variedad: dos tiendas, un iglú y una cabaña de troncos (la puerta y la ventana hacia la cámara)
+add("atrezo_tienda", -7.5, -6.0, 20)
+add("atrezo_tienda", 8.5, 7.0, -35)
+add("atrezo_iglu", 7.0, -9.2, 55)
+add("atrezo_cabana", -13.0, 7.5, 30)
 for x, z, r in ((-3.8, -9.5, 10), (-3.0, -10.4, 40), (-2.2, -9.2, 75), (11.2, -3.5, 5), (11.6, -2.5, 30),
                 (-11.8, 1.2, 60), (3.5, 11.0, 20), (4.3, 11.6, 0)):
     add("atrezo_caja", x, z, r)
@@ -68,7 +71,8 @@ def scatter(model, n, rmin, smin, smax, bias=None):
         add(model, x, z, scale=s)
         placed += 1
 
-scatter("atrezo_roca", 14, 14.0, 0.9, 1.8)
+scatter("atrezo_roca", 9, 14.0, 0.9, 1.8)
+scatter("atrezo_bloques_hielo", 5, 13.0, 0.9, 1.2)
 scatter("atrezo_hielo", 10, 14.0, 0.8, 1.6, bias=True)
 scatter("atrezo_caja", 4, 16.0, 1.0, 1.0)
 
@@ -80,7 +84,10 @@ layout = {
     "sea": {"sides": ["south", "east"], "level": -0.45},
     "lamp": {"color": [1.0, 0.72, 0.4], "energy": 2.2, "range": 8.0},
     "colliders": {
-        "atrezo_tienda": {"type": "cylinder", "radius": 1.15},
+        "atrezo_tienda": {"type": "box", "shrink": 0.8},
+        "atrezo_iglu": {"type": "cylinder", "radius": 1.75},
+        "atrezo_cabana": {"type": "box", "shrink": 0.82},
+        "atrezo_bloques_hielo": {"type": "box", "shrink": 0.9},
         "atrezo_caja": {"type": "box", "shrink": 0.95},
         "atrezo_bidon": {"type": "cylinder", "radius": 0.3},
         "atrezo_farol": {"type": "cylinder", "radius": 0.15},

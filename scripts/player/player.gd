@@ -26,8 +26,13 @@ var god := false                 ## depuración: no recibe daño
 var _anim := "idle"
 var _anim_t := 0.0
 var _hurt_time := -1.0           ## tiempo desde el último golpe (-1 = nunca)
-var _override := ""              ## animación puntual (lanzar) que se impone un momento
+var _override := ""              ## gesto del tren superior (lanzar) que se suma a la animación
 var _override_t := 0.0
+var _blend_snap: Array = []      ## pose de la que se parte al cambiar de animación
+var _blend_t := 1.0
+var _blend_len := 0.0
+var _snow: GPUParticles3D        ## nieve que levanta al deslizarse
+const UPPER_BODY: Array[String] = ["arm_r", "arm_l", "torso"]
 var _ring_mat: StandardMaterial3D
 var _frozen_mat: StandardMaterial3D
 var _frozen_on := false
@@ -59,6 +64,9 @@ func _ready() -> void:
 	add_child(shape)
 	visual = Node3D.new()
 	visual.name = "Visual"
+	# El cuerpo se mueve con la física (interpolado); el modelo se orienta y se anima en
+	# _process, así que queda fuera de la interpolación y sigue al cuerpo interpolado.
+	visual.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(visual)
 	model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
 	visual.add_child(model)
@@ -69,6 +77,8 @@ func _ready() -> void:
 	for mi: MeshInstance3D in model.get_meta("meshes"):
 		mi.material_overlay = _xray
 	add_child(_make_ring())
+	_snow = _make_snow_spray()
+	add_child(_snow)
 	_frozen_mat = StandardMaterial3D.new()          # tinte violeta durante las congelaciones
 	_frozen_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_frozen_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -82,6 +92,7 @@ func _ready() -> void:
 	lamp.omni_range = 4.5
 	lamp.omni_attenuation = 1.4
 	add_child(lamp)
+	reset_physics_interpolation.call_deferred()      # no interpolar desde el origen al aparecer
 
 func _physics_process(delta: float) -> void:
 	if health <= 0.0: return
@@ -117,25 +128,82 @@ func _process(delta: float) -> void:
 	visual.position = Vector3(randf_range(-0.04, 0.04), 0, randf_range(-0.04, 0.04)) if sanity_state.is_trembling() else Vector3.ZERO
 	# Parpadeo durante la invulnerabilidad tras un golpe
 	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
+	_animate(delta)
+	_snow.emitting = motor.is_dodging()
+
+## Animación por capas: una base (reposo, andar o esquive) que se funde al cambiar y,
+## encima, el gesto de lanzar solo en brazos y torso, con entrada y salida suaves.
+func _animate(delta: float) -> void:
 	var anim := "idle"
 	if motor.is_dodging(): anim = "dodge"
 	elif motor.velocity.length() > 0.1: anim = "walk"
-	if _override != "":
-		_override_t += delta / Anims.duration(data.model, _override)
-		if _override_t >= 1.0: _override = ""
-		elif not motor.is_dodging():
-			Anims.pose(data.model, _override, model, _override_t)
-			return
 	if anim != _anim:
+		_blend_snap = Anims.snapshot(model)
+		_blend_t = 0.0
+		# entrar en el esquive, rápido; salir de él (incorporarse), algo más lento
+		_blend_len = 0.06 if anim == "dodge" else (0.22 if _anim == "dodge" else 0.15)
 		_anim = anim
-		_anim_t = 0.0
+		if anim != "walk": _anim_t = 0.0
 	var t: float
 	if anim == "dodge":
-		t = motor.dodge_time / data.dodge_duration
+		# Reloj propio a ritmo de fotograma: motor.dodge_time avanza en pasos de física
+		# (60 Hz) y en monitores más rápidos la pose iría a saltos.
+		_anim_t += delta
+		t = _anim_t / data.dodge_duration
+	elif anim == "walk":
+		# cadencia proporcional a la velocidad real: los pies no patinan
+		_anim_t += delta * (motor.velocity.length() / data.move_speed) / Anims.duration(data.model, "walk")
+		t = fposmod(_anim_t, 1.0)
 	else:
 		_anim_t += delta / Anims.duration(data.model, anim)
 		t = fposmod(_anim_t, 1.0)
 	Anims.pose(data.model, anim, model, t)
+	if _blend_t < _blend_len:
+		_blend_t += delta
+		Anims.blend_from(model, _blend_snap, Anims.ease(_blend_t / _blend_len))
+	if _override != "":
+		_override_t += delta / Anims.duration(data.model, _override)
+		if _override_t >= 1.0:
+			_override = ""
+		elif not motor.is_dodging():
+			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
+			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
+
+## Nieve que salta de los pies al deslizarse: cubitos blancos que quedan atrás.
+func _make_snow_spray() -> GPUParticles3D:
+	var p := GPUParticles3D.new()
+	p.name = "SnowSpray"
+	p.amount = 36
+	p.lifetime = 0.55
+	p.emitting = false
+	p.local_coords = false
+	p.position = Vector3(0, 0.1, 0)
+	var pm := ParticleProcessMaterial.new()
+	pm.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+	pm.emission_sphere_radius = 0.25
+	pm.direction = Vector3.UP
+	pm.spread = 55.0
+	pm.initial_velocity_min = 1.2
+	pm.initial_velocity_max = 3.0
+	pm.gravity = Vector3(0, -9.0, 0)
+	pm.scale_min = 0.045
+	pm.scale_max = 0.09
+	var fade := Gradient.new()
+	fade.set_color(0, Color(0.95, 0.97, 1.0, 1.0))
+	fade.set_color(1, Color(0.85, 0.9, 0.97, 0.0))
+	var ft := GradientTexture1D.new()
+	ft.gradient = fade
+	pm.color_ramp = ft
+	p.process_material = pm
+	var box := BoxMesh.new()
+	box.size = Vector3.ONE
+	var bm := StandardMaterial3D.new()
+	bm.vertex_color_use_as_albedo = true
+	bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	box.material = bm
+	p.draw_pass_1 = box
+	return p
 
 func is_invulnerable() -> bool:
 	return motor.is_invulnerable() or (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes)

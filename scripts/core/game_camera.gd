@@ -11,6 +11,10 @@ extends Camera3D
 var targets: Array[Node3D] = []
 
 func _ready() -> void:
+	# La cámara se mueve en _process siguiendo la posición INTERPOLADA de sus objetivos
+	# (interpolación de física): si siguiera la posición de física, que cambia a 60 Hz,
+	# en monitores más rápidos todo vibraría.
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	projection = Camera3D.PROJECTION_ORTHOGONAL
 	rotation_degrees = Vector3(-30, 45, 0)
 	size = view_size
@@ -21,7 +25,7 @@ func _ready() -> void:
 func center() -> Vector3:
 	if targets.is_empty(): return Vector3.ZERO
 	var c := Vector3.ZERO
-	for t in targets: c += t.global_position
+	for t in targets: c += t.get_global_transform_interpolated().origin
 	return c / targets.size()
 
 func desired_position() -> Vector3:

@@ -31,8 +31,20 @@
  },
  "colliders": {
   "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
    "type": "cylinder",
-   "radius": 1.15
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
   },
   "atrezo_caja": {
    "type": "box",
@@ -62,25 +74,7 @@
     -7.5,
     -6.0
    ],
-   "rot": 15,
-   "scale": 1.0
-  },
-  {
-   "model": "atrezo_tienda",
-   "pos": [
-    6.5,
-    -8.5
-   ],
-   "rot": -20,
-   "scale": 1.0
-  },
-  {
-   "model": "atrezo_tienda",
-   "pos": [
-    -9.0,
-    6.0
-   ],
-   "rot": 35,
+   "rot": 20,
    "scale": 1.0
   },
   {
@@ -89,7 +83,25 @@
     8.5,
     7.0
    ],
-   "rot": -40,
+   "rot": -35,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_iglu",
+   "pos": [
+    7.0,
+    -9.2
+   ],
+   "rot": 55,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_cabana",
+   "pos": [
+    -13.0,
+    7.5
+   ],
+   "rot": 30,
    "scale": 1.0
   },
   {
@@ -957,49 +969,49 @@
    "scale": 1.65
   },
   {
-   "model": "atrezo_roca",
+   "model": "atrezo_bloques_hielo",
    "pos": [
     -24.8,
     -9.31
    ],
    "rot": 96.5,
-   "scale": 1.16
+   "scale": 0.99
   },
   {
-   "model": "atrezo_roca",
+   "model": "atrezo_bloques_hielo",
    "pos": [
     22.32,
     -21.89
    ],
    "rot": 72.7,
-   "scale": 0.93
+   "scale": 0.91
   },
   {
-   "model": "atrezo_roca",
+   "model": "atrezo_bloques_hielo",
    "pos": [
     21.35,
     -12.28
    ],
    "rot": 219.5,
-   "scale": 1.71
+   "scale": 1.17
   },
   {
-   "model": "atrezo_roca",
+   "model": "atrezo_bloques_hielo",
    "pos": [
     10.11,
     22.73
    ],
    "rot": 271.0,
-   "scale": 0.96
+   "scale": 0.92
   },
   {
-   "model": "atrezo_roca",
+   "model": "atrezo_bloques_hielo",
    "pos": [
     14.78,
     11.6
    ],
    "rot": 166.7,
-   "scale": 1.28
+   "scale": 1.03
   },
   {
    "model": "atrezo_hielo",
@@ -1121,10 +1133,10 @@
   {
    "model": "atrezo_caja",
    "pos": [
-    -22.99,
-    4.47
+    22.08,
+    -9.22
    ],
-   "rot": 352.2,
+   "rot": 37.3,
    "scale": 1.0
   }
  ]

@@ -18,6 +18,7 @@ func setup(p_world: CombatWorld, p_kind: String, p_pattern: BulletPattern, p_int
 	return self
 
 func _ready() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # se mueve en _process
 	model = VoxelBuilder.load_model("res://models/%s.json" % kind)
 	add_child(model)
 	runner = PatternRunner.new().setup(world)

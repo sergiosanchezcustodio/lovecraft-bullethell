@@ -50,6 +50,47 @@ static func reset(m: Node3D) -> void:
 		n.rotation = Vector3.ZERO
 		n.scale = Vector3.ONE
 
+## Captura la pose actual del modelo (raíz y partes) para fundirla con otra.
+static func snapshot(m: Node3D) -> Array:
+	var out: Array = [m.position, m.rotation]
+	for n: Node3D in m.get_meta("parts"):
+		out.append_array([n.position, n.rotation, n.scale])
+	return out
+
+## Funde la pose actual del modelo con una captura: w = 0 deja la captura, w = 1 la actual.
+static func blend_from(m: Node3D, snap: Array, w: float) -> void:
+	if w >= 1.0: return
+	m.position = (snap[0] as Vector3).lerp(m.position, w)
+	m.rotation = (snap[1] as Vector3).lerp(m.rotation, w)
+	var parts: Array[Node3D] = m.get_meta("parts")
+	for i in parts.size():
+		var n := parts[i]
+		var o := 2 + i * 3
+		n.position = (snap[o] as Vector3).lerp(n.position, w)
+		n.rotation = (snap[o + 1] as Vector3).lerp(n.rotation, w)
+		n.scale = (snap[o + 2] as Vector3).lerp(n.scale, w)
+
+## Aplica una animación por encima de la pose actual (sin volver al reposo) y solo en las
+## partes indicadas, mezclada con peso w. Sirve para gestos del tren superior (lanzar)
+## mientras las piernas siguen andando.
+static func overlay(model_name: String, anim: String, m: Node3D, t: float, w: float, only: Array[String]) -> void:
+	if not has_anim(model_name, anim) or w <= 0.0: return
+	var saved := {}
+	for pname in only:
+		var n := part(m, pname)
+		saved[pname] = [n.position, n.rotation, n.scale]
+	var root_pos := m.position
+	var root_rot := m.rotation
+	BY_MODEL[model_name].call(anim, m, t)
+	m.position = root_pos
+	m.rotation = root_rot
+	for pname in only:
+		var n := part(m, pname)
+		var s: Array = saved[pname]
+		n.position = (s[0] as Vector3).lerp(n.position, w)
+		n.rotation = (s[1] as Vector3).lerp(n.rotation, w)
+		n.scale = (s[2] as Vector3).lerp(n.scale, w)
+
 static func ease(x: float) -> float:
 	x = clampf(x, 0.0, 1.0)
 	return x * x * (3.0 - 2.0 * x)

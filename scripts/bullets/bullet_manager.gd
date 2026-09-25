@@ -16,6 +16,7 @@ var world: CombatWorld
 var count := 0
 
 var _pos := PackedVector3Array()
+var _prev := PackedVector3Array()            ## posición en el paso de física anterior (para interpolar el dibujo)
 var _vel := PackedVector3Array()
 var _radius := PackedFloat32Array()          ## radio de colisión (m)
 var _size := PackedFloat32Array()            ## radio visual (m), mayor que el de colisión
@@ -35,7 +36,7 @@ var _buffer := PackedFloat32Array()
 func _init() -> void:
 	name = "Bullets"
 	# Uno a uno: un Packed*Array metido en otro array es una copia y redimensionarla no sirve
-	_pos.resize(MAX_BULLETS); _vel.resize(MAX_BULLETS)
+	_pos.resize(MAX_BULLETS); _prev.resize(MAX_BULLETS); _vel.resize(MAX_BULLETS)
 	_radius.resize(MAX_BULLETS); _size.resize(MAX_BULLETS); _life.resize(MAX_BULLETS)
 	_age.resize(MAX_BULLETS); _phys.resize(MAX_BULLETS); _ment.resize(MAX_BULLETS)
 	_team.resize(MAX_BULLETS); _style.resize(MAX_BULLETS); _pierce.resize(MAX_BULLETS)
@@ -52,6 +53,7 @@ func _ready() -> void:
 	_mm.visible_instance_count = 0
 	var mmi := MultiMeshInstance3D.new()
 	mmi.name = "BulletMesh"
+	mmi.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # se interpola a mano en _process
 	mmi.multimesh = _mm
 	var mat := ShaderMaterial.new()
 	mat.shader = preload("res://scripts/bullets/bullet.gdshader")
@@ -67,6 +69,7 @@ func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, 
 	if count >= MAX_BULLETS: return
 	var i := count
 	_pos[i] = Vector3(pos.x, HEIGHT, pos.z)
+	_prev[i] = _pos[i]
 	_vel[i] = Vector3(vel.x, 0.0, vel.z)
 	_radius[i] = radius
 	_size[i] = size
@@ -88,6 +91,7 @@ func _physics_process(delta: float) -> void:
 	var b := world.bounds if world != null else Rect2(-100, -100, 200, 200)
 	var i := 0
 	while i < count:
+		_prev[i] = _pos[i]
 		_pos[i] += _vel[i] * delta
 		_age[i] += delta
 		var dead := _age[i] >= _life[i] or not b.has_point(Vector2(_pos[i].x, _pos[i].z))
@@ -126,7 +130,7 @@ func _collide_player_bullet(i: int) -> bool:
 func _remove(i: int) -> void:
 	var last := count - 1
 	if i != last:
-		_pos[i] = _pos[last]; _vel[i] = _vel[last]; _radius[i] = _radius[last]; _size[i] = _size[last]
+		_pos[i] = _pos[last]; _prev[i] = _prev[last]; _vel[i] = _vel[last]; _radius[i] = _radius[last]; _size[i] = _size[last]
 		_life[i] = _life[last]; _age[i] = _age[last]; _phys[i] = _phys[last]; _ment[i] = _ment[last]
 		_team[i] = _team[last]; _style[i] = _style[last]; _pierce[i] = _pierce[last]; _last_hit[i] = _last_hit[last]
 	count = last
@@ -134,11 +138,13 @@ func _remove(i: int) -> void:
 func _process(_delta: float) -> void:
 	var t0 := Prof.start()
 	# Buffer del MultiMesh: por instancia, transformación 3x4 (fila a fila) y 4 datos propios:
-	# estilo, fase de animación, edad y radio visual.
+	# estilo, fase de animación, edad y radio visual. La posición se interpola entre los dos
+	# últimos pasos de física: si no, en monitores de más de 60 Hz las balas avanzarían a tirones.
+	var frac := Engine.get_physics_interpolation_fraction()
 	for i in count:
 		var o := i * 16
 		var s := _size[i]
-		var p := _pos[i]
+		var p := _prev[i].lerp(_pos[i], frac)
 		_buffer[o] = s; _buffer[o + 1] = 0.0; _buffer[o + 2] = 0.0; _buffer[o + 3] = p.x
 		_buffer[o + 4] = 0.0; _buffer[o + 5] = s; _buffer[o + 6] = 0.0; _buffer[o + 7] = p.y
 		_buffer[o + 8] = 0.0; _buffer[o + 9] = 0.0; _buffer[o + 10] = s; _buffer[o + 11] = p.z

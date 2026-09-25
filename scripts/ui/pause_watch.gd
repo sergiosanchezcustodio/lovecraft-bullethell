@@ -10,5 +10,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventJoypadButton and event.pressed and (event as InputEventJoypadButton).button_index == JOY_BUTTON_START:
 		pressed = true
 	if pressed:
+		if OS.is_debug_build() and game.args.get_bool("log"): print("pausa pedida por: ", event.as_text(), " dispositivo ", event.device)
 		game.toggle_pause()
 		get_viewport().set_input_as_handled()

@@ -25,6 +25,7 @@ func setup(p_world: CombatWorld, p_kind: String) -> TrainingDummy:
 	return self
 
 func _ready() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # se mueve en _process
 	model = VoxelBuilder.load_model("res://models/%s.json" % kind)
 	add_child(model)
 	_flash_mat = StandardMaterial3D.new()

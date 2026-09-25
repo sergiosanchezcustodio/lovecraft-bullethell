@@ -154,3 +154,24 @@ El resto es trabajo del motor: dibujo, transformaciones de unos 1.000 nodos y f�
   3. Llevar balas y enemigos a C# o GDExtension. **Consultar antes.**
 - **Probado y sin efecto:** sustituir `get_node("parte")` por un diccionario de partes (se mantiene porque es más limpio), y quitar el diccionario de repetidos en las consultas de la rejilla.
 - **Aún no aplicado:** la optimización 1 del plan, la fusión de caras. Ahorraría triángulos (GPU), y la GPU no es el límite.
+
+## Tras la segunda partida de prueba (25-09-2026)
+
+**Carga de la partida**, desde que empieza la escena hasta el primer fotograma, con iglú, cabaña, tiendas nuevas y precarga de los enemigos del nivel:
+
+| Situación | Carga de la escena | Desde el arranque del motor |
+|---|---|---|
+| Sin caché de mallas | 4,3-4,5 s | 5,7-6,4 s |
+| Con caché (a partir de la segunda vez) | 0,17 s | 1,45 s |
+
+**Prueba de carga** (150 enemigos, unas 1.400 balas) con interpolación de física, gemas con sombra y las piezas nuevas. Tres pasadas:
+
+| Pasada | Media | 1 % peor |
+|---|---|---|
+| 1 | 8,08 ms (124 FPS) | 14,67 ms (68 FPS) |
+| 2 | 7,70 ms (130 FPS) | 13,29 ms (75 FPS) |
+| 3 | 8,12 ms (123 FPS) | 14,93 ms (67 FPS) |
+
+- **Media:** igual que antes.
+- **1 % peor:** empeora (antes, 86 FPS) por el coste de interpolar unos 150 enemigos, pero sigue por encima de 60 en esta prueba extrema.
+- **Suavidad** (`jitter=true`): la variación de la velocidad en pantalla pasa de 1,00 (vibración) a 0,03.

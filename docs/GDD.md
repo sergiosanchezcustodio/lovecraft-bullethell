@@ -129,6 +129,9 @@ Todas las acciones se pueden reasignar desde el menú de opciones.
 - **Disparo continuo:** el personaje siempre está disparando. Sin ningún enemigo a tiro, cada arma dispara hacia donde mira el personaje.
 - **Disparo automático (D-05):** cada arma dispara sola según su cadencia y patrón, y define en sus datos cómo elige objetivo: el enemigo más cercano, la zona más densa, alrededor del personaje, en arco… Por defecto, el más cercano. De momento el jugador no tiene opción de apuntado; como es un dato, podría añadirse más adelante.
 - **Esquive:** impulso corto en la dirección de movimiento, con fotogramas de invulnerabilidad y tiempo de recarga. Es la herramienta principal para atravesar cortinas de balas.
+  - En los personajes de la parte 1 es un **deslizamiento sobre la nieve**: pies por delante, cuerpo echado atrás y nieve que salta. Frena progresivamente hasta la velocidad de andar y se funde con el paso al incorporarse.
+  - Valores de Dyer: 0,32 s, de 11,5 a 4,5 m/s, 0,36 s de invulnerabilidad y 1,2 s de recarga.
+  - Principio general: **toda acción del personaje enlaza con fluidez con el movimiento normal**. Los gestos de ataque se suman a la animación de andar, nunca la interrumpen.
 - **Telegrafía:** todo ataque fuerte se anuncia con un aviso visual (marca en el suelo, brillo, animación de carga) proporcional a su daño.
 
 ### 4.2 Enemigos
@@ -153,7 +156,7 @@ Tras la primera partida de prueba (25-09-2026), no todos los enemigos disparan: 
 - Cada arma tiene niveles del 1 al 5 (propuesta). Evoluciones o combinaciones: D-06.
 - La progresión se conserva entre los niveles de la misma partida y se pierde al empezar una partida nueva.
 - **Implementado en la fase 1:**
-  - Las gemas de experiencia son cian (un color que no usa ningún tipo de daño) y vuelan hacia el jugador dentro de su radio de recogida.
+  - Las gemas de experiencia son **doradas y talladas**: corona clara, pabellón ámbar oscuro, material metálico con un leve brillo propio y sombra en el suelo. Cuanto más valen, mayores son, y vuelan hacia el jugador dentro de su radio de recogida.
   - La curva de experiencia es 5 × 1,22^(n−1) + 2(n−1) por nivel.
   - Hay cinco pasivas: velocidad, vida máxima, cordura máxima, recarga del esquive y radio de recogida. Cada una llega hasta nivel 5, y las de vida y cordura rellenan lo ganado.
   - Cada subida de nivel ofrece tres opciones distintas entre armas nuevas, subidas de arma y pasivas que no estén al máximo.

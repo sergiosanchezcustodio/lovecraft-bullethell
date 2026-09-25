@@ -40,6 +40,7 @@ func setup(p_data: EnemyData, p_world: CombatWorld, p_obstacles: ObstacleMap) ->
 
 func _ready() -> void:
 	visual = Node3D.new()
+	visual.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # se anima en _process
 	add_child(visual)
 	model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
 	visual.add_child(model)
@@ -54,6 +55,7 @@ func _ready() -> void:
 	anim_t = randf()
 	behavior.start(self)
 	world.add_enemy(self)
+	reset_physics_interpolation.call_deferred()
 
 func _exit_tree() -> void:
 	if world != null: world.remove_enemy(self)

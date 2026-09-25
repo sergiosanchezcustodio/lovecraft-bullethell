@@ -1,7 +1,8 @@
 class_name BotInput
 extends PlayerInput
 ## Jugador automático con guion, para capturas y pruebas de carga reproducibles.
-## Patrones: "idle" (quieto), "circle" (círculos) y "zigzag" (ida y vuelta en diagonal).
+## Patrones: "idle" (quieto), "circle" (círculos), "zigzag" (ida y vuelta en diagonal),
+## y en línea recta para medir: "right", "up" y "diag" (arriba a la derecha).
 ## Esquiva cada `dodge_every` segundos (0 = nunca).
 
 var pattern := "circle"
@@ -24,6 +25,9 @@ func _read_move(_delta: float) -> Vector2:
 			return Vector2(cos(a), sin(a))
 		"zigzag":
 			return Vector2(1, 1).normalized() * (1.0 if fmod(_t, period) < period * 0.5 else -1.0)
+		"right": return Vector2(1, 0)
+		"up": return Vector2(0, 1)
+		"diag": return Vector2(1, 1).normalized()
 	return Vector2.ZERO
 
 func _read_action(action: StringName) -> bool:

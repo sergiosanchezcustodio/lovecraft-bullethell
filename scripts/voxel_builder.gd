@@ -16,6 +16,11 @@ const FACES := [
 ## Mallas ya construidas por ruta de modelo: todas las instancias de un modelo
 ## comparten mallas y materiales, y cada JSON se procesa una sola vez.
 static var _cache := {}
+## Caché en disco de las mallas construidas (ver VoxelMeshCache). Sube BUILDER_VERSION
+## cuando cambie la forma de construir las mallas, para invalidar lo guardado.
+const BUILDER_VERSION := 1
+const DISK_CACHE_DIR := "user://voxcache"
+static var use_disk_cache := true
 static var _mats := {}   # "rugosidad/especular" -> material compartido
 static var _glow_mat: StandardMaterial3D
 
@@ -66,8 +71,19 @@ static func clear_cache() -> void:
 
 static func _get_model(path: String) -> Dictionary:
 	if _cache.has(path): return _cache[path]
-	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
 	_ensure_glow_material()
+	var disk_path := _disk_cache_path(path)
+	if use_disk_cache and ResourceLoader.exists(disk_path):
+		var c := ResourceLoader.load(disk_path, "", ResourceLoader.CACHE_MODE_IGNORE) as VoxelMeshCache
+		if c != null and c.meshes.size() == c.parts.size():
+			var layers_c: Array[Dictionary] = []
+			for i in c.parts.size():
+				layers_c.append({"part": c.parts[i], "pivot": c.layer_pivots[i], "glow": c.glows[i], "mesh": c.meshes[i]})
+			var m := {"pivots": c.pivots, "layers": layers_c, "voxel_size": c.voxel_size,
+				"material": _material(c.roughness, c.specular)}
+			_cache[path] = m
+			return m
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
 	var all := {}            # ocupación global -> oclusión ambiental
 	var occ := {}            # ocupación por parte -> caras ocultas (entre partes solo las enterradas:
 	                         # al girar un brazo o una pierna no deben quedar huecos en la unión)
@@ -92,10 +108,39 @@ static func _get_model(path: String) -> Dictionary:
 			"mesh": _build(parts[key], occ[pname], all, pivot, vs)})
 	# Material por modelo: las criaturas son de piel húmeda (valores por defecto);
 	# ropa, plumas y atrezo declaran en el JSON una superficie mate.
-	var mat := _material(float(data.get("roughness", 0.38)), float(data.get("specular", 0.6)))
-	var model := {"pivots": data.pivots, "layers": layers, "voxel_size": vs, "material": mat}
+	var rough := float(data.get("roughness", 0.38))
+	var spec := float(data.get("specular", 0.6))
+	var model := {"pivots": data.pivots, "layers": layers, "voxel_size": vs, "material": _material(rough, spec)}
 	_cache[path] = model
+	if use_disk_cache: _save_disk_cache(path, disk_path, model, rough, spec)
 	return model
+
+## Ruta en la caché de disco: cambia si cambia el JSON (fecha y tamaño) o el constructor.
+static func _disk_cache_path(path: String) -> String:
+	var f := FileAccess.open(path, FileAccess.READ)
+	var size := f.get_length() if f != null else 0
+	return "%s/%s_%d_%d_v%d.res" % [DISK_CACHE_DIR, path.get_file().get_basename(),
+		FileAccess.get_modified_time(path), size, BUILDER_VERSION]
+
+static func _save_disk_cache(path: String, disk_path: String, model: Dictionary, rough: float, spec: float) -> void:
+	DirAccess.make_dir_recursive_absolute(DISK_CACHE_DIR)
+	# borrar versiones anteriores del mismo modelo
+	var base := path.get_file().get_basename() + "_"
+	for f in DirAccess.get_files_at(DISK_CACHE_DIR):
+		if f.begins_with(base) and f.get_slice("_", f.get_slice_count("_") - 1).begins_with("v"):
+			var rest := f.trim_prefix(base)
+			if rest.count("_") == 2: DirAccess.remove_absolute(DISK_CACHE_DIR + "/" + f)
+	var c := VoxelMeshCache.new()
+	c.pivots = model.pivots
+	c.voxel_size = model.voxel_size
+	c.roughness = rough
+	c.specular = spec
+	for layer: Dictionary in model.layers:
+		c.parts.append(layer.part)
+		c.layer_pivots.append(layer.pivot)
+		c.glows.append(layer.glow)
+		c.meshes.append(layer.mesh)
+	ResourceSaver.save(c, disk_path)
 
 static func _material(roughness: float, specular: float) -> StandardMaterial3D:
 	var key := "%.2f/%.2f" % [roughness, specular]

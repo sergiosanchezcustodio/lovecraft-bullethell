@@ -97,6 +97,9 @@ func _bar_row(parent: Container, bar: UiKit.Bar, text: String) -> Label:
 ## Retrato: la cabeza del modelo del personaje, renderizada una vez en un SubViewport.
 func _portrait_texture() -> Texture2D:
 	var vp := SubViewport.new()
+	# Se renderiza una sola vez: sin interpolación de física, o la cámara y el modelo aún
+	# estarían interpolando desde el origen en ese fotograma y el retrato saldría mal.
+	vp.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	vp.size = Vector2i(128, 128)
 	vp.transparent_bg = true
 	vp.own_world_3d = true

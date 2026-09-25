@@ -49,7 +49,10 @@ func step(delta: float, move: Vector2, dodge_pressed: bool) -> Vector3:
 		dodge_dir = dir.normalized() if dir.length() > 0.1 else facing
 		dodge_time = 0.0
 	if is_dodging():
-		velocity = dodge_dir * data.dodge_speed
+		# Frena de forma progresiva hasta la velocidad de andar: al acabar el esquive no hay
+		# cambio brusco de velocidad.
+		var u := dodge_time / data.dodge_duration
+		velocity = dodge_dir * lerpf(data.dodge_speed, data.move_speed, u * u)
 		facing = dodge_dir
 	else:
 		velocity = dir * data.move_speed

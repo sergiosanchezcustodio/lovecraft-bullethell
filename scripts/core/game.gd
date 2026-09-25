@@ -44,6 +44,7 @@ var _pause: Menus.PauseMenu
 var _rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
+	var t_start := Time.get_ticks_msec()
 	args = LaunchArgs.from_cmdline()
 	Prof.enabled = args.get_bool("prof")
 	UiInput.configure()
@@ -107,6 +108,10 @@ func _ready() -> void:
 		level = load("res://data/levels/%s.tres" % args.get_str("level", "p1_n1")).duplicate()
 		if args.has("final_at"): level.final_time = args.get_float("final_at")
 		if args.has("spawn_rate"): level.spawn_rate = [Vector2(0, args.get_float("spawn_rate"))] as Array[Vector2]
+		# Construir ya los modelos de todos los enemigos del nivel: si no, la primera aparición
+		# de cada uno (el Acechador, en el minuto 4) provocaría un tirón a mitad de partida.
+		for ed: EnemyData in level.pool + ([level.final_enemy] if level.final_enemy else []):
+			VoxelBuilder.load_model("res://models/%s.json" % ed.model).free()
 		var enemies_root := Node3D.new()
 		enemies_root.name = "Enemies"
 		add_child(enemies_root)
@@ -125,7 +130,15 @@ func _ready() -> void:
 	pause_watch.set_script(preload("res://scripts/ui/pause_watch.gd"))
 	pause_watch.set("game", self)
 	add_child(pause_watch)
+	if args.get_bool("log") or args.get_bool("loadtime"):
+		print("CARGA de la partida: %d ms (desde el arranque del motor: %d ms)" % [Time.get_ticks_msec() - t_start, Time.get_ticks_msec()])
+	if args.get_bool("loadtime"): get_tree().quit()
 	if args.get_float("xp") > 0.0: player.progress.add_xp(args.get_float("xp"))
+	if args.get_bool("gem_test"):                  # gemas quietas alrededor, sin recogida (verlas de cerca)
+		player.data.pickup_radius = 0.0
+		for i in 8:
+			var a := TAU * i / 8.0
+			gems.drop(player.position + Vector3(cos(a), 0, sin(a)) * 1.3, 1.0 + i * 3.0)
 	if args.has("hp"): player.health = args.get_float("hp")
 	if args.has("san"): player.sanity = args.get_float("san")
 	if args.get_int("demo") > 0: _demo_crowd(args.get_int("demo"))
@@ -296,6 +309,7 @@ func _process(delta: float) -> void:
 		print("t=%3d s  vivos=%d  abatidos=%d  nivel=%d  vida=%d  cordura=%d  balas=%d" % [director.time, director.alive.size(),
 			kills, player.progress.level, player.health, player.sanity, world.bullets.count])
 	if args.has("perf"): _perf(delta)
+	if args.get_bool("jitter"): _jitter(delta)
 	if args.get_int("bullet_rain") > 0: _bullet_rain(args.get_int("bullet_rain"))
 	for i in _demo.size():
 		var kind := _demo_names[i]
@@ -348,3 +362,29 @@ func _bullet_rain(n: int) -> void:
 			0.13, 0.26, dmg[s], 6.0)
 		enemy_count += 1
 		k += 1
+
+## Suavidad del movimiento en pantalla: con velocidad constante, el desplazamiento del
+## personaje en píxeles por segundo debería ser igual en todos los fotogramas. Mide la
+## variación (desviación típica / media) entre 1 y 4 s y sale. Con judder (física a
+## 60 Hz en un monitor de 120 Hz) sale cerca de 1; con movimiento suave, cerca de 0.
+var _jit_prev := Vector2.INF
+var _jit_rates: Array[float] = []
+
+func _jitter(delta: float) -> void:
+	var target: Node3D = player
+	var sp := camera.unproject_position(target.get_global_transform_interpolated().origin) 		if camera.is_inside_tree() else Vector2.ZERO
+	# posición en pantalla relativa al mundo: se suma el desplazamiento de la cámara
+	var world_px := sp - camera.unproject_position(Vector3.ZERO)
+	if _t > 1.0 and _jit_prev != Vector2.INF:
+		_jit_rates.append((world_px - _jit_prev).length() / delta)
+	_jit_prev = world_px
+	if _t > 4.0:
+		var m := 0.0
+		for r in _jit_rates: m += r
+		m /= _jit_rates.size()
+		var v := 0.0
+		for r in _jit_rates: v += (r - m) * (r - m)
+		var sd := sqrt(v / _jit_rates.size())
+		# y también el movimiento aparente respecto a la cámara (lo que ve el ojo)
+		print("JITTER fotogramas=%d  px/s medio=%.0f  variación=%.2f  fps=%.0f" % [_jit_rates.size(), m, sd / m, Engine.get_frames_per_second()])
+		get_tree().quit()
