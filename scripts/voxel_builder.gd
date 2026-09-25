@@ -16,7 +16,7 @@ const FACES := [
 ## Mallas ya construidas por ruta de modelo: todas las instancias de un modelo
 ## comparten mallas y materiales, y cada JSON se procesa una sola vez.
 static var _cache := {}
-static var _mat: StandardMaterial3D
+static var _mats := {}   # "rugosidad/especular" -> material compartido
 static var _glow_mat: StandardMaterial3D
 
 ## Devuelve una instancia nueva del modelo: un nodo por parte con su pivote.
@@ -36,7 +36,7 @@ static func load_model(path: String) -> Node3D:
 			root.add_child(pivot_node)
 		var mi := MeshInstance3D.new()
 		mi.mesh = layer.mesh
-		mi.material_override = _glow_mat if layer.glow else _mat
+		mi.material_override = _glow_mat if layer.glow else model.material
 		pivot_node.add_child(mi)
 	return root
 
@@ -48,13 +48,17 @@ static func clear_cache() -> void:
 
 static func _get_model(path: String) -> Dictionary:
 	if _cache.has(path): return _cache[path]
-	_ensure_materials()
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
-	var all := {}            # ocupación global -> AO y cullado entre partes
+	_ensure_glow_material()
+	var all := {}            # ocupación global -> oclusión ambiental
+	var occ := {}            # ocupación por parte -> caras ocultas (entre partes solo las enterradas:
+	                         # al girar un brazo o una pierna no deben quedar huecos en la unión)
 	var parts := {}          # nombre -> Array de [pos, color]
 	for v: Array in data.voxels:
 		var p := Vector3i(int(v[0]), int(v[1]), int(v[2]))
 		all[p] = true
+		if not occ.has(v[3]): occ[v[3]] = {}
+		occ[v[3]][p] = true
 		var key: String = v[3] + ("#glow" if v.size() > 7 and v[7] == 1 else "")
 		if not parts.has(key): parts[key] = []
 		parts[key].append([p, Color(v[4], v[5], v[6])])
@@ -67,18 +71,27 @@ static func _get_model(path: String) -> Dictionary:
 		var pv: Array = data.pivots[pname]
 		var pivot := Vector3(pv[0], pv[1], pv[2])
 		layers.append({"part": pname, "pivot": pivot, "glow": key.ends_with("#glow"),
-			"mesh": _build(parts[key], all, pivot, vs)})
-	var model := {"pivots": data.pivots, "layers": layers, "voxel_size": vs}
+			"mesh": _build(parts[key], occ[pname], all, pivot, vs)})
+	# Material por modelo: las criaturas son de piel húmeda (valores por defecto);
+	# ropa, plumas y atrezo declaran en el JSON una superficie mate.
+	var mat := _material(float(data.get("roughness", 0.38)), float(data.get("specular", 0.6)))
+	var model := {"pivots": data.pivots, "layers": layers, "voxel_size": vs, "material": mat}
 	_cache[path] = model
 	return model
 
-static func _ensure_materials() -> void:
-	if _mat != null: return
-	_mat = StandardMaterial3D.new()
-	_mat.vertex_color_use_as_albedo = true
-	_mat.vertex_color_is_srgb = colors_are_srgb()
-	_mat.roughness = 0.38   # piel húmeda
-	_mat.metallic_specular = 0.6
+static func _material(roughness: float, specular: float) -> StandardMaterial3D:
+	var key := "%.2f/%.2f" % [roughness, specular]
+	if not _mats.has(key):
+		var m := StandardMaterial3D.new()
+		m.vertex_color_use_as_albedo = true
+		m.vertex_color_is_srgb = colors_are_srgb()
+		m.roughness = roughness
+		m.metallic_specular = specular
+		_mats[key] = m
+	return _mats[key]
+
+static func _ensure_glow_material() -> void:
+	if _glow_mat != null: return
 	_glow_mat = StandardMaterial3D.new()
 	_glow_mat.vertex_color_use_as_albedo = true
 	_glow_mat.vertex_color_is_srgb = colors_are_srgb()
@@ -89,7 +102,7 @@ static func _ensure_materials() -> void:
 static func colors_are_srgb() -> bool:
 	return RenderingServer.get_current_rendering_method() != "gl_compatibility"
 
-static func _build(voxels: Array, all: Dictionary, pivot: Vector3, vs: float) -> ArrayMesh:
+static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vector3, vs: float) -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for item in voxels:
@@ -97,7 +110,10 @@ static func _build(voxels: Array, all: Dictionary, pivot: Vector3, vs: float) ->
 		var col: Color = item[1]
 		for f in FACES:
 			var n: Vector3i = f[0]
-			if all.has(p + n): continue
+			if own.has(p + n): continue
+			# Entre partes distintas solo se quita la cara si está enterrada (dos voxels
+			# ocupados por delante): las costuras, que pueden asomar al girar, se conservan.
+			if all.has(p + n) and all.has(p + n + n): continue
 			var corners: Array = f[1]
 			var shades := []
 			for c in corners:

@@ -77,6 +77,22 @@ class Model:
                 for z in range(int(round(z0 * S)), int(round(z1 * S))):
                     self.put(x, y, z, part, col, glow, over)
 
+    def vbox(self, x0, y0, z0, x1, y1, z1, part, col, over=True, glow=0):
+        """Caja en coordenadas voxel, extremo superior excluido. Para diseños a bloques
+        (personajes humanos) donde cada voxel cuenta."""
+        for x in range(x0, x1):
+            for y in range(y0, y1):
+                for z in range(z0, z1):
+                    self.put(x, y, z, part, col, glow, over)
+
+    def bevel(self, part, x0, x1, z0, z1, y0, y1):
+        """Quita las cuatro aristas verticales de un bloque para suavizar la silueta."""
+        for y in range(y0, y1):
+            for x, z in ((x0, z0), (x0, z1 - 1), (x1 - 1, z0), (x1 - 1, z1 - 1)):
+                v = self.V.get((x, y, z))
+                if v is not None and v[0] == part:
+                    del self.V[(x, y, z)]
+
     def line(self, a, b, part, col, thick=1, over=True, glow=0):
         """Línea continua de voxels entre dos puntos en ub (cuerdas, mangos, correas)."""
         S = self.S
@@ -137,7 +153,10 @@ class Model:
                 v[1] = c
 
     # ---------- salida ----------
-    def export(self, path, pivots, jitter=0.018, default_col=(0.5, 0.5, 0.5)):
+    def export(self, path, pivots, jitter=0.018, default_col=(0.5, 0.5, 0.5), pivots_in_voxels=False,
+               roughness=None, specular=None):
+        """roughness/specular: material del modelo. Sin indicarlos, piel húmeda (0,38 / 0,6);
+        para ropa, plumas, madera o piedra conviene una superficie mate (~0,9 / 0,25)."""
         out = []
         for (x, y, z), (p, c, g) in self.V.items():
             if isinstance(c, str):
@@ -145,9 +164,12 @@ class Model:
             j = self.rng.uniform(-jitter, jitter) if jitter else 0.0
             out.append([x, y, z, p] + [round(max(0.0, min(1.0, q + j)), 3) for q in c] + [g])
         S = self.S
+        k_piv = 1 if pivots_in_voxels else S
         data = {"voxel_size": 1.0 / (16 * S),
-                "pivots": {k: [a * S for a in v] for k, v in pivots.items()},
+                "pivots": {k: [a * k_piv for a in v] for k, v in pivots.items()},
                 "voxels": out}
+        if roughness is not None: data["roughness"] = roughness
+        if specular is not None: data["specular"] = specular
         with open(path, "w") as f:
             json.dump(data, f)
         return len(out)

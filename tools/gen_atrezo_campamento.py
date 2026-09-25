@@ -187,5 +187,6 @@ def hielo():
 if __name__ == '__main__':
     for name, fn in (('tienda', tienda), ('caja', caja), ('bidon', bidon), ('farol', farol), ('roca', roca), ('hielo', hielo)):
         M, pv = fn()
-        n = M.export('models/atrezo_%s.json' % name, pv, jitter=0.012)
+        mat = (0.45, 0.6) if name == 'hielo' else (0.9, 0.25)          # hielo brillante, lo demás mate
+        n = M.export('models/atrezo_%s.json' % name, pv, jitter=0.012, roughness=mat[0], specular=mat[1])
         print('atrezo_%s: %d voxels' % (name, n))

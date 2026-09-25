@@ -37,7 +37,7 @@ func test_modelo_sin_animacion_queda_en_reposo() -> void:
 
 func test_escala_real_de_los_modelos() -> void:
 	# Alturas aproximadas en metros: la escala de voxel_size tiene que respetarse
-	for pair in [["dyer", 1.78], ["pinguino", 1.5], ["acechador", 1.47]]:
+	for pair in [["dyer", 1.72], ["pinguino", 1.5], ["acechador", 1.47]]:
 		var m := _load(pair[0])
 		var top := 0.0
 		for mi in m.find_children("*", "MeshInstance3D", true, false):

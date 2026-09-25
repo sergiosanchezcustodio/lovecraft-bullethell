@@ -37,3 +37,16 @@ Misma escena, ahora animada con `Anims.pose(..., "walk", ...)`: 75 pingüinos (8
 - **Las criaturas de horda cuestan la mitad de GPU** que el Acechador: unos 28.000 triángulos cada una contando sombras, frente a 70.000.
 - **Con la horda, el límite pasa a la CPU.** La GPU tarda 2,3 ms, pero el fotograma completo tarda 4,4 ms: pesa más animar 150 modelos en GDScript (`Anims.reset` más `pose` en cada fotograma) que dibujarlos. Primer candidato a optimizar en el hito 1.7: guardar en caché las posiciones de reposo y no reponer las partes que la animación no toca.
 - **Construcción de mallas:** 83 ms el pingüino y 86 ms el fragmento, una vez por modelo.
+
+## Hito 1.2, segunda versión: caras entre partes y modelos rehechos (25-09-2026)
+
+Cambios que afectan a la medición:
+- **Caras entre partes:** `VoxelBuilder` ya no quita todas las caras entre partes distintas, solo las enterradas, para que no queden huecos al girar las extremidades.
+  - Quitando **ninguna**, el Acechador subía a 15,6 M de primitivas.
+  - Quitando **solo las enterradas**, se queda en 11,0 M.
+- **Modelos rehechos:** Dyer y el pingüino son nuevos.
+
+| Contenido | Media | 1 % peor | GPU | Primitivas |
+|---|---|---|---|---|
+| 150 Acechadores | 5,06 ms (198 FPS) | 7,30 ms (137 FPS) | 4,41 ms | 11,0 M |
+| 150 pingüinos y fragmentos | 4,34 ms (231 FPS) | 5,59 ms (179 FPS) | 2,07 ms | 3,6 M |

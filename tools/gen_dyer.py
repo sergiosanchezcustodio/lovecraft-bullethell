@@ -1,172 +1,125 @@
 """William Dyer, geólogo de la expedición Miskatonic (1930). Personaje jugable.
 
-Parka de lona con capucha forrada de piel, gafas de nieve sobre la frente, bufanda,
-cinturón con martillo de geólogo y cartuchos de dinamita, zurrón de muestras y
-botas de piel. Paleta cálida para distinguirlo de las criaturas.
-Uso: python tools/gen_dyer.py [S]   (S = voxels por ub; 2 = 32 voxels/m)
+Diseño a bloques limpios ("Minecraft mejorado"): volúmenes rectos con las aristas
+suavizadas, casi sin relieve, y los detalles pintados sobre superficies planas.
+La cara se dibuja sobre el plano frontal de la cabeza, sin volumen.
+Coordenadas en voxels (32 por metro), el modelo mira hacia +Z y mide 1,72 m.
+
+Parka de lona con ribete de piel, gorro de piel con orejeras, bufanda roja,
+cinturón con cartuchos de dinamita, pantalón de lana, manoplas y botas.
+Uso: python tools/gen_dyer.py
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
 from voxlib import Model, lerp, scale
 
-S = int(sys.argv[1]) if len(sys.argv) > 1 else 2
-M = Model(S=S, seed=1930)
+M = Model(S=2, seed=1930)
 
-PARKA = (0.50, 0.40, 0.27); PARKA_D = (0.36, 0.28, 0.18); PARKA_L = (0.60, 0.50, 0.35)
-FUR = (0.58, 0.47, 0.34); FUR_D = (0.36, 0.28, 0.19); FUR_L = (0.78, 0.69, 0.55)
-TROUSER = (0.22, 0.21, 0.20); TROUSER_L = (0.30, 0.28, 0.26)
-BOOT = (0.40, 0.30, 0.20); BOOT_D = (0.22, 0.16, 0.11); SOLE = (0.10, 0.08, 0.07)
-MITT = (0.28, 0.21, 0.15)
-SKIN = (0.88, 0.68, 0.54); SKIN_R = (0.82, 0.50, 0.42); SKIN_D = (0.60, 0.42, 0.33)
-BEARD = (0.46, 0.40, 0.34); BEARD_D = (0.32, 0.27, 0.23)
-EYE = (0.06, 0.05, 0.05); BROW = (0.34, 0.29, 0.24); MOUTH = (0.25, 0.10, 0.09)
-SCARF = (0.50, 0.14, 0.11); SCARF_D = (0.36, 0.09, 0.08)
-BELT = (0.20, 0.13, 0.08); BUCKLE = (0.70, 0.62, 0.40)
-LEATHER = (0.36, 0.22, 0.12); LEATHER_D = (0.24, 0.14, 0.08)
-IRON = (0.42, 0.43, 0.45); WOOD = (0.52, 0.37, 0.20)
-DYN = (0.62, 0.14, 0.10); FUSE = (0.15, 0.12, 0.10)
-GOG_FRAME = (0.16, 0.13, 0.10); GOG_LENS = (0.30, 0.20, 0.10); GOG_GLINT = (0.90, 0.80, 0.55)
+PARKA = (0.56, 0.44, 0.29); PARKA_SH = (0.49, 0.38, 0.25)
+FUR = (0.80, 0.79, 0.75); FUR_SH = (0.71, 0.70, 0.67)      # borreguillo gris claro
+TROUSER = (0.27, 0.28, 0.31); TROUSER_SH = (0.23, 0.24, 0.27)
+BOOT = (0.33, 0.23, 0.15); SOLE = (0.14, 0.10, 0.08)
+MITT = (0.30, 0.21, 0.14)
+CAP = (0.36, 0.23, 0.15)
+SKIN = (0.88, 0.68, 0.54); SKIN_SH = (0.79, 0.59, 0.47); CHEEK = (0.87, 0.58, 0.49)
+HAIR = (0.44, 0.37, 0.31)
+BEARD = (0.54, 0.47, 0.40); BROW = (0.36, 0.29, 0.23); EYE = (0.10, 0.08, 0.07); MOUTH = (0.32, 0.22, 0.18)
+SCARF = (0.64, 0.18, 0.14); SCARF_SH = (0.54, 0.14, 0.11)
+BELT = (0.22, 0.15, 0.10); BUCKLE = (0.80, 0.68, 0.40); TOGGLE = (0.30, 0.20, 0.12)
+DYN = (0.74, 0.17, 0.12); FUSE = (0.18, 0.15, 0.12)
 
-# ================= VOLÚMENES =================
-# Piernas y botas
-for s in (-1, 1):
-    p = 'leg_l' if s < 0 else 'leg_r'
-    hip = (s * 1.6, 14.5, 0.0); knee = (s * 1.75, 8.2, 0.35); ank = (s * 1.85, 3.0, 0.0)
-    M.capsule(hip, knee, 1.55, 1.35, p, 'trouser')
-    M.capsule(knee, ank, 1.35, 1.2, p, 'trouser')
-    M.capsule((s * 1.85, 5.0, 0.0), (s * 1.85, 1.6, 0.25), 1.5, 1.55, p, 'boot')
-    M.ell(s * 1.85, 1.0, 1.1, 1.55, 1.0, 2.4, p, 'boot')           # pie
-    M.ell(s * 1.85, 5.2, 0.0, 1.75, 0.55, 1.75, p, 'fur')           # vuelta de piel
-# Torso: parka larga hasta medio muslo
-M.sell(0, 18.4, 0.0, 3.2, 5.0, 2.3, 'torso', 'parka', p=2.6)
-M.sell(0, 21.4, 0.0, 3.7, 2.1, 2.4, 'torso', 'parka', p=2.8)         # hombros
-M.sell(0, 13.4, 0.1, 3.25, 2.9, 2.55, 'torso', 'parka', p=2.6)       # faldón
-M.ell(0, 23.4, 0.15, 2.2, 0.95, 2.05, 'torso', 'scarf')              # bufanda
-M.ell(0.9, 22.6, 1.9, 0.9, 1.4, 0.55, 'torso', 'scarf')              # caída de la bufanda
-# Brazos
-for s in (-1, 1):
-    p = 'arm_l' if s < 0 else 'arm_r'
-    sh = (s * 3.9, 22.0, 0.0); el = (s * 4.6, 17.6, 0.25); wr = (s * 4.85, 13.9, 0.9)
-    M.ell(*sh, 1.65, 1.65, 1.65, p, 'parka')
-    M.capsule(sh, el, 1.4, 1.25, p, 'parka')
-    M.capsule(el, wr, 1.25, 1.15, p, 'parka')
-    M.ell(s * 4.85, 14.3, 0.85, 1.4, 0.65, 1.4, p, 'fur')           # puño de piel
-    M.ell(s * 4.95, 12.7, 1.05, 1.0, 1.35, 0.95, p, 'mitt')          # manopla
-    M.ell(s * 4.45, 13.1, 1.75, 0.5, 0.65, 0.5, p, 'mitt')           # pulgar
-# Cabeza: capucha con la cara dentro
-M.sell(0, 25.9, 0.0, 2.6, 2.8, 2.7, 'head', 'parka', p=2.5)
-M.sell(0, 25.3, 0.7, 1.75, 2.0, 1.7, 'head', 'skin', p=2.6)
+box = M.vbox
 
-# ================= CARA =================
-FX, FY, FRX, FRY = 0.0, 25.25, 1.6, 1.85           # abertura de la capucha (ub)
-def in_ell(x, y, rx, ry):
-    return ((x + .5) / S - FX) ** 2 / rx ** 2 + ((y + .5) / S - FY) ** 2 / ry ** 2 <= 1
-ys = range(int((FY - 2.6) * S), int((FY + 2.6) * S) + 1)
-xs = range(int(-2.6 * S), int(2.6 * S) + 1)
-for x in xs:
-    for y in ys:
-        if in_ell(x, y, FRX, FRY):
-            # quitar la capucha delante de la cara
-            z = M.front(x, y)
-            while z is not None and M.V[(x, y, z)][1] != 'skin':
-                del M.V[(x, y, z)]
-                z = M.front(x, y)
-        elif in_ell(x, y, FRX + 0.75, FRY + 0.75):
-            z = M.front(x, y)
-            if z is not None and M.V[(x, y, z)][0] == 'head':
-                M.V[(x, y, z)][1] = 'fur'
-                M.put(x, y, z + 1, 'head', 'fur')                  # ribete de piel en relieve
-def face(x, y, col, dz=0):
-    z = M.front(x, y)
-    if z is None: return
-    if dz: M.put(x, y, z + dz, 'head', col)
-    else: M.V[(x, y, z)][1] = col
-EY = int(25.75 * S)
-for x in (1, -2): face(x, EY, EYE)                                  # ojos
-for x in (1, 2, -2, -3): face(x, EY + 1, BROW)                      # cejas
-for y in (EY - 1, EY - 2): face(-1, y, SKIN_D, 1); face(0, y, SKIN_D, 1)   # nariz
-for x in (-3, 2): face(x, EY - 2, SKIN_R)                           # mejillas curtidas
-for x in range(-3, 3): face(x, EY - 3, BEARD)                       # bigote
-for y in (EY - 4, EY - 5):
-    for x in range(-3, 3): face(x, y, BEARD if (x + y) % 3 else BEARD_D)
-face(-1, EY - 4, MOUTH); face(0, EY - 4, MOUTH)
-# Gafas de nieve sobre la capucha
-GY = 27.3
-for x in range(int(-2.6 * S), int(2.6 * S) + 1):
-    for y in (int(GY * S), int(GY * S) + 1):
-        z = M.front(x, y)
-        if z is not None and z > 0: M.V[(x, y, z)][1] = GOG_FRAME
-for gx in (-0.85, 0.85):
-    cx, cy = int(gx * S) - (1 if gx < 0 else 0), int(GY * S)
-    for dx in (0, 1):
-        for dy in (0, 1):
-            z = M.front(cx + dx, cy + dy)
-            M.put(cx + dx, cy + dy, z + 1, 'head', GOG_GLINT if (dx, dy) == (1, 1) else GOG_LENS)
+# ---------------- PIERNAS Y BOTAS ----------------
+for s, p in ((-1, 'leg_l'), (1, 'leg_r')):
+    x0, x1 = (-7, -1) if s < 0 else (1, 7)
+    box(x0, 6, -3, x1, 25, 3, p, TROUSER)                 # pernera
+    box(x0, 2, -3, x1, 6, 3, p, BOOT)                     # caña de la bota
+    box(x0, 0, -3, x1, 2, 5, p, BOOT)                     # pie
+    box(x0, 0, -3, x1, 1, 5, p, SOLE)                     # suela
+    box(x0, 5, -3, x1, 7, 3, p, FUR)                      # vuelta de piel
+    M.bevel(p, x0, x1, -3, 3, 2, 25)
 
-# ================= EQUIPO =================
-def ring(y0, y1, part, col, zmin=None):
-    """Colorea la superficie del torso entre dos alturas (ub): cinturones y ribetes."""
-    for y in range(int(y0 * S), int(y1 * S)):
-        for x in range(int(-4.2 * S), int(4.2 * S) + 1):
-            for z in range(int(-3.2 * S), int(3.2 * S) + 1):
-                v = M.V.get((x, y, z))
-                if v and v[0] == part and M.exposed((x, y, z)) and (zmin is None or z >= zmin):
-                    v[1] = col
-ring(15.2, 15.9, 'torso', BELT)
-ring(10.5, 11.2, 'torso', 'fur')
-M.box(-0.5, 15.1, 2.2, 0.5, 16.0, 2.8, 'torso', BUCKLE)
-# Martillo de geólogo colgado a la derecha
-M.line((3.3, 15.4, 1.3), (3.5, 11.6, 1.9), 'torso', WOOD, thick=2)
-M.box(2.6, 11.2, 1.5, 4.6, 12.0, 2.4, 'torso', IRON)
-# Cartuchos de dinamita en el cinturón, a la izquierda
-for i, x in enumerate((-2.4, -1.7, -1.0)):
-    M.box(x, 14.3, 2.3, x + 0.55, 16.4, 2.85, 'torso', DYN)
-    M.put(x * S, 16.4 * S, 2.4 * S, 'torso', FUSE)
-# Zurrón de muestras con correa en bandolera
-M.box(-4.0, 11.8, -0.9, -2.9, 14.6, 1.6, 'torso', LEATHER)
-M.box(-4.1, 13.9, -1.0, -2.8, 14.7, 1.7, 'torso', LEATHER_D)
-for t in range(0, 41):
-    u = t / 40
-    x = 2.9 - 5.4 * u; y = 22.4 - 8.2 * u
-    for zz in (M.front(int(x * S), int(y * S)),):
-        if zz is not None:
-            M.V[(int(x * S), int(y * S), zz)][1] = LEATHER
-            if (int(x * S) + 1, int(y * S), zz) in M.V: M.V[(int(x * S) + 1, int(y * S), zz)][1] = LEATHER
-# Botonadura de madera de la parka
-for y in range(int(17.0 * S), int(22.0 * S), 3):
-    z = M.front(0, y)
-    if z is not None: M.put(0, y, z + 1, 'torso', WOOD)
+# ---------------- TORSO: PARKA ----------------
+T = 'torso'
+box(-9, 22, -5, 9, 42, 5, T, PARKA)
+M.bevel(T, -9, 9, -5, 5, 22, 42)
+for y, cut in ((40, 1), (41, 2)):                         # hombros caídos
+    for x in list(range(-9, -9 + cut)) + list(range(9 - cut, 9)):
+        for z in range(-5, 5):
+            M.V.pop((x, y, z), None)
+box(-9, 22, -5, 9, 24, 5, T, FUR, over=True)             # ribete del bajo
+M.bevel(T, -9, 9, -5, 5, 22, 24)
+box(-9, 29, -5, 9, 31, 5, T, BELT)                        # cinturón
+M.bevel(T, -9, 9, -5, 5, 29, 31)
+box(-1, 29, 4, 1, 31, 5, T, BUCKLE)                       # hebilla
+for y in range(24, 29): box(-1, y, 4, 1, y + 1, 5, T, PARKA_SH)        # tapeta
+for y in range(31, 41): box(-1, y, 4, 1, y + 1, 5, T, PARKA_SH)
+for y in (33, 36, 39): box(-1, y, 4, 1, y + 1, 5, T, TOGGLE)           # botones de madera
+for x0 in (-7, 3):                                        # bolsillos del pecho, pintados
+    box(x0, 33, 4, x0 + 4, 37, 5, T, PARKA_SH)
+    box(x0, 36, 4, x0 + 4, 37, 5, T, scale(PARKA_SH, 0.85))
+box(-6, 41, -4, 6, 44, 4, T, SCARF)                       # bufanda
+box(-6, 41, 3, 6, 42, 4, T, SCARF_SH)
+# Cartuchos de dinamita en el cinturón (único relieve: un voxel)
+for x in (-7, -5, -3):
+    box(x, 27, 5, x + 1, 33, 6, T, DYN)
+    box(x, 33, 5, x + 1, 34, 6, T, FUSE)
 
-# ================= PINTURA =================
+# ---------------- BRAZOS ----------------
+for s, p in ((-1, 'arm_l'), (1, 'arm_r')):
+    x0, x1 = (-14, -9) if s < 0 else (9, 14)
+    box(x0, 27, -3, x1, 41, 3, p, PARKA)                  # manga
+    box(x0, 25, -3, x1, 27, 3, p, FUR)                    # puño de piel
+    box(x0, 20, -2, x1, 25, 3, p, MITT)                   # manopla
+    M.bevel(p, x0, x1, -3, 3, 25, 41)
+    M.bevel(p, x0, x1, -2, 3, 20, 25)
+    for z in range(-3, 3):                                # hombro redondeado
+        M.V.pop((x1 - 1 if s > 0 else x0, 40, z), None)
+
+# ---------------- CABEZA ----------------
+H = 'head'
+box(-5, 43, -5, 5, 51, 5, H, SKIN)
+M.bevel(H, -5, 5, -5, 5, 43, 51)
+box(-6, 50, -6, 6, 55, 6, H, CAP)                         # gorro de piel
+M.bevel(H, -6, 6, -6, 6, 50, 55)
+box(-6, 50, 5, 6, 52, 6, H, FUR)                          # banda de piel delantera
+box(-6, 45, -3, -5, 50, 4, H, CAP)                        # orejeras de cuero
+box(5, 45, -3, 6, 50, 4, H, CAP)
+box(-5, 47, -6, 5, 50, -5, H, CAP)                        # cogotera
+
+def face(x, y, col):
+    M.V[(x, y, 4)] = [H, col, 0]                          # plano frontal de la cabeza (z = 4)
+# La cara ocupa las columnas -4..3 (las aristas están biseladas), simétricas respecto a -0,5.
+# Patrón de ojos: piel piel OJO piel piel OJO piel piel
+for x in (-3, -2, 1, 2): face(x, 49, BROW)                # cejas
+for x in (-2, 1): face(x, 48, EYE)                        # ojos
+for x in (-1, 0): face(x, 47, SKIN_SH)                    # sombra de la nariz
+for x in range(-3, 3): face(x, 46, BEARD)                 # bigote
+for x in (-4, -3, -2, 1, 2, 3): face(x, 45, BEARD)
+for x in (-1, 0): face(x, 45, MOUTH)                      # boca
+for x in range(-4, 4): face(x, 44, BEARD)                 # barba
+for x in range(-3, 3): face(x, 43, BEARD)
+for y in range(43, 47):                                   # patillas en los laterales
+    for x in (-5, 4):
+        if (x, y, 3) in M.V: M.V[(x, y, 3)][1] = BEARD
+
+# Pelo en la nuca y detrás de las orejas, bajo el gorro
+for (x, y, z), v in M.V.items():
+    if v[0] == H and v[1] == SKIN and y < 50 and (z <= -3 or (abs(x + 0.5) >= 4.5 and z < 1)):
+        v[1] = HAIR
+
+# ---------------- COLOR: variación mínima ----------------
 def paint(k, part, c):
-    if not isinstance(c, str): return None
     x, y, z = k
-    n = M.noise(x, y, z, 5.0)
-    if c == 'parka':
-        base = lerp(PARKA_D, PARKA_L, n)
-        if y < 12.0 * S: base = lerp(base, PARKA_D, 0.45)            # bajo sucio
-        if part == 'torso' and x in (-1, 0) and z > 0 and y > 11 * S: base = PARKA_D   # tapeta
-        if (y + x // 3) % 7 == 0: base = scale(base, 0.88)             # arrugas de la lona
-        return base
-    if c == 'fur':
-        r = M.rng.random()
-        return FUR_D if r < 0.25 else (FUR_L if r > 0.8 else FUR)
-    if c == 'trouser':
-        base = lerp(TROUSER, TROUSER_L, n)
-        if abs(y - 8.2 * S) < 1.5 and z > 0: base = TROUSER_L         # rodilla gastada
-        return base
-    if c == 'boot':
-        if y <= 0: return SOLE
-        if z > 0 and (y % 2 == 0) and 2 * S < y < 5 * S and abs(abs(x) - 1.85 * S) < 1.2: return BOOT_D   # cordones
-        return lerp(BOOT_D, BOOT, 0.4 + n * 0.6)
-    if c == 'mitt': return lerp(MITT, scale(MITT, 1.3), n)
-    if c == 'scarf': return SCARF_D if (x + y) % 4 == 0 else SCARF
-    if c == 'skin': return SKIN
+    h = M.hsh(x, y, z)
+    if c in (FUR, FUR_SH): return FUR if h > 0.2 else FUR_SH            # piel: dos tonos
+    if c == PARKA and y < 30: return lerp(PARKA, PARKA_SH, 0.35)         # bajo de la parka algo más oscuro
     return None
 M.paint(paint)
 
-pivots = {'torso': [0, 14.5, 0], 'head': [0, 23.4, 0],
-          'arm_l': [-3.9, 22.0, 0], 'arm_r': [3.9, 22.0, 0],
-          'leg_l': [-1.6, 14.5, 0], 'leg_r': [1.6, 14.5, 0]}
-n = M.export('models/dyer.json', pivots)
+pivots = {'torso': [0, 24, 0], 'head': [0, 43, 0],
+          'arm_l': [-11.5, 40, 0], 'arm_r': [11.5, 40, 0],
+          'leg_l': [-4, 24, 0], 'leg_r': [4, 24, 0]}
+n = M.export('models/dyer.json', pivots, jitter=0.006, pivots_in_voxels=True, roughness=0.9, specular=0.25)
 print(n, 'voxels')
