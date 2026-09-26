@@ -103,7 +103,7 @@ func _build() -> void:
 		DebugOptions.set_value("god", on)
 		p.god = on)
 	var speeds := DebugOptions.SPEED_MULTS
-	_choice("Velocidad al andar", _fmt(speeds, "%d %%", 100.0), _idx(speeds, float(DebugOptions.get_value("speed", 1.0)), 1),
+	_choice("Velocidad al andar", OptionRow.fmt(speeds, "%d %%", 100.0), OptionRow.idx(speeds, float(DebugOptions.get_value("speed", 1.0)), 1),
 		func(i: int) -> void:
 			DebugOptions.set_value("speed", speeds[i])
 			DebugOptions.rebuild_stats(p))
@@ -156,7 +156,7 @@ func _build() -> void:
 		var counts := DebugOptions.ENEMY_COUNTS
 		var count_names: Array[String] = []
 		for c in counts: count_names.append("Los del nivel" if c < 0 else str(c))
-		_choice("Enemigos en pantalla", count_names, _idx(counts, int(DebugOptions.get_value("enemies", -1)), 0),
+		_choice("Enemigos en pantalla", count_names, OptionRow.idx(counts, int(DebugOptions.get_value("enemies", -1)), 0),
 			func(i: int) -> void:
 				DebugOptions.set_value("enemies", counts[i])
 				DebugOptions.apply_world(game)
@@ -167,7 +167,7 @@ func _build() -> void:
 		for e: EnemyData in kinds:
 			kind_names.append("Solo " + e.display_name)
 			kind_ids.append(String(e.id))
-		_choice("Tipo", kind_names, _idx(kind_ids, String(DebugOptions.get_value("enemy_kind", "")), 0),
+		_choice("Tipo", kind_names, OptionRow.idx(kind_ids, String(DebugOptions.get_value("enemy_kind", "")), 0),
 			func(i: int) -> void:
 				DebugOptions.set_value("enemy_kind", kind_ids[i])
 				DebugOptions.apply_world(game))
@@ -184,11 +184,11 @@ func _build() -> void:
 
 	_header("Partida")
 	var scales := DebugOptions.TIME_SCALES
-	_choice("Velocidad del juego", _fmt(scales, "x%s", 1.0), _idx(scales, float(DebugOptions.get_value("time_scale", 1.0)), 2),
+	_choice("Velocidad del juego", OptionRow.fmt(scales, "x%s", 1.0), OptionRow.idx(scales, float(DebugOptions.get_value("time_scale", 1.0)), 2),
 		func(i: int) -> void: DebugOptions.set_value("time_scale", scales[i]))     # se aplica al volver
 	var cams := DebugOptions.CAMERA_SIZES
 	var cam_now := (game.camera as GameCamera).view_size
-	_choice("Altura visible de la cámara", _fmt(cams, "%d m", 1.0), _idx(cams, cam_now, 1), func(i: int) -> void:
+	_choice("Altura visible de la cámara", OptionRow.fmt(cams, "%d m", 1.0), OptionRow.idx(cams, cam_now, 1), func(i: int) -> void:
 		DebugOptions.set_value("camera", cams[i])
 		(game.camera as GameCamera).view_size = cams[i])
 	_toggle("Información en pantalla (FPS, enemigos, balas)", DebugOptions.get_value("info", false), func(on: bool) -> void:
@@ -206,39 +206,26 @@ func _trim_enemies(keep: int) -> void:
 		var e: Enemy = list[i]
 		if is_instance_valid(e) and e.is_alive(): e.take_damage(Damage.new(1e9, 0.0))
 
-## Nombres de una lista de números: `pattern` con %d (entero) o %s (hasta dos decimales).
-static func _fmt(vals: Array, pattern: String, k: float) -> Array[String]:
-	var out: Array[String] = []
-	for v in vals:
-		var x := float(v) * k
-		out.append(pattern % (int(round(x)) if pattern.contains("%d") else String.num(snappedf(x, 0.01))))
-	return out
-
-## Posición de `v` en `vals` o, si no está, `fallback`.
-static func _idx(vals: Array, v: Variant, fallback: int) -> int:
-	var i := vals.find(v)
-	return i if i >= 0 else fallback
-
 func _header(text: String) -> void:
 	var gap := Control.new()
 	gap.custom_minimum_size.y = 6 if _list.get_child_count() > 0 else 0
 	_list.add_child(gap)
 	_list.add_child(UiKit.label(text.to_upper(), 18, ACCENT))
 
-func _choice(title: String, names: Array[String], index: int, on_change: Callable) -> Row:
-	var r := Row.new(title, names, clampi(index, 0, names.size() - 1), on_change, Callable())
+func _choice(title: String, names: Array[String], index: int, on_change: Callable) -> OptionRow:
+	var r := OptionRow.new(title, names, clampi(index, 0, names.size() - 1), on_change, Callable(), UiKit.GOLD, ACCENT)
 	_add(r)
 	return r
 
-func _toggle(title: String, on: bool, on_change: Callable) -> Row:
+func _toggle(title: String, on: bool, on_change: Callable) -> OptionRow:
 	return _choice(title, ["No", "Sí"] as Array[String], 1 if on else 0, func(i: int) -> void: on_change.call(i == 1))
 
-func _action(title: String, run: Callable) -> Row:
-	var r := Row.new(title, [] as Array[String], 0, Callable(), run)
+func _action(title: String, run: Callable) -> OptionRow:
+	var r := OptionRow.new(title, [] as Array[String], 0, Callable(), run, UiKit.GOLD, ACCENT)
 	_add(r)
 	return r
 
-func _add(r: Row) -> void:
+func _add(r: OptionRow) -> void:
 	_list.add_child(r)
 	if _first == null: _first = r
 
@@ -251,60 +238,6 @@ func _refresh_all() -> void:
 	_first = null
 	await get_tree().process_frame
 	_build()
-	if focus_idx >= 0 and focus_idx < _list.get_child_count() and _list.get_child(focus_idx) is Row:
-		(_list.get_child(focus_idx) as Row).grab_focus()
+	if focus_idx >= 0 and focus_idx < _list.get_child_count() and _list.get_child(focus_idx) is OptionRow:
+		(_list.get_child(focus_idx) as OptionRow).grab_focus()
 	elif _first: _first.grab_focus()
-
-
-## Una fila: título a la izquierda y el valor a la derecha, o una acción.
-class Row extends Button:
-	var title := ""
-	var names: Array[String] = []
-	var index := 0
-	var on_change: Callable
-	var run: Callable
-	var _value: Label
-
-	func _init(p_title: String, p_names: Array[String], p_index: int, p_on_change: Callable, p_run: Callable) -> void:
-		title = p_title; names = p_names; index = p_index; on_change = p_on_change; run = p_run
-		var accent := DebugMenu.ACCENT if run.is_valid() else UiKit.GOLD
-		var styled := UiKit.button("", accent, 18)
-		for s in ["normal", "hover", "focus", "pressed"]:
-			add_theme_stylebox_override(s, styled.get_theme_stylebox(s))
-		for c in ["font_color", "font_focus_color", "font_hover_color"]:
-			add_theme_color_override(c, styled.get_theme_color(c))
-		styled.free()
-		add_theme_font_size_override("font_size", 18)
-		alignment = HORIZONTAL_ALIGNMENT_LEFT
-		custom_minimum_size = Vector2(0, 40)
-		text = ("▸ " if run.is_valid() else "") + title
-		_value = UiKit.label("", 18, UiKit.GOLD)
-		_value.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
-		_value.offset_left = -420
-		_value.offset_right = -12
-		_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		_value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		_value.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(_value)
-		pressed.connect(func() -> void:
-			if run.is_valid(): run.call()
-			else: _step(1))
-		_show()
-
-	func _gui_input(event: InputEvent) -> void:
-		if names.is_empty(): return
-		if event.is_action_pressed("ui_left", true):
-			_step(-1)
-			accept_event()
-		elif event.is_action_pressed("ui_right", true):
-			_step(1)
-			accept_event()
-
-	func _step(dir: int) -> void:
-		if names.is_empty(): return
-		index = posmod(index + dir, names.size())
-		_show()
-		on_change.call(index)
-
-	func _show() -> void:
-		_value.text = "" if names.is_empty() else "◀  %s  ▶" % names[index]

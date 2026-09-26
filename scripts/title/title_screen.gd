@@ -1,3 +1,4 @@
+class_name TitleScreen
 extends Control
 ## Pantalla de título: la ilustración de la biblioteca (resources/PantallasMenus/) con
 ## animaciones sutiles, ceniza que cae, la entrada del título desde la niebla y la música
@@ -10,7 +11,8 @@ extends Control
 ##   strike=3            relámpago en ese segundo      eyes=3  brillo de ojos en ese segundo
 ##   perf=8              mide el rendimiento
 ##   open=slots          abre la ventana de huecos al terminar la presentación (capturas);
-##                       open=slots_borrar, además la confirmación de borrado
+##                       open=slots_borrar, además la confirmación de borrado; open=menu (menú
+##                       principal), open=menu_jugar, open=menu_config tab=0..3
 ## Cualquier botón principal (A, B, X, Y, Start, Select; Intro, Espacio o Esc) salta la
 ## presentación y, con el aviso visible, abre la ventana de huecos de partida (D-22).
 
@@ -48,6 +50,9 @@ var _strike_t := -1.0
 var _rng := RandomNumberGenerator.new()
 var _done := false
 var _slots: SlotMenu                ## ventana de huecos abierta
+var _menu: MainMenu                 ## menú principal abierto
+## Al volver de la partida se entra directamente en el menú principal (sin presentación).
+static var skip_to_menu := false
 ## Botones que valen para "Pulsa Start" (D-22): cualquiera de los principales.
 const PRESS_KEYS := [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE, KEY_ESCAPE]
 const PRESS_BUTTONS := [JOY_BUTTON_A, JOY_BUTTON_B, JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_START, JOY_BUTTON_BACK]
@@ -75,6 +80,10 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 	t = args.get_float("t", 0.0)
+	if skip_to_menu and Saves.slot >= 0:
+		skip_to_menu = false
+		t = _end_intro()
+		_open_main_menu.call_deferred()
 	if args.has("shots"):
 		var tag := ("_" + args.get_str("tag")) if args.has("tag") else ""
 		add_child(ShotTaker.new(args.get_floats("shots"), "res://shots/titulo%s" % tag))
@@ -287,6 +296,13 @@ func _process(delta: float) -> void:
 	_lightning(delta)
 	_eyes()
 	if args.has("perf"): _perf(delta)
+	if args.get_str("open").begins_with("menu") and _menu == null and not _done and t > _end_intro():
+		var what := args.get_str("open")
+		args.options.erase("open")
+		if Saves.slot < 0: Saves.use(0)
+		_open_main_menu()
+		if what == "menu_jugar": _menu._open_play.call_deferred()
+		elif what == "menu_config": _menu.open_settings_tab.call_deferred(args.get_int("tab", 0))
 	if args.get_str("open").begins_with("slots") and _slots == null and not _done and t > _end_intro():
 		var borrar := args.get_str("open") == "slots_borrar"
 		args.options.erase("open")
@@ -335,7 +351,7 @@ static func _ease_out(x: float) -> float:
 	return 1.0 - pow(1.0 - x, 3.0)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _slots != null or _done: return                   # la ventana abierta atiende sus botones
+	if _slots != null or _menu != null or _done: return  # la ventana abierta atiende sus botones
 	var pressed := false
 	if event is InputEventKey and event.pressed and not event.echo:
 		pressed = (event as InputEventKey).keycode in PRESS_KEYS
@@ -358,11 +374,27 @@ func _open_slots() -> void:
 	front.visible = false                                # el título no se transparenta detrás
 	_slots.closed.connect(func() -> void:
 		_slots = null
-		front.visible = true)
+		front.visible = true
+		prompt.visible = true)
 	_slots.chosen.connect(func(i: int) -> void:
 		Saves.use(i)
+		_slots.queue_free()
+		_slots = null
+		_open_main_menu())
+
+## Menú principal, debajo del título. B vuelve a la elección de partida.
+func _open_main_menu() -> void:
+	front.visible = true
+	prompt.visible = false
+	_menu = MainMenu.new()
+	add_child(_menu)
+	_menu.back.connect(func() -> void:
+		_menu.queue_free()
+		_menu = null
+		_open_slots())
+	_menu.play_local.connect(func() -> void:
 		_done = true
-		get_tree().change_scene_to_file(NEXT_SCENE))         # el menú principal llega en el hito 2.2
+		get_tree().change_scene_to_file(NEXT_SCENE))         # selección de personaje: hito 2.3
 
 var _frames: Array[float] = []
 func _perf(delta: float) -> void:

@@ -103,9 +103,9 @@ func _menu() -> Array:
 	add_child_autofree(m)
 	return [g, m]
 
-func _row(m: DebugMenu, title_start: String) -> DebugMenu.Row:
+func _row(m: DebugMenu, title_start: String) -> OptionRow:
 	for r in m.find_children("*", "Button", true, false):
-		if r is DebugMenu.Row and ((r as DebugMenu.Row).title.begins_with(title_start)): return r
+		if r is OptionRow and ((r as OptionRow).title.begins_with(title_start)): return r
 	return null
 
 func test_el_menu_se_monta_y_sus_filas_cambian_la_partida() -> void:
@@ -114,15 +114,15 @@ func test_el_menu_se_monta_y_sus_filas_cambian_la_partida() -> void:
 	var m: DebugMenu = gm[1]
 	var count := _row(m, "Enemigos en pantalla")
 	assert_not_null(count)
-	count._step(-1)                                   # desde "Los del nivel", hacia atrás: 300
+	count.step(-1)                                   # desde "Los del nivel", hacia atrás: 300
 	assert_eq(g.director.target_alive, 300)
-	_row(m, "Invulnerable")._step(1)
+	_row(m, "Invulnerable").step(1)
 	assert_true(player.god)
-	_row(m, "Esquive")._step(1)
+	_row(m, "Esquive").step(1)
 	assert_eq(String(player.data.dodge_style.id), DebugOptions.get_value("dodge", ""))
-	_row(m, "Revólver")._step(2)                      # sin ella -> nivel 2
+	_row(m, "Revólver").step(2)                      # sin ella -> nivel 2
 	assert_eq(player.weapons.get_weapon(&"revolver").level, 2)
-	_row(m, "Altura visible")._step(1)
+	_row(m, "Altura visible").step(1)
 	assert_eq(g.camera.view_size, 20.0)
 	_row(m, "Subir un nivel").pressed.emit()
 	assert_eq(player.progress.level, 2)

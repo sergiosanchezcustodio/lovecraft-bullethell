@@ -34,6 +34,7 @@ func play(path: String, fade := 1.5) -> void:
 	_fade_to(_current, SILENT_DB, fade, true)        # la que sonaba
 	_current = 1 - _current
 	var p := _players[_current]
+	p.bus = Settings.BUS_MUSIC                        # su volumen, en la configuración
 	p.stream = stream
 	p.volume_db = SILENT_DB
 	p.play()

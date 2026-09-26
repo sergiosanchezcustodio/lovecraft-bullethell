@@ -18,7 +18,15 @@ Léela al empezar cada sesión:
     - La portada dice "Pulsa Start" y acepta cualquier botón principal.
     - Después, la ventana de tres huecos de partida, con tiempo jugado, objetos comprados, compañeros y dinero, y un botón de borrar con confirmación.
     - La partida suma al hueco el tiempo jugado, las partidas, las caídas, los enemigos abatidos y los niveles superados.
-  - Siguiente: hito 2.2, menú principal y configuración.
+  - **Hito 2.2 (menú principal y configuración): hecho.**
+    - Tras elegir hueco, el menú principal bajo el título: Jugar (local; online atenuado con "Próximamente"), Tienda (aviso hasta el hito 2.9), Configuración y Salir.
+    - Configuración en cuatro pestañas:
+      - Vídeo: pantalla completa, tamaño de la ventana, sincronización vertical, límite de FPS y resolución del 3D.
+      - Audio: volumen general, de música y de efectos.
+      - Controles: reasignar teclado y mando, con intercambio si la tecla estaba ocupada.
+      - Juego: distorsiones, vibración y contador de FPS.
+    - En la partida, "Salir" pasa a ser "Menú principal": guarda y vuelve al menú.
+  - Siguiente: hito 2.3, selección de personaje y mapa de niveles.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
@@ -195,8 +203,9 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - El título (`title_halo.gdshader`: niebla con su silueta, letras que se condensan, niebla que se deshace y halo fino) y el aviso van fuera del escenario, así que el acercamiento no les afecta.
 - **Configuración por efecto** (`data/title/portada.tres`, `TitleScreenConfig`): cada efecto tiene su interruptor y sus parámetros. Son velas, farolillos, niebla, luna, relámpago, ojos, acercamiento, ceniza, título, halo, niebla del título, aviso y música.
   - Para compararlos sin tocar la configuración: `godot --path . -- title off=niebla,ceniza`. Nombres: velas, farolillos, niebla, luna, relampago, ojos, acercamiento, ceniza, titulo, halo, niebla_titulo, aviso y musica.
-  - Otras opciones: `shots=`, `tag=`, `t=` (empezar en ese segundo), `strike=` (relámpago), `eyes=` (brillo de ojos), `perf=` y `open=slots` (abre la ventana de huecos; `open=slots_borrar`, también la confirmación de borrado).
-- **Controles:** cualquier botón principal (A, B, X, Y, Start, Select; Intro, Espacio o Esc) salta la presentación y, con "Pulsa Start" visible, abre la ventana de huecos. Al elegir hueco se entra en la partida hasta que exista el menú principal (hito 2.2).
+  - Otras opciones: `shots=`, `tag=`, `t=` (empezar en ese segundo), `strike=` (relámpago), `eyes=` (brillo de ojos) y `perf=`.
+  - Para capturas de los menús, `open=` abre una ventana al terminar la presentación: `slots` (huecos), `slots_borrar` (con la confirmación de borrado), `menu` (menú principal), `menu_jugar` o `menu_config` con `tab=0..3`. Úsalo con `saves=demo_saves`, que tiene una partida de ejemplo en el hueco 2.
+- **Controles:** cualquier botón principal (A, B, X, Y, Start, Select; Intro, Espacio o Esc) salta la presentación y, con "Pulsa Start" visible, abre la ventana de huecos. Al elegir hueco se abre el menú principal; "Jugar en local" entra en la partida hasta que exista la selección de personaje (hito 2.3).
 - **Variación medida** (desviación típica en % del brillo): llamas 6,4 %, paredes iluminadas 4,4 %, cielo 2,3 %, niebla del suelo 20 % y resto por debajo del 1 %. Sutil a propósito. Coste: 0,42 ms por fotograma.
 
 ## Arquitectura del juego
@@ -251,7 +260,15 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - Guarda en un fichero temporal y lo renombra, para no dejar una partida a medias si el juego se cierra a mitad.
   - `SaveData` tiene número de versión y `migrate()`: si cambias el formato, sube `VERSION` y añade el paso de migración.
   - La partida guarda al caer, al superar el nivel, al reiniciar y al salir. Sin hueco elegido (arrancando la partida directamente) no se guarda nada.
-- **Menús de fuera de la partida** (`scripts/menus/`): `MenuKit` (fuente de la portada, ventanas centradas, `Confirm` para confirmar con el foco en "no") y `SlotMenu` (huecos).
+- **Configuración** (`Settings`, autoload en `scripts/save/settings.gd`): común a los tres huecos, en `user://settings.json`.
+  - Aplica vídeo y audio (crea los buses `Musica` y `Efectos`).
+  - `Settings.bindings()` da los controles de fábrica más los reasignados; la partida los usa para el teclado y los mandos.
+  - `dev_window` (ejecuciones de prueba en ventana) y `force_fullscreen` los pone `main.gd` y no se guardan.
+- **Menús de fuera de la partida** (`scripts/menus/`):
+  - `MenuKit`: fuente de la portada, ventanas centradas y `Confirm`, para confirmar con el foco en "no".
+  - `SlotMenu` (huecos), `MainMenu` (menú principal y ventana de Jugar) y `SettingsMenu` (pestañas).
+  - `OptionRow` (`scripts/ui/`): fila con valor que se cambia con izquierda/derecha. La usan la configuración y la depuración.
+  - La portada (`TitleScreen`) lleva el flujo: presentación, huecos y menú principal. `TitleScreen.skip_to_menu` hace que, al volver de la partida, entre directamente en el menú.
 - **Música** (`Music`, autoload en `scripts/core/music.gd`): sobrevive a los cambios de escena, funde una pista con la siguiente y no corta la que ya suena si se vuelve a pedir (al reiniciar). `mute=true` la silencia; úsalo en bots y capturas.
 - **Depuración** (`DebugOptions` en `scripts/core/debug_options.gd`, `DebugMenu` en `scripts/ui/debug_menu.gd`): los ajustes van en una variable estática, así que sobreviven a `reload_current_scene`; `game.gd` los aplica al montar la partida (`DebugOptions.apply_all`).
   - Las pasivas se rehacen desde el personaje original (`rebuild_stats`), así que también se pueden bajar.

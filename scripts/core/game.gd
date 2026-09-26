@@ -228,9 +228,17 @@ func _open_debug() -> void:
 	_debug.restart.connect(_restart)
 	add_child(_debug)
 
+## "Menú principal" (pausa y pantalla final): guarda y vuelve al menú de la portada. Sin
+## hueco elegido (partida lanzada directamente), sale del juego.
 func _quit() -> void:
 	Saves.save()
-	get_tree().quit()
+	get_tree().paused = false
+	Engine.time_scale = 1.0
+	if Saves.slot < 0:
+		get_tree().quit()
+		return
+	TitleScreen.skip_to_menu = true
+	get_tree().change_scene_to_file("res://scenes/title.tscn")
 
 func _summary() -> PackedStringArray:
 	var t := int(director.time) if director != null else 0
@@ -303,7 +311,7 @@ func announce(text: String, seconds: float) -> void:
 func _make_input() -> PlayerInput:
 	if args.has("bot"):
 		return BotInput.new(args.get_str("bot", "circle"), args.get_float("dodge_every", 2.5))
-	var bindings: InputBindings = load("res://data/input/bindings_default.tres")
+	var bindings := Settings.bindings()             # los de fábrica más los reasignados
 	var sources: Array[PlayerInput] = [KeyboardInput.new(bindings), JoypadInput.new(0, bindings)]
 	return CombinedInput.new(sources)
 

@@ -107,7 +107,7 @@ class PauseMenu extends CanvasLayer:
 		var t := UiKit.label("Pausa", 40)
 		t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(t)
-		for pair in [["Continuar", resume], ["Reiniciar", restart], ["Depuración", debug], ["Salir", quit]]:
+		for pair in [["Continuar", resume], ["Reiniciar", restart], ["Depuración", debug], ["Menú principal", quit]]:
 			var b := UiKit.button(pair[0])
 			b.custom_minimum_size = Vector2(300, 56)
 			var sig: Signal = pair[1]
@@ -160,7 +160,7 @@ class EndScreen extends CanvasLayer:
 		again.custom_minimum_size = Vector2(300, 56)
 		again.pressed.connect(func() -> void: restart.emit())
 		box.add_child(again)
-		var out := UiKit.button("Salir", accent)
+		var out := UiKit.button("Menú principal", accent)
 		out.custom_minimum_size = Vector2(300, 56)
 		out.pressed.connect(func() -> void: quit.emit())
 		box.add_child(out)

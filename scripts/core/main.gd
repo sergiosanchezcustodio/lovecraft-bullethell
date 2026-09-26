@@ -5,9 +5,10 @@ extends Node
 ##   godot --path . -- still|anim ...        -> visor de modelos (scenes/preview.tscn)
 ##   godot --path . -- bench ...             -> prueba de rendimiento (scenes/bench.tscn)
 ##   godot --path . -- title ...             -> portada (scenes/title.tscn)
-## Pantalla completa por defecto. Las ejecuciones de prueba (capturas, rendimiento, bots, visor,
-## grabación de vídeo) van en ventana. `window=true` fuerza la ventana y `fullscreen=true`, la
-## pantalla completa. La interfaz escala desde 1920x1080 (stretch canvas_items en project.godot).
+## La ventana sigue la configuración (Settings: pantalla completa por defecto). Las ejecuciones
+## de prueba (capturas, rendimiento, bots, visor, grabación de vídeo) van en ventana.
+## `window=true` fuerza la ventana y `fullscreen=true`, la pantalla completa. La interfaz escala
+## desde 1920x1080 (stretch canvas_items en project.godot).
 
 func _ready() -> void:
 	var la := LaunchArgs.from_cmdline()
@@ -22,7 +23,7 @@ func _ready() -> void:
 	get_tree().change_scene_to_file.call_deferred(scene)
 
 func _window_mode(la: LaunchArgs, first: String) -> void:
-	if DisplayServer.get_name() == "headless": return
 	var dev := la.has("shots") or la.has("perf") or la.has("bot") or first in ["still", "anim", "bench"] 		or Engine.get_write_movie_path() != ""
-	var full := la.get_bool("fullscreen", not dev) and not la.get_bool("window")
-	if full: DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)   # la normal deja un borde de 1 px en Windows
+	Settings.dev_window = (dev and not la.get_bool("fullscreen")) or la.get_bool("window")
+	Settings.force_fullscreen = la.get_bool("fullscreen")
+	Settings.apply_video()
