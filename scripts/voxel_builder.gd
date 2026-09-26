@@ -18,7 +18,7 @@ const FACES := [
 static var _cache := {}
 ## Caché en disco de las mallas construidas (ver VoxelMeshCache). Sube BUILDER_VERSION
 ## cuando cambie la forma de construir las mallas, para invalidar lo guardado.
-const BUILDER_VERSION := 1
+const BUILDER_VERSION := 2
 const DISK_CACHE_DIR := "user://voxcache"
 static var use_disk_cache := true
 static var _mats := {}   # "rugosidad/especular" -> material compartido
@@ -85,7 +85,7 @@ static func _get_model(path: String) -> Dictionary:
 			return m
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
 	var all := {}            # ocupación global -> oclusión ambiental
-	var occ := {}            # ocupación por parte -> caras ocultas (entre partes solo las enterradas:
+	var occ := {}            # ocupación por parte -> caras ocultas (solo dentro de la misma parte:
 	                         # al girar un brazo o una pierna no deben quedar huecos en la unión)
 	var parts := {}          # nombre -> Array de [pos, color]
 	for v: Array in data.voxels:
@@ -173,10 +173,10 @@ static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vecto
 		var col: Color = item[1]
 		for f in FACES:
 			var n: Vector3i = f[0]
+			# Solo se quitan las caras que tapa un voxel de la MISMA parte. Entre partes
+			# distintas se conservan todas: al girar un brazo, una pierna o la cabeza queda
+			# al aire lo que tapaban (con el brazo pegado al tronco, el costado se veía hueco).
 			if own.has(p + n): continue
-			# Entre partes distintas solo se quita la cara si está enterrada (dos voxels
-			# ocupados por delante): las costuras, que pueden asomar al girar, se conservan.
-			if all.has(p + n) and all.has(p + n + n): continue
 			var corners: Array = f[1]
 			var shades := []
 			for c in corners:

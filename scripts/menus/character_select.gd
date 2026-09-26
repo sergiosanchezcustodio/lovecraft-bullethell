@@ -3,10 +3,11 @@ extends Control
 ## Selección de personaje (D-22, D-23), al estilo de Extremadura Survivors: cuatro marcos,
 ## uno por jugador. Cada dispositivo se une con Start (el teclado, con Intro) y maneja su
 ## marco con su propio mando: izquierda/derecha cambia de personaje o de compañero, A
-## confirma y B deshace. La entrada se lee aquí por dispositivo, sin el foco de Godot (que
+## confirma y B deshace. LB/RB (Q/E con el teclado), mantenidos, giran el personaje para verlo
+## de lado y de espaldas (lo mismo valdrá para el compañero). La entrada se lee aquí por dispositivo, sin el foco de Godot (que
 ## es uno para toda la pantalla). Cuando todos los presentes están listos se abre el mapa
 ## de niveles. Opciones detrás de `--` (capturas): join=N une N jugadores de prueba;
-## ready=N deja listos los N primeros; map=true abre el mapa; auto_start=true, además, entra
+## ready=N deja listos los N primeros; turn=grados los deja girados; map=true abre el mapa; auto_start=true, además, entra
 ## en el nivel 1 (probar el paso a la partida).
 
 const BG := "res://resources/PantallasMenus/fondo_titulo_sin_texto_1080p_definitivo.png"
@@ -44,6 +45,8 @@ func _ready() -> void:
 	state.join(Devices.last_device)
 	_demo_from_args()
 	_refresh()
+	if args.has("turn"):                                # capturas: todos girados ese ángulo (grados)
+		for f in _frames: f.set_turn(deg_to_rad(args.get_float("turn")))
 	if args.has("shots"):
 		add_child(ShotTaker.new(args.get_floats("shots"), "res://shots/seleccion%s" % (("_" + args.get_str("tag")) if args.has("tag") else "")))
 
@@ -76,7 +79,7 @@ func _build() -> void:
 		f.position = Vector2((DESIGN.x - total) * 0.5 + i * (FRAME.x + GAP), TOP)
 		stage.add_child(f)
 		_frames.append(f)
-	var hint := MenuKit.hint("Start o Intro: unirse  ·  Izquierda/derecha: cambiar  ·  A o Intro: elegir  ·  B o Esc: atrás")
+	var hint := MenuKit.hint("Start o Intro: unirse  ·  Izquierda/derecha: cambiar  ·  LB/RB o Q/E: girar  ·  A o Intro: elegir  ·  B o Esc: atrás")
 	hint.size = Vector2(DESIGN.x, 30)
 	hint.position = Vector2(0, DESIGN.y - 60)
 	stage.add_child(hint)
@@ -100,6 +103,13 @@ func _input(event: InputEvent) -> void:
 	var d: Variant = Devices.device_of(event)
 	if d == null: return
 	var dev: int = d
+	# giro del modelo mientras se mantiene LB/RB o Q/E (se atiende también al soltar)
+	var spin := _spin_input(event)
+	if spin != 2:
+		var seat_s := state.seat_of(dev)
+		if seat_s >= 0: _frames[seat_s].spin = spin
+		get_viewport().set_input_as_handled()
+		return
 	var act := _action(event, dev)
 	if act == "": return
 	get_viewport().set_input_as_handled()
@@ -115,6 +125,18 @@ func _input(event: InputEvent) -> void:
 			if not state.confirm(seat): _frames[seat].shake()
 		"back":
 			if not state.back(seat) and state.joined().is_empty(): _back_to_menu()
+
+## Giro con LB/RB o Q/E: -1 o 1 al pulsar, 0 al soltar, 2 si el evento no es de giro.
+func _spin_input(event: InputEvent) -> int:
+	if event is InputEventJoypadButton:
+		var b := event as InputEventJoypadButton
+		if b.button_index == JOY_BUTTON_LEFT_SHOULDER: return -1 if b.pressed else 0
+		if b.button_index == JOY_BUTTON_RIGHT_SHOULDER: return 1 if b.pressed else 0
+	elif event is InputEventKey and not (event as InputEventKey).echo:
+		var k := event as InputEventKey
+		if k.physical_keycode == KEY_Q: return -1 if k.pressed else 0
+		if k.physical_keycode == KEY_E: return 1 if k.pressed else 0
+	return 2
 
 ## Traduce un evento a una acción del menú: left, right, confirm, back, join o "".
 func _action(event: InputEvent, dev: int) -> String:
@@ -225,6 +247,10 @@ class _Frame extends Control:
 	var _t := 0.0
 	var _shake := 0.0
 	var _base_x := 0.0
+	var spin := 0                             ## -1, 0 o 1 mientras se mantiene LB/RB (Q/E)
+	var _yaw := 0.0                           ## giro elegido por el jugador (rad)
+	var _user_turned := false                 ## deja de balancearse solo en cuanto el jugador lo gira
+	const SPIN_SPEED := 2.6                   ## rad/s
 
 	func _init(p_owner: CharacterSelect, p_index: int) -> void:
 		owner_screen = p_owner
@@ -333,6 +359,11 @@ class _Frame extends Control:
 		_pet_label.custom_minimum_size.x = FRAME.x - 24
 		_pet.add_child(_pet_label)
 
+	## Deja el modelo girado un ángulo (como si el jugador lo hubiera girado con LB/RB).
+	func set_turn(yaw: float) -> void:
+		_user_turned = true
+		_yaw = yaw
+
 	func shake() -> void:
 		if _shake <= 0.0: _base_x = position.x
 		_shake = 0.3
@@ -395,6 +426,8 @@ Se consiguen en la tienda"
 
 	func _set_model(model_name: String) -> void:
 		if model_name == _model_name: return
+		_user_turned = false                  # otro personaje: vuelve a mirar al frente
+		_yaw = 0.0
 		if _model: _model.queue_free()
 		_model_name = model_name
 		_model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
@@ -403,7 +436,12 @@ Se consiguen en la tienda"
 	func _process(delta: float) -> void:
 		_t += delta
 		if _model and _model.is_inside_tree():
-			_holder.rotation.y = 0.35 + sin(_t * 0.6 + index) * 0.45       # se balancea, mirando al frente
+			if spin != 0:
+				if not _user_turned: _yaw = _holder.rotation.y         # parte de donde estaba
+				_user_turned = true
+				_yaw += spin * SPIN_SPEED * delta
+			if _user_turned: _holder.rotation.y = _yaw
+			else: _holder.rotation.y = 0.35 + sin(_t * 0.6 + index) * 0.45   # se balancea, mirando al frente
 			Anims.pose(_model_name, "idle", _model, fposmod(_t / Anims.duration(_model_name, "idle"), 1.0))
 		if _shake > 0.0:
 			_shake -= delta

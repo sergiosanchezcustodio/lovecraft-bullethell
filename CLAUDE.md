@@ -132,7 +132,7 @@ Léela al empezar cada sesión:
    - `export(..., roughness=, specular=)` fija el material del modelo. Sin indicarlos queda piel húmeda (0,38 / 0,6); la ropa, las plumas y el atrezo van mates (~0,9 / 0,25).
 2. **Salida JSON** (`models/*.json`): `voxels` = lista de `[x, y, z, parte, r, g, b, glow]`, `pivots` = pivote por parte, en coordenadas voxel, y `voxel_size` (metros por voxel, opcional; por defecto 1/32). Un pivote sin voxels, como `light` en el farol, sirve para marcar puntos.
 3. **`scripts/voxel_builder.gd`**: convierte el JSON en mallas con eliminación de caras ocultas y oclusión ambiental por vértice. Crea un nodo por parte con su pivote (`torso`, `head`, `arm_l`, `arm_r`, `leg_l`, `leg_r`) y separa los voxels `glow=1` en una capa sin sombreado (ojos, bioluminiscencia, brillos). Las mallas se construyen una vez por modelo y todas las instancias las comparten; la primera construcción del Acechador tarda unos 200 ms.
-   - **Caras ocultas:** dentro de una misma parte se quitan todas. Entre partes distintas, solo las enterradas, con dos voxels ocupados por delante. Así las costuras de brazos y piernas no dejan huecos al girar.
+   - **Caras ocultas:** solo se quitan las que tapa un voxel de la misma parte. Entre partes distintas se conservan todas: al girar un brazo, una pierna o la cabeza queda al aire lo que tapaban. Antes se quitaban las "enterradas" (dos voxels de otra parte delante), y con el brazo de 5 voxels pegado al tronco el costado se veía hueco al andar.
    - **Material:** sale del `roughness` y el `specular` del JSON.
    - **Caché en disco:** las mallas construidas se guardan en `user://voxcache/` (`VoxelMeshCache`). La clave depende de la fecha y el tamaño del JSON y de `VoxelBuilder.BUILDER_VERSION`. Una cabaña de 100.000 voxels tarda 1,7 s en construirse y unos milisegundos en cargarse de la caché. **Sube `BUILDER_VERSION` si cambias cómo se construyen las mallas.** La partida precarga los modelos de todos los enemigos del nivel al empezar.
 4. **Animación:** rotando los nodos-parte desde código (sin rigging).
@@ -285,7 +285,8 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - La lógica está en `SelectState` (sin dibujo, con tests).
   - La entrada se lee por dispositivo en `_input`, sin el foco de Godot, que es uno para toda la pantalla.
   - El mapa de niveles es `LevelMap`, sobre `Campaign` (`data/campaign.json`).
-  - Opciones para capturas: `join=N` (jugadores de prueba), `ready=N`, `map=true` y `auto_start=true`.
+  - Cada jugador gira su modelo con LB/RB (Q/E con el teclado) mientras los mantiene, para verlo de lado y de espaldas; al cambiar de personaje vuelve a mirar al frente. Los compañeros girarán igual cuando tengan modelo.
+  - Opciones para capturas: `join=N` (jugadores de prueba), `ready=N`, `turn=grados`, `map=true` y `auto_start=true`.
 - **Configuración** (`Settings`, autoload en `scripts/save/settings.gd`): común a los tres huecos, en `user://settings.json`.
   - Aplica vídeo y audio (crea los buses `Musica` y `Efectos`).
   - `Settings.bindings()` da los controles de fábrica más los reasignados; la partida los usa para el teclado y los mandos.
