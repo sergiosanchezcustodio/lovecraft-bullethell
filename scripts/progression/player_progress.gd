@@ -48,7 +48,11 @@ func add_xp(amount: float) -> void:
 ## Hasta `n` opciones distintas y válidas: armas nuevas que aún no tiene, subir armas
 ## que no están al máximo y pasivas que no están al máximo.
 func roll_options(weapons: WeaponSystem, rng: RandomNumberGenerator, n: int = -1) -> Array[Option]:
-	if n < 0: n = rules.options_per_level
+	if n < 0:
+		n = rules.options_per_level
+		# suerte: por encima de 1, probabilidad de una opción más (Peaslee)
+		var luck: float = weapons.player.data.luck if weapons != null and weapons.player != null else 1.0
+		if luck > 1.0 and rng.randf() < luck - 1.0: n += 1
 	var cands: Array[Option] = []
 	for wd in weapon_pool:
 		var owned := weapons.get_weapon(wd.id)

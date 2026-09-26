@@ -271,6 +271,13 @@ Todos proceden de relatos de Lovecraft y cada parte tiene al menos un personaje 
 | Gustaf Johansen, marinero | *La llamada de Cthulhu* (parte 3) | Machete | Más vida; inmunidad al empuje (D-19) | Mucha vida |
 | Profesor Henry Armitage | *El horror de Dunwich* | Polvo de Ibn-Ghazi | Las armas arcanas recargan antes | Cordura alta, vida baja |
 | Herbert West | *Herbert West, reanimador* | Reactivo de West | Reanima a compañeros más rápido; curación en área al subir de nivel | Poca cordura, gran resistencia física |
+| Amelia Peaslee, arqueóloga joven y aventurera, sobrina del profesor Peaslee | *La sombra fuera del tiempo* | Rifle de caza | Más suerte en las mejoras; recoge las gemas desde más lejos | Rápida, vida media |
+| Madame Ludmila Varga, espiritista experta en artes oscuras | Médium de Arkham (propia) | Páginas del Necronomicón | Las armas arcanas le cuestan la mitad de cordura | Mucha cordura, poca vida |
+| Padre Iwanicki, sacerdote católico | *Los sueños en la casa de la bruja* | Fórmula de expulsión | Aura que calma: los compañeros cercanos recuperan cordura | Equilibrado |
+| Dra. Marian Whipple, doctora, sobrina del Dr. Elihu Whipple | *La casa maldita* | Bisturís (arma nueva: abanico que atraviesa) | Reanima más rápido; se cura un poco al subir de nivel | Vida y cordura medias |
+| Henrietta Blake, escritora, hermana de Robert Blake | *El morador de las tinieblas* | Trapezoedro Resplandeciente | Más experiencia por gema | Cordura alta, vida baja |
+| Sargento Frank Elwood, ex-soldado de la Gran Guerra | Pariente de Elwood, *Los sueños en la casa de la bruja* | Pistola automática Colt .45 | Recarga del esquive más rápida; resiste mejor el daño físico | Mucha vida |
+| Vera Malone, delincuente de la mafia | *El horror de Red Hook* | Subfusil Thompson | Más daño cuanto más cerca está el enemigo | Rápida, vida media |
 
 ---
 
@@ -394,6 +401,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-23 | Personajes únicos y cuatro jugables en la fase 2 | Fase 2 | **Resuelta** |
 | D-24 | Botón de juego online antes de la fase 9 | Fase 2 | **Resuelta**: visible y desactivado |
 | D-25 | Mapa de niveles con un solo nivel | Fase 2 | **Resuelta**: el mapa completo, con el nivel 1 abierto |
+| D-26 | Siete personajes más en la fase 2 | Fase 2 | **Resuelta** |
 
 D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherencias y huecos detectados al redactar este documento (sección 13). Las decisiones bloqueantes de las fases 1 y 2 se resolvieron el 24-09-2026.
 
@@ -437,6 +445,9 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
 - **D-23 — Personajes únicos (26-09-2026).** *Resuelta:* un personaje elegido por un jugador no puede elegirlo otro en esa partida. Para que puedan jugar cuatro, la fase 2 trae cuatro personajes: Dyer, Olmstead, Legrasse y Johansen, con sus armas iniciales (revólver, escopeta y machete). Amplía D-18.
 - **D-24 — Online antes de tiempo.** *Resuelta:* "Jugar online" aparece atenuado con "Próximamente" hasta la fase 9 (D-10).
 - **D-25 — Mapa de niveles.** *Resuelta:* se hace ya el mapa de las 3 partes × 5 niveles, con solo el nivel 1 abierto.
+- **D-26 — Siete personajes más (27-09-2026).** *Resuelta:* además de Dyer, Olmstead, Legrasse y Johansen, la fase 2 trae siete personajes que se compran en la tienda (mientras no exista, se pueden elegir para probarlos). Cada uno se ata a un relato de Lovecraft: es personaje suyo o pariente o allegado inventado de uno. Se hacen en dos tandas (hito 2.4b), con revisión tras cada una:
+  - *Primera tanda:* Amelia Peaslee (arqueóloga, rifle de caza), Madame Ludmila Varga (espiritista, páginas del Necronomicón), Dra. Marian Whipple (doctora, bisturís) y Henrietta Blake (escritora, Trapezoedro Resplandeciente).
+  - *Segunda tanda:* padre Iwanicki (sacerdote, fórmula de expulsión), sargento Frank Elwood (ex-soldado, Colt .45) y Vera Malone (delincuente de la mafia, subfusil Thompson).
 - **D-19 — Pasivos sin mecánica.** El pasivo de Dyer (frío y ralentización) y el de Johansen (inmunidad al empuje) dependen de efectos sobre el jugador que no están definidos, y el de Legrasse necesita saber si los híbridos de Innsmouth cuentan como "enemigos humanos".
 
 ---

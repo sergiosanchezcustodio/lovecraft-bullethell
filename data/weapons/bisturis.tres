@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bisturis"
+display_name = "Bisturís"
+delivery = 0
+targeting = 0
+cooldown = 0.95
+range = 10.0
+damage = 8.0
+count = 3.0
+spread_deg = 24.0
+pierce = 1.0
+projectile_speed = 24.0
+projectile_radius = 0.14
+projectile_size = 0.12
+max_level = 5
+level_mods = Array[Dictionary]([{"count+": 1.0}, {"damage*": 1.25}, {"pierce+": 1.0}, {"count+": 2.0, "cooldown*": 0.85}])
+level_text = Array[String](["Un bisturí más", "+25 % de daño", "Atraviesan a un enemigo más", "Dos bisturís más y lanza más rápido"])

@@ -99,7 +99,9 @@ func _ready() -> void:
 	for w in DebugOptions.list_resources("res://data/weapons"): player.progress.weapon_pool.append(w)   # todas las armas
 	for f in ["velocidad", "vida", "cordura", "reflejos", "iman"]:
 		player.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
-	player.progress.leveled_up.connect(func(_l: int) -> void: _open_level_up.call_deferred())
+	player.progress.leveled_up.connect(func(_l: int) -> void:
+		player.health = minf(player.health + player.data.max_health * player.data.heal_on_level, player.data.max_health)   # Whipple
+		_open_level_up.call_deferred())
 	player.downed.connect(_on_downed)
 	if args.get_bool("log"):
 		player.damaged.connect(func(d: Damage) -> void:

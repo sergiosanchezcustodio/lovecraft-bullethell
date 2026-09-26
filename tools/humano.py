@@ -88,3 +88,64 @@ def export(M: Model, name, half=9):
     pv['arm_r'][0] = half + 2.5
     n = M.export('models/%s.json' % name, pv, jitter=0.006, pivots_in_voxels=True, roughness=0.9, specular=0.25)
     print(name, n, 'voxels')
+
+
+# ---------------- piezas para personajes femeninos ----------------
+
+def legs_slim(M: Model, stocking, shoe, sole, boot_top=2, boot=None):
+    """Piernas de 5 voxels de ancho (medias o pantalón) y calzado. Con `boot`, botas altas
+    hasta boot_top."""
+    for s, p in ((-1, 'leg_l'), (1, 'leg_r')):
+        x0, x1 = (-6, -1) if s < 0 else (1, 6)
+        M.vbox(x0, 2, -3, x1, 25, 2, p, stocking)
+        if boot is not None: M.vbox(x0, 2, -3, x1, boot_top, 2, p, boot)
+        M.vbox(x0, 0, -3, x1, 2, 4, p, shoe)                 # pie
+        M.vbox(x0, 0, -3, x1, 1, 4, p, sole)
+        M.bevel(p, x0, x1, -3, 2, 2, 25)
+
+
+def skirt(M: Model, col, bottom=12, half=8, flare=2, top=24, front_open=None):
+    """Falda, vestido o faldón de abrigo que cae desde el tronco (parte torso: se mueve con
+    él y deja a las piernas moverse debajo). Se ensancha `flare` voxels hacia abajo.
+    front_open=(ancho, color): abertura delantera (abrigo abierto sobre otra prenda)."""
+    for y in range(bottom, top):
+        k = (top - y) / max(top - bottom, 1)
+        w = half + int(round(flare * k))
+        dz = int(round(flare * 0.5 * k))
+        M.vbox(-w, y, -5 - dz, w, y + 1, 5 + dz, T, col)
+        if front_open is not None:
+            ow, oc = front_open
+            M.vbox(-ow, y, 4 + dz, ow, y + 1, 5 + dz, T, oc)
+    M.bevel(T, -half - flare, half + flare, -5 - flare, 5 + flare, bottom, top)
+
+
+def face_f(M: Model, brow, skin_sh, lips, eye_y=48, lashes=EYE):
+    """Cara femenina: cejas finas, ojos con una pestaña en el rabillo, nariz y labios."""
+    for x in (-3, -2, 1, 2): paint_face(M, x, eye_y + 1, brow)
+    for x in (-2, 1): paint_face(M, x, eye_y, EYE)
+    paint_face(M, -3, eye_y, lashes)
+    paint_face(M, 2, eye_y, lashes)
+    for x in (-1, 0): paint_face(M, x, eye_y - 1, skin_sh)
+    for x in (-1, 0): paint_face(M, x, eye_y - 3, lips)
+
+
+def hair_long(M: Model, hair, bottom=37, top=51):
+    """Melena que cae por la espalda (parte cabeza: se mueve con ella). Por debajo de la
+    cabeza va por detrás del torso (z -7 y -6): si ocupara las posiciones de la espalda, las
+    quitaría del torso y quedaría un hueco al girar la cabeza."""
+    M.vbox(-5, 43, -6, 5, top, -4, H, hair)
+    M.vbox(-5, bottom, -7, 5, 43, -5, H, hair)
+    M.bevel(H, -5, 5, -7, -5, bottom, 43)
+    for x in (-6, 5):                                 # a los lados, hasta la mandíbula
+        M.vbox(x, 44, -5, x + 1, top, 2, H, hair)
+
+
+def hair_bob(M: Model, hair, bottom=44, top=51):
+    """Media melena a la altura de la mandíbula (años 20)."""
+    M.vbox(-6, bottom, -6, 6, top, 1, H, hair)
+    M.vbox(-5, bottom, -6, 5, top, -5, H, hair)
+
+
+def bun(M: Model, hair, y=48):
+    """Moño en la nuca."""
+    M.vbox(-2, y - 2, -8, 2, y + 2, -5, H, hair)

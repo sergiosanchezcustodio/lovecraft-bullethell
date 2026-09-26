@@ -18,3 +18,4 @@ move_speed = 4.5
 dodge_style = ExtResource("2")
 starting_weapons = Array[StringName]([&"escopeta"])
 bonus_tags = {&"humana": 1.25}
+order = 3

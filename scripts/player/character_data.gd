@@ -17,6 +17,13 @@ extends Resource
 @export var bonus_tags := {}
 @export var knockback_immune := false        ## Johansen (D-19: aún no hay empuje sobre los jugadores)
 @export var dodge_length := 1.0              ## multiplica la duración del impulso y la invulnerabilidad del esquive
+@export var arcane_cost_mult := 1.0          ## cordura que cuestan las armas arcanas (Varga: 0,5)
+@export var xp_mult := 1.0                   ## experiencia por gema (Blake: 1,15)
+@export var heal_on_level := 0.0             ## fracción de la vida máxima que recupera al subir de nivel (Whipple)
+@export var revive_speed := 1.0              ## rapidez al reanimar a un compañero (Whipple; hito 2.6)
+@export var calm_aura := 0.0                 ## cordura por segundo a los compañeros cercanos (Iwanicki; hito 2.7)
+@export var in_shop := false                 ## se compra en la tienda (precio en el hito 2.9; mientras, disponible)
+@export var order := 0                       ## orden en la selección de personaje
 @export_group("Recursos")
 @export var max_health := 100.0
 @export var max_sanity := 100.0

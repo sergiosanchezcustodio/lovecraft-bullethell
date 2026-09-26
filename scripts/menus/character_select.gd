@@ -7,7 +7,8 @@ extends Control
 ## de lado y de espaldas (lo mismo valdrá para el compañero). La entrada se lee aquí por dispositivo, sin el foco de Godot (que
 ## es uno para toda la pantalla). Cuando todos los presentes están listos se abre el mapa
 ## de niveles. Opciones detrás de `--` (capturas): join=N une N jugadores de prueba;
-## ready=N deja listos los N primeros; turn=grados los deja girados; map=true abre el mapa; auto_start=true, además, entra
+## ready=N deja listos los N primeros; pick=id,id… elige personaje en cada marco;
+## turn=grados los deja girados; map=true abre el mapa; auto_start=true, además, entra
 ## en el nivel 1 (probar el paso a la partida).
 
 const BG := "res://resources/PantallasMenus/fondo_titulo_sin_texto_1080p_definitivo.png"
@@ -31,6 +32,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var chars: Array[CharacterData] = []
 	for r in DebugOptions.list_resources("res://data/characters"): chars.append(r)
+	chars.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return a.order < b.order)
 	var pets: Array[PetData] = []
 	var owned: Array = Saves.current.pets if Saves.current else []
 	for r in DebugOptions.list_resources("res://data/pets"):
@@ -45,6 +47,12 @@ func _ready() -> void:
 	state.join(Devices.last_device)
 	_demo_from_args()
 	_refresh()
+	if args.has("pick"):                                # capturas: pick=peaslee,varga… un personaje por marco
+		var ids := args.get_str("pick").split(",")
+		for k in mini(ids.size(), state.joined().size()):
+			for ci in state.characters.size():
+				if String(state.characters[ci].id) == ids[k]: (state.seats[state.joined()[k]] as SelectState.Seat).character = ci
+		_refresh()
 	if args.has("turn"):                                # capturas: todos girados ese ángulo (grados)
 		for f in _frames: f.set_turn(deg_to_rad(args.get_float("turn")))
 	if args.has("shots"):

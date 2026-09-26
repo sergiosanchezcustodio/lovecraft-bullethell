@@ -89,3 +89,57 @@ func test_la_escopeta_empuja_mas_que_el_revolver() -> void:
 	var revolver: WeaponData = load("res://data/weapons/revolver.tres")
 	assert_gt(shotgun.stat("knockback", 1), revolver.stat("knockback", 1))
 	assert_gt(shotgun.stat("count", 1), 1.0)
+
+# ---------------- primera tanda de la tienda (D-26) ----------------
+const SHOP_IDS := ["peaslee", "varga", "whipple", "blake"]
+
+func test_los_de_la_tienda_estan_completos() -> void:
+	for id in SHOP_IDS:
+		var c: CharacterData = load("res://data/characters/%s.tres" % id)
+		assert_true(c.in_shop, id + " se compra en la tienda")
+		assert_true(FileAccess.file_exists("res://models/%s.json" % c.model), "modelo de " + id)
+		assert_true(Anims.has_anim(c.model, "walk"))
+		for w in c.starting_weapons: assert_true(ResourceLoader.exists("res://data/weapons/%s.tres" % w))
+		assert_gt(c.order, 4, "después de los cuatro de siempre")
+
+func test_la_orbita_golpea_y_espera_su_intervalo() -> void:
+	var p := _player("varga")
+	var w := p.weapons.add_weapon(load("res://data/weapons/necronomicon.tres"))
+	var e := _enemy([] as Array[StringName], Vector3(w.stat("aoe_radius"), 0, 0))
+	world.rebuild_grid()
+	assert_true(p.weapons._fire(w))
+	var ring: OrbitRing = p.weapons._rings[w]
+	ring._angle = 0.0
+	ring._physics_process(1.0 / 60.0)
+	var after_one := e.health
+	assert_lt(after_one, 1000.0, "la página que pasa por encima le hace daño")
+	ring._physics_process(1.0 / 60.0)
+	assert_eq(e.health, after_one, "no vuelve a golpearle antes del intervalo")
+	assert_false(p.weapons._fire(w), "mientras giran, no se vuelve a activar")
+
+func test_el_rayo_dana_lo_que_esta_en_su_linea() -> void:
+	var p := _player("blake")
+	var w := p.weapons.add_weapon(load("res://data/weapons/trapezoedro.tres"))
+	var inline := _enemy([] as Array[StringName], Vector3(6, 0, 0))
+	var aside := _enemy([] as Array[StringName], Vector3(6, 0, 4))
+	world.rebuild_grid()
+	p.weapons._beam(w, Vector3(10, 0, 0))
+	assert_lt(inline.health, 1000.0)
+	assert_eq(aside.health, 1000.0)
+
+func test_varga_paga_la_mitad_de_cordura() -> void:
+	var p := _player("varga")
+	var w := p.weapons.add_weapon(load("res://data/weapons/necronomicon.tres"))
+	var before := p.sanity
+	p.weapons._pay_sanity(w)
+	assert_almost_eq(before - p.sanity, w.stat("sanity_cost") * 0.5, 0.001)
+
+func test_la_suerte_da_a_veces_una_opcion_mas() -> void:
+	var p := _player("peaslee")
+	for f in ["velocidad", "vida", "cordura", "reflejos", "iman"]:
+		p.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
+	var rng := RandomNumberGenerator.new(); rng.seed = 3
+	var four := 0
+	for i in 400:
+		if p.progress.roll_options(p.weapons, rng).size() == 4: four += 1
+	assert_almost_eq(four / 400.0, 0.3, 0.08)

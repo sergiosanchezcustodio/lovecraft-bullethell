@@ -19,3 +19,4 @@ dodge_style = ExtResource("2")
 starting_weapons = Array[StringName]([&"revolver"])
 resist_tags = {&"marina": 0.7}
 dodge_length = 1.3
+order = 2

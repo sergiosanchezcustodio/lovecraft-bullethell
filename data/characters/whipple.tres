@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/salto.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"whipple"
+display_name = "Dra. Marian Whipple"
+model = "whipple"
+role = "Doctora, sobrina del Dr. Elihu Whipple"
+passive_text = "Reanima más rápido y se cura al subir de nivel."
+story = "La casa maldita"
+price = 0
+in_shop = true
+order = 7
+max_health = 100.0
+max_sanity = 110.0
+move_speed = 4.5
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"bisturis"])
+heal_on_level = 0.12
+revive_speed = 1.5

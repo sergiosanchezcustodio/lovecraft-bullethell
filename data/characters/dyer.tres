@@ -27,3 +27,4 @@ starting_weapons = Array[StringName]([&"dinamita", &"revolver"])
 collision_radius = 0.32
 hurt_radius = 0.25
 hit_iframes = 0.6
+order = 1

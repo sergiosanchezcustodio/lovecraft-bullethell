@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"necronomicon"
+display_name = "Páginas del Necronomicón"
+delivery = 3
+targeting = 3
+cooldown = 2.6
+range = 2.0
+damage = 11.0
+count = 3.0
+projectile_speed = 170.0
+projectile_radius = 0.45
+aoe_radius = 1.9
+duration = 4.5
+hit_interval = 0.45
+knockback = 0.8
+sanity_cost = 4.0
+max_level = 5
+level_mods = Array[Dictionary]([{"count+": 1.0}, {"damage*": 1.25}, {"duration+": 1.5, "aoe_radius*": 1.15}, {"count+": 2.0, "damage*": 1.2}])
+level_text = Array[String](["Una página más", "+25 % de daño", "Duran más y giran más lejos", "Dos páginas más y +20 % de daño"])

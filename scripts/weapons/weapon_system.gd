@@ -18,6 +18,7 @@ var world: CombatWorld
 var weapons: Array[Weapon] = []
 var _pending: Array[Dictionary] = []         ## proyectiles de ráfaga que salen con retardo
 var _bonus_set := -1                         ## rasgos de daño del jugador, registrados en las balas
+var _rings := {}                             ## Weapon -> OrbitRing (páginas del Necronomicón)
 
 func setup(p_player: Player, p_world: CombatWorld) -> WeaponSystem:
 	player = p_player
@@ -33,7 +34,11 @@ func add_weapon(data: WeaponData) -> Weapon:
 
 func remove_weapon(id: StringName) -> void:
 	for w in weapons.duplicate():
-		if w.data.id == id: weapons.erase(w)
+		if w.data.id != id: continue
+		weapons.erase(w)
+		if _rings.has(w):
+			(_rings[w] as Node).queue_free()
+			_rings.erase(w)
 	_pending = _pending.filter(func(p: Dictionary) -> bool: return (p.w as Weapon).data.id != id)
 
 func get_weapon(id: StringName) -> Weapon:
@@ -76,6 +81,10 @@ func _fire(w: Weapon) -> bool:
 	var n := int(w.stat("count"))
 	if w.data.delivery == WeaponData.Delivery.MELEE:
 		return _slash(w)
+	if w.data.delivery == WeaponData.Delivery.ORBIT:
+		return _orbit(w)
+	if w.data.delivery == WeaponData.Delivery.BEAM:
+		return _beam(w, target_pos)
 	if w.data.delivery == WeaponData.Delivery.THROWN:
 		for k in n:
 			var jitter := Vector3.ZERO
@@ -105,6 +114,52 @@ func _spawn_bullet(w: Weapon, dir: Vector3) -> void:
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
 		w.stat("projectile_size"), Damage.new(w.stat("damage"), 0.0), life, int(w.stat("pierce")),
 		w.stat("knockback"), _bonus_set)
+
+## Coste de cordura de las armas arcanas (GDD 5.2), con el rasgo del personaje.
+func _pay_sanity(w: Weapon) -> void:
+	var cost := w.stat("sanity_cost") * player.data.arcane_cost_mult
+	if cost > 0.0: player.sanity = maxf(0.0, player.sanity - cost)
+
+## Páginas que orbitan (Necronomicón): se activan durante `duration` s y luego se recargan.
+## Mientras están activas, el arma no vuelve a disparar.
+func _orbit(w: Weapon) -> bool:
+	var ring := _rings.get(w) as OrbitRing
+	if ring == null:
+		ring = OrbitRing.new().setup(player, world)
+		_rings[w] = ring
+		world.fx.add_child(ring)
+	if ring.active: return false
+	_pay_sanity(w)
+	ring.start(int(w.stat("count")), w.stat("aoe_radius"), w.stat("projectile_speed"), w.stat("projectile_radius"),
+		w.stat("damage"), w.stat("duration"), w.stat("hit_interval"), w.stat("knockback"), player.data.bonus_tags)
+	fired.emit(w)
+	return true
+
+## Rayo recto (Trapezoedro): daña a todo lo que atraviesa hasta su alcance.
+func _beam(w: Weapon, target_pos: Vector3) -> bool:
+	var origin := player.global_position
+	var dir := Vector3(target_pos.x - origin.x, 0, target_pos.z - origin.z)
+	if dir.length() < 0.01: dir = player.motor.facing
+	dir = dir.normalized()
+	var length := w.stat("range")
+	var half := w.stat("projectile_radius")
+	var mid := origin + dir * length * 0.5
+	for t in world.enemies_in_circle(mid, length * 0.5 + half):
+		var rel := Vector2(t.global_position.x - origin.x, t.global_position.z - origin.z)
+		var along := rel.dot(Vector2(dir.x, dir.z))
+		if along < 0.0 or along > length: continue
+		var across := absf(rel.cross(Vector2(dir.x, dir.z)))
+		if across > half + float(t.hit_radius): continue
+		var d := Damage.new(w.stat("damage"), 0.0)
+		d.knockback = dir * w.stat("knockback")
+		d.bonus = player.data.bonus_tags
+		t.take_damage(d)
+	_pay_sanity(w)
+	var fx := Beam.new()
+	fx.setup(origin + Vector3(0, 1.0, 0), dir, length, half, w.stat("duration"))
+	world.fx.add_child(fx)
+	fired.emit(w)
+	return true
 
 ## Tajo circular (machete): daña y empuja hacia fuera a todo lo que haya en el radio.
 ## Solo golpea si hay alguien dentro: sin enemigos cerca, espera.

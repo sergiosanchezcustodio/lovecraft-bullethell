@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/rodar.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"peaslee"
+display_name = "Amelia Peaslee"
+model = "peaslee"
+role = "Arqueóloga, sobrina del profesor Peaslee"
+passive_text = "Más suerte en las mejoras y recoge las gemas desde más lejos."
+story = "La sombra fuera del tiempo"
+price = 0
+in_shop = true
+order = 5
+max_health = 100.0
+max_sanity = 100.0
+move_speed = 4.9
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"rifle"])
+luck = 1.3
+pickup_radius = 3.2

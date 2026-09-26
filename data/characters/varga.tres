@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/destello.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"varga"
+display_name = "Madame Ludmila Varga"
+model = "varga"
+role = "Espiritista y médium de Arkham"
+passive_text = "Las armas arcanas le cuestan la mitad de cordura."
+story = "Médium de Arkham"
+price = 0
+in_shop = true
+order = 6
+max_health = 80.0
+max_sanity = 150.0
+move_speed = 4.4
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"necronomicon"])
+arcane_cost_mult = 0.5

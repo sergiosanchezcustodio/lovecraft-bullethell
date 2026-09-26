@@ -13,6 +13,10 @@ const BY_MODEL := {
 	"olmstead": preload("res://scripts/anim/anim_humano.gd"),
 	"legrasse": preload("res://scripts/anim/anim_humano.gd"),
 	"johansen": preload("res://scripts/anim/anim_humano.gd"),
+	"peaslee": preload("res://scripts/anim/anim_humano.gd"),
+	"varga": preload("res://scripts/anim/anim_humano.gd"),
+	"whipple": preload("res://scripts/anim/anim_humano.gd"),
+	"blake": preload("res://scripts/anim/anim_humano.gd"),
 	"pinguino": preload("res://scripts/anim/anim_pinguino.gd"),
 	"fragmento": preload("res://scripts/anim/anim_fragmento.gd"),
 }

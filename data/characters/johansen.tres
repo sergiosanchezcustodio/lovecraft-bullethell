@@ -18,3 +18,4 @@ move_speed = 4.3
 dodge_style = ExtResource("2")
 starting_weapons = Array[StringName]([&"machete"])
 knockback_immune = true
+order = 4
