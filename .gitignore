@@ -3,3 +3,6 @@ shots/**
 !shots/.gitkeep
 !shots/.gdignore
 __pycache__/
+
+# Instrucciones para otras herramientas de IA (no forman parte del proyecto)
+AGENTS.md
