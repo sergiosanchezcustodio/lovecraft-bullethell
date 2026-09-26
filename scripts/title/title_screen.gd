@@ -1,9 +1,11 @@
 extends Control
 ## Pantalla de título: la ilustración de la biblioteca (resources/PantallasMenus/) con
-## animaciones sutiles y la entrada del título con su halo de niebla.
+## animaciones sutiles, ceniza que cae, la entrada del título desde la niebla y la música
+## de la intro.
 ## Cada efecto se configura o se quita por separado en data/title/portada.tres
 ## (TitleScreenConfig). Para probar, detrás de `--`:
-##   off=velas,niebla,nubes,luna,relampago,ojos,acercamiento,motas,titulo,halo,aviso
+##   off=velas,farolillos,niebla,luna,relampago,ojos,acercamiento,ceniza,titulo,halo,
+##       niebla_titulo,aviso,musica
 ##   shots=2,6,9 tag=x   capturas en esos segundos     t=6   empieza en ese segundo
 ##   strike=3            relámpago en ese segundo      eyes=3  brillo de ojos en ese segundo
 ##   perf=8              mide el rendimiento
@@ -12,15 +14,21 @@ extends Control
 const DESIGN := Vector2(1920, 1080)
 const BG := "res://resources/PantallasMenus/fondo_titulo_sin_texto_1080p_definitivo.png"
 const TITLE_TEX := "res://resources/PantallasMenus/Texto_titulo.png"
+const VELAS := "res://resources/PantallasMenus/mascara_velas.png"
 const LUCES := "res://resources/PantallasMenus/mascara_luces.png"
+const TITLE_FOG := "res://resources/PantallasMenus/Texto_titulo_niebla.png"
 const ZONAS := "res://resources/PantallasMenus/mascara_zonas.png"
 const FONT := "res://resources/fonts/IMFeENsc28P.ttf"
-const TITLE_PAD := 0.06
+const TITLE_PAD := 0.14             ## margen del título para su niebla (igual que en gen_mascaras_portada.py)
 const NEXT_SCENE := "res://scenes/game.tscn"
 
 var cfg: TitleScreenConfig
 var args: LaunchArgs
 var stage: Control                ## ilustración y capas animadas (se acerca)
+## El acercamiento va en un Node2D por encima del escenario: la posición de un Control se
+## redondea a píxeles enteros (snap_controls_to_pixels) y el zoom avanzaba a saltos de 2 px a 4K.
+var zoom_root: Node2D
+var _zoom_pivot := Vector2.ZERO     ## centro del acercamiento, en coordenadas de pantalla
 var front: Control                ## título y aviso (fijos)
 var bg: TextureRect
 var sky_mat: ShaderMaterial
@@ -30,7 +38,7 @@ var title: TextureRect
 var title_mat: ShaderMaterial
 var prompt: Label
 var fade: ColorRect
-var dust: GPUParticles2D
+var ash: Array[GPUParticles2D] = []
 var t := 0.0
 var _next_strike := 6.0
 var _strike_t := -1.0
@@ -41,6 +49,7 @@ func _ready() -> void:
 	args = LaunchArgs.from_cmdline()
 	cfg = (load("res://data/title/portada.tres") as TitleScreenConfig).duplicate()
 	_apply_off(args.get_str("off"))
+	if cfg.music_enabled: Music.play(cfg.music, cfg.music_fade_in)
 	UiInput.configure()
 	_rng.randomize()
 	_next_strike = _rng.randf_range(4.0, 7.0)
@@ -65,10 +74,11 @@ func _ready() -> void:
 
 ## off=niebla,motas… apaga esos efectos (para compararlos sin tocar la configuración).
 func _apply_off(list: String) -> void:
-	var names := {"velas": "candles_enabled", "niebla": "fog_enabled", "nubes": "clouds_enabled",
+	var names := {"velas": "candles_enabled", "farolillos": "lanterns_enabled", "niebla": "fog_enabled",
 		"luna": "moon_enabled", "relampago": "lightning_enabled", "ojos": "eyes_enabled",
-		"acercamiento": "zoom_enabled", "motas": "dust_enabled", "titulo": "title_enabled",
-		"halo": "halo_enabled", "aviso": "prompt_enabled"}
+		"acercamiento": "zoom_enabled", "ceniza": "ash_enabled", "titulo": "title_enabled",
+		"halo": "halo_enabled", "niebla_titulo": "title_fog_enabled", "aviso": "prompt_enabled",
+		"musica": "music_enabled"}
 	for n in list.split(",", false):
 		if names.has(n): cfg.set(names[n], false)
 
@@ -81,7 +91,9 @@ func _build_stage() -> void:
 	stage = Control.new()
 	stage.size = DESIGN
 	stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(stage)
+	zoom_root = Node2D.new()
+	add_child(zoom_root)
+	zoom_root.add_child(stage)
 	var luces: Texture2D = load(LUCES)
 	var zonas: Texture2D = load(ZONAS)
 	bg = TextureRect.new()
@@ -92,6 +104,7 @@ func _build_stage() -> void:
 	_full(bg)
 	bg_mat = ShaderMaterial.new()
 	bg_mat.shader = preload("res://scripts/title/background.gdshader")
+	bg_mat.set_shader_parameter("velas", load(VELAS))
 	bg_mat.set_shader_parameter("luces", luces)
 	bg.material = bg_mat
 	stage.add_child(bg)
@@ -109,38 +122,62 @@ func _build_stage() -> void:
 	sky_mat.set_shader_parameter("zonas", zonas)
 	sky.material = sky_mat
 	stage.add_child(sky)
-	dust = _make_dust()
-	stage.add_child(dust)
+	# ceniza en tres capas: copos lejanos pequeños, medianos y unos pocos cercanos, grandes y
+	# desenfocados (caen más deprisa: parecen más cerca)
+	ash.append(_make_ash(cfg.ash_amount, 1.0, Vector2(0.08, 0.18), cfg.ash_alpha, 1.0))
+	ash.append(_make_ash(cfg.ash_mid_amount, 1.5, Vector2(0.2, 0.42), cfg.ash_alpha * 0.85, 0.7))
+	ash.append(_make_ash(cfg.ash_near_amount, 2.3, Vector2(0.5, 1.3), cfg.ash_alpha * 0.6, 0.35))
+	for a in ash: stage.add_child(a)
 	_push_params()
 
-## Motas de polvo en la luz de las velas de la izquierda.
-func _make_dust() -> GPUParticles2D:
+## Ceniza que cae despacio por toda la sala, meciéndose. Los copos nacen repartidos por toda
+## la sala y aparecen y se apagan con un fundido (no dependemos de `preprocess`, que no llegaba
+## a repartirlos). `speed_k` acelera la caída (los copos
+## cercanos caen más deprisa), `size` es la escala del copo (textura de 32 px) y `sharp`, lo
+## nítido de su borde (los cercanos, desenfocados).
+func _make_ash(amount: int, speed_k: float, size: Vector2, alpha: float, sharp: float) -> GPUParticles2D:
 	var p := GPUParticles2D.new()
-	var area := cfg.dust_area
-	p.position = (area.position + area.size * 0.5) * DESIGN
-	p.amount = cfg.dust_amount
-	p.lifetime = 9.0
-	p.preprocess = 9.0
-	p.visibility_rect = Rect2(-area.size * DESIGN, area.size * DESIGN * 2.0)
+	var speed := cfg.ash_speed * speed_k
+	var life := 14.0
+	p.position = DESIGN * 0.5 - Vector2(0.0, speed * life * 0.5)
+	p.amount = maxi(amount, 1)
+	p.lifetime = life
+	p.preprocess = life                                   # la sala ya tiene ceniza al empezar
+	p.visibility_rect = Rect2(-DESIGN.x, -DESIGN.y, DESIGN.x * 2.0, DESIGN.y * 3.0)
 	var pm := ParticleProcessMaterial.new()
 	pm.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
-	pm.emission_box_extents = Vector3(area.size.x * DESIGN.x * 0.5, area.size.y * DESIGN.y * 0.5, 0)
-	pm.direction = Vector3(0.3, -1, 0)
-	pm.spread = 60.0
-	pm.initial_velocity_min = 2.0
-	pm.initial_velocity_max = 7.0
-	pm.gravity = Vector3(0, -1.5, 0)
+	pm.emission_box_extents = Vector3(DESIGN.x * 0.6, DESIGN.y * 0.55, 0)
+	pm.direction = Vector3(0.18, 1, 0)
+	pm.spread = 12.0
+	pm.initial_velocity_min = speed * 0.7
+	pm.initial_velocity_max = speed * 1.2
+	pm.gravity = Vector3.ZERO
+	# Se mecen al caer. Ojo: la turbulencia arrastra la velocidad hacia la del ruido en cada
+	# paso; con una influencia normal (0,1) los copos se quedan parados arriba.
 	pm.turbulence_enabled = true
-	pm.turbulence_noise_strength = 2.0
-	pm.turbulence_noise_scale = 3.0
-	pm.scale_min = 0.08
-	pm.scale_max = 0.22
+	pm.turbulence_noise_strength = 1.0
+	pm.turbulence_noise_scale = 4.0
+	pm.turbulence_influence_min = 0.002
+	pm.turbulence_influence_max = 0.006
+	pm.angle_min = 0.0
+	pm.angle_max = 360.0
+	pm.angular_velocity_min = -40.0
+	pm.angular_velocity_max = 40.0
+	pm.scale_min = size.x
+	pm.scale_max = size.y
+	var c := cfg.ash_color
 	var ramp := Gradient.new()
-	ramp.offsets = PackedFloat32Array([0.0, 0.2, 0.8, 1.0])
-	ramp.colors = PackedColorArray([Color(1, 0.8, 0.5, 0), Color(1, 0.8, 0.5, 0.7), Color(1, 0.75, 0.45, 0.5), Color(1, 0.7, 0.4, 0)])
+	ramp.offsets = PackedFloat32Array([0.0, 0.12, 0.85, 1.0])
+	ramp.colors = PackedColorArray([Color(c, 0.0), Color(c, alpha), Color(c, alpha), Color(c, 0.0)])
 	var rt := GradientTexture1D.new()
 	rt.gradient = ramp
 	pm.color_ramp = rt
+	var ar := Gradient.new()                              # cada copo, algo más claro u oscuro
+	ar.offsets = PackedFloat32Array([0.0, 1.0])
+	ar.colors = PackedColorArray([Color(0.55, 0.55, 0.55, 0.5), Color(1, 1, 1, 1)])
+	var art := GradientTexture1D.new()
+	art.gradient = ar
+	pm.color_initial_ramp = art
 	p.process_material = pm
 	var dot := GradientTexture2D.new()
 	dot.width = 32; dot.height = 32
@@ -148,15 +185,12 @@ func _make_dust() -> GPUParticles2D:
 	dot.fill_from = Vector2(0.5, 0.5)
 	dot.fill_to = Vector2(0.5, 0.0)
 	var g := Gradient.new()
-	g.set_color(0, Color(1, 1, 1, 1))
-	g.set_color(1, Color(1, 1, 1, 0))
+	g.offsets = PackedFloat32Array([0.0, 0.25 + 0.5 * sharp, 1.0])
+	g.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.85 * sharp + 0.1), Color(1, 1, 1, 0)])
 	dot.gradient = g
 	p.texture = dot
-	var cm := CanvasItemMaterial.new()
-	cm.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-	p.material = cm
-	p.emitting = cfg.dust_enabled
-	p.visible = cfg.dust_enabled
+	p.emitting = cfg.ash_enabled
+	p.visible = cfg.ash_enabled
 	return p
 
 func _build_front() -> void:
@@ -179,6 +213,7 @@ func _build_front() -> void:
 	title_mat = ShaderMaterial.new()
 	title_mat.shader = preload("res://scripts/title/title_halo.gdshader")
 	title_mat.set_shader_parameter("pad", TITLE_PAD)
+	title_mat.set_shader_parameter("fog_tex", load(TITLE_FOG))
 	title.material = title_mat
 	title.visible = cfg.title_enabled
 	front.add_child(title)
@@ -199,13 +234,13 @@ func _build_front() -> void:
 
 ## Parámetros de configuración -> shaders (se llama al crear y si cambia la configuración).
 func _push_params() -> void:
-	for pair in [["candles_enabled", "candles_enabled"], ["flicker_strength", "flicker_strength"],
-			["flicker_speed", "flicker_speed"], ["flame_wobble", "flame_wobble"], ["spill_strength", "spill_strength"]]:
-		bg_mat.set_shader_parameter(pair[1], cfg.get(pair[0]))
+	for n in ["candles_enabled", "flicker_strength", "flicker_speed", "flame_sway", "spill_strength",
+			"lanterns_enabled", "lantern_breath", "lantern_halo", "lantern_period", "lantern_color"]:
+		bg_mat.set_shader_parameter(n, cfg.get(n))
 	fog_mat.set_shader_parameter("fog_strength", cfg.fog_strength if cfg.fog_enabled else 0.0)
 	fog_mat.set_shader_parameter("fog_speed", cfg.fog_speed)
 	fog_mat.set_shader_parameter("fog_color", cfg.fog_color)
-	for n in ["clouds_enabled", "clouds_strength", "clouds_speed", "clouds_color", "moon_enabled", "moon_pos",
+	for n in ["moon_enabled", "moon_pos",
 			"moon_radius", "moon_halo_strength", "moon_halo_period", "moon_color", "lightning_enabled",
 			"eyes_enabled", "eye_left", "eye_right", "eyes_color"]:
 		sky_mat.set_shader_parameter(n, cfg.get(n))
@@ -216,10 +251,9 @@ func _layout() -> void:
 	var s := maxf(vs.x / DESIGN.x, vs.y / DESIGN.y)
 	var offset := (vs - DESIGN * s) * 0.5
 	for c: Control in [stage, front]:
-		c.pivot_offset = (cfg.zoom_center * DESIGN) if c == stage else Vector2.ZERO
-		c.position = offset - c.pivot_offset * (1.0 - s)
+		c.position = offset
 		c.scale = Vector2.ONE * s
-	stage.set_meta("base_scale", s)
+	_zoom_pivot = offset + cfg.zoom_center * DESIGN * s
 
 func _process(delta: float) -> void:
 	t += delta
@@ -228,14 +262,17 @@ func _process(delta: float) -> void:
 	# acercamiento lento durante la presentación
 	if cfg.zoom_enabled:
 		var z := cfg.zoom_amount * _ease_out(clampf(t / cfg.zoom_time, 0.0, 1.0))
-		stage.scale = Vector2.ONE * float(stage.get_meta("base_scale")) * (1.0 + z)
-	# título: primero la niebla, luego las letras
+		zoom_root.scale = Vector2.ONE * (1.0 + z)
+		zoom_root.position = -_zoom_pivot * z           # escala alrededor del centro, sin redondeo
+	# título: primero la niebla con su silueta, luego las letras y la niebla se deshace
 	var r := clampf((t - cfg.title_delay) / cfg.title_reveal_time, 0.0, 1.0)
 	title_mat.set_shader_parameter("reveal", r)
 	title_mat.set_shader_parameter("halo_enabled", cfg.halo_enabled)
 	title_mat.set_shader_parameter("halo_radius", cfg.halo_radius)
 	title_mat.set_shader_parameter("halo_strength", cfg.halo_strength)
 	title_mat.set_shader_parameter("halo_color", cfg.halo_color)
+	title_mat.set_shader_parameter("fog_enabled", cfg.title_fog_enabled)
+	title_mat.set_shader_parameter("fog_color", cfg.title_fog_color)
 	# aviso de pulsar, respirando despacio
 	if cfg.prompt_enabled and t > cfg.prompt_delay:
 		var k := clampf((t - cfg.prompt_delay) / 1.2, 0.0, 1.0)

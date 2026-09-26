@@ -136,3 +136,10 @@ func test_el_salto_del_acechador_hiere_dentro_del_radio() -> void:
 	player.position = Vector3(5, 0, 0)
 	b._land(e)
 	assert_eq(player.health, player.data.max_health, "fuera del radio no le da")
+
+func test_un_nivel_sin_musica_usa_la_del_nivel_1() -> void:
+	var l := LevelData.new()
+	assert_eq(l.music_path(), LevelData.DEFAULT_MUSIC)
+	assert_true(ResourceLoader.exists(LevelData.DEFAULT_MUSIC), "la pista por defecto existe")
+	l.music = "res://otra.mp3"
+	assert_eq(l.music_path(), "res://otra.mp3")

@@ -84,11 +84,13 @@ class LevelUpMenu extends CanvasLayer:
 		queue_free()
 
 
-## Pausa (Esc o Start): continuar, reiniciar o salir.
+## Pausa (Esc o Start): continuar, reiniciar, depuración o salir.
 class PauseMenu extends CanvasLayer:
 	signal resume
 	signal restart
+	signal debug
 	signal quit
+	var _buttons: Array[Button] = []
 
 	func _init() -> void:
 		layer = 30
@@ -105,16 +107,20 @@ class PauseMenu extends CanvasLayer:
 		var t := UiKit.label("Pausa", 40)
 		t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(t)
-		var buttons: Array[Button] = []
-		for pair in [["Continuar", resume], ["Reiniciar", restart], ["Salir", quit]]:
+		for pair in [["Continuar", resume], ["Reiniciar", restart], ["Depuración", debug], ["Salir", quit]]:
 			var b := UiKit.button(pair[0])
 			b.custom_minimum_size = Vector2(300, 56)
 			var sig: Signal = pair[1]
 			b.pressed.connect(func() -> void: sig.emit())
 			box.add_child(b)
-			buttons.append(b)
+			_buttons.append(b)
 		box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
-		buttons[0].grab_focus.call_deferred()
+		_buttons[0].grab_focus.call_deferred()
+
+	## Vuelve a mostrarse al salir de la depuración, con el foco en su botón.
+	func show_again() -> void:
+		visible = true
+		_buttons[2].grab_focus.call_deferred()
 
 
 ## Fin de partida: caída o nivel superado, con un resumen y reintentar o salir.

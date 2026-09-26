@@ -10,6 +10,8 @@ extends Resource
 @export var number := 1                        ## N: aparecen enemigos de escalón 1..N
 @export var arena := "res://data/arenas/campamento.json"
 @export var duration := 300.0                  ## s de referencia (la fase 1 dura 5 minutos)
+## Música del nivel. Vacía: la del nivel 1 (hasta que haya más pistas).
+@export_file("*.mp3", "*.ogg") var music := ""
 @export_group("Oleadas")
 @export var pool: Array[EnemyData] = []        ## enemigos que pueden aparecer
 ## Ritmo de aparición (enemigos por segundo) en función del tiempo: puntos (s, ritmo).
@@ -23,6 +25,11 @@ extends Resource
 @export var final_spawn_scale := 0.3           ## tras el evento, el ritmo normal se multiplica por esto
                                                ## (el duelo con la élite no debe ahogarse en la horda)
 @export var final_text := "Algo acecha entre las tiendas…"
+
+const DEFAULT_MUSIC := "res://resources/Music/Musica_nivel1.mp3"
+
+func music_path() -> String:
+	return music if music != "" else DEFAULT_MUSIC
 
 ## Peso de aparición de un enemigo de escalón t en el nivel N: 2^(N - t) (GDD 2.1).
 static func weight(tier: int, level_number: int) -> float:

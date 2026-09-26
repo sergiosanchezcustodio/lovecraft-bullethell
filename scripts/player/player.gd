@@ -69,8 +69,12 @@ func _ready() -> void:
 	visual = Node3D.new()
 	visual.name = "Visual"
 	# El cuerpo se mueve con la física (interpolado); el modelo se orienta y se anima en
-	# _process, así que queda fuera de la interpolación y sigue al cuerpo interpolado.
+	# _process, así que queda fuera de la interpolación. Pero un nodo sin interpolación
+	# dentro del cuerpo se dibuja en la posición del último paso de física, no en la
+	# interpolada: a 120 Hz el modelo avanzaba a saltos y vibraba contra la cámara. Por eso
+	# va suelto (top_level) y en cada fotograma se coloca en la posición interpolada.
 	visual.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	visual.top_level = true
 	add_child(visual)
 	model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
 	visual.add_child(model)
@@ -115,7 +119,8 @@ func _physics_process(delta: float) -> void:
 	if _hurt_time >= 0.0: _hurt_time += delta
 
 func _process(delta: float) -> void:
-	_xray.set_shader_parameter("center_world", global_position + Vector3(0, 0.85, 0))
+	var here := get_global_transform_interpolated().origin
+	_xray.set_shader_parameter("center_world", here + Vector3(0, 0.85, 0))
 	# Girar el modelo hacia donde mira (el modelo mira hacia +Z)
 	var target := atan2(motor.facing.x, motor.facing.z)
 	visual.rotation.y = lerp_angle(visual.rotation.y, target, 1.0 - exp(-data.turn_speed * delta))
@@ -132,7 +137,8 @@ func _process(delta: float) -> void:
 		for mi: MeshInstance3D in model.get_meta("meshes"):
 			mi.material_overlay = _frozen_mat if frozen else _xray
 	# Temblor de aviso antes de cada congelación de la parálisis
-	visual.position = Vector3(randf_range(-0.04, 0.04), 0, randf_range(-0.04, 0.04)) if sanity_state.is_trembling() else Vector3.ZERO
+	var shake := Vector3(randf_range(-0.04, 0.04), 0, randf_range(-0.04, 0.04)) if sanity_state.is_trembling() else Vector3.ZERO
+	visual.global_position = here + shake
 	# Parpadeo durante la invulnerabilidad tras un golpe
 	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
 	_animate(delta)

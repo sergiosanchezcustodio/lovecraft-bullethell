@@ -56,10 +56,25 @@ Léela al empezar cada sesión:
   - Estructura de menús, tienda con progresión permanente y compañeros al estilo de Extremadura Survivors (D-09, D-20; GDD 8.1).
   - Portada animada en Godot (D-21; GDD 7.1).
   - Orden: cerrar la fase 1 con tu partida, después el cooperativo (fase 2) y luego la fase 5.
-- **Pantalla de título (adelantada de la fase 5): hecha, pendiente de tu revisión.**
+- **Pantalla de título (adelantada de la fase 5): segunda versión, pendiente de tu revisión.**
   - Es tu ilustración de la biblioteca, animada en 2D, con tu imagen del título encima.
-  - Se abre con `godot --path .` sin argumentos o con `-- title`; hay vídeo en `shots/portada_2d.mp4`.
+  - Se abre con `godot --path .` sin argumentos o con `-- title`; hay vídeo con música en `shots/portada_2d_v3.mp4`.
+  - Cambios de la primera revisión (26-09-2026):
+    - Velas y farolillos separados. En las velas solo baila la llama, anclada en la mecha; los farolillos no se mueven, solo respiran su cristal y su halo.
+    - Niebla del suelo rehecha: bancos grandes y suaves en perspectiva, sin grano.
+    - Sin nubes en el ventanal.
+    - Entrada del título desde una niebla con su silueta que se deshace a jirones.
+    - Ceniza que cae por toda la sala.
+  - Segunda revisión: niebla del suelo con movimiento bien visible (antes variaba un 1,8 % y no se percibía; ahora, un 20 %) y ceniza en tres tamaños y más abundante.
   - La portada 3D anterior (montañas y título voxel) se quitó; queda en el historial de git (commit `4809adb`).
+- **Pantalla completa por defecto** (exclusiva, a la resolución del monitor). Las ejecuciones de prueba (`shots=`, `perf=`, `bot=`, visor, banco de pruebas y `--write-movie`) van en ventana; `window=true` y `fullscreen=true` lo fuerzan. La interfaz escala desde 1920×1080 (`stretch` en modo `canvas_items`). A 4K con 150 enemigos y 1.400 balas: 130 FPS de media.
+- **Menú de depuración:** en la pausa, botón "Depuración". Permite cambiar:
+  - Personaje, esquive, invulnerabilidad y velocidad al andar; vida, cordura y subida de nivel.
+  - Nivel de cada arma (o quitarla) y de cada pasiva.
+  - Enemigos en pantalla (los del nivel, 10, 50, 100 o 300), tipo, pausa de oleadas, matar a todos y lanzar el evento final.
+  - Velocidad del juego, altura de la cámara, información en pantalla y música.
+  - Los ajustes se conservan al reiniciar hasta "Restablecer todo".
+- **Música:** en `resources/Music/`. La intro suena en la portada y `Musica_nivel1.mp3` en el nivel 1; los niveles sin música propia usan esa (`LevelData.music`).
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
 ## Decisiones cerradas
@@ -117,6 +132,7 @@ godot --path . -- anim <yaw> <modelo> <animación>  # fotogramas en shots/<model
 godot --path . -- still 0 lineup                  # los cuatro profundos juntos
 godot --path . -- still 0 dyer,pinguino,fragmento,acechador   # cualquier grupo, separado por comas
 godot --path . -- still 0 lineup fog_density=0.03 moon.light_energy=0.6 tag=prueba   # ajustes de entorno y luces al vuelo
+python tools/gen_mascaras_portada.py              # máscaras de la portada y niebla del título
 godot --headless --path . -s addons/gut/gut_cmdln.gd                                 # tests (GUT 9.4.0, configuración en .gutconfig.json)
 godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count=150 model=acechador   # rendimiento (docs/RENDIMIENTO.md)
 ```
@@ -146,6 +162,9 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `autorestart=N`: en la pantalla final, reintenta sola tras N s.
   - `log=true`: cada 30 s de juego imprime vivos, abatidos, nivel, vida, cordura y balas.
   - `prof=true` (junto con `perf=`): reparto del tiempo de CPU por sistema (`Prof`).
+  - `mute=true`: sin música (también en la portada).
+  - `window=true` / `fullscreen=true`: fuerza ventana o pantalla completa.
+  - `debug_menu=N`: abre la pausa y el menú de depuración a los N s (capturas).
 - **Encadenar comandos:** un `godot ... | grep error` devuelve 1 cuando no hay errores, así que no lo encadenes con `&&`.
 
 Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobrescribiría el detallado. Ejecuta `gen_acechador.py` después, o renombra la salida.
@@ -154,21 +173,24 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 
 Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_definitivo.png` (en realidad a 4K, con mipmaps activados en su `.import`) y `Texto_titulo.png`. `fondo_con_titulo_completo.png` es solo la referencia de composición.
 
-- **Máscaras** (`tools/gen_mascaras_portada.py`, a 1920×1080; revisión en `shots/mascaras_revision.png`):
-  - `mascara_luces.png`: R, núcleo de cada llama (207 detectadas; los reflejos del suelo, a media intensidad); G, fase propia de cada llama, extendida a la zona que ilumina; B, luz proyectada.
-  - `mascara_zonas.png`: R, cielo con nubes (sin la tracería ni Cthulhu); G, niebla del suelo; B, cristal del ventanal.
-  - **Si cambia la ilustración, vuelve a ejecutar el script.** Las posiciones de la luna y los ojos están en la configuración.
+- **Máscaras** (`tools/gen_mascaras_portada.py`: analiza la ilustración en 4K y escribe a 1920×1080; revisión en `shots/mascaras_revision.png`):
+  - `mascara_velas.png`: R, llama de cada vela, cortada en el cuello de la mecha (sin cera); G, fase propia de cada vela, extendida a la zona que ilumina; B, cuánto baila cada punto (0 en la base, 1 en la punta, escalado por el tamaño de la llama; las lejanas y los reflejos no bailan).
+  - `mascara_luces.png`: R, cristal de los farolillos; G, su halo; B, luz proyectada por las velas.
+  - `mascara_zonas.png`: R, cielo claro del ventanal; G, niebla del suelo; B, cristal del ventanal.
+  - `Texto_titulo_niebla.png`: el alfa del título difuminado, con el margen `TITLE_PAD` (0,14, el mismo que en `title_screen.gd`).
+  - Los farolillos son una lista de posiciones revisada a mano (`LANTERNS` en el script).
+  - **Si cambia la ilustración, vuelve a ejecutar el script y revisa esa lista.** Las posiciones de la luna y los ojos están en la configuración.
 - **Capas** (todas en un "escenario" de 1920×1080 que cubre la pantalla conservando la proporción):
-  - `background.gdshader`: velas que parpadean con fase propia, bailoteo de la llama y luz proyectada que oscila con ella.
-  - `floor_fog.gdshader`: jirones de niebla.
-  - `window_sky.gdshader`: nubes, halo de la luna, relámpago y ojos.
-  - Motas de polvo con `GPUParticles2D`.
-  - El título (`title_halo.gdshader`, con halo de niebla y entrada en dos tiempos) y el aviso van fuera del escenario, así que el acercamiento no les afecta.
-- **Configuración por efecto** (`data/title/portada.tres`, `TitleScreenConfig`): cada efecto tiene su interruptor y sus parámetros. Son velas, niebla, nubes, luna, relámpago, ojos, acercamiento, motas, título, halo y aviso.
-  - Para compararlos sin tocar la configuración: `godot --path . -- title off=niebla,motas`.
+  - `background.gdshader`: velas que parpadean con fase propia, llama que baila desde la mecha y luz proyectada que oscila con ella; farolillos que respiran despacio (cristal y halo).
+  - `floor_fog.gdshader`: bancos de niebla suaves que aclaran y oscurecen la niebla pintada (mezcla premultiplicada).
+  - `window_sky.gdshader`: halo de la luna, relámpago y ojos.
+  - Ceniza con tres `GPUParticles2D`: copos lejanos pequeños, medianos y unos pocos cercanos, grandes y desenfocados.
+  - El título (`title_halo.gdshader`: niebla con su silueta, letras que se condensan, niebla que se deshace y halo fino) y el aviso van fuera del escenario, así que el acercamiento no les afecta.
+- **Configuración por efecto** (`data/title/portada.tres`, `TitleScreenConfig`): cada efecto tiene su interruptor y sus parámetros. Son velas, farolillos, niebla, luna, relámpago, ojos, acercamiento, ceniza, título, halo, niebla del título, aviso y música.
+  - Para compararlos sin tocar la configuración: `godot --path . -- title off=niebla,ceniza`. Nombres: velas, farolillos, niebla, luna, relampago, ojos, acercamiento, ceniza, titulo, halo, niebla_titulo, aviso y musica.
   - Otras opciones: `shots=`, `tag=`, `t=` (empezar en ese segundo), `strike=` (relámpago), `eyes=` (brillo de ojos) y `perf=`.
 - **Controles:** Intro, Espacio, A o Start saltan la presentación. Con el aviso visible, entran en la partida hasta que existan los menús.
-- **Variación medida** (desviación típica en % del brillo): llamas 6,4 %, paredes iluminadas 4,4 %, cielo 2,3 %, niebla 1-2 % y resto por debajo del 1 %. Sutil a propósito. Coste: menos de 1 ms por fotograma.
+- **Variación medida** (desviación típica en % del brillo): llamas 6,4 %, paredes iluminadas 4,4 %, cielo 2,3 %, niebla del suelo 20 % y resto por debajo del 1 %. Sutil a propósito. Coste: 0,42 ms por fotograma.
 
 ## Arquitectura del juego
 
@@ -179,11 +201,13 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
 - **Interpolación de física** (activada en `project.godot`): la física va a 60 Hz y el dibujo, a la frecuencia del monitor. Reglas:
   - Lo que se mueve en `_physics_process` (jugador, enemigos, dinamita) se interpola solo.
   - Lo que se mueve o se anima en `_process` lleva `physics_interpolation_mode = OFF`. Es el caso de los nodos `Visual` del jugador y de los enemigos, de la cámara, de los muñecos de práctica y del `SubViewport` del retrato.
+  - **Un nodo sin interpolación dentro de un cuerpo que se mueve en la física se dibuja en la posición del último paso de física, no en la interpolada.** Por eso el `Visual` del jugador y de los enemigos va con `top_level = true` y en cada `_process` se coloca en `get_global_transform_interpolated()`. Dentro del cuerpo, el modelo avanzaba a saltos de 3 px adelante y atrás a 120 Hz: una vibración que no sale en las capturas.
   - La cámara sigue `get_global_transform_interpolated()`.
   - Balas y gemas (MultiMesh) interpolan a mano entre la posición anterior y la actual con `Engine.get_physics_interpolation_fraction()`.
   - Al aparecer, `reset_physics_interpolation()`.
   - **Todo lo visual debe avanzar con el reloj de fotograma, no con contadores de física:** el esquive usaba `motor.dodge_time` y la pose avanzaba a saltos.
-  - Métrica de suavidad: `jitter=true` con `bot=right` o `bot=up`. Sin interpolación daba 1,00; con ella, 0,03.
+  - Métrica de suavidad: `jitter=true` con `bot=right` o `bot=up`. Sin interpolación daba 1,00; con ella, 0,03. **Ojo: mide la posición interpolada del cuerpo, no lo que se dibuja**, y por eso no detectó la vibración del modelo.
+  - Para medir lo que ve el ojo: graba a la frecuencia del monitor (`--write-movie ... --fixed-fps 120 -- bot=right god=true nolevel=true mute=true`) y sigue un color del modelo fotograma a fotograma. Si el desplazamiento alterna de signo (+3, −3…), algo se dibuja a saltos.
 - **Animación del jugador:** capas. Una base (reposo, andar o esquive) con fundido de 0,06 a 0,22 s al cambiar (`Anims.snapshot` y `blend_from`), y encima el gesto de lanzar solo en brazos y torso (`Anims.overlay`). La cadencia de andar es proporcional a la velocidad real, para que los pies no patinen. El esquive (su animación sale del `DodgeStyle` del personaje: `slide`, `roll`, `dive`, `jump` o `flash`) es una acción que dura lo que su animación, que puede ser más que el impulso: la voltereta termina de rodar ya a velocidad de andar. El impulso frena progresivamente hasta la velocidad de andar. Para comprobar la fluidez se comparan posiciones reales de puntos del cuerpo, no ángulos, que en una voltereta pasan de +180° a −180°. `tests/test_player_anim.gd` comprueba que ninguna parte salte entre fotogramas.
 - **Jugador** (`scripts/player/`):
   - `CharacterData` (`.tres` en `data/characters/`) guarda el perfil del personaje.
@@ -215,6 +239,11 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - Las mejoras pasivas son `UpgradeData` (`data/upgrades/`) y cambian una estadística de la copia del `CharacterData` de cada jugador (`Player.setup` la duplica).
   - `GemManager` gestiona las gemas con arrays y un MultiMesh, como las balas.
 - **Cordura** (`SanityState`): recuperación pasiva lejos de enemigos y sin daño mental reciente; crisis a cero; parálisis intermitente que bloquea el `PlayerMotor`; al terminar, recupera el 30 %.
+- **Música** (`Music`, autoload en `scripts/core/music.gd`): sobrevive a los cambios de escena, funde una pista con la siguiente y no corta la que ya suena si se vuelve a pedir (al reiniciar). `mute=true` la silencia; úsalo en bots y capturas.
+- **Depuración** (`DebugOptions` en `scripts/core/debug_options.gd`, `DebugMenu` en `scripts/ui/debug_menu.gd`): los ajustes van en una variable estática, así que sobreviven a `reload_current_scene`; `game.gd` los aplica al montar la partida (`DebugOptions.apply_all`).
+  - Las pasivas se rehacen desde el personaje original (`rebuild_stats`), así que también se pueden bajar.
+  - El director tiene `target_alive`, `spawning_paused`, `pool_override` y `trigger_final()`.
+  - Las listas (personajes, esquives, armas, enemigos) se leen de sus carpetas en `data/`: lo nuevo aparece solo.
 - **Interfaz** (`scripts/ui/`):
   - `UiKit`: estilo común y barras con estela.
   - `Hud`: panel del J1 y cabecera. El retrato sale de un `SubViewport` que renderiza la cabeza del modelo.
@@ -293,6 +322,21 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
 - **Tests y datos de equilibrio:** los tests no deben comprobar valores que se retocan al equilibrar (ritmos, experiencia, vida). Cuando haga falta, que construyan sus propios datos. Si un test falla tras un ajuste de equilibrio, el que está mal es el test.
 - **Controles de los menús:** el `ui_accept` de Godot no trae ningún botón del mando y sí trae Espacio, que es la tecla de esquivar. `UiInput.configure()` añade A (aceptar) y B (volver) y quita Espacio. El menú de mejoras ignora las pulsaciones durante su primer medio segundo.
 - **Élites ahogadas en la horda:** las armas apuntan al más cercano o a la zona más densa, así que una élite rodeada de la oleada casi no recibe disparos. `LevelData.final_spawn_scale` (0,3) reduce las apariciones durante el evento final.
+- **Turbulencia en `ParticleProcessMaterial`:** arrastra la velocidad de cada partícula hacia la del campo de ruido en cada paso. Con influencias normales (0,05-0,1), las partículas lentas se quedan paradas donde nacen; por eso no se veían las motas de la primera portada. Para caídas lentas, influencia de 0,002-0,006.
+- **`preprocess` en partículas de vida larga:** no llegaba a repartir la ceniza por la pantalla. Es más fiable emitir en una caja que cubra toda la zona, con fundido de entrada y salida en la rampa de color.
+- **Niebla en shader:** el ruido de valores con umbrales (`smoothstep` estrecho) da grano y formas en cuadrícula que se ven artificiales. Funciona mejor:
+  - Ruido de gradiente con octavas giradas, y pocas octavas.
+  - Formas grandes y alargadas, con perspectiva.
+  - Modular la niebla pintada (aclararla y oscurecerla) en vez de añadir otra capa encima.
+- **Llamas animadas sobre una ilustración:** la cera junto a la llama también es clara y cálida.
+  - La llama se separa cortando cada mancha por el cuello de la mecha: donde la anchura se estrecha o salta al borde de la vela.
+  - El desplazamiento crece de 0 en la base a 1 en la punta, con margen a los lados y por encima, pero nunca por debajo.
+- **Aviso de recursos sin liberar con música:** al forzar la salida con `--quit-after` con música sonando, a veces sale `1 resources still in use at exit`. Es intermitente y no aparece con `mute=true`.
+- **Sutil no es invisible:** una variación del 1,8 % de brillo no se percibe en movimiento. Para que una animación de ambiente se note hace falta del orden del 10-20 % en su zona.
+- **Movimientos lentos de un `Control`:** Godot redondea su posición a píxeles enteros (`gui/common/snap_controls_to_pixels`), así que un zoom o un desplazamiento lento avanza a saltos y parece que la imagen vibra; en la portada eran saltos de 2 px a 4K. Anímalos en un `Node2D` padre, que no se redondea. Para comprobarlo, mide el desplazamiento entre fotogramas con correlación de fase.
+- **Grabar en pantalla completa exclusiva:** si la ventana pierde el foco, Godot deja de dibujar y `--write-movie` repite el último fotograma. Graba en ventana.
+- **Pantalla completa en Windows:** `WINDOW_MODE_FULLSCREEN` deja la ventana 1-2 píxeles más pequeña que el monitor; usa `WINDOW_MODE_EXCLUSIVE_FULLSCREEN`.
+- **Grabar vídeo en pantalla completa:** con `--write-movie` a 4K cada fotograma tarda 2,5 s. `Engine.get_write_movie_path()` sirve para detectar la grabación y quedarse en ventana. Buscar `--write-movie` en `OS.get_cmdline_args()` no funciona.
 - **`cat` sin entrada:** un `cat > fichero` sin heredoc se queda esperando la entrada estándar para siempre.
 
 ## Por definir

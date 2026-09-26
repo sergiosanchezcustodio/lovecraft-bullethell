@@ -19,6 +19,10 @@ var spawned_total := 0
 var killed_total := 0
 var rng := RandomNumberGenerator.new()
 var max_alive_override := -1
+## Depuración (menú de pausa > Depuración):
+var target_alive := -1                     ## > 0: mantiene exactamente tantos enemigos vivos
+var spawning_paused := false               ## no aparece nadie (el evento final tampoco)
+var pool_override: Array[EnemyData] = []   ## no vacío: solo aparecen estos, con el mismo peso
 var _acc := 0.0
 var _final: Enemy
 var _final_done := false
@@ -35,6 +39,10 @@ func max_alive() -> int:
 func _physics_process(delta: float) -> void:
 	if completed: return
 	time += delta
+	if spawning_paused: return
+	if target_alive > 0:
+		_keep_alive(delta)
+		return
 	if not _final_done and level.final_enemy != null and time >= level.final_time:
 		_final_done = true
 		_final = spawn(level.final_enemy, spawn_point(level.final_enemy.body_radius))
@@ -53,8 +61,28 @@ func _physics_process(delta: float) -> void:
 		if d == null: break
 		spawn(d, spawn_point(d.body_radius))
 
+## Depuración: repone enemigos deprisa hasta tener `target_alive` vivos.
+func _keep_alive(delta: float) -> void:
+	_acc += maxf(target_alive / 2.0, 15.0) * delta
+	while _acc >= 1.0 and alive.size() < target_alive:
+		_acc -= 1.0
+		var d := pick()
+		if d == null: break
+		spawn(d, spawn_point(d.body_radius))
+	_acc = minf(_acc, 1.0)
+
+## Lanza ya el evento final (depuración).
+func trigger_final() -> void:
+	if _final_done or level.final_enemy == null: return
+	time = maxf(time, level.final_time)
+	_final_done = true
+	_final = spawn(level.final_enemy, spawn_point(level.final_enemy.body_radius))
+	final_event.emit(_final)
+
 ## Elige un enemigo del grupo por peso, respetando el tope de élites.
 func pick() -> EnemyData:
+	if not pool_override.is_empty():
+		return pool_override[rng.randi_range(0, pool_override.size() - 1)]
 	var elites := alive.filter(func(e: Enemy) -> bool: return e.data.tier >= 4).size()
 	var total := 0.0
 	var cands: Array[EnemyData] = []

@@ -25,6 +25,8 @@ extends Node3D
 ##   xp=40                   experiencia inicial (probar el menú de mejoras)
 ##   hp=10 san=5             vida y cordura iniciales (probar la muerte y la crisis)
 ##   autorestart=2           en la pantalla final, reintenta sola tras N s (probar el reinicio)
+##   mute=true               sin música (también en la portada)
+##   debug_menu=1            abre la pausa y el menú de depuración a ese segundo (capturas)
 
 const PLAYER_COLORS: Array[Color] = [Color(1.0, 0.82, 0.3), Color(0.35, 0.75, 1.0), Color(0.55, 1.0, 0.45), Color(1.0, 0.45, 0.8)]
 
@@ -42,6 +44,8 @@ var kills := 0
 var _menu_open := false
 var _ended := false
 var _pause: Menus.PauseMenu
+var _debug: DebugMenu
+var _info: Label                               ## depuración: FPS, enemigos, balas
 var _rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
@@ -74,7 +78,8 @@ func _ready() -> void:
 	gems.world = world
 	gems.rules = load("res://data/progression/default.tres")
 	world.add_child(gems)
-	player = Player.new().setup(load("res://data/characters/dyer.tres"), _make_input(), PLAYER_COLORS[0])
+	var character := String(DebugOptions.get_value("character", "dyer"))
+	player = Player.new().setup(load("res://data/characters/%s.tres" % character), _make_input(), PLAYER_COLORS[0])
 	player.position = arena.get_meta("spawn")
 	var p := args.get_floats("pos")
 	if p.size() == 2: player.position = Vector3(p[0], 0, p[1])
@@ -127,6 +132,7 @@ func _ready() -> void:
 		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
 		add_child(director)
 		announce(level.display_name, 3.0)
+		Music.play(level.music_path())
 	Engine.time_scale = args.get_float("timescale", 1.0)
 	hud = Hud.new().setup(player, director)
 	add_child(hud)
@@ -146,9 +152,14 @@ func _ready() -> void:
 			gems.drop(player.position + Vector3(cos(a), 0, sin(a)) * 1.3, 1.0 + i * 3.0)
 	if args.has("hp"): player.health = args.get_float("hp")
 	if args.has("san"): player.sanity = args.get_float("san")
+	DebugOptions.apply_all(self)
 	if args.get_int("demo") > 0: _demo_crowd(args.get_int("demo"))
 	if args.get_int("dummies") > 0: _dummies(args.get_int("dummies"))
 	if args.get_bool("emitters"): _emitters()
+	if args.has("debug_menu"):                     # abre la pausa y la depuración (capturas)
+		get_tree().create_timer(args.get_float("debug_menu", 1.0)).timeout.connect(func() -> void:
+			toggle_pause()
+			_open_debug())
 	if args.has("shots"):
 		var tag := ("_" + args.get_str("tag")) if args.has("tag") else ""
 		add_child(ShotTaker.new(args.get_floats("shots"), "res://shots/game%s" % tag))
@@ -161,7 +172,7 @@ func _on_enemy_died(e: Enemy) -> void:
 ## Subida de nivel: pausa y elige una de tres mejoras (D-16). Si hay varias subidas
 ## pendientes, se encadenan.
 func _open_level_up() -> void:
-	if _menu_open or _ended or player.progress.pending <= 0: return
+	if _menu_open or _ended or _pause != null or player.progress.pending <= 0: return
 	var options := player.progress.roll_options(player.weapons, _rng)
 	if options.is_empty():
 		player.progress.pending = 0
@@ -183,17 +194,37 @@ func _open_level_up() -> void:
 
 func toggle_pause() -> void:
 	if _menu_open or _ended: return
+	if _debug != null: return                     # el menú de depuración atiende Esc y Start
 	if _pause != null:
 		_pause.queue_free()
 		_pause = null
 		get_tree().paused = false
+		if DebugOptions.values.has("time_scale"): Engine.time_scale = DebugOptions.values["time_scale"]
+		_open_level_up.call_deferred()             # subidas pendientes (p. ej. de la depuración)
 		return
 	_pause = Menus.PauseMenu.new()
 	_pause.resume.connect(toggle_pause)
 	_pause.restart.connect(_restart)
+	_pause.debug.connect(_open_debug)
 	_pause.quit.connect(func() -> void: get_tree().quit())
 	add_child(_pause)
 	get_tree().paused = true
+
+## Menú de depuración, encima de la pausa (que se oculta mientras tanto).
+func _open_debug() -> void:
+	if _debug != null: return
+	_debug = DebugMenu.new(self)
+	_pause.visible = false
+	_debug.back.connect(func() -> void:
+		_debug.queue_free()
+		_debug = null
+		_pause.show_again())
+	_debug.close.connect(func() -> void:
+		_debug.queue_free()
+		_debug = null
+		toggle_pause())
+	_debug.restart.connect(_restart)
+	add_child(_debug)
 
 func _summary() -> PackedStringArray:
 	var t := int(director.time) if director != null else 0
@@ -316,10 +347,36 @@ func _process(delta: float) -> void:
 	if args.has("perf"): _perf(delta)
 	if args.get_bool("jitter"): _jitter(delta)
 	if args.get_int("bullet_rain") > 0: _bullet_rain(args.get_int("bullet_rain"))
+	_update_info()
 	for i in _demo.size():
 		var kind := _demo_names[i]
 		var anim := "idle" if kind == "acechador" else "walk"
 		Anims.pose(kind, anim, _demo[i], fposmod(_t / Anims.duration(kind, anim) + float(_demo[i].get_meta("phase")), 1.0))
+
+## Depuración: FPS, enemigos vivos, balas y tiempo, arriba a la derecha.
+func _update_info() -> void:
+	var on: bool = DebugOptions.get_value("info", false)
+	if not on:
+		if _info: _info.visible = false
+		return
+	if _info == null:
+		var layer := CanvasLayer.new()
+		layer.layer = 15
+		add_child(layer)
+		_info = UiKit.label("", 16, UiKit.XP)
+		_info.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+		_info.offset_left = -330
+		_info.offset_right = -16
+		_info.offset_top = 110
+		_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		layer.add_child(_info)
+	_info.visible = true
+	_info.text = "%d FPS
+enemigos %d
+balas %d
+velocidad x%s
+t %.0f s" % [Engine.get_frames_per_second(),
+		world.enemies.size(), world.bullets.count, String.num(Engine.time_scale, 2), director.time if director else _t]
 
 var _frames: Array[float] = []
 var _phys_ms := 0.0

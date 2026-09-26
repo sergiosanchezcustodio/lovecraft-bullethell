@@ -1,15 +1,23 @@
-// Fondo de la portada: la ilustración con las velas vivas.
-// Cada llama parpadea con su propia fase (mascara_luces.G) y su luz proyectada
-// (mascara_luces.B) oscila con ella. La forma de la llama baila un poco (desplazamiento
-// del muestreo solo donde hay llama, mascara_luces.R).
+// Fondo de la portada: la ilustración con las velas vivas y los farolillos que respiran.
+// - Velas (mascara_velas): cada llama parpadea con su propia fase (G) y su luz proyectada
+//   (mascara_luces.B) oscila con ella. Solo la llama baila (B): nada en la base, más en la
+//   punta, así que la mecha y la cera no se mueven.
+// - Farolillos (mascara_luces R y G): no se mueven; su cristal y su halo respiran despacio.
 shader_type canvas_item;
 
+uniform sampler2D velas : filter_linear;
 uniform sampler2D luces : filter_linear;
+uniform vec2 design = vec2(1920.0, 1080.0);
 uniform bool candles_enabled = true;
 uniform float flicker_strength = 0.22;
 uniform float flicker_speed = 1.0;
-uniform float flame_wobble = 0.0009;
+uniform float flame_sway = 2.5;              // px (a 1080p) que se desplaza la punta de la llama mayor
 uniform float spill_strength = 0.045;
+uniform bool lanterns_enabled = true;
+uniform float lantern_breath = 0.06;         // variación de brillo del cristal (±)
+uniform float lantern_halo = 0.10;           // intensidad del halo
+uniform float lantern_period = 5.0;          // s de una respiración
+uniform vec3 lantern_color : source_color = vec3(1.0, 0.62, 0.28);
 
 // Parpadeo de vela en [-1, 1]: casi estable, con oscilaciones rápidas pequeñas y, de vez
 // en cuando, una bajada breve.
@@ -20,18 +28,28 @@ float flicker(float ph, float t) {
 }
 
 void fragment() {
-	vec4 m = texture(luces, UV);
+	vec4 v = texture(velas, UV);
+	vec4 l = texture(luces, UV);
 	vec2 uv = UV;
 	float t = TIME * flicker_speed;
-	if (candles_enabled) {
-		float near_flame = smoothstep(0.02, 0.35, m.r);
-		vec2 off = vec2(sin(t * 9.0 + m.g * 50.0), 0.6 + 0.4 * sin(t * 6.3 + m.g * 31.0)) * flame_wobble * near_flame;
-		uv -= off * vec2(1.0, 1.8);                                         // la llama se estira hacia arriba
+	float ph = v.g * 255.0 / 7.0;
+	if (candles_enabled && v.b > 0.001) {
+		// vaivén lento de la punta y estirones hacia arriba
+		float sx = sin(t * 2.1 + ph) * 0.55 + sin(t * 5.3 + ph * 2.7) * 0.3 + sin(t * 11.7 + ph * 5.1) * 0.15;
+		float sy = 0.5 + 0.5 * (sin(t * 3.7 + ph * 1.9) * 0.6 + sin(t * 8.9 + ph * 3.3) * 0.4);
+		uv += vec2(-sx, sy * 0.8) * v.b * flame_sway / design;
 	}
 	vec4 c = texture(TEXTURE, uv);
 	if (candles_enabled) {
-		float f = flicker(m.g, t);
-		c.rgb *= 1.0 + f * (flicker_strength * m.r + spill_strength * m.b);
+		float f = flicker(v.g, t);
+		c.rgb *= 1.0 + f * (flicker_strength * v.r + spill_strength * l.b);
+	}
+	if (lanterns_enabled) {
+		// fase suave según la posición: cada farolillo respira a su ritmo, sin saltos en el halo
+		float lp = sin(TIME * 6.2832 / lantern_period + UV.x * 23.0 + UV.y * 11.0);
+		float slow = 0.5 + 0.5 * lp;
+		c.rgb *= 1.0 + lantern_breath * lp * l.r;
+		c.rgb += lantern_color * l.g * l.g * lantern_halo * mix(0.55, 1.0, slow);
 	}
 	COLOR = c;
 }

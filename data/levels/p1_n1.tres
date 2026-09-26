@@ -14,6 +14,7 @@ part = 1
 number = 1
 arena = "res://data/arenas/campamento.json"
 duration = 300.0
+music = "res://resources/Music/Musica_nivel1.mp3"
 pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3")])
 spawn_rate = Array[Vector2]([Vector2(0, 0.3), Vector2(45, 0.5), Vector2(90, 0.8), Vector2(150, 1.3), Vector2(210, 1.8), Vector2(300, 2.3)])
 max_alive = 70

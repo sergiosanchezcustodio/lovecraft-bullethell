@@ -30,6 +30,11 @@ func add_weapon(data: WeaponData) -> Weapon:
 	weapons.append(w)
 	return w
 
+func remove_weapon(id: StringName) -> void:
+	for w in weapons.duplicate():
+		if w.data.id == id: weapons.erase(w)
+	_pending = _pending.filter(func(p: Dictionary) -> bool: return (p.w as Weapon).data.id != id)
+
 func get_weapon(id: StringName) -> Weapon:
 	for w in weapons:
 		if w.data.id == id: return w

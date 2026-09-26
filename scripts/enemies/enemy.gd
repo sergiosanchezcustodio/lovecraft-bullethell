@@ -40,7 +40,10 @@ func setup(p_data: EnemyData, p_world: CombatWorld, p_obstacles: ObstacleMap) ->
 
 func _ready() -> void:
 	visual = Node3D.new()
-	visual.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # se anima en _process
+	# Se anima en _process (sin interpolación) y va suelto: en cada fotograma se coloca en la
+	# posición interpolada del cuerpo (dentro de él se dibujaría a saltos; ver Player).
+	visual.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	visual.top_level = true
 	add_child(visual)
 	model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
 	visual.add_child(model)
@@ -130,6 +133,7 @@ func _physics_process(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	var t0 := Prof.start()
+	visual.global_position = get_global_transform_interpolated().origin
 	visual.rotation.y = atan2(facing.x, facing.z)
 	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0)       # aparece creciendo
 	if not anim_hold:
