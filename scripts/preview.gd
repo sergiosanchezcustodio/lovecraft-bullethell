@@ -4,7 +4,7 @@ extends Node3D
 ##   godot --path . -- anim <yaw> <modelos> <animación> [opciones]
 ## <modelos>: un nombre de models/, "lineup" (los cuatro profundos) o varios separados por comas.
 ## Opciones clave=valor: propiedades del Environment (fog_density=0.03), de las luces
-## (moon.light_energy=0.6, lamp.*, rim.*), de la cámara (cam.size=4), tag=sufijo,
+## (moon.light_energy=0.6, lamp.*, rim.*), de la cámara (cam.size=4), size=2400x1100, tag=sufijo,
 ## frames=N (fotogramas de animación) y floor=false.
 
 const LINEUP: Array[String] = ["clasico", "bruto", "acechador", "abisal"]
@@ -21,8 +21,10 @@ var frame := 0
 var tag := ""
 
 func _ready() -> void:
-	get_window().size = Vector2i(1000, 1000)   # las capturas del visor son cuadradas; el juego va a 1920x1080
 	var la := LaunchArgs.from_cmdline()
+	# las capturas del visor son cuadradas (el juego va a 1920x1080); size=2400x1100 para otras
+	var sz := la.get_str("size", "1000x1000").split("x")
+	get_window().size = Vector2i(int(sz[0]), int(sz[1]))
 	var pos := la.positional
 	if pos.size() > 0: mode = pos[0]
 	if pos.size() > 1: yaw = float(pos[1])
