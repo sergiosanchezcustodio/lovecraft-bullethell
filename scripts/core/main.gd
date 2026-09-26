@@ -5,6 +5,7 @@ extends Node
 ##   godot --path . -- still|anim ...        -> visor de modelos (scenes/preview.tscn)
 ##   godot --path . -- bench ...             -> prueba de rendimiento (scenes/bench.tscn)
 ##   godot --path . -- title ...             -> portada (scenes/title.tscn)
+##   godot --path . -- select ...            -> selección de personaje (scenes/select.tscn)
 ## La ventana sigue la configuración (Settings: pantalla completa por defecto). Las ejecuciones
 ## de prueba (capturas, rendimiento, bots, visor, grabación de vídeo) van en ventana.
 ## `window=true` fuerza la ventana y `fullscreen=true`, la pantalla completa. La interfaz escala
@@ -20,6 +21,7 @@ func _ready() -> void:
 		"still", "anim": scene = "res://scenes/preview.tscn"
 		"bench": scene = "res://scenes/bench.tscn"
 		"title": scene = "res://scenes/title.tscn"
+		"select": scene = "res://scenes/select.tscn"
 	get_tree().change_scene_to_file.call_deferred(scene)
 
 func _window_mode(la: LaunchArgs, first: String) -> void:

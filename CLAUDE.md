@@ -26,7 +26,13 @@ Léela al empezar cada sesión:
       - Controles: reasignar teclado y mando, con intercambio si la tecla estaba ocupada.
       - Juego: distorsiones, vibración y contador de FPS.
     - En la partida, "Salir" pasa a ser "Menú principal": guarda y vuelve al menú.
-  - Siguiente: hito 2.3, selección de personaje y mapa de niveles.
+  - **Hito 2.3 (selección de personaje y mapa de niveles): hecho.**
+    - "Jugar en local" abre la selección: cuatro marcos, uno por jugador, con el personaje en 3D, su arma, su rasgo y sus estadísticas.
+    - El J1 entra con el dispositivo que usó en los menús; los demás se unen con Start (el teclado, con Intro).
+    - Cada uno maneja su marco con su propio mando: personaje, compañero debajo del marco y "¡Listo!". Un personaje confirmado no lo puede coger otro ("Lo lleva J1"). B deshace un paso y, desde el primero, deja el puesto libre.
+    - Con todos listos, el mapa de los 15 niveles: solo el 1 abierto, el siguiente se abre al superar el anterior y los que aún no existen salen como "Próximamente".
+    - La partida usa el dispositivo, el personaje y el nivel del J1. Los demás jugadores entran en la partida en el hito 2.5.
+  - Siguiente: hito 2.4 ⏸, personajes nuevos (Olmstead, Legrasse y Johansen).
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
@@ -132,7 +138,8 @@ Entorno de desarrollo (Windows 11 + Git Bash):
 Uso desde la raíz del proyecto, en Git Bash:
 ```
 ./jugar.cmd                         # o doble clic en jugar.cmd: partida sin consola
-godot --path .                      # partida (escena principal: scenes/main.tscn, que elige la escena según el primer argumento)
+godot --path .                      # portada (escena principal: scenes/main.tscn, que elige la escena según el primer argumento)
+godot --path . -- select saves=demo_saves slot=2 join=2   # selección de personaje con dos jugadores de prueba
 godot --path . -- bot=circle dodge_every=2 demo=14 shots=1,3 tag=prueba   # partida con bot, criaturas de muestra y capturas
 godot --path . --write-movie shots/mov/f.png --fixed-fps 30 --quit-after 240 -- bot=circle   # vídeo en fotogramas PNG
 godot --path . --disable-vsync -- bot=circle demo=14 perf=8                 # rendimiento de la partida
@@ -260,6 +267,14 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - Guarda en un fichero temporal y lo renombra, para no dejar una partida a medias si el juego se cierra a mitad.
   - `SaveData` tiene número de versión y `migrate()`: si cambias el formato, sube `VERSION` y añade el paso de migración.
   - La partida guarda al caer, al superar el nivel, al reiniciar y al salir. Sin hueco elegido (arrancando la partida directamente) no se guarda nada.
+- **Dispositivos y sesión:**
+  - `Devices` (autoload en `scripts/input/device_manager.gd`) guarda el último dispositivo usado (`KEYBOARD` = −1, o el número del mando), avisa al conectar o desconectar un mando, crea la entrada de partida de un dispositivo (`make_input`) y define los colores de los jugadores (`COLORS`).
+  - `GameSession` (estático, en `scripts/core/game_session.gd`) lleva de los menús a la partida quién juega (dispositivo, GUID, personaje y compañero) y en qué nivel. Vacía, la partida usa sus opciones de siempre.
+- **Selección de personaje** (`scenes/select.tscn`, `scripts/menus/character_select.gd`):
+  - La lógica está en `SelectState` (sin dibujo, con tests).
+  - La entrada se lee por dispositivo en `_input`, sin el foco de Godot, que es uno para toda la pantalla.
+  - El mapa de niveles es `LevelMap`, sobre `Campaign` (`data/campaign.json`).
+  - Opciones para capturas: `join=N` (jugadores de prueba), `ready=N`, `map=true` y `auto_start=true`.
 - **Configuración** (`Settings`, autoload en `scripts/save/settings.gd`): común a los tres huecos, en `user://settings.json`.
   - Aplica vídeo y audio (crea los buses `Musica` y `Efectos`).
   - `Settings.bindings()` da los controles de fábrica más los reasignados; la partida los usa para el teclado y los mandos.

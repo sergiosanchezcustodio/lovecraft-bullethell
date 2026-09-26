@@ -78,8 +78,12 @@ func _ready() -> void:
 	gems.world = world
 	gems.rules = load("res://data/progression/default.tres")
 	world.add_child(gems)
-	var character := String(DebugOptions.get_value("character", "dyer"))
-	player = Player.new().setup(load("res://data/characters/%s.tres" % character), _make_input(), PLAYER_COLORS[0])
+	# Jugador 1: el de la selección de personaje, o el de siempre si la partida se lanza directa
+	var seat: GameSession.Seat = GameSession.seats[0] if GameSession.is_set() else null
+	var character := String(seat.character) if seat else "dyer"
+	character = String(DebugOptions.get_value("character", character))
+	var input := Devices.make_input(seat.device) if seat and not args.has("bot") else _make_input()
+	player = Player.new().setup(load("res://data/characters/%s.tres" % character), input, PLAYER_COLORS[0])
 	player.position = arena.get_meta("spawn")
 	var p := args.get_floats("pos")
 	if p.size() == 2: player.position = Vector3(p[0], 0, p[1])
@@ -115,7 +119,8 @@ func _ready() -> void:
 	add_child(camera)
 	_make_announcer()
 	if not args.get_bool("nolevel"):
-		level = load("res://data/levels/%s.tres" % args.get_str("level", "p1_n1")).duplicate()
+		var level_id := args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1")
+		level = load("res://data/levels/%s.tres" % level_id).duplicate()
 		if args.has("final_at"): level.final_time = args.get_float("final_at")
 		if args.has("spawn_rate"): level.spawn_rate = [Vector2(0, args.get_float("spawn_rate"))] as Array[Vector2]
 		# Construir ya los modelos de todos los enemigos del nivel: si no, la primera aparición

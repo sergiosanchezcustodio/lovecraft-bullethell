@@ -25,7 +25,7 @@ const TITLE_FOG := "res://resources/PantallasMenus/Texto_titulo_niebla.png"
 const ZONAS := "res://resources/PantallasMenus/mascara_zonas.png"
 const FONT := "res://resources/fonts/IMFeENsc28P.ttf"
 const TITLE_PAD := 0.14             ## margen del título para su niebla (igual que en gen_mascaras_portada.py)
-const NEXT_SCENE := "res://scenes/game.tscn"
+const SELECT_SCENE := "res://scenes/select.tscn"
 
 var cfg: TitleScreenConfig
 var args: LaunchArgs
@@ -394,7 +394,7 @@ func _open_main_menu() -> void:
 		_open_slots())
 	_menu.play_local.connect(func() -> void:
 		_done = true
-		get_tree().change_scene_to_file(NEXT_SCENE))         # selección de personaje: hito 2.3
+		get_tree().change_scene_to_file(SELECT_SCENE))
 
 var _frames: Array[float] = []
 func _perf(delta: float) -> void:

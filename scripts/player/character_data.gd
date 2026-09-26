@@ -5,6 +5,11 @@ extends Resource
 @export var id := &"dyer"
 @export var display_name := "William Dyer"
 @export var model := "dyer"                  ## nombre en models/ (y su juego de animaciones)
+@export_group("Presentación")
+@export var role := "Geólogo de la Universidad de Miskatonic"   ## debajo del nombre, en la selección
+@export_multiline var passive_text := ""     ## su rasgo, en una frase (selección y ficha)
+@export var story := "En las montañas de la locura"               ## relato del que viene
+@export var price := 0                       ## en la tienda; 0 = disponible desde el principio
 @export_group("Recursos")
 @export var max_health := 100.0
 @export var max_sanity := 100.0
