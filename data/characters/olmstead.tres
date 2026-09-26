@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/rodar.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"olmstead"
+display_name = "Robert Olmstead"
+model = "olmstead"
+role = "Viajero y narrador de Innsmouth"
+passive_text = "Esquive más largo y 30 % menos de daño de las criaturas marinas."
+story = "La sombra sobre Innsmouth"
+price = 0
+max_health = 110.0
+max_sanity = 110.0
+move_speed = 4.6
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"revolver"])
+resist_tags = {&"marina": 0.7}
+dodge_length = 1.3

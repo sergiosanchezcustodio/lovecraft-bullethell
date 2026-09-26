@@ -89,6 +89,7 @@ static func rebuild_stats(p: Player) -> void:
 		var style := p.data.dodge_style
 		if style != null and STYLE_STATS.has(stat):
 			v = style.get(STYLE_STATS[stat])      # lo marca el estilo de esquive, no el personaje
+			if stat in ["dodge_duration", "dodge_iframes"]: v *= p.data.dodge_length
 		for up in p.progress.upgrade_pool:
 			if up.stat != stat: continue
 			for i in int(p.progress.passives.get(up.id, 0)): v = v * up.multiply + up.add

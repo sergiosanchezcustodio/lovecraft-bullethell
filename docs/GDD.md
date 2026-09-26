@@ -141,7 +141,7 @@ Todas las acciones se pueden reasignar desde el menú de opciones.
 | Salto | Salto en arco de unos 70 cm con los brazos arriba | 9,5 m/s, 0,42 s | 0,42 s | 1,3 s |
 | Destello | Desaparece, cruza muy rápido con una estela breve y reaparece | 26 m/s, 0,13 s | 0,22 s | 1,1 s |
 
-  - Por decidir qué esquive lleva cada personaje. De momento, Dyer usa el deslizamiento; en partida, F1 recorre los cinco.
+  - Esquive de cada personaje (26-09-2026): Dyer, deslizamiento; Olmstead, voltereta con el impulso un 30 % más largo (su "esquive más largo"); Legrasse, salto; Johansen, plancha. El destello queda para un personaje arcano (Armitage). En partida, F1 recorre los cinco.
   - Principio general: **toda acción del personaje enlaza con fluidez con el movimiento normal**. Los gestos de ataque se suman a la animación de andar, nunca la interrumpen.
 - **Telegrafía:** todo ataque fuerte se anuncia con un aviso visual (marca en el suelo, brillo, animación de carga) proporcional a su daño.
 

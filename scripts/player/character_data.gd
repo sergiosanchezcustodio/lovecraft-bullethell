@@ -10,6 +10,13 @@ extends Resource
 @export_multiline var passive_text := ""     ## su rasgo, en una frase (selección y ficha)
 @export var story := "En las montañas de la locura"               ## relato del que viene
 @export var price := 0                       ## en la tienda; 0 = disponible desde el principio
+@export_group("Rasgos")
+## Daño recibido de enemigos con estas etiquetas (EnemyData.tags): {"marina": 0.7} = 30 % menos.
+@export var resist_tags := {}
+## Daño hecho a enemigos con estas etiquetas: {"humana": 1.25} = 25 % más.
+@export var bonus_tags := {}
+@export var knockback_immune := false        ## Johansen (D-19: aún no hay empuje sobre los jugadores)
+@export var dodge_length := 1.0              ## multiplica la duración del impulso y la invulnerabilidad del esquive
 @export_group("Recursos")
 @export var max_health := 100.0
 @export var max_sanity := 100.0

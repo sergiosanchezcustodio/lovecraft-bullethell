@@ -27,6 +27,10 @@ var _ment := PackedFloat32Array()
 var _team := PackedByteArray()
 var _style := PackedByteArray()
 var _pierce := PackedInt32Array()
+var _push := PackedFloat32Array()            ## empuje del impacto (multiplicador)
+var _bonus := PackedInt32Array()             ## índice en bonus_sets (-1 = sin rasgo)
+## Rasgos de daño de quien dispara (Damage.bonus), registrados una vez por jugador.
+var bonus_sets: Array[Dictionary] = []
 var _last_hit := PackedInt64Array()          ## id del último objetivo tocado (para las que atraviesan);
                                              ## id y no referencia: el objetivo puede liberarse antes que la bala
 
@@ -40,7 +44,7 @@ func _init() -> void:
 	_radius.resize(MAX_BULLETS); _size.resize(MAX_BULLETS); _life.resize(MAX_BULLETS)
 	_age.resize(MAX_BULLETS); _phys.resize(MAX_BULLETS); _ment.resize(MAX_BULLETS)
 	_team.resize(MAX_BULLETS); _style.resize(MAX_BULLETS); _pierce.resize(MAX_BULLETS)
-	_last_hit.resize(MAX_BULLETS)
+	_last_hit.resize(MAX_BULLETS); _push.resize(MAX_BULLETS); _bonus.resize(MAX_BULLETS)
 
 func _ready() -> void:
 	_mm = MultiMesh.new()
@@ -65,7 +69,7 @@ func _ready() -> void:
 
 ## Crea una bala. `pos` se proyecta a la altura de vuelo.
 func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, size: float,
-		damage: Damage, life: float, pierce: int = 0) -> void:
+		damage: Damage, life: float, pierce: int = 0, push: float = 1.0, bonus_set: int = -1) -> void:
 	if count >= MAX_BULLETS: return
 	var i := count
 	_pos[i] = Vector3(pos.x, HEIGHT, pos.z)
@@ -81,7 +85,14 @@ func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, 
 	_style[i] = style
 	_pierce[i] = pierce
 	_last_hit[i] = 0
+	_push[i] = push
+	_bonus[i] = bonus_set
 	count += 1
+
+## Registra los rasgos de daño de un tirador y devuelve su índice para spawn().
+func register_bonus(bonus: Dictionary) -> int:
+	bonus_sets.append(bonus)
+	return bonus_sets.size() - 1
 
 func clear() -> void:
 	count = 0
@@ -120,7 +131,8 @@ func _collide_player_bullet(i: int) -> bool:
 		var t := world.target_at(id)
 		if t.get_instance_id() == _last_hit[i] or not t.is_alive(): continue
 		var d := Damage.new(_phys[i], _ment[i])
-		d.knockback = _vel[i].normalized()
+		d.knockback = _vel[i].normalized() * _push[i]
+		if _bonus[i] >= 0: d.bonus = bonus_sets[_bonus[i]]
 		t.take_damage(d)
 		_last_hit[i] = t.get_instance_id()
 		_pierce[i] -= 1
@@ -133,6 +145,7 @@ func _remove(i: int) -> void:
 		_pos[i] = _pos[last]; _prev[i] = _prev[last]; _vel[i] = _vel[last]; _radius[i] = _radius[last]; _size[i] = _size[last]
 		_life[i] = _life[last]; _age[i] = _age[last]; _phys[i] = _phys[last]; _ment[i] = _ment[last]
 		_team[i] = _team[last]; _style[i] = _style[last]; _pierce[i] = _pierce[last]; _last_hit[i] = _last_hit[last]
+		_push[i] = _push[last]; _bonus[i] = _bonus[last]
 	count = last
 
 func _process(_delta: float) -> void:

@@ -4,7 +4,7 @@ extends Resource
 ## (D-05) y cómo entrega el daño: balas o un objeto lanzado que explota.
 
 enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND }
-enum Delivery { BULLET, THROWN }
+enum Delivery { BULLET, THROWN, MELEE }   ## MELEE: tajo alrededor del personaje (aoe_radius)
 
 @export var id := &"revolver"
 @export var display_name := "Revólver .38"
@@ -25,6 +25,7 @@ enum Delivery { BULLET, THROWN }
 @export var flight_time := 0.0               ## s en el aire (lanzados)
 @export var fuse := 0.0                      ## s de mecha tras caer (lanzados)
 @export var sanity_cost := 0.0               ## armas arcanas: cordura por uso
+@export var knockback := 1.0                 ## empuje sobre los enemigos (1 = el de una bala normal)
 @export_group("Progresión")
 @export var max_level := 5
 ## Mejora de cada nivel a partir del 2 (índice 0 = nivel 2). Claves "estadística*"

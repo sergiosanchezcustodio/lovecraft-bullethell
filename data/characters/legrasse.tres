@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/salto.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"legrasse"
+display_name = "John R. Legrasse"
+model = "legrasse"
+role = "Inspector de la policía de Nueva Orleans"
+passive_text = "25 % más daño contra cultistas y enemigos humanos."
+story = "La llamada de Cthulhu"
+price = 0
+max_health = 110.0
+max_sanity = 100.0
+move_speed = 4.5
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"escopeta"])
+bonus_tags = {&"humana": 1.25}

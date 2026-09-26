@@ -27,6 +27,7 @@ extends Node3D
 ##   autorestart=2           en la pantalla final, reintenta sola tras N s (probar el reinicio)
 ##   mute=true               sin música (también en la portada)
 ##   debug_menu=1            abre la pausa y el menú de depuración a ese segundo (capturas)
+##   character=johansen      personaje del J1 (dyer, olmstead, legrasse, johansen)
 
 const PLAYER_COLORS: Array[Color] = [Color(1.0, 0.82, 0.3), Color(0.35, 0.75, 1.0), Color(0.55, 1.0, 0.45), Color(1.0, 0.45, 0.8)]
 
@@ -81,7 +82,7 @@ func _ready() -> void:
 	# Jugador 1: el de la selección de personaje, o el de siempre si la partida se lanza directa
 	var seat: GameSession.Seat = GameSession.seats[0] if GameSession.is_set() else null
 	var character := String(seat.character) if seat else "dyer"
-	character = String(DebugOptions.get_value("character", character))
+	character = args.get_str("character", String(DebugOptions.get_value("character", character)))
 	var input := Devices.make_input(seat.device) if seat and not args.has("bot") else _make_input()
 	player = Player.new().setup(load("res://data/characters/%s.tres" % character), input, PLAYER_COLORS[0])
 	player.position = arena.get_meta("spawn")
@@ -95,7 +96,7 @@ func _ready() -> void:
 	player.world = world
 	add_child(player)
 	world.add_player(player)
-	player.progress.weapon_pool = [load("res://data/weapons/dinamita.tres"), load("res://data/weapons/revolver.tres")] as Array[WeaponData]
+	for w in DebugOptions.list_resources("res://data/weapons"): player.progress.weapon_pool.append(w)   # todas las armas
 	for f in ["velocidad", "vida", "cordura", "reflejos", "iman"]:
 		player.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
 	player.progress.leveled_up.connect(func(_l: int) -> void: _open_level_up.call_deferred())

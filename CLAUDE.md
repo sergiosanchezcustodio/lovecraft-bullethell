@@ -32,7 +32,13 @@ Léela al empezar cada sesión:
     - Cada uno maneja su marco con su propio mando: personaje, compañero debajo del marco y "¡Listo!". Un personaje confirmado no lo puede coger otro ("Lo lleva J1"). B deshace un paso y, desde el primero, deja el puesto libre.
     - Con todos listos, el mapa de los 15 niveles: solo el 1 abierto, el siguiente se abre al superar el anterior y los que aún no existen salen como "Próximamente".
     - La partida usa el dispositivo, el personaje y el nivel del J1. Los demás jugadores entran en la partida en el hito 2.5.
-  - Siguiente: hito 2.4 ⏸, personajes nuevos (Olmstead, Legrasse y Johansen).
+  - **Hito 2.4 (personajes nuevos): hecho, pendiente de tu revisión.**
+    - Olmstead, Legrasse y Johansen, a bloques limpios como Dyer, con su esquive, arma y rasgo.
+    - Esquives: Dyer desliza, Olmstead rueda (impulso un 30 % más largo), Legrasse salta y Johansen se tira en plancha.
+    - Armas nuevas: la escopeta (abanico de 5 perdigones que empuja) y el machete (tajo circular que solo golpea si hay alguien cerca).
+    - Rasgos como datos (`resist_tags`, `bonus_tags` y `knockback_immune` en `CharacterData`; `tags` en `EnemyData`). Se notarán cuando lleguen criaturas marinas y humanas; en el nivel 1 no hay.
+    - Hojas de revisión: `shots/revision_2_4_personajes.png` (cuatro giros) y `shots/revision_2_4_seleccion.png`.
+  - Siguiente: hito 2.5, partida de 1 a 4 jugadores.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
@@ -146,6 +152,7 @@ godot --path . --disable-vsync -- bot=circle demo=14 perf=8                 # re
 python tools/gen_acechador.py       # regenera models/acechador.json
 python tools/gen_variantes.py       # regenera clasico, bruto, acechador (versión simple) y abisal
 python tools/gen_dyer.py            # Dyer (personaje jugable); igual gen_pinguino.py y gen_fragmento.py
+python tools/gen_olmstead.py        # Olmstead; igual gen_legrasse.py y gen_johansen.py (base común en tools/humano.py)
 python tools/gen_atrezo_campamento.py   # models/atrezo_{tienda,caja,bidon,farol,roca,hielo}.json
 godot --headless --path . --import                # reconstruye la caché de .godot/ (primera vez, tras borrarla o al crear un class_name)
 godot --path . -- still <yaw> <modelo>            # captura en shots/<modelo>_<yaw>.png (encuadre automático)
@@ -302,6 +309,9 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
 
 | Personaje | Estado | Concepto |
 |---|---|---|
+| **Robert Olmstead** | Hito 2.4 (`gen_olmstead.py`), 7.100 voxels | Joven viajero: gorra de plato de tweed, chaqueta de tweed gris verdoso, chaleco, camisa blanca y corbata azul, pantalón pardo y un revólver en la cadera. Revólver, voltereta larga, resistencia a las criaturas marinas. |
+| **John R. Legrasse** | Hito 2.4 (`gen_legrasse.py`), 7.600 voxels | Inspector: fedora gris marengo de ala ancha, gabardina corta gris piedra abierta sobre traje azul marino, placa dorada y bigote. Escopeta, salto, más daño a los humanos. |
+| **Gustaf Johansen** | Hito 2.4 (`gen_johansen.py`), 7.800 voxels | Marinero corpulento (torso más ancho): gorro de lana gris, barba dorada, chaquetón cruzado azul marino con botones de latón y jersey crema de cuello vuelto. Machete, plancha, mucha vida. |
 | **William Dyer** | Hito 1.2, segunda versión (`gen_dyer.py`), 7.600 voxels, 1,72 m | Diseño a bloques limpios con los detalles pintados. Gorro de trampero de cuero con banda de borreguillo, cara plana con ojos, cejas, barba y bigote, pelo en la nuca, bufanda roja, parka de lona con bolsillos, botones y ribete de borreguillo, cinturón con tres cartuchos de dinamita (único relieve), manoplas, pantalón de lana y botas. Material mate. Animaciones: reposo, andar, esquive y lanzar. |
 
 ## Bestiario actual
@@ -329,6 +339,8 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
 - **Identidad de un animal:** lo que hace reconocible a una especie es su silueta y su patrón de color, no el detalle. El pingüino todo blanco parecía un huevo; con la silueta de emperador y el frac en tonos pálidos se reconoce al instante.
 - **Material por modelo:** con el material húmedo de las criaturas, las caras planas de la ropa reflejan los faroles casi en blanco. Ropa, plumas y atrezo van mates.
 - **Superficies escalonadas:** los elipsoides grandes dejan un escalón en cada capa de voxels, y la luz cenital los convierte en motas. Para ropa, madera y piedra usa `sell` (superelipsoide), que da caras planas.
+- **Alas y viseras en isométrica:** la cámara mira desde arriba, así que un ala o una visera que sobresale 3 voxels tapa las dos filas de la cara que quedan debajo, y desaparecen los ojos. Como mucho 2 voxels de ala, y los ojos una fila más abajo (`face(..., eye_y=47)` en `tools/humano.py`).
+- **Colores de personajes bajo luz cálida:** un rubio claro se confunde con la piel, y dos tonos oliva distintos se ven iguales. Hay que separar los personajes por valor (claro, medio y oscuro) además de por tono.
 - **Detalles que apuntan a la cámara:** en vista isométrica, lo que apunta justo hacia la cámara desaparece en la proyección (el pico del pingüino de frente). Comprueba cada modelo a varios giros.
 - **Ojos brillantes:** una esfera `glow` dentro de un párpado oscuro tiene que asomar lo suficiente (desplazada ~0,75 ub hacia fuera), o solo se ven motas sueltas.
 - **Capturas abiertas en el visor de fotos:** Windows bloquea el fichero y Python no puede sobrescribirlo (`OSError: Invalid argument`). Guarda con otro nombre.

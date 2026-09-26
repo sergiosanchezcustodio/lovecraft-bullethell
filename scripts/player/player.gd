@@ -239,8 +239,8 @@ func apply_dodge_style(style: DodgeStyle) -> void:
 	data.dodge_style = style
 	data.dodge_anim = style.anim
 	data.dodge_speed = style.speed
-	data.dodge_duration = style.duration
-	data.dodge_iframes = style.iframes
+	data.dodge_duration = style.duration * data.dodge_length
+	data.dodge_iframes = style.iframes * data.dodge_length
 	data.dodge_cooldown = style.cooldown
 
 func is_invulnerable() -> bool:
@@ -253,6 +253,10 @@ func is_hittable() -> bool:
 ## Recibe un ataque: la parte física resta vida y la mental, cordura.
 func take_damage(d: Damage) -> void:
 	if not is_hittable(): return
+	if d.source is Enemy and not data.resist_tags.is_empty():   # rasgos: resistencia a ciertas criaturas
+		var k := 1.0
+		for tag in (d.source as Enemy).data.tags: k *= float(data.resist_tags.get(tag, 1.0))
+		if k != 1.0: d = d.scaled(k)
 	health = maxf(0.0, health - d.physical)
 	if d.mental > 0.0:
 		sanity = maxf(0.0, sanity - d.mental)

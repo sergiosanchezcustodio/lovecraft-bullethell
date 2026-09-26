@@ -17,6 +17,7 @@ var player: Player
 var world: CombatWorld
 var weapons: Array[Weapon] = []
 var _pending: Array[Dictionary] = []         ## proyectiles de ráfaga que salen con retardo
+var _bonus_set := -1                         ## rasgos de daño del jugador, registrados en las balas
 
 func setup(p_player: Player, p_world: CombatWorld) -> WeaponSystem:
 	player = p_player
@@ -51,7 +52,7 @@ func _physics_process(delta: float) -> void:
 	for w in weapons:
 		w.timer -= delta
 		if w.timer > 0.0: continue
-		_fire(w)
+		if not _fire(w): continue                # el machete espera a tener a alguien cerca
 		w.timer = w.stat("cooldown")
 
 ## Elige objetivo según el arma y dispara. Sin nadie a tiro, dispara igualmente hacia
@@ -73,6 +74,8 @@ func _fire(w: Weapon) -> bool:
 		WeaponData.Targeting.AROUND:
 			target_pos = origin
 	var n := int(w.stat("count"))
+	if w.data.delivery == WeaponData.Delivery.MELEE:
+		return _slash(w)
 	if w.data.delivery == WeaponData.Delivery.THROWN:
 		for k in n:
 			var jitter := Vector3.ZERO
@@ -96,9 +99,33 @@ func _fire(w: Weapon) -> bool:
 func _spawn_bullet(w: Weapon, dir: Vector3) -> void:
 	var speed := w.stat("projectile_speed")
 	var life := w.stat("range") / speed * 1.15
+	if _bonus_set < 0 and not player.data.bonus_tags.is_empty():
+		_bonus_set = world.bullets.register_bonus(player.data.bonus_tags)
 	world.bullets.spawn(BulletManager.Team.PLAYER, BulletManager.Style.PLAYER,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
-		w.stat("projectile_size"), Damage.new(w.stat("damage"), 0.0), life, int(w.stat("pierce")))
+		w.stat("projectile_size"), Damage.new(w.stat("damage"), 0.0), life, int(w.stat("pierce")),
+		w.stat("knockback"), _bonus_set)
+
+## Tajo circular (machete): daña y empuja hacia fuera a todo lo que haya en el radio.
+## Solo golpea si hay alguien dentro: sin enemigos cerca, espera.
+func _slash(w: Weapon) -> bool:
+	var origin := player.global_position
+	var r := w.stat("aoe_radius")
+	var targets := world.enemies_in_circle(origin, r)
+	if targets.is_empty(): return false
+	for t in targets:
+		var d := Damage.new(w.stat("damage"), 0.0)
+		var away := t.global_position - origin
+		d.knockback = Vector3(away.x, 0, away.z).normalized() * w.stat("knockback")
+		d.bonus = player.data.bonus_tags
+		t.take_damage(d)
+	var fx := Slash.new()
+	fx.radius = r
+	fx.position = Vector3(origin.x, 0.0, origin.z)
+	world.fx.add_child(fx)
+	player.play_once("throw")                    # el brazo acompaña el tajo
+	fired.emit(w)
+	return true
 
 func _throw(w: Weapon, target: Vector3) -> void:
 	var e := ThrownExplosive.new()

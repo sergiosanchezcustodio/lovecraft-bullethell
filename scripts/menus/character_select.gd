@@ -307,7 +307,7 @@ class _Frame extends Control:
 		_info.add_child(_stats)
 		_status = MenuKit.title("", 24, color)
 		_status.size = Vector2(FRAME.x, 36)
-		_status.position = Vector2(0, FRAME.y - 42)
+		_status.position = Vector2(0, FRAME.y - 38)
 		add_child(_status)
 		# puesto vacío
 		_empty = VBoxContainer.new()

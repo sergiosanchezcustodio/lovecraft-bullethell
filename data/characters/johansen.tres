@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/plancha.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"johansen"
+display_name = "Gustaf Johansen"
+model = "johansen"
+role = "Segundo oficial del Emma"
+passive_text = "Mucha vida. No le afecta el empuje."
+story = "La llamada de Cthulhu"
+price = 0
+max_health = 140.0
+max_sanity = 85.0
+move_speed = 4.3
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"machete"])
+knockback_immune = true

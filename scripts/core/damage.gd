@@ -9,6 +9,9 @@ var physical := 0.0
 var mental := 0.0
 var knockback := Vector3.ZERO
 var source: Object = null
+## Multiplicador de daño contra enemigos con ciertas etiquetas (rasgos: Legrasse contra
+## "humana"). Lo pone el arma del jugador y lo aplica el enemigo.
+var bonus := {}
 
 func _init(p_physical: float = 0.0, p_mental: float = 0.0) -> void:
 	physical = p_physical
@@ -23,6 +26,7 @@ func scaled(k: float) -> Damage:
 	var d := Damage.new(physical * k, mental * k)
 	d.knockback = knockback * k
 	d.source = source
+	d.bonus = bonus
 	return d
 
 ## Colores del lenguaje visual de los daños (balas, avisos, barras).
