@@ -9,7 +9,10 @@ extends Control
 ##   shots=2,6,9 tag=x   capturas en esos segundos     t=6   empieza en ese segundo
 ##   strike=3            relámpago en ese segundo      eyes=3  brillo de ojos en ese segundo
 ##   perf=8              mide el rendimiento
-## Intro / Espacio / A / Start: salta la presentación y, con el aviso visible, entra en la partida.
+##   open=slots          abre la ventana de huecos al terminar la presentación (capturas);
+##                       open=slots_borrar, además la confirmación de borrado
+## Cualquier botón principal (A, B, X, Y, Start, Select; Intro, Espacio o Esc) salta la
+## presentación y, con el aviso visible, abre la ventana de huecos de partida (D-22).
 
 const DESIGN := Vector2(1920, 1080)
 const BG := "res://resources/PantallasMenus/fondo_titulo_sin_texto_1080p_definitivo.png"
@@ -44,6 +47,10 @@ var _next_strike := 6.0
 var _strike_t := -1.0
 var _rng := RandomNumberGenerator.new()
 var _done := false
+var _slots: SlotMenu                ## ventana de huecos abierta
+## Botones que valen para "Pulsa Start" (D-22): cualquiera de los principales.
+const PRESS_KEYS := [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE, KEY_ESCAPE]
+const PRESS_BUTTONS := [JOY_BUTTON_A, JOY_BUTTON_B, JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_START, JOY_BUTTON_BACK]
 
 func _ready() -> void:
 	args = LaunchArgs.from_cmdline()
@@ -280,6 +287,11 @@ func _process(delta: float) -> void:
 	_lightning(delta)
 	_eyes()
 	if args.has("perf"): _perf(delta)
+	if args.get_str("open").begins_with("slots") and _slots == null and not _done and t > _end_intro():
+		var borrar := args.get_str("open") == "slots_borrar"
+		args.options.erase("open")
+		_open_slots()
+		if borrar: _slots.ask_first_delete.call_deferred()      # capturas de la confirmación
 
 ## Relámpago tenue y espaciado dentro del ventanal (nunca dos destellos fuertes seguidos).
 func _lightning(delta: float) -> void:
@@ -323,19 +335,34 @@ static func _ease_out(x: float) -> float:
 	return 1.0 - pow(1.0 - x, 3.0)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _slots != null or _done: return                   # la ventana abierta atiende sus botones
 	var pressed := false
 	if event is InputEventKey and event.pressed and not event.echo:
-		pressed = (event as InputEventKey).keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE]
+		pressed = (event as InputEventKey).keycode in PRESS_KEYS
 	elif event is InputEventJoypadButton and event.pressed:
-		pressed = (event as InputEventJoypadButton).button_index in [JOY_BUTTON_A, JOY_BUTTON_START]
+		pressed = (event as InputEventJoypadButton).button_index in PRESS_BUTTONS
 	if not pressed: return
 	get_viewport().set_input_as_handled()
-	var end_intro := maxf(cfg.prompt_delay, cfg.title_delay + cfg.title_reveal_time) + 0.01
-	if t < end_intro:
-		t = end_intro                                        # salta la presentación
-	elif not _done:
+	if t < _end_intro():
+		t = _end_intro()                                     # salta la presentación
+	else:
+		_open_slots()
+
+func _end_intro() -> float:
+	return maxf(cfg.prompt_delay, cfg.title_delay + cfg.title_reveal_time) + 0.01
+
+## Ventana de huecos de partida. Al elegir uno se carga (o se crea) y se sigue adelante.
+func _open_slots() -> void:
+	_slots = SlotMenu.new()
+	add_child(_slots)
+	front.visible = false                                # el título no se transparenta detrás
+	_slots.closed.connect(func() -> void:
+		_slots = null
+		front.visible = true)
+	_slots.chosen.connect(func(i: int) -> void:
+		Saves.use(i)
 		_done = true
-		get_tree().change_scene_to_file(NEXT_SCENE)          # hasta que existan los menús
+		get_tree().change_scene_to_file(NEXT_SCENE))         # el menú principal llega en el hito 2.2
 
 var _frames: Array[float] = []
 func _perf(delta: float) -> void:

@@ -78,7 +78,7 @@ extends Resource
 @export_group("Aviso de pulsar")
 @export var prompt_enabled := true
 @export var prompt_delay := 8.6
-@export var prompt_text := "Pulsa Intro o A"
+@export var prompt_text := "Pulsa Start"          ## vale cualquier botón principal (D-22)
 @export var prompt_y := 0.9
 
 @export_group("Música")

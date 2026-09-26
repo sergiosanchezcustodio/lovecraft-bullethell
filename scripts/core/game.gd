@@ -153,6 +153,7 @@ func _ready() -> void:
 	if args.has("hp"): player.health = args.get_float("hp")
 	if args.has("san"): player.sanity = args.get_float("san")
 	DebugOptions.apply_all(self)
+	if Saves.current != null: Saves.current.stats["runs"] += 1
 	if args.get_int("demo") > 0: _demo_crowd(args.get_int("demo"))
 	if args.get_int("dummies") > 0: _dummies(args.get_int("dummies"))
 	if args.get_bool("emitters"): _emitters()
@@ -167,6 +168,7 @@ func _ready() -> void:
 # ---------------- flujo de la partida ----------------
 func _on_enemy_died(e: Enemy) -> void:
 	kills += 1
+	if Saves.current != null: Saves.current.stats["kills"] += 1
 	gems.drop(e.global_position, e.data.xp)
 
 ## Subida de nivel: pausa y elige una de tres mejoras (D-16). Si hay varias subidas
@@ -206,7 +208,7 @@ func toggle_pause() -> void:
 	_pause.resume.connect(toggle_pause)
 	_pause.restart.connect(_restart)
 	_pause.debug.connect(_open_debug)
-	_pause.quit.connect(func() -> void: get_tree().quit())
+	_pause.quit.connect(_quit)
 	add_child(_pause)
 	get_tree().paused = true
 
@@ -226,6 +228,10 @@ func _open_debug() -> void:
 	_debug.restart.connect(_restart)
 	add_child(_debug)
 
+func _quit() -> void:
+	Saves.save()
+	get_tree().quit()
+
 func _summary() -> PackedStringArray:
 	var t := int(director.time) if director != null else 0
 	return PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills,
@@ -234,6 +240,8 @@ func _summary() -> PackedStringArray:
 func _on_downed() -> void:
 	if _ended: return
 	_ended = true
+	if Saves.current != null: Saves.current.stats["deaths"] += 1
+	Saves.save()
 	Engine.time_scale = 0.35                       # la caída, a cámara lenta un momento
 	await get_tree().create_timer(0.6, true, false, true).timeout
 	Engine.time_scale = 1.0
@@ -243,6 +251,9 @@ func _on_downed() -> void:
 func _on_level_completed() -> void:
 	if _ended: return
 	_ended = true
+	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)):
+		Saves.current.levels_won.append(String(level.id))
+	Saves.save()
 	announce("Nivel superado", 2.0)
 	await get_tree().create_timer(2.5).timeout
 	get_tree().paused = true
@@ -251,7 +262,7 @@ func _on_level_completed() -> void:
 func _end_screen(title: String, accent: Color) -> void:
 	var s := Menus.EndScreen.new(title, _summary(), accent)
 	s.restart.connect(_restart)
-	s.quit.connect(func() -> void: get_tree().quit())
+	s.quit.connect(_quit)
 	add_child(s)
 	if args.has("autorestart"):
 		print("fin de partida: ", title)
@@ -260,6 +271,7 @@ func _end_screen(title: String, accent: Color) -> void:
 
 func _restart() -> void:
 	print("reinicio")
+	Saves.save()
 	get_tree().paused = false
 	Engine.time_scale = 1.0
 	get_tree().reload_current_scene()
@@ -340,6 +352,8 @@ func _demo_crowd(n: int) -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
+	# tiempo jugado del hueco: en tiempo real, sin contar pausas ni la velocidad del juego
+	if not get_tree().paused and not _ended: Saves.add_play_time(delta / maxf(Engine.time_scale, 0.001))
 	if args.get_bool("debug") and fmod(_t, 0.5) < delta: print("t=%.1f jugador=%s" % [_t, player.global_position])
 	if args.get_bool("log") and director != null and fmod(director.time, 30.0) < delta:
 		print("t=%3d s  vivos=%d  abatidos=%d  nivel=%d  vida=%d  cordura=%d  balas=%d" % [director.time, director.alive.size(),

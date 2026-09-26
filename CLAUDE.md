@@ -11,10 +11,16 @@ Léela al empezar cada sesión:
 
 ## Estado actual
 
-*Actualizado: 24-09-2026.*
+*Actualizado: 26-09-2026.*
 
+- **Fase 2: en curso** (plan del 26-09-2026 en `docs/ROADMAP.md`). Ampliada a "Menús, guardado y cooperativo local": adelanta de la fase 5 el guardado, los menús, la selección de personaje, el mapa de niveles, la tienda y los compañeros (D-22 a D-25 en el GDD). Cuatro personajes jugables: Dyer, Olmstead, Legrasse y Johansen.
+  - **Hito 2.1 (guardado y portada): hecho.**
+    - La portada dice "Pulsa Start" y acepta cualquier botón principal.
+    - Después, la ventana de tres huecos de partida, con tiempo jugado, objetos comprados, compañeros y dinero, y un botón de borrar con confirmación.
+    - La partida suma al hueco el tiempo jugado, las partidas, las caídas, los enemigos abatidos y los niveles superados.
+  - Siguiente: hito 2.2, menú principal y configuración.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
-- **Fase 1: en curso**, con el plan aprobado (subhitos en `docs/ROADMAP.md`).
+- **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
   - **Hito 1.2 (modelos nuevos): segunda versión, pendiente de revisión.** Dyer, pingüino albino ciego, fragmento protoplásmico y atrezo del campamento, con sus animaciones en `scripts/anim/`.
     - Rechazados en la primera revisión: Dyer ("ni siquiera parece una persona": demasiado relieve y cara horrible) y el pingüino ("no parece un pingüino"). Rehechos con el enfoque de las lecciones "Personajes humanos" e "Identidad de un animal".
@@ -163,6 +169,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `log=true`: cada 30 s de juego imprime vivos, abatidos, nivel, vida, cordura y balas.
   - `prof=true` (junto con `perf=`): reparto del tiempo de CPU por sistema (`Prof`).
   - `mute=true`: sin música (también en la portada).
+  - `saves=carpeta`: otra carpeta de partidas dentro de `user://` (capturas y pruebas sin tocar las tuyas). `slot=N`: juega con ese hueco.
   - `window=true` / `fullscreen=true`: fuerza ventana o pantalla completa.
   - `debug_menu=N`: abre la pausa y el menú de depuración a los N s (capturas).
 - **Encadenar comandos:** un `godot ... | grep error` devuelve 1 cuando no hay errores, así que no lo encadenes con `&&`.
@@ -188,8 +195,8 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - El título (`title_halo.gdshader`: niebla con su silueta, letras que se condensan, niebla que se deshace y halo fino) y el aviso van fuera del escenario, así que el acercamiento no les afecta.
 - **Configuración por efecto** (`data/title/portada.tres`, `TitleScreenConfig`): cada efecto tiene su interruptor y sus parámetros. Son velas, farolillos, niebla, luna, relámpago, ojos, acercamiento, ceniza, título, halo, niebla del título, aviso y música.
   - Para compararlos sin tocar la configuración: `godot --path . -- title off=niebla,ceniza`. Nombres: velas, farolillos, niebla, luna, relampago, ojos, acercamiento, ceniza, titulo, halo, niebla_titulo, aviso y musica.
-  - Otras opciones: `shots=`, `tag=`, `t=` (empezar en ese segundo), `strike=` (relámpago), `eyes=` (brillo de ojos) y `perf=`.
-- **Controles:** Intro, Espacio, A o Start saltan la presentación. Con el aviso visible, entran en la partida hasta que existan los menús.
+  - Otras opciones: `shots=`, `tag=`, `t=` (empezar en ese segundo), `strike=` (relámpago), `eyes=` (brillo de ojos), `perf=` y `open=slots` (abre la ventana de huecos; `open=slots_borrar`, también la confirmación de borrado).
+- **Controles:** cualquier botón principal (A, B, X, Y, Start, Select; Intro, Espacio o Esc) salta la presentación y, con "Pulsa Start" visible, abre la ventana de huecos. Al elegir hueco se entra en la partida hasta que exista el menú principal (hito 2.2).
 - **Variación medida** (desviación típica en % del brillo): llamas 6,4 %, paredes iluminadas 4,4 %, cielo 2,3 %, niebla del suelo 20 % y resto por debajo del 1 %. Sutil a propósito. Coste: 0,42 ms por fotograma.
 
 ## Arquitectura del juego
@@ -239,6 +246,12 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - Las mejoras pasivas son `UpgradeData` (`data/upgrades/`) y cambian una estadística de la copia del `CharacterData` de cada jugador (`Player.setup` la duplica).
   - `GemManager` gestiona las gemas con arrays y un MultiMesh, como las balas.
 - **Cordura** (`SanityState`): recuperación pasiva lejos de enemigos y sin daño mental reciente; crisis a cero; parálisis intermitente que bloquea el `PlayerMotor`; al terminar, recupera el 30 %.
+- **Guardado** (`scripts/save/`):
+  - `Saves` (autoload) lleva tres huecos en `user://saves/slot_N.json` y la partida en uso (`Saves.current`, un `SaveData`).
+  - Guarda en un fichero temporal y lo renombra, para no dejar una partida a medias si el juego se cierra a mitad.
+  - `SaveData` tiene número de versión y `migrate()`: si cambias el formato, sube `VERSION` y añade el paso de migración.
+  - La partida guarda al caer, al superar el nivel, al reiniciar y al salir. Sin hueco elegido (arrancando la partida directamente) no se guarda nada.
+- **Menús de fuera de la partida** (`scripts/menus/`): `MenuKit` (fuente de la portada, ventanas centradas, `Confirm` para confirmar con el foco en "no") y `SlotMenu` (huecos).
 - **Música** (`Music`, autoload en `scripts/core/music.gd`): sobrevive a los cambios de escena, funde una pista con la siguiente y no corta la que ya suena si se vuelve a pedir (al reiniciar). `mute=true` la silencia; úsalo en bots y capturas.
 - **Depuración** (`DebugOptions` en `scripts/core/debug_options.gd`, `DebugMenu` en `scripts/ui/debug_menu.gd`): los ajustes van en una variable estática, así que sobreviven a `reload_current_scene`; `game.gd` los aplica al montar la partida (`DebugOptions.apply_all`).
   - Las pasivas se rehacen desde el personaje original (`rebuild_stats`), así que también se pueden bajar.

@@ -311,9 +311,9 @@ Ilustración de la biblioteca (tuya, en `resources/PantallasMenus/`) con animaci
 
 Tomada de Extremadura Survivors (`github.com/sergiosanchezcustodio/extremadura-survivors`), con el estilo de este juego. Se adopta la estructura de menús y de progreso, **no** sus sistemas de partida (corazones, cofres con ruleta): aquí siguen la caída, la reanimación y el vial de West.
 
-- **Arranque:** ficha del proyecto (con qué está hecho, licencia y aviso del uso de IA), intro que presenta el juego y portada animada (sección 7.1), que espera a que se pulse una tecla o un botón concretos (no cualquiera). Los relatos se saltan manteniendo pulsado.
+- **Arranque:** ficha del proyecto (con qué está hecho, licencia y aviso del uso de IA), intro que presenta el juego y portada animada (sección 7.1), que muestra "Pulsa Start" y acepta cualquier botón principal (D-22). Después, la ventana de huecos de partida. Los relatos se saltan manteniendo pulsado.
 - **Menú principal:** quieto a propósito. El fondo se mueve poco, porque lo importante es qué opción está señalada.
-- **Selección de personaje:** carrusel con los modelos voxel en 3D. Los bloqueados se ven en penumbra con su precio. En cooperativo, cada jugador elige el suyo.
+- **Selección de personaje:** tarjetas al estilo de Extremadura Survivors, con los modelos voxel. Los bloqueados se ven en penumbra con su precio. Los jugadores se unen aquí pulsando Start y eligen a la vez; un personaje elegido no puede repetirse (D-23). Debajo de cada tarjeta, su compañero.
 - **Compañeros** (D-20): se elige uno antes de empezar, acompaña toda la partida y sube de nivel contigo. Unos dan una estadística y otros actúan. Sacados de los relatos, por ejemplo los perros de trineo de la expedición de Lake o un gato de Ulthar. Por diseñar.
 - **Mapa de niveles:** las 3 partes × 5 niveles a la vista, con los bloqueados apagados; cada nivel se abre al ganar el anterior. Al elegir uno se cuenta su relato antes de jugarlo.
 - **Tienda:** la moneda sobrevive a la muerte (propuesta: fondos de la Fundación Pickman, que financia la expedición del relato; por decidir). Tres secciones:
@@ -389,6 +389,10 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-19 | Pasivos que dependen de mecánicas sin definir | Fase 4 | Pendiente |
 | D-20 | Compañeros (equivalente a las mascotas de Extremadura Survivors) | Fase 5 | **Resuelta**: sí, sacados de los relatos |
 | D-21 | Portada | Fase 5 | **Resuelta**: escena animada en Godot |
+| D-22 | Flujo de menús y guardado adelantados a la fase 2 | Fase 2 | **Resuelta** |
+| D-23 | Personajes únicos y cuatro jugables en la fase 2 | Fase 2 | **Resuelta** |
+| D-24 | Botón de juego online antes de la fase 9 | Fase 2 | **Resuelta**: visible y desactivado |
+| D-25 | Mapa de niveles con un solo nivel | Fase 2 | **Resuelta**: el mapa completo, con el nivel 1 abierto |
 
 D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherencias y huecos detectados al redactar este documento (sección 13). Las decisiones bloqueantes de las fases 1 y 2 se resolvieron el 24-09-2026.
 
@@ -422,6 +426,16 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
   *Resuelta:* en la fase 2 hay dos personajes, William Dyer y Robert Olmstead (revólver, esquive más largo y "sangre de Innsmouth"), distinguidos además por el color de cada jugador. Cómo se asigna cada uno y cómo se marcan las criaturas marinas para su pasivo se concretará en el plan de la fase 2. El resto de personajes y la selección completa, en la fase 5.
 - **D-20 — Compañeros.** *Resuelta:* sí, sacados de los relatos (sección 8.1).
 - **D-21 — Portada.** *Resuelta:* escena 3D animada en Godot (sección 7.1). De ella sale también la imagen fija para las tiendas. Necesita el título del juego (D-01), que pasa a ser necesario para la fase 5.
+- **D-22 — Flujo de menús (26-09-2026).** *Resuelta:* se adelantan a la fase 2 el guardado, el menú principal, la configuración, la selección de personaje, el mapa de niveles, la tienda y los compañeros. El flujo es:
+  1. Portada con "Pulsa Start". Vale cualquier botón principal del mando (A, B, X, Y, Start, Select) o del teclado; sustituye a lo que decía la sección 8.1 ("un botón concreto, no cualquiera").
+  2. Ventana de huecos de partida: tres huecos locales, cada uno con tiempo total jugado, objetos comprados, compañeros desbloqueados y dinero actual, y un botón de borrar con confirmación. Al borrar, el hueco queda como nuevo.
+  3. Menú principal: Jugar, Tienda, Configuración (vídeo, audio, controles y juego) y Salir.
+  4. Jugar abre una ventana con "Jugar en local" y "Jugar online".
+  5. Selección de personaje, al estilo de Extremadura Survivors: los demás jugadores se unen pulsando Start en su mando y todos eligen a la vez. Debajo de cada tarjeta, el compañero, entre los desbloqueados en la tienda.
+  6. Mapa de niveles y partida.
+- **D-23 — Personajes únicos (26-09-2026).** *Resuelta:* un personaje elegido por un jugador no puede elegirlo otro en esa partida. Para que puedan jugar cuatro, la fase 2 trae cuatro personajes: Dyer, Olmstead, Legrasse y Johansen, con sus armas iniciales (revólver, escopeta y machete). Amplía D-18.
+- **D-24 — Online antes de tiempo.** *Resuelta:* "Jugar online" aparece atenuado con "Próximamente" hasta la fase 9 (D-10).
+- **D-25 — Mapa de niveles.** *Resuelta:* se hace ya el mapa de las 3 partes × 5 niveles, con solo el nivel 1 abierto.
 - **D-19 — Pasivos sin mecánica.** El pasivo de Dyer (frío y ralentización) y el de Johansen (inmunidad al empuje) dependen de efectos sobre el jugador que no están definidos, y el de Legrasse necesita saber si los híbridos de Innsmouth cuentan como "enemigos humanos".
 
 ---

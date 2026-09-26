@@ -16,11 +16,11 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | Fase | Nombre | Estado | Decisiones que la bloquean |
 |---|---|---|---|
 | 0 | Documentación y decisiones | **Hecha** (24-09-2026) | — |
-| 1 | Prototipo jugable (*vertical slice*) | **En curso** (plan aprobado) | Ninguna (D-02, D-03, D-05, D-14, D-15 y D-16, resueltas) |
-| 2 | Cooperativo local | Pendiente | Ninguna (D-03, D-07, D-16, D-17 y D-18, resueltas) |
+| 1 | Prototipo jugable (*vertical slice*) | **Hecha** (26-09-2026; queda tu partida de 5 minutos como comprobación) | Ninguna (D-02, D-03, D-05, D-14, D-15 y D-16, resueltas) |
+| 2 | Menús, guardado y cooperativo local | **En curso** (plan del 26-09-2026) | Ninguna (D-07, D-16 a D-18 y D-22 a D-25, resueltas) |
 | 3 | Pipeline de contenido | Pendiente | D-06 |
 | 4 | Parte 1 completa | Pendiente | D-04, D-19 |
-| 5 | Guardado, menús, tienda y portada | Pendiente | D-01 (título, para el logo de la portada) |
+| 5 | Arranque, relatos y ampliación de la tienda | Pendiente | Ninguna |
 | 6 | Parte 2 completa | Pendiente | D-04, D-13, enfoque de jefes colosales |
 | 7 | Parte 3 completa | Pendiente | Ángulos devoradores, enfoque de jefes colosales |
 | 8 | Pulido y distribución | Pendiente | D-01, D-12 |
@@ -65,17 +65,37 @@ Cada hito cierra con tests en verde, capturas revisadas y commit. ⏸ = parada p
 | 1.6 | Progresión, cordura y HUD: experiencia, mejoras, parálisis, HUD del J1, muerte y reinicio, pausa | **Hecho** |
 | 1.7 ⏸ | Rendimiento y cierre: prueba de carga, optimizaciones si hacen falta, partida de 5 minutos jugada por ti | Prueba de carga hecha; **pendiente de tu partida** |
 
-## Fase 2: Cooperativo local
+## Fase 2: Menús, guardado y cooperativo local
 
-- De 1 a 4 jugadores, asignación de dispositivos y conexión en caliente.
-- Segundo personaje jugable, Robert Olmstead: modelo, revólver y pasivos. Cada jugador lleva a Dyer o a Olmstead y se distingue además por su color (D-18). Cómo se asigna cada personaje se concretará en el plan de la fase.
-- HUD en las cuatro esquinas y cámara compartida con zoom.
-- Pausas (D-16): Start y la subida de nivel pausan a todos, y en la subida cada jugador elige en su cuadrante. Ficha y mapa se abren por cuadrante sin pausar.
-- Experiencia compartida (D-07).
-- Reanimación.
-- Sistema de cordura completo: las cinco crisis (la paranoia resta cordura a los compañeros, D-17), calmar a un compañero, recuperación cerca de compañeros y de luces, auras de presencia y locura acumulada.
+Ampliada el 26-09-2026: adelanta de la fase 5 el guardado, el menú principal, la configuración, la selección de personaje, el mapa de niveles, la tienda y los compañeros, porque la selección de personaje es donde se unen los jugadores (D-22 a D-25).
 
-**Aceptación:** 4 mandos (o 3 mandos y teclado) jugando simultáneamente sin conflictos de entrada.
+- **Portada y guardado:** "Pulsa Start" (vale cualquier botón principal). Tres huecos de partida locales con tiempo jugado, objetos comprados, compañeros desbloqueados y dinero, y la opción de borrar cada uno con confirmación.
+- **Menú principal:** Jugar (local u online; online visible pero desactivado hasta la fase 9), Tienda, Configuración (vídeo, audio, controles y juego) y Salir.
+- **Selección de personaje:** los jugadores se unen pulsando Start en su mando y eligen a la vez. Un personaje elegido no puede elegirlo otro. Debajo, cada uno elige compañero entre los desbloqueados.
+- **Mapa de niveles:** las 3 partes × 5 niveles, con solo el nivel 1 abierto por ahora.
+- **Cuatro personajes jugables:** Dyer, Olmstead, Legrasse y Johansen, con sus armas iniciales (revólver, escopeta y machete, nuevas) y pasivos.
+- **Partida de 1 a 4 jugadores:** asignación de dispositivos y conexión en caliente, HUD en las cuatro esquinas y cámara compartida con zoom.
+- **Pausas (D-16):** Start y la subida de nivel pausan a todos; en la subida, cada jugador elige en su cuadrante. Ficha y mapa se abren por cuadrante sin pausar.
+- **Experiencia compartida (D-07)**, dificultad escalada por jugadores y reanimación.
+- **Sistema de cordura completo:** las cinco crisis (la paranoia resta cordura a los compañeros, D-17), calmar a un compañero, recuperación cerca de compañeros y de luces, auras de presencia y locura acumulada.
+- **Tienda y compañeros:** dinero ganado en cada partida, tres secciones (potenciadores, compañeros y personajes) y un catálogo corto: cinco potenciadores de cinco niveles y dos compañeros funcionales.
+
+**Aceptación:** 4 mandos (o 3 mandos y teclado) jugando simultáneamente sin conflictos de entrada, desde la portada hasta el final del nivel, con el progreso guardado en su hueco.
+
+### Hitos de la fase 2
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 2.1 | Guardado y portada: huecos de partida versionados, "Pulsa Start", ventana de huecos con borrado y confirmación | **Hecho** |
+| 2.2 | Menú principal y configuración: Jugar (local / online desactivado), Tienda, Configuración (vídeo, audio, controles, juego), Salir | Pendiente |
+| 2.3 | Selección de personaje y mapa de niveles: gestor de dispositivos, unirse con Start, cursores simultáneos, personajes únicos, compañero bajo la tarjeta, mapa 3×5 | Pendiente |
+| 2.4 ⏸ | Personajes nuevos: Olmstead, Legrasse y Johansen (modelos, datos, pasivos), escopeta y machete | Pendiente |
+| 2.5 | Partida de 1 a 4 jugadores: cámara compartida con zoom, HUD en las cuatro esquinas, bots como jugadores extra | Pendiente |
+| 2.6 | Reglas del cooperativo: experiencia compartida, subida de nivel por cuadrante, pausa común, escalado, reanimación | Pendiente |
+| 2.7 | Cordura completa: cinco crisis, calmar, recuperación, auras, locura acumulada | Pendiente |
+| 2.8 | Ficha y mapa por cuadrante, sin pausa | Pendiente |
+| 2.9 | Tienda y compañeros: dinero, tres secciones, catálogo corto, dos compañeros funcionales | Pendiente |
+| 2.10 ⏸ | Cierre: prueba de carga con 4 jugadores y tu prueba con varios mandos | Pendiente |
 
 ## Fase 3: Pipeline de contenido
 
@@ -89,13 +109,13 @@ Cinco niveles, sus diez criaturas y el shoggoth primigenio.
 
 **Aceptación:** la parte 1 se puede completar en cooperativo.
 
-## Fase 5: Guardado, menús, tienda y portada
+## Fase 5: Arranque, relatos y ampliación de la tienda
 
-Estructura tomada de Extremadura Survivors (GDD 8.1), con el estilo de este juego:
-- **Arranque y portada:** ficha del proyecto, intro, y portada animada en Godot (GDD 7.1, D-21).
-- **Menús:** menú principal, selección de personaje en carrusel 3D, elección de compañero (D-20) y mapa de niveles con el relato de cada uno.
-- **Tienda y progresión permanente** (D-09): potenciadores, compañeros y personajes.
-- **Guardado:** opciones, reasignación de controles y tres huecos de guardado. Queda por asignar en qué fase se modelan Legrasse, Johansen, Armitage y West (GDD, sección 13).
+El guardado, los menús, la selección de personaje, el mapa de niveles y la tienda se adelantaron a la fase 2 (D-22). Queda:
+- **Arranque:** ficha del proyecto (con qué está hecho, licencia y aviso del uso de IA) e intro que presenta el juego, antes de la portada.
+- **Relatos:** al elegir un nivel en el mapa se cuenta su relato antes de jugarlo; se saltan manteniendo pulsado.
+- **Tienda:** ampliar el catálogo de potenciadores y compañeros.
+- Queda por asignar en qué fase se modelan Armitage y West (GDD, sección 13).
 
 ## Fase 6: Parte 2 completa (*La sombra sobre Innsmouth*)
 
