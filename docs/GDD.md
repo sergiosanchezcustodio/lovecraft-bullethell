@@ -183,11 +183,12 @@ Cada personaje tiene dos recursos, **vida** y **cordura**, con valores base prop
 | **Mixto** | Ambas | El grito "¡Tekeli-li!" del shoggoth, Cthulhu | Combina los dos lenguajes |
 
 - **Pauta:** los escalones bajos hacen sobre todo daño físico; cuanto más alto el escalón, más daño mental. Los jefes combinan ambos.
-- **Lenguaje visual implementado (hito 1.4):** todas las balas enemigas son redondas y tienen contorno oscuro para destacar sobre la nieve y en la oscuridad. Las balas se dibujan siempre por encima del decorado. Los avisos en el suelo usan el color del tipo de daño.
-  - *Físico:* núcleo color hueso con borde rojo anaranjado, sólido y quieto.
-  - *Mental:* anillo violeta que ondula y gira, con el centro oscuro.
-  - *Mixto:* núcleo físico dentro de un anillo mental.
+- **Lenguaje visual implementado** (hito 1.4, rehecho el 26-09-2026): las balas enemigas son cúmulos de cubos en voxel 3D, iluminados como el resto del mundo y con un brillo propio suave. Van en colores **apagados** (con muchas balas, los tonos vivos marean; puede haber excepciones más adelante), y son más pequeñas en las criaturas de nivel bajo. Si el decorado tapa una bala, se ve su silueta. Los avisos en el suelo usan el color del tipo de daño.
+  - *Físico* (resta vida): bola maciza de cubos en **rojos, naranjas y amarillos**, con el núcleo más claro.
+  - *Mental* (resta cordura): anillo de cubos **morados, púrpuras, lilas y violetas** que gira y ondula alrededor de un núcleo violeta oscuro.
+  - *Mixto:* el núcleo físico dentro del anillo mental.
   - *Jugador:* trazadoras doradas alargadas y translúcidas, que no se confunden con las enemigas.
+- **Pocos enemigos a distancia:** la horda es sobre todo de cuerpo a cuerpo, y los que disparan son pocos. Cada enemigo tiene un peso de aparición propio (`spawn_weight`) que multiplica al de su escalón: en el nivel 1, tres pingüinos por cada fragmento.
 - **Radio de impacto del jugador:** 0,25 m, mucho menor que su silueta, como es habitual en el género. El radio de colisión de las balas es algo menor que el visual.
 - **Legibilidad obligatoria:** los ataques mentales se distinguen de los físicos al instante, por forma, color y sonido. El jugador debe poder decidir en décimas de segundo qué esquivar primero según el estado de sus barras.
 - **Otras pérdidas de cordura:**

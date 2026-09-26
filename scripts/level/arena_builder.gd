@@ -17,6 +17,7 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	root.set_meta("spawn", Vector3(data.spawn[0], 0, data.spawn[1]))
 	root.add_child(_ground(data, size))
 	root.add_child(_sea(data, size))
+	if data.has("barrier"): root.add_child(_barrier(data.barrier, size))
 	var lights: Array[OmniLight3D] = []
 	var obstacles := ObstacleMap.new()
 	obstacles.bounds = Rect2(-size * 0.5, size)
@@ -26,6 +27,9 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	for p: Dictionary in data.props:
 		var holder := Node3D.new()
 		holder.position = Vector3(p.pos[0], 0, p.pos[1])
+		# lo que queda en el mar (más allá de la orilla, al sur o al este) flota a la altura del agua
+		if p.pos[0] > size.x * 0.5 or p.pos[1] > size.y * 0.5:
+			holder.position.y = float(data.sea.level) - 0.15
 		holder.rotation_degrees.y = p.rot
 		holder.scale = Vector3.ONE * float(p.scale)
 		var m := VoxelBuilder.load_model("res://models/%s.json" % p.model)
@@ -96,21 +100,78 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	mi.material_override = mat
 	return mi
 
-## Mar helado y negro más allá de la orilla.
+## Mar helado más allá de la orilla (sea.gdshader: baldosas de agua con oleaje y espuma).
 static func _sea(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	mi.name = "Sea"
 	var pm := PlaneMesh.new()
-	pm.size = Vector2(size.x + 160, size.y + 160)
+	pm.size = Vector2(size.x + 200, size.y + 200)
 	mi.mesh = pm
 	# por debajo del suelo solo asoma más allá de la orilla (sur y este)
-	mi.position = Vector3(size.x * 0.5 + 20, float(data.sea.level), size.y * 0.5 + 20)
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.015, 0.03, 0.045)
-	mat.roughness = 0.12
-	mat.metallic_specular = 0.8
+	mi.position = Vector3(size.x * 0.5 + 30, float(data.sea.level), size.y * 0.5 + 30)
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://scripts/level/sea.gdshader")
+	mat.set_shader_parameter("shore", size * 0.5)
 	mi.material_override = mat
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return mi
+
+## Barrera que cierra la arena por detrás (norte y oeste): tramos de acantilado repetidos
+## y solapados, y una meseta nevada detrás que llega hasta donde alcanza la cámara.
+## data: {"models": [...], "sides": ["north", "west"], "line": m desde el centro hasta el
+## frente, "spacing": m entre tramos, "from"/"to": m a lo largo, "y": altura de la base,
+## "plateau": altura de la meseta}.
+static func _barrier(b: Dictionary, size: Vector2) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Barrier"
+	var models: Array = b.models
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 42
+	var line: float = b.line
+	for side: String in b.sides:
+		var t: float = b.from
+		var k := 0
+		while t <= float(b.to):
+			var holder := Node3D.new()
+			var jitter := rng.randf_range(-0.6, 0.6)
+			if side == "north":
+				holder.position = Vector3(t, float(b.y), -line + jitter)
+			else:
+				holder.position = Vector3(-line + jitter, float(b.y), t)
+				holder.rotation_degrees.y = 90.0                       # el frente (+Z) mira al este
+			holder.scale = Vector3(1.0, rng.randf_range(0.9, 1.12), 1.0)
+			var m := VoxelBuilder.load_model("res://models/%s.json" % models[(k * 7 + 3) % models.size()])
+			for mi in m.find_children("*", "MeshInstance3D", true, false):
+				(mi as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			holder.add_child(m)
+			root.add_child(holder)
+			t += float(b.spacing) + rng.randf_range(-0.4, 0.4)
+			k += 1
+	# meseta nevada detrás de la barrera (en L: norte y oeste)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var h: float = b.plateau
+	var far := 90.0
+	var back := line + 3.0                                            # empieza bajo la cumbre
+	for r in [Rect2(-far, -far, 2.0 * far, far - back), Rect2(-far, -back, far - back, far + back)]:
+		var q := [Vector3(r.position.x, h, r.position.y), Vector3(r.position.x, h, r.end.y),
+			Vector3(r.end.x, h, r.end.y), Vector3(r.end.x, h, r.position.y)]
+		for i in [0, 1, 2, 0, 2, 3]:
+			st.set_normal(Vector3.UP)
+			st.set_color(Color(0.84, 0.88, 0.93))
+			st.add_vertex(q[i])
+	var plateau := MeshInstance3D.new()
+	plateau.name = "Plateau"
+	plateau.mesh = st.commit()
+	var mat := StandardMaterial3D.new()
+	mat.vertex_color_use_as_albedo = true
+	mat.vertex_color_is_srgb = VoxelBuilder.colors_are_srgb()
+	mat.roughness = 0.9
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	plateau.material_override = mat
+	plateau.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	root.add_child(plateau)
+	return root
 
 static func _collider(holder: Node3D, m: Node3D, def: Dictionary, obstacles: ObstacleMap) -> void:
 	if def.is_empty() or def.get("type", "none") == "none": return

@@ -8,6 +8,7 @@ id = &"pinguino"
 display_name = "Pingüino albino ciego"
 model = "pinguino"
 tier = 1
+spawn_weight = 3.0
 elite = false
 tags = Array[StringName]([&"marina"])
 max_health = 26.0

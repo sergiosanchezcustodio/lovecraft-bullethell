@@ -1,7 +1,9 @@
 class_name BulletManager
 extends Node3D
 ## Todas las balas del juego, sin un nodo por bala: arrays compactos que se recorren
-## en cada paso de física y un único MultiMesh que se rellena de una vez por fotograma.
+## en cada paso de física y dos MultiMesh que se rellenan de una vez por fotograma: las
+## trazadoras del jugador (cuadrados con bullet.gdshader) y las balas enemigas en voxel
+## (BulletMeshes.orb con bullet_voxel.gdshader y su silueta cuando las tapa el decorado).
 ## Colisiones: las balas de los jugadores contra la rejilla de enemigos de CombatWorld;
 ## las enemigas, por distancia contra los jugadores (como mucho cuatro).
 
@@ -34,8 +36,10 @@ var bonus_sets: Array[Dictionary] = []
 var _last_hit := PackedInt64Array()          ## id del último objetivo tocado (para las que atraviesan);
                                              ## id y no referencia: el objetivo puede liberarse antes que la bala
 
-var _mm: MultiMesh
+var _mm: MultiMesh                           ## trazadoras del jugador
 var _buffer := PackedFloat32Array()
+var _mm_enemy: MultiMesh                     ## balas enemigas en voxel
+var _buffer_enemy := PackedFloat32Array()
 
 func _init() -> void:
 	name = "Bullets"
@@ -66,6 +70,28 @@ func _ready() -> void:
 	mmi.custom_aabb = AABB(Vector3(-200, -10, -200), Vector3(400, 20, 400))   # nunca se descarta por visibilidad
 	add_child(mmi)
 	_buffer.resize(MAX_BULLETS * 16)
+	# balas enemigas: cúmulos de cubos iluminados, con la silueta como segunda pasada
+	_mm_enemy = MultiMesh.new()
+	_mm_enemy.transform_format = MultiMesh.TRANSFORM_3D
+	_mm_enemy.use_custom_data = true
+	_mm_enemy.mesh = BulletMeshes.orb()
+	_mm_enemy.instance_count = MAX_BULLETS
+	_mm_enemy.visible_instance_count = 0
+	var emi := MultiMeshInstance3D.new()
+	emi.name = "EnemyBulletMesh"
+	emi.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	emi.multimesh = _mm_enemy
+	var emat := ShaderMaterial.new()
+	emat.shader = preload("res://scripts/bullets/bullet_voxel.gdshader")
+	var hidden := ShaderMaterial.new()
+	hidden.shader = preload("res://scripts/bullets/bullet_voxel_hidden.gdshader")
+	hidden.render_priority = 1
+	emat.next_pass = hidden
+	emi.material_override = emat
+	emi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	emi.custom_aabb = AABB(Vector3(-200, -10, -200), Vector3(400, 20, 400))
+	add_child(emi)
+	_buffer_enemy.resize(MAX_BULLETS * 16)
 
 ## Crea una bala. `pos` se proyecta a la altura de vuelo.
 func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, size: float,
@@ -154,17 +180,32 @@ func _process(_delta: float) -> void:
 	# estilo, fase de animación, edad y radio visual. La posición se interpola entre los dos
 	# últimos pasos de física: si no, en monitores de más de 60 Hz las balas avanzarían a tirones.
 	var frac := Engine.get_physics_interpolation_fraction()
+	# Se escribe directamente en cada array: un PackedFloat32Array asignado a otra variable
+	# es una copia y lo escrito en ella se perdería.
+	var np := 0
+	var ne := 0
 	for i in count:
-		var o := i * 16
 		var s := _size[i]
 		var p := _prev[i].lerp(_pos[i], frac)
-		_buffer[o] = s; _buffer[o + 1] = 0.0; _buffer[o + 2] = 0.0; _buffer[o + 3] = p.x
-		_buffer[o + 4] = 0.0; _buffer[o + 5] = s; _buffer[o + 6] = 0.0; _buffer[o + 7] = p.y
-		_buffer[o + 8] = 0.0; _buffer[o + 9] = 0.0; _buffer[o + 10] = s; _buffer[o + 11] = p.z
-		_buffer[o + 12] = float(_style[i])
-		# fase: en las del jugador, el rumbo (para alargar la trazadora); en las demás, un desfase
-		_buffer[o + 13] = atan2(_vel[i].x, _vel[i].z) if _style[i] == Style.PLAYER else float(i % 17) * 0.37
-		_buffer[o + 14] = _age[i]; _buffer[o + 15] = s
+		if _style[i] == Style.PLAYER:
+			var o := np * 16
+			_buffer[o] = s; _buffer[o + 1] = 0.0; _buffer[o + 2] = 0.0; _buffer[o + 3] = p.x
+			_buffer[o + 4] = 0.0; _buffer[o + 5] = s; _buffer[o + 6] = 0.0; _buffer[o + 7] = p.y
+			_buffer[o + 8] = 0.0; _buffer[o + 9] = 0.0; _buffer[o + 10] = s; _buffer[o + 11] = p.z
+			# fase: el rumbo, para alargar la trazadora
+			_buffer[o + 12] = 0.0; _buffer[o + 13] = atan2(_vel[i].x, _vel[i].z)
+			_buffer[o + 14] = _age[i]; _buffer[o + 15] = s
+			np += 1
+		else:
+			var o := ne * 16
+			_buffer_enemy[o] = s; _buffer_enemy[o + 1] = 0.0; _buffer_enemy[o + 2] = 0.0; _buffer_enemy[o + 3] = p.x
+			_buffer_enemy[o + 4] = 0.0; _buffer_enemy[o + 5] = s; _buffer_enemy[o + 6] = 0.0; _buffer_enemy[o + 7] = p.y
+			_buffer_enemy[o + 8] = 0.0; _buffer_enemy[o + 9] = 0.0; _buffer_enemy[o + 10] = s; _buffer_enemy[o + 11] = p.z
+			_buffer_enemy[o + 12] = float(_style[i]); _buffer_enemy[o + 13] = float(i % 17) * 0.37
+			_buffer_enemy[o + 14] = _age[i]; _buffer_enemy[o + 15] = s
+			ne += 1
 	RenderingServer.multimesh_set_buffer(_mm.get_rid(), _buffer)
-	_mm.visible_instance_count = count
+	_mm.visible_instance_count = np
+	RenderingServer.multimesh_set_buffer(_mm_enemy.get_rid(), _buffer_enemy)
+	_mm_enemy.visible_instance_count = ne
 	Prof.stop("balas_buffer", t0)

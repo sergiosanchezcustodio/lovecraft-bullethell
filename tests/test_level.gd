@@ -143,3 +143,14 @@ func test_un_nivel_sin_musica_usa_la_del_nivel_1() -> void:
 	assert_true(ResourceLoader.exists(LevelData.DEFAULT_MUSIC), "la pista por defecto existe")
 	l.music = "res://otra.mp3"
 	assert_eq(l.music_path(), "res://otra.mp3")
+
+func test_el_peso_propio_reparte_la_horda() -> void:
+	# Datos propios: dos enemigos del mismo escalón, uno con el triple de peso
+	var a := EnemyData.new(); a.id = &"a"; a.spawn_weight = 3.0
+	var b := EnemyData.new(); b.id = &"b"; b.spawn_weight = 1.0
+	var l := LevelData.new()
+	l.pool = [a, b] as Array[EnemyData]
+	var d := _director(l)
+	var n := {&"a": 0, &"b": 0}
+	for i in 4000: n[d.pick().id] += 1
+	assert_almost_eq(float(n[&"a"]) / 4000.0, 0.75, 0.03)

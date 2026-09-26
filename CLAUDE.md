@@ -38,6 +38,10 @@ Léela al empezar cada sesión:
     - Armas nuevas: la escopeta (abanico de 5 perdigones que empuja) y el machete (tajo circular que solo golpea si hay alguien cerca).
     - Rasgos como datos (`resist_tags`, `bonus_tags` y `knockback_immune` en `CharacterData`; `tags` en `EnemyData`). Se notarán cuando lleguen criaturas marinas y humanas; en el nivel 1 no hay.
     - Hojas de revisión: `shots/revision_2_4_personajes.png` (cuatro giros) y `shots/revision_2_4_seleccion.png`.
+  - **Cambios pedidos tras el hito 2.4 (26-09-2026):**
+    - Balas enemigas en voxel 3D, con colores apagados por tipo de daño (físico en rojos, naranjas y amarillos; mental en morados y lilas) y más pequeñas en las criaturas de nivel bajo.
+    - Horda sobre todo de cuerpo a cuerpo: tres pingüinos por cada fragmento, y los fragmentos disparan cada 9 s.
+    - Arena sin vacío: barrera de hielo al norte y al oeste, meseta nevada detrás, mar visible al sur y al este, y los témpanos flotando a la altura del agua.
   - Siguiente: hito 2.5, partida de 1 a 4 jugadores.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
@@ -248,7 +252,7 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - `CombatWorld` registra jugadores y enemigos, reconstruye la rejilla espacial (`SpatialGrid`) en cada paso de física y contiene las balas y los efectos.
   - Un objetivo es cualquier nodo con `hit_radius`, `take_damage(Damage)` e `is_alive()`.
   - `Damage` tiene una parte física (resta vida) y otra mental (resta cordura); su tipo se deduce de esas partes.
-  - `BulletManager` guarda todas las balas en arrays compactos y las dibuja con un único MultiMesh. Las balas del jugador chocan contra la rejilla de enemigos; las enemigas, contra los jugadores. El estilo visual sale del tipo de daño (`bullet.gdshader`).
+  - `BulletManager` guarda todas las balas en arrays compactos y las dibuja con dos MultiMesh: las trazadoras del jugador (cuadrados con `bullet.gdshader`) y las enemigas en voxel (`BulletMeshes.orb()`, un núcleo de 19 cubos y un anillo de 14, con `bullet_voxel.gdshader`). El shader enseña unos grupos de cubos u otros según el tipo de daño. Las tapadas se dibujan con la segunda pasada (`bullet_voxel_hidden.gdshader`). Las balas del jugador chocan contra la rejilla de enemigos; las enemigas, contra los jugadores. Cada bala lleva su empuje y los rasgos de daño de quien la dispara.
   - Las armas son datos (`WeaponData`, en `data/weapons/`): cadencia, alcance, apuntado (D-05), entrega (bala o lanzado) y mejoras por nivel (`"damage*": 1.25`, `"count+": 1`). `WeaponSystem`, dentro del jugador, las dispara solas. La dinamita es un `ThrownExplosive`.
   - Los patrones enemigos también son datos (`BulletPattern`, en `data/patterns/`): radial o en abanico, ráfagas, giro y aviso previo. `PatternRunner` los ejecuta.
   - Efectos: `Telegraph` (aviso en el suelo) y `Explosion`.
@@ -302,6 +306,7 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - `Menus`: subida de nivel, pausa y pantalla final.
   - `pause_watch.gd` atiende Esc o Start también con la partida en pausa.
 - **Arena** (`scripts/level/arena_builder.gd`):
+  - Borde de la arena: nunca vacío. En el campamento, la Barrera de Ross al norte y al oeste (`tools/gen_barrera_hielo.py`: tres tramos de acantilado de hielo repetidos y solapados, con una meseta nevada detrás) y el mar al sur y al este (`sea.gdshader`: agua en baldosas de 0,5 m con oleaje, destellos de luna y espuma). Lo que queda más allá de la orilla flota a la altura del agua. Cada nivel usará bordes de su temática (muros, acantilados, agua).
   - Monta un JSON de `data/arenas/` (generado por `tools/gen_arena_campamento.py`) con el suelo de nieve, el mar, las piezas con su colisión, una luz y un halo de niebla por farol, y los límites invisibles.
   - Capa 1: mundo. Capa 2: jugadores.
 
@@ -339,6 +344,9 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
 - **Identidad de un animal:** lo que hace reconocible a una especie es su silueta y su patrón de color, no el detalle. El pingüino todo blanco parecía un huevo; con la silueta de emperador y el frac en tonos pálidos se reconoce al instante.
 - **Material por modelo:** con el material húmedo de las criaturas, las caras planas de la ropa reflejan los faroles casi en blanco. Ropa, plumas y atrezo van mates.
 - **Superficies escalonadas:** los elipsoides grandes dejan un escalón en cada capa de voxels, y la luz cenital los convierte en motas. Para ropa, madera y piedra usa `sell` (superelipsoide), que da caras planas.
+- **Includes de shaders:** un `varying` no se puede asignar dentro de una función auxiliar, ni siquiera en un `.gdshaderinc`. Se asigna en `vertex()`.
+- **Fondo grande en voxel:** a 32 voxels por metro, una pared de 80 m tendría millones de voxels. La barrera se modela a 16 y se exporta a 8 por metro (`half_res`). A 16, el peor 1 % de fotogramas bajaba de 71 a 60 FPS; a 8, con el zoom de juego se ve igual.
+- **Colores oscuros bajo la luna:** un agua con albedo de 0,05 sale negra del todo con la luz de luna. Para que un fondo oscuro se lea como agua hace falta un albedo de 0,15 a 0,3.
 - **Alas y viseras en isométrica:** la cámara mira desde arriba, así que un ala o una visera que sobresale 3 voxels tapa las dos filas de la cara que quedan debajo, y desaparecen los ojos. Como mucho 2 voxels de ala, y los ojos una fila más abajo (`face(..., eye_y=47)` en `tools/humano.py`).
 - **Colores de personajes bajo luz cálida:** un rubio claro se confunde con la piel, y dos tonos oliva distintos se ven iguales. Hay que separar los personajes por valor (claro, medio y oscuro) además de por tono.
 - **Detalles que apuntan a la cámara:** en vista isométrica, lo que apunta justo hacia la cámara desaparece en la proyección (el pico del pingüino de frente). Comprueba cada modelo a varios giros.

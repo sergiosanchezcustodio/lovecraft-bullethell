@@ -89,7 +89,7 @@ func pick() -> EnemyData:
 	var weights: Array[float] = []
 	for d in level.pool:
 		if d.tier >= 4 and elites >= level.elite_cap: continue
-		var w := LevelData.weight(d.tier, level.number)
+		var w := LevelData.weight(d.tier, level.number) * d.spawn_weight
 		if w <= 0.0: continue
 		cands.append(d)
 		weights.append(w)

@@ -20,6 +20,23 @@
   ],
   "level": -0.45
  },
+ "barrier": {
+  "models": [
+   "barrera_hielo_1",
+   "barrera_hielo_2",
+   "barrera_hielo_3"
+  ],
+  "sides": [
+   "north",
+   "west"
+  ],
+  "line": 36.5,
+  "spacing": 7.0,
+  "from": -44.0,
+  "to": 46.0,
+  "y": -1.0,
+  "plateau": 7.2
+ },
  "lamp": {
   "color": [
    1.0,

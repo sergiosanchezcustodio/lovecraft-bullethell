@@ -82,6 +82,10 @@ layout = {
     "spawn": [0.0, 0.0],
     "ground": {"seed": 5, "tile": 0.5, "margin_back": 12.0},
     "sea": {"sides": ["south", "east"], "level": -0.45},
+    # Barrera de hielo al norte y al oeste (tools/gen_barrera_hielo.py): cierra la arena en
+    # lugar del vacío. Llega hasta meterse en el mar por el este y por el sur.
+    "barrier": {"models": ["barrera_hielo_1", "barrera_hielo_2", "barrera_hielo_3"], "sides": ["north", "west"],
+                "line": HALF + 4.5, "spacing": 7.0, "from": -HALF - 12.0, "to": HALF + 14.0, "y": -1.0, "plateau": 7.2},
     "lamp": {"color": [1.0, 0.72, 0.4], "energy": 2.2, "range": 8.0},
     "colliders": {
         "atrezo_tienda": {"type": "box", "shrink": 0.8},
