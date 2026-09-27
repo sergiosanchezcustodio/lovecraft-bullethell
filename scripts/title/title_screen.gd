@@ -33,6 +33,10 @@ var stage: Control                ## ilustración y capas animadas (se acerca)
 ## El acercamiento va en un Node2D por encima del escenario: la posición de un Control se
 ## redondea a píxeles enteros (snap_controls_to_pixels) y el zoom avanzaba a saltos de 2 px a 4K.
 var zoom_root: Node2D
+## La ceniza va por delante del título: su propio escenario, con el mismo encaje y el mismo
+## acercamiento que el de la ilustración, pero dibujado después del título.
+var ash_zoom: Node2D
+var ash_stage: Control
 var _zoom_pivot := Vector2.ZERO     ## centro del acercamiento, en coordenadas de pantalla
 var front: Control                ## título y aviso (fijos)
 var bg: TextureRect
@@ -72,6 +76,13 @@ func _ready() -> void:
 	add_child(black)
 	_build_stage()
 	_build_front()
+	ash_zoom = Node2D.new()
+	add_child(ash_zoom)
+	ash_stage = Control.new()
+	ash_stage.size = DESIGN
+	ash_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ash_zoom.add_child(ash_stage)
+	for a in ash: ash_stage.add_child(a)
 	fade = ColorRect.new()
 	fade.color = Color.BLACK
 	fade.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -143,7 +154,6 @@ func _build_stage() -> void:
 	ash.append(_make_ash(cfg.ash_amount, 1.0, Vector2(0.08, 0.18), cfg.ash_alpha, 1.0))
 	ash.append(_make_ash(cfg.ash_mid_amount, 1.5, Vector2(0.2, 0.42), cfg.ash_alpha * 0.85, 0.7))
 	ash.append(_make_ash(cfg.ash_near_amount, 2.3, Vector2(0.5, 1.3), cfg.ash_alpha * 0.6, 0.35))
-	for a in ash: stage.add_child(a)
 	_push_params()
 
 ## Ceniza que cae despacio por toda la sala, meciéndose. Los copos nacen repartidos por toda
@@ -266,7 +276,7 @@ func _layout() -> void:
 	var vs := get_viewport().get_visible_rect().size
 	var s := maxf(vs.x / DESIGN.x, vs.y / DESIGN.y)
 	var offset := (vs - DESIGN * s) * 0.5
-	for c: Control in [stage, front]:
+	for c: Control in [stage, front, ash_stage]:
 		c.position = offset
 		c.scale = Vector2.ONE * s
 	_zoom_pivot = offset + cfg.zoom_center * DESIGN * s
@@ -280,6 +290,8 @@ func _process(delta: float) -> void:
 		var z := cfg.zoom_amount * _ease_out(clampf(t / cfg.zoom_time, 0.0, 1.0))
 		zoom_root.scale = Vector2.ONE * (1.0 + z)
 		zoom_root.position = -_zoom_pivot * z           # escala alrededor del centro, sin redondeo
+		ash_zoom.scale = zoom_root.scale
+		ash_zoom.position = zoom_root.position
 	# título: primero la niebla con su silueta, luego las letras y la niebla se deshace
 	var r := clampf((t - cfg.title_delay) / cfg.title_reveal_time, 0.0, 1.0)
 	title_mat.set_shader_parameter("reveal", r)
