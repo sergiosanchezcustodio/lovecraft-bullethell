@@ -31,6 +31,7 @@ var _style := PackedByteArray()
 var _pierce := PackedInt32Array()
 var _push := PackedFloat32Array()            ## empuje del impacto (multiplicador)
 var _bonus := PackedInt32Array()             ## índice en bonus_sets (-1 = sin rasgo)
+var _split := PackedInt32Array()             ## al morir se divide en tantos proyectiles (fuegos artificiales)
 ## Rasgos de daño de quien dispara (Damage.bonus), registrados una vez por jugador.
 var bonus_sets: Array[Dictionary] = []
 var _last_hit := PackedInt64Array()          ## id del último objetivo tocado (para las que atraviesan);
@@ -48,7 +49,7 @@ func _init() -> void:
 	_radius.resize(MAX_BULLETS); _size.resize(MAX_BULLETS); _life.resize(MAX_BULLETS)
 	_age.resize(MAX_BULLETS); _phys.resize(MAX_BULLETS); _ment.resize(MAX_BULLETS)
 	_team.resize(MAX_BULLETS); _style.resize(MAX_BULLETS); _pierce.resize(MAX_BULLETS)
-	_last_hit.resize(MAX_BULLETS); _push.resize(MAX_BULLETS); _bonus.resize(MAX_BULLETS)
+	_last_hit.resize(MAX_BULLETS); _push.resize(MAX_BULLETS); _bonus.resize(MAX_BULLETS); _split.resize(MAX_BULLETS)
 
 func _ready() -> void:
 	_mm = MultiMesh.new()
@@ -95,7 +96,7 @@ func _ready() -> void:
 
 ## Crea una bala. `pos` se proyecta a la altura de vuelo.
 func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, size: float,
-		damage: Damage, life: float, pierce: int = 0, push: float = 1.0, bonus_set: int = -1) -> void:
+		damage: Damage, life: float, pierce: int = 0, push: float = 1.0, bonus_set: int = -1, split: int = 0) -> void:
 	if count >= MAX_BULLETS: return
 	var i := count
 	_pos[i] = Vector3(pos.x, HEIGHT, pos.z)
@@ -113,6 +114,7 @@ func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, 
 	_last_hit[i] = 0
 	_push[i] = push
 	_bonus[i] = bonus_set
+	_split[i] = split
 	count += 1
 
 ## Registra los rasgos de daño de un tirador y devuelve su índice para spawn().
@@ -135,6 +137,7 @@ func _physics_process(delta: float) -> void:
 		if not dead and world != null:
 			dead = _collide_player_bullet(i) if _team[i] == Team.PLAYER else _collide_enemy_bullet(i)
 		if dead:
+			if _split[i] > 0: _burst(i)
 			_remove(i)          # la última ocupa su hueco: no avanzar i
 		else:
 			i += 1
@@ -165,13 +168,24 @@ func _collide_player_bullet(i: int) -> bool:
 		if _pierce[i] < 0: return true
 	return false
 
+## Fuegos artificiales: la bala se abre en `_split` chispas en círculo, más débiles y cortas.
+func _burst(i: int) -> void:
+	var n := _split[i]
+	var d := Damage.new(_phys[i] * 0.5, _ment[i] * 0.5)
+	var spd := maxf(_vel[i].length() * 0.6, 6.0)
+	var a0 := randf() * TAU
+	for k in n:
+		var a := a0 + TAU * k / n
+		spawn(_team[i], _style[i], _pos[i], Vector3(cos(a), 0, sin(a)) * spd, _radius[i] * 0.8, _size[i] * 0.7,
+			d, 0.45, 0, _push[i] * 0.5, _bonus[i], 0)
+
 func _remove(i: int) -> void:
 	var last := count - 1
 	if i != last:
 		_pos[i] = _pos[last]; _prev[i] = _prev[last]; _vel[i] = _vel[last]; _radius[i] = _radius[last]; _size[i] = _size[last]
 		_life[i] = _life[last]; _age[i] = _age[last]; _phys[i] = _phys[last]; _ment[i] = _ment[last]
 		_team[i] = _team[last]; _style[i] = _style[last]; _pierce[i] = _pierce[last]; _last_hit[i] = _last_hit[last]
-		_push[i] = _push[last]; _bonus[i] = _bonus[last]
+		_push[i] = _push[last]; _bonus[i] = _bonus[last]; _split[i] = _split[last]
 	count = last
 
 func _process(_delta: float) -> void:

@@ -10,7 +10,7 @@
 ![GDScript](https://img.shields.io/badge/GDScript-tipado%20est%C3%A1tico-355570)
 ![Forward+](https://img.shields.io/badge/render-Forward%2B-5c6bc0)
 ![Plataforma](https://img.shields.io/badge/plataforma-Windows-0078D6?logo=windows&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-GUT%20%C2%B7%20114%20en%20verde-2e7d32)
+![Tests](https://img.shields.io/badge/tests-GUT%20%C2%B7%20127%20en%20verde-2e7d32)
 ![Estado](https://img.shields.io/badge/estado-en%20desarrollo%20%C2%B7%20fase%202-e0a100)
 
 </div>
@@ -82,22 +82,24 @@ Un grupo de investigadores sacados de los relatos de Lovecraft atraviesa los esc
 
 ## Personajes
 
-Todos proceden de los relatos de Lovecraft, o son parientes o allegados inventados de sus personajes. Se modelan a **bloques limpios**, con los detalles pintados sobre superficies planas.
+Todos proceden de los relatos de Lovecraft, o son parientes o allegados inventados de sus personajes. Se modelan a **bloques limpios**, con los detalles pintados sobre superficies planas. Se empieza con cuatro (Dyer, Olmstead, Peaslee y Whipple); el resto se consigue en la tienda o jugando.
+
+Cada personaje tiene **siete atributos** (Poder, Inteligencia, Fuerza, Constitución, Tenacidad, Destreza y Educación), todos a 10 más un reparto de 20 puntos según su historia. De ellos salen la vida, la cordura, el esquive, la velocidad y el daño de cada tipo de arma, y al subir de nivel ganan un punto más.
 
 ![Dyer, Olmstead, Legrasse y Johansen](docs/img/personajes_1.jpg)
 
 | Personaje | Relato | Arma inicial | Rasgo | Esquive |
 |---|---|---|---|---|
-| **William Dyer**, geólogo de la Miskatonic | *En las montañas de la locura* | Cartuchos de dinamita y revólver | Resistencia al frío; mucha cordura | Deslizamiento |
-| **Robert Olmstead**, narrador de Innsmouth | *La sombra sobre Innsmouth* | Revólver .38 | Esquive más largo; 30 % menos de daño de las criaturas marinas | Voltereta larga |
-| **John R. Legrasse**, inspector de Nueva Orleans | *La llamada de Cthulhu* | Escopeta de dos cañones | 25 % más de daño a cultistas y humanos | Salto |
+| **William Dyer**, geólogo de la Miskatonic | *En las montañas de la locura* | Stielhandgranate | Resistencia al frío | Deslizamiento |
+| **Robert Olmstead**, narrador de Innsmouth | *La sombra sobre Innsmouth* | Revólver Webly Mk VI | Esquive más largo; 30 % menos de daño de las criaturas marinas | Voltereta larga |
+| **John R. Legrasse**, inspector de Nueva Orleans | *La llamada de Cthulhu* | Escopeta de corredera | 25 % más de daño a cultistas y humanos | Salto |
 | **Gustaf Johansen**, oficial del *Emma* | *La llamada de Cthulhu* | Machete | Mucha vida; inmune al empuje | Plancha |
 
 ![Peaslee, Varga, Whipple y Blake](docs/img/personajes_2.jpg)
 
 | Personaje | Relato | Arma inicial | Rasgo | Esquive |
 |---|---|---|---|---|
-| **Amelia Peaslee**, arqueóloga | *La sombra fuera del tiempo* | Rifle de caza | Más suerte en las mejoras y recogida de gemas más amplia | Voltereta |
+| **Amelia Peaslee**, arqueóloga | *La sombra fuera del tiempo* | Rifle de palanca | Más suerte en las mejoras y recogida de gemas más amplia | Voltereta |
 | **Madame Ludmila Varga**, espiritista | Médium de Arkham | Páginas del Necronomicón | Las armas arcanas le cuestan la mitad de cordura | Destello |
 | **Dra. Marian Whipple**, doctora | *La casa maldita* | Bisturís | Se cura al subir de nivel y reanima más rápido | Salto |
 | **Henrietta Blake**, escritora | *El morador de las tinieblas* | Trapezoedro Resplandeciente | 15 % más de experiencia | Deslizamiento |
@@ -107,8 +109,8 @@ Todos proceden de los relatos de Lovecraft, o son parientes o allegados inventad
 | Personaje | Relato | Arma inicial | Rasgo | Esquive |
 |---|---|---|---|---|
 | **Padre Iwanicki**, sacerdote | *Los sueños en la casa de la bruja* | Fórmula de expulsión | Su presencia calma: los compañeros cercanos recuperan cordura | Voltereta |
-| **Sargento Frank Elwood**, veterano de la Gran Guerra | *Los sueños en la casa de la bruja* | Pistola automática Colt .45 | Esquiva más a menudo y aguanta mejor el daño físico | Plancha |
-| **Vera Malone**, contrabandista | *El horror de Red Hook* | Subfusil Thompson | Hasta un 50 % más de daño cuanto más cerca está el enemigo | Deslizamiento |
+| **Sargento Frank Elwood**, veterano de la Gran Guerra | *Los sueños en la casa de la bruja* | Pistola Mauser C96 | Esquiva más a menudo y aguanta mejor el daño físico | Plancha |
+| **Vera Malone**, contrabandista | *El horror de Red Hook* | Subfusil Thompson M1928 | Hasta un 50 % más de daño cuanto más cerca está el enemigo | Deslizamiento |
 
 **Más adelante:** el profesor Armitage y Herbert West.
 
@@ -118,17 +120,25 @@ Todas disparan solas y cada una decide en sus datos cómo apunta: al más cercan
 
 | Arma | Tipo | Cómo funciona |
 |---|---|---|
-| Revólver .38 | Convencional | Disparo único al enemigo más cercano. El arma de referencia. |
-| Cartuchos de dinamita | Convencional | Lanzamiento en arco a la zona más densa y explosión de área con mecha. |
-| Escopeta de dos cañones | Convencional | Abanico corto de perdigones que empuja a los enemigos. |
-| Machete | Convencional | Tajo circular alrededor del personaje; solo golpea si hay alguien cerca. |
-| Rifle de caza | Convencional | Disparo lento y potente que atraviesa a varios enemigos. |
-| Bisturís | Convencional | Abanico de hojas que atraviesan. |
-| Páginas del Necronomicón | Arcana | Páginas que orbitan alrededor del personaje. Cuesta cordura. |
-| Trapezoedro Resplandeciente | Arcana | Rayo de luz concentrada que daña todo lo que atraviesa. Cuesta cordura. |
-| Fórmula de expulsión | Arcana | Onda que se expande desde el personaje, empuja y aturde. Cuesta cordura. |
-| Pistola automática Colt .45 | Convencional | Ráfagas cortas de tres disparos, más daño y menos alcance. |
-| Subfusil Thompson | Convencional | Chorro de balas que barre en arco. |
+| Revólver Webly Mk VI | De fuego | Proyectiles pesados que hacen retroceder a los enemigos. |
+| Stielhandgranate | Física | Granada de palo lanzada a la zona más densa; gran explosión al impactar. |
+| Escopeta de corredera | De fuego | Perdigones que se abren en anillo alrededor del personaje. |
+| Rifle de palanca | De fuego | Disparos rápidos que atraviesan a varios enemigos. |
+| Pistola Mauser C96 | De fuego | Ráfagas cortas de tres trazadoras. |
+| Subfusil Thompson M1928 | De fuego | Ráfagas cerradas de proyectiles pequeños. |
+| Flammenwerfer | De fuego | Chorro de fuego en cono que deja el suelo ardiendo. |
+| Cóctel Molotov | Física | Botella en arco que crea un charco en llamas. |
+| Arpón ballenero | Física | Proyectil pesado que atraviesa y arrastra a los enemigos menores. |
+| Pistola de bengalas | De fuego | Bengala que ilumina y atrae a los enemigos cercanos (las élites no caen). |
+| Lanzaquímicos | Física | Frasco de ácido: los enemigos del charco reciben un 25 % más de daño. |
+| Cañón de fuegos artificiales | De fuego | Cohetes erráticos que estallan en chispas. |
+| Machete | Física | Tajo circular alrededor del personaje; solo golpea si hay alguien cerca. |
+| Bisturís | Física | Abanico de hojas que atraviesan. |
+| Páginas del Necronomicón | Mágica | Páginas que orbitan alrededor del personaje. Cuesta cordura. |
+| Trapezoedro Resplandeciente | Mágica | Rayo de luz concentrada que daña todo lo que atraviesa. Cuesta cordura. |
+| Fórmula de expulsión | Mágica | Onda que se expande desde el personaje, empuja y aturde. Cuesta cordura. |
+
+Cada arma es física, de fuego o mágica, y su daño crece con los atributos correspondientes. Llegan 17 armas más, arcanas y de los Mitos (rayos Tesla, orbes Mi-Go, el rayo de Yith, la daga ritual…).
 
 ## Bestiario
 
@@ -243,7 +253,7 @@ La lista completa está en [`CLAUDE.md`](CLAUDE.md) y en la cabecera de `scripts
 ```bash
 godot --headless --path . -s addons/gut/gut_cmdln.gd
 ```
-Hay 114 tests de lógica con [GUT 9.4](https://github.com/bitwes/Gut): movimiento, combate, balas, oleadas, progresión, guardado, configuración, selección, personajes y armas. Lo visual se comprueba con capturas automáticas desde la terminal.
+Hay 127 tests de lógica con [GUT 9.4](https://github.com/bitwes/Gut): movimiento, combate, balas, oleadas, progresión, guardado, configuración, selección, personajes y armas. Lo visual se comprueba con capturas automáticas desde la terminal.
 
 ### Rendimiento
 

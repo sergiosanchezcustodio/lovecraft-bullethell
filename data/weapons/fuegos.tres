@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fuegos"
+display_name = "Cañón de fuegos artificiales"
+delivery = 0
+category = 1
+targeting = 0
+cooldown = 1.6
+range = 9.0
+damage = 14.0
+count = 2.0
+spread_deg = 20.0
+burst_delay = 0.15
+projectile_speed = 13.0
+projectile_radius = 0.2
+projectile_size = 0.2
+jitter_deg = 28.0
+split_count = 6.0
+max_level = 5
+level_mods = Array[Dictionary]([{"split_count+": 2.0}, {"damage*": 1.25}, {"count+": 1.0}, {"split_count+": 3.0, "damage*": 1.2}])
+level_text = Array[String](["Dos chispas más al estallar", "+25 % de daño", "Un cohete más", "Tres chispas más y +20 % de daño"])

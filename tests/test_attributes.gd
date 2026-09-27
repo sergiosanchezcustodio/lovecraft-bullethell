@@ -66,7 +66,7 @@ func test_cuatro_armas_como_mucho() -> void:
 	var p := _player("dyer")
 	p.weapons = WeaponSystem.new().setup(p, world)
 	p.add_child(p.weapons)
-	for id in ["dinamita", "revolver", "rifle", "escopeta"]: p.weapons.add_weapon(load("res://data/weapons/%s.tres" % id))
+	for id in ["granada", "webly", "palanca", "corredera"]: p.weapons.add_weapon(load("res://data/weapons/%s.tres" % id))
 	for w in DebugOptions.list_resources("res://data/weapons"): p.progress.weapon_pool.append(w)
 	var rng := RandomNumberGenerator.new(); rng.seed = 1
 	for i in 50:

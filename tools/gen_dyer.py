@@ -6,7 +6,7 @@ La cara se dibuja sobre el plano frontal de la cabeza, sin volumen.
 Coordenadas en voxels (32 por metro), el modelo mira hacia +Z y mide 1,72 m.
 
 Parka de lona con ribete de piel, gorro de piel con orejeras, bufanda roja,
-cinturón con cartuchos de dinamita, pantalón de lana, manoplas y botas.
+cinturón con dos granadas de palo, pantalón de lana, manoplas y botas.
 Uso: python tools/gen_dyer.py
 """
 import sys, os
@@ -26,7 +26,7 @@ HAIR = (0.44, 0.37, 0.31)
 BEARD = (0.54, 0.47, 0.40); BROW = (0.36, 0.29, 0.23); EYE = (0.10, 0.08, 0.07); MOUTH = (0.32, 0.22, 0.18)
 SCARF = (0.64, 0.18, 0.14); SCARF_SH = (0.54, 0.14, 0.11)
 BELT = (0.22, 0.15, 0.10); BUCKLE = (0.80, 0.68, 0.40); TOGGLE = (0.30, 0.20, 0.12)
-DYN = (0.74, 0.17, 0.12); FUSE = (0.18, 0.15, 0.12)
+GREN = (0.28, 0.32, 0.24); GREN_SH = (0.20, 0.23, 0.17); HANDLE = (0.76, 0.62, 0.40)      # madera clara: sobre la parka parda no se leía
 
 box = M.vbox
 
@@ -61,10 +61,12 @@ for x0 in (-7, 3):                                        # bolsillos del pecho,
     box(x0, 36, 4, x0 + 4, 37, 5, T, scale(PARKA_SH, 0.85))
 box(-6, 41, -4, 6, 44, 4, T, SCARF)                       # bufanda
 box(-6, 41, 3, 6, 42, 4, T, SCARF_SH)
-# Cartuchos de dinamita en el cinturón (único relieve: un voxel)
-for x in (-7, -5, -3):
-    box(x, 27, 5, x + 1, 33, 6, T, DYN)
-    box(x, 33, 5, x + 1, 34, 6, T, FUSE)
+# Granadas de palo (Stielhandgranate) colgadas del cinturón (único relieve: un voxel):
+# cabeza de lata verde oscura arriba y mango de madera hacia abajo
+for x in (-8, -5):
+    box(x, 31, 5, x + 2, 34, 6, T, GREN)
+    box(x, 34, 5, x + 2, 35, 6, T, GREN_SH)
+    box(x, 25, 5, x + 1, 31, 6, T, HANDLE)
 
 # ---------------- BRAZOS ----------------
 for s, p in ((-1, 'arm_l'), (1, 'arm_r')):

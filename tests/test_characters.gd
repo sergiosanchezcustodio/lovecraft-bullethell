@@ -84,11 +84,10 @@ func test_el_machete_golpea_alrededor_y_espera_si_no_hay_nadie() -> void:
 	world.rebuild_grid()
 	assert_false(p.weapons._fire(w), "sin nadie cerca no da tajos al aire")
 
-func test_la_escopeta_empuja_mas_que_el_revolver() -> void:
-	var shotgun: WeaponData = load("res://data/weapons/escopeta.tres")
-	var revolver: WeaponData = load("res://data/weapons/revolver.tres")
-	assert_gt(shotgun.stat("knockback", 1), revolver.stat("knockback", 1))
-	assert_gt(shotgun.stat("count", 1), 1.0)
+func test_la_escopeta_dispara_en_anillo() -> void:
+	var shotgun: WeaponData = load("res://data/weapons/corredera.tres")
+	assert_gt(shotgun.stat("count", 1), 6.0)
+	assert_gt(shotgun.stat("spread_deg", 1), 270.0, "los perdigones se abren en anillo")
 
 # ---------------- primera tanda de la tienda (D-26) ----------------
 const SHOP_IDS := ["peaslee", "varga", "whipple", "blake"]

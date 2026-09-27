@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"flammenwerfer"
+display_name = "Flammenwerfer"
+delivery = 6
+category = 1
+targeting = 0
+cooldown = 2.4
+range = 4.5
+damage = 26.0
+spread_deg = 36.0
+duration = 0.9
+zone = 1
+zone_radius = 0.9
+zone_time = 2.0
+zone_dps = 6.0
+max_level = 5
+level_mods = Array[Dictionary]([{"damage*": 1.25}, {"duration+": 0.4}, {"range*": 1.2, "spread_deg+": 8.0}, {"damage*": 1.3, "zone_time+": 1.5}])
+level_text = Array[String](["+25 % de daño", "Chorro más largo", "Llega más lejos y más ancho", "+30 % de daño y el fuego dura más"])

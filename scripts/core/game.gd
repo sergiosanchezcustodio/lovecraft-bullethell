@@ -8,7 +8,7 @@ extends Node3D
 ##   demo=12                 criaturas de muestra quietas alrededor (legibilidad)
 ##   dummies=10              criaturas de práctica que reciben daño (probar armas)
 ##   emitters=true           tres emisores de prueba: patrón físico, mental y mixto
-##   weapons=dinamita,revolver   armas iniciales (por defecto, la del personaje)
+##   weapons=granada,webly   armas iniciales (por defecto, la del personaje)
 ##   wlevel=3                nivel inicial de esas armas
 ##   god=true                el jugador no recibe daño
 ##   bullet_rain=1000        mantiene N balas enemigas vivas alrededor (prueba de carga)

@@ -17,7 +17,7 @@ func before_each() -> void:
 	world.add_player(player)
 	player.weapons = WeaponSystem.new().setup(player, world)
 	player.add_child(player.weapons)
-	player.weapons.add_weapon(load("res://data/weapons/dinamita.tres"))
+	player.weapons.add_weapon(load("res://data/weapons/granada.tres"))
 	for f in ["velocidad", "vida", "reflejos"]:
 		player.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
 	root = Node3D.new()
@@ -61,13 +61,13 @@ func test_velocidad_de_depuracion_se_suma_a_las_pasivas() -> void:
 	assert_almost_eq(player.data.move_speed, speed0 * 2.0, 0.0001)
 
 func test_armas_se_anaden_suben_y_quitan() -> void:
-	DebugOptions.set_value("weapons", {"revolver": 3, "dinamita": 0})
+	DebugOptions.set_value("weapons", {"webly": 3, "granada": 0})
 	DebugOptions.apply_weapons(player)
-	assert_null(player.weapons.get_weapon(&"dinamita"))
-	assert_eq(player.weapons.get_weapon(&"revolver").level, 3)
-	DebugOptions.set_value("weapons", {"revolver": 99})
+	assert_null(player.weapons.get_weapon(&"granada"))
+	assert_eq(player.weapons.get_weapon(&"webly").level, 3)
+	DebugOptions.set_value("weapons", {"webly": 99})
 	DebugOptions.apply_weapons(player)
-	var w := player.weapons.get_weapon(&"revolver")
+	var w := player.weapons.get_weapon(&"webly")
 	assert_eq(w.level, w.data.max_level, "no pasa del nivel máximo")
 
 func test_el_director_mantiene_el_numero_de_enemigos_y_el_tipo() -> void:
@@ -121,8 +121,8 @@ func test_el_menu_se_monta_y_sus_filas_cambian_la_partida() -> void:
 	assert_true(player.god)
 	_row(m, "Esquive").step(1)
 	assert_eq(String(player.data.dodge_style.id), DebugOptions.get_value("dodge", ""))
-	_row(m, "Revólver").step(2)                      # sin ella -> nivel 2
-	assert_eq(player.weapons.get_weapon(&"revolver").level, 2)
+	_row(m, "Revólver Webly").step(2)                      # sin ella -> nivel 2
+	assert_eq(player.weapons.get_weapon(&"webly").level, 2)
 	_row(m, "Altura visible").step(1)
 	assert_eq(g.camera.view_size, 20.0)
 	_row(m, "Subir un nivel").pressed.emit()

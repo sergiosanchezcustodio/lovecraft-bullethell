@@ -87,12 +87,14 @@ func _fire(w: Weapon) -> bool:
 		return _beam(w, target_pos)
 	if w.data.delivery == WeaponData.Delivery.WAVE:
 		return _wave(w)
+	if w.data.delivery == WeaponData.Delivery.FLAME:
+		return _flame(w, target_pos)
 	if w.data.delivery == WeaponData.Delivery.THROWN:
 		for k in n:
 			var jitter := Vector3.ZERO
 			if k > 0:
 				var a := randf() * TAU
-				jitter = Vector3(cos(a), 0, sin(a)) * w.stat("aoe_radius") * randf_range(0.6, 1.1)
+				jitter = Vector3(cos(a), 0, sin(a)) * maxf(w.stat("aoe_radius"), w.stat("zone_radius")) * randf_range(0.6, 1.1)
 			_throw(w, target_pos + jitter)
 		player.play_once("throw")
 	else:
@@ -105,6 +107,7 @@ func _fire(w: Weapon) -> bool:
 		var spread := deg_to_rad(w.stat("spread_deg"))
 		for k in n:
 			var off := 0.0 if n == 1 else lerpf(-spread * 0.5, spread * 0.5, k / float(n - 1))
+			off += deg_to_rad(randf_range(-1.0, 1.0) * w.stat("jitter_deg"))       # errático
 			var dir := base.rotated(Vector3.UP, off)
 			var delay := w.stat("burst_delay") * k
 			if delay > 0.0: _pending.append({"w": w, "dir": dir, "t": delay, "k": dmg_k})
@@ -120,7 +123,7 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 	world.bullets.spawn(BulletManager.Team.PLAYER, BulletManager.Style.PLAYER,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
 		w.stat("projectile_size"), Damage.new(dmg(w) * dmg_k, 0.0), life, int(w.stat("pierce")),
-		w.stat("knockback"), _bonus_set)
+		w.stat("knockback"), _bonus_set, int(w.stat("split_count")))
 
 ## Daño de un arma con los atributos del personaje (D-27).
 func dmg(w: Weapon) -> float:
@@ -207,4 +210,21 @@ func _throw(w: Weapon, target: Vector3) -> void:
 	var e := ThrownExplosive.new()
 	e.setup(world, player.global_position + Vector3(0, 1.4, 0), Vector3(target.x, 0, target.z),
 		w.stat("flight_time"), w.stat("fuse"), w.stat("aoe_radius"), dmg(w), player.color)
+	var z := {}
+	if w.data.zone != WeaponData.Zone.NONE:
+		z = {"kind": w.data.zone, "radius": w.stat("zone_radius"), "time": w.stat("zone_time"),
+			"dps": w.stat("zone_dps") * player.damage_mult(w.data.category), "vulnerable": w.stat("vulnerable")}
+	e.configure(w.data.look, w.stat("arc_height"), z, w.stat("lure"), player.data.bonus_tags)
 	world.fx.add_child(e)
+
+## Lanzallamas: chorro en cono hacia el objetivo que deja fuego en el suelo.
+func _flame(w: Weapon, target_pos: Vector3) -> bool:
+	var origin := player.global_position
+	var dir := Vector3(target_pos.x - origin.x, 0, target_pos.z - origin.z)
+	if dir.length() < 0.01: dir = player.motor.facing
+	var k := player.damage_mult(w.data.category)
+	var jet := FlameJet.new().setup(player, world, dir, w.stat("range"), w.stat("spread_deg"), dmg(w),
+		w.stat("duration"), w.stat("zone_radius"), w.stat("zone_time"), w.stat("zone_dps") * k, player.data.bonus_tags)
+	world.fx.add_child(jet)
+	fired.emit(w)
+	return true

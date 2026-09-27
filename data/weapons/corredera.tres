@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"corredera"
+display_name = "Escopeta de corredera"
+delivery = 0
+category = 1
+targeting = 0
+cooldown = 1.4
+range = 6.0
+damage = 7.0
+count = 10.0
+spread_deg = 324.0
+projectile_speed = 16.0
+projectile_radius = 0.16
+projectile_size = 0.13
+knockback = 2.2
+max_level = 5
+level_mods = Array[Dictionary]([{"count+": 2.0, "spread_deg+": 6.0}, {"damage*": 1.25}, {"cooldown*": 0.8}, {"count+": 4.0, "spread_deg+": 10.0, "knockback*": 1.3}])
+level_text = Array[String](["Dos perdigones más", "+25 % de daño", "Recarga un 20 % más rápido", "Cuatro perdigones más y más empuje"])

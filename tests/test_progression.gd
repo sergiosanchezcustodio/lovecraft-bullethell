@@ -15,8 +15,8 @@ func _player() -> Player:
 	world.add_player(p)
 	p.weapons = WeaponSystem.new().setup(p, world)
 	p.add_child(p.weapons)
-	p.weapons.add_weapon(load("res://data/weapons/dinamita.tres"))
-	p.progress.weapon_pool = [load("res://data/weapons/dinamita.tres"), load("res://data/weapons/revolver.tres")] as Array[WeaponData]
+	p.weapons.add_weapon(load("res://data/weapons/granada.tres"))
+	p.progress.weapon_pool = [load("res://data/weapons/granada.tres"), load("res://data/weapons/webly.tres")] as Array[WeaponData]
 	for f in ["velocidad", "vida", "cordura", "reflejos", "iman"]:
 		p.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
 	return p
@@ -58,15 +58,15 @@ func test_elegir_arma_nueva_subir_arma_y_pasiva() -> void:
 	var p := _player()
 	var o := PlayerProgress.Option.new()
 	o.kind = PlayerProgress.Option.Kind.NEW_WEAPON
-	o.weapon = load("res://data/weapons/revolver.tres")
+	o.weapon = load("res://data/weapons/webly.tres")
 	p.progress.choose(o, p)
-	assert_not_null(p.weapons.get_weapon(&"revolver"))
+	assert_not_null(p.weapons.get_weapon(&"webly"))
 	o = PlayerProgress.Option.new()
 	o.kind = PlayerProgress.Option.Kind.WEAPON_LEVEL
-	o.weapon = load("res://data/weapons/dinamita.tres")
+	o.weapon = load("res://data/weapons/granada.tres")
 	o.to_level = 2
 	p.progress.choose(o, p)
-	assert_eq(p.weapons.get_weapon(&"dinamita").level, 2)
+	assert_eq(p.weapons.get_weapon(&"granada").level, 2)
 	var speed := p.data.move_speed
 	o = PlayerProgress.Option.new()
 	o.kind = PlayerProgress.Option.Kind.PASSIVE
@@ -90,8 +90,8 @@ func test_las_pasivas_no_tocan_el_recurso_compartido() -> void:
 
 func test_armas_al_maximo_no_se_ofrecen() -> void:
 	var p := _player()
-	p.weapons.get_weapon(&"dinamita").level = 5
-	p.progress.weapon_pool = [load("res://data/weapons/dinamita.tres")] as Array[WeaponData]
+	p.weapons.get_weapon(&"granada").level = 5
+	p.progress.weapon_pool = [load("res://data/weapons/granada.tres")] as Array[WeaponData]
 	p.progress.upgrade_pool.clear()
 	var rng := RandomNumberGenerator.new()
 	assert_eq(p.progress.roll_options(p.weapons, rng).size(), 0)

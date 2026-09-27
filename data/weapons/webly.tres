@@ -4,21 +4,19 @@
 
 [resource]
 script = ExtResource("1")
-id = &"revolver"
-display_name = "Revólver .38"
+id = &"webly"
+display_name = "Revólver Webly Mk VI"
 delivery = 0
 category = 1
 targeting = 0
-cooldown = 0.8
+cooldown = 0.9
 range = 12.0
-damage = 12.0
+damage = 16.0
 count = 1.0
-spread_deg = 0.0
-burst_delay = 0.0
-pierce = 0.0
-projectile_speed = 22.0
-projectile_radius = 0.2
-projectile_size = 0.17
+projectile_speed = 21.0
+projectile_radius = 0.22
+projectile_size = 0.2
+knockback = 2.4
 max_level = 5
-level_mods = Array[Dictionary]([{"damage*": 1.25}, {"cooldown*": 0.8}, {"count+": 1.0, "burst_delay+": 0.12}, {"pierce+": 1.0, "damage*": 1.2}])
+level_mods = Array[Dictionary]([{"damage*": 1.25}, {"cooldown*": 0.8}, {"count+": 1.0, "burst_delay+": 0.14}, {"pierce+": 1.0, "damage*": 1.2}])
 level_text = Array[String](["+25 % de daño", "Dispara un 20 % más rápido", "Dos disparos seguidos", "Atraviesa a un enemigo y +20 % de daño"])

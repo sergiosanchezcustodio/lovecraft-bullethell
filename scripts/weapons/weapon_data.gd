@@ -9,7 +9,11 @@ enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND }
 ## grados por segundo). BEAM: rayo recto de `range` m y `projectile_radius` de ancho, que daña
 ## a todo lo que atraviesa. WAVE: onda que se expande desde el personaje hasta aoe_radius en
 ## `duration` s, empuja hacia fuera y aturde `stun` s a lo que alcanza.
-enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE }
+## FLAME: chorro en cono delante del personaje durante `duration` s (alcance `range`, abertura
+## `spread_deg`) que deja fuego en el suelo.
+enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE, FLAME }
+## Zona que deja en el suelo (lanzados, lanzallamas): ninguna, fuego o ácido.
+enum Zone { NONE, FIRE, ACID }
 
 ## Tipo de ataque, para los atributos (D-27): físico (FUE+TEN: cuerpo a cuerpo y lanzadas
 ## con el brazo), de fuego (CON+INT) o mágico (POD+EDU: arcanas y tecnología de los Mitos).
@@ -39,6 +43,16 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var duration := 0.0                  ## s activa (órbita) o visible (rayo)
 @export var hit_interval := 0.45             ## órbita: s entre dos golpes al mismo enemigo
 @export var stun := 0.0                      ## s que deja aturdido al enemigo (onda)
+@export var jitter_deg := 0.0                ## desvío al azar de cada proyectil (errático)
+@export var split_count := 0.0               ## al explotar o apagarse, se divide en tantos proyectiles
+@export var zone := Zone.NONE                ## zona en el suelo al caer (lanzados) o a lo largo del chorro
+@export var zone_radius := 1.6
+@export var zone_time := 3.0                 ## s que dura la zona
+@export var zone_dps := 8.0                  ## daño por segundo dentro de la zona
+@export var vulnerable := 0.0                ## s que el enemigo recibe +25 % de daño (ácido)
+@export var lure := 0.0                      ## s que la bengala atrae a los enemigos cercanos
+@export var arc_height := 2.2                ## altura del arco de los lanzados
+@export var look := "dinamita"               ## aspecto del lanzado: dinamita, granada, molotov, frasco, bengala
 @export_group("Progresión")
 @export var max_level := 5
 ## Mejora de cada nivel a partir del 2 (índice 0 = nivel 2). Claves "estadística*"

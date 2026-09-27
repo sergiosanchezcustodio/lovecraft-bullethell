@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"granada"
+display_name = "Stielhandgranate"
+delivery = 1
+category = 0
+targeting = 1
+cooldown = 2.8
+range = 10.0
+damage = 34.0
+count = 1.0
+aoe_radius = 3.0
+flight_time = 0.75
+fuse = 0.0
+arc_height = 2.6
+look = "granada"
+max_level = 5
+level_mods = Array[Dictionary]([{"aoe_radius*": 1.15}, {"count+": 1.0}, {"cooldown*": 0.8}, {"count+": 1.0, "damage*": 1.25}])
+level_text = Array[String](["Explosión un 15 % más amplia", "Lanza dos granadas", "Lanza un 20 % más rápido", "Una granada más y +25 % de daño"])

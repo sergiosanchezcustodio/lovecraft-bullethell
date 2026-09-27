@@ -23,6 +23,10 @@ var anim_t := 0.0                        ## fase de la animación (0..1)
 var anim_hold := false                   ## el comportamiento controla anim_t directamente
 var _knock := Vector3.ZERO
 var _stun := 0.0                            ## s que le quedan aturdido (no se mueve ni ataca)
+var _vulnerable := 0.0                      ## s que recibe +25 % de daño (ácido)
+var _lure_t := 0.0                          ## s que le atrae una bengala
+var _lure_pos := Vector3.ZERO
+const VULNERABLE_MULT := 1.25
 var _flash := 0.0
 var _flash_on := false
 var _flash_mat: StandardMaterial3D
@@ -79,13 +83,26 @@ func target_player() -> Player:
 			best = p
 	return best
 
+## Vulnerable (+25 % de daño) durante `seconds`.
+func make_vulnerable(seconds: float) -> void:
+	_vulnerable = maxf(_vulnerable, seconds)
+
+## Atraído hacia un punto (bengala) durante `seconds`. Las élites no se dejan engañar.
+func lure(pos: Vector3, seconds: float) -> void:
+	if data.elite: return
+	_lure_pos = pos
+	_lure_t = maxf(_lure_t, seconds)
+
+func is_vulnerable() -> bool:
+	return _vulnerable > 0.0
+
 ## Aturdido durante `seconds` (las élites, la mitad).
 func stun(seconds: float) -> void:
 	_stun = maxf(_stun, seconds * (0.5 if data.elite else 1.0))
 
 func take_damage(d: Damage) -> void:
 	if not is_alive(): return
-	var k := 1.0
+	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
 	for tag in data.tags: k *= float(d.bonus.get(tag, 1.0))    # rasgos contra este tipo de enemigo
 	health -= d.physical * k
 	_flash = 0.07
@@ -106,6 +123,11 @@ func _physics_process(delta: float) -> void:
 	_spawn_t += delta
 	var target := target_player()
 	velocity = behavior.update(self, target, delta)
+	if _vulnerable > 0.0: _vulnerable -= delta
+	if _lure_t > 0.0:                          # bengala: va hacia la luz en lugar del jugador
+		_lure_t -= delta
+		var to := Vector3(_lure_pos.x - position.x, 0, _lure_pos.z - position.z)
+		velocity = to.normalized() * data.move_speed if to.length() > 0.6 else Vector3.ZERO
 	if _stun > 0.0:
 		_stun -= delta
 		velocity = Vector3.ZERO

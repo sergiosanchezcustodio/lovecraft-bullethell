@@ -26,17 +26,19 @@ func _step(n: int = 1) -> void:
 
 # ---------------- armas ----------------
 func test_estadisticas_por_nivel() -> void:
-	var rev: WeaponData = load("res://data/weapons/revolver.tres")
-	assert_almost_eq(rev.stat("damage", 1), 12.0, 0.001)
-	assert_almost_eq(rev.stat("damage", 2), 15.0, 0.001)
-	assert_almost_eq(rev.stat("cooldown", 3), 0.64, 0.001)
-	assert_eq(int(rev.stat("count", 3)), 1)
-	assert_eq(int(rev.stat("count", 4)), 2)
-	assert_eq(int(rev.stat("pierce", 5)), 1)
-	var dyn: WeaponData = load("res://data/weapons/dinamita.tres")
-	assert_almost_eq(dyn.stat("aoe_radius", 2), 2.64, 0.001)
-	assert_eq(int(dyn.stat("count", 5)), 3)
-	assert_eq(rev.level_text.size(), rev.max_level - 1, "un texto por mejora")
+	# Datos propios: los de data/weapons se retocan al equilibrar
+	var w := WeaponData.new()
+	w.damage = 12.0; w.cooldown = 1.0; w.count = 1.0
+	w.level_mods = [{"damage*": 1.25}, {"cooldown*": 0.8}, {"count+": 1.0}] as Array[Dictionary]
+	assert_almost_eq(w.stat("damage", 1), 12.0, 0.001)
+	assert_almost_eq(w.stat("damage", 2), 15.0, 0.001)
+	assert_almost_eq(w.stat("cooldown", 3), 0.8, 0.001)
+	assert_eq(int(w.stat("count", 3)), 1)
+	assert_eq(int(w.stat("count", 4)), 2)
+	for r in DebugOptions.list_resources("res://data/weapons"):
+		var d := r as WeaponData
+		assert_eq(d.level_text.size(), d.max_level - 1, "%s: un texto por mejora" % d.id)
+		assert_eq(d.level_mods.size(), d.max_level - 1, "%s: una mejora por nivel" % d.id)
 
 # ---------------- patrones ----------------
 func test_patron_radial_reparte_y_gira() -> void:

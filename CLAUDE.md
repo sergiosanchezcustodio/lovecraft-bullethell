@@ -60,7 +60,11 @@ Léela al empezar cada sesión:
     - Un arma al empezar; como mucho 4 armas y 4 objetos distintos (`PlayerProgress.weapon_slots` e `item_slots`).
     - De inicio: Dyer, Olmstead, Peaslee y Whipple. Legrasse y Johansen pasan a la tienda.
     - La selección de personaje muestra las estadísticas derivadas y los atributos.
-  - Siguiente: hito 2.6, arsenal I (armas de fuego y lanzadas, zonas de daño y estados).
+  - **Hito 2.6 (arsenal I): hecho.**
+    - Armas fusionadas (D-29), que sustituyen a las antiguas: Webly Mk VI (Olmstead), Stielhandgranate (Dyer, explota al impacto; ya lleva dos en el cinturón), escopeta de corredera (Legrasse, perdigones en anillo), rifle de palanca (Peaslee), Mauser C96 (Elwood) y Thompson M1928 (Malone).
+    - Armas nuevas: Flammenwerfer (chorro en cono que deja fuego), Cóctel Molotov (charco ardiente), arpón ballenero (atraviesa y arrastra), pistola de bengalas (atrae a los enemigos; las élites no), lanzaquímicos (ácido que deja vulnerables con +25 % de daño) y cañón de fuegos artificiales (errático, se abre en chispas).
+    - Sistemas nuevos: `DamageZone` (fuego y ácido), `Flare`, `FlameJet`, estados de los enemigos (`make_vulnerable`, `lure`, `stun`), balas que se dividen (`split`) y lanzados configurables (`ThrownExplosive.configure`: aspecto, arco, zona, bengala; con mecha 0 explotan al impactar).
+  - Siguiente: hito 2.7, arsenal II (arcanas y tecnología de los Mitos).
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
@@ -274,7 +278,8 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - `Damage` tiene una parte física (resta vida) y otra mental (resta cordura); su tipo se deduce de esas partes.
   - `BulletManager` guarda todas las balas en arrays compactos y las dibuja con dos MultiMesh: las trazadoras del jugador (cuadrados con `bullet.gdshader`) y las enemigas en voxel (`BulletMeshes.orb()`, un núcleo de 19 cubos y un anillo de 14, con `bullet_voxel.gdshader`). El shader enseña unos grupos de cubos u otros según el tipo de daño. Las tapadas se dibujan con la segunda pasada (`bullet_voxel_hidden.gdshader`). Las balas del jugador chocan contra la rejilla de enemigos; las enemigas, contra los jugadores. Cada bala lleva su empuje y los rasgos de daño de quien la dispara.
   - Las armas son datos (`WeaponData`, en `data/weapons/`): cadencia, alcance, apuntado (D-05), entrega y mejoras por nivel (`"damage*": 1.25`, `"count+": 1`). `WeaponSystem`, dentro del jugador, las dispara solas.
-    - Entregas: `BULLET` (balas), `THROWN` (la dinamita, un `ThrownExplosive`), `MELEE` (tajo del machete, `Slash`), `ORBIT` (páginas que giran alrededor, `OrbitRing`), `BEAM` (rayo recto, `Beam`) y `WAVE` (onda que empuja y aturde, `Shockwave`; los enemigos tienen `stun()`).
+    - Entregas: `BULLET` (balas; con `split_count` se abren en chispas y con `jitter_deg` son erráticas), `THROWN` (lanzados en arco, `ThrownExplosive`: explosión, zona o bengala al caer), `MELEE` (tajo del machete, `Slash`), `ORBIT` (páginas que giran alrededor, `OrbitRing`), `BEAM` (rayo recto, `Beam`), `WAVE` (onda que empuja y aturde, `Shockwave`) y `FLAME` (chorro del lanzallamas, `FlameJet`).
+    - Zonas en el suelo (`DamageZone`, `WeaponData.zone`): fuego o ácido, con daño por tics. Estados de los enemigos: aturdido (`stun`), vulnerable (`make_vulnerable`, +25 % de daño) y atraído (`lure`, las élites no).
     - Las arcanas cuestan cordura (`sanity_cost`, multiplicado por `CharacterData.arcane_cost_mult`).
   - Los patrones enemigos también son datos (`BulletPattern`, en `data/patterns/`): radial o en abanico, ráfagas, giro y aviso previo. `PatternRunner` los ejecuta.
   - Efectos: `Telegraph` (aviso en el suelo) y `Explosion`.
