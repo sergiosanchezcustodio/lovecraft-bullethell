@@ -241,7 +241,7 @@ func apply_dodge_style(style: DodgeStyle) -> void:
 	data.dodge_speed = style.speed
 	data.dodge_duration = style.duration * data.dodge_length
 	data.dodge_iframes = style.iframes * data.dodge_length
-	data.dodge_cooldown = style.cooldown
+	data.dodge_cooldown = style.cooldown * data.dodge_cooldown_mult
 
 func is_invulnerable() -> bool:
 	return motor.is_invulnerable() or (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes)
@@ -257,6 +257,10 @@ func take_damage(d: Damage) -> void:
 		var k := 1.0
 		for tag in (d.source as Enemy).data.tags: k *= float(data.resist_tags.get(tag, 1.0))
 		if k != 1.0: d = d.scaled(k)
+	if data.physical_resist != 1.0 and d.physical > 0.0:            # rasgo: aguante físico
+		var r := Damage.new(d.physical * data.physical_resist, d.mental)
+		r.knockback = d.knockback; r.source = d.source; r.bonus = d.bonus
+		d = r
 	health = maxf(0.0, health - d.physical)
 	if d.mental > 0.0:
 		sanity = maxf(0.0, sanity - d.mental)

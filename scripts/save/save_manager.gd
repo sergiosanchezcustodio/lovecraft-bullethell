@@ -61,6 +61,12 @@ func save() -> bool:
 		return false
 	return true
 
+## Crea en un hueco la partida de pruebas (todo desbloqueado), sustituyendo lo que hubiera.
+func make_test_save(i: int) -> void:
+	slot = i
+	current = SaveData.create_test()
+	save()
+
 ## Borra un hueco: queda como nuevo.
 func delete(i: int) -> void:
 	if exists(i): DirAccess.remove_absolute(path(i))

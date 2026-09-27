@@ -50,7 +50,7 @@ func _ready() -> void:
 	if _first: _first.grab_focus.call_deferred()
 
 func _level_button(l: Dictionary, won: Array) -> Button:
-	var unlocked := Campaign.is_unlocked(l.id, won)
+	var unlocked := Saves.current.has_level(l.id) if Saves.current else Campaign.is_unlocked(l.id, won)
 	var playable := unlocked and Campaign.exists(l.id)
 	var tag := "" if playable else ("  ·  Próximamente" if unlocked else "  ·  Bloqueado")
 	var done := "✓ " if won.has(l.id) else ""

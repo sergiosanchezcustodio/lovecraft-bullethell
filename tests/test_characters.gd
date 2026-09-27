@@ -143,3 +143,41 @@ func test_la_suerte_da_a_veces_una_opcion_mas() -> void:
 	for i in 400:
 		if p.progress.roll_options(p.weapons, rng).size() == 4: four += 1
 	assert_almost_eq(four / 400.0, 0.3, 0.08)
+
+# ---------------- segunda tanda (D-26) ----------------
+func test_la_segunda_tanda_esta_completa() -> void:
+	for id in ["iwanicki", "elwood", "malone"]:
+		var c: CharacterData = load("res://data/characters/%s.tres" % id)
+		assert_true(c.in_shop)
+		assert_true(FileAccess.file_exists("res://models/%s.json" % c.model), "modelo de " + id)
+		assert_true(Anims.has_anim(c.model, "walk"))
+		for w in c.starting_weapons: assert_true(ResourceLoader.exists("res://data/weapons/%s.tres" % w))
+
+func test_la_onda_empuja_aturde_y_golpea_una_vez() -> void:
+	var p := _player("iwanicki")
+	var w := p.weapons.add_weapon(load("res://data/weapons/formula.tres"))
+	var near := _enemy([] as Array[StringName], Vector3(2, 0, 0))
+	var far := _enemy([] as Array[StringName], Vector3(12, 0, 0))
+	world.rebuild_grid()
+	assert_true(p.weapons._fire(w))
+	var wave: Shockwave = world.fx.get_child(world.fx.get_child_count() - 1)
+	for i in 60: wave._physics_process(1.0 / 60.0)
+	assert_almost_eq(near.health, 1000.0 - w.stat("damage"), 0.01, "una sola vez")
+	assert_gt(near._stun, 0.0)
+	assert_eq(far.health, 1000.0)
+
+func test_elwood_aguanta_el_daño_fisico_y_esquiva_antes() -> void:
+	var p := _player("elwood")
+	assert_almost_eq(p.data.dodge_cooldown, p.data.dodge_style.cooldown * 0.8, 0.001)
+	p.take_damage(Damage.new(20.0, 10.0))
+	assert_almost_eq(p.health, p.data.max_health - 17.0, 0.01)
+	assert_almost_eq(p.sanity, p.data.max_sanity - 10.0, 0.01, "el mental, igual")
+
+func test_malone_hace_mas_daño_a_quemarropa() -> void:
+	var p := _player("malone")
+	var w := p.weapons.add_weapon(load("res://data/weapons/thompson.tres"))
+	_enemy([] as Array[StringName], Vector3(0.5, 0, 0))
+	world.rebuild_grid()
+	p.weapons._fire(w)
+	var first: float = world.bullets._phys[0]
+	assert_gt(first, w.stat("damage") * 1.4)

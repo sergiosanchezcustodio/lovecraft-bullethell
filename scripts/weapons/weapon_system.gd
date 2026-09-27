@@ -52,7 +52,7 @@ func _physics_process(delta: float) -> void:
 		var p := _pending[i]
 		p.t -= delta
 		if p.t <= 0.0:
-			_spawn_bullet(p.w, p.dir)
+			_spawn_bullet(p.w, p.dir, p.get("k", 1.0))
 			_pending.remove_at(i)
 	for w in weapons:
 		w.timer -= delta
@@ -85,6 +85,8 @@ func _fire(w: Weapon) -> bool:
 		return _orbit(w)
 	if w.data.delivery == WeaponData.Delivery.BEAM:
 		return _beam(w, target_pos)
+	if w.data.delivery == WeaponData.Delivery.WAVE:
+		return _wave(w)
 	if w.data.delivery == WeaponData.Delivery.THROWN:
 		for k in n:
 			var jitter := Vector3.ZERO
@@ -95,24 +97,29 @@ func _fire(w: Weapon) -> bool:
 		player.play_once("throw")
 	else:
 		var base := Vector3(target_pos.x - origin.x, 0, target_pos.z - origin.z).normalized()
+		# rasgo de Malone: más daño cuanto más cerca está el objetivo
+		var dmg_k := 1.0
+		if player.data.close_bonus > 0.0:
+			var dist := Vector2(target_pos.x - origin.x, target_pos.z - origin.z).length()
+			dmg_k = 1.0 + player.data.close_bonus * clampf(1.0 - dist / maxf(rng, 0.1), 0.0, 1.0)
 		var spread := deg_to_rad(w.stat("spread_deg"))
 		for k in n:
 			var off := 0.0 if n == 1 else lerpf(-spread * 0.5, spread * 0.5, k / float(n - 1))
 			var dir := base.rotated(Vector3.UP, off)
 			var delay := w.stat("burst_delay") * k
-			if delay > 0.0: _pending.append({"w": w, "dir": dir, "t": delay})
-			else: _spawn_bullet(w, dir)
+			if delay > 0.0: _pending.append({"w": w, "dir": dir, "t": delay, "k": dmg_k})
+			else: _spawn_bullet(w, dir, dmg_k)
 	fired.emit(w)
 	return true
 
-func _spawn_bullet(w: Weapon, dir: Vector3) -> void:
+func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 	var speed := w.stat("projectile_speed")
 	var life := w.stat("range") / speed * 1.15
 	if _bonus_set < 0 and not player.data.bonus_tags.is_empty():
 		_bonus_set = world.bullets.register_bonus(player.data.bonus_tags)
 	world.bullets.spawn(BulletManager.Team.PLAYER, BulletManager.Style.PLAYER,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
-		w.stat("projectile_size"), Damage.new(w.stat("damage"), 0.0), life, int(w.stat("pierce")),
+		w.stat("projectile_size"), Damage.new(w.stat("damage") * dmg_k, 0.0), life, int(w.stat("pierce")),
 		w.stat("knockback"), _bonus_set)
 
 ## Coste de cordura de las armas arcanas (GDD 5.2), con el rasgo del personaje.
@@ -132,6 +139,16 @@ func _orbit(w: Weapon) -> bool:
 	_pay_sanity(w)
 	ring.start(int(w.stat("count")), w.stat("aoe_radius"), w.stat("projectile_speed"), w.stat("projectile_radius"),
 		w.stat("damage"), w.stat("duration"), w.stat("hit_interval"), w.stat("knockback"), player.data.bonus_tags)
+	fired.emit(w)
+	return true
+
+## Onda de expulsión (fórmula de Iwanicki): se expande desde el personaje, empuja y aturde.
+func _wave(w: Weapon) -> bool:
+	if world.enemies_in_circle(player.global_position, w.stat("aoe_radius")).is_empty(): return false
+	_pay_sanity(w)
+	var wave := Shockwave.new().setup(player, world, w.stat("aoe_radius"), w.stat("duration"), w.stat("damage"),
+		w.stat("knockback"), w.stat("stun"), player.data.bonus_tags)
+	world.fx.add_child(wave)
 	fired.emit(w)
 	return true
 

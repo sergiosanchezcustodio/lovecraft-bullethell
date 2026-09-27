@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/rodar.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"iwanicki"
+display_name = "Padre Iwanicki"
+model = "iwanicki"
+role = "Sacerdote de la iglesia de San Estanislao"
+passive_text = "Su presencia calma: los compañeros cercanos recuperan cordura."
+story = "Los sueños en la casa de la bruja"
+price = 0
+in_shop = true
+order = 9
+max_health = 100.0
+max_sanity = 130.0
+move_speed = 4.4
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"formula"])
+calm_aura = 2.0

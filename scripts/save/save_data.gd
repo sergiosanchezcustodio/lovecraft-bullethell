@@ -15,12 +15,33 @@ var pets := []                           ## compañeros desbloqueados (ids)
 var characters := []                     ## personajes desbloqueados además de los iniciales (ids)
 var levels_won := []                     ## niveles superados (ids, p. ej. "p1_n1")
 var stats := {"runs": 0, "kills": 0, "deaths": 0, "revives": 0}
+## Partida de pruebas: todo lo que existe y lo que se añada (personajes, compañeros, niveles,
+## artículos de la tienda) está disponible, sin tener que comprarlo ni ganarlo.
+var unlock_all := false
 
 static func create() -> SaveData:
 	var d := SaveData.new()
 	d.created = Time.get_datetime_string_from_system()
 	d.updated = d.created
 	return d
+
+## Partida de pruebas con todo desbloqueado y dinero de sobra.
+static func create_test() -> SaveData:
+	var d := create()
+	d.unlock_all = true
+	d.money = 999999
+	for r in DebugOptions.list_resources("res://data/characters"): d.characters.append(String((r as CharacterData).id))
+	for r in DebugOptions.list_resources("res://data/pets"): d.pets.append(String((r as PetData).id))
+	return d
+
+func has_character(id: String) -> bool:
+	return unlock_all or characters.has(id)
+
+func has_pet(id: String) -> bool:
+	return unlock_all or pets.has(id)
+
+func has_level(id: String) -> bool:
+	return unlock_all or Campaign.is_unlocked(id, levels_won)
 
 ## Objetos comprados en la tienda (cada nivel de un potenciador cuenta como uno).
 func items_bought() -> int:
@@ -31,7 +52,7 @@ func items_bought() -> int:
 func to_dict() -> Dictionary:
 	return {"version": VERSION, "created": created, "updated": updated, "play_time": play_time,
 		"money": money, "purchases": purchases, "pets": pets, "characters": characters,
-		"levels_won": levels_won, "stats": stats}
+		"levels_won": levels_won, "stats": stats, "unlock_all": unlock_all}
 
 ## Lee un diccionario de cualquier versión conocida; los campos que falten toman su valor
 ## por defecto.
@@ -46,6 +67,7 @@ static func from_dict(d: Dictionary) -> SaveData:
 	s.pets = d.get("pets", [])
 	s.characters = d.get("characters", [])
 	s.levels_won = d.get("levels_won", [])
+	s.unlock_all = bool(d.get("unlock_all", false))
 	var st: Dictionary = d.get("stats", {})
 	for k in s.stats: s.stats[k] = int(st.get(k, 0))
 	for k in st:

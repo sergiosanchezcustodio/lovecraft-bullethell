@@ -6,6 +6,7 @@ extends Node
 ##   godot --path . -- bench ...             -> prueba de rendimiento (scenes/bench.tscn)
 ##   godot --path . -- title ...             -> portada (scenes/title.tscn)
 ##   godot --path . -- select ...            -> selección de personaje (scenes/select.tscn)
+##   godot --path . -- test_save=3           -> crea la partida de pruebas (todo desbloqueado) en ese hueco
 ## La ventana sigue la configuración (Settings: pantalla completa por defecto). Las ejecuciones
 ## de prueba (capturas, rendimiento, bots, visor, grabación de vídeo) van en ventana.
 ## `window=true` fuerza la ventana y `fullscreen=true`, la pantalla completa. La interfaz escala
@@ -14,6 +15,11 @@ extends Node
 func _ready() -> void:
 	var la := LaunchArgs.from_cmdline()
 	var first := la.positional[0] if la.positional.size() > 0 else ""
+	if la.has("test_save"):                     # `test_save=3`: crea la partida de pruebas en ese hueco y sale
+		Saves.make_test_save(clampi(la.get_int("test_save") - 1, 0, Saves.SLOTS - 1))
+		print("Partida de pruebas creada en el hueco %d: %s" % [la.get_int("test_save"), Saves.path(Saves.slot)])
+		get_tree().quit()
+		return
 	_window_mode(la, first)
 	# Sin argumentos se abre la pantalla de título; con opciones de partida, la partida
 	var scene := "res://scenes/title.tscn" if OS.get_cmdline_user_args().is_empty() else "res://scenes/game.tscn"

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/deslizar.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"malone"
+display_name = "Vera Malone"
+model = "malone"
+role = "Contrabandista de Red Hook"
+passive_text = "Hasta un 50 % más de daño cuanto más cerca está el enemigo."
+story = "El horror de Red Hook"
+price = 0
+in_shop = true
+order = 11
+max_health = 100.0
+max_sanity = 95.0
+move_speed = 4.8
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"thompson"])
+close_bonus = 0.5

@@ -22,6 +22,7 @@ var anim := "walk"
 var anim_t := 0.0                        ## fase de la animación (0..1)
 var anim_hold := false                   ## el comportamiento controla anim_t directamente
 var _knock := Vector3.ZERO
+var _stun := 0.0                            ## s que le quedan aturdido (no se mueve ni ataca)
 var _flash := 0.0
 var _flash_on := false
 var _flash_mat: StandardMaterial3D
@@ -78,6 +79,10 @@ func target_player() -> Player:
 			best = p
 	return best
 
+## Aturdido durante `seconds` (las élites, la mitad).
+func stun(seconds: float) -> void:
+	_stun = maxf(_stun, seconds * (0.5 if data.elite else 1.0))
+
 func take_damage(d: Damage) -> void:
 	if not is_alive(): return
 	var k := 1.0
@@ -101,6 +106,9 @@ func _physics_process(delta: float) -> void:
 	_spawn_t += delta
 	var target := target_player()
 	velocity = behavior.update(self, target, delta)
+	if _stun > 0.0:
+		_stun -= delta
+		velocity = Vector3.ZERO
 	# Separación: no amontonarse con los enemigos cercanos
 	var pos2 := Vector2(global_position.x, global_position.z)
 	var push := Vector2.ZERO
@@ -125,7 +133,7 @@ func _physics_process(delta: float) -> void:
 		if Vector2(pp.x - position.x, pp.z - position.z).length_squared() < r * r:
 			p.take_damage(behavior.contact_damage(self))
 	# Ataque a distancia
-	if data.attack != null and target != null and behavior.can_shoot(self):
+	if data.attack != null and target != null and _stun <= 0.0 and behavior.can_shoot(self):
 		_attack_timer -= delta
 		if _attack_timer <= 0.0 and not runner.busy and target.global_position.distance_to(global_position) < data.attack_range:
 			runner.fire(data.attack, func() -> Vector3: return target.global_position if is_instance_valid(target) else global_position)

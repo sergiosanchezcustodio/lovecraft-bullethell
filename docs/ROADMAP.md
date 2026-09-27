@@ -90,7 +90,7 @@ Ampliada el 26-09-2026: adelanta de la fase 5 el guardado, el menú principal, l
 | 2.2 | Menú principal y configuración: Jugar (local / online desactivado), Tienda, Configuración (vídeo, audio, controles, juego), Salir | **Hecho** |
 | 2.3 | Selección de personaje y mapa de niveles: gestor de dispositivos, unirse con Start, cursores simultáneos, personajes únicos, compañero bajo la tarjeta, mapa 3×5 | **Hecho** |
 | 2.4 ⏸ | Personajes nuevos: Olmstead, Legrasse y Johansen (modelos, datos, pasivos), escopeta y machete | Hecho; **pendiente de tu revisión** |
-| 2.4b ⏸ | Siete personajes más (D-26), en dos tandas con revisión: Peaslee, Varga, Whipple y Blake (rifle, Necronomicón, bisturís, Trapezoedro); después Iwanicki, Elwood y Malone (fórmula de expulsión, Colt .45, Thompson) | Primera tanda hecha, **pendiente de tu revisión**; segunda tanda pendiente |
+| 2.4b ⏸ | Siete personajes más (D-26), en dos tandas con revisión: Peaslee, Varga, Whipple y Blake (rifle, Necronomicón, bisturís, Trapezoedro); después Iwanicki, Elwood y Malone (fórmula de expulsión, Colt .45, Thompson) | Las dos tandas hechas, **pendientes de tu revisión** |
 | 2.5 | Partida de 1 a 4 jugadores: cámara compartida con zoom, HUD en las cuatro esquinas, bots como jugadores extra | Pendiente |
 | 2.6 | Reglas del cooperativo: experiencia compartida, subida de nivel por cuadrante, pausa común, escalado, reanimación | Pendiente |
 | 2.7 | Cordura completa: cinco crisis, calmar, recuperación, auras, locura acumulada | Pendiente |

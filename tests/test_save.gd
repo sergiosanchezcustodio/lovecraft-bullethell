@@ -63,3 +63,15 @@ func test_tiempo_jugado_como_texto() -> void:
 	assert_eq(SaveData.format_time(30), "menos de 1 min")
 	assert_eq(SaveData.format_time(12 * 60 + 5), "12 min")
 	assert_eq(SaveData.format_time(3 * 3600 + 5 * 60), "3 h 05 min")
+
+func test_la_partida_de_pruebas_lo_tiene_todo() -> void:
+	saves.make_test_save(2)
+	var d: SaveData = saves.peek(2)
+	assert_true(d.unlock_all)
+	assert_gt(d.money, 100000)
+	assert_true(d.has_character("malone"))
+	assert_true(d.has_character("un_personaje_futuro"), "lo que se añada, también")
+	assert_true(d.has_pet("cualquiera"))
+	assert_true(d.has_level("p3_n5"))
+	var normal := SaveData.create()
+	assert_false(normal.has_level("p1_n2"))

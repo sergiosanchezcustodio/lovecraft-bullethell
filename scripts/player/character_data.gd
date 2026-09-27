@@ -22,6 +22,9 @@ extends Resource
 @export var heal_on_level := 0.0             ## fracción de la vida máxima que recupera al subir de nivel (Whipple)
 @export var revive_speed := 1.0              ## rapidez al reanimar a un compañero (Whipple; hito 2.6)
 @export var calm_aura := 0.0                 ## cordura por segundo a los compañeros cercanos (Iwanicki; hito 2.7)
+@export var physical_resist := 1.0           ## multiplica el daño físico recibido (Elwood: 0,85)
+@export var dodge_cooldown_mult := 1.0       ## multiplica la recarga del esquive (Elwood: 0,8)
+@export var close_bonus := 0.0               ## daño extra a quemarropa: +close_bonus junto al enemigo, 0 al alcance máximo (Malone)
 @export var in_shop := false                 ## se compra en la tienda (precio en el hito 2.9; mientras, disponible)
 @export var order := 0                       ## orden en la selección de personaje
 @export_group("Recursos")

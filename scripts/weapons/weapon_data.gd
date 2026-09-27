@@ -7,8 +7,9 @@ enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND }
 ## MELEE: tajo alrededor del personaje (aoe_radius). ORBIT: proyectiles que giran alrededor del
 ## personaje durante `duration` s (count, aoe_radius = radio de la órbita, projectile_speed =
 ## grados por segundo). BEAM: rayo recto de `range` m y `projectile_radius` de ancho, que daña
-## a todo lo que atraviesa.
-enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM }
+## a todo lo que atraviesa. WAVE: onda que se expande desde el personaje hasta aoe_radius en
+## `duration` s, empuja hacia fuera y aturde `stun` s a lo que alcanza.
+enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE }
 
 @export var id := &"revolver"
 @export var display_name := "Revólver .38"
@@ -32,6 +33,7 @@ enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM }
 @export var knockback := 1.0                 ## empuje sobre los enemigos (1 = el de una bala normal)
 @export var duration := 0.0                  ## s activa (órbita) o visible (rayo)
 @export var hit_interval := 0.45             ## órbita: s entre dos golpes al mismo enemigo
+@export var stun := 0.0                      ## s que deja aturdido al enemigo (onda)
 @export_group("Progresión")
 @export var max_level := 5
 ## Mejora de cada nivel a partir del 2 (índice 0 = nivel 2). Claves "estadística*"

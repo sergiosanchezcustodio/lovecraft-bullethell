@@ -10,7 +10,7 @@
 ![GDScript](https://img.shields.io/badge/GDScript-tipado%20est%C3%A1tico-355570)
 ![Forward+](https://img.shields.io/badge/render-Forward%2B-5c6bc0)
 ![Plataforma](https://img.shields.io/badge/plataforma-Windows-0078D6?logo=windows&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-GUT%20%C2%B7%20109%20en%20verde-2e7d32)
+![Tests](https://img.shields.io/badge/tests-GUT%20%C2%B7%20114%20en%20verde-2e7d32)
 ![Estado](https://img.shields.io/badge/estado-en%20desarrollo%20%C2%B7%20fase%202-e0a100)
 
 </div>
@@ -24,7 +24,7 @@ Un grupo de investigadores sacados de los relatos de Lovecraft atraviesa los esc
 </div>
 
 > [!NOTE]
-> **Proyecto en desarrollo.** La fase 1 (prototipo jugable) está cerrada y la fase 2 (menús, guardado y cooperativo local) va por la mitad. Hoy se puede jugar de principio a fin el primer nivel, con ocho personajes, desde la portada hasta el final del nivel. El estado detallado está en la [hoja de ruta](docs/ROADMAP.md).
+> **Proyecto en desarrollo.** La fase 1 (prototipo jugable) está cerrada y la fase 2 (menús, guardado y cooperativo local) va por la mitad. Hoy se puede jugar de principio a fin el primer nivel, con once personajes, desde la portada hasta el final del nivel. El estado detallado está en la [hoja de ruta](docs/ROADMAP.md).
 
 ## Índice
 
@@ -47,7 +47,7 @@ Un grupo de investigadores sacados de los relatos de Lovecraft atraviesa los esc
 - **Dos recursos, tres tipos de daño:** la vida y la **cordura**. Los ataques físicos (rojos, naranjas, amarillos) quitan vida; los mentales (morados, lilas, violetas) quitan cordura; los mixtos, las dos. Con la cordura a cero llega una **crisis de locura**.
 - **Esquive con personalidad:** cinco estilos (deslizarse por la nieve, voltereta, plancha, salto y destello), cada uno con su animación, impulso e invulnerabilidad.
 - **Progresión dentro de la partida:** gemas de experiencia, subida de nivel con elección de 1 entre 3 mejoras (armas nuevas, subidas de arma y pasivas).
-- **Ocho personajes jugables** (más tres en camino), cada uno con arma inicial, rasgo, esquive y perfil propios.
+- **Once personajes jugables**, cada uno con arma inicial, rasgo, esquive y perfil propios.
 
 **Menús y progreso**
 - Portada animada sobre una ilustración de la biblioteca: velas vivas, farolillos que respiran, niebla, ceniza, relámpagos y los ojos de Cthulhu. El título entra desde la niebla.
@@ -102,7 +102,15 @@ Todos proceden de los relatos de Lovecraft, o son parientes o allegados inventad
 | **Dra. Marian Whipple**, doctora | *La casa maldita* | Bisturís | Se cura al subir de nivel y reanima más rápido | Salto |
 | **Henrietta Blake**, escritora | *El morador de las tinieblas* | Trapezoedro Resplandeciente | 15 % más de experiencia | Deslizamiento |
 
-**Próximamente:** el padre Iwanicki (sacerdote, *Los sueños en la casa de la bruja*), el sargento Frank Elwood (ex-soldado de la Gran Guerra) y Vera Malone (delincuente de la mafia, *El horror de Red Hook*). Más adelante, el profesor Armitage y Herbert West.
+![Iwanicki, Elwood y Malone](docs/img/personajes_3.jpg)
+
+| Personaje | Relato | Arma inicial | Rasgo | Esquive |
+|---|---|---|---|---|
+| **Padre Iwanicki**, sacerdote | *Los sueños en la casa de la bruja* | Fórmula de expulsión | Su presencia calma: los compañeros cercanos recuperan cordura | Voltereta |
+| **Sargento Frank Elwood**, veterano de la Gran Guerra | *Los sueños en la casa de la bruja* | Pistola automática Colt .45 | Esquiva más a menudo y aguanta mejor el daño físico | Plancha |
+| **Vera Malone**, contrabandista | *El horror de Red Hook* | Subfusil Thompson | Hasta un 50 % más de daño cuanto más cerca está el enemigo | Deslizamiento |
+
+**Más adelante:** el profesor Armitage y Herbert West.
 
 ## Armas
 
@@ -118,6 +126,9 @@ Todas disparan solas y cada una decide en sus datos cómo apunta: al más cercan
 | Bisturís | Convencional | Abanico de hojas que atraviesan. |
 | Páginas del Necronomicón | Arcana | Páginas que orbitan alrededor del personaje. Cuesta cordura. |
 | Trapezoedro Resplandeciente | Arcana | Rayo de luz concentrada que daña todo lo que atraviesa. Cuesta cordura. |
+| Fórmula de expulsión | Arcana | Onda que se expande desde el personaje, empuja y aturde. Cuesta cordura. |
+| Pistola automática Colt .45 | Convencional | Ráfagas cortas de tres disparos, más daño y menos alcance. |
+| Subfusil Thompson | Convencional | Chorro de balas que barre en arco. |
 
 ## Bestiario
 
@@ -232,7 +243,7 @@ La lista completa está en [`CLAUDE.md`](CLAUDE.md) y en la cabecera de `scripts
 ```bash
 godot --headless --path . -s addons/gut/gut_cmdln.gd
 ```
-Hay 109 tests de lógica con [GUT 9.4](https://github.com/bitwes/Gut): movimiento, combate, balas, oleadas, progresión, guardado, configuración, selección, personajes y armas. Lo visual se comprueba con capturas automáticas desde la terminal.
+Hay 114 tests de lógica con [GUT 9.4](https://github.com/bitwes/Gut): movimiento, combate, balas, oleadas, progresión, guardado, configuración, selección, personajes y armas. Lo visual se comprueba con capturas automáticas desde la terminal.
 
 ### Rendimiento
 

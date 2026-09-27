@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/plancha.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"elwood"
+display_name = "Sargento Frank Elwood"
+model = "elwood"
+role = "Veterano de la Gran Guerra"
+passive_text = "Esquiva más a menudo y aguanta mejor el daño físico."
+story = "Los sueños en la casa de la bruja"
+price = 0
+in_shop = true
+order = 10
+max_health = 150.0
+max_sanity = 90.0
+move_speed = 4.4
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"colt45"])
+physical_resist = 0.85
+dodge_cooldown_mult = 0.8

@@ -34,10 +34,12 @@ func _ready() -> void:
 	for r in DebugOptions.list_resources("res://data/characters"): chars.append(r)
 	chars.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return a.order < b.order)
 	var pets: Array[PetData] = []
-	var owned: Array = Saves.current.pets if Saves.current else []
 	for r in DebugOptions.list_resources("res://data/pets"):
-		if owned.has(String((r as PetData).id)) or (r as PetData).price == 0: pets.append(r)
-	state = SelectState.new().setup(chars, Saves.current.characters if Saves.current else [], pets)
+		if (r as PetData).price == 0 or (Saves.current != null and Saves.current.has_pet(String((r as PetData).id))): pets.append(r)
+	var unlocked: Array = []
+	for c in chars:
+		if Saves.current != null and Saves.current.has_character(String(c.id)): unlocked.append(String(c.id))
+	state = SelectState.new().setup(chars, unlocked, pets)
 	_build()
 	state.changed.connect(_refresh)
 	Devices.joy_disconnected.connect(func(d: int) -> void:

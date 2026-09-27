@@ -47,7 +47,12 @@ Léela al empezar cada sesión:
     - Son de la tienda (`in_shop`); mientras no exista la tienda se pueden elegir. En la selección salen después de los cuatro de siempre (`order`).
     - Rasgos que ya funcionan: suerte (a veces una cuarta opción de mejora) y radio de recogida de Peaslee, cordura de las armas arcanas a la mitad (Varga), curación al subir de nivel (Whipple) y más experiencia por gema (Blake). La reanimación rápida de Whipple llegará con la reanimación (hito 2.6).
     - Hojas de revisión: `shots/revision_2_4b_personajes.png` y `shots/revision_2_4b_seleccion.png`.
-  - Siguiente: segunda tanda del 2.4b (padre Iwanicki, sargento Elwood y Vera Malone) y después el hito 2.5, partida de 1 a 4 jugadores.
+  - **Hito 2.4b, segunda tanda: hecha, pendiente de tu revisión.**
+    - Padre Iwanicki (fórmula de expulsión: onda dorada que empuja y aturde), sargento Frank Elwood (Colt .45 en ráfagas de tres) y Vera Malone (Thompson que barre en arco).
+    - Rasgos: Elwood recibe un 15 % menos de daño físico y recarga el esquive un 20 % antes; Malone hace hasta un 50 % más de daño a quemarropa. El aura del padre (cordura a los compañeros cercanos) llegará con la cordura completa (hito 2.7).
+    - Hojas de revisión: `shots/revision_2_4b_tanda2.png` y `shots/revision_2_4b_tanda2_seleccion.png`.
+  - **Partida de pruebas:** el hueco 3 tiene todo desbloqueado (`SaveData.unlock_all`: personajes, compañeros, niveles y lo que se añada) y 999.999 de dinero. Se rehace con `godot --path . -- test_save=3` (sustituye lo que haya en ese hueco).
+  - Siguiente: hito 2.5, partida de 1 a 4 jugadores.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
@@ -200,6 +205,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `log=true`: cada 30 s de juego imprime vivos, abatidos, nivel, vida, cordura y balas.
   - `prof=true` (junto con `perf=`): reparto del tiempo de CPU por sistema (`Prof`).
   - `mute=true`: sin música (también en la portada).
+  - `test_save=N`: crea la partida de pruebas (todo desbloqueado) en el hueco N y sale.
   - `saves=carpeta`: otra carpeta de partidas dentro de `user://` (capturas y pruebas sin tocar las tuyas). `slot=N`: juega con ese hueco.
   - `window=true` / `fullscreen=true`: fuerza ventana o pantalla completa.
   - `debug_menu=N`: abre la pausa y el menú de depuración a los N s (capturas).
@@ -259,7 +265,7 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - `Damage` tiene una parte física (resta vida) y otra mental (resta cordura); su tipo se deduce de esas partes.
   - `BulletManager` guarda todas las balas en arrays compactos y las dibuja con dos MultiMesh: las trazadoras del jugador (cuadrados con `bullet.gdshader`) y las enemigas en voxel (`BulletMeshes.orb()`, un núcleo de 19 cubos y un anillo de 14, con `bullet_voxel.gdshader`). El shader enseña unos grupos de cubos u otros según el tipo de daño. Las tapadas se dibujan con la segunda pasada (`bullet_voxel_hidden.gdshader`). Las balas del jugador chocan contra la rejilla de enemigos; las enemigas, contra los jugadores. Cada bala lleva su empuje y los rasgos de daño de quien la dispara.
   - Las armas son datos (`WeaponData`, en `data/weapons/`): cadencia, alcance, apuntado (D-05), entrega y mejoras por nivel (`"damage*": 1.25`, `"count+": 1`). `WeaponSystem`, dentro del jugador, las dispara solas.
-    - Entregas: `BULLET` (balas), `THROWN` (la dinamita, un `ThrownExplosive`), `MELEE` (tajo del machete, `Slash`), `ORBIT` (páginas que giran alrededor, `OrbitRing`) y `BEAM` (rayo recto, `Beam`).
+    - Entregas: `BULLET` (balas), `THROWN` (la dinamita, un `ThrownExplosive`), `MELEE` (tajo del machete, `Slash`), `ORBIT` (páginas que giran alrededor, `OrbitRing`), `BEAM` (rayo recto, `Beam`) y `WAVE` (onda que empuja y aturde, `Shockwave`; los enemigos tienen `stun()`).
     - Las arcanas cuestan cordura (`sanity_cost`, multiplicado por `CharacterData.arcane_cost_mult`).
   - Los patrones enemigos también son datos (`BulletPattern`, en `data/patterns/`): radial o en abanico, ráfagas, giro y aviso previo. `PatternRunner` los ejecuta.
   - Efectos: `Telegraph` (aviso en el suelo) y `Explosion`.
@@ -329,6 +335,9 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
 | **Madame Ludmila Varga** | Hito 2.4b (`gen_varga.py`), 9.300 voxels | Médium de salón: vestido largo de terciopelo negro, estola ciruela con flecos, collar de perlas, media melena negra y diadema con pluma violeta. Necronomicón, destello, arcanas a mitad de cordura. |
 | **Dra. Marian Whipple** | Hito 2.4b (`gen_whipple.py`), 8.000 voxels | Bata blanca larga abierta sobre vestido gris, estetoscopio, gafas de montura clara y moño castaño. Bisturís, salto, curación al subir de nivel. |
 | **Henrietta Blake** | Hito 2.4b (`gen_blake.py`), 8.100 voxels | Escritora: cloché verde azulado, media melena rubia, abrigo burdeos con bufanda crema y pluma en el bolsillo. Trapezoedro, deslizamiento, más experiencia. |
+| **Padre Iwanicki** | Hito 2.4b (`gen_iwanicki.py`), 9.200 voxels | Sotana negra hasta los tobillos con botonadura, alzacuellos, crucifijo de plata, fajín morado y pelo gris. Fórmula de expulsión, voltereta, aura que calma. |
+| **Sargento Frank Elwood** | Hito 2.4b (`gen_elwood.py`), 7.500 voxels | Veterano corpulento: casco Brodie, guerrera oliva con correajes y cartucheras, polainas y bigote de cepillo. Colt .45, plancha, aguante físico. |
+| **Vera Malone** | Hito 2.4b (`gen_malone.py`), 6.800 voxels | Traje cruzado gris a rayas diplomáticas, corbata granate, clavel, fedora granate y media melena negra. Thompson, deslizamiento, daño a quemarropa. |
 | **William Dyer** | Hito 1.2, segunda versión (`gen_dyer.py`), 7.600 voxels, 1,72 m | Diseño a bloques limpios con los detalles pintados. Gorro de trampero de cuero con banda de borreguillo, cara plana con ojos, cejas, barba y bigote, pelo en la nuca, bufanda roja, parka de lona con bolsillos, botones y ribete de borreguillo, cinturón con tres cartuchos de dinamita (único relieve), manoplas, pantalón de lana y botas. Material mate. Animaciones: reposo, andar, esquive y lanzar. |
 
 ## Bestiario actual
@@ -357,6 +366,7 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
 - **Material por modelo:** con el material húmedo de las criaturas, las caras planas de la ropa reflejan los faroles casi en blanco. Ropa, plumas y atrezo van mates.
 - **Superficies escalonadas:** los elipsoides grandes dejan un escalón en cada capa de voxels, y la luz cenital los convierte en motas. Para ropa, madera y piedra usa `sell` (superelipsoide), que da caras planas.
 - **Efectos breves en capturas:** un rayo de 0,35 s cada 2,2 s casi nunca cae en una captura a segundos redondos. Para comprobarlo, imprime cuándo se dispara y captura cada pocas centésimas alrededor de ese instante.
+- **Pelo claro bajo la luz cálida:** un rubio platino se confundía con la piel, de frente y de espaldas. Pelo muy claro solo si el tono es claramente distinto de la piel; si no, oscuro.
 - **Colores claros sobre la nieve:** un rayo aditivo o atenuado se pierde sobre el suelo blanco iluminado. Hace falta un núcleo opaco y saturado (naranja dorado) y dejar lo aditivo para el halo.
 - **Includes de shaders:** un `varying` no se puede asignar dentro de una función auxiliar, ni siquiera en un `.gdshaderinc`. Se asigna en `vertex()`.
 - **Fondo grande en voxel:** a 32 voxels por metro, una pared de 80 m tendría millones de voxels. La barrera se modela a 16 y se exporta a 8 por metro (`half_res`). A 16, el peor 1 % de fotogramas bajaba de 71 a 60 FPS; a 8, con el zoom de juego se ve igual.
