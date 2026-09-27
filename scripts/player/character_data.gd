@@ -27,7 +27,11 @@ extends Resource
 @export var close_bonus := 0.0               ## daño extra a quemarropa: +close_bonus junto al enemigo, 0 al alcance máximo (Malone)
 @export var in_shop := false                 ## se compra en la tienda (precio en el hito 2.9; mientras, disponible)
 @export var order := 0                       ## orden en la selección de personaje
-@export_group("Recursos")
+@export_group("Atributos")
+## Reparto de 20 puntos entre tres atributos según su historia (D-27), p. ej.
+## {"EDU": 8, "POD": 7, "CON": 5}. Los demás se quedan en 10. Ver Attributes.
+@export var attr_bonus := {}
+@export_group("Recursos (base: los atributos la escalan)")
 @export var max_health := 100.0
 @export var max_sanity := 100.0
 @export_group("Movimiento")

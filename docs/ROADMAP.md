@@ -91,12 +91,18 @@ Ampliada el 26-09-2026: adelanta de la fase 5 el guardado, el menú principal, l
 | 2.3 | Selección de personaje y mapa de niveles: gestor de dispositivos, unirse con Start, cursores simultáneos, personajes únicos, compañero bajo la tarjeta, mapa 3×5 | **Hecho** |
 | 2.4 ⏸ | Personajes nuevos: Olmstead, Legrasse y Johansen (modelos, datos, pasivos), escopeta y machete | Hecho; **pendiente de tu revisión** |
 | 2.4b ⏸ | Siete personajes más (D-26), en dos tandas con revisión: Peaslee, Varga, Whipple y Blake (rifle, Necronomicón, bisturís, Trapezoedro); después Iwanicki, Elwood y Malone (fórmula de expulsión, Colt .45, Thompson) | Las dos tandas hechas, **pendientes de tu revisión** |
-| 2.5 | Partida de 1 a 4 jugadores: cámara compartida con zoom, HUD en las cuatro esquinas, bots como jugadores extra | Pendiente |
-| 2.6 | Reglas del cooperativo: experiencia compartida, subida de nivel por cuadrante, pausa común, escalado, reanimación | Pendiente |
-| 2.7 | Cordura completa: cinco crisis, calmar, recuperación, auras, locura acumulada | Pendiente |
-| 2.8 | Ficha y mapa por cuadrante, sin pausa | Pendiente |
-| 2.9 | Tienda y compañeros: dinero, tres secciones, catálogo corto, dos compañeros funcionales | Pendiente |
-| 2.10 ⏸ | Cierre: prueba de carga con 4 jugadores y tu prueba con varios mandos | Pendiente |
+| 2.5 | Atributos (D-27): los siete, repartos por personaje, +1 ponderado al subir de nivel, un arma al empezar, 4 armas y 4 objetos (D-28), personajes de inicio 2+2 (D-30) | **Hecho** |
+| 2.6 | Arsenal I (D-29): armas de fuego y lanzadas, fusiones con las antiguas, zonas de daño y estados de los enemigos; granadas de palo en el cinturón de Dyer | Pendiente |
+| 2.7 | Arsenal II (D-29): arcanas y tecnología de los Mitos | Pendiente |
+| 2.8 | Clima estético (D-33) | Pendiente |
+| 2.9 | Partida de 1 a 4 jugadores: cámara compartida con zoom, HUD en las cuatro esquinas, bots como jugadores extra | Pendiente |
+| 2.10 | Reglas del cooperativo: experiencia compartida, subida de nivel por cuadrante, pausa común, escalado, reanimación | Pendiente |
+| 2.11 | Cordura completa: cinco crisis, calmar, recuperación, auras, locura acumulada | Pendiente |
+| 2.12 | Ficha (con atributos) y mapa por cuadrante, sin pausa | Pendiente |
+| 2.13 ⏸ | Economía y tienda (D-31): dólares por enemigo, precios para ~10 h, tienda de antigüedades en voxel con el anciano, personajes, compañeros, 5.º hueco de arma y de objeto, baúles arcanos | Pendiente |
+| 2.14 | Logros y desbloqueos (D-32) | Pendiente |
+| 2.15 ⏸ | Vestuario (D-34) en dos tandas: sistema y 8 prendas; después el resto | Pendiente |
+| 2.16 ⏸ | Cierre: prueba de carga con 4 jugadores y tu prueba con varios mandos | Pendiente |
 
 ## Fase 3: Pipeline de contenido
 

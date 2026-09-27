@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = &"revolver"
 display_name = "Revólver .38"
 delivery = 0
+category = 1
 targeting = 0
 cooldown = 0.8
 range = 12.0

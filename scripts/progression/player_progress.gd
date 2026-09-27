@@ -30,6 +30,9 @@ var pending := 0                          ## subidas de nivel aún sin elegir me
 var passives := {}                        ## id -> nivel
 var weapon_pool: Array[WeaponData] = []   ## armas que pueden salir
 var upgrade_pool: Array[UpgradeData] = []
+var attr_gains: Array[String] = []        ## atributo ganado en cada subida aún sin elegir mejora
+var weapon_slots := 4                     ## armas que puede llevar (D-28; la tienda da la 5.ª)
+var item_slots := 4                       ## objetos (pasivas) distintos que puede llevar
 
 func _init(p_rules: ProgressionData) -> void:
 	rules = p_rules
@@ -58,6 +61,7 @@ func roll_options(weapons: WeaponSystem, rng: RandomNumberGenerator, n: int = -1
 		var owned := weapons.get_weapon(wd.id)
 		var o := Option.new()
 		if owned == null:
+			if weapons.weapons.size() >= weapon_slots: continue      # sin hueco para otra arma
 			o.kind = Option.Kind.NEW_WEAPON
 			o.weapon = wd
 			cands.append(o)
@@ -68,6 +72,7 @@ func roll_options(weapons: WeaponSystem, rng: RandomNumberGenerator, n: int = -1
 			cands.append(o)
 	for up in upgrade_pool:
 		var lv: int = passives.get(up.id, 0)
+		if lv == 0 and _items_owned() >= item_slots: continue       # sin hueco para otro objeto
 		if lv < up.max_level:
 			var o := Option.new()
 			o.kind = Option.Kind.PASSIVE
@@ -80,12 +85,19 @@ func roll_options(weapons: WeaponSystem, rng: RandomNumberGenerator, n: int = -1
 		var tmp := cands[i]; cands[i] = cands[j]; cands[j] = tmp
 	return cands.slice(0, mini(n, cands.size()))
 
+func _items_owned() -> int:
+	var n := 0
+	for k in passives:
+		if int(passives[k]) > 0: n += 1
+	return n
+
 ## Aplica la opción elegida.
 func choose(o: Option, p: Player) -> void:
 	match o.kind:
 		Option.Kind.NEW_WEAPON: p.weapons.add_weapon(o.weapon)
 		Option.Kind.WEAPON_LEVEL: p.weapons.get_weapon(o.weapon.id).level = o.to_level
 		Option.Kind.PASSIVE:
-			o.upgrade.apply(p)
 			passives[o.upgrade.id] = o.to_level
+			p.rebuild_stats()
 	pending = maxi(pending - 1, 0)
+	if not attr_gains.is_empty(): attr_gains.pop_front()

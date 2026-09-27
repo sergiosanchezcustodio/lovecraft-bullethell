@@ -23,6 +23,11 @@ var world: CombatWorld
 var progress: PlayerProgress
 var sanity_state: SanityState
 var god := false                 ## depuración: no recibe daño
+var attrs_level1 := {}           ## atributos del nivel 1 (fijan las probabilidades de subida)
+var attrs := {}                  ## atributos actuales
+var last_attr := ""              ## el que subió en la última subida de nivel
+var debug_speed := 1.0           ## menú de depuración: multiplica la velocidad
+var _attr_rng := RandomNumberGenerator.new()
 var _anim := "idle"
 var _anim_t := 0.0
 var _hurt_time := -1.0           ## tiempo desde el último golpe (-1 = nunca)
@@ -42,15 +47,19 @@ var _frozen_on := false
 var _xray: ShaderMaterial
 
 func setup(p_data: CharacterData, p_input: PlayerInput, p_color: Color) -> Player:
-	data = p_data.duplicate()        # copia propia: las mejoras pasivas la modifican
-	if data.dodge_style != null: apply_dodge_style(data.dodge_style)
+	data = p_data.duplicate()        # copia propia: los atributos y las pasivas la modifican
+	attrs_level1 = Attributes.initial(p_data)
+	attrs = attrs_level1.duplicate()
+	_attr_rng.randomize()
 	input = p_input
 	color = p_color
 	motor = PlayerMotor.new(data)
-	health = data.max_health
-	sanity = data.max_sanity
 	var rules: ProgressionData = load("res://data/progression/default.tres")
 	progress = PlayerProgress.new(rules)
+	progress.leveled_up.connect(func(_l: int) -> void: gain_attribute())
+	rebuild_stats()
+	health = data.max_health
+	sanity = data.max_sanity
 	sanity_state = SanityState.new(rules)
 	name = "Player_%s" % data.id
 	return self
@@ -234,14 +243,56 @@ func _make_snow_spray() -> GPUParticles3D:
 	return p
 
 ## Aplica un estilo de esquive (animación, velocidad, duración, invulnerabilidad, recarga
-## y efectos). Lo usa la creación del jugador y la tecla F1 de pruebas.
+## y efectos). Lo usa la depuración y la tecla F1 de pruebas.
 func apply_dodge_style(style: DodgeStyle) -> void:
 	data.dodge_style = style
-	data.dodge_anim = style.anim
-	data.dodge_speed = style.speed
-	data.dodge_duration = style.duration * data.dodge_length
-	data.dodge_iframes = style.iframes * data.dodge_length
-	data.dodge_cooldown = style.cooldown * data.dodge_cooldown_mult
+	rebuild_stats()
+
+## Rehace desde cero las estadísticas que dependen de atributos, esquive y pasivas (así se
+## pueden subir y bajar sin acumular errores): la base del personaje, por los multiplicadores
+## de sus atributos (Attributes), el estilo de esquive y, encima, las mejoras pasivas.
+## La vida y la cordura ganadas se rellenan; si bajan, no pasan del nuevo máximo.
+func rebuild_stats() -> void:
+	var base: CharacterData = load(data.resource_path) if data.resource_path != "" else null
+	if base == null: base = load("res://data/characters/%s.tres" % data.id)
+	var old_health := data.max_health
+	var old_sanity := data.max_sanity
+	var style := data.dodge_style
+	if style != null:
+		data.dodge_anim = style.anim
+		data.dodge_speed = style.speed
+	var v := {
+		"max_health": base.max_health * Attributes.mult(attrs, "health"),
+		"max_sanity": base.max_sanity * Attributes.mult(attrs, "sanity"),
+		"move_speed": base.move_speed * Attributes.mult(attrs, "speed"),
+		"dodge_duration": (style.duration if style else base.dodge_duration) * data.dodge_length,
+		"dodge_iframes": (style.iframes if style else base.dodge_iframes) * data.dodge_length,
+		"dodge_cooldown": (style.cooldown if style else base.dodge_cooldown) * data.dodge_cooldown_mult / Attributes.mult(attrs, "dodge"),
+		"pickup_radius": base.pickup_radius,
+	}
+	for up in progress.upgrade_pool if progress else []:
+		if not v.has(up.stat): v[up.stat] = base.get(up.stat)
+		for i in int(progress.passives.get(up.id, 0)): v[up.stat] = v[up.stat] * up.multiply + up.add
+	v["move_speed"] *= debug_speed
+	for k in v: data.set(k, v[k])
+	if motor: motor.data = data
+	health = minf(health + maxf(data.max_health - old_health, 0.0), data.max_health)
+	sanity = minf(sanity + maxf(data.max_sanity - old_sanity, 0.0), data.max_sanity)
+
+## Subida de nivel: +1 en un atributo, al azar con las probabilidades del nivel 1 (D-27).
+func gain_attribute() -> String:
+	last_attr = Attributes.roll_point(attrs_level1, _attr_rng)
+	attrs[last_attr] = int(attrs[last_attr]) + 1
+	progress.attr_gains.append(last_attr)
+	rebuild_stats()
+	return last_attr
+
+## Multiplicador de daño de un arma según su tipo y los atributos (D-27).
+func damage_mult(category: int) -> float:
+	match category:
+		WeaponData.Category.PHYSICAL: return Attributes.mult(attrs, "physical")
+		WeaponData.Category.MAGIC: return Attributes.mult(attrs, "magic")
+	return Attributes.mult(attrs, "firearm")
 
 func is_invulnerable() -> bool:
 	return motor.is_invulnerable() or (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes)

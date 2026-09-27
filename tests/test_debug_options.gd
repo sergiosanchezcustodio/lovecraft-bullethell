@@ -45,13 +45,14 @@ func test_las_pasivas_suben_y_vuelven_a_su_valor() -> void:
 	assert_almost_eq(player.data.dodge_cooldown, cd0, 0.0001)
 
 func test_la_vida_ganada_se_rellena_y_al_bajar_no_pasa_del_maximo() -> void:
+	var base := player.data.max_health
 	DebugOptions.set_value("passives", {"vida": 2})
 	DebugOptions.rebuild_stats(player)
 	assert_eq(player.health, player.data.max_health)
 	DebugOptions.set_value("passives", {"vida": 0})
 	DebugOptions.rebuild_stats(player)
 	assert_eq(player.health, player.data.max_health)
-	assert_eq(player.data.max_health, (load("res://data/characters/dyer.tres") as CharacterData).max_health)
+	assert_eq(player.data.max_health, base)
 
 func test_velocidad_de_depuracion_se_suma_a_las_pasivas() -> void:
 	var speed0 := player.data.move_speed

@@ -81,9 +81,10 @@ func test_las_pasivas_no_tocan_el_recurso_compartido() -> void:
 	o.kind = PlayerProgress.Option.Kind.PASSIVE
 	o.upgrade = load("res://data/upgrades/vida.tres")
 	o.to_level = 1
+	var before := p.data.max_health                     # la base ya escalada por los atributos
 	p.progress.choose(o, p)
-	assert_eq(p.data.max_health, 120.0)
-	assert_eq(p.health, 120.0, "la vida ganada se rellena")
+	assert_eq(p.data.max_health, before + 20.0)
+	assert_eq(p.health, before + 20.0, "la vida ganada se rellena")
 	var shared: CharacterData = load("res://data/characters/dyer.tres")
 	assert_eq(shared.max_health, 100.0, "el .tres del personaje no cambia")
 

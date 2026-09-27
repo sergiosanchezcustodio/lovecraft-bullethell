@@ -281,6 +281,28 @@ Todos proceden de relatos de Lovecraft y cada parte tiene al menos un personaje 
 
 ---
 
+### 6.1 Atributos de cada personaje (D-27)
+
+Todos empiezan con los siete atributos a 10 y reparten 20 puntos entre tres. La base de vida, cordura y velocidad es la misma para todos (100, 100 y 4,5 m/s); los atributos la escalan: con 20 puntos en la pareja de una estadística, vale la base, y cada punto por encima suma un 2,5 % (la velocidad, un 1,25 %).
+
+| Personaje | Reparto | De inicio |
+|---|---|---|
+| William Dyer | EDU +8 · POD +7 · CON +5 | Sí |
+| Robert Olmstead | DES +8 · CON +6 · INT +6 | Sí |
+| Amelia Peaslee | DES +8 · EDU +7 · INT +5 | Sí |
+| Dra. Marian Whipple | EDU +9 · INT +7 · CON +4 | Sí |
+| John R. Legrasse | INT +7 · CON +7 · TEN +6 | Tienda |
+| Gustaf Johansen | FUE +8 · CON +8 · TEN +4 | Tienda |
+| Madame Ludmila Varga | POD +12 · INT +4 · EDU +4 | Tienda |
+| Henrietta Blake | INT +8 · POD +7 · EDU +5 | Tienda |
+| Padre Iwanicki | POD +10 · EDU +6 · TEN +4 | Tienda |
+| Sargento Frank Elwood | CON +8 · TEN +7 · FUE +5 | Tienda |
+| Vera Malone | DES +9 · TEN +6 · FUE +5 | Tienda |
+
+Cada arma declara su tipo (`WeaponData.category`): **física** (cuerpo a cuerpo y lanzadas con el brazo: machete, bisturís, dinamita, granadas, molotov, arpón), **de fuego** (pistolas, fusiles, escopetas, lanzallamas y bengalas) o **mágica** (arcanas y tecnología de los Mitos).
+
+---
+
 ## 7. Dirección de arte
 
 El estilo general (voxel detallado a 32 voxels por metro, atmósfera y pipeline) está en `CLAUDE.md`.
@@ -402,6 +424,14 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-24 | Botón de juego online antes de la fase 9 | Fase 2 | **Resuelta**: visible y desactivado |
 | D-25 | Mapa de niveles con un solo nivel | Fase 2 | **Resuelta**: el mapa completo, con el nivel 1 abierto |
 | D-26 | Siete personajes más en la fase 2 | Fase 2 | **Resuelta** |
+| D-27 | Atributos de los personajes | Fase 2 | **Resuelta** |
+| D-28 | Armas y objetos por personaje | Fase 2 | **Resuelta** |
+| D-29 | Arsenal ampliado (29 armas nuevas) | Fase 2 | **Resuelta** |
+| D-30 | Personajes de inicio y desbloqueos | Fase 2 | **Resuelta** |
+| D-31 | Dinero, tienda de antigüedades y baúles arcanos | Fase 2 | **Resuelta** |
+| D-32 | Logros y desbloqueos | Fase 2 | **Resuelta** |
+| D-33 | Clima estético | Fase 2 | **Resuelta** |
+| D-34 | Vestuario | Fase 2 | **Resuelta** |
 
 D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherencias y huecos detectados al redactar este documento (sección 13). Las decisiones bloqueantes de las fases 1 y 2 se resolvieron el 24-09-2026.
 
@@ -448,6 +478,19 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
 - **D-26 — Siete personajes más (27-09-2026).** *Resuelta:* además de Dyer, Olmstead, Legrasse y Johansen, la fase 2 trae siete personajes que se compran en la tienda (mientras no exista, se pueden elegir para probarlos). Cada uno se ata a un relato de Lovecraft: es personaje suyo o pariente o allegado inventado de uno. Se hacen en dos tandas (hito 2.4b), con revisión tras cada una:
   - *Primera tanda:* Amelia Peaslee (arqueóloga, rifle de caza), Madame Ludmila Varga (espiritista, páginas del Necronomicón), Dra. Marian Whipple (doctora, bisturís) y Henrietta Blake (escritora, Trapezoedro Resplandeciente).
   - *Segunda tanda:* padre Iwanicki (sacerdote, fórmula de expulsión), sargento Frank Elwood (ex-soldado, Colt .45) y Vera Malone (delincuente de la mafia, subfusil Thompson).
+- **D-27 — Atributos (27-09-2026).** *Resuelta:* siete atributos, todos a 10 en el nivel 1: **POD** (poder: voluntad, resistencia mental, afinidad mágica), **INT** (inteligencia), **FUE** (fuerza), **CON** (constitución), **TEN** (tenacidad: negarse a caer, que se traduce en golpes letales), **DES** (destreza) y **EDU** (educación). Cada personaje reparte además **20 puntos entre tres atributos** según su historia (reparto en la sección 6). Las estadísticas salen de la suma de dos atributos: vida = CON+TEN; cordura = POD+INT; esquive = DES+CON; velocidad = DES+TEN; ataques físicos = FUE+TEN; ataques mágicos = POD+EDU; armas de fuego = CON+INT. Al subir de nivel, además de elegir 1 de 3 mejoras de armas u objetos, el personaje gana **+1 en un atributo**, elegido al azar con una probabilidad proporcional a sus atributos del nivel 1 (con INT 20 y DES 10, el doble de probabilidad para INT). Esa proporción no cambia nunca. Se descartó un octavo atributo.
+- **D-28 — Armas y objetos por personaje (27-09-2026).** *Resuelta:* cada personaje **empieza con un solo arma**. Puede llevar **4 armas y 4 objetos** (los objetos son las mejoras pasivas); un artículo de la tienda amplía cada uno a **5**.
+- **D-29 — Arsenal ampliado (27-09-2026).** *Resuelta:* 29 armas nuevas propuestas por el autor. Donde se solapaban con las existentes:
+  - El **Subfusil Thompson M1928** sustituye al Thompson actual.
+  - Las nuevas **sustituyen** a sus equivalentes: escopeta de corredera → escopeta de dos cañones; rifle de palanca → rifle de caza; Mauser C96 → Colt .45; Webly Mk VI → revólver .38; Stielhandgranate → cartuchos de dinamita. Los personajes que empezaban con ellas cambian de arma inicial.
+  - Arcane Sign, Báculo del Farolero, Resonador y Lente del Éter se mantienen **diferenciadas** del Necronomicón, la Fórmula de expulsión y el Trapezoedro.
+  - El **Inyector de Suero de Herbert West** es el arma de Herbert West y sustituye al "Reactivo de West" de la sección 5.2.
+  - Correcciones por coherencia con el juego (sección 5.3): nada puede "distraer" balas; no hay armadura; y solo dos armas interactúan con las balas enemigas, para no romper el pilar "esquivar es la habilidad".
+- **D-30 — Personajes de inicio y desbloqueos (27-09-2026).** *Resuelta:* se empieza con **2 hombres y 2 mujeres**: Dyer, Olmstead, Peaslee y Whipple. El resto se compra en la tienda o se desbloquea en las fases jugando. La tienda muestra a **todos**, también los de inicio (ya desbloqueados). Sustituye a D-23 y D-26 en lo que toca a quién está disponible desde el principio.
+- **D-31 — Dinero y tienda (27-09-2026).** *Resuelta:* la moneda son **dólares** (sustituye a la "Fundación Pickman" de la sección 8.1) y se consiguen matando enemigos. Precios calibrados para que comprar toda la tienda lleve **unas 10 horas de juego**. La tienda es una **tienda de antigüedades atendida por un anciano**. En los niveles aparecen **baúles arcanos** como tesoro. Algunos compañeros se compran y otros se desbloquean haciendo algo especial en una fase.
+- **D-32 — Logros (27-09-2026).** *Resuelta:* el menú principal tiene una sección nueva de **logros y desbloqueos**.
+- **D-33 — Clima (27-09-2026).** *Resuelta:* inclemencias del tiempo **solo estéticas**, sin efecto en personajes ni enemigos: nieve o ceniza, lluvia, niebla, viento, nubes y rayos de fondo, según el nivel.
+- **D-34 — Vestuario (27-09-2026).** *Resuelta:* prendas solo estéticas en la tienda. Cabeza: casco de la Primera Guerra Mundial, gorro de nieve, cinta del pelo, bufanda, sombrero de aventurero, boina, sombrero de copa, sombrero vaquero, bombín, casco de minero, sombrero de mujer, turbante, sombrero de paja, gafas de ver y gafas de nieve. Cuerpo: chaqueta de aviador, abrigo de piel, abrigo de nieve, chubasquero, chaleco, vestido y bata. Pies: botas militares, botas de nieve, botas esquimales y zapatos de tacón.
 - **D-19 — Pasivos sin mecánica.** El pasivo de Dyer (frío y ralentización) y el de Johansen (inmunidad al empuje) dependen de efectos sobre el jugador que no están definidos, y el de Legrasse necesita saber si los híbridos de Innsmouth cuentan como "enemigos humanos".
 
 ---

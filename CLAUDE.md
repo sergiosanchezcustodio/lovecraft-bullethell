@@ -52,7 +52,15 @@ Léela al empezar cada sesión:
     - Rasgos: Elwood recibe un 15 % menos de daño físico y recarga el esquive un 20 % antes; Malone hace hasta un 50 % más de daño a quemarropa. El aura del padre (cordura a los compañeros cercanos) llegará con la cordura completa (hito 2.7).
     - Hojas de revisión: `shots/revision_2_4b_tanda2.png` y `shots/revision_2_4b_tanda2_seleccion.png`.
   - **Partida de pruebas:** el hueco 3 tiene todo desbloqueado (`SaveData.unlock_all`: personajes, compañeros, niveles y lo que se añada) y 999.999 de dinero. Se rehace con `godot --path . -- test_save=3` (sustituye lo que haya en ese hueco).
-  - Siguiente: hito 2.5, partida de 1 a 4 jugadores.
+  - **Plan ampliado (27-09-2026, D-27 a D-34):** atributos, 29 armas nuevas, 4 armas y 4 objetos por personaje, personajes de inicio 2+2, dólares y tienda de antigüedades con baúles arcanos, logros, clima estético y vestuario. Hitos 2.5 a 2.16 en `docs/ROADMAP.md`.
+  - **Hito 2.5 (atributos): hecho.**
+    - Siete atributos (`Attributes`, `scripts/player/attributes.gd`): POD, INT, FUE, CON, TEN, DES y EDU, a 10 más un reparto de 20 puntos por personaje (`CharacterData.attr_bonus`, tabla en el GDD, 6.1).
+    - La vida, la cordura, el esquive, la velocidad y el daño por tipo de arma salen de sumas de dos atributos. `Player.rebuild_stats()` lo rehace todo desde la base (atributos, estilo de esquive, pasivas y depuración).
+    - Al subir de nivel, +1 en un atributo con la probabilidad del nivel 1; se anuncia en el menú de mejoras ("Nivel 3 · +1 Educación").
+    - Un arma al empezar; como mucho 4 armas y 4 objetos distintos (`PlayerProgress.weapon_slots` e `item_slots`).
+    - De inicio: Dyer, Olmstead, Peaslee y Whipple. Legrasse y Johansen pasan a la tienda.
+    - La selección de personaje muestra las estadísticas derivadas y los atributos.
+  - Siguiente: hito 2.6, arsenal I (armas de fuego y lanzadas, zonas de daño y estados).
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
@@ -254,6 +262,7 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
   - Métrica de suavidad: `jitter=true` con `bot=right` o `bot=up`. Sin interpolación daba 1,00; con ella, 0,03. **Ojo: mide la posición interpolada del cuerpo, no lo que se dibuja**, y por eso no detectó la vibración del modelo.
   - Para medir lo que ve el ojo: graba a la frecuencia del monitor (`--write-movie ... --fixed-fps 120 -- bot=right god=true nolevel=true mute=true`) y sigue un color del modelo fotograma a fotograma. Si el desplazamiento alterna de signo (+3, −3…), algo se dibuja a saltos.
 - **Animación del jugador:** capas. Una base (reposo, andar o esquive) con fundido de 0,06 a 0,22 s al cambiar (`Anims.snapshot` y `blend_from`), y encima el gesto de lanzar solo en brazos y torso (`Anims.overlay`). La cadencia de andar es proporcional a la velocidad real, para que los pies no patinen. El esquive (su animación sale del `DodgeStyle` del personaje: `slide`, `roll`, `dive`, `jump` o `flash`) es una acción que dura lo que su animación, que puede ser más que el impulso: la voltereta termina de rodar ya a velocidad de andar. El impulso frena progresivamente hasta la velocidad de andar. Para comprobar la fluidez se comparan posiciones reales de puntos del cuerpo, no ángulos, que en una voltereta pasan de +180° a −180°. `tests/test_player_anim.gd` comprueba que ninguna parte salte entre fotogramas.
+- **Atributos** (`Attributes`): nombres, fórmulas (`FORMULAS`), escala (`mult`) y subida ponderada (`roll_point`). El jugador guarda `attrs_level1` (fijos) y `attrs` (actuales). Las estadísticas de `Player.data` nunca se tocan a mano: se cambian los atributos, las pasivas o el esquive y se llama a `rebuild_stats()`.
 - **Jugador** (`scripts/player/`):
   - `CharacterData` (`.tres` en `data/characters/`) guarda el perfil del personaje.
   - `PlayerMotor` es la lógica pura de movimiento relativo a la cámara y del esquive (impulso, invulnerabilidad y recarga), con tests.

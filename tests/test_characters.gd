@@ -96,11 +96,10 @@ const SHOP_IDS := ["peaslee", "varga", "whipple", "blake"]
 func test_los_de_la_tienda_estan_completos() -> void:
 	for id in SHOP_IDS:
 		var c: CharacterData = load("res://data/characters/%s.tres" % id)
-		assert_true(c.in_shop, id + " se compra en la tienda")
 		assert_true(FileAccess.file_exists("res://models/%s.json" % c.model), "modelo de " + id)
 		assert_true(Anims.has_anim(c.model, "walk"))
 		for w in c.starting_weapons: assert_true(ResourceLoader.exists("res://data/weapons/%s.tres" % w))
-		assert_gt(c.order, 4, "después de los cuatro de siempre")
+		assert_eq(c.in_shop, not ["peaslee", "whipple"].has(id), "Peaslee y Whipple son de inicio (D-30)")
 
 func test_la_orbita_golpea_y_espera_su_intervalo() -> void:
 	var p := _player("varga")
@@ -162,13 +161,13 @@ func test_la_onda_empuja_aturde_y_golpea_una_vez() -> void:
 	assert_true(p.weapons._fire(w))
 	var wave: Shockwave = world.fx.get_child(world.fx.get_child_count() - 1)
 	for i in 60: wave._physics_process(1.0 / 60.0)
-	assert_almost_eq(near.health, 1000.0 - w.stat("damage"), 0.01, "una sola vez")
+	assert_almost_eq(near.health, 1000.0 - p.weapons.dmg(w), 0.01, "una sola vez")
 	assert_gt(near._stun, 0.0)
 	assert_eq(far.health, 1000.0)
 
 func test_elwood_aguanta_el_daño_fisico_y_esquiva_antes() -> void:
 	var p := _player("elwood")
-	assert_almost_eq(p.data.dodge_cooldown, p.data.dodge_style.cooldown * 0.8, 0.001)
+	assert_almost_eq(p.data.dodge_cooldown, p.data.dodge_style.cooldown * 0.8 / Attributes.mult(p.attrs, "dodge"), 0.001)
 	p.take_damage(Damage.new(20.0, 10.0))
 	assert_almost_eq(p.health, p.data.max_health - 17.0, 0.01)
 	assert_almost_eq(p.sanity, p.data.max_sanity - 10.0, 0.01, "el mental, igual")

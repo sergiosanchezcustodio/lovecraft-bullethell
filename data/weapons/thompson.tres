@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = &"thompson"
 display_name = "Subfusil Thompson"
 delivery = 0
+category = 1
 targeting = 0
 cooldown = 1.1
 range = 9.0

@@ -194,6 +194,8 @@ func _open_level_up() -> void:
 	_menu_open = true
 	get_tree().paused = true
 	var title := "Nivel %d" % (player.progress.level - player.progress.pending + 1)
+	if not player.progress.attr_gains.is_empty():                  # D-27: el atributo que ha subido
+		title += "   ·   +1 %s" % Attributes.LONG[player.progress.attr_gains[0]]
 	var menu := Menus.LevelUpMenu.new(options, title)
 	menu.chosen.connect(func(o: PlayerProgress.Option) -> void:
 		player.progress.choose(o, player)

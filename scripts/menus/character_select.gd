@@ -322,7 +322,7 @@ class _Frame extends Control:
 			_arrows.append(a)
 		# ficha
 		_info = VBoxContainer.new()
-		_info.position = Vector2(22, 372)
+		_info.position = Vector2(22, 362)
 		_info.size = Vector2(FRAME.x - 44, 0)
 		_info.add_theme_constant_override("separation", 4)
 		add_child(_info)
@@ -331,19 +331,19 @@ class _Frame extends Control:
 		_role = UiKit.label("", 16, UiKit.TEXT_DIM)
 		_role.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_info.add_child(_role)
-		_weapon = UiKit.label("", 17, UiKit.TEXT)
+		_weapon = UiKit.label("", 16, UiKit.TEXT)
 		_weapon.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_weapon.custom_minimum_size.x = FRAME.x - 44
 		_info.add_child(_weapon)
-		_passive = UiKit.label("", 17, UiKit.TEXT)
+		_passive = UiKit.label("", 16, UiKit.TEXT)
 		_passive.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_passive.custom_minimum_size.x = FRAME.x - 44
 		_info.add_child(_passive)
-		_stats = UiKit.label("", 16, UiKit.TEXT_DIM)
+		_stats = UiKit.label("", 15, UiKit.TEXT_DIM)
 		_info.add_child(_stats)
 		_status = MenuKit.title("", 24, color)
 		_status.size = Vector2(FRAME.x, 36)
-		_status.position = Vector2(0, FRAME.y - 38)
+		_status.position = Vector2(0, FRAME.y - 34)
 		add_child(_status)
 		# puesto vacío
 		_empty = VBoxContainer.new()
@@ -409,7 +409,11 @@ class _Frame extends Control:
 			wnames.append(wd.display_name if wd else String(wid))
 		_weapon.text = "Arma: " + ", ".join(wnames)
 		_passive.text = "Rasgo: " + c.passive_text
-		_stats.text = "Vida %d  ·  Cordura %d  ·  Velocidad %s" % [c.max_health, c.max_sanity, String.num(c.move_speed, 1).replace(".", ",")]
+		var at := Attributes.initial(c)
+		_stats.text = "Vida %d  ·  Cordura %d  ·  Velocidad %s
+%s" % [c.max_health * Attributes.mult(at, "health"),
+			c.max_sanity * Attributes.mult(at, "sanity"), String.num(c.move_speed * Attributes.mult(at, "speed"), 1).replace(".", ","),
+			_attr_line(at)]
 		var choosing := seat.stage == SelectState.Stage.CHARACTER
 		for a in _arrows: a.visible = choosing and st.choices(index).size() > 1
 		match seat.stage:
@@ -433,6 +437,12 @@ Se consiguen en la tienda"
 
 		_pet.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9), Color(color, 0.85 if picking else 0.2), 8))
 		_pet_label.add_theme_color_override("font_color", UiKit.TEXT if picking or seat.stage == SelectState.Stage.READY else UiKit.TEXT_DIM)
+
+	## Atributos en una línea; los que suben con el reparto del personaje, en dorado.
+	static func _attr_line(at: Dictionary) -> String:
+		var parts := PackedStringArray()
+		for n in Attributes.NAMES: parts.append("%s %d" % [n, int(at[n])])
+		return " ".join(parts)
 
 	func _set_model(model_name: String) -> void:
 		if model_name == _model_name: return

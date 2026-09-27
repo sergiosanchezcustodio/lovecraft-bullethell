@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = &"trapezoedro"
 display_name = "Trapezoedro Resplandeciente"
 delivery = 4
+category = 2
 targeting = 1
 cooldown = 2.2
 range = 11.0

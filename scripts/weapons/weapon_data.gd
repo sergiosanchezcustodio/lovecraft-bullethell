@@ -11,10 +11,15 @@ enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND }
 ## `duration` s, empuja hacia fuera y aturde `stun` s a lo que alcanza.
 enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE }
 
+## Tipo de ataque, para los atributos (D-27): físico (FUE+TEN: cuerpo a cuerpo y lanzadas
+## con el brazo), de fuego (CON+INT) o mágico (POD+EDU: arcanas y tecnología de los Mitos).
+enum Category { PHYSICAL, FIREARM, MAGIC }
+
 @export var id := &"revolver"
 @export var display_name := "Revólver .38"
 @export var delivery := Delivery.BULLET
 @export var targeting := Targeting.NEAREST
+@export var category := Category.FIREARM
 @export_group("Base (nivel 1)")
 @export var cooldown := 0.8                  ## s entre disparos
 @export var range := 12.0                    ## alcance para elegir objetivo (m)

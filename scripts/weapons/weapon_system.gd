@@ -119,8 +119,12 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 		_bonus_set = world.bullets.register_bonus(player.data.bonus_tags)
 	world.bullets.spawn(BulletManager.Team.PLAYER, BulletManager.Style.PLAYER,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
-		w.stat("projectile_size"), Damage.new(w.stat("damage") * dmg_k, 0.0), life, int(w.stat("pierce")),
+		w.stat("projectile_size"), Damage.new(dmg(w) * dmg_k, 0.0), life, int(w.stat("pierce")),
 		w.stat("knockback"), _bonus_set)
+
+## Daño de un arma con los atributos del personaje (D-27).
+func dmg(w: Weapon) -> float:
+	return w.stat("damage") * player.damage_mult(w.data.category)
 
 ## Coste de cordura de las armas arcanas (GDD 5.2), con el rasgo del personaje.
 func _pay_sanity(w: Weapon) -> void:
@@ -138,7 +142,7 @@ func _orbit(w: Weapon) -> bool:
 	if ring.active: return false
 	_pay_sanity(w)
 	ring.start(int(w.stat("count")), w.stat("aoe_radius"), w.stat("projectile_speed"), w.stat("projectile_radius"),
-		w.stat("damage"), w.stat("duration"), w.stat("hit_interval"), w.stat("knockback"), player.data.bonus_tags)
+		dmg(w), w.stat("duration"), w.stat("hit_interval"), w.stat("knockback"), player.data.bonus_tags)
 	fired.emit(w)
 	return true
 
@@ -146,7 +150,7 @@ func _orbit(w: Weapon) -> bool:
 func _wave(w: Weapon) -> bool:
 	if world.enemies_in_circle(player.global_position, w.stat("aoe_radius")).is_empty(): return false
 	_pay_sanity(w)
-	var wave := Shockwave.new().setup(player, world, w.stat("aoe_radius"), w.stat("duration"), w.stat("damage"),
+	var wave := Shockwave.new().setup(player, world, w.stat("aoe_radius"), w.stat("duration"), dmg(w),
 		w.stat("knockback"), w.stat("stun"), player.data.bonus_tags)
 	world.fx.add_child(wave)
 	fired.emit(w)
@@ -167,7 +171,7 @@ func _beam(w: Weapon, target_pos: Vector3) -> bool:
 		if along < 0.0 or along > length: continue
 		var across := absf(rel.cross(Vector2(dir.x, dir.z)))
 		if across > half + float(t.hit_radius): continue
-		var d := Damage.new(w.stat("damage"), 0.0)
+		var d := Damage.new(dmg(w), 0.0)
 		d.knockback = dir * w.stat("knockback")
 		d.bonus = player.data.bonus_tags
 		t.take_damage(d)
@@ -186,7 +190,7 @@ func _slash(w: Weapon) -> bool:
 	var targets := world.enemies_in_circle(origin, r)
 	if targets.is_empty(): return false
 	for t in targets:
-		var d := Damage.new(w.stat("damage"), 0.0)
+		var d := Damage.new(dmg(w), 0.0)
 		var away := t.global_position - origin
 		d.knockback = Vector3(away.x, 0, away.z).normalized() * w.stat("knockback")
 		d.bonus = player.data.bonus_tags
@@ -202,5 +206,5 @@ func _slash(w: Weapon) -> bool:
 func _throw(w: Weapon, target: Vector3) -> void:
 	var e := ThrownExplosive.new()
 	e.setup(world, player.global_position + Vector3(0, 1.4, 0), Vector3(target.x, 0, target.z),
-		w.stat("flight_time"), w.stat("fuse"), w.stat("aoe_radius"), w.stat("damage"), player.color)
+		w.stat("flight_time"), w.stat("fuse"), w.stat("aoe_radius"), dmg(w), player.color)
 	world.fx.add_child(e)

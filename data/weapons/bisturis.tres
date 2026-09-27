@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = &"bisturis"
 display_name = "Bisturís"
 delivery = 0
+category = 0
 targeting = 0
 cooldown = 0.95
 range = 10.0
