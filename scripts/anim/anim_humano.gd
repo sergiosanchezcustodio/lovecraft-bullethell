@@ -81,27 +81,33 @@ static func _walk_jointed(m: Node3D, t: float) -> void:
 	bend(m, "scarf", 0.38 + sin(2.0 * w - 0.9) * 0.16, cos(w - 0.6) * 0.14)
 	bend(m, "hair", 0.32 + sin(2.0 * w - 1.1) * 0.2, cos(w - 0.8) * 0.18)
 
-## Esquive: deslizamiento sobre la nieve con los pies por delante. El cuerpo se echa
-## atrás (se gira todo el modelo, para que cabeza y brazos acompañen al torso), la pierna
-## delantera va estirada casi a ras de suelo, la otra algo abierta, una mano atrás rozando
-## la nieve y la otra delante para equilibrarse; la cabeza mira al frente. Entra en el
-## primer 40 % (unas 0,13 s) y se mantiene: al acabar, Player funde la pose con la de andar
-## (incorporarse).
+## Esquive: entrada en plancha de fútbol. Se deja caer de lado sobre la nieve y resbala con
+## los pies por delante: el cuerpo muy echado atrás, casi tumbado y con la cadera a ras de
+## suelo; la pierna delantera estirada y paralela al suelo, la otra doblada por debajo con la
+## rodilla abierta; la mano izquierda atrás apoyada en la nieve y el brazo derecho alto para
+## equilibrarse; la cabeza levantada mirando al frente.
+## El cuerpo gira alrededor de la cadera (no de los pies) y baja con ella; Player sube el
+## modelo lo justo si algo queda bajo la nieve (_keep_above_ground).
+##   0-0,3 se deja caer | 0,3-1 resbala (con un leve asentarse)
 static func slide(m: Node3D, t: float) -> void:
-	var k := Anims.ease(t / 0.4)
-	var lean := -0.5 * k
-	m.rotation.x = lean
-	m.position = Vector3(0, -0.47 * k, 0.12 * k)
-	Anims.part(m, "leg_r").rotation = Vector3(-1.0 * k, 0.0, 0.05 * k)     # delantera, estirada
-	Anims.part(m, "leg_l").rotation = Vector3(-0.8 * k, 0.0, -0.32 * k)    # trasera, abierta
-	Anims.part(m, "arm_l").rotation = Vector3(0.85 * k, 0.0, -0.55 * k)    # mano atrás, a la nieve
-	Anims.part(m, "arm_r").rotation = Vector3(-0.55 * k, 0.0, 0.5 * k)     # brazo abierto para equilibrarse
-	Anims.part(m, "head").rotation.x = 0.42 * k                            # mira al frente
-	Anims.part(m, "torso").rotation.z = 0.06 * k
-	bend(m, "shin_l", 0.9 * k)                                             # la trasera, doblada
-	bend(m, "fore_r", -0.4 * k)
-	bend(m, "scarf", 0.9 * k)                                              # la bufanda ondea detrás
-	bend(m, "hair", 0.8 * k)
+	var k := Anims.ease(t / 0.3)
+	var settle := sin(clampf((t - 0.3) / 0.7, 0.0, 1.0) * PI) * 0.04     # se asienta y se rehace
+	var lean := -(1.12 + settle) * k                                       # casi tumbado hacia atrás
+	var hip := Vector3(0, 0.83, 0)
+	m.rotation = Vector3(lean, 0.0, 0.1 * k)                               # algo ladeado, sobre la cadera izquierda
+	m.position = hip - Basis.from_euler(m.rotation) * hip + Vector3(0, -0.66 * k, 0.1 * k)
+	Anims.part(m, "leg_r").rotation = Vector3(-0.42 * k, 0.0, 0.04 * k)    # delantera, estirada a ras de suelo
+	Anims.part(m, "leg_l").rotation = Vector3(-0.1 * k, 0.0, -0.45 * k)    # trasera, con la rodilla abierta
+	bend(m, "shin_r", 0.12 * k)
+	bend(m, "shin_l", 1.85 * k)                                            # doblada por debajo
+	Anims.part(m, "arm_l").rotation = Vector3(1.45 * k, 0.0, -0.5 * k)     # mano atrás, apoyada en la nieve
+	Anims.part(m, "arm_r").rotation = Vector3(-1.5 * k, 0.0, 0.6 * k)      # brazo alto, para equilibrarse
+	bend(m, "fore_l", -0.15 * k)
+	bend(m, "fore_r", -0.55 * k)
+	Anims.part(m, "torso").rotation = Vector3(0.18 * k, 0.12 * k, 0.0)     # se encoge un poco hacia las piernas
+	Anims.part(m, "head").rotation.x = 0.85 * k                            # mira al frente
+	bend(m, "scarf", 1.3 * k)                                              # la bufanda ondea detrás
+	bend(m, "hair", 1.2 * k)
 
 ## Esquive: voltereta hacia delante. Se encoge (piernas al pecho, brazos abrazándolas,
 ## barbilla metida), da una vuelta completa girando sobre el centro de la bola que forma

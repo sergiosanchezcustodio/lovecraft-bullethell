@@ -3,56 +3,58 @@ bruja"). Personaje jugable (D-26).
 
 Sotana negra hasta los tobillos con una fila de botones, alzacuellos blanco, crucifijo de
 plata al pecho (el que da en el relato), fajín morado, pelo gris corto con entradas y cejas
-pobladas. Delgado. A bloques limpios (tools/humano.py).
+pobladas. Delgado. Estilo 4 (tools/cuerpo.py).
 Uso: python tools/gen_iwanicki.py
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model
-import humano as hu
+import cuerpo as cu
+from cuerpo import slab, T, H
 
-M = Model(S=2, seed=1932)
-CASSOCK = (0.10, 0.10, 0.11); CASSOCK_SH = (0.07, 0.07, 0.08)
-COLLAR = (0.92, 0.92, 0.88)
-SASH = (0.36, 0.16, 0.40)
-SILVER = (0.80, 0.80, 0.84)
-BUTTON = (0.22, 0.20, 0.22)
-HAIR = (0.62, 0.61, 0.60); BROW = (0.46, 0.44, 0.42)
-SHOE = (0.08, 0.07, 0.07); SOLE = (0.03, 0.03, 0.03); SOCK = (0.12, 0.12, 0.13)
-SKIN = (0.88, 0.70, 0.60); SKIN_SH = (0.78, 0.60, 0.51); MOUTH = (0.52, 0.34, 0.30)
-box = M.vbox
-T, H = hu.T, hu.H
-W = 8
+CASSOCK = (0.12, 0.12, 0.13); CASSOCK_SH = (0.08, 0.08, 0.09)
+COLLAR = (0.93, 0.93, 0.89)
+SASH = (0.38, 0.17, 0.42); SASH_SH = (0.30, 0.13, 0.33)
+SILVER = (0.82, 0.82, 0.86)
+BUTTON = (0.26, 0.24, 0.26)
+HAIR = (0.64, 0.63, 0.62); BROW = (0.46, 0.44, 0.42)
+SHOE = (0.09, 0.08, 0.08); SOLE = (0.03, 0.03, 0.03); SOCK = (0.13, 0.13, 0.14)
+SKIN = (0.88, 0.70, 0.60); SKIN_SH = (0.77, 0.59, 0.50); LIP = (0.56, 0.36, 0.32); CHEEK = (0.86, 0.60, 0.52)
+B = -2
 
-hu.legs_slim(M, SOCK, SHOE, SOLE)
-hu.torso(M, CASSOCK, half=W)
-hu.skirt(M, CASSOCK, bottom=3, half=W, flare=2)       # sotana hasta los tobillos
-for y in range(4, 42, 3): box(-1, y, 4 + (1 if y < 24 else 0), 0, y + 1, 5 + (1 if y < 24 else 0) + (1 if y < 13 else 0), T, BUTTON)
-box(-W, 26, -5, W, 28, 5, T, SASH)                    # fajín
-M.bevel(T, -W, W, -5, 5, 26, 28)
-box(3, 22, 4, 5, 26, 6, T, SASH)                      # caída del fajín
-# alzacuellos: tira blanca delante bajo la barbilla
-box(-4, 41, -4, 4, 42, 4, T, CASSOCK)
-box(-1, 41, 4, 1, 42, 5, T, COLLAR)
-box(-3, 40, 4, 3, 41, 5, T, CASSOCK_SH)
+M = cu.new(1932)
+top = cu.shoes(M, SHOE, SOLE)
+cu.legs(M, SOCK, bottom=top)
+cu.torso(M, CASSOCK, b=B)
+cu.skirt(M, CASSOCK, 6, 40, b=B, flare=5)                               # sotana hasta los tobillos
+for y in range(8, 61, 4): cu.front(M, -1, y, BUTTON, dz=1)                # fila de botones
+cu.belt(M, SASH, y=45, b=B, h=3)                                        # fajín
+slab(M, T, SASH, 33, 45, 7, 7, 3, 3.5, 1.5, 1.5, ch=0)                    # caída del fajín
+slab(M, T, SASH_SH, 32, 33, 7, 7, 3.5, 3.5, 1.5, 1.5, ch=0)
+# alzacuellos: cuello negro alto con la tira blanca delante
+slab(M, T, CASSOCK, 59, 64, 0, 0, 12, 10, 11, 10, ch=1)
+for x in (-1, 0):
+    for y in (61, 62, 63): cu.front(M, x, y, COLLAR)
+cu.neck(M, SKIN)
 # crucifijo de plata colgado de un cordón
-for y in range(35, 40): box(-3 + (39 - y) // 2, y, 4, -2 + (39 - y) // 2, y + 1, 5, T, SILVER)
-box(-1, 30, 5, 0, 36, 6, T, SILVER)
-box(-2, 34, 5, 1, 35, 6, T, SILVER)
-hu.arms(M, CASSOCK, CASSOCK_SH, SKIN, half=W, cuff_h=2)
-hu.head(M, SKIN)
-hu.face(M, BROW, SKIN_SH, MOUTH)
-for x in (-4, -3, 2, 3): hu.paint_face(M, x, 49, BROW)   # cejas pobladas
-hu.hair_back(M, SKIN, HAIR, top=51)
-box(-6, 50, -6, 6, 52, 3, H, HAIR)                    # pelo corto gris con entradas
-box(-5, 52, -5, 5, 53, 2, H, HAIR)
-box(-6, 45, -5, -5, 51, 1, H, HAIR)                   # sienes
-box(5, 45, -5, 6, 51, 1, H, HAIR)
+for i in range(7):
+    cu.front(M, -5 + min(i, 3), 60 - i, SILVER)                       # cordón izquierdo
+    cu.front(M, 4 - min(i, 3), 60 - i, SILVER)                        # cordón derecho
+for y in range(46, 54): cu.front(M, -1, y, SILVER, dz=1); cu.front(M, 0, y, SILVER, dz=1)
+for x in range(-3, 3): cu.front(M, x, 51, SILVER, dz=1)
 
+cu.arms(M, CASSOCK, SKIN, b=B, cuff=CASSOCK_SH, cuff_wide=False)
+cu.head(M, SKIN, SKIN_SH)
+cu.eyes(M, BROW, brow_style='poblada')
+cu.cheeks(M, CHEEK)
+cu.mouth(M, LIP)
+# pelo gris corto con entradas: casquete que no llega a la frente, sienes y nuca
+slab(M, H, HAIR, 79, 82, 0, -1.5, 14, 12, 13, 10, ch=2)
+cu.hair_back(M, SKIN, HAIR)
+for (x, y, z), v in M.V.items():                                        # sienes: el lateral de la cabeza
+    if v[0] == H and v[1] == SKIN and 72 <= y < 80 and abs(x + 0.5) >= 6.5 and z <= 2:
+        v[1] = HAIR
 
-def paint(k, part, c):
-    x, y, z = k
-    if c == CASSOCK and M.hsh(x, y, z) < -0.5: return CASSOCK_SH
-    return None
-M.paint(paint)
-hu.export(M, 'iwanicki', half=W)
+cu.seams(M, (CASSOCK,))
+cu.finish(M, 'iwanicki', {CASSOCK: 'lana', CASSOCK_SH: 'lana', SASH: 'punto', SASH_SH: 'punto', SOCK: 'lana',
+                          SHOE: 'cuero', SOLE: 'cuero', HAIR: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
+          flat=(LIP, BROW, CHEEK, SILVER, BUTTON, COLLAR), b=B)

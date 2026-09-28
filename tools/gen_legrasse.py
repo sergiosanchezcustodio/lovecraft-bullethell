@@ -3,65 +3,68 @@ Personaje jugable.
 
 Fedora gris marengo de ala ancha con cinta parda (la silueta que lo distingue), gabardina
 corta gris piedra abierta sobre un traje azul marino, camisa blanca y corbata oscura, placa
-dorada en el pecho, bigote poblado y zapatos negros. A bloques limpios (tools/humano.py).
+dorada en el pecho, bigote poblado y zapatos negros. Estilo 4 (tools/cuerpo.py).
 Uso: python tools/gen_legrasse.py
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model
-import humano as hu
+import cuerpo as cu
+from cuerpo import slab, T, H
 
-M = Model(S=2, seed=1908)
-COAT = (0.63, 0.60, 0.53); COAT_SH = (0.53, 0.50, 0.44)
-SUIT = (0.15, 0.18, 0.30); SUIT_SH = (0.12, 0.14, 0.24)
+COAT = (0.63, 0.60, 0.53); COAT_SH = (0.52, 0.49, 0.43)
+SUIT = (0.16, 0.19, 0.31); SUIT_SH = (0.12, 0.14, 0.24)
 SHIRT = (0.87, 0.86, 0.82); TIE = (0.10, 0.10, 0.12)
 BADGE = (0.92, 0.74, 0.30)
 SHOE = (0.10, 0.09, 0.09); SOLE = (0.05, 0.05, 0.05)
-HAT = (0.20, 0.20, 0.22); HAT_SH = (0.16, 0.16, 0.18); BAND = (0.36, 0.25, 0.16)
-SKIN = (0.84, 0.64, 0.50); SKIN_SH = (0.75, 0.55, 0.43)
-HAIR = (0.20, 0.15, 0.12); MOUSTACHE = (0.22, 0.16, 0.12); MOUTH = (0.52, 0.33, 0.28)
-BUTTON = (0.18, 0.16, 0.12)
-box = M.vbox
-T, H = hu.T, hu.H
+HAT = (0.22, 0.22, 0.24); HAT_SH = (0.17, 0.17, 0.19); BAND = (0.38, 0.26, 0.16)
+SKIN = (0.84, 0.64, 0.50); SKIN_SH = (0.74, 0.54, 0.42); LIP = (0.56, 0.34, 0.29)
+HAIR = (0.20, 0.15, 0.12); MOUSTACHE = (0.24, 0.17, 0.12)
+BUTTON = (0.20, 0.18, 0.14)
+B = -1
 
-hu.legs(M, SUIT, SHOE, SOLE)
-hu.torso(M, COAT, y0=19)                          # la gabardina baja más que una chaqueta
-# gabardina abierta: por delante asoma el traje, la camisa y la corbata
-box(-3, 19, 4, 3, 42, 5, T, SUIT)
-box(-2, 34, 4, 2, 42, 5, T, SHIRT)
-box(-1, 30, 4, 1, 42, 5, T, TIE)
-box(-2, 41, 4, 2, 42, 5, T, SHIRT)
-for y in range(19, 42):                           # solapas de la gabardina, en sombra
-    box(-4, y, 4, -3, y + 1, 5, T, COAT_SH)
-    box(3, y, 4, 4, y + 1, 5, T, COAT_SH)
-box(-9, 29, -5, 9, 31, 5, T, COAT_SH)             # cinturón de la gabardina (de la tela)
-box(-3, 29, 4, 3, 31, 5, T, SUIT)                 # (por delante, abierto)
-for y in (24, 27): box(-5, y, 4, -4, y + 1, 5, T, BUTTON)
-box(5, 34, 4, 7, 37, 5, T, BADGE)                 # placa dorada
-box(6, 37, 4, 7, 38, 5, T, BADGE)
-hu.arms(M, COAT, SHIRT, SKIN, cuff_h=1)
-for s in (-1, 1):                                 # bocamangas de la gabardina
-    x0, x1 = (-14, -9) if s < 0 else (9, 14)
-    box(x0, 26, -3, x1, 28, 3, 'arm_l' if s < 0 else 'arm_r', COAT_SH, over=True)
-hu.head(M, SKIN)
-# fedora: copa con cinta y ala ancha plana (que sobresale por todos lados)
-box(-7, 50, -7, 7, 51, 7, H, HAT_SH)              # ala (2 voxels: más ancha taparía los ojos desde la cámara)
-for x, z in ((-7, -7), (-7, 6), (6, -7), (6, 6)): M.V.pop((x, 50, z), None)
-box(-5, 51, -5, 5, 56, 5, H, HAT)                 # copa
-M.bevel(H, -5, 5, -5, 5, 51, 56)
-box(-5, 51, -5, 5, 53, 5, H, BAND, over=True)     # cinta
-M.bevel(H, -5, 5, -5, 5, 51, 53)
-for x in range(-2, 2): M.V.pop((x, 55, 4), None)  # pellizco delantero de la copa
-hu.face(M, HAIR, SKIN_SH, MOUTH, eye_y=47)
-for x in (-3, -2, -1, 0, 1, 2): hu.paint_face(M, x, 45, MOUSTACHE)   # bigote poblado
-for x in (-3, 2): hu.paint_face(M, x, 44, MOUSTACHE)
-hu.hair_back(M, SKIN, HAIR)
+M = cu.new(1908)
+top = cu.shoes(M, SHOE, SOLE)
+cu.legs(M, SUIT, bottom=top)
+cu.torso(M, COAT, b=B)
+cu.skirt(M, COAT, 26, 40, b=B, flare=3)                                # gabardina corta, hasta medio muslo
+# abierta por delante: asoman el traje, la camisa y la corbata; solapas en sombra
+cu.opening(M, 26, 61, 9, 13, COAT_SH)
+cu.opening(M, 26, 61, 7, 11, SUIT)
+cu.opening(M, 52, 61, 2, 6, SHIRT)
+for y in range(46, 61): cu.front(M, -1, y, TIE); cu.front(M, 0, y, TIE)
+for y in (46, 47): cu.front(M, -2, y, TIE); cu.front(M, 1, y, TIE)
+for y in range(26, 45): cu.front(M, -1, y, SUIT_SH)                     # cierre de la americana
+for y in (40, 44): cu.front(M, -2, y, BUTTON)
+cu.belt(M, COAT_SH, y=45, b=B, h=2)                                    # cinturón de la gabardina
+cu.opening(M, 45, 47, 7, 7, SUIT)                                       # (por delante, abierto)
+for y in (32, 37): cu.front(M, -7, y, BUTTON, dz=1); cu.front(M, 6, y, BUTTON, dz=1)
+# placa dorada en el pecho izquierdo (relieve de un voxel)
+for x, y in ((4, 53), (5, 53), (6, 53), (4, 54), (5, 54), (6, 54), (5, 55), (5, 52)):
+    cu.front(M, x, y, BADGE, dz=1)
+slab(M, T, SHIRT, 60, 63, 0, 0.5, 11, 10, 10, 9, ch=1)                   # cuello de la camisa
+slab(M, T, COAT, 58, 62, 0, -1.5, 21, 19, 12, 10, ch=1)                  # cuello de la gabardina, por detrás
+cu.neck(M, SKIN)
 
+cu.arms(M, COAT, SKIN, b=B, cuff=COAT_SH)                               # bocamangas de la gabardina
+cu.head(M, SKIN, SKIN_SH)
+# fedora: ala ancha plana (asoma 2,5: más taparía los ojos desde la cámara), copa con cinta
+# y pellizco delantero
+slab(M, H, HAT_SH, 78, 79, 0, 0.5, 21, 21, 19.5, 19.5, ch=3)
+slab(M, H, BAND, 79, 81, 0, 0.3, 15, 15, 15, 15, ch=2)
+slab(M, H, HAT, 81, 86, 0, 0.3, 15, 13, 15, 12, ch=2)
+for x in range(-2, 2):
+    for y in (85,):
+        z = M.front(x, y)
+        if z is not None: M.V.pop((x, y, z), None)
+cu.eyes(M, HAIR, brow_style='poblada', y=72)
+cu.moustache(M, MOUSTACHE, xs=range(-4, 4), y=69, rows=2)               # bigote poblado
+for x in (-4, 3): cu.paint_face(M, x, 67, MOUSTACHE, dz=1)
+cu.mouth(M, LIP, y=66)
+cu.hair_back(M, SKIN, HAIR, top=78)
+cu.sideburns(M, HAIR, 71, 78)
 
-def paint(k, part, c):
-    x, y, z = k
-    h = M.hsh(x, y, z)
-    if c == COAT and y < 26: return COAT if h > 0.0 else COAT_SH         # faldón algo más oscuro
-    return None
-M.paint(paint)
-hu.export(M, 'legrasse')
+cu.seams(M, (COAT,))
+cu.finish(M, 'legrasse', {COAT: 'lona', COAT_SH: 'lona', SUIT: 'lana', SUIT_SH: 'lana', SHOE: 'cuero',
+                          SOLE: 'cuero', HAT: 'lana', HAT_SH: 'lana', BAND: 'punto', HAIR: 'pelo',
+                          MOUSTACHE: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
+          flat=(LIP, BADGE, BUTTON, TIE), b=B)
