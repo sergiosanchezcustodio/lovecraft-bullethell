@@ -13,6 +13,7 @@ Uso: python tools/gen_dyer_v4.py
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
 from voxlib import Model
+import materiales
 
 PARKA = (0.56, 0.44, 0.29); PARKA_SH = (0.46, 0.35, 0.22)
 FUR = (0.84, 0.82, 0.77)
@@ -135,9 +136,28 @@ for x in (-6, -5, 4, 5):                                                      # 
 for x in range(-3, 3): face(x, 69, BEARD_SH, dz=1)                            # bigote
 for x in (-1, 0): face(x, 67, LIP)
 for (x, y, z), v in M.V.items():                                              # pelo en la nuca
-    if v[0] == H and v[1] == SKIN and z < -3 and y >= 66:
+    if v[0] == H and v[1] == SKIN and z < -2 and y >= 64:
+        v[1] = HAIR
+for (x, y, z), v in M.V.items():                                              # cuello por detrás: cubierto por el pelo
+    if v[0] == T and v[1] == SKIN and z < 0:
         v[1] = HAIR
 
+
+# costuras: laterales de la parka y línea interior de las mangas
+M.seams = set()
+for (x, y, z), v in M.V.items():
+    if v[0] == T and v[1] == PARKA and abs(z) <= 0 and abs(x) >= 10:
+        M.seams.add((x, y, z))
+    if v[0] in ('arm_l', 'arm_r', 'fore_l', 'fore_r') and v[1] == PARKA and z == -3:
+        M.seams.add((x, y, z))
+    if v[0] == T and v[1] == PARKA and y == 58:                                  # costura de los hombros
+        M.seams.add((x, y, z))
+
+# ---------------- texturas por material ----------------
+materiales.texturize(M, {PARKA: 'lona', PARKA_SH: 'lona', FUR: 'borreguillo', TROUSER: 'lana',
+                         BOOT: 'cuero', SOLE: 'cuero', MITT: 'cuero', MITT_SH: 'cuero', CAP: 'cuero',
+                         SCARF: 'punto', SCARF_SH: 'punto', HAIR: 'pelo', BEARD: 'pelo', BEARD_SH: 'pelo',
+                         SKIN: 'piel', SKIN_SH: 'piel', BELT: 'cuero'})
 
 # ---------------- color: luz arriba, algo más oscuro abajo y en la espalda ----------------
 FLAT = {EYE, EYE_W, LIP, BROW, BUCKLE, TOGGLE, CHEEK}
