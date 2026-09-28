@@ -10,6 +10,8 @@ const BY_MODEL := {
 	"bruto": preload("res://scripts/anim/anim_profundo.gd"),
 	"abisal": preload("res://scripts/anim/anim_profundo.gd"),
 	"dyer": preload("res://scripts/anim/anim_humano.gd"),
+	"dyer_chibi": preload("res://scripts/anim/anim_humano.gd"),
+	"dyer_chibi_fino": preload("res://scripts/anim/anim_humano.gd"),
 	"olmstead": preload("res://scripts/anim/anim_humano.gd"),
 	"legrasse": preload("res://scripts/anim/anim_humano.gd"),
 	"johansen": preload("res://scripts/anim/anim_humano.gd"),

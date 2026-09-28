@@ -28,6 +28,7 @@ extends Node3D
 ##   mute=true               sin música (también en la portada)
 ##   debug_menu=1            abre la pausa y el menú de depuración a ese segundo (capturas)
 ##   character=johansen      personaje del J1 (dyer, olmstead, legrasse, johansen)
+##   model=dyer_chibi        otro modelo para el J1 (probar prototipos)
 
 const PLAYER_COLORS: Array[Color] = [Color(1.0, 0.82, 0.3), Color(0.35, 0.75, 1.0), Color(0.55, 1.0, 0.45), Color(1.0, 0.45, 0.8)]
 
@@ -85,6 +86,7 @@ func _ready() -> void:
 	character = args.get_str("character", String(DebugOptions.get_value("character", character)))
 	var input := Devices.make_input(seat.device) if seat and not args.has("bot") else _make_input()
 	player = Player.new().setup(load("res://data/characters/%s.tres" % character), input, PLAYER_COLORS[0])
+	if args.has("model"): player.data.model = args.get_str("model")   # probar otro modelo (prototipos)
 	player.position = arena.get_meta("spawn")
 	var p := args.get_floats("pos")
 	if p.size() == 2: player.position = Vector3(p[0], 0, p[1])
