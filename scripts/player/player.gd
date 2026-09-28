@@ -45,6 +45,8 @@ var _ring_mat: StandardMaterial3D
 var _frozen_mat: StandardMaterial3D
 var _frozen_on := false
 var _xray: ShaderMaterial
+var _ground_lift := 0.0          ## cuánto se sube el modelo para no hundirse en el suelo
+const GROUND_EASE := 1.5         ## m/s a los que baja cuando ya no hace falta
 
 func setup(p_data: CharacterData, p_input: PlayerInput, p_color: Color) -> Player:
 	data = p_data.duplicate()        # copia propia: los atributos y las pasivas la modifican
@@ -151,6 +153,7 @@ func _process(delta: float) -> void:
 	# Parpadeo durante la invulnerabilidad tras un golpe
 	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
 	_animate(delta)
+	_keep_above_ground(delta)
 	var style := data.dodge_style
 	_snow.emitting = _action != "" and (style == null or style.snow_spray)
 	# Destello: el modelo desaparece en su tramo y deja una estela de imágenes fantasma
@@ -205,6 +208,25 @@ func _animate(delta: float) -> void:
 		elif _action == "":
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
+
+## Ninguna pose puede meter el cuerpo en el suelo: tras animar, se mide el punto más bajo
+## del modelo (las cajas de sus mallas, en el espacio de Visual) y, si queda por debajo de
+## la nieve, se sube el modelo lo justo. Vale para cualquier esquive o animación.
+## Sube al instante lo que haga falta, pero baja poco a poco (GROUND_EASE m/s): en la
+## voltereta el punto más bajo cambia de golpe al rodar y, bajando de golpe, daba tirones.
+func _keep_above_ground(delta: float) -> void:
+	var inv := visual.global_transform.affine_inverse()
+	var lowest := INF
+	for mi: MeshInstance3D in model.get_meta("meshes"):
+		var xf := inv * mi.global_transform
+		var box := mi.get_aabb()
+		for i in 8:
+			lowest = minf(lowest, (xf * box.get_endpoint(i)).y)
+	var needed := maxf(-lowest, 0.0)
+	_ground_lift = maxf(needed, _ground_lift - GROUND_EASE * delta)
+	# en el contenedor (se recoloca cada fotograma), no en el modelo: la pose del modelo se
+	# captura para los fundidos y la subida se sumaría dos veces
+	visual.position.y += _ground_lift
 
 ## Nieve que salta de los pies al deslizarse: cubitos blancos que quedan atrás.
 func _make_snow_spray() -> GPUParticles3D:

@@ -109,3 +109,27 @@ func test_al_lanzar_las_piernas_siguen_andando() -> void:
 	assert_gt(hi - lo, 0.5, "la pierna sigue balanceándose durante el lanzamiento")
 	var arm := Anims.part(p.model, "arm_r")
 	assert_ne(arm.rotation.x, 0.0)
+
+## Ninguna parte del cuerpo se mete en el suelo, en ningún esquive.
+func test_nunca_se_hunde_en_el_suelo() -> void:
+	for anim in ["slide", "roll", "dive", "jump", "flash"]:
+		var world := CombatWorld.new()
+		add_child_autofree(world)
+		var inp := ScriptedInput.new()
+		inp.dodge_at = [0.3] as Array[float]
+		var p := Player.new().setup(load("res://data/characters/dyer.tres"), inp, Color.YELLOW)
+		p.data.dodge_anim = anim
+		p.world = world
+		world.add_child(p)
+		world.add_player(p)
+		var worst := 0.0
+		var t := 0.0
+		while t < 1.2:
+			if fmod(t, 1.0 / 60.0) < DT: p._physics_process(1.0 / 60.0)
+			p._process(DT)
+			for mi: MeshInstance3D in p.model.get_meta("meshes"):
+				var xf := mi.global_transform                # altura real sobre el suelo (y = 0)
+				var box := mi.get_aabb()
+				for i in 8: worst = minf(worst, (xf * box.get_endpoint(i)).y)
+			t += DT
+		assert_gt(worst, -0.01, "%s: se hunde %.2f m" % [anim, -worst])
