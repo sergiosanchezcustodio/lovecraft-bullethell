@@ -12,6 +12,8 @@ const BY_MODEL := {
 	"dyer": preload("res://scripts/anim/anim_humano.gd"),
 	"dyer_chibi": preload("res://scripts/anim/anim_humano.gd"),
 	"dyer_chibi_fino": preload("res://scripts/anim/anim_humano.gd"),
+	"dyer_v3": preload("res://scripts/anim/anim_humano.gd"),
+	"dyer_v4": preload("res://scripts/anim/anim_humano.gd"),
 	"olmstead": preload("res://scripts/anim/anim_humano.gd"),
 	"legrasse": preload("res://scripts/anim/anim_humano.gd"),
 	"johansen": preload("res://scripts/anim/anim_humano.gd"),
