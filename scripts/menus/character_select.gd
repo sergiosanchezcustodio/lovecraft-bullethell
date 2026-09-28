@@ -13,9 +13,14 @@ extends Control
 
 const BG := "res://resources/PantallasMenus/fondo_titulo_sin_texto_1080p_definitivo.png"
 const DESIGN := Vector2(1920, 1080)
-const FRAME := Vector2(400, 610)
-const GAP := 34.0
-const TOP := 150.0
+const FRAME := Vector2(420, 810)
+const GAP := 26.0
+const TOP := 112.0
+const ICONS := "res://resources/PantallasMenus/iconos/ficha_%s.png"
+## Píxeles por metro del personaje: los mismos que en la partida (1080 px para 15 m de alto).
+const PX_PER_M := 1080.0 / 15.0
+## Estadísticas de la columna derecha de la ficha, en el orden de sus iconos.
+const STAT_ROWS: Array[String] = ["vida", "cordura", "esquive", "velocidad", "magia", "fisico", "fuego"]
 const STICK := 0.6                          ## umbral del stick para contar como una pulsación
 
 var state: SelectState
@@ -55,6 +60,8 @@ func _ready() -> void:
 			for ci in state.characters.size():
 				if String(state.characters[ci].id) == ids[k]: (state.seats[state.joined()[k]] as SelectState.Seat).character = ci
 		_refresh()
+	if args.has("cursor"):                              # capturas: marca ese icono de la ficha en J1
+		for k in args.get_int("cursor") + 1: _frames[0].move_cursor(1)
 	if args.has("turn"):                                # capturas: todos girados ese ángulo (grados)
 		for f in _frames: f.set_turn(deg_to_rad(args.get_float("turn")))
 	if args.has("shots"):
@@ -77,7 +84,7 @@ func _build() -> void:
 	add_child(stage)
 	var t := MenuKit.title("Elige a tu investigador", 50)
 	t.size = Vector2(DESIGN.x, 70)
-	t.position = Vector2(0, 50)
+	t.position = Vector2(0, 28)
 	stage.add_child(t)
 	if Saves.current:
 		var m := UiKit.label("Dinero  %s" % MenuKit.money(Saves.current.money), 22, UiKit.GOLD)
@@ -89,9 +96,9 @@ func _build() -> void:
 		f.position = Vector2((DESIGN.x - total) * 0.5 + i * (FRAME.x + GAP), TOP)
 		stage.add_child(f)
 		_frames.append(f)
-	var hint := MenuKit.hint("Start o Intro: unirse  ·  Izquierda/derecha: cambiar  ·  LB/RB o Q/E: girar  ·  A o Intro: elegir  ·  B o Esc: atrás")
+	var hint := MenuKit.hint("Start o Intro: unirse  ·  Izquierda/derecha: cambiar  ·  Arriba/abajo: ver la ficha  ·  LB/RB o Q/E: girar  ·  A o Intro: elegir  ·  B o Esc: atrás")
 	hint.size = Vector2(DESIGN.x, 30)
-	hint.position = Vector2(0, DESIGN.y - 60)
+	hint.position = Vector2(0, DESIGN.y - 44)
 	stage.add_child(hint)
 	var fit := func() -> void:
 		var vs := get_viewport().get_visible_rect().size
@@ -129,6 +136,8 @@ func _input(event: InputEvent) -> void:
 		elif act == "back" and state.joined().is_empty(): _back_to_menu()
 		return
 	match act:
+		"up": _frames[seat].move_cursor(-1)
+		"down": _frames[seat].move_cursor(1)
 		"left": state.move(seat, -1)
 		"right": state.move(seat, 1)
 		"confirm", "join":
@@ -154,6 +163,8 @@ func _action(event: InputEvent, dev: int) -> String:
 		var k := event as InputEventKey
 		if not k.pressed or k.echo: return ""
 		match k.physical_keycode:
+			KEY_UP, KEY_W: return "up"
+			KEY_DOWN, KEY_S: return "down"
 			KEY_LEFT, KEY_A: return "left"
 			KEY_RIGHT, KEY_D: return "right"
 			KEY_ENTER, KEY_KP_ENTER, KEY_SPACE: return "confirm"
@@ -163,19 +174,26 @@ func _action(event: InputEvent, dev: int) -> String:
 		var b := event as InputEventJoypadButton
 		if not b.pressed: return ""
 		match b.button_index:
+			JOY_BUTTON_DPAD_UP: return "up"
+			JOY_BUTTON_DPAD_DOWN: return "down"
 			JOY_BUTTON_DPAD_LEFT: return "left"
 			JOY_BUTTON_DPAD_RIGHT: return "right"
 			JOY_BUTTON_A: return "confirm"
 			JOY_BUTTON_START: return "join"
 			JOY_BUTTON_B: return "back"
 		return ""
-	if event is InputEventJoypadMotion and (event as InputEventJoypadMotion).axis == JOY_AXIS_LEFT_X:
-		# el stick cuenta una vez al pasar el umbral y otra al volver al centro
+	if event is InputEventJoypadMotion:
+		var axis := (event as InputEventJoypadMotion).axis
+		if axis != JOY_AXIS_LEFT_X and axis != JOY_AXIS_LEFT_Y: return ""
+		# el stick cuenta una vez al pasar el umbral y otra al volver al centro (cada eje por separado)
 		var v := (event as InputEventJoypadMotion).axis_value
 		var dir := 1 if v > STICK else (-1 if v < -STICK else 0)
-		var prev: int = _stick.get(dev, 0)
-		_stick[dev] = dir if absf(v) > 0.3 else 0
-		if dir != 0 and prev == 0: return "right" if dir > 0 else "left"
+		var key := dev * 2 + (1 if axis == JOY_AXIS_LEFT_Y else 0)
+		var prev: int = _stick.get(key, 0)
+		_stick[key] = dir if absf(v) > 0.3 else 0
+		if dir != 0 and prev == 0:
+			if axis == JOY_AXIS_LEFT_Y: return "down" if dir > 0 else "up"
+			return "right" if dir > 0 else "left"
 	return ""
 
 # ---------------------------------------------------------------- mapa y salida
@@ -246,11 +264,15 @@ class _Frame extends Control:
 	var _info: VBoxContainer
 	var _name: Label
 	var _role: Label
-	var _weapon: Label
+	var _weapon: TipIcon
+	var _tips: Array[TipIcon] = []            ## iconos de la ficha, en el orden de arriba/abajo
+	var _cursor := -1                         ## icono marcado con el mando (-1: ninguno)
 	var _passive: Label
-	var _stats: Label
+	var _attr_vals: Dictionary = {}           ## atributo -> {icon, val}
+	var _stat_vals: Dictionary = {}           ## estadística -> {icon, val}
 	var _status: Label
 	var _arrows: Array[Label] = []
+	var _wbox: PanelContainer
 	var _empty: VBoxContainer
 	var _pet: PanelContainer
 	var _pet_label: Label
@@ -277,11 +299,11 @@ class _Frame extends Control:
 		_head.size = Vector2(FRAME.x, 40)
 		_head.position = Vector2(0, 10)
 		add_child(_head)
-		# el personaje en 3D, en su propio mundo
+		# el personaje en 3D, en su propio mundo, a la escala de la partida
 		_view = SubViewportContainer.new()
 		_view.stretch = true
-		_view.size = Vector2(FRAME.x - 20, 330)
-		_view.position = Vector2(10, 50)
+		_view.size = Vector2(220, 170)
+		_view.position = Vector2((FRAME.x - 220) * 0.5, 50)
 		add_child(_view)
 		_vp = SubViewport.new()
 		_vp.own_world_3d = true
@@ -310,40 +332,54 @@ class _Frame extends Control:
 		_vp.add_child(rim)
 		var cam := Camera3D.new()
 		cam.projection = Camera3D.PROJECTION_ORTHOGONAL
-		cam.size = 2.05
-		cam.position = Vector3(0, 0.9, 4.0)             # el modelo mide 1,72 m: cabe con su gorro
+		cam.size = _view.size.y / PX_PER_M              # mismos píxeles por metro que en la partida
+		cam.position = Vector3(0, cam.size * 0.5 - 0.12, 4.0)
 		_vp.add_child(cam)
 		_holder = Node3D.new()
 		_vp.add_child(_holder)
 		for side in [-1, 1]:
-			var a := UiKit.label("◀" if side < 0 else "▶", 34, color)
-			a.position = Vector2(14 if side < 0 else FRAME.x - 44, 190)
+			var a := UiKit.label("◀" if side < 0 else "▶", 34, UiKit.GOLD)
+			a.position = Vector2(26 if side < 0 else FRAME.x - 56, 140)
 			add_child(a)
 			_arrows.append(a)
+		# arma inicial, arriba a la derecha
+		_wbox = PanelContainer.new()
+		_wbox.position = Vector2(FRAME.x - 104, 54)
+		_wbox.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.5), Color(UiKit.GOLD, 0.6), 10))
+		add_child(_wbox)
+		_weapon = TipIcon.new(Vector2(72, 72))
+		_weapon.placeholder = "Arma"
+		_wbox.add_child(_weapon)
+		_tips.append(_weapon)
 		# ficha
 		_info = VBoxContainer.new()
-		_info.position = Vector2(22, 362)
-		_info.size = Vector2(FRAME.x - 44, 0)
+		_info.position = Vector2(14, 224)
+		_info.size = Vector2(FRAME.x - 28, 0)
 		_info.add_theme_constant_override("separation", 4)
 		add_child(_info)
-		_name = MenuKit.title("", 30)
+		_name = MenuKit.title("", 32)
 		_info.add_child(_name)
 		_role = UiKit.label("", 16, UiKit.TEXT_DIM)
 		_role.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_role.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_role.custom_minimum_size.x = FRAME.x - 28
 		_info.add_child(_role)
-		_weapon = UiKit.label("", 16, UiKit.TEXT)
-		_weapon.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_weapon.custom_minimum_size.x = FRAME.x - 44
-		_info.add_child(_weapon)
 		_passive = UiKit.label("", 16, UiKit.TEXT)
+		_passive.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_passive.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_passive.custom_minimum_size.x = FRAME.x - 44
+		_passive.custom_minimum_size = Vector2(FRAME.x - 28, 52)
 		_info.add_child(_passive)
-		_stats = UiKit.label("", 15, UiKit.TEXT_DIM)
-		_info.add_child(_stats)
+		var sub := MenuKit.title("Características y habilidades", 22, UiKit.GOLD)
+		_info.add_child(sub)
+		var cols := HBoxContainer.new()
+		cols.alignment = BoxContainer.ALIGNMENT_CENTER
+		cols.add_theme_constant_override("separation", 14)
+		_info.add_child(cols)
+		cols.add_child(_column(Attributes.NAMES, _attr_vals))
+		cols.add_child(_column(STAT_ROWS, _stat_vals))
 		_status = MenuKit.title("", 24, color)
 		_status.size = Vector2(FRAME.x, 36)
-		_status.position = Vector2(0, FRAME.y - 34)
+		_status.position = Vector2(0, FRAME.y - 40)
 		add_child(_status)
 		# puesto vacío
 		_empty = VBoxContainer.new()
@@ -369,6 +405,51 @@ class _Frame extends Control:
 		_pet_label.custom_minimum_size.x = FRAME.x - 24
 		_pet.add_child(_pet_label)
 
+	## Nombre de cada estadística derivada (Attributes.FORMULAS) y su fila en la ficha.
+	const STAT_NAMES := {"health": "Vida", "sanity": "Cordura", "dodge": "Esquive", "speed": "Velocidad",
+		"magic": "Daño mágico", "physical": "Daño físico", "firearm": "Daño con armas de fuego"}
+	const STAT_KEYS := {"vida": "health", "cordura": "sanity", "esquive": "dodge", "velocidad": "speed",
+		"magia": "magic", "fisico": "physical", "fuego": "firearm"}
+
+	## Columna de la ficha: icono (con su descripción emergente) y valor, en un recuadro dorado.
+	func _column(names: Array, into: Dictionary) -> PanelContainer:
+		var box := PanelContainer.new()
+		box.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.45), Color(UiKit.GOLD, 0.55), 8))
+		var v := VBoxContainer.new()
+		v.add_theme_constant_override("separation", 3)
+		box.add_child(v)
+		for n in names:
+			var row := HBoxContainer.new()
+			row.add_theme_constant_override("separation", 8)
+			var icon := TipIcon.new(Vector2(32, 32))
+			icon.set_icon(load(ICONS % n), n)
+			row.add_child(icon)
+			_tips.append(icon)
+			var val := MenuKit.title("", 20, UiKit.GOLD)
+			val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			val.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			val.custom_minimum_size = Vector2(64, 0)
+			row.add_child(val)
+			v.add_child(row)
+			into[n] = {"icon": icon, "val": val}
+		return box
+
+	## Arriba/abajo con el mando o el teclado: marca el icono siguiente y enseña su descripción.
+	func move_cursor(step: int) -> void:
+		if _cursor < 0: _cursor = 0 if step > 0 else _tips.size() - 1
+		else: _cursor = wrapi(_cursor + step, 0, _tips.size())
+		for i in _tips.size(): _tips[i].selected = i == _cursor
+
+	## Qué atributos forman una estadística, para las descripciones.
+	static func _pair(stat: String) -> String:
+		var p: Array = Attributes.FORMULAS[stat]
+		return "%s + %s" % [Attributes.LONG[p[0]], Attributes.LONG[p[1]]]
+
+	## Potenciador respecto a la base: +20 %, −5 % o +0 %.
+	static func _bonus(mult: float) -> String:
+		var pct := roundi((mult - 1.0) * 100.0)
+		return ("+%d %%" % pct) if pct >= 0 else ("−%d %%" % -pct)
+
 	## Deja el modelo girado un ángulo (como si el jugador lo hubiera girado con LB/RB).
 	func set_turn(yaw: float) -> void:
 		_user_turned = true
@@ -384,7 +465,7 @@ class _Frame extends Control:
 		var color := Devices.COLORS[index]
 		var on := seat != null
 		_empty.visible = not on
-		for c in [_view, _info, _status, _pet]: (c as CanvasItem).visible = on
+		for c in [_view, _info, _status, _pet, _wbox]: (c as CanvasItem).visible = on
 		_panel.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9 if on else 0.6),
 			Color(color, 0.85 if on and seat.stage == SelectState.Stage.READY else (0.45 if on else 0.18)), 10))
 		if not on:
@@ -403,17 +484,50 @@ class _Frame extends Control:
 		_view.modulate = Color(0.25, 0.25, 0.3) if unavailable else Color.WHITE
 		_name.text = c.display_name
 		_role.text = c.role
-		var wnames := PackedStringArray()
-		for wid in c.starting_weapons:
-			var wd: WeaponData = load("res://data/weapons/%s.tres" % wid)
-			wnames.append(wd.display_name if wd else String(wid))
-		_weapon.text = "Arma: " + ", ".join(wnames)
+		var wd: WeaponData = null
+		if not c.starting_weapons.is_empty(): wd = load("res://data/weapons/%s.tres" % c.starting_weapons[0])
+		_weapon.set_icon(wd.icon if wd else null, wd.display_name if wd else "Sin arma", wd.description if wd else "")
 		_passive.text = "Rasgo: " + c.passive_text
 		var at := Attributes.initial(c)
-		_stats.text = "Vida %d  ·  Cordura %d  ·  Velocidad %s
-%s" % [c.max_health * Attributes.mult(at, "health"),
-			c.max_sanity * Attributes.mult(at, "sanity"), String.num(c.move_speed * Attributes.mult(at, "speed"), 1).replace(".", ","),
-			_attr_line(at)]
+		for n in Attributes.NAMES:
+			var cell: Dictionary = _attr_vals[n]
+			var l: Label = cell["val"]
+			l.text = str(int(at[n]))
+			l.add_theme_color_override("font_color", UiKit.GOLD if int(at[n]) > Attributes.BASE else UiKit.TEXT_DIM)
+			var uses := PackedStringArray()
+			for fs in Attributes.FORMULAS:
+				if n in Attributes.FORMULAS[fs]: uses.append(String(STAT_NAMES[fs]).to_lower())
+			(cell["icon"] as TipIcon).set_icon(load(ICONS % n), Attributes.LONG[n], "Sube: " + ", ".join(uses) + ".")
+		for n in STAT_ROWS:
+			var sk: String = STAT_KEYS[n]
+			var m := Attributes.mult(at, sk)
+			var cell: Dictionary = _stat_vals[n]
+			var l: Label = cell["val"]
+			var text := ""
+			match sk:
+				"health":
+					l.text = str(roundi(c.max_health * m))
+					text = "Puntos de vida al empezar."
+				"sanity":
+					l.text = str(roundi(c.max_sanity * m))
+					text = "Cordura al empezar. A cero, crisis de parálisis."
+				"dodge":
+					l.text = _bonus(m / c.dodge_cooldown_mult)
+					text = "Rapidez con la que se recarga el esquive."
+				"speed":
+					l.text = _bonus(m)
+					text = "Velocidad al andar."
+				"magic":
+					l.text = _bonus(m)
+					text = "Daño de las armas arcanas y de los Mitos."
+				"physical":
+					l.text = _bonus(m)
+					text = "Daño de las armas cuerpo a cuerpo y lanzadas."
+				"firearm":
+					l.text = _bonus(m)
+					text = "Daño de las armas de fuego."
+			l.add_theme_color_override("font_color", UiKit.TEXT_DIM if l.text == "+0 %" else UiKit.GOLD)
+			(cell["icon"] as TipIcon).set_icon(load(ICONS % n), STAT_NAMES[sk], "%s (%s)." % [text.trim_suffix("."), _pair(sk)])
 		var choosing := seat.stage == SelectState.Stage.CHARACTER
 		for a in _arrows: a.visible = choosing and st.choices(index).size() > 1
 		match seat.stage:
@@ -438,11 +552,6 @@ Se consiguen en la tienda"
 		_pet.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9), Color(color, 0.85 if picking else 0.2), 8))
 		_pet_label.add_theme_color_override("font_color", UiKit.TEXT if picking or seat.stage == SelectState.Stage.READY else UiKit.TEXT_DIM)
 
-	## Atributos en una línea; los que suben con el reparto del personaje, en dorado.
-	static func _attr_line(at: Dictionary) -> String:
-		var parts := PackedStringArray()
-		for n in Attributes.NAMES: parts.append("%s %d" % [n, int(at[n])])
-		return " ".join(parts)
 
 	func _set_model(model_name: String) -> void:
 		if model_name == _model_name: return

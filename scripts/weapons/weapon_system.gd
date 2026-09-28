@@ -127,7 +127,8 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 
 ## Daño de un arma con los atributos del personaje (D-27).
 func dmg(w: Weapon) -> float:
-	return w.stat("damage") * player.damage_mult(w.data.category)
+	var k := player.data.melee_mult if w.data.delivery == WeaponData.Delivery.MELEE else 1.0   # rasgo de Johansen
+	return w.stat("damage") * player.damage_mult(w.data.category) * k
 
 ## Coste de cordura de las armas arcanas (GDD 5.2), con el rasgo del personaje.
 func _pay_sanity(w: Weapon) -> void:
@@ -209,7 +210,7 @@ func _slash(w: Weapon) -> bool:
 func _throw(w: Weapon, target: Vector3) -> void:
 	var e := ThrownExplosive.new()
 	e.setup(world, player.global_position + Vector3(0, 1.4, 0), Vector3(target.x, 0, target.z),
-		w.stat("flight_time"), w.stat("fuse"), w.stat("aoe_radius"), dmg(w), player.color)
+		w.stat("flight_time"), w.stat("fuse"), w.stat("aoe_radius") * player.data.explosion_radius_mult, dmg(w), player.color)
 	var z := {}
 	if w.data.zone != WeaponData.Zone.NONE:
 		z = {"kind": w.data.zone, "radius": w.stat("zone_radius"), "time": w.stat("zone_time"),

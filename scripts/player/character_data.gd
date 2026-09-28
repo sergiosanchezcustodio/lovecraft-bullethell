@@ -11,6 +11,7 @@ extends Resource
 @export var story := "En las montañas de la locura"               ## relato del que viene
 @export var price := 0                       ## en la tienda; 0 = disponible desde el principio
 @export_group("Rasgos")
+## Cada personaje tiene un único rasgo (D-35); los demás campos se quedan en su valor neutro.
 ## Daño recibido de enemigos con estas etiquetas (EnemyData.tags): {"marina": 0.7} = 30 % menos.
 @export var resist_tags := {}
 ## Daño hecho a enemigos con estas etiquetas: {"humana": 1.25} = 25 % más.
@@ -21,10 +22,12 @@ extends Resource
 @export var xp_mult := 1.0                   ## experiencia por gema (Blake: 1,15)
 @export var heal_on_level := 0.0             ## fracción de la vida máxima que recupera al subir de nivel (Whipple)
 @export var revive_speed := 1.0              ## rapidez al reanimar a un compañero (Whipple; hito 2.6)
-@export var calm_aura := 0.0                 ## cordura por segundo a los compañeros cercanos (Iwanicki; hito 2.7)
+@export var calm_aura := 0.0                 ## cordura por segundo a sí mismo y a los compañeros a menos de CALM_RADIUS (Iwanicki)
 @export var physical_resist := 1.0           ## multiplica el daño físico recibido (Elwood: 0,85)
 @export var dodge_cooldown_mult := 1.0       ## multiplica la recarga del esquive (Elwood: 0,8)
 @export var close_bonus := 0.0               ## daño extra a quemarropa: +close_bonus junto al enemigo, 0 al alcance máximo (Malone)
+@export var explosion_radius_mult := 1.0     ## radio de las explosiones de sus lanzados (Dyer: 1,25)
+@export var melee_mult := 1.0              ## daño de las armas cuerpo a cuerpo (Johansen: 1,25)
 @export var in_shop := false                 ## se compra en la tienda (precio en el hito 2.9; mientras, disponible)
 @export var order := 0                       ## orden en la selección de personaje
 @export_group("Atributos")

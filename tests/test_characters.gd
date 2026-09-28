@@ -49,8 +49,9 @@ func test_olmstead_esquiva_mas_largo() -> void:
 	var p := _player("olmstead")
 	assert_almost_eq(p.data.dodge_duration, p.data.dodge_style.duration * 1.3, 0.001)
 
-func test_olmstead_resiste_a_las_criaturas_marinas() -> void:
+func test_la_resistencia_por_etiquetas_solo_vale_contra_ellas() -> void:
 	var p := _player("olmstead")
+	p.data.resist_tags = {&"marina": 0.7}          # rasgo como dato (hoy no lo lleva nadie)
 	var marine := _enemy([&"marina"] as Array[StringName], Vector3(5, 0, 0))
 	var d := Damage.new(10.0, 0.0)
 	d.source = marine
@@ -164,9 +165,8 @@ func test_la_onda_empuja_aturde_y_golpea_una_vez() -> void:
 	assert_gt(near._stun, 0.0)
 	assert_eq(far.health, 1000.0)
 
-func test_elwood_aguanta_el_daño_fisico_y_esquiva_antes() -> void:
+func test_elwood_aguanta_el_daño_fisico() -> void:
 	var p := _player("elwood")
-	assert_almost_eq(p.data.dodge_cooldown, p.data.dodge_style.cooldown * 0.8 / Attributes.mult(p.attrs, "dodge"), 0.001)
 	p.take_damage(Damage.new(20.0, 10.0))
 	assert_almost_eq(p.health, p.data.max_health - 17.0, 0.01)
 	assert_almost_eq(p.sanity, p.data.max_sanity - 10.0, 0.01, "el mental, igual")
@@ -179,3 +179,35 @@ func test_malone_hace_mas_daño_a_quemarropa() -> void:
 	p.weapons._fire(w)
 	var first: float = world.bullets._phys[0]
 	assert_gt(first, w.stat("damage") * 1.4)
+
+func test_dyer_hace_explosiones_mas_grandes() -> void:
+	var p := _player("dyer")
+	var w := p.weapons.add_weapon(load("res://data/weapons/granada.tres"))
+	p.weapons._throw(w, Vector3(3, 0, 0))
+	var e: ThrownExplosive = world.fx.get_child(world.fx.get_child_count() - 1)
+	assert_almost_eq(e.radius, w.stat("aoe_radius") * 1.25, 0.001)
+
+func test_johansen_pega_mas_cuerpo_a_cuerpo() -> void:
+	var p := _player("johansen")
+	var w := p.weapons.add_weapon(load("res://data/weapons/machete.tres"))
+	assert_almost_eq(p.weapons.dmg(w), w.stat("damage") * p.damage_mult(w.data.category) * 1.25, 0.001)
+
+func test_iwanicki_se_calma_a_si_mismo() -> void:
+	var p := _player("iwanicki")
+	p.sanity = 50.0
+	p.world = world
+	p.sanity_state.since_mental_hit = 0.0          # sin la recuperación normal
+	p._physics_process(1.0)
+	assert_gt(p.sanity, 50.0)
+
+func test_un_solo_rasgo_por_personaje() -> void:
+	var neutral := CharacterData.new()
+	var fields := ["resist_tags", "bonus_tags", "knockback_immune", "dodge_length", "arcane_cost_mult", "xp_mult",
+		"heal_on_level", "revive_speed", "calm_aura", "physical_resist", "dodge_cooldown_mult", "close_bonus",
+		"explosion_radius_mult", "melee_mult", "luck", "pickup_radius"]
+	for r in DebugOptions.list_resources("res://data/characters"):
+		var c := r as CharacterData
+		var n := 0
+		for f in fields:
+			if c.get(f) != neutral.get(f): n += 1
+		assert_eq(n, 1, "rasgos de " + String(c.id))

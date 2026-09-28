@@ -21,6 +21,7 @@ var sanity := 0.0
 var weapons: WeaponSystem
 var world: CombatWorld
 var progress: PlayerProgress
+const CALM_RADIUS := 4.0
 var sanity_state: SanityState
 var god := false                 ## depuración: no recibe daño
 var attrs_level1 := {}           ## atributos del nivel 1 (fijan las probabilidades de subida)
@@ -118,6 +119,10 @@ func _physics_process(delta: float) -> void:
 	input.update(delta)
 	var near := world != null and world.nearest_enemy(global_position, sanity_state.rules.horror_radius) != null
 	sanity = sanity_state.update(delta, sanity, data.max_sanity, near)
+	if data.calm_aura > 0.0 and world != null:       # rasgo de Iwanicki: calma a sí mismo y a los cercanos
+		for p in world.players:
+			if p.health > 0.0 and p.global_position.distance_to(global_position) <= CALM_RADIUS:
+				p.sanity = minf(p.data.max_sanity, p.sanity + data.calm_aura * delta)
 	motor.locked = sanity_state.is_frozen()
 	var was_dodging := motor.is_dodging()
 	velocity = motor.step(delta, input.move, input.just_pressed(InputBindings.DODGE))

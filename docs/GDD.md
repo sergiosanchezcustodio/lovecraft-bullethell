@@ -261,22 +261,22 @@ Más potentes que las convencionales, pero **cada uso cuesta cordura**.
 
 ## 6. Personajes jugables
 
-Todos proceden de relatos de Lovecraft y cada parte tiene al menos un personaje nativo. Armitage y West vienen de relatos que no forman parte del juego (licencia aceptada). Cada uno tiene arma inicial, rasgo pasivo y un perfil de estadísticas: vida, cordura, velocidad, recarga del esquive y suerte en las mejoras. Los valores exactos, por datos.
+Todos proceden de relatos de Lovecraft y cada parte tiene al menos un personaje nativo. Armitage y West vienen de relatos que no forman parte del juego (licencia aceptada). Cada uno tiene arma inicial, un único rasgo pasivo (D-35) y un perfil de estadísticas: vida, cordura, velocidad, recarga del esquive y suerte en las mejoras. Los valores exactos, por datos.
 
 | Personaje | Relato | Arma inicial | Rasgo pasivo | Perfil |
 |---|---|---|---|---|
-| William Dyer, geólogo | *En las montañas de la locura* (parte 1) | Cartuchos de dinamita (en la fase 1, además, el revólver) | Resistencia al frío y a los efectos de ralentización (D-19) | Mucha cordura |
-| Robert Olmstead, narrador de Innsmouth | *La sombra sobre Innsmouth* (parte 2) | Revólver .38 | Esquive más largo; "sangre de Innsmouth": resistencia al daño de criaturas marinas | Equilibrado |
+| William Dyer, geólogo | *En las montañas de la locura* (parte 1) | Cartuchos de dinamita (en la fase 1, además, el revólver) | Explosiones un 25 % más grandes (D-35) | Mucha cordura |
+| Robert Olmstead, narrador de Innsmouth | *La sombra sobre Innsmouth* (parte 2) | Revólver .38 | Esquive un 30 % más largo (D-35) | Equilibrado |
 | Inspector John R. Legrasse | *La llamada de Cthulhu* (parte 3) | Escopeta de dos cañones | Más daño contra cultistas y enemigos humanos (D-19) | Equilibrado |
-| Gustaf Johansen, marinero | *La llamada de Cthulhu* (parte 3) | Machete | Más vida; inmunidad al empuje (D-19) | Mucha vida |
+| Gustaf Johansen, marinero | *La llamada de Cthulhu* (parte 3) | Machete | Un 25 % más de daño cuerpo a cuerpo (D-35) | Mucha vida |
 | Profesor Henry Armitage | *El horror de Dunwich* | Polvo de Ibn-Ghazi | Las armas arcanas recargan antes | Cordura alta, vida baja |
 | Herbert West | *Herbert West, reanimador* | Reactivo de West | Reanima a compañeros más rápido; curación en área al subir de nivel | Poca cordura, gran resistencia física |
-| Amelia Peaslee, arqueóloga joven y aventurera, sobrina del profesor Peaslee | *La sombra fuera del tiempo* | Rifle de caza | Más suerte en las mejoras; recoge las gemas desde más lejos | Rápida, vida media |
+| Amelia Peaslee, arqueóloga joven y aventurera, sobrina del profesor Peaslee | *La sombra fuera del tiempo* | Rifle de caza | Más suerte en las mejoras (D-35) | Rápida, vida media |
 | Madame Ludmila Varga, espiritista experta en artes oscuras | Médium de Arkham (propia) | Páginas del Necronomicón | Las armas arcanas le cuestan la mitad de cordura | Mucha cordura, poca vida |
-| Padre Iwanicki, sacerdote católico | *Los sueños en la casa de la bruja* | Fórmula de expulsión | Aura que calma: los compañeros cercanos recuperan cordura | Equilibrado |
-| Dra. Marian Whipple, doctora, sobrina del Dr. Elihu Whipple | *La casa maldita* | Bisturís (arma nueva: abanico que atraviesa) | Reanima más rápido; se cura un poco al subir de nivel | Vida y cordura medias |
+| Padre Iwanicki, sacerdote católico | *Los sueños en la casa de la bruja* | Fórmula de expulsión | Aura que calma: él y los compañeros cercanos recuperan cordura (D-35) | Equilibrado |
+| Dra. Marian Whipple, doctora, sobrina del Dr. Elihu Whipple | *La casa maldita* | Bisturís (arma nueva: abanico que atraviesa) | Reanima a los compañeros un 50 % más rápido (D-35) | Vida y cordura medias |
 | Henrietta Blake, escritora, hermana de Robert Blake | *El morador de las tinieblas* | Trapezoedro Resplandeciente | Más experiencia por gema | Cordura alta, vida baja |
-| Sargento Frank Elwood, ex-soldado de la Gran Guerra | Pariente de Elwood, *Los sueños en la casa de la bruja* | Pistola automática Colt .45 | Recarga del esquive más rápida; resiste mejor el daño físico | Mucha vida |
+| Sargento Frank Elwood, ex-soldado de la Gran Guerra | Pariente de Elwood, *Los sueños en la casa de la bruja* | Pistola automática Colt .45 | Recibe un 15 % menos de daño físico (D-35) | Mucha vida |
 | Vera Malone, delincuente de la mafia | *El horror de Red Hook* | Subfusil Thompson | Más daño cuanto más cerca está el enemigo | Rápida, vida media |
 
 ---
@@ -432,6 +432,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-32 | Logros y desbloqueos | Fase 2 | **Resuelta** |
 | D-33 | Clima estético | Fase 2 | **Resuelta** |
 | D-34 | Vestuario | Fase 2 | **Resuelta** |
+| D-35 | Un rasgo por personaje | Fase 2 | **Resuelta** |
 
 D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherencias y huecos detectados al redactar este documento (sección 13). Las decisiones bloqueantes de las fases 1 y 2 se resolvieron el 24-09-2026.
 
@@ -491,6 +492,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
 - **D-32 — Logros (27-09-2026).** *Resuelta:* el menú principal tiene una sección nueva de **logros y desbloqueos**.
 - **D-33 — Clima (27-09-2026).** *Resuelta:* inclemencias del tiempo **solo estéticas**, sin efecto en personajes ni enemigos: nieve o ceniza, lluvia, niebla, viento, nubes y rayos de fondo, según el nivel.
 - **D-34 — Vestuario (27-09-2026).** *Resuelta:* prendas solo estéticas en la tienda. Cabeza: casco de la Primera Guerra Mundial, gorro de nieve, cinta del pelo, bufanda, sombrero de aventurero, boina, sombrero de copa, sombrero vaquero, bombín, casco de minero, sombrero de mujer, turbante, sombrero de paja, gafas de ver y gafas de nieve. Cuerpo: chaqueta de aviador, abrigo de piel, abrigo de nieve, chubasquero, chaleco, vestido y bata. Pies: botas militares, botas de nieve, botas esquimales y zapatos de tacón.
+- **D-35 — Un rasgo por personaje (29-09-2026).** *Resuelta:* cada personaje tiene un único rasgo, acorde con su oficio. Dyer, explosiones un 25 % más grandes; Olmstead, esquive más largo; Peaslee, suerte; Whipple, reanima más rápido; Elwood, 15 % menos de daño físico; Johansen, 25 % más de daño cuerpo a cuerpo; Iwanicki, aura de cordura que también le afecta a él. Los demás no cambian. Se quitan la resistencia marina de Olmstead, la recogida de Peaslee, la curación de Whipple, la recarga de Elwood y la inmunidad al empuje de Johansen.
 - **D-19 — Pasivos sin mecánica.** El pasivo de Dyer (frío y ralentización) y el de Johansen (inmunidad al empuje) dependen de efectos sobre el jugador que no están definidos, y el de Legrasse necesita saber si los híbridos de Innsmouth cuentan como "enemigos humanos".
 
 ---
