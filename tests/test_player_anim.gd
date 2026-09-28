@@ -25,9 +25,18 @@ func _pose(p: Player) -> Array:
 	var out: Array = []
 	var root: Transform3D = p.model.transform
 	for n: Node3D in p.model.get_meta("parts"):
-		var xf := root * n.transform
+		# transformación respecto al modelo, contando la de la pieza padre (codos y rodillas)
+		var local := n.transform
+		var up := n.get_parent() as Node3D
+		while up != null and up != p.model:
+			local = up.transform * local
+			up = up.get_parent() as Node3D
+		var xf := root * local
 		out.append(xf.origin)
-		out.append(xf * Vector3(0, -0.4, 0))
+		# 40 cm a lo largo de la pieza; las que cuelgan de otra (antebrazo, espinilla) miden
+		# unos 30 cm: se toma un punto a 20 cm, dentro de la pieza, y no más allá de la mano
+		var reach := 0.2 if n.get_parent() != p.model else 0.4
+		out.append(xf * Vector3(0, -reach, 0))
 	return out
 
 func _max_jump(a: Array, b: Array) -> float:

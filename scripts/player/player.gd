@@ -40,7 +40,7 @@ var _blend_snap: Array = []      ## pose de la que se parte al cambiar de animac
 var _blend_t := 1.0
 var _blend_len := 0.0
 var _snow: GPUParticles3D        ## nieve que levanta al deslizarse
-const UPPER_BODY: Array[String] = ["arm_r", "arm_l", "torso"]
+const UPPER_BODY: Array[String] = ["arm_r", "arm_l", "torso", "fore_r", "fore_l"]
 var _ring_mat: StandardMaterial3D
 var _frozen_mat: StandardMaterial3D
 var _frozen_on := false

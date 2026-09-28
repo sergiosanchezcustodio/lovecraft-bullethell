@@ -18,19 +18,22 @@ const FACES := [
 static var _cache := {}
 ## Caché en disco de las mallas construidas (ver VoxelMeshCache). Sube BUILDER_VERSION
 ## cuando cambie la forma de construir las mallas, para invalidar lo guardado.
-const BUILDER_VERSION := 2
+const BUILDER_VERSION := 3
 const DISK_CACHE_DIR := "user://voxcache"
 static var use_disk_cache := true
 static var _mats := {}   # "rugosidad/especular" -> material compartido
 static var _glow_mat: StandardMaterial3D
 
-## Devuelve una instancia nueva del modelo: un nodo por parte con su pivote.
+## Devuelve una instancia nueva del modelo: un nodo por parte con su pivote. Si el JSON
+## trae "parents" ({"fore_l": "arm_l"}), esa parte cuelga de la otra: al girar el brazo, el
+## antebrazo va con él y además se dobla por su propio pivote (el codo).
 static func load_model(path: String) -> Node3D:
 	var model: Dictionary = _get_model(path)
 	var root := Node3D.new()
 	root.name = path.get_file().get_basename()
 	root.set_meta("pivots", model.pivots)
 	root.set_meta("voxel_size", model.voxel_size)
+	var order: Array[String] = []                   # partes en orden de creación
 	for layer: Dictionary in model.layers:
 		var pname: String = layer.part
 		var pivot_node: Node3D = root.get_node_or_null(pname)
@@ -39,23 +42,36 @@ static func load_model(path: String) -> Node3D:
 			pivot_node.name = pname
 			pivot_node.position = layer.pivot * model.voxel_size
 			root.add_child(pivot_node)
+			order.append(pname)
 		var mi := MeshInstance3D.new()
 		mi.mesh = layer.mesh
 		mi.material_override = _glow_mat if layer.glow else model.material
 		pivot_node.add_child(mi)
+	# Jerarquía: cada parte con padre pasa a colgar de él, con la posición relativa a su pivote
+	var parents: Dictionary = model.get("parents", {})
+	for pname in order:
+		if not parents.has(pname): continue
+		var n: Node3D = root.get_node(pname)
+		var parent: Node3D = root.get_node_or_null(String(parents[pname]))
+		if parent == null: continue
+		var pos := n.position - parent.position
+		root.remove_child(n)
+		parent.add_child(n)
+		n.position = pos
 	# Para animar sin buscar ni recalcular en cada fotograma (Anims.reset/rest)
 	var parts: Array[Node3D] = []
 	var rest: Array[Vector3] = []
 	var rest_by_name := {}
 	var part_nodes := {}
 	var meshes: Array[MeshInstance3D] = []
-	for c: Node in root.get_children():
-		var n := c as Node3D
+	for pname in order:
+		var n: Node3D = root.find_child(pname, true, false)
 		parts.append(n)
 		rest.append(n.position)
 		rest_by_name[n.name] = n.position
 		part_nodes[String(n.name)] = n
-		for m: Node in n.get_children(): meshes.append(m as MeshInstance3D)
+		for m: Node in n.get_children():
+			if m is MeshInstance3D: meshes.append(m as MeshInstance3D)
 	root.set_meta("parts", parts)
 	root.set_meta("rest", rest)
 	root.set_meta("rest_by_name", rest_by_name)
@@ -79,7 +95,7 @@ static func _get_model(path: String) -> Dictionary:
 			var layers_c: Array[Dictionary] = []
 			for i in c.parts.size():
 				layers_c.append({"part": c.parts[i], "pivot": c.layer_pivots[i], "glow": c.glows[i], "mesh": c.meshes[i]})
-			var m := {"pivots": c.pivots, "layers": layers_c, "voxel_size": c.voxel_size,
+			var m := {"pivots": c.pivots, "parents": c.parents, "layers": layers_c, "voxel_size": c.voxel_size,
 				"material": _material(c.roughness, c.specular)}
 			_cache[path] = m
 			return m
@@ -110,7 +126,8 @@ static func _get_model(path: String) -> Dictionary:
 	# ropa, plumas y atrezo declaran en el JSON una superficie mate.
 	var rough := float(data.get("roughness", 0.38))
 	var spec := float(data.get("specular", 0.6))
-	var model := {"pivots": data.pivots, "layers": layers, "voxel_size": vs, "material": _material(rough, spec)}
+	var model := {"pivots": data.pivots, "parents": data.get("parents", {}), "layers": layers, "voxel_size": vs,
+		"material": _material(rough, spec)}
 	_cache[path] = model
 	if use_disk_cache: _save_disk_cache(path, disk_path, model, rough, spec)
 	return model
@@ -132,6 +149,7 @@ static func _save_disk_cache(path: String, disk_path: String, model: Dictionary,
 			if rest.count("_") == 2: DirAccess.remove_absolute(DISK_CACHE_DIR + "/" + f)
 	var c := VoxelMeshCache.new()
 	c.pivots = model.pivots
+	c.parents = model.get("parents", {})
 	c.voxel_size = model.voxel_size
 	c.roughness = rough
 	c.specular = spec

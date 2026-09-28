@@ -49,11 +49,23 @@ def arms(M: Model, sleeve, cuff, hand, half=9, cuff_h=2):
         x0, x1 = (-half - 5, -half) if s < 0 else (half, half + 5)
         M.vbox(x0, 27, -3, x1, 41, 3, p, sleeve)
         M.vbox(x0, 25, -3, x1, 25 + cuff_h, 3, p, cuff)
-        M.vbox(x0, 21, -2, x1, 25, 3, p, hand)
         M.bevel(p, x0, x1, -3, 3, 25, 41)
-        M.bevel(p, x0, x1, -2, 3, 21, 25)
+        lego_hand(M, p, x0 + 1 if s < 0 else x0, hand)
         for z in range(-3, 3):
             M.V.pop((x1 - 1 if s > 0 else x0, 40, z), None)
+
+
+def lego_hand(M: Model, part, x0, col, top=25):
+    """Mano sencilla estilo Lego: una pinza en C de 4 voxels de ancho, algo más estrecha que
+    la manga (para que se lea como pieza aparte), con la abertura hacia delante. x0 es su
+    borde izquierdo; cuelga del puño (top) hacia abajo."""
+    y0 = top - 5
+    M.vbox(x0, y0, -2, x0 + 4, top, 3, part, col)
+    M.bevel(part, x0, x0 + 4, -2, 3, y0, top)
+    for x in range(x0 + 1, x0 + 3):                      # hueco de la C, abierto por delante
+        for y in range(y0 + 1, top - 1):
+            for z in range(0, 3):
+                M.V.pop((x, y, z), None)
 
 
 def head(M: Model, skin):
@@ -81,12 +93,37 @@ def hair_back(M: Model, skin, hair, top=50):
             v[1] = hair
 
 
-def export(M: Model, name, half=9):
-    """Exporta con los pivotes comunes. half: medio ancho del torso (los hombros van 2,5 más allá)."""
+KNEE = 13                  # altura de la rodilla (voxels)
+ELBOW = 33                 # altura del codo
+
+
+def split_limbs(M: Model):
+    """Parte brazos y piernas en dos piezas para doblar codos y rodillas: lo que queda por
+    debajo de la rodilla pasa a la espinilla (shin_l/r, con el pie) y lo que queda por debajo
+    del codo, al antebrazo (fore_l/r, con la mano). Llamar después de modelar."""
+    for k, v in M.V.items():
+        x, y, z = k
+        if v[0] in ('leg_l', 'leg_r') and y < KNEE: v[0] = 'shin' + v[0][3:]
+        elif v[0] in ('arm_l', 'arm_r') and y < ELBOW: v[0] = 'fore' + v[0][3:]
+
+
+def export(M: Model, name, half=9, extra_pivots=None, extra_parents=None):
+    """Exporta con los pivotes comunes. half: medio ancho del torso (los hombros van 2,5 más
+    allá). Si el modelo tiene codos y rodillas (split_limbs), exporta también esas piezas y
+    su jerarquía; extra_pivots y extra_parents añaden piezas propias (coleta, bufanda)."""
     pv = {k: list(v) for k, v in PIVOTS.items()}
     pv['arm_l'][0] = -(half + 2.5)
     pv['arm_r'][0] = half + 2.5
-    n = M.export('models/%s.json' % name, pv, jitter=0.006, pivots_in_voxels=True, roughness=0.9, specular=0.25)
+    parents = {}
+    parts = {v[0] for v in M.V.values()}
+    if 'shin_l' in parts:
+        pv['shin_l'] = [-4, KNEE, 0]; pv['shin_r'] = [4, KNEE, 0]
+        pv['fore_l'] = [-(half + 2.5), ELBOW, 0]; pv['fore_r'] = [half + 2.5, ELBOW, 0]
+        parents.update({'shin_l': 'leg_l', 'shin_r': 'leg_r', 'fore_l': 'arm_l', 'fore_r': 'arm_r'})
+    if extra_pivots: pv.update(extra_pivots)
+    if extra_parents: parents.update(extra_parents)
+    n = M.export('models/%s.json' % name, pv, jitter=0.006, pivots_in_voxels=True, roughness=0.9, specular=0.25,
+                 parents=parents or None)
     print(name, n, 'voxels')
 
 

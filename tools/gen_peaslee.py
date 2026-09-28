@@ -45,8 +45,10 @@ for s, p in ((-1, 'arm_l'), (1, 'arm_r')):            # vuelta de la manga
 hu.head(M, SKIN)
 hu.face_f(M, BROW, SKIN_SH, LIPS, eye_y=47)
 hu.hair_back(M, SKIN, HAIR)
-# coleta que asoma bajo el salacot
-box(-2, 40, -8, 2, 50, -5, H, HAIR)
+# coleta que asoma bajo el salacot (pieza propia: se balancea al andar)
+box(-2, 40, -8, 2, 50, -6, 'hair', HAIR)
+box(-1, 38, -8, 1, 40, -6, 'hair', HAIR)                   # punta
+box(-2, 48, -8, 2, 50, -6, 'hair', (0.30, 0.18, 0.10))     # lazo oscuro
 # salacot: cúpula, cinta y ala corta (más ala taparía los ojos desde la cámara)
 box(-6, 50, -6, 6, 51, 7, H, HELMET_SH)               # ala (asoma 2 por delante)
 box(-5, 51, -5, 5, 55, 5, H, HELMET)
@@ -61,4 +63,5 @@ def paint(k, part, c):
     if c == SHIRT and M.hsh(x, y, z) < -0.5: return SHIRT_SH
     return None
 M.paint(paint)
-hu.export(M, 'peaslee', half=W)
+hu.split_limbs(M)                                     # codos y rodillas
+hu.export(M, 'peaslee', half=W, extra_pivots={'hair': [0, 50, -7]}, extra_parents={'hair': 'head'})

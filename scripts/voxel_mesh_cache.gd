@@ -5,6 +5,7 @@ extends Resource
 ## en construirse y ~20 ms en cargarse de aquí.
 
 @export var pivots := {}
+@export var parents := {}                     ## parte -> parte de la que cuelga (antebrazo -> brazo)
 @export var voxel_size := 0.03125
 @export var roughness := 0.38
 @export var specular := 0.6

@@ -12,6 +12,7 @@ Uso: python tools/gen_dyer.py
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
 from voxlib import Model, lerp, scale
+import humano as hu
 
 M = Model(S=2, seed=1930)
 
@@ -73,9 +74,8 @@ for s, p in ((-1, 'arm_l'), (1, 'arm_r')):
     x0, x1 = (-14, -9) if s < 0 else (9, 14)
     box(x0, 27, -3, x1, 41, 3, p, PARKA)                  # manga
     box(x0, 25, -3, x1, 27, 3, p, FUR)                    # puño de piel
-    box(x0, 20, -2, x1, 25, 3, p, MITT)                   # manopla
     M.bevel(p, x0, x1, -3, 3, 25, 41)
-    M.bevel(p, x0, x1, -2, 3, 20, 25)
+    hu.lego_hand(M, p, x0 + 1 if s < 0 else x0, MITT)     # manopla en pinza, estilo Lego
     for z in range(-3, 3):                                # hombro redondeado
         M.V.pop((x1 - 1 if s > 0 else x0, 40, z), None)
 
@@ -120,8 +120,10 @@ def paint(k, part, c):
     return None
 M.paint(paint)
 
-pivots = {'torso': [0, 24, 0], 'head': [0, 43, 0],
-          'arm_l': [-11.5, 40, 0], 'arm_r': [11.5, 40, 0],
-          'leg_l': [-4, 24, 0], 'leg_r': [4, 24, 0]}
-n = M.export('models/dyer.json', pivots, jitter=0.006, pivots_in_voxels=True, roughness=0.9, specular=0.25)
-print(n, 'voxels')
+# Cola de la bufanda que cae por la espalda (pieza propia: se balancea al andar)
+for y in range(31, 42):
+    box(1, y, -6, 5, y + 1, -5, 'scarf', SCARF if y % 4 else SCARF_SH)
+for x in (1, 3):                                          # flecos
+    box(x, 30, -6, x + 1, 31, -5, 'scarf', SCARF_SH)
+hu.split_limbs(M)                                         # codos y rodillas
+hu.export(M, 'dyer', extra_pivots={'scarf': [3, 42, -5.5]}, extra_parents={'scarf': 'torso'})

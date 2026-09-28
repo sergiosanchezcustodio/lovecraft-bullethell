@@ -88,7 +88,9 @@ static func blend_from(m: Node3D, snap: Array, w: float) -> void:
 static func overlay(model_name: String, anim: String, m: Node3D, t: float, w: float, only: Array[String]) -> void:
 	if not has_anim(model_name, anim) or w <= 0.0: return
 	var saved := {}
+	var nodes: Dictionary = m.get_meta("part_nodes")
 	for pname in only:
+		if not nodes.has(pname): continue              # piezas opcionales (antebrazos)
 		var n := part(m, pname)
 		saved[pname] = [n.position, n.rotation, n.scale]
 	var root_pos := m.position
@@ -96,7 +98,7 @@ static func overlay(model_name: String, anim: String, m: Node3D, t: float, w: fl
 	BY_MODEL[model_name].call(anim, m, t)
 	m.position = root_pos
 	m.rotation = root_rot
-	for pname in only:
+	for pname in saved:
 		var n := part(m, pname)
 		var s: Array = saved[pname]
 		n.position = (s[0] as Vector3).lerp(n.position, w)
