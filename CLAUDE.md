@@ -64,7 +64,12 @@ Léela al empezar cada sesión:
     - Armas fusionadas (D-29), que sustituyen a las antiguas: Webly Mk VI (Olmstead), Stielhandgranate (Dyer, explota al impacto; ya lleva dos en el cinturón), escopeta de corredera (Legrasse, perdigones en anillo), rifle de palanca (Peaslee), Mauser C96 (Elwood) y Thompson M1928 (Malone).
     - Armas nuevas: Flammenwerfer (chorro en cono que deja fuego), Cóctel Molotov (charco ardiente), arpón ballenero (atraviesa y arrastra), pistola de bengalas (atrae a los enemigos; las élites no), lanzaquímicos (ácido que deja vulnerables con +25 % de daño) y cañón de fuegos artificiales (errático, se abre en chispas).
     - Sistemas nuevos: `DamageZone` (fuego y ácido), `Flare`, `FlameJet`, estados de los enemigos (`make_vulnerable`, `lure`, `stun`), balas que se dividen (`split`) y lanzados configurables (`ThrownExplosive.configure`: aspecto, arco, zona, bengala; con mecha 0 explotan al impactar).
-  - Siguiente: hito 2.7, arsenal II (arcanas y tecnología de los Mitos).
+  - **En pausa el 28-09-2026, por dónde seguir:**
+    - **Nuevo estilo de personajes (prototipo, pendiente de aplicar):** `tools/gen_dyer_v4.py` (`models/dyer_v4.json`), a 48 voxels por metro, con anatomía realista de caras planas (tramos que se estrechan con chaflanes de 1 voxel, sin formas redondas ni grano por bloques, que hacían escalones y rayas), cabeza algo grande, manoplas en pinza estilo LEGO, codos, rodillas y bufanda articulados, y texturas por material (`tools/materiales.py`). Al autor le gusta; falta su visto bueno final para convertirlo en la base común (cuerpo de hombre y de mujer) y pasar los otros 10 personajes, en dos tandas con revisión. Probar: `godot --path . -- model=dyer_v4 cam=6`.
+    - Descartados: `gen_dyer_chibi.py` (demasiado a bloques) y `gen_dyer_v3.py` (formas redondas: escalones sueltos).
+    - Ya en el juego: codos y rodillas, rebote y bufanda o coleta en Dyer y Peaslee (los demás, al pasarlos al estilo nuevo); manos en pinza en los 11; los personajes no se hunden en el suelo al esquivar (`Player._keep_above_ground`).
+    - El autor tenía más cambios que quería hacer antes del hito 2.7: preguntárselos.
+  - Después: hito 2.7, arsenal II (arcanas y tecnología de los Mitos).
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
