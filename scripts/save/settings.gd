@@ -16,7 +16,8 @@ const BUS_SFX := &"Efectos"
 const REMAP_ACTIONS := [
 	[&"up", "Moverse arriba"], [&"down", "Moverse abajo"], [&"left", "Moverse a la izquierda"],
 	[&"right", "Moverse a la derecha"], [InputBindings.DODGE, "Esquivar"], [InputBindings.PAUSE, "Pausa"],
-	[InputBindings.SHEET, "Ficha del jugador"], [InputBindings.MAP, "Mapa"]]
+	[InputBindings.SHEET, "Ficha del jugador"], [InputBindings.MAP, "Mapa"],
+	[InputBindings.PAGE_PREV, "Página anterior de la ficha"], [InputBindings.PAGE_NEXT, "Página siguiente de la ficha"]]
 
 var defaults := {
 	"fullscreen": true, "resolution": 2, "vsync": true, "fps_limit": 0, "scale_3d": 1.0,

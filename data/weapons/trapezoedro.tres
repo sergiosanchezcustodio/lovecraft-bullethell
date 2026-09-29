@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"trapezoedro"
 display_name = "Trapezoedro Resplandeciente"
+description = "Rayo de luz concentrada que daña todo lo que atraviesa. Cuesta cordura."
 delivery = 4
 category = 2
 targeting = 1

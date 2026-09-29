@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"fuegos"
 display_name = "Cañón de fuegos artificiales"
+description = "Cohetes erráticos que estallan en chispas."
 delivery = 0
 category = 1
 targeting = 0

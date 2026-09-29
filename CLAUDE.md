@@ -116,7 +116,13 @@ Léela al empezar cada sesión:
     - Distorsiones de cordura baja (`SanityFx`): borde violeta que palpita desde el 35 % de cordura y, en solitario, hasta un 40 % de desaturación; en cooperativo, el borde sale de la esquina de cada jugador. La opción "Distorsiones" de la configuración ya las regula (antes no hacía nada).
     - Arreglada una fuga del hito 2.10: el equipo y el progreso se referenciaban mutuamente y no se liberaban ni al reiniciar (ahora `PlayerProgress.team` es una referencia débil).
     - Tests en `tests/test_sanity2.gd`.
-  - Después: hito 2.12, ficha y mapa por cuadrante.
+  - **Hito 2.12 (ficha y mapa por cuadrante): hecho, pendiente de tu revisión (29-09-2026).**
+    - `PlayerMenus` (`scripts/ui/player_menus.gd`): Select/Tab abre la ficha, cruceta abajo/M el mapa, B/Esc los cierra. En solitario, centrados y con la partida en pausa (Esc cierra antes de abrir la pausa); en cooperativo, en el cuadrante del jugador, semitransparentes y sin pausar: el personaje sigue controlable (D-16). Se ocultan mientras la partida está en pausa por otra cosa.
+    - Ficha (`PlayerMenus.Sheet`), tres páginas con LB/RB o Q/E (acciones nuevas `page_prev` y `page_next`, reasignables): personaje (rasgo, atributos con lo ganado desde el nivel 1, vida y cordura actuales y potenciadores, crisis sufridas), armas (nivel, grupo, descripción y siguiente mejora, huecos ocupados) y objetos.
+    - Mapa (`PlayerMenus.ArenaMap`): la arena en rombo, orientada como la cámara, con obstáculos, faroles, jugadores (el propio con un aro), enemigos (élites en violeta) y el enemigo del evento final.
+    - Las 17 armas del arsenal I tenían la descripción vacía; ahora la llevan (un test lo comprueba).
+    - Capturas: `panel=sheet|map panel_player=N panel_page=N panel_at=s`. Tests en `tests/test_player_menus.gd`.
+  - Después: hito 2.13, economía y tienda.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"machete"
 display_name = "Machete"
+description = "Tajo circular alrededor del personaje; solo golpea si hay alguien cerca."
 delivery = 2
 category = 0
 targeting = 3

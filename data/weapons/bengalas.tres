@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"bengalas"
 display_name = "Pistola de bengalas"
+description = "Bengala que ilumina y atrae a los enemigos cercanos (las élites no caen)."
 delivery = 1
 category = 1
 targeting = 1

@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"flammenwerfer"
 display_name = "Flammenwerfer"
+description = "Chorro de fuego en cono que deja el suelo ardiendo."
 delivery = 6
 category = 1
 targeting = 0

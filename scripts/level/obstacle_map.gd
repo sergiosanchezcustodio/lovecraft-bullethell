@@ -11,6 +11,10 @@ func add_circle(center: Vector2, radius: float) -> void:
 	_circles.append(Vector3(center.x, center.y, radius))
 	_grid.insert(center, radius)
 
+## Los obstáculos como (x, z, radio), para dibujarlos en el mapa del nivel.
+func circles() -> Array[Vector3]:
+	return _circles
+
 func count() -> int:
 	return _circles.size()
 

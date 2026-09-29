@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"formula"
 display_name = "Fórmula de expulsión"
+description = "Onda que se expande desde el personaje, empuja y aturde. Cuesta cordura."
 delivery = 5
 category = 2
 targeting = 3

@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"arpon"
 display_name = "Arpón ballenero"
+description = "Proyectil pesado que atraviesa y arrastra a los enemigos menores."
 delivery = 0
 category = 0
 targeting = 0

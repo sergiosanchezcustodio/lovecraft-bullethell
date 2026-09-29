@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"molotov"
 display_name = "Cóctel Molotov"
+description = "Botella en arco que crea un charco en llamas."
 delivery = 1
 category = 0
 targeting = 1

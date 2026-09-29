@@ -31,6 +31,7 @@ extends Node3D
 ##   model=dyer_chibi        otro modelo para el J1 (probar prototipos)
 ##   bots=3                  jugadores de compañía manejados por la máquina (J2..J4, hito 2.9)
 ##   bot_chars=olmstead,…    personajes de esos bots (por defecto, los de inicio y los demás)
+##   panel=sheet|map         abre la ficha o el mapa (panel_player=N, panel_page=N, panel_at=s)
 
 const PLAYER_COLORS: Array[Color] = [Color(1.0, 0.82, 0.3), Color(0.35, 0.75, 1.0), Color(0.55, 1.0, 0.45), Color(1.0, 0.45, 0.8)]
 
@@ -39,6 +40,7 @@ var arena: Node3D
 var player: Player                            ## el J1 (lo usan la depuración y las opciones de prueba)
 var players: Array[Player] = []               ## J1..J4 (hito 2.9)
 var team: TeamXp                              ## experiencia compartida del cooperativo (D-07)
+var menus: PlayerMenus                        ## ficha y mapa de cada jugador (hito 2.12)
 var camera: GameCamera
 var world: CombatWorld
 var level: LevelData
@@ -189,6 +191,13 @@ func _ready() -> void:
 	hud = Hud.new().setup(players, director)
 	add_child(hud)
 	add_child(SanityFx.new().setup(players))         # distorsiones de cordura baja
+	menus = PlayerMenus.new().setup(self, players)
+	add_child(menus)
+	if args.has("panel"):                            # capturas: panel=sheet|map, panel_player=2, panel_page=1
+		var who := players[clampi(args.get_int("panel_player", 1), 1, players.size()) - 1]
+		get_tree().create_timer(args.get_float("panel_at", 1.0)).timeout.connect(func() -> void:
+			menus.toggle(who, StringName(args.get_str("panel")))
+			if menus._open.get(who) is PlayerMenus.Sheet: (menus._open[who] as PlayerMenus.Sheet).turn(args.get_int("panel_page", 0)))
 	var pause_watch := Node.new()                  # sigue atento a Esc/Start con la partida en pausa
 	pause_watch.process_mode = Node.PROCESS_MODE_ALWAYS
 	pause_watch.set_script(preload("res://scripts/ui/pause_watch.gd"))
@@ -331,6 +340,7 @@ func _open_coop_level_up() -> void:
 
 func toggle_pause() -> void:
 	if _menu_open or _ended: return
+	if menus != null and _pause == null and menus.solo() and menus.close_all(): return   # Esc cierra la ficha o el mapa
 	if _debug != null: return                     # el menú de depuración atiende Esc y Start
 	if _pause != null:
 		_pause.queue_free()

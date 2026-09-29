@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"corredera"
 display_name = "Escopeta de corredera"
+description = "Perdigones que se abren en anillo alrededor del personaje."
 delivery = 0
 category = 1
 targeting = 0

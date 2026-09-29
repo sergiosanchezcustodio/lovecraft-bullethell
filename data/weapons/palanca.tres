@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"palanca"
 display_name = "Rifle de palanca"
+description = "Disparos rápidos que atraviesan a varios enemigos."
 delivery = 0
 category = 1
 targeting = 0

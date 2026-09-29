@@ -10,7 +10,9 @@ const SHEET := &"sheet"
 const MAP := &"map"
 const CONFIRM := &"confirm"
 const BACK := &"back"
-const ACTIONS: Array[StringName] = [DODGE, PAUSE, SHEET, MAP, CONFIRM, BACK]
+const PAGE_PREV := &"page_prev"             ## páginas de la ficha (hito 2.12)
+const PAGE_NEXT := &"page_next"
+const ACTIONS: Array[StringName] = [DODGE, PAUSE, SHEET, MAP, CONFIRM, BACK, PAGE_PREV, PAGE_NEXT]
 
 ## Teclado: movimiento (varias teclas por dirección) y acciones (varias teclas por acción).
 @export var key_up: Array[Key] = [KEY_W, KEY_UP]
@@ -24,6 +26,8 @@ const ACTIONS: Array[StringName] = [DODGE, PAUSE, SHEET, MAP, CONFIRM, BACK]
 	MAP: [KEY_M],
 	CONFIRM: [KEY_ENTER, KEY_KP_ENTER],
 	BACK: [KEY_ESCAPE],
+	PAGE_PREV: [KEY_Q],
+	PAGE_NEXT: [KEY_E],
 }
 
 ## Mando: stick izquierdo (más la cruceta como alternativa de movimiento) y botones.
@@ -35,4 +39,6 @@ const ACTIONS: Array[StringName] = [DODGE, PAUSE, SHEET, MAP, CONFIRM, BACK]
 	MAP: [JOY_BUTTON_DPAD_DOWN],
 	CONFIRM: [JOY_BUTTON_A],
 	BACK: [JOY_BUTTON_B],
+	PAGE_PREV: [JOY_BUTTON_LEFT_SHOULDER],
+	PAGE_NEXT: [JOY_BUTTON_RIGHT_SHOULDER],
 }

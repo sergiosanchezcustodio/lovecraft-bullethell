@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"thompson"
 display_name = "Subfusil Thompson M1928"
+description = "Ráfagas cerradas de proyectiles pequeños."
 delivery = 0
 category = 1
 targeting = 0

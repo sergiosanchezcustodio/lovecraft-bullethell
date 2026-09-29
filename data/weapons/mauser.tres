@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"mauser"
 display_name = "Pistola Mauser C96"
+description = "Ráfagas cortas de tres trazadoras."
 delivery = 0
 category = 1
 targeting = 0

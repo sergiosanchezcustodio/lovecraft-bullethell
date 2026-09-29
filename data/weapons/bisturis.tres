@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"bisturis"
 display_name = "Bisturís"
+description = "Abanico de hojas que atraviesan."
 delivery = 0
 category = 0
 targeting = 0

@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"lanzaquimicos"
 display_name = "Lanzaquímicos"
+description = "Frasco de ácido: los enemigos del charco reciben un 25 % más de daño."
 delivery = 1
 category = 0
 targeting = 1

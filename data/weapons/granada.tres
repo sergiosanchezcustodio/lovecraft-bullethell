@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"granada"
 display_name = "Stielhandgranate"
+description = "Granada de palo lanzada a la zona más densa; gran explosión al impactar."
 delivery = 1
 category = 0
 targeting = 1
