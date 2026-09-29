@@ -9,7 +9,7 @@ y se recorta y centra en 256 × 256 con transparencia.
   python tools/generar_iconos_armas.py --todas --rehacer        # todas otra vez
 
 Salida: resources/weapons/icons/<id>.png (la que usa el juego) y, en bruto,
-resources/weapons/icons/raw/<id>.png.
+resources/weapons/icons/raw/<id>.png (fuera de git y de Godot).
 El token sale de REPLICATE_API_TOKEN (entorno) o del .env de la raíz, que no se versiona.
 Cuesta dinero (~0,04 $ por imagen más el recorte): se avisa del total antes de empezar.
 """
@@ -157,6 +157,7 @@ def main():
     if not ids: return print('Nada que hacer.')
     print('%d iconos, unos %.2f $ en total.' % (len(ids), len(ids) * (PRICE + 0.005)))
     os.makedirs(RAW, exist_ok=True)
+    open(os.path.join(RAW, '.gdignore'), 'a').close()   # Godot no importa las imágenes en bruto
     bg_version = api('GET', '/models/%s' % BG_MODEL)['latest_version']['id']
     for i in ids:
         try:

@@ -9,3 +9,6 @@ AGENTS.md
 
 # claves de API (Replicate): nunca al repositorio
 .env
+
+# iconos de armas en bruto (Replicate): solo en local; el juego usa los recortados
+resources/weapons/icons/raw/
