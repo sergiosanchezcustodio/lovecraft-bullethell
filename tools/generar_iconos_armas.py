@@ -29,10 +29,12 @@ UA = 'lovecraft-bullethell-tools/1.0 (+python urllib)'
 
 # Sin imagen de referencia: con el icono del revólver como `image_prompt`, el modelo copiaba
 # el revólver en todas las armas e ignoraba el texto. El estilo va solo en el texto.
-STYLE = ("single game item icon, detailed 3D voxel art made of small visible cubes, glossy and "
-         "chunky like a premium mobile game inventory icon, three-quarter view, rich saturated colors, "
-         "soft studio lighting with a warm rim light, crisp edges, centered, the whole object in frame "
-         "with margin, plain flat dark grey background, no text, no letters, no hands, no people")
+STYLE = ("high quality 3D voxel art, MagicaVoxel style render, the object is built entirely from "
+         "small cubic voxels with a clearly visible cube grid on every surface, like a detailed voxel "
+         "sculpture, blocky with stepped jagged edges made of cubes and no smooth curves, like a high-resolution "
+         "Minecraft-style item, even metal and wood parts are made of cubes, isometric three-quarter view, soft global illumination, ambient occlusion between "
+         "the cubes, subtle soft shadow, rich but slightly muted colors, single object centered with margin, "
+         "plain flat dark grey background, game inventory icon, no text, no letters, no hands, no people")
 
 # Qué es cada arma (en inglés: el modelo lo entiende mejor). 1920s, mitos de Lovecraft.
 WEAPONS = {
