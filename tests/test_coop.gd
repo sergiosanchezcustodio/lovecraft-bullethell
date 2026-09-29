@@ -12,6 +12,7 @@ func _cam(targets: Array[Node3D]) -> GameCamera:
 
 func _dot(pos: Vector3) -> Node3D:
 	var n := Node3D.new()
+	n.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # la cámara lee la posición interpolada
 	add_child_autofree(n)
 	n.global_position = pos
 	n.reset_physics_interpolation()
