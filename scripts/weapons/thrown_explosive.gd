@@ -23,6 +23,7 @@ var look := "dinamita"
 var arc := 2.2
 var zone := {}                                   ## {kind, radius, time, dps, vulnerable}
 var lure := 0.0
+var net := 0.0                                   ## red de pesca: s que inmoviliza a los de dentro
 var bonus := {}
 var _landed := false
 
@@ -46,6 +47,9 @@ const LOOKS := {
 	"frasco": [[Vector3(0.11, 0.11, 0.14), Color(0.42, 0.75, 0.25), Vector3.ZERO],
 		[Vector3(0.05, 0.05, 0.06), Color(0.55, 0.40, 0.25), Vector3(0, 0, 0.1)]],
 	"bengala": [[Vector3(0.07, 0.07, 0.2), Color(0.85, 0.18, 0.12), Vector3.ZERO]],
+	"red": [[Vector3(0.26, 0.1, 0.26), Color(0.62, 0.55, 0.38), Vector3.ZERO],
+		[Vector3(0.06, 0.06, 0.06), Color(0.3, 0.3, 0.32), Vector3(0.12, 0, 0.12)],
+		[Vector3(0.06, 0.06, 0.06), Color(0.3, 0.3, 0.32), Vector3(-0.12, 0, -0.12)]],
 }
 
 func _ready() -> void:
@@ -80,7 +84,7 @@ func _physics_process(delta: float) -> void:
 	elif not _landed:
 		_landed = true
 		position = end + Vector3(0, 0.05, 0)
-		if not zone.is_empty() or lure > 0.0 or fuse <= 0.0:
+		if not zone.is_empty() or lure > 0.0 or net > 0.0 or fuse <= 0.0:
 			_land()
 			return
 		_stick.rotation = Vector3(0, randf() * TAU, PI * 0.5)
@@ -95,6 +99,15 @@ func _physics_process(delta: float) -> void:
 
 ## Efecto al caer que no espera a la mecha: zona, bengala o explosión al impacto.
 func _land() -> void:
+	if net > 0.0:                                # red: inmoviliza y hace poco daño, sin explosión
+		for e in world.enemies_in_circle(end, radius):
+			var d := Damage.new(damage, 0.0)
+			d.bonus = bonus
+			e.take_damage(d)
+			if e.is_alive() and e.has_method("root"): e.root(net)
+		world.fx.add_child(NetFx.new().setup(end, radius, net))
+		queue_free()
+		return
 	if not zone.is_empty():
 		world.fx.add_child(DamageZone.new().setup(world, int(zone.kind), end, float(zone.radius), float(zone.time),
 			float(zone.dps), float(zone.get("vulnerable", 0.0)), bonus))

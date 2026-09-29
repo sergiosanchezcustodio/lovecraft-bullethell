@@ -3,7 +3,9 @@ extends Resource
 ## Definición de un arma (datos en data/weapons/*.tres). Cada arma decide cómo apunta
 ## (D-05) y cómo entrega el daño: balas o un objeto lanzado que explota.
 
-enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND }
+## STRONGEST: la élite más cercana o, si no hay, el de más vida (Springfield). FRONT_BACK:
+## hacia donde anda el personaje y hacia atrás a la vez, sin buscar objetivo (Lugers).
+enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND, STRONGEST, FRONT_BACK }
 ## MELEE: tajo alrededor del personaje (aoe_radius). ORBIT: proyectiles que giran alrededor del
 ## personaje durante `duration` s (count, aoe_radius = radio de la órbita, projectile_speed =
 ## grados por segundo). BEAM: rayo recto de `range` m y `projectile_radius` de ancho, que daña
@@ -21,7 +23,19 @@ enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND }
 ## DRONE: `count` orbes que vuelan alrededor del personaje (aoe_radius) durante `duration`
 ## s y disparan al más cercano cada hit_interval (Orbe Mi-Go).
 ## STAB: puñalada al más cercano a menos de `range` que lo maldice (Daga ritual).
-enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE, FLAME, SIGIL, PULSE, TETHER, CLOUD, DRONE, STAB }
+## Arsenal II, segunda tanda (hito 2.7b):
+## CHAIN: rayo que salta de enemigo en enemigo, `count` objetivos a menos de aoe_radius
+## entre saltos; cada salto hace un 15 % menos (Bobina Tesla).
+## TURRET: deja en el suelo una torreta que dispara sola `duration` s al más cercano cada
+## hit_interval (Ametralladora Lewis).
+## BOOMERANG: `count` proyectiles que van hasta `range` y vuelven al personaje, golpeando
+## una vez a cada enemigo a la ida y otra a la vuelta.
+## FISSURE: grieta que avanza por el suelo `range` m a projectile_speed m/s, de aoe_radius
+## de ancho, y aturde `stun` s (Martillo de geólogo).
+## THRUST: estocada en línea hacia el más cercano, `range` de largo y projectile_radius de
+## medio ancho, que daña todo lo que hay en ella (Bastón estoque).
+enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE, FLAME, SIGIL, PULSE, TETHER, CLOUD, DRONE, STAB,
+	CHAIN, TURRET, BOOMERANG, FISSURE, THRUST }
 ## Zona que deja en el suelo (lanzados, lanzallamas, nube): ninguna, fuego, ácido o polvo
 ## (ralentiza y debilita).
 enum Zone { NONE, FIRE, ACID, DUST }
@@ -76,6 +90,10 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var curse := 0.0                     ## s de maldición (Daga ritual)
 @export var curse_dps := 0.0                 ## daño por segundo de la maldición
 @export var curse_spread := 0.0              ## enemigos a los que salta al morir el maldito
+@export var crit_chance := 0.0               ## probabilidad de crítico (Springfield)
+@export var crit_mult := 1.0                 ## daño del crítico
+@export var ally_time := 0.0                 ## s que se levanta como aliado el que muere inyectado (West)
+@export var root := 0.0                      ## s que deja inmóviles a los de la red (las élites solo se frenan)
 @export_group("Progresión")
 @export var max_level := 5
 ## Mejora de cada nivel a partir del 2 (índice 0 = nivel 2). Claves "estadística*"

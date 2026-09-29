@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bumeran"
+display_name = "Bumerán"
+description = "Va hasta su alcance y vuelve a tus manos, golpeando a la ida y a la vuelta."
+category = 0
+delivery = 15
+targeting = 0
+cooldown = 1.8
+range = 6.5
+damage = 12.0
+count = 1.0
+spread_deg = 40.0
+projectile_speed = 12.0
+projectile_radius = 0.5
+knockback = 0.8
+max_level = 5
+level_mods = Array[Dictionary]([{"damage*": 1.3}, {"count+": 1.0}, {"range*": 1.25, "projectile_speed*": 1.2}, {"count+": 1.0, "damage*": 1.2}])
+level_text = Array[String](["+30 % de daño", "Dos bumeranes", "Llega más lejos y vuela más rápido", "Tres bumeranes y +20 % de daño"])

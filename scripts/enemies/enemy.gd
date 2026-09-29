@@ -40,6 +40,11 @@ var _curse_tick := 0.0
 const STASIS_MULT := 1.5                    ## el daño aplazado sale un 50 % mayor
 const CURSE_TICK := 0.5
 const CURSE_JUMP := 3.5                     ## m a los que salta la maldición
+var _root_t := 0.0                          ## s inmóvil (red de pesca); puede seguir atacando
+var _inject_t := 0.0                        ## s con el suero de West dentro
+var _ally_time := 0.0                       ## s que se levanta como aliado si muere inyectado
+var _inject_bonus := {}
+const INJECT_TIME := 4.0
 var _status_mat: StandardMaterial3D         ## tinte de la estasis o la maldición
 var _overlay: Material = null               ## el que lleva puesto el modelo ahora
 var _flash := 0.0
@@ -140,6 +145,25 @@ func curse(seconds: float, dps: float, spread: int, bonus: Dictionary = {}) -> v
 func is_cursed() -> bool:
 	return _curse_t > 0.0
 
+## Inmóvil `seconds` (red de pesca): no anda pero sí ataca. Las élites solo se frenan.
+func root(seconds: float) -> void:
+	if data.elite:
+		slow(seconds, 0.5)
+		return
+	_root_t = maxf(_root_t, seconds)
+
+func is_rooted() -> bool:
+	return _root_t > 0.0
+
+## Suero de Herbert West: si muere en los próximos segundos, se levanta `ally_time` s como aliado.
+func inject(ally_time: float, bonus: Dictionary = {}) -> void:
+	_inject_t = INJECT_TIME
+	_ally_time = ally_time
+	_inject_bonus = bonus
+
+func is_injected() -> bool:
+	return _inject_t > 0.0
+
 ## Velocidad actual (con el ralentizado aplicado): para los tests.
 func speed_mult() -> float:
 	return _slow_k if _slow_t > 0.0 else 1.0
@@ -163,6 +187,8 @@ func take_damage(d: Damage) -> void:
 
 func _die() -> void:
 	if _curse_t > 0.0 and int(_curse.get("spread", 0)) > 0: _spread_curse()
+	if _inject_t > 0.0 and _ally_time > 0.0:            # se levanta como aliado
+		world.fx.add_child(Reanimated.new().setup(world, data, global_position, facing, _ally_time, _inject_bonus))
 	var fx := DeathBurst.new()
 	fx.setup(data.model, data.body_radius)
 	fx.position = global_position
@@ -188,6 +214,8 @@ func _spread_curse() -> void:
 ## Devuelve true si está congelado (no se mueve ni ataca este paso).
 func _update_status(delta: float) -> bool:
 	if _slow_t > 0.0: _slow_t -= delta
+	if _root_t > 0.0: _root_t -= delta
+	if _inject_t > 0.0: _inject_t -= delta
 	if _weak_t > 0.0: _weak_t -= delta
 	runner.damage_mult = _weak_k if _weak_t > 0.0 else 1.0
 	if _curse_t > 0.0:
@@ -218,6 +246,7 @@ func _physics_process(delta: float) -> void:
 	var target := target_player()
 	velocity = behavior.update(self, target, delta)
 	if _slow_t > 0.0: velocity *= _slow_k
+	if _root_t > 0.0: velocity = Vector3.ZERO
 	if _vulnerable > 0.0: _vulnerable -= delta
 	if _lure_t > 0.0:                          # bengala: va hacia la luz en lugar del jugador
 		_lure_t -= delta
@@ -274,6 +303,7 @@ func _process(delta: float) -> void:
 	if _flash > 0.0: want = _flash_mat
 	elif _stasis_t > 0.0: want = _status(Color(0.35, 0.95, 1.0, 0.5))
 	elif _curse_t > 0.0: want = _status(Color(0.55, 0.12, 0.7, 0.35 + 0.1 * sin(_spawn_t * 9.0)))
+	elif _inject_t > 0.0: want = _status(Color(0.8, 0.95, 0.25, 0.14 + 0.06 * sin(_spawn_t * 12.0)))   # suero: tenue (el aliado, verde intenso)
 	if want != _overlay:
 		_overlay = want
 		for mi: MeshInstance3D in model.get_meta("meshes"):

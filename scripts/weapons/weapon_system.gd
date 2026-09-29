@@ -81,6 +81,11 @@ func _fire(w: Weapon) -> bool:
 			target_pos = origin + player.motor.facing * rng
 		WeaponData.Targeting.AROUND:
 			target_pos = origin
+		WeaponData.Targeting.STRONGEST:
+			var t := world.strongest_enemy(origin, rng)
+			target_pos = t.global_position if t != null else ahead
+		WeaponData.Targeting.FRONT_BACK:
+			target_pos = origin + player.motor.facing * rng
 	var n := int(w.stat("count"))
 	if w.data.delivery == WeaponData.Delivery.MELEE:
 		return _slash(w)
@@ -99,6 +104,11 @@ func _fire(w: Weapon) -> bool:
 		WeaponData.Delivery.CLOUD: return _cloud(w, target_pos)
 		WeaponData.Delivery.DRONE: return _drone(w)
 		WeaponData.Delivery.STAB: return _stab(w)
+		WeaponData.Delivery.CHAIN: return _chain(w, target_pos)
+		WeaponData.Delivery.TURRET: return _turret(w)
+		WeaponData.Delivery.BOOMERANG: return _boomerang(w, target_pos)
+		WeaponData.Delivery.FISSURE: return _fissure(w, target_pos)
+		WeaponData.Delivery.THRUST: return _thrust(w)
 	if w.data.delivery == WeaponData.Delivery.THROWN:
 		for k in n:
 			var jitter := Vector3.ZERO
@@ -115,13 +125,16 @@ func _fire(w: Weapon) -> bool:
 			var dist := Vector2(target_pos.x - origin.x, target_pos.z - origin.z).length()
 			dmg_k = 1.0 + player.data.close_bonus * clampf(1.0 - dist / maxf(rng, 0.1), 0.0, 1.0)
 		var spread := deg_to_rad(w.stat("spread_deg"))
-		for k in n:
-			var off := 0.0 if n == 1 else lerpf(-spread * 0.5, spread * 0.5, k / float(n - 1))
-			off += deg_to_rad(randf_range(-1.0, 1.0) * w.stat("jitter_deg"))       # errático
-			var dir := base.rotated(Vector3.UP, off)
-			var delay := w.stat("burst_delay") * k
-			if delay > 0.0: _pending.append({"w": w, "dir": dir, "t": delay, "k": dmg_k})
-			else: _spawn_bullet(w, dir, dmg_k)
+		var bases: Array[Vector3] = [base]
+		if w.data.targeting == WeaponData.Targeting.FRONT_BACK: bases.append(-base)   # Lugers: delante y detrás
+		for b in bases:
+			for k in n:
+				var off := 0.0 if n == 1 else lerpf(-spread * 0.5, spread * 0.5, k / float(n - 1))
+				off += deg_to_rad(randf_range(-1.0, 1.0) * w.stat("jitter_deg"))       # errático
+				var dir := b.rotated(Vector3.UP, off)
+				var delay := w.stat("burst_delay") * k
+				if delay > 0.0: _pending.append({"w": w, "dir": dir, "t": delay, "k": dmg_k})
+				else: _spawn_bullet(w, dir, dmg_k)
 		_pay_sanity(w)                           # balas arcanas (fuegos fatuos, Rayo de Yith)
 	fired.emit(w)
 	return true
@@ -133,18 +146,27 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 		_bonus_set = world.bullets.register_bonus(player.data.bonus_tags)
 	var style := BulletManager.Style.PLAYER
 	var effect := BulletManager.Effect.NONE
+	var effect_val := w.stat("stasis")
+	var size := w.stat("projectile_size")
+	if w.stat("crit_chance") > 0.0 and randf() < w.stat("crit_chance"):   # crítico (Springfield)
+		dmg_k *= w.stat("crit_mult")
+		size *= 1.5
+	if w.stat("ally_time") > 0.0:                                         # suero de West
+		effect = BulletManager.Effect.INJECT
+		effect_val = w.stat("ally_time")
 	if w.stat("homing") > 0.0: style = BulletManager.Style.WISP
 	if w.stat("stasis") > 0.0:
 		style = BulletManager.Style.YITH
 		effect = BulletManager.Effect.STASIS
 	world.bullets.spawn(BulletManager.Team.PLAYER, style,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
-		w.stat("projectile_size"), Damage.new(dmg(w) * dmg_k, 0.0), life, int(w.stat("pierce")),
-		w.stat("knockback"), _bonus_set, int(w.stat("split_count")), w.stat("homing"), effect, w.stat("stasis"))
+		size, Damage.new(dmg(w) * dmg_k, 0.0), life, int(w.stat("pierce")),
+		w.stat("knockback"), _bonus_set, int(w.stat("split_count")), w.stat("homing"), effect, effect_val)
 
 ## Daño de un arma con los atributos del personaje (D-27).
 func dmg(w: Weapon) -> float:
-	var k := player.data.melee_mult if w.data.delivery == WeaponData.Delivery.MELEE else 1.0   # rasgo de Johansen
+	var melee := w.data.delivery in [WeaponData.Delivery.MELEE, WeaponData.Delivery.THRUST]
+	var k := player.data.melee_mult if melee else 1.0   # rasgo de Johansen
 	return w.stat("damage") * player.damage_mult(w.data.category) * k
 
 ## Coste de cordura de las armas arcanas (GDD 5.2), con el rasgo del personaje.
@@ -309,6 +331,102 @@ func _stab(w: Weapon) -> bool:
 	fired.emit(w)
 	return true
 
+## Bobina Tesla: rayo al más cercano que salta a los siguientes (a menos de aoe_radius, sin
+## repetir) hasta `count` objetivos; cada salto hace un 15 % menos.
+func _chain(w: Weapon, target_pos: Vector3) -> bool:
+	var origin := player.global_position
+	var first := world.nearest_enemy(origin, w.stat("range"))
+	if first == null: return false
+	var points: Array[Vector3] = [origin]
+	var done := {}
+	var cur: Node3D = first
+	var k := 1.0
+	for i in int(w.stat("count")):
+		done[cur.get_instance_id()] = true
+		points.append(cur.global_position)
+		var d := Damage.new(dmg(w) * k, 0.0)
+		d.bonus = player.data.bonus_tags
+		cur.take_damage(d)
+		if cur.has_method("stun") and cur.is_alive(): cur.stun(w.stat("stun"))
+		k *= 0.85
+		var next: Node3D = null
+		var best := INF
+		for e in world.enemies_in_circle(points[points.size() - 1], w.stat("aoe_radius")):
+			if done.has(e.get_instance_id()) or not e.is_alive(): continue
+			var dd := e.global_position.distance_squared_to(points[points.size() - 1])
+			if dd < best:
+				best = dd
+				next = e
+		if next == null: break
+		cur = next
+	world.fx.add_child(ChainBolt.new().setup(points))
+	fired.emit(w)
+	return true
+
+## Ametralladora Lewis: la deja en el suelo, donde está el personaje.
+func _turret(w: Weapon) -> bool:
+	if _bonus_set < 0 and not player.data.bonus_tags.is_empty():
+		_bonus_set = world.bullets.register_bonus(player.data.bonus_tags)
+	var t := Turret.new().setup(world, player.global_position + player.motor.facing * 0.8, w.stat("duration"),
+		w.stat("hit_interval"), dmg(w), w.stat("range"), w.stat("projectile_speed"), _bonus_set)
+	world.fx.add_child(t)
+	player.play_once("throw")
+	fired.emit(w)
+	return true
+
+## Bumerán: `count` a la vez, abiertos en abanico hacia el objetivo.
+func _boomerang(w: Weapon, target_pos: Vector3) -> bool:
+	var origin := player.global_position
+	var base := Vector3(target_pos.x - origin.x, 0, target_pos.z - origin.z)
+	if base.length() < 0.01: base = player.motor.facing
+	base = base.normalized()
+	var n := int(w.stat("count"))
+	var spread := deg_to_rad(w.stat("spread_deg"))
+	for k in n:
+		var off := 0.0 if n == 1 else lerpf(-spread * 0.5, spread * 0.5, k / float(n - 1))
+		world.fx.add_child(Boomerang.new().setup(player, world, base.rotated(Vector3.UP, off), w.stat("range"),
+			w.stat("projectile_speed"), w.stat("projectile_radius"), dmg(w), w.stat("knockback"), player.data.bonus_tags))
+	player.play_once("throw")
+	fired.emit(w)
+	return true
+
+## Martillo de geólogo: grieta en línea hacia el objetivo (o hacia donde mira).
+func _fissure(w: Weapon, target_pos: Vector3) -> bool:
+	var origin := player.global_position
+	var dir := Vector3(target_pos.x - origin.x, 0, target_pos.z - origin.z)
+	if dir.length() < 0.01: dir = player.motor.facing
+	world.fx.add_child(Fissure.new().setup(world, origin + dir.normalized() * 0.5, dir, w.stat("range"),
+		w.stat("projectile_speed"), w.stat("aoe_radius"), dmg(w), w.stat("stun"), player.data.bonus_tags))
+	player.play_once("throw")
+	fired.emit(w)
+	return true
+
+## Bastón estoque: estocada en línea hacia el más cercano; daña todo lo que haya en ella.
+## Sin nadie a su alcance, espera.
+func _thrust(w: Weapon) -> bool:
+	var origin := player.global_position
+	var length := w.stat("range")
+	var first := world.nearest_enemy(origin, length)
+	if first == null: return false
+	var dir := Vector3(first.global_position.x - origin.x, 0, first.global_position.z - origin.z).normalized()
+	var half := w.stat("projectile_radius")
+	for t in world.enemies_in_circle(origin + dir * length * 0.5, length * 0.5 + half):
+		var rel := Vector2(t.global_position.x - origin.x, t.global_position.z - origin.z)
+		var along := rel.dot(Vector2(dir.x, dir.z))
+		if along < 0.0 or along > length: continue
+		if absf(rel.cross(Vector2(dir.x, dir.z))) > half + float(t.hit_radius): continue
+		var d := Damage.new(dmg(w), 0.0)
+		d.knockback = dir * w.stat("knockback")
+		d.bonus = player.data.bonus_tags
+		t.take_damage(d)
+	var fx := Stab.new().setup(origin, origin + dir * length)
+	fx.color = Color(0.85, 0.88, 0.92, 0.95)
+	fx.blade = 1.1
+	world.fx.add_child(fx)
+	player.play_once("throw")
+	fired.emit(w)
+	return true
+
 func _throw(w: Weapon, target: Vector3) -> void:
 	var e := ThrownExplosive.new()
 	e.setup(world, player.global_position + Vector3(0, 1.4, 0), Vector3(target.x, 0, target.z),
@@ -318,6 +436,7 @@ func _throw(w: Weapon, target: Vector3) -> void:
 		z = {"kind": w.data.zone, "radius": w.stat("zone_radius"), "time": w.stat("zone_time"),
 			"dps": w.stat("zone_dps") * player.damage_mult(w.data.category), "vulnerable": w.stat("vulnerable")}
 	e.configure(w.data.look, w.stat("arc_height"), z, w.stat("lure"), player.data.bonus_tags)
+	e.net = w.stat("root")                                                # red de pesca
 	world.fx.add_child(e)
 
 ## Lanzallamas: chorro en cono hacia el objetivo que deja fuego en el suelo.

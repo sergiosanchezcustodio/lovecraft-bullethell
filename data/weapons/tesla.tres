@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"tesla"
+display_name = "Bobina Tesla portátil"
+description = "Descarga un rayo al enemigo más cercano que salta a los siguientes, hasta cuatro; cada salto hace un poco menos."
+category = 1
+delivery = 13
+targeting = 0
+cooldown = 1.6
+range = 7.0
+damage = 13.0
+count = 4.0
+aoe_radius = 3.5
+stun = 0.15
+max_level = 5
+level_mods = Array[Dictionary]([{"count+": 1.0}, {"damage*": 1.3}, {"aoe_radius*": 1.25, "cooldown*": 0.85}, {"count+": 2.0, "damage*": 1.2}])
+level_text = Array[String](["Salta a un enemigo más", "+30 % de daño", "Saltos más largos y descarga antes", "Dos saltos más y +20 % de daño"])

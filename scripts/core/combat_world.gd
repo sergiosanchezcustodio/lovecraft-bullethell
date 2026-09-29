@@ -63,6 +63,19 @@ func densest_enemy(pos: Vector3, max_r: float, r: float) -> Node3D:
 	var id := grid.densest(Vector2(pos.x, pos.z), max_r, r)
 	return null if id < 0 else _grid_targets[id]
 
+## La élite más cercana a menos de max_r o, si no hay ninguna, el enemigo con más vida.
+func strongest_enemy(pos: Vector3, max_r: float) -> Node3D:
+	var best: Node3D = null
+	var best_score := -INF
+	for e in enemies_in_circle(pos, max_r):
+		var elite: bool = "data" in e and e.data.elite
+		var hp: float = e.health if "health" in e else 0.0
+		var score: float = (1e6 - e.global_position.distance_to(pos)) if elite else hp
+		if score > best_score:
+			best_score = score
+			best = e
+	return best
+
 ## Objetivos vivos que tocan un círculo (para explosiones y áreas).
 func enemies_in_circle(pos: Vector3, r: float) -> Array[Node3D]:
 	var out: Array[Node3D] = []

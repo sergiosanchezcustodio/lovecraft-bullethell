@@ -83,7 +83,14 @@ Léela al empezar cada sesión:
     - Lente del Éter (`TetherBeam`): rayo sostenido cuyo daño crece sobre el mismo enemigo (`ramp`, `ramp_max`). Polvo de Ibn-Ghazi: zona `DUST` que ralentiza (`Enemy.slow`) y debilita (`Enemy.weaken`, también sus balas con `PatternRunner.damage_mult`).
     - Orbe Mi-Go (`MiGoDrones`): orbes que vuelan y disparan solos. Daga ritual: puñalada (`Stab`) que maldice (`Enemy.curse`); al morir maldito, la maldición salta (`CurseJump`).
     - Todas cuestan cordura, también las de balas. Tests en `tests/test_arsenal2.gd`. Hoja `shots/revision_2_7_magicas.png`.
-  - Después: hito 2.7b, las 4 de fuego y las 5 físicas del GDD, 5.3.
+  - **Hito 2.7b (arsenal II, fuego y físicas): hecho, pendiente de tu revisión (29-09-2026).** Quedan 34 armas: 11 físicas, 12 de fuego y 11 mágicas (lo comprueba un test).
+    - Bobina Tesla (`CHAIN`, `ChainBolt`): salta hasta `count` enemigos, un 15 % menos cada salto. Springfield: apunta con `STRONGEST` (`CombatWorld.strongest_enemy`: élite o más vida) y hace críticos (`crit_chance`, `crit_mult`).
+    - Ametralladora Lewis (`TURRET`, `Turret`): torreta en trípode que dispara sola. Lugers (`FRONT_BACK`): delante y detrás a la vez.
+    - Inyector de West: bala con `Effect.INJECT`; el que muere inyectado se levanta como aliado (`Reanimated`, tinte verde) y ataca a los suyos.
+    - Bumerán (`BOOMERANG`, `Boomerang`): ida y vuelta. Red de pesca: lanzado con `ThrownExplosive.net`, inmoviliza (`Enemy.root`; las élites solo se frenan) y deja la red en el suelo (`NetFx`).
+    - Martillo de geólogo (`FISSURE`, `Fissure`): grieta que avanza con esquirlas de hielo y aturde. Bastón estoque (`THRUST`): estocada en línea; cuenta como cuerpo a cuerpo para el rasgo de Johansen.
+    - Tests en `tests/test_arsenal3.gd`. Hoja `shots/revision_2_7b_fuego_fisicas.png`.
+  - Después: hito 2.8, clima estético (D-33).
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

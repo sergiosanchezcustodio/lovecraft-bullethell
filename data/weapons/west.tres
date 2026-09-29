@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"west"
+display_name = "Inyector de Herbert West"
+description = "Dispara dardos de suero: el enemigo que muere con el suero dentro se levanta 6 segundos como aliado y ataca a los suyos."
+category = 0
+delivery = 0
+targeting = 0
+cooldown = 1.4
+range = 9.0
+damage = 9.0
+projectile_speed = 20.0
+projectile_radius = 0.2
+projectile_size = 0.14
+ally_time = 6.0
+knockback = 0.3
+max_level = 5
+level_mods = Array[Dictionary]([{"damage*": 1.3}, {"ally_time+": 3.0}, {"count+": 1.0, "spread_deg+": 18.0}, {"cooldown*": 0.75, "ally_time+": 3.0}])
+level_text = Array[String](["+30 % de daño", "Los aliados duran 3 s más", "Dos dardos a la vez", "Dispara antes y los aliados duran más"])

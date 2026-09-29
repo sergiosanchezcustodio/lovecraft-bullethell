@@ -12,7 +12,8 @@ enum Team { PLAYER, ENEMY }
 ## WISP y YITH son trazadoras del jugador de otro color (Báculo del Farolero, Rayo de Yith).
 enum Style { PLAYER, PHYSICAL, MENTAL, MIXED, WISP, YITH }
 ## Efecto al impactar una bala del jugador: ninguno o estasis (Rayo de Yith, `_effect_val` s).
-enum Effect { NONE, STASIS }
+## INJECT: suero de Herbert West; el que muere inyectado se levanta `_effect_val` s como aliado.
+enum Effect { NONE, STASIS, INJECT }
 
 const MAX_BULLETS := 4096
 const HEIGHT := 0.8                          ## altura de vuelo (a la altura del pecho)
@@ -224,6 +225,7 @@ func _collide_player_bullet(i: int) -> bool:
 		if _bonus[i] >= 0: d.bonus = bonus_sets[_bonus[i]]
 		t.take_damage(d)
 		if _effect[i] == Effect.STASIS and t.is_alive() and t.has_method("stasis"): t.stasis(_effect_val[i])
+		elif _effect[i] == Effect.INJECT and t.has_method("inject"): t.inject(_effect_val[i], d.bonus)
 		_last_hit[i] = t.get_instance_id()
 		_pierce[i] -= 1
 		if _pierce[i] < 0: return true

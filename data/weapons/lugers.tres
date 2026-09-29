@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"lugers"
+display_name = "Lugers P08 a dos manos"
+description = "Una pistola en cada mano: disparan a la vez hacia donde andas y hacia atrás, sin buscar objetivo."
+category = 1
+delivery = 0
+targeting = 5
+cooldown = 0.45
+range = 9.0
+damage = 7.0
+count = 1.0
+projectile_speed = 24.0
+projectile_radius = 0.18
+projectile_size = 0.14
+knockback = 0.6
+max_level = 5
+level_mods = Array[Dictionary]([{"damage*": 1.25}, {"count+": 1.0, "spread_deg+": 14.0}, {"cooldown*": 0.8}, {"count+": 1.0, "damage*": 1.2}])
+level_text = Array[String](["+25 % de daño", "Dos balas por lado", "Disparan un 20 % más rápido", "Tres balas por lado y +20 % de daño"])
