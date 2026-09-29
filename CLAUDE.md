@@ -70,7 +70,7 @@ Léela al empezar cada sesión:
     - Alas de sombrero: como mucho 2,5 voxels por delante y con el borde a la altura 78 o más; los ojos van en 72-75. A los lados pueden asomar más (casco Brodie).
     - **Primera tanda (hombres) hecha, pendiente de tu revisión:** Dyer, Olmstead, Legrasse, Johansen, Elwood e Iwanicki. Hojas `shots/revision_estilo4_tanda1a.png` y `tanda1b.png`.
     - **Segunda tanda (mujeres) hecha, pendiente de tu revisión (29-09-2026):** cuerpo de mujer en `cuerpo.py` (`torso_f`, `legs_f`, `shoes_f`, `boots(slim=True)`, `arms(ax=ARM_X_F, slim=True)`, `bob`; mismas alturas y articulaciones que el hombre). Peaslee, Whipple, Blake, Varga y Malone rehechos. Hojas `shots/rev_tanda2_v2.png`, `rev_whipple_v2.png` y `rev_peaslee_v2.png`. `tools/humano.py` ya no lo usa nadie.
-    - **Por investigar:** en `anim 60 varga walk` los fotogramas salen idénticos (Peaslee sí anda). Faltan por comprobar los esquives de las cinco y cómo se ven en la selección y en la partida.
+    - Comprobadas al andar, en sus esquives, en la selección y en la partida. Arreglado de paso: bajo una falda o una sotana el muslo se queda sin voxels y el modelo perdía la pieza `leg_l`/`leg_r`, así que la animación fallaba (Varga, Whipple, Blake e Iwanicki no andaban). `VoxelBuilder.load_model` crea vacío el padre sin voxels para que la espinilla siga colgando de él.
     - **Esquive de deslizamiento rehecho como entrada en plancha de fútbol** (`slide` en `anim_humano.gd`): gira sobre la cadera y queda casi tumbado, con la pierna delantera estirada a ras de suelo, la otra doblada debajo, la mano atrás en la nieve y el brazo alto. Pendiente de tu revisión (`shots/revision_esquive_plancha.png`).
     - Descartados: `gen_dyer_chibi.py` (demasiado a bloques) y `gen_dyer_v3.py` (formas redondas: escalones sueltos).
     - Ya en el juego: codos y rodillas en los 11, bufanda de Dyer y coleta de Peaslee; manos en pinza en los 5 que faltan por pasar; los personajes no se hunden en el suelo al esquivar (`Player._keep_above_ground`).
@@ -191,7 +191,7 @@ godot --path . --disable-vsync -- bot=circle demo=14 perf=8                 # re
 python tools/gen_acechador.py       # regenera models/acechador.json
 python tools/gen_variantes.py       # regenera clasico, bruto, acechador (versión simple) y abisal
 python tools/gen_dyer.py            # Dyer (personaje jugable); igual gen_pinguino.py y gen_fragmento.py
-python tools/gen_olmstead.py        # Olmstead; igual gen_legrasse.py, gen_johansen.py, gen_peaslee.py, gen_varga.py, gen_whipple.py y gen_blake.py (base común en tools/humano.py)
+python tools/gen_olmstead.py        # Olmstead; igual gen_legrasse.py, gen_johansen.py, gen_peaslee.py, gen_varga.py, gen_whipple.py y gen_blake.py (base común en tools/cuerpo.py; tools/humano.py ya no se usa)
 python tools/gen_atrezo_campamento.py   # models/atrezo_{tienda,caja,bidon,farol,roca,hielo}.json
 godot --headless --path . --import                # reconstruye la caché de .godot/ (primera vez, tras borrarla o al crear un class_name)
 godot --path . -- still <yaw> <modelo>            # captura en shots/<modelo>_<yaw>.png (encuadre automático)

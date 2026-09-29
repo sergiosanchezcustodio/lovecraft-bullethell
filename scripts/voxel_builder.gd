@@ -49,6 +49,17 @@ static func load_model(path: String) -> Node3D:
 		pivot_node.add_child(mi)
 	# Jerarquía: cada parte con padre pasa a colgar de él, con la posición relativa a su pivote
 	var parents: Dictionary = model.get("parents", {})
+	# Un padre sin voxels (el muslo bajo una falda o una sotana, que lo tapa entero) sigue
+	# haciendo falta como articulación: se crea vacío para que la espinilla cuelgue de él.
+	for pname in order.duplicate():
+		var pp := String(parents.get(pname, ""))
+		if pp == "" or root.has_node(pp) or not model.pivots.has(pp): continue
+		var pv: Array = model.pivots[pp]
+		var empty := Node3D.new()
+		empty.name = pp
+		empty.position = Vector3(pv[0], pv[1], pv[2]) * model.voxel_size
+		root.add_child(empty)
+		order.append(pp)
 	for pname in order:
 		if not parents.has(pname): continue
 		var n: Node3D = root.get_node(pname)
