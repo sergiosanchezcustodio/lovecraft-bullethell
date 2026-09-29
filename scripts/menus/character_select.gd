@@ -91,7 +91,7 @@ func _build() -> void:
 	t.position = Vector2(0, 28)
 	stage.add_child(t)
 	if Saves.current:
-		var m := UiKit.label("Dinero  %s" % MenuKit.money(Saves.current.money), 22, UiKit.GOLD)
+		var m := UiKit.label("Dinero  %s $" % MenuKit.money(Saves.current.money), 22, UiKit.GOLD)
 		m.position = Vector2(DESIGN.x - 260, 30)
 		stage.add_child(m)
 	var total := FRAME.x * 4 + GAP * 3

@@ -128,7 +128,13 @@ Léela al empezar cada sesión:
     - `game.earn()` suma al momento a la partida guardada (se conserva aunque se caiga) y a `stats["money"]`; el HUD muestra los dólares de la partida bajo el objetivo, el resumen final los ganados y el mapa los baúles.
     - Calibración: una partida del nivel 1 con bot da unos 500 $ en ~270 s (290 abatidos); a ~5.500 $/h, la tienda planeada (~55.000 $) son unas 10 horas. `log=true` imprime "NIVEL SUPERADO t=… abatidos=… dólares=…".
     - `chest_every=N` saca baúles más a menudo (capturas). Tests en `tests/test_economy.gd`.
-  - Después: hito 2.13b, la tienda.
+  - **Hito 2.13b (tienda): hecho, pendiente de tu revisión.**
+    - `Shop` (`scripts/save/shop.gd`, sin interfaz y con tests) reúne el catálogo: potenciadores y mejoras en `data/shop/*.tres` (`ShopItem`), personajes con `in_shop` y su `price`, y compañeros en `data/pets/*.tres` (`PetData`). Compra, niveles y efectos (`Shop.bonuses`).
+    - Catálogo (~58.000 $, unas 10 h): Vitalidad (+4 % de vida), Temple (+4 % de cordura), Puntería (+3 % de daño), Agilidad (+2 % de velocidad) y Codicia (+5 % de dólares), a 150/300/600/1.000/1.500 $ por nivel; Legrasse y Johansen 1.500 $, Varga y Blake 3.000 $, Elwood e Iwanicki 4.500 $, Malone 6.000 $; perro de trineo de Lake 2.500 $ y gato de Ulthar 4.000 $ (sin modelo ni comportamiento hasta el 2.13c); quinta funda y quinto bolsillo 5.000 $.
+    - `ShopMenu` desde el menú principal: pestañas Potenciadores, Personajes, Compañeros y Mejoras (LB/RB o Q/E), nivel en puntos, precio del siguiente (atenuado si no llega) y compra con confirmación; guarda al momento. Fondo provisional hasta el 2.13d. Capturas: `title saves=… open=menu_tienda tab=N shots=14`.
+    - En partida: `Player.shop` multiplica vida, cordura, velocidad y daño; los huecos suman a `weapon_slots` e `item_slots`; Codicia, a `game.money_mult`.
+    - El dinero se muestra en dólares en todos los menús.
+  - Después: hito 2.13c, los compañeros.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

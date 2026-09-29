@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ShopItem" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"vitalidad"
+display_name = "Vitalidad"
+description = "+4 % de vida máxima por nivel para todos tus personajes."
+section = 0
+order = 1
+prices = Array[int]([150, 300, 600, 1000, 1500])
+stat = "health"
+per_level = 0.04

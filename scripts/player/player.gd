@@ -35,6 +35,9 @@ var _elim_t := 0.0
 var lights: Array[Node3D] = []   ## luces del escenario (recuperan cordura cerca)
 var madness := true              ## locura acumulada activada (configuración)
 var _wander := 0.0               ## rumbo del vagar sin rumbo (rad)
+## Potenciadores comprados en la tienda (Shop.bonuses): multiplicadores de vida, cordura,
+## daño y velocidad. Vacío: sin tienda.
+var shop := {}
 var visual: Node3D          ## contenedor que gira hacia donde mira; dentro, el modelo voxel
 var model: Node3D
 var health := 0.0
@@ -439,9 +442,9 @@ func rebuild_stats() -> void:
 		data.dodge_anim = style.anim
 		data.dodge_speed = style.speed
 	var v := {
-		"max_health": base.max_health * Attributes.mult(attrs, "health"),
-		"max_sanity": base.max_sanity * Attributes.mult(attrs, "sanity") * _madness_factor(),
-		"move_speed": base.move_speed * Attributes.mult(attrs, "speed"),
+		"max_health": base.max_health * Attributes.mult(attrs, "health") * float(shop.get("health", 1.0)),
+		"max_sanity": base.max_sanity * Attributes.mult(attrs, "sanity") * _madness_factor() * float(shop.get("sanity", 1.0)),
+		"move_speed": base.move_speed * Attributes.mult(attrs, "speed") * float(shop.get("speed", 1.0)),
 		"dodge_duration": (style.duration if style else base.dodge_duration) * data.dodge_length,
 		"dodge_iframes": (style.iframes if style else base.dodge_iframes) * data.dodge_length,
 		"dodge_cooldown": (style.cooldown if style else base.dodge_cooldown) * data.dodge_cooldown_mult / Attributes.mult(attrs, "dodge"),
@@ -471,10 +474,11 @@ func gain_attribute() -> String:
 
 ## Multiplicador de daño de un arma según su tipo y los atributos (D-27).
 func damage_mult(category: int) -> float:
+	var k := float(shop.get("damage", 1.0))                  # Puntería (tienda)
 	match category:
-		WeaponData.Category.PHYSICAL: return Attributes.mult(attrs, "physical")
-		WeaponData.Category.MAGIC: return Attributes.mult(attrs, "magic")
-	return Attributes.mult(attrs, "firearm")
+		WeaponData.Category.PHYSICAL: return Attributes.mult(attrs, "physical") * k
+		WeaponData.Category.MAGIC: return Attributes.mult(attrs, "magic") * k
+	return Attributes.mult(attrs, "firearm") * k
 
 func is_invulnerable() -> bool:
 	return motor.is_invulnerable() or (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes)

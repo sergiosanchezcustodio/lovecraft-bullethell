@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ShopItem" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"quinto_objeto"
+display_name = "Quinto bolsillo"
+description = "Puedes llevar un quinto objeto."
+section = 3
+order = 2
+prices = Array[int]([5000])
+stat = "item_slots"
+per_level = 1.0

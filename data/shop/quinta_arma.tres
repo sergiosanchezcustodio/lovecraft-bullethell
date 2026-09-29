@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ShopItem" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"quinta_arma"
+display_name = "Quinta funda"
+description = "Puedes llevar una quinta arma."
+section = 3
+order = 1
+prices = Array[int]([5000])
+stat = "weapon_slots"
+per_level = 1.0

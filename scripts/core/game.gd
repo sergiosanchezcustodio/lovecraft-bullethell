@@ -43,7 +43,7 @@ var players: Array[Player] = []               ## J1..J4 (hito 2.9)
 var team: TeamXp                              ## experiencia compartida del cooperativo (D-07)
 var menus: PlayerMenus                        ## ficha y mapa de cada jugador (hito 2.12)
 var run_money := 0                            ## dólares ganados en esta partida (D-31)
-var money_mult := 1.0                         ## lo subirá la tienda (Codicia, hito 2.13b)
+var money_mult := 1.0                         ## Codicia (tienda)
 var camera: GameCamera
 var world: CombatWorld
 var level: LevelData
@@ -138,6 +138,15 @@ func _ready() -> void:
 		bot.body = bp
 		bot.leader = players[0]
 	player = players[0]
+	var bonus := Shop.bonuses(Saves.current)          # lo comprado en la tienda (D-31)
+	money_mult = float(bonus.money)
+	for q in players:
+		q.shop = bonus
+		q.progress.weapon_slots += int(bonus.weapon_slots)
+		q.progress.item_slots += int(bonus.item_slots)
+		q.rebuild_stats()
+		q.health = q.data.max_health
+		q.sanity = q.data.max_sanity
 	if players.size() > 1:                          # reglas del cooperativo (hito 2.10)
 		var progs: Array[PlayerProgress] = []
 		for q in players:

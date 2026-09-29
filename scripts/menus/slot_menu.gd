@@ -75,7 +75,7 @@ func _card(i: int, d: SaveData) -> Button:
 		v.add_child(n)
 	else:
 		for pair in [["Tiempo jugado", SaveData.format_time(d.play_time)], ["Objetos comprados", str(d.items_bought())],
-				["Compañeros", str(d.pets.size())], ["Dinero", MenuKit.money(d.money)]]:
+				["Compañeros", str(d.pets.size())], ["Dinero", MenuKit.money(d.money) + " $"]]:
 			v.add_child(_line(pair[0], pair[1]))
 	for c in v.get_children(): (c as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return b
@@ -95,7 +95,7 @@ func _line(label: String, value: String) -> HBoxContainer:
 func _ask_delete(i: int, d: SaveData) -> void:
 	if _busy or d == null: return
 	_busy = true
-	var c := MenuKit.Confirm.new("¿Borrar la Partida %d?\n\nSe perderá todo su progreso: %s de juego, %s de dinero, %s y %s." % [
+	var c := MenuKit.Confirm.new("¿Borrar la Partida %d?\n\nSe perderá todo su progreso: %s de juego, %s $, %s y %s." % [
 		i + 1, SaveData.format_time(d.play_time), MenuKit.money(d.money), MenuKit.count(d.items_bought(), "objeto"),
 		MenuKit.count(d.pets.size(), "compañero")], "Borrar")
 	add_child(c)

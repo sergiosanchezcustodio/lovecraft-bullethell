@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ShopItem" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"punteria"
+display_name = "Puntería"
+description = "+3 % de daño de todas las armas por nivel."
+section = 0
+order = 3
+prices = Array[int]([150, 300, 600, 1000, 1500])
+stat = "damage"
+per_level = 0.03

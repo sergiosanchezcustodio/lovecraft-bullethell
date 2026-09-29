@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PetData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/pets/pet_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"perro"
+display_name = "Perro de trineo de Lake"
+story = "En las montañas de la locura"
+description = "Corre hacia los enemigos cercanos y los muerde"
+price = 2500

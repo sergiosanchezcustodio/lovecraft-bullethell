@@ -29,7 +29,7 @@ func _ready() -> void:
 		col.position = Vector2((vs.x - col.size.x) * 0.5, vs.y * 0.64))
 	# partida en uso, abajo a la izquierda
 	if Saves.slot >= 0:
-		var l := UiKit.label("Partida %d  ·  %s de dinero" % [Saves.slot + 1, MenuKit.money(Saves.current.money)], 20, UiKit.TEXT_DIM)
+		var l := UiKit.label("Partida %d  ·  %s $" % [Saves.slot + 1, MenuKit.money(Saves.current.money)], 20, UiKit.TEXT_DIM)
 		l.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 		l.offset_left = 24
 		l.offset_top = -44
@@ -80,22 +80,13 @@ func _open_play() -> void:
 	local.grab_focus.call_deferred()
 
 func _open_shop() -> void:
-	# La tienda llega en el hito 2.9; mientras, un aviso.
-	var p := Control.new()
-	p.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var w: Array = MenuKit.window(p, MenuKit.INK, 560)
-	var box: VBoxContainer = w[1]
-	box.add_child(MenuKit.title("Tienda", 46))
-	var l := UiKit.label("Abrirá pronto: potenciadores, compañeros y personajes.", 22, UiKit.TEXT)
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(l)
-	var ok := MenuKit.button("Volver", MenuKit.INK, 26)
-	ok.custom_minimum_size = Vector2(220, 56)
-	ok.pressed.connect(p.queue_free)
-	box.add_child(ok)
-	_closes_with_cancel(p)
-	_push(p, 1)
-	ok.grab_focus.call_deferred()
+	var s := ShopMenu.new()
+	_push(s, 1)
+
+## Tienda abierta en una pestaña (capturas: `open=menu_tienda tab=N`).
+func open_shop_tab(tab: int) -> void:
+	_open_shop()
+	(_popup as ShopMenu)._show_tab.call_deferred(tab)
 
 func _open_settings() -> void:
 	var s := SettingsMenu.new()
