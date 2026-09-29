@@ -12,6 +12,8 @@ var director: WaveDirector
 var panels: Array[PlayerPanel] = []
 var _time_lbl: Label
 var _objective_lbl: Label
+var _money_lbl: Label
+var money := Callable()                      ## () -> int: dólares de la partida (los pone game.gd)
 
 ## Compatibilidad: el J1.
 var player: Player:
@@ -45,10 +47,14 @@ func _ready() -> void:
 	_objective_lbl = UiKit.label("", 16, UiKit.TEXT)
 	_objective_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	top.add_child(_objective_lbl)
+	_money_lbl = UiKit.label("", 18, UiKit.GOLD)
+	_money_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	top.add_child(_money_lbl)
 	top.resized.connect(func() -> void: top.position.x = (get_viewport().get_visible_rect().size.x - top.size.x) * 0.5)
 
 func _process(_delta: float) -> void:
 	for pp in panels: pp.refresh()
+	if money.is_valid(): _money_lbl.text = "%s $" % MenuKit.money(int(money.call()))
 	if director != null:
 		var t := int(director.time)
 		_time_lbl.text = "%02d:%02d" % [t / 60, t % 60]

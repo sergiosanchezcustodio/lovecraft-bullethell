@@ -7,6 +7,7 @@ extends Node
 signal enemy_spawned(e: Enemy)
 signal final_event(e: Enemy)
 signal level_completed
+signal chest_spawned(chest: ArcaneChest)
 
 var level: LevelData
 var world: CombatWorld
@@ -28,6 +29,7 @@ var _acc := 0.0
 var _final: Enemy
 var _final_done := false
 var completed := false
+var _chest_t := -1.0                       ## s hasta el próximo baúl arcano
 
 func setup(p_level: LevelData, p_world: CombatWorld, p_obstacles: ObstacleMap, p_camera: GameCamera, p_root: Node3D) -> WaveDirector:
 	level = p_level; world = p_world; obstacles = p_obstacles; camera = p_camera; enemies_root = p_root
@@ -41,6 +43,7 @@ func max_alive() -> int:
 func _physics_process(delta: float) -> void:
 	if completed: return
 	time += delta
+	_chest_step(delta)
 	if spawning_paused: return
 	if target_alive > 0:
 		_keep_alive(delta)
@@ -62,6 +65,33 @@ func _physics_process(delta: float) -> void:
 		var d := pick()
 		if d == null: break
 		spawn(d, spawn_point(d.body_radius))
+
+## Baúles arcanos (D-31): uno cada `chest_every` s (±25 %), como mucho `chest_max` cerrados,
+## en un sitio libre a 6-12 m de un jugador en pie.
+func _chest_step(delta: float) -> void:
+	if level.chest_every <= 0.0: return
+	if _chest_t < 0.0: _chest_t = level.chest_every * rng.randf_range(0.75, 1.25)
+	_chest_t -= delta
+	if _chest_t > 0.0: return
+	_chest_t = level.chest_every * rng.randf_range(0.75, 1.25)
+	if get_tree().get_nodes_in_group(&"chests").filter(func(c: Node) -> bool: return not c.is_open).size() >= level.chest_max: return
+	spawn_chest()
+
+func spawn_chest() -> ArcaneChest:
+	var alive := world.players.filter(func(p: Player) -> bool: return p.health > 0.0)
+	var center: Vector3 = alive[rng.randi() % alive.size()].global_position if not alive.is_empty() else Vector3.ZERO
+	var pos := center
+	for i in 24:
+		var a := rng.randf() * TAU
+		var c := center + Vector3(cos(a), 0, sin(a)) * rng.randf_range(6.0, 12.0)
+		var p2 := Vector2(c.x, c.z)
+		if obstacles != null and (not obstacles.bounds.grow(-2.0).has_point(p2) or obstacles.is_blocked(p2, 0.9)): continue
+		pos = c
+		break
+	var chest := ArcaneChest.new().setup(world, pos, rng.randi_range(level.chest_money.x, level.chest_money.y), level.chest_heal)
+	world.fx.add_child(chest)
+	chest_spawned.emit(chest)
+	return chest
 
 ## Depuración: repone enemigos deprisa hasta tener `target_alive` vivos.
 func _keep_alive(delta: float) -> void:

@@ -22,6 +22,7 @@ extends Resource
 @export var body_radius := 0.45            ## separación entre enemigos y con el decorado
 @export var move_speed := 2.2
 @export var xp := 1.0
+@export var money := 1                     ## dólares al morir (D-31)
 @export_group("Contacto")
 @export var contact_physical := 6.0
 @export var contact_mental := 0.0

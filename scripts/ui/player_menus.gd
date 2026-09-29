@@ -289,6 +289,10 @@ class ArenaMap extends PanelContainer:
 				var elite: bool = "data" in e and e.data.elite
 				var at := o + project(e.global_position) * k
 				_canvas.draw_circle(at, 5.0 if elite else 2.2, Color(0.72, 0.36, 1.0) if elite else Color(0.9, 0.3, 0.25, 0.85))
+		for c: Node in game.get_tree().get_nodes_in_group(&"chests"):              # baúles arcanos
+			if (c as ArcaneChest).is_open: continue
+			var at := o + project((c as Node3D).global_position) * k
+			_canvas.draw_rect(Rect2(at - Vector2(5, 4), Vector2(10, 8)), Color(1.0, 0.8, 0.35))
 		if final_enemy != null:
 			_canvas.draw_arc(o + project(final_enemy.global_position) * k, 10.0, 0, TAU, 24, Color(0.9, 0.5, 1.0), 2.0)
 		for q: Player in game.get("players"):

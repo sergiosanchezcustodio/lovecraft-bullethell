@@ -31,6 +31,7 @@ extends Node3D
 ##   model=dyer_chibi        otro modelo para el J1 (probar prototipos)
 ##   bots=3                  jugadores de compañía manejados por la máquina (J2..J4, hito 2.9)
 ##   bot_chars=olmstead,…    personajes de esos bots (por defecto, los de inicio y los demás)
+##   chest_every=5           un baúl arcano cada tantos segundos (por defecto, el del nivel)
 ##   panel=sheet|map         abre la ficha o el mapa (panel_player=N, panel_page=N, panel_at=s)
 
 const PLAYER_COLORS: Array[Color] = [Color(1.0, 0.82, 0.3), Color(0.35, 0.75, 1.0), Color(0.55, 1.0, 0.45), Color(1.0, 0.45, 0.8)]
@@ -41,6 +42,8 @@ var player: Player                            ## el J1 (lo usan la depuración y
 var players: Array[Player] = []               ## J1..J4 (hito 2.9)
 var team: TeamXp                              ## experiencia compartida del cooperativo (D-07)
 var menus: PlayerMenus                        ## ficha y mapa de cada jugador (hito 2.12)
+var run_money := 0                            ## dólares ganados en esta partida (D-31)
+var money_mult := 1.0                         ## lo subirá la tienda (Codicia, hito 2.13b)
 var camera: GameCamera
 var world: CombatWorld
 var level: LevelData
@@ -169,6 +172,7 @@ func _ready() -> void:
 		var level_id := args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1")
 		level = load("res://data/levels/%s.tres" % level_id).duplicate()
 		if args.has("final_at"): level.final_time = args.get_float("final_at")
+		if args.has("chest_every"): level.chest_every = args.get_float("chest_every")   # baúles más a menudo (capturas)
 		if args.has("spawn_rate"): level.spawn_rate = [Vector2(0, args.get_float("spawn_rate"))] as Array[Vector2]
 		# Construir ya los modelos de todos los enemigos del nivel: si no, la primera aparición
 		# de cada uno (el Acechador, en el minuto 4) provocaría un tirón a mitad de partida.
@@ -183,12 +187,16 @@ func _ready() -> void:
 		director.final_event.connect(func(_e: Enemy) -> void: announce(level.final_text, 3.5))
 		director.level_completed.connect(_on_level_completed)
 		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
+		director.chest_spawned.connect(func(c: ArcaneChest) -> void:
+			c.opened.connect(func(_c: ArcaneChest, _by: Player) -> void: earn(c.money))
+			announce("Ha aparecido un baúl arcano", 1.5))
 		add_child(director)
 		announce(level.display_name, 3.0)
 		Music.play(level.music_path())
 	_start_weather()
 	Engine.time_scale = args.get_float("timescale", 1.0)
 	hud = Hud.new().setup(players, director)
+	hud.money = func() -> int: return run_money
 	add_child(hud)
 	add_child(SanityFx.new().setup(players))         # distorsiones de cordura baja
 	menus = PlayerMenus.new().setup(self, players)
@@ -273,6 +281,16 @@ func _on_enemy_died(e: Enemy) -> void:
 	kills += 1
 	if Saves.current != null: Saves.current.stats["kills"] += 1
 	gems.drop(e.global_position, e.data.xp)
+	earn(e.data.money)
+
+## Dólares (D-31): se suman al hueco en el momento, así que se conservan aunque se caiga.
+func earn(amount: int) -> void:
+	var n := int(round(amount * money_mult))
+	if n <= 0: return
+	run_money += n
+	if Saves.current != null:
+		Saves.current.money += n
+		Saves.current.stats["money"] = int(Saves.current.stats.get("money", 0)) + n
 
 ## Subida de nivel: pausa y elige una de tres mejoras (D-16). Si hay varias subidas
 ## pendientes, se encadenan.
@@ -392,7 +410,8 @@ func _summary() -> PackedStringArray:
 		var parts := PackedStringArray()
 		for q in players: parts.append("J%d %d" % [q.index + 1, q.progress.level])
 		lv = "Niveles: " + "  ·  ".join(parts)
-	return PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills, lv])
+	return PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills, lv,
+		"Dólares ganados: %s $" % MenuKit.money(run_money)])
 
 ## Cae un jugador. En cooperativo queda derribado y los demás pueden reanimarlo; la partida
 ## se acaba cuando no queda nadie en pie (derribados y eliminados no cuentan).
@@ -421,6 +440,8 @@ func _game_over() -> void:
 func _on_level_completed() -> void:
 	if _ended: return
 	_ended = true
+	earn(level.money_bonus)                          # bono por superar el nivel
+	if args.get_bool("log"): print("NIVEL SUPERADO t=%d s  abatidos=%d  dólares=%d" % [director.time, kills, run_money])
 	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)):
 		Saves.current.levels_won.append(String(level.id))
 	Saves.save()

@@ -122,7 +122,13 @@ Léela al empezar cada sesión:
     - Mapa (`PlayerMenus.ArenaMap`): la arena en rombo, orientada como la cámara, con obstáculos, faroles, jugadores (el propio con un aro), enemigos (élites en violeta) y el enemigo del evento final.
     - Las 17 armas del arsenal I tenían la descripción vacía; ahora la llevan (un test lo comprueba).
     - Capturas: `panel=sheet|map panel_player=N panel_page=N panel_at=s`. Tests en `tests/test_player_menus.gd`.
-  - Después: hito 2.13, economía y tienda.
+  - **Hito 2.13 partido en cuatro (plan aprobado el 29-09-2026):** 2.13a economía, 2.13b tienda, 2.13c compañeros y 2.13d tienda de antigüedades con el anciano. Detalle en `docs/ROADMAP.md`.
+  - **Hito 2.13a (economía): hecho, pendiente de tu revisión.**
+    - Dólares por enemigo (`EnemyData.money`: pingüino 1, fragmento 2, Acechador 25), bono por nivel (`LevelData.money_bonus`, 100) y baúles arcanos (`ArcaneChest`, `WaveDirector._chest_step`): uno cada ~90 s a 6-12 m de un jugador, como mucho dos cerrados; al tocarlo da 20-60 $ y un 15 % de vida y cordura a quien lo abre. Sin ruletas.
+    - `game.earn()` suma al momento a la partida guardada (se conserva aunque se caiga) y a `stats["money"]`; el HUD muestra los dólares de la partida bajo el objetivo, el resumen final los ganados y el mapa los baúles.
+    - Calibración: una partida del nivel 1 con bot da unos 500 $ en ~270 s (290 abatidos); a ~5.500 $/h, la tienda planeada (~55.000 $) son unas 10 horas. `log=true` imprime "NIVEL SUPERADO t=… abatidos=… dólares=…".
+    - `chest_every=N` saca baúles más a menudo (capturas). Tests en `tests/test_economy.gd`.
+  - Después: hito 2.13b, la tienda.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

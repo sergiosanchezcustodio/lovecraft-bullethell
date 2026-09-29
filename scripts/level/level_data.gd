@@ -27,6 +27,12 @@ extends Resource
 @export var final_spawn_scale := 0.3           ## tras el evento, el ritmo normal se multiplica por esto
                                                ## (el duelo con la élite no debe ahogarse en la horda)
 @export var final_text := "Algo acecha entre las tiendas…"
+@export_group("Dinero (D-31)")
+@export var money_bonus := 100                 ## dólares al superar el nivel
+@export var chest_every := 90.0                ## s medios entre baúles arcanos (0: ninguno)
+@export var chest_money := Vector2i(20, 60)    ## dólares de cada baúl (mínimo, máximo)
+@export var chest_heal := 0.15                 ## vida y cordura que da a quien lo abre
+@export var chest_max := 2                     ## baúles cerrados a la vez
 @export_group("Cooperativo")
 ## Según los jugadores (1, 2, 3, 4): vida de los enemigos y ritmo y tope de aparición.
 @export var coop_health: Array[float] = [1.0, 1.5, 1.9, 2.3]
