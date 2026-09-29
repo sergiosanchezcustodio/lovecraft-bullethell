@@ -3,65 +3,82 @@ fuera del tiempo"). Personaje jugable (D-26).
 
 Salacot claro, pelo cobrizo en coleta, camisa caqui con las mangas remangadas, correa de
 cartera cruzada y cartera de cuero en la cadera (único relieve), pantalón de montar pardo y
-botas altas de cuero. A bloques limpios (tools/humano.py).
+botas altas de cuero. Estilo 4, cuerpo de mujer (tools/cuerpo.py).
 Uso: python tools/gen_peaslee.py
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model
-import humano as hu
+import cuerpo as cu
+from cuerpo import slab, T, H
 
-M = Model(S=2, seed=1935)
-HELMET = (0.80, 0.74, 0.58); HELMET_SH = (0.70, 0.64, 0.49); BAND = (0.44, 0.30, 0.18)
-HAIR = (0.56, 0.25, 0.12)
-SHIRT = (0.67, 0.59, 0.41); SHIRT_SH = (0.58, 0.51, 0.35)
-STRAP = (0.34, 0.21, 0.11); BAG = (0.42, 0.26, 0.13); BUCKLE = (0.80, 0.68, 0.40)
+HELMET = (0.80, 0.74, 0.58); HELMET_SH = (0.68, 0.62, 0.48); BAND = (0.44, 0.30, 0.18)
+HAIR = (0.50, 0.23, 0.12); HAIR_TIE = (0.28, 0.16, 0.09)
+SHIRT = (0.67, 0.59, 0.41); SHIRT_SH = (0.56, 0.49, 0.33)
+STRAP = (0.34, 0.21, 0.11); BAG = (0.44, 0.27, 0.13); BUCKLE = (0.80, 0.68, 0.40)
 TROUSER = (0.40, 0.34, 0.25)
 BOOT = (0.30, 0.18, 0.10); SOLE = (0.12, 0.08, 0.06)
-SKIN = (0.90, 0.71, 0.58); SKIN_SH = (0.80, 0.61, 0.50); LIPS = (0.70, 0.36, 0.33)
+SKIN = (0.90, 0.71, 0.58); SKIN_SH = (0.80, 0.61, 0.50); LIP = (0.68, 0.34, 0.32); CHEEK = (0.88, 0.60, 0.50)
 BROW = (0.45, 0.20, 0.10)
-box = M.vbox
-T, H = hu.T, hu.H
-W = 8
+BUTTON = (0.40, 0.33, 0.22)
+AX = cu.ARM_X_F
 
-hu.legs_slim(M, TROUSER, BOOT, SOLE, boot_top=13, boot=BOOT)
-hu.torso(M, SHIRT, half=W)
-box(-W, 29, -5, W, 31, 5, T, STRAP)                   # cinturón
-box(-1, 29, 4, 1, 31, 5, T, BUCKLE)
-for i in range(12):                                   # correa cruzada del hombro izquierdo a la cadera derecha
-    x = -6 + i
-    y = 40 - i
-    box(x, y, 4, x + 2, y + 1, 5, T, STRAP)
-    box(x, y, -5, x + 2, y + 1, -4, T, STRAP)
-box(5, 23, 3, 9, 29, 6, T, BAG)                       # cartera en la cadera
-box(6, 27, 5, 8, 28, 6, T, BUCKLE)
-box(-2, 38, 4, 2, 42, 5, T, SKIN)                     # cuello abierto de la camisa
-box(-1, 36, 4, 1, 38, 5, T, SKIN)
-for y in (33, 35): box(-1, y, 4, 0, y + 1, 5, T, SHIRT_SH)
-hu.arms(M, SHIRT, SKIN, SKIN, half=W, cuff_h=4)       # mangas remangadas: antebrazo al aire
-for s, p in ((-1, 'arm_l'), (1, 'arm_r')):            # vuelta de la manga
-    x0, x1 = (-W - 5, -W) if s < 0 else (W, W + 5)
-    box(x0, 29, -3, x1, 31, 3, p, SHIRT_SH)
-hu.head(M, SKIN)
-hu.face_f(M, BROW, SKIN_SH, LIPS, eye_y=47)
-hu.hair_back(M, SKIN, HAIR)
-# coleta que asoma bajo el salacot (pieza propia: se balancea al andar)
-box(-2, 40, -8, 2, 50, -6, 'hair', HAIR)
-box(-1, 38, -8, 1, 40, -6, 'hair', HAIR)                   # punta
-box(-2, 48, -8, 2, 50, -6, 'hair', (0.30, 0.18, 0.10))     # lazo oscuro
-# salacot: cúpula, cinta y ala corta (más ala taparía los ojos desde la cámara)
-box(-6, 50, -6, 6, 51, 7, H, HELMET_SH)               # ala (asoma 2 por delante)
-box(-5, 51, -5, 5, 55, 5, H, HELMET)
-M.bevel(H, -5, 5, -5, 5, 51, 55)
-box(-4, 55, -4, 4, 56, 4, H, HELMET)
-box(-5, 51, -5, 5, 52, 5, H, BAND)
-M.bevel(H, -5, 5, -5, 5, 51, 52)
+M = cu.new(1935)
+top = cu.boots(M, BOOT, SOLE, top=21, slim=True)                        # botas altas
+cu.legs_f(M, TROUSER, bottom=top)
+for s, leg, _, _, _ in cu.sides():                                      # pantalón de montar: muslo abombado
+    slab(M, leg, TROUSER, 29, 39, 4.5 * s * 1.1, 0, 10, 11, 10, 10.5, ch=2)
+cu.torso_f(M, SHIRT, bottom=36)
+cu.belt(M, STRAP, y=41, b=-4, h=2, buckle=BUCKLE)
+# pechera: cuello abierto en V, tapeta con botones y bolsillos del pecho
+cu.opening(M, 56, 61, 1, 5, SKIN)
+for y in range(43, 56): cu.front(M, -1, y, SHIRT_SH)
+for y in (46, 50, 54): cu.front(M, 0, y, BUTTON)
+for x0 in (-7, 3):
+    for x in range(x0, x0 + 4): cu.front(M, x, 55, SHIRT_SH)
+    for y in (51, 52, 53, 54): cu.front(M, x0, y, SHIRT_SH); cu.front(M, x0 + 3, y, SHIRT_SH)
+slab(M, T, SHIRT_SH, 59, 62, 0, 0.3, 11, 10, 10, 9, ch=1)                 # cuello de la camisa
+cu.opening(M, 59, 62, 3, 5, SKIN)
+cu.neck(M, SKIN)
+# correa cruzada del hombro izquierdo a la cadera derecha, por delante y por detrás
+for i in range(19):
+    x, y = -8 + i * 0.9, 60 - i
+    for dx in (0, 1, 2):
+        cu.front(M, int(round(x)) + dx, y, STRAP)
+        cu.back(M, int(round(x)) + dx, y, STRAP)
+# cartera de cuero en la cadera derecha, con su hebilla
+slab(M, T, BAG, 32, 41, 10.5, 2, 3, 3, 8, 8, ch=1)
+slab(M, T, STRAP, 38, 41, 11.5, 2, 1.5, 1.5, 8.5, 8.5, ch=0)
+for y in (38, 39): M.put(12, y, 2, T, BUCKLE)
 
+# mangas remangadas: antebrazo al aire y la vuelta de la manga en el codo
+cu.arms(M, SHIRT, SKIN, fore=SKIN, ax=AX, slim=True)
+for s, _, _, _, fa in cu.sides():
+    slab(M, fa, SHIRT_SH, 43, 46, AX * s * 1.02, 0.5, 7.5, 7.5, 8, 8, ch=1)
 
-def paint(k, part, c):
-    x, y, z = k
-    if c == SHIRT and M.hsh(x, y, z) < -0.5: return SHIRT_SH
-    return None
-M.paint(paint)
-hu.split_limbs(M)                                     # codos y rodillas
-hu.export(M, 'peaslee', half=W, extra_pivots={'hair': [0, 50, -7]}, extra_parents={'hair': 'head'})
+cu.head(M, SKIN, SKIN_SH, ears=False)
+cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
+cu.cheeks(M, CHEEK)
+cu.mouth(M, LIP)
+# pelo recogido: tapa las orejas y la nuca, con un mechón fino delante de cada oreja
+cu.hair_back(M, SKIN, HAIR, top=80, zmax=2)
+for (x, y, z), v in M.V.items():
+    if v[0] == H and v[1] == SKIN and 74 <= y < 78 and abs(x + 0.5) >= 6.5 and z <= 3:
+        v[1] = HAIR
+# coleta (pieza propia: se balancea al andar), del cogote hacia abajo
+slab(M, 'hair', HAIR_TIE, 74, 76, 0, -7.5, 4, 4, 3, 3, ch=0)             # lazo
+slab(M, 'hair', HAIR, 76, 79, 0, -7, 5, 5, 3, 3, ch=1)                  # nacimiento, bajo el ala
+slab(M, 'hair', HAIR, 64, 74, 0, -8.5, 4.5, 3.5, 3.5, 3.5, ch=1, zoff0=-0.8, zoff1=0)
+slab(M, 'hair', HAIR, 60, 64, 0, -9.3, 3, 3.5, 3, 3, ch=1)                # punta
+# salacot: ala (asoma 2,5 por delante, más taparía los ojos), cinta y cúpula de caras planas
+slab(M, H, HELMET_SH, 78, 79, 0, 0.5, 19.5, 19.5, 19.5, 19.5, ch=3)
+slab(M, H, BAND, 79, 81, 0, 0.5, 16, 16, 16.5, 16.5, ch=2)
+slab(M, H, HELMET, 81, 86, 0, 0.5, 16, 16, 16.5, 16.5, ch=2)
+slab(M, H, HELMET, 86, 88, 0, 0.5, 13, 13, 13.5, 13.5, ch=2)
+slab(M, H, HELMET_SH, 88, 89, 0, 0.5, 4, 4, 4, 4, ch=1)                   # botón de la cúpula
+
+cu.seams(M, (SHIRT,))
+cu.finish(M, 'peaslee', {SHIRT: 'lona', SHIRT_SH: 'lona', TROUSER: 'lana', BOOT: 'cuero', SOLE: 'cuero',
+                         STRAP: 'cuero', BAG: 'cuero', HELMET: 'lona', HELMET_SH: 'lona', HAIR: 'pelo',
+                         SKIN: 'piel', SKIN_SH: 'piel'},
+          flat=(LIP, BROW, CHEEK, BUTTON, BUCKLE, HAIR_TIE, BAND), ax=AX,
+          extra_pivots={'hair': [0, 74, -8]}, extra_parents={'hair': 'head'})

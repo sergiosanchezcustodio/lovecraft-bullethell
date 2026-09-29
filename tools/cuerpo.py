@@ -12,6 +12,12 @@ su sombrero y su cara; las piezas van en este orden (lo posterior pisa a lo ante
 
 `b` (bulk) ensancha el tronco b voxels y separa los brazos b/2 a cada lado: Dyer (parka) es
 0, un traje -2, un corpulento +3.
+
+Cuerpo de mujer (29-09-2026): las mismas alturas y articulaciones (las animaciones son las
+mismas), con hombros más estrechos, cintura marcada, algo de cadera, pecho insinuado solo
+con el volumen del tronco, piernas y brazos más finos y los brazos más cerca del cuerpo
+(ARM_X_F). Piezas: shoes_f/boots, legs_f, torso_f, arms(..., ax=ARM_X_F, slim=True),
+bob() para la media melena y finish(..., ax=ARM_X_F).
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
@@ -20,6 +26,8 @@ import materiales
 
 T, H = 'torso', 'head'
 KNEE, HIP, ELBOW, SHOULDER, NECK = 27, 40, 46, 59, 64
+ARM_X = 15.0                                      # separación de los brazos (hombre, b = 0)
+ARM_X_F = 13.0                                    # mujer
 EYE = (0.08, 0.06, 0.05); EYE_W = (0.93, 0.91, 0.87)
 
 
@@ -53,9 +61,18 @@ def sides():
 
 # ---------------- calzado ----------------
 
-def boots(M, col, sole, top=11, cuff=None):
-    """Botas: suela, pie con puntera y caña hasta `top` (cuff: vuelta de 2 voxels encima)."""
+def boots(M, col, sole, top=11, cuff=None, slim=False):
+    """Botas: suela, pie con puntera y caña hasta `top` (cuff: vuelta de 2 voxels encima).
+    slim: botas de mujer, más finas y con la caña ajustada."""
     for s, _, shin, _, _ in sides():
+        if slim:
+            cx = 4.5 * s
+            slab(M, shin, sole, 0, 1, cx, 1.5, 7, 7, 13, 13, ch=1)
+            slab(M, shin, col, 1, 4, cx, 1.5, 7, 7, 13, 11, ch=1)
+            slab(M, shin, col, 4, top, cx, 0, 7, 8, 8, 8.5, ch=1)
+            if cuff is not None:
+                slab(M, shin, cuff, top, top + 2, cx, 0, 8.5, 8.5, 9, 9, ch=1)
+            continue
         cx = 5 * s
         slab(M, shin, sole, 0, 2, cx, 1, 9, 9, 15, 15, ch=1)
         slab(M, shin, col, 2, 5, cx, 1, 9, 9, 15, 14, ch=1)
@@ -88,6 +105,27 @@ def legs(M, col, bottom=13, thigh=None):
         slab(M, leg, thigh or col, 27, 41, cx * 1.04, 0, 8.5, 10.5, 8.5, 10, ch=1)       # muslo
 
 
+def shoes_f(M, col, sole, heel=None):
+    """Zapatos de mujer: más finos, con un tacón bajo detrás. Devuelve dónde empieza la pierna."""
+    for s, _, shin, _, _ in sides():
+        cx = 4.5 * s
+        slab(M, shin, sole, 0, 1, cx, 2, 6.5, 6.5, 12, 12, ch=1)
+        slab(M, shin, col, 1, 3, cx, 2, 6.5, 6, 12, 10, ch=1)
+        slab(M, shin, heel or sole, 0, 2, cx, -3, 4, 4, 3, 3, ch=0)                   # tacón
+    return 3
+
+
+def legs_f(M, col, bottom=3, thigh=None):
+    """Piernas de mujer: tobillo fino, gemelo, rodilla y muslo algo más ancho arriba."""
+    for s, leg, shin, _, _ in sides():
+        cx = 4.5 * s
+        if bottom < 12:
+            slab(M, shin, col, bottom, 12, cx, 0.5, 5, 6, 5.5, 6.5, ch=1)               # tobillo
+        slab(M, shin, col, max(bottom, 12), 20, cx, 0.3, 6, 7.5, 6.5, 7.5, ch=1, zoff1=-0.5)   # gemelo
+        slab(M, shin, col, 20, 27, cx, 0, 7.5, 6.5, 7.5, 7, ch=1, zoff0=-0.5)          # a la rodilla
+        slab(M, leg, thigh or col, 27, 41, cx * 1.05, 0, 7, 10, 7.5, 10, ch=1)          # muslo
+
+
 # ---------------- tronco ----------------
 
 def torso(M, col, b=0, hip=None, bottom=38):
@@ -96,6 +134,15 @@ def torso(M, col, b=0, hip=None, bottom=38):
     slab(M, T, col, 45, 50, 0, 0, 22 + b, 21 + b, 12.5, 12.5, ch=1)
     slab(M, T, col, 50, 58, 0, 0.3, 21 + b, 25 + b, 12.5, 14, ch=1)
     slab(M, T, col, 58, 61, 0, 0.3, 25 + b, 20 + b, 14, 12, ch=1)
+
+
+def torso_f(M, col, b=0, hip=None, bottom=38, bust=None):
+    """Tronco de mujer: cadera, cintura estrecha, pecho (solo volumen: algo más de fondo y
+    adelantado) y hombros estrechos que caen. bust: color de la pechera si es distinto."""
+    slab(M, T, hip or col, bottom, 45, 0, 0, 22 + b, 19 + b, 13, 12, ch=1)
+    slab(M, T, col, 45, 50, 0, 0, 18.5 + b, 18 + b, 11.5, 11.5, ch=1)
+    slab(M, T, bust or col, 50, 57, 0, 0.8, 18.5 + b, 20.5 + b, 12.5, 14, ch=1, zoff0=0.2, zoff1=0.6)
+    slab(M, T, col, 57, 61, 0, 0.3, 20.5 + b, 17 + b, 13, 11, ch=1)
 
 
 def skirt(M, col, bottom, top=45, b=0, flare=3, depth=13):
@@ -144,19 +191,21 @@ def opening(M, y0, y1, w0, w1, col, x0=0.0):
 
 # ---------------- brazos ----------------
 
-def arms(M, sleeve, hand, b=0, fore=None, cuff=None, cuff_wide=True, mitten=False):
+def arms(M, sleeve, hand, b=0, fore=None, cuff=None, cuff_wide=True, mitten=False, ax=ARM_X, slim=False):
     """Mangas (brazo y antebrazo), puño y manos (hand()). fore: color del antebrazo si es
     distinto (remangado). cuff: color del puño; ancho (de abrigo, cuff_wide) o fino (de
-    camisa). mitten: manoplas (dedos juntos) en lugar de mano o guante."""
+    camisa). mitten: manoplas (dedos juntos) en lugar de mano o guante. ax: separación de
+    los brazos (ARM_X_F para mujer); slim: brazos más finos."""
+    k = 0.85 if slim else 1.0
     for s, _, _, arm, fa in sides():
-        cx = (15 + b / 2) * s
-        slab(M, arm, sleeve, 46, 61, cx, 0, 7, 8.5, 7.5, 8.5, ch=1)
-        slab(M, fa, fore or sleeve, 37, 46, cx * 1.02, 0.5, 6.5, 7, 7, 7.5, ch=1)
+        cx = (ax + b / 2) * s
+        slab(M, arm, sleeve, 46, 61, cx, 0, 7 * k, 8.5 * k, 7.5 * k, 8.5 * k, ch=1)
+        slab(M, fa, fore or sleeve, 37, 46, cx * 1.02, 0.5, 6.5 * k, 7 * k, 7 * k, 7.5 * k, ch=1)
         if cuff is not None:
             if cuff_wide: slab(M, fa, cuff, 35, 38, cx * 1.02, 0.5, 8.5, 8.5, 9, 9, ch=1)
             else: slab(M, fa, cuff, 35, 37, cx * 1.02, 0.5, 7, 7, 7.5, 7.5, ch=1)
         else:
-            slab(M, fa, fore or sleeve, 35, 37, cx * 1.02, 0.5, 6.5, 6.5, 7, 7, ch=1)
+            slab(M, fa, fore or sleeve, 35, 37, cx * 1.02, 0.5, 6.5 * k, 6.5 * k, 7 * k, 7 * k, ch=1)
         hand_(M, fa, cx * 1.02, hand, mitten)
 
 
@@ -268,6 +317,26 @@ def hair_back(M, skin, hair, top=200, zmax=-2):
             v[1] = hair
 
 
+def bob(M, hair, bottom=66, top=82, fringe=78, side_z=3, back=-8, width=16.5):
+    """Media melena: casco de pelo alrededor de la cabeza, desde `bottom` (a la altura de la
+    mandíbula) hasta `top`, que deja la cara al aire (por delante de side_z y por debajo del
+    flequillo `fringe`). Los voxels de la cabeza no se tocan: el pelo va por fuera."""
+    hw = width / 2
+    for y in range(bottom, top):
+        cap = y >= top - 2                                    # coronilla: algo más estrecha
+        w = hw - (1 if cap else 0)
+        for x in range(int(-w - 0.5), int(w + 0.5)):
+            for z in range(back, 10):
+                if (x, y, z) in M.V: continue
+                ex = min(x + w + 0.5, w - 0.5 - x)
+                ez = min(z - back, 9 - z)
+                if ex + ez < 2: continue                         # aristas achaflanadas
+                if z > side_z and y < fringe: continue           # la cara, al aire
+                if z > 8: continue
+                if y < 72 and z > side_z - 2: continue           # por abajo se recoge hacia atrás
+                M.put(x, y, z, H, hair, 0, False)
+
+
 def sideburns(M, hair, y0=70, y1=76):
     """Patillas: el lateral de la cabeza delante de la oreja."""
     for (x, y, z), v in M.V.items():
@@ -288,7 +357,7 @@ def seams(M, cols, parts_arms=True):
         if v[0] == T and y == 58: M.seams.add((x, y, z))
 
 
-def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, top=85.0):
+def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, top=85.0, ax=ARM_X):
     """Texturas por material, luz (arriba algo más claro, la espalda algo más oscura) y
     exportación con los pivotes comunes."""
     materiales.texturize(M, mats)
@@ -299,11 +368,14 @@ def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, t
         shade = 0.9 + 0.12 * y / top
         shade *= 0.95 if z < -4 else 1.0
         v[1] = tuple(max(0.0, min(1.0, c * shade)) for c in v[1])
-    ax = 15 + b / 2
+    ax = ax + b / 2
     piv = {'torso': [0, HIP, 0], 'head': [0, NECK, 0],
            'arm_l': [-ax, SHOULDER, 0], 'arm_r': [ax, SHOULDER, 0],
            'fore_l': [-ax * 1.02, ELBOW, 0.5], 'fore_r': [ax * 1.02, ELBOW, 0.5],
            'leg_l': [-5, HIP, 0], 'leg_r': [5, HIP, 0], 'shin_l': [-5, KNEE, 0], 'shin_r': [5, KNEE, 0]}
+    if ax < ARM_X:                                    # mujer: piernas algo más juntas
+        for k in ('leg_l', 'shin_l'): piv[k][0] = -4.5
+        for k in ('leg_r', 'shin_r'): piv[k][0] = 4.5
     parents = {'shin_l': 'leg_l', 'shin_r': 'leg_r', 'fore_l': 'arm_l', 'fore_r': 'arm_r'}
     if extra_pivots: piv.update(extra_pivots)
     if extra_parents: parents.update(extra_parents)
