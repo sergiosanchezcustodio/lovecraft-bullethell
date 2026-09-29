@@ -97,7 +97,7 @@ Ampliada el 26-09-2026: adelanta de la fase 5 el guardado, el menú principal, l
 | 2.7b ⏸ | Arsenal II (GDD 5.3): las 4 de fuego (Tesla, Springfield, Lewis, Lugers) y las 5 físicas (inyector de West, bumerán, red, martillo, bastón estoque) | Hecho; **pendiente de tu revisión** |
 | 2.8 ⏸ | Clima estético (D-33): nieve, ceniza, lluvia, ventisca, niebla, sombras de nubes y rayos; seis climas de muestra y la nevada en el nivel 1 | Hecho; **pendiente de tu revisión** |
 | 2.9 ⏸ | Partida de 1 a 4 jugadores: cámara compartida con zoom, HUD en las cuatro esquinas, bots como jugadores extra | Hecho; **pendiente de tu prueba con varios mandos** |
-| 2.10 | Reglas del cooperativo: experiencia compartida, subida de nivel por cuadrante, pausa común, escalado, reanimación | Pendiente |
+| 2.10 ⏸ | Reglas del cooperativo: experiencia compartida, subida de nivel por cuadrante, pausa común, escalado, reanimación | Hecho; **pendiente de tu prueba con varios mandos** |
 | 2.11 | Cordura completa: cinco crisis, calmar, recuperación, auras, locura acumulada | Pendiente |
 | 2.12 | Ficha (con atributos) y mapa por cuadrante, sin pausa | Pendiente |
 | 2.13 ⏸ | Economía y tienda (D-31): dólares por enemigo, precios para ~10 h, tienda de antigüedades en voxel con el anciano, personajes, compañeros, 5.º hueco de arma y de objeto, baúles arcanos | Pendiente |

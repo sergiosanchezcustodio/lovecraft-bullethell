@@ -27,6 +27,10 @@ extends Resource
 @export var final_spawn_scale := 0.3           ## tras el evento, el ritmo normal se multiplica por esto
                                                ## (el duelo con la élite no debe ahogarse en la horda)
 @export var final_text := "Algo acecha entre las tiendas…"
+@export_group("Cooperativo")
+## Según los jugadores (1, 2, 3, 4): vida de los enemigos y ritmo y tope de aparición.
+@export var coop_health: Array[float] = [1.0, 1.5, 1.9, 2.3]
+@export var coop_spawn: Array[float] = [1.0, 1.35, 1.7, 2.0]
 
 const DEFAULT_MUSIC := "res://resources/Music/Musica_nivel1.mp3"
 
@@ -47,3 +51,8 @@ func rate_at(t: float) -> float:
 		var b := spawn_rate[i]
 		if t <= b.x: return lerpf(a.y, b.y, (t - a.x) / maxf(b.x - a.x, 0.001))
 	return spawn_rate[spawn_rate.size() - 1].y
+
+## Valor de una tabla del cooperativo para n jugadores.
+static func coop(table: Array[float], n: int) -> float:
+	if table.is_empty(): return 1.0
+	return table[clampi(n, 1, table.size()) - 1]

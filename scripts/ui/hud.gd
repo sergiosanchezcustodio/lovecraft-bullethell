@@ -163,7 +163,7 @@ class PlayerPanel extends PanelContainer:
 		_crisis_lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 		_crisis_lbl.size_flags_vertical = Control.SIZE_SHRINK_END
 		_crisis_lbl.size_flags_horizontal = Control.SIZE_SHRINK_END
-		_down_lbl = MenuKit.title("Caído", 34, Color(0.9, 0.3, 0.25))
+		_down_lbl = MenuKit.title("Caído", 30, Color(0.95, 0.35, 0.28))
 		_down_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		_down_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_down_lbl.visible = false
@@ -188,7 +188,7 @@ class PlayerPanel extends PanelContainer:
 		_sanity.value = p.sanity / d.max_sanity
 		_health_txt.text = "Vida %d" % ceili(p.health)
 		_sanity_txt.text = "Cordura %d" % ceili(p.sanity)
-		_xp.value = p.progress.xp / p.progress.xp_to_next()
+		_xp.value = p.progress.xp_fraction()
 		_level_lbl.text = "Nv %d" % p.progress.level
 		_dodge.value = p.motor.dodge_ready_fraction()
 		var parts: PackedStringArray = []
@@ -199,4 +199,9 @@ class PlayerPanel extends PanelContainer:
 		_crisis_lbl.text = "Crisis de locura: parálisis" if p.sanity_state.in_crisis else ""
 		var down := p.health <= 0.0
 		_down_lbl.visible = down
+		if p.is_eliminated: _down_lbl.text = "Eliminado"
+		elif down and p.revivable:
+			var pct := int(100.0 * p.revive_progress / p.rules.revive_time)
+			_down_lbl.text = "Derribado · %d s" % ceili(p.down_left) + ("  ·  %d %%" % pct if pct > 0 else "")
+		else: _down_lbl.text = "Caído"
 		modulate = Color(0.55, 0.55, 0.6, 0.8) if down else Color.WHITE

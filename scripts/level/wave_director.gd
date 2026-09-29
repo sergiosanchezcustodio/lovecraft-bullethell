@@ -19,6 +19,7 @@ var spawned_total := 0
 var killed_total := 0
 var rng := RandomNumberGenerator.new()
 var max_alive_override := -1
+var players := 1                           ## jugadores: escala vida y aparición (GDD 4.6)
 ## Depuración (menú de pausa > Depuración):
 var target_alive := -1                     ## > 0: mantiene exactamente tantos enemigos vivos
 var spawning_paused := false               ## no aparece nadie (el evento final tampoco)
@@ -34,7 +35,8 @@ func setup(p_level: LevelData, p_world: CombatWorld, p_obstacles: ObstacleMap, p
 	return self
 
 func max_alive() -> int:
-	return max_alive_override if max_alive_override > 0 else level.max_alive
+	if max_alive_override > 0: return max_alive_override
+	return int(round(level.max_alive * LevelData.coop(level.coop_spawn, players)))
 
 func _physics_process(delta: float) -> void:
 	if completed: return
@@ -51,7 +53,7 @@ func _physics_process(delta: float) -> void:
 			if d != null: spawn(d, spawn_point(d.body_radius))
 		final_event.emit(_final)
 	var scale := level.final_spawn_scale if _final_done else 1.0
-	_acc += level.rate_at(time) * scale * delta
+	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * delta
 	while _acc >= 1.0:
 		if alive.size() >= max_alive():
 			_acc = 1.0
@@ -122,6 +124,7 @@ func spawn_point(radius: float) -> Vector3:
 
 func spawn(d: EnemyData, pos: Vector3) -> Enemy:
 	var e := Enemy.new().setup(d, world, obstacles)
+	e.health *= LevelData.coop(level.coop_health, players)          # más jugadores, más aguante
 	e.position = pos
 	e.died.connect(_on_died)
 	enemies_root.add_child(e)

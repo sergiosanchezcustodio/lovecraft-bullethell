@@ -38,6 +38,7 @@ var args: LaunchArgs
 var arena: Node3D
 var player: Player                            ## el J1 (lo usan la depuración y las opciones de prueba)
 var players: Array[Player] = []               ## J1..J4 (hito 2.9)
+var team: TeamXp                              ## experiencia compartida del cooperativo (D-07)
 var camera: GameCamera
 var world: CombatWorld
 var level: LevelData
@@ -132,6 +133,12 @@ func _ready() -> void:
 		bot.body = bp
 		bot.leader = players[0]
 	player = players[0]
+	if players.size() > 1:                          # reglas del cooperativo (hito 2.10)
+		var progs: Array[PlayerProgress] = []
+		for q in players:
+			progs.append(q.progress)
+			q.revivable = true
+		team = TeamXp.new(player.rules, progs)
 	if args.has("model"): player.data.model = args.get_str("model")   # probar otro modelo (prototipos)
 	var p := args.get_floats("pos")
 	if p.size() == 2: player.position = Vector3(p[0], 0, p[1])
@@ -169,6 +176,7 @@ func _ready() -> void:
 		add_child(enemies_root)
 		director = WaveDirector.new().setup(level, world, arena.get_meta("obstacles"), camera, enemies_root)
 		if args.has("max_alive"): director.max_alive_override = args.get_int("max_alive")
+		director.players = players.size()           # la dificultad crece con los jugadores
 		director.final_event.connect(func(_e: Enemy) -> void: announce(level.final_text, 3.5))
 		director.level_completed.connect(_on_level_completed)
 		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
@@ -227,6 +235,10 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 		q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
 		_open_level_up.call_deferred())
 	q.downed.connect(_on_downed.bind(q))
+	q.revived.connect(func() -> void: announce("J%d vuelve a la lucha" % (i + 1), 1.5))
+	q.eliminated.connect(func() -> void:
+		announce("J%d, eliminado hasta el siguiente nivel" % (i + 1), 2.0)
+		_check_all_down())
 	if args.get_bool("log"):
 		q.damaged.connect(func(d: Damage) -> void:
 			var src := "bala" if d.source == null else String((d.source as Enemy).data.id) + (" (carga)" if d.physical > 8.0 else "")
@@ -250,10 +262,13 @@ func _on_enemy_died(e: Enemy) -> void:
 
 ## Subida de nivel: pausa y elige una de tres mejoras (D-16). Si hay varias subidas
 ## pendientes, se encadenan.
-## En cooperativo se atiende a los jugadores por orden; los bots eligen solos (el menú por
-## cuadrante, sin esperar a los demás, llega en el hito 2.10).
+## En solitario, el menú de siempre en el centro. En cooperativo (D-16), todos los que suben
+## eligen a la vez, cada uno en su cuadrante (CoopLevelUp); los bots eligen solos.
 func _open_level_up() -> void:
 	if _menu_open or _ended or _pause != null: return
+	if players.size() > 1:
+		_open_coop_level_up()
+		return
 	var q: Player = null
 	for c in players:
 		if c.progress.pending > 0:
@@ -281,6 +296,32 @@ func _open_level_up() -> void:
 		_menu_open = false
 		get_tree().paused = false
 		_open_level_up.call_deferred())
+	add_child(menu)
+
+func _open_coop_level_up() -> void:
+	var entries: Array[Dictionary] = []
+	for q in players:
+		if q.progress.pending <= 0: continue
+		var options := q.progress.roll_options(q.weapons, _rng)
+		if options.is_empty():
+			q.progress.pending = 0
+			continue
+		var title := "J%d · Nivel %d" % [q.index + 1, q.progress.level - q.progress.pending + 1]
+		if not q.progress.attr_gains.is_empty():
+			title += " · +1 %s" % Attributes.LONG[q.progress.attr_gains[0]]
+		entries.append({"player": q, "options": options, "title": title})
+	if entries.is_empty(): return
+	if args.get_bool("autopick") or entries.all(func(e: Dictionary) -> bool: return _is_bot(e.player)):
+		for e in entries: (e.player as Player).progress.choose(e.options[_rng.randi() % e.options.size()], e.player)
+		_open_level_up.call_deferred()
+		return
+	_menu_open = true
+	get_tree().paused = true
+	var menu := CoopLevelUp.new(entries, func(q: Player, o: PlayerProgress.Option) -> void: q.progress.choose(o, q))
+	menu.finished.connect(func() -> void:
+		_menu_open = false
+		get_tree().paused = false
+		_open_level_up.call_deferred())                # quedan subidas (varios niveles de golpe)
 	add_child(menu)
 
 func toggle_pause() -> void:
@@ -338,13 +379,21 @@ func _summary() -> PackedStringArray:
 		lv = "Niveles: " + "  ·  ".join(parts)
 	return PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills, lv])
 
-## Cae un jugador: si quedan otros en pie, la partida sigue (la reanimación llega en el hito
-## 2.10); si han caído todos, se acaba.
+## Cae un jugador. En cooperativo queda derribado y los demás pueden reanimarlo; la partida
+## se acaba cuando no queda nadie en pie (derribados y eliminados no cuentan).
 func _on_downed(q: Player) -> void:
 	if _ended: return
-	if players.any(func(c: Player) -> bool: return c.health > 0.0):
-		announce("J%d ha caído" % (q.index + 1), 2.0)
+	if players.size() > 1 and players.any(func(c: Player) -> bool: return c.health > 0.0):
+		announce("J%d, derribado: ¡reanimadlo!" % (q.index + 1), 2.0)
 		return
+	_game_over()
+
+func _check_all_down() -> void:
+	if _ended or players.any(func(c: Player) -> bool: return c.health > 0.0): return
+	_game_over()
+
+func _game_over() -> void:
+	if _ended: return
 	_ended = true
 	if Saves.current != null: Saves.current.stats["deaths"] += 1
 	Saves.save()
@@ -461,7 +510,7 @@ func _process(delta: float) -> void:
 	if players.size() > 1:                           # la cámara encuadra a los que siguen en pie
 		var alive: Array[Node3D] = []
 		for q in players:
-			if q.health > 0.0: alive.append(q)
+			if not q.is_eliminated: alive.append(q)        # los derribados también: hay que ir a por ellos
 		if not alive.is_empty(): camera.targets = alive
 	# tiempo jugado del hueco: en tiempo real, sin contar pausas ni la velocidad del juego
 	if not get_tree().paused and not _ended: Saves.add_play_time(delta / maxf(Engine.time_scale, 0.001))

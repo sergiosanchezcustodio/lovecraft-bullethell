@@ -102,7 +102,13 @@ Léela al empezar cada sesión:
     - HUD: un `Hud.PlayerPanel` por jugador en su esquina (J1 arriba a la izquierda, J2 arriba a la derecha, J3 abajo a la izquierda, J4 abajo a la derecha), con "J1…J4" en su color. Si cae, el panel se apaga y dice "Caído".
     - Si cae un jugador, la partida sigue ("J2 ha caído"); se acaba cuando caen todos ("Habéis caído", con el nivel de cada uno). Las subidas de nivel se atienden por orden; el menú por cuadrante sin pausar a los demás, la experiencia compartida y la reanimación son del hito 2.10.
     - Tests en `tests/test_coop.gd`. Prueba: `godot --path . -- bots=3`.
-  - Después: hito 2.10, reglas del cooperativo.
+  - **Hito 2.10 (reglas del cooperativo): hecho, pendiente de tu prueba con varios mandos (29-09-2026).**
+    - Experiencia compartida (D-07, `TeamXp`): la gema que recoge cualquiera cuenta para todos, suben a la vez y la curva se alarga (`ProgressionData.coop_xp_scale`: ×1,5, ×1,9, ×2,3 con 2, 3 y 4).
+    - Subida de nivel por cuadrante (D-16, `CoopLevelUp`): pausa para todos y cada uno elige a la vez en su cuadrante con su mando (arriba/abajo y A o Intro); los bots eligen solos. En solitario, el menú de siempre.
+    - Dificultad según los jugadores (`LevelData.coop_health` y `coop_spawn`, `LevelData.coop()`): vida de los enemigos y ritmo y tope de aparición.
+    - Reanimación (GDD 4.6): en cooperativo, con la vida a cero queda derribado 30 s (`Player.revivable`, `down_left`); un compañero a menos de 1,5 m lo levanta en 3 s (Whipple, 1,5 veces más rápido) con el 35 % de la vida. Si nadie llega, queda eliminado hasta el siguiente nivel. Tendido de bruces con un anillo en el suelo (`revive_ring.gdshader`: rojo, el tiempo que le queda; verde, la reanimación) y su estado en el panel del HUD. Los bots acuden a reanimar. La partida se acaba cuando no queda nadie en pie.
+    - Tests en `tests/test_coop_rules.gd`. Prueba: `godot --path . -- bots=3` (con el J1 a mano, el menú por cuadrantes espera a que elijas).
+  - Después: hito 2.11, cordura completa.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

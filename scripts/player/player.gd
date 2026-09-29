@@ -6,6 +6,8 @@ extends CharacterBody3D
 signal dodged
 signal damaged(d: Damage)
 signal downed                    ## vida a cero
+signal revived                   ## un compañero lo ha levantado (cooperativo)
+signal eliminated                ## se acabó su tiempo derribado: fuera hasta el siguiente nivel
 
 const LAYER_WORLD := 1
 const LAYER_PLAYERS := 2
@@ -18,6 +20,17 @@ var index := 0                   ## J1 = 0 … J4 = 3
 ## Correa del cooperativo (hito 2.9): recoloca al jugador para que no salga del encuadre
 ## máximo de la cámara compartida. Sin asignar, no hace nada.
 var leash := Callable()
+## Reanimación (hito 2.10, GDD 4.6): en cooperativo, con la vida a cero queda derribado
+## `rules.down_time` s; un compañero en pie a menos de `revive_radius` lo levanta en
+## `revive_time` s (más rápido si reanima Whipple). Si nadie lo hace, queda eliminado.
+var revivable := false
+var down_left := -1.0            ## s que le quedan derribado (-1: no lo está)
+var revive_progress := 0.0       ## s de reanimación acumulados
+var is_eliminated := false
+var rules: ProgressionData
+var _down_ring: MeshInstance3D
+var _down_mat: ShaderMaterial
+var _elim_t := 0.0
 var visual: Node3D          ## contenedor que gira hacia donde mira; dentro, el modelo voxel
 var model: Node3D
 var health := 0.0
@@ -61,7 +74,7 @@ func setup(p_data: CharacterData, p_input: PlayerInput, p_color: Color) -> Playe
 	input = p_input
 	color = p_color
 	motor = PlayerMotor.new(data)
-	var rules: ProgressionData = load("res://data/progression/default.tres")
+	rules = load("res://data/progression/default.tres")
 	progress = PlayerProgress.new(rules)
 	progress.leveled_up.connect(func(_l: int) -> void: gain_attribute())
 	rebuild_stats()
@@ -119,7 +132,9 @@ func _ready() -> void:
 	reset_physics_interpolation.call_deferred()      # no interpolar desde el origen al aparecer
 
 func _physics_process(delta: float) -> void:
-	if health <= 0.0: return
+	if health <= 0.0:
+		_downed_step(delta)
+		return
 	input.update(delta)
 	var near := world != null and world.nearest_enemy(global_position, sanity_state.rules.horror_radius) != null
 	sanity = sanity_state.update(delta, sanity, data.max_sanity, near)
@@ -139,7 +154,77 @@ func _physics_process(delta: float) -> void:
 		dodged.emit()
 	if _hurt_time >= 0.0: _hurt_time += delta
 
+## Derribado: corre el tiempo y avanza la reanimación si hay un compañero al lado (si se
+## aparta, lo avanzado se va perdiendo despacio).
+func _downed_step(delta: float) -> void:
+	if not revivable or is_eliminated or down_left < 0.0: return
+	down_left -= delta
+	var speed := 0.0
+	if world != null:
+		for q in world.players:
+			if q == self or q.health <= 0.0: continue
+			if q.global_position.distance_to(global_position) <= rules.revive_radius:
+				speed = maxf(speed, q.data.revive_speed)
+	if speed > 0.0: revive_progress += delta * speed
+	else: revive_progress = maxf(0.0, revive_progress - delta * 0.5)
+	if revive_progress >= rules.revive_time:
+		revive()
+	elif down_left <= 0.0:
+		is_eliminated = true
+		down_left = 0.0
+		eliminated.emit()
+
+## Vuelve a la lucha con parte de la vida y un momento de invulnerabilidad.
+func revive() -> void:
+	health = data.max_health * rules.revive_health
+	down_left = -1.0
+	revive_progress = 0.0
+	motor.locked = false
+	_hurt_time = 0.0
+	Anims.reset(model)
+	if _down_ring: _down_ring.visible = false
+	revived.emit()
+
+func is_downed() -> bool:
+	return health <= 0.0 and not is_eliminated
+
+## Tendido boca abajo con el anillo de la reanimación; eliminado, se hunde y desaparece.
+func _downed_visual(delta: float) -> void:
+	var here := get_global_transform_interpolated().origin
+	Anims.reset(model)
+	model.rotation.x = PI * 0.47                      # de bruces, hacia donde miraba
+	model.position.y = 0.22
+	visual.global_position = here
+	_snow.emitting = false
+	if not revivable: return
+	if _down_ring == null:
+		_down_ring = MeshInstance3D.new()
+		var pm := PlaneMesh.new()
+		pm.size = Vector2(rules.revive_radius * 2.0, rules.revive_radius * 2.0)
+		_down_ring.mesh = pm
+		_down_mat = ShaderMaterial.new()
+		_down_mat.shader = preload("res://scripts/fx/revive_ring.gdshader")
+		_down_ring.material_override = _down_mat
+		_down_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_down_ring.top_level = true
+		_down_ring.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+		add_child(_down_ring)
+	_down_ring.global_position = Vector3(here.x, 0.06, here.z)
+	if is_eliminated:
+		_elim_t += delta
+		_down_ring.visible = false
+		model.position.y = 0.22 - _elim_t * 0.5
+		visual.visible = _elim_t < 1.2
+		return
+	_down_ring.visible = true
+	_down_mat.set_shader_parameter("bleed", clampf(down_left / rules.down_time, 0.0, 1.0))
+	_down_mat.set_shader_parameter("revive", clampf(revive_progress / rules.revive_time, 0.0, 1.0))
+
 func _process(delta: float) -> void:
+	if health <= 0.0:
+		_downed_visual(delta)
+		return
+	visual.visible = true
 	var here := get_global_transform_interpolated().origin
 	_xray.set_shader_parameter("center_world", here + Vector3(0, 0.85, 0))
 	# Girar el modelo hacia donde mira (el modelo mira hacia +Z)
@@ -352,6 +437,9 @@ func take_damage(d: Damage) -> void:
 	damaged.emit(d)
 	if health <= 0.0:
 		motor.locked = true
+		if revivable:
+			down_left = rules.down_time
+			revive_progress = 0.0
 		downed.emit()
 
 ## Reproduce una animación puntual (p. ej. "throw") por encima de andar o estar quieto.

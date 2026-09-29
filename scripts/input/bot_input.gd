@@ -36,14 +36,30 @@ func _read_move(_delta: float) -> Vector2:
 		"diag": return Vector2(1, 1).normalized()
 	return Vector2.ZERO
 
-## Hacia el líder si está a más de 4 m; si no, rodeándolo a unos 3 m.
+## El compañero derribado más cercano (cooperativo), o null.
+func _downed_mate() -> Node3D:
+	if not ("world" in body) or body.world == null: return null
+	var best: Node3D = null
+	var best_d := INF
+	for q in body.world.players:
+		if q == body or not q.is_downed(): continue
+		var d: float = q.global_position.distance_to(body.global_position)
+		if d < best_d:
+			best_d = d
+			best = q
+	return best
+
+## Hacia el líder si está a más de 4 m; si no, rodeándolo a unos 3 m. Si hay un compañero
+## derribado, va a su lado para reanimarlo.
 func _follow() -> Vector2:
 	if body == null or leader == null or not is_instance_valid(body) or not is_instance_valid(leader): return Vector2.ZERO
 	var a := _t / period * TAU + phase
 	var spot := leader.global_position + Vector3(cos(a), 0, sin(a)) * 3.0
+	var down := _downed_mate()                              # un compañero derribado: a reanimarlo
+	if down != null: spot = down.global_position
 	var to := spot - body.global_position
 	to.y = 0.0
-	if to.length() < 0.4: return Vector2.ZERO
+	if to.length() < 0.4 or (down != null and to.length() < 0.8): return Vector2.ZERO
 	var d := to.normalized() * clampf(to.length() / 2.0, 0.4, 1.0)
 	# del suelo al espacio de la pantalla (inverso de PlayerMotor.screen_to_world)
 	var right := PlayerMotor.screen_to_world(Vector2(1, 0))

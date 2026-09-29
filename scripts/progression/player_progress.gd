@@ -33,6 +33,7 @@ var upgrade_pool: Array[UpgradeData] = []
 var attr_gains: Array[String] = []        ## atributo ganado en cada subida aún sin elegir mejora
 var weapon_slots := 4                     ## armas que puede llevar (D-28; la tienda da la 5.ª)
 var item_slots := 4                       ## objetos (pasivas) distintos que puede llevar
+var team: TeamXp                          ## cooperativo: la experiencia es común (D-07)
 
 func _init(p_rules: ProgressionData) -> void:
 	rules = p_rules
@@ -41,12 +42,24 @@ func xp_to_next() -> float:
 	return rules.xp_to_next(level)
 
 func add_xp(amount: float) -> void:
+	if team != null:
+		team.add(amount)
+		return
 	xp += amount
 	while xp >= xp_to_next():
 		xp -= xp_to_next()
-		level += 1
-		pending += 1
-		leveled_up.emit(level)
+		gain_level()
+
+## Sube un nivel: una mejora más por elegir (y el +1 de atributo, que pone el jugador).
+func gain_level() -> void:
+	level += 1
+	pending += 1
+	leveled_up.emit(level)
+
+## Fracción de la barra de experiencia (la del equipo en cooperativo).
+func xp_fraction() -> float:
+	if team != null: return team.xp / team.xp_to_next()
+	return xp / xp_to_next()
 
 ## Hasta `n` opciones distintas y válidas: armas nuevas que aún no tiene, subir armas
 ## que no están al máximo y pasivas que no están al máximo.

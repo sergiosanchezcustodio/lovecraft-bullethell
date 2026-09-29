@@ -7,6 +7,13 @@ extends Resource
 @export var xp_add := 2.0                  ## y esta cantidad fija más
 @export var magnet_speed := 11.0           ## velocidad de las gemas al volar (m/s); el radio es del personaje
 @export var options_per_level := 3
+@export_group("Cooperativo")
+## Curva de experiencia compartida según los jugadores (1, 2, 3, 4): la del nivel por esto (D-07).
+@export var coop_xp_scale: Array[float] = [1.0, 1.5, 1.9, 2.3]
+@export var down_time := 30.0              ## s derribado antes de quedar eliminado
+@export var revive_time := 3.0             ## s junto al derribado para levantarlo
+@export var revive_radius := 1.5           ## m a los que hay que estar
+@export var revive_health := 0.35          ## fracción de la vida con la que vuelve
 @export_group("Cordura")
 @export var sanity_regen := 1.2            ## por segundo, lejos de los horrores
 @export var sanity_regen_delay := 2.5      ## s sin daño mental antes de recuperar
@@ -21,3 +28,8 @@ extends Resource
 ## Experiencia necesaria para pasar del nivel `level` al siguiente.
 func xp_to_next(level: int) -> float:
 	return roundf(xp_base * pow(xp_growth, level - 1) + xp_add * (level - 1))
+
+## Multiplicador de la curva de experiencia con n jugadores.
+func coop_xp(n: int) -> float:
+	if coop_xp_scale.is_empty(): return 1.0
+	return coop_xp_scale[clampi(n, 1, coop_xp_scale.size()) - 1]
