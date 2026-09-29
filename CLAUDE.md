@@ -95,7 +95,14 @@ Léela al empezar cada sesión:
     - `Weather` (`scripts/fx/weather.gd`) lo monta y lo lleva con la cámara: partículas en coordenadas del mundo, dos capas de niebla (`weather_mist.gdshader`, fundida con la profundidad) y sombras de nubes (`weather_clouds.gdshader`, mezcla multiplicativa). El rayo es un destello contenido de una luz direccional y de la ambiental (`FLASH_LIGHT`, `FLASH_AMBIENT`): con más, sobre la nieve la noche parecía de día.
     - Climas de muestra: nevada, ventisca, ceniza, lluvia, tormenta y niebla densa. `weather=<id>` o `weather=no` al arrancar; el menú de depuración lo cambia en partida. Configuración > Juego > Clima: apagado, reducido (mitad de partículas) o completo.
     - Sin coste medible: 120 FPS (el tope) con y sin ventisca o tormenta. Tests en `tests/test_weather.gd`. Hoja `shots/revision_2_8_clima.png`.
-  - Después: hito 2.9, partida de 1 a 4 jugadores.
+  - **Hito 2.9 (partida de 1 a 4 jugadores): hecho, pendiente de tu prueba con varios mandos (29-09-2026).**
+    - `game.gd` crea un jugador por puesto de la selección (`GameSession.seats`), cada uno con su entrada, su personaje, sus armas y su progreso. `player` sigue siendo el J1 (depuración y opciones de prueba); `players` los lleva a todos. Lanzando la partida directa, `bots=N` añade jugadores de compañía (`bot_chars=` elige sus personajes).
+    - Bots: `BotInput` con el patrón `follow` (va hacia el J1 y lo rodea a su aire, esquiva de vez en cuando) y eligen sus mejoras solos.
+    - Cámara compartida (`GameCamera`): abre el zoom para que quepan todos (`needed_size`, de `view_size` a `max_view_size` = 24 m) y sigue a los que están en pie. La correa (`Player.leash` → `GameCamera.leash`) no deja que nadie se salga del encuadre máximo.
+    - HUD: un `Hud.PlayerPanel` por jugador en su esquina (J1 arriba a la izquierda, J2 arriba a la derecha, J3 abajo a la izquierda, J4 abajo a la derecha), con "J1…J4" en su color. Si cae, el panel se apaga y dice "Caído".
+    - Si cae un jugador, la partida sigue ("J2 ha caído"); se acaba cuando caen todos ("Habéis caído", con el nivel de cada uno). Las subidas de nivel se atienden por orden; el menú por cuadrante sin pausar a los demás, la experiencia compartida y la reanimación son del hito 2.10.
+    - Tests en `tests/test_coop.gd`. Prueba: `godot --path . -- bots=3`.
+  - Después: hito 2.10, reglas del cooperativo.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

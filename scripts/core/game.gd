@@ -29,12 +29,15 @@ extends Node3D
 ##   debug_menu=1            abre la pausa y el menú de depuración a ese segundo (capturas)
 ##   character=johansen      personaje del J1 (dyer, olmstead, legrasse, johansen)
 ##   model=dyer_chibi        otro modelo para el J1 (probar prototipos)
+##   bots=3                  jugadores de compañía manejados por la máquina (J2..J4, hito 2.9)
+##   bot_chars=olmstead,…    personajes de esos bots (por defecto, los de inicio y los demás)
 
 const PLAYER_COLORS: Array[Color] = [Color(1.0, 0.82, 0.3), Color(0.35, 0.75, 1.0), Color(0.55, 1.0, 0.45), Color(1.0, 0.45, 0.8)]
 
 var args: LaunchArgs
 var arena: Node3D
-var player: Player
+var player: Player                            ## el J1 (lo usan la depuración y las opciones de prueba)
+var players: Array[Player] = []               ## J1..J4 (hito 2.9)
 var camera: GameCamera
 var world: CombatWorld
 var level: LevelData
@@ -102,48 +105,54 @@ func _ready() -> void:
 	gems.world = world
 	gems.rules = load("res://data/progression/default.tres")
 	world.add_child(gems)
-	# Jugador 1: el de la selección de personaje, o el de siempre si la partida se lanza directa
-	var seat: GameSession.Seat = GameSession.seats[0] if GameSession.is_set() else null
-	var character := String(seat.character) if seat else "dyer"
-	character = args.get_str("character", String(DebugOptions.get_value("character", character)))
-	var input := Devices.make_input(seat.device) if seat and not args.has("bot") else _make_input()
-	player = Player.new().setup(load("res://data/characters/%s.tres" % character), input, PLAYER_COLORS[0])
+	# Jugadores: los de la selección de personaje (J1..J4) o, lanzando la partida directa, el
+	# J1 de siempre más `bots=N` jugadores de compañía.
+	if GameSession.is_set():
+		for i in GameSession.seats.size():
+			var seat: GameSession.Seat = GameSession.seats[i]
+			var ch := String(seat.character)
+			if i == 0: ch = args.get_str("character", String(DebugOptions.get_value("character", ch)))
+			var inp := Devices.make_input(seat.device) if not (i == 0 and args.has("bot")) else _make_input()
+			_spawn_player(ch, inp)
+	else:
+		_spawn_player(args.get_str("character", String(DebugOptions.get_value("character", "dyer"))), _make_input())
+	var extra: PackedStringArray = args.get_str("bot_chars", "").split(",", false)
+	var defaults := ["olmstead", "peaslee", "whipple", "legrasse", "johansen", "varga", "blake", "iwanicki", "elwood", "malone", "dyer"]
+	for k in mini(args.get_int("bots", 0), 4 - players.size()):
+		var ch: String = extra[k] if k < extra.size() else ""
+		if ch == "":
+			for d: String in defaults:
+				if players.all(func(q: Player) -> bool: return String(q.data.id) != d):
+					ch = d
+					break
+		var bot := BotInput.new("follow", 3.0 + k * 0.7)
+		bot.phase = TAU * (k + 1) / 4.0
+		bot.period = 7.0 + k * 1.5
+		var bp := _spawn_player(ch, bot)
+		bot.body = bp
+		bot.leader = players[0]
+	player = players[0]
 	if args.has("model"): player.data.model = args.get_str("model")   # probar otro modelo (prototipos)
-	player.position = arena.get_meta("spawn")
 	var p := args.get_floats("pos")
 	if p.size() == 2: player.position = Vector3(p[0], 0, p[1])
-	player.god = args.get_bool("god")
 	if args.has("dodge"):
 		var legacy := {"slide": "deslizar", "roll": "rodar"}
 		var id: String = legacy.get(args.get_str("dodge"), args.get_str("dodge"))
 		player.apply_dodge_style(load("res://data/dodges/%s.tres" % id))
-	player.world = world
-	add_child(player)
-	world.add_player(player)
-	for w in DebugOptions.list_resources("res://data/weapons"): player.progress.weapon_pool.append(w)   # todas las armas
-	for f in ["velocidad", "vida", "cordura", "reflejos", "iman"]:
-		player.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
-	player.progress.leveled_up.connect(func(_l: int) -> void:
-		player.health = minf(player.health + player.data.max_health * player.data.heal_on_level, player.data.max_health)   # Whipple
-		_open_level_up.call_deferred())
-	player.downed.connect(_on_downed)
-	if args.get_bool("log"):
-		player.damaged.connect(func(d: Damage) -> void:
-			var src := "bala" if d.source == null else String((d.source as Enemy).data.id) + (" (carga)" if d.physical > 8.0 else "")
-			print("  golpe t=%.1f  -%d vida -%d cordura  de %s  -> vida %d" % [director.time if director else 0.0, d.physical, d.mental, src, player.health]))
-	player.sanity_state.crisis_started.connect(func(_k: StringName) -> void: announce("Crisis de locura", 1.5))
-	player.weapons = WeaponSystem.new().setup(player, world)
-	player.add_child(player.weapons)
-	var start := PackedStringArray()
-	for wid in player.data.starting_weapons: start.append(String(wid))
-	var wlist: PackedStringArray = args.get_str("weapons", ",".join(start)).split(",", false)
-	for wid in wlist:
-		var w := player.weapons.add_weapon(load("res://data/weapons/%s.tres" % wid))
-		w.level = clampi(args.get_int("wlevel", 1), 1, w.data.max_level)
+	var wlist: PackedStringArray = args.get_str("weapons", "").split(",", false)
+	if not wlist.is_empty():                        # armas de prueba para el J1
+		for w in player.weapons.weapons.duplicate(): player.weapons.remove_weapon(w.data.id)
+		for wid in wlist:
+			var w := player.weapons.add_weapon(load("res://data/weapons/%s.tres" % wid))
+			w.level = clampi(args.get_int("wlevel", 1), 1, w.data.max_level)
+	elif args.has("wlevel"):
+		for w in player.weapons.weapons: w.level = clampi(args.get_int("wlevel", 1), 1, w.data.max_level)
 	camera = GameCamera.new()
 	camera.view_size = args.get_float("cam", 15.0)
-	camera.targets.append(player)
+	for q in players: camera.targets.append(q)
 	add_child(camera)
+	if players.size() > 1:                          # correa: nadie se sale del encuadre máximo
+		for q in players: q.leash = func(pos: Vector3) -> Vector3: return camera.leash(pos)
 	_env = env
 	_make_announcer()
 	if not args.get_bool("nolevel"):
@@ -168,7 +177,7 @@ func _ready() -> void:
 		Music.play(level.music_path())
 	_start_weather()
 	Engine.time_scale = args.get_float("timescale", 1.0)
-	hud = Hud.new().setup(player, director)
+	hud = Hud.new().setup(players, director)
 	add_child(hud)
 	var pause_watch := Node.new()                  # sigue atento a Esc/Start con la partida en pausa
 	pause_watch.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -199,6 +208,40 @@ func _ready() -> void:
 		var tag := ("_" + args.get_str("tag")) if args.has("tag") else ""
 		add_child(ShotTaker.new(args.get_floats("shots"), "res://shots/game%s" % tag))
 
+## Crea un jugador (J1..J4 según el orden) con su personaje, su entrada y sus armas iniciales.
+func _spawn_player(character: String, input: PlayerInput) -> Player:
+	var i := players.size()
+	var q := Player.new().setup(load("res://data/characters/%s.tres" % character), input, PLAYER_COLORS[i])
+	q.index = i
+	var a := TAU * i / 4.0 + 0.6
+	q.position = arena.get_meta("spawn") + (Vector3(cos(a), 0, sin(a)) * 1.8 if i > 0 else Vector3.ZERO)
+	q.god = args.get_bool("god")
+	q.world = world
+	add_child(q)
+	world.add_player(q)
+	players.append(q)
+	for w in DebugOptions.list_resources("res://data/weapons"): q.progress.weapon_pool.append(w)   # todas las armas
+	for f in ["velocidad", "vida", "cordura", "reflejos", "iman"]:
+		q.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
+	q.progress.leveled_up.connect(func(_l: int) -> void:
+		q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
+		_open_level_up.call_deferred())
+	q.downed.connect(_on_downed.bind(q))
+	if args.get_bool("log"):
+		q.damaged.connect(func(d: Damage) -> void:
+			var src := "bala" if d.source == null else String((d.source as Enemy).data.id) + (" (carga)" if d.physical > 8.0 else "")
+			print("  J%d golpe t=%.1f  -%d vida -%d cordura  de %s  -> vida %d" % [i + 1, director.time if director else 0.0, d.physical, d.mental, src, q.health]))
+	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void:
+		announce("Crisis de locura" if players.size() == 1 else "J%d: crisis de locura" % (i + 1), 1.5))
+	q.weapons = WeaponSystem.new().setup(q, world)
+	q.add_child(q.weapons)
+	for wid in q.data.starting_weapons: q.weapons.add_weapon(load("res://data/weapons/%s.tres" % wid))
+	return q
+
+## ¿Lo maneja la máquina? (elige sola sus mejoras)
+func _is_bot(q: Player) -> bool:
+	return q.input is BotInput
+
 # ---------------- flujo de la partida ----------------
 func _on_enemy_died(e: Enemy) -> void:
 	kills += 1
@@ -207,24 +250,34 @@ func _on_enemy_died(e: Enemy) -> void:
 
 ## Subida de nivel: pausa y elige una de tres mejoras (D-16). Si hay varias subidas
 ## pendientes, se encadenan.
+## En cooperativo se atiende a los jugadores por orden; los bots eligen solos (el menú por
+## cuadrante, sin esperar a los demás, llega en el hito 2.10).
 func _open_level_up() -> void:
-	if _menu_open or _ended or _pause != null or player.progress.pending <= 0: return
-	var options := player.progress.roll_options(player.weapons, _rng)
+	if _menu_open or _ended or _pause != null: return
+	var q: Player = null
+	for c in players:
+		if c.progress.pending > 0:
+			q = c
+			break
+	if q == null: return
+	var options := q.progress.roll_options(q.weapons, _rng)
 	if options.is_empty():
-		player.progress.pending = 0
+		q.progress.pending = 0
+		_open_level_up.call_deferred()
 		return
-	if args.get_bool("autopick"):
-		player.progress.choose(options[0], player)
+	if args.get_bool("autopick") or _is_bot(q):
+		q.progress.choose(options[0] if not _is_bot(q) else options[_rng.randi() % options.size()], q)
 		_open_level_up.call_deferred()
 		return
 	_menu_open = true
 	get_tree().paused = true
-	var title := "Nivel %d" % (player.progress.level - player.progress.pending + 1)
-	if not player.progress.attr_gains.is_empty():                  # D-27: el atributo que ha subido
-		title += "   ·   +1 %s" % Attributes.LONG[player.progress.attr_gains[0]]
+	var title := "Nivel %d" % (q.progress.level - q.progress.pending + 1)
+	if players.size() > 1: title = "J%d · %s · %s" % [q.index + 1, q.data.display_name, title]
+	if not q.progress.attr_gains.is_empty():                        # D-27: el atributo que ha subido
+		title += "   ·   +1 %s" % Attributes.LONG[q.progress.attr_gains[0]]
 	var menu := Menus.LevelUpMenu.new(options, title)
 	menu.chosen.connect(func(o: PlayerProgress.Option) -> void:
-		player.progress.choose(o, player)
+		q.progress.choose(o, q)
 		_menu_open = false
 		get_tree().paused = false
 		_open_level_up.call_deferred())
@@ -278,11 +331,20 @@ func _quit() -> void:
 
 func _summary() -> PackedStringArray:
 	var t := int(director.time) if director != null else 0
-	return PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills,
-		"Nivel alcanzado: %d" % player.progress.level])
+	var lv := "Nivel alcanzado: %d" % player.progress.level
+	if players.size() > 1:
+		var parts := PackedStringArray()
+		for q in players: parts.append("J%d %d" % [q.index + 1, q.progress.level])
+		lv = "Niveles: " + "  ·  ".join(parts)
+	return PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills, lv])
 
-func _on_downed() -> void:
+## Cae un jugador: si quedan otros en pie, la partida sigue (la reanimación llega en el hito
+## 2.10); si han caído todos, se acaba.
+func _on_downed(q: Player) -> void:
 	if _ended: return
+	if players.any(func(c: Player) -> bool: return c.health > 0.0):
+		announce("J%d ha caído" % (q.index + 1), 2.0)
+		return
 	_ended = true
 	if Saves.current != null: Saves.current.stats["deaths"] += 1
 	Saves.save()
@@ -290,7 +352,7 @@ func _on_downed() -> void:
 	await get_tree().create_timer(0.6, true, false, true).timeout
 	Engine.time_scale = 1.0
 	get_tree().paused = true
-	_end_screen("Has caído", Color(0.86, 0.22, 0.18))
+	_end_screen("Has caído" if players.size() == 1 else "Habéis caído", Color(0.86, 0.22, 0.18))
 
 func _on_level_completed() -> void:
 	if _ended: return
@@ -396,6 +458,11 @@ func _demo_crowd(n: int) -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
+	if players.size() > 1:                           # la cámara encuadra a los que siguen en pie
+		var alive: Array[Node3D] = []
+		for q in players:
+			if q.health > 0.0: alive.append(q)
+		if not alive.is_empty(): camera.targets = alive
 	# tiempo jugado del hueco: en tiempo real, sin contar pausas ni la velocidad del juego
 	if not get_tree().paused and not _ended: Saves.add_play_time(delta / maxf(Engine.time_scale, 0.001))
 	if args.get_bool("debug") and fmod(_t, 0.5) < delta: print("t=%.1f jugador=%s" % [_t, player.global_position])

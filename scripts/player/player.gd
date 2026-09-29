@@ -14,6 +14,10 @@ var data: CharacterData
 var input: PlayerInput
 var motor: PlayerMotor
 var color := Color(1.0, 0.82, 0.3)
+var index := 0                   ## J1 = 0 … J4 = 3
+## Correa del cooperativo (hito 2.9): recoloca al jugador para que no salga del encuadre
+## máximo de la cámara compartida. Sin asignar, no hace nada.
+var leash := Callable()
 var visual: Node3D          ## contenedor que gira hacia donde mira; dentro, el modelo voxel
 var model: Node3D
 var health := 0.0
@@ -128,6 +132,7 @@ func _physics_process(delta: float) -> void:
 	velocity = motor.step(delta, input.move, input.just_pressed(InputBindings.DODGE))
 	move_and_slide()
 	position.y = 0.0
+	if leash.is_valid(): global_position = leash.call(global_position)
 	if motor.is_dodging() and not was_dodging:
 		_action = data.dodge_anim         # la animación del esquive empieza con el impulso
 		_action_t = 0.0
