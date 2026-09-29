@@ -134,7 +134,12 @@ Léela al empezar cada sesión:
     - `ShopMenu` desde el menú principal: pestañas Potenciadores, Personajes, Compañeros y Mejoras (LB/RB o Q/E), nivel en puntos, precio del siguiente (atenuado si no llega) y compra con confirmación; guarda al momento. Fondo provisional hasta el 2.13d. Capturas: `title saves=… open=menu_tienda tab=N shots=14`.
     - En partida: `Player.shop` multiplica vida, cordura, velocidad y daño; los huecos suman a `weapon_slots` e `item_slots`; Codicia, a `game.money_mult`.
     - El dinero se muestra en dólares en todos los menús.
-  - Después: hito 2.13c, los compañeros.
+  - **Hito 2.13c (compañeros): hecho, pendiente de tu revisión.**
+    - Modelos estilo 4 a 48 voxels/m: `tools/gen_perro.py` (husky gris y blanco con antifaz, ojos claros, arnés rojo y rabo enroscado) y `tools/gen_gato.py` (atigrado naranja con "M" en la frente, ojos verdes, calcetines blancos y rabo anillado). Animaciones en `anim_cuadrupedo.gd` (idle, walk, run, bite). Hoja `shots/rev_mascotas_v2.png`.
+    - `Pet` (`scripts/pets/pet.gd`): sigue a su jugador (se da prisa si se aleja; si se queda muy atrás, aparece a su lado) con un anillo fino de su color. Perro (`PetData.Kind.BITE`): corre a morder a los enemigos a menos de 5,5 m de su jugador, 9 + 2 por nivel del jugador. Gato (`WARD`): `Player.mental_resist` quita un 20 % del daño mental (+1 % por nivel, hasta 35 %), también el de las auras.
+    - En partida sale el compañero de cada puesto de la selección (`GameSession.Seat.pet`); lanzando directo, `pet=perro|gato` para el J1.
+    - Tests en `tests/test_pets.gd`.
+  - Después: hito 2.13d, la tienda de antigüedades con el anciano.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

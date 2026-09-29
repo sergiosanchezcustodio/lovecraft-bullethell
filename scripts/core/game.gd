@@ -32,6 +32,7 @@ extends Node3D
 ##   bots=3                  jugadores de compañía manejados por la máquina (J2..J4, hito 2.9)
 ##   bot_chars=olmstead,…    personajes de esos bots (por defecto, los de inicio y los demás)
 ##   chest_every=5           un baúl arcano cada tantos segundos (por defecto, el del nivel)
+##   pet=perro|gato          compañero del J1
 ##   panel=sheet|map         abre la ficha o el mapa (panel_player=N, panel_page=N, panel_at=s)
 
 const PLAYER_COLORS: Array[Color] = [Color(1.0, 0.82, 0.3), Color(0.35, 0.75, 1.0), Color(0.55, 1.0, 0.45), Color(1.0, 0.45, 0.8)]
@@ -119,7 +120,8 @@ func _ready() -> void:
 			var ch := String(seat.character)
 			if i == 0: ch = args.get_str("character", String(DebugOptions.get_value("character", ch)))
 			var inp := Devices.make_input(seat.device) if not (i == 0 and args.has("bot")) else _make_input()
-			_spawn_player(ch, inp)
+			var sp := _spawn_player(ch, inp)
+			if seat.pet != &"": _spawn_pet(String(seat.pet), sp)
 	else:
 		_spawn_player(args.get_str("character", String(DebugOptions.get_value("character", "dyer"))), _make_input())
 	var extra: PackedStringArray = args.get_str("bot_chars", "").split(",", false)
@@ -138,6 +140,7 @@ func _ready() -> void:
 		bot.body = bp
 		bot.leader = players[0]
 	player = players[0]
+	if args.has("pet"): _spawn_pet(args.get_str("pet"), player)   # probar un compañero
 	var bonus := Shop.bonuses(Saves.current)          # lo comprado en la tienda (D-31)
 	money_mult = float(bonus.money)
 	for q in players:
@@ -280,6 +283,12 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	q.add_child(q.weapons)
 	for wid in q.data.starting_weapons: q.weapons.add_weapon(load("res://data/weapons/%s.tres" % wid))
 	return q
+
+## Compañero de un jugador (D-20): lo sigue toda la partida.
+func _spawn_pet(id: String, owner: Player) -> void:
+	var pd: PetData = load("res://data/pets/%s.tres" % id)
+	if pd == null: return
+	add_child(Pet.new().setup(pd, owner, world))
 
 ## ¿Lo maneja la máquina? (elige sola sus mejoras)
 func _is_bot(q: Player) -> bool:

@@ -25,6 +25,8 @@ const BY_MODEL := {
 	"malone": preload("res://scripts/anim/anim_humano.gd"),
 	"pinguino": preload("res://scripts/anim/anim_pinguino.gd"),
 	"fragmento": preload("res://scripts/anim/anim_fragmento.gd"),
+	"perro": preload("res://scripts/anim/anim_cuadrupedo.gd"),
+	"gato": preload("res://scripts/anim/anim_cuadrupedo.gd"),
 }
 
 static func has_anim(model_name: String, anim: String) -> bool:

@@ -38,6 +38,7 @@ var _wander := 0.0               ## rumbo del vagar sin rumbo (rad)
 ## Potenciadores comprados en la tienda (Shop.bonuses): multiplicadores de vida, cordura,
 ## daño y velocidad. Vacío: sin tienda.
 var shop := {}
+var mental_resist := 1.0         ## fracción del daño mental que recibe (gato de Ulthar)
 var visual: Node3D          ## contenedor que gira hacia donde mira; dentro, el modelo voxel
 var model: Node3D
 var health := 0.0
@@ -215,7 +216,7 @@ static func _to_screen(d: Vector3) -> Vector2:
 ## Presencia de una élite o un jefe: drena cordura sin contar como golpe.
 func drain_sanity(amount: float) -> void:
 	if health <= 0.0 or god: return
-	sanity = maxf(0.0, sanity - amount)
+	sanity = maxf(0.0, sanity - amount * mental_resist)
 
 ## Derribado: corre el tiempo y avanza la reanimación si hay un compañero al lado (si se
 ## aparta, lo avanzado se va perdiendo despacio).
@@ -500,7 +501,7 @@ func take_damage(d: Damage) -> void:
 		d = r
 	health = maxf(0.0, health - d.physical)
 	if d.mental > 0.0:
-		sanity = maxf(0.0, sanity - d.mental)
+		sanity = maxf(0.0, sanity - d.mental * mental_resist)
 		sanity_state.on_mental_damage()
 	_hurt_time = 0.0
 	damaged.emit(d)
