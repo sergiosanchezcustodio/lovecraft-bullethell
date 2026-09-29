@@ -15,6 +15,9 @@ var _t := 0.0
 var _hit := {}                               ## ids ya alcanzados
 var _mat: ShaderMaterial
 var _disc: MeshInstance3D
+var clears := false                          ## Resonador: deshace las balas enemigas que alcanza
+var color := COLOR
+var cleared := 0                             ## balas deshechas (tests)
 
 const FADE := 0.25
 const COLOR := Color(1.0, 0.84, 0.46, 0.95)        # dorado: un blanco pálido se perdía sobre la nieve
@@ -33,7 +36,7 @@ func _ready() -> void:
 	_disc.mesh = pm
 	_mat = ShaderMaterial.new()
 	_mat.shader = preload("res://scripts/fx/telegraph.gdshader")
-	_mat.set_shader_parameter("color", COLOR)
+	_mat.set_shader_parameter("color", color)
 	_mat.set_shader_parameter("fill", false)
 	_mat.set_shader_parameter("ring_width", 0.14)
 	_disc.material_override = _mat
@@ -50,6 +53,7 @@ func _physics_process(delta: float) -> void:
 	_t += delta
 	if _t > _grow: return
 	var r := current_radius()
+	if clears: cleared += world.bullets.clear_enemy_bullets(global_position, r)
 	for e in world.enemies_in_circle(global_position, r):
 		var id := e.get_instance_id()
 		if _hit.has(id): continue
@@ -65,5 +69,5 @@ func _process(_delta: float) -> void:
 	var r := maxf(current_radius(), 0.3)
 	_disc.scale = Vector3.ONE * r
 	var fade := 1.0 - smoothstep(_grow, _grow + FADE, _t)
-	_mat.set_shader_parameter("color", Color(COLOR, COLOR.a * fade))
+	_mat.set_shader_parameter("color", Color(color, color.a * fade))
 	if _t > _grow + FADE: queue_free()

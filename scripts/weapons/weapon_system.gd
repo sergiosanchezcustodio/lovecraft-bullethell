@@ -19,6 +19,8 @@ var weapons: Array[Weapon] = []
 var _pending: Array[Dictionary] = []         ## proyectiles de ráfaga que salen con retardo
 var _bonus_set := -1                         ## rasgos de daño del jugador, registrados en las balas
 var _rings := {}                             ## Weapon -> OrbitRing (páginas del Necronomicón)
+var _drones := {}                            ## Weapon -> MiGoDrones (orbes Mi-Go)
+var _tethers := {}                           ## Weapon -> TetherBeam activo (Lente del Éter)
 
 func setup(p_player: Player, p_world: CombatWorld) -> WeaponSystem:
 	player = p_player
@@ -36,9 +38,10 @@ func remove_weapon(id: StringName) -> void:
 	for w in weapons.duplicate():
 		if w.data.id != id: continue
 		weapons.erase(w)
-		if _rings.has(w):
-			(_rings[w] as Node).queue_free()
-			_rings.erase(w)
+		for d: Dictionary in [_rings, _drones, _tethers]:
+			if d.has(w):
+				if is_instance_valid(d[w]): (d[w] as Node).queue_free()
+				d.erase(w)
 	_pending = _pending.filter(func(p: Dictionary) -> bool: return (p.w as Weapon).data.id != id)
 
 func get_weapon(id: StringName) -> Weapon:
@@ -89,6 +92,13 @@ func _fire(w: Weapon) -> bool:
 		return _wave(w)
 	if w.data.delivery == WeaponData.Delivery.FLAME:
 		return _flame(w, target_pos)
+	match w.data.delivery:
+		WeaponData.Delivery.SIGIL: return _sigil(w)
+		WeaponData.Delivery.PULSE: return _pulse(w)
+		WeaponData.Delivery.TETHER: return _tether(w)
+		WeaponData.Delivery.CLOUD: return _cloud(w, target_pos)
+		WeaponData.Delivery.DRONE: return _drone(w)
+		WeaponData.Delivery.STAB: return _stab(w)
 	if w.data.delivery == WeaponData.Delivery.THROWN:
 		for k in n:
 			var jitter := Vector3.ZERO
@@ -112,6 +122,7 @@ func _fire(w: Weapon) -> bool:
 			var delay := w.stat("burst_delay") * k
 			if delay > 0.0: _pending.append({"w": w, "dir": dir, "t": delay, "k": dmg_k})
 			else: _spawn_bullet(w, dir, dmg_k)
+		_pay_sanity(w)                           # balas arcanas (fuegos fatuos, Rayo de Yith)
 	fired.emit(w)
 	return true
 
@@ -120,10 +131,16 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 	var life := w.stat("range") / speed * 1.15
 	if _bonus_set < 0 and not player.data.bonus_tags.is_empty():
 		_bonus_set = world.bullets.register_bonus(player.data.bonus_tags)
-	world.bullets.spawn(BulletManager.Team.PLAYER, BulletManager.Style.PLAYER,
+	var style := BulletManager.Style.PLAYER
+	var effect := BulletManager.Effect.NONE
+	if w.stat("homing") > 0.0: style = BulletManager.Style.WISP
+	if w.stat("stasis") > 0.0:
+		style = BulletManager.Style.YITH
+		effect = BulletManager.Effect.STASIS
+	world.bullets.spawn(BulletManager.Team.PLAYER, style,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
 		w.stat("projectile_size"), Damage.new(dmg(w) * dmg_k, 0.0), life, int(w.stat("pierce")),
-		w.stat("knockback"), _bonus_set, int(w.stat("split_count")))
+		w.stat("knockback"), _bonus_set, int(w.stat("split_count")), w.stat("homing"), effect, w.stat("stasis"))
 
 ## Daño de un arma con los atributos del personaje (D-27).
 func dmg(w: Weapon) -> float:
@@ -204,6 +221,91 @@ func _slash(w: Weapon) -> bool:
 	fx.position = Vector3(origin.x, 0.0, origin.z)
 	world.fx.add_child(fx)
 	player.play_once("throw")                    # el brazo acompaña el tajo
+	fired.emit(w)
+	return true
+
+## Signo Arcano: se traza bajo el personaje y se queda ahí. Uno a la vez por arma: se
+## vuelve a trazar al recargarse.
+func _sigil(w: Weapon) -> bool:
+	_pay_sanity(w)
+	var s := Sigil.new().setup(world, player.global_position, w.stat("aoe_radius"), w.stat("duration"), dmg(w),
+		w.stat("hit_interval"), w.stat("knockback"), w.stat("bullet_slow"), player.data.bonus_tags)
+	world.fx.add_child(s)
+	fired.emit(w)
+	return true
+
+## Resonador de Tillinghast: onda que deshace balas enemigas. Solo vibra si hay balas o
+## enemigos a su alcance.
+func _pulse(w: Weapon) -> bool:
+	var origin := player.global_position
+	var r := w.stat("aoe_radius")
+	if world.bullets.count_enemy_bullets(origin, r) == 0 and world.enemies_in_circle(origin, r).is_empty(): return false
+	_pay_sanity(w)
+	var wave := Shockwave.new().setup(player, world, r, w.stat("duration"), dmg(w), w.stat("knockback"),
+		w.stat("stun"), player.data.bonus_tags)
+	wave.clears = true
+	wave.color = Color(0.45, 0.95, 0.85, 0.9)
+	world.fx.add_child(wave)
+	fired.emit(w)
+	return true
+
+## Lente del Éter: rayo sostenido. Espera a tener a alguien a tiro y no se solapa consigo.
+func _tether(w: Weapon) -> bool:
+	if is_instance_valid(_tethers.get(w)): return false
+	if world.nearest_enemy(player.global_position, w.stat("range")) == null: return false
+	_pay_sanity(w)
+	var b := TetherBeam.new().setup(player, world, dmg(w), w.stat("hit_interval"), w.stat("ramp"),
+		w.stat("ramp_max"), w.stat("range"), w.stat("duration"), player.data.bonus_tags)
+	_tethers[w] = b
+	world.fx.add_child(b)
+	fired.emit(w)
+	return true
+
+## Polvo de Ibn-Ghazi: nube que se queda donde está el grupo más denso.
+func _cloud(w: Weapon, target_pos: Vector3) -> bool:
+	_pay_sanity(w)
+	var z := DamageZone.new().setup(world, w.data.zone, target_pos, w.stat("zone_radius"), w.stat("zone_time"),
+		w.stat("zone_dps") * player.damage_mult(w.data.category), w.stat("vulnerable"), player.data.bonus_tags)
+	z.slow_k = w.stat("slow_factor")
+	z.weak_k = w.stat("weaken")
+	world.fx.add_child(z)
+	player.play_once("throw")
+	fired.emit(w)
+	return true
+
+## Orbes Mi-Go: se activan durante `duration` s y luego se recargan, como las páginas.
+func _drone(w: Weapon) -> bool:
+	var d := _drones.get(w) as MiGoDrones
+	if d == null:
+		d = MiGoDrones.new().setup(player, world)
+		_drones[w] = d
+		world.fx.add_child(d)
+	if d.active: return false
+	_pay_sanity(w)
+	if _bonus_set < 0 and not player.data.bonus_tags.is_empty():
+		_bonus_set = world.bullets.register_bonus(player.data.bonus_tags)
+	d.start(int(w.stat("count")), w.stat("aoe_radius"), dmg(w), w.stat("hit_interval"), w.stat("range"),
+		w.stat("projectile_speed"), w.stat("duration"), _bonus_set)
+	fired.emit(w)
+	return true
+
+## Daga ritual: puñalada al más cercano a menos de `range`, que queda maldito. Sin nadie
+## cerca, espera.
+func _stab(w: Weapon) -> bool:
+	var origin := player.global_position
+	var t := world.nearest_enemy(origin, w.stat("range"))
+	if t == null: return false
+	_pay_sanity(w)
+	var d := Damage.new(dmg(w), 0.0)
+	var away := t.global_position - origin
+	d.knockback = Vector3(away.x, 0, away.z).normalized() * w.stat("knockback")
+	d.bonus = player.data.bonus_tags
+	t.take_damage(d)
+	if t.is_alive() and t.has_method("curse"):
+		t.curse(w.stat("curse"), w.stat("curse_dps") * player.damage_mult(w.data.category), int(w.stat("curse_spread")),
+			player.data.bonus_tags)
+	world.fx.add_child(Stab.new().setup(origin, t.global_position))
+	player.play_once("throw")
 	fired.emit(w)
 	return true
 

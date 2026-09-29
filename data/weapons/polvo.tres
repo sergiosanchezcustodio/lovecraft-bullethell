@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"polvo"
+display_name = "Polvo de Ibn-Ghazi"
+description = "Esparce una nube sobre el grupo más denso: dentro, los enemigos van un 40 % más lentos y hacen un 30 % menos de daño. Cuesta cordura."
+category = 2
+delivery = 10
+targeting = 1
+cooldown = 6.0
+range = 7.0
+damage = 3.0
+zone = 3
+zone_radius = 2.4
+zone_time = 4.0
+zone_dps = 3.0
+slow_factor = 0.6
+weaken = 0.7
+aoe_radius = 2.4
+sanity_cost = 3.0
+max_level = 5
+level_mods = Array[Dictionary]([{"zone_radius*": 1.2, "aoe_radius*": 1.2}, {"zone_time+": 2.0}, {"zone_dps*": 2.0, "slow_factor*": 0.85}, {"zone_radius*": 1.2, "aoe_radius*": 1.2, "cooldown*": 0.8}])
+level_text = Array[String](["Nube un 20 % más amplia", "La nube dura 2 s más", "Doble daño y frena más", "Nube más amplia y más frecuente"])

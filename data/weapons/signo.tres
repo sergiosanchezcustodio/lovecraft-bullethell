@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"signo"
+display_name = "Signo Arcano"
+description = "Traza bajo sus pies un signo que daña y empuja hacia fuera a los enemigos; las balas enemigas que lo cruzan van a la mitad de velocidad. Cuesta cordura."
+category = 2
+delivery = 7
+targeting = 3
+cooldown = 7.0
+range = 3.0
+damage = 4.0
+aoe_radius = 2.6
+duration = 4.5
+hit_interval = 0.4
+knockback = 1.2
+bullet_slow = 0.5
+sanity_cost = 4.0
+max_level = 5
+level_mods = Array[Dictionary]([{"aoe_radius*": 1.15}, {"damage*": 1.35}, {"duration+": 1.5, "bullet_slow*": 0.8}, {"cooldown*": 0.8, "aoe_radius*": 1.1}])
+level_text = Array[String](["Signo un 15 % más amplio", "+35 % de daño", "Dura más y frena más las balas", "Se traza antes y es más amplio"])

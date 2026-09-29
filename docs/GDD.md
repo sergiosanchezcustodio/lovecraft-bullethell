@@ -257,6 +257,38 @@ Más potentes que las convencionales, pero **cada uso cuesta cordura**.
 | Trapezoedro Resplandeciente | Rayo de luz concentrada a través de la gema | *El morador de las tinieblas* |
 | Reactivo de Herbert West | Frasco que al romperse reanima brevemente a enemigos caídos como aliados | *Herbert West, reanimador* |
 
+### 5.3 Arsenal II (29-09-2026, completa D-29)
+Las 17 armas que faltaban de las 29 de D-29, propuestas para equilibrar los tres grupos (quedan 12 de fuego, 11 físicas y 11 mágicas) y con una mecánica nueva cada una. Se hacen en dos hitos: 2.7 (las mágicas) y 2.7b (las de fuego y las físicas).
+
+**Mágicas (cuestan cordura)**
+| Arma | Qué hace | Mecánica |
+|---|---|---|
+| Signo Arcano | Signo en el suelo, bajo el personaje, que daña y empuja hacia fuera; las balas enemigas que lo cruzan van a la mitad de velocidad | Zona que repele y frena balas (1 de las 2 que tocan balas) |
+| Resonador de Tillinghast (*Del más allá*) | Pulso periódico que deshace las balas enemigas cercanas y hace poco daño | Borra balas (la 2.ª de las 2) |
+| Báculo del Farolero | Fuegos fatuos que zigzaguean y buscan solos a los enemigos | Proyectiles teledirigidos |
+| Lente del Éter | Rayo sostenido cuyo daño crece mientras sigue sobre el mismo enemigo, hasta el triple | Daño que va en aumento |
+| Polvo de Ibn-Ghazi (*El horror de Dunwich*) | Nube que se queda donde cae: dentro, los enemigos van un 40 % más lentos y hacen un 30 % menos de daño | Ralentiza y debilita |
+| Orbe Mi-Go (*El que susurra en la oscuridad*) | Orbe que vuela solo alrededor del personaje y dispara al enemigo más cercano | Aliado volador |
+| Rayo de Yith (*La sombra fuera del tiempo*) | Congela al enemigo en el tiempo 1,5 s; el daño que recibe se guarda y se aplica al final, un 50 % mayor | Estasis con daño aplazado |
+| Daga ritual | Apuñala al más cercano y lo maldice (daño continuo); si muere maldito, la maldición salta a los de al lado | Maldición que se contagia |
+
+**De fuego**
+| Arma | Qué hace | Mecánica |
+|---|---|---|
+| Bobina Tesla portátil | Rayo que salta de enemigo en enemigo, hasta 4 (tecnología humana: crece con CON+INT) | Encadena objetivos |
+| Springfield M1903 con mira | Disparo lento y fuerte a la élite o al de más vida, con crítico triple | Prioriza élites y crítico |
+| Ametralladora Lewis en trípode | La deja en el suelo y dispara sola 8 s | Torreta fija |
+| Lugers P08 a dos manos | Disparan a la vez hacia donde anda el personaje y hacia atrás | Apunta con el movimiento |
+
+**Físicas**
+| Arma | Qué hace | Mecánica |
+|---|---|---|
+| Inyector de Herbert West (*Herbert West, reanimador*) | Dardo de suero: el que muere inyectado se levanta 6 s como aliado (sustituye al Reactivo de 5.2) | Reanima aliados |
+| Bumerán | Va hasta su alcance y vuelve, golpeando a la ida y a la vuelta | Ida y vuelta |
+| Red de pesca | Deja inmóvil 2 s al grupo donde cae (las élites solo se frenan) | Inmoviliza en área |
+| Martillo de geólogo | Golpe al suelo que abre una grieta en línea recta hacia delante | Grieta que avanza |
+| Bastón estoque | Estocada larga hacia delante que atraviesa todo lo que hay en la línea | Cuerpo a cuerpo frontal |
+
 ---
 
 ## 6. Personajes jugables

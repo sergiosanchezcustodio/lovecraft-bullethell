@@ -5,6 +5,8 @@
 //   1 físico: núcleo hueso, borde rojo anaranjado, contorno oscuro. Sólido y quieto.
 //   2 mental: anillo violeta que ondula y gira, núcleo lila tenue.
 //   3 mixto: núcleo físico dentro de un anillo mental.
+//   4 fuego fatuo (Báculo del Farolero) y 5 Rayo de Yith: trazadoras del jugador, verde
+//     pálido y turquesa.
 // INSTANCE_CUSTOM: x = estilo, y = fase (en las del jugador, el rumbo en radianes),
 // z = edad (s), w = radio visual (m).
 // Los colores se multiplican por `exposure_comp`: el tonemapper (ACES, exposición 1,6)
@@ -16,6 +18,8 @@ uniform vec3 core_color : source_color = vec3(1.0, 0.95, 0.85);
 uniform vec3 physical_color : source_color = vec3(1.0, 0.36, 0.18);
 uniform vec3 mental_color : source_color = vec3(0.72, 0.36, 1.0);
 uniform vec3 player_color : source_color = vec3(1.0, 0.8, 0.35);
+uniform vec3 wisp_color : source_color = vec3(0.55, 1.0, 0.6);
+uniform vec3 yith_color : source_color = vec3(0.3, 0.95, 0.95);
 uniform vec3 outline_color : source_color = vec3(0.05, 0.02, 0.04);
 uniform float exposure_comp = 0.55;
 
@@ -31,7 +35,8 @@ void vertex() {
 	// los casos: si una rama lo escribe y otra no, Godot deja la otra sin posición.
 	vec3 center = (VIEW_MATRIX * vec4(MODEL_MATRIX[3].xyz, 1.0)).xyz;
 	vec2 off = VERTEX.xy * s;
-	if (int(v_style + 0.5) == 0) {
+	int st = int(v_style + 0.5);
+	if (st == 0 || st >= 4) {
 		// Trazadora: se alarga en pantalla a lo largo de su rumbo
 		vec2 dir = normalize((VIEW_MATRIX * vec4(sin(v_phase), 0.0, cos(v_phase), 0.0)).xy + vec2(1e-5));
 		vec2 perp = vec2(-dir.y, dir.x);
@@ -53,12 +58,13 @@ void fragment() {
 	vec3 col = vec3(0.0);
 	float alpha = 0.0;
 	int style = int(v_style + 0.5);
-	if (style == 0) {
+	if (style == 0 || style >= 4) {
 		// cabeza brillante delante (UV.x alto) y estela que se desvanece detrás
 		float along = UV.x;
 		float across = abs(UV.y * 2.0 - 1.0);
 		alpha = smoothstep(1.0, 0.35, across) * smoothstep(0.0, 0.75, along) * 0.8;
-		col = mix(player_color * exposure_comp * 1.3, vec3(1.0, 0.95, 0.8) * 0.9, smoothstep(0.7, 0.95, along) * (1.0 - across));
+		vec3 pc = style == 4 ? wisp_color : (style == 5 ? yith_color : player_color);
+		col = mix(pc * exposure_comp * 1.3, vec3(1.0, 0.95, 0.8) * 0.9, smoothstep(0.7, 0.95, along) * (1.0 - across));
 	} else if (style == 1) {
 		alpha = smoothstep(0.97, 0.9, r);
 		col = r < 0.48 ? core_color * 0.85 : (r < 0.8 ? physical_color * exposure_comp : outline_color);

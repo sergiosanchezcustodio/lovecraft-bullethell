@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"yith"
+display_name = "Rayo de Yith"
+description = "Congela al enemigo en el tiempo 1,5 s; el daño que recibe mientras tanto se aplica al final, un 50 % mayor. Cuesta cordura."
+category = 2
+delivery = 0
+targeting = 0
+cooldown = 2.4
+range = 11.0
+damage = 14.0
+projectile_speed = 18.0
+projectile_radius = 0.28
+projectile_size = 0.24
+stasis = 1.5
+knockback = 0.2
+sanity_cost = 2.5
+max_level = 5
+level_mods = Array[Dictionary]([{"stasis+": 0.5}, {"damage*": 1.3}, {"count+": 1.0, "spread_deg+": 20.0}, {"cooldown*": 0.8, "stasis+": 0.5}])
+level_text = Array[String](["La estasis dura 0,5 s más", "+30 % de daño", "Dos rayos a la vez", "Dispara antes y congela más"])

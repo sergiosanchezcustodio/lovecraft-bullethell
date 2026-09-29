@@ -11,6 +11,8 @@ var radius := 1.6
 var life := 3.0
 var dps := 8.0
 var vulnerable := 0.0
+var slow_k := 1.0                            ## polvo: velocidad de los enemigos de dentro
+var weak_k := 1.0                            ## polvo: daño que hacen los de dentro
 var bonus := {}
 var _t := 0.0
 var _tick := 0.0
@@ -21,7 +23,9 @@ var _light: OmniLight3D
 const TICK := 0.3
 const FADE := 0.5
 const COLORS := {WeaponData.Zone.FIRE: [Color(1.0, 0.45, 0.12), Color(1.0, 0.78, 0.3)],
-	WeaponData.Zone.ACID: [Color(0.45, 0.85, 0.2), Color(0.75, 1.0, 0.45)]}
+	WeaponData.Zone.ACID: [Color(0.45, 0.85, 0.2), Color(0.75, 1.0, 0.45)],
+	# polvo: mancha sepia oscura y motas doradas (un tono pálido desaparecía sobre la nieve)
+	WeaponData.Zone.DUST: [Color(0.55, 0.36, 0.14), Color(1.0, 0.82, 0.4)]}
 
 func setup(p_world: CombatWorld, p_kind: int, pos: Vector3, p_radius: float, p_life: float, p_dps: float,
 		p_vulnerable: float = 0.0, p_bonus: Dictionary = {}) -> DamageZone:
@@ -38,7 +42,7 @@ func _ready() -> void:
 	disc.mesh = pm
 	_mat = ShaderMaterial.new()
 	_mat.shader = preload("res://scripts/fx/telegraph.gdshader")
-	_mat.set_shader_parameter("color", Color(cols[0] * 0.55, 0.5))
+	_mat.set_shader_parameter("color", Color(cols[0] * 0.55, _alpha()))
 	_mat.set_shader_parameter("fill", true)
 	_mat.set_shader_parameter("soft", true)
 	disc.material_override = _mat
@@ -57,7 +61,15 @@ func _ready() -> void:
 	ppm.spread = 12.0
 	ppm.initial_velocity_min = 0.6
 	ppm.initial_velocity_max = 1.6
-	ppm.gravity = Vector3(0, 0.6 if kind == WeaponData.Zone.FIRE else -0.5, 0)
+	ppm.gravity = Vector3(0, 0.6 if kind == WeaponData.Zone.FIRE else (0.05 if kind == WeaponData.Zone.DUST else -0.5), 0)
+	if kind == WeaponData.Zone.DUST:                # polvo: motas que flotan despacio y duran más
+		_parts.lifetime = 1.6
+		_parts.amount = int(clampf(radius * 18.0, 16.0, 48.0))
+		ppm.scale_min = 0.08
+		ppm.scale_max = 0.18
+		ppm.initial_velocity_min = 0.1
+		ppm.initial_velocity_max = 0.4
+		ppm.spread = 80.0
 	ppm.scale_min = 0.06
 	ppm.scale_max = 0.14
 	var g := Gradient.new()
@@ -99,9 +111,15 @@ func _physics_process(delta: float) -> void:
 		d.bonus = bonus
 		e.take_damage(d)
 		if vulnerable > 0.0 and e.has_method("make_vulnerable") and e.is_alive(): e.make_vulnerable(vulnerable)
+		if slow_k < 1.0 and e.has_method("slow") and e.is_alive(): e.slow(TICK + 0.25, slow_k)
+		if weak_k < 1.0 and e.has_method("weaken") and e.is_alive(): e.weaken(TICK + 0.25, weak_k)
 
 func _process(_delta: float) -> void:
 	var fade := 1.0 - smoothstep(life, life + FADE, _t)
 	var cols: Array = COLORS.get(kind, COLORS[WeaponData.Zone.FIRE])
-	_mat.set_shader_parameter("color", Color(cols[0] * 0.55, 0.5 * fade))
+	_mat.set_shader_parameter("color", Color(cols[0] * 0.55, _alpha() * fade))
 	if _light: _light.light_energy = (0.8 + 0.4 * sin(_t * 23.0) * sin(_t * 7.0)) * fade
+
+## Opacidad de la mancha: el polvo, más densa para que se lea sobre la nieve.
+func _alpha() -> float:
+	return 0.75 if kind == WeaponData.Zone.DUST else 0.5

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"resonador"
+display_name = "Resonador de Tillinghast"
+description = "Vibra cada poco y su pulso deshace las balas enemigas cercanas; hace poco daño. Solo vibra si hay balas o enemigos cerca. Cuesta cordura."
+category = 2
+delivery = 8
+targeting = 3
+cooldown = 3.5
+range = 3.2
+damage = 6.0
+aoe_radius = 3.2
+duration = 0.4
+knockback = 0.5
+sanity_cost = 2.0
+max_level = 5
+level_mods = Array[Dictionary]([{"aoe_radius*": 1.15}, {"cooldown*": 0.85}, {"damage*": 1.5}, {"aoe_radius*": 1.15, "cooldown*": 0.85}])
+level_text = Array[String](["Pulso un 15 % más amplio", "Vibra un 15 % más a menudo", "+50 % de daño", "Pulso más amplio y más frecuente"])

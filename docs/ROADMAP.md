@@ -93,7 +93,8 @@ Ampliada el 26-09-2026: adelanta de la fase 5 el guardado, el menú principal, l
 | 2.4b ⏸ | Siete personajes más (D-26), en dos tandas con revisión: Peaslee, Varga, Whipple y Blake (rifle, Necronomicón, bisturís, Trapezoedro); después Iwanicki, Elwood y Malone (fórmula de expulsión, Colt .45, Thompson) | Las dos tandas hechas, **pendientes de tu revisión** |
 | 2.5 | Atributos (D-27): los siete, repartos por personaje, +1 ponderado al subir de nivel, un arma al empezar, 4 armas y 4 objetos (D-28), personajes de inicio 2+2 (D-30) | **Hecho** |
 | 2.6 | Arsenal I (D-29): armas de fuego y lanzadas, fusiones con las antiguas, zonas de daño y estados de los enemigos; granadas de palo en el cinturón de Dyer | **Hecho** |
-| 2.7 | Arsenal II (D-29): arcanas y tecnología de los Mitos | Pendiente |
+| 2.7 ⏸ | Arsenal II (D-29, GDD 5.3): las 8 mágicas (Signo Arcano, Resonador, Báculo del Farolero, Lente del Éter, Polvo de Ibn-Ghazi, Orbe Mi-Go, Rayo de Yith, Daga ritual) | Hecho; **pendiente de tu revisión** |
+| 2.7b | Arsenal II (GDD 5.3): las 4 de fuego (Tesla, Springfield, Lewis, Lugers) y las 5 físicas (inyector de West, bumerán, red, martillo, bastón estoque) | Pendiente |
 | 2.8 | Clima estético (D-33) | Pendiente |
 | 2.9 | Partida de 1 a 4 jugadores: cámara compartida con zoom, HUD en las cuatro esquinas, bots como jugadores extra | Pendiente |
 | 2.10 | Reglas del cooperativo: experiencia compartida, subida de nivel por cuadrante, pausa común, escalado, reanimación | Pendiente |

@@ -9,7 +9,10 @@ extends Node3D
 
 enum Team { PLAYER, ENEMY }
 ## Estilo visual (lenguaje de daños, GDD 4.4): lo lee el shader por instancia.
-enum Style { PLAYER, PHYSICAL, MENTAL, MIXED }
+## WISP y YITH son trazadoras del jugador de otro color (Báculo del Farolero, Rayo de Yith).
+enum Style { PLAYER, PHYSICAL, MENTAL, MIXED, WISP, YITH }
+## Efecto al impactar una bala del jugador: ninguno o estasis (Rayo de Yith, `_effect_val` s).
+enum Effect { NONE, STASIS }
 
 const MAX_BULLETS := 4096
 const HEIGHT := 0.8                          ## altura de vuelo (a la altura del pecho)
@@ -32,6 +35,10 @@ var _pierce := PackedInt32Array()
 var _push := PackedFloat32Array()            ## empuje del impacto (multiplicador)
 var _bonus := PackedInt32Array()             ## índice en bonus_sets (-1 = sin rasgo)
 var _split := PackedInt32Array()             ## al morir se divide en tantos proyectiles (fuegos artificiales)
+var _home := PackedFloat32Array()            ## giro máximo hacia el enemigo más cercano (rad/s; 0 = recta)
+var _effect := PackedByteArray()             ## Effect al impactar
+var _effect_val := PackedFloat32Array()
+var _slowed := PackedByteArray()             ## 1 si ya la frenó un Signo Arcano (solo una vez)
 ## Rasgos de daño de quien dispara (Damage.bonus), registrados una vez por jugador.
 var bonus_sets: Array[Dictionary] = []
 var _last_hit := PackedInt64Array()          ## id del último objetivo tocado (para las que atraviesan);
@@ -50,6 +57,7 @@ func _init() -> void:
 	_age.resize(MAX_BULLETS); _phys.resize(MAX_BULLETS); _ment.resize(MAX_BULLETS)
 	_team.resize(MAX_BULLETS); _style.resize(MAX_BULLETS); _pierce.resize(MAX_BULLETS)
 	_last_hit.resize(MAX_BULLETS); _push.resize(MAX_BULLETS); _bonus.resize(MAX_BULLETS); _split.resize(MAX_BULLETS)
+	_home.resize(MAX_BULLETS); _effect.resize(MAX_BULLETS); _effect_val.resize(MAX_BULLETS); _slowed.resize(MAX_BULLETS)
 
 func _ready() -> void:
 	_mm = MultiMesh.new()
@@ -96,7 +104,8 @@ func _ready() -> void:
 
 ## Crea una bala. `pos` se proyecta a la altura de vuelo.
 func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, size: float,
-		damage: Damage, life: float, pierce: int = 0, push: float = 1.0, bonus_set: int = -1, split: int = 0) -> void:
+		damage: Damage, life: float, pierce: int = 0, push: float = 1.0, bonus_set: int = -1, split: int = 0,
+		homing: float = 0.0, effect: Effect = Effect.NONE, effect_val: float = 0.0) -> void:
 	if count >= MAX_BULLETS: return
 	var i := count
 	_pos[i] = Vector3(pos.x, HEIGHT, pos.z)
@@ -115,6 +124,10 @@ func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, 
 	_push[i] = push
 	_bonus[i] = bonus_set
 	_split[i] = split
+	_home[i] = homing
+	_effect[i] = effect
+	_effect_val[i] = effect_val
+	_slowed[i] = 0
 	count += 1
 
 ## Registra los rasgos de daño de un tirador y devuelve su índice para spawn().
@@ -125,12 +138,45 @@ func register_bonus(bonus: Dictionary) -> int:
 func clear() -> void:
 	count = 0
 
+## Signo Arcano: las balas enemigas dentro del círculo pasan a ir a `factor` de su
+## velocidad (cada bala, una sola vez). Devuelve cuántas ha frenado.
+func slow_enemy_bullets(center: Vector3, r: float, factor: float) -> int:
+	var c := Vector2(center.x, center.z)
+	var n := 0
+	for i in count:
+		if _team[i] != Team.ENEMY or _slowed[i] == 1: continue
+		if Vector2(_pos[i].x, _pos[i].z).distance_squared_to(c) > r * r: continue
+		_vel[i] *= factor
+		_slowed[i] = 1
+		n += 1
+	return n
+
+## Resonador: deshace las balas enemigas dentro del círculo. Devuelve cuántas.
+func clear_enemy_bullets(center: Vector3, r: float) -> int:
+	var c := Vector2(center.x, center.z)
+	var n := 0
+	for i in range(count - 1, -1, -1):          # hacia atrás: _remove trae la última a su hueco
+		if _team[i] != Team.ENEMY: continue
+		if Vector2(_pos[i].x, _pos[i].z).distance_squared_to(c) > r * r: continue
+		_remove(i)
+		n += 1
+	return n
+
+## Balas enemigas dentro del círculo (el Resonador solo vibra si hay algo que deshacer).
+func count_enemy_bullets(center: Vector3, r: float) -> int:
+	var c := Vector2(center.x, center.z)
+	var n := 0
+	for i in count:
+		if _team[i] == Team.ENEMY and Vector2(_pos[i].x, _pos[i].z).distance_squared_to(c) <= r * r: n += 1
+	return n
+
 func _physics_process(delta: float) -> void:
 	var t0 := Prof.start()
 	var b := world.bounds if world != null else Rect2(-100, -100, 200, 200)
 	var i := 0
 	while i < count:
 		_prev[i] = _pos[i]
+		if _home[i] > 0.0 and world != null: _steer(i, delta)
 		_pos[i] += _vel[i] * delta
 		_age[i] += delta
 		var dead := _age[i] >= _life[i] or not b.has_point(Vector2(_pos[i].x, _pos[i].z))
@@ -142,6 +188,20 @@ func _physics_process(delta: float) -> void:
 		else:
 			i += 1
 	Prof.stop("balas", t0)
+
+## Fuegos fatuos: giran hacia el enemigo más cercano (como mucho _home rad/s) con un
+## vaivén que los hace zigzaguear.
+func _steer(i: int, delta: float) -> void:
+	var v := Vector2(_vel[i].x, _vel[i].z)
+	var spd := v.length()
+	if spd < 0.01: return
+	var a := v.angle()
+	var t := world.nearest_enemy(_pos[i], 7.0)
+	if t != null:
+		var want := Vector2(t.global_position.x - _pos[i].x, t.global_position.z - _pos[i].z).angle()
+		a += clampf(wrapf(want - a, -PI, PI), -_home[i] * delta, _home[i] * delta)
+	a += sin(_age[i] * 11.0 + float(i)) * 2.2 * delta               # vaivén
+	_vel[i] = Vector3(cos(a) * spd, 0.0, sin(a) * spd)
 
 func _collide_enemy_bullet(i: int) -> bool:
 	var p := Vector2(_pos[i].x, _pos[i].z)
@@ -163,6 +223,7 @@ func _collide_player_bullet(i: int) -> bool:
 		d.knockback = _vel[i].normalized() * _push[i]
 		if _bonus[i] >= 0: d.bonus = bonus_sets[_bonus[i]]
 		t.take_damage(d)
+		if _effect[i] == Effect.STASIS and t.is_alive() and t.has_method("stasis"): t.stasis(_effect_val[i])
 		_last_hit[i] = t.get_instance_id()
 		_pierce[i] -= 1
 		if _pierce[i] < 0: return true
@@ -186,6 +247,7 @@ func _remove(i: int) -> void:
 		_life[i] = _life[last]; _age[i] = _age[last]; _phys[i] = _phys[last]; _ment[i] = _ment[last]
 		_team[i] = _team[last]; _style[i] = _style[last]; _pierce[i] = _pierce[last]; _last_hit[i] = _last_hit[last]
 		_push[i] = _push[last]; _bonus[i] = _bonus[last]; _split[i] = _split[last]
+		_home[i] = _home[last]; _effect[i] = _effect[last]; _effect_val[i] = _effect_val[last]; _slowed[i] = _slowed[last]
 	count = last
 
 func _process(_delta: float) -> void:
@@ -201,13 +263,13 @@ func _process(_delta: float) -> void:
 	for i in count:
 		var s := _size[i]
 		var p := _prev[i].lerp(_pos[i], frac)
-		if _style[i] == Style.PLAYER:
+		if _team[i] == Team.PLAYER:
 			var o := np * 16
 			_buffer[o] = s; _buffer[o + 1] = 0.0; _buffer[o + 2] = 0.0; _buffer[o + 3] = p.x
 			_buffer[o + 4] = 0.0; _buffer[o + 5] = s; _buffer[o + 6] = 0.0; _buffer[o + 7] = p.y
 			_buffer[o + 8] = 0.0; _buffer[o + 9] = 0.0; _buffer[o + 10] = s; _buffer[o + 11] = p.z
 			# fase: el rumbo, para alargar la trazadora
-			_buffer[o + 12] = 0.0; _buffer[o + 13] = atan2(_vel[i].x, _vel[i].z)
+			_buffer[o + 12] = float(_style[i]); _buffer[o + 13] = atan2(_vel[i].x, _vel[i].z)
 			_buffer[o + 14] = _age[i]; _buffer[o + 15] = s
 			np += 1
 		else:

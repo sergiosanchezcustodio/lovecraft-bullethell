@@ -11,9 +11,20 @@ enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND }
 ## `duration` s, empuja hacia fuera y aturde `stun` s a lo que alcanza.
 ## FLAME: chorro en cono delante del personaje durante `duration` s (alcance `range`, abertura
 ## `spread_deg`) que deja fuego en el suelo.
-enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE, FLAME }
-## Zona que deja en el suelo (lanzados, lanzallamas): ninguna, fuego o ácido.
-enum Zone { NONE, FIRE, ACID }
+## Arsenal II (hito 2.7):
+## SIGIL: signo en el suelo bajo el personaje durante `duration` s (radio aoe_radius) que daña
+## `damage` cada hit_interval, empuja hacia fuera y frena las balas enemigas (bullet_slow).
+## PULSE: onda como WAVE que además deshace las balas enemigas que alcanza (Resonador).
+## TETHER: rayo sostenido `duration` s sobre un enemigo; cada hit_interval hace `damage` y,
+## si sigue sobre el mismo, el daño crece `ramp` hasta ramp_max veces (Lente del Éter).
+## CLOUD: deja una zona (zone) donde está el grupo más denso (Polvo de Ibn-Ghazi).
+## DRONE: `count` orbes que vuelan alrededor del personaje (aoe_radius) durante `duration`
+## s y disparan al más cercano cada hit_interval (Orbe Mi-Go).
+## STAB: puñalada al más cercano a menos de `range` que lo maldice (Daga ritual).
+enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE, FLAME, SIGIL, PULSE, TETHER, CLOUD, DRONE, STAB }
+## Zona que deja en el suelo (lanzados, lanzallamas, nube): ninguna, fuego, ácido o polvo
+## (ralentiza y debilita).
+enum Zone { NONE, FIRE, ACID, DUST }
 
 ## Tipo de ataque, para los atributos (D-27): físico (FUE+TEN: cuerpo a cuerpo y lanzadas
 ## con el brazo), de fuego (CON+INT) o mágico (POD+CUL: arcanas y tecnología de los Mitos).
@@ -55,6 +66,16 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var lure := 0.0                      ## s que la bengala atrae a los enemigos cercanos
 @export var arc_height := 2.2                ## altura del arco de los lanzados
 @export var look := "dinamita"               ## aspecto del lanzado: dinamita, granada, molotov, frasco, bengala
+@export var homing := 0.0                    ## giro máximo hacia el enemigo más cercano (rad/s; fuegos fatuos)
+@export var stasis := 0.0                    ## s de estasis al impactar (Rayo de Yith)
+@export var bullet_slow := 0.5               ## velocidad de las balas enemigas dentro del signo
+@export var slow_factor := 1.0               ## velocidad de los enemigos dentro de la zona (polvo)
+@export var weaken := 1.0                    ## daño que hacen los enemigos dentro de la zona (polvo)
+@export var ramp := 0.0                      ## rayo sostenido: aumento del daño por golpe al mismo enemigo
+@export var ramp_max := 1.0                  ## rayo sostenido: tope del multiplicador
+@export var curse := 0.0                     ## s de maldición (Daga ritual)
+@export var curse_dps := 0.0                 ## daño por segundo de la maldición
+@export var curse_spread := 0.0              ## enemigos a los que salta al morir el maldito
 @export_group("Progresión")
 @export var max_level := 5
 ## Mejora de cada nivel a partir del 2 (índice 0 = nivel 2). Claves "estadística*"

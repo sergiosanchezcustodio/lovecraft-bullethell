@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"farolero"
+display_name = "Báculo del Farolero"
+description = "Suelta fuegos fatuos que zigzaguean y buscan solos a los enemigos. Cuesta cordura."
+category = 2
+delivery = 0
+targeting = 0
+cooldown = 1.3
+range = 11.0
+damage = 9.0
+count = 2.0
+spread_deg = 50.0
+projectile_speed = 8.0
+projectile_radius = 0.3
+projectile_size = 0.2
+jitter_deg = 15.0
+homing = 4.0
+knockback = 0.5
+sanity_cost = 1.5
+max_level = 5
+level_mods = Array[Dictionary]([{"count+": 1.0}, {"damage*": 1.25}, {"homing*": 1.4, "projectile_speed*": 1.2}, {"count+": 2.0, "damage*": 1.15}])
+level_text = Array[String](["Un fuego fatuo más", "+25 % de daño", "Buscan mejor y vuelan más deprisa", "Dos fuegos más y +15 % de daño"])

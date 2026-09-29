@@ -27,6 +27,21 @@ var _vulnerable := 0.0                      ## s que recibe +25 % de daño (áci
 var _lure_t := 0.0                          ## s que le atrae una bengala
 var _lure_pos := Vector3.ZERO
 const VULNERABLE_MULT := 1.25
+# Arsenal II (hito 2.7)
+var _slow_t := 0.0                          ## s que va más lento (Polvo de Ibn-Ghazi)
+var _slow_k := 1.0                          ## factor de velocidad mientras dura
+var _weak_t := 0.0                          ## s que hace menos daño (Polvo de Ibn-Ghazi)
+var _weak_k := 1.0
+var _stasis_t := 0.0                        ## s congelado en el tiempo (Rayo de Yith)
+var _stasis_store := 0.0                    ## daño recibido durante la estasis, aplazado
+var _curse_t := 0.0                         ## s maldito (Daga ritual): daño continuo
+var _curse := {}                            ## {len, dps, spread, bonus}: para contagiarla al morir
+var _curse_tick := 0.0
+const STASIS_MULT := 1.5                    ## el daño aplazado sale un 50 % mayor
+const CURSE_TICK := 0.5
+const CURSE_JUMP := 3.5                     ## m a los que salta la maldición
+var _status_mat: StandardMaterial3D         ## tinte de la estasis o la maldición
+var _overlay: Material = null               ## el que lleva puesto el modelo ahora
 var _flash := 0.0
 var _flash_on := false
 var _flash_mat: StandardMaterial3D
@@ -96,6 +111,39 @@ func lure(pos: Vector3, seconds: float) -> void:
 func is_vulnerable() -> bool:
 	return _vulnerable > 0.0
 
+## Más lento durante `seconds`: la velocidad pasa a `factor` (las élites, la mitad de efecto).
+func slow(seconds: float, factor: float) -> void:
+	_slow_t = maxf(_slow_t, seconds)
+	_slow_k = lerpf(1.0, factor, 0.5 if data.elite else 1.0)
+
+## Debilitado durante `seconds`: su contacto y sus balas hacen `factor` del daño.
+func weaken(seconds: float, factor: float) -> void:
+	_weak_t = maxf(_weak_t, seconds)
+	_weak_k = factor
+
+## Congelado en el tiempo (las élites, la mitad): ni se mueve ni ataca, y el daño que recibe
+## se guarda y se aplica al terminar, un 50 % mayor.
+func stasis(seconds: float) -> void:
+	if _stasis_t > 0.0: return
+	_stasis_t = seconds * (0.5 if data.elite else 1.0)
+	_stasis_store = 0.0
+
+func in_stasis() -> bool:
+	return _stasis_t > 0.0
+
+## Maldito durante `seconds`: pierde `dps` por segundo y, si muere así, la maldición salta a
+## los `spread` enemigos más cercanos.
+func curse(seconds: float, dps: float, spread: int, bonus: Dictionary = {}) -> void:
+	_curse_t = maxf(_curse_t, seconds)
+	_curse = {"len": seconds, "dps": dps, "spread": spread, "bonus": bonus}
+
+func is_cursed() -> bool:
+	return _curse_t > 0.0
+
+## Velocidad actual (con el ralentizado aplicado): para los tests.
+func speed_mult() -> float:
+	return _slow_k if _slow_t > 0.0 else 1.0
+
 ## Aturdido durante `seconds` (las élites, la mitad).
 func stun(seconds: float) -> void:
 	_stun = maxf(_stun, seconds * (0.5 if data.elite else 1.0))
@@ -104,12 +152,17 @@ func take_damage(d: Damage) -> void:
 	if not is_alive(): return
 	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
 	for tag in data.tags: k *= float(d.bonus.get(tag, 1.0))    # rasgos contra este tipo de enemigo
+	if _stasis_t > 0.0:                        # congelado: el daño se guarda para el final
+		_stasis_store += d.physical * k
+		_flash = 0.07
+		return
 	health -= d.physical * k
 	_flash = 0.07
 	_knock += Vector3(d.knockback.x, 0, d.knockback.z) * (2.5 if not data.elite else 0.6)
 	if health <= 0.0: _die()
 
 func _die() -> void:
+	if _curse_t > 0.0 and int(_curse.get("spread", 0)) > 0: _spread_curse()
 	var fx := DeathBurst.new()
 	fx.setup(data.model, data.body_radius)
 	fx.position = global_position
@@ -117,12 +170,54 @@ func _die() -> void:
 	died.emit(self)
 	queue_free()
 
+## La maldición salta a los más cercanos que aún no la llevan.
+func _spread_curse() -> void:
+	var near := world.enemies_in_circle(global_position, CURSE_JUMP)
+	near.sort_custom(func(a: Node3D, b: Node3D) -> bool:
+		return a.global_position.distance_squared_to(global_position) < b.global_position.distance_squared_to(global_position))
+	var left := int(_curse.spread)
+	for e in near:
+		if left <= 0: break
+		if e == self or not e.has_method("curse") or e.is_cursed(): continue
+		e.curse(_curse.len, _curse.dps, _curse.spread, _curse.bonus)
+		var fx := CurseJump.new().setup(global_position, e.global_position)
+		world.fx.add_child(fx)
+		left -= 1
+
+## Estados del arsenal II: estasis (y su daño aplazado), maldición, ralentizado y debilitado.
+## Devuelve true si está congelado (no se mueve ni ataca este paso).
+func _update_status(delta: float) -> bool:
+	if _slow_t > 0.0: _slow_t -= delta
+	if _weak_t > 0.0: _weak_t -= delta
+	runner.damage_mult = _weak_k if _weak_t > 0.0 else 1.0
+	if _curse_t > 0.0:
+		_curse_t -= delta
+		_curse_tick -= delta
+		if _curse_tick <= 0.0:
+			_curse_tick = CURSE_TICK
+			var d := Damage.new(float(_curse.dps) * CURSE_TICK, 0.0)
+			d.bonus = _curse.bonus
+			take_damage(d)
+			if not is_alive(): return true
+	if _stasis_t > 0.0:
+		_stasis_t -= delta
+		if _stasis_t <= 0.0 and _stasis_store > 0.0:
+			var d := Damage.new(_stasis_store * STASIS_MULT, 0.0)
+			_stasis_store = 0.0
+			take_damage(d)
+		return true
+	return false
+
 func _physics_process(delta: float) -> void:
 	if not is_alive(): return
 	var t0 := Prof.start()
 	_spawn_t += delta
+	if _update_status(delta):                  # congelado en el tiempo (o muerto por la maldición)
+		Prof.stop("enemigos_fisica", t0)
+		return
 	var target := target_player()
 	velocity = behavior.update(self, target, delta)
+	if _slow_t > 0.0: velocity *= _slow_k
 	if _vulnerable > 0.0: _vulnerable -= delta
 	if _lure_t > 0.0:                          # bengala: va hacia la luz en lugar del jugador
 		_lure_t -= delta
@@ -153,7 +248,8 @@ func _physics_process(delta: float) -> void:
 		var r := data.body_radius + p.data.hurt_radius
 		var pp := p.global_position
 		if Vector2(pp.x - position.x, pp.z - position.z).length_squared() < r * r:
-			p.take_damage(behavior.contact_damage(self))
+			var cd := behavior.contact_damage(self)
+			p.take_damage(cd.scaled(_weak_k) if _weak_t > 0.0 else cd)
 	# Ataque a distancia
 	if data.attack != null and target != null and _stun <= 0.0 and behavior.can_shoot(self):
 		_attack_timer -= delta
@@ -168,13 +264,27 @@ func _process(delta: float) -> void:
 	visual.global_position = get_global_transform_interpolated().origin
 	visual.rotation.y = atan2(facing.x, facing.z)
 	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0)       # aparece creciendo
-	if not anim_hold:
+	if not anim_hold and _stasis_t <= 0.0:          # congelado: la animación se detiene
 		anim_t = fposmod(anim_t + delta / Anims.duration(data.model, anim), 1.0)
 	Anims.pose(data.model, anim, model, anim_t)
 	_flash -= delta
-	var flashing := _flash > 0.0
-	if flashing != _flash_on:          # solo se toca el material al cambiar
-		_flash_on = flashing
+	# tinte: destello al recibir daño; si no, turquesa en estasis o violeta maldito.
+	# Solo se toca el material al cambiar.
+	var want: Material = null
+	if _flash > 0.0: want = _flash_mat
+	elif _stasis_t > 0.0: want = _status(Color(0.35, 0.95, 1.0, 0.5))
+	elif _curse_t > 0.0: want = _status(Color(0.55, 0.12, 0.7, 0.35 + 0.1 * sin(_spawn_t * 9.0)))
+	if want != _overlay:
+		_overlay = want
 		for mi: MeshInstance3D in model.get_meta("meshes"):
-			mi.material_overlay = _flash_mat if flashing else null
+			mi.material_overlay = want
 	Prof.stop("enemigos_anim", t0)
+
+## Material de tinte de estado (uno por enemigo, se cambia su color).
+func _status(c: Color) -> StandardMaterial3D:
+	if _status_mat == null:
+		_status_mat = StandardMaterial3D.new()
+		_status_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_status_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_status_mat.albedo_color = c
+	return _status_mat

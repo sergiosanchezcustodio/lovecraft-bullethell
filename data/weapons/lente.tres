@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"lente"
+display_name = "Lente del Éter"
+description = "Rayo sostenido sobre un enemigo: su daño crece mientras sigue sobre él, hasta el triple. Si el enemigo cae, salta a otro. Cuesta cordura."
+category = 2
+delivery = 9
+targeting = 0
+cooldown = 5.0
+range = 8.0
+damage = 5.0
+duration = 3.0
+hit_interval = 0.25
+ramp = 0.2
+ramp_max = 3.0
+sanity_cost = 4.0
+max_level = 5
+level_mods = Array[Dictionary]([{"duration+": 1.0}, {"damage*": 1.3}, {"ramp*": 1.5}, {"range*": 1.2, "damage*": 1.2, "ramp_max+": 1.0}])
+level_text = Array[String](["El rayo dura un segundo más", "+30 % de daño", "El daño crece más deprisa", "Más alcance, +20 % de daño y hasta el cuádruple"])

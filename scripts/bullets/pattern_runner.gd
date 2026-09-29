@@ -10,6 +10,7 @@ var world: CombatWorld
 var pattern: BulletPattern
 var aim_provider: Callable            ## () -> Vector3 posición a la que apuntar
 var busy := false
+var damage_mult := 1.0                ## lo baja el Polvo de Ibn-Ghazi (enemigo debilitado)
 var _burst := 0
 var _timer := 0.0
 var _firing := false
@@ -47,6 +48,7 @@ func _physics_process(delta: float) -> void:
 	var target: Vector3 = aim_provider.call() if aim_provider.is_valid() else origin + Vector3.FORWARD
 	var aim := Vector3(target.x - origin.x, 0, target.z - origin.z)
 	var dmg := pattern.damage()
+	if damage_mult != 1.0: dmg = dmg.scaled(damage_mult)
 	for dir in pattern.directions(aim, _burst):
 		world.bullets.spawn(BulletManager.Team.ENEMY, pattern.style(), origin + dir * 0.5,
 			dir * pattern.speed, pattern.radius, pattern.size, dmg, pattern.lifetime)
