@@ -3,8 +3,7 @@ extends Control
 ## Tienda (D-31, hito 2.13b): cuatro pestañas (potenciadores, personajes, compañeros y
 ## mejoras) con lo que hay, su nivel, lo que cuesta el siguiente y lo que hace. A compra (con
 ## confirmación), LB/RB o Q/E cambian de pestaña y B / Esc cierra. Lo comprado se guarda al
-## momento. El fondo es provisional: la tienda de antigüedades con el anciano llega en el
-## hito 2.13d.
+## momento. Detrás, la tienda de antigüedades con el anciano (ShopBackdrop).
 
 signal closed
 
@@ -20,8 +19,12 @@ var _focus_id := ""                          ## artículo a enfocar al redibujar
 func _ready() -> void:
 	if save == null: save = Saves.current
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var w: Array = MenuKit.window(self, UiKit.GOLD, 980)
+	add_child(ShopBackdrop.new())                             # la tienda de antigüedades con el anciano
+	var w: Array = MenuKit.window(self, UiKit.GOLD, 900)
 	var box: VBoxContainer = w[1]
+	var win_root: Control = w[0]
+	(win_root.get_child(0) as ColorRect).color = Color(0, 0, 0.02, 0.12)   # sin oscurecer la escena
+	(win_root.get_child(1) as Control).anchor_left = 0.47                  # la ventana, a la derecha
 	box.add_child(MenuKit.title("Tienda", 48))
 	_money = UiKit.label("", 24, UiKit.GOLD)
 	_money.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -38,7 +41,7 @@ func _ready() -> void:
 		tabs.add_child(b)
 		_tabs.append(b)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(920, 520)
+	scroll.custom_minimum_size = Vector2(840, 520)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	box.add_child(scroll)
@@ -85,7 +88,7 @@ func _row(e: Shop.Entry) -> Button:
 	var price := Shop.next_price(save, e)
 	var afford := Shop.can_buy(save, e)
 	var b := MenuKit.button("", UiKit.GOLD, 22)
-	b.custom_minimum_size = Vector2(880, 92)
+	b.custom_minimum_size = Vector2(810, 92)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var h := HBoxContainer.new()
 	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -111,7 +114,7 @@ func _row(e: Shop.Entry) -> Button:
 	col.add_child(UiKit.label(name, 22, UiKit.TEXT))
 	var d := UiKit.label(e.description, 15, UiKit.TEXT_DIM)
 	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	d.custom_minimum_size.x = 560
+	d.custom_minimum_size.x = 500
 	col.add_child(d)
 	var tag := ""
 	var color := UiKit.GOLD

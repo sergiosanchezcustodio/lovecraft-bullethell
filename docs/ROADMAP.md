@@ -103,7 +103,7 @@ Ampliada el 26-09-2026: adelanta de la fase 5 el guardado, el menú principal, l
 | 2.13a ⏸ | Economía (D-31): dólares por enemigo, bono por nivel, baúles arcanos, resumen con lo ganado | Hecho; **pendiente de tu revisión** |
 | 2.13b ⏸ | Tienda: catálogo por datos para ~10 h (potenciadores 5×5, personajes, compañeros, 5.º hueco de arma y de objeto), compra con confirmación, efectos en partida | Hecho; **pendiente de tu revisión** |
 | 2.13c ⏸ | Compañeros: perro de trineo de Lake (muerde) y gato de Ulthar (−20 % de daño mental), con modelo | Hecho; **pendiente de tu revisión** |
-| 2.13d ⏸ | Tienda de antigüedades en voxel con el anciano (diorama detrás del menú) | Pendiente |
+| 2.13d ⏸ | Tienda de antigüedades en voxel con el anciano (diorama detrás del menú) | Hecho; **pendiente de tu revisión** |
 | 2.14 | Logros y desbloqueos (D-32) | Pendiente |
 | 2.15 ⏸ | Vestuario (D-34) en dos tandas: sistema y 8 prendas; después el resto | Pendiente |
 | 2.16 ⏸ | Cierre: prueba de carga con 4 jugadores y tu prueba con varios mandos | Pendiente |

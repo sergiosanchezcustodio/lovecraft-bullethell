@@ -79,3 +79,12 @@ func test_el_jugador_aplica_los_potenciadores() -> void:
 	p.rebuild_stats()
 	assert_almost_eq(p.data.max_health, base * 1.2, 0.01)
 	assert_almost_eq(p.damage_mult(WeaponData.Category.FIREARM), dmg * 1.1, 0.001)
+
+func test_la_tienda_de_antiguedades_tiene_su_decorado_y_su_anciano() -> void:
+	assert_true(FileAccess.file_exists("res://models/tienda_antiguedades.json"))
+	assert_true(FileAccess.file_exists("res://models/anciano.json"))
+	assert_true(Anims.has_anim("anciano", "idle"))
+	var b := ShopBackdrop.new()
+	add_child_autofree(b)
+	assert_not_null(b._keeper)
+	b._process(0.1)
