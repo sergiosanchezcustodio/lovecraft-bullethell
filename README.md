@@ -84,7 +84,7 @@ Un grupo de investigadores sacados de los relatos de Lovecraft atraviesa los esc
 
 Todos proceden de los relatos de Lovecraft, o son parientes o allegados inventados de sus personajes. Se modelan a **bloques limpios**, con los detalles pintados sobre superficies planas. Se empieza con cuatro (Dyer, Olmstead, Peaslee y Whipple); el resto se consigue en la tienda o jugando.
 
-Cada personaje tiene **siete atributos** (Poder, Inteligencia, Fuerza, Constitución, Tenacidad, Destreza y Educación), todos a 10 más un reparto de 20 puntos según su historia. De ellos salen la vida, la cordura, el esquive, la velocidad y el daño de cada tipo de arma, y al subir de nivel ganan un punto más.
+Cada personaje tiene **siete atributos** (Poder, Inteligencia, Fuerza, Constitución, Tenacidad, Destreza y Cultura), todos a 10 más un reparto de 20 puntos según su historia. De ellos salen la vida, la cordura, el esquive, la velocidad y el daño de cada tipo de arma, y al subir de nivel ganan un punto más.
 
 ![Dyer, Olmstead, Legrasse y Johansen](docs/img/personajes_1.jpg)
 

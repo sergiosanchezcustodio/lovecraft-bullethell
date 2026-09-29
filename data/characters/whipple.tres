@@ -19,4 +19,4 @@ move_speed = 4.5
 dodge_style = ExtResource("2")
 starting_weapons = Array[StringName]([&"bisturis"])
 revive_speed = 1.5
-attr_bonus = {"EDU": 9, "INT": 7, "CON": 4}
+attr_bonus = {"CUL": 9, "INT": 7, "CON": 4}

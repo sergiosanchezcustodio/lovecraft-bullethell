@@ -16,7 +16,7 @@ enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE, FLAME }
 enum Zone { NONE, FIRE, ACID }
 
 ## Tipo de ataque, para los atributos (D-27): físico (FUE+TEN: cuerpo a cuerpo y lanzadas
-## con el brazo), de fuego (CON+INT) o mágico (POD+EDU: arcanas y tecnología de los Mitos).
+## con el brazo), de fuego (CON+INT) o mágico (POD+CUL: arcanas y tecnología de los Mitos).
 enum Category { PHYSICAL, FIREARM, MAGIC }
 
 @export var id := &"revolver"

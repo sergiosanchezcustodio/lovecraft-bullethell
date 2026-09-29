@@ -13,12 +13,16 @@ extends Control
 
 const BG := "res://resources/PantallasMenus/fondo_titulo_sin_texto_1080p_definitivo.png"
 const DESIGN := Vector2(1920, 1080)
-const FRAME := Vector2(420, 810)
+const FRAME := Vector2(420, 750)
 const GAP := 26.0
 const TOP := 112.0
 const ICONS := "res://resources/PantallasMenus/iconos/ficha_%s.png"
 ## Píxeles por metro del personaje: los mismos que en la partida (1080 px para 15 m de alto).
 const PX_PER_M := 1080.0 / 15.0
+## Aumento del personaje en la ficha respecto a la partida.
+const MODEL_ZOOM := 2.0
+## Alto del visor del personaje.
+const VIEW_H := 150.0 * MODEL_ZOOM
 ## Estadísticas de la columna derecha de la ficha, en el orden de sus iconos.
 const STAT_ROWS: Array[String] = ["vida", "cordura", "esquive", "velocidad", "magia", "fisico", "fuego"]
 const STICK := 0.6                          ## umbral del stick para contar como una pulsación
@@ -261,7 +265,7 @@ class _Frame extends Control:
 	var _holder: Node3D
 	var _model: Node3D
 	var _model_name := ""
-	var _info: VBoxContainer
+	var _info: Control
 	var _name: Label
 	var _role: Label
 	var _weapon: TipIcon
@@ -302,8 +306,8 @@ class _Frame extends Control:
 		# el personaje en 3D, en su propio mundo, a la escala de la partida
 		_view = SubViewportContainer.new()
 		_view.stretch = true
-		_view.size = Vector2(220, 170)
-		_view.position = Vector2((FRAME.x - 220) * 0.5, 50)
+		_view.size = Vector2(240, VIEW_H)
+		_view.position = Vector2((FRAME.x - 240) * 0.5, 20)
 		add_child(_view)
 		_vp = SubViewport.new()
 		_vp.own_world_3d = true
@@ -332,14 +336,14 @@ class _Frame extends Control:
 		_vp.add_child(rim)
 		var cam := Camera3D.new()
 		cam.projection = Camera3D.PROJECTION_ORTHOGONAL
-		cam.size = _view.size.y / PX_PER_M              # mismos píxeles por metro que en la partida
-		cam.position = Vector3(0, cam.size * 0.5 - 0.12, 4.0)
+		cam.size = _view.size.y / (PX_PER_M * MODEL_ZOOM)   # la escala de la partida, aumentada
+		cam.position = Vector3(0, cam.size * 0.5 - 0.06, 4.0)
 		_vp.add_child(cam)
 		_holder = Node3D.new()
 		_vp.add_child(_holder)
 		for side in [-1, 1]:
 			var a := UiKit.label("◀" if side < 0 else "▶", 34, UiKit.GOLD)
-			a.position = Vector2(26 if side < 0 else FRAME.x - 56, 140)
+			a.position = Vector2(26 if side < 0 else FRAME.x - 56, 15 + VIEW_H * 0.5)
 			add_child(a)
 			_arrows.append(a)
 		# arma inicial, arriba a la derecha
@@ -352,34 +356,28 @@ class _Frame extends Control:
 		_wbox.add_child(_weapon)
 		_tips.append(_weapon)
 		# ficha
-		_info = VBoxContainer.new()
-		_info.position = Vector2(14, 224)
-		_info.size = Vector2(FRAME.x - 28, 0)
-		_info.add_theme_constant_override("separation", 4)
+		# ficha: cada bloque en una casilla fija, para que nada se mueva al cambiar de personaje
+		_info = Control.new()
+		_info.position = Vector2(14, 0)
+		_info.size = Vector2(FRAME.x - 28, FRAME.y)
+		_info.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(_info)
-		_name = MenuKit.title("", 32)
-		_info.add_child(_name)
-		_role = UiKit.label("", 16, UiKit.TEXT_DIM)
-		_role.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_role.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_role.custom_minimum_size.x = FRAME.x - 28
-		_info.add_child(_role)
-		_passive = UiKit.label("", 16, UiKit.TEXT)
-		_passive.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_name = _slot(MenuKit.title("", 32), 322, 40)
+		_role = _slot(UiKit.label("", 16, UiKit.TEXT_DIM), 364, 24)
+		_passive = _slot(UiKit.label("", 16, UiKit.TEXT), 390, 50)       # hasta dos líneas
 		_passive.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_passive.custom_minimum_size = Vector2(FRAME.x - 28, 52)
-		_info.add_child(_passive)
-		var sub := MenuKit.title("Características y habilidades", 22, UiKit.GOLD)
-		_info.add_child(sub)
+		_slot(MenuKit.title("Características y habilidades", 22, UiKit.GOLD), 452, 30)
 		var cols := HBoxContainer.new()
 		cols.alignment = BoxContainer.ALIGNMENT_CENTER
-		cols.add_theme_constant_override("separation", 14)
+		cols.add_theme_constant_override("separation", 10)
+		cols.position = Vector2(0, 487)
+		cols.size = Vector2(_info.size.x, 0)
 		_info.add_child(cols)
-		cols.add_child(_column(Attributes.NAMES, _attr_vals))
-		cols.add_child(_column(STAT_ROWS, _stat_vals))
+		cols.add_child(_column(Attributes.NAMES, _attr_vals, 116))
+		cols.add_child(_column(STAT_ROWS, _stat_vals, 243))
 		_status = MenuKit.title("", 24, color)
 		_status.size = Vector2(FRAME.x, 36)
-		_status.position = Vector2(0, FRAME.y - 40)
+		_status.position = Vector2(0, FRAME.y - 44)
 		add_child(_status)
 		# puesto vacío
 		_empty = VBoxContainer.new()
@@ -406,29 +404,39 @@ class _Frame extends Control:
 		_pet.add_child(_pet_label)
 
 	## Nombre de cada estadística derivada (Attributes.FORMULAS) y su fila en la ficha.
-	const STAT_NAMES := {"health": "Vida", "sanity": "Cordura", "dodge": "Esquive", "speed": "Velocidad",
-		"magic": "Daño mágico", "physical": "Daño físico", "firearm": "Daño con armas de fuego"}
+	const STAT_NAMES := {"health": "Puntos de vida", "sanity": "Puntos de cordura", "dodge": "Acción de esquiva",
+		"speed": "Velocidad", "magic": "Ataques mágicos", "physical": "Ataques físicos", "firearm": "Ataques balísticos"}
 	const STAT_KEYS := {"vida": "health", "cordura": "sanity", "esquive": "dodge", "velocidad": "speed",
 		"magia": "magic", "fisico": "physical", "fuego": "firearm"}
 
-	## Columna de la ficha: icono (con su descripción emergente) y valor, en un recuadro dorado.
-	func _column(names: Array, into: Dictionary) -> PanelContainer:
+	## Columna de la ficha: icono (con su descripción emergente), nombre y valor, en un
+	## recuadro dorado. Atributos con su abreviatura (POD); estadísticas con su nombre.
+	func _column(names: Array, into: Dictionary, width: float) -> PanelContainer:
 		var box := PanelContainer.new()
+		box.custom_minimum_size.x = width
 		box.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.45), Color(UiKit.GOLD, 0.55), 8))
 		var v := VBoxContainer.new()
-		v.add_theme_constant_override("separation", 3)
+		v.add_theme_constant_override("separation", 2)
 		box.add_child(v)
 		for n in names:
 			var row := HBoxContainer.new()
 			row.add_theme_constant_override("separation", 8)
-			var icon := TipIcon.new(Vector2(32, 32))
+			row.custom_minimum_size.y = 27
+			var icon := TipIcon.new(Vector2(24, 24))              # 25 % menores que los 32 originales
 			icon.set_icon(load(ICONS % n), n)
+			icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			row.add_child(icon)
 			_tips.append(icon)
+			var is_attr: bool = n in Attributes.NAMES
+			var tag := MenuKit.title(n if is_attr else STAT_NAMES[STAT_KEYS[n]], 17 if is_attr else 16, UiKit.GOLD)
+			tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			tag.size_flags_vertical = Control.SIZE_FILL
+			row.add_child(tag)
 			var val := MenuKit.title("", 20, UiKit.GOLD)
 			val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			val.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			val.custom_minimum_size = Vector2(64, 0)
+			val.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			row.add_child(val)
 			v.add_child(row)
 			into[n] = {"icon": icon, "val": val}
@@ -439,6 +447,25 @@ class _Frame extends Control:
 		if _cursor < 0: _cursor = 0 if step > 0 else _tips.size() - 1
 		else: _cursor = wrapi(_cursor + step, 0, _tips.size())
 		for i in _tips.size(): _tips[i].selected = i == _cursor
+
+	## Coloca una etiqueta centrada en una casilla fija de la ficha (y y alto en el marco).
+	func _slot(l: Label, y: float, h: float) -> Label:
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		l.clip_text = false
+		l.position = Vector2(0, y)
+		l.size = Vector2(_info.size.x, h)
+		_info.add_child(l)
+		return l
+
+	## Reduce el cuerpo de una etiqueta hasta que quepa en una línea de su casilla (como
+	## mucho hasta min_size). Para nombres y descripciones que no deben partirse.
+	static func _fit_line(l: Label, max_size: int, min_size: int) -> void:
+		var font := l.get_theme_font("font")
+		var sz := max_size
+		while sz > min_size and font.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x > l.size.x:
+			sz -= 1
+		l.add_theme_font_size_override("font_size", sz)
 
 	## Qué atributos forman una estadística, para las descripciones.
 	static func _pair(stat: String) -> String:
@@ -488,6 +515,8 @@ class _Frame extends Control:
 		if not c.starting_weapons.is_empty(): wd = load("res://data/weapons/%s.tres" % c.starting_weapons[0])
 		_weapon.set_icon(wd.icon if wd else null, wd.display_name if wd else "Sin arma", wd.description if wd else "")
 		_passive.text = "Rasgo: " + c.passive_text
+		_fit_line(_name, 32, 24)
+		_fit_line(_role, 16, 13)
 		var at := Attributes.initial(c)
 		for n in Attributes.NAMES:
 			var cell: Dictionary = _attr_vals[n]
@@ -497,7 +526,7 @@ class _Frame extends Control:
 			var uses := PackedStringArray()
 			for fs in Attributes.FORMULAS:
 				if n in Attributes.FORMULAS[fs]: uses.append(String(STAT_NAMES[fs]).to_lower())
-			(cell["icon"] as TipIcon).set_icon(load(ICONS % n), Attributes.LONG[n], "Sube: " + ", ".join(uses) + ".")
+			(cell["icon"] as TipIcon).set_icon(load(ICONS % n), Attributes.LONG[n], "%s\nSube: %s." % [Attributes.DESC[n], ", ".join(uses)])
 		for n in STAT_ROWS:
 			var sk: String = STAT_KEYS[n]
 			var m := Attributes.mult(at, sk)

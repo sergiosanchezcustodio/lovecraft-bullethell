@@ -83,6 +83,10 @@ func _process(delta: float) -> void:
 		_bubble.position = Vector2(size.x + 8, 0)
 		if right + _bubble.size.x * get_global_transform().get_scale().x > get_viewport_rect().size.x - 8:
 			_bubble.position.x = -_bubble.size.x - 8
+		# si se sale por abajo, se sube lo que haga falta
+		var k := get_global_transform().get_scale().y
+		var over := global_position.y + _bubble.size.y * k - (get_viewport_rect().size.y - 8)
+		if over > 0.0: _bubble.position.y = -over / k
 	elif not want and _bubble.visible:
 		_bubble.visible = false
 

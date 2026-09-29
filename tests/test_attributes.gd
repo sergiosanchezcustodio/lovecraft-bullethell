@@ -25,7 +25,7 @@ func test_cuatro_de_inicio_dos_hombres_y_dos_mujeres() -> void:
 	assert_eq(start, ["dyer", "olmstead", "peaslee", "whipple"])
 
 func test_las_estadisticas_salen_de_los_atributos() -> void:
-	var a := {"POD": 10, "INT": 10, "FUE": 10, "CON": 10, "TEN": 10, "DES": 10, "EDU": 10}
+	var a := {"POD": 10, "INT": 10, "FUE": 10, "CON": 10, "TEN": 10, "DES": 10, "CUL": 10}
 	assert_eq(Attributes.mult(a, "health"), 1.0, "20 puntos = la base")
 	a["CON"] = 20
 	assert_almost_eq(Attributes.mult(a, "health"), 1.25, 0.0001)
@@ -35,7 +35,7 @@ func test_las_estadisticas_salen_de_los_atributos() -> void:
 	assert_almost_eq(Attributes.mult(a, "speed"), 1.125, 0.0001, "la velocidad escala a la mitad")
 
 func test_la_subida_es_proporcional_al_nivel_1() -> void:
-	var l1 := {"POD": 10, "INT": 20, "FUE": 10, "CON": 10, "TEN": 10, "DES": 10, "EDU": 10}
+	var l1 := {"POD": 10, "INT": 20, "FUE": 10, "CON": 10, "TEN": 10, "DES": 10, "CUL": 10}
 	var rng := RandomNumberGenerator.new(); rng.seed = 9
 	var n := {}
 	for i in 16000:

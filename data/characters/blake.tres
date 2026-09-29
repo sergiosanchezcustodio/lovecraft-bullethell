@@ -19,5 +19,5 @@ move_speed = 4.5
 dodge_style = ExtResource("2")
 starting_weapons = Array[StringName]([&"trapezoedro"])
 xp_mult = 1.15
-attr_bonus = {"INT": 8, "POD": 7, "EDU": 5}
+attr_bonus = {"INT": 8, "POD": 7, "CUL": 5}
 in_shop = true

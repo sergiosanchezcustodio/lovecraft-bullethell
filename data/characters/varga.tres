@@ -19,5 +19,5 @@ move_speed = 4.5
 dodge_style = ExtResource("2")
 starting_weapons = Array[StringName]([&"necronomicon"])
 arcane_cost_mult = 0.5
-attr_bonus = {"POD": 12, "INT": 4, "EDU": 4}
+attr_bonus = {"POD": 12, "INT": 4, "CUL": 4}
 in_shop = true

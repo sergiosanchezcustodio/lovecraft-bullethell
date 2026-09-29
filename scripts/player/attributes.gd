@@ -7,9 +7,19 @@ extends RefCounted
 ## Al subir de nivel se gana +1 en un atributo, al azar con probabilidad proporcional a los
 ## atributos del nivel 1, que no cambia nunca.
 
-const NAMES: Array[String] = ["POD", "INT", "FUE", "CON", "TEN", "DES", "EDU"]
+const NAMES: Array[String] = ["POD", "INT", "FUE", "CON", "TEN", "DES", "CUL"]
 const LONG := {"POD": "Poder", "INT": "Inteligencia", "FUE": "Fuerza", "CON": "Constitución",
-	"TEN": "Tenacidad", "DES": "Destreza", "EDU": "Educación"}
+	"TEN": "Tenacidad", "DES": "Destreza", "CUL": "Cultura"}
+## Qué representa cada atributo, para las descripciones emergentes.
+const DESC := {
+	"POD": "Fuerza de voluntad y afinidad con lo oculto. Quien tiene mucho Poder sostiene la mirada de lo que no debería existir y doblega los ritos a su favor.",
+	"INT": "Agudeza para razonar y atar cabos. Una mente despierta resiste mejor lo incomprensible, aunque también comprende antes lo terrible.",
+	"FUE": "Vigor físico: golpear, cargar, arrojar y abrirse paso a la fuerza entre lo que se arrastra.",
+	"CON": "Salud y aguante del cuerpo. Soportar el frío, la fatiga y las heridas, y mantener el pulso firme al disparar.",
+	"TEN": "Terquedad de quien se niega a caer. Seguir en pie cuando el cuerpo y la razón piden rendirse.",
+	"DES": "Agilidad, reflejos y rapidez de manos para esquivar zarpas y escurrirse entre la horda.",
+	"CUL": "Lo aprendido en aulas, bibliotecas y caminos: años de estudio, lecturas voraces, viajes a tierras remotas y leyendas escuchadas junto al fuego. Quien reconoce un signo antiguo o recuerda el nombre olvidado de un dios sabe cómo usar lo arcano contra él.",
+}
 const BASE := 10
 
 ## Estadística derivada -> los dos atributos que la forman.
@@ -19,7 +29,7 @@ const FORMULAS := {
 	"dodge": ["DES", "CON"],        ## esquive: recarga más corta
 	"speed": ["DES", "TEN"],        ## velocidad al andar
 	"physical": ["FUE", "TEN"],     ## daño de las armas físicas (cuerpo a cuerpo y lanzadas)
-	"magic": ["POD", "EDU"],        ## daño de las armas mágicas (arcanas y de los Mitos)
+	"magic": ["POD", "CUL"],        ## daño de las armas mágicas (arcanas y de los Mitos)
 	"firearm": ["CON", "INT"],      ## daño de las armas de fuego
 }
 const RATE := 0.025                 ## +2,5 % por punto por encima de 20

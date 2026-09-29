@@ -28,5 +28,5 @@ collision_radius = 0.32
 hurt_radius = 0.25
 hit_iframes = 0.6
 order = 1
-attr_bonus = {"EDU": 8, "POD": 7, "CON": 5}
+attr_bonus = {"CUL": 8, "POD": 7, "CON": 5}
 explosion_radius_mult = 1.25

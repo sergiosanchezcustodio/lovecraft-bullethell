@@ -19,5 +19,5 @@ move_speed = 4.5
 dodge_style = ExtResource("2")
 starting_weapons = Array[StringName]([&"formula"])
 calm_aura = 2.0
-attr_bonus = {"POD": 10, "EDU": 6, "TEN": 4}
+attr_bonus = {"POD": 10, "CUL": 6, "TEN": 4}
 in_shop = true
