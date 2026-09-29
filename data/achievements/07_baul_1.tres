@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"baul_1"
+display_name = "Curiosidad"
+description = "Abre un baúl arcano."
+order = 7
+stat = "chests"
+target = 1
+reward_money = 50
+icon_model = "icono_codicia"
+icon_mode = "full"

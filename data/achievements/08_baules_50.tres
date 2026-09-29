@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"baules_50"
+display_name = "Anticuario"
+description = "Abre 50 baúles arcanos."
+order = 8
+stat = "chests"
+target = 50
+reward_money = 500
+icon_model = "icono_bolsillo"
+icon_mode = "full"

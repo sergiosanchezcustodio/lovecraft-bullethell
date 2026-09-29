@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/PantallasMenus/iconos/ficha_vida.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"reanimador"
+display_name = "Nadie se queda atrás"
+description = "Reanima a 10 compañeros. Johansen se une a la expedición."
+order = 10
+stat = "revives"
+target = 10
+reward_character = &"johansen"
+icon = ExtResource("2")

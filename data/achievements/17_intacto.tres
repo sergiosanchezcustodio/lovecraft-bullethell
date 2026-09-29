@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"intacto"
+display_name = "Sin un rasguño"
+description = "Supera un nivel sin que nadie caiga. El gato de Ulthar te adopta."
+order = 17
+stat = "flawless"
+target = 1
+reward_pet = &"gato"
+icon_model = "gato"
+icon_mode = "full"

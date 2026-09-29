@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"elites_25"
+display_name = "Cazador de pesadillas"
+description = "Abate a 25 élites."
+order = 6
+stat = "elites"
+target = 25
+reward_money = 600
+icon_model = "acechador"
+icon_mode = "full"

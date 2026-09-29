@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/PantallasMenus/iconos/ficha_TEN.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"superviviente"
+display_name = "Superviviente"
+description = "Aguanta 5 minutos en una partida."
+order = 13
+stat = "best_time"
+target = 300
+reward_money = 200
+icon = ExtResource("2")

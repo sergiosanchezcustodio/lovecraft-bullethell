@@ -44,6 +44,8 @@ var players: Array[Player] = []               ## J1..J4 (hito 2.9)
 var team: TeamXp                              ## experiencia compartida del cooperativo (D-07)
 var menus: PlayerMenus                        ## ficha y mapa de cada jugador (hito 2.12)
 var run_money := 0                            ## dólares ganados en esta partida (D-31)
+var _someone_fell := false                    ## alguien ha caído en este nivel (logro "Sin un rasguño")
+var _ach_t := 0.0
 var money_mult := 1.0                         ## Codicia (tienda)
 var camera: GameCamera
 var world: CombatWorld
@@ -200,7 +202,9 @@ func _ready() -> void:
 		director.level_completed.connect(_on_level_completed)
 		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
 		director.chest_spawned.connect(func(c: ArcaneChest) -> void:
-			c.opened.connect(func(_c: ArcaneChest, _by: Player) -> void: earn(c.money))
+			c.opened.connect(func(_c: ArcaneChest, _by: Player) -> void:
+				earn(c.money)
+				Achievements.add(Saves.current, "chests"))
 			announce("Ha aparecido un baúl arcano", 1.5))
 		add_child(director)
 		announce(level.display_name, 3.0)
@@ -236,6 +240,7 @@ func _ready() -> void:
 	if args.has("san"): player.sanity = args.get_float("san")
 	DebugOptions.apply_all(self)
 	if Saves.current != null: Saves.current.stats["runs"] += 1
+	if players.size() > 1: Achievements.add(Saves.current, "coop_runs")
 	if args.get_int("demo") > 0: _demo_crowd(args.get_int("demo"))
 	if args.get_int("dummies") > 0: _dummies(args.get_int("dummies"))
 	if args.get_bool("emitters"): _emitters()
@@ -262,11 +267,15 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	for w in DebugOptions.list_resources("res://data/weapons"): q.progress.weapon_pool.append(w)   # todas las armas
 	for f in ["velocidad", "vida", "cordura", "reflejos", "iman"]:
 		q.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
+	q.progress.leveled_up.connect(func(l: int) -> void: Achievements.record(Saves.current, "best_level", l))
 	q.progress.leveled_up.connect(func(_l: int) -> void:
 		q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
 		_open_level_up.call_deferred())
 	q.downed.connect(_on_downed.bind(q))
-	q.revived.connect(func() -> void: announce("J%d vuelve a la lucha" % (i + 1), 1.5))
+	q.revived.connect(func() -> void:
+		Achievements.add(Saves.current, "revives")
+		announce("J%d vuelve a la lucha" % (i + 1), 1.5))
+	q.downed.connect(func() -> void: _someone_fell = true)
 	q.eliminated.connect(func() -> void:
 		announce("J%d, eliminado hasta el siguiente nivel" % (i + 1), 2.0)
 		_check_all_down())
@@ -274,6 +283,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 		q.damaged.connect(func(d: Damage) -> void:
 			var src := "bala" if d.source == null else String((d.source as Enemy).data.id) + (" (carga)" if d.physical > 8.0 else "")
 			print("  J%d golpe t=%.1f  -%d vida -%d cordura  de %s  -> vida %d" % [i + 1, director.time if director else 0.0, d.physical, d.mental, src, q.health]))
+	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void: Achievements.add(Saves.current, "crises"))
 	q.sanity_state.crisis_started.connect(func(k: StringName) -> void:
 		var what := "Crisis: %s" % SanityState.NAMES.get(k, "locura")
 		announce(what if players.size() == 1 else "J%d · %s" % [i + 1, what], 1.5))
@@ -298,6 +308,7 @@ func _is_bot(q: Player) -> bool:
 func _on_enemy_died(e: Enemy) -> void:
 	kills += 1
 	if Saves.current != null: Saves.current.stats["kills"] += 1
+	if e.data.elite: Achievements.add(Saves.current, "elites")
 	gems.drop(e.global_position, e.data.xp)
 	earn(e.data.money)
 
@@ -448,6 +459,7 @@ func _game_over() -> void:
 	if _ended: return
 	_ended = true
 	if Saves.current != null: Saves.current.stats["deaths"] += 1
+	_check_achievements()
 	Saves.save()
 	Engine.time_scale = 0.35                       # la caída, a cámara lenta un momento
 	await get_tree().create_timer(0.6, true, false, true).timeout
@@ -459,9 +471,11 @@ func _on_level_completed() -> void:
 	if _ended: return
 	_ended = true
 	earn(level.money_bonus)                          # bono por superar el nivel
+	if not _someone_fell: Achievements.add(Saves.current, "flawless")
 	if args.get_bool("log"): print("NIVEL SUPERADO t=%d s  abatidos=%d  dólares=%d" % [director.time, kills, run_money])
 	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)):
 		Saves.current.levels_won.append(String(level.id))
+	_check_achievements.call_deferred()              # después de contar la baja del enemigo final (élite)
 	Saves.save()
 	announce("Nivel superado", 2.0)
 	await get_tree().create_timer(2.5).timeout
@@ -559,8 +573,30 @@ func _demo_crowd(n: int) -> void:
 		_demo.append(m)
 		_demo_names.append(kind)
 
+## Logros (D-32): récords de la partida y comprobación; los recién cumplidos se anuncian.
+func _check_achievements() -> void:
+	var save := Saves.current
+	if save == null: return
+	if director != null: Achievements.record(save, "best_time", int(director.time))
+	var maxed := 0
+	for q in players:
+		if q.weapons == null: continue
+		for w in q.weapons.weapons:
+			if w.level >= w.data.max_level: maxed += 1
+	Achievements.record(save, "maxed_weapons", maxed)
+	var done := Achievements.check(save)
+	for a in done:
+		var reward := Achievements.reward_text(a)
+		announce("Logro: %s%s" % [a.display_name, ("  ·  " + reward) if reward != "" else ""], 3.0)
+		if args.get_bool("log"): print("LOGRO %s" % a.id)
+	if not done.is_empty(): Saves.save()
+
 func _process(delta: float) -> void:
 	_t += delta
+	_ach_t += delta
+	if _ach_t >= 1.0 and not _ended:
+		_ach_t = 0.0
+		_check_achievements()
 	if players.size() > 1:                           # la cámara encuadra a los que siguen en pie
 		var alive: Array[Node3D] = []
 		for q in players:

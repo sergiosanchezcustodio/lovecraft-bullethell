@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/PantallasMenus/iconos/ficha_CUL.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"nivel_20"
+display_name = "Erudito de lo oculto"
+description = "Llega al nivel 20 en una partida."
+order = 12
+stat = "best_level"
+target = 20
+reward_money = 300
+icon = ExtResource("2")

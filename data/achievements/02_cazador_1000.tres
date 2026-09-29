@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/PantallasMenus/iconos/ficha_fisico.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"cazador_1000"
+display_name = "Exterminador"
+description = "Abate a 1.000 criaturas."
+order = 2
+stat = "kills"
+target = 1000
+reward_money = 400
+icon = ExtResource("2")

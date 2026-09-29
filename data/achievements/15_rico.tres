@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rico"
+display_name = "Fondos de la expedición"
+description = "Gana 10.000 $ en total."
+order = 15
+stat = "money"
+target = 10000
+reward_money = 500
+icon_model = "icono_codicia"
+icon_mode = "full"

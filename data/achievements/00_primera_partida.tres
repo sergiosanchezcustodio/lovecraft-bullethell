@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/PantallasMenus/iconos/ficha_POD.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"primera_partida"
+display_name = "Primeros pasos"
+description = "Juega tu primera partida."
+order = 0
+stat = "runs"
+target = 1
+reward_money = 50
+icon = ExtResource("2")

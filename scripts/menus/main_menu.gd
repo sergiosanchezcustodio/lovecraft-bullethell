@@ -1,6 +1,6 @@
 class_name MainMenu
 extends Control
-## Menú principal, debajo del título de la portada: Jugar, Tienda, Configuración y Salir.
+## Menú principal, debajo del título de la portada: Jugar, Tienda, Logros, Configuración y Salir.
 ## Quieto a propósito (GDD 8.1): lo importante es qué opción está señalada.
 ## Jugar abre la elección de local u online (online, desactivado hasta la fase 9, D-24).
 ## B / Esc vuelve a la elección de partida.
@@ -18,18 +18,21 @@ func _ready() -> void:
 	col.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	col.custom_minimum_size = Vector2(380, 0)
 	add_child(col)
-	for pair in [["Jugar", _open_play], ["Tienda", _open_shop], ["Configuración", _open_settings], ["Salir", _ask_quit]]:
-		var b := MenuKit.button(pair[0], MenuKit.INK, 32)
-		b.custom_minimum_size = Vector2(380, 60)
+	for pair in [["Jugar", _open_play], ["Tienda", _open_shop], ["Logros", _open_achievements],
+			["Configuración", _open_settings], ["Salir", _ask_quit]]:
+		var b := MenuKit.button(pair[0], MenuKit.INK, 30)
+		b.custom_minimum_size = Vector2(380, 54)
 		b.pressed.connect(pair[1])
 		col.add_child(b)
 		_buttons.append(b)
 	col.resized.connect(func() -> void:
 		var vs := get_viewport().get_visible_rect().size
-		col.position = Vector2((vs.x - col.size.x) * 0.5, vs.y * 0.64))
+		col.position = Vector2((vs.x - col.size.x) * 0.5, vs.y * 0.6))
 	# partida en uso, abajo a la izquierda
 	if Saves.slot >= 0:
-		var l := UiKit.label("Partida %d  ·  %s $" % [Saves.slot + 1, MenuKit.money(Saves.current.money)], 20, UiKit.TEXT_DIM)
+		var l := UiKit.label("", 20, UiKit.TEXT_DIM)
+		_money_lbl = l
+		_refresh_money()
 		l.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 		l.offset_left = 24
 		l.offset_top = -44
@@ -48,6 +51,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		back.emit()
 
+var _money_lbl: Label
+
+func _refresh_money() -> void:
+	if _money_lbl != null and Saves.current != null:
+		_money_lbl.text = "Partida %d  ·  %s $" % [Saves.slot + 1, MenuKit.money(Saves.current.money)]
+
 ## Abre una ventana encima; al cerrarse, el foco vuelve al botón que la abrió.
 func _push(popup: Control, from: int) -> void:
 	_popup = popup
@@ -55,6 +64,7 @@ func _push(popup: Control, from: int) -> void:
 	MenuKit.trap_focus(popup)                  # el mando no se escapa a los botones de detrás
 	popup.tree_exited.connect(func() -> void:
 		_popup = null
+		_refresh_money()                           # la tienda y los logros cambian el dinero
 		if is_inside_tree(): _buttons[from].grab_focus.call_deferred())
 
 # ---------------------------------------------------------------- opciones
@@ -89,10 +99,13 @@ func open_shop_tab(tab: int) -> void:
 	_open_shop()
 	(_popup as ShopMenu)._show_tab.call_deferred(tab)
 
+func _open_achievements() -> void:
+	_push(AchievementsMenu.new(), 2)
+
 func _open_settings() -> void:
 	var s := SettingsMenu.new()
 	s.closed.connect(func() -> void: pass)
-	_push(s, 2)
+	_push(s, 3)
 
 ## Configuración abierta en una pestaña (capturas: `open=menu_config tab=N`).
 func open_settings_tab(tab: int) -> void:
@@ -105,7 +118,7 @@ func _ask_quit() -> void:
 		if yes:
 			Saves.save()
 			get_tree().quit())
-	_push(c, 3)
+	_push(c, 4)
 
 ## Las ventanas sencillas se cierran con B / Esc.
 func _closes_with_cancel(p: Control) -> void:

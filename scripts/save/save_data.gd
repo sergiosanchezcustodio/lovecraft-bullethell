@@ -15,6 +15,7 @@ var pets := []                           ## compañeros desbloqueados (ids)
 var characters := []                     ## personajes desbloqueados además de los iniciales (ids)
 var levels_won := []                     ## niveles superados (ids, p. ej. "p1_n1")
 var stats := {"runs": 0, "kills": 0, "deaths": 0, "revives": 0}
+var achievements := {}                   ## logros cumplidos: id -> fecha (D-32)
 ## Partida de pruebas: todo lo que existe y lo que se añada (personajes, compañeros, niveles,
 ## artículos de la tienda) está disponible, sin tener que comprarlo ni ganarlo.
 var unlock_all := false
@@ -52,7 +53,7 @@ func items_bought() -> int:
 func to_dict() -> Dictionary:
 	return {"version": VERSION, "created": created, "updated": updated, "play_time": play_time,
 		"money": money, "purchases": purchases, "pets": pets, "characters": characters,
-		"levels_won": levels_won, "stats": stats, "unlock_all": unlock_all}
+		"levels_won": levels_won, "stats": stats, "unlock_all": unlock_all, "achievements": achievements}
 
 ## Lee un diccionario de cualquier versión conocida; los campos que falten toman su valor
 ## por defecto.
@@ -72,6 +73,7 @@ static func from_dict(d: Dictionary) -> SaveData:
 	for k in s.stats: s.stats[k] = int(st.get(k, 0))
 	for k in st:
 		if not s.stats.has(k): s.stats[k] = st[k]
+	s.achievements = (d.get("achievements", {}) as Dictionary).duplicate()
 	# JSON guarda los enteros como float: los niveles comprados se vuelven a enteros
 	for k in s.purchases: s.purchases[k] = int(s.purchases[k])
 	return s

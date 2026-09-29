@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"primer_nivel"
+display_name = "El campamento resiste"
+description = "Supera el nivel 1. Legrasse se une a la expedición."
+order = 4
+stat = "levels_won"
+target = 1
+reward_character = &"legrasse"
+icon_model = "legrasse"
+icon_mode = "head"
