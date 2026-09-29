@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="WeatherData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/weather_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"tormenta"
+display_name = "Tormenta"
+wind_dir = Vector2(1, 0.3)
+wind = 5.0
+gusts = 0.8
+gust_period = 5.0
+precip = 3
+precip_amount = 1.0
+fall_speed = 16.0
+precip_color = Color(0.72, 0.8, 0.92, 0.55)
+drift = 0.0
+mist = 0.35
+mist_color = Color(0.5, 0.56, 0.66, 1.0)
+clouds = 0.45
+lightning_every = 9.0

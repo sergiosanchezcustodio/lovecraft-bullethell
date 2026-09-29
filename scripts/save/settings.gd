@@ -22,6 +22,7 @@ var defaults := {
 	"fullscreen": true, "resolution": 2, "vsync": true, "fps_limit": 0, "scale_3d": 1.0,
 	"vol_master": 1.0, "vol_music": 0.8, "vol_sfx": 0.9,
 	"distortion": 1.0, "vibration": true, "show_fps": false,
+	"weather": 2,                           ## clima: 0 apagado, 1 reducido, 2 completo
 	"keys": {}, "joy": {},                  ## reasignaciones: acción -> tecla / botón
 }
 var values := {}

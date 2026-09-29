@@ -49,6 +49,28 @@ var _pause: Menus.PauseMenu
 var _debug: DebugMenu
 var _info: Label                               ## depuración: FPS, enemigos, balas
 var _rng := RandomNumberGenerator.new()
+var _env: Environment
+var weather: Weather
+
+## Clima del nivel (D-33): `weather=<id>` lo cambia (capturas) y `weather=no` lo quita. La
+## configuración decide si va completo, reducido o apagado; el menú de depuración, cuál.
+func _start_weather() -> void:
+	var wd: WeatherData = level.weather if level != null else null
+	var pick := args.get_str("weather", String(DebugOptions.get_value("weather", "")))
+	if pick == "no": wd = null
+	elif pick != "": wd = load("res://data/weather/%s.tres" % pick)
+	set_weather(wd)
+
+func set_weather(wd: WeatherData) -> void:
+	if weather != null:
+		weather.queue_free()
+		weather = null
+	_env.fog_density = Atmosphere.make_environment().fog_density     # la de siempre
+	_env.ambient_light_energy = Atmosphere.make_environment().ambient_light_energy
+	var quality := int(Settings.get_value("weather"))
+	if wd == null or quality == 0: return
+	weather = Weather.new().setup(wd, camera, _env, 1.0 if quality >= 2 else 0.5)
+	add_child(weather)
 
 func _ready() -> void:
 	var t_start := Time.get_ticks_msec()
@@ -122,6 +144,7 @@ func _ready() -> void:
 	camera.view_size = args.get_float("cam", 15.0)
 	camera.targets.append(player)
 	add_child(camera)
+	_env = env
 	_make_announcer()
 	if not args.get_bool("nolevel"):
 		var level_id := args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1")
@@ -143,6 +166,7 @@ func _ready() -> void:
 		add_child(director)
 		announce(level.display_name, 3.0)
 		Music.play(level.music_path())
+	_start_weather()
 	Engine.time_scale = args.get_float("timescale", 1.0)
 	hud = Hud.new().setup(player, director)
 	add_child(hud)

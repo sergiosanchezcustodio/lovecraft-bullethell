@@ -117,6 +117,9 @@ func _game() -> void:
 	_choice("Distorsiones de pantalla (cordura baja)", dist, int(round(float(Settings.get_value("distortion")) * 4.0)), func(i: int) -> void:
 		Settings.set_value("distortion", i / 4.0))
 	_note("Nunca ocultan ni falsean las balas. Desactívalas si te marean.")
+	var wx: Array[String] = ["Apagado", "Reducido", "Completo"]
+	_choice("Clima (nieve, lluvia, niebla…)", wx, int(Settings.get_value("weather")), func(i: int) -> void:
+		Settings.set_value("weather", i))
 	_toggle("Vibración del mando", Settings.get_value("vibration"), func(on: bool) -> void:
 		Settings.set_value("vibration", on))
 	_toggle("Mostrar FPS", Settings.get_value("show_fps"), func(on: bool) -> void:

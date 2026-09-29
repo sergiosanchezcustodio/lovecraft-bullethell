@@ -90,7 +90,12 @@ Léela al empezar cada sesión:
     - Bumerán (`BOOMERANG`, `Boomerang`): ida y vuelta. Red de pesca: lanzado con `ThrownExplosive.net`, inmoviliza (`Enemy.root`; las élites solo se frenan) y deja la red en el suelo (`NetFx`).
     - Martillo de geólogo (`FISSURE`, `Fissure`): grieta que avanza con esquirlas de hielo y aturde. Bastón estoque (`THRUST`): estocada en línea; cuenta como cuerpo a cuerpo para el rasgo de Johansen.
     - Tests en `tests/test_arsenal3.gd`. Hoja `shots/revision_2_7b_fuego_fisicas.png`.
-  - Después: hito 2.8, clima estético (D-33).
+  - **Hito 2.8 (clima estético, D-33): hecho, pendiente de tu revisión (29-09-2026).**
+    - `WeatherData` (`data/weather/*.tres`): viento con rachas sin azar (`wind_at`), precipitación (nieve, ceniza con brasas o lluvia con salpicaduras), ventisca a ras de suelo, niebla baja, sombras de nubes y rayos. Cada nivel elige el suyo (`LevelData.weather`); el nivel 1 tiene la nevada.
+    - `Weather` (`scripts/fx/weather.gd`) lo monta y lo lleva con la cámara: partículas en coordenadas del mundo, dos capas de niebla (`weather_mist.gdshader`, fundida con la profundidad) y sombras de nubes (`weather_clouds.gdshader`, mezcla multiplicativa). El rayo es un destello contenido de una luz direccional y de la ambiental (`FLASH_LIGHT`, `FLASH_AMBIENT`): con más, sobre la nieve la noche parecía de día.
+    - Climas de muestra: nevada, ventisca, ceniza, lluvia, tormenta y niebla densa. `weather=<id>` o `weather=no` al arrancar; el menú de depuración lo cambia en partida. Configuración > Juego > Clima: apagado, reducido (mitad de partículas) o completo.
+    - Sin coste medible: 120 FPS (el tope) con y sin ventisca o tormenta. Tests en `tests/test_weather.gd`. Hoja `shots/revision_2_8_clima.png`.
+  - Después: hito 2.9, partida de 1 a 4 jugadores.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
@@ -442,6 +447,9 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
 - **Scripts largos en la herramienta de Bash:** un heredoc muy largo se corta ("unexpected EOF while looking for matching"). Para ediciones grandes, escribe el script en el scratchpad y ejecútalo.
 - **Partículas con billboard:** `BILLBOARD_PARTICLES` descarta la escala de cada partícula si no se activa `billboard_keep_scale`. Todos los copos de nieve medían 1 m.
 - **Bloom general y partículas pequeñas:** con `glow_bloom` > 0 cada punto claro se convierte en una bola borrosa. En la portada, el bloom es 0 y el brillo sale solo del umbral HDR.
+- **Rayos del clima sobre nieve:** un destello de luz direccional de 2,2 más 0,9 de ambiente convierte la noche en día sobre el suelo blanco. Con 0,45 y 0,18 se lee como un fogonazo frío.
+- **Propiedades antes de `script` en un `.tres`:** Godot las ignora (aún no sabe de qué clase es el recurso). Van siempre después de la línea `script = ExtResource(...)`.
+- **Colores en `.tres`:** `Color(r, g, b)` con tres componentes no se carga; hacen falta los cuatro.
 - **Relámpagos y luz ambiental:** si el ambiente sale del cielo, cada relámpago ilumina el valle como si fuera de día. Usa ambiente de color fijo y deja el destello al cielo, a un contraluz rasante y a una luz puntual.
 - **Montañas voxel:** un cono con pendiente uniforme o bloques aplanados se ven como pirámides escalonadas. Hacen falta cárcavas, un contorno quebrado de agujas (ruido de crestas de celda pequeña) y pocas mesetas.
 - **NumPy y JSON:** los enteros de NumPy (`int64`) no se pueden serializar; conviértelos con `int()` o `float()` antes de `json.dump`.

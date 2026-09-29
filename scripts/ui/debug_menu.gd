@@ -191,6 +191,19 @@ func _build() -> void:
 	_choice("Altura visible de la cámara", OptionRow.fmt(cams, "%d m", 1.0), OptionRow.idx(cams, cam_now, 1), func(i: int) -> void:
 		DebugOptions.set_value("camera", cams[i])
 		(game.camera as GameCamera).view_size = cams[i])
+	# clima (D-33): el del nivel, ninguno o cualquiera de data/weather
+	var wx_ids: Array[String] = ["", "no"]
+	var wx_names: Array[String] = ["El del nivel", "Sin clima"]
+	for wd: WeatherData in DebugOptions.list_resources("res://data/weather"):
+		wx_ids.append(String(wd.id))
+		wx_names.append(wd.display_name)
+	_choice("Clima", wx_names, OptionRow.idx(wx_ids, String(DebugOptions.get_value("weather", "")), 0), func(i: int) -> void:
+		DebugOptions.set_value("weather", wx_ids[i])
+		var lv: LevelData = game.level
+		var wd: WeatherData = null
+		if wx_ids[i] == "": wd = lv.weather if lv != null else null
+		elif wx_ids[i] != "no": wd = load("res://data/weather/%s.tres" % wx_ids[i])
+		game.set_weather(wd))
 	_toggle("Información en pantalla (FPS, enemigos, balas)", DebugOptions.get_value("info", false), func(on: bool) -> void:
 		DebugOptions.set_value("info", on))
 	_toggle("Música", not Music.is_muted(), func(on: bool) -> void: Music.set_muted(not on))

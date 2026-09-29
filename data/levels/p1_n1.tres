@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/enemies/pinguino.tres" id="2"]
@@ -6,8 +6,11 @@
 [ext_resource type="Resource" path="res://data/enemies/acechador.tres" id="4"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
 
+[ext_resource type="Resource" path="res://data/weather/nevada.tres" id="weather_nevada"]
+
 [resource]
 script = ExtResource("1")
+weather = ExtResource("weather_nevada")
 id = &"p1_n1"
 display_name = "Campamento base en la costa del mar de Ross"
 part = 1

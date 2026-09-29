@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WeatherData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/weather_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"niebla"
+display_name = "Niebla densa"
+wind_dir = Vector2(1, 0.6)
+wind = 0.6
+gusts = 0.3
+precip = 0
+drift = 0.0
+mist = 0.75
+clouds = 0.15
+fog_density = 0.035

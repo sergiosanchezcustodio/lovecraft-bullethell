@@ -12,6 +12,8 @@ extends Resource
 @export var duration := 300.0                  ## s de referencia (la fase 1 dura 5 minutos)
 ## Música del nivel. Vacía: la del nivel 1 (hasta que haya más pistas).
 @export_file("*.mp3", "*.ogg") var music := ""
+## Clima estético del nivel (D-33). Vacío: sin clima.
+@export var weather: WeatherData
 @export_group("Oleadas")
 @export var pool: Array[EnemyData] = []        ## enemigos que pueden aparecer
 ## Ritmo de aparición (enemigos por segundo) en función del tiempo: puntos (s, ritmo).
