@@ -1,7 +1,8 @@
 """Máscaras para animar la ilustración de la tienda (resources/PantallasMenus/tienda.png).
 
 Como la portada: no se pinta nada encima, se modula la imagen con un mapa de máscaras.
-Salida: resources/PantallasMenus/mascara_tienda.png, a la resolución de la ilustración:
+Salida: resources/PantallasMenus/mascara_tienda.png, a la resolución de la ilustración (las
+posiciones revisadas a mano están en píxeles de la de 1672 px de ancho y se escalan):
   R  llamas (quinqué y velas): el núcleo claro y cálido de cada una;
   G  brillos mágicos (bola de cristal y frascos violetas y verdes);
   B  luz que proyectan las llamas (las llamas difuminadas): oscila con ellas;
@@ -22,6 +23,7 @@ img = np.asarray(Image.open(SRC).convert('RGB')).astype(np.float32) / 255.0
 r, g, b = img[..., 0], img[..., 1], img[..., 2]
 v = img.max(axis=2)
 H, W = v.shape
+K = W / 1672.0                   # posiciones y radios medidos en la ilustración de 1672 px de ancho
 
 # llamas: lo muy claro y cálido, pero solo junto a las llamas de verdad (lista revisada a
 # mano, en píxeles de la ilustración): la detección sola marcaba superficies iluminadas
@@ -30,17 +32,17 @@ H, W = v.shape
 FLAMES = [(255, 468, 34), (177, 470, 14), (680, 250, 12), (897, 300, 12), (909, 312, 12)]
 yy, xx = np.mgrid[0:H, 0:W]
 near = np.zeros((H, W), bool)
-for fx, fy, rad in FLAMES: near |= (xx - fx) ** 2 + (yy - fy) ** 2 <= rad * rad
+for fx, fy, rad in FLAMES: near |= (xx - fx * K) ** 2 + (yy - fy * K) ** 2 <= (rad * K) ** 2
 flame = near & (v > 0.7) & (r > 0.8) & (r - b > 0.25)
-flame = ndimage.binary_dilation(flame, iterations=2) & near
+flame = ndimage.binary_dilation(flame, iterations=max(1, round(2 * K))) & near
 # brillos mágicos: violetas (bola de cristal, frascos) y verdes (frascos)
 violet = (v > 0.45) & (b > 0.5) & (r > 0.35) & (g < 0.45) & (b - g > 0.25)
 green = (v > 0.4) & (g > 0.45) & (g - r > 0.12) & (g - b > 0.12)
-magic = ndimage.binary_opening(violet | green, iterations=1)
-magic = ndimage.binary_dilation(magic, iterations=2)
+magic = ndimage.binary_opening(violet | green, iterations=max(1, round(K)))
+magic = ndimage.binary_dilation(magic, iterations=max(1, round(2 * K)))
 # zonas que no son brillos aunque lo parezcan (el hombro del anciano)
 for x0, y0, x1, y1 in ((330, 350, 420, 410),):
-    magic[y0:y1, x0:x1] = False
+    magic[int(y0 * K):int(y1 * K), int(x0 * K):int(x1 * K)] = False
 
 # quitar manchas diminutas (reflejos sueltos)
 def keep_big(m, min_px):
@@ -51,12 +53,12 @@ def keep_big(m, min_px):
     lab, n = ndimage.label(keep)
     return keep, lab, n
 
-flame, flab, fn = keep_big(flame, 6)
-magic, mlab, mn = keep_big(magic, 40)
+flame, flab, fn = keep_big(flame, 6 * K * K)
+magic, mlab, mn = keep_big(magic, 40 * K * K)
 
-soft_flame = ndimage.gaussian_filter(flame.astype(np.float32), 1.2)
-soft_magic = ndimage.gaussian_filter(magic.astype(np.float32), 1.5)
-glow = ndimage.gaussian_filter(flame.astype(np.float32), 38.0)
+soft_flame = ndimage.gaussian_filter(flame.astype(np.float32), 1.2 * K)
+soft_magic = ndimage.gaussian_filter(magic.astype(np.float32), 1.5 * K)
+glow = ndimage.gaussian_filter(flame.astype(np.float32), 38.0 * K)
 glow = glow / max(glow.max(), 1e-6)
 
 # fase por mancha, extendida a su alrededor (la luz proyectada titila con su llama)
