@@ -369,12 +369,12 @@ class _Frame extends Control:
 		_slot(MenuKit.title("Características y habilidades", 22, UiKit.GOLD), 452, 30)
 		var cols := HBoxContainer.new()
 		cols.alignment = BoxContainer.ALIGNMENT_CENTER
-		cols.add_theme_constant_override("separation", 10)
+		cols.add_theme_constant_override("separation", 8)
 		cols.position = Vector2(0, 487)
 		cols.size = Vector2(_info.size.x, 0)
 		_info.add_child(cols)
-		cols.add_child(_column(Attributes.NAMES, _attr_vals, 116))
-		cols.add_child(_column(STAT_ROWS, _stat_vals, 243))
+		cols.add_child(_column(Attributes.NAMES, _attr_vals, 44, 30))
+		cols.add_child(_column(STAT_ROWS, _stat_vals, 132, 62))
 		_status = MenuKit.title("", 24, color)
 		_status.size = Vector2(FRAME.x, 36)
 		_status.position = Vector2(0, FRAME.y - 44)
@@ -411,16 +411,17 @@ class _Frame extends Control:
 
 	## Columna de la ficha: icono (con su descripción emergente), nombre y valor, en un
 	## recuadro dorado. Atributos con su abreviatura (POD); estadísticas con su nombre.
-	func _column(names: Array, into: Dictionary, width: float) -> PanelContainer:
+	## Anchos fijos (tag_w, val_w: medidos con la fuente para el texto más largo, "+100 %")
+	## y textos recortados, para que el recuadro no cambie de ancho con los valores.
+	func _column(names: Array, into: Dictionary, tag_w: float, val_w: float) -> PanelContainer:
 		var box := PanelContainer.new()
-		box.custom_minimum_size.x = width
 		box.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.45), Color(UiKit.GOLD, 0.55), 8))
 		var v := VBoxContainer.new()
 		v.add_theme_constant_override("separation", 2)
 		box.add_child(v)
 		for n in names:
 			var row := HBoxContainer.new()
-			row.add_theme_constant_override("separation", 8)
+			row.add_theme_constant_override("separation", 6)
 			row.custom_minimum_size.y = 27
 			var icon := TipIcon.new(Vector2(24, 24))              # 25 % menores que los 32 originales
 			icon.set_icon(load(ICONS % n), n)
@@ -432,11 +433,14 @@ class _Frame extends Control:
 			tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 			tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			tag.size_flags_vertical = Control.SIZE_FILL
+			tag.clip_text = true
+			tag.custom_minimum_size.x = tag_w
 			row.add_child(tag)
 			var val := MenuKit.title("", 20, UiKit.GOLD)
 			val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			val.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			val.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			val.clip_text = true
+			val.custom_minimum_size.x = val_w
 			row.add_child(val)
 			v.add_child(row)
 			into[n] = {"icon": icon, "val": val}
