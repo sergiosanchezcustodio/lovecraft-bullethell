@@ -13,7 +13,9 @@ enum Team { PLAYER, ENEMY }
 enum Style { PLAYER, PHYSICAL, MENTAL, MIXED, WISP, YITH }
 ## Efecto al impactar una bala del jugador: ninguno o estasis (Rayo de Yith, `_effect_val` s).
 ## INJECT: suero de Herbert West; el que muere inyectado se levanta `_effect_val` s como aliado.
-enum Effect { NONE, STASIS, INJECT }
+## PARANOIA: bala de un jugador en crisis de paranoia; a los compañeros (no a quien la dispara,
+## `_owner`) les quita `_effect_val` de cordura y ninguna vida (D-17).
+enum Effect { NONE, STASIS, INJECT, PARANOIA }
 
 const MAX_BULLETS := 4096
 const HEIGHT := 0.8                          ## altura de vuelo (a la altura del pecho)
@@ -40,6 +42,7 @@ var _home := PackedFloat32Array()            ## giro máximo hacia el enemigo m�
 var _effect := PackedByteArray()             ## Effect al impactar
 var _effect_val := PackedFloat32Array()
 var _slowed := PackedByteArray()             ## 1 si ya la frenó un Signo Arcano (solo una vez)
+var _owner := PackedInt32Array()             ## índice del jugador que la disparó (-1: nadie)
 ## Rasgos de daño de quien dispara (Damage.bonus), registrados una vez por jugador.
 var bonus_sets: Array[Dictionary] = []
 var _last_hit := PackedInt64Array()          ## id del último objetivo tocado (para las que atraviesan);
@@ -59,6 +62,7 @@ func _init() -> void:
 	_team.resize(MAX_BULLETS); _style.resize(MAX_BULLETS); _pierce.resize(MAX_BULLETS)
 	_last_hit.resize(MAX_BULLETS); _push.resize(MAX_BULLETS); _bonus.resize(MAX_BULLETS); _split.resize(MAX_BULLETS)
 	_home.resize(MAX_BULLETS); _effect.resize(MAX_BULLETS); _effect_val.resize(MAX_BULLETS); _slowed.resize(MAX_BULLETS)
+	_owner.resize(MAX_BULLETS)
 
 func _ready() -> void:
 	_mm = MultiMesh.new()
@@ -106,7 +110,7 @@ func _ready() -> void:
 ## Crea una bala. `pos` se proyecta a la altura de vuelo.
 func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, size: float,
 		damage: Damage, life: float, pierce: int = 0, push: float = 1.0, bonus_set: int = -1, split: int = 0,
-		homing: float = 0.0, effect: Effect = Effect.NONE, effect_val: float = 0.0) -> void:
+		homing: float = 0.0, effect: Effect = Effect.NONE, effect_val: float = 0.0, owner: int = -1) -> void:
 	if count >= MAX_BULLETS: return
 	var i := count
 	_pos[i] = Vector3(pos.x, HEIGHT, pos.z)
@@ -129,6 +133,7 @@ func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, 
 	_effect[i] = effect
 	_effect_val[i] = effect_val
 	_slowed[i] = 0
+	_owner[i] = owner
 	count += 1
 
 ## Registra los rasgos de daño de un tirador y devuelve su índice para spawn().
@@ -217,6 +222,7 @@ func _collide_enemy_bullet(i: int) -> bool:
 	return false
 
 func _collide_player_bullet(i: int) -> bool:
+	if _effect[i] == Effect.PARANOIA and _hits_mate(i): return true
 	for id in world.grid.query_circle(Vector2(_pos[i].x, _pos[i].z), _radius[i]):
 		var t := world.target_at(id)
 		if t.get_instance_id() == _last_hit[i] or not t.is_alive(): continue
@@ -229,6 +235,17 @@ func _collide_player_bullet(i: int) -> bool:
 		_last_hit[i] = t.get_instance_id()
 		_pierce[i] -= 1
 		if _pierce[i] < 0: return true
+	return false
+
+## Paranoia: ¿toca a un compañero del que la disparó? Le quita cordura, nunca vida.
+func _hits_mate(i: int) -> bool:
+	var p := Vector2(_pos[i].x, _pos[i].z)
+	for pl in world.players:
+		if pl.index == _owner[i] or not pl.is_hittable(): continue
+		var r := _radius[i] + pl.data.hurt_radius
+		if p.distance_squared_to(Vector2(pl.global_position.x, pl.global_position.z)) <= r * r:
+			pl.take_damage(Damage.new(0.0, _effect_val[i]))
+			return true
 	return false
 
 ## Fuegos artificiales: la bala se abre en `_split` chispas en círculo, más débiles y cortas.
@@ -250,6 +267,7 @@ func _remove(i: int) -> void:
 		_team[i] = _team[last]; _style[i] = _style[last]; _pierce[i] = _pierce[last]; _last_hit[i] = _last_hit[last]
 		_push[i] = _push[last]; _bonus[i] = _bonus[last]; _split[i] = _split[last]
 		_home[i] = _home[last]; _effect[i] = _effect[last]; _effect_val[i] = _effect_val[last]; _slowed[i] = _slowed[last]
+		_owner[i] = _owner[last]
 	count = last
 
 func _process(_delta: float) -> void:

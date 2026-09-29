@@ -139,6 +139,7 @@ func _ready() -> void:
 			progs.append(q.progress)
 			q.revivable = true
 		team = TeamXp.new(player.rules, progs)
+		for q in players: q.sanity_state.coop = true    # la paranoia solo existe en cooperativo
 	if args.has("model"): player.data.model = args.get_str("model")   # probar otro modelo (prototipos)
 	var p := args.get_floats("pos")
 	if p.size() == 2: player.position = Vector3(p[0], 0, p[1])
@@ -187,6 +188,7 @@ func _ready() -> void:
 	Engine.time_scale = args.get_float("timescale", 1.0)
 	hud = Hud.new().setup(players, director)
 	add_child(hud)
+	add_child(SanityFx.new().setup(players))         # distorsiones de cordura baja
 	var pause_watch := Node.new()                  # sigue atento a Esc/Start con la partida en pausa
 	pause_watch.process_mode = Node.PROCESS_MODE_ALWAYS
 	pause_watch.set_script(preload("res://scripts/ui/pause_watch.gd"))
@@ -243,8 +245,11 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 		q.damaged.connect(func(d: Damage) -> void:
 			var src := "bala" if d.source == null else String((d.source as Enemy).data.id) + (" (carga)" if d.physical > 8.0 else "")
 			print("  J%d golpe t=%.1f  -%d vida -%d cordura  de %s  -> vida %d" % [i + 1, director.time if director else 0.0, d.physical, d.mental, src, q.health]))
-	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void:
-		announce("Crisis de locura" if players.size() == 1 else "J%d: crisis de locura" % (i + 1), 1.5))
+	q.sanity_state.crisis_started.connect(func(k: StringName) -> void:
+		var what := "Crisis: %s" % SanityState.NAMES.get(k, "locura")
+		announce(what if players.size() == 1 else "J%d · %s" % [i + 1, what], 1.5))
+	q.lights.assign(arena.get_meta("lights"))       # las luces del escenario recuperan cordura
+	q.madness = bool(Settings.get_value("madness"))
 	q.weapons = WeaponSystem.new().setup(q, world)
 	q.add_child(q.weapons)
 	for wid in q.data.starting_weapons: q.weapons.add_weapon(load("res://data/weapons/%s.tres" % wid))

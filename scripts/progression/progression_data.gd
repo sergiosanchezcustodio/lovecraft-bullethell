@@ -24,6 +24,19 @@ extends Resource
 @export var paralysis_period := 1.25       ## una congelación cada tanto (D-14)
 @export var paralysis_freeze := 0.4        ## duración de cada congelación
 @export var paralysis_warning := 0.2       ## temblor previo
+## Pesos de cada crisis (hito 2.11); un personaje puede tener los suyos (CharacterData).
+@export var crisis_weights := {&"paralisis": 1.0, &"huida": 1.0, &"vagar": 1.0, &"paranoia": 1.0, &"delirio": 1.0}
+@export var calm_rate := 1.0               ## compañero al lado: la crisis avanza (1 + esto) veces más rápido
+@export var regen_near_light := 2.0        ## recuperación junto a una luz del escenario
+@export var regen_near_mate := 1.5         ## y junto a un compañero
+@export var light_radius := 3.0            ## m a una farola, hoguera o lámpara
+@export var mate_radius := 3.5             ## m a un compañero
+@export var madness_step := 0.1            ## locura acumulada: cordura máxima que quita cada crisis
+@export var madness_floor := 0.5           ## sin bajar de esta fracción
+@export var paranoia_mental := 2.0         ## cordura que quita a un compañero cada disparo del paranoico
+@export var flee_speed := 1.15             ## huida: velocidad respecto a la de andar
+@export var wander_obey := 0.35            ## vagar: cuánto obedecen los controles
+@export var wander_speed := 0.55           ## vagar: velocidad
 
 ## Experiencia necesaria para pasar del nivel `level` al siguiente.
 func xp_to_next(level: int) -> float:

@@ -52,6 +52,7 @@ extends Resource
 @export var dodge_style: DodgeStyle
 @export_group("Otros")
 @export var luck := 1.0                      ## suerte en las mejoras
+@export var crisis_weights := {}             ## pesos propios de las crisis (vacío: los comunes)
 @export var pickup_radius := 2.2             ## a qué distancia empiezan a volar las gemas hacia él
 ## Armas con las que empieza. El GDD da una por personaje; en la fase 1 Dyer empieza
 ## con la suya y el revólver, como pide la especificación del prototipo.

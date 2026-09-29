@@ -108,7 +108,15 @@ Léela al empezar cada sesión:
     - Dificultad según los jugadores (`LevelData.coop_health` y `coop_spawn`, `LevelData.coop()`): vida de los enemigos y ritmo y tope de aparición.
     - Reanimación (GDD 4.6): en cooperativo, con la vida a cero queda derribado 30 s (`Player.revivable`, `down_left`); un compañero a menos de 1,5 m lo levanta en 3 s (Whipple, 1,5 veces más rápido) con el 35 % de la vida. Si nadie llega, queda eliminado hasta el siguiente nivel. Tendido de bruces con un anillo en el suelo (`revive_ring.gdshader`: rojo, el tiempo que le queda; verde, la reanimación) y su estado en el panel del HUD. Los bots acuden a reanimar. La partida se acaba cuando no queda nadie en pie.
     - Tests en `tests/test_coop_rules.gd`. Prueba: `godot --path . -- bots=3` (con el J1 a mano, el menú por cuadrantes espera a que elijas).
-  - Después: hito 2.11, cordura completa.
+  - **Hito 2.11 (cordura completa): hecho, pendiente de tu revisión (29-09-2026).**
+    - Cinco crisis (`SanityState`), al azar con pesos (`ProgressionData.crisis_weights`; un personaje puede tener los suyos, `CharacterData.crisis_weights`): parálisis, huida histérica (corre lejos del horror, sin esquive), vagar sin rumbo (errático y lento, obedece un 35 %), delirio (controles invertidos) y paranoia, solo en cooperativo: sus armas de balas apuntan al compañero más cercano y le quitan 2 de cordura por bala, nunca vida (`Effect.PARANOIA`, D-17).
+    - Calmar: un compañero a menos de 1,5 m que no esté en crisis la acorta (`calm_rate`, con su `revive_speed`). Recuperación ×2 junto a un farol (`Player.lights`, de la arena) y ×1,5 junto a un compañero.
+    - Presencia: `EnemyData.aura_radius` y `aura_drain`; el Acechador drena 2,5 de cordura por segundo a 4,5 m, con un disco violeta que late.
+    - Locura acumulada (configuración > Juego, activada por defecto): cada crisis quita un 10 % de cordura máxima, sin bajar del 50 %.
+    - Distorsiones de cordura baja (`SanityFx`): borde violeta que palpita desde el 35 % de cordura y, en solitario, hasta un 40 % de desaturación; en cooperativo, el borde sale de la esquina de cada jugador. La opción "Distorsiones" de la configuración ya las regula (antes no hacía nada).
+    - Arreglada una fuga del hito 2.10: el equipo y el progreso se referenciaban mutuamente y no se liberaban ni al reiniciar (ahora `PlayerProgress.team` es una referencia débil).
+    - Tests en `tests/test_sanity2.gd`.
+  - Después: hito 2.12, ficha y mapa por cuadrante.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
@@ -463,6 +471,7 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
 - **Rayos del clima sobre nieve:** un destello de luz direccional de 2,2 más 0,9 de ambiente convierte la noche en día sobre el suelo blanco. Con 0,45 y 0,18 se lee como un fogonazo frío.
 - **Propiedades antes de `script` en un `.tres`:** Godot las ignora (aún no sabe de qué clase es el recurso). Van siempre después de la línea `script = ExtResource(...)`.
 - **Colores en `.tres`:** `Color(r, g, b)` con tres componentes no se carga; hacen falta los cuatro.
+- **Referencias circulares entre RefCounted:** dos objetos que se guardan el uno al otro (el equipo y el progreso de cada jugador) no se liberan nunca, ni al reiniciar la escena; aparece como "N resources still in use at exit". Uno de los dos debe guardar al otro con `weakref()`. Para localizarlo: `godot --verbose ... --quit-after N` y mirar qué scripts siguen en uso.
 - **Relámpagos y luz ambiental:** si el ambiente sale del cielo, cada relámpago ilumina el valle como si fuera de día. Usa ambiente de color fijo y deja el destello al cielo, a un contraluz rasante y a una luz puntual.
 - **Montañas voxel:** un cono con pendiente uniforme o bloques aplanados se ven como pirámides escalonadas. Hacen falta cárcavas, un contorno quebrado de agujas (ruido de crestas de celda pequeña) y pocas mesetas.
 - **NumPy y JSON:** los enteros de NumPy (`int64`) no se pueden serializar; conviértelos con `int()` o `float()` antes de `json.dump`.

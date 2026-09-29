@@ -86,6 +86,10 @@ func _fire(w: Weapon) -> bool:
 			target_pos = t.global_position if t != null else ahead
 		WeaponData.Targeting.FRONT_BACK:
 			target_pos = origin + player.motor.facing * rng
+	# paranoia (D-17): las armas de balas apuntan al compañero más cercano
+	if paranoid() and w.data.delivery == WeaponData.Delivery.BULLET:
+		var mate := _nearest_mate(rng * 1.5)
+		if mate != null: target_pos = mate.global_position
 	var n := int(w.stat("count"))
 	if w.data.delivery == WeaponData.Delivery.MELEE:
 		return _slash(w)
@@ -154,6 +158,9 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 	if w.stat("ally_time") > 0.0:                                         # suero de West
 		effect = BulletManager.Effect.INJECT
 		effect_val = w.stat("ally_time")
+	if paranoid():                                                         # en crisis de paranoia
+		effect = BulletManager.Effect.PARANOIA
+		effect_val = player.rules.paranoia_mental
 	if w.stat("homing") > 0.0: style = BulletManager.Style.WISP
 	if w.stat("stasis") > 0.0:
 		style = BulletManager.Style.YITH
@@ -161,7 +168,23 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 	world.bullets.spawn(BulletManager.Team.PLAYER, style,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
 		size, Damage.new(dmg(w) * dmg_k, 0.0), life, int(w.stat("pierce")),
-		w.stat("knockback"), _bonus_set, int(w.stat("split_count")), w.stat("homing"), effect, effect_val)
+		w.stat("knockback"), _bonus_set, int(w.stat("split_count")), w.stat("homing"), effect, effect_val, player.index)
+
+## ¿En crisis de paranoia? (solo en cooperativo: en solitario no sale.)
+func paranoid() -> bool:
+	return player.sanity_state != null and player.sanity_state.is_kind(&"paranoia")
+
+## El compañero en pie más cercano a menos de max_r, o null.
+func _nearest_mate(max_r: float) -> Player:
+	var best: Player = null
+	var best_d := max_r
+	for q in world.players:
+		if q == player or q.health <= 0.0: continue
+		var d := q.global_position.distance_to(player.global_position)
+		if d < best_d:
+			best_d = d
+			best = q
+	return best
 
 ## Daño de un arma con los atributos del personaje (D-27).
 func dmg(w: Weapon) -> float:

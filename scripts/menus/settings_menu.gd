@@ -120,6 +120,8 @@ func _game() -> void:
 	var wx: Array[String] = ["Apagado", "Reducido", "Completo"]
 	_choice("Clima (nieve, lluvia, niebla…)", wx, int(Settings.get_value("weather")), func(i: int) -> void:
 		Settings.set_value("weather", i))
+	_toggle("Locura acumulada (cada crisis baja la cordura máxima)", Settings.get_value("madness"), func(on: bool) -> void:
+		Settings.set_value("madness", on))
 	_toggle("Vibración del mando", Settings.get_value("vibration"), func(on: bool) -> void:
 		Settings.set_value("vibration", on))
 	_toggle("Mostrar FPS", Settings.get_value("show_fps"), func(on: bool) -> void:

@@ -33,7 +33,12 @@ var upgrade_pool: Array[UpgradeData] = []
 var attr_gains: Array[String] = []        ## atributo ganado en cada subida aún sin elegir mejora
 var weapon_slots := 4                     ## armas que puede llevar (D-28; la tienda da la 5.ª)
 var item_slots := 4                       ## objetos (pasivas) distintos que puede llevar
-var team: TeamXp                          ## cooperativo: la experiencia es común (D-07)
+## Cooperativo: la experiencia es común (D-07). Referencia débil: el equipo ya guarda a sus
+## miembros y, con dos fuertes, ninguno de los dos se liberaba nunca (ni al reiniciar).
+var team: TeamXp:
+	get: return _team_ref.get_ref() if _team_ref != null else null
+	set(v): _team_ref = weakref(v) if v != null else null
+var _team_ref: WeakRef
 
 func _init(p_rules: ProgressionData) -> void:
 	rules = p_rules

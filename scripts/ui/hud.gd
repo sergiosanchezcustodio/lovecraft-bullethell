@@ -196,7 +196,8 @@ class PlayerPanel extends PanelContainer:
 			for w in p.weapons.weapons:
 				parts.append("%s %d" % [w.data.display_name, w.level])
 		_weapons_lbl.text = "  ·  ".join(parts)
-		_crisis_lbl.text = "Crisis de locura: parálisis" if p.sanity_state.in_crisis else ""
+		var ss := p.sanity_state
+		_crisis_lbl.text = ("Crisis: %s" % SanityState.NAMES.get(ss.crisis_kind, "locura")) if ss.in_crisis else ""
 		var down := p.health <= 0.0
 		_down_lbl.visible = down
 		if p.is_eliminated: _down_lbl.text = "Eliminado"

@@ -23,6 +23,7 @@ var defaults := {
 	"vol_master": 1.0, "vol_music": 0.8, "vol_sfx": 0.9,
 	"distortion": 1.0, "vibration": true, "show_fps": false,
 	"weather": 2,                           ## clima: 0 apagado, 1 reducido, 2 completo
+	"madness": true,                        ## locura acumulada (GDD 4.5)
 	"keys": {}, "joy": {},                  ## reasignaciones: acción -> tecla / botón
 }
 var values := {}

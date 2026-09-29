@@ -47,6 +47,8 @@ var _inject_bonus := {}
 const INJECT_TIME := 4.0
 var _status_mat: StandardMaterial3D         ## tinte de la estasis o la maldición
 var _overlay: Material = null               ## el que lleva puesto el modelo ahora
+var _aura: MeshInstance3D                   ## presencia: disco violeta en el suelo
+var _aura_mat: ShaderMaterial
 var _flash := 0.0
 var _flash_on := false
 var _flash_mat: StandardMaterial3D
@@ -81,6 +83,7 @@ func _ready() -> void:
 	_flash_mat.albedo_color = Color(1, 1, 1, 0.75)
 	_attack_timer = data.attack_cooldown * randf_range(0.5, 1.0)
 	anim_t = randf()
+	if data.aura_drain > 0.0 and data.aura_radius > 0.0: _make_aura()
 	behavior.start(self)
 	world.add_enemy(self)
 	reset_physics_interpolation.call_deferred()
@@ -273,6 +276,9 @@ func _physics_process(delta: float) -> void:
 	if velocity.length() > 0.1:
 		facing = facing.slerp(velocity.normalized(), 1.0 - exp(-10.0 * delta)).normalized()
 	# Contacto con los jugadores
+	if data.aura_drain > 0.0:                   # presencia: drena cordura a los de dentro del aura
+		for p in world.players:
+			if p.global_position.distance_to(global_position) <= data.aura_radius: p.drain_sanity(data.aura_drain * delta)
 	for p in world.players:
 		var r := data.body_radius + p.data.hurt_radius
 		var pp := p.global_position
@@ -293,6 +299,7 @@ func _process(delta: float) -> void:
 	visual.global_position = get_global_transform_interpolated().origin
 	visual.rotation.y = atan2(facing.x, facing.z)
 	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0)       # aparece creciendo
+	if _aura_mat: _aura_mat.set_shader_parameter("color", Color(0.45, 0.2, 0.7, 0.14 + 0.07 * sin(_spawn_t * 2.5)))
 	if not anim_hold and _stasis_t <= 0.0:          # congelado: la animación se detiene
 		anim_t = fposmod(anim_t + delta / Anims.duration(data.model, anim), 1.0)
 	Anims.pose(data.model, anim, model, anim_t)
@@ -309,6 +316,23 @@ func _process(delta: float) -> void:
 		for mi: MeshInstance3D in model.get_meta("meshes"):
 			mi.material_overlay = want
 	Prof.stop("enemigos_anim", t0)
+
+## Aura de presencia (GDD 4.4): disco violeta tenue que late alrededor de la élite.
+func _make_aura() -> void:
+	_aura = MeshInstance3D.new()
+	var pm := PlaneMesh.new()
+	pm.size = Vector2(2, 2)
+	_aura.mesh = pm
+	_aura_mat = ShaderMaterial.new()
+	_aura_mat.shader = preload("res://scripts/fx/telegraph.gdshader")
+	_aura_mat.set_shader_parameter("fill", true)
+	_aura_mat.set_shader_parameter("soft", true)
+	_aura_mat.set_shader_parameter("color", Color(0.45, 0.2, 0.7, 0.18))
+	_aura.material_override = _aura_mat
+	_aura.scale = Vector3.ONE * data.aura_radius
+	_aura.position.y = 0.05
+	_aura.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	visual.add_child(_aura)
 
 ## Material de tinte de estado (uno por enemigo, se cambia su color).
 func _status(c: Color) -> StandardMaterial3D:

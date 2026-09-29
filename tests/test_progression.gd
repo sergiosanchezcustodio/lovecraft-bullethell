@@ -107,6 +107,7 @@ func test_recuperacion_de_cordura() -> void:
 
 func test_crisis_de_paralisis_intermitente() -> void:
 	var s := SanityState.new(rules)
+	s.forced_kind = &"paralisis"          # el tipo sale al azar (hito 2.11); aquí se prueba la parálisis
 	s.rng.seed = 3
 	s.update(DT, 0.0, 100.0, false)
 	assert_true(s.in_crisis)
@@ -131,6 +132,7 @@ func test_crisis_de_paralisis_intermitente() -> void:
 func test_el_jugador_congelado_no_se_mueve_pero_dispara() -> void:
 	var p := _player()
 	p.sanity = 0.0
+	p.sanity_state.forced_kind = &"paralisis"          # el tipo sale al azar (hito 2.11)
 	var e := TrainingDummy.new().setup(p.world, "pinguino")
 	e.position = Vector3(4, 0, 0)
 	p.world.add_child(e)

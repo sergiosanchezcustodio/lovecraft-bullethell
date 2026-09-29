@@ -9,6 +9,9 @@ extends Resource
 @export var model := "pinguino"            ## nombre en models/ y juego de animaciones
 @export var tier := 1                      ## escalón (1-5); 4 y 5 son élites
 @export var elite := false
+## Presencia (GDD 4.4): élites y jefes drenan cordura a quien está dentro de su aura.
+@export var aura_radius := 0.0
+@export var aura_drain := 0.0              ## cordura por segundo
 ## Peso de aparición propio, que multiplica al del escalón (GDD 2.1): los de cuerpo a cuerpo
 ## son la masa de la horda y los que disparan, pocos.
 @export var spawn_weight := 1.0

@@ -31,6 +31,10 @@ var rules: ProgressionData
 var _down_ring: MeshInstance3D
 var _down_mat: ShaderMaterial
 var _elim_t := 0.0
+## Cordura completa (hito 2.11)
+var lights: Array[Node3D] = []   ## luces del escenario (recuperan cordura cerca)
+var madness := true              ## locura acumulada activada (configuración)
+var _wander := 0.0               ## rumbo del vagar sin rumbo (rad)
 var visual: Node3D          ## contenedor que gira hacia donde mira; dentro, el modelo voxel
 var model: Node3D
 var health := 0.0
@@ -81,6 +85,7 @@ func setup(p_data: CharacterData, p_input: PlayerInput, p_color: Color) -> Playe
 	health = data.max_health
 	sanity = data.max_sanity
 	sanity_state = SanityState.new(rules)
+	sanity_state.weights = data.crisis_weights          # pesos propios de las crisis (si los tiene)
 	name = "Player_%s" % data.id
 	return self
 
@@ -137,14 +142,22 @@ func _physics_process(delta: float) -> void:
 		return
 	input.update(delta)
 	var near := world != null and world.nearest_enemy(global_position, sanity_state.rules.horror_radius) != null
+	_sanity_context()
+	var before := sanity_state.crises
 	sanity = sanity_state.update(delta, sanity, data.max_sanity, near)
+	if sanity_state.crises != before and madness: rebuild_stats()      # locura acumulada
 	if data.calm_aura > 0.0 and world != null:       # rasgo de Iwanicki: calma a sí mismo y a los cercanos
 		for p in world.players:
 			if p.health > 0.0 and p.global_position.distance_to(global_position) <= CALM_RADIUS:
 				p.sanity = minf(p.data.max_sanity, p.sanity + data.calm_aura * delta)
 	motor.locked = sanity_state.is_frozen()
 	var was_dodging := motor.is_dodging()
-	velocity = motor.step(delta, input.move, input.just_pressed(InputBindings.DODGE))
+	var ss := sanity_state
+	var move := _crisis_move(delta, input.move)
+	var dodge := input.just_pressed(InputBindings.DODGE) and not (ss.is_kind(&"huida") or ss.is_kind(&"vagar"))
+	velocity = motor.step(delta, move, dodge)
+	if ss.is_kind(&"huida"): velocity *= rules.flee_speed
+	elif ss.is_kind(&"vagar"): velocity *= rules.wander_speed
 	move_and_slide()
 	position.y = 0.0
 	if leash.is_valid(): global_position = leash.call(global_position)
@@ -153,6 +166,53 @@ func _physics_process(delta: float) -> void:
 		_action_t = 0.0
 		dodged.emit()
 	if _hurt_time >= 0.0: _hurt_time += delta
+
+## Lo que rodea al jugador para su cordura: luces y compañeros cerca aceleran la
+## recuperación; compañeros al lado que no estén en crisis la acortan (calmar).
+func _sanity_context() -> void:
+	var ss := sanity_state
+	var k := 1.0
+	var here := global_position
+	for l in lights:
+		if is_instance_valid(l) and Vector2(l.global_position.x - here.x, l.global_position.z - here.z).length() <= rules.light_radius:
+			k *= rules.regen_near_light
+			break
+	var calm := 0.0
+	if world != null:
+		var mate := false
+		for q in world.players:
+			if q == self or q.health <= 0.0: continue
+			var d := q.global_position.distance_to(here)
+			if d <= rules.mate_radius: mate = true
+			if d <= rules.revive_radius and not q.sanity_state.in_crisis: calm = maxf(calm, q.data.revive_speed)
+		if mate: k *= rules.regen_near_mate
+	ss.regen_mult = k
+	ss.calm_speed = calm
+
+## Movimiento durante una crisis: huida (lejos del horror más cercano, sin control),
+## vagar (rumbo errático, obedece poco) o delirio (controles invertidos).
+func _crisis_move(delta: float, move: Vector2) -> Vector2:
+	var ss := sanity_state
+	if ss.is_kind(&"delirio"): return -move
+	if ss.is_kind(&"huida"):
+		var e := world.nearest_enemy(global_position, 14.0) if world != null else null
+		var away := (global_position - e.global_position) if e != null else motor.facing
+		away.y = 0.0
+		return _to_screen(away.normalized())
+	if ss.is_kind(&"vagar"):
+		_wander += (sin(ss.crisis_time * 1.7) * 2.0 + sin(ss.crisis_time * 4.3)) * delta
+		var w := Vector2(cos(_wander), sin(_wander))
+		return (w * (1.0 - rules.wander_obey) + move * rules.wander_obey).limit_length(1.0)
+	return move
+
+## Del suelo al espacio de la pantalla (inverso de PlayerMotor.screen_to_world).
+static func _to_screen(d: Vector3) -> Vector2:
+	return Vector2(d.dot(PlayerMotor.screen_to_world(Vector2(1, 0))), d.dot(PlayerMotor.screen_to_world(Vector2(0, 1))))
+
+## Presencia de una élite o un jefe: drena cordura sin contar como golpe.
+func drain_sanity(amount: float) -> void:
+	if health <= 0.0 or god: return
+	sanity = maxf(0.0, sanity - amount)
 
 ## Derribado: corre el tiempo y avanza la reanimación si hay un compañero al lado (si se
 ## aparta, lo avanzado se va perdiendo despacio).
@@ -380,7 +440,7 @@ func rebuild_stats() -> void:
 		data.dodge_speed = style.speed
 	var v := {
 		"max_health": base.max_health * Attributes.mult(attrs, "health"),
-		"max_sanity": base.max_sanity * Attributes.mult(attrs, "sanity"),
+		"max_sanity": base.max_sanity * Attributes.mult(attrs, "sanity") * _madness_factor(),
 		"move_speed": base.move_speed * Attributes.mult(attrs, "speed"),
 		"dodge_duration": (style.duration if style else base.dodge_duration) * data.dodge_length,
 		"dodge_iframes": (style.iframes if style else base.dodge_iframes) * data.dodge_length,
@@ -395,6 +455,11 @@ func rebuild_stats() -> void:
 	if motor: motor.data = data
 	health = minf(health + maxf(data.max_health - old_health, 0.0), data.max_health)
 	sanity = minf(sanity + maxf(data.max_sanity - old_sanity, 0.0), data.max_sanity)
+
+## Locura acumulada (GDD 4.5): cada crisis del nivel quita un poco de cordura máxima.
+func _madness_factor() -> float:
+	if not madness or sanity_state == null or rules == null: return 1.0
+	return maxf(rules.madness_floor, 1.0 - rules.madness_step * sanity_state.crises)
 
 ## Subida de nivel: +1 en un atributo, al azar con las probabilidades del nivel 1 (D-27).
 func gain_attribute() -> String:
