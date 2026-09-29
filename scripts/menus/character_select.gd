@@ -517,7 +517,7 @@ class _Frame extends Control:
 		_role.text = c.role
 		var wd: WeaponData = null
 		if not c.starting_weapons.is_empty(): wd = load("res://data/weapons/%s.tres" % c.starting_weapons[0])
-		_weapon.set_icon(wd.icon if wd else null, wd.display_name if wd else "Sin arma", wd.description if wd else "")
+		_weapon.set_icon(wd.get_icon() if wd else null, wd.display_name if wd else "Sin arma", wd.description if wd else "")
 		_passive.text = "Rasgo: " + c.passive_text
 		_fit_line(_name, 32, 24)
 		_fit_line(_role, 16, 13)

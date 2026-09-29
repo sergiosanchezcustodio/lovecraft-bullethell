@@ -101,6 +101,13 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var level_mods: Array[Dictionary] = []
 @export var level_text: Array[String] = []   ## descripción de cada mejora, para el menú
 
+## Imagen del arma: la asignada o, si no la hay, resources/weapons/icons/<id>.png
+## (tools/generar_iconos_armas.py). Null si no tiene.
+func get_icon() -> Texture2D:
+	if icon != null: return icon
+	var path := "res://resources/weapons/icons/%s.png" % id
+	return load(path) if ResourceLoader.exists(path) else null
+
 ## Valor de una estadística en un nivel dado.
 func stat(stat_name: String, level: int) -> float:
 	var v: float = get(stat_name)

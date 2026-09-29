@@ -153,13 +153,14 @@ class Sheet extends PanelContainer:
 			1: _weapons()
 			2: _items()
 
-	func _row(icon: String, name: String, value: String, dim := false) -> void:
+	func _row(icon: Variant, name: String, value: String, dim := false, px := 24) -> void:
 		var h := HBoxContainer.new()
 		h.add_theme_constant_override("separation", 8)
-		if icon != "":
+		var tex: Texture2D = icon if icon is Texture2D else (load(ICONS % icon) if icon is String and icon != "" else null)
+		if tex != null:
 			var t := TextureRect.new()
-			t.texture = load(ICONS % icon)
-			t.custom_minimum_size = Vector2(24, 24)
+			t.texture = tex
+			t.custom_minimum_size = Vector2(px, px)
 			t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			h.add_child(t)
@@ -203,7 +204,7 @@ class Sheet extends PanelContainer:
 		_text("Armas %d/%d" % [ws.size(), p.progress.weapon_slots], 17, UiKit.GOLD)
 		for w: WeaponSystem.Weapon in ws:
 			var d := w.data
-			_row("", d.display_name, "Nv %d/%d" % [w.level, d.max_level])
+			_row(d.get_icon(), d.display_name, "Nv %d/%d" % [w.level, d.max_level], false, 44)
 			var info := "%s. %s" % [CATEGORY[int(d.category)], d.description]
 			if w.level < d.max_level and w.level - 1 < d.level_text.size():
 				info += "\nSiguiente nivel: %s" % d.level_text[w.level - 1]

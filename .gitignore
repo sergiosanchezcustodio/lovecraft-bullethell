@@ -6,3 +6,6 @@ __pycache__/
 
 # Instrucciones para otras herramientas de IA (no forman parte del proyecto)
 AGENTS.md
+
+# claves de API (Replicate): nunca al repositorio
+.env

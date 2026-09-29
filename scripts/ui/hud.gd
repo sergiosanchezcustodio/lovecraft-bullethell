@@ -115,6 +115,8 @@ class PlayerPanel extends PanelContainer:
 	var _health_txt: Label
 	var _sanity_txt: Label
 	var _down_lbl: Label
+	var _weapons_row: HBoxContainer
+	var _weapons_key := ""                      ## armas y niveles pintados (solo se rehace al cambiar)
 
 	const MARGIN := 16.0
 
@@ -160,7 +162,10 @@ class PlayerPanel extends PanelContainer:
 		_sanity_txt = _bar_row(col, _sanity)
 		_xp = UiKit.Bar.new(UiKit.XP, 250, 6)
 		col.add_child(_xp)
-		_weapons_lbl = UiKit.label("", 15, UiKit.TEXT_DIM)
+		_weapons_row = HBoxContainer.new()                # armas: su icono con el nivel
+		_weapons_row.add_theme_constant_override("separation", 4)
+		col.add_child(_weapons_row)
+		_weapons_lbl = UiKit.label("", 15, UiKit.TEXT_DIM)  # las que no tienen icono, por su nombre
 		_weapons_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_weapons_lbl.custom_minimum_size.x = 250
 		col.add_child(_weapons_lbl)
@@ -177,6 +182,32 @@ class PlayerPanel extends PanelContainer:
 	func _ready() -> void:
 		add_child(_crisis_lbl)
 		add_child(_down_lbl)
+
+	## Iconos de las armas con su nivel en la esquina; sin icono, el nombre debajo.
+	func _paint_weapons() -> void:
+		for c in _weapons_row.get_children(): c.queue_free()
+		var names: PackedStringArray = []
+		if p.weapons != null:
+			for w in p.weapons.weapons:
+				var tex := w.data.get_icon()
+				if tex == null:
+					names.append("%s %d" % [w.data.display_name, w.level])
+					continue
+				var cell := Control.new()
+				cell.custom_minimum_size = Vector2(38, 38)
+				var t := TextureRect.new()
+				t.texture = tex
+				t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+				t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+				t.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+				cell.add_child(t)
+				var lv := UiKit.label(str(w.level), 13, UiKit.GOLD)
+				lv.position = Vector2(27, 21)
+				cell.add_child(lv)
+				_weapons_row.add_child(cell)
+		_weapons_row.visible = _weapons_row.get_child_count() > 0
+		_weapons_lbl.text = "  ·  ".join(names)
+		_weapons_lbl.visible = not names.is_empty()
 
 	func _bar_row(parent: Container, bar: UiKit.Bar) -> Label:
 		var h := HBoxContainer.new()
@@ -197,11 +228,12 @@ class PlayerPanel extends PanelContainer:
 		_xp.value = p.progress.xp_fraction()
 		_level_lbl.text = "Nv %d" % p.progress.level
 		_dodge.value = p.motor.dodge_ready_fraction()
-		var parts: PackedStringArray = []
+		var key := ""
 		if p.weapons != null:
-			for w in p.weapons.weapons:
-				parts.append("%s %d" % [w.data.display_name, w.level])
-		_weapons_lbl.text = "  ·  ".join(parts)
+			for w in p.weapons.weapons: key += "%s:%d," % [w.data.id, w.level]
+		if key != _weapons_key:
+			_weapons_key = key
+			_paint_weapons()
 		var ss := p.sanity_state
 		_crisis_lbl.text = ("Crisis: %s" % SanityState.NAMES.get(ss.crisis_kind, "locura")) if ss.in_crisis else ""
 		var down := p.health <= 0.0
