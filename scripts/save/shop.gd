@@ -17,6 +17,9 @@ class Entry:
 	var item: ShopItem
 	var character: CharacterData
 	var pet: PetData
+	var icon: Texture2D                        ## imagen dibujada, si la hay
+	var icon_model := ""                       ## si no, el modelo que se renderiza
+	var icon_mode := "full"                    ## "head" (retrato) o "full"
 
 ## Todo el catálogo, sección a sección.
 static func catalog() -> Array[Entry]:
@@ -34,6 +37,8 @@ static func catalog() -> Array[Entry]:
 		e.description = "%s. Rasgo: %s" % [c.role, c.passive_text]
 		e.prices = [c.price] as Array[int]
 		e.character = c
+		e.icon_model = c.model
+		e.icon_mode = "head"
 		out.append(e)
 	var pets: Array = DebugOptions.list_resources("res://data/pets")
 	pets.sort_custom(func(a: PetData, b: PetData) -> bool: return a.price < b.price)
@@ -43,6 +48,7 @@ static func catalog() -> Array[Entry]:
 		e.description = "%s (%s)." % [p.description.trim_suffix("."), p.story]
 		e.prices = [p.price] as Array[int]
 		e.pet = p
+		e.icon_model = p.model
 		out.append(e)
 	for it: ShopItem in items:
 		if it.section == ShopItem.Section.UPGRADE: out.append(_from_item(it))
@@ -52,6 +58,7 @@ static func _from_item(it: ShopItem) -> Entry:
 	var e := Entry.new()
 	e.id = String(it.id); e.name = it.display_name; e.description = it.description
 	e.section = it.section; e.prices = it.prices; e.item = it
+	e.icon = it.icon; e.icon_model = it.icon_model
 	return e
 
 static func in_section(section: int) -> Array[Entry]:

@@ -12,3 +12,4 @@ order = 2
 prices = Array[int]([5000])
 stat = "item_slots"
 per_level = 1.0
+icon_model = "icono_bolsillo"

@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ShopItem" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ShopItem" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/PantallasMenus/iconos/ficha_cordura.png" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -12,3 +13,4 @@ order = 2
 prices = Array[int]([150, 300, 600, 1000, 1500])
 stat = "sanity"
 per_level = 0.04
+icon = ExtResource("2")

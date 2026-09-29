@@ -67,10 +67,13 @@ func _show_tab(i: int) -> void:
 		c.queue_free()
 	_first = null
 	var focus: Control = null
+	var rows: Array = []
 	for e in Shop.in_section(i):
 		var row := _row(e)
+		rows.append(row)
 		if _first == null: _first = row
 		if e.id == _focus_id: focus = row
+	MenuKit.chain_focus(rows)                                 # arriba y abajo no salen de la lista
 	_money.text = "Dinero: %s $" % MenuKit.money(save.money if save else 0)
 	var target := focus if focus != null else _first
 	if target: target.grab_focus.call_deferred()
@@ -89,6 +92,15 @@ func _row(e: Shop.Entry) -> Button:
 	h.offset_left = 16; h.offset_right = -16; h.offset_top = 8; h.offset_bottom = -8
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(h)
+	var pic := TextureRect.new()                              # imagen del artículo
+	pic.texture = _icon(e)
+	pic.custom_minimum_size = Vector2(76, 76)
+	pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if maxed: pic.modulate = Color(1, 1, 1, 0.55)
+	h.add_child(pic)
+	h.add_theme_constant_override("separation", 14)
 	var col := VBoxContainer.new()
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -99,7 +111,7 @@ func _row(e: Shop.Entry) -> Button:
 	col.add_child(UiKit.label(name, 22, UiKit.TEXT))
 	var d := UiKit.label(e.description, 15, UiKit.TEXT_DIM)
 	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	d.custom_minimum_size.x = 640
+	d.custom_minimum_size.x = 560
 	col.add_child(d)
 	var tag := ""
 	var color := UiKit.GOLD
@@ -116,6 +128,15 @@ func _row(e: Shop.Entry) -> Button:
 	b.pressed.connect(_try_buy.bind(e))
 	_list.add_child(b)
 	return b
+
+## Imagen de un artículo: la dibujada o, si no hay, su modelo renderizado (una vez).
+var _icons := {}
+func _icon(e: Shop.Entry) -> Texture2D:
+	if e.icon != null: return e.icon
+	if e.icon_model == "": return null
+	var key := e.icon_model + ":" + e.icon_mode
+	if not _icons.has(key): _icons[key] = ModelIcon.make(self, e.icon_model, e.icon_mode, 160)
+	return _icons[key]
 
 func _try_buy(e: Shop.Entry) -> void:
 	_focus_id = e.id

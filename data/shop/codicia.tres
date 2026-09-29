@@ -12,3 +12,4 @@ order = 5
 prices = Array[int]([150, 300, 600, 1000, 1500])
 stat = "money"
 per_level = 0.05
+icon_model = "icono_codicia"

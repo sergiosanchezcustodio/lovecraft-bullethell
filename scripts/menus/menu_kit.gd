@@ -75,6 +75,30 @@ static func hint(text: String) -> Label:
 
 
 ## Confirmación de sí o no. El foco empieza en "no" (lo seguro). B / Esc también es "no".
+## Encierra el foco en una ventana mientras está abierta: los controles de detrás dejan de
+## poder recibirlo y, al cerrarse, lo recuperan. Sin esto, el mando (que busca el control más
+## cercano en la dirección pulsada) saltaba a los botones de detrás de la ventana.
+static func trap_focus(root: Control) -> void:
+	var saved := {}                              # id del control -> su focus_mode
+	for c in root.get_tree().root.find_children("*", "Control", true, false):
+		var ctl := c as Control
+		if ctl == root or root.is_ancestor_of(ctl) or ctl.focus_mode == Control.FOCUS_NONE: continue
+		saved[ctl.get_instance_id()] = ctl.focus_mode
+		ctl.focus_mode = Control.FOCUS_NONE
+	root.tree_exiting.connect(func() -> void:
+		for id in saved:
+			var o := instance_from_id(id)
+			if o != null and is_instance_valid(o): (o as Control).focus_mode = saved[id])
+
+## Lista vertical: arriba y abajo recorren las filas y no salen de ella por los extremos.
+static func chain_focus(rows: Array) -> void:
+	for i in rows.size():
+		var r := rows[i] as Control
+		r.focus_neighbor_top = r.get_path_to(rows[maxi(i - 1, 0)])
+		r.focus_neighbor_bottom = r.get_path_to(rows[mini(i + 1, rows.size() - 1)])
+		r.focus_neighbor_left = r.get_path_to(r)
+		r.focus_neighbor_right = r.get_path_to(r)
+
 class Confirm extends Control:
 	signal answered(yes: bool)
 	var _text := ""
@@ -107,6 +131,14 @@ class Confirm extends Control:
 		yes.custom_minimum_size = Vector2(220, 58)
 		yes.pressed.connect(_answer.bind(true))
 		row.add_child(yes)
+		# izquierda y derecha pasan de un botón al otro; arriba y abajo no se van a ningún sitio
+		for b: Button in [_no_button, yes]:
+			var other := yes if b == _no_button else _no_button
+			b.focus_neighbor_left = b.get_path_to(other)
+			b.focus_neighbor_right = b.get_path_to(other)
+			b.focus_neighbor_top = b.get_path_to(b)
+			b.focus_neighbor_bottom = b.get_path_to(b)
+		MenuKit.trap_focus(self)
 		_no_button.grab_focus.call_deferred()
 
 	func _unhandled_input(event: InputEvent) -> void:

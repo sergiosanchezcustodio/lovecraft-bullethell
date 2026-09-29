@@ -52,6 +52,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _push(popup: Control, from: int) -> void:
 	_popup = popup
 	add_child(popup)
+	MenuKit.trap_focus(popup)                  # el mando no se escapa a los botones de detrás
 	popup.tree_exited.connect(func() -> void:
 		_popup = null
 		if is_inside_tree(): _buttons[from].grab_focus.call_deferred())

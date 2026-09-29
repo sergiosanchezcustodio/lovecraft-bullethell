@@ -139,6 +139,9 @@ Léela al empezar cada sesión:
     - `Pet` (`scripts/pets/pet.gd`): sigue a su jugador (se da prisa si se aleja; si se queda muy atrás, aparece a su lado) con un anillo fino de su color. Perro (`PetData.Kind.BITE`): corre a morder a los enemigos a menos de 5,5 m de su jugador, 9 + 2 por nivel del jugador. Gato (`WARD`): `Player.mental_resist` quita un 20 % del daño mental (+1 % por nivel, hasta 35 %), también el de las auras.
     - En partida sale el compañero de cada puesto de la selección (`GameSession.Seat.pet`); lanzando directo, `pet=perro|gato` para el J1.
     - Tests en `tests/test_pets.gd`.
+  - **Arreglos de mando en los menús e imágenes en la tienda (29-09-2026):**
+    - Las ventanas encima (confirmación, tienda, configuración) dejaban que el foco saltara a los botones de detrás: la cruceta no pasaba de "Cancelar" a "Comprar" y en la tienda, al bajar del último artículo, se iba al menú principal. `MenuKit.trap_focus(ventana)` deja sin foco lo de detrás mientras está abierta (lo usan `Confirm` y `MainMenu._push`); `MenuKit.chain_focus(filas)` encadena una lista para que no salga por los extremos. Tests en `tests/test_menu_focus.gd` (con eventos de mando simulados).
+    - Cada artículo de la tienda lleva su imagen: los iconos de la ficha para Vitalidad, Temple, Puntería y Agilidad (`ShopItem.icon`); el retrato del modelo para los personajes y el modelo entero para los compañeros (`ModelIcon`, `scripts/ui/model_icon.gd`); y tres iconos en voxel nuevos para Codicia, la quinta funda y el quinto bolsillo (`tools/gen_iconos_tienda.py`, `ShopItem.icon_model`).
   - Después: hito 2.13d, la tienda de antigüedades con el anciano.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
@@ -495,6 +498,7 @@ Tus imágenes en `resources/PantallasMenus/`: `fondo_titulo_sin_texto_1080p_defi
 - **Propiedades antes de `script` en un `.tres`:** Godot las ignora (aún no sabe de qué clase es el recurso). Van siempre después de la línea `script = ExtResource(...)`.
 - **Colores en `.tres`:** `Color(r, g, b)` con tres componentes no se carga; hacen falta los cuatro.
 - **Referencias circulares entre RefCounted:** dos objetos que se guardan el uno al otro (el equipo y el progreso de cada jugador) no se liberan nunca, ni al reiniciar la escena; aparece como "N resources still in use at exit". Uno de los dos debe guardar al otro con `weakref()`. Para localizarlo: `godot --verbose ... --quit-after N` y mirar qué scripts siguen en uso.
+- **Foco del mando con ventanas encima:** Godot busca el control más cercano en la dirección pulsada entre todos los visibles, también los que están detrás de una ventana. Toda ventana modal debe encerrar el foco (`MenuKit.trap_focus`).
 - **Relámpagos y luz ambiental:** si el ambiente sale del cielo, cada relámpago ilumina el valle como si fuera de día. Usa ambiente de color fijo y deja el destello al cielo, a un contraluz rasante y a una luz puntual.
 - **Montañas voxel:** un cono con pendiente uniforme o bloques aplanados se ven como pirámides escalonadas. Hacen falta cárcavas, un contorno quebrado de agujas (ruido de crestas de celda pequeña) y pocas mesetas.
 - **NumPy y JSON:** los enteros de NumPy (`int64`) no se pueden serializar; conviértelos con `int()` o `float()` antes de `json.dump`.

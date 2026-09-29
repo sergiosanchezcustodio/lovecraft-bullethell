@@ -11,6 +11,8 @@ enum Section { POWERUP, CHARACTER, PET, UPGRADE }
 @export_multiline var description := ""
 @export var section := Section.POWERUP
 @export var order := 0                          ## orden dentro de su sección
+@export var icon: Texture2D                     ## imagen del artículo
+@export var icon_model := ""                    ## o, si no tiene, un modelo en models/ para renderizarla
 ## Precio de cada nivel (el tamaño es el número de niveles).
 @export var prices: Array[int] = [150, 300, 600, 1000, 1500]
 ## Efecto por nivel: `stat` sube `per_level` (multiplicador: 0,04 = +4 %; huecos: +1).
