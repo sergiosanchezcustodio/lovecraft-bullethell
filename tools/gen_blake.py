@@ -43,7 +43,7 @@ for y in range(45, 58, 3):                                              # rayas 
 cu.neck(M, SKIN)
 
 cu.arms(M, COAT, SKIN, cuff=COAT_SH, ax=AX, slim=True)
-cu.head(M, SKIN, SKIN_SH, ears=False)
+cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
 cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
 cu.cheeks(M, CHEEK, y=70)
 cu.mouth(M, LIP)

@@ -35,10 +35,13 @@ def new(seed):
     return Model(S=3, seed=seed)                  # voxel_size = 1/48 m
 
 
-def slab(M, part, col, y0, y1, cx, cz, w0, w1, d0, d1, ch=2, over=True, zoff0=0.0, zoff1=0.0):
+def slab(M, part, col, y0, y1, cx, cz, w0, w1, d0, d1, ch=2, over=True, zoff0=0.0, zoff1=0.0, r=None):
     """Tramo que se estrecha: en cada altura, un rectángulo de ancho w y fondo d (de w0/d0
     abajo a w1/d1 arriba) con las cuatro aristas verticales achaflanadas `ch` voxels.
-    zoff desplaza el tramo adelante o atrás con la altura (pantorrilla, pecho)."""
+    zoff desplaza el tramo adelante o atrás con la altura (pantorrilla, pecho).
+    En la cabeza (sombreros, pelo, barba) las esquinas son redondas, de radio ch + 1,5
+    (o `r`), en lugar del chaflán."""
+    if r is None and part == H and ch > 0: r = ch + 1.5
     for y in range(y0, y1):
         t = (y - y0 + 0.5) / max(y1 - y0, 1)
         w = w0 + (w1 - w0) * t
@@ -50,7 +53,32 @@ def slab(M, part, col, y0, y1, cx, cz, w0, w1, d0, d1, ch=2, over=True, zoff0=0.
             for z in range(za, zb):
                 ex = min(x - xa, xb - 1 - x)
                 ez = min(z - za, zb - 1 - z)
-                if ex + ez < ch: continue                 # chaflán
+                if r:
+                    qx, qz = r - 0.5 - ex, r - 0.5 - ez
+                    if qx > 0 and qz > 0 and qx * qx + qz * qz > r * r: continue
+                elif ex + ez < ch: continue                 # chaflán
+                M.put(x, y, z, part, col, 0, over)
+
+
+def rslab(M, part, col, y0, y1, cx, cz, w, d, r=3.0, rt=3.0, rb=2.0, over=True, zoff=0.0):
+    """Bloque redondeado (cabezas, gorros, barbas): sección de rectángulo con esquinas de
+    radio r, y arriba y abajo se encoge como un cuarto de círculo de radio rt / rb.
+    Con radios de 2 a 4 voxels la forma se lee redonda sin dejar escalones sueltos."""
+    for y in range(y0, y1):
+        yc = y + 0.5
+        k = 0.0
+        if rt > 0 and yc > y1 - rt: k = rt - math.sqrt(max(0.0, rt * rt - (yc - (y1 - rt)) ** 2))
+        if rb > 0 and yc < y0 + rb: k = max(k, rb - math.sqrt(max(0.0, rb * rb - ((y0 + rb) - yc) ** 2)))
+        hw, hd = w / 2 - k, d / 2 - k
+        if hw <= 0 or hd <= 0: continue
+        rr = max(0.0, min(r, hw, hd))
+        zc = cz + zoff * (y - y0) / max(y1 - y0, 1)
+        for x in range(int(math.floor(cx - hw)), int(math.ceil(cx + hw))):
+            for z in range(int(math.floor(zc - hd)), int(math.ceil(zc + hd))):
+                px, pz = abs(x + 0.5 - cx), abs(z + 0.5 - zc)
+                if px > hw or pz > hd: continue
+                qx, qz = px - (hw - rr), pz - (hd - rr)
+                if qx > 0 and qz > 0 and qx * qx + qz * qz > rr * rr: continue
                 M.put(x, y, z, part, col, 0, over)
 
 
@@ -254,13 +282,16 @@ def hand_(M, part, hx, col, mitten=False):
 
 # ---------------- cabeza y cara ----------------
 
-def head(M, skin, skin_sh, ears=True, nose=True):
-    """Cabeza (la mandíbula algo más estrecha), nariz y orejas."""
-    slab(M, H, skin, 64, 80, 0, 0.5, 13.5, 14.5, 14, 14.5, ch=2)
-    if nose: slab(M, H, skin_sh, 69, 72, 0, 8, 2.5, 2.5, 2, 2, ch=0)
+def head(M, skin, skin_sh, ears=True, nose=True, w=15.0, d=15.0, fem=False):
+    """Cabeza redondeada (30-09-2026, referencia del autor): esquinas de radio 4, coronilla
+    y mandíbula en cuarto de círculo, nariz que asoma 1 (fem: más pequeña) y orejas redondas."""
+    rslab(M, H, skin, 64, 81, 0, 0.5, w, d, r=4, rt=4, rb=3)
+    if nose:                                          # asoma 1 (2 parecía de payaso)
+        if fem: rslab(M, H, skin_sh, 69, 71, 0, 0.5 + d / 2, 2, 2, r=0, rt=0, rb=0)
+        else: rslab(M, H, skin_sh, 69, 72, 0, 0.5 + d / 2, 3, 2, r=1, rt=1, rb=0)
     if ears:
         for s in (-1, 1):
-            slab(M, H, skin_sh, 70, 75, 7.5 * s, 0, 1.5, 1.5, 3.5, 3.5, ch=0)
+            rslab(M, H, skin_sh, 70, 75, (w / 2 + 0.5) * s, 0, 2, 4, r=1, rt=1, rb=1)
 
 
 def paint_face(M, x, y, col, dz=0):
@@ -268,27 +299,32 @@ def paint_face(M, x, y, col, dz=0):
 
 
 def eyes(M, brow, eye=EYE, white=EYE_W, y=73, brow_style='caida', lashes=None):
-    """Ojos de 3 filas con el blanco por fuera y un brillo, y cejas finas encima.
-    brow_style: 'caida' (caída por fuera, la de Dyer), 'recta' o 'poblada'."""
+    """Ojos de 2 filas con el blanco por fuera y un brillo, y cejas encima (con relieve).
+    brow_style: 'caida' (caída por fuera), 'recta' o 'poblada'. Con pestañas (mujeres), la
+    ceja es de una fila y más fina."""
     for x, c in ((-5, white), (-4, eye), (-3, eye), (2, eye), (3, eye), (4, white)):
-        for yy in (y, y + 1, y + 2): paint_face(M, x, yy, c)
-    paint_face(M, -3, y + 2, white); paint_face(M, 2, y + 2, white)          # brillo
+        for yy in (y, y + 1): paint_face(M, x, yy, c)
+    paint_face(M, -3, y + 1, white); paint_face(M, 2, y + 1, white)          # brillo
     if lashes is not None:                                                    # pestañas en el rabillo
-        paint_face(M, -6, y + 2, lashes); paint_face(M, 5, y + 2, lashes)
-        for x in (-5, -4, -3, 2, 3, 4): paint_face(M, x, y + 3, lashes)
-    if brow_style == 'caida':
-        pts = ((-5, 3), (-4, 4), (-3, 4), (-2, 4), (1, 4), (2, 4), (3, 4), (4, 3))
+        paint_face(M, -6, y + 1, lashes); paint_face(M, 5, y + 1, lashes)
+        for x in (-5, -4, -3, 2, 3, 4): paint_face(M, x, y + 2, lashes)
+        pts = ((-5, 4), (-4, 4), (-3, 4), (2, 4), (3, 4), (4, 4))
+    elif brow_style == 'caida':
+        pts = ((-6, 3), (-5, 4), (-4, 4), (-3, 4), (-2, 3), (1, 3), (2, 4), (3, 4), (4, 4), (5, 3),
+               (-5, 3), (-4, 3), (3, 3), (4, 3))
     elif brow_style == 'recta':
-        pts = ((-5, 4), (-4, 4), (-3, 4), (-2, 4), (1, 4), (2, 4), (3, 4), (4, 4))
-    else:                                                                     # poblada: dos filas
-        pts = ((-5, 4), (-4, 4), (-3, 4), (-2, 4), (1, 4), (2, 4), (3, 4), (4, 4),
-               (-4, 5), (-3, 5), (2, 5), (3, 5))
+        pts = ((-5, 3), (-4, 3), (-3, 3), (-2, 3), (1, 3), (2, 3), (3, 3), (4, 3),
+               (-4, 4), (-3, 4), (2, 4), (3, 4))
+    else:                                                                     # poblada
+        pts = ((-6, 3), (-5, 3), (-4, 3), (-3, 3), (-2, 3), (1, 3), (2, 3), (3, 3), (4, 3), (5, 3),
+               (-5, 4), (-4, 4), (-3, 4), (-2, 4), (1, 4), (2, 4), (3, 4), (4, 4))
     for x, dy in pts:
         paint_face(M, x, y + dy, brow, dz=1)
 
 
 def cheeks(M, col, y=71):
-    for x in (-6, -5, 4, 5): paint_face(M, x, y, col)
+    for x in (-6, -5, 4, 5):
+        for yy in (y - 1, y): paint_face(M, x, yy, col)
 
 
 def mouth(M, col, y=67, wide=False):
@@ -296,9 +332,9 @@ def mouth(M, col, y=67, wide=False):
 
 
 def beard(M, col):
-    """Barba corta: mentón redondeado y capa delante y a los lados, como Dyer."""
-    slab(M, H, col, 63, 65, 0, 3.5, 9, 11, 7, 8, ch=2)
-    slab(M, H, col, 65, 70, 0, 3.5, 12, 13.5, 8, 8.5, ch=2)
+    """Barba poblada y redonda: cubre la mandíbula y los carrillos, deja ver las mejillas."""
+    rslab(M, H, col, 61, 69, 0, 2.5, 16, 12, r=4, rt=0, rb=4)
+    rslab(M, H, col, 66, 71, -0.5, 1.5, 17, 11, r=3, rt=0, rb=0)
 
 
 def moustache(M, col, xs=range(-3, 3), y=69, rows=1):

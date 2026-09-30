@@ -45,7 +45,7 @@ cu.arms(M, DRESS, SKIN, cuff=DRESS_SH, cuff_wide=False, ax=AX, slim=True)
 for s, _, _, arm, _ in cu.sides():                                      # la estola cubre el hombro
     slab(M, arm, STOLE, 53, 61, AX * s, 0, 8, 8.5, 8.5, 9, ch=1)
     slab(M, arm, FRINGE, 52, 53, AX * s, 0, 8, 8, 8.5, 8.5, ch=1)
-cu.head(M, SKIN, SKIN_SH, ears=False)
+cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
 cu.eyes(M, BROW, brow_style='caida', lashes=cu.EYE)
 cu.cheeks(M, CHEEK, y=70)
 cu.mouth(M, LIP, wide=True)

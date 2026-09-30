@@ -52,7 +52,7 @@ cu.opening(M, 59, 63, 2, 2, TIE)
 cu.neck(M, SKIN)
 for x, y in ((5, 56), (6, 56), (5, 57), (6, 57), (4, 57)): cu.front(M, x, y, FLOWER, dz=1)   # clavel
 
-cu.head(M, SKIN, SKIN_SH, ears=False)
+cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
 cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
 cu.cheeks(M, CHEEK, y=70)
 cu.mouth(M, LIP, wide=True)

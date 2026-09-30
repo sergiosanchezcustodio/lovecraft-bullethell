@@ -47,7 +47,7 @@ for x in (-4, -3, 2, 3): cu.front(M, x, 61, STETH, dz=1)
 for x, y in ((-4, 50), (-3, 50), (-4, 49), (-3, 49)): cu.front(M, x, y, STETH_M, dz=1)
 
 cu.arms(M, COAT, SKIN, cuff=COAT_SH, cuff_wide=False, ax=AX, slim=True)
-cu.head(M, SKIN, SKIN_SH, ears=False)
+cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
 cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
 cu.cheeks(M, CHEEK, y=70)
 cu.mouth(M, LIP)

@@ -55,7 +55,7 @@ cu.arms(M, SHIRT, SKIN, fore=SKIN, ax=AX, slim=True)
 for s, _, _, _, fa in cu.sides():
     slab(M, fa, SHIRT_SH, 43, 46, AX * s * 1.02, 0.5, 7.5, 7.5, 8, 8, ch=1)
 
-cu.head(M, SKIN, SKIN_SH, ears=False)
+cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
 cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
 cu.cheeks(M, CHEEK)
 cu.mouth(M, LIP)
