@@ -67,6 +67,18 @@
   ],
   "fog_density": 0.0
  },
+ "no_shadow": [
+  "costa_1",
+  "costa_2",
+  "costa_3",
+  "tempano_1",
+  "tempano_2",
+  "tempano_3",
+  "tempano_4",
+  "tempano_5",
+  "iceberg_1",
+  "iceberg_2"
+ ],
  "lamp": {
   "color": [
    1.0,

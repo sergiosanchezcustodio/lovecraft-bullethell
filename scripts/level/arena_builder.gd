@@ -35,6 +35,10 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 		holder.scale = Vector3.ONE * float(p.scale)
 		var m := VoxelBuilder.load_model("res://models/%s.json" % p.model)
 		holder.add_child(m)
+		# lo que está en el mar o en la orilla solo haría sombra sobre el agua, que no la recibe
+		if p.model in data.get("no_shadow", []):
+			for mi: MeshInstance3D in m.find_children("*", "MeshInstance3D", true, false):
+				mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		props.add_child(holder)
 		_collider(holder, m, data.colliders.get(p.model, {}), obstacles)
 		if (m.get_meta("pivots") as Dictionary).has("light"):

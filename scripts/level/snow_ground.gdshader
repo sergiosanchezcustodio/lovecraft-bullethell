@@ -25,11 +25,11 @@ float vnoise(vec2 p) {
 	return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
 }
 
-float fbm(vec2 p) {
+float fbm(vec2 p) {          // 3 octavas (4 costaban demasiado a pantalla completa)
 	float s = 0.0, a = 0.5;
 	mat2 r = mat2(vec2(0.8, 0.6), vec2(-0.6, 0.8));
-	for (int i = 0; i < 4; i++) { s += a * vnoise(p); p = r * p * 2.03; a *= 0.5; }
-	return s;
+	for (int i = 0; i < 3; i++) { s += a * vnoise(p); p = r * p * 2.03; a *= 0.5; }
+	return s * 1.14;
 }
 
 // Altura de la celda c (en escalones enteros)
@@ -38,7 +38,7 @@ float height(vec2 c) {
 	vec2 wd = normalize(wind);
 	vec2 q = vec2(dot(p, wd), dot(p, vec2(-wd.y, wd.x)));
 	float drift = fbm(p * 0.07) * 6.0;                            // ventisqueros
-	float sas = fbm(vec2(q.x * 1.6, q.y * 0.35)) * 1.4;            // sastrugi, alargados por el viento
+	float sas = vnoise(vec2(q.x * 1.6, q.y * 0.35)) * 1.4;            // sastrugi, alargados por el viento
 	float grain = hash(c) * 0.3;                                   // grano de voxel
 	return floor(drift + sas + grain);
 }
@@ -55,8 +55,9 @@ void fragment() {
 	} else {
 		vec2 c = floor(wpos.xz / cell);
 		float h = height(c);
-		float hx = height(c + vec2(1, 0)) - height(c - vec2(1, 0));
-		float hz = height(c + vec2(0, 1)) - height(c - vec2(0, 1));
+		// diferencias hacia delante (3 alturas por píxel en vez de 5)
+		float hx = (height(c + vec2(1, 0)) - h) * 2.0;
+		float hz = (height(c + vec2(0, 1)) - h) * 2.0;
 		vec3 n = normalize(vec3(-hx * 0.18 * relief, 1.0, -hz * 0.18 * relief));
 		NORMAL = normalize((VIEW_MATRIX * vec4(n, 0.0)).xyz);
 

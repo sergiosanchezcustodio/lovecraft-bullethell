@@ -357,9 +357,11 @@ func _open_level_up() -> void:
 	if players.size() > 1: title = "J%d · %s · %s" % [q.index + 1, q.data.display_name, title]
 	if not q.progress.attr_gains.is_empty():                        # D-27: el atributo que ha subido
 		title += "   ·   +1 %s" % Attributes.LONG[q.progress.attr_gains[0]]
-	var menu := Menus.LevelUpMenu.new(options, title)
-	menu.chosen.connect(func(o: PlayerProgress.Option) -> void:
-		q.progress.choose(o, q)
+	# la misma ventana que en cooperativo, centrada (antes, Menus.LevelUpMenu: fila de botones
+	# con el foco de Godot, que con el mando no bajaba y a ratos no respondía)
+	var menu := CoopLevelUp.new([{"player": q, "options": options, "title": title}] as Array[Dictionary],
+		func(pq: Player, o: PlayerProgress.Option) -> void: pq.progress.choose(o, pq), true)
+	menu.finished.connect(func() -> void:
 		_menu_open = false
 		get_tree().paused = false
 		_open_level_up.call_deferred())

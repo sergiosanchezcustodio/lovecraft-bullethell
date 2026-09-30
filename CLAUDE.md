@@ -163,7 +163,9 @@ Léela al empezar cada sesión:
     - Costa (`tools/gen_costa_hielo.py`): frente de la plataforma, témpanos de cinco tamaños, icebergs y montículos de hielo en tierra (sustituyen a las rocas).
     - Atrezo a 48 voxels/m (`tools/gen_atrezo_expedicion.py`): tienda de lona, caja, barril, trineo, trípode y bandera. `gen_atrezo_campamento.py` ya no genera tienda, caja ni bidón.
     - `"no_bottom": true` en el JSON del atrezo fijo: `VoxelBuilder` no construye las caras hacia abajo (`BUILDER_VERSION` 4). Mantiene el rendimiento (115 FPS con 150 enemigos).
-    - Pendiente: cabaña, iglú, faroles y barrera con el detalle anterior.
+    - Cabaña, iglú y farol rehechos en `gen_atrezo_expedicion.py`; barrera en seracs con bloques caídos (`gen_barrera_hielo.py`). `"no_shadow"` en el JSON de la arena: la costa, los témpanos y los icebergs no proyectan sombra (caería sobre el agua).
+    - Rendimiento con 150 enemigos y 1.200 balas: 88 FPS de media (102 antes del escenario nuevo); el 1 % peor igual (~60). Sobra geometría (8 M de primitivas): si hace falta, bajar la resolución de la tienda y la cabaña o unir caras en `VoxelBuilder`.
+  - **Subida de nivel con mando arreglada (30-09-2026):** la misma ventana (`CoopLevelUp`) en solitario (centrada, `solo=true`) y en cooperativo. La cruceta abajo es también `MAP` y `JoypadInput` no la da como movimiento: `CoopLevelUp.nav_dir` la lee aparte. Repite al mantener; solo confirmar espera 0,35 s. Tarjetas con la imagen del arma (`get_icon()`) o del objeto (`UpgradeData.icon`; la brújula usa de momento el icono de Cultura). `Menus.LevelUpMenu` ya no se usa. Tests en `tests/test_level_up_input.gd`.
   - Después: hito 2.15, vestuario.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.

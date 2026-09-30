@@ -114,6 +114,9 @@ layout = {
     "light": {"sun_rot": [-18, 35], "sun_color": [1.0, 0.80, 0.62], "sun_energy": 0.6, "exposure": 1.2,
               "ambient_color": [0.50, 0.58, 0.72], "ambient_energy": 0.32,
               "background": [0.20, 0.25, 0.33], "fog_color": [0.30, 0.36, 0.46], "fog_density": 0.0},
+    # sin sombra: solo caería sobre el agua, que no la recibe (ahorra geometría)
+    "no_shadow": ["costa_1", "costa_2", "costa_3", "tempano_1", "tempano_2", "tempano_3", "tempano_4",
+                  "tempano_5", "iceberg_1", "iceberg_2"],
     "lamp": {"color": [1.0, 0.72, 0.4], "energy": 2.2, "range": 8.0},
     "colliders": {
         "atrezo_tienda": {"type": "box", "shrink": 0.8},

@@ -19,7 +19,7 @@ class Option:
 		return "%s  %d" % [upgrade.display_name, to_level]
 	func text() -> String:
 		match kind:
-			Kind.NEW_WEAPON: return "Arma nueva"
+			Kind.NEW_WEAPON: return weapon.description if weapon.description != "" else "Arma nueva"
 			Kind.WEAPON_LEVEL: return weapon.level_text[to_level - 2] if to_level - 2 < weapon.level_text.size() else "Mejora"
 		return upgrade.description
 

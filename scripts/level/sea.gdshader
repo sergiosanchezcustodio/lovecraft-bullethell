@@ -47,8 +47,8 @@ void fragment() {
 	vec2 p = (c + 0.5) * cell;
 	// escalones de altura (como el suelo): 6 niveles
 	float h = floor(wave(p, t) * 6.0) / 6.0;
-	float hx = floor(wave(p + vec2(cell, 0), t) * 6.0) / 6.0 - floor(wave(p - vec2(cell, 0), t) * 6.0) / 6.0;
-	float hz = floor(wave(p + vec2(0, cell), t) * 6.0) / 6.0 - floor(wave(p - vec2(0, cell), t) * 6.0) / 6.0;
+	float hx = (floor(wave(p + vec2(cell, 0), t) * 6.0) / 6.0 - h) * 2.0;
+	float hz = (floor(wave(p + vec2(0, cell), t) * 6.0) / 6.0 - h) * 2.0;
 	vec3 n = normalize(vec3(-hx * 1.2, 1.0, -hz * 1.2));
 	NORMAL = normalize((VIEW_MATRIX * vec4(n, 0.0)).xyz);
 

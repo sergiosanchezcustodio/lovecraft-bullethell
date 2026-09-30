@@ -361,9 +361,9 @@ def bloques_hielo():
     snow_cap(M, thresh=(2 * H + 8) / S, depth=2)
     return M, {'body': [0, 0, 0]}
 
-# tienda, caja y bidón: ahora en gen_atrezo_expedicion.py (48 voxels/m)
-PIECES = (('farol', farol), ('roca', roca), ('hielo', hielo),
-          ('iglu', iglu), ('cabana', cabana), ('bloques_hielo', bloques_hielo))
+# tienda, caja, bidón, farol, iglú y cabaña: ahora en gen_atrezo_expedicion.py
+PIECES = (('roca', roca), ('hielo', hielo),
+          ('bloques_hielo', bloques_hielo))
 VOXEL_PIVOTS = {'tienda', 'iglu', 'cabana', 'bloques_hielo'}          # diseñadas en voxels, no en ub
 SHINY = {'hielo', 'bloques_hielo'}                                     # hielo brillante, lo demás mate
 

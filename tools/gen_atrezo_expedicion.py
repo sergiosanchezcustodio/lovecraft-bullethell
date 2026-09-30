@@ -336,13 +336,268 @@ def bandera():
     return M
 
 
-PIECES = {'tienda': tienda, 'caja': caja, 'bidon': bidon, 'trineo': trineo, 'tripode': tripode, 'bandera': bandera}
+# ---------------- farol ----------------
+
+def farol():
+    """Farol de poste: poste de madera con vetas, brazo con tornapunta y voluta de hierro,
+    farol de cuatro cristales con marco, tejadillo y asa, nieve encima y al pie, y cuña de
+    piedras. Pivote "light" en la llama."""
+    M = Model(S=3, seed=27)
+    H = 104                                                        # 2,15 m
+    for y in range(0, H):
+        for x in range(-2, 2):
+            for z in range(-2, 2):
+                if abs(x + 0.5) + abs(z + 0.5) > 3: continue          # aristas achaflanadas
+                c = lerp(WOOD_D, WOOD, 0.45 + 0.4 * M.noise(x * 0.8, y * 0.08, z * 0.8, 1.0))
+                if (y + x * 7) % 23 == 0: c = GROOVE                  # vetas
+                M.put(x, y, z, P, c)
+    for y in range(H, H + 3):                                       # remate
+        for x in range(-3, 3):
+            for z in range(-3, 3): M.put(x, y, z, P, WOOD_D)
+    for x in range(-2, 30):                                         # brazo
+        for y in (H - 6, H - 5, H - 4):
+            for z in (-1, 0): M.put(x, y, z, P, WOOD if y != H - 6 else WOOD_D)
+    for i in range(22):                                              # tornapunta
+        for z in (-1, 0):
+            M.put(2 + i, H - 28 + i, z, P, WOOD_D); M.put(2 + i, H - 27 + i, z, P, WOOD)
+    for a in range(0, 300, 12):                                      # voluta de hierro
+        t = math.radians(a); r = 2 + a / 60
+        M.put(int(round(10 + r * math.cos(t))), int(round(H - 12 + r * math.sin(t))), 0, P, IRON)
+    LX, LY = 26, H - 26                                              # farol colgado
+    for y in range(LY + 12, H - 6): M.put(LX, y, 0, P, IRON); M.put(LX, y, -1, P, IRON)   # gancho
+    for x in range(LX - 6, LX + 6):
+        for z in range(-6, 6):
+            M.put(x, LY - 10, z, P, IRON)                            # base
+            M.put(x, LY - 9, z, P, IRON_L if min(x - LX + 6, LX + 5 - x, z + 6, 5 - z) == 0 else IRON)
+    for y in range(LY - 8, LY + 7):                                  # cristales y montantes
+        for x in range(LX - 5, LX + 5):
+            for z in range(-5, 5):
+                ex = x in (LX - 5, LX + 4); ez = z in (-5, 4)
+                if not (ex or ez): continue
+                if (ex and ez) or y in (LY - 8, LY + 6): M.put(x, y, z, P, IRON)
+                else: M.put(x, y, z, P, (1.0, 0.82, 0.50), glow=1)
+    for y in range(LY - 7, LY + 4):                                  # llama
+        w = 2 if y < LY + 1 else 1
+        for x in range(LX - w, LX + w):
+            for z in range(-w, w): M.put(x, y, z, P, (1.0, 0.72, 0.30), glow=1)
+    for i, y in enumerate(range(LY + 7, LY + 12)):                  # tejadillo
+        w = 7 - i
+        for x in range(LX - w, LX + w):
+            for z in range(-w, w): M.put(x, y, z, P, IRON if i < 4 else IRON_L)
+    for x in range(LX - 3, LX + 3): M.put(x, LY + 14, 0, P, IRON)   # asa
+    for y in range(LY + 11, LY + 14): M.put(LX - 3, y, 0, P, IRON); M.put(LX + 2, y, 0, P, IRON)
+    snow_on_top(M, prob=0.95, depth=1, min_y=H - 5)
+    for x in range(-4, 5):                                           # cuña de piedras al pie
+        for z in range(-4, 5):
+            for y in range(0, 5):
+                if max(abs(x), abs(z)) in (3, 4) and M.hsh(x, y, z) > 0.45:
+                    M.put(x, y, z, P, (0.35, 0.34, 0.33) if M.hsh(z, x, y) > 0.5 else (0.26, 0.25, 0.25))
+    drift(M, lambda x, z: math.hypot(x + 0.5, z + 0.5) - 4, 14, 7)
+    return M, {P: [0, 0, 0], 'light': [LX, LY, 0]}
+
+
+# ---------------- iglú ----------------
+
+def iglu():
+    """Iglú de bloques de nieve (radio 1,7 m, 32 voxels/m): hileras que se estrechan hacia
+    arriba, cada bloque con su tono y algo abombado, juntas hundidas, túnel de bloques hacia
+    +Z con resplandor cálido dentro, ventana de hielo y nieve amontonada al pie."""
+    M = Model(S=2, seed=28)
+    R, SHELL = 54, 3
+    TR, T0, T1 = 19, R - 16, R + 16
+    BLOCK_A, BLOCK_B = (0.92, 0.94, 0.98), (0.80, 0.86, 0.93)
+    JOINT = (0.56, 0.64, 0.77)
+    def block_of(x, y, z):
+        row_h = 9 - min(4, y // 14)                                # hileras más bajas arriba
+        row = int(y / row_h)
+        rr = math.sqrt(max(1.0, R * R - (y + 0.5) ** 2))
+        per = max(3, int(round(2 * math.pi * rr / 18)))
+        f = math.atan2(z + 0.5, x + 0.5) / (2 * math.pi) * per + (0.5 if row % 2 else 0.0)
+        return row, int(math.floor(f)) % per, f - math.floor(f), 2 * math.pi * rr / per, (y % row_h) / row_h
+    for y in range(0, R + 2):
+        for x in range(-R - 2, R + 2):
+            for z in range(-R - 2, R + 2):
+                d = math.sqrt((x + 0.5) ** 2 + (y + 0.5) ** 2 + (z + 0.5) ** 2)
+                if d > R + 1 or d < R - SHELL: continue
+                row, idx, f, length, fy = block_of(x, y, z)
+                joint = fy < 0.12 or f * length < 1.2
+                bulge = 0.9 * math.sin(math.pi * f) * math.sin(math.pi * min(1.0, fy + 0.05))
+                if d > R - 0.2 + bulge: continue                        # bloque abombado
+                if joint and d > R - 1.3: continue                      # junta hundida
+                c = JOINT if joint else lerp(BLOCK_B, BLOCK_A, 0.3 + 0.6 * M.hsh(row, idx, 0))
+                if not joint and y > R * 0.6: c = lerp(c, SNOW, 0.5)     # nieve en lo alto
+                M.put(x, y, z, P, c)
+    for z in range(T0, T1):                                          # túnel de bloques
+        for x in range(-TR - 1, TR + 1):
+            for y in range(0, TR + 1):
+                d = math.hypot(x + 0.5, y + 0.5)
+                if d < TR - SHELL:
+                    M.V.pop((x, y, z), None); continue
+                if d > TR: continue
+                joint = (z - T0) % 10 == 0 or y % 7 == 0
+                if joint and d > TR - 1: continue
+                M.put(x, y, z, P, JOINT if joint else lerp(BLOCK_B, BLOCK_A, 0.3 + 0.6 * M.hsh((z - T0) // 10, y // 7, 5)))
+    for x in range(-TR + SHELL, TR - SHELL):                        # dentro: oscuro con luz cálida
+        for y in range(0, TR - SHELL):
+            if math.hypot(x + 0.5, y + 0.5) < TR - SHELL:
+                warm = max(0.0, 1 - math.hypot(x + 0.5, y - 3) / 14)
+                M.put(x, y, T0, P, lerp((0.08, 0.07, 0.08), (0.80, 0.45, 0.18), warm), glow=1 if warm > 0.45 else 0)
+        for z in range(T0, T1):
+            if abs(x + 0.5) < TR - SHELL:
+                M.put(x, 0, z, P, lerp((0.14, 0.13, 0.15), (0.55, 0.58, 0.65), (z - T0) / (T1 - T0)))
+    a = math.radians(-40)                                            # ventana de hielo translúcido
+    for (x, y, z), v in M.V.items():
+        if 24 <= y < 33 and v[1] != JOINT:
+            ang = math.atan2(z + 0.5, x + 0.5)
+            if abs(ang - a) < 0.13 and math.sqrt(x * x + y * y + z * z) > R - 2:
+                v[1] = (0.98, 0.80, 0.52); v[2] = 1
+    drift(M, lambda x, z: None if (z > 0 and abs(x + 0.5) < TR + 2) else math.hypot(x + 0.5, z + 0.5) - R + 1, 10, 14)
+    return M, {P: [0, 0, 0]}
+
+
+# ---------------- cabaña ----------------
+
+def cabana():
+    """Cabaña de troncos (3,1 x 2,4 m, 32 voxels/m): troncos redondeados (canto claro arriba,
+    sombra abajo) con nudos y cabezas cruzadas con anillos, zócalo de piedra, tejado de tablas
+    con un manto de nieve grueso y carámbanos en el alero, puerta de tablas en Z con bisagras,
+    ventana con contraventanas y luz cálida, chimenea de piedra con mortero, leña apilada y
+    nieve amontonada."""
+    M = Model(S=2, seed=29)
+    HX, HZ, WALL, LOG, TH = 50, 38, 58, 7, 3
+    LOGC = [(0.45, 0.31, 0.18), (0.40, 0.27, 0.15), (0.48, 0.33, 0.19), (0.37, 0.25, 0.14)]
+    SHAPE = [0.62, 0.85, 1.0, 1.08, 1.12, 1.05, 0.9]                # sección redonda del tronco
+    def log_col(course, yy, x, z):
+        c = scale(LOGC[(course * 3 + (x + z) // 40) % 4], SHAPE[yy])
+        if M.hsh(x // 3, course, z // 3) > 0.985: c = scale(c, 0.6)  # nudos
+        return c
+    def ring(x, z, pad):
+        return min(x + HX + pad, HX - 1 + pad - x, z + HZ + pad, HZ - 1 + pad - z)
+    for y in range(0, 6):                                            # zócalo de piedra
+        for x in range(-HX - 1, HX + 1):
+            for z in range(-HZ - 1, HZ + 1):
+                if ring(x, z, 1) >= 3: continue
+                off = (y // 3) * 2
+                mortar = y % 3 == 0 or (x + z + off) % 5 == 0
+                M.put(x, y, z, P, (0.22, 0.21, 0.21) if mortar else lerp((0.34, 0.33, 0.32), (0.48, 0.47, 0.45), M.hsh((x + off) // 5, y // 3, z // 5)))
+    for y in range(6, WALL):
+        course, yy = (y - 6) // LOG, (y - 6) % LOG
+        for x in range(-HX, HX):
+            for z in range(-HZ, HZ):
+                r = ring(x, z, 0)
+                if r >= TH or (r == 0 and yy == 0): continue          # junta hundida
+                M.put(x, y, z, P, log_col(course, yy, x, z))
+        if yy == 0: continue
+        for sx in (-1, 1):                                            # cabezas cruzadas
+            for sz in (-1, 1):
+                for e in range(1, 7):
+                    for t in range(TH):
+                        if course % 2 == 0:
+                            x = HX - 1 + e if sx > 0 else -HX - e
+                            z = HZ - 1 - t if sz > 0 else -HZ + t
+                        else:
+                            x = HX - 1 - t if sx > 0 else -HX + t
+                            z = HZ - 1 + e if sz > 0 else -HZ - e
+                        c = log_col(course, yy, x, z)
+                        if e == 6:                                    # la testa, con anillos
+                            rr = abs(yy - 3.5) + t * 0.7
+                            c = (0.64, 0.50, 0.31) if rr < 1.5 else ((0.50, 0.37, 0.22) if rr < 2.6 else (0.34, 0.23, 0.13))
+                        M.put(x, y, z, P, c)
+    RISE, EAVE = 36, 12
+    for i in range(0, HZ + EAVE):                                     # tejado de tablas y nieve
+        yb = WALL + RISE - int(i * RISE / (HZ + 8))
+        for z in (i, -i - 1):
+            for x in range(-HX - 10, HX + 10):
+                M.put(x, yb, z, P, (0.24, 0.17, 0.11) if (x // 6) % 2 else (0.29, 0.21, 0.13))
+                depth = 3 + int(round(1.5 * M.noise(x * 0.07, 0, z * 0.07, 3.0)))
+                if i > HZ + EAVE - 3 and M.hsh(x, 0, z) < 0.3: depth = 1
+                for d in range(1, depth + 1):
+                    M.put(x, yb + d, z, P, SNOW if M.hsh(x, yb + d, z) > 0.15 else SNOW_SH)
+    yb = WALL + RISE - int((HZ + EAVE - 1) * RISE / (HZ + 8))
+    for x in range(-HX - 10, HX + 10):                                # frontal del alero y carámbanos
+        for zs in (-1, 1):
+            z = zs * (HZ + EAVE) - (1 if zs > 0 else 0)
+            for y in (yb - 1, yb - 2): M.put(x, y, z, P, WOOD_D)
+            if M.hsh(x, 9, zs) > 0.72:
+                for k in range(int(2 + 6 * M.hsh(x, 4, zs))):
+                    M.put(x, yb - 3 - k, z, P, (0.80, 0.90, 0.97))
+    for x in list(range(-HX, -HX + TH)) + list(range(HX - TH, HX)):  # hastiales de tablas
+        for y in range(WALL, WALL + RISE):
+            w = (HZ + 8) * (1 - (y - WALL) / RISE) - 1
+            for z in range(-int(w), int(w)):
+                M.put(x, y, z, P, (0.38, 0.26, 0.15) if (z // 5) % 2 else (0.32, 0.22, 0.13), over=False)
+    DX0, DX1, DH = -30, -12, 46                                        # puerta
+    BRACE = (0.36, 0.25, 0.14)
+    for x in range(DX0, DX1):
+        for y in range(6, DH):
+            frame = x in (DX0, DX1 - 1) or y == DH - 1
+            c = WOOD_D if frame else ((0.33, 0.22, 0.12) if ((x - DX0) // 4) % 2 else (0.28, 0.18, 0.10))
+            if (x - DX0) % 4 == 0 and not frame: c = GROOVE
+            for z in (HZ - 1, HZ): M.put(x, y, z, P, c)
+            if y in (14, 15, 36, 37) and not frame: M.put(x, y, HZ + 1, P, BRACE)
+    for i in range(20):                                               # diagonal de la Z
+        x = DX0 + 1 + int(i * (DX1 - DX0 - 3) / 20); y = 16 + i
+        M.put(x, y, HZ + 1, P, BRACE); M.put(x + 1, y, HZ + 1, P, BRACE)
+    for y in (14, 36):
+        for x in range(DX0, DX0 + 6): M.put(x, y, HZ + 2, P, IRON)     # bisagras
+    for y in (26, 27): M.put(DX1 - 4, y, HZ + 2, P, IRON_L)            # tirador
+    WX0, WX1, WY0, WY1 = 10, 32, 24, 42                                # ventana
+    for x in range(WX0, WX1):
+        for y in range(WY0, WY1):
+            frame = x in (WX0, WX1 - 1) or y in (WY0, WY1 - 1) or x == (WX0 + WX1) // 2 or y == (WY0 + WY1) // 2
+            for z in (HZ - 1, HZ):
+                if frame: M.put(x, y, z, P, WOOD_D)
+                else: M.put(x, y, z, P, (1.0, 0.76, 0.42) if (x + y) % 7 else (1.0, 0.86, 0.6), glow=1)
+    for x0 in (WX0 - 10, WX1):                                        # contraventanas abiertas
+        for x in range(x0, x0 + 10):
+            for y in range(WY0, WY1):
+                M.put(x, y, HZ + 1, P, (0.27, 0.35, 0.30) if (x - x0) % 4 else (0.20, 0.26, 0.22))
+    for x in range(WX0 - 2, WX1 + 2):                                 # alféizar con nieve
+        for z in (HZ + 1, HZ + 2):
+            M.put(x, WY0 - 1, z, P, WOOD_D); M.put(x, WY0, z, P, SNOW)
+    CX0, CX1, CZ0, CZ1 = 26, 38, -22, -10                             # chimenea
+    top = WALL + RISE + 14
+    for y in range(40, top):
+        for x in range(CX0, CX1):
+            for z in range(CZ0, CZ1):
+                inner = min(x - CX0, CX1 - 1 - x, z - CZ0, CZ1 - 1 - z) >= 2
+                if inner and y < top - 2: continue
+                off = 2 if (y // 4) % 2 else 0
+                mortar = y % 4 == 0 or (x + z + off) % 6 == 0
+                c = (0.55, 0.54, 0.52) if mortar else lerp((0.30, 0.30, 0.31), (0.46, 0.45, 0.44), M.hsh((x + off) // 6, y // 4, (z + off) // 6))
+                if inner: c = (0.06, 0.05, 0.05)
+                M.put(x, y, z, P, c)
+    for x in range(CX0, CX1):
+        for z in range(CZ0, CZ1):
+            if min(x - CX0, CX1 - 1 - x, z - CZ0, CZ1 - 1 - z) < 2: M.put(x, top, z, P, SNOW)
+    for row in range(5):                                              # leña apilada (+X)
+        for k in range(6 - (row % 2)):
+            zc = -24 + k * 8 + (4 if row % 2 else 0); yc = 7 + row * 7
+            for x in range(HX + 1, HX + 16):
+                for y in range(yc - 3, yc + 4):
+                    for z in range(zc - 3, zc + 4):
+                        r = math.hypot(y - yc, z - zc)
+                        if r > 3.6: continue
+                        c = (0.38, 0.26, 0.15)
+                        if x == HX + 15: c = (0.66, 0.52, 0.32) if r < 2.2 else (0.30, 0.20, 0.11)
+                        M.put(x, y, z, P, c)
+    snow_on_top(M, prob=1.0, depth=1, min_y=40, patch=lambda x, y, z: x > HX and y < 50)
+    def inside(x, z):
+        if z > 0 and DX0 - 4 < x < DX1 + 4: return None               # la entrada, despejada
+        return max(abs(x + 0.5) - HX - 1, abs(z + 0.5) - HZ - 1)
+    drift(M, inside, 12, 7)
+    return M, {P: [0, 0, 0]}
+
+
+PIECES = {'farol': farol, 'iglu': iglu, 'cabana': cabana, 'tienda': tienda, 'caja': caja, 'bidon': bidon,
+          'trineo': trineo, 'tripode': tripode, 'bandera': bandera}
 
 if __name__ == '__main__':
     only = set(sys.argv[1:])
     for name, fn in PIECES.items():
         if only and name not in only: continue
-        M = fn()
-        n = M.export('models/atrezo_%s.json' % name, {P: [0, 0, 0]}, jitter=0.008, pivots_in_voxels=True,
+        r = fn()
+        M, piv = r if isinstance(r, tuple) else (r, {P: [0, 0, 0]})
+        n = M.export('models/atrezo_%s.json' % name, piv, jitter=0.008, pivots_in_voxels=True,
                      roughness=0.9, specular=0.25, no_bottom=True)
         print('atrezo_%s: %d voxels' % (name, n))

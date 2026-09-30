@@ -12,6 +12,7 @@ extends Resource
 @export var max_level := 5
 @export var heal := false                  ## al subir la vida o la cordura máximas, rellena lo ganado
 @export var color := Color(0.8, 0.8, 0.8)  ## color del icono en el menú
+@export var icon: Texture2D                 ## imagen en la subida de nivel
 
 ## Aplica un nivel de la mejora a los datos (copia propia) de un personaje.
 func apply(p: Player) -> void:

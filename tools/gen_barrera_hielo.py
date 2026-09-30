@@ -36,9 +36,20 @@ def build(seed):
     # perfil de la cumbre: 110..140 voxels con ondulación suave y escalones
     base_h = rnd.uniform(118, 130)
     ph = [rnd.uniform(0, 6.28) for _ in range(3)]
+    # seracs (30-09-2026): columnas de 5 a 12 voxels, cada una con su altura y su retranqueo
+    cols = []
+    x = -W
+    while x < W:
+        w = rnd.randint(5, 12)
+        cols.append((x, x + w, rnd.randint(-10, 8), rnd.randint(0, 9), rnd.random()))
+        x += w
+    def col_at(x):
+        for c in cols:
+            if c[0] <= x < c[1]: return c
+        return cols[-1]
     def crest(x):
-        h = base_h + 9 * math.sin(x * 0.045 + ph[0]) + 5 * math.sin(x * 0.11 + ph[1]) + 2 * math.sin(x * 0.31 + ph[2])
-        return int(h)
+        h = base_h + 9 * math.sin(x * 0.045 + ph[0]) + 5 * math.sin(x * 0.11 + ph[1])
+        return int(h + col_at(x)[2])
     # estratos: bandas horizontales con su tono y su retranqueo
     bands = []
     y = 0
@@ -68,7 +79,7 @@ def build(seed):
         lean = y // 14
         bulge = 7 * (0.5 + 0.5 * math.sin(x * 0.06 + ph2[0])) + 4 * (0.5 + 0.5 * math.sin(x * 0.17 + ph2[1]))
         # (sin variar con la altura: cada escalón de un voxel dibujaba una línea ondulada)
-        return int(band_at(y)[3] * 2 + bulge + lean + crack_at(x, y))
+        return int(band_at(y)[3] * 2 + bulge + lean + crack_at(x, y) + col_at(x)[3])
 
     for x in range(-W, W):
         top = crest(x)
@@ -76,6 +87,10 @@ def build(seed):
             d = depth(x, y)
             cd = crack_at(x, y)
             col = band_at(y)[2]
+            c0, c1, _, _, tone = col_at(x)
+            col = lerp(col, ICE_A if tone > 0.5 else ICE_C, 0.35)          # cada serac, su tono
+            if x == c0: col = lerp(col, (0.9, 0.95, 1.0), 0.35)            # arista iluminada
+            elif x == c1 - 1: col = lerp(col, CRACK, 0.35)                 # arista en sombra
             if cd: col = CRACK if (d - depth(x, y) + cd) < 10 else CRACK_DEEP
             # si el de encima está más hundido, este voxel tiene la cara de arriba al aire: nieve
             if y + 1 < top and depth(x, y + 1) > d + 1 and not cd: col = SNOW_SH
@@ -96,15 +111,23 @@ def build(seed):
         for z in range(-D, 0):
             for y in range(0, crest(x)):
                 M.put(x, y, z, P, band_at(y)[2], over=False)
-    # zócalo de cascotes al pie
-    for _ in range(18):
-        cx = rnd.randint(-W + 4, W - 4)
-        r = rnd.randint(6, 14)
-        for x in range(cx - r, cx + r):
-            for z in range(0, r + 2):
-                hh = int((r - abs(x - cx)) * 0.9 - z * 0.6 + rnd.uniform(-1, 1))
-                for y in range(0, max(0, hh)):
-                    M.put(x, y, z, P, RUBBLE if y < hh - 1 else SNOW)
+    # bloques de hielo caídos al pie, de varios tamaños, con nieve encima
+    for _ in range(26):
+        bx = rnd.randint(-W + 4, W - 8)
+        bs = rnd.choice((4, 5, 6, 8, 10, 14))
+        bz = rnd.randint(-2, 12)
+        by = 0
+        for x in range(bx, bx + bs):
+            for z in range(bz, bz + bs):
+                for y in range(by, by + bs):
+                    if (x, y, z) in M.V: continue
+                    top = y == by + bs - 1
+                    M.put(x, y, z, P, (SNOW if rnd.random() > 0.2 else SNOW_SH) if top else lerp(RUBBLE, ICE_B, rnd.random() * 0.4))
+    for x in range(-W, W):                                          # nieve amontonada al pie
+        for z in range(0, 16):
+            hh = int(6 * (1 - z / 16) * (0.6 + 0.4 * math.sin(x * 0.2 + z * 0.3)))
+            for y in range(0, hh):
+                M.put(x, y, z, P, SNOW if y == hh - 1 else SNOW_SH, over=False)
 
     def paint(k, part, c):
         x, y, z = k
