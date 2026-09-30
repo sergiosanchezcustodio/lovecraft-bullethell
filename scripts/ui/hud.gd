@@ -72,7 +72,7 @@ func portrait_texture(p: Player) -> Texture2D:
 	# Se renderiza una sola vez: sin interpolación de física, o la cámara y el modelo aún
 	# estarían interpolando desde el origen en ese fotograma y el retrato saldría mal.
 	vp.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-	vp.size = Vector2i(128, 128)
+	vp.size = Vector2i(128, 128)                     # la cabeza (panel del jugador)
 	vp.transparent_bg = true
 	vp.own_world_3d = true
 	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
@@ -102,27 +102,37 @@ func portrait_texture(p: Player) -> Texture2D:
 	return vp.get_texture()
 
 
-## Panel de un jugador en su esquina.
+## Panel de un jugador en su esquina (diseño del autor, 30-09-2026; al 60 % de su primer
+## tamaño, con los iconos lo menos reducidos posible): a la izquierda "J1" y el nivel, la
+## cabeza del personaje y debajo la experiencia en 10 casillas en relieve; a la
+## derecha el nombre, las barras de vida, cordura y esquive con su icono, la fila de armas y
+## la de objetos, cada uno con su nivel. Todo en posiciones fijas: nada se mueve al cambiar.
 class PlayerPanel extends PanelContainer:
 	var p: Player
 	var _health: UiKit.Bar
 	var _sanity: UiKit.Bar
-	var _xp: UiKit.Bar
 	var _dodge: UiKit.Bar
+	var _xp: LevelCells
 	var _level_lbl: Label
-	var _weapons_lbl: Label
 	var _crisis_lbl: Label
-	var _health_txt: Label
-	var _sanity_txt: Label
 	var _down_lbl: Label
 	var _weapons_row: HBoxContainer
+	var _items_row: HBoxContainer
 	var _weapons_key := ""                      ## armas y niveles pintados (solo se rehace al cambiar)
+	var _items_key := ""
 
 	const MARGIN := 16.0
+	const SIZE := Vector2(272, 132)
+	const LEFT_W := 76.0                        ## columna de la cabeza
+	const RIGHT_X := 84.0
+	const BAR_W := 166.0
+	const CELL := Vector2(36, 32)               ## casilla de arma u objeto: caben 5 en la fila
+	const ICON := 16.0                          ## iconos de vida, cordura y esquive
+	const ICONS := "res://resources/PantallasMenus/iconos/ficha_%s.png"
 
 	func _init(player: Player, hud: Hud) -> void:
 		p = player
-		add_theme_stylebox_override("panel", UiKit.panel(UiKit.PANEL, Color(p.color, 0.55)))
+		add_theme_stylebox_override("panel", UiKit.panel(UiKit.PANEL, Color(p.color, 0.55), 8))
 		var right := p.index % 2 == 1
 		var bottom := p.index >= 2
 		var preset := Control.PRESET_TOP_LEFT
@@ -132,49 +142,44 @@ class PlayerPanel extends PanelContainer:
 		set_anchors_and_offsets_preset(preset, Control.PRESET_MODE_MINSIZE, int(MARGIN))
 		grow_horizontal = Control.GROW_DIRECTION_BEGIN if right else Control.GROW_DIRECTION_END
 		grow_vertical = Control.GROW_DIRECTION_BEGIN if bottom else Control.GROW_DIRECTION_END
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 12)
-		add_child(row)
+		var box := Control.new()
+		box.custom_minimum_size = SIZE
+		add_child(box)
+		# izquierda: J1 y nivel, busto, experiencia
+		var j := MenuKit.title("J%d" % (p.index + 1), 20, p.color)
+		j.position = Vector2(0, -4)
+		box.add_child(j)
+		_level_lbl = UiKit.label("Nv. 1", 14, UiKit.GOLD)
+		_level_lbl.position = Vector2(28, -1)
+		box.add_child(_level_lbl)
 		var portrait := TextureRect.new()
-		portrait.texture = hud.portrait_texture(p)
-		portrait.custom_minimum_size = Vector2(92, 92)
+		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE      # antes que el tamaño: si no, se queda al de la imagen
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		var pbox := VBoxContainer.new()
-		pbox.add_child(portrait)
-		_dodge = UiKit.Bar.new(UiKit.GOLD, 92, 5)
-		pbox.add_child(_dodge)
-		row.add_child(pbox)
-		var col := VBoxContainer.new()
-		col.add_theme_constant_override("separation", 4)
-		row.add_child(col)
-		var head := HBoxContainer.new()
-		head.add_child(UiKit.label("J%d" % (p.index + 1), 18, p.color))
-		head.add_child(UiKit.label(p.data.display_name, 18))
-		var sp := Control.new(); sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		head.add_child(sp)
-		_level_lbl = UiKit.label("Nv 1", 18, UiKit.XP)
-		head.add_child(_level_lbl)
-		col.add_child(head)
-		_health = UiKit.Bar.new(UiKit.HEALTH, 250, 14)
-		_health_txt = _bar_row(col, _health)
-		_sanity = UiKit.Bar.new(UiKit.SANITY, 250, 14)
-		_sanity_txt = _bar_row(col, _sanity)
-		_xp = UiKit.Bar.new(UiKit.XP, 250, 6)
-		col.add_child(_xp)
-		_weapons_row = HBoxContainer.new()                # armas: su icono con el nivel
-		_weapons_row.add_theme_constant_override("separation", 4)
-		col.add_child(_weapons_row)
-		_weapons_lbl = UiKit.label("", 15, UiKit.TEXT_DIM)  # las que no tienen icono, por su nombre
-		_weapons_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_weapons_lbl.custom_minimum_size.x = 250
-		col.add_child(_weapons_lbl)
-		_crisis_lbl = UiKit.label("", 15, UiKit.SANITY)          # superpuesto abajo: no ocupa sitio
+		portrait.texture = hud.portrait_texture(p)
+		portrait.position = Vector2(0, 22)
+		portrait.size = Vector2(LEFT_W, 86)
+		box.add_child(portrait)
+		_xp = LevelCells.new()
+		_xp.position = Vector2(0, 116)
+		_xp.size = Vector2(LEFT_W, 14)
+		box.add_child(_xp)
+		# derecha: nombre, barras con su icono, armas y objetos
+		var name_lbl := UiKit.label(p.data.display_name, 16, UiKit.TEXT)
+		name_lbl.position = Vector2(RIGHT_X, -3)
+		name_lbl.size = Vector2(SIZE.x - RIGHT_X, 22)
+		name_lbl.clip_text = true
+		box.add_child(name_lbl)
+		_health = _bar(box, "vida", UiKit.HEALTH, 22)
+		_sanity = _bar(box, "cordura", UiKit.SANITY, 38)
+		_dodge = _bar(box, "esquive", UiKit.GOLD, 54)
+		_weapons_row = _cells(box, 68)
+		_items_row = _cells(box, 100)
+		_crisis_lbl = UiKit.label("", 12, UiKit.SANITY)          # superpuesto abajo: no ocupa sitio
 		_crisis_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		_crisis_lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 		_crisis_lbl.size_flags_vertical = Control.SIZE_SHRINK_END
 		_crisis_lbl.size_flags_horizontal = Control.SIZE_SHRINK_END
-		_down_lbl = MenuKit.title("Caído", 30, Color(0.95, 0.35, 0.28))
+		_down_lbl = MenuKit.title("Caído", 22, Color(0.95, 0.35, 0.28))
 		_down_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		_down_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_down_lbl.visible = false
@@ -183,50 +188,67 @@ class PlayerPanel extends PanelContainer:
 		add_child(_crisis_lbl)
 		add_child(_down_lbl)
 
-	## Iconos de las armas con su nivel en la esquina; sin icono, el nombre debajo.
+	## Fila de barra: icono de la ficha y la barra.
+	func _bar(box: Control, icon: String, c: Color, y: float) -> UiKit.Bar:
+		var t := TextureRect.new()
+		t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		t.texture = load(ICONS % icon)
+		t.position = Vector2(RIGHT_X, y - 3)
+		t.size = Vector2(ICON, ICON)
+		box.add_child(t)
+		var b := UiKit.Bar.new(c, BAR_W, 10)
+		b.position = Vector2(RIGHT_X + ICON + 4, y)
+		b.size = Vector2(BAR_W, 10)
+		box.add_child(b)
+		return b
+
+	func _cells(box: Control, y: float) -> HBoxContainer:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 1)
+		row.position = Vector2(RIGHT_X - 2, y)
+		box.add_child(row)
+		return row
+
+	## Casilla con la imagen (o el nombre abreviado, si no tiene) y el nivel en la esquina.
+	func _cell(row: HBoxContainer, tex: Texture2D, name: String, level: int) -> void:
+		var cell := Control.new()
+		cell.custom_minimum_size = CELL
+		if tex != null:
+			var t := TextureRect.new()
+			t.texture = tex
+			t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			t.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			cell.add_child(t)
+		else:
+			var n := UiKit.label(name.substr(0, 4), 10, UiKit.TEXT_DIM)
+			n.position = Vector2(1, 8)
+			cell.add_child(n)
+		var lv := UiKit.label(str(level), 14, UiKit.GOLD)
+		lv.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+		lv.add_theme_constant_override("outline_size", 4)
+		lv.position = Vector2(CELL.x - 10, CELL.y - 19)
+		cell.add_child(lv)
+		row.add_child(cell)
+
 	func _paint_weapons() -> void:
 		for c in _weapons_row.get_children(): c.queue_free()
-		var names: PackedStringArray = []
-		if p.weapons != null:
-			for w in p.weapons.weapons:
-				var tex := w.data.get_icon()
-				if tex == null:
-					names.append("%s %d" % [w.data.display_name, w.level])
-					continue
-				var cell := Control.new()
-				cell.custom_minimum_size = Vector2(38, 38)
-				var t := TextureRect.new()
-				t.texture = tex
-				t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-				t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-				t.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-				cell.add_child(t)
-				var lv := UiKit.label(str(w.level), 13, UiKit.GOLD)
-				lv.position = Vector2(27, 21)
-				cell.add_child(lv)
-				_weapons_row.add_child(cell)
-		_weapons_row.visible = _weapons_row.get_child_count() > 0
-		_weapons_lbl.text = "  ·  ".join(names)
-		_weapons_lbl.visible = not names.is_empty()
+		if p.weapons == null: return
+		for w in p.weapons.weapons: _cell(_weapons_row, w.data.get_icon(), w.data.display_name, w.level)
 
-	func _bar_row(parent: Container, bar: UiKit.Bar) -> Label:
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override("separation", 8)
-		h.add_child(bar)
-		var l := UiKit.label("", 13, UiKit.TEXT_DIM)
-		l.custom_minimum_size.x = 96
-		h.add_child(l)
-		parent.add_child(h)
-		return l
+	func _paint_items() -> void:
+		for c in _items_row.get_children(): c.queue_free()
+		for up in p.progress.upgrade_pool:
+			var lv: int = p.progress.passives.get(up.id, 0)
+			if lv > 0: _cell(_items_row, up.icon, up.display_name, lv)
 
 	func refresh() -> void:
 		var d := p.data
 		_health.value = p.health / d.max_health
 		_sanity.value = p.sanity / d.max_sanity
-		_health_txt.text = "Vida %d" % ceili(p.health)
-		_sanity_txt.text = "Cordura %d" % ceili(p.sanity)
 		_xp.value = p.progress.xp_fraction()
-		_level_lbl.text = "Nv %d" % p.progress.level
+		_level_lbl.text = "Nv. %d" % p.progress.level
 		_dodge.value = p.motor.dodge_ready_fraction()
 		var key := ""
 		if p.weapons != null:
@@ -234,6 +256,10 @@ class PlayerPanel extends PanelContainer:
 		if key != _weapons_key:
 			_weapons_key = key
 			_paint_weapons()
+		key = str(p.progress.passives)
+		if key != _items_key:
+			_items_key = key
+			_paint_items()
 		var ss := p.sanity_state
 		_crisis_lbl.text = ("Crisis: %s" % SanityState.NAMES.get(ss.crisis_kind, "locura")) if ss.in_crisis else ""
 		var down := p.health <= 0.0
@@ -244,3 +270,36 @@ class PlayerPanel extends PanelContainer:
 			_down_lbl.text = "Derribado · %d s" % ceili(p.down_left) + ("  ·  %d %%" % pct if pct > 0 else "")
 		else: _down_lbl.text = "Caído"
 		modulate = Color(0.55, 0.55, 0.6, 0.8) if down else Color.WHITE
+
+
+## Experiencia en 10 casillas en relieve: llenas en azul, la que se está llenando a medias y
+## las demás claras y apagadas.
+class LevelCells extends Control:
+	var value := 0.0                            ## 0..1
+	var _shown := 0.0
+	const N := 10
+	const FILL := Color(0.18, 0.42, 0.78)
+	const EMPTY := Color(0.80, 0.82, 0.86)
+
+	func _process(delta: float) -> void:
+		var target := clampf(value, 0.0, 1.0)
+		if target < _shown - 0.5: _shown = target          # subió de nivel: vuelve a empezar
+		_shown = lerpf(_shown, target, 1.0 - exp(-12.0 * delta))
+		queue_redraw()
+
+	func _draw() -> void:
+		var gap := 1.0
+		var w := (size.x - gap * (N - 1)) / N
+		for i in N:
+			var r := Rect2(Vector2(i * (w + gap), 0), Vector2(w, size.y))
+			var f := clampf(_shown * N - i, 0.0, 1.0)
+			_cell(r, EMPTY)
+			if f > 0.0: _cell(Rect2(r.position, Vector2(r.size.x * f, r.size.y)), FILL)
+
+	## Casilla en relieve: canto claro arriba y a la izquierda, oscuro abajo y a la derecha.
+	func _cell(r: Rect2, c: Color) -> void:
+		draw_rect(r, c)
+		draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), c.lightened(0.45))
+		draw_rect(Rect2(r.position, Vector2(1, r.size.y)), c.lightened(0.3))
+		draw_rect(Rect2(r.position + Vector2(0, r.size.y - 1), Vector2(r.size.x, 1)), c.darkened(0.45))
+		draw_rect(Rect2(r.position + Vector2(r.size.x - 1, 0), Vector2(1, r.size.y)), c.darkened(0.3))
