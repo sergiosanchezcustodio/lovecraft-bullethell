@@ -4,18 +4,25 @@ extends Control
 ## uno por jugador. Cada dispositivo se une con Start (el teclado, con Intro) y maneja su
 ## marco con su propio mando: izquierda/derecha cambia de personaje o de compañero, A
 ## confirma y B deshace. LB/RB (Q/E con el teclado), mantenidos, giran el personaje para verlo
-## de lado y de espaldas (lo mismo valdrá para el compañero). La entrada se lee aquí por dispositivo, sin el foco de Godot (que
+## de lado y de espaldas; mientras se elige compañero, giran el compañero. La entrada se lee aquí por dispositivo, sin el foco de Godot (que
 ## es uno para toda la pantalla). Cuando todos los presentes están listos se abre el mapa
 ## de niveles. Opciones detrás de `--` (capturas): join=N une N jugadores de prueba;
-## ready=N deja listos los N primeros; pick=id,id… elige personaje en cada marco;
+## ready=N deja listos los N primeros; pets=N deja a los N primeros eligiendo compañero; pick=id,id… elige personaje en cada marco;
 ## turn=grados los deja girados; map=true abre el mapa; auto_start=true, además, entra
 ## en el nivel 1 (probar el paso a la partida).
 
 const BG := "res://resources/PantallasMenus/fondo_titulo_sin_texto_1080p_definitivo.png"
 const DESIGN := Vector2(1920, 1080)
-const FRAME := Vector2(420, 750)
+const FRAME := Vector2(420, 684)
 const GAP := 26.0
-const TOP := 112.0
+const TOP := 96.0
+## Recuadro del compañero, debajo del marco: título, nombre con flechas, modelo y estado.
+const PET_H := 240.0
+const PET_GAP := 10.0
+## Escala de los compañeros en su visor, la misma para todos (se ven proporcionados: el perro
+## más grande que el murciélago), y tamaño del visor: cabe el más alto (el perro, 0,85 m).
+const PET_PX_PER_M := 160.0
+const PET_VIEW := Vector2(380, 150)
 const ICONS := "res://resources/PantallasMenus/iconos/ficha_%s.png"
 ## Píxeles por metro del personaje: los mismos que en la partida (1080 px para 15 m de alto).
 const PX_PER_M := 1080.0 / 15.0
@@ -88,11 +95,11 @@ func _build() -> void:
 	add_child(stage)
 	var t := MenuKit.title("Elige a tu investigador", 50)
 	t.size = Vector2(DESIGN.x, 70)
-	t.position = Vector2(0, 28)
+	t.position = Vector2(0, 18)
 	stage.add_child(t)
 	if Saves.current:
 		var m := UiKit.label("Dinero  %s $" % MenuKit.money(Saves.current.money), 22, UiKit.GOLD)
-		m.position = Vector2(DESIGN.x - 260, 30)
+		m.position = Vector2(DESIGN.x - 260, 22)
 		stage.add_child(m)
 	var total := FRAME.x * 4 + GAP * 3
 	for i in 4:
@@ -248,6 +255,9 @@ func _demo_from_args() -> void:
 		state.confirm(j[k])
 		if k % 2 == 1: state.move(j[k], 1)
 		state.confirm(j[k])
+	for k in mini(args.get_int("pets", 0), j.size()):     # eligiendo compañero, uno distinto cada uno
+		state.confirm(j[k])
+		for n in k * 3 + 1: state.move(j[k], 1)
 	if args.get_bool("map"):
 		for k in state.joined():
 			while (state.seats[k] as SelectState.Seat).stage != SelectState.Stage.READY:
@@ -260,11 +270,9 @@ class _Frame extends Control:
 	var index := 0
 	var _panel: Panel
 	var _head: Label
-	var _view: SubViewportContainer
-	var _vp: SubViewport
-	var _holder: Node3D
-	var _model: Node3D
-	var _model_name := ""
+	var _jbox: PanelContainer
+	var _view: _Preview
+	var _pet_view: _Preview
 	var _info: Control
 	var _name: Label
 	var _role: Label
@@ -278,20 +286,19 @@ class _Frame extends Control:
 	var _arrows: Array[Label] = []
 	var _wbox: PanelContainer
 	var _empty: VBoxContainer
-	var _pet: PanelContainer
-	var _pet_label: Label
-	var _t := 0.0
+	var _pet: Panel
+	var _pet_title: Label
+	var _pet_name: Label
+	var _pet_arrows: Array[Label] = []
+	var _pet_note: Label
 	var _shake := 0.0
 	var _base_x := 0.0
 	var spin := 0                             ## -1, 0 o 1 mientras se mantiene LB/RB (Q/E)
-	var _yaw := 0.0                           ## giro elegido por el jugador (rad)
-	var _user_turned := false                 ## deja de balancearse solo en cuanto el jugador lo gira
-	const SPIN_SPEED := 2.6                   ## rad/s
 
 	func _init(p_owner: CharacterSelect, p_index: int) -> void:
 		owner_screen = p_owner
 		index = p_index
-		size = Vector2(FRAME.x, FRAME.y + 90)
+		size = Vector2(FRAME.x, FRAME.y + PET_GAP + PET_H)
 
 	func _ready() -> void:
 		var color := Devices.COLORS[index]
@@ -299,56 +306,31 @@ class _Frame extends Control:
 		_panel.size = FRAME
 		_panel.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9), Color(color, 0.25), 10))
 		add_child(_panel)
-		_head = MenuKit.title("J%d" % (index + 1), 26, color)
+		_head = MenuKit.title("J%d" % (index + 1), 26, color)   # puesto vacío: arriba, centrado
 		_head.size = Vector2(FRAME.x, 40)
 		_head.position = Vector2(0, 10)
 		add_child(_head)
+		_jbox = PanelContainer.new()                           # puesto ocupado: recuadro como el del arma
+		_jbox.position = Vector2(12, 12)
+		_jbox.custom_minimum_size = Vector2(92, 92)
+		_jbox.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.5), Color(color, 0.7), 10))
+		add_child(_jbox)
+		var jl := MenuKit.title("J%d" % (index + 1), 54, color)
+		jl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		jl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		_jbox.add_child(jl)
 		# el personaje en 3D, en su propio mundo, a la escala de la partida
-		_view = SubViewportContainer.new()
-		_view.stretch = true
-		_view.size = Vector2(240, VIEW_H)
-		_view.position = Vector2((FRAME.x - 240) * 0.5, 20)
+		_view = _Preview.new(Vector2(240, VIEW_H), PX_PER_M * MODEL_ZOOM, index)
+		_view.position = Vector2((FRAME.x - 240) * 0.5, 4)
 		add_child(_view)
-		_vp = SubViewport.new()
-		_vp.own_world_3d = true
-		_vp.transparent_bg = true
-		_vp.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-		_view.add_child(_vp)
-		var env := Environment.new()
-		env.background_mode = Environment.BG_CLEAR_COLOR
-		env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-		env.ambient_light_color = Color(0.42, 0.42, 0.5)
-		env.ambient_light_energy = 0.9
-		env.tonemap_mode = Environment.TONE_MAPPER_ACES
-		env.tonemap_exposure = 1.3
-		var we := WorldEnvironment.new()
-		we.environment = env
-		_vp.add_child(we)
-		var key := DirectionalLight3D.new()
-		key.rotation_degrees = Vector3(-30, 30, 0)
-		key.light_color = Color(1.0, 0.86, 0.66)
-		key.light_energy = 1.4
-		_vp.add_child(key)
-		var rim := DirectionalLight3D.new()
-		rim.rotation_degrees = Vector3(-20, 200, 0)
-		rim.light_color = Color(0.5, 0.65, 1.0)
-		rim.light_energy = 0.8
-		_vp.add_child(rim)
-		var cam := Camera3D.new()
-		cam.projection = Camera3D.PROJECTION_ORTHOGONAL
-		cam.size = _view.size.y / (PX_PER_M * MODEL_ZOOM)   # la escala de la partida, aumentada
-		cam.position = Vector3(0, cam.size * 0.5 - 0.06, 4.0)
-		_vp.add_child(cam)
-		_holder = Node3D.new()
-		_vp.add_child(_holder)
 		for side in [-1, 1]:
 			var a := UiKit.label("◀" if side < 0 else "▶", 34, UiKit.GOLD)
-			a.position = Vector2(26 if side < 0 else FRAME.x - 56, 15 + VIEW_H * 0.5)
+			a.position = Vector2(26 if side < 0 else FRAME.x - 56, 20 + VIEW_H * 0.5)
 			add_child(a)
 			_arrows.append(a)
 		# arma inicial, arriba a la derecha
 		_wbox = PanelContainer.new()
-		_wbox.position = Vector2(FRAME.x - 104, 54)
+		_wbox.position = Vector2(FRAME.x - 104, 12)
 		_wbox.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.5), Color(UiKit.GOLD, 0.6), 10))
 		add_child(_wbox)
 		_weapon = TipIcon.new(Vector2(72, 72))
@@ -362,23 +344,19 @@ class _Frame extends Control:
 		_info.size = Vector2(FRAME.x - 28, FRAME.y)
 		_info.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(_info)
-		_name = _slot(MenuKit.title("", 32), 322, 40)
-		_role = _slot(UiKit.label("", 16, UiKit.TEXT_DIM), 364, 24)
-		_passive = _slot(UiKit.label("", 16, UiKit.TEXT), 390, 50)       # hasta dos líneas
+		_name = _slot(MenuKit.title("", 32), 300, 40)
+		_role = _slot(UiKit.label("", 16, UiKit.TEXT_DIM), 340, 24)
+		_passive = _slot(UiKit.label("", 16, UiKit.TEXT), 364, 50)       # hasta dos líneas
 		_passive.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_slot(MenuKit.title("Características y habilidades", 22, UiKit.GOLD), 452, 30)
+		_slot(MenuKit.title("Características y habilidades", 22, UiKit.GOLD), 418, 30)
 		var cols := HBoxContainer.new()
 		cols.alignment = BoxContainer.ALIGNMENT_CENTER
 		cols.add_theme_constant_override("separation", 8)
-		cols.position = Vector2(0, 487)
+		cols.position = Vector2(0, 452)
 		cols.size = Vector2(_info.size.x, 0)
 		_info.add_child(cols)
 		cols.add_child(_column(Attributes.NAMES, _attr_vals, 44, 30))
 		cols.add_child(_column(STAT_ROWS, _stat_vals, 132, 62))
-		_status = MenuKit.title("", 24, color)
-		_status.size = Vector2(FRAME.x, 36)
-		_status.position = Vector2(0, FRAME.y - 44)
-		add_child(_status)
 		# puesto vacío
 		_empty = VBoxContainer.new()
 		_empty.size = Vector2(FRAME.x, 0)
@@ -389,19 +367,36 @@ class _Frame extends Control:
 		var join2 := UiKit.label("para unirte  ·  Intro con el teclado", 18, UiKit.TEXT_DIM)
 		join2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_empty.add_child(join2)
-		# compañero, debajo del marco
-		_pet = PanelContainer.new()
-		_pet.position = Vector2(0, FRAME.y + 14)
-		_pet.custom_minimum_size = Vector2(FRAME.x, 70)
-		_pet.size = Vector2(FRAME.x, 70)
-		_pet.clip_contents = true
+		# compañero, debajo del marco: título, ◀ nombre ▶, el modelo girando y el estado
+		_pet = Panel.new()
+		_pet.position = Vector2(0, FRAME.y + PET_GAP)
+		_pet.size = Vector2(FRAME.x, PET_H)
 		add_child(_pet)
-		_pet_label = UiKit.label("", 19, UiKit.TEXT)
-		_pet_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_pet_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		_pet_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_pet_label.custom_minimum_size.x = FRAME.x - 24
-		_pet.add_child(_pet_label)
+		_pet_title = MenuKit.title("Elige compañero", 24, UiKit.GOLD)
+		_pet_title.size = Vector2(FRAME.x, 32)
+		_pet_title.position = Vector2(0, 8)
+		_pet.add_child(_pet_title)
+		_pet_name = MenuKit.title("", 21, color)
+		_pet_name.size = Vector2(FRAME.x - 100, 28)
+		_pet_name.position = Vector2(50, 40)
+		_pet.add_child(_pet_name)
+		for side in [-1, 1]:
+			var a := UiKit.label("◀" if side < 0 else "▶", 24, UiKit.TEXT)
+			a.position = Vector2(24 if side < 0 else FRAME.x - 44, 38)
+			_pet.add_child(a)
+			_pet_arrows.append(a)
+		_pet_view = _Preview.new(PET_VIEW, PET_PX_PER_M, index + 2)
+		_pet_view.position = Vector2((FRAME.x - PET_VIEW.x) * 0.5, 66)
+		_pet.add_child(_pet_view)
+		_pet_note = UiKit.label("", 16, UiKit.TEXT_DIM)
+		_pet_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_pet_note.size = Vector2(FRAME.x, 24)
+		_pet_note.position = Vector2(0, 128)
+		_pet.add_child(_pet_note)
+		_status = MenuKit.title("", 20, color)
+		_status.size = Vector2(FRAME.x, 26)
+		_status.position = Vector2(0, PET_H - 32)
+		_pet.add_child(_status)
 
 	## Nombre de cada estadística derivada (Attributes.FORMULAS) y su fila en la ficha.
 	const STAT_NAMES := {"health": "Puntos de vida", "sanity": "Puntos de cordura", "dodge": "Acción de esquiva",
@@ -483,8 +478,8 @@ class _Frame extends Control:
 
 	## Deja el modelo girado un ángulo (como si el jugador lo hubiera girado con LB/RB).
 	func set_turn(yaw: float) -> void:
-		_user_turned = true
-		_yaw = yaw
+		_view.set_turn(yaw)
+		_pet_view.set_turn(yaw)
 
 	func shake() -> void:
 		if _shake <= 0.0: _base_x = position.x
@@ -496,16 +491,17 @@ class _Frame extends Control:
 		var color := Devices.COLORS[index]
 		var on := seat != null
 		_empty.visible = not on
-		for c in [_view, _info, _status, _pet, _wbox]: (c as CanvasItem).visible = on
+		for c in [_view, _info, _pet, _wbox]: (c as CanvasItem).visible = on
 		_panel.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9 if on else 0.6),
 			Color(color, 0.85 if on and seat.stage == SelectState.Stage.READY else (0.45 if on else 0.18)), 10))
+		_jbox.visible = on
 		if not on:
-			_head.text = "J%d" % (index + 1)
+			_head.visible = true
 			for a in _arrows: a.visible = false
 			return
 		var c: CharacterData = st.characters[seat.character]
-		_head.text = "J%d  ·  %s" % [index + 1, Devices.device_name(seat.device) if seat.device >= Devices.KEYBOARD else "Prueba"]
-		_set_model(c.model)
+		_head.visible = false
+		_view.set_model(c.model)
 		var locked := st.is_locked(seat.character)
 		var holder := -1                            # quién lo ha confirmado ya (D-23)
 		for j in st.seats.size():
@@ -570,41 +566,113 @@ class _Frame extends Control:
 				else: _status.text = "A: elegir"
 				_status.add_theme_color_override("font_color", MenuKit.DANGER if unavailable else UiKit.TEXT_DIM)
 			SelectState.Stage.PET:
-				_status.text = "Elige compañero"
+				_status.text = "A: confirmar"
 				_status.add_theme_color_override("font_color", color)
 			SelectState.Stage.READY:
 				_status.text = "¡Listo!"
 				_status.add_theme_color_override("font_color", color)
 		var pet: PetData = st.pets[seat.pet]
-		var pet_name := pet.display_name if pet else "Ninguno"
 		var picking := seat.stage == SelectState.Stage.PET
-		_pet_label.text = ("◀  Compañero: %s  ▶" if picking and st.pets.size() > 1 else "Compañero: %s") % pet_name
-		if st.pets.size() == 1: _pet_label.text += "
-Se consiguen en la tienda"
-
-		_pet.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9), Color(color, 0.85 if picking else 0.2), 8))
-		_pet_label.add_theme_color_override("font_color", UiKit.TEXT if picking or seat.stage == SelectState.Stage.READY else UiKit.TEXT_DIM)
-
-
-	func _set_model(model_name: String) -> void:
-		if model_name == _model_name: return
-		_user_turned = false                  # otro personaje: vuelve a mirar al frente
-		_yaw = 0.0
-		if _model: _model.queue_free()
-		_model_name = model_name
-		_model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
-		_holder.add_child(_model)
+		_pet_name.text = pet.display_name if pet else "Sin compañero"
+		for a in _pet_arrows: a.visible = picking and st.pets.size() > 1
+		_pet_view.set_model(pet.model if pet else "")
+		_pet_note.text = "" if pet else ("Se consiguen en la tienda" if st.pets.size() == 1 else "Irás solo")
+		var active := picking or seat.stage == SelectState.Stage.READY
+		_pet_title.add_theme_color_override("font_color", UiKit.GOLD if active else Color(UiKit.GOLD, 0.45))
+		_pet_name.add_theme_color_override("font_color", color if active else UiKit.TEXT_DIM)
+		_pet_view.modulate = Color.WHITE if active else Color(0.55, 0.55, 0.6)
+		_pet.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9), Color(color, 0.85 if picking else 0.25), 10))
 
 	func _process(delta: float) -> void:
-		_t += delta
-		if _model and _model.is_inside_tree():
-			if spin != 0:
-				if not _user_turned: _yaw = _holder.rotation.y         # parte de donde estaba
-				_user_turned = true
-				_yaw += spin * SPIN_SPEED * delta
-			if _user_turned: _holder.rotation.y = _yaw
-			else: _holder.rotation.y = 0.35 + sin(_t * 0.6 + index) * 0.45   # se balancea, mirando al frente
-			Anims.pose(_model_name, "idle", _model, fposmod(_t / Anims.duration(_model_name, "idle"), 1.0))
+		# LB/RB giran lo que se está eligiendo: el compañero en su paso; si no, el personaje
+		var st := owner_screen.state
+		var seat: SelectState.Seat = st.seats[index] if st else null
+		var on_pet := seat != null and seat.stage == SelectState.Stage.PET
+		_view.spin = 0 if on_pet else spin
+		_pet_view.spin = spin if on_pet else 0
 		if _shake > 0.0:
 			_shake -= delta
 			position.x = _base_x + (sin(_shake * 80.0) * 6.0 * (_shake / 0.3) if _shake > 0.0 else 0.0)
+
+
+## Visor 3D de un modelo (personaje o compañero), en su propio mundo: luz de la ficha, se
+## balancea mirando al frente, respira con su animación de reposo y gira mientras se mantiene
+## LB/RB (`spin`). Al cambiar de modelo vuelve a mirar al frente.
+class _Preview extends SubViewportContainer:
+	var spin := 0                             ## -1, 0 o 1 mientras se mantiene LB/RB (Q/E)
+	var _vp: SubViewport
+	var _holder: Node3D
+	var _model: Node3D
+	var _model_name := ""
+	var _phase := 0.0
+	var _t := 0.0
+	var _yaw := 0.0                           ## giro elegido por el jugador (rad)
+	var _user_turned := false                 ## deja de balancearse solo en cuanto el jugador lo gira
+	var _cam: Camera3D
+	const SPIN_SPEED := 2.6                   ## rad/s
+
+	func _init(view: Vector2, px_per_m: float, phase: float) -> void:
+		stretch = true
+		size = view
+		_phase = phase
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_vp = SubViewport.new()
+		_vp.own_world_3d = true
+		_vp.transparent_bg = true
+		_vp.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+		add_child(_vp)
+		var env := Environment.new()
+		env.background_mode = Environment.BG_CLEAR_COLOR
+		env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+		env.ambient_light_color = Color(0.42, 0.42, 0.5)
+		env.ambient_light_energy = 0.9
+		env.tonemap_mode = Environment.TONE_MAPPER_ACES
+		env.tonemap_exposure = 1.3
+		var we := WorldEnvironment.new()
+		we.environment = env
+		_vp.add_child(we)
+		var key := DirectionalLight3D.new()
+		key.rotation_degrees = Vector3(-30, 30, 0)
+		key.light_color = Color(1.0, 0.86, 0.66)
+		key.light_energy = 1.4
+		_vp.add_child(key)
+		var rim := DirectionalLight3D.new()
+		rim.rotation_degrees = Vector3(-20, 200, 0)
+		rim.light_color = Color(0.5, 0.65, 1.0)
+		rim.light_energy = 0.8
+		_vp.add_child(rim)
+		_cam = Camera3D.new()
+		_cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+		_cam.size = view.y / px_per_m                    # la escala de la partida, aumentada
+		_cam.position = Vector3(0, _cam.size * 0.5 - 0.06, 4.0)
+		_vp.add_child(_cam)
+		_holder = Node3D.new()
+		_vp.add_child(_holder)
+
+	## Pone otro modelo ("" para ninguno).
+	func set_model(model_name: String) -> void:
+		if model_name == _model_name: return
+		_user_turned = false                  # otro modelo: vuelve a mirar al frente
+		_yaw = 0.0
+		if _model: _model.queue_free()
+		_model = null
+		_model_name = model_name
+		if model_name == "": return
+		_model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
+		_holder.add_child(_model)
+
+	## Lo deja girado un ángulo (como si el jugador lo hubiera girado con LB/RB).
+	func set_turn(yaw: float) -> void:
+		_user_turned = true
+		_yaw = yaw
+
+	func _process(delta: float) -> void:
+		_t += delta
+		if _model == null or not _model.is_inside_tree(): return
+		if spin != 0:
+			if not _user_turned: _yaw = _holder.rotation.y         # parte de donde estaba
+			_user_turned = true
+			_yaw += spin * SPIN_SPEED * delta
+		if _user_turned: _holder.rotation.y = _yaw
+		else: _holder.rotation.y = 0.35 + sin(_t * 0.6 + _phase) * 0.45   # se balancea, mirando al frente
+		Anims.pose(_model_name, "idle", _model, fposmod(_t / Anims.duration(_model_name, "idle"), 1.0))

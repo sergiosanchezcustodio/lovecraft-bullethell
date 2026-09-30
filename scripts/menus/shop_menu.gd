@@ -101,8 +101,7 @@ func _row(e: Shop.Entry) -> Button:
 	pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if maxed: pic.modulate = Color(1, 1, 1, 0.55)
-	h.add_child(pic)
+	h.add_child(pic)                                          # comprado: lo dice la etiqueta, la imagen no se atenúa
 	h.add_theme_constant_override("separation", 14)
 	var col := VBoxContainer.new()
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -120,7 +119,7 @@ func _row(e: Shop.Entry) -> Button:
 	var color := UiKit.GOLD
 	if maxed:
 		tag = "Comprado" if e.prices.size() == 1 else "Completo"
-		color = UiKit.XP
+		color = Color(0.45, 0.9, 0.35)                        # verde
 	else:
 		tag = "%s $" % MenuKit.money(price)
 		if not afford: color = UiKit.TEXT_DIM
