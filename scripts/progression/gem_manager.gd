@@ -99,6 +99,32 @@ func drop(pos: Vector3, value: float) -> void:
 		_homing[count] = 0
 		count += 1
 
+## Gema suelta (que aún no vuela hacia nadie) más cercana a `pos` dentro de `r`: su índice o -1.
+func free_gem_near(pos: Vector3, r: float) -> int:
+	var best := -1
+	var bd := r * r
+	for i in count:
+		if _homing[i] != 0: continue
+		var d := Vector2(_pos[i].x - pos.x, _pos[i].z - pos.z).length_squared()
+		if d < bd:
+			bd = d
+			best = i
+	return best
+
+func gem_position(i: int) -> Vector3:
+	return _pos[i]
+
+## Las gemas sueltas dentro del círculo echan a volar hacia el jugador más cercano (cuervo).
+func attract(pos: Vector3, r: float) -> int:
+	var n := 0
+	for i in count:
+		if _homing[i] != 0: continue
+		if Vector2(_pos[i].x - pos.x, _pos[i].z - pos.z).length_squared() <= r * r:
+			_homing[i] = 1
+			_age[i] = maxf(_age[i], 0.4)
+			n += 1
+	return n
+
 func _physics_process(delta: float) -> void:
 	var t0 := Prof.start()
 	var i := 0

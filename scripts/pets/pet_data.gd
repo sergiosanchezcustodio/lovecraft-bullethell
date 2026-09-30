@@ -13,8 +13,13 @@ extends Resource
 ## BITE: corre a morder a los enemigos cercanos (perro). CLAW: araña a los que se acercan y se
 ## enfada si hieren a su jugador (gato). SPIT: escupe baba venenosa (sapo). INSIGHT: más
 ## experiencia (búho). FORAGE: encuentra dólares y baúles (rata). DEVOUR: se come las balas
-## enemigas (shoggoth bebé).
-enum Kind { BITE, CLAW, SPIT, INSIGHT, FORAGE, DEVOUR }
+## enemigas (shoggoth bebé). DIVE: cae en picado sobre un enemigo (Mini-Byakhee). FETCH: trae
+## gemas lejanas y roba monedas (cuervo). CONFUSE: polvo que confunde (polilla). HEAL: trae
+## pescado que cura y chilla ante las élites (gaviota). ZAP: rayos (Mini-Mi-Go). BLINK: se
+## teletransporta detrás de un enemigo y lo aturde (araña de Tíndalos). POISON: muerde y
+## envenena (serpiente de Yig). CHARGE: embiste en línea (pez, cabra). BURROW: excava y sale
+## bajo un grupo (Mini-Dhole).
+enum Kind { BITE, CLAW, SPIT, INSIGHT, FORAGE, DEVOUR, DIVE, FETCH, CONFUSE, HEAL, ZAP, BLINK, POISON, CHARGE, BURROW }
 @export var kind := Kind.BITE
 ## Ataque: daño por golpe (por segundo en las zonas), crecimiento por nivel del jugador y s
 ## entre ataques. La rata usa `attack_damage` como dólares por hallazgo.
@@ -27,6 +32,10 @@ enum Kind { BITE, CLAW, SPIT, INSIGHT, FORAGE, DEVOUR }
 @export var bonus := 0.0
 @export var bonus_per_level := 0.0
 @export var bonus_max := 1.0
+@export var radius := 1.5                    ## área del golpe, del polvo o de la salida
+@export var stun := 0.0                      ## s que aturde el golpe
+@export var knockback := 0.8                 ## empuje del golpe
+@export var effect_time := 3.0               ## s de veneno o de confusión
 @export var fly_height := 0.0                ## m sobre el suelo (búho); 0 = por el suelo
 @export var follow_gap := 1.6                ## distancia a la que sigue a su jugador
 

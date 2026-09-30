@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PetData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/pets/pet_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"polilla"
+display_name = "Polilla de Leng"
+story = "La búsqueda en sueños de la ignota Kadath"
+description = "Bonita... hasta que abre las alas. Sacude su polvo sobre los grupos de enemigos: vagan confundidos y no disparan"
+price = 4000
+model = "polilla"
+kind = 8
+attack_every = 6.0
+attack_range = 7.0
+radius = 1.8
+effect_time = 3.0
+fly_height = 1.2
+follow_gap = 1.1

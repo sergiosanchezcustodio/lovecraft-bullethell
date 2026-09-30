@@ -11,18 +11,20 @@ var _mat_core: StandardMaterial3D
 var _mat_glow: StandardMaterial3D
 var _light: OmniLight3D
 
-func setup(origin: Vector3, dir: Vector3, length: float, half_width: float, life: float) -> void:
+## `core` y `glow` cambian los colores (rayo del Mini-Mi-Go); por defecto, los del Trapezoedro.
+func setup(origin: Vector3, dir: Vector3, length: float, half_width: float, life: float,
+		core := Color(1.0, 0.72, 0.40, 0.95), glow := Color(0.95, 0.30, 0.18, 0.45)) -> void:
 	_life = maxf(life, 0.1)
 	position = origin + dir * length * 0.5
 	rotation.y = atan2(dir.x, dir.z)
 	# núcleo opaco (sobre la nieve, un rayo aditivo casi no se ve) y halo rojizo aditivo
 	# (el núcleo, sin atenuar y saturado: con el brillo de la nieve no se distinguía de ella)
-	_core = _bar(Vector3(half_width * 0.8, half_width * 0.8, length), Color(1.0, 0.72, 0.40, 0.95), false, 1.0)
+	_core = _bar(Vector3(half_width * 0.8, half_width * 0.8, length), core, false, 1.0)
 	_mat_core = _core.material_override
-	_glow = _bar(Vector3(half_width * 2.2, half_width * 2.2, length), Color(0.95, 0.30, 0.18, 0.45), true, 0.6)
+	_glow = _bar(Vector3(half_width * 2.2, half_width * 2.2, length), glow, true, 0.6)
 	_mat_glow = _glow.material_override
 	_light = OmniLight3D.new()
-	_light.light_color = Color(1.0, 0.45, 0.3)
+	_light.light_color = Color(glow.r, glow.g, glow.b)
 	_light.light_energy = 2.0
 	_light.omni_range = 4.0
 	add_child(_light)

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="PetData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/pets/pet_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"byakhee"
+display_name = "Mini-Byakhee"
+story = "El festival"
+description = "Murciélago alienígena con cara de pocos amigos. Vuela alto y cae en picado sobre los enemigos: golpe en área que los empuja"
+price = 4500
+model = "byakhee"
+kind = 6
+attack_damage = 14.0
+attack_per_level = 3.0
+attack_every = 3.5
+attack_range = 6.0
+radius = 1.3
+knockback = 1.5
+fly_height = 1.8
+follow_gap = 1.2

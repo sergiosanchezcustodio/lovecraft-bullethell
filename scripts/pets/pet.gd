@@ -18,6 +18,9 @@ var speed := 0.0
 var target: Node3D = null                    ## a quién mira
 var cooldown := 0.0
 var bristle := 0.0                           ## 1 = erizado (gato enfadado)
+var lift := 1.0                              ## fracción de la altura de vuelo (0 = en el suelo: picado)
+var hidden := false                          ## bajo tierra (dhole): no se dibuja
+var rush := false                            ## embestida: va a `speed` sin frenar al acercarse
 var _model: Node3D
 var _visual: Node3D
 var _velocity := Vector3.ZERO
@@ -80,6 +83,25 @@ func level() -> int:
 func act() -> void:
 	_act_t = 0.0
 
+## Golpe con los datos del compañero: daño (por defecto el de su nivel), empuje desde él y
+## aturdimiento.
+func strike(e: Node3D, dmg := -1.0) -> void:
+	if e == null or not is_instance_valid(e) or not e.is_alive(): return
+	var d := Damage.new(data.attack_at(level()) if dmg < 0.0 else dmg, 0.0)
+	var away := e.global_position - global_position
+	away.y = 0.0
+	d.knockback = (away.normalized() if away.length() > 0.01 else facing) * data.knockback
+	d.bonus = owner_player.data.bonus_tags
+	e.take_damage(d)
+	if data.stun > 0.0 and e.is_alive() and e.has_method("stun"): e.stun(data.stun)
+	hits += 1
+
+## Aparece de golpe en otro sitio (araña de Tíndalos, dhole).
+func teleport(pos: Vector3) -> void:
+	global_position = Vector3(pos.x, 0.0, pos.z)
+	_velocity = Vector3.ZERO
+	reset_physics_interpolation()
+
 ## Aviso flotante sobre el compañero ("+12 $").
 func popup(text: String, color: Color) -> void:
 	var l := Label3D.new()
@@ -112,11 +134,13 @@ func _physics_process(delta: float) -> void:
 	var to := goal - global_position
 	to.y = 0.0
 	var stop := 0.5 if target != null else 0.35
-	if to.length() > stop and speed > 0.0:
+	if rush:
+		_velocity = to.normalized() * speed if to.length() > 0.05 else Vector3.ZERO
+	elif to.length() > stop and speed > 0.0:
 		_velocity = _velocity.lerp(to.normalized() * speed * clampf(to.length() / 1.5, 0.3, 1.0), 1.0 - exp(-10.0 * delta))
 	else:
 		_velocity = _velocity.lerp(Vector3.ZERO, 1.0 - exp(-12.0 * delta))
-	if global_position.distance_to(home) > LEASH * 2.0:          # se quedó muy atrás: aparece junto a él
+	if global_position.distance_to(home) > LEASH * 2.0 and not rush:          # se quedó muy atrás: aparece junto a él
 		global_position = goal
 		_velocity = Vector3.ZERO
 	position += _velocity * delta
@@ -133,8 +157,9 @@ func facing_of_owner() -> Vector3:
 func _process(delta: float) -> void:
 	if _model == null: return
 	var p := get_global_transform_interpolated().origin
-	var fly := data.fly_height
-	if fly > 0.0: fly += sin(Time.get_ticks_msec() * 0.0025) * 0.08    # flota
+	_visual.visible = not hidden
+	var fly := data.fly_height * lift
+	if fly > 0.0: fly += sin(Time.get_ticks_msec() * 0.0025) * 0.08 * lift    # flota
 	_visual.global_position = p
 	_visual.rotation.y = atan2(facing.x, facing.z)
 	_bristle_k = move_toward(_bristle_k, bristle, delta * 6.0)

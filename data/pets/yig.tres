@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PetData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/pets/pet_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"yig"
+display_name = "Serpiente de Yig"
+story = "La maldición de Yig"
+description = "Serpiente que mira demasiado fijamente. Muerde y envenena: el veneno sigue dañando unos segundos"
+price = 4000
+model = "yig"
+kind = 12
+attack_damage = 4.0
+attack_per_level = 1.0
+attack_every = 1.2
+attack_range = 5.0
+effect_time = 4.0
+knockback = 0.2

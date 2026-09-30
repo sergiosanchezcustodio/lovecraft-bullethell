@@ -45,6 +45,14 @@ var _inject_t := 0.0                        ## s con el suero de West dentro
 var _ally_time := 0.0                       ## s que se levanta como aliado si muere inyectado
 var _inject_bonus := {}
 const INJECT_TIME := 4.0
+# Compañeros (hito 2.15, D-36)
+var _poison_t := 0.0                        ## s envenenado (serpiente de Yig): daño continuo
+var _poison_dps := 0.0
+var _poison_bonus := {}
+var _poison_tick := 0.0
+var _confuse_t := 0.0                       ## s confundido (polilla de Leng): vaga sin rumbo y no dispara
+var _wander := Vector3.ZERO
+var _wander_t := 0.0
 var _status_mat: StandardMaterial3D         ## tinte de la estasis o la maldición
 var _overlay: Material = null               ## el que lleva puesto el modelo ahora
 var _aura: MeshInstance3D                   ## presencia: disco violeta en el suelo
@@ -171,6 +179,24 @@ func is_injected() -> bool:
 func speed_mult() -> float:
 	return _slow_k if _slow_t > 0.0 else 1.0
 
+## Envenenado durante `seconds`: pierde `dps` por segundo (serpiente de Yig). Un veneno nuevo
+## renueva el tiempo y se queda con el daño mayor.
+func poison(seconds: float, dps: float, bonus: Dictionary = {}) -> void:
+	_poison_t = maxf(_poison_t, seconds)
+	_poison_dps = maxf(_poison_dps if _poison_t > 0.0 else 0.0, dps)
+	_poison_bonus = bonus
+
+func is_poisoned() -> bool:
+	return _poison_t > 0.0
+
+## Confundido durante `seconds` (polilla de Leng; las élites, la mitad): vaga sin rumbo, a
+## ratos hacia un lado y a ratos hacia otro, y no dispara.
+func confuse(seconds: float) -> void:
+	_confuse_t = maxf(_confuse_t, seconds * (0.5 if data.elite else 1.0))
+
+func is_confused() -> bool:
+	return _confuse_t > 0.0
+
 ## Aturdido durante `seconds` (las élites, la mitad).
 func stun(seconds: float) -> void:
 	_stun = maxf(_stun, seconds * (0.5 if data.elite else 1.0))
@@ -230,6 +256,15 @@ func _update_status(delta: float) -> bool:
 			d.bonus = _curse.bonus
 			take_damage(d)
 			if not is_alive(): return true
+	if _poison_t > 0.0:
+		_poison_t -= delta
+		_poison_tick -= delta
+		if _poison_tick <= 0.0:
+			_poison_tick = CURSE_TICK
+			var d := Damage.new(_poison_dps * CURSE_TICK, 0.0)
+			d.bonus = _poison_bonus
+			take_damage(d)
+			if not is_alive(): return true
 	if _stasis_t > 0.0:
 		_stasis_t -= delta
 		if _stasis_t <= 0.0 and _stasis_store > 0.0:
@@ -255,6 +290,14 @@ func _physics_process(delta: float) -> void:
 		_lure_t -= delta
 		var to := Vector3(_lure_pos.x - position.x, 0, _lure_pos.z - position.z)
 		velocity = to.normalized() * data.move_speed if to.length() > 0.6 else Vector3.ZERO
+	if _confuse_t > 0.0:                       # polilla: da vueltas sin rumbo
+		_confuse_t -= delta
+		_wander_t -= delta
+		if _wander_t <= 0.0:
+			_wander_t = randf_range(0.4, 0.9)
+			var a := randf() * TAU
+			_wander = Vector3(cos(a), 0, sin(a))
+		velocity = _wander * data.move_speed * 0.6
 	if _stun > 0.0:
 		_stun -= delta
 		velocity = Vector3.ZERO
@@ -286,7 +329,7 @@ func _physics_process(delta: float) -> void:
 			var cd := behavior.contact_damage(self)
 			p.take_damage(cd.scaled(_weak_k) if _weak_t > 0.0 else cd)
 	# Ataque a distancia
-	if data.attack != null and target != null and _stun <= 0.0 and behavior.can_shoot(self):
+	if data.attack != null and target != null and _stun <= 0.0 and _confuse_t <= 0.0 and behavior.can_shoot(self):
 		_attack_timer -= delta
 		if _attack_timer <= 0.0 and not runner.busy and target.global_position.distance_to(global_position) < data.attack_range:
 			runner.fire(data.attack, func() -> Vector3: return target.global_position if is_instance_valid(target) else global_position)
@@ -310,6 +353,8 @@ func _process(delta: float) -> void:
 	if _flash > 0.0: want = _flash_mat
 	elif _stasis_t > 0.0: want = _status(Color(0.35, 0.95, 1.0, 0.5))
 	elif _curse_t > 0.0: want = _status(Color(0.55, 0.12, 0.7, 0.35 + 0.1 * sin(_spawn_t * 9.0)))
+	elif _poison_t > 0.0: want = _status(Color(0.35, 0.85, 0.15, 0.3 + 0.08 * sin(_spawn_t * 7.0)))
+	elif _confuse_t > 0.0: want = _status(Color(0.95, 0.75, 0.95, 0.22 + 0.1 * sin(_spawn_t * 11.0)))
 	elif _inject_t > 0.0: want = _status(Color(0.8, 0.95, 0.25, 0.14 + 0.06 * sin(_spawn_t * 12.0)))   # suero: tenue (el aliado, verde intenso)
 	if want != _overlay:
 		_overlay = want

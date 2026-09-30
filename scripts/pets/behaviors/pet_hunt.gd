@@ -4,6 +4,8 @@ extends PetBehavior
 ## Gato (CLAW): igual, pero da un zarpazo a todos los que tiene delante y, cuando hieren a su
 ## jugador, se enfada unos segundos: se eriza, busca más lejos, ataca el doble de rápido y un
 ## 50 % más fuerte.
+## Serpiente de Yig (POISON): muerde y envenena: el daño del nivel por segundo durante
+## `effect_time` s, además del mordisco.
 
 var target: Node3D = null
 var anger := 0.0                              ## s de enfado que le quedan (gato)
@@ -46,6 +48,8 @@ func _hit(e: Node3D) -> void:
 	d.knockback = pet.facing * 0.8
 	d.bonus = pet.owner_player.data.bonus_tags
 	e.take_damage(d)
+	if pet.data.kind == PetData.Kind.POISON and e.is_alive() and e.has_method("poison"):
+		e.poison(pet.data.effect_time, pet.data.attack_at(pet.level()), d.bonus)
 	pet.hits += 1
 
 ## Zarpazo: a todos los que están delante del gato, con un arañazo en el aire.

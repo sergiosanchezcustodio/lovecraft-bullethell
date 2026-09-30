@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PetData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/pets/pet_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"tindalos"
+display_name = "Araña de Tíndalos"
+story = "Los perros de Tíndalos"
+description = "Una araña que no respeta las leyes de la geometría. Se teletransporta detrás de un enemigo, le muerde fuerte y lo aturde"
+price = 6000
+model = "tindalos"
+kind = 11
+attack_damage = 16.0
+attack_per_level = 3.5
+attack_every = 3.0
+attack_range = 6.0
+stun = 1.2
+knockback = 0.3

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PetData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/pets/pet_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"dhole"
+display_name = "Mini-Dhole"
+story = "A través de las puertas de la llave de plata"
+description = "Gusano gigantesco reducido a mascota. Excava y sale bajo los grupos de enemigos: los golpea, los empuja y los aturde"
+price = 6000
+model = "dhole"
+kind = 14
+attack_damage = 18.0
+attack_per_level = 4.0
+attack_every = 6.0
+attack_range = 7.0
+radius = 1.8
+stun = 0.8
+knockback = 1.8

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="PetData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/pets/pet_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cuervo"
+display_name = "Cuervo de Arkham"
+story = "El que acecha en la oscuridad"
+description = "Cuervo ladrón. Vuela a por las gemas lejanas y te las trae; de paso roba unas monedas, a quien sea"
+price = 3000
+model = "cuervo"
+kind = 7
+attack_damage = 5.0
+attack_per_level = 1.0
+attack_every = 5.0
+attack_range = 10.0
+bonus = 2.0
+bonus_per_level = 0.2
+bonus_max = 6.0
+fly_height = 1.4
+follow_gap = 1.2

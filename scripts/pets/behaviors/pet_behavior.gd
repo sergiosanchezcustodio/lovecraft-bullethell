@@ -8,7 +8,15 @@ var pet: Pet
 
 static func make(kind: int) -> PetBehavior:
 	match kind:
-		PetData.Kind.BITE, PetData.Kind.CLAW: return PetHunt.new()
+		PetData.Kind.BITE, PetData.Kind.CLAW, PetData.Kind.POISON: return PetHunt.new()
+		PetData.Kind.DIVE: return PetDive.new()
+		PetData.Kind.FETCH: return PetFetch.new()
+		PetData.Kind.CONFUSE: return PetConfuse.new()
+		PetData.Kind.HEAL: return PetHeal.new()
+		PetData.Kind.ZAP: return PetZap.new()
+		PetData.Kind.BLINK: return PetBlink.new()
+		PetData.Kind.CHARGE: return PetCharge.new()
+		PetData.Kind.BURROW: return PetBurrow.new()
 		PetData.Kind.SPIT: return PetSpit.new()
 		PetData.Kind.INSIGHT: return PetInsight.new()
 		PetData.Kind.FORAGE: return PetForage.new()

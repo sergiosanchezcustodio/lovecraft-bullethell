@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PetData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/pets/pet_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gaviota"
+display_name = "Gaviota de Innsmouth"
+story = "La sombra sobre Innsmouth"
+description = "Carroñera y chillona. Se va a por pescado y te lo trae: cura un 8 % de vida y cordura (hasta un 15 %) a quien más lo necesite. Chilla cuando ve una élite"
+price = 3500
+model = "gaviota"
+kind = 9
+attack_every = 18.0
+bonus = 0.08
+bonus_per_level = 0.004
+bonus_max = 0.15
+fly_height = 1.6
+follow_gap = 1.2
