@@ -143,9 +143,18 @@ func _fire(w: Weapon) -> bool:
 	fired.emit(w)
 	return true
 
+## Velocidad que hereda un proyectil del jugador: la parte de su movimiento en la dirección
+## del disparo (nunca hacia atrás), como mucho su velocidad al andar. Así, al correr y
+## disparar hacia delante, el jugador no alcanza a sus propios proyectiles lentos; de lado o
+## hacia atrás no se tuercen ni se frenan.
+func inherited_speed(dir: Vector3) -> float:
+	var v := player.velocity
+	var d := Vector3(dir.x, 0, dir.z).normalized()
+	return clampf(Vector3(v.x, 0, v.z).dot(d), 0.0, player.data.move_speed)
+
 func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
-	var speed := w.stat("projectile_speed")
-	var life := w.stat("range") / speed * 1.15
+	var speed := w.stat("projectile_speed") + inherited_speed(dir)
+	var life := w.stat("range") / speed * 1.15                        # mismo alcance: solo sale más rápido
 	if _bonus_set < 0 and not player.data.bonus_tags.is_empty():
 		_bonus_set = world.bullets.register_bonus(player.data.bonus_tags)
 	var style := BulletManager.Style.PLAYER
@@ -407,8 +416,9 @@ func _boomerang(w: Weapon, target_pos: Vector3) -> bool:
 	var spread := deg_to_rad(w.stat("spread_deg"))
 	for k in n:
 		var off := 0.0 if n == 1 else lerpf(-spread * 0.5, spread * 0.5, k / float(n - 1))
-		world.fx.add_child(Boomerang.new().setup(player, world, base.rotated(Vector3.UP, off), w.stat("range"),
-			w.stat("projectile_speed"), w.stat("projectile_radius"), dmg(w), w.stat("knockback"), player.data.bonus_tags))
+		var bdir := base.rotated(Vector3.UP, off)
+		world.fx.add_child(Boomerang.new().setup(player, world, bdir, w.stat("range"),
+			w.stat("projectile_speed") + inherited_speed(bdir), w.stat("projectile_radius"), dmg(w), w.stat("knockback"), player.data.bonus_tags))
 	player.play_once("throw")
 	fired.emit(w)
 	return true
@@ -419,7 +429,7 @@ func _fissure(w: Weapon, target_pos: Vector3) -> bool:
 	var dir := Vector3(target_pos.x - origin.x, 0, target_pos.z - origin.z)
 	if dir.length() < 0.01: dir = player.motor.facing
 	world.fx.add_child(Fissure.new().setup(world, origin + dir.normalized() * 0.5, dir, w.stat("range"),
-		w.stat("projectile_speed"), w.stat("aoe_radius"), dmg(w), w.stat("stun"), player.data.bonus_tags))
+		w.stat("projectile_speed") + inherited_speed(dir), w.stat("aoe_radius"), dmg(w), w.stat("stun"), player.data.bonus_tags))
 	player.play_once("throw")
 	fired.emit(w)
 	return true
@@ -452,8 +462,13 @@ func _thrust(w: Weapon) -> bool:
 
 func _throw(w: Weapon, target: Vector3) -> void:
 	var e := ThrownExplosive.new()
+	# corriendo hacia donde lanza, el vuelo se acorta para ir claramente por delante de él
+	var flight := w.stat("flight_time")
+	var to := Vector3(target.x - player.global_position.x, 0, target.z - player.global_position.z)
+	var fwd := inherited_speed(to)
+	if fwd > 0.5: flight = clampf(to.length() / (fwd * 1.8), 0.25, flight)
 	e.setup(world, player.global_position + Vector3(0, 1.4, 0), Vector3(target.x, 0, target.z),
-		w.stat("flight_time"), w.stat("fuse"), w.stat("aoe_radius") * player.data.explosion_radius_mult, dmg(w), player.color)
+		flight, w.stat("fuse"), w.stat("aoe_radius") * player.data.explosion_radius_mult, dmg(w), player.color)
 	var z := {}
 	if w.data.zone != WeaponData.Zone.NONE:
 		z = {"kind": w.data.zone, "radius": w.stat("zone_radius"), "time": w.stat("zone_time"),
