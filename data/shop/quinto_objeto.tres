@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ShopItem" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ShopItem" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/items/icons/quinto_objeto.png" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -12,4 +13,4 @@ order = 2
 prices = Array[int]([5000])
 stat = "item_slots"
 per_level = 1.0
-icon_model = "icono_bolsillo"
+icon = ExtResource("2")
