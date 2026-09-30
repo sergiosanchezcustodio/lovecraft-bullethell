@@ -33,17 +33,27 @@ static func make(host: Node, model_name: String, mode: String = "full", px: int 
 		cam.size = maxf(box.size.x, maxf(box.size.y, box.size.z)) * 0.95
 		cam.position = box.get_center() + cam.transform.basis.z * 4.0
 	vp.add_child(cam)
-	var l := DirectionalLight3D.new()
-	l.rotation_degrees = Vector3(-35, 40, 0)
-	l.light_energy = 1.3
-	vp.add_child(l)
+	# iluminación de estudio: luz principal cálida, relleno frío suave y poco ambiente. Con un
+	# ambiente gris fuerte y una sola luz, el modelo salía plano y lavado, como tras una niebla.
+	var key := DirectionalLight3D.new()
+	key.rotation_degrees = Vector3(-40, 50, 0)
+	key.light_energy = 1.35
+	key.light_color = Color(1.0, 0.95, 0.88)
+	vp.add_child(key)
+	var fill := DirectionalLight3D.new()
+	fill.rotation_degrees = Vector3(-15, -60, 0)
+	fill.light_energy = 0.4
+	fill.light_color = Color(0.75, 0.82, 1.0)
+	vp.add_child(fill)
 	var we := WorldEnvironment.new()
 	var env := Environment.new()
 	env.background_mode = Environment.BG_CLEAR_COLOR
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.5, 0.5, 0.55)
+	env.ambient_light_color = Color(0.14, 0.14, 0.16)
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
-	env.tonemap_exposure = 1.3
+	env.tonemap_exposure = 1.0
+	env.adjustment_enabled = true
+	env.adjustment_saturation = 1.08
 	we.environment = env
 	vp.add_child(we)
 	return vp.get_texture()
