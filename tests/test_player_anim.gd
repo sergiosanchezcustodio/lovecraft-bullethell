@@ -129,7 +129,7 @@ func test_nunca_se_hunde_en_el_suelo() -> void:
 			p._process(DT)
 			for mi: MeshInstance3D in p.model.get_meta("meshes"):
 				var xf := mi.global_transform                # altura real sobre el suelo (y = 0)
-				var box := mi.get_aabb()
-				for i in 8: worst = minf(worst, (xf * box.get_endpoint(i)).y)
+				# puntos reales de la pieza: las esquinas de su caja, girada, quedan por debajo
+				for v: Vector3 in Player._extremes(mi): worst = minf(worst, (xf * v).y)
 			t += DT
 		assert_gt(worst, -0.01, "%s: se hunde %.2f m" % [anim, -worst])

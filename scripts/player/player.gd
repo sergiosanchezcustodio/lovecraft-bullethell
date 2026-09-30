@@ -165,6 +165,9 @@ func _physics_process(delta: float) -> void:
 	elif ss.is_kind(&"vagar"): velocity *= rules.wander_speed
 	move_and_slide()
 	position.y = 0.0
+	if world != null and world.obstacles != null and world.obstacles.has_mask():   # límites y decorado dibujados
+		var p2 := world.obstacles.push_out(Vector2(position.x, position.z), data.hurt_radius + 0.05)
+		position.x = p2.x; position.z = p2.y
 	if leash.is_valid(): global_position = leash.call(global_position)
 	if motor.is_dodging() and not was_dodging:
 		_action = data.dodge_anim         # la animación del esquive empieza con el impulso
@@ -379,14 +382,41 @@ func _keep_above_ground(delta: float) -> void:
 	var lowest := INF
 	for mi: MeshInstance3D in model.get_meta("meshes"):
 		var xf := inv * mi.global_transform
-		var box := mi.get_aabb()
-		for i in 8:
-			lowest = minf(lowest, (xf * box.get_endpoint(i)).y)
+		# puntos reales de la pieza (no las esquinas de su caja: al inclinarse quedan muy por
+		# debajo del voxel más bajo y lo levantaban de más, y el deslizamiento no se tumbaba)
+		for v: Vector3 in _extremes(mi):
+			lowest = minf(lowest, (xf * v).y)
 	var needed := maxf(-lowest, 0.0)
 	_ground_lift = maxf(needed, _ground_lift - GROUND_EASE * delta)
 	# en el contenedor (se recoloca cada fotograma), no en el modelo: la pose del modelo se
 	# captura para los fundidos y la subida se sumaría dos veces
 	visual.position.y += _ground_lift
+
+## Vértices extremos de una malla en 98 direcciones (se calculan una vez por malla): bastan
+## para saber el punto más bajo de la pieza girada como se quiera.
+static func _extremes(mi: MeshInstance3D) -> PackedVector3Array:
+	var mesh := mi.mesh
+	if mesh.has_meta("extremes"): return mesh.get_meta("extremes")
+	var out := PackedVector3Array()
+	var dirs: Array[Vector3] = []
+	for x in [-2, -1, 0, 1, 2]:
+		for y in [-2, -1, 0, 1, 2]:
+			for z in [-2, -1, 0, 1, 2]:
+				if maxi(maxi(absi(x), absi(y)), absi(z)) == 2: dirs.append(Vector3(x, y, z).normalized())
+	var best: Array[float] = []
+	best.resize(dirs.size())
+	best.fill(-INF)
+	out.resize(dirs.size())
+	for s in mesh.get_surface_count():
+		var verts: PackedVector3Array = mesh.surface_get_arrays(s)[Mesh.ARRAY_VERTEX]
+		for v in verts:
+			for k in dirs.size():
+				var d := v.dot(dirs[k])
+				if d > best[k]:
+					best[k] = d
+					out[k] = v
+	mesh.set_meta("extremes", out)
+	return out
 
 ## Nieve que salta de los pies al deslizarse: cubitos blancos que quedan atrás.
 func _make_snow_spray() -> GPUParticles3D:

@@ -145,6 +145,9 @@ func _physics_process(delta: float) -> void:
 		_velocity = Vector3.ZERO
 	position += _velocity * delta
 	position.y = 0.0
+	if world != null and world.obstacles != null and data.fly_height <= 0.0:   # los que vuelan pasan por encima
+		var p2 := world.obstacles.push_out(Vector2(position.x, position.z), 0.3)
+		position.x = p2.x; position.z = p2.y
 	if _velocity.length() > 0.2: facing = facing.slerp(_velocity.normalized(), 1.0 - exp(-12.0 * delta)).normalized()
 	elif target != null and is_instance_valid(target):
 		var f := target.global_position - global_position

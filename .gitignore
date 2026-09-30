@@ -12,3 +12,9 @@ AGENTS.md
 
 # iconos de armas en bruto (Replicate): solo en local; el juego usa los recortados
 resources/weapons/icons/raw/
+
+# iconos de objetos en bruto (Replicate)
+resources/items/icons/raw/
+
+# ejecutables exportados
+builds/

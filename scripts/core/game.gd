@@ -115,6 +115,7 @@ func _ready() -> void:
 	world = CombatWorld.new()
 	var size: Vector2 = arena.get_meta("size")
 	world.bounds = Rect2(-size * 0.5 - Vector2(6, 6), size + Vector2(12, 12))
+	world.obstacles = arena.get_meta("obstacles")
 	add_child(world)
 	gems = GemManager.new()
 	gems.world = world

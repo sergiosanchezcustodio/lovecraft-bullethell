@@ -14,6 +14,7 @@ var enemies: Array[Node3D] = []
 var grid := SpatialGrid.new(2.0)
 var _grid_targets: Array[Node3D] = []        ## índice de la rejilla -> objetivo
 var bounds := Rect2(-40, -40, 80, 80)        ## límites para eliminar balas perdidas
+var obstacles: ObstacleMap                   ## decorado: lo que no se atraviesa (jugadores, mascotas, balas)
 
 func _init() -> void:
 	name = "CombatWorld"

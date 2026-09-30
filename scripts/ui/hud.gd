@@ -160,7 +160,7 @@ class PlayerPanel extends PanelContainer:
 		portrait.size = Vector2(LEFT_W, 86)
 		box.add_child(portrait)
 		_xp = LevelCells.new()
-		_xp.position = Vector2(0, 116)
+		_xp.position = Vector2(0, 113.5)                 # a igual distancia de la cabeza y del borde inferior
 		_xp.size = Vector2(LEFT_W, 14)
 		box.add_child(_xp)
 		# derecha: nombre, barras con su icono, armas y objetos

@@ -196,13 +196,16 @@ func count_enemy_bullets(center: Vector3, r: float) -> int:
 func _physics_process(delta: float) -> void:
 	var t0 := Prof.start()
 	var b := world.bounds if world != null else Rect2(-100, -100, 200, 200)
+	var obs: ObstacleMap = world.obstacles if world != null and world.obstacles != null and world.obstacles.has_mask() else null
 	var i := 0
 	while i < count:
 		_prev[i] = _pos[i]
 		if _home[i] > 0.0 and world != null: _steer(i, delta)
 		_pos[i] += _vel[i] * delta
 		_age[i] += delta
-		var dead := _age[i] >= _life[i] or not b.has_point(Vector2(_pos[i].x, _pos[i].z))
+		var p2 := Vector2(_pos[i].x, _pos[i].z)
+		# se paran contra el decorado (cabañas, iglús, acantilados…), las del jugador y las enemigas
+		var dead := _age[i] >= _life[i] or not b.has_point(p2) or (obs != null and obs.stops_bullet(p2))
 		if not dead and world != null:
 			dead = _collide_player_bullet(i) if _team[i] == Team.PLAYER else _collide_enemy_bullet(i)
 		if dead:

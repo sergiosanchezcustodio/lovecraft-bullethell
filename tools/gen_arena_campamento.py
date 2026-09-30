@@ -140,3 +140,7 @@ layout = {
 with open("data/arenas/campamento.json", "w") as f:
     json.dump(layout, f, indent=1)
 print(len(props), "piezas")
+
+# mapa de lo transitable (voxels reales de las piezas) y tramos de la barrera
+import gen_mapa_transitable
+gen_mapa_transitable.build("campamento")

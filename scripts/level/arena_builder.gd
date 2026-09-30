@@ -22,6 +22,9 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	var lights: Array[OmniLight3D] = []
 	var obstacles := ObstacleMap.new()
 	obstacles.bounds = Rect2(-size * 0.5, size)
+	# mapa de lo transitable (tools/gen_mapa_transitable.py): con él, los límites y los
+	# obstáculos siguen lo dibujado y sobran los cuerpos físicos del decorado
+	var masked := data.has("mask") and obstacles.load_mask(data.mask)
 	var props := Node3D.new()
 	props.name = "Props"
 	root.add_child(props)
@@ -40,12 +43,12 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 			for mi: MeshInstance3D in m.find_children("*", "MeshInstance3D", true, false):
 				mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		props.add_child(holder)
-		_collider(holder, m, data.colliders.get(p.model, {}), obstacles)
+		_collider(holder, m, data.colliders.get(p.model, {}), obstacles, not masked)
 		if (m.get_meta("pivots") as Dictionary).has("light"):
 			lights.append(_lamp(holder, m, data.lamp, fog_volumes))
 	root.set_meta("lights", lights)
 	root.set_meta("obstacles", obstacles)
-	root.add_child(_walls(size))
+	if not masked: root.add_child(_walls(size))
 	return root
 
 ## Luz propia de la arena (JSON "light"): sol o luna y entorno. Claves opcionales: sun_rot
@@ -149,7 +152,18 @@ static func _barrier(b: Dictionary, size: Vector2) -> Node3D:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 42
 	var line: float = b.line
-	for side: String in b.sides:
+	if b.has("placements"):                  # medidos por gen_mapa_transitable.py: justo ahí
+		for pl: Array in b.placements:
+			var holder := Node3D.new()
+			holder.position = Vector3(pl[0], pl[1], pl[2])
+			holder.rotation_degrees.y = pl[3]
+			holder.scale = Vector3(1.0, pl[4], 1.0)
+			var m := VoxelBuilder.load_model("res://models/%s.json" % pl[5])
+			for mi in m.find_children("*", "MeshInstance3D", true, false):
+				(mi as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			holder.add_child(m)
+			root.add_child(holder)
+	for side: String in ([] if b.has("placements") else b.sides):
 		var t: float = b.from
 		var k := 0
 		while t <= float(b.to):
@@ -194,7 +208,9 @@ static func _barrier(b: Dictionary, size: Vector2) -> Node3D:
 	root.add_child(plateau)
 	return root
 
-static func _collider(holder: Node3D, m: Node3D, def: Dictionary, obstacles: ObstacleMap) -> void:
+## Colisión de una pieza: su círculo en el mapa de obstáculos (con mapa de lo transitable,
+## solo para dibujarlo en el mapa del nivel) y, sin él, un cuerpo físico para el jugador.
+static func _collider(holder: Node3D, m: Node3D, def: Dictionary, obstacles: ObstacleMap, physical := true) -> void:
 	if def.is_empty() or def.get("type", "none") == "none": return
 	var body := StaticBody3D.new()
 	body.collision_layer = LAYER_WORLD
@@ -217,7 +233,8 @@ static func _collider(holder: Node3D, m: Node3D, def: Dictionary, obstacles: Obs
 		var c := holder.transform * aabb.get_center()
 		obstacles.add_circle(Vector2(c.x, c.z), maxf(box.size.x, box.size.z) * 0.5 * holder.scale.x)
 	body.add_child(cs)
-	holder.add_child(body)
+	if physical: holder.add_child(body)
+	else: body.free()
 
 ## Caja envolvente del modelo en el espacio del contenedor (sin su escala).
 static func _model_aabb(m: Node3D) -> AABB:
