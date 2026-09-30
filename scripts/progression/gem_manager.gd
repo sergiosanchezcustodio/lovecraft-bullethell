@@ -119,7 +119,7 @@ func _physics_process(delta: float) -> void:
 			_homing[i] = 1
 			var to := target.global_position + Vector3(0, 0.8, 0) - p
 			if to.length() < 0.45:
-				target.progress.add_xp(_value[i] * target.data.xp_mult)
+				target.progress.add_xp(_value[i] * target.data.xp_mult * target.pet_xp_mult)
 				_remove(i)
 				continue
 			_vel[i] = _vel[i].lerp(to.normalized() * rules.magnet_speed, 1.0 - exp(-10.0 * delta))

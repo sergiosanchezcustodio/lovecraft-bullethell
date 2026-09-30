@@ -1,37 +1,42 @@
 class_name Pet
 extends Node3D
-## Compañero en partida (D-20, hito 2.13c): acompaña a su jugador toda la partida y sube de
-## nivel con él.
-## - Perro de trineo (`kind = BITE`): sigue al jugador y, si hay un enemigo cerca de él,
-##   corre a morderlo; no se aleja demasiado. El mordisco crece con el nivel del jugador.
-## - Gato de Ulthar (`kind = WARD`): se queda a su lado y le quita parte del daño mental
-##   (`Player.mental_resist`), más cuanto más nivel.
+## Compañero en partida (D-20, D-36): acompaña a su jugador toda la partida y sube de nivel
+## con él. Aquí va lo común (seguirlo, volar, animarse); lo que hace cada uno está en su
+## comportamiento (`PetBehavior.make(data.kind)`, en scripts/pets/behaviors/).
 ## No recibe daño ni lo buscan los enemigos (no está en CombatWorld).
 
 var data: PetData
 var owner_player: Player
 var world: CombatWorld
-var bites := 0                               ## mordiscos dados (tests)
+var game: Node                               ## la partida (dólares, director); puede faltar en tests
+var behavior: PetBehavior
+var hits := 0                                ## ataques o balas comidas (tests)
+var found_money := 0                         ## dólares encontrados (rata)
+var facing := Vector3.FORWARD
+var goal := Vector3.ZERO                     ## adónde va este paso (el comportamiento lo cambia)
+var speed := 0.0
+var target: Node3D = null                    ## a quién mira
+var cooldown := 0.0
+var bristle := 0.0                           ## 1 = erizado (gato enfadado)
 var _model: Node3D
 var _visual: Node3D
-var _facing := Vector3.FORWARD
 var _velocity := Vector3.ZERO
 var _anim := "idle"
 var _anim_t := 0.0
-var _bite_t := -1.0
-var _cooldown := 0.0
-var _target: Node3D = null
+var _act_t := -1.0
+var _bristle_k := 0.0
 
-const FOLLOW_GAP := 1.6                     ## se pone a esta distancia del jugador
-const HUNT_RADIUS := 5.5                    ## enemigos a esta distancia del jugador: a por ellos
-const LEASH := 8.0                          ## más lejos del jugador que esto, vuelve
+const LEASH := 8.0                           ## más lejos del jugador que esto, deja lo que hace
 
-func setup(p_data: PetData, p_owner: Player, p_world: CombatWorld) -> Pet:
+func setup(p_data: PetData, p_owner: Player, p_world: CombatWorld, p_game: Node = null) -> Pet:
 	data = p_data
 	owner_player = p_owner
 	world = p_world
+	game = p_game
 	name = "Pet_%s" % data.id
 	position = p_owner.global_position + Vector3(-1.2, 0, -0.6)
+	behavior = PetBehavior.make(data.kind)
+	behavior.pet = self
 	return self
 
 func _ready() -> void:
@@ -43,11 +48,11 @@ func _ready() -> void:
 		_model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
 		_visual.add_child(_model)
 	_visual.add_child(_ring())
-	if data.kind == PetData.Kind.WARD: _apply_ward()
-	owner_player.progress.leveled_up.connect(func(_l: int) -> void: _apply_ward())
+	behavior.start()
+	owner_player.progress.leveled_up.connect(func(_l: int) -> void: behavior.leveled())
 	reset_physics_interpolation.call_deferred()
 
-## Anillo fino del color de su jugador: se ve a quién acompaña y dónde está.
+## Anillo fino del color de su jugador, en el suelo: se ve a quién acompaña y dónde está.
 func _ring() -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	var tm := TorusMesh.new()
@@ -58,6 +63,7 @@ func _ring() -> MeshInstance3D:
 	mi.mesh = tm
 	mi.scale = Vector3(1, 0.08, 1)
 	mi.position.y = 0.03
+	mi.set_meta("ground", true)
 	var m := StandardMaterial3D.new()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.albedo_color = Color(owner_player.color, 0.8)
@@ -70,38 +76,43 @@ func _ring() -> MeshInstance3D:
 func level() -> int:
 	return owner_player.progress.level
 
-## Gato: fracción del daño mental que recibe el jugador (menos cuanto más nivel).
-func ward_factor() -> float:
-	return 1.0 - minf(data.ward + data.ward_per_level * (level() - 1), data.ward_max)
+## Ataca (o traga, o escarba): pone la animación de ataque.
+func act() -> void:
+	_act_t = 0.0
 
-func _apply_ward() -> void:
-	if data.kind == PetData.Kind.WARD: owner_player.mental_resist = ward_factor()
-
-func bite_damage() -> float:
-	return data.bite_damage + data.bite_per_level * (level() - 1)
+## Aviso flotante sobre el compañero ("+12 $").
+func popup(text: String, color: Color) -> void:
+	var l := Label3D.new()
+	l.text = text
+	l.modulate = color
+	l.outline_modulate = Color(0, 0, 0, 0.8)
+	l.font_size = 40
+	l.outline_size = 10
+	l.pixel_size = 0.006
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.no_depth_test = true
+	l.position = global_position + Vector3(0, 1.0 + data.fly_height, 0)
+	(world.fx if world != null else get_parent()).add_child(l)
+	var tw := l.create_tween()
+	tw.tween_property(l, "position:y", l.position.y + 0.8, 1.2)
+	tw.parallel().tween_property(l, "modulate:a", 0.0, 1.2).set_delay(0.5)
+	tw.tween_callback(l.queue_free)
 
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(owner_player): return
-	_cooldown -= delta
+	cooldown -= delta
+	target = null
 	var home := owner_player.global_position
-	var goal := home - owner_player.motor.facing * FOLLOW_GAP + owner_player.motor.facing.cross(Vector3.UP) * 0.9
+	var side := facing_of_owner().cross(Vector3.UP)
+	goal = home - facing_of_owner() * data.follow_gap + side * 0.9 * signf(data.follow_gap)
 	# se da prisa cuanto más lejos está: un poco más rápido que el jugador cuando lo sigue
 	var far := clampf((global_position.distance_to(home) - 2.0) / 3.0, 0.0, 1.0)
-	var speed := owner_player.data.move_speed * (1.1 + 0.9 * far)
-	if data.kind == PetData.Kind.BITE:
-		if _target == null or not is_instance_valid(_target) or not _target.is_alive() \
-				or _target.global_position.distance_to(home) > LEASH:
-			_target = world.nearest_enemy(home, HUNT_RADIUS) if world != null else null
-		if _target != null and global_position.distance_to(home) < LEASH:
-			goal = _target.global_position
-			speed = owner_player.data.move_speed * 1.45
-			var reach := float(_target.hit_radius) + 0.55
-			if global_position.distance_to(_target.global_position) <= reach and _cooldown <= 0.0:
-				_bite()
+	speed = owner_player.data.move_speed * (1.1 + 0.9 * far)
+	behavior.step(delta)
 	var to := goal - global_position
 	to.y = 0.0
-	var stop := 0.5 if _target != null else 0.35
-	if to.length() > stop:
+	var stop := 0.5 if target != null else 0.35
+	if to.length() > stop and speed > 0.0:
 		_velocity = _velocity.lerp(to.normalized() * speed * clampf(to.length() / 1.5, 0.3, 1.0), 1.0 - exp(-10.0 * delta))
 	else:
 		_velocity = _velocity.lerp(Vector3.ZERO, 1.0 - exp(-12.0 * delta))
@@ -110,33 +121,37 @@ func _physics_process(delta: float) -> void:
 		_velocity = Vector3.ZERO
 	position += _velocity * delta
 	position.y = 0.0
-	if _velocity.length() > 0.2: _facing = _facing.slerp(_velocity.normalized(), 1.0 - exp(-12.0 * delta)).normalized()
-	elif _target != null: _facing = (_target.global_position - global_position).normalized()
+	if _velocity.length() > 0.2: facing = facing.slerp(_velocity.normalized(), 1.0 - exp(-12.0 * delta)).normalized()
+	elif target != null and is_instance_valid(target):
+		var f := target.global_position - global_position
+		f.y = 0.0
+		if f.length() > 0.01: facing = f.normalized()
 
-func _bite() -> void:
-	_cooldown = data.bite_every
-	_bite_t = 0.0
-	var d := Damage.new(bite_damage(), 0.0)
-	d.knockback = _facing * 0.8
-	d.bonus = owner_player.data.bonus_tags
-	_target.take_damage(d)
-	bites += 1
+func facing_of_owner() -> Vector3:
+	return owner_player.motor.facing
 
 func _process(delta: float) -> void:
 	if _model == null: return
-	_visual.global_position = get_global_transform_interpolated().origin
-	_visual.rotation.y = atan2(_facing.x, _facing.z)
+	var p := get_global_transform_interpolated().origin
+	var fly := data.fly_height
+	if fly > 0.0: fly += sin(Time.get_ticks_msec() * 0.0025) * 0.08    # flota
+	_visual.global_position = p
+	_visual.rotation.y = atan2(facing.x, facing.z)
+	_bristle_k = move_toward(_bristle_k, bristle, delta * 6.0)
 	var anim := "idle"
 	var v := _velocity.length()
-	if _bite_t >= 0.0:
+	if _act_t >= 0.0:
 		anim = "bite"
-		_bite_t += delta
-		if _bite_t >= Anims.duration(data.model, "bite"): _bite_t = -1.0
+		_act_t += delta
+		if _act_t >= Anims.duration(data.model, "bite"): _act_t = -1.0
 	elif v > owner_player.data.move_speed * 1.2: anim = "run"
 	elif v > 0.3: anim = "walk"
 	if anim != _anim:
 		_anim = anim
 		_anim_t = 0.0
 	var dur := Anims.duration(data.model, anim)
-	_anim_t = (_bite_t / dur) if anim == "bite" else fposmod(_anim_t + delta / dur * (clampf(v / 2.5, 0.6, 1.6) if anim != "idle" else 1.0), 1.0)
+	if anim == "bite": _anim_t = clampf(_act_t / dur, 0.0, 1.0)
+	else: _anim_t = fposmod(_anim_t + delta / dur * (clampf(v / 2.5, 0.6, 1.6) if anim != "idle" else 1.0), 1.0)
 	Anims.pose(data.model, anim, _model, _anim_t)
+	_model.position.y += fly                    # la animación pone la raíz; el vuelo y el erizado van encima
+	_model.scale *= 1.0 + 0.15 * _bristle_k

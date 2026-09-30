@@ -304,7 +304,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 func _spawn_pet(id: String, owner: Player) -> void:
 	var pd: PetData = load("res://data/pets/%s.tres" % id)
 	if pd == null: return
-	add_child(Pet.new().setup(pd, owner, world))
+	add_child(Pet.new().setup(pd, owner, world, self))
 
 ## ¿Lo maneja la máquina? (elige sola sus mejoras)
 func _is_bot(q: Player) -> bool:

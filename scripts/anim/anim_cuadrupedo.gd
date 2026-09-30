@@ -1,5 +1,5 @@
 extends RefCounted
-## Animaciones de los compañeros de cuatro patas (perro de trineo, gato de Ulthar).
+## Animaciones de los compañeros de cuatro patas (perro de trineo, gato de Ulthar, rata).
 ## Partes: body, head, leg_fl, leg_fr, leg_bl, leg_br, tail. El modelo mira hacia +Z.
 
 const DURATION := {"idle": 2.4, "walk": 0.5, "run": 0.34, "bite": 0.35}

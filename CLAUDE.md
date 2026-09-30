@@ -11,7 +11,7 @@ Léela al empezar cada sesión:
 
 ## Estado actual
 
-*Actualizado: 26-09-2026.*
+*Actualizado: 30-09-2026.*
 
 - **Fase 2: en curso** (plan del 26-09-2026 en `docs/ROADMAP.md`). Ampliada a "Menús, guardado y cooperativo local": adelanta de la fase 5 el guardado, los menús, la selección de personaje, el mapa de niveles, la tienda y los compañeros (D-22 a D-25 en el GDD). Cuatro personajes jugables: Dyer, Olmstead, Legrasse y Johansen.
   - **Hito 2.1 (guardado y portada): hecho.**
@@ -166,7 +166,13 @@ Léela al empezar cada sesión:
     - Cabaña, iglú y farol rehechos en `gen_atrezo_expedicion.py`; barrera en seracs con bloques caídos (`gen_barrera_hielo.py`). `"no_shadow"` en el JSON de la arena: la costa, los témpanos y los icebergs no proyectan sombra (caería sobre el agua).
     - Rendimiento con 150 enemigos y 1.200 balas: 88 FPS de media (102 antes del escenario nuevo); el 1 % peor igual (~60). Sobra geometría (8 M de primitivas): si hace falta, bajar la resolución de la tienda y la cabaña o unir caras en `VoxelBuilder`.
   - **Subida de nivel con mando arreglada (30-09-2026):** la misma ventana (`CoopLevelUp`) en solitario (centrada, `solo=true`) y en cooperativo. La cruceta abajo es también `MAP` y `JoypadInput` no la da como movimiento: `CoopLevelUp.nav_dir` la lee aparte. Repite al mantener; solo confirmar espera 0,35 s. Tarjetas con la imagen del arma (`get_icon()`) o del objeto (`UpgradeData.icon`; la brújula usa de momento el icono de Cultura). `Menus.LevelUpMenu` ya no se usa. Tests en `tests/test_level_up_input.gd`.
-  - Después: hito 2.15, vestuario.
+  - **Hito 2.15 (bestiario de compañeros, D-36), en tres tandas.** El vestuario pasa a 2.16 y el cierre a 2.17.
+    - **2.15a hecha, pendiente de tu revisión (30-09-2026):** comportamientos intercambiables (`PetBehavior.make(kind)`, `scripts/pets/behaviors/`); `Pet` solo sigue, vuela (`PetData.fly_height`), anima y saca avisos flotantes (`popup`). Datos genéricos en `PetData`: `attack_*` y `bonus*` (`attack_at`, `bonus_at` por nivel).
+      - Gato de Ulthar rehecho en negro (`CLAW`, `PetHunt`): zarpazo en área; si hieren a su jugador se eriza 5 s (doble de rápido, +50 %). Ya no quita daño mental.
+      - Sapo de Innsmouth (`SPIT`): escupe baba (`ThrownExplosive`, aspecto `baba`) que deja un charco de ácido. Búho de los sueños (`INSIGHT`, vuela): +12 % de experiencia, hasta +30 % (`Player.pet_xp_mult`). Rata de las Paredes (`FORAGE`): cada 20 s escarba y encuentra dólares, a veces un baúl (`game.director.spawn_chest`). Shoggoth bebé (`DEVOUR`): se traga 2 balas enemigas por segundo, hasta 5 (`BulletManager.devour_enemy_bullets`).
+      - Modelos `gen_gato.py`, `gen_rata.py`, `gen_sapo.py`, `gen_buho.py` y `gen_shoggoth.py`; animaciones `anim_sapo.gd`, `anim_volador.gd` y `anim_blob.gd` (la rata usa `anim_cuadrupedo.gd`). Precios: rata 2.000 $, sapo 3.000 $, búho 3.500 $, shoggoth 5.000 $.
+      - Tests en `tests/test_pets.gd`. Hojas `shots/revision_2_15a_modelos.png`, `revision_2_15a_gato.png` y `revision_2_15a_sapo.png`. Prueba: `godot --path . -- pet=shoggoth`.
+    - Pendientes: 2.15b (byakhee, cuervo, polilla, gaviota y Mi-Go) y 2.15c (Tíndalos, Yig, pez, dhole y cabra).
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

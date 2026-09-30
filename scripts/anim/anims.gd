@@ -28,6 +28,10 @@ const BY_MODEL := {
 	"fragmento": preload("res://scripts/anim/anim_fragmento.gd"),
 	"perro": preload("res://scripts/anim/anim_cuadrupedo.gd"),
 	"gato": preload("res://scripts/anim/anim_cuadrupedo.gd"),
+	"rata": preload("res://scripts/anim/anim_cuadrupedo.gd"),
+	"sapo": preload("res://scripts/anim/anim_sapo.gd"),
+	"buho": preload("res://scripts/anim/anim_volador.gd"),
+	"shoggoth": preload("res://scripts/anim/anim_blob.gd"),
 }
 
 static func has_anim(model_name: String, anim: String) -> bool:

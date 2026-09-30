@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PetData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/pets/pet_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rata"
+display_name = "Rata de las Paredes"
+story = "Las ratas en las paredes"
+description = "Una rata enorme y maleducada. Escarba cada poco y encuentra dólares; a veces, un baúl arcano"
+price = 2000
+model = "rata"
+kind = 4
+attack_damage = 6.0
+attack_per_level = 1.0
+attack_every = 20.0
+bonus = 0.2
+bonus_per_level = 0.01
+bonus_max = 0.35

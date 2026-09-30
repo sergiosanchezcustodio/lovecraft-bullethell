@@ -38,7 +38,8 @@ var _wander := 0.0               ## rumbo del vagar sin rumbo (rad)
 ## Potenciadores comprados en la tienda (Shop.bonuses): multiplicadores de vida, cordura,
 ## daño y velocidad. Vacío: sin tienda.
 var shop := {}
-var mental_resist := 1.0         ## fracción del daño mental que recibe (gato de Ulthar)
+var mental_resist := 1.0         ## fracción del daño mental que recibe
+var pet_xp_mult := 1.0          ## experiencia extra por gema (búho de los sueños)
 var visual: Node3D          ## contenedor que gira hacia donde mira; dentro, el modelo voxel
 var model: Node3D
 var health := 0.0

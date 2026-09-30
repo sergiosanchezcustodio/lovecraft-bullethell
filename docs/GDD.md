@@ -376,7 +376,7 @@ Tomada de Extremadura Survivors (`github.com/sergiosanchezcustodio/extremadura-s
 - **Arranque:** ficha del proyecto (con qué está hecho, licencia y aviso del uso de IA), intro que presenta el juego y portada animada (sección 7.1), que muestra "Pulsa Start" y acepta cualquier botón principal (D-22). Después, la ventana de huecos de partida. Los relatos se saltan manteniendo pulsado.
 - **Menú principal:** quieto a propósito. El fondo se mueve poco, porque lo importante es qué opción está señalada.
 - **Selección de personaje:** tarjetas al estilo de Extremadura Survivors, con los modelos voxel. Los bloqueados se ven en penumbra con su precio. Los jugadores se unen aquí pulsando Start y eligen a la vez; un personaje elegido no puede repetirse (D-23). Debajo de cada tarjeta, su compañero.
-- **Compañeros** (D-20): se elige uno antes de empezar, acompaña toda la partida y sube de nivel contigo. Unos dan una estadística y otros actúan. Sacados de los relatos, por ejemplo los perros de trineo de la expedición de Lake o un gato de Ulthar. Por diseñar.
+- **Compañeros** (D-20): se elige uno antes de empezar, acompaña toda la partida y sube de nivel contigo. Unos dan una estadística y otros actúan. Sacados de los relatos: quince en total (D-36).
 - **Mapa de niveles:** las 3 partes × 5 niveles a la vista, con los bloqueados apagados; cada nivel se abre al ganar el anterior. Al elegir uno se cuenta su relato antes de jugarlo.
 - **Tienda:** la moneda sobrevive a la muerte (propuesta: fondos de la Fundación Pickman, que financia la expedición del relato; por decidir). Tres secciones:
   - Potenciadores permanentes de valores pequeños, cinco niveles cada uno.
@@ -465,6 +465,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-33 | Clima estético | Fase 2 | **Resuelta** |
 | D-34 | Vestuario | Fase 2 | **Resuelta** |
 | D-35 | Un rasgo por personaje | Fase 2 | **Resuelta** |
+| D-36 | Quince compañeros | Fase 2 | **Resuelta** |
 
 D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherencias y huecos detectados al redactar este documento (sección 13). Las decisiones bloqueantes de las fases 1 y 2 se resolvieron el 24-09-2026.
 
@@ -525,6 +526,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
 - **D-33 — Clima (27-09-2026).** *Resuelta:* inclemencias del tiempo **solo estéticas**, sin efecto en personajes ni enemigos: nieve o ceniza, lluvia, niebla, viento, nubes y rayos de fondo, según el nivel.
 - **D-34 — Vestuario (27-09-2026).** *Resuelta:* prendas solo estéticas en la tienda. Cabeza: casco de la Primera Guerra Mundial, gorro de nieve, cinta del pelo, bufanda, sombrero de aventurero, boina, sombrero de copa, sombrero vaquero, bombín, casco de minero, sombrero de mujer, turbante, sombrero de paja, gafas de ver y gafas de nieve. Cuerpo: chaqueta de aviador, abrigo de piel, abrigo de nieve, chubasquero, chaleco, vestido y bata. Pies: botas militares, botas de nieve, botas esquimales y zapatos de tacón.
 - **D-35 — Un rasgo por personaje (29-09-2026).** *Resuelta:* cada personaje tiene un único rasgo, acorde con su oficio. Dyer, explosiones un 25 % más grandes; Olmstead, esquive más largo; Peaslee, suerte; Whipple, reanima más rápido; Elwood, 15 % menos de daño físico; Johansen, 25 % más de daño cuerpo a cuerpo; Iwanicki, aura de cordura que también le afecta a él. Los demás no cambian. Se quitan la resistencia marina de Olmstead, la recogida de Peaslee, la curación de Whipple, la recarga de Elwood y la inmunidad al empuje de Johansen.
+- **D-36 — Quince compañeros (30-09-2026).** *Resuelta:* se añaden trece compañeros y el gato de Ulthar cambia (negro, araña a los enemigos cercanos y se enfada al recibir su jugador un golpe; pierde la protección mental). Rata de las Paredes (más baúles y dólares de los muertos), sapo de Innsmouth (escupe baba venenosa: charco), Mini-Byakhee (picado desde el aire), araña de Tíndalos (se teletransporta detrás de un enemigo y lo aturde), serpiente de Yig (veneno), pez de Innsmouth (embiste y empuja), Mini-Dhole (sale bajo un grupo), cuervo de Arkham (trae gemas y dólares lejanos), shoggoth bebé (se come balas enemigas), Mini-Mi-Go (rayos), búho de los sueños (más experiencia), cabra de los bosques (embestida que aturde), polilla de Leng (polvo que confunde) y gaviota de Innsmouth (trae pescado: cura vida y cordura, y chilla ante los élites). Todos en la tienda (hito 2.15).
 - **D-19 — Pasivos sin mecánica.** El pasivo de Dyer (frío y ralentización) y el de Johansen (inmunidad al empuje) dependen de efectos sobre el jugador que no están definidos, y el de Legrasse necesita saber si los híbridos de Innsmouth cuentan como "enemigos humanos".
 
 ---

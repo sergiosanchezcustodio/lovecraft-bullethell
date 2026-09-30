@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PetData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/pets/pet_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"buho"
+display_name = "Búho de los sueños"
+story = "La búsqueda en sueños de la ignota Kadath"
+description = "Parece sabio. Vuela a tu lado y te da un 12 % más de experiencia, hasta un 30 % con el nivel"
+price = 3500
+model = "buho"
+kind = 3
+bonus = 0.12
+bonus_per_level = 0.01
+bonus_max = 0.3
+fly_height = 1.5
+follow_gap = 1.0

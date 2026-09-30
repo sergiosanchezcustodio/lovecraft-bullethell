@@ -47,6 +47,8 @@ const LOOKS := {
 	"frasco": [[Vector3(0.11, 0.11, 0.14), Color(0.42, 0.75, 0.25), Vector3.ZERO],
 		[Vector3(0.05, 0.05, 0.06), Color(0.55, 0.40, 0.25), Vector3(0, 0, 0.1)]],
 	"bengala": [[Vector3(0.07, 0.07, 0.2), Color(0.85, 0.18, 0.12), Vector3.ZERO]],
+	"baba": [[Vector3(0.12, 0.1, 0.12), Color(0.45, 0.78, 0.22), Vector3.ZERO],
+		[Vector3(0.07, 0.07, 0.07), Color(0.62, 0.9, 0.35), Vector3(0.05, 0.05, -0.08)]],
 	"red": [[Vector3(0.26, 0.1, 0.26), Color(0.62, 0.55, 0.38), Vector3.ZERO],
 		[Vector3(0.06, 0.06, 0.06), Color(0.3, 0.3, 0.32), Vector3(0.12, 0, 0.12)],
 		[Vector3(0.06, 0.06, 0.06), Color(0.3, 0.3, 0.32), Vector3(-0.12, 0, -0.12)]],
@@ -68,7 +70,7 @@ func _ready() -> void:
 		mi.position = piece[2]
 		_stick.add_child(mi)
 	_spark = OmniLight3D.new()                       # chispa de la mecha
-	_spark.light_color = Color(1.0, 0.7, 0.3)
+	_spark.light_color = tint if look == "baba" else Color(1.0, 0.7, 0.3)
 	_spark.light_energy = 1.2
 	_spark.omni_range = 1.6
 	_spark.position = Vector3(0, 0.1, 0.12)

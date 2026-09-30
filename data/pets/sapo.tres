@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PetData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/pets/pet_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sapo"
+display_name = "Sapo de Innsmouth"
+story = "La sombra sobre Innsmouth"
+description = "Feísimo pero adorable. Escupe baba venenosa: deja un charco que daña y debilita a los enemigos"
+price = 3000
+model = "sapo"
+kind = 2
+attack_damage = 6.0
+attack_per_level = 1.2
+attack_every = 2.6
+attack_range = 6.5
+follow_gap = 1.3

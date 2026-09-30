@@ -168,6 +168,23 @@ func clear_enemy_bullets(center: Vector3, r: float) -> int:
 		n += 1
 	return n
 
+## Se traga hasta `max_n` balas enemigas dentro del círculo, las más cercanas primero
+## (shoggoth bebé). Devuelve cuántas.
+func devour_enemy_bullets(center: Vector3, r: float, max_n: int) -> int:
+	var c := Vector2(center.x, center.z)
+	var near: Array = []
+	for i in count:
+		if _team[i] != Team.ENEMY: continue
+		var d := Vector2(_pos[i].x, _pos[i].z).distance_squared_to(c)
+		if d <= r * r: near.append([d, i])
+	if near.is_empty(): return 0
+	near.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	var idx: Array[int] = []
+	for k in mini(max_n, near.size()): idx.append(int(near[k][1]))
+	idx.sort()
+	for k in range(idx.size() - 1, -1, -1): _remove(idx[k])     # de atrás adelante: _remove mueve la última
+	return idx.size()
+
 ## Balas enemigas dentro del círculo (el Resonador solo vibra si hay algo que deshacer).
 func count_enemy_bullets(center: Vector3, r: float) -> int:
 	var c := Vector2(center.x, center.z)
