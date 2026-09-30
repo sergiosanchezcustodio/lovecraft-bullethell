@@ -285,7 +285,9 @@ def hand_(M, part, hx, col, mitten=False):
 def head(M, skin, skin_sh, ears=True, nose=True, w=15.0, d=15.0, fem=False):
     """Cabeza redondeada (30-09-2026, referencia del autor): esquinas de radio 4, coronilla
     y mandíbula en cuarto de círculo, nariz que asoma 1 (fem: más pequeña) y orejas redondas."""
-    rslab(M, H, skin, 64, 81, 0, 0.5, w, d, r=4, rt=4, rb=3)
+    if fem: w, rb = min(w, 14.0), 4
+    else: rb = 3
+    rslab(M, H, skin, 64, 81, 0, 0.5, w, d, r=4, rt=4, rb=rb)
     if nose:                                          # asoma 1 (2 parecía de payaso)
         if fem: rslab(M, H, skin_sh, 69, 71, 0, 0.5 + d / 2, 2, 2, r=0, rt=0, rb=0)
         else: rslab(M, H, skin_sh, 69, 72, 0, 0.5 + d / 2, 3, 2, r=1, rt=1, rb=0)
@@ -371,6 +373,42 @@ def bob(M, hair, bottom=66, top=82, fringe=78, side_z=3, back=-8, width=16.5):
                 if z > 8: continue
                 if y < 72 and z > side_z - 2: continue           # por abajo se recoge hacia atrás
                 M.put(x, y, z, H, hair, 0, False)
+
+
+def long_hair(M, hair, bottom=54, top=78, sh=None, width=15.0, locks=True, part=H):
+    """Melena larga que cae por la espalda hasta `bottom` (y, si locks, dos mechones por
+    delante de los hombros que enmarcan la cara). Con `sh`, ondas: filas alternas de sombra.
+    Va en la pieza de la cabeza: se mueve con ella."""
+    hw = width / 2
+    for y in range(bottom, top):
+        t = (top - y) / max(top - bottom, 1)                   # 0 arriba, 1 en las puntas
+        w = hw + 0.5 * math.sin(t * math.pi)                   # algo más ancha a media altura
+        if y < bottom + 3: w -= (bottom + 3 - y)               # puntas redondeadas
+        z0, z1 = -10, -5 if y < 64 else -3
+        col = sh if (sh is not None and (y // 3) % 2) else hair
+        for x in range(int(math.floor(-w)), int(math.ceil(w))):
+            for z in range(z0, z1):
+                px = abs(x + 0.5)
+                if px > w: continue
+                ex, ez = w - px, min(z - z0, z1 - 1 - z)
+                if ex < 1.5 and ez < 1: continue
+                M.put(x, y, z, part, col, 0, False)
+    if locks:                                                  # mechones delante de los hombros
+        lo = max(bottom + 6, 58)
+        for s in (-1, 1):
+            for y in range(lo, 72):
+                col = sh if (sh is not None and (y // 3) % 2) else hair
+                for x in (int(s * hw) - (1 if s > 0 else 0), int(s * hw) - (1 if s > 0 else 0) - s):
+                    for z in range(-4, 3):
+                        if y < lo + 2 and z in (-4, 2): continue
+                        M.put(x, y, z, part, col, 0, False)
+
+
+def lips(M, col, y=67):
+    """Labios de mujer: el de arriba de 4 y el de abajo de 2, algo más claro."""
+    for x in (-2, -1, 0, 1): paint_face(M, x, y, col)
+    lo = tuple(min(1.0, c * 1.15) for c in col)
+    for x in (-1, 0): paint_face(M, x, y - 1, lo)
 
 
 def sideburns(M, hair, y0=70, y1=76):

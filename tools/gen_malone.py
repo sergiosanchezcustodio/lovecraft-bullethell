@@ -55,8 +55,12 @@ for x, y in ((5, 56), (6, 56), (5, 57), (6, 57), (4, 57)): cu.front(M, x, y, FLO
 cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
 cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
 cu.cheeks(M, CHEEK, y=70)
-cu.mouth(M, LIP, wide=True)
-cu.bob(M, HAIR, bottom=67, top=80, fringe=78, side_z=3)
+cu.lips(M, LIP)
+cu.bob(M, HAIR, bottom=66, top=80, fringe=78, side_z=3)
+cu.rslab(M, H, HAIR, 63, 71, 0, -8.5, 9, 5, r=2.5, rt=2.5, rb=2.5)       # moño bajo en la nuca
+slab(M, H, (0.55, 0.10, 0.14), 66, 68, 0, -8.5, 9.5, 9.5, 5.5, 5.5, ch=1)  # cinta granate
+for y in range(72, 79):                                                  # onda del flequillo, ladeada
+    for x in range(-6, -6 + (79 - y) // 2): cu.paint_face(M, x, y, HAIR, dz=1) if y >= 77 else None
 cu.hair_back(M, SKIN, HAIR, top=80, zmax=2)
 # fedora ladeada: ala de 2,5, cinta negra y copa con pellizco delantero
 slab(M, H, HAT_SH, 78, 79, 0.5, 0.5, 20, 20, 19.5, 19.5, ch=3)

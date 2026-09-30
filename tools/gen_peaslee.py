@@ -1,7 +1,7 @@
 """Amelia Peaslee, arqueóloga joven y aventurera, sobrina del profesor Peaslee ("La sombra
 fuera del tiempo"). Personaje jugable (D-26).
 
-Salacot claro, pelo cobrizo en coleta, camisa caqui con las mangas remangadas, correa de
+Fedora de fieltro pardo al estilo aventurero, pelo cobrizo con trenza larga y mechones, camisa caqui con las mangas remangadas, correa de
 cartera cruzada y cartera de cuero en la cadera (único relieve), pantalón de montar pardo y
 botas altas de cuero. Estilo 4, cuerpo de mujer (tools/cuerpo.py).
 Uso: python tools/gen_peaslee.py
@@ -11,8 +11,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 import cuerpo as cu
 from cuerpo import slab, T, H
 
-HELMET = (0.80, 0.74, 0.58); HELMET_SH = (0.68, 0.62, 0.48); BAND = (0.44, 0.30, 0.18)
-HAIR = (0.50, 0.23, 0.12); HAIR_TIE = (0.28, 0.16, 0.09)
+HAT = (0.45, 0.32, 0.21); HAT_SH = (0.37, 0.26, 0.17); BAND = (0.18, 0.12, 0.08)
+HAIR = (0.50, 0.23, 0.12); HAIR_SH = (0.42, 0.18, 0.09); HAIR_TIE = (0.28, 0.16, 0.09)
 SHIRT = (0.67, 0.59, 0.41); SHIRT_SH = (0.56, 0.49, 0.33)
 STRAP = (0.34, 0.21, 0.11); BAG = (0.44, 0.27, 0.13); BUCKLE = (0.80, 0.68, 0.40)
 TROUSER = (0.40, 0.34, 0.25)
@@ -58,27 +58,40 @@ for s, _, _, _, fa in cu.sides():
 cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
 cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
 cu.cheeks(M, CHEEK)
-cu.mouth(M, LIP)
-# pelo recogido: tapa las orejas y la nuca, con un mechón fino delante de cada oreja
+cu.lips(M, LIP)
+# pelo: tapa las orejas y la nuca, raya al lado y mechones largos que enmarcan la cara
 cu.hair_back(M, SKIN, HAIR, top=80, zmax=2)
 for (x, y, z), v in M.V.items():
-    if v[0] == H and v[1] == SKIN and 74 <= y < 78 and abs(x + 0.5) >= 6.5 and z <= 3:
+    if v[0] == H and v[1] == SKIN and 72 <= y < 80 and abs(x + 0.5) >= 6 and z <= 4:
         v[1] = HAIR
-# coleta (pieza propia: se balancea al andar), del cogote hacia abajo
-slab(M, 'hair', HAIR_TIE, 74, 76, 0, -7.5, 4, 4, 3, 3, ch=0)             # lazo
-slab(M, 'hair', HAIR, 76, 79, 0, -7, 5, 5, 3, 3, ch=1)                  # nacimiento, bajo el ala
-slab(M, 'hair', HAIR, 64, 74, 0, -8.5, 4.5, 3.5, 3.5, 3.5, ch=1, zoff0=-0.8, zoff1=0)
-slab(M, 'hair', HAIR, 60, 64, 0, -9.3, 3, 3.5, 3, 3, ch=1)                # punta
-# salacot: ala (asoma 2,5 por delante, más taparía los ojos), cinta y cúpula de caras planas
-slab(M, H, HELMET_SH, 78, 79, 0, 0.5, 19.5, 19.5, 19.5, 19.5, ch=3)
-slab(M, H, BAND, 79, 81, 0, 0.5, 16, 16, 16.5, 16.5, ch=2)
-slab(M, H, HELMET, 81, 86, 0, 0.5, 16, 16, 16.5, 16.5, ch=2)
-slab(M, H, HELMET, 86, 88, 0, 0.5, 13, 13, 13.5, 13.5, ch=2)
-slab(M, H, HELMET_SH, 88, 89, 0, 0.5, 4, 4, 4, 4, ch=1)                   # botón de la cúpula
+for s_ in (-1, 1):                                                       # mechones sueltos
+    slab(M, H, HAIR, 63, 77, 7.5 * s_ - 0.5, 1.5, 2, 2, 5, 4, ch=0)
+# trenza larga (pieza propia: se balancea al andar), del cogote a media espalda
+slab(M, 'hair', HAIR, 72, 79, 0, -7.5, 6, 5, 3, 3, ch=1)                # nacimiento, bajo el ala
+for i, y in enumerate(range(52, 72, 3)):                                # tramos cruzados de la trenza
+    off = 0.8 if i % 2 else -0.8
+    slab(M, 'hair', HAIR if i % 2 else HAIR_SH, y, y + 3, off, -8.5 - (71 - y) * 0.03, 4, 4.5, 3.5, 3.5, ch=1)
+slab(M, 'hair', HAIR_TIE, 52, 54, 0, -8.8, 4.5, 4.5, 4, 4, ch=0)         # lazo
+slab(M, 'hair', HAIR, 48, 52, 0, -8.8, 3.5, 2, 3, 2, ch=0)               # punta
+# fedora de fieltro: ala ancha algo caída delante y detrás (asoma 2,5), cinta oscura,
+# copa con pellizco delantero y hendidura a lo largo
+slab(M, H, HAT_SH, 78, 79, 0, 0.5, 21, 21, 20, 20, ch=3)
+for z in (-10, 10):                                                     # ala caída en las puntas
+    for x in range(-4, 4):
+        k = (x, 78, z if z > 0 else z + 0)
+        if (x, 78, z - (1 if z > 0 else -1)) in M.V: M.put(x, 77, z - (1 if z > 0 else -1), H, HAT_SH)
+slab(M, H, BAND, 79, 81, 0, 0.3, 15, 15, 15, 15, ch=2)
+slab(M, H, HAT, 81, 87, 0, 0.3, 15, 13, 15, 12.5, ch=2)
+for x in range(-2, 2):                                                   # pellizco delantero
+    for y in (85, 86):
+        z = M.front(x, y)
+        if z is not None and M.V[(x, y, z)][0] == H: M.V.pop((x, y, z), None)
+for z in range(-4, 5):                                                   # hendidura de la copa
+    for x in (-1, 0): M.V.pop((x, 86, z), None)
 
 cu.seams(M, (SHIRT,))
 cu.finish(M, 'peaslee', {SHIRT: 'lona', SHIRT_SH: 'lona', TROUSER: 'lana', BOOT: 'cuero', SOLE: 'cuero',
-                         STRAP: 'cuero', BAG: 'cuero', HELMET: 'lona', HELMET_SH: 'lona', HAIR: 'pelo',
+                         STRAP: 'cuero', BAG: 'cuero', HAT: 'lana', HAT_SH: 'lana', HAIR: 'pelo', HAIR_SH: 'pelo',
                          SKIN: 'piel', SKIN_SH: 'piel'},
           flat=(LIP, BROW, CHEEK, BUTTON, BUCKLE, HAIR_TIE, BAND), ax=AX,
-          extra_pivots={'hair': [0, 74, -8]}, extra_parents={'hair': 'head'})
+          extra_pivots={'hair': [0, 76, -8]}, extra_parents={'hair': 'head'})

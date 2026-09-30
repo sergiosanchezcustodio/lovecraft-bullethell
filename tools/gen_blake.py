@@ -46,8 +46,9 @@ cu.arms(M, COAT, SKIN, cuff=COAT_SH, ax=AX, slim=True)
 cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
 cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
 cu.cheeks(M, CHEEK, y=70)
-cu.mouth(M, LIP)
+cu.lips(M, LIP)
 cu.bob(M, HAIR, bottom=67, top=80, fringe=78, side_z=3)
+cu.long_hair(M, HAIR, bottom=56, sh=tuple(c * 0.85 for c in HAIR))   # melena ondulada hasta los hombros
 cu.hair_back(M, SKIN, HAIR, top=80, zmax=2)
 # cloché: casquete hasta las cejas, con cinta y lazo, y el ala muy corta
 slab(M, H, HAT_SH, 77, 78, 0, 0.8, 17, 17, 17.5, 17.5, ch=3)             # ala (asoma 1,5)

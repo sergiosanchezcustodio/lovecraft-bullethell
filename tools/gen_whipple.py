@@ -50,7 +50,7 @@ cu.arms(M, COAT, SKIN, cuff=COAT_SH, cuff_wide=False, ax=AX, slim=True)
 cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
 cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
 cu.cheeks(M, CHEEK, y=70)
-cu.mouth(M, LIP)
+cu.lips(M, LIP)
 # gafas: montura clara a los lados y en el puente (oscura parecía un antifaz)
 # gafas: montura clara y fina alrededor de cada ojo, pintada (oscura parecía un antifaz)
 for x0 in (-6, 1):
@@ -64,6 +64,9 @@ slab(M, H, HAIR, 81, 83, 0, 0.3, 13, 11, 13.5, 11.5, ch=2)
 for (x, y, z), v in M.V.items():
     if v[0] == H and v[1] == SKIN and 72 <= y < 80 and abs(x + 0.5) >= 6.5 and z <= 4:
         v[1] = HAIR
+for s_ in (-1, 1):                                                       # mechones sueltos junto a la cara
+    slab(M, H, HAIR, 64, 77, 7 * s_ - 0.5, 2, 2, 2, 4, 3, ch=0)
+cu.rslab(M, H, HAIR, 79, 89, 0, -6.5, 9, 8, r=3, rt=3, rb=2)  # moño alto, redondo
 slab(M, H, HAIR, 79, 87, 0, -6.5, 8, 7, 7, 6, ch=2)                      # moño alto en la coronilla
 slab(M, H, HAIR, 80, 86, 0, -9.5, 6, 5, 2, 2, ch=1)
 slab(M, H, (0.26, 0.15, 0.09), 82, 83, 0, -6.5, 8.5, 8.5, 7.5, 7.5, ch=2)  # cinta del moño

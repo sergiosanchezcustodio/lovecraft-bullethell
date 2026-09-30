@@ -48,8 +48,9 @@ for s, _, _, arm, _ in cu.sides():                                      # la est
 cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
 cu.eyes(M, BROW, brow_style='caida', lashes=cu.EYE)
 cu.cheeks(M, CHEEK, y=70)
-cu.mouth(M, LIP, wide=True)
+cu.lips(M, LIP)
 cu.bob(M, HAIR, bottom=67, top=83, fringe=78, side_z=3)
+cu.long_hair(M, HAIR, bottom=46, width=16)                               # melena lisa larga, a media espalda
 cu.hair_back(M, SKIN, HAIR, top=82, zmax=2)
 slab(M, H, HAIR, 78, 81, 0, 0.5, 14.5, 14.5, 15, 15, ch=2)                # pelo por encima de la frente
 # diadema con broche y pluma violeta al lado
