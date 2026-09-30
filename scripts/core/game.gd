@@ -63,6 +63,8 @@ var _info: Label                               ## depuración: FPS, enemigos, ba
 var _rng := RandomNumberGenerator.new()
 var _env: Environment
 var weather: Weather
+var _base_fog := Atmosphere.make_environment().fog_density
+var _base_ambient := Atmosphere.make_environment().ambient_light_energy
 
 ## Clima del nivel (D-33): `weather=<id>` lo cambia (capturas) y `weather=no` lo quita. La
 ## configuración decide si va completo, reducido o apagado; el menú de depuración, cuál.
@@ -77,8 +79,9 @@ func set_weather(wd: WeatherData) -> void:
 	if weather != null:
 		weather.queue_free()
 		weather = null
-	_env.fog_density = Atmosphere.make_environment().fog_density     # la de siempre
-	_env.ambient_light_energy = Atmosphere.make_environment().ambient_light_energy
+	# la de la arena (su luz propia) o, sin ella, la de siempre
+	_env.fog_density = _base_fog
+	_env.ambient_light_energy = _base_ambient
 	var quality := int(Settings.get_value("weather"))
 	if wd == null or quality == 0: return
 	weather = Weather.new().setup(wd, camera, _env, 1.0 if quality >= 2 else 0.5)
@@ -106,6 +109,9 @@ func _ready() -> void:
 	add_child(moon)
 	arena = ArenaBuilder.build("res://data/arenas/campamento.json", fogvol)
 	add_child(arena)
+	ArenaBuilder.apply_light(arena.get_meta("light", {}), moon, env)
+	_base_fog = env.fog_density
+	_base_ambient = env.ambient_light_energy
 	world = CombatWorld.new()
 	var size: Vector2 = arena.get_meta("size")
 	world.bounds = Rect2(-size * 0.5 - Vector2(6, 6), size + Vector2(12, 12))

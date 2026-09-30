@@ -18,7 +18,7 @@ const FACES := [
 static var _cache := {}
 ## Caché en disco de las mallas construidas (ver VoxelMeshCache). Sube BUILDER_VERSION
 ## cuando cambie la forma de construir las mallas, para invalidar lo guardado.
-const BUILDER_VERSION := 3
+const BUILDER_VERSION := 4
 const DISK_CACHE_DIR := "user://voxcache"
 static var use_disk_cache := true
 static var _mats := {}   # "rugosidad/especular" -> material compartido
@@ -132,7 +132,7 @@ static func _get_model(path: String) -> Dictionary:
 		var pv: Array = data.pivots[pname]
 		var pivot := Vector3(pv[0], pv[1], pv[2])
 		layers.append({"part": pname, "pivot": pivot, "glow": key.ends_with("#glow"),
-			"mesh": _build(parts[key], occ[pname], all, pivot, vs)})
+			"mesh": _build(parts[key], occ[pname], all, pivot, vs, bool(data.get("no_bottom", false)))})
 	# Material por modelo: las criaturas son de piel húmeda (valores por defecto);
 	# ropa, plumas y atrezo declaran en el JSON una superficie mate.
 	var rough := float(data.get("roughness", 0.38))
@@ -194,7 +194,9 @@ static func _ensure_glow_material() -> void:
 static func colors_are_srgb() -> bool:
 	return RenderingServer.get_current_rendering_method() != "gl_compatibility"
 
-static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vector3, vs: float) -> ArrayMesh:
+## no_bottom (JSON "no_bottom": true, atrezo fijo): sin las caras que miran hacia abajo, que la
+## cámara isométrica nunca ve; en piezas planas (témpanos, costa) son casi la mitad.
+static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vector3, vs: float, no_bottom := false) -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for item in voxels:
@@ -206,6 +208,7 @@ static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vecto
 			# distintas se conservan todas: al girar un brazo, una pierna o la cabeza queda
 			# al aire lo que tapaban (con el brazo pegado al tronco, el costado se veía hueco).
 			if own.has(p + n): continue
+			if no_bottom and n.y < 0: continue
 			var corners: Array = f[1]
 			var shades := []
 			for c in corners:

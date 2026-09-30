@@ -15,6 +15,7 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	var size := Vector2(data.size[0], data.size[1])
 	root.set_meta("size", size)
 	root.set_meta("spawn", Vector3(data.spawn[0], 0, data.spawn[1]))
+	root.set_meta("light", data.get("light", {}))
 	root.add_child(_ground(data, size))
 	root.add_child(_sea(data, size))
 	if data.has("barrier"): root.add_child(_barrier(data.barrier, size))
@@ -42,6 +43,23 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	root.set_meta("obstacles", obstacles)
 	root.add_child(_walls(size))
 	return root
+
+## Luz propia de la arena (JSON "light"): sol o luna y entorno. Claves opcionales: sun_rot
+## [x, y], sun_color, sun_energy, ambient_color, ambient_energy, background, fog_color,
+## fog_density y exposure (solo Forward+).
+static func apply_light(l: Dictionary, sun: DirectionalLight3D, env: Environment) -> void:
+	if l.is_empty(): return
+	var col := func(a: Array) -> Color: return Color(a[0], a[1], a[2])
+	if l.has("sun_rot"): sun.rotation_degrees = Vector3(l.sun_rot[0], l.sun_rot[1], 0)
+	if l.has("sun_color"): sun.light_color = col.call(l.sun_color)
+	if l.has("sun_energy"): sun.light_energy = l.sun_energy
+	if l.has("ambient_color"): env.ambient_light_color = col.call(l.ambient_color)
+	if l.has("ambient_energy"): env.ambient_light_energy = l.ambient_energy
+	if l.has("background"): env.background_color = col.call(l.background)
+	if l.has("fog_color"): env.fog_light_color = col.call(l.fog_color)
+	if l.has("fog_density"): env.fog_density = l.fog_density
+	if l.has("exposure") and RenderingServer.get_current_rendering_method() != "gl_compatibility":
+		env.tonemap_exposure = l.exposure
 
 ## Suelo de nieve en losas de 0,5 m: nieve blanca (se ve gris azulada con la luz de luna), placas de hielo,
 ## roca asomando y nieve pisada alrededor del campamento. Por detrás (norte y oeste)
@@ -92,11 +110,10 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	mi.name = "Ground"
 	mi.mesh = st.commit()
-	var mat := StandardMaterial3D.new()
-	mat.vertex_color_use_as_albedo = true
-	mat.vertex_color_is_srgb = VoxelBuilder.colors_are_srgb()
-	mat.roughness = 0.85
-	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	# El color y el relieve fino salen del shader (celdas de 12,5 cm); el color de vértice
+	# ya no se usa.
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://scripts/level/snow_ground.gdshader")
 	mi.material_override = mat
 	return mi
 

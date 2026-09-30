@@ -361,7 +361,8 @@ def bloques_hielo():
     snow_cap(M, thresh=(2 * H + 8) / S, depth=2)
     return M, {'body': [0, 0, 0]}
 
-PIECES = (('tienda', tienda), ('caja', caja), ('bidon', bidon), ('farol', farol), ('roca', roca), ('hielo', hielo),
+# tienda, caja y bidón: ahora en gen_atrezo_expedicion.py (48 voxels/m)
+PIECES = (('farol', farol), ('roca', roca), ('hielo', hielo),
           ('iglu', iglu), ('cabana', cabana), ('bloques_hielo', bloques_hielo))
 VOXEL_PIVOTS = {'tienda', 'iglu', 'cabana', 'bloques_hielo'}          # diseñadas en voxels, no en ub
 SHINY = {'hielo', 'bloques_hielo'}                                     # hielo brillante, lo demás mate
@@ -373,5 +374,5 @@ if __name__ == '__main__':
         M, pv = fn()
         mat = (0.45, 0.6) if name in SHINY else (0.9, 0.25)
         n = M.export('models/atrezo_%s.json' % name, pv, jitter=0.012, roughness=mat[0], specular=mat[1],
-                     pivots_in_voxels=name in VOXEL_PIVOTS)
+                     pivots_in_voxels=name in VOXEL_PIVOTS, no_bottom=True)
         print('atrezo_%s: %d voxels' % (name, n))

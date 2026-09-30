@@ -22,7 +22,10 @@ func test_un_farol_una_luz() -> void:
 
 func test_las_piezas_con_colision_la_tienen() -> void:
 	var sin_colision := 0
-	for holder: Node in arena.get_node("Props").get_children():
+	# lo que está en el borde o fuera (costa, témpanos, icebergs, barrera) es decorado
+	var half: Vector2 = arena.get_meta("size") * 0.5
+	for holder: Node3D in arena.get_node("Props").get_children():
+		if absf(holder.position.x) >= half.x - 0.01 or absf(holder.position.z) >= half.y - 0.01: continue
 		if holder.find_children("*", "StaticBody3D", false, false).is_empty(): sin_colision += 1
 	assert_eq(sin_colision, 0)
 

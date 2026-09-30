@@ -154,7 +154,7 @@ class Model:
 
     # ---------- salida ----------
     def export(self, path, pivots, jitter=0.018, default_col=(0.5, 0.5, 0.5), pivots_in_voxels=False,
-               roughness=None, specular=None, parents=None):
+               roughness=None, specular=None, parents=None, no_bottom=False):
         """roughness/specular: material del modelo. Sin indicarlos, piel húmeda (0,38 / 0,6);
         para ropa, plumas, madera o piedra conviene una superficie mate (~0,9 / 0,25)."""
         out = []
@@ -171,6 +171,7 @@ class Model:
         if parents: data["parents"] = parents          # parte -> parte de la que cuelga
         if roughness is not None: data["roughness"] = roughness
         if specular is not None: data["specular"] = specular
+        if no_bottom: data["no_bottom"] = True           # atrezo fijo: sin caras hacia abajo
         with open(path, "w") as f:
             json.dump(data, f)
         return len(out)

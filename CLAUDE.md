@@ -157,6 +157,13 @@ Léela al empezar cada sesión:
   - **Iconos de las armas con Replicate (29-09-2026):** `tools/generar_iconos_armas.py` (sin dependencias) genera cada icono con FLUX 1.1 Pro (~0,04 $), quita el fondo con `851-labs/background-remover` y lo deja en `resources/weapons/icons/<id>.png` a 256 × 256 (en bruto, en `raw/`). `WeaponData.get_icon()` lo usa si el arma no tiene `icon`; salen en la selección, en la ficha (página de armas) y en el HUD (icono con el nivel; sin icono, el nombre). Las 34 armas tienen icono, en estilo voxel 3D (render tipo MagicaVoxel). Aprobados en general (30-09-2026); más adelante se afinarán algunos (candidatos: bengalas, bisturís y lanzallamas) con `python tools/generar_iconos_armas.py <arma> --rehacer`.
     - El token está en `.env` (ignorado por git), copiado del de Extremadura Survivors. Cloudflare rechaza el User-Agent por defecto de urllib (403, "error code 1010"): el script manda uno propio. Con menos de 5 $ de crédito, la cuenta admite 6 predicciones por minuto: el script espera y reintenta.
     - No usar el icono del revólver como `image_prompt`: el modelo copiaba el revólver en todas las armas.
+  - **Escenario del nivel 1 rehecho (30-09-2026), aprobado:**
+    - Luz propia de la arena (JSON "light", `ArenaBuilder.apply_light`): crepúsculo polar, sol bajo y cálido. El clima parte de esa luz (`game._base_fog`, `_base_ambient`); antes la niebla antigua lo lavaba todo. Niebla general a 0: con la cámara isométrica lejos, tapaba la mitad del color.
+    - Suelo `snow_ground.gdshader`: celdas de 12,5 cm con relieve en escalones (ventisqueros y sastrugi), placas de hielo y nieve pisada. Mar `sea.gdshader`: celdas de 12,5 cm, olas en escalones, rizos, hielo menudo que deriva y espuma. El mar está a −1 m.
+    - Costa (`tools/gen_costa_hielo.py`): frente de la plataforma, témpanos de cinco tamaños, icebergs y montículos de hielo en tierra (sustituyen a las rocas).
+    - Atrezo a 48 voxels/m (`tools/gen_atrezo_expedicion.py`): tienda de lona, caja, barril, trineo, trípode y bandera. `gen_atrezo_campamento.py` ya no genera tienda, caja ni bidón.
+    - `"no_bottom": true` en el JSON del atrezo fijo: `VoxelBuilder` no construye las caras hacia abajo (`BUILDER_VERSION` 4). Mantiene el rendimiento (115 FPS con 150 enemigos).
+    - Pendiente: cabaña, iglú, faroles y barrera con el detalle anterior.
   - Después: hito 2.15, vestuario.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
