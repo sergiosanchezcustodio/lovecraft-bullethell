@@ -356,11 +356,10 @@ func _open_level_up() -> void:
 	get_tree().paused = true
 	var title := "Nivel %d" % (q.progress.level - q.progress.pending + 1)
 	if players.size() > 1: title = "J%d · %s · %s" % [q.index + 1, q.data.display_name, title]
-	if not q.progress.attr_gains.is_empty():                        # D-27: el atributo que ha subido
-		title += "   ·   +1 %s" % Attributes.LONG[q.progress.attr_gains[0]]
+	var attr := "" if q.progress.attr_gains.is_empty() else String(q.progress.attr_gains[0])  # D-27: lo enseña el rodillo
 	# la misma ventana que en cooperativo, centrada (antes, Menus.LevelUpMenu: fila de botones
 	# con el foco de Godot, que con el mando no bajaba y a ratos no respondía)
-	var menu := CoopLevelUp.new([{"player": q, "options": options, "title": title}] as Array[Dictionary],
+	var menu := CoopLevelUp.new([{"player": q, "options": options, "title": title, "attr": attr}] as Array[Dictionary],
 		func(pq: Player, o: PlayerProgress.Option) -> void: pq.progress.choose(o, pq), true)
 	menu.finished.connect(func() -> void:
 		_menu_open = false
@@ -377,9 +376,8 @@ func _open_coop_level_up() -> void:
 			q.progress.pending = 0
 			continue
 		var title := "J%d · Nivel %d" % [q.index + 1, q.progress.level - q.progress.pending + 1]
-		if not q.progress.attr_gains.is_empty():
-			title += " · +1 %s" % Attributes.LONG[q.progress.attr_gains[0]]
-		entries.append({"player": q, "options": options, "title": title})
+		var attr := "" if q.progress.attr_gains.is_empty() else String(q.progress.attr_gains[0])
+		entries.append({"player": q, "options": options, "title": title, "attr": attr})
 	if entries.is_empty(): return
 	if args.get_bool("autopick") or entries.all(func(e: Dictionary) -> bool: return _is_bot(e.player)):
 		for e in entries: (e.player as Player).progress.choose(e.options[_rng.randi() % e.options.size()], e.player)

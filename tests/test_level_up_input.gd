@@ -57,3 +57,21 @@ func test_mantener_repite_y_soltar_para() -> void:
 	for i in 40: menu._process(0.016)
 	assert_eq(pk.cursor, 2, "suelto: no se mueve")
 	p.free()
+
+## Tragaperras: no se puede elegir con los rodillos girando; confirmar los para.
+func test_reels_must_stop_before_choosing() -> void:
+	var o := PlayerProgress.Option.new()
+	o.kind = PlayerProgress.Option.Kind.NEW_WEAPON
+	o.weapon = load("res://data/weapons/webly.tres")
+	var opts: Array[PlayerProgress.Option] = [o, o, o]
+	var pk := CoopLevelUp.Picker.new(null, opts, "Nivel 2", true, "CUL", CoopLevelUp.filler())
+	add_child_autofree(pk)
+	assert_false(pk.settled(), "gira al abrirse")
+	pk.spin(0.6)
+	assert_false(pk.settled(), "las tarjetas siguen girando")
+	pk.spin(1.0)
+	assert_true(pk.settled(), "todo parado tras REEL_STOPS")
+	var pk2 := CoopLevelUp.Picker.new(null, opts, "Nivel 2", true, "CUL", CoopLevelUp.filler())
+	add_child_autofree(pk2)
+	pk2.settle()
+	assert_true(pk2.settled(), "confirmar lo para todo")
