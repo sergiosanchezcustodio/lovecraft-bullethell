@@ -433,7 +433,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-01 | Título del juego | Publicación (fase 8) | **Resuelta**: *Lovecraft Library: Surviving Cthulhu* |
 | D-02 | Objetivo y duración de cada nivel | Fase 1 | **Resuelta** |
 | D-03 | Tamaño y forma de los escenarios | Fases 1 y 2 | **Resuelta** |
-| D-04 | Escalones 4 y 5 y seres únicos | Fases 4 y 6 | Pendiente (la fase 1 usa un tope de élites configurable) |
+| D-04 | Escalones 4 y 5 y seres únicos | Fases 4 y 6 | **Resuelta** |
 | D-05 | Apuntado | Fase 1 | **Resuelta** |
 | D-06 | Evoluciones de armas | Fase 3 (modelo de datos de armas) | **Resuelta** |
 | D-07 | Experiencia en cooperativo | Fase 2 | **Resuelta** |
@@ -448,7 +448,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-16 | Pausas y menús personales | Fases 1 y 2 | **Resuelta** |
 | D-17 | Paranoia frente a "sin fuego amigo" | Fase 2 | **Resuelta** |
 | D-18 | Personajes disponibles en la fase 2 | Fase 2 | **Resuelta** |
-| D-19 | Pasivos que dependen de mecánicas sin definir | Fase 4 | Pendiente |
+| D-19 | Pasivos que dependen de mecánicas sin definir | Fase 4 | **Resuelta** |
 | D-20 | Compañeros (equivalente a las mascotas de Extremadura Survivors) | Fase 5 | **Resuelta**: sí, sacados de los relatos |
 | D-21 | Portada | Fase 5 | **Resuelta**: escena animada en Godot |
 | D-22 | Flujo de menús y guardado adelantados a la fase 2 | Fase 2 | **Resuelta** |
@@ -475,7 +475,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
   *Resuelta:* supervivencia por oleadas de 8–10 minutos. Solo el último nivel de cada parte (el 5) termina con jefe; los niveles 1 a 4 terminan con un evento final sin jefe. El tipo de objetivo es un dato del nivel. En la fase 1, versión de 5 minutos con el Acechador como élite en el evento final.
 - **D-03 — Tamaño y forma de los escenarios.** El botón de mapa implica escenarios mayores que la pantalla. ¿Arena abierta o recorrido?
   *Resuelta:* arena finita de unas 3×3 pantallas, cerrada por el decorado, con fuentes de luz y obstáculos. Tamaño por datos.
-- **D-04 — Escalones 4 y 5.** Incluyen seres únicos (Barnabas Marsh, Madre Hydra, Pth'thya-l'yi) que no pueden aparecer en número. *Recomendación de la especificación:* élites con tope de 1–2 simultáneos; los seres únicos, como minijefes con una única aparición en su nivel.
+- **D-04 — Escalones 4 y 5.** Incluyen seres únicos (Barnabas Marsh, Madre Hydra, Pth'thya-l'yi) que no pueden aparecer en número. *Recomendación de la especificación:* élites con tope de 1–2 simultáneos; los seres únicos, como minijefes con una única aparición en su nivel. *Resuelta (03-10-2026):* se adopta la recomendación. `LevelData.elite_cap` (1-2) limita las élites de escalón 4 y 5; los seres únicos son minijefes con `EnemyData.unique`: aparecen una sola vez en su nivel, con aviso, y no entran en las oleadas.
 - **D-05 — Apuntado.** Automático al más cercano, en dirección de movimiento o elegible.
   *Resuelta:* lo decide cada arma en sus datos, con "al más cercano" por defecto. Sin opción de jugador de momento.
 - **D-06 — Evoluciones de armas.** ¿Combinaciones de arma y pasiva al estilo "survivors"?
@@ -530,7 +530,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
 - **D-36 — Quince compañeros (30-09-2026).** *Resuelta:* se añaden trece compañeros y el gato de Ulthar cambia (negro, araña a los enemigos cercanos y se enfada al recibir su jugador un golpe; pierde la protección mental). Rata de las Paredes (más baúles y dólares de los muertos), sapo de Innsmouth (escupe baba venenosa: charco), Mini-Byakhee (picado desde el aire), araña de Tíndalos (se teletransporta detrás de un enemigo y lo aturde), serpiente de Yig (veneno), pez de Innsmouth (embiste y empuja), Mini-Dhole (sale bajo un grupo), cuervo de Arkham (trae gemas y dólares lejanos), shoggoth bebé (se come balas enemigas), Mini-Mi-Go (rayos), búho de los sueños (más experiencia), cabra de los bosques (embestida que aturde), polilla de Leng (polvo que confunde) y gaviota de Innsmouth (trae pescado: cura vida y cordura, y chilla ante los élites). Todos en la tienda (hito 2.15).
 - **D-06 — Evoluciones de armas (03-10-2026).** *Resuelta:* al estilo de Vampire Survivors, un arma al nivel máximo más un objeto concreto en el inventario evoluciona al abrir el siguiente baúl arcano. Las evoluciones no salen al subir de nivel ni siguen las reglas de daño (D-37): rinden alrededor de 1,4 veces su nivel 5. Primera tanda, las armas de los personajes de inicio: Stielhandgranate + Reflejos de alpinista → Carga concentrada; Webly + Brújula de Lake → Revólver del vigía; rifle de palanca + Diario de campo → Rifle de la expedición Miskatonic; bisturís + Abrigo de piel de reno → Instrumental de cirujano. Las demás, en fases posteriores.
 - **D-37 — Reglas de daño de las armas (03-10-2026).** *Resuelta:* cada arma parte de un mismo daño por segundo a un solo objetivo (nivel 1, si todo acierta; 14, la mediana del arsenal) multiplicado por sus rasgos: corto alcance ×1,3 y largo ×0,85; un objetivo ×1,15 y área ×0,8; un proyectil ×1,15 y varios ×0,85; cadencia baja ×1,2 y alta ×0,85; cuesta cordura ×1,2 (vida o esquive ×1,3); teledirigida ×0,8 y al azar ×1,15; control (aturde, inmoviliza, atrae, congela, frena, debilita, hace vulnerable o levanta aliados) ×0,6. Las de puro apoyo (bengalas, red, resonador, polvo) quedan fuera. `DamageRules` lo calcula, `tools/reglas_dano.gd` lo aplica y un test admite ±15 %.
-- **D-19 — Pasivos sin mecánica.** El pasivo de Dyer (frío y ralentización) y el de Johansen (inmunidad al empuje) dependen de efectos sobre el jugador que no están definidos, y el de Legrasse necesita saber si los híbridos de Innsmouth cuentan como "enemigos humanos".
+- **D-19 — Pasivos sin mecánica.** El pasivo de Dyer (frío y ralentización) y el de Johansen (inmunidad al empuje) dependen de efectos sobre el jugador que no están definidos, y el de Legrasse necesita saber si los híbridos de Innsmouth cuentan como "enemigos humanos". *Resuelta (03-10-2026):* D-35 quitó los de Dyer y Johansen. Para Legrasse llevan la etiqueta `humana` los cultistas, los habitantes de Innsmouth, los acólitos de la Orden de Dagon y los híbridos que aún andan entre los hombres (hasta los híbridos avanzados); los Profundos completos y las criaturas, no.
 
 ---
 
