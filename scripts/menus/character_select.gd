@@ -55,7 +55,13 @@ func _ready() -> void:
 	var unlocked: Array = []
 	for c in chars:
 		if Saves.current != null and Saves.current.has_character(String(c.id)): unlocked.append(String(c.id))
-	state = SelectState.new().setup(chars, unlocked, pets)
+	var owned: Array = []                               # vestuario comprado (D-34)
+	var worn := {}
+	if Saves.current != null:
+		for o in OutfitData.all():
+			if Saves.current.has_outfit(String(o.id)): owned.append(o)
+		for c in chars: worn[String(c.id)] = Saves.current.worn_by(String(c.id))
+	state = SelectState.new().setup(chars, unlocked, pets, owned, worn)
 	_build()
 	state.changed.connect(_refresh)
 	Devices.joy_disconnected.connect(func(d: int) -> void:
@@ -71,6 +77,9 @@ func _ready() -> void:
 			for ci in state.characters.size():
 				if String(state.characters[ci].id) == ids[k]: (state.seats[state.joined()[k]] as SelectState.Seat).character = ci
 		_refresh()
+	if args.has("vest") and state.confirm(0):            # capturas: J1 en el vestuario, N sombreros más allá
+		for k in args.get_int("vest"): state.move(0, 1)
+		state.vert(0, 1); state.move(0, 1); state.vert(0, 1); state.move(0, 1)
 	if args.has("cursor"):                              # capturas: marca ese icono de la ficha en J1
 		for k in args.get_int("cursor") + 1: _frames[0].move_cursor(1)
 	if args.has("turn"):                                # capturas: todos girados ese ángulo (grados)
@@ -147,8 +156,8 @@ func _input(event: InputEvent) -> void:
 		elif act == "back" and state.joined().is_empty(): _back_to_menu()
 		return
 	match act:
-		"up": _frames[seat].move_cursor(-1)
-		"down": _frames[seat].move_cursor(1)
+		"up": if not state.vert(seat, -1): _frames[seat].move_cursor(-1)
+		"down": if not state.vert(seat, 1): _frames[seat].move_cursor(1)
 		"left": state.move(seat, -1)
 		"right": state.move(seat, 1)
 		"confirm", "join":
@@ -238,6 +247,9 @@ func _start(level_id: String) -> void:
 		var pet: PetData = state.pets[s.pet]
 		seat.pet = pet.id if pet else &""
 		GameSession.seats.append(seat)
+		if Saves.current != null and not state.outfits.is_empty():   # el vestuario queda puesto
+			Saves.current.worn[String(seat.character)] = s.worn.duplicate()
+	if Saves.current != null: Saves.save()
 	_leaving = true
 	get_tree().change_scene_to_file("res://scenes/game.tscn")
 
@@ -279,6 +291,10 @@ class _Frame extends Control:
 	var _weapon: TipIcon
 	var _tips: Array[TipIcon] = []            ## iconos de la ficha, en el orden de arriba/abajo
 	var _cursor := -1                         ## icono marcado con el mando (-1: ninguno)
+	var _outfit: PanelContainer                ## vestuario (D-34)
+	var _outfit_rows: Array[Label] = []
+	var _sheet_title: Label
+	var _sheet_cols: Control
 	var _passive: Label
 	var _attr_vals: Dictionary = {}           ## atributo -> {icon, val}
 	var _stat_vals: Dictionary = {}           ## estadística -> {icon, val}
@@ -348,8 +364,9 @@ class _Frame extends Control:
 		_role = _slot(UiKit.label("", 16, UiKit.TEXT_DIM), 340, 24)
 		_passive = _slot(UiKit.label("", 16, UiKit.TEXT), 364, 50)       # hasta dos líneas
 		_passive.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_slot(MenuKit.title("Características y habilidades", 22, UiKit.GOLD), 418, 30)
+		_sheet_title = _slot(MenuKit.title("Características y habilidades", 22, UiKit.GOLD), 418, 30)
 		var cols := HBoxContainer.new()
+		_sheet_cols = cols
 		cols.alignment = BoxContainer.ALIGNMENT_CENTER
 		cols.add_theme_constant_override("separation", 8)
 		cols.position = Vector2(0, 452)
@@ -357,6 +374,31 @@ class _Frame extends Control:
 		_info.add_child(cols)
 		cols.add_child(_column(Attributes.NAMES, _attr_vals, 44, 30))
 		cols.add_child(_column(STAT_ROWS, _stat_vals, 132, 62))
+		# vestuario (D-34): tapa las características mientras se elige
+		_outfit = PanelContainer.new()
+		_outfit.position = Vector2(14, 418)
+		_outfit.custom_minimum_size = Vector2(FRAME.x - 28, FRAME.y - 430)
+		_outfit.size = _outfit.custom_minimum_size
+		_outfit.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.97), Color(color, 0.6), 10))
+		add_child(_outfit)
+		var ob := VBoxContainer.new()
+		ob.alignment = BoxContainer.ALIGNMENT_CENTER
+		ob.add_theme_constant_override("separation", 6)
+		_outfit.add_child(ob)
+		ob.add_child(MenuKit.title("Vestuario", 26, UiKit.GOLD))
+		for k in 3:
+			var row := VBoxContainer.new()
+			var tag := UiKit.label(OutfitData.SLOT_NAMES[k], 16, UiKit.TEXT_DIM)
+			tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			row.add_child(tag)
+			var val := MenuKit.title("", 22, UiKit.TEXT)
+			row.add_child(val)
+			ob.add_child(row)
+			_outfit_rows.append(val)
+		var oh := UiKit.label("Arriba/abajo: prenda · Izquierda/derecha: cambiar", 14, UiKit.TEXT_DIM)
+		oh.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		ob.add_child(oh)
+		_outfit.visible = false
 		# puesto vacío
 		_empty = VBoxContainer.new()
 		_empty.size = Vector2(FRAME.x, 0)
@@ -501,7 +543,7 @@ class _Frame extends Control:
 			return
 		var c: CharacterData = st.characters[seat.character]
 		_head.visible = false
-		_view.set_model(c.model)
+		_view.set_model(c.model, st.worn_of(index))
 		var locked := st.is_locked(seat.character)
 		var holder := -1                            # quién lo ha confirmado ya (D-23)
 		for j in st.seats.size():
@@ -565,12 +607,16 @@ class _Frame extends Control:
 				elif locked: _status.text = "Se compra en la tienda (%s)" % MenuKit.money(c.price)
 				else: _status.text = "A: elegir"
 				_status.add_theme_color_override("font_color", MenuKit.DANGER if unavailable else UiKit.TEXT_DIM)
+			SelectState.Stage.OUTFIT:
+				_status.text = "Vestuario · A: confirmar"
+				_status.add_theme_color_override("font_color", color)
 			SelectState.Stage.PET:
 				_status.text = "A: confirmar"
 				_status.add_theme_color_override("font_color", color)
 			SelectState.Stage.READY:
 				_status.text = "¡Listo!"
 				_status.add_theme_color_override("font_color", color)
+		_paint_outfit(seat, color)
 		var pet: PetData = st.pets[seat.pet]
 		var picking := seat.stage == SelectState.Stage.PET
 		_pet_name.text = pet.display_name if pet else "Sin compañero"
@@ -582,6 +628,19 @@ class _Frame extends Control:
 		_pet_name.add_theme_color_override("font_color", color if active else UiKit.TEXT_DIM)
 		_pet_view.modulate = Color.WHITE if active else Color(0.55, 0.55, 0.6)
 		_pet.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9), Color(color, 0.85 if picking else 0.25), 10))
+
+	func _paint_outfit(seat: SelectState.Seat, color: Color) -> void:
+		_outfit.visible = seat.stage == SelectState.Stage.OUTFIT
+		_sheet_title.visible = not _outfit.visible
+		_sheet_cols.visible = not _outfit.visible
+		if not _outfit.visible: return
+		for k in 3:
+			var id := String(seat.worn.get(SelectState.OUTFIT_KEYS[k], ""))
+			var o := OutfitData.find(id) if id != "" else null
+			var on := k == seat.outfit_row
+			var l: Label = _outfit_rows[k]
+			l.text = ("◀  %s  ▶" if on else "%s") % (o.display_name if o else "Lo suyo")
+			l.add_theme_color_override("font_color", color if on else UiKit.TEXT_DIM)
 
 	func _process(delta: float) -> void:
 		# LB/RB giran lo que se está eligiendo: el compañero en su paso; si no, el personaje
@@ -649,16 +708,20 @@ class _Preview extends SubViewportContainer:
 		_holder = Node3D.new()
 		_vp.add_child(_holder)
 
-	## Pone otro modelo ("" para ninguno).
-	func set_model(model_name: String) -> void:
-		if model_name == _model_name: return
-		_user_turned = false                  # otro modelo: vuelve a mirar al frente
-		_yaw = 0.0
+	## Pone otro modelo ("" para ninguno), vestido con `worn` (vestuario, D-34).
+	func set_model(model_name: String, worn: Dictionary = {}) -> void:
+		var key := model_name + str(worn)
+		if key == _model_name: return
+		var same := _model_name.begins_with(model_name + "{") and model_name != ""
+		if not same:
+			_user_turned = false              # otro personaje: vuelve a mirar al frente
+			_yaw = 0.0
 		if _model: _model.queue_free()
 		_model = null
-		_model_name = model_name
+		_model_name = key
 		if model_name == "": return
 		_model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
+		OutfitData.apply(_model, model_name, worn)
 		_holder.add_child(_model)
 
 	## Lo deja girado un ángulo (como si el jugador lo hubiera girado con LB/RB).
@@ -675,4 +738,5 @@ class _Preview extends SubViewportContainer:
 			_yaw += spin * SPIN_SPEED * delta
 		if _user_turned: _holder.rotation.y = _yaw
 		else: _holder.rotation.y = 0.35 + sin(_t * 0.6 + _phase) * 0.45   # se balancea, mirando al frente
-		Anims.pose(_model_name, "idle", _model, fposmod(_t / Anims.duration(_model_name, "idle"), 1.0))
+		var mn := _model_name.get_slice("{", 0)
+		Anims.pose(mn, "idle", _model, fposmod(_t / Anims.duration(mn, "idle"), 1.0))

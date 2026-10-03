@@ -4,27 +4,37 @@ extends RefCounted
 ## prueban). Cuatro puestos; cada dispositivo ocupa uno. En su puesto, cada jugador:
 ##   1. elige personaje (izquierda/derecha); no puede confirmar uno que ya ha confirmado
 ##      otro (D-23) ni uno bloqueado (se compra en la tienda);
-##   2. elige compañero entre los desbloqueados (o ninguno);
-##   3. queda listo.
+##   2. elige su vestuario (D-34): arriba/abajo cabeza, cuerpo o pies, izquierda/derecha la
+##      prenda (o lo suyo); se salta si no se ha comprado ninguna prenda;
+##   3. elige compañero entre los desbloqueados (o ninguno);
+##   4. queda listo.
 ## Atrás deshace el último paso y, desde el primero, deja el puesto libre.
 
 signal changed
 
-enum Stage { CHARACTER, PET, READY }
+enum Stage { CHARACTER, OUTFIT, PET, READY }
+const OUTFIT_KEYS := ["head", "body", "feet"]
 
 class Seat:
 	var device := -1
 	var character := 0                   ## índice en `characters`
 	var pet := 0                         ## índice en `pets` (0 = ninguno)
 	var stage := Stage.CHARACTER
+	var worn := {}                       ## vestuario elegido: "head"/"body"/"feet" -> id de prenda
+	var outfit_row := 0                  ## fila del vestuario con el cursor (0 cabeza, 1 cuerpo, 2 pies)
 
 var characters: Array[CharacterData] = []
 var unlocked_characters: Array = []      ## ids desbloqueados (además de los de precio 0)
 var pets: Array = [null]                 ## PetData desbloqueados; el 0 es "ninguno"
 var seats: Array = [null, null, null, null]
+var outfits: Array = []                  ## OutfitData comprados
+var saved_worn := {}                     ## id de personaje -> lo que llevaba la última vez
 
-func setup(p_characters: Array[CharacterData], p_unlocked: Array, p_pets: Array[PetData]) -> SelectState:
+func setup(p_characters: Array[CharacterData], p_unlocked: Array, p_pets: Array[PetData],
+		p_outfits: Array = [], p_worn: Dictionary = {}) -> SelectState:
 	characters = p_characters
+	outfits = p_outfits
+	saved_worn = p_worn
 	unlocked_characters = p_unlocked
 	pets = [null]
 	for p in p_pets: pets.append(p)
@@ -96,10 +106,39 @@ func move(seat: int, dir: int) -> void:
 			if c.is_empty(): return
 			var at := c.find(s.character)
 			s.character = c[posmod((at if at >= 0 else 0) + dir, c.size())]
+		Stage.OUTFIT:
+			var key: String = OUTFIT_KEYS[s.outfit_row]
+			var opts := outfit_options(s.outfit_row)
+			var at := opts.find(String(s.worn.get(key, "")))
+			var next: String = opts[posmod(at + dir, opts.size())]
+			if next == "": s.worn.erase(key)
+			else: s.worn[key] = next
 		Stage.PET:
 			s.pet = posmod(s.pet + dir, pets.size())
 		_: return
 	changed.emit()
+
+## Prendas de una fila del vestuario: "" (lo suyo) y las compradas de ese hueco.
+func outfit_options(row: int) -> Array[String]:
+	var out: Array[String] = [""]
+	for o: OutfitData in outfits:
+		if int(o.slot) == row: out.append(String(o.id))
+	return out
+
+## Arriba/abajo en el vestuario. Devuelve false si el puesto no está en ese paso.
+func vert(seat: int, dir: int) -> bool:
+	var s: Seat = seats[seat]
+	if s == null or s.stage != Stage.OUTFIT: return false
+	s.outfit_row = posmod(s.outfit_row + dir, OUTFIT_KEYS.size())
+	changed.emit()
+	return true
+
+## Lo que se ve puesto: lo elegido o, mientras elige personaje, lo que llevaba la última vez.
+func worn_of(seat: int) -> Dictionary:
+	var s: Seat = seats[seat]
+	if s == null: return {}
+	if s.stage == Stage.CHARACTER: return saved_worn.get(String(characters[s.character].id), {})
+	return s.worn
 
 ## Confirmar: pasa al paso siguiente. Devuelve false si no se puede (bloqueado o cogido).
 func confirm(seat: int) -> bool:
@@ -108,12 +147,16 @@ func confirm(seat: int) -> bool:
 	match s.stage:
 		Stage.CHARACTER:
 			if is_locked(s.character) or taken_by_other(s.character, seat): return false
-			s.stage = Stage.PET
+			s.stage = Stage.PET if outfits.is_empty() else Stage.OUTFIT
+			s.worn = (saved_worn.get(String(characters[s.character].id), {}) as Dictionary).duplicate()
+			s.outfit_row = 0
 			# quien estuviera mirando este personaje pasa al siguiente libre
 			for i in seats.size():
 				if i != seat and seats[i] != null and (seats[i] as Seat).stage == Stage.CHARACTER \
 						and (seats[i] as Seat).character == s.character:
 					move(i, 1)
+		Stage.OUTFIT:
+			s.stage = Stage.PET
 		Stage.PET:
 			s.stage = Stage.READY
 		_: return false
@@ -126,7 +169,8 @@ func back(seat: int) -> bool:
 	if s == null: return false
 	match s.stage:
 		Stage.READY: s.stage = Stage.PET
-		Stage.PET: s.stage = Stage.CHARACTER
+		Stage.PET: s.stage = Stage.CHARACTER if outfits.is_empty() else Stage.OUTFIT
+		Stage.OUTFIT: s.stage = Stage.CHARACTER
 		Stage.CHARACTER:
 			leave(seat)
 			return false

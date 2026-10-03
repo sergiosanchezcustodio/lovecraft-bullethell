@@ -61,3 +61,27 @@ func test_todos_listos_solo_si_todos_los_presentes_lo_estan() -> void:
 	assert_true(st.all_ready())
 	st.unready_all()
 	assert_false(st.all_ready())
+
+## Vestuario (D-34): paso entre personaje y compañero si hay prendas; se salta si no.
+func test_vestuario_solo_si_hay_prendas() -> void:
+	st.join(-1)
+	assert_true(st.confirm(0))
+	assert_eq(st.seats[0].stage, SelectState.Stage.PET, "sin prendas, directo al compañero")
+	var hat := OutfitData.new(); hat.id = &"bombin"; hat.slot = OutfitData.Slot.HEAD
+	var boots := OutfitData.new(); boots.id = &"botas_nieve"; boots.slot = OutfitData.Slot.FEET
+	var chars: Array[CharacterData] = [_char("dyer")]
+	var s2 := SelectState.new().setup(chars, [], [] as Array[PetData], [hat, boots], {"dyer": {"feet": "botas_nieve"}})
+	s2.join(-1)
+	assert_eq(s2.worn_of(0), {"feet": "botas_nieve"}, "mientras elige personaje, lo de la última vez")
+	s2.confirm(0)
+	assert_eq(s2.seats[0].stage, SelectState.Stage.OUTFIT)
+	s2.move(0, 1)
+	assert_eq(s2.seats[0].worn.get("head"), "bombin")
+	s2.vert(0, 1); s2.move(0, 1)                         # cuerpo: no hay prendas, sigue lo suyo
+	assert_false(s2.seats[0].worn.has("body"))
+	s2.vert(0, 1); s2.move(0, 1)                         # pies: de botas a lo suyo
+	assert_false(s2.seats[0].worn.has("feet"))
+	assert_true(s2.confirm(0))
+	assert_eq(s2.seats[0].stage, SelectState.Stage.PET)
+	s2.back(0)
+	assert_eq(s2.seats[0].stage, SelectState.Stage.OUTFIT, "atrás vuelve al vestuario")

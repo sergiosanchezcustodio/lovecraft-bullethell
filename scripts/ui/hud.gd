@@ -78,6 +78,7 @@ func portrait_texture(p: Player) -> Texture2D:
 	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
 	add_child(vp)
 	var m := VoxelBuilder.load_model("res://models/%s.json" % p.data.model)
+	OutfitData.apply(m, p.data.model, OutfitData.worn_for(String(p.data.id)))
 	vp.add_child(m)
 	var head: Vector3 = Anims.rest(m, "head") + Vector3(0, 0.2, 0)
 	var cam := Camera3D.new()

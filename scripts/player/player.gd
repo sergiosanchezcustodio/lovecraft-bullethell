@@ -116,6 +116,7 @@ func _ready() -> void:
 	visual.top_level = true
 	add_child(visual)
 	model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
+	OutfitData.apply(model, data.model, OutfitData.worn_for(String(data.id)))   # vestuario (D-34)
 	visual.add_child(model)
 	# Silueta del color del jugador cuando lo tapa el decorado
 	_xray = ShaderMaterial.new()

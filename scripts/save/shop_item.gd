@@ -4,7 +4,7 @@ extends Resource
 ## potenciadores permanentes (varios niveles) y las mejoras de huecos (un solo nivel).
 ## Los personajes y los compañeros llevan su precio en sus propios datos (Shop los reúne).
 
-enum Section { POWERUP, CHARACTER, PET, UPGRADE }
+enum Section { POWERUP, CHARACTER, PET, UPGRADE, OUTFIT }
 
 @export var id := &"vitalidad"
 @export var display_name := "Vitalidad"

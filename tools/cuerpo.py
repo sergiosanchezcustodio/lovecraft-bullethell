@@ -19,7 +19,7 @@ con el volumen del tronco, piernas y brazos más finos y los brazos más cerca d
 (ARM_X_F). Piezas: shoes_f/boots, legs_f, torso_f, arms(..., ax=ARM_X_F, slim=True),
 bob() para la media melena y finish(..., ax=ARM_X_F).
 """
-import sys, os, math
+import sys, os, math, json
 sys.path.insert(0, os.path.dirname(__file__))
 from voxlib import Model
 import materiales
@@ -32,7 +32,14 @@ EYE = (0.08, 0.06, 0.05); EYE_W = (0.93, 0.91, 0.87)
 
 
 def new(seed):
-    return Model(S=3, seed=seed)                  # voxel_size = 1/48 m
+    M = Model(S=3, seed=seed)                     # voxel_size = 1/48 m
+    # medidas del cuerpo, para que las prendas del vestuario (gen_vestuario.py) le encajen
+    M.body = {'b': 0, 'fem': False, 'ax': ARM_X, 'slim': False, 'head_w': 15.0, 'head_d': 15.0}
+    return M
+
+
+def _note(M, **kw):
+    if hasattr(M, 'body'): M.body.update(kw)
 
 
 def slab(M, part, col, y0, y1, cx, cz, w0, w1, d0, d1, ch=2, over=True, zoff0=0.0, zoff1=0.0, r=None):
@@ -158,6 +165,7 @@ def legs_f(M, col, bottom=3, thigh=None):
 
 def torso(M, col, b=0, hip=None, bottom=38):
     """Cadera (desde `bottom`), cintura, pecho que se abre y hombros que caen."""
+    _note(M, b=b, fem=False)
     slab(M, T, hip or col, bottom, 45, 0, 0, 24 + b, 23 + b, 13, 13, ch=1)
     slab(M, T, col, 45, 50, 0, 0, 22 + b, 21 + b, 12.5, 12.5, ch=1)
     slab(M, T, col, 50, 58, 0, 0.3, 21 + b, 25 + b, 12.5, 14, ch=1)
@@ -167,6 +175,7 @@ def torso(M, col, b=0, hip=None, bottom=38):
 def torso_f(M, col, b=0, hip=None, bottom=38, bust=None):
     """Tronco de mujer: cadera, cintura estrecha, pecho (solo volumen: algo más de fondo y
     adelantado) y hombros estrechos que caen. bust: color de la pechera si es distinto."""
+    _note(M, b=b, fem=True)
     slab(M, T, hip or col, bottom, 45, 0, 0, 22 + b, 19 + b, 13, 12, ch=1)
     slab(M, T, col, 45, 50, 0, 0, 18.5 + b, 18 + b, 11.5, 11.5, ch=1)
     slab(M, T, bust or col, 50, 57, 0, 0.8, 18.5 + b, 20.5 + b, 12.5, 14, ch=1, zoff0=0.2, zoff1=0.6)
@@ -225,6 +234,7 @@ def arms(M, sleeve, hand, b=0, fore=None, cuff=None, cuff_wide=True, mitten=Fals
     camisa). mitten: manoplas (dedos juntos) en lugar de mano o guante. ax: separación de
     los brazos (ARM_X_F para mujer); slim: brazos más finos."""
     k = 0.85 if slim else 1.0
+    _note(M, ax=ax, slim=slim, arm_b=b)
     for s, _, _, arm, fa in sides():
         cx = (ax + b / 2) * s
         slab(M, arm, sleeve, 46, 61, cx, 0, 7 * k, 8.5 * k, 7.5 * k, 8.5 * k, ch=1)
@@ -287,6 +297,7 @@ def head(M, skin, skin_sh, ears=True, nose=True, w=15.0, d=15.0, fem=False):
     y mandíbula en cuarto de círculo, nariz que asoma 1 (fem: más pequeña) y orejas redondas."""
     if fem: w, rb = min(w, 14.0), 4
     else: rb = 3
+    _note(M, head_w=w, head_d=d)
     rslab(M, H, skin, 64, 81, 0, 0.5, w, d, r=4, rt=4, rb=rb)
     if nose:                                          # asoma 1 (2 parecía de payaso)
         if fem: rslab(M, H, skin_sh, 69, 71, 0, 0.5 + d / 2, 2, 2, r=0, rt=0, rb=0)
@@ -431,9 +442,28 @@ def seams(M, cols, parts_arms=True):
         if v[0] == T and y == 58: M.seams.add((x, y, z))
 
 
-def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, top=85.0, ax=ARM_X):
+def pivots(b=0, ax=ARM_X):
+    """Pivotes y jerarquía comunes de los humanos (también los de las prendas del vestuario,
+    que tienen que coincidir para colgar de las mismas partes)."""
+    ax = ax + b / 2
+    piv = {'torso': [0, HIP, 0], 'head': [0, NECK, 0], 'hat': [0, NECK, 0],
+           'arm_l': [-ax, SHOULDER, 0], 'arm_r': [ax, SHOULDER, 0],
+           'fore_l': [-ax * 1.02, ELBOW, 0.5], 'fore_r': [ax * 1.02, ELBOW, 0.5],
+           'leg_l': [-5, HIP, 0], 'leg_r': [5, HIP, 0], 'shin_l': [-5, KNEE, 0], 'shin_r': [5, KNEE, 0]}
+    if ax < ARM_X:                                    # mujer: piernas algo más juntas
+        for k in ('leg_l', 'shin_l'): piv[k][0] = -4.5
+        for k in ('leg_r', 'shin_r'): piv[k][0] = 4.5
+    parents = {'shin_l': 'leg_l', 'shin_r': 'leg_r', 'fore_l': 'arm_l', 'fore_r': 'arm_r', 'hat': 'head'}
+    return piv, parents
+
+
+def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, top=85.0, ax=ARM_X, hat=()):
     """Texturas por material, luz (arriba algo más claro, la espalda algo más oscura) y
-    exportación con los pivotes comunes."""
+    exportación con los pivotes comunes. hat: colores del sombrero (o diadema): esos voxels
+    de la cabeza pasan a la parte `hat`, que se oculta al ponerse una prenda de cabeza."""
+    hat = set(hat)
+    for v in M.V.values():
+        if v[0] == H and v[1] in hat: v[0] = 'hat'
     materiales.texturize(M, mats)
     flat = set(flat) | {EYE, EYE_W}
     for k, v in M.V.items():
@@ -442,18 +472,14 @@ def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, t
         shade = 0.9 + 0.12 * y / top
         shade *= 0.95 if z < -4 else 1.0
         v[1] = tuple(max(0.0, min(1.0, c * shade)) for c in v[1])
-    ax = ax + b / 2
-    piv = {'torso': [0, HIP, 0], 'head': [0, NECK, 0],
-           'arm_l': [-ax, SHOULDER, 0], 'arm_r': [ax, SHOULDER, 0],
-           'fore_l': [-ax * 1.02, ELBOW, 0.5], 'fore_r': [ax * 1.02, ELBOW, 0.5],
-           'leg_l': [-5, HIP, 0], 'leg_r': [5, HIP, 0], 'shin_l': [-5, KNEE, 0], 'shin_r': [5, KNEE, 0]}
-    if ax < ARM_X:                                    # mujer: piernas algo más juntas
-        for k in ('leg_l', 'shin_l'): piv[k][0] = -4.5
-        for k in ('leg_r', 'shin_r'): piv[k][0] = 4.5
-    parents = {'shin_l': 'leg_l', 'shin_r': 'leg_r', 'fore_l': 'arm_l', 'fore_r': 'arm_r'}
+    piv, parents = pivots(b, ax)
     if extra_pivots: piv.update(extra_pivots)
     if extra_parents: parents.update(extra_parents)
     n = M.export('models/%s.json' % name, piv, jitter=0.0, pivots_in_voxels=True, roughness=0.9, specular=0.25,
                  parents=parents)
+    body = dict(getattr(M, 'body', {}), finish_b=b, finish_ax=ax)
+    with open('models/%s.json' % name) as f: data = json.load(f)
+    data['body'] = body                               # medidas para el vestuario
+    with open('models/%s.json' % name, 'w') as f: json.dump(data, f)
     print(name, n, 'voxels')
     return n

@@ -65,4 +65,5 @@ cu.seams(M, (TUNIC,))
 cu.finish(M, 'elwood', {TUNIC: 'lana', TUNIC_SH: 'lana', WEBBING: 'lona', POUCH: 'lona', TROUSER: 'lana',
                         PUTTEE: 'lana', PUTTEE_SH: 'lana', BOOT: 'cuero', SOLE: 'cuero', HAIR: 'pelo',
                         MOUSTACHE: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
-          flat=(LIP, BRASS, CHEEK), b=B)
+          flat=(LIP, BRASS, CHEEK), b=B,
+          hat=(HELMET_SH, HELMET,))

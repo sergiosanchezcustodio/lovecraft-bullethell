@@ -31,11 +31,11 @@ func _ready() -> void:
 	box.add_child(_money)
 	var tabs := HBoxContainer.new()
 	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
-	tabs.add_theme_constant_override("separation", 12)
+	tabs.add_theme_constant_override("separation", 8)
 	box.add_child(tabs)
 	for i in Shop.SECTIONS.size():
-		var b := MenuKit.button(Shop.SECTIONS[i], UiKit.GOLD, 24)
-		b.custom_minimum_size = Vector2(210, 50)
+		var b := MenuKit.button(Shop.SECTIONS[i], UiKit.GOLD, 20)
+		b.custom_minimum_size = Vector2(160, 46)          # caben las cinco pestañas
 		b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(_show_tab.bind(i))
 		tabs.add_child(b)

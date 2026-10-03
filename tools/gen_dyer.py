@@ -75,4 +75,5 @@ cu.finish(M, 'dyer', {PARKA: 'lona', PARKA_SH: 'lona', FUR: 'borreguillo', TROUS
                       SCARF: 'punto', SCARF_SH: 'punto', HAIR: 'pelo', BEARD: 'pelo', BEARD_SH: 'pelo',
                       SKIN: 'piel', SKIN_SH: 'piel', BELT: 'cuero'},
           flat=(LIP, BROW, TOGGLE, CHEEK),
-          extra_pivots={'scarf': [3, 61, -7.5]}, extra_parents={'scarf': 'torso'})
+          extra_pivots={'scarf': [3, 61, -7.5]}, extra_parents={'scarf': 'torso'},
+          hat=(CAP, FUR,))

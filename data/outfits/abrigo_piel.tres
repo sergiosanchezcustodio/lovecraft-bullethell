@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="OutfitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/outfit_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"abrigo_piel"
+display_name = "Abrigo de piel"
+description = "Abrigo largo de piel hasta las rodillas."
+slot = 1
+price = 4000
+order = 1

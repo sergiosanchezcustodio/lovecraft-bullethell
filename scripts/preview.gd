@@ -33,7 +33,7 @@ func _ready() -> void:
 	if spec == "lineup": names = LINEUP.duplicate()
 	else:
 		for n in spec.split(","): names.append(n)
-	nframes = la.get_int("frames", roundi(Anims.duration(names[0], anim) * 24.0))
+	nframes = la.get_int("frames", roundi(Anims.duration(names[0].split("+")[0], anim) * 24.0))
 	if la.has("tag"): tag = "_" + la.get_str("tag")
 	var env := Atmosphere.make_environment()
 	var we := WorldEnvironment.new(); we.environment = env; add_child(we)
@@ -44,7 +44,11 @@ func _ready() -> void:
 	var right := cam.transform.basis.x
 	var widths: Array[float] = []
 	for n in names:
-		var m := VoxelBuilder.load_model("res://models/%s.json" % n)
+		# "dyer+bombin+botas_nieve": el personaje con prendas del vestuario puestas
+		var bits := n.split("+")
+		var m := VoxelBuilder.load_model("res://models/%s.json" % bits[0])
+		for g in bits.slice(1):
+			VoxelBuilder.dress(m, "res://models/vest_%s_%s.json" % [g, bits[0]], OutfitData.is_head(g))
 		var holder := Node3D.new()
 		holder.rotation_degrees.y = yaw
 		holder.add_child(m)
@@ -146,11 +150,11 @@ func _floor(center: Vector3, size: float) -> void:
 
 func _process(_delta: float) -> void:
 	frame += 1
-	var fname := spec.replace(",", "-")
+	var fname := spec.replace(",", "-").replace("+", "_")
 	if mode == "anim":
 		var t := (frame - 5) / float(nframes)
 		for i in models.size():
-			Anims.pose(names[i], anim, models[i], fposmod(t, 1.0))
+			Anims.pose(names[i].split("+")[0], anim, models[i], fposmod(t, 1.0))
 		if frame >= 5 and frame < 5 + nframes:
 			await RenderingServer.frame_post_draw
 			get_viewport().get_texture().get_image().save_png("res://shots/%s_%s_%03d%s.png" % [fname, anim, frame - 5, tag])

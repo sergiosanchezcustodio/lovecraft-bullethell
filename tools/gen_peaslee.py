@@ -94,4 +94,5 @@ cu.finish(M, 'peaslee', {SHIRT: 'lona', SHIRT_SH: 'lona', TROUSER: 'lana', BOOT:
                          STRAP: 'cuero', BAG: 'cuero', HAT: 'lana', HAT_SH: 'lana', HAIR: 'pelo', HAIR_SH: 'pelo',
                          SKIN: 'piel', SKIN_SH: 'piel'},
           flat=(LIP, BROW, CHEEK, BUTTON, BUCKLE, HAIR_TIE, BAND), ax=AX,
-          extra_pivots={'hair': [0, 76, -8]}, extra_parents={'hair': 'head'})
+          extra_pivots={'hair': [0, 76, -8]}, extra_parents={'hair': 'head'},
+          hat=(HAT_SH, BAND, HAT,))

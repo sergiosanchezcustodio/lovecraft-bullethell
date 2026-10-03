@@ -64,4 +64,5 @@ for i, y in enumerate(range(80, 94)):                                    # pluma
 cu.seams(M, (DRESS,))
 cu.finish(M, 'varga', {DRESS: 'lana', DRESS_SH: 'lana', STOLE: 'lana', HAIR: 'pelo',
                        SHOE: 'cuero', SOLE: 'cuero', SKIN: 'piel', SKIN_SH: 'piel'},
-          flat=(LIP, BROW, CHEEK, PEARL, FRINGE, GEM, FEATHER, FEATHER_SH, BAND, STOCKING), ax=AX)
+          flat=(LIP, BROW, CHEEK, PEARL, FRINGE, GEM, FEATHER, FEATHER_SH, BAND, STOCKING), ax=AX,
+          hat=(BAND, GEM, FEATHER, FEATHER_SH,))

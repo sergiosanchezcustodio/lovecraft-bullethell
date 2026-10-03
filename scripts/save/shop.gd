@@ -5,7 +5,7 @@ extends RefCounted
 ## in_shop y price), compañeros (data/pets) y mejoras (5.º hueco de arma y de objeto).
 ## Lo comprado va en SaveData: `purchases` (id -> nivel), `characters` y `pets`.
 
-const SECTIONS: Array[String] = ["Potenciadores", "Personajes", "Compañeros", "Mejoras"]
+const SECTIONS: Array[String] = ["Potenciadores", "Personajes", "Compañeros", "Mejoras", "Vestuario"]
 
 ## Una entrada del catálogo, sea del tipo que sea.
 class Entry:
@@ -17,6 +17,7 @@ class Entry:
 	var item: ShopItem
 	var character: CharacterData
 	var pet: PetData
+	var outfit: OutfitData
 	var icon: Texture2D                        ## imagen dibujada, si la hay
 	var icon_model := ""                       ## si no, el modelo que se renderiza
 	var icon_mode := "full"                    ## "head" (retrato) o "full"
@@ -52,6 +53,14 @@ static func catalog() -> Array[Entry]:
 		out.append(e)
 	for it: ShopItem in items:
 		if it.section == ShopItem.Section.UPGRADE: out.append(_from_item(it))
+	for o in OutfitData.all():                       # vestuario (D-34): para todos los personajes
+		var e := Entry.new()
+		e.id = String(o.id); e.name = o.display_name; e.section = ShopItem.Section.OUTFIT
+		e.description = "%s · %s." % [OutfitData.SLOT_NAMES[o.slot], o.description.trim_suffix(".")]
+		e.prices = [o.price] as Array[int]
+		e.outfit = o
+		e.icon_model = "vest_%s_dyer" % o.id
+		out.append(e)
 	return out
 
 static func _from_item(it: ShopItem) -> Entry:
@@ -73,6 +82,7 @@ static func level_of(save: SaveData, e: Entry) -> int:
 	match e.section:
 		ShopItem.Section.CHARACTER: return 1 if save.characters.has(e.id) else 0
 		ShopItem.Section.PET: return 1 if save.pets.has(e.id) else 0
+		ShopItem.Section.OUTFIT: return 1 if save.has_outfit(e.id) else 0
 	return int(save.purchases.get(e.id, 0))
 
 static func is_maxed(save: SaveData, e: Entry) -> bool:
@@ -94,6 +104,7 @@ static func buy(save: SaveData, e: Entry) -> bool:
 	match e.section:
 		ShopItem.Section.CHARACTER: save.characters.append(e.id)
 		ShopItem.Section.PET: save.pets.append(e.id)
+		ShopItem.Section.OUTFIT: save.outfits.append(e.id)
 		_: save.purchases[e.id] = level_of(save, e) + 1
 	return true
 

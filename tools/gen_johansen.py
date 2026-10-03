@@ -58,4 +58,5 @@ cu.seams(M, (COAT,))
 cu.finish(M, 'johansen', {COAT: 'lana', COAT_SH: 'lana', SWEATER: 'punto', TROUSER: 'lana', BOOT: 'cuero',
                           SOLE: 'cuero', CAP: 'punto', CAP_SH: 'punto', BLOND: 'pelo', BLOND_SH: 'pelo',
                           SKIN: 'piel', SKIN_SH: 'piel'},
-          flat=(LIP, BRASS, CHEEK), b=B)
+          flat=(LIP, BRASS, CHEEK), b=B,
+          hat=(CAP, CAP_SH,))

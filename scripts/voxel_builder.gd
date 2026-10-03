@@ -90,6 +90,27 @@ static func load_model(path: String) -> Node3D:
 	root.set_meta("meshes", meshes)
 	return root
 
+## Viste un modelo con una prenda del vestuario (models/vest_*.json, con los mismos pivotes):
+## las mallas de cada parte de la prenda pasan a la parte igual del modelo, así que se animan
+## con ella. Una prenda de cabeza oculta el sombrero del personaje (parte "hat").
+static func dress(root: Node3D, garment_path: String, hides_hat := false) -> bool:
+	if not ResourceLoader.exists(garment_path) and not FileAccess.file_exists(garment_path): return false
+	var g := load_model(garment_path)
+	var nodes: Dictionary = root.get_meta("part_nodes")
+	var meshes: Array[MeshInstance3D] = root.get_meta("meshes")
+	for pname in (g.get_meta("part_nodes") as Dictionary):
+		var src: Node3D = g.get_meta("part_nodes")[pname]
+		var dst: Node3D = nodes.get(pname)
+		if dst == null: continue
+		for c in src.get_children():
+			if c is MeshInstance3D:
+				src.remove_child(c)
+				dst.add_child(c)
+				meshes.append(c as MeshInstance3D)
+	g.free()
+	if hides_hat and nodes.has("hat"): (nodes["hat"] as Node3D).visible = false
+	return true
+
 static func is_cached(path: String) -> bool:
 	return _cache.has(path)
 

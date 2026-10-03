@@ -73,4 +73,5 @@ for x in range(-1, 3):
 cu.seams(M, (SUIT, STRIPE))
 cu.finish(M, 'malone', {SUIT: 'lana', SUIT_SH: 'lana', STRIPE: 'lana', HAT: 'lana', HAT_SH: 'lana',
                         HAIR: 'pelo', SKIN: 'piel', SKIN_SH: 'piel', SHOE: 'cuero', SHOE_TIP: 'cuero'},
-          flat=(LIP, BROW, CHEEK, BUTTON, FLOWER, TIE, BAND, SHIRT), ax=AX)
+          flat=(LIP, BROW, CHEEK, BUTTON, FLOWER, TIE, BAND, SHIRT), ax=AX,
+          hat=(HAT_SH, BAND, HAT,))

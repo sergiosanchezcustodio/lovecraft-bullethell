@@ -17,6 +17,10 @@ var levels_won := []                     ## niveles superados (ids, p. ej. "p1_n
 var stats := {"runs": 0, "kills": 0, "deaths": 0, "revives": 0}
 var achievements := {}                   ## logros cumplidos: id -> fecha (D-32)
 ## Biblioteca: lo visto o tenido alguna vez (enemies, weapons, items, places) -> lista de ids.
+## Vestuario (D-34): prendas compradas (ids) y lo que lleva puesto cada personaje
+## (id de personaje -> {"head": id, "body": id, "feet": id}; sin clave, lo suyo).
+var outfits := []
+var worn := {}
 var seen := {"enemies": [], "weapons": [], "items": [], "places": []}
 ## Partida de pruebas: todo lo que existe y lo que se añada (personajes, compañeros, niveles,
 ## artículos de la tienda) está disponible, sin tener que comprarlo ni ganarlo.
@@ -43,6 +47,17 @@ func has_character(id: String) -> bool:
 func has_pet(id: String) -> bool:
 	return unlock_all or pets.has(id)
 
+func has_outfit(id: String) -> bool:
+	return unlock_all or outfits.has(id)
+
+## Lo que lleva puesto un personaje, solo con prendas que tiene.
+func worn_by(character_id: String) -> Dictionary:
+	var out := {}
+	var w: Dictionary = worn.get(character_id, {})
+	for k in w:
+		if has_outfit(String(w[k])): out[k] = String(w[k])
+	return out
+
 func has_seen(kind: String, id: String) -> bool:
 	return (seen.get(kind, []) as Array).has(id)
 
@@ -67,7 +82,7 @@ func to_dict() -> Dictionary:
 	return {"version": VERSION, "created": created, "updated": updated, "play_time": play_time,
 		"money": money, "purchases": purchases, "pets": pets, "characters": characters,
 		"levels_won": levels_won, "stats": stats, "unlock_all": unlock_all, "achievements": achievements,
-		"seen": seen}
+		"seen": seen, "outfits": outfits, "worn": worn}
 
 ## Lee un diccionario de cualquier versión conocida; los campos que falten toman su valor
 ## por defecto.
@@ -88,6 +103,8 @@ static func from_dict(d: Dictionary) -> SaveData:
 	for k in st:
 		if not s.stats.has(k): s.stats[k] = st[k]
 	s.achievements = (d.get("achievements", {}) as Dictionary).duplicate()
+	s.outfits = (d.get("outfits", []) as Array).duplicate()
+	s.worn = (d.get("worn", {}) as Dictionary).duplicate(true)
 	var sn: Dictionary = d.get("seen", {})
 	for k in sn: s.seen[k] = (sn[k] as Array).duplicate()
 	# JSON guarda los enteros como float: los niveles comprados se vuelven a enteros

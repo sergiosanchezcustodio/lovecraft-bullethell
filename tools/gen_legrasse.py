@@ -67,4 +67,5 @@ cu.seams(M, (COAT,))
 cu.finish(M, 'legrasse', {COAT: 'lona', COAT_SH: 'lona', SUIT: 'lana', SUIT_SH: 'lana', SHOE: 'cuero',
                           SOLE: 'cuero', HAT: 'lana', HAT_SH: 'lana', BAND: 'punto', HAIR: 'pelo',
                           MOUSTACHE: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
-          flat=(LIP, BADGE, BUTTON, TIE), b=B)
+          flat=(LIP, BADGE, BUTTON, TIE), b=B,
+          hat=(HAT_SH, BAND, HAT,))
