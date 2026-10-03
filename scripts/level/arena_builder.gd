@@ -123,6 +123,10 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	var mat := ShaderMaterial.new()
 	mat.shader = preload("res://scripts/level/snow_ground.gdshader")
 	if g.has("camp_radius"): mat.set_shader_parameter("camp_radius", float(g.camp_radius))   # nieve pisada
+	# colores del suelo (snow_hi, snow_lo, ice, ice_vein, trampled...): roca en el nivel 3
+	for k in (g.get("colors", {}) as Dictionary):
+		var c: Array = g.colors[k]
+		mat.set_shader_parameter(k, Color(c[0], c[1], c[2]))
 	mi.material_override = mat
 	return mi
 

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/globulos_tekeli.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"shoggoth_mimetico"
+display_name = "Shoggoth mimético"
+model = "antiguo"
+tier = 3
+spawn_weight = 0.5
+elite = false
+max_health = 80.0
+hit_radius = 0.7
+body_radius = 0.7
+move_speed = 1.9
+xp = 3.0
+money = 5
+contact_physical = 11.0
+contact_mental = 6.0
+movement = &"mimic"
+params = {"reveal_pattern": ExtResource("2"), "reveal_range": 5.0, "speed_mult": 1.7, "true_model": "shoggoth_grande", "true_scale": 1.6}
+attack = ExtResource("2")
+attack_cooldown = 6.0
+attack_range = 6.0

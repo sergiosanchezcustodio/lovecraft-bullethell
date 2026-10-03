@@ -12,6 +12,8 @@ var world: CombatWorld
 var obstacles: ObstacleMap
 var behavior: EnemyBehavior
 var model: Node3D
+var model_name := ""                        ## modelo que lleva ahora (el mimético cambia de forma)
+var model_scale := 1.0
 var visual: Node3D
 var runner: PatternRunner
 var hit_radius := 0.5
@@ -73,6 +75,16 @@ func setup(p_data: EnemyData, p_world: CombatWorld, p_obstacles: ObstacleMap) ->
 	name = String(data.id)
 	return self
 
+## Cambia de forma (shoggoth mimético): otro modelo y otra escala, con un destello.
+func swap_model(new_model: String, new_scale: float = 1.0) -> void:
+	if model != null: model.queue_free()
+	model_name = new_model
+	model_scale = new_scale
+	model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
+	visual.add_child(model)
+	_spawn_t = 0.0                                 # vuelve a crecer desde pequeño
+	anim_t = 0.0
+
 func _ready() -> void:
 	visual = Node3D.new()
 	# Se anima en _process (sin interpolación) y va suelto: en cada fotograma se coloca en la
@@ -80,7 +92,9 @@ func _ready() -> void:
 	visual.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	visual.top_level = true
 	add_child(visual)
-	model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
+	model_name = data.model
+	model_scale = data.model_scale
+	model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
 	visual.add_child(model)
 	runner = PatternRunner.new().setup(world)
 	runner.position.y = 0.6
@@ -219,7 +233,7 @@ func _die() -> void:
 	if _inject_t > 0.0 and _ally_time > 0.0:            # se levanta como aliado
 		world.fx.add_child(Reanimated.new().setup(world, data, global_position, facing, _ally_time, _inject_bonus))
 	var fx := DeathBurst.new()
-	fx.setup(data.model, data.body_radius)
+	fx.setup(model_name, data.body_radius)
 	fx.position = global_position
 	world.fx.add_child(fx)
 	died.emit(self)
@@ -341,11 +355,11 @@ func _process(delta: float) -> void:
 	var t0 := Prof.start()
 	visual.global_position = get_global_transform_interpolated().origin
 	visual.rotation.y = atan2(facing.x, facing.z)
-	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * data.model_scale   # aparece creciendo
+	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale   # aparece creciendo
 	if _aura_mat: _aura_mat.set_shader_parameter("color", Color(0.45, 0.2, 0.7, 0.14 + 0.07 * sin(_spawn_t * 2.5)))
 	if not anim_hold and _stasis_t <= 0.0:          # congelado: la animación se detiene
-		anim_t = fposmod(anim_t + delta / Anims.duration(data.model, anim), 1.0)
-	Anims.pose(data.model, anim, model, anim_t)
+		anim_t = fposmod(anim_t + delta / Anims.duration(model_name, anim), 1.0)
+	Anims.pose(model_name, anim, model, anim_t)
 	_flash -= delta
 	# tinte: destello al recibir daño; si no, turquesa en estasis o violeta maldito.
 	# Solo se toca el material al cambiar.

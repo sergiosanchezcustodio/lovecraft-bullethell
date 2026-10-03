@@ -6,7 +6,7 @@ var _burst_t := -1.0
 func update(e: Enemy, target: Player, delta: float) -> Vector3:
 	if _burst_t >= 0.0:
 		_burst_t += delta
-		if _burst_t < Anims.duration(e.data.model, "burst"):
+		if _burst_t < Anims.duration(e.model_name, "burst"):
 			return Vector3.ZERO                        # quieta mientras escupe
 		_burst_t = -1.0
 		e.anim = "walk"

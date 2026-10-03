@@ -10,7 +10,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 from voxlib import Model, lerp, scale
 
 S = int(sys.argv[1]) if len(sys.argv) > 1 else 2
-M = Model(S=S, seed=1936)
+NAME = sys.argv[2] if len(sys.argv) > 2 else 'fragmento'      # shoggoth_grande: S=5, otra semilla
+M = Model(S=S, seed=int(sys.argv[3]) if len(sys.argv) > 3 else 1936)
 
 BLACK = (0.02, 0.03, 0.03); DEEP_G = (0.04, 0.12, 0.09); DEEP_P = (0.10, 0.05, 0.13)
 SHEEN = (0.14, 0.30, 0.26); SHEEN_P = (0.26, 0.16, 0.32)
@@ -96,5 +97,5 @@ for x in range(int(-2.6 * S), int(2.6 * S)):
 
 pivots = {'body': [0, 0, 0], 'top': [0.4, 6.0, 0.2],
           'pod_l': [-3.0, 2.2, 4.0], 'pod_r': [3.0, 2.2, 4.0]}
-n = M.export('models/fragmento.json', pivots, jitter=0.01)
+n = M.export('models/%s.json' % NAME, pivots, jitter=0.01)
 print(n, 'voxels')
