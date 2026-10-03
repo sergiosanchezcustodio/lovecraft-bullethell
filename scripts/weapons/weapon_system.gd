@@ -44,6 +44,23 @@ func remove_weapon(id: StringName) -> void:
 				d.erase(w)
 	_pending = _pending.filter(func(p: Dictionary) -> bool: return (p.w as Weapon).data.id != id)
 
+## Primera arma lista para evolucionar (D-06): al nivel máximo y con su objeto entre las
+## pasivas del jugador (id -> nivel).
+func evolvable(passives: Dictionary) -> Weapon:
+	for w in weapons:
+		var d := w.data
+		if d.evolution == &"" or d.evolved or w.level < d.max_level: continue
+		if int(passives.get(d.evolves_with, 0)) > 0: return w
+	return null
+
+## Convierte el arma en su evolución, que empieza a disparar enseguida.
+func evolve(w: Weapon) -> void:
+	var path := "res://data/weapons/%s.tres" % w.data.evolution
+	if not ResourceLoader.exists(path): return
+	w.data = load(path)
+	w.level = 1
+	w.timer = 0.2
+
 func get_weapon(id: StringName) -> Weapon:
 	for w in weapons:
 		if w.data.id == id: return w

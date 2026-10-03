@@ -7,8 +7,8 @@ func _init() -> void:
 	var apply := "aplicar" in OS.get_cmdline_user_args()
 	print("%-16s %7s %7s %6s  %s" % ["arma", "actual", "toca", "desvío", "rasgos"])
 	for w in DamageRules.all_weapons():
-		if w.support:
-			print("%-16s (apoyo: fuera de las reglas)" % w.id); continue
+		if w.support or w.evolved:
+			print("%-16s (%s: fuera de las reglas)" % [w.id, "evolución" if w.evolved else "apoyo"]); continue
 		var now := DamageRules.dps(w)
 		var want := DamageRules.target_dps(w)
 		var tr := []

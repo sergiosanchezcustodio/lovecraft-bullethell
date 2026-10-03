@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/weapons/icons/bisturis.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"instrumental"
+display_name = "Instrumental de cirujano"
+description = "Abanico ancho de ocho hojas que atraviesan a tres enemigos."
+icon = ExtResource("2")
+evolved = true
+delivery = 0
+category = 0
+targeting = 0
+cooldown = 0.7
+range = 11.0
+damage = 5.0
+count = 8.0
+spread_deg = 40.0
+pierce = 3.0
+projectile_speed = 26.0
+projectile_radius = 0.14
+projectile_size = 0.13
+max_level = 1
+level_mods = Array[Dictionary]([])
+level_text = Array[String]([])

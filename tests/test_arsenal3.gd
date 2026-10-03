@@ -53,7 +53,8 @@ func test_las_nueve_armas_existen_con_su_grupo() -> void:
 
 func test_los_tres_grupos_quedan_equilibrados() -> void:
 	var n := [0, 0, 0]
-	for wd: WeaponData in DebugOptions.list_resources("res://data/weapons"): n[wd.category] += 1
+	for wd: WeaponData in DebugOptions.list_resources("res://data/weapons"):
+		if not wd.evolved: n[wd.category] += 1        # las evoluciones (D-06) no cuentan
 	assert_eq(n, [11, 12, 11], "11 físicas, 12 de fuego y 11 mágicas (GDD 5.3)")
 
 func test_el_rayo_tesla_salta_de_enemigo_en_enemigo() -> void:

@@ -96,6 +96,11 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var ally_time := 0.0                 ## s que se levanta como aliado el que muere inyectado (West)
 @export var root := 0.0                      ## s que deja inmóviles a los de la red (las élites solo se frenan)
 @export_group("Progresión")
+## Evolución (D-06): con el arma al nivel máximo y el objeto `evolves_with` (id de UpgradeData),
+## el siguiente baúl arcano la convierte en `evolution` (id de otra arma, con `evolved`).
+@export var evolves_with := &""
+@export var evolution := &""
+@export var evolved := false                  ## es una evolución: no sale al subir de nivel
 @export var max_level := 5
 ## Mejora de cada nivel a partir del 2 (índice 0 = nivel 2). Claves "estadística*"
 ## multiplican y "estadística+" suman, p. ej. {"damage*": 1.25, "count+": 1}.

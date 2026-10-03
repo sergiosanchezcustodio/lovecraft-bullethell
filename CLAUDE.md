@@ -206,6 +206,9 @@ Léela al empezar cada sesión:
     - El vestuario entero cuesta ~49.000 $ (unas 9 h); el test de la tienda lo cuenta aparte de las ~20 h del resto.
     - Hojas `shots/*_v2a.png` a `*_v2e.png` (prendas puestas) y `shots/vest_sel_crop.png` (selección con las cuatro filas).
   - **Hito 2.17 (cierre), prueba de carga con 4 jugadores hecha (03-10-2026):** 65-69 FPS de media y 37-41 en el 1 % peor con 150 enemigos y 1.000 balas (con 1 jugador, 90 y 53); partida normal con 4 jugadores, 114 y 82. Detalle en `docs/RENDIMIENTO.md`. **Falta tu prueba con varios mandos** para cerrar la fase 2.
+- **Fase 3 (pipeline de contenido): en curso.**
+  - **Evoluciones de armas (D-06), primera tanda: hecha, pendiente de tu revisión (03-10-2026).** `WeaponData.evolves_with` (objeto), `evolution` (arma) y `evolved`; `WeaponSystem.evolvable` y `evolve`; al abrir un baúl, `game._try_evolve` convierte la primera arma lista y lo anuncia. Las evoluciones no salen al subir de nivel y quedan fuera de las reglas de daño. Cuatro: Carga concentrada, Revólver del vigía, Rifle de la expedición Miskatonic e Instrumental de cirujano (de momento con el icono del arma base). La Biblioteca dice con qué objeto evoluciona cada arma.
+  - Prueba: `bot=circle god=true weapons=webly wlevel=5 items=iman chest_every=4 log=true` (`items=` da objetos al J1). Tests en `tests/test_evolutions.gd`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

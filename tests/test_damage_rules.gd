@@ -3,7 +3,7 @@ extends GutTest
 
 func test_every_weapon_follows_the_rules() -> void:
 	for w in DamageRules.all_weapons():
-		if w.support: continue
+		if w.support or w.evolved: continue          # las evoluciones van por encima (D-06)
 		assert_almost_eq(DamageRules.deviation(w), 0.0, DamageRules.TOLERANCE,
 			"%s: %.1f de daño por segundo, le tocan %.1f" % [w.id, DamageRules.dps(w), DamageRules.target_dps(w)])
 

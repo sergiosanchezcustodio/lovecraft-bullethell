@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/weapons/icons/granada.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"carga_concentrada"
+display_name = "Carga concentrada"
+description = "Tres granadas atadas a un mango: una explosión enorme que derriba a los que no mata."
+icon = ExtResource("2")
+evolved = true
+delivery = 1
+category = 0
+targeting = 1
+cooldown = 2.0
+range = 10.0
+damage = 75.0
+count = 3.0
+aoe_radius = 4.5
+flight_time = 0.75
+fuse = 0.0
+arc_height = 2.6
+knockback = 2.0
+look = "granada"
+max_level = 1
+level_mods = Array[Dictionary]([])
+level_text = Array[String]([])

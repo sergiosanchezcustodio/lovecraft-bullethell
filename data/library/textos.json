@@ -39,7 +39,11 @@
 		"bumeran": "Bumerán de madera de un museo de Melbourne. Golpea a la ida y a la vuelta.",
 		"red": "Red de pesca de Innsmouth. Lo que queda debajo no se mueve.",
 		"martillo": "Martillo de geólogo de Dyer. Un golpe en el hielo abre una grieta que avanza y derriba.",
-		"estoque": "Bastón de paseo con una hoja dentro. Una estocada larga que atraviesa todo lo que encuentra."
+		"estoque": "Bastón de paseo con una hoja dentro. Una estocada larga que atraviesa todo lo que encuentra.",
+		"carga_concentrada": "Dyer ató tres granadas al mango de una con alambre de la cabaña, como hacían los zapadores en el Somme. No es elegante. Funciona.",
+		"revolver_vigia": "El Webly de Olmstead, ajustado por un armero de Arkham siguiendo la brújula de Lake: dicen que ahora siempre sabe dónde está lo que acecha.",
+		"rifle_miskatonic": "El rifle de Peaslee con la mira de la expedición y las notas del diario sobre dónde están los puntos débiles de cada criatura.",
+		"instrumental": "El estuche completo de cirujano de la doctora Whipple, que guardaba en el forro del abrigo. Ocho hojas finas como una idea."
 	},
 	"items": {
 		"vida": "Abrigo de piel de reno de la intendencia de la expedición. Abriga hasta en la Barrera de Ross.",

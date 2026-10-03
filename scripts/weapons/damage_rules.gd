@@ -93,4 +93,5 @@ static func all_weapons() -> Array[WeaponData]:
 	var out: Array[WeaponData] = []
 	for f in DirAccess.get_files_at("res://data/weapons"):
 		if f.ends_with(".tres"): out.append(load("res://data/weapons/" + f))
+	out.sort_custom(func(a: WeaponData, b: WeaponData) -> bool: return int(a.evolved) < int(b.evolved))
 	return out

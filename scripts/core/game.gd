@@ -185,6 +185,9 @@ func _ready() -> void:
 			w.level = clampi(args.get_int("wlevel", 1), 1, w.data.max_level)
 	elif args.has("wlevel"):
 		for w in player.weapons.weapons: w.level = clampi(args.get_int("wlevel", 1), 1, w.data.max_level)
+	for up_id in args.get_str("items").split(",", false):     # items=iman,vida: objetos del J1 al empezar
+		player.progress.passives[up_id] = 1
+	if args.has("items"): player.rebuild_stats()
 	camera = GameCamera.new()
 	camera.view_size = args.get_float("cam", 15.0)
 	for q in players: camera.targets.append(q)
@@ -213,8 +216,10 @@ func _ready() -> void:
 		director.level_completed.connect(_on_level_completed)
 		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
 		director.chest_spawned.connect(func(c: ArcaneChest) -> void:
-			c.opened.connect(func(_c: ArcaneChest, _by: Player) -> void:
+			c.opened.connect(func(_c: ArcaneChest, by: Player) -> void:
 				earn(c.money)
+				_try_evolve(by)
+				if args.get_bool("log"): print("BAUL abierto por J%d" % (by.index + 1))
 				Achievements.add(Saves.current, "chests"))
 			announce("Ha aparecido un baúl arcano", 1.5))
 		add_child(director)
@@ -275,7 +280,8 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	add_child(q)
 	world.add_player(q)
 	players.append(q)
-	for w in DebugOptions.list_resources("res://data/weapons"): q.progress.weapon_pool.append(w)   # todas las armas
+	for w in DebugOptions.list_resources("res://data/weapons"):    # todas las armas, sin las evoluciones (D-06)
+		if not (w as WeaponData).evolved: q.progress.weapon_pool.append(w)
 	for f in ["velocidad", "vida", "cordura", "reflejos", "iman"]:
 		q.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
 	q.progress.leveled_up.connect(func(l: int) -> void: Achievements.record(Saves.current, "best_level", l))
@@ -524,6 +530,17 @@ func _make_announcer() -> void:
 	announcer.add_theme_constant_override("outline_size", 10)
 	announcer.modulate.a = 0.0
 	layer.add_child(announcer)
+
+## Evolución (D-06): al abrir un baúl, la primera arma al nivel máximo cuyo objeto lleva el
+## jugador se convierte en su evolución.
+func _try_evolve(q: Player) -> void:
+	if q == null or q.weapons == null: return
+	var w := q.weapons.evolvable(q.progress.passives)
+	if w == null: return
+	var before := w.data.display_name
+	q.weapons.evolve(w)
+	announce("¡Evolución! %s → %s" % [before, w.data.display_name], 3.0)
+	if args.get_bool("log"): print("EVOLUCION %s" % w.data.id)
 
 func announce(text: String, seconds: float) -> void:
 	announcer.text = text
