@@ -1,6 +1,6 @@
 class_name MainMenu
 extends Control
-## Menú principal, debajo del título de la portada: Jugar, Tienda, Logros, Configuración y Salir.
+## Menú principal, debajo del título de la portada: Jugar, Tienda, Biblioteca (con los logros como un tomo), Configuración y Salir.
 ## Quieto a propósito (GDD 8.1): lo importante es qué opción está señalada.
 ## Jugar abre la elección de local u online (online, desactivado hasta la fase 9, D-24).
 ## B / Esc vuelve a la elección de partida.
@@ -18,7 +18,7 @@ func _ready() -> void:
 	col.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	col.custom_minimum_size = Vector2(380, 0)
 	add_child(col)
-	for pair in [["Jugar", _open_play], ["Tienda", _open_shop], ["Logros", _open_achievements],
+	for pair in [["Jugar", _open_play], ["Tienda", _open_shop], ["Biblioteca", _open_library],
 			["Configuración", _open_settings], ["Salir", _ask_quit]]:
 		var b := MenuKit.button(pair[0], MenuKit.INK, 30)
 		b.custom_minimum_size = Vector2(380, 54)
@@ -101,6 +101,14 @@ func open_shop_tab(tab: int) -> void:
 
 func _open_achievements() -> void:
 	_push(AchievementsMenu.new(), 2)
+
+func _open_library() -> void:
+	_push(LibraryMenu.new(), 2)
+
+## Biblioteca abierta en un tomo (capturas: `open=menu_biblioteca tome=N cursor=N`).
+func open_library_at(tome: int, cursor: int) -> void:
+	_open_library()
+	if tome >= 0: (_popup as LibraryMenu).open_at.call_deferred(tome, cursor)
 
 func _open_settings() -> void:
 	var s := SettingsMenu.new()

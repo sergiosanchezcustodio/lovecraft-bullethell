@@ -591,12 +591,29 @@ func _check_achievements() -> void:
 		for w in q.weapons.weapons:
 			if w.level >= w.data.max_level: maxed += 1
 	Achievements.record(save, "maxed_weapons", maxed)
+	_record_seen(save)
 	var done := Achievements.check(save)
 	for a in done:
 		var reward := Achievements.reward_text(a)
 		announce("Logro: %s%s" % [a.display_name, ("  ·  " + reward) if reward != "" else ""], 3.0)
 		if args.get_bool("log"): print("LOGRO %s" % a.id)
 	if not done.is_empty(): Saves.save()
+
+## Biblioteca: el lugar, las armas y objetos que llevan los jugadores y los enemigos que
+## están en pantalla. No guarda aquí: lo hace la partida al acabar o al salir.
+func _record_seen(save: SaveData) -> void:
+	if level != null: save.mark_seen("places", String(level.id))
+	for q in players:
+		if q.weapons != null:
+			for w in q.weapons.weapons: save.mark_seen("weapons", String(w.data.id))
+		if q.progress != null:
+			for k in q.progress.passives: save.mark_seen("items", String(k))
+	var view := get_viewport().get_visible_rect()
+	for e in world.enemies:
+		if not is_instance_valid(e) or not ("data" in e): continue
+		var p: Vector3 = e.global_position
+		if camera.is_position_behind(p) or not view.has_point(camera.unproject_position(p)): continue
+		save.mark_seen("enemies", String(e.data.id))
 
 func _process(delta: float) -> void:
 	_t += delta
