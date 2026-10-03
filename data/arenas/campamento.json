@@ -1,13 +1,5 @@
 {
  "name": "Campamento base en la costa del mar de Ross",
- "size": [
-  64.0,
-  64.0
- ],
- "spawn": [
-  0.0,
-  0.0
- ],
  "ground": {
   "seed": 5,
   "tile": 0.5,
@@ -360,6 +352,14 @@
    "shrink": 0.75
   }
  },
+ "size": [
+  64.0,
+  64.0
+ ],
+ "spawn": [
+  0.0,
+  0.0
+ ],
  "props": [
   {
    "model": "atrezo_tienda",

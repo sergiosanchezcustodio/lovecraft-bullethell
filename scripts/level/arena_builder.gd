@@ -17,7 +17,7 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	root.set_meta("spawn", Vector3(data.spawn[0], 0, data.spawn[1]))
 	root.set_meta("light", data.get("light", {}))
 	root.add_child(_ground(data, size))
-	root.add_child(_sea(data, size))
+	if data.has("sea"): root.add_child(_sea(data, size))     # arenas de interior: sin mar
 	if data.has("barrier"): root.add_child(_barrier(data.barrier, size))
 	var lights: Array[OmniLight3D] = []
 	var obstacles := ObstacleMap.new()
@@ -32,7 +32,7 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 		var holder := Node3D.new()
 		holder.position = Vector3(p.pos[0], 0, p.pos[1])
 		# lo que queda en el mar (más allá de la orilla, al sur o al este) flota a la altura del agua
-		if p.pos[0] > size.x * 0.5 or p.pos[1] > size.y * 0.5:
+		if data.has("sea") and (p.pos[0] > size.x * 0.5 or p.pos[1] > size.y * 0.5):
 			holder.position.y = float(data.sea.level) - 0.15
 		holder.rotation_degrees.y = p.rot
 		holder.scale = Vector3.ONE * float(p.scale)
@@ -75,6 +75,7 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	var g: Dictionary = data.ground
 	var tile: float = g.tile
 	var back: float = g.margin_back
+	var front: float = g.get("margin_front", 0.0)     # sin mar: el suelo sigue por delante
 	var noise := FastNoiseLite.new()
 	noise.seed = int(g.seed)
 	noise.frequency = 0.06
@@ -83,8 +84,8 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	fine.frequency = 0.35
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var x0 := -size.x * 0.5 - back; var x1 := size.x * 0.5
-	var z0 := -size.y * 0.5 - back; var z1 := size.y * 0.5
+	var x0 := -size.x * 0.5 - back; var x1 := size.x * 0.5 + front
+	var z0 := -size.y * 0.5 - back; var z1 := size.y * 0.5 + front
 	var nx := int((x1 - x0) / tile); var nz := int((z1 - z0) / tile)
 	for i in nx:
 		for j in nz:
@@ -106,8 +107,8 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 				st.add_vertex(q[k])
 	# Frente de la plataforma de hielo en la orilla (sur y este)
 	var edge := Color(0.55, 0.66, 0.74)
-	var lvl: float = data.sea.level
-	for seg in [[Vector3(x0, 0, z1), Vector3(x1, 0, z1), Vector3(0, 0, 1)], [Vector3(x1, 0, z1), Vector3(x1, 0, z0), Vector3(1, 0, 0)]]:
+	var lvl: float = data.sea.level if data.has("sea") else 0.0
+	for seg in [] if not data.has("sea") else [[Vector3(x0, 0, z1), Vector3(x1, 0, z1), Vector3(0, 0, 1)], [Vector3(x1, 0, z1), Vector3(x1, 0, z0), Vector3(1, 0, 0)]]:
 		var a: Vector3 = seg[0]; var b: Vector3 = seg[1]; var nrm: Vector3 = seg[2]
 		var q := [a, a + Vector3(0, lvl - 0.05, 0), b + Vector3(0, lvl - 0.05, 0), b]
 		for k in [0, 1, 2, 0, 2, 3]:
@@ -121,6 +122,7 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	# ya no se usa.
 	var mat := ShaderMaterial.new()
 	mat.shader = preload("res://scripts/level/snow_ground.gdshader")
+	if g.has("camp_radius"): mat.set_shader_parameter("camp_radius", float(g.camp_radius))   # nieve pisada
 	mi.material_override = mat
 	return mi
 

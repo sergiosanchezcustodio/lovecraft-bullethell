@@ -110,17 +110,18 @@ def build(name):
     data = json.load(open(path))
     half = np.array(data['size'], dtype=float) * 0.5
     back = float(data['ground']['margin_back'])
-    sea_y = float(data['sea']['level'])
+    sea_y = float(data['sea']['level']) if 'sea' in data else 0.0
+    front = float(data['ground'].get('margin_front', 0.0))     # sin mar, el suelo sigue por delante
     body = np.zeros((N, N), bool)
     bullet = np.zeros((N, N), bool)
     floor = np.zeros((N, N), bool)
     # el llano: de detrás de los acantilados hasta la orilla
     cx = (np.arange(N) + 0.5) * CELL - EXTENT
     X, Z = np.meshgrid(cx, cx)
-    floor |= (X <= half[0]) & (Z <= half[1]) & (X >= -half[0] - back) & (Z >= -half[1] - back)
+    floor |= (X <= half[0] + front) & (Z <= half[1] + front) & (X >= -half[0] - back) & (Z >= -half[1] - back)
     pieces = []
     for p in data['props']:
-        y = sea_y - 0.15 if (p['pos'][0] > half[0] or p['pos'][1] > half[1]) else 0.0
+        y = sea_y - 0.15 if ('sea' in data and (p['pos'][0] > half[0] or p['pos'][1] > half[1])) else 0.0
         s = float(p['scale'])
         pieces.append((p['model'], (p['pos'][0], y, p['pos'][1]), p['rot'], (s, s, s)))
     if 'barrier' in data:

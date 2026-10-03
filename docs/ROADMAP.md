@@ -127,7 +127,7 @@ Cada hito con su revisión de arte (modelos de frente, de perfil y de espaldas, 
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 4.1 | Generador de escenarios general: una receta por nivel (suelo, bordes, luz, clima, atrezo repartido, zonas libres) que produce el JSON de la arena y su mapa de obstáculos; el campamento pasa a ser una receta más. Arena del nivel 2: el campamento destruido de Lake (tiendas rasgadas, el avión, cajas reventadas, mesas de disección, ventisca) | Pendiente |
+| 4.1 | Generador de escenarios general: una receta por nivel (suelo, bordes, luz, clima, atrezo repartido, zonas libres) que produce el JSON de la arena y su mapa de obstáculos; el campamento pasa a ser una receta más. Arena del nivel 2: el campamento destruido de Lake (tiendas rasgadas, el avión, cajas reventadas, mesas de disección, ventisca) | Hecho (03-10-2026), pendiente de revisión |
 | 4.2 | Los Antiguos: modelo base (cuerpo de barril, cabeza de estrella, alas plegadas) y sus animaciones. Antiguo revivido (anda y golpea) y Antiguo alado (vuela en picado, comportamiento nuevo). Seres únicos (D-04: `EnemyData.unique`). Nivel 2 jugable con su evento final | Pendiente |
 | 4.3 | Nivel 3, el paso de la cordillera y sus cavernas: arena, shoggoth esclavo (masa grande que embiste) y shoggoth mimético (se disfraza de Antiguo y se transforma al acercarse) | Pendiente |
 | 4.4 | Nivel 4, la ciudad ciclópea: arena de piedra con relieves, Antiguo guerrero (élite con lanza) y Antiguo mutilado (lento, deja limo) | Pendiente |
