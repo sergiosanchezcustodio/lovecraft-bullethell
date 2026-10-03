@@ -30,6 +30,10 @@ func contact_damage(e: Enemy) -> Damage:
 	d.source = e
 	return d
 
+## ¿Puede dañar por contacto ahora? (los voladores, solo cuando están abajo)
+func touches(_e: Enemy) -> bool:
+	return true
+
 func can_shoot(_e: Enemy) -> bool:
 	return true
 

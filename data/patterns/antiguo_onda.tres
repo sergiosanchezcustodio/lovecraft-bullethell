@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"antiguo_onda"
+shape = 0
+count = 16
+speed = 4.2
+radius = 0.14
+size = 0.2
+damage_physical = 8.0
+damage_mental = 0.0
+lifetime = 4.0
+bursts = 2
+burst_interval = 0.25
+spin_deg = 11.25
+aimed = false
+gap_count = 2
+gap_width = 3

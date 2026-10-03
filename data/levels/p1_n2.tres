@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/pinguino.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/fragmento.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/antiguo_revivido.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/antiguo_alado.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/antiguo_despierto.tres" id="7"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+[ext_resource type="Resource" path="res://data/weather/ventisca.tres" id="weather_ventisca"]
+
+[resource]
+script = ExtResource("1")
+weather = ExtResource("weather_ventisca")
+id = &"p1_n2"
+display_name = "El campamento destruido de Lake"
+part = 1
+number = 2
+arena = "res://data/arenas/lake.json"
+duration = 300.0
+music = ""
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("6")])
+spawn_rate = Array[Vector2]([Vector2(0, 0.4), Vector2(45, 0.6), Vector2(90, 0.9), Vector2(150, 1.4), Vector2(210, 1.9), Vector2(300, 2.4)])
+max_alive = 75
+elite_cap = 2
+final_time = 240.0
+final_enemy = ExtResource("7")
+final_wave = 20
+final_spawn_scale = 0.3
+final_text = "Algo silba entre las mesas de disección…"

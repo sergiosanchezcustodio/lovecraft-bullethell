@@ -322,7 +322,7 @@ func _physics_process(delta: float) -> void:
 	if data.aura_drain > 0.0:                   # presencia: drena cordura a los de dentro del aura
 		for p in world.players:
 			if p.global_position.distance_to(global_position) <= data.aura_radius: p.drain_sanity(data.aura_drain * delta)
-	for p in world.players:
+	for p in world.players if behavior.touches(self) else []:
 		var r := data.body_radius + p.data.hurt_radius
 		var pp := p.global_position
 		if Vector2(pp.x - position.x, pp.z - position.z).length_squared() < r * r:
@@ -341,7 +341,7 @@ func _process(delta: float) -> void:
 	var t0 := Prof.start()
 	visual.global_position = get_global_transform_interpolated().origin
 	visual.rotation.y = atan2(facing.x, facing.z)
-	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0)       # aparece creciendo
+	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * data.model_scale   # aparece creciendo
 	if _aura_mat: _aura_mat.set_shader_parameter("color", Color(0.45, 0.2, 0.7, 0.14 + 0.07 * sin(_spawn_t * 2.5)))
 	if not anim_hold and _stasis_t <= 0.0:          # congelado: la animación se detiene
 		anim_t = fposmod(anim_t + delta / Anims.duration(data.model, anim), 1.0)

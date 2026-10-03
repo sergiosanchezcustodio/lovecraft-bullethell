@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/antiguo_espinas.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"antiguo_revivido"
+display_name = "Antiguo revivido"
+model = "antiguo"
+tier = 2
+spawn_weight = 1.0
+elite = false
+max_health = 55.0
+hit_radius = 0.6
+body_radius = 0.6
+move_speed = 1.7
+xp = 2.0
+money = 3
+contact_physical = 9.0
+contact_mental = 3.0
+movement = &"chase"
+attack = ExtResource("2")
+attack_cooldown = 6.0
+attack_range = 7.0
+attack_anim = "lash"

@@ -37,6 +37,8 @@
 		"migo": "anim_cuadrupedo",
 		"yig": "anim_serpiente",
 		"dhole": "anim_serpiente",
-		"pez": "anim_pez"
+		"pez": "anim_pez",
+		"antiguo": "anim_antiguo",
+		"antiguo_alado": "anim_antiguo"
 	}
 }

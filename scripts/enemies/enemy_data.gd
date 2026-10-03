@@ -9,6 +9,8 @@ extends Resource
 @export var model := "pinguino"            ## nombre en models/ y juego de animaciones
 @export var tier := 1                      ## escalón (1-5); 4 y 5 son élites
 @export var elite := false
+@export var model_scale := 1.0             ## tamaño del modelo (minijefes más grandes que su especie)
+@export var unique := false                ## ser único (D-04): minijefe que aparece una vez, nunca en las oleadas
 ## Presencia (GDD 4.4): élites y jefes drenan cordura a quien está dentro de su aura.
 @export var aura_radius := 0.0
 @export var aura_drain := 0.0              ## cordura por segundo

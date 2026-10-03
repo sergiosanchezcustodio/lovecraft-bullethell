@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"antiguo_alado"
+display_name = "Antiguo alado"
+model = "antiguo_alado"
+tier = 2
+spawn_weight = 0.6
+elite = false
+max_health = 35.0
+hit_radius = 0.6
+body_radius = 0.5
+move_speed = 3.2
+xp = 2.0
+money = 3
+contact_physical = 8.0
+contact_mental = 2.0
+movement = &"dive"
+params = {"dive_cooldown": 4.5, "dive_damage": 12.0, "dive_radius": 1.3, "dive_range": 9.0, "dive_time": 0.4, "height": 2.6, "orbit": 5.0, "telegraph": 0.75}

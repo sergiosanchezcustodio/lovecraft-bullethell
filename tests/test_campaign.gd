@@ -18,4 +18,5 @@ func test_solo_el_primero_esta_abierto_al_empezar() -> void:
 func test_superar_un_nivel_abre_el_siguiente_aunque_sea_de_otra_parte() -> void:
 	assert_true(Campaign.is_unlocked("p1_n2", ["p1_n1"]))
 	assert_true(Campaign.is_unlocked("p2_n1", ["p1_n5"]))
-	assert_false(Campaign.is_playable("p1_n2", ["p1_n1"]), "sin datos todavía: próximamente")
+	assert_true(Campaign.is_playable("p1_n2", ["p1_n1"]), "el nivel 2 ya existe (hito 4.2)")
+	assert_false(Campaign.is_playable("p1_n3", ["p1_n2"]), "sin datos todavía: próximamente")
