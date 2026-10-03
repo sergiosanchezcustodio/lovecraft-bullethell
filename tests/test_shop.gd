@@ -21,9 +21,13 @@ func test_el_catalogo_tiene_las_cuatro_secciones() -> void:
 
 func test_la_tienda_entera_lleva_unas_veinte_horas() -> void:
 	var total := 0
+	var outfits := 0
 	for e in Shop.catalog():
-		for p in e.prices: total += p
+		for p in e.prices:
+			if e.section == ShopItem.Section.OUTFIT: outfits += p      # estético: aparte
+			else: total += p
 	assert_between(total, 80000, 140000, "a unos 5.500 $ por hora: 10 h la tienda y 10 h los compañeros (D-36)")
+	assert_between(outfits, 30000, 70000, "el vestuario (D-34), de 5 a 13 h más")
 
 func test_comprar_potenciador_sube_de_nivel_y_cobra() -> void:
 	var s := _save(500)

@@ -4,7 +4,7 @@ extends RefCounted
 ## prueban). Cuatro puestos; cada dispositivo ocupa uno. En su puesto, cada jugador:
 ##   1. elige personaje (izquierda/derecha); no puede confirmar uno que ya ha confirmado
 ##      otro (D-23) ni uno bloqueado (se compra en la tienda);
-##   2. elige su vestuario (D-34): arriba/abajo cabeza, cuerpo o pies, izquierda/derecha la
+##   2. elige su vestuario (D-34): arriba/abajo cabeza, cuerpo, pies o accesorio, izquierda/derecha la
 ##      prenda (o lo suyo); se salta si no se ha comprado ninguna prenda;
 ##   3. elige compañero entre los desbloqueados (o ninguno);
 ##   4. queda listo.
@@ -13,7 +13,7 @@ extends RefCounted
 signal changed
 
 enum Stage { CHARACTER, OUTFIT, PET, READY }
-const OUTFIT_KEYS := ["head", "body", "feet"]
+const OUTFIT_KEYS := OutfitData.KEYS
 
 class Seat:
 	var device := -1

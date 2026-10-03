@@ -95,7 +95,7 @@ func _ready() -> void:
 	OutfitData.override = {}                       # outfit=bombin,botas_nieve: prendas para probar
 	for o_id in args.get_str("outfit").split(",", false):
 		var o := OutfitData.find(o_id)
-		if o != null: OutfitData.override[["head", "body", "feet"][o.slot]] = o_id
+		if o != null: OutfitData.override[OutfitData.KEYS[o.slot]] = o_id
 	var env := Atmosphere.make_environment()
 	# Los volúmenes de niebla solo existen en Forward+ (Compatibility da error)
 	var fogvol := args.get_bool("fogvol", true) and RenderingServer.get_current_rendering_method() != "gl_compatibility"

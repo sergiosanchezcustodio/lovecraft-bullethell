@@ -4,8 +4,10 @@ extends Resource
 ## una vez en la tienda y la puede llevar cualquier personaje. El modelo de cada personaje
 ## está en models/vest_<id>_<personaje>.json (tools/gen_vestuario.py).
 
-enum Slot { HEAD, BODY, FEET }
-const SLOT_NAMES := ["Cabeza", "Cuerpo", "Pies"]
+## ACCESSORY: gafas y bufanda; van con cualquier sombrero (no lo ocultan).
+enum Slot { HEAD, BODY, FEET, ACCESSORY }
+const SLOT_NAMES := ["Cabeza", "Cuerpo", "Pies", "Accesorio"]
+const KEYS := ["head", "body", "feet", "acc"]
 const DIR := "res://data/outfits"
 
 @export var id := &"bombin"
@@ -40,7 +42,7 @@ static func worn_for(character_id: String) -> Dictionary:
 	if not override.is_empty(): return override
 	return Saves.current.worn_by(character_id) if Saves.current != null else {}
 
-## Viste un modelo de personaje con lo que lleva puesto ({"head": id, "body": id, "feet": id}).
+## Viste un modelo de personaje con lo que lleva puesto ({"head": id, "body": id, "feet": id, "acc": id}).
 static func apply(root: Node3D, character_model: String, worn: Dictionary) -> void:
 	for k in worn:
 		var o := find(String(worn[k]))

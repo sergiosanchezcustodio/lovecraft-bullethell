@@ -116,7 +116,7 @@ func _build() -> void:
 		f.position = Vector2((DESIGN.x - total) * 0.5 + i * (FRAME.x + GAP), TOP)
 		stage.add_child(f)
 		_frames.append(f)
-	var hint := MenuKit.hint("Start o Intro: unirse  ·  Izquierda/derecha: cambiar  ·  Arriba/abajo: ver la ficha  ·  LB/RB o Q/E: girar  ·  A o Intro: elegir  ·  B o Esc: atrás")
+	var hint := MenuKit.hint("Start o Intro: unirse  ·  Izquierda/derecha: cambiar  ·  Arriba/abajo: ficha o prenda  ·  LB/RB o Q/E: girar  ·  A o Intro: elegir  ·  B o Esc: atrás")
 	hint.size = Vector2(DESIGN.x, 30)
 	hint.position = Vector2(0, DESIGN.y - 44)
 	stage.add_child(hint)
@@ -383,21 +383,18 @@ class _Frame extends Control:
 		add_child(_outfit)
 		var ob := VBoxContainer.new()
 		ob.alignment = BoxContainer.ALIGNMENT_CENTER
-		ob.add_theme_constant_override("separation", 6)
+		ob.add_theme_constant_override("separation", 2)
 		_outfit.add_child(ob)
-		ob.add_child(MenuKit.title("Vestuario", 26, UiKit.GOLD))
-		for k in 3:
+		ob.add_child(MenuKit.title("Vestuario", 24, UiKit.GOLD))
+		for k in OutfitData.KEYS.size():
 			var row := VBoxContainer.new()
-			var tag := UiKit.label(OutfitData.SLOT_NAMES[k], 16, UiKit.TEXT_DIM)
+			var tag := UiKit.label(OutfitData.SLOT_NAMES[k], 14, UiKit.TEXT_DIM)
 			tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			row.add_child(tag)
-			var val := MenuKit.title("", 22, UiKit.TEXT)
+			var val := MenuKit.title("", 20, UiKit.TEXT)
 			row.add_child(val)
 			ob.add_child(row)
 			_outfit_rows.append(val)
-		var oh := UiKit.label("Arriba/abajo: prenda · Izquierda/derecha: cambiar", 14, UiKit.TEXT_DIM)
-		oh.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		ob.add_child(oh)
 		_outfit.visible = false
 		# puesto vacío
 		_empty = VBoxContainer.new()
@@ -634,12 +631,12 @@ class _Frame extends Control:
 		_sheet_title.visible = not _outfit.visible
 		_sheet_cols.visible = not _outfit.visible
 		if not _outfit.visible: return
-		for k in 3:
+		for k in OutfitData.KEYS.size():
 			var id := String(seat.worn.get(SelectState.OUTFIT_KEYS[k], ""))
 			var o := OutfitData.find(id) if id != "" else null
 			var on := k == seat.outfit_row
 			var l: Label = _outfit_rows[k]
-			l.text = ("◀  %s  ▶" if on else "%s") % (o.display_name if o else "Lo suyo")
+			l.text = ("◀  %s  ▶" if on else "%s") % (o.display_name if o else ("Ninguno" if k == OutfitData.Slot.ACCESSORY else "Lo suyo"))
 			l.add_theme_color_override("font_color", color if on else UiKit.TEXT_DIM)
 
 	func _process(delta: float) -> void:

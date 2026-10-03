@@ -199,7 +199,12 @@ Léela al empezar cada sesión:
     - El sombrero de cada personaje va en su propia parte `hat` (`finish(..., hat=(colores))`); una prenda de cabeza la oculta. `VoxelBuilder.dress` cuelga las mallas de la prenda de las partes del personaje (se anima con él). `OutfitData.apply` viste: partida, retrato del HUD, selección y visor (`still 0 dyer+bombin+botas_nieve`).
     - Tienda: pestaña Vestuario. Selección: paso nuevo tras el personaje (arriba/abajo cabeza, cuerpo o pies; izquierda/derecha la prenda o "Lo suyo"); se salta si no hay prendas. Lo elegido se guarda por personaje (`SaveData.outfits`, `worn`, `worn_by`).
     - Pruebas: `outfit=bombin,botas_nieve` en la partida; capturas `select saves=test_bib slot=0 vest=2 shots=3`. Tests en `tests/test_outfits.gd` y `test_select_state.gd`. Hojas `shots/revision_vestuario_giros.png` y `vest_sel_crop.png`.
-    - Segunda tanda pendiente: las 18 prendas restantes de D-34.
+  - **Hito 2.16, segunda tanda: hecha, pendiente de tu revisión (03-10-2026).** Las 18 restantes; en total 26 prendas en cuatro huecos:
+    - Cabeza: casco Brodie, cinta del pelo (con una capa de pelo del color del personaje, `hair_of`, porque bajo el sombrero original no hay coronilla), sombrero de aventurero, boina (burdeos: negra no se veía sobre el pelo negro), sombrero vaquero, pamela, turbante y canotier de paja.
+    - **Hueco nuevo, Accesorio** (`OutfitData.Slot.ACCESSORY`, no oculta el sombrero): gafas de ver, gafas de nieve inuit y bufanda.
+    - Cuerpo: abrigo de nieve, chubasquero, chaleco, vestido y bata (más holgada, para tapar el estetoscopio de Whipple). Pies: botas esquimales y zapatos de tacón.
+    - El vestuario entero cuesta ~49.000 $ (unas 9 h); el test de la tienda lo cuenta aparte de las ~20 h del resto.
+    - Hojas `shots/*_v2a.png` a `*_v2e.png` (prendas puestas) y `shots/vest_sel_crop.png` (selección con las cuatro filas).
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

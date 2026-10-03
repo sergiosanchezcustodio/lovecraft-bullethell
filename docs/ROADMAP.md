@@ -106,7 +106,7 @@ Ampliada el 26-09-2026: adelanta de la fase 5 el guardado, el menú principal, l
 | 2.13d ⏸ | Tienda de antigüedades en voxel con el anciano (diorama detrás del menú) | Hecho; **pendiente de tu revisión** |
 | 2.14 ⏸ | Logros y desbloqueos (D-32): 18 logros por datos con recompensa (dólares, Legrasse, Johansen, el gato), aviso en partida y sección en el menú principal | Hecho; **pendiente de tu revisión** |
 | 2.15 ⏸ | Bestiario de compañeros (D-36) en tres tandas: 2.15a sistema de comportamientos, gato negro, sapo, búho, rata y shoggoth bebé; 2.15b byakhee, cuervo, polilla, gaviota y Mi-Go; 2.15c Tíndalos, Yig, pez, dhole y cabra | Hecho; **pendiente de tu revisión** |
-| 2.16 ⏳ | Vestuario (D-34) en dos tandas: sistema y 8 prendas; después el resto | Primera tanda hecha (03-10-2026) |
+| 2.16 ✅ | Vestuario (D-34) en dos tandas: sistema y 8 prendas; después el resto | Hecho (03-10-2026), pendiente de revisión |
 | 2.17 ⏸ | Cierre: prueba de carga con 4 jugadores y tu prueba con varios mandos | Pendiente |
 
 ## Fase 3: Pipeline de contenido
