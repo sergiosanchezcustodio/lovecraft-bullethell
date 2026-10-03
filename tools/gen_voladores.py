@@ -1,15 +1,22 @@
 """Compañeros que vuelan (D-36): Mini-Byakhee, cuervo de Arkham, polilla de Leng y gaviota de
-Innsmouth. Estilo 4 (tramos de caras planas, detalles pintados), a 48 voxels por metro; miran
+Innsmouth. Estilo 4 (tramos de caras planas, detalles pintados), a 32 voxels por metro (1,5× los demás, para que no queden pequeños); miran
 hacia +Z. Las alas van abiertas en horizontal y aletean girando en su hombro.
 Partes: body, head, wing_l, wing_r (anim_volador.gd; la altura de vuelo la pone Pet).
 Uso: python tools/gen_voladores.py [byakhee|cuervo|polilla|gaviota]
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
-from cuerpo import slab, rslab, new
+from cuerpo import slab, rslab
+from voxlib import Model
 import materiales
 
 B, H = 'body', 'head'
+
+
+def new(seed):
+    # A 32 voxels por metro (no 48): 1,5 veces más grandes, a la par del búho y el resto de
+    # compañeros. Las alas, más cortas en voxels, quedan con la misma envergadura.
+    return Model(S=2, seed=seed)
 
 
 def face_fn(M, part=H):
@@ -57,9 +64,9 @@ def byakhee():
     for x in (-2, 1): face(x, 4, FANG); face(x, 5, FANG)                       # colmillos
     for x in (-1, 0): face(x, 5, FINGER)
     for part, s in (('wing_l', -1), ('wing_r', 1)):
-        wing(M, part, s, MEMB, 6, 4, 18, -5, 6, taper=0.6)
+        wing(M, part, s, MEMB, 6, 4, 12, -5, 6, taper=0.6)
         for (x, y, z), v in M.V.items():                                     # dedos de la membrana
-            if v[0] == part and (abs(x) in (8, 13, 18) or z == 5): v[1] = FINGER
+            if v[0] == part and (abs(x) in (7, 11, 15) or z == 5): v[1] = FINGER
     materiales.texturize(M, {SKIN: 'piel', MEMB: 'piel'})
     piv = {'body': [0, 0, 0], 'head': [0, 6, 6], 'wing_l': [-4, 7, 0], 'wing_r': [4, 7, 0]}
     return M, piv, (0.5, 0.5)
@@ -85,7 +92,7 @@ def cuervo():
         for xx in (x - 1 if x < 0 else x + 1,):
             M.put(xx, 14, 8, H, EYE, 1)                                      # ojillos a los lados
     for part, s in (('wing_l', -1), ('wing_r', 1)):
-        wing(M, part, s, BLACK, 8, 4, 14, -6, 5, taper=0.5, tip=SHEEN)
+        wing(M, part, s, BLACK, 8, 4, 10, -6, 5, taper=0.5, tip=SHEEN)
     materiales.texturize(M, {BLACK: 'pelo', SHEEN: 'pelo'})
     piv = {'body': [0, 0, 0], 'head': [0, 10, 5], 'wing_l': [-4, 9, 0], 'wing_r': [4, 9, 0]}
     return M, piv, (0.9, 0.25)
@@ -111,15 +118,15 @@ def polilla():
             M.put(s * (1 + i // 2) - (1 if s < 0 else 0), 9 + i, 8 + i // 2, H, ANT)
             M.put(s * (2 + i // 2) - (1 if s < 0 else 0), 9 + i, 8 + i // 2, H, ANT)
     for part, s in (('wing_l', -1), ('wing_r', 1)):
-        wing(M, part, s, WING, 5, 3, 17, -8, 9, taper=0.3, rim=RIM)
-        cx, cz = s * 11 - (1 if s < 0 else 0), 1
+        wing(M, part, s, WING, 5, 3, 12, -8, 9, taper=0.3, rim=RIM)
+        cx, cz = s * 9 - (1 if s < 0 else 0), 1
         for (x, y, z), v in M.V.items():
             if v[0] != part: continue
             d = ((x - cx) ** 2 + (z - cz) ** 2) ** 0.5
             if y == 6 and d < 1.5: v[1] = PUPIL
             elif y == 6 and d < 3.0: v[1] = EYE_I; v[2] = 1
             elif y == 6 and d < 4.5: v[1] = EYE_O
-            if abs(x) >= 18 or z >= 8: v[1] = RIM
+            if abs(x) >= 14 or z >= 8: v[1] = RIM
     materiales.texturize(M, {FUZZ: 'borreguillo', WING: 'lana'})
     piv = {'body': [0, 0, 0], 'head': [0, 5, 5], 'wing_l': [-3, 6, 0], 'wing_r': [3, 6, 0]}
     return M, piv, (0.9, 0.25)
@@ -146,9 +153,9 @@ def gaviota():
         M.put(x, 14, 9, H, EYE); M.put(x, 14, 10, H, PUPIL)
         M.put(x, 15, 10, H, GREY)                                             # ceño de mala uva
     for part, s in (('wing_l', -1), ('wing_r', 1)):
-        wing(M, part, s, GREY, 8, 4, 18, -5, 5, taper=0.5, tip=BLACK)
+        wing(M, part, s, GREY, 8, 4, 12, -5, 5, taper=0.5, tip=BLACK)
         for (x, y, z), v in M.V.items():
-            if v[0] == part and v[1] == BLACK and abs(x) == 20 and y == 9: v[1] = WHITE   # motas
+            if v[0] == part and v[1] == BLACK and abs(x) == 14 and y == 9: v[1] = WHITE   # motas
     materiales.texturize(M, {WHITE: 'pelo', GREY: 'pelo'})
     piv = {'body': [0, 0, 0], 'head': [0, 10, 6], 'wing_l': [-4, 9, 0], 'wing_r': [4, 9, 0]}
     return M, piv, (0.9, 0.25)

@@ -17,20 +17,25 @@ def add(model, x, z, rot=None, scale=1.0):
     props.append({"model": model, "pos": [round(x, 2), round(z, 2)],
                   "rot": round(rng.uniform(0, 360) if rot is None else rot, 1), "scale": round(scale, 2)})
 
+# Radio que ocupa cada pieza grande a escala 1 (lo demás, 1,2 m).
+FOOT = {"atrezo_cabana": 3.6, "atrezo_tienda": 2.6, "atrezo_iglu": 2.2}
+
 def free(x, z, r):
     """¿Está (x, z) a más de r metros de todas las piezas y de la zona de aparición?"""
     if math.hypot(x, z) < 5.0 + r: return False
     for p in props:
         px, pz = p["pos"]
-        if math.hypot(px - x, pz - z) < r + 1.2 * p["scale"]: return False
+        if math.hypot(px - x, pz - z) < r + FOOT.get(p["model"], 1.2) * p["scale"]: return False
     return True
 
 # ---------- Campamento (centro) ----------
 # Variedad: dos tiendas, un iglú y una cabaña de troncos (la puerta y la ventana hacia la cámara)
-add("atrezo_tienda", -7.5, -6.0, 20)
-add("atrezo_tienda", 8.5, 7.0, -35)
-add("atrezo_iglu", 7.0, -9.2, 55)
-add("atrezo_cabana", -13.0, 7.5, 30)
+# A 1,5× (03-10-2026): a escala 1 se veían de juguete al lado de los personajes.
+BIG = 1.5
+add("atrezo_tienda", -8.0, -6.5, 20, BIG)
+add("atrezo_tienda", 9.0, 7.5, -35, BIG)
+add("atrezo_iglu", 7.5, -10.0, 55, BIG)
+add("atrezo_cabana", -14.5, 8.0, 30, BIG)
 for x, z, r in ((-3.8, -9.5, 10), (-3.0, -10.4, 40), (-2.2, -9.2, 75), (11.2, -3.5, 5), (11.6, -2.5, 30),
                 (-11.8, 1.2, 60), (3.5, 11.0, 20), (4.3, 11.6, 0)):
     add("atrezo_caja", x, z, r)
@@ -39,15 +44,15 @@ for x, z in ((-5.5, -10.5), (12.0, -5.2), (-12.5, 2.6), (5.2, 12.2), (5.9, 11.3)
 # Faroles alrededor del campamento: fuentes de luz (recuperarán cordura en la fase 2)
 for i in range(6):
     a = math.radians(30 + i * 60)
-    add("atrezo_farol", math.cos(a) * 10.5, math.sin(a) * 10.5, rot=math.degrees(-a) + 90)
+    add("atrezo_farol", math.cos(a) * 10.5, math.sin(a) * 10.5, rot=math.degrees(-a) + 90, scale=BIG)
 # Material de la expedición (tools/gen_atrezo_expedicion.py)
 add("atrezo_bandera", -2.5, -12.5, rot=10)
 add("atrezo_trineo", -9.5, -1.5, rot=70)
 add("atrezo_trineo", 12.8, 3.0, rot=-20)
 add("atrezo_tripode", 3.0, -13.5, rot=0)
 add("atrezo_tripode", -16.5, 13.5, rot=40)
-add("atrezo_farol", -20.0, -18.0, rot=45)
-add("atrezo_farol", 19.0, 17.0, rot=225)
+add("atrezo_farol", -20.0, -18.0, rot=45, scale=BIG)
+add("atrezo_farol", 19.0, 17.0, rot=225, scale=BIG)
 
 # Norte y oeste: los cierra la barrera de hielo ("barrier", más abajo).
 

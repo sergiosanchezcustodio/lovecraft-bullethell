@@ -53,12 +53,12 @@ def cabra():
 
 def tindalos():
     """Araña que no respeta la geometría: cuerpo de ángulos rectos, cian oscuro y azulado,
-    con aristas de un azul que brilla, ocho patas rectas y quebradas en ángulo, ocho ojos
-    blancos en fila y un abdomen de cubo girado."""
-    BODY = (0.14, 0.22, 0.30); EDGE = (0.35, 0.85, 1.0); LEG = (0.10, 0.14, 0.20)
-    EYE = (0.92, 0.98, 1.0)
+    ocho patas rectas y quebradas en ángulo, ocho ojos blancos en dos filas y un abdomen de
+    cubo girado 45° (rombo). Las aristas son de un azul apagado; solo brillan las verticales
+    del abdomen, a trazos, como una luz que no sale de ningún sitio."""
+    BODY = (0.14, 0.22, 0.30); EDGE = (0.35, 0.85, 1.0); EDGE_D = (0.20, 0.36, 0.48)
+    LEG = (0.10, 0.14, 0.20); EYE = (0.92, 0.98, 1.0)
     M = new(7202)
-    # ocho patas, dos por pieza, rectas y quebradas en ángulo recto
     for part, s, zs in (('leg_fl', -1, (6, 3)), ('leg_fr', 1, (6, 3)), ('leg_bl', -1, (-1, -4)), ('leg_br', 1, (-1, -4))):
         for z in zs:
             for i in range(7):
@@ -66,17 +66,24 @@ def tindalos():
             for y in range(0, 9):
                 M.put(s * 10 - (1 if s < 0 else 0), y, z, part, EDGE if y == 0 else LEG, 1 if y == 0 else 0)
     slab(M, B, BODY, 5, 11, 0, 3, 8, 8, 8, 8, ch=0)                           # cefalotórax cúbico
-    slab(M, 'tail', BODY, 5, 14, 0, -6, 9, 9, 9, 9, ch=0)                      # abdomen de cubo
-    for (x, y, z), v in M.V.items():                                         # aristas que brillan
-        if v[0] in (B, 'tail'):
-            if sum(1 for q in ((x + 1, y, z), (x - 1, y, z)) if q not in M.V) \
-               + sum(1 for q in ((x, y + 1, z), (x, y - 1, z)) if q not in M.V) \
-               + sum(1 for q in ((x, y, z + 1), (x, y, z - 1)) if q not in M.V) >= 2:
-                v[1] = EDGE; v[2] = 1
+    for (x, y, z), v in M.V.items():                                         # aristas apagadas
+        if v[0] == B and sum((x in (-4, 3), y in (5, 10), z in (-1, 6))) >= 2: v[1] = EDGE_D
+    R, ZC = 5, -6                                                            # abdomen: cubo girado
+    for y in range(5, 15):
+        for x in range(-R - 1, R + 1):
+            for z in range(ZC - R - 1, ZC + R + 1):
+                d = abs(x + 0.5) + abs(z - ZC)
+                if d > R + 0.5: continue
+                vert = d > R - 0.5 and (abs(x + 0.5) < 1 or abs(z - ZC) < 0.5)   # esquinas del rombo
+                rim = y in (5, 14) and d > R - 0.5
+                if vert: M.put(x, y, z, 'tail', EDGE if y % 3 else EDGE_D, 1 if y % 3 else 0)
+                else: M.put(x, y, z, 'tail', EDGE_D if rim else BODY)
     slab(M, H, BODY, 6, 11, 0, 8.5, 6, 6, 3, 3, ch=0)
     face = face_fn(M)
     for x in (-3, -1, 0, 2):
-        face(x, 9, EYE, 1); face(x, 7, EYE, 1)
+        face(x, 9, EYE, 1)
+    for x in (-2, 1):
+        face(x, 7, EYE, 1)
     piv = {'body': [0, 8, 0], 'head': [0, 8, 7], 'tail': [0, 9, -2],
            'leg_fl': [-4, 8, 4], 'leg_fr': [4, 8, 4], 'leg_bl': [-4, 8, -2], 'leg_br': [4, 8, -2]}
     return M, piv, (0.4, 0.5)
@@ -184,11 +191,14 @@ def dhole():
 
 
 def pez():
-    """Pez con patas que se cree humano: pez gris verdoso de escamas, vientre plateado, ojos
-    saltones y bobos, labios gruesos, aletas como bracitos, y dos piernas humanas con
-    pantalón corto de rayas y zapatos de charol (se cree un caballero). Pajarita roja."""
+    """Pez con patas que se cree humano: pez gris verdoso de escamas, aplanado de lado como un
+    pez de verdad, vientre plateado, ojos saltones a los lados, boca de pez que boquea (labios
+    gruesos en anillo que asoman), agallas, cresta dorsal, aletas como bracitos, y dos piernas
+    humanas con pantalón corto de rayas y zapatos de charol (se cree un caballero). Pajarita.
+    Las aletas y la cola cuelgan del cuerpo (`parents`): se inclinan con él."""
     SCALE = (0.40, 0.52, 0.50); SCALE_D = (0.28, 0.38, 0.38); BELLY = (0.78, 0.82, 0.80)
     EYE_W = (0.95, 0.95, 0.88); PUPIL = (0.04, 0.04, 0.04); LIP = (0.72, 0.46, 0.46)
+    MOUTH = (0.16, 0.08, 0.10); GILL = (0.22, 0.30, 0.30)
     FIN = (0.48, 0.62, 0.58); PANTS = (0.30, 0.30, 0.40); STRIPE = (0.72, 0.70, 0.64)
     SHOE = (0.08, 0.07, 0.08); SKIN = (0.66, 0.70, 0.62); BOW = (0.80, 0.14, 0.14)
     M = new(7606)
@@ -198,30 +208,51 @@ def pez():
         slab(M, part, PANTS, 6, 10, 2.5 * s, 0, 3.5, 3.5, 3.5, 3.5, ch=0)
         for (x, y, z), v in M.V.items():
             if v[0] == part and v[1] == PANTS and x % 2 == 0: v[1] = STRIPE
-    rslab(M, B, SCALE, 9, 24, 0, 0, 9, 14, r=3, rt=4, rb=3)                    # pez de pie
+    # cuerpo de pez de pie: estrecho de lado, fondo de delante atrás, ahusado arriba (la cabeza)
+    rslab(M, B, SCALE, 9, 17, 0, 0, 8, 13, r=3, rt=0, rb=3)
+    rslab(M, B, SCALE, 17, 25, 0, 0.5, 8, 11, r=3, rt=5, rb=0)
     for (x, y, z), v in M.V.items():
         if v[0] != B: continue
-        if z >= 4 and y < 20: v[1] = BELLY
+        if z >= 3 and y < 19: v[1] = BELLY
         elif (y + (z % 2)) % 3 == 0: v[1] = SCALE_D                            # escamas
-    face = face_fn(M, B)
-    for s in (-1, 1):                                                          # ojos saltones a los lados
+    for y in range(18, 25):                                                    # cresta dorsal
+        for z in range(-6 + (y - 18) // 2, -2 + (y - 18) // 3):
+            if (0, y, z) not in M.V and (-1, y, z) not in M.V: M.put(-1, y, z, B, FIN); M.put(0, y, z, B, FIN)
+    for z in range(-5, 2):
+        M.put(-1, 25, z, B, FIN); M.put(0, 25, z, B, FIN)
+    for s in (-1, 1):                                                          # ojos saltones, redondos
         x = 4 if s > 0 else -5
-        for y in (19, 20):
-            for z in (3, 4): M.put(x, y, z, B, EYE_W)
-        M.put(x + s, 20, 4, B, PUPIL)
-    for x in (-2, -1, 0, 1): face(x, 16, LIP); face(x, 15, LIP)                 # labios gruesos
+        for y in range(19, 23):
+            for z in range(1, 5):
+                if (y in (19, 22)) and (z in (1, 4)): continue
+                M.put(x, y, z, B, EYE_W)
+        M.put(x + s, 20, 3, B, PUPIL); M.put(x + s, 21, 3, B, PUPIL)
+        M.put(x + s, 20, 4, B, PUPIL); M.put(x + s, 21, 4, B, PUPIL)
+        for y in (15, 17):                                                     # agallas
+            for z in (-1, 0, 1): M.put(x - s if s > 0 else x + 1, y, z, B, GILL)
+    # boca de pez que asoma: anillo de labios con el hueco oscuro
+    zf = max(z for (x, y, z) in M.V if M.V[(x, y, z)][0] == B and y == 16)
+    for x in range(-3, 3):
+        for y in range(14, 19):
+            edge = x in (-3, 2) or y in (14, 18)
+            corner = x in (-3, 2) and y in (14, 18)
+            if corner: continue
+            M.put(x, y, zf + 1, B, LIP if edge else MOUTH)
+            if edge: M.put(x, y, zf + 2, B, LIP)
+    face = face_fn(M, B)
     for x in (-1, 0): face(x, 12, BOW)
-    face(-2, 12, BOW); face(1, 12, BOW)
+    face(-2, 12, BOW); face(1, 12, BOW); face(-3, 12, BOW); face(2, 12, BOW)
     for part, s in (('fin_l', -1), ('fin_r', 1)):
-        slab(M, part, FIN, 11, 15, 5.5 * s, 1, 2, 1, 4, 3, ch=0)
+        slab(M, part, FIN, 11, 15, 4.5 * s, 1, 2, 1, 4, 3, ch=0)
     slab(M, 'tail', FIN, 11, 20, 0, -8, 2, 2, 3, 6, ch=0)                      # aleta de la cola
     piv = {'body': [0, 9, 0], 'leg_l': [-2.5, 9, 0], 'leg_r': [2.5, 9, 0],
-           'fin_l': [-5, 14, 1], 'fin_r': [5, 14, 1], 'tail': [0, 15, -7]}
-    return M, piv, (0.4, 0.5)
+           'fin_l': [-4, 14, 1], 'fin_r': [4, 14, 1], 'tail': [0, 15, -6]}
+    return M, piv, (0.4, 0.5), {'fin_l': B, 'fin_r': B, 'tail': B}
 
 
 MODELS = {'cabra': cabra, 'tindalos': tindalos, 'migo': migo, 'yig': yig, 'dhole': dhole, 'pez': pez}
 for name in (sys.argv[1:] or MODELS):
-    M, piv, (rough, spec) = MODELS[name]()
-    n = M.export('models/%s.json' % name, piv, jitter=0.0, pivots_in_voxels=True, roughness=rough, specular=spec)
+    M, piv, (rough, spec), *par = MODELS[name]()
+    n = M.export('models/%s.json' % name, piv, jitter=0.0, pivots_in_voxels=True, roughness=rough, specular=spec,
+                 parents=par[0] if par else None)
     print(name, n, 'voxels')

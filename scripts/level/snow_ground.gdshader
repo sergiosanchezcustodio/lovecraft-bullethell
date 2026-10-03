@@ -29,10 +29,21 @@ float vnoise(vec2 p) {
 	return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
 }
 
+// Ruido de gradiente (0..1). El de valores, cortado con un umbral, dejaba bordes rectos en
+// las diagonales de su rejilla (placas de hielo y nieve pisada con lados de rombo).
+vec2 grad(vec2 i) { float a = hash(i) * 6.2831853; return vec2(cos(a), sin(a)); }
+float gnoise(vec2 p) {
+	vec2 i = floor(p), f = fract(p);
+	vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+	float a = dot(grad(i), f), b = dot(grad(i + vec2(1, 0)), f - vec2(1, 0));
+	float c = dot(grad(i + vec2(0, 1)), f - vec2(0, 1)), d = dot(grad(i + vec2(1, 1)), f - vec2(1, 1));
+	return 0.5 + 0.75 * mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+
 float fbm(vec2 p) {          // 3 octavas (4 costaban demasiado a pantalla completa)
 	float s = 0.0, a = 0.5;
 	mat2 r = mat2(vec2(0.8, 0.6), vec2(-0.6, 0.8));
-	for (int i = 0; i < 3; i++) { s += a * vnoise(p); p = r * p * 2.03; a *= 0.5; }
+	for (int i = 0; i < 3; i++) { s += a * gnoise(p); p = r * p * 2.03; a *= 0.5; }
 	return s * 1.14;
 }
 
@@ -71,13 +82,14 @@ void fragment() {
 		float g = hash(c + 17.0);
 		col *= 0.975 + 0.04 * g;                                      // grano fino de nieve
 		// placas de hielo (en las hondonadas y por manchas), con vetas claras
-		float icy = fbm(pc * 0.05 + 40.0);
-		float ice_m = step(0.64, icy) * step(h, 4.0);
+		vec2 warp = vec2(gnoise(pc * 0.11 + 3.0), gnoise(pc * 0.11 + 21.0)) - 0.5;  // bordes irregulares
+		float icy = fbm(pc * 0.05 + 40.0 + warp * 1.6);
+		float ice_m = step(0.585, icy) * step(h, 4.0);
 		float vein = step(0.94, 1.0 - abs(vnoise(pc * 1.3 + 7.0) - 0.5) * 2.0);
 		vec3 ice_c = mix(ice, ice_vein, vein * 0.45) * (0.97 + 0.05 * hash(c + 3.0));
 		// nieve pisada alrededor del campamento, a manchas
 		float d = length(pc);
-		float tr = step(fbm(pc * 0.35 + 9.0), 0.52 - (d - camp_radius) * 0.04) * step(d, camp_radius + 4.0);
+		float tr = step(fbm(pc * 0.35 + 9.0 + warp * 2.0), 0.52 - (d - camp_radius) * 0.04) * step(d, camp_radius + 4.0);
 		col = mix(col, trampled * (0.97 + 0.05 * g), tr * 0.75);
 		col = mix(col, ice_c, ice_m);
 		ALBEDO = col * shade;

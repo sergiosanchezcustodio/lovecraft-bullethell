@@ -364,38 +364,38 @@
   {
    "model": "atrezo_tienda",
    "pos": [
-    -7.5,
-    -6.0
+    -8.0,
+    -6.5
    ],
    "rot": 20,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "atrezo_tienda",
    "pos": [
-    8.5,
-    7.0
+    9.0,
+    7.5
    ],
    "rot": -35,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "atrezo_iglu",
    "pos": [
-    7.0,
-    -9.2
+    7.5,
+    -10.0
    ],
    "rot": 55,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "atrezo_cabana",
    "pos": [
-    -13.0,
-    7.5
+    -14.5,
+    8.0
    ],
    "rot": 30,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "atrezo_caja",
@@ -521,7 +521,7 @@
     5.25
    ],
    "rot": 60.0,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "atrezo_farol",
@@ -530,7 +530,7 @@
     10.5
    ],
    "rot": 0.0,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "atrezo_farol",
@@ -539,7 +539,7 @@
     5.25
    ],
    "rot": -60.0,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "atrezo_farol",
@@ -548,7 +548,7 @@
     -5.25
    ],
    "rot": -120.0,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "atrezo_farol",
@@ -557,7 +557,7 @@
     -10.5
    ],
    "rot": -180.0,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "atrezo_farol",
@@ -566,7 +566,7 @@
     -5.25
    ],
    "rot": -240.0,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "atrezo_bandera",
@@ -620,7 +620,7 @@
     -18.0
    ],
    "rot": 45,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "atrezo_farol",
@@ -629,7 +629,7 @@
     17.0
    ],
    "rot": 225,
-   "scale": 1.0
+   "scale": 1.5
   },
   {
    "model": "costa_3",
@@ -1588,83 +1588,56 @@
   {
    "model": "monticulo_1",
    "pos": [
-    -11.58,
-    10.86
+    21.48,
+    -28.65
    ],
-   "rot": 313.3,
-   "scale": 1.26
+   "rot": 138.2,
+   "scale": 0.98
   },
   {
    "model": "monticulo_2",
    "pos": [
-    -28.65,
-    -18.06
+    -11.41,
+    24.3
    ],
-   "rot": 109.2,
-   "scale": 1.02
+   "rot": 218.7,
+   "scale": 1.18
   },
   {
    "model": "monticulo_2",
    "pos": [
-    24.3,
-    25.41
+    12.43,
+    19.55
    ],
-   "rot": 257.1,
-   "scale": 1.08
-  },
-  {
-   "model": "monticulo_2",
-   "pos": [
-    19.55,
-    -16.76
-   ],
-   "rot": 86.8,
+   "rot": 71.3,
    "scale": 0.96
   },
   {
-   "model": "monticulo_3",
+   "model": "monticulo_2",
    "pos": [
-    -25.98,
-    -11.96
+    -15.01,
+    -25.98
    ],
-   "rot": 64.5,
-   "scale": 1.21
+   "rot": 247.5,
+   "scale": 0.99
   },
   {
    "model": "monticulo_3",
    "pos": [
-    -27.92,
-    5.79
+    -18.6,
+    -27.92
    ],
-   "rot": 150.9,
-   "scale": 1.24
-  },
-  {
-   "model": "monticulo_3",
-   "pos": [
-    21.54,
-    13.11
-   ],
-   "rot": 212.2,
-   "scale": 0.97
-  },
-  {
-   "model": "monticulo_3",
-   "pos": [
-    -18.53,
-    25.52
-   ],
-   "rot": 190.2,
-   "scale": 1.28
-  },
-  {
-   "model": "monticulo_3",
-   "pos": [
-    -2.34,
-    -18.13
-   ],
-   "rot": 87.6,
+   "rot": 265.0,
    "scale": 1.16
+  },
+  {
+   "model": "monticulo_3",
+   "pos": [
+    25.52,
+    17.78
+   ],
+   "rot": 165.5,
+   "scale": 1.12
   },
   {
    "model": "monticulo_3",
@@ -1685,31 +1658,31 @@
    "scale": 1.27
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "monticulo_3",
    "pos": [
     9.31,
     -25.64
    ],
    "rot": 175.6,
-   "scale": 1.04
+   "scale": 1.09
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "monticulo_3",
    "pos": [
     -1.71,
     24.86
    ],
    "rot": 46.7,
-   "scale": 0.91
+   "scale": 0.81
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "monticulo_3",
    "pos": [
     -4.82,
     15.84
    ],
    "rot": 111.5,
-   "scale": 1.14
+   "scale": 1.28
   },
   {
    "model": "atrezo_bloques_hielo",
@@ -1730,84 +1703,111 @@
    "scale": 1.03
   },
   {
-   "model": "atrezo_hielo",
+   "model": "atrezo_bloques_hielo",
    "pos": [
     17.4,
-    21.67
+    13.66
    ],
-   "rot": 9.6,
-   "scale": 0.99
+   "rot": 195.7,
+   "scale": 1.07
+  },
+  {
+   "model": "atrezo_bloques_hielo",
+   "pos": [
+    -18.22,
+    -11.01
+   ],
+   "rot": 150.6,
+   "scale": 0.91
+  },
+  {
+   "model": "atrezo_bloques_hielo",
+   "pos": [
+    19.03,
+    -3.12
+   ],
+   "rot": 314.5,
+   "scale": 1.14
   },
   {
    "model": "atrezo_hielo",
    "pos": [
-    -4.74,
-    -15.29
+    -21.06,
+    23.78
    ],
-   "rot": 109.0,
-   "scale": 1.31
+   "rot": 306.1,
+   "scale": 1.26
   },
   {
    "model": "atrezo_hielo",
    "pos": [
-    -8.64,
-    24.82
+    16.86,
+    24.83
    ],
-   "rot": 288.6,
-   "scale": 1.37
+   "rot": 324.1,
+   "scale": 1.11
   },
   {
    "model": "atrezo_hielo",
    "pos": [
-    3.72,
-    27.86
+    15.35,
+    1.27
    ],
-   "rot": 272.9,
-   "scale": 0.94
+   "rot": 266.8,
+   "scale": 1.14
   },
   {
    "model": "atrezo_hielo",
    "pos": [
-    22.05,
-    -23.75
+    -8.35,
+    28.03
    ],
-   "rot": 151.4,
-   "scale": 1.12
+   "rot": 174.7,
+   "scale": 1.22
   },
   {
-   "model": "atrezo_caja",
-   "pos": [
-    15.07,
-    20.32
-   ],
-   "rot": 188.2,
-   "scale": 1.0
-  },
-  {
-   "model": "atrezo_caja",
-   "pos": [
-    1.22,
-    23.21
-   ],
-   "rot": 297.8,
-   "scale": 1.0
-  },
-  {
-   "model": "atrezo_caja",
-   "pos": [
-    -20.26,
-    15.35
-   ],
-   "rot": 339.8,
-   "scale": 1.0
-  },
-  {
-   "model": "atrezo_caja",
+   "model": "atrezo_hielo",
    "pos": [
     27.64,
     -27.45
    ],
-   "rot": 259.8,
+   "rot": 237.4,
+   "scale": 1.23
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    27.53,
+    13.24
+   ],
+   "rot": 27.9,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    -19.72,
+    28.18
+   ],
+   "rot": 271.8,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    -27.55,
+    -20.91
+   ],
+   "rot": 73.7,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    -25.12,
+    11.32
+   ],
+   "rot": 203.2,
    "scale": 1.0
   }
  ],
