@@ -484,6 +484,7 @@ func _check_all_down() -> void:
 func _game_over() -> void:
 	if _ended: return
 	_ended = true
+	if args.get_bool("log") and director != null: print("FIN DERROTA t=%d abatidos=%d" % [int(director.time), director.killed_total])
 	if Saves.current != null: Saves.current.stats["deaths"] += 1
 	_check_achievements()
 	Saves.save()

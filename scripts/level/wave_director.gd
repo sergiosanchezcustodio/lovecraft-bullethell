@@ -156,6 +156,7 @@ func spawn_point(radius: float) -> Vector3:
 func spawn(d: EnemyData, pos: Vector3) -> Enemy:
 	var e := Enemy.new().setup(d, world, obstacles)
 	e.health_scale = LevelData.coop(level.coop_health, players)     # más jugadores, más aguante
+	if d.unique: e.health_scale = 1.0 + (e.health_scale - 1.0) * 0.5   # los únicos, la mitad (con 4: ×1,65)
 	e.health *= e.health_scale
 	e.position = pos
 	e.died.connect(_on_died)

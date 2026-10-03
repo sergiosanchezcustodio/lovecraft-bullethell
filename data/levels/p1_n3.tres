@@ -27,6 +27,6 @@ max_alive = 75
 elite_cap = 2
 final_time = 240.0
 final_enemy = ExtResource("9")
-final_wave = 20
+final_wave = 12
 final_spawn_scale = 0.3
 final_text = "Tekeli-li… tekeli-li… resuena en las cavernas"

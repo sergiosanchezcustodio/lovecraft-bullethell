@@ -36,7 +36,7 @@ extends Resource
 @export_group("Cooperativo")
 ## Según los jugadores (1, 2, 3, 4): vida de los enemigos y ritmo y tope de aparición.
 @export var coop_health: Array[float] = [1.0, 1.5, 1.9, 2.3]
-@export var coop_spawn: Array[float] = [1.0, 1.35, 1.7, 2.0]
+@export var coop_spawn: Array[float] = [1.0, 1.25, 1.5, 1.75]
 
 const DEFAULT_MUSIC := "res://resources/Music/Musica_nivel1.mp3"
 
