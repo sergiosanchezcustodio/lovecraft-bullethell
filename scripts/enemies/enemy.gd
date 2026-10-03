@@ -18,6 +18,8 @@ var visual: Node3D
 var runner: PatternRunner
 var hit_radius := 0.5
 var health := 1.0
+var health_scale := 1.0                  ## multiplicador de vida (cooperativo): vida máxima = data.max_health × esto
+var shield_t := 0.0                      ## s de invulnerabilidad (cambio de fase de un jefe)
 var velocity := Vector3.ZERO
 var facing := Vector3(0, 0, 1)
 var anim := "walk"
@@ -216,6 +218,7 @@ func stun(seconds: float) -> void:
 	_stun = maxf(_stun, seconds * (0.5 if data.elite else 1.0))
 
 func take_damage(d: Damage) -> void:
+	if shield_t > 0.0: return
 	if not is_alive(): return
 	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
 	for tag in data.tags: k *= float(d.bonus.get(tag, 1.0))    # rasgos contra este tipo de enemigo
@@ -292,6 +295,7 @@ func _physics_process(delta: float) -> void:
 	if not is_alive(): return
 	var t0 := Prof.start()
 	_spawn_t += delta
+	if shield_t > 0.0: shield_t -= delta
 	if _update_status(delta):                  # congelado en el tiempo (o muerto por la maldición)
 		Prof.stop("enemigos_fisica", t0)
 		return

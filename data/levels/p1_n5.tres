@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/fragmento.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/shoggoth_esclavo.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/antiguo_mutilado.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/shoggoth_ojos.tres" id="7"]
+[ext_resource type="Resource" path="res://data/enemies/antiguo_abisal.tres" id="8"]
+[ext_resource type="Resource" path="res://data/enemies/shoggoth_primigenio.tres" id="9"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+[ext_resource type="Resource" path="res://data/weather/niebla.tres" id="weather"]
+
+[resource]
+script = ExtResource("1")
+weather = ExtResource("weather")
+id = &"p1_n5"
+display_name = "Los túneles y el abismo del mar subterráneo"
+part = 1
+number = 5
+arena = "res://data/arenas/tuneles.json"
+duration = 300.0
+music = ""
+pool = Array[ExtResource("5")]([ExtResource("3"), ExtResource("4"), ExtResource("6"), ExtResource("7"), ExtResource("8")])
+spawn_rate = Array[Vector2]([Vector2(0, 0.45), Vector2(45, 0.65), Vector2(90, 1.0), Vector2(150, 1.5), Vector2(210, 2.0), Vector2(300, 2.5)])
+max_alive = 75
+elite_cap = 2
+final_time = 240.0
+final_enemy = ExtResource("9")
+final_wave = 15
+final_spawn_scale = 0.2
+final_text = "¡Tekeli-li! ¡Tekeli-li! Algo enorme llena el túnel…"

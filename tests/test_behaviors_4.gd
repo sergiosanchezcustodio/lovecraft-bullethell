@@ -35,3 +35,14 @@ func test_los_unicos_no_salen_en_oleadas() -> void:
 	for l: LevelData in DebugOptions.list_resources("res://data/levels"):
 		for d in l.pool: assert_false(d.unique, "%s: %s es único" % [l.id, d.id])
 		if l.final_enemy != null and l.number >= 2: assert_true(l.final_enemy.unique, String(l.id))
+
+func test_el_jefe_cambia_de_fase_con_la_vida() -> void:
+	var e := _enemy("shoggoth_primigenio")
+	var b := BossBehavior.new()
+	e.health = e.data.max_health
+	assert_eq(b.phase_for(e), 1)
+	e.health = e.data.max_health * 0.5
+	assert_eq(b.phase_for(e), 2)
+	e.health = e.data.max_health * 0.2
+	assert_eq(b.phase_for(e), 3)
+	e.free()

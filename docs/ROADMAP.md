@@ -131,7 +131,7 @@ Cada hito con su revisión de arte (modelos de frente, de perfil y de espaldas, 
 | 4.2 | Los Antiguos: modelo base (cuerpo de barril, cabeza de estrella, alas plegadas) y sus animaciones. Antiguo revivido (anda y golpea) y Antiguo alado (vuela en picado, comportamiento nuevo). Seres únicos (D-04: `EnemyData.unique`). Nivel 2 jugable con su evento final | Hecho (03-10-2026), pendiente de revisión |
 | 4.3 | Nivel 3, el paso de la cordillera y sus cavernas: arena, shoggoth esclavo (masa grande que embiste) y shoggoth mimético (se disfraza de Antiguo y se transforma al acercarse) | Hecho (03-10-2026), pendiente de revisión |
 | 4.4 | Nivel 4, la ciudad ciclópea: arena de piedra con relieves, Antiguo guerrero (élite con lanza) y Antiguo mutilado (lento, deja limo) | Hecho (03-10-2026), pendiente de revisión |
-| 4.5 | Nivel 5, los túneles y el mar subterráneo: arena, shoggoth de ojos luminosos y Antiguo del mar abisal. Jefe: el shoggoth primigenio (fases, persecución por el túnel, "¡Tekeli-li!") | Pendiente |
+| 4.5 | Nivel 5, los túneles y el mar subterráneo: arena, shoggoth de ojos luminosos y Antiguo del mar abisal. Jefe: el shoggoth primigenio (fases, persecución por el túnel, "¡Tekeli-li!") | Hecho (04-10-2026), pendiente de revisión |
 | 4.6 | Cierre: los cinco niveles seguidos en cooperativo con bots, equilibrio de ritmo y dificultad, y tu partida | Pendiente |
 
 ## Fase 5: Arranque, relatos y ampliación de la tienda

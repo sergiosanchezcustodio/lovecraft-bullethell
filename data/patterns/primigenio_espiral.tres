@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"primigenio_espiral"
+shape = 0
+count = 14
+speed = 4.0
+radius = 0.15
+size = 0.22
+damage_physical = 7.0
+damage_mental = 3.0
+lifetime = 6.0
+bursts = 6
+burst_interval = 0.18
+spin_deg = 9.0
+aimed = false
+gap_count = 2
+gap_width = 3

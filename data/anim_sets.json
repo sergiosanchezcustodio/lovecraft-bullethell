@@ -42,6 +42,8 @@
 		"antiguo_alado": "anim_antiguo",
 		"shoggoth_grande": "anim_fragmento",
 		"antiguo_guerrero": "anim_antiguo",
-		"antiguo_mutilado": "anim_antiguo"
+		"antiguo_mutilado": "anim_antiguo",
+		"shoggoth_ojos": "anim_fragmento",
+		"antiguo_abisal": "anim_antiguo"
 	}
 }

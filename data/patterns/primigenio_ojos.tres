@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"primigenio_ojos"
+shape = 1
+count = 9
+spread_deg = 90.0
+speed = 5.0
+radius = 0.15
+size = 0.24
+damage_physical = 6.0
+damage_mental = 4.0
+lifetime = 5.0
+bursts = 3
+burst_interval = 0.25
+aimed = true

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/ojos_rafaga.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"shoggoth_ojos"
+display_name = "Shoggoth de ojos luminosos"
+model = "shoggoth_ojos"
+model_scale = 1.4
+tier = 3
+spawn_weight = 0.9
+max_health = 70.0
+hit_radius = 0.8
+body_radius = 0.8
+move_speed = 1.9
+xp = 3.0
+money = 4
+contact_physical = 9.0
+contact_mental = 5.0
+movement = &"crawl"
+attack = ExtResource("2")
+attack_cooldown = 4.5
+attack_range = 8.0
+attack_anim = "burst"
