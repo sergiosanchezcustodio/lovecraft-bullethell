@@ -17,8 +17,8 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 |---|---|---|---|
 | 0 | Documentación y decisiones | **Hecha** (24-09-2026) | — |
 | 1 | Prototipo jugable (*vertical slice*) | **Hecha** (26-09-2026; queda tu partida de 5 minutos como comprobación) | Ninguna (D-02, D-03, D-05, D-14, D-15 y D-16, resueltas) |
-| 2 | Menús, guardado y cooperativo local | **En curso** (plan del 26-09-2026) | Ninguna (D-07, D-16 a D-18 y D-22 a D-25, resueltas) |
-| 3 | Pipeline de contenido | Pendiente | D-06 |
+| 2 | Menús, guardado y cooperativo local | **Hecha** salvo tu prueba con varios mandos (2.17) | Ninguna (D-07, D-16 a D-18 y D-22 a D-25, resueltas) |
+| 3 | Pipeline de contenido | **En curso** (03-10-2026): D-06 resuelta; enemigos, niveles y animaciones por datos | Ninguna |
 | 4 | Parte 1 completa | Pendiente | D-04, D-19 |
 | 5 | Arranque, relatos y ampliación de la tienda | Pendiente | Ninguna |
 | 6 | Parte 2 completa | Pendiente | D-04, D-13, enfoque de jefes colosales |

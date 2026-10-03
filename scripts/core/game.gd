@@ -111,7 +111,14 @@ func _ready() -> void:
 	moon.shadow_enabled = true
 	moon.directional_shadow_max_distance = 60.0
 	add_child(moon)
-	arena = ArenaBuilder.build("res://data/arenas/campamento.json", fogvol)
+	# arena del nivel (LevelData.arena); arena=ruta para probar otra
+	var arena_path := "res://data/arenas/campamento.json"
+	if not args.get_bool("nolevel"):
+		var lid := args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1")
+		var ld: LevelData = load("res://data/levels/%s.tres" % lid)
+		if ld != null: arena_path = ld.arena
+	arena_path = args.get_str("arena", arena_path)
+	arena = ArenaBuilder.build(arena_path, fogvol)
 	add_child(arena)
 	ArenaBuilder.apply_light(arena.get_meta("light", {}), moon, env)
 	_base_fog = env.fog_density
@@ -211,6 +218,8 @@ func _ready() -> void:
 		add_child(enemies_root)
 		director = WaveDirector.new().setup(level, world, arena.get_meta("obstacles"), camera, enemies_root)
 		if args.has("max_alive"): director.max_alive_override = args.get_int("max_alive")
+		for eid in args.get_str("enemies").split(",", false):    # enemies=clasico: solo esos (probar uno nuevo)
+			director.pool_override.append(load("res://data/enemies/%s.tres" % eid))
 		director.players = players.size()           # la dificultad crece con los jugadores
 		director.final_event.connect(func(_e: Enemy) -> void: announce(level.final_text, 3.5))
 		director.level_completed.connect(_on_level_completed)

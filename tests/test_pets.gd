@@ -215,7 +215,7 @@ func test_cada_modelo_tiene_las_piezas_de_sus_animaciones() -> void:
 		var m := VoxelBuilder.load_model("res://models/%s.json" % pd.model)
 		add_child_autofree(m)
 		var parts: Dictionary = m.get_meta("part_nodes")
-		var script: Script = Anims.BY_MODEL[pd.model]
+		var script: Script = Anims.script_for(pd.model)
 		for part in _parts_used(script): assert_true(parts.has(part), "%s: falta la pieza %s" % [pd.id, part])
 
 ## Piezas que pide un script de animación (las cadenas de _p(m, "...") y la lista SEGS).

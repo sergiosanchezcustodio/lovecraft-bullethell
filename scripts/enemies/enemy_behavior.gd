@@ -3,11 +3,15 @@ extends RefCounted
 ## Comportamiento de movimiento de un enemigo. Cada subclase decide la velocidad deseada,
 ## la animación y cuándo puede disparar su patrón. El Enemy se encarga del resto.
 
+## Por convención: EnemyData.movement = "blind" usa scripts/enemies/blind_behavior.gd. Un
+## comportamiento nuevo es un script nuevo con ese nombre; "chase" (o uno que no exista)
+## usa esta clase, que persigue al jugador.
+const DIR := "res://scripts/enemies/%s_behavior.gd"
+
 static func create(kind: StringName) -> EnemyBehavior:
-	match kind:
-		&"crawl": return CrawlBehavior.new()
-		&"blind": return BlindBehavior.new()
-		&"stalk": return StalkBehavior.new()
+	var path := DIR % kind
+	if kind != &"chase" and ResourceLoader.exists(path): return (load(path) as GDScript).new()
+	if kind != &"chase": push_warning("Comportamiento '%s' sin script: persigue" % kind)
 	return EnemyBehavior.new()
 
 func start(_e: Enemy) -> void:
