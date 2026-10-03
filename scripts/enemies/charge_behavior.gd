@@ -3,6 +3,7 @@ extends EnemyBehavior
 ## Shoggoth esclavo (hito 4.3): se arrastra hacia el jugador; a `charge_range` m se encoge
 ## (`windup` s, con un aviso alargado en el suelo) y embiste en línea recta a `charge_speed`
 ## durante `charge_time` s; después descansa `rest` s. Durante la embestida empuja fuerte.
+## Animaciones: anim_windup, anim_move y anim_rest (para otros modelos: el Antiguo guerrero).
 enum State { CRAWL, WINDUP, CHARGE, REST }
 var state := State.CRAWL
 var _t := 0.0
@@ -16,20 +17,20 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 	_t += delta
 	match state:
 		State.WINDUP:
-			e.anim = "burst"; e.anim_hold = true
+			e.anim = String(e.data.param("anim_windup", "burst")); e.anim_hold = true
 			e.anim_t = clampf(_t / float(e.data.param("windup", 0.8)), 0.0, 1.0) * 0.5
 			if _t >= float(e.data.param("windup", 0.8)): _enter(State.CHARGE)
 			return Vector3.ZERO
 		State.CHARGE:
-			e.anim = "crawl"; e.anim_hold = false
+			e.anim = String(e.data.param("anim_move", "crawl")); e.anim_hold = false
 			e.facing = _dir
 			if _t >= float(e.data.param("charge_time", 0.7)): _enter(State.REST)
 			return _dir * float(e.data.param("charge_speed", 11.0))
 		State.REST:
-			e.anim = "idle"
+			e.anim = String(e.data.param("anim_rest", "idle"))
 			if _t >= float(e.data.param("rest", 1.2)): _enter(State.CRAWL)
 			return Vector3.ZERO
-	e.anim = "crawl"
+	e.anim = String(e.data.param("anim_move", "crawl"))
 	if target == null: return Vector3.ZERO
 	_cd -= delta
 	var to := target.global_position - e.global_position

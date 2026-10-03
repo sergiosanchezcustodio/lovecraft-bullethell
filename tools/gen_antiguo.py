@@ -30,7 +30,7 @@ def barrel_r(y):
     return 2.8 + 3.2 * math.sin(math.pi * min(1.0, max(0.0, t))) ** 1.2
 
 
-def build(open_wings, seed, tint=0.0):
+def build(open_wings, seed, tint=0.0, variant=''):
     M = Model(S=2, seed=seed)
     S = M.S
     def ub(v): return v * S
@@ -117,6 +117,8 @@ def build(open_wings, seed, tint=0.0):
                 r = barrel_r(y) * 1.13 + 0.3
                 for zz in range(-int(ub(1.6)), int(ub(1.6)) + 1):
                     M.put(int(round(s * ub(r))), yv, zz - int(ub(1.0)), p, MEMB if (yv // 3) % 2 else MEMB_D)
+    if variant == 'guerrero': _guerrero(M)
+    if variant == 'mutilado': _mutilado(M)
     for k in [k for k in M.V if k[1] < 0]: del M.V[k]
     piv = {'body': [0, BODY_Y0, 0], 'head': [0, 24.0, 0], 'arms': [0, 15.0, 0],
            'wing_l': [-4.5, 19.0, -1.5], 'wing_r': [4.5, 19.0, -1.5]}
@@ -126,7 +128,40 @@ def build(open_wings, seed, tint=0.0):
     return M, piv
 
 
-for name, wings, seed, tint in (('antiguo', False, 7101, 0.0), ('antiguo_alado', True, 7102, 0.25)):
-    M, piv = build(wings, seed, tint)
+PLATE = (0.20, 0.22, 0.26); PLATE_L = (0.34, 0.36, 0.40); SPEAR = (0.52, 0.48, 0.40); TIP = (0.30, 0.62, 0.55)
+SLIME = (0.05, 0.07, 0.06); SLIME_G = (0.10, 0.20, 0.14)
+
+
+def _guerrero(M):
+    """Antiguo guerrero: el barril más oscuro, con placas como de pizarra, una cresta en la
+    cabeza y una lanza de piedra con punta de cristal verdoso en los tentáculos."""
+    S = M.S
+    for (x, y, z), v in M.V.items():
+        if v[0] == 'body' and y > 6 * S and (y // 5) % 3 == 0: v[1] = PLATE if M.hsh(x, y, z) > 0.4 else PLATE_L
+    for i in range(int(4 * S)):                                     # cresta
+        for dz in range(-2, 2): M.put(0, int(27.5 * S) + i, dz - i // 2, 'head', PLATE)
+    a, b = (7.8, 3.0, 4.0), (5.5, 27.0, 1.0)                          # lanza en diagonal (en ub)
+    M.capsule(a, b, 0.4, 0.4, 'arms', SPEAR)
+    M.cone(b, (5.2, 31.0, 0.6), 0.9, 'arms', TIP, TIP, tip_r=0.15)
+
+
+def _mutilado(M):
+    """Antiguo mutilado: le faltan dos puntas de la estrella y la mitad de los tentáculos,
+    tiene las alas rotas y lo cubren manchas del limo negro de los shoggoths que lo atacaron."""
+    S = M.S
+    for (x, y, z) in [k for k, v in M.V.items() if v[0] == 'head' and k[2] < -2 * S]: del M.V[(x, y, z)]
+    for (x, y, z) in [k for k, v in M.V.items() if v[0] == 'arms' and k[0] < 0]: del M.V[(x, y, z)]
+    for (x, y, z) in [k for k, v in M.V.items() if v[0] in ('wing_l', 'wing_r') and M.noise(*k, 6.0) > 0.55
+                      and k[1] < 17 * S]:                           # alas rotas; queda el muñón de arriba
+        del M.V[(x, y, z)]
+    for (x, y, z), v in M.V.items():
+        n = M.noise(x, y, z, 7.0)
+        if n > 0.62: v[1] = SLIME if n > 0.72 else SLIME_G
+
+
+for name, wings, seed, tint, var in (('antiguo', False, 7101, 0.0, ''), ('antiguo_alado', True, 7102, 0.25, ''),
+                                     ('antiguo_guerrero', False, 7103, -0.1, 'guerrero'),
+                                     ('antiguo_mutilado', False, 7104, 0.1, 'mutilado')):
+    M, piv = build(wings, seed, tint, var)
     n = M.export('models/%s.json' % name, piv, jitter=0.012, roughness=0.5, specular=0.45)
     print(name, n, 'voxels')

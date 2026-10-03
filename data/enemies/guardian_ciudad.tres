@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/antiguo_onda.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"guardian_ciudad"
+display_name = "El guardián de la ciudad"
+model = "antiguo_guerrero"
+model_scale = 1.7
+unique = true
+tier = 5
+spawn_weight = 1.0
+elite = true
+max_health = 800.0
+hit_radius = 1.0
+body_radius = 1.0
+move_speed = 2.4
+xp = 35.0
+money = 50
+contact_physical = 18.0
+contact_mental = 5.0
+aura_radius = 4.5
+aura_drain = 2.0
+movement = &"charge"
+params = {"anim_move": "walk", "anim_rest": "idle", "anim_windup": "lash", "charge_cooldown": 2.2, "charge_mult": 1.6, "charge_range": 9.0, "charge_speed": 16.0, "charge_time": 0.45, "rest": 0.8, "windup": 0.7}
+attack = ExtResource("2")
+attack_cooldown = 4.0
+attack_range = 12.0
+attack_anim = "lash"

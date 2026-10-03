@@ -40,6 +40,8 @@
 		"pez": "anim_pez",
 		"antiguo": "anim_antiguo",
 		"antiguo_alado": "anim_antiguo",
-		"shoggoth_grande": "anim_fragmento"
+		"shoggoth_grande": "anim_fragmento",
+		"antiguo_guerrero": "anim_antiguo",
+		"antiguo_mutilado": "anim_antiguo"
 	}
 }

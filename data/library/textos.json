@@ -10,7 +10,10 @@
 		"antiguo_despierto": "El espécimen más grande de la mesa de Lake, el que tenía las alas intactas. Despertó el primero y despertó a los demás. Silba una música aguda, como de flauta, que se mete en la cabeza; cuando salta, la nieve tiembla.",
 		"shoggoth_esclavo": "Lo que los Antiguos criaron para construir sus ciudades: una masa negra, iridiscente, más grande que un hombre, que forma ojos y bocas donde los necesita. Se encoge un instante antes de embestir; ese instante es todo el aviso que da.",
 		"shoggoth_mimetico": "Danforth lo vio primero: un Antiguo que andaba torpe entre las rocas. No era un Antiguo. Los shoggoths imitan la forma y hasta la voz de sus amos. Cuando se acerca uno lo bastante, deja de fingir.",
-		"shoggoth_caverna": "Llena el túnel de pared a pared. Sus ojos se forman y se deshacen en la masa como burbujas en brea, y empuja delante de sí un viento que huele a abismo. No persigue: arrolla."
+		"shoggoth_caverna": "Llena el túnel de pared a pared. Sus ojos se forman y se deshacen en la masa como burbujas en brea, y empuja delante de sí un viento que huele a abismo. No persigue: arrolla.",
+		"antiguo_guerrero": "Los relieves de la ciudad los muestran en formación, con lanzas de piedra rematadas en cristal. Este no ha olvidado cómo se usan: amaga, se encoge y la estocada llega antes de que uno se aparte.",
+		"antiguo_mutilado": "Lo que quedó de los Antiguos que se enfrentaron a sus esclavos: sin la mitad de los tentáculos, con las alas rotas y el cuerpo cubierto del limo negro de los shoggoths, que va dejando a su paso.",
+		"guardian_ciudad": "Más alto que los otros, con la lanza más larga y la cresta intacta. Custodia la entrada de la ciudad muerta desde hace millones de años y no ha dejado de hacerlo porque la ciudad esté muerta."
 	},
 	"weapons": {
 		"webly": "Revólver del ejército británico, pesado y fiable. Su bala del .455 tumba a un hombre y hace retroceder a lo que no lo es.",

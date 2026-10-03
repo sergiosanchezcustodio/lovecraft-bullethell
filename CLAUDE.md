@@ -230,6 +230,12 @@ Léela al empezar cada sesión:
     - Evento final: "El shoggoth de la caverna", único, a 3,2× con embestida, glóbulos y aura.
     - Arena `tools/gen_arena_paso.py` → `data/arenas/paso.json`: barrera de roca (`tools/gen_barrera_roca.py` recolorea la de hielo), suelo de roca (`ground.colors` da colores al shader del suelo), rocas grandes en el borde sur y este, avenida de columnas talladas por los Antiguos, estalagmitas, cristales de hielo que brillan y dos faroles. Penumbra azulada; clima niebla. Atrezo en `tools/gen_atrezo_paso.py`. La primera roca parecía una calavera (redonda con dos huecos oscuros): ahora es de caras planas.
     - Con bot a ritmo normal cae hacia los 105 s (nivel 2: 210 s): la dificultad sube rápido; se ajusta en el 4.6. Tests en `tests/test_behaviors_4.gd`. Captura `shots/game_n3_050.0s.png`.
+  - **Hito 4.4 (nivel 4, la ciudad ciclópea): hecho, pendiente de tu revisión (03-10-2026).**
+    - Variantes en `gen_antiguo.py`: Antiguo guerrero (placas de pizarra, cresta y lanza de piedra con punta de cristal; élite de escalón 4 con estocada rápida: `ChargeBehavior` con `anim_windup`/`anim_move`/`anim_rest` configurables) y Antiguo mutilado (sin dos puntas de la estrella ni medio manojo de tentáculos, alas rotas, limo negro; `OozeBehavior` deja charcos `EnemyZone` que dañan a los jugadores).
+    - Evento final: "El guardián de la ciudad" (guerrero único a 1,7×, embestidas, onda de espinas y aura).
+    - Atrezo `tools/gen_atrezo_ciudad.py` (muros rotos de sillares con estrellas en relieve, arcos, murales de Antiguos, bloques y el muro ciclópeo de fondo a 8 voxels/m) y arena `tools/gen_arena_ciudad.py`: dos anillos de calles en ruinas alrededor de una plaza, suelo de losas grises con escarcha, ceniza. La piedra parda salía marrón con el sol cálido: ahora gris fría.
+    - Ojo en los generadores: en una lista por comprensión, `x, y, z` del bucle de fuera no son los de `k`. El mutilado perdía las alas enteras por eso.
+    - Captura `shots/game_n4_036.0s.png`; arena `shots/game_ciu_003.0s.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
