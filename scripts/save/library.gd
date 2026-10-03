@@ -58,7 +58,9 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				var id := String(l.id)
 				var known := _seen(save, "places", id) or (save != null and save.levels_won.has(id))
 				var p: Dictionary = parts[int(l.part)]
-				out.append(_e(id, String(l.name), known, text("places", id), "", "", null,
+				var map_path := "res://resources/maps/%s.png" % id
+				var map: Texture2D = load(map_path) if ResourceLoader.exists(map_path) else null
+				out.append(_e(id, String(l.name), known, text("places", id), "", "", map,
 					["Parte %d · %s (%s) · Nivel %d" % [int(l.part) + 1, p.title, p.place, int(l.number)],
 					"Criaturas: " + String(l.get("creatures", ""))], String(p.title)))
 		"people":

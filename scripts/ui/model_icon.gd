@@ -2,9 +2,39 @@ class_name ModelIcon
 extends RefCounted
 ## Imagen de un modelo voxel para los menús: lo renderiza una vez en un SubViewport (hijo de
 ## `host`) y devuelve la textura. "head" encuadra la cabeza (retratos de personajes);
-## "full", el modelo entero de tres cuartos (compañeros, iconos de la tienda).
+## "full", el modelo entero de tres cuartos (compañeros, iconos de la tienda), encajado con
+## margen según lo que ocupa visto desde la cámara. Con `fixed` > 0 (m de alto del encuadre),
+## todos a la misma escala y con los pies en el mismo sitio (bestiario de la Biblioteca).
 
-static func make(host: Node, model_name: String, mode: String = "full", px: int = 128) -> Texture2D:
+const FULL_ROT := Vector3(-25, 35, 0)
+const MARGIN := 1.12
+
+## Lo que ocupa el modelo visto con la cámara de "full" (m, lo mayor de ancho y alto).
+static func frame_size(model_name: String) -> float:
+	var m := VoxelBuilder.load_model("res://models/%s.json" % model_name)
+	var r := _projected(m, Basis.from_euler(FULL_ROT * PI / 180.0))
+	m.free()
+	return maxf(r.size.x, r.size.y)
+
+## Caja del modelo proyectada en el plano de la cámara (x a la derecha, y arriba).
+static func _projected(m: Node3D, basis: Basis) -> Rect2:
+	var r := Rect2()
+	var first := true
+	for mi: MeshInstance3D in m.get_meta("meshes"):
+		var xf := Transform3D()                    # de la malla a la raíz del modelo (cuelga de su parte)
+		var n: Node = mi
+		while n != m and n is Node3D:
+			xf = (n as Node3D).transform * xf
+			n = n.get_parent()
+		var b: AABB = xf * mi.get_aabb()
+		for i in 8:
+			var c := b.get_endpoint(i)
+			var p := Vector2(c.dot(basis.x), c.dot(basis.y))
+			r = Rect2(p, Vector2.ZERO) if first else r.expand(p)
+			first = false
+	return r
+
+static func make(host: Node, model_name: String, mode: String = "full", px: int = 128, fixed := 0.0) -> Texture2D:
 	var vp := SubViewport.new()
 	# se renderiza una sola vez: sin interpolación, o saldría a medio camino desde el origen
 	vp.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
@@ -23,15 +53,18 @@ static func make(host: Node, model_name: String, mode: String = "full", px: int 
 		cam.rotation_degrees = Vector3(-12, 25, 0)
 		cam.position = head + cam.transform.basis.z * 3.0
 	else:
-		var box := AABB()
-		var first := true
-		for mi: MeshInstance3D in m.get_meta("meshes"):
-			var b := m.transform.affine_inverse() * mi.global_transform * mi.get_aabb()   # en el espacio del modelo
-			box = b if first else box.merge(b)
-			first = false
-		cam.rotation_degrees = Vector3(-25, 35, 0)
-		cam.size = maxf(box.size.x, maxf(box.size.y, box.size.z)) * 0.95
-		cam.position = box.get_center() + cam.transform.basis.z * 4.0
+		cam.rotation_degrees = FULL_ROT
+		var bs := cam.transform.basis
+		var r := _projected(m, bs)
+		var c := r.get_center()
+		if fixed > 0.0:
+			cam.size = fixed
+			c.y = r.position.y + fixed * 0.5 * 0.9          # pies abajo, todos a la misma altura
+		else:
+			cam.size = maxf(r.size.x, r.size.y) * MARGIN
+		var far := 0.0
+		for mi: MeshInstance3D in m.get_meta("meshes"): far = maxf(far, mi.get_aabb().size.length())
+		cam.position = bs.x * c.x + bs.y * c.y + bs.z * (far + 4.0)
 	vp.add_child(cam)
 	# iluminación de estudio: luz principal cálida, relleno frío suave y poco ambiente. Con un
 	# ambiente gris fuerte y una sola luz, el modelo salía plano y lavado, como tras una niebla.

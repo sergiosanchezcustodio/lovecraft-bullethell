@@ -213,7 +213,18 @@ func _show_entry(k: int) -> void:
 	var e: Dictionary = _entries[k]
 	var known: bool = e.known
 	var tex := _image(e)
-	if tex != null:
+	if _tome == "places":                          # el mapa, a lo ancho de la página
+		if tex != null and known:
+			var map := TextureRect.new()
+			map.texture = tex
+			var h := 360.0                         # lo que deja libre el texto sin que crezca la página
+			map.custom_minimum_size = Vector2(h * tex.get_width() / tex.get_height(), h)
+			map.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			map.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			map.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			_right.add_child(map)
+		tex = null
+	elif tex != null:
 		var frame := PanelContainer.new()
 		frame.add_theme_stylebox_override("panel", UiKit.panel(Color(0.3, 0.22, 0.12, 0.12), Color(INK, 0.35), 4))
 		frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -262,8 +273,19 @@ func _image(e: Dictionary) -> Texture2D:
 	if e.icon != null: return e.icon
 	if String(e.model) == "": return null
 	var key := "%s:%s" % [e.model, e.mode]
-	if not _icons.has(key): _icons[key] = ModelIcon.make(self, String(e.model), String(e.mode), IMAGE_PX)
+	if not _icons.has(key):
+		var fixed := _bestiary_scale() if _tome == "enemies" else 0.0
+		_icons[key] = ModelIcon.make(self, String(e.model), String(e.mode), IMAGE_PX, fixed)
 	return _icons[key]
+
+## Bestiario a escala: el encuadre lo marca el enemigo más grande.
+var _scale := 0.0
+func _bestiary_scale() -> float:
+	if _scale <= 0.0:
+		for e in _entries:
+			if String(e.model) != "": _scale = maxf(_scale, ModelIcon.frame_size(String(e.model)))
+		_scale *= ModelIcon.MARGIN
+	return _scale
 
 func _rule() -> Control:
 	var r := ColorRect.new()
