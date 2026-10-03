@@ -143,6 +143,11 @@ func _ready() -> void:
 	reset_physics_interpolation.call_deferred()      # no interpolar desde el origen al aparecer
 
 func _physics_process(delta: float) -> void:
+	var t0 := Prof.start()
+	_physics_process_step(delta)
+	Prof.stop("jugadores_fisica", t0)
+
+func _physics_process_step(delta: float) -> void:
 	if health <= 0.0:
 		_downed_step(delta)
 		return
@@ -290,6 +295,11 @@ func _downed_visual(delta: float) -> void:
 	_down_mat.set_shader_parameter("revive", clampf(revive_progress / rules.revive_time, 0.0, 1.0))
 
 func _process(delta: float) -> void:
+	var t0 := Prof.start()
+	_process_step(delta)
+	Prof.stop("jugadores_anim", t0)
+
+func _process_step(delta: float) -> void:
 	if health <= 0.0:
 		_downed_visual(delta)
 		return

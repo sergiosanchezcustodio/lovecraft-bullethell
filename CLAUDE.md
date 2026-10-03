@@ -205,6 +205,7 @@ Léela al empezar cada sesión:
     - Cuerpo: abrigo de nieve, chubasquero, chaleco, vestido y bata (más holgada, para tapar el estetoscopio de Whipple). Pies: botas esquimales y zapatos de tacón.
     - El vestuario entero cuesta ~49.000 $ (unas 9 h); el test de la tienda lo cuenta aparte de las ~20 h del resto.
     - Hojas `shots/*_v2a.png` a `*_v2e.png` (prendas puestas) y `shots/vest_sel_crop.png` (selección con las cuatro filas).
+  - **Hito 2.17 (cierre), prueba de carga con 4 jugadores hecha (03-10-2026):** 65-69 FPS de media y 37-41 en el 1 % peor con 150 enemigos y 1.000 balas (con 1 jugador, 90 y 53); partida normal con 4 jugadores, 114 y 82. Detalle en `docs/RENDIMIENTO.md`. **Falta tu prueba con varios mandos** para cerrar la fase 2.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

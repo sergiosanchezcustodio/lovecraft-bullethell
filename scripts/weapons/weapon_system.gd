@@ -50,6 +50,11 @@ func get_weapon(id: StringName) -> Weapon:
 	return null
 
 func _physics_process(delta: float) -> void:
+	var t0 := Prof.start()
+	_physics_process_step(delta)
+	Prof.stop("armas", t0)
+
+func _physics_process_step(delta: float) -> void:
 	if player.health <= 0.0: return
 	for i in range(_pending.size() - 1, -1, -1):
 		var p := _pending[i]

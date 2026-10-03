@@ -175,3 +175,17 @@ El resto es trabajo del motor: dibujo, transformaciones de unos 1.000 nodos y f�
 - **Media:** igual que antes.
 - **1 % peor:** empeora (antes, 86 FPS) por el coste de interpolar unos 150 enemigos, pero sigue por encima de 60 en esta prueba extrema.
 - **Suavidad** (`jitter=true`): la variación de la velocidad en pantalla pasa de 1,00 (vibración) a 0,03.
+
+## Cooperativo con 4 jugadores (hito 2.17, 03-10-2026)
+
+Mismo equipo, Forward+, 1920×1080 sin vsync. J1 y 3 bots (`bot=circle bots=3 god=true autopick=true`), con `prof=true`.
+
+| Prueba | Media | 1 % peor | Llamadas de dibujo | Primitivas |
+|---|---|---|---|---|
+| Carga, 1 jugador (150 enemigos, 1.000 balas) | 11,1 ms (90 FPS) | 18,8 ms (53 FPS) | 606 | 8,1 M |
+| Carga, 4 jugadores (150 enemigos, 1.000 balas) | 14,5-15,5 ms (65-69 FPS) | 24-27 ms (37-41 FPS) | 813-863 | 8,6-9,0 M |
+| Partida normal del nivel 1, 4 jugadores, 45 s | 8,8 ms (114 FPS) | 12,2 ms (82 FPS) | 539 | 5,6 M |
+
+- Con 4 jugadores, la prueba de carga cuesta unos 4 ms más por fotograma. No hay un sistema culpable: la física de los enemigos sube de 2,0 a 3,2 ms (cada enemigo recorre los jugadores para elegir objetivo y comprobar el contacto) y las balas de 1,1 a 1,9 ms (cuatro jugadores disparando). Jugadores, armas y HUD suman menos de 1 ms. El resto es dibujo: la cámara se abre para que quepan todos y se ven más escenario y más enemigos a la vez.
+- La prueba de carga es extrema (150 enemigos y 1.000 balas a la vez). En la partida normal sobra margen. Si en un equipo de gama media la carga con 4 jugadores baja de 60, lo primero sería unir caras en `VoxelBuilder` (8-9 M de primitivas) y rebajar la resolución de la tienda y la cabaña del campamento.
+- Nuevas secciones del perfil: `jugadores_fisica`, `jugadores_anim`, `armas`, `hud` y `partida`.

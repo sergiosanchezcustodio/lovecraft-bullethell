@@ -53,6 +53,11 @@ func _ready() -> void:
 	top.resized.connect(func() -> void: top.position.x = (get_viewport().get_visible_rect().size.x - top.size.x) * 0.5)
 
 func _process(_delta: float) -> void:
+	var t0 := Prof.start()
+	_process_step(_delta)
+	Prof.stop("hud", t0)
+
+func _process_step(_delta: float) -> void:
 	for pp in panels: pp.refresh()
 	if money.is_valid(): _money_lbl.text = "%s $" % MenuKit.money(int(money.call()))
 	if director != null:

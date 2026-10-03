@@ -620,6 +620,11 @@ func _record_seen(save: SaveData) -> void:
 		save.mark_seen("enemies", String(e.data.id))
 
 func _process(delta: float) -> void:
+	var t0 := Prof.start()
+	_process_step(delta)
+	Prof.stop("partida", t0)
+
+func _process_step(delta: float) -> void:
 	_t += delta
 	_ach_t += delta
 	if _ach_t >= 1.0 and not _ended:
