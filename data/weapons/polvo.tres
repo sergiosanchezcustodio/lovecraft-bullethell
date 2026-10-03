@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"polvo"
 display_name = "Polvo de Ibn-Ghazi"
+support = true
 description = "Esparce una nube sobre el grupo más denso: dentro, los enemigos van un 40 % más lentos y hacen un 30 % menos de daño. Cuesta cordura."
 category = 2
 delivery = 10

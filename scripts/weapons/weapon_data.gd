@@ -47,6 +47,7 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var id := &"revolver"
 @export var display_name := "Revólver .38"
 @export_multiline var description := ""      ## qué hace, en una frase (descripciones emergentes)
+@export var support := false                ## de puro apoyo (bengala, red...): fuera de las reglas de daño (DamageRules)
 @export var icon: Texture2D                  ## imagen del arma (ficha, HUD); sin ella, un hueco
 @export var delivery := Delivery.BULLET
 @export var targeting := Targeting.NEAREST

@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = &"red"
 display_name = "Red de pesca"
+support = true
 description = "Lanza una red sobre el grupo más denso: los de debajo se quedan inmóviles 2 segundos. Las élites solo se frenan."
 category = 0
 delivery = 1
