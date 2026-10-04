@@ -15,7 +15,7 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 	var to := target.global_position - e.global_position
 	to.y = 0.0
 	var pulse := 0.2 + 1.3 * maxf(0.0, sin(e.anim_t * TAU))    # empuja en la fase de estirarse
-	return to.normalized() * e.data.move_speed * pulse
+	return shape_path(e, toward(e, target), e.data.move_speed * pulse)
 
 func play_attack_anim(e: Enemy, anim: String) -> void:
 	super.play_attack_anim(e, anim)

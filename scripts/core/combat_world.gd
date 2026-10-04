@@ -11,6 +11,7 @@ var bullets: BulletManager
 ## Estadísticas de la partida por etiqueta de arma ("J1:webly"): [daño hecho, enemigos abatidos].
 var stats := {}
 var breakables: Array[Node3D] = []           ## objetos rompibles: se golpean, no se apuntan
+var flow: FlowField                          ## mapa de flujo hacia los jugadores (rodear el decorado)
 var freeze_t := 0.0                          ## s de tiempo congelado (recompensa): enemigos y sus balas quietos
 var fx: Node3D                               ## efectos visuales (explosiones, avisos)
 var players: Array[Player] = []
@@ -44,6 +45,15 @@ func remove_enemy(e: Node3D) -> void:
 func _physics_process(delta: float) -> void:
 	if freeze_t > 0.0: freeze_t -= delta
 	rebuild_grid()
+	if flow == null and obstacles != null and obstacles.has_mask() and not OS.get_cmdline_user_args().has("noflow=true"):
+		flow = FlowField.new().setup(obstacles, bounds)
+	if flow != null:
+		var t0 := Prof.start()
+		var targets: Array[Vector2] = []
+		for p in players:
+			if p.health > 0.0: targets.append(Vector2(p.global_position.x, p.global_position.z))
+		flow.tick(delta, targets)
+		Prof.stop("flujo", t0)
 
 func freeze_time(seconds: float) -> void:
 	freeze_t = maxf(freeze_t, seconds)

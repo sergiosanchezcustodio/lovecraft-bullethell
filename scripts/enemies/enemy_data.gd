@@ -32,6 +32,10 @@ extends Resource
 ## Comportamiento de movimiento: "chase" (persigue), "crawl" (persigue a tirones),
 ## "blind" (va hacia donde oyó al jugador y carga), "stalk" (ronda y salta).
 @export var movement := &"chase"
+## Trayectoria (04-10-2026): "" recta; "zigzag" vaivén lateral; "hop" a saltos con pausas;
+## "flutter" revolotea (ondula y cambia de lado); "circle" se acerca en espiral. Se suma a la
+## dirección hacia el jugador (EnemyBehavior.shape_path).
+@export var path := &""
 @export var params := {}                   ## parámetros del comportamiento
 @export_group("Ataque a distancia")
 @export var attack: BulletPattern          ## patrón (o null)

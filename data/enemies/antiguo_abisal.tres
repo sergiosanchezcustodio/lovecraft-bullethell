@@ -21,6 +21,7 @@ contact_mental = 6.0
 aura_radius = 3.0
 aura_drain = 1.0
 movement = &"chase"
+path = &"flutter"
 attack = ExtResource("2")
 attack_cooldown = 5.0
 attack_range = 7.0

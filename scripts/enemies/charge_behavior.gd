@@ -47,7 +47,7 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 		_cd = float(e.data.param("charge_cooldown", 3.5))
 		_enter(State.WINDUP)
 		return Vector3.ZERO
-	return to.normalized() * e.data.move_speed
+	return toward(e, target) * e.data.move_speed
 
 func contact_damage(e: Enemy) -> Damage:
 	var d := super.contact_damage(e)

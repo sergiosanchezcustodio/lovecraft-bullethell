@@ -14,13 +14,13 @@ func update(e: Enemy, target: Player, _delta: float) -> Vector3:
 		if target == null: return Vector3.ZERO
 		var to := target.global_position - e.global_position
 		to.y = 0.0
-		if to.length() < float(e.data.param("reveal_range", 5.0)) or e.health < _hp0: _reveal(e)
-		else: return to.normalized() * e.data.move_speed * 0.6
+		if to.length() < float(e.data.param("reveal_range", 5.0)) or e.health < _hp0 or e._spawn_t > float(e.data.param("reveal_after", 9.0)): _reveal(e)   # no espera para siempre: busca hacer daño
+		else: return toward(e, target) * e.data.move_speed * 0.6
 	e.anim = "crawl"
 	if target == null: return Vector3.ZERO
 	var t := target.global_position - e.global_position
 	t.y = 0.0
-	return t.normalized() * e.data.move_speed * float(e.data.param("speed_mult", 1.6))
+	return toward(e, target) * e.data.move_speed * float(e.data.param("speed_mult", 1.6))
 
 func _reveal(e: Enemy) -> void:
 	revealed = true

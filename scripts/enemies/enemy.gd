@@ -19,7 +19,9 @@ var runner: PatternRunner
 var hit_radius := 0.5
 var health := 1.0
 var health_scale := 1.0                  ## multiplicador de vida (cooperativo): vida máxima = data.max_health × esto
-var shield_t := 0.0                      ## s de invulnerabilidad (cambio de fase de un jefe)
+var shield_t := 0.0
+var _path_t := 0.0                      ## s hasta volver a mirar si hay línea libre al jugador
+var _path_clear := true                      ## s de invulnerabilidad (cambio de fase de un jefe)
 var velocity := Vector3.ZERO
 var facing := Vector3(0, 0, 1)
 var anim := "walk"

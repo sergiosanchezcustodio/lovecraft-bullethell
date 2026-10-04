@@ -20,6 +20,7 @@ money = 2
 contact_physical = 4.0
 contact_mental = 3.0
 movement = &"crawl"
+path = &"hop"
 attack = ExtResource("2")
 attack_cooldown = 9.0
 attack_range = 6.5

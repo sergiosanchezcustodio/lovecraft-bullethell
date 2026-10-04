@@ -57,6 +57,8 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 		e.anim = "idle"                                   # escucha
 		return Vector3.ZERO
 	e.anim = "walk"
+	if target != null and e.world.flow != null and not e.world.flow.clear_line(Vector2(e.global_position.x, e.global_position.z), Vector2(heard.x, heard.z)):
+		return toward(e, target) * e.data.move_speed               # algo en medio: rodea
 	return to.normalized() * e.data.move_speed
 
 func _enter(s: State) -> void:

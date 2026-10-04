@@ -20,3 +20,4 @@ money = 3
 contact_physical = 8.0
 contact_mental = 2.0
 movement = &"chase"
+path = &"zigzag"

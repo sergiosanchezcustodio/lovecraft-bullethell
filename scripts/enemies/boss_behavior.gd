@@ -36,7 +36,7 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 			if target == null: return Vector3.ZERO
 			var to := target.global_position - e.global_position
 			to.y = 0.0
-			return to.normalized() * e.data.move_speed * 0.35       # avanza despacio
+			return toward(e, target) * e.data.move_speed * 0.35       # avanza despacio
 		3:
 			if _fire <= 0.0 and target != null:
 				_fire = float(e.data.param("phase3_every", 2.2))
