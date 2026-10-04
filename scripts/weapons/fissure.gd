@@ -1,5 +1,6 @@
 class_name Fissure
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Martillo de geólogo: el golpe abre en el suelo una grieta que avanza en línea recta a
 ## `speed` m/s hasta `length` m. A su paso, cada enemigo a menos de `half_width` recibe el
 ## daño una vez y queda aturdido `stun_s` s. Visual: la raja oscura se va dibujando y brotan
@@ -33,6 +34,7 @@ func setup(p_world: CombatWorld, origin: Vector3, p_dir: Vector3, p_length: floa
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	_crack_mat = StandardMaterial3D.new()
 	_crack_mat.albedo_color = Color(0.08, 0.1, 0.14)
 	_crack_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -46,6 +48,7 @@ func tip() -> float:
 	return minf(_t * speed, length)
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	var reach := tip()
 	if _t * speed <= length + 0.01:
@@ -66,6 +69,7 @@ func _physics_process(delta: float) -> void:
 	if _t > length / speed + SHARD_LIFE + FADE: queue_free()
 
 func _process(_delta: float) -> void:
+	Damage.ctx = _wtag
 	var reach := tip()
 	while _next <= reach and _next <= length:           # la raja y sus esquirlas, según avanza
 		var side := randf_range(-0.25, 0.25)

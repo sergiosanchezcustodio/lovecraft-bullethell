@@ -1,5 +1,6 @@
 class_name FlameJet
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Chorro del Flammenwerfer: un cono de fuego delante del personaje durante `duration` s.
 ## Sigue al jugador y a la dirección elegida al disparar. Daña a lo que está dentro del
 ## cono cada 0,15 s y va dejando fuego en el suelo (DamageZone) en la punta del chorro.
@@ -30,6 +31,7 @@ func setup(p: Player, p_world: CombatWorld, p_dir: Vector3, p_length: float, spr
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	_parts = GPUParticles3D.new()
 	_parts.amount = 90
 	_parts.lifetime = length / 9.0
@@ -83,6 +85,7 @@ func _place() -> void:
 	_light.position = Vector3(0, 0, length * 0.5)
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	if _t >= life:
 		_parts.emitting = false
@@ -106,5 +109,6 @@ func _physics_process(delta: float) -> void:
 		world.fx.add_child(DamageZone.new().setup(world, WeaponData.Zone.FIRE, tip, zone_r, zone_t, zone_dps, 0.0, bonus))
 
 func _process(_delta: float) -> void:
+	Damage.ctx = _wtag
 	_place()
 	_light.light_energy = (1.3 + 0.5 * sin(_t * 29.0)) * (1.0 - smoothstep(life - 0.1, life, _t))

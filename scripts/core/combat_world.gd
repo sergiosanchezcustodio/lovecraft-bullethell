@@ -8,6 +8,8 @@ extends Node3D
 ##   var hit_radius: float, func take_damage(d: Damage) -> void, func is_alive() -> bool
 
 var bullets: BulletManager
+## Estadísticas de la partida por etiqueta de arma ("J1:webly"): [daño hecho, enemigos abatidos].
+var stats := {}
 var fx: Node3D                               ## efectos visuales (explosiones, avisos)
 var players: Array[Player] = []
 var enemies: Array[Node3D] = []
@@ -78,6 +80,30 @@ func strongest_enemy(pos: Vector3, max_r: float) -> Node3D:
 	return best
 
 ## Objetivos vivos que tocan un círculo (para explosiones y áreas).
+func record_damage(tag: StringName, amount: float) -> void:
+	if tag == &"" or amount <= 0.0: return
+	var s: Array = stats.get(tag, [0.0, 0])
+	s[0] += amount
+	stats[tag] = s
+
+func record_kill(tag: StringName) -> void:
+	if tag == &"": return
+	var s: Array = stats.get(tag, [0.0, 0])
+	s[1] += 1
+	stats[tag] = s
+
+## Daño y abatidos de un jugador (índice 0..3): {arma: [daño, abatidos]} y los totales.
+func stats_of(index: int) -> Dictionary:
+	var prefix := "J%d:" % (index + 1)
+	var out := {}
+	var total := [0.0, 0]
+	for k in stats:
+		var ks := String(k)
+		if not ks.begins_with(prefix): continue
+		out[ks.substr(prefix.length())] = stats[k]
+		total[0] += stats[k][0]; total[1] += stats[k][1]
+	return {"weapons": out, "total": total}
+
 func enemies_in_circle(pos: Vector3, r: float) -> Array[Node3D]:
 	var out: Array[Node3D] = []
 	for id in grid.query_circle(Vector2(pos.x, pos.z), r):

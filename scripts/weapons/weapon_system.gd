@@ -61,6 +61,10 @@ func evolve(w: Weapon) -> void:
 	w.level = 1
 	w.timer = 0.2
 
+## Etiqueta de las estadísticas de un arma: "J1:webly".
+func tag_of(w: Weapon) -> StringName:
+	return StringName("J%d:%s" % [player.index + 1, w.data.id])
+
 func get_weapon(id: StringName) -> Weapon:
 	for w in weapons:
 		if w.data.id == id: return w
@@ -77,11 +81,13 @@ func _physics_process_step(delta: float) -> void:
 		var p := _pending[i]
 		p.t -= delta
 		if p.t <= 0.0:
+			Damage.ctx = tag_of(p.w)
 			_spawn_bullet(p.w, p.dir, p.get("k", 1.0))
 			_pending.remove_at(i)
 	for w in weapons:
 		w.timer -= delta
 		if w.timer > 0.0: continue
+		Damage.ctx = tag_of(w)                   # lo que cree este disparo daña en nombre de esta arma
 		if not _fire(w): continue                # el machete espera a tener a alguien cerca
 		w.timer = w.stat("cooldown")
 

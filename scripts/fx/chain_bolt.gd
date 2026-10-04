@@ -1,5 +1,6 @@
 class_name ChainBolt
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Rayo de la Bobina Tesla: tramos en zigzag, blancos azulados, entre los puntos por los que
 ## ha saltado; parpadean y se apagan en un instante. Solo visual: el daño lo aplica el arma.
 
@@ -18,6 +19,7 @@ func setup(points: Array[Vector3]) -> ChainBolt:
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	_mat = StandardMaterial3D.new()
 	_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -59,6 +61,7 @@ func _seg(a: Vector3, b: Vector3) -> void:
 	_segs.append(mi)
 
 func _process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	if fmod(_t, 0.07) < delta: _rebuild()
 	var k := 1.0 - _t / LIFE

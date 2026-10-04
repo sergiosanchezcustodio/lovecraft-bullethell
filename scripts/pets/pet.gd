@@ -121,6 +121,7 @@ func popup(text: String, color: Color) -> void:
 	tw.tween_callback(l.queue_free)
 
 func _physics_process(delta: float) -> void:
+	if owner_player != null: Damage.ctx = StringName("J%d:mascota" % (owner_player.index + 1))
 	if not is_instance_valid(owner_player): return
 	cooldown -= delta
 	target = null

@@ -1,5 +1,6 @@
 class_name Sigil
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Signo Arcano: un círculo violeta trazado en el suelo donde estaba el personaje. Mientras
 ## dura, cada `interval` s daña a los enemigos de dentro y los empuja hacia fuera, y las balas
 ## enemigas que entran pasan a ir a `bullet_slow` de su velocidad (una de las dos únicas armas
@@ -32,6 +33,7 @@ func setup(p_world: CombatWorld, pos: Vector3, p_radius: float, p_life: float, p
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	_mat_fill = _disc(true, 0.05)
 	_mat_ring = _disc(false, 0.07)
 	var rm := StandardMaterial3D.new()
@@ -71,6 +73,7 @@ func _disc(fill: bool, y: float) -> ShaderMaterial:
 	return m
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	if _t >= life:
 		if _t >= life + FADE: queue_free()
@@ -87,6 +90,7 @@ func _physics_process(delta: float) -> void:
 		e.take_damage(d)
 
 func _process(_delta: float) -> void:
+	Damage.ctx = _wtag
 	var k := clampf(_t / 0.25, 0.0, 1.0) * (1.0 - smoothstep(life, life + FADE, _t))
 	_mat_fill.set_shader_parameter("color", Color(COLOR * 0.5, 0.22 * k))
 	_mat_ring.set_shader_parameter("color", Color(COLOR, 0.9 * k))

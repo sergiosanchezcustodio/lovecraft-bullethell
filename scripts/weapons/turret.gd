@@ -1,5 +1,6 @@
 class_name Turret
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Ametralladora Lewis en trípode: se queda en el suelo donde la deja el personaje y durante
 ## `life` s dispara sola al enemigo más cercano cada `interval` s, girando hacia él. Voxel a
 ## bloques: tres patas, cajón del mecanismo, cañón con camisa de refrigeración y el cargador
@@ -33,6 +34,7 @@ func setup(p_world: CombatWorld, pos: Vector3, p_life: float, p_interval: float,
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	for k in 3:                                      # trípode
 		var a := TAU * k / 3.0
 		var leg := _box(Vector3(0.05, 0.62, 0.05), WOOD, self)
@@ -72,6 +74,7 @@ func _box(size: Vector3, c: Color, parent: Node3D) -> MeshInstance3D:
 	return mi
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	if _t >= life:
 		if _t >= life + FADE: queue_free()
@@ -92,6 +95,7 @@ func _physics_process(delta: float) -> void:
 	_flash_t = 0.05
 
 func _process(delta: float) -> void:
+	Damage.ctx = _wtag
 	var grow := clampf(_t / 0.2, 0.01, 1.0) * (1.0 - smoothstep(life, life + FADE, _t))
 	scale = Vector3.ONE * maxf(grow, 0.01)
 	_head.rotation.y = lerp_angle(_head.rotation.y, _aim, 1.0 - exp(-18.0 * delta))

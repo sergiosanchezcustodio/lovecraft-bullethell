@@ -12,10 +12,16 @@ var source: Object = null
 ## Multiplicador de daño contra enemigos con ciertas etiquetas (rasgos: Legrasse contra
 ## "humana"). Lo pone el arma del jugador y lo aplica el enemigo.
 var bonus := {}
+## Arma que lo causa, para las estadísticas de la ficha: "J1:webly", "J2:mascota"… Sale del
+## contexto `ctx` al crearse: WeaponSystem lo pone al disparar cada arma y cada efecto (bala,
+## zona, onda…) guarda el suyo al crearse y lo vuelve a poner antes de dañar.
+var tag := &""
+static var ctx := &""
 
 func _init(p_physical: float = 0.0, p_mental: float = 0.0) -> void:
 	physical = p_physical
 	mental = p_mental
+	tag = ctx
 
 func kind() -> Kind:
 	if physical > 0.0 and mental > 0.0: return Kind.MIXED
@@ -27,6 +33,7 @@ func scaled(k: float) -> Damage:
 	d.knockback = knockback * k
 	d.source = source
 	d.bonus = bonus
+	d.tag = tag
 	return d
 
 ## Colores del lenguaje visual de los daños (balas, avisos, barras).

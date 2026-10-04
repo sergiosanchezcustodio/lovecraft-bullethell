@@ -1,5 +1,6 @@
 class_name Reanimated
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Enemigo levantado por el suero de Herbert West: su propio modelo, con un tinte verde
 ## enfermizo, que durante `life` s persigue al enemigo más cercano y le hace daño al tocarlo.
 ## No recibe daño ni lo buscan los enemigos (no está en CombatWorld). Al acabar se desmorona.
@@ -31,6 +32,7 @@ func setup(p_world: CombatWorld, p_data: EnemyData, pos: Vector3, facing: Vector
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	_visual = Node3D.new()
 	_visual.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	_visual.top_level = true
@@ -44,6 +46,7 @@ func _ready() -> void:
 	for mi: MeshInstance3D in _model.get_meta("meshes"): mi.material_overlay = m
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	if _t >= life:
 		if _t >= life + FADE: queue_free()
@@ -65,6 +68,7 @@ func _physics_process(delta: float) -> void:
 		hits += 1
 
 func _process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_visual.global_position = get_global_transform_interpolated().origin
 	_visual.rotation.y = atan2(_facing.x, _facing.z)
 	var sink := smoothstep(life, life + FADE, _t)                       # se desmorona hundiéndose

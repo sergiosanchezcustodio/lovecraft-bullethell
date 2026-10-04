@@ -37,7 +37,8 @@ var _style := PackedByteArray()
 var _pierce := PackedInt32Array()
 var _push := PackedFloat32Array()            ## empuje del impacto (multiplicador)
 var _bonus := PackedInt32Array()             ## índice en bonus_sets (-1 = sin rasgo)
-var _split := PackedInt32Array()             ## al morir se divide en tantos proyectiles (fuegos artificiales)
+var _split := PackedInt32Array()
+var _tag: Array[StringName] = []          ## arma de cada bala (estadísticas de la ficha)             ## al morir se divide en tantos proyectiles (fuegos artificiales)
 var _home := PackedFloat32Array()            ## giro máximo hacia el enemigo más cercano (rad/s; 0 = recta)
 var _effect := PackedByteArray()             ## Effect al impactar
 var _effect_val := PackedFloat32Array()
@@ -60,7 +61,7 @@ func _init() -> void:
 	_radius.resize(MAX_BULLETS); _size.resize(MAX_BULLETS); _life.resize(MAX_BULLETS)
 	_age.resize(MAX_BULLETS); _phys.resize(MAX_BULLETS); _ment.resize(MAX_BULLETS)
 	_team.resize(MAX_BULLETS); _style.resize(MAX_BULLETS); _pierce.resize(MAX_BULLETS)
-	_last_hit.resize(MAX_BULLETS); _push.resize(MAX_BULLETS); _bonus.resize(MAX_BULLETS); _split.resize(MAX_BULLETS)
+	_last_hit.resize(MAX_BULLETS); _push.resize(MAX_BULLETS); _bonus.resize(MAX_BULLETS); _split.resize(MAX_BULLETS); _tag.resize(MAX_BULLETS)
 	_home.resize(MAX_BULLETS); _effect.resize(MAX_BULLETS); _effect_val.resize(MAX_BULLETS); _slowed.resize(MAX_BULLETS)
 	_owner.resize(MAX_BULLETS)
 
@@ -132,6 +133,7 @@ func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, 
 	_home[i] = homing
 	_effect[i] = effect
 	_effect_val[i] = effect_val
+	_tag[i] = damage.tag
 	_slowed[i] = 0
 	_owner[i] = owner
 	count += 1
@@ -247,6 +249,7 @@ func _collide_player_bullet(i: int) -> bool:
 		var t := world.target_at(id)
 		if t.get_instance_id() == _last_hit[i] or not t.is_alive(): continue
 		var d := Damage.new(_phys[i], _ment[i])
+		d.tag = _tag[i]
 		d.knockback = _vel[i].normalized() * _push[i]
 		if _bonus[i] >= 0: d.bonus = bonus_sets[_bonus[i]]
 		t.take_damage(d)
@@ -272,6 +275,7 @@ func _hits_mate(i: int) -> bool:
 func _burst(i: int) -> void:
 	var n := _split[i]
 	var d := Damage.new(_phys[i] * 0.5, _ment[i] * 0.5)
+	d.tag = _tag[i]
 	var spd := maxf(_vel[i].length() * 0.6, 6.0)
 	var a0 := randf() * TAU
 	for k in n:
@@ -286,7 +290,7 @@ func _remove(i: int) -> void:
 		_life[i] = _life[last]; _age[i] = _age[last]; _phys[i] = _phys[last]; _ment[i] = _ment[last]
 		_team[i] = _team[last]; _style[i] = _style[last]; _pierce[i] = _pierce[last]; _last_hit[i] = _last_hit[last]
 		_push[i] = _push[last]; _bonus[i] = _bonus[last]; _split[i] = _split[last]
-		_home[i] = _home[last]; _effect[i] = _effect[last]; _effect_val[i] = _effect_val[last]; _slowed[i] = _slowed[last]
+		_home[i] = _home[last]; _effect[i] = _effect[last]; _effect_val[i] = _effect_val[last]; _slowed[i] = _slowed[last]; _tag[i] = _tag[last]
 		_owner[i] = _owner[last]
 	count = last
 

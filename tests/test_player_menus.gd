@@ -71,14 +71,11 @@ func test_la_ficha_pasa_sus_tres_paginas() -> void:
 	var p := _player(0)
 	var s := PlayerMenus.Sheet.new(p, game)
 	add_child_autofree(s)
-	assert_eq(s.page, 0)
+	s.paged = true                                # cooperativo: una columna por página
 	s.turn(1)
 	assert_eq(s.page, 1)
-	s.turn(1)
-	s.turn(1)
+	s.turn(1); s.turn(1)
 	assert_eq(s.page, 0, "vuelve a la primera")
-	s.turn(-1)
-	assert_eq(s.page, 2)
 
 func test_el_mapa_mira_como_la_camara() -> void:
 	var right := PlayerMotor.screen_to_world(Vector2(1, 0))

@@ -1,5 +1,6 @@
 class_name ThrownExplosive
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Objeto lanzado en arco (dinamita, granada de palo, Molotov, frasco de ácido, bengala).
 ## Al caer, según su configuración (`configure`):
 ## - con radio de explosión: arde la mecha (con un anillo en el suelo que muestra el radio)
@@ -55,6 +56,7 @@ const LOOKS := {
 }
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	position = start
 	_stick = MeshInstance3D.new()                    # contenedor de las piezas (gira en vuelo)
 	add_child(_stick)
@@ -77,6 +79,7 @@ func _ready() -> void:
 	add_child(_spark)
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	if _t < flight:
 		var u := _t / flight

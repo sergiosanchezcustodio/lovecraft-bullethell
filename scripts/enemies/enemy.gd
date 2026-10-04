@@ -226,7 +226,10 @@ func take_damage(d: Damage) -> void:
 		_stasis_store += d.physical * k
 		_flash = 0.07
 		return
+	var dealt := minf(d.physical * k, maxf(health, 0.0))
 	health -= d.physical * k
+	world.record_damage(d.tag, dealt)              # estadísticas de la ficha
+	if health <= 0.0: world.record_kill(d.tag)
 	_flash = 0.07
 	_knock += Vector3(d.knockback.x, 0, d.knockback.z) * (2.5 if not data.elite else 0.6)
 	if health <= 0.0: _die()

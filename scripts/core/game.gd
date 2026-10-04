@@ -324,7 +324,9 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 func _spawn_pet(id: String, owner: Player) -> void:
 	var pd: PetData = load("res://data/pets/%s.tres" % id)
 	if pd == null: return
-	add_child(Pet.new().setup(pd, owner, world, self))
+	var pet := Pet.new().setup(pd, owner, world, self)
+	owner.pet = pet                                  # la ficha lo enseña
+	add_child(pet)
 
 ## ¿Lo maneja la máquina? (elige sola sus mejoras)
 func _is_bot(q: Player) -> bool:
@@ -500,6 +502,7 @@ func _on_level_completed() -> void:
 	earn(level.money_bonus)                          # bono por superar el nivel
 	if not _someone_fell: Achievements.add(Saves.current, "flawless")
 	if args.get_bool("log"): print("NIVEL SUPERADO t=%d s  abatidos=%d  dólares=%d" % [director.time, kills, run_money])
+	if args.get_bool("log"): for q in players: print("ESTADISTICAS J%d %s" % [q.index + 1, world.stats_of(q.index)])
 	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)):
 		Saves.current.levels_won.append(String(level.id))
 	_check_achievements.call_deferred()              # después de contar la baja del enemigo final (élite)

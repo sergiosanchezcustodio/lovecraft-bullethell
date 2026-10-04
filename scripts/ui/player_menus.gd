@@ -82,145 +82,316 @@ func close_all() -> bool:
 ## Solitario: centrado. Cooperativo: en el cuadrante del jugador, sin tapar su panel.
 func _place(c: Control, p: Player) -> void:
 	if solo():
-		c.anchor_left = 0.33; c.anchor_right = 0.67; c.anchor_top = 0.16; c.anchor_bottom = 0.86
+		if c is Sheet:
+			c.anchor_left = 0.08; c.anchor_right = 0.92; c.anchor_top = 0.08; c.anchor_bottom = 0.92
+		else:
+			c.anchor_left = 0.33; c.anchor_right = 0.67; c.anchor_top = 0.16; c.anchor_bottom = 0.86
 		return
 	var qx := p.index % 2
 	var qy := p.index / 2
+	if c is Sheet:                                # la ficha, a lo alto de su lado (se lee)
+		c.anchor_left = qx * 0.5 + 0.1; c.anchor_right = qx * 0.5 + 0.4
+		c.anchor_top = 0.13; c.anchor_bottom = 0.87
+		return
 	c.anchor_left = qx * 0.5 + 0.03
 	c.anchor_right = qx * 0.5 + 0.47
 	c.anchor_top = 0.16 if qy == 0 else 0.52
 	c.anchor_bottom = 0.48 if qy == 0 else 0.84
 
 
-## Ficha del jugador: personaje (atributos, estadísticas y rasgo), armas y objetos.
-class Sheet extends PanelContainer:
+## Ficha del jugador (rehecha el 04-10-2026 con el formato de la selección de personaje):
+## tres columnas en un escenario de 1560×860 que se escala al hueco (centrada en solitario,
+## en el cuadrante en cooperativo).
+##   1. Personaje: modelo, nombre, papel, nivel y experiencia, rasgo; debajo, el compañero
+##      con su imagen y lo que hace a su nivel.
+##   2. Características y habilidades: atributos (con lo ganado desde el nivel 1) y
+##      estadísticas ya actualizadas (tienda, objetos y subidas de nivel).
+##   3. Combate: daño total y abatidos; cada arma con su imagen, nivel, descripción, daño y
+##      abatidos; cada objeto con su imagen, nivel y efecto.
+## Las imágenes se hacen una vez; los valores se refrescan cada segundo.
+class Sheet extends Control:
 	var p: Player
 	var game: Node
-	var page := 0
+	var page := 0                                ## columna a la vista en cooperativo (0..2)
+	var paged := false                           ## cooperativo: una columna cada vez, LB/RB
+	var design := DESIGN
+	var _frames: Array[PanelContainer] = []
 	var _title: Label
-	var _body: VBoxContainer
+	var _stage: Control
 	var _t := 0.0
+	var _dyn: Array[Callable] = []               ## refrescos de los valores
+	var _icons := {}
+	var _cols: Array[VBoxContainer] = []
 
-	const PAGES: Array[String] = ["Personaje", "Armas", "Objetos"]
+	const DESIGN := Vector2(1560, 860)
 	const ICONS := "res://resources/PantallasMenus/iconos/ficha_%s.png"
-	## Estadística derivada -> [icono, nombre]
-	const STATS := {"health": ["vida", "Puntos de vida"], "sanity": ["cordura", "Puntos de cordura"],
-		"dodge": ["esquive", "Acción de esquiva"], "speed": ["velocidad", "Velocidad"],
-		"magic": ["magia", "Ataques mágicos"], "physical": ["fisico", "Ataques físicos"],
-		"firearm": ["fuego", "Ataques balísticos"]}
+	const STATS := [["health", "vida", "Puntos de vida"], ["sanity", "cordura", "Puntos de cordura"],
+		["dodge", "esquive", "Acción de esquiva"], ["speed", "velocidad", "Velocidad"],
+		["magic", "magia", "Ataques mágicos"], ["physical", "fisico", "Ataques físicos"],
+		["firearm", "fuego", "Ataques balísticos"]]
 	const CATEGORY := ["Física", "De fuego", "Mágica"]
 
 	func _init(player: Player, p_game: Node) -> void:
 		p = player
 		game = p_game
-		var alpha := 0.93 if p_game == null or (p_game.get("players") as Array).size() == 1 else 0.8
-		add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, alpha), Color(p.color, 0.8), 10))
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var box := VBoxContainer.new()
-		box.add_theme_constant_override("separation", 6)
-		add_child(box)
-		_title = MenuKit.title("", 24, p.color)
-		box.add_child(_title)
-		var scroll := ScrollContainer.new()
-		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-		box.add_child(scroll)
-		_body = VBoxContainer.new()
-		_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		_body.add_theme_constant_override("separation", 4)
-		scroll.add_child(_body)
-		var hint := UiKit.label("LB/RB o Q/E: página  ·  B o Esc: cerrar", 13, UiKit.TEXT_DIM)
+		clip_contents = true
+		_stage = Control.new()
+		_stage.size = DESIGN
+		_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_stage)
+		var solo := p_game == null or (p_game.get("players") as Array).size() == 1
+		paged = not solo                         # en un cuadrante, las tres columnas no se leerían
+		if paged: design = Vector2(680, 900)
+		_stage.size = design
+		var bg := Panel.new()
+		bg.size = design
+		bg.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.95 if solo else 0.85), Color(p.color, 0.8), 12))
+		_stage.add_child(bg)
+		_title = MenuKit.title("J%d  ·  Ficha del investigador" % (p.index + 1), 30, p.color)
+		_title.size = Vector2(design.x, 44)
+		_title.position = Vector2(0, 10)
+		_stage.add_child(_title)
+		var row := HBoxContainer.new()
+		row.position = Vector2(20, 60)
+		row.size = Vector2(design.x - 40, design.y - 100)
+		row.add_theme_constant_override("separation", 16)
+		_stage.add_child(row)
+		for w in [400, 470, 634]:
+			var frame := PanelContainer.new()
+			frame.custom_minimum_size = Vector2(640 if paged else w, row.size.y)
+			_frames.append(frame)
+			frame.add_theme_stylebox_override("panel", UiKit.panel(Color(0.03, 0.033, 0.045, 0.9), Color(p.color, 0.35), 10))
+			row.add_child(frame)
+			var v := VBoxContainer.new()
+			v.add_theme_constant_override("separation", 6)
+			frame.add_child(v)
+			_cols.append(v)
+		var hint := UiKit.label(("LB/RB o Q/E: página  ·  " if paged else "") + "Select, B o Esc: cerrar", 14, UiKit.TEXT_DIM)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		box.add_child(hint)
-		_build()
+		hint.size = Vector2(design.x, 24)
+		hint.position = Vector2(0, design.y - 34)
+		_stage.add_child(hint)
+
+	func _ready() -> void:
+		_character(_cols[0])
+		_sheet(_cols[1])
+		_combat(_cols[2])
+		_refresh()
+		_show_page()
+		resized.connect(_fit)
+		_fit.call_deferred()
+
+	func _fit() -> void:
+		var k := minf(size.x / design.x, size.y / design.y)
+		_stage.scale = Vector2.ONE * k
+		_stage.position = (size - design * k) * 0.5
+
+	const PAGE_NAMES: Array[String] = ["Personaje", "Características", "Combate"]
 
 	func turn(step: int) -> void:
-		page = wrapi(page + step, 0, PAGES.size())
-		_build()
+		if not paged: return                     # en solitario se ve todo a la vez
+		page = wrapi(page + step, 0, _frames.size())
+		_show_page()
 
-	## Rehace la página cada medio segundo (los valores cambian mientras se juega).
+	func _show_page() -> void:
+		if not paged: return
+		for i in _frames.size(): _frames[i].visible = i == page
+		_title.text = "J%d  ·  %s  (%d/3)" % [p.index + 1, PAGE_NAMES[page], page + 1]
+
 	func _process(delta: float) -> void:
 		_t += delta
-		if _t >= 0.5:
+		if _t >= 1.0:
 			_t = 0.0
-			_build()
+			_refresh()
 
-	func _build() -> void:
-		_title.text = "J%d · %s  ·  %s  (%d/%d)" % [p.index + 1, p.data.display_name, PAGES[page], page + 1, PAGES.size()]
-		for c in _body.get_children(): c.queue_free()
-		match page:
-			0: _character()
-			1: _weapons()
-			2: _items()
+	func _refresh() -> void:
+		for c in _dyn: c.call()
 
-	func _row(icon: Variant, name: String, value: String, dim := false, px := 24) -> void:
+	# ------------------------------------------------------------ piezas
+
+	func _img(tex: Texture2D, px: int, frame_col := Color(1, 1, 1, 0.15)) -> PanelContainer:
+		var f := PanelContainer.new()
+		f.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.4), frame_col, 6))
+		f.custom_minimum_size = Vector2(px, px)
+		f.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		f.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var t := TextureRect.new()
+		t.texture = tex
+		t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		t.custom_minimum_size = Vector2(px - 8, px - 8)
+		f.add_child(t)
+		return f
+
+	func _model(name: String, px: int) -> Texture2D:
+		if name == "": return null
+		if not _icons.has(name): _icons[name] = ModelIcon.make(self, name, "full", px)
+		return _icons[name]
+
+	func _label(text: String, size: int, color := UiKit.TEXT, center := false) -> Label:
+		var l := UiKit.label(text, size, color)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		if center: l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		return l
+
+	func _head(col: VBoxContainer, text: String) -> void:
+		col.add_child(MenuKit.title(text, 22, UiKit.GOLD))
+
+	## Fila icono + nombre + valor (que se refresca con `value`).
+	func _stat_row(col: Container, icon: Texture2D, name: String, value: Callable, gold: Callable = Callable()) -> void:
 		var h := HBoxContainer.new()
 		h.add_theme_constant_override("separation", 8)
-		var tex: Texture2D = icon if icon is Texture2D else (load(ICONS % icon) if icon is String and icon != "" else null)
-		if tex != null:
-			var t := TextureRect.new()
-			t.texture = tex
-			t.custom_minimum_size = Vector2(px, px)
-			t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			h.add_child(t)
-		var n := UiKit.label(name, 16, UiKit.TEXT)
+		var t := TextureRect.new()
+		t.texture = icon
+		t.custom_minimum_size = Vector2(28, 28)
+		t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		h.add_child(t)
+		var n := UiKit.label(name, 18, UiKit.TEXT)
 		n.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		h.add_child(n)
-		h.add_child(UiKit.label(value, 16, UiKit.TEXT_DIM if dim else UiKit.GOLD))
-		_body.add_child(h)
-
-	func _text(t: String, size := 15, color := UiKit.TEXT_DIM) -> void:
-		var l := UiKit.label(t, size, color)
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_body.add_child(l)
+		var v := UiKit.label("", 18, UiKit.GOLD)
+		h.add_child(v)
+		col.add_child(h)
+		_dyn.append(func() -> void:
+			v.text = String(value.call())
+			if gold.is_valid(): v.add_theme_color_override("font_color", UiKit.GOLD if gold.call() else UiKit.TEXT_DIM))
 
 	static func _pct(m: float) -> String:
 		var v := roundi((m - 1.0) * 100.0)
 		return ("+%d %%" % v) if v >= 0 else ("−%d %%" % -v)
 
-	func _character() -> void:
-		_text("Nivel %d  ·  Rasgo: %s" % [p.progress.level, p.data.passive_text], 15, UiKit.TEXT)
-		_text("Atributos", 17, UiKit.GOLD)
+	# ------------------------------------------------------------ 1. personaje
+
+	func _character(col: VBoxContainer) -> void:
+		var tex := _model(p.data.model, 300)
+		var pic := _img(tex, 230, Color(p.color, 0.5))
+		col.add_child(pic)
+		col.add_child(MenuKit.title(p.data.display_name, 28, UiKit.TEXT))
+		col.add_child(_label(p.data.role, 15, UiKit.TEXT_DIM, true))
+		var lvl := _label("", 20, p.color, true)
+		col.add_child(lvl)
+		var xp := UiKit.Bar.new(UiKit.XP, 340, 10)
+		xp.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		col.add_child(xp)
+		_dyn.append(func() -> void:
+			lvl.text = "Nivel %d" % p.progress.level
+			xp.value = p.progress.xp / maxf(p.progress.xp_to_next(), 1.0))
+		col.add_child(_label("Rasgo: " + p.data.passive_text, 15, UiKit.TEXT, true))
+		# compañero
+		var pet: Node = p.get("pet")
+		var sep := HSeparator.new()
+		col.add_child(sep)
+		_head(col, "Compañero")
+		if pet == null or not is_instance_valid(pet):
+			col.add_child(_label("Sin compañero. Se consiguen en la tienda.", 15, UiKit.TEXT_DIM, true))
+			return
+		var pd: PetData = pet.get("data")
+		var h := HBoxContainer.new()
+		h.add_theme_constant_override("separation", 10)
+		h.add_child(_img(_model(pd.model, 160), 110, Color(UiKit.GOLD, 0.4)))
+		var v := VBoxContainer.new()
+		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		v.add_child(_label(pd.display_name, 19, UiKit.GOLD))
+		v.add_child(_label(pd.description, 13, UiKit.TEXT_DIM))
+		h.add_child(v)
+		col.add_child(h)
+		var info := _label("", 15, UiKit.TEXT)
+		col.add_child(info)
+		_dyn.append(func() -> void:
+			var s := world_stats()
+			var lines := PackedStringArray()
+			if pd.attack_damage > 0.0: lines.append("Golpe: %d de daño" % roundi(pd.attack_at(p.progress.level)))
+			if pd.bonus > 0.0: lines.append("Bonificación: %s" % _pct(1.0 + pd.bonus_at(p.progress.level)))
+			var m: Array = (s.weapons as Dictionary).get("mascota", [0.0, 0])
+			lines.append("Daño hecho: %d  ·  Abatidos: %d" % [roundi(m[0]), int(m[1])])
+			info.text = "\n".join(lines))
+
+	# ------------------------------------------------------------ 2. características
+
+	func _sheet(col: VBoxContainer) -> void:
+		_head(col, "Atributos")
 		for n in Attributes.NAMES:
-			var now := int(p.attrs.get(n, Attributes.BASE))
-			var gain := now - int(p.attrs_level1.get(n, Attributes.BASE))
-			_row(n, Attributes.LONG[n], "%d%s" % [now, ("  (+%d)" % gain) if gain > 0 else ""], now <= Attributes.BASE)
-		_text("Estadísticas", 17, UiKit.GOLD)
-		for k in ["health", "sanity", "dodge", "speed", "magic", "physical", "firearm"]:
-			var info: Array = STATS[k]
-			var v := ""
-			match k:
-				"health": v = "%d / %d" % [ceili(p.health), roundi(p.data.max_health)]
-				"sanity": v = "%d / %d" % [ceili(p.sanity), roundi(p.data.max_sanity)]
-				_: v = _pct(Attributes.mult(p.attrs, k))
-			_row(info[0], info[1], v)
-		var crises := p.sanity_state.crises
-		if crises > 0:
-			_text("Crisis sufridas: %d%s" % [crises, "  ·  cordura máxima reducida por la locura" if p.madness else ""], 14, UiKit.SANITY)
+			var nn: String = n
+			_stat_row(col, load(ICONS % nn), "%s  ·  %s" % [nn, Attributes.LONG[nn]], func() -> String:
+				var now := int(p.attrs.get(nn, Attributes.BASE))
+				var gain := now - int(p.attrs_level1.get(nn, Attributes.BASE))
+				return "%d%s" % [now, ("  (+%d)" % gain) if gain > 0 else ""],
+				func() -> bool: return int(p.attrs.get(nn, Attributes.BASE)) > Attributes.BASE)
+		col.add_child(HSeparator.new())
+		_head(col, "Estadísticas")
+		var base: CharacterData = load("res://data/characters/%s.tres" % p.data.id)
+		for row in STATS:
+			var k: String = row[0]
+			_stat_row(col, load(ICONS % row[1]), row[2], func() -> String:
+				match k:
+					"health": return "%d / %d" % [ceili(p.health), roundi(p.data.max_health)]
+					"sanity": return "%d / %d" % [ceili(p.sanity), roundi(p.data.max_sanity)]
+					"speed": return _pct(p.data.move_speed / maxf(base.move_speed, 0.01))
+					"dodge": return _pct(base.dodge_cooldown / maxf(p.data.dodge_cooldown, 0.01))
+					"magic": return _pct(p.damage_mult(WeaponData.Category.MAGIC))
+					"physical": return _pct(p.damage_mult(WeaponData.Category.PHYSICAL))
+				return _pct(p.damage_mult(WeaponData.Category.FIREARM)))
+		var crisis := _label("", 14, UiKit.SANITY)
+		col.add_child(crisis)
+		_dyn.append(func() -> void:
+			var c := p.sanity_state.crises
+			crisis.text = "" if c == 0 else "Crisis sufridas: %d%s" % [c, "  ·  locura acumulada" if p.madness else ""])
 
-	func _weapons() -> void:
-		var ws := p.weapons.weapons if p.weapons != null else []
-		_text("Armas %d/%d" % [ws.size(), p.progress.weapon_slots], 17, UiKit.GOLD)
+	# ------------------------------------------------------------ 3. combate
+
+	func world_stats() -> Dictionary:
+		var w: CombatWorld = p.world
+		return w.stats_of(p.index) if w != null else {"weapons": {}, "total": [0.0, 0]}
+
+	func _combat(col: VBoxContainer) -> void:
+		var tot := _label("", 20, UiKit.GOLD, true)
+		col.add_child(tot)
+		_dyn.append(func() -> void:
+			var t: Array = world_stats().total
+			tot.text = "Daño total: %s   ·   Enemigos abatidos: %d" % [MenuKit.money(roundi(t[0])), int(t[1])])
+		var ws: Array = p.weapons.weapons if p.weapons != null else []
+		_head(col, "Armas  %d / %d" % [ws.size(), p.progress.weapon_slots])
 		for w: WeaponSystem.Weapon in ws:
-			var d := w.data
-			_row(d.get_icon(), d.display_name, "Nv %d/%d" % [w.level, d.max_level], false, 44)
-			var info := "%s. %s" % [CATEGORY[int(d.category)], d.description]
-			if w.level < d.max_level and w.level - 1 < d.level_text.size():
-				info += "\nSiguiente nivel: %s" % d.level_text[w.level - 1]
-			_text(info, 14)
-
-	func _items() -> void:
-		var owned := 0
+			var card := HBoxContainer.new()
+			card.add_theme_constant_override("separation", 10)
+			card.add_child(_img(w.data.get_icon(), 64, Color(UiKit.GOLD, 0.45)))
+			var v := VBoxContainer.new()
+			v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			v.add_theme_constant_override("separation", 0)
+			var name := UiKit.label("", 18, UiKit.TEXT)
+			v.add_child(name)
+			v.add_child(_label("%s. %s" % [CATEGORY[int(w.data.category)], w.data.description], 13, UiKit.TEXT_DIM))
+			var num := UiKit.label("", 14, UiKit.GOLD)
+			v.add_child(num)
+			card.add_child(v)
+			col.add_child(card)
+			var ww := w
+			_dyn.append(func() -> void:
+				name.text = "%s  ·  Nv %d/%d" % [ww.data.display_name, ww.level, ww.data.max_level]
+				var s: Array = (world_stats().weapons as Dictionary).get(String(ww.data.id), [0.0, 0])
+				num.text = "Daño %s  ·  Abatidos %d  ·  %s por golpe" % [MenuKit.money(roundi(s[0])), int(s[1]), str(snappedf(ww.stat("damage") * p.damage_mult(ww.data.category), 0.1))])
+		col.add_child(HSeparator.new())
+		var owned: Array = []
 		for up in p.progress.upgrade_pool:
-			if int(p.progress.passives.get(up.id, 0)) > 0: owned += 1
-		_text("Objetos %d/%d" % [owned, p.progress.item_slots], 17, UiKit.GOLD)
-		if owned == 0: _text("Aún no llevas ninguno: salen al subir de nivel.")
-		for up in p.progress.upgrade_pool:
-			var lv := int(p.progress.passives.get(up.id, 0))
-			if lv <= 0: continue
-			_row("", up.display_name, "Nv %d/%d" % [lv, up.max_level])
-			_text(up.description, 14)
+			if int(p.progress.passives.get(up.id, 0)) > 0: owned.append(up)
+		_head(col, "Objetos  %d / %d" % [owned.size(), p.progress.item_slots])
+		if owned.is_empty(): col.add_child(_label("Aún no llevas ninguno: salen al subir de nivel.", 14, UiKit.TEXT_DIM))
+		var grid := GridContainer.new()
+		grid.columns = 2
+		grid.add_theme_constant_override("h_separation", 12)
+		col.add_child(grid)
+		for up: UpgradeData in owned:
+			var h := HBoxContainer.new()
+			h.custom_minimum_size.x = 290
+			h.add_child(_img(up.icon, 48, Color(up.color, 0.5)))
+			var v := VBoxContainer.new()
+			v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			v.add_child(UiKit.label("%s  ·  Nv %d/%d" % [up.display_name, int(p.progress.passives.get(up.id, 0)), up.max_level], 15, UiKit.TEXT))
+			v.add_child(_label(up.description, 13, UiKit.TEXT_DIM))
+			h.add_child(v)
+			grid.add_child(h)
 
 
 ## Mapa del nivel: la arena vista desde arriba con la misma orientación que la cámara

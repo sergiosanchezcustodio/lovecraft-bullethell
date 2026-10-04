@@ -1,5 +1,6 @@
 class_name Slash
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Tajo circular del machete: un anillo claro que se abre desde el personaje hasta el radio
 ## del golpe en una décima de segundo y se apaga. Solo visual: el daño lo aplica el arma.
 
@@ -12,6 +13,7 @@ var _disc: MeshInstance3D
 const LIFE := 0.22
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	_disc = MeshInstance3D.new()
 	var pm := PlaneMesh.new()
 	pm.size = Vector2(2, 2)
@@ -28,6 +30,7 @@ func _ready() -> void:
 	_process(0.0)
 
 func _process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	var u := clampf(_t / LIFE, 0.0, 1.0)
 	var grow := 1.0 - pow(1.0 - minf(u / 0.45, 1.0), 3.0)

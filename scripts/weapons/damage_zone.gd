@@ -1,5 +1,6 @@
 class_name DamageZone
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Zona en el suelo que daña a los enemigos que están dentro (fuego del Molotov y del
 ## lanzallamas, charco del lanzaquímicos). Aplica el daño por tics y, si es ácido, deja a
 ## los enemigos vulnerables. Visual: una mancha en el suelo y cubitos que brotan (llamas o
@@ -35,6 +36,7 @@ func setup(p_world: CombatWorld, p_kind: int, pos: Vector3, p_radius: float, p_l
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	var cols: Array = COLORS.get(kind, COLORS[WeaponData.Zone.FIRE])
 	var disc := MeshInstance3D.new()
 	var pm := PlaneMesh.new()
@@ -98,6 +100,7 @@ func _ready() -> void:
 		add_child(_light)
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	if _t >= life:
 		_parts.emitting = false
@@ -115,6 +118,7 @@ func _physics_process(delta: float) -> void:
 		if weak_k < 1.0 and e.has_method("weaken") and e.is_alive(): e.weaken(TICK + 0.25, weak_k)
 
 func _process(_delta: float) -> void:
+	Damage.ctx = _wtag
 	var fade := 1.0 - smoothstep(life, life + FADE, _t)
 	var cols: Array = COLORS.get(kind, COLORS[WeaponData.Zone.FIRE])
 	_mat.set_shader_parameter("color", Color(cols[0] * 0.55, _alpha() * fade))

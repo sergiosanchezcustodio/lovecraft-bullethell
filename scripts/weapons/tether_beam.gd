@@ -1,5 +1,6 @@
 class_name TetherBeam
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Lente del Éter: un rayo fino que une al personaje con un enemigo durante `life` s. Cada
 ## `interval` s le hace daño; mientras sigue sobre el mismo enemigo, el daño crece `ramp` por
 ## golpe hasta `ramp_max` veces. Si el enemigo muere o se aleja, salta al más cercano y el
@@ -38,6 +39,7 @@ func setup(p_player: Player, p_world: CombatWorld, p_damage: float, p_interval: 
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	_core = _bar(0.06, false)
 	_mat_core = _core.material_override
 	_glow = _bar(0.2, true)
@@ -68,6 +70,7 @@ func _valid_target() -> bool:
 	return _target.global_position.distance_to(player.global_position) <= reach * 1.15
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	if _t >= life or not is_instance_valid(player):
 		if _t >= life + FADE or not is_instance_valid(player): queue_free()
@@ -85,6 +88,7 @@ func _physics_process(delta: float) -> void:
 	mult = minf(mult + ramp, ramp_max)
 
 func _process(_delta: float) -> void:
+	Damage.ctx = _wtag
 	var on := is_instance_valid(player) and _target != null and is_instance_valid(_target) and _t < life + FADE
 	visible = on
 	if not on: return

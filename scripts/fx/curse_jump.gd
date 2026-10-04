@@ -1,5 +1,6 @@
 class_name CurseJump
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Maldición de la Daga ritual que salta de un enemigo muerto a otro: un arco violeta que
 ## vuela del uno al otro y se apaga. Solo visual: la maldición ya se ha aplicado.
 
@@ -18,6 +19,7 @@ func setup(from: Vector3, to: Vector3) -> CurseJump:
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	var m := StandardMaterial3D.new()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -34,6 +36,7 @@ func _ready() -> void:
 	_process(0.0)
 
 func _process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	var u := clampf(_t / LIFE, 0.0, 1.0)
 	for i in N:

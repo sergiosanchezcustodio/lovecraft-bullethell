@@ -1,5 +1,6 @@
 class_name Shockwave
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Onda de la fórmula de expulsión: un anillo de luz pálida que se expande desde el
 ## personaje hasta su radio. Cada enemigo que alcanza recibe el daño una sola vez, sale
 ## empujado hacia fuera y queda aturdido. Nace donde está el jugador y no le sigue.
@@ -30,6 +31,7 @@ func setup(p: Player, p_world: CombatWorld, radius: float, grow: float, damage: 
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	_disc = MeshInstance3D.new()
 	var pm := PlaneMesh.new()
 	pm.size = Vector2(2, 2)
@@ -50,6 +52,7 @@ func current_radius() -> float:
 	return _radius * (1.0 - pow(1.0 - u, 2.0))
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	if _t > _grow: return
 	var r := current_radius()
@@ -66,6 +69,7 @@ func _physics_process(delta: float) -> void:
 		if e.has_method("stun") and e.is_alive(): e.stun(_stun)
 
 func _process(_delta: float) -> void:
+	Damage.ctx = _wtag
 	var r := maxf(current_radius(), 0.3)
 	_disc.scale = Vector3.ONE * r
 	var fade := 1.0 - smoothstep(_grow, _grow + FADE, _t)

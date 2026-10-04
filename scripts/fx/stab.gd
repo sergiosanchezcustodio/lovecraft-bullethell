@@ -1,5 +1,6 @@
 class_name Stab
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Puñalada de la Daga ritual (hoja violeta) o estocada del bastón estoque (hoja de acero
 ## más larga): sale del personaje hacia el enemigo, entra y se desvanece. Solo visual: el
 ## daño lo aplica el arma.
@@ -24,6 +25,7 @@ func setup(from: Vector3, to: Vector3) -> Stab:
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	_blade = MeshInstance3D.new()
 	var bm := BoxMesh.new()
 	bm.size = Vector3(0.1, 0.05, blade)
@@ -38,6 +40,7 @@ func _ready() -> void:
 	_process(0.0)
 
 func _process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	var u := clampf(_t / LIFE, 0.0, 1.0)
 	var go := 1.0 - pow(1.0 - minf(u * 1.8, 1.0), 3.0)               # sale rápida y se clava

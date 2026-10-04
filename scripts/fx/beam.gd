@@ -1,5 +1,6 @@
 class_name Beam
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Rayo del Trapezoedro Resplandeciente: una columna de luz concentrada, rojiza y dorada,
 ## que se enciende en un instante y se apaga. Solo visual: el daño lo aplica el arma.
 
@@ -45,6 +46,7 @@ func _bar(size: Vector3, c: Color, additive: bool, k: float) -> MeshInstance3D:
 	return mi
 
 func _process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	var u := clampf(_t / _life, 0.0, 1.0)
 	var k := 1.0 - u * u

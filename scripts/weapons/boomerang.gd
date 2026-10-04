@@ -1,5 +1,6 @@
 class_name Boomerang
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Bumerán: sale hacia `dir`, frena al llegar a su alcance y vuelve a las manos del personaje
 ## (le sigue aunque se mueva). Golpea una vez a cada enemigo a la ida y otra a la vuelta.
 ## Voxel: dos brazos de madera en V que giran.
@@ -32,6 +33,7 @@ func setup(p_player: Player, p_world: CombatWorld, p_dir: Vector3, p_reach: floa
 	return self
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	_spin = Node3D.new()
 	add_child(_spin)
 	for side in [-1, 1]:
@@ -58,6 +60,7 @@ func _ready() -> void:
 	reset_physics_interpolation.call_deferred()
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	if not is_instance_valid(player) or _t > MAX_LIFE:
 		queue_free()
@@ -89,4 +92,5 @@ func _physics_process(delta: float) -> void:
 		hits += 1
 
 func _process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_spin.rotation.y += 22.0 * delta

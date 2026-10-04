@@ -1,5 +1,6 @@
 class_name OrbitRing
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Páginas del Necronomicón: proyectiles que giran alrededor del jugador mientras dura el
 ## arma (WeaponData.duration) y dañan a lo que tocan, con un intervalo por enemigo para no
 ## golpear al mismo en cada paso. Las páginas son bloques de pergamino con un brillo dorado
@@ -58,6 +59,7 @@ func _make_page() -> MeshInstance3D:
 	return mi
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	if not active or not is_instance_valid(player): return
 	_left -= delta
 	_t += delta
@@ -79,6 +81,7 @@ func _physics_process(delta: float) -> void:
 			t.take_damage(d)
 
 func _process(delta: float) -> void:
+	Damage.ctx = _wtag
 	var on := active and is_instance_valid(player)
 	visible = on or _left > -FADE
 	if not visible: return

@@ -1,5 +1,6 @@
 class_name Explosion
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Explosión: fogonazo de luz, esfera de fuego, onda expansiva en el suelo, cascotes
 ## y una mancha de quemado que se desvanece. Solo visual: el daño lo aplica quien explota.
 
@@ -15,6 +16,7 @@ var _scorch_mat: ShaderMaterial
 const LIFE := 4.0
 
 func _ready() -> void:
+	Damage.ctx = _wtag
 	_light = OmniLight3D.new()
 	_light.light_color = Color(1.0, 0.65, 0.3)
 	_light.omni_range = radius * 3.0
@@ -91,6 +93,7 @@ func _debris() -> GPUParticles3D:
 	return p
 
 func _process(delta: float) -> void:
+	Damage.ctx = _wtag
 	_t += delta
 	_light.light_energy = 8.0 * maxf(0.0, 1.0 - _t / 0.35)
 	var grow := clampf(_t / 0.12, 0.0, 1.0)

@@ -1,5 +1,6 @@
 class_name MiGoDrones
 extends Node3D
+var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 ## Orbes Mi-Go: `count` esferas de cristal rosado con un núcleo que late, que vuelan despacio
 ## alrededor del personaje (a `orbit` m y 1,7 m de altura) durante `life` s. Cada una dispara
 ## por su cuenta al enemigo más cercano cada `interval` s (desfasadas entre sí). Como las
@@ -83,6 +84,7 @@ func _orb_pos(i: int, center: Vector3) -> Vector3:
 	return center + Vector3(cos(a) * _orbit, HEIGHT + 0.15 * sin(_t * 2.3 + i), sin(a) * _orbit)
 
 func _physics_process(delta: float) -> void:
+	Damage.ctx = _wtag
 	if not active or not is_instance_valid(player): return
 	_t += delta
 	_left -= delta
@@ -104,6 +106,7 @@ func _physics_process(delta: float) -> void:
 		shots += 1
 
 func _process(delta: float) -> void:
+	Damage.ctx = _wtag
 	var on := active and is_instance_valid(player)
 	visible = on or _left > -FADE
 	if not visible: return
