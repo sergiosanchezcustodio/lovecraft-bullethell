@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WeatherData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/weather_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ventisca_ligera"
+display_name = "Ventisca ligera"
+wind_dir = Vector2(1, 0.2)
+wind = 6.0
+gusts = 0.8
+gust_period = 5.0
+precip = 1
+precip_amount = 0.7
+fall_speed = 2.0
+flake_size = 0.045
+drift = 0.5
+mist = 0.08
+clouds = 0.35
+fog_density = 0.005

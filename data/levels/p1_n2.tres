@@ -7,7 +7,7 @@
 [ext_resource type="Resource" path="res://data/enemies/antiguo_alado.tres" id="6"]
 [ext_resource type="Resource" path="res://data/enemies/antiguo_despierto.tres" id="7"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
-[ext_resource type="Resource" path="res://data/weather/ventisca.tres" id="weather_ventisca"]
+[ext_resource type="Resource" path="res://data/weather/ventisca_ligera.tres" id="weather_ventisca"]
 
 [resource]
 script = ExtResource("1")

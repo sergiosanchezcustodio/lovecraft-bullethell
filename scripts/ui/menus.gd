@@ -117,6 +117,14 @@ class PauseMenu extends CanvasLayer:
 		box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
 		_buttons[0].grab_focus.call_deferred()
 
+	## B en el mando: vuelve al juego (Esc y Start ya los atiende pause_watch). Oculta, con la
+	## depuración encima, no hace nada: B es "volver" en ese menú.
+	func _unhandled_input(event: InputEvent) -> void:
+		if not visible: return
+		if event is InputEventJoypadButton and event.pressed and (event as InputEventJoypadButton).button_index == JOY_BUTTON_B:
+			get_viewport().set_input_as_handled()
+			resume.emit()
+
 	## Vuelve a mostrarse al salir de la depuración, con el foco en su botón.
 	func show_again() -> void:
 		visible = true
