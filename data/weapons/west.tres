@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+bullet_look = "dart"
 id = &"west"
 display_name = "Inyector de Herbert West"
 description = "Dispara dardos de suero: el enemigo que muere con el suero dentro se levanta 6 segundos como aliado y ataca a los suyos."

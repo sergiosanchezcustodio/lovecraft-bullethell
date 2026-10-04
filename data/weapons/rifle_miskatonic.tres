@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("1")
+bullet_look = "rifle"
 id = &"rifle_miskatonic"
 display_name = "Rifle de la expedición Miskatonic"
 description = "Dos disparos rápidos que atraviesan a seis enemigos; uno de cada cinco es crítico (doble daño)."

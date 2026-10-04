@@ -10,7 +10,18 @@ extends Node3D
 enum Team { PLAYER, ENEMY }
 ## Estilo visual (lenguaje de daños, GDD 4.4): lo lee el shader por instancia.
 ## WISP y YITH son trazadoras del jugador de otro color (Báculo del Farolero, Rayo de Yith).
-enum Style { PLAYER, PHYSICAL, MENTAL, MIXED, WISP, YITH }
+enum Style { PLAYER, PHYSICAL, MENTAL, MIXED, WISP, YITH, PELLET, RIFLE, SMG, BLADE, SPARK, HARPOON, DART, IMPACT }
+## Aspecto de bala de cada `WeaponData.bullet_look`.
+const LOOK_STYLE := {"pellet": Style.PELLET, "rifle": Style.RIFLE, "smg": Style.SMG, "blade": Style.BLADE,
+	"spark": Style.SPARK, "harpoon": Style.HARPOON, "dart": Style.DART}
+## Destellos de impacto: un depósito fijo que se dibuja en el mismo MultiMesh que las balas del
+## jugador (cero llamadas de dibujo extra). Cada uno vive IMPACT_LIFE s.
+const MAX_IMPACTS := 256
+const IMPACT_LIFE := 0.18
+var _imp_pos := PackedVector3Array()
+var _imp_age := PackedFloat32Array()
+var _imp_look := PackedInt32Array()
+var _imp_n := 0
 ## Efecto al impactar una bala del jugador: ninguno o estasis (Rayo de Yith, `_effect_val` s).
 ## INJECT: suero de Herbert West; el que muere inyectado se levanta `_effect_val` s como aliado.
 ## PARANOIA: bala de un jugador en crisis de paranoia; a los compañeros (no a quien la dispara,
@@ -64,6 +75,7 @@ func _init() -> void:
 	_last_hit.resize(MAX_BULLETS); _push.resize(MAX_BULLETS); _bonus.resize(MAX_BULLETS); _split.resize(MAX_BULLETS); _tag.resize(MAX_BULLETS)
 	_home.resize(MAX_BULLETS); _effect.resize(MAX_BULLETS); _effect_val.resize(MAX_BULLETS); _slowed.resize(MAX_BULLETS)
 	_owner.resize(MAX_BULLETS)
+	_imp_pos.resize(MAX_IMPACTS); _imp_age.resize(MAX_IMPACTS); _imp_look.resize(MAX_IMPACTS)
 
 func _ready() -> void:
 	_mm = MultiMesh.new()
@@ -72,7 +84,7 @@ func _ready() -> void:
 	var quad := QuadMesh.new()
 	quad.size = Vector2(2, 2)                 # el shader escala por el radio visual
 	_mm.mesh = quad
-	_mm.instance_count = MAX_BULLETS
+	_mm.instance_count = MAX_BULLETS + MAX_IMPACTS
 	_mm.visible_instance_count = 0
 	var mmi := MultiMeshInstance3D.new()
 	mmi.name = "BulletMesh"
@@ -84,7 +96,7 @@ func _ready() -> void:
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mmi.custom_aabb = AABB(Vector3(-200, -10, -200), Vector3(400, 20, 400))   # nunca se descarta por visibilidad
 	add_child(mmi)
-	_buffer.resize(MAX_BULLETS * 16)
+	_buffer.resize((MAX_BULLETS + MAX_IMPACTS) * 16)
 	# balas enemigas: cúmulos de cubos iluminados, con la silueta como segunda pasada
 	_mm_enemy = MultiMesh.new()
 	_mm_enemy.transform_format = MultiMesh.TRANSFORM_3D
@@ -250,6 +262,7 @@ func _collide_player_bullet(i: int) -> bool:
 		if t.get_instance_id() == _last_hit[i] or not t.is_alive(): continue
 		var d := Damage.new(_phys[i], _ment[i])
 		d.tag = _tag[i]
+		impact(_pos[i], _style[i])
 		d.knockback = _vel[i].normalized() * _push[i]
 		if _bonus[i] >= 0: d.bonus = bonus_sets[_bonus[i]]
 		t.take_damage(d)
@@ -282,6 +295,14 @@ func _burst(i: int) -> void:
 		var a := a0 + TAU * k / n
 		spawn(_team[i], _style[i], _pos[i], Vector3(cos(a), 0, sin(a)) * spd, _radius[i] * 0.8, _size[i] * 0.7,
 			d, 0.45, 0, _push[i] * 0.5, _bonus[i], 0)
+
+## Destello de impacto de una bala del jugador (con el aspecto de la bala, para su color).
+func impact(pos: Vector3, look: int) -> void:
+	if _imp_n >= MAX_IMPACTS: return
+	_imp_pos[_imp_n] = Vector3(pos.x, HEIGHT, pos.z)
+	_imp_age[_imp_n] = 0.0
+	_imp_look[_imp_n] = look
+	_imp_n += 1
 
 func _remove(i: int) -> void:
 	var last := count - 1
@@ -324,6 +345,25 @@ func _process(_delta: float) -> void:
 			_buffer_enemy[o + 12] = float(_style[i]); _buffer_enemy[o + 13] = float(i % 17) * 0.37
 			_buffer_enemy[o + 14] = _age[i]; _buffer_enemy[o + 15] = s
 			ne += 1
+	# destellos de impacto, detrás de las balas en el mismo buffer
+	var dt := get_process_delta_time()
+	var k := 0
+	while k < _imp_n:
+		_imp_age[k] += dt
+		if _imp_age[k] >= IMPACT_LIFE:
+			_imp_n -= 1
+			_imp_pos[k] = _imp_pos[_imp_n]; _imp_age[k] = _imp_age[_imp_n]; _imp_look[k] = _imp_look[_imp_n]
+			continue
+		var o := np * 16
+		var s := 0.4
+		var q := _imp_pos[k]
+		_buffer[o] = s; _buffer[o + 1] = 0.0; _buffer[o + 2] = 0.0; _buffer[o + 3] = q.x
+		_buffer[o + 4] = 0.0; _buffer[o + 5] = s; _buffer[o + 6] = 0.0; _buffer[o + 7] = q.y
+		_buffer[o + 8] = 0.0; _buffer[o + 9] = 0.0; _buffer[o + 10] = s; _buffer[o + 11] = q.z
+		_buffer[o + 12] = float(Style.IMPACT); _buffer[o + 13] = float(_imp_look[k])
+		_buffer[o + 14] = _imp_age[k] / IMPACT_LIFE; _buffer[o + 15] = s
+		np += 1
+		k += 1
 	RenderingServer.multimesh_set_buffer(_mm.get_rid(), _buffer)
 	_mm.visible_instance_count = np
 	RenderingServer.multimesh_set_buffer(_mm_enemy.get_rid(), _buffer_enemy)

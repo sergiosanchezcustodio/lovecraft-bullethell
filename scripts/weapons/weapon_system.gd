@@ -198,6 +198,7 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 	if paranoid():                                                         # en crisis de paranoia
 		effect = BulletManager.Effect.PARANOIA
 		effect_val = player.rules.paranoia_mental
+	if w.data.bullet_look != "": style = BulletManager.LOOK_STYLE.get(w.data.bullet_look, style)
 	if w.stat("homing") > 0.0: style = BulletManager.Style.WISP
 	if w.stat("stasis") > 0.0:
 		style = BulletManager.Style.YITH

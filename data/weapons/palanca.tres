@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+bullet_look = "rifle"
 id = &"palanca"
 display_name = "Rifle de palanca"
 description = "Disparos rápidos que atraviesan a varios enemigos."

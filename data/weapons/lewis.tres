@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+bullet_look = "smg"
 id = &"lewis"
 display_name = "Ametralladora Lewis"
 description = "Monta la ametralladora en su trípode, en el suelo; dispara sola al más cercano durante 8 segundos."

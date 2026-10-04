@@ -47,6 +47,10 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var id := &"revolver"
 @export var display_name := "Revólver .38"
 @export_multiline var description := ""      ## qué hace, en una frase (descripciones emergentes)
+## Aspecto de sus balas (04-10-2026): "" trazadora pesada (pistolas), "pellet" (perdigón),
+## "rifle" (estela larga), "smg" (trazadora corta), "blade" (hoja que gira), "spark" (chispa
+## de colores), "harpoon" (arpón), "dart" (dardo). Las teledirigidas y las de Yith, las suyas.
+@export var bullet_look := ""
 @export var support := false                ## de puro apoyo (bengala, red...): fuera de las reglas de daño (DamageRules)
 @export var icon: Texture2D                  ## imagen del arma (ficha, HUD); sin ella, un hueco
 @export var delivery := Delivery.BULLET

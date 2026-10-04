@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+bullet_look = "harpoon"
 id = &"arpon"
 display_name = "Arpón ballenero"
 description = "Proyectil pesado que atraviesa y arrastra a los enemigos menores."

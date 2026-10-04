@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+bullet_look = "spark"
 id = &"fuegos"
 display_name = "Cañón de fuegos artificiales"
 description = "Cohetes erráticos que estallan en chispas."

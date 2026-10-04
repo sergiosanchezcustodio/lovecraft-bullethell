@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+bullet_look = "rifle"
 id = &"springfield"
 display_name = "Springfield M1903 con mira"
 description = "Disparo lento y fuerte que busca primero a la élite o al enemigo con más vida; a veces es un crítico triple. Atraviesa a uno."

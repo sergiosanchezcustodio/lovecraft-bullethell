@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("1")
+bullet_look = "blade"
 id = &"instrumental"
 display_name = "Instrumental de cirujano"
 description = "Abanico ancho de ocho hojas que atraviesan a tres enemigos."

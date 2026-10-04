@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+bullet_look = "pellet"
 id = &"corredera"
 display_name = "Escopeta de corredera"
 description = "Perdigones que se abren en anillo alrededor del personaje."
