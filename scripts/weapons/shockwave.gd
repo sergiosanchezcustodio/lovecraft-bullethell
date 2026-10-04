@@ -56,6 +56,7 @@ func _physics_process(delta: float) -> void:
 	_t += delta
 	if _t > _grow: return
 	var r := current_radius()
+	if Engine.get_physics_frames() % 3 == 0: world.bullets.clear_enemy_bullets(global_position, r * 0.6)   # la onda aparta balas
 	if clears: cleared += world.bullets.clear_enemy_bullets(global_position, r)
 	for e in world.enemies_in_circle(global_position, r):
 		var id := e.get_instance_id()

@@ -70,6 +70,7 @@ func _physics_process(delta: float) -> void:
 	for i in _count:
 		var a := deg_to_rad(_angle) + TAU * i / _count
 		var p := center + Vector3(cos(a), 0, sin(a)) * _radius
+		world.bullets.clear_enemy_bullets(p, _hit_r)              # las páginas paran balas
 		for t in world.enemies_in_circle(p, _hit_r):
 			var id := t.get_instance_id()
 			if _t - float(_last_hit.get(id, -99.0)) < _interval: continue

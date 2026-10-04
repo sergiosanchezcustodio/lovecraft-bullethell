@@ -95,6 +95,7 @@ func _physics_process(delta: float) -> void:
 	_tick -= delta
 	if _tick <= 0.0:
 		_tick = 0.15
+		world.bullets.clear_enemy_bullets(origin + dir * length * 0.35, length * 0.3)   # el chorro quema balas
 		for e in world.enemies_in_circle(origin + dir * length * 0.5, length * 0.5 + 0.5):
 			var rel := Vector3(e.global_position.x - origin.x, 0, e.global_position.z - origin.z)
 			if rel.length() > length or rel.length() < 0.01: continue

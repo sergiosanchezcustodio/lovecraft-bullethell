@@ -292,6 +292,7 @@ func _slash(w: Weapon) -> bool:
 	var origin := player.global_position
 	var r := w.stat("aoe_radius")
 	var targets := world.enemies_in_circle(origin, r)
+	world.bullets.clear_enemy_bullets(origin, r * 0.8)          # el tajo también corta balas
 	if targets.is_empty(): return false
 	for t in targets:
 		var d := Damage.new(dmg(w), 0.0)

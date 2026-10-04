@@ -124,6 +124,7 @@ func _land() -> void:
 	queue_free()
 
 func _explode() -> void:
+	world.bullets.clear_enemy_bullets(end, radius * 0.7)       # protege algo: deshace balas enemigas
 	for e in world.enemies_in_circle(end, radius):
 		var d := end.distance_to(Vector3(e.global_position.x, 0, e.global_position.z))
 		var k := lerpf(1.0, 0.5, clampf(d / radius, 0.0, 1.0))

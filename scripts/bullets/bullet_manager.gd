@@ -16,6 +16,18 @@ const LOOK_STYLE := {"pellet": Style.PELLET, "rifle": Style.RIFLE, "smg": Style.
 	"spark": Style.SPARK, "harpoon": Style.HARPOON, "dart": Style.DART}
 ## Destellos de impacto: un depósito fijo que se dibuja en el mismo MultiMesh que las balas del
 ## jugador (cero llamadas de dibujo extra). Cada uno vive IMPACT_LIFE s.
+## Choque entre balas (04-10-2026): las del jugador anulan las enemigas que tocan. Rejilla plana
+## de las balas enemigas (celdas de CLASH_CELL m), rehecha una vez por paso: cada bala del
+## jugador mira solo su celda y las vecinas. Las pesadas (radio >= HEAVY) siguen; las demás se
+## gastan al chocar.
+const CLASH_CELL := 1.0
+const CLASH_N := 96                          ## celdas por lado (96 m alrededor del centro)
+const HEAVY := 0.2
+var _clash_head := PackedInt32Array()        ## primera bala enemiga de cada celda (-1: ninguna)
+var _clash_next := PackedInt32Array()        ## siguiente en la misma celda
+var _clash_dead := PackedByteArray()         ## anuladas (se retiran al empezar el siguiente paso)
+var _pending_clear := false
+var _clash_built := -1                      ## fotograma de física en que se hizo la rejilla
 const MAX_IMPACTS := 256
 const IMPACT_LIFE := 0.18
 var _imp_pos := PackedVector3Array()
@@ -75,6 +87,7 @@ func _init() -> void:
 	_last_hit.resize(MAX_BULLETS); _push.resize(MAX_BULLETS); _bonus.resize(MAX_BULLETS); _split.resize(MAX_BULLETS); _tag.resize(MAX_BULLETS)
 	_home.resize(MAX_BULLETS); _effect.resize(MAX_BULLETS); _effect_val.resize(MAX_BULLETS); _slowed.resize(MAX_BULLETS)
 	_owner.resize(MAX_BULLETS)
+	_clash_head.resize(CLASH_N * CLASH_N); _clash_next.resize(MAX_BULLETS); _clash_dead.resize(MAX_BULLETS)
 	_imp_pos.resize(MAX_IMPACTS); _imp_age.resize(MAX_IMPACTS); _imp_look.resize(MAX_IMPACTS)
 
 func _ready() -> void:
@@ -172,14 +185,33 @@ func slow_enemy_bullets(center: Vector3, r: float, factor: float) -> int:
 	return n
 
 ## Resonador: deshace las balas enemigas dentro del círculo. Devuelve cuántas.
+## Las armas de área la llaman a menudo: solo marca (con la rejilla de choques, sin recorrer
+## todas las balas) y las marcadas se retiran al empezar el siguiente paso.
 func clear_enemy_bullets(center: Vector3, r: float) -> int:
-	var c := Vector2(center.x, center.z)
 	var n := 0
-	for i in range(count - 1, -1, -1):          # hacia atrás: _remove trae la última a su hueco
-		if _team[i] != Team.ENEMY: continue
-		if Vector2(_pos[i].x, _pos[i].z).distance_squared_to(c) > r * r: continue
-		_remove(i)
-		n += 1
+	if _clash_built != Engine.get_physics_frames():      # sin rejilla de este paso: recorrido simple
+		for j in count:
+			if _team[j] == Team.ENEMY and _clash_dead[j] == 0 					and Vector2(_pos[j].x - center.x, _pos[j].z - center.z).length_squared() <= r * r:
+				_clash_dead[j] = 1
+				n += 1
+		if n > 0:                                        # sin rejilla no hay índices que cuidar: fuera ya
+			for k in range(count - 1, -1, -1):
+				if _clash_dead[k] == 1: _remove(k)
+			for k in count: _clash_dead[k] = 0
+		return n
+	var c0 := int(floor((center.x - r) / CLASH_CELL)) + CLASH_N / 2
+	var c1 := int(floor((center.x + r) / CLASH_CELL)) + CLASH_N / 2
+	var z0 := int(floor((center.z - r) / CLASH_CELL)) + CLASH_N / 2
+	var z1 := int(floor((center.z + r) / CLASH_CELL)) + CLASH_N / 2
+	for z in range(maxi(z0, 0), mini(z1, CLASH_N - 1) + 1):
+		for x in range(maxi(c0, 0), mini(c1, CLASH_N - 1) + 1):
+			var j := _clash_head[z * CLASH_N + x]
+			while j >= 0:
+				if j < count and _team[j] == Team.ENEMY and _clash_dead[j] == 0 						and Vector2(_pos[j].x - center.x, _pos[j].z - center.z).length_squared() <= r * r:
+					_clash_dead[j] = 1
+					n += 1
+				j = _clash_next[j]
+	if n > 0: _pending_clear = true
 	return n
 
 ## Se traga hasta `max_n` balas enemigas dentro del círculo, las más cercanas primero
@@ -213,6 +245,7 @@ func _physics_process(delta: float) -> void:
 	var obs: ObstacleMap = world.obstacles if world != null and world.obstacles != null and world.obstacles.has_mask() else null
 	var i := 0
 	var frozen := world != null and world.freeze_t > 0.0
+	_resolve_clashes()                                # antes de mover nada: los índices aún valen
 	while i < count:
 		_prev[i] = _pos[i]
 		if frozen and _team[i] == Team.ENEMY:          # tiempo congelado: las balas enemigas, quietas
@@ -300,6 +333,60 @@ func _burst(i: int) -> void:
 		spawn(_team[i], _style[i], _pos[i], Vector3(cos(a), 0, sin(a)) * spd, _radius[i] * 0.8, _size[i] * 0.7,
 			d, 0.45, 0, _push[i] * 0.5, _bonus[i], 0)
 
+func _clash_key(p: Vector3) -> int:
+	var cx := int(floor(p.x / CLASH_CELL)) + CLASH_N / 2
+	var cz := int(floor(p.z / CLASH_CELL)) + CLASH_N / 2
+	if cx < 0 or cz < 0 or cx >= CLASH_N or cz >= CLASH_N: return -1
+	return cz * CLASH_N + cx
+
+## Choques entre balas, en una pasada aparte: rejilla de las enemigas, cada bala del jugador
+## anula como mucho una, y se retiran las anuladas (y las del jugador que no son pesadas).
+func _resolve_clashes() -> void:
+	if _pending_clear:                               # lo que marcaron las armas de área
+		_pending_clear = false
+		for k in range(count - 1, -1, -1):
+			if _clash_dead[k] == 1: _remove(k)
+	for k in count: _clash_dead[k] = 0               # ya retiradas: se vuelve a empezar
+	_build_clash()
+	var any := false
+	for i in count:
+		if _team[i] == Team.PLAYER and _clash(i):
+			any = true
+			if _radius[i] < HEAVY: _clash_dead[i] = 1
+	if not any: return
+	for k in range(count - 1, -1, -1):
+		if _clash_dead[k] == 1: _remove(k)
+
+func _build_clash() -> void:
+	_clash_built = Engine.get_physics_frames()
+	_clash_head.fill(-1)
+	for i in count:
+		if _team[i] != Team.ENEMY: continue
+		var k := _clash_key(_pos[i])
+		if k < 0: continue
+		_clash_next[i] = _clash_head[k]
+		_clash_head[k] = i
+
+## ¿Anula esta bala del jugador alguna enemiga? (como mucho una por paso)
+func _clash(i: int) -> bool:
+	var p := _pos[i]
+	var cx := int(floor(p.x / CLASH_CELL)) + CLASH_N / 2
+	var cz := int(floor(p.z / CLASH_CELL)) + CLASH_N / 2
+	for dz in range(-1, 2):
+		for dx in range(-1, 2):
+			var x := cx + dx; var z := cz + dz
+			if x < 0 or z < 0 or x >= CLASH_N or z >= CLASH_N: continue
+			var j := _clash_head[z * CLASH_N + x]
+			while j >= 0:
+				if _clash_dead[j] == 0 and _team[j] == Team.ENEMY:
+					var r := _radius[i] + _radius[j]
+					if Vector2(_pos[j].x - p.x, _pos[j].z - p.z).length_squared() <= r * r:
+						_clash_dead[j] = 1
+						impact(_pos[j], int(_style[i]))
+						return true
+				j = _clash_next[j]
+	return false
+
 ## Destello de impacto de una bala del jugador (con el aspecto de la bala, para su color).
 func impact(pos: Vector3, look: int) -> void:
 	if _imp_n >= MAX_IMPACTS: return
@@ -316,7 +403,7 @@ func _remove(i: int) -> void:
 		_team[i] = _team[last]; _style[i] = _style[last]; _pierce[i] = _pierce[last]; _last_hit[i] = _last_hit[last]
 		_push[i] = _push[last]; _bonus[i] = _bonus[last]; _split[i] = _split[last]
 		_home[i] = _home[last]; _effect[i] = _effect[last]; _effect_val[i] = _effect_val[last]; _slowed[i] = _slowed[last]; _tag[i] = _tag[last]
-		_owner[i] = _owner[last]
+		_owner[i] = _owner[last]; _clash_dead[i] = _clash_dead[last]
 	count = last
 
 func _process(_delta: float) -> void:
