@@ -212,8 +212,12 @@ func _physics_process(delta: float) -> void:
 	var b := world.bounds if world != null else Rect2(-100, -100, 200, 200)
 	var obs: ObstacleMap = world.obstacles if world != null and world.obstacles != null and world.obstacles.has_mask() else null
 	var i := 0
+	var frozen := world != null and world.freeze_t > 0.0
 	while i < count:
 		_prev[i] = _pos[i]
+		if frozen and _team[i] == Team.ENEMY:          # tiempo congelado: las balas enemigas, quietas
+			i += 1
+			continue
 		if _home[i] > 0.0 and world != null: _steer(i, delta)
 		_pos[i] += _vel[i] * delta
 		_age[i] += delta

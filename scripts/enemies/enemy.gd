@@ -298,6 +298,9 @@ func _physics_process(delta: float) -> void:
 	if not is_alive(): return
 	var t0 := Prof.start()
 	_spawn_t += delta
+	if world.freeze_t > 0.0:                         # tiempo congelado (recompensa): ni se mueve ni ataca
+		Prof.stop("enemigos_fisica", t0)
+		return
 	if shield_t > 0.0: shield_t -= delta
 	if _update_status(delta):                  # congelado en el tiempo (o muerto por la maldición)
 		Prof.stop("enemigos_fisica", t0)
@@ -364,7 +367,7 @@ func _process(delta: float) -> void:
 	visual.rotation.y = atan2(facing.x, facing.z)
 	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale   # aparece creciendo
 	if _aura_mat: _aura_mat.set_shader_parameter("color", Color(0.45, 0.2, 0.7, 0.14 + 0.07 * sin(_spawn_t * 2.5)))
-	if not anim_hold and _stasis_t <= 0.0:          # congelado: la animación se detiene
+	if not anim_hold and _stasis_t <= 0.0 and world.freeze_t <= 0.0:   # congelado: la animación se detiene
 		anim_t = fposmod(anim_t + delta / Anims.duration(model_name, anim), 1.0)
 	Anims.pose(model_name, anim, model, anim_t)
 	_flash -= delta
@@ -372,7 +375,7 @@ func _process(delta: float) -> void:
 	# Solo se toca el material al cambiar.
 	var want: Material = null
 	if _flash > 0.0: want = _flash_mat
-	elif _stasis_t > 0.0: want = _status(Color(0.35, 0.95, 1.0, 0.5))
+	elif _stasis_t > 0.0 or world.freeze_t > 0.0: want = _status(Color(0.35, 0.95, 1.0, 0.5))
 	elif _curse_t > 0.0: want = _status(Color(0.55, 0.12, 0.7, 0.35 + 0.1 * sin(_spawn_t * 9.0)))
 	elif _poison_t > 0.0: want = _status(Color(0.35, 0.85, 0.15, 0.3 + 0.08 * sin(_spawn_t * 7.0)))
 	elif _confuse_t > 0.0: want = _status(Color(0.95, 0.75, 0.95, 0.22 + 0.1 * sin(_spawn_t * 11.0)))

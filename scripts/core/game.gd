@@ -226,6 +226,9 @@ func _ready() -> void:
 		director.final_event.connect(func(_e: Enemy) -> void: announce(level.final_text, 3.5))
 		director.level_completed.connect(_on_level_completed)
 		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
+		if not args.get_bool("nobreakables"): add_child(BreakableSpawner.new().setup(world, arena.get_meta("size")))
+		if args.get_bool("pickup_test"):               # las cinco recompensas en fila delante del J1
+			for k in 5: world.fx.add_child.call_deferred(Pickup.new().setup(world, player.position + Vector3(-4 + k * 2, 0, 3), k as Pickup.Kind))
 		director.chest_spawned.connect(func(c: ArcaneChest) -> void:
 			c.opened.connect(func(_c: ArcaneChest, by: Player) -> void:
 				earn(c.money)

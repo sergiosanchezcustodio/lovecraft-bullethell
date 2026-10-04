@@ -10,6 +10,8 @@ extends Node3D
 var bullets: BulletManager
 ## Estadísticas de la partida por etiqueta de arma ("J1:webly"): [daño hecho, enemigos abatidos].
 var stats := {}
+var breakables: Array[Node3D] = []           ## objetos rompibles: se golpean, no se apuntan
+var freeze_t := 0.0                          ## s de tiempo congelado (recompensa): enemigos y sus balas quietos
 var fx: Node3D                               ## efectos visuales (explosiones, avisos)
 var players: Array[Player] = []
 var enemies: Array[Node3D] = []
@@ -39,8 +41,21 @@ func add_enemy(e: Node3D) -> void:
 func remove_enemy(e: Node3D) -> void:
 	enemies.erase(e)
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	if freeze_t > 0.0: freeze_t -= delta
 	rebuild_grid()
+
+func freeze_time(seconds: float) -> void:
+	freeze_t = maxf(freeze_t, seconds)
+
+func add_breakable(b: Node3D) -> void:
+	breakables.append(b)
+
+func remove_breakable(b: Node3D) -> void:
+	breakables.erase(b)
+
+static func is_enemy(t: Node3D) -> bool:
+	return not t.is_in_group(&"breakable")
 
 func rebuild_grid() -> void:
 	var t0 := Prof.start()
@@ -51,6 +66,10 @@ func rebuild_grid() -> void:
 		var p := e.global_position
 		grid.insert(Vector2(p.x, p.z), e.hit_radius)
 		_grid_targets.append(e)
+	for b in breakables:
+		if not is_instance_valid(b): continue
+		grid.insert(Vector2(b.global_position.x, b.global_position.z), b.hit_radius)
+		_grid_targets.append(b)
 	Prof.stop("rejilla", t0)
 
 func target_at(grid_id: int) -> Node3D:
@@ -59,18 +78,29 @@ func target_at(grid_id: int) -> Node3D:
 ## Enemigo vivo más cercano a pos dentro de max_r, o null.
 func nearest_enemy(pos: Vector3, max_r: float) -> Node3D:
 	var id := grid.nearest(Vector2(pos.x, pos.z), max_r)
-	return null if id < 0 else _grid_targets[id]
+	if id < 0: return null
+	if is_enemy(_grid_targets[id]): return _grid_targets[id]
+	# lo más cercano es un rompible: el enemigo más cercano de verdad (rara vez pasa)
+	var best: Node3D = null
+	var bd := INF
+	for t in enemies_in_circle(pos, max_r):
+		if not is_enemy(t): continue
+		var d := t.global_position.distance_squared_to(pos)
+		if d < bd: bd = d; best = t
+	return best
 
 ## Enemigo en el centro de la zona más poblada a menos de max_r (radio de grupo r), o null.
 func densest_enemy(pos: Vector3, max_r: float, r: float) -> Node3D:
 	var id := grid.densest(Vector2(pos.x, pos.z), max_r, r)
-	return null if id < 0 else _grid_targets[id]
+	if id < 0: return null
+	return _grid_targets[id] if is_enemy(_grid_targets[id]) else nearest_enemy(pos, max_r)
 
 ## La élite más cercana a menos de max_r o, si no hay ninguna, el enemigo con más vida.
 func strongest_enemy(pos: Vector3, max_r: float) -> Node3D:
 	var best: Node3D = null
 	var best_score := -INF
 	for e in enemies_in_circle(pos, max_r):
+		if not is_enemy(e): continue
 		var elite: bool = "data" in e and e.data.elite
 		var hp: float = e.health if "health" in e else 0.0
 		var score: float = (1e6 - e.global_position.distance_to(pos)) if elite else hp
