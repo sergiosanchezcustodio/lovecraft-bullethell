@@ -258,9 +258,9 @@ func _ready() -> void:
 	if args.get_float("xp") > 0.0: player.progress.add_xp(args.get_float("xp"))
 	if args.get_bool("gem_test"):                  # gemas quietas alrededor, sin recogida (verlas de cerca)
 		player.data.pickup_radius = 0.0
-		for i in 8:
-			var a := TAU * i / 8.0
-			gems.drop(player.position + Vector3(cos(a), 0, sin(a)) * 1.3, 1.0 + i * 3.0)
+		for i in 10:                                   # dos de cada escalón (amarilla a morada)
+			var a := TAU * i / 10.0
+			gems.drop(player.position + Vector3(cos(a), 0, sin(a)) * 1.6, 1.0, i / 2 + 1)
 	if args.has("hp"): player.health = args.get_float("hp")
 	if args.has("san"): player.sanity = args.get_float("san")
 	DebugOptions.apply_all(self)
@@ -335,7 +335,7 @@ func _on_enemy_died(e: Enemy) -> void:
 	kills += 1
 	if Saves.current != null: Saves.current.stats["kills"] += 1
 	if e.data.elite: Achievements.add(Saves.current, "elites")
-	gems.drop(e.global_position, e.data.xp)
+	gems.drop(e.global_position, e.data.xp, e.data.tier)
 	earn(e.data.money)
 
 ## Dólares (D-31): se suman al hueco en el momento, así que se conservan aunque se caiga.

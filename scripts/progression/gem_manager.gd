@@ -7,11 +7,17 @@ extends Node3D
 const MAX_GEMS := 2048
 ## Gema dorada tallada: facetas superiores claras, inferiores ámbar oscuro (contrasta con
 ## la nieve) y un destello blanco. Proyecta una pequeña sombra que la asienta en el suelo.
-const TOP_A := Color(1.0, 0.9, 0.5)
-const TOP_B := Color(1.0, 0.76, 0.24)
-const LOW_A := Color(0.9, 0.52, 0.1)
-const LOW_B := Color(0.62, 0.32, 0.05)
-const GLINT := Color(1.0, 1.0, 0.92)
+## Las facetas van en tonos neutros (claro arriba, oscuro abajo) y cada gema se tiñe con el
+## color de su escalón (color por instancia del MultiMesh: cero coste extra).
+const TOP_A := Color(1.0, 1.0, 1.0)
+const TOP_B := Color(0.86, 0.86, 0.86)
+const LOW_A := Color(0.62, 0.62, 0.62)
+const LOW_B := Color(0.42, 0.42, 0.42)
+const GLINT := Color(1.6, 1.6, 1.6)
+## Color de cada escalón (1..5): amarilla, verde, azul, roja y morada.
+const TIER_COLORS: Array[Color] = [Color(1.0, 0.78, 0.22), Color(0.35, 0.92, 0.35), Color(0.30, 0.62, 1.0),
+	Color(1.0, 0.24, 0.20), Color(0.72, 0.32, 1.0)]
+const STRIDE := 16
 
 var world: CombatWorld
 var rules: ProgressionData
@@ -22,17 +28,19 @@ var _vel := PackedVector3Array()
 var _value := PackedFloat32Array()
 var _age := PackedFloat32Array()
 var _homing := PackedByteArray()
+var _tier := PackedByteArray()
 var _mm: MultiMesh
 var _buffer := PackedFloat32Array()
 
 func _init() -> void:
 	name = "Gems"
 	_pos.resize(MAX_GEMS); _prev.resize(MAX_GEMS); _vel.resize(MAX_GEMS); _value.resize(MAX_GEMS)
-	_age.resize(MAX_GEMS); _homing.resize(MAX_GEMS)
+	_age.resize(MAX_GEMS); _homing.resize(MAX_GEMS); _tier.resize(MAX_GEMS)
 
 func _ready() -> void:
 	_mm = MultiMesh.new()
 	_mm.transform_format = MultiMesh.TRANSFORM_3D
+	_mm.use_colors = true
 	_mm.mesh = _gem_mesh()
 	_mm.instance_count = MAX_GEMS
 	_mm.visible_instance_count = 0
@@ -42,20 +50,14 @@ func _ready() -> void:
 	# Material iluminado (las facetas brillan con la luna y los faroles) con un leve brillo
 	# propio para verse de noche. Sin iluminar, el tonemapper dejaba el dorado casi blanco
 	# (invisible sobre la nieve) o naranja rojizo.
-	var mat := StandardMaterial3D.new()
-	mat.vertex_color_use_as_albedo = true
-	mat.vertex_color_is_srgb = VoxelBuilder.colors_are_srgb()
-	mat.metallic = 0.4
-	mat.roughness = 0.5          # brillo repartido (con 0,25 los reflejos parecían ojos)
-	mat.emission_enabled = true
-	mat.emission = Color(1.0, 0.72, 0.22)
-	mat.emission_energy_multiplier = 0.35
-	mat.cull_mode = BaseMaterial3D.CULL_DISABLED      # la gema es pequeña y se ve desde cualquier lado
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://scripts/progression/gem.gdshader")
+	mat.set_shader_parameter("srgb", VoxelBuilder.colors_are_srgb())
 	mmi.material_override = mat
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	mmi.custom_aabb = AABB(Vector3(-200, -10, -200), Vector3(400, 20, 400))
 	add_child(mmi)
-	_buffer.resize(MAX_GEMS * 12)
+	_buffer.resize(MAX_GEMS * STRIDE)
 
 ## Gema tallada: mesa plana arriba, corona de seis facetas, cintura y pabellón en punta.
 ## Cada faceta lleva su color (se ve el tallado aunque el material no se ilumine).
@@ -86,7 +88,7 @@ func _gem_mesh() -> ArrayMesh:
 	return st.commit()
 
 ## Suelta experiencia en una posición, repartida en gemas que saltan un poco.
-func drop(pos: Vector3, value: float) -> void:
+func drop(pos: Vector3, value: float, tier: int = 1) -> void:
 	var n := clampi(int(ceil(value / 5.0)), 1, 6)
 	for k in n:
 		if count >= MAX_GEMS: return
@@ -97,6 +99,7 @@ func drop(pos: Vector3, value: float) -> void:
 		_value[count] = value / n
 		_age[count] = 0.0
 		_homing[count] = 0
+		_tier[count] = clampi(tier, 1, 5)
 		count += 1
 
 ## Gema suelta (que aún no vuela hacia nadie) más cercana a `pos` dentro de `r`: su índice o -1.
@@ -163,21 +166,23 @@ func _physics_process(delta: float) -> void:
 func _remove(i: int) -> void:
 	var last := count - 1
 	_pos[i] = _pos[last]; _prev[i] = _prev[last]; _vel[i] = _vel[last]; _value[i] = _value[last]
-	_age[i] = _age[last]; _homing[i] = _homing[last]
+	_age[i] = _age[last]; _homing[i] = _homing[last]; _tier[i] = _tier[last]
 	count = last
 
 func _process(_delta: float) -> void:
 	var t := Time.get_ticks_msec() / 1000.0
 	var frac := Engine.get_physics_interpolation_fraction()
 	for i in count:
-		var o := i * 12
+		var o := i * STRIDE
 		var a := t * 2.5 + i * 0.7
-		var s := 1.0 + clampf(_value[i] / 10.0, 0.0, 1.5)
+		var s := 0.9 + 0.15 * _tier[i] + clampf(_value[i] / 20.0, 0.0, 0.6)
 		var c := cos(a) * s; var sn := sin(a) * s
 		var bob := sin(t * 3.0 + i) * 0.05 if _homing[i] == 0 else 0.0
 		var p := _prev[i].lerp(_pos[i], frac)
 		_buffer[o] = c; _buffer[o + 1] = 0.0; _buffer[o + 2] = sn; _buffer[o + 3] = p.x
 		_buffer[o + 4] = 0.0; _buffer[o + 5] = s; _buffer[o + 6] = 0.0; _buffer[o + 7] = p.y + bob
 		_buffer[o + 8] = -sn; _buffer[o + 9] = 0.0; _buffer[o + 10] = c; _buffer[o + 11] = p.z
+		var col := TIER_COLORS[_tier[i] - 1]
+		_buffer[o + 12] = col.r; _buffer[o + 13] = col.g; _buffer[o + 14] = col.b; _buffer[o + 15] = 1.0
 	RenderingServer.multimesh_set_buffer(_mm.get_rid(), _buffer)
 	_mm.visible_instance_count = count
