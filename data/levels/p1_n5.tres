@@ -19,6 +19,7 @@ display_name = "Los túneles y el abismo del mar subterráneo"
 part = 1
 number = 5
 arena = "res://data/arenas/tuneles.json"
+health_mult = 1.6
 duration = 300.0
 music = ""
 pool = Array[ExtResource("5")]([ExtResource("peng"), ExtResource("3"), ExtResource("4"), ExtResource("6"), ExtResource("7"), ExtResource("8")])

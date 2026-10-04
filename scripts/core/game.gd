@@ -114,7 +114,7 @@ func _ready() -> void:
 	# arena del nivel (LevelData.arena); arena=ruta para probar otra
 	var arena_path := "res://data/arenas/campamento.json"
 	if not args.get_bool("nolevel"):
-		var lid := args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1")
+		var lid := (String(GameSession.level) if not GameSession.carry.is_empty() else args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1"))
 		var ld: LevelData = load("res://data/levels/%s.tres" % lid)
 		if ld != null: arena_path = ld.arena
 	arena_path = args.get_str("arena", arena_path)
@@ -204,8 +204,10 @@ func _ready() -> void:
 	_env = env
 	_make_announcer()
 	if not args.get_bool("nolevel"):
-		var level_id := args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1")
+		var level_id := (String(GameSession.level) if not GameSession.carry.is_empty() else args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1"))
 		level = load("res://data/levels/%s.tres" % level_id).duplicate()
+		_apply_carry()                                 # progreso del nivel anterior de la parte
+		if args.get_bool("log"): print("INICIO %s nivel=%d armas=%s" % [level_id, player.progress.level, player.weapons.weapons.map(func(w: WeaponSystem.Weapon) -> String: return "%s:%d" % [w.data.id, w.level])])
 		if args.has("final_at"): level.final_time = args.get_float("final_at")
 		if args.has("chest_every"): level.chest_every = args.get_float("chest_every")   # baúles más a menudo (capturas)
 		if args.has("spawn_rate"): level.spawn_rate = [Vector2(0, args.get_float("spawn_rate"))] as Array[Vector2]
@@ -510,17 +512,56 @@ func _on_level_completed() -> void:
 	announce("Nivel superado", 2.0)
 	await get_tree().create_timer(2.5).timeout
 	get_tree().paused = true
-	_end_screen("Nivel superado", UiKit.GOLD)
+	_end_screen("Nivel superado", UiKit.GOLD, Campaign.next_in_part(String(level.id)))
 
-func _end_screen(title: String, accent: Color) -> void:
+func _end_screen(title: String, accent: Color, next_id := "") -> void:
 	var s := Menus.EndScreen.new(title, _summary(), accent)
+	s.has_next = next_id != ""
+	s.next_level.connect(func() -> void: _next_level(next_id))
 	s.restart.connect(_restart)
 	s.quit.connect(_quit)
 	add_child(s)
+	if args.get_bool("autonext") and next_id != "":           # pruebas: pasa solo al siguiente nivel
+		await get_tree().create_timer(0.5, true, false, true).timeout
+		_next_level(next_id)
+		return
 	if args.has("autorestart"):
 		print("fin de partida: ", title)
 		await get_tree().create_timer(args.get_float("autorestart"), true, false, true).timeout
 		_restart()
+
+## Progreso al empezar el nivel: el que viene del anterior de la parte (GameSession.carry) o,
+## si se empieza a mitad de parte sin él (mapa de depuración o level=), el que se tendría:
+## subidas de nivel automáticas (DEV_LEVELS_PER_STAGE por cada nivel anterior).
+const DEV_LEVELS_PER_STAGE := 7
+func _apply_carry() -> void:
+	if level == null: return
+	if not GameSession.carry.is_empty():
+		for q in players:
+			if q.index < GameSession.carry.size(): GameSession.restore(q, GameSession.carry[q.index])
+		if team != null:
+			team.level = player.progress.level
+			team.xp = GameSession.team_xp
+		return
+	var stage := Campaign.number_of(String(level.id))
+	if stage <= 1 or args.get_bool("fresh"): return
+	for q in players:
+		for k in DEV_LEVELS_PER_STAGE * (stage - 1):
+			q.progress.gain_level()
+			var opts := q.progress.roll_options(q.weapons, _rng)
+			if not opts.is_empty(): q.progress.choose(opts[_rng.randi() % opts.size()], q)
+		q.progress.pending = 0
+		q.rebuild_stats()
+		q.health = q.data.max_health
+	if team != null: team.level = player.progress.level
+
+## Siguiente nivel de la parte: el progreso de cada jugador pasa con él (GameSession.carry).
+func _next_level(id: String) -> void:
+	GameSession.carry.clear()
+	for q in players: GameSession.carry.append(GameSession.snapshot(q))
+	GameSession.team_xp = team.xp if team != null else 0.0
+	GameSession.level = StringName(id)
+	_restart()
 
 func _restart() -> void:
 	print("reinicio")

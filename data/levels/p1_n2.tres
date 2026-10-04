@@ -17,6 +17,7 @@ display_name = "El campamento destruido de Lake"
 part = 1
 number = 2
 arena = "res://data/arenas/lake.json"
+health_mult = 1.15
 duration = 300.0
 music = ""
 pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("6")])

@@ -23,3 +23,11 @@ func test_superar_un_nivel_abre_el_siguiente_aunque_sea_de_otra_parte() -> void:
 	assert_true(Campaign.is_playable("p1_n4", ["p1_n3"]))
 	assert_true(Campaign.is_playable("p1_n5", ["p1_n4"]))
 	assert_false(Campaign.is_playable("p2_n1", ["p1_n5"]), "sin datos todavía: próximamente")
+
+func test_siguiente_nivel_dentro_de_la_parte() -> void:
+	assert_eq(Campaign.next_in_part("p1_n1"), "p1_n2")
+	assert_eq(Campaign.next_in_part("p1_n5"), "", "el último de la parte no tiene siguiente")
+	assert_eq(Campaign.number_of("p1_n3"), 3)
+	assert_true(Campaign.part_unlocked(0, []))
+	assert_false(Campaign.part_unlocked(1, ["p1_n1"]))
+	assert_true(Campaign.part_unlocked(1, ["p1_n5"]))

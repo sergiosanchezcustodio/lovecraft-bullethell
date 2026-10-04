@@ -20,6 +20,7 @@ display_name = "La ciudad ciclópea de los Antiguos"
 part = 1
 number = 4
 arena = "res://data/arenas/ciudad.json"
+health_mult = 1.45
 duration = 300.0
 music = ""
 pool = Array[ExtResource("5")]([ExtResource("peng"), ExtResource("3"), ExtResource("4"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9")])

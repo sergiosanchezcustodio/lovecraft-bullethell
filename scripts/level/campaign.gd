@@ -38,5 +38,33 @@ static func is_unlocked(id: String, won: Array) -> bool:
 static func exists(id: String) -> bool:
 	return ResourceLoader.exists("res://data/levels/%s.tres" % id)
 
+## Siguiente nivel de la misma parte que ya existe ("" si es el último o no hay datos).
+static func next_in_part(id: String) -> String:
+	var all := levels()
+	for i in all.size() - 1:
+		if all[i].id == id and all[i + 1].part == all[i].part:
+			return String(all[i + 1].id) if exists(String(all[i + 1].id)) else ""
+	return ""
+
+## Número de nivel dentro de su parte (1..5).
+static func number_of(id: String) -> int:
+	for l in levels():
+		if l.id == id: return int(l.number)
+	return 1
+
+## Primer nivel de una parte (0..2).
+static func first_of(part: int) -> String:
+	for l in levels():
+		if l.part == part: return String(l.id)
+	return ""
+
+## Una parte se abre al superar el último nivel de la anterior (la primera, siempre).
+static func part_unlocked(part: int, won: Array) -> bool:
+	if part == 0: return true
+	var last := ""
+	for l in levels():
+		if l.part == part - 1: last = String(l.id)
+	return won.has(last)
+
 static func is_playable(id: String, won: Array) -> bool:
 	return is_unlocked(id, won) and exists(id)

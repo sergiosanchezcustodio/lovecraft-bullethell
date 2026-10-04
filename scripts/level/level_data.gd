@@ -9,6 +9,9 @@ extends Resource
 @export var part := 1
 @export var number := 1                        ## N: aparecen enemigos de escalón 1..N
 @export var arena := "res://data/arenas/campamento.json"
+## Vida de los enemigos del nivel (04-10-2026): los jugadores llegan con el progreso de los
+## niveles anteriores de la parte (GameSession.carry), así que los niveles avanzados aguantan más.
+@export var health_mult := 1.0
 @export var duration := 300.0                  ## s de referencia (la fase 1 dura 5 minutos)
 ## Música del nivel. Vacía: la del nivel 1 (hasta que haya más pistas).
 @export_file("*.mp3", "*.ogg") var music := ""

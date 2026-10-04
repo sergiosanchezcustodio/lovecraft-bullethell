@@ -135,6 +135,8 @@ class PauseMenu extends CanvasLayer:
 class EndScreen extends CanvasLayer:
 	signal restart
 	signal quit
+	signal next_level
+	var has_next := false                       ## "Siguiente nivel", primero y con el foco
 	var title := ""
 	var lines: PackedStringArray = []
 	var accent := UiKit.GOLD
@@ -164,6 +166,12 @@ class EndScreen extends CanvasLayer:
 			box.add_child(ll)
 		var gap := Control.new(); gap.custom_minimum_size.y = 12
 		box.add_child(gap)
+		var nxt: Button = null
+		if has_next:
+			nxt = UiKit.button("Siguiente nivel", accent)
+			nxt.custom_minimum_size = Vector2(300, 56)
+			nxt.pressed.connect(func() -> void: next_level.emit())
+			box.add_child(nxt)
 		var again := UiKit.button("Reintentar", accent)
 		again.custom_minimum_size = Vector2(300, 56)
 		again.pressed.connect(func() -> void: restart.emit())
@@ -173,4 +181,4 @@ class EndScreen extends CanvasLayer:
 		out.pressed.connect(func() -> void: quit.emit())
 		box.add_child(out)
 		box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
-		again.grab_focus.call_deferred()
+		(nxt if nxt != null else again).grab_focus.call_deferred()

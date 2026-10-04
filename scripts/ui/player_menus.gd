@@ -401,11 +401,17 @@ class ArenaMap extends PanelContainer:
 	var p: Player
 	var game: Node
 	var _canvas: Control
+	## Zoom (04-10-2026): gatillos del mando (LT aleja, RT acerca) o + y - del teclado. Con
+	## zoom, el mapa sigue al jugador. Todo se recorta al marco.
+	var zoom := 1.0
+	const ZOOM_MIN := 1.0
+	const ZOOM_MAX := 4.0
 
 	func _init(player: Player, p_game: Node) -> void:
 		p = player
 		game = p_game
-		add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.025, 0.035, 0.82), Color(p.color, 0.8), 10))
+		var solo := p_game == null or (p_game.get("players") as Array).size() == 1
+		add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.025, 0.035, 0.95 if solo else 0.82), Color(p.color, 0.8), 10))
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var box := VBoxContainer.new()
 		add_child(box)
@@ -413,14 +419,34 @@ class ArenaMap extends PanelContainer:
 		box.add_child(t)
 		_canvas = Control.new()
 		_canvas.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		_canvas.clip_contents = true                   # nada se sale del marco
 		_canvas.draw.connect(_draw_map)
 		box.add_child(_canvas)
-		var hint := UiKit.label("Cruceta abajo o M, B o Esc: cerrar", 13, UiKit.TEXT_DIM)
+		var hint := UiKit.label("Gatillos o + y −: zoom  ·  Cruceta abajo o M, B o Esc: cerrar", 13, UiKit.TEXT_DIM)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(hint)
 
-	func _process(_delta: float) -> void:
+	func _process(delta: float) -> void:
+		var z := _zoom_input()
+		if z != 0.0: zoom = clampf(zoom * exp(z * 1.6 * delta), ZOOM_MIN, ZOOM_MAX)
 		_canvas.queue_redraw()
+
+	## +1 acercar, −1 alejar, 0 nada: teclado (+/−) si el jugador lo usa, gatillos de su mando.
+	func _zoom_input() -> float:
+		var z := 0.0
+		var devs: Array[int] = []
+		var keyboard := false
+		var srcs: Array = [p.input]
+		if p.input is CombinedInput: srcs = (p.input as CombinedInput).sources
+		for s in srcs:
+			if s is JoypadInput: devs.append((s as JoypadInput).device)
+			elif s is KeyboardInput: keyboard = true
+		if keyboard:
+			if Input.is_physical_key_pressed(KEY_EQUAL) or Input.is_physical_key_pressed(KEY_KP_ADD) or Input.is_key_pressed(KEY_PLUS): z += 1.0
+			if Input.is_physical_key_pressed(KEY_MINUS) or Input.is_physical_key_pressed(KEY_KP_SUBTRACT): z -= 1.0
+		for d in devs:
+			z += Input.get_joy_axis(d, JOY_AXIS_TRIGGER_RIGHT) - Input.get_joy_axis(d, JOY_AXIS_TRIGGER_LEFT)
+		return clampf(z, -1.0, 1.0)
 
 	## Del suelo al mapa: ejes de la pantalla (la arena se ve como un rombo, como en el juego).
 	static func project(pos: Vector3) -> Vector2:
@@ -437,8 +463,10 @@ class ArenaMap extends PanelContainer:
 		var extent := 0.0
 		for c: Vector3 in corners: extent = maxf(extent, project(c).length())
 		var area := _canvas.size
-		var k := minf(area.x, area.y) * 0.48 / maxf(extent, 1.0)
+		var k := minf(area.x, area.y) * 0.46 / maxf(extent, 1.0) * zoom
 		var o := area * 0.5
+		if zoom > 1.0: o -= project(p.global_position) * k * clampf((zoom - 1.0) * 2.0, 0.0, 1.0)   # sigue al jugador
+		var inside := func(v: Vector3) -> bool: return absf(v.x) <= half.x + 2.0 and absf(v.z) <= half.y + 2.0
 		var poly := PackedVector2Array()
 		for c: Vector3 in corners: poly.append(o + project(c) * k)
 		_canvas.draw_colored_polygon(poly, Color(0.55, 0.62, 0.72, 0.18))       # la arena
@@ -447,6 +475,7 @@ class ArenaMap extends PanelContainer:
 		var obs: ObstacleMap = arena.get_meta("obstacles") if arena != null and arena.has_meta("obstacles") else null
 		if obs != null:
 			for c in obs.circles():
+				if not inside.call(Vector3(c.x, 0, c.y)): continue        # el mar y el fondo, fuera
 				_canvas.draw_circle(o + project(Vector3(c.x, 0, c.y)) * k, maxf(c.z * k, 1.5), Color(0.35, 0.38, 0.42, 0.8))
 		if arena != null and arena.has_meta("lights"):
 			for l: Node3D in arena.get_meta("lights"):
