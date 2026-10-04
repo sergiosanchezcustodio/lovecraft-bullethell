@@ -228,8 +228,10 @@ def perforadora():
     return M
 
 
+# El avión ya no sale de aquí (04-10-2026): lo genera tools/generar_modelo_replicate.py (FLUX +
+# TRELLIS, voxelizado). La función avion() queda como alternativa sin conexión.
 PIECES = {'tienda_rota': tienda_rota, 'caja_rota': caja_rota, 'mesa_diseccion': mesa_diseccion,
-          'avion': avion, 'perforadora': perforadora}
+          'perforadora': perforadora}
 
 if __name__ == '__main__':
     only = set(sys.argv[1:])
