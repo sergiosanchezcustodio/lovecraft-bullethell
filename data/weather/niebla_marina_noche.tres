@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WeatherData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/weather_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"niebla_marina_noche"
+display_name = "Niebla marina de noche"
+wind_dir = Vector2(-1, -0.6)
+wind = 1.6
+gusts = 0.7
+precip = 3
+precip_amount = 0.12
+fall_speed = 9.0
+precip_color = Color(0.70, 0.76, 0.80, 0.35)
+drift = 0.0
+mist = 0.22
+mist_color = Color(0.16, 0.19, 0.22, 1.0)
+clouds = 0.35
+fog_density = 0.004

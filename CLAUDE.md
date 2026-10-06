@@ -333,6 +333,39 @@ Léela al empezar cada sesión:
       - En la prueba extrema (150 enemigos y 1.000 balas): 57 FPS, porque los humanos de estilo 4 (20.000-34.000 voxels) suman unos 10 millones de primitivas; la arena sola va a 119 FPS. Si hiciera falta, la solución sería unir caras en `VoxelBuilder` o exportar los enemigos humanos a 32 voxels/m.
     - **Arreglado de paso:** la maldición de la daga ritual intentaba saltar a los objetos rompibles (`Breakable` no tiene `is_cursed`).
     - **Probar:** `godot --path . -- level=p2_n2` (o `final_at=10`). Capturas: `shots/game_cal_003.0s.png` (la plaza), `game_cal15_003.0s.png` (el muelle) y `game_sumo_030.0s.png`.
+  - **Hito 6.3 (nivel 3 de la parte 2, el hotel Gilman House y la huida por los tejados): hecho, pendiente de tu revisión (06-10-2026).**
+    - **Evento de supervivencia** (el primero), en `LevelData`:
+      - Datos nuevos: `final_survive` (s), `final_rate`, `final_cap`, `final_pool`, `final_name` e `is_survival()`.
+      - `WaveDirector._survival_step`: de `final_time` a `final_time + final_survive` llega la horda, sustituyendo a las oleadas normales, y al acabar el nivel está superado. Al empezar la horda aparece un baúl arcano.
+      - HUD: "Resiste a la horda · 0:42" (`survive_left()`).
+      - Test en `tests/test_survival.gd`.
+      - Aquí: 60 s de horda del Arrecife del Diablo (Profundos y escupidores, hasta 70 vivos).
+    - **Enemigos:**
+      - Profundo (del 6.0) como horda principal.
+      - Profundo escupidor (`profundo_lanzador`): azul pizarra con aletas turquesa. Comportamiento `keep`; escupe un abanico de agua salada física (`agua_salada`).
+      - `acechador_tejados`: el Acechador como élite de las oleadas, con menos vida y menos aura que en la parte 1.
+      - Vuelven los híbridos avanzados.
+      - `tools/gen_profundo.py` hace las dos variantes (`build(nombre)`).
+    - **Piezas a otra altura:** clave `y` en las piezas de la arena (`Arena.add(..., y=)`, `ArenaBuilder`, `gen_mapa_transitable.py`). Aquí, los tejados y las farolas de la calle, más abajo que el tejado.
+    - **Atrezo** (`tools/gen_atrezo_tejados.py` → `models/tej_*.json`):
+      - La trasera del Gilman House (16/m), con ventanas encendidas que brillan y la escalera de incendios.
+      - Tejado abuhardillado, chimenea, claraboya, depósito de agua sobre patas, tendedero, pretil de ladrillo y trampilla.
+    - **Arena** (`tools/gen_arena_tejados.py` → `data/arenas/tejados.json`, mapa en `resources/maps/p2_n3.png`):
+      - Tablas mojadas (`planks`). El hotel y las buhardillas al norte y al oeste.
+      - Pretil al sur y al este, y abajo dos filas de tejados de la calle con farolas.
+      - Chimeneas, claraboyas, depósitos, tendederos y medianeras bajas hacen pasillos.
+      - Clima nuevo `niebla_marina_noche`: la niebla clara se veía como un suelo gris.
+      - Primera versión: los tejados de abajo estaban a 9 m del borde y entre medias solo se veía el fondo. Ahora están a 4 m y el fondo es más oscuro.
+    - **Nivel `data/levels/p2_n3.tres`:** `health_mult` 1,3.
+    - **Equilibrio con bot (`circle`, sin compras):**
+      - Cae entre los 155 y los 271 s; una vez superó el nivel, horda incluida. El nivel 2 de la parte 2, entre 186 y 208.
+      - En cooperativo con 3 bots lo superan, horda incluida.
+      - Ajustes: el aura del Acechador hundía la cordura del bot (37 a los 90 s); escupidores con menos daño y más pausa; Profundo con menos daño por contacto.
+    - **Rendimiento:** 113 FPS con 75 enemigos y 500 balas; 48 en la prueba extrema (150 y 1.000), por los modelos humanos y los Profundos de estilo 4.
+    - **Probar:**
+      - `godot --path . -- level=p2_n3`.
+      - La horda, adelantada: `final_at=15`.
+      - Hoja `shots/revision_6_3_atrezo_y_profundos.png`; capturas `shots/game_tej4_003.0s.png` y `shots/game_horda_040.0s.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

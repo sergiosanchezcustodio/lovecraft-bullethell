@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"agua_salada"
+shape = 1
+count = 5
+spread_deg = 40.0
+speed = 5.0
+radius = 0.13
+size = 0.2
+damage_physical = 6.0
+damage_mental = 0.0
+lifetime = 3.0
+bursts = 1
+aimed = true
+telegraph_time = 0.0

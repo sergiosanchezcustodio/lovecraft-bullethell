@@ -26,7 +26,9 @@
 		"hibrido_m": "Híbrida avanzada. En Innsmouth dicen que las mujeres de las viejas familias se marchan antes al Arrecife. Ésta no tardará: bajo el vestido roto le asoman las aletas de los pies.",
 		"acolito_guardia": "Acólito guardián del sumo sacerdote. Lo protege con su propio cuerpo; mientras quede uno en pie, el oro de la tiara desvía cualquier golpe.",
 		"sacerdote": "Sacerdote de la tiara. Viste vestiduras verde marino con galones de oro y lleva en la cabeza la tiara alta de oro extraño que la Orden saca del Arrecife. Sus cánticos se meten en la cabeza en oleadas.",
-		"sumo_sacerdote": "El sumo sacerdote de la Orden Esotérica de Dagon, de negro bordado en oro y con la tiara más alta de todas. Cuando se ve en peligro, sus acólitos forman un círculo a su alrededor y nada lo toca mientras canten."
+		"sumo_sacerdote": "El sumo sacerdote de la Orden Esotérica de Dagon, de negro bordado en oro y con la tiara más alta de todas. Cuando se ve en peligro, sus acólitos forman un círculo a su alrededor y nada lo toca mientras canten.",
+		"profundo_lanzador": "Profundo escupidor, de piel azul pizarra y aletas turquesa. No se acerca: se agazapa a unos metros y escupe un abanico de agua salada que golpea como una pedrada.",
+		"acechador_tejados": "El Acechador también sube a los tejados de Innsmouth. Ronda entre las chimeneas, se agazapa y salta sobre su presa con un croar que hiela la sangre."
 	},
 	"weapons": {
 		"webly": "Revólver del ejército británico, pesado y fiable. Su bala del .455 tumba a un hombre y hace retroceder a lo que no lo es.",
@@ -90,7 +92,7 @@
 		"p1_n5": "Túneles que bajan hasta un mar sin luz. Al fondo, algo silba.",
 		"p2_n1": "Newburyport, al anochecer. La última parada antes de Innsmouth es un autobús viejo que conduce Joe Sargent, un hombre de cabeza estrecha que nunca parpadea. La carretera de tierra cruza la marisma entre casas tapiadas y postes de telégrafo; nadie del pueblo quiere hablar de lo que hay al final.",
 		"p2_n2": "Innsmouth. Las casas georgianas se caen a pedazos, los tejados están hundidos y en las calles de adoquines huele a pescado podrido. En la vieja plaza, el antiguo templo masónico luce ahora el símbolo de la Orden Esotérica de Dagon. Junto a los muelles, el agua del puerto es negra y verde, y no se mueve como debería.",
-		"p2_n3": "El hotel Gilman House. De noche, alguien prueba el picaporte.",
+		"p2_n3": "El hotel Gilman House. A medianoche alguien probó el picaporte de mi cuarto; luego, todas las puertas del pasillo. Salí por la ventana a los tejados y corrí entre chimeneas y depósitos de agua, mientras abajo, en la calle, la horda del Arrecife del Diablo subía por las escaleras de incendios.",
 		"p2_n4": "Los pantanos y la vía muerta del tren a Rowley: la única salida.",
 		"p2_n5": "El Arrecife del Diablo y, bajo él, la ciudad de Y'ha-nthlei.",
 		"p3_n1": "Providence, Rhode Island. El estudio del escultor Wilcox, que sueña con una ciudad sumergida.",

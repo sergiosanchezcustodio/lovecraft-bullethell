@@ -213,7 +213,7 @@ func _ready() -> void:
 		if args.has("spawn_rate"): level.spawn_rate = [Vector2(0, args.get_float("spawn_rate"))] as Array[Vector2]
 		# Construir ya los modelos de todos los enemigos del nivel: si no, la primera aparición
 		# de cada uno (el Acechador, en el minuto 4) provocaría un tirón a mitad de partida.
-		for ed: EnemyData in level.pool + ([level.final_enemy] if level.final_enemy else []):
+		for ed: EnemyData in level.pool + level.final_pool + ([level.final_enemy] if level.final_enemy else []):
 			VoxelBuilder.load_model("res://models/%s.json" % ed.model).free()
 		var enemies_root := Node3D.new()
 		enemies_root.name = "Enemies"

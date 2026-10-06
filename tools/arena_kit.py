@@ -23,10 +23,12 @@ class Arena:
         self.foot = foot or {}                  # radio que ocupa cada pieza a escala 1 (resto, 1,2 m)
         self.spawn_clear = spawn_clear          # radio libre alrededor de la salida
 
-    def add(self, model, x, z, rot=None, scale=1.0):
-        self.props.append({"model": model, "pos": [round(x, 2), round(z, 2)],
-                           "rot": round(self.rng.uniform(0, 360) if rot is None else rot, 1),
-                           "scale": round(scale, 2)})
+    def add(self, model, x, z, rot=None, scale=1.0, y=None):
+        """y: altura propia de la pieza (por defecto, el suelo; o el agua si está en el mar)."""
+        p = {"model": model, "pos": [round(x, 2), round(z, 2)],
+             "rot": round(self.rng.uniform(0, 360) if rot is None else rot, 1), "scale": round(scale, 2)}
+        if y is not None: p["y"] = round(y, 2)
+        self.props.append(p)
 
     def free(self, x, z, r):
         """¿Está (x, z) a más de r metros de todas las piezas y de la zona de salida?"""

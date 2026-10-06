@@ -30,6 +30,18 @@ extends Resource
 @export var final_spawn_scale := 0.3           ## tras el evento, el ritmo normal se multiplica por esto
                                                ## (el duelo con la élite no debe ahogarse en la horda)
 @export var final_text := "Algo acecha entre las tiendas…"
+## Evento de supervivencia (hito 6.3, la horda del Arrecife): si final_survive > 0, al llegar a
+## final_time no aparece un ser único; llega una horda durante final_survive s (final_rate
+## enemigos/s, de final_pool o, vacío, del pool del nivel, hasta final_cap vivos; 0 = max_alive)
+## y el nivel se supera al aguantarla.
+@export var final_survive := 0.0
+@export var final_rate := 3.0
+@export var final_cap := 0
+@export var final_pool: Array[EnemyData] = []
+@export var final_name := "la horda"           ## para el HUD: "Resiste a la horda · 0:42"
+
+func is_survival() -> bool:
+	return final_survive > 0.0
 @export_group("Dinero (D-31)")
 @export var money_bonus := 100                 ## dólares al superar el nivel
 @export var chest_every := 90.0                ## s medios entre baúles arcanos (0: ninguno)

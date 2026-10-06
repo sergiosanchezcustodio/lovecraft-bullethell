@@ -48,7 +48,9 @@ func _physics_process(delta: float) -> void:
 	if target_alive > 0:
 		_keep_alive(delta)
 		return
-	if not _final_done and level.final_enemy != null and time >= level.final_time:
+	if level.is_survival():
+		if _survival_step(delta): return
+	elif not _final_done and level.final_enemy != null and time >= level.final_time:
 		_final_done = true
 		_final = spawn(level.final_enemy, spawn_point(level.final_enemy.body_radius))
 		for i in level.final_wave:
@@ -65,6 +67,43 @@ func _physics_process(delta: float) -> void:
 		var d := pick()
 		if d == null: break
 		spawn(d, spawn_point(d.body_radius))
+
+## Evento de supervivencia (hito 6.3): de final_time a final_time + final_survive llega la
+## horda a su ritmo; al acabar, nivel superado. Devuelve true mientras dura (sustituye a las
+## oleadas normales).
+func _survival_step(delta: float) -> bool:
+	if time < level.final_time: return false
+	if not _final_done:
+		_final_done = true
+		_acc = 0.0
+		spawn_chest()                                   # un baúl para aguantar la horda
+		final_event.emit(null)
+	if time >= level.final_time + level.final_survive:
+		if not completed:
+			completed = true
+			level_completed.emit()
+		return true
+	var cap := level.final_cap if level.final_cap > 0 else max_alive()
+	cap = int(round(cap * LevelData.coop(level.coop_spawn, players)))
+	_acc += level.final_rate * LevelData.coop(level.coop_spawn, players) * delta
+	while _acc >= 1.0:
+		if alive.size() >= cap:
+			_acc = 1.0
+			break
+		_acc -= 1.0
+		var d := _pick_final()
+		if d == null: break
+		spawn(d, spawn_point(d.body_radius))
+	return true
+
+func _pick_final() -> EnemyData:
+	if level.final_pool.is_empty(): return pick()
+	return level.final_pool[rng.randi() % level.final_pool.size()]
+
+## Segundos que quedan de la horda (0 si no hay o no ha empezado).
+func survive_left() -> float:
+	if not level.is_survival() or time < level.final_time: return 0.0
+	return maxf(0.0, level.final_time + level.final_survive - time)
 
 ## Baúles arcanos (D-31): uno cada `chest_every` s (±25 %), como mucho `chest_max` cerrados,
 ## en un sitio libre a 6-12 m de un jugador en pie.
@@ -105,6 +144,9 @@ func _keep_alive(delta: float) -> void:
 
 ## Lanza ya el evento final (depuración).
 func trigger_final() -> void:
+	if level.is_survival():
+		time = maxf(time, level.final_time)
+		return
 	if _final_done or level.final_enemy == null: return
 	time = maxf(time, level.final_time)
 	_final_done = true

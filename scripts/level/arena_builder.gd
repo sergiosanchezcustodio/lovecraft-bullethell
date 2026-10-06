@@ -37,6 +37,7 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 		# lo que queda en el mar (más allá de la orilla, al sur o al este) flota a la altura del agua
 		if data.has("sea") and (p.pos[0] > size.x * 0.5 or p.pos[1] > size.y * 0.5):
 			holder.position.y = float(data.sea.level) - 0.15
+		if p.has("y"): holder.position.y = float(p.y)          # altura propia (tejados de abajo, hito 6.3)
 		holder.rotation_degrees.y = p.rot
 		holder.scale = Vector3.ONE * float(p.scale)
 		var m := VoxelBuilder.load_model("res://models/%s.json" % p.model)

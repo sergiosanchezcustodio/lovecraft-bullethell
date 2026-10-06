@@ -122,6 +122,7 @@ def build(name):
     pieces = []
     for p in data['props']:
         y = sea_y - 0.15 if ('sea' in data and (p['pos'][0] > half[0] or p['pos'][1] > half[1])) else 0.0
+        if 'y' in p: y = p['y']
         s = float(p['scale'])
         pieces.append((p['model'], (p['pos'][0], y, p['pos'][1]), p['rot'], (s, s, s)))
     if 'barrier' in data:

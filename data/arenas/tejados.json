@@ -1,0 +1,1365 @@
+{
+ "name": "El hotel Gilman House y la huida por los tejados",
+ "spawn": [
+  0.0,
+  4.0
+ ],
+ "ground": {
+  "seed": 29,
+  "tile": 0.5,
+  "margin_back": 14.0,
+  "margin_front": 0.6,
+  "camp_radius": 0.0,
+  "kind": "planks",
+  "wet": 0.6,
+  "colors": {
+   "base_hi": [
+    0.4,
+    0.36,
+    0.32
+   ],
+   "base_lo": [
+    0.22,
+    0.2,
+    0.18
+   ],
+   "joint": [
+    0.02,
+    0.02,
+    0.02
+   ]
+  }
+ },
+ "light": {
+  "sun_rot": [
+   -48,
+   210
+  ],
+  "sun_color": [
+   0.62,
+   0.7,
+   0.9
+  ],
+  "sun_energy": 0.38,
+  "exposure": 1.3,
+  "ambient_color": [
+   0.4,
+   0.46,
+   0.56
+  ],
+  "ambient_energy": 0.46,
+  "background": [
+   0.015,
+   0.02,
+   0.03
+  ],
+  "fog_color": [
+   0.18,
+   0.21,
+   0.25
+  ],
+  "fog_density": 0.0
+ },
+ "lamp": {
+  "color": [
+   1.0,
+   0.78,
+   0.48
+  ],
+  "energy": 2.6,
+  "range": 9.0
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.12
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "tej_gilman": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "tej_buhardilla": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "tej_chimenea": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "tej_claraboya": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "tej_deposito": {
+   "type": "cylinder",
+   "radius": 1.1
+  },
+  "tej_tendedero": {
+   "type": "box",
+   "shrink": 0.6
+  },
+  "tej_pretil": {
+   "type": "box",
+   "shrink": 1.0
+  },
+  "tej_trampilla": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "inn_casa": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "inn_farola": {
+   "type": "cylinder",
+   "radius": 0.2
+  }
+ },
+ "size": [
+  60.0,
+  60.0
+ ],
+ "props": [
+  {
+   "model": "tej_gilman",
+   "pos": [
+    0.0,
+    -32.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -20.0,
+    -33.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -11.0,
+    -33.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    15.0,
+    -33.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    24.0,
+    -33.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -33.0,
+    -24.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -33.0,
+    -16.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -33.0,
+    -8.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -33.0,
+    0.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -33.0,
+    8.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -33.0,
+    16.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -33.0,
+    24.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -33.0,
+    32.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    -28.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    -28.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    -24.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    -24.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    -20.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    -20.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    -16.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    -16.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    -12.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    -12.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    -8.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    -8.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    -4.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    -4.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    0.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    0.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    4.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    4.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    8.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    8.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    12.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    12.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    16.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    16.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    20.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    20.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    24.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    24.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    28.0,
+    30.3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    30.3,
+    28.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -36.0,
+    34.2
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.2,
+    -36.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -32.0,
+    43.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    43.0,
+    -32.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -28.0,
+    34.2
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.2,
+    -28.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -24.0,
+    43.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    43.0,
+    -24.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -20.0,
+    34.2
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.2,
+    -20.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -16.0,
+    43.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    43.0,
+    -16.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -12.0,
+    34.2
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.2,
+    -12.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    -8.0,
+    43.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    43.0,
+    -8.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -4.0,
+    34.2
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.2,
+    -4.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    0.0,
+    43.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    43.0,
+    0.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    4.0,
+    34.2
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.2,
+    4.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    8.0,
+    43.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    43.0,
+    8.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    12.0,
+    34.2
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.2,
+    12.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    16.0,
+    43.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    43.0,
+    16.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    20.0,
+    34.2
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.2,
+    20.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    24.0,
+    43.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    43.0,
+    24.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    28.0,
+    34.2
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.2,
+    28.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    32.0,
+    43.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    43.0,
+    32.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    36.0,
+    34.2
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.2,
+    36.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    40.0,
+    43.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    43.0,
+    40.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    44.0,
+    34.2
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.2,
+    44.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -5.5
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    48.0,
+    43.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "tej_buhardilla",
+   "pos": [
+    43.0,
+    48.0
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -4.0
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    -22.0,
+    39.0
+   ],
+   "rot": 0,
+   "scale": 1.3,
+   "y": -5.5
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    39.0,
+    -22.0
+   ],
+   "rot": 0,
+   "scale": 1.3,
+   "y": -5.5
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    0.0,
+    39.0
+   ],
+   "rot": 0,
+   "scale": 1.3,
+   "y": -5.5
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    39.0,
+    0.0
+   ],
+   "rot": 0,
+   "scale": 1.3,
+   "y": -5.5
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    22.0,
+    39.0
+   ],
+   "rot": 0,
+   "scale": 1.3,
+   "y": -5.5
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    39.0,
+    22.0
+   ],
+   "rot": 0,
+   "scale": 1.3,
+   "y": -5.5
+  },
+  {
+   "model": "tej_deposito",
+   "pos": [
+    -12.0,
+    -14.0
+   ],
+   "rot": 69.1,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_deposito",
+   "pos": [
+    13.0,
+    -16.0
+   ],
+   "rot": 56.1,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_deposito",
+   "pos": [
+    -4.0,
+    18.0
+   ],
+   "rot": 2.6,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_tendedero",
+   "pos": [
+    -16.0,
+    4.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_tendedero",
+   "pos": [
+    6.0,
+    -6.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_tendedero",
+   "pos": [
+    18.0,
+    12.0
+   ],
+   "rot": 30,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_tendedero",
+   "pos": [
+    -6.0,
+    -22.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    -22.0,
+    -8.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    2.0,
+    10.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_pretil",
+   "pos": [
+    22.0,
+    -2.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    -9.1,
+    3.85
+   ],
+   "rot": 299.9,
+   "scale": 1.24
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    -13.77,
+    -25.52
+   ],
+   "rot": 285.9,
+   "scale": 1.2
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    21.69,
+    -17.54
+   ],
+   "rot": 63.8,
+   "scale": 1.29
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    6.03,
+    17.78
+   ],
+   "rot": 58.3,
+   "scale": 1.18
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    -16.27,
+    11.92
+   ],
+   "rot": 78.2,
+   "scale": 1.25
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    7.87,
+    1.09
+   ],
+   "rot": 18.8,
+   "scale": 1.08
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    -15.11,
+    -18.17
+   ],
+   "rot": 155.8,
+   "scale": 1.29
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    9.79,
+    14.05
+   ],
+   "rot": 248.6,
+   "scale": 1.24
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    -20.85,
+    23.93
+   ],
+   "rot": 37.2,
+   "scale": 1.27
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    -14.91,
+    24.04
+   ],
+   "rot": 313.1,
+   "scale": 1.1
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    23.53,
+    -14.26
+   ],
+   "rot": 29.9,
+   "scale": 1.26
+  },
+  {
+   "model": "tej_chimenea",
+   "pos": [
+    15.22,
+    25.99
+   ],
+   "rot": 229.3,
+   "scale": 1.14
+  },
+  {
+   "model": "tej_claraboya",
+   "pos": [
+    -15.27,
+    -6.5
+   ],
+   "rot": 123.4,
+   "scale": 1.06
+  },
+  {
+   "model": "tej_claraboya",
+   "pos": [
+    -24.8,
+    -24.98
+   ],
+   "rot": 70.9,
+   "scale": 1.15
+  },
+  {
+   "model": "tej_claraboya",
+   "pos": [
+    -4.44,
+    -6.38
+   ],
+   "rot": 21.0,
+   "scale": 1.01
+  },
+  {
+   "model": "tej_claraboya",
+   "pos": [
+    14.85,
+    -25.75
+   ],
+   "rot": 140.0,
+   "scale": 1.11
+  },
+  {
+   "model": "tej_claraboya",
+   "pos": [
+    9.68,
+    4.3
+   ],
+   "rot": 276.7,
+   "scale": 1.02
+  },
+  {
+   "model": "tej_claraboya",
+   "pos": [
+    -13.36,
+    26.9
+   ],
+   "rot": 230.8,
+   "scale": 1.05
+  },
+  {
+   "model": "tej_trampilla",
+   "pos": [
+    26.37,
+    10.51
+   ],
+   "rot": 313.6,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_trampilla",
+   "pos": [
+    -12.01,
+    -4.07
+   ],
+   "rot": 59.1,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_trampilla",
+   "pos": [
+    -2.39,
+    8.19
+   ],
+   "rot": 284.8,
+   "scale": 1.0
+  },
+  {
+   "model": "tej_trampilla",
+   "pos": [
+    5.83,
+    -21.06
+   ],
+   "rot": 347.7,
+   "scale": 1.0
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/tejados_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125
+ }
+}
