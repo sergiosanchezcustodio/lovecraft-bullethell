@@ -253,6 +253,18 @@ Léela al empezar cada sesión:
   - Ficha del jugador rehecha con el formato de la selección (`PlayerMenus.Sheet`): personaje, compañero (imagen y datos), atributos y estadísticas ya actualizadas, armas con imagen, daño y abatidos, objetos con imagen. En cooperativo, a lo alto de su lado y una columna por página (LB/RB).
   - Estadísticas por arma: `Damage.ctx`/`Damage.tag` ("J1:webly"); `WeaponSystem` lo pone al disparar, cada efecto lo guarda al crearse (`_wtag`) y cada bala en `BulletManager._tag`; `Enemy.take_damage` suma en `CombatWorld.stats` (`stats_of(i)`). El compañero cuenta como "mascota". Con `log=true`, "ESTADISTICAS J1 …" al superar el nivel.
   - Balas del jugador con aspecto por arma (`WeaponData.bullet_look`: pellet, rifle, smg, blade, spark, harpoon, dart; sin él, trazadora pesada con halo) y destellos de impacto (estilo 13, depósito de 256 en el mismo MultiMesh). Sin coste medible (buffer 0,71 ms). Hoja `shots/rev_balas.png`.
+  - **Campaña por partes:** al superar un nivel, "Siguiente nivel" lleva al siguiente de la misma parte conservando el progreso de los jugadores (`GameSession.carry`). `Campaign.next_in_part`, `first_of` y `part_unlocked`: una parte se abre al superar el último nivel de la anterior. El mapa se muestra por partes, recortado y con zoom, y los niveles sueltos siguen abiertos mientras estemos en desarrollo. `LevelData.health_mult` sube la vida de los enemigos en los niveles avanzados (1,15 en el nivel 2), porque se llega con el personaje ya mejorado.
+  - **Objetos rompibles** (`Breakable`, `BreakableSpawner`, `Pickup`):
+    - Hay vasijas y cofres de suministros por la arena: 8 al empezar y uno nuevo cada 20 s, siempre a más de 5 m de los jugadores.
+    - Al romperlos dan comida, poción, dólares, un lanzallamas potente durante 5 s o tiempo congelado durante 5 s.
+    - Modelos en `tools/gen_recompensas.py`. Tests en `tests/test_breakables.gd`.
+  - **Movimiento de los enemigos:**
+    - Rodean el decorado con un mapa de flujo (`FlowField`, `scripts/level/flow_field.gd`) cuando no tienen línea libre hacia el jugador. Esa comprobación se hace cada 0,3 s por enemigo.
+    - Trayectorias por datos (`EnemyData.path`, aplicadas en `EnemyBehavior.shape_path`): `zigzag`, `hop` (a saltos), `flutter` (revoloteando) y `circle` (en espiral).
+    - El mimético se revela solo.
+    - Tests en `tests/test_flow_field.gd`.
+  - **Choque de balas:** las balas del jugador anulan las enemigas que tocan; las pesadas siguen su camino. Lo resuelve una rejilla plana en `BulletManager`. Las armas de área (lanzallamas, páginas que orbitan, onda, explosiones) también deshacen balas enemigas. Tests en `tests/test_bullet_clash.gd`.
+- **Fase 6 (parte 2, *La sombra sobre Innsmouth*): plan aprobado el 06-10-2026** (hitos 6.0 a 6.7 en `docs/ROADMAP.md`). D-13: más difícil que la parte 1, contando con las mejoras permanentes de la tienda; equilibrio medido sin compras y con las esperables; difícil, nunca exasperante. Dagon a 16 voxels/m, asomando del agua; las tiaras, solo prohibidas a los Profundos.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

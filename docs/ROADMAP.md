@@ -19,9 +19,9 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 1 | Prototipo jugable (*vertical slice*) | **Hecha** (26-09-2026; queda tu partida de 5 minutos como comprobación) | Ninguna (D-02, D-03, D-05, D-14, D-15 y D-16, resueltas) |
 | 2 | Menús, guardado y cooperativo local | **Hecha** salvo tu prueba con varios mandos (2.17) | Ninguna (D-07, D-16 a D-18 y D-22 a D-25, resueltas) |
 | 3 | Pipeline de contenido | **En curso** (03-10-2026): D-06 resuelta; enemigos, niveles y animaciones por datos | Ninguna |
-| 4 | Parte 1 completa | Pendiente | D-04, D-19 |
+| 4 | Parte 1 completa | **Hecha** salvo tu partida (04-10-2026) | Ninguna (D-04 y D-19, resueltas) |
 | 5 | Arranque, relatos y ampliación de la tienda | Pendiente | Ninguna |
-| 6 | Parte 2 completa | Pendiente | D-04, D-13, enfoque de jefes colosales |
+| 6 | Parte 2 completa | **Plan aprobado** (06-10-2026) | Ninguna (D-13 y jefes colosales, resueltas) |
 | 7 | Parte 3 completa | Pendiente | Ángulos devoradores, enfoque de jefes colosales |
 | 8 | Pulido y distribución | Pendiente | D-01, D-12 |
 | 9 | Online | Pendiente | D-10 |
@@ -145,6 +145,23 @@ El guardado, los menús, la selección de personaje, el mapa de niveles y la tie
 ## Fase 6: Parte 2 completa (*La sombra sobre Innsmouth*)
 
 Cinco niveles, sus diez criaturas y Padre Dagon.
+
+**Aceptación:** la parte 2 se puede completar en cooperativo.
+
+### Hitos de la fase 6 (plan aprobado el 06-10-2026)
+
+Se adelanta a la fase 5 (relatos y arranque), que no bloquea el contenido. Cada hito pasa la misma revisión de arte que en la fase 4 (modelos de frente, de perfil y de espaldas, y en partida). Primer escenario fuera de la Antártida: tierra, madera, piedra y agua de puerto, con luz de atardecer nublado y niebla marina.
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 6.0 | **Base común** (D-13, jefes colosales y tiaras, resueltas en el GDD: la parte 2 es más difícil que la 1, contando con las mejoras permanentes de la tienda). En `cuerpo.py`, el "aspecto de Innsmouth" por grados (0 humano, 1 ojos saltones y piel grisácea, 2 cuello con agallas y calva, 3 casi Profundo), sobre los cuerpos del estilo 4. Profundo definitivo en estilo 4, que sustituye al prototipo `clasico`. Suelo nuevo en el shader (tierra mojada, adoquín, tablas) y clima de lluvia y niebla marina | Pendiente |
+| 6.1 | **Nivel 1, Newburyport y la carretera a Innsmouth.** Arena: carretera de tierra entre marismas, la parada del autobús de Joe Sargent, casas de madera cerradas y postes de telégrafo. Habitantes de Innsmouth (grado 1, etiqueta `humana`, cuerpo a cuerpo torpe, en grupo) y acólitos de la Orden de Dagon (túnica sencilla y amuleto, disparo mental). Evento final: un acólito mayor (único) | Pendiente |
+| 6.2 | **Nivel 2, las calles y el templo de la Orden.** Arena: calles de casas georgianas en ruinas y la fachada del antiguo templo masónico. Híbridos avanzados (grado 3, rápidos, a saltos, `humana`) y sacerdotes de la tiara (élite, cánticos mentales en abanico, vestiduras y tiara de oro). Evento final: el sumo sacerdote | Pendiente |
+| 6.3 | **Nivel 3, el hotel Gilman House y la huida por los tejados.** Arena de tejados (bordes: caída a la calle, chimeneas y claraboyas como obstáculos). Profundos (estilo 4) y el Acechador, ya hecho, como élite. Evento final: la horda del Arrecife del Diablo (oleada masiva durante un tiempo, no un único enemigo: objetivo "sobrevive") | Pendiente |
+| 6.4 | **Nivel 4, los pantanos y la vía muerta a Rowley.** Arena: terraplén del tren con traviesas y agua estancada a los lados (frena a los jugadores). Profundos ancianos de Y'ha-nthlei (sobre el prototipo `abisal`, bioluminiscentes, aura). Minijefe: Barnabas Marsh transformado (único, ropa de patriarca rota) | Pendiente |
+| 6.5 | **Nivel 5, el Arrecife del Diablo y Y'ha-nthlei.** Arena de arrecife negro con pozas y columnas ciclópeas sumergidas, luz verde desde abajo. Pth'thya-l'yi (única, invoca Profundos) y Madre Hydra (única, minijefa previa al jefe) | Pendiente |
+| 6.6 | **Jefe: Padre Dagon.** Colosal: emerge del agua en el borde de la arena, golpea con las manos (avisos grandes en el suelo), lanza oleadas de agua y llama a Profundos; varias fases como el shoggoth primigenio (`BossBehavior`). Sobre el prototipo `bruto` | Pendiente |
+| 6.7 | **Cierre:** la parte entera en cooperativo con bots, equilibrio (como en el 4.6, medido sin compras y con las compras esperables tras la parte 1: difícil, nunca exasperante), la Biblioteca con las entradas nuevas (textos y mapas) y tu partida | Pendiente |
 
 ## Fase 7: Parte 3 completa (*La llamada de Cthulhu*)
 

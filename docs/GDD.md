@@ -442,7 +442,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-10 | Modelo online | Fase 9 | Pendiente |
 | D-11 | Guardado en la nube | Fase 10 | Pendiente |
 | D-12 | Plataforma de distribución | Fase 8; condiciona D-10 y D-11 | Pendiente |
-| D-13 | Reto al empezar cada parte en la campaña | Fase 6 | Pendiente |
+| D-13 | Reto al empezar cada parte en la campaña | Fase 6 | **Resuelta** |
 | D-14 | Parálisis frente a la duración de las crisis | Fase 1 | **Resuelta** |
 | D-15 | Renderizador | Fase 1 | **Resuelta** |
 | D-16 | Pausas y menús personales | Fases 1 y 2 | **Resuelta** |
@@ -488,6 +488,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
 - **D-11 — Guardado en la nube.** Gist privado del jugador mediante el flujo de autorización por dispositivo de GitHub, servidor propio o guardado en la nube de la plataforma de distribución.
 - **D-12 — Plataforma de distribución.** itch.io, Steam u otra.
 - **D-13 — Reto al empezar cada parte.** El personaje conserva sus mejoras, pero la parte siguiente arranca con enemigos de escalón 1. *Recomendación de la especificación:* estadísticas base de los enemigos más altas en cada parte.
+  *Resuelta (06-10-2026):* cada parte es más difícil que la anterior aunque los personajes vuelvan a empezar desde el nivel 1, porque entre partes se mejoran de forma permanente con la tienda (potenciadores, personajes, compañeros y huecos). Las estadísticas base de los enemigos suben por parte (`LevelData.health_mult` desde 1,2 en el primer nivel de la parte 2, más daño y ritmo de aparición). El equilibrio se mide con bots en dos casos: sin compras y con las compras esperables tras la parte anterior. Objetivo del autor: que no sea fácil, pero nunca exasperante. Jefes colosales (06-10-2026): modelo propio a 16 voxels/m (`voxel_size` en el JSON) y solo la parte que asoma del agua. La regla de "sin tiaras ni joyas" solo afecta a los Profundos: los sacerdotes humanos de la Orden llevan su tiara.
 - **D-14 — Parálisis y duración de las crisis.** Las crisis duran 4–6 s, pero la parálisis es "un instante muy breve". ¿Qué pasa el resto de la crisis?
   *Resuelta:* congelaciones intermitentes durante toda la crisis (unos 0,4 s cada 1–1,5 s), avisadas con un temblor. Sigue disparando. Tiempos por datos.
 - **D-15 — Renderizador.** El proyecto usa Compatibility, elegido para capturar sin GPU. ¿Se mantiene o se pasa a Forward+?
