@@ -11,6 +11,17 @@ centro de la base, como gen_atrezo_expedicion.py.
   barca      bote de remos volcado (32/m)
   farola     farola de gas de hierro con la luz en el pivote "light" (48/m)
   juncos     mata de juncos de la marisma (32/m)
+Hito 6.2 (las calles y el templo de la Orden):
+  fachada    casa georgiana de ladrillo en ruinas, tejado hundido y ventanas rotas (16/m)
+  templo     el antiguo templo masónico de la Orden de Dagon: piedra, columnas, frontón con el
+             símbolo de la Orden y la puerta entreabierta (16/m)
+  escombros  montón de ladrillos y vigas (32/m)
+  fuente     fuente seca de la plaza con un pez de bronce (32/m)
+  carretilla carretilla de pescado (32/m)
+  cajas      cajas de pescado apiladas (32/m)
+  nasa       nasa de langostas (32/m)
+  pilote     pilote de muelle con cabo (32/m)
+  coche      coche abandonado de los años 20 (32/m)
 
 Escribe models/inn_<pieza>.json. Uso: python tools/gen_atrezo_innsmouth.py [piezas...]
 """
@@ -288,8 +299,238 @@ def juncos():
     return M, {P: [0, 0, 0]}
 
 
+
+# ---------------- hito 6.2 ----------------
+
+STONE = (0.52, 0.51, 0.48); STONE_D = (0.40, 0.39, 0.37); STONE_L = (0.62, 0.61, 0.58)
+GREEN = (0.20, 0.34, 0.30)
+GOLD_OLD = (0.62, 0.52, 0.28)
+
+
+def fachada():
+    """Casa georgiana de ladrillo, de dos plantas, en ruinas: hueca, con un rincón del tejado
+    hundido (falta la pared de arriba), ventanas de guillotina rotas y cornisa clara."""
+    M = Model(S=1, seed=71)
+    HX, HZ, H = 56, 40, 96                                  # 7 x 5 m, 6 m de alto
+    for y in range(0, H):
+        for x in range(-HX, HX):
+            for z in range(-HZ, HZ):
+                if min(x + HX, HX - 1 - x, z + HZ, HZ - 1 - z) > 1: continue
+                if x > 10 and y > H - 30 + (x - 10) * 0.4 + 8 * M.noise(x, y, z, 6.0): continue   # derrumbe
+                c = BRICK if (y // 2 + (x + z) // 4 + (y // 2) % 2 * 2) % 5 else BRICK_D
+                if M.noise(x, y, z, 12.0) > 0.7: c = lerp(c, MOSS, 0.4)
+                M.put(x, y, z, P, c)
+    for x in range(-HX - 1, HX + 1):                        # cornisa e imposta
+        for z in (HZ, HZ + 1):
+            M.put(x, H - 4, z, P, STONE_L); M.put(x, 48, z, P, STONE_L)
+    for cx in (-38, -14, 14, 38):                           # ventanas de guillotina, rotas
+        for cy in (26, 70):
+            if cy == 70 and cx > 14: continue
+            for a in range(-6, 6):
+                for b in range(-10, 10):
+                    edge = a in (-6, 5) or b in (-10, 9) or b == 0
+                    c = TRIM if edge else (DARK if M.hsh(a, b, cx) > 0.25 else GLASS)
+                    M.put(cx + a, cy + b, HZ, P, c)
+    for x in range(-6, 6):                                  # puerta con montante
+        for y in range(0, 36):
+            M.put(x, y, HZ, P, DARK if abs(x + 0.5) < 5 and y < 34 else STONE_L)
+    for x in range(-HX - 2, 11):                            # lo que queda del tejado
+        for z in range(-HZ - 2, HZ + 2):
+            y = H + int((HZ - abs(z)) * 0.5)
+            if x > 0 and M.hsh(x // 3, z // 3, 1) > 0.6: continue
+            M.put(x, y, z, P, ROOF if (x // 4 + z // 3) % 2 else ROOF_D)
+    return M, {P: [0, 0, 0]}
+
+
+def templo():
+    """Antiguo templo masónico de la Orden de Dagon: fachada clásica de piedra (14 m de ancho)
+    con escalinata, cuatro columnas, frontón con el símbolo de la Orden (un pez en un círculo
+    de olas, en oro deslustrado) y la puerta negra entreabierta. Verdín del salitre."""
+    M = Model(S=1, seed=72)
+    HX, D, H = 112, 28, 128
+    for y in range(0, 8):                                   # escalinata
+        for x in range(-HX + 20, HX - 20):
+            zt = D + 8 + (8 - y) * 3
+            for z in range(max(D, zt - 4), zt):                       # solo la huella de cada peldaño
+                M.put(x, y, z, P, STONE if (y + z) % 3 else STONE_D)
+    for y in range(8, H):                                   # muro de sillares
+        for x in range(-HX, HX):
+            for z in range(-D, D):
+                if min(x + HX, HX - 1 - x, D - 1 - z) > 0 or z == -D: continue   # muro de 1, sin la trasera (no se ve)
+                off = (y // 6 % 2) * 6
+                c = STONE if (y // 6 + (x + off) // 12) % 2 else lerp(STONE, STONE_D, 0.4)
+                if y % 6 == 0 or (x + off) % 12 == 0: c = STONE_D
+                if M.noise(x, y, z, 10.0) > 0.66: c = lerp(c, GREEN, 0.45)
+                M.put(x, y, z, P, c)
+    for cx in (-66, -26, 26, 66):                           # columnas estriadas
+        for y in range(8, H - 6):
+            for x in range(cx - 5, cx + 5):
+                for z in range(D, D + 10):
+                    if not 3.5 < math.hypot(x - cx + 0.5, z - D - 5 + 0.5) <= 5: continue
+                    c = STONE_L if int(math.atan2(z - D - 5, x - cx) * 4) % 2 else STONE
+                    M.put(x, y, z, P, c)
+        for y in range(H - 8, H - 4):                       # capiteles
+            for x in range(cx - 7, cx + 7):
+                for z in range(D - 1, D + 12): M.put(x, y, z, P, STONE_L)
+    for y in range(H - 4, H + 4):                           # entablamento
+        for x in range(-HX - 2, HX + 2):
+            for z in range(D + 9, D + 13): M.put(x, y, z, P, STONE_L if y < H else STONE)
+    for y in range(H + 4, H + 44):                          # frontón
+        w = HX + 2 - (y - H - 4) * 3
+        if w <= 0: break
+        for x in range(-w, w):
+            for z in range(D + 9, D + 12):
+                M.put(x, y, z, P, STONE_L if abs(abs(x) - w) < 2 or y == H + 4 else STONE)
+    cy = H + 18
+    for a in range(0, 360, 3):                              # símbolo: círculo de olas
+        t = math.radians(a)
+        r = 11 + 1.5 * math.sin(t * 8)
+        M.put(round(r * math.cos(t)), round(cy + r * math.sin(t)), D + 12, P, GOLD_OLD)
+    for x in range(-6, 7):                                  # y el pez dentro
+        h = int(3 * math.sqrt(max(0.0, 1 - (x / 7) ** 2)))
+        for y in range(-h, h + 1): M.put(x, cy + y, D + 12, P, GOLD_OLD)
+    for y in range(-3, 4): M.put(-8 - abs(y) // 2, cy + y, D + 12, P, GOLD_OLD)   # cola
+    for x in range(-14, 14):                                # puerta en arco, una hoja entreabierta
+        for y in range(8, 64):
+            if y > 56 and abs(x + 0.5) > 14 - (y - 56) * 2: continue
+            M.put(x, y, D, P, DARK if x > -6 else WOOD_D)
+    return M, {P: [0, 0, 0]}
+
+
+def escombros():
+    M = Model(S=2, seed=73)
+    for i in range(160):
+        a = M.rng.uniform(0, math.tau); r = abs(M.rng.gauss(0, 14))
+        x, z = r * math.cos(a), r * math.sin(a)
+        y = int(max(0, 18 - r * 1.1 + M.rng.uniform(-3, 3)))
+        c = BRICK if M.rng.random() < 0.7 else BRICK_D
+        for dx in range(3):
+            for dz in range(2):
+                for yy in range(max(0, y - 2), y + 1): M.put(x + dx, yy, z + dz, P, c)
+    for k in range(2):                                      # vigas
+        ang = M.rng.uniform(0, math.pi)
+        for t in range(-30, 30):
+            for w in range(-1, 2):
+                M.put(t * math.cos(ang) - w * math.sin(ang), 16 + t * 0.25 * (1 if k else -1),
+                      t * math.sin(ang) + w * math.cos(ang), P, WOOD_D)
+    return M, {P: [0, 0, 0]}
+
+
+def fuente():
+    """Fuente seca: pilón octogonal de piedra con verdín y un pez de bronce que salta."""
+    M = Model(S=2, seed=74)
+    for y in range(0, 14):
+        for x in range(-40, 40):
+            for z in range(-40, 40):
+                d = max(abs(x + 0.5), abs(z + 0.5), (abs(x + 0.5) + abs(z + 0.5)) / 1.414)
+                if d > 38 or (d < 34 and y > 2): continue
+                c = STONE if (y // 3) % 2 else STONE_D
+                if y > 10 and M.noise(x, y, z, 6.0) > 0.55: c = GREEN
+                M.put(x, y, z, P, c)
+    for y in range(0, 30):
+        for x in range(-5, 5):
+            for z in range(-5, 5): M.put(x, y, z, P, STONE_L)
+    BRONZE = (0.30, 0.42, 0.36)
+    for x in range(-12, 13):
+        h = int(5 * math.sqrt(max(0.0, 1 - (x / 12) ** 2)))
+        for y in range(-h, h + 1):
+            for z in range(-2, 2): M.put(x, 40 + y + x // 3, z, P, BRONZE)
+    for y in range(-6, 7):
+        for z in range(-1, 1): M.put(-13 - abs(y) // 2, 36 + y, z, P, BRONZE)
+    return M, {P: [0, 0, 0]}
+
+
+def carretilla():
+    M = Model(S=2, seed=75)
+    for x in range(-22, 22):
+        for z in range(-14, 14):
+            for y in range(12, 26):
+                if min(x + 22, 21 - x, z + 14, 13 - z) > 1 and y > 13: continue
+                M.put(x, y, z, P, WOOD if y % 4 else WOOD_D)
+    for x in range(-20, 18, 3):                             # pescado plateado
+        for z in range(-12, 12, 4):
+            for t in range(5): M.put(x + t // 2, 24, z + t % 2, P, (0.66, 0.70, 0.72) if t else (0.40, 0.44, 0.46))
+    for a in range(0, 360, 6):                              # rueda delantera
+        t = math.radians(a)
+        for r in (9, 10):
+            for z in (-1, 0): M.put(24 + r * math.cos(t), 10 + r * math.sin(t), z, P, IRON)
+    for z in (-12, 11):                                     # varales y patas
+        for x in range(-40, -22): M.put(x, 22 + (x + 22) // 6, z, P, WOOD_D)
+        for y in range(0, 12): M.put(-18, y, z, P, WOOD_D)
+    return M, {P: [0, 0, 0]}
+
+
+def cajas():
+    M = Model(S=2, seed=76)
+    for x0, z0, y0 in ((-14, -10, 0), (12, -8, 0), (-2, 12, 0), (-4, -6, 14)):
+        for x in range(x0 - 12, x0 + 12):
+            for z in range(z0 - 9, z0 + 9):
+                for y in range(y0, y0 + 14):
+                    if min(x - x0 + 12, x0 + 11 - x, z - z0 + 9, z0 + 8 - z) > 0 and y < y0 + 13: continue
+                    c = PLANK if (y // 3) % 2 else PLANK_D
+                    if y == y0 + 13 and (x + z) % 5 == 0: c = (0.60, 0.64, 0.66)
+                    M.put(x, y, z, P, c)
+    return M, {P: [0, 0, 0]}
+
+
+def nasa():
+    M = Model(S=2, seed=77)
+    for x in range(-18, 18):
+        for z in range(-12, 12):
+            for y in range(0, 14):
+                if y < 2: M.put(x, y, z, P, WOOD); continue
+                r = math.hypot(z, y - 2)
+                if abs(r - 11) < 1 and (x % 4 == 0 or (z + y) % 3 == 0): M.put(x, y, z, P, NET)
+    return M, {P: [0, 0, 0]}
+
+
+def pilote():
+    M = Model(S=2, seed=78)
+    for y in range(0, 40):
+        for x in range(-5, 5):
+            for z in range(-5, 5):
+                if math.hypot(x + 0.5, z + 0.5) > 5: continue
+                c = lerp(WOOD_D, (0.18, 0.20, 0.16), 0.5) if y < 12 else (WOOD if (x + y) % 5 else WOOD_D)
+                M.put(x, y, z, P, c)
+    for i in range(30):                                     # cabo enrollado
+        a = i / 30 * math.tau * 2
+        M.put(6 * math.cos(a), 30 - i // 3, 6 * math.sin(a), P, (0.58, 0.52, 0.38))
+    return M, {P: [0, 0, 0]}
+
+
+def coche():
+    """Coche cerrado de los años 20, abandonado: carrocería negra desconchada con óxido, capó
+    largo, ruedas de radios y lunas rotas."""
+    M = Model(S=2, seed=79)
+    BODY = (0.12, 0.13, 0.14); BODY_L = (0.22, 0.23, 0.24)
+    for x in range(-60, 60):
+        for z in range(-26, 26):
+            for y in range(14, 60):
+                hood = x > 10
+                if hood and y > 36: continue
+                top = 35 if hood else 59
+                if min(x + 60, 59 - x, z + 26, 25 - z) > 1 and y < top: continue
+                win = 38 < y < 56 and -54 < x < 6 and z in (-26, 25) and (x + 54) % 20 > 2
+                if win: c = DARK if M.hsh(x // 6, y // 6, 3) > 0.4 else GLASS
+                else: c = RUST if M.noise(x, y, z, 5.0) > 0.8 else (BODY if y % 5 else BODY_L)
+                M.put(x, y, z, P, c)
+    for cx in (-40, 40):
+        for s in (-1, 1):
+            for a in range(-13, 14):
+                for b in range(0, 26):
+                    r = math.hypot(a, b - 13)
+                    if r > 13: continue
+                    c = TIRE if r > 9 else (IRON_L if abs(a) < 1 or abs(b - 13) < 1 else IRON)
+                    for dz in range(3): M.put(cx + a, b, s * (26 + dz), P, c)
+    for z in (-14, 13):
+        for y in (30, 31): M.put(60, y, z, P, (0.68, 0.64, 0.50))
+    return M, {P: [0, 0, 0]}
+
+
 PIECES = {'casa': casa, 'autobus': autobus, 'poste': poste, 'valla': valla, 'barril': barril,
-          'redes': redes, 'barca': barca, 'farola': farola, 'juncos': juncos}
+          'redes': redes, 'barca': barca, 'farola': farola, 'juncos': juncos,
+          'fachada': fachada, 'templo': templo, 'escombros': escombros, 'fuente': fuente,
+          'carretilla': carretilla, 'cajas': cajas, 'nasa': nasa, 'pilote': pilote, 'coche': coche}
 
 if __name__ == '__main__':
     only = set(sys.argv[1:])

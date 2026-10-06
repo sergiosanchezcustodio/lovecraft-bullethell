@@ -6,15 +6,22 @@ extends EnemyBehavior
 ##   keep (6.0), strafe (0.45: parte de la velocidad al rodear)
 ##   extra_pattern + extra_every: un segundo patrón propio cada tantos s (espiral del diácono)
 ##   minion + minion_every + minion_count: llama a otros a su alrededor (con aviso "¡Ïa!")
+##   shield_at + shield_minion + shield_count (hito 6.2, sumo sacerdote): al bajar de esa parte
+##     de su vida (una vez), llama a un círculo de protectores cerca y es invulnerable mientras
+##     viva alguno, con un aro dorado alrededor
 var _extra := 2.0
 var _minion := 3.0
 var _side := 1.0
+var _shield_done := false
+var _guards: Array[int] = []                ## instance_id de los protectores vivos
+var _ring: MeshInstance3D
 
 func start(e: Enemy) -> void:
 	_side = 1.0 if e.get_instance_id() % 2 == 0 else -1.0
 
 func update(e: Enemy, target: Player, delta: float) -> Vector3:
 	e.anim = "walk"
+	_shield(e)
 	if target == null: return Vector3.ZERO
 	_extra -= delta
 	_minion -= delta
@@ -58,3 +65,40 @@ func _summon(e: Enemy) -> void:
 	tw.tween_property(l, "position:y", l.position.y + 1.2, 1.6)
 	tw.parallel().tween_property(l, "modulate:a", 0.0, 1.6).set_ease(Tween.EASE_IN)
 	tw.tween_callback(l.queue_free)
+
+func _shield(e: Enemy) -> void:
+	var at := float(e.data.param("shield_at", 0.0))
+	if at <= 0.0: return
+	if not _shield_done and e.health <= e.data.max_health * e.health_scale * at:
+		_shield_done = true
+		if OS.get_cmdline_user_args().has("log=true"): print("ESCUDO t=%.1f" % e._spawn_t)
+		var game := e.get_tree().current_scene
+		var d: EnemyData = e.data.param("shield_minion", null)
+		if d != null and game != null and game.get("director") != null:
+			var n := int(e.data.param("shield_count", 4))
+			for i in n:
+				var a := TAU * i / n
+				var g: Enemy = game.director.spawn(d, e.global_position + Vector3(cos(a), 0, sin(a)) * 3.0)
+				if g != null: _guards.append(g.get_instance_id())
+		_ring = MeshInstance3D.new()
+		var tm := TorusMesh.new()
+		tm.inner_radius = 1.1; tm.outer_radius = 1.3
+		_ring.mesh = tm
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.albedo_color = Color(0.85, 0.70, 0.30) * 0.8
+		_ring.material_override = m
+		_ring.position.y = 1.2
+		e.add_child(_ring)
+	if _guards.is_empty(): return
+	_guards.assign(_guards.filter(func(id: int) -> bool:
+		var o := instance_from_id(id)
+		return o != null and is_instance_valid(o) and (o as Enemy).is_alive()))
+	if _guards.is_empty():
+		if _ring != null and OS.get_cmdline_user_args().has("log=true"): print("ESCUDO roto")
+		if _ring != null:
+			_ring.queue_free()
+			_ring = null
+		return
+	e.shield_t = 0.25                                           # invulnerable mientras viva alguno
+	if _ring != null: _ring.rotation.y += 0.05

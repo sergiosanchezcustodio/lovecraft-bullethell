@@ -255,7 +255,7 @@ func _spread_curse() -> void:
 	var left := int(_curse.spread)
 	for e in near:
 		if left <= 0: break
-		if e == self or not e.has_method("curse") or e.is_cursed(): continue
+		if e == self or not e.has_method("curse") or not e.has_method("is_cursed") or e.is_cursed(): continue   # los rompibles no se maldicen
 		e.curse(_curse.len, _curse.dps, _curse.spread, _curse.bonus)
 		var fx := CurseJump.new().setup(global_position, e.global_position)
 		world.fx.add_child(fx)

@@ -54,6 +54,10 @@
 		"innsmouth_g0": "anim_humano",
 		"innsmouth_g1": "anim_humano",
 		"innsmouth_g2": "anim_humano",
-		"innsmouth_g3": "anim_humano"
+		"innsmouth_g3": "anim_humano",
+		"hibrido_h": "anim_humano",
+		"hibrido_m": "anim_humano",
+		"sacerdote": "anim_humano",
+		"sumo_sacerdote": "anim_humano"
 	}
 }

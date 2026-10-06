@@ -307,6 +307,32 @@ Léela al empezar cada sesión:
       - El evento final, adelantado: `level=p2_n1 final_at=10`.
       - Solo la arena: `nolevel=true arena=res://data/arenas/carretera.json`.
     - Captura del evento final: `shots/game_diac_018.0s.png`.
+  - **Hito 6.2 (nivel 2 de la parte 2, las calles de Innsmouth y el templo de la Orden): hecho, pendiente de tu revisión (06-10-2026).**
+    - **Enemigos nuevos** (en `tools/gen_vecinos_innsmouth.py`):
+      - Híbridos avanzados, hombre y mujer (grado 3, ropa empapada y hecha jirones, descalzos y con garras). Van a saltos (`path = hop`) y llevan las etiquetas `humana` y `marina`.
+      - Sacerdote de la tiara (élite de escalón 3): vestiduras verde marino con galones de oro, capa y tiara alta en corona (`tiara()`). Comportamiento `keep`: canto en abanico y anillo mental con huecos y aviso.
+      - El sumo sacerdote de la Orden, evento final (único, a 1,5×): negro bordado en oro y la tiara más alta. Canto, espiral, llama a híbridos ("¡Ph'nglui mglw'nafh!") y aura.
+      - El oro de las tiaras es ahora deslustrado (`GOLD`): antes salía naranja.
+      - Hoja `shots/revision_6_2_enemigos.png`.
+    - **Escudo de protectores** (`KeepBehavior`, `shield_at`, `shield_minion`, `shield_count`): al bajar del 50 % de vida, el sumo sacerdote llama a 4 acólitos guardianes (`acolito_guardia`: poca vida, van a por el jugador) y es invulnerable, con un aro dorado, mientras viva alguno. Con `log=true` imprime "ESCUDO" y "ESCUDO roto".
+    - **Atrezo nuevo** (en `tools/gen_atrezo_innsmouth.py`):
+      - El templo de la Orden: fachada clásica de piedra con columnas, frontón con el símbolo de oro, escalinata y la puerta entreabierta. Va a 16/m, hueco y sin muro trasero, con 92.000 voxels (macizo eran 311.000).
+      - Casa georgiana de ladrillo en ruinas (`fachada`).
+      - Escombros, fuente seca con un pez de bronce, carretilla y cajas de pescado, nasa, pilote y coche abandonado.
+      - Hoja `shots/revision_6_2_atrezo.png`.
+    - **Arena** (`tools/gen_arena_calles.py` → `data/arenas/calles.json`, mapa en `resources/maps/p2_n2.png`):
+      - Plaza de adoquín con la fuente, el templo al norte entre casas en ruinas y más casas al oeste.
+      - Muelle de tablas al sur y al este: `ground.dock` hace que el adoquín pase a tablas cerca del agua (colores `dock_hi`, `dock_lo`).
+      - Agua del puerto verde oscura y sin hielo: `sea.colors` y `sea.brash`, que ahora se leen del JSON.
+      - La salida está en `[3.5, 6]`: en el centro está el pilón y salían 0 m² transitables.
+      - Clima nuevo `lluvia_ligera`.
+    - **Nivel `data/levels/p2_n2.tres`:** `health_mult` 1,3 y algo más de ritmo que el nivel 1.
+    - **Equilibrio con bot (`circle`, sin compras):** lo supera 1 de 3; en las otras cae a los 186-208 s (el nivel 1 de la parte 2, a los 195-229 s). En cooperativo con 3 bots lo superan.
+    - **Rendimiento:**
+      - Con el tope real del nivel (75 enemigos y 500 balas): 118 FPS de media, igual que el nivel 1 de la parte 1 (119).
+      - En la prueba extrema (150 enemigos y 1.000 balas): 57 FPS, porque los humanos de estilo 4 (20.000-34.000 voxels) suman unos 10 millones de primitivas; la arena sola va a 119 FPS. Si hiciera falta, la solución sería unir caras en `VoxelBuilder` o exportar los enemigos humanos a 32 voxels/m.
+    - **Arreglado de paso:** la maldición de la daga ritual intentaba saltar a los objetos rompibles (`Breakable` no tiene `is_cursed`).
+    - **Probar:** `godot --path . -- level=p2_n2` (o `final_at=10`). Capturas: `shots/game_cal_003.0s.png` (la plaza), `game_cal15_003.0s.png` (el muelle) y `game_sumo_030.0s.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

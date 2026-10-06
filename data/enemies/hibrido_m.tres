@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"hibrido_m"
+display_name = "Híbrida avanzada"
+model = "hibrido_m"
+tier = 2
+spawn_weight = 1.0
+elite = false
+tags = Array[StringName]([&"humana", &"marina"])
+max_health = 38.0
+hit_radius = 0.42
+body_radius = 0.42
+move_speed = 2.4
+xp = 2.0
+money = 3
+contact_physical = 9.0
+contact_mental = 2.0
+movement = &"chase"
+path = &"hop"
+attack_anim = ""

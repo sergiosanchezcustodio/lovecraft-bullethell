@@ -24,6 +24,10 @@ uniform float road_w = 0.0;
 uniform vec3 road_col : source_color = vec3(0.40, 0.34, 0.26);
 // marisma (hito 6.1): más allá de x o z = marsh (0: sin marisma) todo se encharca
 uniform float marsh = 0.0;
+// muelle (hito 6.2): más allá de x o z = dock (0: sin muelle) el adoquín pasa a tablas
+uniform float dock = 0.0;
+uniform vec3 dock_hi : source_color = vec3(0.44, 0.38, 0.31);
+uniform vec3 dock_lo : source_color = vec3(0.26, 0.22, 0.18);
 
 varying vec3 wpos;
 varying vec3 wnrm;
@@ -100,7 +104,10 @@ void fragment() {
 		float spec = 0.3;
 		float shade = 1.0;
 		float wetm = 0.0;                 // charco (0..1)
-		if (kind == 1) {
+		int k = kind;
+		vec3 bhi = base_hi, blo = base_lo;
+		if (dock > 0.0 && max(pc.x, pc.y) > dock) { k = 2; bhi = dock_hi; blo = dock_lo; }
+		if (k == 1) {
 			vec3 s = cobble_at(c);
 			float up = s.z - cobble_at(c + vec2(-1, -1)).z;
 			float dn = cobble_at(c + vec2(1, 1)).z - s.z;
@@ -114,7 +121,7 @@ void fragment() {
 				col = mix(col, moss * 1.2, m * step(s.y, 2.0) * 0.6);   // verdín en los bordes
 			}
 			wetm = max(wetm, step(0.66, fbm(pc * 0.18 + 30.0)) * wet * step(s.z, 1.0));   // charcos en las hondas
-		} else if (kind == 2) {
+		} else if (k == 2) {
 			vec3 s = plank_at(c);
 			float up = s.z - plank_at(c + vec2(-1, -1)).z;
 			float dn = plank_at(c + vec2(1, 1)).z - s.z;

@@ -137,6 +137,7 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 			mat.set_shader_parameter("road_d", Vector2(r[2], r[3]))
 			mat.set_shader_parameter("road_w", float(r[4]))
 		if g.has("marsh"): mat.set_shader_parameter("marsh", float(g.marsh))
+		if g.has("dock"): mat.set_shader_parameter("dock", float(g.dock))
 	else:
 		mat.shader = preload("res://scripts/level/snow_ground.gdshader")
 	if g.has("camp_radius"): mat.set_shader_parameter("camp_radius", float(g.camp_radius))   # nieve pisada
@@ -159,6 +160,11 @@ static func _sea(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	var mat := ShaderMaterial.new()
 	mat.shader = preload("res://scripts/level/sea.gdshader")
 	mat.set_shader_parameter("shore", size * 0.5)
+	# sea.colors (deep, mid, shallow, crest, foam...) y sea.brash (hielo menudo, 0..1): puerto de Innsmouth
+	for k in (data.sea.get("colors", {}) as Dictionary):
+		var c: Array = data.sea.colors[k]
+		mat.set_shader_parameter(k, Color(c[0], c[1], c[2]))
+	if data.sea.has("brash"): mat.set_shader_parameter("brash_amount", float(data.sea.brash))
 	mi.material_override = mat
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return mi

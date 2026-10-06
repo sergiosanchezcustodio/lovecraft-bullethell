@@ -12,6 +12,7 @@ uniform vec3 mid : source_color = vec3(0.14, 0.32, 0.44);
 uniform vec3 shallow : source_color = vec3(0.26, 0.50, 0.60);
 uniform vec3 crest : source_color = vec3(0.50, 0.68, 0.78);
 uniform vec3 brash : source_color = vec3(0.78, 0.86, 0.92);
+uniform float brash_amount = 1.0;            // hielo menudo (0: puerto sin hielo, hito 6.2)
 uniform vec3 foam : source_color = vec3(0.80, 0.87, 0.93);
 uniform float cell = 0.125;
 uniform vec2 shore = vec2(32.0, 32.0);       // la orilla: x = shore.x (este) y z = shore.y (sur)
@@ -73,7 +74,7 @@ void fragment() {
 	vec2 qc = floor(q);
 	float b = step(0.97, hash(qc + 71.0));
 	b *= step(0.72, vnoise(qc * 0.06 + 3.0)) * (1.0 - 0.6 * depth);   // a manchas, más junto a la costa
-	b = step(0.5, b);
+	b = step(0.5, b) * brash_amount;
 	col = mix(col, brash * (0.92 + 0.1 * hash(qc)), b);
 
 	// espuma contra la plataforma (asoma en los entrantes del frente)

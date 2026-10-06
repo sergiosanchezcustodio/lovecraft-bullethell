@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="WeatherData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/weather_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"lluvia_ligera"
+display_name = "Lluvia ligera"
+wind_dir = Vector2(1, 0.5)
+wind = 2.5
+gusts = 0.5
+precip = 3
+precip_amount = 0.3
+fall_speed = 13.0
+precip_color = Color(0.72, 0.8, 0.92, 0.5)
+drift = 0.0
+mist = 0.15
+mist_color = Color(0.55, 0.62, 0.7, 1.0)
+clouds = 0.3

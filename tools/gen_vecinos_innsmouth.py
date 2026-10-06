@@ -6,16 +6,19 @@
                       atrás, cordón y amuleto de oro con un pez (grado 2)
   diacono             "El diácono de la Orden" (único): túnica casi negra, estola verde marino
                       y tiara baja de oro (los humanos de la Orden sí la llevan; GDD D-13)
+  hibrido_h/_m        híbridos avanzados (hito 6.2, grado 3): ropa empapada y hecha jirones
+  sacerdote           sacerdote de la tiara: vestiduras verde marino con galones de oro y tiara alta
+  sumo_sacerdote      "El sumo sacerdote de la Orden" (único): negro bordado en oro, la tiara más alta
 Colores apagados y grises, la piel verdosa: no se confunden con los investigadores, que
 además llevan el anillo de su color. Uso: python tools/gen_vecinos_innsmouth.py
 """
-import sys, os
+import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
 import cuerpo as cu
 from cuerpo import slab, rslab, T, H
 
 SKIN = (0.80, 0.68, 0.58); SKIN_SH = (0.70, 0.58, 0.49)
-GOLD = (0.78, 0.62, 0.26); GOLD_SH = (0.55, 0.42, 0.16)
+GOLD = (0.64, 0.54, 0.30); GOLD_SH = (0.44, 0.36, 0.18)       # oro extraño, deslustrado
 SOLE = (0.08, 0.07, 0.07)
 MATS = {}
 
@@ -156,8 +159,92 @@ def robe(name, seed, col, sh, grade, stole=None, tiara=False):
               roughness=0.9 if not tiara else 0.75, specular=0.25 if not tiara else 0.4)
 
 
+def tiara(M, h=7, flare=4, y0=77):
+    """Tiara de oro extraño, más ancha arriba, con relieves de olas pintados y una cresta
+    delantera. h: alto; flare: cuánto se abre."""
+    slab(M, H, GOLD, y0, y0 + h, 0, -0.5, 15, 15 + flare, 15, 15 + flare * 0.7, ch=2)
+    for x in range(-7, 7):
+        for y in range(y0 + 2, y0 + h - 1, 3):
+            if (x + y) % 3 == 0: cu.paint_face(M, x, y, GOLD_SH)
+    top = y0 + h                                                       # puntas en el borde, como una corona
+    hw, hd = (15 + flare) / 2, (15 + flare * 0.7) / 2
+    for i in range(0, 64, 1):
+        a = i / 64 * math.tau
+        x, z = int(round(hw * math.cos(a) - 0.5)), int(round(hd * math.sin(a) - 1.0))
+        if i % 4 == 0:
+            for y in range(top, top + 3): M.put(x, y, z, H, GOLD)
+    for x in (-1, 0):                                                  # y la cresta delantera, más alta
+        for i, y in enumerate(range(top, top + 5)): M.put(x, y, int(hd) - 1 - i // 2, H, GOLD_SH if i == 4 else GOLD)
+
+
+def hibrido(name, seed, fem):
+    """Híbrido avanzado: grado 3, la ropa del pueblo empapada y hecha jirones, descalzo."""
+    MATS.clear()
+    TOP = mat((0.22, 0.24, 0.26) if not fem else (0.24, 0.20, 0.22), 'lana')
+    BOT = mat((0.20, 0.18, 0.15), 'lana')
+    M = cu.new(seed)
+    for s_, _, shin, _, _ in cu.sides():                               # pies palmeados
+        slab(M, shin, SKIN, 0, 3, 5 * s_, 3, 9, 8, 17, 14, ch=1)
+    if fem:
+        M.body['fem'] = True
+        cu.legs_f(M, SKIN)
+        cu.torso_f(M, TOP, bottom=36)
+        cu.skirt(M, BOT, 14, top=40, b=-3, flare=3, depth=12)
+        cu.arms(M, TOP, SKIN, ax=cu.ARM_X_F, slim=True)
+    else:
+        cu.legs(M, BOT, bottom=3)
+        cu.torso(M, TOP, b=1, bottom=36)
+        cu.arms(M, TOP, SKIN, b=1)
+    for (x, y, z), v in M.V.items():                                   # jirones: asoma la piel
+        if v[1] in (TOP, BOT) and M.noise(x, y, z, 2.5) > 0.8: v[1] = SKIN
+    for k in [k for k, v in M.V.items() if v[1] == BOT and k[1] < 20 and M.noise(*k, 3.0) > 0.55]:
+        del M.V[k]                                                     # perneras deshilachadas
+    cu.neck(M, SKIN)
+    cu.head(M, SKIN, SKIN_SH, fem=fem)
+    cu.innsmouth(M, 3, SKIN, SKIN_SH, w=14.0 if fem else 15.0)
+    for k in list(M.V):                                                # garras en las manos
+        v = M.V[k]
+        if v[0] in ('fore_l', 'fore_r') and k[1] in (24, 25) and v[1] != TOP: v[1] = (0.80, 0.78, 0.66)
+    cu.finish(M, name, dict(MATS), flat=(cu.FISH_EYE, cu.FISH_PUPIL), ax=cu.ARM_X_F if fem else cu.ARM_X,
+              b=0 if fem else 1, roughness=0.6, specular=0.4)
+
+
+def vestments(name, seed, col, sh, trim, grade, tiara_h, flare, embroider=False):
+    """Vestiduras ceremoniales: túnica hasta los pies, capa abierta sobre los hombros, galones
+    de oro en el borde y la pechera, cíngulo y la tiara."""
+    MATS.clear()
+    mat(col, 'lana'); mat(sh, 'lana')
+    M = cu.new(seed)
+    for s_, _, shin, _, _ in cu.sides():
+        slab(M, shin, SKIN, 0, 3, 5 * s_, 2, 8, 8, 13, 12, ch=1)
+    cu.legs(M, col, bottom=3)
+    cu.torso(M, col, b=1, bottom=30)
+    cu.skirt(M, col, 3, top=40, b=1, flare=5, depth=14)
+    for (x, y, z), v in M.V.items():                                   # galón en el bajo
+        if v[0] == T and 3 <= y <= 5 and v[1] == col: v[1] = trim
+    for y in range(6, 61):                                             # galón delantero
+        for x in (-2, 1): cu.front(M, x, y, trim)
+    if embroider:                                                      # bordados de oro: olas y peces
+        for (x, y, z), v in M.V.items():
+            if v[0] == T and v[1] == col and z > 4 and (x * 2 + y) % 7 == 0 and y % 4 == 0: v[1] = trim
+    slab(M, T, sh, 30, 62, 0, -2, 27, 24, 12, 13, ch=1, over=False)   # capa por detrás y los lados
+    cu.belt(M, trim, y=43, b=1, h=2)
+    cu.neck(M, SKIN)
+    cu.arms(M, col, SKIN, b=1, cuff=trim)
+    amulet(M, y=50)
+    cu.head(M, SKIN, SKIN_SH)
+    cu.innsmouth(M, grade, SKIN, SKIN_SH)
+    tiara(M, h=tiara_h, flare=flare)
+    cu.finish(M, name, dict(MATS), flat=(cu.FISH_EYE, cu.FISH_PUPIL, GOLD, GOLD_SH, trim), b=1,
+              hat=(GOLD, GOLD_SH), roughness=0.75, specular=0.4)
+
+
 pescador()
 mujer()
 viejo()
 robe('acolito', 1944, (0.36, 0.29, 0.21), (0.28, 0.22, 0.16), 2)
 robe('diacono', 1945, (0.12, 0.13, 0.16), (0.08, 0.09, 0.11), 2, stole=(0.16, 0.38, 0.34), tiara=True)
+hibrido('hibrido_h', 1946, False)
+hibrido('hibrido_m', 1947, True)
+vestments('sacerdote', 1948, (0.14, 0.30, 0.28), (0.10, 0.22, 0.20), (0.72, 0.58, 0.24), 2, 11, 6)
+vestments('sumo_sacerdote', 1949, (0.08, 0.08, 0.10), (0.05, 0.05, 0.07), (0.78, 0.62, 0.26), 2, 15, 8, embroider=True)
