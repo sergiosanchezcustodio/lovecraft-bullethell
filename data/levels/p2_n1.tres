@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/habitante_pescador.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/habitante_mujer.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/habitante_viejo.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/acolito.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/diacono.tres" id="7"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+[ext_resource type="Resource" path="res://data/weather/niebla_marina.tres" id="weather"]
+
+[resource]
+script = ExtResource("1")
+weather = ExtResource("weather")
+id = &"p2_n1"
+display_name = "Newburyport y la carretera a Innsmouth"
+part = 2
+number = 1
+arena = "res://data/arenas/carretera.json"
+health_mult = 1.2
+duration = 300.0
+music = ""
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("6")])
+spawn_rate = Array[Vector2]([Vector2(0, 0.35), Vector2(45, 0.55), Vector2(90, 0.9), Vector2(150, 1.35), Vector2(210, 1.85), Vector2(300, 2.4)])
+max_alive = 75
+elite_cap = 2
+final_time = 240.0
+final_enemy = ExtResource("7")
+final_wave = 20
+final_spawn_scale = 0.3
+final_text = "Un cántico gutural llega por la carretera…"

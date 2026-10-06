@@ -131,6 +131,12 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 		mat.shader = preload("res://scripts/level/town_ground.gdshader")
 		mat.set_shader_parameter("kind", TOWN_KINDS[kind])
 		if g.has("wet"): mat.set_shader_parameter("wet", float(g.wet))
+		if g.has("road"):                                       # [x, z, dir_x, dir_z, ancho]
+			var r: Array = g.road
+			mat.set_shader_parameter("road_p", Vector2(r[0], r[1]))
+			mat.set_shader_parameter("road_d", Vector2(r[2], r[3]))
+			mat.set_shader_parameter("road_w", float(r[4]))
+		if g.has("marsh"): mat.set_shader_parameter("marsh", float(g.marsh))
 	else:
 		mat.shader = preload("res://scripts/level/snow_ground.gdshader")
 	if g.has("camp_radius"): mat.set_shader_parameter("camp_radius", float(g.camp_radius))   # nieve pisada

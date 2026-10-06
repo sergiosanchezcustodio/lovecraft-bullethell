@@ -1,0 +1,1913 @@
+{
+ "name": "Newburyport y la carretera a Innsmouth",
+ "ground": {
+  "seed": 27,
+  "tile": 0.5,
+  "margin_back": 14.0,
+  "margin_front": 18.0,
+  "camp_radius": 0.0,
+  "kind": "mud",
+  "wet": 0.55,
+  "road": [
+   0.0,
+   0.0,
+   1.0,
+   1.0,
+   4.2
+  ],
+  "marsh": 29.0,
+  "colors": {
+   "base_hi": [
+    0.44,
+    0.37,
+    0.27
+   ],
+   "base_lo": [
+    0.28,
+    0.23,
+    0.17
+   ]
+  }
+ },
+ "light": {
+  "sun_rot": [
+   -24,
+   40
+  ],
+  "sun_color": [
+   0.95,
+   0.8,
+   0.66
+  ],
+  "sun_energy": 0.5,
+  "exposure": 1.25,
+  "ambient_color": [
+   0.46,
+   0.52,
+   0.52
+  ],
+  "ambient_energy": 0.46,
+  "background": [
+   0.16,
+   0.19,
+   0.2
+  ],
+  "fog_color": [
+   0.3,
+   0.34,
+   0.35
+  ],
+  "fog_density": 0.0
+ },
+ "lamp": {
+  "color": [
+   1.0,
+   0.78,
+   0.48
+  ],
+  "energy": 2.0,
+  "range": 8.0
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.12
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "inn_casa": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "inn_autobus": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "inn_poste": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "inn_farola": {
+   "type": "cylinder",
+   "radius": 0.2
+  },
+  "inn_valla": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "inn_barril": {
+   "type": "cylinder",
+   "radius": 0.35
+  },
+  "inn_redes": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "inn_barca": {
+   "type": "box",
+   "shrink": 0.85
+  }
+ },
+ "size": [
+  64.0,
+  64.0
+ ],
+ "spawn": [
+  0.0,
+  0.0
+ ],
+ "props": [
+  {
+   "model": "inn_casa",
+   "pos": [
+    -35.75,
+    -35.11
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -31.0,
+    -31.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -25.31,
+    -34.93
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -21.0,
+    -31.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -16.08,
+    -35.26
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -11.0,
+    -31.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -6.61,
+    -35.06
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -1.0,
+    -31.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    3.44,
+    -35.69
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    9.0,
+    -31.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    14.04,
+    -35.92
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    19.0,
+    -31.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    23.96,
+    -35.03
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    29.0,
+    -31.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    34.31,
+    -35.96
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    39.0,
+    -31.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -35.37,
+    -26.74
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -31.5,
+    -21.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -35.51,
+    -15.28
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -31.5,
+    -11.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -35.33,
+    -5.23
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -31.5,
+    -1.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -35.58,
+    4.48
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -31.5,
+    9.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -35.73,
+    14.01
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -31.5,
+    19.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -35.7,
+    24.11
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -31.5,
+    29.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa",
+   "pos": [
+    -34.9,
+    33.81
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -31.5,
+    39.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_poste",
+   "pos": [
+    -27.86,
+    -23.05
+   ],
+   "rot": 45,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_poste",
+   "pos": [
+    -19.37,
+    -14.57
+   ],
+   "rot": 45,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_poste",
+   "pos": [
+    -10.89,
+    -6.08
+   ],
+   "rot": 45,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_poste",
+   "pos": [
+    -2.4,
+    2.4
+   ],
+   "rot": 45,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_poste",
+   "pos": [
+    6.08,
+    10.89
+   ],
+   "rot": 45,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_poste",
+   "pos": [
+    14.57,
+    19.37
+   ],
+   "rot": 45,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_poste",
+   "pos": [
+    23.05,
+    27.86
+   ],
+   "rot": 45,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    -10.47,
+    -14.99
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    2.26,
+    -2.26
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    14.99,
+    10.47
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_autobus",
+   "pos": [
+    9.76,
+    2.97
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    6.01,
+    0.35
+   ],
+   "rot": 334.1,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    7.14,
+    0.64
+   ],
+   "rot": 50.3,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_redes",
+   "pos": [
+    14.0,
+    -6.0
+   ],
+   "rot": 20,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_redes",
+   "pos": [
+    -8.0,
+    15.0
+   ],
+   "rot": -30,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_redes",
+   "pos": [
+    20.0,
+    10.0
+   ],
+   "rot": 70,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barca",
+   "pos": [
+    17.0,
+    -12.0
+   ],
+   "rot": 15,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barca",
+   "pos": [
+    -13.0,
+    20.0
+   ],
+   "rot": 110,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barca",
+   "pos": [
+    24.0,
+    2.0
+   ],
+   "rot": 60,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    12.0,
+    -9.0
+   ],
+   "rot": 218.4,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    -10.5,
+    12.0
+   ],
+   "rot": 209.4,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    -11.0,
+    -12.0
+   ],
+   "rot": 224.7,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    6.0,
+    16.0
+   ],
+   "rot": 59.9,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -16.0,
+    -6.0
+   ],
+   "rot": 30,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    -4.0,
+    -18.0
+   ],
+   "rot": 10,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_valla",
+   "pos": [
+    8.0,
+    -20.0
+   ],
+   "rot": 80,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -44.0,
+    33.99
+   ],
+   "rot": 61.1,
+   "scale": 1.33
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.7,
+    -44.0
+   ],
+   "rot": 38.0,
+   "scale": 1.42
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -42.4,
+    33.01
+   ],
+   "rot": 164.2,
+   "scale": 1.54
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.81,
+    -42.4
+   ],
+   "rot": 6.6,
+   "scale": 1.51
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -40.8,
+    33.77
+   ],
+   "rot": 79.4,
+   "scale": 1.31
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.73,
+    -40.8
+   ],
+   "rot": 78.2,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -39.2,
+    33.13
+   ],
+   "rot": 144.0,
+   "scale": 1.19
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.93,
+    -39.2
+   ],
+   "rot": 98.3,
+   "scale": 1.52
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -37.6,
+    33.3
+   ],
+   "rot": 147.1,
+   "scale": 1.02
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.75,
+    -37.6
+   ],
+   "rot": 77.3,
+   "scale": 1.19
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -36.0,
+    33.96
+   ],
+   "rot": 152.2,
+   "scale": 1.27
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.96,
+    -36.0
+   ],
+   "rot": 124.1,
+   "scale": 1.31
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -34.4,
+    33.22
+   ],
+   "rot": 308.2,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.33,
+    -34.4
+   ],
+   "rot": 69.3,
+   "scale": 1.11
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -32.8,
+    33.67
+   ],
+   "rot": 10.5,
+   "scale": 1.5
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.12,
+    -32.8
+   ],
+   "rot": 113.4,
+   "scale": 1.56
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -31.2,
+    32.99
+   ],
+   "rot": 229.1,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.37,
+    -31.2
+   ],
+   "rot": 35.2,
+   "scale": 1.24
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -29.6,
+    34.09
+   ],
+   "rot": 113.0,
+   "scale": 1.45
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    34.01,
+    -29.6
+   ],
+   "rot": 185.4,
+   "scale": 1.51
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -28.0,
+    33.3
+   ],
+   "rot": 162.9,
+   "scale": 1.26
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.34,
+    -28.0
+   ],
+   "rot": 14.5,
+   "scale": 1.39
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -26.4,
+    34.05
+   ],
+   "rot": 222.0,
+   "scale": 1.21
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.92,
+    -26.4
+   ],
+   "rot": 103.2,
+   "scale": 1.07
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -24.8,
+    33.88
+   ],
+   "rot": 200.4,
+   "scale": 1.42
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.24,
+    -24.8
+   ],
+   "rot": 299.7,
+   "scale": 1.42
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -23.2,
+    33.65
+   ],
+   "rot": 176.4,
+   "scale": 1.21
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.32,
+    -23.2
+   ],
+   "rot": 325.2,
+   "scale": 1.3
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -21.6,
+    34.07
+   ],
+   "rot": 171.0,
+   "scale": 1.46
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.66,
+    -21.6
+   ],
+   "rot": 100.5,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -20.0,
+    33.02
+   ],
+   "rot": 322.5,
+   "scale": 1.32
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.57,
+    -20.0
+   ],
+   "rot": 189.8,
+   "scale": 1.22
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -18.4,
+    33.45
+   ],
+   "rot": 141.9,
+   "scale": 1.51
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.76,
+    -18.4
+   ],
+   "rot": 228.0,
+   "scale": 1.13
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -16.8,
+    33.47
+   ],
+   "rot": 356.3,
+   "scale": 1.36
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    34.02,
+    -16.8
+   ],
+   "rot": 104.0,
+   "scale": 1.04
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -15.2,
+    33.59
+   ],
+   "rot": 258.5,
+   "scale": 1.33
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.82,
+    -15.2
+   ],
+   "rot": 348.0,
+   "scale": 1.06
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -13.6,
+    33.57
+   ],
+   "rot": 63.2,
+   "scale": 1.6
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.94,
+    -13.6
+   ],
+   "rot": 234.1,
+   "scale": 1.28
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -12.0,
+    33.46
+   ],
+   "rot": 320.3,
+   "scale": 1.16
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.99,
+    -12.0
+   ],
+   "rot": 335.0,
+   "scale": 1.55
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -10.4,
+    33.72
+   ],
+   "rot": 332.9,
+   "scale": 1.19
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.26,
+    -10.4
+   ],
+   "rot": 28.3,
+   "scale": 1.41
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -8.8,
+    33.74
+   ],
+   "rot": 259.7,
+   "scale": 1.54
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.13,
+    -8.8
+   ],
+   "rot": 243.1,
+   "scale": 1.39
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -7.2,
+    33.45
+   ],
+   "rot": 100.7,
+   "scale": 1.55
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.81,
+    -7.2
+   ],
+   "rot": 135.1,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -5.6,
+    33.72
+   ],
+   "rot": 209.9,
+   "scale": 1.06
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.16,
+    -5.6
+   ],
+   "rot": 275.8,
+   "scale": 1.28
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -4.0,
+    33.01
+   ],
+   "rot": 121.9,
+   "scale": 1.5
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.93,
+    -4.0
+   ],
+   "rot": 102.7,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -2.4,
+    33.87
+   ],
+   "rot": 235.4,
+   "scale": 1.21
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.98,
+    -2.4
+   ],
+   "rot": 310.6,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -0.8,
+    33.71
+   ],
+   "rot": 147.2,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.69,
+    -0.8
+   ],
+   "rot": 59.8,
+   "scale": 1.35
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    0.8,
+    33.46
+   ],
+   "rot": 66.1,
+   "scale": 1.37
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.52,
+    0.8
+   ],
+   "rot": 273.9,
+   "scale": 1.49
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    2.4,
+    33.8
+   ],
+   "rot": 103.7,
+   "scale": 1.23
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.88,
+    2.4
+   ],
+   "rot": 68.8,
+   "scale": 1.08
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    4.0,
+    32.96
+   ],
+   "rot": 155.8,
+   "scale": 1.29
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.91,
+    4.0
+   ],
+   "rot": 277.5,
+   "scale": 1.53
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    5.6,
+    32.93
+   ],
+   "rot": 272.6,
+   "scale": 1.56
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.31,
+    5.6
+   ],
+   "rot": 43.5,
+   "scale": 1.11
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    7.2,
+    34.03
+   ],
+   "rot": 347.3,
+   "scale": 1.34
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.61,
+    7.2
+   ],
+   "rot": 162.1,
+   "scale": 1.59
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    8.8,
+    33.6
+   ],
+   "rot": 166.3,
+   "scale": 1.57
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.31,
+    8.8
+   ],
+   "rot": 192.1,
+   "scale": 1.49
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    10.4,
+    33.92
+   ],
+   "rot": 292.5,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.46,
+    10.4
+   ],
+   "rot": 96.6,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    12.0,
+    33.45
+   ],
+   "rot": 84.1,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.77,
+    12.0
+   ],
+   "rot": 0.8,
+   "scale": 1.53
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    13.6,
+    33.5
+   ],
+   "rot": 251.3,
+   "scale": 1.33
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.51,
+    13.6
+   ],
+   "rot": 29.1,
+   "scale": 1.24
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    15.2,
+    33.61
+   ],
+   "rot": 208.6,
+   "scale": 1.37
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.14,
+    15.2
+   ],
+   "rot": 32.8,
+   "scale": 1.29
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    16.8,
+    32.97
+   ],
+   "rot": 255.8,
+   "scale": 1.04
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.8,
+    16.8
+   ],
+   "rot": 118.1,
+   "scale": 1.11
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    18.4,
+    33.08
+   ],
+   "rot": 112.8,
+   "scale": 1.08
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.49,
+    18.4
+   ],
+   "rot": 305.1,
+   "scale": 1.44
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    20.0,
+    33.74
+   ],
+   "rot": 197.8,
+   "scale": 1.38
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    34.08,
+    20.0
+   ],
+   "rot": 86.6,
+   "scale": 1.18
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    21.6,
+    33.61
+   ],
+   "rot": 260.6,
+   "scale": 1.3
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.45,
+    21.6
+   ],
+   "rot": 129.0,
+   "scale": 1.24
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    23.2,
+    33.82
+   ],
+   "rot": 41.3,
+   "scale": 1.23
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.99,
+    23.2
+   ],
+   "rot": 289.7,
+   "scale": 1.26
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    24.8,
+    33.35
+   ],
+   "rot": 57.9,
+   "scale": 1.08
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.94,
+    24.8
+   ],
+   "rot": 101.7,
+   "scale": 1.39
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    26.4,
+    33.77
+   ],
+   "rot": 267.6,
+   "scale": 1.46
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.16,
+    26.4
+   ],
+   "rot": 346.3,
+   "scale": 1.52
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    28.0,
+    33.2
+   ],
+   "rot": 283.9,
+   "scale": 1.57
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.3,
+    28.0
+   ],
+   "rot": 27.4,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    29.6,
+    33.61
+   ],
+   "rot": 140.3,
+   "scale": 1.13
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.19,
+    29.6
+   ],
+   "rot": 245.9,
+   "scale": 1.52
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    31.2,
+    33.52
+   ],
+   "rot": 181.2,
+   "scale": 1.11
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.37,
+    31.2
+   ],
+   "rot": 330.4,
+   "scale": 1.56
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.8,
+    33.04
+   ],
+   "rot": 45.4,
+   "scale": 1.44
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.59,
+    32.8
+   ],
+   "rot": 177.6,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    34.4,
+    33.26
+   ],
+   "rot": 212.1,
+   "scale": 1.43
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.57,
+    34.4
+   ],
+   "rot": 155.3,
+   "scale": 1.39
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    36.0,
+    34.0
+   ],
+   "rot": 176.5,
+   "scale": 1.57
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.83,
+    36.0
+   ],
+   "rot": 1.6,
+   "scale": 1.3
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    37.6,
+    33.89
+   ],
+   "rot": 193.9,
+   "scale": 1.06
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.59,
+    37.6
+   ],
+   "rot": 186.2,
+   "scale": 1.34
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    39.2,
+    33.27
+   ],
+   "rot": 239.9,
+   "scale": 1.28
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.31,
+    39.2
+   ],
+   "rot": 107.0,
+   "scale": 1.28
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    40.8,
+    34.04
+   ],
+   "rot": 285.0,
+   "scale": 1.5
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    34.02,
+    40.8
+   ],
+   "rot": 64.1,
+   "scale": 1.55
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    42.4,
+    33.91
+   ],
+   "rot": 296.5,
+   "scale": 1.07
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.62,
+    42.4
+   ],
+   "rot": 222.3,
+   "scale": 1.45
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -6.52,
+    24.43
+   ],
+   "rot": 186.4,
+   "scale": 1.18
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    21.21,
+    4.92
+   ],
+   "rot": 329.1,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    26.15,
+    24.25
+   ],
+   "rot": 357.0,
+   "scale": 0.81
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -11.85,
+    15.14
+   ],
+   "rot": 265.6,
+   "scale": 1.11
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    22.1,
+    -16.16
+   ],
+   "rot": 4.3,
+   "scale": 1.01
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    20.01,
+    24.21
+   ],
+   "rot": 314.5,
+   "scale": 1.34
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    22.52,
+    20.48
+   ],
+   "rot": 185.6,
+   "scale": 1.05
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    28.37,
+    -6.98
+   ],
+   "rot": 193.0,
+   "scale": 1.12
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -7.75,
+    -18.02
+   ],
+   "rot": 304.0,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    28.84,
+    -12.95
+   ],
+   "rot": 48.0,
+   "scale": 0.99
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    19.41,
+    -18.16
+   ],
+   "rot": 232.7,
+   "scale": 0.93
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    18.23,
+    1.6
+   ],
+   "rot": 294.8,
+   "scale": 1.11
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -7.23,
+    21.49
+   ],
+   "rot": 324.4,
+   "scale": 0.95
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -20.66,
+    -18.02
+   ],
+   "rot": 26.7,
+   "scale": 0.9
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    23.84,
+    -25.31
+   ],
+   "rot": 193.6,
+   "scale": 0.81
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -19.34,
+    23.55
+   ],
+   "rot": 227.5,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    6.88,
+    25.54
+   ],
+   "rot": 76.5,
+   "scale": 1.28
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -14.73,
+    26.29
+   ],
+   "rot": 207.6,
+   "scale": 1.13
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -23.55,
+    23.64
+   ],
+   "rot": 305.2,
+   "scale": 1.14
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    16.66,
+    26.41
+   ],
+   "rot": 78.6,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -5.73,
+    -22.21
+   ],
+   "rot": 113.2,
+   "scale": 1.04
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -15.84,
+    14.37
+   ],
+   "rot": 59.2,
+   "scale": 1.22
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -2.04,
+    26.43
+   ],
+   "rot": 213.7,
+   "scale": 1.12
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -11.73,
+    25.56
+   ],
+   "rot": 128.0,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -1.2,
+    20.42
+   ],
+   "rot": 77.9,
+   "scale": 1.27
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    26.71,
+    11.96
+   ],
+   "rot": 140.5,
+   "scale": 0.83
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/carretera_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125
+ }
+}

@@ -16,7 +16,12 @@
 		"guardian_ciudad": "Más alto que los otros, con la lanza más larga y la cresta intacta. Custodia la entrada de la ciudad muerta desde hace millones de años y no ha dejado de hacerlo porque la ciudad esté muerta.",
 		"shoggoth_ojos": "En los túneles, los shoggoths no se molestan en fingir. Abren ojos verdes por toda la masa, los cierran, los vuelven a abrir en otra parte. Lo que miran, lo escupen.",
 		"antiguo_abisal": "Los Antiguos que se retiraron al mar sin luz bajo la ciudad. El agua los ha vuelto azules, casi negros, y les ha dejado líneas que brillan como peces de fondo. Cantan, y el canto duele.",
-		"shoggoth_primigenio": "Danforth miró atrás una vez en el túnel y lo vio: una masa del ancho del túnel, llena de ojos verdes que se formaban y se deshacían, avanzando como un tren. Gritaba. Tekeli-li. No volvió a ser el mismo."
+		"shoggoth_primigenio": "Danforth miró atrás una vez en el túnel y lo vio: una masa del ancho del túnel, llena de ojos verdes que se formaban y se deshacían, avanzando como un tren. Gritaba. Tekeli-li. No volvió a ser el mismo.",
+		"habitante_pescador": "Pescador de Innsmouth, de los que aún salen al mar con las barcas viejas. Tiene la cabeza estrecha, los ojos saltones que nunca parpadean y una piel gris que huele a salmuera. No habla con forasteros: se acerca despacio, en grupo, y mira.",
+		"habitante_mujer": "Vecina de Innsmouth, envuelta en un chal deshilachado. En la carretera de Newburyport las mujeres del pueblo caminan juntas y en silencio, sin apartar de ti esos ojos fijos y húmedos.",
+		"habitante_viejo": "Viejo de Innsmouth con abrigo raído y gorra de plato. Ya no tiene pelo ni orejas, y en el cuello le laten unas rajas rojizas que nadie en el pueblo menciona. Anda despacio, pero no se rinde.",
+		"acolito": "Acólito de la Orden Esotérica de Dagon, con túnica parda de lana y un amuleto de oro con un pez. Guarda la distancia y entona un cántico que se mete en la cabeza como agua fría.",
+		"diacono": "El diácono de la Orden lleva la tiara baja de oro extraño y una estola del color del mar. Cuando alza la voz, los vecinos acuden desde las casas tapiadas: «¡Ïa! ¡Ïa! ¡Dagon!»."
 	},
 	"weapons": {
 		"webly": "Revólver del ejército británico, pesado y fiable. Su bala del .455 tumba a un hombre y hace retroceder a lo que no lo es.",
@@ -78,7 +83,7 @@
 		"p1_n3": "El paso entre las montañas más altas de la Tierra y las cavernas que se abren debajo.",
 		"p1_n4": "Una ciudad de piedra más vieja que la humanidad, construida por los Antiguos.",
 		"p1_n5": "Túneles que bajan hasta un mar sin luz. Al fondo, algo silba.",
-		"p2_n1": "Newburyport, Massachusetts. El autobús de Joe Sargent es el único que va a Innsmouth.",
+		"p2_n1": "Newburyport, al anochecer. La última parada antes de Innsmouth es un autobús viejo que conduce Joe Sargent, un hombre de cabeza estrecha que nunca parpadea. La carretera de tierra cruza la marisma entre casas tapiadas y postes de telégrafo; nadie del pueblo quiere hablar de lo que hay al final.",
 		"p2_n2": "Calles vacías, casas cerradas y un templo masónico convertido en la Orden Esotérica de Dagon.",
 		"p2_n3": "El hotel Gilman House. De noche, alguien prueba el picaporte.",
 		"p2_n4": "Los pantanos y la vía muerta del tren a Rowley: la única salida.",

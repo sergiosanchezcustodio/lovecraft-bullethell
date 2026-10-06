@@ -45,6 +45,15 @@
 		"antiguo_guerrero": "anim_antiguo",
 		"antiguo_mutilado": "anim_antiguo",
 		"shoggoth_ojos": "anim_fragmento",
-		"antiguo_abisal": "anim_antiguo"
+		"antiguo_abisal": "anim_antiguo",
+		"habitante_pescador": "anim_humano",
+		"habitante_mujer": "anim_humano",
+		"habitante_viejo": "anim_humano",
+		"acolito": "anim_humano",
+		"diacono": "anim_humano",
+		"innsmouth_g0": "anim_humano",
+		"innsmouth_g1": "anim_humano",
+		"innsmouth_g2": "anim_humano",
+		"innsmouth_g3": "anim_humano"
 	}
 }

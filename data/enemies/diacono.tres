@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/diacono_canto.tres" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/diacono_espiral.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/habitante_pescador.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"diacono"
+display_name = "El diácono de la Orden"
+model = "diacono"
+model_scale = 1.4
+unique = true
+tier = 4
+spawn_weight = 1.0
+elite = true
+tags = Array[StringName]([&"humana"])
+max_health = 420.0
+hit_radius = 0.6
+body_radius = 0.6
+move_speed = 2.2
+xp = 25.0
+money = 30
+contact_physical = 12.0
+contact_mental = 4.0
+aura_radius = 4.0
+aura_drain = 1.8
+movement = &"keep"
+params = {"keep": 7.0, "strafe": 0.55, "extra_pattern": ExtResource("3"), "extra_every": 6.5, "minion": ExtResource("4"), "minion_every": 10.0, "minion_count": 3, "minion_text": "¡Ïa! ¡Ïa! ¡Dagon!"}
+attack = ExtResource("2")
+attack_cooldown = 5.0
+attack_range = 11.0
+attack_anim = "throw"

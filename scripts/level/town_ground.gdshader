@@ -17,6 +17,13 @@ uniform vec3 puddle : source_color = vec3(0.10, 0.12, 0.14);
 uniform vec3 edge_col : source_color = vec3(0.18, 0.15, 0.12);
 uniform float stone = 0.25;                                     // tamaño del adoquín (m)
 uniform float plank = 0.22;                                     // ancho de la tabla (m)
+// carretera de tierra (solo en mud): punto, dirección y ancho (0: sin carretera), con dos rodadas
+uniform vec2 road_p = vec2(0.0);
+uniform vec2 road_d = vec2(1.0, 0.0);
+uniform float road_w = 0.0;
+uniform vec3 road_col : source_color = vec3(0.40, 0.34, 0.26);
+// marisma (hito 6.1): más allá de x o z = marsh (0: sin marisma) todo se encharca
+uniform float marsh = 0.0;
 
 varying vec3 wpos;
 varying vec3 wnrm;
@@ -137,6 +144,21 @@ void fragment() {
 			col = mix(col, moss * (0.9 + 0.3 * g), grass);             // matas de hierba rala
 			wetm = step(h, 0.0) * wet;                                 // charcos en lo más hondo
 			wetm = max(wetm, step(h, 1.0) * step(0.6, fbm(pc * 0.2 + 2.0)) * wet);
+			if (road_w > 0.0) {                                       // carretera: tierra pisada y rodadas
+				vec2 dd = normalize(road_d);
+				float off = dot(pc - road_p, vec2(-dd.y, dd.x)) + (gnoise(pc * 0.3) - 0.5) * 0.6;
+				float on = step(abs(off), road_w * 0.5);
+				col = mix(col, road_col * (0.94 + 0.1 * g), on * 0.85);
+				float rut = on * step(abs(abs(off) - 0.75), 0.16);
+				col = mix(col, base_lo * 1.1, rut * 0.7);
+				wetm = max(wetm * (1.0 - on), rut * step(0.45, fbm(pc * 0.4 + 8.0)) * wet);
+				shade -= rut * 0.08;
+			}
+			if (marsh > 0.0) {                                        // marisma: agua quieta entre matas
+				float m = smoothstep(marsh - 2.0, marsh + 3.0, max(pc.x, pc.y) + (fbm(pc * 0.15) - 0.5) * 6.0);
+				wetm = max(wetm, m * step(0.42, fbm(pc * 0.25 + 70.0)));
+				col = mix(col, moss * 0.8, m * 0.5);
+			}
 		}
 		col *= mix(1.0, 0.78, wet);                                    // todo mojado oscurece
 		col = mix(col, puddle, wetm);

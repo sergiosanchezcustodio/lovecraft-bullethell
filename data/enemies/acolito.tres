@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/acolito_canto.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"acolito"
+display_name = "Acólito de la Orden de Dagon"
+model = "acolito"
+tier = 2
+spawn_weight = 1.2
+elite = false
+tags = Array[StringName]([&"humana"])
+max_health = 34.0
+hit_radius = 0.42
+body_radius = 0.42
+move_speed = 2.0
+xp = 2.0
+money = 3
+contact_physical = 5.0
+contact_mental = 3.0
+movement = &"keep"
+params = {"keep": 6.5, "strafe": 0.45}
+attack = ExtResource("2")
+attack_cooldown = 8.0
+attack_range = 9.5
+attack_anim = "throw"

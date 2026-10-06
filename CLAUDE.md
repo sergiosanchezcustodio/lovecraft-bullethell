@@ -279,6 +279,34 @@ Léela al empezar cada sesión:
       - Campos de prueba: `tools/gen_arena_prueba_suelos.py` → `godot --path . -- nolevel=true arena=res://data/arenas/prueba_cobble.json weather=niebla_marina`. Hoja `shots/revision_6_0_suelos.png`.
       - Sin coste: con 150 enemigos y 1.000 balas, 75-79 FPS, igual que el campamento (74); el límite es la física.
     - **Clima `niebla_marina`:** niebla baja a rachas desde el mar con llovizna fina. Al principio tapaba demasiado; ahora tiene bruma 0,28 y niebla 0,004.
+  - **Hito 6.1 (nivel 1 de la parte 2, Newburyport y la carretera a Innsmouth): hecho, pendiente de tu revisión (06-10-2026).**
+    - **Gente de Innsmouth** (`tools/gen_vecinos_innsmouth.py`, estilo 4 con `cuerpo.innsmouth`, animados con `anim_humano.gd`). Todos con la etiqueta `humana` (rasgo de Legrasse):
+      - Tres vecinos que persiguen en grupo: pescador (grado 1), mujer con chal (grado 1) y viejo con abrigo raído (grado 2).
+      - Acólito de la Orden de Dagon: túnica parda, capucha echada atrás, cordón y amuleto de oro con un pez. Canto mental en abanico (`acolito_canto`).
+      - El diácono de la Orden, evento final (único, a 1,4×): túnica casi negra, estola verde marino y tiara baja de oro. Canto en abanico (`diacono_canto`), espiral mixta con huecos (`diacono_espiral`), llama a 3 pescadores cada 10 s ("¡Ïa! ¡Ïa! ¡Dagon!") y un aura que drena cordura.
+      - La piel del grado 1 a 3 es ahora más verde (`cuerpo.FISH`): con la luz cálida parecía bronceada.
+      - Hoja `shots/revision_6_1_enemigos.png`.
+    - **Comportamiento nuevo `keep`** (`KeepBehavior`, `scripts/enemies/keep_behavior.gd`): se acerca hasta `keep` m, retrocede si se le echan encima y rodea de lado. Admite un segundo patrón propio (`extra_pattern`, `extra_every`) y llamar a otros enemigos (`minion`, `minion_every`, `minion_count`, `minion_text`).
+    - **Atrezo** (`tools/gen_atrezo_innsmouth.py` → `models/inn_*.json`):
+      - Casa de tablas tapiada con porche y chimenea, a 16 voxels/m porque es pieza de borde (69.000 voxels).
+      - El autobús de Joe Sargent, postes de telégrafo, valla de estacas, barril de arenques, redes tendidas, barca volcada, farola de gas (con luz) y juncos.
+      - Hoja `shots/revision_6_1_atrezo.png`.
+    - **Arena** (`tools/gen_arena_carretera.py` → `data/arenas/carretera.json`, mapa en `resources/maps/p2_n1.png`):
+      - Casas y vallas al norte y al oeste. La carretera cruza en diagonal: es una banda del suelo `mud` con dos rodadas encharcadas (`ground.road`: punto, dirección y ancho).
+      - Marisma al sur y al este (`ground.marsh`): la tierra se encharca y hay juncos. El mar habría salido con hielo y espuma.
+      - Atardecer nublado y niebla marina.
+    - **Nivel `data/levels/p2_n1.tres`:** se abre al superar el nivel 5 de la parte 1. Enemigos con `health_mult` 1,2. Música provisional: la del nivel 1. Textos de la Biblioteca para las cinco criaturas y el lugar.
+    - **Equilibrio con bot (`circle`, sin compras):**
+      - Parte 1, nivel 1: lo supera 2 de 2 veces.
+      - Este nivel: lo supera 1 de 3; en las otras cae a los 195-229 s.
+      - Cooperativo con 3 bots: lo superan.
+      - Más difícil que la parte 1, como pide D-13. Antes de ajustarlo caía hacia los 2 minutos: los vecinos persiguen en línea recta (los pingüinos van a ciegas). Ahora tienen menos vida y daño por contacto, y van algo más lentos.
+    - **Rendimiento** con 150 enemigos y 1.000 balas: 67 FPS de media (el campamento, 74). Los vecinos tienen más voxels que los pingüinos.
+    - **Probar:**
+      - `godot --path . -- level=p2_n1`.
+      - El evento final, adelantado: `level=p2_n1 final_at=10`.
+      - Solo la arena: `nolevel=true arena=res://data/arenas/carretera.json`.
+    - Captura del evento final: `shots/game_diac_018.0s.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

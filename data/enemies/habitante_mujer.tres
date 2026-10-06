@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"habitante_mujer"
+display_name = "Vecina de Innsmouth"
+model = "habitante_mujer"
+tier = 1
+spawn_weight = 1.0
+elite = false
+tags = Array[StringName]([&"humana"])
+max_health = 22.0
+hit_radius = 0.4
+body_radius = 0.4
+move_speed = 2.3
+xp = 1.0
+money = 1
+contact_physical = 6.5
+contact_mental = 1.0
+movement = &"chase"
+attack_anim = ""

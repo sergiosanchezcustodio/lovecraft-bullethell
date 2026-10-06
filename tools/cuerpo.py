@@ -489,7 +489,7 @@ def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, t
 
 # ---------------- el aspecto de Innsmouth (fase 6, 06-10-2026) ----------------
 
-FISH = (0.46, 0.55, 0.47)                             # piel del grado 3: gris verdosa de pez
+FISH = (0.38, 0.54, 0.43)                             # piel del grado 3: gris verdosa de pez
 FISH_EYE = (0.80, 0.82, 0.55); FISH_PUPIL = (0.05, 0.05, 0.04)
 
 
