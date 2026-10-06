@@ -457,10 +457,12 @@ def pivots(b=0, ax=ARM_X):
     return piv, parents
 
 
-def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, top=85.0, ax=ARM_X, hat=()):
+def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, top=85.0, ax=ARM_X, hat=(),
+           roughness=0.9, specular=0.25):
     """Texturas por material, luz (arriba algo más claro, la espalda algo más oscura) y
     exportación con los pivotes comunes. hat: colores del sombrero (o diadema): esos voxels
-    de la cabeza pasan a la parte `hat`, que se oculta al ponerse una prenda de cabeza."""
+    de la cabeza pasan a la parte `hat`, que se oculta al ponerse una prenda de cabeza.
+    roughness/specular: mate por defecto (ropa); las criaturas de piel húmeda, ~0,45 / 0,5."""
     hat = set(hat)
     for v in M.V.values():
         if v[0] == H and v[1] in hat: v[0] = 'hat'
@@ -475,7 +477,7 @@ def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, t
     piv, parents = pivots(b, ax)
     if extra_pivots: piv.update(extra_pivots)
     if extra_parents: parents.update(extra_parents)
-    n = M.export('models/%s.json' % name, piv, jitter=0.0, pivots_in_voxels=True, roughness=0.9, specular=0.25,
+    n = M.export('models/%s.json' % name, piv, jitter=0.0, pivots_in_voxels=True, roughness=roughness, specular=specular,
                  parents=parents)
     body = dict(getattr(M, 'body', {}), finish_b=b, finish_ax=ax)
     with open('models/%s.json' % name) as f: data = json.load(f)
@@ -483,3 +485,105 @@ def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, t
     with open('models/%s.json' % name, 'w') as f: json.dump(data, f)
     print(name, n, 'voxels')
     return n
+
+
+# ---------------- el aspecto de Innsmouth (fase 6, 06-10-2026) ----------------
+
+FISH = (0.46, 0.55, 0.47)                             # piel del grado 3: gris verdosa de pez
+FISH_EYE = (0.80, 0.82, 0.55); FISH_PUPIL = (0.05, 0.05, 0.04)
+
+
+def _mix(a, b, t):
+    return tuple(a[i] + (b[i] - a[i]) * t for i in range(3))
+
+
+def innsmouth(M, g, skin, skin_sh, w=15.0, d=15.0):
+    """"El aspecto de Innsmouth" por grados, sobre una cabeza de head() SIN ojos, boca ni pelo
+    (los pone esta función). Devuelve (piel, sombra) nuevas para lo que se ponga después.
+      0: humano (ojos y boca normales).
+      1: piel grisácea, sin orejas, ojos saltones que no parpadean (asoman de frente y por
+         los lados: de frente solos desaparecen en la isométrica) y boca ancha.
+      2: además calva con manchas, pliegues de agallas en el cuello y labios gruesos.
+      3: además cabeza aplastada, escamas en toda la piel y una joroba en la espalda.
+    Llamar después de head() y de arms() (también cambia el color de las manos)."""
+    if g <= 0:
+        eyes(M, (0.25, 0.18, 0.12), brow_style='recta')
+        mouth(M, (0.55, 0.35, 0.30))
+        return skin, skin_sh
+    t = (0.6, 0.8, 1.0)[min(g, 3) - 1]
+    ns, nsh = _mix(skin, FISH, t), _mix(skin_sh, tuple(c * 0.82 for c in FISH), t)
+    for v in M.V.values():                                     # toda la piel a la vista
+        if v[1] == skin: v[1] = ns
+        elif v[1] == skin_sh: v[1] = nsh
+    hw = w / 2
+    for k in [k for k, v in M.V.items() if v[0] == H and 70 <= k[1] < 75 and abs(k[0] + 0.5) > hw + 0.6]:
+        del M.V[k]                                             # sin orejas
+    if g >= 3:                                                 # cráneo aplastado y hacia atrás
+        for k in [k for k, v in M.V.items() if v[0] == H and (k[1] >= 79 or (k[1] >= 77 and k[2] > 4))]:
+            del M.V[k]
+        rslab(M, H, ns, 76, 79, 0, -1.5, w - 1, d - 3, r=4, rt=2, rb=0)
+    zf = 0.5 + d / 2                                           # plano de la cara
+    ey = 72
+    for s in (-1, 1):                                          # ojos saltones de 3x3
+        xs = range(-7, -4) if s < 0 else range(4, 7)
+        for x in xs:
+            for y in range(ey, ey + 3):
+                z = M.front(x, y)
+                z = int(zf) - 1 if z is None else z
+                M.put(x, y, z + 1, H, FISH_EYE)
+        for y in range(ey, ey + 3):                            # se ven también por el lado
+            M.put(int(s * hw) - (1 if s > 0 else 0) + s, y, int(zf) - 2, H, FISH_EYE)
+        px = -6 if s < 0 else 5                                # pupila redonda y fija, en el centro
+        z = M.front(px, ey + 1)
+        if z is not None:
+            M.put(px, ey + 1, z, H, FISH_PUPIL); M.put(px, ey + 1, z + 1, H, FISH_PUPIL)
+        for y in range(ey, ey + 3):                            # el centro asoma uno más: saltón
+            z = M.front(px, y)
+            if z is not None and y != ey + 1: M.put(px, y, z + 1, H, FISH_EYE)
+        for x in xs:                                           # párpado pesado encima
+            z = M.front(x, ey + 3)
+            if z is not None: M.put(x, ey + 3, z + 1, H, nsh)
+    lip = tuple(c * 0.55 for c in ns)
+    for x in range(-4, 4): paint_face(M, x, 67, lip)           # boca ancha, de pez
+    if g >= 2:
+        thick = _mix(ns, (0.55, 0.45, 0.45), 0.4)
+        for x in range(-3, 3): paint_face(M, x, 66, thick, dz=1)   # labio de abajo grueso
+        for (x, y, z), v in M.V.items():                       # manchas en la calva
+            if v[0] == H and v[1] == ns and y >= 76 and M.noise(x, y, z, 3) > 0.62: v[1] = nsh
+        gill = (0.45, 0.20, 0.20)                              # agallas: tres rajas rojizas a cada lado
+        for s_ in (-1, 1):
+            xo = int(s_ * hw) - (1 if s_ > 0 else 0) + s_
+            for y in (64, 66, 68):
+                for z in range(-3, 3):
+                    M.put(xo, y, z, H, gill)
+                    M.put(xo, y + 1, z, H, nsh)
+    if g >= 3:
+        scale = tuple(c * 0.86 for c in ns)
+        for (x, y, z), v in M.V.items():                       # escamas: rombos alternos
+            if v[1] == ns and (x + y + (y // 2) * 2 + z) % 4 == 0: v[1] = scale
+        slab(M, T, ns, 48, 63, 0, -7.5, 14, 10, 5, 7, ch=1, over=False)   # joroba
+        for y in range(52, 63, 2):                             # cresta de púas en la nuca y la joroba
+            M.put(0, y, -10, T, nsh); M.put(-1, y, -10, T, nsh)
+    return ns, nsh
+
+
+def hunch(M, k=0.35, y0=40, head_drop=3):
+    """Encorva una criatura de pie (Profundos): el tronco se inclina hacia delante desde la
+    cadera (z += k * (y - y0)), los brazos se adelantan con su hombro sin inclinarse (cuelgan
+    rectos) y la cabeza va con el cuello y baja `head_drop`. Devuelve los pivotes corridos
+    para finish(extra_pivots=...)."""
+    dz_sh = int(round(k * (SHOULDER - y0)))
+    dz_neck = int(round(k * (NECK - y0)))
+    arms_ = ('arm_l', 'arm_r', 'fore_l', 'fore_r')
+    V = {}
+    for (x, y, z), v in M.V.items():
+        if v[0] == T and y > y0: z += int(round(k * (y - y0)))
+        elif v[0] in arms_: z += dz_sh; y -= 1
+        elif v[0] in (H, 'hat'): z += dz_neck; y -= head_drop
+        V[(x, y, z)] = v
+    M.V = V
+    piv, _ = pivots()
+    out = {}
+    for n in arms_: out[n] = [piv[n][0], piv[n][1] - 1, piv[n][2] + dz_sh]
+    out['head'] = [0, NECK - head_drop, dz_neck]
+    return out

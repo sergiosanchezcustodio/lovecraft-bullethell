@@ -7,12 +7,12 @@ extends Node3D
 ## (moon.light_energy=0.6, lamp.*, rim.*), de la cámara (cam.size=4), size=2400x1100, tag=sufijo,
 ## frames=N (fotogramas de animación) y floor=false.
 
-const LINEUP: Array[String] = ["clasico", "bruto", "acechador", "abisal"]
+const LINEUP: Array[String] = ["profundo", "bruto", "acechador", "abisal"]
 const GAP := 0.3   # separación entre modelos de un grupo, en metros
 
 var mode := "still"
 var yaw := 0.0
-var spec := "clasico"
+var spec := "profundo"
 var anim := "walk"
 var names: Array[String] = []
 var models: Array[Node3D] = []

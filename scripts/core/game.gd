@@ -220,7 +220,7 @@ func _ready() -> void:
 		add_child(enemies_root)
 		director = WaveDirector.new().setup(level, world, arena.get_meta("obstacles"), camera, enemies_root)
 		if args.has("max_alive"): director.max_alive_override = args.get_int("max_alive")
-		for eid in args.get_str("enemies").split(",", false):    # enemies=clasico: solo esos (probar uno nuevo)
+		for eid in args.get_str("enemies").split(",", false):    # enemies=profundo: solo esos (probar uno nuevo)
 			director.pool_override.append(load("res://data/enemies/%s.tres" % eid))
 		director.players = players.size()           # la dificultad crece con los jugadores
 		director.final_event.connect(func(_e: Enemy) -> void: announce(level.final_text, 3.5))

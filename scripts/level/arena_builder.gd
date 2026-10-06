@@ -1,9 +1,12 @@
 class_name ArenaBuilder
 extends RefCounted
+
 ## Monta una arena a partir de su JSON (data/arenas/*.json, generado en tools/):
 ## suelo, mar, piezas de atrezo con colisión, luces de los faroles y límites.
 
 const LAYER_WORLD := 1
+## Suelos de la parte 2 (town_ground.gdshader): nombre en el JSON -> `kind` del shader.
+const TOWN_KINDS := {"mud": 0, "cobble": 1, "planks": 2}
 
 ## Devuelve el nodo raíz de la arena. Metadatos: "spawn" (Vector3), "size" (Vector2),
 ## "lights" (Array de OmniLight3D de los faroles) y "obstacles" (ObstacleMap, para que los
@@ -121,7 +124,15 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	# El color y el relieve fino salen del shader (celdas de 12,5 cm); el color de vértice
 	# ya no se usa.
 	var mat := ShaderMaterial.new()
-	mat.shader = preload("res://scripts/level/snow_ground.gdshader")
+	# ground.kind (hito 6.0): "snow" (por defecto, parte 1) o los de la parte 2 en otro shader,
+	# "mud", "cobble" y "planks"; ground.wet, lo mojado (0..1)
+	var kind := String(g.get("kind", "snow"))
+	if TOWN_KINDS.has(kind):
+		mat.shader = preload("res://scripts/level/town_ground.gdshader")
+		mat.set_shader_parameter("kind", TOWN_KINDS[kind])
+		if g.has("wet"): mat.set_shader_parameter("wet", float(g.wet))
+	else:
+		mat.shader = preload("res://scripts/level/snow_ground.gdshader")
 	if g.has("camp_radius"): mat.set_shader_parameter("camp_radius", float(g.camp_radius))   # nieve pisada
 	# colores del suelo (snow_hi, snow_lo, ice, ice_vein, trampled...): roca en el nivel 3
 	for k in (g.get("colors", {}) as Dictionary):

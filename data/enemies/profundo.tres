@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-id = &"clasico"
+id = &"profundo"
 display_name = "Profundo"
-model = "clasico"
+model = "profundo"
 tier = 2
 spawn_weight = 1.0
 elite = false

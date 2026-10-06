@@ -3,6 +3,7 @@
 	"modelos": {
 		"acechador": "anim_profundo",
 		"clasico": "anim_profundo",
+		"profundo": "anim_profundo",
 		"bruto": "anim_profundo",
 		"abisal": "anim_profundo",
 		"dyer": "anim_humano",

@@ -265,6 +265,20 @@ Léela al empezar cada sesión:
     - Tests en `tests/test_flow_field.gd`.
   - **Choque de balas:** las balas del jugador anulan las enemigas que tocan; las pesadas siguen su camino. Lo resuelve una rejilla plana en `BulletManager`. Las armas de área (lanzallamas, páginas que orbitan, onda, explosiones) también deshacen balas enemigas. Tests en `tests/test_bullet_clash.gd`.
 - **Fase 6 (parte 2, *La sombra sobre Innsmouth*): plan aprobado el 06-10-2026** (hitos 6.0 a 6.7 en `docs/ROADMAP.md`). D-13: más difícil que la parte 1, contando con las mejoras permanentes de la tienda; equilibrio medido sin compras y con las esperables; difícil, nunca exasperante. Dagon a 16 voxels/m, asomando del agua; las tiaras, solo prohibidas a los Profundos.
+  - **Hito 6.0 (base común de Innsmouth): hecho, pendiente de tu revisión (06-10-2026).**
+    - **"Aspecto de Innsmouth" por grados** (`cuerpo.innsmouth(M, grado, piel, sombra)`): se llama tras `head()` y `arms()` en lugar de `eyes()` y `mouth()`.
+      - Grado 1: piel grisácea, sin orejas, ojos saltones de 3×3 que asoman también por los lados y boca ancha.
+      - Grado 2: además calva con manchas, agallas rojizas a los lados de la cabeza y labio grueso.
+      - Grado 3: además cráneo aplastado, escamas y joroba con púas.
+      - Muestra: `tools/gen_innsmouth_muestra.py` (un pescador en los cuatro grados, `models/innsmouth_g0..g3`). Hoja `shots/revision_6_0_innsmouth.png`.
+    - **Profundo definitivo** (`tools/gen_profundo.py`, estilo 4 a 48 voxels/m): sin ropa, cabeza chata de pez, ojos saltones, boca con dientes, agallas, cresta de púas, aletas y manos palmeadas con garras. `cuerpo.hunch()` lo encorva (tronco inclinado, brazos y cabeza adelantados con sus pivotes). `cuerpo.finish` admite `roughness` y `specular` (piel húmeda: 0,45 / 0,5).
+      - El enemigo `clasico` pasa a llamarse `profundo` (`data/enemies/profundo.tres`, Biblioteca, visor). Anima con `anim_profundo.gd`; aún sin zarpazo propio (no le hace falta: daña por contacto).
+      - Hoja `shots/revision_6_0_profundo.png`; andando, `shots/rev_profundo_walk.png`.
+    - **Suelos de la parte 2** (`scripts/level/town_ground.gdshader`), elegidos con `ground.kind` en el JSON de la arena: `mud` (tierra con baches, matas y charcos), `cobble` (adoquín en hileras con juntas, verdín y charcos) y `planks` (tablas de muelle con vetas, clavos y huecos). `ground.wet` (0..1) oscurece y abrillanta; los colores, con `ground.colors` (`base_hi`, `base_lo`, `joint`, `moss`, `puddle`).
+      - La nieve no se ha tocado (`snow_ground.gdshader`, por defecto sin `kind`): los niveles de la parte 1 se ven igual. Test en `tests/test_ground_kinds.gd`.
+      - Campos de prueba: `tools/gen_arena_prueba_suelos.py` → `godot --path . -- nolevel=true arena=res://data/arenas/prueba_cobble.json weather=niebla_marina`. Hoja `shots/revision_6_0_suelos.png`.
+      - Sin coste: con 150 enemigos y 1.000 balas, 75-79 FPS, igual que el campamento (74); el límite es la física.
+    - **Clima `niebla_marina`:** niebla baja a rachas desde el mar con llovizna fina. Al principio tapaba demasiado; ahora tiene bruma 0,28 y niebla 0,004.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

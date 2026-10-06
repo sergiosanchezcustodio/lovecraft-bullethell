@@ -1,0 +1,172 @@
+{
+ "name": "Prueba de suelo: mud",
+ "ground": {
+  "seed": 6,
+  "tile": 0.5,
+  "margin_back": 8.0,
+  "margin_front": 8.0,
+  "camp_radius": 0.0,
+  "kind": "mud",
+  "wet": 0.6,
+  "colors": {
+   "base_hi": [
+    0.36,
+    0.29,
+    0.21
+   ],
+   "base_lo": [
+    0.2,
+    0.16,
+    0.11
+   ]
+  }
+ },
+ "light": {
+  "sun_rot": [
+   -24,
+   40
+  ],
+  "sun_color": [
+   0.95,
+   0.8,
+   0.66
+  ],
+  "sun_energy": 0.42,
+  "exposure": 1.2,
+  "ambient_color": [
+   0.46,
+   0.52,
+   0.52
+  ],
+  "ambient_energy": 0.34,
+  "background": [
+   0.16,
+   0.19,
+   0.2
+  ],
+  "fog_color": [
+   0.3,
+   0.34,
+   0.35
+  ],
+  "fog_density": 0.0
+ },
+ "lamp": {
+  "color": [
+   1.0,
+   0.72,
+   0.4
+  ],
+  "energy": 2.2,
+  "range": 8.0
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.12
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  }
+ },
+ "size": [
+  32.0,
+  32.0
+ ],
+ "spawn": [
+  0.0,
+  0.0
+ ],
+ "props": [
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    -4,
+    -3
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    5,
+    2
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    -2,
+    6
+   ],
+   "rot": 0,
+   "scale": 1.0
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/prueba_mud_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125
+ }
+}
