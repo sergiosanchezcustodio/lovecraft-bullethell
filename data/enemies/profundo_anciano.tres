@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/anciano_canto.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"profundo_anciano"
+display_name = "Profundo anciano de Y'ha-nthlei"
+model = "profundo_anciano"
+model_scale = 1.3
+tier = 3
+elite = true
+spawn_weight = 0.3
+tags = Array[StringName]([&"marina"])
+swims = true
+emerge = true
+max_health = 160.0
+hit_radius = 0.65
+body_radius = 0.65
+move_speed = 2.0
+xp = 9.0
+money = 10
+contact_physical = 11.0
+contact_mental = 3.0
+aura_radius = 4.0
+aura_drain = 0.7
+movement = &"chase"
+attack = ExtResource("2")
+attack_cooldown = 5.0
+attack_range = 9.0
+attack_anim = "pounce"

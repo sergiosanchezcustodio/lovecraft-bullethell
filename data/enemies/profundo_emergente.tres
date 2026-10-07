@@ -4,14 +4,15 @@
 
 [resource]
 script = ExtResource("1")
-id = &"profundo"
-display_name = "Profundo"
+id = &"profundo_emergente"
+display_name = "Profundo de la ciénaga"
 model = "profundo"
 tier = 2
-spawn_weight = 1.0
+spawn_weight = 0.5
 elite = false
 tags = Array[StringName]([&"marina"])
 swims = true
+emerge = true
 max_health = 45.0
 hit_radius = 0.5
 body_radius = 0.5

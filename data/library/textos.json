@@ -28,7 +28,10 @@
 		"sacerdote": "Sacerdote de la tiara. Viste vestiduras verde marino con galones de oro y lleva en la cabeza la tiara alta de oro extraño que la Orden saca del Arrecife. Sus cánticos se meten en la cabeza en oleadas.",
 		"sumo_sacerdote": "El sumo sacerdote de la Orden Esotérica de Dagon, de negro bordado en oro y con la tiara más alta de todas. Cuando se ve en peligro, sus acólitos forman un círculo a su alrededor y nada lo toca mientras canten.",
 		"profundo_lanzador": "Profundo escupidor, de piel azul pizarra y aletas turquesa. No se acerca: se agazapa a unos metros y escupe un abanico de agua salada que golpea como una pedrada.",
-		"acechador_tejados": "El Acechador también sube a los tejados de Innsmouth. Ronda entre las chimeneas, se agazapa y salta sobre su presa con un croar que hiela la sangre."
+		"acechador_tejados": "El Acechador también sube a los tejados de Innsmouth. Ronda entre las chimeneas, se agazapa y salta sobre su presa con un croar que hiela la sangre.",
+		"profundo_anciano": "Profundo anciano de Y'ha-nthlei. Dicen que no mueren nunca: crecen. Este era más alto que un hombre, de un azul casi negro, con líneas que brillaban bajo la piel como el plancton en el mar de noche. Salió de la ciénaga sin una onda, y al mirarle sentí que algo se me escurría de la cabeza.",
+		"profundo_emergente": "En la ciénaga de Rowley los Profundos no vienen por el camino: el agua se riza, se abre un círculo y salen de ella a dos pasos, chorreando lodo. Aprendí a desconfiar de cada charco.",
+		"barnabas": "Barnabas Marsh, el viejo dueño de la refinería, nieto del capitán Obed. Nadie lo había visto en años. Llevaba aún la levita y la leontina de oro, reventadas por un cuerpo que ya no era de hombre. Cuando le herimos se hundió en el agua negra y salió a mi espalda, en otra poza."
 	},
 	"weapons": {
 		"webly": "Revólver del ejército británico, pesado y fiable. Su bala del .455 tumba a un hombre y hace retroceder a lo que no lo es.",
@@ -93,7 +96,7 @@
 		"p2_n1": "Newburyport, al anochecer. La última parada antes de Innsmouth es un autobús viejo que conduce Joe Sargent, un hombre de cabeza estrecha que nunca parpadea. La carretera de tierra cruza la marisma entre casas tapiadas y postes de telégrafo; nadie del pueblo quiere hablar de lo que hay al final.",
 		"p2_n2": "Innsmouth. Las casas georgianas se caen a pedazos, los tejados están hundidos y en las calles de adoquines huele a pescado podrido. En la vieja plaza, el antiguo templo masónico luce ahora el símbolo de la Orden Esotérica de Dagon. Junto a los muelles, el agua del puerto es negra y verde, y no se mueve como debería.",
 		"p2_n3": "El hotel Gilman House. A medianoche alguien probó el picaporte de mi cuarto; luego, todas las puertas del pasillo. Salí por la ventana a los tejados y corrí entre chimeneas y depósitos de agua, mientras abajo, en la calle, la horda del Arrecife del Diablo subía por las escaleras de incendios.",
-		"p2_n4": "Los pantanos y la vía muerta del tren a Rowley: la única salida.",
+		"p2_n4": "La vía muerta del tren a Rowley. Huí por el terraplén, sobre las traviesas podridas, entre la ciénaga y el bosque muerto. Fuera del balasto el agua me llegaba a los tobillos y cada paso costaba el doble; en el apeadero abandonado, un farol de señales seguía ardiendo en rojo sin que nadie lo cuidara.",
 		"p2_n5": "El Arrecife del Diablo y, bajo él, la ciudad de Y'ha-nthlei.",
 		"p3_n1": "Providence, Rhode Island. El estudio del escultor Wilcox, que sueña con una ciudad sumergida.",
 		"p3_n2": "Los pantanos al sur de Nueva Orleans, 1907. Un culto danza alrededor de un ídolo.",

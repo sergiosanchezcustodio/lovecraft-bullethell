@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="WeatherData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/weather_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"niebla_pantano"
+display_name = "Niebla del pantano"
+wind_dir = Vector2(-0.6, -1)
+wind = 0.8
+gusts = 0.4
+precip = 0
+precip_amount = 0.0
+drift = 0.0
+mist = 0.24
+mist_color = Color(0.17, 0.21, 0.17, 1.0)
+clouds = 0.3
+fog_density = 0.004

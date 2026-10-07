@@ -6,7 +6,10 @@ grisáceo oscuro, flancos con escamas y vientre pálido.
 Base de estilo 4 (tools/cuerpo.py, 48 voxels/m) con los pivotes humanos: anim_profundo.gd.
 Variante `profundo_lanzador` (hito 6.3): azul pizarra con aletas turquesa, el que escupe
 agua salada desde lejos.
-Uso: python tools/gen_profundo.py [profundo|profundo_lanzador]  (sin argumento, los dos)
+Variante `profundo_anciano` (hito 6.4): Profundo anciano de Y'ha-nthlei, azul casi negro con
+líneas bioluminiscentes en los flancos, ojos cian que brillan y cresta más alta (en el juego,
+a escala 1,3).
+Uso: python tools/gen_profundo.py [profundo|profundo_lanzador|profundo_anciano]  (sin argumento, todos)
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
@@ -19,11 +22,18 @@ def build(NAME):
     BACK = (0.12, 0.18, 0.16); FLANK = (0.22, 0.31, 0.26); SCALE = (0.17, 0.24, 0.20)
     if NAME == 'profundo_lanzador':                                       # azul pizarra
         BACK = (0.10, 0.14, 0.20); FLANK = (0.20, 0.27, 0.34); SCALE = (0.15, 0.21, 0.27)
+    OLD = NAME == 'profundo_anciano'
+    if OLD:                                                               # azul casi negro, como el prototipo abisal
+        BACK = (0.08, 0.11, 0.18); FLANK = (0.14, 0.20, 0.30); SCALE = (0.11, 0.16, 0.24)
+    GLOW = (0.30, 0.90, 0.85)
     BELLY = (0.52, 0.55, 0.43); BELLY_SH = (0.44, 0.47, 0.37)
     FIN = (0.38, 0.30, 0.42); FIN_SH = (0.28, 0.22, 0.32)          # membranas violáceas
     if NAME == 'profundo_lanzador': FIN, FIN_SH = (0.22, 0.48, 0.50), (0.15, 0.36, 0.38)   # turquesa
+    if OLD:
+        BELLY, BELLY_SH = (0.34, 0.40, 0.46), (0.28, 0.33, 0.39)
+        FIN, FIN_SH = (0.12, 0.26, 0.36), (0.08, 0.17, 0.25)
     CLAW = (0.82, 0.80, 0.68)
-    EYE = (0.85, 0.80, 0.35); PUPIL = (0.03, 0.03, 0.02)
+    EYE = (0.40, 0.95, 0.95) if OLD else (0.85, 0.80, 0.35); PUPIL = (0.03, 0.03, 0.02)
     MOUTH = (0.12, 0.05, 0.06); TOOTH = (0.88, 0.86, 0.76); GILL = (0.55, 0.18, 0.20)
 
     M = cu.new(1928)
@@ -90,14 +100,31 @@ def build(NAME):
             zb = min((z for (x, yy, z), v in M.V.items() if yy == y and x in (0, -1) and v[0] == T), default=None)
             part = T
         if zb is None: continue
-        h = 2 + (y % 4 == 0) * 2
+        h = (3 + (y % 4 == 0) * 3) if OLD else (2 + (y % 4 == 0) * 2)
         for k in range(1, h + 1):
             for x in (-1, 0): M.put(x, y, zb - k, part, FIN if k < h else FIN_SH)
 
+    if OLD:                                                               # líneas bioluminiscentes y ojos que brillan
+        for (x, y, z), v in list(M.V.items()):                            # listas nuevas: slab comparte la misma
+            if v[1] == EYE: M.V[(x, y, z)] = [v[0], EYE, 1]
+            elif v[1] in (FLANK, SCALE, BACK) and lateral(v[0], x, y, z): M.V[(x, y, z)] = [v[0], GLOW, 1]
+            elif v[1] == FIN and k_dot(x, y, z): M.V[(x, y, z)] = [v[0], GLOW, 1]
     piv = cu.hunch(M, k=0.4, head_drop=4)
-    cu.finish(M, NAME, {BACK: 'piel', FLANK: 'piel', SCALE: 'piel', BELLY: 'piel'},
-              flat=(EYE, PUPIL, MOUTH, TOOTH, GILL, CLAW), extra_pivots=piv, roughness=0.45, specular=0.5)
+    cu.finish(M, NAME, {BACK: 'piel', FLANK: 'piel', SCALE: 'piel', BELLY: 'piel'} if not OLD else {BACK: 'piel', FLANK: 'piel', SCALE: 'piel'},
+              flat=(EYE, PUPIL, MOUTH, TOOTH, GILL, CLAW, GLOW), extra_pivots=piv, roughness=0.45, specular=0.5)
 
 
-for name in sys.argv[1:] or ['profundo', 'profundo_lanzador']:
+def lateral(part, x, y, z):
+    """Línea lateral de pez en los costados del tronco y anillos en brazos y piernas."""
+    if part == 'torso': return y in (47, 52, 57) and x % 3 != 0
+    if part in ('arm_l', 'arm_r', 'fore_l', 'fore_r', 'shin_l', 'shin_r', 'leg_l', 'leg_r'): return y % 8 == 0 and (x + z) % 3 != 0
+    return False
+
+
+def k_dot(x, y, z):
+    """Puntos de luz en las puntas de la cresta."""
+    return (x + y) % 5 == 0
+
+
+for name in sys.argv[1:] or ['profundo', 'profundo_lanzador', 'profundo_anciano']:
     build(name)

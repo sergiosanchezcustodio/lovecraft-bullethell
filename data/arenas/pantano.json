@@ -1,0 +1,2752 @@
+{
+ "name": "Los pantanos y la v\u00eda muerta del tren a Rowley",
+ "spawn": [
+  0.0,
+  0.0
+ ],
+ "ground": {
+  "seed": 29,
+  "tile": 0.5,
+  "margin_back": 16.0,
+  "walk_back": 0.5,
+  "camp_radius": 0.0,
+  "kind": "mud",
+  "wet": 0.6,
+  "road": [
+   0.0,
+   0.0,
+   1.0,
+   1.0,
+   5.0
+  ],
+  "road_kind": 1,
+  "colors": {
+   "base_hi": [
+    0.3,
+    0.29,
+    0.2
+   ],
+   "base_lo": [
+    0.18,
+    0.18,
+    0.12
+   ],
+   "moss": [
+    0.22,
+    0.28,
+    0.14
+   ],
+   "puddle": [
+    0.07,
+    0.09,
+    0.07
+   ]
+  }
+ },
+ "water": {
+  "embank": [
+   0.0,
+   0.0,
+   1.0,
+   1.0,
+   3.0
+  ],
+  "seed": 4,
+  "islands": 0.45,
+  "scale": 5.0,
+  "clear": [
+   0.0,
+   0.0,
+   4.0
+  ]
+ },
+ "sea": {
+  "sides": [
+   "south",
+   "east"
+  ],
+  "level": -0.35,
+  "brash": 0.0,
+  "colors": {
+   "deep": [
+    0.03,
+    0.05,
+    0.04
+   ],
+   "mid": [
+    0.06,
+    0.09,
+    0.07
+   ],
+   "shallow": [
+    0.1,
+    0.13,
+    0.09
+   ],
+   "crest": [
+    0.16,
+    0.2,
+    0.14
+   ],
+   "foam": [
+    0.32,
+    0.36,
+    0.28
+   ]
+  }
+ },
+ "light": {
+  "sun_rot": [
+   -34,
+   25
+  ],
+  "sun_color": [
+   0.62,
+   0.72,
+   0.78
+  ],
+  "sun_energy": 0.42,
+  "exposure": 1.3,
+  "ambient_color": [
+   0.38,
+   0.46,
+   0.4
+  ],
+  "ambient_energy": 0.44,
+  "background": [
+   0.08,
+   0.11,
+   0.09
+  ],
+  "fog_color": [
+   0.2,
+   0.25,
+   0.2
+  ],
+  "fog_density": 0.0
+ },
+ "lamp": {
+  "color": [
+   1.0,
+   0.62,
+   0.38
+  ],
+  "energy": 2.2,
+  "range": 8.0
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.12
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "pan_apeadero": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "pan_vagoneta": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "pan_senal": {
+   "type": "cylinder",
+   "radius": 0.2
+  },
+  "pan_arbol_1": {
+   "type": "cylinder",
+   "radius": 0.35
+  },
+  "pan_arbol_2": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "pan_tocon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "pan_caballete": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "inn_farola": {
+   "type": "cylinder",
+   "radius": 0.2
+  },
+  "inn_barril": {
+   "type": "cylinder",
+   "radius": 0.35
+  },
+  "inn_barca": {
+   "type": "box",
+   "shrink": 0.85
+  }
+ },
+ "no_shadow": [
+  "pan_via"
+ ],
+ "size": [
+  64.0,
+  64.0
+ ],
+ "props": [
+  {
+   "model": "pan_via",
+   "pos": [
+    -33.94,
+    -33.94
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    -31.11,
+    -31.11
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    -28.28,
+    -28.28
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    -25.46,
+    -25.46
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    -22.63,
+    -22.63
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    -19.8,
+    -19.8
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    -16.97,
+    -16.97
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    -14.14,
+    -14.14
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    -11.31,
+    -11.31
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    -8.49,
+    -8.49
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    -5.66,
+    -5.66
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    -2.83,
+    -2.83
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    0.0,
+    0.0
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    2.83,
+    2.83
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    5.66,
+    5.66
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    8.49,
+    8.49
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    11.31,
+    11.31
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    14.14,
+    14.14
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    16.97,
+    16.97
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    19.8,
+    19.8
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_via",
+   "pos": [
+    22.63,
+    22.63
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_caballete",
+   "pos": [
+    25.46,
+    25.46
+   ],
+   "rot": -45,
+   "scale": 1.2
+  },
+  {
+   "model": "pan_apeadero",
+   "pos": [
+    -4.81,
+    -13.58
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    -2.05,
+    -7.14
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "pan_senal",
+   "pos": [
+    -19.37,
+    -14.57
+   ],
+   "rot": -45,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_senal",
+   "pos": [
+    10.89,
+    6.08
+   ],
+   "rot": 135,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_vagoneta",
+   "pos": [
+    2.12,
+    10.61
+   ],
+   "rot": -30,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    6.08,
+    -0.42
+   ],
+   "rot": 47.9,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    -5.23,
+    0.99
+   ],
+   "rot": 332.5,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    7.03,
+    -44.32
+   ],
+   "rot": 45.2,
+   "scale": 1.36
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    7.69,
+    -42.58
+   ],
+   "rot": 205.7,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    24.72,
+    -40.08
+   ],
+   "rot": 160.4,
+   "scale": 1.67
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    16.52,
+    -42.1
+   ],
+   "rot": 245.9,
+   "scale": 1.35
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -43.03,
+    -36.55
+   ],
+   "rot": 227.0,
+   "scale": 1.1
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -44.62,
+    -45.47
+   ],
+   "rot": 201.6,
+   "scale": 1.33
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    39.72,
+    -41.69
+   ],
+   "rot": 180.1,
+   "scale": 1.43
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -5.03,
+    -33.46
+   ],
+   "rot": 68.1,
+   "scale": 1.19
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -44.68,
+    -41.91
+   ],
+   "rot": 193.7,
+   "scale": 1.72
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    33.51,
+    -44.5
+   ],
+   "rot": 56.5,
+   "scale": 1.2
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -6.57,
+    -40.46
+   ],
+   "rot": 346.6,
+   "scale": 1.15
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -9.36,
+    -33.16
+   ],
+   "rot": 212.8,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    12.11,
+    -39.56
+   ],
+   "rot": 229.8,
+   "scale": 1.71
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    29.02,
+    -43.11
+   ],
+   "rot": 340.5,
+   "scale": 1.2
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -7.35,
+    -34.97
+   ],
+   "rot": 298.8,
+   "scale": 1.33
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    10.01,
+    -34.51
+   ],
+   "rot": 324.0,
+   "scale": 1.37
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    26.0,
+    -44.84
+   ],
+   "rot": 4.8,
+   "scale": 1.3
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -5.28,
+    -45.18
+   ],
+   "rot": 352.2,
+   "scale": 1.71
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -7.85,
+    -43.92
+   ],
+   "rot": 155.4,
+   "scale": 1.23
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -7.52,
+    -42.11
+   ],
+   "rot": 275.9,
+   "scale": 1.11
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    31.53,
+    -40.93
+   ],
+   "rot": 14.0,
+   "scale": 1.33
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    7.16,
+    -44.04
+   ],
+   "rot": 25.5,
+   "scale": 1.3
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -38.98,
+    -35.18
+   ],
+   "rot": 185.6,
+   "scale": 1.33
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -45.61,
+    -36.9
+   ],
+   "rot": 44.6,
+   "scale": 1.36
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    11.99,
+    -33.36
+   ],
+   "rot": 203.6,
+   "scale": 1.33
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    32.68,
+    -43.53
+   ],
+   "rot": 327.1,
+   "scale": 1.38
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -14.46,
+    -41.41
+   ],
+   "rot": 123.6,
+   "scale": 1.3
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    7.81,
+    -45.68
+   ],
+   "rot": 147.2,
+   "scale": 1.31
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -34.7,
+    -39.75
+   ],
+   "rot": 230.9,
+   "scale": 1.11
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -27.05,
+    -43.73
+   ],
+   "rot": 7.5,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    3.29,
+    -33.62
+   ],
+   "rot": 166.9,
+   "scale": 1.41
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -42.35,
+    -45.18
+   ],
+   "rot": 20.1,
+   "scale": 1.23
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    17.41,
+    -43.64
+   ],
+   "rot": 121.8,
+   "scale": 1.23
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    32.73,
+    -34.18
+   ],
+   "rot": 251.7,
+   "scale": 1.33
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -44.32,
+    -10.49
+   ],
+   "rot": 251.0,
+   "scale": 1.27
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -35.77,
+    -29.95
+   ],
+   "rot": 198.1,
+   "scale": 1.4
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -42.15,
+    32.56
+   ],
+   "rot": 163.1,
+   "scale": 1.38
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -42.38,
+    6.47
+   ],
+   "rot": 174.3,
+   "scale": 1.07
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -34.02,
+    -18.28
+   ],
+   "rot": 357.7,
+   "scale": 1.62
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -33.18,
+    -28.72
+   ],
+   "rot": 259.9,
+   "scale": 1.23
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -39.23,
+    -20.61
+   ],
+   "rot": 355.5,
+   "scale": 1.12
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -44.82,
+    -18.35
+   ],
+   "rot": 48.5,
+   "scale": 1.36
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -39.02,
+    23.47
+   ],
+   "rot": 40.5,
+   "scale": 1.78
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -40.28,
+    -9.86
+   ],
+   "rot": 210.6,
+   "scale": 1.17
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -32.63,
+    -5.1
+   ],
+   "rot": 27.6,
+   "scale": 1.16
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -42.34,
+    2.27
+   ],
+   "rot": 326.3,
+   "scale": 1.0
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -39.67,
+    39.05
+   ],
+   "rot": 270.7,
+   "scale": 1.14
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -33.3,
+    14.01
+   ],
+   "rot": 201.1,
+   "scale": 1.03
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -43.53,
+    6.65
+   ],
+   "rot": 228.4,
+   "scale": 1.17
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -40.9,
+    8.32
+   ],
+   "rot": 154.0,
+   "scale": 1.04
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -34.73,
+    -14.58
+   ],
+   "rot": 282.0,
+   "scale": 1.38
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -44.35,
+    -31.81
+   ],
+   "rot": 114.1,
+   "scale": 1.33
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -33.27,
+    6.16
+   ],
+   "rot": 152.7,
+   "scale": 1.27
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -37.04,
+    11.73
+   ],
+   "rot": 98.6,
+   "scale": 1.34
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -43.55,
+    -1.81
+   ],
+   "rot": 312.1,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -40.67,
+    2.54
+   ],
+   "rot": 274.6,
+   "scale": 1.47
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -43.78,
+    -0.25
+   ],
+   "rot": 56.9,
+   "scale": 1.08
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -39.85,
+    10.0
+   ],
+   "rot": 245.5,
+   "scale": 1.31
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -44.72,
+    15.34
+   ],
+   "rot": 358.6,
+   "scale": 1.31
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -44.93,
+    39.75
+   ],
+   "rot": 99.8,
+   "scale": 1.02
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -34.77,
+    16.68
+   ],
+   "rot": 96.4,
+   "scale": 1.13
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -44.62,
+    -1.1
+   ],
+   "rot": 178.9,
+   "scale": 1.18
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -38.48,
+    34.23
+   ],
+   "rot": 24.9,
+   "scale": 1.32
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -38.83,
+    29.74
+   ],
+   "rot": 304.3,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -30.14,
+    -31.64
+   ],
+   "rot": 138.7,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -31.05,
+    -29.55
+   ],
+   "rot": 140.6,
+   "scale": 1.07
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -27.73,
+    -32.23
+   ],
+   "rot": 314.1,
+   "scale": 1.1
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -30.96,
+    -26.46
+   ],
+   "rot": 74.3,
+   "scale": 1.42
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -24.7,
+    -32.2
+   ],
+   "rot": 17.5,
+   "scale": 1.14
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -32.02,
+    -24.52
+   ],
+   "rot": 307.7,
+   "scale": 1.38
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -20.22,
+    -30.72
+   ],
+   "rot": 107.4,
+   "scale": 1.06
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -30.84,
+    -20.34
+   ],
+   "rot": 2.3,
+   "scale": 1.28
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -17.51,
+    -31.01
+   ],
+   "rot": 30.5,
+   "scale": 1.13
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -31.81,
+    -18.31
+   ],
+   "rot": 280.5,
+   "scale": 1.18
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -14.23,
+    -30.73
+   ],
+   "rot": 184.4,
+   "scale": 1.07
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -30.85,
+    -14.35
+   ],
+   "rot": 38.1,
+   "scale": 1.48
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -11.32,
+    -30.82
+   ],
+   "rot": 168.8,
+   "scale": 1.04
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -31.98,
+    -12.48
+   ],
+   "rot": 314.2,
+   "scale": 1.2
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -9.49,
+    -31.99
+   ],
+   "rot": 315.8,
+   "scale": 1.35
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -31.28,
+    -8.78
+   ],
+   "rot": 319.6,
+   "scale": 1.2
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -6.18,
+    -31.68
+   ],
+   "rot": 50.0,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -31.09,
+    -5.59
+   ],
+   "rot": 358.4,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -2.2,
+    -30.7
+   ],
+   "rot": 10.0,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -31.38,
+    -2.88
+   ],
+   "rot": 278.0,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    0.12,
+    -31.38
+   ],
+   "rot": 327.0,
+   "scale": 1.19
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -31.56,
+    -0.06
+   ],
+   "rot": 10.1,
+   "scale": 1.14
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    3.47,
+    -31.03
+   ],
+   "rot": 81.9,
+   "scale": 1.14
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -31.44,
+    3.06
+   ],
+   "rot": 98.1,
+   "scale": 1.46
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    5.89,
+    -31.61
+   ],
+   "rot": 57.2,
+   "scale": 1.33
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -31.59,
+    5.91
+   ],
+   "rot": 317.5,
+   "scale": 1.45
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    9.01,
+    -31.49
+   ],
+   "rot": 300.1,
+   "scale": 1.26
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -31.91,
+    8.59
+   ],
+   "rot": 6.5,
+   "scale": 1.24
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    11.73,
+    -31.77
+   ],
+   "rot": 16.8,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -32.11,
+    11.39
+   ],
+   "rot": 214.8,
+   "scale": 1.41
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    15.07,
+    -31.43
+   ],
+   "rot": 170.2,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -32.19,
+    14.31
+   ],
+   "rot": 193.3,
+   "scale": 1.32
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    17.9,
+    -31.6
+   ],
+   "rot": 300.2,
+   "scale": 1.04
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -31.2,
+    18.3
+   ],
+   "rot": 323.8,
+   "scale": 1.04
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    21.6,
+    -30.9
+   ],
+   "rot": 174.6,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -32.07,
+    20.43
+   ],
+   "rot": 29.6,
+   "scale": 1.45
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    23.28,
+    -32.22
+   ],
+   "rot": 131.0,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -30.88,
+    24.62
+   ],
+   "rot": 259.9,
+   "scale": 1.22
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    26.65,
+    -31.85
+   ],
+   "rot": 5.2,
+   "scale": 1.28
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -31.84,
+    26.66
+   ],
+   "rot": 168.5,
+   "scale": 1.05
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    29.91,
+    -31.59
+   ],
+   "rot": 271.4,
+   "scale": 1.37
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -30.74,
+    30.76
+   ],
+   "rot": 90.7,
+   "scale": 1.27
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    32.62,
+    -31.88
+   ],
+   "rot": 206.8,
+   "scale": 1.41
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -31.27,
+    33.23
+   ],
+   "rot": 307.8,
+   "scale": 1.32
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -25.58,
+    -0.71
+   ],
+   "rot": 319.7,
+   "scale": 0.96
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -2.42,
+    17.6
+   ],
+   "rot": 207.6,
+   "scale": 1.06
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -18.13,
+    22.38
+   ],
+   "rot": 279.9,
+   "scale": 1.03
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    20.45,
+    -17.99
+   ],
+   "rot": 352.5,
+   "scale": 0.95
+  },
+  {
+   "model": "pan_arbol_1",
+   "pos": [
+    -3.41,
+    9.39
+   ],
+   "rot": 62.4,
+   "scale": 0.91
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -3.2,
+    27.19
+   ],
+   "rot": 47.8,
+   "scale": 1.04
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -6.67,
+    12.9
+   ],
+   "rot": 206.0,
+   "scale": 1.18
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -26.29,
+    -10.46
+   ],
+   "rot": 97.7,
+   "scale": 1.04
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    19.59,
+    12.05
+   ],
+   "rot": 234.3,
+   "scale": 1.01
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    23.9,
+    -4.43
+   ],
+   "rot": 190.6,
+   "scale": 1.15
+  },
+  {
+   "model": "pan_arbol_2",
+   "pos": [
+    -18.73,
+    -8.88
+   ],
+   "rot": 318.7,
+   "scale": 1.16
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    17.83,
+    -3.7
+   ],
+   "rot": 14.0,
+   "scale": 1.15
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    10.26,
+    2.22
+   ],
+   "rot": 148.6,
+   "scale": 1.03
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    29.35,
+    -2.29
+   ],
+   "rot": 337.9,
+   "scale": 1.32
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -26.51,
+    -14.46
+   ],
+   "rot": 117.0,
+   "scale": 1.4
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -11.17,
+    6.59
+   ],
+   "rot": 211.5,
+   "scale": 1.38
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    17.77,
+    0.73
+   ],
+   "rot": 319.1,
+   "scale": 0.91
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -14.81,
+    11.97
+   ],
+   "rot": 180.7,
+   "scale": 1.21
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    2.42,
+    -23.19
+   ],
+   "rot": 337.6,
+   "scale": 1.03
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -9.51,
+    22.96
+   ],
+   "rot": 224.9,
+   "scale": 1.18
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -22.89,
+    26.32
+   ],
+   "rot": 215.2,
+   "scale": 1.26
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    28.79,
+    -15.63
+   ],
+   "rot": 236.7,
+   "scale": 1.35
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -9.17,
+    -24.8
+   ],
+   "rot": 157.1,
+   "scale": 0.97
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    25.7,
+    -8.29
+   ],
+   "rot": 9.4,
+   "scale": 0.92
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    16.3,
+    24.83
+   ],
+   "rot": 199.9,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -5.76,
+    24.08
+   ],
+   "rot": 140.7,
+   "scale": 1.42
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -23.41,
+    20.35
+   ],
+   "rot": 315.3,
+   "scale": 1.6
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    7.37,
+    -12.61
+   ],
+   "rot": 270.6,
+   "scale": 1.49
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    8.59,
+    -15.76
+   ],
+   "rot": 133.1,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    12.11,
+    19.98
+   ],
+   "rot": 271.2,
+   "scale": 1.13
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    23.5,
+    0.44
+   ],
+   "rot": 352.9,
+   "scale": 1.56
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    7.42,
+    29.58
+   ],
+   "rot": 242.2,
+   "scale": 1.46
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -7.82,
+    -20.44
+   ],
+   "rot": 200.2,
+   "scale": 1.54
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    4.48,
+    -27.49
+   ],
+   "rot": 3.4,
+   "scale": 1.53
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    22.74,
+    12.98
+   ],
+   "rot": 201.6,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    29.99,
+    6.29
+   ],
+   "rot": 86.8,
+   "scale": 1.45
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -28.96,
+    20.09
+   ],
+   "rot": 168.2,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -16.37,
+    15.54
+   ],
+   "rot": 89.7,
+   "scale": 1.18
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -27.42,
+    28.07
+   ],
+   "rot": 13.1,
+   "scale": 1.05
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -18.97,
+    16.12
+   ],
+   "rot": 253.4,
+   "scale": 1.12
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    5.49,
+    -7.27
+   ],
+   "rot": 22.1,
+   "scale": 1.27
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    14.21,
+    -5.77
+   ],
+   "rot": 204.4,
+   "scale": 1.05
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    21.52,
+    -23.47
+   ],
+   "rot": 166.8,
+   "scale": 1.22
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -1.75,
+    -22.16
+   ],
+   "rot": 270.9,
+   "scale": 1.12
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    18.87,
+    -1.59
+   ],
+   "rot": 55.2,
+   "scale": 1.06
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    10.9,
+    -26.34
+   ],
+   "rot": 29.9,
+   "scale": 1.26
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    16.84,
+    -24.91
+   ],
+   "rot": 114.1,
+   "scale": 1.29
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -11.62,
+    22.09
+   ],
+   "rot": 271.6,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -25.04,
+    14.85
+   ],
+   "rot": 308.4,
+   "scale": 1.5
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    25.93,
+    -13.66
+   ],
+   "rot": 86.5,
+   "scale": 1.52
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    2.93,
+    -20.83
+   ],
+   "rot": 185.2,
+   "scale": 1.32
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -24.02,
+    -4.15
+   ],
+   "rot": 175.0,
+   "scale": 1.13
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -13.45,
+    2.86
+   ],
+   "rot": 265.2,
+   "scale": 1.18
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -21.3,
+    27.61
+   ],
+   "rot": 123.0,
+   "scale": 1.06
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -28.69,
+    10.02
+   ],
+   "rot": 238.8,
+   "scale": 1.41
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -20.72,
+    12.32
+   ],
+   "rot": 113.3,
+   "scale": 1.51
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -12.41,
+    -5.79
+   ],
+   "rot": 165.9,
+   "scale": 1.43
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    15.6,
+    6.74
+   ],
+   "rot": 208.5,
+   "scale": 1.37
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -9.92,
+    4.03
+   ],
+   "rot": 58.2,
+   "scale": 1.39
+  },
+  {
+   "model": "inn_barca",
+   "pos": [
+    7.78,
+    20.51
+   ],
+   "rot": 70,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -44.0,
+    32.01
+   ],
+   "rot": 185.4,
+   "scale": 1.14
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.11,
+    -44.0
+   ],
+   "rot": 43.9,
+   "scale": 1.55
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -41.8,
+    32.02
+   ],
+   "rot": 11.8,
+   "scale": 1.53
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.74,
+    -41.8
+   ],
+   "rot": 353.1,
+   "scale": 1.36
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -39.6,
+    33.18
+   ],
+   "rot": 135.5,
+   "scale": 1.36
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.42,
+    -39.6
+   ],
+   "rot": 0.7,
+   "scale": 1.35
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -37.4,
+    32.4
+   ],
+   "rot": 356.4,
+   "scale": 1.6
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.66,
+    -37.4
+   ],
+   "rot": 14.7,
+   "scale": 1.34
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -35.2,
+    32.06
+   ],
+   "rot": 262.1,
+   "scale": 1.16
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.6,
+    -35.2
+   ],
+   "rot": 265.9,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -33.0,
+    32.3
+   ],
+   "rot": 137.9,
+   "scale": 1.31
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.19,
+    -33.0
+   ],
+   "rot": 44.3,
+   "scale": 1.26
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -30.8,
+    32.35
+   ],
+   "rot": 28.0,
+   "scale": 1.28
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.02,
+    -30.8
+   ],
+   "rot": 110.7,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -28.6,
+    33.13
+   ],
+   "rot": 73.1,
+   "scale": 1.49
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.47,
+    -28.6
+   ],
+   "rot": 258.0,
+   "scale": 1.21
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -26.4,
+    32.78
+   ],
+   "rot": 115.4,
+   "scale": 1.34
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.12,
+    -26.4
+   ],
+   "rot": 256.2,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -24.2,
+    32.69
+   ],
+   "rot": 102.7,
+   "scale": 1.51
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.29,
+    -24.2
+   ],
+   "rot": 87.0,
+   "scale": 1.29
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -22.0,
+    32.54
+   ],
+   "rot": 358.5,
+   "scale": 1.39
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.96,
+    -22.0
+   ],
+   "rot": 34.6,
+   "scale": 1.1
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -19.8,
+    32.58
+   ],
+   "rot": 324.5,
+   "scale": 1.18
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.34,
+    -19.8
+   ],
+   "rot": 192.9,
+   "scale": 1.38
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -17.6,
+    33.19
+   ],
+   "rot": 11.4,
+   "scale": 1.62
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.32,
+    -17.6
+   ],
+   "rot": 93.3,
+   "scale": 1.44
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -15.4,
+    32.3
+   ],
+   "rot": 320.8,
+   "scale": 1.62
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.93,
+    -15.4
+   ],
+   "rot": 358.6,
+   "scale": 1.46
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -13.2,
+    32.39
+   ],
+   "rot": 276.1,
+   "scale": 1.54
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.1,
+    -13.2
+   ],
+   "rot": 2.0,
+   "scale": 1.68
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -11.0,
+    32.72
+   ],
+   "rot": 321.5,
+   "scale": 1.36
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.45,
+    -11.0
+   ],
+   "rot": 259.8,
+   "scale": 1.53
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -8.8,
+    32.68
+   ],
+   "rot": 339.1,
+   "scale": 1.58
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.53,
+    -8.8
+   ],
+   "rot": 177.7,
+   "scale": 1.59
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -6.6,
+    33.07
+   ],
+   "rot": 249.3,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.41,
+    -6.6
+   ],
+   "rot": 81.7,
+   "scale": 1.61
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -4.4,
+    32.09
+   ],
+   "rot": 325.3,
+   "scale": 1.56
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.08,
+    -4.4
+   ],
+   "rot": 95.2,
+   "scale": 1.61
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -2.2,
+    32.56
+   ],
+   "rot": 64.9,
+   "scale": 1.3
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.5,
+    -2.2
+   ],
+   "rot": 26.6,
+   "scale": 1.53
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    0.0,
+    32.43
+   ],
+   "rot": 100.5,
+   "scale": 1.3
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.95,
+    0.0
+   ],
+   "rot": 49.7,
+   "scale": 1.37
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    2.2,
+    32.23
+   ],
+   "rot": 205.6,
+   "scale": 1.29
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.08,
+    2.2
+   ],
+   "rot": 305.8,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    4.4,
+    33.04
+   ],
+   "rot": 171.6,
+   "scale": 1.38
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.89,
+    4.4
+   ],
+   "rot": 57.3,
+   "scale": 1.43
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    6.6,
+    33.01
+   ],
+   "rot": 141.6,
+   "scale": 1.64
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.72,
+    6.6
+   ],
+   "rot": 126.3,
+   "scale": 1.39
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    8.8,
+    32.9
+   ],
+   "rot": 10.7,
+   "scale": 1.27
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.31,
+    8.8
+   ],
+   "rot": 317.8,
+   "scale": 1.13
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    11.0,
+    33.04
+   ],
+   "rot": 293.5,
+   "scale": 1.16
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.96,
+    11.0
+   ],
+   "rot": 256.5,
+   "scale": 1.63
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    13.2,
+    32.3
+   ],
+   "rot": 241.7,
+   "scale": 1.65
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.03,
+    13.2
+   ],
+   "rot": 260.0,
+   "scale": 1.51
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    15.4,
+    32.89
+   ],
+   "rot": 36.7,
+   "scale": 1.23
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.77,
+    15.4
+   ],
+   "rot": 298.4,
+   "scale": 1.56
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    17.6,
+    32.71
+   ],
+   "rot": 204.9,
+   "scale": 1.39
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.18,
+    17.6
+   ],
+   "rot": 149.0,
+   "scale": 1.62
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    19.8,
+    33.14
+   ],
+   "rot": 245.2,
+   "scale": 1.56
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.02,
+    19.8
+   ],
+   "rot": 296.4,
+   "scale": 1.23
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    22.0,
+    33.08
+   ],
+   "rot": 199.1,
+   "scale": 1.62
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.7,
+    22.0
+   ],
+   "rot": 97.1,
+   "scale": 1.6
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    24.2,
+    32.86
+   ],
+   "rot": 217.0,
+   "scale": 1.36
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.95,
+    24.2
+   ],
+   "rot": 228.3,
+   "scale": 1.53
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    26.4,
+    32.18
+   ],
+   "rot": 308.3,
+   "scale": 1.43
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.07,
+    26.4
+   ],
+   "rot": 96.2,
+   "scale": 1.18
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    28.6,
+    32.43
+   ],
+   "rot": 86.7,
+   "scale": 1.57
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.72,
+    28.6
+   ],
+   "rot": 154.5,
+   "scale": 1.48
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    30.8,
+    32.55
+   ],
+   "rot": 163.5,
+   "scale": 1.49
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.68,
+    30.8
+   ],
+   "rot": 54.4,
+   "scale": 1.48
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.0,
+    33.03
+   ],
+   "rot": 70.7,
+   "scale": 1.33
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.16,
+    33.0
+   ],
+   "rot": 323.0,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    35.2,
+    32.3
+   ],
+   "rot": 253.4,
+   "scale": 1.5
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.19,
+    35.2
+   ],
+   "rot": 14.9,
+   "scale": 1.63
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    37.4,
+    32.84
+   ],
+   "rot": 309.3,
+   "scale": 1.11
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.55,
+    37.4
+   ],
+   "rot": 93.4,
+   "scale": 1.42
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    39.6,
+    32.73
+   ],
+   "rot": 314.8,
+   "scale": 1.51
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.66,
+    39.6
+   ],
+   "rot": 195.5,
+   "scale": 1.54
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    41.8,
+    32.85
+   ],
+   "rot": 139.5,
+   "scale": 1.33
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.77,
+    41.8
+   ],
+   "rot": 27.7,
+   "scale": 1.21
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/pantano_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125,
+  "water": "res://data/arenas/pantano_agua.bin"
+ }
+}

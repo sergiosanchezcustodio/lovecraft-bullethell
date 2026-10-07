@@ -16,6 +16,7 @@ var _n := 0
 var _cell := 0.25
 var _origin := Vector2.ZERO
 var _dist_step := 1.0 / 32.0
+var _water := PackedByteArray()          ## N × N: agua somera (0..255), si la arena la tiene (hito 6.4)
 
 func add_circle(center: Vector2, radius: float) -> void:
 	_circles.append(Vector3(center.x, center.y, radius))
@@ -32,6 +33,10 @@ func load_mask(def: Dictionary) -> bool:
 	_cell = float(def.cell)
 	_origin = Vector2(def.origin[0], def.origin[1])
 	_dist_step = float(def.dist_step)
+	_water = PackedByteArray()
+	if def.has("water"):                     # agua somera que frena (pantano, hito 6.4)
+		var w := FileAccess.get_file_as_bytes(String(def.water))
+		if w.size() == n * n: _water = w
 	var lo := Vector2(INF, INF)
 	var hi := -lo
 	for j in n:
@@ -41,6 +46,31 @@ func load_mask(def: Dictionary) -> bool:
 				hi = hi.max(Vector2(i + 1, j + 1))
 	bounds = Rect2(_origin + lo * _cell, (hi - lo) * _cell)
 	return true
+
+## ¿Hay agua somera en ese punto? (0: seco, 1: agua). Por celda, sin interpolar.
+func water_at(pos: Vector2) -> float:
+	if _water.is_empty(): return 0.0
+	var i := int(floor((pos.x - _origin.x) / _cell)); var j := int(floor((pos.y - _origin.y) / _cell))
+	if i < 0 or j < 0 or i >= _n or j >= _n: return 0.0
+	return _water[j * _n + i] / 255.0
+
+## Punto de agua somera al azar entre rmin y rmax de center, libre para un cuerpo de radio r
+## (Vector2.INF si no hay). Para los que salen del agua (hito 6.4).
+func random_water(rng: RandomNumberGenerator, center: Vector2, rmin: float, rmax: float, r := 0.6) -> Vector2:
+	if _water.is_empty(): return Vector2.INF
+	for attempt in 40:
+		var a := rng.randf() * TAU
+		var p := center + Vector2(cos(a), sin(a)) * rng.randf_range(rmin, rmax)
+		if water_at(p) > 0.5 and not is_blocked(p, r): return p
+	return Vector2.INF
+
+func has_water() -> bool:
+	return not _water.is_empty()
+
+## El agua como textura (L8, N × N) para el shader del suelo, o null.
+func water_texture() -> ImageTexture:
+	if _water.is_empty(): return null
+	return ImageTexture.create_from_image(Image.create_from_data(_n, _n, false, Image.FORMAT_L8, _water))
 
 func has_mask() -> bool:
 	return _n > 0

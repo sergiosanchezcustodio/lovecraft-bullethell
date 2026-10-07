@@ -12,6 +12,7 @@ tier = 2
 spawn_weight = 0.8
 elite = false
 tags = Array[StringName]([&"marina"])
+swims = true
 max_health = 36.0
 hit_radius = 0.5
 body_radius = 0.5

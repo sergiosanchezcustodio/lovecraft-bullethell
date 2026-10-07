@@ -366,6 +366,27 @@ Léela al empezar cada sesión:
       - `godot --path . -- level=p2_n3`.
       - La horda, adelantada: `final_at=15`.
       - Hoja `shots/revision_6_3_atrezo_y_profundos.png`; capturas `shots/game_tej4_003.0s.png` y `shots/game_horda_040.0s.png`.
+  - **Hito 6.4 (nivel 4 de la parte 2, los pantanos y la vía muerta a Rowley): hecho, pendiente de tu revisión (07-10-2026).**
+    - **Agua somera que frena** (sistema nuevo):
+      - La arena declara `"water"` en su JSON (`embank`: eje y medio ancho del terraplén seco; `islands`: parte seca en islotes; `scale`; `clear`: salida). `gen_mapa_transitable.py` escribe `data/arenas/<arena>_agua.bin` (N×N bytes) y la clave `mask.water`.
+      - `ObstacleMap.water_at`, `has_water`, `random_water` y `water_texture`. El suelo dibuja el agua con esa misma capa (`town_ground.gdshader`, `water_tex`): lo que se ve es lo que frena.
+      - `WadeSplash` (`scripts/fx/wade_splash.gd`): ×0,6 de velocidad al vadear (`SLOW`), el modelo se hunde 16 cm y salpica. El esquive no se frena: sirve para salir del agua.
+      - Enemigos: vadean todos menos los que nadan (`EnemyData.swims`: Profundos, escupidores, anciano y Barnabas). Los híbridos sí se frenan.
+      - `ground.walk_back`: lo transitable acaba antes que el suelo dibujado (el bosque del fondo no se pisa).
+      - `ground.road_kind` 1: terraplén de balasto en vez de carretera con rodadas.
+      - Tests en `tests/test_wading.gd`.
+    - **Los que salen del agua** (`EnemyData.emerge`, `WaveDirector._emerge`): aparecen en una poza a 5-9 m de un jugador, tras un aro de aviso de 0,9 s y con un estallido de agua (`WadeSplash.burst`). Sin agua cerca, aparecen como siempre. `profundo_emergente` (Profundo de la ciénaga) y el anciano.
+    - **Enemigos:**
+      - Profundo anciano de Y'ha-nthlei (`gen_profundo.py profundo_anciano`, a escala 1,3): azul casi negro, bandas bioluminiscentes, ojos cian. Élite de escalón 3 con aura y canto mental en abanico (`anciano_canto`).
+      - **Barnabas Marsh, transformado** (evento final, único, a 1,6×; `gen_vecinos_innsmouth.py`): levita negra y chaleco granate hechos jirones, leontina de oro, grado 3, descalzo con garras y aletas. `keep` a 4 m, canto, ola de agua en anillo con huecos (`barnabas_ola`), llama a Profundos ancianos ("¡Y'ha-nthlei!") y aura.
+      - **Zambullida** (`KeepBehavior`, `dive_at`, `dive_time`, `dive_pattern`): al bajar del 66 % y del 33 % de vida se hunde, invulnerable 2,6 s, y sale en otra poza a 6-10 m de su objetivo con un aro de aviso y la ola. Con `log=true`, "ZAMBULLIDA N".
+      - Ojo en los generadores: `slab` comparte la misma lista para todos sus voxels; para cambiar uno, asigna una lista nueva (`M.V[k] = [...]`), o cambias toda la pieza.
+    - **Atrezo** (`tools/gen_atrezo_pantano.py` → `models/pan_*.json`): vía en tramos de 4 m (por debajo de 0,15 m: se anda encima), vagón de mercancías volcado, poste de señales con el farol rojo (luz), apeadero de Rowley (16/m), dos árboles muertos con musgo, tocón y puente de caballetes roto.
+    - **Arena** (`tools/gen_arena_pantano.py` → `data/arenas/pantano.json`, mapa en `resources/maps/p2_n4.png`): el terraplén en diagonal con la vía; ciénaga con islotes a los lados (49 % de lo transitable es agua); bosque muerto al norte y al oeste; agua abierta al sur y al este. Noche de luna; clima nuevo `niebla_pantano`.
+    - **Nivel `data/levels/p2_n4.tres`:** `health_mult` 1,35.
+    - **Equilibrio con bot (`circle`, sin compras):** cae entre los 157 y los 258 s; una vez de seis lo superó (Barnabas cae en unos 20 s con las armas que lleva a esas alturas). El nivel 3 de la parte 2, entre 155 y 271. En cooperativo con 3 bots lo superan.
+    - **Rendimiento** con el tope del nivel (75 enemigos y 500 balas): 119 FPS de media y 79 en el 1 % peor.
+    - **Probar:** `godot --path . -- level=p2_n4` (o `final_at=10`); solo la arena: `nolevel=true arena=res://data/arenas/pantano.json`. Capturas `shots/game_pan4_040.0s.png` y `shots/game_barn_014.0s.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

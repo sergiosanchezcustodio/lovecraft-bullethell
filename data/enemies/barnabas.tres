@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/barnabas_canto.tres" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/barnabas_ola.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/profundo_anciano.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"barnabas"
+display_name = "Barnabas Marsh, transformado"
+model = "barnabas"
+model_scale = 1.6
+unique = true
+tier = 5
+spawn_weight = 1.0
+elite = true
+tags = Array[StringName]([&"humana", &"marina"])
+swims = true
+max_health = 650.0
+hit_radius = 0.8
+body_radius = 0.8
+move_speed = 2.4
+xp = 40.0
+money = 50
+contact_physical = 15.0
+contact_mental = 5.0
+aura_radius = 5.0
+aura_drain = 1.6
+movement = &"keep"
+params = {"keep": 4.0, "strafe": 0.6, "extra_pattern": ExtResource("3"), "extra_every": 7.0, "minion": ExtResource("4"), "minion_every": 14.0, "minion_count": 2, "minion_text": "¡Y'ha-nthlei!", "dive_at": [0.66, 0.33], "dive_time": 2.6, "dive_pattern": ExtResource("3")}
+attack = ExtResource("2")
+attack_cooldown = 4.0
+attack_range = 10.0
+attack_anim = "throw"

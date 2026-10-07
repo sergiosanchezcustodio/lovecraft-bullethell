@@ -9,6 +9,9 @@
   hibrido_h/_m        híbridos avanzados (hito 6.2, grado 3): ropa empapada y hecha jirones
   sacerdote           sacerdote de la tiara: vestiduras verde marino con galones de oro y tiara alta
   sumo_sacerdote      "El sumo sacerdote de la Orden" (único): negro bordado en oro, la tiara más alta
+  barnabas            Barnabas Marsh transformado (hito 6.4, único): el viejo patriarca de la
+                      refinería, grado 3 al límite; levita negra y chaleco de seda hechos jirones,
+                      leontina de oro, plastrón deshecho, descalzo con garras y aletas en los brazos
 Colores apagados y grises, la piel verdosa: no se confunden con los investigadores, que
 además llevan el anillo de su color. Uso: python tools/gen_vecinos_innsmouth.py
 """
@@ -239,6 +242,42 @@ def vestments(name, seed, col, sh, trim, grade, tiara_h, flare, embroider=False)
               hat=(GOLD, GOLD_SH), roughness=0.75, specular=0.4)
 
 
+def barnabas():
+    MATS.clear()
+    COAT = mat((0.10, 0.10, 0.12), 'lana'); COAT_SH = mat((0.07, 0.07, 0.08), 'lana')
+    VEST = mat((0.30, 0.12, 0.14), 'lana'); SHIRT = mat((0.62, 0.62, 0.56), 'lino')
+    TRO = mat((0.17, 0.17, 0.19), 'lana')
+    FIN = (0.30, 0.44, 0.40); CLAW = (0.82, 0.80, 0.66)
+    M = cu.new(1950)
+    for s_, _, shin, _, _ in cu.sides():                               # pies palmeados (reventó los zapatos)
+        slab(M, shin, SKIN, 0, 3, 5 * s_, 3, 9, 8, 17, 14, ch=1)
+    cu.legs(M, TRO, bottom=3)
+    cu.torso(M, VEST, b=2, bottom=30)
+    cu.skirt(M, COAT, 14, top=44, b=2, flare=3, depth=14)              # faldones de la levita
+    for (x, y, z), v in M.V.items():                                   # levita abierta: la pechera queda delante
+        if v[0] == T and v[1] == VEST and (abs(x + 0.5) > 6 or z < 3) and y > 40: v[1] = COAT
+    for y in range(44, 60):                                            # camisa y plastrón deshecho
+        for x in (-2, -1, 0, 1): cu.front(M, x, y, SHIRT if y < 57 else (0.85, 0.85, 0.80))
+    for y in (46, 50, 54): cu.front(M, -3, y, GOLD, dz=1)              # botones del chaleco
+    for i, x in enumerate(range(-5, 5)):                               # leontina de oro de bolsillo a bolsillo
+        cu.front(M, x, 44 - (abs(x + 0.5) < 3) - (abs(x + 0.5) < 1), GOLD, dz=1)
+    for (x, y, z), v in M.V.items():                                   # jirones y desgarros: asoma la piel
+        if v[1] in (COAT, VEST, TRO) and M.noise(x, y, z, 2.5) > 0.78: v[1] = SKIN
+    for k in [k for k, v in M.V.items() if v[1] in (COAT, TRO) and k[1] < 26 and M.noise(*k, 3.0) > 0.55]:
+        del M.V[k]                                                     # bajos deshilachados
+    cu.neck(M, SKIN)
+    cu.arms(M, COAT, SKIN, b=2, cuff=COAT_SH)
+    for s_, _, _, arm, fa in cu.sides():                               # aletas que rompen las mangas
+        slab(M, fa, FIN, 34, 46, 17.5 * s_ + 3.5 * s_, -2.5, 1, 1, 3, 1, ch=0)
+    for k in list(M.V):                                                # garras
+        v = M.V[k]
+        if v[0] in ('fore_l', 'fore_r') and k[1] in (23, 24, 25) and v[1] != COAT: M.V[k] = [v[0], CLAW, 0]
+    cu.head(M, SKIN, SKIN_SH)
+    cu.innsmouth(M, 3, SKIN, SKIN_SH)
+    cu.finish(M, 'barnabas', dict(MATS), flat=(cu.FISH_EYE, cu.FISH_PUPIL, GOLD, FIN, CLAW), b=2,
+              roughness=0.65, specular=0.35)
+
+
 pescador()
 mujer()
 viejo()
@@ -248,3 +287,4 @@ hibrido('hibrido_h', 1946, False)
 hibrido('hibrido_m', 1947, True)
 vestments('sacerdote', 1948, (0.14, 0.30, 0.28), (0.10, 0.22, 0.20), (0.72, 0.58, 0.24), 2, 11, 6)
 vestments('sumo_sacerdote', 1949, (0.08, 0.08, 0.10), (0.05, 0.05, 0.07), (0.78, 0.62, 0.26), 2, 15, 8, embroider=True)
+barnabas()

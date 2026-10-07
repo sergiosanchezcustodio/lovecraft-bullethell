@@ -59,6 +59,8 @@
 		"hibrido_m": "anim_humano",
 		"sacerdote": "anim_humano",
 		"sumo_sacerdote": "anim_humano",
-		"profundo_lanzador": "anim_profundo"
+		"profundo_lanzador": "anim_profundo",
+		"profundo_anciano": "anim_profundo",
+		"barnabas": "anim_humano"
 	}
 }

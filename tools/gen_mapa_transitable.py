@@ -109,7 +109,7 @@ def build(name):
     path = os.path.join(ROOT, 'data', 'arenas', name + '.json')
     data = json.load(open(path))
     half = np.array(data['size'], dtype=float) * 0.5
-    back = float(data['ground']['margin_back'])
+    back = float(data['ground'].get('walk_back', data['ground']['margin_back']))   # walk_back: el bosque del fondo no se pisa
     sea_y = float(data['sea']['level']) if 'sea' in data else 0.0
     front = float(data['ground'].get('margin_front', 0.0))     # sin mar, el suelo sigue por delante
     body = np.zeros((N, N), bool)
@@ -137,7 +137,9 @@ def build(name):
         own = np.zeros((N, N), bool)
         stamp(own, wx, wz, (y1 > BULLET[0]) & (y0 < BULLET[1]), size)
         bullet |= solid(own)
-        stamp(floor, wx, wz, (y1 > TOP[0]) & (y1 < TOP[1]), size)        # lo alto de la costa
+        behind = 'walk_back' in data['ground'] and (pos[0] < -half[0] or pos[2] < -half[1])
+        if not behind:                                                    # lo alto de la costa (con walk_back, no lo de detrás)
+            stamp(floor, wx, wz, (y1 > TOP[0]) & (y1 < TOP[1]), size)
     blocked = body | ~floor
     # solo lo que se alcanza andando desde la salida
     free, _ = ndimage.label(~blocked)
@@ -145,18 +147,44 @@ def build(name):
     si, sj = int((sp[0] + EXTENT) / CELL), int((sp[1] + EXTENT) / CELL)
     blocked |= free != free[sj, si]
     dist = ndimage.distance_transform_edt(~blocked) * CELL
+    water = None
+    if 'water' in data:
+        water = water_layer(data['water'], X, Z) & ~blocked
+        open(os.path.join(ROOT, 'data', 'arenas', name + '_agua.bin'), 'wb').write(
+            np.where(water, 255, 0).astype(np.uint8).tobytes())
     img = np.zeros((N, N, 3), np.uint8)
     img[..., 0] = np.where(blocked, 255, 0)
     img[..., 1] = np.where(bullet, 255, 0)
     img[..., 2] = np.clip(dist / DIST_STEP, 0, 255).astype(np.uint8)
+    prev = img.copy()
+    if water is not None: prev[water & ~blocked] = (40, 90, 200)
     open(os.path.join(ROOT, 'data', 'arenas', name + '_mapa.bin'), 'wb').write(img.tobytes())
     os.makedirs(os.path.join(ROOT, 'shots'), exist_ok=True)
-    Image.fromarray(img, 'RGB').save(os.path.join(ROOT, 'shots', name + '_mapa.png'))
+    Image.fromarray(prev, 'RGB').save(os.path.join(ROOT, 'shots', name + '_mapa.png'))
     data['mask'] = {'file': 'res://data/arenas/%s_mapa.bin' % name, 'size': N, 'cell': CELL,
                     'origin': [-EXTENT, -EXTENT], 'dist_step': DIST_STEP}
+    if water is not None: data['mask']['water'] = 'res://data/arenas/%s_agua.bin' % name
     with open(path, 'w') as f: json.dump(data, f, indent=1)
     walk = (~blocked).sum() * CELL * CELL
     print('%s: %d m² transitables, %d celdas de bala bloqueadas' % (name, walk, bullet.sum()))
+    if water is not None: print('  agua somera: %d m² (%d %% de lo transitable)' % (water.sum() * CELL * CELL, 100 * water.sum() / max((~blocked).sum(), 1)))
+
+
+def water_layer(w, X, Z):
+    """Agua somera del pantano (hito 6.4): todo menos el terraplén (banda seca a lo largo de
+    "embank": [x, z, dir_x, dir_z, medio ancho]), la zona de salida y unos islotes de tierra
+    (ruido suave: "islands", fracción seca; "scale", m de cada mancha)."""
+    rng = np.random.default_rng(int(w.get('seed', 1)))
+    ex, ez, dx, dz, hw = w['embank']
+    n = math.hypot(dx, dz)
+    off = np.abs((X - ex) * (-dz / n) + (Z - ez) * (dx / n))
+    k = max(int(w.get('scale', 5.0) / CELL / 2), 1)
+    noise = ndimage.gaussian_filter(rng.random(X.shape), k, mode='wrap')
+    noise = (noise - noise.min()) / (noise.max() - noise.min())
+    dry = noise > np.quantile(noise, 1.0 - float(w.get('islands', 0.3)))
+    sp = w.get('clear', [0.0, 0.0, 0.0])
+    near = np.hypot(X - sp[0], Z - sp[1]) < sp[2]
+    return (off > hw) & ~dry & ~near
 
 
 if __name__ == '__main__':

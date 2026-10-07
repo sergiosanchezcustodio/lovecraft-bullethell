@@ -18,6 +18,8 @@ extends Resource
 ## son la masa de la horda y los que disparan, pocos.
 @export var spawn_weight := 1.0
 @export var tags: Array[StringName] = []   ## p. ej. &"marina", &"humana" (pasivos de personajes)
+@export var emerge := false                  ## sale del agua cerca de los jugadores, con aviso (si la arena tiene agua; hito 6.4)
+@export var swims := false                   ## nada en el agua somera del pantano (no se frena; hito 6.4)
 @export_group("Cuerpo")
 @export var max_health := 30.0
 @export var hit_radius := 0.45

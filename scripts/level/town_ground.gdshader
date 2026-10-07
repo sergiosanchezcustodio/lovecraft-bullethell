@@ -22,6 +22,17 @@ uniform vec2 road_p = vec2(0.0);
 uniform vec2 road_d = vec2(1.0, 0.0);
 uniform float road_w = 0.0;
 uniform vec3 road_col : source_color = vec3(0.40, 0.34, 0.26);
+// road_kind 1 (hito 6.4): terraplén de la vía, balasto de grava sin rodadas
+uniform int road_kind = 0;
+uniform vec3 ballast_hi : source_color = vec3(0.42, 0.40, 0.37);
+uniform vec3 ballast_lo : source_color = vec3(0.24, 0.22, 0.20);
+// agua somera del pantano (hito 6.4): la capa "water" del mapa de la arena (la misma que frena)
+uniform sampler2D water_tex : filter_linear, repeat_disable;
+uniform vec2 water_origin = vec2(-50.0);
+uniform float water_extent = 0.0;            // 0: sin agua
+uniform vec3 water_deep : source_color = vec3(0.13, 0.19, 0.21);
+uniform vec3 water_shallow : source_color = vec3(0.27, 0.36, 0.37);
+uniform vec3 duckweed : source_color = vec3(0.30, 0.38, 0.14);
 // marisma (hito 6.1): más allá de x o z = marsh (0: sin marisma) todo se encharca
 uniform float marsh = 0.0;
 // muelle (hito 6.2): más allá de x o z = dock (0: sin muelle) el adoquín pasa a tablas
@@ -155,11 +166,21 @@ void fragment() {
 				vec2 dd = normalize(road_d);
 				float off = dot(pc - road_p, vec2(-dd.y, dd.x)) + (gnoise(pc * 0.3) - 0.5) * 0.6;
 				float on = step(abs(off), road_w * 0.5);
+				if (road_kind == 1) {                                 // balasto: piedras de 2-3 celdas en escalones
+					vec2 sc = floor(c / 2.5);
+					float st = hash(sc + 41.0);
+					float hs = floor(st * 2.0);
+					float hn = floor(hash(floor((c + vec2(-1.0)) / 2.5) + 41.0) * 2.0);
+					vec3 bc = mix(ballast_lo, ballast_hi, 0.3 + 0.7 * st) * (0.92 + 0.12 * g);
+					col = mix(col, bc * (1.0 + clamp(hs - hn, 0.0, 1.0) * 0.12 - clamp(hn - hs, 0.0, 1.0) * 0.12), on);
+					wetm *= 1.0 - on;
+				} else {
 				col = mix(col, road_col * (0.94 + 0.1 * g), on * 0.85);
 				float rut = on * step(abs(abs(off) - 0.75), 0.16);
 				col = mix(col, base_lo * 1.1, rut * 0.7);
 				wetm = max(wetm * (1.0 - on), rut * step(0.45, fbm(pc * 0.4 + 8.0)) * wet);
 				shade -= rut * 0.08;
+				}
 			}
 			if (marsh > 0.0) {                                        // marisma: agua quieta entre matas
 				float m = smoothstep(marsh - 2.0, marsh + 3.0, max(pc.x, pc.y) + (fbm(pc * 0.15) - 0.5) * 6.0);
@@ -169,6 +190,24 @@ void fragment() {
 		}
 		col *= mix(1.0, 0.78, wet);                                    // todo mojado oscurece
 		col = mix(col, puddle, wetm);
+		if (water_extent > 0.0) {                                      // ciénaga: agua quieta con lentejas
+			float wv = texture(water_tex, (pc - water_origin) / water_extent).r;
+			wv += (fbm(pc * 0.9 + 13.0) - 0.5) * 0.35;                  // orilla irregular, no a celdas de 25 cm
+			float inw = step(0.5, wv);
+			float shore = step(0.38, wv) * (1.0 - inw);                 // barro mojado en la orilla
+			col = mix(col, puddle * 1.3, shore);
+			wetm = max(wetm, shore * 0.6);
+			if (inw > 0.5) {
+				float depth = clamp((wv - 0.5) * 2.5, 0.0, 1.0);
+				vec3 wc = mix(water_shallow, water_deep, depth);
+				float weed = step(0.70, fbm(pc * 0.5 + 90.0)) * step(0.3, hash(c + 9.0));   // lentejas de agua, a manchas
+				float ripple = step(0.985, hash(floor(c / 2.0) + floor(TIME * 0.8)));       // alguna onda que destella
+				float rim = 1.0 - smoothstep(0.5, 0.62, wv);                  // borde claro junto a la orilla
+				col = mix(wc * (1.0 + rim * 0.5), duckweed * (0.85 + 0.3 * g), weed);
+				shade = 1.0 + ripple * 0.35 * (1.0 - weed);
+				wetm = 1.0 - weed * 0.8;
+			}
+		}
 		ALBEDO = col * shade;
 		ROUGHNESS = mix(mix(rough, 0.45, wet), 0.04, wetm);
 		SPECULAR = mix(mix(spec, 0.5, wet), 0.9, wetm);

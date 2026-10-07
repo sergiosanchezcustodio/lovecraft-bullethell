@@ -73,6 +73,8 @@ var _ring_mat: StandardMaterial3D
 var _frozen_mat: StandardMaterial3D
 var _frozen_on := false
 var _xray: ShaderMaterial
+var _wade := 0.0                 ## 0..1: cuánto está metido en el agua somera (pantano)
+var _splash: GPUParticles3D      ## salpicaduras al vadear
 var _ground_lift := 0.0          ## cuánto se sube el modelo para no hundirse en el suelo
 const GROUND_EASE := 1.5         ## m/s a los que baja cuando ya no hace falta
 
@@ -128,6 +130,8 @@ func _ready() -> void:
 	add_child(_make_ring())
 	_snow = _make_snow_spray()
 	add_child(_snow)
+	_splash = WadeSplash.make()
+	add_child(_splash)
 	_frozen_mat = StandardMaterial3D.new()          # tinte violeta durante las congelaciones
 	_frozen_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_frozen_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -168,6 +172,7 @@ func _physics_process_step(delta: float) -> void:
 	var move := _crisis_move(delta, input.move)
 	var dodge := input.just_pressed(InputBindings.DODGE) and not (ss.is_kind(&"huida") or ss.is_kind(&"vagar"))
 	velocity = motor.step(delta, move, dodge)
+	if in_water() and not motor.is_dodging(): velocity *= WadeSplash.SLOW   # agua somera: frena
 	if ss.is_kind(&"huida"): velocity *= rules.flee_speed
 	elif ss.is_kind(&"vagar"): velocity *= rules.wander_speed
 	move_and_slide()
@@ -329,6 +334,9 @@ func _process_step(delta: float) -> void:
 	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
 	_animate(delta)
 	_keep_above_ground(delta)
+	_wade = move_toward(_wade, 1.0 if in_water() else 0.0, WadeSplash.EASE * delta)
+	visual.position.y -= _wade * WadeSplash.SINK        # metido en el agua hasta los tobillos
+	_splash.emitting = _wade > 0.5 and motor.velocity.length() > 0.3
 	var style := data.dodge_style
 	_snow.emitting = _action != "" and (style == null or style.snow_spray)
 	# Destello: el modelo desaparece en su tramo y deja una estela de imágenes fantasma
@@ -383,6 +391,10 @@ func _animate(delta: float) -> void:
 		elif _action == "":
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
+
+## ¿Está en agua somera? (capa "water" del mapa de la arena, hito 6.4)
+func in_water() -> bool:
+	return world != null and world.obstacles != null and world.obstacles.water_at(Vector2(position.x, position.z)) > 0.5
 
 ## Ninguna pose puede meter el cuerpo en el suelo: tras animar, se mide el punto más bajo
 ## del modelo (las cajas de sus mallas, en el espacio de Visual) y, si queda por debajo de

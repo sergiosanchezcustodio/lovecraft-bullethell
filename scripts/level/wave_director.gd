@@ -60,12 +60,13 @@ func _physics_process(delta: float) -> void:
 	var scale := level.final_spawn_scale if _final_done else 1.0
 	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * delta
 	while _acc >= 1.0:
-		if alive.size() >= max_alive():
+		if alive.size() + _emerging >= max_alive():
 			_acc = 1.0
 			break
 		_acc -= 1.0
 		var d := pick()
 		if d == null: break
+		if d.emerge and _emerge(d): continue
 		spawn(d, spawn_point(d.body_radius))
 
 ## Evento de supervivencia (hito 6.3): de final_time a final_time + final_survive llega la
@@ -175,6 +176,30 @@ func pick() -> EnemyData:
 		r -= weights[i]
 		if r <= 0.0: return cands[i]
 	return cands[cands.size() - 1]
+
+var _emerging := 0
+const EMERGE_WARN := 0.9          ## s de aviso antes de salir del agua
+
+## Sale del agua (hito 6.4): en una poza a 5-9 m de un jugador en pie, con un aro en el
+## suelo y un estallido de agua. false si no hay agua cerca (aparece como siempre).
+func _emerge(d: EnemyData) -> bool:
+	if obstacles == null or not obstacles.has_water() or world == null: return false
+	var standing := world.players.filter(func(p: Player) -> bool: return p.health > 0.0)
+	if standing.is_empty(): return false
+	var who: Player = standing[rng.randi() % standing.size()]
+	var w := obstacles.random_water(rng, Vector2(who.global_position.x, who.global_position.z), 5.0, 9.0, d.body_radius)
+	if w == Vector2.INF: return false
+	var pos := Vector3(w.x, 0, w.y)
+	var tg := Telegraph.new().setup(d.body_radius + 0.5, EMERGE_WARN, Color(0.35, 0.75, 0.85, 0.7), false)
+	tg.position = pos
+	world.fx.add_child(tg)
+	_emerging += 1                     # cuenta para el tope mientras sale
+	tg.finished.connect(func() -> void:
+		_emerging -= 1
+		if completed: return
+		WadeSplash.burst(world.fx, pos)
+		spawn(d, pos))
+	return true
 
 ## Punto de aparición fuera de cámara, dentro de la arena y lejos de obstáculos.
 func spawn_point(radius: float) -> Vector3:

@@ -34,6 +34,7 @@ var _lure_t := 0.0                          ## s que le atrae una bengala
 var _lure_pos := Vector3.ZERO
 const VULNERABLE_MULT := 1.25
 # Arsenal II (hito 2.7)
+var _wade := 0.0                            ## 0..1: metido en agua somera (hunde el modelo)
 var _slow_t := 0.0                          ## s que va más lento (Polvo de Ibn-Ghazi)
 var _slow_k := 1.0                          ## factor de velocidad mientras dura
 var _weak_t := 0.0                          ## s que hace menos daño (Polvo de Ibn-Ghazi)
@@ -194,6 +195,11 @@ func is_injected() -> bool:
 	return _inject_t > 0.0
 
 ## Velocidad actual (con el ralentizado aplicado): para los tests.
+## ¿Vadea agua somera? Los marinos (Profundos) no: nadan.
+func wades() -> bool:
+	if obstacles == null or data.swims: return false
+	return obstacles.water_at(Vector2(position.x, position.z)) > 0.5
+
 func speed_mult() -> float:
 	return _slow_k if _slow_t > 0.0 else 1.0
 
@@ -310,6 +316,9 @@ func _physics_process(delta: float) -> void:
 	var target := target_player()
 	velocity = behavior.update(self, target, delta)
 	if _slow_t > 0.0: velocity *= _slow_k
+	var wet := wades()
+	if wet: velocity *= WadeSplash.SLOW                # agua somera: los marinos nadan, los demás vadean
+	_wade = move_toward(_wade, 1.0 if wet else 0.0, WadeSplash.EASE * delta)
 	if _root_t > 0.0: velocity = Vector3.ZERO
 	if _vulnerable > 0.0: _vulnerable -= delta
 	if _lure_t > 0.0:                          # bengala: va hacia la luz en lugar del jugador
@@ -365,7 +374,7 @@ func _physics_process(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	var t0 := Prof.start()
-	visual.global_position = get_global_transform_interpolated().origin
+	visual.global_position = get_global_transform_interpolated().origin - Vector3(0, _wade * WadeSplash.SINK, 0)
 	visual.rotation.y = atan2(facing.x, facing.z)
 	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale   # aparece creciendo
 	if _aura_mat: _aura_mat.set_shader_parameter("color", Color(0.45, 0.2, 0.7, 0.14 + 0.07 * sin(_spawn_t * 2.5)))

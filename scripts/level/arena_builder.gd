@@ -19,7 +19,8 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	root.set_meta("size", size)
 	root.set_meta("spawn", Vector3(data.spawn[0], 0, data.spawn[1]))
 	root.set_meta("light", data.get("light", {}))
-	root.add_child(_ground(data, size))
+	var ground := _ground(data, size)
+	root.add_child(ground)
 	if data.has("sea"): root.add_child(_sea(data, size))     # arenas de interior: sin mar
 	if data.has("barrier"): root.add_child(_barrier(data.barrier, size))
 	var lights: Array[OmniLight3D] = []
@@ -28,6 +29,11 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	# mapa de lo transitable (tools/gen_mapa_transitable.py): con él, los límites y los
 	# obstáculos siguen lo dibujado y sobran los cuerpos físicos del decorado
 	var masked := data.has("mask") and obstacles.load_mask(data.mask)
+	if obstacles.has_water():                # agua somera (pantano, hito 6.4): el suelo la dibuja donde frena
+		var gm := ground.material_override as ShaderMaterial
+		gm.set_shader_parameter("water_tex", obstacles.water_texture())
+		gm.set_shader_parameter("water_origin", Vector2(data.mask.origin[0], data.mask.origin[1]))
+		gm.set_shader_parameter("water_extent", float(data.mask.size) * float(data.mask.cell))
 	var props := Node3D.new()
 	props.name = "Props"
 	root.add_child(props)
@@ -139,6 +145,7 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 			mat.set_shader_parameter("road_w", float(r[4]))
 		if g.has("marsh"): mat.set_shader_parameter("marsh", float(g.marsh))
 		if g.has("dock"): mat.set_shader_parameter("dock", float(g.dock))
+		if g.has("road_kind"): mat.set_shader_parameter("road_kind", int(g.road_kind))   # 1: balasto (vía del tren)
 	else:
 		mat.shader = preload("res://scripts/level/snow_ground.gdshader")
 	if g.has("camp_radius"): mat.set_shader_parameter("camp_radius", float(g.camp_radius))   # nieve pisada
