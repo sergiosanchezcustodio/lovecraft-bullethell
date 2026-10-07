@@ -42,6 +42,12 @@ extends Resource
 
 func is_survival() -> bool:
 	return final_survive > 0.0
+@export_group("Eventos intermedios")
+## Minijefes a mitad de nivel (hito 6.5): aparecen una vez, con aviso, y las oleadas siguen.
+## Listas paralelas: el enemigo, el segundo y el texto del aviso.
+@export var mid_enemies: Array[EnemyData] = []
+@export var mid_times: Array[float] = []
+@export var mid_texts: Array[String] = []
 @export_group("Dinero (D-31)")
 @export var money_bonus := 100                 ## dólares al superar el nivel
 @export var chest_every := 90.0                ## s medios entre baúles arcanos (0: ninguno)

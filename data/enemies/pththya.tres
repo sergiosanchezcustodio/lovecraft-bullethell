@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/pththya_canto.tres" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/pththya_espiral.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/profundo_emergente.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/profundo.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = &"pththya"
+display_name = "Pth'thya-l'yi, la antepasada"
+model = "pththya"
+model_scale = 1.5
+unique = true
+tier = 5
+spawn_weight = 1.0
+elite = true
+tags = Array[StringName]([&"marina"])
+swims = true
+max_health = 440.0
+hit_radius = 0.75
+body_radius = 0.75
+move_speed = 2.0
+xp = 30.0
+money = 40
+contact_physical = 12.0
+contact_mental = 6.0
+aura_radius = 5.0
+aura_drain = 1.2
+movement = &"keep"
+params = {"keep": 7.0, "strafe": 0.5, "extra_pattern": ExtResource("3"), "extra_every": 7.0, "minion": ExtResource("4"), "minion_every": 10.0, "minion_count": 3, "minion_text": "¡Ïa! ¡Ïa! Hijos del Arrecife…", "shield_at": 0.5, "shield_minion": ExtResource("5"), "shield_count": 4}
+attack = ExtResource("2")
+attack_cooldown = 4.0
+attack_range = 11.0
+attack_anim = "pounce"

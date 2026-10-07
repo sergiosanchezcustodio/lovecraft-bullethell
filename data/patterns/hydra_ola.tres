@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"hydra_ola"
+shape = 0
+count = 28
+speed = 3.4
+radius = 0.17
+size = 0.28
+damage_physical = 11.0
+damage_mental = 0.0
+lifetime = 6.0
+bursts = 2
+burst_interval = 0.6
+aimed = true
+gap_count = 4
+gap_width = 3
+telegraph_time = 0.8
+telegraph_radius = 3.0

@@ -15,6 +15,7 @@ extends Node3D
 ##   level=p1_n1             nivel a jugar (por defecto); nolevel=true: campo de pruebas sin oleadas
 ##   timescale=4             acelera el tiempo de juego (verificar el evento final)
 ##   final_at=20             adelanta el evento final a ese segundo
+##   mid_at=10               adelanta el primer evento intermedio a ese segundo (y los demás en proporción)
 ##   max_alive=150           cambia el tope de enemigos vivos
 ##   spawn_rate=20           ritmo de aparición fijo (enemigos por segundo)
 ##   fogvol=false            sin los halos de niebla de los faroles
@@ -209,11 +210,14 @@ func _ready() -> void:
 		_apply_carry()                                 # progreso del nivel anterior de la parte
 		if args.get_bool("log"): print("INICIO %s nivel=%d armas=%s" % [level_id, player.progress.level, player.weapons.weapons.map(func(w: WeaponSystem.Weapon) -> String: return "%s:%d" % [w.data.id, w.level])])
 		if args.has("final_at"): level.final_time = args.get_float("final_at")
+		if args.has("mid_at") and not level.mid_times.is_empty():     # adelanta los eventos intermedios
+			var k := args.get_float("mid_at") / level.mid_times[0]
+			level.mid_times.assign(level.mid_times.map(func(t: float) -> float: return t * k))
 		if args.has("chest_every"): level.chest_every = args.get_float("chest_every")   # baúles más a menudo (capturas)
 		if args.has("spawn_rate"): level.spawn_rate = [Vector2(0, args.get_float("spawn_rate"))] as Array[Vector2]
 		# Construir ya los modelos de todos los enemigos del nivel: si no, la primera aparición
 		# de cada uno (el Acechador, en el minuto 4) provocaría un tirón a mitad de partida.
-		for ed: EnemyData in level.pool + level.final_pool + ([level.final_enemy] if level.final_enemy else []):
+		for ed: EnemyData in level.pool + level.final_pool + level.mid_enemies + ([level.final_enemy] if level.final_enemy else []):
 			VoxelBuilder.load_model("res://models/%s.json" % ed.model).free()
 		var enemies_root := Node3D.new()
 		enemies_root.name = "Enemies"
@@ -224,6 +228,9 @@ func _ready() -> void:
 			director.pool_override.append(load("res://data/enemies/%s.tres" % eid))
 		director.players = players.size()           # la dificultad crece con los jugadores
 		director.final_event.connect(func(_e: Enemy) -> void: announce(level.final_text, 3.5))
+		director.mid_event.connect(func(e: Enemy, text: String) -> void:
+			announce(text, 3.5)
+			if args.get_bool("log"): print("MINIJEFE %s t=%.0f" % [e.data.id, director.time]))
 		director.level_completed.connect(_on_level_completed)
 		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
 		if not args.get_bool("nobreakables"): add_child(BreakableSpawner.new().setup(world, arena.get_meta("size")))

@@ -1,0 +1,1359 @@
+{
+ "name": "El Arrecife del Diablo y Y'ha-nthlei",
+ "spawn": [
+  0.0,
+  0.0
+ ],
+ "ground": {
+  "seed": 30,
+  "tile": 0.5,
+  "margin_back": 16.0,
+  "camp_radius": 0.0,
+  "kind": "reef",
+  "wet": 0.75,
+  "colors": {
+   "base_hi": [
+    0.27,
+    0.3,
+    0.29
+   ],
+   "base_lo": [
+    0.12,
+    0.14,
+    0.14
+   ],
+   "moss": [
+    0.14,
+    0.24,
+    0.12
+   ],
+   "puddle": [
+    0.05,
+    0.08,
+    0.07
+   ],
+   "water_shallow": [
+    0.12,
+    0.2,
+    0.17
+   ],
+   "water_deep": [
+    0.05,
+    0.1,
+    0.09
+   ],
+   "duckweed": [
+    0.12,
+    0.22,
+    0.1
+   ],
+   "water_glow": [
+    0.03,
+    0.13,
+    0.07
+   ],
+   "crack_glow": [
+    0.2,
+    0.75,
+    0.4
+   ]
+  }
+ },
+ "water": {
+  "seed": 9,
+  "islands": 0.62,
+  "scale": 4.0,
+  "clear": [
+   0.0,
+   0.0,
+   4.5
+  ]
+ },
+ "sea": {
+  "sides": [
+   "south",
+   "east"
+  ],
+  "level": -0.8,
+  "brash": 0.0,
+  "colors": {
+   "deep": [
+    0.02,
+    0.06,
+    0.05
+   ],
+   "mid": [
+    0.04,
+    0.11,
+    0.08
+   ],
+   "shallow": [
+    0.07,
+    0.18,
+    0.12
+   ],
+   "crest": [
+    0.14,
+    0.26,
+    0.18
+   ],
+   "foam": [
+    0.3,
+    0.4,
+    0.32
+   ]
+  }
+ },
+ "light": {
+  "sun_rot": [
+   -40,
+   20
+  ],
+  "sun_color": [
+   0.55,
+   0.66,
+   0.7
+  ],
+  "sun_energy": 0.32,
+  "exposure": 1.35,
+  "ambient_color": [
+   0.3,
+   0.42,
+   0.36
+  ],
+  "ambient_energy": 0.6,
+  "background": [
+   0.04,
+   0.07,
+   0.06
+  ],
+  "fog_color": [
+   0.12,
+   0.2,
+   0.16
+  ],
+  "fog_density": 0.0
+ },
+ "lamp": {
+  "color": [
+   0.45,
+   0.95,
+   0.6
+  ],
+  "energy": 0.9,
+  "range": 6.0,
+  "fog": 0.1
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.12
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "arr_muro": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "arr_arco": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "arr_columna_1": {
+   "type": "cylinder",
+   "radius": 0.85
+  },
+  "arr_columna_2": {
+   "type": "cylinder",
+   "radius": 0.85
+  },
+  "arr_bloque": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "arr_roca_1": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "arr_roca_2": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "arr_coral": {
+   "type": "cylinder",
+   "radius": 0.3
+  }
+ },
+ "no_shadow": [
+  "arr_muro"
+ ],
+ "size": [
+  64.0,
+  64.0
+ ],
+ "props": [
+  {
+   "model": "arr_muro",
+   "pos": [
+    -43.46,
+    -33.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_muro",
+   "pos": [
+    -21.75,
+    -33.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_muro",
+   "pos": [
+    -0.94,
+    -33.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_muro",
+   "pos": [
+    21.66,
+    -33.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_muro",
+   "pos": [
+    44.14,
+    -33.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_muro",
+   "pos": [
+    -33.0,
+    -23.43
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_muro",
+   "pos": [
+    -33.0,
+    -1.33
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_muro",
+   "pos": [
+    -33.0,
+    19.49
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_muro",
+   "pos": [
+    -33.0,
+    41.05
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_columna_2",
+   "pos": [
+    -22.27,
+    -14.49
+   ],
+   "rot": 81.2,
+   "scale": 0.94
+  },
+  {
+   "model": "arr_columna_1",
+   "pos": [
+    -14.49,
+    -22.27
+   ],
+   "rot": 41.8,
+   "scale": 1.1
+  },
+  {
+   "model": "arr_columna_1",
+   "pos": [
+    -17.32,
+    -9.54
+   ],
+   "rot": 14.6,
+   "scale": 0.95
+  },
+  {
+   "model": "arr_columna_1",
+   "pos": [
+    -9.54,
+    -17.32
+   ],
+   "rot": 36.6,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_columna_2",
+   "pos": [
+    -12.37,
+    -4.6
+   ],
+   "rot": 4.7,
+   "scale": 0.96
+  },
+  {
+   "model": "arr_columna_2",
+   "pos": [
+    -7.42,
+    0.35
+   ],
+   "rot": 7.6,
+   "scale": 1.08
+  },
+  {
+   "model": "arr_columna_2",
+   "pos": [
+    0.35,
+    -7.42
+   ],
+   "rot": 62.2,
+   "scale": 0.93
+  },
+  {
+   "model": "arr_columna_1",
+   "pos": [
+    -2.47,
+    5.3
+   ],
+   "rot": 51.5,
+   "scale": 1.02
+  },
+  {
+   "model": "arr_columna_2",
+   "pos": [
+    5.3,
+    -2.47
+   ],
+   "rot": 46.4,
+   "scale": 1.05
+  },
+  {
+   "model": "arr_columna_2",
+   "pos": [
+    2.47,
+    10.25
+   ],
+   "rot": 21.2,
+   "scale": 1.12
+  },
+  {
+   "model": "arr_columna_2",
+   "pos": [
+    7.42,
+    15.2
+   ],
+   "rot": 41.5,
+   "scale": 1.06
+  },
+  {
+   "model": "arr_columna_1",
+   "pos": [
+    15.2,
+    7.42
+   ],
+   "rot": 5.3,
+   "scale": 1.01
+  },
+  {
+   "model": "arr_columna_2",
+   "pos": [
+    12.37,
+    20.15
+   ],
+   "rot": 40.7,
+   "scale": 0.95
+  },
+  {
+   "model": "arr_columna_2",
+   "pos": [
+    20.15,
+    12.37
+   ],
+   "rot": 64.4,
+   "scale": 1.03
+  },
+  {
+   "model": "arr_arco",
+   "pos": [
+    -14.0,
+    10.0
+   ],
+   "rot": 30,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_arco",
+   "pos": [
+    12.0,
+    -15.0
+   ],
+   "rot": -60,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_arco",
+   "pos": [
+    19.0,
+    14.0
+   ],
+   "rot": 10,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_bloque",
+   "pos": [
+    6.02,
+    -12.34
+   ],
+   "rot": 232.1,
+   "scale": 1.08
+  },
+  {
+   "model": "arr_bloque",
+   "pos": [
+    -0.32,
+    25.7
+   ],
+   "rot": 148.6,
+   "scale": 0.91
+  },
+  {
+   "model": "arr_bloque",
+   "pos": [
+    7.66,
+    0.21
+   ],
+   "rot": 2.8,
+   "scale": 1.07
+  },
+  {
+   "model": "arr_bloque",
+   "pos": [
+    4.88,
+    23.3
+   ],
+   "rot": 182.1,
+   "scale": 1.16
+  },
+  {
+   "model": "arr_bloque",
+   "pos": [
+    7.7,
+    4.2
+   ],
+   "rot": 225.7,
+   "scale": 0.98
+  },
+  {
+   "model": "arr_bloque",
+   "pos": [
+    -11.61,
+    18.22
+   ],
+   "rot": 317.2,
+   "scale": 1.09
+  },
+  {
+   "model": "arr_bloque",
+   "pos": [
+    13.52,
+    10.89
+   ],
+   "rot": 106.4,
+   "scale": 1.03
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    27.15,
+    -4.88
+   ],
+   "rot": 274.6,
+   "scale": 1.16
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -14.85,
+    -16.47
+   ],
+   "rot": 33.1,
+   "scale": 1.11
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -8.45,
+    28.05
+   ],
+   "rot": 98.3,
+   "scale": 1.14
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    23.55,
+    -19.68
+   ],
+   "rot": 254.3,
+   "scale": 0.91
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -10.65,
+    21.53
+   ],
+   "rot": 68.9,
+   "scale": 0.99
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    22.45,
+    3.39
+   ],
+   "rot": 220.5,
+   "scale": 1.03
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    18.71,
+    -0.13
+   ],
+   "rot": 109.2,
+   "scale": 0.88
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    0.25,
+    -16.61
+   ],
+   "rot": 108.4,
+   "scale": 1.04
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    2.64,
+    17.14
+   ],
+   "rot": 103.1,
+   "scale": 1.02
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    27.95,
+    17.04
+   ],
+   "rot": 35.4,
+   "scale": 1.21
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    15.63,
+    2.88
+   ],
+   "rot": 262.4,
+   "scale": 1.21
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    22.22,
+    -15.86
+   ],
+   "rot": 288.6,
+   "scale": 0.88
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    4.16,
+    12.39
+   ],
+   "rot": 132.3,
+   "scale": 0.88
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    21.11,
+    23.42
+   ],
+   "rot": 160.6,
+   "scale": 1.23
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    -1.04,
+    15.44
+   ],
+   "rot": 211.6,
+   "scale": 1.23
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    8.74,
+    25.27
+   ],
+   "rot": 284.1,
+   "scale": 1.22
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    -17.11,
+    -0.22
+   ],
+   "rot": 210.2,
+   "scale": 0.92
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    -12.94,
+    1.44
+   ],
+   "rot": 238.4,
+   "scale": 0.95
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    -8.0,
+    -6.0
+   ],
+   "rot": 64.5,
+   "scale": 1.4
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    7.0,
+    8.0
+   ],
+   "rot": 0.9,
+   "scale": 1.4
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    -20.0,
+    20.0
+   ],
+   "rot": 288.6,
+   "scale": 1.4
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    22.0,
+    -22.0
+   ],
+   "rot": 268.4,
+   "scale": 1.4
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    -22.0,
+    -18.0
+   ],
+   "rot": 49.8,
+   "scale": 1.4
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    18.0,
+    24.0
+   ],
+   "rot": 70.8,
+   "scale": 1.4
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    2.0,
+    -20.0
+   ],
+   "rot": 175.5,
+   "scale": 1.4
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    13.6,
+    -4.06
+   ],
+   "rot": 120.7,
+   "scale": 1.13
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    25.83,
+    21.36
+   ],
+   "rot": 308.6,
+   "scale": 1.03
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    26.01,
+    23.37
+   ],
+   "rot": 304.8,
+   "scale": 0.91
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    12.61,
+    0.86
+   ],
+   "rot": 278.4,
+   "scale": 1.28
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    6.33,
+    28.24
+   ],
+   "rot": 44.0,
+   "scale": 1.25
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    20.73,
+    6.01
+   ],
+   "rot": 211.1,
+   "scale": 1.03
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    -9.46,
+    14.77
+   ],
+   "rot": 110.5,
+   "scale": 0.97
+  },
+  {
+   "model": "arr_coral",
+   "pos": [
+    -14.43,
+    3.74
+   ],
+   "rot": 174.3,
+   "scale": 1.02
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -44.0,
+    32.87
+   ],
+   "rot": 279.2,
+   "scale": 0.97
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    32.38,
+    -44.0
+   ],
+   "rot": 39.4,
+   "scale": 1.04
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -40.8,
+    32.67
+   ],
+   "rot": 131.5,
+   "scale": 0.87
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    33.34,
+    -40.8
+   ],
+   "rot": 54.8,
+   "scale": 1.08
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    -37.6,
+    32.91
+   ],
+   "rot": 119.6,
+   "scale": 0.79
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    32.81,
+    -37.6
+   ],
+   "rot": 20.7,
+   "scale": 1.03
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    -34.4,
+    32.68
+   ],
+   "rot": 208.4,
+   "scale": 0.88
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    33.3,
+    -34.4
+   ],
+   "rot": 275.4,
+   "scale": 0.82
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -31.2,
+    32.61
+   ],
+   "rot": 228.9,
+   "scale": 0.73
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    32.66,
+    -31.2
+   ],
+   "rot": 332.0,
+   "scale": 0.96
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -28.0,
+    32.41
+   ],
+   "rot": 125.5,
+   "scale": 0.71
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    33.23,
+    -28.0
+   ],
+   "rot": 161.6,
+   "scale": 0.74
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -24.8,
+    32.95
+   ],
+   "rot": 294.4,
+   "scale": 0.83
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    32.6,
+    -24.8
+   ],
+   "rot": 295.9,
+   "scale": 0.98
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    -21.6,
+    32.66
+   ],
+   "rot": 3.7,
+   "scale": 0.86
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    32.39,
+    -21.6
+   ],
+   "rot": 231.9,
+   "scale": 0.82
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -18.4,
+    32.8
+   ],
+   "rot": 28.3,
+   "scale": 0.93
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    33.17,
+    -18.4
+   ],
+   "rot": 247.9,
+   "scale": 0.79
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    -15.2,
+    33.33
+   ],
+   "rot": 220.1,
+   "scale": 0.72
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    32.77,
+    -15.2
+   ],
+   "rot": 96.5,
+   "scale": 0.79
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -12.0,
+    32.68
+   ],
+   "rot": 203.4,
+   "scale": 1.04
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    32.33,
+    -12.0
+   ],
+   "rot": 358.8,
+   "scale": 0.92
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -8.8,
+    33.04
+   ],
+   "rot": 358.4,
+   "scale": 0.84
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    32.42,
+    -8.8
+   ],
+   "rot": 296.0,
+   "scale": 1.07
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -5.6,
+    33.0
+   ],
+   "rot": 321.0,
+   "scale": 0.9
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    32.32,
+    -5.6
+   ],
+   "rot": 225.4,
+   "scale": 0.72
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    -2.4,
+    33.21
+   ],
+   "rot": 289.3,
+   "scale": 0.74
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    33.39,
+    -2.4
+   ],
+   "rot": 294.6,
+   "scale": 1.05
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    0.8,
+    32.87
+   ],
+   "rot": 9.9,
+   "scale": 1.03
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    33.06,
+    0.8
+   ],
+   "rot": 85.0,
+   "scale": 0.97
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    4.0,
+    32.66
+   ],
+   "rot": 249.5,
+   "scale": 0.94
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    32.56,
+    4.0
+   ],
+   "rot": 190.2,
+   "scale": 0.95
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    7.2,
+    32.48
+   ],
+   "rot": 238.9,
+   "scale": 0.77
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    32.71,
+    7.2
+   ],
+   "rot": 175.4,
+   "scale": 0.91
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    10.4,
+    32.48
+   ],
+   "rot": 81.9,
+   "scale": 0.77
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    32.77,
+    10.4
+   ],
+   "rot": 44.6,
+   "scale": 0.72
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    13.6,
+    33.2
+   ],
+   "rot": 177.6,
+   "scale": 1.06
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    33.08,
+    13.6
+   ],
+   "rot": 278.0,
+   "scale": 0.9
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    16.8,
+    32.42
+   ],
+   "rot": 49.1,
+   "scale": 1.0
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    33.03,
+    16.8
+   ],
+   "rot": 357.3,
+   "scale": 0.84
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    20.0,
+    32.95
+   ],
+   "rot": 334.2,
+   "scale": 0.82
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    32.7,
+    20.0
+   ],
+   "rot": 158.1,
+   "scale": 0.78
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    23.2,
+    32.62
+   ],
+   "rot": 254.5,
+   "scale": 0.99
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    32.6,
+    23.2
+   ],
+   "rot": 155.9,
+   "scale": 0.79
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    26.4,
+    32.6
+   ],
+   "rot": 89.8,
+   "scale": 1.03
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    32.63,
+    26.4
+   ],
+   "rot": 233.5,
+   "scale": 0.89
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    29.6,
+    32.91
+   ],
+   "rot": 276.6,
+   "scale": 0.74
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    32.58,
+    29.6
+   ],
+   "rot": 71.0,
+   "scale": 0.94
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    32.8,
+    32.49
+   ],
+   "rot": 50.3,
+   "scale": 0.85
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    32.76,
+    32.8
+   ],
+   "rot": 338.9,
+   "scale": 0.97
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    36.0,
+    32.29
+   ],
+   "rot": 121.2,
+   "scale": 0.92
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    32.25,
+    36.0
+   ],
+   "rot": 308.5,
+   "scale": 0.7
+  },
+  {
+   "model": "arr_roca_2",
+   "pos": [
+    39.2,
+    32.27
+   ],
+   "rot": 310.5,
+   "scale": 1.04
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    32.63,
+    39.2
+   ],
+   "rot": 78.3,
+   "scale": 0.87
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    42.4,
+    32.44
+   ],
+   "rot": 0.4,
+   "scale": 1.04
+  },
+  {
+   "model": "arr_roca_1",
+   "pos": [
+    32.96,
+    42.4
+   ],
+   "rot": 297.1,
+   "scale": 0.97
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/arrecife_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125,
+  "water": "res://data/arenas/arrecife_agua.bin"
+ }
+}

@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/profundo.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/profundo_emergente.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/profundo_lanzador.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/profundo_anciano.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/hibrido_h.tres" id="8"]
+[ext_resource type="Resource" path="res://data/enemies/pththya.tres" id="9"]
+[ext_resource type="Resource" path="res://data/enemies/hydra.tres" id="7"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+[ext_resource type="Resource" path="res://data/weather/niebla_arrecife.tres" id="weather"]
+
+[resource]
+script = ExtResource("1")
+weather = ExtResource("weather")
+id = &"p2_n5"
+display_name = "El Arrecife del Diablo y Y'ha-nthlei"
+part = 2
+number = 5
+arena = "res://data/arenas/arrecife.json"
+health_mult = 1.4
+duration = 300.0
+music = ""
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("6"), ExtResource("8")])
+spawn_rate = Array[Vector2]([Vector2(0, 0.4), Vector2(45, 0.6), Vector2(90, 0.95), Vector2(150, 1.4), Vector2(210, 1.9), Vector2(300, 2.4)])
+max_alive = 75
+elite_cap = 2
+mid_enemies = Array[ExtResource("5")]([ExtResource("9")])
+mid_times = Array[float]([120.0])
+mid_texts = Array[String](["Del agua negra sale ella: la antepasada, Pth'thya-l'yi…"])
+final_time = 240.0
+final_enemy = ExtResource("7")
+final_wave = 16
+final_spawn_scale = 0.3
+final_text = "El arrecife tiembla: Madre Hydra se alza de la sima…"

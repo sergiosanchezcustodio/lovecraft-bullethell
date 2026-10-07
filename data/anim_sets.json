@@ -61,6 +61,8 @@
 		"sumo_sacerdote": "anim_humano",
 		"profundo_lanzador": "anim_profundo",
 		"profundo_anciano": "anim_profundo",
-		"barnabas": "anim_humano"
+		"barnabas": "anim_humano",
+		"pththya": "anim_profundo",
+		"hydra": "anim_profundo"
 	}
 }

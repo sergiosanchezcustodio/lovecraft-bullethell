@@ -6,7 +6,7 @@ extends RefCounted
 
 const LAYER_WORLD := 1
 ## Suelos de la parte 2 (town_ground.gdshader): nombre en el JSON -> `kind` del shader.
-const TOWN_KINDS := {"mud": 0, "cobble": 1, "planks": 2}
+const TOWN_KINDS := {"mud": 0, "cobble": 1, "planks": 2, "reef": 3}
 
 ## Devuelve el nodo raíz de la arena. Metadatos: "spawn" (Vector3), "size" (Vector2),
 ## "lights" (Array de OmniLight3D de los faroles) y "obstacles" (ObstacleMap, para que los
@@ -302,7 +302,7 @@ static func _lamp(holder: Node3D, m: Node3D, def: Dictionary, fog_volume: bool) 
 		fv.size = Vector3(3.0, 2.6, 3.0)
 		fv.position = local
 		var fm := FogMaterial.new()
-		fm.density = 0.35
+		fm.density = float(def.get("fog", 0.35))          # lamp.fog: halo más tenue (corales del arrecife)
 		fm.albedo = Color(1.0, 0.85, 0.7)
 		fm.height_falloff = 0.0
 		fm.edge_fade = 0.9

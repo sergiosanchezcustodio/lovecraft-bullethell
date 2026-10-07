@@ -13,6 +13,10 @@ extends EnemyBehavior
 ##     su vida (lista), se zambulle: desaparece invulnerable dive_time s y sale en otra poza
 ##     (a 6-10 m de su objetivo; sin agua, en cualquier sitio libre) con un estallido de agua
 ##     y dive_pattern; avisa con un aro en el suelo antes de salir
+##   slam_every + slam_radius + slam_damage + slam_warn + slam_count (hito 6.5, Madre Hydra):
+##     golpe de zarpa: marca con un aviso grande donde está el jugador (y slam_count - 1
+##     sitios más a su alrededor) y al cumplirse daña a los que sigan dentro, con un
+##     estallido de agua
 var _extra := 2.0
 var _minion := 3.0
 var _side := 1.0
@@ -23,6 +27,7 @@ var _dives := 0                             ## zambullidas hechas
 var _dive_t := 0.0                          ## > 0: bajo el agua
 var _rise: Vector3                          ## por dónde saldrá
 var _rng := RandomNumberGenerator.new()
+var _slam := 3.0
 
 func start(e: Enemy) -> void:
 	_side = 1.0 if e.get_instance_id() % 2 == 0 else -1.0
@@ -39,6 +44,10 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 		_extra = float(e.data.param("extra_every", 6.0))
 		e.runner.fire(pat, func() -> Vector3: return target.global_position if is_instance_valid(target) else e.global_position)
 		super.play_attack_anim(e, "throw")
+	_slam -= delta
+	if float(e.data.param("slam_every", 0.0)) > 0.0 and _slam <= 0.0:
+		_slam = float(e.data.param("slam_every", 5.0))
+		_slam_at(e, target)
 	if e.data.param("minion", null) != null and _minion <= 0.0:
 		_minion = float(e.data.param("minion_every", 8.0))
 		_summon(e)
@@ -59,6 +68,7 @@ func _summon(e: Enemy) -> void:
 	var d: EnemyData = e.data.param("minion", null)
 	if d == null or game == null or game.get("director") == null: return
 	for i in int(e.data.param("minion_count", 3)):
+		if d.emerge and game.director._emerge(d): continue      # los que salen del agua, de las pozas
 		var a := randf() * TAU
 		game.director.spawn(d, e.global_position + Vector3(cos(a), 0, sin(a)) * 2.5)
 	var l := Label3D.new()
@@ -157,3 +167,25 @@ func _dive(e: Enemy, target: Player, delta: float) -> bool:
 		e.runner.fire(pat, func() -> Vector3: return target.global_position if is_instance_valid(target) else e.global_position)
 		super.play_attack_anim(e, "throw")
 	return false
+
+## Golpe de zarpa con aviso grande en el suelo (Madre Hydra).
+func _slam_at(e: Enemy, target: Player) -> void:
+	var r := float(e.data.param("slam_radius", 2.5))
+	var warn := float(e.data.param("slam_warn", 1.1))
+	var spots: Array[Vector3] = [Vector3(target.global_position.x, 0, target.global_position.z)]
+	for i in int(e.data.param("slam_count", 1)) - 1:
+		var a := _rng.randf() * TAU
+		spots.append(spots[0] + Vector3(cos(a), 0, sin(a)) * _rng.randf_range(r * 1.6, r * 2.6))
+	super.play_attack_anim(e, "pounce")
+	for at in spots:
+		var tg := Telegraph.new().setup(r, warn, Color(Damage.COLOR_PHYSICAL, 0.8))
+		tg.position = at
+		e.world.fx.add_child(tg)
+		tg.finished.connect(func() -> void:
+			if not is_instance_valid(e) or not e.is_alive(): return
+			WadeSplash.burst(e.world.fx, at, r * 0.8)
+			for p in e.world.players:
+				if p.health > 0.0 and Vector2(p.global_position.x - at.x, p.global_position.z - at.z).length() < r + p.data.hurt_radius:
+					var d := Damage.new(float(e.data.param("slam_damage", 20.0)), 0.0)
+					d.knockback = (p.global_position - at).normalized()
+					p.take_damage(d))

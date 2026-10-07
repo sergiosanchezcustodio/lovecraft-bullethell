@@ -68,6 +68,8 @@ func _process_step(_delta: float) -> void:
 		elif director.level.is_survival() and director.time >= director.level.final_time:
 			var s := int(ceil(director.survive_left()))
 			_objective_lbl.text = "Resiste a %s · %d:%02d" % [director.level.final_name, s / 60, s % 60]
+		elif not director.mid_alive.is_empty():
+			_objective_lbl.text = "Acaba con %s" % director.mid_alive[0].data.display_name
 		elif director.time >= director.level.final_time and director.level.final_enemy != null:
 			_objective_lbl.text = "Acaba con %s" % director.level.final_enemy.display_name
 		else:

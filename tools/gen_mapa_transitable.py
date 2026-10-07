@@ -175,7 +175,7 @@ def water_layer(w, X, Z):
     "embank": [x, z, dir_x, dir_z, medio ancho]), la zona de salida y unos islotes de tierra
     (ruido suave: "islands", fracción seca; "scale", m de cada mancha)."""
     rng = np.random.default_rng(int(w.get('seed', 1)))
-    ex, ez, dx, dz, hw = w['embank']
+    ex, ez, dx, dz, hw = w.get('embank', [0.0, 0.0, 1.0, 0.0, -1.0])   # sin terraplén: todo puede ser agua
     n = math.hypot(dx, dz)
     off = np.abs((X - ex) * (-dz / n) + (Z - ez) * (dx / n))
     k = max(int(w.get('scale', 5.0) / CELL / 2), 1)

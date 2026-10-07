@@ -3,7 +3,8 @@ shader_type spatial;
 // de muelle, en voxel fino como la nieve (snow_ground.gdshader, que no se toca): celdas de
 // 1/32 m, todo por celda y en coordenadas del mundo, con el canto claro arriba a la
 // izquierda y el oscuro abajo a la derecha, como los modelos.
-// kind: 0 tierra (mud), 1 adoquín (cobble), 2 tablas (planks). wet (0..1): lluvia; oscurece
+// kind: 0 tierra (mud), 1 adoquín (cobble), 2 tablas (planks), 3 arrecife (reef, hito 6.5: roca
+// negra mojada en escalones, algas, percebes y grietas con luz verde de abajo). wet (0..1): lluvia; oscurece
 // y abrillanta todo. Los charcos son brillo especular falso: sin reflejos reales.
 
 uniform int kind = 0;
@@ -33,6 +34,9 @@ uniform float water_extent = 0.0;            // 0: sin agua
 uniform vec3 water_deep : source_color = vec3(0.13, 0.19, 0.21);
 uniform vec3 water_shallow : source_color = vec3(0.27, 0.36, 0.37);
 uniform vec3 duckweed : source_color = vec3(0.30, 0.38, 0.14);
+uniform vec3 water_glow : source_color = vec3(0.0);            // luz que sube del agua (arrecife)
+uniform vec3 crack_glow : source_color = vec3(0.25, 0.85, 0.45);  // grietas del arrecife
+uniform vec3 barnacle : source_color = vec3(0.55, 0.55, 0.50);
 // marisma (hito 6.1): más allá de x o z = marsh (0: sin marisma) todo se encharca
 uniform float marsh = 0.0;
 // muelle (hito 6.2): más allá de x o z = dock (0: sin muelle) el adoquín pasa a tablas
@@ -91,6 +95,12 @@ vec3 plank_at(vec2 c) {
 	return vec3(hash(id), ed, h);
 }
 
+// --- arrecife: roca en escalones más bruscos, con grietas ---
+float reef_h(vec2 c) {
+	vec2 p = c * cell;
+	return floor(fbm(p * 0.5) * 7.0 + gnoise(p * 3.0) * 1.5);
+}
+
 // --- tierra: baches y rodadas en escalones de un voxel ---
 float mud_h(vec2 c) {
 	vec2 p = c * cell;
@@ -115,6 +125,8 @@ void fragment() {
 		float spec = 0.3;
 		float shade = 1.0;
 		float wetm = 0.0;                 // charco (0..1)
+		float crack = 0.0;                // grieta que brilla (arrecife)
+		vec3 glow = vec3(0.0);
 		int k = kind;
 		vec3 bhi = base_hi, blo = base_lo;
 		if (dock > 0.0 && max(pc.x, pc.y) > dock) { k = 2; bhi = dock_hi; blo = dock_lo; }
@@ -152,6 +164,19 @@ void fragment() {
 				}
 			}
 			wetm = step(0.7, fbm(pc * 0.2 + 30.0)) * wet * 0.7;
+		} else if (k == 3) {
+			float h = reef_h(c);
+			float up = h - reef_h(c + vec2(-1, -1));
+			float dn = reef_h(c + vec2(1, 1)) - h;
+			shade = 1.0 + clamp(up, 0.0, 1.0) * 0.16 - clamp(dn, 0.0, 1.0) * 0.18;
+			col = mix(base_lo, base_hi, clamp(h / 7.0, 0.0, 1.0)) * (0.92 + 0.12 * g);
+			float alga = step(0.62, fbm(pc * 0.45 + 33.0)) * step(h, 3.0);
+			col = mix(col, moss * (0.8 + 0.4 * g), alga * 0.85);                // algas en lo hondo
+			float barn = step(0.985, hash(floor(c / 2.0) + 71.0)) * step(5.0, h);
+			col = mix(col, barnacle * (0.8 + 0.3 * g), barn);                     // percebes en lo alto
+			wetm = step(h, 1.0) * wet;                                            // charcos en las hondonadas
+			float cr = abs(gnoise(pc * 0.16 + 5.0) - 0.5);                         // grietas: pocas líneas finas
+			if (cr < 0.004 && h < 4.0 && fbm(pc * 0.1 + 2.0) > 0.55) { col = crack_glow; crack = 1.0; }
 		} else {
 			float h = mud_h(c);
 			float up = h - mud_h(c + vec2(-1, -1));
@@ -206,9 +231,12 @@ void fragment() {
 				col = mix(wc * (1.0 + rim * 0.5), duckweed * (0.85 + 0.3 * g), weed);
 				shade = 1.0 + ripple * 0.35 * (1.0 - weed);
 				wetm = 1.0 - weed * 0.8;
+				crack = 0.0;
+				glow = water_glow * (0.6 + 0.4 * depth) * (1.0 - weed) * (0.85 + 0.15 * sin(TIME * 1.3 + fbm(pc * 0.3) * 6.0));
 			}
 		}
 		ALBEDO = col * shade;
+		EMISSION = glow + crack_glow * crack * 0.7;
 		ROUGHNESS = mix(mix(rough, 0.45, wet), 0.04, wetm);
 		SPECULAR = mix(mix(spec, 0.5, wet), 0.9, wetm);
 	}

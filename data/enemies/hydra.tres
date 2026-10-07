@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/hydra_ola.tres" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/hydra_espiral.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/profundo_anciano.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"hydra"
+display_name = "Madre Hydra"
+model = "hydra"
+model_scale = 3.0
+unique = true
+tier = 5
+spawn_weight = 1.0
+elite = true
+tags = Array[StringName]([&"marina"])
+swims = true
+max_health = 1300.0
+hit_radius = 1.3
+body_radius = 1.3
+move_speed = 1.5
+xp = 60.0
+money = 80
+contact_physical = 18.0
+contact_mental = 6.0
+aura_radius = 5.0
+aura_drain = 1.2
+movement = &"keep"
+params = {"keep": 6.0, "strafe": 0.35, "slam_every": 4.5, "slam_radius": 2.6, "slam_damage": 17.0, "slam_warn": 1.2, "slam_count": 2, "minion": ExtResource("4"), "minion_every": 20.0, "minion_count": 2, "minion_text": "¡Madre Hydra!", "dive_at": [0.66, 0.4, 0.2], "dive_time": 2.2, "dive_pattern": ExtResource("3")}
+attack = ExtResource("2")
+attack_cooldown = 6.0
+attack_range = 12.0
+attack_anim = "pounce"

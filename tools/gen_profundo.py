@@ -9,9 +9,14 @@ agua salada desde lejos.
 Variante `profundo_anciano` (hito 6.4): Profundo anciano de Y'ha-nthlei, azul casi negro con
 líneas bioluminiscentes en los flancos, ojos cian que brillan y cresta más alta (en el juego,
 a escala 1,3).
-Uso: python tools/gen_profundo.py [profundo|profundo_lanzador|profundo_anciano]  (sin argumento, todos)
+Variante `pththya` (hito 6.5): Pth'thya-l'yi, la antepasada milenaria. Erguida (casi sin
+joroba), verde azulado viejo con el vientre nacarado, un manto de aletas largas que le cae de
+los hombros a las corvas, cresta muy alta y ojos dorados que brillan. Sin joyas: solo anatomía.
+Variante `hydra` (hito 6.5): Madre Hydra, colosal (en el juego a escala 3): muy encorvada,
+verde negruzco, vientre pálido, velas de aletas en la espalda, ojos y agallas de luz verde.
+Uso: python tools/gen_profundo.py [profundo|profundo_lanzador|profundo_anciano|pththya|hydra]  (sin argumento, todos)
 """
-import sys, os
+import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
 import cuerpo as cu
 
@@ -25,15 +30,27 @@ def build(NAME):
     OLD = NAME == 'profundo_anciano'
     if OLD:                                                               # azul casi negro, como el prototipo abisal
         BACK = (0.08, 0.11, 0.18); FLANK = (0.14, 0.20, 0.30); SCALE = (0.11, 0.16, 0.24)
-    GLOW = (0.30, 0.90, 0.85)
+    QUEEN = NAME == 'pththya'
+    if QUEEN:
+        BACK = (0.10, 0.20, 0.20); FLANK = (0.18, 0.33, 0.32); SCALE = (0.14, 0.27, 0.27)
+    HYDRA = NAME == 'hydra'
+    if HYDRA:
+        BACK = (0.05, 0.10, 0.08); FLANK = (0.10, 0.18, 0.14); SCALE = (0.08, 0.14, 0.11)
+    GLOW = (0.30, 0.90, 0.85) if not HYDRA else (0.45, 1.0, 0.45)
     BELLY = (0.52, 0.55, 0.43); BELLY_SH = (0.44, 0.47, 0.37)
     FIN = (0.38, 0.30, 0.42); FIN_SH = (0.28, 0.22, 0.32)          # membranas violáceas
     if NAME == 'profundo_lanzador': FIN, FIN_SH = (0.22, 0.48, 0.50), (0.15, 0.36, 0.38)   # turquesa
     if OLD:
         BELLY, BELLY_SH = (0.34, 0.40, 0.46), (0.28, 0.33, 0.39)
         FIN, FIN_SH = (0.12, 0.26, 0.36), (0.08, 0.17, 0.25)
+    if QUEEN:
+        BELLY, BELLY_SH = (0.62, 0.66, 0.60), (0.52, 0.57, 0.52)
+        FIN, FIN_SH = (0.20, 0.42, 0.40), (0.13, 0.30, 0.29)
+    if HYDRA:
+        BELLY, BELLY_SH = (0.46, 0.50, 0.40), (0.38, 0.42, 0.33)
+        FIN, FIN_SH = (0.16, 0.30, 0.22), (0.10, 0.20, 0.15)
     CLAW = (0.82, 0.80, 0.68)
-    EYE = (0.40, 0.95, 0.95) if OLD else (0.85, 0.80, 0.35); PUPIL = (0.03, 0.03, 0.02)
+    EYE = (0.55, 1.0, 0.50) if HYDRA else (0.40, 0.95, 0.95) if OLD else ((1.0, 0.82, 0.30) if QUEEN else (0.85, 0.80, 0.35)); PUPIL = (0.03, 0.03, 0.02)
     MOUTH = (0.12, 0.05, 0.06); TOOTH = (0.88, 0.86, 0.76); GILL = (0.55, 0.18, 0.20)
 
     M = cu.new(1928)
@@ -100,7 +117,7 @@ def build(NAME):
             zb = min((z for (x, yy, z), v in M.V.items() if yy == y and x in (0, -1) and v[0] == T), default=None)
             part = T
         if zb is None: continue
-        h = (3 + (y % 4 == 0) * 3) if OLD else (2 + (y % 4 == 0) * 2)
+        h = (5 + (y % 3 == 0) * 4) if QUEEN else ((3 + (y % 4 == 0) * 3) if OLD else (2 + (y % 4 == 0) * 2))
         for k in range(1, h + 1):
             for x in (-1, 0): M.put(x, y, zb - k, part, FIN if k < h else FIN_SH)
 
@@ -109,8 +126,41 @@ def build(NAME):
             if v[1] == EYE: M.V[(x, y, z)] = [v[0], EYE, 1]
             elif v[1] in (FLANK, SCALE, BACK) and lateral(v[0], x, y, z): M.V[(x, y, z)] = [v[0], GLOW, 1]
             elif v[1] == FIN and k_dot(x, y, z): M.V[(x, y, z)] = [v[0], GLOW, 1]
-    piv = cu.hunch(M, k=0.4, head_drop=4)
-    cu.finish(M, NAME, {BACK: 'piel', FLANK: 'piel', SCALE: 'piel', BELLY: 'piel'} if not OLD else {BACK: 'piel', FLANK: 'piel', SCALE: 'piel'},
+    if HYDRA:
+        for (x, y, z), v in list(M.V.items()):                          # ojos y agallas de luz
+            if v[1] in (EYE, GILL): M.V[(x, y, z)] = [v[0], GLOW if v[1] == GILL else EYE, 1]
+        for i, xs in enumerate((-7, 6)):                                # dos velas de aletas a lo largo de la espalda
+            for y in range(36, 64):
+                h = int(5 + 9 * math.sin((y - 36) / 28 * math.pi))      # más altas en medio
+                for dz in range(h):
+                    rib = (y % 4 == 0)
+                    col = FIN_SH if rib else FIN
+                    xx = xs + (dz // 3) * (1 if xs > 0 else -1)          # se abren hacia fuera
+                    if dz == h - 1 and rib: M.put(xx, y, -9 - dz, T, GLOW, glow=1); continue
+                    M.put(xx, y, -9 - dz, T, col, over=False)
+    if QUEEN:
+        for (x, y, z), v in list(M.V.items()):                          # ojos que brillan
+            if v[1] == EYE: M.V[(x, y, z)] = [v[0], EYE, 1]
+        for s_ in (-1, 1):                                              # aletas en abanico a los lados de la cabeza
+            for k in range(0, 12):                                      # radios del abanico, hacia arriba y afuera
+                a = math.radians(15 + k * 8)
+                for r in range(3, 13):
+                    x = int(round(s_ * (8 + r * math.cos(a))))
+                    y = int(round(70 + r * math.sin(a)))
+                    for z in (HZ - 1, HZ):
+                        M.put(x, y, z, H, FIN_SH if k % 3 == 0 else FIN, over=False)
+                    if r == 12 and k % 2 == 0: M.put(x, y, HZ, H, GLOW, glow=1)
+        for y in range(14, 62):                                         # manto de aletas: de los hombros a las corvas
+            w = 13 + (62 - y) // 5
+            for x in range(-w, w):
+                if abs(x + 0.5) < 3 and y > 44: continue                # deja asomar la cresta
+                ribs = (x + 64) % 5 == 0
+                col = FIN_SH if ribs else FIN
+                for z in (-9, -10):
+                    if y < 20 and (x + y) % 3 == 0: continue            # borde deshilachado
+                    M.put(x, y, z - (62 - y) // 12, T, col, over=False)
+    piv = cu.hunch(M, k=0.15 if QUEEN else (0.6 if HYDRA else 0.4), head_drop=2 if QUEEN else (6 if HYDRA else 4))
+    cu.finish(M, NAME, {BACK: 'piel', FLANK: 'piel', SCALE: 'piel', BELLY: 'piel'} if not (OLD or QUEEN or HYDRA) else {BACK: 'piel', FLANK: 'piel', SCALE: 'piel'},
               flat=(EYE, PUPIL, MOUTH, TOOTH, GILL, CLAW, GLOW), extra_pivots=piv, roughness=0.45, specular=0.5)
 
 
@@ -126,5 +176,5 @@ def k_dot(x, y, z):
     return (x + y) % 5 == 0
 
 
-for name in sys.argv[1:] or ['profundo', 'profundo_lanzador', 'profundo_anciano']:
+for name in sys.argv[1:] or ['profundo', 'profundo_lanzador', 'profundo_anciano', 'pththya', 'hydra']:
     build(name)

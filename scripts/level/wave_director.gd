@@ -6,6 +6,7 @@ extends Node
 
 signal enemy_spawned(e: Enemy)
 signal final_event(e: Enemy)
+signal mid_event(e: Enemy, text: String)
 signal level_completed
 signal chest_spawned(chest: ArcaneChest)
 
@@ -28,6 +29,8 @@ var pool_override: Array[EnemyData] = []   ## no vacío: solo aparecen estos, co
 var _acc := 0.0
 var _final: Enemy
 var _final_done := false
+var _mid_done := 0                          ## eventos intermedios ya lanzados
+var mid_alive: Array[Enemy] = []            ## minijefes intermedios vivos (HUD)
 var completed := false
 var _chest_t := -1.0                       ## s hasta el próximo baúl arcano
 
@@ -48,6 +51,7 @@ func _physics_process(delta: float) -> void:
 	if target_alive > 0:
 		_keep_alive(delta)
 		return
+	_mid_step()
 	if level.is_survival():
 		if _survival_step(delta): return
 	elif not _final_done and level.final_enemy != null and time >= level.final_time:
@@ -142,6 +146,17 @@ func _keep_alive(delta: float) -> void:
 		if d == null: break
 		spawn(d, spawn_point(d.body_radius))
 	_acc = minf(_acc, 1.0)
+
+## Eventos intermedios (hito 6.5): cada minijefe a su segundo, una sola vez.
+func _mid_step() -> void:
+	while _mid_done < level.mid_enemies.size() and _mid_done < level.mid_times.size() and time >= level.mid_times[_mid_done]:
+		var d := level.mid_enemies[_mid_done]
+		var text := level.mid_texts[_mid_done] if _mid_done < level.mid_texts.size() else ""
+		_mid_done += 1
+		var e := spawn(d, spawn_point(d.body_radius))
+		mid_alive.append(e)
+		e.died.connect(func(x: Enemy) -> void: mid_alive.erase(x))
+		mid_event.emit(e, text)
 
 ## Lanza ya el evento final (depuración).
 func trigger_final() -> void:

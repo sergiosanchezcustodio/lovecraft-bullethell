@@ -31,7 +31,9 @@
 		"acechador_tejados": "El Acechador también sube a los tejados de Innsmouth. Ronda entre las chimeneas, se agazapa y salta sobre su presa con un croar que hiela la sangre.",
 		"profundo_anciano": "Profundo anciano de Y'ha-nthlei. Dicen que no mueren nunca: crecen. Este era más alto que un hombre, de un azul casi negro, con líneas que brillaban bajo la piel como el plancton en el mar de noche. Salió de la ciénaga sin una onda, y al mirarle sentí que algo se me escurría de la cabeza.",
 		"profundo_emergente": "En la ciénaga de Rowley los Profundos no vienen por el camino: el agua se riza, se abre un círculo y salen de ella a dos pasos, chorreando lodo. Aprendí a desconfiar de cada charco.",
-		"barnabas": "Barnabas Marsh, el viejo dueño de la refinería, nieto del capitán Obed. Nadie lo había visto en años. Llevaba aún la levita y la leontina de oro, reventadas por un cuerpo que ya no era de hombre. Cuando le herimos se hundió en el agua negra y salió a mi espalda, en otra poza."
+		"barnabas": "Barnabas Marsh, el viejo dueño de la refinería, nieto del capitán Obed. Nadie lo había visto en años. Llevaba aún la levita y la leontina de oro, reventadas por un cuerpo que ya no era de hombre. Cuando le herimos se hundió en el agua negra y salió a mi espalda, en otra poza.",
+		"pththya": "Pth'thya-l'yi, la antepasada. Ochenta mil años en Y'ha-nthlei, y me reconoció. Alta y erguida como una reina, con un manto de aletas que le arrastraba por la roca y los ojos de oro viejo. Cantaba, y del agua salían sus hijos; cuando la herí, la rodearon y nada la tocó mientras vivieron.",
+		"hydra": "Madre Hydra. No hay palabra para su tamaño: se alzó de la sima y su sombra tapó el arrecife entero. Cada vez que bajaba la zarpa, el agua saltaba en un círculo que sentía venir; luego se hundía, y la oía moverse bajo las pozas antes de verla salir otra vez."
 	},
 	"weapons": {
 		"webly": "Revólver del ejército británico, pesado y fiable. Su bala del .455 tumba a un hombre y hace retroceder a lo que no lo es.",
@@ -97,7 +99,7 @@
 		"p2_n2": "Innsmouth. Las casas georgianas se caen a pedazos, los tejados están hundidos y en las calles de adoquines huele a pescado podrido. En la vieja plaza, el antiguo templo masónico luce ahora el símbolo de la Orden Esotérica de Dagon. Junto a los muelles, el agua del puerto es negra y verde, y no se mueve como debería.",
 		"p2_n3": "El hotel Gilman House. A medianoche alguien probó el picaporte de mi cuarto; luego, todas las puertas del pasillo. Salí por la ventana a los tejados y corrí entre chimeneas y depósitos de agua, mientras abajo, en la calle, la horda del Arrecife del Diablo subía por las escaleras de incendios.",
 		"p2_n4": "La vía muerta del tren a Rowley. Huí por el terraplén, sobre las traviesas podridas, entre la ciénaga y el bosque muerto. Fuera del balasto el agua me llegaba a los tobillos y cada paso costaba el doble; en el apeadero abandonado, un farol de señales seguía ardiendo en rojo sin que nadie lo cuidara.",
-		"p2_n5": "El Arrecife del Diablo y, bajo él, la ciudad de Y'ha-nthlei.",
+		"p2_n5": "El Arrecife del Diablo. De noche la marea deja al aire la roca negra y, entre las pozas, las columnas de Y'ha-nthlei. Una luz verde sube del agua y de las grietas, como si debajo, muy hondo, alguien hubiera dejado encendida la ciudad.",
 		"p3_n1": "Providence, Rhode Island. El estudio del escultor Wilcox, que sueña con una ciudad sumergida.",
 		"p3_n2": "Los pantanos al sur de Nueva Orleans, 1907. Un culto danza alrededor de un ídolo.",
 		"p3_n3": "Los muelles de Dunedin y la cubierta del Alert.",
