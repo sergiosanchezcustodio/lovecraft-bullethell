@@ -69,6 +69,7 @@
 		"cultista_alert": "anim_humano",
 		"sacerdote_culto": "anim_humano",
 		"pesadilla": "anim_pesadilla",
-		"pesadilla_relieve": "anim_pesadilla"
+		"pesadilla_relieve": "anim_pesadilla",
+		"diablo": "anim_diablo"
 	}
 }

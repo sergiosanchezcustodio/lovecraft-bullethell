@@ -1,0 +1,2850 @@
+{
+ "name": "Los pantanos de Luisiana: el ritual del culto",
+ "spawn": [
+  0.0,
+  8.0
+ ],
+ "ground": {
+  "seed": 32,
+  "tile": 0.5,
+  "margin_back": 16.0,
+  "walk_back": 0.5,
+  "camp_radius": 0.0,
+  "kind": "mud",
+  "wet": 0.7,
+  "colors": {
+   "base_hi": [
+    0.28,
+    0.25,
+    0.18
+   ],
+   "base_lo": [
+    0.15,
+    0.13,
+    0.1
+   ],
+   "moss": [
+    0.2,
+    0.26,
+    0.14
+   ],
+   "puddle": [
+    0.06,
+    0.08,
+    0.07
+   ],
+   "water_shallow": [
+    0.22,
+    0.28,
+    0.24
+   ],
+   "water_deep": [
+    0.1,
+    0.14,
+    0.12
+   ],
+   "duckweed": [
+    0.26,
+    0.34,
+    0.14
+   ]
+  }
+ },
+ "water": {
+  "seed": 12,
+  "islands": 0.42,
+  "scale": 4.5,
+  "clear": [
+   0.0,
+   -4.0,
+   13.0
+  ]
+ },
+ "sea": {
+  "sides": [
+   "south",
+   "east"
+  ],
+  "level": -0.35,
+  "brash": 0.0,
+  "colors": {
+   "deep": [
+    0.03,
+    0.05,
+    0.04
+   ],
+   "mid": [
+    0.06,
+    0.08,
+    0.06
+   ],
+   "shallow": [
+    0.1,
+    0.12,
+    0.08
+   ],
+   "crest": [
+    0.16,
+    0.18,
+    0.12
+   ],
+   "foam": [
+    0.32,
+    0.34,
+    0.26
+   ]
+  }
+ },
+ "light": {
+  "sun_rot": [
+   -50,
+   30
+  ],
+  "sun_color": [
+   0.45,
+   0.52,
+   0.62
+  ],
+  "sun_energy": 0.25,
+  "exposure": 1.35,
+  "ambient_color": [
+   0.34,
+   0.4,
+   0.38
+  ],
+  "ambient_energy": 0.58,
+  "background": [
+   0.04,
+   0.05,
+   0.05
+  ],
+  "fog_color": [
+   0.14,
+   0.16,
+   0.13
+  ],
+  "fog_density": 0.0
+ },
+ "lamp": {
+  "color": [
+   1.0,
+   0.58,
+   0.28
+  ],
+  "energy": 2.6,
+  "range": 9.0,
+  "fog": 0.25
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.12
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "lui_cipres": {
+   "type": "cylinder",
+   "radius": 0.45
+  },
+  "lui_choza": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "lui_monolito": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "lui_hoguera": {
+   "type": "cylinder",
+   "radius": 0.5
+  },
+  "lui_poste": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "lui_piragua": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "cth_idolo": {
+   "type": "box",
+   "shrink": 0.9
+  }
+ },
+ "no_shadow": [
+  "inn_juncos"
+ ],
+ "size": [
+  64.0,
+  64.0
+ ],
+ "props": [
+  {
+   "model": "lui_monolito",
+   "pos": [
+    0.0,
+    -4.0
+   ],
+   "rot": 45,
+   "scale": 1.2
+  },
+  {
+   "model": "cth_idolo",
+   "pos": [
+    0.0,
+    -4.0
+   ],
+   "rot": 45,
+   "scale": 1.1,
+   "y": 3.15
+  },
+  {
+   "model": "lui_hoguera",
+   "pos": [
+    6.72,
+    2.72
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "lui_hoguera",
+   "pos": [
+    -6.72,
+    2.72
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "lui_hoguera",
+   "pos": [
+    -6.72,
+    -10.72
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "lui_hoguera",
+   "pos": [
+    6.72,
+    -10.72
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "lui_poste",
+   "pos": [
+    6.5,
+    -4.0
+   ],
+   "rot": 90.0,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_poste",
+   "pos": [
+    4.6,
+    0.6
+   ],
+   "rot": 45.0,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_poste",
+   "pos": [
+    0.0,
+    2.5
+   ],
+   "rot": 0.0,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_poste",
+   "pos": [
+    -4.6,
+    0.6
+   ],
+   "rot": -45.0,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_poste",
+   "pos": [
+    -6.5,
+    -4.0
+   ],
+   "rot": -90.0,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_poste",
+   "pos": [
+    -4.6,
+    -8.6
+   ],
+   "rot": -135.0,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_poste",
+   "pos": [
+    -0.0,
+    -10.5
+   ],
+   "rot": -180.0,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_poste",
+   "pos": [
+    4.6,
+    -8.6
+   ],
+   "rot": -225.0,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_choza",
+   "pos": [
+    -20.0,
+    10.0
+   ],
+   "rot": 70,
+   "scale": 1.0
+  },
+  {
+   "model": "lui_piragua",
+   "pos": [
+    20.0,
+    20.0
+   ],
+   "rot": 30,
+   "scale": 1.0
+  },
+  {
+   "model": "lui_piragua",
+   "pos": [
+    24.0,
+    -6.0
+   ],
+   "rot": 100,
+   "scale": 1.0
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -46.87,
+    -32.7
+   ],
+   "rot": 304.8,
+   "scale": 1.12
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -44.75,
+    -36.28
+   ],
+   "rot": 194.5,
+   "scale": 0.99
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -45.36,
+    -40.81
+   ],
+   "rot": 63.5,
+   "scale": 1.26
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -42.83,
+    -33.82
+   ],
+   "rot": 321.1,
+   "scale": 1.24
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.48,
+    -36.39
+   ],
+   "rot": 159.6,
+   "scale": 0.98
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -42.06,
+    -41.05
+   ],
+   "rot": 322.0,
+   "scale": 1.26
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -37.49,
+    -32.23
+   ],
+   "rot": 3.2,
+   "scale": 1.01
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -37.99,
+    -36.6
+   ],
+   "rot": 254.0,
+   "scale": 1.02
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -39.06,
+    -41.52
+   ],
+   "rot": 261.9,
+   "scale": 1.24
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.66,
+    -33.38
+   ],
+   "rot": 170.9,
+   "scale": 1.27
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.06,
+    -37.61
+   ],
+   "rot": 56.9,
+   "scale": 0.93
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -34.87,
+    -40.09
+   ],
+   "rot": 21.9,
+   "scale": 1.03
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -31.3,
+    -33.77
+   ],
+   "rot": 256.6,
+   "scale": 1.16
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -29.88,
+    -36.11
+   ],
+   "rot": 209.1,
+   "scale": 1.16
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -30.17,
+    -41.88
+   ],
+   "rot": 199.8,
+   "scale": 1.16
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -26.21,
+    -32.51
+   ],
+   "rot": 195.5,
+   "scale": 1.22
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -26.21,
+    -36.38
+   ],
+   "rot": 328.1,
+   "scale": 1.01
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -25.22,
+    -41.46
+   ],
+   "rot": 246.1,
+   "scale": 1.28
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -22.62,
+    -33.57
+   ],
+   "rot": 294.5,
+   "scale": 1.23
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -21.75,
+    -37.27
+   ],
+   "rot": 74.1,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -20.89,
+    -41.58
+   ],
+   "rot": 323.3,
+   "scale": 0.98
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -17.2,
+    -32.63
+   ],
+   "rot": 126.3,
+   "scale": 1.3
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -17.86,
+    -37.68
+   ],
+   "rot": 218.6,
+   "scale": 1.05
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -18.94,
+    -41.79
+   ],
+   "rot": 252.2,
+   "scale": 1.05
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -12.9,
+    -32.96
+   ],
+   "rot": 283.6,
+   "scale": 1.28
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -14.77,
+    -36.94
+   ],
+   "rot": 313.9,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -12.74,
+    -41.13
+   ],
+   "rot": 53.1,
+   "scale": 0.94
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -9.75,
+    -32.1
+   ],
+   "rot": 213.9,
+   "scale": 0.91
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -9.94,
+    -37.23
+   ],
+   "rot": 352.6,
+   "scale": 1.07
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -10.75,
+    -40.65
+   ],
+   "rot": 134.3,
+   "scale": 1.22
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -4.6,
+    -33.03
+   ],
+   "rot": 85.1,
+   "scale": 1.17
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -6.54,
+    -37.11
+   ],
+   "rot": 99.2,
+   "scale": 1.17
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -6.13,
+    -40.86
+   ],
+   "rot": 252.7,
+   "scale": 1.17
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -1.26,
+    -33.45
+   ],
+   "rot": 248.8,
+   "scale": 0.91
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -2.11,
+    -37.98
+   ],
+   "rot": 341.3,
+   "scale": 0.99
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -3.09,
+    -41.97
+   ],
+   "rot": 136.3,
+   "scale": 0.95
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    3.35,
+    -32.89
+   ],
+   "rot": 311.7,
+   "scale": 1.15
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    2.22,
+    -37.06
+   ],
+   "rot": 277.5,
+   "scale": 1.23
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    0.8,
+    -41.73
+   ],
+   "rot": 64.1,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    6.27,
+    -33.08
+   ],
+   "rot": 226.1,
+   "scale": 1.13
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    6.23,
+    -36.77
+   ],
+   "rot": 90.1,
+   "scale": 1.13
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    7.12,
+    -41.84
+   ],
+   "rot": 12.2,
+   "scale": 1.16
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    9.69,
+    -32.86
+   ],
+   "rot": 127.6,
+   "scale": 1.05
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    9.02,
+    -37.72
+   ],
+   "rot": 26.7,
+   "scale": 0.92
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    8.7,
+    -40.88
+   ],
+   "rot": 222.9,
+   "scale": 1.24
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    14.0,
+    -33.75
+   ],
+   "rot": 234.5,
+   "scale": 1.14
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    14.88,
+    -37.19
+   ],
+   "rot": 18.3,
+   "scale": 1.04
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    14.11,
+    -41.46
+   ],
+   "rot": 164.4,
+   "scale": 1.2
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    18.16,
+    -33.91
+   ],
+   "rot": 202.9,
+   "scale": 1.28
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    17.05,
+    -36.47
+   ],
+   "rot": 54.8,
+   "scale": 0.95
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    18.58,
+    -40.98
+   ],
+   "rot": 306.8,
+   "scale": 0.92
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    20.85,
+    -32.78
+   ],
+   "rot": 84.5,
+   "scale": 1.24
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    21.22,
+    -37.7
+   ],
+   "rot": 73.2,
+   "scale": 0.96
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    23.45,
+    -40.53
+   ],
+   "rot": 340.5,
+   "scale": 0.91
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    27.05,
+    -32.34
+   ],
+   "rot": 98.3,
+   "scale": 1.07
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    25.64,
+    -36.13
+   ],
+   "rot": 37.7,
+   "scale": 1.1
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    26.89,
+    -40.99
+   ],
+   "rot": 332.3,
+   "scale": 0.97
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    31.02,
+    -32.56
+   ],
+   "rot": 3.5,
+   "scale": 1.19
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    31.45,
+    -36.91
+   ],
+   "rot": 77.8,
+   "scale": 1.23
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    29.49,
+    -40.86
+   ],
+   "rot": 311.5,
+   "scale": 1.29
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    34.84,
+    -33.13
+   ],
+   "rot": 69.7,
+   "scale": 1.17
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    33.26,
+    -36.2
+   ],
+   "rot": 183.2,
+   "scale": 1.0
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    33.99,
+    -41.32
+   ],
+   "rot": 55.0,
+   "scale": 1.02
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    37.97,
+    -32.81
+   ],
+   "rot": 303.8,
+   "scale": 1.05
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    39.31,
+    -37.94
+   ],
+   "rot": 294.4,
+   "scale": 0.94
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    37.27,
+    -40.95
+   ],
+   "rot": 247.3,
+   "scale": 0.93
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -32.57,
+    -40.23
+   ],
+   "rot": 195.3,
+   "scale": 1.3
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.38,
+    -39.25
+   ],
+   "rot": 139.9,
+   "scale": 1.19
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.87,
+    -39.67
+   ],
+   "rot": 127.0,
+   "scale": 0.95
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -32.08,
+    -35.44
+   ],
+   "rot": 349.4,
+   "scale": 0.93
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.18,
+    -36.11
+   ],
+   "rot": 205.0,
+   "scale": 0.93
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.57,
+    -35.46
+   ],
+   "rot": 222.4,
+   "scale": 1.03
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -32.51,
+    -32.38
+   ],
+   "rot": 341.2,
+   "scale": 1.16
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -37.35,
+    -32.05
+   ],
+   "rot": 318.9,
+   "scale": 0.99
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -40.56,
+    -30.99
+   ],
+   "rot": 305.0,
+   "scale": 1.06
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.38,
+    -26.54
+   ],
+   "rot": 228.2,
+   "scale": 1.04
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -37.94,
+    -27.47
+   ],
+   "rot": 197.6,
+   "scale": 0.99
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.71,
+    -27.14
+   ],
+   "rot": 318.8,
+   "scale": 1.28
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.78,
+    -23.58
+   ],
+   "rot": 261.3,
+   "scale": 1.13
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -37.81,
+    -22.52
+   ],
+   "rot": 354.3,
+   "scale": 1.15
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.45,
+    -24.9
+   ],
+   "rot": 253.4,
+   "scale": 1.05
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.5,
+    -18.73
+   ],
+   "rot": 350.6,
+   "scale": 1.11
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.18,
+    -20.53
+   ],
+   "rot": 192.6,
+   "scale": 0.9
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -40.56,
+    -19.17
+   ],
+   "rot": 333.3,
+   "scale": 1.23
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -32.45,
+    -16.7
+   ],
+   "rot": 320.5,
+   "scale": 1.06
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.79,
+    -14.79
+   ],
+   "rot": 179.7,
+   "scale": 0.93
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.0,
+    -15.76
+   ],
+   "rot": 330.2,
+   "scale": 0.98
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.25,
+    -13.18
+   ],
+   "rot": 254.0,
+   "scale": 1.06
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.38,
+    -11.98
+   ],
+   "rot": 226.5,
+   "scale": 0.92
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -40.54,
+    -12.51
+   ],
+   "rot": 119.6,
+   "scale": 0.97
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.37,
+    -8.65
+   ],
+   "rot": 95.0,
+   "scale": 1.3
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.26,
+    -8.8
+   ],
+   "rot": 357.7,
+   "scale": 0.9
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -40.58,
+    -9.32
+   ],
+   "rot": 344.2,
+   "scale": 0.93
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.45,
+    -2.91
+   ],
+   "rot": 354.2,
+   "scale": 0.99
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -37.0,
+    -3.16
+   ],
+   "rot": 139.1,
+   "scale": 1.17
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.05,
+    -4.65
+   ],
+   "rot": 4.3,
+   "scale": 1.2
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -32.9,
+    1.09
+   ],
+   "rot": 115.0,
+   "scale": 1.11
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -37.46,
+    0.61
+   ],
+   "rot": 310.9,
+   "scale": 1.11
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -40.8,
+    -0.45
+   ],
+   "rot": 166.0,
+   "scale": 1.11
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.14,
+    3.75
+   ],
+   "rot": 281.2,
+   "scale": 1.11
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.16,
+    4.88
+   ],
+   "rot": 291.1,
+   "scale": 1.04
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.07,
+    4.61
+   ],
+   "rot": 83.4,
+   "scale": 1.17
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -32.17,
+    8.77
+   ],
+   "rot": 231.6,
+   "scale": 1.05
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.37,
+    6.56
+   ],
+   "rot": 256.2,
+   "scale": 1.28
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -40.78,
+    6.76
+   ],
+   "rot": 286.1,
+   "scale": 1.25
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -32.65,
+    11.92
+   ],
+   "rot": 96.8,
+   "scale": 1.11
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.3,
+    11.5
+   ],
+   "rot": 73.8,
+   "scale": 1.13
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.54,
+    10.72
+   ],
+   "rot": 45.8,
+   "scale": 0.99
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.33,
+    16.24
+   ],
+   "rot": 284.3,
+   "scale": 1.22
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.93,
+    15.04
+   ],
+   "rot": 360.0,
+   "scale": 0.99
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.41,
+    15.48
+   ],
+   "rot": 221.8,
+   "scale": 1.02
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.55,
+    20.86
+   ],
+   "rot": 84.3,
+   "scale": 1.17
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -37.65,
+    20.89
+   ],
+   "rot": 47.8,
+   "scale": 1.24
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.46,
+    18.89
+   ],
+   "rot": 74.2,
+   "scale": 1.27
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.7,
+    24.36
+   ],
+   "rot": 109.5,
+   "scale": 1.25
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.73,
+    23.71
+   ],
+   "rot": 200.8,
+   "scale": 1.13
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.87,
+    25.38
+   ],
+   "rot": 142.9,
+   "scale": 1.24
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -33.98,
+    26.68
+   ],
+   "rot": 326.7,
+   "scale": 1.23
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.25,
+    29.45
+   ],
+   "rot": 109.6,
+   "scale": 1.19
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.61,
+    28.39
+   ],
+   "rot": 171.3,
+   "scale": 0.98
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -32.86,
+    31.28
+   ],
+   "rot": 273.2,
+   "scale": 0.97
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -37.78,
+    32.26
+   ],
+   "rot": 132.8,
+   "scale": 1.14
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.21,
+    31.33
+   ],
+   "rot": 77.7,
+   "scale": 1.01
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -32.49,
+    37.2
+   ],
+   "rot": 302.1,
+   "scale": 0.93
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -36.7,
+    34.79
+   ],
+   "rot": 158.5,
+   "scale": 1.03
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -41.53,
+    36.63
+   ],
+   "rot": 42.8,
+   "scale": 1.07
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -26.1,
+    23.05
+   ],
+   "rot": 230.7,
+   "scale": 0.96
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -14.5,
+    6.84
+   ],
+   "rot": 171.8,
+   "scale": 1.0
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    23.12,
+    -20.22
+   ],
+   "rot": 160.2,
+   "scale": 1.06
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    2.0,
+    15.62
+   ],
+   "rot": 342.0,
+   "scale": 1.08
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -5.9,
+    -16.3
+   ],
+   "rot": 84.4,
+   "scale": 1.13
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    28.84,
+    28.58
+   ],
+   "rot": 14.0,
+   "scale": 1.07
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    8.46,
+    -19.7
+   ],
+   "rot": 239.0,
+   "scale": 1.06
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    26.31,
+    -18.68
+   ],
+   "rot": 16.5,
+   "scale": 0.97
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -26.1,
+    -6.65
+   ],
+   "rot": 330.6,
+   "scale": 0.97
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    27.67,
+    11.39
+   ],
+   "rot": 0.8,
+   "scale": 0.98
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -1.09,
+    21.41
+   ],
+   "rot": 141.3,
+   "scale": 1.11
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    13.06,
+    4.37
+   ],
+   "rot": 96.6,
+   "scale": 1.23
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    24.55,
+    -14.52
+   ],
+   "rot": 315.9,
+   "scale": 1.19
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -17.89,
+    -19.94
+   ],
+   "rot": 197.8,
+   "scale": 0.97
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    17.06,
+    -7.34
+   ],
+   "rot": 152.4,
+   "scale": 1.19
+  },
+  {
+   "model": "lui_cipres",
+   "pos": [
+    -23.25,
+    1.88
+   ],
+   "rot": 256.2,
+   "scale": 1.11
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -21.27,
+    16.39
+   ],
+   "rot": 255.5,
+   "scale": 1.31
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -11.09,
+    -15.08
+   ],
+   "rot": 117.9,
+   "scale": 1.13
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    20.61,
+    -17.96
+   ],
+   "rot": 155.9,
+   "scale": 0.93
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    6.37,
+    -16.74
+   ],
+   "rot": 66.0,
+   "scale": 1.23
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    10.43,
+    10.29
+   ],
+   "rot": 154.1,
+   "scale": 1.24
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    0.02,
+    -20.4
+   ],
+   "rot": 308.6,
+   "scale": 1.23
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -2.37,
+    -19.21
+   ],
+   "rot": 30.9,
+   "scale": 0.94
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -19.79,
+    26.92
+   ],
+   "rot": 207.9,
+   "scale": 1.33
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    9.19,
+    -28.75
+   ],
+   "rot": 266.4,
+   "scale": 1.25
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    5.21,
+    23.5
+   ],
+   "rot": 22.1,
+   "scale": 1.06
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    11.19,
+    -16.22
+   ],
+   "rot": 248.7,
+   "scale": 1.05
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    13.93,
+    -23.47
+   ],
+   "rot": 76.0,
+   "scale": 1.21
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    29.06,
+    -6.72
+   ],
+   "rot": 250.6,
+   "scale": 1.49
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -28.87,
+    -16.68
+   ],
+   "rot": 166.1,
+   "scale": 1.53
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -22.78,
+    -26.11
+   ],
+   "rot": 232.5,
+   "scale": 1.37
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    15.72,
+    -28.68
+   ],
+   "rot": 239.7,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    19.72,
+    -2.13
+   ],
+   "rot": 339.9,
+   "scale": 1.43
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -4.04,
+    23.59
+   ],
+   "rot": 337.7,
+   "scale": 1.21
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    23.78,
+    13.35
+   ],
+   "rot": 112.5,
+   "scale": 1.12
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    14.46,
+    0.05
+   ],
+   "rot": 240.6,
+   "scale": 1.01
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    15.92,
+    -17.54
+   ],
+   "rot": 168.5,
+   "scale": 1.06
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -14.56,
+    29.19
+   ],
+   "rot": 353.4,
+   "scale": 1.38
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    4.25,
+    9.07
+   ],
+   "rot": 127.9,
+   "scale": 1.58
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    4.68,
+    29.65
+   ],
+   "rot": 255.1,
+   "scale": 1.14
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    14.15,
+    27.16
+   ],
+   "rot": 312.7,
+   "scale": 1.32
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -13.98,
+    -13.86
+   ],
+   "rot": 286.3,
+   "scale": 1.36
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -22.14,
+    -11.83
+   ],
+   "rot": 127.0,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    15.3,
+    22.97
+   ],
+   "rot": 338.6,
+   "scale": 1.33
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -26.04,
+    -13.62
+   ],
+   "rot": 320.4,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    5.5,
+    18.13
+   ],
+   "rot": 125.4,
+   "scale": 1.32
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    10.87,
+    28.2
+   ],
+   "rot": 190.1,
+   "scale": 1.28
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    19.14,
+    13.29
+   ],
+   "rot": 249.4,
+   "scale": 1.38
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -17.23,
+    -3.62
+   ],
+   "rot": 293.2,
+   "scale": 1.58
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -26.63,
+    1.65
+   ],
+   "rot": 278.2,
+   "scale": 1.22
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    26.88,
+    -9.0
+   ],
+   "rot": 212.6,
+   "scale": 1.4
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    15.86,
+    -2.41
+   ],
+   "rot": 311.2,
+   "scale": 1.33
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -22.23,
+    -9.57
+   ],
+   "rot": 187.9,
+   "scale": 1.07
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -3.74,
+    -21.68
+   ],
+   "rot": 200.7,
+   "scale": 1.3
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    7.27,
+    13.82
+   ],
+   "rot": 133.0,
+   "scale": 1.52
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -9.91,
+    -26.88
+   ],
+   "rot": 47.3,
+   "scale": 1.38
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    28.03,
+    17.54
+   ],
+   "rot": 218.3,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -26.42,
+    -28.68
+   ],
+   "rot": 108.6,
+   "scale": 1.45
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -44.0,
+    33.14
+   ],
+   "rot": 37.1,
+   "scale": 1.22
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.14,
+    -44.0
+   ],
+   "rot": 46.9,
+   "scale": 1.37
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -42.0,
+    32.47
+   ],
+   "rot": 42.0,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.01,
+    -42.0
+   ],
+   "rot": 357.7,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -40.0,
+    32.5
+   ],
+   "rot": 93.7,
+   "scale": 1.1
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.0,
+    -40.0
+   ],
+   "rot": 317.0,
+   "scale": 1.42
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -38.0,
+    32.62
+   ],
+   "rot": 190.2,
+   "scale": 1.65
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.84,
+    -38.0
+   ],
+   "rot": 185.3,
+   "scale": 1.37
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -36.0,
+    32.69
+   ],
+   "rot": 301.8,
+   "scale": 1.64
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.07,
+    -36.0
+   ],
+   "rot": 127.6,
+   "scale": 1.55
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -34.0,
+    32.9
+   ],
+   "rot": 140.0,
+   "scale": 1.4
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.02,
+    -34.0
+   ],
+   "rot": 164.0,
+   "scale": 1.38
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -32.0,
+    32.17
+   ],
+   "rot": 49.6,
+   "scale": 1.63
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.63,
+    -32.0
+   ],
+   "rot": 238.9,
+   "scale": 1.58
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -30.0,
+    32.96
+   ],
+   "rot": 16.0,
+   "scale": 1.58
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.18,
+    -30.0
+   ],
+   "rot": 349.3,
+   "scale": 1.45
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -28.0,
+    32.83
+   ],
+   "rot": 192.4,
+   "scale": 1.24
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.18,
+    -28.0
+   ],
+   "rot": 180.1,
+   "scale": 1.63
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -26.0,
+    32.21
+   ],
+   "rot": 327.9,
+   "scale": 1.19
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.47,
+    -26.0
+   ],
+   "rot": 324.3,
+   "scale": 1.49
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -24.0,
+    32.48
+   ],
+   "rot": 146.9,
+   "scale": 1.54
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.26,
+    -24.0
+   ],
+   "rot": 233.5,
+   "scale": 1.5
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -22.0,
+    32.2
+   ],
+   "rot": 334.6,
+   "scale": 1.14
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.75,
+    -22.0
+   ],
+   "rot": 63.8,
+   "scale": 1.3
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -20.0,
+    32.29
+   ],
+   "rot": 318.8,
+   "scale": 1.52
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.13,
+    -20.0
+   ],
+   "rot": 158.4,
+   "scale": 1.21
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -18.0,
+    32.93
+   ],
+   "rot": 294.2,
+   "scale": 1.39
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.53,
+    -18.0
+   ],
+   "rot": 152.4,
+   "scale": 1.1
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -16.0,
+    32.0
+   ],
+   "rot": 23.0,
+   "scale": 1.18
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.2,
+    -16.0
+   ],
+   "rot": 270.1,
+   "scale": 1.44
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -14.0,
+    32.97
+   ],
+   "rot": 225.1,
+   "scale": 1.18
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.25,
+    -14.0
+   ],
+   "rot": 148.9,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -12.0,
+    32.73
+   ],
+   "rot": 337.7,
+   "scale": 1.27
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.97,
+    -12.0
+   ],
+   "rot": 101.2,
+   "scale": 1.1
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -10.0,
+    32.61
+   ],
+   "rot": 195.6,
+   "scale": 1.49
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.16,
+    -10.0
+   ],
+   "rot": 183.6,
+   "scale": 1.43
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -8.0,
+    32.45
+   ],
+   "rot": 73.1,
+   "scale": 1.63
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.29,
+    -8.0
+   ],
+   "rot": 353.7,
+   "scale": 1.41
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -6.0,
+    33.0
+   ],
+   "rot": 174.0,
+   "scale": 1.43
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.17,
+    -6.0
+   ],
+   "rot": 332.5,
+   "scale": 1.3
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -4.0,
+    32.88
+   ],
+   "rot": 112.4,
+   "scale": 1.64
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.12,
+    -4.0
+   ],
+   "rot": 161.3,
+   "scale": 1.59
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    -2.0,
+    33.04
+   ],
+   "rot": 115.1,
+   "scale": 1.45
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.23,
+    -2.0
+   ],
+   "rot": 307.6,
+   "scale": 1.22
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    0.0,
+    32.73
+   ],
+   "rot": 354.8,
+   "scale": 1.53
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.84,
+    0.0
+   ],
+   "rot": 7.6,
+   "scale": 1.33
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    2.0,
+    32.94
+   ],
+   "rot": 263.7,
+   "scale": 1.56
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.25,
+    2.0
+   ],
+   "rot": 50.7,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    4.0,
+    32.88
+   ],
+   "rot": 171.2,
+   "scale": 1.57
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.68,
+    4.0
+   ],
+   "rot": 226.7,
+   "scale": 1.27
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    6.0,
+    32.58
+   ],
+   "rot": 101.5,
+   "scale": 1.23
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.24,
+    6.0
+   ],
+   "rot": 77.4,
+   "scale": 1.54
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    8.0,
+    32.24
+   ],
+   "rot": 50.8,
+   "scale": 1.34
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.65,
+    8.0
+   ],
+   "rot": 339.6,
+   "scale": 1.44
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    10.0,
+    32.66
+   ],
+   "rot": 53.4,
+   "scale": 1.61
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.15,
+    10.0
+   ],
+   "rot": 9.4,
+   "scale": 1.27
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    12.0,
+    32.14
+   ],
+   "rot": 254.6,
+   "scale": 1.35
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.16,
+    12.0
+   ],
+   "rot": 105.1,
+   "scale": 1.23
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    14.0,
+    33.01
+   ],
+   "rot": 240.5,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.46,
+    14.0
+   ],
+   "rot": 32.8,
+   "scale": 1.39
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    16.0,
+    33.16
+   ],
+   "rot": 344.1,
+   "scale": 1.31
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.14,
+    16.0
+   ],
+   "rot": 259.6,
+   "scale": 1.4
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    18.0,
+    33.12
+   ],
+   "rot": 113.8,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.01,
+    18.0
+   ],
+   "rot": 11.0,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    20.0,
+    32.9
+   ],
+   "rot": 69.7,
+   "scale": 1.68
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.95,
+    20.0
+   ],
+   "rot": 102.9,
+   "scale": 1.63
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    22.0,
+    32.2
+   ],
+   "rot": 187.4,
+   "scale": 1.54
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.24,
+    22.0
+   ],
+   "rot": 120.0,
+   "scale": 1.21
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    24.0,
+    32.87
+   ],
+   "rot": 295.9,
+   "scale": 1.23
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.78,
+    24.0
+   ],
+   "rot": 233.0,
+   "scale": 1.46
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    26.0,
+    32.08
+   ],
+   "rot": 331.5,
+   "scale": 1.32
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.71,
+    26.0
+   ],
+   "rot": 109.3,
+   "scale": 1.57
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    28.0,
+    32.83
+   ],
+   "rot": 149.9,
+   "scale": 1.34
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.62,
+    28.0
+   ],
+   "rot": 139.9,
+   "scale": 1.53
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    30.0,
+    33.04
+   ],
+   "rot": 202.1,
+   "scale": 1.42
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.64,
+    30.0
+   ],
+   "rot": 225.0,
+   "scale": 1.34
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.0,
+    32.25
+   ],
+   "rot": 319.1,
+   "scale": 1.32
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.21,
+    32.0
+   ],
+   "rot": 2.1,
+   "scale": 1.28
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    34.0,
+    32.49
+   ],
+   "rot": 42.7,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.71,
+    34.0
+   ],
+   "rot": 156.1,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    36.0,
+    32.6
+   ],
+   "rot": 218.8,
+   "scale": 1.25
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.05,
+    36.0
+   ],
+   "rot": 172.2,
+   "scale": 1.47
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    38.0,
+    33.11
+   ],
+   "rot": 108.1,
+   "scale": 1.51
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.59,
+    38.0
+   ],
+   "rot": 348.6,
+   "scale": 1.29
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    40.0,
+    32.23
+   ],
+   "rot": 119.5,
+   "scale": 1.38
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    33.02,
+    40.0
+   ],
+   "rot": 100.1,
+   "scale": 1.58
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    42.0,
+    32.23
+   ],
+   "rot": 337.5,
+   "scale": 1.34
+  },
+  {
+   "model": "inn_juncos",
+   "pos": [
+    32.39,
+    42.0
+   ],
+   "rot": 310.6,
+   "scale": 1.4
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/ritual_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125,
+  "water": "res://data/arenas/ritual_agua.bin"
+ }
+}

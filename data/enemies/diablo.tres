@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"diablo"
+display_name = "Diablo con alas de murciélago"
+model = "diablo"
+tier = 2
+spawn_weight = 0.7
+elite = false
+max_health = 40.0
+hit_radius = 0.5
+body_radius = 0.5
+move_speed = 3.4
+xp = 2.5
+money = 3
+contact_physical = 9.0
+contact_mental = 2.0
+movement = &"dive"
+params = {"dive_cooldown": 3.8, "dive_damage": 11.0, "dive_radius": 1.1, "dive_range": 8.0, "dive_time": 0.35, "height": 2.4, "orbit": 4.5, "telegraph": 0.7}

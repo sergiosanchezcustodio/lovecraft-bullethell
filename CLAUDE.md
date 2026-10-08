@@ -446,7 +446,17 @@ Léela al empezar cada sesión:
     - **Nivel `data/levels/p3_n1.tres`:** `health_mult` 1,1, ritmo un 15 % mayor que el del nivel 1 de la parte 2 y `coop_spawn` más suave [1; 1,15; 1,3; 1,45] (con el de siempre, el cooperativo salía más difícil que el solitario: las pesadillas atraviesan paredes y se acumulan).
     - **Equilibrio con bot (`circle`, nivel suelto, personaje nuevo):** en solitario 5 de 11; en cooperativo con 3 bots 6 de 11. La primera versión se superaba 12 de 12 (las pesadillas solo quitaban cordura) y la segunda, 0 de 17.
     - **Rendimiento** con 75 enemigos y 500 balas: 119 FPS de media y 117 en el 1 % peor.
-    - **Probar:** `godot --path . -- level=p3_n1` (o `final_at=15`). Captura `shots/game_p31_022.0s.png`. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
+    - **Probar:** `godot --path . -- level=p3_n1` (o `final_at=15`). Captura `shots/game_p31_022.0s.png`.
+  - **Hito 7.2 (nivel 2 de la parte 3, los pantanos de Luisiana: el ritual): hecho, pendiente de tu revisión (08-10-2026).**
+    - **Diablo con alas de murciélago** (`tools/gen_diablo.py`, 32/m, `anim_diablo.gd`: fly, dive): criatura menuda y encorvada, piel correosa casi negra, cuernos, orejas de murciélago, ojos amarillos, cola con punta de flecha y alas de 2,6 m de envergadura con dedos huesudos y membrana rojiza. Vuela en círculo y cae en picado (`DiveBehavior`, como el Antiguo alado).
+    - **Cultista armado del *Alert*** (`cultista_alert`, modelo del 7.0): `keep` a 6,5 m, ráfagas de tres tiros de revólver (`revolver_culto`).
+    - **El sacerdote del ritual** (evento final, único, a 1,4×; `sacerdote_culto`): canto mixto en abanico, anillo mental con huecos, llama a diablos ("Ph'nglui mglw'nafh…") y, al 50 %, un corro de 5 cultistas que lo protegen (escudo del 6.2).
+    - **Atrezo** (`tools/gen_atrezo_luisiana.py` → `models/lui_*.json`): hoguera de troncos cruzados (luz), monolito con jeroglíficos (el ídolo va encima como otra pieza, con `y`), ciprés calvo con rodillas y musgo español, choza de tablas sobre pilotes con tejado de chapa (16/m), poste con antorcha (luz) y calavera de vaca, y piragua.
+    - **Arena** (`tools/gen_arena_ritual.py` → `data/arenas/ritual.json`, mapa en `resources/maps/p3_n2.png`): claro seco con el monolito y el ídolo, corro de ocho antorchas y cuatro hogueras; ciénaga de agua somera (48 % de lo transitable) con islotes alrededor; bosque cerrado de cipreses al norte y al oeste; bayou al sur y al este. Noche sin luna; la luz es la del fuego.
+    - **Nivel `data/levels/p3_n2.tres`:** `health_mult` 1,12 (con 1,2, en solitario 2 de 12), `coop_spawn` suave como el nivel 1.
+    - **Equilibrio con bot (`circle`, nivel suelto):** en solitario 3 de 11; en cooperativo con 3 bots 7 de 9.
+    - **Rendimiento** con 75 enemigos y 500 balas: 119 FPS de media y 76 en el 1 % peor.
+    - **Probar:** `godot --path . -- level=p3_n2` (o `final_at=12`). Capturas `shots/game_rit1_003.0s.png` (el claro) y `shots/game_p32_024.0s.png`. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/ritual_canto.tres" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/ritual_anillo.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/cultista.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/diablo.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = &"sacerdote_culto"
+display_name = "El sacerdote del ritual"
+model = "sacerdote_culto"
+model_scale = 1.4
+unique = true
+tier = 4
+spawn_weight = 1.0
+elite = true
+tags = Array[StringName]([&"humana"])
+max_health = 640.0
+hit_radius = 0.7
+body_radius = 0.7
+move_speed = 2.0
+xp = 35.0
+money = 45
+contact_physical = 12.0
+contact_mental = 4.0
+aura_radius = 4.5
+aura_drain = 1.6
+movement = &"keep"
+params = {"keep": 7.0, "strafe": 0.45, "extra_pattern": ExtResource("3"), "extra_every": 6.5, "minion": ExtResource("5"), "minion_every": 11.0, "minion_count": 2, "minion_text": "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn!", "shield_at": 0.5, "shield_minion": ExtResource("4"), "shield_count": 5}
+attack = ExtResource("2")
+attack_cooldown = 4.0
+attack_range = 11.0
+attack_anim = "throw"
