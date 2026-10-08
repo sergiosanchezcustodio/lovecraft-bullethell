@@ -161,7 +161,7 @@ Se adelanta a la fase 5 (relatos y arranque), que no bloquea el contenido. Cada 
 | 6.4 | **Nivel 4, los pantanos y la vía muerta a Rowley.** Arena: terraplén del tren con traviesas y agua estancada a los lados (frena a los jugadores). Profundos ancianos de Y'ha-nthlei (sobre el prototipo `abisal`, bioluminiscentes, aura). Minijefe: Barnabas Marsh transformado (único, ropa de patriarca rota) | Hecho, pendiente de revisión (07-10-2026) |
 | 6.5 | **Nivel 5, el Arrecife del Diablo y Y'ha-nthlei.** Arena de arrecife negro con pozas y columnas ciclópeas sumergidas, luz verde desde abajo. Pth'thya-l'yi (única, invoca Profundos) y Madre Hydra (única, minijefa previa al jefe) | Hecho, pendiente de revisión (07-10-2026) |
 | 6.6 | **Jefe: Padre Dagon.** Colosal: emerge del agua en el borde de la arena, golpea con las manos (avisos grandes en el suelo), lanza oleadas de agua y llama a Profundos; varias fases como el shoggoth primigenio (`BossBehavior`). Sobre el prototipo `bruto` | Hecho, pendiente de revisión (08-10-2026): sale de simas en la mitad norte del arrecife, no de la orilla (`DagonBehavior`) |
-| 6.7 | **Cierre:** la parte entera en cooperativo con bots, equilibrio (como en el 4.6, medido sin compras y con las compras esperables tras la parte 1: difícil, nunca exasperante), la Biblioteca con las entradas nuevas (textos y mapas) y tu partida | Pendiente |
+| 6.7 | **Cierre:** la parte entera en cooperativo con bots, equilibrio (como en el 4.6, medido sin compras y con las compras esperables tras la parte 1: difícil, nunca exasperante), la Biblioteca con las entradas nuevas (textos y mapas) y tu partida | Hecho salvo tu partida (08-10-2026) |
 
 ## Fase 7: Parte 3 completa (*La llamada de Cthulhu*)
 

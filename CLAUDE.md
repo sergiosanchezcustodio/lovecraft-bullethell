@@ -411,7 +411,23 @@ Léela al empezar cada sesión:
     - **Objetivo prioritario** (`CombatWorld.focus`): Dagon se pone como foco; `nearest_enemy` lo elige si está a tiro y no hay ningún enemigo a menos de 3 m. Sin eso, las armas siempre disparaban a los Profundos de alrededor y Dagon tardaba minutos en pasar de fase.
     - Las simas están a unos 13 m del centro (a 21 m quedaban fuera del alcance de casi todas las armas). Con el jefe vivo, el ritmo de aparición baja a la mitad del de después del evento final (`BOSS_SPAWN_SCALE`).
     - **Equilibrio con bot (`circle`, sin compras), nivel 5 entero:** Dagon con 3.600 de vida y el nivel con `health_mult` 1,3 (antes 1,4). En cooperativo con 3 bots lo superan (Dagon cae a los 342 s). En solitario, el bot llega a Dagon en 4 de 6 partidas pero no lo vence (cae entre 252 y 423 s). Queda para el 6.7 (equilibrio de la parte con y sin compras).
-    - **Probar:** `godot --path . -- level=p2_n5 boss=true final_at=5` (Dagon directo). Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
+    - **Probar:** `godot --path . -- level=p2_n5 boss=true final_at=5` (Dagon directo).
+  - **Hito 6.7 (cierre de la parte 2): hecho, falta tu partida (08-10-2026).**
+    - **Medir la parte entera:** `level=p2_n1 bot=circle autopick=true autonext=true autorestart=1 chain=true log=true timescale=5`. `autonext` pasa al siguiente nivel conservando el progreso; `chain=true` hace que, al caer, se vuelva a empezar en el nivel de `level=` desde cero. `shop=N` simula N niveles comprados en cada potenciador (vida, cordura, daño y velocidad) sin tocar la partida guardada. Los registros "NIVEL SUPERADO" y "FIN DERROTA" llevan el nivel y el del J1.
+    - Ojo: lanzando un nivel suelto de mitad de parte (`level=p2_n4`), el jugador recibe 7 subidas por cada nivel anterior (`DEV_LEVELS_PER_STAGE`): por eso las capturas salen con "Nv. 22" o "Nv. 29". Encadenado, se llega al nivel 5 hacia el nivel 22-25.
+    - **Ajustes:** `health_mult` 1,0 / 1,1 / 1,15 / 1,2 / 1,2 (antes 1,2 / 1,3 / 1,3 / 1,35 / 1,3); el nivel 1 con el ritmo del nivel 1 de la parte 1; nivel 3 con un 10 % menos de ritmo y la horda a 2,4 por segundo con tope 55; Dagon con 3.000 de vida y zarpa 17. Antes, el bot recién empezado superaba el nivel 1 solo 2 de 37 veces y el nivel 3 paraba al equipo de 3 bots 8 de 9.
+    - **Resultado** (bot `circle`, que no esquiva; superados / intentos):
+
+      | | N1 | N2 | N3 | N4 | N5 |
+      |---|---|---|---|---|---|
+      | Solitario, sin compras | 5/17 | 4/5 | 1/4 | 1/1 | 0/1 |
+      | Solitario, `shop=2` | 4/18 | 3/4 | 2/3 | 2/2 | 0/2 |
+      | Cooperativo, 3 bots | 7/8 | 6/7 | 3/5 | 3/3 | 3/3 |
+
+      En solitario el bot llega a Dagon pero no lo vence; en cooperativo la parte entera se supera.
+    - **Rendimiento** con el tope de cada nivel (75 enemigos y 500 balas): 118-119 FPS de media en los cinco; el 1 % peor, 51 (nivel 1), 70, 60, 57 y 74.
+    - **Biblioteca:** las criaturas y los cinco lugares de la parte 2 tienen texto y mapa.
+    - **Falta tu partida** de la parte 2 para cerrarla. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

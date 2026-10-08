@@ -16,6 +16,8 @@ extends Node3D
 ##   timescale=4             acelera el tiempo de juego (verificar el evento final)
 ##   final_at=20             adelanta el evento final a ese segundo
 ##   boss=true               el jefe que sale tras el evento final (Dagon) es el evento final
+##   chain=true              con autonext y autorestart: la parte entera seguida; al caer, vuelve al nivel de level=
+##   shop=N                  N niveles comprados en cada potenciador de la tienda (pruebas de equilibrio)
 ##   mid_at=10               adelanta el primer evento intermedio a ese segundo (y los demás en proporción)
 ##   max_alive=150           cambia el tope de enemigos vivos
 ##   spawn_rate=20           ritmo de aparición fijo (enemigos por segundo)
@@ -164,6 +166,11 @@ func _ready() -> void:
 	player = players[0]
 	if args.has("pet"): _spawn_pet(args.get_str("pet"), player)   # probar un compañero
 	var bonus := Shop.bonuses(Saves.current)          # lo comprado en la tienda (D-31)
+	if args.has("shop"):                              # pruebas: N niveles en cada potenciador, sin tocar la partida
+		var n := args.get_int("shop")
+		for it: ShopItem in DebugOptions.list_resources("res://data/shop"):
+			if bonus.has(it.stat) and not it.stat.ends_with("_slots") and it.stat != "money":
+				bonus[it.stat] = 1.0 + it.per_level * mini(n, it.max_level())
 	money_mult = float(bonus.money)
 	for q in players:
 		q.shop = bonus
@@ -505,7 +512,7 @@ func _check_all_down() -> void:
 func _game_over() -> void:
 	if _ended: return
 	_ended = true
-	if args.get_bool("log") and director != null: print("FIN DERROTA t=%d abatidos=%d" % [int(director.time), director.killed_total])
+	if args.get_bool("log") and director != null: print("FIN DERROTA %s t=%d abatidos=%d nivel_j1=%d" % [level.id, int(director.time), director.killed_total, player.progress.level])
 	if Saves.current != null: Saves.current.stats["deaths"] += 1
 	_check_achievements()
 	Saves.save()
@@ -520,7 +527,7 @@ func _on_level_completed() -> void:
 	_ended = true
 	earn(level.money_bonus)                          # bono por superar el nivel
 	if not _someone_fell: Achievements.add(Saves.current, "flawless")
-	if args.get_bool("log"): print("NIVEL SUPERADO t=%d s  abatidos=%d  dólares=%d" % [director.time, kills, run_money])
+	if args.get_bool("log"): print("NIVEL SUPERADO %s t=%d s  abatidos=%d  dólares=%d  nivel_j1=%d" % [level.id, director.time, kills, run_money, player.progress.level])
 	if args.get_bool("log"): for q in players: print("ESTADISTICAS J%d %s" % [q.index + 1, world.stats_of(q.index)])
 	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)):
 		Saves.current.levels_won.append(String(level.id))
@@ -544,6 +551,8 @@ func _end_screen(title: String, accent: Color, next_id := "") -> void:
 		return
 	if args.has("autorestart"):
 		print("fin de partida: ", title)
+		if args.get_bool("chain") and next_id == "":      # cadena (pruebas): al caer, la parte desde el principio
+			GameSession.carry.clear()
 		await get_tree().create_timer(args.get_float("autorestart"), true, false, true).timeout
 		_restart()
 
