@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cthulhu_espiral"
+shape = 0
+count = 8
+speed = 3.8
+radius = 0.16
+size = 0.28
+damage_physical = 6.0
+damage_mental = 6.0
+lifetime = 8.0
+bursts = 18
+burst_interval = 0.13
+spin_deg = 8.0
+aimed = true

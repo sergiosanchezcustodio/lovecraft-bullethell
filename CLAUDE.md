@@ -490,7 +490,13 @@ Léela al empezar cada sesión:
     - **Arreglado:** los golpes de zarpa, zambullidas y avisos retrasados guardaban al enemigo en la lambda; si moría antes, Godot avisaba "Lambda capture at index 0 was freed". Ahora guardan su `instance_id`.
     - **Equilibrio con bot (`circle`, nivel suelto):** en solitario 4 de 10; en cooperativo con 3 bots 8 de 8.
     - **Rendimiento** con 75 enemigos y 500 balas: 117 FPS de media y 60 en el 1 % peor.
-    - **Probar:** `godot --path . -- level=p3_n5` (o `mid_at=5 final_at=30`). Capturas `shots/game_p35_045.0s.png` (la horda) y `shots/rly_puerta-rly_monolito-rly_escalera-rly_bloque_30_rlp1.png`. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
+    - **Probar:** `godot --path . -- level=p3_n5` (o `mid_at=5 final_at=30`).
+  - **Hito 7.6 (jefe de la parte 3, Cthulhu): hecho, pendiente de tu revisión (08-10-2026).**
+    - **Modelo** (`tools/gen_cthulhu.py`, 16/m, ~79.000 voxels huecos; en el juego a 1,15×, `anim_dagon`): de cintura para arriba, cabeza de pulpo con el manto echado atrás, mata de trece tentáculos sobre el pecho, ojos pequeños que brillan, cuerpo escamoso, brazos enormes con garras y alas estrechas de murciélago abiertas a la espalda.
+    - **Combate:** `DagonBehavior` (del 6.6) con sus propios patrones (`cthulhu_llamada`, `cthulhu_espiral`, `cthulhu_anillo`) y emanaciones que salen como esbirros. Asoma por tres puntos delante de la puerta (`boss_spots` en `rlyeh.json`, a ~13 m del centro: a 22 m quedaba fuera del alcance de las armas y se atascaba en la fase 3).
+    - **Se recompone:** es el evento final del nivel 5 (sustituye a la horda del 7.5) y `final_next` es `cthulhu_recompuesto` (menos vida, golpes y zambullidas más seguidos); al salir, la nube verde (`param cloud`: estallidos de `WadeSplash.burst` con color, nuevo parámetro `tint`) y la cámara tiembla. El nivel se supera al matar la segunda forma.
+    - **Equilibrio con bot (`circle`, nivel suelto):** en solitario llega a Cthulhu pero no lo vence; en cooperativo con 3 bots, 3 de 5 (uno de los combates se alargó a 1.125 s). Vida 2.600 + 1.500. Se ajusta en el 7.7.
+    - **Probar:** `godot --path . -- level=p3_n5 final_at=5`. Capturas `shots/game_cth3_010.0s.png` y `shots/cthulhu_30_cth1.png`. Capturas `shots/game_p35_045.0s.png` (la horda) y `shots/rly_puerta-rly_monolito-rly_escalera-rly_bloque_30_rlp1.png`. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

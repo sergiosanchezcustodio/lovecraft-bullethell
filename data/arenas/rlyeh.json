@@ -115,6 +115,20 @@
   "range": 7.0,
   "fog": 0.1
  },
+ "boss_spots": [
+  [
+   0.0,
+   -13.0
+  ],
+  [
+   -11.0,
+   -8.0
+  ],
+  [
+   11.0,
+   -9.0
+  ]
+ ],
  "colliders": {
   "atrezo_tienda": {
    "type": "box",
@@ -347,15 +361,6 @@
   {
    "model": "rly_monolito",
    "pos": [
-    12.42,
-    -10.79
-   ],
-   "rot": 286.1,
-   "scale": 0.97
-  },
-  {
-   "model": "rly_monolito",
-   "pos": [
     -6.88,
     -19.22
    ],
@@ -428,15 +433,6 @@
   {
    "model": "rly_bloque",
    "pos": [
-    -8.35,
-    -11.66
-   ],
-   "rot": 320.9,
-   "scale": 0.93
-  },
-  {
-   "model": "rly_bloque",
-   "pos": [
     -16.55,
     -16.25
    ],
@@ -464,15 +460,6 @@
   {
    "model": "rly_bloque",
    "pos": [
-    -6.46,
-    -8.4
-   ],
-   "rot": 306.1,
-   "scale": 0.97
-  },
-  {
-   "model": "rly_bloque",
-   "pos": [
     15.88,
     7.18
    ],
@@ -496,15 +483,6 @@
    ],
    "rot": 23.3,
    "scale": 1.25
-  },
-  {
-   "model": "arr_coral",
-   "pos": [
-    12.35,
-    -14.75
-   ],
-   "rot": 242.7,
-   "scale": 1.19
   },
   {
    "model": "arr_coral",

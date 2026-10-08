@@ -63,6 +63,10 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 		phase = 1
 		e.position = spot_for(e.obstacles, target.global_position if target != null else Vector3.ZERO, Vector3.INF)
 		e.reset_physics_interpolation()
+		if bool(e.data.param("cloud", false)):                  # se recompone de una nube verde (Cthulhu)
+			for k in 6:
+				WadeSplash.burst(e.world.fx, e.global_position + Vector3(randf_range(-3, 3), randf_range(0, 4), randf_range(-3, 3)), 4.0, Color(0.35, 0.9, 0.45, 0.9))
+			_shake(e, 0.8)
 		e.world.focus = e                                      # las armas le apuntan aunque no sea el más cercano
 		var game := e.get_tree().current_scene
 		if game != null and game.get("camera") != null:        # que quepa en el encuadre

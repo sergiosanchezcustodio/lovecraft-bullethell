@@ -47,8 +47,15 @@ static func make() -> GPUParticles3D:
 	return p
 
 ## Estallido de agua donde algo sale o se zambulle: un aro de gotas que se borra solo.
-static func burst(parent: Node, pos: Vector3, size := 1.0) -> void:
+static func burst(parent: Node, pos: Vector3, size := 1.0, tint := Color(0, 0, 0, 0)) -> void:
 	var p := make()
+	if tint.a > 0.0:                                          # otro color (la nube verde de Cthulhu)
+		var g := Gradient.new()
+		g.set_color(0, tint)
+		g.set_color(1, Color(tint.r, tint.g, tint.b, 0.0))
+		var gt := GradientTexture1D.new()
+		gt.gradient = g
+		(p.process_material as ParticleProcessMaterial).color_ramp = gt
 	p.amount = int(48 * size)
 	p.one_shot = true
 	p.explosiveness = 0.9

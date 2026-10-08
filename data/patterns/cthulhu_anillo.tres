@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cthulhu_anillo"
+shape = 0
+count = 40
+speed = 3.5
+radius = 0.17
+size = 0.3
+damage_physical = 7.0
+damage_mental = 6.0
+lifetime = 9.0
+bursts = 3
+burst_interval = 0.7
+spin_deg = 4.5
+aimed = true
+gap_count = 4
+gap_width = 3
+telegraph_time = 0.6
+telegraph_radius = 3.5

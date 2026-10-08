@@ -1,10 +1,12 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=8 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/enemies/emanacion.tres" id="2"]
 [ext_resource type="Resource" path="res://data/enemies/profundo.tres" id="3"]
 [ext_resource type="Resource" path="res://data/enemies/cultista.tres" id="4"]
 [ext_resource type="Resource" path="res://data/enemies/primigenio_menor.tres" id="7"]
+[ext_resource type="Resource" path="res://data/enemies/cthulhu.tres" id="8"]
+[ext_resource type="Resource" path="res://data/enemies/cthulhu_recompuesto.tres" id="9"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
 [ext_resource type="Resource" path="res://data/weather/niebla_arrecife.tres" id="weather"]
 
@@ -32,10 +34,9 @@ mid_enemies = Array[ExtResource("5")]([ExtResource("7"), ExtResource("7")])
 mid_times = Array[float]([100.0, 180.0])
 mid_texts = Array[String](["Una de las figuras de piedra abre los ojos…", "Otro de los que yacen con él se levanta…"])
 final_time = 240.0
-final_wave = 0
-final_text = "La puerta negra se abre del todo. De dentro brota algo verde, que no deja de salir…"
-final_survive = 60.0
-final_rate = 2.6
-final_cap = 55
-final_pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("2"), ExtResource("3")])
-final_name = "las emanaciones"
+final_enemy = ExtResource("8")
+final_wave = 12
+final_spawn_scale = 0.3
+final_text = "La puerta negra se abre del todo. Cthulhu sale de R'lyeh."
+final_next = ExtResource("9")
+final_next_text = "Se deshace en una nube verde… y vuelve a juntarse."

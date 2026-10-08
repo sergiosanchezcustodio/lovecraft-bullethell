@@ -26,6 +26,11 @@ A.scatter("rly_bloque", 10, 6.0, 0.9, 1.3)
 A.scatter("arr_coral", 8, 6.0, 1.0, 1.3)
 A.edge(["arr_roca_1", "arr_roca_2"], step=3.2, inset=0.8, smin=0.7, smax=1.0)
 
+# por donde asoma Cthulhu (hito 7.6): delante de la puerta y a sus lados, sin piezas encima
+SPOTS = [(0.0, -13.0), (-11.0, -8.0), (11.0, -9.0)]
+A.props = [p for p in A.props if p["model"] in ("rly_puerta", "rly_muro") or
+           all(math.hypot(p["pos"][0] - x, p["pos"][1] - z) > 6.0 for x, z in SPOTS)]
+
 COLL = dict(COLLIDERS)
 COLL.update({
     "rly_puerta": {"type": "box", "shrink": 0.95},
@@ -53,6 +58,7 @@ A.write({
               "ambient_color": [0.34, 0.46, 0.40], "ambient_energy": 0.58,
               "background": [0.05, 0.09, 0.07], "fog_color": [0.14, 0.22, 0.18], "fog_density": 0.0},
     "lamp": {"color": [0.45, 1.0, 0.6], "energy": 1.4, "range": 7.0, "fog": 0.1},
+    "boss_spots": [[x, z] for x, z in SPOTS],
     "colliders": COLL,
     "no_shadow": ["rly_muro", "rly_puerta"],
 })
