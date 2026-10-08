@@ -1,0 +1,1376 @@
+{
+ "name": "Los muelles y la cubierta del Alert",
+ "spawn": [
+  0.0,
+  4.0
+ ],
+ "ground": {
+  "seed": 33,
+  "tile": 0.5,
+  "margin_back": 14.0,
+  "walk_back": 0.5,
+  "camp_radius": 0.0,
+  "kind": "planks",
+  "wet": 0.75,
+  "colors": {
+   "base_hi": [
+    0.4,
+    0.35,
+    0.29
+   ],
+   "base_lo": [
+    0.22,
+    0.19,
+    0.16
+   ],
+   "joint": [
+    0.03,
+    0.03,
+    0.03
+   ]
+  }
+ },
+ "sea": {
+  "sides": [
+   "south",
+   "east"
+  ],
+  "level": -1.2,
+  "brash": 0.0,
+  "colors": {
+   "deep": [
+    0.03,
+    0.06,
+    0.08
+   ],
+   "mid": [
+    0.06,
+    0.11,
+    0.14
+   ],
+   "shallow": [
+    0.1,
+    0.17,
+    0.2
+   ],
+   "crest": [
+    0.18,
+    0.25,
+    0.28
+   ],
+   "foam": [
+    0.44,
+    0.5,
+    0.52
+   ]
+  }
+ },
+ "light": {
+  "sun_rot": [
+   -32,
+   40
+  ],
+  "sun_color": [
+   0.62,
+   0.7,
+   0.86
+  ],
+  "sun_energy": 0.4,
+  "exposure": 1.3,
+  "ambient_color": [
+   0.38,
+   0.44,
+   0.5
+  ],
+  "ambient_energy": 0.5,
+  "background": [
+   0.06,
+   0.08,
+   0.1
+  ],
+  "fog_color": [
+   0.18,
+   0.22,
+   0.26
+  ],
+  "fog_density": 0.0
+ },
+ "lamp": {
+  "color": [
+   1.0,
+   0.76,
+   0.46
+  ],
+  "energy": 2.2,
+  "range": 8.0,
+  "fog": 0.25
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.12
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "alr_casco": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "alr_grua": {
+   "type": "cylinder",
+   "radius": 0.4
+  },
+  "alr_fardos": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "alr_bolardo": {
+   "type": "cylinder",
+   "radius": 0.25
+  },
+  "alr_rollo": {
+   "type": "cylinder",
+   "radius": 0.4
+  },
+  "alr_linterna": {
+   "type": "cylinder",
+   "radius": 0.1
+  },
+  "alr_bote": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "inn_fachada": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "inn_barril": {
+   "type": "cylinder",
+   "radius": 0.35
+  },
+  "inn_cajas": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "inn_pilote": {
+   "type": "cylinder",
+   "radius": 0.2
+  }
+ },
+ "no_shadow": [
+  "inn_pilote"
+ ],
+ "size": [
+  64.0,
+  64.0
+ ],
+ "props": [
+  {
+   "model": "alr_casco",
+   "pos": [
+    -2.0,
+    -36.6
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_casco",
+   "pos": [
+    46.0,
+    -38.0
+   ],
+   "rot": 8,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_fachada",
+   "pos": [
+    -35.0,
+    -26
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_fachada",
+   "pos": [
+    -35.0,
+    -17
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_fachada",
+   "pos": [
+    -35.0,
+    -8
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_fachada",
+   "pos": [
+    -35.0,
+    1
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_fachada",
+   "pos": [
+    -35.0,
+    10
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_fachada",
+   "pos": [
+    -35.0,
+    19
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_fachada",
+   "pos": [
+    -35.0,
+    28
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_fachada",
+   "pos": [
+    -35.0,
+    37
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_bolardo",
+   "pos": [
+    -26,
+    -30.8
+   ],
+   "rot": 52.9,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_bolardo",
+   "pos": [
+    -20,
+    -30.8
+   ],
+   "rot": 30.5,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_bolardo",
+   "pos": [
+    -14,
+    -30.8
+   ],
+   "rot": 250.0,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_bolardo",
+   "pos": [
+    -8,
+    -30.8
+   ],
+   "rot": 149.6,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_bolardo",
+   "pos": [
+    -2,
+    -30.8
+   ],
+   "rot": 267.2,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_bolardo",
+   "pos": [
+    4,
+    -30.8
+   ],
+   "rot": 187.4,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_bolardo",
+   "pos": [
+    10,
+    -30.8
+   ],
+   "rot": 154.6,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_bolardo",
+   "pos": [
+    16,
+    -30.8
+   ],
+   "rot": 204.9,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_bolardo",
+   "pos": [
+    22,
+    -30.8
+   ],
+   "rot": 358.5,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_bolardo",
+   "pos": [
+    28,
+    -30.8
+   ],
+   "rot": 249.4,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_grua",
+   "pos": [
+    -18,
+    -24
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_grua",
+   "pos": [
+    6,
+    -24
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_grua",
+   "pos": [
+    22,
+    -22
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_linterna",
+   "pos": [
+    -12,
+    -18
+   ],
+   "rot": 270,
+   "scale": 1.2
+  },
+  {
+   "model": "alr_linterna",
+   "pos": [
+    14,
+    -16
+   ],
+   "rot": 270,
+   "scale": 1.2
+  },
+  {
+   "model": "alr_linterna",
+   "pos": [
+    -20,
+    2
+   ],
+   "rot": 180,
+   "scale": 1.2
+  },
+  {
+   "model": "alr_linterna",
+   "pos": [
+    18,
+    8
+   ],
+   "rot": 90,
+   "scale": 1.2
+  },
+  {
+   "model": "alr_linterna",
+   "pos": [
+    2,
+    18
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "alr_linterna",
+   "pos": [
+    -10,
+    22
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "alr_fardos",
+   "pos": [
+    15.78,
+    5.88
+   ],
+   "rot": 73.4,
+   "scale": 1.18
+  },
+  {
+   "model": "alr_fardos",
+   "pos": [
+    8.14,
+    15.74
+   ],
+   "rot": 219.5,
+   "scale": 1.15
+  },
+  {
+   "model": "alr_fardos",
+   "pos": [
+    -25.09,
+    -28.72
+   ],
+   "rot": 228.7,
+   "scale": 1.1
+  },
+  {
+   "model": "alr_fardos",
+   "pos": [
+    -20.4,
+    -17.52
+   ],
+   "rot": 260.4,
+   "scale": 1.17
+  },
+  {
+   "model": "alr_fardos",
+   "pos": [
+    -28.11,
+    -17.23
+   ],
+   "rot": 65.5,
+   "scale": 1.09
+  },
+  {
+   "model": "alr_fardos",
+   "pos": [
+    13.98,
+    12.9
+   ],
+   "rot": 337.8,
+   "scale": 0.92
+  },
+  {
+   "model": "alr_fardos",
+   "pos": [
+    21.11,
+    25.2
+   ],
+   "rot": 122.8,
+   "scale": 1.12
+  },
+  {
+   "model": "alr_fardos",
+   "pos": [
+    4.34,
+    7.84
+   ],
+   "rot": 261.0,
+   "scale": 0.95
+  },
+  {
+   "model": "alr_fardos",
+   "pos": [
+    12.42,
+    -10.79
+   ],
+   "rot": 286.1,
+   "scale": 0.96
+  },
+  {
+   "model": "alr_fardos",
+   "pos": [
+    -19.7,
+    6.72
+   ],
+   "rot": 137.3,
+   "scale": 1.14
+  },
+  {
+   "model": "alr_rollo",
+   "pos": [
+    -19.22,
+    -2.73
+   ],
+   "rot": 276.8,
+   "scale": 1.24
+  },
+  {
+   "model": "alr_rollo",
+   "pos": [
+    -23.47,
+    11.88
+   ],
+   "rot": 326.6,
+   "scale": 1.04
+  },
+  {
+   "model": "alr_rollo",
+   "pos": [
+    -22.1,
+    18.98
+   ],
+   "rot": 69.0,
+   "scale": 1.27
+  },
+  {
+   "model": "alr_rollo",
+   "pos": [
+    19.95,
+    -28.35
+   ],
+   "rot": 134.4,
+   "scale": 1.14
+  },
+  {
+   "model": "alr_rollo",
+   "pos": [
+    -27.14,
+    14.98
+   ],
+   "rot": 91.5,
+   "scale": 1.3
+  },
+  {
+   "model": "alr_rollo",
+   "pos": [
+    23.54,
+    1.89
+   ],
+   "rot": 149.1,
+   "scale": 1.21
+  },
+  {
+   "model": "alr_rollo",
+   "pos": [
+    -23.3,
+    0.51
+   ],
+   "rot": 83.7,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_rollo",
+   "pos": [
+    -3.88,
+    -20.25
+   ],
+   "rot": 229.1,
+   "scale": 1.14
+  },
+  {
+   "model": "inn_cajas",
+   "pos": [
+    17.14,
+    -3.27
+   ],
+   "rot": 225.7,
+   "scale": 1.19
+  },
+  {
+   "model": "inn_cajas",
+   "pos": [
+    -13.04,
+    16.01
+   ],
+   "rot": 152.4,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_cajas",
+   "pos": [
+    28.92,
+    -19.59
+   ],
+   "rot": 90.0,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_cajas",
+   "pos": [
+    -16.65,
+    -4.47
+   ],
+   "rot": 8.8,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_cajas",
+   "pos": [
+    -13.31,
+    -8.35
+   ],
+   "rot": 26.2,
+   "scale": 1.06
+  },
+  {
+   "model": "inn_cajas",
+   "pos": [
+    11.28,
+    -16.55
+   ],
+   "rot": 132.1,
+   "scale": 1.04
+  },
+  {
+   "model": "inn_cajas",
+   "pos": [
+    28.0,
+    17.65
+   ],
+   "rot": 64.8,
+   "scale": 1.05
+  },
+  {
+   "model": "inn_cajas",
+   "pos": [
+    23.48,
+    21.02
+   ],
+   "rot": 212.1,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    -16.16,
+    7.62
+   ],
+   "rot": 137.8,
+   "scale": 1.11
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    -22.65,
+    28.02
+   ],
+   "rot": 139.9,
+   "scale": 1.01
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    -8.4,
+    -19.33
+   ],
+   "rot": 172.7,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    27.69,
+    8.84
+   ],
+   "rot": 224.6,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    3.38,
+    20.36
+   ],
+   "rot": 202.4,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    0.1,
+    18.44
+   ],
+   "rot": 256.7,
+   "scale": 1.01
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    20.21,
+    14.39
+   ],
+   "rot": 290.9,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    20.73,
+    -13.39
+   ],
+   "rot": 90.0,
+   "scale": 1.18
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    -12.73,
+    25.23
+   ],
+   "rot": 252.5,
+   "scale": 1.02
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    -11.4,
+    -4.28
+   ],
+   "rot": 287.1,
+   "scale": 1.2
+  },
+  {
+   "model": "alr_bote",
+   "pos": [
+    10.0,
+    -8.0
+   ],
+   "rot": 30,
+   "scale": 1.0
+  },
+  {
+   "model": "alr_bote",
+   "pos": [
+    -16.0,
+    12.0
+   ],
+   "rot": -60,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -44.0,
+    32.84
+   ],
+   "rot": 61.3,
+   "scale": 1.14
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.54,
+    -44.0
+   ],
+   "rot": 210.6,
+   "scale": 1.06
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -41.0,
+    32.33
+   ],
+   "rot": 51.8,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    31.96,
+    -41.0
+   ],
+   "rot": 105.6,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -38.0,
+    32.44
+   ],
+   "rot": 333.7,
+   "scale": 1.04
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    33.01,
+    -38.0
+   ],
+   "rot": 161.9,
+   "scale": 1.16
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -35.0,
+    32.88
+   ],
+   "rot": 299.6,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.55,
+    -35.0
+   ],
+   "rot": 347.1,
+   "scale": 1.08
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -32.0,
+    31.92
+   ],
+   "rot": 324.4,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.4,
+    -32.0
+   ],
+   "rot": 239.9,
+   "scale": 1.05
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -29.0,
+    32.66
+   ],
+   "rot": 35.0,
+   "scale": 1.07
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.63,
+    -29.0
+   ],
+   "rot": 213.2,
+   "scale": 1.08
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -26.0,
+    31.99
+   ],
+   "rot": 312.4,
+   "scale": 1.18
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.65,
+    -26.0
+   ],
+   "rot": 329.6,
+   "scale": 1.02
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -23.0,
+    32.86
+   ],
+   "rot": 115.1,
+   "scale": 1.19
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.53,
+    -23.0
+   ],
+   "rot": 39.2,
+   "scale": 1.07
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -20.0,
+    32.43
+   ],
+   "rot": 148.8,
+   "scale": 1.16
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    31.93,
+    -20.0
+   ],
+   "rot": 144.8,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -17.0,
+    32.24
+   ],
+   "rot": 66.3,
+   "scale": 1.05
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    31.92,
+    -17.0
+   ],
+   "rot": 82.6,
+   "scale": 1.14
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -14.0,
+    33.03
+   ],
+   "rot": 185.5,
+   "scale": 1.12
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.4,
+    -14.0
+   ],
+   "rot": 235.9,
+   "scale": 1.12
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -11.0,
+    32.49
+   ],
+   "rot": 194.1,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.99,
+    -11.0
+   ],
+   "rot": 302.1,
+   "scale": 1.02
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -8.0,
+    32.94
+   ],
+   "rot": 49.5,
+   "scale": 1.04
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.48,
+    -8.0
+   ],
+   "rot": 223.5,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -5.0,
+    32.98
+   ],
+   "rot": 154.9,
+   "scale": 1.06
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.44,
+    -5.0
+   ],
+   "rot": 220.9,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -2.0,
+    32.04
+   ],
+   "rot": 191.1,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.9,
+    -2.0
+   ],
+   "rot": 168.6,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    1.0,
+    32.25
+   ],
+   "rot": 178.0,
+   "scale": 1.06
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    31.91,
+    1.0
+   ],
+   "rot": 327.3,
+   "scale": 1.18
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    4.0,
+    33.07
+   ],
+   "rot": 184.2,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.64,
+    4.0
+   ],
+   "rot": 68.6,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    7.0,
+    33.09
+   ],
+   "rot": 326.1,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    31.94,
+    7.0
+   ],
+   "rot": 45.1,
+   "scale": 1.16
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    10.0,
+    33.04
+   ],
+   "rot": 51.7,
+   "scale": 1.05
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    31.97,
+    10.0
+   ],
+   "rot": 110.1,
+   "scale": 1.07
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    13.0,
+    32.43
+   ],
+   "rot": 162.2,
+   "scale": 1.19
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.83,
+    13.0
+   ],
+   "rot": 28.2,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    16.0,
+    32.77
+   ],
+   "rot": 80.3,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.4,
+    16.0
+   ],
+   "rot": 315.0,
+   "scale": 1.04
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    19.0,
+    31.91
+   ],
+   "rot": 223.2,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.1,
+    19.0
+   ],
+   "rot": 170.9,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    22.0,
+    33.0
+   ],
+   "rot": 195.9,
+   "scale": 1.06
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.24,
+    22.0
+   ],
+   "rot": 196.3,
+   "scale": 1.13
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    25.0,
+    32.9
+   ],
+   "rot": 6.7,
+   "scale": 1.03
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.26,
+    25.0
+   ],
+   "rot": 169.0,
+   "scale": 1.02
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    28.0,
+    32.61
+   ],
+   "rot": 170.0,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.31,
+    28.0
+   ],
+   "rot": 274.4,
+   "scale": 1.05
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    31.0,
+    32.09
+   ],
+   "rot": 1.2,
+   "scale": 1.01
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.74,
+    31.0
+   ],
+   "rot": 286.6,
+   "scale": 1.14
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    34.0,
+    32.48
+   ],
+   "rot": 149.9,
+   "scale": 1.05
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.15,
+    34.0
+   ],
+   "rot": 60.9,
+   "scale": 1.11
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    37.0,
+    32.26
+   ],
+   "rot": 323.0,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.77,
+    37.0
+   ],
+   "rot": 235.0,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    40.0,
+    32.58
+   ],
+   "rot": 38.9,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.83,
+    40.0
+   ],
+   "rot": 5.4,
+   "scale": 1.09
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    43.0,
+    32.0
+   ],
+   "rot": 167.6,
+   "scale": 1.17
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    32.5,
+    43.0
+   ],
+   "rot": 333.4,
+   "scale": 1.04
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/muelle_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125
+ }
+}

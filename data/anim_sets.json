@@ -70,6 +70,7 @@
 		"sacerdote_culto": "anim_humano",
 		"pesadilla": "anim_pesadilla",
 		"pesadilla_relieve": "anim_pesadilla",
-		"diablo": "anim_diablo"
+		"diablo": "anim_diablo",
+		"engendro": "anim_profundo"
 	}
 }

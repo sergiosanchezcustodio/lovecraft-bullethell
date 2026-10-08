@@ -29,7 +29,8 @@ func test_superar_un_nivel_abre_el_siguiente_aunque_sea_de_otra_parte() -> void:
 	assert_true(Campaign.is_playable("p2_n5", ["p2_n4"]), "el nivel 5 de la parte 2 ya existe (hito 6.5)")
 	assert_true(Campaign.is_playable("p3_n1", ["p2_n5"]), "el nivel 1 de la parte 3 ya existe (hito 7.1)")
 	assert_true(Campaign.is_playable("p3_n2", ["p3_n1"]), "el nivel 2 de la parte 3 ya existe (hito 7.2)")
-	assert_false(Campaign.is_playable("p3_n3", ["p3_n2"]), "sin datos todavía: próximamente")
+	assert_true(Campaign.is_playable("p3_n3", ["p3_n2"]), "el nivel 3 de la parte 3 ya existe (hito 7.3)")
+	assert_false(Campaign.is_playable("p3_n4", ["p3_n3"]), "sin datos todavía: próximamente")
 
 func test_siguiente_nivel_dentro_de_la_parte() -> void:
 	assert_eq(Campaign.next_in_part("p1_n1"), "p1_n2")

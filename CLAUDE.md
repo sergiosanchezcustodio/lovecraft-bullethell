@@ -456,7 +456,17 @@ Léela al empezar cada sesión:
     - **Nivel `data/levels/p3_n2.tres`:** `health_mult` 1,12 (con 1,2, en solitario 2 de 12), `coop_spawn` suave como el nivel 1.
     - **Equilibrio con bot (`circle`, nivel suelto):** en solitario 3 de 11; en cooperativo con 3 bots 7 de 9.
     - **Rendimiento** con 75 enemigos y 500 balas: 119 FPS de media y 76 en el 1 % peor.
-    - **Probar:** `godot --path . -- level=p3_n2` (o `final_at=12`). Capturas `shots/game_rit1_003.0s.png` (el claro) y `shots/game_p32_024.0s.png`. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
+    - **Probar:** `godot --path . -- level=p3_n2` (o `final_at=12`). Capturas `shots/game_rit1_003.0s.png` (el claro) y `shots/game_p32_024.0s.png`.
+  - **Hito 7.3 (nivel 3 de la parte 3, los muelles y la cubierta del *Alert*): hecho, pendiente de tu revisión (08-10-2026).**
+    - **Engendro de Cthulhu** (`tools/gen_engendro.py`, 32/m, partes de los Profundos: `anim_profundo`): la progenie estelar, ~2,6 m; cabeza de pulpo con el manto echado atrás y una mata de tentáculos gruesos hasta la cintura, ojos amarillo verdoso, cuerpo escamoso hinchado, garras y alas de murciélago plegadas que asoman por encima. La primera versión tenía la cabeza pequeña y redonda (parecía un gorila) y garras claras que parecían manos.
+      - `engendro` (a 1,2×): minijefe intermedio a los 120 s (evento intermedio del 6.5). `keep` a 4,5 m, canto mental, onda con huecos, golpe de zarpa con aviso (del 6.5) y llama a Profundos.
+      - `engendro_mayor` (a 1,7×): el evento final, "lo que viajaba en la bodega del Alert"; dos avisos por golpe y más vida.
+    - **Atrezo** (`tools/gen_atrezo_alert.py` → `models/alr_*.json`): el costado del *Alert* (casco negro con franja roja, borda, superestructura blanca con portillos, chimenea, palo y jarcia; 24 m de eslora, modelado a 16/m y exportado a 8/m: de 137.000 a 20.000 voxels), bolardos con cabo, grúa de carga, fardos con lona, rollos de cabo, faroles de puerto (luz) y bote volcado.
+    - **Arena** (`tools/gen_arena_muelle.py` → `data/arenas/muelle.json`, mapa en `resources/maps/p3_n3.png`): muelle de tablas mojadas de Auckland; el *Alert* y otro vapor atracados al norte, almacenes de ladrillo al oeste (`inn_fachada`), pilotes en el borde del agua al sur y al este. Noche con llovizna (`niebla_marina_noche`).
+    - **Nivel `data/levels/p3_n3.tres`:** Profundos, escupidores, cultistas y cultistas del *Alert*; `health_mult` 1,08, ritmo del nivel 1 de la parte 1. Los dos tiradores van con peso 0,3 en este nivel (`profundo_lanzador_muelle`, `cultista_alert_muelle`): con tres tipos de tirador más el engendro, el bot (que no esquiva) no lo superaba ninguna vez de 13.
+    - **Equilibrio con bot (`circle`, nivel suelto):** en solitario 3 de 13; en cooperativo con 3 bots 8 de 9.
+    - **Rendimiento** con 75 enemigos y 500 balas: 118 FPS de media y 60 en el 1 % peor.
+    - **Probar:** `godot --path . -- level=p3_n3` (o `mid_at=6 final_at=30`). Capturas `shots/game_mue1_003.0s.png`, `shots/game_p33_012.0s.png` y `shots/engendro-profundo_30_eng2.png`. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

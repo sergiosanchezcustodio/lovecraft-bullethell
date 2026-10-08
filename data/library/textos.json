@@ -40,7 +40,11 @@
 		"pesadilla_relieve": "La figura que Wilcox modeló en arcilla sin saber de dónde: cabeza de pulpo, tentáculos, alas membranosas y un cuerpo escamoso. En su estudio se levantó del bajorrelieve, hecha de la misma sombra que sus sueños, y llamó a las demás pesadillas con una palabra que el escultor repetía en la fiebre: «Cthulhu fhtagn».",
 		"diablo": "Los criollos del pantano hablaban de una laguna adonde nadie iba y de los diablos que la guardaban: menudos, de piel correosa, con cuernos, ojos amarillos y unas alas de murciélago más grandes que ellos. Vuelan en círculos sobre la cabeza y caen en picado sin hacer ruido.",
 		"cultista_alert": "Marineros mestizos del Alert, el yate que salió de Dunedin con tripulación del culto. Jersey a rayas, gorra de lana, un pañuelo con el símbolo del ídolo y un revólver que no dudan en usar. No se acercan: disparan en ráfagas de tres desde unos metros.",
-		"sacerdote_culto": "El que dirige el ritual en el claro: túnica negra con bordes de hueso, la máscara mayor, de la que cuelgan más tentáculos que a ninguno, y los brazos desnudos pintados. Lleva el ídolo grande al cuello. Cuando lo hieren, los suyos cierran el corro a su alrededor y canta más alto."
+		"sacerdote_culto": "El que dirige el ritual en el claro: túnica negra con bordes de hueso, la máscara mayor, de la que cuelgan más tentáculos que a ninguno, y los brazos desnudos pintados. Lleva el ídolo grande al cuello. Cuando lo hieren, los suyos cierran el corro a su alrededor y canta más alto.",
+		"engendro": "La progenie estelar de Cthulhu: vinieron con él de las estrellas y se parecen a él como un niño a su padre. Cabeza de pulpo con una mata de tentáculos donde debería estar la cara, cuerpo escamoso e hinchado, garras y alas de murciélago plegadas. Subió del agua por los pilotes del muelle de Auckland.",
+		"engendro_mayor": "El que viajaba en la bodega del Alert, encadenado y vivo. Más grande que los otros, más viejo. Cuando hundió las garras en la cubierta, los Profundos del puerto respondieron a su llamada.",
+		"profundo_lanzador_muelle": "Profundo escupidor, de piel azul pizarra y aletas turquesa. No se acerca: se agazapa a unos metros y escupe un abanico de agua salada que golpea como una pedrada.",
+		"cultista_alert_muelle": "Marineros mestizos del Alert, el yate que salió de Dunedin con tripulación del culto. Jersey a rayas, gorra de lana, un pañuelo con el símbolo del ídolo y un revólver que no dudan en usar. No se acercan: disparan en ráfagas de tres desde unos metros."
 	},
 	"weapons": {
 		"webly": "Revólver del ejército británico, pesado y fiable. Su bala del .455 tumba a un hombre y hace retroceder a lo que no lo es.",
@@ -109,7 +113,7 @@
 		"p2_n5": "El Arrecife del Diablo. De noche la marea deja al aire la roca negra y, entre las pozas, las columnas de Y'ha-nthlei. Una luz verde sube del agua y de las grietas, como si debajo, muy hondo, alguien hubiera dejado encendida la ciudad.",
 		"p3_n1": "El estudio de Henry Anthony Wilcox, en el último piso del edificio Fleur-de-Lys de Providence. Esculturas a medio desbastar, caballetes con mares negros y, al fondo, el bajorrelieve de arcilla que trajo a mi tío una mañana de 1925. Por los ventanales entra la luna; dentro, algo se mueve entre las estatuas.",
 		"p3_n2": "Los pantanos al sur de Nueva Orleans, noviembre de 1907. El inspector Legrasse siguió los tambores hasta un claro seco entre la ciénaga: un monolito con el ídolo encima, un corro de antorchas y hogueras, y alrededor, danzando, los que cantaban «Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn».",
-		"p3_n3": "Los muelles de Dunedin y la cubierta del Alert.",
+		"p3_n3": "Los muelles de Auckland, abril de 1925. El Alert, el yate armado que encontró el Vigilant a la deriva, fue antes el barco del culto. De noche, atracado entre grúas y fardos, todavía huele a lo que llevaba en la bodega.",
 		"p3_n4": "Una tormenta en el Pacífico Sur, a 47° 9' S, 126° 43' O.",
 		"p3_n5": "R'lyeh, la ciudad muerta, de nuevo sobre el agua. La puerta está abierta."
 	},

@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/revolver_culto.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"cultista_alert_muelle"
+display_name = "Cultista armado del Alert"
+model = "cultista_alert"
+tier = 2
+spawn_weight = 0.3
+elite = false
+tags = Array[StringName]([&"humana"])
+max_health = 48.0
+hit_radius = 0.45
+body_radius = 0.45
+move_speed = 2.3
+xp = 2.5
+money = 4
+contact_physical = 6.0
+contact_mental = 0.0
+movement = &"keep"
+params = {"keep": 6.5, "strafe": 0.5}
+attack = ExtResource("2")
+attack_cooldown = 3.2
+attack_range = 10.0
+attack_anim = "throw"

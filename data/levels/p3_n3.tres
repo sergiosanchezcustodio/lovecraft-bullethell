@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/profundo.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/profundo_lanzador_muelle.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/cultista.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/cultista_alert_muelle.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/engendro.tres" id="8"]
+[ext_resource type="Resource" path="res://data/enemies/engendro_mayor.tres" id="7"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+[ext_resource type="Resource" path="res://data/weather/niebla_marina_noche.tres" id="weather"]
+
+[resource]
+script = ExtResource("1")
+weather = ExtResource("weather")
+id = &"p3_n3"
+display_name = "Los muelles y la cubierta del Alert"
+part = 3
+number = 3
+arena = "res://data/arenas/muelle.json"
+health_mult = 1.08
+duration = 300.0
+music = ""
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("6")])
+spawn_rate = Array[Vector2]([Vector2(0, 0.3), Vector2(45, 0.5), Vector2(90, 0.8), Vector2(150, 1.3), Vector2(210, 1.8), Vector2(300, 2.3)])
+max_alive = 75
+elite_cap = 1
+mid_enemies = Array[ExtResource("5")]([ExtResource("8")])
+mid_times = Array[float]([120.0])
+mid_texts = Array[String](["Algo sube del agua por los pilotes del muelle…"])
+final_time = 240.0
+final_enemy = ExtResource("7")
+final_wave = 14
+final_spawn_scale = 0.3
+final_text = "La bodega del Alert se abre. Lo que viajaba en ella sale a cubierta…"
+coop_spawn = Array[float]([1.0, 1.15, 1.3, 1.45])
