@@ -46,7 +46,9 @@
 		"profundo_lanzador_muelle": "Profundo escupidor, de piel azul pizarra y aletas turquesa. No se acerca: se agazapa a unos metros y escupe un abanico de agua salada que golpea como una pedrada.",
 		"cultista_alert_muelle": "Marineros mestizos del Alert, el yate que salió de Dunedin con tripulación del culto. Jersey a rayas, gorra de lana, un pañuelo con el símbolo del ídolo y un revólver que no dudan en usar. No se acercan: disparan en ráfagas de tres desde unos metros.",
 		"polipo": "Algo blanco y blando, como un racimo de pólipos, que la tormenta subió a la cubierta del Emma. Se arrastra a tirones, abre bocas redondas rodeadas de tentáculos cortos y escupe una nube de esporas. Johansen escribió que «brillaba apenas, como la carne de un pez muerto».",
-		"polipo_madre": "La cosa blanca del lago oculto, de la que salían las demás. Una masa de bulbos translúcidos del tamaño de un bote que no dejaba de dividirse: cada vez que la herían, se desprendía de ella otro racimo que se arrastraba hacia nosotros."
+		"polipo_madre": "La cosa blanca del lago oculto, de la que salían las demás. Una masa de bulbos translúcidos del tamaño de un bote que no dejaba de dividirse: cada vez que la herían, se desprendía de ella otro racimo que se arrastraba hacia nosotros.",
+		"emanacion": "Cuando la puerta negra de R'lyeh cedió, lo primero que salió no fue Él: fue algo verde, gelatinoso, que brotaba de la oscuridad como el humo de un incendio. Masas que reptaban, se partían y volvían a juntarse, con burbujas que brillaban por dentro.",
+		"primigenio_menor": "Los que yacen con Cthulhu en la ciudad muerta. Al llegar parecían estatuas de piedra verdinegra entre los monolitos; cuando la isla terminó de salir del agua, abrieron los ojos. Golpean el suelo con las garras y despiertan a las emanaciones."
 	},
 	"weapons": {
 		"webly": "Revólver del ejército británico, pesado y fiable. Su bala del .455 tumba a un hombre y hace retroceder a lo que no lo es.",
@@ -117,7 +119,7 @@
 		"p3_n2": "Los pantanos al sur de Nueva Orleans, noviembre de 1907. El inspector Legrasse siguió los tambores hasta un claro seco entre la ciénaga: un monolito con el ídolo encima, un corro de antorchas y hogueras, y alrededor, danzando, los que cantaban «Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn».",
 		"p3_n3": "Los muelles de Auckland, abril de 1925. El Alert, el yate armado que encontró el Vigilant a la deriva, fue antes el barco del culto. De noche, atracado entre grúas y fardos, todavía huele a lo que llevaba en la bodega.",
 		"p3_n4": "La cubierta de la goleta Emma, marzo de 1925, a la altura de los 34° S. La tormenta barría la cubierta de proa a popa; en el aire, a veces, los ángulos no cuadraban, y algo se abría en las tablas como si el barco tuviera más dimensiones que las debidas. Uno de los nuestros cayó en uno de esos ángulos y no volvió a salir.",
-		"p3_n5": "R'lyeh, la ciudad muerta, de nuevo sobre el agua. La puerta está abierta."
+		"p3_n5": "R'lyeh, emergida en el Pacífico a 47° 9′ S, 126° 43′ O. Losas enormes cuyos ángulos no cuadran, monolitos torcidos, escaleras que suben a ninguna parte y, al fondo, la puerta colosal, entreabierta, con un resplandor verde en la rendija. Johansen escribió que la geometría «era toda equivocada»."
 	},
 	"characters": {
 		"dyer": "Profesor de geología de la Miskatonic y jefe de la expedición antártica de 1930. Vio lo que había más allá de las montañas y volvió para advertir a la siguiente.",

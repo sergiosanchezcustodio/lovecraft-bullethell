@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"primigenio_menor_canto"
+shape = 0
+count = 18
+speed = 3.2
+radius = 0.15
+size = 0.26
+damage_physical = 4.0
+damage_mental = 7.0
+lifetime = 6.0
+bursts = 2
+burst_interval = 0.5
+aimed = true
+gap_count = 3
+gap_width = 2
+telegraph_time = 0.6
+telegraph_radius = 2.0

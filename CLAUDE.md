@@ -479,7 +479,18 @@ Léela al empezar cada sesión:
     - **Nivel `data/levels/p3_n4.tres`:** polipoides, Profundos, cultistas del *Alert* y diablos; `health_mult` 1,1; Ángulos cada 11 s y olas cada 16 s.
     - **Equilibrio con bot (`circle`, nivel suelto):** en solitario 4 de 10; en cooperativo con 3 bots 9 de 9 (también con el escalado de aparición normal). Se revisa en el 7.7.
     - **Rendimiento** con 75 enemigos y 500 balas: 119 FPS de media y 114 en el 1 % peor.
-    - **Probar:** `godot --path . -- level=p3_n4` (o `final_at=15`). Capturas `shots/game_p34_008.2s.png` (un Ángulo abierto) y `shots/game_p34_013.0s.png` (una ola). Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
+    - **Probar:** `godot --path . -- level=p3_n4` (o `final_at=15`). Capturas `shots/game_p34_008.2s.png` (un Ángulo abierto) y `shots/game_p34_013.0s.png` (una ola).
+  - **Hito 7.5 (nivel 5 de la parte 3, R'lyeh emergida): hecho, pendiente de tu revisión (08-10-2026).**
+    - **Criaturas** recoloreadas de modelos existentes (`tools/gen_rlyeh_criaturas.py`; si cambian `fragmento` o `engendro`, vuelve a ejecutarlo):
+      - **Emanación de la puerta** (`emanacion`): el fragmento protoplásmico en verde gelatinoso con burbujas que brillan; repta a tirones.
+      - **Primigenio menor** (`primigenio_menor`, a 1,5×): el engendro en piedra verdinegra con grietas de luz verde, como una estatua que despierta. `keep` con golpe de zarpa (2 avisos), anillo mixto con huecos y llamada de emanaciones. Sale dos veces como evento intermedio (100 y 180 s).
+    - **Final: supervivencia** (el sistema del 6.3): 60 s de emanaciones que brotan de la puerta abierta. En el 7.6, Cthulhu.
+    - **Atrezo** (`tools/gen_atrezo_rlyeh.py` → `models/rly_*.json`): la **puerta colosal** (18 x 14 m, jambas que no son paralelas, dintel torcido, losa negra entreabierta con una rendija de luz verde; 16/m exportada a 8/m), muros ciclópeos inclinados (8/m), monolitos torcidos en dos ejes, escaleras de escalones desiguales que suben a ninguna parte y bloques de caras torcidas.
+    - **Arena** (`tools/gen_arena_rlyeh.py` → `data/arenas/rlyeh.json`, mapa en `resources/maps/p3_n5.png`): suelo `rlyeh` (del 7.0), la puerta al norte, muros al norte y al oeste, corales de luz verde, rocas en la orilla y el mar al sur y al este. Ángulos devoradores cada 14 s.
+    - **Arreglado:** los golpes de zarpa, zambullidas y avisos retrasados guardaban al enemigo en la lambda; si moría antes, Godot avisaba "Lambda capture at index 0 was freed". Ahora guardan su `instance_id`.
+    - **Equilibrio con bot (`circle`, nivel suelto):** en solitario 4 de 10; en cooperativo con 3 bots 8 de 8.
+    - **Rendimiento** con 75 enemigos y 500 balas: 117 FPS de media y 60 en el 1 % peor.
+    - **Probar:** `godot --path . -- level=p3_n5` (o `mid_at=5 final_at=30`). Capturas `shots/game_p35_045.0s.png` (la horda) y `shots/rly_puerta-rly_monolito-rly_escalera-rly_bloque_30_rlp1.png`. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

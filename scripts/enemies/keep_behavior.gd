@@ -152,8 +152,11 @@ func _dive(e: Enemy, target: Player, delta: float) -> bool:
 		var warn := minf(1.0, _dive_t * 0.5)
 		var tg := Telegraph.new().setup(e.data.body_radius * e.model_scale + 0.8, warn, Color(0.35, 0.75, 0.85, 0.7), false)
 		tg.position = _rise
+		var eid := e.get_instance_id()
 		e.get_tree().create_timer(_dive_t - warn, false).timeout.connect(func() -> void:
-			if is_instance_valid(e) and e.is_alive(): e.world.fx.add_child(tg))
+			var e2 := instance_from_id(eid) as Enemy
+			if e2 != null and e2.is_alive(): e2.world.fx.add_child(tg)
+			else: tg.free())
 		if OS.get_cmdline_user_args().has("log=true"): print("ZAMBULLIDA %d t=%.1f" % [_dives, e._spawn_t])
 	_dive_t -= delta
 	e.shield_t = 0.25
@@ -181,11 +184,13 @@ func _slam_at(e: Enemy, target: Player) -> void:
 		var tg := Telegraph.new().setup(r, warn, Color(Damage.COLOR_PHYSICAL, 0.8))
 		tg.position = at
 		e.world.fx.add_child(tg)
+		var eid := e.get_instance_id()
 		tg.finished.connect(func() -> void:
-			if not is_instance_valid(e) or not e.is_alive(): return
-			WadeSplash.burst(e.world.fx, at, r * 0.8)
-			for p in e.world.players:
+			var e2 := instance_from_id(eid) as Enemy
+			if e2 == null or not e2.is_alive(): return
+			WadeSplash.burst(e2.world.fx, at, r * 0.8)
+			for p in e2.world.players:
 				if p.health > 0.0 and Vector2(p.global_position.x - at.x, p.global_position.z - at.z).length() < r + p.data.hurt_radius:
-					var d := Damage.new(float(e.data.param("slam_damage", 20.0)), 0.0)
+					var d := Damage.new(float(e2.data.param("slam_damage", 20.0)), 0.0)
 					d.knockback = (p.global_position - at).normalized()
 					p.take_damage(d))

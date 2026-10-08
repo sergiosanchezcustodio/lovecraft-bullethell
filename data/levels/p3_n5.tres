@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/emanacion.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/profundo.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/cultista.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/primigenio_menor.tres" id="7"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+[ext_resource type="Resource" path="res://data/weather/niebla_arrecife.tres" id="weather"]
+
+[resource]
+script = ExtResource("1")
+weather = ExtResource("weather")
+id = &"p3_n5"
+display_name = "R'lyeh emergida: la puerta colosal"
+part = 3
+number = 5
+arena = "res://data/arenas/rlyeh.json"
+health_mult = 1.15
+duration = 300.0
+music = ""
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4")])
+spawn_rate = Array[Vector2]([Vector2(0, 0.3), Vector2(45, 0.5), Vector2(90, 0.8), Vector2(150, 1.3), Vector2(210, 1.8), Vector2(300, 2.3)])
+max_alive = 75
+elite_cap = 1
+angle_every = 14.0
+angle_radius = 1.8
+angle_time = 5.0
+angle_pull = 2.0
+angle_damage = 16.0
+mid_enemies = Array[ExtResource("5")]([ExtResource("7"), ExtResource("7")])
+mid_times = Array[float]([100.0, 180.0])
+mid_texts = Array[String](["Una de las figuras de piedra abre los ojos…", "Otro de los que yacen con él se levanta…"])
+final_time = 240.0
+final_wave = 0
+final_text = "La puerta negra se abre del todo. De dentro brota algo verde, que no deja de salir…"
+final_survive = 60.0
+final_rate = 2.6
+final_cap = 55
+final_pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("2"), ExtResource("3")])
+final_name = "las emanaciones"

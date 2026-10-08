@@ -132,13 +132,15 @@ func _slam(e: Enemy, target: Player) -> void:
 		var tg := Telegraph.new().setup(r, warn, Color(Damage.COLOR_PHYSICAL, 0.85))
 		tg.position = s
 		e.world.fx.add_child(tg)
+		var eid := e.get_instance_id()
 		tg.finished.connect(func() -> void:
-			if not is_instance_valid(e) or not e.is_alive(): return
-			WadeSplash.burst(e.world.fx, s, r * 0.9)
-			_shake(e, 0.25)
-			for q in e.world.players:
+			var e2 := instance_from_id(eid) as Enemy
+			if e2 == null or not e2.is_alive(): return
+			WadeSplash.burst(e2.world.fx, s, r * 0.9)
+			_shake(e2, 0.25)
+			for q in e2.world.players:
 				if q.health > 0.0 and Vector2(q.global_position.x - s.x, q.global_position.z - s.z).length() < r + q.data.hurt_radius:
-					var d := Damage.new(float(e.data.param("slam_damage", 22.0)), 0.0)
+					var d := Damage.new(float(e2.data.param("slam_damage", 22.0)), 0.0)
 					d.knockback = (q.global_position - s).normalized()
 					q.take_damage(d))
 
@@ -176,14 +178,18 @@ func _dive(e: Enemy, target: Player) -> void:
 	var to := spot_for(e.obstacles, target.global_position, e.global_position)   # siempre otra sima
 	var tg := Telegraph.new().setup(3.5, 1.0, Color(0.35, 0.75, 0.85, 0.7), false)
 	tg.position = to
+	var eid := e.get_instance_id()
 	e.get_tree().create_timer(down + 0.6, false).timeout.connect(func() -> void:
-		if is_instance_valid(e) and e.is_alive(): e.world.fx.add_child(tg))
+		var e2 := instance_from_id(eid) as Enemy
+		if e2 != null and e2.is_alive(): e2.world.fx.add_child(tg)
+		else: tg.free())
 	e.get_tree().create_timer(down + 1.6, false).timeout.connect(func() -> void:
-		if not is_instance_valid(e) or not e.is_alive(): return
-		e.position = to
-		e.reset_physics_interpolation()
+		var e3 := instance_from_id(eid) as Enemy
+		if e3 == null or not e3.is_alive(): return
+		e3.position = to
+		e3.reset_physics_interpolation()
 		_hidden = false
-		WadeSplash.burst(e.world.fx, to, 3.0)
-		_shake(e, 0.4)
-		_play(e, "emerge"))
+		WadeSplash.burst(e3.world.fx, to, 3.0)
+		_shake(e3, 0.4)
+		_play(e3, "emerge"))
 	if OS.get_cmdline_user_args().has("log=true"): print("DAGON se hunde")

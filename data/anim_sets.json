@@ -73,6 +73,8 @@
 		"diablo": "anim_diablo",
 		"engendro": "anim_profundo",
 		"polipo": "anim_fragmento",
-		"polipo_madre": "anim_fragmento"
+		"polipo_madre": "anim_fragmento",
+		"emanacion": "anim_fragmento",
+		"primigenio_menor": "anim_profundo"
 	}
 }

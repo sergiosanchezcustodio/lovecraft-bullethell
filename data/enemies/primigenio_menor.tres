@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/primigenio_menor_canto.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/emanacion.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = &"primigenio_menor"
+display_name = "Primigenio menor"
+model = "primigenio_menor"
+model_scale = 1.5
+unique = true
+tier = 5
+spawn_weight = 1.0
+elite = true
+tags = Array[StringName]([&"marina"])
+max_health = 560.0
+hit_radius = 1.0
+body_radius = 1.0
+move_speed = 1.8
+xp = 30.0
+money = 40
+contact_physical = 14.0
+contact_mental = 6.0
+aura_radius = 5.0
+aura_drain = 1.2
+movement = &"keep"
+params = {"keep": 4.5, "strafe": 0.4, "slam_every": 5.0, "slam_radius": 2.4, "slam_damage": 14.0, "slam_warn": 1.0, "slam_count": 2, "minion": ExtResource("3"), "minion_every": 12.0, "minion_count": 2, "minion_text": "Despierta uno de los que yacen con él…"}
+attack = ExtResource("2")
+attack_cooldown = 5.0
+attack_range = 10.0
+attack_anim = "pounce"

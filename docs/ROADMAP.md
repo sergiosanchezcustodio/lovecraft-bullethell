@@ -176,7 +176,7 @@ Cinco niveles, sus diez criaturas y Cthulhu. Decidido el 08-10-2026: los Ángulo
 | 7.2 | **Nivel 2, los pantanos de Luisiana: el ritual.** Claro con hogueras, el monolito del ídolo y el corro, con agua que frena. Diablos con alas de murciélago (picados) y cultistas armados del *Alert* (balas físicas). Evento final: el sacerdote del ritual | Hecho, pendiente de revisión (08-10-2026) |
 | 7.3 | **Nivel 3, los muelles y la cubierta del *Alert*.** Engendros de Cthulhu (minijefe) y Profundos servidores (de la parte 2) | Hecho, pendiente de revisión (08-10-2026) |
 | 7.4 | **Nivel 4, la tormenta en el Pacífico.** Cubierta del *Emma* en la tormenta (lluvia, rayos, olas que barren la cubierta). La cosa blanca polipoide y los Ángulos devoradores como peligro | Hecho, pendiente de revisión (08-10-2026) |
-| 7.5 | **Nivel 5, R'lyeh emergida.** Arquitectura imposible y la puerta colosal. Primigenios menores (minijefes) y emanaciones de la puerta (masas gelatinosas verdes) | Pendiente |
+| 7.5 | **Nivel 5, R'lyeh emergida.** Arquitectura imposible y la puerta colosal. Primigenios menores (minijefes) y emanaciones de la puerta (masas gelatinosas verdes) | Hecho, pendiente de revisión (08-10-2026) |
 | 7.6 | **Jefe: Cthulhu.** Asoma por la puerta, fases (zarpazos con aviso, tentáculos que barren, alas, llamada de criaturas); al caer se deshace en nube verde y se recompone una vez | Pendiente |
 | 7.7 | **Cierre:** la parte encadenada con bots, con y sin compras, la Biblioteca y tu partida | Pendiente |
 
