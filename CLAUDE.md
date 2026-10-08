@@ -440,6 +440,13 @@ Léela al empezar cada sesión:
     - Rendimiento: 82 FPS con sonido y 83 sin él (150 enemigos y 1.000 balas).
     - Cita en la ficha del proyecto (`data/credits.json`).
   - **Hito 8.2 (música por nivel): hecho, provisional.** 17 pistas CC0 de OpenGameArt en `resources/Music/cc0/` (OGG, volumen igualado a −16 LUFS con ffmpeg `loudnorm`): una por nivel (salvo el nivel 1 de la parte 1, que sigue con la tuya) y una de jefe por parte (`LevelData.boss_music`: suena al empezar el evento final). Elegidas por título y carácter, sin escucharlas (Storm Chasers en la tormenta, Pirate Indenture en los muelles, Dark Cavern Ambient en las cavernas…). Autores, títulos y enlaces en `data/musica.json`; cita en la ficha. **Para poner la tuya**, cambia `music` o `boss_music` en `data/levels/<nivel>.tres`. Con `log=true`, "MUSICA ruta".
+  - **Hito 8.3 (accesibilidad): hecho, pendiente de tu revisión.** Configuración > Juego > Accesibilidad:
+    - **Tamaño de la interfaz** (Pequeño, Normal, Grande, Muy grande: ×0,85 a ×1,3; `ui_scale`, `Settings.apply_ui` con `content_scale_factor`): menús y HUD.
+    - **Colores de las balas:** Normales o Alto contraste (`bullet_palette`; `BulletManager.HIGH_CONTRAST`: físicas amarillo y blanco, mentales cian). Las formas ya se distinguían (bola maciza o anillo). Hoja `shots/revision_8_3_balas.png`.
+    - **Destellos** (`flashes`): reducidos bajan el destello blanco de los golpes a los enemigos (0,75 → 0,2) y los rayos del clima a la cuarta parte.
+    - **Temblor de la cámara** (`shake`, de 0 a 100 %): multiplica `GameCamera.shake`.
+    - Las distorsiones de cordura baja ya se regulaban.
+    - Para probar un ajuste sin guardarlo: `cfg_<clave>=valor` al lanzar (p. ej. `cfg_bullet_palette=1`, `cfg_ui_scale=3`; `Settings._overrides`).
 - **Fase 7 (parte 3, *La llamada de Cthulhu*): hecha salvo tu partida (08-10-2026)** (hitos 7.0 a 7.7 en `docs/ROADMAP.md`). Los Ángulos devoradores son un peligro del escenario (zonas que se abren con aviso, atraen y engullen; no se matan). Cthulhu se combate como Dagon (colosal, anclado, asomando por la puerta de R'lyeh) y al caer se deshace en nube verde y se recompone una vez.
   - **Hito 7.0 (base común): hecho, pendiente de tu revisión (08-10-2026).**
     - **El culto** (`tools/gen_culto_cthulhu.py`, estilo 4, `anim_humano`):

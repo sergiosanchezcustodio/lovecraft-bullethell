@@ -84,7 +84,7 @@ var _shake := 0.0                  ## m de temblor (jefes: rugidos y golpes); se
 
 ## Tiembla la cámara (hito 6.6): amount en metros; se suma y decae en unas décimas.
 func shake(amount: float) -> void:
-	_shake = maxf(_shake, amount)
+	_shake = maxf(_shake, amount * float(Settings.get_value("shake")))   # accesibilidad: se puede reducir o quitar
 
 func _process(delta: float) -> void:
 	_size = lerpf(_size, needed_size(), 1.0 - exp(-zoom_speed * delta))

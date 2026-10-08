@@ -24,6 +24,10 @@ var defaults := {
 	"vol_master": 1.0, "vol_music": 0.8, "vol_sfx": 0.9,
 	"distortion": 1.0, "vibration": true, "show_fps": false,
 	"weather": 2,                           ## clima: 0 apagado, 1 reducido, 2 completo
+	"ui_scale": 1,                          ## accesibilidad (hito 8.3): tamaño de la interfaz (UI_SCALES)
+	"bullet_palette": 0,                    ## 0 normal, 1 alto contraste (daltonismo)
+	"flashes": 1,                           ## destellos (golpes, rayos): 0 reducidos, 1 normales
+	"shake": 1.0,                           ## temblor de cámara (0..1)
 	"madness": true,                        ## locura acumulada (GDD 4.5)
 	"intro": 1,                             ## ficha e intro al arrancar: 0 siempre, 1 solo la primera vez (hito 5.2)
 	"intro_seen": false,
@@ -34,14 +38,20 @@ var path := PATH                            ## los tests usan otro fichero
 var dev_window := false                     ## ejecución de pruebas: siempre en ventana (main.gd)
 var force_fullscreen := false               ## `fullscreen=true`: pantalla completa solo en esta ejecución
 var _fps_label: Label
+var _overrides := {}                        ## `cfg_<clave>=valor` al lanzar: solo esta ejecución (capturas)
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_make_buses()
 	load_file()
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("cfg_") and "=" in a:
+			var kv := a.substr(4).split("=", true, 1)
+			_overrides[kv[0]] = str_to_var(kv[1]) if str_to_var(kv[1]) != null else kv[1]
 	apply_audio()
 
 func get_value(key: String) -> Variant:
+	if _overrides.has(key): return _overrides[key]
 	return values.get(key, defaults.get(key))
 
 func set_value(key: String, v: Variant) -> void:
@@ -67,9 +77,17 @@ func reset_all() -> void:
 	save_file()
 	apply_all()
 
+const UI_SCALES := [0.85, 1.0, 1.15, 1.3]
+
 func apply_all() -> void:
+	apply_ui()
 	apply_video()
 	apply_audio()
+
+## Tamaño de la interfaz (hito 8.3): escala todo lo 2D (menús y HUD) sobre la base 1920x1080.
+func apply_ui() -> void:
+	if not is_inside_tree(): return
+	get_window().content_scale_factor = UI_SCALES[clampi(int(get_value("ui_scale")), 0, UI_SCALES.size() - 1)]
 
 # ---------------------------------------------------------------- vídeo
 

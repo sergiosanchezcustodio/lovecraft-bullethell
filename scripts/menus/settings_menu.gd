@@ -122,6 +122,21 @@ func _game() -> void:
 		Settings.set_value("weather", i))
 	_toggle("Locura acumulada (cada crisis baja la cordura máxima)", Settings.get_value("madness"), func(on: bool) -> void:
 		Settings.set_value("madness", on))
+	_note("Accesibilidad")
+	var sizes: Array[String] = ["Pequeño", "Normal", "Grande", "Muy grande"]
+	_choice("Tamaño de la interfaz", sizes, int(Settings.get_value("ui_scale")), func(i: int) -> void:
+		Settings.set_value("ui_scale", i)
+		Settings.apply_ui())
+	var pal: Array[String] = ["Normales", "Alto contraste"]
+	_choice("Colores de las balas", pal, int(Settings.get_value("bullet_palette")), func(i: int) -> void:
+		Settings.set_value("bullet_palette", i))
+	_note("Alto contraste: físicas en amarillo y blanco, mentales en cian. Se distinguen también por la forma: bola maciza o anillo.")
+	var fl: Array[String] = ["Reducidos", "Normales"]
+	_choice("Destellos (golpes y rayos)", fl, int(Settings.get_value("flashes")), func(i: int) -> void:
+		Settings.set_value("flashes", i))
+	var sh: Array[String] = ["Sin temblor", "25 %", "50 %", "75 %", "100 %"]
+	_choice("Temblor de la cámara", sh, int(round(float(Settings.get_value("shake")) * 4.0)), func(i: int) -> void:
+		Settings.set_value("shake", i / 4.0))
 	var intro: Array[String] = ["Siempre", "Solo la primera vez"]
 	_choice("Ficha e intro al arrancar", intro, int(Settings.get_value("intro")), func(i: int) -> void:
 		Settings.set_value("intro", i))

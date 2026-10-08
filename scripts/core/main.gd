@@ -41,3 +41,4 @@ func _window_mode(la: LaunchArgs, first: String) -> void:
 	Settings.dev_window = (dev and not la.get_bool("fullscreen")) or la.get_bool("window")
 	Settings.force_fullscreen = la.get_bool("fullscreen")
 	Settings.apply_video()
+	Settings.apply_ui()

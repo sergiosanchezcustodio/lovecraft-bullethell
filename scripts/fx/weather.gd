@@ -288,7 +288,7 @@ func _lightning(delta: float) -> void:
 			_next_bolt = data.lightning_every * _rng.randf_range(0.5, 1.5)
 	else:
 		_bolt_t += delta
-	var k := flash_at(_bolt_t)
+	var k := flash_at(_bolt_t) * (1.0 if int(Settings.get_value("flashes")) == 1 else 0.25)   # accesibilidad
 	if _bolt_t > 0.7: _bolt_t = -1.0
 	# destello contenido: con más, la escena se quemaba en blanco y la noche parecía de día
 	if _flash: _flash.light_energy = k * FLASH_LIGHT

@@ -118,7 +118,7 @@ func _ready() -> void:
 	_flash_mat = StandardMaterial3D.new()
 	_flash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_flash_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_flash_mat.albedo_color = Color(1, 1, 1, 0.75)
+	_flash_mat.albedo_color = Color(1, 1, 1, 0.75 if int(Settings.get_value("flashes")) == 1 else 0.2)   # accesibilidad
 	_attack_timer = data.attack_cooldown * randf_range(0.5, 1.0)
 	anim_t = randf()
 	if data.aura_drain > 0.0 and data.aura_radius > 0.0: _make_aura()

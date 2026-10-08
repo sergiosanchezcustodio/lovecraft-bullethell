@@ -7,6 +7,12 @@ extends Node3D
 ## Colisiones: las balas de los jugadores contra la rejilla de enemigos de CombatWorld;
 ## las enemigas, por distancia contra los jugadores (como mucho cuatro).
 
+## Paleta de alto contraste para las balas enemigas (daltonismo): físicas amarillo y blanco,
+## mentales cian; la forma (bola maciza o anillo) no cambia.
+const HIGH_CONTRAST := {"phys_core": Color(1.0, 1.0, 0.85), "phys_mid": Color(1.0, 0.85, 0.15),
+	"phys_edge": Color(0.85, 0.6, 0.0), "ment_light": Color(0.6, 1.0, 1.0), "ment_mid": Color(0.1, 0.8, 0.95),
+	"ment_dark": Color(0.0, 0.35, 0.5), "glow": 0.45}
+
 enum Team { PLAYER, ENEMY }
 ## Estilo visual (lenguaje de daños, GDD 4.4): lo lee el shader por instancia.
 ## WISP y YITH son trazadoras del jugador de otro color (Báculo del Farolero, Rayo de Yith).
@@ -123,6 +129,8 @@ func _ready() -> void:
 	emi.multimesh = _mm_enemy
 	var emat := ShaderMaterial.new()
 	emat.shader = preload("res://scripts/bullets/bullet_voxel.gdshader")
+	if int(Settings.get_value("bullet_palette")) == 1:      # accesibilidad: alto contraste (hito 8.3)
+		for k in HIGH_CONTRAST: emat.set_shader_parameter(k, HIGH_CONTRAST[k])
 	var hidden := ShaderMaterial.new()
 	hidden.shader = preload("res://scripts/bullets/bullet_voxel_hidden.gdshader")
 	hidden.render_priority = 1
