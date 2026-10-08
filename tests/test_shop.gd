@@ -12,10 +12,10 @@ func _entry(id: String) -> Shop.Entry:
 	return null
 
 func test_el_catalogo_tiene_las_cuatro_secciones() -> void:
-	assert_eq(Shop.in_section(ShopItem.Section.POWERUP).size(), 5, "cinco potenciadores")
+	assert_eq(Shop.in_section(ShopItem.Section.POWERUP).size(), 9, "nueve potenciadores (cuatro más en el hito 5.4)")
 	assert_eq(Shop.in_section(ShopItem.Section.CHARACTER).size(), 7, "los siete que no son de inicio")
 	assert_eq(Shop.in_section(ShopItem.Section.PET).size(), DebugOptions.list_resources("res://data/pets").size(), "todos los compañeros")
-	assert_eq(Shop.in_section(ShopItem.Section.UPGRADE).size(), 2, "quinta arma y quinto objeto")
+	assert_eq(Shop.in_section(ShopItem.Section.UPGRADE).size(), 4, "quinta y sexta funda, quinto y sexto bolsillo")
 	for e in Shop.catalog():
 		for p in e.prices: assert_gt(p, 0, e.id)
 
@@ -26,7 +26,7 @@ func test_la_tienda_entera_lleva_unas_veinte_horas() -> void:
 		for p in e.prices:
 			if e.section == ShopItem.Section.OUTFIT: outfits += p      # estético: aparte
 			else: total += p
-	assert_between(total, 80000, 140000, "a unos 5.500 $ por hora: 10 h la tienda y 10 h los compañeros (D-36)")
+	assert_between(total, 80000, 180000, "a unos 5.500 $ por hora: de 15 a 30 h entre tienda y compañeros (D-36; el 5.4 la amplía para las partes 2 y 3)")
 	assert_between(outfits, 30000, 70000, "el vestuario (D-34), de 5 a 13 h más")
 
 func test_comprar_potenciador_sube_de_nivel_y_cobra() -> void:

@@ -24,7 +24,13 @@ ITEMS = {
     'punteria': "a brass rifle telescopic sight with glass lenses at both ends and mounting rings",
     'agilidad': "an antique brass pocket stopwatch with the lid open and a winding crown",
     'codicia': "a small leather drawstring money purse with shiny gold coins spilling out of it",
+    'presteza': "a pair of worn leather boxing gloves hanging from a hook, tied by the laces",
+    'magnetismo': "a red horseshoe magnet with silver tips attracting small golden gems",
+    'erudicion': "a thick antique leather-bound book with brass corners, open, with glowing pages",
+    'fortuna': "a four-leaf clover pressed under glass in a small round brass locket",
     # tienda: mejoras
+    'sexta_arma': "a leather bandolier belt with two empty holsters and brass buckles",
+    'sexto_objeto': "an old leather satchel bag with two buckled straps and many small pockets",
     'quinta_arma': "an empty brown leather gun holster with a brass buckle and stitched edges",
     'quinto_objeto': "a small brown leather explorer's pouch bag with a flap and a brass clasp",
     # partida: objetos de la subida de nivel

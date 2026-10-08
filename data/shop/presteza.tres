@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItem" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/items/icons/presteza.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"presteza"
+display_name = "Presteza"
+description = "El esquive se recarga un 4 % antes por nivel."
+section = 0
+order = 5
+prices = Array[int]([200, 400, 800, 1300, 2000])
+stat = "reflex"
+per_level = 0.04
+icon = ExtResource("2")

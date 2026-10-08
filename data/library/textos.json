@@ -104,7 +104,13 @@
 		"agilidad": "Gimnasia sueca cada mañana.",
 		"codicia": "El anciano de la tienda paga bien lo que se trae de vuelta.",
 		"quinta_arma": "Una funda más en el cinturón.",
-		"quinto_objeto": "Un bolsillo cosido por dentro del abrigo."
+		"quinto_objeto": "Un bolsillo cosido por dentro del abrigo.",
+		"presteza": "Unos guantes de boxeo viejos del gimnasio de la universidad. Dicen que quien entrena con ellos aprende a apartarse a tiempo.",
+		"magnetismo": "Un imán de herradura de feria. Las gemas que sueltan las criaturas acuden a él como limaduras de hierro.",
+		"erudicion": "Un tratado encuadernado en cuero de la Biblioteca de Miskatonic. Cada página leída hace más fácil entender lo que no debería entenderse.",
+		"fortuna": "Un trébol de cuatro hojas prensado en un relicario de latón. Las opciones que te ofrece el destino parecen algo mejores.",
+		"sexta_arma": "Una canana de cuero con dos fundas. Cabe un arma más.",
+		"sexto_objeto": "Un morral viejo con muchos bolsillos. Cabe un objeto más."
 	},
 	"places": {
 		"p1_n1": "Costa del mar de Ross, Antártida, 1930. La expedición de la Universidad de Miskatonic monta aquí su campamento: tiendas, una cabaña de troncos, un iglú y los faroles. Al norte, la Barrera de hielo; al sur, el mar. Algo vino de las cavernas de abajo.",

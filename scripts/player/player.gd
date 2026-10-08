@@ -506,8 +506,10 @@ func rebuild_stats() -> void:
 		"move_speed": base.move_speed * Attributes.mult(attrs, "speed") * float(shop.get("speed", 1.0)),
 		"dodge_duration": (style.duration if style else base.dodge_duration) * data.dodge_length,
 		"dodge_iframes": (style.iframes if style else base.dodge_iframes) * data.dodge_length,
-		"dodge_cooldown": (style.cooldown if style else base.dodge_cooldown) * data.dodge_cooldown_mult / Attributes.mult(attrs, "dodge"),
-		"pickup_radius": base.pickup_radius,
+		"dodge_cooldown": (style.cooldown if style else base.dodge_cooldown) * data.dodge_cooldown_mult / Attributes.mult(attrs, "dodge") / float(shop.get("reflex", 1.0)),
+		"pickup_radius": base.pickup_radius * float(shop.get("magnet", 1.0)),     # Imán (tienda)
+		"xp_mult": base.xp_mult * float(shop.get("insight", 1.0)),                # Erudición (tienda)
+		"luck": base.luck * float(shop.get("fortune", 1.0)),                      # Fortuna (tienda)
 	}
 	for up in progress.upgrade_pool if progress else []:
 		if not v.has(up.stat): v[up.stat] = base.get(up.stat)

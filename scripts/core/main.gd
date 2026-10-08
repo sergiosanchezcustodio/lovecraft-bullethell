@@ -5,6 +5,7 @@ extends Node
 ##   godot --path . -- still|anim ...        -> visor de modelos (scenes/preview.tscn)
 ##   godot --path . -- bench ...             -> prueba de rendimiento (scenes/bench.tscn)
 ##   godot --path . -- title ...             -> portada (scenes/title.tscn)
+##   godot --path . -- intro ...            -> ficha del proyecto e intro (scenes/intro.tscn)
 ##   godot --path . -- select ...            -> selección de personaje (scenes/select.tscn)
 ##   godot --path . -- test_save=3           -> crea la partida de pruebas (todo desbloqueado) en ese hueco
 ## La ventana sigue la configuración (Settings: pantalla completa por defecto). Las ejecuciones
@@ -22,12 +23,17 @@ func _ready() -> void:
 		return
 	_window_mode(la, first)
 	# Sin argumentos se abre la pantalla de título; con opciones de partida, la partida
-	var scene := "res://scenes/title.tscn" if OS.get_cmdline_user_args().is_empty() else "res://scenes/game.tscn"
+	var scene := "res://scenes/game.tscn"
+	if OS.get_cmdline_user_args().is_empty():           # arranque normal: ficha e intro (según la configuración) y portada
+		var show := int(Settings.get_value("intro")) == 0 or not bool(Settings.get_value("intro_seen"))
+		scene = "res://scenes/intro.tscn" if show else "res://scenes/title.tscn"
 	match first:
 		"still", "anim": scene = "res://scenes/preview.tscn"
 		"bench": scene = "res://scenes/bench.tscn"
 		"title": scene = "res://scenes/title.tscn"
 		"select": scene = "res://scenes/select.tscn"
+		"intro": scene = "res://scenes/intro.tscn"
+		"relato": scene = "res://scenes/relato.tscn"
 	get_tree().change_scene_to_file.call_deferred(scene)
 
 func _window_mode(la: LaunchArgs, first: String) -> void:

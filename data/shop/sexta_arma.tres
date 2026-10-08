@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItem" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/items/icons/sexta_arma.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"sexta_arma"
+display_name = "Sexta funda"
+description = "Puedes llevar una sexta arma."
+section = 3
+order = 3
+prices = Array[int]([9000])
+stat = "weapon_slots"
+per_level = 1.0
+icon = ExtResource("2")

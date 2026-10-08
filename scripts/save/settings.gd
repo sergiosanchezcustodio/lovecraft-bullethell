@@ -25,6 +25,8 @@ var defaults := {
 	"distortion": 1.0, "vibration": true, "show_fps": false,
 	"weather": 2,                           ## clima: 0 apagado, 1 reducido, 2 completo
 	"madness": true,                        ## locura acumulada (GDD 4.5)
+	"intro": 1,                             ## ficha e intro al arrancar: 0 siempre, 1 solo la primera vez (hito 5.2)
+	"intro_seen": false,
 	"keys": {}, "joy": {},                  ## reasignaciones: acción -> tecla / botón
 }
 var values := {}

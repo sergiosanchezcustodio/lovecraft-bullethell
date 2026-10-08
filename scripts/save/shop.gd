@@ -112,6 +112,7 @@ static func buy(save: SaveData, e: Entry) -> bool:
 ## "speed", "money") y huecos ("weapon_slots", "item_slots", que suman).
 static func bonuses(save: SaveData) -> Dictionary:
 	var out := {"health": 1.0, "sanity": 1.0, "damage": 1.0, "speed": 1.0, "money": 1.0,
+		"reflex": 1.0, "magnet": 1.0, "insight": 1.0, "fortune": 1.0,    # hito 5.4
 		"weapon_slots": 0, "item_slots": 0}
 	if save == null: return out
 	for it: ShopItem in DebugOptions.list_resources("res://data/shop"):

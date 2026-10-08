@@ -251,7 +251,7 @@ func _start(level_id: String) -> void:
 			Saves.current.worn[String(seat.character)] = s.worn.duplicate()
 	if Saves.current != null: Saves.save()
 	_leaving = true
-	get_tree().change_scene_to_file("res://scenes/game.tscn")
+	get_tree().change_scene_to_file("res://scenes/relato.tscn")   # el relato del nivel y después la partida
 
 func _back_to_menu() -> void:
 	_leaving = true

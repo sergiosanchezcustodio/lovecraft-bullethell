@@ -589,7 +589,11 @@ func _next_level(id: String) -> void:
 	for q in players: GameSession.carry.append(GameSession.snapshot(q))
 	GameSession.team_xp = team.xp if team != null else 0.0
 	GameSession.level = StringName(id)
-	_restart()
+	Saves.save()
+	get_tree().paused = false
+	Engine.time_scale = 1.0
+	if args.get_bool("autonext"): _restart()                 # pruebas: sin relato
+	else: get_tree().change_scene_to_file.call_deferred("res://scenes/relato.tscn")
 
 func _restart() -> void:
 	print("reinicio")

@@ -1,0 +1,93 @@
+{
+	"_comentario": "Relatos de cada nivel (hito 5.3): se cuentan al elegir el nivel en el mapa (y al pasar al siguiente), antes de jugarlo. Una frase por línea; aparecen una tras otra. Tono de diario de los años 20 y 30.",
+	"p1_n1": [
+		"Costa del mar de Ross, noviembre de 1930.",
+		"La expedición de la Universidad de Miskatonic ha montado el campamento base al pie de la Barrera de hielo.",
+		"Lake ha encontrado fósiles imposibles en las perforaciones y no deja de enviar telegramas exaltados.",
+		"Esta noche los pingüinos no se callan. Hay algo bajo el hielo que los ha dejado ciegos y furiosos."
+	],
+	"p1_n2": [
+		"No hubo respuesta de la radio de Lake en toda la noche.",
+		"Cuando el avión llegó a su campamento encontramos las tiendas rasgadas, los perros muertos y las mesas de disección vacías.",
+		"Los catorce especímenes que había desenterrado ya no estaban. Ocho habían desaparecido intactos.",
+		"En la nieve quedaban huellas en forma de estrella de cinco puntas."
+	],
+	"p1_n3": [
+		"Sobrevolamos las montañas de la locura, más altas que el Himalaya, y bajamos al paso entre los picos.",
+		"La roca está tallada: columnas, avenidas, terrazas que ningún hombre construyó.",
+		"En las cavernas el aire es tibio y huele a algo vivo.",
+		"Algo negro y brillante se mueve allá abajo, y a veces silba: ¡Tekeli-li!"
+	],
+	"p1_n4": [
+		"La ciudad se extiende hasta perderse de vista: bloques ciclópeos, torres en estrella, puentes de piedra.",
+		"Los murales cuentan su historia: llegaron de las estrellas, crearon a los shoggoths para servirles y los shoggoths se rebelaron.",
+		"No estamos solos en las calles.",
+		"Algunos de los constructores siguen aquí, y no parecen contentos de vernos."
+	],
+	"p1_n5": [
+		"Bajamos por los túneles hacia el mar subterráneo que los murales señalaban con miedo.",
+		"Encontramos a los Antiguos que escaparon del campamento de Lake: decapitados, cubiertos de un limo negro.",
+		"Al fondo, algo enorme y oscuro avanza por el túnel como un tren, cubierto de ojos que se encienden y se apagan.",
+		"Danforth no deja de gritar. No miréis atrás."
+	],
+	"p2_n1": [
+		"Newburyport, julio de 1927. Quería ir a Arkham por la costa y el billete más barato pasa por Innsmouth.",
+		"Todos me aconsejan no ir. Dicen que la gente de allí tiene un aspecto raro: ojos saltones, piel gris, cuellos con pliegues.",
+		"El autobús de Joe Sargent sale al atardecer, medio vacío.",
+		"A mitad de la carretera, entre las marismas, el conductor para el motor y se baja sin decir nada."
+	],
+	"p2_n2": [
+		"Innsmouth se cae a pedazos: casas georgianas hundidas, ventanas tapiadas, el puerto lleno de barcas podridas.",
+		"El viejo Zadok Allen me contó, borracho, lo del capitán Obed Marsh y el pacto con los del arrecife.",
+		"En la antigua logia masónica ahora reza la Orden Esotérica de Dagon.",
+		"Esta noche sus puertas están abiertas, y el sumo sacerdote me ha visto."
+	],
+	"p2_n3": [
+		"No hay autobús hasta mañana. Me quedo en el hotel Gilman House, el único de la ciudad.",
+		"A medianoche alguien prueba el picaporte de mi habitación. Luego, las puertas de al lado.",
+		"Salto por la ventana a los tejados.",
+		"Abajo, en la calle, la horda del Arrecife del Diablo sube por las escaleras de incendios."
+	],
+	"p2_n4": [
+		"La única salida es la vía muerta del tren a Rowley, que cruza los pantanos al oeste.",
+		"Corro sobre las traviesas podridas mientras el agua estancada me llega a los tobillos a cada paso que me salgo.",
+		"Detrás de mí oigo chapoteos, y algo más grande que un hombre.",
+		"Dicen que Barnabas Marsh, el nieto del capitán, ya no puede salir a la calle. Esta noche ha salido."
+	],
+	"p2_n5": [
+		"He vuelto. Mi propia sangre me ha traído hasta aquí: mi bisabuela era una Marsh.",
+		"El Arrecife del Diablo emerge con la marea baja, negro, y bajo él duerme Y'ha-nthlei, la ciudad de los Profundos.",
+		"Pth'thya-l'yi, mi antepasada, lleva ochenta mil años esperándome.",
+		"Y más abajo, en la sima, Madre Hydra y Padre Dagon han oído que alguien quiere impedirlo."
+	],
+	"p3_n1": [
+		"Providence, marzo de 1925. El escultor Wilcox trajo a mi tío un bajorrelieve de arcilla que había modelado en sueños.",
+		"Cada noche sueña con ciudades de ángulos imposibles y con una voz que repite «Cthulhu fhtagn».",
+		"No es el único: media ciudad sueña lo mismo desde el terremoto.",
+		"Esta noche, en su estudio, los sueños han empezado a salir de las paredes."
+	],
+	"p3_n2": [
+		"Las notas de mi tío me llevan a 1907, a los pantanos al sur de Nueva Orleans.",
+		"El inspector Legrasse siguió los tambores hasta un claro con un monolito, un ídolo de piedra verdinegra y hogueras alrededor.",
+		"Los que bailaban en corro cantaban la misma frase que Wilcox repetía en la fiebre.",
+		"Y en el pantano, dicen los criollos, hay diablos con alas que guardan el lugar."
+	],
+	"p3_n3": [
+		"Auckland, 1925. El Vigilant encontró a la deriva el Alert, un yate armado, con un superviviente: el noruego Johansen.",
+		"El Alert era del culto; su tripulación atacó la goleta de Johansen sin motivo.",
+		"Esta noche el Alert está atracado en el muelle, y algo viaja todavía en su bodega.",
+		"Del agua suben los Profundos, y los marineros del culto bajan a cubierta con los revólveres."
+	],
+	"p3_n4": [
+		"El diario de Johansen cuenta la tormenta que los arrastró hacia los 47° Sur, 126° Oeste.",
+		"Las olas barrían la cubierta del Emma de proa a popa.",
+		"A veces, en el aire, los ángulos no cuadraban, y algo se abría en las tablas como si el barco tuviera más dimensiones de las debidas.",
+		"Uno de los marineros cayó en uno de esos ángulos y no volvió a salir."
+	],
+	"p3_n5": [
+		"El 23 de marzo de 1925 la isla emergió: R'lyeh, la ciudad muerta donde Cthulhu yace soñando.",
+		"Losas que no cuadran, monolitos torcidos, escaleras que no llevan a ninguna parte.",
+		"Al fondo, una puerta colosal, entreabierta, con un resplandor verde en la rendija.",
+		"Los que yacen con Él empiezan a despertar. La puerta se abre del todo. Él sale."
+	]
+}
