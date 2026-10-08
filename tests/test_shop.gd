@@ -13,7 +13,7 @@ func _entry(id: String) -> Shop.Entry:
 
 func test_el_catalogo_tiene_las_cuatro_secciones() -> void:
 	assert_eq(Shop.in_section(ShopItem.Section.POWERUP).size(), 9, "nueve potenciadores (cuatro más en el hito 5.4)")
-	assert_eq(Shop.in_section(ShopItem.Section.CHARACTER).size(), 7, "los siete que no son de inicio")
+	assert_eq(Shop.in_section(ShopItem.Section.CHARACTER).size(), 9, "los nueve que no son de inicio (Armitage y West, hito 5.5)")
 	assert_eq(Shop.in_section(ShopItem.Section.PET).size(), DebugOptions.list_resources("res://data/pets").size(), "todos los compañeros")
 	assert_eq(Shop.in_section(ShopItem.Section.UPGRADE).size(), 4, "quinta y sexta funda, quinto y sexto bolsillo")
 	for e in Shop.catalog():

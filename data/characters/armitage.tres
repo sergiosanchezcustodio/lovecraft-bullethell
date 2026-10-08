@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/destello.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"armitage"
+display_name = "Profesor Henry Armitage"
+model = "armitage"
+role = "Bibliotecario de la Universidad de Miskatonic"
+passive_text = "Las armas mágicas se recargan un 20 % antes."
+story = "El horror de Dunwich"
+price = 6000
+order = 12
+max_health = 85.0
+max_sanity = 120.0
+move_speed = 4.3
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"polvo"])
+arcane_cooldown_mult = 0.8
+attr_bonus = {"CUL": 10, "POD": 6, "INT": 4}
+in_shop = true

@@ -324,6 +324,10 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	q.progress.leveled_up.connect(func(l: int) -> void: Achievements.record(Saves.current, "best_level", l))
 	q.progress.leveled_up.connect(func(_l: int) -> void:
 		q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
+		if q.data.team_heal_on_level > 0.0:                   # rasgo de West: cura a los compañeros cercanos
+			for o in players:
+				if o != q and o.health > 0.0 and o.global_position.distance_to(q.global_position) <= 6.0:
+					o.health = minf(o.health + o.data.max_health * q.data.team_heal_on_level, o.data.max_health)
 		_open_level_up.call_deferred())
 	q.downed.connect(_on_downed.bind(q))
 	q.revived.connect(func() -> void:

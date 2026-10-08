@@ -90,6 +90,7 @@ func _physics_process_step(delta: float) -> void:
 		Damage.ctx = tag_of(w)                   # lo que cree este disparo daña en nombre de esta arma
 		if not _fire(w): continue                # el machete espera a tener a alguien cerca
 		w.timer = w.stat("cooldown")
+		if w.data.category == WeaponData.Category.MAGIC: w.timer *= player.data.arcane_cooldown_mult   # rasgo de Armitage
 
 ## Elige objetivo según el arma y dispara. Sin nadie a tiro, dispara igualmente hacia
 ## donde mira el personaje: el jugador siempre está disparando.

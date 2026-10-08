@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/rodar.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"west"
+display_name = "Herbert West"
+model = "west"
+role = "Médico, reanimador"
+passive_text = "Al subir de nivel cura un 15 % de la vida a los compañeros cercanos."
+story = "Herbert West, reanimador"
+price = 6000
+order = 13
+max_health = 115.0
+max_sanity = 80.0
+move_speed = 4.5
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"west"])
+team_heal_on_level = 0.15
+attr_bonus = {"CON": 9, "INT": 7, "FUE": 4}
+in_shop = true

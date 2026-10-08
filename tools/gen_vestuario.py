@@ -17,7 +17,7 @@ from cuerpo import slab, rslab, T, H
 import materiales
 
 CHARS = ['dyer', 'olmstead', 'legrasse', 'johansen', 'peaslee', 'varga', 'whipple', 'blake',
-         'iwanicki', 'elwood', 'malone']
+         'iwanicki', 'elwood', 'malone', 'armitage', 'west']
 
 
 def body_of(c):

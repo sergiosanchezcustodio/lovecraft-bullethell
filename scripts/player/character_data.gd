@@ -20,6 +20,8 @@ extends Resource
 @export var dodge_length := 1.0              ## multiplica la duración del impulso y la invulnerabilidad del esquive
 @export var arcane_cost_mult := 1.0          ## cordura que cuestan las armas arcanas (Varga: 0,5)
 @export var xp_mult := 1.0                   ## experiencia por gema (Blake: 1,15)
+@export var arcane_cooldown_mult := 1.0      ## recarga de las armas mágicas (Armitage: 0,8; hito 5.5)
+@export var team_heal_on_level := 0.0        ## al subir de nivel cura esa parte de la vida a los compañeros a menos de 6 m (West; hito 5.5)
 @export var heal_on_level := 0.0             ## fracción de la vida máxima que recupera al subir de nivel (Whipple)
 @export var revive_speed := 1.0              ## rapidez al reanimar a un compañero (Whipple; hito 2.6)
 @export var calm_aura := 0.0                 ## cordura por segundo a sí mismo y a los compañeros a menos de CALM_RADIUS (Iwanicki)

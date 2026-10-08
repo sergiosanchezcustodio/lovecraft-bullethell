@@ -20,7 +20,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 2 | Menús, guardado y cooperativo local | **Hecha** salvo tu prueba con varios mandos (2.17) | Ninguna (D-07, D-16 a D-18 y D-22 a D-25, resueltas) |
 | 3 | Pipeline de contenido | **En curso** (03-10-2026): D-06 resuelta; enemigos, niveles y animaciones por datos | Ninguna |
 | 4 | Parte 1 completa | **Hecha** salvo tu partida (04-10-2026) | Ninguna (D-04 y D-19, resueltas) |
-| 5 | Arranque, relatos y ampliación de la tienda | Pendiente | Ninguna |
+| 5 | Arranque, relatos y ampliación de la tienda | **Hecha** salvo tu revisión (08-10-2026) | Ninguna |
 | 6 | Parte 2 completa | **Plan aprobado** (06-10-2026) | Ninguna (D-13 y jefes colosales, resueltas) |
 | 7 | Parte 3 completa | **Hecha** salvo tu partida (08-10-2026) | Ninguna (Ángulos devoradores y Cthulhu, resueltos) |
 | 8 | Pulido y distribución | Pendiente | D-01, D-12 |
@@ -140,7 +140,9 @@ El guardado, los menús, la selección de personaje, el mapa de niveles y la tie
 - **Arranque:** ficha del proyecto (con qué está hecho, licencia y aviso del uso de IA) e intro que presenta el juego, antes de la portada.
 - **Relatos:** al elegir un nivel en el mapa se cuenta su relato antes de jugarlo; se saltan manteniendo pulsado.
 - **Tienda:** ampliar el catálogo de potenciadores y compañeros.
-- Queda por asignar en qué fase se modelan Armitage y West (GDD, sección 13).
+- Armitage y West, modelados en esta fase (hito 5.5).
+
+Hecha el 08-10-2026: 5.1 ficha del proyecto, 5.2 intro, 5.3 relatos de los 15 niveles, 5.4 tienda ampliada (cuatro potenciadores, sexta funda y sexto bolsillo) y 5.5 Armitage y West.
 
 ## Fase 6: Parte 2 completa (*La sombra sobre Innsmouth*)
 
