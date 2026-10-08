@@ -81,6 +81,15 @@ func setup(p_data: EnemyData, p_world: CombatWorld, p_obstacles: ObstacleMap) ->
 	name = String(data.id)
 	return self
 
+## Semitransparente y sin sombra (pesadillas): copia el material de cada malla con alfa.
+static func _make_ethereal(m: Node3D) -> void:
+	for mi: MeshInstance3D in m.get_meta("meshes"):
+		var mat := (mi.material_override as StandardMaterial3D).duplicate() as StandardMaterial3D
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.albedo_color.a = 0.7
+		mi.material_override = mat
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
 ## Cambia de forma (shoggoth mimético): otro modelo y otra escala, con un destello.
 func swap_model(new_model: String, new_scale: float = 1.0) -> void:
 	if model != null: model.queue_free()
@@ -102,6 +111,7 @@ func _ready() -> void:
 	model_scale = data.model_scale
 	model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
 	visual.add_child(model)
+	if data.ethereal: _make_ethereal(model)
 	runner = PatternRunner.new().setup(world)
 	runner.position.y = 0.6
 	add_child(runner)
@@ -198,7 +208,7 @@ func is_injected() -> bool:
 ## Velocidad actual (con el ralentizado aplicado): para los tests.
 ## ¿Vadea agua somera? Los marinos (Profundos) no: nadan.
 func wades() -> bool:
-	if obstacles == null or data.swims: return false
+	if obstacles == null or data.swims or data.ethereal: return false
 	return obstacles.water_at(Vector2(position.x, position.z)) > 0.5
 
 func speed_mult() -> float:
@@ -351,7 +361,10 @@ func _physics_process(delta: float) -> void:
 	_knock = _knock.lerp(Vector3.ZERO, 1.0 - exp(-8.0 * delta))
 	if not anchored:
 		var np := Vector2(position.x + move.x, position.z + move.z)
-		if obstacles != null: np = obstacles.push_out(np, data.body_radius)
+		if obstacles != null and data.ethereal:          # atraviesa el decorado, pero no sale de la arena
+			var b := obstacles.bounds.grow(-data.body_radius)
+			np = Vector2(clampf(np.x, b.position.x, b.end.x), clampf(np.y, b.position.y, b.end.y))
+		elif obstacles != null: np = obstacles.push_out(np, data.body_radius)
 		position = Vector3(np.x, position.y, np.y)
 	if velocity.length() > 0.1:
 		facing = facing.slerp(velocity.normalized(), 1.0 - exp(-10.0 * delta)).normalized()

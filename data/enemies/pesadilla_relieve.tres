@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/relieve_canto.tres" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/relieve_espiral.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/pesadilla.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"pesadilla_relieve"
+display_name = "La pesadilla del bajorrelieve"
+model = "pesadilla_relieve"
+model_scale = 1.8
+unique = true
+tier = 4
+spawn_weight = 1.0
+elite = true
+ethereal = true
+max_health = 760.0
+hit_radius = 0.8
+body_radius = 0.8
+move_speed = 1.9
+xp = 30.0
+money = 40
+contact_physical = 8.0
+contact_mental = 12.0
+aura_radius = 4.5
+aura_drain = 1.5
+movement = &"keep"
+params = {"keep": 6.5, "strafe": 0.5, "extra_pattern": ExtResource("3"), "extra_every": 7.0, "minion": ExtResource("4"), "minion_every": 10.0, "minion_count": 3, "minion_text": "Cthulhu fhtagn…"}
+attack = ExtResource("2")
+attack_cooldown = 4.0
+attack_range = 11.0
+attack_anim = "throw"

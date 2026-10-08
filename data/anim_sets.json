@@ -67,6 +67,8 @@
 		"dagon": "anim_dagon",
 		"cultista": "anim_humano",
 		"cultista_alert": "anim_humano",
-		"sacerdote_culto": "anim_humano"
+		"sacerdote_culto": "anim_humano",
+		"pesadilla": "anim_pesadilla",
+		"pesadilla_relieve": "anim_pesadilla"
 	}
 }
