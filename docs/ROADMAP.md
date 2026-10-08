@@ -22,7 +22,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 4 | Parte 1 completa | **Hecha** salvo tu partida (04-10-2026) | Ninguna (D-04 y D-19, resueltas) |
 | 5 | Arranque, relatos y ampliación de la tienda | Pendiente | Ninguna |
 | 6 | Parte 2 completa | **Plan aprobado** (06-10-2026) | Ninguna (D-13 y jefes colosales, resueltas) |
-| 7 | Parte 3 completa | **Plan aprobado** (08-10-2026) | Ninguna (Ángulos devoradores y Cthulhu, resueltos) |
+| 7 | Parte 3 completa | **Hecha** salvo tu partida (08-10-2026) | Ninguna (Ángulos devoradores y Cthulhu, resueltos) |
 | 8 | Pulido y distribución | Pendiente | D-01, D-12 |
 | 9 | Online | Pendiente | D-10 |
 | 10 | Guardado en la nube con GitHub | Pendiente | D-11 |
@@ -178,7 +178,7 @@ Cinco niveles, sus diez criaturas y Cthulhu. Decidido el 08-10-2026: los Ángulo
 | 7.4 | **Nivel 4, la tormenta en el Pacífico.** Cubierta del *Emma* en la tormenta (lluvia, rayos, olas que barren la cubierta). La cosa blanca polipoide y los Ángulos devoradores como peligro | Hecho, pendiente de revisión (08-10-2026) |
 | 7.5 | **Nivel 5, R'lyeh emergida.** Arquitectura imposible y la puerta colosal. Primigenios menores (minijefes) y emanaciones de la puerta (masas gelatinosas verdes) | Hecho, pendiente de revisión (08-10-2026) |
 | 7.6 | **Jefe: Cthulhu.** Asoma por la puerta, fases (zarpazos con aviso, tentáculos que barren, alas, llamada de criaturas); al caer se deshace en nube verde y se recompone una vez | Hecho, pendiente de revisión (08-10-2026) |
-| 7.7 | **Cierre:** la parte encadenada con bots, con y sin compras, la Biblioteca y tu partida | Pendiente |
+| 7.7 | **Cierre:** la parte encadenada con bots, con y sin compras, la Biblioteca y tu partida | Hecho salvo tu partida (08-10-2026) |
 
 ## Fase 8: Pulido y distribución
 

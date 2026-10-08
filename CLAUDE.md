@@ -428,7 +428,7 @@ Léela al empezar cada sesión:
     - **Rendimiento** con el tope de cada nivel (75 enemigos y 500 balas): 118-119 FPS de media en los cinco; el 1 % peor, 51 (nivel 1), 70, 60, 57 y 74.
     - **Biblioteca:** las criaturas y los cinco lugares de la parte 2 tienen texto y mapa.
     - **Falta tu partida** de la parte 2 para cerrarla.
-- **Fase 7 (parte 3, *La llamada de Cthulhu*): plan aprobado el 08-10-2026** (hitos 7.0 a 7.7 en `docs/ROADMAP.md`). Los Ángulos devoradores son un peligro del escenario (zonas que se abren con aviso, atraen y engullen; no se matan). Cthulhu se combate como Dagon (colosal, anclado, asomando por la puerta de R'lyeh) y al caer se deshace en nube verde y se recompone una vez.
+- **Fase 7 (parte 3, *La llamada de Cthulhu*): hecha salvo tu partida (08-10-2026)** (hitos 7.0 a 7.7 en `docs/ROADMAP.md`). Los Ángulos devoradores son un peligro del escenario (zonas que se abren con aviso, atraen y engullen; no se matan). Cthulhu se combate como Dagon (colosal, anclado, asomando por la puerta de R'lyeh) y al caer se deshace en nube verde y se recompone una vez.
   - **Hito 7.0 (base común): hecho, pendiente de tu revisión (08-10-2026).**
     - **El culto** (`tools/gen_culto_cthulhu.py`, estilo 4, `anim_humano`):
       - `cultista`: túnica casi negra con la capucha puesta, máscara de hueso con borde oscuro y tentáculos verdinegros que caen sobre el pecho, amuleto del ídolo y una antorcha encendida en la mano derecha (llama `glow`, sin luz real: con muchos cultistas costaría demasiado). Datos en `data/enemies/cultista.tres` (persigue; `humana`) y texto en la Biblioteca.
@@ -496,7 +496,21 @@ Léela al empezar cada sesión:
     - **Combate:** `DagonBehavior` (del 6.6) con sus propios patrones (`cthulhu_llamada`, `cthulhu_espiral`, `cthulhu_anillo`) y emanaciones que salen como esbirros. Asoma por tres puntos delante de la puerta (`boss_spots` en `rlyeh.json`, a ~13 m del centro: a 22 m quedaba fuera del alcance de las armas y se atascaba en la fase 3).
     - **Se recompone:** es el evento final del nivel 5 (sustituye a la horda del 7.5) y `final_next` es `cthulhu_recompuesto` (menos vida, golpes y zambullidas más seguidos); al salir, la nube verde (`param cloud`: estallidos de `WadeSplash.burst` con color, nuevo parámetro `tint`) y la cámara tiembla. El nivel se supera al matar la segunda forma.
     - **Equilibrio con bot (`circle`, nivel suelto):** en solitario llega a Cthulhu pero no lo vence; en cooperativo con 3 bots, 3 de 5 (uno de los combates se alargó a 1.125 s). Vida 2.600 + 1.500. Se ajusta en el 7.7.
-    - **Probar:** `godot --path . -- level=p3_n5 final_at=5`. Capturas `shots/game_cth3_010.0s.png` y `shots/cthulhu_30_cth1.png`. Capturas `shots/game_p35_045.0s.png` (la horda) y `shots/rly_puerta-rly_monolito-rly_escalera-rly_bloque_30_rlp1.png`. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
+    - **Probar:** `godot --path . -- level=p3_n5 final_at=5`. Capturas `shots/game_cth3_010.0s.png` y `shots/cthulhu_30_cth1.png`.
+  - **Hito 7.7 (cierre de la parte 3): hecho, falta tu partida (08-10-2026).**
+    - **Medido encadenado** (`level=p3_n1 ... autonext=true autorestart=1 chain=true`, como el 6.7), sin compras, con `shop=3` (lo esperable tras dos partes) y en cooperativo con 3 bots.
+    - **Ajustes:** el nivel 1 era un muro (3 de 20 en solitario) y los niveles 2 a 4 salían al 100 % llegando con el progreso. `health_mult` 1,0 / 1,25 / 1,25 / 1,25 / 1,15 (antes 1,1 / 1,12 / 1,08 / 1,1 / 1,15) y el nivel 1 con algo menos de ritmo.
+    - **Resultado** (bot `circle`, que no esquiva; superados / intentos):
+
+      | | N1 | N2 | N3 | N4 | N5 (Cthulhu) |
+      |---|---|---|---|---|---|
+      | Solitario, sin compras | 5/27 | 2/5 | 1/2 | 1/1 | 0/1 |
+      | Solitario, `shop=3` | 6/14 | 5/6 | 4/5 | 3/3 | 0/3 (1/3 en la primera ronda) |
+      | Cooperativo, 3 bots | 7/9 | 6/7 | 5/6 | 4/4 | 2/4 |
+
+    - **Rendimiento** con 75 enemigos y 500 balas: 117-119 FPS de media en los cinco; el 1 % peor, 118, 60, 60, 68 y 114.
+    - **Biblioteca:** todas las criaturas y los cinco lugares de la parte 3 tienen texto y mapa (lo comprueba `test_content`).
+    - **Falta tu partida** de la parte 3 para cerrarla. Capturas `shots/game_p35_045.0s.png` (la horda) y `shots/rly_puerta-rly_monolito-rly_escalera-rly_bloque_30_rlp1.png`. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).
