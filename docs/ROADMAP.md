@@ -192,7 +192,7 @@ Audio, equilibrado, accesibilidad, rendimiento final y distribución. Decidido e
 | 8.2 | **Música por nivel:** una pista por parte (o por nivel) y la del jefe, con fundidos (a falta de pistas, CC0 o las tuyas) | Hecho con pistas CC0 provisionales (08-10-2026) |
 | 8.3 | **Accesibilidad:** tamaño del texto, balas para daltónicos (formas además de colores), reducir destellos, temblor de cámara y distorsiones | Hecho, pendiente de revisión (08-10-2026) |
 | 8.4 | **Equilibrio final** con tus partidas de las tres partes como referencia | Pendiente (necesita tus partidas) |
-| 8.5 | **Exportación y página de itch.io:** builds de Windows y macOS, subida con butler, capturas, texto y portada de la página | Pendiente |
+| 8.5 | **Exportación y página de itch.io:** builds de Windows y macOS, subida con butler, capturas, texto y portada de la página | Builds y página listas (08-10-2026); falta subir (tu cuenta de itch.io) |
 
 ## Fase 9: Online
 

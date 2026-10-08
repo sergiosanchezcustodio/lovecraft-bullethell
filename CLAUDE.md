@@ -447,6 +447,11 @@ Léela al empezar cada sesión:
     - **Temblor de la cámara** (`shake`, de 0 a 100 %): multiplica `GameCamera.shake`.
     - Las distorsiones de cordura baja ya se regulaban.
     - Para probar un ajuste sin guardarlo: `cfg_<clave>=valor` al lanzar (p. ej. `cfg_bullet_palette=1`, `cfg_ui_scale=3`; `Settings._overrides`).
+  - **Hito 8.5 (exportación e itch.io): builds y página listas; falta subirlo (necesita tu cuenta).**
+    - `sh tools/exportar.sh`: comprime los modelos (`tools/empaquetar_modelos.gd`: `models/*.json` → `models/*.json.z`, formato comprimido de Godot con ZSTD, de 278 a 46 MB; los `.json.z` no van a git) y exporta Windows (`builds/windows/LovecraftLibrary.exe`, 248 MB; antes 494) y macOS (`builds/macos/LovecraftLibrary.zip`, 197 MB). La build no lleva los JSON de modelos, `tools/` ni `docs/` (`exclude_filter`). `VoxelBuilder.read_text` lee el `.json` o, si no está, el `.json.z`.
+    - **Arreglado:** la fuente de los títulos (`IMFeENsc28P.ttf`) no se cargaba en las builds (se leía como archivo suelto con `load_dynamic_font`); ahora se carga como recurso importado (`MenuKit.font`, portada).
+    - Probado el `.exe`: arranca, carga los modelos comprimidos, la música y los sonidos.
+    - Página: `docs/itchio/pagina.md` (título, URL, etiquetas, descripción, créditos, requisitos y pasos con butler), `portada_630x500.png`, `cabecera_1920x1080.png` y siete capturas en `docs/itchio/capturas/`.
 - **Fase 7 (parte 3, *La llamada de Cthulhu*): hecha salvo tu partida (08-10-2026)** (hitos 7.0 a 7.7 en `docs/ROADMAP.md`). Los Ángulos devoradores son un peligro del escenario (zonas que se abren con aviso, atraen y engullen; no se matan). Cthulhu se combate como Dagon (colosal, anclado, asomando por la puerta de R'lyeh) y al caer se deshace en nube verde y se recompone una vez.
   - **Hito 7.0 (base común): hecho, pendiente de tu revisión (08-10-2026).**
     - **El culto** (`tools/gen_culto_cthulhu.py`, estilo 4, `anim_humano`):

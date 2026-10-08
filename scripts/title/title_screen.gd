@@ -246,9 +246,7 @@ func _build_front() -> void:
 	front.add_child(title)
 	prompt = Label.new()
 	prompt.text = cfg.prompt_text
-	var font := FontFile.new()
-	font.load_dynamic_font(FONT)
-	prompt.add_theme_font_override("font", font)
+	prompt.add_theme_font_override("font", load(FONT) as FontFile)   # recurso importado (en la build no va el .ttf suelto)
 	prompt.add_theme_font_size_override("font_size", 40)
 	prompt.add_theme_color_override("font_color", Color(0.93, 0.82, 0.58))
 	prompt.add_theme_color_override("font_outline_color", Color(0.02, 0.02, 0.04))

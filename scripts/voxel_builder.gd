@@ -94,7 +94,7 @@ static func load_model(path: String) -> Node3D:
 ## las mallas de cada parte de la prenda pasan a la parte igual del modelo, así que se animan
 ## con ella. Una prenda de cabeza oculta el sombrero del personaje (parte "hat").
 static func dress(root: Node3D, garment_path: String, hides_hat := false) -> bool:
-	if not ResourceLoader.exists(garment_path) and not FileAccess.file_exists(garment_path): return false
+	if not model_exists(garment_path): return false
 	var g := load_model(garment_path)
 	var nodes: Dictionary = root.get_meta("part_nodes")
 	var meshes: Array[MeshInstance3D] = root.get_meta("meshes")
@@ -131,7 +131,7 @@ static func _get_model(path: String) -> Dictionary:
 				"material": _material(c.roughness, c.specular)}
 			_cache[path] = m
 			return m
-	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var data: Dictionary = JSON.parse_string(read_text(path))
 	var all := {}            # ocupación global -> oclusión ambiental
 	var occ := {}            # ocupación por parte -> caras ocultas (solo dentro de la misma parte:
 	                         # al girar un brazo o una pierna no deben quedar huecos en la unión)
@@ -164,8 +164,27 @@ static func _get_model(path: String) -> Dictionary:
 	if use_disk_cache: _save_disk_cache(path, disk_path, model, rough, spec)
 	return model
 
+## Los modelos van en JSON (models/*.json) o, en las builds exportadas, comprimidos con el
+## formato de Godot y ZSTD (models/*.json.z, de tools/empaquetar_modelos.gd: los JSON ocupan
+## ~280 MB). Se piden siempre por su ruta .json; si no está, se lee el .json.z.
+static func source_file(path: String) -> String:
+	if FileAccess.file_exists(path): return path
+	if FileAccess.file_exists(path + ".z"): return path + ".z"
+	return path
+
+static func model_exists(path: String) -> bool:
+	return FileAccess.file_exists(path) or FileAccess.file_exists(path + ".z")
+
+static func read_text(path: String) -> String:
+	var src := source_file(path)
+	if src.ends_with(".z"):
+		var f := FileAccess.open_compressed(src, FileAccess.READ, FileAccess.COMPRESSION_ZSTD)
+		return f.get_as_text() if f != null else ""
+	return FileAccess.get_file_as_string(src)
+
 ## Ruta en la caché de disco: cambia si cambia el JSON (fecha y tamaño) o el constructor.
 static func _disk_cache_path(path: String) -> String:
+	path = source_file(path)
 	var f := FileAccess.open(path, FileAccess.READ)
 	var size := f.get_length() if f != null else 0
 	return "%s/%s_%d_%d_v%d.res" % [DISK_CACHE_DIR, path.get_file().get_basename(),

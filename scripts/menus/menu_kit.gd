@@ -12,8 +12,7 @@ static var _font: FontFile
 
 static func font() -> FontFile:
 	if _font == null:
-		_font = FontFile.new()
-		_font.load_dynamic_font(FONT_PATH)
+		_font = load(FONT_PATH) as FontFile         # como recurso importado: el .ttf suelto no va en la build
 	return _font
 
 ## Título con la fuente de la portada.
