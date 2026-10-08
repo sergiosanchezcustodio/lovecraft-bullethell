@@ -23,7 +23,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 5 | Arranque, relatos y ampliación de la tienda | **Hecha** salvo tu revisión (08-10-2026) | Ninguna |
 | 6 | Parte 2 completa | **Plan aprobado** (06-10-2026) | Ninguna (D-13 y jefes colosales, resueltas) |
 | 7 | Parte 3 completa | **Hecha** salvo tu partida (08-10-2026) | Ninguna (Ángulos devoradores y Cthulhu, resueltos) |
-| 8 | Pulido y distribución | Pendiente | D-01, D-12 |
+| 8 | Pulido y distribución | **Plan aprobado** (08-10-2026) | Ninguna (D-01 y D-12, resueltas) |
 | 9 | Online | Pendiente | D-10 |
 | 10 | Guardado en la nube con GitHub | Pendiente | D-11 |
 
@@ -184,7 +184,15 @@ Cinco niveles, sus diez criaturas y Cthulhu. Decidido el 08-10-2026: los Ángulo
 
 ## Fase 8: Pulido y distribución
 
-Audio, equilibrado, accesibilidad, rendimiento final y distribución.
+Audio, equilibrado, accesibilidad, rendimiento final y distribución. Decidido el 08-10-2026: publicar primero en **itch.io** (D-12) y efectos de sonido de **bancos libres CC0**.
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 8.1 | **Sistema de sonido y efectos:** gestor de efectos con buses, variaciones de tono y límite de voces; efectos CC0 de disparos, impactos, golpes, esquive, recoger gemas, subida de nivel, menús, criaturas por familia y jefes; citados en la ficha | Pendiente |
+| 8.2 | **Música por nivel:** una pista por parte (o por nivel) y la del jefe, con fundidos (a falta de pistas, CC0 o las tuyas) | Pendiente |
+| 8.3 | **Accesibilidad:** tamaño del texto, balas para daltónicos (formas además de colores), reducir destellos, temblor de cámara y distorsiones | Pendiente |
+| 8.4 | **Equilibrio final** con tus partidas de las tres partes como referencia | Pendiente (necesita tus partidas) |
+| 8.5 | **Exportación y página de itch.io:** builds de Windows y macOS, subida con butler, capturas, texto y portada de la página | Pendiente |
 
 ## Fase 9: Online
 
