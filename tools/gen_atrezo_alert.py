@@ -145,7 +145,43 @@ def bote():
     return M, {P: [0, 0, 0]}
 
 
-PIECES = {'casco': casco, 'bolardo': bolardo, 'grua': grua, 'fardos': fardos, 'rollo': rollo,
+def borda():
+    """Tramo de borda de la cubierta del Emma (4 m): regala baja de tablas y pasamanos, con
+    imbornales por donde escapa el agua. Baja (1 m) porque va del lado de la cámara (32/m)."""
+    M = Model(S=2, seed=108)
+    for x in range(-64, 64):
+        for y in range(0, 30):
+            for z in (-1, 0):
+                if y < 4 and (x + 64) % 24 < 4: continue          # imbornal
+                M.put(x, y, z, P, RAIL if y >= 28 else (HULL if y < 26 else HULL_L))
+        if x % 20 == 0:
+            for y in range(0, 32): M.put(x, y, 1, P, RAIL)
+    return M, {P: [0, 0, 0]}
+
+
+def puente():
+    """El puente y la superestructura del Emma (16/m, pieza de borde): caseta blanca con las
+    ventanas del puente encendidas, chimenea y palo con jarcia."""
+    M = Model(S=1, seed=109)
+    for x in range(-48, 48):
+        for y in range(0, 44):
+            for z in range(-24, 0):
+                if min(x + 48, 47 - x, z + 24, -1 - z) > 1 and y < 43: continue
+                c = WHITE
+                if 28 < y < 38 and (x % 10) < 6 and z == -1: c = LIGHT
+                M.put(x, y, z, P, c, glow=1 if c == LIGHT else 0)
+    for y in range(44, 80):
+        for x in range(-12, 4):
+            for z in range(-16, -6):
+                if min(x + 12, 3 - x, z + 16, -7 - z) > 1: continue
+                M.put(x, y, z, P, HULL if y > 72 else RED)
+    for y in range(44, 160):
+        for x in (30, 31):
+            for z in (-12, -11): M.put(x, y, z, P, WOOD)
+    return M, {P: [0, 0, 0]}
+
+
+PIECES = {'borda': borda, 'puente': puente, 'casco': casco, 'bolardo': bolardo, 'grua': grua, 'fardos': fardos, 'rollo': rollo,
           'linterna': linterna, 'bote': bote}
 
 if __name__ == '__main__':

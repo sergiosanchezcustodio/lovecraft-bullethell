@@ -73,6 +73,7 @@ var _ring_mat: StandardMaterial3D
 var _frozen_mat: StandardMaterial3D
 var _frozen_on := false
 var _xray: ShaderMaterial
+var push := Vector3.ZERO         ## velocidad externa de este paso (peligros: Ángulos que atraen, olas); se consume
 var _wade := 0.0                 ## 0..1: cuánto está metido en el agua somera (pantano)
 var _splash: GPUParticles3D      ## salpicaduras al vadear
 var _ground_lift := 0.0          ## cuánto se sube el modelo para no hundirse en el suelo
@@ -173,6 +174,8 @@ func _physics_process_step(delta: float) -> void:
 	var dodge := input.just_pressed(InputBindings.DODGE) and not (ss.is_kind(&"huida") or ss.is_kind(&"vagar"))
 	velocity = motor.step(delta, move, dodge)
 	if in_water() and not motor.is_dodging(): velocity *= WadeSplash.SLOW   # agua somera: frena
+	velocity += push
+	push = Vector3.ZERO
 	if ss.is_kind(&"huida"): velocity *= rules.flee_speed
 	elif ss.is_kind(&"vagar"): velocity *= rules.wander_speed
 	move_and_slide()

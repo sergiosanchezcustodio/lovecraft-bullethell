@@ -258,6 +258,8 @@ func _ready() -> void:
 				Achievements.add(Saves.current, "chests"))
 			announce("Ha aparecido un baúl arcano", 1.5))
 		add_child(director)
+		if level.angle_every > 0.0 or level.wave_every > 0.0:      # peligros del escenario (hito 7.4)
+			add_child(Hazards.new().setup(level, world, arena.get_meta("obstacles")))
 		announce(level.display_name, 3.0)
 		Music.play(level.music_path())
 	_start_weather()

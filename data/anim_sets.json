@@ -71,6 +71,8 @@
 		"pesadilla": "anim_pesadilla",
 		"pesadilla_relieve": "anim_pesadilla",
 		"diablo": "anim_diablo",
-		"engendro": "anim_profundo"
+		"engendro": "anim_profundo",
+		"polipo": "anim_fragmento",
+		"polipo_madre": "anim_fragmento"
 	}
 }

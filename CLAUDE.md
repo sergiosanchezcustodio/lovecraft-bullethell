@@ -466,7 +466,20 @@ Léela al empezar cada sesión:
     - **Nivel `data/levels/p3_n3.tres`:** Profundos, escupidores, cultistas y cultistas del *Alert*; `health_mult` 1,08, ritmo del nivel 1 de la parte 1. Los dos tiradores van con peso 0,3 en este nivel (`profundo_lanzador_muelle`, `cultista_alert_muelle`): con tres tipos de tirador más el engendro, el bot (que no esquiva) no lo superaba ninguna vez de 13.
     - **Equilibrio con bot (`circle`, nivel suelto):** en solitario 3 de 13; en cooperativo con 3 bots 8 de 9.
     - **Rendimiento** con 75 enemigos y 500 balas: 118 FPS de media y 60 en el 1 % peor.
-    - **Probar:** `godot --path . -- level=p3_n3` (o `mid_at=6 final_at=30`). Capturas `shots/game_mue1_003.0s.png`, `shots/game_p33_012.0s.png` y `shots/engendro-profundo_30_eng2.png`. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
+    - **Probar:** `godot --path . -- level=p3_n3` (o `mid_at=6 final_at=30`). Capturas `shots/game_mue1_003.0s.png`, `shots/game_p33_012.0s.png` y `shots/engendro-profundo_30_eng2.png`.
+  - **Hito 7.4 (nivel 4 de la parte 3, la tormenta en el Pacífico): hecho, pendiente de tu revisión (08-10-2026).**
+    - **Peligros del escenario** (sistema nuevo, `Hazards`, `scripts/level/hazards.gd`; datos en `LevelData`, grupo "Peligros del escenario"; la partida lo crea si el nivel tiene alguno):
+      - **Ángulos devoradores** (`angle_every`, `angle_radius`, `angle_warn`, `angle_time`, `angle_pull`, `angle_damage`): cada ~11 s se abre cerca de un jugador en pie, con aviso verde, una grieta de esquirlas negras y verdes en ángulos que no cuadran; atrae hacia su centro y engulle (vida y cordura por segundo) a quien queda dentro. No se matan; se cierran solos. Con `log=true`, "ANGULOS abiertos".
+      - **Olas que barren la cubierta** (`wave_every`, `wave_width`, `wave_warn`, `wave_damage`, `wave_push`): franja azul de lado a lado que parpadea; al romper, daña y empuja medio segundo hacia el sur.
+      - `Player.push`: velocidad externa de un paso (la suman los peligros; se consume en `_physics_process`).
+      - Tests en `tests/test_hazards.gd`.
+    - **La cosa blanca polipoide** (`tools/gen_polipo.py`, 32/m, partes del fragmento: `anim_fragmento`): racimo de bulbos blancos azulados translúcidos con alguna vena rosada, bocas redondas de pólipo con anillo de tentáculos y una pizca de luz, tentáculos largos y una corona arriba. Se arrastra a tirones (`crawl`) y suelta esporas. **La cosa blanca del lago oculto** (`polipo_madre`, a 2,4×) es el evento final: anillo con huecos, espiral de esporas, se divide en polipoides y aura.
+    - **Atrezo nuevo** en `tools/gen_atrezo_alert.py`: `alr_borda` (borda baja con imbornales, del lado de la cámara) y `alr_puente` (superestructura del Emma con el puente encendido, chimenea y palo, 16/m).
+    - **Arena** (`tools/gen_arena_tormenta.py` → `data/arenas/tormenta.json`, 56 x 40 m, mapa en `resources/maps/p3_n4.png`): cubierta de la goleta *Emma* muy mojada, el puente al norte, la borda al sur y al este, el mar embravecido más allá; faroles, botes, bolardos, cabos, fardos y barriles. Clima `tormenta`.
+    - **Nivel `data/levels/p3_n4.tres`:** polipoides, Profundos, cultistas del *Alert* y diablos; `health_mult` 1,1; Ángulos cada 11 s y olas cada 16 s.
+    - **Equilibrio con bot (`circle`, nivel suelto):** en solitario 4 de 10; en cooperativo con 3 bots 9 de 9 (también con el escalado de aparición normal). Se revisa en el 7.7.
+    - **Rendimiento** con 75 enemigos y 500 balas: 119 FPS de media y 114 en el 1 % peor.
+    - **Probar:** `godot --path . -- level=p3_n4` (o `final_at=15`). Capturas `shots/game_p34_008.2s.png` (un Ángulo abierto) y `shots/game_p34_013.0s.png` (una ola). Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

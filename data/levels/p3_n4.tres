@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/polipo.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/profundo.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/cultista_alert_muelle.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/diablo.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/polipo_madre.tres" id="7"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+[ext_resource type="Resource" path="res://data/weather/tormenta.tres" id="weather"]
+
+[resource]
+script = ExtResource("1")
+weather = ExtResource("weather")
+id = &"p3_n4"
+display_name = "La tormenta en el Pacífico"
+part = 3
+number = 4
+arena = "res://data/arenas/tormenta.json"
+health_mult = 1.1
+duration = 300.0
+music = ""
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("6")])
+spawn_rate = Array[Vector2]([Vector2(0, 0.3), Vector2(45, 0.5), Vector2(90, 0.8), Vector2(150, 1.3), Vector2(210, 1.8), Vector2(300, 2.3)])
+max_alive = 70
+elite_cap = 1
+angle_every = 11.0
+angle_radius = 1.8
+angle_time = 5.0
+angle_pull = 2.2
+angle_damage = 18.0
+wave_every = 16.0
+wave_width = 4.0
+wave_damage = 8.0
+wave_push = 9.0
+final_time = 240.0
+final_enemy = ExtResource("7")
+final_wave = 12
+final_spawn_scale = 0.3
+final_text = "Del agua que barre la cubierta sube una masa blanca, enorme, que no deja de crecer…"

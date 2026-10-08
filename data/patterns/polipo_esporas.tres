@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"polipo_esporas"
+shape = 0
+count = 8
+speed = 2.8
+radius = 0.13
+size = 0.2
+damage_physical = 4.0
+damage_mental = 3.0
+lifetime = 5.0
+bursts = 1
+aimed = false

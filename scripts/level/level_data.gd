@@ -46,6 +46,20 @@ func is_survival() -> bool:
 ## se supera al matarlo a él.
 @export var final_next: EnemyData
 @export var final_next_text := ""
+@export_group("Peligros del escenario")
+## Ángulos devoradores (hito 7.4; Hazards): 0 en angle_every, sin ellos.
+@export var angle_every := 0.0
+@export var angle_radius := 1.8
+@export var angle_warn := 1.2
+@export var angle_time := 5.0
+@export var angle_pull := 2.2
+@export var angle_damage := 18.0
+## Olas que barren la cubierta (hito 7.4): 0 en wave_every, sin ellas.
+@export var wave_every := 0.0
+@export var wave_width := 4.0
+@export var wave_warn := 1.4
+@export var wave_damage := 8.0
+@export var wave_push := 9.0
 @export_group("Eventos intermedios")
 ## Minijefes a mitad de nivel (hito 6.5): aparecen una vez, con aviso, y las oleadas siguen.
 ## Listas paralelas: el enemigo, el segundo y el texto del aviso.
