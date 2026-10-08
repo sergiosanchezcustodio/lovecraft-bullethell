@@ -60,6 +60,7 @@ func _spawn_minions(e: Enemy) -> void:
 		game.director.spawn(d, e.global_position + Vector3(cos(a), 0, sin(a)) * 2.5)
 
 func _announce(e: Enemy) -> void:
+	Sfx.play("roar")
 	var l := Label3D.new()
 	l.text = "¡TEKELI-LI!"
 	l.font_size = 110

@@ -71,6 +71,7 @@ func _summon(e: Enemy) -> void:
 		if d.emerge and game.director._emerge(d): continue      # los que salen del agua, de las pozas
 		var a := randf() * TAU
 		game.director.spawn(d, e.global_position + Vector3(cos(a), 0, sin(a)) * 2.5)
+	Sfx.play("chant")
 	var l := Label3D.new()
 	l.text = String(e.data.param("minion_text", "¡Ïa! ¡Dagon!"))
 	l.font_size = 90
@@ -188,6 +189,7 @@ func _slam_at(e: Enemy, target: Player) -> void:
 		tg.finished.connect(func() -> void:
 			var e2 := instance_from_id(eid) as Enemy
 			if e2 == null or not e2.is_alive(): return
+			Sfx.play("slam")
 			WadeSplash.burst(e2.world.fx, at, r * 0.8)
 			for p in e2.world.players:
 				if p.health > 0.0 and Vector2(p.global_position.x - at.x, p.global_position.z - at.z).length() < r + p.data.hurt_radius:

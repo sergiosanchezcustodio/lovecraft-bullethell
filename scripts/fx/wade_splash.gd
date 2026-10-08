@@ -48,6 +48,7 @@ static func make() -> GPUParticles3D:
 
 ## Estallido de agua donde algo sale o se zambulle: un aro de gotas que se borra solo.
 static func burst(parent: Node, pos: Vector3, size := 1.0, tint := Color(0, 0, 0, 0)) -> void:
+	Sfx.play("splash" if tint.a <= 0.0 else "roar")
 	var p := make()
 	if tint.a > 0.0:                                          # otro color (la nube verde de Cthulhu)
 		var g := Gradient.new()

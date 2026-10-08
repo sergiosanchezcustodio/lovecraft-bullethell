@@ -188,7 +188,7 @@ Audio, equilibrado, accesibilidad, rendimiento final y distribución. Decidido e
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 8.1 | **Sistema de sonido y efectos:** gestor de efectos con buses, variaciones de tono y límite de voces; efectos CC0 de disparos, impactos, golpes, esquive, recoger gemas, subida de nivel, menús, criaturas por familia y jefes; citados en la ficha | Pendiente |
+| 8.1 | **Sistema de sonido y efectos:** gestor de efectos con buses, variaciones de tono y límite de voces; efectos CC0 de disparos, impactos, golpes, esquive, recoger gemas, subida de nivel, menús, criaturas por familia y jefes; citados en la ficha | Hecho, pendiente de que lo escuches (08-10-2026) |
 | 8.2 | **Música por nivel:** una pista por parte (o por nivel) y la del jefe, con fundidos (a falta de pistas, CC0 o las tuyas) | Pendiente |
 | 8.3 | **Accesibilidad:** tamaño del texto, balas para daltónicos (formas además de colores), reducir destellos, temblor de cámara y distorsiones | Pendiente |
 | 8.4 | **Equilibrio final** con tus partidas de las tres partes como referencia | Pendiente (necesita tus partidas) |

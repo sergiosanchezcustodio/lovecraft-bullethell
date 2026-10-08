@@ -89,8 +89,25 @@ func _physics_process_step(delta: float) -> void:
 		if w.timer > 0.0: continue
 		Damage.ctx = tag_of(w)                   # lo que cree este disparo daña en nombre de esta arma
 		if not _fire(w): continue                # el machete espera a tener a alguien cerca
+		Sfx.play(sound_of(w.data))
 		w.timer = w.stat("cooldown")
 		if w.data.category == WeaponData.Category.MAGIC: w.timer *= player.data.arcane_cooldown_mult   # rasgo de Armitage
+
+## Sonido al disparar (hito 8.1): el del arma o, si no tiene, según su categoría y entrega.
+static func sound_of(d: WeaponData) -> String:
+	if d.sfx != "": return d.sfx
+	match d.delivery:
+		WeaponData.Delivery.THROWN: return ""                    # suena al explotar
+		WeaponData.Delivery.FLAME: return "fire"
+		WeaponData.Delivery.BEAM, WeaponData.Delivery.TETHER: return "beam"
+		WeaponData.Delivery.MELEE, WeaponData.Delivery.STAB: return "swing"
+	if d.category == WeaponData.Category.MAGIC: return "magic"
+	if d.category == WeaponData.Category.PHYSICAL: return "swing"
+	match d.bullet_look:
+		"pellet": return "shot_shotgun"
+		"rifle", "harpoon": return "shot_rifle"
+		"smg": return "shot_smg"
+	return "shot_revolver"
 
 ## Elige objetivo según el arma y dispara. Sin nadie a tiro, dispara igualmente hacia
 ## donde mira el personaje: el jugador siempre está disparando.

@@ -51,6 +51,7 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 ## "rifle" (estela larga), "smg" (trazadora corta), "blade" (hoja que gira), "spark" (chispa
 ## de colores), "harpoon" (arpón), "dart" (dardo). Las teledirigidas y las de Yith, las suyas.
 @export var bullet_look := ""
+@export var sfx := ""                         ## sonido al disparar (data/sfx.json); vacío: según categoría y entrega (hito 8.1)
 @export var support := false                ## de puro apoyo (bengala, red...): fuera de las reglas de daño (DamageRules)
 @export var icon: Texture2D                  ## imagen del arma (ficha, HUD); sin ella, un hueco
 @export var delivery := Delivery.BULLET

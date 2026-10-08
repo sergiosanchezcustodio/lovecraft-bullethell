@@ -140,6 +140,7 @@ func _slam(e: Enemy, target: Player) -> void:
 		tg.finished.connect(func() -> void:
 			var e2 := instance_from_id(eid) as Enemy
 			if e2 == null or not e2.is_alive(): return
+			Sfx.play("slam")
 			WadeSplash.burst(e2.world.fx, s, r * 0.9)
 			_shake(e2, 0.25)
 			for q in e2.world.players:
@@ -164,6 +165,7 @@ func _summon(e: Enemy) -> void:
 
 # --- rugido al cambiar de fase ---
 func _roar(e: Enemy) -> void:
+	Sfx.play("roar")
 	_play(e, "roar")
 	e.shield_t = float(e.data.param("roar_shield", 1.5))
 	_shake(e, 0.6)

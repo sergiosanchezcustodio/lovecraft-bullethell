@@ -16,6 +16,7 @@ var _scorch_mat: ShaderMaterial
 const LIFE := 4.0
 
 func _ready() -> void:
+	Sfx.play("explosion")
 	Damage.ctx = _wtag
 	_light = OmniLight3D.new()
 	_light.light_color = Color(1.0, 0.65, 0.3)

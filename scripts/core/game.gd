@@ -238,11 +238,14 @@ func _ready() -> void:
 		for eid in args.get_str("enemies").split(",", false):    # enemies=profundo: solo esos (probar uno nuevo)
 			director.pool_override.append(load("res://data/enemies/%s.tres" % eid))
 		director.players = players.size()           # la dificultad crece con los jugadores
-		director.final_event.connect(func(_e: Enemy) -> void: announce(level.final_text, 3.5))
+		director.final_event.connect(func(e: Enemy) -> void:
+			Sfx.play("roar" if e != null and e.data.unique else "growl")
+			announce(level.final_text, 3.5))
 		director.boss_event.connect(func(e: Enemy, text: String) -> void:
 			announce(text, 4.0)
 			if args.get_bool("log"): print("JEFE %s t=%.0f" % [e.data.id, director.time]))
 		director.mid_event.connect(func(e: Enemy, text: String) -> void:
+			Sfx.play("growl")
 			announce(text, 3.5)
 			if args.get_bool("log"): print("MINIJEFE %s t=%.0f" % [e.data.id, director.time]))
 		director.level_completed.connect(_on_level_completed)
@@ -252,6 +255,7 @@ func _ready() -> void:
 			for k in 5: world.fx.add_child.call_deferred(Pickup.new().setup(world, player.position + Vector3(-4 + k * 2, 0, 3), k as Pickup.Kind))
 		director.chest_spawned.connect(func(c: ArcaneChest) -> void:
 			c.opened.connect(func(_c: ArcaneChest, by: Player) -> void:
+				Sfx.play("chest")
 				earn(c.money)
 				_try_evolve(by)
 				if args.get_bool("log"): print("BAUL abierto por J%d" % (by.index + 1))
@@ -323,6 +327,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 		q.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
 	q.progress.leveled_up.connect(func(l: int) -> void: Achievements.record(Saves.current, "best_level", l))
 	q.progress.leveled_up.connect(func(_l: int) -> void:
+		Sfx.play("level_up")
 		q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
 		if q.data.team_heal_on_level > 0.0:                   # rasgo de West: cura a los compañeros cercanos
 			for o in players:

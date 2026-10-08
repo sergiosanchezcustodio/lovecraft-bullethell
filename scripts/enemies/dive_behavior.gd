@@ -56,6 +56,7 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 		mark.position = _to
 		e.world.fx.add_child(mark)
 		_cd = float(e.data.param("dive_cooldown", 4.0))
+		Sfx.play("screech")
 		_enter(State.AIM)
 		return Vector3.ZERO
 	var orbit := float(e.data.param("orbit", 5.0))

@@ -185,6 +185,7 @@ func _physics_process_step(delta: float) -> void:
 		position.x = p2.x; position.z = p2.y
 	if leash.is_valid(): global_position = leash.call(global_position)
 	if motor.is_dodging() and not was_dodging:
+		Sfx.play("dodge")
 		_action = data.dodge_anim         # la animación del esquive empieza con el impulso
 		_action_t = 0.0
 		dodged.emit()
@@ -560,6 +561,7 @@ func take_damage(d: Damage) -> void:
 		r.knockback = d.knockback; r.source = d.source; r.bonus = d.bonus
 		d = r
 	health = maxf(0.0, health - d.physical)
+	Sfx.play("hit_player" if d.physical > 0.0 else "chant")
 	if d.mental > 0.0:
 		sanity = maxf(0.0, sanity - d.mental * mental_resist)
 		sanity_state.on_mental_damage()
@@ -570,6 +572,7 @@ func take_damage(d: Damage) -> void:
 		if revivable:
 			down_left = rules.down_time
 			revive_progress = 0.0
+		Sfx.play("down")
 		downed.emit()
 
 ## Reproduce una animación puntual (p. ej. "throw") por encima de andar o estar quieto.

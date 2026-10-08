@@ -50,6 +50,7 @@ func _process(delta: float) -> void:
 		for mi: MeshInstance3D in _model.get_meta("meshes"): mi.material_overlay = _mat if _flash > 0.0 else null
 
 func _break() -> void:
+	Sfx.play("glass")
 	world.remove_breakable(self)
 	var fx := DeathBurst.new()
 	fx.setup("atrezo_caja", 0.4)

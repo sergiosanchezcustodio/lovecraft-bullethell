@@ -62,6 +62,7 @@ func _physics_process(_delta: float) -> void:
 		var off := p.global_position - global_position
 		off.y = 0.0
 		if off.length() < 0.9:
+			Sfx.play("pickup")
 			_give(p)
 			queue_free()
 			return

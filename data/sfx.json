@@ -1,0 +1,404 @@
+{
+	"_comentario": "Efectos de sonido (hito 8.1): evento -> archivos de resources/sfx (al azar), volumen en dB, tono al azar [min, max], voces a la vez y separación mínima en s. Sintetizados (tools/gen_sfx.py) y CC0 de Kenney (kenney.nl).",
+	"eventos": {
+		"shot_revolver": {
+			"db": -10,
+			"pitch": [
+				0.92,
+				1.08
+			],
+			"voices": 3,
+			"gap": 0.05,
+			"files": [
+				"shot_revolver.wav"
+			]
+		},
+		"shot_rifle": {
+			"db": -9,
+			"pitch": [
+				0.95,
+				1.05
+			],
+			"voices": 2,
+			"gap": 0.08,
+			"files": [
+				"shot_rifle.wav"
+			]
+		},
+		"shot_shotgun": {
+			"db": -8,
+			"pitch": [
+				0.95,
+				1.05
+			],
+			"voices": 2,
+			"gap": 0.1,
+			"files": [
+				"shot_shotgun.wav"
+			]
+		},
+		"shot_smg": {
+			"db": -13,
+			"pitch": [
+				0.9,
+				1.1
+			],
+			"voices": 3,
+			"gap": 0.04,
+			"files": [
+				"shot_smg.wav"
+			]
+		},
+		"swing": {
+			"db": -10,
+			"pitch": [
+				0.85,
+				1.15
+			],
+			"voices": 2,
+			"gap": 0.08,
+			"files": [
+				"swing.wav"
+			]
+		},
+		"magic": {
+			"db": -14,
+			"pitch": [
+				0.8,
+				1.1
+			],
+			"voices": 2,
+			"gap": 0.12,
+			"files": [
+				"magic_0.ogg",
+				"magic_1.ogg",
+				"magic_2.ogg"
+			]
+		},
+		"beam": {
+			"db": -16,
+			"pitch": [
+				0.8,
+				1.0
+			],
+			"voices": 1,
+			"gap": 0.3,
+			"files": [
+				"beam_0.ogg",
+				"beam_1.ogg"
+			]
+		},
+		"fire": {
+			"db": -15,
+			"pitch": [
+				0.9,
+				1.1
+			],
+			"voices": 1,
+			"gap": 0.25,
+			"files": [
+				"fire_0.ogg",
+				"fire_1.ogg"
+			]
+		},
+		"explosion": {
+			"db": -6,
+			"pitch": [
+				0.85,
+				1.05
+			],
+			"voices": 3,
+			"gap": 0.06,
+			"files": [
+				"explosion_0.ogg",
+				"explosion_1.ogg",
+				"explosion_2.ogg"
+			]
+		},
+		"hit": {
+			"db": -17,
+			"pitch": [
+				0.85,
+				1.15
+			],
+			"voices": 4,
+			"gap": 0.035,
+			"files": [
+				"hit_0.ogg",
+				"hit_1.ogg",
+				"hit_2.ogg",
+				"hit_player_0.ogg",
+				"hit_player_1.ogg",
+				"hit_player_2.ogg"
+			]
+		},
+		"die": {
+			"db": -14,
+			"pitch": [
+				0.8,
+				1.15
+			],
+			"voices": 3,
+			"gap": 0.05,
+			"files": [
+				"die_0.ogg",
+				"die_1.ogg",
+				"die_2.ogg",
+				"die_3.ogg"
+			]
+		},
+		"hit_player": {
+			"db": -6,
+			"pitch": [
+				0.9,
+				1.05
+			],
+			"voices": 1,
+			"gap": 0.2,
+			"files": [
+				"hit_player_0.ogg",
+				"hit_player_1.ogg",
+				"hit_player_2.ogg"
+			]
+		},
+		"down": {
+			"db": -4,
+			"pitch": [
+				0.9,
+				0.9
+			],
+			"voices": 1,
+			"gap": 0.5,
+			"files": [
+				"down_0.ogg"
+			]
+		},
+		"dodge": {
+			"db": -12,
+			"pitch": [
+				0.9,
+				1.1
+			],
+			"voices": 1,
+			"gap": 0.15,
+			"files": [
+				"dodge_0.ogg",
+				"dodge_1.ogg",
+				"dodge_2.ogg"
+			]
+		},
+		"gem": {
+			"db": -20,
+			"pitch": [
+				0.9,
+				1.3
+			],
+			"voices": 3,
+			"gap": 0.04,
+			"files": [
+				"gem_0.ogg",
+				"gem_1.ogg",
+				"gem_2.ogg"
+			]
+		},
+		"level_up": {
+			"db": -6,
+			"pitch": [
+				1.0,
+				1.0
+			],
+			"voices": 1,
+			"gap": 0.5,
+			"files": [
+				"level_up_0.ogg",
+				"level_up_1.ogg"
+			]
+		},
+		"chest": {
+			"db": -6,
+			"pitch": [
+				0.95,
+				1.05
+			],
+			"voices": 1,
+			"gap": 0.3,
+			"files": [
+				"chest_0.ogg",
+				"chest_1.ogg"
+			]
+		},
+		"pickup": {
+			"db": -8,
+			"pitch": [
+				1.0,
+				1.1
+			],
+			"voices": 1,
+			"gap": 0.2,
+			"files": [
+				"pickup_0.ogg"
+			]
+		},
+		"glass": {
+			"db": -10,
+			"pitch": [
+				0.85,
+				1.15
+			],
+			"voices": 2,
+			"gap": 0.08,
+			"files": [
+				"glass_0.ogg",
+				"glass_1.ogg"
+			]
+		},
+		"slam": {
+			"db": -4,
+			"pitch": [
+				0.8,
+				0.95
+			],
+			"voices": 2,
+			"gap": 0.15,
+			"files": [
+				"slam_0.ogg",
+				"slam_1.ogg"
+			]
+		},
+		"splash": {
+			"db": -10,
+			"pitch": [
+				0.8,
+				1.2
+			],
+			"voices": 3,
+			"gap": 0.08,
+			"files": [
+				"splash.wav"
+			]
+		},
+		"wave": {
+			"db": -6,
+			"pitch": [
+				0.9,
+				1.05
+			],
+			"voices": 1,
+			"gap": 1.0,
+			"files": [
+				"wave.wav"
+			]
+		},
+		"angles": {
+			"db": -8,
+			"pitch": [
+				0.9,
+				1.1
+			],
+			"voices": 2,
+			"gap": 0.5,
+			"files": [
+				"angles.wav"
+			]
+		},
+		"chant": {
+			"db": -12,
+			"pitch": [
+				0.85,
+				1.15
+			],
+			"voices": 2,
+			"gap": 0.4,
+			"files": [
+				"chant.wav"
+			]
+		},
+		"roar": {
+			"db": -2,
+			"pitch": [
+				0.85,
+				1.0
+			],
+			"voices": 1,
+			"gap": 1.0,
+			"files": [
+				"roar.wav"
+			]
+		},
+		"growl": {
+			"db": -8,
+			"pitch": [
+				0.8,
+				1.15
+			],
+			"voices": 2,
+			"gap": 0.6,
+			"files": [
+				"growl.wav"
+			]
+		},
+		"screech": {
+			"db": -12,
+			"pitch": [
+				0.85,
+				1.2
+			],
+			"voices": 2,
+			"gap": 0.4,
+			"files": [
+				"screech.wav"
+			]
+		},
+		"ui_move": {
+			"db": -16,
+			"pitch": [
+				1.0,
+				1.05
+			],
+			"voices": 1,
+			"gap": 0.04,
+			"files": [
+				"ui_move_0.ogg",
+				"ui_move_1.ogg"
+			]
+		},
+		"ui_accept": {
+			"db": -10,
+			"pitch": [
+				1.0,
+				1.0
+			],
+			"voices": 1,
+			"gap": 0.08,
+			"files": [
+				"ui_accept_0.ogg"
+			]
+		},
+		"ui_back": {
+			"db": -12,
+			"pitch": [
+				1.0,
+				1.0
+			],
+			"voices": 1,
+			"gap": 0.08,
+			"files": [
+				"ui_back_0.ogg"
+			]
+		},
+		"page": {
+			"db": -10,
+			"pitch": [
+				0.9,
+				1.1
+			],
+			"voices": 1,
+			"gap": 0.1,
+			"files": [
+				"page_0.ogg",
+				"page_1.ogg",
+				"page_2.ogg"
+			]
+		}
+	}
+}
