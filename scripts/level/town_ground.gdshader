@@ -4,7 +4,9 @@ shader_type spatial;
 // 1/32 m, todo por celda y en coordenadas del mundo, con el canto claro arriba a la
 // izquierda y el oscuro abajo a la derecha, como los modelos.
 // kind: 0 tierra (mud), 1 adoquín (cobble), 2 tablas (planks), 3 arrecife (reef, hito 6.5: roca
-// negra mojada en escalones, algas, percebes y grietas con luz verde de abajo). wet (0..1): lluvia; oscurece
+// negra mojada en escalones, algas, percebes y grietas con luz verde de abajo), 4 R'lyeh (fase 7:
+// losas ciclópeas verdinegras cuya rejilla gira y se tuerce por zonas, así que los ángulos no
+// cuadran; juntas con limo que brilla apenas). wet (0..1): lluvia; oscurece
 // y abrillanta todo. Los charcos son brillo especular falso: sin reflejos reales.
 
 uniform int kind = 0;
@@ -101,6 +103,24 @@ float reef_h(vec2 c) {
 	return floor(fbm(p * 0.5) * 7.0 + gnoise(p * 3.0) * 1.5);
 }
 
+// --- R'lyeh: cada zona de ~7 m tiene su rejilla de losas girada y torcida ---
+// Devuelve (id de la losa, distancia a la junta en celdas, altura)
+vec3 rlyeh_at(vec2 c) {
+	vec2 p = (c + 0.5) * cell;
+	vec2 zone = floor(p / 7.0 + vec2(fbm(p * 0.05), fbm(p * 0.05 + 9.0)) * 0.8);
+	float a = (hash(zone) - 0.5) * 1.1;                       // giro de la zona: hasta ±30°
+	float sh = (hash(zone + 3.0) - 0.5) * 0.6;                 // y una torsión que deja ángulos raros
+	mat2 r = mat2(vec2(cos(a), sin(a)), vec2(-sin(a), cos(a)));
+	vec2 q = r * p;
+	q.x += q.y * sh;
+	float size = 1.1 + hash(zone + 7.0) * 0.8;
+	vec2 id = floor(q / size);
+	vec2 f = fract(q / size) - 0.5;
+	float ed = min(0.5 - abs(f.x), 0.5 - abs(f.y)) * size / cell;
+	float h = ed < 1.0 ? -1.0 : floor(hash(id + zone * 13.0) * 3.0);
+	return vec3(hash(id + zone), ed, h);
+}
+
 // --- tierra: baches y rodadas en escalones de un voxel ---
 float mud_h(vec2 c) {
 	vec2 p = c * cell;
@@ -164,6 +184,20 @@ void fragment() {
 				}
 			}
 			wetm = step(0.7, fbm(pc * 0.2 + 30.0)) * wet * 0.7;
+		} else if (k == 4) {
+			vec3 s = rlyeh_at(c);
+			float up = s.z - rlyeh_at(c + vec2(-1, -1)).z;
+			float dn = rlyeh_at(c + vec2(1, 1)).z - s.z;
+			shade = 1.0 + clamp(up, 0.0, 1.0) * 0.14 - clamp(dn, 0.0, 1.0) * 0.16;
+			if (s.y < 1.0) {                                           // junta: limo verdoso que apenas brilla
+				col = mix(joint, moss, 0.6);
+				crack = step(0.72, fbm(pc * 0.3 + 4.0)) * 0.18;
+			} else {
+				col = mix(base_lo, base_hi, 0.25 + 0.75 * s.x) * (0.93 + 0.1 * g);
+				col = mix(col, moss, step(0.68, fbm(pc * 0.35 + 21.0)) * 0.5);   // verdín
+				if (s.y < 3.0 && hash(floor(c / 3.0)) > 0.97) col *= 0.6;          // muescas
+			}
+			wetm = step(0.7, fbm(pc * 0.2 + 12.0)) * wet * step(s.z, 0.0);
 		} else if (k == 3) {
 			float h = reef_h(c);
 			float up = h - reef_h(c + vec2(-1, -1));

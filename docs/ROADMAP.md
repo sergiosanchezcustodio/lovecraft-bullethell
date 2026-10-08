@@ -22,7 +22,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 4 | Parte 1 completa | **Hecha** salvo tu partida (04-10-2026) | Ninguna (D-04 y D-19, resueltas) |
 | 5 | Arranque, relatos y ampliación de la tienda | Pendiente | Ninguna |
 | 6 | Parte 2 completa | **Plan aprobado** (06-10-2026) | Ninguna (D-13 y jefes colosales, resueltas) |
-| 7 | Parte 3 completa | Pendiente | Ángulos devoradores, enfoque de jefes colosales |
+| 7 | Parte 3 completa | **Plan aprobado** (08-10-2026) | Ninguna (Ángulos devoradores y Cthulhu, resueltos) |
 | 8 | Pulido y distribución | Pendiente | D-01, D-12 |
 | 9 | Online | Pendiente | D-10 |
 | 10 | Guardado en la nube con GitHub | Pendiente | D-11 |
@@ -165,7 +165,20 @@ Se adelanta a la fase 5 (relatos y arranque), que no bloquea el contenido. Cada 
 
 ## Fase 7: Parte 3 completa (*La llamada de Cthulhu*)
 
-Cinco niveles, sus diez criaturas y Cthulhu. Decidir si los Ángulos devoradores son enemigo o peligro del escenario.
+Cinco niveles, sus diez criaturas y Cthulhu. Decidido el 08-10-2026: los Ángulos devoradores son un **peligro del escenario** (zonas de geometría imposible que se abren con aviso, atraen hacia su centro y engullen a quien se queda dentro; no se matan, se esquivan) y **Cthulhu se combate como Dagon** (colosal a 16 voxels/m, solo la parte visible, asomando por la puerta de R'lyeh, anclado y con fases) y, como en el relato, al "morir" se deshace en una nube verde y **se recompone una vez**, más furioso. Más difícil que la parte 2 (D-13).
+
+### Hitos de la fase 7 (plan aprobado el 08-10-2026)
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 7.0 | **Base común:** cultistas del culto de Cthulhu en estilo 4 (túnicas oscuras, amuletos del ídolo, máscaras con tentáculos, antorchas que dan luz), el ídolo de piedra verdinegra como atrezo y el suelo de R'lyeh (piedra verdinegra con ángulos que no cuadran). Paleta: negro verdoso, hueso, resplandor de hogueras | Hecho, pendiente de revisión (08-10-2026) |
+| 7.1 | **Nivel 1, Providence: el estudio de Wilcox.** Primera arena de interior (estudio con esculturas, caballetes y el bajorrelieve de arcilla) y la calle. Pesadillas de la oleada de sueños (etéreas, atraviesan el decorado, daño mental) y cultistas. Evento final: la pesadilla del bajorrelieve | Pendiente |
+| 7.2 | **Nivel 2, los pantanos de Luisiana: el ritual.** Claro con hogueras, el monolito del ídolo y el corro, con agua que frena. Diablos con alas de murciélago (picados) y cultistas armados del *Alert* (balas físicas). Evento final: el sacerdote del ritual | Pendiente |
+| 7.3 | **Nivel 3, los muelles y la cubierta del *Alert*.** Engendros de Cthulhu (minijefe) y Profundos servidores (de la parte 2) | Pendiente |
+| 7.4 | **Nivel 4, la tormenta en el Pacífico.** Cubierta del *Emma* en la tormenta (lluvia, rayos, olas que barren la cubierta). La cosa blanca polipoide y los Ángulos devoradores como peligro | Pendiente |
+| 7.5 | **Nivel 5, R'lyeh emergida.** Arquitectura imposible y la puerta colosal. Primigenios menores (minijefes) y emanaciones de la puerta (masas gelatinosas verdes) | Pendiente |
+| 7.6 | **Jefe: Cthulhu.** Asoma por la puerta, fases (zarpazos con aviso, tentáculos que barren, alas, llamada de criaturas); al caer se deshace en nube verde y se recompone una vez | Pendiente |
+| 7.7 | **Cierre:** la parte encadenada con bots, con y sin compras, la Biblioteca y tu partida | Pendiente |
 
 ## Fase 8: Pulido y distribución
 

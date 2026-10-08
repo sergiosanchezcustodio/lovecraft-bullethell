@@ -427,7 +427,16 @@ Léela al empezar cada sesión:
       En solitario el bot llega a Dagon pero no lo vence; en cooperativo la parte entera se supera.
     - **Rendimiento** con el tope de cada nivel (75 enemigos y 500 balas): 118-119 FPS de media en los cinco; el 1 % peor, 51 (nivel 1), 70, 60, 57 y 74.
     - **Biblioteca:** las criaturas y los cinco lugares de la parte 2 tienen texto y mapa.
-    - **Falta tu partida** de la parte 2 para cerrarla. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
+    - **Falta tu partida** de la parte 2 para cerrarla.
+- **Fase 7 (parte 3, *La llamada de Cthulhu*): plan aprobado el 08-10-2026** (hitos 7.0 a 7.7 en `docs/ROADMAP.md`). Los Ángulos devoradores son un peligro del escenario (zonas que se abren con aviso, atraen y engullen; no se matan). Cthulhu se combate como Dagon (colosal, anclado, asomando por la puerta de R'lyeh) y al caer se deshace en nube verde y se recompone una vez.
+  - **Hito 7.0 (base común): hecho, pendiente de tu revisión (08-10-2026).**
+    - **El culto** (`tools/gen_culto_cthulhu.py`, estilo 4, `anim_humano`):
+      - `cultista`: túnica casi negra con la capucha puesta, máscara de hueso con borde oscuro y tentáculos verdinegros que caen sobre el pecho, amuleto del ídolo y una antorcha encendida en la mano derecha (llama `glow`, sin luz real: con muchos cultistas costaría demasiado). Datos en `data/enemies/cultista.tres` (persigue; `humana`) y texto en la Biblioteca.
+      - `cultista_alert` (tripulante del *Alert*: jersey a rayas, gorra de lana roja, pañuelo con el símbolo, tatuaje y revólver) y `sacerdote_culto` (máscara mayor con más tentáculos, brazos desnudos pintados con franjas de hueso, el ídolo grande al cuello): modelos listos; sus datos llegan en el 7.2.
+      - La primera máscara (hueso liso y tentáculos claros) se leía como una cara pálida con barba.
+    - **El ídolo** (`models/cth_idolo.json`, 32/m): figura sentada de piedra verdinegra con cabeza de pulpo, tentáculos, alas rudimentarias y ojos que apenas brillan, sobre un pedestal con jeroglíficos.
+    - **Suelo `rlyeh`** (`town_ground.gdshader`, kind 4): losas ciclópeas verdinegras cuya rejilla gira (hasta ±30°) y se tuerce por zonas de ~7 m, así que en las fronteras los ángulos no cuadran; juntas con limo que apenas brilla (`crack_glow`), verdín y charcos.
+    - Campo de prueba: `godot --path . -- nolevel=true arena=res://data/arenas/prueba_rlyeh.json`. Capturas `shots/game_rly2_003.0s.png` y `shots/cultista-cultista_alert-sacerdote_culto_30_cul2.png`. Capturas `shots/game_dag6_008.0s.png` y `shots/dagon_30_dg1.png`.
 - **Fase 0: hecha.** GDD, hoja de ruta y las nueve decisiones que bloqueaban las fases 1 y 2.
 - **Fase 1: hecha** (queda tu partida de 5 minutos como comprobación). Subhitos en `docs/ROADMAP.md`.
   - **Hito 1.1 (base técnica): hecho y aprobado.** Forward+ con el entorno recalibrado, GUT 9.4.0, caché de mallas, capturas por tiempo (`ShotTaker`) y escena de rendimiento (`scenes/bench.tscn`, medición en `docs/RENDIMIENTO.md`).

@@ -6,7 +6,7 @@ extends RefCounted
 
 const LAYER_WORLD := 1
 ## Suelos de la parte 2 (town_ground.gdshader): nombre en el JSON -> `kind` del shader.
-const TOWN_KINDS := {"mud": 0, "cobble": 1, "planks": 2, "reef": 3}
+const TOWN_KINDS := {"mud": 0, "cobble": 1, "planks": 2, "reef": 3, "rlyeh": 4}
 
 ## Devuelve el nodo raíz de la arena. Metadatos: "spawn" (Vector3), "size" (Vector2),
 ## "lights" (Array de OmniLight3D de los faroles) y "obstacles" (ObstacleMap, para que los

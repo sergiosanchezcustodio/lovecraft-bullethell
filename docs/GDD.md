@@ -82,7 +82,7 @@ El rastro del culto a Cthulhu lleva de Providence a los pantanos de Luisiana y a
 | 5 | R'lyeh emergida: la puerta colosal | Primigenios menores que yacen con Cthulhu (M) · Emanaciones de la puerta: masas gelatinosas verdes que brotan de la puerta negra al abrirse, anticipo de Cthulhu (V) |
 | **Jefe** | | **Cthulhu** (C) |
 
-El relato apenas describe criaturas aparte de Cthulhu. Los Ángulos devoradores (la geometría imposible que engulle a un marinero) pueden ser enemigo o peligro del escenario; se decidirá al diseñar ese nivel.
+El relato apenas describe criaturas aparte de Cthulhu. *Decidido (08-10-2026):* los Ángulos devoradores (la geometría imposible que engulle a un marinero) son un **peligro del escenario**: zonas que se abren en el suelo con aviso, atraen hacia su centro y engullen (mucho daño y cordura) a quien se queda dentro, y se cierran solas; no se matan. **Cthulhu** se combate como Dagon: colosal, solo la parte visible, asomando por la puerta de R'lyeh, anclado y con fases; al "morir" se deshace en una nube verde y se recompone una vez, más furioso, como en el relato.
 
 ---
 
