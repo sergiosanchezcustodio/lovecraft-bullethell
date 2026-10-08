@@ -16,6 +16,7 @@ extends Resource
 ## Música del nivel. Vacía: la del nivel 1 (hasta que haya más pistas).
 @export_file("*.mp3", "*.ogg") var music := ""
 ## Clima estético del nivel (D-33). Vacío: sin clima.
+@export_file("*.mp3", "*.ogg") var boss_music := ""   ## suena al empezar el evento final (jefes; hito 8.2)
 @export var weather: WeatherData
 @export_group("Oleadas")
 @export var pool: Array[EnemyData] = []        ## enemigos que pueden aparecer

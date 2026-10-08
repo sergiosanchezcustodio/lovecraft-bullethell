@@ -239,6 +239,8 @@ func _ready() -> void:
 			director.pool_override.append(load("res://data/enemies/%s.tres" % eid))
 		director.players = players.size()           # la dificultad crece con los jugadores
 		director.final_event.connect(func(e: Enemy) -> void:
+			if level.boss_music != "": Music.play(level.boss_music, 2.0)   # música del jefe
+			if args.get_bool("log"): print("MUSICA ", Music.current())
 			Sfx.play("roar" if e != null and e.data.unique else "growl")
 			announce(level.final_text, 3.5))
 		director.boss_event.connect(func(e: Enemy, text: String) -> void:
@@ -266,6 +268,7 @@ func _ready() -> void:
 			add_child(Hazards.new().setup(level, world, arena.get_meta("obstacles")))
 		announce(level.display_name, 3.0)
 		Music.play(level.music_path())
+		if args.get_bool("log"): print("MUSICA ", Music.current())
 	_start_weather()
 	Engine.time_scale = args.get_float("timescale", 1.0)
 	hud = Hud.new().setup(players, director)
