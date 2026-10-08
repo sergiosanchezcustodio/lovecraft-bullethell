@@ -7,6 +7,7 @@ extends Node
 signal enemy_spawned(e: Enemy)
 signal final_event(e: Enemy)
 signal mid_event(e: Enemy, text: String)
+signal boss_event(e: Enemy, text: String)
 signal level_completed
 signal chest_spawned(chest: ArcaneChest)
 
@@ -62,6 +63,7 @@ func _physics_process(delta: float) -> void:
 			if d != null: spawn(d, spawn_point(d.body_radius))
 		final_event.emit(_final)
 	var scale := level.final_spawn_scale if _final_done else 1.0
+	if _boss_on: scale *= BOSS_SPAWN_SCALE         # con el jefe en pantalla, las oleadas casi paran
 	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * delta
 	while _acc >= 1.0:
 		if alive.size() + _emerging >= max_alive():
@@ -158,6 +160,10 @@ func _mid_step() -> void:
 		e.died.connect(func(x: Enemy) -> void: mid_alive.erase(x))
 		mid_event.emit(e, text)
 
+## El enemigo que hay que matar ahora para superar el nivel (el final, o el jefe tras él).
+func final_target() -> Enemy:
+	return _final if is_instance_valid(_final) and _final.is_alive() else null
+
 ## Lanza ya el evento final (depuración).
 func trigger_final() -> void:
 	if level.is_survival():
@@ -193,6 +199,8 @@ func pick() -> EnemyData:
 	return cands[cands.size() - 1]
 
 var _emerging := 0
+var _boss_on := false
+const BOSS_SPAWN_SCALE := 0.5          ## sobre final_spawn_scale (0,3): un 15 % del ritmo con el jefe
 const EMERGE_WARN := 0.9          ## s de aviso antes de salir del agua
 
 ## Sale del agua (hito 6.4): en una poza a 5-9 m de un jugador en pie, con un aro en el
@@ -253,5 +261,10 @@ func _on_died(e: Enemy) -> void:
 	alive.erase(e)
 	killed_total += 1
 	if e == _final and not completed:
+		if level.final_next != null and _final.data != level.final_next:   # tras el final, el jefe
+			_final = spawn(level.final_next, spawn_point(level.final_next.body_radius))
+			_boss_on = true
+			boss_event.emit(_final, level.final_next_text)
+			return
 		completed = true
 		level_completed.emit()

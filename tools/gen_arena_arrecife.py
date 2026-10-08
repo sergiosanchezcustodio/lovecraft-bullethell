@@ -41,6 +41,11 @@ A.scatter("arr_coral", 8, 5.0, 0.9, 1.3)
 # la orilla del mar abierto: rocas bajas pegadas
 A.edge(["arr_roca_1", "arr_roca_2"], step=3.2, inset=0.8, smin=0.7, smax=1.1)
 
+# las simas de las que sale Padre Dagon (hito 6.6): agua honda en la mitad norte; sin piezas encima
+SPOTS = [(-2.0, -13.5), (-13.5, -2.0), (-10.0, -10.0)]
+HOLE = 4.0
+A.props = [p for p in A.props if all(math.hypot(p["pos"][0] - x, p["pos"][1] - z) > HOLE + 2.0 for x, z in SPOTS)]
+
 COLL = dict(COLLIDERS)
 COLL.update({
     "arr_muro": {"type": "box", "shrink": 0.95},
@@ -64,7 +69,9 @@ A.write({
                           "duckweed": [0.12, 0.22, 0.10], "water_glow": [0.03, 0.13, 0.07],
                           "crack_glow": [0.20, 0.75, 0.40]}},
     # pozas: islotes secos más grandes que en el pantano (el arrecife es sobre todo roca)
-    "water": {"seed": 9, "islands": 0.62, "scale": 4.0, "clear": [0.0, 0.0, 4.5]},
+    "water": {"seed": 9, "islands": 0.62, "scale": 4.0, "clear": [0.0, 0.0, 4.5],
+              "holes": [[x, z, HOLE] for x, z in SPOTS]},
+    "boss_spots": [[x, z] for x, z in SPOTS],
     "sea": {"sides": ["south", "east"], "level": -0.8, "brash": 0.0,
             "colors": {"deep": [0.02, 0.06, 0.05], "mid": [0.04, 0.11, 0.08], "shallow": [0.07, 0.18, 0.12],
                        "crest": [0.14, 0.26, 0.18], "foam": [0.30, 0.40, 0.32]}},

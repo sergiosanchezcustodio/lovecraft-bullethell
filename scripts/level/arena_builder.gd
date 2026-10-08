@@ -29,6 +29,7 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	# mapa de lo transitable (tools/gen_mapa_transitable.py): con él, los límites y los
 	# obstáculos siguen lo dibujado y sobran los cuerpos físicos del decorado
 	var masked := data.has("mask") and obstacles.load_mask(data.mask)
+	for bs: Array in data.get("boss_spots", []): obstacles.boss_spots.append(Vector2(bs[0], bs[1]))
 	if obstacles.has_water():                # agua somera (pantano, hito 6.4): el suelo la dibuja donde frena
 		var gm := ground.material_override as ShaderMaterial
 		gm.set_shader_parameter("water_tex", obstacles.water_texture())

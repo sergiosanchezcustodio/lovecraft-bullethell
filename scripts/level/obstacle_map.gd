@@ -16,6 +16,7 @@ var _n := 0
 var _cell := 0.25
 var _origin := Vector2.ZERO
 var _dist_step := 1.0 / 32.0
+var boss_spots: Array[Vector2] = []      ## simas de las que sale el jefe (arena "boss_spots", hito 6.6)
 var _water := PackedByteArray()          ## N × N: agua somera (0..255), si la arena la tiene (hito 6.4)
 
 func add_circle(center: Vector2, radius: float) -> void:

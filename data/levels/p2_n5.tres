@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/enemies/profundo.tres" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Resource" path="res://data/enemies/hibrido_h.tres" id="8"]
 [ext_resource type="Resource" path="res://data/enemies/pththya.tres" id="9"]
 [ext_resource type="Resource" path="res://data/enemies/hydra.tres" id="7"]
+[ext_resource type="Resource" path="res://data/enemies/dagon.tres" id="10"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
 [ext_resource type="Resource" path="res://data/weather/niebla_arrecife.tres" id="weather"]
 
@@ -19,7 +20,7 @@ display_name = "El Arrecife del Diablo y Y'ha-nthlei"
 part = 2
 number = 5
 arena = "res://data/arenas/arrecife.json"
-health_mult = 1.4
+health_mult = 1.3
 duration = 300.0
 music = ""
 pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("6"), ExtResource("8")])
@@ -34,3 +35,5 @@ final_enemy = ExtResource("7")
 final_wave = 16
 final_spawn_scale = 0.3
 final_text = "El arrecife tiembla: Madre Hydra se alza de la sima…"
+final_next = ExtResource("10")
+final_next_text = "El mar se abre. Padre Dagon ha venido a vengarla."

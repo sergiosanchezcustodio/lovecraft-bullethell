@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/dagon_ola.tres" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/dagon_espiral.tres" id="3"]
+[ext_resource type="Resource" path="res://data/patterns/dagon_anillo.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/profundo_emergente.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = &"dagon"
+display_name = "Padre Dagon"
+model = "dagon"
+model_scale = 1.25
+unique = true
+tier = 5
+spawn_weight = 1.0
+elite = true
+tags = Array[StringName]([&"marina"])
+swims = true
+max_health = 3600.0
+hit_radius = 2.6
+body_radius = 2.6
+move_speed = 0.0
+xp = 120.0
+money = 200
+contact_physical = 0.0
+contact_mental = 0.0
+movement = &"dagon"
+params = {"slam_every": [4.5, 4.0, 3.0], "slam_radius": 3.0, "slam_damage": 20.0, "slam_warn": 1.0, "wave_every": 5.5, "wave_pattern": ExtResource("2"), "spiral_pattern": ExtResource("3"), "ring_pattern": ExtResource("4"), "minion": ExtResource("5"), "minion_every": 12.0, "minion_count": 3, "roar_shield": 1.5, "sink_every": 14.0}
+attack_cooldown = 99.0
+attack_range = 0.0

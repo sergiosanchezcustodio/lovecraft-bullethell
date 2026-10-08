@@ -141,6 +141,10 @@ def build(name):
         if not behind:                                                    # lo alto de la costa (con walk_back, no lo de detrás)
             stamp(floor, wx, wz, (y1 > TOP[0]) & (y1 < TOP[1]), size)
     blocked = body | ~floor
+    holes = np.zeros((N, N), bool)                     # simas (hito 6.6): agua honda que no se pisa
+    for hx, hz, hr in data.get('water', {}).get('holes', []):
+        holes |= np.hypot(X - hx, Z - hz) < hr
+    blocked |= holes
     # solo lo que se alcanza andando desde la salida
     free, _ = ndimage.label(~blocked)
     sp = data['spawn']
@@ -149,7 +153,7 @@ def build(name):
     dist = ndimage.distance_transform_edt(~blocked) * CELL
     water = None
     if 'water' in data:
-        water = water_layer(data['water'], X, Z) & ~blocked
+        water = (water_layer(data['water'], X, Z) & ~blocked) | holes
         open(os.path.join(ROOT, 'data', 'arenas', name + '_agua.bin'), 'wb').write(
             np.where(water, 255, 0).astype(np.uint8).tobytes())
     img = np.zeros((N, N, 3), np.uint8)

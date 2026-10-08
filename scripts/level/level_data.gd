@@ -42,6 +42,10 @@ extends Resource
 
 func is_survival() -> bool:
 	return final_survive > 0.0
+## Jefe que sale al morir el enemigo final (hito 6.6, Padre Dagon tras Madre Hydra): el nivel
+## se supera al matarlo a él.
+@export var final_next: EnemyData
+@export var final_next_text := ""
 @export_group("Eventos intermedios")
 ## Minijefes a mitad de nivel (hito 6.5): aparecen una vez, con aviso, y las oleadas siguen.
 ## Listas paralelas: el enemigo, el segundo y el texto del aviso.

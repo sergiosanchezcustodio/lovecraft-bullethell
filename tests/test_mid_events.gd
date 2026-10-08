@@ -44,3 +44,29 @@ func test_el_minijefe_sale_una_vez_a_su_hora_y_no_acaba_el_nivel() -> void:
 	e.take_damage(Damage.new(99999.0, 0.0))
 	assert_eq(d.mid_alive.size(), 0, "muerto, deja de ser el objetivo")
 	assert_false(done[0], "matarlo no supera el nivel")
+
+func test_tras_el_final_sale_el_jefe_y_el_nivel_se_supera_al_matarlo_a_el() -> void:
+	var l := LevelData.new()
+	l.number = 5
+	l.pool = [load("res://data/enemies/pinguino.tres")]
+	l.spawn_rate = [Vector2(0, 0.0), Vector2(300, 0.0)]
+	l.final_time = 0.5
+	l.final_wave = 0
+	l.final_enemy = load("res://data/enemies/fragmento.tres")
+	l.final_next = load("res://data/enemies/pinguino.tres")
+	l.final_next_text = "¡El jefe!"
+	var d := WaveDirector.new().setup(l, world, obstacles, null, root)
+	world.add_child(d)
+	var boss := []
+	d.boss_event.connect(func(e: Enemy, text: String) -> void: boss.append(text))
+	var done := [false]
+	d.level_completed.connect(func() -> void: done[0] = true)
+	for i in 40: d._physics_process(DT)
+	var first := d.final_target()
+	assert_eq(first.data.id, &"fragmento")
+	first.take_damage(Damage.new(99999.0, 0.0))
+	assert_false(done[0], "muerto el final, aún queda el jefe")
+	assert_eq(boss, ["¡El jefe!"])
+	assert_eq(d.final_target().data.id, &"pinguino")
+	d.final_target().take_damage(Damage.new(99999.0, 0.0))
+	assert_true(done[0], "muerto el jefe, nivel superado")

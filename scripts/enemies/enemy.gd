@@ -34,6 +34,7 @@ var _lure_t := 0.0                          ## s que le atrae una bengala
 var _lure_pos := Vector3.ZERO
 const VULNERABLE_MULT := 1.25
 # Arsenal II (hito 2.7)
+var anchored := false                       ## no se mueve ni lo empujan (Dagon, en la orilla)
 var _wade := 0.0                            ## 0..1: metido en agua somera (hunde el modelo)
 var _slow_t := 0.0                          ## s que va más lento (Polvo de Ibn-Ghazi)
 var _slow_k := 1.0                          ## factor de velocidad mientras dura
@@ -348,9 +349,10 @@ func _physics_process(delta: float) -> void:
 		if dist > 0.001 and dist < min_d: push += off / dist * (min_d - dist)
 	var move := velocity * delta + _knock * delta + Vector3(push.x, 0, push.y) * 0.5
 	_knock = _knock.lerp(Vector3.ZERO, 1.0 - exp(-8.0 * delta))
-	var np := Vector2(position.x + move.x, position.z + move.z)
-	if obstacles != null: np = obstacles.push_out(np, data.body_radius)
-	position = Vector3(np.x, position.y, np.y)
+	if not anchored:
+		var np := Vector2(position.x + move.x, position.z + move.z)
+		if obstacles != null: np = obstacles.push_out(np, data.body_radius)
+		position = Vector3(np.x, position.y, np.y)
 	if velocity.length() > 0.1:
 		facing = facing.slerp(velocity.normalized(), 1.0 - exp(-10.0 * delta)).normalized()
 	# Contacto con los jugadores

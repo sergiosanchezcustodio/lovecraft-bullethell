@@ -80,7 +80,16 @@ func desired_position() -> Vector3:
 func snap() -> void:
 	position = desired_position()
 
+var _shake := 0.0                  ## m de temblor (jefes: rugidos y golpes); se apaga solo
+
+## Tiembla la cámara (hito 6.6): amount en metros; se suma y decae en unas décimas.
+func shake(amount: float) -> void:
+	_shake = maxf(_shake, amount)
+
 func _process(delta: float) -> void:
 	_size = lerpf(_size, needed_size(), 1.0 - exp(-zoom_speed * delta))
 	size = maxf(_size, view_size)
 	position = position.lerp(desired_position(), 1.0 - exp(-follow_speed * delta))
+	if _shake > 0.001:
+		position += (transform.basis.x * randf_range(-1, 1) + transform.basis.y * randf_range(-1, 1)) * _shake
+		_shake = move_toward(_shake, 0.0, delta * maxf(_shake * 3.0, 0.2))

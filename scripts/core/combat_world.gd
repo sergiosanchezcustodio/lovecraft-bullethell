@@ -86,7 +86,15 @@ func target_at(grid_id: int) -> Node3D:
 	return _grid_targets[grid_id]
 
 ## Enemigo vivo más cercano a pos dentro de max_r, o null.
+## Jefe al que se apunta con prioridad (hito 6.6, Padre Dagon: desde su sima casi nunca es el
+## más cercano). nearest_enemy lo elige si está a tiro y no hay nadie a menos de FOCUS_NEAR m.
+var focus: Node3D
+const FOCUS_NEAR := 3.0
+
 func nearest_enemy(pos: Vector3, max_r: float) -> Node3D:
+	if focus != null and (not is_instance_valid(focus) or not focus.is_alive()): focus = null
+	if focus != null and focus.global_position.distance_to(pos) - float(focus.hit_radius) < max_r 			and grid.nearest(Vector2(pos.x, pos.z), FOCUS_NEAR) < 0:
+		return focus
 	var id := grid.nearest(Vector2(pos.x, pos.z), max_r)
 	if id < 0: return null
 	if is_enemy(_grid_targets[id]): return _grid_targets[id]
