@@ -97,11 +97,37 @@ func roll_options(weapons: WeaponSystem, rng: RandomNumberGenerator, n: int = -1
 			o.upgrade = up
 			o.to_level = lv + 1
 			cands.append(o)
-	# Barajar (Fisher-Yates con el generador dado, para que sea reproducible) y quedarse n
-	for i in range(cands.size() - 1, 0, -1):
+	# Con 50 armas y 50 objetos (D-38), al azar casi nunca saldría lo que ya se lleva: lo propio
+	# pesa OWNED_WEIGHT veces más y, si hay, una de las opciones es siempre mejorar algo propio.
+	var out: Array[Option] = []
+	var owned := cands.filter(func(o: Option) -> bool: return o.kind != Option.Kind.NEW_WEAPON and o.to_level > 1)
+	if not owned.is_empty() and n > 0:
+		var first: Option = owned[rng.randi_range(0, owned.size() - 1)]
+		out.append(first)
+		cands.erase(first)
+	while out.size() < n and not cands.is_empty():
+		var total := 0.0
+		for o in cands: total += _weight(o)
+		var r := rng.randf() * total
+		var pick := cands.size() - 1
+		for i in cands.size():
+			r -= _weight(cands[i])
+			if r <= 0.0:
+				pick = i
+				break
+		out.append(cands[pick])
+		cands.remove_at(pick)
+	# en orden al azar: la mejora garantizada no va siempre la primera
+	for i in range(out.size() - 1, 0, -1):
 		var j := rng.randi_range(0, i)
-		var tmp := cands[i]; cands[i] = cands[j]; cands[j] = tmp
-	return cands.slice(0, mini(n, cands.size()))
+		var tmp := out[i]; out[i] = out[j]; out[j] = tmp
+	return out
+
+const OWNED_WEIGHT := 8.0
+
+## Peso al sortear: subir un arma u objeto que ya lleva pesa más que algo nuevo.
+static func _weight(o: Option) -> float:
+	return OWNED_WEIGHT if o.kind != Option.Kind.NEW_WEAPON and o.to_level > 1 else 1.0
 
 func _items_owned() -> int:
 	var n := 0

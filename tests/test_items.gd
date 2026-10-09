@@ -205,3 +205,14 @@ func test_llave_de_plata() -> void:
 	assert_eq(p.rerolls_left(), 2)
 	p.rerolls_used = 2
 	assert_eq(p.rerolls_left(), 0)
+
+func test_la_subida_ofrece_siempre_algo_propio() -> void:
+	for w in DebugOptions.list_resources("res://data/weapons"):
+		if not (w as WeaponData).evolved: p.progress.weapon_pool.append(w)
+	ws.add_weapon(load("res://data/weapons/webly.tres"))
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	for i in 50:
+		var opts := p.progress.roll_options(ws, rng)
+		assert_true(opts.any(func(o: PlayerProgress.Option) -> bool: return o.weapon != null and o.weapon.id == &"webly"),
+			"entre 100 opciones, mejorar el Webly sale siempre")

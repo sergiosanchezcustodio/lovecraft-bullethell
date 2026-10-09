@@ -196,7 +196,7 @@ Audio, equilibrado, accesibilidad, rendimiento final y distribución. Decidido e
 | 8.6 | **Objetos I (D-38, GDD 5.5):** modificadores generales del jugador que lee `Weapon.stat` (proyectiles, alcance, velocidad, área, recarga, duración, perforación, crítico, daño por grupo, élites, empuje); `UpgradeData` con varios efectos y tope; los objetos de estadísticas (~33); ficha, tarjetas y Biblioteca; tests | Hecho, pendiente de revisión (09-10-2026): 32 objetos nuevos, 37 en total |
 | 8.7 | **Objetos II:** los que necesitan sistemas: escudo de Nodens, *ankh*, escamas, señuelo y petardos al esquivar, esquive doble, llave de plata (cambiar opciones), disparadores al abatir e impactar, diente de *shoggoth* e ídolo de Cthulhu (~12) | Hecho, pendiente de revisión (09-10-2026): 13 objetos; 50 en total |
 | 8.8 | **Arsenal III (GDD 5.4):** las 16 armas, con entregas nuevas (cepos, rebote, cadencia creciente, agujero negro, rayo giratorio, nube que deriva, enemigos contra enemigos), reglas de daño (D-37), sonidos y textos | Hecho, pendiente de revisión (09-10-2026): 50 armas (16 físicas, 17 de fuego, 17 mágicas), con icono |
-| 8.9 | **Iconos y cierre:** 61 iconos con Replicate (~3 $), textos de la Biblioteca, peso de armas y objetos en la subida de nivel (con 100 opciones deben seguir saliendo mejoras de lo que se lleva) y prueba con bots | Propuesto |
+| 8.9 | **Iconos y cierre:** 61 iconos con Replicate (~3 $), textos de la Biblioteca, peso de armas y objetos en la subida de nivel (con 100 opciones deben seguir saliendo mejoras de lo que se lleva) y prueba con bots | Hecho, pendiente de revisión (09-10-2026) |
 
 ## Fase 9: Online
 
