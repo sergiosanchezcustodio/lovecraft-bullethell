@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"recortada"
+display_name = "Recortada"
+description = "Dos disparos seguidos de perdigones en un cono corto y ancho que empuja mucho."
+delivery = 0
+category = 1
+targeting = 0
+bullet_look = "pellet"
+cooldown = 1.6
+range = 5.0
+damage = 2.8
+count = 6.0
+spread_deg = 40.0
+volleys = 2.0
+volley_delay = 0.22
+projectile_speed = 18.0
+projectile_radius = 0.16
+projectile_size = 0.13
+knockback = 2.5
+max_level = 5
+level_mods = Array[Dictionary]([{"count+": 2.0}, {"damage*": 1.25}, {"cooldown*": 0.85}, {"volleys+": 1.0, "knockback*": 1.2}])
+level_text = Array[String](["Dos perdigones más", "+25 % de daño", "Recarga un 15 % más rápido", "Un tercer disparo y más empuje"])

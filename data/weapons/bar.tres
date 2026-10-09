@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bar"
+display_name = "BAR M1918"
+description = "Ráfagas cuyas balas rebotan hacia otro enemigo cercano."
+delivery = 0
+category = 1
+targeting = 0
+bullet_look = "smg"
+cooldown = 1.0
+range = 11.0
+damage = 4.6
+count = 3.0
+burst_delay = 0.08
+bounces = 1.0
+projectile_speed = 26.0
+projectile_radius = 0.16
+projectile_size = 0.13
+knockback = 1.0
+max_level = 5
+level_mods = Array[Dictionary]([{"bounces+": 1.0}, {"count+": 1.0}, {"damage*": 1.25}, {"bounces+": 1.0, "cooldown*": 0.9}])
+level_text = Array[String](["Un rebote más", "Una bala más por ráfaga", "+25 % de daño", "Un rebote más y algo más de cadencia"])

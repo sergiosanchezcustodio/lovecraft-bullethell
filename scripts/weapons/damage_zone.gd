@@ -15,6 +15,7 @@ var vulnerable := 0.0
 var slow_k := 1.0                            ## polvo: velocidad de los enemigos de dentro
 var weak_k := 1.0                            ## polvo: daño que hacen los de dentro
 var bonus := {}
+var drift := Vector3.ZERO                    ## gas: se desplaza (m/s)
 var _t := 0.0
 var _tick := 0.0
 var _mat: ShaderMaterial
@@ -26,7 +27,9 @@ const FADE := 0.5
 const COLORS := {WeaponData.Zone.FIRE: [Color(1.0, 0.45, 0.12), Color(1.0, 0.78, 0.3)],
 	WeaponData.Zone.ACID: [Color(0.45, 0.85, 0.2), Color(0.75, 1.0, 0.45)],
 	# polvo: mancha sepia oscura y motas doradas (un tono pálido desaparecía sobre la nieve)
-	WeaponData.Zone.DUST: [Color(0.55, 0.36, 0.14), Color(1.0, 0.82, 0.4)]}
+	WeaponData.Zone.DUST: [Color(0.55, 0.36, 0.14), Color(1.0, 0.82, 0.4)],
+	# gas de cloro: verde amarillento turbio
+	WeaponData.Zone.GAS: [Color(0.55, 0.62, 0.12), Color(0.82, 0.9, 0.35)]}
 
 func setup(p_world: CombatWorld, p_kind: int, pos: Vector3, p_radius: float, p_life: float, p_dps: float,
 		p_vulnerable: float = 0.0, p_bonus: Dictionary = {}) -> DamageZone:
@@ -64,6 +67,10 @@ func _ready() -> void:
 	ppm.initial_velocity_min = 0.6
 	ppm.initial_velocity_max = 1.6
 	ppm.gravity = Vector3(0, 0.6 if kind == WeaponData.Zone.FIRE else (0.05 if kind == WeaponData.Zone.DUST else -0.5), 0)
+	if kind == WeaponData.Zone.GAS:                 # gas: bocanadas lentas que suben poco
+		_parts.lifetime = 1.4
+		_parts.amount = int(clampf(radius * 16.0, 16.0, 40.0))
+		ppm.gravity = Vector3(0, 0.15, 0)
 	if kind == WeaponData.Zone.DUST:                # polvo: motas que flotan despacio y duran más
 		_parts.lifetime = 1.6
 		_parts.amount = int(clampf(radius * 18.0, 16.0, 48.0))
@@ -106,6 +113,7 @@ func _physics_process(delta: float) -> void:
 		_parts.emitting = false
 		if _t >= life + FADE: queue_free()
 		return
+	if drift != Vector3.ZERO: global_position += drift * delta
 	_tick -= delta
 	if _tick > 0.0: return
 	_tick = TICK
@@ -126,4 +134,4 @@ func _process(_delta: float) -> void:
 
 ## Opacidad de la mancha: el polvo, más densa para que se lea sobre la nieve.
 func _alpha() -> float:
-	return 0.75 if kind == WeaponData.Zone.DUST else 0.5
+	return 0.75 if kind in [WeaponData.Zone.DUST, WeaponData.Zone.GAS] else 0.5

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"antitanque"
+display_name = "Antitanque Mauser"
+description = "Disparo muy lento que atraviesa a todos los enemigos de la línea."
+delivery = 0
+category = 1
+targeting = 4
+bullet_look = "rifle"
+cooldown = 2.6
+range = 20.0
+damage = 34.2
+pierce = 99.0
+projectile_speed = 40.0
+projectile_radius = 0.22
+projectile_size = 0.2
+knockback = 3.0
+max_level = 5
+level_mods = Array[Dictionary]([{"damage*": 1.25}, {"cooldown*": 0.85}, {"damage*": 1.25}, {"knockback*": 1.5, "projectile_radius*": 1.4}])
+level_text = Array[String](["+25 % de daño", "Recarga un 15 % más rápido", "+25 % de daño", "Bala más gruesa y más empuje"])

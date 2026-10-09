@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"mortero"
+display_name = "Mortero Stokes"
+description = "Proyectil en arco alto al grupo más denso a distancia; explosión grande."
+delivery = 1
+category = 1
+targeting = 1
+look = "granada"
+cooldown = 2.4
+range = 16.0
+damage = 31.5
+aoe_radius = 3.0
+flight_time = 1.1
+fuse = 0.0
+arc_height = 7.0
+knockback = 2.0
+max_level = 5
+level_mods = Array[Dictionary]([{"aoe_radius*": 1.15}, {"damage*": 1.25}, {"count+": 1.0}, {"cooldown*": 0.85}])
+level_text = Array[String](["Explosión un 15 % más grande", "+25 % de daño", "Dos proyectiles por disparo", "Recarga un 15 % más rápido"])

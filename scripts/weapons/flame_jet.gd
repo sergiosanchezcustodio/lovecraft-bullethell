@@ -16,6 +16,10 @@ var zone_r := 1.0
 var zone_t := 2.0
 var zone_dps := 6.0
 var bonus := {}
+var frost := false                           ## Aliento de Ithaqua: frena y, si sigue dentro, congela
+var _cold := {}                              ## id del enemigo -> s dentro del chorro helado
+const FREEZE_AFTER := 0.9
+const FREEZE_TIME := 1.2
 var _t := 0.0
 var _tick := 0.0
 var _drop := 0.0
@@ -48,6 +52,9 @@ func _ready() -> void:
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
 	g.colors = PackedColorArray([Color(1.0, 0.9, 0.55), Color(1.0, 0.45, 0.1), Color(0.35, 0.1, 0.05, 0.0)])
+	if frost:
+		g.colors = PackedColorArray([Color(0.95, 1.0, 1.0), Color(0.45, 0.8, 1.0), Color(0.2, 0.35, 0.6, 0.0)])
+		ppm.gravity = Vector3(0, -0.4, 0)
 	var gt := GradientTexture1D.new()
 	gt.gradient = g
 	ppm.color_ramp = gt
@@ -62,7 +69,7 @@ func _ready() -> void:
 	_parts.draw_pass_1 = box
 	add_child(_parts)
 	_light = OmniLight3D.new()
-	_light.light_color = Color(1.0, 0.5, 0.2)
+	_light.light_color = Color(0.5, 0.8, 1.0) if frost else Color(1.0, 0.5, 0.2)
 	_light.light_energy = 1.6
 	_light.omni_range = length
 	add_child(_light)
@@ -103,6 +110,13 @@ func _physics_process(delta: float) -> void:
 			var d := Damage.new(dps * 0.15, 0.0)
 			d.bonus = bonus
 			e.take_damage(d)
+			if frost and e.is_alive():
+				e.slow(0.4, 0.45)
+				var id := e.get_instance_id()
+				_cold[id] = float(_cold.get(id, 0.0)) + 0.15
+				if _cold[id] >= FREEZE_AFTER:
+					_cold[id] = -FREEZE_TIME                      # congelado: tarda en volver a helarse
+					e.stun(FREEZE_TIME)
 	_drop -= delta
 	if _drop <= 0.0 and zone_t > 0.0:
 		_drop = 0.25

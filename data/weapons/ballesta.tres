@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ballesta"
+display_name = "Ballesta"
+description = "Virotes que atraviesan y dejan clavado al enemigo un instante."
+delivery = 0
+category = 0
+targeting = 0
+bullet_look = "harpoon"
+cooldown = 1.3
+range = 14.0
+damage = 8.5
+pierce = 2.0
+root = 0.6
+projectile_speed = 28.0
+projectile_radius = 0.18
+projectile_size = 0.15
+knockback = 1.2
+max_level = 5
+level_mods = Array[Dictionary]([{"pierce+": 1.0}, {"damage*": 1.25}, {"count+": 1.0, "spread_deg+": 10.0}, {"root*": 1.5}])
+level_text = Array[String](["Atraviesa un enemigo más", "+25 % de daño", "Dos virotes por disparo", "Clava un 50 % más de tiempo"])

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gas"
+display_name = "Gas de cloro"
+description = "Nube tóxica que deriva lentamente hacia los enemigos y los envenena."
+delivery = 10
+category = 0
+targeting = 1
+zone = 4
+range = 9.0
+cooldown = 3.0
+damage = 0.0
+zone_radius = 1.8
+zone_time = 5.0
+zone_dps = 8.1
+drift = 0.8
+max_level = 5
+level_mods = Array[Dictionary]([{"zone_radius*": 1.15}, {"zone_dps*": 1.25}, {"zone_time*": 1.25}, {"cooldown*": 0.85}])
+level_text = Array[String](["Nube un 15 % más grande", "+25 % de daño", "Dura un 25 % más", "Recarga un 15 % más rápido"])

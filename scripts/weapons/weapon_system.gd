@@ -8,6 +8,8 @@ class Weapon:
 	var data: WeaponData
 	var level := 1
 	var timer := 0.0
+	var heat := 0.0                              ## 0..1: cadencia creciente al disparar sin parar (Nagant)
+	var had_target := false                      ## el último disparo tenía a quién apuntar
 	var owner_data: CharacterData                ## estadísticas del jugador: los objetos (D-38) las cambian
 	func _init(p_data: WeaponData, p_owner: CharacterData = null) -> void:
 		data = p_data
@@ -46,6 +48,7 @@ var _bonus_set := -1                         ## rasgos de daño del jugador, reg
 var _rings := {}                             ## Weapon -> OrbitRing (páginas del Necronomicón)
 var _drones := {}                            ## Weapon -> MiGoDrones (orbes Mi-Go)
 var _tethers := {}                           ## Weapon -> TetherBeam activo (Lente del Éter)
+var _traps := {}                             ## Weapon -> cepos puestos (Cepos)
 
 func setup(p_player: Player, p_world: CombatWorld) -> WeaponSystem:
 	player = p_player
@@ -120,6 +123,10 @@ func _physics_process_step(delta: float) -> void:
 		if not _fire(w): continue                # el machete espera a tener a alguien cerca
 		Sfx.play(sound_of(w.data))
 		w.timer = w.stat("cooldown")
+		if w.data.spinup > 1.0:                  # Nagant: cuanto más dispara seguido, más rápido
+			var step := w.stat("cooldown") / maxf(w.data.spinup_time, 0.1)
+			w.heat = clampf(w.heat + (step if w.had_target else -step * 3.0), 0.0, 1.0)
+			w.timer /= lerpf(1.0, w.data.spinup, w.heat)
 		if w.data.category == WeaponData.Category.MAGIC: w.timer *= player.data.arcane_cooldown_mult   # rasgo de Armitage
 
 ## Sonido al disparar (hito 8.1): el del arma o, si no tiene, según su categoría y entrega.
@@ -145,10 +152,12 @@ func _fire(w: Weapon) -> bool:
 	var rng := w.stat("range")
 	var ahead := origin + player.motor.facing * rng * 0.55
 	var target_pos := Vector3.ZERO
+	w.had_target = true
 	match w.data.targeting:
 		WeaponData.Targeting.NEAREST:
 			var t := world.nearest_enemy(origin, rng)
 			target_pos = t.global_position if t != null else ahead
+			w.had_target = t != null
 		WeaponData.Targeting.DENSEST:
 			var t := world.densest_enemy(origin, rng, maxf(w.stat("aoe_radius"), 1.0))
 			target_pos = t.global_position if t != null else ahead
@@ -188,6 +197,13 @@ func _fire(w: Weapon) -> bool:
 		WeaponData.Delivery.BOOMERANG: return _boomerang(w, target_pos)
 		WeaponData.Delivery.FISSURE: return _fissure(w, target_pos)
 		WeaponData.Delivery.THRUST: return _thrust(w)
+		WeaponData.Delivery.WHIP: return _whip(w)
+		WeaponData.Delivery.TRAP: return _trap(w, target_pos)
+		WeaponData.Delivery.FIREBALL: return _fireball(w, target_pos)
+		WeaponData.Delivery.VORTEX: return _vortex(w, target_pos)
+		WeaponData.Delivery.SPIKES: return _spikes(w)
+		WeaponData.Delivery.MADDEN: return _madden(w)
+		WeaponData.Delivery.SWEEP: return _sweep(w)
 	if w.data.delivery == WeaponData.Delivery.THROWN:
 		for k in n:
 			var jitter := Vector3.ZERO
@@ -206,14 +222,15 @@ func _fire(w: Weapon) -> bool:
 		var spread := deg_to_rad(w.stat("spread_deg"))
 		var bases: Array[Vector3] = [base]
 		if w.data.targeting == WeaponData.Targeting.FRONT_BACK: bases.append(-base)   # Lugers: delante y detrás
-		for b in bases:
-			for k in n:
-				var off := 0.0 if n == 1 else lerpf(-spread * 0.5, spread * 0.5, k / float(n - 1))
-				off += deg_to_rad(randf_range(-1.0, 1.0) * w.stat("jitter_deg"))       # errático
-				var dir := b.rotated(Vector3.UP, off)
-				var delay := w.stat("burst_delay") * k
-				if delay > 0.0: _pending.append({"w": w, "dir": dir, "t": delay, "k": dmg_k})
-				else: _spawn_bullet(w, dir, dmg_k)
+		for v in int(w.stat("volleys")):         # Recortada: dos disparos seguidos
+			for b in bases:
+				for k in n:
+					var off := 0.0 if n == 1 else lerpf(-spread * 0.5, spread * 0.5, k / float(n - 1))
+					off += deg_to_rad(randf_range(-1.0, 1.0) * w.stat("jitter_deg"))       # errático
+					var dir := b.rotated(Vector3.UP, off)
+					var delay := w.stat("burst_delay") * k + w.stat("volley_delay") * v
+					if delay > 0.0: _pending.append({"w": w, "dir": dir, "t": delay, "k": dmg_k})
+					else: _spawn_bullet(w, dir, dmg_k)
 		_pay_sanity(w)                           # balas arcanas (fuegos fatuos, Rayo de Yith)
 	fired.emit(w)
 	return true
@@ -242,6 +259,12 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 	if w.stat("ally_time") > 0.0:                                         # suero de West
 		effect = BulletManager.Effect.INJECT
 		effect_val = w.stat("ally_time")
+	if w.stat("root") > 0.0:                                              # ballesta: clava
+		effect = BulletManager.Effect.ROOT
+		effect_val = w.stat("root")
+	if w.stat("bounces") > 0.0:                                           # BAR: rebota
+		effect = BulletManager.Effect.BOUNCE
+		effect_val = w.stat("bounces")
 	if paranoid():                                                         # en crisis de paranoia
 		effect = BulletManager.Effect.PARANOIA
 		effect_val = player.rules.paranoia_mental
@@ -292,6 +315,7 @@ func _orbit(w: Weapon) -> bool:
 	var ring := _rings.get(w) as OrbitRing
 	if ring == null:
 		ring = OrbitRing.new().setup(player, world)
+		ring.look = w.data.orbit_look
 		_rings[w] = ring
 		world.fx.add_child(ring)
 	if ring.active: return false
@@ -403,6 +427,9 @@ func _cloud(w: Weapon, target_pos: Vector3) -> bool:
 		w.stat("zone_dps") * player.damage_mult(w.data.category), w.stat("vulnerable"), player.data.bonus_tags)
 	z.slow_k = w.stat("slow_factor")
 	z.weak_k = w.stat("weaken")
+	if w.stat("drift") > 0.0:                                     # gas: deriva hacia donde se lanzó
+		var away := Vector3(target_pos.x - player.global_position.x, 0, target_pos.z - player.global_position.z)
+		z.drift = (away.normalized() if away.length() > 0.1 else player.motor.facing) * w.stat("drift")
 	world.fx.add_child(z)
 	player.play_once("throw")
 	fired.emit(w)
@@ -566,6 +593,113 @@ func _flame(w: Weapon, target_pos: Vector3) -> bool:
 	var k := player.damage_mult(w.data.category)
 	var jet := FlameJet.new().setup(player, world, dir, w.stat("range"), w.stat("spread_deg"), dmg(w),
 		w.stat("duration"), w.stat("zone_radius"), w.stat("zone_time"), w.stat("zone_dps") * k, player.data.bonus_tags)
+	jet.frost = w.data.frost                                      # Aliento de Ithaqua
+	_pay_sanity(w)
 	world.fx.add_child(jet)
+	fired.emit(w)
+	return true
+
+# ---------------- Arsenal III (D-38, hito 8.8) ----------------
+
+## Dirección plana hacia un punto (o hacia donde mira el personaje si está encima).
+func _dir_to(p: Vector3) -> Vector3:
+	var d := Vector3(p.x - player.global_position.x, 0, p.z - player.global_position.z)
+	return d.normalized() if d.length() > 0.05 else player.motor.facing
+
+## Látigo: sector hacia el más cercano a su alcance. Sin nadie, espera.
+func _whip(w: Weapon) -> bool:
+	var origin := player.global_position
+	var length := w.stat("range")
+	var first := world.nearest_enemy(origin, length)
+	if first == null: return false
+	var dir := _dir_to(first.global_position)
+	var half := deg_to_rad(w.stat("spread_deg")) * 0.5
+	for t in world.enemies_in_circle(origin, length):
+		var rel := Vector3(t.global_position.x - origin.x, 0, t.global_position.z - origin.z)
+		if rel.length() > 0.3 and absf(Vector2(dir.x, dir.z).angle_to(Vector2(rel.x, rel.z))) > half: continue
+		var d := Damage.new(dmg(w), 0.0)
+		d.knockback = rel.normalized() * w.stat("knockback")
+		d.bonus = player.data.bonus_tags
+		t.take_damage(d)
+	world.bullets.clear_enemy_bullets(origin + dir * length * 0.5, length * 0.3)   # la tralla corta balas
+	world.fx.add_child(WhipFx.new().setup(origin, dir, length, w.stat("spread_deg")))
+	player.play_once("throw")
+	fired.emit(w)
+	return true
+
+## Cepos: uno nuevo a 1,5-3,5 m hacia el enemigo más cercano (o donde mira), como mucho
+## `count` puestos a la vez.
+func _trap(w: Weapon, target_pos: Vector3) -> bool:
+	var live: Array = (_traps.get(w, []) as Array).filter(func(t: Node) -> bool: return is_instance_valid(t) and not t.sprung)
+	_traps[w] = live
+	if live.size() >= int(w.stat("count")): return false
+	var dir := _dir_to(target_pos).rotated(Vector3.UP, randf_range(-0.9, 0.9))
+	var pos := player.global_position + dir * randf_range(1.5, 3.5)
+	var obs := world.obstacles
+	if obs != null and obs.has_mask() and obs.is_blocked(Vector2(pos.x, pos.z), 0.3): pos = player.global_position + dir * 0.8
+	var trap := BearTrap.new().setup(world, pos, w.stat("aoe_radius"), w.stat("duration"), dmg(w), w.stat("root"),
+		player.data.bonus_tags)
+	world.fx.add_child(trap)
+	live.append(trap)
+	fired.emit(w)
+	return true
+
+## Llama de Cthugha: bola de fuego hacia el objetivo.
+func _fireball(w: Weapon, target_pos: Vector3) -> bool:
+	_pay_sanity(w)
+	var dir := _dir_to(target_pos)
+	var k := player.damage_mult(w.data.category)
+	world.fx.add_child(Fireball.new().setup(world, player.global_position, dir,
+		w.stat("projectile_speed") + inherited_speed(dir), w.stat("range"), w.stat("projectile_radius"), dmg(w),
+		w.stat("zone_radius"), w.stat("zone_time"), w.stat("zone_dps") * k, player.data.bonus_tags))
+	fired.emit(w)
+	return true
+
+## Esfera de Yog-Sothoth: hacia el grupo más denso a su alcance.
+func _vortex(w: Weapon, target_pos: Vector3) -> bool:
+	_pay_sanity(w)
+	world.fx.add_child(Vortex.new().setup(world, player.global_position + _dir_to(target_pos) * 0.8, target_pos,
+		w.stat("projectile_speed"), w.stat("aoe_radius"), dmg(w), w.stat("hit_interval"), w.stat("pull"),
+		w.stat("duration"), player.data.bonus_tags))
+	fired.emit(w)
+	return true
+
+## Tentáculos de Shub: bajo `count` enemigos al azar a su alcance. Sin nadie, espera.
+func _spikes(w: Weapon) -> bool:
+	var pool := world.enemies_in_circle(player.global_position, w.stat("range"))
+	if pool.is_empty(): return false
+	_pay_sanity(w)
+	pool.shuffle()
+	for i in mini(int(w.stat("count")), pool.size()):
+		world.fx.add_child(TentacleSpike.new().setup(world, pool[i].global_position, w.stat("aoe_radius"), dmg(w),
+			w.stat("stun"), player.data.bonus_tags))
+	fired.emit(w)
+	return true
+
+## Signo Amarillo: enloquece a los `count` enemigos más cercanos que aún no lo están.
+func _madden(w: Weapon) -> bool:
+	var origin := player.global_position
+	var pool := world.enemies_in_circle(origin, w.stat("range")).filter(
+		func(e: Node3D) -> bool: return e.is_alive() and e.has_method("madden") and not e.is_maddened())
+	if pool.is_empty(): return false
+	pool.sort_custom(func(a: Node3D, b: Node3D) -> bool:
+		return a.global_position.distance_squared_to(origin) < b.global_position.distance_squared_to(origin))
+	_pay_sanity(w)
+	for i in mini(int(w.stat("count")), pool.size()):
+		pool[i].madden(w.stat("duration"), dmg(w), player.data.bonus_tags)
+		var fx := Stab.new().setup(origin, pool[i].global_position)
+		fx.color = Color(1.0, 0.85, 0.2, 0.9)                       # el signo, amarillo
+		world.fx.add_child(fx)
+	fired.emit(w)
+	return true
+
+## Lámpara de Alhazred: el haz gira alrededor del personaje. Uno a la vez por arma.
+func _sweep(w: Weapon) -> bool:
+	if is_instance_valid(_tethers.get(w)): return false
+	_pay_sanity(w)
+	var b := SweepBeam.new().setup(player, world, w.stat("range"), w.stat("projectile_radius"), w.stat("projectile_speed"),
+		dmg(w), w.stat("hit_interval"), w.stat("duration"), player.data.bonus_tags)
+	_tethers[w] = b
+	world.fx.add_child(b)
 	fired.emit(w)
 	return true

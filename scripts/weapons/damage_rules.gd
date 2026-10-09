@@ -18,12 +18,12 @@ const TOLERANCE := 0.15
 const D := WeaponData.Delivery
 ## Entregas que no son proyectiles: el rasgo "uno o varios proyectiles" no se aplica.
 const NO_PROJECTILE := [D.MELEE, D.WAVE, D.PULSE, D.SIGIL, D.FLAME, D.CLOUD, D.TETHER, D.STAB,
-	D.THRUST, D.FISSURE, D.BEAM, D.CHAIN, D.TURRET]
+	D.THRUST, D.FISSURE, D.BEAM, D.CHAIN, D.TURRET, D.WHIP, D.TRAP, D.VORTEX, D.SPIKES, D.MADDEN, D.SWEEP]
 ## Entregas que dañan una zona o una línea (o atraviesan).
 const AREA := [D.MELEE, D.ORBIT, D.WAVE, D.PULSE, D.SIGIL, D.FLAME, D.CLOUD, D.CHAIN, D.FISSURE,
-	D.BEAM, D.THRUST]
+	D.BEAM, D.THRUST, D.WHIP, D.FIREBALL, D.VORTEX, D.SPIKES, D.SWEEP]
 ## Entregas centradas en el personaje: su alcance es aoe_radius.
-const SELF := [D.MELEE, D.ORBIT, D.WAVE, D.PULSE, D.SIGIL]
+const SELF := [D.MELEE, D.ORBIT, D.WAVE, D.PULSE, D.SIGIL, D.SWEEP]
 
 const SHORT_REACH := 5.0
 const LONG_REACH := 14.0
@@ -33,7 +33,7 @@ const FAST_COOLDOWN := 0.5
 ## Rasgos del arma: diccionario rasgo -> [etiqueta, factor].
 static func traits(w: WeaponData) -> Dictionary:
 	var t := {}
-	var reach := w.aoe_radius if w.delivery in SELF else w.range
+	var reach := w.aoe_radius if w.delivery in SELF and w.delivery != D.SWEEP else w.range
 	if reach <= SHORT_REACH: t["alcance"] = ["corto", 1.3]
 	elif reach >= LONG_REACH: t["alcance"] = ["largo", 0.85]
 	var area := w.delivery in AREA or w.pierce > 0.0 or w.zone != WeaponData.Zone.NONE \
@@ -52,7 +52,7 @@ static func traits(w: WeaponData) -> Dictionary:
 	return t
 
 static func is_control(w: WeaponData) -> bool:
-	return w.stun > 0.0 or w.root > 0.0 or w.lure > 0.0 or w.stasis > 0.0 or w.vulnerable > 0.0 		or w.ally_time > 0.0 or w.delivery in [D.PULSE, D.SIGIL] or w.zone == WeaponData.Zone.DUST 		or (w.delivery == D.CLOUD and (w.slow_factor < 1.0 or w.weaken < 1.0))
+	return w.stun > 0.0 or w.root > 0.0 or w.lure > 0.0 or w.stasis > 0.0 or w.vulnerable > 0.0 		or w.ally_time > 0.0 or w.delivery in [D.PULSE, D.SIGIL] or w.zone == WeaponData.Zone.DUST 		or (w.delivery == D.CLOUD and (w.slow_factor < 1.0 or w.weaken < 1.0)) or w.frost or w.pull > 0.0 		or w.delivery == D.MADDEN
 
 static func factor(w: WeaponData) -> float:
 	var f := 1.0
@@ -71,11 +71,17 @@ static func _hit_per_use(w: WeaponData) -> float:
 		D.DRONE: return w.damage * w.count * w.duration / maxf(w.hit_interval, 0.05)
 		D.TETHER: return w.damage * w.duration / maxf(w.hit_interval, 0.05) * (1.0 + w.ramp_max) * 0.5
 		D.FLAME: return w.damage * w.duration / 0.15
+		D.VORTEX: return w.damage * w.duration / maxf(w.hit_interval, 0.05)
+		D.SWEEP: return w.damage * maxf(w.duration * w.projectile_speed / 360.0, 1.0)   # una vez por vuelta
+		D.MADDEN: return w.damage * w.duration                   # lo que hacen los enloquecidos
+		D.SPIKES, D.TRAP: return w.damage                        # cada uno, a un enemigo distinto
+	if w.delivery == D.BULLET: return w.damage * w.count * w.volleys
 	return w.damage * w.count
 
 ## s entre usos: las páginas y los orbes no vuelven a salir mientras están activos.
 static func cycle(w: WeaponData) -> float:
-	if w.delivery in [D.ORBIT, D.DRONE]: return maxf(w.cooldown, w.duration)
+	if w.delivery in [D.ORBIT, D.DRONE, D.SWEEP]: return maxf(w.cooldown, w.duration)
+	if w.spinup > 1.0: return w.cooldown / ((1.0 + w.spinup) * 0.5)   # Nagant: la cadencia media
 	return maxf(w.cooldown, 0.05)
 
 ## Daño por segundo a un solo objetivo, nivel 1, si todo acierta.

@@ -63,6 +63,11 @@ var _burn_dps := 0.0
 var _burn_bonus := {}
 var _burn_tag := &""
 var _burn_tick := 0.0
+var _madden_t := 0.0                        ## s enloquecido (Signo Amarillo): ataca a los suyos
+var _madden_dps := 0.0
+var _madden_hit := 0.0
+var _madden_tag := &""
+var _madden_bonus := {}
 var _confuse_t := 0.0                       ## s confundido (polilla de Leng): vaga sin rumbo y no dispara
 var _wander := Vector3.ZERO
 var _wander_t := 0.0
@@ -244,6 +249,22 @@ func is_poisoned() -> bool:
 func confuse(seconds: float) -> void:
 	_confuse_t = maxf(_confuse_t, seconds * (0.5 if data.elite else 1.0))
 
+## Enloquecido `seconds` (Signo Amarillo; las élites, la mitad): va a por el enemigo más cercano
+## y le hace `dps`; no dispara ni daña a los jugadores.
+func madden(seconds: float, dps: float, bonus: Dictionary = {}) -> void:
+	_madden_t = maxf(_madden_t, seconds * (0.5 if data.elite else 1.0))
+	_madden_dps = dps
+	_madden_tag = Damage.ctx
+	_madden_bonus = bonus
+
+func is_maddened() -> bool:
+	return _madden_t > 0.0
+
+## Empujón externo (Esfera de Yog-Sothoth): se suma al retroceso; las élites lo notan menos.
+func nudge(v: Vector3) -> void:
+	if anchored: return
+	_knock += Vector3(v.x, 0, v.z) * (0.3 if data.elite or data.unique else 1.0)
+
 func is_confused() -> bool:
 	return _confuse_t > 0.0
 
@@ -345,6 +366,34 @@ func _update_status(delta: float) -> bool:
 		return true
 	return false
 
+## Enloquecido: persigue al enemigo vivo más cercano y le golpea cada MADDEN_HIT s.
+const MADDEN_HIT := 0.5
+func _madden_step(delta: float) -> void:
+	_madden_t -= delta
+	_madden_hit -= delta
+	var best: Node3D = null
+	var best_d := INF
+	for e in world.enemies_in_circle(global_position, 7.0):
+		if e == self or not e.is_alive(): continue
+		var dd := global_position.distance_squared_to(e.global_position)
+		if dd < best_d:
+			best_d = dd
+			best = e
+	if best == null:
+		velocity = Vector3.ZERO
+		return
+	var to := Vector3(best.global_position.x - position.x, 0, best.global_position.z - position.z)
+	velocity = to.normalized() * data.move_speed * 1.1
+	if to.length() <= data.body_radius + float(best.hit_radius) + 0.25 and _madden_hit <= 0.0:
+		_madden_hit = MADDEN_HIT
+		var prev := Damage.ctx
+		Damage.ctx = _madden_tag
+		var d := Damage.new(_madden_dps * MADDEN_HIT, 0.0)
+		Damage.ctx = prev
+		d.bonus = _madden_bonus
+		d.knockback = to.normalized()
+		best.take_damage(d)
+
 func _physics_process(delta: float) -> void:
 	if not is_alive(): return
 	var t0 := Prof.start()
@@ -376,6 +425,7 @@ func _physics_process(delta: float) -> void:
 			var a := randf() * TAU
 			_wander = Vector3(cos(a), 0, sin(a))
 		velocity = _wander * data.move_speed * 0.6
+	if _madden_t > 0.0: _madden_step(delta)
 	if _stun > 0.0:
 		_stun -= delta
 		velocity = Vector3.ZERO
@@ -404,14 +454,14 @@ func _physics_process(delta: float) -> void:
 	if data.aura_drain > 0.0:                   # presencia: drena cordura a los de dentro del aura
 		for p in world.players:
 			if p.global_position.distance_to(global_position) <= data.aura_radius: p.drain_sanity(data.aura_drain * delta)
-	for p in world.players if behavior.touches(self) else []:
+	for p in world.players if behavior.touches(self) and _madden_t <= 0.0 else []:
 		var r := data.body_radius + p.data.hurt_radius
 		var pp := p.global_position
 		if Vector2(pp.x - position.x, pp.z - position.z).length_squared() < r * r:
 			var cd := behavior.contact_damage(self)
 			p.take_damage(cd.scaled(_weak_k) if _weak_t > 0.0 else cd)
 	# Ataque a distancia
-	if data.attack != null and target != null and _stun <= 0.0 and _confuse_t <= 0.0 and behavior.can_shoot(self):
+	if data.attack != null and target != null and _stun <= 0.0 and _confuse_t <= 0.0 and _madden_t <= 0.0 and behavior.can_shoot(self):
 		_attack_timer -= delta
 		if _attack_timer <= 0.0 and not runner.busy and target.global_position.distance_to(global_position) < data.attack_range:
 			runner.fire(data.attack, func() -> Vector3: return target.global_position if is_instance_valid(target) else global_position)
@@ -437,6 +487,7 @@ func _process(delta: float) -> void:
 	elif _curse_t > 0.0: want = _status(Color(0.55, 0.12, 0.7, 0.35 + 0.1 * sin(_spawn_t * 9.0)))
 	elif _burn_t > 0.0: want = _status(Color(1.0, 0.5, 0.12, 0.3 + 0.1 * sin(_spawn_t * 13.0)))
 	elif _poison_t > 0.0: want = _status(Color(0.35, 0.85, 0.15, 0.3 + 0.08 * sin(_spawn_t * 7.0)))
+	elif _madden_t > 0.0: want = _status(Color(1.0, 0.85, 0.15, 0.3 + 0.12 * sin(_spawn_t * 10.0)))
 	elif _confuse_t > 0.0: want = _status(Color(0.95, 0.75, 0.95, 0.22 + 0.1 * sin(_spawn_t * 11.0)))
 	elif _inject_t > 0.0: want = _status(Color(0.8, 0.95, 0.25, 0.14 + 0.06 * sin(_spawn_t * 12.0)))   # suero: tenue (el aliado, verde intenso)
 	if want != _overlay:

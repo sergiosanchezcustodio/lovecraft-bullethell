@@ -9,7 +9,7 @@ var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 var player: Player
 var world: CombatWorld
 var active := false
-var _pages: Array[MeshInstance3D] = []
+var _pages: Array[Node3D] = []
 var _count := 3
 var _radius := 1.8
 var _speed := 160.0                        ## grados por segundo
@@ -23,8 +23,11 @@ var _bonus := {}
 var _angle := 0.0
 var _last_hit := {}                        ## id del enemigo -> momento del último golpe
 var _t := 0.0
+var look := ""                             ## "" páginas; "ancla": el ancla del Alert con su cadena (hito 8.8)
+var _chain: Array[MeshInstance3D] = []
 
 const FADE := 0.25
+const CHAIN_LINKS := 7
 
 func setup(p_player: Player, p_world: CombatWorld) -> OrbitRing:
 	player = p_player
@@ -41,7 +44,29 @@ func start(count: int, radius: float, speed: float, hit_r: float, damage: float,
 	while _pages.size() < _count: _pages.append(_make_page())
 	for i in _pages.size(): _pages[i].visible = i < _count
 
-func _make_page() -> MeshInstance3D:
+func _make_page() -> Node3D:
+	if look == "ancla":
+		var holder := Node3D.new()
+		holder.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+		var m := VoxelBuilder.load_model("res://models/proj_ancla.json")
+		m.position = Vector3(0, -0.3, 0)
+		holder.add_child(m)
+		add_child(holder)
+		var bm := BoxMesh.new()                       # cadena: eslabones hasta el personaje
+		bm.size = Vector3.ONE * 0.08
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = Color(0.35, 0.36, 0.38)
+		mat.metallic = 0.6
+		mat.roughness = 0.5
+		bm.material = mat
+		for i in CHAIN_LINKS:
+			var link := MeshInstance3D.new()
+			link.mesh = bm
+			link.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			link.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+			add_child(link)
+			_chain.append(link)
+		return holder
 	var mi := MeshInstance3D.new()
 	var bm := BoxMesh.new()
 	bm.size = Vector3(0.26, 0.34, 0.04)
@@ -92,6 +117,15 @@ func _process(delta: float) -> void:
 	for i in _count:
 		var a := deg_to_rad(_angle) + TAU * i / _count
 		var pg := _pages[i]
+		if look == "ancla":
+			pg.global_position = center + Vector3(cos(a) * _radius, 0.7, sin(a) * _radius)
+			pg.rotation = Vector3(0, -a, PI * 0.5)                                         # tumbada, la caña hacia el personaje
+			pg.scale = Vector3.ONE * k * 1.4
+			for j in _chain.size():
+				var f := float(j + 1) / (_chain.size() + 1)
+				_chain[j].global_position = center + Vector3(cos(a) * _radius * f, 0.9 - 0.2 * f, sin(a) * _radius * f)
+				_chain[j].visible = k > 0.05
+			continue
 		pg.global_position = center + Vector3(cos(a) * _radius, 1.0 + 0.12 * sin(_t * 6.0 + i), sin(a) * _radius)
 		pg.rotation = Vector3(0.35 * sin(_t * 9.0 + i * 2.0), -a, 0.2)                   # aletean al girar
 		pg.scale = Vector3.ONE * k

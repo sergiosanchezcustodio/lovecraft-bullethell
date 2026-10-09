@@ -72,6 +72,23 @@ WEAPONS = {
     'red': "a coiled fishing net with rope and small lead weights",
     'martillo': "a geologist's rock hammer with a pointed pick head and a wooden handle",
     'estoque': "a sword cane, a black walking stick with a silver handle and a thin rapier blade half drawn",
+    # Arsenal III (D-38, hito 8.8)
+    'recortada': "a break-action double-barreled coach gun cut very short: two fat side-by-side barrels welded together, two external hammers, no pump, no magazine, a short curved wooden grip",
+    'antitanque': "a WWI German Mauser 1918 anti-tank rifle, very long heavy barrel, bipod, bolt action, dark steel and wood",
+    'mortero': "a WWI Stokes trench mortar: a short wide steel tube on a bipod and a base plate, with a mortar shell beside it",
+    'bar': "a Browning Automatic Rifle M1918, long dark steel rifle with a box magazine underneath and a wooden stock",
+    'nagant': "a Russian Nagant M1895 revolver, dark blued steel, long thin barrel, brown wooden grip",
+    'ancla': "a rusty iron ship anchor with a heavy chain coiled around its shank",
+    'gas': "a WWI chlorine gas canister, dented olive metal cylinder with a valve, leaking yellow-green toxic gas",
+    'latigo': "a coiled braided leather bullwhip with a wooden handle",
+    'cepos': "an open round steel bear trap lying flat: two semicircular jaws with sharp jagged teeth forming a circle, a round pressure plate in the middle, two flat springs on the sides and a short chain",
+    'ballesta': "a wooden hunting crossbow loaded with a steel-tipped bolt",
+    'cthugha': "a sphere of living fire, an orange and yellow fireball with a white-hot core floating above a brass ritual brazier",
+    'ithaqua': "a swirling gust of icy wind with snowflakes and frost crystals around a pale blue glowing ice shard",
+    'yog': "a floating cluster of five round glowing orbs of different sizes, golden, violet and teal, overlapping like soap bubbles, each orb a round ball, floating in the air, nothing else",
+    'shub': "a dark green and black slimy tentacle bursting up from cracked earth, glowing green tip",
+    'signo_amarillo': "a tattered bright yellow cloth banner hanging from a wooden crossbar, large and clearly visible, with a dark brown occult sigil embroidered in the middle shaped like an irregular spiral with three curling hooked tendrils, the King in Yellow",
+    'lampara': "an ornate Arabian brass oil lamp with a bright golden beam of light shining out of its spout",
 }
 
 

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"shub"
+display_name = "Tentáculos de Shub"
+description = "Tentáculos que brotan del suelo, tras un aviso, bajo enemigos al azar."
+delivery = 22
+category = 2
+targeting = 3
+cooldown = 1.8
+range = 8.0
+count = 2.0
+aoe_radius = 1.1
+damage = 17.4
+stun = 0.4
+sanity_cost = 2.5
+max_level = 5
+level_mods = Array[Dictionary]([{"count+": 1.0}, {"damage*": 1.25}, {"aoe_radius*": 1.2}, {"count+": 1.0}])
+level_text = Array[String](["Un tentáculo más", "+25 % de daño", "Un 20 % más grandes", "Un tentáculo más"])

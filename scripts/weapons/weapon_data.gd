@@ -34,11 +34,26 @@ enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND, STRONGEST, FRONT_BACK }
 ## de ancho, y aturde `stun` s (Martillo de geólogo).
 ## THRUST: estocada en línea hacia el más cercano, `range` de largo y projectile_radius de
 ## medio ancho, que daña todo lo que hay en ella (Bastón estoque).
+## Arsenal III (D-38, hito 8.8):
+## WHIP: latigazo en un sector de `spread_deg` hacia el más cercano, de `range` de largo (Látigo).
+## TRAP: deja un cepo a unos metros (como mucho `count` a la vez) que atrapa `root` s al primero
+## que lo pisa (aoe_radius) y dura `duration` s (Cepos).
+## FIREBALL: bola de fuego que avanza `range` m a projectile_speed, atraviesa y va dejando fuego
+## en el suelo (zone) cada pocos pasos (Llama de Cthugha).
+## VORTEX: orbe lento hacia el grupo más denso que atrae (`pull`) a los de aoe_radius y los daña
+## cada hit_interval durante `duration` s (Esfera de Yog-Sothoth).
+## SPIKES: `count` tentáculos que brotan, tras un aviso, bajo enemigos al azar a menos de `range`;
+## dañan en aoe_radius y aturden `stun` s (Tentáculos de Shub).
+## MADDEN: enloquece a `count` enemigos a menos de `range` durante `duration` s: atacan a los
+## suyos con `damage` por segundo y no disparan ni tocan a los jugadores (Signo Amarillo).
+## SWEEP: rayo de `range` m que gira alrededor del personaje a projectile_speed grados por
+## segundo durante `duration` s; daña cada hit_interval a cada enemigo (Lámpara de Alhazred).
 enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE, FLAME, SIGIL, PULSE, TETHER, CLOUD, DRONE, STAB,
-	CHAIN, TURRET, BOOMERANG, FISSURE, THRUST }
+	CHAIN, TURRET, BOOMERANG, FISSURE, THRUST, WHIP, TRAP, FIREBALL, VORTEX, SPIKES, MADDEN, SWEEP }
 ## Zona que deja en el suelo (lanzados, lanzallamas, nube): ninguna, fuego, ácido o polvo
 ## (ralentiza y debilita).
-enum Zone { NONE, FIRE, ACID, DUST }
+## GAS: nube tóxica que deriva (`drift` m/s) hacia donde se lanzó (Gas de cloro).
+enum Zone { NONE, FIRE, ACID, DUST, GAS }
 
 ## Tipo de ataque, para los atributos (D-27): físico (FUE+TEN: cuerpo a cuerpo y lanzadas
 ## con el brazo), de fuego (CON+INT) o mágico (POD+CUL: arcanas y tecnología de los Mitos).
@@ -100,6 +115,16 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var crit_mult := 1.0                 ## daño del crítico
 @export var ally_time := 0.0                 ## s que se levanta como aliado el que muere inyectado (West)
 @export var root := 0.0                      ## s que deja inmóviles a los de la red (las élites solo se frenan)
+@export_group("Arsenal III")
+@export var volleys := 1.0                   ## disparos seguidos por uso (Recortada: 2)
+@export var volley_delay := 0.2              ## s entre ellos
+@export var bounces := 0.0                   ## rebotes de cada bala hacia otro enemigo cercano (BAR)
+@export var spinup := 1.0                    ## cadencia máxima al disparar sin parar (Nagant: 2,5); 1 = fija
+@export var spinup_time := 3.0               ## s disparando hasta llegar a ella
+@export var drift := 0.0                     ## m/s que deriva la zona (Gas de cloro)
+@export var frost := false                   ## chorro helado: frena y, si sigue, congela (Aliento de Ithaqua)
+@export var pull := 0.0                      ## fuerza con que atrae hacia su centro (Esfera de Yog-Sothoth)
+@export var orbit_look := ""                 ## aspecto de la órbita: "" páginas, "ancla"
 @export_group("Progresión")
 ## Evolución (D-06): con el arma al nivel máximo y el objeto `evolves_with` (id de UpgradeData),
 ## el siguiente baúl arcano la convierte en `evolution` (id de otra arma, con `evolved`).

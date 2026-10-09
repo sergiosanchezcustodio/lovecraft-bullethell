@@ -44,7 +44,7 @@ var _imp_n := 0
 ## INJECT: suero de Herbert West; el que muere inyectado se levanta `_effect_val` s como aliado.
 ## PARANOIA: bala de un jugador en crisis de paranoia; a los compañeros (no a quien la dispara,
 ## `_owner`) les quita `_effect_val` de cordura y ninguna vida (D-17).
-enum Effect { NONE, STASIS, INJECT, PARANOIA }
+enum Effect { NONE, STASIS, INJECT, PARANOIA, ROOT, BOUNCE }
 
 const MAX_BULLETS := 4096
 const HEIGHT := 0.8                          ## altura de vuelo (a la altura del pecho)
@@ -313,10 +313,33 @@ func _collide_player_bullet(i: int) -> bool:
 		t.take_damage(d)
 		if _effect[i] == Effect.STASIS and t.is_alive() and t.has_method("stasis"): t.stasis(_effect_val[i])
 		elif _effect[i] == Effect.INJECT and t.has_method("inject"): t.inject(_effect_val[i], d.bonus)
+		elif _effect[i] == Effect.ROOT and t.is_alive() and t.has_method("root"): t.root(_effect_val[i])   # ballesta
 		_last_hit[i] = t.get_instance_id()
+		if _effect[i] == Effect.BOUNCE and _effect_val[i] >= 1.0 and _bounce(i, t): return false   # BAR
 		_pierce[i] -= 1
 		if _pierce[i] < 0: return true
 	return false
+
+## Rebote (BAR): la bala sale hacia el enemigo vivo más cercano a menos de BOUNCE_RANGE que
+## no sea el que acaba de tocar, con su misma velocidad y el alcance renovado.
+const BOUNCE_RANGE := 6.0
+func _bounce(i: int, hit: Node3D) -> bool:
+	var best: Node3D = null
+	var best_d := BOUNCE_RANGE * BOUNCE_RANGE
+	for e in world.enemies_in_circle(_pos[i], BOUNCE_RANGE):
+		if e == hit or not e.is_alive(): continue
+		var dd := Vector2(e.global_position.x - _pos[i].x, e.global_position.z - _pos[i].z).length_squared()
+		if dd < best_d:
+			best_d = dd
+			best = e
+	if best == null: return false
+	var spd := _vel[i].length()
+	var to := Vector3(best.global_position.x - _pos[i].x, 0, best.global_position.z - _pos[i].z).normalized()
+	_vel[i] = to * spd
+	_age[i] = 0.0
+	_life[i] = BOUNCE_RANGE * 1.3 / maxf(spd, 0.1)
+	_effect_val[i] -= 1.0
+	return true
 
 ## Paranoia: ¿toca a un compañero del que la disparó? Le quita cordura, nunca vida.
 func _hits_mate(i: int) -> bool:
