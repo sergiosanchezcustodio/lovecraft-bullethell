@@ -12,7 +12,7 @@ from arena_kit import Arena, COLLIDERS, LAMP
 
 HALF = 32.0
 A = Arena("paso", seed=1932, half=HALF,
-          foot={"atrezo_roca_grande": 2.6, "atrezo_columna_tallada": 1.6, "atrezo_estalagmita": 1.0,
+          foot={"atrezo_roca_grande": 2.6, "atrezo_columna_tallada": 1.6, "atrezo_estalagmita": 1.0, "atrezo_estalagmita_2": 1.0,
                 "atrezo_cristales": 1.2})
 
 # columnas de los Antiguos: una avenida rota que cruza el paso en diagonal
@@ -32,7 +32,8 @@ A.add("atrezo_trineo", 4.0, -5.0, rot=40)
 A.edge(["atrezo_roca_grande"], step=2.8, inset=1.5, smin=1.6, smax=2.2)
 
 A.scatter("atrezo_roca_grande", 9, 12.0, 0.9, 1.4)
-A.scatter("atrezo_estalagmita", 14, 9.0, 0.9, 1.6)
+for m in ("atrezo_estalagmita", "atrezo_estalagmita_2"):
+    A.scatter(m, 7, 9.0, 0.9, 1.6)
 A.scatter("monticulo_3", 5, 12.0, 0.8, 1.2)
 # Rocas nevadas hechas con Replicate (09-10-2026); al final, para no mover lo demás
 A.scatter("atrezo_roca_nevada", 8, 9.0, 0.9, 1.5)
@@ -41,6 +42,7 @@ COLL = dict(COLLIDERS)
 COLL.update({
     "atrezo_roca_grande": {"type": "box", "shrink": 0.8},
     "atrezo_estalagmita": {"type": "cylinder", "radius": 0.5},
+    "atrezo_estalagmita_2": {"type": "cylinder", "radius": 0.5},
     "atrezo_columna_tallada": {"type": "box", "shrink": 0.6},
     "atrezo_cristales": {"type": "cylinder", "radius": 0.8},
     "atrezo_caja_rota": {"type": "box", "shrink": 0.9},

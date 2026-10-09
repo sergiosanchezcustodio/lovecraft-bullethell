@@ -389,6 +389,10 @@
    "type": "cylinder",
    "radius": 0.5
   },
+  "atrezo_estalagmita_2": {
+   "type": "cylinder",
+   "radius": 0.5
+  },
   "atrezo_columna_tallada": {
    "type": "box",
    "shrink": 0.6
@@ -1267,7 +1271,7 @@
    "scale": 1.09
   },
   {
-   "model": "atrezo_estalagmita",
+   "model": "atrezo_estalagmita_2",
    "pos": [
     7.89,
     10.96
@@ -1276,7 +1280,7 @@
    "scale": 0.92
   },
   {
-   "model": "atrezo_estalagmita",
+   "model": "atrezo_estalagmita_2",
    "pos": [
     1.24,
     -26.62
@@ -1285,7 +1289,7 @@
    "scale": 1.15
   },
   {
-   "model": "atrezo_estalagmita",
+   "model": "atrezo_estalagmita_2",
    "pos": [
     14.37,
     17.87
@@ -1294,7 +1298,7 @@
    "scale": 1.28
   },
   {
-   "model": "atrezo_estalagmita",
+   "model": "atrezo_estalagmita_2",
    "pos": [
     12.56,
     -1.88
@@ -1303,7 +1307,7 @@
    "scale": 1.3
   },
   {
-   "model": "atrezo_estalagmita",
+   "model": "atrezo_estalagmita_2",
    "pos": [
     -14.31,
     -14.02
@@ -1312,7 +1316,7 @@
    "scale": 1.16
   },
   {
-   "model": "atrezo_estalagmita",
+   "model": "atrezo_estalagmita_2",
    "pos": [
     -12.38,
     -16.4
@@ -1321,7 +1325,7 @@
    "scale": 0.93
   },
   {
-   "model": "atrezo_estalagmita",
+   "model": "atrezo_estalagmita_2",
    "pos": [
     -24.39,
     -9.79

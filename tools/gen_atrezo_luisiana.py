@@ -78,40 +78,92 @@ def monolito():
     return M, {P: [0, 0, 0]}
 
 
-def cipres():
-    M = Model(S=2, seed=93)
+FOL = (0.19, 0.26, 0.13); FOL_D = (0.11, 0.16, 0.09); FOL_L = (0.29, 0.35, 0.17); FOL_R = (0.42, 0.30, 0.15)
+
+
+def cipres(variant=1):
+    """Ciprés calvo de la ciénaga (rehecho el 09-10-2026), 32/m, ~4,7 m: tronco con la base
+    acanalada en contrafuertes que se estrecha hacia arriba, "rodillas" alrededor, ramas que salen
+    casi horizontales y acaban en masas de follaje planas y escalonadas (verde oscuro con toques
+    rojizos, como el ciprés en otoño) y cortinas largas de musgo español colgando por debajo.
+    Visto desde arriba se lee por la copa. Dos variantes de forma (semilla)."""
+    M = Model(S=2, seed=93 + variant * 17)
     rng = M.rng
-    def bark(x, y, z): return BARK_D if M.noise(x, y, z, 3.0) > 0.6 else BARK
-    for y in range(0, 150):                                     # tronco que se ensancha abajo
-        r = 4.5 + max(0, 18 - y) * 0.35
-        lobes = 1 + 0.25 * math.sin(math.atan2(1, 1) * 6) if y < 18 else 1
-        for x in range(-int(r) - 1, int(r) + 2):
-            for z in range(-int(r) - 1, int(r) + 2):
-                d = math.hypot(x, z) * (1 + 0.18 * math.sin(math.atan2(z, x) * 5) * (y < 20))
-                if r - 1.8 <= d <= r: M.put(x, y, z, P, bark(x, y, z))
-    for k in range(7):                                          # "rodillas" del ciprés
-        a = rng.uniform(0, math.tau); dd = rng.uniform(12, 20)
-        for y in range(0, rng.randint(6, 12)):
-            for x in range(-1, 2):
-                for z in range(-1, 2): M.put(int(math.cos(a) * dd) + x, y, int(math.sin(a) * dd) + z, P, bark(x, y, z))
-    tips = []
-    for i in range(7):                                          # ramas casi horizontales arriba
-        a = i / 7 * math.tau + rng.uniform(-0.3, 0.3)
-        y0 = 90 + i * 8
-        tip = (math.cos(a) * rng.uniform(22, 32), y0 + rng.uniform(4, 12), math.sin(a) * rng.uniform(22, 32))
-        line(M, (0, y0, 0), tip, 1.5, bark)
-        tips.append((tip, (0, y0, 0)))
-    for tip, base in tips:                                      # musgo español colgando a lo largo de la rama
-        for k in range(10):
-            t = 0.3 + k * 0.07
-            px = base[0] + (tip[0] - base[0]) * t; py = base[1] + (tip[1] - base[1]) * t; pz = base[2] + (tip[2] - base[2]) * t
-            n = rng.randint(10, 28)
-            for j in range(n):
-                M.put(int(px + math.sin(j * 0.4) * 0.8), int(py - j), int(pz), P, MOSS if j % 3 else MOSS_D, over=False)
-    for x in range(-10, 11):                                    # copa rala
-        for z in range(-10, 11):
-            if math.hypot(x, z) < 10 and M.hsh(x, 1, z) > 0.55:
-                M.put(x, 150 + int(M.hsh(x, 2, z) * 4), z, P, (0.24, 0.30, 0.18))
+    H = 132 + 12 * variant
+    lean = (rng.uniform(-0.06, 0.06), rng.uniform(-0.06, 0.06))
+
+    def bark(x, y, z):
+        c = BARK_D if M.noise(x, y * 0.4, z, 3.0) > 0.58 else BARK
+        if y < 14 and M.noise(x, y, z, 5.0) > 0.5: c = lerp(c, MOSS_D, 0.5)          # verdín de la crecida
+        return c
+
+    for y in range(0, H):                                        # tronco acanalado, hueco
+        r = 4.0 + max(0, 26 - y) * 0.42                          # se ensancha mucho abajo
+        cx, cz = lean[0] * y, lean[1] * y
+        flute = 0.22 * max(0.0, 1 - y / 30.0)
+        for x in range(-int(r) - 3, int(r) + 4):
+            for z in range(-int(r) - 3, int(r) + 4):
+                ang = math.atan2(z, x)
+                d = math.hypot(x, z) / (1 + flute * math.sin(ang * 6 + variant))
+                if r - 2.0 <= d <= r: M.put(int(x + cx), y, int(z + cz), P, bark(x, y, z))
+    for k in range(6 + variant):                                 # rodillas
+        ang = rng.uniform(0, math.tau); dd = rng.uniform(14, 24)
+        kx, kz = math.cos(ang) * dd, math.sin(ang) * dd
+        hk = rng.randint(6, 13)
+        for y in range(0, hk):
+            rr = 2.2 * (1 - y / (hk + 2))
+            for x in range(-3, 4):
+                for z in range(-3, 4):
+                    if math.hypot(x, z) <= rr + 0.3: M.put(int(kx + x), y, int(kz + z), P, bark(x, y, z))
+
+    def branch(a, b, thick):
+        n = int(max(abs(b[0] - a[0]), abs(b[1] - a[1]), abs(b[2] - a[2]))) + 1
+        for i in range(n + 1):
+            t = i / n
+            px, py, pz = (a[k] + (b[k] - a[k]) * t for k in range(3))
+            w = thick * (1 - 0.5 * t)
+            for x in range(-int(w), int(w) + 1):
+                for z in range(-int(w), int(w) + 1):
+                    for y in range(-int(w), int(w) + 1):
+                        if x * x + y * y + z * z <= w * w + 0.5: M.put(int(px + x), int(py + y), int(pz + z), P, bark(px, py, pz))
+
+    def foliage(cx, cy, cz, rx, ry, rz):
+        """Masa de follaje plana: cáscara de elipsoide con el borde deshilachado."""
+        for x in range(int(cx - rx) - 1, int(cx + rx) + 2):
+            for z in range(int(cz - rz) - 1, int(cz + rz) + 2):
+                for y in range(int(cy - ry) - 1, int(cy + ry) + 2):
+                    q = ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 + ((z - cz) / rz) ** 2
+                    q += 0.35 * (M.noise(x, y, z, 3.0) - 0.5)
+                    if not (0.62 < q <= 1.0): continue
+                    n = M.noise(x, y, z, 4.0)
+                    c = FOL_L if y > cy + ry * 0.4 and n > 0.45 else (FOL_D if n < 0.35 else FOL)
+                    if M.noise(x + 50, y, z, 6.0) > 0.74: c = FOL_R                    # toques rojizos
+                    M.put(x, y, z, P, c)
+
+    pads = []
+    nb = 6 + variant
+    for i in range(nb):                                          # ramas y masas en pisos
+        ang = i / nb * math.tau + rng.uniform(-0.35, 0.35)
+        y0 = int(H * 0.52) + int(i * (H * 0.42) / nb)
+        reach = rng.uniform(16, 30) * (1.15 - 0.4 * i / nb)    # las de abajo, más largas
+        base = (lean[0] * y0, y0, lean[1] * y0)
+        tip = (base[0] + math.cos(ang) * reach, y0 + rng.uniform(4, 10), base[2] + math.sin(ang) * reach)
+        branch(base, tip, 1.6)
+        pads.append((tip, rng.uniform(11, 16), rng.uniform(4, 6)))
+    top = (lean[0] * H, H + 4, lean[1] * H)                      # copa: un piso plano arriba
+    pads.append((top, 14, 5))
+    for (px, py, pz), rxz, ry in pads:
+        foliage(px, py, pz, rxz, ry, rxz * rng.uniform(0.8, 1.1))
+    for (px, py, pz), rxz, ry in pads:                           # musgo español bajo cada masa
+        for j in range(int(rxz * 1.4)):
+            ang = rng.uniform(0, math.tau); r = rng.uniform(0.2, 0.85) * rxz
+            mx, mz = px + math.cos(ang) * r, pz + math.sin(ang) * r
+            length = rng.randint(14, 36)
+            for k in range(length):
+                sway = math.sin(k * 0.35 + j) * 0.9
+                col = MOSS if (k + j) % 4 else MOSS_D
+                if k > length - 4: col = lerp(MOSS, (0.62, 0.64, 0.56), 0.5)
+                M.put(int(mx + sway), int(py - ry * 0.6 - k), int(mz), P, col, over=False)
     return M, {P: [0, 0, 0]}
 
 
@@ -171,7 +223,7 @@ def piragua():
     return M, {P: [0, 0, 0]}
 
 
-PIECES = {'hoguera': hoguera, 'monolito': monolito, 'cipres': cipres, 'choza': choza, 'poste': poste,
+PIECES = {'hoguera': hoguera, 'monolito': monolito, 'cipres': cipres, 'cipres_2': lambda: cipres(2), 'choza': choza, 'poste': poste,
           'piragua': piragua}
 
 if __name__ == '__main__':

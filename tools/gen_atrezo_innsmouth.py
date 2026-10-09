@@ -535,37 +535,121 @@ GOLD_OLD = (0.62, 0.52, 0.28)
 
 
 def fachada():
-    """Casa georgiana de ladrillo, de dos plantas, en ruinas: hueca, con un rincón del tejado
-    hundido (falta la pared de arriba), ventanas de guillotina rotas y cornisa clara."""
+    """Casa georgiana de ladrillo de dos plantas en ruinas (rehecha el 09-10-2026), 16/m, hueca:
+    aparejo con llagas claras, zócalo de piedra, imposta y cornisa con dentellones; ventanas de
+    guillotina simétricas con dintel de piedra y clave, alféizar y contraventanas (alguna
+    descolgada); puerta con pilastras, frontón y montante en abanico; un rincón hundido con el
+    ladrillo roto en escalera, vigas y cabios al aire y cascotes al pie; tejado de pizarra con
+    chimeneas en los hastiales y verdín y hiedra que trepa por una esquina."""
     M = Model(S=1, seed=71)
     HX, HZ, H = 56, 40, 96                                  # 7 x 5 m, 6 m de alto
+    MORTAR = (0.48, 0.44, 0.40); SHUT = (0.20, 0.30, 0.26); SHUT_D = (0.14, 0.21, 0.18)
+    IVY = (0.18, 0.28, 0.14); IVY_L = (0.26, 0.38, 0.18); RAFTER = (0.30, 0.22, 0.15)
+    FLOOR2 = 48
+
+    def collapsed(x, y):                                    # rincón hundido (arriba a la derecha)
+        return x > 8 and y > H - 34 + (x - 8) * 0.45 + 6 * M.noise(x, y, 0, 5.0)
+
+    def brick(x, y, z):
+        if y < 8: return lerp(STONE_D, STONE_L, 0.5 * M.noise(x, y, z, 3.0))
+        course = y // 3
+        if y % 3 == 0: return MORTAR
+        u = x if abs(z) >= HZ - 1 else z
+        if (u + (course % 2) * 4) % 8 == 0: return MORTAR
+        c = BRICK if M.hsh(course, (u + (course % 2) * 4) // 8, 2) < 0.7 else BRICK_D
+        if M.noise(x, y, z, 12.0) > 0.7: c = lerp(c, MOSS, 0.4)
+        return c
+
     for y in range(0, H):
         for x in range(-HX, HX):
             for z in range(-HZ, HZ):
                 if min(x + HX, HX - 1 - x, z + HZ, HZ - 1 - z) > 1: continue
-                if x > 10 and y > H - 30 + (x - 10) * 0.4 + 8 * M.noise(x, y, z, 6.0): continue   # derrumbe
-                c = BRICK if (y // 2 + (x + z) // 4 + (y // 2) % 2 * 2) % 5 else BRICK_D
-                if M.noise(x, y, z, 12.0) > 0.7: c = lerp(c, MOSS, 0.4)
-                M.put(x, y, z, P, c)
-    for x in range(-HX - 1, HX + 1):                        # cornisa e imposta
+                if collapsed(x, y): continue
+                M.put(x, y, z, P, brick(x, y, z))
+    # borde roto: ladrillos en escalera sobre el hueco
+    for x in range(8, HX):
+        top = max((y for y in range(H) if (x, y, HZ - 1) in M.V), default=0)
+        for k in range(0, 1 + int(3 * M.hsh(x // 4, 0, 5))):
+            M.put(x, top + 1 + k, HZ - 1, P, BRICK_D if k else BRICK, over=False)
+    for x in range(-HX - 1, HX + 1):                        # imposta y cornisa con dentellones
         for z in (HZ, HZ + 1):
-            M.put(x, H - 4, z, P, STONE_L); M.put(x, 48, z, P, STONE_L)
-    for cx in (-38, -14, 14, 38):                           # ventanas de guillotina, rotas
-        for cy in (26, 70):
-            if cy == 70 and cx > 14: continue
-            for a in range(-6, 6):
-                for b in range(-10, 10):
-                    edge = a in (-6, 5) or b in (-10, 9) or b == 0
-                    c = TRIM if edge else (DARK if M.hsh(a, b, cx) > 0.25 else GLASS)
-                    M.put(cx + a, cy + b, HZ, P, c)
-    for x in range(-6, 6):                                  # puerta con montante
-        for y in range(0, 36):
+            if not collapsed(x, FLOOR2): M.put(x, FLOOR2, z, P, STONE_L)
+            if not collapsed(x, H - 4):
+                for y in (H - 5, H - 4): M.put(x, y, z, P, STONE_L)
+                if x % 4 < 2: M.put(x, H - 6, HZ, P, STONE_L)
+
+    def window(cx, cy, shutters):
+        if collapsed(cx, cy + 10): return
+        for a in range(-6, 6):
+            for b in range(-10, 10):
+                edge = a in (-6, 5) or b in (-10, 9) or b == 0 or a in (-1, 0)
+                c = TRIM if edge else (DARK if M.hsh(a, b, cx + cy) > 0.25 else GLASS)
+                M.put(cx + a, cy + b, HZ, P, c)
+        for a in range(-8, 8):                              # dintel con clave y alféizar
+            for b in (10, 11, 12): M.put(cx + a, cy + b, HZ, P, STONE_L)
+            M.put(cx + a, cy - 11, HZ, P, STONE_L); M.put(cx + a, cy - 11, HZ + 1, P, STONE_L)
+        for b in (10, 11, 12, 13): M.put(cx - 1, cy + b, HZ + 1, P, STONE_L); M.put(cx, cy + b, HZ + 1, P, STONE_L)
+        if shutters:                                        # contraventanas de tablillas
+            loose = M.hsh(cx, cy, 8) < 0.35
+            for side in (-1, 1):
+                for a in range(0, 5):
+                    for b in range(-10, 10):
+                        x = cx + side * (7 + a)
+                        y = cy + b
+                        if loose and side == 1: x, y = cx + 7 + a + (b + 10) // 4, cy + b - a   # descolgada
+                        M.put(x, y, HZ + 1, P, SHUT if b % 2 else SHUT_D)
+    for cx in (-38, -16, 16, 38):
+        window(cx, 28, True)
+        window(cx, 72, True)
+    # puerta: pilastras, frontón y montante en abanico
+    for x in range(-7, 7):
+        for y in range(8, 40):
             M.put(x, y, HZ, P, DARK if abs(x + 0.5) < 5 and y < 34 else STONE_L)
-    for x in range(-HX - 2, 11):                            # lo que queda del tejado
+    for a in range(0, 180, 12):                             # abanico del montante
+        r = 5
+        M.put(int(r * math.cos(math.radians(a))), 34 + int(r * math.sin(math.radians(a)) * 0.6), HZ, P, TRIM)
+    for x in (-9, -8, 7, 8):                                # pilastras
+        for y in range(8, 42): M.put(x, y, HZ + 1, P, STONE_L)
+    for k in range(0, 6):                                   # frontón
+        for x in range(-11 + k, 11 - k): M.put(x, 42 + k, HZ + 1, P, STONE_L)
+    for i in range(3):                                      # escalones
+        for x in range(-9, 9):
+            for z in range(HZ, HZ + 7 - i * 2): M.put(x, 7 - i * 2, z, P, STONE_D); M.put(x, 6 - i * 2, z, P, STONE_D)
+    # tejado de pizarra a dos aguas a lo largo de x; hundido sobre el rincón roto
+    for x in range(-HX - 2, HX + 2):
+        for z in range(-HZ - 3, HZ + 3):
+            y = H + int((HZ + 3 - abs(z + 0.5)) * 0.55)
+            if collapsed(x, H + 2) and x > 14: continue
+            if x > 6 and M.hsh(x // 3, z // 3, 1) > 0.5: continue          # tejas que faltan
+            row = y // 2
+            c = ROOF if M.hsh(row, x // 4, 3) < 0.6 else ROOF_D
+            if M.noise(x, y, z, 8.0) > 0.7: c = lerp(c, MOSS, 0.8)
+            M.put(x, y, z, P, c)
+    for x in range(10, HX, 7):                              # cabios al aire sobre el hueco
         for z in range(-HZ - 2, HZ + 2):
-            y = H + int((HZ - abs(z)) * 0.5)
-            if x > 0 and M.hsh(x // 3, z // 3, 1) > 0.6: continue
-            M.put(x, y, z, P, ROOF if (x // 4 + z // 3) % 2 else ROOF_D)
+            y = H + int((HZ + 3 - abs(z + 0.5)) * 0.55) - 1
+            if M.hsh(x, 0, 9) < 0.3 and z > 10: continue                   # alguno partido
+            M.put(x, y, z, P, RAFTER); M.put(x + 1, y, z, P, RAFTER)
+    for z in range(-HZ, HZ):                                # vigas del forjado asomando
+        for x in range(20, HX, 12): M.put(x, FLOOR2 - 2, z, P, RAFTER)
+    for cx in (-HX + 4, HX - 8):                            # chimeneas en los hastiales
+        if cx > 0: continue                                  # la de la parte hundida se cayó
+        for y in range(H, H + 40):
+            for x in range(cx - 4, cx + 6):
+                for z in range(-6, 6):
+                    if min(x - cx + 4, cx + 5 - x, z + 6, 5 - z) > 0 and y < H + 39: continue
+                    M.put(x, y, z, P, STONE_L if y >= H + 36 else brick(x, y, z + HZ))
+    for _ in range(14):                                     # cascotes al pie del derrumbe
+        cx, cz = M.rng.randint(14, HX + 6), M.rng.randint(HZ, HZ + 16)
+        sz = M.rng.randint(2, 5)
+        for x in range(cx, cx + sz):
+            for z in range(cz, cz + sz):
+                for y in range(0, M.rng.randint(1, sz)): M.put(x, y, z, P, BRICK_D if (x + z) % 3 else MORTAR)
+    for y in range(0, 70):                                  # hiedra en la esquina izquierda
+        spread = 10 * (1 - y / 70.0) + 3 * M.noise(0, y, 0, 6.0)
+        for x in range(-HX, int(-HX + spread)):
+            if M.noise(x, y, 0, 3.0) > 0.42:
+                M.put(x, y, HZ, P, IVY_L if M.noise(x, y, 1, 2.0) > 0.6 else IVY)
     return M, {P: [0, 0, 0]}
 
 

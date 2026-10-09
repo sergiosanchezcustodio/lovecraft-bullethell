@@ -10,7 +10,7 @@ from arena_kit import Arena, COLLIDERS, LAMP
 
 HALF = 32.0
 A = Arena("tuneles", seed=1934, half=HALF, spawn_clear=7.0,
-          foot={"atrezo_roca_grande": 2.6, "atrezo_columna_tallada": 1.6, "atrezo_estalagmita": 1.0,
+          foot={"atrezo_roca_grande": 2.6, "atrezo_columna_tallada": 1.6, "atrezo_estalagmita": 1.0, "atrezo_estalagmita_2": 1.0,
                 "atrezo_cristales": 1.2, "atrezo_arco": 2.8})
 for x, z in ((-10, -12), (12, -14), (-18, 6), (6, 12), (16, 0), (-4, -22), (22, -20), (-22, -20)):
     A.add("atrezo_cristales", x, z, scale=A.rng.uniform(1.3, 1.8))
@@ -21,13 +21,15 @@ for x, z in ((-6, 8), (9, -6), (-20, -2), (2, -16)):
 A.add("atrezo_farol", -2.5, 3.0, rot=40, scale=1.5)                 # el último farol de la expedición
 # orilla: rocas a lo largo del agua (sur y este)
 A.edge(["atrezo_roca_grande"], step=3.0, inset=-1.5, smin=1.2, smax=1.7, extra=4.0)
-A.scatter("atrezo_estalagmita", 22, 8.0, 1.0, 2.0)
+for m in ("atrezo_estalagmita", "atrezo_estalagmita_2"):
+    A.scatter(m, 11, 8.0, 1.0, 2.0)
 A.scatter("atrezo_roca_grande", 6, 12.0, 0.9, 1.4)
 
 COLL = dict(COLLIDERS)
 COLL.update({
     "atrezo_roca_grande": {"type": "box", "shrink": 0.8},
     "atrezo_estalagmita": {"type": "cylinder", "radius": 0.5},
+    "atrezo_estalagmita_2": {"type": "cylinder", "radius": 0.5},
     "atrezo_columna_tallada": {"type": "box", "shrink": 0.6},
     "atrezo_cristales": {"type": "cylinder", "radius": 0.8},
     "atrezo_arco": {"type": "box", "shrink": 0.9},

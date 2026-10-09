@@ -56,13 +56,13 @@ PIECES = {
     'roca': {
         'prompt': ('A dark grey Antarctic boulder with angular cracked faces, patches of lichen and snow '
                    'resting on top'),
-        'length_m': 1.19, 'vpm': 32, 'out': 'atrezo_roca_nevada',
+        'length_m': 1.19, 'vpm': 20, 'out': 'atrezo_roca_nevada',
     },
     # Segunda tanda (09-10-2026): piezas macizas de varios niveles, como prueba_<pieza>
     'roca_grande': {
         'prompt': ('A large dark grey mountain boulder with sharp angular fractured faces and deep cracks, '
                    'thin streaks of snow and frost in the crevices, cold and harsh'),
-        'length_m': 1.62, 'vpm': 32, 'out': 'atrezo_roca_grande',
+        'length_m': 1.62, 'vpm': 20, 'out': 'atrezo_roca_grande',
     },
     'bloque_ciclopeo': {
         'prompt': ('A huge ancient cyclopean stone block of dark grey slate, eroded edges, carved with a worn '
@@ -77,7 +77,7 @@ PIECES = {
     'roca_arrecife': {
         'prompt': ('A jagged black volcanic reef rock covered with barnacles, mussels and dark green seaweed, '
                    'wet and glistening, a few small glowing green spots'),
-        'length_m': 2.25, 'vpm': 32, 'out': 'arr_roca_1',
+        'length_m': 2.25, 'vpm': 20, 'out': 'arr_roca_1',
     },
     'idolo': {
         'prompt': ('A small ancient idol of Cthulhu carved in greenish-black stone: a squatting winged figure '
@@ -94,7 +94,7 @@ PIECES = {
     'escombros': {
         'prompt': ('A low pile of rubble from a collapsed 1920s New England brick house: broken red bricks, '
                    'splintered grey boards, a few roof slates, wet and dirty, spread flat on the ground'),
-        'length_m': 2.34, 'vpm': 32, 'out': 'inn_escombros',
+        'length_m': 2.34, 'vpm': 20, 'out': 'inn_escombros',
     },
     'cajas_pescado': {
         'prompt': ('A stack of three old wooden fish crates on a 1920s harbour, weathered grey slats, one crate '
@@ -119,7 +119,7 @@ PIECES = {
     'roca_arrecife_2': {
         'prompt': ('A tall jagged black basalt reef rock spire covered with barnacles, mussels and dark green '
                    'seaweed, wet and glistening, a few small glowing green spots'),
-        'length_m': 2.0, 'vpm': 32, 'fit': 'height', 'value': 0.5, 'out': 'arr_roca_2',
+        'length_m': 2.0, 'vpm': 20, 'fit': 'height', 'value': 0.5, 'out': 'arr_roca_2',
     },
     # Cuarta tanda (09-10-2026)
     'rly_bloque': {

@@ -46,16 +46,47 @@ def roca_grande():
     return M
 
 
-def estalagmita():
-    """Estalagmita de roca de 3 m, en tramos que se estrechan, con hielo en la punta."""
-    M = Model(S=2, seed=52)
-    for i, (y0, r) in enumerate(((0, 4.0), (8, 3.0), (16, 2.0), (24, 1.2), (30, 0.6))):
-        M.cone((0.3 * i, y0, 0), (0.3 * i + 0.2, y0 + 9, 0.2), r, P, ROCK_D, ROCK, tip_r=r * 0.65)
-    def paint(k, part, c):
-        x, y, z = k
-        if y > 48: return ICE
-        return lerp(ROCK_D, ROCK_L, M.noise(x, y, z, 5.0) * 0.8)
-    M.paint(paint)
+def estalagmita(variant=1):
+    """Grupo de estalagmitas (rehecho el 09-10-2026), 32/m: una principal de ~3 m y dos o tres
+    menores, cada una con perfil de gota que se afila, acanaladuras verticales por donde baja el
+    agua, bandas de depósito mineral más claras, una colada de flujo en la base que las une y
+    escarcha pálida en las puntas. Hueca. Dos variantes."""
+    M = Model(S=2, seed=52 + variant * 11)
+    rng = M.rng
+    FLOW = (0.44, 0.45, 0.46); FLOW_L = (0.54, 0.55, 0.57); FROST = (0.74, 0.80, 0.88)   # gris frío: beige salía marrón
+
+    def spike(cx, cz, h, r0, lean):
+        for y in range(0, h):
+            t = y / h
+            r = r0 * (1 - t) ** 0.85 + 0.6                       # perfil de gota afilada
+            ox, oz = cx + lean[0] * y, cz + lean[1] * y
+            for x in range(int(ox - r) - 2, int(ox + r) + 3):
+                for z in range(int(oz - r) - 2, int(oz + r) + 3):
+                    ang = math.atan2(z - oz, x - ox)
+                    d = math.hypot(x - ox, z - oz) * (1 + 0.12 * math.sin(ang * 7 + cx))   # acanaladuras
+                    if not (r - 2.2 <= d <= r): continue
+                    groove = math.sin(ang * 7 + cx) > 0.6
+                    c = lerp(ROCK_D, ROCK, M.noise(x, y * 0.25, z, 3.0))
+                    if groove: c = lerp(c, ROCK_D, 0.5)
+                    if (y + int(4 * M.noise(x, 0, z, 6.0))) % 11 < 2: c = lerp(c, FLOW_L, 0.45)   # bandas
+                    if M.noise(x, y, z, 2.5) > 0.7: c = lerp(c, FLOW, 0.4)                       # brillo húmedo
+                    if t > 0.86: c = lerp(c, FROST, (t - 0.86) / 0.14)                          # escarcha
+                    M.put(int(x), y, int(z), P, c)
+
+    spikes = [(0, 0, 96 if variant == 1 else 80, 9, (rng.uniform(-0.03, 0.03), rng.uniform(-0.03, 0.03)))]
+    for k in range(2 + variant):
+        ang = rng.uniform(0, math.tau); d = rng.uniform(9, 15)
+        spikes.append((math.cos(ang) * d, math.sin(ang) * d, rng.randint(26, 56), rng.uniform(3.5, 6),
+                       (math.cos(ang) * 0.05, math.sin(ang) * 0.05)))
+    for cx, cz, h, r0, lean in spikes:
+        spike(cx, cz, h, r0, lean)
+    for x in range(-20, 21):                                    # colada en la base
+        for z in range(-20, 21):
+            d = math.hypot(x, z) * (1 + 0.25 * M.noise(x, 0, z, 5.0))
+            if d > 18: continue
+            hgt = int(4 * (1 - d / 18) ** 1.5) + (1 if M.noise(x, 3, z, 3.0) > 0.6 else 0)
+            for y in range(0, hgt + 1):
+                M.put(x, y, z, P, lerp(FLOW, FLOW_L, M.noise(x, y, z, 2.0)) if y == hgt else ROCK_D, over=False)
     return M
 
 
@@ -108,7 +139,7 @@ def cristales():
 
 
 PIECES = {'roca_grande_mano': roca_grande,   # la del juego es de Replicate (generar_modelo_replicate.py)
-          'estalagmita': estalagmita, 'columna_tallada': columna_tallada,
+          'estalagmita': estalagmita, 'estalagmita_2': lambda: estalagmita(2), 'columna_tallada': columna_tallada,
           'cristales': cristales}
 
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ from arena_kit import Arena, COLLIDERS
 
 HALF = 32.0
 A = Arena("ritual", seed=1908, half=HALF, spawn_clear=4.0,
-          foot={"lui_cipres": 1.6, "lui_choza": 4.0, "lui_monolito": 1.2, "lui_hoguera": 1.0, "lui_poste": 0.4,
+          foot={"lui_cipres": 1.6, "lui_cipres_2": 1.6, "lui_choza": 4.0, "lui_monolito": 1.2, "lui_hoguera": 1.0, "lui_poste": 0.4,
                 "lui_piragua": 1.6, "inn_juncos": 0.8, "pan_tocon": 0.6})
 CX, CZ = 0.0, -4.0                                         # el monolito, en medio del claro
 
@@ -32,10 +32,10 @@ A.add("lui_piragua", 24.0, -6.0, rot=100)
 # bosque cerrado al norte y al oeste (y detrás, hasta donde alcanza la cámara)
 for x in range(-46, 40, 4):
     for row in range(3):
-        A.add("lui_cipres", x + A.rng.uniform(-1.5, 1.5), -HALF - 1 - row * 4 + A.rng.uniform(-1, 1), scale=A.rng.uniform(0.9, 1.3))
+        A.add(A.rng.choice(["lui_cipres", "lui_cipres_2"]), x + A.rng.uniform(-1.5, 1.5), -HALF - 1 - row * 4 + A.rng.uniform(-1, 1), scale=A.rng.uniform(0.9, 1.3))
 for z in range(-40, 40, 4):
     for row in range(3):
-        A.add("lui_cipres", -HALF - 1 - row * 4 + A.rng.uniform(-1, 1), z + A.rng.uniform(-1.5, 1.5), scale=A.rng.uniform(0.9, 1.3))
+        A.add(A.rng.choice(["lui_cipres", "lui_cipres_2"]), -HALF - 1 - row * 4 + A.rng.uniform(-1, 1), z + A.rng.uniform(-1.5, 1.5), scale=A.rng.uniform(0.9, 1.3))
 
 # cipreses sueltos en la ciénaga, tocones y juncos (fuera del claro)
 def clear(x, z): return math.hypot(x - CX, z - CZ) > 13.0
@@ -52,6 +52,7 @@ A.edge(["inn_juncos"], step=2.0, inset=0.6, smin=1.1, smax=1.7)
 COLL = dict(COLLIDERS)
 COLL.update({
     "lui_cipres": {"type": "cylinder", "radius": 0.45},
+    "lui_cipres_2": {"type": "cylinder", "radius": 0.45},
     "lui_choza": {"type": "box", "shrink": 0.9},
     "lui_monolito": {"type": "box", "shrink": 0.95},
     "lui_hoguera": {"type": "cylinder", "radius": 0.5},
