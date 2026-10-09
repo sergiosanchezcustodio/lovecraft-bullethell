@@ -7,6 +7,12 @@ extends Control
 ## en silueta. El tomo de logros abre la lista de logros encima. Datos: Library.
 ## A abre, arriba y abajo recorren, B / Esc vuelve (del tomo a la estantería, de ahí cierra).
 ## Capturas: `title saves=… open=menu_biblioteca tome=N cursor=N`.
+##
+## El libro es una ilustración (09-10-2026, tools/generar_libro_biblioteca.py): cubre la pantalla
+## y cada página es un recuadro en fracciones de la imagen (LEFT_PAGE, RIGHT_PAGE, dentro del
+## marco dorado y sin pisar sus esquinas). El contenido se maqueta a un tamaño fijo (PAGE) y se
+## escala al recuadro, así que no cambia con la resolución. Si se cambia la ilustración, hay que
+## volver a medir los recuadros.
 
 signal closed
 
@@ -17,7 +23,10 @@ const PAPER_SHADE := Color(0.74, 0.66, 0.5)
 const INK := Color(0.2, 0.13, 0.08)
 const INK_DIM := Color(0.42, 0.34, 0.25)
 const RED_INK := Color(0.5, 0.12, 0.08)
-const PAGE := Vector2(760, 860)
+const PAGE := Vector2(680, 930)                ## tamaño de maqueta de cada página (se escala)
+const ART := preload("res://resources/PantallasMenus/libro.png")
+const LEFT_PAGE := Rect2(0.218, 0.143, 0.265, 0.664)    ## en fracciones de la ilustración
+const RIGHT_PAGE := Rect2(0.549, 0.143, 0.280, 0.664)
 const IMAGE_PX := 300
 
 var save: SaveData
@@ -33,49 +42,50 @@ var _sub: Control                              ## logros abiertos encima
 func _ready() -> void:
 	if save == null: save = Saves.current
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var dim := ColorRect.new()
-	dim.color = Color(0.0, 0.0, 0.02, 0.7)
-	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(dim)
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
-	var book := PanelContainer.new()
-	var cover := UiKit.panel(LEATHER, LEATHER_EDGE, 14)
-	cover.set_border_width_all(6)
-	cover.content_margin_left = 22; cover.content_margin_right = 22
-	cover.content_margin_top = 22; cover.content_margin_bottom = 22
-	book.add_theme_stylebox_override("panel", cover)
-	center.add_child(book)
-	var spread := HBoxContainer.new()
-	spread.add_theme_constant_override("separation", 0)
-	book.add_child(spread)
-	_left = _page(spread, true)
-	var spine := ColorRect.new()                  # lomo: sombra entre las dos páginas
-	spine.color = Color(0.3, 0.22, 0.13)
-	spine.custom_minimum_size = Vector2(10, PAGE.y)
-	spread.add_child(spine)
-	_right = _page(spread, false)
+	var bg := ColorRect.new()                    # por si la pantalla no es 16:9
+	bg.color = Color(0.02, 0.015, 0.01)
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(bg)
+	var fit := AspectRatioContainer.new()       # la ilustración cubre la pantalla sin deformarse
+	fit.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	fit.ratio = float(ART.get_width()) / ART.get_height()
+	fit.stretch_mode = AspectRatioContainer.STRETCH_COVER
+	add_child(fit)
+	var art := Control.new()
+	fit.add_child(art)
+	var tex := TextureRect.new()
+	tex.texture = ART
+	tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tex.stretch_mode = TextureRect.STRETCH_SCALE
+	tex.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	tex.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	art.add_child(tex)
+	_left = _page(art, LEFT_PAGE)
+	_right = _page(art, RIGHT_PAGE)
 	_show_shelf()
 
-## Página de papel; devuelve su columna de contenido.
-func _page(parent: Control, left: bool) -> VBoxContainer:
-	var p := PanelContainer.new()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = PAPER
-	sb.border_color = PAPER_SHADE
-	sb.set_border_width_all(2)
-	if left: sb.border_width_right = 18                # el papel se oscurece hacia el lomo
-	else: sb.border_width_left = 18
-	sb.content_margin_left = 56 if left else 46
-	sb.content_margin_right = 46 if left else 56
-	sb.content_margin_top = 40; sb.content_margin_bottom = 34
-	p.add_theme_stylebox_override("panel", sb)
-	p.custom_minimum_size = PAGE
-	parent.add_child(p)
+## Página: un recuadro de la ilustración con una maqueta de PAGE escalada dentro. Devuelve su
+## columna de contenido.
+func _page(art: Control, r: Rect2) -> VBoxContainer:
+	var holder := Control.new()
+	holder.anchor_left = r.position.x; holder.anchor_right = r.end.x
+	holder.anchor_top = r.position.y; holder.anchor_bottom = r.end.y
+	art.add_child(holder)
+	var sheet := MarginContainer.new()
+	sheet.size = PAGE
+	for k in ["margin_left", "margin_right"]: sheet.add_theme_constant_override(k, 18)
+	sheet.add_theme_constant_override("margin_top", 6)
+	sheet.add_theme_constant_override("margin_bottom", 6)
+	holder.add_child(sheet)
+	var fit_sheet := func() -> void:              # la maqueta, escalada al recuadro y centrada
+		var k := minf(holder.size.x / PAGE.x, holder.size.y / PAGE.y)
+		sheet.scale = Vector2.ONE * k
+		sheet.position = (holder.size - PAGE * k) * 0.5
+	holder.resized.connect(fit_sheet)
+	fit_sheet.call_deferred()
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 12)
-	p.add_child(v)
+	sheet.add_child(v)
 	return v
 
 static func _ink(text: String, size: int, color := INK, title_font := false) -> Label:
@@ -274,17 +284,25 @@ func _image(e: Dictionary) -> Texture2D:
 	if String(e.model) == "": return null
 	var key := "%s:%s" % [e.model, e.mode]
 	if not _icons.has(key):
-		var fixed := _bestiary_scale() if _tome == "enemies" else 0.0
+		var fixed := 0.0
+		if _tome == "enemies" and String(e.model) != "":   # a escala, salvo los colosos: a la suya
+			fixed = maxf(_bestiary_scale(), ModelIcon.frame_size(String(e.model)) * ModelIcon.MARGIN)
 		_icons[key] = ModelIcon.make(self, String(e.model), String(e.mode), IMAGE_PX, fixed)
 	return _icons[key]
 
 ## Bestiario a escala: el encuadre lo marca el enemigo más grande.
 var _scale := 0.0
+## Encuadre común del bestiario: el de las criaturas de tamaño normal (percentil SCALE_PCT). Con
+## el más grande, desde que hay colosos (Dagon, Cthulhu), todos los demás salían diminutos.
+const SCALE_PCT := 0.8
 func _bestiary_scale() -> float:
 	if _scale <= 0.0:
+		var sizes: Array[float] = []
 		for e in _entries:
-			if String(e.model) != "": _scale = maxf(_scale, ModelIcon.frame_size(String(e.model)))
-		_scale *= ModelIcon.MARGIN
+			if String(e.model) != "": sizes.append(ModelIcon.frame_size(String(e.model)))
+		if sizes.is_empty(): return 0.0
+		sizes.sort()
+		_scale = sizes[mini(int(sizes.size() * SCALE_PCT), sizes.size() - 1)] * ModelIcon.MARGIN
 	return _scale
 
 func _rule() -> Control:
@@ -294,7 +312,7 @@ func _rule() -> Control:
 	return r
 
 func _hint(text: String) -> Label:
-	var l := _ink(text, 17, INK_DIM)
+	var l := _ink(text, 19, Color(INK, 0.8))        # sobre el pergamino claro, INK_DIM no se leía
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	return l
 
