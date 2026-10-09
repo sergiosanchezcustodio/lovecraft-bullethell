@@ -75,14 +75,48 @@ def muro():
 
 
 def muro_bajo():
+    """Arranque de la pared del estudio por el lado de la cámara (rehecho el 09-10-2026), 4 m,
+    32/m: la cara de dentro (-z, hacia el estudio) enlucida con desconchones que dejan ver el
+    ladrillo y un rodapié de madera; la de fuera, ladrillo. El corte, escalonado por ladrillos,
+    con alguno suelto encima; en medio, el alféizar del ventanal con los arranques del marco
+    (como los de la pared alta); y cascotes y polvo de yeso al pie por dentro."""
     M = Model(S=2, seed=72)
     b = brick(M)
-    box(M, -64, 64, 0, 14, -4, 4, b)
-    box(M, -64, 64, 14, 16, -5, 5, TRIM)
-    for x in range(-64, 64):                                    # el corte de la pared, irregular
-        h = 16 + int(M.noise(x, 0, 0, 10.0) * 6)
-        for y in range(16, h):
-            for z in range(-4, 4): M.put(x, y, z, P, b(x, y, z))
+    T = 5                                                       # medio grosor
+    def top_at(x):                                              # altura del corte, escalonada por ladrillos
+        k = (x + 64) // 8
+        return 14 + int(10 * M.noise(k * 8, 0, 0, 28.0)) + int(3 * M.hsh(k, 0, 4))
+    win0, win1 = -20, 20                                        # el ventanal cortado
+    for x in range(-64, 64):
+        h = top_at(x)
+        if win0 <= x < win1: h = min(h, 12)
+        for y in range(0, h):
+            for z in range(-T, T):
+                if min(z + T, T - 1 - z) > 0 and y < h - 1: continue          # hueco
+                inner = z == -T
+                if inner and y >= 4:                                         # enlucido con desconchones
+                    peel = M.noise(x, y, 0, 5.0) > 0.66
+                    c = b(x, y, z) if peel else lerp(PLASTER_D, PLASTER, M.noise(x, y, 1, 4.0))
+                    if not peel and y < 8: c = lerp(c, (0.48, 0.44, 0.38), 0.4)  # sucio abajo
+                elif inner: c = WOOD_D if y in (0, 3) else WOOD                 # rodapié
+                else: c = b(x, y, z)
+                M.put(x, y, z, P, c)
+        if M.hsh(x // 8, 1, 7) < 0.25 and not (win0 <= x < win1):           # ladrillo suelto encima
+            for z in range(-T + 1, T - 1): M.put(x, h, z, P, b(x, h, z))
+    for x in range(win0 - 2, win1 + 2):                         # alféizar de piedra
+        for z in range(-T - 2, T + 1):
+            M.put(x, 12, z, P, TRIM); M.put(x, 13, z, P, TRIM)
+    for x in (win0, win0 + 1, -1, 0, win1 - 2, win1 - 1):       # arranques del marco y del parteluz
+        for y in range(14, 14 + (8 if x in (-1, 0) else 5)):
+            for z in (-1, 0): M.put(x, y, z, P, FRAME)
+    for x in range(win0 + 2, win1 - 2):                         # cristales rotos en el alféizar
+        if M.hsh(x, 2, 3) < 0.3: M.put(x, 14, -2, P, GLASS_L)
+    for k in range(10):                                         # cascotes y yeso al pie, dentro
+        cx, cz = M.rng.randint(-60, 56), M.rng.randint(-T - 10, -T - 2)
+        for x in range(cx, cx + M.rng.randint(2, 5)):
+            for z in range(cz, cz + M.rng.randint(2, 4)):
+                M.put(x, 0, z, P, PLASTER_D if (x + z) % 2 else BRICK_D)
+                if M.hsh(x, 0, z) < 0.3: M.put(x, 1, z, P, BRICK)
     return M, {P: [0, 0, 0]}
 
 

@@ -141,20 +141,62 @@ def roca_2(): return roca(96, 12, 16, 11)
 # ---------------- coral ----------------
 
 def coral():
+    """Coral negro del arrecife (rehecho el 09-10-2026), 32/m, ~1,2 m: sobre una roca de basalto
+    con percebes, ramas gruesas que se afinan al bifurcarse (pólipos más claros), puntas con un
+    núcleo que brilla en verde, un abanico de mar rojizo y esponjas de tubo. Es la luz del
+    arrecife (pivote "light")."""
     M = Model(S=2, seed=97)
     rng = M.rng
-    def grow(x, y, z, ang, up, n, depth):
+    POLYP = (0.30, 0.27, 0.30); FAN = (0.34, 0.12, 0.16); FAN_D = (0.22, 0.07, 0.10)
+    SPONGE = (0.27, 0.26, 0.22); SPONGE_D = (0.17, 0.16, 0.14); GLOW_C = (0.75, 1.0, 0.80)
+    # roca base
+    for x in range(-14, 15):
+        for z in range(-14, 15):
+            d = math.hypot(x, z) * (1 + 0.3 * M.noise(x, 0, z, 6.0))
+            if d > 13: continue
+            h = int(8 * (1 - d / 13) ** 0.7)
+            for y in range(0, h + 1):
+                c = lerp(ROCK_D, ROCK_L, M.noise(x, y, z, 3.0))
+                if y == h and M.hsh(x, y, z) < 0.12: c = BARN
+                if y == h and M.noise(x + 9, y, z, 4.0) > 0.66: c = WEED
+                M.put(x, y, z, P, c)
+
+    def ball(cx, cy, cz, r, col, glow=0):
+        for x in range(int(cx - r) - 1, int(cx + r) + 2):
+            for y in range(int(cy - r) - 1, int(cy + r) + 2):
+                for z in range(int(cz - r) - 1, int(cz + r) + 2):
+                    if (x - cx) ** 2 + (y - cy) ** 2 + (z - cz) ** 2 <= r * r:
+                        M.put(x, y, z, P, col, glow=glow)
+
+    def grow(x, y, z, ang, up, n, r, depth):
         for i in range(n):
-            x += math.cos(ang) * 0.8; z += math.sin(ang) * 0.8; y += up
-            for dx in (0, 1):
-                M.put(x + dx, y, z, P, CORAL if i % 3 else CORAL_L)
-        if depth == 0:
-            M.put(x, y + 1, z, P, GLOW, glow=1); M.put(x + 1, y + 1, z, P, GLOW, glow=1)
+            x += math.cos(ang) * 0.9; z += math.sin(ang) * 0.9; y += up
+            ang += rng.uniform(-0.15, 0.15)
+            col = CORAL if (i + depth) % 4 else (POLYP if M.hsh(int(x), int(y), int(z)) < 0.5 else CORAL_L)
+            ball(x, y, z, r, col)
+        if depth == 0 or r < 0.9:
+            ball(x, y + 1, z, 1.4, GLOW, glow=1)                 # punta que brilla, con núcleo claro
+            M.put(int(x), int(y + 1), int(z), P, GLOW_C, glow=1)
             return
-        for _ in range(2):
-            grow(x, y, z, ang + rng.uniform(-1.0, 1.0), max(up + rng.uniform(-0.2, 0.3), 0.4), int(n * 0.7), depth - 1)
-    for k in range(4):
-        grow(0, 0, 0, k * 1.6 + rng.uniform(0, 0.5), 0.9, 14, 3)
+        for k in range(2 if depth > 1 else rng.choice((2, 3))):
+            grow(x, y, z, ang + rng.uniform(-1.1, 1.1), max(up + rng.uniform(-0.15, 0.3), 0.5),
+                 int(n * 0.72), r * 0.72, depth - 1)
+    for k in range(3):
+        grow(0, 6, 0, k * 2.1 + rng.uniform(0, 0.6), 1.0, 12, 2.4, 3)
+    # abanico de mar: celosía plana rojiza a un lado
+    fx, fz = 9, -6
+    for u in range(-9, 10):
+        for v in range(0, 22):
+            if (u / 9.5) ** 2 + ((v - 11) / 11.5) ** 2 > 1: continue
+            if (u + v) % 3 and (u - v) % 3 and abs(u) > 0 and v % 4: continue   # celosía
+            M.put(fx + u, 6 + v, fz + u // 3, P, FAN if (u * 3 + v) % 5 else FAN_D)
+    # esponjas de tubo
+    for tx, tz, th in ((-8, 7, 14), (-10, 3, 10), (-5, 10, 8)):
+        for y in range(4, 4 + th):
+            for x in range(tx - 2, tx + 3):
+                for z in range(tz - 2, tz + 3):
+                    d = math.hypot(x - tx, z - tz)
+                    if 1.2 <= d <= 2.3: M.put(x, y, z, P, SPONGE if y % 3 else SPONGE_D)
     return M, {P: [0, 0, 0], 'light': [0, 30, 0]}                     # el fulgor verde del arrecife
 
 
