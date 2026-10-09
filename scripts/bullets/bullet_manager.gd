@@ -129,7 +129,10 @@ func _ready() -> void:
 	emi.multimesh = _mm_enemy
 	var emat := ShaderMaterial.new()
 	emat.shader = preload("res://scripts/bullets/bullet_voxel.gdshader")
-	if int(Settings.get_value("bullet_palette")) == 1:      # accesibilidad: alto contraste (hito 8.3)
+	# accesibilidad: alto contraste (hito 8.3). Por el árbol y no por nombre: con `-s` (herramientas
+	# como render_mapa.gd) no hay autoloads y el nombre Settings no compilaría.
+	var settings := get_node_or_null("/root/Settings")
+	if settings != null and int(settings.get_value("bullet_palette")) == 1:
 		for k in HIGH_CONTRAST: emat.set_shader_parameter(k, HIGH_CONTRAST[k])
 	var hidden := ShaderMaterial.new()
 	hidden.shader = preload("res://scripts/bullets/bullet_voxel_hidden.gdshader")

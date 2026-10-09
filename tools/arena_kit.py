@@ -120,6 +120,7 @@ COLLIDERS = {
     "atrezo_bidon": {"type": "cylinder", "radius": 0.3},
     "atrezo_farol": {"type": "cylinder", "radius": 0.15},
     "atrezo_roca": {"type": "box", "shrink": 0.8},
+    "atrezo_roca_nevada": {"type": "box", "shrink": 0.75},      # hecha con Replicate (09-10-2026)
     "atrezo_trineo": {"type": "box", "shrink": 0.85},
     "atrezo_tripode": {"type": "cylinder", "radius": 0.3},
     "atrezo_bandera": {"type": "cylinder", "radius": 0.12},

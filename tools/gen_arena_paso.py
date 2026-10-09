@@ -34,6 +34,8 @@ A.edge(["atrezo_roca_grande"], step=2.8, inset=1.5, smin=1.6, smax=2.2)
 A.scatter("atrezo_roca_grande", 9, 12.0, 0.9, 1.4)
 A.scatter("atrezo_estalagmita", 14, 9.0, 0.9, 1.6)
 A.scatter("monticulo_3", 5, 12.0, 0.8, 1.2)
+# Rocas nevadas hechas con Replicate (09-10-2026); al final, para no mover lo demás
+A.scatter("atrezo_roca_nevada", 8, 9.0, 0.9, 1.5)
 
 COLL = dict(COLLIDERS)
 COLL.update({

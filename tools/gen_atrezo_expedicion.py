@@ -589,7 +589,7 @@ def cabana():
     return M, {P: [0, 0, 0]}
 
 
-PIECES = {'farol': farol, 'iglu': iglu, 'cabana': cabana, 'tienda': tienda, 'caja': caja, 'bidon': bidon,
+PIECES = {'farol': farol, 'iglu': iglu, 'cabana': cabana, 'tienda': tienda, 'caja_mano': caja, 'bidon': bidon,
           'trineo': trineo, 'tripode': tripode, 'bandera': bandera}
 
 if __name__ == '__main__':

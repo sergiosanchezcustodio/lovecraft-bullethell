@@ -30,17 +30,50 @@ PIECES = {
         'length_m': 8.0,              # lo más largo de la pieza, en metros
         'vpm': 32,                    # voxels por metro
     },
+    # Prueba (09-10-2026): las mismas piezas del campamento que hay hechas a mano, para comparar.
+    # Salen como models/rep_<pieza>.json y no sustituyen a las de atrezo_.
+    'tienda': {
+        'prompt': ('A 1930s Antarctic expedition ridge tent made of weathered grey-green canvas, two wooden poles, '
+                   'guy ropes pegged into the snow, the front flap half open showing a dark interior, snow piled '
+                   'on the lower edges'),
+        'length_m': 5.04, 'vpm': 32, 'out': 'prueba_tienda',
+    },
+    'trineo': {
+        'prompt': ('A 1930s wooden polar expedition dog sled with long curved runners, loaded with wooden crates and '
+                   'canvas bags tied with ropes, a little snow on top'),
+        'length_m': 2.62, 'vpm': 48, 'out': 'prueba_trineo',
+    },
+    'farol': {
+        'prompt': ('A 1930s expedition lamp post: a tall wooden pole with an iron bracket at the top from which hangs a '
+                   'brass storm lantern with glass panes, the base wedged in a small mound of snow'),
+        'length_m': 1.04, 'vpm': 48, 'out': 'prueba_farol',
+    },
+    'bidon': {
+        'prompt': ('A dented 1930s steel fuel drum painted dark red with two raised rings, faded white stencil '
+                   'letters, rust stains, a little snow on the lid'),
+        'length_m': 0.96, 'vpm': 48, 'fit': 'height', 'out': 'prueba_bidon',
+    },
+    'roca': {
+        'prompt': ('A dark grey Antarctic boulder with angular cracked faces, patches of lichen and snow '
+                   'resting on top'),
+        'length_m': 1.19, 'vpm': 32, 'out': 'atrezo_roca_nevada',
+    },
+    'caja': {
+        'prompt': ('A small wooden supply crate of a 1930s polar expedition, nailed weathered planks, dark iron '
+                   'corner brackets, plain sides with no letters and no markings, a little snow on the lid'),
+        'length_m': 0.62, 'vpm': 48, 'fit': 'height', 'sat': 0.7, 'out': 'atrezo_caja',
+    },
 }
 
 
-def voxelize(glb, length_m, vpm):
+def voxelize(glb, length_m, vpm, fit='horizontal'):
     """Voxels de la superficie de la malla con el color de la textura en cada punto."""
     import trimesh
     scene = trimesh.load(glb, force='scene')
     mesh = scene.dump(concatenate=True) if hasattr(scene, 'dump') else scene
     mesh.apply_transform(trimesh.transformations.rotation_matrix(0, [0, 1, 0]))
     ext = mesh.extents
-    k = length_m / max(ext[0], ext[2])
+    k = length_m / (ext[1] if fit == 'height' else max(ext[0], ext[2]))   # piezas altas: por la altura
     mesh.apply_scale(k)
     b = mesh.bounds
     mesh.apply_translation([-(b[0][0] + b[1][0]) / 2, -b[0][1], -(b[0][2] + b[1][2]) / 2])
@@ -54,6 +87,49 @@ def voxelize(glb, length_m, vpm):
         key = (int(p[0]), int(p[1]), int(p[2]))
         if key in vox: vox[key][0] += c; vox[key][1] += 1
         else: vox[key] = [c.astype(float), 1]
+    return vox
+
+
+def postprocess(vox, img_path, colors=20, saturation=1.0):
+    """Arreglos tras voxelizar (09-10-2026):
+    - Colores: la textura de TRELLIS sale más oscura y apagada que la imagen de FLUX; se lleva su
+      brillo medio y su saturación a los de la imagen (sin el fondo blanco).
+    - Paleta: k-medias a `colors` colores, que quita el ruido de color de la textura.
+    - Hueco: fuera los voxels con los seis vecinos ocupados (no se ven y pesan)."""
+    from PIL import Image
+    from scipy.cluster.vq import kmeans2
+    keys = list(vox.keys())
+    cols = np.array([(c / cnt)[:3] / 255.0 for c, cnt in vox.values()])
+    im = np.asarray(Image.open(img_path).convert('RGB'), dtype=float) / 255.0
+    px = im.reshape(-1, 3)
+    px = px[px.min(axis=1) < 0.9]                                 # sin el fondo blanco
+    lum = lambda a: a @ np.array([0.299, 0.587, 0.114])
+    sat = lambda a: a.max(axis=1) - a.min(axis=1)
+    # cada canal con la misma distribución que en la imagen (por cuantiles): conserva los
+    # contrastes de la textura con los tonos de FLUX
+    rng = np.random.default_rng(1)
+    ref = px[rng.choice(len(px), min(len(px), 60000), replace=False)]
+    q = np.linspace(0, 1, 101)
+    for ch in range(3):
+        src = np.quantile(cols[:, ch], q)
+        dst = np.quantile(ref[:, ch], q)
+        cols[:, ch] = np.interp(cols[:, ch], src, dst)
+    # y se ajusta a la paleta de la imagen: colores limpios, sin ruido
+    pal, _ = kmeans2(ref, colors, minit='++', seed=1)
+    d = ((cols[:, None, :] - pal[None, :, :]) ** 2).sum(axis=2)
+    cols = np.clip(pal[d.argmin(axis=1)], 0.0, 1.0)
+    if saturation != 1.0:                                                # piezas de fondo: color más apagado
+        g = lum(cols)[:, None]
+        cols = np.clip(g + (cols - g) * saturation, 0.0, 1.0)
+    occ = set(keys)
+    out = []
+    for (x, y, z), c in zip(keys, cols):
+        if all(n in occ for n in ((x+1,y,z),(x-1,y,z),(x,y+1,z),(x,y-1,z),(x,y,z+1),(x,y,z-1))): continue
+        out.append([x, y, z, 'body', round(float(c[0]), 3), round(float(c[1]), 3), round(float(c[2]), 3), 0])
+    return out
+
+
+def _unused(vox):
     out = []
     for (x, y, z), (c, cnt) in vox.items():
         r, g, bl = (c / cnt)[:3] / 255.0
@@ -100,11 +176,13 @@ def main():
                      version=ver)
         url = out.get('model_file') if isinstance(out, dict) else out
         open(glb_path, 'wb').write(gi.download(url))
-    vox = voxelize(glb_path, piece['length_m'], piece['vpm'])
+    vox = postprocess(voxelize(glb_path, piece['length_m'], piece['vpm'], piece.get('fit', 'horizontal')), img_path,
+                      saturation=piece.get('sat', 1.0))
     data = {'voxel_size': 1.0 / piece['vpm'], 'pivots': {'body': [0, 0, 0]}, 'voxels': vox,
             'roughness': 0.85, 'specular': 0.3, 'no_bottom': True}
-    json.dump(data, open(os.path.join(ROOT, 'models', 'atrezo_%s.json' % name), 'w'))
-    print('atrezo_%s: %d voxels' % (name, len(vox)))
+    out_name = piece.get('out', 'atrezo_%s' % name)
+    json.dump(data, open(os.path.join(ROOT, 'models', '%s.json' % out_name), 'w'))
+    print('%s: %d voxels' % (out_name, len(vox)))
 
 
 if __name__ == '__main__':

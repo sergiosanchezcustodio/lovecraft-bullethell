@@ -322,6 +322,10 @@
    "type": "box",
    "shrink": 0.8
   },
+  "atrezo_roca_nevada": {
+   "type": "box",
+   "shrink": 0.75
+  },
   "atrezo_trineo": {
    "type": "box",
    "shrink": 0.85
@@ -1639,6 +1643,60 @@
    ],
    "rot": 223.1,
    "scale": 1.0
+  },
+  {
+   "model": "atrezo_roca_nevada",
+   "pos": [
+    6.25,
+    19.62
+   ],
+   "rot": 261.0,
+   "scale": 1.18
+  },
+  {
+   "model": "atrezo_roca_nevada",
+   "pos": [
+    23.2,
+    -8.32
+   ],
+   "rot": 111.2,
+   "scale": 1.43
+  },
+  {
+   "model": "atrezo_roca_nevada",
+   "pos": [
+    2.62,
+    23.44
+   ],
+   "rot": 276.0,
+   "scale": 0.92
+  },
+  {
+   "model": "atrezo_roca_nevada",
+   "pos": [
+    -10.96,
+    15.56
+   ],
+   "rot": 91.6,
+   "scale": 1.06
+  },
+  {
+   "model": "atrezo_roca_nevada",
+   "pos": [
+    -5.62,
+    21.0
+   ],
+   "rot": 343.2,
+   "scale": 0.95
+  },
+  {
+   "model": "atrezo_roca_nevada",
+   "pos": [
+    -21.5,
+    10.5
+   ],
+   "rot": 23.9,
+   "scale": 1.39
   }
  ],
  "mask": {

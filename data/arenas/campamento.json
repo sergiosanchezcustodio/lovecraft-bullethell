@@ -323,6 +323,10 @@
    "type": "box",
    "shrink": 0.8
   },
+  "atrezo_roca_nevada": {
+   "type": "box",
+   "shrink": 0.75
+  },
   "atrezo_trineo": {
    "type": "box",
    "shrink": 0.85

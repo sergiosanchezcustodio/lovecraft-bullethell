@@ -54,6 +54,8 @@ A.scatter("monticulo_2", 4, 16.0, 0.9, 1.2)
 A.scatter("monticulo_3", 8, 13.0, 0.8, 1.4)
 A.scatter("atrezo_bloques_hielo", 4, 14.0, 0.9, 1.2)
 A.scatter("atrezo_caja_rota", 4, 15.0, 1.0, 1.0)
+# Rocas nevadas hechas con Replicate (09-10-2026); al final, para no mover lo demás
+A.scatter("atrezo_roca_nevada", 6, 9.0, 0.9, 1.5)
 
 COLL = dict(COLLIDERS)
 COLL.update({
