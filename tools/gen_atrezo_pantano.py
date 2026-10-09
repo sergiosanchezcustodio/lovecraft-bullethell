@@ -280,7 +280,7 @@ def caballete():
 
 
 PIECES = {'via': via, 'vagoneta': vagoneta, 'senal': senal, 'apeadero': apeadero,
-          'arbol_1': arbol_1, 'arbol_2': arbol_2, 'tocon': tocon, 'caballete': caballete}
+          'arbol_1': arbol_1, 'arbol_2': arbol_2, 'tocon_mano': tocon, 'caballete': caballete}
 
 if __name__ == '__main__':
     only = set(sys.argv[1:])

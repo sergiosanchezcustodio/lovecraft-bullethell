@@ -90,6 +90,37 @@ PIECES = {
                    'rough unfinished chisel marks, standing on a dark wooden sculptor stand'),
         'length_m': 1.5, 'vpm': 32, 'fit': 'height', 'out': 'prv_escultura_1',
     },
+    # Tercera tanda (09-10-2026)
+    'escombros': {
+        'prompt': ('A low pile of rubble from a collapsed 1920s New England brick house: broken red bricks, '
+                   'splintered grey boards, a few roof slates, wet and dirty, spread flat on the ground'),
+        'length_m': 2.34, 'vpm': 32, 'out': 'inn_escombros',
+    },
+    'cajas_pescado': {
+        'prompt': ('A stack of three old wooden fish crates on a 1920s harbour, weathered grey slats, one crate '
+                   'full of silver fish, wet, a little seaweed'),
+        'length_m': 1.56, 'vpm': 32, 'out': 'prueba_cajas_pescado',
+    },
+    'fardos': {
+        'prompt': ('A stack of cargo bales on a 1920s harbour dock: burlap sacks and canvas-wrapped bundles tied '
+                   'with thick ropes, piled on a wooden pallet, wet from the rain'),
+        'length_m': 1.38, 'vpm': 32, 'out': 'prueba_fardos',
+    },
+    'tocon': {
+        'prompt': ('A rotten dead tree stump in a swamp, dark grey wet bark, broken jagged top, exposed gnarled '
+                   'roots, patches of moss and hanging Spanish moss'),
+        'length_m': 1.0, 'vpm': 32, 'value': 0.6, 'out': 'pan_tocon',
+    },
+    'sacos': {
+        'prompt': ('Three heavy burlap sacks of sculptor clay leaning against each other, one open showing grey '
+                   'wet clay, dusty with dried clay stains'),
+        'length_m': 1.22, 'vpm': 32, 'out': 'prueba_sacos',
+    },
+    'roca_arrecife_2': {
+        'prompt': ('A tall jagged black basalt reef rock spire covered with barnacles, mussels and dark green '
+                   'seaweed, wet and glistening, a few small glowing green spots'),
+        'length_m': 2.0, 'vpm': 32, 'fit': 'height', 'value': 0.5, 'out': 'arr_roca_2',
+    },
     'caja': {
         'prompt': ('A small wooden supply crate of a 1930s polar expedition, nailed weathered planks, dark iron '
                    'corner brackets, plain sides with no letters and no markings, a little snow on the lid'),
@@ -122,7 +153,24 @@ def voxelize(glb, length_m, vpm, fit='horizontal'):
     return vox
 
 
-def postprocess(vox, img_path, colors=20, saturation=1.0):
+def foreground(img_path, tol=70):
+    """Píxeles de la pieza en la imagen de FLUX: se quita el fondo inundando desde los bordes
+    (blanco o gris claro, con sus sombras suaves). Antes se quitaba solo el blanco y las sombras
+    del fondo aclaraban todos los colores."""
+    from PIL import Image, ImageDraw
+    im = Image.open(img_path).convert('RGB')
+    im.thumbnail((384, 384))
+    mark = im.copy()
+    w, h = mark.size
+    for x, y in [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1), (w // 2, 0), (w // 2, h - 1), (0, h // 2), (w - 1, h // 2)]:
+        ImageDraw.floodfill(mark, (x, y), (255, 0, 255), thresh=tol)
+    a = np.asarray(im, dtype=float) / 255.0
+    m = np.asarray(mark)
+    keep = ~((m[:, :, 0] == 255) & (m[:, :, 1] == 0) & (m[:, :, 2] == 255))
+    return a[keep].reshape(-1, 3)
+
+
+def postprocess(vox, img_path, colors=20, saturation=1.0, value=1.0):
     """Arreglos tras voxelizar (09-10-2026):
     - Colores: la textura de TRELLIS sale más oscura y apagada que la imagen de FLUX; se lleva su
       brillo medio y su saturación a los de la imagen (sin el fondo blanco).
@@ -130,11 +178,12 @@ def postprocess(vox, img_path, colors=20, saturation=1.0):
     - Hueco: fuera los voxels con los seis vecinos ocupados (no se ven y pesan)."""
     from PIL import Image
     from scipy.cluster.vq import kmeans2
+    occ = set(vox.keys())                                         # primero, solo la superficie: los
+    nb = lambda x, y, z: ((x+1,y,z),(x-1,y,z),(x,y+1,z),(x,y-1,z),(x,y,z+1),(x,y,z-1))   # interiores, oscuros,
+    vox = {k: v for k, v in vox.items() if not all(q in occ for q in nb(*k))}   # se llevaban los tonos oscuros
     keys = list(vox.keys())
     cols = np.array([(c / cnt)[:3] / 255.0 for c, cnt in vox.values()])
-    im = np.asarray(Image.open(img_path).convert('RGB'), dtype=float) / 255.0
-    px = im.reshape(-1, 3)
-    px = px[px.min(axis=1) < 0.9]                                 # sin el fondo blanco
+    px = foreground(img_path)
     lum = lambda a: a @ np.array([0.299, 0.587, 0.114])
     sat = lambda a: a.max(axis=1) - a.min(axis=1)
     # cada canal con la misma distribución que en la imagen (por cuantiles): conserva los
@@ -153,10 +202,9 @@ def postprocess(vox, img_path, colors=20, saturation=1.0):
     if saturation != 1.0:                                                # piezas de fondo: color más apagado
         g = lum(cols)[:, None]
         cols = np.clip(g + (cols - g) * saturation, 0.0, 1.0)
-    occ = set(keys)
+    cols = np.clip(cols * value, 0.0, 1.0)                        # piezas oscuras: la imagen lleva sombras
     out = []
     for (x, y, z), c in zip(keys, cols):
-        if all(n in occ for n in ((x+1,y,z),(x-1,y,z),(x,y+1,z),(x,y-1,z),(x,y,z+1),(x,y,z-1))): continue
         out.append([x, y, z, 'body', round(float(c[0]), 3), round(float(c[1]), 3), round(float(c[2]), 3), 0])
     return out
 
@@ -209,7 +257,7 @@ def main():
         url = out.get('model_file') if isinstance(out, dict) else out
         open(glb_path, 'wb').write(gi.download(url))
     vox = postprocess(voxelize(glb_path, piece['length_m'], piece['vpm'], piece.get('fit', 'horizontal')), img_path,
-                      saturation=piece.get('sat', 1.0))
+                      saturation=piece.get('sat', 1.0), value=piece.get('value', 1.0))
     data = {'voxel_size': 1.0 / piece['vpm'], 'pivots': {'body': [0, 0, 0]}, 'voxels': vox,
             'roughness': 0.85, 'specular': 0.3, 'no_bottom': True}
     out_name = piece.get('out', 'atrezo_%s' % name)

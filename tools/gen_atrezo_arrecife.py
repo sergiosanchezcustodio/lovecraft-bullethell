@@ -183,7 +183,8 @@ def muro():
 
 PIECES = {'columna_1': columna_1, 'columna_2': columna_2, 'arco': arco, 'bloque': bloque,
           'roca_1_mano': roca_1,   # la del juego es de Replicate
-           'roca_2': roca_2, 'coral': coral, 'muro': muro}
+           'roca_2_mano': roca_2,   # la del juego es de Replicate
+           'coral': coral, 'muro': muro}
 
 if __name__ == '__main__':
     only = set(sys.argv[1:])

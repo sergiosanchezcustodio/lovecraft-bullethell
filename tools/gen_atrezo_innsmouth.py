@@ -529,7 +529,7 @@ def coche():
 
 PIECES = {'casa': casa, 'autobus': autobus, 'poste': poste, 'valla': valla, 'barril': barril,
           'redes': redes, 'barca': barca, 'farola': farola, 'juncos': juncos,
-          'fachada': fachada, 'templo': templo, 'escombros': escombros, 'fuente': fuente,
+          'fachada': fachada, 'templo': templo, 'escombros_mano': escombros, 'fuente': fuente,
           'carretilla': carretilla, 'cajas': cajas, 'nasa': nasa, 'pilote': pilote, 'coche': coche}
 
 if __name__ == '__main__':
