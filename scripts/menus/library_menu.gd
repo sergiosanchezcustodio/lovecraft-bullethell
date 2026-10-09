@@ -9,6 +9,7 @@ extends Control
 ## Capturas: `title saves=… open=menu_biblioteca tome=N cursor=N`.
 ##
 ## El libro es una ilustración (09-10-2026, tools/generar_libro_biblioteca.py): cubre la pantalla
+## (con la perspectiva corregida: generar_libro_biblioteca.enderezar, marcos verticales)
 ## y cada página es un recuadro en fracciones de la imagen (LEFT_PAGE, RIGHT_PAGE, dentro del
 ## marco dorado y sin pisar sus esquinas). El contenido se maqueta a un tamaño fijo (PAGE) y se
 ## escala al recuadro, así que no cambia con la resolución. Si se cambia la ilustración, hay que
@@ -23,10 +24,10 @@ const PAPER_SHADE := Color(0.74, 0.66, 0.5)
 const INK := Color(0.2, 0.13, 0.08)
 const INK_DIM := Color(0.42, 0.34, 0.25)
 const RED_INK := Color(0.5, 0.12, 0.08)
-const PAGE := Vector2(680, 930)                ## tamaño de maqueta de cada página (se escala)
+const PAGE := Vector2(690, 920)                ## tamaño de maqueta de cada página (se escala)
 const ART := preload("res://resources/PantallasMenus/libro.png")
-const LEFT_PAGE := Rect2(0.218, 0.143, 0.265, 0.664)    ## en fracciones de la ilustración
-const RIGHT_PAGE := Rect2(0.549, 0.143, 0.280, 0.664)
+const LEFT_PAGE := Rect2(0.218, 0.150, 0.2616, 0.625)    ## en fracciones de la ilustración
+const RIGHT_PAGE := Rect2(0.5578, 0.150, 0.2598, 0.625)
 const IMAGE_PX := 300
 
 var save: SaveData

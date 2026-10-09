@@ -38,5 +38,31 @@ def main():
         print('ok', path)
 
 
+
+def enderezar(src, dst, quad, pad=400):
+    """Corrige la perspectiva (09-10-2026): FLUX dibuja el libro algo más ancho abajo que arriba y
+    los marcos de las páginas salían inclinados respecto al texto. `quad` son las esquinas
+    (sup. izq., sup. der., inf. der., inf. izq.) de los bordes exteriores de las páginas; se
+    llevan a un rectángulo. Lo que falta en las esquinas se rellena en espejo (estirando el borde salían rayas)."""
+    import numpy as np
+    from PIL import Image
+    im = Image.open(src).convert('RGB')
+    W, H = im.size
+    a = np.pad(np.asarray(im), ((pad, pad), (pad, pad), (0, 0)), mode='reflect')
+    big = Image.fromarray(a)
+    (x0, y0), (x1, _), (x2, y2), (x3, _) = quad
+    L, R = (x0 + x3) / 2.0, (x1 + x2) / 2.0
+    out_pts = [(L, y0), (R, y0), (R, y2), (L, y2)]
+    in_pts = [(x + pad, y + pad) for x, y in quad]
+    # coeficientes de la perspectiva: salida (x, y) -> entrada
+    A, B = [], []
+    for (u, v), (x, y) in zip(out_pts, in_pts):
+        A += [[u, v, 1, 0, 0, 0, -x * u, -x * v], [0, 0, 0, u, v, 1, -y * u, -y * v]]
+        B += [x, y]
+    c = np.linalg.solve(np.array(A, float), np.array(B, float))
+    out = big.transform((W, H), Image.PERSPECTIVE, tuple(c), Image.BICUBIC)
+    out.save(dst)
+
+
 if __name__ == '__main__':
     main()
