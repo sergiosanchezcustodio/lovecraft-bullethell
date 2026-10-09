@@ -55,110 +55,299 @@ def box(M, x0, x1, y0, y1, z0, z1, col):
 
 # ---------------- casa ----------------
 
-def casa():
-    """Casa de Nueva Inglaterra de tablas solapadas (líneas oscuras cada 3 voxels), tejado de
-    dos aguas a lo largo de x con tejas y verdín, ventanas tapiadas con tablones en aspa,
-    puerta, porche con dos pies derechos y chimenea de ladrillo. Hueca."""
-    M = Model(S=1, seed=61)
-    HX, HZ, WALL, RIDGE = 56, 44, 52, 84                     # 7 x 5,5 m; aleros a 3,25 m; cumbrera a 5,25
+def casa(variant=1):
+    """Casa de Innsmouth (rehecha el 09-10-2026 siguiendo tools/replicate/ref_casa.png), 16/m,
+    7 x 5,5 m, hueca. Dos plantas de tablas solapadas con tablas que faltan, pintura que se
+    pela y humedad abajo; zócalo de piedra; moldura entre plantas y esquineras; ventanas con
+    marco, alféizar y cada una en su estado (tapiada en aspa, oscura, rota o, una, con luz);
+    tejado de tejas con verdín, cumbrera algo hundida, aleros con canalón y un hastial
+    delantero con su ventana; porche con escalones y baranda rota; chimenea con remate.
+    Variante 1: gris; 2: pintura verde azulada desvaída."""
+    M = Model(S=1, seed=60 + variant)
+    HX, HZ, WALL, RIDGE = 56, 44, 52, 84
+    FLOOR2 = 28                                               # moldura entre plantas
+    PAINT = BOARD if variant == 1 else (0.40, 0.48, 0.47)
+    PAINT_D = BOARD_D if variant == 1 else (0.30, 0.37, 0.36)
+    STONE_B = (0.40, 0.39, 0.36); STONE_BD = (0.30, 0.29, 0.27)
+    GUTTER = (0.30, 0.42, 0.36)                               # cobre con pátina
+
     def siding(x, y, z):
-        if y % 3 == 0: return BOARD_D
-        c = lerp(BOARD, BOARD_G, 0.6 * M.noise(x, y, z, 10.0) + 0.3 * (y < 10))
+        if y < 4: return lerp(STONE_BD, STONE_B, M.noise(x, y, z, 3.0))           # zócalo
+        if y % 3 == 0: return lerp(PAINT_D, DARK, 0.3)                           # sombra de la tabla
+        row = y // 3
+        u = x if abs(z) >= HZ - 1 else z
+        seg = (u + 7 * row) // 22
+        if M.hsh(row, seg, 11 + variant) < 0.035: return DARK                     # tabla que falta
+        c = lerp(PAINT, PAINT_D, 0.5 * M.hsh(row, seg, 3))
+        if M.noise(x, y, z, 7.0) > 0.66: c = lerp(c, (0.62, 0.60, 0.55), 0.5)     # pintura pelada
+        if y < 16: c = lerp(c, BOARD_G, 0.6 * M.noise(x, y, z, 9.0))             # humedad
         return c
-    for y in range(0, WALL):                                 # paredes de 2 voxels
+
+    for y in range(0, WALL):                                  # paredes
         for x in range(-HX, HX):
             for z in range(-HZ, HZ):
                 if min(x + HX, HX - 1 - x, z + HZ, HZ - 1 - z) > 1: continue
                 M.put(x, y, z, P, siding(x, y, z))
-    for y in range(0, WALL):                                 # esquineras claras
-        for x in (-HX, HX - 1):
-            for z in (-HZ, HZ - 1): M.put(x, y, z, P, TRIM)
-    for x in range(-HX, HX):                                 # hastiales (los dos extremos)
-        pass
-    for z in range(-HZ - 4, HZ + 4):                         # tejado: dos faldones a lo largo de x
-        dz = abs(z + 0.5)
-        y = int(RIDGE - (dz / (HZ + 4)) * (RIDGE - WALL + 4))
-        for x in range(-HX - 3, HX + 3):
-            c = ROOF if (x // 4 + y) % 2 else ROOF_D
-            if M.noise(x, y, z, 9.0) > 0.68: c = MOSS
-            M.put(x, y, z, P, c); M.put(x, y - 1, z, P, ROOF_D)
-    for x in (-HX, HX - 1):                                  # hastiales rellenos bajo el tejado
+    for y in range(4, WALL):                                  # esquineras
+        for x in (-HX, -HX + 1, HX - 2, HX - 1):
+            for z in (-HZ, HZ - 1):
+                M.put(x, y, z, P, TRIM)
+        for z in (-HZ, -HZ + 1, HZ - 2, HZ - 1):
+            for x in (-HX, HX - 1): M.put(x, y, z, P, TRIM)
+    for x in range(-HX, HX):                                  # moldura entre plantas
+        for y in (FLOOR2, FLOOR2 + 1):
+            M.put(x, y, HZ, P, TRIM); M.put(x, y, -HZ - 1, P, TRIM)
+    for z in range(-HZ, HZ):
+        for y in (FLOOR2, FLOOR2 + 1):
+            M.put(HX, y, z, P, TRIM); M.put(-HX - 1, y, z, P, TRIM)
+
+    def roof_y(x, z):                                         # faldones a lo largo de x, cumbrera hundida
+        sag = 3 * (1 - (x / HX) ** 2)
+        return RIDGE - sag - (abs(z + 0.5) / (HZ + 5)) * (RIDGE - WALL + 5)
+
+    def shingle(x, y, z):
+        row = y // 2
+        c = ROOF if M.hsh(row, (x + 3 * (row % 2)) // 4, 5) < 0.6 else ROOF_D
+        if M.noise(x, y, z, 8.0) > 0.66: c = lerp(c, MOSS, 0.85)
+        return c
+
+    for z in range(-HZ - 5, HZ + 5):                          # tejado con alero
+        for x in range(-HX - 4, HX + 4):
+            y = int(roof_y(x, z))
+            M.put(x, y, z, P, shingle(x, y, z)); M.put(x, y - 1, z, P, ROOF_D)
+            if abs(z + 0.5) > HZ + 3: M.put(x, y - 1, z, P, TRIM)                 # imposta
+    for x in range(-HX - 4, HX + 4):                          # canalón de cobre a lo largo del alero delantero
+        y = int(roof_y(x, HZ + 4)) - 1
+        M.put(x, y, HZ + 5, P, GUTTER); M.put(x, y - 1, HZ + 5, P, GUTTER)
+    for y in range(4, int(roof_y(HX - 1, HZ + 4))):           # bajante
+        M.put(HX + 2, y, HZ + 5, P, GUTTER)
+    for x in (-HX, HX - 1):                                   # hastiales
         for z in range(-HZ, HZ):
-            top = int(RIDGE - (abs(z + 0.5) / (HZ + 4)) * (RIDGE - WALL + 4)) - 1
+            top = int(roof_y(x, z)) - 1
             for y in range(WALL, top): M.put(x, y, z, P, siding(x, y, z))
-    def window(cx, cy, face):                                # ventana tapiada en la fachada sur (+z) o este (+x)
-        for a in range(-6, 6):
-            for b in range(-8, 8):
-                edge = a in (-6, 5) or b in (-8, 7)
-                col = TRIM if edge else DARK
-                if not edge and (abs(a * 1.4 - b) < 1.2 or abs(a * 1.4 + b) < 1.2): col = PLANK if (a + b) % 3 else PLANK_D
-                if not edge and b in (-3, 3): col = PLANK_D
-                if face == 'z': M.put(cx + a, cy + b, HZ, P, col)
-                else: M.put(HX, cy + b, cx + a, P, col)
-    for cx in (-38, -14, 26):
-        window(cx, 26, 'z')
-    for cz in (-22, 18): window(cz, 26, 'x')
-    for x in range(2, 16):                                   # puerta
-        for y in range(0, 36):
-            M.put(x, y, HZ, P, WOOD_D if x in (2, 15) or y == 35 else WOOD)
-    M.put(13, 17, HZ + 1, P, IRON_L)
-    for x in range(-4, 24):                                  # porche: tarima, pies derechos y tejadillo
-        for z in range(HZ, HZ + 14):
-            M.put(x, 2, z, P, PLANK if x % 3 else PLANK_D)
-            M.put(x, 1, z, P, PLANK_D)
-    for x in (-3, 22):
-        for y in range(3, 40): M.put(x, y, HZ + 12, P, TRIM)
-    for x in range(-6, 26):
-        for z in range(HZ, HZ + 15):
-            M.put(x, 40 + (HZ + 15 - z) // 5, z, P, ROOF_D)
-    for y in range(RIDGE - 20, RIDGE + 10):                  # chimenea
-        for x in range(-34, -27):
-            for z in range(-8, -1):
-                if min(x + 34, -28 - x, z + 8, -2 - z) > 0 and y < RIDGE + 9: continue
-                M.put(x, y, z, P, BRICK if (y // 2 + x) % 4 else BRICK_D)
+
+    # hastial delantero (sobre el porche): tejadillo a dos aguas con la cumbrera hacia +z
+    gx, gw, gtop = 6, 22, RIDGE - 4
+    for z in range(0, HZ + 6):
+        for x in range(gx - gw - 3, gx + gw + 3):
+            y = int(gtop - abs(x - gx + 0.5) * (gtop - WALL + 3) / (gw + 3))
+            if y > roof_y(x, z) - 1:
+                M.put(x, y, z, P, shingle(x, y, z)); M.put(x, y - 1, z, P, ROOF_D)
+                if z >= HZ + 4: M.put(x, y - 1, z, P, TRIM)
+    for x in range(gx - gw, gx + gw):                         # su frontón de tablas
+        top = int(gtop - abs(x - gx + 0.5) * (gtop - WALL + 3) / (gw + 3)) - 1
+        for y in range(WALL - 2, top):
+            M.put(x, y, HZ, P, siding(x, y, HZ)); M.put(x, y, HZ - 1, P, siding(x, y, HZ))
+
+    lit_done = [False]
+
+    def window(cx, cy, face, w=10, h=14, state=None):
+        """Ventana con marco, travesaño y alféizar; estado: tapiada, oscura, rota o con luz."""
+        if state is None:
+            r = M.hsh(cx, cy, 31 + variant + (7 if face == 'x' else 0))
+            state = 'tapiada' if r < 0.4 else ('rota' if r < 0.6 else ('luz' if r < 0.72 and not lit_done[0] else 'oscura'))
+            if state == 'luz': lit_done[0] = True
+
+        def put(a, b, col, glow=0, out=0):
+            if face == 'z': M.put(cx + a, cy + b, HZ + out, P, col, glow=glow)
+            else: M.put(HX + out, cy + b, cx + a, P, col, glow=glow)
+        hw, hh = w // 2, h // 2
+        for a in range(-hw - 1, hw + 1):
+            for b in range(-hh - 1, hh + 1):
+                frame = a in (-hw - 1, hw) or b in (-hh - 1, hh)
+                if frame: put(a, b, TRIM); continue
+                sash = a == 0 or b == 0
+                if state == 'tapiada':
+                    col = PLANK if (abs(a * 1.3 - b) < 1.3 or abs(a * 1.3 + b) < 1.3) else DARK
+                    if b in (-hh + 2, hh - 3): col = PLANK_D
+                    put(a, b, col, out=1 if col != DARK else 0)
+                elif state == 'luz':
+                    put(a, b, TRIM if sash else LIGHT, glow=0 if sash else 1)
+                elif state == 'rota':
+                    put(a, b, TRIM if sash else (GLASS if M.hsh(a, b, cx) < 0.3 else DARK))
+                else:
+                    put(a, b, TRIM if sash else (GLASS if (a + b) % 5 == 0 else DARK))
+        for a in range(-hw - 2, hw + 2): put(a, -hh - 2, TRIM, out=1)              # alféizar
+        for a in range(-hw - 2, hw + 2): put(a, hh + 1, TRIM, out=1)               # dintel
+    for cx in (-38, -20):                                     # fachada: planta baja y alta
+        window(cx, 16, 'z')
+    for cx in (-38, -16, 30, 44):
+        if abs(cx - gx) > gw - 6 or cx in (-16,): window(cx, 40, 'z')
+    window(gx, 44, 'z', w=12, h=12)                            # ventana del hastial delantero
+    window(gx, 62, 'z', w=6, h=6, state='oscura')              # ojo de buey del desván
+    for cz in (-22, 18):                                      # costado este, dos plantas
+        window(cz, 16, 'x'); window(cz, 40, 'x')
+    for cx in (-30, 22):                                      # trasera y oeste (casi no se ven)
+        for cy in (16, 40):
+            for a in range(-5, 5):
+                for b in range(-7, 7): M.put(cx + a, cy + b, -HZ - 1, P, DARK if a and b else TRIM)
+    # puerta con marco y montante de cristal
+    for x in range(2, 16):
+        for y in range(4, 40):
+            edge = x in (2, 15) or y == 39
+            col = TRIM if edge else (DARK if y > 33 else (WOOD if (x - 2) % 6 else WOOD_D))
+            M.put(x, y, HZ, P, col)
+    M.put(13, 20, HZ + 1, P, IRON_L)
+    # porche: tarima, escalones, pies derechos, baranda rota y tejadillo
+    PZ = HZ + 16
+    for x in range(-6, 24):
+        for z in range(HZ, PZ):
+            M.put(x, 4, z, P, PLANK if x % 3 else PLANK_D); M.put(x, 3, z, P, PLANK_D)
+            for y in range(0, 3):
+                if x in (-6, 23) or z == PZ - 1: M.put(x, y, z, P, STONE_BD)
+    for i, z in enumerate(range(PZ, PZ + 6, 2)):              # escalones
+        for x in range(2, 16):
+            for zz in (z, z + 1):
+                M.put(x, 3 - i, zz, P, PLANK if x % 3 else PLANK_D)
+    for x in (-6, 23):                                        # pies derechos
+        for y in range(5, 44):
+            M.put(x, y, PZ - 1, P, TRIM); M.put(x, y, HZ, P, TRIM)
+    for x in range(-6, 24):                                   # baranda (rota en un tramo)
+        if 2 <= x < 16: continue
+        if 17 <= x < 21: continue
+        M.put(x, 16, PZ - 1, P, TRIM)
+        if x % 3 == 0:
+            for y in range(5, 16): M.put(x, y, PZ - 1, P, TRIM)
+    for x in (18, 19):                                        # un balaústre caído
+        M.put(x, 5, PZ + 1, P, TRIM)
+    for x in range(-8, 26):                                   # tejadillo del porche
+        for z in range(HZ, PZ + 2):
+            y = 44 + (PZ + 2 - z) // 5
+            M.put(x, y, z, P, shingle(x, y, z))
+            if z == PZ + 1: M.put(x, y - 1, z, P, TRIM)
+    # chimenea con remate
+    for y in range(RIDGE - 20, RIDGE + 12):
+        for x in range(-36, -26):
+            for z in range(-8, 0):
+                cap = y >= RIDGE + 9
+                xx0, xx1, zz0, zz1 = (-37, -25, -9, 1) if cap else (-36, -26, -8, 0)
+                if min(x - xx0, xx1 - 1 - x, z - zz0, zz1 - 1 - z) > 0 and y < RIDGE + 11: continue
+                M.put(x, y, z, P, (0.48, 0.44, 0.40) if cap else (BRICK if (y // 2 + x) % 4 else BRICK_D))
+        if y >= RIDGE + 9:
+            for x in (-37, -26):
+                for z in range(-9, 1): M.put(x, y, z, P, (0.48, 0.44, 0.40))
+            for z in (-9, 0):
+                for x in range(-37, -25): M.put(x, y, z, P, (0.48, 0.44, 0.40))
     return M, {P: [0, 0, 0]}
 
 
 # ---------------- autobús de Joe Sargent ----------------
 
 def autobus():
-    """Autobús de los años 20: caja larga sobre chasis, capó delante (+x) con rejilla,
-    ventanillas oscuras, techo combado, ruedas de radios, óxido y pintura desvaída."""
+    """El autobús de Joe Sargent (rehecho el 09-10-2026 siguiendo tools/replicate/ref_autobus.png),
+    32/m, 5,25 x 2,1 m: carrocería de techo redondeado en verde desvaído con desconchones de
+    óxido y barro abajo, franja crema bajo las ventanillas enmarcadas, puerta; capó largo con
+    guardabarros curvos sobre las ruedas delanteras, rejilla redonda cromada, faros redondos y
+    parachoques; ruedas de radios, estribo y baca con una maleta atada. Delante, +x."""
     M = Model(S=2, seed=62)
-    L, W = 84, 34                                           # 5,25 x 2,1 m (mitad)
+    L, W = 84, 34                                           # media eslora y anchura total
+    HW = W // 2
+    CREAM = (0.66, 0.62, 0.50); CHROME = (0.62, 0.62, 0.60); SPOKE = (0.62, 0.52, 0.30)
+    MUD = (0.30, 0.25, 0.18); CASE = (0.50, 0.30, 0.16); CASE_D = (0.34, 0.20, 0.11)
+    BACK = -L; FRONT_BOX = L - 30                           # la caja acaba donde empieza el capó
+    ROOF0, ROOF1 = 66, 76                                   # el techo se curva entre estas alturas
+
     def paint(x, y, z):
-        c = BUS if y % 6 else BUS_D
-        if M.noise(x, y, z, 6.0) > 0.7: c = RUST
+        c = BUS if (y // 5) % 4 else lerp(BUS, BUS_D, 0.5)
+        if M.noise(x, y, z, 5.0) > 0.68: c = RUST                              # desconchones
+        if y < 26: c = lerp(c, MUD, 0.6 * (1 - (y - 14) / 12.0) + 0.2 * M.noise(x, y, z, 3.0))
         return c
-    for x in range(-L, L - 26):                             # caja
-        for y in range(16, 74):
-            for z in range(-W // 2, W // 2):
-                if min(x + L, L - 27 - x, z + W // 2, W // 2 - 1 - z) > 1 and y < 72: continue
-                win = 44 <= y < 64 and (x + L) % 18 > 3 and z in (-W // 2, W // 2 - 1) and x < L - 32
-                M.put(x, y, z, P, GLASS if win else paint(x, y, z))
-    for x in range(-L - 1, L - 25):                         # techo combado
-        for z in range(-W // 2 - 1, W // 2 + 1):
-            M.put(x, 74 + (abs(z) < 10), z, P, BUS_D)
-    for x in range(L - 26, L):                              # capó y rejilla
-        for y in range(18, 46):
-            for z in range(-12, 12):
-                if x == L - 1: M.put(x, y, z, P, IRON if (y + z) % 2 else IRON_L)
-                elif min(z + 12, 11 - z) == 0 or y == 45: M.put(x, y, z, P, paint(x, y, z))
-    for z in (-9, 8):                                       # faros
-        for y in (40, 41):
-            M.put(L, y, z, P, (0.70, 0.66, 0.52)); M.put(L, y, z + 1, P, (0.70, 0.66, 0.52))
-    for y in range(46, 66):                                 # parabrisas
-        for z in range(-15, 15): M.put(L - 27, y, z, P, GLASS if y < 64 else BUS_D)
-    for x in range(-L, L):                                  # chasis y estribo
-        for z in range(-W // 2, W // 2): M.put(x, 14, z, P, IRON)
-    for cx in (-L + 22, L - 20):                            # ruedas
+
+    def half_w(y):                                          # sección: el techo se redondea
+        if y <= ROOF0: return HW
+        t = (y - ROOF0) / float(ROOF1 - ROOF0)
+        return int(HW * (1 - t * t) ** 0.5)
+
+    for x in range(BACK, FRONT_BOX):                        # caja
+        back_round = max(0.0, 1 - (x - BACK) / 6.0)         # trasera algo redondeada
+        for y in range(16, ROOF1 + 1):
+            hw = half_w(y) - int(3 * back_round * (y > 60))
+            if hw <= 0: continue
+            for z in range(-hw, hw):
+                interior = min(x - BACK, FRONT_BOX - 1 - x, z + hw, hw - 1 - z) > 1
+                top = y == ROOF1 or z in (-hw, hw - 1)
+                if interior and not top: continue
+                side = z in (-HW, HW - 1)
+                c = paint(x, y, z)
+                if 40 <= y <= 42: c = CREAM                                       # franja crema
+                if side and 46 <= y < 62 and x < FRONT_BOX - 6:
+                    k = (x - BACK - 4) % 16
+                    if 2 <= k < 14:
+                        c = GLASS if not (M.hsh(x // 16, z, 9) < 0.25 and k in (5, 9) and y > 54) else DARK   # cristal rajado
+                    elif k in (0, 1, 14, 15): c = CREAM                              # marcos
+                if side and z == HW - 1 and 20 <= x - BACK + 0 and FRONT_BOX - 22 <= x < FRONT_BOX - 10 and 18 <= y < 62:
+                    c = lerp(BUS_D, DARK, 0.3) if x in (FRONT_BOX - 22, FRONT_BOX - 11) or y == 61 else (GLASS if y > 46 else BUS_D)  # puerta
+                M.put(x, y, z, P, c)
+    for y in range(44, 64):                                 # parabrisas en el frente de la caja
+        for z in range(-HW + 2, HW - 2):
+            M.put(FRONT_BOX, y, z, P, CREAM if z in (-1, 0) or y in (44, 63) else GLASS)
+    for x in range(BACK + 6, FRONT_BOX - 4):                # baca y maleta
+        for z in (-12, 11):
+            M.put(x, ROOF1 + 3, z, P, IRON_L)
+        if (x - BACK) % 8 == 0:
+            for z in range(-12, 12): M.put(x, ROOF1 + 3, z, P, IRON_L)
+            for y in (ROOF1 + 1, ROOF1 + 2):
+                M.put(x, y, -12, P, IRON); M.put(x, y, 11, P, IRON)
+    for x in range(-20, 6):
+        for y in range(ROOF1 + 4, ROOF1 + 13):
+            for z in range(-9, 9):
+                strap = x in (-14, -2)
+                M.put(x, y, z, P, CASE_D if strap or y == ROOF1 + 12 or z in (-9, 8) else CASE)
+    # capó, rejilla redonda, faros y parachoques
+    for x in range(FRONT_BOX, L):
+        t = (x - FRONT_BOX) / float(L - FRONT_BOX)
+        top = int(46 - 4 * t * t)
+        for y in range(20, top + 1):
+            hw = 12 if y < top - 2 else 10
+            for z in range(-hw, hw):
+                if min(z + hw, hw - 1 - z) > 0 and y < top: continue
+                c = paint(x, y, z)
+                if y == top and abs(z) < 2: c = CHROME                            # bisagra del capó
+                if z in (-hw, hw - 1) and 30 <= y < 40 and (x - FRONT_BOX) % 4 == 0: c = BUS_D   # rejillas laterales
+                M.put(x, y, z, P, c)
+    for y in range(20, 46):                                 # rejilla del radiador, redondeada arriba
+        for z in range(-11, 11):
+            if y > 38 and (y - 38) ** 2 + (z + 0.5) ** 2 * 0.5 > 64: continue
+            edge = z in (-11, 10) or y == 20 or (y > 38 and (y - 38) ** 2 + (z + 0.5) ** 2 * 0.5 > 40)
+            M.put(L, y, z, P, CHROME if edge else (IRON if z % 2 else IRON_L))
+    for zc in (-14, 13):                                    # faros redondos sobre los guardabarros
+        for y in range(36, 44):
+            for z in range(zc - 4, zc + 4):
+                d = (y - 39.5) ** 2 + (z - zc + 0.5) ** 2
+                if d > 16: continue
+                M.put(L - 2, y, z, P, CHROME if d > 9 else (0.80, 0.76, 0.58), glow=0)
+                M.put(L - 3, y, z, P, CHROME)
+    for z in range(-HW - 1, HW + 1):                        # parachoques
+        M.put(L + 2, 16, z, P, CHROME); M.put(L + 2, 17, z, P, CHROME)
+        if z in (-12, 11):
+            M.put(L + 1, 16, z, P, IRON)
+    # guardabarros curvos y estribo
+    for cx in (L - 18, BACK + 22):
         for s in (-1, 1):
-            z0 = s * (W // 2) - (1 if s > 0 else 0)
+            zf = s * (HW + 1) - (1 if s > 0 else 0)
+            for a in range(0, 181, 4):
+                ang = math.radians(a)
+                x = int(round(cx + 17 * math.cos(ang))); y = int(round(13 + 17 * math.sin(ang)))
+                for dz in range(-5, 1):
+                    M.put(x, y, zf - s * dz, P, paint(x, y, zf))
+    for x in range(BACK + 40, L - 36):
+        for s in (-1, 1):
+            for dz in range(0, 4): M.put(x, 16, s * (HW + dz) - (1 if s > 0 else 0), P, IRON)
+    for x in range(BACK, L):                                # chasis
+        for z in range(-HW + 2, HW - 2): M.put(x, 14, z, P, IRON)
+    # ruedas de radios
+    for cx in (L - 18, BACK + 22):
+        for s in (-1, 1):
+            z0 = s * HW - (1 if s > 0 else 0)
             for a in range(-13, 14):
-                for b in range(0, 26):
+                for b in range(0, 27):
                     r = math.hypot(a, b - 13)
                     if r > 13: continue
-                    c = TIRE if r > 9 else (IRON_L if r < 3 or abs(a) < 1 or abs(b - 13) < 1 else IRON)
+                    ang = math.degrees(math.atan2(b - 13, a)) % 30
+                    if r > 9.5: c = TIRE
+                    elif r < 3: c = CHROME
+                    elif ang < 6 or ang > 24: c = SPOKE
+                    else: c = DARK
                     for dz in range(0, 4): M.put(cx + a, b, z0 + s * dz, P, c)
     return M, {P: [0, 0, 0]}
 
@@ -527,7 +716,7 @@ def coche():
     return M, {P: [0, 0, 0]}
 
 
-PIECES = {'casa': casa, 'autobus': autobus, 'poste': poste, 'valla': valla, 'barril': barril,
+PIECES = {'casa': casa, 'casa_2': lambda: casa(2), 'autobus': autobus, 'poste': poste, 'valla': valla, 'barril': barril,
           'redes': redes, 'barca': barca, 'farola': farola, 'juncos': juncos,
           'fachada': fachada, 'templo': templo, 'escombros_mano': escombros, 'fuente': fuente,
           'carretilla': carretilla, 'cajas': cajas, 'nasa': nasa, 'pilote': pilote, 'coche': coche}

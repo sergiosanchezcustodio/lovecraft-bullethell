@@ -102,6 +102,10 @@
    "type": "box",
    "shrink": 0.8
   },
+  "atrezo_roca_nevada": {
+   "type": "box",
+   "shrink": 0.75
+  },
   "atrezo_trineo": {
    "type": "box",
    "shrink": 0.85
@@ -163,6 +167,10 @@
    "shrink": 0.9
   },
   "inn_casa": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "inn_casa_2": {
    "type": "box",
    "shrink": 0.95
   },
@@ -564,7 +572,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     -36.0,
     34.2
@@ -574,7 +582,7 @@
    "y": -5.5
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     34.2,
     -36.0
@@ -644,7 +652,7 @@
    "y": -4.0
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     -20.0,
     34.2
@@ -654,7 +662,7 @@
    "y": -5.5
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     34.2,
     -20.0
@@ -724,7 +732,7 @@
    "y": -4.0
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     -4.0,
     34.2
@@ -734,7 +742,7 @@
    "y": -5.5
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     34.2,
     -4.0
@@ -804,7 +812,7 @@
    "y": -4.0
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     12.0,
     34.2
@@ -814,7 +822,7 @@
    "y": -5.5
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     34.2,
     12.0
@@ -884,7 +892,7 @@
    "y": -4.0
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     28.0,
     34.2
@@ -894,7 +902,7 @@
    "y": -5.5
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     34.2,
     28.0
@@ -964,7 +972,7 @@
    "y": -4.0
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     44.0,
     34.2
@@ -974,7 +982,7 @@
    "y": -5.5
   },
   {
-   "model": "inn_casa",
+   "model": "inn_casa_2",
    "pos": [
     34.2,
     44.0

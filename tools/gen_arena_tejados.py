@@ -25,8 +25,8 @@ for t in range(-28, 32, 4):                                         # el pretil 
     A.add("tej_pretil", float(t), HALF + 0.3, rot=0)
     A.add("tej_pretil", HALF + 0.3, float(t), rot=90)
 for t in range(-36, 48, 8):                                         # abajo, los tejados de la calle (dos filas)
-    A.add("inn_casa", float(t), HALF + 4.2, rot=180, y=-5.5)
-    A.add("inn_casa", HALF + 4.2, float(t), rot=-90, y=-5.5)
+    A.add(["inn_casa", "inn_casa_2"][(int(t) // 8) % 2], float(t), HALF + 4.2, rot=180, y=-5.5)
+    A.add(["inn_casa", "inn_casa_2"][(int(t) // 8) % 2], HALF + 4.2, float(t), rot=-90, y=-5.5)
     A.add("tej_buhardilla", float(t) + 4.0, HALF + 13.0, rot=180, y=-4.0)
     A.add("tej_buhardilla", HALF + 13.0, float(t) + 4.0, rot=-90, y=-4.0)
 for t in (-22.0, 0.0, 22.0):
@@ -50,7 +50,7 @@ COLL.update({
     "tej_chimenea": {"type": "box", "shrink": 0.95}, "tej_claraboya": {"type": "box", "shrink": 0.9},
     "tej_deposito": {"type": "cylinder", "radius": 1.1}, "tej_tendedero": {"type": "box", "shrink": 0.6},
     "tej_pretil": {"type": "box", "shrink": 1.0}, "tej_trampilla": {"type": "box", "shrink": 0.9},
-    "inn_casa": {"type": "box", "shrink": 0.95}, "inn_farola": {"type": "cylinder", "radius": 0.2},
+    "inn_casa": {"type": "box", "shrink": 0.95}, "inn_casa_2": {"type": "box", "shrink": 0.95}, "inn_farola": {"type": "cylinder", "radius": 0.2},
 })
 
 A.write({

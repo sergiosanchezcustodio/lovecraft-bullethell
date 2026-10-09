@@ -68,33 +68,79 @@ def gilman():
 
 
 def buhardilla():
-    """Tejado abuhardillado (mansarda) de 7 x 5 m: faldón empinado de pizarra, ventana de
-    buhardilla con su tejadillo y una chimenea. Pieza de borde (oeste)."""
+    """Tejado abuhardillado (rehecho el 09-10-2026 siguiendo tools/replicate/ref_buhardilla.png),
+    7 x 5 m, 16/m: faldones empinados de pizarra en hileras con verdín, cornisa blanca con canalón
+    de cobre verdoso, dos buhardillas con su tejadillo a dos aguas, marco blanco y ventana (una
+    con luz), y una chimenea de ladrillo con dos sombreretes. Pieza de borde (oeste)."""
     M = Model(S=1, seed=82)
-    HX, HZ = 56, 40
-    for y in range(0, 56):
-        inset = int(y * 0.35)
-        for x in range(-HX + inset, HX - inset):
-            for z in range(-HZ + inset, HZ - inset):
-                if min(x + HX - inset, HX - inset - 1 - x, z + HZ - inset, HZ - inset - 1 - z) > 1 and y < 55: continue
-                c = ROOF if (y // 3 + x // 5) % 2 else ROOF_D
-                if M.noise(x, y, z, 10.0) > 0.72: c = MOSS
-                M.put(x, y, z, P, c)
-    for cx in (-24, 20):                                     # ventanas de buhardilla (al este, +x)
-        for y in range(10, 34):
-            for z in range(cx - 8, cx + 8):
-                xf = HX - int(y * 0.35)
-                for x in range(xf - 8, xf + 1):
-                    if x == xf: M.put(x, y, z, P, TRIM if z in (cx - 8, cx + 7) or y in (10, 33) else (DARK if y < 30 else TRIM))
-                    elif z in (cx - 8, cx + 7): M.put(x, y, z, P, ROOF_D)
-        for i in range(8):
-            for z in range(cx - 9 + i, cx + 9 - i):
-                for x in range(HX - 18, HX - 2): M.put(x, 34 + i, z, P, ROOF_D)
-    for y in range(40, 76):                                  # chimenea
-        for x in range(-30, -22):
-            for z in range(-6, 2):
-                if min(x + 30, -23 - x, z + 6, 1 - z) > 0 and y < 75: continue
-                M.put(x, y, z, P, BRICK if (y // 2 + x) % 4 else BRICK_D)
+    HX, HZ, H = 56, 40, 56
+    SLATE = (0.24, 0.26, 0.29); SLATE_D = (0.17, 0.18, 0.21); SLATE_L = (0.32, 0.34, 0.37)
+    GUTTER = (0.30, 0.42, 0.36); POT = (0.52, 0.36, 0.26)
+
+    def slate(x, y, z):
+        row = y // 3
+        u = x + z
+        c = SLATE if M.hsh(row, (u + 3 * (row % 2)) // 5, 2) < 0.55 else (SLATE_D if M.hsh(row, u // 5, 4) < 0.6 else SLATE_L)
+        if y % 3 == 0: c = lerp(c, SLATE_D, 0.6)                    # sombra de la hilera
+        if M.noise(x, y, z, 8.0) > 0.7: c = lerp(c, MOSS, 0.8)
+        return c
+
+    def inset(y):
+        return int(y * 0.35)
+
+    for y in range(0, H):
+        i = inset(y)
+        for x in range(-HX + i, HX - i):
+            for z in range(-HZ + i, HZ - i):
+                if min(x + HX - i, HX - i - 1 - x, z + HZ - i, HZ - i - 1 - z) > 1 and y < H - 1: continue
+                M.put(x, y, z, P, slate(x, y, z))
+    for x in range(-HX - 1, HX + 1):                                # cornisa blanca y canalón
+        for z in range(-HZ - 1, HZ + 1):
+            if min(x + HX + 1, HX - x, z + HZ + 1, HZ - z) > 0: continue
+            M.put(x, 0, z, P, TRIM); M.put(x, 1, z, P, TRIM)
+    for x in range(-HX - 2, HX + 2):
+        for z in (HZ + 1, -HZ - 2):
+            M.put(x, 1, z, P, GUTTER); M.put(x, 2, z, P, GUTTER)
+    for z in range(-HZ - 2, HZ + 2):
+        for x in (HX + 1, -HX - 2):
+            M.put(x, 1, z, P, GUTTER); M.put(x, 2, z, P, GUTTER)
+    for y in range(-14, 2): M.put(HX + 1, y, HZ + 1, P, GUTTER)        # bajante
+    for i, cx in enumerate((-24, 20)):                              # buhardillas en el faldón este (+x)
+        lit = i == 1
+        y0, y1 = 8, 34
+        for y in range(y0, y1):
+            xf = HX - inset(y)
+            for z in range(cx - 10, cx + 10):
+                for x in range(xf - 12, xf + 1):
+                    side = z in (cx - 10, cx + 9)
+                    front = x == xf
+                    if not (side or front): continue
+                    if front:
+                        if z in (cx - 10, cx - 9, cx + 8, cx + 9) or y in (y0, y0 + 1, y1 - 1, y1 - 2): c = TRIM
+                        elif z in (cx - 1, cx) or y == (y0 + y1) // 2: c = TRIM                          # parteluz
+                        else: c = LIT if lit else (0.06, 0.07, 0.08)
+                        M.put(x, y, z, P, c, glow=1 if c == LIT else 0)
+                    else:
+                        M.put(x, y, z, P, slate(x, y, z))
+            M.put(HX - inset(y0) + 1, y0, cx, P, TRIM)
+        for k in range(0, 12):                                      # tejadillo a dos aguas con alero
+            for z in range(cx - 12 + k, cx + 12 - k):
+                for x in range(HX - inset(y1) - 16, HX - inset(y1) + 3):
+                    rake = z in (cx - 12 + k, cx + 11 - k) and x >= HX - inset(y1) + 1   # tabla de remate, solo delante
+                    M.put(x, y1 + k, z, P, TRIM if rake else slate(x, y1 + k, z))
+        for k in range(0, 10):                                      # frontón del tejadillo
+            for z in range(cx - 10 + k, cx + 10 - k):
+                M.put(HX - inset(y1) + 2, y1 + k, z, P, TRIM if k == 0 else (0.60, 0.58, 0.54))
+    for y in range(36, 78):                                         # chimenea con dos sombreretes
+        for x in range(-32, -20):
+            for z in range(-6, 4):
+                cap = y >= 72
+                if min(x + 32, -21 - x, z + 6, 3 - z) > 0 and y < 77: continue
+                M.put(x, y, z, P, (0.46, 0.42, 0.38) if cap else (BRICK if (y // 2 + x) % 4 else BRICK_D))
+    for px in (-29, -24):
+        for y in range(78, 84):
+            for x in range(px - 1, px + 2):
+                for z in range(-2, 1): M.put(x, y, z, P, POT)
     return M, {P: [0, 0, 0]}
 
 

@@ -30,6 +30,19 @@ PIECES = {
                'enormous dark grey slate blocks of different sizes fitted without mortar, five-pointed star '
                'reliefs carved on some blocks, cracks, a collapsed corner with fallen blocks at its foot, frost and '
                'snow on the top edges'),
+    'casa': ('4:3', 'A decaying 1920s New England clapboard house in the fishing town of Innsmouth: two storeys, '
+             'grey weathered wooden siding with missing boards, a steep gambrel roof of dark mossy shingles with a '
+             'sagging ridge and a brick chimney, boarded-up windows with crossed planks, one window faintly lit, a '
+             'small front porch with broken railing and steps, peeling paint, green damp stains'),
+    'autobus': ('16:9', "Joe Sargent's decrepit 1920s motor bus to Innsmouth: a small boxy grey and faded green bus with "
+                'rounded roof, rust patches, cracked windows, a long hood with a round radiator grille and round '
+                'headlights, spoked wheels, luggage rack on the roof with a tied suitcase, mud on the lower body'),
+    'buhardilla': ('4:3', 'A section of an old 1920s New England town rooftop at night: steep slate roof with a dormer '
+                   'window (small gabled roof, dark window, white trim), mossy slate shingles in rows, a copper gutter '
+                   'with green patina, a brick chimney with chimney pots'),
+    'gilman': ('3:4', 'The back of the decrepit Gilman House hotel in Innsmouth, 1920s: a tall four storey dark brick '
+               'building with rows of tall sash windows, a few dimly lit in yellow, others black and broken, an iron '
+               'fire escape zigzagging down the wall, a cornice at the top, drainpipes, peeling posters, damp stains'),
 }
 
 

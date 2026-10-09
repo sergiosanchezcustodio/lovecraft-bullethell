@@ -13,14 +13,14 @@ from arena_kit import Arena, COLLIDERS
 
 HALF = 32.0
 A = Arena("carretera", seed=1927, half=HALF,
-          foot={"inn_casa": 4.5, "inn_autobus": 3.2, "inn_redes": 1.6, "inn_barca": 2.0, "inn_valla": 1.6})
+          foot={"inn_casa": 4.5, "inn_casa_2": 4.5, "inn_autobus": 3.2, "inn_redes": 1.6, "inn_barca": 2.0, "inn_valla": 1.6})
 
 # casas al norte (fachada al sur) y al oeste (fachada al este), con vallas en los huecos
 for i, x in enumerate(range(-36, 40, 10)):
-    A.add("inn_casa", x + A.rng.uniform(-0.8, 0.8), -HALF - 3.5 + A.rng.uniform(-0.6, 0.6), rot=0, scale=1.0)
+    A.add(A.rng.choice(["inn_casa", "inn_casa_2"]), x + A.rng.uniform(-0.8, 0.8), -HALF - 3.5 + A.rng.uniform(-0.6, 0.6), rot=0, scale=1.0)
     A.add("inn_valla", x + 5.0, -HALF + 0.5, rot=0)
 for z in range(-26, 40, 10):
-    A.add("inn_casa", -HALF - 3.5 + A.rng.uniform(-0.6, 0.6), z + A.rng.uniform(-0.8, 0.8), rot=90, scale=1.0)
+    A.add(A.rng.choice(["inn_casa", "inn_casa_2"]), -HALF - 3.5 + A.rng.uniform(-0.6, 0.6), z + A.rng.uniform(-0.8, 0.8), rot=90, scale=1.0)
     A.add("inn_valla", -HALF + 0.5, z + 5.0, rot=90)
 
 # la carretera: de la esquina noroeste a la sudeste (dirección (1, 1)); a sus lados, postes y farolas
@@ -50,7 +50,7 @@ A.scatter("inn_juncos", 26, 18.0, 0.8, 1.4, bias=True)
 
 COLL = dict(COLLIDERS)
 COLL.update({
-    "inn_casa": {"type": "box", "shrink": 0.95},
+    "inn_casa": {"type": "box", "shrink": 0.95}, "inn_casa_2": {"type": "box", "shrink": 0.95},
     "inn_autobus": {"type": "box", "shrink": 0.9},
     "inn_poste": {"type": "cylinder", "radius": 0.15},
     "inn_farola": {"type": "cylinder", "radius": 0.2},
