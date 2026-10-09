@@ -355,36 +355,74 @@ def autobus():
 # ---------------- poste, valla, barril, redes, barca ----------------
 
 def poste():
+    """Poste de telégrafo de 6 m (32/m): madera gris agrietada, dos crucetas con tornapuntas,
+    aisladores de vidrio verde en sus pernos, clavos de trepar y un aviso clavado."""
     M = Model(S=2, seed=63)
-    for y in range(0, 192):                                 # 6 m
-        for x in range(-2, 2):
-            for z in range(-2, 2):
-                if abs(x + 0.5) + abs(z + 0.5) > 3: continue
-                M.put(x, y, z, P, WOOD_D if (y + x * 5) % 17 == 0 else lerp(WOOD_D, WOOD, M.noise(x, y, z, 8.0)))
-    for x in range(-28, 28):                                # travesaño
-        for y in (176, 177, 178):
-            M.put(x, y, 0, P, WOOD); M.put(x, y, -1, P, WOOD_D)
-    for x in (-25, -13, 12, 24):                            # aisladores de vidrio verdoso
-        for y in range(179, 184):
-            M.put(x, y, 0, P, (0.40, 0.58, 0.52)); M.put(x, y, -1, P, (0.40, 0.58, 0.52))
+    GREY = (0.40, 0.38, 0.35); GREY_D = (0.28, 0.27, 0.25); INS = (0.36, 0.58, 0.50)
+    for y in range(0, 192):
+        for x in range(-3, 3):
+            for z in range(-3, 3):
+                if (x + 0.5) ** 2 + (z + 0.5) ** 2 > 9: continue
+                c = lerp(GREY_D, GREY, M.noise(x, y * 0.3, z, 4.0))
+                if (y * 7 + x * 13) % 41 == 0: c = DARK                          # grietas
+                M.put(x, y, z, P, c)
+    for arm_y in (176, 160):
+        for x in range(-28, 28):
+            for y in (arm_y, arm_y + 1, arm_y + 2):
+                for z in (-1, 0): M.put(x, y, z, P, GREY if y > arm_y else GREY_D)
+        for k in range(12):                                   # tornapuntas
+            for s in (-1, 1): M.put(s * (3 + k), arm_y - 12 + k, 1, P, IRON)
+        for x in (-25, -16, -8, 7, 15, 24):                    # pernos y aisladores
+            M.put(x, arm_y + 3, 0, P, WOOD_D)
+            for y in range(arm_y + 4, arm_y + 9):
+                w = 2 if y < arm_y + 7 else 1
+                for dx in range(-w + 1, w):
+                    for dz in range(-w + 1, w): M.put(x + dx, y, dz, P, INS)
+    for y in range(40, 150, 14):                              # clavos de trepar, alternos
+        s = 1 if (y // 14) % 2 else -1
+        for k in range(3, 7): M.put(s * k, y, 0, P, IRON_L)
+    for x in range(-2, 4):                                    # aviso clavado
+        for y in range(70, 80): M.put(x, y, 3, P, (0.70, 0.66, 0.54) if y < 78 else (0.52, 0.48, 0.38))
     return M, {P: [0, 0, 0]}
 
 
 def valla():
-    """3 m de valla de estacas: dos travesaños, estacas puntiagudas, alguna rota y una caída."""
+    """3 m de valla de estacas (rehecha siguiendo tools/replicate/ref_valla.png): estacas
+    puntiagudas de pintura blanca que se pela, alguna rota, torcida o que falta, dos travesaños,
+    postes gruesos grises, un travesaño suelto en diagonal y matas al pie."""
     M = Model(S=2, seed=64)
-    for x in range(-48, 48):
-        for y in (12, 13, 30, 31): M.put(x, y, 0, P, WOOD_D)
-    for i, x0 in enumerate(range(-46, 46, 7)):
-        h = 40 if M.hsh(i, 0, 1) > 0.25 else int(14 + 14 * M.hsh(i, 1, 1))   # rotas
-        if M.hsh(i, 2, 2) > 0.85:                            # caída al suelo
-            for t in range(0, 40):
-                for w in range(0, 4): M.put(x0 + w, 0, 2 + t // 2 + (t % 2), P, WOOD)
-            continue
+    PAINT = (0.74, 0.72, 0.66); PAINT_D = (0.60, 0.58, 0.52); BARE = (0.46, 0.40, 0.32)
+    POST = (0.40, 0.38, 0.35); WEED = (0.30, 0.38, 0.18); WEED_D = (0.22, 0.28, 0.14)
+
+    def wood(x, y, z):
+        if M.noise(x, y, z, 3.0) > 0.62: return BARE                    # pintura pelada
+        return PAINT if (x + y) % 5 else PAINT_D
+    for x in (-48, 44):                                                   # postes
+        for y in range(0, 46):
+            for dx in range(0, 4):
+                for z in range(-1, 3): M.put(x + dx, y, z, P, lerp(POST, (0.30, 0.29, 0.27), M.noise(x, y, z, 5.0)))
+    for x in range(-44, 44):                                              # travesaños
+        for y in (12, 13, 30, 31): M.put(x, y, 0, P, wood(x, y, 0))
+    for i, x0 in enumerate(range(-43, 42, 6)):
+        r = M.hsh(i, 0, 1)
+        if r < 0.1: continue                                               # falta
+        h = 42 if r > 0.3 else int(16 + 16 * M.hsh(i, 1, 1))               # rota
+        lean = 0.0 if M.hsh(i, 3, 3) > 0.25 else (M.hsh(i, 4, 4) - 0.5) * 0.5   # torcida
         for y in range(0, h):
             for w in range(0, 4):
-                if y >= h - 2 and w in (0, 3) and h == 40: continue
-                M.put(x0 + w, y, 1, P, lerp(BOARD_D, BOARD, M.noise(x0, y, 0, 6.0)))
+                if h == 42 and y >= h - 4 and abs(w - 1.5) > (h - y) * 0.45: continue   # punta
+                x = x0 + w + int(lean * y)
+                M.put(x, y, 1, P, wood(x, y, 1))
+                M.put(x, y, 2, P, wood(x, y, 2))
+    for t in range(0, 60):                                                # travesaño suelto en diagonal
+        x = -40 + t; y = 6 + int(t * 0.45)
+        for z in (3, 4): M.put(x, y, z, P, wood(x, y, z))
+    for k in range(10):                                                   # matas al pie
+        cx, cz = M.rng.randint(-46, 44), M.rng.randint(-3, 6)
+        for b in range(M.rng.randint(4, 10)):
+            ang = M.rng.uniform(0, math.tau); r = M.rng.uniform(0, 2.5)
+            x, z = int(cx + r * math.cos(ang)), int(cz + r * math.sin(ang))
+            for y in range(0, M.rng.randint(3, 9)): M.put(x, y, z, P, WEED if y % 3 else WEED_D)
     return M, {P: [0, 0, 0]}
 
 

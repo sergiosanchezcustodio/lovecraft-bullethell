@@ -16,7 +16,7 @@ Escribe models/tej_<pieza>.json. Uso: python tools/gen_atrezo_tejados.py [piezas
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
 from voxlib import Model, lerp
-from gen_atrezo_innsmouth import (P, BRICK, BRICK_D, DARK, WOOD, WOOD_D, IRON, IRON_L, ROOF, ROOF_D, MOSS,
+from gen_atrezo_innsmouth import (P, BRICK, BRICK_D, DARK, WOOD, WOOD_D, IRON, IRON_L, ROOF, ROOF_D, MOSS, RUST,
                                   TRIM, GLASS, PLANK, PLANK_D)
 
 BRICK_N = (0.30, 0.20, 0.17); BRICK_ND = (0.23, 0.15, 0.13)          # ladrillo del hotel, más oscuro
@@ -26,44 +26,109 @@ SHEET = (0.78, 0.76, 0.70); SHEET_D = (0.62, 0.60, 0.56)
 
 
 def gilman():
-    """Trasera del Gilman House: 14 m de ancho y cuatro plantas (11 m). Hueca (muro de 1 voxel,
-    sin trasera). Ventanas de guillotina, unas pocas encendidas (luz que brilla), cornisa, y la
-    escalera de incendios en zigzag delante."""
+    """Trasera del Gilman House (rehecha el 09-10-2026 siguiendo tools/replicate/ref_gilman.png),
+    14 m de ancho y cuatro plantas (11 m), 16/m, hueca. Ladrillo con llagas claras, zócalo y
+    impostas de piedra, ventanas de guillotina con dintel y alféizar en distintos estados (unas
+    pocas encendidas, rotas, oscuras y tapiadas abajo), puerta trasera con escalones, cornisa con
+    dentellones y ménsulas, bajante, manchas de humedad, carteles despegados y la escalera de
+    incendios en hierro claro (plataformas con baranda, tramos en zigzag y escalera colgante)."""
     M = Model(S=1, seed=81)
     HX, D, H = 112, 24, 176
+    MORTAR = (0.46, 0.42, 0.38); FE = (0.34, 0.33, 0.31); FE_D = (0.20, 0.20, 0.20)
+    POSTER = [(0.70, 0.64, 0.48), (0.58, 0.30, 0.24), (0.62, 0.60, 0.54)]
+    FLOORS = [8 + k * 42 for k in range(4)]                  # suelo de cada planta
+
+    def brick(x, y, z):
+        if y < 8: return lerp(STONE, (0.40, 0.39, 0.36), M.noise(x, y, z, 3.0))           # zócalo
+        if any(f - 2 <= y < f for f in FLOORS[1:]): return STONE                             # imposta
+        course = y // 3
+        if y % 3 == 0: return MORTAR                                                         # tendel
+        u = x if abs(z - D + 1) < 1 else z
+        if (u + (course % 2) * 4) % 8 == 0: return MORTAR                                    # llaga
+        c = BRICK_N if M.hsh(course, (u + (course % 2) * 4) // 8, 1) < 0.7 else BRICK_ND
+        if M.noise(x, y, z, 14.0) > 0.68: c = lerp(c, (0.16, 0.20, 0.16), 0.45)             # humedad
+        return c
+
     for y in range(0, H):
         for x in range(-HX, HX):
             for z in range(-D, D):
                 if min(x + HX, HX - 1 - x, D - 1 - z) > 0 or z == -D: continue
-                c = BRICK_N if (y // 2 + (x + (y // 2 % 2) * 2) // 4) % 4 else BRICK_ND
-                if M.noise(x, y, z, 14.0) > 0.7: c = lerp(c, (0.18, 0.22, 0.18), 0.4)   # humedad
-                M.put(x, y, z, P, c)
-    for x in range(-HX - 2, HX + 2):                         # cornisa
-        for y in (H, H + 1, H + 2):
-            for z in range(D - 2, D + 2): M.put(x, y, z, P, STONE)
+                M.put(x, y, z, P, brick(x, y, z))
+    for x in range(-HX - 3, HX + 3):                          # cornisa con dentellones
+        for y in range(H, H + 6):
+            for z in range(D - 3, D + (3 if y >= H + 3 else 1)):
+                M.put(x, y, z, P, STONE if y != H + 2 else (0.46, 0.45, 0.42))
+        if x % 4 < 2:
+            for z in (D + 1, D + 2): M.put(x, H + 2, z, P, STONE)
+        if x % 24 == 0:                                       # ménsulas
+            for k in range(4):
+                for z in range(D, D + 1 + k): M.put(x, H - 4 + k, z, P, STONE)
     rng = M.rng
-    for floor_ in range(4):
-        cy = 22 + floor_ * 42
+    for fi, f in enumerate(FLOORS):
+        cy = f + 16
         for cx in range(-96, 100, 24):
-            lit = rng.random() < 0.22
+            if fi == 0 and abs(cx - 0) < 14: continue          # puerta trasera
+            r = rng.random()
+            state = 'tapiada' if fi == 0 and r < 0.5 else ('luz' if r < 0.2 else ('rota' if r < 0.38 else 'oscura'))
             for a in range(-6, 6):
                 for b in range(-11, 11):
                     edge = a in (-6, 5) or b in (-11, 10) or b == 0
-                    if edge: M.put(cx + a, cy + b, D, P, TRIM)
-                    else: M.put(cx + a, cy + b, D, P, LIT if lit else DARK, glow=1 if lit else 0)
-    # escalera de incendios: plataformas en cada planta y tramos en zigzag
-    for floor_ in range(1, 4):
-        py = floor_ * 42
-        for x in range(-40, 40):
-            for z in range(D, D + 14):
-                if (x + z) % 3 == 0 or z in (D, D + 13): M.put(x, py, z, P, IRON)
-            M.put(x, py + 10, D + 13, P, IRON)               # barandilla
-        for x in range(-40, 40, 8):
-            for y in range(py, py + 10): M.put(x, y, D + 13, P, IRON)
-        d = 1 if floor_ % 2 else -1
-        for i in range(42):                                  # tramo hacia la planta de abajo
-            x = int(-d * 30 + d * i * 1.4)
-            for z in range(D + 4, D + 10): M.put(x, py - i, z, P, IRON_L if i % 3 == 0 else IRON)
+                    if edge: c, g = TRIM, 0
+                    elif state == 'luz': c, g = LIT, 1
+                    elif state == 'tapiada': c, g = (PLANK if (b + 11) % 5 else PLANK_D), 0
+                    elif state == 'rota': c, g = (GLASS if M.hsh(a, b, cx + fi) < 0.25 else DARK), 0
+                    else: c, g = (GLASS if (a + b) % 7 == 0 else DARK), 0
+                    M.put(cx + a, cy + b, D, P, c, glow=g)
+            for a in range(-8, 8):                             # dintel y alféizar de piedra
+                for b in (11, 12, 13): M.put(cx + a, cy + b, D, P, STONE)
+                M.put(cx + a, cy - 12, D, P, STONE); M.put(cx + a, cy - 12, D + 1, P, STONE)
+            if state != 'luz' and rng.random() < 0.5:          # chorretón de humedad bajo la ventana
+                for b in range(0, rng.randint(8, 20)):
+                    M.put(cx + rng.choice((-2, 1)), cy - 13 - b, D, P, (0.18, 0.15, 0.13))
+    for x in range(-8, 8):                                    # puerta trasera con escalones
+        for y in range(8, 40):
+            M.put(x, y, D, P, TRIM if x in (-8, 7) or y == 39 else (WOOD if (x + 8) % 5 else WOOD_D))
+    for i in range(3):
+        for x in range(-11, 11):
+            for z in range(D, D + 8 - i * 2): M.put(x, 6 - i * 2, z, P, STONE)
+            for z in range(D, D + 8 - i * 2): M.put(x, 7 - i * 2, z, P, STONE)
+    for y in range(0, H):                                     # bajante con abrazaderas
+        M.put(HX - 6, y, D + 1, P, IRON_L if y % 24 else IRON)
+        M.put(HX - 5, y, D + 1, P, IRON_L if y % 24 else IRON)
+    for k, (px, py) in enumerate(((-70, 20), (-58, 26), (60, 18))):   # carteles despegados
+        col = POSTER[k % 3]
+        for a in range(0, 10):
+            for b in range(0, 14):
+                if b > 11 and a > 6: continue                 # esquina despegada
+                M.put(px + a, py + b, D, P, lerp(col, (0.30, 0.26, 0.20), 0.3 * M.noise(a, b, k, 3.0)))
+    # escalera de incendios (hierro claro para que se lea sobre el ladrillo)
+    FX0, FX1, FZ = -44, 44, D + 14
+    for fi, f in enumerate(FLOORS[1:], start=1):
+        py = f
+        for x in range(FX0, FX1):
+            for z in range(D + 1, FZ):
+                if (x + z) % 3 == 0 or z in (D + 1, FZ - 1) or x in (FX0, FX1 - 1): M.put(x, py, z, P, FE)
+            M.put(x, py + 12, FZ - 1, P, FE)                 # barandilla delantera
+            M.put(x, py + 6, FZ - 1, P, FE_D)
+        for z in range(D + 1, FZ):
+            for x in (FX0, FX1 - 1): M.put(x, py + 12, z, P, FE)
+        for x in range(FX0, FX1, 6):
+            for y in range(py, py + 12): M.put(x, y, FZ - 1, P, FE)
+        for z in range(D + 1, FZ, 6):
+            for y in range(py, py + 12):
+                M.put(FX0, y, z, P, FE); M.put(FX1 - 1, y, z, P, FE)
+        d = 1 if fi % 2 else -1                               # tramo en zigzag hasta la de abajo
+        top_x = -d * 36
+        for i in range(0, 42 if fi > 1 else 0):
+            x = int(top_x + d * i * 1.5)
+            y = py - i
+            for z in range(D + 3, D + 10):
+                if z in (D + 3, D + 9) or i % 2 == 0: M.put(x, y, z, P, FE if z in (D + 3, D + 9) else FE_D)
+            M.put(x, y + 10, D + 9, P, FE)                    # pasamanos
+    for y in range(14, FLOORS[1]):                            # escalera colgante bajo la primera plataforma
+        for x in (30, 36): M.put(x, y, FZ - 3, P, FE)
+        if y % 4 == 0:
+            for x in range(30, 37): M.put(x, y, FZ - 3, P, FE)
     return M, {P: [0, 0, 0]}
 
 
@@ -227,17 +292,35 @@ def tendedero():
 
 
 def pretil():
-    """4 m de pretil de ladrillo (50 cm) con albardilla de piedra: el borde de los tejados."""
+    """4 m de pretil de ladrillo (50 cm) con albardilla de piedra en piezas: llagas claras,
+    ladrillos que faltan, verdín abajo y una gárgola de hierro oxidado (desagüe)."""
     M = Model(S=2, seed=87)
+    MORTAR = (0.44, 0.40, 0.36)
     for x in range(-64, 64):
         for z in range(-4, 4):
             for y in range(0, 16):
-                if M.hsh(x // 8, 0, 9) > 0.92 and y > 6: continue   # algún hueco desmoronado
-                c = BRICK if (y // 2 + (x + (y // 2 % 2) * 2) // 4) % 4 else BRICK_D
+                course = y // 2
+                if y % 2 == 0 and y > 0: c = MORTAR
+                elif (x + (course % 2) * 4) % 8 == 0: c = MORTAR
+                else:
+                    k = (x + (course % 2) * 4) // 8
+                    if M.hsh(course, k, 9) < 0.05 and abs(z) == 3 and 2 < y < 14: continue   # ladrillo que falta
+                    c = BRICK if M.hsh(course, k, 3) < 0.65 else BRICK_D
+                    if y < 5 and M.noise(x, y, z, 6.0) > 0.5: c = lerp(c, MOSS, 0.6)
                 M.put(x, y, z, P, c)
-            if M.hsh(x // 8, 0, 9) <= 0.92:
-                for y in (16, 17): M.put(x, y, z + (1 if z == 3 else 0), P, STONE)
+            if M.hsh(x // 16, 0, 9) > 0.93: continue          # tramo de albardilla caído
+            for y in (16, 17):
+                cz = z if z < 3 else 4
+                M.put(x, y, cz, P, STONE if (x + 64) % 16 else (0.42, 0.41, 0.38))
+                if z == -4: M.put(x, y, -5, P, STONE)
+    for x in range(-3, 3):                                    # gárgola: canalón de hierro que asoma
+        for z in range(4, 12):
+            M.put(x, 3, z, P, RUST if x in (-3, 2) else IRON)
+        M.put(x, 2, 4, P, IRON)
+    for y in range(0, 3):                                     # mancha de óxido bajo la gárgola
+        for x in range(-2, 2): M.put(x, y, 4, P, RUST)
     return M, {P: [0, 0, 0]}
+
 
 
 def trampilla():

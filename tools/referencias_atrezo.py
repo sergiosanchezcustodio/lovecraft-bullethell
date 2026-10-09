@@ -43,6 +43,17 @@ PIECES = {
     'gilman': ('3:4', 'The back of the decrepit Gilman House hotel in Innsmouth, 1920s: a tall four storey dark brick '
                'building with rows of tall sash windows, a few dimly lit in yellow, others black and broken, an iron '
                'fire escape zigzagging down the wall, a cornice at the top, drainpipes, peeling posters, damp stains'),
+    'valla': ('16:9', 'A section of a rotten white picket fence in a 1920s New England fishing town: weathered '
+              'pointed pickets with peeling white paint, some missing or leaning, two horizontal rails, wooden posts, '
+              'weeds and mud at the base'),
+    'poste': ('3:4', 'A tall wooden telegraph pole from the 1920s by a muddy country road: weathered grey wood, two '
+              'crossarms with green glass insulators, sagging wires, an iron step spike, a small faded notice nailed on'),
+    'farola': ('3:4', 'A 1920s cast iron gas street lamp in a decaying New England harbour town: dark green fluted '
+               'post with a decorative base, a four-sided glass lantern with a warm yellow flame inside, a small '
+               'ladder rest bar, rust and verdigris'),
+    'pretil': ('16:9', 'A section of an old brick rooftop parapet wall of a 1920s New England building: dark red '
+               'bricks with crumbling mortar, a stone coping on top, some missing bricks, moss and a rusty iron drain '
+               'scupper'),
 }
 
 
