@@ -135,3 +135,73 @@ func test_rasgo_contra_elites() -> void:
 func test_crisis_mas_cortas() -> void:
 	_give(_item("crisis_mult", 0.5, 0.0), 1)
 	assert_almost_eq(p.sanity_state.duration_mult, 0.5, 0.001)
+
+# --- Hito 8.7: objetos con mecánica ---
+
+func _enemy() -> Enemy:
+	var e := Enemy.new().setup(load("res://data/enemies/pinguino.tres"), world, null)
+	world.add_child(e)
+	world.add_enemy(e)
+	return e
+
+func test_escudo_de_nodens_absorbe_un_golpe() -> void:
+	_give(_item("nodens_level", 1.0, 1.0), 1)
+	p._nodens_t = p.nodens_every()
+	var h := p.health
+	p.take_damage(Damage.new(30.0, 0.0))
+	assert_eq(p.health, h, "el primero lo para")
+	assert_false(p.nodens_ready(), "y se descarga")
+
+func test_ankh_levanta_una_vez() -> void:
+	_give(_item("ankh", 1.0, 1.0), 1)
+	p.take_damage(Damage.new(9999.0, 0.0))
+	assert_almost_eq(p.health, p.data.max_health * Player.ANKH_HEALTH, 0.01)
+	p._hurt_time = -1.0
+	p.take_damage(Damage.new(9999.0, 0.0))
+	assert_eq(p.health, 0.0, "la segunda vez no")
+
+func test_esquives_seguidos() -> void:
+	_give(_item("dodge_charges", 1.0, 1.0), 1)
+	var m := p.motor
+	m.step(0.016, Vector2.RIGHT, true)
+	assert_true(m.is_dodging())
+	m.step(p.data.dodge_duration + 0.01, Vector2.RIGHT, false)
+	assert_true(m.can_dodge(), "con los esquís, otro seguido")
+	m.step(0.016, Vector2.RIGHT, true)
+	m.step(p.data.dodge_duration + 0.01, Vector2.RIGHT, false)
+	assert_false(m.can_dodge(), "el tercero espera a la recarga")
+
+func test_furia_tras_esquivar() -> void:
+	var k := p.damage_mult(WeaponData.Category.FIREARM)
+	_give(_item("dodge_fury", 1.0, 0.5), 1)
+	p._on_dodge()
+	assert_almost_eq(p.damage_mult(WeaponData.Category.FIREARM), k * 1.5, 0.001)
+
+func test_diente_con_poca_vida() -> void:
+	var k := p.damage_mult(WeaponData.Category.MAGIC)
+	_give(_item("low_hp_bonus", 1.0, 0.2), 1)
+	p.health = p.data.max_health * 0.2
+	assert_almost_eq(p.damage_mult(WeaponData.Category.MAGIC), k * 1.2, 0.001)
+
+func test_escamas_devuelven_el_contacto() -> void:
+	_give(_item("thorns", 1.0, 0.5), 1)
+	var e := _enemy()
+	var hp := e.health
+	var d := Damage.new(10.0, 0.0)
+	d.source = e
+	p.take_damage(d)
+	assert_almost_eq(hp - e.health, 5.0, 0.01)
+
+func test_fosforos_prenden() -> void:
+	_give(_item("hit_burn", 1.0, 1.0), 1)
+	var e := _enemy()
+	Damage.ctx = &"J1:webly"
+	e.take_damage(Damage.new(1.0, 0.0))
+	Damage.ctx = &""
+	assert_true(e.is_burning())
+
+func test_llave_de_plata() -> void:
+	_give(_item("rerolls", 1.0, 1.0), 2)
+	assert_eq(p.rerolls_left(), 2)
+	p.rerolls_used = 2
+	assert_eq(p.rerolls_left(), 0)

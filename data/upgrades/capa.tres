@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/upgrade_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"capa"
+display_name = "Capa del Hombre Negro"
+description = "Al esquivar dejas un señuelo que atrae a los enemigos 1 s por nivel"
+stat = "decoy_time"
+multiply = 1.0
+add = 1.0
+max_level = 5
+color = Color(0.55, 0.8, 1.0, 1)
+group = "esquive"

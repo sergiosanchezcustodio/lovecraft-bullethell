@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/upgrade_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"llave"
+display_name = "Llave de plata"
+description = "RB o E en la subida de nivel: otras opciones, una vez por nivel"
+stat = "rerolls"
+multiply = 1.0
+add = 1.0
+max_level = 3
+color = Color(1.0, 0.82, 0.3, 1)
+group = "utilidad"

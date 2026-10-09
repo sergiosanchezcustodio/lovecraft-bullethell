@@ -16,6 +16,7 @@ var bonus := {}
 ## contexto `ctx` al crearse: WeaponSystem lo pone al disparar cada arma y cada efecto (bala,
 ## zona, onda…) guarda el suyo al crearse y lo vuelve a poner antes de dañar.
 var tag := &""
+var dot := false                 ## daño continuo (quemadura…): no dispara los objetos al impactar
 static var ctx := &""
 
 func _init(p_physical: float = 0.0, p_mental: float = 0.0) -> void:

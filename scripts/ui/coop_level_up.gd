@@ -17,6 +17,9 @@ extends CanvasLayer
 ## en el que sube (entrada "attr"), y cada tarjeta gira con armas y objetos al azar hasta
 ## pararse en su opción, una tras otra (REEL_STOPS). Confirmar durante el giro lo para todo;
 ## elegir solo se puede con los rodillos parados.
+##
+## Llave de plata (D-38): con RB o E, quien la lleva vuelve a tirar sus opciones (las veces que
+## le queden en el nivel); los rodillos giran otra vez.
 
 signal finished
 
@@ -104,6 +107,8 @@ func _process(delta: float) -> void:
 			if pk.repeat_in <= 0.0:
 				pk.repeat_in = REPEAT_NEXT
 				pk.move(d)
+		if q.input.just_pressed(InputBindings.PAGE_NEXT) and pk.settled():
+			pk.reroll()
 		if _t >= INPUT_DELAY and q.input.just_pressed(InputBindings.CONFIRM):
 			if pk.settled(): _choose(pk, pk.cursor)
 			else: pk.settle()
@@ -259,7 +264,7 @@ class Picker extends PanelContainer:
 					_paint())
 			box.add_child(card)
 			_cards.append(card)
-		_status = UiKit.label(HINT if _filler.is_empty() else " ", 15 if solo else 12, UiKit.TEXT_DIM)
+		_status = UiKit.label(hint() if _filler.is_empty() else " ", 15 if solo else 12, UiKit.TEXT_DIM)
 		_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(_status)
 		_paint()
@@ -298,7 +303,31 @@ class Picker extends PanelContainer:
 			elif _time >= _next_tick[i]:
 				_show_filler(i)
 				_next_tick[i] = _time + lerpf(0.045, 0.14, pow(_time / stop, 2.0))
-		if settled() and not done: _status.text = HINT
+		if settled() and not done: _status.text = hint()
+
+	## Ayuda del pie, con los cambios de la Llave de plata si le quedan.
+	func hint() -> String:
+		var n := player.rerolls_left() if player != null else 0
+		return HINT + ("\nRB o E: otras opciones (%d)" % n if n > 0 else "")
+
+	## Llave de plata: otras opciones, tantas como antes, y los rodillos vuelven a girar.
+	func reroll() -> bool:
+		if done or player.rerolls_left() <= 0 or player.weapons == null: return false
+		var rng := RandomNumberGenerator.new()
+		rng.randomize()
+		var fresh := player.progress.roll_options(player.weapons, rng, options.size())
+		if fresh.size() < options.size(): return false
+		options = fresh
+		player.rerolls_used += 1
+		Sfx.play("magic")
+		_time = 0.0
+		for i in _stopped.size():
+			_stopped[i] = _filler.is_empty()
+			_next_tick[i] = 0.0
+			if _stopped[i]: _show_option(i)
+			else: _show_filler(i)
+		_status.text = " " if not _filler.is_empty() else hint()
+		return true
 
 	func _show_attr(n: String) -> void:
 		_attr_tex.texture = load("res://resources/PantallasMenus/iconos/ficha_%s.png" % n)

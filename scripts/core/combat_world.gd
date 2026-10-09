@@ -134,16 +134,29 @@ func record_damage(tag: StringName, amount: float) -> void:
 	s[0] += amount
 	stats[tag] = s
 
-func record_kill(tag: StringName) -> void:
+func record_kill(tag: StringName, pos := Vector3.INF) -> void:
 	if tag == &"": return
 	var s: Array = stats.get(tag, [0.0, 0])
 	s[1] += 1
 	stats[tag] = s
-	var t := String(tag)                         # "J1:webly": avisa al jugador (objetos al abatir)
-	if t.begins_with("J") and t.length() > 2 and t[2] == ":":
-		var i := int(t[1]) - 1
-		for p in players:
-			if p.index == i and p.has_method("on_kill"): p.on_kill()
+	var p := player_of(tag)                      # avisa al jugador (objetos al abatir)
+	if p != null: p.on_kill(tag, pos)
+
+## Jugador al que pertenece una etiqueta "J1:webly" (null si no es de nadie).
+func player_of(tag: StringName) -> Player:
+	var t := String(tag)
+	if t.length() < 3 or t[0] != "J" or t[2] != ":": return null
+	var i := int(t[1]) - 1
+	for p in players:
+		if p.index == i: return p
+	return null
+
+## Un enemigo ha recibido un golpe de un jugador: Cristal de Ithaqua y Fósforos de Cthugha.
+func player_hit(tag: StringName, e: Node3D) -> void:
+	if tag == &"": return
+	if not players.any(func(q: Player) -> bool: return q.data.hit_slow > 0.0 or q.data.hit_burn > 0.0): return
+	var p := player_of(tag)
+	if p != null and (p.data.hit_slow > 0.0 or p.data.hit_burn > 0.0): p.on_hit(e)
 
 ## Daño y abatidos de un jugador (índice 0..3): {arma: [daño, abatidos]} y los totales.
 func stats_of(index: int) -> Dictionary:

@@ -42,7 +42,7 @@ func setup(p_level: LevelData, p_world: CombatWorld, p_obstacles: ObstacleMap, p
 
 func max_alive() -> int:
 	if max_alive_override > 0: return max_alive_override
-	return int(round(level.max_alive * LevelData.coop(level.coop_spawn, players)))
+	return int(round(level.max_alive * LevelData.coop(level.coop_spawn, players) * _idol()))
 
 func _physics_process(delta: float) -> void:
 	if completed: return
@@ -64,7 +64,7 @@ func _physics_process(delta: float) -> void:
 		final_event.emit(_final)
 	var scale := level.final_spawn_scale if _final_done else 1.0
 	if _boss_on: scale *= BOSS_SPAWN_SCALE         # con el jefe en pantalla, las oleadas casi paran
-	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * delta
+	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * _idol() * delta
 	while _acc >= 1.0:
 		if alive.size() + _emerging >= max_alive():
 			_acc = 1.0
@@ -118,6 +118,10 @@ func team_item(stat: String) -> float:
 	var v := 1.0
 	for p in world.players: v = maxf(v, float(p.data.get(stat)))
 	return v
+
+## Ídolo de Cthulhu (D-38): más enemigos.
+func _idol() -> float:
+	return team_item("idol_mult") if world != null else 1.0
 
 ## Baúles arcanos (D-31): uno cada `chest_every` s (±25 %), como mucho `chest_max` cerrados,
 ## en un sitio libre a 6-12 m de un jugador en pie.

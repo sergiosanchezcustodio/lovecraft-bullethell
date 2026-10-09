@@ -56,7 +56,23 @@ const ITEM_STATS: Array[String] = ["proj_count_add", "range_mult", "proj_speed_m
 	"weapon_cooldown_mult", "duration_mult", "pierce_add", "crit_chance", "crit_bonus", "damage_mult",
 	"firearm_mult", "physical_mult", "magic_mult", "elite_mult", "knockback_mult", "armor", "mental_mult",
 	"health_regen", "sanity_regen", "heal_on_kill", "sanity_on_kill", "crisis_mult", "money_mult",
-	"chest_mult", "pickup_heal_mult", "pet_mult", "hit_iframes", "arcane_cost_mult"]
+	"chest_mult", "pickup_heal_mult", "pet_mult", "hit_iframes", "arcane_cost_mult", "thorns", "nodens_level",
+	"ankh", "dodge_charges", "decoy_time", "dodge_blast", "dodge_fury", "rerolls", "kill_blast", "hit_slow",
+	"hit_burn", "low_hp_bonus", "idol_mult"]
+## Objetos con mecánica (hito 8.7)
+const LOW_HP := 0.3              ## por debajo de esta parte de la vida cuenta el Diente de shoggoth
+const FURY_TIME := 2.0           ## s de daño extra tras esquivar (Elixir de Curwen)
+const ANKH_HEALTH := 0.3         ## vida con la que se levanta (Ankh de Nephren)
+const BLAST_RADIUS := 2.0        ## estallidos de la Tablilla de Eltdown y de los Petardos
+const KILL_BLAST_DAMAGE := 14.0
+const HIT_SLOW := Vector2(1.5, 0.5)   ## s y velocidad del Cristal de Ithaqua
+const HIT_BURN := Vector2(3.0, 6.0)   ## s y daño por segundo de los Fósforos de Cthugha
+const DECOY_RADIUS := 7.0
+var _nodens_t := 0.0             ## s cargando el Escudo de Nodens
+var _nodens_fx: MeshInstance3D
+var _ankh_used := false
+var _fury_t := 0.0
+var rerolls_used := 0            ## cambios de opciones gastados en este nivel (Llave de plata)
 var sanity_state: SanityState
 var god := false                 ## depuración: no recibe daño
 var attrs_level1 := {}           ## atributos del nivel 1 (fijan las probabilidades de subida)
@@ -177,6 +193,8 @@ func _physics_process_step(delta: float) -> void:
 				p.sanity = minf(p.data.max_sanity, p.sanity + data.calm_aura * delta)
 	if data.health_regen > 0.0: health = minf(data.max_health, health + data.health_regen * delta)   # Botiquín
 	if data.sanity_regen > 0.0: sanity = minf(data.max_sanity, sanity + data.sanity_regen * delta)   # Pipa
+	if _fury_t > 0.0: _fury_t -= delta
+	_nodens_step(delta)
 	motor.locked = sanity_state.is_frozen()
 	var was_dodging := motor.is_dodging()
 	var ss := sanity_state
@@ -198,6 +216,7 @@ func _physics_process_step(delta: float) -> void:
 		Sfx.play("dodge")
 		_action = data.dodge_anim         # la animación del esquive empieza con el impulso
 		_action_t = 0.0
+		_on_dodge()
 		dodged.emit()
 	if _hurt_time >= 0.0: _hurt_time += delta
 
@@ -554,6 +573,8 @@ func gain_attribute() -> String:
 ## Multiplicador de daño de un arma según su tipo y los atributos (D-27).
 func damage_mult(category: int) -> float:
 	var k := float(shop.get("damage", 1.0)) * data.damage_mult   # Puntería (tienda) y objetos
+	if _fury_t > 0.0: k *= 1.0 + data.dodge_fury                  # Elixir de Curwen
+	if data.low_hp_bonus > 0.0 and health < data.max_health * LOW_HP: k *= 1.0 + data.low_hp_bonus   # Diente de shoggoth
 	match category:
 		WeaponData.Category.PHYSICAL: return Attributes.mult(attrs, "physical") * data.physical_mult * k
 		WeaponData.Category.MAGIC: return Attributes.mult(attrs, "magic") * data.magic_mult * k
@@ -569,6 +590,13 @@ func is_hittable() -> bool:
 ## Recibe un ataque: la parte física resta vida y la mental, cordura.
 func take_damage(d: Damage) -> void:
 	if not is_hittable(): return
+	if nodens_ready() and (d.physical > 0.0 or d.mental > 0.0):   # Escudo de Nodens: absorbe el golpe entero
+		_nodens_t = 0.0
+		_hurt_time = 0.0
+		Sfx.play("magic")
+		return
+	if d.source is Enemy and data.thorns > 0.0 and d.physical > 0.0 and (d.source as Enemy).is_alive():
+		_item_hit(d.source, d.physical * data.thorns, "escamas")     # Escamas de Profundo
 	if d.source is Enemy and not data.resist_tags.is_empty():   # rasgos: resistencia a ciertas criaturas
 		var k := 1.0
 		for tag in (d.source as Enemy).data.tags: k *= float(data.resist_tags.get(tag, 1.0))
@@ -586,6 +614,13 @@ func take_damage(d: Damage) -> void:
 		sanity_state.on_mental_damage()
 	_hurt_time = 0.0
 	damaged.emit(d)
+	if health <= 0.0 and data.ankh > 0.0 and not _ankh_used:       # Ankh de Nephren: se levanta una vez
+		_ankh_used = true
+		health = data.max_health * ANKH_HEALTH
+		Sfx.play("level_up")
+		var game := get_tree().current_scene if is_inside_tree() else null
+		if game != null and game.has_method("announce"): game.announce("El ankh de Nephren te devuelve a la vida", 2.0)
+		return
 	if health <= 0.0:
 		motor.locked = true
 		if revivable:
@@ -594,11 +629,89 @@ func take_damage(d: Damage) -> void:
 		Sfx.play("down")
 		downed.emit()
 
-## Ha abatido a un enemigo (CombatWorld.record_kill): Colmillo de ghoul y Salterio.
-func on_kill() -> void:
+## Ha abatido a un enemigo (CombatWorld.record_kill): Colmillo de ghoul, Salterio y Tablilla
+## de Eltdown (sus propios estallidos no encadenan otros).
+func on_kill(tag: StringName = &"", pos := Vector3.INF) -> void:
 	if health <= 0.0: return
 	if data.heal_on_kill > 0.0: health = minf(data.max_health, health + data.heal_on_kill)
 	if data.sanity_on_kill > 0.0: sanity = minf(data.max_sanity, sanity + data.sanity_on_kill)
+	if data.kill_blast > 0.0 and pos != Vector3.INF and not String(tag).ends_with(":tablilla") and randf() < data.kill_blast:
+		blast(pos, KILL_BLAST_DAMAGE, "tablilla")
+
+## Ha golpeado a un enemigo (Enemy.take_damage): Cristal de Ithaqua y Fósforos de Cthugha.
+func on_hit(e: Node3D) -> void:
+	if data.hit_slow > 0.0 and e.has_method("slow") and randf() < data.hit_slow: e.slow(HIT_SLOW.x, HIT_SLOW.y)
+	if data.hit_burn > 0.0 and e.has_method("ignite") and randf() < data.hit_burn:
+		var prev := Damage.ctx
+		Damage.ctx = item_tag("fosforos")
+		e.ignite(HIT_BURN.x, HIT_BURN.y * damage_mult(WeaponData.Category.PHYSICAL), data.bonus_tags)
+		Damage.ctx = prev
+
+## Etiqueta de las estadísticas para lo que hace un objeto: "J1:tablilla".
+func item_tag(item: String) -> StringName:
+	return StringName("J%d:%s" % [index + 1, item])
+
+## Explosión de un objeto (Tablilla, Petardos): daña y empuja a los de alrededor.
+func blast(pos: Vector3, dmg: float, item: String) -> void:
+	if world == null: return
+	var r := BLAST_RADIUS * data.area_mult
+	var prev := Damage.ctx
+	Damage.ctx = item_tag(item)
+	var fx := Explosion.new()
+	fx.radius = r
+	fx.position = Vector3(pos.x, 0, pos.z)
+	world.fx.add_child(fx)
+	for t in world.enemies_in_circle(pos, r):
+		var d := Damage.new(dmg * damage_mult(WeaponData.Category.PHYSICAL), 0.0)
+		var away := t.global_position - pos
+		d.knockback = Vector3(away.x, 0, away.z).normalized() * 1.5
+		d.bonus = data.bonus_tags
+		t.take_damage(d)
+	Damage.ctx = prev
+
+## Daño directo de un objeto a un enemigo (Escamas).
+func _item_hit(e: Node3D, dmg: float, item: String) -> void:
+	var prev := Damage.ctx
+	Damage.ctx = item_tag(item)
+	var d := Damage.new(dmg, 0.0)
+	d.bonus = data.bonus_tags
+	e.take_damage(d)
+	Damage.ctx = prev
+
+## Al empezar un esquive: señuelo, petardos y furia.
+func _on_dodge() -> void:
+	var from := global_position - motor.dodge_dir * 0.3
+	if data.decoy_time > 0.0 and world != null:              # Capa del Hombre Negro
+		world.fx.add_child(Flare.new().setup(world, from, data.decoy_time, DECOY_RADIUS))
+	if data.dodge_blast > 0.0: blast(from, data.dodge_blast, "petardos")
+	if data.dodge_fury > 0.0: _fury_t = FURY_TIME
+
+## Escudo de Nodens: s entre dos golpes absorbidos (25 a nivel 1, −3 por nivel).
+func nodens_every() -> float:
+	return 28.0 - 3.0 * data.nodens_level
+
+func nodens_ready() -> bool:
+	return data.nodens_level > 0.0 and _nodens_t >= nodens_every()
+
+func _nodens_step(delta: float) -> void:
+	if data.nodens_level <= 0.0: return
+	_nodens_t = minf(_nodens_t + delta, nodens_every())
+	if _nodens_fx == null and visual != null:
+		_nodens_fx = MeshInstance3D.new()
+		var sm := SphereMesh.new()
+		sm.radius = 0.75; sm.height = 1.5; sm.radial_segments = 24; sm.rings = 12
+		_nodens_fx.mesh = sm
+		var m := ShaderMaterial.new()
+		m.shader = preload("res://scripts/fx/nodens_shield.gdshader")
+		_nodens_fx.material_override = m
+		_nodens_fx.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_nodens_fx.position.y = 0.85
+		visual.add_child(_nodens_fx)
+	if _nodens_fx != null: _nodens_fx.visible = nodens_ready()
+
+## Cambios de opciones que le quedan en este nivel (Llave de plata).
+func rerolls_left() -> int:
+	return maxi(int(data.rerolls) - rerolls_used, 0)
 
 ## Reproduce una animación puntual (p. ej. "throw") por encima de andar o estar quieto.
 func play_once(anim: String) -> void:

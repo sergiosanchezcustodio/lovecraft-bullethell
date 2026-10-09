@@ -142,7 +142,20 @@
 		"vara": "Vara de avellano en horquilla. En Dunwich la usan para buscar agua; aquí tiembla cerca de otras cosas.",
 		"pemmican": "Pemmican de las provisiones de la expedición: grasa, carne seca y bayas. Sabe mal y alimenta mucho.",
 		"silbato": "Silbato de perrero del campamento de Lake. Los animales lo obedecen con más ganas.",
-		"talisman": "Talismán de la Orden Esotérica de Dagon, robado en el registro de su templo. Lo que cuesta, cuesta menos."
+		"talisman": "Talismán de la Orden Esotérica de Dagon, robado en el registro de su templo. Lo que cuesta, cuesta menos.",
+		"escamas": "Escamas de Profundo cosidas a un chaleco. Lo que muerde a quien lo lleva se lleva su parte.",
+		"nodens": "Concha gris que el Señor del Gran Abismo deja a veces en la orilla. Se cierra sola ante el peligro, y tarda en volver a abrirse.",
+		"ankh": "Cruz ansada del faraón Nephren-Ka, de la tumba que nunca se debió abrir. Devuelve la vida, una vez; el precio no lo dice.",
+		"esquis": "Esquís cortos que Pabodie hizo para la expedición. Con ellos se encadenan dos virajes sin pararse.",
+		"capa": "Capa negra de los aquelarres de Arkham. Al moverse deja atrás una sombra que no es la de nadie, y los monstruos la siguen.",
+		"petardos": "Ristra de petardos de la fiesta de Kingsport. Encendidos al echar a correr, le dan una sorpresa al que viene detrás.",
+		"elixir": "Frasco de la botica de Joseph Curwen. Un sorbo y la sangre corre más deprisa, sobre todo al saltar.",
+		"llave": "La llave de plata de Randolph Carter, con arabescos que no son de ningún alfabeto. Abre otras puertas que las que había.",
+		"tablilla": "Fragmento de las Tablillas de Eltdown, de arcilla cocida. A veces, lo que muere cerca se deshace con un estallido.",
+		"cristal": "Cristal de hielo que no se derrite, de las tierras donde camina el viento. El que lo toca se queda helado.",
+		"fosforos": "Caja de fósforos que se encienden solos. Su llama no es del todo de este mundo.",
+		"diente": "No es un diente: es un trozo de shoggoth endurecido que cambia de forma cuando su dueño está en peligro.",
+		"idolo": "Ídolo de piedra verdinegra de los pantanos de Luisiana. Atrae a los que sueñan con él, y no vienen con las manos vacías."
 	},
 	"places": {
 		"p1_n1": "Costa del mar de Ross, Antártida, 1930. La expedición de la Universidad de Miskatonic monta aquí su campamento: tiendas, una cabaña de troncos, un iglú y los faroles. Al norte, la Barrera de hielo; al sur, el mar. Algo vino de las cavernas de abajo.",

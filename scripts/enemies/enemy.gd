@@ -58,6 +58,11 @@ var _poison_t := 0.0                        ## s envenenado (serpiente de Yig): 
 var _poison_dps := 0.0
 var _poison_bonus := {}
 var _poison_tick := 0.0
+var _burn_t := 0.0                          ## s ardiendo (objetos y armas de fuego vivo)
+var _burn_dps := 0.0
+var _burn_bonus := {}
+var _burn_tag := &""
+var _burn_tick := 0.0
 var _confuse_t := 0.0                       ## s confundido (polilla de Leng): vaga sin rumbo y no dispara
 var _wander := Vector3.ZERO
 var _wander_t := 0.0
@@ -221,6 +226,16 @@ func poison(seconds: float, dps: float, bonus: Dictionary = {}) -> void:
 	_poison_dps = maxf(_poison_dps if _poison_t > 0.0 else 0.0, dps)
 	_poison_bonus = bonus
 
+## Ardiendo durante `seconds` (Fósforos de Cthugha, Llama de Cthugha): daño continuo.
+func ignite(seconds: float, dps: float, bonus: Dictionary = {}) -> void:
+	_burn_dps = maxf(_burn_dps if _burn_t > 0.0 else 0.0, dps)
+	_burn_t = maxf(_burn_t, seconds)
+	_burn_bonus = bonus
+	_burn_tag = Damage.ctx
+
+func is_burning() -> bool:
+	return _burn_t > 0.0
+
 func is_poisoned() -> bool:
 	return _poison_t > 0.0
 
@@ -250,7 +265,8 @@ func take_damage(d: Damage) -> void:
 	var dealt := minf(d.physical * k, maxf(health, 0.0))
 	health -= d.physical * k
 	world.record_damage(d.tag, dealt)              # estadísticas de la ficha
-	if health <= 0.0: world.record_kill(d.tag)
+	if not d.dot: world.player_hit(d.tag, self)    # objetos al impactar (hito 8.7)
+	if health <= 0.0: world.record_kill(d.tag, global_position)
 	_flash = 0.07
 	_knock += Vector3(d.knockback.x, 0, d.knockback.z) * (2.5 if not data.elite else 0.6)
 	if health <= 0.0: _die()
@@ -305,6 +321,19 @@ func _update_status(delta: float) -> bool:
 			_poison_tick = CURSE_TICK
 			var d := Damage.new(_poison_dps * CURSE_TICK, 0.0)
 			d.bonus = _poison_bonus
+			take_damage(d)
+			if not is_alive(): return true
+	if _burn_t > 0.0:
+		_burn_t -= delta
+		_burn_tick -= delta
+		if _burn_tick <= 0.0:
+			_burn_tick = CURSE_TICK
+			var prev := Damage.ctx
+			Damage.ctx = _burn_tag
+			var d := Damage.new(_burn_dps * CURSE_TICK, 0.0)
+			Damage.ctx = prev
+			d.bonus = _burn_bonus
+			d.dot = true
 			take_damage(d)
 			if not is_alive(): return true
 	if _stasis_t > 0.0:
@@ -406,6 +435,7 @@ func _process(delta: float) -> void:
 	if _flash > 0.0: want = _flash_mat
 	elif _stasis_t > 0.0 or world.freeze_t > 0.0: want = _status(Color(0.35, 0.95, 1.0, 0.5))
 	elif _curse_t > 0.0: want = _status(Color(0.55, 0.12, 0.7, 0.35 + 0.1 * sin(_spawn_t * 9.0)))
+	elif _burn_t > 0.0: want = _status(Color(1.0, 0.5, 0.12, 0.3 + 0.1 * sin(_spawn_t * 13.0)))
 	elif _poison_t > 0.0: want = _status(Color(0.35, 0.85, 0.15, 0.3 + 0.08 * sin(_spawn_t * 7.0)))
 	elif _confuse_t > 0.0: want = _status(Color(0.95, 0.75, 0.95, 0.22 + 0.1 * sin(_spawn_t * 11.0)))
 	elif _inject_t > 0.0: want = _status(Color(0.8, 0.95, 0.25, 0.14 + 0.06 * sin(_spawn_t * 12.0)))   # suero: tenue (el aliado, verde intenso)

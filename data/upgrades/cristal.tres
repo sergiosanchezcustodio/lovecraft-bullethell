@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/upgrade_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cristal"
+display_name = "Cristal de Ithaqua"
+description = "6 % de que el impacto frene al enemigo 1,5 s"
+stat = "hit_slow"
+multiply = 1.0
+add = 0.06
+max_level = 5
+color = Color(0.75, 0.5, 1.0, 1)
+group = "disparador"

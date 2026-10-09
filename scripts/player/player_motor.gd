@@ -11,6 +11,7 @@ var facing := Vector3(0, 0, 1)       ## hacia dónde mira el personaje (plano XZ
 var dodge_dir := Vector3.ZERO
 var dodge_time := -1.0               ## tiempo desde el inicio del esquive (-1 = sin esquivar nunca)
 var velocity := Vector3.ZERO
+var spare := 0                       ## esquives seguidos que quedan antes de la recarga (Esquís de Pabodie)
 var locked := false                  ## sin control (p. ej. parálisis): no se mueve ni esquiva
 
 func _init(p_data: CharacterData) -> void:
@@ -30,7 +31,9 @@ func is_invulnerable() -> bool:
 	return dodge_time >= 0.0 and dodge_time < data.dodge_iframes
 
 func can_dodge() -> bool:
-	return not locked and (dodge_time < 0.0 or dodge_time >= data.dodge_cooldown)
+	if locked: return false
+	if dodge_time < 0.0 or dodge_time >= data.dodge_cooldown: return true
+	return spare > 0 and dodge_time >= data.dodge_duration     # otro seguido, al acabar el anterior
 
 ## Fracción de recarga del esquive (1 = listo), para el HUD.
 func dodge_ready_fraction() -> float:
@@ -46,6 +49,8 @@ func step(delta: float, move: Vector2, dodge_pressed: bool) -> Vector3:
 		velocity = Vector3.ZERO
 		return velocity
 	if dodge_pressed and can_dodge():
+		if dodge_time < 0.0 or dodge_time >= data.dodge_cooldown: spare = int(data.dodge_charges)
+		else: spare -= 1
 		dodge_dir = dir.normalized() if dir.length() > 0.1 else facing
 		dodge_time = 0.0
 	if is_dodging():
