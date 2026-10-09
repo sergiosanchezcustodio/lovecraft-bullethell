@@ -107,7 +107,8 @@ def cristales():
     return M
 
 
-PIECES = {'roca_grande': roca_grande, 'estalagmita': estalagmita, 'columna_tallada': columna_tallada,
+PIECES = {'roca_grande_mano': roca_grande,   # la del juego es de Replicate (generar_modelo_replicate.py)
+          'estalagmita': estalagmita, 'columna_tallada': columna_tallada,
           'cristales': cristales}
 
 if __name__ == '__main__':

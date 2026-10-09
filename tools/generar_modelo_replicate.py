@@ -58,6 +58,38 @@ PIECES = {
                    'resting on top'),
         'length_m': 1.19, 'vpm': 32, 'out': 'atrezo_roca_nevada',
     },
+    # Segunda tanda (09-10-2026): piezas macizas de varios niveles, como prueba_<pieza>
+    'roca_grande': {
+        'prompt': ('A large dark grey mountain boulder with sharp angular fractured faces and deep cracks, '
+                   'thin streaks of snow and frost in the crevices, cold and harsh'),
+        'length_m': 1.62, 'vpm': 32, 'out': 'atrezo_roca_grande',
+    },
+    'bloque_ciclopeo': {
+        'prompt': ('A huge ancient cyclopean stone block of dark grey slate, eroded edges, carved with a worn '
+                   'five-pointed star relief of an alien elder race, frost in the grooves'),
+        'length_m': 1.25, 'vpm': 32, 'out': 'prueba_bloque_ciclopeo',
+    },
+    'barril_innsmouth': {
+        'prompt': ('An old wooden herring barrel from a 1920s New England fishing harbour, dark wet staves, '
+                   'rusty iron hoops, green algae stains at the bottom, a few fish scales'),
+        'length_m': 0.94, 'vpm': 32, 'fit': 'height', 'out': 'prueba_barril_innsmouth',
+    },
+    'roca_arrecife': {
+        'prompt': ('A jagged black volcanic reef rock covered with barnacles, mussels and dark green seaweed, '
+                   'wet and glistening, a few small glowing green spots'),
+        'length_m': 2.25, 'vpm': 32, 'out': 'arr_roca_1',
+    },
+    'idolo': {
+        'prompt': ('A small ancient idol of Cthulhu carved in greenish-black stone: a squatting winged figure '
+                   'with an octopus head and a mass of face tentacles, rudimentary wings, claws on its knees, '
+                   'sitting on a rectangular pedestal with strange hieroglyphs'),
+        'length_m': 1.72, 'vpm': 32, 'fit': 'height', 'out': 'cth_idolo',
+    },
+    'escultura': {
+        'prompt': ('A half-finished white plaster sculpture of a monstrous winged creature with tentacles, '
+                   'rough unfinished chisel marks, standing on a dark wooden sculptor stand'),
+        'length_m': 1.5, 'vpm': 32, 'fit': 'height', 'out': 'prv_escultura_1',
+    },
     'caja': {
         'prompt': ('A small wooden supply crate of a 1930s polar expedition, nailed weathered planks, dark iron '
                    'corner brackets, plain sides with no letters and no markings, a little snow on the lid'),

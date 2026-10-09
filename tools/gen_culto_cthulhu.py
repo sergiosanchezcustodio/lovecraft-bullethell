@@ -215,6 +215,6 @@ def idolo():
 cultista()
 cultista_alert()
 sacerdote_culto()
-n = idolo().export('models/cth_idolo.json', {'body': [0, 0, 0]}, jitter=0.006, pivots_in_voxels=True,
+n = idolo().export('models/cth_idolo_mano.json'   # el del juego es de Replicate, {'body': [0, 0, 0]}, jitter=0.006, pivots_in_voxels=True,
                    roughness=0.5, specular=0.45, no_bottom=True)
-print('cth_idolo:', n, 'voxels')
+print('cth_idolo_mano:', n, 'voxels')

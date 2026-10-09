@@ -210,7 +210,8 @@ def pilar():
     return M, {P: [0, 0, 0]}
 
 
-PIECES = {'muro': muro, 'muro_bajo': muro_bajo, 'escultura_1': escultura_1, 'escultura_2': escultura_2,
+PIECES = {'muro': muro, 'muro_bajo': muro_bajo, 'escultura_1_mano': escultura_1,   # la del juego es de Replicate
+           'escultura_2': escultura_2,
           'caballete': caballete, 'mesa': mesa, 'relieve': relieve, 'sacos': sacos, 'lampara': lampara,
           'pilar': pilar}
 
