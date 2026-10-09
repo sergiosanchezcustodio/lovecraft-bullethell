@@ -13,12 +13,20 @@ extends Resource
 @export var heal := false                  ## al subir la vida o la cordura máximas, rellena lo ganado
 @export var color := Color(0.8, 0.8, 0.8)  ## color del icono en el menú
 @export var icon: Texture2D                 ## imagen en la subida de nivel
+## Otros efectos por nivel con la sintaxis de WeaponData.level_mods: "estadística*" multiplica
+## y "estadística+" suma, p. ej. {"knockback_mult*": 1.1} (Guantes de estibador).
+@export var also := {}
+@export_enum("ataque", "proteccion", "esquive", "utilidad", "disparador") var group := "utilidad"
 
-## Aplica un nivel de la mejora a los datos (copia propia) de un personaje.
-func apply(p: Player) -> void:
-	var before: float = p.data.get(stat)
-	var after := before * multiply + add
-	p.data.set(stat, after)
-	if heal:
-		if stat == "max_health": p.health += after - before
-		elif stat == "max_sanity": p.sanity += after - before
+## Aplica `lv` niveles del objeto sobre un diccionario de estadísticas (las que falten se
+## leen de `base`). Lo usa Player.rebuild_stats.
+func apply_levels(v: Dictionary, base: CharacterData, lv: int) -> void:
+	if stat != "":
+		if not v.has(stat): v[stat] = base.get(stat)
+		for i in lv: v[stat] = v[stat] * multiply + add
+	for key: String in also:
+		var s := key.trim_suffix("*").trim_suffix("+")
+		if not v.has(s): v[s] = base.get(s)
+		for i in lv:
+			if key.ends_with("*"): v[s] = v[s] * float(also[key])
+			else: v[s] = v[s] + float(also[key])

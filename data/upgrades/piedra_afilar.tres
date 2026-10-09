@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/upgrade_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"piedra_afilar"
+display_name = "Piedra de afilar"
+description = "Las balas atraviesan 1 enemigo más"
+stat = "pierce_add"
+multiply = 1.0
+add = 1.0
+max_level = 3
+color = Color(0.95, 0.45, 0.3, 1)
+group = "ataque"

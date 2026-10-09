@@ -112,12 +112,19 @@ func survive_left() -> float:
 	if not level.is_survival() or time < level.final_time: return 0.0
 	return maxf(0.0, level.final_time + level.final_survive - time)
 
+## El mayor valor de una estadística de objeto (D-38) entre los jugadores: el equipo
+## comparte baúles y dólares.
+func team_item(stat: String) -> float:
+	var v := 1.0
+	for p in world.players: v = maxf(v, float(p.data.get(stat)))
+	return v
+
 ## Baúles arcanos (D-31): uno cada `chest_every` s (±25 %), como mucho `chest_max` cerrados,
 ## en un sitio libre a 6-12 m de un jugador en pie.
 func _chest_step(delta: float) -> void:
 	if level.chest_every <= 0.0: return
 	if _chest_t < 0.0: _chest_t = level.chest_every * rng.randf_range(0.75, 1.25)
-	_chest_t -= delta
+	_chest_t -= delta * team_item("chest_mult")             # Vara de zahorí
 	if _chest_t > 0.0: return
 	_chest_t = level.chest_every * rng.randf_range(0.75, 1.25)
 	if get_tree().get_nodes_in_group(&"chests").filter(func(c: Node) -> bool: return not c.is_open).size() >= level.chest_max: return

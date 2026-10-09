@@ -8,10 +8,35 @@ class Weapon:
 	var data: WeaponData
 	var level := 1
 	var timer := 0.0
-	func _init(p_data: WeaponData) -> void:
+	var owner_data: CharacterData                ## estadísticas del jugador: los objetos (D-38) las cambian
+	func _init(p_data: WeaponData, p_owner: CharacterData = null) -> void:
 		data = p_data
+		owner_data = p_owner
 	func stat(n: String) -> float:
-		return data.stat(n, level)
+		return WeaponSystem.with_items(data, n, data.stat(n, level), owner_data)
+
+const BASE_CRIT := 1.5                       ## daño del crítico de las armas que no lo tienen propio
+
+## Valor de una estadística de arma con los objetos del jugador (D-38): proyectiles, alcance,
+## velocidad, área, recarga, duración, perforación, crítico y empuje.
+static func with_items(d: WeaponData, n: String, v: float, c: CharacterData) -> float:
+	if c == null: return v
+	var D := WeaponData.Delivery
+	match n:
+		"count":
+			if d.delivery in [D.BULLET, D.THROWN, D.BOOMERANG]: v += c.proj_count_add
+		"range": v *= c.range_mult
+		"projectile_speed":
+			if d.delivery != D.ORBIT: v *= c.proj_speed_mult     # en la órbita es su giro
+		"aoe_radius", "zone_radius": v *= c.area_mult
+		"cooldown": v *= c.weapon_cooldown_mult
+		"duration", "zone_time": v *= c.duration_mult
+		"pierce":
+			if d.delivery == D.BULLET: v += c.pierce_add
+		"crit_chance": v += c.crit_chance
+		"crit_mult": v = (v if v > 1.0 else BASE_CRIT) + c.crit_bonus
+		"knockback": v *= c.knockback_mult
+	return v
 
 var player: Player
 var world: CombatWorld
@@ -29,7 +54,7 @@ func setup(p_player: Player, p_world: CombatWorld) -> WeaponSystem:
 	return self
 
 func add_weapon(data: WeaponData) -> Weapon:
-	var w := Weapon.new(data)
+	var w := Weapon.new(data, player.data if player else null)
 	w.timer = 0.3
 	weapons.append(w)
 	return w
@@ -62,6 +87,10 @@ func evolve(w: Weapon) -> void:
 	w.timer = 0.2
 
 ## Etiqueta de las estadísticas de un arma: "J1:webly".
+## Han cambiado los rasgos de daño del jugador (objetos): las balas registran otro juego.
+func bonus_changed() -> void:
+	_bonus_set = -1
+
 func tag_of(w: Weapon) -> StringName:
 	return StringName("J%d:%s" % [player.index + 1, w.data.id])
 
@@ -223,7 +252,7 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 		effect = BulletManager.Effect.STASIS
 	world.bullets.spawn(BulletManager.Team.PLAYER, style,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
-		size, Damage.new(dmg(w) * dmg_k, 0.0), life, int(w.stat("pierce")),
+		size, Damage.new(dmg(w, false) * dmg_k, 0.0), life, int(w.stat("pierce")),
 		w.stat("knockback"), _bonus_set, int(w.stat("split_count")), w.stat("homing"), effect, effect_val, player.index)
 
 ## ¿En crisis de paranoia? (solo en cooperativo: en solitario no sale.)
@@ -243,9 +272,13 @@ func _nearest_mate(max_r: float) -> Player:
 	return best
 
 ## Daño de un arma con los atributos del personaje (D-27).
-func dmg(w: Weapon) -> float:
+## Con `crit`, las armas que no son de balas tiran el crítico de los objetos para todo el
+## disparo (las balas lo tiran cada una al salir).
+func dmg(w: Weapon, crit := true) -> float:
 	var melee := w.data.delivery in [WeaponData.Delivery.MELEE, WeaponData.Delivery.THRUST]
 	var k := player.data.melee_mult if melee else 1.0   # rasgo de Johansen
+	if crit and w.data.delivery != WeaponData.Delivery.BULLET and player.data.crit_chance > 0.0 			and randf() < w.stat("crit_chance"):
+		k *= w.stat("crit_mult")
 	return w.stat("damage") * player.damage_mult(w.data.category) * k
 
 ## Coste de cordura de las armas arcanas (GDD 5.2), con el rasgo del personaje.

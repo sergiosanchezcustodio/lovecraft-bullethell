@@ -13,5 +13,6 @@ multiply = 1.0
 add = 20.0
 max_level = 5
 heal = true
-color = Color(0.86, 0.22, 0.18, 1)
+color = Color(0.45, 0.8, 0.5, 1)
 icon = ExtResource("2")
+group = "proteccion"

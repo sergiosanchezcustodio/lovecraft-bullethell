@@ -49,6 +49,14 @@ var weapons: WeaponSystem
 var world: CombatWorld
 var progress: PlayerProgress
 const CALM_RADIUS := 4.0
+const ARMOR_FLOOR := 0.2         ## parte del golpe físico que siempre pasa la armadura
+const ELITE_TAG := "elite"       ## rasgo de daño contra élites y seres únicos (Enemy.take_damage)
+## Estadísticas de los objetos (D-38) que rebuild_stats rehace desde la base del personaje.
+const ITEM_STATS: Array[String] = ["proj_count_add", "range_mult", "proj_speed_mult", "area_mult",
+	"weapon_cooldown_mult", "duration_mult", "pierce_add", "crit_chance", "crit_bonus", "damage_mult",
+	"firearm_mult", "physical_mult", "magic_mult", "elite_mult", "knockback_mult", "armor", "mental_mult",
+	"health_regen", "sanity_regen", "heal_on_kill", "sanity_on_kill", "crisis_mult", "money_mult",
+	"chest_mult", "pickup_heal_mult", "pet_mult", "hit_iframes", "arcane_cost_mult"]
 var sanity_state: SanityState
 var god := false                 ## depuración: no recibe daño
 var attrs_level1 := {}           ## atributos del nivel 1 (fijan las probabilidades de subida)
@@ -167,6 +175,8 @@ func _physics_process_step(delta: float) -> void:
 		for p in world.players:
 			if p.health > 0.0 and p.global_position.distance_to(global_position) <= CALM_RADIUS:
 				p.sanity = minf(p.data.max_sanity, p.sanity + data.calm_aura * delta)
+	if data.health_regen > 0.0: health = minf(data.max_health, health + data.health_regen * delta)   # Botiquín
+	if data.sanity_regen > 0.0: sanity = minf(data.max_sanity, sanity + data.sanity_regen * delta)   # Pipa
 	motor.locked = sanity_state.is_frozen()
 	var was_dodging := motor.is_dodging()
 	var ss := sanity_state
@@ -236,7 +246,7 @@ static func _to_screen(d: Vector3) -> Vector2:
 ## Presencia de una élite o un jefe: drena cordura sin contar como golpe.
 func drain_sanity(amount: float) -> void:
 	if health <= 0.0 or god: return
-	sanity = maxf(0.0, sanity - amount * mental_resist)
+	sanity = maxf(0.0, sanity - amount * mental_resist * data.mental_mult)
 
 ## Derribado: corre el tiempo y avanza la reanimación si hay un compañero al lado (si se
 ## aparta, lo avanzado se va perdiendo despacio).
@@ -512,11 +522,18 @@ func rebuild_stats() -> void:
 		"xp_mult": base.xp_mult * float(shop.get("insight", 1.0)),                # Erudición (tienda)
 		"luck": base.luck * float(shop.get("fortune", 1.0)),                      # Fortuna (tienda)
 	}
+	v["dodge_speed"] = style.speed if style else base.dodge_speed   # Crampones lo multiplican
+	for k in ITEM_STATS: v[k] = base.get(k)              # objetos (D-38): desde la base cada vez
 	for up in progress.upgrade_pool if progress else []:
-		if not v.has(up.stat): v[up.stat] = base.get(up.stat)
-		for i in int(progress.passives.get(up.id, 0)): v[up.stat] = v[up.stat] * up.multiply + up.add
+		up.apply_levels(v, base, int(progress.passives.get(up.id, 0)))
 	v["move_speed"] *= debug_speed
 	for k in v: data.set(k, v[k])
+	var tags := base.bonus_tags.duplicate()                  # Medallón del cazador: contra élites y únicos
+	if data.elite_mult != 1.0: tags[ELITE_TAG] = data.elite_mult
+	if tags != data.bonus_tags:
+		data.bonus_tags = tags
+		if weapons: weapons.bonus_changed()
+	if sanity_state: sanity_state.duration_mult = data.crisis_mult
 	if motor: motor.data = data
 	health = minf(health + maxf(data.max_health - old_health, 0.0), data.max_health)
 	sanity = minf(sanity + maxf(data.max_sanity - old_sanity, 0.0), data.max_sanity)
@@ -536,11 +553,11 @@ func gain_attribute() -> String:
 
 ## Multiplicador de daño de un arma según su tipo y los atributos (D-27).
 func damage_mult(category: int) -> float:
-	var k := float(shop.get("damage", 1.0))                  # Puntería (tienda)
+	var k := float(shop.get("damage", 1.0)) * data.damage_mult   # Puntería (tienda) y objetos
 	match category:
-		WeaponData.Category.PHYSICAL: return Attributes.mult(attrs, "physical") * k
-		WeaponData.Category.MAGIC: return Attributes.mult(attrs, "magic") * k
-	return Attributes.mult(attrs, "firearm") * k
+		WeaponData.Category.PHYSICAL: return Attributes.mult(attrs, "physical") * data.physical_mult * k
+		WeaponData.Category.MAGIC: return Attributes.mult(attrs, "magic") * data.magic_mult * k
+	return Attributes.mult(attrs, "firearm") * data.firearm_mult * k
 
 func is_invulnerable() -> bool:
 	return motor.is_invulnerable() or (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes)
@@ -556,14 +573,16 @@ func take_damage(d: Damage) -> void:
 		var k := 1.0
 		for tag in (d.source as Enemy).data.tags: k *= float(data.resist_tags.get(tag, 1.0))
 		if k != 1.0: d = d.scaled(k)
-	if data.physical_resist != 1.0 and d.physical > 0.0:            # rasgo: aguante físico
-		var r := Damage.new(d.physical * data.physical_resist, d.mental)
+	if (data.physical_resist != 1.0 or data.armor > 0.0) and d.physical > 0.0:   # aguante físico y armadura
+		var ph := d.physical * data.physical_resist
+		ph = maxf(ph - data.armor, ph * ARMOR_FLOOR)          # la armadura nunca quita más del 80 %
+		var r := Damage.new(ph, d.mental)
 		r.knockback = d.knockback; r.source = d.source; r.bonus = d.bonus
 		d = r
 	health = maxf(0.0, health - d.physical)
 	Sfx.play("hit_player" if d.physical > 0.0 else "chant")
 	if d.mental > 0.0:
-		sanity = maxf(0.0, sanity - d.mental * mental_resist)
+		sanity = maxf(0.0, sanity - d.mental * mental_resist * data.mental_mult)
 		sanity_state.on_mental_damage()
 	_hurt_time = 0.0
 	damaged.emit(d)
@@ -574,6 +593,12 @@ func take_damage(d: Damage) -> void:
 			revive_progress = 0.0
 		Sfx.play("down")
 		downed.emit()
+
+## Ha abatido a un enemigo (CombatWorld.record_kill): Colmillo de ghoul y Salterio.
+func on_kill() -> void:
+	if health <= 0.0: return
+	if data.heal_on_kill > 0.0: health = minf(data.max_health, health + data.heal_on_kill)
+	if data.sanity_on_kill > 0.0: sanity = minf(data.max_sanity, sanity + data.sanity_on_kill)
 
 ## Reproduce una animación puntual (p. ej. "throw") por encima de andar o estar quieto.
 func play_once(anim: String) -> void:

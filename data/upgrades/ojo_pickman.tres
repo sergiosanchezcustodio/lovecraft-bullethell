@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/upgrade_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ojo_pickman"
+display_name = "Ojo de Pickman"
+description = "+5 % de probabilidad de crítico (daño ×1,5)"
+stat = "crit_chance"
+multiply = 1.0
+add = 0.05
+max_level = 5
+color = Color(0.95, 0.45, 0.3, 1)
+group = "ataque"

@@ -30,6 +30,7 @@ var weights := {}                          ## pesos propios del personaje (vací
 var coop := false                          ## la paranoia solo existe en cooperativo
 var regen_mult := 1.0                      ## lo pone el jugador cada paso: luces y compañeros cerca
 var calm_speed := 0.0                      ## lo pone el jugador: compañeros calmándolo
+var duration_mult := 1.0                   ## duración de las crisis (Láudano, D-38)
 var crises := 0                            ## crisis sufridas en el nivel (locura acumulada)
 var forced_kind := &""                     ## pruebas: fuerza el tipo de la próxima crisis
 
@@ -55,7 +56,7 @@ func update(delta: float, sanity: float, max_sanity: float, near_horror: bool) -
 		in_crisis = true
 		crisis_kind = forced_kind if forced_kind != &"" else pick_kind()
 		crisis_time = 0.0
-		crisis_duration = rng.randf_range(rules.crisis_min, rules.crisis_max)
+		crisis_duration = rng.randf_range(rules.crisis_min, rules.crisis_max) * duration_mult
 		crises += 1
 		crisis_started.emit(crisis_kind)
 		return 0.0

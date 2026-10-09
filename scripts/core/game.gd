@@ -326,8 +326,8 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	players.append(q)
 	for w in DebugOptions.list_resources("res://data/weapons"):    # todas las armas, sin las evoluciones (D-06)
 		if not (w as WeaponData).evolved: q.progress.weapon_pool.append(w)
-	for f in ["velocidad", "vida", "cordura", "reflejos", "iman"]:
-		q.progress.upgrade_pool.append(load("res://data/upgrades/%s.tres" % f))
+	for up in DebugOptions.list_resources("res://data/upgrades"):    # todos los objetos (D-38)
+		q.progress.upgrade_pool.append(up)
 	q.progress.leveled_up.connect(func(l: int) -> void: Achievements.record(Saves.current, "best_level", l))
 	q.progress.leveled_up.connect(func(_l: int) -> void:
 		Sfx.play("level_up")
@@ -382,7 +382,7 @@ func _on_enemy_died(e: Enemy) -> void:
 
 ## Dólares (D-31): se suman al hueco en el momento, así que se conservan aunque se caiga.
 func earn(amount: int) -> void:
-	var n := int(round(amount * money_mult))
+	var n := int(round(amount * money_mult * (director.team_item("money_mult") if director else 1.0)))   # Oro de Obed
 	if n <= 0: return
 	run_money += n
 	if Saves.current != null:

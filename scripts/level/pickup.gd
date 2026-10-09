@@ -70,8 +70,8 @@ func _physics_process(_delta: float) -> void:
 func _give(p: Player) -> void:
 	var game := get_tree().current_scene
 	match kind:
-		Kind.FOOD: p.health = minf(p.data.max_health, p.health + p.data.max_health * 0.3)
-		Kind.POTION: p.sanity = minf(p.data.max_sanity, p.sanity + p.data.max_sanity * 0.3)
+		Kind.FOOD: p.health = minf(p.data.max_health, p.health + p.data.max_health * 0.3 * p.data.pickup_heal_mult)
+		Kind.POTION: p.sanity = minf(p.data.max_sanity, p.sanity + p.data.max_sanity * 0.3 * p.data.pickup_heal_mult)
 		Kind.MONEY:
 			var n := randi_range(15, 40)
 			if game != null and game.has_method("earn"): game.earn(n)

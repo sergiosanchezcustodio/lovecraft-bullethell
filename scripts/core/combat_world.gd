@@ -139,6 +139,11 @@ func record_kill(tag: StringName) -> void:
 	var s: Array = stats.get(tag, [0.0, 0])
 	s[1] += 1
 	stats[tag] = s
+	var t := String(tag)                         # "J1:webly": avisa al jugador (objetos al abatir)
+	if t.begins_with("J") and t.length() > 2 and t[2] == ":":
+		var i := int(t[1]) - 1
+		for p in players:
+			if p.index == i and p.has_method("on_kill"): p.on_kill()
 
 ## Daño y abatidos de un jugador (índice 0..3): {arma: [daño, abatidos]} y los totales.
 func stats_of(index: int) -> Dictionary:

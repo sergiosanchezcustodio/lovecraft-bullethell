@@ -87,7 +87,7 @@ func act() -> void:
 ## aturdimiento.
 func strike(e: Node3D, dmg := -1.0) -> void:
 	if e == null or not is_instance_valid(e) or not e.is_alive(): return
-	var d := Damage.new(data.attack_at(level()) if dmg < 0.0 else dmg, 0.0)
+	var d := Damage.new((data.attack_at(level()) if dmg < 0.0 else dmg) * owner_player.data.pet_mult, 0.0)
 	var away := e.global_position - global_position
 	away.y = 0.0
 	d.knockback = (away.normalized() if away.length() > 0.01 else facing) * data.knockback
@@ -130,7 +130,7 @@ func _physics_process(delta: float) -> void:
 	goal = home - facing_of_owner() * data.follow_gap + side * 0.9 * signf(data.follow_gap)
 	# se da prisa cuanto más lejos está: un poco más rápido que el jugador cuando lo sigue
 	var far := clampf((global_position.distance_to(home) - 2.0) / 3.0, 0.0, 1.0)
-	speed = owner_player.data.move_speed * (1.1 + 0.9 * far)
+	speed = owner_player.data.move_speed * (1.1 + 0.9 * far) * owner_player.data.pet_mult   # Silbato de Lake
 	behavior.step(delta)
 	var to := goal - global_position
 	to.y = 0.0

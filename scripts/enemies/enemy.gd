@@ -242,6 +242,7 @@ func take_damage(d: Damage) -> void:
 	Sfx.play("hit")
 	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
 	for tag in data.tags: k *= float(d.bonus.get(tag, 1.0))    # rasgos contra este tipo de enemigo
+	if data.elite or data.unique: k *= float(d.bonus.get(Player.ELITE_TAG, 1.0))   # Medallón del cazador
 	if _stasis_t > 0.0:                        # congelado: el daño se guarda para el final
 		_stasis_store += d.physical * k
 		_flash = 0.07

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/upgrade_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"salterio"
+display_name = "Salterio"
+description = "Cada enemigo abatido devuelve 0,3 de cordura"
+stat = "sanity_on_kill"
+multiply = 1.0
+add = 0.3
+max_level = 5
+color = Color(0.45, 0.8, 0.5, 1)
+group = "proteccion"

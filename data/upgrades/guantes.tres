@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/upgrade_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"guantes"
+display_name = "Guantes de estibador"
+description = "+12 % de daño de las armas físicas y +10 % de empuje"
+stat = "physical_mult"
+multiply = 1.12
+add = 0.0
+max_level = 5
+color = Color(0.95, 0.45, 0.3, 1)
+also = {
+"knockback_mult*": 1.1
+}
+group = "ataque"

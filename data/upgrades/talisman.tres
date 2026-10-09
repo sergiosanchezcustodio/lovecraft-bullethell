@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/upgrade_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"talisman"
+display_name = "Talismán esotérico"
+description = "Las armas mágicas cuestan un 12 % menos de cordura"
+stat = "arcane_cost_mult"
+multiply = 0.88
+add = 0.0
+max_level = 5
+color = Color(1.0, 0.82, 0.3, 1)
+group = "utilidad"
