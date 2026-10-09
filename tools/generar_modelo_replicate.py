@@ -121,6 +121,28 @@ PIECES = {
                    'seaweed, wet and glistening, a few small glowing green spots'),
         'length_m': 2.0, 'vpm': 32, 'fit': 'height', 'value': 0.5, 'out': 'arr_roca_2',
     },
+    # Cuarta tanda (09-10-2026)
+    'rly_bloque': {
+        'prompt': ('A massive cyclopean stone block from the sunken city of Rlyeh, greenish-black slimy stone, '
+                   'faces that meet at wrong impossible angles, worn alien carvings, patches of green slime and '
+                   'seaweed'),
+        'length_m': 1.91, 'vpm': 32, 'value': 0.7, 'out': 'prueba_rly_bloque',
+    },
+    'rly_monolito': {
+        'prompt': ('A very tall narrow twisted monolith of greenish-black stone from the sunken city of Rlyeh, '
+                   'leaning and bent at impossible angles, covered with worn alien hieroglyphs and green slime'),
+        'length_m': 5.94, 'vpm': 32, 'fit': 'height', 'value': 0.7, 'out': 'prueba_rly_monolito',
+    },
+    'cristales': {
+        'prompt': ('A cluster of glowing pale blue ice crystals growing from a dark rock, sharp hexagonal '
+                   'shards of different heights, faint inner light'),
+        'length_m': 0.94, 'vpm': 32, 'fit': 'height', 'glow': [0.55, 0.25], 'out': 'prueba_cristales',
+    },
+    'bloques_hielo': {
+        'prompt': ('A stack of rough cut blocks of compacted snow and blue ice, like bricks for an igloo, '
+                   'irregular edges, frost and powder snow on top'),
+        'length_m': 2.12, 'vpm': 32, 'out': 'prueba_bloques_hielo',
+    },
     'caja': {
         'prompt': ('A small wooden supply crate of a 1930s polar expedition, nailed weathered planks, dark iron '
                    'corner brackets, plain sides with no letters and no markings, a little snow on the lid'),
@@ -170,7 +192,7 @@ def foreground(img_path, tol=70):
     return a[keep].reshape(-1, 3)
 
 
-def postprocess(vox, img_path, colors=20, saturation=1.0, value=1.0):
+def postprocess(vox, img_path, colors=20, saturation=1.0, value=1.0, glow=None):
     """Arreglos tras voxelizar (09-10-2026):
     - Colores: la textura de TRELLIS sale más oscura y apagada que la imagen de FLUX; se lleva su
       brillo medio y su saturación a los de la imagen (sin el fondo blanco).
@@ -203,9 +225,11 @@ def postprocess(vox, img_path, colors=20, saturation=1.0, value=1.0):
         g = lum(cols)[:, None]
         cols = np.clip(g + (cols - g) * saturation, 0.0, 1.0)
     cols = np.clip(cols * value, 0.0, 1.0)                        # piezas oscuras: la imagen lleva sombras
+    # glow: (brillo mínimo, saturación mínima): esos voxels brillan solos (cristales, runas)
+    lit = (lum(cols) >= glow[0]) & (sat(cols) >= glow[1]) if glow else np.zeros(len(cols), bool)
     out = []
-    for (x, y, z), c in zip(keys, cols):
-        out.append([x, y, z, 'body', round(float(c[0]), 3), round(float(c[1]), 3), round(float(c[2]), 3), 0])
+    for (x, y, z), c, g in zip(keys, cols, lit):
+        out.append([x, y, z, 'body', round(float(c[0]), 3), round(float(c[1]), 3), round(float(c[2]), 3), int(g)])
     return out
 
 
@@ -257,7 +281,7 @@ def main():
         url = out.get('model_file') if isinstance(out, dict) else out
         open(glb_path, 'wb').write(gi.download(url))
     vox = postprocess(voxelize(glb_path, piece['length_m'], piece['vpm'], piece.get('fit', 'horizontal')), img_path,
-                      saturation=piece.get('sat', 1.0), value=piece.get('value', 1.0))
+                      saturation=piece.get('sat', 1.0), value=piece.get('value', 1.0), glow=piece.get('glow'))
     data = {'voxel_size': 1.0 / piece['vpm'], 'pivots': {'body': [0, 0, 0]}, 'voxels': vox,
             'roughness': 0.85, 'specular': 0.3, 'no_bottom': True}
     out_name = piece.get('out', 'atrezo_%s' % name)
