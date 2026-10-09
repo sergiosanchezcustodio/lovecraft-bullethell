@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 id = &"tesla"
-display_name = "Bobina Tesla portátil"
+display_name = "Bobina Tesla"
 description = "Descarga un rayo al enemigo más cercano que salta a los siguientes, hasta cuatro; cada salto hace un poco menos."
 category = 1
 delivery = 13

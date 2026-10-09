@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1")
 id = &"vida"
-display_name = "Abrigo de piel de reno"
+display_name = "Abrigo de reno"
 description = "+20 de vida máxima"
 stat = "max_health"
 multiply = 1.0

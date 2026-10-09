@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 id = &"trapezoedro"
-display_name = "Trapezoedro Resplandeciente"
+display_name = "Trapezoedro"
 description = "Rayo de luz concentrada que daña todo lo que atraviesa. Cuesta cordura."
 delivery = 4
 category = 2

@@ -6,7 +6,7 @@
 script = ExtResource("1")
 bullet_look = "smg"
 id = &"thompson"
-display_name = "Subfusil Thompson M1928"
+display_name = "Thompson M1928"
 description = "Ráfagas cerradas de proyectiles pequeños."
 delivery = 0
 category = 1

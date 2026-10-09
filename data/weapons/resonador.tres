@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 id = &"resonador"
-display_name = "Resonador de Tillinghast"
+display_name = "Resonador"
 support = true
 description = "Vibra cada poco y su pulso deshace las balas enemigas cercanas; hace poco daño. Solo vibra si hay balas o enemigos cerca. Cuesta cordura."
 category = 2

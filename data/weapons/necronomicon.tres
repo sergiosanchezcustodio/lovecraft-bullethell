@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 id = &"necronomicon"
-display_name = "Páginas del Necronomicón"
+display_name = "Necronomicón"
 description = "Páginas que orbitan alrededor del personaje. Cuesta cordura."
 delivery = 3
 category = 2

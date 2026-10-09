@@ -193,6 +193,10 @@ Audio, equilibrado, accesibilidad, rendimiento final y distribución. Decidido e
 | 8.3 | **Accesibilidad:** tamaño del texto, balas para daltónicos (formas además de colores), reducir destellos, temblor de cámara y distorsiones | Hecho, pendiente de revisión (08-10-2026) |
 | 8.4 | **Equilibrio final** con tus partidas de las tres partes como referencia | Pendiente (necesita tus partidas) |
 | 8.5 | **Exportación y página de itch.io:** builds de Windows y macOS, subida con butler, capturas, texto y portada de la página | Builds y página listas (08-10-2026); falta subir (tu cuenta de itch.io) |
+| 8.6 | **Objetos I (D-38, GDD 5.5):** modificadores generales del jugador que lee `Weapon.stat` (proyectiles, alcance, velocidad, área, recarga, duración, perforación, crítico, daño por grupo, élites, empuje); `UpgradeData` con varios efectos y tope; los objetos de estadísticas (~33); ficha, tarjetas y Biblioteca; tests | Aprobado (09-10-2026), en curso |
+| 8.7 | **Objetos II:** los que necesitan sistemas: escudo de Nodens, *ankh*, escamas, señuelo y petardos al esquivar, esquive doble, llave de plata (cambiar opciones), disparadores al abatir e impactar, diente de *shoggoth* e ídolo de Cthulhu (~12) | Propuesto |
+| 8.8 | **Arsenal III (GDD 5.4):** las 16 armas, con entregas nuevas (cepos, rebote, cadencia creciente, agujero negro, rayo giratorio, nube que deriva, enemigos contra enemigos), reglas de daño (D-37), sonidos y textos | Propuesto |
+| 8.9 | **Iconos y cierre:** 61 iconos con Replicate (~3 $), textos de la Biblioteca, peso de armas y objetos en la subida de nivel (con 100 opciones deben seguir saliendo mejoras de lo que se lleva) y prueba con bots | Propuesto |
 
 ## Fase 9: Online
 

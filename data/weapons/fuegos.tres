@@ -6,7 +6,7 @@
 script = ExtResource("1")
 bullet_look = "spark"
 id = &"fuegos"
-display_name = "Cañón de fuegos artificiales"
+display_name = "Fuegos artificiales"
 description = "Cohetes erráticos que estallan en chispas."
 delivery = 0
 category = 1

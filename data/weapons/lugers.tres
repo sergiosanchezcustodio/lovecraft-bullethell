@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 id = &"lugers"
-display_name = "Lugers P08 a dos manos"
+display_name = "Lugers a dos manos"
 description = "Una pistola en cada mano: disparan a la vez hacia donde andas y hacia atrás, sin buscar objetivo."
 category = 1
 delivery = 0

@@ -289,6 +289,106 @@ Las 17 armas que faltaban de las 29 de D-29, propuestas para equilibrar los tres
 | Martillo de geólogo | Golpe al suelo que abre una grieta en línea recta hacia delante | Grieta que avanza |
 | Bastón estoque | Estocada larga hacia delante que atraviesa todo lo que hay en la línea | Cuerpo a cuerpo frontal |
 
+
+### 5.4 Arsenal III (propuesta del 09-10-2026, D-38)
+Dieciséis armas más, hasta 50 (16 físicas, 17 de fuego y 17 mágicas). Cada una con una mecánica que aún no hay y repartidas por papel: distancia, área, cuerpo a cuerpo, control y cordura.
+
+**De fuego**
+| Arma | Qué hace | Papel / mecánica |
+|---|---|---|
+| Recortada | Dos disparos seguidos en cono corto y ancho con mucho empuje | Quemarropa |
+| Antitanque Mauser | Disparo muy lento que atraviesa a todos los de la línea, de borde a borde | Distancia, perforación total |
+| Mortero Stokes | Proyectil en arco alto al grupo más lejano; explosión grande | Área a distancia |
+| BAR M1918 | Ráfagas cuyas balas rebotan hacia otro enemigo cercano | Rebote |
+| Nagant de Danforth | Cadencia que se acelera mientras tiene a quién disparar (hasta ×2,5) y se enfría al parar | Cadencia creciente |
+
+**Físicas**
+| Arma | Qué hace | Papel / mecánica |
+|---|---|---|
+| Ancla del *Alert* | Ancla con cadena que gira alrededor a mucha distancia, lenta y pesada | Órbita amplia, empuje |
+| Gas de cloro | Nube verde que deriva con el viento y envenena | Área que se mueve |
+| Látigo | Latigazo largo en arco por delante, golpea a todos los del arco | Cuerpo a cuerpo largo |
+| Cepos | Deja cepos en el suelo; el que los pisa queda atrapado y herido | Minas |
+| Ballesta | Virotes que atraviesan y clavan al suelo un instante | Distancia, inmoviliza |
+
+**Mágicas (cuestan cordura)**
+| Arma | Qué hace | Papel / mecánica |
+|---|---|---|
+| Llama de Cthugha | Bolas de fuego vivo que dejan un rastro ardiendo | Proyectil con rastro |
+| Aliento de Ithaqua | Viento helado en cono: frena y, si sigue, congela | Control en cono |
+| Esfera de Yog-Sothoth | Orbe lento que atrae a los enemigos a su centro y los tritura | Agujero negro |
+| Tentáculos de Shub | Tentáculos que brotan del suelo bajo enemigos al azar | Área aleatoria |
+| Signo Amarillo | Los enemigos que lo miran enloquecen y atacan a los suyos unos segundos | Enemigos contra enemigos |
+| Lámpara de Alhazred | Haz de luz que barre en círculo alrededor del personaje | Rayo giratorio |
+
+### 5.5 Objetos (propuesta del 09-10-2026, D-38)
+De 5 a 50 objetos de subida de nivel. Nombres cortos, de una a tres palabras. Siguen los 4 huecos (5 y 6 con la tienda) y cinco niveles por objeto (salvo los que tienen tope). Son modificadores generales del jugador que afectan a todas sus armas. Los 5 de siempre no cambian: Abrigo de reno (vida), Diario de campo (cordura), Brújula de Lake (recogida), Botas de nieve (velocidad) y Reflejos (recarga del esquive).
+
+**Ataque (15)**
+| Objeto | Por nivel |
+|---|---|
+| Bandolera | +1 proyectil a las armas de balas y lanzados (tope 3) |
+| Catalejo | +10 % de alcance |
+| Pólvora de Ponape | +12 % de velocidad de los proyectiles |
+| Mapa de Leng | +10 % de área (explosiones, zonas, ondas, tajos) |
+| Reloj de Tillinghast | −6 % de recarga de todas las armas |
+| Clepsidra de Yith | +15 % de duración (zonas, órbitas, rayos, torretas) |
+| Piedra de afilar | +1 enemigo atravesado por las balas (tope 3) |
+| Ojo de Pickman | +5 % de probabilidad de crítico (×1,5) |
+| Collar de colmillos | +15 % de daño de los críticos |
+| Petaca de ron | +8 % de daño |
+| Manual de tiro | +12 % de daño de las armas de fuego |
+| Guantes de estibador | +12 % de daño físico y +10 % de empuje |
+| Manuscritos pnakóticos | +12 % de daño de las armas mágicas |
+| Medallón del cazador | +20 % de daño a élites y jefes |
+| Plomada | +25 % de empuje |
+
+**Protección y recuperación (11)**
+| Objeto | Por nivel |
+|---|---|
+| Coraza de foca | −2 al daño físico de cada golpe |
+| Signo Primigenio | −10 % de daño mental (también auras) |
+| Botiquín | Regenera 0,3 de vida por segundo |
+| Pipa de espuma | Regenera 0,4 de cordura por segundo |
+| Colmillo de *ghoul* | Cada abatido cura 0,5 de vida |
+| Salterio | Cada abatido devuelve 0,3 de cordura |
+| Escapulario | +25 % de invulnerabilidad tras recibir un golpe |
+| Escamas de Profundo | Devuelve el 30 % del daño de contacto al que golpea |
+| Escudo de Nodens | Cada 25 s (−3 por nivel) absorbe un golpe entero (se ve una burbuja) |
+| *Ankh* de Nephren | Una vez por nivel, al caer se levanta con el 30 % de vida (tope 1) |
+| Láudano | Crisis de locura un 20 % más cortas |
+
+**Esquive y movimiento (6)**
+| Objeto | Por nivel |
+|---|---|
+| Crampones | +15 % de distancia del esquive |
+| Esquís de Pabodie | +1 esquive seguido (tope 2) |
+| Gafas de aviador | +0,08 s de invulnerabilidad al esquivar |
+| Capa del Hombre Negro | Al esquivar deja un señuelo que atrae a los enemigos 1,5 s (+0,5 s) |
+| Petardos | Al esquivar, explosión donde empezó |
+| Elixir de Curwen | Tras esquivar, +15 % de daño durante 2 s |
+
+**Utilidad (8)**
+| Objeto | Por nivel |
+|---|---|
+| Lupa | +10 % de experiencia |
+| Dado de hueso | +15 % de suerte |
+| Oro de Obed | +15 % de dólares |
+| Llave de plata | Una vez por nivel, cambiar las opciones de la subida (tope 3) |
+| Vara de zahorí | Baúles arcanos un 15 % más a menudo |
+| *Pemmican* | La comida y las pociones curan un 30 % más |
+| Silbato de Lake | +20 % de daño y velocidad del compañero |
+| Talismán esotérico | −12 % de cordura de las armas mágicas |
+
+**Disparadores y riesgo (5)**
+| Objeto | Por nivel |
+|---|---|
+| Tablilla de Eltdown | 8 % de que el abatido estalle y dañe alrededor |
+| Cristal de Ithaqua | 6 % de que el impacto frene al enemigo 1,5 s |
+| Fósforos de Cthugha | 6 % de que el impacto lo prenda (quemadura 3 s) |
+| Diente de *shoggoth* | Con menos del 30 % de vida, +20 % de daño |
+| Ídolo de Cthulhu | +12 % de enemigos y +12 % de experiencia y dólares (riesgo) |
+
 ---
 
 ## 6. Personajes jugables
@@ -531,6 +631,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
 - **D-36 — Quince compañeros (30-09-2026).** *Resuelta:* se añaden trece compañeros y el gato de Ulthar cambia (negro, araña a los enemigos cercanos y se enfada al recibir su jugador un golpe; pierde la protección mental). Rata de las Paredes (más baúles y dólares de los muertos), sapo de Innsmouth (escupe baba venenosa: charco), Mini-Byakhee (picado desde el aire), araña de Tíndalos (se teletransporta detrás de un enemigo y lo aturde), serpiente de Yig (veneno), pez de Innsmouth (embiste y empuja), Mini-Dhole (sale bajo un grupo), cuervo de Arkham (trae gemas y dólares lejanos), shoggoth bebé (se come balas enemigas), Mini-Mi-Go (rayos), búho de los sueños (más experiencia), cabra de los bosques (embestida que aturde), polilla de Leng (polvo que confunde) y gaviota de Innsmouth (trae pescado: cura vida y cordura, y chilla ante los élites). Todos en la tienda (hito 2.15).
 - **D-06 — Evoluciones de armas (03-10-2026).** *Resuelta:* al estilo de Vampire Survivors, un arma al nivel máximo más un objeto concreto en el inventario evoluciona al abrir el siguiente baúl arcano. Las evoluciones no salen al subir de nivel ni siguen las reglas de daño (D-37): rinden alrededor de 1,4 veces su nivel 5. Primera tanda, las armas de los personajes de inicio: Stielhandgranate + Reflejos de alpinista → Carga concentrada; Webly + Brújula de Lake → Revólver del vigía; rifle de palanca + Diario de campo → Rifle de la expedición Miskatonic; bisturís + Abrigo de piel de reno → Instrumental de cirujano. Las demás, en fases posteriores.
 - **D-37 — Reglas de daño de las armas (03-10-2026).** *Resuelta:* cada arma parte de un mismo daño por segundo a un solo objetivo (nivel 1, si todo acierta; 14, la mediana del arsenal) multiplicado por sus rasgos: corto alcance ×1,3 y largo ×0,85; un objetivo ×1,15 y área ×0,8; un proyectil ×1,15 y varios ×0,85; cadencia baja ×1,2 y alta ×0,85; cuesta cordura ×1,2 (vida o esquive ×1,3); teledirigida ×0,8 y al azar ×1,15; control (aturde, inmoviliza, atrae, congela, frena, debilita, hace vulnerable o levanta aliados) ×0,6. Las de puro apoyo (bengalas, red, resonador, polvo) quedan fuera. `DamageRules` lo calcula, `tools/reglas_dano.gd` lo aplica y un test admite ±15 %.
+- **D-38 — Arsenal III y 50 objetos (09-10-2026).** *Aprobada:* 16 armas nuevas (5.4) y 45 objetos nuevos (5.5), hasta 50 y 50. Los objetos pasan de cambiar una estadística a ser modificadores generales que leen todas las armas, con disparadores (al abatir, al impactar, al esquivar). Iconos con Replicate en el estilo de los actuales.
 - **D-19 — Pasivos sin mecánica.** El pasivo de Dyer (frío y ralentización) y el de Johansen (inmunidad al empuje) dependen de efectos sobre el jugador que no están definidos, y el de Legrasse necesita saber si los híbridos de Innsmouth cuentan como "enemigos humanos". *Resuelta (03-10-2026):* D-35 quitó los de Dyer y Johansen. Para Legrasse llevan la etiqueta `humana` los cultistas, los habitantes de Innsmouth, los acólitos de la Orden de Dagon y los híbridos que aún andan entre los hombres (hasta los híbridos avanzados); los Profundos completos y las criaturas, no.
 
 ---

@@ -7,7 +7,7 @@
 script = ExtResource("1")
 bullet_look = "blade"
 id = &"instrumental"
-display_name = "Instrumental de cirujano"
+display_name = "Instrumental"
 description = "Abanico ancho de ocho hojas que atraviesan a tres enemigos."
 icon = ExtResource("2")
 evolved = true

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 id = &"webly"
-display_name = "Revólver Webly Mk VI"
+display_name = "Webly Mk VI"
 description = "Proyectiles pesados que hacen retroceder a los enemigos."
 delivery = 0
 category = 1

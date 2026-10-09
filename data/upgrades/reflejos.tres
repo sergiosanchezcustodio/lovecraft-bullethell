@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1")
 id = &"reflejos"
-display_name = "Reflejos de alpinista"
+display_name = "Reflejos"
 description = "El esquive se recarga un 10 % antes"
 stat = "dodge_cooldown"
 multiply = 0.9
