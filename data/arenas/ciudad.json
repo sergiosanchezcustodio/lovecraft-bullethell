@@ -349,6 +349,10 @@
    "type": "box",
    "shrink": 0.8
   },
+  "atrezo_roca_nevada": {
+   "type": "box",
+   "shrink": 0.75
+  },
   "atrezo_trineo": {
    "type": "box",
    "shrink": 0.85
@@ -392,6 +396,14 @@
   "atrezo_bloque_ciclopeo": {
    "type": "box",
    "shrink": 0.95
+  },
+  "atrezo_bloque_ciclopeo_2": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bloque_ciclopeo_3": {
+   "type": "box",
+   "shrink": 0.9
   },
   "atrezo_cristales": {
    "type": "cylinder",
@@ -624,7 +636,7 @@
    "scale": 1.4
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
     -44.0,
     33.3
@@ -669,442 +681,478 @@
    "scale": 1.76
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     33.16,
     -39.2
    ],
-   "rot": 268.8,
-   "scale": 1.98
+   "rot": 316.8,
+   "scale": 1.65
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     -36.8,
-    33.85
+    33.91
    ],
-   "rot": 302.8,
-   "scale": 1.93
+   "rot": 70.0,
+   "scale": 1.72
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    32.92,
+    33.99,
     -36.8
    ],
-   "rot": 57.6,
-   "scale": 2.07
+   "rot": 353.7,
+   "scale": 1.76
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     -34.4,
-    33.35
+    33.87
    ],
-   "rot": 46.5,
-   "scale": 2.04
+   "rot": 231.6,
+   "scale": 1.64
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    33.27,
+    33.49,
     -34.4
    ],
    "rot": 320.5,
    "scale": 1.85
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     -32.0,
     34.03
    ],
-   "rot": 89.4,
-   "scale": 1.73
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    34.06,
-    -32.0
-   ],
-   "rot": 278.6,
-   "scale": 2.1
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    -29.6,
-    33.31
-   ],
-   "rot": 299.9,
-   "scale": 1.88
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    33.9,
-    -29.6
-   ],
-   "rot": 256.6,
-   "scale": 1.61
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    -27.2,
-    33.03
-   ],
-   "rot": 154.3,
-   "scale": 2.05
+   "rot": 194.3,
+   "scale": 2.03
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
     33.22,
+    -32.0
+   ],
+   "rot": 5.2,
+   "scale": 1.95
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_3",
+   "pos": [
+    -29.6,
+    34.09
+   ],
+   "rot": 214.1,
+   "scale": 1.77
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_3",
+   "pos": [
+    33.58,
+    -29.6
+   ],
+   "rot": 150.3,
+   "scale": 2.02
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_3",
+   "pos": [
+    -27.2,
+    33.29
+   ],
+   "rot": 347.7,
+   "scale": 1.65
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    33.99,
     -27.2
    ],
-   "rot": 358.6,
-   "scale": 2.1
+   "rot": 20.8,
+   "scale": 2.03
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
     -24.8,
-    33.67
+    34.1
    ],
-   "rot": 197.5,
-   "scale": 1.9
+   "rot": 44.6,
+   "scale": 1.92
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
-    33.4,
+    33.05,
     -24.8
    ],
-   "rot": 103.0,
-   "scale": 2.04
+   "rot": 140.5,
+   "scale": 1.81
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
     -22.4,
-    33.06
+    33.8
    ],
-   "rot": 216.6,
-   "scale": 1.89
+   "rot": 203.0,
+   "scale": 1.67
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
-    33.57,
+    33.6,
     -22.4
    ],
-   "rot": 64.3,
-   "scale": 2.01
+   "rot": 13.2,
+   "scale": 1.78
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     -20.0,
-    33.9
+    34.06
    ],
-   "rot": 158.2,
-   "scale": 1.98
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    33.24,
-    -20.0
-   ],
-   "rot": 258.1,
-   "scale": 2.01
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    -17.6,
-    33.57
-   ],
-   "rot": 337.1,
-   "scale": 1.96
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    33.7,
-    -17.6
-   ],
-   "rot": 17.1,
-   "scale": 2.08
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    -15.2,
-    33.65
-   ],
-   "rot": 332.0,
-   "scale": 1.95
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    33.12,
-    -15.2
-   ],
-   "rot": 177.0,
-   "scale": 1.88
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    -12.8,
-    33.82
-   ],
-   "rot": 302.8,
+   "rot": 275.8,
    "scale": 1.73
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
-    33.58,
-    -12.8
+    33.03,
+    -20.0
    ],
-   "rot": 204.5,
-   "scale": 1.89
+   "rot": 188.3,
+   "scale": 1.7
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
-    -10.4,
-    33.29
+    -17.6,
+    33.79
    ],
-   "rot": 247.5,
-   "scale": 1.85
+   "rot": 147.0,
+   "scale": 1.86
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    33.01,
-    -10.4
+    32.93,
+    -17.6
    ],
-   "rot": 55.7,
-   "scale": 1.66
+   "rot": 341.4,
+   "scale": 1.88
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    -8.0,
-    33.01
+    -15.2,
+    33.77
    ],
-   "rot": 238.0,
+   "rot": 317.3,
    "scale": 1.93
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    33.64,
+    34.05,
+    -15.2
+   ],
+   "rot": 316.7,
+   "scale": 1.79
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_3",
+   "pos": [
+    -12.8,
+    33.29
+   ],
+   "rot": 30.6,
+   "scale": 1.69
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo",
+   "pos": [
+    33.3,
+    -12.8
+   ],
+   "rot": 86.8,
+   "scale": 1.93
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_3",
+   "pos": [
+    -10.4,
+    33.2
+   ],
+   "rot": 6.6,
+   "scale": 1.73
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    33.81,
+    -10.4
+   ],
+   "rot": 181.9,
+   "scale": 2.0
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo",
+   "pos": [
+    -8.0,
+    33.72
+   ],
+   "rot": 43.8,
+   "scale": 1.75
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo",
+   "pos": [
+    33.09,
     -8.0
+   ],
+   "rot": 276.7,
+   "scale": 1.89
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_3",
+   "pos": [
+    -5.6,
+    33.7
+   ],
+   "rot": 6.9,
+   "scale": 1.77
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    34.07,
+    -5.6
    ],
    "rot": 193.2,
    "scale": 1.78
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    -5.6,
+    -3.2,
     33.51
    ],
    "rot": 205.3,
    "scale": 1.97
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     33.63,
-    -5.6
+    -3.2
    ],
-   "rot": 174.4,
-   "scale": 2.01
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    -3.2,
-    33.06
-   ],
-   "rot": 242.2,
+   "rot": 313.6,
    "scale": 2.07
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    33.77,
-    -3.2
-   ],
-   "rot": 217.4,
-   "scale": 1.64
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     -0.8,
-    33.82
+    34.01
    ],
-   "rot": 15.1,
-   "scale": 1.61
+   "rot": 312.7,
+   "scale": 1.76
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    33.67,
+    33.78,
     -0.8
    ],
-   "rot": 239.9,
-   "scale": 2.03
+   "rot": 42.9,
+   "scale": 1.62
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     1.6,
-    33.04
+    33.11
    ],
-   "rot": 354.5,
-   "scale": 2.0
+   "rot": 31.0,
+   "scale": 2.04
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
-    33.37,
+    33.62,
     1.6
    ],
-   "rot": 129.8,
-   "scale": 1.68
+   "rot": 9.3,
+   "scale": 2.06
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     4.0,
-    33.01
+    32.95
    ],
-   "rot": 251.7,
-   "scale": 1.94
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    33.11,
-    4.0
-   ],
-   "rot": 53.8,
-   "scale": 1.64
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    6.4,
-    33.6
-   ],
-   "rot": 249.5,
+   "rot": 306.2,
    "scale": 1.75
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    33.31,
+    33.7,
+    4.0
+   ],
+   "rot": 288.6,
+   "scale": 1.75
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    6.4,
+    34.08
+   ],
+   "rot": 319.7,
+   "scale": 1.88
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo",
+   "pos": [
+    33.12,
     6.4
    ],
-   "rot": 13.8,
-   "scale": 1.84
+   "rot": 32.9,
+   "scale": 1.78
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     8.8,
-    33.42
+    34.01
    ],
-   "rot": 86.9,
-   "scale": 2.06
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    33.19,
-    8.8
-   ],
-   "rot": 121.7,
+   "rot": 209.8,
    "scale": 1.83
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    11.2,
-    33.51
+    33.51,
+    8.8
    ],
-   "rot": 57.6,
+   "rot": 335.6,
    "scale": 1.79
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    34.0,
+    11.2,
+    33.9
+   ],
+   "rot": 333.0,
+   "scale": 1.86
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    32.97,
     11.2
    ],
-   "rot": 188.7,
-   "scale": 2.05
+   "rot": 298.8,
+   "scale": 1.67
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     13.6,
-    33.42
+    33.63
    ],
-   "rot": 211.8,
-   "scale": 1.96
+   "rot": 351.6,
+   "scale": 1.64
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    33.82,
+    33.62,
     13.6
    ],
-   "rot": 230.0,
-   "scale": 1.93
+   "rot": 180.1,
+   "scale": 1.82
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
     16.0,
-    33.9
+    33.39
    ],
-   "rot": 353.1,
-   "scale": 1.75
+   "rot": 137.5,
+   "scale": 1.91
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
-    34.03,
+    33.09,
     16.0
    ],
-   "rot": 299.5,
-   "scale": 1.73
+   "rot": 344.6,
+   "scale": 1.72
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    18.4,
+    33.53
+   ],
+   "rot": 144.8,
+   "scale": 2.04
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    33.56,
+    18.4
+   ],
+   "rot": 0.9,
+   "scale": 1.98
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    20.8,
+    34.01
+   ],
+   "rot": 106.7,
+   "scale": 1.99
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_3",
+   "pos": [
+    34.08,
+    20.8
+   ],
+   "rot": 122.6,
+   "scale": 1.65
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    18.4,
-    33.63
+    23.2,
+    33.56
    ],
    "rot": 150.7,
    "scale": 1.95
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
     33.48,
-    18.4
+    23.2
    ],
    "rot": 14.3,
    "scale": 1.96
@@ -1112,7 +1160,7 @@
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    20.8,
+    25.6,
     33.33
    ],
    "rot": 142.8,
@@ -1122,124 +1170,133 @@
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
     33.42,
-    20.8
+    25.6
    ],
    "rot": 309.6,
    "scale": 2.04
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    23.2,
-    33.57
-   ],
-   "rot": 137.3,
-   "scale": 1.86
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    34.07,
-    23.2
-   ],
-   "rot": 189.0,
-   "scale": 1.72
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    25.6,
-    32.99
-   ],
-   "rot": 26.0,
-   "scale": 1.9
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    34.02,
-    25.6
-   ],
-   "rot": 100.4,
-   "scale": 1.93
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
     28.0,
-    33.18
+    33.57
    ],
-   "rot": 348.9,
-   "scale": 1.75
+   "rot": 189.9,
+   "scale": 2.07
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    33.97,
+    33.36,
     28.0
    ],
-   "rot": 98.1,
-   "scale": 1.73
+   "rot": 116.7,
+   "scale": 1.88
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    30.4,
+    33.72
+   ],
+   "rot": 357.6,
+   "scale": 1.64
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    30.4,
-    33.19
+    33.61,
+    30.4
    ],
-   "rot": 227.6,
+   "rot": 217.7,
+   "scale": 1.76
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    32.8,
+    33.04
+   ],
+   "rot": 222.2,
+   "scale": 1.78
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    33.27,
+    32.8
+   ],
+   "rot": 129.8,
+   "scale": 2.05
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_3",
+   "pos": [
+    35.2,
+    33.58
+   ],
+   "rot": 239.5,
    "scale": 1.72
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
-    33.09,
-    30.4
-   ],
-   "rot": 358.9,
-   "scale": 2.03
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    32.8,
-    33.44
-   ],
-   "rot": 144.7,
-   "scale": 1.81
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    33.91,
-    32.8
-   ],
-   "rot": 197.9,
-   "scale": 1.74
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    35.2,
-    33.64
-   ],
-   "rot": 253.6,
-   "scale": 1.62
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    33.9,
+    33.18,
     35.2
+   ],
+   "rot": 117.9,
+   "scale": 1.64
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_3",
+   "pos": [
+    37.6,
+    33.92
+   ],
+   "rot": 338.6,
+   "scale": 1.82
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    33.85,
+    37.6
+   ],
+   "rot": 6.4,
+   "scale": 2.05
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    40.0,
+    33.33
+   ],
+   "rot": 10.1,
+   "scale": 2.08
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo",
+   "pos": [
+    33.62,
+    40.0
+   ],
+   "rot": 13.1,
+   "scale": 1.63
+  },
+  {
+   "model": "atrezo_bloque_ciclopeo_2",
+   "pos": [
+    42.4,
+    33.55
    ],
    "rot": 26.7,
    "scale": 1.99
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    37.6,
-    33.29
+    33.29,
+    42.4
    ],
    "rot": 95.0,
    "scale": 1.92
@@ -1247,137 +1304,110 @@
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    33.49,
-    37.6
+    -18.73,
+    0.41
    ],
-   "rot": 267.0,
-   "scale": 1.95
+   "rot": 237.2,
+   "scale": 1.42
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    40.0,
-    33.85
+    26.57,
+    9.37
    ],
-   "rot": 344.9,
-   "scale": 1.93
+   "rot": 331.7,
+   "scale": 1.07
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    33.69,
-    40.0
-   ],
-   "rot": 316.0,
-   "scale": 1.99
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    42.4,
-    33.01
+    27.73,
+    15.02
    ],
    "rot": 325.0,
-   "scale": 1.94
+   "scale": 1.4
   },
   {
    "model": "atrezo_bloque_ciclopeo",
    "pos": [
-    33.41,
-    42.4
+    -19.47,
+    24.96
    ],
-   "rot": 322.1,
-   "scale": 1.92
+   "rot": 148.5,
+   "scale": 1.26
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    -6.82,
-    -28.41
+    14.02,
+    25.16
    ],
-   "rot": 19.7,
-   "scale": 1.32
+   "rot": 186.2,
+   "scale": 1.34
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    26.7,
-    -27.58
+    21.09,
+    8.6
    ],
-   "rot": 351.2,
-   "scale": 1.31
+   "rot": 310.2,
+   "scale": 1.11
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    19.91,
-    -25.68
+    -23.91,
+    18.0
    ],
-   "rot": 16.0,
-   "scale": 1.08
+   "rot": 269.8,
+   "scale": 1.28
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_2",
    "pos": [
-    21.24,
-    26.93
+    -0.1,
+    27.97
    ],
-   "rot": 123.9,
-   "scale": 1.21
+   "rot": 86.5,
+   "scale": 1.49
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
-    -28.78,
-    -7.36
+    -28.51,
+    28.95
    ],
-   "rot": 83.0,
-   "scale": 1.25
+   "rot": 108.5,
+   "scale": 1.04
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
-    1.19,
-    28.4
+    28.71,
+    -16.65
    ],
-   "rot": 152.7,
-   "scale": 1.22
+   "rot": 73.7,
+   "scale": 1.19
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
-    23.54,
-    13.38
+    11.12,
+    -26.63
    ],
-   "rot": 327.8,
-   "scale": 1.09
+   "rot": 139.0,
+   "scale": 1.14
   },
   {
-   "model": "atrezo_bloque_ciclopeo",
+   "model": "atrezo_bloque_ciclopeo_3",
    "pos": [
-    26.9,
-    -21.11
+    -23.06,
+    10.93
    ],
-   "rot": 9.2,
-   "scale": 1.17
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    -21.67,
-    -20.54
-   ],
-   "rot": 305.3,
-   "scale": 1.46
-  },
-  {
-   "model": "atrezo_bloque_ciclopeo",
-   "pos": [
-    26.12,
-    22.24
-   ],
-   "rot": 273.3,
-   "scale": 1.02
+   "rot": 267.7,
+   "scale": 1.11
   }
  ],
  "mask": {

@@ -142,6 +142,10 @@
    "type": "box",
    "shrink": 0.8
   },
+  "atrezo_roca_nevada": {
+   "type": "box",
+   "shrink": 0.75
+  },
   "atrezo_trineo": {
    "type": "box",
    "shrink": 0.85
@@ -171,6 +175,10 @@
    "shrink": 0.75
   },
   "alr_puente": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "alr_caseta": {
    "type": "box",
    "shrink": 0.95
   },
@@ -205,7 +213,7 @@
  },
  "props": [
   {
-   "model": "alr_puente",
+   "model": "alr_caseta",
    "pos": [
     -24,
     -20.0
@@ -214,7 +222,7 @@
    "scale": 1.0
   },
   {
-   "model": "alr_puente",
+   "model": "alr_caseta",
    "pos": [
     -12,
     -20.0
@@ -232,7 +240,7 @@
    "scale": 1.0
   },
   {
-   "model": "alr_puente",
+   "model": "alr_caseta",
    "pos": [
     12,
     -20.0
@@ -241,7 +249,7 @@
    "scale": 1.0
   },
   {
-   "model": "alr_puente",
+   "model": "alr_caseta",
    "pos": [
     24,
     -20.0

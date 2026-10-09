@@ -13,11 +13,11 @@ from arena_kit import Arena, COLLIDERS
 
 HX, HZ = 28.0, 20.0
 A = Arena("tormenta", seed=1925, half=HX, spawn_clear=4.0,
-          foot={"alr_puente": 6.0, "alr_bolardo": 0.4, "alr_rollo": 0.5, "alr_linterna": 0.3, "alr_bote": 1.4,
+          foot={"alr_puente": 6.0, "alr_caseta": 6.0, "alr_bolardo": 0.4, "alr_rollo": 0.5, "alr_linterna": 0.3, "alr_bote": 1.4,
                 "alr_fardos": 1.6, "alr_borda": 2.0})
 
-for x in range(-24, 30, 12):                                 # el puente y la superestructura al norte
-    A.add("alr_puente", x, -HZ, rot=0)
+for x in range(-24, 30, 12):                                 # la superestructura al norte: el puente en medio
+    A.add("alr_puente" if x == 0 else "alr_caseta", x, -HZ, rot=0)
 for z in range(-18, 22, 4):                                   # borda baja al este (lado de la cámara)
     A.add("alr_borda", HX + 0.3, z, rot=90)
 for x in range(-26, 30, 4):                                   # y al sur
@@ -35,6 +35,7 @@ A.scatter("inn_barril", 6, 5.0, 1.0, 1.2)
 COLL = dict(COLLIDERS)
 COLL.update({
     "alr_puente": {"type": "box", "shrink": 0.95},
+    "alr_caseta": {"type": "box", "shrink": 0.95},
     "alr_borda": {"type": "box", "shrink": 0.95},
     "alr_bolardo": {"type": "cylinder", "radius": 0.25},
     "alr_rollo": {"type": "cylinder", "radius": 0.4},

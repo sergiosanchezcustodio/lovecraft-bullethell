@@ -13,7 +13,7 @@ from arena_kit import Arena, COLLIDERS, LAMP
 
 HALF = 32.0
 A = Arena("ciudad", seed=1933, half=HALF,
-          foot={"atrezo_muro_roto": 3.2, "atrezo_arco": 2.8, "atrezo_mural": 3.6, "atrezo_bloque_ciclopeo": 1.1,
+          foot={"atrezo_muro_roto": 3.2, "atrezo_arco": 2.8, "atrezo_mural": 3.6, "atrezo_bloque_ciclopeo": 1.1, "atrezo_bloque_ciclopeo_2": 1.1, "atrezo_bloque_ciclopeo_3": 1.1,
                 "atrezo_cristales": 1.2})
 
 # calles: muros rotos en dos anillos alrededor de la plaza, con huecos para pasar
@@ -29,8 +29,9 @@ for x, z, r in ((0, -26, 0), (-26, 2, 90), (25, -8, 90)):
 for x, z in ((5, 5), (-6, -4), (8, -10), (-9, 8)):
     A.add("atrezo_cristales", x, z, scale=1.4)
 
-A.edge(["atrezo_bloque_ciclopeo"], step=2.4, inset=1.5, smin=1.6, smax=2.1)
-A.scatter("atrezo_bloque_ciclopeo", 10, 7.0, 1.0, 1.6)
+A.edge(["atrezo_bloque_ciclopeo", "atrezo_bloque_ciclopeo_2", "atrezo_bloque_ciclopeo_3"], step=2.4, inset=1.5, smin=1.6, smax=2.1)
+for m in ["atrezo_bloque_ciclopeo", "atrezo_bloque_ciclopeo_2", "atrezo_bloque_ciclopeo_3"]:
+    A.scatter(m, 4, 7.0, 1.0, 1.6)
 
 COLL = dict(COLLIDERS)
 COLL.update({
@@ -38,6 +39,8 @@ COLL.update({
     "atrezo_arco": {"type": "box", "shrink": 0.9},
     "atrezo_mural": {"type": "box", "shrink": 0.95},
     "atrezo_bloque_ciclopeo": {"type": "box", "shrink": 0.95},
+    "atrezo_bloque_ciclopeo_2": {"type": "box", "shrink": 0.95},
+    "atrezo_bloque_ciclopeo_3": {"type": "box", "shrink": 0.9},
     "atrezo_cristales": {"type": "cylinder", "radius": 0.8},
 })
 
