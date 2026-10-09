@@ -49,12 +49,14 @@ func _process(delta: float) -> void:
 	_held_t += delta
 	if _held_t < _next: return
 	_next = _held_t + lerpf(STEP_SLOW, STEP_FAST, clampf((_held_t - FIRST) / RAMP, 0.0, 1.0))
-	# solo la pulsación: un "soltar" daría la acción por soltada aunque el botón o el stick
-	# sigan pulsados, y se cortaría la repetición
-	var ev := InputEventAction.new()
-	ev.action = dir
-	ev.pressed = true
-	Input.parse_input_event(ev)
+	# Directamente a la interfaz (Viewport.push_input), no a Input: con Input.parse_input_event
+	# la acción quedaba pulsada para siempre (no la suelta el botón físico) y el menú se
+	# bloqueaba. Así el estado de los botones solo lo cambian los de verdad.
+	for pressed in [true, false]:
+		var ev := InputEventAction.new()
+		ev.action = dir
+		ev.pressed = pressed
+		get_viewport().push_input(ev)
 
 ## La dirección que se mantiene (la primera que esté pulsada), o vacío.
 func _pressed_dir() -> StringName:

@@ -53,3 +53,26 @@ func test_sin_mantener_no_repite() -> void:
 	Input.action_release("ui_down")
 	await get_tree().create_timer(0.3).timeout
 	assert_lt(_focused(), 2, "una pulsación corta no repite")
+
+## Cruceta del mando como eventos de verdad (lo que hizo el autor: el menú se bloqueaba).
+func _dpad(button: JoyButton, pressed: bool) -> void:
+	var ev := InputEventJoypadButton.new()
+	ev.device = 0
+	ev.button_index = button
+	ev.pressed = pressed
+	Input.parse_input_event(ev)
+
+func test_cruceta_mantenida_no_bloquea() -> void:
+	_dpad(JOY_BUTTON_DPAD_DOWN, true)
+	await get_tree().create_timer(1.2).timeout
+	_dpad(JOY_BUTTON_DPAD_DOWN, false)
+	await get_tree().process_frame
+	assert_gt(_focused(), 3, "manteniendo la cruceta avanza")
+	assert_false(Input.is_action_pressed("ui_down"), "al soltarla, abajo deja de estar pulsado")
+	var at := _focused()
+	await get_tree().create_timer(0.5).timeout
+	assert_eq(_focused(), at, "y el foco se queda quieto")
+	_dpad(JOY_BUTTON_DPAD_UP, true)
+	await get_tree().create_timer(0.8).timeout
+	_dpad(JOY_BUTTON_DPAD_UP, false)
+	assert_lt(_focused(), at, "y se puede volver a subir")
