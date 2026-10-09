@@ -92,6 +92,28 @@ WEAPONS = {
 }
 
 
+# Evoluciones (D-06): la misma arma que su base en versión legendaria. Se sacan de los .tres
+# (evolution = &"…" en el arma base); si una evolución tiene descripción propia aquí, manda esa.
+EVO_STYLE = ("an upgraded legendary relic version of it: more ornate and imposing, engraved gold and dark brass "
+             "details, small glowing eldritch runes, a faint otherworldly green glow")
+
+
+def _evolutions():
+    import re
+    folder = os.path.join(ROOT, 'data', 'weapons')
+    out = {}
+    for f in os.listdir(folder):
+        if not f.endswith('.tres'): continue
+        m = re.search(r'evolution = &"(\w+)"', open(os.path.join(folder, f), encoding='utf-8').read())
+        base = f[:-5]
+        if m and base in WEAPONS and m.group(1) not in WEAPONS:
+            out[m.group(1)] = WEAPONS[base] + ', ' + EVO_STYLE
+    return out
+
+
+WEAPONS.update(_evolutions())
+
+
 def token():
     t = os.environ.get('REPLICATE_API_TOKEN', '')
     env = os.path.join(ROOT, '.env')

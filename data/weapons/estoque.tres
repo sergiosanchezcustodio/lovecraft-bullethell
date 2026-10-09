@@ -18,3 +18,5 @@ knockback = 1.0
 max_level = 5
 level_mods = Array[Dictionary]([{"damage*": 1.3}, {"range*": 1.25}, {"cooldown*": 0.8}, {"damage*": 1.3, "projectile_radius*": 1.4}])
 level_text = Array[String](["+30 % de daño", "Estocada un 25 % más larga", "Estocadas un 20 % más rápidas", "+30 % de daño y más ancha"])
+evolves_with = &"piedra_afilar"
+evolution = &"estoque_duelista"

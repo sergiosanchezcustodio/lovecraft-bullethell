@@ -24,10 +24,10 @@ var _light: OmniLight3D
 const FADE := 0.25
 
 func setup(p: Player, p_world: CombatWorld, p_length: float, p_half: float, p_speed: float, p_damage: float,
-		p_interval: float, p_life: float, p_bonus: Dictionary) -> SweepBeam:
+		p_interval: float, p_life: float, p_bonus: Dictionary, offset := 0.0) -> SweepBeam:
 	player = p; world = p_world; length = p_length; half = p_half; speed = p_speed; damage = p_damage
 	interval = p_interval; life = p_life; bonus = p_bonus
-	_angle = atan2(p.motor.facing.z, p.motor.facing.x)
+	_angle = atan2(p.motor.facing.z, p.motor.facing.x) + offset   # varios haces: repartidos
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	return self
 

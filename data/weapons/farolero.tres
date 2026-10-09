@@ -25,3 +25,5 @@ sanity_cost = 1.5
 max_level = 5
 level_mods = Array[Dictionary]([{"count+": 1.0}, {"damage*": 1.25}, {"homing*": 1.4, "projectile_speed*": 1.2}, {"count+": 2.0, "damage*": 1.15}])
 level_text = Array[String](["Un fuego fatuo más", "+25 % de daño", "Buscan mejor y vuelan más deprisa", "Dos fuegos más y +15 % de daño"])
+evolves_with = &"pipa"
+evolution = &"linterna_fatuos"

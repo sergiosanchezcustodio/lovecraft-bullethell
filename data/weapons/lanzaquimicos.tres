@@ -27,3 +27,5 @@ look = "frasco"
 max_level = 5
 level_mods = Array[Dictionary]([{"zone_radius*": 1.2}, {"vulnerable+": 1.5, "zone_dps*": 1.3}, {"count+": 1.0}, {"zone_time+": 2.0, "zone_radius*": 1.15}])
 level_text = Array[String](["Charco un 20 % más amplio", "Vulnerables más tiempo y más daño", "Lanza dos frascos", "El ácido dura más y cubre más"])
+evolves_with = &"laudano"
+evolution = &"botica_arkham"

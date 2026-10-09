@@ -22,3 +22,5 @@ sanity_cost = 2.5
 max_level = 5
 level_mods = Array[Dictionary]([{"stasis+": 0.5}, {"damage*": 1.3}, {"count+": 1.0, "spread_deg+": 20.0}, {"cooldown*": 0.8, "stasis+": 0.5}])
 level_text = Array[String](["La estasis dura 0,5 s más", "+30 % de daño", "Dos rayos a la vez", "Dispara antes y congela más"])
+evolves_with = &"clepsidra"
+evolution = &"rayo_gran_raza"

@@ -697,9 +697,11 @@ func _madden(w: Weapon) -> bool:
 func _sweep(w: Weapon) -> bool:
 	if is_instance_valid(_tethers.get(w)): return false
 	_pay_sanity(w)
-	var b := SweepBeam.new().setup(player, world, w.stat("range"), w.stat("projectile_radius"), w.stat("projectile_speed"),
-		dmg(w), w.stat("hit_interval"), w.stat("duration"), player.data.bonus_tags)
-	_tethers[w] = b
-	world.fx.add_child(b)
+	var n := maxi(int(w.stat("count")), 1)                    # la evolución lleva dos haces
+	for i in n:
+		var b := SweepBeam.new().setup(player, world, w.stat("range"), w.stat("projectile_radius"), w.stat("projectile_speed"),
+			dmg(w), w.stat("hit_interval"), w.stat("duration"), player.data.bonus_tags, TAU * i / n)
+		if i == 0: _tethers[w] = b
+		world.fx.add_child(b)
 	fired.emit(w)
 	return true

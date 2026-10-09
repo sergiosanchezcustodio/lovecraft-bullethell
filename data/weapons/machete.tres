@@ -18,3 +18,5 @@ knockback = 2.0
 max_level = 5
 level_mods = Array[Dictionary]([{"damage*": 1.25}, {"aoe_radius*": 1.2}, {"cooldown*": 0.8}, {"damage*": 1.3, "aoe_radius*": 1.15}])
 level_text = Array[String](["+25 % de daño", "Tajo un 20 % más amplio", "Golpea un 20 % más rápido", "+30 % de daño y tajo más amplio"])
+evolves_with = &"guantes"
+evolution = &"machete_canaveral"

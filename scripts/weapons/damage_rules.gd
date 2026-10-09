@@ -72,7 +72,7 @@ static func _hit_per_use(w: WeaponData) -> float:
 		D.TETHER: return w.damage * w.duration / maxf(w.hit_interval, 0.05) * (1.0 + w.ramp_max) * 0.5
 		D.FLAME: return w.damage * w.duration / 0.15
 		D.VORTEX: return w.damage * w.duration / maxf(w.hit_interval, 0.05)
-		D.SWEEP: return w.damage * maxf(w.duration * w.projectile_speed / 360.0, 1.0)   # una vez por vuelta
+		D.SWEEP: return w.damage * maxf(w.duration * w.projectile_speed / 360.0, 1.0) * maxf(w.count, 1.0)   # una vez por vuelta y haz
 		D.MADDEN: return w.damage * w.duration                   # lo que hacen los enloquecidos
 		D.SPIKES, D.TRAP: return w.damage                        # cada uno, a un enemigo distinto
 	if w.delivery == D.BULLET: return w.damage * w.count * w.volleys

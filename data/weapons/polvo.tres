@@ -25,3 +25,5 @@ sanity_cost = 3.0
 max_level = 5
 level_mods = Array[Dictionary]([{"zone_radius*": 1.2, "aoe_radius*": 1.2}, {"zone_time+": 2.0}, {"zone_dps*": 2.0, "slow_factor*": 0.85}, {"zone_radius*": 1.2, "aoe_radius*": 1.2, "cooldown*": 0.8}])
 level_text = Array[String](["Nube un 20 % más amplia", "La nube dura 2 s más", "Doble daño y frena más", "Nube más amplia y más frecuente"])
+evolves_with = &"mapa_leng"
+evolution = &"polvo_antiguos"

@@ -23,3 +23,5 @@ look = "red"
 max_level = 5
 level_mods = Array[Dictionary]([{"aoe_radius*": 1.2}, {"root+": 1.0}, {"cooldown*": 0.8, "damage*": 2.0}, {"count+": 1.0, "aoe_radius*": 1.15}])
 level_text = Array[String](["Red un 20 % más amplia", "Inmoviliza 1 s más", "Se lanza antes y hace más daño", "Dos redes y más amplias"])
+evolves_with = &"escamas"
+evolution = &"red_innsmouth"

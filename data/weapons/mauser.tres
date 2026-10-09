@@ -23,3 +23,5 @@ knockback = 0.8
 max_level = 5
 level_mods = Array[Dictionary]([{"damage*": 1.25}, {"count+": 1.0}, {"cooldown*": 0.8}, {"damage*": 1.3, "pierce+": 1.0}])
 level_text = Array[String](["+25 % de daño", "Ráfagas de cuatro", "Dispara un 20 % más rápido", "+30 % de daño y atraviesan a un enemigo"])
+evolves_with = &"reloj"
+evolution = &"mauser_tillinghast"

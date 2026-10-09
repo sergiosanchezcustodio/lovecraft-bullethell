@@ -24,3 +24,5 @@ look = "bengala"
 max_level = 5
 level_mods = Array[Dictionary]([{"lure+": 1.5}, {"damage*": 1.4, "aoe_radius*": 1.2}, {"cooldown*": 0.8}, {"count+": 1.0, "lure+": 1.5}])
 level_text = Array[String](["La bengala arde más tiempo", "+40 % de daño y más radio", "Dispara un 20 % más rápido", "Dos bengalas que arden más"])
+evolves_with = &"capa"
+evolution = &"bengala_faro"

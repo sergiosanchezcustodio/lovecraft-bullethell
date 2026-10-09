@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://resources/weapons/icons/palanca.png" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -9,7 +8,6 @@ bullet_look = "rifle"
 id = &"rifle_miskatonic"
 display_name = "Rifle Miskatonic"
 description = "Dos disparos rápidos que atraviesan a seis enemigos; uno de cada cinco es crítico (doble daño)."
-icon = ExtResource("2")
 evolved = true
 delivery = 0
 category = 1

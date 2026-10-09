@@ -1,14 +1,12 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://resources/weapons/icons/granada.png" id="2"]
 
 [resource]
 script = ExtResource("1")
 id = &"carga_concentrada"
 display_name = "Carga concentrada"
 description = "Tres granadas atadas a un mango: una explosión enorme que derriba a los que no mata."
-icon = ExtResource("2")
 evolved = true
 delivery = 1
 category = 0

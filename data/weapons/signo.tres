@@ -22,3 +22,5 @@ sanity_cost = 4.0
 max_level = 5
 level_mods = Array[Dictionary]([{"aoe_radius*": 1.15}, {"damage*": 1.35}, {"duration+": 1.5, "bullet_slow*": 0.8}, {"cooldown*": 0.8, "aoe_radius*": 1.1}])
 level_text = Array[String](["Signo un 15 % más amplio", "+35 % de daño", "Dura más y frena más las balas", "Se traza antes y es más amplio"])
+evolves_with = &"escapulario"
+evolution = &"signo_mayor"
