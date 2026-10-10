@@ -7,6 +7,7 @@ var root: Node3D
 var obstacles: ObstacleMap
 
 func before_each() -> void:
+	Difficulty.forced = 0                                  # topes sin multiplicar
 	world = CombatWorld.new()
 	add_child_autofree(world)
 	player = Player.new().setup(load("res://data/characters/dyer.tres"), BotInput.new("idle"), Color.YELLOW)
@@ -154,3 +155,6 @@ func test_el_peso_propio_reparte_la_horda() -> void:
 	var n := {&"a": 0, &"b": 0}
 	for i in 4000: n[d.pick().id] += 1
 	assert_almost_eq(float(n[&"a"]) / 4000.0, 0.75, 0.03)
+
+func after_all() -> void:
+	Difficulty.forced = -1

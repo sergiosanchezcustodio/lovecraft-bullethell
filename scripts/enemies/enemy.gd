@@ -21,6 +21,9 @@ var health := 1.0
 var health_scale := 1.0                  ## multiplicador de vida (cooperativo): vida máxima = data.max_health × esto
 var shield_t := 0.0
 var _path_t := 0.0                      ## s hasta volver a mirar si hay línea libre al jugador
+var _stuck_ref := Vector2.INF               ## dónde estaba en la última comprobación de atasco
+var _stuck_t := 0.0
+var _detour_t := 0.0                         ## s yendo por el flujo aunque haya línea libre (se atascó)
 var _path_clear := true                      ## s de invulnerabilidad (cambio de fase de un jefe)
 var velocity := Vector3.ZERO
 var facing := Vector3(0, 0, 1)
@@ -34,6 +37,8 @@ var _lure_t := 0.0                          ## s que le atrae una bengala
 var _lure_pos := Vector3.ZERO
 const VULNERABLE_MULT := 1.25
 # Arsenal II (hito 2.7)
+var giant: GiantMoves                        ## salto y erupciones de los grandes (o null)
+var pace_mult := 1.0                         ## dificultad: los de cuerpo a cuerpo, más rápidos
 var anchored := false                       ## no se mueve ni lo empujan (Dagon, en la orilla)
 var _wade := 0.0                            ## 0..1: metido en agua somera (hunde el modelo)
 var _slow_t := 0.0                          ## s que va más lento (Polvo de Ibn-Ghazi)
@@ -123,6 +128,10 @@ func _ready() -> void:
 	visual.add_child(model)
 	if data.ethereal: _make_ethereal(model)
 	runner = PatternRunner.new().setup(world)
+	if GiantMoves.applies(data):
+		giant = GiantMoves.new()
+		runner.over_walls = true
+	if data.attack == null: pace_mult = Difficulty.melee_speed()
 	runner.position.y = 0.6
 	add_child(runner)
 	_flash_mat = StandardMaterial3D.new()
@@ -406,7 +415,11 @@ func _physics_process(delta: float) -> void:
 		Prof.stop("enemigos_fisica", t0)
 		return
 	var target := target_player()
-	velocity = behavior.update(self, target, delta)
+	if giant != null and giant.step(self, target, delta):   # agachado o saltando: no anda
+		velocity = Vector3.ZERO
+		Prof.stop("enemigos_fisica", t0)
+		return
+	velocity = behavior.update(self, target, delta) * pace_mult
 	if _slow_t > 0.0: velocity *= _slow_k
 	var wet := wades()
 	if wet: velocity *= WadeSplash.SLOW                # agua somera: los marinos nadan, los demás vadean

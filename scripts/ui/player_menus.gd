@@ -102,12 +102,13 @@ func _place(c: Control, p: Player) -> void:
 ## Ficha del jugador (rehecha el 04-10-2026 con el formato de la selección de personaje):
 ## tres columnas en un escenario de 1560×860 que se escala al hueco (centrada en solitario,
 ## en el cuadrante en cooperativo).
-##   1. Personaje: modelo, nombre, papel, nivel y experiencia, rasgo; debajo, el compañero
-##      con su imagen y lo que hace a su nivel.
-##   2. Características y habilidades: atributos (con lo ganado desde el nivel 1) y
+## Las tres columnas miden lo mismo (rehecha el 10-10-2026 para que sea simétrica):
+##   1. Personaje: nombre, papel, nivel y experiencia y rasgo arriba; el modelo debajo; y al
+##      pie, compacto, el compañero con su imagen y lo que hace a su nivel.
+##   2. Mitad de arriba, atributos (con lo ganado desde el nivel 1); mitad de abajo,
 ##      estadísticas ya actualizadas (tienda, objetos y subidas de nivel).
-##   3. Combate: daño total y abatidos; cada arma con su imagen, nivel, descripción, daño y
-##      abatidos; cada objeto con su imagen, nivel y efecto.
+##   3. Mitad de arriba, armas; mitad de abajo, objetos. Una fila por cada uno con imagen,
+##      nivel, descripción en una línea y daño y abatidos.
 ## Las imágenes se hacen una vez; los valores se refrescan cada segundo.
 class Sheet extends Control:
 	var p: Player
@@ -157,9 +158,10 @@ class Sheet extends Control:
 		row.size = Vector2(design.x - 40, design.y - 100)
 		row.add_theme_constant_override("separation", 16)
 		_stage.add_child(row)
-		for w in [400, 470, 634]:
+		var col_w := (row.size.x - 16 * 2) / 3.0         # tres columnas iguales: mismo margen a los dos lados
+		for i in 3:
 			var frame := PanelContainer.new()
-			frame.custom_minimum_size = Vector2(640 if paged else w, row.size.y)
+			frame.custom_minimum_size = Vector2(640 if paged else col_w, row.size.y)
 			_frames.append(frame)
 			frame.add_theme_stylebox_override("panel", UiKit.panel(Color(0.03, 0.033, 0.045, 0.9), Color(p.color, 0.35), 10))
 			row.add_child(frame)
@@ -262,12 +264,41 @@ class Sheet extends Control:
 		var v := roundi((m - 1.0) * 100.0)
 		return ("+%d %%" % v) if v >= 0 else ("−%d %%" % -v)
 
+	## Mitad de una columna (las dos mitades miden lo mismo), con su título.
+	func _half(col: VBoxContainer, title: String = "") -> VBoxContainer:
+		var v := VBoxContainer.new()
+		v.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		v.clip_contents = true
+		v.add_theme_constant_override("separation", 6)
+		col.add_child(v)
+		if title != "": _head(v, title)
+		return v
+
+	## Fila de arma u objeto: imagen, nombre con nivel, descripción en una línea y un dato.
+	## Devuelve [nombre, dato] para refrescarlos.
+	func _item_row(col: Container, icon: Texture2D, frame_col: Color, desc: String) -> Array:
+		var card := HBoxContainer.new()
+		card.add_theme_constant_override("separation", 10)
+		card.add_child(_img(icon, 52, frame_col))
+		var v := VBoxContainer.new()
+		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		v.alignment = BoxContainer.ALIGNMENT_CENTER
+		v.add_theme_constant_override("separation", 0)
+		var name := UiKit.label("", 17, UiKit.TEXT)
+		var d := UiKit.label(desc, 13, UiKit.TEXT_DIM)
+		d.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		d.clip_text = true
+		var num := UiKit.label("", 13, UiKit.GOLD)
+		for l in [name, d, num]:
+			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			v.add_child(l)
+		card.add_child(v)
+		col.add_child(card)
+		return [name, num]
+
 	# ------------------------------------------------------------ 1. personaje
 
 	func _character(col: VBoxContainer) -> void:
-		var tex := _model(p.data.model, 300)
-		var pic := _img(tex, 230, Color(p.color, 0.5))
-		col.add_child(pic)
 		col.add_child(MenuKit.title(p.data.display_name, 28, UiKit.TEXT))
 		col.add_child(_label(p.data.role, 15, UiKit.TEXT_DIM, true))
 		var lvl := _label("", 20, p.color, true)
@@ -279,52 +310,56 @@ class Sheet extends Control:
 			lvl.text = "Nivel %d" % p.progress.level
 			xp.value = p.progress.xp / maxf(p.progress.xp_to_next(), 1.0))
 		col.add_child(_label("Rasgo: " + p.data.passive_text, 15, UiKit.TEXT, true))
-		# compañero
-		var pet: Node = p.get("pet")
-		var sep := HSeparator.new()
-		col.add_child(sep)
+		# la imagen, centrada en lo que queda entre los datos y el compañero
+		var pic := _img(_model(p.data.model, 360), 300, Color(p.color, 0.5))
+		pic.size_flags_vertical = Control.SIZE_EXPAND | Control.SIZE_SHRINK_CENTER
+		col.add_child(pic)
+		col.add_child(HSeparator.new())
 		_head(col, "Compañero")
+		var pet: Node = p.get("pet")
 		if pet == null or not is_instance_valid(pet):
-			col.add_child(_label("Sin compañero. Se consiguen en la tienda.", 15, UiKit.TEXT_DIM, true))
+			col.add_child(_label("Sin compañero. Se consiguen en la tienda.", 14, UiKit.TEXT_DIM, true))
 			return
 		var pd: PetData = pet.get("data")
 		var h := HBoxContainer.new()
 		h.add_theme_constant_override("separation", 10)
-		h.add_child(_img(_model(pd.model, 160), 110, Color(UiKit.GOLD, 0.4)))
+		h.add_child(_img(_model(pd.model, 120), 76, Color(UiKit.GOLD, 0.4)))
 		var v := VBoxContainer.new()
 		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		v.add_child(_label(pd.display_name, 19, UiKit.GOLD))
-		v.add_child(_label(pd.description, 13, UiKit.TEXT_DIM))
+		v.alignment = BoxContainer.ALIGNMENT_CENTER
+		v.add_theme_constant_override("separation", 0)
+		v.add_child(UiKit.label(pd.display_name, 18, UiKit.GOLD))
+		var info := UiKit.label("", 13, UiKit.TEXT)
+		info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		v.add_child(info)
 		h.add_child(v)
 		col.add_child(h)
-		var info := _label("", 15, UiKit.TEXT)
-		col.add_child(info)
 		_dyn.append(func() -> void:
-			var s := world_stats()
-			var lines := PackedStringArray()
-			if pd.attack_damage > 0.0: lines.append("Golpe: %d de daño" % roundi(pd.attack_at(p.progress.level)))
-			if pd.bonus > 0.0: lines.append("Bonificación: %s" % _pct(1.0 + pd.bonus_at(p.progress.level)))
-			var m: Array = (s.weapons as Dictionary).get("mascota", [0.0, 0])
-			lines.append("Daño hecho: %d  ·  Abatidos: %d" % [roundi(m[0]), int(m[1])])
-			info.text = "\n".join(lines))
+			var parts := PackedStringArray()
+			if pd.attack_damage > 0.0: parts.append("Golpe %d" % roundi(pd.attack_at(p.progress.level)))
+			if pd.bonus > 0.0: parts.append("Bonificación %s" % _pct(1.0 + pd.bonus_at(p.progress.level)))
+			var m: Array = (world_stats().weapons as Dictionary).get("mascota", [0.0, 0])
+			parts.append("Daño %d" % roundi(m[0]))
+			parts.append("Abatidos %d" % int(m[1]))
+			info.text = "  ·  ".join(parts))
 
 	# ------------------------------------------------------------ 2. características
 
 	func _sheet(col: VBoxContainer) -> void:
-		_head(col, "Atributos")
+		var top := _half(col, "Atributos")
 		for n in Attributes.NAMES:
 			var nn: String = n
-			_stat_row(col, load(ICONS % nn), "%s  ·  %s" % [nn, Attributes.LONG[nn]], func() -> String:
+			_stat_row(top, load(ICONS % nn), "%s  ·  %s" % [nn, Attributes.LONG[nn]], func() -> String:
 				var now := int(p.attrs.get(nn, Attributes.BASE))
 				var gain := now - int(p.attrs_level1.get(nn, Attributes.BASE))
 				return "%d%s" % [now, ("  (+%d)" % gain) if gain > 0 else ""],
 				func() -> bool: return int(p.attrs.get(nn, Attributes.BASE)) > Attributes.BASE)
 		col.add_child(HSeparator.new())
-		_head(col, "Estadísticas")
+		var bottom := _half(col, "Estadísticas")
 		var base: CharacterData = load("res://data/characters/%s.tres" % p.data.id)
 		for row in STATS:
 			var k: String = row[0]
-			_stat_row(col, load(ICONS % row[1]), row[2], func() -> String:
+			_stat_row(bottom, load(ICONS % row[1]), row[2], func() -> String:
 				match k:
 					"health": return "%d / %d" % [ceili(p.health), roundi(p.data.max_health)]
 					"sanity": return "%d / %d" % [ceili(p.sanity), roundi(p.data.max_sanity)]
@@ -334,7 +369,7 @@ class Sheet extends Control:
 					"physical": return _pct(p.damage_mult(WeaponData.Category.PHYSICAL))
 				return _pct(p.damage_mult(WeaponData.Category.FIREARM)))
 		var crisis := _label("", 14, UiKit.SANITY)
-		col.add_child(crisis)
+		bottom.add_child(crisis)
 		_dyn.append(func() -> void:
 			var c := p.sanity_state.crises
 			crisis.text = "" if c == 0 else "Crisis sufridas: %d%s" % [c, "  ·  locura acumulada" if p.madness else ""])
@@ -346,52 +381,33 @@ class Sheet extends Control:
 		return w.stats_of(p.index) if w != null else {"weapons": {}, "total": [0.0, 0]}
 
 	func _combat(col: VBoxContainer) -> void:
-		var tot := _label("", 20, UiKit.GOLD, true)
-		col.add_child(tot)
+		var ws: Array = p.weapons.weapons if p.weapons != null else []
+		var top := _half(col, "Armas  %d / %d" % [ws.size(), p.progress.weapon_slots])
+		var tot := _label("", 15, UiKit.GOLD, true)
+		top.add_child(tot)
 		_dyn.append(func() -> void:
 			var t: Array = world_stats().total
-			tot.text = "Daño total: %s   ·   Enemigos abatidos: %d" % [MenuKit.money(roundi(t[0])), int(t[1])])
-		var ws: Array = p.weapons.weapons if p.weapons != null else []
-		_head(col, "Armas  %d / %d" % [ws.size(), p.progress.weapon_slots])
+			tot.text = "Daño total %s  ·  Abatidos %d" % [MenuKit.money(roundi(t[0])), int(t[1])])
 		for w: WeaponSystem.Weapon in ws:
-			var card := HBoxContainer.new()
-			card.add_theme_constant_override("separation", 10)
-			card.add_child(_img(w.data.get_icon(), 64, Color(UiKit.GOLD, 0.45)))
-			var v := VBoxContainer.new()
-			v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			v.add_theme_constant_override("separation", 0)
-			var name := UiKit.label("", 18, UiKit.TEXT)
-			v.add_child(name)
-			v.add_child(_label("%s. %s" % [CATEGORY[int(w.data.category)], w.data.description], 13, UiKit.TEXT_DIM))
-			var num := UiKit.label("", 14, UiKit.GOLD)
-			v.add_child(num)
-			card.add_child(v)
-			col.add_child(card)
+			var ls := _item_row(top, w.data.get_icon(), Color(UiKit.GOLD, 0.45), "%s. %s" % [CATEGORY[int(w.data.category)], w.data.description])
 			var ww := w
 			_dyn.append(func() -> void:
-				name.text = "%s  ·  Nv %d/%d" % [ww.data.display_name, ww.level, ww.data.max_level]
+				(ls[0] as Label).text = "%s  ·  Nv %d/%d" % [ww.data.display_name, ww.level, ww.data.max_level]
 				var s: Array = (world_stats().weapons as Dictionary).get(String(ww.data.id), [0.0, 0])
-				num.text = "Daño %s  ·  Abatidos %d  ·  %s por golpe" % [MenuKit.money(roundi(s[0])), int(s[1]), str(snappedf(ww.stat("damage") * p.damage_mult(ww.data.category), 0.1))])
+				(ls[1] as Label).text = "Daño %s  ·  Abatidos %d  ·  %s por golpe" % [MenuKit.money(roundi(s[0])), int(s[1]), str(snappedf(ww.stat("damage") * p.damage_mult(ww.data.category), 0.1))])
 		col.add_child(HSeparator.new())
 		var owned: Array = []
 		for up in p.progress.upgrade_pool:
 			if int(p.progress.passives.get(up.id, 0)) > 0: owned.append(up)
-		_head(col, "Objetos  %d / %d" % [owned.size(), p.progress.item_slots])
-		if owned.is_empty(): col.add_child(_label("Aún no llevas ninguno: salen al subir de nivel.", 14, UiKit.TEXT_DIM))
-		var grid := GridContainer.new()
-		grid.columns = 2
-		grid.add_theme_constant_override("h_separation", 12)
-		col.add_child(grid)
+		var bottom := _half(col, "Objetos  %d / %d" % [owned.size(), p.progress.item_slots])
+		if owned.is_empty(): bottom.add_child(_label("Aún no llevas ninguno: salen al subir de nivel.", 14, UiKit.TEXT_DIM, true))
 		for up: UpgradeData in owned:
-			var h := HBoxContainer.new()
-			h.custom_minimum_size.x = 290
-			h.add_child(_img(up.icon, 48, Color(up.color, 0.5)))
-			var v := VBoxContainer.new()
-			v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			v.add_child(UiKit.label("%s  ·  Nv %d/%d" % [up.display_name, int(p.progress.passives.get(up.id, 0)), up.max_level], 15, UiKit.TEXT))
-			v.add_child(_label(up.description, 13, UiKit.TEXT_DIM))
-			h.add_child(v)
-			grid.add_child(h)
+			var ls := _item_row(bottom, up.icon, Color(up.color, 0.5), up.description)
+			var uu: UpgradeData = up
+			_dyn.append(func() -> void:
+				(ls[0] as Label).text = "%s  ·  Nv %d/%d" % [uu.display_name, int(p.progress.passives.get(uu.id, 0)), uu.max_level]
+				var s: Array = (world_stats().weapons as Dictionary).get(String(uu.id), [0.0, 0])
+				(ls[1] as Label).text = ("Daño %s  ·  Abatidos %d" % [MenuKit.money(roundi(s[0])), int(s[1])]) if s[0] > 0.0 else "")
 
 
 ## Mapa del nivel: la arena vista desde arriba con la misma orientación que la cámara

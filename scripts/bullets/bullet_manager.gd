@@ -72,6 +72,7 @@ var _home := PackedFloat32Array()            ## giro máximo hacia el enemigo m�
 var _effect := PackedByteArray()             ## Effect al impactar
 var _effect_val := PackedFloat32Array()
 var _slowed := PackedByteArray()             ## 1 si ya la frenó un Signo Arcano (solo una vez)
+const OVER_WALLS := -2                       ## _owner de las balas enemigas que no para el decorado
 var _owner := PackedInt32Array()             ## índice del jugador que la disparó (-1: nadie)
 ## Rasgos de daño de quien dispara (Damage.bonus), registrados una vez por jugador.
 var bonus_sets: Array[Dictionary] = []
@@ -267,7 +268,7 @@ func _physics_process(delta: float) -> void:
 		_age[i] += delta
 		var p2 := Vector2(_pos[i].x, _pos[i].z)
 		# se paran contra el decorado (cabañas, iglús, acantilados…), las del jugador y las enemigas
-		var dead := _age[i] >= _life[i] or not b.has_point(p2) or (obs != null and obs.stops_bullet(p2))
+		var dead := _age[i] >= _life[i] or not b.has_point(p2) or (obs != null and _owner[i] != OVER_WALLS and obs.stops_bullet(p2))
 		if not dead and world != null:
 			dead = _collide_player_bullet(i) if _team[i] == Team.PLAYER else _collide_enemy_bullet(i)
 		if dead:

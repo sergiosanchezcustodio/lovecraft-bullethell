@@ -33,6 +33,7 @@ var _final_done := false
 var _mid_done := 0                          ## eventos intermedios ya lanzados
 var mid_alive: Array[Enemy] = []            ## minijefes intermedios vivos (HUD)
 var completed := false
+var loot_left := 0.0                     ## s que quedan para recoger el botín tras superar el nivel (lo lleva game.gd)
 var _chest_t := -1.0                       ## s hasta el próximo baúl arcano
 
 func setup(p_level: LevelData, p_world: CombatWorld, p_obstacles: ObstacleMap, p_camera: GameCamera, p_root: Node3D) -> WaveDirector:
@@ -42,7 +43,7 @@ func setup(p_level: LevelData, p_world: CombatWorld, p_obstacles: ObstacleMap, p
 
 func max_alive() -> int:
 	if max_alive_override > 0: return max_alive_override
-	return int(round(level.max_alive * LevelData.coop(level.coop_spawn, players) * _idol()))
+	return int(round(level.max_alive * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.cap()))
 
 func _physics_process(delta: float) -> void:
 	if completed: return
@@ -64,7 +65,7 @@ func _physics_process(delta: float) -> void:
 		final_event.emit(_final)
 	var scale := level.final_spawn_scale if _final_done else 1.0
 	if _boss_on: scale *= BOSS_SPAWN_SCALE         # con el jefe en pantalla, las oleadas casi paran
-	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * _idol() * delta
+	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.rate() * delta
 	while _acc >= 1.0:
 		if alive.size() + _emerging >= max_alive():
 			_acc = 1.0
@@ -90,9 +91,9 @@ func _survival_step(delta: float) -> bool:
 			completed = true
 			level_completed.emit()
 		return true
-	var cap := level.final_cap if level.final_cap > 0 else max_alive()
+	var cap := int(round(level.final_cap * Difficulty.cap())) if level.final_cap > 0 else max_alive()
 	cap = int(round(cap * LevelData.coop(level.coop_spawn, players)))
-	_acc += level.final_rate * LevelData.coop(level.coop_spawn, players) * delta
+	_acc += level.final_rate * LevelData.coop(level.coop_spawn, players) * Difficulty.rate() * delta
 	while _acc >= 1.0:
 		if alive.size() >= cap:
 			_acc = 1.0
@@ -142,7 +143,7 @@ func spawn_chest() -> ArcaneChest:
 		var a := rng.randf() * TAU
 		var c := center + Vector3(cos(a), 0, sin(a)) * rng.randf_range(6.0, 12.0)
 		var p2 := Vector2(c.x, c.z)
-		if obstacles != null and (not obstacles.bounds.grow(-2.0).has_point(p2) or obstacles.is_blocked(p2, 0.9)): continue
+		if obstacles != null and (not obstacles.bounds.grow(-2.0).has_point(p2) or not _spawnable(p2, 0.7)): continue
 		pos = c
 		break
 	var chest := ArcaneChest.new().setup(world, pos, rng.randi_range(level.chest_money.x, level.chest_money.y), level.chest_heal)
@@ -244,21 +245,30 @@ func spawn_point(radius: float) -> Vector3:
 	for attempt in 30:
 		var a := rng.randf() * TAU
 		var p := Vector2(center.x, center.z) + Vector2(cos(a), sin(a)) * rng.randf_range(ring, ring + 5.0)
-		if obstacles == null or not obstacles.is_blocked(p, radius + 0.2):
+		if _spawnable(p, radius):
 			return Vector3(p.x, 0, p.y)
 	# arena pequeña respecto a la cámara: cualquier punto libre
 	for attempt in 60:
 		var b := obstacles.bounds.grow(-2.0) if obstacles != null else Rect2(-30, -30, 60, 60)
 		var p := Vector2(rng.randf_range(b.position.x, b.end.x), rng.randf_range(b.position.y, b.end.y))
-		if (obstacles == null or not obstacles.is_blocked(p, radius + 0.2)) and p.distance_to(Vector2(center.x, center.z)) > 6.0:
+		if _spawnable(p, radius) and p.distance_to(Vector2(center.x, center.z)) > 6.0:
 			return Vector3(p.x, 0, p.y)
 	return Vector3(center.x + 20.0, 0, center.z)
+
+## Punto donde puede aparecer un enemigo: libre, con sitio para su cuerpo y desde el que se
+## llega andando hasta algún jugador (10-10-2026). Sin lo último aparecían tras los muros
+## exteriores o en rincones cerrados del decorado y se quedaban allí.
+func _spawnable(p: Vector2, radius: float) -> bool:
+	if obstacles == null: return true
+	if obstacles.is_blocked(p, radius + 0.2): return false
+	var f: FlowField = world.flow if world != null else null
+	return f == null or f.reachable(p)
 
 func spawn(d: EnemyData, pos: Vector3) -> Enemy:
 	var e := Enemy.new().setup(d, world, obstacles)
 	e.health_scale = LevelData.coop(level.coop_health, players)     # más jugadores, más aguante
 	if d.unique: e.health_scale = 1.0 + (e.health_scale - 1.0) * 0.5   # los únicos, la mitad (con 4: ×1,65)
-	e.health_scale *= level.health_mult
+	e.health_scale *= level.health_mult * Difficulty.health()
 	e.health *= e.health_scale
 	e.position = pos
 	e.died.connect(_on_died)

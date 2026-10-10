@@ -32,6 +32,7 @@ func _spawn() -> void:
 	for tries in 40:
 		var p := Vector2(randf_range(-half.x, half.x), randf_range(-half.y, half.y))
 		if world.obstacles != null and world.obstacles.is_blocked(p, 0.7): continue
+		if world.flow != null and not world.flow.reachable(p): continue      # nada en rincones cerrados
 		var far := true
 		for q in world.players:
 			if Vector2(q.global_position.x, q.global_position.z).distance_to(p) < MIN_DIST: far = false

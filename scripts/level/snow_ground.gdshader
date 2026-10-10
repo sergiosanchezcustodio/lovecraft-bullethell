@@ -54,7 +54,11 @@ float height(vec2 c) {
 	vec2 wd = normalize(wind);
 	vec2 q = vec2(dot(p, wd), dot(p, vec2(-wd.y, wd.x)));
 	float drift = fbm(p * 0.07) * 9.0;                            // ventisqueros
-	float sas = vnoise(vec2(q.x * 1.9, q.y * 0.4)) * 2.6;             // sastrugi, alargados por el viento
+	// sastrugi, alargados por el viento. Con ruido de gradiente y algo torcidos: el de valores
+	// se aplana en las líneas de su rejilla y, cortado en escalones, dibujaba rectas largas
+	// por todo el suelo (10-10-2026)
+	vec2 bend = vec2(gnoise(p * 0.21 + 5.0), gnoise(p * 0.21 + 13.0)) - 0.5;
+	float sas = gnoise(vec2(q.x * 1.9, q.y * 0.4) + bend * 2.2) * 2.6;
 	return floor(drift + sas);
 }
 
@@ -85,7 +89,7 @@ void fragment() {
 		vec2 warp = vec2(gnoise(pc * 0.11 + 3.0), gnoise(pc * 0.11 + 21.0)) - 0.5;  // bordes irregulares
 		float icy = fbm(pc * 0.05 + 40.0 + warp * 1.6);
 		float ice_m = step(0.585, icy) * step(h, 4.0);
-		float vein = step(0.94, 1.0 - abs(vnoise(pc * 1.3 + 7.0) - 0.5) * 2.0);
+		float vein = step(0.94, 1.0 - abs(gnoise(pc * 1.3 + 7.0) - 0.5) * 2.0);
 		vec3 ice_c = mix(ice, ice_vein, vein * 0.45) * (0.97 + 0.05 * hash(c + 3.0));
 		// nieve pisada alrededor del campamento, a manchas
 		float d = length(pc);

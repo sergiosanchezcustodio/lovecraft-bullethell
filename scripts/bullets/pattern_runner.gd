@@ -10,6 +10,7 @@ var world: CombatWorld
 var pattern: BulletPattern
 var aim_provider: Callable            ## () -> Vector3 posición a la que apuntar
 var busy := false
+var over_walls := false               ## sus balas pasan por encima del decorado (los grandes, 10-10-2026)
 var damage_mult := 1.0                ## lo baja el Polvo de Ibn-Ghazi (enemigo debilitado)
 var _burst := 0
 var _timer := 0.0
@@ -51,7 +52,8 @@ func _physics_process(delta: float) -> void:
 	if damage_mult != 1.0: dmg = dmg.scaled(damage_mult)
 	for dir in pattern.directions(aim, _burst):
 		world.bullets.spawn(BulletManager.Team.ENEMY, pattern.style(), origin + dir * 0.5,
-			dir * pattern.speed, pattern.radius, pattern.size, dmg, pattern.lifetime)
+			dir * pattern.speed, pattern.radius, pattern.size, dmg, pattern.lifetime,
+			0, 1.0, -1, 0, 0.0, BulletManager.Effect.NONE, 0.0, BulletManager.OVER_WALLS if over_walls else -1)
 	_burst += 1
 	_timer = pattern.burst_interval
 	if _burst >= pattern.bursts:

@@ -85,7 +85,9 @@ func _on_focus_changed(c: Control) -> void:
 
 ## Desliza la lista hasta que la opción quede entera a la vista.
 func _scroll_to(sc: ScrollContainer, c: Control) -> void:
-	var top := c.get_global_rect().position.y - sc.get_global_rect().position.y + sc.scroll_vertical
+	# en coordenadas de la lista, no de pantalla: si un padre está escalado (las páginas de la
+	# Biblioteca), la diferencia en pantalla no cuadra con scroll_vertical y la opción se salía
+	var top := (sc.get_global_transform().affine_inverse() * c.global_position).y + sc.scroll_vertical
 	var bottom := top + c.size.y
 	var view := sc.size.y
 	var target := float(sc.scroll_vertical)

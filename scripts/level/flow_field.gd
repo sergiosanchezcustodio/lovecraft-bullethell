@@ -19,6 +19,7 @@ var h := 0
 var _free := PackedByteArray()
 var _dist := PackedFloat32Array()
 var _t := 999.0
+var built := false                       ## ya hay distancias (antes de la primera pasada, todo vale)
 
 func setup(p_obstacles: ObstacleMap, bounds: Rect2) -> FlowField:
 	obstacles = p_obstacles
@@ -52,6 +53,7 @@ func tick(delta: float, targets: Array[Vector2]) -> void:
 var _queue := PackedInt32Array()
 func rebuild(targets: Array[Vector2]) -> void:
 	_dist.fill(INF_D)
+	built = true
 	if _queue.size() != w * h: _queue.resize(w * h)
 	var tail := 0
 	for t in targets:
@@ -96,11 +98,29 @@ func direction(from: Vector2) -> Vector2:
 	if best_c == c: return Vector2.ZERO
 	return (center(best_c.x, best_c.y) - from).normalized()
 
-## ¿Línea recta libre entre dos puntos? (muestreo cada media celda)
-func clear_line(a: Vector2, b: Vector2) -> bool:
+## Distancia andando hasta el jugador más cercano (INF_D si desde ahí no se llega).
+func distance_at(p: Vector2) -> float:
+	var c := cell_of(p)
+	if not _inside(c): return INF_D
+	var k := c.y * w + c.x
+	if _free[k] == 0: return INF_D
+	return _dist[k] if built else 0.0
+
+## ¿Se llega andando desde ahí hasta algún jugador?
+func reachable(p: Vector2) -> bool:
+	return distance_at(p) < INF_D
+
+## ¿Pasillo recto libre entre dos puntos, del ancho del cuerpo (radio r)? Se mira la línea
+## del centro y las dos de los costados: midiendo solo el centro, el enemigo iba recto y se
+## enganchaba en las esquinas con el hombro.
+func clear_line(a: Vector2, b: Vector2, r := 0.0) -> bool:
 	var d := a.distance_to(b)
+	if d < 0.01: return true
+	var side := Vector2(b.y - a.y, a.x - b.x) / d * r
 	var steps := int(d / (CELL * 0.5))
 	for s in range(1, steps):
-		var c := cell_of(a.lerp(b, float(s) / steps))
-		if not _inside(c) or _free[c.y * w + c.x] == 0: return false
+		var m := a.lerp(b, float(s) / steps)
+		for o in ([Vector2.ZERO, side, -side] if r > 0.0 else [Vector2.ZERO]):
+			var c := cell_of(m + o)
+			if not _inside(c) or _free[c.y * w + c.x] == 0: return false
 	return true

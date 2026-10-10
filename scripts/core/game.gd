@@ -548,9 +548,28 @@ func _on_level_completed() -> void:
 	_check_achievements.call_deferred()              # después de contar la baja del enemigo final (élite)
 	Saves.save()
 	announce("Nivel superado", 2.0)
-	await get_tree().create_timer(2.5).timeout
+	await _loot_time()
 	get_tree().paused = true
 	_end_screen("Nivel superado", UiKit.GOLD, Campaign.next_in_part(String(level.id)))
+
+## Tras superar el nivel, LOOT_TIME s para recoger lo que han soltado el jefe y los últimos
+## enemigos: no aparece nadie más, los que quedan caen (sueltan sus gemas), se deshacen las balas
+## enemigas, se apagan los peligros del escenario y los jugadores ya no reciben daño.
+const LOOT_TIME := 10.0
+func _loot_time() -> void:
+	for e in director.alive.duplicate():
+		if is_instance_valid(e) and e.is_alive(): e.take_damage(Damage.new(1e9, 0.0))
+	world.bullets.clear_enemy_bullets(Vector3.ZERO, 1e5)
+	var hz := get_node_or_null("Hazards")
+	if hz != null: hz.queue_free()
+	for q in players: q.god = true
+	var wait := LOOT_TIME
+	if args.has("autonext") or args.has("autorestart"): wait = 2.5   # pruebas con bot: sin esperar
+	director.loot_left = wait
+	while director.loot_left > 0.0:
+		await get_tree().create_timer(0.1).timeout     # se para con la pausa
+		director.loot_left -= 0.1
+	director.loot_left = 0.0
 
 func _end_screen(title: String, accent: Color, next_id := "") -> void:
 	var s := Menus.EndScreen.new(title, _summary(), accent)
@@ -756,6 +775,14 @@ func _process_step(delta: float) -> void:
 	if args.get_bool("log") and director != null and fmod(director.time, 30.0) < delta:
 		print("t=%3d s  vivos=%d  abatidos=%d  nivel=%d  vida=%d  cordura=%d  balas=%d" % [director.time, director.alive.size(),
 			kills, player.progress.level, player.health, player.sanity, world.bullets.count])
+		if world.flow != null:                          # enemigos que no pueden llegar o se han atascado
+			var lost := 0
+			var stuck := 0
+			for e: Enemy in director.alive:
+				if e.data.ethereal or e.anchored: continue
+				if not world.flow.reachable(Vector2(e.global_position.x, e.global_position.z)): lost += 1
+				if e._detour_t > 0.0: stuck += 1
+			print("         inalcanzables=%d  desatascándose=%d" % [lost, stuck])
 	if args.has("perf"): _perf(delta)
 	if args.get_bool("jitter"): _jitter(delta)
 	if args.get_int("bullet_rain") > 0: _bullet_rain(args.get_int("bullet_rain"))

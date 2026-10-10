@@ -120,6 +120,9 @@ func _game() -> void:
 	var wx: Array[String] = ["Apagado", "Reducido", "Completo"]
 	_choice("Clima (nieve, lluvia, niebla…)", wx, int(Settings.get_value("weather")), func(i: int) -> void:
 		Settings.set_value("weather", i))
+	_choice("Dificultad", Difficulty.NAMES, int(Settings.get_value("difficulty")), func(i: int) -> void:
+		Settings.set_value("difficulty", i))
+	_note("Investigador: menos enemigos. Pesadilla: hordas más grandes, más rápidas y más duras.")
 	_toggle("Locura acumulada (cada crisis baja la cordura máxima)", Settings.get_value("madness"), func(on: bool) -> void:
 		Settings.set_value("madness", on))
 	_note("Accesibilidad")

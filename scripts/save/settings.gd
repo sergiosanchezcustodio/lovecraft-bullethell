@@ -28,6 +28,7 @@ var defaults := {
 	"bullet_palette": 0,                    ## 0 normal, 1 alto contraste (daltonismo)
 	"flashes": 1,                           ## destellos (golpes, rayos): 0 reducidos, 1 normales
 	"shake": 1.0,                           ## temblor de cámara (0..1)
+	"difficulty": 1,                        ## 0 investigador (la de antes), 1 normal, 2 pesadilla (Difficulty)
 	"madness": true,                        ## locura acumulada (GDD 4.5)
 	"intro": 1,                             ## ficha e intro al arrancar: 0 siempre, 1 solo la primera vez (hito 5.2)
 	"intro_seen": false,

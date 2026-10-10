@@ -9,6 +9,7 @@ var wet := Vector2.INF
 var dry := Vector2.INF
 
 func before_each() -> void:
+	Difficulty.forced = 0                                  # topes sin multiplicar
 	obstacles = ObstacleMap.new()
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/arenas/pantano.json"))
 	assert_true(obstacles.load_mask(data.mask), "carga el mapa del pantano")
@@ -103,3 +104,6 @@ func test_los_que_emergen_salen_del_agua_cerca_de_un_jugador() -> void:
 	for at in born:
 		assert_gt(obstacles.water_at(at), 0.5, "en el agua")
 		assert_between(at.distance_to(dry), 4.9, 9.1, "a 5-9 m del jugador")
+
+func after_all() -> void:
+	Difficulty.forced = -1

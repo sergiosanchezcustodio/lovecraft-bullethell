@@ -8,6 +8,7 @@ var root: Node3D
 var obstacles: ObstacleMap
 
 func before_each() -> void:
+	Difficulty.forced = 0                                  # topes sin multiplicar
 	world = CombatWorld.new()
 	add_child_autofree(world)
 	var player := Player.new().setup(load("res://data/characters/dyer.tres"), BotInput.new("idle"), Color.YELLOW)
@@ -44,3 +45,6 @@ func test_la_horda_llega_con_su_tope_y_el_nivel_se_supera_al_aguantar() -> void:
 	for i in 120: d._physics_process(DT)
 	assert_true(done[0], "aguantada la horda, nivel superado")
 	assert_true(d.completed)
+
+func after_all() -> void:
+	Difficulty.forced = -1

@@ -47,23 +47,42 @@ static func shape_path(e: Enemy, dir: Vector3, speed: float) -> Vector3:
 			return (dir * 0.75 + side * 0.65 * (1.0 if e.get_instance_id() % 2 == 0 else -1.0)).normalized() * speed
 	return dir * speed
 
-## Hacia dónde ir para llegar al jugador (04-10-2026): en línea recta si no hay nada en medio;
-## si lo hay, por el mapa de flujo, que rodea el decorado. Así no se quedan enganchados.
-## La comprobación de la línea libre (lo caro) se hace cada 0,3 s por enemigo; entre medias
-## se reutiliza la decisión (recto o por el flujo).
+## Hacia dónde ir para llegar al jugador (04-10-2026): en línea recta si hay un pasillo libre
+## del ancho del cuerpo; si no, por el mapa de flujo, que rodea el decorado. La comprobación
+## del pasillo (lo caro) se hace cada 0,3 s por enemigo; entre medias se reutiliza la decisión.
+## Atascos (10-10-2026): si en STUCK_EVERY s apenas se ha movido estando lejos, va por el
+## flujo DETOUR s pase lo que pase, y el primer tramo con un empujón de lado para soltarse.
+const STUCK_EVERY := 0.8
+const STUCK_MIN := 0.3
+const DETOUR := 2.5
 static func toward(e: Enemy, target: Node3D) -> Vector3:
 	var to := target.global_position - e.global_position
 	to.y = 0.0
 	var f: FlowField = e.world.flow if e.world != null else null
 	if f == null or to.length() < 2.0: return to.normalized()
+	var dt := e.get_physics_process_delta_time()
 	var a := Vector2(e.global_position.x, e.global_position.z)
-	e._path_t -= e.get_physics_process_delta_time()
+	e._stuck_t += dt
+	if e._stuck_t >= STUCK_EVERY:
+		e._stuck_t = 0.0
+		if e._stuck_ref != Vector2.INF and a.distance_to(e._stuck_ref) < STUCK_MIN and to.length() > 2.5:
+			e._detour_t = DETOUR
+		e._stuck_ref = a
+	e._path_t -= dt
 	if e._path_t <= 0.0:
 		e._path_t = 0.3 + randf() * 0.1
-		e._path_clear = f.clear_line(a, Vector2(target.global_position.x, target.global_position.z))
-	if e._path_clear: return to.normalized()
-	var d := f.direction(a)
-	return Vector3(d.x, 0, d.y) if d != Vector2.ZERO else to.normalized()
+		e._path_clear = f.clear_line(a, Vector2(target.global_position.x, target.global_position.z), e.data.body_radius)
+	var d := Vector2.ZERO
+	if e._path_clear and e._detour_t <= 0.0:
+		return to.normalized()
+	d = f.direction(a)
+	var dir := Vector3(d.x, 0, d.y) if d != Vector2.ZERO else to.normalized()
+	if e._detour_t > 0.0:
+		e._detour_t -= dt
+		if e._detour_t > DETOUR - 0.6:                     # soltarse de la esquina: de lado
+			var side := Vector3(-dir.z, 0, dir.x) * (1.0 if e.get_instance_id() % 2 == 0 else -1.0)
+			dir = (dir + side * 0.8).normalized()
+	return dir
 
 func contact_damage(e: Enemy) -> Damage:
 	var d := Damage.new(e.data.contact_physical, e.data.contact_mental)

@@ -148,8 +148,30 @@ def _api(method, path, body=None):
         return json.loads(r.read())
 
 
+# Tope de gasto (10-10-2026): en una semana se fueron 157 imágenes de FLUX (~6,3 $) sin que
+# el autor lo aprobara. Cada ejecución admite como mucho REPLICATE_MAX predicciones
+# (por defecto 5); para más, hay que pedirlo expresamente con REPLICATE_MAX=N en el entorno,
+# y solo con el permiso del autor. Todo lo lanzado se apunta en tools/replicate/gasto.log.
+COST = {'black-forest-labs/flux-1.1-pro': 0.04, 'black-forest-labs/flux-1.1-pro-ultra': 0.06,
+        'firtoz/trellis': 0.05, '851-labs/background-remover': 0.001}
+MAX_RUNS = int(os.environ.get('REPLICATE_MAX', '5'))
+_runs = 0
+
+
+def _charge(model):
+    global _runs
+    if _runs >= MAX_RUNS:
+        sys.exit('Tope alcanzado: %d predicciones en esta ejecución (REPLICATE_MAX). '
+                 'No se lanza ninguna más sin permiso del autor.' % MAX_RUNS)
+    _runs += 1
+    os.makedirs(os.path.join(ROOT, 'tools', 'replicate'), exist_ok=True)
+    with open(os.path.join(ROOT, 'tools', 'replicate', 'gasto.log'), 'a', encoding='utf-8') as f:
+        f.write('%s  %s  ~%.3f $\n' % (time.strftime('%Y-%m-%d %H:%M'), model, COST.get(model, 0.05)))
+
+
 def run(model, inputs, version=None):
     """Lanza una predicción y espera al resultado. Devuelve su salida."""
+    _charge(model or version)
     if version: p = api('POST', '/predictions', {'version': version, 'input': inputs})
     else: p = api('POST', '/models/%s/predictions' % model, {'input': inputs})
     t0 = time.time()
