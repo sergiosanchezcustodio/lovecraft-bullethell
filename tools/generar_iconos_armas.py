@@ -140,6 +140,8 @@ def api(method, path, body=None, tries=6):
 
 
 def _api(method, path, body=None):
+    global TOKEN
+    if TOKEN is None: TOKEN = token()        # solo al usar la API: importar el módulo no la necesita
     req = urllib.request.Request('https://api.replicate.com/v1' + path, method=method,
                                  data=json.dumps(body).encode() if body is not None else None,
                                  headers={'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json',
@@ -237,5 +239,5 @@ def main():
             print('FALLO', i, detail)
 
 
-TOKEN = token()
+TOKEN = None
 if __name__ == '__main__': main()
