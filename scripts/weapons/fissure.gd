@@ -22,6 +22,7 @@ var _shard_mat: StandardMaterial3D
 var _shards: Array[Dictionary] = []          ## {node, born}
 var _next := 0.0                             ## m donde va la próxima esquirla
 
+var _spray: GPUParticles3D
 const SHARD_EVERY := 0.4
 const SHARD_LIFE := 0.7
 const FADE := 0.6
@@ -43,6 +44,8 @@ func _ready() -> void:
 	_shard_mat.roughness = 0.2
 	_shard_mat.metallic = 0.2
 	_shard_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_spray = VoxelFx.emitter("spray", 0.4, false, false, Color(0.75, 0.88, 0.98))   # esquirlas en la punta (11-10-2026)
+	add_child(_spray)
 
 func tip() -> float:
 	return minf(_t * speed, length)
@@ -71,6 +74,8 @@ func _physics_process(delta: float) -> void:
 func _process(_delta: float) -> void:
 	Damage.ctx = _wtag
 	var reach := tip()
+	_spray.position = dir * reach + Vector3(0, 0.1, 0)
+	_spray.emitting = _t * speed <= length
 	while _next <= reach and _next <= length:           # la raja y sus esquirlas, según avanza
 		var side := randf_range(-0.25, 0.25)
 		var crack := MeshInstance3D.new()

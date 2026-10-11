@@ -278,6 +278,67 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.04; m.scale_max = 0.09
 			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.0]])
 			m.color_ramp = _ramp([[0.0, Color(1, 1, 1, 1)], [1.0, Color(0.7, 0.7, 0.7, 0.0)]])
+		"fuse":                   # mecha encendida: chispitas que saltan y caen (tinte: color)
+			p.draw_pass_1 = cube("add")
+			p.amount = 14
+			p.lifetime = 0.35
+			m.spread = 70.0
+			m.initial_velocity_min = 0.8; m.initial_velocity_max = 2.0
+			m.gravity = Vector3(0, -5.0, 0)
+			m.scale_min = 0.025; m.scale_max = 0.045
+			m.color_ramp = _ramp([[0.0, Color(1.0, 0.9, 0.55, 1.0)], [1.0, Color(1.0, 0.4, 0.1, 0.0)]])
+		"drip":                   # gotas que se escurren de lo que vuela (tinte: color)
+			p.draw_pass_1 = cube("mix")
+			p.amount = 12
+			p.lifetime = 0.5
+			m.spread = 30.0
+			m.direction = Vector3(0, -1, 0)
+			m.initial_velocity_min = 0.2; m.initial_velocity_max = 0.6
+			m.gravity = Vector3(0, -6.0, 0)
+			m.scale_min = 0.03; m.scale_max = 0.06
+			m.color_ramp = _ramp([[0.0, Color(0.7, 0.7, 0.7, 0.95)], [1.0, Color(0.6, 0.6, 0.6, 0.0)]])
+		"streak":                 # rastro: cubitos que se quedan donde pasa y se apagan (tinte: color)
+			p.draw_pass_1 = cube("add")
+			p.amount = 40
+			p.lifetime = 0.35
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.5
+			m.spread = 180.0
+			m.initial_velocity_min = 0.0; m.initial_velocity_max = 0.15
+			m.scale_min = 0.06; m.scale_max = 0.11
+			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.85, 0.85, 0.85, 0.9)], [1.0, Color(0.5, 0.5, 0.5, 0.0)]])
+		"vortex_in":              # motas que giran hacia el centro de un vórtice
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 14.0, 20.0, 50.0))
+			p.lifetime = 1.1
+			p.local_coords = true
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
+			m.emission_ring_axis = Vector3.UP
+			m.emission_ring_radius = r
+			m.emission_ring_inner_radius = r * 0.7
+			m.emission_ring_height = 0.1
+			m.spread = 0.0
+			m.initial_velocity_min = 0.0; m.initial_velocity_max = 0.0
+			m.radial_velocity_min = -r * 0.9; m.radial_velocity_max = -r * 0.7
+			m.orbit_velocity_min = 0.35; m.orbit_velocity_max = 0.55
+			m.gravity = Vector3(0, 0.6, 0)
+			m.scale_min = 0.04; m.scale_max = 0.09
+			m.scale_curve = _curve([[0.0, 0.3], [0.5, 1.0], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.6, 0.45, 0.9, 0.0)], [0.3, Color(0.75, 0.6, 1.0, 1.0)],
+				[0.7, Color(0.4, 0.8, 0.8, 1.0)], [1.0, Color(0.9, 0.75, 0.3, 0.0)]])
+		"spray":                  # esquirlas que saltan de la grieta (tinte: color)
+			p.draw_pass_1 = cube("lit")
+			p.amount = 50
+			p.lifetime = 0.6
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r
+			m.spread = 35.0
+			m.initial_velocity_min = 2.0; m.initial_velocity_max = 4.5
+			m.gravity = Vector3(0, -14.0, 0)
+			m.angular_velocity_min = -400.0; m.angular_velocity_max = 400.0
+			m.scale_min = 0.06; m.scale_max = 0.12
+			m.scale_curve = _curve([[0.0, 1.0], [0.8, 1.0], [1.0, 0.0]])
 		"gas":                    # gas de cloro: bocanadas lentas, turbias, que suben poco
 			p.draw_pass_1 = cube("mix")
 			p.amount = int(clampf(r * 8.0, 8.0, 22.0))

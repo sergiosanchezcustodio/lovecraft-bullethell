@@ -27,6 +27,7 @@ var lure := 0.0
 var net := 0.0                                   ## red de pesca: s que inmoviliza a los de dentro
 var bonus := {}
 var _landed := false
+var _trail: GPUParticles3D
 
 func setup(p_world: CombatWorld, p_start: Vector3, p_end: Vector3, p_flight: float, p_fuse: float,
 		p_radius: float, p_damage: float, p_tint: Color) -> void:
@@ -77,6 +78,18 @@ func _ready() -> void:
 	_spark.omni_range = 1.6
 	_spark.position = Vector3(0, 0.1, 0.12)
 	add_child(_spark)
+	# rastro en vuelo según lo que es (11-10-2026): mecha que chisporrotea, llama del trapo del
+	# Molotov o gotas que se escurren del frasco y de la baba
+	var trail: GPUParticles3D = null
+	match look:
+		"dinamita", "granada": trail = VoxelFx.emitter("fuse", 0.2)
+		"bengala": trail = VoxelFx.emitter("fuse", 0.2, false, false, Color(1.0, 0.45, 0.4))
+		"molotov": trail = VoxelFx.emitter("flames", 0.12)
+		"frasco", "baba": trail = VoxelFx.emitter("drip", 0.2, false, false, Color(tint.r, tint.g, tint.b) * 0.8)
+	if trail:
+		trail.position = Vector3(0, 0.05, 0.12)
+		add_child(trail)
+		_trail = trail
 
 func _physics_process(delta: float) -> void:
 	Damage.ctx = _wtag
@@ -89,6 +102,7 @@ func _physics_process(delta: float) -> void:
 	elif not _landed:
 		_landed = true
 		position = end + Vector3(0, 0.05, 0)
+		if _trail and look not in ["dinamita", "granada"]: _trail.emitting = false   # la mecha sigue
 		if not zone.is_empty() or lure > 0.0 or net > 0.0 or fuse <= 0.0:
 			_land()
 			return

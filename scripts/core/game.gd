@@ -689,7 +689,7 @@ func _dummies(n: int) -> void:
 
 ## Efecto de prueba delante del jugador, cada 3 s (capturas y comparaciones):
 ## fx_demo=explosion|fire|acid|gas|dust|jet|frost|fireball|wave|death|death_big|beam|chain|tether|
-## slash|stab|sigil|sweep|impact.
+## slash|stab|sigil|sweep|impact|thrown|vortex|boomerang|fissure|tentacle.
 ## Empieza a los 2 s.
 func _fx_demo(kind: String) -> void:
 	var at := player.position + Vector3(2.5, 0, -1.0)
@@ -742,6 +742,22 @@ func _fx_demo(kind: String) -> void:
 					var looks := [0, 6, 9, 12]
 					get_tree().create_timer(i * 0.04).timeout.connect(func() -> void:
 						world.bullets.impact(at + Vector3(randf_range(-1.2, 1.2), 0, randf_range(-1.2, 1.2)), looks[i % 4]))
+			"thrown":                                    # dinamita, Molotov y frasco en vuelo
+				var looks := ["dinamita", "molotov", "frasco"]
+				for i in 3:
+					var te := ThrownExplosive.new()
+					te.setup(world, player.position + Vector3(0, 1.0, 0), at + Vector3(i * 1.4 - 1.4, 0, i * 0.8), 1.4, 9.0, 2.0, 0.0,
+						Color(0.45, 0.85, 0.2) if i == 2 else Color(1.0, 0.8, 0.3))
+					te.configure(looks[i], 2.4, {}, 0.0, {})
+					world.fx.add_child(te)
+			"vortex":
+				world.fx.add_child(Vortex.new().setup(world, player.position, at, 2.5, 2.4, 0.0, 0.4, 0.0, 2.6, {}))
+			"boomerang":
+				world.fx.add_child(Boomerang.new().setup(player, world, dir, 6.0, 7.0, 0.4, 0.0, 0.0, {}))
+			"fissure":
+				world.fx.add_child(Fissure.new().setup(world, player.position, dir, 6.0, 8.0, 0.6, 0.0, 0.0, {}))
+			"tentacle":
+				world.fx.add_child(TentacleSpike.new().setup(world, at, 1.4, 0.0, 0.0, {}))
 			"sweep":
 				world.fx.add_child(SweepBeam.new().setup(player, world, 6.0, 0.3, 140.0, 0.0, 0.35, 2.6, {}))
 			_:

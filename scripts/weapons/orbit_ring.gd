@@ -66,6 +66,7 @@ func _make_page() -> Node3D:
 			link.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 			add_child(link)
 			_chain.append(link)
+		holder.add_child(VoxelFx.emitter("streak", 0.4, false, false, Color(0.5, 0.52, 0.55)))
 		return holder
 	var mi := MeshInstance3D.new()
 	var bm := BoxMesh.new()
@@ -78,6 +79,7 @@ func _make_page() -> Node3D:
 	mat.emission_energy_multiplier = 0.55
 	mat.roughness = 0.8
 	mi.material_override = mat
+	mi.add_child(VoxelFx.emitter("streak", 0.2, false, false, Color(0.95, 0.7, 0.3)))   # rastro dorado (11-10-2026)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mi.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(mi)

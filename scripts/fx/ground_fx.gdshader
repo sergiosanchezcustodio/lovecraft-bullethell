@@ -10,7 +10,8 @@ render_mode unshaded, cull_disabled, depth_draw_never, shadows_disabled;
 // dorada con motas que destellan; 6 salpicadura: mancha del color `tint` con gotas
 // alrededor, que se seca y aclara con `age`; 7 signo: anillos con runas que giran y estrella
 // de cinco puntas (color `tint`, aparece con `age`); 8 tajo: barrido circular con estela
-// (`age` = avance del giro, 0..1).
+// (`age` = avance del giro, 0..1); 9 vórtice: brazos en espiral que giran hacia dentro,
+// iridiscentes, con el centro oscuro.
 
 uniform int mode = 0;
 uniform float fade = 1.0;
@@ -108,6 +109,17 @@ void fragment() {
 		ALBEDO = col8 * 0.75;
 		EMISSION = col8 * k * 1.2;
 		ALPHA = clamp(k * 1.6 + edge8 * band, 0.0, 1.0) * fade;
+	} else if (mode == 9) {
+		if (r > 1.0) discard;
+		float ang = atan(q.y, q.x);
+		float sp = fract((ang + log(r + 0.05) * 3.2 - TIME * 2.4) / 6.2831853 * 3.0);
+		float arm = step(sp, 0.32) * step(0.12, r);
+		vec3 c9 = mix(vec3(0.55, 0.35, 0.95), vec3(0.3, 0.85, 0.85), 0.5 + 0.5 * sin(ang * 3.0 + TIME));
+		c9 = mix(c9, vec3(0.95, 0.75, 0.25), step(0.82, hash(c + floor(TIME * 6.0))) * arm);
+		float core = 1.0 - smoothstep(0.0, 0.25, r);
+		ALBEDO = mix(c9 * 0.35, vec3(0.02, 0.0, 0.04), core);
+		EMISSION = c9 * arm * (1.0 - r) * 0.9;
+		ALPHA = (arm * (1.0 - r * 0.6) * 0.85 + core * 0.9 + 0.12 * (1.0 - r)) * fade;
 	} else {
 	float edge = 0.78 + 0.22 * fbm(n * 0.9);
 	if (mode == 6) {                                   // salpicadura: núcleo más pequeño y gotas sueltas

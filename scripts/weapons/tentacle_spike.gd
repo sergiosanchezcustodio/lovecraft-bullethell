@@ -13,6 +13,7 @@ var _t := 0.0
 var _struck := false
 var _warn: Telegraph
 var _bits: Array[MeshInstance3D] = []
+var _hole_mat: ShaderMaterial
 
 const WARN := 0.35
 const RISE := 0.12
@@ -55,6 +56,15 @@ func _physics_process(delta: float) -> void:
 	_t += delta
 	if not _struck and _t >= WARN:
 		_struck = true
+		var burst := VoxelFx.emitter("debris", radius, true, false, Color(0.5, 0.55, 0.4))   # tierra que salta (11-10-2026)
+		burst.position.y = 0.35                      # por encima del suelo de colisión
+		add_child(burst)
+		VoxelFx.ensure_floor(get_parent())
+		var hole := VoxelFx.ground(6, radius * 0.9)    # tierra removida donde brota
+		hole.material_override.set_shader_parameter("tint", Color(0.16, 0.14, 0.1))
+		hole.material_override.set_shader_parameter("age", 0.6)
+		add_child(hole)
+		_hole_mat = hole.material_override
 		Damage.ctx = _wtag
 		for e in world.enemies_in_circle(global_position, radius):
 			var d := Damage.new(damage, 0.0)
@@ -66,6 +76,7 @@ func _physics_process(delta: float) -> void:
 func _process(_delta: float) -> void:
 	if _t < WARN: return
 	var u := _t - WARN
+	if _hole_mat: _hole_mat.set_shader_parameter("fade", 1.0 - smoothstep(RISE + HOLD, RISE + HOLD + SINK, u))
 	var h := smoothstep(0.0, RISE, u) * (1.0 - smoothstep(RISE + HOLD, RISE + HOLD + SINK, u))
 	for i in BITS:
 		var k := float(i) / BITS

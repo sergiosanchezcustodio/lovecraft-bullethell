@@ -19,6 +19,7 @@ var _tick := 0.0
 var _spheres: Array[MeshInstance3D] = []
 var _disc_mat: ShaderMaterial
 var _light: OmniLight3D
+var _motes: GPUParticles3D
 
 const FADE := 0.4
 const SPHERES := 7
@@ -31,24 +32,19 @@ func setup(p_world: CombatWorld, origin: Vector3, p_goal: Vector3, p_speed: floa
 	return self
 
 func _ready() -> void:
-	var disc := MeshInstance3D.new()
-	var pm := PlaneMesh.new()
-	pm.size = Vector2(2, 2)
-	disc.mesh = pm
-	_disc_mat = ShaderMaterial.new()
-	_disc_mat.shader = preload("res://scripts/fx/telegraph.gdshader")
-	_disc_mat.set_shader_parameter("fill", true)
-	_disc_mat.set_shader_parameter("soft", true)
-	disc.material_override = _disc_mat
-	disc.scale = Vector3.ONE * radius
+	# remolino en celdas con brazos en espiral que giran hacia dentro, y motas que caen en
+	# espiral hacia el centro (11-10-2026)
+	var disc := VoxelFx.ground(9, radius)
 	disc.position.y = 0.05
-	disc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_disc_mat = disc.material_override
 	add_child(disc)
+	_motes = VoxelFx.emitter("vortex_in", radius)
+	add_child(_motes)
 	var cols := [Color(0.95, 0.75, 0.25), Color(0.55, 0.35, 0.95), Color(0.3, 0.85, 0.85)]
 	for i in SPHERES:                             # las esferas de Yog-Sothoth, que se entrecruzan
 		var mi := MeshInstance3D.new()
-		var sm := SphereMesh.new()
-		sm.radius = 0.22; sm.height = 0.44; sm.radial_segments = 10; sm.rings = 5
+		var sm := BoxMesh.new()                    # cubos, a juego con el voxel (eran esferas)
+		sm.size = Vector3.ONE * 0.34
 		var m := StandardMaterial3D.new()
 		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		m.albedo_color = cols[i % cols.size()] * 0.75
@@ -87,10 +83,12 @@ func _physics_process(delta: float) -> void:
 
 func _process(_delta: float) -> void:
 	var k := clampf(minf(_t / FADE, (life + FADE - _t) / FADE), 0.0, 1.0)
-	_disc_mat.set_shader_parameter("color", Color(0.35, 0.2, 0.6, 0.35 * k))
+	_disc_mat.set_shader_parameter("fade", k)
+	if _t >= life: _motes.emitting = false
 	for i in _spheres.size():
 		var a := _t * (2.0 + 0.4 * i) + TAU * i / _spheres.size()
 		var r := 0.45 + 0.25 * sin(_t * 3.0 + i)
 		_spheres[i].position = Vector3(cos(a) * r, 1.0 + 0.35 * sin(a * 1.3 + i), sin(a) * r)
 		_spheres[i].scale = Vector3.ONE * k * (0.8 + 0.3 * sin(_t * 5.0 + i * 2.0))
+		_spheres[i].rotation = Vector3(_t * 2.0 + i, _t * 1.3, i * 0.7)
 	_light.light_energy = 1.5 * k

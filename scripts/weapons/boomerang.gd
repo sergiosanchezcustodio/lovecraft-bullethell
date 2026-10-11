@@ -57,6 +57,7 @@ func _ready() -> void:
 		band.material_override = pm
 		band.position = Vector3(0, 0, 0.12)
 		arm.add_child(band)
+	add_child(VoxelFx.emitter("streak", 0.35, false, false, Color(0.75, 0.6, 0.4)))   # rastro al girar (11-10-2026)
 	reset_physics_interpolation.call_deferred()
 
 func _physics_process(delta: float) -> void:
