@@ -688,7 +688,8 @@ func _dummies(n: int) -> void:
 		add_child(d)
 
 ## Efecto de prueba delante del jugador, cada 3 s (capturas y comparaciones):
-## fx_demo=explosion|fire|acid|gas|dust|jet|frost|fireball|wave. Empieza a los 2 s.
+## fx_demo=explosion|fire|acid|gas|dust|jet|frost|fireball|wave|death|death_big|beam|chain|tether.
+## Empieza a los 2 s.
 func _fx_demo(kind: String) -> void:
 	var at := player.position + Vector3(2.5, 0, -1.0)
 	var spawn := func() -> void:
@@ -708,10 +709,32 @@ func _fx_demo(kind: String) -> void:
 				world.fx.add_child(Fireball.new().setup(world, player.position, dir, 6.0, 9.0, 0.5, 0.0, 0.9, 2.0, 0.0, {}))
 			"wave":
 				world.fx.add_child(Shockwave.new().setup(player, world, 4.5, 0.5, 0.0, 0.0, 0.0, {}))
+			"death", "death_big":
+				var big := kind == "death_big"
+				var id := "acechador" if big else "pinguino"
+				var root := VoxelBuilder.load_model("res://models/%s.json" % id)
+				var fx := DeathBurst.new()
+				fx.setup(id, 0.9 if big else 0.45, root, big)
+				fx.position = at
+				world.fx.add_child(fx)
+				root.free()
+			"beam":
+				var b := Beam.new()
+				b.setup(player.position + Vector3(0, 1.0, 0), dir, 7.0, 0.15, 0.3)
+				world.fx.add_child(b)
+			"chain":
+				var pts: Array[Vector3] = [player.position, at, at + Vector3(2.0, 0, 1.5), at + Vector3(3.5, 0, -0.5)]
+				world.fx.add_child(ChainBolt.new().setup(pts))
+			"tether":
+				world.fx.add_child(TetherBeam.new().setup(player, world, 0.0, 0.2, 0.3, 3.0, 8.0, 2.5, {}))
 			_:
 				var z: int = {"fire": WeaponData.Zone.FIRE, "acid": WeaponData.Zone.ACID, "gas": WeaponData.Zone.GAS,
 					"dust": WeaponData.Zone.DUST}.get(kind, WeaponData.Zone.FIRE)
 				world.fx.add_child(DamageZone.new().setup(world, z, at, 1.8, 2.6, 0.0))
+	if kind == "tether":                                # el rayo necesita a quién morder
+		var d := TrainingDummy.new().setup(world, "fragmento")
+		d.position = at + Vector3(1.5, 0, 0)
+		add_child(d)
 	var t := Timer.new()
 	t.wait_time = 3.0
 	t.timeout.connect(spawn)

@@ -8,6 +8,8 @@ static var _cube_add: BoxMesh
 static var _cube_mix: BoxMesh
 static var _cube_lit: BoxMesh
 static var _ground_shader: Shader
+static var _tex_cache := {}                   ## rampas y curvas ya creadas (por sus puntos)
+static var _mat_cache := {}                   ## receta|radio -> material de proceso compartido
 
 ## Cubo sin iluminar: aditivo (fuego, chispas), mezclado (humo, burbujas) o iluminado (cascotes).
 static func cube(kind: String) -> BoxMesh:
@@ -31,6 +33,17 @@ static func _make_cube(blend: int, lit: bool) -> BoxMesh:
 	box.material = m
 	return box
 
+## Un único suelo para que reboten cascotes y trozos, compartido por todos los efectos que
+## cuelgan de `parent` (con una caja por efecto, cada sistema de partículas comprobaba
+## todas: con muchas muertes seguidas se notaba).
+static func ensure_floor(parent: Node) -> void:
+	if parent == null or parent.has_meta("fx_floor"): return
+	parent.set_meta("fx_floor", true)
+	var box := GPUParticlesCollisionBox3D.new()
+	box.size = Vector3(400.0, 0.4, 400.0)
+	box.position.y = -0.2
+	parent.add_child.call_deferred(box)
+
 ## Mancha animada del suelo (`ground_fx.gdshader`): 0 fuego, 1 ácido, 2 quemado.
 static func ground(mode: int, radius: float) -> MeshInstance3D:
 	if _ground_shader == null: _ground_shader = preload("res://scripts/fx/ground_fx.gdshader")
@@ -49,6 +62,8 @@ static func ground(mode: int, radius: float) -> MeshInstance3D:
 	return mi
 
 static func _ramp(stops: Array) -> GradientTexture1D:
+	var key := "r" + var_to_str(stops)
+	if _tex_cache.has(key): return _tex_cache[key]
 	var g := Gradient.new()
 	var offs := PackedFloat32Array()
 	var cols := PackedColorArray()
@@ -58,18 +73,26 @@ static func _ramp(stops: Array) -> GradientTexture1D:
 	g.colors = cols
 	var t := GradientTexture1D.new()
 	t.gradient = g
+	_tex_cache[key] = t
 	return t
 
 static func _curve(points: Array) -> CurveTexture:
+	var key := "c" + var_to_str(points)
+	if _tex_cache.has(key): return _tex_cache[key]
 	var c := Curve.new()
 	for p in points: c.add_point(Vector2(p[0], p[1]))
 	var t := CurveTexture.new()
 	t.curve = c
+	_tex_cache[key] = t
 	return t
 
 ## Receta -> GPUParticles3D listo para añadir; empieza a emitir al entrar en la escena.
-## `r` es el radio del efecto (m).
-static func emitter(recipe: String, r: float, one_shot := false) -> GPUParticles3D:
+## `r` es el radio del efecto (m). El material de proceso se comparte entre emisores de la
+## misma receta y radio (crearlo con sus texturas en cada muerte costaba fotogramas): quien
+## vaya a cambiarlo (caja, dispersión…) pide `own = true` y recibe una copia. `tint` tiñe la
+## receta (forma parte de la clave de la caché).
+static func emitter(recipe: String, r: float, one_shot := false, own := false,
+		tint := Color.WHITE) -> GPUParticles3D:
 	var p := GPUParticles3D.new()
 	var m := ParticleProcessMaterial.new()
 	p.process_material = m
@@ -201,6 +224,60 @@ static func emitter(recipe: String, r: float, one_shot := false) -> GPUParticles
 			m.gravity = Vector3(0, -9.0, 0)
 			m.scale_min = 0.03; m.scale_max = 0.06
 			m.color_ramp = _ramp([[0.0, Color(1.0, 0.95, 0.7, 1.0)], [1.0, Color(1.0, 0.45, 0.1, 0.0)]])
+		"chunks":                 # trozos de un enemigo al morir (el color lo pone quien lo usa)
+			p.draw_pass_1 = cube("lit")
+			p.amount = int(clampf(r * 32.0, 12.0, 44.0))
+			p.lifetime = 1.2
+			p.explosiveness = 1.0
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.6
+			m.spread = 75.0
+			m.initial_velocity_min = 1.8; m.initial_velocity_max = 4.8
+			m.gravity = Vector3(0, -14.0, 0)
+			m.collision_mode = ParticleProcessMaterial.COLLISION_RIGID
+			m.collision_bounce = 0.3
+			m.collision_friction = 0.7
+			m.collision_use_scale = true
+			m.angular_velocity_min = -500.0; m.angular_velocity_max = 500.0
+			m.scale_min = 0.06; m.scale_max = 0.14
+			m.scale_curve = _curve([[0.0, 1.0], [0.75, 1.0], [1.0, 0.0]])
+		"death_puff":             # fogonazo breve al morir (color de quien lo usa)
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 16.0, 8.0, 24.0))
+			p.lifetime = 0.35
+			p.explosiveness = 1.0
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.5
+			m.spread = 180.0
+			m.initial_velocity_min = r * 2.0; m.initial_velocity_max = r * 4.0
+			m.damping_min = r * 6.0; m.damping_max = r * 9.0
+			m.scale_min = 0.08; m.scale_max = 0.16
+			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.6, 0.6, 0.6, 1.0)], [1.0, Color(0.3, 0.3, 0.3, 0.0)]])
+		"zap":                    # chispas de impacto de un rayo (color: m.color de quien lo usa)
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 14.0, 8.0, 20.0))
+			p.lifetime = 0.4
+			p.explosiveness = 0.9
+			m.spread = 180.0
+			m.initial_velocity_min = 2.0; m.initial_velocity_max = 5.0
+			m.damping_min = 6.0; m.damping_max = 10.0
+			m.gravity = Vector3(0, -4.0, 0)
+			m.scale_min = 0.035; m.scale_max = 0.07
+			m.color_ramp = _ramp([[0.0, Color(1, 1, 1, 1)], [1.0, Color(0.6, 0.6, 0.6, 0.0)]])
+		"beam_motes":             # motas que se desprenden a lo largo de un haz (caja: la pone quien lo usa)
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 6.0, 10.0, 40.0))
+			p.lifetime = 0.45
+			p.local_coords = true
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+			m.emission_box_extents = Vector3(0.1, 0.1, r * 0.5)
+			m.spread = 180.0
+			m.initial_velocity_min = 0.4; m.initial_velocity_max = 1.4
+			m.gravity = Vector3(0, 0.8, 0)
+			m.scale_min = 0.04; m.scale_max = 0.09
+			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(1, 1, 1, 1)], [1.0, Color(0.7, 0.7, 0.7, 0.0)]])
 		"gas":                    # gas de cloro: bocanadas lentas, turbias, que suben poco
 			p.draw_pass_1 = cube("mix")
 			p.amount = int(clampf(r * 8.0, 8.0, 22.0))
@@ -299,6 +376,11 @@ static func emitter(recipe: String, r: float, one_shot := false) -> GPUParticles
 			m.gravity = Vector3(0, -2.0, 0)
 			m.scale_min = 0.08; m.scale_max = 0.18
 			m.color_ramp = _ramp([[0.0, Color(0.85, 0.85, 0.9, 0.7)], [1.0, Color(0.8, 0.8, 0.85, 0.0)]])
+	m.color = tint
+	var key := "%s|%.1f|%s" % [recipe, r, tint.to_html()]
+	if _mat_cache.has(key): p.process_material = _mat_cache[key]
+	else: _mat_cache[key] = m
+	if own: p.process_material = p.process_material.duplicate()
 	# empieza ya colocado en la escena: emitiendo desde antes, la primera partícula salía en
 	# el origen del mundo (un cubo suelto lejos del efecto)
 	p.emitting = false

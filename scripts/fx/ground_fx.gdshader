@@ -7,7 +7,8 @@ render_mode unshaded, cull_disabled, depth_draw_never, shadows_disabled;
 // mueven, borde más oscuro y burbujas que se hinchan y revientan; 2 quemado: mancha negra
 // irregular con brasas que se enfrían con `age` (0..1); 3 onda: anillo de celdas con runas
 // que se abre (`wave_r`, 0..1, color `tint`); 4 gas: nubes turbias que derivan; 5 polvo: tierra
-// dorada con motas que destellan.
+// dorada con motas que destellan; 6 salpicadura: mancha del color `tint` con gotas
+// alrededor, que se seca y aclara con `age`.
 
 uniform int mode = 0;
 uniform float fade = 1.0;
@@ -60,6 +61,11 @@ void fragment() {
 		ALPHA = clamp(front + rune * 0.8 + trail * 0.25, 0.0, 1.0) * fade;
 	} else {
 	float edge = 0.78 + 0.22 * fbm(n * 0.9);
+	if (mode == 6) {                                   // salpicadura: núcleo más pequeño y gotas sueltas
+		edge = 0.45 + 0.35 * fbm(n * 1.4);
+		float drop = step(0.975, hash(floor(c / 2.0) + seed)) * step(r, 0.95) * step(0.5, fbm(n * 0.7));
+		edge = max(edge, r * drop + 0.001 * drop);
+	}
 	float inside = step(r, edge);
 	if (inside < 0.5) discard;
 	float rim = smoothstep(edge - 0.18, edge, r);          // 0 en el centro, 1 en el borde
@@ -122,6 +128,13 @@ void fragment() {
 		col = mix(col, vec3(1.0, 0.82, 0.4) * 0.7, mote * (1.0 - rim));
 		emi = vec3(1.0, 0.8, 0.35) * mote * (1.0 - rim) * 0.8;
 		a = mix(0.85, 0.4, rim);
+	} else if (mode == 6) {
+		float wet = 1.0 - smoothstep(0.0, 0.8, age);
+		col = tint * 0.6 * (0.8 + 0.25 * floor(fbm(n * 1.5) * 3.0) / 3.0);
+		float shine = step(0.9, hash(c + 33.0)) * wet;
+		col = mix(col, tint * 1.1 + 0.06, shine * 0.5);
+		emi = vec3(0.0);
+		a = mix(0.85, 0.6, rim) * (0.55 + 0.45 * wet);
 	} else {
 		// quemado: negro hollín irregular con brasas que se apagan
 		float soot = fbm(n * 1.3);

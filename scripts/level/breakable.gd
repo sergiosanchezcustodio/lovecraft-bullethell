@@ -11,6 +11,7 @@ var world: CombatWorld
 var hit_radius := 0.45
 var health := 18.0
 var _model: Node3D
+var _model_id := "atrezo_caja"
 var _flash := 0.0
 var _mat: StandardMaterial3D
 const MODELS := [["rompible_vasija", 1.0], ["rompible_suministros", 1.1]]
@@ -27,6 +28,7 @@ func _ready() -> void:
 	holder.scale = Vector3.ONE * float(m[1])
 	holder.rotation.y = randf() * TAU
 	add_child(holder)
+	_model_id = m[0]
 	_model = VoxelBuilder.load_model("res://models/%s.json" % m[0])
 	holder.add_child(_model)
 	_mat = StandardMaterial3D.new()
@@ -53,7 +55,7 @@ func _break() -> void:
 	Sfx.play("glass")
 	world.remove_breakable(self)
 	var fx := DeathBurst.new()
-	fx.setup("atrezo_caja", 0.4)
+	fx.setup(_model_id, 0.4, _model)
 	fx.position = global_position
 	world.fx.add_child(fx)
 	world.fx.add_child(Pickup.new().setup(world, global_position, Pickup.roll()))

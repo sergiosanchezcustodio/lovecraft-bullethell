@@ -51,11 +51,7 @@ func _ready() -> void:
 	add_child(fx)
 	for r in ["fireball", "blast_smoke", "sparks", "debris"]:
 		fx.add_child(VoxelFx.emitter(r, radius, true))
-	# suelo para que reboten los cascotes
-	var floor_col := GPUParticlesCollisionBox3D.new()
-	floor_col.size = Vector3(radius * 8.0, 0.4, radius * 8.0)
-	floor_col.position.y = -0.2
-	add_child(floor_col)
+	VoxelFx.ensure_floor(get_parent())                 # suelo para que reboten los cascotes
 
 func _flat_disc(c: Color) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()

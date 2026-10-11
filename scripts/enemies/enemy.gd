@@ -307,7 +307,7 @@ func _die() -> void:
 	if _inject_t > 0.0 and _ally_time > 0.0:            # se levanta como aliado
 		world.fx.add_child(Reanimated.new().setup(world, data, global_position, facing, _ally_time, _inject_bonus))
 	var fx := DeathBurst.new()
-	fx.setup(model_name, data.body_radius)
+	fx.setup(model_name, data.body_radius, model, data.elite or data.unique)
 	fx.position = global_position
 	world.fx.add_child(fx)
 	died.emit(self)

@@ -11,6 +11,7 @@ var _glow: MeshInstance3D
 var _mat_core: StandardMaterial3D
 var _mat_glow: StandardMaterial3D
 var _light: OmniLight3D
+var _motes: GPUParticles3D
 
 ## `core` y `glow` cambian los colores (rayo del Mini-Mi-Go); por defecto, los del Trapezoedro.
 func setup(origin: Vector3, dir: Vector3, length: float, half_width: float, life: float,
@@ -24,6 +25,15 @@ func setup(origin: Vector3, dir: Vector3, length: float, half_width: float, life
 	_mat_core = _core.material_override
 	_glow = _bar(Vector3(half_width * 2.2, half_width * 2.2, length), glow, true, 0.6)
 	_mat_glow = _glow.material_override
+	# motas que se desprenden del haz y chispas donde acaba (11-10-2026)
+	var tint := Color(core.r * 0.8, core.g * 0.8, core.b * 0.8)
+	var motes := VoxelFx.emitter("beam_motes", length, true, false, tint)
+	motes.one_shot = false
+	add_child(motes)
+	_motes = motes
+	var zap := VoxelFx.emitter("zap", half_width * 6.0, true, false, tint)
+	zap.position = Vector3(0, 0, length * 0.5)
+	add_child(zap)
 	_light = OmniLight3D.new()
 	_light.light_color = Color(glow.r, glow.g, glow.b)
 	_light.light_energy = 2.0
@@ -48,6 +58,12 @@ func _bar(size: Vector3, c: Color, additive: bool, k: float) -> MeshInstance3D:
 func _process(delta: float) -> void:
 	Damage.ctx = _wtag
 	_t += delta
+	if _t >= _life:                                   # el haz ya se apagó: dejamos acabar las chispas
+		_motes.emitting = false
+		_core.visible = false; _glow.visible = false; _light.light_energy = 0.0
+		visible = _t < _life + 0.4
+		if _t >= _life + 0.45: queue_free()
+		return
 	var u := clampf(_t / _life, 0.0, 1.0)
 	var k := 1.0 - u * u
 	_core.scale = Vector3(k, k, 1.0)
@@ -55,4 +71,3 @@ func _process(delta: float) -> void:
 	_mat_glow.albedo_color.a = 0.45 * k
 	_mat_core.albedo_color.a = 0.95 * k
 	_light.light_energy = 2.0 * k
-	if _t >= _life: queue_free()

@@ -25,6 +25,8 @@ var _glow: MeshInstance3D
 var _mat_core: StandardMaterial3D
 var _mat_glow: StandardMaterial3D
 var _light: OmniLight3D
+var _sparks: GPUParticles3D                  ## chispas donde muerde el rayo (11-10-2026)
+var _motes: GPUParticles3D
 
 const FADE := 0.2
 const COLD := Color(0.55, 0.8, 1.0)          # frío al empezar
@@ -48,6 +50,13 @@ func _ready() -> void:
 	_light.light_color = COLD
 	_light.omni_range = 2.5
 	add_child(_light)
+	_sparks = VoxelFx.emitter("zap", 0.8, false, true)
+	_sparks.one_shot = false
+	_sparks.explosiveness = 0.0
+	_sparks.amount = 16
+	_light.add_child(_sparks)
+	_motes = VoxelFx.emitter("beam_motes", 4.0, false, true)
+	add_child(_motes)
 	visible = false
 
 func _bar(w: float, additive: bool) -> MeshInstance3D:
@@ -109,3 +118,8 @@ func _process(_delta: float) -> void:
 	_light.position = Vector3(0, 0, -len * 0.5)                     # en el extremo del enemigo (look_at mira por -Z)
 	_light.light_color = c
 	_light.light_energy = (0.8 + u * 1.4) * fade
+	(_sparks.process_material as ParticleProcessMaterial).color = Color(c.r, c.g, c.b) * 0.8
+	_sparks.amount_ratio = 0.4 + 0.6 * u                              # más chispas cuanto más quema
+	var mm := _motes.process_material as ParticleProcessMaterial
+	mm.emission_box_extents = Vector3(0.04, 0.04, len * 0.5)
+	mm.color = Color(c.r, c.g, c.b) * 0.6

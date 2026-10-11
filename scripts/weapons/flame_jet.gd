@@ -39,7 +39,7 @@ func _ready() -> void:
 	Damage.ctx = _wtag
 	# chorro en cubitos (11-10-2026): núcleo que pasa de blanco a rojo y se ensancha, con
 	# humo negro escapando por arriba; helado, en azules y cayendo
-	_parts = VoxelFx.emitter("jet", length)
+	_parts = VoxelFx.emitter("jet", length, false, true)
 	_parts.process_material.spread = rad_to_deg(half_angle) * 0.8
 	add_child(_parts)
 	if frost:

@@ -7,6 +7,7 @@ var _wtag := Damage.ctx                    ## arma que lo creó (estadísticas)
 var _points: Array[Vector3] = []
 var _t := 0.0
 var _mat: StandardMaterial3D
+var _glow_mat: StandardMaterial3D
 var _segs: Array[MeshInstance3D] = []
 var _light: OmniLight3D
 
@@ -24,7 +25,16 @@ func _ready() -> void:
 	_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_mat.albedo_color = Color(0.75, 0.9, 1.0, 1.0)
+	_glow_mat = StandardMaterial3D.new()                 # halo aditivo alrededor del zigzag (11-10-2026)
+	_glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_glow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_glow_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	_glow_mat.albedo_color = Color(0.25, 0.4, 0.7, 0.6)
 	_rebuild()
+	for i in range(1, _points.size()):                    # chispas donde salta
+		var zap := VoxelFx.emitter("zap", 1.0, true, false, Color(0.6, 0.8, 1.0))
+		zap.position = _points[i] + Vector3(0, 0.8, 0)
+		add_child(zap)
 	_light = OmniLight3D.new()
 	_light.light_color = Color(0.6, 0.8, 1.0)
 	_light.light_energy = 2.5
@@ -59,12 +69,24 @@ func _seg(a: Vector3, b: Vector3) -> void:
 	mi.global_position = (a + b) * 0.5
 	mi.look_at(b, Vector3.UP if absf((b - a).normalized().y) < 0.99 else Vector3.RIGHT)
 	_segs.append(mi)
+	var halo := MeshInstance3D.new()
+	var hb := BoxMesh.new()
+	hb.size = Vector3(0.22, 0.22, len)
+	halo.mesh = hb
+	halo.material_override = _glow_mat
+	halo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.add_child(halo)
 
 func _process(delta: float) -> void:
 	Damage.ctx = _wtag
 	_t += delta
+	if _t >= LIFE:                                    # el rayo ya se apagó: dejamos acabar las chispas
+		for sg in _segs: sg.visible = false
+		_light.light_energy = 0.0
+		if _t >= LIFE + 0.42: queue_free()
+		return
 	if fmod(_t, 0.07) < delta: _rebuild()
 	var k := 1.0 - _t / LIFE
 	_mat.albedo_color.a = clampf(k, 0.0, 1.0) * (0.7 + 0.3 * randf())
+	_glow_mat.albedo_color.a = clampf(k, 0.0, 1.0) * 0.6
 	_light.light_energy = 2.5 * maxf(k, 0.0)
-	if _t >= LIFE: queue_free()

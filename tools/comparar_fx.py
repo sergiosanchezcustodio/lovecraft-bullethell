@@ -12,7 +12,7 @@ CW, CH = 480, 340
 
 def shot(tag, k, i):
     import glob
-    files = sorted(glob.glob(os.path.join(ROOT, 'shots', 'game_fx_%s_%s_*.png' % (tag, k))))
+    files = sorted(glob.glob(os.path.join(ROOT, 'shots', 'game_fx_%s_%s_[0-9]*.png' % (tag, k))))
     return files[i] if i < len(files) else None
 
 def main():
