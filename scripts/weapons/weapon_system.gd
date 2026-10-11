@@ -10,6 +10,7 @@ class Weapon:
 	var timer := 0.0
 	var heat := 0.0                              ## 0..1: cadencia creciente al disparar sin parar (Nagant)
 	var had_target := false                      ## el último disparo tenía a quién apuntar
+	var muzzle_frame := -1                       ## último fotograma con fogonazo (uno por disparo, no por perdigón)
 	var owner_data: CharacterData                ## estadísticas del jugador: los objetos (D-38) las cambian
 	func _init(p_data: WeaponData, p_owner: CharacterData = null) -> void:
 		data = p_data
@@ -273,6 +274,11 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 	if w.stat("stasis") > 0.0:
 		style = BulletManager.Style.YITH
 		effect = BulletManager.Effect.STASIS
+	# fogonazo y humo en la boca de las armas de fuego (11-10-2026): va en el mismo MultiMesh
+	# que las balas y los impactos, sin nodos ni coste por disparo
+	if w.data.category == WeaponData.Category.FIREARM and Engine.get_physics_frames() != w.muzzle_frame:
+		w.muzzle_frame = Engine.get_physics_frames()
+		world.bullets.muzzle(player.global_position + dir * 0.55)
 	world.bullets.spawn(BulletManager.Team.PLAYER, style,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
 		size, Damage.new(dmg(w, false) * dmg_k, 0.0), life, int(w.stat("pierce")),

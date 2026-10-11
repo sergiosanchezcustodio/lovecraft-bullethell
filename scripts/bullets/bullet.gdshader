@@ -45,7 +45,7 @@ void vertex() {
 	vec2 off = VERTEX.xy * s;
 	int st = int(v_style + 0.5);
 	if (st == 13) {
-		s = length(MODEL_MATRIX[0].xyz) * 1.5;          // cuadro fijo: dentro saltan las chispas
+		s = length(MODEL_MATRIX[0].xyz) * (v_phase > 99.5 ? 2.0 : 1.5);   // cuadro fijo; el fogonazo, mayor
 		off = VERTEX.xy * s;
 	} else if (st == 9 || st == 10) {
 		// hoja y chispa: cuadrado que gira (la hoja, rápido)
@@ -85,6 +85,23 @@ void fragment() {
 		int look = int(v_phase + 0.5);
 		vec3 tint = look == 6 ? vec3(1.0, 0.55, 0.2) : (look == 12 ? vec3(0.5, 1.0, 0.45) : (look == 9 ? vec3(0.85, 0.9, 1.0) : (look == 4 ? wisp_color : (look == 5 ? yith_color : player_color))));
 		vec2 g = (floor(UV * 16.0) + 0.5) / 16.0 * 2.0 - 1.0;
+		if (look >= 100) {
+			// fogonazo: destello cálido en cruz muy breve y bocanada de humo gris (tres
+			// cuadrados que suben, crecen y se aclaran)
+			float fl = step(life, 0.3) * max(step(max(abs(g.x), abs(g.y)), 0.22 * (1.0 - life * 3.0)),
+				max(step(abs(g.y), 0.06) * step(abs(g.x), 0.6 * (1.0 - life * 3.0)),
+					step(abs(g.x), 0.06) * step(abs(g.y), 0.4 * (1.0 - life * 3.0))));
+			float sm = 0.0;
+			for (int i = 0; i < 5; i++) {
+				float h = fract(v_seed * (3.1 + float(i) * 5.7));
+				vec2 q = vec2((h - 0.5) * 0.6, -0.05 - life * (0.35 + 0.35 * h));
+				float sz = 0.04 + life * 0.08 + h * 0.03;
+				sm = max(sm, step(max(abs(g.x - q.x), abs(g.y - q.y)), sz));
+			}
+			sm *= step(0.08, life) * (1.0 - life);
+			alpha = max(fl, sm * 0.45);
+			col = fl > 0.5 ? vec3(1.0, 0.85, 0.5) * exposure_comp * 1.8 : vec3(0.3, 0.29, 0.28) * exposure_comp * (0.8 + life * 0.6);
+		} else {
 		float core = step(max(abs(g.x), abs(g.y)), 0.28 * (1.0 - life * 1.6));
 		float cross = step(life, 0.35) * max(step(abs(g.x), 0.07) * step(abs(g.y), 0.75 * (1.0 - life * 2.0)),
 			step(abs(g.y), 0.07) * step(abs(g.x), 0.75 * (1.0 - life * 2.0)));
@@ -97,6 +114,7 @@ void fragment() {
 		}
 		alpha = max(max(core, cross), sp * (1.0 - life * 0.8));
 		col = mix(tint * exposure_comp * 1.6, vec3(1.0, 0.97, 0.9), core * (1.0 - life) * 0.55);
+		}
 	} else if (style == 6) {
 		// perdigón: brasa con núcleo blanco y cola corta naranja
 		float body = smoothstep(1.0, 0.4, across) * smoothstep(0.0, 0.6, along);

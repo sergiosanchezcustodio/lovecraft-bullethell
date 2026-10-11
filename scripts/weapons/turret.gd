@@ -93,6 +93,7 @@ func _physics_process(delta: float) -> void:
 		0.18, 0.13, Damage.new(damage, 0.0), reach / speed * 1.15, 0, 0.6, bonus_set)
 	shots += 1
 	_flash_t = 0.05
+	world.bullets.muzzle(global_position + dir * 0.8)            # fogonazo y humo (11-10-2026)
 
 func _process(delta: float) -> void:
 	Damage.ctx = _wtag

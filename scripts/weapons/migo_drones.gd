@@ -76,6 +76,7 @@ func _make_orb() -> Node3D:
 	light.light_energy = 0.6
 	light.omni_range = 1.8
 	orb.add_child(light)
+	orb.add_child(VoxelFx.emitter("streak", 0.15, false, false, Color(PINK.r, PINK.g, PINK.b) * 0.8))   # estela (11-10-2026)
 	add_child(orb)
 	return orb
 

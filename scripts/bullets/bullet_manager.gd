@@ -36,6 +36,7 @@ var _pending_clear := false
 var _clash_built := -1                      ## fotograma de física en que se hizo la rejilla
 const MAX_IMPACTS := 256
 const IMPACT_LIFE := 0.26
+const MUZZLE := 100                          ## aspecto de impacto que el shader dibuja como fogonazo
 var _imp_pos := PackedVector3Array()
 var _imp_age := PackedFloat32Array()
 var _imp_look := PackedInt32Array()
@@ -421,6 +422,11 @@ func _clash(i: int) -> bool:
 						return true
 				j = _clash_next[j]
 	return false
+
+## Fogonazo en la boca de un arma de fuego: un impacto con el aspecto 100 (el shader lo
+## dibuja como destello cálido y una bocanada de humo que sube).
+func muzzle(pos: Vector3) -> void:
+	impact(pos, MUZZLE)
 
 ## Destello de impacto de una bala del jugador (con el aspecto de la bala, para su color).
 func impact(pos: Vector3, look: int) -> void:

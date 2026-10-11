@@ -689,7 +689,8 @@ func _dummies(n: int) -> void:
 
 ## Efecto de prueba delante del jugador, cada 3 s (capturas y comparaciones):
 ## fx_demo=explosion|fire|acid|gas|dust|jet|frost|fireball|wave|death|death_big|beam|chain|tether|
-## slash|stab|sigil|sweep|impact|thrown|vortex|boomerang|fissure|tentacle.
+## slash|stab|sigil|sweep|impact|thrown|vortex|boomerang|fissure|tentacle|
+## flare|trap (el fogonazo se ve con weapons=thompson dummies=3).
 ## Empieza a los 2 s.
 func _fx_demo(kind: String) -> void:
 	var at := player.position + Vector3(2.5, 0, -1.0)
@@ -758,13 +759,17 @@ func _fx_demo(kind: String) -> void:
 				world.fx.add_child(Fissure.new().setup(world, player.position, dir, 6.0, 8.0, 0.6, 0.0, 0.0, {}))
 			"tentacle":
 				world.fx.add_child(TentacleSpike.new().setup(world, at, 1.4, 0.0, 0.0, {}))
+			"flare":
+				world.fx.add_child(Flare.new().setup(world, at, 2.6, 4.0))
+			"trap":
+				world.fx.add_child(BearTrap.new().setup(world, at + Vector3(1.5, 0, 0), 0.8, 5.0, 0.0, 0.5, {}))
 			"sweep":
 				world.fx.add_child(SweepBeam.new().setup(player, world, 6.0, 0.3, 140.0, 0.0, 0.35, 2.6, {}))
 			_:
 				var z: int = {"fire": WeaponData.Zone.FIRE, "acid": WeaponData.Zone.ACID, "gas": WeaponData.Zone.GAS,
 					"dust": WeaponData.Zone.DUST}.get(kind, WeaponData.Zone.FIRE)
 				world.fx.add_child(DamageZone.new().setup(world, z, at, 1.8, 2.6, 0.0))
-	if kind == "tether" or kind == "stab":              # necesitan a quién morder
+	if kind in ["tether", "stab", "trap"]:              # necesitan a quién morder
 		var d := TrainingDummy.new().setup(world, "fragmento")
 		d.position = at + Vector3(1.5, 0, 0)
 		add_child(d)

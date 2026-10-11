@@ -12,6 +12,7 @@ var _pulse := 0.0
 var _light: OmniLight3D
 var _core: MeshInstance3D
 var _parts: GPUParticles3D
+var _smoke: GPUParticles3D
 
 func setup(p_world: CombatWorld, pos: Vector3, p_life: float, p_radius: float) -> Flare:
 	world = p_world; life = p_life; radius = p_radius
@@ -60,6 +61,10 @@ func _ready() -> void:
 	_parts.draw_pass_1 = box
 	_parts.position.y = 0.12
 	add_child(_parts)
+	# columna de humo rojizo que sube de la bengala (11-10-2026)
+	_smoke = VoxelFx.emitter("smoke", 0.4, false, false, Color(1.0, 0.55, 0.5))
+	_smoke.position.y = 0.2
+	add_child(_smoke)
 
 func _physics_process(delta: float) -> void:
 	_t += delta

@@ -53,6 +53,9 @@ func _spring() -> void:
 	_model.queue_free()
 	_model = VoxelBuilder.load_model("res://models/proj_cepo_cerrado.json")
 	add_child(_model)
+	var snap := VoxelFx.emitter("zap", 0.8, true, false, Color(0.85, 0.85, 0.8))   # chispas del hierro al cerrarse (11-10-2026)
+	snap.position.y = 0.2
+	add_child(snap)
 
 func _process(_delta: float) -> void:
 	if sprung: _model.scale = Vector3.ONE * (1.0 - smoothstep(CLOSE_LIFE * 0.6, CLOSE_LIFE, _t))
