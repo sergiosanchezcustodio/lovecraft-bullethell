@@ -25,6 +25,7 @@ var _tick := 0.0
 var _drop := 0.0
 var _parts: GPUParticles3D
 var _light: OmniLight3D
+var _smoke: GPUParticles3D
 
 func setup(p: Player, p_world: CombatWorld, p_dir: Vector3, p_length: float, spread_deg: float, p_dps: float,
 		p_life: float, z_r: float, z_t: float, z_dps: float, p_bonus: Dictionary) -> FlameJet:
@@ -36,52 +37,26 @@ func setup(p: Player, p_world: CombatWorld, p_dir: Vector3, p_length: float, spr
 
 func _ready() -> void:
 	Damage.ctx = _wtag
-	_parts = GPUParticles3D.new()
-	_parts.amount = 90
-	_parts.lifetime = length / 9.0
-	_parts.local_coords = false
-	var ppm := ParticleProcessMaterial.new()
-	ppm.direction = Vector3(0, 0, 1)
-	ppm.spread = rad_to_deg(half_angle)
-	ppm.initial_velocity_min = 8.0
-	ppm.initial_velocity_max = 10.0
-	ppm.gravity = Vector3(0, 1.2, 0)
-	ppm.scale_min = 0.08
-	ppm.scale_max = 0.2
-	ppm.scale_curve = _grow_curve()
-	var g := Gradient.new()
-	g.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
-	g.colors = PackedColorArray([Color(1.0, 0.9, 0.55), Color(1.0, 0.45, 0.1), Color(0.35, 0.1, 0.05, 0.0)])
-	if frost:
-		g.colors = PackedColorArray([Color(0.95, 1.0, 1.0), Color(0.45, 0.8, 1.0), Color(0.2, 0.35, 0.6, 0.0)])
-		ppm.gravity = Vector3(0, -0.4, 0)
-	var gt := GradientTexture1D.new()
-	gt.gradient = g
-	ppm.color_ramp = gt
-	_parts.process_material = ppm
-	var box := BoxMesh.new()
-	box.size = Vector3.ONE
-	var bm := StandardMaterial3D.new()
-	bm.vertex_color_use_as_albedo = true
-	bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	box.material = bm
-	_parts.draw_pass_1 = box
+	# chorro en cubitos (11-10-2026): núcleo que pasa de blanco a rojo y se ensancha, con
+	# humo negro escapando por arriba; helado, en azules y cayendo
+	_parts = VoxelFx.emitter("jet", length)
+	_parts.process_material.spread = rad_to_deg(half_angle) * 0.8
 	add_child(_parts)
+	if frost:
+		var pm: ParticleProcessMaterial = _parts.process_material
+		pm.color_ramp = VoxelFx._ramp([[0.0, Color(0.6, 0.72, 0.8, 1.0)], [0.3, Color(0.3, 0.52, 0.75, 1.0)],
+			[1.0, Color(0.15, 0.3, 0.55, 0.0)]])
+		pm.gravity = Vector3(0, -0.6, 0)
+	else:
+		var smoke := VoxelFx.emitter("jet_smoke", length)
+		add_child(smoke)
+		_smoke = smoke
 	_light = OmniLight3D.new()
 	_light.light_color = Color(0.5, 0.8, 1.0) if frost else Color(1.0, 0.5, 0.2)
 	_light.light_energy = 1.6
 	_light.omni_range = length
 	add_child(_light)
 	_place()
-
-func _grow_curve() -> CurveTexture:
-	var c := Curve.new()
-	c.add_point(Vector2(0, 0.4))
-	c.add_point(Vector2(1, 1.6))
-	var ct := CurveTexture.new()
-	ct.curve = c
-	return ct
 
 func _place() -> void:
 	if not is_instance_valid(player): return
@@ -96,7 +71,8 @@ func _physics_process(delta: float) -> void:
 	_t += delta
 	if _t >= life:
 		_parts.emitting = false
-		if _t >= life + _parts.lifetime: queue_free()
+		if _smoke: _smoke.emitting = false
+		if _t >= life + _parts.lifetime * 2.6: queue_free()
 		return
 	var origin := player.global_position if is_instance_valid(player) else global_position
 	_tick -= delta
@@ -121,7 +97,9 @@ func _physics_process(delta: float) -> void:
 	if _drop <= 0.0 and zone_t > 0.0:
 		_drop = 0.25
 		var tip := origin + dir * length * randf_range(0.6, 0.95)
-		world.fx.add_child(DamageZone.new().setup(world, WeaponData.Zone.FIRE, tip, zone_r, zone_t, zone_dps, 0.0, bonus))
+		var z := DamageZone.new().setup(world, WeaponData.Zone.FIRE, tip, zone_r, zone_t, zone_dps, 0.0, bonus)
+		z.lite = true                                        # varias por segundo: sin luz propia
+		world.fx.add_child(z)
 
 func _process(_delta: float) -> void:
 	Damage.ctx = _wtag

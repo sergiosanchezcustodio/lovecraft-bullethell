@@ -32,19 +32,15 @@ func setup(p: Player, p_world: CombatWorld, radius: float, grow: float, damage: 
 
 func _ready() -> void:
 	Damage.ctx = _wtag
-	_disc = MeshInstance3D.new()
-	var pm := PlaneMesh.new()
-	pm.size = Vector2(2, 2)
-	_disc.mesh = pm
-	_mat = ShaderMaterial.new()
-	_mat.shader = preload("res://scripts/fx/telegraph.gdshader")
-	_mat.set_shader_parameter("color", color)
-	_mat.set_shader_parameter("fill", false)
-	_mat.set_shader_parameter("ring_width", 0.14)
-	_disc.material_override = _mat
-	_disc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_disc.position.y = 0.3
+	# anillo de celdas con runas que se abre, y polvo levantado hacia fuera (11-10-2026)
+	_disc = VoxelFx.ground(3, _radius)
+	_disc.position.y = 0.06
 	add_child(_disc)
+	_mat = _disc.material_override
+	_mat.set_shader_parameter("tint", Color(color.r, color.g, color.b))
+	var dust := VoxelFx.emitter("ring_dust", _radius, true)
+	dust.position.y = 0.1
+	add_child(dust)
 	_process(0.0)
 
 func current_radius() -> float:
@@ -71,8 +67,7 @@ func _physics_process(delta: float) -> void:
 
 func _process(_delta: float) -> void:
 	Damage.ctx = _wtag
-	var r := maxf(current_radius(), 0.3)
-	_disc.scale = Vector3.ONE * r
+	_mat.set_shader_parameter("wave_r", maxf(current_radius(), 0.3) / _radius)
 	var fade := 1.0 - smoothstep(_grow, _grow + FADE, _t)
-	_mat.set_shader_parameter("color", Color(color, color.a * fade))
-	if _t > _grow + FADE: queue_free()
+	_mat.set_shader_parameter("fade", fade)
+	if _t > _grow + FADE + 0.6: queue_free()               # deja acabar el polvo

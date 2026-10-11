@@ -304,6 +304,7 @@ func _ready() -> void:
 	if args.get_int("demo") > 0: _demo_crowd(args.get_int("demo"))
 	if args.get_int("dummies") > 0: _dummies(args.get_int("dummies"))
 	if args.get_bool("emitters"): _emitters()
+	if args.has("fx_demo"): _fx_demo(args.get_str("fx_demo"))
 	if args.has("debug_menu"):                     # abre la pausa y la depuración (capturas)
 		get_tree().create_timer(args.get_float("debug_menu", 1.0)).timeout.connect(func() -> void:
 			toggle_pause()
@@ -685,6 +686,37 @@ func _dummies(n: int) -> void:
 		d.position = player.position + Vector3(cos(a) * r, 0, sin(a) * r)
 		d.rotation.y = atan2(-cos(a), -sin(a))
 		add_child(d)
+
+## Efecto de prueba delante del jugador, cada 3 s (capturas y comparaciones):
+## fx_demo=explosion|fire|acid|gas|dust|jet|frost|fireball|wave. Empieza a los 2 s.
+func _fx_demo(kind: String) -> void:
+	var at := player.position + Vector3(2.5, 0, -1.0)
+	var spawn := func() -> void:
+		var dir := Vector3(1, 0, -0.4).normalized()
+		match kind:
+			"explosion":
+				var fx := Explosion.new()
+				fx.radius = 2.2
+				fx.position = at
+				world.fx.add_child(fx)
+			"jet", "frost":
+				var j := FlameJet.new().setup(player, world, dir, 4.5, 35.0, 0.0, 1.2, 1.0, 2.0, 0.0, {})
+				j.frost = kind == "frost"
+				if j.frost: j.zone_t = 0.0
+				world.fx.add_child(j)
+			"fireball":
+				world.fx.add_child(Fireball.new().setup(world, player.position, dir, 6.0, 9.0, 0.5, 0.0, 0.9, 2.0, 0.0, {}))
+			"wave":
+				world.fx.add_child(Shockwave.new().setup(player, world, 4.5, 0.5, 0.0, 0.0, 0.0, {}))
+			_:
+				var z: int = {"fire": WeaponData.Zone.FIRE, "acid": WeaponData.Zone.ACID, "gas": WeaponData.Zone.GAS,
+					"dust": WeaponData.Zone.DUST}.get(kind, WeaponData.Zone.FIRE)
+				world.fx.add_child(DamageZone.new().setup(world, z, at, 1.8, 2.6, 0.0))
+	var t := Timer.new()
+	t.wait_time = 3.0
+	t.timeout.connect(spawn)
+	add_child(t)
+	get_tree().create_timer(2.0).timeout.connect(func() -> void: spawn.call(); t.start())
 
 ## Tres emisores de prueba, uno por tipo de daño, a unos 8 m del jugador.
 func _emitters() -> void:

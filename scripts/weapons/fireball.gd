@@ -17,7 +17,7 @@ var bonus := {}
 var _done := {}
 var _run := 0.0
 var _drop := 0.0
-var _core: MeshInstance3D
+var _core: Node3D
 var _light: OmniLight3D
 var _parts: GPUParticles3D
 
@@ -31,49 +31,32 @@ func setup(p_world: CombatWorld, origin: Vector3, p_dir: Vector3, p_speed: float
 	return self
 
 func _ready() -> void:
-	_core = MeshInstance3D.new()
-	var bm := BoxMesh.new()                      # bola de cubos, al estilo voxel
-	bm.size = Vector3.ONE * radius * 1.1
-	var mat := StandardMaterial3D.new()
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color(1.0, 0.62, 0.18) * 0.8
-	bm.material = mat
-	_core.mesh = bm
-	_core.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# bola de cubos (11-10-2026): tres cubos girando unos dentro de otros, del amarillo
+	# casi blanco del centro al rojo de fuera, con estela de llamas y chispas
+	_core = Node3D.new()
 	add_child(_core)
+	for k in 3:
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3.ONE * radius * [1.15, 0.85, 0.5][k]
+		var mat := StandardMaterial3D.new()
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if k == 0 else BaseMaterial3D.TRANSPARENCY_DISABLED
+		mat.albedo_color = [Color(0.8, 0.22, 0.04, 0.55), Color(0.85, 0.5, 0.1), Color(0.9, 0.85, 0.55)][k]
+		bm.material = mat
+		mi.mesh = bm
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.rotation = Vector3(randf(), randf(), randf()) * TAU
+		_core.add_child(mi)
 	_light = OmniLight3D.new()
 	_light.light_color = Color(1.0, 0.5, 0.15)
 	_light.light_energy = 2.0
 	_light.omni_range = 4.0
 	add_child(_light)
-	_parts = GPUParticles3D.new()
-	_parts.amount = 40
-	_parts.lifetime = 0.5
-	_parts.local_coords = false
-	var ppm := ParticleProcessMaterial.new()
-	ppm.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
-	ppm.emission_sphere_radius = radius * 0.6
-	ppm.gravity = Vector3(0, 1.5, 0)
-	ppm.initial_velocity_min = 0.2
-	ppm.initial_velocity_max = 0.8
-	ppm.scale_min = 0.07
-	ppm.scale_max = 0.16
-	var g := Gradient.new()
-	g.offsets = PackedFloat32Array([0.0, 0.4, 1.0])
-	g.colors = PackedColorArray([Color(1.0, 0.92, 0.5), Color(1.0, 0.4, 0.08), Color(0.3, 0.08, 0.05, 0.0)])
-	var gt := GradientTexture1D.new()
-	gt.gradient = g
-	ppm.color_ramp = gt
-	_parts.process_material = ppm
-	var box := BoxMesh.new()
-	box.size = Vector3.ONE
-	var pm := StandardMaterial3D.new()
-	pm.vertex_color_use_as_albedo = true
-	pm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	pm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	box.material = pm
-	_parts.draw_pass_1 = box
+	_parts = VoxelFx.emitter("trail", radius)
 	add_child(_parts)
+	var sparks := VoxelFx.emitter("embers", radius * 2.0)
+	add_child(sparks)
 
 func _physics_process(delta: float) -> void:
 	Damage.ctx = _wtag
@@ -83,8 +66,10 @@ func _physics_process(delta: float) -> void:
 	_drop -= step
 	if _drop <= 0.0 and zone_t > 0.0:
 		_drop = DROP_EVERY
-		world.fx.add_child(DamageZone.new().setup(world, WeaponData.Zone.FIRE, global_position, zone_r, zone_t,
-			zone_dps, 0.0, bonus))
+		var z := DamageZone.new().setup(world, WeaponData.Zone.FIRE, global_position, zone_r, zone_t,
+			zone_dps, 0.0, bonus)
+		z.lite = true
+		world.fx.add_child(z)
 	world.bullets.clear_enemy_bullets(global_position, radius)
 	for e in world.enemies_in_circle(global_position, radius):
 		var id := e.get_instance_id()
@@ -99,5 +84,8 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 
 func _process(_delta: float) -> void:
-	_core.rotation += Vector3(0.21, 0.33, 0.17)
+	var k := 0
+	for c in _core.get_children():
+		c.rotation += Vector3(0.21, 0.33, 0.17) * (1.0 + k * 0.6) * (1 if k % 2 == 0 else -1)
+		k += 1
 	_light.light_energy = 1.8 + 0.5 * sin(Time.get_ticks_msec() * 0.03)

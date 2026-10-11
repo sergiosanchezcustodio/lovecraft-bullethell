@@ -18,18 +18,11 @@ var bonus := {}
 var drift := Vector3.ZERO                    ## gas: se desplaza (m/s)
 var _t := 0.0
 var _tick := 0.0
-var _mat: ShaderMaterial
 var _parts: GPUParticles3D
 var _light: OmniLight3D
 
 const TICK := 0.3
 const FADE := 0.5
-const COLORS := {WeaponData.Zone.FIRE: [Color(1.0, 0.45, 0.12), Color(1.0, 0.78, 0.3)],
-	WeaponData.Zone.ACID: [Color(0.45, 0.85, 0.2), Color(0.75, 1.0, 0.45)],
-	# polvo: mancha sepia oscura y motas doradas (un tono pálido desaparecía sobre la nieve)
-	WeaponData.Zone.DUST: [Color(0.55, 0.36, 0.14), Color(1.0, 0.82, 0.4)],
-	# gas de cloro: verde amarillento turbio
-	WeaponData.Zone.GAS: [Color(0.55, 0.62, 0.12), Color(0.82, 0.9, 0.35)]}
 
 func setup(p_world: CombatWorld, p_kind: int, pos: Vector3, p_radius: float, p_life: float, p_dps: float,
 		p_vulnerable: float = 0.0, p_bonus: Dictionary = {}) -> DamageZone:
@@ -38,71 +31,44 @@ func setup(p_world: CombatWorld, p_kind: int, pos: Vector3, p_radius: float, p_l
 	position = Vector3(pos.x, 0.0, pos.z)
 	return self
 
+var _ground_mat: ShaderMaterial               ## mancha animada (ground_fx)
+var _extra: Array[GPUParticles3D] = []
+
 func _ready() -> void:
 	Damage.ctx = _wtag
-	var cols: Array = COLORS.get(kind, COLORS[WeaponData.Zone.FIRE])
-	var disc := MeshInstance3D.new()
-	var pm := PlaneMesh.new()
-	pm.size = Vector2(2, 2)
-	disc.mesh = pm
-	_mat = ShaderMaterial.new()
-	_mat.shader = preload("res://scripts/fx/telegraph.gdshader")
-	_mat.set_shader_parameter("color", Color(cols[0] * 0.55, _alpha()))
-	_mat.set_shader_parameter("fill", true)
-	_mat.set_shader_parameter("soft", true)
-	disc.material_override = _mat
-	disc.scale = Vector3.ONE * radius
-	disc.position.y = 0.04
-	disc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(disc)
-	_parts = GPUParticles3D.new()
-	_parts.amount = int(clampf(radius * 10.0, 8.0, 24.0))
-	_parts.lifetime = 0.7
-	_parts.local_coords = true
-	var ppm := ParticleProcessMaterial.new()
-	ppm.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
-	ppm.emission_sphere_radius = radius * 0.8
-	ppm.direction = Vector3.UP
-	ppm.spread = 12.0
-	ppm.initial_velocity_min = 0.6
-	ppm.initial_velocity_max = 1.6
-	ppm.gravity = Vector3(0, 0.6 if kind == WeaponData.Zone.FIRE else (0.05 if kind == WeaponData.Zone.DUST else -0.5), 0)
-	if kind == WeaponData.Zone.GAS:                 # gas: bocanadas lentas que suben poco
-		_parts.lifetime = 1.4
-		_parts.amount = int(clampf(radius * 16.0, 16.0, 40.0))
-		ppm.gravity = Vector3(0, 0.15, 0)
-	if kind == WeaponData.Zone.DUST:                # polvo: motas que flotan despacio y duran más
-		_parts.lifetime = 1.6
-		_parts.amount = int(clampf(radius * 18.0, 16.0, 48.0))
-		ppm.scale_min = 0.08
-		ppm.scale_max = 0.18
-		ppm.initial_velocity_min = 0.1
-		ppm.initial_velocity_max = 0.4
-		ppm.spread = 80.0
-	ppm.scale_min = 0.06
-	ppm.scale_max = 0.14
-	var g := Gradient.new()
-	g.set_color(0, Color(cols[1], 1.0))
-	g.set_color(1, Color(cols[0], 0.0))
-	var gt := GradientTexture1D.new()
-	gt.gradient = g
-	ppm.color_ramp = gt
-	_parts.process_material = ppm
-	var box := BoxMesh.new()
-	box.size = Vector3.ONE
-	var bm := StandardMaterial3D.new()
-	bm.vertex_color_use_as_albedo = true
-	bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	box.material = bm
-	_parts.draw_pass_1 = box
-	_parts.position.y = 0.1
-	add_child(_parts)
-	if kind == WeaponData.Zone.FIRE:
+	_ready_voxel()
+
+## Zonas en cubitos (11-10-2026): mancha animada en el suelo (`ground_fx`) y partículas.
+## Fuego: llamas que acaban en humo y chispas. Ácido: burbujas que revientan y vapor.
+## Gas: bocanadas turbias que derivan. Polvo: motas doradas que flotan y destellan.
+## `lite` (las que siembran el lanzallamas y la bola de fuego, varias por segundo): sin luz
+## y solo el emisor principal, con la mitad de partículas.
+var lite := false
+
+func _ready_voxel() -> void:
+	var recipes: Array = {WeaponData.Zone.FIRE: ["flames", "smoke", "embers"],
+		WeaponData.Zone.ACID: ["bubbles", "vapor"], WeaponData.Zone.GAS: ["gas"],
+		WeaponData.Zone.DUST: ["dust", "motes"]}.get(kind, ["flames"])
+	var mode: int = {WeaponData.Zone.FIRE: 0, WeaponData.Zone.ACID: 1, WeaponData.Zone.GAS: 4,
+		WeaponData.Zone.DUST: 5}.get(kind, 0)
+	var g := VoxelFx.ground(mode, radius)
+	add_child(g)
+	_ground_mat = g.material_override
+	var fx := Node3D.new()
+	fx.position.y = 0.08
+	add_child(fx)
+	if lite: recipes = [recipes[0]]
+	for r in recipes:
+		var e := VoxelFx.emitter(r, radius)
+		if lite: e.amount = maxi(4, e.amount / 2)
+		e.local_coords = kind == WeaponData.Zone.GAS          # el gas se lleva su nube al derivar
+		fx.add_child(e)
+		_extra.append(e)
+	_parts = _extra[0]
+	if kind == WeaponData.Zone.FIRE and not lite:
 		_light = OmniLight3D.new()
-		_light.light_color = cols[0]
-		_light.light_energy = 1.0
-		_light.omni_range = radius * 2.2
+		_light.light_color = Color(1.0, 0.5, 0.15)
+		_light.omni_range = radius * 2.4
 		_light.position.y = 0.6
 		add_child(_light)
 
@@ -111,6 +77,7 @@ func _physics_process(delta: float) -> void:
 	_t += delta
 	if _t >= life:
 		_parts.emitting = false
+		for e in _extra: e.emitting = false
 		if _t >= life + FADE: queue_free()
 		return
 	if drift != Vector3.ZERO: global_position += drift * delta
@@ -128,10 +95,5 @@ func _physics_process(delta: float) -> void:
 func _process(_delta: float) -> void:
 	Damage.ctx = _wtag
 	var fade := 1.0 - smoothstep(life, life + FADE, _t)
-	var cols: Array = COLORS.get(kind, COLORS[WeaponData.Zone.FIRE])
-	_mat.set_shader_parameter("color", Color(cols[0] * 0.55, _alpha() * fade))
-	if _light: _light.light_energy = (0.8 + 0.4 * sin(_t * 23.0) * sin(_t * 7.0)) * fade
-
-## Opacidad de la mancha: el polvo, más densa para que se lea sobre la nieve.
-func _alpha() -> float:
-	return 0.75 if kind in [WeaponData.Zone.DUST, WeaponData.Zone.GAS] else 0.5
+	_ground_mat.set_shader_parameter("fade", fade * smoothstep(0.0, 0.15, _t))
+	if _light: _light.light_energy = (1.1 + 0.5 * sin(_t * 23.0) * sin(_t * 7.0)) * fade
