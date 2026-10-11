@@ -20,6 +20,9 @@ var _last := {}
 var _beam: MeshInstance3D
 var _mat: StandardMaterial3D
 var _light: OmniLight3D
+var _ghost: MeshInstance3D
+var _ghost_mat: StandardMaterial3D
+var _motes: GPUParticles3D
 
 const FADE := 0.25
 
@@ -43,6 +46,17 @@ func _ready() -> void:
 	_beam.material_override = _mat
 	_beam.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(_beam)
+	# estela: el mismo haz algo atrás en el giro y más tenue; y motas doradas (11-10-2026)
+	_ghost = MeshInstance3D.new()
+	_ghost.mesh = bm
+	_ghost_mat = _mat.duplicate()
+	_ghost.material_override = _ghost_mat
+	_ghost.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(_ghost)
+	_motes = VoxelFx.emitter("beam_motes", length, false, true, Color(0.9, 0.7, 0.3))
+	(_motes.process_material as ParticleProcessMaterial).emission_box_extents = Vector3(length * 0.5, 0.06, half)
+	_motes.local_coords = false
+	add_child(_motes)
 	_light = OmniLight3D.new()
 	_light.light_color = Color(1.0, 0.85, 0.45)
 	_light.light_energy = 1.4
@@ -81,5 +95,14 @@ func _process(_delta: float) -> void:
 	_beam.global_rotation = Vector3(0, -_angle, 0)
 	_beam.scale = Vector3(length, 1, half * 2.0 * (0.85 + 0.15 * sin(_t * 30.0)))
 	_mat.albedo_color = Color(1.0, 0.82, 0.4, 0.55 * k)
+	var lag := _angle - deg_to_rad(signf(speed) * 14.0)
+	var gdir := Vector3(cos(lag), 0, sin(lag))
+	_ghost.global_position = o + gdir * length * 0.5 + Vector3(0, 0.88, 0)
+	_ghost.global_rotation = Vector3(0, -lag, 0)
+	_ghost.scale = Vector3(length, 0.6, half * 2.4)
+	_ghost_mat.albedo_color = Color(0.9, 0.55, 0.2, 0.22 * k)
+	_motes.global_position = _beam.global_position
+	_motes.global_rotation = _beam.global_rotation
+	_motes.emitting = _t < life
 	_light.global_position = o + dir * length * 0.6 + Vector3(0, 1.0, 0)
 	_light.light_energy = 1.4 * k

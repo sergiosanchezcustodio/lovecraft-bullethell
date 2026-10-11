@@ -17,9 +17,8 @@ var bonus := {}
 var slowed := 0                              ## balas frenadas (tests)
 var _t := 0.0
 var _tick := 0.0
-var _mat_fill: ShaderMaterial
-var _mat_ring: ShaderMaterial
-var _runes: Array[MeshInstance3D] = []
+var _mat: ShaderMaterial
+var _motes: GPUParticles3D
 var _light: OmniLight3D
 
 const FADE := 0.4
@@ -34,43 +33,21 @@ func setup(p_world: CombatWorld, pos: Vector3, p_radius: float, p_life: float, p
 
 func _ready() -> void:
 	Damage.ctx = _wtag
-	_mat_fill = _disc(true, 0.05)
-	_mat_ring = _disc(false, 0.07)
-	var rm := StandardMaterial3D.new()
-	rm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	rm.albedo_color = Color(COLOR.r * 0.8, COLOR.g * 0.8, COLOR.b * 0.8)
-	for i in 5:
-		var mi := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = Vector3(0.16, 0.05, 0.3)
-		mi.mesh = bm
-		mi.material_override = rm
-		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(mi)
-		_runes.append(mi)
+	# signo en celdas (11-10-2026): anillos con runas que giran, estrella de cinco puntas que
+	# gira al revés y motas violetas que suben
+	var g := VoxelFx.ground(7, radius)
+	g.position.y = 0.05
+	_mat = g.material_override
+	_mat.set_shader_parameter("tint", COLOR * 0.75)
+	add_child(g)
+	_motes = VoxelFx.emitter("motes", radius, false, false, Color(0.75, 0.5, 1.0))
+	add_child(_motes)
 	_light = OmniLight3D.new()
 	_light.light_color = COLOR
 	_light.omni_range = radius * 1.8
 	_light.position.y = 0.5
 	add_child(_light)
 	_process(0.0)
-
-func _disc(fill: bool, y: float) -> ShaderMaterial:
-	var mi := MeshInstance3D.new()
-	var pm := PlaneMesh.new()
-	pm.size = Vector2(2, 2)
-	mi.mesh = pm
-	var m := ShaderMaterial.new()
-	m.shader = preload("res://scripts/fx/telegraph.gdshader")
-	m.set_shader_parameter("fill", fill)
-	m.set_shader_parameter("soft", fill)
-	m.set_shader_parameter("ring_width", 0.06)
-	mi.material_override = m
-	mi.scale = Vector3.ONE * radius
-	mi.position.y = y
-	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(mi)
-	return m
 
 func _physics_process(delta: float) -> void:
 	Damage.ctx = _wtag
@@ -92,12 +69,7 @@ func _physics_process(delta: float) -> void:
 func _process(_delta: float) -> void:
 	Damage.ctx = _wtag
 	var k := clampf(_t / 0.25, 0.0, 1.0) * (1.0 - smoothstep(life, life + FADE, _t))
-	_mat_fill.set_shader_parameter("color", Color(COLOR * 0.5, 0.22 * k))
-	_mat_ring.set_shader_parameter("color", Color(COLOR, 0.9 * k))
-	for i in _runes.size():
-		var a := _t * 0.8 + TAU * i / _runes.size()
-		var r := _runes[i]
-		r.position = Vector3(cos(a) * radius * 0.72, 0.08, sin(a) * radius * 0.72)
-		r.rotation.y = -a
-		r.scale = Vector3.ONE * maxf(k, 0.01)
+	_mat.set_shader_parameter("age", _t)
+	_mat.set_shader_parameter("fade", 1.0 - smoothstep(life, life + FADE, _t))
+	if _t >= life: _motes.emitting = false
 	_light.light_energy = 0.9 * k

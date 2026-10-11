@@ -688,7 +688,8 @@ func _dummies(n: int) -> void:
 		add_child(d)
 
 ## Efecto de prueba delante del jugador, cada 3 s (capturas y comparaciones):
-## fx_demo=explosion|fire|acid|gas|dust|jet|frost|fireball|wave|death|death_big|beam|chain|tether.
+## fx_demo=explosion|fire|acid|gas|dust|jet|frost|fireball|wave|death|death_big|beam|chain|tether|
+## slash|stab|sigil|sweep|impact.
 ## Empieza a los 2 s.
 func _fx_demo(kind: String) -> void:
 	var at := player.position + Vector3(2.5, 0, -1.0)
@@ -727,11 +728,27 @@ func _fx_demo(kind: String) -> void:
 				world.fx.add_child(ChainBolt.new().setup(pts))
 			"tether":
 				world.fx.add_child(TetherBeam.new().setup(player, world, 0.0, 0.2, 0.3, 3.0, 8.0, 2.5, {}))
+			"slash":
+				var sl := Slash.new()
+				sl.radius = 2.2
+				sl.position = player.position
+				world.fx.add_child(sl)
+			"stab":
+				world.fx.add_child(Stab.new().setup(player.position, at + Vector3(1.5, 0, 0)))
+			"sigil":
+				world.fx.add_child(Sigil.new().setup(world, at, 2.0, 2.6, 0.0, 1.0, 0.0, 1.0, {}))
+			"impact":                                    # una ráfaga de impactos de varios aspectos
+				for i in 8:
+					var looks := [0, 6, 9, 12]
+					get_tree().create_timer(i * 0.04).timeout.connect(func() -> void:
+						world.bullets.impact(at + Vector3(randf_range(-1.2, 1.2), 0, randf_range(-1.2, 1.2)), looks[i % 4]))
+			"sweep":
+				world.fx.add_child(SweepBeam.new().setup(player, world, 6.0, 0.3, 140.0, 0.0, 0.35, 2.6, {}))
 			_:
 				var z: int = {"fire": WeaponData.Zone.FIRE, "acid": WeaponData.Zone.ACID, "gas": WeaponData.Zone.GAS,
 					"dust": WeaponData.Zone.DUST}.get(kind, WeaponData.Zone.FIRE)
 				world.fx.add_child(DamageZone.new().setup(world, z, at, 1.8, 2.6, 0.0))
-	if kind == "tether":                                # el rayo necesita a quién morder
+	if kind == "tether" or kind == "stab":              # necesitan a quién morder
 		var d := TrainingDummy.new().setup(world, "fragmento")
 		d.position = at + Vector3(1.5, 0, 0)
 		add_child(d)

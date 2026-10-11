@@ -8,7 +8,9 @@ render_mode unshaded, cull_disabled, depth_draw_never, shadows_disabled;
 // irregular con brasas que se enfrían con `age` (0..1); 3 onda: anillo de celdas con runas
 // que se abre (`wave_r`, 0..1, color `tint`); 4 gas: nubes turbias que derivan; 5 polvo: tierra
 // dorada con motas que destellan; 6 salpicadura: mancha del color `tint` con gotas
-// alrededor, que se seca y aclara con `age`.
+// alrededor, que se seca y aclara con `age`; 7 signo: anillos con runas que giran y estrella
+// de cinco puntas (color `tint`, aparece con `age`); 8 tajo: barrido circular con estela
+// (`age` = avance del giro, 0..1).
 
 uniform int mode = 0;
 uniform float fade = 1.0;
@@ -59,6 +61,53 @@ void fragment() {
 		ALBEDO = col * 0.7;
 		EMISSION = tint * (front * 0.9 + rune * 0.6);
 		ALPHA = clamp(front + rune * 0.8 + trail * 0.25, 0.0, 1.0) * fade;
+	} else if (mode == 7) {
+		if (r > 1.0) discard;
+		float ang = atan(q.y, q.x);
+		float t7 = TIME;
+		float outer = step(0.9, r) * step(r, 0.99);
+		float inner = step(0.7, r) * step(r, 0.75);
+		// runas: 20 casillas en la corona que gira, cada una con su dibujo de 3×2 bloques
+		float ra = ang + t7 * 0.35;
+		float seg = floor(ra / 6.2831853 * 20.0);
+		float fa = fract(ra / 6.2831853 * 20.0);
+		float fr = (r - 0.76) / 0.13;
+		vec2 blk = floor(vec2(fa * 3.0, fr * 2.0));
+		float rune = step(0.45, hash(blk + seg * 7.0 + seed)) * step(0.15, fa) * step(fa, 0.85)
+			* step(0.0, fr) * step(fr, 1.0);
+		// estrella de cinco puntas que gira al revés
+		float star = 0.0;
+		for (int i = 0; i < 5; i++) {
+			float a0 = -t7 * 0.25 + float(i) * 2.5132741;
+			float a1 = a0 + 2.5132741 * 2.0;
+			vec2 p0 = vec2(cos(a0), sin(a0)) * 0.7, p1 = vec2(cos(a1), sin(a1)) * 0.7;
+			vec2 pa = q - p0, ba = p1 - p0;
+			float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+			star = max(star, step(length(pa - ba * h), 0.035));
+		}
+		float pulse = 0.8 + 0.2 * sin(t7 * 4.0);
+		float on = clamp(age * 4.0, 0.0, 1.0);
+		float lines = max(max(outer, inner), max(rune, star));
+		ALBEDO = tint * (0.25 + 0.55 * lines);
+		EMISSION = tint * lines * pulse * 0.9;
+		ALPHA = (lines * 0.95 + 0.12) * on * fade;
+	} else if (mode == 8) {
+		// tajo: corona que barre una vuelta; la cabeza es casi blanca y la estela se apaga
+		if (r > 1.0 || r < 0.5) discard;
+		float ang = mod(atan(q.y, q.x) + 6.2831853, 6.2831853);
+		float head = age * 6.2831853 * 1.15;
+		float behind = head - ang;
+		if (behind < 0.0) behind += 6.2831853 * step(6.2831853, head);
+		float trail = 1.0 - behind / 2.6;
+		if (behind < 0.0 || trail <= 0.0) discard;
+		float band = 1.0 - abs(r - 0.78) / 0.22;
+		float streak = step(0.35, hash(vec2(floor(ang * 30.0), floor(r * 10.0)) + seed));
+		float edge8 = step(behind, 0.25);
+		float k = trail * band * mix(0.55, 1.0, streak);
+		vec3 col8 = mix(tint, vec3(1.0), edge8 * 0.7);
+		ALBEDO = col8 * 0.75;
+		EMISSION = col8 * k * 1.2;
+		ALPHA = clamp(k * 1.6 + edge8 * band, 0.0, 1.0) * fade;
 	} else {
 	float edge = 0.78 + 0.22 * fbm(n * 0.9);
 	if (mode == 6) {                                   // salpicadura: núcleo más pequeño y gotas sueltas

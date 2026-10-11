@@ -30,6 +30,7 @@ uniform float exposure_comp = 0.55;
 varying flat float v_style;
 varying float v_phase;
 varying float v_age;
+varying flat float v_seed;                       // azar por instancia (impactos)
 
 void vertex() {
 	float s = length(MODEL_MATRIX[0].xyz);
@@ -37,13 +38,14 @@ void vertex() {
 	v_style = INSTANCE_CUSTOM.x;
 	v_phase = INSTANCE_CUSTOM.y;
 	v_age = INSTANCE_CUSTOM.z;
+	v_seed = fract(sin(dot(MODEL_MATRIX[3].xz, vec2(12.9898, 78.233))) * 43758.5453);
 	// Cuadrado en el plano de la vista, centrado en la bala. Se calcula POSITION en todos
 	// los casos: si una rama lo escribe y otra no, Godot deja la otra sin posición.
 	vec3 center = (VIEW_MATRIX * vec4(MODEL_MATRIX[3].xyz, 1.0)).xyz;
 	vec2 off = VERTEX.xy * s;
 	int st = int(v_style + 0.5);
 	if (st == 13) {
-		s = length(MODEL_MATRIX[0].xyz) * (0.6 + 0.9 * INSTANCE_CUSTOM.z);      // el destello crece
+		s = length(MODEL_MATRIX[0].xyz) * 1.5;          // cuadro fijo: dentro saltan las chispas
 		off = VERTEX.xy * s;
 	} else if (st == 9 || st == 10) {
 		// hoja y chispa: cuadrado que gira (la hoja, rápido)
@@ -77,15 +79,24 @@ void fragment() {
 	float along = UV.x;                                   // 0 cola, 1 cabeza
 	float across = abs(UV.y * 2.0 - 1.0);
 	if (style == 13) {
-		// impacto: estrella de cuatro puntas y anillo que se abre y se apaga
+		// impacto en píxeles gruesos (11-10-2026): destello cuadrado que se encoge, cruz breve
+		// y seis chispas cuadradas que salen despedidas y caen, cada impacto con su azar
 		float life = clamp(v_age, 0.0, 1.0);
 		int look = int(v_phase + 0.5);
 		vec3 tint = look == 6 ? vec3(1.0, 0.55, 0.2) : (look == 12 ? vec3(0.5, 1.0, 0.45) : (look == 9 ? vec3(0.85, 0.9, 1.0) : (look == 4 ? wisp_color : (look == 5 ? yith_color : player_color))));
-		float star = max(smoothstep(0.16, 0.0, abs(p.x)) * smoothstep(1.0, 0.0, abs(p.y)), smoothstep(0.16, 0.0, abs(p.y)) * smoothstep(1.0, 0.0, abs(p.x)));
-		float ring = smoothstep(0.12, 0.0, abs(r - (0.35 + 0.55 * life)));
-		float fade = 1.0 - life;
-		alpha = max(star * fade * 1.2, ring * fade * 0.8) * step(r, 1.0);
-		col = mix(tint * exposure_comp * 1.6, vec3(1.0, 0.97, 0.9), star * 0.6);
+		vec2 g = (floor(UV * 16.0) + 0.5) / 16.0 * 2.0 - 1.0;
+		float core = step(max(abs(g.x), abs(g.y)), 0.28 * (1.0 - life * 1.6));
+		float cross = step(life, 0.35) * max(step(abs(g.x), 0.07) * step(abs(g.y), 0.75 * (1.0 - life * 2.0)),
+			step(abs(g.y), 0.07) * step(abs(g.x), 0.75 * (1.0 - life * 2.0)));
+		float sp = 0.0;
+		for (int i = 0; i < 6; i++) {
+			float h = fract(v_seed * (7.13 + float(i) * 3.71));
+			float a = v_seed * 6.2831853 + float(i) * 1.0472 + h * 0.8;
+			vec2 q = vec2(cos(a), sin(a)) * life * (0.55 + 0.4 * h) + vec2(0.0, life * life * 0.45);
+			sp = max(sp, step(max(abs(g.x - q.x), abs(g.y - q.y)), 0.09 * (1.0 - life * 0.7)));
+		}
+		alpha = max(max(core, cross), sp * (1.0 - life * 0.8));
+		col = mix(tint * exposure_comp * 1.6, vec3(1.0, 0.97, 0.9), core * (1.0 - life) * 0.55);
 	} else if (style == 6) {
 		// perdigón: brasa con núcleo blanco y cola corta naranja
 		float body = smoothstep(1.0, 0.4, across) * smoothstep(0.0, 0.6, along);
