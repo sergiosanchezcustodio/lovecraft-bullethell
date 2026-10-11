@@ -23,19 +23,11 @@ func setup(p_world: CombatWorld, pos: Vector3, p_radius: float, p_life: float, p
 	return self
 
 func _ready() -> void:
-	var disc := MeshInstance3D.new()
-	var pm := PlaneMesh.new()
-	pm.size = Vector2(2, 2)
-	disc.mesh = pm
-	_mat = ShaderMaterial.new()
-	_mat.shader = preload("res://scripts/fx/telegraph.gdshader")
-	_mat.set_shader_parameter("color", Color(color, 0.85))
-	_mat.set_shader_parameter("fill", true)
-	_mat.set_shader_parameter("soft", true)
-	disc.material_override = _mat
-	disc.scale = Vector3.ONE * radius
+	# charco espeso que burbujea, en celdas (11-10-2026)
+	var disc := VoxelFx.ground(10, radius)
 	disc.position.y = 0.03
-	disc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_mat = disc.material_override
+	_mat.set_shader_parameter("tint", Color(color.r, color.g, color.b) * 1.6)
 	add_child(disc)
 
 func _physics_process(delta: float) -> void:
@@ -43,7 +35,7 @@ func _physics_process(delta: float) -> void:
 	if _t >= life:
 		queue_free()
 		return
-	_mat.set_shader_parameter("color", Color(color, 0.85 * clampf((life - _t) / FADE, 0.0, 1.0)))
+	_mat.set_shader_parameter("fade", clampf((life - _t) / FADE, 0.0, 1.0) * clampf(_t / 0.3, 0.0, 1.0))
 	_tick -= delta
 	if _tick > 0.0: return
 	_tick = TICK

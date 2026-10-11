@@ -88,7 +88,7 @@ void fragment() {
 		if (look >= 100) {
 			// fogonazo: destello cálido en cruz muy breve y bocanada de humo gris (tres
 			// cuadrados que suben, crecen y se aclaran)
-			float fl = step(life, 0.3) * max(step(max(abs(g.x), abs(g.y)), 0.22 * (1.0 - life * 3.0)),
+			float fl = step(life, 0.3) * max(step(max(abs(g.x), abs(g.y)), 0.1 * (1.0 - life * 3.0)),
 				max(step(abs(g.y), 0.06) * step(abs(g.x), 0.6 * (1.0 - life * 3.0)),
 					step(abs(g.x), 0.06) * step(abs(g.y), 0.4 * (1.0 - life * 3.0))));
 			float sm = 0.0;

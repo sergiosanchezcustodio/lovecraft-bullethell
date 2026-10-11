@@ -11,7 +11,8 @@ render_mode unshaded, cull_disabled, depth_draw_never, shadows_disabled;
 // alrededor, que se seca y aclara con `age`; 7 signo: anillos con runas que giran y estrella
 // de cinco puntas (color `tint`, aparece con `age`); 8 tajo: barrido circular con estela
 // (`age` = avance del giro, 0..1); 9 vórtice: brazos en espiral que giran hacia dentro,
-// iridiscentes, con el centro oscuro.
+// iridiscentes, con el centro oscuro; 10 limo: charco espeso del color `tint` con brillos
+// húmedos y burbujas lentas que revientan.
 
 uniform int mode = 0;
 uniform float fade = 1.0;
@@ -189,6 +190,20 @@ void fragment() {
 		col = mix(col, vec3(1.0, 0.82, 0.4) * 0.7, mote * (1.0 - rim));
 		emi = vec3(1.0, 0.8, 0.35) * mote * (1.0 - rim) * 0.8;
 		a = mix(0.85, 0.4, rim);
+	} else if (mode == 10) {
+		float lq = fbm(n * 0.8 + vec2(t * 0.08, -t * 0.05));
+		col = tint * (0.7 + 0.6 * floor(lq * 4.0) / 4.0);
+		col = mix(col, tint * 0.4, rim * 0.8);
+		float wetsh = step(0.9, gnoise(n * 2.0 + vec2(t * 0.2, 0.0))) * (1.0 - rim);
+		vec2 b = floor(c / 5.0);
+		vec2 bc = b * 5.0 + 2.5;
+		float ph = fract(t * (0.3 + hash(b + 3.0) * 0.3) + hash(b + seed));
+		float on = step(0.55, hash(b + 9.0 + floor(t * 0.3 + hash(b))));
+		float br = length(c + 0.5 - bc);
+		float bub = step(br, ph * 2.4) * step(ph * 2.4 - 0.9, br) * step(ph, 0.85) * on * (1.0 - rim);
+		col = mix(col, tint * 2.2 + 0.04, max(wetsh * 0.5, bub * 0.8));
+		emi = tint * bub * 0.4;
+		a = mix(0.92, 0.6, rim);
 	} else if (mode == 6) {
 		float wet = 1.0 - smoothstep(0.0, 0.8, age);
 		col = tint * 0.6 * (0.8 + 0.25 * floor(fbm(n * 1.5) * 3.0) / 3.0);

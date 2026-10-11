@@ -690,7 +690,7 @@ func _dummies(n: int) -> void:
 ## Efecto de prueba delante del jugador, cada 3 s (capturas y comparaciones):
 ## fx_demo=explosion|fire|acid|gas|dust|jet|frost|fireball|wave|death|death_big|beam|chain|tether|
 ## slash|stab|sigil|sweep|impact|thrown|vortex|boomerang|fissure|tentacle|
-## flare|trap (el fogonazo se ve con weapons=thompson dummies=3).
+## flare|trap|telegraph|ooze (el fogonazo se ve con weapons=thompson dummies=3).
 ## Empieza a los 2 s.
 func _fx_demo(kind: String) -> void:
 	var at := player.position + Vector3(2.5, 0, -1.0)
@@ -763,6 +763,13 @@ func _fx_demo(kind: String) -> void:
 				world.fx.add_child(Flare.new().setup(world, at, 2.6, 4.0))
 			"trap":
 				world.fx.add_child(BearTrap.new().setup(world, at + Vector3(1.5, 0, 0), 0.8, 5.0, 0.0, 0.5, {}))
+			"telegraph":
+				var tg := Telegraph.new()
+				tg.setup(2.0, 1.5, Color(1.0, 0.36, 0.18, 0.7), true)
+				tg.position = at
+				world.fx.add_child(tg)
+			"ooze":
+				world.fx.add_child(EnemyZone.new().setup(world, at, 1.6, 2.8, 0.0, 0.0))
 			"sweep":
 				world.fx.add_child(SweepBeam.new().setup(player, world, 6.0, 0.3, 140.0, 0.0, 0.35, 2.6, {}))
 			_:
