@@ -47,7 +47,8 @@ static func make() -> GPUParticles3D:
 	return p
 
 ## Estallido de agua donde algo sale o se zambulle: un aro de gotas que se borra solo.
-static func burst(parent: Node, pos: Vector3, size := 1.0, tint := Color(0, 0, 0, 0), sound := "auto") -> void:
+## `mark`: aro y marca en el suelo (las olas, que estallan en hilera, van sin ella).
+static func burst(parent: Node, pos: Vector3, size := 1.0, tint := Color(0, 0, 0, 0), sound := "auto", mark := true) -> void:
 	if sound == "auto": sound = "splash" if tint.a <= 0.0 else "roar"
 	if sound != "": Sfx.play(sound)
 	var p := make()
@@ -73,4 +74,4 @@ static func burst(parent: Node, pos: Vector3, size := 1.0, tint := Color(0, 0, 0
 	p.emitting = true
 	p.get_tree().create_timer(1.2).timeout.connect(p.queue_free)
 	# aro de polvo o agua y marca en el suelo (11-10-2026): erupciones, zambullidas, emersiones
-	VoxelFx.ground_hit(parent, pos, 1.2 * size, tint if tint.a > 0.0 else Color(0.45, 0.6, 0.7), tint.a > 0.0)
+	if mark: VoxelFx.ground_hit(parent, pos, 1.2 * size, tint if tint.a > 0.0 else Color(0.45, 0.6, 0.7), tint.a > 0.0)

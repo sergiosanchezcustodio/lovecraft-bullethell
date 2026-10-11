@@ -158,7 +158,7 @@ func _step_waves(delta: float) -> void:
 			mat.albedo_color = Color(0.75, 0.88, 1.0, 0.6)
 			var b := obstacles.bounds if obstacles != null else Rect2(-32, -32, 64, 64)
 			for x in range(int(b.position.x), int(b.end.x), 4):
-				WadeSplash.burst(world.fx, Vector3(x, 0, w.z), 1.2)
+				WadeSplash.burst(world.fx, Vector3(x, 0, w.z), 1.2, Color(0, 0, 0, 0), "auto" if x == int(b.position.x) else "", false)
 			for p: Player in _standing():
 				if absf(p.global_position.z - w.z) < w.half:
 					p.take_damage(Damage.new(level.wave_damage, 0.0))
