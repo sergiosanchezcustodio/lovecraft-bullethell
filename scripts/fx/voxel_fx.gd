@@ -44,6 +44,38 @@ static func ensure_floor(parent: Node) -> void:
 	box.position.y = -0.2
 	parent.add_child.call_deferred(box)
 
+## Golpe contra el suelo (saltos de los jefes, erupciones, zambullidas…): aro de polvo hacia
+## fuera, cascotes y una marca que se borra sola. `tint` da el color (polvo, agua, limo…).
+static func ground_hit(parent: Node, pos: Vector3, r: float, tint: Color, debris := true) -> void:
+	if parent == null or not parent.is_inside_tree(): return
+	var root := Node3D.new()
+	parent.add_child(root)
+	root.global_position = Vector3(pos.x, 0.0, pos.z)
+	var ring := emitter("ring_dust", r, true, false, Color(tint.r, tint.g, tint.b))
+	ring.position.y = 0.1
+	root.add_child(ring)
+	if debris:
+		var lit := Color(minf(tint.r * 2.4, 1.0), minf(tint.g * 2.4, 1.0), minf(tint.b * 2.4, 1.0))   # la rampa ya es oscura
+		var d := emitter("debris", r * 0.8, true, false, lit)
+		d.position.y = 0.35
+		root.add_child(d)
+		ensure_floor(parent)
+	var mark := ground(6, r * 0.8)
+	mark.material_override.set_shader_parameter("tint", Color(tint.r, tint.g, tint.b) * 0.45)
+	mark.material_override.set_shader_parameter("age", 0.5)
+	root.add_child(mark)
+	var tw := root.create_tween()
+	tw.tween_method(func(v: float) -> void: mark.material_override.set_shader_parameter("fade", v), 1.0, 0.0, 1.8).set_delay(0.6)
+	tw.tween_callback(root.queue_free)
+
+## Ráfaga breve de una receta en un punto, que se borra sola (recompensas, esquive, subir de nivel).
+static func puff(parent: Node, pos: Vector3, recipe: String, r: float, tint := Color.WHITE, life := 1.5) -> void:
+	if parent == null or not parent.is_inside_tree(): return
+	var e := emitter(recipe, r, true, false, tint)
+	parent.add_child(e)
+	e.global_position = pos
+	e.get_tree().create_timer(life).timeout.connect(e.queue_free)
+
 ## Mancha animada del suelo (`ground_fx.gdshader`): 0 fuego, 1 ácido, 2 quemado.
 static func ground(mode: int, radius: float) -> MeshInstance3D:
 	if _ground_shader == null: _ground_shader = preload("res://scripts/fx/ground_fx.gdshader")
@@ -339,6 +371,38 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.angular_velocity_min = -400.0; m.angular_velocity_max = 400.0
 			m.scale_min = 0.06; m.scale_max = 0.12
 			m.scale_curve = _curve([[0.0, 1.0], [0.8, 1.0], [1.0, 0.0]])
+		"sparkle":                # destellos dorados que saltan (baúles, recompensas)
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 30.0, 12.0, 40.0))
+			p.lifetime = 0.9
+			p.explosiveness = 0.95
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.4
+			m.spread = 60.0
+			m.initial_velocity_min = 2.0; m.initial_velocity_max = 4.5
+			m.gravity = Vector3(0, -7.0, 0)
+			m.angular_velocity_min = -300.0; m.angular_velocity_max = 300.0
+			m.scale_min = 0.04; m.scale_max = 0.09
+			m.scale_curve = _curve([[0.0, 1.0], [0.7, 1.0], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.75, 0.6, 0.3, 1.0)], [0.5, Color(0.7, 0.5, 0.15, 1.0)], [1.0, Color(0.6, 0.3, 0.08, 0.0)]])
+		"rise":                   # columna de luz que sube alrededor (subir de nivel)
+			p.draw_pass_1 = cube("add")
+			p.amount = 46
+			p.lifetime = 1.0
+			p.explosiveness = 0.7
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
+			m.emission_ring_axis = Vector3.UP
+			m.emission_ring_radius = r
+			m.emission_ring_inner_radius = r * 0.8
+			m.emission_ring_height = 0.05
+			m.spread = 5.0
+			m.direction = Vector3.UP
+			m.initial_velocity_min = 3.0; m.initial_velocity_max = 5.0
+			m.damping_min = 0.5; m.damping_max = 1.0
+			m.gravity = Vector3(0, 0.5, 0)
+			m.scale_min = 0.05; m.scale_max = 0.1
+			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.75, 0.62, 0.35, 1.0)], [1.0, Color(0.7, 0.45, 0.15, 0.0)]])
 		"gas":                    # gas de cloro: bocanadas lentas, turbias, que suben poco
 			p.draw_pass_1 = cube("mix")
 			p.amount = int(clampf(r * 8.0, 8.0, 22.0))

@@ -681,6 +681,7 @@ func _item_hit(e: Node3D, dmg: float, item: String) -> void:
 ## Al empezar un esquive: señuelo, petardos y furia.
 func _on_dodge() -> void:
 	var from := global_position - motor.dodge_dir * 0.3
+	if world != null: VoxelFx.puff(world.fx, from + Vector3(0, 0.1, 0), "ring_dust", 0.5, Color(0.8, 0.8, 0.85), 1.0)
 	if data.decoy_time > 0.0 and world != null:              # Capa del Hombre Negro
 		world.fx.add_child(Flare.new().setup(world, from, data.decoy_time, DECOY_RADIUS))
 	if data.dodge_blast > 0.0: blast(from, data.dodge_blast, "petardos")

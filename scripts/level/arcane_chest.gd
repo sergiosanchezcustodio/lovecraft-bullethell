@@ -125,6 +125,7 @@ func open(by: Player) -> void:
 	by.health = minf(by.data.max_health, by.health + by.data.max_health * heal)
 	by.sanity = minf(by.data.max_sanity, by.sanity + by.data.max_sanity * heal)
 	_coins.emitting = true
+	VoxelFx.puff(get_parent(), global_position + Vector3(0, 0.5, 0), "sparkle", 0.6)   # destellos (11-10-2026)
 	var label := Label3D.new()                                                       # "+35 $" que sube
 	label.text = "+%d $" % money
 	label.font_size = 64

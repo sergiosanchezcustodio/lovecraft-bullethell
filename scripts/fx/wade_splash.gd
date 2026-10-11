@@ -72,3 +72,5 @@ static func burst(parent: Node, pos: Vector3, size := 1.0, tint := Color(0, 0, 0
 	p.global_position = pos
 	p.emitting = true
 	p.get_tree().create_timer(1.2).timeout.connect(p.queue_free)
+	# aro de polvo o agua y marca en el suelo (11-10-2026): erupciones, zambullidas, emersiones
+	VoxelFx.ground_hit(parent, pos, 1.2 * size, tint if tint.a > 0.0 else Color(0.45, 0.6, 0.7), tint.a > 0.0)

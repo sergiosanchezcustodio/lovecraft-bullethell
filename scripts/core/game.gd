@@ -332,6 +332,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	q.progress.leveled_up.connect(func(l: int) -> void: Achievements.record(Saves.current, "best_level", l))
 	q.progress.leveled_up.connect(func(_l: int) -> void:
 		Sfx.play("level_up")
+		VoxelFx.puff(q, q.global_position, "rise", 0.6, Color.WHITE, 1.4)      # columna de luz (11-10-2026)
 		q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
 		if q.data.team_heal_on_level > 0.0:                   # rasgo de West: cura a los compañeros cercanos
 			for o in players:
@@ -690,7 +691,7 @@ func _dummies(n: int) -> void:
 ## Efecto de prueba delante del jugador, cada 3 s (capturas y comparaciones):
 ## fx_demo=explosion|fire|acid|gas|dust|jet|frost|fireball|wave|death|death_big|beam|chain|tether|
 ## slash|stab|sigil|sweep|impact|thrown|vortex|boomerang|fissure|tentacle|
-## flare|trap|telegraph|ooze (el fogonazo se ve con weapons=thompson dummies=3).
+## flare|trap|telegraph|ooze|leap|erupt|chest|angles|levelup (el fogonazo se ve con weapons=thompson dummies=3).
 ## Empieza a los 2 s.
 func _fx_demo(kind: String) -> void:
 	var at := player.position + Vector3(2.5, 0, -1.0)
@@ -770,6 +771,23 @@ func _fx_demo(kind: String) -> void:
 				world.fx.add_child(tg)
 			"ooze":
 				world.fx.add_child(EnemyZone.new().setup(world, at, 1.6, 2.8, 0.0, 0.0))
+			"leap":
+				VoxelFx.ground_hit(world.fx, at, 2.2, Color(0.6, 0.58, 0.55))
+			"erupt":
+				WadeSplash.burst(world.fx, at, 1.4, Color(0.45, 0.35, 0.25, 1.0), "")
+			"chest":
+				VoxelFx.puff(world.fx, at + Vector3(0, 0.5, 0), "sparkle", 0.6)
+			"angles":
+				var hz := Node3D.new()
+				hz.position = at
+				world.fx.add_child(hz)
+				var pit := VoxelFx.ground(11, 1.6)
+				pit.position.y = 0.04
+				hz.add_child(pit)
+				hz.add_child(VoxelFx.emitter("vortex_in", 1.7, false, false, Color(0.4, 1.0, 0.55)))
+				get_tree().create_timer(2.8).timeout.connect(hz.queue_free)
+			"levelup":
+				VoxelFx.puff(player, player.global_position, "rise", 0.6, Color.WHITE, 1.4)
 			"sweep":
 				world.fx.add_child(SweepBeam.new().setup(player, world, 6.0, 0.3, 140.0, 0.0, 0.35, 2.6, {}))
 			_:

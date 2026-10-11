@@ -102,13 +102,11 @@ func _angle_mesh(r: float) -> Node3D:
 	var glow := StandardMaterial3D.new()
 	glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	glow.albedo_color = Color(0.25, 0.85, 0.45) * 0.8
-	var floor_mi := MeshInstance3D.new()                  # el pozo: un disco negro
-	var cyl := CylinderMesh.new()
-	cyl.top_radius = r * 0.55; cyl.bottom_radius = r * 0.55; cyl.height = 0.04; cyl.radial_segments = 7
-	floor_mi.mesh = cyl
-	floor_mi.material_override = dark
-	floor_mi.position.y = 0.03
-	root.add_child(floor_mi)
+	# el pozo en celdas con grietas verdes que no cuadran, y motas que caen hacia dentro (11-10-2026)
+	var pit := VoxelFx.ground(11, r * 0.75)
+	pit.position.y = 0.04
+	root.add_child(pit)
+	root.add_child(VoxelFx.emitter("vortex_in", r * 0.8, false, false, Color(0.4, 1.0, 0.55)))
 	for i in 9:                                           # esquirlas inclinadas
 		var mi := MeshInstance3D.new()
 		var b := BoxMesh.new()

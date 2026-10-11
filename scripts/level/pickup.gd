@@ -63,6 +63,7 @@ func _physics_process(_delta: float) -> void:
 		off.y = 0.0
 		if off.length() < 0.9:
 			Sfx.play("pickup")
+			VoxelFx.puff(get_parent(), global_position + Vector3(0, 0.4, 0), "sparkle", 0.35)
 			_give(p)
 			queue_free()
 			return

@@ -85,6 +85,7 @@ func _fly(e: Enemy, delta: float) -> bool:
 		_air_t = -1.0
 		e.position.y = 0.0
 		_impact(e, _to, _radius(e), maxf(12.0, e.data.contact_physical * 1.5), 6.0)
+		VoxelFx.ground_hit(e.world.fx, _to, _radius(e), Color(0.6, 0.58, 0.55))   # polvo, cascotes y marca
 	return true
 
 ## Dónde caer: hacia el jugador, lo más cerca de él que se pueda (sin pasarse), en un sitio con

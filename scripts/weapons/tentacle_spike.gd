@@ -56,7 +56,7 @@ func _physics_process(delta: float) -> void:
 	_t += delta
 	if not _struck and _t >= WARN:
 		_struck = true
-		var burst := VoxelFx.emitter("debris", radius, true, false, Color(0.5, 0.55, 0.4))   # tierra que salta (11-10-2026)
+		var burst := VoxelFx.emitter("debris", radius, true, false, Color(1.0, 1.0, 0.85))   # tierra que salta (11-10-2026)
 		burst.position.y = 0.35                      # por encima del suelo de colisión
 		add_child(burst)
 		VoxelFx.ensure_floor(get_parent())

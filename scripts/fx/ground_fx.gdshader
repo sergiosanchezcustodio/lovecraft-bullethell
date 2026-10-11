@@ -12,7 +12,8 @@ render_mode unshaded, cull_disabled, depth_draw_never, shadows_disabled;
 // de cinco puntas (color `tint`, aparece con `age`); 8 tajo: barrido circular con estela
 // (`age` = avance del giro, 0..1); 9 vórtice: brazos en espiral que giran hacia dentro,
 // iridiscentes, con el centro oscuro; 10 limo: charco espeso del color `tint` con brillos
-// húmedos y burbujas lentas que revientan.
+// húmedos y burbujas lentas que revientan; 11 Ángulos: pozo negro en celdas con grietas
+// rectas en ángulos que no cuadran y luz verde que late en ellas.
 
 uniform int mode = 0;
 uniform float fade = 1.0;
@@ -190,6 +191,20 @@ void fragment() {
 		col = mix(col, vec3(1.0, 0.82, 0.4) * 0.7, mote * (1.0 - rim));
 		emi = vec3(1.0, 0.8, 0.35) * mote * (1.0 - rim) * 0.8;
 		a = mix(0.85, 0.4, rim);
+	} else if (mode == 11) {
+		float cr = 0.0;
+		for (int i = 0; i < 6; i++) {                 // grietas rectas con ángulos que no cuadran
+			float a11 = hash(vec2(float(i), seed)) * 6.2831853 + TIME * 0.05 * (float(i) - 2.5);
+			vec2 d11 = vec2(cos(a11), sin(a11));
+			float off = (hash(vec2(seed, float(i))) - 0.5) * 0.9;
+			cr = max(cr, step(abs(dot(q, vec2(-d11.y, d11.x)) - off), 0.035));
+		}
+		float pit = 1.0 - smoothstep(0.2, 0.75, r);
+		col = mix(vec3(0.05, 0.07, 0.06), vec3(0.0, 0.01, 0.0), pit);
+		float pulse = 0.6 + 0.4 * sin(TIME * 5.0 + r * 8.0);
+		col = mix(col, vec3(0.15, 0.6, 0.3), cr * pulse);
+		emi = vec3(0.2, 0.9, 0.45) * cr * pulse * 0.9;
+		a = mix(0.95, 0.7, rim);
 	} else if (mode == 10) {
 		float lq = fbm(n * 0.8 + vec2(t * 0.08, -t * 0.05));
 		col = tint * (0.7 + 0.6 * floor(lq * 4.0) / 4.0);
