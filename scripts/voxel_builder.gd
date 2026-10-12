@@ -114,6 +114,11 @@ static func dress(root: Node3D, garment_path: String, hides_hat := false) -> boo
 static func is_cached(path: String) -> bool:
 	return _cache.has(path)
 
+## Olvida un modelo ya construido para que la próxima carga lea el JSON de nuevo (revisión de
+## arte: el modelo cambia en disco con el juego abierto).
+static func forget(path: String) -> void:
+	_cache.erase(path)
+
 static func clear_cache() -> void:
 	_cache.clear()
 

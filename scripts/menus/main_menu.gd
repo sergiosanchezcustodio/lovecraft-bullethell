@@ -18,8 +18,10 @@ func _ready() -> void:
 	col.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	col.custom_minimum_size = Vector2(380, 0)
 	add_child(col)
-	for pair in [["Jugar", _open_play], ["Tienda", _open_shop], ["Biblioteca", _open_library],
-			["Configuración", _open_settings], ["Salir", _ask_quit]]:
+	var opts := [["Jugar", _open_play], ["Tienda", _open_shop], ["Biblioteca", _open_library],
+			["Configuración", _open_settings], ["Salir", _ask_quit]]
+	if Review.available(): opts.insert(4, ["Revisión de arte (temporal)", _open_review])   # solo en desarrollo
+	for pair in opts:
 		var b := MenuKit.button(pair[0], MenuKit.INK, 30)
 		b.custom_minimum_size = Vector2(380, 54)
 		b.pressed.connect(pair[1])
@@ -110,6 +112,9 @@ func open_library_at(tome: int, cursor: int) -> void:
 	_open_library()
 	if tome >= 0: (_popup as LibraryMenu).open_at.call_deferred(tome, cursor)
 
+func _open_review() -> void:
+	_push(ReviewMenu.new(), 4)
+
 func _open_settings() -> void:
 	var s := SettingsMenu.new()
 	s.closed.connect(func() -> void: pass)
@@ -126,7 +131,7 @@ func _ask_quit() -> void:
 		if yes:
 			Saves.save()
 			get_tree().quit())
-	_push(c, 4)
+	_push(c, _buttons.size() - 1)
 
 ## Las ventanas sencillas se cierran con B / Esc.
 func _closes_with_cancel(p: Control) -> void:

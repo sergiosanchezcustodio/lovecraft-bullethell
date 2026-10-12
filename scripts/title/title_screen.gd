@@ -14,6 +14,7 @@ extends Control
 ##                       open=slots_borrar, además la confirmación de borrado; open=menu (menú
 ##                       principal), open=menu_jugar, open=menu_config tab=0..3, open=menu_tienda tab=0..3, open=menu_logros,
 ##                       open=menu_biblioteca tome=N cursor=N
+##                       open=menu_revision (revisión de arte, temporal)
 ## Cualquier botón principal (A, B, X, Y, Start, Select; Intro, Espacio o Esc) salta la
 ## presentación y, con el aviso visible, abre la ventana de huecos de partida (D-22).
 
@@ -317,6 +318,9 @@ func _process(delta: float) -> void:
 		elif what == "menu_tienda": _menu.open_shop_tab.call_deferred(args.get_int("tab", 0))
 		elif what == "menu_logros": _menu._open_achievements.call_deferred()
 		elif what == "menu_biblioteca": _menu.open_library_at.call_deferred(args.get_int("tome", -1), args.get_int("cursor", 0))
+		elif what == "menu_revision":
+			_menu._open_review.call_deferred()
+			if args.has("tab"): (func() -> void: (_menu._popup as ReviewMenu)._show_section(args.get_int("tab"))).call_deferred()
 	if args.get_str("open").begins_with("slots") and _slots == null and not _done and t > _end_intro():
 		var borrar := args.get_str("open") == "slots_borrar"
 		args.options.erase("open")
