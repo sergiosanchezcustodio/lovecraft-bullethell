@@ -22,3 +22,4 @@ builds/
 # modelos comprimidos para exportar (tools/empaquetar_modelos.gd)
 models/*.json.z
 tools/local/
+review/peticiones.json*

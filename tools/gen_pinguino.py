@@ -17,8 +17,9 @@ M = Model(S=2, seed=1931)
 DARK = (0.54, 0.57, 0.62); DARK_SH = (0.49, 0.52, 0.57)        # "negro" del frac, despigmentado
 WHITE = (0.93, 0.93, 0.91); WHITE_SH = (0.87, 0.87, 0.85)
 EAR = (0.95, 0.86, 0.60)                                        # manchas de las orejas
-BEAK = (0.74, 0.70, 0.68); BEAK_STRIPE = (0.88, 0.64, 0.60)
-PINK = (0.86, 0.62, 0.60); PINK_SH = (0.72, 0.50, 0.49)
+# pico y patas vivos, con contraste con el plumaje blanco (revisión de arte, 12-10-2026)
+BEAK = (0.96, 0.56, 0.42); BEAK_STRIPE = (0.82, 0.28, 0.26)
+PINK = (0.97, 0.45, 0.55); PINK_SH = (0.76, 0.27, 0.36)
 MILK = (0.82, 0.84, 0.88); MILK_SH = (0.66, 0.68, 0.74)
 
 # Tamaño: K = 0,8 da unos 1,2 m (se redujo un 20 % tras la primera partida de prueba).

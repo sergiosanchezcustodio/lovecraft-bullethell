@@ -18,6 +18,10 @@ SHEEN = (0.14, 0.30, 0.26); SHEEN_P = (0.26, 0.16, 0.32)
 PUST = (0.30, 0.38, 0.22); PUST_L = (0.52, 0.60, 0.34)
 EYE = (0.72, 0.96, 0.40); EYE_R = (0.05, 0.09, 0.05); PUPIL = (0.01, 0.02, 0.01)
 MAW = (0.06, 0.01, 0.03); GUM = (0.26, 0.07, 0.13); TOOTH = (0.70, 0.72, 0.60)
+if NAME == 'fragmento':                       # más claro y en morados y violetas (revisión de arte, 12-10-2026);
+    BLACK = (0.10, 0.05, 0.16); DEEP_G = (0.22, 0.10, 0.34); DEEP_P = (0.36, 0.17, 0.50)   # el shoggoth grande sigue negro
+    SHEEN = (0.46, 0.30, 0.64); SHEEN_P = (0.62, 0.40, 0.78)
+    PUST = (0.50, 0.30, 0.58); PUST_L = (0.74, 0.54, 0.84)
 
 # ================= VOLÚMENES =================
 M.ell(0, 4.2, 0, 7.0, 4.6, 6.4, 'body', 'proto')                     # masa principal, apoyada

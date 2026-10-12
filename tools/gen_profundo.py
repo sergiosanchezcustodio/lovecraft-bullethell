@@ -12,7 +12,7 @@ a escala 1,3).
 Variante `pththya` (hito 6.5): Pth'thya-l'yi, la antepasada milenaria. Erguida (casi sin
 joroba), verde azulado viejo con el vientre nacarado, un manto de aletas largas que le cae de
 los hombros a las corvas, cresta muy alta y ojos dorados que brillan. Sin joyas: solo anatomía.
-Variante `hydra` (hito 6.5): Madre Hydra, colosal (en el juego a escala 3): muy encorvada,
+Variante `hydra` (hito 6.5): Madre Hydra, colosal (en el juego a escala 3): erguida con una chepa (antes muy encorvada),
 verde negruzco, vientre pálido, velas de aletas en la espalda, ojos y agallas de luz verde.
 Uso: python tools/gen_profundo.py [profundo|profundo_lanzador|profundo_anciano|pththya|hydra]  (sin argumento, todos)
 """
@@ -129,6 +129,13 @@ def build(NAME):
     if HYDRA:
         for (x, y, z), v in list(M.V.items()):                          # ojos y agallas de luz
             if v[1] in (EYE, GILL): M.V[(x, y, z)] = [v[0], GLOW if v[1] == GILL else EYE, 1]
+        # chepa redondeada en lo alto de la espalda (revisión de arte, 12-10-2026: con chepa,
+        # pero sin ir tan inclinada; antes la daba solo la inclinación del tronco)
+        for x in range(-8, 9):
+            for y in range(44, 66):
+                for z in range(-14, -5):
+                    if ((x + 0.5) / 7.5) ** 2 + ((y - 55) / 10.5) ** 2 + ((z + 7) / 5.0) ** 2 <= 1.0:
+                        M.put(x, y, z, T, BACK if (x + y + z) % 5 else SCALE, over=False)
         for i, xs in enumerate((-7, 6)):                                # dos velas de aletas a lo largo de la espalda
             for y in range(36, 64):
                 h = int(5 + 9 * math.sin((y - 36) / 28 * math.pi))      # más altas en medio
@@ -159,7 +166,7 @@ def build(NAME):
                 for z in (-9, -10):
                     if y < 20 and (x + y) % 3 == 0: continue            # borde deshilachado
                     M.put(x, y, z - (62 - y) // 12, T, col, over=False)
-    piv = cu.hunch(M, k=0.15 if QUEEN else (0.6 if HYDRA else 0.4), head_drop=2 if QUEEN else (6 if HYDRA else 4))
+    piv = cu.hunch(M, k=0.15 if QUEEN else (0.12 if HYDRA else 0.4), head_drop=2 if QUEEN else (2 if HYDRA else 4))
     cu.finish(M, NAME, {BACK: 'piel', FLANK: 'piel', SCALE: 'piel', BELLY: 'piel'} if not (OLD or QUEEN or HYDRA) else {BACK: 'piel', FLANK: 'piel', SCALE: 'piel'},
               flat=(EYE, PUPIL, MOUTH, TOOTH, GILL, CLAW, GLOW), extra_pivots=piv, roughness=0.45, specular=0.5)
 

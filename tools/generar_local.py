@@ -13,6 +13,7 @@ Arrancarlo antes (se queda escuchando en 127.0.0.1:8188):
   python tools/generar_local.py arma webly                  # icono de un arma
   python tools/generar_local.py objeto ankh --semillas 3    # tres variantes de un objeto
   python tools/generar_local.py libre "a voxel lantern" --nombre farol
+  --tam N  lado de la imagen (por defecto 1024; 768 si la tarjeta va justa de memoria)
   --usar   copia la variante 1 como icono del juego (si no, todo va a tools/local/ para revisarlo)
 
 Salida de prueba: tools/local/<nombre>_<semilla>.png (bruto) y _icono.png (recortado).
@@ -53,9 +54,9 @@ def _get(path):
         return r.read()
 
 
-def generate(prompt, seed):
+def generate(prompt, seed, size=1024):
     """Lanza el grafo y espera la imagen (PNG en bytes)."""
-    body = json.dumps({'prompt': workflow(prompt, seed)}).encode()
+    body = json.dumps({'prompt': workflow(prompt, seed, size)}).encode()
     req = urllib.request.Request(URL + '/prompt', data=body, headers={'Content-Type': 'application/json'})
     try:
         pid = json.loads(urllib.request.urlopen(req, timeout=30).read())['prompt_id']
@@ -110,7 +111,7 @@ def main():
     for k in range(seeds):
         seed = int(opt('--semilla', '1000')) + k
         t0 = time.time()
-        png = generate(prompt, seed)
+        png = generate(prompt, seed, int(opt('--tam', '1024')))
         raw = os.path.join(TEST, '%s_%d.png' % (key, seed))
         open(raw, 'wb').write(png)
         icon = os.path.join(TEST, '%s_%d_icono.png' % (key, seed))
