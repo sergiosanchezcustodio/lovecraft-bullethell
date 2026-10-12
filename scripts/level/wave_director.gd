@@ -22,6 +22,10 @@ var spawned_total := 0
 var killed_total := 0
 var rng := RandomNumberGenerator.new()
 var max_alive_override := -1
+## Tope duro de enemigos vivos (12-10-2026): cada enemigo cuesta ~0,04 ms de física por paso y,
+## pasados unos 180, la física no llega a 60 Hz y el juego se hunde (150: 70 FPS; 200: 41;
+## 250: 20; 300: 8). Subirlo exige antes abaratar la lógica de los enemigos.
+const HARD_CAP := 180
 var players := 1                           ## jugadores: escala vida y aparición (GDD 4.6)
 ## Depuración (menú de pausa > Depuración):
 var target_alive := -1                     ## > 0: mantiene exactamente tantos enemigos vivos
@@ -43,7 +47,7 @@ func setup(p_level: LevelData, p_world: CombatWorld, p_obstacles: ObstacleMap, p
 
 func max_alive() -> int:
 	if max_alive_override > 0: return max_alive_override
-	return int(round(level.max_alive * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.cap()))
+	return mini(HARD_CAP, int(round(level.max_alive * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.cap())))
 
 func _physics_process(delta: float) -> void:
 	if completed: return
@@ -91,7 +95,7 @@ func _survival_step(delta: float) -> bool:
 			completed = true
 			level_completed.emit()
 		return true
-	var cap := int(round(level.final_cap * Difficulty.cap())) if level.final_cap > 0 else max_alive()
+	var cap := mini(HARD_CAP, int(round(level.final_cap * Difficulty.cap()))) if level.final_cap > 0 else max_alive()
 	cap = int(round(cap * LevelData.coop(level.coop_spawn, players)))
 	_acc += level.final_rate * LevelData.coop(level.coop_spawn, players) * Difficulty.rate() * delta
 	while _acc >= 1.0:

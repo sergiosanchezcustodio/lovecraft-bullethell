@@ -47,4 +47,4 @@ func test_la_horda_llega_con_su_tope_y_el_nivel_se_supera_al_aguantar() -> void:
 	assert_true(d.completed)
 
 func after_all() -> void:
-	Difficulty.forced = -1
+	Difficulty.forced = 0                                  # (pre_run.gd la deja en la base)

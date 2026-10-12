@@ -354,7 +354,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void: Achievements.add(Saves.current, "crises"))
 	q.sanity_state.crisis_started.connect(func(k: StringName) -> void:
 		var what := "Crisis: %s" % SanityState.NAMES.get(k, "locura")
-		announce(what if players.size() == 1 else "J%d · %s" % [i + 1, what], 1.5))
+		announce(what if players.size() == 1 else "J%d · %s" % [i + 1, what], 2.5))
 	q.lights.assign(arena.get_meta("lights"))       # las luces del escenario recuperan cordura
 	q.madness = bool(Settings.get_value("madness"))
 	q.weapons = WeaponSystem.new().setup(q, world)

@@ -90,7 +90,8 @@ func _video() -> void:
 			Settings.apply_video())
 
 func _audio() -> void:
-	for pair in [["Volumen general", "vol_master"], ["Música", "vol_music"], ["Efectos", "vol_sfx"]]:
+	for pair in [["Volumen general", "vol_master"], ["Música", "vol_music"], ["Efectos", "vol_sfx"],
+			["Armas e impactos", "vol_weapons"]]:
 		var key: String = pair[1]
 		var steps: Array[String] = []
 		for k in 11: steps.append("%d %%" % (k * 10))

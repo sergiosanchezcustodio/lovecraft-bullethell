@@ -106,4 +106,4 @@ func test_los_que_emergen_salen_del_agua_cerca_de_un_jugador() -> void:
 		assert_between(at.distance_to(dry), 4.9, 9.1, "a 5-9 m del jugador")
 
 func after_all() -> void:
-	Difficulty.forced = -1
+	Difficulty.forced = 0                                  # (pre_run.gd la deja en la base)

@@ -1,8 +1,8 @@
 {
-	"_comentario": "Efectos de sonido (hito 8.1): evento -> archivos de resources/sfx (al azar), volumen en dB, tono al azar [min, max], voces a la vez y separación mínima en s. Sintetizados (tools/gen_sfx.py) y CC0 de Kenney (kenney.nl).",
+	"_comentario": "Efectos de sonido (hito 8.1): evento -> archivos de resources/sfx (al azar), volumen en dB, tono al azar [min, max], voces a la vez y separación mínima en s. Sintetizados (tools/gen_sfx.py) y CC0 de Kenney (kenney.nl). `group` (armas, golpes): todas las del grupo comparten un tope de voces y se atenúan cuanto más suenan a la vez (Sfx.GROUPS); el volumen de las armas se regula aparte en Configuración > Audio.",
 	"eventos": {
 		"shot_revolver": {
-			"db": -10,
+			"db": -18,
 			"pitch": [
 				0.92,
 				1.08
@@ -11,10 +11,11 @@
 			"gap": 0.05,
 			"files": [
 				"shot_revolver.wav"
-			]
+			],
+			"group": "armas"
 		},
 		"shot_rifle": {
-			"db": -9,
+			"db": -17,
 			"pitch": [
 				0.95,
 				1.05
@@ -23,10 +24,11 @@
 			"gap": 0.08,
 			"files": [
 				"shot_rifle.wav"
-			]
+			],
+			"group": "armas"
 		},
 		"shot_shotgun": {
-			"db": -8,
+			"db": -16,
 			"pitch": [
 				0.95,
 				1.05
@@ -35,10 +37,11 @@
 			"gap": 0.1,
 			"files": [
 				"shot_shotgun.wav"
-			]
+			],
+			"group": "armas"
 		},
 		"shot_smg": {
-			"db": -13,
+			"db": -21,
 			"pitch": [
 				0.9,
 				1.1
@@ -47,10 +50,11 @@
 			"gap": 0.04,
 			"files": [
 				"shot_smg.wav"
-			]
+			],
+			"group": "armas"
 		},
 		"swing": {
-			"db": -10,
+			"db": -18,
 			"pitch": [
 				0.85,
 				1.15
@@ -59,10 +63,11 @@
 			"gap": 0.08,
 			"files": [
 				"swing.wav"
-			]
+			],
+			"group": "armas"
 		},
 		"magic": {
-			"db": -14,
+			"db": -21,
 			"pitch": [
 				0.8,
 				1.1
@@ -73,10 +78,11 @@
 				"magic_0.ogg",
 				"magic_1.ogg",
 				"magic_2.ogg"
-			]
+			],
+			"group": "armas"
 		},
 		"beam": {
-			"db": -16,
+			"db": -22,
 			"pitch": [
 				0.8,
 				1.0
@@ -86,10 +92,11 @@
 			"files": [
 				"beam_0.ogg",
 				"beam_1.ogg"
-			]
+			],
+			"group": "armas"
 		},
 		"fire": {
-			"db": -15,
+			"db": -22,
 			"pitch": [
 				0.9,
 				1.1
@@ -99,10 +106,11 @@
 			"files": [
 				"fire_0.ogg",
 				"fire_1.ogg"
-			]
+			],
+			"group": "armas"
 		},
 		"explosion": {
-			"db": -6,
+			"db": -12,
 			"pitch": [
 				0.85,
 				1.05
@@ -113,10 +121,11 @@
 				"explosion_0.ogg",
 				"explosion_1.ogg",
 				"explosion_2.ogg"
-			]
+			],
+			"group": "golpes"
 		},
 		"hit": {
-			"db": -17,
+			"db": -22,
 			"pitch": [
 				0.85,
 				1.15
@@ -130,10 +139,11 @@
 				"hit_player_0.ogg",
 				"hit_player_1.ogg",
 				"hit_player_2.ogg"
-			]
+			],
+			"group": "golpes"
 		},
 		"die": {
-			"db": -14,
+			"db": -19,
 			"pitch": [
 				0.8,
 				1.15
@@ -145,7 +155,8 @@
 				"die_1.ogg",
 				"die_2.ogg",
 				"die_3.ogg"
-			]
+			],
+			"group": "golpes"
 		},
 		"hit_player": {
 			"db": -6,
@@ -240,7 +251,7 @@
 			]
 		},
 		"glass": {
-			"db": -10,
+			"db": -14,
 			"pitch": [
 				0.85,
 				1.15
@@ -250,7 +261,8 @@
 			"files": [
 				"glass_0.ogg",
 				"glass_1.ogg"
-			]
+			],
+			"group": "golpes"
 		},
 		"slam": {
 			"db": -4,

@@ -54,6 +54,36 @@ func test_la_huida_aleja_del_horror() -> void:
 	for i in 30: p._physics_process(DT)
 	assert_lt(p.global_position.x, -0.5, "corre en dirección contraria")
 
+func test_la_huida_rodea_el_decorado() -> void:
+	# con una roca justo detrás, antes se quedaba pegado a ella toda la crisis
+	var p := _player("dyer", Vector3.ZERO)
+	world.obstacles = ObstacleMap.new()
+	world.obstacles.add_circle(Vector2(-1.6, 0), 1.0)
+	var d: EnemyData = (load("res://data/enemies/pinguino.tres") as EnemyData).duplicate()
+	var e := Enemy.new().setup(d, world, null)
+	e.position = Vector3(3, 0, 0)
+	world.add_child(e)
+	world.rebuild_grid()
+	_crisis(p, &"huida")
+	var start := p.global_position
+	for i in 60: p._physics_process(DT)
+	assert_gt(p.global_position.distance_to(start), 1.5, "sigue huyendo por un lado")
+
+func test_tras_una_crisis_la_presencia_da_un_respiro() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	p.sanity_state.since_crisis = 0.0
+	var d: EnemyData = (load("res://data/enemies/pinguino.tres") as EnemyData).duplicate()
+	var e := Enemy.new().setup(d, world, null)
+	e.position = Vector3(1, 0, 0)
+	world.add_child(e)
+	world.rebuild_grid()
+	p._presence_step(DT)
+	assert_eq(p.presence, 0.0, "recién salido de una crisis no drena")
+	p.sanity_state.since_crisis = 99.0
+	p._presence_t = 0.0
+	p._presence_step(DT)
+	assert_gt(p.presence, 0.0, "después, sí")
+
 func test_el_delirio_invierte_los_controles() -> void:
 	var p := _player("dyer", Vector3.ZERO)
 	_crisis(p, &"delirio")

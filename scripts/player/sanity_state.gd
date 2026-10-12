@@ -21,6 +21,7 @@ const NAMES := {&"paralisis": "parálisis", &"huida": "huida histérica", &"vaga
 
 var rules: ProgressionData
 var in_crisis := false
+var since_crisis := 999.0                  ## s desde que acabó la última crisis (la presencia respeta un respiro)
 var crisis_kind := &""
 var crisis_time := 0.0
 var crisis_duration := 0.0
@@ -44,10 +45,12 @@ func on_mental_damage() -> void:
 ## Avanza la cordura. Devuelve el nuevo valor de cordura del jugador.
 func update(delta: float, sanity: float, max_sanity: float, near_horror: bool) -> float:
 	since_mental_hit += delta
+	since_crisis += delta
 	if in_crisis:
 		crisis_time += delta * (1.0 + calm_speed * rules.calm_rate)     # calmarlo la acorta
 		if crisis_time >= crisis_duration:
 			in_crisis = false
+			since_crisis = 0.0
 			crisis_kind = &""
 			crisis_ended.emit()
 			return max_sanity * rules.crisis_restore

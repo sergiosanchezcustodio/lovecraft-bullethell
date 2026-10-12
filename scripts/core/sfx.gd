@@ -8,7 +8,13 @@ extends Node
 ## - Bus "Efectos" (Settings). `mute=true` silencia también los efectos.
 ## - Los botones de los menús suenan solos al recibir el foco y al pulsarse (node_added).
 
+## - Grupos (12-10-2026): las armas disparan sin parar, varias a la vez y con varios jugadores.
+##   Los eventos de un grupo comparten un tope de voces y cada voz baja `duck` dB por cada otra
+##   que ya suena del grupo, así la mezcla no crece con las armas ni con los jugadores. Las del
+##   grupo "armas" y "golpes" siguen además el volumen de armas de la configuración (`vol_weapons`).
+
 const POOL := 24
+const GROUPS := {"armas": {"voices": 4, "duck": 2.5}, "golpes": {"voices": 5, "duck": 2.0}}
 var _defs := {}
 var _streams := {}                         ## evento -> Array[AudioStream]
 var _players: Array[AudioStreamPlayer] = []
@@ -48,6 +54,13 @@ func play(ev: String, vol_db := 0.0) -> void:
 	var voices: Array = _playing.get(ev, [])
 	voices = voices.filter(func(p: AudioStreamPlayer) -> bool: return p.playing and p.get_meta("ev", "") == ev)
 	if voices.size() >= int(def.get("voices", 4)): return
+	var group: String = def.get("group", "")
+	var busy := 0
+	if group != "":
+		for q in _players:
+			if q.playing and q.get_meta("group", "") == group: busy += 1
+		if busy >= int(GROUPS[group].voices): return
+		vol_db += -float(GROUPS[group].duck) * busy + _weapons_db()
 	_last[ev] = now
 	var p := _free_player()
 	var list: Array = _streams[ev]
@@ -56,10 +69,16 @@ func play(ev: String, vol_db := 0.0) -> void:
 	var pr: Array = def.get("pitch", [0.95, 1.05])
 	p.pitch_scale = randf_range(float(pr[0]), float(pr[1]))
 	p.set_meta("ev", ev)
+	p.set_meta("group", group)
 	p.play()
 	counts[ev] = int(counts.get(ev, 0)) + 1
 	voices.append(p)
 	_playing[ev] = voices
+
+## dB del volumen de las armas de la configuración (0 = silencio).
+func _weapons_db() -> float:
+	var v := float(Settings.get_value("vol_weapons")) if Settings.has_method("get_value") else 0.7
+	return -80.0 if v <= 0.01 else linear_to_db(v)
 
 func _free_player() -> AudioStreamPlayer:
 	for k in POOL:

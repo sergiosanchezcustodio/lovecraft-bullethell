@@ -187,6 +187,7 @@ func _physics_process_step(delta: float) -> void:
 	var before := sanity_state.crises
 	sanity = sanity_state.update(delta, sanity, data.max_sanity, near)
 	if sanity_state.crises != before and madness: rebuild_stats()      # locura acumulada
+	_presence_step(delta)
 	if data.calm_aura > 0.0 and world != null:       # rasgo de Iwanicki: calma a sí mismo y a los cercanos
 		for p in world.players:
 			if p.health > 0.0 and p.global_position.distance_to(global_position) <= CALM_RADIUS:
@@ -251,18 +252,58 @@ func _crisis_move(delta: float, move: Vector2) -> Vector2:
 		var e := world.nearest_enemy(global_position, 14.0) if world != null else null
 		var away := (global_position - e.global_position) if e != null else motor.facing
 		away.y = 0.0
-		return _to_screen(away.normalized())
+		return _to_screen(_free_heading(away.normalized()))
 	if ss.is_kind(&"vagar"):
 		_wander += (sin(ss.crisis_time * 1.7) * 2.0 + sin(ss.crisis_time * 4.3)) * delta
 		var w := Vector2(cos(_wander), sin(_wander))
 		return (w * (1.0 - rules.wander_obey) + move * rules.wander_obey).limit_length(1.0)
 	return move
 
+## Rumbo de huida que no choca (12-10-2026): en línea recta se quedaba pegado a una pared
+## de 4 a 6 s sin control y parecía enganchado al decorado. Prueba el rumbo pedido y otros
+## cada vez más abiertos, a los dos lados, y se queda con el primero libre a 1,2 m.
+func _free_heading(dir: Vector3) -> Vector3:
+	var obs: ObstacleMap = world.obstacles if world != null else null
+	if obs == null: return dir
+	var here := Vector2(global_position.x, global_position.z)
+	for ang in [0.0, 0.5, -0.5, 1.0, -1.0, 1.6, -1.6, 2.2, -2.2, PI]:
+		var d := dir.rotated(Vector3.UP, ang)
+		if not obs.is_blocked(here + Vector2(d.x, d.z) * 1.2, data.hurt_radius):
+			return d
+	return dir
+
 ## Del suelo al espacio de la pantalla (inverso de PlayerMotor.screen_to_world).
 static func _to_screen(d: Vector3) -> Vector2:
 	return Vector2(d.dot(PlayerMotor.screen_to_world(Vector2(1, 0))), d.dot(PlayerMotor.screen_to_world(Vector2(0, 1))))
 
 ## Presencia de una élite o un jefe: drena cordura sin contar como golpe.
+## Presencia (12-10-2026): los enemigos cercanos drenan cordura, más cuanto más cerca, cuantos
+## más y cuanto más alto su escalón (las élites y los seres únicos, mucho). Se mira cada
+## PRESENCE_EVERY s; tope PRESENCE_MAX por segundo. Aparte de las auras de algunos enemigos.
+const PRESENCE_RADIUS := 5.0
+const PRESENCE_BASE := 0.16                 ## cordura/s por enemigo corriente pegado al jugador
+const PRESENCE_MAX := 4.5
+const PRESENCE_EVERY := 0.2
+const PRESENCE_GRACE := 6.0                ## s sin drenar al acabar una crisis (que no se encadenen)
+var _presence_t := 0.0
+var presence := 0.0                         ## cordura/s que drena ahora mismo (HUD, tests)
+
+func _presence_step(delta: float) -> void:
+	_presence_t -= delta
+	if _presence_t <= 0.0:
+		_presence_t = PRESENCE_EVERY
+		presence = 0.0
+		if world != null and not god and not sanity_state.in_crisis and sanity_state.since_crisis >= PRESENCE_GRACE:
+			var w := 0.0
+			for e in world.enemies_in_circle(global_position, PRESENCE_RADIUS):
+				if not (e is Enemy) or not e.is_alive(): continue
+				var ed: EnemyData = (e as Enemy).data
+				var k := 8.0 if ed.unique else (3.0 if ed.elite else 0.6 + 0.25 * ed.tier)
+				var near := 1.0 - clampf(global_position.distance_to(e.global_position) / PRESENCE_RADIUS, 0.0, 1.0)
+				w += k * near
+			presence = minf(w * PRESENCE_BASE * Difficulty.horror(), PRESENCE_MAX)
+	if presence > 0.0: drain_sanity(presence * delta)
+
 func drain_sanity(amount: float) -> void:
 	if health <= 0.0 or god: return
 	sanity = maxf(0.0, sanity - amount * mental_resist * data.mental_mult)
@@ -595,6 +636,10 @@ func take_damage(d: Damage) -> void:
 		_hurt_time = 0.0
 		Sfx.play("magic")
 		return
+	if Difficulty.damage() != 1.0 or Difficulty.mental() != 1.0:    # dificultad (12-10-2026)
+		var sd := Damage.new(d.physical * Difficulty.damage(), d.mental * Difficulty.mental())
+		sd.knockback = d.knockback; sd.source = d.source; sd.bonus = d.bonus; sd.tag = d.tag
+		d = sd
 	if d.source is Enemy and data.thorns > 0.0 and d.physical > 0.0 and (d.source as Enemy).is_alive():
 		_item_hit(d.source, d.physical * data.thorns, "escamas")     # Escamas de Profundo
 	if d.source is Enemy and not data.resist_tags.is_empty():   # rasgos: resistencia a ciertas criaturas

@@ -157,4 +157,4 @@ func test_el_peso_propio_reparte_la_horda() -> void:
 	assert_almost_eq(float(n[&"a"]) / 4000.0, 0.75, 0.03)
 
 func after_all() -> void:
-	Difficulty.forced = -1
+	Difficulty.forced = 0                                  # (pre_run.gd la deja en la base)
