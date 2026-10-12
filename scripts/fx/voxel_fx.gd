@@ -403,6 +403,24 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.05; m.scale_max = 0.1
 			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.0]])
 			m.color_ramp = _ramp([[0.0, Color(0.75, 0.62, 0.35, 1.0)], [1.0, Color(0.7, 0.45, 0.15, 0.0)]])
+		"crisis":                 # aura de una crisis de cordura: jirones morados que suben
+			p.draw_pass_1 = cube("add")
+			p.amount = 64
+			p.lifetime = 1.1
+			p.local_coords = false
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
+			m.emission_ring_axis = Vector3.UP
+			m.emission_ring_radius = r
+			m.emission_ring_inner_radius = r * 0.5
+			m.emission_ring_height = 0.2
+			m.spread = 10.0
+			m.initial_velocity_min = 0.8; m.initial_velocity_max = 1.8
+			m.orbit_velocity_min = 0.2; m.orbit_velocity_max = 0.4
+			m.gravity = Vector3(0, 0.8, 0)
+			m.scale_min = 0.07; m.scale_max = 0.15
+			m.scale_curve = _curve([[0.0, 0.4], [0.3, 1.0], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.5, 0.25, 0.85, 0.0)], [0.2, Color(0.55, 0.28, 0.9, 1.0)],
+				[1.0, Color(0.3, 0.1, 0.55, 0.0)]])
 		"gas":                    # gas de cloro: bocanadas lentas, turbias, que suben poco
 			p.draw_pass_1 = cube("mix")
 			p.amount = int(clampf(r * 8.0, 8.0, 22.0))

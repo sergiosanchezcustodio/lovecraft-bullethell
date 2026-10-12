@@ -43,6 +43,7 @@ var pet: Node                    ## su compañero (Pet), si lleva
 var pet_xp_mult := 1.0          ## experiencia extra por gema (búho de los sueños)
 var visual: Node3D          ## contenedor que gira hacia donde mira; dentro, el modelo voxel
 var model: Node3D
+var _crisis_look: CrisisLook
 var health := 0.0
 var sanity := 0.0
 var weapons: WeaponSystem
@@ -153,6 +154,8 @@ func _ready() -> void:
 	for mi: MeshInstance3D in model.get_meta("meshes"):
 		mi.material_overlay = _xray
 	add_child(_make_ring())
+	_crisis_look = CrisisLook.new().setup(model)      # aura morada y cara de pánico en las crisis
+	add_child(_crisis_look)
 	_snow = _make_snow_spray()
 	add_child(_snow)
 	_splash = WadeSplash.make()
@@ -392,6 +395,7 @@ func _process_step(delta: float) -> void:
 	# Animación según el estado
 	# Crisis de locura: anillo violeta que late y tinte violeta en cada congelación
 	var ss := sanity_state
+	if _crisis_look and ss.in_crisis != _crisis_look._on: _crisis_look.set_on(ss.in_crisis)
 	if ss.in_crisis:
 		_ring_mat.albedo_color = UiKit.SANITY.lerp(Color.WHITE, 0.25 + 0.25 * sin(Time.get_ticks_msec() * 0.012))
 	else:
