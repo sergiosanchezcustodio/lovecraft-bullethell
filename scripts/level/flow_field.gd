@@ -117,10 +117,11 @@ func clear_line(a: Vector2, b: Vector2, r := 0.0) -> bool:
 	var d := a.distance_to(b)
 	if d < 0.01: return true
 	var side := Vector2(b.y - a.y, a.x - b.x) / d * r
-	var steps := int(d / (CELL * 0.5))
+	var steps := maxi(2, int(d / CELL) + 1)          # una muestra por celda, sin arrays en el bucle
+	var lanes := 3 if r > 0.0 else 1
 	for s in range(1, steps):
 		var m := a.lerp(b, float(s) / steps)
-		for o in ([Vector2.ZERO, side, -side] if r > 0.0 else [Vector2.ZERO]):
-			var c := cell_of(m + o)
+		for k in lanes:
+			var c := cell_of(m + (side if k == 1 else (-side if k == 2 else Vector2.ZERO)))
 			if not _inside(c) or _free[c.y * w + c.x] == 0: return false
 	return true

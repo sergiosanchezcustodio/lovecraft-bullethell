@@ -307,6 +307,20 @@ func _presence_step(delta: float) -> void:
 			presence = minf(w * PRESENCE_BASE * Difficulty.horror(), PRESENCE_MAX)
 	if presence > 0.0: drain_sanity(presence * delta)
 
+## Vibración suave del mando al recibir daño (12-10-2026), según lo fuerte del golpe. Respeta
+## Configuración > Juego > Vibración del mando y no se repite más de una vez cada 0,15 s.
+var _rumble_ms := 0
+
+func _rumble(amount: float) -> void:
+	if input == null or amount <= 0.0: return
+	var dev := input.joy_device()
+	if dev < 0 or not bool(Settings.get_value("vibration")): return
+	var now := Time.get_ticks_msec()
+	if now - _rumble_ms < 150: return
+	_rumble_ms = now
+	var k := clampf(amount / 30.0, 0.0, 1.0)
+	Input.start_joy_vibration(dev, 0.2 + 0.3 * k, 0.25 * k, 0.12 + 0.12 * k)
+
 func drain_sanity(amount: float) -> void:
 	if health <= 0.0 or god: return
 	sanity = maxf(0.0, sanity - amount * mental_resist * data.mental_mult)
@@ -658,6 +672,7 @@ func take_damage(d: Damage) -> void:
 		d = r
 	health = maxf(0.0, health - d.physical)
 	Sfx.play("hit_player" if d.physical > 0.0 else "chant")
+	_rumble(d.physical + d.mental * 0.5)
 	if d.mental > 0.0:
 		sanity = maxf(0.0, sanity - d.mental * mental_resist * data.mental_mult)
 		sanity_state.on_mental_damage()

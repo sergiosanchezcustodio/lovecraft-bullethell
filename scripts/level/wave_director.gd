@@ -22,10 +22,11 @@ var spawned_total := 0
 var killed_total := 0
 var rng := RandomNumberGenerator.new()
 var max_alive_override := -1
-## Tope duro de enemigos vivos (12-10-2026): cada enemigo cuesta ~0,04 ms de física por paso y,
-## pasados unos 180, la física no llega a 60 Hz y el juego se hunde (150: 70 FPS; 200: 41;
-## 250: 20; 300: 8). Subirlo exige antes abaratar la lógica de los enemigos.
-const HARD_CAP := 180
+## Tope duro de enemigos vivos (12-10-2026). Antes de optimizar, pasados ~180 la física no
+## llegaba a 60 Hz (200: 41 FPS; 250: 20; 300: 8). Con la lógica abaratada (línea recta solo de
+## cerca, separación y pensar en pasos alternos con mucha gente, pose solo en pantalla y en
+## fotogramas alternos): 200: 67 FPS; 220: 62; 240: 57; 270: 42 (ahí pesa ya el dibujo).
+const HARD_CAP := 240
 var players := 1                           ## jugadores: escala vida y aparición (GDD 4.6)
 ## Depuración (menú de pausa > Depuración):
 var target_alive := -1                     ## > 0: mantiene exactamente tantos enemigos vivos

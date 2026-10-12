@@ -8,8 +8,8 @@ extends RefCounted
 ## mental más) y presencia: los enemigos cercanos drenan cordura (Player._presence_step).
 
 const NAMES: Array[String] = ["Investigador", "Normal", "Pesadilla"]
-const RATE := [1.0, 6.3, 8.4]           ## ritmo de aparición (×3 el 12-10-2026: "aún muy fácil")
-const CAP := [1.0, 2.4, 2.4]            ## enemigos vivos a la vez (ver WaveDirector.HARD_CAP)
+const RATE := [1.0, 8.5, 12.6]          ## ritmo de aparición (12-10-2026: ×3, ×1,5 y luego −10 %, "un pelín difícil")
+const CAP := [1.0, 2.9, 3.2]            ## enemigos vivos a la vez (ver WaveDirector.HARD_CAP)
 const DAMAGE := [1.0, 1.4, 1.8]         ## daño físico que reciben los jugadores
 const MENTAL := [1.0, 1.7, 2.2]         ## daño mental que reciben los jugadores
 const HORROR := [0.4, 1.0, 1.5]         ## cordura que drena la presencia de los enemigos

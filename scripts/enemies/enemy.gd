@@ -403,6 +403,11 @@ func _madden_step(delta: float) -> void:
 		d.knockback = to.normalized()
 		best.take_damage(d)
 
+const CROWD := 120                         ## enemigos: con más, la pose va en fotogramas alternos
+const FAR := 16.0                          ## m: más lejos de todos los jugadores, piensa a medio ritmo
+var _far := false
+var _ai_vel := Vector3.ZERO
+
 func _physics_process(delta: float) -> void:
 	if not is_alive(): return
 	var t0 := Prof.start()
@@ -419,7 +424,14 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector3.ZERO
 		Prof.stop("enemigos_fisica", t0)
 		return
-	velocity = behavior.update(self, target, delta) * pace_mult
+	# lejos de todos los jugadores, o con mucha gente, piensa en pasos alternos y mantiene la
+	# velocidad (12-10-2026)
+	if (_far or world.enemies.size() > CROWD) and (Engine.get_physics_frames() + get_instance_id()) % 2 == 1:
+		velocity = _ai_vel
+	else:
+		velocity = behavior.update(self, target, delta) * pace_mult
+		_ai_vel = velocity
+	if Engine.get_physics_frames() % 15 == get_instance_id() % 15: _far = _far_from_players()
 	if _slow_t > 0.0: velocity *= _slow_k
 	var wet := wades()
 	if wet: velocity *= WadeSplash.SLOW                # agua somera: los marinos nadan, los demás vadean
@@ -445,14 +457,16 @@ func _physics_process(delta: float) -> void:
 	# Separación: no amontonarse con los enemigos cercanos
 	var pos2 := Vector2(global_position.x, global_position.z)
 	var push := Vector2.ZERO
-	for id in world.grid.query_circle(pos2, data.body_radius):
+	# en pasos alternos (la mitad de cada enemigo en cada paso) y con el doble de fuerza
+	var sep_turn := (Engine.get_physics_frames() + get_instance_id()) % 2 == 0
+	for id in (world.grid.query_circle(pos2, data.body_radius) if sep_turn else PackedInt32Array()):
 		var other := world.target_at(id)
 		if other == self: continue
 		var off := pos2 - Vector2(other.global_position.x, other.global_position.z)
 		var dist := off.length()
 		var min_d: float = data.body_radius + float(other.hit_radius)
 		if dist > 0.001 and dist < min_d: push += off / dist * (min_d - dist)
-	var move := velocity * delta + _knock * delta + Vector3(push.x, 0, push.y) * 0.5
+	var move := velocity * delta + _knock * delta + Vector3(push.x, 0, push.y)
 	_knock = _knock.lerp(Vector3.ZERO, 1.0 - exp(-8.0 * delta))
 	if not anchored:
 		var np := Vector2(position.x + move.x, position.z + move.z)
@@ -482,6 +496,12 @@ func _physics_process(delta: float) -> void:
 			_attack_timer = data.attack_cooldown * randf_range(0.85, 1.15)
 	Prof.stop("enemigos_fisica", t0)
 
+## ¿Lejos de todos los jugadores? (se mira cada 15 pasos)
+func _far_from_players() -> bool:
+	for p in world.players:
+		if p.global_position.distance_squared_to(global_position) < FAR * FAR: return false
+	return true
+
 func _process(delta: float) -> void:
 	var t0 := Prof.start()
 	visual.global_position = get_global_transform_interpolated().origin - Vector3(0, _wade * WadeSplash.SINK, 0)
@@ -490,7 +510,13 @@ func _process(delta: float) -> void:
 	if _aura_mat: _aura_mat.set_shader_parameter("color", Color(0.45, 0.2, 0.7, 0.14 + 0.07 * sin(_spawn_t * 2.5)))
 	if not anim_hold and _stasis_t <= 0.0 and world.freeze_t <= 0.0:   # congelado: la animación se detiene
 		anim_t = fposmod(anim_t + delta / Anims.duration(model_name, anim), 1.0)
-	Anims.pose(model_name, anim, model, anim_t)
+	# fuera de la vista no se aplica la pose (la animación sigue corriendo): con 200 enemigos
+	# era una cuarta parte de su coste
+	var cam := get_viewport().get_camera_3d()
+	# con muchos en pantalla, la pose en fotogramas alternos (a más de 60 FPS no se nota)
+	var crowd := world.enemies.size() > CROWD and (Engine.get_process_frames() + get_instance_id()) % 2 == 1
+	if model_scale > 1.5 or (not crowd and (cam == null or cam.is_position_in_frustum(visual.global_position + Vector3(0, 1.0, 0)))):
+		Anims.pose(model_name, anim, model, anim_t)
 	_flash -= delta
 	# tinte: destello al recibir daño; si no, turquesa en estasis o violeta maldito.
 	# Solo se toca el material al cambiar.

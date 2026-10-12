@@ -31,3 +31,6 @@ func _read_action(action: StringName) -> bool:
 
 func device_name() -> String:
 	return "mando %d (%s)" % [device, Input.get_joy_name(device)]
+
+func joy_device() -> int:
+	return device

@@ -32,5 +32,9 @@ func _read_action(_action: StringName) -> bool:
 	return false
 
 ## Nombre del dispositivo, para depuración y la pantalla de unirse (fase 2).
+## Mando que vibra para este jugador (-1: ninguno, p. ej. el teclado o un bot).
+func joy_device() -> int:
+	return -1
+
 func device_name() -> String:
 	return "ninguno"

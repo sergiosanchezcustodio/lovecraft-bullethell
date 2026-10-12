@@ -24,5 +24,10 @@ func _read_action(action: StringName) -> bool:
 		if s.is_down(action): return true
 	return false
 
+func joy_device() -> int:
+	for s in sources:
+		if s.joy_device() >= 0: return s.joy_device()
+	return -1
+
 func device_name() -> String:
 	return " + ".join(sources.map(func(s: PlayerInput) -> String: return s.device_name()))

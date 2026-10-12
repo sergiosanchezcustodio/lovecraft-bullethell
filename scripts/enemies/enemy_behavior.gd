@@ -55,6 +55,8 @@ static func shape_path(e: Enemy, dir: Vector3, speed: float) -> Vector3:
 const STUCK_EVERY := 0.8
 const STUCK_MIN := 0.3
 const DETOUR := 2.5
+const CLEAR_RANGE := 12.0                 ## m: más lejos no se mira la línea recta (sigue el flujo)
+
 static func toward(e: Enemy, target: Node3D) -> Vector3:
 	var to := target.global_position - e.global_position
 	to.y = 0.0
@@ -70,8 +72,10 @@ static func toward(e: Enemy, target: Node3D) -> Vector3:
 		e._stuck_ref = a
 	e._path_t -= dt
 	if e._path_t <= 0.0:
-		e._path_t = 0.3 + randf() * 0.1
-		e._path_clear = f.clear_line(a, Vector2(target.global_position.x, target.global_position.z), e.data.body_radius)
+		# lejos, el flujo ya da el mejor camino: la línea recta solo se mira de cerca (12-10-2026,
+		# era casi la mitad del coste de cada enemigo)
+		e._path_t = 0.5 + randf() * 0.15
+		e._path_clear = to.length() < CLEAR_RANGE and f.clear_line(a, Vector2(target.global_position.x, target.global_position.z), e.data.body_radius)
 	var d := Vector2.ZERO
 	if e._path_clear and e._detour_t <= 0.0:
 		return to.normalized()
