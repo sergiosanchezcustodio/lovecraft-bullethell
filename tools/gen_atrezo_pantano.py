@@ -14,7 +14,7 @@ Escribe models/pan_<pieza>.json. Uso: python tools/gen_atrezo_pantano.py [piezas
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model, lerp
+from voxlib import Model, lerp, refine
 
 P = 'body'
 SLEEPER = (0.30, 0.24, 0.18); SLEEPER_D = (0.20, 0.16, 0.12); ROT = (0.24, 0.28, 0.18)
@@ -150,7 +150,7 @@ RUST = (0.42, 0.24, 0.13)
 
 # ---------------- apeadero ----------------
 
-def apeadero():
+def _apeadero16():
     """Apeadero de Rowley: andén de tablas de 9 x 3 m, caseta de 4 x 2,5 m de tablas
     verticales con puerta y ventana tapiada, tejadillo a un agua que vuela sobre el andén con
     dos pies derechos, letrero blanco en el alero y un banco. Hueco, 16/m."""
@@ -186,6 +186,51 @@ def apeadero():
         for z in (10, 11, 12): M.put(x, 12, z, P, BOARD_D)
         if x in (-59, -46):
             for y in range(6, 12): M.put(x, y, 11, P, IRON)
+    return M, {P: [0, 0, 0]}
+
+
+def apeadero():
+    """Apeadero de Rowley a 32/m (revisión de arte del 13-10-2026): el de _apeadero16 al doble de
+    resolución con textura fina (veta en las tablas, moteado en la piedra, arañazos en el hierro),
+    más un farol apagado en la esquina, el tablón de horarios con papeles medio arrancados, dos
+    lecheras de hierro, una carretilla de equipajes y hierbajos entre las tablas del andén."""
+    M = refine(_apeadero16()[0], 2, seed=84)
+    rng = M.rng
+    for y in range(12, 96):                                         # farol en su brazo
+        M.put(-70, y, 44, P, IRON)
+    for x in range(-70, -60): M.put(x, 94, 44, P, IRON)
+    for y in range(80, 92):
+        for x in range(-64, -58):
+            for z in range(41, 47):
+                edge = x in (-64, -59) or z in (41, 46) or y in (80, 91)
+                if edge or y > 88: M.put(x, y, z, P, IRON)
+                else: M.put(x, y, z, P, (0.30, 0.34, 0.34))
+    for x in range(36, 60):                                         # tablón de horarios
+        for y in range(40, 70):
+            edge = x in (36, 59) or y in (40, 69)
+            c = BOARD_D if edge else BOARD
+            if not edge and (x - 38) % 7 < 5 and (y - 42) % 9 < 7 and M.hsh((x - 38) // 7, (y - 42) // 9, 3) > 0.35:
+                c = (0.70, 0.66, 0.56) if M.hsh(x, y, 4) > 0.15 else (0.40, 0.36, 0.30)    # papeles
+            M.put(x, y, 31, P, c)
+    for cx in (-100, -92):                                          # lecheras
+        for y in range(12, 34):
+            r = 4 if y > 28 else 6
+            for x in range(cx - 7, cx + 8):
+                for z in range(30, 45):
+                    if (x - cx) ** 2 + (z - 37) ** 2 <= r * r: M.put(x, y, z, P, IRON_L if y in (14, 26, 33) else IRON)
+    for x in range(60, 104):                                        # carretilla de equipajes
+        for z in range(14, 34):
+            M.put(x, 22, z, P, BOARD_D if x % 6 == 0 else BOARD)
+        if x in (62, 100):
+            for y in range(12, 22): M.put(x, y, 16, P, IRON); M.put(x, y, 32, P, IRON)
+    for x in range(98, 104):
+        for y in range(22, 50): M.put(x, y, 24, P, IRON)
+    for x in range(66, 90):
+        for y in range(23, 36):
+            for z in range(18, 30): M.put(x, y, z, P, (0.40, 0.26, 0.16) if (x + y) % 9 else (0.26, 0.16, 0.10))
+    for _ in range(60):                                             # hierbajos entre las tablas
+        x, z = rng.randint(-140, 140), rng.randint(-46, 46)
+        for k in range(rng.randint(2, 7)): M.put(x, 12 + k, z, P, (0.32, 0.40, 0.20) if k % 2 else (0.24, 0.32, 0.16), over=False)
     return M, {P: [0, 0, 0]}
 
 

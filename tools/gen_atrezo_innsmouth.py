@@ -536,18 +536,71 @@ def barril():
 
 
 def redes():
-    """Red de pesca tendida entre dos palos, con agujeros y corchos."""
-    M = Model(S=2, seed=66)
-    for x0 in (-44, 44):
-        for y in range(0, 64):
-            for x in (x0 - 1, x0):
-                for z in (-1, 0): M.put(x, y, z, P, WOOD_D if y % 9 else WOOD)
-    for x in range(-43, 44):
-        sag = int(6 * math.cos(x / 44 * math.pi / 2))
-        for y in range(10, 60 - sag):
-            if (x % 4 == 0 or y % 4 == 0) and M.noise(x, y, 0, 7.0) < 0.7:
-                M.put(x, y, 0, P, NET)
-        if x % 8 == 0: M.put(x, 59 - sag, 1, P, FLOAT); M.put(x, 58 - sag, 1, P, FLOAT)
+    """Redes tendidas a secar (rehechas a 64/m en la revisión de arte del 13-10-2026): dos postes
+    con travesaño y tornapuntas; la red cuelga en paños que se comban, de malla en rombo con los
+    nudos más oscuros, rota a trozos, con algas y un pez enredados; corchos en la relinga de
+    arriba y plomos en la de abajo; un cesto de mimbre, una boya y cabo adujado al pie."""
+    M = Model(S=4, seed=66)
+    rng = M.rng
+    NETC = (0.48, 0.45, 0.36); KNOT = (0.30, 0.28, 0.22); CORK = (0.64, 0.42, 0.26); LEAD_C = (0.32, 0.33, 0.35)
+    WICKER = (0.58, 0.46, 0.28); WICKER_D = (0.42, 0.32, 0.18)
+    PX = 92
+    for x0 in (-PX, PX):                                                             # postes
+        for y in range(0, 136):
+            for dx in range(-3, 3):
+                for dz in range(-3, 3):
+                    if dx * dx + dz * dz > 8: continue
+                    c = lerp(WOOD_D, WOOD, 0.5 + 0.4 * math.sin(dx + dz + y * 0.2))
+                    if y < 12: c = lerp(c, (0.24, 0.30, 0.20), 0.5)
+                    M.put(x0 + dx, y, dz, P, c)
+        for i in range(24):                                                          # tornapuntas
+            for dz in (-1, 0): M.put(x0 - (1 if x0 > 0 else -1) * i, 100 + i, dz, P, WOOD_D)
+    for x in range(-PX - 6, PX + 6):                                                 # travesaño
+        for y in (124, 125, 126):
+            for dz in (-2, -1, 0, 1): M.put(x, y, dz, P, WOOD if y < 126 else WOOD_D)
+    def top_y(x): return 120 - int(10 * math.cos(x / PX * math.pi / 2))
+    for x in range(-PX + 3, PX - 2):                                                 # paños de red
+        t = top_y(x)
+        drape = 70 + int(12 * math.sin(x / 15.0))
+        for y in range(t - drape, t):
+            f = (t - y) / drape
+            z = int(round(3 * math.sin(x / 11.0 + y / 9.0) * f))
+            u, v = x + y, x - y
+            mesh = u % 6 == 0 or v % 6 == 0
+            if not mesh: continue
+            if M.noise(x, y, 0, 9.0) > 0.72: continue                                 # agujeros
+            c = KNOT if (u % 6 == 0 and v % 6 == 0) else NETC
+            M.put(x, y, z, P, c)
+        if x % 10 == 0:                                                              # corchos
+            for dy in range(3):
+                for dx in range(3): M.put(x + dx, t - 1 - dy, 1, P, CORK)
+        yb = t - drape
+        if x % 12 == 0:                                                              # plomos
+            for dx in range(2): M.put(x + dx, yb, 0, P, LEAD_C); M.put(x + dx, yb - 1, 0, P, LEAD_C)
+    for _ in range(14):                                                              # algas enredadas
+        x = rng.randint(-PX + 10, PX - 10); y = rng.randint(50, 100)
+        for k in range(rng.randint(4, 12)): M.put(x + k // 4, y - k, 1, P, (0.20, 0.32, 0.16) if k % 3 else (0.14, 0.22, 0.10))
+    for t in range(-7, 8):                                                           # un pez enredado
+        for k in range(-2, 3):
+            if abs(k) <= 2 * math.sqrt(max(0, 1 - (t / 8) ** 2)): M.put(20 + t, 70 + k, 2, P, (0.62, 0.66, 0.68) if k > -1 else (0.30, 0.38, 0.44))
+    for y in range(0, 26):                                                           # cesto de mimbre
+        r = 14 + (y // 8)
+        for a in range(0, 360, 3):
+            x = int(-50 + r * math.cos(math.radians(a))); z = int(28 + r * math.sin(math.radians(a)))
+            M.put(x, y, z, P, WICKER if (a // 9 + y // 2) % 2 else WICKER_D)
+    for x in range(-63, -36):
+        for z in range(15, 42):
+            if (x + 50) ** 2 + (z - 28) ** 2 < 196: M.put(x, 0, z, P, WICKER_D)
+    for y in range(0, 16):                                                           # boya
+        for x in range(42, 58):
+            for z in range(24, 40):
+                if ((x - 50) / 8) ** 2 + ((y - 8) / 8) ** 2 + ((z - 32) / 8) ** 2 < 1:
+                    M.put(x, y, z, P, (0.70, 0.22, 0.16) if y > 7 else (0.82, 0.78, 0.70))
+    for a in range(0, 720, 5):                                                       # cabo adujado
+        r = 6 + a / 120
+        M.put(int(5 + r * math.cos(math.radians(a))), 1 + a // 360, int(34 + r * math.sin(math.radians(a))), P, (0.58, 0.50, 0.34))
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 
@@ -1074,26 +1127,111 @@ def escombros():
 
 
 def fuente():
-    """Fuente seca: pilón octogonal de piedra con verdín y un pez de bronce que salta."""
-    M = Model(S=2, seed=74)
-    for y in range(0, 14):
-        for x in range(-40, 40):
-            for z in range(-40, 40):
-                d = max(abs(x + 0.5), abs(z + 0.5), (abs(x + 0.5) + abs(z + 0.5)) / 1.414)
-                if d > 38 or (d < 34 and y > 2): continue
-                c = STONE if (y // 3) % 2 else STONE_D
-                if y > 10 and M.noise(x, y, z, 6.0) > 0.55: c = GREEN
+    """Fuente de la plaza (rehecha a 64/m en la revisión de arte del 13-10-2026): pilón octogonal
+    de sillares con moldura en el borde y paneles con peces en relieve, verdín y grietas, una
+    pieza del borde caída; dentro, agua sucia estancada (verde parduzca, con nata, hojas, un
+    reflejo y basura flotando); en el centro, un pedestal con dos tazas escalonadas y el pez de
+    bronce que salta, comido por el cardenillo; y un charco que se sale por la grieta."""
+    M = Model(S=4, seed=74)
+    rng = M.rng
+    R, H = 76, 28
+    BRONZE = (0.30, 0.42, 0.36); VERDI = (0.36, 0.58, 0.48); BRONZE_D = (0.20, 0.28, 0.24)
+    WATER = (0.16, 0.20, 0.14); WATER_L = (0.26, 0.30, 0.20); SCUM = (0.34, 0.38, 0.22); LEAF = (0.36, 0.26, 0.14)
+    def octd(x, z): return max(abs(x + 0.5), abs(z + 0.5), (abs(x + 0.5) + abs(z + 0.5)) / 1.414)
+    def stone_c(x, y, z, face=0):
+        c = lerp(STONE, STONE_D, 0.5 * M.noise(x, y, z, 5.0))
+        if y % 9 == 0: c = lerp(c, STONE_D, 0.6)                                   # hiladas
+        if M.noise(x, y, z, 6.0) > 0.6 and y > 8: c = lerp(c, GREEN, 0.7)
+        if y < 6: c = lerp(c, (0.30, 0.30, 0.26), 0.4)
+        return c
+    gap = (math.radians(30), math.radians(52))                                      # pieza caída del borde
+    for x in range(-R - 4, R + 5):
+        for z in range(-R - 4, R + 5):
+            d = octd(x, z)
+            a = math.atan2(z, x) % math.tau
+            for y in range(0, H + 4):
+                if y < H:
+                    if d > R or (d < R - 8 and y > 4): continue
+                    if d < R - 1 and d > 1 and R - 8 <= d and y > 4 and not (d >= R - 8): continue
+                    c = stone_c(x, y, z)
+                    if d > R - 1.5 and 8 <= y < 22:                                     # paneles con pez
+                        seg = int(a / (math.tau / 8))
+                        u = (a - seg * math.tau / 8) / (math.tau / 8)
+                        if 0.08 < u < 0.92:
+                            fx, fy = (u - 0.5) * 2, (y - 15) / 6
+                            if fx * fx / 0.5 + fy * fy < 1 and abs(fx) < 0.7: c = lerp(STONE, (0.70, 0.69, 0.64), 0.4)
+                            elif 0.7 <= fx < 0.95 and abs(fy) < (fx - 0.6) * 3: c = lerp(STONE, (0.70, 0.69, 0.64), 0.3)
+                            elif abs(fx) > 0.95 or abs(fy) > 1.2: c = lerp(c, STONE_D, 0.4)
+                    M.put(x, y, z, P, c)
+                else:                                                                 # moldura del borde que vuela
+                    if not (R - 10 <= d <= R + 3): continue
+                    if gap[0] < a < gap[1]: continue
+                    c = lerp(STONE_L, STONE, 0.4 * M.noise(x, y, z, 4.0))
+                    if y == H + 3 and d > R: continue
+                    if M.noise(x, y, z, 5.0) > 0.68: c = lerp(c, GREEN, 0.6)
+                    M.put(x, y, z, P, c)
+    for x in range(-R + 9, R - 8):                                                    # agua sucia
+        for z in range(-R + 9, R - 8):
+            if octd(x, z) > R - 9: continue
+            n = M.noise(x, 0, z, 9.0)
+            c = lerp(WATER, WATER_L, M.noise(x, 3, z, 4.0) * 0.6)
+            if n > 0.66: c = SCUM if M.hsh(x, z, 1) > 0.3 else lerp(SCUM, WATER, 0.4)     # nata
+            if M.hsh(x, z, 2) > 0.995: c = LEAF
+            if 10 < x < 30 and -30 < z < -14 and (x + z) % 3 == 0: c = (0.46, 0.50, 0.44)   # reflejo
+            M.put(x, H - 6, z, P, c)
+    for _ in range(9):                                                               # hojas y basura flotando
+        cx, cz = rng.randint(-50, 50), rng.randint(-50, 50)
+        if octd(cx, cz) > R - 14: continue
+        col = LEAF if rng.random() < 0.7 else (0.62, 0.58, 0.48)
+        for dx in range(-2, 3):
+            for dz in range(-1, 2): M.put(cx + dx, H - 5, cz + dz, P, col)
+    for y in range(0, 46):                                                           # pedestal y tazas
+        r = 9 if y < 40 else 12
+        if 22 <= y < 26: r = 26 - (y - 22) * 2
+        for x in range(-27, 28):
+            for z in range(-27, 28):
+                dd = math.hypot(x, z)
+                if dd > r: continue
+                if 22 <= y < 26 and dd < r - 3 and y > 22: continue
+                c = stone_c(x, y, z)
+                if 22 <= y < 26: c = lerp(STONE_L, GREEN, 0.4 * M.noise(x, y, z, 3.0))
                 M.put(x, y, z, P, c)
-    for y in range(0, 30):
-        for x in range(-5, 5):
-            for z in range(-5, 5): M.put(x, y, z, P, STONE_L)
-    BRONZE = (0.30, 0.42, 0.36)
-    for x in range(-12, 13):
-        h = int(5 * math.sqrt(max(0.0, 1 - (x / 12) ** 2)))
-        for y in range(-h, h + 1):
-            for z in range(-2, 2): M.put(x, 40 + y + x // 3, z, P, BRONZE)
-    for y in range(-6, 7):
-        for z in range(-1, 1): M.put(-13 - abs(y) // 2, 36 + y, z, P, BRONZE)
+    for x in range(-12, 13):                                                         # pez de bronce que salta
+        h = int(8 * math.sqrt(max(0.0, 1 - (x / 24) ** 2)))
+        for xx in (x * 2, x * 2 + 1):
+            for y in range(-h, h + 1):
+                for z in range(-4, 4):
+                    if abs(z) > 3 * math.sqrt(max(0, 1 - (y / max(h, 1)) ** 2)): continue
+                    c = BRONZE if M.noise(xx, y, z, 3.0) < 0.55 else VERDI
+                    if (xx + y) % 5 == 0: c = BRONZE_D                                   # escamas
+                    M.put(xx, 74 + y + xx // 3, z, P, c)
+    for y in range(-12, 13):                                                         # cola
+        for z in range(-2, 2):
+            M.put(-26 - abs(y) // 2, 64 + y, z, P, VERDI if abs(y) > 8 else BRONZE)
+    for k in range(4):                                                               # aletas y ojo
+        M.put(4 + k, 86 + k, 0, P, BRONZE_D); M.put(-6 + k, 66 - k, 0, P, BRONZE_D)
+    for z in (-3, 3): M.put(20, 82, z, P, (0.06, 0.06, 0.06))
+    for y in range(44, 66):                                                          # apoyo del pez
+        for x in range(-2, 2):
+            for z in range(-2, 2): M.put(x, y, z, P, BRONZE_D)
+    for (x, y, z) in [k for k in M.V if k[1] == H + 3]: pass
+    for k in range(18):                                                              # trozo del borde caído
+        a = math.radians(41)
+        for u in range(-9, 10):
+            for y in range(0, 4):
+                M.put(int((R + 16) * math.cos(a)) + u, y, int((R + 16) * math.sin(a)) + k - 9, P, STONE_L if y == 3 else STONE)
+    for x in range(40, 110):                                                         # charco que se sale por la grieta
+        for z in range(30, 90):
+            if octd(x, z) < R + 2: continue
+            if M.noise(x, 0, z, 10.0) > 0.45 and math.hypot(x - 64, z - 60) < 34:
+                M.put(x, 0, z, P, lerp(WATER, WATER_L, M.noise(x, 1, z, 3.0) * 0.5))
+    x, y = int(R * 0.7), H
+    for _ in range(26):                                                              # la grieta
+        v = M.V.get((x, y, int(R * 0.7)))
+        if v: v[1] = (0.12, 0.12, 0.11)
+        y -= 1; x += rng.choice((-1, 0, 1))
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 

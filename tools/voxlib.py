@@ -175,3 +175,74 @@ class Model:
         with open(path, "w") as f:
             json.dump(data, f)
         return len(out)
+
+
+# ---------- más resolución y textura fina (revisión de arte, 13-10-2026) ----------
+
+def _ih(x, y, z, s=0):
+    """Hash entero rápido en [0, 1) (sin la caché de Model.hsh, para millones de voxels)."""
+    h = (x * 73856093) ^ (y * 19349663) ^ (z * 83492791) ^ (s * 2654435761)
+    h = (h ^ (h >> 13)) * 1274126177
+    return ((h ^ (h >> 16)) & 0xFFFFFF) / 16777216.0
+
+
+def material_of(c):
+    """Clase de material por el color: 'snow', 'wood', 'cloth', 'stone', 'metal', 'green' u 'other'."""
+    r, g, b = c
+    mx, mn = max(c), min(c)
+    sat = (mx - mn) / mx if mx > 0 else 0
+    if mn > 0.74 and sat < 0.14: return 'snow'
+    if r > g > b and sat > 0.28 and mx < 0.75: return 'wood'
+    if r >= g >= b and sat <= 0.28 and mx > 0.45: return 'cloth'
+    if g > r and g > b and sat > 0.2: return 'green'
+    if mx < 0.3 and sat < 0.2: return 'metal'
+    if sat < 0.2: return 'stone'
+    return 'other'
+
+
+def refine(M, k=2, seed=0, strength=1.0, keep=None):
+    """Devuelve el modelo a k veces su resolución (cada voxel pasa a k x k x k) con textura fina
+    según el material de cada voxel: veta en la madera, trama en la tela, moteado y picaduras en
+    la piedra, arañazos en el metal, brillo en la nieve, matices en el musgo; y las aristas de
+    arriba algo más claras. keep(color) -> True deja ese color sin tocar (cristales, luces...).
+    Las piezas y los pivotes se conservan (los pivotes hay que multiplicarlos por k)."""
+    N = Model(S=M.S * k, seed=seed)
+    for (x, y, z), v in M.V.items():
+        for i in range(k):
+            for j in range(k):
+                for l in range(k):
+                    N.V[(k * x + i, k * y + j, k * z + l)] = [v[0], v[1], v[2]]
+    s = strength
+    for (x, y, z), v in N.V.items():
+        c = v[1]
+        if v[2] or (keep and keep(c)) or not isinstance(c, tuple): continue
+        m = material_of(c)
+        h = _ih(x, y, z, seed)
+        if m == 'wood':
+            f = 0.5 + 0.5 * math.sin((x + z) * 0.9 + y * 0.12 + 4 * _ih(x // 7, y // 23, z // 7, seed))   # fibras
+            c = lerp(c, (c[0] * 0.72, c[1] * 0.70, c[2] * 0.68), 0.35 * s * f)
+            if h > 0.97: c = lerp(c, (0.12, 0.08, 0.05), 0.5 * s)                                         # poros
+        elif m == 'cloth':
+            w = ((x + y) % 2) ^ ((z + y) % 2)                                                               # trama
+            c = lerp(c, (c[0] * 0.9, c[1] * 0.9, c[2] * 0.88), 0.5 * s * w)
+            if h > 0.985: c = lerp(c, (0.3, 0.27, 0.22), 0.4 * s)
+        elif m == 'stone':
+            c = lerp(c, (c[0] * 0.75, c[1] * 0.75, c[2] * 0.75) if h < 0.5 else (min(1, c[0] * 1.15), min(1, c[1] * 1.15), min(1, c[2] * 1.15)), 0.35 * s * abs(h - 0.5) * 2)
+            if h > 0.985: c = lerp(c, (0.05, 0.05, 0.05), 0.5 * s)                                         # picaduras
+        elif m == 'metal':
+            if _ih(x // 3, y, z, seed + 1) > 0.93: c = lerp(c, (0.55, 0.55, 0.56), 0.35 * s)              # arañazos
+            else: c = lerp(c, (0, 0, 0), 0.12 * s * h)
+        elif m == 'snow':
+            if h > 0.97: c = lerp(c, (1.0, 1.0, 1.0), 0.6 * s)                                             # brillo
+            elif h < 0.25: c = lerp(c, (0.78, 0.84, 0.92), 0.4 * s)
+        elif m == 'green':
+            c = lerp(c, (c[0] * 0.7, c[1] * 0.85, c[2] * 0.7) if h < 0.5 else (min(1, c[0] * 1.2), min(1, c[1] * 1.15), c[2]), 0.4 * s)
+        else:
+            c = lerp(c, (0, 0, 0), 0.08 * s * h)
+        if (x, y + 1, z) not in N.V and m != 'snow':                                                      # arista de arriba
+            c = lerp(c, (min(1, c[0] * 1.12), min(1, c[1] * 1.12), min(1, c[2] * 1.12)), 0.5 * s)
+        v[1] = c
+    for kk in [kk for kk in N.V if all((kk[0] + a, kk[1] + b, kk[2] + cc) in N.V for a, b, cc in
+               ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)))]:
+        del N.V[kk]                                                                                        # hueco
+    return N

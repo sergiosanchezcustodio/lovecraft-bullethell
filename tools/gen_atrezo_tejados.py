@@ -287,20 +287,57 @@ def chimenea():
 
 
 def claraboya():
-    M = Model(S=2, seed=84)
-    for y in range(0, 8):                                    # bastidor
-        for x in range(-26, 26):
-            for z in range(-26, 26):
-                if min(x + 26, 25 - x, z + 26, 25 - z) > 1: continue
-                M.put(x, y, z, P, WOOD_D)
-    for y in range(8, 24):                                   # pirámide de cristal con nervios
-        w = 26 - (y - 8) * 1.6
+    """Claraboya del tejado (rehecha a 64/m en la revisión de arte del 13-10-2026): brocal de
+    tablas con tapajuntas de plomo, pirámide de cristal en paños con montantes de hierro y
+    junquillos, los cristales sucios de hollín y verdín por abajo, dos rotos (uno con el hueco
+    oscuro y esquirlas), un paño entreabierto sujeto con una varilla, y por dentro la luz tenue
+    de la escalera."""
+    M = Model(S=4, seed=84)
+    W, BH = 52, 14
+    GLASS_C = (0.30, 0.40, 0.42); GLASS_D = (0.20, 0.26, 0.26); GRIME = (0.18, 0.18, 0.16)
+    for x in range(-W - 2, W + 2):                                                    # tapajuntas
+        for z in range(-W - 2, W + 2):
+            if max(abs(x + 0.5), abs(z + 0.5)) > W - 2: M.put(x, 0, z, P, LEAD); M.put(x, 1, z, P, LEAD)
+    for y in range(0, BH):                                                           # brocal
+        for x in range(-W, W):
+            for z in range(-W, W):
+                if max(abs(x + 0.5), abs(z + 0.5)) < W - 3: continue
+                c = lerp(PLANK, PLANK_D, M.hsh(y // 4, (x + z) // 12, 1))
+                if y % 4 == 0: c = lerp(c, (0.08, 0.07, 0.06), 0.5)
+                M.put(x, y, z, P, c)
+    TOP = BH + 34
+    broken = {(0, 1), (2, 0)}
+    for y in range(BH, TOP):
+        w = (W - 2) * (1 - (y - BH) / (TOP - BH))
         if w < 2: break
-        for x in range(-int(w), int(w)):
-            for z in range(-int(w), int(w)):
-                if min(x + w, w - 1 - x, z + w, w - 1 - z) > 1: continue
-                rib = abs(abs(x) - abs(z)) < 1.2 or x in (0, -1) or z in (0, -1)
-                M.put(x, y, z, P, IRON if rib else (0.30, 0.40, 0.42))
+        for x in range(-int(w) - 1, int(w) + 1):
+            for z in range(-int(w) - 1, int(w) + 1):
+                m = max(abs(x + 0.5), abs(z + 0.5))
+                if m > w or m < w - 2.2: continue
+                rib = abs(abs(x + 0.5) - abs(z + 0.5)) < 1.2                         # aristas
+                face = 0 if abs(x) > abs(z) and x > 0 else 1 if abs(x) > abs(z) else 2 if z > 0 else 3
+                u = (z if face < 2 else x) / max(w, 1)
+                mull = abs(u) < 0.04 or abs(abs(u) - 0.5) < 0.03                    # montantes
+                pane = (face, int((u + 1) * 2))
+                if rib or mull or (y - BH) % 11 == 0: M.put(x, y, z, P, IRON); continue
+                if pane in broken and M.noise(x, y, z, 5.0) > 0.35: continue          # roto
+                if face == 0 and pane[1] == 2 and y > BH + 6: continue                 # paño entreabierto (se pone aparte)
+                c = lerp(GLASS_C, GLASS_D, M.noise(x, y, z, 6.0))
+                if y < BH + 6: c = lerp(c, (0.22, 0.30, 0.18), 0.5)                    # verdín abajo
+                if M.noise(x, y, z, 4.0) > 0.66: c = lerp(c, GRIME, 0.6)                # hollín
+                if (x + 2 * y + z) % 13 == 0: c = lerp(c, (0.62, 0.70, 0.72), 0.5)      # reflejos
+                M.put(x, y, z, P, c)
+    for k in range(18):                                                              # paño entreabierto y varilla
+        for j in range(18):
+            M.put(W - 10 - k // 2 + 6, BH + 8 + k, -2 + j, P, lerp(GLASS_C, GRIME, 0.3) if j % 9 else IRON)
+    for k in range(12): M.put(W - 12, BH + 4 + k, 4, P, IRON_L)
+    for x in range(-W + 4, W - 3):                                                   # fondo: luz tenue de la escalera
+        for z in range(-W + 4, W - 3):
+            M.put(x, BH - 6, z, P, (0.40, 0.30, 0.18) if M.hsh(x // 8, z // 8, 2) > 0.6 else (0.06, 0.05, 0.05))
+    for _ in range(14):                                                              # esquirlas
+        M.put(M.rng.randint(-W, W), BH, M.rng.randint(-W, W), P, (0.56, 0.66, 0.68))
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 

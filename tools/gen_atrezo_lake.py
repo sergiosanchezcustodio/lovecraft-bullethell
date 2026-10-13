@@ -8,7 +8,7 @@ Uso: python tools/gen_atrezo_lake.py [piezas...]
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model, lerp
+from voxlib import Model, lerp, refine
 import gen_atrezo_expedicion as ex
 from gen_atrezo_expedicion import (P, SNOW, SNOW_SH, CANVAS, CANVAS_D, CANVAS_DIRT, WOOD, WOOD_D, WOOD_L, IRON,
                                    IRON_L, BRASS, ROPE, snow_on_top, drift)
@@ -34,7 +34,7 @@ def box(M, x0, x1, y0, y1, z0, z1, col, shell=False):
 def tienda_rota():
     """La tienda de la expedición desgarrada: jirones en el tejado y en un costado, solapas
     que cuelgan, la cumbrera partida por un extremo, nieve dentro y alguna mancha oscura."""
-    M = ex.tienda()
+    M = ex._tienda48()
     RIDGE = 96
     rm = []
     for (x, y, z), v in M.V.items():
@@ -60,7 +60,7 @@ def tienda_rota():
             h = int(2 + 5 * M.noise(x, 0, z, 16.0))
             for y in range(1, h):
                 M.put(x, y, z, P, SNOW if M.hsh(x, y, z) > 0.3 else SNOW_SH, over=False)
-    return M
+    return refine(M, 1, seed=31)                                      # textura fina (a 96/m pesaba demasiado; revisión de arte, 13-10-2026)
 
 
 # ---------------- caja reventada ----------------

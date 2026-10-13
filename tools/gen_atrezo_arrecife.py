@@ -68,32 +68,77 @@ def columna_2(): return columna(92, 66, -0.08)
 # ---------------- arco ----------------
 
 def arco():
-    """Arco de medio punto de sillares de 1 m, con un lado caído: un pilar en pie, la mitad
-    del arco y los sillares del otro lado tirados en el suelo. 16/m."""
-    M = Model(S=1, seed=93)
-    W, Hp, T = 40, 56, 14                                              # medio vano, alto del pilar, grosor
-    def blk(x, y, z, k):
+    """Arco de medio punto del arrecife, medio caído (rehecho a 32/m en la revisión de arte del
+    13-10-2026): un pilar entero con basa, columna adosada con estrías y capitel, la rosca del
+    arco en dovelas de juntas radiales hasta la clave (con un pez tallado), el otro pilar roto a
+    media altura con los bloques que faltan, y las dovelas caídas por el suelo, medio enterradas;
+    todo basalto verdinegro con percebes, algas que cuelgan, verdín y grietas."""
+    M = Model(S=2, seed=93)
+    rng = M.rng
+    W, Hp, T, RW = 80, 112, 28, 28                                       # medio vano, pilar, grosor, ancho de la rosca
+    def st(x, y, z, block):
         c = stone(M, x, y, z)
-        if (x % 16 == 0) or (y % 16 == 0): c = CARVE                    # juntas de sillares
+        c = lerp(c, STONE_D, 0.3 * M.hsh(*block))
         return c
-    for x in range(-W - 14, -W):                                        # pilar izquierdo entero
-        for y in range(0, Hp):
-            for z in range(-T // 2, T // 2): M.put(x, y, z, P, blk(x, y, z, 0))
-    for a in range(0, 70):                                              # media rosca del arco (se corta)
-        t = math.radians(180 - a * 1.3)
-        if a * 1.3 > 95: break
-        for r in range(W, W + 14):
-            x = int(r * math.cos(t)); y = Hp + int(r * math.sin(t))
-            for z in range(-T // 2, T // 2): M.put(x, y, z, P, blk(x, y, z, 1))
-    for x in range(W, W + 14):                                          # pilar derecho roto
-        for y in range(0, 22 - (x - W)):
-            for z in range(-T // 2, T // 2): M.put(x, y, z, P, blk(x, y, z, 0))
-    for i, (cx, cz, a) in enumerate(((W + 26, 10, 0.4), (W + 10, -22, 1.1), (W + 40, -8, 2.0))):   # sillares caídos
-        for u in range(-8, 8):
-            for v in range(-7, 7):
-                for y in range(0, 14):
+    def pier(x0, x1, ytop):
+        for x in range(x0, x1):
+            for y in range(0, ytop):
+                for z in range(-T // 2, T // 2):
+                    if min(x - x0, x1 - 1 - x, z + T // 2, T // 2 - 1 - z) > 1 and y < ytop - 1: continue
+                    row = y // 22
+                    off = 12 if row % 2 else 0
+                    blk = (row, (x + off) // 24, 7)
+                    c = st(x, y, z, blk)
+                    if y % 22 == 0 or (x + off) % 24 == 0: c = CARVE
+                    if y < 10: c = lerp(c, STONE_L, 0.3)                                 # basa
+                    M.put(x, y, z, P, c)
+    pier(-W - 28, -W, Hp)
+    for y in range(10, Hp - 8):                                                         # columna adosada con estrías
+        for a in range(0, 181, 6):
+            r = 7 if (a // 18) % 2 else 6
+            x = -W - 14 + int(r * math.cos(math.radians(a))); z = T // 2 + int(r * math.sin(math.radians(a)) * 0.6)
+            M.put(x, y, z, P, stone(M, x, y, z))
+    for y in range(Hp - 8, Hp):                                                         # capitel
+        for x in range(-W - 30, -W + 2):
+            for z in range(-T // 2 - 2, T // 2 + 4):
+                if y < Hp - 1 and min(x + W + 30, -W + 1 - x, z + T // 2 + 2, T // 2 + 3 - z) > 1: continue
+                M.put(x, y, z, P, STONE_L if (x + y) % 4 else stone(M, x, y, z))
+    pier(W, W + 28, 50)                                                                 # pilar roto
+    for (x, y, z) in [k for k in M.V if k[0] >= W and k[1] > 30 and M.noise(*k, 8.0) > 0.5]: del M.V[(x, y, z)]
+    NV = 15                                                                             # dovelas
+    for i in range(NV):
+        if i > 10: break                                                                # el lado derecho se ha caído
+        a0, a1 = math.pi * (1 - i / NV), math.pi * (1 - (i + 1) / NV)
+        for r in range(W, W + RW):
+            for k in range(0, 60):
+                t = a0 + (a1 - a0) * k / 59
+                x = int(round(r * math.cos(t))); y = Hp + int(round(r * math.sin(t)))
+                for z in range(-T // 2, T // 2):
+                    if min(z + T // 2, T // 2 - 1 - z) > 1 and W < r < W + RW - 1 and k not in (0, 59): continue
+                    c = st(x, y, z, (i, 3, 3))
+                    if k in (0, 59) or r in (W, W + RW - 1): c = lerp(c, CARVE, 0.5)
+                    if i == 7 and z == T // 2 - 1 and W + 6 < r < W + 22:                 # clave con un pez
+                        u = (k - 30) / 30
+                        if ((u / 0.6) ** 2 + ((r - W - 14) / 6) ** 2) < 1: c = STONE_L
+                        if abs(u - 0.62) < 0.15 and abs(r - W - 14) < 5 * (u - 0.45) * 4: c = STONE_L
+                    M.put(x, y, z, P, c)
+    for j, (cx, cz, a) in enumerate(((W + 40, 26, 0.5), (W + 16, -40, 1.2), (W + 76, -10, 2.1), (W - 10, 36, 2.8))):   # dovelas caídas
+        sink = 4 + j * 2
+        for u in range(-16, 16):
+            for v in range(-12, 12):
+                for y in range(0, 26 - sink):
                     x = int(cx + u * math.cos(a) - v * math.sin(a)); z = int(cz + u * math.sin(a) + v * math.cos(a))
-                    M.put(x, y, z, P, stone(M, x, y, z))
+                    M.put(x, y, z, P, st(x, y, z, (j, 9, 9)) if (u + 16) * (16 - u) > 12 else CARVE)
+    for _ in range(260):                                                                # percebes
+        k = rng.choice(list(M.V.keys()))
+        if k[1] < 40: M.V[k][1] = BARN if rng.random() < 0.7 else (0.16, 0.14, 0.20)
+    for _ in range(30):                                                                 # algas que cuelgan de la rosca
+        a = rng.uniform(0.15, math.pi * 0.7)
+        x = int((W + 1) * math.cos(a)); y = Hp + int((W + 1) * math.sin(a))
+        for k in range(rng.randint(4, 16)):
+            M.put(x, y - k, rng.randint(-T // 2, T // 2 - 1), P, WEED if k % 3 else WEED_D)
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 

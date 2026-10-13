@@ -444,33 +444,143 @@ def choza():
 
 
 def poste():
-    M = Model(S=2, seed=95)
-    for y in range(0, 70):
-        for x in (-1, 0):
-            for z in (-1, 0): M.put(x, y, z, P, LOG_D if y % 9 == 0 else LOG)
-    for x in range(-5, 5):                                      # calavera de vaca con cuernos
-        for y in range(52, 60):
-            if abs(x + 0.5) < 4 - (60 - y) // 4: M.put(x, y, 1, P, BONE)
-    for x in (-3, 2): M.put(x, 57, 2, P, (0.05, 0.05, 0.05))
-    for s in (-1, 1):
-        for k in range(7): M.put(s * (4 + k), 59 + k // 3, 1, P, BONE_D)
-    for y in range(70, 74):
-        for x in range(-2, 2):
-            for z in range(-2, 2): M.put(x, y, z, P, (0.20, 0.16, 0.12))
-    flames(M, 0, 0, 74, 12, 2.5)
-    return M, {P: [0, 0, 0], 'light': [0, 78, 0]}
+    """Poste con antorcha del ritual (rehecho más grande y grueso a 64/m en la revisión de arte
+    del 13-10-2026): un tronco de ciprés de 3,4 m y unos 30 cm, con la corteza en tiras, muescas
+    talladas con símbolos del culto, la calavera de vaca clavada con sus cuernos, tiras de tela y
+    plumas negras atadas, un collar de huesos colgando, la antorcha arriba con los trapos
+    empapados y una llama grande, hollín, y un círculo de piedras y ceniza al pie."""
+    M = Model(S=4, seed=95)
+    rng = M.rng
+    H, R = 196, 9.5
+    for y in range(0, H):
+        r = R - 1.5 * y / H + (2.5 if y < 8 else 0)
+        for x in range(-13, 14):
+            for z in range(-13, 14):
+                d = math.hypot(x + 0.5, z + 0.5)
+                if d > r or d < r - 2.5: continue
+                a = math.atan2(z, x)
+                c = LOG if int((a + math.pi) * 6 + y * 0.03) % 3 else LOG_D                 # tiras de corteza
+                c = lerp(c, BARK_D, 0.3 * M.noise(x, y, z, 4.0))
+                if y > H - 30: c = lerp(c, (0.06, 0.05, 0.04), (y - H + 30) / 40)           # hollín
+                M.put(x, y, z, P, c)
+        if y == H - 1:
+            for x in range(-10, 11):
+                for z in range(-10, 11):
+                    if math.hypot(x, z) < r: M.put(x, y, z, P, LOG_D)
+    for k, y0 in enumerate((40, 62, 84)):                                          # muescas con símbolos
+        for dy in range(10):
+            for dx in range(-4, 5):
+                if (abs(dx) == 4 or dy in (0, 9)) or (k == 0 and abs(dx) == abs(dy - 5)) or (k == 1 and dx == 0) or (k == 2 and abs(dy - 5) + abs(dx) == 4):
+                    M.put(dx, y0 + dy, 9, P, (0.10, 0.07, 0.05))
+    for x in range(-12, 13):                                                        # calavera de vaca
+        for y in range(108, 136):
+            fy = (y - 108) / 28
+            w = 7 + 5 * fy if fy > 0.4 else 7 - 3 * (0.4 - fy) * 2
+            if abs(x) > w: continue
+            c = BONE if M.noise(x, y, 0, 3.0) < 0.7 else BONE_D
+            if fy > 0.55 and abs(abs(x) - 5) < 2.2 and abs(y - 126) < 3: c = (0.04, 0.04, 0.04)   # cuencas
+            if fy < 0.2 and abs(x) in (1, 2) and y in (111, 112): c = (0.05, 0.05, 0.05)            # fosas
+            M.put(x, y, 11 + int(3 * math.cos(x / 9)), P, c)
+            M.put(x, y, 10, P, BONE_D)
+    for s in (-1, 1):                                                               # cuernos
+        for k in range(26):
+            x = s * (12 + k); y = 134 + int(8 * math.sin(k / 26 * math.pi)) + k // 4
+            r = 2.5 - k / 14
+            for dx in range(-2, 3):
+                for dy in range(-2, 3):
+                    if dx * dx + dy * dy <= r * r: M.put(x + dx, y + dy, 11, P, BONE if k < 20 else (0.30, 0.26, 0.20))
+    for k in range(9):                                                              # tiras de tela y plumas
+        a = k / 9 * math.tau
+        x0, z0 = int(10 * math.cos(a)), int(10 * math.sin(a))
+        col = [(0.46, 0.10, 0.08), (0.10, 0.10, 0.10), (0.56, 0.50, 0.36)][k % 3]
+        for j in range(rng.randint(10, 22)):
+            M.put(x0 + int(j * 0.15 * math.cos(a)), 150 - j, z0 + int(j * 0.15 * math.sin(a)), P, col)
+    for k in range(24):                                                             # collar de huesos
+        a = k / 24 * math.pi + math.pi * 0.1
+        x = int(12 * math.cos(a)); y = 100 - int(14 * math.sin(a)); z = 12
+        M.put(x, y, z, P, ROPE if k % 3 else BONE)
+        if k % 3 == 0:
+            for j in range(3): M.put(x, y - j, z + 1, P, BONE)
+    for y in range(H, H + 18):                                                      # trapos de la antorcha
+        for x in range(-12, 13):
+            for z in range(-12, 13):
+                d = math.hypot(x, z)
+                if d > 11 - abs(y - H - 9) * 0.3: continue
+                c = (0.18, 0.14, 0.10) if (y + int(math.atan2(z, x) * 4)) % 3 else (0.10, 0.08, 0.06)
+                if M.hsh(x, y, z) > 0.9: c = (1.0, 0.45, 0.15)
+                M.put(x, y, z, P, c, glow=1 if c == (1.0, 0.45, 0.15) else 0)
+    flames(M, 0, 0, H + 14, 48, 10)
+    for k in range(16):                                                             # chispas
+        M.put(rng.randint(-10, 10), H + 64 + rng.randint(0, 30), rng.randint(-10, 10), P, (1.0, 0.75, 0.35), glow=1)
+    for k in range(12):                                                             # círculo de piedras y ceniza
+        a = k / 12 * math.tau
+        cx, cz = 30 * math.cos(a), 30 * math.sin(a)
+        for x in range(int(cx) - 5, int(cx) + 6):
+            for z in range(int(cz) - 5, int(cz) + 6):
+                for y in range(0, 6):
+                    if (x - cx) ** 2 + (z - cz) ** 2 + ((y - 1) * 1.6) ** 2 < 26: M.put(x, y, z, P, (0.30, 0.29, 0.27) if M.hsh(x, y, z) > 0.3 else (0.20, 0.19, 0.18))
+    for x in range(-26, 27):
+        for z in range(-26, 27):
+            if 12 < math.hypot(x, z) < 25 and M.noise(x, 0, z, 4.0) > 0.4: M.put(x, 0, z, P, (0.22, 0.21, 0.20), over=False)
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
+    return M, {P: [0, 0, 0], 'light': [0, H + 30, 0]}
 
 
 def piragua():
-    M = Model(S=2, seed=96)
-    for x in range(-44, 44):
-        w = 6 * math.sqrt(max(0.0, 1 - (x / 44) ** 2))
-        for z in range(-int(w), int(w) + 1):
-            for y in range(0, 6):
-                inside = abs(z) < w - 1.5 and y > 1
-                if inside: continue
-                M.put(x, y, z, P, LOG if (x + y) % 5 else LOG_D)
-    for k in range(20): M.put(10 + k, 6, 3 - k // 6, P, PLANK)   # el remo
+    """Piragua del bayou (rehecha a 64/m en la revisión de arte del 13-10-2026): canoa vaciada en
+    un tronco de ciprés, de 3 m, con la proa y la popa afiladas y levantadas, borda gastada, dos
+    bancadas, agua sucia y hojas en el fondo, un remo de pala ancha cruzado, una nasa y un rollo
+    de cuerda dentro, musgo y barro en el casco, y medio varada en el barro con un cabo a una
+    estaca."""
+    M = Model(S=4, seed=96)
+    L, W, H = 96, 18, 22
+    for x in range(-L, L):
+        f = abs(x) / L
+        w = W * math.sqrt(max(0.0, 1 - f ** 2.4))
+        lift = int(10 * max(0.0, f - 0.7) / 0.3 * max(0.0, f - 0.7) / 0.3)
+        if w < 1.5: continue
+        for z in range(-int(w) - 1, int(w) + 2):
+            for y in range(0, H + lift + 1):
+                u = z / max(w, 1)
+                bottom = int((1 - math.sqrt(max(0.0, 1 - u * u))) * H * 0.9) + lift // 2
+                if y < bottom or abs(u) > 1: continue
+                inner = abs(u) < 1 - 3.0 / max(w, 1) and y > bottom + 2
+                if inner and y < H + lift: continue
+                c = LOG if int(y + abs(z) * 0.3 + x * 0.05) % 4 else LOG_D
+                c = lerp(c, BARK_D, 0.3 * M.noise(x, y, z, 5.0))
+                if y >= H + lift - 1: c = lerp(c, (0.56, 0.44, 0.30), 0.4)                 # borda gastada
+                if y < bottom + 4 and abs(u) > 0.8: c = lerp(c, (0.24, 0.30, 0.16), 0.5)   # musgo y barro
+                M.put(x, y, z, P, c)
+    for x in range(-L + 24, L - 24):                                                 # agua sucia en el fondo
+        for z in range(-12, 13):
+            w = W * math.sqrt(max(0.0, 1 - (abs(x) / L) ** 2.4))
+            if abs(z) < w - 5: M.put(x, 6, z, P, (0.16, 0.20, 0.14) if M.hsh(x, z, 1) > 0.04 else (0.40, 0.30, 0.16))
+    for bx in (-40, 34):                                                             # bancadas
+        for x in range(bx - 4, bx + 4):
+            for z in range(-W + 2, W - 1): M.put(x, H - 4, z, P, PLANK if (x + z) % 7 else PLANK_D)
+    for k in range(120):                                                             # remo de pala ancha cruzado
+        x = -60 + k; z = -8 + k // 10; y = H - 2 + (1 if k > 80 else 0)
+        M.put(x, y, z, P, PLANK); M.put(x, y, z + 1, P, PLANK)
+        if k > 92:
+            for dz in range(-4, 6): M.put(x, y, z + dz, P, PLANK if dz % 3 else PLANK_D)
+    for a in range(0, 540, 6):                                                       # rollo de cuerda
+        r = 4 + a / 180
+        M.put(int(56 + r * math.cos(math.radians(a))), 8 + a // 360, int(r * math.sin(math.radians(a))), P, (0.56, 0.48, 0.32))
+    for x in range(-74, -54):                                                        # nasa pequeña
+        for y in range(7, 19):
+            for z in range(-9, 10):
+                if abs(math.hypot(y - 7, z) - 9) < 0.8 and (x % 4 == 0 or (y + z) % 3 == 0): M.put(x, y, z, P, (0.50, 0.46, 0.34))
+    for x in range(-150, 150):                                                       # barro donde está varada
+        for z in range(-40, 40):
+            if (x / 140) ** 2 + (z / 36) ** 2 < 1 and M.noise(x, 0, z, 12.0) > 0.35: M.put(x, 0, z, P, (0.22, 0.18, 0.12), over=False)
+    for k in range(70):                                                              # cabo a una estaca
+        M.put(L + k, max(1, 18 - k // 3), k // 6, P, (0.56, 0.48, 0.32))
+    for y in range(0, 26):
+        for dx in (0, 1):
+            for dz in (0, 1): M.put(L + 70 + dx, y, 11 + dz, P, LOG_D)
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 

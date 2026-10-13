@@ -6,7 +6,7 @@ Uso: python tools/gen_atrezo_ciudad.py
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model, lerp
+from voxlib import Model, lerp, refine
 
 P = 'body'
 STONE = (0.50, 0.50, 0.50); STONE_D = (0.32, 0.32, 0.34); STONE_L = (0.62, 0.62, 0.62)   # gris frío: pardo, con el sol cálido, salía marrón
@@ -239,8 +239,26 @@ def muro_ciclopeo(seed):
     return half(M)
 
 
-PIECES = {'muro_roto': muro_roto, 'arco': arco, 'bloque_ciclopeo': bloque,
-          'bloque_ciclopeo_2': lambda: bloque(2), 'bloque_ciclopeo_3': lambda: bloque(3), 'mural': mural}
+def _fine(M, seed):
+    """A 64/m con textura fina (revisión de arte del 13-10-2026): moteado y picaduras en la
+    piedra, y además liquen a manchas y desconchones pequeños en las aristas de arriba."""
+    N = refine(M, 2, seed=seed)
+    LICHEN = (0.56, 0.58, 0.44)
+    for (x, y, z), v in N.V.items():
+        if v[1] == FROST or v[2]: continue
+        if N.noise(x, y, z, 5.0) > 0.78 and _hh(x, y, z) > 0.4: v[1] = lerp(v[1], LICHEN, 0.5)
+        if (x, y + 1, z) not in N.V and _hh(x, y, z) > 0.93: v[1] = lerp(v[1], STONE_D, 0.6)
+    return N
+
+
+def _hh(x, y, z):
+    h = (x * 73856093) ^ (y * 19349663) ^ (z * 83492791)
+    return ((h ^ (h >> 13)) * 1274126177 & 0xFFFF) / 65536.0
+
+
+PIECES = {'muro_roto': lambda: _fine(muro_roto(), 61), 'arco': arco, 'bloque_ciclopeo': lambda: _fine(bloque(), 63),
+          'bloque_ciclopeo_2': lambda: _fine(bloque(2), 64), 'bloque_ciclopeo_3': lambda: _fine(bloque(3), 65),
+          'mural': lambda: _fine(mural(), 66)}
 
 if __name__ == '__main__':
     for name, fn in PIECES.items():

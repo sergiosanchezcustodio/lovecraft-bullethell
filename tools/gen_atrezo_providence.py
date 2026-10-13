@@ -156,17 +156,67 @@ def escultura_2():
 
 
 def caballete():
-    M = Model(S=2, seed=75)
-    for s in (-1, 1):                                           # patas
-        for y in range(0, 60):
-            M.put(s * (10 - y // 8), y, -y // 10, P, WOOD); M.put(s * (10 - y // 8), y, -y // 10 + 1, P, WOOD)
-    for y in range(0, 52): M.put(0, y, -6 + y // 6, P, WOOD_D)  # pata trasera
-    for x in range(-12, 12):                                    # lienzo: mar negro y una ciudad de ángulos
-        for y in range(22, 50):
-            c = CANVAS if x in (-12, 11) or y in (22, 49) else (SEA if y < 32 else (SEA_L if (x + y) % 5 == 0 else SEA))
-            if 32 <= y < 44 and abs(x - 2) < 6 and (y - 32) < 12 - abs(x - 2) * 1.6: c = CITY
-            M.put(x, y, -y // 10 + 2, P, c)
-    for x in range(-13, 13): M.put(x, 21, -1, P, WOOD_D)        # repisa
+    """Caballete de Wilcox con un lienzo (rehecho a 64/m en la revisión de arte del 13-10-2026):
+    tres patas de listón con tornillo de ajuste y travesaños, repisa con una paleta llena de
+    manchas de color, pinceles y un trapo; el lienzo sobre su bastidor, con el borde sin pintar y
+    las chinchetas, muestra un mar negro y una ciudad de ángulos imposibles bajo un cielo verde
+    enfermo, a pinceladas; salpicaduras de pintura en el suelo."""
+    M = Model(S=4, seed=75)
+    rng = M.rng
+    LEAN = 0.18
+    H = 132
+    def zl(y): return -int(y * LEAN)
+    for s in (-1, 1):                                                                # patas delanteras
+        for y in range(0, H):
+            x = s * (24 - y // 10)
+            for dx in range(-1, 2):
+                for dz in (0, 1): M.put(x + dx, y, zl(y) + dz, P, WOOD if dx else WOOD_D)
+    for y in range(0, int(H * 0.88)):                                                # pata trasera
+        z = zl(y) - 20 + int(y * 0.35)
+        for dx in (-1, 0, 1): M.put(dx, y, -z - 2 * zl(y) - 40 + z, P, WOOD_D)
+    for y in range(0, int(H * 0.85)):
+        M.put(0, y, -int(0.55 * (H * 0.85 - y)) + zl(int(H * 0.85)), P, WOOD_D)
+    for x in range(-22, 23):                                                         # travesaño y tornillo
+        M.put(x, 30, zl(30), P, WOOD_D); M.put(x, 31, zl(31), P, WOOD_D)
+    for k in range(5): M.put(-2 + k, 70, zl(70) + 2, P, IRON)
+    TY = 54                                                                          # repisa
+    for x in range(-30, 31):
+        for z in range(zl(TY) - 2, zl(TY) + 8):
+            M.put(x, TY, z, P, WOOD); M.put(x, TY - 1, z, P, WOOD_D)
+        M.put(x, TY + 1, zl(TY) + 7, P, WOOD_D)
+    PAL = [(0.62, 0.12, 0.10), (0.16, 0.24, 0.40), (0.86, 0.80, 0.62), (0.20, 0.36, 0.20), (0.08, 0.08, 0.08), (0.70, 0.56, 0.20)]
+    for x in range(8, 28):                                                           # paleta
+        for z in range(zl(TY), zl(TY) + 7):
+            if ((x - 18) / 10) ** 2 + ((z - zl(TY) - 3) / 3.5) ** 2 < 1:
+                c = (0.60, 0.46, 0.28)
+                if M.hsh(x // 3, z // 2, 3) > 0.55: c = PAL[int(M.hsh(x // 3, z, 4) * 6)]
+                M.put(x, TY + 1, z, P, c)
+    for k, xb in enumerate((-24, -20, -16)):                                          # pinceles
+        for j in range(14): M.put(xb + j // 7, TY + 1, zl(TY) + 1 + j // 3, P, (0.56, 0.44, 0.30) if j < 11 else PAL[k])
+    for x in range(-12, -2):                                                         # trapo
+        for z in range(zl(TY), zl(TY) + 6): M.put(x, TY + 1 + (x + z) % 2, z, P, lerp(CANVAS, PAL[(x * z) % 6], 0.3))
+    CW, CB, CT = 30, TY + 2, TY + 74                                                 # lienzo
+    for y in range(CB, CT):
+        b = (y - CB) / (CT - CB)
+        for x in range(-CW, CW):
+            a = x / CW
+            edge = abs(x) >= CW - 2 or y < CB + 2 or y >= CT - 2
+            if edge: c = CANVAS
+            elif b < 0.38:                                                            # mar negro con oleaje
+                c = SEA if (x + int(6 * math.sin(y * 0.7 + x * 0.1))) % 9 else SEA_L
+            elif b < 0.75 and abs(a - 0.1) < 0.55 - (b - 0.38) * 1.2 and ((int(a * 16 + b * 6) % 3) or b < 0.45):
+                c = CITY if (int(a * 30 - b * 12) % 4) else lerp(CITY, (0.06, 0.08, 0.06), 0.6)   # ciudad de ángulos
+            else:
+                c = lerp((0.30, 0.40, 0.24), (0.14, 0.20, 0.12), b + 0.2 * M.noise(x, y, 0, 4.0))  # cielo verde enfermo
+            if not edge and M.hsh(x // 2, y // 1, 7) > 0.92: c = lerp(c, (0, 0, 0), 0.2)         # pinceladas
+            M.put(x, y, zl(y) + 3, P, c)
+            M.put(x, y, zl(y) + 2, P, WOOD_D if edge else CANVAS)
+    for (x, y) in ((-CW + 1, CB + 1), (CW - 2, CB + 1), (-CW + 1, CT - 2), (CW - 2, CT - 2)):
+        M.put(x, y, zl(y) + 4, P, IRON)
+    for _ in range(40):                                                              # salpicaduras en el suelo
+        M.put(rng.randint(-30, 30), 0, rng.randint(-10, 30), P, PAL[rng.randrange(6)])
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 

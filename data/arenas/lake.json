@@ -344,7 +344,7 @@
   },
   "atrezo_bandera": {
    "type": "cylinder",
-   "radius": 0.12
+   "radius": 0.4
   },
   "monticulo_1": {
    "type": "cylinder",

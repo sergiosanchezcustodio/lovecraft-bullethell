@@ -8,7 +8,7 @@ Uso: python tools/gen_atrezo_expedicion.py [piezas...]
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model, lerp, scale
+from voxlib import Model, lerp, scale, refine
 
 P = 'body'
 SNOW = (0.90, 0.93, 0.97); SNOW_SH = (0.80, 0.85, 0.92)
@@ -50,7 +50,7 @@ def drift(M, inside, reach, height):
 
 # ---------------- tienda ----------------
 
-def tienda():
+def _tienda48():
     """Tienda de expedición de lona cruda: cumbrera a lo largo de X (3 m), paredes bajas,
     faldones que ceden entre los postes, costuras, faldón en el suelo, puerta en el extremo
     +X con las solapas recogidas, vientos con estacas y nieve en el tejado y al pie."""
@@ -152,6 +152,24 @@ def tienda():
     return M
 
 
+def tienda():
+    """La tienda a 96/m (revisión de arte del 13-10-2026): la de _tienda48 al doble de
+    resolución con trama en la lona y veta en la madera, y parches cosidos con puntadas."""
+    M = refine(_tienda48(), 1, seed=21)                               # textura fina sin doblar: a 96/m pesaba demasiado (las tiendas se repiten)
+    rng = M.rng
+    PATCH = (0.66, 0.60, 0.47)
+    keys = [k for k, v in M.V.items() if v[1] and k[1] > 60 and abs(k[2]) > 20]
+    for _ in range(7):                                               # parches cosidos
+        x0, y0, z0 = keys[rng.randrange(len(keys))]
+        w, h = rng.randint(10, 22), rng.randint(8, 16)
+        for (x, y, z), v in M.V.items():
+            if abs(z - z0) > 6 or not (x0 <= x < x0 + w and y0 <= y < y0 + h): continue
+            if v[1][0] < 0.5: continue
+            edge = x in (x0, x0 + w - 1) or y in (y0, y0 + h - 1)
+            v[1] = ((0.36, 0.30, 0.22) if (x + y) % 3 == 0 else PATCH) if edge else lerp(PATCH, v[1], 0.3)
+    return M
+
+
 # ---------------- caja ----------------
 
 LETTERS = {'M': ["1...1", "11.11", "1.1.1", "1...1", "1...1"], 'U': ["1...1", "1...1", "1...1", "1...1", ".111."],
@@ -236,7 +254,7 @@ def bidon():
 
 # ---------------- trineo ----------------
 
-def trineo():
+def _trineo48():
     """Trineo de expedición (tipo Nansen): patines que se curvan delante, montantes, plataforma
     de listones, y encima una caja y un fardo de lona atados con cuerdas."""
     M = Model(S=3, seed=24)
@@ -288,7 +306,7 @@ def trineo():
 
 # ---------------- trípode ----------------
 
-def tripode():
+def _tripode48():
     """Trípode de madera con un teodolito de latón encima."""
     M = Model(S=3, seed=25)
     top = 62
@@ -309,6 +327,94 @@ def tripode():
     for x in range(-6, 8):
         for y in range(top + 12, top + 16):
             for z in (0, 1): M.put(x, y, z, P, IRON if x not in (-6, 7) else BRASS)
+    return M
+
+
+def tripode():
+    """Trípode con teodolito (rehecho a 96/m en la revisión de arte del 13-10-2026): tres patas de
+    madera de dos tramos que se afinan, con abrazaderas de latón y tornillos, conteras de hierro
+    clavadas en la nieve, cabeza de latón con tornillos niveladores, el teodolito (base, limbo
+    graduado, columnas, anteojo con ocular y objetivo de cristal, nivel de burbuja) y una
+    plomada que cuelga entre las patas."""
+    M = Model(S=6, seed=25)
+    top = 128
+    GLASS_C = (0.40, 0.56, 0.64)
+    def leg(fx, fz):
+        n = 260
+        for i in range(n + 1):
+            t = i / n
+            x = fx * (1 - t); z = fz * (1 - t); y = top * t
+            r = 2.6 if t > 0.5 else 2.2
+            if t < 0.06: r = 1.4
+            for dx in range(-3, 4):
+                for dz in range(-3, 4):
+                    if dx * dx + dz * dz > r * r: continue
+                    c = lerp(WOOD_D, WOOD, 0.55 + 0.35 * math.sin((dx + dz) * 1.3 + y * 0.05))
+                    if t < 0.06: c = IRON
+                    if abs(t - 0.5) < 0.012 or abs(t - 0.53) < 0.006: c = BRASS                     # abrazadera
+                    if abs(t - 0.95) < 0.01: c = BRASS
+                    M.put(int(round(x)) + dx, int(round(y)), int(round(z)) + dz, P, c)
+        x, z, y = fx * 0.49, fz * 0.49, top * 0.51                                               # tornillo de la abrazadera
+        for k in range(4): M.put(int(x) + k, int(y), int(z), P, BRASS)
+    for a in (0.3, 2.4, 4.5):
+        leg(math.cos(a) * 46, math.sin(a) * 46)
+    for y in range(top, top + 6):                                     # cabeza de latón
+        for x in range(-9, 10):
+            for z in range(-9, 10):
+                if x * x + z * z <= 81: M.put(x, y, z, P, BRASS if y > top + 1 else WOOD_D)
+    for a in (0, 120, 240):                                           # tornillos niveladores
+        for y in range(top + 6, top + 10):
+            M.put(int(6 * math.cos(math.radians(a))), y, int(6 * math.sin(math.radians(a))), P, IRON_L)
+    for y in range(top + 10, top + 14):                               # limbo graduado
+        for a in range(0, 360, 4):
+            for r in (7, 8):
+                c = BRASS if a % 20 else IRON
+                M.put(int(round(r * math.cos(math.radians(a)))), y, int(round(r * math.sin(math.radians(a)))), P, c)
+    for s in (-1, 1):                                                 # columnas
+        for y in range(top + 14, top + 34):
+            for x in range(-1, 2): M.put(x, y, s * 5, P, BRASS); M.put(x, y, s * 5 + s, P, BRASS)
+    for x in range(-16, 18):                                          # anteojo
+        r = 3.2 if -10 < x < 12 else 4.2
+        for y in range(-5, 6):
+            for z in range(-5, 6):
+                if y * y + z * z > r * r: continue
+                c = IRON if (x // 4) % 2 else (0.30, 0.30, 0.32)
+                if x >= 16: c = GLASS_C
+                if x <= -16: c = (0.08, 0.08, 0.10)
+                M.put(x, top + 30 + y, z, P, c)
+    for x in range(-4, 5):                                            # nivel de burbuja
+        for z in range(-2, 3):
+            M.put(x, top + 36, z, P, (0.66, 0.84, 0.58) if abs(x) < 2 and z == 0 else BRASS)
+    for y in range(22, top):                                          # plomada
+        M.put(0, y, 0, P, (0.72, 0.68, 0.56))
+    for y in range(10, 22):
+        for x in range(-3, 4):
+            for z in range(-3, 4):
+                if abs(x) + abs(z) <= (y - 10) // 3: M.put(x, y, z, P, BRASS)
+    for a in (0.3, 2.4, 4.5):                                         # nieve al pie de cada pata
+        cx, cz = math.cos(a) * 46, math.sin(a) * 46
+        for x in range(int(cx) - 7, int(cx) + 8):
+            for z in range(int(cz) - 7, int(cz) + 8):
+                d = math.hypot(x - cx, z - cz)
+                for y in range(0, max(0, int(4 - d * 0.6))): M.put(x, y, z, P, SNOW if M.hsh(x, y, z) > 0.2 else SNOW_SH, over=False)
+    return M
+
+
+def trineo():
+    """Trineo a 96/m (revisión de arte del 13-10-2026): el de _trineo48 al doble de resolución,
+    con los patines forrados de hierro, ataduras de cuero en cada montante, la caja con
+    cantoneras y las ataduras de la carga más gruesas."""
+    M = refine(_trineo48(), 2, seed=24)
+    for (x, y, z), v in list(M.V.items()):
+        if y <= 1 and v[1][0] < 0.6: v[1] = IRON if (x // 9) % 2 else IRON_L        # forro de hierro de los patines
+    LEATHER = (0.30, 0.18, 0.10)
+    for xm in range(-108, 112, 32):                                  # ataduras de cuero en los montantes
+        for y in range(20, 28):
+            for z in (-32, -31, 30, 31):
+                M.put(xm - 1, y, z, P, LEATHER); M.put(xm + 3, y, z, P, LEATHER)
+    for x in (-88, -14):                                             # cantoneras de la caja
+        for y in (28, 29, 74, 75):
+            for z in (-26, -25, 24, 25): M.put(x, y, z, P, IRON)
     return M
 
 
