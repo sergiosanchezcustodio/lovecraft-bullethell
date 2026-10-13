@@ -314,26 +314,92 @@ def tripode():
 
 # ---------------- bandera ----------------
 
+FROCK = (0.38, 0.37, 0.35); FROCK_D = (0.26, 0.25, 0.24); FROCK_L = (0.50, 0.48, 0.45)
+DIRT = (0.40, 0.36, 0.30)
+
+
 def bandera():
-    """Mástil con la bandera de Estados Unidos (48 estrellas, 1930) ondeando hacia +X."""
-    M = Model(S=3, seed=26)
-    H = 170
-    for y in range(0, H):
-        for x in (0, 1):
-            for z in (0, 1): M.put(x, y, z, P, WOOD_D if y < H - 2 else BRASS)
-    FW, FH = 62, 34
-    for x in range(2, 2 + FW):
-        wave = int(round(2.5 * math.sin((x - 2) * 0.16)))
-        for y in range(H - 4 - FH, H - 4):
-            fy = H - 5 - y                                        # fila desde arriba
-            c = RED if (fy * 13 // FH) % 2 == 0 else WHITE
-            if fy < FH * 7 // 13 and x - 2 < FW * 2 // 5:
-                c = BLUE
-                if (x % 3 == 0) and (fy % 3 == 1): c = WHITE
-            M.put(x, y, wave, P, c)
-    # nieve al pie
-    drift(M, lambda x, z: max(abs(x + 0.5), abs(z + 0.5)) - 1, 10, 5)
-    return M
+    """Mástil con la bandera de Estados Unidos (48 estrellas, 1930), rehecho en la revisión de
+    arte del 13-10-2026 a 64/m: mástil de 4,6 m que se afina, con anillas de hierro, perilla de
+    latón, driza y cornamusa; base ancha de piedras amontonadas con nieve, y tres vientos a
+    estacas. La bandera es la parte "flag" (VoxelBuilder la hace ondear con flag_wave.gdshader):
+    desteñida, sucia, con la punta deshilachada en jirones y algún agujero."""
+    M = Model(S=4, seed=26)
+    rng = M.rng
+    H = 296
+    for y in range(0, H):                                          # mástil que se afina
+        r = 3.2 - 1.4 * y / H
+        for x in range(-4, 5):
+            for z in range(-4, 5):
+                if math.hypot(x + 0.5, z + 0.5) > r: continue
+                c = lerp(WOOD_D, WOOD, 0.4 + 0.4 * M.noise(x, y * 0.1, z, 1.0))
+                if (y + x * 5) % 31 == 0: c = GROOVE
+                if y in range(60, 64) or y in range(200, 203): c = IRON          # anillas
+                M.put(x, y, z, P, c)
+    for x in range(-4, 5):                                          # perilla de latón
+        for y in range(H, H + 8):
+            for z in range(-4, 5):
+                if (x + 0.5) ** 2 + (y - H - 3.5) ** 2 + (z + 0.5) ** 2 < 14: M.put(x, y, z, P, BRASS)
+    for y in range(40, H - 4):                                     # driza junto al mástil
+        M.put(3, y, 2, P, ROPE if y % 3 else lerp(ROPE, WOOD_D, 0.4))
+    for x in range(2, 6):                                           # cornamusa con la driza
+        M.put(x, 44, 2, P, IRON); M.put(x, 45, 2, P, IRON)
+    for k in range(10): M.put(4 + (k % 2), 43 - k, 3, P, ROPE)
+    # base: piedras amontonadas
+    for _ in range(70):
+        a = rng.uniform(0, math.tau); d = rng.uniform(4, 26)
+        cx, cz = math.cos(a) * d, math.sin(a) * d
+        rs = rng.uniform(4.5, 8.0) * (1.15 - d / 40)
+        cy = max(rs * 0.6, 24 - d * 0.85) + rng.uniform(-2, 2)
+        for x in range(int(cx - rs) - 1, int(cx + rs) + 2):
+            for z in range(int(cz - rs) - 1, int(cz + rs) + 2):
+                for y in range(0, int(cy + rs) + 1):
+                    if ((x - cx) / rs) ** 2 + ((y - cy) / (rs * 0.75)) ** 2 + ((z - cz) / rs) ** 2 > 1: continue
+                    if abs(x + 0.5) < 3 and abs(z + 0.5) < 3: continue
+                    c = lerp(FROCK_D, FROCK, M.noise(x, y, z, 2.5))
+                    if M.hsh(x, y, z) > 0.92: c = FROCK_L
+                    M.put(x, y, z, P, c, over=False)
+    tops = {}
+    for (x, y, z) in M.V:
+        if math.hypot(x, z) > 3.5 and y < 40 and y > tops.get((x, z), -1): tops[(x, z)] = y
+    for (x, z), y in tops.items():                                  # nieve en lo alto de las piedras
+        if M.noise(x, 3, z, 4.0) > 0.4:
+            for d in range(1 + int(M.noise(x, 5, z, 3.0) * 3)): M.put(x, y + 1 + d, z, P, SNOW if M.hsh(x, d, z) < 0.8 else SNOW_SH)
+    # tres vientos a estacas
+    for k in range(3):
+        a = k / 3 * math.tau + 0.5
+        sx, sz = math.cos(a) * 64, math.sin(a) * 64
+        for y in range(0, 12):
+            for dx in (0, 1): M.put(int(sx) + dx, y, int(sz), P, WOOD_D)
+        n = 260
+        for i in range(n + 1):
+            t = i / n
+            x = sx * t; z = sz * t
+            y = 11 + (190 - 11) * (1 - t) - 18 * math.sin(math.pi * t)       # comba
+            M.put(int(round(x)), int(round(y)), int(round(z)), P, ROPE)
+    drift(M, lambda x, z: math.hypot(x + 0.5, z + 0.5) - 17, 16, 9)
+    # bandera (parte "flag", hacia +X desde el mástil), desteñida y raída
+    FW, FH = 120, 64
+    top = H - 6
+    RED_F = lerp(RED, WHITE, 0.18); BLUE_F = lerp(BLUE, (0.30, 0.32, 0.40), 0.25); WHITE_F = lerp(WHITE, DIRT, 0.25)
+    for x in range(0, FW):
+        fray = FW - 6 - 22 * M.noise(0, 0, x * 0.0 + 1, 1.0)
+        for fy in range(0, FH):
+            ragged = FW - 4 - 26 * M.noise(3, fy, 7, 6.0) - (14 if M.hsh(fy // 4, 1, 2) > 0.7 else 0)
+            if x > ragged: continue                                    # jirones en la punta
+            if M.noise(x, fy, 1, 5.0) > 0.86 and x > 30: continue      # agujeros
+            stripe = (fy * 13 // FH) % 2 == 0
+            c = RED_F if stripe else WHITE_F
+            if fy < FH * 7 // 13 and x < FW * 2 // 5:
+                c = BLUE_F
+                if ((x // 3) % 3 == 1) and ((fy // 3) % 2 == 1) and x % 3 == 1 and fy % 3 == 1: c = WHITE_F   # estrellas
+            c = lerp(c, DIRT, 0.25 * M.noise(x, fy, 9, 7.0) + 0.15 * (x / FW))   # suciedad hacia la punta
+            if x > ragged - 2: c = lerp(c, DIRT, 0.4)                  # borde deshilachado
+            for z in (0, 1):
+                M.put(x + 4, top - fy, z, 'flag', c)
+    for fy in range(0, FH):                                          # vaina junto al mástil
+        for x in (4, 5): M.put(x, top - fy, 0, 'flag', WHITE_F); M.put(x, top - fy, 1, 'flag', WHITE_F)
+    return M, {P: [0, 0, 0], 'flag': [4, top, 0]}
 
 
 # ---------------- farol ----------------

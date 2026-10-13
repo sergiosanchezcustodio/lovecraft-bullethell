@@ -4,12 +4,13 @@
   gilman      la trasera del hotel Gilman House: cuatro plantas de ladrillo oscuro, ventanas
               con alguna luz encendida y la escalera de incendios de hierro (16/m)
   buhardilla  tejado abuhardillado de la casa de al lado, con ventana y chimenea (16/m)
-  chimenea    chimenea de ladrillo con dos sombreretes (32/m)
+  chimenea    chimenea de ladrillo con tres sombreretes de barro (64/m)
   claraboya   claraboya de cristal con marco de hierro (32/m)
-  deposito    depósito de agua de madera sobre patas (32/m)
-  tendedero   dos palos con cuerda y sábanas tendidas (32/m)
-  pretil      tramo de pretil de ladrillo con albardilla de piedra, el borde del tejado (32/m)
-  trampilla   trampilla de acceso al tejado (32/m)
+  deposito    depósito de agua de duelas sobre patas, con escalera (64/m)
+  tendedero   dos palos en T con cuerdas y ropa tendida (64/m)
+  pretil      tramo de pretil de ladrillo con albardilla de piedra, el borde del tejado (64/m)
+  trampilla   trampilla de acceso al tejado con la tapa abierta (64/m)
+Las cinco de 64/m, rehechas en la revisión de arte del 13-10-2026.
 
 Escribe models/tej_<pieza>.json. Uso: python tools/gen_atrezo_tejados.py [piezas...]
 """
@@ -23,6 +24,31 @@ BRICK_N = (0.30, 0.20, 0.17); BRICK_ND = (0.23, 0.15, 0.13)          # ladrillo 
 STONE = (0.55, 0.54, 0.50)
 LIT = (1.0, 0.78, 0.46)
 SHEET = (0.78, 0.76, 0.70); SHEET_D = (0.62, 0.60, 0.56)
+MORTAR = (0.46, 0.42, 0.37); SOOT = (0.08, 0.07, 0.07); POT = (0.52, 0.32, 0.22); POT_D = (0.38, 0.22, 0.16)
+LEAD = (0.36, 0.38, 0.40); STONE_D = (0.42, 0.41, 0.38); WET = (0.22, 0.24, 0.22)
+STAVE = (0.42, 0.31, 0.20); STAVE_D = (0.30, 0.22, 0.14); STAVE_L = (0.52, 0.40, 0.27)
+PEG = (0.50, 0.42, 0.30); CLOTH_R = (0.56, 0.24, 0.20); CLOTH_B = (0.30, 0.36, 0.46); CLOTH_S = (0.70, 0.66, 0.56)
+
+
+
+def _brick(M, x, y, z, u, seed=0):
+    """Aparejo de ladrillo a 64/m: hiladas de 4, ladrillos de 14, llaga de 1; tono por pieza,
+    algún ladrillo más oscuro o quemado, mortero que falta."""
+    course = y // 4
+    k = (u + (course % 2) * 7) // 14
+    if y % 4 == 0 or (u + (course % 2) * 7) % 14 == 0:
+        return MORTAR if M.hsh(u // 3, y, 5) > 0.15 else lerp(MORTAR, SOOT, 0.5)
+    h = M.hsh(course, k, seed)
+    c = lerp(BRICK, BRICK_D, h * 0.8)
+    if h > 0.9: c = lerp(BRICK_D, SOOT, 0.4)
+    return lerp(c, BRICK_D, 0.25 * M.noise(x, y, z, 3.0))
+
+
+def _hollow(M):
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
+
+
 
 
 def gilman():
@@ -210,20 +236,53 @@ def buhardilla():
 
 
 def chimenea():
-    M = Model(S=2, seed=83)
-    for y in range(0, 52):
-        for x in range(-13, 13):
-            for z in range(-9, 9):
-                if min(x + 13, 12 - x, z + 9, 8 - z) > 0 and y < 47: continue
-                c = BRICK if (y // 2 + (x + (y // 2 % 2) * 2) // 4) % 4 else BRICK_D
-                if y >= 47: c = STONE
+    """Chimenea de ladrillo (64/m, revisión de arte del 13-10-2026): aparejo con llagas, base con
+    tapajuntas de plomo sobre el tejado, cornisa de dos hiladas que vuelan, albardilla de piedra,
+    hollín que baja desde arriba, verdín abajo, una grieta, una abrazadera de hierro con su
+    tirante, y tres sombreretes de barro de alturas distintas, uno roto, con el interior negro."""
+    M = Model(S=4, seed=83)
+    HX, HZ, H = 26, 18, 100
+    for y in range(0, H):
+        ex = 2 if H - 14 <= y < H - 6 else 0                         # cornisa que vuela
+        for x in range(-HX - ex, HX + ex):
+            for z in range(-HZ - ex, HZ + ex):
+                if min(x + HX + ex, HX + ex - 1 - x, z + HZ + ex, HZ + ex - 1 - z) > 1 and y < H - 1: continue
+                u = x if abs(z) >= HZ - 1 else z + 100
+                c = _brick(M, x, y, z, u, 83)
+                if y >= H - 4: c = lerp(STONE, STONE_D, M.hsh(x // 10, 1, z // 10))       # albardilla
+                elif y > H - 30: c = lerp(c, SOOT, min(1.0, (y - H + 30) / 30) * (0.4 + 0.5 * M.noise(x, y, z, 6.0)))
+                if y < 12: c = lerp(c, MOSS, 0.5 * M.noise(x, y, z, 5.0))
+                if y < 6 and min(x + HX, HX - 1 - x, z + HZ, HZ - 1 - z) <= 1: c = LEAD          # tapajuntas
                 M.put(x, y, z, P, c)
-    for cx in (-6, 6):                                       # sombreretes de barro
-        for y in range(52, 62):
-            for x in range(cx - 3, cx + 3):
-                for z in range(-3, 3):
-                    if math.hypot(x - cx + 0.5, z + 0.5) > 3: continue
-                    M.put(x, y, z, P, (0.48, 0.30, 0.22) if y < 60 else (0.36, 0.22, 0.16))
+    for x in range(-HX - 1, HX + 1):                                 # tapajuntas que asoma
+        for z in range(-HZ - 1, HZ + 1):
+            if min(x + HX + 1, HX - x, z + HZ + 1, HZ - z) == 0:
+                for y in range(0, 3): M.put(x, y, z, P, LEAD)
+    x, y = 8, 70                                                     # grieta
+    for _ in range(40):
+        v = M.V.get((x, y, HZ - 1))
+        if v: v[1] = SOOT
+        y -= 1; x += M.rng.choice((-1, 0, 1))
+    for xx in range(-HX - 1, HX + 1):                                # abrazadera y tirante
+        M.put(xx, 60, HZ, P, IRON); M.put(xx, 61, HZ, P, IRON)
+    for i in range(60): M.put(HX + i // 2, 60 - i, HZ - 2, P, IRON)
+    for cx, h, broken in ((-13, 26, False), (0, 34, True), (13, 22, False)):    # sombreretes
+        for y in range(H, H + h):
+            r = 6.5 - 1.5 * math.sin((y - H) / h * math.pi) + (1.5 if y > H + h - 4 else 0)
+            if broken and y > H + h - 10 and M.hsh(y, 1, 1) > 0.3: r -= 1.5
+            for x in range(cx - 9, cx + 10):
+                for z in range(-9, 10):
+                    d = math.hypot(x - cx + 0.5, z + 0.5)
+                    if d > r: continue
+                    if d < r - 2 and y < H + h - 1: continue
+                    c = POT if (y - H) % 8 else POT_D
+                    if broken and y > H + h - 10 and M.hsh(x, y, z) > 0.75: continue
+                    M.put(x, y, z, P, lerp(c, SOOT, 0.6 * max(0, (y - H - h + 10) / 10)))
+            if y == H + h - 1:
+                for x in range(cx - 4, cx + 5):
+                    for z in range(-4, 5):
+                        if math.hypot(x - cx, z) < r - 2: M.put(x, y, z, P, SOOT)
+    _hollow(M)
     return M, {P: [0, 0, 0]}
 
 
@@ -246,96 +305,218 @@ def claraboya():
 
 
 def deposito():
-    """Depósito de agua de duelas sobre cuatro patas con tirantes: 2 m de diámetro y 4 de alto."""
-    M = Model(S=2, seed=85)
-    for y in range(0, 56):                                   # patas y tirantes
-        for cx, cz in ((-22, -22), (21, -22), (-22, 21), (21, 21)):
-            for x in range(cx, cx + 2):
-                for z in range(cz, cz + 2): M.put(x, y, z, P, WOOD_D)
-    for i in range(44):
-        M.put(-22 + i, 10 + i, -22, P, IRON); M.put(-22 + i, 10 + i, 22, P, IRON)
-        M.put(-22, 10 + i, -22 + i, P, IRON); M.put(22, 10 + i, -22 + i, P, IRON)
-    for y in range(56, 60):                                  # tablero
-        for x in range(-26, 26):
-            for z in range(-26, 26): M.put(x, y, z, P, PLANK_D)
-    for y in range(60, 116):                                 # cuba
-        for x in range(-32, 32):
-            for z in range(-32, 32):
+    """Depósito de agua de duelas sobre patas (64/m, revisión de arte del 13-10-2026): 2 m de
+    diámetro y 4 de alto. Cuba de duelas de tono propio que se ensancha un poco abajo, cinco aros de
+    hierro oxidado con sus tensores, manchas de humedad y verdín donde gotea, tejadillo cónico de
+    tablas con remate y trampilla, escalera de mano, patas con tirantes en aspa y pernos, tablero
+    con vigas, y un caño de desagüe que baja con una gotera."""
+    M = Model(S=4, seed=85)
+    K = 2
+    for cx, cz in ((-44, -44), (42, -44), (-44, 42), (42, 42)):      # patas
+        for y in range(0, 112):
+            for x in range(cx, cx + 4):
+                for z in range(cz, cz + 4):
+                    c = lerp(WOOD, WOOD_D, 0.4 + 0.3 * M.noise(x, y, z, 3.0))
+                    if y < 8: c = lerp(c, MOSS, 0.4)
+                    M.put(x, y, z, P, c)
+        for y in (20, 60, 100):
+            M.put(cx + 4, y, cz + 1, P, IRON_L); M.put(cx + 1, y, cz + 4, P, IRON_L)
+    for i in range(88):                                              # tirantes en aspa
+        for a, b in ((-44, -44), (-44, 46)):
+            M.put(-44 + i, 20 + i, b, P, IRON); M.put(-44 + i, 108 - i, b, P, IRON)
+            M.put(a if a == -44 else 46, 20 + i, -44 + i, P, IRON); M.put(46, 108 - i, -44 + i, P, IRON)
+        M.put(-46, 20 + i, -44 + i, P, IRON); M.put(-46, 108 - i, -44 + i, P, IRON)
+    for y in range(112, 120):                                        # tablero con vigas
+        for x in range(-54, 54):
+            for z in range(-54, 54):
+                if y < 116 and (x // 8) % 3: continue
+                M.put(x, y, z, P, lerp(PLANK, PLANK_D, M.hsh(x // 8, 2, 2)) if y >= 116 else WOOD_D)
+    R0 = 64
+    for y in range(120, 232):                                        # cuba de duelas
+        r = R0 + 2 * (1 - (y - 120) / 112)
+        for x in range(-68, 69):
+            for z in range(-68, 69):
                 d = math.hypot(x + 0.5, z + 0.5)
-                if d > 32 or (d < 30.5 and y < 115): continue
-                c = WOOD if int(math.atan2(z, x) * 16) % 2 else WOOD_D
-                if y in (66, 67, 88, 89, 108, 109) and d > 30: c = IRON
+                if d > r or (d < r - 2.5 and y < 231): continue
+                a = math.atan2(z, x)
+                st = int((a + math.pi) / math.tau * 40)
+                c = [STAVE, STAVE_D, STAVE_L][int(M.hsh(st, 1, 1) * 3)]
+                if (a + math.pi) / math.tau * 40 % 1 < 0.08: c = lerp(STAVE_D, SOOT, 0.4)    # junta
+                c = lerp(c, STAVE_D, 0.3 * M.noise(x * 0.2, y, z * 0.2, 1.0))
+                if y < 160 and M.noise(x, y, z, 7.0) > 0.6: c = lerp(c, WET, 0.6)           # humedad
+                if y < 132 and M.noise(x, y, z, 4.0) > 0.55: c = lerp(c, MOSS, 0.6)
+                if y in (126, 127, 128, 152, 153, 154, 178, 179, 180, 204, 205, 206, 224, 225) and d > r - 1.5:
+                    c = IRON if M.hsh(x, y, z) > 0.3 else RUST
                 M.put(x, y, z, P, c)
-    for y in range(116, 132):                                # tejadillo cónico
-        r = 34 - (y - 116) * 2.1
-        for x in range(-34, 34):
-            for z in range(-34, 34):
-                if math.hypot(x + 0.5, z + 0.5) <= r: M.put(x, y, z, P, ROOF if y % 2 else ROOF_D)
+    for y in (127, 153, 179, 205):                                   # tensores de los aros
+        for x in range(-2, 3):
+            for k in range(3): M.put(x, y - 1 + k, 66, P, IRON_L)
+    for y in range(232, 266):                                        # tejadillo cónico de tablas
+        r = 70 - (y - 232) * 2.0
+        for x in range(-70, 71):
+            for z in range(-70, 71):
+                d = math.hypot(x + 0.5, z + 0.5)
+                if d > r or d < r - 3: continue
+                a = math.atan2(z, x)
+                c = ROOF if int((a + math.pi) / math.tau * 48) % 2 else ROOF_D
+                if M.noise(x, y, z, 5.0) > 0.65: c = lerp(c, MOSS, 0.6)
+                M.put(x, y, z, P, c)
+    for y in range(266, 276):                                        # remate
+        for x in range(-3, 4):
+            for z in range(-3, 4):
+                if x * x + z * z <= 9 - (y - 266): M.put(x, y, z, P, IRON)
+    for x in range(-10, 10):                                         # trampilla del tejadillo
+        for y in range(244, 256):
+            d = math.hypot(x, 0)
+            M.put(x, y, int(70 - (y - 232) * 2.0) - 1, P, PLANK_D if x in (-10, 9) or y in (244, 255) else PLANK)
+    for y in range(0, 240):                                          # escalera de mano
+        for zz in (-6, 6):
+            M.put(68 + (240 - y) // 40, y, zz, P, WOOD_D)
+        if y % 10 == 0:
+            for zz in range(-6, 7): M.put(68 + (240 - y) // 40, y, zz, P, WOOD)
+    for y in range(20, 122):                                         # caño de desagüe y gotera
+        M.put(-30, y, 0, P, LEAD); M.put(-31, y, 0, P, LEAD)
+    for y in range(4, 18, 3): M.put(-30, y, 0, P, (0.40, 0.50, 0.56))
+    for x in range(-36, -24):
+        for z in range(-6, 6):
+            if (x + 30) ** 2 + z * z < 30: M.put(x, 0, z, P, WET)
+    _hollow(M)
     return M, {P: [0, 0, 0]}
 
 
 def tendedero():
-    M = Model(S=2, seed=86)
-    for x0 in (-56, 56):
-        for y in range(0, 64):
-            for x in (x0 - 1, x0):
-                for z in (-1, 0): M.put(x, y, z, P, WOOD_D)
-    for x in range(-55, 56):                                 # cuerda que cuelga un poco
-        y = 60 - int(4 * math.cos(x / 56 * math.pi / 2))
-        M.put(x, y, 0, P, (0.55, 0.52, 0.45))
-    for x0, w, col in ((-44, 22, SHEET), (-14, 18, (0.60, 0.42, 0.36)), (14, 26, SHEET), (46, 8, SHEET_D)):
-        for x in range(x0, x0 + w):                          # sábanas y ropa tendida, combadas por el viento
-            top = 59 - int(4 * math.cos(x / 56 * math.pi / 2))
-            for y in range(top - 30 if w > 10 else top - 14, top):
-                M.put(x, y, int(2 * math.sin(y / 8 + x / 10)), P, col if (y // 6) % 3 else lerp(col, (0, 0, 0), 0.12))
+    """Tendedero (64/m, revisión de arte del 13-10-2026): dos palos en T con tornapuntas, clavados
+    en bases de ladrillo; dos cuerdas que se comban; sábanas, camisas, un pantalón, calcetines y una
+    toalla con pinzas, que ondean y se pliegan, alguna remendada o deshilachada en el bajo."""
+    M = Model(S=4, seed=86)
+    for x0 in (-112, 112):
+        for y in range(0, 136):
+            for x in range(x0 - 2, x0 + 2):
+                for z in range(-2, 2): M.put(x, y, z, P, lerp(WOOD_D, WOOD, M.noise(x, y, z, 4.0) * 0.6))
+        for z in range(-16, 16):                                     # travesaño en T
+            for y in (128, 129, 130):
+                for x in (x0 - 1, x0): M.put(x, y, z, P, WOOD_D)
+        for i in range(14):                                          # tornapuntas
+            M.put(x0, 114 + i, -2 - i, P, WOOD_D); M.put(x0, 114 + i, 1 + i, P, WOOD_D)
+        for x in range(x0 - 8, x0 + 8):                              # base de ladrillo
+            for z in range(-8, 8):
+                for y in range(0, 10):
+                    if min(abs(x - x0 + 0.5), abs(z + 0.5)) < 6 and y < 9 and abs(x - x0 + 0.5) < 6.5 and abs(z + 0.5) < 6.5: continue
+                    M.put(x, y, z, P, _brick(M, x, y, z, x + z))
+    def rope_y(x): return 126 - int(10 * math.cos(x / 110 * math.pi / 2))
+    for zc in (-12, 12):
+        for x in range(-110, 111): M.put(x, rope_y(x), zc, P, (0.62, 0.58, 0.50))
+    items = [(-104, 44, 60, CLOTH_S, -12, 'sheet'), (-54, 22, 30, (0.66, 0.68, 0.72), -12, 'shirt'), (-26, 20, 40, (0.30, 0.30, 0.34), -12, 'trousers'),
+             (2, 50, 64, (0.74, 0.70, 0.60), -12, 'sheet'), (60, 10, 14, CLOTH_R, -12, 'sock'), (76, 10, 14, CLOTH_B, -12, 'sock'),
+             (-96, 34, 26, CLOTH_B, 12, 'towel'), (-50, 46, 56, (0.80, 0.78, 0.72), 12, 'sheet'), (8, 22, 30, (0.60, 0.42, 0.36), 12, 'shirt'),
+             (40, 40, 50, CLOTH_S, 12, 'sheet')]
+    for i, (x0, w, h, col, zc, kind) in enumerate(items):
+        for x in range(x0, x0 + w):
+            top = rope_y(x)
+            hh = h
+            if kind == 'shirt': hh = h if abs(x - x0 - w / 2) < w * 0.3 else int(h * 0.45)        # mangas
+            if kind == 'trousers': hh = h if (x - x0) < w * 0.45 or (x - x0) > w * 0.55 else int(h * 0.3)
+            ragged = int(3 * M.noise(x, i, 0, 3.0))
+            for y in range(top - hh + ragged, top):
+                t = (top - y) / max(1, hh)
+                dz = int(round(3 * math.sin(x / 9 + i) * t + 2 * math.sin(y / 7 + x / 13) * t))
+                c = col
+                if (x - x0) % 12 in (0, 1) and kind == 'sheet': c = lerp(col, (0, 0, 0), 0.12)     # pliegues
+                if kind == 'towel' and (top - y) in range(6, 10): c = CLOTH_R
+                if kind == 'sheet' and M.hsh(i, 3, 3) > 0.5 and abs(x - x0 - w * 0.6) < 6 and abs(y - top + hh * 0.5) < 6: c = lerp(col, (0.6, 0.5, 0.4), 0.4)  # remiendo
+                c = lerp(c, (0.5, 0.5, 0.48), 0.12 * M.noise(x, y, i, 6.0))
+                M.put(x, y, zc + dz, P, c)
+        for px in (x0 + 1, x0 + w - 2):                              # pinzas
+            for k in range(4): M.put(px, rope_y(px) + 1 - k, zc + 1, P, PEG)
     return M, {P: [0, 0, 0]}
 
 
 def pretil():
-    """4 m de pretil de ladrillo (50 cm) con albardilla de piedra en piezas: llagas claras,
-    ladrillos que faltan, verdín abajo y una gárgola de hierro oxidado (desagüe)."""
-    M = Model(S=2, seed=87)
-    MORTAR = (0.44, 0.40, 0.36)
-    for x in range(-64, 64):
-        for z in range(-4, 4):
-            for y in range(0, 16):
-                course = y // 2
-                if y % 2 == 0 and y > 0: c = MORTAR
-                elif (x + (course % 2) * 4) % 8 == 0: c = MORTAR
-                else:
-                    k = (x + (course % 2) * 4) // 8
-                    if M.hsh(course, k, 9) < 0.05 and abs(z) == 3 and 2 < y < 14: continue   # ladrillo que falta
-                    c = BRICK if M.hsh(course, k, 3) < 0.65 else BRICK_D
-                    if y < 5 and M.noise(x, y, z, 6.0) > 0.5: c = lerp(c, MOSS, 0.6)
+    """4 m de pretil de ladrillo (64/m, revisión de arte del 13-10-2026): aparejo con llagas y
+    ladrillos de tono propio, algunos que faltan o rotos, mortero que se cae, verdín y humedad
+    abajo, eflorescencias de sal, albardilla de piedra en piezas con goterón, una que falta y otra
+    movida; gárgola de hierro con óxido que chorrea y un hierbajo en una junta."""
+    M = Model(S=4, seed=87)
+    L, Z, H = 128, 9, 32
+    for x in range(-L, L):
+        for z in range(-Z, Z):
+            for y in range(0, H):
+                if min(z + Z, Z - 1 - z) > 1 and y < H - 1: continue
+                u = x
+                course = y // 4
+                k = (u + (course % 2) * 7) // 14
+                if M.hsh(course, k, 9) < 0.04 and z >= Z - 2 and 3 < y < H - 4:
+                    if z == Z - 1: continue                                   # ladrillo que falta
+                    M.put(x, y, z, P, SOOT); continue
+                c = _brick(M, x, y, z, u, 87)
+                if y < 10: c = lerp(c, MOSS, 0.6 * M.noise(x, y, z, 5.0))
+                elif y < 18 and M.noise(x, y, z, 6.0) > 0.7: c = lerp(c, (0.78, 0.76, 0.70), 0.45)   # sal
                 M.put(x, y, z, P, c)
-            if M.hsh(x // 16, 0, 9) > 0.93: continue          # tramo de albardilla caído
-            for y in (16, 17):
-                cz = z if z < 3 else 4
-                M.put(x, y, cz, P, STONE if (x + 64) % 16 else (0.42, 0.41, 0.38))
-                if z == -4: M.put(x, y, -5, P, STONE)
-    for x in range(-3, 3):                                    # gárgola: canalón de hierro que asoma
-        for z in range(4, 12):
-            M.put(x, 3, z, P, RUST if x in (-3, 2) else IRON)
-        M.put(x, 2, 4, P, IRON)
-    for y in range(0, 3):                                     # mancha de óxido bajo la gárgola
-        for x in range(-2, 2): M.put(x, y, 4, P, RUST)
+    for x in range(-L, L):                                          # albardilla
+        piece = (x + L) // 32
+        if M.hsh(piece, 0, 9) > 0.9: continue                        # una que falta
+        lift = 1 if M.hsh(piece, 1, 9) > 0.85 else 0                 # otra movida
+        for z in range(-Z - 2, Z + 2):
+            for y in (H, H + 1, H + 2):
+                c = lerp(STONE, STONE_D, M.hsh(piece, 2, 9) * 0.6 + 0.2 * M.noise(x, y, z, 4.0))
+                if (x + L) % 32 == 0: c = MORTAR
+                if M.noise(x, y, z, 5.0) > 0.72: c = lerp(c, MOSS, 0.5)
+                M.put(x, y + lift, z + (lift if x % 2 else 0) * 0, P, c)
+            if z in (-Z - 2, Z + 1): M.put(x, H - 1, z, P, STONE_D)     # goterón
+    for x in range(-6, 6):                                          # gárgola
+        for z in range(Z, Z + 20):
+            for y in (6, 7):
+                c = IRON if abs(x) < 5 else RUST
+                if y == 7 and abs(x) < 4: continue
+                M.put(x, y, z, P, c)
+    for y in range(0, 6):
+        for x in range(-4, 4):
+            M.put(x, y, Z, P, lerp(RUST, BRICK_D, y / 8))
+    for k in range(10):                                              # hierbajo en una junta
+        M.put(60 + (k % 3) - 1, 20 + k // 2, Z, P, (0.30, 0.42, 0.20))
+    _hollow(M)
     return M, {P: [0, 0, 0]}
 
 
-
 def trampilla():
-    M = Model(S=2, seed=88)
-    for x in range(-18, 18):
-        for z in range(-14, 14):
-            for y in range(0, 8):
-                if min(x + 18, 17 - x, z + 14, 13 - z) > 1 and y < 7: continue
-                M.put(x, y, z, P, PLANK if (x // 4) % 2 else PLANK_D)
-    for i in range(30):                                      # la tapa, abierta y apoyada
-        for x in range(-16, 16):
-            M.put(x, 8 + int(i * 0.9), -14 - int(i * 0.45), P, PLANK if (x // 4) % 2 else PLANK_D)
-    for z in range(-10, 10): M.put(0, 8, z, P, DARK)
-    for x in range(-14, 14):
-        for z in range(-10, 10): M.put(x, 7, z, P, DARK)
+    """Trampilla de acceso al tejado (64/m, revisión de arte del 13-10-2026): brocal de tablas con
+    tapajuntas de plomo, la tapa abierta apoyada con bisagras y un asa de hierro, refuerzos en aspa
+    y clavos, y abajo el hueco oscuro con el arranque de la escalera."""
+    M = Model(S=4, seed=88)
+    X, Z, H = 36, 28, 16
+    for x in range(-X - 2, X + 2):                                  # tapajuntas
+        for z in range(-Z - 2, Z + 2):
+            if min(x + X + 2, X + 1 - x, z + Z + 2, Z + 1 - z) < 3: M.put(x, 0, z, P, LEAD); M.put(x, 1, z, P, LEAD)
+    for x in range(-X, X):                                          # brocal
+        for z in range(-Z, Z):
+            for y in range(0, H):
+                if min(x + X, X - 1 - x, z + Z, Z - 1 - z) > 2 and y < H - 1: continue
+                if min(x + X, X - 1 - x, z + Z, Z - 1 - z) > 3: continue
+                c = lerp(PLANK, PLANK_D, M.hsh(y // 4, (x + z) // 9, 1))
+                if y % 4 == 0: c = lerp(c, SOOT, 0.5)
+                M.put(x, y, z, P, c)
+    for x in range(-X + 4, X - 4):                                  # hueco y escalera
+        for z in range(-Z + 4, Z - 4):
+            M.put(x, H - 3, z, P, DARK)
+    for zz in range(-Z + 6, Z - 6, 8):
+        for x in range(-12, 12): M.put(x, H - 2, zz, P, WOOD_D)
+    T = 2 * Z - 2
+    ang = math.radians(68)
+    for i in range(T):                                              # tapa abierta
+        for x in range(-X + 2, X - 2):
+            for t in range(4):
+                y = H + int(i * math.sin(ang)) + int(t * math.cos(ang))
+                z = -Z - int(i * math.cos(ang)) + t
+                c = lerp(PLANK, PLANK_D, M.hsh((x + X) // 9, 3, 3))
+                if (x + X) % 9 == 0: c = lerp(c, SOOT, 0.5)
+                if t == 3 and (abs(x - (i - T / 2) * 2 * X / T) < 2 or abs(x + (i - T / 2) * 2 * X / T) < 2): c = WOOD_D  # aspa
+                if t == 3 and (x + X) % 9 == 4 and i % 10 == 2: c = IRON_L                                              # clavos
+                M.put(x, y, z, P, c)
+    for x in (-X + 8, X - 9):                                       # bisagras
+        for k in range(8): M.put(x, H + 1, -Z - 2 + k, P, IRON)
+    for k in range(10):                                             # asa
+        M.put(-5 + k, H + int((T - 4) * math.sin(ang)) + 5, -Z - int((T - 4) * math.cos(ang)) + 5, P, IRON)
+    _hollow(M)
     return M, {P: [0, 0, 0]}
 
 

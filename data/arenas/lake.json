@@ -306,6 +306,14 @@
    "type": "box",
    "shrink": 0.9
   },
+  "atrezo_bloques_hielo_2": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_bloques_hielo_3": {
+   "type": "box",
+   "shrink": 0.85
+  },
   "atrezo_caja": {
    "type": "box",
    "shrink": 0.95
@@ -637,7 +645,7 @@
    "scale": 0.9
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_2",
    "pos": [
     18.89,
     21.87
@@ -646,7 +654,7 @@
    "scale": 0.9
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_2",
    "pos": [
     16.88,
     20.91
@@ -655,7 +663,7 @@
    "scale": 0.9
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_2",
    "pos": [
     15.5,
     19.17
@@ -664,7 +672,7 @@
    "scale": 0.9
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_3",
    "pos": [
     15.0,
     17.0
@@ -673,7 +681,7 @@
    "scale": 0.9
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_2",
    "pos": [
     15.5,
     14.83
@@ -691,7 +699,7 @@
    "scale": 0.9
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_3",
    "pos": [
     18.89,
     12.13
@@ -700,7 +708,7 @@
    "scale": 0.9
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_2",
    "pos": [
     21.11,
     12.13
@@ -709,7 +717,7 @@
    "scale": 0.9
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_2",
    "pos": [
     23.12,
     13.09
@@ -718,7 +726,7 @@
    "scale": 0.9
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_2",
    "pos": [
     24.5,
     14.83
@@ -727,7 +735,7 @@
    "scale": 0.9
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_2",
    "pos": [
     26.5,
     21.5
@@ -1573,7 +1581,7 @@
    "scale": 1.03
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_2",
    "pos": [
     -26.21,
     13.31
@@ -1582,7 +1590,7 @@
    "scale": 1.05
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_3",
    "pos": [
     -23.79,
     1.65
@@ -1591,7 +1599,7 @@
    "scale": 0.9
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_2",
    "pos": [
     -7.73,
     25.02
@@ -1600,7 +1608,7 @@
    "scale": 0.97
   },
   {
-   "model": "atrezo_bloques_hielo",
+   "model": "atrezo_bloques_hielo_3",
    "pos": [
     18.33,
     -20.72

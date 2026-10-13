@@ -7,7 +7,8 @@ centro de la base, como gen_atrezo_pantano.py.
   bloque       bloque tallado volcado con un ojo de pez en relieve (32/m)
   roca_1/2     roca negra del arrecife, de caras planas, con percebes y algas (32/m)
   coral        coral negro ramificado con las puntas que brillan en verde (32/m)
-  muro         tramo de muro sumergido de Y'ha-nthlei para el borde norte y oeste (8/m: pieza de borde)
+  muro         tramo de muro de Y'ha-nthlei, semiderruido y mohoso, para el borde norte y oeste
+               (16/m exportado a 8/m: pieza de borde)
 
 Escribe models/arr_<pieza>.json. Uso: python tools/gen_atrezo_arrecife.py [piezas...]
 """
@@ -99,17 +100,68 @@ def arco():
 # ---------------- bloque ----------------
 
 def bloque():
-    M = Model(S=2, seed=94)
-    for x in range(-28, 28):
-        for y in range(0, 30):
-            for z in range(-20, 20):
-                if min(x + 28, 27 - x, y, 29 - y, z + 20, 19 - z) > 1: continue
-                c = stone(M, x, y, z)
-                if z == 19:                                             # cara tallada: un ojo de pez
-                    d = math.hypot(x / 1.6, y - 15)
-                    if 6 < d < 8.5 or d < 3: c = CARVE
-                    if abs(y - 15) < 1 and 8.5 < abs(x) < 24: c = CARVE
-                M.put(x, y, z, P, c)
+    """Bloque tallado volcado del arrecife (rehecho a 64/m en la revisión de arte del 13-10-2026):
+    sillar de basalto verdinegro medio hundido y algo girado, con las aristas comidas por el mar;
+    en la cara, un ojo de pez enorme en relieve con su párpado, pupila y escamas alrededor, y una
+    franja de olas; percebes y mejillones, algas que cuelgan, verdín y caracolas en la base, y un
+    trozo que se partió al caer."""
+    M = Model(S=4, seed=94)
+    rng = M.rng
+    X, Y, Z = 56, 58, 40
+    BAS = (0.17, 0.21, 0.20); BAS_D = (0.10, 0.13, 0.12); BAS_L = (0.26, 0.30, 0.28)
+    MUSSEL = (0.10, 0.10, 0.16); SHELL = (0.66, 0.60, 0.50)
+    def eaten(x, y, z):
+        e = min(x + X, X - 1 - x) + min(y, Y - 1 - y) + min(z + Z, Z - 1 - z)
+        return e < 5 + 6 * M.noise(x, y, z, 6.0)
+    for x in range(-X, X):
+        for y in range(0, Y):
+            tilt = int((x + X) * 0.12)
+            for z in range(-Z, Z):
+                if min(x + X, X - 1 - x, y, Y - 1 - y, z + Z, Z - 1 - z) > 1: continue
+                if eaten(x, y, z) and min(x + X, X - 1 - x, Y - 1 - y, z + Z, Z - 1 - z) < 4: continue
+                c = lerp(BAS, BAS_D, M.noise(x, y, z, 6.0))
+                if M.noise(x, y, z, 2.0) > 0.82: c = BAS_L
+                if (x + 2 * y + z) % 17 == 0: c = lerp(c, BAS_D, 0.5)              # picaduras
+                if y < 14 and M.noise(x, y + 30, z, 5.0) > 0.4: c = lerp((0.17, 0.28, 0.14), (0.11, 0.19, 0.09), M.noise(x, y, z, 2.0))
+                M.put(x, y + tilt // 4, z, P, c)
+    # cara tallada (z = Z - 1): ojo de pez en relieve
+    fz = Z
+    cx, cy = 0, 30
+    for x in range(-X + 4, X - 4):
+        for y in range(4, Y - 4):
+            yy = y + int((x + X) * 0.12) // 4
+            dx, dy = x - cx, y - cy
+            e = (dx / 30.0) ** 2 + (dy / 16.0) ** 2
+            c = None
+            if 0.82 < e < 1.0: c = BAS_L                                                  # párpado
+            elif e <= 0.82:
+                r = math.hypot(dx / 1.4, dy)
+                if r < 7: c = (0.03, 0.04, 0.04)                                           # pupila
+                elif r < 12: c = lerp(BAS, (0.22, 0.32, 0.26), 0.6)                         # iris
+                elif r < 13: c = BAS_D
+                else: c = BAS
+            elif e < 2.2 and ((dx // 5 + dy // 4) % 2 == 0) and (dx % 5) and (dy % 4): c = lerp(BAS, BAS_L, 0.4)   # escamas
+            if y < 10 and abs(math.sin(x / 6.0) * 3 - (y - 6)) < 1.2: c = BAS_L            # franja de olas
+            if c is None: continue
+            M.put(x, yy, fz, P, c)
+            if e <= 1.0 and 0.82 < e: M.put(x, yy, fz + 1, P, c)
+    for _ in range(140):                                             # percebes y mejillones
+        x, z = rng.randint(-X, X - 1), rng.choice((Z, -Z - 1, rng.randint(-Z, Z - 1)))
+        y = rng.randint(0, 20)
+        M.put(x, y, z, P, BARN if rng.random() < 0.6 else MUSSEL)
+    for _ in range(14):                                              # algas que cuelgan del canto
+        x = rng.randint(-X, X - 1)
+        for k in range(rng.randint(4, 14)): M.put(x, Y - 3 - k + int((x + X) * 0.12) // 4, Z, P, WEED if k % 3 else WEED_D)
+    for _ in range(12):                                              # caracolas al pie
+        x, z = rng.randint(-X - 10, X + 10), rng.randint(Z, Z + 14)
+        M.put(x, 0, z, P, SHELL); M.put(x + 1, 0, z, P, SHELL)
+    for x in range(X - 2, X + 22):                                   # trozo partido al lado
+        for z in range(-10, 14):
+            for y in range(0, 16):
+                if ((x - X - 10) / 12) ** 2 + (y / 16) ** 2 + ((z - 2) / 12) ** 2 > 1: continue
+                M.put(x, y, z, P, lerp(BAS, BAS_D, M.noise(x, y, z, 3.0)))
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 
@@ -202,25 +254,173 @@ def coral():
 
 # ---------------- muro ----------------
 
-def muro():
-    """Muro ciclópeo de Y'ha-nthlei: 24 m de largo y 8 de alto, sillares enormes desiguales,
-    algunos caídos, con algas en la base y un friso de peces. Hecho a 16/m y exportado a 8/m."""
-    M = Model(S=1, seed=98)
-    L, H, T = 192, 128, 24
-    for x in range(-L, L):
-        h = H - int(M.noise(x, 0, 0, 30.0) * 40) - (30 if M.hsh(x // 40, 1, 0) > 0.75 else 0)
-        for y in range(0, h):
-            for z in range(-T, 0):
-                if z > -T + 2 and y < h - 2 and -T + 2 < z: continue       # hueco
-                c = stone(M, x, y, z)
-                if (x + (y // 32) * 13) % 37 == 0 or y % 32 == 0: c = CARVE
-                if 70 <= y <= 80 and z == -1 and (x // 6) % 3 == 0: c = CARVE
-                M.put(x, y, z, P, c)
-    half = Model(S=1, seed=0)                                          # a 8/m: uno de cada 2x2x2
+M_STONE_D = (0.13, 0.16, 0.15); M_STONE_L = (0.36, 0.40, 0.37); M_JOINT = (0.05, 0.07, 0.06)
+MOSS = (0.24, 0.38, 0.16); MOSS_D = (0.14, 0.25, 0.10); MOSS_L = (0.36, 0.50, 0.22)
+SLIME = (0.10, 0.17, 0.12); SALT = (0.50, 0.54, 0.50); M_BARN = (0.66, 0.64, 0.56); M_BARN_D = (0.40, 0.38, 0.33)
+M_GLOW = (0.30, 0.85, 0.50)
+
+
+def _halve(M):
+    """De 16/m a 8/m: cada bloque de 2x2x2 queda si tiene algún voxel, con el color del de más
+    arriba (para que el musgo de los rellanos no se pierda)."""
+    half = Model(S=1, seed=0)
+    best = {}
     for (x, y, z), v in M.V.items():
-        if x % 2 == 0 and y % 2 == 0 and z % 2 == 0: half.V[(x // 2, y // 2, z // 2)] = v
+        k = (x // 2, y // 2, z // 2)
+        if k not in best or y > best[k][0] or (y == best[k][0] and v[2] > best[k][1][2]):
+            best[k] = (y, v)
+    for k, (_, v) in best.items(): half.V[k] = v
     half.S = 0.5
-    return half, {P: [0, 0, 0]}
+    return half
+
+
+def muro():
+    """Muro ciclópeo de Y'ha-nthlei, semiderruido (rehecho en la revisión de arte del 13-10-2026):
+    24 m de largo y hasta 8 de alto. Hiladas de sillares enormes de tamaños distintos, cada uno con
+    su tono y algunos salidos o hundidos; juntas hondas; dos brechas donde se han caído los bloques
+    de arriba, que están volcados al pie con cascotes; musgo en los rellanos y colgando de las
+    juntas, chorretones verdinegros, una franja de algas y una línea de sal en la base, percebes,
+    picaduras, grietas (alguna con el fulgor verde del arrecife) y un friso de peces en relieve.
+    Hecho a 16/m y exportado a 8/m."""
+    M = Model(S=1, seed=98)
+    rng = M.rng
+    L, H, T = 192, 128, 24
+    # hiladas y bloques (cortes en números pares para que las juntas sobrevivan a 8/m)
+    courses, y = [], 0
+    while y < H:
+        h = 2 * rng.randint(10, 18)
+        if y + h > H - 12: h = H - y
+        courses.append((y, y + h)); y += h
+    blocks = []                                                       # (ci, x0, x1, y0, y1, salida)
+    for ci, (ya, yb) in enumerate(courses):
+        x = -L - 2 * rng.randint(0, 14)
+        while x < L:
+            w = 2 * rng.randint(14, 34)
+            blocks.append((ci, x, min(L, x + w), ya, yb, 2 * rng.randint(-1, 1) if ci > 0 else 0))
+            x += w
+    # brechas: los bloques que quedan por encima de la línea de rotura se han caído
+    breaches = [(-90, 70, 52), (110, 50, 40)]                         # (centro, profundidad, ancho)
+    def broken(xc, ya):
+        line = H - 4
+        for bx, dp, wd in breaches: line -= dp * math.exp(-((xc - bx) / wd) ** 2)
+        line -= 26 * M.noise(xc, 0, 0, 40.0)
+        return ya >= line
+    keep, fallen = [], []
+    for b in blocks:
+        ci, x0, x1, ya, yb, off = b
+        if broken((x0 + x1) / 2, ya) or (ci == len(courses) - 1 and M.hsh(x0, ci, 1) > 0.6): fallen.append(b)
+        else: keep.append(b)
+    def block_at(x, y):
+        for b in keep:
+            if b[1] <= x < b[2] and b[3] <= y < b[4]: return b
+        return None
+    grid = {}                                                          # (x, y) -> bloque, por columnas
+    for b in keep:
+        for x in range(b[1], b[2]):
+            for y in range(b[3], b[4]): grid[(x, y)] = b
+    def occ(x, y, z):
+        b = grid.get((x, y))
+        if b is None: return False
+        ci, x0, x1, ya, yb, off = b
+        front = -1 + off
+        if z > front or z < -T: return False
+        # junta honda: dos voxels de ancho y dos de fondo en la cara delantera
+        if z >= front - 1 and (x - x0 < 2 or y - ya < 2) and x0 > -L and ya > 0: return False
+        # esquinas gastadas del bloque
+        cu = min(x - x0, x1 - 1 - x); cv = min(y - ya, yb - 1 - y)
+        if z >= front - 3 and cu + cv < 3: return False
+        # picaduras
+        if z == front and M.hsh(x // 2, y // 2, 5) > 0.97: return False
+        return True
+    for (x, y), b in grid.items():
+        for z in range(-T, 1 + b[5]):
+            if not occ(x, y, z): continue
+            if all(occ(x + a, y + c, z + d) for a, c, d in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))):
+                continue
+            M.put(x, y, z, P, ('w', b))
+    # bloques caídos al pie, delante, algo volcados, y cascotes
+    for i, b in enumerate(fallen[:9]):
+        ci, x0, x1, ya, yb, off = b
+        w, h = min(x1 - x0, 50), yb - ya
+        cx = (x0 + x1) // 2 + rng.randint(-10, 10)
+        cz = rng.randint(6, 30)
+        tilt = rng.uniform(-0.25, 0.25)
+        d = rng.randint(16, 24)
+        for x in range(cx - w // 2, cx + w // 2):
+            for z in range(cz - d // 2, cz + d // 2):
+                lift = int(abs(tilt) * (x - cx + w // 2)) if tilt > 0 else int(abs(tilt) * (cx + w // 2 - x))
+                for y in range(lift // 2, lift // 2 + h - 2):
+                    u, v, wz = x - cx + w // 2, y - lift // 2, z - cz + d // 2
+                    if min(u, w - 1 - u) + min(v, h - 3 - v) + min(wz, d - 1 - wz) < 3: continue   # cantos rotos
+                    if 0 < u < w - 1 and 0 < v < h - 3 and 0 < wz < d - 1: continue
+                    M.put(x, y, z, P, ('f', i))
+    for _ in range(70):                                                # cascotes
+        cx, cz = rng.randint(-L, L), rng.randint(0, 36)
+        if not any(abs(cx - (b[1] + b[2]) / 2) < 80 for b in fallen): continue
+        s = rng.randint(3, 7)
+        for x in range(cx, cx + s):
+            for z in range(cz, cz + s):
+                for y in range(0, rng.randint(2, s)): M.put(x, y, z, P, ('f', 99))
+    # color
+    tops = {}
+    for (x, y, z) in M.V:
+        if y > tops.get((x, z), -1): tops[(x, z)] = y
+    crack_cells = set()
+    for _ in range(14):                                                # grietas que bajan por la cara
+        x, y = rng.randint(-L + 10, L - 10), rng.randint(40, H)
+        for _ in range(rng.randint(14, 40)):
+            crack_cells.add((x, y)); crack_cells.add((x + 1, y))
+            y -= 1; x += rng.choice((-1, 0, 0, 1))
+            if y < 4: break
+    streak = {x: M.hsh(x // 2, 3, 3) for x in range(-L - 40, L + 40)}
+    def paint(k, part, c):
+        if not (isinstance(c, tuple) and c and isinstance(c[0], str)): return None
+        x, y, z = k
+        if c[0] == 'w':
+            ci, x0, x1, ya, yb, off = c[1]
+            front = -1 + off
+            col = lerp(M_STONE_D, M_STONE_L, 0.15 + 0.6 * M.hsh(ci, x0, 7))
+            col = lerp(col, M_STONE_D, 0.35 * M.noise(x, y, z, 6.0))
+            if M.noise(x, y, z, 2.5) > 0.80: col = lerp(col, M_STONE_L, 0.4)     # moteado
+            if z < front - 1 and z > -T: col = lerp(col, M_JOINT, 0.6)           # dentro de las juntas
+            if (x, y) in crack_cells and z >= front - 1:
+                col = M_JOINT
+                if M.hsh(x, y, 9) > 0.93 and y < 60: return M_GLOW
+            if streak[x] > 0.82 and z >= front - 1:                              # chorretones
+                col = lerp(col, SLIME, 0.55 * M.noise(x, y, 1, 10.0) + 0.2)
+        else:
+            col = lerp(M_STONE_D, M_STONE_L, 0.25 + 0.5 * M.hsh(c[1], 2, 2))
+            col = lerp(col, M_STONE_D, 0.4 * M.noise(x, y, z, 5.0))
+        # musgo en lo alto y colgando unos voxels
+        t = tops.get((x, z), -1)
+        if y >= t - 1: col = lerp(MOSS_D, MOSS_L, M.noise(x, y, z, 3.0)) if M.noise(x, 7, z, 5.0) > 0.3 else col
+        elif t - y < 2 + 6 * M.noise(x, t, z, 4.0) and M.noise(x, 9, z, 6.0) > 0.45: col = lerp(MOSS_D, MOSS, M.noise(x, y, z, 2.0))
+        # algas en la base, línea de sal y percebes
+        wl = 18 + 8 * M.noise(x, 0, z, 12.0)
+        if y < wl: col = lerp(SLIME, MOSS_D, M.noise(x, y, z, 3.0))
+        elif y < wl + 3: col = lerp(col, SALT, 0.55)
+        elif y < 54 and M.noise(x, y, z, 6.0) > 0.62 and M.hsh(x, y, z) > 0.55:
+            col = M_BARN if M.hsh(x, y, z + 1) > 0.4 else M_BARN_D
+        return col
+    M.paint(paint)
+    for v in M.V.values():
+        if v[1] == M_GLOW: v[2] = 1
+    # friso de peces en relieve en la hilada que cae hacia 4,5-6 m (sobre bloques que siguen en pie)
+    fy = 80
+    for fx in range(-L + 20, L - 20, 44):
+        b = grid.get((fx, fy))
+        if b is None or grid.get((fx + 18, fy + 6)) is not b: continue
+        front = -1 + b[5]
+        for dx in range(0, 18):
+            for dy in range(-5, 6):
+                body = (dx / 13 - 0.5) ** 2 * 4 + (dy / 5) ** 2 < 1 and dx < 13
+                tail = 13 <= dx < 18 and abs(dy) <= (dx - 12)
+                if not (body or tail): continue
+                c = M_STONE_L if body else lerp(M_STONE_L, M_STONE_D, 0.3)
+                if (dx, dy) in ((3, 1), (3, 2), (4, 1), (4, 2)): c = M_JOINT              # ojo
+                if body and dx in (6, 9) and abs(dy) < 4: c = lerp(c, M_JOINT, 0.5)        # escamas/agallas
+                for zz in (front + 1, front + 2): M.put(fx + dx, fy + dy, zz, P, c)
+    return _halve(M), {P: [0, 0, 0]}
 
 
 PIECES = {'columna_1': columna_1, 'columna_2': columna_2, 'arco': arco, 'bloque': bloque,

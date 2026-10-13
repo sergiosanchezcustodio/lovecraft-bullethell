@@ -8,7 +8,7 @@
 script = ExtResource("1")
 id = &"antiguo_despierto"
 display_name = "El primero en despertar"
-model = "antiguo"
+model = "antiguo_despierto"
 model_scale = 1.5
 unique = true
 tier = 4

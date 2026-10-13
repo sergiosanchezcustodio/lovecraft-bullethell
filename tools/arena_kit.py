@@ -101,6 +101,10 @@ class Arena:
         layout = dict(layout)
         layout.setdefault("size", [self.half * 2, self.half * 2])
         layout.setdefault("spawn", [0.0, 0.0])
+        for p in self.props:                    # variantes que no mueven nada: elegidas por la posición, sin el azar de la receta
+            if p["model"] in VARIANTS:
+                vs = VARIANTS[p["model"]]
+                p["model"] = vs[int(abs(p["pos"][0] * 7.3 + p["pos"][1] * 13.1)) % len(vs)]
         layout["props"] = self.props
         path = "data/arenas/%s.json" % self.name
         with open(path, "w") as f:
@@ -110,12 +114,17 @@ class Arena:
         gen_mapa_transitable.build(self.name)
 
 
+# Piezas con variantes: al escribir la arena, cada una se cambia por una de su lista según su posición
+VARIANTS = {"atrezo_bloques_hielo": ["atrezo_bloques_hielo", "atrezo_bloques_hielo_2", "atrezo_bloques_hielo_3"]}
+
 # Colisiones comunes del atrezo (las arenas añaden las suyas)
 COLLIDERS = {
     "atrezo_tienda": {"type": "box", "shrink": 0.8},
     "atrezo_iglu": {"type": "cylinder", "radius": 1.75},
     "atrezo_cabana": {"type": "box", "shrink": 0.82},
     "atrezo_bloques_hielo": {"type": "box", "shrink": 0.9},
+    "atrezo_bloques_hielo_2": {"type": "box", "shrink": 0.85},
+    "atrezo_bloques_hielo_3": {"type": "box", "shrink": 0.85},
     "atrezo_caja": {"type": "box", "shrink": 0.95},
     "atrezo_bidon": {"type": "cylinder", "radius": 0.3},
     "atrezo_farol": {"type": "cylinder", "radius": 0.15},
@@ -123,7 +132,7 @@ COLLIDERS = {
     "atrezo_roca_nevada": {"type": "box", "shrink": 0.75},      # hecha con Replicate (09-10-2026)
     "atrezo_trineo": {"type": "box", "shrink": 0.85},
     "atrezo_tripode": {"type": "cylinder", "radius": 0.3},
-    "atrezo_bandera": {"type": "cylinder", "radius": 0.12},
+    "atrezo_bandera": {"type": "cylinder", "radius": 0.4},
     "monticulo_1": {"type": "cylinder", "radius": 1.4},
     "monticulo_2": {"type": "cylinder", "radius": 1.9},
     "monticulo_3": {"type": "cylinder", "radius": 0.95},

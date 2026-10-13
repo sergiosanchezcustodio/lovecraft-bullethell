@@ -46,6 +46,7 @@ static func load_model(path: String) -> Node3D:
 		var mi := MeshInstance3D.new()
 		mi.mesh = layer.mesh
 		mi.material_override = _glow_mat if layer.glow else model.material
+		if pname == "flag" and not layer.glow: mi.material_override = _flag_material(model.material)   # ondea al viento
 		pivot_node.add_child(mi)
 	# Jerarquía: cada parte con padre pasa a colgar de él, con la posición relativa a su pivote
 	var parents: Dictionary = model.get("parents", {})
@@ -226,6 +227,19 @@ static func _material(roughness: float, specular: float) -> StandardMaterial3D:
 		m.metallic_specular = specular
 		_mats[key] = m
 	return _mats[key]
+
+## Material de las banderas (parte "flag"): el de la pieza, con las ondas del viento en el
+## shader de vértices (scripts/fx/flag_wave.gdshader). Uno compartido por cada material base.
+static var _flag_mats := {}
+static func _flag_material(base: StandardMaterial3D) -> ShaderMaterial:
+	if not _flag_mats.has(base):
+		var m := ShaderMaterial.new()
+		m.shader = preload("res://scripts/fx/flag_wave.gdshader")
+		m.set_shader_parameter("colors_srgb", colors_are_srgb())
+		m.set_shader_parameter("roughness_v", base.roughness)
+		m.set_shader_parameter("specular_v", base.metallic_specular)
+		_flag_mats[base] = m
+	return _flag_mats[base]
 
 static func _ensure_glow_material() -> void:
 	if _glow_mat != null: return

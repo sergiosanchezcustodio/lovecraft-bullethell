@@ -50,19 +50,119 @@ def flames(M, cx, cz, y0, h, r0):
                 M.put(cx + x, y, cz + z, P, FLAME_C if d < r * 0.4 and y < y0 + h * 0.6 else FLAME, glow=1)
 
 
+CHAR = (0.07, 0.06, 0.05); CHAR_L = (0.14, 0.11, 0.09); EMBER_D = (0.70, 0.18, 0.06); RING_C = (0.48, 0.40, 0.30)
+FLAME_R = (0.92, 0.30, 0.08); SOOT = (0.10, 0.10, 0.10); SPARK = (1.0, 0.75, 0.35)
+ROCK_A = (0.30, 0.29, 0.27); ROCK_B = (0.22, 0.21, 0.20); ROCK_C = (0.38, 0.36, 0.33)
+
+
+def _log(M, a, b, r, seed, charred=0.0):
+    """Tronco: corteza con surcos, extremos cortados con anillos y la parte quemada negra con
+    grietas de brasa. charred: fracción del tronco (desde b) quemada."""
+    ax, ay, az = a; bx, by, bz = b
+    L = math.dist(a, b)
+    tx, ty, tz = (bx - ax) / L, (by - ay) / L, (bz - az) / L
+    n = int(L * 1.5) + 1
+    ri = int(math.ceil(r)) + 1
+    for k in range(n + 1):
+        t = k / n
+        cx, cy, cz = ax + (bx - ax) * t, ay + (by - ay) * t, az + (bz - az) * t
+        for x in range(-ri, ri + 1):
+            for y in range(-ri, ri + 1):
+                for z in range(-ri, ri + 1):
+                    if x * x + y * y + z * z > r * r + 0.3: continue
+                    q = (int(round(cx + x)), int(round(cy + y)), int(round(cz + z)))
+                    along = (q[0] - ax) * tx + (q[1] - ay) * ty + (q[2] - az) * tz
+                    f = along / L
+                    if f < 0 or f > 1.0: continue
+                    rad = math.sqrt(max(0.0, (q[0] - ax) ** 2 + (q[1] - ay) ** 2 + (q[2] - az) ** 2 - along ** 2))
+                    end = f < 0.03 or f > 0.97
+                    if end and rad < r - 0.8:                                    # testa con anillos
+                        c = LOG_D if int(rad) % 2 else (0.46, 0.34, 0.22)
+                    else:
+                        ang = math.atan2(q[1] - cy, q[0] - cx) + math.atan2(q[2] - cz, q[0] - cx)
+                        c = LOG if (int(ang * 3 + seed) % 3) else LOG_D               # surcos de la corteza
+                        c = lerp(c, BARK_D, 0.4 * M.noise(q[0], q[1], q[2], 3.0))
+                    if f > 1 - charred:                                             # quemado
+                        burn = (f - (1 - charred)) / max(charred, 1e-6)
+                        c = lerp(c, CHAR, min(1.0, burn * 1.6))
+                        if burn > 0.4 and M.hsh(*q) > 0.82:
+                            M.put(*q, P, EMBER if M.hsh(q[0], 1, q[2]) > 0.5 else EMBER_D, glow=1); continue
+                    M.put(*q, P, c)
+
+
 def hoguera():
-    M = Model(S=2, seed=91)
-    for x in range(-14, 15):                                    # cerco de piedras y ceniza
-        for z in range(-14, 15):
+    """Hoguera del ritual (rehecha a 64/m en la revisión de arte del 13-10-2026): cerco de piedras
+    redondeadas de tamaños distintos, tiznadas por dentro; lecho de ceniza con brasas que brillan,
+    carbones y restos; troncos de corteza con surcos, testas con anillos y las puntas quemadas con
+    grietas de brasa, en cono y dos cruzados por debajo; llamas en varias lenguas, blanco
+    amarillento en el centro, naranja y con puntas rojas; chispas que suben."""
+    M = Model(S=4, seed=91)
+    rng = M.rng
+    # cerco de piedras
+    a = 0.0
+    while a < math.tau - 0.15:
+        rs = rng.uniform(2.6, 4.6)
+        cx, cz = math.cos(a) * 26, math.sin(a) * 26
+        h = rs * rng.uniform(0.7, 1.0)
+        for x in range(int(cx - rs) - 1, int(cx + rs) + 2):
+            for z in range(int(cz - rs) - 1, int(cz + rs) + 2):
+                for y in range(0, int(h * 1.6) + 1):
+                    d = ((x - cx) / rs) ** 2 + ((z - cz) / rs) ** 2 + ((y - h * 0.4) / (h * 1.1)) ** 2
+                    if d > 1: continue
+                    c = lerp(ROCK_B, ROCK_A, M.noise(x, y, z, 2.0))
+                    if M.hsh(x, y, z) > 0.9: c = ROCK_C
+                    if math.hypot(x, z) < 26 - rs * 0.3: c = lerp(c, SOOT, 0.7)        # tiznada por dentro
+                    M.put(x, y, z, P, c)
+        a += (2 * rs + rng.uniform(0.2, 1.2)) / 26
+    # lecho de ceniza con brasas, carbones y restos
+    for x in range(-24, 25):
+        for z in range(-24, 25):
             d = math.hypot(x, z)
-            if 12 <= d <= 14 and (x + z) % 3: M.put(x, 0, z, P, STONE); M.put(x, 1, z, P, STONE_D)
-            elif d < 12: M.put(x, 0, z, P, EMBER if M.hsh(x, 0, z) > 0.8 else ASH, glow=1 if M.hsh(x, 0, z) > 0.8 else 0)
-    for k in range(6):                                          # troncos cruzados en cono
-        a = k / 6 * math.tau
-        line(M, (math.cos(a) * 11, 1, math.sin(a) * 11), (math.cos(a) * 2, 18, math.sin(a) * 2), 1.6,
-             lambda x, y, z: LOG_D if (x + y) % 4 == 0 else LOG)
-    flames(M, 0, 0, 4, 34, 7)
-    return M, {P: [0, 0, 0], 'light': [0, 20, 0]}
+            if d > 23: continue
+            hgt = 1 + int(2 * (1 - d / 23) + M.noise(x, 0, z, 4.0) * 1.5)
+            for y in range(0, hgt):
+                c = lerp(ASH, (0.32, 0.31, 0.29), M.noise(x, y, z, 2.5))
+                gl = 0
+                if y == hgt - 1:
+                    e = M.noise(x, 3, z, 3.0) * (1.3 - d / 23)
+                    if e > 0.62: c, gl = (EMBER if e > 0.75 else EMBER_D), 1
+                    elif M.hsh(x, y, z) > 0.86: c = CHAR_L
+                M.put(x, y, z, P, c, glow=gl)
+    for _ in range(14):                                                        # carbones
+        cx, cz = rng.uniform(-18, 18), rng.uniform(-18, 18)
+        if math.hypot(cx, cz) > 19: continue
+        for x in range(int(cx), int(cx) + rng.randint(2, 4)):
+            for z in range(int(cz), int(cz) + rng.randint(2, 3)):
+                for y in (3, 4):
+                    M.put(x, y, z, P, CHAR if M.hsh(x, y, z) > 0.3 else EMBER_D, glow=0 if M.hsh(x, y, z) > 0.3 else 1)
+    # troncos: dos cruzados por debajo y seis en cono
+    _log(M, (-22, 4, -6), (20, 5, 8), 3.4, 1, charred=0.0)
+    _log(M, (-8, 7, 21), (6, 6, -21), 3.2, 2, charred=0.0)
+    for k in range(5):
+        aa = k / 5 * math.tau + rng.uniform(-0.15, 0.15)
+        R = rng.uniform(19, 23)
+        _log(M, (math.cos(aa) * R, 3, math.sin(aa) * R), (math.cos(aa) * 3.5, rng.uniform(32, 40), math.sin(aa) * 3.5),
+             rng.uniform(2.4, 2.8), k + 3, charred=0.55)
+    # llamas: varias lenguas que se retuercen
+    tongues = [(0, 0, 78, 9)] + [(math.cos(i * 0.9 + 0.3) * rng.uniform(5, 9), math.sin(i * 0.9 + 0.3) * rng.uniform(5, 9), rng.randint(40, 62), rng.uniform(4.5, 6.5)) for i in range(7)]
+    for (tx, tz, h, r0) in tongues:
+        ph = rng.uniform(0, 6)
+        for y in range(6, 6 + h):
+            f = (y - 6) / h
+            r = r0 * (1 - f) ** 1.2 * (0.8 + 0.3 * math.sin(ph + f * 9)) + 0.5
+            ox = tx * (1 - f * 0.6) + 2.2 * math.sin(ph + f * 5) * f
+            oz = tz * (1 - f * 0.6) + 2.2 * math.cos(ph + f * 4) * f
+            for x in range(int(ox - r) - 1, int(ox + r) + 2):
+                for z in range(int(oz - r) - 1, int(oz + r) + 2):
+                    d = math.hypot(x - ox, z - oz)
+                    if d > r or M.hsh(x, y, z) < 0.08 + 0.4 * f * f: continue
+                    if d < r * 0.35 and f < 0.4: c = FLAME_C
+                    elif f > 0.65 or d > r * 0.8: c = FLAME_R if f > 0.5 else FLAME
+                    else: c = FLAME
+                    M.put(x, y, z, P, c, glow=1)
+    for _ in range(26):                                                        # chispas
+        M.put(int(rng.uniform(-14, 14)), int(rng.uniform(70, 110)), int(rng.uniform(-14, 14)), P, SPARK, glow=1)
+    return M, {P: [0, 0, 0], 'light': [0, 40, 0]}
 
 
 def monolito():
@@ -167,28 +267,179 @@ def cipres(variant=1):
     return M, {P: [0, 0, 0]}
 
 
+IRON = (0.16, 0.16, 0.17); ROPE = (0.52, 0.46, 0.32)
+WALL = (0.40, 0.36, 0.30); WALL_D = (0.26, 0.23, 0.19); WALL_L = (0.50, 0.46, 0.38); BATTEN = (0.30, 0.26, 0.21)
+ROT = (0.18, 0.20, 0.13); WIN_L = (1.0, 0.70, 0.36); SHUT = (0.30, 0.34, 0.30); TIN_L = (0.48, 0.42, 0.38)
+SKIN = (0.50, 0.38, 0.26); NET = (0.36, 0.32, 0.24); JUG = (0.62, 0.50, 0.34)
+
+
 def choza():
-    M = Model(S=1, seed=94)
-    for x in (-26, 25):                                         # pilotes
-        for z in (-18, 17):
-            for y in range(0, 14): M.put(x, y, z, P, LOG_D); M.put(x + 1, y, z, P, LOG_D)
-    for x in range(-28, 28):                                    # suelo
-        for z in range(-20, 20): M.put(x, 14, z, P, PLANK if (x // 3) % 2 else PLANK_D)
-    for y in range(15, 40):                                     # paredes de tablas
-        for x in range(-24, 24):
-            for z in (-18, 17):
-                c = PLANK_D if x % 4 == 0 else PLANK
-                if z == 17 and -4 < x < 4 and y < 33: c = (0.04, 0.04, 0.04)   # puerta
-                if z == 17 and 10 < x < 18 and 24 < y < 32: c = (0.70, 0.45, 0.20)   # ventana con luz
-                M.put(x, y, z, P, c, glow=1 if c == (0.70, 0.45, 0.20) else 0)
-        for z in range(-18, 18):
-            for x in (-24, 23): M.put(x, y, z, P, PLANK_D if z % 4 == 0 else PLANK)
-    for x in range(-28, 28):                                    # tejado de chapa a dos aguas
-        for z in range(-22, 22):
-            y = 46 - abs(z) // 3
-            M.put(x, y, z, P, RUST if M.noise(x, y, z, 6.0) > 0.6 else TIN)
-    for x in range(-6, 6):                                      # escalera
-        for k in range(7): M.put(x, 2 + k * 2, 20 + k, P, PLANK_D)
+    """Choza del bayou sobre pilotes (rehecha a 32/m en la revisión de arte del 13-10-2026):
+    pilotes de tronco con la línea de agua y riostras en aspa, vigas a la vista, porche delantero
+    con baranda y escalera; paredes de tablas verticales con tapajuntas, gastadas y podridas
+    abajo, con huecos; puerta de tablas con su travesaño en zeta, entreabierta; ventana encendida
+    con contraventanas (una descolgada) y otra cegada con tablas; tejado de chapa ondulada en
+    láminas solapadas con óxido, caballete y alero; tejadillo del porche sobre postes; chimenea de
+    tubo con sombrerete; un farol junto a la puerta, una red tendida, una piel clavada, una garrafa
+    y un amuleto de huesos colgado."""
+    M = Model(S=2, seed=94)
+    X0, X1, Z0, Z1 = -48, 48, -36, 34                    # cuerpo de la casa (frente en z = Z1)
+    FY = 28                                              # altura del suelo (pilotes de 0,9 m)
+    WH = 50                                              # altura de las paredes
+    # pilotes con la línea de agua y riostras
+    piles = [(x, z) for x in (X0 - 2, 0, X1 + 1) for z in (Z0 - 2, Z1 + 1)] + [(X0 + 8, Z1 + 16), (X1 - 9, Z1 + 16)]
+    for (px, pz) in piles:
+        for y in range(0, FY):
+            for dx in range(-2, 3):
+                for dz in range(-2, 3):
+                    if dx * dx + dz * dz > 5: continue
+                    c = LOG if (dx + y // 3) % 3 else LOG_D
+                    if y < 8: c = lerp(c, ROT, 0.6)                              # mojado y verdín abajo
+                    M.put(px + dx, y, pz + dz, P, c)
+    for (pa, pb) in (((X0 - 2, Z1 + 1), (0, Z1 + 1)), ((0, Z1 + 1), (X1 + 1, Z1 + 1))):
+        for k in range(0, 49):
+            t = k / 48
+            x = int(pa[0] + (pb[0] - pa[0]) * t)
+            for y in (int(4 + t * 20), int(24 - t * 20)):
+                M.put(x, y, pa[1] + 2, P, LOG_D); M.put(x, y + 1, pa[1] + 2, P, LOG_D)
+    # suelo de tablas y porche
+    for x in range(X0 - 4, X1 + 4):
+        for z in range(Z0 - 4, Z1 + 18):
+            if z >= Z1 and not (X0 + 6 <= x < X1 - 6): continue                # el porche es algo más estrecho
+            b = (x // 5)
+            c = lerp(PLANK, PLANK_D, M.hsh(b, 2, 2) * 0.7)
+            if x % 5 == 0: c = lerp(c, (0.08, 0.07, 0.06), 0.6)
+            M.put(x, FY, z, P, c); M.put(x, FY - 1, z, P, PLANK_D)
+        for z in (Z0 - 4, Z1, Z1 + 17):                                       # vigas a la vista
+            M.put(x, FY - 2, z, P, LOG_D); M.put(x, FY - 3, z, P, LOG_D)
+    # paredes de tablas verticales con tapajuntas
+    def wall_col(u, y, side):
+        b = u // 6
+        c = lerp(WALL, WALL_D, 0.6 * M.hsh(b, side, 1))
+        if M.hsh(b, side, 4) > 0.85: c = lerp(c, WALL_L, 0.5)
+        c = lerp(c, WALL_D, 0.3 * M.noise(u, y * 0.3, side, 3.0))
+        if y - FY < 8 + 6 * M.noise(u, 0, side, 6.0): c = lerp(c, ROT, 0.55)  # podrido y verdín abajo
+        return c
+    gaps = set()
+    for _ in range(10): gaps.add((M.rng.randint(X0, X1), M.rng.randint(FY + 6, FY + WH - 6)))
+    for y in range(FY + 1, FY + WH):
+        for x in range(X0, X1):
+            for z, side in ((Z1 - 1, 0), (Z0, 1)):
+                if (x - X0) % 6 == 0 and any(abs(y - gy) < 4 and abs(x - gx) < 1 for gx, gy in gaps): continue   # rendija
+                M.put(x, y, z, P, wall_col(x, y, side))
+                if (x - X0) % 6 == 0: M.put(x, y, z + (1 if side == 0 else -1), P, BATTEN)
+        for z in range(Z0, Z1):
+            for x, side in ((X0, 2), (X1 - 1, 3)):
+                M.put(x, y, z, P, wall_col(z, y, side))
+                if (z - Z0) % 6 == 0: M.put(x + (-1 if side == 2 else 1), y, z, P, BATTEN)
+    fz = Z1                                                                    # cara delantera (fuera)
+    # puerta entreabierta (hacia fuera) con travesaño en zeta
+    for x in range(-8, 8):
+        for y in range(FY + 1, FY + 38): M.put(x, y, Z1 - 1, P, (0.03, 0.03, 0.03))
+    for k in range(15):
+        x, z = -8 + int(k * 0.6), Z1 + 1 + int(k * 0.8)
+        for y in range(FY + 1, FY + 38):
+            c = lerp(PLANK, PLANK_D, M.hsh(k // 4, 7, 7) * 0.6)
+            if k % 4 == 0: c = PLANK_D
+            if y in (FY + 6, FY + 7, FY + 30, FY + 31) or abs((y - FY - 7) - k * 23 / 14) < 1.2: c = BATTEN
+            M.put(x, y, z, P, c)
+    for y in range(FY + 1, FY + 40):                                          # marco
+        for x in (-10, -9, 8, 9): M.put(x, y, fz, P, BATTEN)
+    for x in range(-10, 10): M.put(x, FY + 38, fz, P, BATTEN); M.put(x, FY + 39, fz, P, BATTEN)
+    # ventana encendida con contraventanas, y otra cegada con tablas
+    wx, wy = 26, FY + 22
+    for x in range(wx - 8, wx + 8):
+        for y in range(wy - 7, wy + 8):
+            fr = x in (wx - 8, wx + 7) or y in (wy - 7, wy + 7)
+            mull = x in (wx - 1, wx) or y == wy
+            if fr: M.put(x, y, fz, P, BATTEN)
+            elif mull: M.put(x, y, Z1 - 1, P, BATTEN)
+            else: M.put(x, y, Z1 - 1, P, WIN_L, glow=1)
+    for y in range(wy - 7, wy + 8):                                           # contraventana abierta y otra descolgada
+        for k in range(8):
+            M.put(wx - 9 - k, y, fz, P, SHUT if (k % 4) else lerp(SHUT, (0.1, 0.1, 0.1), 0.5))
+        for k in range(8):
+            yy = y - (k // 2)
+            M.put(wx + 8 + k, yy, fz + 1, P, SHUT if k % 4 else lerp(SHUT, (0.1, 0.1, 0.1), 0.5))
+    bx = -30
+    for x in range(bx - 7, bx + 7):
+        for y in range(FY + 15, FY + 30):
+            M.put(x, y, Z1 - 1, P, (0.05, 0.05, 0.05))
+    for i, yy in enumerate((FY + 17, FY + 22, FY + 27)):                     # tablas clavadas en la ventana cegada
+        for x in range(bx - 9, bx + 9):
+            dy = int((x - bx) * (0.15 if i % 2 else -0.12))
+            for y in (yy + dy, yy + dy + 1, yy + dy + 2):
+                M.put(x, y, fz, P, lerp(PLANK, PLANK_D, M.hsh(i, x // 6, 3) * 0.6))
+    # tejado de chapa ondulada en láminas solapadas
+    RY = FY + WH
+    for x in range(X0 - 6, X1 + 6):
+        for z in range(Z0 - 8, Z1 + 8):
+            y = RY + 22 - abs(z - (Z0 + Z1) // 2) * 22 // ((Z1 - Z0) // 2 + 8)
+            sheet = (x - X0 + 6) // 18
+            lap = (x - X0 + 6) % 18 == 0
+            c = TIN if (x % 3) else TIN_L                                       # ondas
+            if M.noise(x, y, z, 7.0) > 0.58: c = lerp(c, RUST, 0.6 + 0.4 * M.noise(x, y, z, 2.0))
+            if M.hsh(sheet, 3, 3) > 0.7: c = lerp(c, RUST, 0.3)
+            M.put(x, y, z, P, c)
+            M.put(x, y + (1 if x % 3 == 0 else 0), z, P, c)
+            if lap: M.put(x, y + 1, z, P, lerp(c, (0.1, 0.1, 0.1), 0.3))
+            if z in (Z0 - 8, Z1 + 7): M.put(x, y - 1, z, P, RUST)             # borde oxidado del alero
+        M.put(x, RY + 23, (Z0 + Z1) // 2, P, TIN_L); M.put(x, RY + 23, (Z0 + Z1) // 2 + 1, P, TIN_L)   # caballete
+    for z in range(Z0, Z1):
+        top = RY + 22 - abs(z - (Z0 + Z1) // 2) * 22 // ((Z1 - Z0) // 2 + 8)
+        for y in range(RY, top):
+            for x in (X0, X1 - 1): M.put(x, y, z, P, wall_col(z, y, 4))
+    # tejadillo del porche sobre postes
+    for x in range(X0 + 4, X1 - 4):
+        for z in range(Z1 + 1, Z1 + 21):
+            y = RY - 2 - (z - Z1) // 4
+            c = TIN if x % 3 else TIN_L
+            if M.noise(x, 9, z, 6.0) > 0.55: c = lerp(c, RUST, 0.7)
+            M.put(x, y, z, P, c)
+    for px in (X0 + 8, 0, X1 - 9):
+        for y in range(FY, RY - 9):
+            for dx in (0, 1):
+                for dz in (0, 1): M.put(px + dx, y, Z1 + 15 + dz, P, LOG if y % 7 else LOG_D)
+    # baranda del porche (con un tramo roto) y escalera
+    for x in range(X0 + 6, X1 - 6):
+        if -10 <= x <= 10: continue
+        if 24 < x < 34: continue                                                # roto
+        M.put(x, FY + 14, Z1 + 16, P, PLANK); M.put(x, FY + 15, Z1 + 16, P, PLANK_D)
+        if x % 8 == 0:
+            for y in range(FY + 1, FY + 14): M.put(x, y, Z1 + 16, P, PLANK_D)
+    for k in range(7):
+        y = FY - 4 - k * 4
+        for x in range(-9, 9):
+            for dz in range(0, 3): M.put(x, y, Z1 + 18 + k * 3 + dz, P, lerp(PLANK, PLANK_D, M.hsh(k, 1, 1)))
+        for x in (-10, 9):
+            for yy in range(y - 1, y + 4): M.put(x, yy, Z1 + 18 + k * 3, P, LOG_D)
+    # chimenea de tubo con sombrerete
+    for y in range(RY + 8, RY + 40):
+        for x in range(30, 35):
+            for z in range(-16, -11):
+                if (x - 32) ** 2 + (z + 13.5) ** 2 > 6: continue
+                M.put(x, y, z, P, IRON if y % 9 else RUST)
+    for x in range(28, 37):
+        for z in range(-18, -9): M.put(x, RY + 41, z, P, IRON)
+    # farol junto a la puerta, red tendida, piel clavada, garrafa y amuleto de huesos
+    for y in range(FY + 26, FY + 33):
+        for x in (12, 13, 14):
+            cage = y in (FY + 26, FY + 32) or x != 13
+            M.put(x, y, fz + 1, P, IRON if cage else WIN_L, glow=0 if cage else 1)
+    for x in range(-44, -16):                                                 # red en el porche (en la pared)
+        for y in range(FY + 2, FY + 14):
+            if (x + y) % 3 == 0 or (x - y) % 3 == 0: M.put(x, y + (abs(x + 30) // 6), fz, P, NET)
+    for x in range(34, 44):                                                   # piel clavada
+        for y in range(FY + 30, FY + 44):
+            if abs(x - 39) + abs(y - FY - 37) * 0.6 < 6: M.put(x, y, fz, P, SKIN if M.hsh(x, y, 2) > 0.2 else lerp(SKIN, PLANK_D, 0.5))
+    for y in range(FY + 1, FY + 8):                                           # garrafa
+        for x in range(-16, -11):
+            for z in range(Z1 + 6, Z1 + 11):
+                if (x + 13.5) ** 2 + (z - Z1 - 8.5) ** 2 < 5.5 - (y - FY - 4) ** 2 * 0.15: M.put(x, y, z, P, JUG)
+    M.put(-14, FY + 8, Z1 + 8, P, PLANK_D)
+    for y in range(RY - 12, RY - 3): M.put(-4, y, Z1 + 12, P, ROPE)          # amuleto de huesos bajo el tejadillo
+    for (dx, dy) in ((-1, -1), (1, -1), (0, -2), (-2, -3), (2, -3), (0, -4)):
+        M.put(-4 + dx, RY - 12 + dy, Z1 + 12, P, BONE if dy % 2 else BONE_D)
     return M, {P: [0, 0, 0]}
 
 

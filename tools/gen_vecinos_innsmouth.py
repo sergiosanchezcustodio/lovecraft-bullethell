@@ -1,7 +1,7 @@
 """Gente de Innsmouth (hito 6.1), estilo 4 con el "aspecto de Innsmouth" (cuerpo.innsmouth):
   habitante_pescador  pescador con jersey, tirantes, gorra de lana y botas de goma (grado 1)
   habitante_mujer     mujer con vestido largo, chal y moño gris (grado 1)
-  habitante_viejo     viejo con abrigo raído, gorra de plato y barba rala (grado 2)
+  habitante_viejo     viejo con abrigo raído, gorra de plato, cara arrugada y barba blanca poblada (grado 2)
   acolito             acólito de la Orden de Dagon: túnica parda de lana con la capucha echada
                       atrás, cordón y amuleto de oro con un pez (grado 2)
   diacono             "El diácono de la Orden" (único): túnica casi negra, estola verde marino
@@ -101,7 +101,7 @@ def viejo():
     MATS.clear()
     COAT = mat((0.33, 0.29, 0.22), 'lana'); COAT_SH = mat((0.26, 0.22, 0.17), 'lana')
     TRO = mat((0.22, 0.22, 0.24), 'lana'); SHOE = mat((0.20, 0.15, 0.11), 'cuero')
-    CAP = mat((0.20, 0.21, 0.24), 'lana'); BEARD = mat((0.62, 0.62, 0.58), 'pelo')
+    CAP = mat((0.20, 0.21, 0.24), 'lana'); BEARD = mat((0.84, 0.86, 0.90), 'pelo'); BEARD_D = (0.68, 0.70, 0.75)   # blanco frío: la luz cálida lo amarillea
     M = cu.new(1943)
     top = cu.shoes(M, SHOE, SOLE)
     cu.legs(M, TRO, bottom=top)
@@ -118,9 +118,23 @@ def viejo():
     slab(M, H, CAP, 78, 81, 0, 0, 16, 16, 16, 16, ch=2)                # gorra de plato
     slab(M, H, CAP, 81, 83, 0, 1, 15, 14, 16, 14, ch=2)
     slab(M, H, CAP, 77, 78, 0, 8.5, 12, 12, 3, 3, ch=1)
-    for x in range(-5, 5):                                             # barba rala bajo la boca
-        for y in range(62, 66):
-            if (x + y) % 2 == 0: cu.paint_face(M, x, y, BEARD, dz=1)
+    aged(M, s, sh)                                                     # arrugas, bolsas y mechones grises
+    cu.beard(M, BEARD)                                                 # barba blanca poblada (revisión del 13-10-2026)
+    cu.moustache(M, BEARD_D, xs=range(-5, 5), y=69, rows=1)
+    for (x, y, z), v in M.V.items():                                   # mechones: la barba no es lisa
+        if v[1] == BEARD and (x * 3 + y * 5 + z) % 7 == 0: v[1] = BEARD_D
+    for x in range(-3, 3): cu.paint_face(M, x, 67, (0.20, 0.10, 0.10))  # la boca asoma entre la barba
+    WR = tuple(c * 0.5 for c in s)
+    for s_ in (-1, 1):                                                 # cejas blancas pobladas, caídas por fuera
+        for i, x in enumerate(range(1, 8)):
+            xx = s_ * x - (1 if s_ > 0 else 0)
+            y = 76 - (1 if i >= 5 else 0)
+            cu.paint_face(M, xx, y, BEARD, dz=1)
+            if i % 2 == 0: cu.paint_face(M, xx, y - 1, BEARD_D, dz=1)
+        for i in range(3):                                             # arrugas hondas en las mejillas
+            cu.paint_face(M, s_ * (6 - i) - (1 if s_ > 0 else 0), 70 + i % 2, WR)
+    for y in (74, 75): cu.paint_face(M, -1, y, WR); cu.paint_face(M, 0, y, WR)   # entrecejo fruncido
+    for x in (-2, 1): cu.paint_face(M, x, 72, WR)                      # pliegues de la nariz
     cu.finish(M, 'habitante_viejo', dict(MATS), flat=(cu.FISH_EYE, cu.FISH_PUPIL), hat=(CAP,))
 
 

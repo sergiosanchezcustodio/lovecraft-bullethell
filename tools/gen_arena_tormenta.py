@@ -58,6 +58,6 @@ A.write({
     "light": {"sun_rot": [-38, 30], "sun_color": [0.62, 0.70, 0.82], "sun_energy": 0.38, "exposure": 1.3,
               "ambient_color": [0.38, 0.44, 0.50], "ambient_energy": 0.52,
               "background": [0.05, 0.07, 0.09], "fog_color": [0.16, 0.20, 0.24], "fog_density": 0.0},
-    "lamp": {"color": [1.0, 0.76, 0.46], "energy": 2.0, "range": 7.5, "fog": 0.2},
+    "lamp": {"color": [1.0, 0.78, 0.50], "energy": 3.1, "range": 9.0, "fog": 0.25},
     "colliders": COLL,
 })

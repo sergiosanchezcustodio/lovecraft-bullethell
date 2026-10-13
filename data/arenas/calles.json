@@ -121,6 +121,14 @@
    "type": "box",
    "shrink": 0.9
   },
+  "atrezo_bloques_hielo_2": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_bloques_hielo_3": {
+   "type": "box",
+   "shrink": 0.85
+  },
   "atrezo_caja": {
    "type": "box",
    "shrink": 0.95
@@ -151,7 +159,7 @@
   },
   "atrezo_bandera": {
    "type": "cylinder",
-   "radius": 0.12
+   "radius": 0.4
   },
   "monticulo_1": {
    "type": "cylinder",

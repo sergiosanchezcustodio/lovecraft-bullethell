@@ -57,5 +57,6 @@ static func dive(m: Node3D, t: float) -> void:
 		_p(m, "leg%d" % i).rotation = Vector3(-sin(a) * 0.7, 0, cos(a) * 0.7)
 
 static func _wings(m: Node3D, ang: float) -> void:
+	if not m.get_meta("part_nodes").has("wing_l"): return     # el primero en despertar no tiene alas
 	_p(m, "wing_l").rotation.z = ang
 	_p(m, "wing_r").rotation.z = -ang

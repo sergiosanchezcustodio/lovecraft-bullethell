@@ -183,41 +183,185 @@ def mesa():
     return M, {P: [0, 0, 0]}
 
 
+CLAY_X = (0.58, 0.47, 0.36); CLAY_W = (0.34, 0.25, 0.18)
+
+
 def relieve():
-    """El bajorrelieve: tablilla de arcilla de unos 60 x 50 cm en un soporte inclinado, con
-    la figura (cabeza de pulpo, alas, cuerpo escamoso) ante una arquitectura ciclópea y
-    jeroglíficos alrededor."""
-    M = Model(S=2, seed=77)
-    for s in (-1, 1):                                           # soporte
-        for y in range(0, 44): M.put(s * 10, y, -y // 8, P, WOOD_D); M.put(s * 10 + s, y, -y // 8, P, WOOD_D)
-    for x in range(-10, 11): M.put(x, 24, -2, P, WOOD_D)
-    for x in range(-9, 10):                                     # tablilla
-        for y in range(26, 46):
-            z = -y // 8
-            c = CLAY
-            if x in (-9, 9) or y in (26, 45): c = CLAY_D
-            elif (x * 5 + y * 3) % 7 == 0 and (abs(x) > 6 or y > 41): c = CLAY_D   # jeroglíficos
-            M.put(x, y, z, P, c)
-            if c == CLAY and abs(x) < 6 and 28 < y < 41: M.put(x, y, z + 1, P, CLAY_L if (x + y) % 3 else CLAY)   # figura en relieve
-    for x in range(-2, 3):                                      # cabeza de pulpo de la figura
-        for y in range(36, 40): M.put(x, y, -y // 8 + 2, P, CLAY_L)
-    for x in (-2, 0, 2):
-        for y in range(31, 36): M.put(x, y, -y // 8 + 2, P, CLAY_D)
+    """El bajorrelieve de Wilcox (rehecho a 128/m en la revisión de arte del 13-10-2026): tablilla
+    de arcilla de unos 60 x 50 cm en un caballete de tres patas. En relieve, la figura del sueño
+    (cabeza de pulpo con ojos hundidos, tentáculos que le caen sobre el pecho, cuerpo escamoso,
+    brazos con garras y alas membranosas) ante una arquitectura ciclópea de ángulos que no
+    cuadran, y un marco con jeroglíficos. Arcilla con marcas de los dedos, más clara en lo alto y
+    oscura en los huecos; migas de barro y un palillo de modelar en la repisa."""
+    M = Model(S=8, seed=77)
+    V = 128
+    TW, TH, T0 = int(0.31 * V), int(0.52 * V), int(0.72 * V)        # semiancho, alto, altura de la base
+    lean = 0.22                                                      # se inclina hacia atrás
+    def zb(y): return -int((y - T0) * lean)
+    def height(a, b):
+        """Altura del relieve (voxels) en el punto (a, b) de la tablilla: a en [-1, 1], b en [0, 1]."""
+        if abs(a) > 0.9 or b < 0.07 or b > 0.93:                     # marco con jeroglíficos
+            fr = 4
+            u = (a + 1) * 22 if (b < 0.07 or b > 0.93) else b * 30
+            cell = int(u) % 3
+            if (abs(a) > 0.9 and 0.08 < (abs(a) - 0.9) < 0.07 + 0.02 * cell) or ((b < 0.07 or b > 0.93) and int(u * 3) % 4 == 1 and 0.02 < (b if b < 0.07 else 1 - b) < 0.055):
+                fr = 2                                               # trazos hundidos
+            return fr
+        h = 1.0
+        # arquitectura de fondo: bloques en rejilla torcida y dos monolitos que se inclinan
+        gu = a * 6 + b * 2.2; gv = b * 7 - a * 1.3
+        if (gu % 1) < 0.08 or (gv % 1) < 0.08: h = 0.4
+        else: h = 1.4 + 0.6 * ((int(gu) * 7 + int(gv) * 3) % 3) / 2
+        for mx, tilt in ((-0.68, 0.18), (0.66, -0.22)):
+            if abs(a - mx - tilt * (b - 0.5)) < 0.09 and b < 0.85 - 0.1 * abs(tilt) * (a - mx) * 10: h = 3.2
+        # alas membranosas: desde los hombros, con nervios en abanico y el borde festoneado
+        for s in (-1, 1):
+            wa = s * a
+            if 0.18 < wa < 0.88:
+                lo = 0.30 + 0.32 * (wa - 0.18) + 0.04 * abs(math.sin((wa - 0.18) * 13))
+                hi = 0.92 - 0.10 * (wa - 0.18)
+                if lo < b < hi:
+                    ang = math.atan2(b - 0.62, wa - 0.18)
+                    rib = any(abs(ang - r) < 0.035 for r in (-0.55, -0.15, 0.25, 0.65))
+                    h = max(h, 3.5 + (1.5 if rib else 0.0) - 1.5 * (wa - 0.18))
+        # cuerpo escamoso y brazos
+        if abs(a) < 0.26 - 0.1 * (0.55 - b) and 0.12 < b < 0.55:
+            sc = ((int(a * 40) + int(b * 34)) % 2)
+            h = max(h, 5.0 - sc * 0.8)
+        for s in (-1, 1):
+            if abs(a - s * (0.3 - 0.25 * (0.5 - b))) < 0.05 and 0.18 < b < 0.5: h = max(h, 5.5)
+            if abs(a - s * 0.18) < 0.05 and 0.12 < b < 0.2: h = max(h, 6.0 - 3 * abs(a - s * 0.18) * 10)   # garras
+        # cabeza de pulpo
+        hd = (a / 0.21) ** 2 + ((b - 0.71) / 0.19) ** 2
+        if hd < 1: h = max(h, 7.0 + 4.0 * math.sqrt(1 - hd))
+        for s in (-1, 1):                                            # ojos hundidos
+            if (a - s * 0.07) ** 2 / 0.0015 + (b - 0.66) ** 2 / 0.0009 < 1: h -= 3.5
+        # tentáculos que caen sobre el pecho
+        for k in range(7):
+            tx = (k - 3) * 0.055
+            cx = tx + 0.03 * math.sin(b * 20 + k) + tx * (0.6 - b) * 0.8
+            if 0.3 < b < 0.6 and abs(a - cx) < 0.022 * (0.4 + (b - 0.3) * 3): h = max(h, 7.0)
+        return h
+    for y in range(T0, T0 + TH):                                    # tablilla
+        b = (y - T0) / TH
+        for x in range(-TW, TW):
+            a = x / TW
+            h = height(a, b)
+            z0 = zb(y)
+            for zz in range(-4, int(round(h)) + 1):
+                c = CLAY
+                if zz == int(round(h)):
+                    c = lerp(CLAY_W, CLAY_X, min(1.0, (h - 0.5) / 8.0) ** 0.8)   # más clara en lo alto
+                    if M.noise(x, y, zz, 3.0) > 0.7: c = lerp(c, CLAY_D, 0.3)   # marcas de los dedos
+                    if h < 1.2: c = CLAY_W                           # huecos oscuros
+                elif zz < 0: c = CLAY_D
+                M.put(x, y, z0 + zz, P, c)
+    # caballete de tres patas con repisa
+    for s in (-1, 1):
+        for y in range(0, T0 + TH + 10):
+            x = s * (TW - 4) + int(s * (T0 - y) * 0.08) if y < T0 else s * (TW - 4)
+            z = zb(y) - 6
+            for dx in range(-2, 3):
+                for dz in range(-2, 2): M.put(x + dx, y, z + dz, P, WOOD if abs(dx) < 2 else WOOD_D)
+    for y in range(0, T0 + int(TH * 0.6)):                         # pata de atrás
+        z = -int((T0 + TH * 0.6 - y) * 0.45) - 10
+        for dx in range(-2, 3):
+            for dz in range(-2, 2): M.put(dx, y, z + dz, P, WOOD_D)
+    for x in range(-TW - 6, TW + 6):                                 # repisa y travesaño
+        for z in range(zb(T0) - 8, zb(T0) + 12):
+            for y in (T0 - 4, T0 - 3, T0 - 2):
+                M.put(x, y, z, P, WOOD if y > T0 - 4 else WOOD_D)
+        M.put(x, T0 - 1, zb(T0) + 11, P, WOOD_D); M.put(x, T0, zb(T0) + 11, P, WOOD_D)
+        for y in (int(T0 * 0.35), int(T0 * 0.35) + 1, int(T0 * 0.35) + 2):
+            M.put(x, y, zb(T0) - 6, P, WOOD_D)
+    for k in range(40):                                               # palillo de modelar y migas
+        M.put(10 + k, T0 - 1, zb(T0) + 6 + k // 14, P, (0.60, 0.48, 0.32))
+    for _ in range(30):
+        x = M.rng.randint(-TW, TW); z = M.rng.randint(zb(T0) - 6, zb(T0) + 10)
+        M.put(x, T0 - 1, z, P, CLAY_D)
+    for _ in range(40):
+        x = M.rng.randint(-TW - 20, TW + 20); z = M.rng.randint(-40, 40)
+        M.put(x, 0, z, P, CLAY_D if M.rng.random() < 0.6 else CLAY)
     return M, {P: [0, 0, 0]}
 
 
+BURLAP = (0.56, 0.47, 0.32); BURLAP_D = (0.42, 0.34, 0.22); BURLAP_L = (0.66, 0.58, 0.42)
+TWINE = (0.36, 0.28, 0.18); STENCIL = (0.20, 0.16, 0.12)
+
+
+def _sack(M, cx, cz, rx, ry, rz, yaw, seed, open_top=False, fallen=False):
+    """Saco de arpillera lleno de barro: cuerpo blando que se aplasta abajo, trama de la tela,
+    pliegues, costura, cuello atado con bramante (o abierto con el barro asomando) y una franja
+    estarcida (las letras parecían una cara)."""
+    ca, sa = math.cos(math.radians(yaw)), math.sin(math.radians(yaw))
+    R = int(max(rx, rz) * (1.6 if fallen else 1.2)) + 4
+    top_y = int(ry * 2.1)
+    for x in range(-R, R + 1):
+        for z in range(-R, R + 1):
+            u = x * ca + z * sa; w = -x * sa + z * ca
+            for y in range(0, top_y + 8):
+                if fallen:
+                    uu, yy = u / (rx * 1.5), (y - ry * 0.8) / (ry * 0.8)
+                    d = uu * uu + yy * yy + (w / rz) ** 2
+                else:
+                    f = y / (ry * 2)
+                    bulge = 1.0 + 0.15 * math.sin(f * math.pi) - 0.25 * max(0.0, f - 0.75) * 4
+                    d = (u / (rx * bulge)) ** 2 + (w / (rz * bulge)) ** 2 + max(0.0, (y - ry * 1.6) / (ry * 0.5)) ** 2
+                    if y > ry * 1.95:                                    # cuello
+                        d = (u / (rx * 0.32)) ** 2 + (w / (rz * 0.32)) ** 2
+                        if y > top_y + 4: d = 9
+                if d > 1: continue
+                if d < 0.75 and y > 0: continue
+                weave = (int(u) + int(y)) % 2
+                c = BURLAP if weave else BURLAP_D
+                if M.noise(cx + x, y, cz + z, 4.0) > 0.68: c = lerp(c, BURLAP_D, 0.5)          # pliegues y sombra
+                if M.noise(cx + x, y, cz + z, 2.0) > 0.86: c = BURLAP_L
+                if abs(w) < 1 and not fallen and y < ry * 1.9: c = lerp(c, TWINE, 0.4)          # costura
+                if not fallen and ry * 1.95 < y < ry * 2.05: c = TWINE                         # atado
+                if not fallen and abs(u) < rx * 0.55 and abs(y - ry * 0.85) < 1.2 and w > 0: c = STENCIL   # franja estarcida
+                if y < 3: c = lerp(c, CLAY_D, 0.5)
+                M.put(cx + x, y, cz + z, P, c)
+    if open_top or fallen:                                                # barro que asoma
+        ox = int(rx * 1.5 * ca) if fallen else 0; oz = int(rx * 1.5 * sa) if fallen else 0
+        for x in range(-6, 7):
+            for z in range(-6, 7):
+                if x * x + z * z > 30: continue
+                y = (int(ry * 0.8) if fallen else top_y) + 1 + (1 if M.hsh(x, z, 1) > 0.6 else 0)
+                M.put(cx + ox + x, y, cz + oz + z, P, CLAY if M.hsh(x, z, 2) > 0.3 else CLAY_D)
+
+
 def sacos():
-    M = Model(S=2, seed=78)
-    for i, (cx, cz) in enumerate(((-8, 0), (2, -4), (-2, 8))):
-        M.sell(cx / 2, 8 / 2, cz / 2, 7 / 2, 8 / 2, 6 / 2, P, SACK, p=2.2)
-    for y in range(0, 30):                                      # barril
-        r = 8 + (2 if 8 < y < 22 else 0)
-        for x in range(-r, r):
-            for z in range(-r, r):
-                if x * x + z * z <= r * r and (x * x + z * z >= (r - 2) ** 2 or y in (0, 29)):
-                    M.put(14 + x, y, 4 + z, P, IRON if y in (4, 25) else WOOD)
-    for k, v in list(M.V.items()):
-        if v[1] == SACK and M.noise(*k, 3.0) > 0.6: M.V[k] = [P, SACK_D, 0]
+    """Sacos de barro del escultor (rehechos a 64/m en la revisión de arte del 13-10-2026): tres
+    de arpillera de tamaños distintos, uno abierto con el barro asomando y otro caído, una tina de
+    duelas con el barro húmedo y una paleta clavada, y pellas y salpicaduras por el suelo."""
+    M = Model(S=4, seed=78)
+    _sack(M, -16, 0, 13, 15, 11, 15, 1)
+    _sack(M, 6, -10, 11, 13, 10, -20, 2, open_top=True)
+    _sack(M, -4, 18, 11, 9, 9, 70, 3, fallen=True)
+    for y in range(0, 50):                                           # tina
+        r = 16 + (2 if 12 < y < 38 else 0)
+        for x in range(-r, r + 1):
+            for z in range(-r, r + 1):
+                d = x * x + z * z
+                if d > r * r or (d < (r - 2) ** 2 and y > 0): continue
+                a = math.atan2(z, x)
+                c = WOOD if int((a + math.pi) / math.tau * 20) % 2 else WOOD_D
+                if y in (6, 7, 42, 43): c = IRON_L
+                M.put(30 + x, y, 8 + z, P, c)
+    for x in range(-14, 15):                                         # barro húmedo dentro
+        for z in range(-14, 15):
+            if x * x + z * z < 196:
+                for y in range(40, 46 + (1 if M.noise(x, 0, z, 3.0) > 0.6 else 0)):
+                    M.put(30 + x, y, 8 + z, P, CLAY_D if M.hsh(x, z, 3) > 0.3 else CLAY)
+    for k in range(40):                                              # paleta clavada
+        M.put(34 + k // 6, 46 + k, 6, P, WOOD); M.put(35 + k // 6, 46 + k, 6, P, WOOD)
+    for _ in range(26):                                              # pellas y salpicaduras
+        x, z = M.rng.randint(-40, 52), M.rng.randint(-30, 40)
+        s = M.rng.randint(1, 4)
+        for dx in range(s):
+            for dz in range(s): M.put(x + dx, 0, z + dz, P, CLAY_D if M.rng.random() < 0.5 else CLAY)
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 

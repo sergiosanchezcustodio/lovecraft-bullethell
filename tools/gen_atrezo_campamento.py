@@ -332,40 +332,107 @@ def cabana():
     M.paint(paint)
     return M, {'body': [0, 0, 0]}
 
-def bloques_hielo():
-    """Bloques de hielo cortados y apilados (tres abajo, dos encima y uno arriba), de
-    0,7 x 0,5 x 0,5 m, con las aristas claras, cara superior más luminosa, alguna grieta
-    interior y un poco de nieve encima."""
-    M = Model(S=S, seed=41)
-    W, D, H = 22, 16, 16
-    placed = [(-23, 0, -2), (0, 0, 1), (23, 0, -1), (-11, H, 0), (12, H, -1), (0, 2 * H, 0)]
-    for i, (bx, by, bz) in enumerate(placed):
-        jx = M.rng.randint(-2, 2); jz = M.rng.randint(-2, 2)
-        x0, x1 = bx - W // 2 + jx, bx + W // 2 + jx
-        z0, z1 = bz - D // 2 + jz, bz + D // 2 + jz
-        M.vbox(x0, by, z0, x1, by + H, z1, 'body', ('ice', i, x0, x1, by, z0, z1))
-        M.bevel('body', x0, x1, z0, z1, by, by + H)
-    ICE_A = (0.64, 0.80, 0.88); ICE_B = (0.52, 0.68, 0.80); EDGE = (0.86, 0.95, 0.99); CRACK = (0.40, 0.56, 0.70)
+ICE_DEEP = (0.30, 0.48, 0.62); ICE_MID = (0.50, 0.68, 0.80); ICE_PALE = (0.70, 0.84, 0.90)
+ICE_EDGE = (0.86, 0.94, 0.98); ICE_BUBBLE = (0.92, 0.97, 1.0); ICE_CRACK = (0.94, 0.98, 1.0)
+ICE_DIRT = (0.42, 0.46, 0.48); SAW = (0.60, 0.74, 0.84)
+
+PILES = {
+    # (x, y, z, ancho, alto, fondo, giro en voxels por lado) de cada bloque; y = 0 es el suelo
+    'bloques_hielo': [(-23, 0, -2, 22, 16, 16), (0, 0, 1, 21, 15, 17), (23, 0, -1, 22, 17, 15),
+                      (-11, 'top', 0, 21, 15, 16), (12, 'top', -1, 22, 16, 16), (0, 'top', 0, 19, 14, 15)],
+    'bloques_hielo_2': [(-14, 0, -6, 24, 17, 18), (12, 0, -4, 20, 15, 16), (-2, 0, 14, 18, 14, 15),
+                        (-6, 'top', -5, 22, 16, 17), (24, 0, 12, 14, 9, 12)],         # uno caído delante
+    'bloques_hielo_3': [(-16, 0, 0, 21, 16, 16), (8, 0, -2, 22, 17, 17), (-5, 'top', -1, 22, 15, 16),
+                        (22, 0, 14, 16, 11, 13), (-26, 0, 16, 12, 8, 11)],              # dos sueltos y uno roto
+}
+
+
+def bloques_hielo(name='bloques_hielo', seed=41):
+    """Bloques de hielo cortados a sierra y apilados, cada uno distinto (revisión de arte del
+    13-10-2026): tamaños y desplazamientos propios, aristas desconchadas y alguna esquina rota,
+    marcas de sierra en las caras, capas del hielo, burbujas atrapadas, grietas blancas que
+    cruzan el bloque, algo de tierra en la base, escarcha en las aristas y nieve amontonada
+    encima y al pie de la pila."""
+    M = Model(S=S, seed=seed)
+    rng = M.rng
+    hmap = {}                                                        # altura ocupada por columna
+    blocks = []
+    for i, (bx, by, bz, W, H, D) in enumerate(PILES[name]):
+        jx, jz = rng.randint(-2, 2), rng.randint(-2, 2)
+        x0, z0 = bx - W // 2 + jx, bz - D // 2 + jz
+        x1, z1 = x0 + W, z0 + D
+        if by == 'top':
+            by = max(hmap.get((x, z), 0) for x in range(x0 + 3, x1 - 3) for z in range(z0 + 3, z1 - 3))
+        tilt = rng.uniform(-0.12, 0.12) if i % 2 else 0.0           # alguno asentado algo torcido
+        chip = rng.randint(0, 3)                                     # esquina rota
+        for x in range(x0, x1):
+            for z in range(z0, z1):
+                dy = int(round(tilt * (x - (x0 + x1) / 2)))
+                for y in range(by + max(0, dy), by + H + dy):
+                    u, v, w = x - x0, y - by - dy, z - z0
+                    # aristas desconchadas: muescas al azar en los cantos
+                    edge = (u in (0, W - 1)) + (v in (0, H - 1)) + (w in (0, D - 1))
+                    if edge >= 2 and M.hsh(x, y, z) < 0.22: continue
+                    # esquina rota (arriba)
+                    cu = u if chip in (0, 2) else W - 1 - u
+                    cw = w if chip in (0, 1) else D - 1 - w
+                    if cu + cw + (H - 1 - v) < 7: continue
+                    M.put(x, y, z, 'body', ('ice', i, u, v, w, W, H, D))
+                    hmap[(x, z)] = max(hmap.get((x, z), 0), y + 1)
+        blocks.append((i, W, H, D))
+    # grietas: planos inclinados por bloque
+    cracks = {}
+    for (i, W, H, D) in blocks:
+        cracks[i] = [(rng.uniform(-1, 1), rng.uniform(-0.6, 0.6), rng.uniform(0.3, 0.7), rng.random() < 0.5) for _ in range(rng.randint(1, 2))]
     def paint(k, part, c):
         if not tag(c): return None
         x, y, z = k
-        _, i, x0, x1, y0, z0, z1 = c
-        top = y == y0 + H - 1
-        edges = (x in (x0, x0 + 1, x1 - 2, x1 - 1)) + (y in (y0, y0 + H - 1)) + (z in (z0, z0 + 1, z1 - 2, z1 - 1))
-        base = lerp(ICE_B, ICE_A, (y - y0) / H)
-        if top: base = lerp(ICE_A, EDGE, 0.45)
-        if edges >= 2: base = EDGE
-        elif (x - x0 + (y - y0) * 2 + i * 5) % 19 == 0 and not top: base = CRACK
+        _, i, u, v, w, W, H, D = c
+        f = v / max(1, H - 1)
+        base = lerp(ICE_DEEP, ICE_MID, 0.35 + 0.65 * f)                # más profundo abajo
+        layer = M.noise(0, v + i * 7, 0, 3.0)                           # capas del hielo
+        base = lerp(base, ICE_PALE, 0.35 * layer)
+        cloud = M.noise(x, y, z, 4.0)                                   # hielo lechoso a manchas
+        if cloud > 0.62: base = lerp(base, ICE_PALE, (cloud - 0.62) * 1.6)
+        if M.hsh(x * 3, y, z * 5) > 0.975: base = ICE_BUBBLE            # burbujas
+        for (a, b, off, along_x) in cracks[i]:                         # grietas blancas
+            p = (u / W if along_x else w / D)
+            if abs(f - (off + a * (p - 0.5) + b * ((w / D if along_x else u / W) - 0.5))) < 0.045:
+                base = ICE_CRACK
+        if v < 2: base = lerp(base, ICE_DIRT, 0.45 if v == 0 else 0.2)  # tierra en la base
+        if (u in (0, W - 1)) or (w in (0, D - 1)):                      # caras: marcas de sierra
+            if v % 3 == 0 and M.hsh(u + w, v, i) > 0.4: base = lerp(base, SAW, 0.6)
+        edges = (u in (0, W - 1)) + (v in (0, H - 1)) + (w in (0, D - 1))
+        if edges >= 2: base = lerp(base, ICE_EDGE, 0.75)                # escarcha en las aristas
+        if v == H - 1: base = lerp(base, ICE_EDGE, 0.35)
         return base
     M.paint(paint)
-    snow_cap(M, thresh=(2 * H + 8) / S, depth=2)
+    # nieve: encima de cada bloque, en montoncitos, y amontonada al pie del lado del viento
+    cols = {}
+    for (x, y, z) in M.V:
+        if y > cols.get((x, z), -1): cols[(x, z)] = y
+    for (x, z), top in cols.items():
+        n = M.noise(x, 0, z, 5.0)
+        if n > 0.45:
+            for d in range(1 + int((n - 0.45) * 6)):
+                M.put(x, top + 1 + d, z, 'body', SNOW if M.hsh(x, d, z) < 0.8 else SNOW_D)
+    xs = [k[0] for k in M.V]; zs = [k[2] for k in M.V]
+    for x in range(min(xs) - 6, max(xs) + 7):
+        for z in range(min(zs) - 6, max(zs) + 7):
+            if (x, 0, z) in M.V: continue
+            d = min(abs(x - q[0]) + abs(z - q[2]) for q in [(x2, 0, z2) for (x2, z2) in cols if abs(x2 - x) < 7 and abs(z2 - z) < 7] or [(999, 0, 999)])
+            if d >= 7 or z > max(zs) - 4: continue                       # el pie del lado norte y los lados
+            h = int((7 - d) * 0.8 * M.noise(x, 3, z, 4.0) + 0.5)
+            for y in range(0, h): M.put(x, y, z, 'body', SNOW if M.hsh(x, y, z) < 0.85 else SNOW_D, over=False)
     return M, {'body': [0, 0, 0]}
 
 # tienda, caja, bidón, farol, iglú y cabaña: ahora en gen_atrezo_expedicion.py
 PIECES = (('roca', roca), ('hielo', hielo),
-          ('bloques_hielo', bloques_hielo))
-VOXEL_PIVOTS = {'tienda', 'iglu', 'cabana', 'bloques_hielo'}          # diseñadas en voxels, no en ub
-SHINY = {'hielo', 'bloques_hielo'}                                     # hielo brillante, lo demás mate
+          ('bloques_hielo', bloques_hielo),
+          ('bloques_hielo_2', lambda: bloques_hielo('bloques_hielo_2', 42)),
+          ('bloques_hielo_3', lambda: bloques_hielo('bloques_hielo_3', 43)))
+VOXEL_PIVOTS = {'tienda', 'iglu', 'cabana', 'bloques_hielo', 'bloques_hielo_2', 'bloques_hielo_3'}   # diseñadas en voxels, no en ub
+SHINY = {'hielo', 'bloques_hielo', 'bloques_hielo_2', 'bloques_hielo_3'}                     # hielo brillante, lo demás mate
 
 if __name__ == '__main__':
     only = set(sys.argv[2:])

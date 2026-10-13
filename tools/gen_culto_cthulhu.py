@@ -1,6 +1,6 @@
 """El culto de Cthulhu (fase 7, hito 7.0), estilo 4 (tools/cuerpo.py, 48 voxels/m):
-  cultista         túnica casi negra con la capucha puesta, máscara de hueso con tentáculos
-                   que le caen sobre el pecho, amuleto del ídolo en piedra verdinegra y una
+  cultista         túnica casi negra con la capucha puesta, máscara blanca de teatro griego con gesto
+                   de miedo (antes de hueso con tentáculos), amuleto del ídolo en piedra verdinegra y una
                    antorcha encendida en la mano derecha (llama `glow`)
   cultista_alert   tripulante del Alert: jersey de marinero, pantalón de lona, gorra de lana,
                    tatuaje y pañuelo con el símbolo del culto, un revólver (hito 7.2)
@@ -52,6 +52,47 @@ def mask(M, tentacles=6, big=False):
             c = IDOL_L if k % 3 else (0.34, 0.48, 0.38)               # tentáculos verdinegros con ventosas claras
             M.put(x, y, z, H, c); M.put(x, y, z + 1, H, c)
             if k < n - 4: M.put(x + 1, y, z, H, c, over=False); M.put(x + 1, y, z + 1, H, c, over=False)
+
+
+MASK_W = (0.93, 0.92, 0.89); MASK_SH = (0.78, 0.77, 0.74); MASK_D = (0.38, 0.37, 0.36); HOLE = (0.03, 0.03, 0.03)
+
+
+def mask_fear(M):
+    """Máscara blanca de teatro griego con gesto de miedo (revisión de arte, 13-10-2026): óvalo
+    algo mayor que la cara, cejas que suben hacia el centro, ojos muy abiertos, nariz recta en
+    relieve, arrugas de angustia y una boca abierta y alta con las comisuras caídas."""
+    zf = 8
+    holes = set()
+    for x0 in (-6, 2):                                               # ojos muy abiertos: redondos, 4 x 4 sin esquinas
+        for dx in range(4):
+            for y in range(70, 74):
+                if dx in (0, 3) and y in (70, 73): continue
+                holes.add((x0 + dx, y))
+    mouth = {66: range(-2, 2), 65: range(-3, 3), 64: range(-4, 4), 63: range(-4, 4), 62: (-4, -3, 2, 3)}
+    for y, xs in mouth.items():
+        for x in xs: holes.add((x, y))
+    for x in range(-8, 8):
+        for y in range(60, 81):
+            u, v = (x + 0.5) / 8.3, (y - 70.2) / 10.8
+            if u * u + v * v > 1.0: continue                           # óvalo
+            c = MASK_W
+            if u * u + v * v > 0.80: c = MASK_SH                       # borde
+            if (x, y) in holes: c = HOLE
+            M.put(x, y, zf, H, c); M.put(x, y, zf + 1, H, c, over=False)
+            if c == HOLE: M.put(x, y, zf + 1, H, HOLE)
+    for s in (-1, 1):                                                # cejas angustiadas: suben hacia el centro
+        for i, x in enumerate((6, 5, 4, 3, 2) if s > 0 else (-7, -6, -5, -4, -3)):
+            y = 75 + (i + 1) // 2
+            M.put(x, y, zf + 2, H, MASK_D)
+        M.put(-1 if s < 0 else 0, 77, zf + 2, H, MASK_SH)              # arruga del entrecejo
+        for k in range(3):                                           # surcos de miedo bajo los ojos
+            M.put((-5 + k) if s < 0 else (4 - k), 69 - k // 2, zf + 2, H, MASK_SH)
+    for y in range(67, 72):                                          # nariz en relieve
+        for x in (-1, 0): M.put(x, y, zf + 2, H, MASK_W if y > 67 else MASK_SH)
+    for y, xs in mouth.items():                                      # labios en relieve alrededor de la boca
+        for x in (min(xs) - 1, max(xs) + 1): M.put(x, y, zf + 2, H, MASK_SH)
+    for x in range(-2, 2): M.put(x, 67, zf + 2, H, MASK_SH)
+    for x in range(-3, 3): M.put(x, 61, zf + 2, H, MASK_SH)
 
 
 def hood_up(M, col, sh):
@@ -109,11 +150,14 @@ def cultista():
     cu.arms(M, ROBE, SKIN, cuff=ROBE_SH)
     cu.head(M, SKIN, SKIN_SH)
     cu.eyes(M, (0.2, 0.15, 0.1))
-    mask(M)
+    mask_fear(M)
     hood_up(M, ROBE, ROBE_SH)
+    for k, v in M.V.items():                                         # la piel que asomaba entre máscara y capucha
+        if v[0] == H and v[1] in (SKIN, SKIN_SH) and k[1] >= 60: v[1] = ROBE_SH
     amulet(M)
     torch(M)
-    cu.finish(M, 'cultista', dict(MATS), flat=(BONE, BONE_SH, BONE_D, IDOL, IDOL_L, FLAME, FLAME_C, ROPE, (0.04, 0.04, 0.04)))
+    cu.finish(M, 'cultista', dict(MATS), flat=(BONE, BONE_SH, BONE_D, IDOL, IDOL_L, FLAME, FLAME_C, ROPE, (0.04, 0.04, 0.04),
+                                              MASK_W, MASK_SH, MASK_D, HOLE))
 
 
 def cultista_alert():
@@ -215,6 +259,7 @@ def idolo():
 cultista()
 cultista_alert()
 sacerdote_culto()
-n = idolo().export('models/cth_idolo_mano.json'   # el del juego es de Replicate, {'body': [0, 0, 0]}, jitter=0.006, pivots_in_voxels=True,
+# el ídolo del juego es el de Replicate (cth_idolo); este queda como cth_idolo_mano
+n = idolo().export('models/cth_idolo_mano.json', {'body': [0, 0, 0]}, jitter=0.006, pivots_in_voxels=True,
                    roughness=0.5, specular=0.45, no_bottom=True)
 print('cth_idolo_mano:', n, 'voxels')

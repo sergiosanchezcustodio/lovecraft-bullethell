@@ -39,26 +39,57 @@ for (x, y, z), v in list(M.V.items()):                        # pliegues de la b
     if v[1] == BELLY and y % 4 == 0: v[1] = BELLY_D
 
 # ---------------- ALAS de murciélago pequeñas, violeta ----------------
-# Triángulo raíz-punta alta-punta baja en el plano de la espalda; borde de abajo festoneado
+# En el plano de la espalda (una lámina plana: inclinada sale a rayas). Brazo y antebrazo hasta la
+# muñeca con su garrita, cuatro dedos en abanico con nudillos y uña, membrana festoneada entre
+# ellos: más oscura junto a los huesos, más clara y algo rosada en medio, con venas finas.
+WING_M = (0.46, 0.26, 0.62); VEIN = (0.20, 0.08, 0.28); WBONE = (0.14, 0.07, 0.19); WBONE_L = (0.22, 0.12, 0.28); HOOK = (0.12, 0.07, 0.15)
+WZ = -9                                                        # plano de la membrana (voxels)
+def wing_poly(s):
+    Rt, Wr = (6, 31), (13, 44)                                 # hombro y muñeca
+    tips = [(23, 50), (25, 41), (21, 33), (9, 27)]             # puntas de los dedos (el último se une al cuerpo)
+    return Rt, Wr, tips
+def seg_d(p, a, b):
+    ax, ay = b[0] - a[0], b[1] - a[1]
+    t = max(0.0, min(1.0, ((p[0] - a[0]) * ax + (p[1] - a[1]) * ay) / (ax * ax + ay * ay)))
+    return math.hypot(p[0] - a[0] - ax * t, p[1] - a[1] - ay * t), t
+def in_tri(p, a, b, c):
+    def sgn(p1, p2, p3): return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+    d1, d2, d3 = sgn(p, a, b), sgn(p, b, c), sgn(p, c, a)
+    return not ((d1 < 0 or d2 < 0 or d3 < 0) and (d1 > 0 or d2 > 0 or d3 > 0))
 for s in (-1, 1):
-    R = (6, 30); TOPW = (23, 52); LOW = (24, 30)
-    def inside(u, y):
-        (x1, y1), (x2, y2), (x3, y3) = R, TOPW, LOW
-        d = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3)
-        l1 = ((y2 - y3) * (u - x3) + (x3 - x2) * (y - y3)) / d
-        l2 = ((y3 - y1) * (u - x3) + (x1 - x3) * (y - y3)) / d
-        return l1 >= 0 and l2 >= 0 and 1 - l1 - l2 >= 0
-    for u in range(6, 25):
-        for y in range(28, 53):
-            if not inside(u + 0.5, y + 0.5): continue
-            edge = 30 + 0.8 * (u - 6) * 0 + 3.2 * abs(math.sin((u - 6) * math.pi / 6))   # festón entre dedos
-            if y < edge and u > 8: continue
-            z = -8 - (u - 6) * 0.35
-            c = WING
-            M.put(s * u, y, z, T, c, over=False); M.put(s * u, y, z - 1, T, WING_D, over=False)
-    for (fx, fy) in ((23, 52), (24, 42), (18, 31), (24, 30)):            # dedos del ala, por delante de la membrana
-        M.line(V(s * 6, 30, -7), V(s * fx, fy, -7 - (fx - 6) * 0.35), T, BONE, thick=1)
-    M.cone(V(s * 23, 52, -14), V(s * 24, 55, -15), 0.6, T, BONE, CLAW, tip_r=0.5)
+    Rt, Wr, tips = wing_poly(s)
+    bones = [(Rt, Wr)] + [(Wr, t) for t in tips[:3]]
+    panels = [(Wr, tips[i], tips[i + 1]) for i in range(3)] + [(Rt, Wr, tips[3])]
+    for u in range(4, 27):
+        for y in range(25, 52):
+            p = (u + 0.5, y + 0.5)
+            hit = None
+            for k, (a, b, c) in enumerate(panels):
+                if in_tri(p, a, b, c): hit = k; break
+            if hit is None: continue
+            a, b, c = panels[hit]
+            de, te = seg_d(p, b, c)                            # borde de salida: festón hacia dentro
+            if de < 2.6 * math.sin(math.pi * te) ** 0.8 and hit < 3: continue
+            dbone = min(seg_d(p, *bn)[0] for bn in bones)
+            col = lerp(WING_D, WING, min(1.0, dbone / 1.3))
+            mid = (a[0] + (b[0] + c[0]) / 2) / 2, (a[1] + (b[1] + c[1]) / 2) / 2
+            if dbone > 1.3: col = lerp(col, WING_M, max(0.0, 1 - math.hypot(p[0] - mid[0], p[1] - mid[1]) / 6.0) * 0.7)
+            if hit < 3:                                        # vena: de la muñeca al centro del festón
+                vm = ((b[0] + c[0]) / 2, (b[1] + c[1]) / 2)
+                dv, tv = seg_d(p, a, vm)
+                if dv < 0.55 and 0.25 < tv < 0.85: col = lerp(col, VEIN, 0.55)
+            if de < 0.9 and hit < 3: col = WING_D               # ribete del borde
+            M.put(s * u, y, WZ, T, col, over=False); M.put(s * u, y, WZ - 1, T, col, over=False)
+    # huesos: brazo grueso, dedos que se afinan, nudillos y uñas
+    cap((s * Rt[0], Rt[1], WZ - 0.5), (s * Wr[0], Wr[1], WZ - 0.5), 1.2, 0.9, T, WBONE)
+    ell((s * Wr[0], Wr[1], WZ - 0.5), (1.4, 1.4, 1.3), T, WBONE_L)   # muñeca
+    cap((s * Wr[0], Wr[1] + 1, WZ - 0.5), (s * (Wr[0] - 1.5), Wr[1] + 4, WZ + 0.5), 1.0, 0.6, T, HOOK)   # garrita del pulgar
+    for (tx, ty) in tips[:3]:
+        cap((s * Wr[0], Wr[1], WZ - 0.5), (s * tx, ty, WZ - 0.5), 0.8, 0.55, T, WBONE)
+        kx, ky = Wr[0] + (tx - Wr[0]) * 0.5, Wr[1] + (ty - Wr[1]) * 0.5
+        ell((s * kx, ky, WZ - 0.5), (0.9, 0.9, 0.9), T, WBONE_L)     # nudillo
+        dx, dy = tx - Wr[0], ty - Wr[1]; L = math.hypot(dx, dy)
+        cap((s * tx, ty, WZ - 0.5), (s * (tx + 2.2 * dx / L), ty + 2.2 * dy / L - 1.2, WZ - 0.5), 0.9, 0.6, T, HOOK)   # uña ganchuda
 
 # ---------------- BRACITOS con tres garras ----------------
 for s, A in ((-1, AL), (1, AR)):

@@ -2,7 +2,7 @@
 Receta del generador de escenarios (tools/arena_kit.py).
 
 Muelle de Auckland, de noche: 64 x 64 m de tablas mojadas (`planks`). Al norte, el Alert
-atracado a lo largo del muelle (pieza de borde a 8 voxels/m); al oeste, almacenes de ladrillo
+atracado a lo largo del muelle (pieza de borde a 16 voxels/m, 33 m); al oeste, almacenes de ladrillo
 (la fachada de Innsmouth, `inn_fachada`). Grúas, bolardos con cabos, fardos con lona, rollos
 de cabo, botes y faroles de puerto. Al sur y al este, el agua del puerto.
 Uso: python tools/gen_arena_muelle.py
@@ -12,7 +12,7 @@ from arena_kit import Arena, COLLIDERS
 
 HALF = 32.0
 A = Arena("muelle", seed=1925, half=HALF, spawn_clear=4.0,
-          foot={"alr_casco": 14.0, "alr_grua": 1.2, "alr_fardos": 1.6, "alr_bolardo": 0.4, "alr_rollo": 0.5,
+          foot={"alr_casco": 17.0, "alr_grua": 1.8, "alr_fardos": 1.6, "alr_bolardo": 0.4, "alr_rollo": 0.5,
                 "alr_linterna": 0.3, "alr_bote": 1.4, "inn_fachada": 4.0, "inn_barril": 0.4, "inn_cajas": 0.8})
 
 A.add("alr_casco", -2.0, -HALF - 4.6, rot=0)                 # el Alert, atracado al norte
@@ -60,7 +60,7 @@ A.write({
     "light": {"sun_rot": [-32, 40], "sun_color": [0.62, 0.70, 0.86], "sun_energy": 0.4, "exposure": 1.3,
               "ambient_color": [0.38, 0.44, 0.50], "ambient_energy": 0.5,
               "background": [0.06, 0.08, 0.10], "fog_color": [0.18, 0.22, 0.26], "fog_density": 0.0},
-    "lamp": {"color": [1.0, 0.76, 0.46], "energy": 2.2, "range": 8.0, "fog": 0.25},
+    "lamp": {"color": [1.0, 0.78, 0.50], "energy": 3.4, "range": 9.5, "fog": 0.3},
     "colliders": COLL,
     "no_shadow": ["inn_pilote"],
 })
