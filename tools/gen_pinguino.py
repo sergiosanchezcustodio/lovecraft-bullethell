@@ -4,7 +4,7 @@ Silueta de pingüino emperador (1,2 m): cuerpo de torpedo, cuello estrecho, cabe
 adelantada, pico largo y fino, aletas planas pegadas a los costados. Conserva el
 dibujo de "frac" que hace reconocible a un pingüino, pero en tonos de albino:
 gris pardo pálido en espalda, cabeza y aletas, pecho blanco, manchas de las orejas
-amarillo claro y ojos lechosos, sin pupila.
+amarillo claro y ojos rojo sangre de albino (revisión de arte, 13-10-2026).
 Coordenadas en voxels (32 por metro), mira hacia +Z.
 Uso: python tools/gen_pinguino.py
 """
@@ -20,7 +20,8 @@ EAR = (0.95, 0.86, 0.60)                                        # manchas de las
 # pico y patas vivos, con contraste con el plumaje blanco (revisión de arte, 12-10-2026)
 BEAK = (0.96, 0.56, 0.42); BEAK_STRIPE = (0.82, 0.28, 0.26)
 PINK = (0.97, 0.45, 0.55); PINK_SH = (0.76, 0.27, 0.36)
-MILK = (0.82, 0.84, 0.88); MILK_SH = (0.66, 0.68, 0.74)
+# ojos de albino rojo sangre; brillan un poco para leerse de noche (sin iluminar: tonos oscuros, ACES los aviva)
+BLOOD = (0.50, 0.02, 0.04); BLOOD_SH = (0.30, 0.01, 0.02)
 
 # Tamaño: K = 0,8 da unos 1,2 m (se redujo un 20 % tras la primera partida de prueba).
 # Todas las medidas se escalan por K y se redondean al voxel: el tamaño del voxel no
@@ -79,13 +80,14 @@ for i in range(8):
             lower = (r == rows - 1 and rows >= 2)
             M.put(x, y, z, 'head', BEAK_STRIPE if lower else BEAK)
 
-# ---------------- OJOS LECHOSOS ----------------
+# ---------------- OJOS ROJO SANGRE ----------------
 for s in (-1, 1):
     for y in (BEAK_Y - 1, BEAK_Y):
         for z in (2, 3):
             x = 0
             while (x + s, y, z) in M.V: x += s                        # superficie lateral de la cabeza
-            if (x, y, z) in M.V: M.V[(x, y, z)][1] = MILK if (y, z) != (BEAK_Y - 1, 2) else MILK_SH
+            if (x, y, z) in M.V:
+                M.V[(x, y, z)] = ['head', BLOOD if (y, z) != (BEAK_Y - 1, 2) else BLOOD_SH, 1]
 
 # ---------------- ALETAS ----------------
 FLIP_TOP = round(k(31)); FLIP_LEN = round(k(18))

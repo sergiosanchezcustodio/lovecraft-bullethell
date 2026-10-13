@@ -14,7 +14,9 @@ joroba), verde azulado viejo con el vientre nacarado, un manto de aletas largas 
 los hombros a las corvas, cresta muy alta y ojos dorados que brillan. Sin joyas: solo anatomía.
 Variante `hydra` (hito 6.5): Madre Hydra, colosal (en el juego a escala 3): erguida con una chepa (antes muy encorvada),
 verde negruzco, vientre pálido, velas de aletas en la espalda, ojos y agallas de luz verde.
-Uso: python tools/gen_profundo.py [profundo|profundo_lanzador|profundo_anciano|pththya|hydra]  (sin argumento, todos)
+Desde el 13-10-2026 Madre Hydra tiene diseño propio en tools/gen_hydra.py (la variante `hydra`
+de aquí queda solo como referencia; no se genera por defecto).
+Uso: python tools/gen_profundo.py [profundo|profundo_lanzador|profundo_anciano|pththya]  (sin argumento, todos)
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
@@ -183,5 +185,5 @@ def k_dot(x, y, z):
     return (x + y) % 5 == 0
 
 
-for name in sys.argv[1:] or ['profundo', 'profundo_lanzador', 'profundo_anciano', 'pththya', 'hydra']:
+for name in sys.argv[1:] or ['profundo', 'profundo_lanzador', 'profundo_anciano', 'pththya']:
     build(name)

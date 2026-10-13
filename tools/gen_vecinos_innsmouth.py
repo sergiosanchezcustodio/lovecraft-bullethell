@@ -162,26 +162,28 @@ def robe(name, seed, col, sh, grade, stole=None, tiara=False):
               roughness=0.9 if not tiara else 0.75, specular=0.25 if not tiara else 0.4)
 
 
-def tiara(M, h=7, flare=4, y0=77):
+def tiara(M, h=7, flare=4, y0=77, col=None, sh=None):
     """Tiara de oro extraño, más ancha arriba, con relieves de olas pintados y una cresta
-    delantera. h: alto; flare: cuánto se abre."""
-    slab(M, H, GOLD, y0, y0 + h, 0, -0.5, 15, 15 + flare, 15, 15 + flare * 0.7, ch=2)
+    delantera. h: alto; flare: cuánto se abre. col/sh: otro metal (por defecto, oro)."""
+    G, GS = col or GOLD, sh or GOLD_SH
+    slab(M, H, G, y0, y0 + h, 0, -0.5, 15, 15 + flare, 15, 15 + flare * 0.7, ch=2)
     for x in range(-7, 7):
         for y in range(y0 + 2, y0 + h - 1, 3):
-            if (x + y) % 3 == 0: cu.paint_face(M, x, y, GOLD_SH)
+            if (x + y) % 3 == 0: cu.paint_face(M, x, y, GS)
     top = y0 + h                                                       # puntas en el borde, como una corona
     hw, hd = (15 + flare) / 2, (15 + flare * 0.7) / 2
     for i in range(0, 64, 1):
         a = i / 64 * math.tau
         x, z = int(round(hw * math.cos(a) - 0.5)), int(round(hd * math.sin(a) - 1.0))
         if i % 4 == 0:
-            for y in range(top, top + 3): M.put(x, y, z, H, GOLD)
+            for y in range(top, top + 3): M.put(x, y, z, H, G)
     for x in (-1, 0):                                                  # y la cresta delantera, más alta
-        for i, y in enumerate(range(top, top + 5)): M.put(x, y, int(hd) - 1 - i // 2, H, GOLD_SH if i == 4 else GOLD)
+        for i, y in enumerate(range(top, top + 5)): M.put(x, y, int(hd) - 1 - i // 2, H, GS if i == 4 else G)
 
 
-def hibrido(name, seed, fem):
-    """Híbrido avanzado: grado 3, la ropa del pueblo empapada y hecha jirones, descalzo."""
+def hibrido(name, seed, fem, old=False):
+    """Híbrido avanzado: grado 3, la ropa del pueblo empapada y hecha jirones, descalzo.
+    old: cara de anciana (arrugas, bolsas, comisuras caídas) y mechones grises ralos."""
     MATS.clear()
     TOP = mat((0.22, 0.24, 0.26) if not fem else (0.24, 0.20, 0.22), 'lana')
     BOT = mat((0.20, 0.18, 0.15), 'lana')
@@ -204,7 +206,8 @@ def hibrido(name, seed, fem):
         del M.V[k]                                                     # perneras deshilachadas
     cu.neck(M, SKIN)
     cu.head(M, SKIN, SKIN_SH, fem=fem)
-    cu.innsmouth(M, 3, SKIN, SKIN_SH, w=14.0 if fem else 15.0)
+    ns, nsh = cu.innsmouth(M, 3, SKIN, SKIN_SH, w=14.0 if fem else 15.0)
+    if old: aged(M, ns, nsh)
     for k in list(M.V):                                                # garras en las manos
         v = M.V[k]
         if v[0] in ('fore_l', 'fore_r') and k[1] in (24, 25) and v[1] != TOP: v[1] = (0.80, 0.78, 0.66)
@@ -212,7 +215,43 @@ def hibrido(name, seed, fem):
               b=0 if fem else 1, roughness=0.6, specular=0.4)
 
 
-def vestments(name, seed, col, sh, trim, grade, tiara_h, flare, embroider=False):
+def aged(M, ns, nsh):
+    """Cara de anciana sobre una cabeza de innsmouth(): arrugas en la frente, patas de gallo,
+    surcos de la nariz a la boca, bolsas bajo los ojos y comisuras caídas; y pelo gris claro
+    ralo: calvas en lo alto y mechones lacios que caen por la nuca y los lados."""
+    wr = tuple(c * 0.45 for c in ns)
+    for y, xs in ((76, range(-4, 4)), (78, range(-3, 3))):            # arrugas de la frente, a trozos
+        for x in xs:
+            if (x + y) % 4 != 0: cu.paint_face(M, x, y, wr)
+    for s_ in (-1, 1):
+        for i in range(3):                                            # patas de gallo
+            cu.paint_face(M, s_ * (7 + (i > 0)) - (1 if s_ > 0 else 0), 71 + i, wr)
+        for i in range(3):                                            # surco de la nariz a la boca
+            cu.paint_face(M, s_ * (3 + i // 2) - (1 if s_ > 0 else 0), 70 - i, wr)
+        for x in (range(-7, -4) if s_ < 0 else range(4, 7)):          # bolsas bajo los ojos
+            cu.paint_face(M, x, 71, nsh)
+        cu.paint_face(M, s_ * 5 - (1 if s_ > 0 else 0), 66, tuple(c * 0.55 for c in ns))   # comisuras caídas
+        cu.paint_face(M, s_ * 5 - (1 if s_ > 0 else 0), 65, wr)
+    HAIR = mat((0.62, 0.65, 0.70), 'pelo'); HAIR_D = (0.48, 0.50, 0.55)   # gris frío: la luz cálida lo rubia
+    for (x, y, z), v in M.V.items():                                  # pelo ralo arriba, con calvas
+        if v[0] == H and y >= 76 and v[1] in (ns, nsh, tuple(c * 0.86 for c in ns)) and M.noise(x, y, z, 2.5) > 0.38:
+            v[1] = HAIR if (x + z) % 3 else HAIR_D
+    tops = {}
+    for (x, y, z), v in M.V.items():
+        if v[0] == H and y >= 74: tops[(x, z)] = max(tops.get((x, z), 0), y)
+    for (x, z), yt in tops.items():                                   # mechones lacios que cuelgan
+        back = z <= -5; side = abs(x + 0.5) >= 6 and z <= 0
+        if not (back or side) or (x * 5 + z * 3) % 3 == 0: continue
+        if (x, yt + 1, z) in M.V: continue
+        ln = 8 + (x * 7 + z * 11) % 9 if back else 5 + (x + z) % 4
+        for k in range(ln):
+            y = yt - k
+            out = (x + (1 if x >= 0 else -1) * (k // 6), y, z - (1 if back and k > 3 else 0))
+            if out in M.V and M.V[out][1] in (cu.FISH_EYE, cu.FISH_PUPIL): break
+            M.put(*out, H, HAIR if k % 4 else HAIR_D, over=True)
+
+
+def vestments(name, seed, col, sh, trim, grade, tiara_h, flare, embroider=False, hair=None, metal=None):
     """Vestiduras ceremoniales: túnica hasta los pies, capa abierta sobre los hombros, galones
     de oro en el borde y la pechera, cíngulo y la tiara."""
     MATS.clear()
@@ -237,9 +276,24 @@ def vestments(name, seed, col, sh, trim, grade, tiara_h, flare, embroider=False)
     amulet(M, y=50)
     cu.head(M, SKIN, SKIN_SH)
     cu.innsmouth(M, grade, SKIN, SKIN_SH)
-    tiara(M, h=tiara_h, flare=flare)
-    cu.finish(M, name, dict(MATS), flat=(cu.FISH_EYE, cu.FISH_PUPIL, GOLD, GOLD_SH, trim), b=1,
-              hat=(GOLD, GOLD_SH), roughness=0.75, specular=0.4)
+    if hair:                                                           # melena rala en la nuca, las sienes y la coronilla
+        HAIR = mat(hair, 'pelo')
+        keep = {cu.FISH_EYE, cu.FISH_PUPIL}
+        for (x, y, z), v in M.V.items():
+            if v[0] != H or v[1] in keep or v[1][0] > v[1][1] + 0.12: continue    # ojos y agallas
+            if (z < -2 and y >= 64) or (abs(x + 0.5) >= 6.5 and z < 4 and y >= 72) or y >= 79:
+                M.V[(x, y, z)] = [H, HAIR, v[2]]
+    TC, TS = metal or (GOLD, GOLD_SH)
+    tiara(M, h=tiara_h, flare=flare, col=TC, sh=TS)
+    if hair:                                                           # la tiara, abierta por arriba: asoma el pelo
+        top = 77 + tiara_h - 1
+        hw, hd = (15 + flare) / 2 - 2.5, (15 + flare * 0.7) / 2 - 2.5
+        for (x, y, z), v in list(M.V.items()):
+            if v[0] == H and y in (top, top - 1) and ((x + 0.5) / hw) ** 2 + ((z + 1) / hd) ** 2 < 1:
+                if y == top: del M.V[(x, y, z)]
+                else: M.V[(x, y, z)] = [H, HAIR, 0]
+    cu.finish(M, name, dict(MATS), flat=(cu.FISH_EYE, cu.FISH_PUPIL, GOLD, GOLD_SH, TC, TS, trim), b=1,
+              hat=(TC, TS), roughness=0.75, specular=0.4)
 
 
 def barnabas():
@@ -283,8 +337,10 @@ mujer()
 viejo()
 robe('acolito', 1944, (0.36, 0.29, 0.21), (0.28, 0.22, 0.16), 2)
 robe('diacono', 1945, (0.12, 0.13, 0.16), (0.08, 0.09, 0.11), 2, stole=(0.16, 0.38, 0.34), tiara=True)
-hibrido('hibrido_h', 1946, False)
-hibrido('hibrido_m', 1947, True)
+hibrido('hibrido_h', 1946, False, old=True)                         # anciano (revisión de arte, 13-10-2026)
+hibrido('hibrido_m', 1947, True, old=True)                          # anciana (revisión de arte, 13-10-2026)
 vestments('sacerdote', 1948, (0.14, 0.30, 0.28), (0.10, 0.22, 0.20), (0.72, 0.58, 0.24), 2, 11, 6)
-vestments('sumo_sacerdote', 1949, (0.08, 0.08, 0.10), (0.05, 0.05, 0.07), (0.78, 0.62, 0.26), 2, 15, 8, embroider=True)
+vestments('sumo_sacerdote', 1949, (0.08, 0.08, 0.10), (0.05, 0.05, 0.07), (0.78, 0.62, 0.26), 2, 15, 8, embroider=True,
+          hair=(0.80, 0.80, 0.78),                                     # pelo blanco grisáceo y tiara gris ceniza
+          metal=((0.40, 0.43, 0.48), (0.28, 0.30, 0.34)))              # (revisión de arte, 13-10-2026)
 barnabas()

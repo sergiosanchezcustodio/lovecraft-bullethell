@@ -7,7 +7,7 @@
 script = ExtResource("1")
 id = &"shoggoth_caverna"
 display_name = "El shoggoth de la caverna"
-model = "shoggoth_grande"
+model = "shoggoth_caverna"
 model_scale = 3.2
 unique = true
 tier = 4

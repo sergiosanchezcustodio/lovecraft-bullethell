@@ -4,7 +4,8 @@
   primigenio_menor uno de los que yacen con Cthulhu: el engendro con piel de piedra
                    verdinegra agrietada, como una estatua que despierta, con los ojos y las
                    grietas en verde
-Si cambian fragmento.json o engendro.json, vuelve a ejecutarlo.
+El primigenio menor (cachorro de Cthulhu) va ahora en tools/gen_primigenio_menor.py.
+Si cambia fragmento.json, vuelve a ejecutarlo.
 Uso: python tools/gen_rlyeh_criaturas.py
 """
 import json, random
@@ -32,4 +33,4 @@ def stone(x, y, z, r, g, b, rng):
     return (0.13 + l * 0.35) * k, (0.18 + l * 0.4) * k, (0.15 + l * 0.35) * k, 0
 
 recolor('fragmento', 'emanacion', gel, lambda r, g, b: (0.70, 1.0, 0.55))
-recolor('engendro', 'primigenio_menor', stone, lambda r, g, b: (0.35, 1.0, 0.55))
+# primigenio_menor: desde el 13-10-2026 tiene generador propio (gen_primigenio_menor.py)
