@@ -79,39 +79,122 @@ def via():
 # ---------------- vagoneta ----------------
 
 def vagoneta():
-    """Vagón de mercancías de caja roja volcado sobre su costado: la caja tumbada (3,6 m de
-    largo, 1,5 de alto tumbada), el bastidor y las ruedas hacia +z, la puerta corredera caída
-    al suelo. Hueco."""
-    M = Model(S=2, seed=82)
-    L, H, W = 58, 48, 34                                          # medio largo, alto tumbado, ancho
-    def plank(x, y, z):
-        if (y + z) % 5 == 0: return WAGON_D
-        return lerp(WAGON, WAGON_L, 0.6 * M.noise(x, y, z, 8.0)) if M.noise(x, y, z, 3.0) < 0.82 else (0.30, 0.24, 0.18)
+    """Vagón de mercancías volcado sobre su costado (revisión de arte del 14-10-2026; el de antes
+    queda en models/pan_vagoneta_v1.json). A 48 voxels/m, mismas medidas (3,6 x 1,5 x 2,9 m): la
+    caja de tablas verticales con ranuras, pintura roja óxido desvaída con la tabla al aire,
+    escuadras y flejes de hierro en las esquinas, la franja con el rótulo borrado, la puerta
+    corredera con sus tornapuntas en Z caída al lado con el carril, la pasarela del techo y la
+    escalerilla, los dos bogies al aire con ballestas, cajas de grasa y ruedas de radios con
+    pestaña, topes y enganche en las testas, tablas rotas con el interior oscuro, chorretones de
+    óxido, verdín y barro con juncos al pie."""
+    M = Model(S=3, seed=82)
+    rng = M.rng
+    L, H, W = 87, 72, 51                                           # medio largo, alto tumbado (lado), medio ancho
+    RUSTS = (0.40, 0.22, 0.12)
+    def plank(x, y, z, face):
+        u = z if face == 'side' else (x if face != 'end' else z)
+        board = (u + 2 * W) // 6
+        c = lerp(WAGON, (0.62, 0.36, 0.26), 0.2 + 0.6 * M.hsh(board, 3, 5 if face == 'side' else 7))
+        if (u + 2 * W) % 6 == 0: c = lerp(c, DARK, 0.55)                    # ranura entre tablas
+        if M.noise(x, y, z, 5.0) > 0.74: c = lerp(SLEEPER, BARK_L, 0.4)      # pintura caída: madera
+        if M.noise(x * 0.6, y * 2.5, z * 0.6, 4.0) > 0.78: c = lerp(c, RUSTS, 0.5)   # chorretón
+        return c
+    holes = [(rng.randint(-60, 40), rng.randint(-30, 20), rng.randint(6, 12), rng.randint(4, 9)) for _ in range(2)]
     for x in range(-L, L):
         for y in range(0, H):
             for z in range(-W, W):
                 edge = min(x + L, L - 1 - x, y, H - 1 - y, z + W, W - 1 - z)
                 if edge > 1: continue
-                if y == H - 1 or y == H - 2:                       # el techo (ahora un lado) con una tabla rota
-                    if -10 < x < 6 and -8 < z < 14: continue
-                c = plank(x, y, z)
-                if abs(x) in (L - 1, L - 2) or x in (-L // 3, L // 3): c = WAGON_D   # montantes
+                top = y >= H - 2                                       # el costado que mira al cielo
+                face = 'side' if top or y <= 1 else ('end' if abs(x) >= L - 2 else 'roof')
+                if top and any(abs(x - hx) < hw and abs(z - hz) < hh for hx, hz, hw, hh in holes): continue
+                c = plank(x, y, z, face)
+                if top and -W + 14 < z < -W + 22: c = lerp(c, (0.70, 0.66, 0.56), 0.45 if M.hsh(x // 3, 1, 1) > 0.4 else 0.1)   # franja del rótulo
+                corner = (abs(x) >= L - 3) + (abs(z) >= W - 3) + (y <= 2 or y >= H - 3)
+                if corner >= 2 or (abs(x) in range(L // 3 - 1, L // 3 + 2) and face != 'end'):
+                    c = lerp((0.24, 0.20, 0.18), RUSTS, 0.4 * M.noise(x, y, z, 3.0))           # escuadras y montantes
+                if y in (H - 1,) and abs(z) >= W - 3 and (x % 10 == 0): c = IRON_L               # remaches
                 M.put(x, y, z, P, c)
-    for x in range(-L + 4, L - 4):                                 # bastidor de hierro hacia +z
-        for y in (8, 9, H - 10, H - 9):
-            M.put(x, y, W, P, IRON); M.put(x, y, W + 1, P, IRON)
-    for cx in (-L + 12, -L + 26, L - 26, L - 12):                  # ruedas al aire
-        for a in range(-9, 10):
-            for b in range(-9, 10):
-                r = math.hypot(a, b)
-                if r > 9: continue
-                c = IRON_L if r > 7.5 else (RAIL if r > 2 else IRON)
-                for dz in range(W + 2, W + 5):
-                    for yy in (12, H - 12): M.put(cx + a, yy + b, dz, P, c)
-    for x in range(-14, 14):                                       # puerta corredera caída
-        for z in range(-W - 22, -W - 2):
-            M.put(x + int(0.2 * (z + W)), 0, z, P, plank(x, 0, z))
-            if (x + 14) % 9 == 0: M.put(x + int(0.2 * (z + W)), 1, z, P, WAGON_D)
+    for (hx, hz, hw, hh) in holes:                                       # interior oscuro bajo las tablas rotas
+        for x in range(hx - hw, hx + hw):
+            for z in range(hz - hh, hz + hh):
+                M.put(x, H - 6, z, P, lerp(DARK, SLEEPER_D, 0.3))
+        for k in range(3):                                               # astillas que asoman
+            M.put(hx + hw - 1, H, hz - hh + k * 3, P, BARK_L)
+    # pasarela del techo (el techo mira a -z tumbado): tablón con listones
+    for x in range(-L + 4, L - 4):
+        for y in range(H // 2 - 5, H // 2 + 5):
+            M.put(x, y, -W - 1, P, BOARD_D if (x // 4) % 2 else BOARD)
+            if y in (H // 2 - 5, H // 2 + 4): M.put(x, y, -W - 2, P, IRON)
+    for k in range(9):                                                   # escalerilla de la testa
+        for y in range(8, H - 8):
+            if y % 9 == 0: M.put(L, y, -W + 8 + k, P, IRON_L)
+        M.put(L, 8 + k, -W + 8, P, IRON); M.put(L, 8 + k, -W + 16, P, IRON)
+    for y in range(8, H - 8):
+        M.put(L, y, -W + 8, P, IRON); M.put(L, y, -W + 16, P, IRON)
+    # bastidor y bogies hacia +z
+    for x in range(-L + 6, L - 6):
+        for y in (12, 13, H - 14, H - 13):
+            for dz in (0, 1, 2): M.put(x, y, W + dz, P, IRON)
+    for x in range(-L + 6, L - 6, 3):
+        for y in range(12, H - 12):
+            if x % 30 == 0: M.put(x, y, W + 1, P, IRON)                  # traviesas del bastidor
+    for bx in (-L + 26, L - 26):
+        for x in range(bx - 22, bx + 22):                                # bastidor del bogie
+            for y in (H // 2 - 2, H // 2 + 2):
+                for dz in range(W + 3, W + 7): M.put(x, y, dz, P, IRON)
+        for k in range(-3, 4):                                           # ballestas
+            for x in range(bx - 8 + abs(k), bx + 8 - abs(k)):
+                M.put(x, H // 2 + k, W + 8 + (3 - abs(k)) // 2, P, IRON_L if k % 2 else IRON)
+        for cx in (bx - 14, bx + 14):                                    # ruedas con radios y pestaña
+            for wy in (14, H - 14):
+                for a2 in range(-14, 15):
+                    for b2 in range(-14, 15):
+                        r = math.hypot(a2, b2)
+                        if r > 14: continue
+                        ang = math.atan2(b2, a2)
+                        if r > 12: c = IRON_L                                      # llanta
+                        elif r > 10.5: c = IRON
+                        elif r < 3: c = IRON_L                                    # cubo
+                        elif abs(math.sin(4 * ang)) < 0.22: c = IRON              # radios
+                        else: continue
+                        for dz in range(W + 9, W + 13 + (2 if r > 13 else 0)):
+                            M.put(cx + a2, wy + b2, dz, P, lerp(c, RUSTS, 0.3 * M.noise(cx + a2, wy + b2, dz, 2.0)))
+                for dz in range(W + 4, W + 13): M.put(cx, wy, dz, P, IRON)        # eje
+                box(M, cx - 3, cx + 3, wy - 3, wy + 3, W + 13, W + 16, IRON_L)     # caja de grasa
+    for sx in (-1, 1):                                                   # topes y enganche
+        for y in (16, H - 16):
+            for k in range(6):
+                for a2 in range(-3, 4):
+                    for b2 in range(-3, 4):
+                        if a2 * a2 + b2 * b2 <= 9: M.put(sx * (L + k), y + a2, b2 + 4, P, IRON_L if k == 5 else IRON)
+        box(M, sx * L - (0 if sx > 0 else 8), sx * L + (8 if sx > 0 else 0), H // 2 - 3, H // 2 + 3, 0, 8, IRON)
+    # puerta corredera caída en el suelo, con sus tornapuntas en Z y el carril
+    for x in range(-24, 24):
+        for z in range(-W - 34, -W - 4):
+            xx = x + int(0.25 * (z + W))
+            c = plank(xx, 0, z, 'roof')
+            frame = x in (-24, -23, 22, 23) or z in (-W - 34, -W - 33, -W - 5, -W - 4)
+            zbr = abs((x + 24) - (z + W + 34) * 48 / 30) < 1.6 or abs(x - (z + W + 34) * 0 - (-24 + (z + W + 34) * 48 / 30)) < 0
+            if frame or zbr or z in (-W - 19, -W - 20): c = WAGON_D
+            M.put(xx, 0, z, P, c)
+            if frame or zbr: M.put(xx, 1, z, P, WAGON_D)
+    for x in range(-30, 30): M.put(x, 0, -W - 37, P, IRON); M.put(x, 1, -W - 37, P, IRON_L)
+    # barro, juncos y verdín al pie
+    for x in range(-L - 12, L + 12):
+        for z in range(-W - 40, W + 24):
+            if (x, 0, z) in M.V: continue
+            d = max(abs(x) - L, abs(z) - W, 0)
+            if d < 10 and M.noise(x, 0, z, 6.0) > 0.42: M.put(x, 0, z, P, lerp(MOSS_D, (0.18, 0.15, 0.11), M.hsh(x, 0, z)))
+    for (x, y, z), v in list(M.V.items()):
+        if y < 6 and M.noise(x, y, z, 4.0) > 0.5 and v[1] != IRON_L: v[1] = lerp(v[1], MOSS_D, 0.5)
+    for i in range(10):
+        cx, cz = rng.choice((-1, 1)) * rng.randint(L - 4, L + 10), rng.randint(-W, W)
+        for k in range(rng.randint(3, 6)):
+            hgt = rng.randint(14, 30)
+            for y in range(hgt): M.put(cx + k * 2 - 4 + int(y * 0.08), y, cz + (k % 3) - 1, P, (0.40, 0.42, 0.24) if y < hgt - 3 else (0.52, 0.50, 0.30))
+    NB = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a2, k[1] + b2, k[2] + c2) in M.V for a2, b2, c2 in NB)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 
@@ -374,42 +457,87 @@ def apeadero():
 # ---------------- árboles ----------------
 
 def arbol(seed, H):
-    """Árbol muerto del pantano: tronco retorcido que se estrecha, raíces que salen del agua,
-    ramas desnudas que suben y se doblan, y barbas de musgo colgando."""
-    M = Model(S=2, seed=seed)
+    """Árbol muerto del pantano (revisión de arte del 14-10-2026; los de antes quedan en
+    models/pan_arbol_{1,2}_v1.json). A 48 voxels/m, mismas medidas: base ensanchada en
+    contrafuertes con raíces que se hunden en el agua, tronco retorcido con la corteza en surcos
+    verticales y placas, un nudo hueco y negro, la copa partida con la madera desnuda y gris al
+    aire, ramas desnudas que suben y se doblan (alguna rota y colgando), hongos de repisa en el
+    tronco, y cortinas de musgo español que cuelgan en flecos de las ramas."""
+    V = 3
+    M = Model(S=V, seed=seed)
     rng = M.rng
+    H = int(H * 1.5)
+    GREY = (0.46, 0.44, 0.40); GREY_D = (0.32, 0.30, 0.28); FUNGUS = (0.58, 0.48, 0.30); FUNGUS_D = (0.40, 0.30, 0.18)
     def bark(x, y, z):
-        if M.noise(x, y, z, 3.0) > 0.7: return BARK_L
-        return lerp(BARK, BARK_D, M.noise(x, y, z, 7.0))
-    for k in range(6):                                             # raíces
-        a = k / 6 * math.tau + rng.uniform(-0.3, 0.3)
-        line(M, (0, 10, 0), (math.cos(a) * 20, 0, math.sin(a) * 20), 2.2, bark)
+        a = math.atan2(z, x)
+        groove = (a * 9 + 0.04 * y + 3 * M.noise(x, y * 0.2, z, 4.0)) % 1 < 0.22    # surcos verticales
+        c = lerp(BARK, BARK_D, 0.3 + 0.5 * M.noise(x, y * 0.4, z, 6.0))
+        if groove: c = lerp(c, (0.08, 0.07, 0.06), 0.6)
+        elif M.noise(x, y, z, 2.5) > 0.72: c = BARK_L                                # placas
+        if M.noise(x, y + 99, z, 5.0) > 0.7: c = lerp(c, MOSS_D, 0.45)                # verdín
+        return c
+    def wood(x, y, z): return lerp(GREY_D, GREY, M.noise(x, y, z, 2.0))
+    for k in range(8):                                                               # contrafuertes y raíces
+        a = k / 8 * math.tau + rng.uniform(-0.25, 0.25)
+        L = rng.uniform(26, 40)
+        line(M, (0, 26, 0), (math.cos(a) * L * 0.5, 6, math.sin(a) * L * 0.5), 4.2, bark)
+        line(M, (math.cos(a) * L * 0.5, 6, math.sin(a) * L * 0.5), (math.cos(a) * L, -2, math.sin(a) * L), 2.6, bark)
     pts = [(0, 0, 0)]
     x = z = 0.0
-    for y in range(0, H, 10):                                      # tronco retorcido
-        x += rng.uniform(-2.5, 2.5); z += rng.uniform(-2.5, 2.5)
+    for y in range(0, H, 12):                                                        # tronco retorcido
+        x += rng.uniform(-3.5, 3.5); z += rng.uniform(-3.5, 3.5)
         pts.append((x, y, z))
     for i in range(1, len(pts)):
-        r = 6.0 * (1 - i / len(pts)) + 1.5
+        r = 9.5 * (1 - i / len(pts)) ** 0.8 + 2.2
         line(M, pts[i - 1], pts[i], r, bark)
+    tp = pts[-1]                                                                     # copa partida: astillas grises
+    for k in range(7):
+        a = rng.uniform(0, math.tau)
+        line(M, tp, (tp[0] + math.cos(a) * 3, tp[1] + rng.uniform(6, 16), tp[2] + math.sin(a) * 3), 1.2, wood)
+    mid = pts[len(pts) // 3]                                                         # nudo hueco
+    for dy in range(-5, 6):
+        for dz in range(-3, 4):
+            if dy * dy / 25 + dz * dz / 9 <= 1:
+                M.put(mid[0] + 7, mid[1] + dy, mid[2] + dz, P, (0.04, 0.04, 0.04))
+                M.put(mid[0] + 8, mid[1] + dy, mid[2] + dz, P, (0.04, 0.04, 0.04))
+    for i in range(3):                                                               # hongos de repisa
+        p = pts[int(len(pts) * rng.uniform(0.2, 0.6))]
+        a = rng.uniform(0, math.tau); r0 = 7
+        for w in range(-5, 6):
+            for d in range(0, 5 - abs(w) // 2):
+                q = (p[0] + math.cos(a) * (r0 + d) - math.sin(a) * w, p[1] - i * 4, p[2] + math.sin(a) * (r0 + d) + math.cos(a) * w)
+                M.put(*q, P, FUNGUS if d < 3 else FUNGUS_D)
     tips = []
     def branch(p, ang, up, length, r, depth):
         dx, dz = math.cos(ang), math.sin(ang)
         q = (p[0] + dx * length, p[1] + up * length, p[2] + dz * length)
-        line(M, p, q, r, bark)
-        if depth == 0 or r < 1.1:
+        line(M, p, q, r, bark if r > 1.6 else wood)
+        if depth == 0 or r < 1.2:
             tips.append(q); return
-        for _ in range(2):
-            branch(q, ang + rng.uniform(-0.9, 0.9), max(up + rng.uniform(-0.3, 0.2), 0.1), length * 0.7, r * 0.6, depth - 1)
-    for i in range(4):
-        base = pts[int(len(pts) * rng.uniform(0.45, 0.85))]
-        branch(base, rng.uniform(0, math.tau), rng.uniform(0.4, 0.9), rng.uniform(22, 34), 2.6, 2)
-    branch(pts[-1], rng.uniform(0, math.tau), 0.8, 18, 2.0, 2)
-    for t in tips + [p for p in tips[::2]]:                        # musgo colgando de las ramas
-        n = rng.randint(10, 26)
-        for k in range(n):
-            for j in range(rng.randint(0, 2)):
-                M.put(int(t[0]) + j, int(t[1]) - k, int(t[2]), P, MOSS if k % 3 else MOSS_D, over=False)
+        n = 2 if rng.random() > 0.25 else 1                                          # alguna rama no se bifurca: rota
+        for _ in range(n):
+            branch(q, ang + rng.uniform(-0.9, 0.9), max(up + rng.uniform(-0.35, 0.2), 0.05), length * 0.7, r * 0.62, depth - 1)
+    for i in range(5):
+        base = pts[int(len(pts) * rng.uniform(0.4, 0.85))]
+        branch(base, rng.uniform(0, math.tau), rng.uniform(0.35, 0.9), rng.uniform(30, 48), 3.6, 3)
+    branch(pts[-2], rng.uniform(0, math.tau), 0.8, 24, 2.8, 2)
+    b0 = pts[int(len(pts) * 0.55)]                                                   # rama rota colgando
+    a = rng.uniform(0, math.tau)
+    q = (b0[0] + math.cos(a) * 14, b0[1] + 4, b0[2] + math.sin(a) * 14)
+    line(M, b0, q, 2.4, bark)
+    line(M, q, (q[0] + math.cos(a) * 4, q[1] - 30, q[2] + math.sin(a) * 4), 1.8, wood)
+    for t_ in tips + tips[::2]:                                                      # musgo español en flecos
+        width = rng.randint(3, 7)
+        for j in range(-width, width + 1):
+            n = int(rng.randint(14, 40) * (1 - abs(j) / (width + 1)) ** 0.5)
+            for k in range(n):
+                if rng.random() < 0.12: continue
+                c = MOSS if (k + j) % 3 else MOSS_D
+                if k > n - 3: c = lerp(MOSS, (0.56, 0.58, 0.46), 0.5)
+                M.put(int(t_[0]) + j, int(t_[1]) - k - (abs(j) // 2), int(t_[2]) + (j % 2), P, c, over=False)
+    NB = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a2, k[1] + b2, k[2] + c2) in M.V for a2, b2, c2 in NB)]: del M.V[k]
+    for k in [k for k in M.V if k[1] < 0]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 
@@ -437,6 +565,59 @@ def tocon():
 
 # ---------------- caballete ----------------
 
+def tocon_v2():
+    """Tocón de ciprés podrido (revisión de arte del 14-10-2026, a mano; el de Replicate queda en
+    models/pan_tocon_v1.json). A 48 voxels/m, ~0,9 m: base acampanada con contrafuertes y raíces
+    que entran al agua, corteza en surcos, el corte roto en dientes con la madera gris y los
+    anillos, el centro podrido y hueco, hongos de repisa, musgo y una rodilla de ciprés al lado."""
+    V = 3
+    M = Model(S=V, seed=87)
+    rng = M.rng
+    GREY = (0.48, 0.45, 0.40); RING = (0.36, 0.33, 0.29); ROT_D = (0.10, 0.08, 0.06)
+    FUNGUS = (0.62, 0.52, 0.32)
+    Hs = 34
+    for y in range(0, Hs + 10):
+        r = 9 + 9 * math.exp(-y / 5.0)
+        for x in range(-22, 23):
+            for z in range(-22, 23):
+                a = math.atan2(z, x)
+                rr = r + (3.5 * max(0, math.cos(5 * a + 0.7)) * math.exp(-y / 7.0))          # contrafuertes
+                d = math.hypot(x, z)
+                if d > rr: continue
+                topy = Hs + int(8 * M.noise(x, 0, z, 3.0)) - (6 if x > 2 else 0)            # corte roto
+                if y > topy: continue
+                if d < rr - 2.5 and y < topy: continue
+                if y >= topy - 1 and d < 5: continue                                          # centro hueco
+                groove = (a * 10 + 3 * M.noise(x, y * 0.2, z, 3.0)) % 1 < 0.25
+                c = lerp(BARK, BARK_D, 0.3 + 0.5 * M.noise(x, y * 0.4, z, 5.0))
+                if groove: c = lerp(c, (0.08, 0.07, 0.06), 0.6)
+                if y >= topy - 1 and d < rr - 1.5:
+                    c = RING if int(d) % 3 == 0 else GREY
+                    if d < 7: c = ROT_D
+                if y < 8 and M.noise(x, y, z, 4.0) > 0.4: c = lerp(c, MOSS_D, 0.6)
+                M.put(x, y, z, P, lerp(c, GREY, 0.25))                                       # algo más claro: de noche no se leía
+    for y in range(0, Hs - 4):                                                           # el hueco, oscuro
+        for x in range(-4, 5):
+            for z in range(-4, 5):
+                if math.hypot(x, z) < 5 and (x, y, z) not in M.V and y == Hs - 6: M.put(x, y, z, P, ROT_D)
+    for k in range(6):                                                                   # raíces al agua
+        a = k / 6 * math.tau + 0.3
+        line(M, (math.cos(a) * 14, 4, math.sin(a) * 14), (math.cos(a) * 30, -1, math.sin(a) * 30), 2.4,
+             lambda x, y, z: lerp(BARK, BARK_D, M.noise(x, y, z, 3.0)))
+    a = rng.uniform(0, math.tau)                                                         # hongos
+    for i in range(2):
+        for w in range(-5, 6):
+            for d in range(0, 4 - abs(w) // 2):
+                M.put(math.cos(a) * (11 + d) - math.sin(a) * w, 14 + i * 7, math.sin(a) * (11 + d) + math.cos(a) * w, P, FUNGUS if d < 2 else (0.44, 0.34, 0.20))
+    for y in range(0, 16):                                                               # rodilla de ciprés
+        r = 3.5 - y * 0.18
+        for x in range(-4, 5):
+            for z in range(-4, 5):
+                if math.hypot(x, z) <= r: M.put(26 + x, y, -14 + z, P, BARK if (x + y) % 4 else BARK_L)
+    for k in [k for k in M.V if k[1] < 0]: del M.V[k]
+    return M, {P: [0, 0, 0]}
+
+
 def caballete():
     """Tramo de puente de caballetes: tres pórticos de pies inclinados con riostras en aspa
     (a lo largo de z), la viga de arriba partida y dos traviesas caídas al agua."""
@@ -462,7 +643,7 @@ def caballete():
 
 
 PIECES = {'via': via, 'vagoneta': vagoneta, 'senal': senal, 'apeadero': apeadero,
-          'arbol_1': arbol_1, 'arbol_2': arbol_2, 'tocon_mano': tocon, 'caballete': caballete}
+          'arbol_1': arbol_1, 'arbol_2': arbol_2, 'tocon_mano': tocon, 'tocon': tocon_v2, 'caballete': caballete}
 
 if __name__ == '__main__':
     only = set(sys.argv[1:])

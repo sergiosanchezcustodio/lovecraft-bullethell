@@ -413,15 +413,81 @@ def caballete():
 
 
 def mesa():
-    M = Model(S=2, seed=76)
-    box(M, -30, 30, 26, 29, -14, 14, lambda x, y, z: WOOD if (x // 6) % 2 else WOOD_D)
-    for x in (-27, 26):
-        for z in (-11, 10): box(M, x, x + 2, 0, 26, z, z + 2, WOOD_D)
-    M.sell(-10 / 2, 32 / 2, 0, 7 / 2, 3 / 2, 6 / 2, P, CLAY, p=2.2)  # montón de barro
-    for i in range(4):                                          # herramientas de modelar
-        for k in range(8): M.put(8 + i * 3, 29, -4 + k, P, IRON_L if k < 2 else WOOD)
-    box(M, 18, 25, 29, 37, -4, 3, IRON)                         # cubo
-    box(M, -24, -16, 29, 30, 4, 12, (0.70, 0.66, 0.60))         # trapos
+    """Mesa de trabajo del escultor (revisión de arte del 14-10-2026; la de antes queda en
+    models/prv_mesa_v1.json). A 64 voxels/m, 1,8 x 1,1 x 0,8 m: tablero de tablones con juntas,
+    canto y manchas de barro y escayola, patas torneadas con travesaños y una balda abajo con
+    sacos y un balde; encima, una maqueta de barro a medio modelar (un busto con tentáculos), los
+    palillos y vaciadores de modelar en fila, un compás, un trapo húmedo, un tarro con pinceles
+    y un cuaderno abierto con un boceto."""
+    V = 4
+    M = Model(S=V, seed=76)
+    rng = M.rng
+    TOP = 52
+    def plank(x, y, z):
+        c = lerp(WOOD_D, (0.48, 0.35, 0.22), 0.3 + 0.5 * M.hsh(z // 8, 1, 1))
+        c = lerp(c, WOOD_D, 0.3 * M.noise(x * 0.2, y, z * 2, 3.0))
+        if z % 8 == 0: c = lerp(c, (0.10, 0.07, 0.05), 0.6)
+        if M.noise(x, y, z, 5.0) > 0.72: c = lerp(c, PLASTER_D, 0.6)              # escayola
+        elif M.noise(x + 50, y, z, 4.0) > 0.76: c = lerp(c, CLAY_D, 0.7)           # barro
+        return c
+    box(M, -58, 58, TOP, TOP + 5, -26, 26, plank)                                  # tablero
+    box(M, -58, 58, TOP - 4, TOP, -24, 24, lambda x, y, z: WOOD_D)                  # faldón
+    for sx in (-52, 50):                                                           # patas torneadas
+        for sz in (-21, 19):
+            for y in range(0, TOP - 4):
+                r = 2.6 + (1.0 if y % 16 < 3 else 0) - (0.6 if y < 8 else 0)
+                for x in range(-4, 5):
+                    for z in range(-4, 5):
+                        if math.hypot(x, z) <= r: M.put(sx + x + 1, y, sz + z + 1, P, WOOD if (y // 16) % 2 else WOOD_D)
+    for y in (10, 11, 12):                                                         # travesaños y balda
+        box(M, -52, 52, y, y + 1, -21, 22, lambda x, y, z: WOOD_D if (x // 10) % 2 else WOOD)
+    for i, (cx, cz) in enumerate(((-30, 0), (-12, 4))):                            # sacos en la balda
+        for x in range(cx - 9, cx + 9):
+            for z in range(cz - 10, cz + 10):
+                for y in range(13, 26):
+                    if ((x - cx) / 9) ** 2 + ((z - cz) / 10) ** 2 + ((y - 13) / 13) ** 2 <= 1:
+                        M.put(x, y, z, P, SACK if M.hsh(x, y, z) > 0.3 else SACK_D)
+    for y in range(13, 28):                                                        # balde
+        for a in range(0, 360, 10):
+            r = 7 + (y - 13) * 0.15
+            M.put(24 + r * math.cos(math.radians(a)), y, r * math.sin(math.radians(a)), P, IRON_L if y in (14, 27) else IRON)
+    # maqueta de barro: peana, busto en bruto con cabeza de pulpo y tentáculos
+    box(M, -44, -24, TOP + 5, TOP + 8, -10, 10, lambda x, y, z: WOOD_D)
+    for y in range(TOP + 8, TOP + 40):
+        for x in range(-46, -22):
+            for z in range(-12, 12):
+                u = y - TOP - 8
+                if u < 14: rx, rz = 9 - u * 0.2, 7                                  # hombros
+                else: rx, rz = 7 - (u - 14) * 0.18, 7 - (u - 14) * 0.15             # cabeza
+                if ((x + 34) / max(rx, 1)) ** 2 + (z / max(rz, 1)) ** 2 <= 1:
+                    c = lerp(CLAY, CLAY_L, M.noise(x, y, z, 2.0))
+                    if M.hsh(x, y, z) < 0.04: c = CLAY_D                            # marcas de los dedos
+                    M.put(x, y, z, P, c)
+    for k in range(5):                                                             # tentáculos de la cara
+        for i in range(10):
+            M.put(-37 + k * 2 + int(math.sin(i * 0.6 + k) * 1.5), TOP + 26 - i, 7 + (i // 4), P, CLAY_D)
+    for i in range(6):                                                             # palillos y vaciadores
+        for k in range(22):
+            c = WOOD if k > 4 else (IRON_L if i % 2 else WOOD_D)
+            M.put(4 + i * 4, TOP + 5, -18 + k, P, c)
+            if k < 3 and i % 2: M.put(4 + i * 4 + 1, TOP + 5, -18 + k, P, IRON_L)
+    for k in range(18):                                                            # compás
+        M.put(30 + k // 2, TOP + 5, 8 + k, P, BRASS); M.put(30 + k, TOP + 5, 8 + k // 3, P, BRASS)
+    box(M, 38, 52, TOP + 5, TOP + 7, -22, -8, lambda x, y, z: (0.62, 0.60, 0.54) if M.hsh(x, y, z) > 0.3 else (0.52, 0.50, 0.46))   # trapo
+    for y in range(TOP + 5, TOP + 16):                                             # tarro con pinceles
+        for a in range(0, 360, 20):
+            M.put(48 + 4 * math.cos(math.radians(a)), y, 14 + 4 * math.sin(math.radians(a)), P, GLASS_L)
+    for k in range(4):
+        for y in range(TOP + 10, TOP + 26):
+            M.put(47 + k, y, 13 + (k % 2), P, WOOD if y < TOP + 23 else (0.15, 0.12, 0.10))
+    for x in range(10, 34):                                                        # cuaderno con boceto
+        for z in range(4, 20):
+            c = (0.84, 0.80, 0.70)
+            if x == 22: c = (0.40, 0.36, 0.30)
+            elif ((x - 16) ** 2 + (z - 12) ** 2 < 16 and (x - 16) ** 2 + (z - 12) ** 2 > 8) or (x > 25 and (z + x) % 5 == 0): c = (0.20, 0.18, 0.16)
+            M.put(x, TOP + 5, z, P, c)
+    NB = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a2, k[1] + b2, k[2] + c2) in M.V for a2, b2, c2 in NB)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 
@@ -608,25 +674,88 @@ def sacos():
 
 
 def lampara():
-    M = Model(S=2, seed=79)
-    box(M, -6, 6, 0, 2, -6, 6, BRASS)
-    for y in range(2, 52): M.put(0, y, 0, P, BRASS); M.put(-1, y, 0, P, BRASS)
-    for y in range(52, 62):                                     # pantalla
-        r = 4 + (62 - y) // 2
-        for x in range(-r, r):
-            for z in range(-r, r):
-                if r - 1.5 <= math.hypot(x, z) <= r: M.put(x, y, z, P, SHADE, glow=1)
-    for y in range(52, 56): M.put(0, y, 0, P, LIGHT, glow=1)
-    return M, {P: [0, 0, 0], 'light': [0, 52, 0]}
+    """Lámpara de pie (revisión de arte del 14-10-2026; la de antes queda en
+    models/prv_lampara_v1.json). A 64 voxels/m, 1,9 m: pie de trípode de latón con garras, fuste
+    con anillos y nudos, pantalla de tela plisada con flecos y ribete, la bombilla que brilla
+    dentro y el cable que baja al suelo."""
+    V = 4
+    M = Model(S=V, seed=79)
+    BRASS_D = (0.42, 0.30, 0.14); BRASS_L = (0.80, 0.66, 0.36)
+    for k in range(3):                                                             # trípode con garras
+        a = k * math.tau / 3
+        for i in range(20):
+            M.put(int(i * math.cos(a)), int(10 - i * 0.45), int(i * math.sin(a)), P, BRASS_D)
+            M.put(int(i * math.cos(a)), int(11 - i * 0.45), int(i * math.sin(a)), P, BRASS)
+        for d in range(3): M.put(int(20 * math.cos(a)) + d - 1, 0, int(20 * math.sin(a)), P, BRASS_D)
+    for y in range(6, 104):                                                        # fuste
+        r = 1.6 + (1.6 if y % 24 < 3 else 0) + (2.4 if 40 < y < 46 else 0)
+        for x in range(-5, 6):
+            for z in range(-5, 6):
+                d = math.hypot(x, z)
+                if d <= r: M.put(x, y, z, P, BRASS_L if x < 0 and d > r - 1 else (BRASS if d > r - 1 else BRASS_D))
+    for y in range(104, 124):                                                      # pantalla plisada
+        u = (y - 104) / 20
+        r = 20 - 10 * u
+        for a in range(0, 360, 3):
+            ra = math.radians(a)
+            pl = 0.8 * (a // 6 % 2)
+            for d in (r - 1, r - 0.3 + pl):
+                c = SHADE if a // 6 % 2 else lerp(SHADE, (0.70, 0.52, 0.30), 0.4)
+                if y in (104, 123): c = (0.50, 0.20, 0.14)                           # ribete
+                M.put(d * math.cos(ra), y, d * math.sin(ra), P, c, glow=1)
+    for a in range(0, 360, 8):                                                      # flecos
+        for k in range(1, 4 if (a // 8) % 2 else 2):
+            M.put(20.5 * math.cos(math.radians(a)), 104 - k, 20.5 * math.sin(math.radians(a)), P, (0.56, 0.24, 0.16))
+    for y in range(106, 113):                                                       # bombilla
+        for x in range(-3, 4):
+            for z in range(-3, 4):
+                if x * x + z * z + (y - 109) ** 2 <= 10: M.put(x, y, z, P, LIGHT, glow=1)
+    for i in range(60):                                                             # cable al suelo
+        M.put(-2 - int(i * 0.5), max(0, 30 - i), int(math.sin(i * 0.3) * 2), P, (0.12, 0.10, 0.09))
+    return M, {P: [0, 0, 0], 'light': [0, 106, 0]}
 
 
 def pilar():
-    M = Model(S=2, seed=80)
-    for y in range(0, 128):
-        r = 4 if 8 < y < 118 else 7
-        for x in range(-r, r):
-            for z in range(-r, r):
-                if abs(x + 0.5) + abs(z + 0.5) <= r * 1.3: M.put(x, y, z, P, IRON_L if (x + z + y // 3) % 7 == 0 else IRON)
+    """Pilar de fundición de la nave (revisión de arte del 14-10-2026; el de antes queda en
+    models/prv_pilar_v1.json). A 48 voxels/m, 4 m: basa moldurada sobre un dado de piedra, fuste
+    cilíndrico con acanaladuras y un collarino, capitel con hojas y volutas sencillas, ábaco y
+    zapata con los pernos, pintura verde oscura que se pela al hierro y óxido abajo."""
+    V = 3
+    M = Model(S=V, seed=80)
+    H = 190
+    GREEN = (0.20, 0.27, 0.22); GREEN_L = (0.30, 0.38, 0.32); GREEN_D = (0.12, 0.16, 0.13)
+    STONE_P = (0.52, 0.50, 0.46)
+    box(M, -14, 14, 0, 10, -14, 14, lambda x, y, z: lerp(STONE_P, (0.40, 0.38, 0.35), M.hsh(x // 4, y, z // 4)))   # dado
+    def prof(y):
+        if y < 14: return 11
+        if y < 18: return 9.5
+        if y < 22: return 10.5
+        if y < 26: return 8.5
+        if y < H - 34: return 6.5
+        if y < H - 30: return 8
+        if y < H - 10: return 7 + (y - (H - 30)) * 0.45                            # campana del capitel
+        return 13
+    for y in range(10, H):
+        r = prof(y)
+        for x in range(-14, 15):
+            for z in range(-14, 15):
+                d = math.hypot(x + 0.5, z + 0.5)
+                ang = math.atan2(z, x)
+                rr = r
+                if 26 <= y < H - 34 and (ang / math.tau * 16) % 1 < 0.3: rr -= 1     # acanaladuras
+                if H - 30 <= y < H - 10 and abs(math.sin(4 * ang)) > 0.7 and (y - (H - 30)) % 10 < 7: rr += 1.5   # hojas
+                if y >= H - 10 and (abs(x) > 12 or abs(z) > 12): continue
+                if y >= H - 10: rr = 99 if max(abs(x), abs(z)) <= 12 else 0           # ábaco cuadrado
+                if d > rr: continue
+                if d < rr - 2 and y < H - 2: continue
+                c = lerp(GREEN_D, GREEN_L, 0.4 + 0.5 * (0.5 + 0.5 * math.cos(ang - 2.4)))
+                if 26 <= y < H - 34 and (ang / math.tau * 16) % 1 < 0.3: c = lerp(c, GREEN_D, 0.4)
+                if M.noise(x, y, z, 4.0) > 0.74: c = lerp(IRON, (0.40, 0.24, 0.14), M.noise(x, y, z, 1.5))   # pelado y óxido
+                if y < 30 and M.noise(x, y, z, 3.0) > 0.55: c = lerp(c, (0.38, 0.22, 0.12), 0.5)
+                M.put(x, y, z, P, c)
+    for sx in (-10, 10):                                                           # pernos de la zapata
+        for sz in (-10, 10):
+            M.put(sx, H, sz, P, IRON_L); M.put(sx, 10, sz + (1 if sz > 0 else -1) * 3, P, IRON_L)
     return M, {P: [0, 0, 0]}
 
 

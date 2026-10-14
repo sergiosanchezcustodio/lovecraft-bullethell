@@ -36,28 +36,90 @@ def stone(M, x, y, z):
 # ---------------- columnas ----------------
 
 def columna(seed, H, lean):
-    """Fuste octogonal de 1,6 m de ancho, partido arriba en bisel, con bandas de relieves: peces
-    (rombos con cola) y olas (zigzag) en surco oscuro. Algo inclinada y hundida en el arrecife."""
-    M = Model(S=2, seed=seed)
-    R = 26
-    top = lambda x, z: H - int((x + z) * 0.35) - int(M.hsh(x // 4, 0, z // 4) * 4)   # rotura en bisel
-    for y in range(0, H + 20):
+    """Columna ciclópea del arrecife (revisión de arte del 14-10-2026; las de antes quedan en
+    models/arr_columna_{1,2}_v1.json). A 48 voxels/m, mismas medidas: fuste octogonal en tambores
+    de alturas distintas con su junta y su tono, cada cara con acanaladuras, una banda ancha de
+    relieve por tambor (peces de perfil con aleta, ojo y escamas, y una ola en espiral), la
+    rotura en bisel con lascas, percebes en racimos, cortinas de algas que cuelgan, manchas de
+    coral incrustado, la base hundida con cascotes y la línea de la marea más clara."""
+    V = 3
+    M = Model(S=V, seed=seed)
+    STONE_D, STONE_L, CARVE = (0.24, 0.30, 0.28), (0.44, 0.50, 0.46), (0.12, 0.16, 0.15)   # más clara: la noche del arrecife la apagaba
+    rng = M.rng
+    H = int(H * 1.5); R = 39
+    drums, y = [], 0
+    while y < H + 30:
+        h = rng.randint(30, 48)
+        drums.append((y, y + h, rng.uniform(-0.12, 0.12))); y += h
+    def drum_at(y):
+        for i, d in enumerate(drums):
+            if d[0] <= y < d[1]: return i, d
+        return len(drums) - 1, drums[-1]
+    def top(x, z):
+        return H - int((x + z) * 0.35) - int(M.hsh(x // 5, 0, z // 5) * 7)
+    def oct_d(x, z):
+        return max(abs(x + 0.5), abs(z + 0.5), (abs(x + 0.5) + abs(z + 0.5)) / 1.42)
+    for y in range(0, H + 30):
         off = int(y * lean)
-        for x in range(-R, R):
-            for z in range(-R, R):
-                if abs(x + 0.5) + abs(z + 0.5) > R * 1.42: continue    # octógono
+        di, (y0, y1, tone) = drum_at(y)
+        for x in range(-R - 2, R + 3):
+            for z in range(-R - 2, R + 3):
+                d = oct_d(x, z)
+                ang = math.atan2(z, x)
+                # acanaladuras: 6 por cara (48 en total), hundidas un voxel
+                flute = (ang / math.tau * 48) % 1 < 0.28
+                rr = R - (1 if flute and y1 - y > 3 and y - y0 > 3 else 0)
+                if y in (y0, y0 + 1) and y > 2: rr -= 1                         # junta del tambor
+                if d > rr: continue
                 if y > top(x, z): continue
-                edge = abs(x + 0.5) > R - 2.5 or abs(z + 0.5) > R - 2.5 or abs(x + 0.5) + abs(z + 0.5) > R * 1.42 - 2.5
-                if not edge and y < top(x, z) - 2: continue             # hueca
-                c = stone(M, x, y, z)
-                band = y % 36
-                if edge and 12 <= band <= 22:                           # banda de relieves
-                    u = (math.atan2(z, x) / math.tau * 48) % 12
-                    v = band - 12
-                    fish = abs(u - 6) + abs(v - 5) * 1.6 < 4 or (u < 2.5 and abs(v - 5) < u + 0.5)
-                    if fish: c = CARVE
-                if edge and band in (8, 26) and (int(math.atan2(z, x) * 20) + y) % 4 < 2: c = CARVE   # olas
+                if d < rr - 2.5 and y < top(x, z) - 2: continue
+                c = lerp(STONE_D, STONE_L, 0.35 + tone * 2 + 0.35 * M.noise(x, y, z, 6.0))
+                if flute: c = lerp(c, STONE_D, 0.35)
+                if y in (y0, y0 + 1): c = lerp(c, CARVE, 0.6)
+                band = y - y0
+                if d > rr - 1.5 and 10 <= band <= 26 and y1 - y0 > 32:          # banda de relieve
+                    u = (ang / math.tau * 32) % 8                              # 4 peces por vuelta... 32 unidades
+                    v = band - 18
+                    body = (u - 4) ** 2 / 9 + v * v / 16 < 1
+                    tail = 0.4 < u < 1.6 and abs(v) < (1.6 - u) * 4 + 1
+                    fin = 3 < u < 5 and 3.5 < v < 6
+                    if body or tail or fin:
+                        c = lerp(STONE_L, (0.36, 0.42, 0.38), 0.5)
+                        if body and abs(u - 5.6) < 0.35 and abs(v - 1) < 1.2: c = CARVE     # ojo
+                        elif body and int(u * 3 + v) % 3 == 0: c = lerp(c, STONE_D, 0.4)   # escamas
+                        M.put(x + off + (1 if abs(x) >= abs(z) and x > 0 else 0), y, z, P, c)
+                    elif abs(v) > 7: c = CARVE                                  # marco de la banda
+                    else: c = lerp(c, CARVE, 0.35)                               # fondo rehundido
+                if 60 < y < 72: c = lerp(c, (0.40, 0.44, 0.40), 0.25)               # marea
+                if y < 18 and M.noise(x, y + 40, z, 5.0) > 0.42: c = lerp(WEED, WEED_D, M.noise(x, y, z, 2.0))
+                if M.noise(x, y, z, 3.0) > 0.8: c = lerp(c, (0.30, 0.14, 0.18), 0.5)        # coral incrustado
                 M.put(x + off, y, z, P, c)
+    # percebes en racimos y algas que cuelgan
+    surf = [k for k in M.V if k[1] < H * 0.7]
+    for i in range(60):
+        x, y, z = rng.choice(surf)
+        for k in range(rng.randint(3, 8)):
+            q = (x + rng.randint(-2, 2), y + rng.randint(-2, 2), z + rng.randint(-2, 2))
+            if q in M.V: continue
+            if any((q[0] + a2, q[1], q[2] + c2) in M.V for a2, c2 in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                M.put(*q, P, BARN if M.hsh(*q) > 0.3 else (0.40, 0.40, 0.36))
+    for i in range(16):
+        x, y, z = rng.choice([k for k in M.V if 20 < k[1] < H * 0.8])
+        n = (1 if x > 0 else -1, 0) if abs(x) > abs(z) else (0, 1 if z > 0 else -1)
+        for k in range(rng.randint(8, 22)):
+            q = (x + n[0], y - k, z + n[1])
+            if q[1] < 0: break
+            M.put(*q, P, WEED if k % 3 else WEED_D)
+    # lascas de la rotura y cascotes hundidos
+    for i in range(10):
+        a2 = rng.uniform(0, math.tau); r = rng.uniform(R + 4, R + 22)
+        cx, cz = int(r * math.cos(a2)), int(r * math.sin(a2)); s = rng.randint(3, 8)
+        for x in range(cx - s, cx + s):
+            for z in range(cz - s, cz + s):
+                for y in range(0, rng.randint(2, s)):
+                    if abs(x - cx) + abs(z - cz) < s * 1.2: M.put(x, y, z, P, stone(M, x, y + 20, z))
+    NB = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a2, k[1] + b2, k[2] + c2) in M.V for a2, b2, c2 in NB)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 
