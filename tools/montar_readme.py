@@ -11,11 +11,20 @@ from PIL import Image
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 OUT = os.path.join(ROOT, 'docs', 'img')
 SHOTS = os.path.join(ROOT, 'shots')
+
+
+def shot(src):
+    """Ruta de una captura: en la raíz de shots/ o, si ya se ordenó (tools/ordenar_shots.py), en sus carpetas."""
+    p = os.path.join(SHOTS, src)
+    if os.path.exists(p): return p
+    for d, _, files in os.walk(SHOTS):
+        if os.path.basename(src) in files: return os.path.join(d, os.path.basename(src))
+    return p
 BG = (14, 16, 22)
 
 
 def shot(src, dst, w=960):
-    im = Image.open(os.path.join(SHOTS, src)).convert('RGB')
+    im = Image.open(shot(src)).convert('RGB')
     im = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
     im.save(os.path.join(OUT, dst), quality=86, optimize=True)
 
@@ -37,7 +46,7 @@ def lineup(srcs, dst, w=960, pad=24):
     a la misma altura, sobre el fondo de las láminas."""
     parts = []
     for src in srcs:
-        im = Image.open(os.path.join(SHOTS, src)).convert('RGB')
+        im = Image.open(shot(src)).convert('RGB')
         x0, y0, x1, y1 = _content_box(im)
         parts.append(im.crop((max(x0 - pad, 0), max(y0 - pad, 0), min(x1 + pad, im.width), min(y1 + pad, im.height))))
     h = max(p.height for p in parts)
