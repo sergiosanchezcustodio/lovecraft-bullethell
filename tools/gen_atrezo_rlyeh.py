@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from voxlib import Model, lerp
 
 P = 'body'
-ST = (0.21, 0.27, 0.24); ST_D = (0.11, 0.15, 0.13); ST_L = (0.33, 0.40, 0.35)
+ST = (0.29, 0.36, 0.32); ST_D = (0.16, 0.21, 0.18); ST_L = (0.44, 0.52, 0.46)   # más clara (revisión de arte del 14-10-2026): de noche era una mancha negra; las de antes, rly_*_v1
 SLIME = (0.22, 0.36, 0.20); SLIME_D = (0.12, 0.22, 0.12); CARVE = (0.04, 0.06, 0.05)
 JOINT = (0.05, 0.07, 0.06); VOID = (0.01, 0.02, 0.02); GLOW = (0.35, 1.0, 0.5); GLOW_D = (0.22, 0.70, 0.36)
 BARN = (0.56, 0.58, 0.52); WEED = (0.16, 0.28, 0.14)

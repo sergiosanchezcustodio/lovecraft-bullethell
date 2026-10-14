@@ -14,7 +14,7 @@ Escribe models/alr_<pieza>.json. Uso: python tools/gen_atrezo_alert.py [piezas..
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model, lerp
+from voxlib import Model, lerp, refine
 
 P = 'body'
 HULL = (0.08, 0.09, 0.10); HULL_L = (0.16, 0.17, 0.18); RED = (0.42, 0.12, 0.10); RAIL = (0.40, 0.32, 0.22)
@@ -1364,7 +1364,16 @@ def puente():
     return M, {P: [0, 0, 0]}
 
 
-PIECES = {'borda': borda, 'puente': puente, 'caseta': caseta, 'casco': casco, 'bolardo': bolardo, 'grua': grua, 'fardos': fardos, 'rollo': rollo,
+def _fine(fn, seed):
+    """Al doble de resolución con textura fina (revisión de arte del 14-10-2026): veta en la madera,
+    trama en la lona, arañazos en el hierro. Las de antes quedan como alr_<pieza>_v1.json."""
+    def go():
+        M, piv = fn()
+        return refine(M, 2, seed=seed), {k: [c * 2 for c in v] for k, v in piv.items()}
+    return go
+
+
+PIECES = {'borda': borda, 'puente': _fine(puente, 109), 'caseta': caseta, 'casco': casco, 'bolardo': bolardo, 'grua': grua, 'fardos': _fine(fardos, 104), 'rollo': rollo,
           'linterna': linterna, 'bote': bote, 'barca': barca, 'barca_2': lambda: barca(2), 'barca_3': lambda: barca(3)}
 
 if __name__ == '__main__':
