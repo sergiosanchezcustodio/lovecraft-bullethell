@@ -1317,17 +1317,79 @@ def carretilla():
     return M, {P: [0, 0, 0]}
 
 
-def cajas():
-    M = Model(S=2, seed=76)
-    for x0, z0, y0 in ((-14, -10, 0), (12, -8, 0), (-2, 12, 0), (-4, -6, 14)):
-        for x in range(x0 - 12, x0 + 12):
-            for z in range(z0 - 9, z0 + 9):
-                for y in range(y0, y0 + 14):
-                    if min(x - x0 + 12, x0 + 11 - x, z - z0 + 9, z0 + 8 - z) > 0 and y < y0 + 13: continue
-                    c = PLANK if (y // 3) % 2 else PLANK_D
-                    if y == y0 + 13 and (x + z) % 5 == 0: c = (0.60, 0.64, 0.66)
-                    M.put(x, y, z, P, c)
+def cajas(variant=1):
+    """Cajas del puerto de Innsmouth (rehechas a 64/m y en tres variantes en la revisión de arte
+    del 13-10-2026), con las cajas de tablas de gen_atrezo_alert (cada tabla de su marrón, veta,
+    nudos, clavos, listones, tornapuntas y cantoneras):
+      1  cajas de pescado abiertas, apiladas, con el pescado plateado sobre hielo y una tapa caída
+      2  dos cajas grandes y una pequeña encima, atadas con cabo, con un saco de sal al lado
+      3  una caja reventada (tablas sueltas y la carga desparramada) junto a dos enteras y un barrilete"""
+    from gen_atrezo_alert import _crate
+    M = Model(S=4, seed=76 + variant)
+    rng = M.rng
+    SILV = (0.66, 0.70, 0.72); BLUE_B = (0.30, 0.38, 0.46); ICE = (0.80, 0.86, 0.90)
+    def _h(a, b): return ((a * 73856093) ^ (b * 19349663)) % 1000 / 1000.0
+    def fish_box(x0, y0, z0, w, h, d, seed):
+        _crate(M, x0, x0 + w, y0, y0 + h, z0, z0 + d, seed, brace='h', stencil=False)
+        for x in range(x0 + 2, x0 + w - 2):                          # abierta: fuera la tapa, dentro hielo y peces
+            for z in range(z0 + 2, z0 + d - 2):
+                M.V.pop((x, y0 + h - 1, z), None)
+                M.put(x, y0 + h - 4, z, P, ICE if _h(x, z) > 0.3 else (0.66, 0.74, 0.80))
+        for _ in range(w * d // 60):
+            cx, cz = rng.randint(x0 + 6, x0 + w - 7), rng.randint(z0 + 5, z0 + d - 6)
+            a = rng.uniform(0, math.pi); ca, sa = math.cos(a), math.sin(a)
+            for t_ in range(-6, 7):
+                for k in range(-2, 3):
+                    if abs(k) > 2 * math.sqrt(max(0, 1 - (t_ / 7) ** 2)): continue
+                    M.put(int(cx + t_ * ca - k * sa), y0 + h - 3, int(cz + t_ * sa + k * ca), P, SILV if k > -1 else BLUE_B)
+    if variant == 1:
+        fish_box(-40, 0, -24, 40, 22, 30, 1)
+        fish_box(4, 0, -20, 38, 22, 30, 2)
+        fish_box(-22, 22, -22, 40, 22, 30, 3)
+        for x in range(10, 44):                                       # tapa caída
+            for z in range(18, 44): M.put(x, 0 + (1 if x > 26 else 0), z, P, (0.40, 0.30, 0.20) if (z - 18) % 6 else (0.24, 0.16, 0.10))
+    elif variant == 2:
+        _crate(M, -44, 0, 0, 40, -26, 20, 4, brace='x')
+        _crate(M, 2, 44, 0, 36, -24, 18, 5, brace='z', stencil=False)
+        _crate(M, -16, 14, 40, 60, -14, 10, 6, brace='h')
+        for x in range(-46, 46):                                      # cabo que las ata
+            for zz in (-4, 6):
+                y = 61 if -16 <= x < 14 else (41 if x < 0 else 37)
+                M.put(x, y, zz, P, ROPE_C if x % 3 else (0.40, 0.34, 0.22))
+        for y in range(0, 26):                                        # saco de sal
+            for x in range(46, 66):
+                for z in range(-10, 10):
+                    if ((x - 56) / 10) ** 2 + ((y - 11) / 13) ** 2 + (z / 9) ** 2 < 1:
+                        M.put(x, y, z, P, (0.80, 0.78, 0.72) if (x + y + z) % 2 else (0.70, 0.68, 0.62))
+    else:
+        _crate(M, -46, -10, 0, 30, -24, 8, 7, brace='x')
+        _crate(M, -40, -12, 30, 52, -20, 4, 8, brace='h', stencil=False)
+        for k in range(9):                                            # caja reventada: tablas sueltas
+            a = rng.uniform(0, math.pi); L = rng.randint(18, 34)
+            cx, cz = rng.randint(4, 40), rng.randint(-20, 30)
+            for t_ in range(L):
+                for w in range(4):
+                    M.put(int(cx + t_ * math.cos(a) - w * math.sin(a)), (k % 3) * 2, int(cz + t_ * math.sin(a) + w * math.cos(a)), P,
+                          (0.42, 0.32, 0.22) if t_ % 9 else (0.24, 0.16, 0.10))
+        for _ in range(40):                                           # carga desparramada (latas y pescado seco)
+            x, z = rng.randint(0, 50), rng.randint(-24, 34)
+            c = (0.56, 0.56, 0.58) if rng.random() < 0.5 else (0.62, 0.54, 0.38)
+            for dx in range(3):
+                for dz in range(3): M.put(x + dx, 1 + (1 if dx == 1 and dz == 1 else 0), z + dz, P, c)
+        for y in range(0, 30):                                        # barrilete
+            r = 9 + (2 if 8 < y < 22 else 0)
+            for x in range(-r, r + 1):
+                for z in range(-r, r + 1):
+                    d = x * x + z * z
+                    if d > r * r or (d < (r - 2) ** 2 and 0 < y < 29): continue
+                    c = IRON if y in (4, 5, 24, 25) else ((0.42, 0.30, 0.18) if (math.atan2(z, x) * 5) % 2 < 1 else (0.32, 0.22, 0.12))
+                    M.put(52 + x, y, -20 + z, P, c)
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
+
+
+ROPE_C = (0.56, 0.49, 0.34)
 
 
 def nasa():
@@ -1575,7 +1637,7 @@ def coche():
 PIECES = {'casa': casa, 'casa_2': lambda: casa(2), 'autobus': autobus, 'poste': poste, 'valla': valla, 'barril': barril,
           'redes': redes, 'barca': barca, 'farola': farola, 'juncos': juncos,
           'fachada': fachada, 'templo': templo, 'escombros_mano': escombros, 'fuente': fuente,
-          'carretilla': carretilla, 'cajas': cajas, 'nasa': nasa, 'pilote': pilote, 'coche': coche}
+          'carretilla': carretilla, 'cajas': cajas, 'cajas_2': lambda: cajas(2), 'cajas_3': lambda: cajas(3), 'nasa': nasa, 'pilote': pilote, 'coche': coche}
 
 if __name__ == '__main__':
     only = set(sys.argv[1:])

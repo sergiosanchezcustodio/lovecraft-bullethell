@@ -115,7 +115,8 @@ class Arena:
 
 
 # Piezas con variantes: al escribir la arena, cada una se cambia por una de su lista según su posición
-VARIANTS = {"atrezo_bloques_hielo": ["atrezo_bloques_hielo", "atrezo_bloques_hielo_2", "atrezo_bloques_hielo_3"]}
+VARIANTS = {"atrezo_bloques_hielo": ["atrezo_bloques_hielo", "atrezo_bloques_hielo_2", "atrezo_bloques_hielo_3"],
+            "inn_cajas": ["inn_cajas", "inn_cajas_2", "inn_cajas_3"]}
 
 # Colisiones comunes del atrezo (las arenas añaden las suyas)
 COLLIDERS = {

@@ -201,6 +201,14 @@
    "type": "box",
    "shrink": 0.9
   },
+  "inn_cajas_2": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "inn_cajas_3": {
+   "type": "box",
+   "shrink": 0.85
+  },
   "inn_nasa": {
    "type": "box",
    "shrink": 0.9
@@ -469,7 +477,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_cajas",
+   "model": "inn_cajas_3",
    "pos": [
     21.0,
     -3.0
@@ -478,7 +486,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_cajas",
+   "model": "inn_cajas_3",
    "pos": [
     5.0,
     21.0
@@ -487,7 +495,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_cajas",
+   "model": "inn_cajas_3",
    "pos": [
     -20.0,
     20.0

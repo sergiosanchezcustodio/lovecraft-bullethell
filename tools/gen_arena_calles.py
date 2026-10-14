@@ -53,6 +53,8 @@ COLL.update({
     "inn_coche": {"type": "box", "shrink": 0.9},
     "inn_carretilla": {"type": "box", "shrink": 0.85},
     "inn_cajas": {"type": "box", "shrink": 0.9},
+    "inn_cajas_2": {"type": "box", "shrink": 0.9},
+    "inn_cajas_3": {"type": "box", "shrink": 0.85},
     "inn_nasa": {"type": "box", "shrink": 0.9},
     "inn_pilote": {"type": "cylinder", "radius": 0.18},
     "inn_escombros": {"type": "cylinder", "radius": 0.7},

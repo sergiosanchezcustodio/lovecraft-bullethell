@@ -218,6 +218,14 @@
    "type": "box",
    "shrink": 0.9
   },
+  "inn_cajas_2": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "inn_cajas_3": {
+   "type": "box",
+   "shrink": 0.85
+  },
   "inn_pilote": {
    "type": "cylinder",
    "radius": 0.2
@@ -655,7 +663,7 @@
    "scale": 1.08
   },
   {
-   "model": "inn_cajas",
+   "model": "inn_cajas_2",
    "pos": [
     21.7,
     -4.44
@@ -673,7 +681,7 @@
    "scale": 1.04
   },
   {
-   "model": "inn_cajas",
+   "model": "inn_cajas_3",
    "pos": [
     12.62,
     -22.54
@@ -682,7 +690,7 @@
    "scale": 1.05
   },
   {
-   "model": "inn_cajas",
+   "model": "inn_cajas_2",
    "pos": [
     -23.11,
     -11.07
@@ -700,7 +708,7 @@
    "scale": 1.1
   },
   {
-   "model": "inn_cajas",
+   "model": "inn_cajas_2",
    "pos": [
     -11.05,
     28.0
@@ -709,7 +717,7 @@
    "scale": 1.16
   },
   {
-   "model": "inn_cajas",
+   "model": "inn_cajas_2",
    "pos": [
     -18.56,
     23.48
@@ -718,7 +726,7 @@
    "scale": 1.17
   },
   {
-   "model": "inn_cajas",
+   "model": "inn_cajas_3",
    "pos": [
     5.17,
     -16.16

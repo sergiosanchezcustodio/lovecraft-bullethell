@@ -91,7 +91,7 @@ def caja_rota():
 
 # ---------------- mesa de disección ----------------
 
-def mesa_diseccion():
+def _mesa48():
     """Mesa de caballetes con una lona encima, vacía: manchas verdinegras, bandeja de
     instrumentos y un cubo volcado. Lo que había encima ya no está."""
     M = Model(S=3, seed=41)
@@ -123,6 +123,53 @@ def mesa_diseccion():
     for x in range(-70, -50):                                         # derrame junto al cubo
         for z in range(-24, -2):
             if M.noise(x, 0, z, 6.0) > 0.5: M.put(x, 0, z, P, ICHOR)
+    return M
+
+
+def mesa_diseccion():
+    """Mesa de disección a 96/m (revisión de arte del 13-10-2026): la de _mesa48 al doble de
+    resolución con textura fina, y además correas de cuero con hebilla cruzando la lona, frascos
+    de cristal con especímenes en un líquido verdoso que brilla apenas, un cuaderno de notas
+    abierto, una sierra de hueso y una lámpara de queroseno apagada."""
+    M = refine(_mesa48(), 2, seed=41)
+    H = 78                                                            # tablero (a 96/m)
+    LEATHER = (0.30, 0.18, 0.10); BUCKLE = (0.62, 0.56, 0.40)
+    for xs in (-40, 30):                                              # correas con hebilla
+        for z in range(-46, 47):
+            for x in (xs, xs + 1, xs + 2, xs + 3): M.put(x, H + 1, z, P, LEATHER)
+        for y in range(H - 20, H + 1):
+            for x in (xs, xs + 1, xs + 2, xs + 3): M.put(x, y, 47, P, LEATHER); M.put(x, y, -47, P, LEATHER)
+        for x in range(xs - 1, xs + 5): M.put(x, H + 2, 10, P, BUCKLE)
+    GL = (0.62, 0.74, 0.70); LIQ = (0.30, 0.50, 0.26)
+    for k, (jx, jz) in enumerate(((-70, -30), (-60, -32), (-78, -18))):   # frascos con especímenes
+        h = 18 + 6 * k
+        for y in range(H + 1, H + 1 + h):
+            for x in range(jx - 5, jx + 6):
+                for z in range(jz - 5, jz + 6):
+                    d = (x - jx) ** 2 + (z - jz) ** 2
+                    if d > 25: continue
+                    if d > 16 or y == H + h: M.put(x, y, z, P, GL); continue
+                    if y < H + h - 4:
+                        spec = d < 6 and (H + 4 < y < H + h - 6)
+                        M.put(x, y, z, P, (0.14, 0.20, 0.12) if spec else LIQ, glow=0 if spec else 1)
+        for x in range(jx - 5, jx + 6):
+            for z in range(jz - 5, jz + 6):
+                if (x - jx) ** 2 + (z - jz) ** 2 <= 25: M.put(x, H + h + 1, z, P, (0.30, 0.26, 0.20))
+    for x in range(-20, 4):                                           # cuaderno abierto
+        for z in range(18, 34):
+            c = (0.80, 0.76, 0.64) if x != -8 else (0.40, 0.30, 0.20)
+            if x != -8 and (z - 20) % 3 == 0 and abs(x + 8) > 2: c = (0.36, 0.34, 0.30)
+            M.put(x, H + 1 + (1 if abs(x + 8) > 6 else 0), z, P, c)
+    for k in range(30):                                               # sierra de hueso
+        M.put(48 + k, H + 1, 20, P, (0.70, 0.72, 0.74)); M.put(48 + k, H + 1, 21, P, (0.70, 0.72, 0.74) if k % 2 else (0.40, 0.42, 0.44))
+    for k in range(10): M.put(38 + k, H + 1, 20, P, (0.36, 0.22, 0.12)); M.put(38 + k, H + 2, 20, P, (0.36, 0.22, 0.12))
+    for y in range(H + 1, H + 26):                                    # lámpara de queroseno
+        r = 6 if y < H + 8 else (5 if y < H + 20 else 3)
+        for x in range(70 - r, 71 + r):
+            for z in range(-34 - r, -33 + r):
+                if (x - 70) ** 2 + (z + 34) ** 2 > r * r: continue
+                if H + 8 <= y < H + 20 and (x - 70) ** 2 + (z + 34) ** 2 < (r - 1) ** 2: continue
+                M.put(x, y, z, P, (0.56, 0.62, 0.62) if H + 8 <= y < H + 20 else (0.50, 0.40, 0.20))
     return M
 
 

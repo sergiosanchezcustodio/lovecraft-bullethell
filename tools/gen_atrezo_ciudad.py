@@ -239,10 +239,10 @@ def muro_ciclopeo(seed):
     return half(M)
 
 
-def _fine(M, seed):
+def _fine(M, seed, k=2):
     """A 64/m con textura fina (revisión de arte del 13-10-2026): moteado y picaduras en la
     piedra, y además liquen a manchas y desconchones pequeños en las aristas de arriba."""
-    N = refine(M, 2, seed=seed)
+    N = refine(M, k, seed=seed)
     LICHEN = (0.56, 0.58, 0.44)
     for (x, y, z), v in N.V.items():
         if v[1] == FROST or v[2]: continue
@@ -256,8 +256,10 @@ def _hh(x, y, z):
     return ((h ^ (h >> 13)) * 1274126177 & 0xFFFF) / 65536.0
 
 
-PIECES = {'muro_roto': lambda: _fine(muro_roto(), 61), 'arco': arco, 'bloque_ciclopeo': lambda: _fine(bloque(), 63),
-          'bloque_ciclopeo_2': lambda: _fine(bloque(2), 64), 'bloque_ciclopeo_3': lambda: _fine(bloque(3), 65),
+# Los bloques (se repiten 86 veces) y el muro roto (14) llevan la textura fina a 32/m: al doble de
+# resolución la ciudad bajaba de ~118 a ~88 FPS. El mural (3) sí va a 64/m.
+PIECES = {'muro_roto': lambda: _fine(muro_roto(), 61, 1), 'arco': arco, 'bloque_ciclopeo': lambda: _fine(bloque(), 63, 1),
+          'bloque_ciclopeo_2': lambda: _fine(bloque(2), 64, 1), 'bloque_ciclopeo_3': lambda: _fine(bloque(3), 65, 1),
           'mural': lambda: _fine(mural(), 66)}
 
 if __name__ == '__main__':

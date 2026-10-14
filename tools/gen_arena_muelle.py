@@ -45,6 +45,8 @@ COLL.update({
     "inn_fachada": {"type": "box", "shrink": 0.95},
     "inn_barril": {"type": "cylinder", "radius": 0.35},
     "inn_cajas": {"type": "box", "shrink": 0.9},
+    "inn_cajas_2": {"type": "box", "shrink": 0.9},
+    "inn_cajas_3": {"type": "box", "shrink": 0.85},
     "inn_pilote": {"type": "cylinder", "radius": 0.2},
 })
 
