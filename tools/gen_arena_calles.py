@@ -2,8 +2,8 @@
 Receta del generador de escenarios (tools/arena_kit.py).
 
 64 x 64 m de adoquín mojado (suelo `cobble`) con la plaza de la fuente en el centro. Al norte,
-la fachada del antiguo templo masónico de la Orden de Dagon entre casas georgianas de ladrillo
-en ruinas; al oeste, más casas en ruinas. Al sur y al este, el muelle de tablas (`dock`) con
+el antiguo templo masónico de la Orden de Dagon (pórtico jónico) entre casas, tiendas y tabernas,
+con alguna luz encendida y humo en las chimeneas; al oeste, más casas; en la plaza, bancos y olmos. Al sur y al este, el muelle de tablas (`dock`) con
 pilotes y el agua verde oscura del puerto, sin hielo. Por las calles, coches abandonados,
 carretillas y cajas de pescado, nasas, escombros y farolas de gas. Anochecer frío con lluvia.
 Uso: python tools/gen_arena_calles.py
@@ -12,17 +12,28 @@ from arena_kit import Arena, COLLIDERS
 
 HALF = 32.0
 A = Arena("calles", seed=1928, half=HALF,
-          foot={"inn_templo": 7.5, "inn_fachada": 4.2, "inn_fuente": 1.4, "inn_coche": 2.2, "inn_casa": 4.5})
+          foot={"inn_templo": 8.0, "inn_fachada": 4.2, "prt_casa": 4.0, "prt_casa_3": 4.0, "prt_casa_4": 4.0, "prt_tienda": 4.0,
+               "prt_tienda_inn": 4.0, "prt_taberna": 4.6, "prt_taberna_inn": 4.6, "prt_almacen": 4.0, "prt_banco": 1.2, "prt_arbol": 2.2, "prt_arbol_2": 2.2, "inn_fuente": 1.4, "inn_coche": 2.2, "inn_casa": 4.5})
 
-A.add("inn_templo", 0.0, -HALF - 2.2, rot=0)                       # el templo, al fondo de la plaza
-for x in (-24.0, -15.0, 15.0, 24.0, 33.0):
-    A.add("inn_fachada", x, -HALF - 3.0 + A.rng.uniform(-0.4, 0.4), rot=0)
-for z in range(-24, 40, 9):
-    A.add("inn_fachada", -HALF - 3.0 + A.rng.uniform(-0.4, 0.4), float(z), rot=90)
+A.add("inn_templo", 0.0, -HALF - 3.6, rot=0)                       # el templo (gen_templo_orden.py), al fondo
+# casas, tiendas y tabernas variadas (revisión de arte del 14-10-2026; gen_atrezo_puerto.py): algunas
+# luces encendidas y chimeneas que humean; quedan dos casas georgianas en ruinas
+for x, m in zip((-24.0, -15.0, 15.0, 24.0, 33.0), ("prt_tienda_inn", "inn_fachada", "prt_casa_3", "prt_taberna_inn", "prt_casa_4")):
+    A.add(m, x, -HALF - 3.0 + A.rng.uniform(-0.4, 0.4), rot=0)
+for z, m in zip(range(-24, 40, 9), ("prt_casa_4", "prt_taberna", "prt_casa_3", "prt_tienda", "inn_fachada",
+                                    "prt_casa", "prt_tienda_inn", "prt_almacen")):
+    A.add(m, -HALF - 3.0 + A.rng.uniform(-0.4, 0.4), float(z), rot=90)
 
 A.add("inn_fuente", 0.0, 0.0, rot=0, scale=1.0)                     # la plaza
 for x, z in ((-7.0, -7.0), (7.0, -7.0), (-7.0, 7.0), (7.0, 7.0)):
     A.add("inn_farola", x, z, rot=0, scale=1.2)
+# la plaza: bancos mirando a la fuente y olmos en las esquinas
+for x, z, r in ((0.0, -4.8, 0), (-4.8, 0.0, 90), (4.8, 0.0, -90), (0.0, 4.8, 180)):
+    A.add("prt_banco", x, z, rot=r)
+for x, z, m in ((-11.0, -10.5, "prt_arbol"), (10.5, -10.0, "prt_arbol_2"), (-10.5, 10.5, "prt_arbol_2"), (11.0, 10.0, "prt_arbol")):
+    A.add(m, x, z, rot=A.rng.uniform(0, 360))
+for x, z, r in ((-8.6, -12.6, 0), (12.8, -7.6, -90), (-12.8, 7.6, 90)):
+    A.add("prt_banco", x, z, rot=r)
 for x, z, r in ((-14.0, 6.0, 30), (12.0, -14.0, -60), (18.0, 12.0, 110)):
     A.add("inn_coche", x, z, rot=r)
 for x, z, r in ((-6.0, 15.0, 10), (14.0, 3.0, 80), (-17.0, -12.0, -20)):
@@ -49,6 +60,12 @@ COLL = dict(COLLIDERS)
 COLL.update({
     "inn_templo": {"type": "box", "shrink": 0.95},
     "inn_fachada": {"type": "box", "shrink": 0.95},
+    "prt_casa": {"type": "box", "shrink": 0.95}, "prt_casa_3": {"type": "box", "shrink": 0.95},
+    "prt_casa_4": {"type": "box", "shrink": 0.95}, "prt_tienda": {"type": "box", "shrink": 0.9},
+    "prt_tienda_inn": {"type": "box", "shrink": 0.9}, "prt_taberna": {"type": "box", "shrink": 0.9},
+    "prt_taberna_inn": {"type": "box", "shrink": 0.9}, "prt_almacen": {"type": "box", "shrink": 0.95},
+    "prt_banco": {"type": "box", "shrink": 0.9}, "prt_arbol": {"type": "cylinder", "radius": 0.3},
+    "prt_arbol_2": {"type": "cylinder", "radius": 0.3},
     "inn_fuente": {"type": "cylinder", "radius": 2.3},
     "inn_coche": {"type": "box", "shrink": 0.9},
     "inn_carretilla": {"type": "box", "shrink": 0.85},

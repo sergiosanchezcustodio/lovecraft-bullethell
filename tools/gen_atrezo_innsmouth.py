@@ -1130,8 +1130,8 @@ def fuente():
     """Fuente de la plaza (rehecha a 64/m en la revisión de arte del 13-10-2026): pilón octogonal
     de sillares con moldura en el borde y paneles con peces en relieve, verdín y grietas, una
     pieza del borde caída; dentro, agua sucia estancada (verde parduzca, con nata, hojas, un
-    reflejo y basura flotando); en el centro, un pedestal con dos tazas escalonadas y el pez de
-    bronce que salta, comido por el cardenillo; y un charco que se sale por la grieta."""
+    reflejo y basura flotando); en el centro, un pedestal con dos tazas escalonadas y un cachalote de
+    bronce que sale del agua, comido por el cardenillo; y un charco que se sale por la grieta."""
     M = Model(S=4, seed=74)
     rng = M.rng
     R, H = 76, 28
@@ -1196,24 +1196,83 @@ def fuente():
                 c = stone_c(x, y, z)
                 if 22 <= y < 26: c = lerp(STONE_L, GREEN, 0.4 * M.noise(x, y, z, 3.0))
                 M.put(x, y, z, P, c)
-    for x in range(-12, 13):                                                         # pez de bronce que salta
-        h = int(8 * math.sqrt(max(0.0, 1 - (x / 24) ** 2)))
-        for xx in (x * 2, x * 2 + 1):
-            for y in range(-h, h + 1):
-                for z in range(-4, 4):
-                    if abs(z) > 3 * math.sqrt(max(0, 1 - (y / max(h, 1)) ** 2)): continue
-                    c = BRONZE if M.noise(xx, y, z, 3.0) < 0.55 else VERDI
-                    if (xx + y) % 5 == 0: c = BRONZE_D                                   # escamas
-                    M.put(xx, 74 + y + xx // 3, z, P, c)
-    for y in range(-12, 13):                                                         # cola
-        for z in range(-2, 2):
-            M.put(-26 - abs(y) // 2, 64 + y, z, P, VERDI if abs(y) > 8 else BRONZE)
-    for k in range(4):                                                               # aletas y ojo
-        M.put(4 + k, 86 + k, 0, P, BRONZE_D); M.put(-6 + k, 66 - k, 0, P, BRONZE_D)
-    for z in (-3, 3): M.put(20, 82, z, P, (0.06, 0.06, 0.06))
-    for y in range(44, 66):                                                          # apoyo del pez
-        for x in range(-2, 2):
-            for z in range(-2, 2): M.put(x, y, z, P, BRONZE_D)
+    # cachalote de bronce que sale del agua (revisión de arte del 14-10-2026): cabeza enorme y
+    # roma de caja, mandíbula estrecha por debajo con los dientes, ojo pequeño, espiráculo a la
+    # izquierda, piel arrugada, joroba y nudillos en el lomo, aletas pequeñas y la cola abierta;
+    # sale de una ola de bronce sobre la taza. 1,9 m de largo, cardenillo en lo expuesto.
+    WL, AL = 122, math.radians(38)
+    TX, TY = -46, 50                                                                # arranque de la cola
+    ca, sa = math.cos(AL), math.sin(AL)
+    def prof(t):                                                                     # media altura, media anchura, exponente
+        if t < 0.10: return 3.0, 3.0, 2.0
+        if t < 0.36: k = (t - 0.10) / 0.26; return 3 + 12 * k ** 1.3, 3 + 10 * k ** 1.2, 2.0
+        if t < 0.62: k = (t - 0.36) / 0.26; return 15 + 2 * k, 13 + 1 * k, 2.0 + 0.8 * k
+        if t < 0.95: return 17.5, 14.0, 3.6
+        k = (t - 0.95) / 0.05; return 17.5 * (1 - 0.55 * k * k), 14.0 * (1 - 0.45 * k * k), 3.6
+    def bend(t): return 7 * math.sin(math.pi * (t - 0.05))                           # lomo arqueado
+    def wcol(x, y, z, top):
+        c = lerp(BRONZE, BRONZE_D, 0.4 * M.noise(x, y, z, 4.0))
+        if top or M.noise(x, y, z, 6.0) > 0.58: c = lerp(c, VERDI, 0.35 + 0.5 * M.noise(x, y, z, 3.0))
+        return c
+    for x in range(-90, 80):
+        for y in range(36, 150):
+            dx, dy = x - TX, y - TY
+            u = dx * ca + dy * sa
+            if u < -4 or u > WL + 1: continue
+            t = u / WL
+            v = -dx * sa + dy * ca - bend(t)
+            for z in range(-34, 35):
+                if t < 0.12:                                                         # aleta caudal horizontal
+                    sp = 30 * (0.12 - t) / 0.12 + 4
+                    if abs(v) > 2.2 - 1.2 * abs(z) / 34 or abs(z) > sp: continue
+                    if abs(z) < 4 and t < 0.03: continue                              # escotadura
+                    if t < 0.12 - 0.1 * (abs(z) / 34) ** 0.7 - 0.02: pass
+                    elif abs(z) > 8 and t < 0.12 - 0.09 * (abs(z) / 34): continue
+                    M.put(x, y, z, P, wcol(x, y, z, v > 0)); continue
+                hh, hw, p = prof(t)
+                if t > 0.62 and v < 0: hh *= 0.86                                       # la cabeza baja menos
+                if (abs(v) / hh) ** p + (abs(z) / hw) ** p > 1: continue
+                c = wcol(x, y, z, v > hh * 0.3)
+                if 0.12 < t < 0.62 and int(u) % 5 == 0 and v < hh * 0.6: c = lerp(c, BRONZE_D, 0.55)   # arrugas
+                if t > 0.62 and abs(v + hh * 0.86) < 1.5 and t < 0.95: c = (0.10, 0.12, 0.10)          # comisura
+                M.put(x, y, z, P, c)
+    def at(t, v, z):                                                                 # punto local -> mundo
+        u = t * WL; vv = v + bend(t)
+        return int(round(TX + u * ca - vv * sa)), int(round(TY + u * sa + vv * ca)), int(round(z))
+    for i in range(int(0.66 * WL), int(0.95 * WL)):                                   # mandíbula estrecha con dientes
+        t = i / WL
+        for w in range(-4, 5):
+            for d in range(0, 4):
+                q = at(t, -15.5 - d, w)
+                M.put(*q, P, BRONZE_D if d < 3 else BRONZE)
+        if i % 3 == 0:
+            for s in (-3, 3): M.put(*at(t, -14.5, s), P, (0.80, 0.76, 0.62))
+    for s in (-1, 1):                                                                # ojos pequeños
+        for a in range(2):
+            for b in range(2): M.put(*at(0.69 + a / WL, -9 + b, s * 13.6), P, (0.05, 0.05, 0.05))
+        for k in range(12):                                                          # aletas pectorales
+            for w in range(6 - k // 2):
+                M.put(*at(0.60 - k * 0.004 - w * 0.006, -11 - w * 0.4, s * (12 + k)), P, wcol(k, w, s, True))
+    for k in range(4):                                                               # espiráculo
+        M.put(*at(0.97 - k * 0.004, 8.5, -6), P, (0.06, 0.07, 0.06))
+    for i in range(int(0.30 * WL), int(0.50 * WL), 4):                                # joroba y nudillos del lomo
+        h = 2 if i < int(0.38 * WL) else 1
+        for d in range(h + 1):
+            for w in (-1, 0, 1): M.put(*at(i / WL, prof(i / WL)[0] + d, w), P, VERDI)
+    for y in range(44, 82):                                                          # ola de bronce que la sostiene
+        k = (y - 44) / 38
+        r = 9 - 3 * k
+        cx = -4 + 10 * k * k
+        for x in range(-24, 24):
+            for z in range(-14, 15):
+                d = math.hypot(x - cx, z)
+                if d > r + 2 * math.sin(y * 0.5 + math.atan2(z, x - cx) * 3): continue
+                c = lerp(VERDI, BRONZE, 0.5 + 0.5 * math.sin(y * 0.6 + z * 0.4))
+                M.put(x, y, z, P, c)
+    for a in range(0, 360, 20):                                                      # espuma que rompe en la taza
+        for rr in range(8, 16):
+            x = int(rr * math.cos(math.radians(a + rr * 7))); z = int(rr * math.sin(math.radians(a + rr * 7)))
+            M.put(x - 4, 46 + (rr % 3 == 0), z, P, lerp(VERDI, (0.52, 0.66, 0.58), 0.5))
     for (x, y, z) in [k for k in M.V if k[1] == H + 3]: pass
     for k in range(18):                                                              # trozo del borde caído
         a = math.radians(41)
@@ -1636,7 +1695,7 @@ def coche():
 
 PIECES = {'casa': casa, 'casa_2': lambda: casa(2), 'autobus': autobus, 'poste': poste, 'valla': valla, 'barril': barril,
           'redes': redes, 'barca': barca, 'farola': farola, 'juncos': juncos,
-          'fachada': fachada, 'templo': templo, 'escombros_mano': escombros, 'fuente': fuente,
+          'fachada': fachada, 'templo_v1': templo, 'escombros_mano': escombros, 'fuente': fuente,
           'carretilla': carretilla, 'cajas': cajas, 'cajas_2': lambda: cajas(2), 'cajas_3': lambda: cajas(3), 'nasa': nasa, 'pilote': pilote, 'coche': coche}
 
 if __name__ == '__main__':

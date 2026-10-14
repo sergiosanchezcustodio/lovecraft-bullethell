@@ -166,15 +166,120 @@ def hoguera():
 
 
 def monolito():
-    M = Model(S=2, seed=92)
-    for y in range(0, 84):
-        w = 14 - y // 14
-        for x in range(-w, w):
-            for z in range(-w + 3, w - 3):
-                if min(x + w, w - 1 - x, z + w - 3, w - 4 - z) > 1 and y < 82: continue
-                c = lerp(STONE, STONE_D, M.noise(x, y, z, 6.0))
-                if z == w - 4 and 8 < y < 76 and (x * 3 + y * 5) % 7 == 0: c = CARVE
+    """Monolito del ritual (rehecho a 64/m en la revisión de arte del 14-10-2026), 2,6 m: estela
+    de basalto verdinegro que se estrecha, tallada a golpes (aristas desconchadas), sobre dos
+    gradas; las cuatro caras cubiertas de jeroglíficos en relieve hundido, en hileras; arriba, en
+    la cara del corro, la cabeza de pulpo con los ojos de un verde que apenas brilla y tentáculos
+    que bajan; líquenes y verdín de la ciénaga abajo, chorretones de sangre seca desde lo alto, y
+    al pie velas negras encendidas, un cuenco y huesos. El ídolo va encima (otra pieza): lo alto
+    es plano y mide lo mismo que antes."""
+    M = Model(S=4, seed=92)
+    rng = M.rng
+    BAS = (0.21, 0.24, 0.22); BAS_D = (0.13, 0.15, 0.14); BAS_L = (0.30, 0.33, 0.30)
+    LICH = (0.30, 0.36, 0.24); LICH_Y = (0.46, 0.48, 0.36); BLOOD = (0.38, 0.10, 0.07); BLOOD_D = (0.24, 0.07, 0.05)
+    GLOW = (0.36, 0.78, 0.44); WAX = (0.10, 0.10, 0.11)
+    Y0, Y1 = 18, 168
+    def wx(y): return 28 - 9 * (y - Y0) / (Y1 - Y0)
+    def wz(y): return 22 - 8 * (y - Y0) / (Y1 - Y0)
+    def stone(x, y, z):
+        c = lerp(BAS, BAS_D, 0.55 * M.noise(x, y, z, 7.0))
+        if M.hsh(x, y, z) > 0.85: c = lerp(c, BAS_L, 0.5)                               # grano
+        if y < Y0 + 24 and M.noise(x, y, z, 5.0) > 0.62 - 0.006 * (Y0 + 24 - y): c = lerp(c, LICH, 0.6)   # verdín
+        if M.noise(x + 50, y, z, 2.0) > 0.86: c = lerp(c, LICH_Y, 0.7)                                # líquenes
+        return c
+    def glyph(u, v, face):                                                          # jeroglífico por celda (simétrico)
+        cu, cv = int(math.floor(u / 9)), int(math.floor(v / 11))
+        fu, fv = u - cu * 9, v - cv * 11
+        if fu < 1 or fu > 7 or fv < 1 or fv > 9: return False
+        i, j = int(abs(fu - 4)), int((fv - 1) // 2)
+        if i > 2: return False
+        return M.hsh(cu * 7 + face, cv * 3 + j, i) > 0.5
+    # gradas
+    for y in range(0, Y0):
+        hx, hz = (38, 32) if y < 10 else (33, 27)
+        for x in range(-hx, hx + 1):
+            for z in range(-hz, hz + 1):
+                edge = abs(x) == hx or abs(z) == hz
+                if edge and abs(x) == hx and abs(z) == hz: continue
+                if edge and M.hsh(x, y // 3, z) > 0.93: continue                          # desconchones
+                c = stone(x, y, z)
+                if y in (9, 17): c = lerp(c, BAS_L, 0.3)
                 M.put(x, y, z, P, c)
+    # estela
+    for y in range(Y0, Y1):
+        ax, az = wx(y), wz(y)
+        ix, iz = int(ax), int(az)
+        for x in range(-ix, ix + 1):
+            for z in range(-iz, iz + 1):
+                dx, dz = ix - abs(x), iz - abs(z)
+                if min(dx, dz) > 3 and y < Y1 - 1: continue
+                if dx == 0 and dz == 0: continue                                          # aristas achaflanadas
+                if min(dx, dz) <= 1 and max(dx, dz) <= 2 and M.noise(x, y, z, 4.0) > 0.45: continue   # desconchones
+                c = stone(x, y, z)
+                if dx <= dz: face, u, depth = (0 if x > 0 else 1), z, dx
+                else: face, u, depth = (2 if z > 0 else 3), x, dz
+                if y == Y1 - 1: depth = 9
+                lim = iz if face < 2 else ix
+                carved = Y0 + 8 < y < Y1 - 40 and abs(u) < lim - 3 and glyph(u + 40, y, face)
+                if face == 2 and y >= Y1 - 52 and abs(u) < 19: carved = False
+                if carved and depth == 0: continue                                        # el relieve, hundido
+                if carved and depth == 1: c = lerp(BAS_D, (0, 0, 0), 0.4)
+                if depth == 0 and (y - Y0) % 11 == 0 and Y0 + 8 < y < Y1 - 40 and abs(u) < lim - 3: c = lerp(c, BAS_D, 0.6)   # renglones
+                M.put(x, y, z, P, c)
+    # cabeza de pulpo tallada en la cara del corro (+z), con los ojos que brillan
+    for y in range(Y1 - 52, Y1 - 3):
+        iz = int(wz(y))
+        for x in range(-17, 18):
+            hx, hy = x / 13, (y - (Y1 - 16)) / 12
+            inside = hx * hx + hy * hy < 1
+            tent = False
+            for k in range(-2, 3):
+                tx = k * 5.0 + (2 + abs(k)) * math.sin(y * 0.25 + k) * (Y1 - 26 - y) / 26
+                if y < Y1 - 22 and abs(x - tx) < 1.6 - (Y1 - 26 - y) / 40: tent = True
+            if inside or tent:
+                c = lerp(BAS, BAS_L, 0.7) if not tent else lerp(BAS, BAS_L, 0.45)
+                if inside and (hx * hx + hy * hy > 0.8): c = BAS_D                       # contorno tallado
+                M.put(x, y, iz + 1, P, c)
+                if inside and hx * hx + hy * hy < 0.5: M.put(x, y, iz + 2, P, lerp(BAS, BAS_L, 0.8))
+            for s in (-1, 1):
+                if abs(x - s * 4.5) < 1.6 and abs(y - (Y1 - 15)) < 1.6:
+                    M.V.pop((x, y, iz + 1), None); M.V.pop((x, y, iz + 2), None); M.put(x, y, iz, P, GLOW, glow=1)
+    # sangre seca que chorrea desde lo alto
+    for k in range(14):
+        face = rng.randrange(4); u = rng.uniform(-0.8, 0.8); L = rng.randint(20, 90)
+        for i in range(L):
+            y = Y1 - 1 - i
+            if face < 2:
+                x = (1 if face == 0 else -1) * int(wx(y)); z = int(u * wz(y)) + (1 if i > L * 0.7 and k % 2 else 0)
+            else:
+                z = (1 if face == 2 else -1) * int(wz(y)); x = int(u * wx(y))
+            q = (x, y, z)
+            if q in M.V: M.V[q] = [P, BLOOD if i < L * 0.6 else BLOOD_D, 0]
+    for x in range(-int(wx(Y1)), int(wx(Y1)) + 1):                                   # lo alto, manchado
+        for z in range(-int(wz(Y1)), int(wz(Y1)) + 1):
+            if (x, Y1 - 1, z) in M.V and M.noise(x, 0, z, 4.0) > 0.7: M.V[(x, Y1 - 1, z)] = [P, BLOOD_D, 0]
+    # ofrendas al pie: velas negras encendidas, cuenco y huesos
+    for (cx, cz, h) in ((-30, 30, 10), (-22, 29, 7), (26, 30, 12), (35, 24, 6), (16, 31, 9), (-35, 18, 8)):
+        for y in range(10, 10 + h):
+            for x in range(cx - 1, cx + 2):
+                for z in range(cz - 1, cz + 2):
+                    if abs(x - cx) + abs(z - cz) < 2: M.put(x, y, z, P, WAX)
+        for y in range(10 + h, 10 + h + 3): M.put(cx, y, cz, P, (1.0, 0.70, 0.30) if y < 10 + h + 2 else (1.0, 0.90, 0.60), glow=1)
+        M.put(cx + 1, 10, cz, P, WAX); M.put(cx, 10, cz + 1, P, (0.16, 0.16, 0.16))  # cera derramada
+    for x in range(-6, 7):                                                           # cuenco de barro con sangre
+        for z in range(23, 37):
+            d = math.hypot(x, z - 30) if False else math.hypot(x * 1.0, z - 29.5)
+            if d > 6: continue
+            M.put(x, 12 if d > 4.5 else 11, z, P, (0.40, 0.26, 0.16) if d > 4.5 else BLOOD)
+            M.put(x, 11 if d > 4.5 else 10, z, P, (0.32, 0.20, 0.12))
+    for k in range(5):                                                               # huesos sueltos
+        a = rng.uniform(0, math.pi); cx, cz = rng.randint(-36, 36), rng.choice((-1, 1)) * rng.randint(34, 44)
+        for i in range(-6, 7):
+            r = 2 if abs(i) > 4 else 1
+            for w in range(r):
+                M.put(int(cx + i * math.cos(a) - w * math.sin(a)), 0 + (1 if abs(i) > 4 else 0), int(cz + i * math.sin(a) + w * math.cos(a)), P, BONE if w == 0 else BONE_D)
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 

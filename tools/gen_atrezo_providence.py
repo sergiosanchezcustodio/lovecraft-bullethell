@@ -5,7 +5,7 @@ parte "body", origen en el centro de la base.
               (12 m de largo y 4 de alto; 16/m: pieza de borde)
   muro_bajo   el arranque de la pared por el lado de la cámara: zócalo de ladrillo (32/m)
   escultura_1 figura de escayola sobre un plinto, a medio desbastar (32/m)
-  escultura_2 busto de arcilla oscura, inquietante, sobre una peana (32/m)
+  escultura_2 busto de mármol con tentáculos por barba sobre una columna gris (80/m)
   caballete   caballete con un lienzo de un mar negro y una ciudad de ángulos (32/m)
   mesa        mesa de trabajo con barro, herramientas, un cubo y trapos (32/m)
   relieve     el bajorrelieve de arcilla de Wilcox sobre su soporte: la figura con cabeza de
@@ -140,18 +140,179 @@ def escultura_1():
 
 
 def escultura_2():
-    """Busto de arcilla oscura sobre una peana: cabeza calva, ojos hundidos y algo que le
-    crece de la barbilla."""
-    M = Model(S=2, seed=74)
-    plinth(M, 6, 28, WOOD)
-    M.sell(0, 34 / 2, 0, 7 / 2, 5 / 2, 5 / 2, P, CLAY, p=2.5)       # hombros
-    M.ell(0, 44 / 2, 0, 4.5 / 2, 6 / 2, 5 / 2, P, CLAY)             # cabeza
-    for x in (-2, 1):
-        for y in (45, 46): M.put(x, y, 5, P, CLAY_D)               # ojos hundidos
-    for i in range(5):                                          # tentáculos de barro de la barbilla
-        for k in range(7): M.put(-2 + i, 40 - k, 4 + k // 3, P, CLAY_D if k % 2 else CLAY)
-    for k, v in list(M.V.items()):
-        if v[1] == CLAY and M.noise(*k, 2.0) > 0.7: M.V[k] = [P, CLAY_L, 0]
+    """Busto de mármol sobre una columna de piedra gris (rehecho a 80/m en la revisión de arte del
+    14-10-2026). Peana: basa con molduras, fuste acanalado, capitel y una placa de latón. Busto
+    clásico de mármol blanco con vetas grises: hombros con el manto en pliegues y una fíbula,
+    cuello, cabeza con rizos tallados, cejas, nariz, ojos vacíos de estatua, orejas y, en vez de
+    barba, un manojo de tentáculos que cae sobre el pecho: lo inquietante del estudio de Wilcox."""
+    M = Model(S=5, seed=74)                                          # 80/m: 1,9 m en total
+    STN = (0.42, 0.44, 0.48); STN_D = (0.32, 0.34, 0.37); STN_L = (0.54, 0.56, 0.60)   # gris frío: la luz es cálida
+    MAR = (0.84, 0.86, 0.90); MAR_S = (0.68, 0.70, 0.75); VEIN = (0.50, 0.52, 0.58)
+    def stone(x, y, z):
+        c = lerp(STN, STN_D, 0.6 * M.noise(x, y, z, 3.0))
+        if M.hsh(x, y, z) > 0.8: c = lerp(c, STN_L, 0.5)
+        return c
+    def marble(x, y, z):
+        c = lerp(MAR, MAR_S, 0.35 * M.noise(x, y, z, 6.0))
+        n = M.noise(x + 0.6 * y, y, z - 0.4 * y, 5.0)
+        if abs(n - 0.5) < 0.018: c = lerp(c, VEIN, 0.6)                               # vetas
+        return c
+    def sq(x0, x1, y0, y1, col):                                                     # bloque cuadrado centrado
+        for y in range(y0, y1):
+            for x in range(-x0, x0):
+                for z in range(-x0, x0):
+                    if max(abs(x + 0.5), abs(z + 0.5)) > x1: continue
+                    M.put(x, y, z, P, col(x, y, z))
+    # peana
+    sq(26, 26, 0, 5, stone)
+    sq(24, 24, 5, 8, lambda x, y, z: STN_L)
+    for y in range(8, 12):                                                           # toro redondeado
+        r = 22 - abs(y - 10) // 2
+        sq(r, r, y, y + 1, stone)
+    for y in range(12, 64):                                                          # fuste acanalado
+        for x in range(-18, 18):
+            for z in range(-18, 18):
+                d = math.hypot(x + 0.5, z + 0.5)
+                if d > 17: continue
+                a = math.atan2(z + 0.5, x + 0.5)
+                if d > 15.5 and math.cos(a * 16) > 0.55: continue                      # estrías
+                c = stone(x, y, z)
+                if d > 15.5 and math.cos(a * 16) > 0.2: c = lerp(c, STN_D, 0.5)
+                M.put(x, y, z, P, c)
+    for y in range(64, 70):                                                          # capitel
+        r = 18 + (y - 64)
+        sq(r, r, y, y + 1, lambda x, y, z: STN_L if y == 69 else stone(x, y, z))
+    sq(25, 25, 70, 74, stone)
+    for x in range(-8, 8):                                                           # placa de latón
+        for y in range(40, 48):
+            c = (0.62, 0.50, 0.26) if x not in (-8, 7) and y not in (40, 47) else (0.40, 0.30, 0.14)
+            if 42 <= y <= 45 and x % 3 != 0 and -6 < x < 6 and y != 44: c = (0.34, 0.26, 0.12)
+            M.put(x, y, 17, P, c)
+    # busto
+    B = 74
+    TENT = (0.64, 0.66, 0.71); TENT_D = (0.50, 0.52, 0.58); PUPIL = (0.30, 0.32, 0.38)
+    for y in range(B, B + 9):                                                        # pie redondo del busto
+        r = 10 - (y - B) // 3 + (1 if y == B else 0)
+        for x in range(-r, r + 1):
+            for z in range(-r, r + 1):
+                if x * x + z * z <= r * r: M.put(x, y, z, P, MAR_S if y in (B, B + 1) else marble(x, y, z))
+    for x in range(-33, 34):                                                         # hombros y pecho, corte en arco
+        for y in range(B + 7, B + 42):
+            for z in range(-16, 17):
+                if abs(x / 32) ** 2.6 + abs((y - B - 25) / 16) ** 2.6 + abs(z / 15) ** 2.6 > 1: continue
+                if y < B + 8 + 16 * (x / 32) ** 2: continue
+                c = marble(x, y, z)
+                k = (x + 1.1 * (y - B)) % 10                                            # manto en pliegues, del hombro izquierdo
+                if x > -10 and z > 0 and (k < 1.5 or (x > 12 and k < 3)): c = MAR_S
+                if x <= -10 and z > 4 and (y - B) % 7 == 0: c = lerp(c, MAR_S, 0.6)     # túnica
+                M.put(x, y, z, P, c)
+    for x in range(-25, -14):                                                        # fíbula en el hombro
+        for y in range(B + 28, B + 39):
+            d = (x + 20) ** 2 + (y - B - 33) ** 2
+            if d > 25: continue
+            for z in range(20, -1, -1):
+                if (x, y, z) in M.V:
+                    M.put(x, y, z + 1, P, MAR_S if d > 12 else MAR)
+                    if d < 5: M.put(x, y, z + 2, P, MAR)
+                    break
+    for y in range(B + 36, B + 52):                                                  # cuello
+        for x in range(-9, 10):
+            for z in range(-9, 10):
+                if x * x + (z - 1) ** 2 <= 76: M.put(x, y, z, P, marble(x, y, z))
+    HY = B + 64
+    for x in range(-14, 15):                                                         # cabeza
+        for y in range(HY - 18, HY + 18):
+            for z in range(-16, 17):
+                yy = y - HY
+                rx = 12.5 if yy > -6 else 12.5 - 4 * ((-6 - yy) / 12) ** 1.4           # mandíbula que se estrecha
+                ry = 16.5 if yy > 0 else 17.5
+                if abs(x / rx) ** 2.3 + abs(yy / ry) ** 2.3 + abs((z - 1) / 14) ** 2.3 > 1: continue
+                M.put(x, y, z, P, marble(x, y, z))
+    def front(x, y):
+        for z in range(30, -24, -1):
+            if (x, y, z) in M.V: return z
+        return None
+    for y in range(HY + 6, HY + 19):                                                 # pelo en rizos: casco tallado
+        for x in range(-15, 16):
+            for z in range(-17, 18):
+                yy = y - HY
+                if abs(x / 13.5) ** 2.3 + abs(yy / 18) ** 2.3 + abs((z - 0.5) / 15.5) ** 2.3 > 1: continue
+                if (x, y, z) in M.V: continue
+                M.put(x, y, z, P, MAR)
+    for y in range(HY - 6, HY + 6):                                                  # pelo por detrás y los lados
+        for x in range(-15, 16):
+            for z in range(-17, 3):
+                if abs(x / 13.5) ** 2.3 + abs((y - HY) / 18) ** 2.3 + abs((z - 0.5) / 15.5) ** 2.3 > 1: continue
+                if (x, y, z) not in M.V: M.put(x, y, z, P, MAR)
+    bumps = []
+    for (x, y, z), v in M.V.items():                                                 # rizos: un bucle en relieve por celda
+        if y < HY - 6 or (y < HY + 7 and z > 3): continue
+        if abs(x / 13.5) ** 2.3 + abs((y - HY) / 18) ** 2.3 + abs((z - 0.5) / 15.5) ** 2.3 < 0.8: continue
+        a = math.atan2(z, x); cu, cv = a * 4.2 + (0.5 if int((y - HY) / 3.4) % 2 else 0), (y - HY) / 3.4
+        if y >= HY + 13: cu, cv = x / 3.4 + (0.5 if int(z / 3.4 + 20) % 2 else 0), z / 3.4         # coronilla
+        fu, fv = cu - math.floor(cu) - 0.5, cv - math.floor(cv) - 0.5
+        r = math.hypot(fu, fv)
+        v[1] = MAR_S if r > 0.36 else MAR
+        if r < 0.24:
+            n = math.sqrt(x * x + (y - HY) ** 2 + z * z) or 1
+            bumps.append((int(round(x + x / n)), int(round(y + (y - HY) / n)), int(round(z + z / n))))
+    for q in bumps: M.put(*q, P, MAR, over=False)
+    for x in range(-11, 12):                                                         # cejas en relieve y su sombra
+        if abs(x) < 2: continue
+        f = front(x, HY + 5)
+        if f is None: continue
+        for y in (HY + 4, HY + 5): M.put(x, y, f + 1, P, MAR)
+        g = front(x, HY + 3)
+        if g is not None: M.V[(x, HY + 3, g)] = [P, MAR_S, 0]
+    for s in (-1, 1):                                                                # ojos: cuenca en sombra y pupila taladrada
+        for x in range(s * 2, s * 10, s):
+            for y in range(HY - 1, HY + 3):
+                f = front(x, y)
+                if f is None: continue
+                ex = (x - s * 5.5) ** 2 / 10 + (y - HY - 1) ** 2 / 3
+                if ex < 1: M.V[(x, y, f)] = [P, MAR if ex < 0.6 else MAR_S, 0]
+                if abs(x - s * 5.5) < 1.1 and y in (HY, HY + 1): M.V[(x, y, f)] = [P, PUPIL, 0]
+    for y in range(HY - 8, HY + 4):                                                  # nariz
+        w = 1 if y > HY - 5 else 2
+        for x in range(-w, w + 1):
+            f = front(x, y)
+            if f is None: continue
+            M.put(x, y, f + 1, P, MAR)
+            if y < HY - 3 and abs(x) < 2: M.put(x, y, f + 2, P, MAR)
+    for x in (-2, 2): M.V[(x, HY - 8, front(x, HY - 8))] = [P, PUPIL, 0]           # aletas de la nariz
+    for s in (-1, 1):                                                                # orejas
+        for y in range(HY - 7, HY + 4):
+            for z in range(-3, 3):
+                M.put(s * 13, y, z, P, MAR_S if (z in (-1, 0) and HY - 5 < y < HY + 2) else MAR)
+    surf = {}
+    for x in range(-24, 25):
+        for y in range(B + 8, HY):
+            f = front(x, y)
+            if f is not None: surf[(x, y)] = f
+    for k in range(6):                                                               # tentáculos donde iría la barba
+        x0 = -7.0 + 2.8 * k
+        y0 = HY - 9 - (2 if k in (0, 5) else 0)
+        L = 30 + 8 * ((k * 5) % 3) - int(abs(k - 2.5)) * 3
+        zp = None
+        side = 1 if x0 > 0 else -1
+        for i in range(L):
+            u = i / L
+            x = x0 * (1 + 0.6 * u) + 2.2 * math.sin(u * 6 + k * 1.7) * u
+            y = y0 - i
+            if i > L - 7: x += (i - L + 7) * 0.9 * side; y += (i - L + 7) * 0.5          # la punta se enrosca hacia fuera
+            r = 2.2 * (1 - u) + 0.9
+            xi, yi = int(round(x)), int(round(y))
+            zc = surf.get((xi, yi), 10) + r * 0.7
+            if zp is not None: zc = max(zc, zp - 0.5)                                  # cuelga: no se mete hacia el cuello
+            zp = zc
+            for dx in range(-4, 5):
+                for dz in range(-4, 5):
+                    if dx * dx + dz * dz > r * r: continue
+                    c = TENT if dx * side <= 0 or dx * dx + dz * dz < (r - 1) ** 2 else TENT_D
+                    if dz > r - 1.2 and i % 4 == 0 and abs(dx) < 1: c = MAR                  # ventosas
+                    M.put(xi + dx, yi, int(round(zc)) + dz, P, c)
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 
@@ -159,8 +320,8 @@ def caballete():
     """Caballete de Wilcox con un lienzo (rehecho a 64/m en la revisión de arte del 13-10-2026):
     tres patas de listón con tornillo de ajuste y travesaños, repisa con una paleta llena de
     manchas de color, pinceles y un trapo; el lienzo sobre su bastidor, con el borde sin pintar y
-    las chinchetas, muestra un mar negro y una ciudad de ángulos imposibles bajo un cielo verde
-    enfermo, a pinceladas; salpicaduras de pintura en el suelo."""
+    las chinchetas, muestra la silueta negra de Cthulhu (cabeza de pulpo, tentáculos y alas)
+    alzándose de un mar negro entre torres de ángulos imposibles, bajo un cielo verde enfermo; salpicaduras de pintura en el suelo."""
     M = Model(S=4, seed=75)
     rng = M.rng
     LEAN = 0.18
@@ -171,11 +332,11 @@ def caballete():
             x = s * (24 - y // 10)
             for dx in range(-1, 2):
                 for dz in (0, 1): M.put(x + dx, y, zl(y) + dz, P, WOOD if dx else WOOD_D)
-    for y in range(0, int(H * 0.88)):                                                # pata trasera
-        z = zl(y) - 20 + int(y * 0.35)
-        for dx in (-1, 0, 1): M.put(dx, y, -z - 2 * zl(y) - 40 + z, P, WOOD_D)
-    for y in range(0, int(H * 0.85)):
-        M.put(0, y, -int(0.55 * (H * 0.85 - y)) + zl(int(H * 0.85)), P, WOOD_D)
+    YT = int(H * 0.85)                                                               # pata trasera, siempre detrás del lienzo
+    for y in range(0, YT):
+        z = -int(0.55 * (YT - y)) + zl(YT) - 2
+        for dx in (-1, 0, 1):
+            for dz in (0, -1): M.put(dx, y, z + dz, P, WOOD_D)
     for x in range(-22, 23):                                                         # travesaño y tornillo
         M.put(x, 30, zl(30), P, WOOD_D); M.put(x, 31, zl(31), P, WOOD_D)
     for k in range(5): M.put(-2 + k, 70, zl(70) + 2, P, IRON)
@@ -195,6 +356,42 @@ def caballete():
         for j in range(14): M.put(xb + j // 7, TY + 1, zl(TY) + 1 + j // 3, P, (0.56, 0.44, 0.30) if j < 11 else PAL[k])
     for x in range(-12, -2):                                                         # trapo
         for z in range(zl(TY), zl(TY) + 6): M.put(x, TY + 1 + (x + z) % 2, z, P, lerp(CANVAS, PAL[(x * z) % 6], 0.3))
+    def monster(a, b):
+        """Silueta de Cthulhu que se alza del mar: cabeza de pulpo, barba de tentáculos,
+        hombros encorvados y alas de murciélago abiertas. Devuelve 0 (fuera), 1 (silueta) o 2 (ojo)."""
+        for k in range(-3, 4):                                                       # tentáculos de la cara, con brillo húmedo
+            tx = k * 0.04 + 0.025 * math.sin(b * 22 + k)
+            if 0.36 < b < 0.60 and abs(a - tx) < 0.012: return 3
+        hx, hy = a / 0.17, (b - 0.68) / 0.17                                         # cabeza
+        if hx * hx + hy * hy < 1:
+            if abs(abs(a) - 0.06) < 0.025 and abs(b - 0.64) < 0.012: return 2
+            return 1
+        if ((a / 0.36) ** 2 + ((b - 0.40) / 0.16) ** 2) < 1 and b < 0.52: return 1    # hombros y cuerpo
+        if b < 0.30: return 0
+        for k in range(-3, 4):                                                       # tentáculos de la cara
+            tx = k * 0.045 + 0.03 * math.sin(b * 22 + k)
+            if 0.40 < b < 0.58 and abs(a - tx) < 0.018 + 0.02 * (b - 0.40): return 1
+        for s in (-1, 1):                                                            # alas
+            u = s * a
+            if u < 0.2 or u > 0.92: continue
+            top = 0.50 + 0.50 * (u - 0.2) / 0.72                                     # borde de ataque hacia arriba
+            bot = 0.46 + 0.06 * abs(math.sin((u - 0.2) * 13))                         # festón de la membrana
+            if bot < b < top and b < 0.98: return 1
+            if abs(b - top) < 0.012 and u < 0.94: return 1
+        return 0
+    def paint(a, b, x, y):
+        if b < 0.30:                                                                 # mar negro con oleaje
+            c = SEA if (x + int(6 * math.sin(y * 0.7 + x * 0.1))) % 9 else SEA_L
+            if b > 0.27 and abs(a) < 0.4: c = lerp(c, (0.30, 0.40, 0.24), 0.4)      # reflejo bajo la figura
+            return c
+        m = monster(a, b)
+        if m == 2: return (0.86, 0.70, 0.20)
+        if m == 1: return lerp((0.03, 0.04, 0.03), (0.08, 0.10, 0.07), M.noise(x, y, 0, 3.0))
+        if m == 3: return (0.16, 0.22, 0.13)
+        if b < 0.38 and abs(a) > 0.45 and (int(a * 30 - b * 12) % 4) and abs(a) < 0.9:   # torres de R'lyeh a los lados
+            if b < 0.30 + 0.08 * M.hsh(int(a * 12), 0, 5): return lerp(CITY, (0.06, 0.08, 0.06), 0.4)
+        g = 1 - b                                                                    # cielo verde enfermo, más claro al horizonte
+        return lerp((0.12, 0.18, 0.10), (0.52, 0.58, 0.30), max(0.0, g - 0.15 + 0.15 * M.noise(x, y, 0, 4.0)))
     CW, CB, CT = 30, TY + 2, TY + 74                                                 # lienzo
     for y in range(CB, CT):
         b = (y - CB) / (CT - CB)
@@ -202,12 +399,7 @@ def caballete():
             a = x / CW
             edge = abs(x) >= CW - 2 or y < CB + 2 or y >= CT - 2
             if edge: c = CANVAS
-            elif b < 0.38:                                                            # mar negro con oleaje
-                c = SEA if (x + int(6 * math.sin(y * 0.7 + x * 0.1))) % 9 else SEA_L
-            elif b < 0.75 and abs(a - 0.1) < 0.55 - (b - 0.38) * 1.2 and ((int(a * 16 + b * 6) % 3) or b < 0.45):
-                c = CITY if (int(a * 30 - b * 12) % 4) else lerp(CITY, (0.06, 0.08, 0.06), 0.6)   # ciudad de ángulos
-            else:
-                c = lerp((0.30, 0.40, 0.24), (0.14, 0.20, 0.12), b + 0.2 * M.noise(x, y, 0, 4.0))  # cielo verde enfermo
+            else: c = paint(a, b, x, y)
             if not edge and M.hsh(x // 2, y // 1, 7) > 0.92: c = lerp(c, (0, 0, 0), 0.2)         # pinceladas
             M.put(x, y, zl(y) + 3, P, c)
             M.put(x, y, zl(y) + 2, P, WOOD_D if edge else CANVAS)

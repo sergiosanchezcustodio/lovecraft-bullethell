@@ -57,6 +57,8 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 		_collider(holder, m, data.colliders.get(p.model, {}), obstacles, not masked)
 		if (m.get_meta("pivots") as Dictionary).has("light"):
 			lights.append(_lamp(holder, m, data.lamp, fog_volumes))
+		for k: String in (m.get_meta("pivots") as Dictionary):
+			if k.begins_with("smoke"): _smoke(holder, m, k)
 	root.set_meta("lights", lights)
 	root.set_meta("obstacles", obstacles)
 	if not masked: root.add_child(_walls(size))
@@ -96,7 +98,7 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var x0 := -size.x * 0.5 - back; var x1 := size.x * 0.5 + front
-	var z0 := -size.y * 0.5 - back; var z1 := size.y * 0.5 + front
+	var z0 := -size.y * 0.5 - float(g.get("margin_north", back)); var z1 := size.y * 0.5 + front   # margin_north: muelle con agua al norte
 	var nx := int((x1 - x0) / tile); var nz := int((z1 - z0) / tile)
 	for i in nx:
 		for j in nz:
@@ -117,9 +119,12 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 				st.set_color(c)
 				st.add_vertex(q[k])
 	# Frente de la plataforma de hielo en la orilla (sur y este)
-	var edge := Color(0.55, 0.66, 0.74)
+	var ec: Array = g.get("edge_color", [0.55, 0.66, 0.74])                        # canto: hielo, o madera en un muelle
+	var edge := Color(ec[0], ec[1], ec[2])
 	var lvl: float = data.sea.level if data.has("sea") else 0.0
-	for seg in [] if not data.has("sea") else [[Vector3(x0, 0, z1), Vector3(x1, 0, z1), Vector3(0, 0, 1)], [Vector3(x1, 0, z1), Vector3(x1, 0, z0), Vector3(1, 0, 0)]]:
+	var segs := [] if not data.has("sea") else [[Vector3(x0, 0, z1), Vector3(x1, 0, z1), Vector3(0, 0, 1)], [Vector3(x1, 0, z1), Vector3(x1, 0, z0), Vector3(1, 0, 0)]]
+	if data.has("sea") and g.has("margin_north"): segs.append([Vector3(x1, 0, z0), Vector3(x0, 0, z0), Vector3(0, 0, -1)])
+	for seg in segs:
 		var a: Vector3 = seg[0]; var b: Vector3 = seg[1]; var nrm: Vector3 = seg[2]
 		var q := [a, a + Vector3(0, lvl - 0.05, 0), b + Vector3(0, lvl - 0.05, 0), b]
 		for k in [0, 1, 2, 0, 2, 3]:
@@ -174,6 +179,8 @@ static func _sea(data: Dictionary, size: Vector2) -> MeshInstance3D:
 		var c: Array = data.sea.colors[k]
 		mat.set_shader_parameter(k, Color(c[0], c[1], c[2]))
 	if data.sea.has("brash"): mat.set_shader_parameter("brash_amount", float(data.sea.brash))
+	if data.has("ground") and data.ground.has("margin_north"):              # agua también al norte (muelle)
+		mat.set_shader_parameter("north_shore", -size.y * 0.5 - float(data.ground.margin_north))
 	mi.material_override = mat
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return mi
@@ -284,6 +291,14 @@ static func _model_aabb(m: Node3D) -> AABB:
 		box = b if first else box.merge(b)
 		first = false
 	return box
+
+## Humo de chimenea en un punto "smoke", "smoke_2"... del modelo (casas, vapores).
+static func _smoke(holder: Node3D, m: Node3D, key: String) -> void:
+	var pv: Array = m.get_meta("pivots")[key]
+	var e := VoxelFx.emitter("chimney", 0.45)
+	e.name = "Smoke"
+	e.position = Vector3(pv[0], pv[1], pv[2]) * float(m.get_meta("voxel_size"))
+	holder.add_child(e)
 
 ## Luz cálida del farol en el punto "light" del modelo.
 static func _lamp(holder: Node3D, m: Node3D, def: Dictionary, fog_volume: bool) -> OmniLight3D:

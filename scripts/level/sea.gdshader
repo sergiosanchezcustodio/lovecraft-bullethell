@@ -16,6 +16,7 @@ uniform float brash_amount = 1.0;            // hielo menudo (0: puerto sin hiel
 uniform vec3 foam : source_color = vec3(0.80, 0.87, 0.93);
 uniform float cell = 0.125;
 uniform vec2 shore = vec2(32.0, 32.0);       // la orilla: x = shore.x (este) y z = shore.y (sur)
+uniform float north_shore = -100000.0;       // orilla norte (un muelle con agua detrás); por defecto, ninguna
 uniform vec2 drift = vec2(0.05, 0.03);       // deriva del hielo menudo (m/s)
 
 varying vec3 wpos;
@@ -57,6 +58,7 @@ void fragment() {
 	float dist = length(max(p - shore, vec2(0.0)));
 	if (p.x < shore.x) dist = p.y - shore.y;
 	if (p.y < shore.y) dist = p.x - shore.x;
+	if (p.y < north_shore) dist = north_shore - p.y;
 	float depth = smoothstep(1.0, 26.0, dist);
 
 	// valles oscuros y crestas claras: el tono sigue a la ola

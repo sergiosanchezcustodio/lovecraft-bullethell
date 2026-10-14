@@ -185,6 +185,50 @@
    "type": "box",
    "shrink": 0.95
   },
+  "prt_casa": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "prt_casa_3": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "prt_casa_4": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "prt_tienda": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "prt_tienda_inn": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "prt_taberna": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "prt_taberna_inn": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "prt_almacen": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "prt_banco": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "prt_arbol": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "prt_arbol_2": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
   "inn_fuente": {
    "type": "cylinder",
    "radius": 2.3
@@ -246,13 +290,13 @@
    "model": "inn_templo",
    "pos": [
     0.0,
-    -34.2
+    -35.6
    ],
    "rot": 0,
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_tienda_inn",
    "pos": [
     -24.0,
     -35.29
@@ -270,7 +314,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_casa_3",
    "pos": [
     15.0,
     -34.91
@@ -279,7 +323,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_taberna_inn",
    "pos": [
     24.0,
     -35.3
@@ -288,7 +332,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_casa_4",
    "pos": [
     33.0,
     -34.78
@@ -297,7 +341,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_casa_4",
    "pos": [
     -34.7,
     -24.0
@@ -306,7 +350,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_taberna",
    "pos": [
     -34.68,
     -15.0
@@ -315,7 +359,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_casa_3",
    "pos": [
     -35.3,
     -6.0
@@ -324,7 +368,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_tienda",
    "pos": [
     -34.9,
     3.0
@@ -342,7 +386,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_casa",
    "pos": [
     -35.16,
     21.0
@@ -351,7 +395,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_tienda_inn",
    "pos": [
     -34.65,
     30.0
@@ -360,7 +404,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_almacen",
    "pos": [
     -35.24,
     39.0
@@ -412,6 +456,105 @@
    ],
    "rot": 0,
    "scale": 1.2
+  },
+  {
+   "model": "prt_banco",
+   "pos": [
+    0.0,
+    -4.8
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "prt_banco",
+   "pos": [
+    -4.8,
+    0.0
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "prt_banco",
+   "pos": [
+    4.8,
+    0.0
+   ],
+   "rot": -90,
+   "scale": 1.0
+  },
+  {
+   "model": "prt_banco",
+   "pos": [
+    0.0,
+    4.8
+   ],
+   "rot": 180,
+   "scale": 1.0
+  },
+  {
+   "model": "prt_arbol",
+   "pos": [
+    -11.0,
+    -10.5
+   ],
+   "rot": 175.7,
+   "scale": 1.0
+  },
+  {
+   "model": "prt_arbol_2",
+   "pos": [
+    10.5,
+    -10.0
+   ],
+   "rot": 206.3,
+   "scale": 1.0
+  },
+  {
+   "model": "prt_arbol_2",
+   "pos": [
+    -10.5,
+    10.5
+   ],
+   "rot": 279.0,
+   "scale": 1.0
+  },
+  {
+   "model": "prt_arbol",
+   "pos": [
+    11.0,
+    10.0
+   ],
+   "rot": 160.4,
+   "scale": 1.0
+  },
+  {
+   "model": "prt_banco",
+   "pos": [
+    -8.6,
+    -12.6
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "prt_banco",
+   "pos": [
+    12.8,
+    -7.6
+   ],
+   "rot": -90,
+   "scale": 1.0
+  },
+  {
+   "model": "prt_banco",
+   "pos": [
+    -12.8,
+    7.6
+   ],
+   "rot": 90,
+   "scale": 1.0
   },
   {
    "model": "inn_coche",
@@ -473,7 +616,7 @@
     -10.0,
     18.0
    ],
-   "rot": 175.7,
+   "rot": 261.7,
    "scale": 1.0
   },
   {
@@ -482,7 +625,7 @@
     21.0,
     -3.0
    ],
-   "rot": 206.3,
+   "rot": 103.9,
    "scale": 1.0
   },
   {
@@ -491,7 +634,7 @@
     5.0,
     21.0
    ],
-   "rot": 279.0,
+   "rot": 191.9,
    "scale": 1.0
   },
   {
@@ -500,7 +643,7 @@
     -20.0,
     20.0
    ],
-   "rot": 160.4,
+   "rot": 338.3,
    "scale": 1.0
   },
   {
@@ -509,7 +652,7 @@
     -22.0,
     -4.0
    ],
-   "rot": 261.7,
+   "rot": 84.1,
    "scale": 1.0
   },
   {
@@ -518,7 +661,7 @@
     -12.0,
     -20.0
    ],
-   "rot": 103.9,
+   "rot": 294.3,
    "scale": 1.0
   },
   {
@@ -527,7 +670,7 @@
     10.0,
     -21.0
    ],
-   "rot": 191.9,
+   "rot": 324.9,
    "scale": 1.0
   },
   {
@@ -536,7 +679,7 @@
     -24.0,
     12.0
    ],
-   "rot": 338.3,
+   "rot": 92.8,
    "scale": 1.0
   },
   {
@@ -545,7 +688,7 @@
     24.0,
     22.0
    ],
-   "rot": 84.1,
+   "rot": 227.0,
    "scale": 1.0
   },
   {
@@ -554,7 +697,7 @@
     27.0,
     8.0
    ],
-   "rot": 294.3,
+   "rot": 5.8,
    "scale": 1.0
   },
   {
@@ -563,7 +706,7 @@
     10.0,
     27.0
    ],
-   "rot": 324.9,
+   "rot": 14.2,
    "scale": 1.0
   },
   {
@@ -572,7 +715,7 @@
     -6.0,
     27.0
    ],
-   "rot": 92.8,
+   "rot": 53.2,
    "scale": 1.0
   },
   {
@@ -581,7 +724,7 @@
     26.5,
     16.0
    ],
-   "rot": 227.0,
+   "rot": 240.2,
    "scale": 1.0
   },
   {
@@ -590,7 +733,7 @@
     16.0,
     26.5
    ],
-   "rot": 5.8,
+   "rot": 268.7,
    "scale": 1.0
   },
   {
@@ -599,7 +742,7 @@
     -14.0,
     26.0
    ],
-   "rot": 14.2,
+   "rot": 297.0,
    "scale": 1.0
   },
   {
@@ -857,15 +1000,6 @@
   {
    "model": "inn_escombros",
    "pos": [
-    -20.42,
-    9.7
-   ],
-   "rot": 297.0,
-   "scale": 1.1
-  },
-  {
-   "model": "inn_escombros",
-   "pos": [
     21.01,
     21.56
    ],
@@ -891,13 +1025,13 @@
    "scale": 0.92
   },
   {
-   "model": "inn_barril",
+   "model": "inn_escombros",
    "pos": [
     -0.17,
     -12.05
    ],
    "rot": 174.0,
-   "scale": 1.0
+   "scale": 1.02
   },
   {
    "model": "inn_barril",
@@ -920,10 +1054,19 @@
   {
    "model": "inn_barril",
    "pos": [
-    -10.52,
-    12.15
+    -4.91,
+    -25.75
    ],
-   "rot": 149.5,
+   "rot": 298.8,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    8.77,
+    20.35
+   ],
+   "rot": 352.1,
    "scale": 1.0
   }
  ],

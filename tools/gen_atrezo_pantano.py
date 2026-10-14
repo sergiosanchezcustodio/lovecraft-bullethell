@@ -5,7 +5,7 @@ centro de la base, como gen_atrezo_innsmouth.py.
              oxidados. Todo por debajo de 0,15 m: se anda por encima (32/m)
   vagoneta   vagón de mercancías volcado de lado, tablas, ruedas al aire y la puerta caída (32/m)
   senal      poste de señales con su brazo de semáforo y el farol rojo (pivote "light") (48/m)
-  apeadero   la caseta del apeadero de Rowley: tablas, tejadillo, andén y el letrero (16/m)
+  apeadero   la caseta del apeadero de Rowley: tablas, tejado de chapa, andén y el letrero (32/m)
   arbol_1/2  árbol muerto del pantano, retorcido y sin hojas, con musgo colgando (32/m)
   tocon      tocón podrido con raíces (32/m)
   caballete  tramo del puente de caballetes roto: pies, riostras y vigas caídas (32/m)
@@ -14,7 +14,7 @@ Escribe models/pan_<pieza>.json. Uso: python tools/gen_atrezo_pantano.py [piezas
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model, lerp, refine
+from voxlib import Model, lerp
 
 P = 'body'
 SLEEPER = (0.30, 0.24, 0.18); SLEEPER_D = (0.20, 0.16, 0.12); ROT = (0.24, 0.28, 0.18)
@@ -150,87 +150,224 @@ RUST = (0.42, 0.24, 0.13)
 
 # ---------------- apeadero ----------------
 
-def _apeadero16():
-    """Apeadero de Rowley: andén de tablas de 9 x 3 m, caseta de 4 x 2,5 m de tablas
-    verticales con puerta y ventana tapiada, tejadillo a un agua que vuela sobre el andén con
-    dos pies derechos, letrero blanco en el alero y un banco. Hueco, 16/m."""
-    M = Model(S=1, seed=84)
-    for x in range(-72, 72):                                       # andén
-        for z in range(-24, 24):
-            for y in range(0, 6):
-                if y < 5 and min(x + 72, 71 - x, z + 24, 23 - z) > 0 and y > 0: continue
-                c = BOARD_D if x % 6 == 0 else lerp(BOARD, BOARD_G, M.noise(x, y, z, 6.0))
-                if y == 5 and M.hsh(x // 6, 0, z) < 0.04: continue  # tabla que falta
-                M.put(x, y, z, P, c)
-    WX, WZ, WH = 32, 20, 46
-    for y in range(6, WH):                                         # caseta
-        for x in range(-WX, WX):
-            for z in range(-24, -24 + 2 * WZ):
-                if min(x + WX, WX - 1 - x, z + 24, 2 * WZ - 25 - z) > 0: continue
-                c = BOARD_D if x % 4 == 0 or z % 4 == 0 else lerp(BOARD, BOARD_G, M.noise(x, y, z, 9.0) + 0.3 * (y < 14))
-                if z == 15 and -8 < x < 4 and y < 38: c = DARK         # puerta abierta
-                if z == 15 and 12 < x < 24 and 20 < y < 34: c = (0.36, 0.28, 0.20) if (x + y) % 5 else DARK   # ventana tapiada
-                M.put(x, y, z, P, c)
-    for x in range(-WX - 4, WX + 4):                               # tejadillo a un agua hacia el andén
-        for z in range(-28, 26):
-            y = WH + 8 - (z + 28) // 4
-            M.put(x, y, z, P, ROOF_D if x % 5 == 0 else ROOF)
-    for x in (-WX - 2, WX + 1):                                    # pies derechos
-        for y in range(6, WH - 4): M.put(x, y, 23, P, BOARD_D)
-    for x in range(-16, 16):                                       # letrero ROWLEY (sin texto legible: franjas)
-        for y in range(WH - 2, WH + 4):
-            c = SIGN
-            if y in (WH, WH + 1) and x % 4 in (1, 2) and -12 < x < 12: c = DARK
-            M.put(x, y, 24, P, c)
-    for x in range(-60, -44):                                      # banco
-        for z in (10, 11, 12): M.put(x, 12, z, P, BOARD_D)
-        if x in (-59, -46):
-            for y in range(6, 12): M.put(x, y, 11, P, IRON)
-    return M, {P: [0, 0, 0]}
-
-
 def apeadero():
-    """Apeadero de Rowley a 32/m (revisión de arte del 13-10-2026): el de _apeadero16 al doble de
-    resolución con textura fina (veta en las tablas, moteado en la piedra, arañazos en el hierro),
-    más un farol apagado en la esquina, el tablón de horarios con papeles medio arrancados, dos
-    lecheras de hierro, una carretilla de equipajes y hierbajos entre las tablas del andén."""
-    M = refine(_apeadero16()[0], 2, seed=84)
+    """Apeadero de Rowley (rehecho a 32/m en la revisión de arte del 14-10-2026), 9 x 3 m de andén
+    y caseta de 4 x 2,5 m. El tejado de chapa ondulada a un agua apoya en las paredes: los
+    costados suben en trapecio hasta su cara de abajo, así que no queda ningún hueco entre pared y
+    tejado. Andén de tablas con juntas, clavos, tablas podridas o que faltan, viga de canto y
+    pilotes; caseta de tablas y tapajuntas con la pintura verde gris pelada, cantoneras, zócalo
+    con verdín; puerta abierta con su marco y la hoja entornada; ventanilla de billetes tapiada
+    con tablas en aspa; ventana lateral con cristales rotos; tejado que vuela sobre el andén con
+    dos pies derechos, carrera y tornapuntas; canalón, chimenea de estufa con sombrerete; letrero
+    blanco colgado; farol, tablón de horarios, banco, lecheras, carretilla de equipajes y
+    hierbajos entre las tablas."""
+    M = Model(S=2, seed=84)
     rng = M.rng
-    for y in range(12, 96):                                         # farol en su brazo
-        M.put(-70, y, 44, P, IRON)
-    for x in range(-70, -60): M.put(x, 94, 44, P, IRON)
-    for y in range(80, 92):
-        for x in range(-64, -58):
-            for z in range(41, 47):
-                edge = x in (-64, -59) or z in (41, 46) or y in (80, 91)
-                if edge or y > 88: M.put(x, y, z, P, IRON)
-                else: M.put(x, y, z, P, (0.30, 0.34, 0.34))
-    for x in range(36, 60):                                         # tablón de horarios
-        for y in range(40, 70):
-            edge = x in (36, 59) or y in (40, 69)
+    PAINT = (0.40, 0.44, 0.40); PAINT_D = (0.30, 0.34, 0.31); BARE = (0.44, 0.39, 0.32); BARE_D = (0.32, 0.28, 0.22)
+    TRIM_C = (0.70, 0.68, 0.60); TINR = (0.30, 0.31, 0.32); TINR_D = (0.20, 0.21, 0.22); RUSTC = (0.42, 0.24, 0.13)
+    MOSSC = (0.30, 0.36, 0.20); GL = (0.20, 0.26, 0.30)
+    PX, PZ, PT = 144, 48, 11                                         # andén: media eslora, media manga, cara de arriba
+    X0, X1, ZB, ZF = -64, 64, -46, 31                                # caseta
+    def roof_y(z): return 108 - (z + 56) // 4                         # cara de abajo del tejado
+    def plank(x, y, z):
+        k = (z + PZ) // 6
+        c = lerp(BOARD, BOARD_G, 0.6 * M.noise(x * 0.3, k, 0, 2.0) + 0.3 * M.hsh(k, x // 40, 1))
+        if (z + PZ) % 6 == 0: c = lerp(c, DARK, 0.6)                   # junta
+        if (x + 7 * k) % 40 == 0: c = lerp(c, DARK, 0.5)                # testas
+        if (x + 7 * k) % 40 in (2, 37) and (z + PZ) % 6 in (2, 4): c = IRON_L   # clavos
+        if M.noise(x, y, z, 6.0) > 0.66: c = lerp(c, MOSSC, 0.5)
+        return c
+    # andén
+    for x in range(-PX, PX):
+        for z in range(-PZ, PZ):
+            k = (z + PZ) // 6
+            if M.hsh(k, (x + 7 * k) // 40, 2) < 0.04 and not (X0 - 4 <= x < X1 + 4 and ZB - 4 <= z < ZF + 4): continue   # tabla que falta
+            sag = 1 if M.hsh(k, (x + 7 * k) // 40, 3) < 0.06 else 0                 # tabla hundida
+            M.put(x, PT - sag, z, P, plank(x, PT, z))
+            M.put(x, PT - 1 - sag, z, P, BOARD_D)
+    for x in range(-PX, PX):                                          # viga de canto y faldón
+        for y in range(4, PT - 1):
+            for z in (-PZ, PZ - 1):
+                M.put(x, y, z, P, BOARD_D if y in (4, PT - 2) else lerp(BOARD_D, ROT, 0.5 * M.noise(x, y, z, 4.0)))
+    for z in range(-PZ, PZ):
+        for y in range(4, PT - 1):
+            for x in (-PX, PX - 1): M.put(x, y, z, P, BOARD_D)
+    for x in range(-PX + 4, PX, 24):                                  # pilotes
+        for z in (-PZ + 1, PZ - 2):
+            for y in range(0, PT - 1):
+                for dx in range(3):
+                    M.put(x + dx, y, z + (1 if z > 0 else -1), P, lerp(SLEEPER_D, ROT, 0.4 if y < 4 else 0.1))
+    # caseta: tablas verticales y tapajuntas, la pintura pelada
+    def wall_c(x, y, z, u):
+        c = PAINT if (u // 6) % 2 else lerp(PAINT, PAINT_D, 0.4)
+        if M.noise(x, y, z, 5.0) > 0.62: c = BARE if M.hsh(x, y, z) > 0.3 else BARE_D   # pintura saltada
+        if y < PT + 8: c = lerp(c, MOSSC, 0.4 + 0.3 * M.noise(x, y, z, 3.0))              # zócalo con verdín
+        if M.hsh(u, y // 3, 9) > 0.985: c = lerp(c, DARK, 0.5)                           # vetas y grietas
+        return c
+    walls = []
+    for y in range(PT + 1, roof_y(ZB) + 1):
+        for x in range(X0, X1):
+            for z in range(ZB, ZF + 1):
+                if min(x - X0, X1 - 1 - x, z - ZB, ZF - z) > 1: continue
+                if y > roof_y(z): continue                                               # costados en trapecio: llegan al tejado
+                side = x - X0 <= 1 or X1 - 1 - x <= 1
+                u = z if side else x
+                out = (x == X0 or x == X1 - 1) if side else (z == ZB or z == ZF)
+                c = wall_c(x, y, z, u)
+                if out and u % 6 == 0: c = PAINT_D                                       # junta
+                M.put(x, y, z, P, c)
+                if out and u % 6 == 0:                                                   # tapajuntas
+                    q = (x + (-1 if x == X0 else 1 if x == X1 - 1 else 0), y, z + (-1 if z == ZB and not side else 1 if z == ZF and not side else 0))
+                    M.put(*q, P, PAINT_D if M.noise(x, y, z, 5.0) < 0.62 else BARE_D)
+    for (cx, cz) in ((X0 - 1, ZB - 1), (X1, ZB - 1), (X0 - 1, ZF + 1), (X1, ZF + 1)):  # cantoneras
+        for y in range(PT + 1, roof_y(cz) + 1):
+            for d in range(3):
+                M.put(cx + (d if cx < 0 else -d), y, cz, P, TRIM_C if M.noise(cx, y, cz, 4.0) < 0.6 else BARE)
+                M.put(cx, y, cz + (d if cz < 0 else -d), P, TRIM_C if M.noise(cx, y, cz, 4.0) < 0.6 else BARE)
+    # puerta abierta con marco y la hoja entornada
+    DX0, DX1, DH = -18, 8, PT + 66
+    for x in range(DX0 - 3, DX1 + 3):
+        for y in range(PT + 1, DH + 4):
+            inside = DX0 <= x < DX1 and y < DH
+            for z in (ZF, ZF - 1, ZF + 1):
+                if inside:
+                    M.V.pop((x, y, z), None)
+                elif z == ZF + 1 and (x < DX0 or x >= DX1 or y >= DH): M.put(x, y, z, P, TRIM_C if M.hsh(x, y, 4) > 0.2 else BARE)
+            if inside: M.put(x, y, ZF - 8, P, (0.07, 0.07, 0.07))                         # interior en penumbra
+    for i in range(DX1 - DX0):                                                           # hoja abierta hacia fuera
+        a = math.radians(70)
+        x, z = DX0 + int(i * math.cos(a)) - 1, ZF + 1 + int(i * math.sin(a))
+        for y in range(PT + 2, DH - 1):
+            c = lerp(PAINT, PAINT_D, 0.5) if i % 6 else PAINT_D
+            if y in (PT + 20, DH - 14) or abs(y - PT - 20 - (DH - PT - 34) * i / (DX1 - DX0)) < 1.2: c = BARE_D   # travesaños y riostra
+            M.put(x, y, z, P, c); M.put(x + 1, y, z, P, c)
+    M.put(DX0 + 10, PT + 36, ZF + 10, P, IRON_L)
+    # ventanilla de billetes tapiada
+    WX0, WX1, WY0, WY1 = 20, 48, PT + 30, PT + 58
+    for x in range(WX0 - 2, WX1 + 2):
+        for y in range(WY0 - 3, WY1 + 2):
+            frame = x < WX0 or x >= WX1 or y < WY0 or y >= WY1
+            if frame:
+                M.put(x, y, ZF + 1, P, TRIM_C if M.hsh(x, y, 5) > 0.15 else BARE)
+                if y == WY0 - 3: M.put(x, y, ZF + 2, P, TRIM_C)                          # alféizar
+            else:
+                M.put(x, y, ZF, P, GL if (x + y) % 7 else (0.40, 0.46, 0.48))
+    for k in range(2):                                                                   # tablas clavadas en aspa
+        for i in range(WX1 - WX0 + 4):
+            x = WX0 - 2 + i
+            yc = WY0 + (i * (WY1 - WY0) // (WX1 - WX0 + 4) if k == 0 else (WY1 - WY0) - i * (WY1 - WY0) // (WX1 - WX0 + 4))
+            for d in range(-2, 3):
+                M.put(x, yc + d, ZF + 2 + k, P, lerp(BARE, BARE_D, 0.5 * M.noise(x, d, k, 3.0)) if abs(d) < 2 else BARE_D)
+            if i in (1, WX1 - WX0 + 2): M.put(x, yc, ZF + 3 + k, P, IRON_L)
+    # ventana lateral con cristales rotos (+x)
+    for z in range(-30, -2):
+        for y in range(PT + 30, PT + 60):
+            frame = z in (-30, -29, -4, -3) or y in (PT + 30, PT + 31, PT + 58, PT + 59) or z in (-17, -16) or y in (PT + 44, PT + 45)
+            if frame: M.put(X1, y, z, P, TRIM_C if M.hsh(z, y, 6) > 0.2 else BARE); continue
+            pane = (z > -16) * 2 + (y > PT + 45)
+            if pane in (1, 2) and M.hsh(z // 2, y // 2, pane) > 0.35: M.V.pop((X1 - 1, y, z), None); M.V.pop((X1 - 2, y, z), None); continue
+            M.put(X1 - 1, y, z, P, GL if (z + y) % 5 else (0.38, 0.44, 0.46)); M.V.pop((X1, y, z), None)
+    # tejado de chapa ondulada: asienta en las paredes y vuela sobre el andén
+    RZ0, RZ1 = -54, 52
+    for x in range(X0 - 6, X1 + 6):
+        for z in range(RZ0, RZ1):
+            y = roof_y(z) + 1
+            c = TINR if (x // 2) % 2 else TINR_D                                         # ondas
+            if M.noise(x * 0.5, 0, z, 6.0) > 0.6: c = lerp(c, RUSTC, 0.7)                # óxido
+            if M.hsh(x // 2, z // 20, 7) > 0.92 and z > -20: c = lerp(c, RUSTC, 0.9)     # chorretón
+            if (z - RZ0) % 30 == 0: c = TINR_D                                           # solapes de las chapas
+            M.put(x, y + ((x // 2) % 2), z, P, c)
+            M.put(x, y, z, P, TINR_D)
+            if X0 <= x < X1 and ZB <= z <= ZF: continue
+            M.put(x, y - 1, z, P, BOARD_D if (x // 8) % 2 else BOARD)                     # tablazón bajo el alero
+    for x in range(X0 - 6, X1 + 6):                                                      # tabla de alero y canalón
+        for y in range(roof_y(RZ1) - 2, roof_y(RZ1) + 3): M.put(x, y, RZ1, P, TRIM_C if M.hsh(x, y, 8) > 0.25 else BARE)
+        for y in range(roof_y(RZ1) - 2, roof_y(RZ1) + 1):
+            M.put(x, y, RZ1 + 2, P, RUSTC if M.noise(x, 0, 0, 5.0) > 0.6 else IRON_L)
+        M.put(x, roof_y(RZ1) - 3, RZ1 + 1, P, IRON_L)
+        for y in range(roof_y(RZ0) - 1, roof_y(RZ0) + 3): M.put(x, y, RZ0 - 1, P, BOARD_D)
+    for s in (X0 - 7, X1 + 6):                                                           # tablas de los costados del tejado
+        for z in range(RZ0 - 1, RZ1 + 1):
+            for d in range(-2, 3): M.put(s, roof_y(z) + 1 + d, z, P, TRIM_C if M.hsh(z, d, 9) > 0.2 else BARE)
+    for y in range(roof_y(RZ1) - 26, roof_y(RZ1) - 3):                                  # bajante
+        M.put(X1 + 4, y, RZ1 + 2, P, IRON_L); M.put(X1 + 4, y, RZ1 + 3, P, IRON)
+    # pies derechos, carrera y tornapuntas
+    for px in (X0 - 2, X1 + 1):
+        for y in range(PT + 1, roof_y(46)):
+            for dx in range(3):
+                for dz in range(3): M.put(px + dx - 1, y, 45 + dz, P, BOARD_D if dx == 1 else BOARD)
+        for i in range(14):                                                              # tornapuntas
+            M.put(px + (i if px < 0 else -i), roof_y(46) - 14 + i, 46, P, BOARD_D)
+            M.put(px, roof_y(46) - 14 + i, 46 - i, P, BOARD_D)
+    for x in range(X0 - 4, X1 + 4):
+        for y in range(roof_y(46) - 3, roof_y(46)): M.put(x, y, 46, P, BOARD_D if y == roof_y(46) - 3 else BOARD)
+    # chimenea de la estufa con sombrerete
+    for y in range(roof_y(-34) - 2, roof_y(-34) + 22):
+        for x in range(-44, -38):
+            for z in range(-37, -31):
+                if (x + 41) ** 2 + (z + 34) ** 2 <= 8: M.put(x, y, z, P, IRON if y % 8 else IRON_L)
+    for x in range(-46, -35):
+        for z in range(-39, -28):
+            M.put(x, roof_y(-34) + 22, z, P, IRON); M.put(x, roof_y(-34) + 23, z, P, IRON_L) if abs(x + 41) + abs(z + 34) < 5 else None
+    # letrero blanco colgado de la carrera (sin texto legible: letras en bloques)
+    SY = roof_y(46) - 20
+    for x in range(-40, 40):
+        for y in range(SY, SY + 12):
+            c = SIGN if M.noise(x, y, 0, 4.0) < 0.72 else lerp(SIGN, BOARD_D, 0.5)
+            if x in (-40, 39) or y in (SY, SY + 11): c = BOARD_D
+            elif SY + 3 <= y <= SY + 8 and -34 < x < 34 and (x + 34) % 11 < 7 and M.hsh((x + 34) // 11, (x + 34) % 11 // 2, y) > 0.25: c = DARK
+            M.put(x, y, 47, P, c)
+    for xc in (-30, 29):
+        for y in range(SY + 12, roof_y(46) - 3): M.put(xc, y, 47, P, IRON_L if y % 2 else IRON)
+    # farol apagado en su brazo, en la esquina
+    for y in range(PT + 1, 74): M.put(-76, y, 40, P, IRON)
+    for x in range(-76, -66): M.put(x, 72, 40, P, IRON)
+    for y in range(58, 70):
+        for x in range(-70, -64):
+            for z in range(37, 43):
+                edge = x in (-70, -65) or z in (37, 42) or y in (58, 69)
+                M.put(x, y, z, P, IRON if (edge or y > 66) else (0.30, 0.34, 0.34))
+    # tablón de horarios con papeles medio arrancados
+    for x in range(-58, -28):
+        for y in range(PT + 28, PT + 58):
+            edge = x in (-58, -29) or y in (PT + 28, PT + 57)
             c = BOARD_D if edge else BOARD
-            if not edge and (x - 38) % 7 < 5 and (y - 42) % 9 < 7 and M.hsh((x - 38) // 7, (y - 42) // 9, 3) > 0.35:
-                c = (0.70, 0.66, 0.56) if M.hsh(x, y, 4) > 0.15 else (0.40, 0.36, 0.30)    # papeles
-            M.put(x, y, 31, P, c)
-    for cx in (-100, -92):                                          # lecheras
-        for y in range(12, 34):
-            r = 4 if y > 28 else 6
+            if not edge and (x + 56) % 7 < 5 and (y - PT - 30) % 9 < 7 and M.hsh((x + 56) // 7, (y - PT - 30) // 9, 3) > 0.35:
+                c = (0.70, 0.66, 0.56) if M.hsh(x, y, 4) > 0.15 else (0.40, 0.36, 0.30)
+            M.put(x, y, ZF + 2, P, c)
+    # banco de tablas con patas de hierro
+    for x in range(-132, -102):
+        for z in range(30, 40):
+            M.put(x, PT + 13, z, P, BOARD_D if (z - 30) % 3 == 0 else BOARD)
+        for y in range(PT + 14, PT + 26): M.put(x, y, 40, P, BOARD if y % 4 else BOARD_D)
+        if x in (-130, -105):
+            for y in range(PT + 1, PT + 13): M.put(x, y, 32, P, IRON); M.put(x, y, 38, P, IRON)
+    # lecheras
+    for cx in (-100, -88):
+        for y in range(PT + 1, PT + 23):
+            r = 4 if y > PT + 17 else 6
             for x in range(cx - 7, cx + 8):
-                for z in range(30, 45):
-                    if (x - cx) ** 2 + (z - 37) ** 2 <= r * r: M.put(x, y, z, P, IRON_L if y in (14, 26, 33) else IRON)
-    for x in range(60, 104):                                        # carretilla de equipajes
-        for z in range(14, 34):
-            M.put(x, 22, z, P, BOARD_D if x % 6 == 0 else BOARD)
-        if x in (62, 100):
-            for y in range(12, 22): M.put(x, y, 16, P, IRON); M.put(x, y, 32, P, IRON)
-    for x in range(98, 104):
-        for y in range(22, 50): M.put(x, y, 24, P, IRON)
-    for x in range(66, 90):
-        for y in range(23, 36):
-            for z in range(18, 30): M.put(x, y, z, P, (0.40, 0.26, 0.16) if (x + y) % 9 else (0.26, 0.16, 0.10))
-    for _ in range(60):                                             # hierbajos entre las tablas
-        x, z = rng.randint(-140, 140), rng.randint(-46, 46)
-        for k in range(rng.randint(2, 7)): M.put(x, 12 + k, z, P, (0.32, 0.40, 0.20) if k % 2 else (0.24, 0.32, 0.16), over=False)
+                for z in range(-38, -23):
+                    if (x - cx) ** 2 + (z + 30) ** 2 <= r * r: M.put(x, y, z, P, IRON_L if y in (PT + 3, PT + 15, PT + 22) else IRON)
+    # carretilla de equipajes con un baúl
+    for x in range(72, 116):
+        for z in range(10, 30): M.put(x, PT + 11, z, P, BOARD_D if x % 6 == 0 else BOARD)
+        if x in (74, 112):
+            for y in range(PT + 1, PT + 11): M.put(x, y, 12, P, IRON); M.put(x, y, 28, P, IRON)
+    for x in range(110, 116):
+        for y in range(PT + 11, PT + 38): M.put(x, y, 20, P, IRON)
+    for x in range(78, 102):
+        for y in range(PT + 12, PT + 25):
+            for z in range(14, 26): M.put(x, y, z, P, (0.40, 0.26, 0.16) if (x + y) % 9 and y != PT + 20 else (0.26, 0.16, 0.10))
+    # hierbajos entre las tablas y en las juntas
+    for _ in range(90):
+        x, z = rng.randint(-PX + 2, PX - 2), rng.randint(-PZ + 2, PZ - 2)
+        if X0 - 2 <= x < X1 + 2 and ZB - 2 <= z < ZF + 2: continue
+        z -= (z + PZ) % 6
+        for k in range(rng.randint(2, 8)):
+            M.put(x + (k // 3) * rng.choice((-1, 1)), PT + 1 + k, z, P, (0.32, 0.40, 0.20) if k % 2 else (0.24, 0.32, 0.16), over=False)
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 

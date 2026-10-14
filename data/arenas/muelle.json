@@ -8,8 +8,14 @@
   "seed": 33,
   "tile": 0.5,
   "margin_back": 14.0,
-  "walk_back": 0.5,
+  "margin_north": 0.0,
+  "walk_back": 0.0,
   "camp_radius": 0.0,
+  "edge_color": [
+   0.2,
+   0.16,
+   0.12
+  ],
   "kind": "planks",
   "wet": 0.75,
   "colors": {
@@ -32,6 +38,7 @@
  },
  "sea": {
   "sides": [
+   "north",
    "south",
    "east"
   ],
@@ -210,6 +217,26 @@
    "type": "box",
    "shrink": 0.95
   },
+  "prt_almacen": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "prt_casa": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "prt_casa_2": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "prt_taberna": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "prt_tienda": {
+   "type": "box",
+   "shrink": 0.9
+  },
   "inn_barril": {
    "type": "cylinder",
    "radius": 0.35
@@ -229,10 +256,25 @@
   "inn_pilote": {
    "type": "cylinder",
    "radius": 0.2
+  },
+  "alr_barca": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "alr_barca_2": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "alr_barca_3": {
+   "type": "box",
+   "shrink": 0.85
   }
  },
  "no_shadow": [
-  "inn_pilote"
+  "inn_pilote",
+  "alr_barca",
+  "alr_barca_2",
+  "alr_barca_3"
  ],
  "size": [
   64.0,
@@ -243,10 +285,11 @@
    "model": "alr_casco",
    "pos": [
     -2.0,
-    -36.6
+    -36.4
    ],
    "rot": 0,
-   "scale": 1.0
+   "scale": 1.0,
+   "y": -1.55
   },
   {
    "model": "alr_casco",
@@ -258,7 +301,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_almacen",
    "pos": [
     -35.0,
     -26
@@ -267,7 +310,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_casa",
    "pos": [
     -35.0,
     -17
@@ -276,7 +319,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_taberna",
    "pos": [
     -35.0,
     -8
@@ -285,7 +328,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_tienda",
    "pos": [
     -35.0,
     1
@@ -294,7 +337,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_casa_2",
    "pos": [
     -35.0,
     10
@@ -303,7 +346,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_almacen",
    "pos": [
     -35.0,
     19
@@ -312,7 +355,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_casa_2",
    "pos": [
     -35.0,
     28
@@ -321,7 +364,7 @@
    "scale": 1.0
   },
   {
-   "model": "inn_fachada",
+   "model": "prt_casa",
    "pos": [
     -35.0,
     37
@@ -1381,6 +1424,296 @@
    ],
    "rot": 292.6,
    "scale": 1.02
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -30.72,
+    -32.51
+   ],
+   "rot": 211.3,
+   "scale": 1.06,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -28.26,
+    -32.77
+   ],
+   "rot": 257.9,
+   "scale": 1.17,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -25.37,
+    -32.69
+   ],
+   "rot": 28.6,
+   "scale": 1.06,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -22.0,
+    -32.87
+   ],
+   "rot": 263.8,
+   "scale": 1.13,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -18.78,
+    -32.79
+   ],
+   "rot": 145.3,
+   "scale": 1.18,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -16.05,
+    -32.61
+   ],
+   "rot": 137.8,
+   "scale": 1.07,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -13.15,
+    -32.71
+   ],
+   "rot": 43.8,
+   "scale": 1.03,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -10.21,
+    -32.86
+   ],
+   "rot": 354.0,
+   "scale": 1.07,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -7.06,
+    -32.66
+   ],
+   "rot": 357.7,
+   "scale": 1.18,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -3.81,
+    -32.61
+   ],
+   "rot": 96.2,
+   "scale": 1.11,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    -0.69,
+    -32.73
+   ],
+   "rot": 319.6,
+   "scale": 1.11,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    1.74,
+    -32.83
+   ],
+   "rot": 98.7,
+   "scale": 1.15,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    4.6,
+    -32.52
+   ],
+   "rot": 65.9,
+   "scale": 1.17,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    8.33,
+    -32.82
+   ],
+   "rot": 273.0,
+   "scale": 1.11,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    11.14,
+    -32.54
+   ],
+   "rot": 229.7,
+   "scale": 1.06,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    14.29,
+    -32.85
+   ],
+   "rot": 69.5,
+   "scale": 1.05,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    17.36,
+    -32.65
+   ],
+   "rot": 52.6,
+   "scale": 1.14,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    20.13,
+    -32.93
+   ],
+   "rot": 355.5,
+   "scale": 1.0,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    22.82,
+    -32.94
+   ],
+   "rot": 179.3,
+   "scale": 1.03,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    25.99,
+    -32.65
+   ],
+   "rot": 152.6,
+   "scale": 1.06,
+   "y": -1.35
+  },
+  {
+   "model": "inn_pilote",
+   "pos": [
+    28.64,
+    -32.54
+   ],
+   "rot": 226.4,
+   "scale": 1.13,
+   "y": -1.35
+  },
+  {
+   "model": "alr_barca",
+   "pos": [
+    19.0,
+    -33.9
+   ],
+   "rot": -90,
+   "scale": 1.0,
+   "y": -1.25
+  },
+  {
+   "model": "alr_barca_2",
+   "pos": [
+    23.5,
+    -34.1
+   ],
+   "rot": -84,
+   "scale": 1.0,
+   "y": -1.25
+  },
+  {
+   "model": "alr_barca_3",
+   "pos": [
+    28.0,
+    -33.9
+   ],
+   "rot": -95,
+   "scale": 1.0,
+   "y": -1.25
+  },
+  {
+   "model": "alr_barca_2",
+   "pos": [
+    -24.0,
+    33.9
+   ],
+   "rot": 92,
+   "scale": 1.0,
+   "y": -1.25
+  },
+  {
+   "model": "alr_barca",
+   "pos": [
+    -6.0,
+    34.0
+   ],
+   "rot": 86,
+   "scale": 1.0,
+   "y": -1.25
+  },
+  {
+   "model": "alr_barca_3",
+   "pos": [
+    12.0,
+    33.9
+   ],
+   "rot": 90,
+   "scale": 1.0,
+   "y": -1.25
+  },
+  {
+   "model": "alr_barca",
+   "pos": [
+    33.9,
+    16.0
+   ],
+   "rot": 180,
+   "scale": 1.0,
+   "y": -1.25
+  },
+  {
+   "model": "alr_barca_3",
+   "pos": [
+    34.0,
+    -10.0
+   ],
+   "rot": 176,
+   "scale": 1.0,
+   "y": -1.25
   }
  ],
  "mask": {

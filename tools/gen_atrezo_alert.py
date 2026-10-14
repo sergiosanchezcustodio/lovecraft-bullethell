@@ -284,10 +284,12 @@ def casco():
                 for k in range(0, 8): M.put(dx, by + 16 - k // 3, s * (BEAM - 2) - s * k, P, IRON_L)
                 for y in range(by + 7, by + 13): M.put(dx, y, bz, P, ROPE_D)
     # tres chimeneas negras con banda roja, tubo de vapor y vientos
+    smokes = []
     for fxc in (-56, -26, 4):
         fz = 0; fb = h1
         if fxc > cx0 + 40 and fxc < cx1 - 6: fb = h2
         ft = h1 + 74
+        smokes.append([fxc - (ft - 1 - fb) // 9, ft + 2, 0])                 # boca: de ahí sale el humo
         for y in range(fb, ft):
             rake = (y - fb) // 9
             for x in range(fxc - 10, fxc + 10):
@@ -365,6 +367,7 @@ def casco():
                         if x in (bx - 5, bx + 4) and z in (bz - 5, bz + 4): c = IRON
                         M.put(x, y, z, P, c)
     piv = {P: [0, 0, 0], 'flag': [-L + 14, ftop, 0]}
+    piv.update({'smoke' + ('' if i == 0 else '_%d' % (i + 1)): s for i, s in enumerate(smokes)})
     return M, piv
 
 
@@ -813,6 +816,90 @@ def bote():
         for z in range(W + 20, W + 28):
             for y in range(0, 6):
                 if y == 0 or x in (-40, -31) or z in (W + 20, W + 27): M.put(x, y, z, P, IRON_L if y < 5 else IRON)
+    return M, {P: [0, 0, 0]}
+
+
+BARCA_PAINT = {1: ((0.70, 0.68, 0.62), (0.44, 0.13, 0.10)), 2: ((0.24, 0.36, 0.40), (0.70, 0.66, 0.56)),
+               3: ((0.30, 0.38, 0.26), (0.42, 0.30, 0.18))}
+
+
+def barca(variant=1):
+    """Barca de remos amarrada al muelle, a flote (revisión de arte del 14-10-2026), 64/m, 2,6 m:
+    casco de tingladillo con la pintura de su variante (blanca con franja roja, azul petróleo con
+    crema, verde con pardo), regala y roda de madera, bancadas, los remos recogidos dentro, agua
+    de sentina, un rollo de cabo, una nasa o un cubo, y la amarra que sube desde la proa (+x)
+    hasta el borde del muelle (0,9 m más arriba y 0,6 m por delante). El origen está en la línea
+    de flotación: lo que queda por debajo de y = 0 va bajo el agua."""
+    M = Model(S=4, seed=110 + variant)
+    rng = M.rng
+    HULL, BAND = BARCA_PAINT[variant]
+    L, W, HH, DRAFT = 82, 26, 30, 10
+    def width(x):
+        f = abs(x) / L
+        if x > 0: return W * max(0.0, 1 - f ** 1.7) ** 0.8                          # proa afilada
+        return W * (1 - 0.42 * f ** 2.5)                                             # popa ancha (espejo)
+    def gun(x): return HH + int((14 if x > 0 else 7) * (abs(x) / L) ** 2)           # arrufo, más alto en la proa
+    def hull_c(x, y, z, u):
+        c = HULL
+        if y < 6: c = BAND                                                           # franja de la flotación
+        if (u * 6) % 1 < 0.14: c = lerp(c, (0.16, 0.14, 0.12), 0.55)                 # solape de las tracas
+        c = lerp(c, (0.40, 0.40, 0.36), 0.25 * M.noise(x, y, z, 7.0))               # mugre
+        if M.noise(x, y, z, 3.0) > 0.80: c = lerp(WOOD, WOOD_D, M.noise(x, y, z, 1.5))   # desconchón
+        if y < 2: c = lerp(c, (0.12, 0.20, 0.12), 0.6)                               # verdín en la flotación
+        return c
+    for x in range(-L, L):
+        w = width(x)
+        if w < 1: continue
+        for z in range(-int(w) - 1, int(w) + 2):
+            u = abs(z) / w
+            if u > 1: continue
+            yb = int(-DRAFT + (HH + DRAFT) * 0.55 * u ** 2.2 + 3 * (abs(x) / L) ** 3)   # fondo en V suave
+            g = gun(x)
+            if u > 1 - 2.5 / max(w, 1) or abs(x) > L - 3 or (x < -L + 4):            # costados, roda y espejo
+                for y in range(yb, g + 1): M.put(x, y, z, P, hull_c(x, y, z, u))
+            else:
+                for y in (yb, yb + 1): M.put(x, y, z, P, WOOD_D if (z // 5) % 2 else WOOD)   # plan
+                if yb + 2 <= -3:
+                    M.put(x, yb + 2, z, P, (0.12, 0.16, 0.14) if M.hsh(x, z, 1) > 0.1 else (0.24, 0.28, 0.26))   # agua de sentina
+    for x in range(-L, L):                                                           # regala de madera
+        w = width(x)
+        if w < 2: continue
+        for s in (-1, 1):
+            for d in range(3): M.put(x, gun(x) + 1, s * (int(w) - d), P, WOOD if d else WOOD_D)
+    for y in range(-DRAFT, gun(L) + 4):                                              # roda
+        M.put(L - 1, y, 0, P, WOOD_D); M.put(L, y, 0, P, WOOD_D)
+    for xb in (-44, -4, 36):                                                         # bancadas
+        w = int(width(xb)) - 2
+        for z in range(-w, w + 1):
+            for x in range(xb, xb + 8): M.put(x, HH - 7, z, P, WOOD if (x - xb) % 4 else WOOD_D)
+    for s in (-1, 1):                                                                # remos recogidos
+        for x in range(-64, 52):
+            z = s * 9 + (x // 40) * s
+            M.put(x, HH - 5, z, P, lerp(WOOD, (0.80, 0.78, 0.70), 0.25))
+            if x > 32:
+                for d in range(-3, 4): M.put(x, HH - 5, z + d, P, WOOD)
+        for k in range(4): M.put(-10 + k, gun(-10) + 2, s * (int(width(-10)) - 1), P, IRON)   # chumaceras
+    for a in range(0, 360, 12):                                                      # rollo de cabo en la proa
+        for r in (5, 6, 7):
+            M.put(56 + int(r * math.cos(math.radians(a))), HH - 6 + (r - 5), int(r * math.sin(math.radians(a))), P, ROPE if r != 6 else ROPE_D)
+    if variant == 2:                                                                 # nasa
+        for y in range(HH - 6, HH + 6):
+            for a in range(0, 360, 15):
+                r = 7 if y < HH + 3 else 4
+                M.put(-60 + int(r * math.cos(math.radians(a))), y, int(r * math.sin(math.radians(a))), P, ROPE_D if (a // 15 + y) % 2 else WOOD_D)
+    else:                                                                            # cubo
+        for y in range(HH - 6, HH + 2):
+            for a in range(0, 360, 15):
+                M.put(-24 + int(5 * math.cos(math.radians(a))), y, 12 + int(5 * math.sin(math.radians(a))), P, IRON_L if y != HH + 1 else IRON)
+    # amarra: de la cornamusa de la proa hasta el muelle (+x 38 voxels, +48 de altura: llega a la tabla)
+    x0, y0 = L - 4, gun(L) + 2
+    for i in range(80):
+        t = i / 79
+        x = x0 + 38 * t
+        y = y0 + 48 * t - 14 * math.sin(math.pi * t)                                  # catenaria
+        for d in (0, 1): M.put(int(x), int(y) + d, 0, P, ROPE if i % 3 else ROPE_D)
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 
@@ -1278,7 +1365,7 @@ def puente():
 
 
 PIECES = {'borda': borda, 'puente': puente, 'caseta': caseta, 'casco': casco, 'bolardo': bolardo, 'grua': grua, 'fardos': fardos, 'rollo': rollo,
-          'linterna': linterna, 'bote': bote}
+          'linterna': linterna, 'bote': bote, 'barca': barca, 'barca_2': lambda: barca(2), 'barca_3': lambda: barca(3)}
 
 if __name__ == '__main__':
     only = set(sys.argv[1:])
