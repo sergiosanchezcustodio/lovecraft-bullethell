@@ -182,27 +182,131 @@ def roca():
     return M, {'body': [0, 0, 0]}
 
 def hielo():
-    M = Model(S=S, seed=16)
-    # bloque facetado: intersección de semiespacios con normales aleatorias
-    planes = []
-    for i in range(14):
-        a = M.rng.uniform(0, math.tau); e = M.rng.uniform(-0.4, 1.0)
-        n = (math.cos(a) * math.cos(e), math.sin(e), math.sin(a) * math.cos(e))
-        planes.append((n, M.rng.uniform(5.0, 7.5)))
-    for x in range(-9 * S, 9 * S):
-        for y in range(0, 16 * S):
-            for z in range(-9 * S, 9 * S):
-                p = ((x + .5) / S, (y + .5) / S - 5.5, (z + .5) / S)
-                if all(p[0] * n[0] + p[1] * n[1] + p[2] * n[2] <= d for n, d in planes):
-                    M.put(x, y, z, 'body', 'ice')
+    """Bloque de hielo de presión (revisión de arte del 14-10-2026; la versión de antes queda en
+    models/atrezo_hielo_v1.json): tres esquirlas facetadas soldadas, a 64 voxels/m, con el
+    hielo azul profundo abajo y pálido arriba, vetas verticales, burbujas, aristas escarchadas,
+    nieve en las caras de arriba y un ventisquero al pie."""
+    V = 4                                                    # voxels por ub (64/m)
+    M = Model(S=V, seed=16)
+    rng = M.rng
+    shards = [((0, 0), 18.0, 7.0, 0.12), ((7.0, 3.5), 12.0, 5.0, -0.3), ((-6.5, 3.0), 8.0, 4.2, 0.45)]
+    owner = {}
+    for i, ((sx, sz), hgt, rad, lean) in enumerate(shards):
+        planes = []
+        for j in range(11):
+            a = rng.uniform(0, math.tau); e = rng.uniform(-0.25, 0.55)
+            planes.append(((math.cos(a) * math.cos(e), math.sin(e), math.sin(a) * math.cos(e)), rad * rng.uniform(0.8, 1.1)))
+        for j in range(2):                                   # punta inclinada
+            a = rng.uniform(0, math.tau)
+            planes.append(((math.cos(a) * 0.6, 0.8, math.sin(a) * 0.6), hgt * 0.62))
+        R = int((rad * 1.3 + 2) * V)
+        for x in range(int((sx - rad * 1.3) * V), int((sx + rad * 1.3) * V)):
+            for y in range(0, int(hgt * V)):
+                for z in range(int((sz - rad * 1.3) * V), int((sz + rad * 1.3) * V)):
+                    px = (x + .5) / V - sx - lean * (y / V); py = (y + .5) / V - hgt * 0.35; pz = (z + .5) / V - sz
+                    if all(px * n[0] + py * n[1] + pz * n[2] <= d for n, d in planes):
+                        if (x, y, z) not in owner:
+                            owner[(x, y, z)] = i
+                            M.put(x, y, z, 'body', ICE)
+    top = max(y for (_, y, _) in M.V)
     def paint(k, part, c):
         x, y, z = k
-        n = M.noise(x, y, z, 4)
-        base = lerp(ICE_D, ICE, n)
-        if (x + y + z) % 9 == 0: base = ICE_L                           # vetas brillantes
-        if not M.exposed(k): return base
-        return lerp(base, ICE_L, 0.25)
+        f = y / top
+        base = lerp(ICE_DEEP, ICE_PALE, min(1.0, f * 1.05))
+        base = lerp(base, ICE_MID, 0.35 * M.noise(x, y * 0.3, z, 6))
+        if M.hsh(x // 3, 1, z // 3) < 0.09: base = lerp(base, ICE_DEEP, 0.5)          # vetas verticales
+        if M.hsh(x, y, z) < 0.012: base = ICE_BUBBLE                                    # burbujas
+        nb = [(x + 1, y, z), (x - 1, y, z), (x, y + 1, z), (x, y - 1, z), (x, y, z + 1), (x, y, z - 1)]
+        if any(owner.get(q, owner[k]) != owner[k] for q in nb): return lerp(base, ICE_DEEP, 0.55)   # junta
+        exp = sum(q not in M.V for q in nb)
+        if exp >= 2: base = lerp(base, ICE_EDGE, 0.6)                                   # arista escarchada
+        if y < 6: base = lerp(base, ICE_DIRT, 0.25)
+        return base
     M.paint(paint)
+    hollow = [k for k in M.V if all(q in M.V for q in ((k[0] + 1, k[1], k[2]), (k[0] - 1, k[1], k[2]), (k[0], k[1] + 1, k[2]),
+                                                      (k[0], k[1] - 1, k[2]), (k[0], k[1], k[2] + 1), (k[0], k[1], k[2] - 1)))]
+    for k in hollow: del M.V[k]
+    # nieve en lo que mira arriba (columna cuyo tope tiene vecinos a menos de un voxel)
+    tops = {}
+    for (x, y, z) in M.V:
+        if y > tops.get((x, z), -1): tops[(x, z)] = y
+    for (x, z), h in tops.items():
+        if h < 8: continue
+        if all(abs(tops.get((x + dx, z + dz), -99) - h) <= 1 for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1))) and M.noise(x, 0, z, 5) > 0.5:
+            for y in range(h + 1, h + 2 + int(M.noise(x, 1, z, 3) * 2.5)):
+                M.put(x, y, z, 'body', SNOW if M.hsh(x, y, z) < 0.85 else SNOW_D)
+    # ventisquero al pie
+    occ = set(tops)
+    for x in range(min(k[0] for k in occ) - 14, max(k[0] for k in occ) + 15):
+        for z in range(min(k[1] for k in occ) - 14, max(k[1] for k in occ) + 15):
+            if (x, z) in occ: continue
+            d = next((r for r in range(2, 9, 2) if any((x + dx * r, z + dz * r) in occ for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)))), None)
+            if d is None: continue
+            h = int((9 - d) * 0.6 * M.noise(x, 2, z, 7) + 0.5)
+            for y in range(0, h): M.put(x, y, z, 'body', SNOW if M.hsh(x, y, z) < 0.85 else SNOW_D)
+    return M, {'body': [0, 0, 0]}
+
+def roca_nevada():
+    """Peña de basalto medio enterrada en la nieve (revisión de arte del 14-10-2026, referencia
+    tools/local/ref_roca_nevada_1000.png). DESCARTADA: la de Replicate (models/atrezo_roca_nevada.json)
+    se lee mejor con la luz de los niveles 2 y 3; esta queda fuera de PIECES. A 48 voxels/m, 1,2 x 0,9 m: caras planas de fractura,
+    diaclasas oscuras, una veta de cuarzo, líquenes, escarcha en las grietas, una capa gruesa
+    de nieve en lo alto que cae por los lados y un ventisquero a barlovento."""
+    V = 3
+    M = Model(S=V, seed=71)
+    rng = M.rng
+    BAS = (0.44, 0.46, 0.52); BAS_L = (0.64, 0.66, 0.72); BAS_D = (0.26, 0.28, 0.33)
+    LICHEN = ((0.62, 0.50, 0.18), (0.40, 0.46, 0.22)); QUARTZ = (0.80, 0.80, 0.76)
+    planes = []
+    for j in range(10):
+        a = j * math.tau / 10 + rng.uniform(-0.3, 0.3); e = rng.uniform(-0.05, 0.5)
+        planes.append(((math.cos(a) * math.cos(e), math.sin(e), math.sin(a) * math.cos(e)), rng.uniform(8.5, 10.5)))
+    planes.append(((0.2, 1.0, -0.15), 9.0))
+    planes.append(((-0.5, 1.0, 0.4), 9.5))
+    for x in range(-14 * V, 14 * V):
+        for y in range(0, 17 * V):
+            for z in range(-14 * V, 14 * V):
+                p = ((x + .5) / V, (y + .5) / V - 3.5, (z + .5) / V * 1.1)
+                if all(p[0] * n[0] + p[1] * n[1] + p[2] * n[2] <= d for n, d in planes):
+                    j = max(range(len(planes)), key=lambda j: p[0] * planes[j][0][0] + p[1] * planes[j][0][1] + p[2] * planes[j][0][2] - planes[j][1])
+                    M.put(x, y, z, 'body', ('f', j))
+    joints = [(rng.uniform(0, math.tau), rng.uniform(-12, 12)) for _ in range(3)]
+    def paint(k, part, c):
+        x, y, z = k
+        tone = M.hsh(c[1], 7, 7) if isinstance(c, tuple) and c and c[0] == 'f' else 0.5
+        base = lerp(BAS_D, BAS_L, 0.15 + 0.5 * tone + 0.3 * M.noise(x, y, z, 5))
+        base = lerp(base, BAS, 0.3 * M.noise(x, y, z, 2))
+        for a, o in joints:                                                  # diaclasas
+            if abs(x * math.cos(a) + z * math.sin(a) - o * V) < 1.0: return lerp(BAS_D, (0.70, 0.78, 0.86), 0.25 if y > 20 else 0.0)
+        if abs(y - 0.4 * x - 16) < 1.2 and M.noise(x, y, z, 3) > 0.35: return QUARTZ           # veta de cuarzo
+        if M.noise(x, y, z, 2.5) > 0.74: return LICHEN[M.hsh(x // 3, y // 3, z // 3) > 0.5]    # líquenes
+        nb = ((x + 1, y, z), (x - 1, y, z), (x, y + 1, z), (x, y - 1, z), (x, y, z + 1), (x, y, z - 1))
+        if sum(q not in M.V for q in nb) >= 2: base = lerp(base, BAS_L, 0.4)                 # aristas
+        return base
+    M.paint(paint)
+    for k in [k for k in M.V if all(q in M.V for q in ((k[0] + 1, k[1], k[2]), (k[0] - 1, k[1], k[2]), (k[0], k[1] + 1, k[2]),
+                                                        (k[0], k[1] - 1, k[2]), (k[0], k[1], k[2] + 1), (k[0], k[1], k[2] - 1)))]:
+        del M.V[k]
+    tops = {}
+    for (x, y, z) in M.V:
+        if y > tops.get((x, z), -1): tops[(x, z)] = y
+    for (x, z), h in tops.items():                                           # nieve en lo alto
+        slope = max(abs(tops.get((x + dx, z + dz), h - 9) - h) for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        if slope > 1 or M.noise(x, 0, z, 8) < 0.3: continue
+        d = 1 + int(4 * (M.noise(x, 0, z, 8) - 0.42)) if h > 20 else int(2 * M.noise(x, 0, z, 6))
+        for y in range(h + 1, h + 1 + d): M.put(x, y, z, 'body', SNOW if M.hsh(x, y, z) < 0.85 else SNOW_D)
+    occ = set(tops)                                                          # ventisquero a barlovento (-X)
+    for x in range(-16 * V, 16 * V):
+        for z in range(-16 * V, 16 * V):
+            if (x, z) in occ: continue
+            dd = next((r for r in range(1, 16) if (x + r, z) in occ or (x + r // 2, z + r // 2) in occ), None)
+            if dd is None:
+                dd = next((r for r in range(1, 7) if any((x + a * r, z + b * r) in occ for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1)))), None)
+                if dd is None: continue
+                h = int((7 - dd) * 0.8 * M.noise(x, 2, z, 5))
+            else:
+                h = int((16 - dd) * 0.9 * (0.5 + 0.5 * M.noise(x, 2, z, 6)))
+            for y in range(0, h): M.put(x, y, z, 'body', SNOW if M.hsh(x, y, z) < 0.85 else SNOW_D)
     return M, {'body': [0, 0, 0]}
 
 def iglu():
@@ -353,11 +457,15 @@ def bloques_hielo(name='bloques_hielo', seed=41):
     marcas de sierra en las caras, capas del hielo, burbujas atrapadas, grietas blancas que
     cruzan el bloque, algo de tierra en la base, escarcha en las aristas y nieve amontonada
     encima y al pie de la pila."""
-    M = Model(S=S, seed=seed)
+    M = Model(S=3, seed=seed)                                        # 48/m (revisión de arte del 14-10-2026; antes 32/m: *_v1)
     rng = M.rng
     hmap = {}                                                        # altura ocupada por columna
     blocks = []
+    K = 1.5                                                          # PILES está medido a 32/m
+    owner = {}
     for i, (bx, by, bz, W, H, D) in enumerate(PILES[name]):
+        bx, bz, W, H, D = (int(round(v * K)) for v in (bx, bz, W, H, D))
+        if by != 'top': by = int(round(by * K))
         jx, jz = rng.randint(-2, 2), rng.randint(-2, 2)
         x0, z0 = bx - W // 2 + jx, bz - D // 2 + jz
         x1, z1 = x0 + W, z0 + D
@@ -376,8 +484,9 @@ def bloques_hielo(name='bloques_hielo', seed=41):
                     # esquina rota (arriba)
                     cu = u if chip in (0, 2) else W - 1 - u
                     cw = w if chip in (0, 1) else D - 1 - w
-                    if cu + cw + (H - 1 - v) < 7: continue
+                    if cu + cw + (H - 1 - v) < 10: continue
                     M.put(x, y, z, 'body', ('ice', i, u, v, w, W, H, D))
+                    owner[(x, y, z)] = i
                     hmap[(x, z)] = max(hmap.get((x, z), 0), y + 1)
         blocks.append((i, W, H, D))
     # grietas: planos inclinados por bloque
@@ -404,6 +513,8 @@ def bloques_hielo(name='bloques_hielo', seed=41):
             if v % 3 == 0 and M.hsh(u + w, v, i) > 0.4: base = lerp(base, SAW, 0.6)
         edges = (u in (0, W - 1)) + (v in (0, H - 1)) + (w in (0, D - 1))
         if edges >= 2: base = lerp(base, ICE_EDGE, 0.75)                # escarcha en las aristas
+        if edges >= 1 and any(isinstance(owner.get(q), int) and owner[q] != i for q in ((x + 1, y, z), (x - 1, y, z), (x, y + 1, z), (x, y - 1, z), (x, y, z + 1), (x, y, z - 1))):
+            base = SNOW if M.hsh(x, y, z) < 0.8 else SNOW_D             # nieve prensada en las juntas
         if v == H - 1: base = lerp(base, ICE_EDGE, 0.35)
         return base
     M.paint(paint)
@@ -431,7 +542,7 @@ PIECES = (('roca', roca), ('hielo', hielo),
           ('bloques_hielo', bloques_hielo),
           ('bloques_hielo_2', lambda: bloques_hielo('bloques_hielo_2', 42)),
           ('bloques_hielo_3', lambda: bloques_hielo('bloques_hielo_3', 43)))
-VOXEL_PIVOTS = {'tienda', 'iglu', 'cabana', 'bloques_hielo', 'bloques_hielo_2', 'bloques_hielo_3'}   # diseñadas en voxels, no en ub
+VOXEL_PIVOTS = {'hielo', 'roca_nevada', 'tienda', 'iglu', 'cabana', 'bloques_hielo', 'bloques_hielo_2', 'bloques_hielo_3'}   # diseñadas en voxels, no en ub
 SHINY = {'hielo', 'bloques_hielo', 'bloques_hielo_2', 'bloques_hielo_3'}                     # hielo brillante, lo demás mate
 
 if __name__ == '__main__':

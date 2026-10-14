@@ -24,10 +24,26 @@ static var use_disk_cache := true
 static var _mats := {}   # "rugosidad/especular" -> material compartido
 static var _glow_mat: StandardMaterial3D
 
+## Versión del arte a comparar (revisión de arte, 14-10-2026): con `arte=v1` al lanzar, cada
+## modelo que tenga una copia `models/<nombre>_v1.json` (la versión de antes de rehacerlo) se
+## carga de ella. Sin el argumento, la versión nueva.
+static var _variant = null
+
+static func variant_path(path: String) -> String:
+	if _variant == null:
+		_variant = ""
+		for a in OS.get_cmdline_user_args():
+			if a.begins_with("arte="): _variant = a.substr(5)
+	if _variant == "" or not path.ends_with(".json"): return path
+	var alt: String = path.trim_suffix(".json") + "_" + str(_variant) + ".json"
+	if FileAccess.file_exists(alt) or FileAccess.file_exists(alt + ".z"): return alt
+	return path
+
 ## Devuelve una instancia nueva del modelo: un nodo por parte con su pivote. Si el JSON
 ## trae "parents" ({"fore_l": "arm_l"}), esa parte cuelga de la otra: al girar el brazo, el
 ## antebrazo va con él y además se dobla por su propio pivote (el codo).
 static func load_model(path: String) -> Node3D:
+	path = variant_path(path)
 	var model: Dictionary = _get_model(path)
 	var root := Node3D.new()
 	root.name = path.get_file().get_basename()

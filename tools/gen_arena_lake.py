@@ -22,7 +22,7 @@ A.add("atrezo_tienda_rota", 8.0, -10.5, rot=-25, scale=BIG)
 A.add("atrezo_tienda_rota", 11.0, 8.0, rot=60, scale=BIG)
 A.add("atrezo_tienda", -12.0, 9.5, rot=-10, scale=BIG)          # la única en pie
 A.add("atrezo_avion", -17.0, -17.5, rot=35)                     # el avión, al fondo
-A.add("atrezo_perforadora", 17.5, -3.0, rot=-70)
+A.add("atrezo_perforadora", 17.5, -3.0, rot=25)
 for x, z, r in ((-3.0, -11.0, 10), (2.5, -12.5, -20), (-1.0, 12.0, 80)):
     A.add("atrezo_mesa_diseccion", x, z, rot=r)
 for x, z in ((-6.0, -2.5), (5.5, 3.5), (-4.0, 6.5), (13.5, -7.0), (-14.0, 2.0), (3.0, -6.5)):
