@@ -66,23 +66,29 @@ def cuts(rng, u0, u1, wmin=14, wmax=34):
     return out
 
 
-def masonry(M, x0, x1, y0, y1, z0, z1, stars=0.3, cracks=3):
+def masonry(M, x0, x1, y0, y1, z0, z1, stars=0.3, cracks=3, hmin=12, hmax=22, wmin=14, wmax=34, slant=0.0, rustic=False):
     """Muro de sillares ciclópeos: hiladas de alturas distintas, bloques de anchos distintos,
     cada uno con su tono, canto biselado, juntas hundidas, estrellas talladas en algunos y grietas.
     Hueco por dentro. Devuelve el reparto de bloques {(hilada, índice): (ua, ub, ya, yb)} de la
-    cara +z (para romper el muro por bloques)."""
+    cara +z (para romper el muro por bloques).
+    Revisión de arte del 14-10-2026: las juntas van hundidas un voxel (relieve de verdad) y, con
+    `slant`, las juntas verticales se inclinan por hilada (aparejo poligonal, ciclópeo)."""
     rng = M.rng
-    cs = courses(rng, y0, y1)
+    cs = courses(rng, y0, y1, hmin, hmax)
+    sl = [rng.uniform(-slant, slant) for _ in cs]
     lay = {}                                                     # cara -> hilada -> cortes
     for face in ('z', 'x'):
         u0, u1 = (x0, x1) if face == 'z' else (z0, z1)
-        lay[face] = [cuts(rng, u0, u1) for _ in cs]
+        lay[face] = [cuts(rng, u0, u1, wmin, wmax) for _ in cs]
 
     def block(face, u, y):
         for ci, (ya, yb) in enumerate(cs):
             if ya <= y < yb:
+                du = sl[ci] * (y - (ya + yb) / 2)
+                uu = u - du
                 for bi, (ua, ub) in enumerate(lay[face][ci]):
-                    if ua <= u < ub: return ci, bi, ua, ub, ya, yb
+                    if ua <= uu < ub: return ci, bi, ua + du, ub + du, ya, yb
+                return ci, 0, u, u + 1, ya, yb
         return 0, 0, u, u + 1, y, y + 1
 
     for x in range(x0, x1):
@@ -100,8 +106,17 @@ def masonry(M, x0, x1, y0, y1, z0, z1, stars=0.3, cracks=3):
                 # cada pieza parecía una caja con el contorno negro)
                 d = min(u - ua if ua > uo0 else 99, ub - 1 - u if ub < uo1 else 99,
                         y - ya if ya > y0 else 99, yb - 1 - y if yb < y1 else 99)
+                d = int(math.floor(d)) if d < 99 else d
+                if edge == 1 and y < y1 - 1: c = lerp(JOINT, STONE_D, 0.3)   # fondo de la junta hundida
+                if (edge == 0 and d == 0 and y < y1 - 1 and 0 < x - x0 < x1 - x0 - 1
+                        and 0 < z - z0 < z1 - z0 - 1 and y > y0):
+                    continue                                             # junta hundida: se ve el fondo
                 if edge == 0 or y == y1 - 1:
                     if d == 0: c = JOINT                                 # junta
+                    if rustic and d >= 3 and edge == 0 and y < y1 - 1:  # almohadillado: la cara abomba
+                        out = ((0, 0, 1) if z == z1 - 1 else (0, 0, -1) if z == z0 else
+                               (1, 0, 0) if x == x1 - 1 else (-1, 0, 0) if x == x0 else None)
+                        if out: M.put(x + out[0], y, z + out[2], P, lerp(c, STONE_L, 0.12) if d >= 5 else c)
                     elif d == 1: c = lerp(c, JOINT, 0.3)                 # bisel
                     if y >= yb - 2: c = lerp(c, STONE_L, 0.3)            # canto de arriba, más claro
                 M.put(x, y, z, P, c)
@@ -145,7 +160,7 @@ def muro_roto():
     """Muro de sillares roto por bloques (perfil escalonado), con bloques caídos al pie."""
     M = Model(S=2, seed=61)
     x0, x1 = -48, 48
-    cs, lay = masonry(M, x0, x1, 0, 76, -10, 10, stars=0.35, cracks=4)
+    cs, lay = masonry(M, x0, x1, 0, 80, -11, 11, stars=0.5, cracks=4, hmin=20, hmax=34, wmin=22, wmax=48, slant=0.35, rustic=True)
     # Se rompe por bloques, de abajo arriba: un bloque se queda si cabe bajo el perfil y todo
     # su ancho apoya en lo de abajo (si no, quedaban bloques en el aire sobre huecos).
     prof = {x: 34 + 46 * M.noise(x, 0, 0, 26.0) for x in range(x0, x1)}
@@ -153,36 +168,64 @@ def muro_roto():
     for ci, (ya, yb) in enumerate(cs):
         for ua, ub in lay[ci]:
             span = range(ua, ub)
-            if ci <= 1 or (all(h[x] == ya for x in span) and yb <= min(prof[x] for x in span)):
+            if ci <= 0 or (all(h[x] == ya for x in span) and yb <= min(prof[x] for x in span)):
                 for x in span: h[x] = yb
-            else:
-                for x in span:
-                    for y in range(ya, yb):
-                        for z in range(-10, 10): M.V.pop((x, y, z), None)
+    for (x, y, z) in list(M.V):                                    # se corta en vertical por el perfil
+        if y >= h[min(max(x, x0), x1 - 1)] and -12 <= z <= 12 and x0 - 2 <= x <= x1 + 1: del M.V[(x, y, z)]
     # el muro es hueco: se cierran por arriba y por los lados los cortes que deja
     for x in range(x0, x1):
         for y in range(0, h[x]):
             side = y >= h.get(x - 1, 0) or y >= h.get(x + 1, 0) or y == h[x] - 1
             if side:
-                for z in range(-10, 10):
-                    if (x, y, z) not in M.V: M.put(x, y, z, P, lerp(STONE_D, STONE, M.noise(x, y, z, 4.0)))
+                for z in range(-11, 11):
+                    if (x, y, z) not in M.V:
+                        c = lerp(STONE_D, STONE, M.noise(x, y, z, 4.0))
+                        if y == h[x] - 1: c = lerp(c, STONE_L, 0.35)
+                        M.put(x, y, z, P, c)
     for i in range(4):                                            # bloques caídos al pie
-        w, h, d = M.rng.randint(12, 22), M.rng.randint(8, 14), M.rng.randint(10, 16)
-        fallen(M, M.rng.randint(-50, 30), M.rng.randint(12, 22), w, h, d)
+        w, hh, d = M.rng.randint(16, 30), M.rng.randint(12, 20), M.rng.randint(14, 22)
+        cx, cz = M.rng.randint(-56, 30), M.rng.randint(14, 26)
+        masonry(M, cx, cx + w, 0, hh, cz, cz + d, stars=0.4, cracks=1, hmin=hh, hmax=hh, wmin=w, wmax=w)
     frost(M)
     return M
 
 
 def arco():
-    """Arco de dos jambas y un dintel partido, una mitad caída."""
+    """Arco monumental de los Antiguos (revisión de arte del 14-10-2026, referencia de FLUX en
+    local tools/local/ref_arco_1000.png; el de antes queda en models/atrezo_arco_v1.json): dos
+    jambas de sillería, dovelas en abanico que forman un arco apuntado con la clave tallada con
+    la estrella, una banda de meandro en el intradós, la mitad derecha del arco caída a trozos al
+    pie y escarcha. A 32 voxels/m con la textura fina a 64/m."""
     M = Model(S=2, seed=62)
-    ashlar(M, -40, -24, 0, 96, -9, 9, rows=6, star=False)
-    ashlar(M, 24, 40, 0, 96, -9, 9, rows=6, star=False)
-    ashlar(M, -40, 2, 96, 112, -9, 9, rows=1, star=False)               # dintel
-    for x in range(-10, 30):                                           # la otra mitad, caída
-        for y in range(0, 14):
-            for z in range(12, 30):
-                if M.hsh(x // 8, y // 7, z // 9) < 0.85: M.put(x, y, z, P, lerp(STONE_D, STONE, 0.5))
+    rng = M.rng
+    masonry(M, -50, -28, 0, 84, -11, 11, stars=0.0, cracks=2, hmin=16, hmax=26, wmin=22, wmax=22)
+    masonry(M, 28, 50, 0, 70, -11, 11, stars=0.0, cracks=3, hmin=16, hmax=26, wmin=22, wmax=22)
+    cy, NV = 84, 9
+    for x in range(-52, 53):
+        for y in range(cy, cy + 64):
+            cxc = 12 if x < 0 else -12                          # apuntado: dos centros cruzados
+            r = math.hypot(x - cxc, y - cy)
+            if not (38 <= r <= 62): continue
+            ang = (math.atan2(y - cy, x) % math.pi) / math.pi * NV
+            k = int(ang)
+            if x > 4 and k < 3: continue                         # la mitad derecha se cayó
+            for z in range(-11, 11):
+                edge = min(r - 38, 62 - r, z + 11, 10 - z)
+                if edge > 1.5 and r > 39.5: continue
+                if abs(ang - round(ang)) < 0.05 and abs(z) >= 10 and 0 < round(ang) < NV: continue   # junta
+                c = lerp(STONE_D, STONE_L, 0.25 + 0.55 * M.hsh(k, 3, 3))
+                c = lerp(c, STONE_D, 0.3 * M.noise(x, y, z, 4.0))
+                if r < 41 and abs(z) >= 9: c = RELIEF if int(ang * 7) % 2 else lerp(RELIEF, STONE_L, 0.4)   # meandro
+                M.put(x, y, z, P, c)
+    for x in range(-9, 10):                                       # clave con la estrella
+        for y in range(cy + 44, cy + 62):
+            a2 = math.atan2(y - (cy + 52), x); r = math.hypot(x, y - (cy + 52))
+            lim = 7 * (0.45 + 0.55 * (0.5 + 0.5 * math.cos(5 * (a2 - math.pi / 2))) ** 2)
+            if r < lim:
+                for z in (11, -12): M.put(x, y, z, P, RELIEF)
+    for i in range(5):                                            # dovelas caídas
+        w = rng.randint(14, 22); x0 = rng.randint(18, 64); z0 = rng.randint(12, 32); hh = rng.randint(10, 16)
+        masonry(M, x0, x0 + w, 0, hh, z0, z0 + rng.randint(12, 20), stars=0.0, cracks=1, hmin=hh, hmax=hh, wmin=w, wmax=w)
     frost(M)
     return M
 
@@ -233,10 +276,22 @@ def muro_ciclopeo(seed):
     """Tramo de fondo: muro altísimo de sillares (10 m) con almenas rotas. Se hace a 32/m y se
     baja a 8/m como la Barrera de hielo (es fondo)."""
     M = Model(S=2, seed=seed)
-    ashlar(M, -128, 128, 0, 320, -64, 0, rows=10)
+    masonry(M, -128, 128, 0, 320, -64, 0, stars=0.45, cracks=8, hmin=34, hmax=60, wmin=40, wmax=90, slant=0.3, rustic=True)
     for k in [k for k in M.V if k[1] > 260 + 60 * M.noise(k[0], 0, 0, 40.0)]: del M.V[k]
     frost(M)
-    return half(M)
+    return half2(M)
+
+
+def half2(M):
+    """De 32/m a 16/m conservando las juntas oscuras (revisión de arte del 14-10-2026; antes a 8/m)."""
+    H = Model(S=1, seed=1)
+    NB = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    rank = {}
+    for (x, y, z), v in M.V.items():                      # gana lo que está a la vista (no el relleno de dentro)
+        k = (x // 2, y // 2, z // 2)
+        r = sum((x + a, y + b, z + c) not in M.V for a, b, c in NB) + (3 if v[1] in (FROST, JOINT) else 0)
+        if k not in H.V or r > rank[k]: H.V[k] = [v[0], v[1], v[2]]; rank[k] = r
+    return H
 
 
 def _fine(M, seed, k=2):
@@ -258,7 +313,7 @@ def _hh(x, y, z):
 
 # Los bloques (se repiten 86 veces) y el muro roto (14) llevan la textura fina a 32/m: al doble de
 # resolución la ciudad bajaba de ~118 a ~88 FPS. El mural (3) sí va a 64/m.
-PIECES = {'muro_roto': lambda: _fine(muro_roto(), 61, 1), 'arco': arco, 'bloque_ciclopeo': lambda: _fine(bloque(), 63, 1),
+PIECES = {'muro_roto': lambda: _fine(muro_roto(), 61, 1), 'arco': lambda: _fine(arco(), 62), 'bloque_ciclopeo': lambda: _fine(bloque(), 63, 1),
           'bloque_ciclopeo_2': lambda: _fine(bloque(2), 64, 1), 'bloque_ciclopeo_3': lambda: _fine(bloque(3), 65, 1),
           'mural': lambda: _fine(mural(), 66)}
 

@@ -522,16 +522,63 @@ def valla():
 
 
 def barril():
-    M = Model(S=2, seed=65)
-    for y in range(0, 30):
-        r = 9 + 1.4 * math.sin(y / 29 * math.pi)
-        for x in range(-11, 11):
-            for z in range(-11, 11):
+    """Barril de arenques (revisión de arte del 14-10-2026, referencia de FLUX en local
+    tools/local/ref_barril_1000.png; el de antes queda en models/inn_barril_v1.json). A 48 voxels/m,
+    0,6 x 0,9 m: duelas con su tono y juntas, panza, cuatro aros de hierro con remaches y óxido,
+    canto de las duelas por encima de la tapa, la tapa medio corrida y arenques plateados
+    asomando, salitre y verdín abajo."""
+    M = Model(S=3, seed=65)                                     # 48/m (a 64 la carretera perdía en el 1 % peor)
+    rng = M.rng
+    H, R0 = 44, 12.8
+    NST = 18
+    FISH = (0.62, 0.66, 0.68); FISH_D = (0.36, 0.40, 0.44); FISH_B = (0.24, 0.30, 0.36)
+    SALT = (0.70, 0.70, 0.66)
+    tones = [rng.uniform(0, 1) for _ in range(NST)]
+    for y in range(0, H):
+        r = R0 + 2.0 * math.sin(y / (H - 1) * math.pi)
+        for x in range(-17, 18):
+            for z in range(-17, 18):
                 d = math.hypot(x + 0.5, z + 0.5)
-                if d > r or (d < r - 2 and 1 < y < 29): continue
-                c = IRON if y in (3, 4, 25, 26) else (WOOD if int(math.atan2(z, x) * 5) % 2 else WOOD_D)
-                if y == 29: c = WOOD_D
+                if d > r or d < r - 1.8: continue
+                a = (math.atan2(z, x) % math.tau) / math.tau * NST
+                s = int(a)
+                c = lerp(WOOD_D, (0.46, 0.36, 0.25), 0.25 + 0.6 * tones[s])
+                c = lerp(c, WOOD_D, 0.3 * M.noise(x * 0.3, y, z * 0.3, 3.0))       # veta a lo largo
+                if a - s < 0.08: c = lerp(c, (0.12, 0.09, 0.07), 0.7)                  # junta
+                if y in (4, 5, 11, 12, H - 13, H - 12, H - 6, H - 5):
+                    c = lerp(IRON, RUST, 0.6 * M.noise(x, y, z, 2.5))                  # aros
+                    if (int(a * 2) % 5 == 0) and y in (5, 12, H - 12, H - 5): c = IRON_L   # remaches
+                    M.put(x * 1.04, y, z * 1.04, P, c)
+                if y < 6: c = lerp(c, (0.24, 0.30, 0.20), 0.5 * M.noise(x, y, z, 3.0))  # verdín
+                if M.noise(x, y, z, 2.0) > 0.8: c = lerp(c, SALT, 0.5)                 # salitre
                 M.put(x, y, z, P, c)
+    # fondo, y tapa medio corrida (a un lado, inclinada)
+    for x in range(-15, 16):
+        for z in range(-15, 16):
+            if math.hypot(x, z) < R0: M.put(x, 0, z, P, WOOD_D)
+    for x in range(-13, 14):
+        for z in range(-13, 14):
+            if math.hypot(x, z) < R0 - 1 and x < 3:
+                y = H - 3 + int((x + 13) * 0.06)
+                M.put(x + 5, y, z, P, (0.40, 0.31, 0.22) if (z // 4) % 2 else (0.34, 0.26, 0.18))
+    # arenques en el hueco que deja la tapa
+    for i in range(9):
+        cx, cz = rng.uniform(-10, -2) + 10, rng.uniform(-9, 9)
+        ang = rng.uniform(0, math.pi)
+        L = rng.randint(6, 8)
+        y = H - 4 + rng.randint(-1, 1)
+        for k in range(-L, L + 1):
+            px, pz = cx + k * math.cos(ang), cz + k * math.sin(ang)
+            if math.hypot(px, pz) > R0 - 2: continue
+            w = 1.6 * math.sin(math.pi * (k + L) / (2 * L)) + 0.4
+            for dw in range(-int(w), int(w) + 1):
+                qx, qz = px - dw * math.sin(ang), pz + dw * math.cos(ang)
+                c = FISH if dw >= 0 else FISH_D
+                if dw == int(w): c = FISH_B
+                if k == L: c = (0.08, 0.08, 0.09)                                    # ojo/cabeza
+                M.put(qx, y + (1 if abs(dw) < 1 else 0), qz, P, c)
+    NB = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a2, k[1] + b2, k[2] + c2) in M.V for a2, b2, c2 in NB)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 
@@ -605,22 +652,58 @@ def redes():
 
 
 def barca():
-    """Bote de remos volcado sobre la tierra: casco a lo largo de x, quilla arriba."""
-    M = Model(S=2, seed=67)
-    for x in range(-56, 56):
-        t = abs(x) / 56
-        half = 22 * math.sqrt(max(0.0, 1 - t ** 2.2))
-        hgt = 20 - 4 * t
-        for z in range(-int(half) - 1, int(half) + 1):
+    """Bote de remos volcado (revisión de arte del 14-10-2026, referencia
+    tools/local/ref_barca_1000.png; el de antes queda en models/inn_barca_v1.json). A 48 voxels/m,
+    3,5 x 1,6 m, quilla arriba: tracas de tingladillo con el solape en sombra, pintura azul y
+    blanca que se pela a la madera, franja roja de flotación, quilla y roda de madera oscura, el
+    espejo de popa, una tabla rota con el hueco a la vista, verdín y barro al pie, y un remo
+    partido y un cabo en el suelo."""
+    M = Model(S=3, seed=67)
+    rng = M.rng
+    L, Wd, Hh = 84, 34, 30
+    BLUE = (0.28, 0.40, 0.48); BLUE_D = (0.20, 0.30, 0.36); WHITE = (0.70, 0.70, 0.64); RED = (0.48, 0.16, 0.12)
+    broken = (rng.randint(-30, 10), rng.randint(6, 14))
+    for x in range(-L, L):
+        t_ = abs(x) / L
+        half = Wd * math.sqrt(max(0.0, 1 - t_ ** (1.8 if x > 0 else 3.0)))            # proa afilada en +x
+        hgt = Hh - 6 * t_ ** 2
+        for z in range(-int(half) - 1, int(half) + 2):
             u = abs(z + 0.5) / max(half, 1)
             if u > 1: continue
-            y = int(hgt * math.sqrt(max(0.0, 1 - u * u)))
-            c = (0.30, 0.38, 0.42) if (y // 3) % 2 else (0.24, 0.30, 0.34)   # pintura azul desconchada
-            if M.noise(x, y, z, 5.0) > 0.66: c = WOOD
-            for yy in range(max(0, y - 2), y + 1): M.put(x, yy, z, P, c)
-        M.put(x, int(hgt) + 1, 0, P, WOOD_D)              # quilla
-    for x in range(-10, 30):                              # un remo en el suelo
-        M.put(x, 0, 28 + x // 12, P, WOOD); M.put(x, 0, 29 + x // 12, P, WOOD)
+            y = int(hgt * math.sqrt(max(0.0, 1 - u ** 2.4)))
+            strake = int(u * 7)
+            c = WHITE if strake == 5 else (BLUE if strake % 2 else BLUE_D)
+            if u > 0.94: c = RED                                                       # franja de flotación (abajo, volcado)
+            if (u * 7) % 1 < 0.14: c = lerp(c, (0.10, 0.10, 0.10), 0.5)                # solape
+            if M.noise(x, y, z, 4.0) > 0.68: c = lerp(WOOD, WOOD_D, M.noise(x, y, z, 1.5))   # pelado
+            if y < 3: c = lerp(c, (0.22, 0.26, 0.18), 0.6)                             # verdín al pie
+            if abs(x - broken[0]) < 7 and abs(z - broken[1]) < 4 and strake in (1, 2): continue   # tabla rota
+            for yy in range(max(0, y - 1), y + 1): M.put(x, yy, z, P, c)
+        for k in (-1, 0, 1): M.put(x, int(hgt) + 1, k, P, WOOD_D)                    # quilla
+        M.put(x, int(hgt) + 2, 0, P, WOOD_D)
+    for y in range(0, Hh - 4):                                                         # espejo de popa
+        for z in range(-int(Wd * 0.8), int(Wd * 0.8)):
+            if abs(z) / (Wd * 0.8) <= math.sqrt(max(0.0, 1 - (y / (Hh - 4)) ** 2)):
+                M.put(-L, y, z, P, WOOD if (y // 4) % 2 else WOOD_D)
+    for (x, y, z), v in list(M.V.items()):                                            # el hueco: interior oscuro
+        if abs(x - broken[0]) < 8 and abs(z - broken[1]) < 5: v[1] = lerp(v[1], (0.08, 0.07, 0.06), 0.3)
+    for x in range(-30, 40):                                                           # remo partido
+        z = 46 + x // 10
+        for d in (0, 1): M.put(x, 0, z + d, P, WOOD)
+        if x > 26:
+            for d in range(-3, 5): M.put(x, 0, z + d, P, WOOD)
+    for x in range(48, 60):                                                            # la otra mitad, suelta
+        for d in (0, 1): M.put(x, 0, 52 - (x - 48) // 3 + d, P, WOOD_D)
+    for i in range(70):                                                                # cabo en el suelo
+        a = i * 0.25
+        r = 6 + i * 0.06
+        M.put(70 + r * math.cos(a), 0, 30 + r * math.sin(a), P, ROPE)
+    for x in range(-L - 6, L + 6):                                                     # barro al pie
+        for z in range(-Wd - 6, Wd + 6):
+            if (x, 0, z) in M.V: continue
+            if M.noise(x, 0, z, 6.0) > 0.55: M.put(x, 0, z, P, MUD)
+    NB = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a2, k[1] + b2, k[2] + c2) in M.V for a2, b2, c2 in NB)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 
@@ -1123,6 +1206,90 @@ def escombros():
             for w in range(-1, 2):
                 M.put(t * math.cos(ang) - w * math.sin(ang), 16 + t * 0.25 * (1 if k else -1),
                       t * math.sin(ang) + w * math.cos(ang), P, WOOD_D)
+    return M, {P: [0, 0, 0]}
+
+
+def escombros_v2():
+    """Montón de escombros de una casa (revisión de arte del 14-10-2026, a mano con la referencia
+    tools/local/ref_escombros_1000.png; el de Replicate queda en models/inn_escombros_v1.json).
+    A 48 voxels/m, 2,3 m: el arranque de un muro de ladrillo en aparejo con llagas, roto en
+    escalera; el montón de ladrillos sueltos (enteros y medios, cada uno con su tono y algunos
+    de canto), cascotes de enlucido blanco, polvo de mortero, dos vigas astilladas, un marco de
+    ventana roto con un cristal y hierbajos."""
+    M = Model(S=3, seed=73)
+    rng = M.rng
+    PLASTER = (0.82, 0.80, 0.74); PLASTER_D = (0.64, 0.62, 0.58); MORTAR = (0.60, 0.58, 0.54)
+    BR_L = (0.68, 0.38, 0.28); BR_D = (0.48, 0.25, 0.19)
+    BRICK_D, BRICK_W = BR_D, BR_L                                             # más claros: de noche salían negros
+    FRAME = (0.62, 0.60, 0.54); WEED = (0.30, 0.36, 0.20)
+    def brick_col(i):
+        return lerp(BRICK_D, BRICK_W, rng.random()) if rng.random() > 0.15 else lerp(BRICK_D, (0.30, 0.20, 0.16), 0.4)
+    # muro: dos hiladas de ladrillos de 6x3 (más llaga) a lo largo de x, roto en escalera
+    top = {}
+    for x in range(-52, 30):
+        top[x] = int(max(3, 46 - max(0, x + 20) * 0.9 + 6 * M.noise(x, 0, 0, 5.0)))
+    for x in range(-52, 30):
+        for y in range(0, top[x]):
+            row = y // 4
+            off = 3 if row % 2 else 0
+            for z in range(-36, -30):
+                joint = (y % 4 == 3) or ((x + off) % 7 == 6)
+                c = MORTAR if joint else lerp(BRICK_D, BRICK_W, M.hsh((x + off) // 7, row, 1))
+                if z in (-36, -31) or y == top[x] - 1:
+                    if joint and z == -31 and y < top[x] - 1: c = lerp(MORTAR, (0.2, 0.2, 0.2), 0.3)
+                    if z == -31 and M.noise(x, y, z, 6.0) > 0.62 and y > 10: c = lerp(PLASTER, PLASTER_D, M.hsh(x, y, 2))   # enlucido
+                    M.put(x, y, z, P, c)
+    # el montón: ladrillos sueltos apilados, más alto en el centro
+    hmap = {}
+    for i in range(380):
+        a = rng.uniform(0, math.tau); r = abs(rng.gauss(0, 18))
+        cx, cz = r * math.cos(a), r * math.sin(a) - 6
+        L, Wb, Hb = (7, 3, 3) if rng.random() < 0.75 else (4, 3, 3)
+        if rng.random() < 0.3: L, Wb = Wb, L
+        if rng.random() < 0.15: Hb, Wb = Wb, Hb                                   # de canto
+        x0, z0 = int(cx), int(cz)
+        base = max(hmap.get((x, z), 0) for x in range(x0, x0 + L) for z in range(z0, z0 + Wb))
+        if base > 30 - r * 0.9: continue
+        c = brick_col(i)
+        for x in range(x0, x0 + L):
+            for z in range(z0, z0 + Wb):
+                for y in range(base, base + Hb):
+                    edge = x in (x0, x0 + L - 1) and z in (z0, z0 + Wb - 1)
+                    M.put(x, y, z, P, lerp(c, (0.2, 0.12, 0.1), 0.25) if edge else c)
+                hmap[(x, z)] = base + Hb
+    for i in range(90):                                                         # cascotes de enlucido
+        cx, cz = rng.gauss(0, 16), rng.gauss(-6, 14)
+        s = rng.randint(2, 5)
+        y0 = hmap.get((int(cx), int(cz)), 0)
+        for x in range(int(cx), int(cx) + s):
+            for z in range(int(cz), int(cz) + s - 1):
+                if abs(x - cx) + abs(z - cz) <= s:
+                    M.put(x, y0, z, P, PLASTER if M.hsh(x, y0, z) > 0.3 else PLASTER_D)
+    for x in range(-44, 44):                                                    # polvo de mortero alrededor
+        for z in range(-40, 36):
+            if (x, 0, z) not in M.V and M.noise(x, 0, z, 5.0) > 0.5 and math.hypot(x, z + 6) < 40:
+                M.put(x, 0, z, P, lerp(MORTAR, PLASTER_D, M.hsh(x, 0, z)))
+    for k, (ang, y0, rise) in enumerate(((0.5, 18, 0.32), (2.3, 10, -0.25))):    # vigas astilladas
+        for s in range(-36, 36):
+            for w in range(-2, 2):
+                for h in range(0, 3):
+                    x = s * math.cos(ang) - w * math.sin(ang); z = s * math.sin(ang) + w * math.cos(ang) - 6
+                    y = y0 + s * rise + h
+                    if y < 0: continue
+                    c = WOOD_D if h == 0 or w in (-2, 1) else WOOD
+                    if abs(s) > 32 and M.hsh(int(x), int(y), int(z)) < 0.5: continue        # astillas
+                    M.put(x, y, z, P, c)
+    for y in range(0, 26):                                                      # marco de ventana roto, de lado
+        for z in range(14, 34):
+            fr = y in (0, 1, 24, 25) or z in (14, 15, 32, 33) or z == 24
+            if fr and not (y > 16 and z > 26): M.put(30 + y // 3, y // 2, z, P, FRAME)
+            elif 2 < y < 12 and 16 < z < 23: M.put(30 + y // 3, y // 2, z, P, GLASS)
+    for i in range(14):                                                         # hierbajos
+        cx, cz = rng.uniform(-40, 40), rng.uniform(-40, 30)
+        for k in range(rng.randint(3, 7)):
+            M.put(cx + rng.randint(-1, 1), k, cz + rng.randint(-1, 1), P, WEED)
+    NB = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for kk in [kk for kk in M.V if all((kk[0] + a2, kk[1] + b2, kk[2] + c2) in M.V for a2, b2, c2 in NB)]: del M.V[kk]
     return M, {P: [0, 0, 0]}
 
 
@@ -1695,7 +1862,7 @@ def coche():
 
 PIECES = {'casa': casa, 'casa_2': lambda: casa(2), 'autobus': autobus, 'poste': poste, 'valla': valla, 'barril': barril,
           'redes': redes, 'barca': barca, 'farola': farola, 'juncos': juncos,
-          'fachada': fachada, 'templo_v1': templo, 'escombros_mano': escombros, 'fuente': fuente,
+          'fachada': fachada, 'templo_v1': templo, 'escombros_mano': escombros, 'escombros': escombros_v2, 'fuente': fuente,
           'carretilla': carretilla, 'cajas': cajas, 'cajas_2': lambda: cajas(2), 'cajas_3': lambda: cajas(3), 'nasa': nasa, 'pilote': pilote, 'coche': coche}
 
 if __name__ == '__main__':
