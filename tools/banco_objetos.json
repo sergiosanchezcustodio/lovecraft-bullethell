@@ -1,0 +1,193 @@
+{
+ "base": {
+  "abatidos": 81.6,
+  "dano": 4308.041700121719,
+  "vida": 94.4,
+  "cordura": 51.4,
+  "crisis": 0.2
+ },
+ "objetos": {
+  "_base0": {
+   "abatidos": 77,
+   "dano": 3995.68476056295,
+   "vida": 48,
+   "cordura": 27,
+   "crisis": 0
+  },
+  "_base1": {
+   "abatidos": 74,
+   "dano": 4194.92395294482,
+   "vida": 98,
+   "cordura": 24,
+   "crisis": 0
+  },
+  "_base2": {
+   "abatidos": 80,
+   "dano": 3932.41215233722,
+   "vida": 29,
+   "cordura": 15,
+   "crisis": 0
+  },
+  "_base3": {
+   "abatidos": 109,
+   "dano": 5412.34166034683,
+   "vida": 271,
+   "cordura": 175,
+   "crisis": 1
+  },
+  "_base4": {
+   "abatidos": 68,
+   "dano": 4004.84597441678,
+   "vida": 26,
+   "cordura": 16,
+   "crisis": 0
+  },
+  "bandolera": {
+   "abatidos": 235,
+   "dano": 11386.0322402497,
+   "vida": 82,
+   "cordura": 36,
+   "crisis": 0
+  },
+  "tablilla": {
+   "abatidos": 101,
+   "dano": 5675.80817884405,
+   "vida": 157,
+   "cordura": 57,
+   "crisis": 0
+  },
+  "guantes": {
+   "abatidos": 109,
+   "dano": 5060.62018419314,
+   "vida": 107,
+   "cordura": 20,
+   "crisis": 0
+  },
+  "reloj": {
+   "abatidos": 106,
+   "dano": 5109.11119946874,
+   "vida": 15,
+   "cordura": 5,
+   "crisis": 0
+  },
+  "piedra_afilar": {
+   "abatidos": 116,
+   "dano": 6375.54066923311,
+   "vida": 102,
+   "cordura": 41,
+   "crisis": 0
+  },
+  "collar": {
+   "abatidos": 80,
+   "dano": 3914.23454198514,
+   "vida": 125,
+   "cordura": 56,
+   "crisis": 0
+  },
+  "mapa_leng": {
+   "abatidos": 99,
+   "dano": 5340.98339560923,
+   "vida": 76,
+   "cordura": 7,
+   "crisis": 0
+  },
+  "petaca": {
+   "abatidos": 139,
+   "dano": 6983.10498581803,
+   "vida": 391,
+   "cordura": 197,
+   "crisis": 1
+  },
+  "manual_tiro": {
+   "abatidos": 94,
+   "dano": 4311.5497972707,
+   "vida": 81,
+   "cordura": 16,
+   "crisis": 0
+  },
+  "idolo": {
+   "abatidos": 75,
+   "dano": 3387.68690584072,
+   "vida": 25,
+   "cordura": 5,
+   "crisis": 0
+  },
+  "ojo_pickman": {
+   "abatidos": 81,
+   "dano": 4272.36843116022,
+   "vida": 142,
+   "cordura": 38,
+   "crisis": 0
+  },
+  "clepsidra": {
+   "abatidos": 107,
+   "dano": 5861.64144436717,
+   "vida": 479,
+   "cordura": 170,
+   "crisis": 1
+  },
+  "cristal": {
+   "abatidos": 88,
+   "dano": 4661.8208146058,
+   "vida": 42,
+   "cordura": 27,
+   "crisis": 0
+  },
+  "fosforos": {
+   "abatidos": 97,
+   "dano": 4732.50918320642,
+   "vida": 56,
+   "cordura": 22,
+   "crisis": 0
+  },
+  "medallon": {
+   "abatidos": 74,
+   "dano": 3749.45266272028,
+   "vida": 5,
+   "cordura": 9,
+   "crisis": 0
+  },
+  "diente": {
+   "abatidos": 81,
+   "dano": 4090.56587961589,
+   "vida": 64,
+   "cordura": 24,
+   "crisis": 0
+  },
+  "elixir": {
+   "abatidos": 67,
+   "dano": 3528.70121110162,
+   "vida": 21,
+   "cordura": 8,
+   "crisis": 0
+  },
+  "polvora": {
+   "abatidos": 91,
+   "dano": 5432.97989307145,
+   "vida": 475,
+   "cordura": 257,
+   "crisis": 2
+  },
+  "catalejo": {
+   "abatidos": 80,
+   "dano": 4560.28829303284,
+   "vida": 0,
+   "cordura": 2,
+   "crisis": 0
+  },
+  "plomada": {
+   "abatidos": 82,
+   "dano": 3867.2189897377,
+   "vida": 94,
+   "cordura": 28,
+   "crisis": 0
+  },
+  "manuscritos": {
+   "abatidos": 68,
+   "dano": 3694.97957393477,
+   "vida": 16,
+   "cordura": 6,
+   "crisis": 0
+  }
+ }
+}

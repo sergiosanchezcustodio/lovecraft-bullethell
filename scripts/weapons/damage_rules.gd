@@ -60,7 +60,19 @@ static func factor(w: WeaponData) -> float:
 	return f
 
 static func target_dps(w: WeaponData) -> float:
-	return BASE_DPS * factor(w)
+	return BASE_DPS * factor(w) * bench_factor(w.id)
+
+## Corrección medida en partida (15-10-2026): tools/banco_armas.py enfrenta cada arma sola a la
+## misma horda y guarda en data/weapons/banco.json cuánto hay que subir o bajar su daño para que
+## rinda como la mediana. Los rasgos de arriba no recogen bien lo que pasa contra una horda (un
+## área toca a diez enemigos; un abanico de perdigones casi nunca acierta todos).
+const BENCH_PATH := "res://data/weapons/banco.json"
+static var _bench := {}
+static func bench_factor(id: StringName) -> float:
+	if _bench.is_empty() and FileAccess.file_exists(BENCH_PATH):
+		_bench = JSON.parse_string(FileAccess.get_file_as_string(BENCH_PATH))
+		if _bench == null: _bench = {"_": 1}
+	return float(_bench.get(String(id), 1.0))
 
 ## Daño a un solo objetivo por uso (todo acierta), sin el de las zonas ni maldiciones.
 static func _hit_per_use(w: WeaponData) -> float:

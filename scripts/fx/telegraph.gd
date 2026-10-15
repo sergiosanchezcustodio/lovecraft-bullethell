@@ -17,6 +17,7 @@ func setup(p_radius: float, p_duration: float, p_color: Color, p_fill: bool = tr
 	return self
 
 func _ready() -> void:
+	add_to_group(&"enemy_warnings")                 # el bot (SmartBot) sale de los avisos
 	var pm := PlaneMesh.new()
 	pm.size = Vector2(radius * 2.0, radius * 2.0)
 	mesh = pm

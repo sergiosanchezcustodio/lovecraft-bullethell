@@ -13,15 +13,17 @@ from arena_kit import Arena, COLLIDERS
 
 HALF = 24.0
 A = Arena("estudio", seed=1925, half=HALF, spawn_clear=4.0,
-          foot={"prv_muro": 12.0, "prv_muro_bajo": 2.0, "prv_mesa": 2.0, "prv_pilar": 0.5,
+          foot={"prv_muro": 12.0, "prv_muro_2": 12.0, "prv_muro_3": 12.0, "prv_muro_bajo": 2.0, "prv_mesa": 2.0, "prv_pilar": 0.5,
                 "prv_escultura_1": 0.8, "prv_escultura_2": 0.6, "prv_caballete": 0.8, "prv_sacos": 1.2,
                 "prv_lampara": 0.4, "prv_relieve": 0.8})
 
 # paredes: altas al norte y al oeste, el arranque al sur y al este
-for x in range(-int(HALF) + 6, int(HALF) + 12, 12):
-    A.add("prv_muro", x, -HALF, rot=0)
-for z in range(-int(HALF) + 6, int(HALF) + 12, 12):
-    A.add("prv_muro", -HALF, z, rot=90)
+# tres variantes (petición 102): envejecida, deteriorada con enlucido y semiderruida
+WALLS = ("prv_muro", "prv_muro_2", "prv_muro_3", "prv_muro", "prv_muro_2")
+for i, x in enumerate(range(-int(HALF) + 6, int(HALF) + 12, 12)):
+    A.add(WALLS[i], x, -HALF, rot=0)
+for i, z in enumerate(range(-int(HALF) + 6, int(HALF) + 12, 12)):
+    A.add(WALLS[(i + 2) % 5], -HALF, z, rot=90)
 for t in range(-int(HALF) + 2, int(HALF) + 4, 4):
     A.add("prv_muro_bajo", t, HALF + 0.2, rot=0)
     A.add("prv_muro_bajo", HALF + 0.2, t, rot=90)
@@ -52,6 +54,8 @@ A.scatter("prv_mesa", 3, 8.0, 1.0, 1.0)
 COLL = dict(COLLIDERS)
 COLL.update({
     "prv_muro": {"type": "box", "shrink": 0.98},
+    "prv_muro_2": {"type": "box", "shrink": 0.98},
+    "prv_muro_3": {"type": "box", "shrink": 0.98},
     "prv_muro_bajo": {"type": "box", "shrink": 0.95},
     "prv_pilar": {"type": "cylinder", "radius": 0.25},
     "prv_mesa": {"type": "box", "shrink": 0.95},

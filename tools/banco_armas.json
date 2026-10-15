@@ -1,0 +1,252 @@
+{
+ "ancla": {
+  "dano": 6975,
+  "abatidos": 164,
+  "total_abatidos": 164
+ },
+ "antitanque": {
+  "dano": 2087,
+  "abatidos": 42,
+  "total_abatidos": 42
+ },
+ "arpon": {
+  "dano": 4293,
+  "abatidos": 78,
+  "total_abatidos": 78
+ },
+ "ballesta": {
+  "dano": 2735,
+  "abatidos": 46,
+  "total_abatidos": 46
+ },
+ "bar": {
+  "dano": 2525,
+  "abatidos": 47,
+  "total_abatidos": 47
+ },
+ "bengalas": {
+  "dano": 2446,
+  "abatidos": 46,
+  "total_abatidos": 46
+ },
+ "bisturis": {
+  "dano": 3133,
+  "abatidos": 58,
+  "total_abatidos": 58
+ },
+ "bumeran": {
+  "dano": 5068,
+  "abatidos": 116,
+  "total_abatidos": 116
+ },
+ "cepos": {
+  "dano": 1197,
+  "abatidos": 20,
+  "total_abatidos": 20
+ },
+ "corredera": {
+  "dano": 1868,
+  "abatidos": 21,
+  "total_abatidos": 21
+ },
+ "cthugha": {
+  "dano": 4660,
+  "abatidos": 105,
+  "total_abatidos": 105
+ },
+ "daga": {
+  "dano": 7811,
+  "abatidos": 182,
+  "total_abatidos": 182
+ },
+ "estoque": {
+  "dano": 2664,
+  "abatidos": 68,
+  "total_abatidos": 68
+ },
+ "farolero": {
+  "dano": 2889,
+  "abatidos": 57,
+  "total_abatidos": 57
+ },
+ "flammenwerfer": {
+  "dano": 2300,
+  "abatidos": 35,
+  "total_abatidos": 35
+ },
+ "formula": {
+  "dano": 6321,
+  "abatidos": 152,
+  "total_abatidos": 152
+ },
+ "fuegos": {
+  "dano": 3340,
+  "abatidos": 63,
+  "total_abatidos": 63
+ },
+ "gas": {
+  "dano": 3832,
+  "abatidos": 74,
+  "total_abatidos": 74
+ },
+ "granada": {
+  "dano": 5948,
+  "abatidos": 132,
+  "total_abatidos": 132
+ },
+ "ithaqua": {
+  "dano": 1427,
+  "abatidos": 23,
+  "total_abatidos": 23
+ },
+ "lampara": {
+  "dano": 5873,
+  "abatidos": 132,
+  "total_abatidos": 132
+ },
+ "lanzaquimicos": {
+  "dano": 4372,
+  "abatidos": 82,
+  "total_abatidos": 82
+ },
+ "latigo": {
+  "dano": 4235,
+  "abatidos": 94,
+  "total_abatidos": 94
+ },
+ "lente": {
+  "dano": 2326,
+  "abatidos": 61,
+  "total_abatidos": 61
+ },
+ "lewis": {
+  "dano": 2997,
+  "abatidos": 51,
+  "total_abatidos": 51
+ },
+ "lugers": {
+  "dano": 2259,
+  "abatidos": 48,
+  "total_abatidos": 48
+ },
+ "machete": {
+  "dano": 1259,
+  "abatidos": 16,
+  "total_abatidos": 16
+ },
+ "martillo": {
+  "dano": 3766,
+  "abatidos": 81,
+  "total_abatidos": 81
+ },
+ "mauser": {
+  "dano": 2757,
+  "abatidos": 61,
+  "total_abatidos": 61
+ },
+ "migo": {
+  "dano": 3751,
+  "abatidos": 77,
+  "total_abatidos": 77
+ },
+ "molotov": {
+  "dano": 5244,
+  "abatidos": 121,
+  "total_abatidos": 121
+ },
+ "mortero": {
+  "dano": 6650,
+  "abatidos": 151,
+  "total_abatidos": 151
+ },
+ "nagant": {
+  "dano": 2881,
+  "abatidos": 54,
+  "total_abatidos": 54
+ },
+ "necronomicon": {
+  "dano": 2686,
+  "abatidos": 69,
+  "total_abatidos": 69
+ },
+ "palanca": {
+  "dano": 2672,
+  "abatidos": 53,
+  "total_abatidos": 53
+ },
+ "polvo": {
+  "dano": 4408,
+  "abatidos": 92,
+  "total_abatidos": 92
+ },
+ "recortada": {
+  "dano": 1675,
+  "abatidos": 28,
+  "total_abatidos": 28
+ },
+ "red": {
+  "dano": 3236,
+  "abatidos": 56,
+  "total_abatidos": 56
+ },
+ "resonador": {
+  "dano": 914,
+  "abatidos": 5,
+  "total_abatidos": 5
+ },
+ "shub": {
+  "dano": 6063,
+  "abatidos": 139,
+  "total_abatidos": 139
+ },
+ "signo": {
+  "dano": 6336,
+  "abatidos": 150,
+  "total_abatidos": 150
+ },
+ "signo_amarillo": {
+  "dano": 3362,
+  "abatidos": 74,
+  "total_abatidos": 74
+ },
+ "springfield": {
+  "dano": 1895,
+  "abatidos": 27,
+  "total_abatidos": 27
+ },
+ "tesla": {
+  "dano": 2813,
+  "abatidos": 53,
+  "total_abatidos": 53
+ },
+ "thompson": {
+  "dano": 2194,
+  "abatidos": 37,
+  "total_abatidos": 37
+ },
+ "trapezoedro": {
+  "dano": 5463,
+  "abatidos": 144,
+  "total_abatidos": 144
+ },
+ "webly": {
+  "dano": 3392,
+  "abatidos": 71,
+  "total_abatidos": 71
+ },
+ "west": {
+  "dano": 4023,
+  "abatidos": 94,
+  "total_abatidos": 94
+ },
+ "yith": {
+  "dano": 1691,
+  "abatidos": 36,
+  "total_abatidos": 36
+ },
+ "yog": {
+  "dano": 5655,
+  "abatidos": 135,
+  "total_abatidos": 135
+ }
+}

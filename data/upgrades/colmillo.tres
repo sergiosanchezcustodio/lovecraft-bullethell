@@ -7,10 +7,10 @@
 script = ExtResource("1")
 id = &"colmillo"
 display_name = "Colmillo de ghoul"
-description = "Cada enemigo abatido cura 0,5 de vida"
+description = "Cada enemigo abatido cura 0,15 de vida"
 stat = "heal_on_kill"
 multiply = 1.0
-add = 0.5
+add = 0.15
 max_level = 5
 color = Color(0.45, 0.8, 0.5, 1)
 icon = ExtResource("2")

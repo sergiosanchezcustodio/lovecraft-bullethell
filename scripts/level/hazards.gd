@@ -65,6 +65,8 @@ func _open_angle(pos: Vector3, r: float) -> void:
 	Sfx.play("angles")
 	var node := _angle_mesh(r)
 	node.position = pos
+	node.set_meta("warn_r", r * 1.6)                    # el bot (SmartBot) se aparta
+	node.add_to_group(&"enemy_warnings")
 	world.fx.add_child(node)
 	_open.append({"pos": pos, "r": r, "t": level.angle_time, "node": node})
 	if OS.get_cmdline_user_args().has("log=true"): print("ANGULOS abiertos")

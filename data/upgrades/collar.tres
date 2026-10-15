@@ -7,10 +7,10 @@
 script = ExtResource("1")
 id = &"collar"
 display_name = "Collar de colmillos"
-description = "+15 % de daño de los críticos"
+description = "+25 % de daño de los críticos"
 stat = "crit_bonus"
 multiply = 1.0
-add = 0.15
+add = 0.25
 max_level = 5
 color = Color(0.95, 0.45, 0.3, 1)
 icon = ExtResource("2")

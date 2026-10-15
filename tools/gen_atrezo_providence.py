@@ -49,28 +49,150 @@ def brick(M):
 
 # ---------------- paredes ----------------
 
-def muro():
-    M = Model(S=1, seed=71)
-    L, H, T = 96, 64, 4                                         # 12 x 4 m, 25 cm de grosor
-    b = brick(M)
+def muro(variant=1):
+    """Pared alta del estudio, la que cierra el borde norte y oeste (petición de revisión 102, del
+    15-10-2026; la de antes queda en models/prv_muro_v1.json). 12 x 4 m a 32 voxels/m (antes 16),
+    cara a la vista hacia +z, hueca. Tres variantes para que no se repita:
+    1. envejecida: ladrillo en aparejo inglés con tonos por pieza, hollín y eflorescencias de
+       salitre, ventanales con arco de ladrillo a sardinel, alféizar de piedra y parteluz, placas
+       de anclaje de hierro, bajante con abrazaderas y un rótulo pintado que se borra;
+    2. deteriorada: enlucido viejo que se cae a placas dejando ver el ladrillo, grietas en
+       escalera por las llagas, manchas de humedad, un ventanal cegado con tablas y otro con un
+       cristal roto, y hiedra que trepa;
+    3. semiderruida: el remate caído en un perfil roto por ladrillos, un boquete con vigas al
+       aire, una grieta grande que la parte, un ventanal sin marco, ladrillos sueltos y cascotes
+       al pie y hiedra."""
+    M = Model(S=2, seed=70 + variant)
+    rng = M.rng
+    L, H, T = 192, 128, 8                                       # medio largo, alto, grosor
+    SOOT = (0.12, 0.10, 0.09); SALT = (0.72, 0.70, 0.64); DAMP = (0.22, 0.20, 0.17)
+    IVY = (0.18, 0.28, 0.14); IVY_L = (0.28, 0.40, 0.20); STONE = (0.58, 0.56, 0.50)
+    PL = (0.70, 0.66, 0.58); PL_D = (0.54, 0.50, 0.44); BOARDS = (0.36, 0.28, 0.20)
+    def brick_c(x, y):
+        row = y // 5
+        hdr = row % 2                                           # aparejo inglés: soga y tizón alternos
+        bw = 8 if hdr else 16
+        off = (row * 4) % bw
+        bx = (x + L + off) // bw
+        if y % 5 == 4: return MORTAR, True
+        if (x + L + off) % bw == 0: return MORTAR, True
+        c = lerp(BRICK_D, (0.52, 0.30, 0.22), M.hsh(bx, row, variant))
+        if M.hsh(bx, row, 9) < 0.08: c = lerp(c, (0.24, 0.13, 0.10), 0.6)          # ladrillo requemado
+        return c, False
+    wins = [(-L + 24 + k * 64, -L + 24 + k * 64 + 32) for k in range(6)]        # ventanales
+    WY0, WY1 = 22, 104
+    def in_win(x, y):
+        for w0, w1 in wins:
+            if w0 <= x < w1:
+                cx, r = (w0 + w1) / 2, (w1 - w0) / 2
+                if WY0 <= y < WY1 - r: return w0, w1
+                if y >= WY1 - r and (x + 0.5 - cx) ** 2 + (y - (WY1 - r)) ** 2 <= r * r: return w0, w1
+        return None
+    # perfil del remate (3: caído) y boquete
+    prof = {x: H for x in range(-L, L)}
+    if variant == 3:
+        for x in range(-L, L):
+            k = (x + L) // 8
+            prof[x] = int(H - 8 - 52 * max(0.0, M.noise(k * 8, 0, 0, 90.0) - 0.25) * 1.6 - 4 * M.hsh(k, 0, 1))
+    hole = (40, 100, 30, 80) if variant == 3 else None                           # x0, x1, y0, y1
+    crack = []
+    if variant >= 2:
+        for c0 in range(2 if variant == 2 else 3):
+            x, y = rng.randint(-L + 20, L - 20), rng.randint(H // 2, H - 8)
+            while y > 2:
+                crack.append((x, y))
+                if rng.random() < 0.5: y -= 1
+                else: x += rng.choice((-1, 1)) * (4 if rng.random() < 0.5 else 1)
+    crack = set(crack)
+    boarded = wins[2] if variant == 2 else None
     for x in range(-L, L):
-        for y in range(0, H):
-            win = 10 < y < 54 and (x + L) % 32 >= 8 and (x + L) % 32 < 24
+        for y in range(0, prof[x]):
+            w = in_win(x, y)
+            if hole and hole[0] <= x < hole[1] and hole[2] + 6 * M.noise(x, 0, 0, 9.0) <= y < hole[3] - 6 * M.noise(x, 1, 0, 9.0): continue
             for z in range(-T, 0):
-                if win and z > -T:
+                face = z == -1
+                if not face and y < prof[x] - 1 and not w: continue                # la trasera no se ve: fuera
+                if w:
+                    edge = any(in_win(x + dx, y + dy) is None for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+                    if edge:                                                       # mocheta: ladrillo en todo el grosor
+                        M.put(x, y, z, P, brick_c(x, y)[0]); continue
+                    if w == boarded:
+                        if z == -2: M.put(x, y, z, P, BOARDS if (x // 7) % 2 else lerp(BOARDS, (0.20, 0.15, 0.10), 0.4))
+                        continue
+                    if variant != 3 and z == -T // 2:
+                        u = x - w[0]
+                        if variant == 2 and w == wins[4] and (u - 8) ** 2 + (y - 60) ** 2 < 40: continue   # cristal roto
+                        fr = u in (0, 1, 15, 16, 30, 31) or (y - WY0) % 20 in (0, 1)
+                        M.put(x, y, z, P, FRAME if fr else (GLASS_L if (u + y) % 11 == 0 else GLASS))
                     continue
-                if win:                                         # ventanal: cristal de noche con parteluz
-                    u = (x + L) % 32
-                    c = FRAME if u in (8, 15, 16, 23) or y in (11, 32, 53) else (GLASS_L if (u + y) % 9 == 0 else GLASS)
-                    M.put(x, y, z, P, c)
-                    continue
-                M.put(x, y, z, P, b(x, y, z))
-    for x in range(-L, L):                                      # cornisa y zócalo
-        for z in range(-T - 1, 1):
-            M.put(x, H, z, P, TRIM); M.put(x, H + 1, z, P, TRIM)
-            M.put(x, 0, z, P, TRIM); M.put(x, 1, z, P, TRIM)
-    for y in range(0, H):                                       # bajante de hierro
-        M.put(L - 6, y, 1, P, IRON); M.put(-L + 6, y, 1, P, IRON)
+                c, joint = brick_c(x, y)
+                if face:
+                    # arco a sardinel sobre cada ventanal
+                    for w0, w1 in wins:
+                        cx, r = (w0 + w1) / 2, (w1 - w0) / 2
+                        d = math.hypot(x + 0.5 - cx, y - (WY1 - r))
+                        if y >= WY1 - r and r <= d < r + 6:
+                            ang = math.atan2(y - (WY1 - r), x + 0.5 - cx)
+                            c = MORTAR if int(ang * 12) != int((ang + 0.02) * 12) else lerp(BRICK_D, (0.56, 0.32, 0.22), M.hsh(int(ang * 12), 2, 2))
+                        if w0 - 2 <= x < w1 + 2 and WY0 - 4 <= y < WY0: c = lerp(STONE, (0.44, 0.42, 0.38), M.noise(x, y, 0, 3.0))   # alféizar
+                    if y >= H - 8 and variant != 3:                                   # cornisa de ladrillo a sardinel
+                        c = lerp(BRICK_D, MORTAR, 0.3) if y % 2 else c
+                    if y < 6: c = lerp(STONE, (0.36, 0.34, 0.30), M.noise(x, y, 0, 4.0))   # zócalo de piedra
+                    # envejecimiento
+                    if y > 90 and M.noise(x, y, 0, 18.0) > 0.45 and variant == 1: c = lerp(c, SOOT, 0.45)   # hollín arriba
+                    if y < 40 and M.noise(x, y, 0, 10.0) > 0.6: c = lerp(c, SALT, 0.35)               # salitre
+                    if variant == 2:
+                        if M.noise(x, y, 1, 20.0) > 0.42 and not joint and not w:                      # enlucido
+                            c = lerp(PL_D, PL, M.noise(x, y, 2, 5.0))
+                            if M.noise(x, y, 3, 30.0) > 0.6: c = lerp(c, DAMP, 0.4)                    # humedad
+                        if M.noise(x, y + 40, 0, 26.0) > 0.62: c = lerp(c, DAMP, 0.5)
+                    if (x, y) in crack or (x + 1, y) in crack: c = (0.05, 0.04, 0.04)
+                    if variant == 1 and -40 < x < 40 and 112 < y < 122:                             # rótulo borrado
+                        if (x // 3 + y // 3) % 3 and M.noise(x, y, 0, 6.0) > 0.4: c = lerp(c, (0.78, 0.74, 0.62), 0.6)
+                # junta hundida: la llaga no sale a la cara
+                if face and joint and variant != 2: M.put(x, y, z - 1, P, lerp(MORTAR, (0.2, 0.2, 0.2), 0.3)); continue
+                M.put(x, y, z, P, c)
+        # tapa del remate roto
+        if variant == 3:
+            for z in range(-T, 0): M.put(x, prof[x] - 1, z, P, brick_c(x, prof[x] - 1)[0])
+    if hole:                                                                       # vigas al aire en el boquete
+        for k in range(3):
+            y0 = hole[2] + 12 + k * 14
+            for x in range(hole[0] - 6, hole[1] + 6):
+                for dy in range(3):
+                    for z in range(-T, 2 + (k * 3)):
+                        if hole[0] <= x < hole[1] or z < -1: M.put(x, y0 + dy, z, P, WOOD if dy else WOOD_D)
+    # bajante de hierro con abrazaderas
+    for bx in ((L - 10,) if variant != 3 else ()) + (-L + 10,):
+        for y in range(0, H - 6 if variant != 3 else prof[bx] - 4):
+            for dx in (0, 1):
+                M.put(bx + dx, y, 1, P, IRON if y % 24 else IRON_L)
+                M.put(bx + dx, y, 2, P, IRON)
+    if variant == 1:                                                               # placas de anclaje
+        for x in range(-L + 56, L, 64):
+            for dx in range(-3, 4):
+                M.put(x + dx, 96, 0, P, IRON); M.put(x, 96 + dx, 0, P, IRON)
+    if variant >= 2:                                                               # hiedra que trepa
+        for k in range(3 if variant == 2 else 4):
+            x0 = rng.randint(-L + 10, L - 10)
+            for y in range(0, rng.randint(40, 110)):
+                x0 += rng.choice((-1, 0, 0, 1))
+                for dx in range(-int(6 * (1 - y / 120)) - 2, int(6 * (1 - y / 120)) + 3):
+                    if M.noise(x0 + dx, y, 5, 3.0) > 0.38 and (x0 + dx) in prof and y < prof[x0 + dx]:
+                        M.put(x0 + dx, y, 0, P, IVY if M.hsh(x0 + dx, y, 0) > 0.4 else IVY_L)
+    if variant == 3:                                                               # ladrillos sueltos y cascotes al pie
+        for k in range(160):
+            x = rng.randint(-L, L - 8); z = rng.randint(1, 26)
+            y = 0
+            while (x, y, z) in M.V: y += 1
+            if y > 12: continue
+            c = brick_c(rng.randint(0, 99), 1)[0]
+            for dx in range(rng.choice((4, 8))):
+                for dz in range(3):
+                    M.put(x + dx, y, z + dz, P, c); M.put(x + dx, y + 1, z + dz, P, c)
+            if rng.random() < 0.3: M.put(x, y + 2, z, P, PL_D)
+    NB = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a2, k[1] + b2, k[2] + c2) in M.V for a2, b2, c2 in NB)]: del M.V[k]
     return M, {P: [0, 0, 0]}
 
 
@@ -759,7 +881,7 @@ def pilar():
     return M, {P: [0, 0, 0]}
 
 
-PIECES = {'muro': muro, 'muro_bajo': muro_bajo, 'escultura_1_mano': escultura_1,   # la del juego es de Replicate
+PIECES = {'muro': muro, 'muro_2': lambda: muro(2), 'muro_3': lambda: muro(3), 'muro_bajo': muro_bajo, 'escultura_1_mano': escultura_1,   # la del juego es de Replicate
            'escultura_2': escultura_2,
           'caballete': caballete, 'mesa': mesa, 'relieve': relieve, 'sacos': sacos, 'lampara': lampara,
           'pilar': pilar}

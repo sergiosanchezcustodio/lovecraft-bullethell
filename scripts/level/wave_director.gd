@@ -48,7 +48,7 @@ func setup(p_level: LevelData, p_world: CombatWorld, p_obstacles: ObstacleMap, p
 
 func max_alive() -> int:
 	if max_alive_override > 0: return max_alive_override
-	return mini(HARD_CAP, int(round(level.max_alive * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.cap())))
+	return mini(HARD_CAP, int(round(level.max_alive * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.cap(time))))
 
 func _physics_process(delta: float) -> void:
 	if completed: return
@@ -70,7 +70,7 @@ func _physics_process(delta: float) -> void:
 		final_event.emit(_final)
 	var scale := level.final_spawn_scale if _final_done else 1.0
 	if _boss_on: scale *= BOSS_SPAWN_SCALE         # con el jefe en pantalla, las oleadas casi paran
-	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.rate() * delta
+	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.rate(time) * delta
 	while _acc >= 1.0:
 		if alive.size() + _emerging >= max_alive():
 			_acc = 1.0
@@ -252,12 +252,19 @@ func spawn_point(radius: float) -> Vector3:
 		var p := Vector2(center.x, center.z) + Vector2(cos(a), sin(a)) * rng.randf_range(ring, ring + 5.0)
 		if _spawnable(p, radius):
 			return Vector3(p.x, 0, p.y)
-	# arena pequeña respecto a la cámara: cualquier punto libre
+	# arena pequeña respecto a la cámara: el punto libre más lejano de entre los probados (15-10-2026:
+	# antes valía cualquiera a más de 6 m y en el estudio salían cultistas casi encima del jugador)
+	var best := Vector2.INF
+	var best_d := -1.0
+	var c2 := Vector2(center.x, center.z)
 	for attempt in 60:
 		var b := obstacles.bounds.grow(-2.0) if obstacles != null else Rect2(-30, -30, 60, 60)
 		var p := Vector2(rng.randf_range(b.position.x, b.end.x), rng.randf_range(b.position.y, b.end.y))
-		if _spawnable(p, radius) and p.distance_to(Vector2(center.x, center.z)) > 6.0:
-			return Vector3(p.x, 0, p.y)
+		var dist := p.distance_to(c2)
+		if dist > best_d and dist > 6.0 and _spawnable(p, radius):
+			best = p
+			best_d = dist
+	if best_d > 0.0: return Vector3(best.x, 0, best.y)
 	return Vector3(center.x + 20.0, 0, center.z)
 
 ## Punto donde puede aparecer un enemigo: libre, con sitio para su cuerpo y desde el que se

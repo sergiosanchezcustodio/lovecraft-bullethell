@@ -305,7 +305,20 @@ func _presence_step(delta: float) -> void:
 				var near := 1.0 - clampf(global_position.distance_to(e.global_position) / PRESENCE_RADIUS, 0.0, 1.0)
 				w += k * near
 			presence = minf(w * PRESENCE_BASE * Difficulty.horror(), PRESENCE_MAX)
-	if presence > 0.0: drain_sanity(presence * delta)
+	if presence > 0.0:
+		drain_sanity(presence * delta)
+		recv_add("presencia", 0.0, presence * delta)
+
+## Daño recibido por origen (simulaciones de equilibrio: "RECIBIDO J1 {...}" con log=true):
+## id del enemigo -> [vida, cordura].
+var received := {}
+static var bench_immortal := OS.get_cmdline_user_args().has("immortal=true")
+func recv_add(src: String, ph: float, me: float) -> void:
+	if not received.has(src): received[src] = [0.0, 0.0]
+	received[src][0] += ph
+	received[src][1] += me
+	min_hp = minf(min_hp, health / maxf(data.max_health, 1.0))   # take_damage ya ha restado el golpe
+var min_hp := 1.0                       ## la vida más baja del nivel, en fracción (simulaciones)
 
 ## Vibración suave del mando al recibir daño (12-10-2026), según lo fuerte del golpe. Respeta
 ## Configuración > Juego > Vibración del mando y no se repite más de una vez cada 0,15 s.
@@ -671,6 +684,10 @@ func take_damage(d: Damage) -> void:
 		r.knockback = d.knockback; r.source = d.source; r.bonus = d.bonus
 		d = r
 	health = maxf(0.0, health - d.physical)
+	if bench_immortal: health = maxf(health, 1.0)        # banco de objetos: recibe el daño pero no cae
+	var src := "otro"
+	if d.source is Enemy and is_instance_valid(d.source): src = String((d.source as Enemy).data.id)
+	recv_add(src, d.physical, d.mental * mental_resist * data.mental_mult)
 	Sfx.play("hit_player" if d.physical > 0.0 else "chant")
 	_rumble(d.physical + d.mental * 0.5)
 	if d.mental > 0.0:

@@ -32,6 +32,7 @@ func setup(p_world: CombatWorld, pos: Vector3, p_kind: Kind) -> Pickup:
 	return self
 
 func _ready() -> void:
+	add_to_group(&"pickups")
 	_holder = Node3D.new()
 	_holder.scale = Vector3.ONE * 1.3
 	add_child(_holder)

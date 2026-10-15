@@ -76,7 +76,7 @@ func is_survival() -> bool:
 @export_group("Cooperativo")
 ## Según los jugadores (1, 2, 3, 4): vida de los enemigos y ritmo y tope de aparición.
 @export var coop_health: Array[float] = [1.0, 1.5, 1.9, 2.3]
-@export var coop_spawn: Array[float] = [1.0, 1.25, 1.5, 1.75]
+@export var coop_spawn: Array[float] = [1.0, 1.5, 1.9, 2.3]     ## 15-10-2026: igual que la vida (con ×1,25 el cooperativo de 2 salía más fácil que el solitario)
 
 const DEFAULT_MUSIC := "res://resources/Music/Musica_nivel1.mp3"
 

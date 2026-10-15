@@ -28,6 +28,8 @@ extends Node3D
 ##   autopick=true           elige sola la primera mejora al subir de nivel (bot, capturas)
 ##   xp=40                   experiencia inicial (probar el menú de mejoras)
 ##   hp=10 san=5             vida y cordura iniciales (probar la muerte y la crisis)
+##   sim_time=N, nolevelup=true  banco de armas: sin subidas de nivel y sale a los N s con las estadísticas
+##   quit_on_end=true        sale al caer o al acabar la parte (con autonext): simulaciones
 ##   autorestart=2           en la pantalla final, reintenta sola tras N s (probar el reinicio)
 ##   mute=true               sin música (también en la portada)
 ##   debug_menu=1            abre la pausa y el menú de depuración a ese segundo (capturas)
@@ -147,7 +149,8 @@ func _ready() -> void:
 			var sp := _spawn_player(ch, inp)
 			if seat.pet != &"": _spawn_pet(String(seat.pet), sp)
 	else:
-		_spawn_player(args.get_str("character", String(DebugOptions.get_value("character", "dyer"))), _make_input())
+		var p0 := _spawn_player(args.get_str("character", String(DebugOptions.get_value("character", "dyer"))), _make_input())
+		if p0.input is SmartBot: (p0.input as SmartBot).body = p0
 	var extra: PackedStringArray = args.get_str("bot_chars", "").split(",", false)
 	var defaults := ["olmstead", "peaslee", "whipple", "legrasse", "johansen", "varga", "blake", "iwanicki", "elwood", "malone", "dyer"]
 	for k in mini(args.get_int("bots", 0), 4 - players.size()):
@@ -157,7 +160,7 @@ func _ready() -> void:
 				if players.all(func(q: Player) -> bool: return String(q.data.id) != d):
 					ch = d
 					break
-		var bot := BotInput.new("follow", 3.0 + k * 0.7)
+		var bot: BotInput = SmartBot.new(args.get_float("skill", 0.8)) if args.get_str("bot", "") == "smart" else BotInput.new("follow", 3.0 + k * 0.7)
 		bot.phase = TAU * (k + 1) / 4.0
 		bot.period = 7.0 + k * 1.5
 		var bp := _spawn_player(ch, bot)
@@ -193,6 +196,10 @@ func _ready() -> void:
 		var legacy := {"slide": "deslizar", "roll": "rodar"}
 		var id: String = legacy.get(args.get_str("dodge"), args.get_str("dodge"))
 		player.apply_dodge_style(load("res://data/dodges/%s.tres" % id))
+	if args.get_bool("neutral"):                    # bancos: atributos iguales (13) para no favorecer ningún tipo de arma
+		for k in Attributes.NAMES:
+			player.attrs[k] = 13; player.attrs_level1[k] = 13
+		player.rebuild_stats()
 	var wlist: PackedStringArray = args.get_str("weapons", "").split(",", false)
 	if not wlist.is_empty():                        # armas de prueba para el J1
 		for w in player.weapons.weapons.duplicate(): player.weapons.remove_weapon(w.data.id)
@@ -202,7 +209,7 @@ func _ready() -> void:
 	elif args.has("wlevel"):
 		for w in player.weapons.weapons: w.level = clampi(args.get_int("wlevel", 1), 1, w.data.max_level)
 	for up_id in args.get_str("items").split(",", false):     # items=iman,vida: objetos del J1 al empezar
-		player.progress.passives[up_id] = 1
+		player.progress.passives[up_id] = args.get_int("ilevel", 1)
 	if args.has("items"): player.rebuild_stats()
 	camera = GameCamera.new()
 	camera.view_size = args.get_float("cam", 15.0)
@@ -397,6 +404,9 @@ func earn(amount: int) -> void:
 ## eligen a la vez, cada uno en su cuadrante (CoopLevelUp); los bots eligen solos.
 func _open_level_up() -> void:
 	if _menu_open or _ended or _pause != null: return
+	if args.get_bool("nolevelup"):                   # banco de armas (tools/banco_armas.py): sin mejoras
+		for q in players: q.progress.pending = 0
+		return
 	if players.size() > 1:
 		_open_coop_level_up()
 		return
@@ -412,7 +422,9 @@ func _open_level_up() -> void:
 		_open_level_up.call_deferred()
 		return
 	if args.get_bool("autopick") or _is_bot(q):
-		q.progress.choose(options[0] if not _is_bot(q) else options[_rng.randi() % options.size()], q)
+		var pick: PlayerProgress.Option = options[0] if not _is_bot(q) else options[_rng.randi() % options.size()]
+		if q.input is SmartBot: pick = SmartBot.pick(options, q, _rng)
+		q.progress.choose(pick, q)
 		_open_level_up.call_deferred()
 		return
 	_menu_open = true
@@ -443,7 +455,10 @@ func _open_coop_level_up() -> void:
 		entries.append({"player": q, "options": options, "title": title, "attr": attr})
 	if entries.is_empty(): return
 	if args.get_bool("autopick") or entries.all(func(e: Dictionary) -> bool: return _is_bot(e.player)):
-		for e in entries: (e.player as Player).progress.choose(e.options[_rng.randi() % e.options.size()], e.player)
+		for e in entries:
+			var ep: Player = e.player
+			var o: PlayerProgress.Option = SmartBot.pick(e.options, ep, _rng) if ep.input is SmartBot else e.options[_rng.randi() % e.options.size()]
+			ep.progress.choose(o, ep)
 		_open_level_up.call_deferred()
 		return
 	_menu_open = true
@@ -528,7 +543,12 @@ func _check_all_down() -> void:
 func _game_over() -> void:
 	if _ended: return
 	_ended = true
-	if args.get_bool("log") and director != null: print("FIN DERROTA %s t=%d abatidos=%d nivel_j1=%d" % [level.id, int(director.time), director.killed_total, player.progress.level])
+	if args.get_bool("log") and director != null:
+		print("FIN DERROTA %s t=%d abatidos=%d nivel_j1=%d" % [level.id, int(director.time), director.killed_total, player.progress.level])
+		for q in players:
+			var rv := {}
+			for k in q.received: rv[k] = [roundi(q.received[k][0]), roundi(q.received[k][1])]
+			print("RECIBIDO J%d crisis=%d %s" % [q.index + 1, q.sanity_state.crises if "crises" in q.sanity_state else -1, JSON.stringify(rv)])
 	if Saves.current != null: Saves.current.stats["deaths"] += 1
 	_check_achievements()
 	Saves.save()
@@ -543,7 +563,7 @@ func _on_level_completed() -> void:
 	_ended = true
 	earn(level.money_bonus)                          # bono por superar el nivel
 	if not _someone_fell: Achievements.add(Saves.current, "flawless")
-	if args.get_bool("log"): print("NIVEL SUPERADO %s t=%d s  abatidos=%d  dólares=%d  nivel_j1=%d" % [level.id, director.time, kills, run_money, player.progress.level])
+	if args.get_bool("log"): print("NIVEL SUPERADO %s t=%d s  abatidos=%d  dólares=%d  nivel_j1=%d  vida_min=%d" % [level.id, director.time, kills, run_money, player.progress.level, roundi(maxf(player.min_hp, 0.0) * 100)])
 	if args.get_bool("log"): for q in players: print("ESTADISTICAS J%d %s" % [q.index + 1, world.stats_of(q.index)])
 	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)):
 		Saves.current.levels_won.append(String(level.id))
@@ -580,6 +600,10 @@ func _end_screen(title: String, accent: Color, next_id := "") -> void:
 	s.restart.connect(_restart)
 	s.quit.connect(_quit)
 	add_child(s)
+	if args.get_bool("quit_on_end") and not (args.get_bool("autonext") and next_id != ""):   # simulaciones (tools/simular.py)
+		print("FIN SIMULACION")
+		get_tree().quit()
+		return
 	if args.get_bool("autonext") and next_id != "":           # pruebas: pasa solo al siguiente nivel
 		await get_tree().create_timer(0.5, true, false, true).timeout
 		_next_level(next_id)
@@ -597,6 +621,7 @@ func _end_screen(title: String, accent: Color, next_id := "") -> void:
 const DEV_LEVELS_PER_STAGE := 7
 func _apply_carry() -> void:
 	if level == null: return
+	Difficulty.ramp_on = GameSession.carry.is_empty() and (Campaign.number_of(String(level.id)) <= 1 or args.get_bool("fresh"))
 	if not GameSession.carry.is_empty():
 		for q in players:
 			if q.index < GameSession.carry.size(): GameSession.restore(q, GameSession.carry[q.index])
@@ -610,7 +635,7 @@ func _apply_carry() -> void:
 		for k in DEV_LEVELS_PER_STAGE * (stage - 1):
 			q.progress.gain_level()
 			var opts := q.progress.roll_options(q.weapons, _rng)
-			if not opts.is_empty(): q.progress.choose(opts[_rng.randi() % opts.size()], q)
+			if not opts.is_empty(): q.progress.choose(SmartBot.pick(opts, q, _rng) if q.input is SmartBot else opts[_rng.randi() % opts.size()], q)
 		q.progress.pending = 0
 		q.rebuild_stats()
 		q.health = q.data.max_health
@@ -671,6 +696,8 @@ func announce(text: String, seconds: float) -> void:
 	tw.tween_property(announcer, "modulate:a", 0.0, 0.8)
 
 func _make_input() -> PlayerInput:
+	if args.get_str("bot", "") == "smart":
+		return SmartBot.new(args.get_float("skill", 0.8))
 	if args.has("bot"):
 		return BotInput.new(args.get_str("bot", "circle"), args.get_float("dodge_every", 2.5))
 	var bindings := Settings.bindings()             # los de fábrica más los reasignados
@@ -878,6 +905,14 @@ func _process(delta: float) -> void:
 
 func _process_step(delta: float) -> void:
 	_t += delta
+	if args.has("sim_time") and director != null and director.time >= args.get_float("sim_time") and not _ended:
+		_ended = true                                  # banco de armas: corta a los N s de juego
+		var rv := {"vida": 0.0, "cordura": 0.0}
+		for k in player.received:
+			rv.vida += player.received[k][0]; rv.cordura += player.received[k][1]
+		print("BANCO abatidos=%d %s RECIBIDO %d %d crisis=%d" % [director.killed_total, world.stats_of(0), rv.vida, rv.cordura, player.sanity_state.crises])
+		get_tree().quit()
+		return
 	_ach_t += delta
 	if _ach_t >= 1.0 and not _ended:
 		_ach_t = 0.0

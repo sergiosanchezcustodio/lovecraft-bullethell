@@ -153,6 +153,14 @@
    "type": "box",
    "shrink": 0.98
   },
+  "prv_muro_2": {
+   "type": "box",
+   "shrink": 0.98
+  },
+  "prv_muro_3": {
+   "type": "box",
+   "shrink": 0.98
+  },
   "prv_muro_bajo": {
    "type": "box",
    "shrink": 0.95
@@ -205,7 +213,7 @@
    "scale": 1.0
   },
   {
-   "model": "prv_muro",
+   "model": "prv_muro_2",
    "pos": [
     -6,
     -24.0
@@ -214,7 +222,7 @@
    "scale": 1.0
   },
   {
-   "model": "prv_muro",
+   "model": "prv_muro_3",
    "pos": [
     6,
     -24.0
@@ -232,7 +240,7 @@
    "scale": 1.0
   },
   {
-   "model": "prv_muro",
+   "model": "prv_muro_2",
    "pos": [
     30,
     -24.0
@@ -241,7 +249,7 @@
    "scale": 1.0
   },
   {
-   "model": "prv_muro",
+   "model": "prv_muro_3",
    "pos": [
     -24.0,
     -18
@@ -259,7 +267,7 @@
    "scale": 1.0
   },
   {
-   "model": "prv_muro",
+   "model": "prv_muro_2",
    "pos": [
     -24.0,
     6
@@ -277,7 +285,7 @@
    "scale": 1.0
   },
   {
-   "model": "prv_muro",
+   "model": "prv_muro_2",
    "pos": [
     -24.0,
     30

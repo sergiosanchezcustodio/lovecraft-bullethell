@@ -23,6 +23,7 @@ func setup(p_world: CombatWorld, pos: Vector3, p_radius: float, p_life: float, p
 	return self
 
 func _ready() -> void:
+	add_to_group(&"enemy_warnings")
 	# charco espeso que burbujea, en celdas (11-10-2026)
 	var disc := VoxelFx.ground(10, radius)
 	disc.position.y = 0.03

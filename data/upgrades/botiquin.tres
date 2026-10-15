@@ -7,10 +7,10 @@
 script = ExtResource("1")
 id = &"botiquin"
 display_name = "Botiquín"
-description = "Recupera 0,3 de vida por segundo"
+description = "Recupera 0,5 de vida por segundo"
 stat = "health_regen"
 multiply = 1.0
-add = 0.3
+add = 0.5
 max_level = 5
 color = Color(0.45, 0.8, 0.5, 1)
 icon = ExtResource("2")

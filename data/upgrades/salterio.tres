@@ -7,10 +7,10 @@
 script = ExtResource("1")
 id = &"salterio"
 display_name = "Salterio"
-description = "Cada enemigo abatido devuelve 0,3 de cordura"
+description = "Cada enemigo abatido devuelve 0,12 de cordura"
 stat = "sanity_on_kill"
 multiply = 1.0
-add = 0.3
+add = 0.12
 max_level = 5
 color = Color(0.45, 0.8, 0.5, 1)
 icon = ExtResource("2")
