@@ -168,6 +168,7 @@ def ambiente():
     bandera(r)
     pasos(r)
     fuente(r)
+    campana(r)
 
 
 def save_loop(name, w, d, fade):
@@ -424,6 +425,29 @@ def fuente(r):
         bub[k:k + m] += np.sin(2 * np.pi * np.cumsum(f0 * (1 + 2.5 * tt / tt[-1])) / SR) * np.exp(-tt / (m / SR * 0.35)) * r.uniform(0.3, 1)
     w = flow * 0.35 + bub * 0.45
     save_loop('fountain_loop', w, d, fade)
+
+
+def campana(r):
+    """Campanada grave y lejana (la campana del templo de la Orden, 16-10-2026): parciales
+    inarmónicos de campana (hum, fundamental, tercera menor, quinta, octava...) que decaen cada uno
+    a su ritmo, con un golpe del badajo y algo de batido; apagada por la distancia."""
+    d = 7.0
+    tt = t(d)
+    f0 = 196.0
+    parts = ((0.5, 1.0, 4.5), (1.0, 0.9, 3.2), (1.19, 0.55, 2.4), (1.5, 0.35, 1.8), (2.0, 0.45, 1.6),
+             (2.51, 0.22, 1.0), (2.66, 0.18, 0.9), (3.01, 0.15, 0.7), (4.1, 0.08, 0.45))
+    x = np.zeros(len(tt))
+    for k, (ratio, amp, dec) in enumerate(parts):
+        beat = 1 + 0.06 * np.sin(2 * np.pi * (0.7 + 0.3 * k) * tt)
+        x += amp * np.sin(2 * np.pi * f0 * ratio * tt + k) * np.exp(-tt / dec) * beat
+    x *= np.minimum(tt / 0.004, 1)
+    x += hp(r.standard_normal(len(tt)), 1500) * np.exp(-tt / 0.01) * 0.3
+    x = lp(x, 2200)
+    ir = r.standard_normal(int(1.5 * SR)) * np.exp(-t(1.5) / 0.45)
+    ir = lp(ir, 1500)
+    wet = signal.fftconvolve(x, ir)[:len(x)]
+    wet *= np.std(x) / (np.std(wet) + 1e-9)
+    save('bell_0', x * 0.75 + wet * 0.5)
 
 
 def lluvia(r):

@@ -632,6 +632,19 @@
 				"step_water_2.wav",
 				"step_water_3.wav"
 			]
+		},
+		"bell": {
+			"db": -13,
+			"pitch": [
+				0.97,
+				1.0
+			],
+			"voices": 2,
+			"gap": 1.5,
+			"files": [
+				"bell_0.wav"
+			],
+			"bus": "Ambiente"
 		}
 	}
 }

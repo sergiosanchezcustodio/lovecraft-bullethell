@@ -10,6 +10,11 @@ uniform float on_share = 0.35;                 // parte de las ventanas encendid
 uniform float period_min = 20.0;
 uniform float period_max = 40.0;
 uniform vec3 off_color : source_color = vec3(0.045, 0.05, 0.06);
+// alguien vigila (16-10-2026, Ambient): si un jugador pasa cerca de una ventana encendida, casi
+// todas se apagan de golpe y vuelven a encenderse cuando se ha ido
+uniform int watch_n = 0;
+uniform vec4 watch_pos[4];                   // xz del jugador
+uniform float watch_r = 8.0;
 
 varying float lit;
 
@@ -27,6 +32,7 @@ void vertex() {
 		COLOR.rgb = mix(pow((COLOR.rgb + vec3(0.055)) * (1.0 / 1.055), vec3(2.4)), COLOR.rgb * (1.0 / 12.92), lessThan(COLOR.rgb, vec3(0.04045)));
 	}
 	vec2 seed = vec2(UV.x * 7.13, dot(NODE_POSITION_WORLD.xz, vec2(0.37, 0.71)));
+	vec2 wxz = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz;            // la propia ventana (el origen de la casa queda lejos)
 	float h0 = hash(seed);
 	float period = mix(period_min, period_max, hash(seed + 3.1));
 	float tt = TIME + h0 * period * 7.0;
@@ -44,6 +50,12 @@ void vertex() {
 		}
 	}
 	lit *= 0.93 + 0.07 * sin(TIME * 5.3 + h0 * 40.0) * sin(TIME * 2.1 + h0 * 13.0);
+	if (hash(seed + 9.7) < 0.8) {                  // casi todas: que se note
+		for (int i = 0; i < 4; i++) {
+			if (i >= watch_n) break;
+			if (length(wxz - watch_pos[i].xy) < watch_r) lit = 0.0;
+		}
+	}
 }
 
 void fragment() {

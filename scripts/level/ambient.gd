@@ -212,6 +212,12 @@ var _perch_t := 0.0
 var _watchers: Array[Dictionary] = []           ## vecinos que miran en silencio
 var _watch_spots: Array = []
 var _watch_t := 0.0
+var _bell_at := Vector3.ZERO                    ## la campana del templo
+var _next_bell := 20.0
+var _eyes: Array[Dictionary] = []               ## ojos entre los árboles del borde
+var _eye_spots: Array = []
+var _eye_t := 0.0
+var _windows_watch := false
 var _sounds: Array = []                         ## [reproductor 3D, dB, alcance]: el fuego
 var _walked := {}                               ## jugador -> [última posición, m hasta el próximo crujido]
 var _next_idle_creak := 6.0
@@ -279,6 +285,9 @@ func _ready() -> void:
 	if cfg.has("perch"): _find_perches(cfg.perch)
 	if cfg.has("sea_mist") and _sea_mat != null: _make_sea_mist(cfg.sea_mist)
 	if cfg.has("watchers"): _find_watch_spots(cfg.watchers)
+	if cfg.has("bell"): _find_bell(cfg.bell)
+	if cfg.has("eyes"): _find_eye_spots(cfg.eyes)
+	_windows_watch = bool(cfg.get("windows_watch", false))
 	if cfg.has("loop"): _start_loop(cfg.loop)
 	if cfg.has("crowd") and not sfx_muted():
 		_crowd = _loop_player(String(cfg.crowd.file), false) as AudioStreamPlayer
@@ -414,6 +423,9 @@ func _process(delta: float) -> void:
 			_ripple(rp[0] + Vector3(_rng.randf_range(-0.06, 0.06), 0.01, _rng.randf_range(-0.06, 0.06)), 0.35, 0.65)
 	if not _perch_spots.is_empty(): _perch_step(delta, t)
 	if not _watch_spots.is_empty(): _watch_step(delta, t)
+	if cfg.has("bell"): _bell_step(delta)
+	if not _eye_spots.is_empty(): _eye_step(delta)
+	if _windows_watch: _windows_step()
 	if _crowd != null: _crowd_step(delta)
 	_hook_t -= delta
 	if _hook_t <= 0.0:                                          # pasos: cada jugador nuevo, enganchado
@@ -1047,6 +1059,159 @@ func _watch_step(delta: float, t: float) -> void:
 					if is_instance_valid(pl) and (pl as Node3D).global_position.distance_to(p) < 10.0: close = true
 				if close: continue
 				_watch_place(i, c)
+				break
+
+# ------------------------------------------------------------------ la campana del templo
+
+func _find_bell(c: Dictionary) -> void:
+	for h: Node in arena.get_node("Props").get_children():
+		var m := h.get_child(0) as Node3D
+		if m != null and String(m.name) == String(c.get("model", "inn_templo")):
+			var bb := _world_aabb(h as Node3D)
+			_bell_at = Vector3((h as Node3D).global_position.x, bb.end.y, (h as Node3D).global_position.z)
+	_next_bell = _rng.randf_range(8.0, 20.0) if not demo else 1.0
+
+## Toca a lo lejos de vez en cuando: dos o tres campanadas lentas.
+func _bell_step(delta: float) -> void:
+	_next_bell -= delta
+	if _next_bell > 0.0: return
+	var ev: Array = cfg.bell.get("every", [45, 90])
+	_next_bell = _rng.randf_range(ev[0], ev[1])
+	var n := _rng.randi_range(2, 3)
+	for k in n:
+		get_tree().create_timer(k * 2.6).timeout.connect(sfx_at.bind("bell", _bell_at, -1.5 * k))
+
+# ------------------------------------------------------------------ ventanas que vigilan
+
+func _windows_step() -> void:
+	var g := get_parent()
+	var arr := PackedVector4Array()
+	if g != null and "players" in g:
+		for pl in g.players:
+			if arr.size() < 4 and is_instance_valid(pl) and pl.health > 0.0:
+				var p: Vector3 = (pl as Node3D).global_position
+				arr.append(Vector4(p.x, p.z, 0, 0))
+	var n := arr.size()
+	while arr.size() < 4: arr.append(Vector4.ZERO)
+	var m := VoxelBuilder.window_material()
+	m.set_shader_parameter("watch_pos", arr)
+	m.set_shader_parameter("watch_n", n)
+	m.set_shader_parameter("watch_r", float(cfg.get("windows_watch_r", 8.0)))
+
+# ------------------------------------------------------------------ ojos en la oscuridad
+
+## Entre los árboles del borde (norte y oeste), a la altura de una cabeza.
+func _find_eye_spots(c: Dictionary) -> void:
+	var half: Vector2 = arena.get_meta("size") * 0.5
+	var models: Array = c.get("among", [])
+	var canopies: Array = []                                         # [centro de la copa, radio]: lo que los taparía
+	for h: Node in arena.get_node("Props").get_children():
+		var m := h.get_child(0) as Node3D
+		if m == null: continue
+		var bb := _world_aabb(h as Node3D)
+		if bb.size.y > 2.5: canopies.append([Vector3(bb.get_center().x, bb.end.y - 1.0, bb.get_center().z), maxf(bb.size.x, bb.size.z) * 0.45])
+	for h: Node in arena.get_node("Props").get_children():
+		var m := h.get_child(0) as Node3D
+		if m == null or not String(m.name) in models: continue
+		var p := (h as Node3D).global_position
+		if not (p.x < -half.x + 7.0 or p.z < -half.y + 7.0) or p.x > half.x or p.z > half.y: continue
+		var side := Vector3(1, 0, 1).normalized() * _rng.randf_range(2.2, 3.2)   # por delante de la copa, hacia la cámara
+		var q := p + side
+		if q.x > -half.x + 1.0 and q.z > -half.y + 1.0: continue          # que no salgan a lo transitable
+		var eye := q + Vector3(0, _rng.randf_range(0.6, 1.2), 0)
+		if not _hidden_by(eye, canopies): _eye_spots.append([eye, false])
+	_eye_spots.shuffle()
+	_eye_t = 0.5
+
+## ¿Lo tapa alguna copa, vista desde la cámara isométrica (mira hacia -x-z, 30° hacia abajo)?
+static func _hidden_by(p: Vector3, canopies: Array) -> bool:
+	var su := (p.x - p.z) * 0.70710678
+	var sv := p.y * 0.866 - (p.x + p.z) * 0.70710678 * 0.5
+	var depth := p.x + p.z
+	for cn: Array in canopies:
+		var c: Vector3 = cn[0]
+		if c.x + c.z <= depth + 0.3: continue                            # está detrás: no tapa
+		var du := (c.x - c.z) * 0.70710678 - su
+		var dv := c.y * 0.866 - (c.x + c.z) * 0.70710678 * 0.5 - sv
+		var r: float = cn[1]
+		if (du / r) * (du / r) + (dv / (r * 0.5 + 0.8)) * (dv / (r * 0.5 + 0.8)) < 1.0: return true
+	return false
+
+func _eye_mat(col: Color) -> StandardMaterial3D:
+	var key := "eye|" + col.to_html()
+	if not _mats.has(key):
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.albedo_color = col
+		_mats[key] = m
+	return _mats[key]
+
+func _eye_open(i: int, c: Dictionary) -> void:
+	var sp: Array = _eye_spots[i]
+	sp[1] = true
+	var b := Node3D.new()
+	var cols: Array = c.get("colors", [[0.9, 0.85, 0.3], [0.5, 0.95, 0.4], [0.95, 0.4, 0.2]])
+	var cc: Array = cols[_rng.randi() % cols.size()]
+	var gap := _rng.randf_range(0.16, 0.26)
+	for s in [-1, 1]:
+		var e := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.09, 0.05, 0.04)
+		bm.material = _eye_mat(Color(cc[0], cc[1], cc[2]))
+		e.mesh = bm
+		e.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		e.position = Vector3(s * gap * 0.5, 0, 0)
+		b.add_child(e)
+	add_child(b)
+	b.position = sp[0]
+	b.rotation.y = PI * 0.25                                        # miran hacia la cámara
+	b.scale = Vector3(1, 0.05, 1)
+	create_tween().tween_property(b, "scale:y", 1.0, 0.4)           # se abren despacio
+	_eyes.append({"node": b, "spot": i, "blink": _rng.randf_range(2.0, 6.0), "closing": false})
+
+## Parpadean de vez en cuando; si alguien se acerca, se cierran y ya no están. Otros se abren
+## en otro sitio, fuera de la vista.
+func _eye_step(delta: float) -> void:
+	var c: Dictionary = cfg.eyes
+	var g := get_parent()
+	var players: Array = g.players if g != null and "players" in g else []
+	var f := _focus()
+	for ed: Dictionary in _eyes.duplicate():
+		var b: Node3D = ed.node
+		if ed.closing: continue
+		ed.blink -= delta
+		if ed.blink <= 0.0:
+			ed.blink = _rng.randf_range(2.5, 7.0)
+			var tw := create_tween()
+			tw.tween_property(b, "scale:y", 0.05, 0.07)
+			tw.tween_property(b, "scale:y", 1.0, 0.1)
+		for pl in players:
+			if not is_instance_valid(pl) or pl.health <= 0.0: continue
+			if (pl as Node3D).global_position.distance_to(b.position) < float(c.get("near", 7.0)):
+				ed.closing = true
+				(_eye_spots[ed.spot] as Array)[1] = false
+				var tw := create_tween()
+				tw.tween_property(b, "scale:y", 0.0, 0.25)
+				tw.tween_callback(b.queue_free)
+				_eyes.erase(ed)
+				var rs: Array = c.get("respawn", [6, 16])
+				_eye_t = maxf(_eye_t, _rng.randf_range(rs[0], rs[1]))
+				break
+	if _eyes.size() < int(c.get("n", 4)):
+		_eye_t -= delta
+		if _eye_t <= 0.0:
+			_eye_t = 2.5 if _eyes.size() > 1 else 0.3
+			var idx := range(_eye_spots.size())
+			idx.shuffle()
+			for i: int in idx:
+				var sp: Array = _eye_spots[i]
+				if sp[1]: continue
+				var near := false
+				var dd: float = Vector2(sp[0].x - f.x, sp[0].z - f.z).length()
+				for pl in players:
+					if is_instance_valid(pl) and (pl as Node3D).global_position.distance_to(sp[0]) < 11.0: near = true
+				if near or dd > 20.0: continue                          # a la vista, pero no encima
+				_eye_open(i, c)
 				break
 
 # ------------------------------------------------------------------ gaviotas posadas
