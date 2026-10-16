@@ -32,6 +32,7 @@ var _base_ambient := 0.35
 var _next_bolt := 0.0
 var _bolt_t := -1.0
 var _rng := RandomNumberGenerator.new()
+var _rain: AudioStreamPlayer                 ## lluvia en bucle (16-10-2026), más fuerte con las rachas
 
 const AREA := 24.0                           ## medio lado de la zona cubierta (m)
 const TOP := 9.0                             ## altura a la que nace la precipitación
@@ -56,7 +57,7 @@ func _ready() -> void:
 	match data.precip:
 		WeatherData.Precip.SNOW: _make_precip(false)
 		WeatherData.Precip.ASH: _make_precip(false); _make_embers()
-		WeatherData.Precip.RAIN: _make_precip(true); _make_splashes()
+		WeatherData.Precip.RAIN: _make_precip(true); _make_splashes(); _make_rain_sound()
 	if data.drift > 0.0: _make_drift()
 	if data.mist > 0.0:
 		_make_mist(0.3, 1.0, 1.0)
@@ -71,6 +72,27 @@ func _ready() -> void:
 		add_child(_flash)
 		_next_bolt = data.lightning_every * _rng.randf_range(0.3, 0.8)
 	_process(0.0)
+
+## Lluvia en bucle (tools/gen_sfx.py --ambiente, sin costura), en el bus Ambiente: tanto más
+## fuerte cuanto más llueve; las rachas la suben.
+func _make_rain_sound() -> void:
+	if Sfx.muted or not ResourceLoader.exists("res://resources/sfx/rain_loop.wav"): return
+	var st := (load("res://resources/sfx/rain_loop.wav") as AudioStreamWAV).duplicate() as AudioStreamWAV
+	st.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	st.loop_begin = 0
+	st.loop_end = int(st.get_length() * st.mix_rate)
+	_rain = AudioStreamPlayer.new()
+	_rain.stream = st
+	_rain.bus = "Ambiente" if AudioServer.get_bus_index("Ambiente") >= 0 else "Master"
+	_rain.volume_db = -60.0
+	_rain.pitch_scale = 1.0 + 0.15 * (1.0 - data.precip_amount)       # la llovizna, más fina
+	add_child(_rain)
+	_rain.play(_rng.randf() * st.get_length())
+
+func _rain_step(delta: float) -> void:
+	var ratio := data.wind_at(_t) / maxf(data.wind, 0.1)
+	var target := -13.0 + 20.0 * log(maxf(data.precip_amount, 0.02)) / log(10.0) + 4.0 * log(maxf(ratio, 0.5)) / log(2.0)
+	_rain.volume_db = lerpf(_rain.volume_db, target, minf(delta * (0.7 if _rain.volume_db < target - 20.0 else 2.0), 1.0))
 
 ## Punto del suelo al que mira la cámara (el centro de sus objetivos).
 func focus() -> Vector3:
@@ -281,6 +303,7 @@ func _process(delta: float) -> void:
 		_cloud_off += Vector2(wv.x, wv.z).normalized() * clampf(data.wind * 0.25, 0.35, 1.4) * delta
 		_cloud_mat.set_shader_parameter("offset", _cloud_off)
 	if data.lightning_every > 0.0: _lightning(delta)
+	if _rain != null: _rain_step(delta)
 
 ## Sin sombras de nubes (grutas e interiores: Ambient, data/ambient.json "clouds": false)
 func hide_clouds() -> void:

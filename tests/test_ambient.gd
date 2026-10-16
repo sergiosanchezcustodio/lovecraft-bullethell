@@ -49,3 +49,18 @@ func test_la_llama_tiembla_y_la_bombilla_falla_a_ratos() -> void:
 		if Ambient.anim_k(3, 0.3, 1.0, i * 0.05, 3.0) < 0.5: off += 1
 	assert_gt(off, 0, "la bombilla se apaga alguna vez")
 	assert_lt(off, 200, "pero casi siempre luce")
+
+func test_el_sonido_del_ambiente_tiene_su_bus_y_sus_archivos() -> void:
+	var i := AudioServer.get_bus_index("Ambiente")
+	assert_gt(i, -1, "bus Ambiente")
+	assert_eq(String(AudioServer.get_bus_send(i)), "Efectos", "dentro de Efectos: su volumen también lo baja")
+	var ev: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/sfx.json")).eventos
+	var n := 0
+	for e: String in ev:
+		if String(ev[e].get("bus", "")) != "Ambiente": continue
+		n += 1
+		for f: String in ev[e].files: assert_true(ResourceLoader.exists("res://resources/sfx/" + f), e + ": " + f)
+	assert_gt(n, 5, "eventos del ambiente")
+	for f in ["wind_loop.wav", "rain_loop.wav"]: assert_true(ResourceLoader.exists("res://resources/sfx/" + f), f)
+	for a: Dictionary in Ambient.config().arenas.values():
+		if a.has("loop"): assert_true(ResourceLoader.exists("res://resources/sfx/" + String(a.loop.file)), "bucle " + String(a.loop.file))

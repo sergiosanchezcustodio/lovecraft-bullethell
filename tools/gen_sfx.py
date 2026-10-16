@@ -93,8 +93,8 @@ def synth():
 def ambiente():
     """Sonidos de ambiente de los escenarios (16-10-2026), con su propio azar para no cambiar los
     de synth(): gotas en la gruta con su eco, golpes de ola contra el casco, crujidos del gancho
-    de los faroles que se mecen, truenos y el viento en bucle (sin costura: el final se funde con
-    el principio)."""
+    de los faroles que se mecen, truenos, el viento y la lluvia en bucle (sin costura: el final se
+    funde con el principio) y los graznidos de las bandadas."""
     r = np.random.default_rng(1016)
     def nz(d): return r.standard_normal(int(d * SR))
     def cave(x, tail=0.9, level=0.25):                       # eco de cueva: cola de ruido que decae
@@ -158,13 +158,93 @@ def ambiente():
             k += step
         whistle += out * g ** 2 * 0.25
     w = base + whistle
+    save_loop('wind_loop', w, d, fade)
+    aves(r)
+    lluvia(r)
+
+
+def save_loop(name, w, d, fade):
+    """Bucle sin costura: los `fade` s de después del final se funden con el principio (save()
+    haría un fundido a cero al final y se oiría el corte)."""
     m = int(fade * SR)
     loop = w[:int(d * SR)].copy()
-    loop[:m] = loop[:m] * np.linspace(0, 1, m) + w[int(d * SR):int(d * SR) + m] * np.linspace(1, 0, m)
-    x = loop / (np.max(np.abs(loop)) + 1e-9) * 0.9                    # save() con fundido al final rompería el bucle
-    with wave.open(os.path.join(OUT, 'wind_loop.wav'), 'wb') as wv:
+    a = np.linspace(0, np.pi / 2, m)                         # potencia constante: el ruido no baja en la junta
+    loop[:m] = loop[:m] * np.sin(a) + w[int(d * SR):int(d * SR) + m] * np.cos(a)
+    x = loop / (np.max(np.abs(loop)) + 1e-9) * 0.9
+    with wave.open(os.path.join(OUT, name + '.wav'), 'wb') as wv:
         wv.setnchannels(1); wv.setsampwidth(2); wv.setframerate(SR)
         wv.writeframes((x * 32767).astype(np.int16).tobytes())
+
+
+def _voice(f, rough, r, formants=((2200, 6),), harm=6):
+    """Voz de ave: armónicos sobre la línea de tono f (Hz por muestra), aspereza (ruido que
+    modula la amplitud) y formantes (picos que le dan el timbre nasal o ronco)."""
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    v = sum(np.sin(k * ph) / k ** 0.7 for k in range(1, harm + 1))
+    am = 1 + rough * bp(r.standard_normal(len(f)), 60, 160) / 0.08
+    v = v * np.clip(am, 0, 3)
+    out = np.zeros(len(v))
+    for fc, q in formants:
+        out += signal.lfilter(*signal.iirpeak(fc / (SR / 2), q), v)
+    return out + v * 0.15
+
+
+def _notes(parts, gap):
+    """Une notas (arrays) con silencios de `gap` s."""
+    sil = np.zeros(int(gap * SR))
+    out = []
+    for i, n in enumerate(parts):
+        if i: out.append(sil)
+        out.append(n)
+    return np.concatenate(out)
+
+
+def aves(r):
+    """Graznidos para las bandadas del ambiente (16-10-2026): gaviota (un grito largo, la risa y
+    dos gritos), cuervo (dos y tres graznidos roncos) y murciélago (chillidos cortos que bajan)."""
+    def gull(d, f_lo, f_hi, f_end):
+        n = int(d * SR)
+        x = np.linspace(0, 1, n)
+        f = np.where(x < 0.18, f_lo + (f_hi - f_lo) * x / 0.18, f_hi + (f_end - f_hi) * (x - 0.18) / 0.82)
+        f = f * (1 + 0.012 * np.sin(2 * np.pi * 23 * np.arange(n) / SR))
+        e = np.minimum(x / 0.06, 1) * np.minimum((1 - x) / 0.25, 1)
+        return _voice(f, 0.25, r, ((2400, 5), (3600, 8))) * e
+    save('bird_gull_0', gull(0.55, 950, 1750, 1150))
+    save('bird_gull_1', _notes([gull(0.16, 1200 - 60 * k, 1650 - 70 * k, 1300 - 60 * k) for k in range(5)], 0.06))
+    save('bird_gull_2', _notes([gull(0.4, 1000, 1700, 1250), gull(0.45, 950, 1600, 1100)], 0.18))
+    def caw(d, f0):
+        n = int(d * SR)
+        x = np.linspace(0, 1, n)
+        f = f0 * (1.08 - 0.15 * x) * (1 + 0.03 * lp(r.standard_normal(n), 30) / 0.02)
+        e = np.minimum(x / 0.08, 1) * np.minimum((1 - x) / 0.3, 1)
+        return _voice(f, 0.9, r, ((1300, 4), (2600, 6)), harm=10) * e
+    save('bird_crow_0', _notes([caw(0.32, 560), caw(0.3, 540)], 0.16))
+    save('bird_crow_1', _notes([caw(0.28, 600), caw(0.3, 580), caw(0.34, 550)], 0.14))
+    def squeak(d, f0, f1):
+        n = int(d * SR)
+        x = np.linspace(0, 1, n)
+        f = f0 + (f1 - f0) * x
+        return np.sin(2 * np.pi * np.cumsum(f) / SR) * np.sin(np.pi * x) ** 2
+    for i in range(2):
+        parts = [squeak(0.035 + 0.015 * r.random(), 4200 + 600 * r.random(), 2600 + 400 * r.random()) for _ in range(4 + i)]
+        save('bird_bat_%d' % i, _notes(parts, 0.07 + 0.03 * i))
+
+
+def lluvia(r):
+    """Lluvia en bucle (16-10-2026): cortina de ruido, miles de gotas que golpean (clics con
+    timbre al azar) y un fondo grave; sin costura."""
+    d, fade = 10.0, 2.0
+    n = int((d + fade) * SR)
+    curtain = hp(lp(r.standard_normal(n), 6000), 350) * 0.5
+    drops = np.zeros(n)
+    k = r.integers(0, n, int(260 * (d + fade)))
+    drops[k] = r.uniform(0.2, 1.0, len(k)) * r.choice([-1, 1], len(k))
+    ticks = np.zeros(n)
+    for lo, hi in ((900, 2500), (2000, 5000), (3500, 8000)):
+        ticks += bp(drops * (r.random(n) < 0.34), lo, hi)
+    roar = lp(r.standard_normal(n), 380) * 0.6
+    w = curtain + ticks * 2.2 + roar
+    save_loop('rain_loop', w, d, fade)
 
 
 # evento -> archivos de Kenney (se copian como <evento>_N.ogg)

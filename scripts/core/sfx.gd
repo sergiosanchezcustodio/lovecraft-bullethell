@@ -5,7 +5,8 @@ extends Node
 ## - `Sfx.play(evento)`: suena una de sus variaciones al azar, con algo de tono al azar.
 ## - Límite de voces por evento (`voices`) y separación mínima entre dos del mismo (`gap`, s):
 ##   con 150 enemigos no se apilan cientos de impactos.
-## - Bus "Efectos" (Settings). `mute=true` silencia también los efectos.
+## - Bus "Efectos" (Settings), o el de la tabla (`bus`: "Ambiente" para el sonido de los
+##   escenarios, con su volumen propio). `mute=true` silencia también los efectos.
 ## - Los botones de los menús suenan solos al recibir el foco y al pulsarse (node_added).
 
 ## - Grupos (12-10-2026): las armas disparan sin parar, varias a la vez y con varios jugadores.
@@ -68,6 +69,8 @@ func play(ev: String, vol_db := 0.0) -> void:
 	p.volume_db = float(def.get("db", 0.0)) + vol_db
 	var pr: Array = def.get("pitch", [0.95, 1.05])
 	p.pitch_scale = randf_range(float(pr[0]), float(pr[1]))
+	var bus := String(def.get("bus", "Efectos"))
+	p.bus = bus if AudioServer.get_bus_index(bus) >= 0 else "Master"
 	p.set_meta("ev", ev)
 	p.set_meta("group", group)
 	p.play()

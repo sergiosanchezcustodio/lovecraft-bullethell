@@ -15,8 +15,9 @@ extends Node3D
 ##   roca), nieve que se desprende de las cornisas (pivotes "spill" de las rocas y del acantilado)
 ##   y olas que rompen contra la borda con rocío y espuma por la cubierta (que brillan con los
 ##   relámpagos).
-## Sonido (16-10-2026): gotas, golpes de ola y crujidos de los faroles (Sfx: drip, wave_hit,
-## creak) y un bucle de viento por arena ("loop") que sube con las rachas del clima.
+## Sonido (16-10-2026): gotas, golpes de ola, crujidos de los faroles y graznidos de las
+## bandadas a la vista (Sfx: drip, wave_hit, creak, bird_<ave>, en el bus Ambiente) y un bucle de
+## viento por arena ("loop") que sube con las rachas del clima. La lluvia la pone Weather.
 ## Las ventanas que se encienden y el cristal con cielo son capas del modelo (VoxelBuilder,
 ## glow 2 y 3) y no necesitan nada de aquí. Las banderas, igual (parte "flag").
 ## Nada de esto tiene colisión ni afecta a la partida. `ambient=false` lo quita (comparar).
@@ -214,7 +215,7 @@ func _swing_step(delta: float, t: float) -> void:
 		var d: Vector2 = s.d
 		var part: Node3D = s.part
 		var out_now := (s.v as Vector2).dot(d) > 0.0                    # se aleja del centro
-		if s.get("out", false) and not out_now and d.length() > deg_to_rad(9.0) and _rng.randf() < 0.35:
+		if s.get("out", false) and not out_now and d.length() > deg_to_rad(9.0) and _rng.randf() < 0.25:
 			var gp := part.global_position
 			var f := _focus()
 			if Vector2(gp.x - f.x, gp.z - f.z).length() < 12.0: Sfx.play("creak")
@@ -354,7 +355,7 @@ func _start_loop(c: Dictionary) -> void:
 	st.loop_end = int(st.get_length() * st.mix_rate)
 	_loop = AudioStreamPlayer.new()
 	_loop.stream = st
-	_loop.bus = "Efectos" if AudioServer.get_bus_index("Efectos") >= 0 else "Master"
+	_loop.bus = "Ambiente" if AudioServer.get_bus_index("Ambiente") >= 0 else "Master"
 	_loop.volume_db = -60.0
 	_loop.pitch_scale = float(c.get("pitch", 1.0))
 	add_child(_loop)
@@ -632,7 +633,12 @@ func _birds(delta: float, t: float) -> void:
 			var bank: float = -0.35 * float(fl.turn) if fl.t < fl.circle_time else sin(fl.t * 0.9 + ph) * 0.12
 			b.basis = basis * Basis(Vector3(0, 0, 1), bank)
 			_flap(b, kind, t + ph, fl.t + ph)
-		var gone: bool = Vector2(center.x - f.x, center.z - f.z).length() > 34.0 and fl.t > fl.circle_time
+		fl.next_call -= delta                                            # graznan de vez en cuando, si se les ve
+		var dist := Vector2(center.x - f.x, center.z - f.z).length()
+		if fl.next_call <= 0.0:
+			fl.next_call = _rng.randf_range(2.0, 5.0) if kind == "bat" else _rng.randf_range(3.5, 9.0)
+			if dist < 15.0: Sfx.play("bird_" + kind, -dist * 0.4)
+		var gone: bool = dist > 34.0 and fl.t > fl.circle_time
 		if gone or fl.t > 90.0:
 			for b: Node3D in fl.members: b.queue_free()
 			_flocks.erase(fl)
@@ -649,7 +655,8 @@ func _spawn_flock(c: Dictionary) -> void:
 	var side := Vector3(-dir.z, 0, dir.x)
 	var fl := {"kind": kind, "t": 0.0, "speed": float(BIRD_SPEED.get(kind, 5.0)) * _rng.randf_range(0.85, 1.15),
 		"h": _rng.randf_range(hh[0], hh[1]), "members": [], "offsets": [], "phases": [], "storm": bool(c.get("storm", false)),
-		"circle_time": 0.0, "radius": 1.0, "a0": 0.0, "turn": 1.0, "c": f, "p": f - dir * 30.0 + side * _rng.randf_range(-8, 8), "dir": dir}
+		"circle_time": 0.0, "radius": 1.0, "a0": 0.0, "turn": 1.0, "c": f, "p": f - dir * 30.0 + side * _rng.randf_range(-8, 8), "dir": dir,
+		"next_call": _rng.randf_range(1.0, 4.0)}
 	if _rng.randf() < float(c.get("circle", 0.0)):                 # dan vueltas un rato y se van
 		fl.circle_time = _rng.randf_range(10.0, 20.0)
 		fl.radius = _rng.randf_range(5.0, 8.0)

@@ -1,5 +1,5 @@
 {
-	"_comentario": "Efectos de sonido (hito 8.1): evento -> archivos de resources/sfx (al azar), volumen en dB, tono al azar [min, max], voces a la vez y separación mínima en s. Sintetizados (tools/gen_sfx.py) y CC0 de Kenney (kenney.nl). `group` (armas, golpes): todas las del grupo comparten un tope de voces y se atenúan cuanto más suenan a la vez (Sfx.GROUPS); el volumen de las armas se regula aparte en Configuración > Audio. Ambiente de los escenarios (16-10-2026, Ambient y Weather): drip, wave_hit, creak y thunder; el viento en bucle (wind_loop.wav) lo pone Ambient aparte.",
+	"_comentario": "Efectos de sonido (hito 8.1): evento -> archivos de resources/sfx (al azar), volumen en dB, tono al azar [min, max], voces a la vez y separación mínima en s. Sintetizados (tools/gen_sfx.py) y CC0 de Kenney (kenney.nl). `group` (armas, golpes): todas las del grupo comparten un tope de voces y se atenúan cuanto más suenan a la vez (Sfx.GROUPS); el volumen de las armas se regula aparte en Configuración > Audio. Ambiente de los escenarios (16-10-2026, Ambient y Weather): drip, wave_hit, creak, thunder y los graznidos de las bandadas (bird_<ave>); la lluvia en bucle (rain_loop.wav) la pone Weather y el viento en bucle (wind_loop.wav) lo pone Ambient aparte. `bus`: Ambiente (volumen propio en Configuración > Audio).",
 	"eventos": {
 		"shot_revolver": {
 			"db": -18,
@@ -424,7 +424,8 @@
 				"drip_0.wav",
 				"drip_1.wav",
 				"drip_2.wav"
-			]
+			],
+			"bus": "Ambiente"
 		},
 		"wave_hit": {
 			"db": -15,
@@ -437,7 +438,8 @@
 			"files": [
 				"wave_hit_0.wav",
 				"wave_hit_1.wav"
-			]
+			],
+			"bus": "Ambiente"
 		},
 		"creak": {
 			"db": -24,
@@ -446,12 +448,13 @@
 				1.15
 			],
 			"voices": 1,
-			"gap": 0.9,
+			"gap": 1.8,
 			"files": [
 				"creak_0.wav",
 				"creak_1.wav",
 				"creak_2.wav"
-			]
+			],
+			"bus": "Ambiente"
 		},
 		"thunder": {
 			"db": -6,
@@ -464,7 +467,81 @@
 			"files": [
 				"thunder_0.wav",
 				"thunder_1.wav"
-			]
+			],
+			"bus": "Ambiente"
+		},
+		"bird_gull": {
+			"db": -22,
+			"pitch": [
+				0.92,
+				1.1
+			],
+			"voices": 1,
+			"gap": 2.0,
+			"files": [
+				"bird_gull_0.wav",
+				"bird_gull_1.wav",
+				"bird_gull_2.wav"
+			],
+			"bus": "Ambiente"
+		},
+		"bird_skua": {
+			"db": -22,
+			"pitch": [
+				0.72,
+				0.82
+			],
+			"voices": 1,
+			"gap": 2.0,
+			"files": [
+				"bird_gull_0.wav",
+				"bird_gull_1.wav",
+				"bird_gull_2.wav"
+			],
+			"bus": "Ambiente"
+		},
+		"bird_petrel": {
+			"db": -25,
+			"pitch": [
+				1.18,
+				1.32
+			],
+			"voices": 1,
+			"gap": 2.0,
+			"files": [
+				"bird_gull_0.wav",
+				"bird_gull_1.wav",
+				"bird_gull_2.wav"
+			],
+			"bus": "Ambiente"
+		},
+		"bird_crow": {
+			"db": -21,
+			"pitch": [
+				0.9,
+				1.1
+			],
+			"voices": 1,
+			"gap": 2.0,
+			"files": [
+				"bird_crow_0.wav",
+				"bird_crow_1.wav"
+			],
+			"bus": "Ambiente"
+		},
+		"bird_bat": {
+			"db": -27,
+			"pitch": [
+				0.9,
+				1.15
+			],
+			"voices": 1,
+			"gap": 1.5,
+			"files": [
+				"bird_bat_0.wav",
+				"bird_bat_1.wav"
+			],
+			"bus": "Ambiente"
 		}
 	}
 }

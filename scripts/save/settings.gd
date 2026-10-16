@@ -11,6 +11,7 @@ const FPS_LIMITS: Array[int] = [0, 60, 120, 144, 240]          ## 0 = sin límit
 const SCALES_3D: Array[float] = [0.5, 0.67, 0.75, 1.0]
 const BUS_MUSIC := &"Musica"
 const BUS_SFX := &"Efectos"
+const BUS_AMBIENT := &"Ambiente"               ## sonido de los escenarios (16-10-2026), dentro de Efectos
 
 ## Acciones que se pueden reasignar, con su nombre en el menú.
 const REMAP_ACTIONS := [
@@ -21,7 +22,7 @@ const REMAP_ACTIONS := [
 
 var defaults := {
 	"fullscreen": true, "resolution": 2, "vsync": true, "fps_limit": 0, "scale_3d": 1.0,
-	"vol_master": 1.0, "vol_music": 0.8, "vol_sfx": 0.9, "vol_weapons": 0.7,
+	"vol_master": 1.0, "vol_music": 0.8, "vol_sfx": 0.9, "vol_weapons": 0.7, "vol_ambient": 0.8,
 	"distortion": 1.0, "vibration": true, "show_fps": false,
 	"weather": 2,                           ## clima: 0 apagado, 1 reducido, 2 completo
 	"ui_scale": 1,                          ## accesibilidad (hito 8.3): tamaño de la interfaz (UI_SCALES)
@@ -114,15 +115,15 @@ func apply_video() -> void:
 # ---------------------------------------------------------------- audio
 
 func _make_buses() -> void:
-	for n in [BUS_MUSIC, BUS_SFX]:
-		if AudioServer.get_bus_index(n) < 0:
+	for pair in [[BUS_MUSIC, &"Master"], [BUS_SFX, &"Master"], [BUS_AMBIENT, BUS_SFX]]:
+		if AudioServer.get_bus_index(pair[0]) < 0:
 			AudioServer.add_bus()
 			var i := AudioServer.bus_count - 1
-			AudioServer.set_bus_name(i, n)
-			AudioServer.set_bus_send(i, &"Master")
+			AudioServer.set_bus_name(i, pair[0])
+			AudioServer.set_bus_send(i, pair[1])
 
 func apply_audio() -> void:
-	for pair in [[&"Master", "vol_master"], [BUS_MUSIC, "vol_music"], [BUS_SFX, "vol_sfx"]]:
+	for pair in [[&"Master", "vol_master"], [BUS_MUSIC, "vol_music"], [BUS_SFX, "vol_sfx"], [BUS_AMBIENT, "vol_ambient"]]:
 		var i := AudioServer.get_bus_index(pair[0])
 		var v := float(get_value(pair[1]))
 		AudioServer.set_bus_volume_db(i, linear_to_db(maxf(v, 0.0001)))
