@@ -140,22 +140,19 @@ func _fade_ramp(c: Color) -> GradientTexture1D:
 func _make_precip(rain: bool) -> void:
 	var speed := data.fall_speed
 	var life := TOP / maxf(speed, 0.1) * 1.05
-	var base := 2600 if rain else 2200
+	var base := 1950 if rain else 2200                  # lluvia: menos gotas (16-10-2026: estorbaba)
 	_precip = _particles(int(base * data.precip_amount), life)
 	_precip_mat = ParticleProcessMaterial.new()
 	_precip_mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
 	_precip_mat.emission_box_extents = Vector3(AREA, 0.5, AREA)
 	_precip_mat.spread = 4.0 if rain else 12.0
 	_precip_mat.gravity = Vector3.ZERO
-	_precip_mat.color_ramp = _fade_ramp(data.precip_color)
+	_precip_mat.color_ramp = _fade_ramp(data.precip_color if not rain else RAIN_SOFT * data.precip_color)
 	if rain:
 		_precip_mat.particle_flag_align_y = true        # la gota se alarga en su dirección
 		_precip_mat.scale_min = 0.8
 		_precip_mat.scale_max = 1.2
-		var drop := BoxMesh.new()
-		drop.size = Vector3(0.018, 0.5, 0.018)
-		drop.material = _unshaded(Color.WHITE, false)
-		_precip.draw_pass_1 = drop
+		_precip.draw_pass_1 = _rain_drop()
 	else:
 		_precip_mat.scale_min = data.flake_size * 0.6
 		_precip_mat.scale_max = data.flake_size * 1.4
@@ -174,6 +171,30 @@ func _make_precip(rain: bool) -> void:
 	_precip.process_material = _precip_mat
 
 ## Lluvia: salpicaduras que se abren en el suelo.
+## Lluvia más discreta (16-10-2026, "demasiado intrusiva"): más oscura y transparente.
+const RAIN_SOFT := Color(0.7, 0.7, 0.7, 0.5)
+
+## Gota de lluvia: estela fina (dos tiras cruzadas, se ve desde cualquier lado) que se desvanece
+## hacia arriba; antes era una barra opaca de 1,8 cm.
+func _rain_drop() -> ArrayMesh:
+	var w := 0.006
+	var h := 0.42
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for ax: Vector3 in [Vector3(w, 0, 0), Vector3(0, 0, w)]:
+		var top := Color(1, 1, 1, 0.0)
+		var bot := Color(1, 1, 1, 1.0)
+		var quad := [[-ax + Vector3(0, -h * 0.5, 0), bot], [ax + Vector3(0, -h * 0.5, 0), bot],
+			[ax + Vector3(0, h * 0.5, 0), top], [-ax + Vector3(0, h * 0.5, 0), top]]
+		for i: int in [0, 1, 2, 0, 2, 3]:
+			st.set_color(quad[i][1])
+			st.add_vertex(quad[i][0])
+	var m := st.commit()
+	var mat := _unshaded(Color.WHITE, false)
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	m.surface_set_material(0, mat)
+	return m
+
 func _make_splashes() -> void:
 	_extra = _particles(int(500 * data.precip_amount), 0.28)
 	_extra.preprocess = 0.0
@@ -183,14 +204,14 @@ func _make_splashes() -> void:
 	m.gravity = Vector3.ZERO
 	m.initial_velocity_min = 0.0
 	m.initial_velocity_max = 0.0
-	m.scale_min = 0.08
-	m.scale_max = 0.16
+	m.scale_min = 0.05
+	m.scale_max = 0.11
 	var sc := CurveTexture.new()
 	var cv := Curve.new()
 	cv.add_point(Vector2(0, 0.3)); cv.add_point(Vector2(1, 1.0))
 	sc.curve = cv
 	m.scale_curve = sc
-	m.color_ramp = _fade_ramp(Color(data.precip_color, 0.6))
+	m.color_ramp = _fade_ramp(Color(data.precip_color * 0.6, 0.18))      # salpicaduras: apenas un brillo
 	_extra.process_material = m
 	var ring := QuadMesh.new()
 	ring.size = Vector2.ONE

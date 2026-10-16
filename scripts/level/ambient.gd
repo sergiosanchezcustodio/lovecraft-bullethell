@@ -156,6 +156,8 @@ var cfg := {}                                   ## el de esta arena
 var night := 0.0
 var _rng := RandomNumberGenerator.new()
 var _bobs: Array = []                           ## [holder, y0, amplitud, semilla]
+var _sea_mat: ShaderMaterial                    ## el del mar (sea.gdshader): estado, viento y rachas
+var _sea: Dictionary = {}                       ## lo que necesita sea_height: state, swell, shore, north
 var _lights: Array = []                         ## [OmniLight3D, energía, modo, amount, speed, semilla]
 var _swings: Array[Dictionary] = []             ## faroles que cuelgan: parte, ángulo y velocidad
 var _mats_sky: Array[ShaderMaterial] = []       ## suelo y mar: estrellas y fugaces
@@ -206,7 +208,10 @@ func _ready() -> void:
 	if not enabled(): return
 	for it: Dictionary in arena.get_meta("ambient", []):
 		var h: Node3D = it.holder
-		if it.has("bob"): _bobs.append([h, h.position.y, float(it.bob), seed_of(h.global_position)])
+		if it.has("bob"):                                       # [.., giro, escala, radio, altura y vuelco suavizados]
+			var bb := _world_aabb(h)
+			_bobs.append([h, h.position.y, float(it.bob), seed_of(h.global_position), h.rotation.y, h.scale.x,
+				clampf(maxf(bb.size.x, bb.size.z) * 0.3, 0.3, 4.0), 0.0, Vector2.ZERO])
 		if it.has("glow") and it.has("light"):
 			var g: Dictionary = it.glow
 			var l: OmniLight3D = it.light
@@ -219,6 +224,17 @@ func _ready() -> void:
 			var sm := mi.material_override as ShaderMaterial
 			sm.set_shader_parameter("night", night)
 			_mats_sky.append(sm)
+			if n == "Sea":
+				_sea_mat = sm
+				sm.set_shader_parameter("state", float(cfg.get("sea_state", 0.35)))
+				sm.set_shader_parameter("period_override", float(cfg.get("sea_period", 0.0)))
+				if cfg.has("sea_swell"): sm.set_shader_parameter("swell", float(cfg.sea_swell))   # el hielo amortigua el mar de fondo
+				var sw: Variant = sm.get_shader_parameter("swell")              # sin fijar: el de por defecto (null)
+				var no: Variant = sm.get_shader_parameter("north_shore")
+				_sea = {"state": float(cfg.get("sea_state", 0.35)), "swell": float(sw) if sw != null else 1.0,
+					"shore": sm.get_shader_parameter("shore") as Vector2, "north": float(no) if no != null else -100000.0,
+					"level": (mi as Node3D).position.y, "period": float(cfg.get("sea_period", 0.0)),
+					"coast": float((cfg.get("coast", {}) as Dictionary).get("amp", 0.0))}
 	var size: Vector2 = arena.get_meta("size")
 	if cfg.has("fireflies"): _scatter("fireflies", cfg.fireflies, size, 1.2, Color(1, 1, 1))
 	if cfg.has("motes"): _scatter("glow_motes", cfg.motes, size, 1.0, Color(1, 1, 1))
@@ -306,9 +322,28 @@ func _process(delta: float) -> void:
 	for b: Array in _bobs:
 		var h: Node3D = b[0]
 		var s: float = b[3]
-		h.position.y = b[1] + sin(t * 0.9 + s) * b[2]
-		h.rotation.x = sin(t * 0.7 + s * 1.3) * b[2] * 0.5
-		h.rotation.z = sin(t * 0.8 + s * 0.7) * b[2] * 0.5
+		if _sea.is_empty():
+			h.position.y = b[1] + sin(t * 0.9 + s) * b[2]
+			h.rotation.x = sin(t * 0.7 + s * 1.3) * b[2] * 0.5
+			h.rotation.z = sin(t * 0.8 + s * 0.7) * b[2] * 0.5
+			continue
+		# sube y baja con el agua que tiene debajo (la media de toda su planta: lo grande, más
+		# suave) y con retraso, como un cuerpo pesado: sin tirones al pasar la cresta
+		var p := Vector2(h.position.x, h.position.z)
+		var r: float = b[6]
+		var hx0 := sea_height(p - Vector2(r, 0), t, _sea); var hx1 := sea_height(p + Vector2(r, 0), t, _sea)
+		var hz0 := sea_height(p - Vector2(0, r), t, _sea); var hz1 := sea_height(p + Vector2(0, r), t, _sea)
+		var target := (sea_height(p, t, _sea) * 2.0 + hx0 + hx1 + hz0 + hz1) / 6.0
+		var slope := Vector2((hx1 - hx0) / (2.0 * r), (hz1 - hz0) / (2.0 * r))
+		var lag := 1.0 - exp(-delta / (0.35 + r * 0.15))
+		b[7] = lerpf(b[7], target, lag)
+		b[8] = (b[8] as Vector2).lerp(slope, lag * 0.8)
+		var k := clampf(b[2] / 0.045, 0.35, 1.0)                        # bob de los datos: lo pequeño sigue al agua entera, lo grande menos
+		var sl: Vector2 = b[8]
+		h.position.y = b[1] + 0.06 + b[7] * k + sin(t * 0.5 + s) * b[2] * 0.25   # algo más de borde libre: la cresta no lo cubre
+		# inclinado en el mundo (no en su giro): su vertical sigue a la normal del agua
+		var tilt := Basis.from_euler(Vector3(-sl.y * 0.5 * k + sin(t * 0.4 + s * 1.3) * b[2] * 0.15, 0.0, sl.x * 0.5 * k + sin(t * 0.45 + s * 0.7) * b[2] * 0.15))
+		h.basis = (tilt * Basis(Vector3.UP, b[4])).scaled(Vector3.ONE * float(b[5]))
 	for l: Array in _lights:
 		(l[0] as OmniLight3D).light_energy = l[1] * anim_k(l[2], l[3], l[4], t, l[5])
 	if not _swings.is_empty(): _swing_step(delta, t)
@@ -317,6 +352,7 @@ func _process(delta: float) -> void:
 		var g := get_parent()
 		if not bool(cfg.get("clouds", true)) and g != null and "weather" in g and g.weather != null: g.weather.hide_clouds()
 	if night > 0.0: _shooting(delta)
+	if _sea_mat != null: _sea_wind()
 	if cfg.has("birds"): _birds(delta, t)
 	if cfg.has("bubbles"): _bubbles(delta)
 	if cfg.has("whirls"): _whirl_step(delta)
@@ -373,7 +409,7 @@ func _bubbles(delta: float) -> void:
 		var obstacles: ObstacleMap = arena.get_meta("obstacles")
 		var sea: bool = arena.get_node_or_null("Sea") != null and (p.x > size.x * 0.5 + 1.5 or p.y > size.y * 0.5 + 1.5)
 		if sea or obstacles.water_at(p) > 0.5:
-			var y: float = (arena.get_node("Sea") as Node3D).position.y + 0.05 if sea else 0.04
+			var y: float = _water_y(p) + 0.05 if sea else 0.04
 			var e := VoxelFx.emitter("sea_bubbles", _rng.randf_range(0.2, 0.45), true)
 			e.position = Vector3(p.x, y, p.y)
 			add_child(e)
@@ -400,6 +436,61 @@ func _whirl_step(delta: float) -> void:
 			e.emitting = false
 			get_tree().create_timer(2.0).timeout.connect(e.queue_free)
 			_whirls.erase(w)
+
+# ------------------------------------------------------------------ el mar
+
+## El viento del clima mueve la marejadilla y las rachas la encrespan (sea.gdshader).
+func _sea_wind() -> void:
+	var w := _weather()
+	if w == null or w.data == null: return
+	var wv := w.data.wind_vector()
+	_sea_mat.set_shader_parameter("wind_dir", Vector2(wv.x, wv.z))
+	_sea_mat.set_shader_parameter("gust", clampf(w.wind_now().length() / maxf(w.data.wind, 0.1), 0.6, 2.2))
+
+func _water_y(p: Vector2) -> float:
+	var t := fmod(Time.get_ticks_msec() / 1000.0, 3600.0)
+	return float(_sea.get("level", 0.0)) + (sea_height(p, t, _sea) if not _sea.is_empty() else 0.0)
+
+## Altura del mar de fondo en p (m sobre su nivel), la misma cuenta que swell_at de sea.gdshader
+## (sin la marejadilla): para que lo que flota suba y baje con cada ola. sea = {state, swell,
+## shore, north}.
+static func sea_height(p: Vector2, t: float, sea: Dictionary) -> float:
+	var shore: Vector2 = sea.shore
+	var d := Vector2(maxf(p.x - shore.x, 0.0), maxf(p.y - shore.y, 0.0)).length()
+	if p.x < shore.x: d = p.y - shore.y
+	if p.y < shore.y: d = p.x - shore.x
+	var north: float = sea.north
+	if p.y < north: d = north - p.y
+	var along := p.x if (p.x < shore.x or p.y < north) else p.y
+	if float(sea.get("coast", 0.0)) > 0.0 and p.y >= north:
+		d -= ArenaBuilder.coast_offset(along, float(sea.coast))
+	d = maxf(d, 0.0)
+	var state: float = sea.state
+	var T := float(sea.get("period", 0.0)) if float(sea.get("period", 0.0)) > 0.0 else lerpf(4.2, 7.5, state)
+	var wob := 0.9 * sin(along * 0.09 + 1.3) + 0.5 * sin(along * 0.23 - 0.6)
+	var th := (t + _travel(d)) / T + wob / TAU
+	var n := floorf(th)
+	var f := th - n
+	var size := lerpf(_wave_size(n), _wave_size(n + 1.0), smoothstep(0.0, 1.0, f))
+	size *= 0.8 + 0.4 * (0.5 + 0.5 * sin(along * 0.31 + n * 1.7) * sin(along * 0.07 - n * 0.9))
+	var a0 := lerpf(0.015, 0.42, state) * float(sea.swell)
+	var grow := 1.0 + 0.9 * exp(-d / 5.0)
+	var d_break := lerpf(1.2, 5.0, state) * size
+	var surf := 1.0 - smoothstep(d_break * 0.6, d_break, d)
+	var a := a0 * grow * size * lerpf(0.3, 1.0, smoothstep(0.0, d_break, d))
+	var k := lerpf(1.2, 2.8, clampf(grow - 1.0 + surf * 0.6, 0.0, 1.0))
+	var u := cos(TAU * f)
+	var y := a * (2.0 * pow(0.5 + 0.5 * u, k) - 0.6)
+	var back := (t - _travel(d)) / T + wob / TAU
+	y += 0.35 * a0 * exp(-d / 2.5) * cos(TAU * back + PI)
+	return y
+
+static func _travel(d: float) -> float:
+	return 2.0 * 7.0 / 1.4 * (sqrt(1.0 + maxf(d, 0.0) / 7.0) - 1.0)
+
+static func _wave_size(n: float) -> float:
+	var s := 0.5 + 0.5 * sin(TAU * n / 7.3 + 0.7)
+	return lerpf(0.45, 1.25, s * s) * (0.85 + 0.3 * (0.5 + 0.5 * sin(n * 2.39 + 1.1)))
 
 # ------------------------------------------------------------------ sonido de fondo y rayos
 
@@ -543,7 +634,7 @@ func _drip_step(delta: float) -> void:
 			var sea: bool = sea_node != null and (p.x > size.x * 0.5 + 1.0 or p.y > size.y * 0.5 + 1.0)
 			if want_sea != sea and attempt < 10: continue
 			if not sea and obstacles.is_blocked(p, 0.1): continue
-			var y: float = sea_node.position.y + 0.06 if sea else 0.02
+			var y: float = _water_y(p) + 0.06 if sea else 0.02
 			var d := MeshInstance3D.new()
 			var bm := BoxMesh.new()
 			bm.size = Vector3(0.025, 0.12, 0.025)

@@ -22,6 +22,11 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	var ground := _ground(data, size)
 	root.add_child(ground)
 	if data.has("sea"): root.add_child(_sea(data, size))     # arenas de interior: sin mar
+	# costa natural (16-10-2026): entrantes y salientes en vez de la línea recta del suelo
+	var coast: Dictionary = (Ambient.config().get("arenas", {}) as Dictionary).get(path.get_file().get_basename(), {}).get("coast", {})
+	if data.has("sea") and float(coast.get("amp", 0.0)) > 0.0:
+		root.add_child(_coast(data, size, coast, ground.material_override))
+		(root.get_node("Sea") as MeshInstance3D).material_override.set_shader_parameter("coast_amp", float(coast.amp))
 	if data.has("barrier"): root.add_child(_barrier(data.barrier, size))
 	var lights: Array[OmniLight3D] = []
 	var obstacles := ObstacleMap.new()
@@ -182,6 +187,9 @@ static func _sea(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	mi.name = "Sea"
 	var pm := PlaneMesh.new()
 	pm.size = Vector2(size.x + 200, size.y + 200)
+	# subdividida a ~1 m: el agua sube y baja de verdad con las olas (sea.gdshader, 16-10-2026)
+	pm.subdivide_width = int(pm.size.x) - 1
+	pm.subdivide_depth = int(pm.size.y) - 1
 	mi.mesh = pm
 	# por debajo del suelo solo asoma más allá de la orilla (sur y este)
 	mi.position = Vector3(size.x * 0.5 + 30, float(data.sea.level), size.y * 0.5 + 30)
@@ -339,6 +347,103 @@ static func _lamp(holder: Node3D, m: Node3D, def: Dictionary, fog_volume: bool) 
 		fv.material = fm
 		holder.add_child(fv)
 	return l
+
+## Cuánto avanza la tierra sobre el agua (m, 0..amp) en el punto `along` de la orilla: senos sin
+## azar (sea.gdshader y Ambient.sea_height hacen la misma cuenta), en escalones de 1/16 m.
+const COAST_STEP := 0.0625
+static func coast_offset(along: float, amp: float) -> float:
+	if amp <= 0.0: return 0.0
+	along = (floorf(along / COAST_STEP) + 0.5) * COAST_STEP          # el centro de su escalón
+	var v := 0.5 + 0.28 * sin(along * 0.83 + 1.3) + 0.2 * sin(along * 1.97 + 0.4) + 0.12 * sin(along * 4.3 + 2.1) + 0.07 * sin(along * 9.7 + 0.7)
+	return floorf(amp * clampf(v, 0.0, 1.0) / COAST_STEP + 0.5) * COAST_STEP
+
+## Costa natural (arrecife, R'lyeh, túneles, pantano, ritual): una franja de suelo (el mismo
+## material, sigue sin costura) que avanza sobre el agua con entrantes y salientes, y su pared
+## hasta debajo del agua con estratos, más oscura y con verdín donde la moja la ola. Lo
+## transitable sigue en la línea recta: siempre queda dentro de la tierra dibujada.
+static func _coast(data: Dictionary, size: Vector2, c: Dictionary, ground_mat: Material) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Coast"
+	var amp := float(c.amp)
+	var g: Dictionary = data.ground
+	var gc: Dictionary = g.get("colors", {})
+	var base: Array = gc.get("base_lo", gc.get("snow_lo", [0.2, 0.2, 0.2]))
+	var top: Array = gc.get("base_hi", gc.get("snow_hi", base))
+	var hi: Array = c.get("face", [top[0] * 0.75, top[1] * 0.75, top[2] * 0.75])
+	var lo: Array = c.get("face_lo", [base[0] * 0.8, base[1] * 0.8, base[2] * 0.8])
+	var wet: Array = c.get("wet", [base[0] * 0.4, base[1] * 0.5, base[2] * 0.42])
+	var face_hi := Color(hi[0], hi[1], hi[2]); var face_lo := Color(lo[0], lo[1], lo[2]); var face_wet := Color(wet[0], wet[1], wet[2])
+	var sea_y := float(data.sea.level)
+	var bottom := sea_y - 0.6
+	var cap := SurfaceTool.new()
+	cap.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var face := SurfaceTool.new()
+	face.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var half := size * 0.5
+	var back := float(g.get("margin_back", 0.0))
+	var row := 0.125
+	for side: String in data.sea.get("sides", []):
+		if side != "south" and side != "east": continue
+		# a lo largo: x en el sur (z = half.y), z en el este (x = half.x)
+		var a0 := -half.x - back if side == "south" else -half.y - back
+		var a1 := half.x if side == "south" else half.y
+		var line := half.y if side == "south" else half.x
+		var n := int((a1 - a0) / COAST_STEP)
+		var prev := 0.0
+		for i in n + 1:
+			var a := a0 + i * COAST_STEP
+			var o := coast_offset(a + COAST_STEP * 0.5, amp) if i < n else 0.0
+			var pt := func(along: float, out: float, y: float) -> Vector3:
+				return Vector3(along, y, line + out) if side == "south" else Vector3(line + out, y, along)
+			if i < n and o > 0.0:                                         # suelo que avanza
+				for fl: bool in [false, true]:                               # por las dos caras: el material del suelo no se toca
+					_quad(cap, pt.call(a, 0.0, 0.0), pt.call(a + COAST_STEP, 0.0, 0.0), pt.call(a + COAST_STEP, o, 0.0), pt.call(a, o, 0.0), Color.WHITE, fl)
+			# pared: el frente de este tramo y el escalón con el anterior
+			var y := 0.0
+			while y > bottom:
+				var y1 := maxf(y - row, bottom)
+				var col := _strata(face_hi, face_lo, a, y, sea_y, face_wet)
+				if i < n: _quad(face, pt.call(a, o, y), pt.call(a + COAST_STEP, o, y), pt.call(a + COAST_STEP, o, y1), pt.call(a, o, y1), col, side == "east")
+				if absf(o - prev) > 0.001:
+					var lo2 := minf(o, prev); var hi2 := maxf(o, prev)
+					var flip := (o > prev) != (side == "east")
+					_quad(face, pt.call(a, lo2, y), pt.call(a, hi2, y), pt.call(a, hi2, y1), pt.call(a, lo2, y1), col, flip)
+				y = y1
+			prev = o
+	var mc := MeshInstance3D.new()
+	mc.name = "CoastTop"
+	mc.mesh = cap.commit()
+	mc.material_override = ground_mat
+	mc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	root.add_child(mc)
+	face.generate_normals()
+	var mf := MeshInstance3D.new()
+	mf.name = "CoastFace"
+	mf.mesh = face.commit()
+	var fm := StandardMaterial3D.new()
+	fm.vertex_color_use_as_albedo = true
+	fm.vertex_color_is_srgb = VoxelBuilder.colors_are_srgb()
+	fm.roughness = 0.8
+	fm.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mf.material_override = fm
+	mf.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	root.add_child(mf)
+	return root
+
+## Un cuadrilátero (dos triángulos) con su color; `flip` da la vuelta al orden.
+static func _quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3, col: Color, flip: bool) -> void:
+	var pts := [a, b, c, a, c, d] if not flip else [a, c, b, a, d, c]
+	for p: Vector3 in pts:
+		st.set_color(col)
+		st.add_vertex(p)
+
+## Color de la pared de la costa: estratos de tonos distintos y la franja mojada junto al agua.
+static func _strata(hi: Color, lo: Color, along: float, y: float, sea_y: float, wet: Color) -> Color:
+	var band := floorf(y / 0.125)
+	var k := 0.5 + 0.5 * sin(band * 2.7 + sin(along * 0.31) * 1.2 + sin(along * 0.07) * 2.0)   # estratos: casi horizontales
+	var c := lo.lerp(hi, k * 0.8)
+	if y < sea_y + 0.35: c = c.lerp(wet, clampf((sea_y + 0.35 - y) / 0.3, 0.0, 1.0) * 0.8)
+	return c
 
 ## Paredes invisibles en los bordes de la arena.
 static func _walls(size: Vector2) -> StaticBody3D:
