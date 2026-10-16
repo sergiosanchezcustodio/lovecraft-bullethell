@@ -1296,7 +1296,7 @@ def escombros_v2():
     return M, {P: [0, 0, 0]}
 
 
-def fuente():
+def fuente_v1():
     """Fuente de la plaza (rehecha a 64/m en la revisión de arte del 13-10-2026): pilón octogonal
     de sillares con moldura en el borde y paneles con peces en relieve, verdín y grietas, una
     pieza del borde caída; dentro, agua sucia estancada (verde parduzca, con nata, hojas, un
@@ -1457,6 +1457,113 @@ def fuente():
     x, y = int(R * 0.7), H
     for _ in range(26):                                                              # la grieta
         v = M.V.get((x, y, int(R * 0.7)))
+        if v: v[1] = (0.12, 0.12, 0.11)
+        y -= 1; x += rng.choice((-1, 0, 1))
+    nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
+    return M, {P: [0, 0, 0]}
+
+FUENTE_ROCK_TOP = 36                 # voxels (32/m): altura de la roca en que se sienta la sirena (gen_arena_calles.py)
+
+
+def fuente():
+    """Fuente de la plaza, el triple de grande (16-10-2026, encargo del autor; la de antes queda en
+    inn_fuente_v1): pilón octogonal de 7 m a 32/m, de sillares con moldura que vuela, paneles con
+    peces en relieve, verdín y grietas, un escalón alrededor y una pieza del borde caída con su
+    charco; dentro, agua estancada verde parduzca con nata, hojas y basura; en el centro, como en
+    Copenhague, un montón de rocas de granito con algas y percebes donde se sienta la sirena
+    (inn_sirena, aparte, a 48/m)."""
+    M = Model(S=2, seed=75)
+    rng = M.rng
+    R, H, T = 114, 20, 10                          # radio (3,56 m), alto del pilón (0,62 m), grueso del muro
+    WATER = (0.15, 0.19, 0.13); WATER_L = (0.25, 0.29, 0.19); SCUM = (0.33, 0.37, 0.21); LEAF = (0.36, 0.26, 0.14)
+    GRANITE = (0.44, 0.42, 0.40); GRANITE_D = (0.30, 0.29, 0.28); ALGAE = (0.16, 0.24, 0.12)
+    def octd(x, z): return max(abs(x + 0.5), abs(z + 0.5), (abs(x + 0.5) + abs(z + 0.5)) / 1.414)
+    def stone_c(x, y, z):
+        c = lerp(STONE, STONE_D, 0.5 * M.noise(x, y, z, 5.0))
+        bx = int((math.atan2(z, x) % math.tau) / (math.tau / 40))                     # sillares
+        if y % 7 == 0 or (y // 7 + bx) % 2 == 0 and int(math.degrees(math.atan2(z, x)) * 2) % 18 == 0: c = lerp(c, STONE_D, 0.6)
+        c = lerp(c, STONE_L, 0.25 * M.hsh(bx, y // 7, 3))
+        if M.noise(x, y, z, 6.0) > 0.6 and y > 6: c = lerp(c, GREEN, 0.7)
+        if y < 5: c = lerp(c, (0.30, 0.30, 0.26), 0.4)
+        return c
+    gap = (math.radians(30), math.radians(46))                                      # pieza caída del borde
+    for x in range(-R - 12, R + 13):
+        for z in range(-R - 12, R + 13):
+            d = octd(x, z)
+            a = math.atan2(z, x) % math.tau
+            if R < d <= R + 10:                                                       # escalón alrededor
+                for y in range(0, 4): M.put(x, y, z, P, lerp(STONE_D, STONE, 0.5 * M.noise(x, y, z, 4.0)) if y < 3 else STONE)
+                continue
+            if d > R: continue
+            for y in range(0, H + 4):
+                if y < H:
+                    if d < R - T and y > 3: continue
+                    c = stone_c(x, y, z)
+                    if d > R - 1.5 and 5 <= y < 17:                                     # paneles con pez
+                        seg = int(a / (math.tau / 8))
+                        u = (a - seg * math.tau / 8) / (math.tau / 8)
+                        if 0.1 < u < 0.9:
+                            fx, fy = (u - 0.5) * 2.4, (y - 11) / 5
+                            if fx * fx / 0.5 + fy * fy < 1 and abs(fx) < 0.7: c = lerp(STONE, (0.70, 0.69, 0.64), 0.4)
+                            elif 0.7 <= fx < 0.98 and abs(fy) < (fx - 0.6) * 3: c = lerp(STONE, (0.70, 0.69, 0.64), 0.3)
+                            elif abs(fx) < 0.6 and abs(fy) < 0.2 and abs(fx + 0.45) < 0.05: c = (0.12, 0.12, 0.11)   # ojo
+                            elif abs(fx) > 1.05 or abs(fy) > 1.25: c = lerp(c, STONE_D, 0.45)
+                    M.put(x, y, z, P, c)
+                else:                                                                 # moldura del borde que vuela
+                    if not (R - T - 1 <= d <= R + 3): continue
+                    if gap[0] < a < gap[1]: continue
+                    c = lerp(STONE_L, STONE, 0.4 * M.noise(x, y, z, 4.0))
+                    if y == H + 3 and (d > R + 1 or d < R - T + 1): continue
+                    if M.noise(x, y, z, 5.0) > 0.66: c = lerp(c, GREEN, 0.6)
+                    M.put(x, y, z, P, c)
+    WY = H - 4                                                                        # agua sucia
+    for x in range(-R + T, R - T + 1):
+        for z in range(-R + T, R - T + 1):
+            if octd(x, z) > R - T: continue
+            n = M.noise(x, 0, z, 12.0)
+            c = lerp(WATER, WATER_L, M.noise(x, 3, z, 5.0) * 0.6)
+            if n > 0.64: c = SCUM if M.hsh(x, z, 1) > 0.3 else lerp(SCUM, WATER, 0.4)     # nata
+            if M.hsh(x, z, 2) > 0.996: c = LEAF
+            if 20 < x < 60 and -60 < z < -30 and (x + z) % 3 == 0: c = (0.42, 0.46, 0.40)   # reflejo
+            M.put(x, WY, z, P, c)
+    for _ in range(22):                                                               # hojas y basura flotando
+        cx, cz = rng.randint(-90, 90), rng.randint(-90, 90)
+        if octd(cx, cz) > R - T - 4 or math.hypot(cx, cz) < 40: continue
+        col = LEAF if rng.random() < 0.7 else (0.62, 0.58, 0.48)
+        for dx in range(-2, 3):
+            for dz in range(-1, 2): M.put(cx + dx, WY + 1, cz + dz, P, col)
+    # rocas de granito en el centro: unos bloques redondeados alrededor de uno alto y plano arriba
+    rocks = [(0, 0, 30, FUENTE_ROCK_TOP, 26, 2.6), (-30, 16, 20, 22, 18, 2.3), (24, 22, 18, 18, 16, 2.4),
+             (20, -26, 22, 24, 17, 2.2), (-22, -24, 16, 16, 14, 2.5), (38, -4, 14, 12, 12, 2.3)]
+    for (cx, cz, rx, top, rz, pw) in rocks:
+        for x in range(cx - rx - 3, cx + rx + 4):
+            for z in range(cz - rz - 3, cz + rz + 4):
+                for y in range(0, top + 1):
+                    k = (y / max(top, 1))
+                    wob = 1.0 + 0.14 * (M.noise(x, y, z, 7.0) - 0.5) * 2
+                    rr = (1.0 - 0.35 * k ** 3) * wob                                   # se cierra arriba
+                    if abs((x - cx) / (rx * rr)) ** pw + abs((z - cz) / (rz * rr)) ** pw > 1: continue
+                    if y == top and abs((x - cx) / rx) ** pw + abs((z - cz) / rz) ** pw > 0.55 and M.hsh(x, z, 9) > 0.5: continue
+                    c = lerp(GRANITE, GRANITE_D, 0.6 * M.noise(x, y, z, 4.0))
+                    if M.hsh(x, y, z) > 0.93: c = lerp(c, (0.62, 0.58, 0.54), 0.6)    # cristales del granito
+                    if WY - 2 <= y <= WY + 5: c = lerp(c, ALGAE, 0.7 * (1.0 - abs(y - WY - 1) / 5))   # algas en la línea del agua
+                    if WY + 1 <= y <= WY + 6 and M.hsh(x, y, z + 7) > 0.88: c = (0.66, 0.64, 0.56)    # percebes
+                    if y > WY + 6 and M.noise(x, y, z, 5.0) > 0.66: c = lerp(c, GREEN, 0.5)          # verdín
+                    M.put(x, y, z, P, c, over=False)
+    for k in range(26):                                                               # trozo del borde caído
+        a = math.radians(38)
+        for u in range(-13, 14):
+            for y in range(0, 4):
+                M.put(int((R + 22) * math.cos(a)) + u, y + 3, int((R + 22) * math.sin(a)) + k - 13, P, STONE_L if y == 3 else STONE)
+    for x in range(60, 170):                                                          # charco que se sale por la grieta
+        for z in range(40, 140):
+            if octd(x, z) < R + 11: continue
+            if M.noise(x, 0, z, 14.0) > 0.45 and math.hypot(x - 100, z - 85) < 48:
+                M.put(x, 0, z, P, lerp(WATER, WATER_L, M.noise(x, 1, z, 3.0) * 0.5))
+    x, y = int(R * 0.68), H
+    for _ in range(22):                                                               # la grieta
+        v = M.V.get((x, y, int(R * 0.73)))
         if v: v[1] = (0.12, 0.12, 0.11)
         y -= 1; x += rng.choice((-1, 0, 1))
     nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
@@ -1865,7 +1972,7 @@ def coche():
 
 PIECES = {'casa': casa, 'casa_2': lambda: casa(2), 'autobus': autobus, 'poste': poste, 'valla': valla, 'barril': barril,
           'redes': redes, 'barca': barca, 'farola': farola, 'juncos': juncos,
-          'fachada': fachada, 'templo_v1': templo, 'escombros_mano': escombros, 'escombros': escombros_v2, 'fuente': fuente,
+          'fachada': fachada, 'templo_v1': templo, 'escombros_mano': escombros, 'escombros': escombros_v2, 'fuente_v1': fuente_v1, 'fuente': fuente,
           'carretilla': carretilla, 'cajas': cajas, 'cajas_2': lambda: cajas(2), 'cajas_3': lambda: cajas(3), 'nasa': nasa, 'pilote': pilote, 'coche': coche}
 
 if __name__ == '__main__':

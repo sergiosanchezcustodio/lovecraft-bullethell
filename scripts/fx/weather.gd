@@ -76,7 +76,7 @@ func _ready() -> void:
 ## Lluvia en bucle (tools/gen_sfx.py --ambiente, sin costura), en el bus Ambiente: tanto más
 ## fuerte cuanto más llueve; las rachas la suben.
 func _make_rain_sound() -> void:
-	if Sfx.muted or not ResourceLoader.exists("res://resources/sfx/rain_loop.wav"): return
+	if Ambient.sfx_muted() or not ResourceLoader.exists("res://resources/sfx/rain_loop.wav"): return
 	var st := (load("res://resources/sfx/rain_loop.wav") as AudioStreamWAV).duplicate() as AudioStreamWAV
 	st.loop_mode = AudioStreamWAV.LOOP_FORWARD
 	st.loop_begin = 0
@@ -342,11 +342,12 @@ func _lightning(delta: float) -> void:
 			_bolt_t = 0.0
 			lightning_count += 1
 			# el trueno llega después del destello (16-10-2026)
-			get_tree().create_timer(_rng.randf_range(0.4, 1.6)).timeout.connect(func() -> void: Sfx.play("thunder"))
+			get_tree().create_timer(_rng.randf_range(0.4, 1.6)).timeout.connect(_thunder)
 			_next_bolt = data.lightning_every * _rng.randf_range(0.5, 1.5)
 	else:
 		_bolt_t += delta
-	var k := flash_at(_bolt_t) * (1.0 if int(Settings.get_value("flashes")) == 1 else 0.25)   # accesibilidad
+	var st := Ambient.autoload("Settings")
+	var k := flash_at(_bolt_t) * (1.0 if st == null or int(st.call("get_value", "flashes")) == 1 else 0.25)   # accesibilidad
 	if _bolt_t > 0.7: _bolt_t = -1.0
 	flash = k
 	var lit := 1.0 + k * 1.6
@@ -355,6 +356,11 @@ func _lightning(delta: float) -> void:
 	if _flash: _flash.light_energy = k * FLASH_LIGHT
 	if env: env.ambient_light_energy = _base_ambient + k * FLASH_AMBIENT
 	for m in _mist: m.set_shader_parameter("flash", k)
+
+## Trueno (sin lugar: suena en el centro). Sfx se busca al usarlo (ver Ambient.autoload).
+func _thunder() -> void:
+	var sfx := Ambient.autoload("Sfx")
+	if sfx != null: sfx.call("play", "thunder")
 
 ## Brillo del rayo t s después de caer: un destello fuerte, otro más flojo y un tercero.
 static func flash_at(t: float) -> float:

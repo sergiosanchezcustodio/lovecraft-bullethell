@@ -1714,6 +1714,42 @@
    "rot": 176,
    "scale": 1.0,
    "y": -1.25
+  },
+  {
+   "model": "alr_linterna",
+   "pos": [
+    30.6,
+    -4.0
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "alr_linterna",
+   "pos": [
+    30.6,
+    20.0
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "alr_linterna",
+   "pos": [
+    3.0,
+    30.6
+   ],
+   "rot": -90,
+   "scale": 1.2
+  },
+  {
+   "model": "alr_linterna",
+   "pos": [
+    -18.0,
+    30.6
+   ],
+   "rot": -90,
+   "scale": 1.2
   }
  ],
  "mask": {

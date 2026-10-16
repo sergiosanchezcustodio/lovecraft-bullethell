@@ -19,11 +19,11 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	root.set_meta("size", size)
 	root.set_meta("spawn", Vector3(data.spawn[0], 0, data.spawn[1]))
 	root.set_meta("light", data.get("light", {}))
-	var ground := _ground(data, size)
+	var coast: Dictionary = (Ambient.config().get("arenas", {}) as Dictionary).get(path.get_file().get_basename(), {}).get("coast", {})
+	var ground := _ground(data, size, float(coast.get("amp", 0.0)) > 0.0)
 	root.add_child(ground)
 	if data.has("sea"): root.add_child(_sea(data, size))     # arenas de interior: sin mar
 	# costa natural (16-10-2026): entrantes y salientes en vez de la línea recta del suelo
-	var coast: Dictionary = (Ambient.config().get("arenas", {}) as Dictionary).get(path.get_file().get_basename(), {}).get("coast", {})
 	if data.has("sea") and float(coast.get("amp", 0.0)) > 0.0:
 		root.add_child(_coast(data, size, coast, ground.material_override))
 		(root.get_node("Sea") as MeshInstance3D).material_override.set_shader_parameter("coast_amp", float(coast.amp))
@@ -102,7 +102,7 @@ static func apply_light(l: Dictionary, sun: DirectionalLight3D, env: Environment
 ## Suelo de nieve en losas de 0,5 m: nieve blanca (se ve gris azulada con la luz de luna), placas de hielo,
 ## roca asomando y nieve pisada alrededor del campamento. Por detrás (norte y oeste)
 ## se prolonga bajo los acantilados; por delante (sur y este) acaba en la orilla.
-static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
+static func _ground(data: Dictionary, size: Vector2, has_coast := false) -> MeshInstance3D:
 	var g: Dictionary = data.ground
 	var tile: float = g.tile
 	var back: float = g.margin_back
@@ -142,10 +142,15 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	var lvl: float = data.sea.level if data.has("sea") else 0.0
 	var segs := [] if not data.has("sea") else [[Vector3(x0, 0, z1), Vector3(x1, 0, z1), Vector3(0, 0, 1)], [Vector3(x1, 0, z1), Vector3(x1, 0, z0), Vector3(1, 0, 0)]]
 	if data.has("sea") and g.has("margin_north"): segs.append([Vector3(x1, 0, z0), Vector3(x0, 0, z0), Vector3(0, 0, -1)])
+	# 16-10-2026: el orden iba al revés y la cámara no dibujaba la cara (el agua parecía llegar a ras
+	# del suelo). En la nieve sigue como estaba: el frente lo ponen las piezas de la costa; y con
+	# costa natural, su pared (coincidirían donde no avanza y parpadearía).
+	var town := TOWN_KINDS.has(String(g.get("kind", "snow"))) and not has_coast
+	var order := [0, 3, 2, 0, 2, 1] if town else [0, 1, 2, 0, 2, 3]
 	for seg in segs:
 		var a: Vector3 = seg[0]; var b: Vector3 = seg[1]; var nrm: Vector3 = seg[2]
-		var q := [a, a + Vector3(0, lvl - 0.05, 0), b + Vector3(0, lvl - 0.05, 0), b]
-		for k in [0, 1, 2, 0, 2, 3]:
+		var q := [a, a + Vector3(0, lvl - 0.6, 0), b + Vector3(0, lvl - 0.6, 0), b]
+		for k in order:
 			st.set_normal(nrm)
 			st.set_color(edge)
 			st.add_vertex(q[k])
@@ -169,6 +174,9 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 			mat.set_shader_parameter("road_w", float(r[4]))
 		if g.has("marsh"): mat.set_shader_parameter("marsh", float(g.marsh))
 		if g.has("dock"): mat.set_shader_parameter("dock", float(g.dock))
+		if kind == "planks" or g.has("dock"):                   # el borde es un muelle sobre pilotes
+			mat.set_shader_parameter("edge_kind", 1)
+			mat.set_shader_parameter("sea_y", float(data.sea.level) if data.has("sea") else -1.0)
 		if g.has("road_kind"): mat.set_shader_parameter("road_kind", int(g.road_kind))   # 1: balasto (vía del tren)
 	else:
 		mat.shader = preload("res://scripts/level/snow_ground.gdshader")

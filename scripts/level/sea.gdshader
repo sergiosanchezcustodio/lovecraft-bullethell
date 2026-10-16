@@ -34,6 +34,13 @@ uniform vec2 wind_dir = vec2(0.8, 0.5);      // hacia dónde sopla (en el suelo)
 uniform float gust = 1.0;                    // rachas: 1 lo normal, más con las rachas
 uniform float coast_amp = 0.0;               // costa natural: cuánto avanza la tierra (ArenaBuilder.coast_offset)
 uniform float period_override = 0.0;         // periodo del mar de fondo (s); 0: según el estado
+// faroles junto al agua (Ambient, cada fotograma): su reflejo es un rastro de luz que tiembla
+uniform int lamp_n = 0;
+uniform vec4 lamp_pos[8];                    // xyz del farol, w = intensidad
+uniform vec4 lamp_col[8];
+// rocas, témpanos, pilotes y barcas en el agua (Ambient): la ola rompe a su alrededor
+uniform int rock_n = 0;
+uniform vec4 rocks[24];                      // xz del centro, z = radio
 
 varying vec3 wpos;
 
@@ -202,6 +209,18 @@ void fragment() {
 	float caps = smoothstep(0.45, 0.95, state * gust) * exp(-age / 1.1) * smoothstep(0.85, 1.15, sz)
 		* step(0.45, vnoise(vec2(along * 0.4, floor((t + travel(d)) / period()) * 1.7)));
 	white = max(white, caps * 0.85);
+	// alrededor de rocas y témpanos: un aro de encaje siempre y, al pasar cada ola, espuma que rompe
+	float rk = 1e4;
+	for (int i = 0; i < 24; i++) {
+		if (i >= rock_n) break;
+		rk = min(rk, length(p - rocks[i].xy) - rocks[i].z);
+	}
+	if (rk < 2.5) {
+		float hit = exp(-age / 0.9) * clamp(sz, 0.0, 1.3);
+		float rim = (1.0 - smoothstep(0.03, 0.08 + 0.75 * hit * smoothstep(0.02, 0.3, state * swell), rk)) * smoothstep(-0.6, -0.2, rk);
+		float lee = 1.0 - smoothstep(0.0, 1.8, rk);                       // y la que queda flotando
+		white = max(white, rim * mix(0.22, 0.95, hit) + lee * 0.1 * smoothstep(0.3, 0.7, vnoise(p * 1.3 - wv * t * 0.2)));
+	}
 	float old = surf * 0.18 * smoothstep(0.3, 0.7, vnoise(p * 0.5 + wv * t * 0.1));   // espuma vieja en la rompiente
 	white = max(white, old) * land;
 	// a manchas que se encogen al deshacerse, con agujeros de encaje; solo recién rota, entera
@@ -223,10 +242,31 @@ void fragment() {
 
 	float ice = max(b, fo);
 	ALBEDO = col;
+	vec3 em = vec3(0.0);
 	if (night > 0.0) {                       // estrellas reflejadas que tiemblan con las olas
 		vec2 sp = wpos.xz + n.xz * 0.35;
-		EMISSION = (star_at(floor(sp * 16.0), t, 0.005) * night * 1.1 + shooting_star(sp)) * (1.0 - ice) * (0.6 + 0.4 * hq);
+		em = (star_at(floor(sp * 16.0), t, 0.005) * night * 1.1 + shooting_star(sp)) * (1.0 - ice) * (0.6 + 0.4 * hq);
 	}
+	// reflejo de los faroles: alrededor del punto donde el agua lo refleja hacia la cámara (a 1,73
+	// veces su altura, hacia el que mira), estirado por las olas en trozos que tiemblan
+	vec2 vd = vec2(0.70710678, 0.70710678);
+	for (int i = 0; i < 8; i++) {
+		if (i >= lamp_n) break;
+		vec4 L = lamp_pos[i];
+		float hh = max(L.y - wpos.y, 0.3);
+		vec2 rel = p - L.xz;
+		float al = dot(rel, vd);
+		float k = al / (1.732 * hh);
+		if (k < 0.3 || k > 2.6) continue;
+		float ac = dot(rel, vec2(-vd.y, vd.x));
+		float wdt = 0.1 + 0.11 * k;
+		float wob = (gx - gz) * 0.4 + 0.07 * sin(al * 5.0 - t * 2.3);
+		float core = 1.0 - smoothstep(wdt * 0.35, wdt, abs(ac + wob));
+		float dash = step(0.42, vnoise(vec2(al * 5.5 - t * 1.2, ac * 2.5 + t * 0.5)));
+		float fall = exp(-abs(k - 1.0) * 1.5);
+		em += lamp_col[i].rgb * lamp_col[i].rgb * L.w * core * dash * fall * (1.0 - ice * 0.8);   // al cuadrado: más cálido, no blanco
+	}
+	EMISSION = em;
 	ROUGHNESS = mix(0.22, 0.85, ice);
 	SPECULAR = mix(0.45, 0.3, ice);
 }

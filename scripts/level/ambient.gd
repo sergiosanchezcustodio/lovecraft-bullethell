@@ -36,6 +36,20 @@ static func config() -> Dictionary:
 static func enabled() -> bool:
 	return not OS.get_cmdline_user_args().has("ambient=false")
 
+## Los autoloads Sfx y Settings se buscan al usarlos: sin ellos (herramientas con -s, como
+## tools/render_mapa.gd, que monta la arena) el nombre no compilaría y no suena nada.
+static func autoload(n: String) -> Node:
+	var ml := Engine.get_main_loop()
+	return (ml as SceneTree).root.get_node_or_null(n) if ml is SceneTree else null
+
+static func sfx_muted() -> bool:
+	var s := autoload("Sfx")
+	return s == null or bool(s.get("muted"))
+
+static func sfx_at(ev: String, pos: Vector3, db := 0.0) -> void:
+	var s := autoload("Sfx")
+	if s != null: s.call("play_at", ev, pos, db)
+
 static func model_cfg(model: String) -> Dictionary:
 	return (config().get("models", {}) as Dictionary).get(model, {})
 
@@ -61,7 +75,7 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 		holder.add_child(fx)
 	var out := {}
 	var sat := String((c.get("sound", {}) as Dictionary).get("at", "light"))
-	if c.has("sound") and pivots.has(sat) and not Sfx.muted:          # el fuego que chisporrotea, la bandera
+	if c.has("sound") and pivots.has(sat) and not sfx_muted():          # el fuego que chisporrotea, la bandera
 		var sp := _loop_player(String(c.sound.file), true)
 		if sp != null:
 			var lp: Array = pivots[sat]
@@ -158,6 +172,9 @@ var _rng := RandomNumberGenerator.new()
 var _bobs: Array = []                           ## [holder, y0, amplitud, semilla]
 var _sea_mat: ShaderMaterial                    ## el del mar (sea.gdshader): estado, viento y rachas
 var _sea: Dictionary = {}                       ## lo que necesita sea_height: state, swell, shore, north
+var _ground_mat: ShaderMaterial                 ## el del suelo: ondas de la lluvia en los charcos
+var _rocks: Array = []                          ## [Vector2 centro, radio]: lo que asoma del mar (espuma alrededor)
+var _rock_t := 0.0
 var _lights: Array = []                         ## [OmniLight3D, energía, modo, amount, speed, semilla]
 var _swings: Array[Dictionary] = []             ## faroles que cuelgan: parte, ángulo y velocidad
 var _mats_sky: Array[ShaderMaterial] = []       ## suelo y mar: estrellas y fugaces
@@ -224,6 +241,7 @@ func _ready() -> void:
 			var sm := mi.material_override as ShaderMaterial
 			sm.set_shader_parameter("night", night)
 			_mats_sky.append(sm)
+			if n == "Ground": _ground_mat = sm
 			if n == "Sea":
 				_sea_mat = sm
 				sm.set_shader_parameter("state", float(cfg.get("sea_state", 0.35)))
@@ -235,6 +253,7 @@ func _ready() -> void:
 					"shore": sm.get_shader_parameter("shore") as Vector2, "north": float(no) if no != null else -100000.0,
 					"level": (mi as Node3D).position.y, "period": float(cfg.get("sea_period", 0.0)),
 					"coast": float((cfg.get("coast", {}) as Dictionary).get("amp", 0.0))}
+	if _sea_mat != null and cfg.has("rock_foam"): _find_rocks(cfg.rock_foam)
 	var size: Vector2 = arena.get_meta("size")
 	if cfg.has("fireflies"): _scatter("fireflies", cfg.fireflies, size, 1.2, Color(1, 1, 1))
 	if cfg.has("motes"): _scatter("glow_motes", cfg.motes, size, 1.0, Color(1, 1, 1))
@@ -242,7 +261,7 @@ func _ready() -> void:
 	if cfg.has("spills"): _find_spills(cfg.spills)
 	if cfg.has("spray"): _find_sprays(cfg.spray)
 	if cfg.has("loop"): _start_loop(cfg.loop)
-	if cfg.has("crowd") and not Sfx.muted:
+	if cfg.has("crowd") and not sfx_muted():
 		_crowd = _loop_player(String(cfg.crowd.file), false) as AudioStreamPlayer
 		if _crowd != null:
 			add_child(_crowd)
@@ -285,7 +304,7 @@ func _swing_step(delta: float, t: float) -> void:
 		if s.get("out", false) and not out_now and d.length() > deg_to_rad(9.0) and _rng.randf() < 0.25:
 			var gp := part.global_position
 			var f := _focus()
-			if Vector2(gp.x - f.x, gp.z - f.z).length() < 12.0: Sfx.play_at("creak", gp)
+			if Vector2(gp.x - f.x, gp.z - f.z).length() < 12.0: sfx_at("creak", gp)
 		s["out"] = out_now
 		if d.length() < 0.0005:
 			part.basis = Basis.IDENTITY
@@ -352,7 +371,14 @@ func _process(delta: float) -> void:
 		var g := get_parent()
 		if not bool(cfg.get("clouds", true)) and g != null and "weather" in g and g.weather != null: g.weather.hide_clouds()
 	if night > 0.0: _shooting(delta)
-	if _sea_mat != null: _sea_wind()
+	if _sea_mat != null:
+		_sea_wind()
+		_sea_lamps()
+		_rock_t -= delta
+		if _rock_t <= 0.0 and not _rocks.is_empty():
+			_rock_t = 0.5
+			_sea_rocks()
+	if _ground_mat != null: _ground_rain()
 	if cfg.has("birds"): _birds(delta, t)
 	if cfg.has("bubbles"): _bubbles(delta)
 	if cfg.has("whirls"): _whirl_step(delta)
@@ -447,6 +473,73 @@ func _sea_wind() -> void:
 	_sea_mat.set_shader_parameter("wind_dir", Vector2(wv.x, wv.z))
 	_sea_mat.set_shader_parameter("gust", clampf(w.wind_now().length() / maxf(w.data.wind, 0.1), 0.6, 2.2))
 
+## Lluvia en los charcos: tanta como llueve (0 si no llueve o el clima está apagado).
+func _ground_rain() -> void:
+	var w := _weather()
+	var r := 0.0
+	if w != null and w.data != null and w.data.precip == WeatherData.Precip.RAIN: r = clampf(w.data.precip_amount * 1.3, 0.15, 1.0)
+	_ground_mat.set_shader_parameter("rain", r)
+
+## Lo que asoma del mar (data/ambient.json, rock_foam: modelos), con un radio algo menor que su
+## planta: la espuma rompe contra su borde.
+func _find_rocks(models: Array) -> void:
+	var half: Vector2 = arena.get_meta("size") * 0.5
+	for h: Node in arena.get_node("Props").get_children():
+		var m := h.get_child(0) as Node3D
+		if m == null or not String(m.name) in models: continue
+		var hn := h as Node3D
+		var p := Vector2(hn.global_position.x, hn.global_position.z)
+		if shore_dist(p, _sea) < -0.5: continue                      # en tierra: no
+		var bb := _world_aabb(hn)
+		_rocks.append([p, clampf((bb.size.x + bb.size.z) * 0.25 * 0.55, 0.12, 6.0)])   # dentro de su planta: la espuma asoma por fuera
+
+## Las 24 más cerca de la vista, al material del mar.
+func _sea_rocks() -> void:
+	var f := _focus()
+	var fv := Vector2(f.x, f.z)
+	var near := _rocks.duplicate()
+	near.sort_custom(func(a: Array, b: Array) -> bool: return (a[0] as Vector2).distance_squared_to(fv) < (b[0] as Vector2).distance_squared_to(fv))
+	var arr := PackedVector4Array()
+	for i in 24:
+		if i < near.size(): arr.append(Vector4(near[i][0].x, near[i][0].y, near[i][1], 0.0))
+		else: arr.append(Vector4.ZERO)
+	_sea_mat.set_shader_parameter("rocks", arr)
+	_sea_mat.set_shader_parameter("rock_n", mini(near.size(), 24))
+
+## Faroles cuyo reflejo cae en el agua (el punto que refleja hacia la cámara está a 1,73 veces
+## su altura sobre el agua, hacia el que mira): hasta 8, los más cerca de la vista. Cada
+## fotograma: los que se mecen o titilan llevan el reflejo con ellos.
+func _sea_lamps() -> void:
+	var lights: Array = arena.get_meta("lights", [])
+	var f := _focus()
+	var cand: Array = []
+	var wy := float(_sea.get("level", 0.0))
+	for l in lights:
+		if not is_instance_valid(l) or not (l as Node3D).is_visible_in_tree(): continue
+		var gp := (l as Node3D).global_position
+		var h := gp.y - wy
+		if h <= 0.2: continue
+		var spec := Vector2(gp.x, gp.z) + Vector2(0.70710678, 0.70710678) * 1.732 * h
+		if shore_dist(spec, _sea) < 0.3: continue                      # se refleja en tierra
+		var dist := spec.distance_to(Vector2(f.x, f.z))
+		if dist > 26.0: continue
+		cand.append([dist, l])
+	cand.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	var pos := PackedVector4Array()
+	var col := PackedVector4Array()
+	for i in 8:
+		if i < cand.size():
+			var l: OmniLight3D = cand[i][1]
+			var gp := l.global_position
+			pos.append(Vector4(gp.x, gp.y, gp.z, l.light_energy * 0.14))
+			col.append(Vector4(l.light_color.r, l.light_color.g, l.light_color.b, 1.0))
+		else:
+			pos.append(Vector4.ZERO); col.append(Vector4.ZERO)
+	_sea_mat.set_shader_parameter("lamp_pos", pos)
+	_sea_mat.set_shader_parameter("lamp_col", col)
+	_sea_mat.set_shader_parameter("lamp_n", mini(cand.size(), 8))
+	if OS.get_cmdline_user_args().has("amb_dbg=true") and Engine.get_process_frames() % 300 == 0: print("REFLEJOS faroles=%d de %d rocas=%d" % [cand.size(), lights.size(), _rocks.size()])
+
 func _water_y(p: Vector2) -> float:
 	var t := fmod(Time.get_ticks_msec() / 1000.0, 3600.0)
 	return float(_sea.get("level", 0.0)) + (sea_height(p, t, _sea) if not _sea.is_empty() else 0.0)
@@ -454,6 +547,19 @@ func _water_y(p: Vector2) -> float:
 ## Altura del mar de fondo en p (m sobre su nivel), la misma cuenta que swell_at de sea.gdshader
 ## (sin la marejadilla): para que lo que flota suba y baje con cada ola. sea = {state, swell,
 ## shore, north}.
+## Distancia a la orilla (m, positiva en el agua), con la costa natural: la de sea.gdshader.
+static func shore_dist(p: Vector2, sea: Dictionary) -> float:
+	if sea.is_empty(): return -1.0
+	var shore: Vector2 = sea.shore
+	var d := Vector2(maxf(p.x - shore.x, 0.0), maxf(p.y - shore.y, 0.0)).length()
+	if p.x < shore.x: d = p.y - shore.y
+	if p.y < shore.y: d = p.x - shore.x
+	var north: float = sea.north
+	if p.y < north: d = north - p.y
+	var along := p.x if (p.x < shore.x or p.y < north) else p.y
+	if float(sea.get("coast", 0.0)) > 0.0 and p.y >= north: d -= ArenaBuilder.coast_offset(along, float(sea.coast))
+	return d
+
 static func sea_height(p: Vector2, t: float, sea: Dictionary) -> float:
 	var shore: Vector2 = sea.shore
 	var d := Vector2(maxf(p.x - shore.x, 0.0), maxf(p.y - shore.y, 0.0)).length()
@@ -500,7 +606,7 @@ func _weather() -> Weather:
 
 ## Bucle de viento de la arena (sin costura: tools/gen_sfx.py --ambiente), con fundido de entrada.
 func _start_loop(c: Dictionary) -> void:
-	if Sfx.muted: return
+	if sfx_muted(): return
 	var path := "res://resources/sfx/%s" % String(c.get("file", "wind_loop.wav"))
 	if not ResourceLoader.exists(path): return
 	var st := (load(path) as AudioStreamWAV).duplicate() as AudioStreamWAV
@@ -540,7 +646,7 @@ func _on_step(pl: Node3D) -> void:
 	var kind := String(cfg.get("step", "snow"))
 	var obstacles: ObstacleMap = arena.get_meta("obstacles")
 	if obstacles != null and obstacles.water_at(Vector2(pos.x, pos.z)) > 0.3: kind = "water"
-	Sfx.play_at("step_" + kind, pos)
+	sfx_at("step_" + kind, pos)
 
 ## El cántico: más fuerte cuantos más cultistas quedan; sin ninguno (al caer el sacerdote se
 ## acaba el nivel y se van), se apaga despacio.
@@ -554,7 +660,8 @@ func _crowd_step(delta: float) -> void:
 		if g != null and "world" in g and g.world != null:
 			var tag := StringName(String(c.get("tag", "humana")))
 			for e in g.world.enemies:
-				if is_instance_valid(e) and e is Enemy and (e as Enemy).is_alive() and (e as Enemy).data.tags.has(tag): _crowd_n += 1
+				# sin nombrar la clase Enemy: arrastraría al jugador y a Sfx a tools/render_mapa.gd
+				if is_instance_valid(e) and e.has_method("is_alive") and e.is_alive() and e.get("data") != null and e.data.tags.has(tag): _crowd_n += 1
 	var target := -80.0
 	if _crowd_n > 0: target = float(c.get("db", -20.0)) + 20.0 * log(clampf(float(_crowd_n) / float(c.get("full", 6)), 0.25, 1.0)) / log(10.0)
 	_crowd_db = lerpf(_crowd_db, target, minf(delta * (0.35 if target < _crowd_db else 0.8), 1.0))
@@ -575,13 +682,13 @@ func _creak_step(delta: float) -> void:
 			w[0] = pos
 			if w[1] <= 0.0:
 				w[1] = _rng.randf_range(walk[0], walk[1])
-				if _rng.randf() < float(c.get("chance", 0.4)): Sfx.play_at("floor_creak", pos)
+				if _rng.randf() < float(c.get("chance", 0.4)): sfx_at("floor_creak", pos)
 	_next_idle_creak -= delta
 	if _next_idle_creak <= 0.0:
 		var idle: Array = c.get("idle", [10, 25])
 		_next_idle_creak = _rng.randf_range(idle[0], idle[1])
 		var f := _focus()
-		Sfx.play_at("floor_creak", f + Vector3(_rng.randf_range(-10, 10), 0, _rng.randf_range(-8, 8)), -7.0)   # la casa que se asienta
+		sfx_at("floor_creak", f + Vector3(_rng.randf_range(-10, 10), 0, _rng.randf_range(-8, 8)), -7.0)   # la casa que se asienta
 
 ## Las rachas del clima lo suben (hasta unos 8 dB) y lo afinan un poco.
 func _loop_step(delta: float) -> void:
@@ -659,7 +766,7 @@ func _drip_step(delta: float) -> void:
 		get_tree().create_timer(0.8).timeout.connect(sp.queue_free)
 		_ripple(at, 0.55 if dr[3] else 0.3, 0.8 if dr[3] else 0.45)          # en la roca, la película de agua del suelo
 		var near := Vector2(at.x - _focus().x, at.z - _focus().z).length()
-		Sfx.play_at("drip", at, -clampf((near - 4.0) * 0.8, 0.0, 10.0))       # las lejanas, más bajas
+		sfx_at("drip", at, -clampf((near - 4.0) * 0.8, 0.0, 10.0))       # las lejanas, más bajas
 	for r: Array in _ripples.duplicate():
 		r[2] += delta / 1.6
 		(r[1] as ShaderMaterial).set_shader_parameter("life", r[2])
@@ -796,7 +903,7 @@ func _spray_step(delta: float) -> void:
 	sp.basis = b
 	add_child(sp)
 	get_tree().create_timer(1.8).timeout.connect(sp.queue_free)
-	Sfx.play_at("wave_hit", at, (r - 2.6) * 3.0)                   # las flojas suenan menos
+	sfx_at("wave_hit", at, (r - 2.6) * 3.0)                   # las flojas suenan menos
 	var crest := _lit_emitter("snow_puff", r * 0.45, Color(1.3, 1.38, 1.45, 0.55))   # la cresta asoma por la borda
 	crest.position = at
 	add_child(crest)
@@ -859,7 +966,7 @@ func _birds(delta: float, t: float) -> void:
 		var dist := Vector2(center.x - f.x, center.z - f.z).length()
 		if fl.next_call <= 0.0:
 			fl.next_call = _rng.randf_range(2.0, 5.0) if kind == "bat" else _rng.randf_range(3.5, 9.0)
-			if dist < 15.0: Sfx.play_at("bird_" + kind, center, -dist * 0.4)
+			if dist < 15.0: sfx_at("bird_" + kind, center, -dist * 0.4)
 		var gone: bool = dist > 34.0 and fl.t > fl.circle_time
 		if gone or fl.t > 90.0:
 			for b: Node3D in fl.members: b.queue_free()

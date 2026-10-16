@@ -47,6 +47,11 @@ for m, x, z, rot in (("alr_barca", 19.0, -HALF - 1.9, -90), ("alr_barca_2", 23.5
                      ("alr_barca", HALF + 1.9, 16.0, 180), ("alr_barca_3", HALF + 2.0, -10.0, 176)):
     A.add(m, x, z, rot=rot, y=SEA - 0.05)
 
+# faroles en el borde del muelle, colgando sobre el agua: su luz se refleja en ella (16-10-2026);
+# al final, para no mover lo repartido
+for x, z, r in ((HALF - 1.4, -4.0, 0), (HALF - 1.4, 20.0, 0), (3.0, HALF - 1.4, -90), (-18.0, HALF - 1.4, -90)):
+    A.add("alr_linterna", x, z, rot=r, scale=1.2)
+
 COLL = dict(COLLIDERS)
 COLL.update({
     "alr_casco": {"type": "box", "shrink": 0.95},

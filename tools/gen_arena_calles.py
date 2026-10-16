@@ -4,7 +4,8 @@ Receta del generador de escenarios (tools/arena_kit.py).
 64 x 64 m de adoquín mojado (suelo `cobble`) con la plaza de la fuente en el centro. Al norte,
 el antiguo templo masónico de la Orden de Dagon (pórtico jónico) entre casas, tiendas y tabernas,
 con alguna luz encendida y humo en las chimeneas; al oeste, más casas; en la plaza, bancos y olmos. Al sur y al este, el muelle de tablas (`dock`) con
-pilotes y el agua verde oscura del puerto, sin hielo. Por las calles, coches abandonados,
+pilotes y el agua verde oscura del puerto, sin hielo. En el centro de la plaza, la gran fuente con la
+sirena de bronce. Por las calles, coches abandonados,
 carretillas y cajas de pescado, nasas, escombros y farolas de gas. Anochecer frío con lluvia.
 Uso: python tools/gen_arena_calles.py
 """
@@ -55,6 +56,12 @@ for t in range(-30, 34, 5):
     A.add("inn_pilote", HALF + 0.3, t, rot=0)
 A.scatter("inn_escombros", 4, 12.0, 0.8, 1.2)
 A.scatter("inn_barril", 4, 10.0, 1.0, 1.0)
+# la sirena de bronce (gen_sirena.py) en la roca de la fuente, mirando a la cámara; al final, para
+# no mover lo repartido (16-10-2026: la fuente, el triple de grande; la sirena sustituye al cachalote)
+A.add("inn_sirena", 0.0, 0.0, rot=45, y=36 / 32)
+# farolas en el borde del muelle: su luz se refleja en el agua del puerto (16-10-2026)
+for x, z in ((HALF - 1.4, -2.5), (HALF - 1.4, 17.5), (2.5, HALF - 1.4), (-17.5, HALF - 1.4)):
+    A.add("inn_farola", x, z, rot=0, scale=1.2)
 
 COLL = dict(COLLIDERS)
 COLL.update({
@@ -66,7 +73,8 @@ COLL.update({
     "prt_taberna_inn": {"type": "box", "shrink": 0.9}, "prt_almacen": {"type": "box", "shrink": 0.95},
     "prt_banco": {"type": "box", "shrink": 0.9}, "prt_arbol": {"type": "cylinder", "radius": 0.3},
     "prt_arbol_2": {"type": "cylinder", "radius": 0.3},
-    "inn_fuente": {"type": "cylinder", "radius": 2.3},
+    "inn_fuente": {"type": "cylinder", "radius": 3.7},
+    "inn_sirena": {"type": "cylinder", "radius": 0.6},
     "inn_coche": {"type": "box", "shrink": 0.9},
     "inn_carretilla": {"type": "box", "shrink": 0.85},
     "inn_cajas": {"type": "box", "shrink": 0.9},

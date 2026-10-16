@@ -12,6 +12,7 @@ shader_type spatial;
 #include "res://scripts/fx/night_sky.gdshaderinc"
 
 uniform int kind = 0;
+uniform float rain = 0.0;                    // lluvia (0..1, Ambient): ondas en los charcos y el agua somera
 uniform float cell = 0.03125;
 uniform float wet = 0.5;
 uniform vec3 base_hi : source_color = vec3(0.36, 0.29, 0.21);   // tierra / piedra / madera clara
@@ -20,6 +21,8 @@ uniform vec3 joint : source_color = vec3(0.07, 0.07, 0.06);     // juntas, hueco
 uniform vec3 moss : source_color = vec3(0.20, 0.27, 0.15);      // verdín y matas
 uniform vec3 puddle : source_color = vec3(0.10, 0.12, 0.14);
 uniform vec3 edge_col : source_color = vec3(0.18, 0.15, 0.12);
+uniform int edge_kind = 0;                   // 1: el borde es un muelle de piedra (tablas, albardilla y sillería)
+uniform float sea_y = -1.0;                  // nivel del agua (el verdín del muelle)
 uniform float stone = 0.25;                                     // tamaño del adoquín (m)
 uniform float plank = 0.22;                                     // ancho de la tabla (m)
 // carretera de tierra (solo en mud): punto, dirección y ancho (0: sin carretera), con dos rodadas
@@ -138,6 +141,55 @@ void fragment() {
 	if (wnrm.y < 0.5) {
 		ALBEDO = edge_col;
 		ROUGHNESS = 0.8;
+		if (edge_kind == 1) {                    // muelle de piedra (16-10-2026): se ve que está por encima del agua
+			float al = abs(wnrm.x) > 0.5 ? wpos.z : wpos.x;
+			float ac = floor(al / cell) * cell;
+			float y = floor(wpos.y / cell) * cell;
+			vec3 c;
+			vec3 st_hi = vec3(0.37, 0.36, 0.34); vec3 st_lo = vec3(0.22, 0.22, 0.21); vec3 jnt = vec3(0.07, 0.07, 0.07);
+			if (y > -0.07) {                                  // canto de las tablas, cada una con su tono
+				float pl = floor(al / plank);
+				c = mix(base_lo, base_hi, 0.35 + 0.4 * sky_hash(vec2(pl, 3.0))) * 0.8;
+				if (fract(al / plank) < 0.08) c *= 0.4;
+			} else if (y > -0.29) {                           // albardilla: sillares largos, más claros, canto biselado
+				float bl = floor(al / 1.2);
+				c = mix(st_lo, st_hi, 0.55 + 0.35 * sky_hash(vec2(bl, 11.0))) * 1.08;
+				if (fract(al / 1.2) < 0.03) c = jnt;
+				if (y < -0.25) c *= 0.55;                     // sombra de la albardilla que vuela
+				if (y > -0.11) c *= 1.12;                     // bisel arriba
+			} else {                                          // sillería: hiladas de 28 cm, sillares a tizón
+				float yy = -0.29 - y;
+				float row = floor(yy / 0.28);
+				float ry = fract(yy / 0.28);
+				float len = 0.55 + 0.45 * sky_hash(vec2(row, 5.0));
+				float shift = sky_hash(vec2(row, 9.0)) * len;
+				float bl = floor((al + shift) / len);
+				float bx = fract((al + shift) / len);
+				float tone = sky_hash(vec2(bl, row));
+				c = mix(st_lo, st_hi, 0.25 + 0.6 * tone);
+				c *= 0.9 + 0.12 * smoothstep(0.0, 1.0, ry);  // cada sillar algo más claro arriba (lo pule la lluvia)
+				c *= 0.94 + 0.1 * sky_hash(floor(vec2(al, y) / (cell * 3.0)));   // grano de la piedra
+				if (ry < 0.07 || bx < 0.035) c = jnt;         // juntas
+				else if (ry > 0.93 || bx > 0.975) c *= 0.75;  // la junta hunde el canto
+				// verdín y chorretones bajo la albardilla
+				float drip = sky_hash(vec2(floor(al / 0.12), 2.0));
+				if (drip > 0.86 && yy < 0.25 + drip * 0.6) c = mix(c, vec3(0.13, 0.17, 0.13), 0.35);
+				// argollas de amarre cada 9 m, con su chorretón de óxido
+				float ra = fract(al / 9.0 + 0.3) * 9.0;
+				float rd = length(vec2(ra - 4.5, (y + 0.52) * 1.4));
+				if (abs(rd - 0.075) < 0.022) c = vec3(0.14, 0.11, 0.09);
+				else if (abs(ra - 4.5) < 0.05 && y < -0.6 && y > sea_y + 0.2) c = mix(c, vec3(0.36, 0.2, 0.11), 0.45);
+				// lo que moja la ola: más oscuro, verdín, algas y percebes junto al agua
+				float hw = y - sea_y;
+				float soak = 1.0 - smoothstep(0.15, 0.75, hw);
+				c = mix(c, c * 0.42, soak);
+				float alg = 1.0 - smoothstep(0.0, 0.32 + 0.12 * sky_hash(vec2(floor(al / 0.2), 4.0)), hw);
+				c = mix(c, vec3(0.05, 0.1, 0.06), alg * 0.85);
+				if (hw > 0.05 && hw < 0.4 && sky_hash(floor(vec2(al, y) / cell) + 3.3) > 0.965) c = vec3(0.34, 0.33, 0.3);   // percebes
+			}
+			ALBEDO = c * (0.95 + 0.1 * sky_hash(vec2(ac, y) * 7.0));
+			ROUGHNESS = 0.85;
+		}
 	} else {
 		vec2 c = floor(wpos.xz / cell);
 		vec2 pc = (c + 0.5) * cell;
@@ -270,6 +322,26 @@ void fragment() {
 				crack = 0.0;
 				glow = water_glow * (0.6 + 0.4 * depth) * (1.0 - weed) * (0.85 + 0.15 * sin(TIME * 1.3 + fbm(pc * 0.3) * 6.0));
 			}
+		}
+		if (rain > 0.0 && wetm > 0.3) {                               // gotas que caen en el charco (16-10-2026)
+			vec2 gp = pc / 0.6;
+			float rr = 0.0;
+			for (int dy = -1; dy <= 1; dy++) {
+				for (int dx = -1; dx <= 1; dx++) {
+					vec2 gc = floor(gp) + vec2(float(dx), float(dy));
+					float per = mix(1.8, 0.8, rain) * (0.8 + 0.4 * sky_hash(gc + 1.7));
+					float tt = TIME / per + sky_hash(gc + 5.3);
+					float slot = floor(tt);
+					float age = tt - slot;
+					if (sky_hash(gc + slot * 1.31) > mix(0.35, 0.85, rain)) continue;     // no cae en todos
+					vec2 o = gc + vec2(sky_hash(gc + slot + 2.1), sky_hash(gc + slot + 7.7));
+					float d = length(gp - o) * 0.6;
+					float ring = 1.0 - smoothstep(0.012, 0.03, abs(d - age * 0.3));              // aro que se abre hasta 30 cm
+					float inner = (1.0 - smoothstep(0.01, 0.026, abs(d - age * 0.16))) * step(0.3, age);
+					rr = max(rr, max(ring, inner * 0.55) * pow(1.0 - age, 1.2));
+				}
+			}
+			col = mix(col, max(col * 2.2, vec3(0.36, 0.40, 0.44)), rr * clamp(wetm / 0.45, 0.0, 1.0));   // el aro recoge la luz del cielo
 		}
 		ALBEDO = col * shade;
 		EMISSION = glow + crack_glow * crack * 0.7;

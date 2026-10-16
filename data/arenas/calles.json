@@ -231,7 +231,11 @@
   },
   "inn_fuente": {
    "type": "cylinder",
-   "radius": 2.3
+   "radius": 3.7
+  },
+  "inn_sirena": {
+   "type": "cylinder",
+   "radius": 0.6
   },
   "inn_coche": {
    "type": "box",
@@ -1068,6 +1072,52 @@
    ],
    "rot": 352.1,
    "scale": 1.0
+  },
+  {
+   "model": "inn_sirena",
+   "pos": [
+    0.0,
+    0.0
+   ],
+   "rot": 45,
+   "scale": 1.0,
+   "y": 1.12
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    30.6,
+    -2.5
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    30.6,
+    17.5
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    2.5,
+    30.6
+   ],
+   "rot": 0,
+   "scale": 1.2
+  },
+  {
+   "model": "inn_farola",
+   "pos": [
+    -17.5,
+    30.6
+   ],
+   "rot": 0,
+   "scale": 1.2
   }
  ],
  "mask": {
