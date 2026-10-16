@@ -252,7 +252,7 @@ func _ready() -> void:
 		if it.has("bob"):                                       # [.., giro, escala, radio, altura y vuelco suavizados]
 			var bb := _world_aabb(h)
 			_bobs.append([h, h.position.y, float(it.bob), seed_of(h.global_position), h.rotation.y, h.scale.x,
-				clampf(maxf(bb.size.x, bb.size.z) * 0.3, 0.3, 4.0), 0.0, Vector2.ZERO])
+				clampf(maxf(bb.size.x, bb.size.z) * 0.3, 0.3, 4.0), 0.0, Vector2.ZERO, h.position, Vector3.ZERO, 0.0])
 		if it.has("glow") and it.has("light"):
 			var g: Dictionary = it.glow
 			var l: OmniLight3D = it.light
@@ -291,6 +291,7 @@ func _ready() -> void:
 	if cfg.has("bell"): _find_bell(cfg.bell)
 	if cfg.has("eyes"): _find_eye_spots(cfg.eyes)
 	_windows_watch = bool(cfg.get("windows_watch", false))
+	moored_models = cfg.get("moored", [])
 	if cfg.has("frogs"): _find_frogs(cfg.frogs)
 	if cfg.has("moss_drips"): _find_moss(cfg.moss_drips)
 	if cfg.has("loop"): _start_loop(cfg.loop)
@@ -393,6 +394,8 @@ func _process(delta: float) -> void:
 		var k := clampf(b[2] / 0.045, 0.35, 1.0)                        # bob de los datos: lo pequeño sigue al agua entera, lo grande menos
 		var sl: Vector2 = b[8]
 		h.position.y = b[1] + 0.06 + b[7] * k + sin(t * 0.5 + s) * b[2] * 0.25   # algo más de borde libre: la cresta no lo cubre
+		if moored_models.has(String(h.get_child(0).name)):
+			_moor(b, t, s)
 		# inclinado en el mundo (no en su giro): su vertical sigue a la normal del agua
 		var tilt := Basis.from_euler(Vector3(-sl.y * 0.5 * k + sin(t * 0.4 + s * 1.3) * b[2] * 0.15, 0.0, sl.x * 0.5 * k + sin(t * 0.45 + s * 0.7) * b[2] * 0.15))
 		h.basis = (tilt * Basis(Vector3.UP, b[4])).scaled(Vector3.ONE * float(b[5]))
@@ -411,7 +414,10 @@ func _process(delta: float) -> void:
 		if _rock_t <= 0.0 and not _rocks.is_empty():
 			_rock_t = 0.5
 			_sea_rocks()
-	if _ground_mat != null: _ground_rain()
+	if _ground_mat != null:
+		_ground_rain()
+		if cfg.get("puddle_lamps", false): _ground_lamps()
+	if cfg.get("breath", false): _breath_step(delta)
 	if cfg.has("birds"): _birds(delta, t)
 	if cfg.has("bubbles"): _bubbles(delta)
 	if cfg.has("whirls"): _whirl_step(delta)
@@ -514,6 +520,28 @@ func _whirl_step(delta: float) -> void:
 
 # ------------------------------------------------------------------ el mar
 
+## Barca amarrada junto al muro: el oleaje la acerca y la aleja (la amarra no la deja irse) y,
+## cuando llega, lo golpea con un toc de madera.
+var moored_models: Array = []
+func _moor(b: Array, t: float, s: float) -> void:
+	var h: Node3D = b[0]
+	var base: Vector3 = b[9]
+	if (b[10] as Vector3) == Vector3.ZERO:                          # hacia el muro: donde baja la distancia a la orilla
+		var p := Vector2(base.x, base.z)
+		var e := 0.5
+		var gx := shore_dist(p + Vector2(e, 0), _sea) - shore_dist(p - Vector2(e, 0), _sea)
+		var gz := shore_dist(p + Vector2(0, e), _sea) - shore_dist(p - Vector2(0, e), _sea)
+		b[10] = -Vector3(gx, 0, gz).normalized()
+	var T := float(_sea.get("period", 0.0)) if float(_sea.get("period", 0.0)) > 0.0 else lerpf(4.2, 7.5, float(_sea.state))
+	var u := sin(TAU * t / T + s)
+	var surge := 0.16 * maxf(u, -0.6)                               # hacia el muro llega más deprisa que se va
+	h.position.x = base.x + (b[10] as Vector3).x * surge
+	h.position.z = base.z + (b[10] as Vector3).z * surge
+	if u > 0.97 and float(b[11]) < t - T * 0.6:                       # toca el muro
+		b[11] = t
+		var f := _focus()
+		if Vector2(h.position.x - f.x, h.position.z - f.z).length() < 14.0: sfx_at("boat_knock", h.position)
+
 ## El viento del clima mueve la marejadilla y las rachas la encrespan (sea.gdshader).
 func _sea_wind() -> void:
 	var w := _weather()
@@ -528,6 +556,50 @@ func _ground_rain() -> void:
 	var r := 0.0
 	if w != null and w.data != null and w.data.precip == WeatherData.Precip.RAIN: r = clampf(w.data.precip_amount * 1.3, 0.15, 1.0)
 	_ground_mat.set_shader_parameter("rain", r)
+
+## Las farolas más cerca de la vista, al suelo: se reflejan en los charcos.
+func _ground_lamps() -> void:
+	var f := _focus()
+	var cand: Array = []
+	for l in arena.get_meta("lights", []):
+		if not is_instance_valid(l): continue
+		var gp := (l as Node3D).global_position
+		var d := Vector2(gp.x - f.x, gp.z - f.z).length()
+		if d < 22.0: cand.append([d, l])
+	cand.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	var pos := PackedVector4Array()
+	var col := PackedVector4Array()
+	for i in 8:
+		if i < cand.size():
+			var l: OmniLight3D = cand[i][1]
+			var gp := l.global_position
+			pos.append(Vector4(gp.x, gp.y, gp.z, l.light_energy * 0.1))
+			col.append(Vector4(l.light_color.r, l.light_color.g, l.light_color.b, 1.0))
+		else:
+			pos.append(Vector4.ZERO); col.append(Vector4.ZERO)
+	_ground_mat.set_shader_parameter("lamp_pos", pos)
+	_ground_mat.set_shader_parameter("lamp_col", col)
+	_ground_mat.set_shader_parameter("lamp_n", mini(cand.size(), 8))
+
+## Con frío, el vaho del aliento de los jugadores quietos (o casi), cada pocos segundos.
+var _breath := {}
+func _breath_step(delta: float) -> void:
+	var g := get_parent()
+	if g == null or not "players" in g: return
+	for pl in g.players:
+		if not is_instance_valid(pl) or pl.health <= 0.0: continue
+		var t: float = _breath.get(pl, _rng.randf_range(0.5, 2.0)) - delta
+		if t <= 0.0:
+			t = _rng.randf_range(2.4, 3.4)
+			var p: Player = pl
+			if p.velocity.length() < 1.5:
+				var fwd := Vector3(sin(p.visual.rotation.y), 0, cos(p.visual.rotation.y))
+				var e := VoxelFx.emitter("breath", 0.1, true)
+				add_child(e)
+				e.global_position = p.global_position + Vector3(0, 1.45, 0) + fwd * 0.2
+				e.basis = Basis.looking_at(-fwd, Vector3.UP)
+				get_tree().create_timer(1.6).timeout.connect(e.queue_free)
+		_breath[pl] = t
 
 ## Lo que asoma del mar (data/ambient.json, rock_foam: modelos), con un radio algo menor que su
 ## planta: la espuma rompe contra su borde.

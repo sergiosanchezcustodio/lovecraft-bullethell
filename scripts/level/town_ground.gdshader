@@ -13,6 +13,10 @@ shader_type spatial;
 
 uniform int kind = 0;
 uniform float rain = 0.0;                    // lluvia (0..1, Ambient): ondas en los charcos y el agua somera
+// farolas que se reflejan en los charcos (Ambient, como en el mar): rastro de luz que tiembla
+uniform int lamp_n = 0;
+uniform vec4 lamp_pos[8];
+uniform vec4 lamp_col[8];
 uniform float cell = 0.03125;
 uniform float wet = 0.5;
 uniform vec3 base_hi : source_color = vec3(0.36, 0.29, 0.21);   // tierra / piedra / madera clara
@@ -345,6 +349,23 @@ void fragment() {
 		}
 		ALBEDO = col * shade;
 		EMISSION = glow + crack_glow * crack * 0.7;
+		if (wetm > 0.3 && lamp_n > 0) {                               // reflejo de las farolas en el charco (16-10-2026)
+			vec2 vd = vec2(0.70710678, 0.70710678);
+			for (int i = 0; i < 8; i++) {
+				if (i >= lamp_n) break;
+				vec4 L = lamp_pos[i];
+				float hh = max(L.y - wpos.y, 0.3);
+				vec2 rel = pc - L.xz;
+				float al = dot(rel, vd);
+				float k = al / (1.732 * hh);
+				if (k < 0.45 || k > 1.9) continue;
+				float ac = dot(rel, vec2(-vd.y, vd.x));
+				float wob = 0.03 * sin(al * 9.0 + TIME * (1.5 + 4.0 * rain));
+				float core = 1.0 - smoothstep(0.08, 0.22 + 0.08 * k, abs(ac + wob));
+				float fall = exp(-abs(k - 1.0) * 2.2);
+				EMISSION += lamp_col[i].rgb * lamp_col[i].rgb * L.w * core * fall * clamp((wetm - 0.3) / 0.3, 0.0, 1.0);
+			}
+		}
 		if (night > 0.0 && wetm > 0.55) {                             // estrellas en charcos y pozas (16-10-2026)
 			vec2 sp = pc + vec2(sin(TIME * 0.9 + pc.y * 3.0), cos(TIME * 0.7 + pc.x * 3.0)) * 0.02;
 			EMISSION += (star_at(floor(sp * 16.0), TIME, 0.005) * night * 1.1 + shooting_star(sp)) * wetm;

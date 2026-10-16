@@ -216,6 +216,19 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_curve = _curve([[0.0, 0.5], [1.0, 1.0]])
 			m.color_ramp = _ramp([[0.0, Color(0.6, 0.95, 0.3, 0.0)], [0.25, Color(0.35, 0.6, 0.12, 0.4)],
 				[1.0, Color(0.5, 0.7, 0.3, 0.0)]])
+		"breath":                 # vaho del aliento con frío: una nubecilla que sale hacia delante (+Z) y se deshace
+			p.draw_pass_1 = cube("mix")
+			p.amount = 10
+			p.lifetime = 1.3
+			p.explosiveness = 0.7
+			m.direction = Vector3(0, 0.3, 1)
+			m.spread = 18.0
+			m.initial_velocity_min = 0.25; m.initial_velocity_max = 0.45
+			m.gravity = Vector3(0, 0.12, 0)
+			m.damping_min = 0.4; m.damping_max = 0.7
+			m.scale_min = 0.07; m.scale_max = 0.12
+			m.scale_curve = _curve([[0.0, 0.4], [1.0, 1.7]])
+			m.color_ramp = _ramp([[0.0, Color(0.78, 0.84, 0.92, 0.0)], [0.12, Color(0.78, 0.84, 0.92, 0.6)], [1.0, Color(0.8, 0.86, 0.94, 0.0)]])
 		"fireball":               # bola de fuego de la explosión: estalla hacia fuera y se apaga
 			p.draw_pass_1 = cube("add")
 			p.amount = int(clampf(r * 22.0, 30.0, 70.0))

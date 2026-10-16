@@ -661,6 +661,20 @@
 				"frog_3.wav"
 			],
 			"bus": "Ambiente"
+		},
+		"boat_knock": {
+			"db": -18,
+			"pitch": [
+				0.85,
+				1.1
+			],
+			"voices": 2,
+			"gap": 0.4,
+			"files": [
+				"boat_knock_0.wav",
+				"boat_knock_1.wav"
+			],
+			"bus": "Ambiente"
 		}
 	}
 }

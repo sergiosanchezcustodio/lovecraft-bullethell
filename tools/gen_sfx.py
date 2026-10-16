@@ -170,6 +170,7 @@ def ambiente():
     fuente(r)
     campana(r)
     ranas(r)
+    toc(r)
 
 
 def save_loop(name, w, d, fade):
@@ -474,6 +475,18 @@ def ranas(r):
         am = 1 + 0.5 * np.sin(2 * np.pi * 24 * tt)
         e = np.minimum(tt / 0.04, 1) * np.minimum((d - tt) / 0.12, 1)
         save('frog_%d' % (i + 2), lp(tone * am * e, 1100))
+
+
+def toc(r):
+    """La barca que golpea el muro del muelle (16-10-2026): toc hueco de madera mojada, con el
+    chapoteo que levanta."""
+    for i, f0 in enumerate((150, 125)):
+        d = 0.6
+        tt = t(d)
+        body = (np.sin(2 * np.pi * f0 * tt) + 0.5 * np.sin(2 * np.pi * f0 * 2.4 * tt)) * np.exp(-tt / 0.07)
+        click = hp(r.standard_normal(len(tt)), 1500) * np.exp(-tt / 0.004) * 0.4
+        slap = bp(r.standard_normal(len(tt)), 500, 3500) * np.exp(-np.maximum(tt - 0.03, 0) / 0.12) * (tt > 0.03) * 0.25
+        save('boat_knock_%d' % i, body + click + slap)
 
 
 def lluvia(r):
