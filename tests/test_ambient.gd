@@ -9,8 +9,16 @@ func test_las_piezas_y_las_arenas_del_ambiente_existen() -> void:
 		assert_true(VoxelBuilder.model_exists("res://models/%s.json" % m), "pieza " + m)
 		var c: Dictionary = cfg.models[m]
 		if c.has("glow"): assert_true(Ambient.MODES.has(String(c.glow)), "modo de brillo de " + m)
+		if c.has("swing"):                                          # la parte que cuelga existe en el modelo
+			var piv: Dictionary = JSON.parse_string(VoxelBuilder.read_text("res://models/%s.json" % m)).get("pivots", {})
+			assert_true(piv.has(String(c.swing.part)), "parte que se mece de " + m)
 	for a: String in cfg.get("arenas", {}):
 		assert_true(FileAccess.file_exists("res://data/arenas/%s.json" % a), "arena " + a)
+		for m: String in cfg.arenas[a].get("spills", {}).get("models", []):   # nieve que cae: la pieza tiene sus bordes
+			var piv: Dictionary = JSON.parse_string(VoxelBuilder.read_text("res://models/%s.json" % m)).get("pivots", {})
+			assert_true(piv.keys().any(func(k: String) -> bool: return k.begins_with("spill")), "bordes con nieve de " + m)
+		if cfg.arenas[a].has("spray"):
+			assert_true(VoxelBuilder.model_exists("res://models/%s.json" % cfg.arenas[a].spray.model), "borda de " + a)
 		var birds: Dictionary = cfg.arenas[a].get("birds", {})
 		for k: String in birds.get("kinds", []):
 			assert_true(VoxelBuilder.model_exists("res://models/amb_%s.json" % k), "ave " + k)

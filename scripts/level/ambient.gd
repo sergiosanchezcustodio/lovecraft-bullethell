@@ -5,12 +5,15 @@ extends Node3D
 ## - por pieza ("models"), en cualquier arena: balanceo con el viento (sway.gdshader: árboles,
 ##   juncos), brillo animado de su capa de luz (glow_anim.gdshader: llamas que tiemblan, cristales
 ##   que laten, bombillas que fallan; la luz real va a la par), flotar en el mar y partículas en
-##   un pivote (brasas de las hogueras, polillas de las lámparas). Lo aplica `dress()` al montar
+##   un pivote (brasas de las hogueras, polillas de las lámparas), y faroles colgados que se mecen
+##   con el viento del clima y sus rachas (swing: la parte que cuelga, con su luz). Lo aplica `dress()` al montar
 ##   la arena (ArenaBuilder).
 ## - por arena ("arenas"): noche (estrellas que titilan en el agua y los charcos y alguna fugaz),
 ##   bandadas de aves o murciélagos que cruzan o dan vueltas, luciérnagas, motas de luz, polvo en
-##   la luz de luna, burbujas que suben en el mar, remolinos de ceniza o nieve y sin sombras de
-##   nubes (interiores y grutas).
+##   la luz de luna, burbujas que suben en el mar, remolinos de ceniza o nieve, sin sombras de
+##   nubes (interiores y grutas), gotas que caen de la bóveda (ondas en el mar, salpicaduras en la
+##   roca), nieve que se desprende de las cornisas (pivotes "spill" de las rocas y del acantilado)
+##   y olas que rompen contra la borda con rocío y espuma por la cubierta.
 ## Las ventanas que se encienden y el cristal con cielo son capas del modelo (VoxelBuilder,
 ## glow 2 y 3) y no necesitan nada de aquí. Las banderas, igual (parte "flag").
 ## Nada de esto tiene colisión ni afecta a la partida. `ambient=false` lo quita (comparar).
@@ -54,6 +57,7 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 		holder.add_child(fx)
 	var out := {}
 	if c.has("bob") and in_sea: out["bob"] = float(c.bob)
+	if c.has("swing") and (m.get_meta("part_nodes") as Dictionary).has(String(c.swing.get("part", ""))): out["swing"] = c.swing
 	if c.has("glow"): out["glow"] = c
 	return out
 
@@ -114,6 +118,7 @@ var night := 0.0
 var _rng := RandomNumberGenerator.new()
 var _bobs: Array = []                           ## [holder, y0, amplitud, semilla]
 var _lights: Array = []                         ## [OmniLight3D, energía, modo, amount, speed, semilla]
+var _swings: Array[Dictionary] = []             ## faroles que cuelgan: parte, ángulo y velocidad
 var _mats_sky: Array[ShaderMaterial] = []       ## suelo y mar: estrellas y fugaces
 var _shoot_t := -1.0
 var _next_shoot := 8.0
@@ -123,6 +128,13 @@ var _next_bubble := 4.0
 var _next_whirl := 5.0
 var _whirls: Array = []                         ## [emisor, dirección, vida]
 var _clouds_done := false
+var _next_drip := 2.0
+var _drops: Array = []                          ## [gota, velocidad, y del suelo o del agua, en el mar]
+var _ripples: Array = []                        ## [malla, material, vida]
+var _spills: Array = []                         ## [punto del borde (mundo), hacia dónde cae]
+var _next_spill := 4.0
+var _sprays: Array = []                         ## [punto en la borda, base con -Z hacia la cubierta, largo]
+var _next_spray := 1.5
 var demo := false
 
 func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
@@ -135,6 +147,7 @@ func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
 	demo = OS.get_cmdline_user_args().has("amb_demo=true")       # clips: todo enseguida
 	if demo:
 		_next_shoot = 1.0; _next_flock = 0.3; _next_bubble = 0.8; _next_whirl = 0.5
+		_next_spill = 1.0; _next_spray = 0.5; _next_drip = 0.3
 	return self
 
 func _ready() -> void:
@@ -146,6 +159,7 @@ func _ready() -> void:
 			var g: Dictionary = it.glow
 			var l: OmniLight3D = it.light
 			_lights.append([l, l.light_energy, int(MODES.get(String(g.glow), 1)), float(g.get("amount", 0.2)), float(g.get("speed", 1.0)), seed_of(h.global_position)])
+		if it.has("swing"): _add_swing(h, it.swing)
 	for n in ["Ground", "Sea"]:
 		var mi := arena.get_node_or_null(n) as MeshInstance3D
 		if mi != null and mi.material_override is ShaderMaterial:
@@ -156,6 +170,46 @@ func _ready() -> void:
 	if cfg.has("fireflies"): _scatter("fireflies", cfg.fireflies, size, 1.2, Color(1, 1, 1))
 	if cfg.has("motes"): _scatter("glow_motes", cfg.motes, size, 1.0, Color(1, 1, 1))
 	if cfg.get("dust", false): _dust_beams()
+	if cfg.has("spills"): _find_spills(cfg.spills)
+	if cfg.has("spray"): _find_sprays(cfg.spray)
+
+## Farol que cuelga: su parte gira sobre el gancho y se lleva la luz y el halo de niebla.
+func _add_swing(h: Node3D, c: Dictionary) -> void:
+	var m := h.get_child(0) as Node3D
+	var part: Node3D = (m.get_meta("part_nodes") as Dictionary)[String(c.part)]
+	for n in h.get_children():
+		if n is OmniLight3D or n is FogVolume: n.reparent(part, true)
+	var p := float(c.get("period", 1.9))
+	_swings.append({"part": part, "d": Vector2.ZERO, "v": Vector2.ZERO, "seed": seed_of(h.global_position),
+		"k": pow(TAU / p, 2.0), "deg": float(c.get("deg", 0.65)), "max": deg_to_rad(float(c.get("max", 28.0))),
+		"turb": float(c.get("turb", 0.8)), "inv": h.global_basis.orthonormalized().inverse()})
+
+## Péndulo amortiguado empujado por el viento: se inclina a sotavento tanto más cuanto más
+## sopla, y la turbulencia (cerca de su frecuencia propia) lo mece; las rachas lo agitan más.
+func _swing_step(delta: float, t: float) -> void:
+	var g := get_parent()
+	var wv := Vector3.ZERO
+	if g != null and "weather" in g and g.weather != null: wv = (g.weather as Weather).wind_now()
+	var w := Vector2(wv.x, wv.z)
+	var along := w.normalized() if w.length() > 0.01 else Vector2.RIGHT
+	var side := Vector2(-along.y, along.x)
+	var dt := minf(delta, 0.05)
+	for s: Dictionary in _swings:
+		var sd: float = s.seed
+		var a: float = deg_to_rad(s.deg) * w.length()
+		var turb: float = s.turb
+		var target: Vector2 = along * a * (1.0 + turb * (0.7 * sin(t * 3.1 + sd) + 0.3 * sin(t * 1.9 + sd * 1.7))) 			+ side * a * turb * 0.45 * sin(t * 2.6 + sd * 2.3)
+		var acc: Vector2 = -(s.k as float) * ((s.d as Vector2) - target) - 0.7 * (s.v as Vector2)
+		s.v += acc * dt
+		s.d = (s.d as Vector2) + (s.v as Vector2) * dt
+		s.d = (s.d as Vector2).limit_length(s.max)
+		var d: Vector2 = s.d
+		var part: Node3D = s.part
+		if d.length() < 0.0005:
+			part.basis = Basis.IDENTITY
+			continue
+		var axis: Vector3 = (s.inv as Basis) * Vector3(d.x, 0, d.y).cross(Vector3.UP)   # la punta va hacia d
+		part.basis = Basis(axis.normalized(), d.length())
 
 ## N emisores repartidos por la arena (luciérnagas sobre el agua, motas de luz)
 func _scatter(recipe: String, c: Dictionary, size: Vector2, y: float, tint: Color) -> void:
@@ -191,6 +245,7 @@ func _process(delta: float) -> void:
 		h.rotation.z = sin(t * 0.8 + s * 0.7) * b[2] * 0.5
 	for l: Array in _lights:
 		(l[0] as OmniLight3D).light_energy = l[1] * anim_k(l[2], l[3], l[4], t, l[5])
+	if not _swings.is_empty(): _swing_step(delta, t)
 	if not _clouds_done:
 		_clouds_done = true
 		var g := get_parent()
@@ -199,6 +254,9 @@ func _process(delta: float) -> void:
 	if cfg.has("birds"): _birds(delta, t)
 	if cfg.has("bubbles"): _bubbles(delta)
 	if cfg.has("whirls"): _whirl_step(delta)
+	if cfg.has("drips"): _drip_step(delta)
+	if not _spills.is_empty(): _spill_step(delta)
+	if not _sprays.is_empty(): _spray_step(delta)
 
 func _focus() -> Vector3:
 	return camera.center() if camera != null else Vector3.ZERO
@@ -262,6 +320,200 @@ func _whirl_step(delta: float) -> void:
 			e.emitting = false
 			get_tree().create_timer(2.0).timeout.connect(e.queue_free)
 			_whirls.erase(w)
+
+# ------------------------------------------------------------------ gotas de la bóveda
+
+## Una gota cae de la bóveda (fuera de la vista) y, al llegar, salpica y deja ondas en el mar o,
+## más pequeñas, en la roca mojada.
+func _drip_step(delta: float) -> void:
+	var c: Dictionary = cfg.drips
+	_next_drip -= delta
+	if _next_drip <= 0.0:
+		var ev: Array = c.get("every", [0.6, 1.5])
+		_next_drip = _rng.randf_range(ev[0], ev[1]) * (0.4 if demo else 1.0)
+		var size: Vector2 = arena.get_meta("size")
+		var obstacles: ObstacleMap = arena.get_meta("obstacles")
+		var sea_node := arena.get_node_or_null("Sea") as Node3D
+		var f := _focus()
+		var want_sea := _rng.randf() < float(c.get("sea", 0.5))
+		for attempt in 12:
+			var p := Vector2(f.x + _rng.randf_range(-12, 12), f.z + _rng.randf_range(-9, 9))
+			var sea: bool = sea_node != null and (p.x > size.x * 0.5 + 1.0 or p.y > size.y * 0.5 + 1.0)
+			if want_sea != sea and attempt < 10: continue
+			if not sea and obstacles.is_blocked(p, 0.1): continue
+			var y: float = sea_node.position.y + 0.06 if sea else 0.02
+			var d := MeshInstance3D.new()
+			var bm := BoxMesh.new()
+			bm.size = Vector3(0.025, 0.12, 0.025)
+			bm.material = _drop_material()
+			d.mesh = bm
+			d.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			d.position = Vector3(p.x, y + float(c.get("h", 6.0)), p.y)
+			add_child(d)
+			_drops.append([d, 0.0, y, sea])
+			break
+	for dr: Array in _drops.duplicate():
+		var d: MeshInstance3D = dr[0]
+		dr[1] += 9.8 * delta
+		d.position.y -= float(dr[1]) * delta
+		if d.position.y > float(dr[2]): continue
+		var at := Vector3(d.position.x, dr[2], d.position.z)
+		d.queue_free()
+		_drops.erase(dr)
+		var sp := VoxelFx.emitter("drip_splash", 0.1, true)
+		sp.position = at + Vector3(0, 0.02, 0)
+		add_child(sp)
+		get_tree().create_timer(0.8).timeout.connect(sp.queue_free)
+		_ripple(at, 0.55 if dr[3] else 0.3, 0.8 if dr[3] else 0.45)          # en la roca, la película de agua del suelo
+	for r: Array in _ripples.duplicate():
+		r[2] += delta / 1.6
+		(r[1] as ShaderMaterial).set_shader_parameter("life", r[2])
+		if r[2] >= 1.0:
+			(r[0] as Node).queue_free()
+			_ripples.erase(r)
+
+static func _drop_material() -> StandardMaterial3D:
+	if not _mats.has("drop"):
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.albedo_color = Color(0.5, 0.58, 0.66, 0.75)
+		_mats["drop"] = m
+	return _mats["drop"]
+
+func _ripple(at: Vector3, radius: float, alpha: float) -> void:
+	var mi := MeshInstance3D.new()
+	var pm := PlaneMesh.new()
+	pm.size = Vector2.ONE * radius * 2.2
+	mi.mesh = pm
+	var m := ShaderMaterial.new()
+	m.shader = preload("res://scripts/fx/ripple.gdshader")
+	m.set_shader_parameter("radius", radius)
+	m.set_shader_parameter("tint", Color(0.42, 0.5, 0.58, alpha))
+	mi.material_override = m
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.position = at
+	add_child(mi)
+	_ripples.append([mi, m, 0.0])
+
+# ------------------------------------------------------------------ nieve de las cornisas
+
+## Bordes con nieve (pivotes "spill" de las piezas y del acantilado) que miran a la cámara.
+func _find_spills(c: Dictionary) -> void:
+	var models: Array = c.get("models", [])
+	var holders: Array = []
+	for h: Node in arena.get_node("Props").get_children():
+		var m := h.get_child(0) as Node3D
+		if m != null and String(m.name) in models: holders.append(h)
+	var barrier := arena.get_node_or_null("Barrier")
+	if barrier != null and c.get("barrier", false): holders.append_array(barrier.get_children())
+	var cam_dir := Vector3(1, 0, 1).normalized()
+	for h: Node in holders:
+		var m := h.get_child(0) as Node3D if h.get_child_count() > 0 else null
+		if m == null or not m.has_meta("pivots"): continue                  # la meseta de detrás no es una pieza
+		var vs := float(m.get_meta("voxel_size"))
+		var piv: Dictionary = m.get_meta("pivots")
+		for k: String in piv:
+			if not k.begins_with("spill"): continue
+			var pv: Array = piv[k]
+			var p := m.global_transform * (Vector3(pv[0], pv[1], pv[2]) * vs)
+			var out := (m.global_basis * Vector3(pv[3], 0, pv[4]))
+			out = Vector3(out.x, 0, out.z).normalized()
+			if out.dot(cam_dir) > 0.25: _spills.append([p, out])
+
+func _spill_step(delta: float) -> void:
+	_next_spill -= delta
+	if _next_spill > 0.0: return
+	var ev: Array = cfg.spills.get("every", [5, 12])
+	_next_spill = _rng.randf_range(ev[0], ev[1]) * (0.3 if demo else 1.0)
+	var f := _focus()
+	var seen: Array = []
+	for s: Array in _spills:                                       # a la vista: lo alto sube en pantalla
+		var p: Vector3 = s[0]
+		var d := Vector2(p.x - f.x, p.z - f.z) - Vector2(1, 1).normalized() * p.y * 1.73
+		var across := absf(d.dot(Vector2(1, -1).normalized()))           # de lado en la pantalla
+		var depth := absf(d.dot(Vector2(1, 1).normalized()))             # arriba y abajo (el doble de suelo)
+		if across < 11.0 and depth < 12.0 and p.y > 0.6: seen.append(s)
+	if seen.is_empty(): return
+	var s: Array = seen[_rng.randi() % seen.size()]
+	var top: Vector3 = s[0]
+	var out: Vector3 = s[1]
+	var r := _rng.randf_range(0.7, 1.4)
+	var e := VoxelFx.emitter("snow_spill", r, true)
+	e.position = top
+	e.basis = Basis.looking_at(-out, Vector3.UP)                   # +Z de la receta hacia fuera
+	add_child(e)
+	get_tree().create_timer(2.5).timeout.connect(e.queue_free)
+	var fall := sqrt(2.0 * maxf(top.y, 0.2) / 4.0)
+	get_tree().create_timer(fall * 0.8).timeout.connect(_snow_puff.bind(Vector3(top.x, 0.15, top.z) + out * 0.35, r))
+
+func _snow_puff(at: Vector3, r: float) -> void:
+	var pf := VoxelFx.emitter("snow_puff", r * 0.7, true, false, Color(1.15, 1.2, 1.3, 0.7))
+	pf.position = at
+	add_child(pf)
+	get_tree().create_timer(1.8).timeout.connect(pf.queue_free)
+
+# ------------------------------------------------------------------ olas contra la borda
+
+## Tramos de borda: punto en lo alto y hacia dónde queda la cubierta.
+func _find_sprays(c: Dictionary) -> void:
+	var model := String(c.get("model", ""))
+	for h: Node in arena.get_node("Props").get_children():
+		var m := h.get_child(0) as Node3D
+		if m == null or String(m.name) != model: continue
+		var hn := h as Node3D
+		var center := Vector3(-hn.global_position.x, 0, -hn.global_position.z).normalized()
+		var best := Vector3.ZERO
+		for ax: Vector3 in [hn.global_basis.x, -hn.global_basis.x, hn.global_basis.z, -hn.global_basis.z]:
+			var a := Vector3(ax.x, 0, ax.z).normalized()
+			if best == Vector3.ZERO or a.dot(center) > best.dot(center): best = a
+		var aabb := _world_aabb(hn)
+		# la borda queda a la altura del mar (más allá de la orilla): el rocío salta a la de la cubierta
+		var top := Vector3(hn.global_position.x, maxf(aabb.end.y, 0.0) + 0.2, hn.global_position.z) - best * 0.25
+		_sprays.append([top, Basis.looking_at(best, Vector3.UP), maxf(aabb.size.x, aabb.size.z)])
+
+static func _world_aabb(h: Node3D) -> AABB:
+	var out := AABB()
+	var first := true
+	for mi: MeshInstance3D in h.find_children("*", "MeshInstance3D", true, false):
+		var b := mi.global_transform * mi.get_aabb()
+		out = b if first else out.merge(b)
+		first = false
+	return out
+
+func _spray_step(delta: float) -> void:
+	_next_spray -= delta
+	if _next_spray > 0.0: return
+	var ev: Array = cfg.spray.get("every", [1.2, 3.5])
+	_next_spray = _rng.randf_range(ev[0], ev[1]) * (0.5 if demo else 1.0)
+	var f := _focus()
+	var seen: Array = []
+	for s: Array in _sprays:
+		var p: Vector3 = s[0]
+		if Vector2(p.x, p.z).distance_to(Vector2(f.x, f.z)) < 13.0: seen.append(s)
+	if seen.is_empty(): return
+	var s: Array = seen[_rng.randi() % seen.size()]
+	var b: Basis = s[1]
+	var at: Vector3 = (s[0] as Vector3) + b.x * _rng.randf_range(-0.35, 0.35) * float(s[2])
+	var r := _rng.randf_range(1.2, 2.6)                            # unas rompen más fuerte que otras
+	var sp := VoxelFx.emitter("spray", r, true)
+	sp.position = at
+	sp.basis = b
+	add_child(sp)
+	get_tree().create_timer(1.8).timeout.connect(sp.queue_free)
+	var crest := VoxelFx.emitter("snow_puff", r * 0.45, true, false, Color(1.3, 1.38, 1.45, 0.55))   # la cresta asoma por la borda
+	crest.position = at
+	add_child(crest)
+	get_tree().create_timer(1.6).timeout.connect(crest.queue_free)
+	get_tree().create_timer(0.5).timeout.connect(_foam.bind(Vector3(at.x, 0.05, at.z) - b.z * 0.4, b, r))
+
+## Espuma por la cubierta cuando cae el rocío (-Z de la base hacia dentro).
+func _foam(at: Vector3, b: Basis, r: float) -> void:
+	var fo := VoxelFx.emitter("foam", r, true)
+	fo.position = at
+	fo.basis = b
+	add_child(fo)
+	get_tree().create_timer(2.2).timeout.connect(fo.queue_free)
 
 # ------------------------------------------------------------------ bandadas
 

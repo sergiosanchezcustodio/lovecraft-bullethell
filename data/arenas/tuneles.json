@@ -5,6 +5,7 @@
   "tile": 0.5,
   "margin_back": 12.0,
   "camp_radius": 0.0,
+  "sparkle": 0.2,
   "colors": {
    "snow_lo": [
     0.2,

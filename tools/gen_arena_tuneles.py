@@ -37,7 +37,7 @@ COLL.update({
 
 A.write({
     "name": "Los túneles y el abismo del mar subterráneo",
-    "ground": {"seed": 9, "tile": 0.5, "margin_back": 12.0, "camp_radius": 0.0,
+    "ground": {"seed": 9, "tile": 0.5, "margin_back": 12.0, "camp_radius": 0.0, "sparkle": 0.2,
                "colors": {"snow_lo": [0.20, 0.20, 0.22], "snow_hi": [0.36, 0.37, 0.40], "ice": [0.16, 0.26, 0.34],
                           "ice_vein": [0.30, 0.50, 0.60], "trampled": [0.24, 0.24, 0.26]}},
     "sea": {"sides": ["south", "east"], "level": -1.0},

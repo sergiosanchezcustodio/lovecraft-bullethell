@@ -7,7 +7,7 @@ Uso: python tools/gen_atrezo_paso.py [piezas...]
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model, lerp
+from voxlib import Model, lerp, spill_points
 
 P = 'body'
 ROCK = (0.40, 0.38, 0.37); ROCK_D = (0.24, 0.23, 0.23); ROCK_L = (0.52, 0.50, 0.48)
@@ -312,7 +312,9 @@ if __name__ == '__main__':
     for name, fn in PIECES.items():
         if only and name not in only: continue
         M = fn()
-        n = M.export('models/atrezo_%s.json' % name, {P: [0, 0, 0]}, jitter=0.01, pivots_in_voxels=True,
+        piv = {P: [0, 0, 0]}
+        if name == 'roca_grande': piv.update(spill_points(M, (SNOW, SNOW_SH), n=6, drop=6, min_y=20))   # nieve que cae (Ambient)
+        n = M.export('models/atrezo_%s.json' % name, piv, jitter=0.01, pivots_in_voxels=True,
                      roughness=0.85 if name != 'cristales' else 0.2, specular=0.25 if name != 'cristales' else 0.7,
                      no_bottom=True)
         print('atrezo_%s: %d voxels' % (name, n))

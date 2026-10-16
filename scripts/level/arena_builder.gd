@@ -168,6 +168,7 @@ static func _ground(data: Dictionary, size: Vector2) -> MeshInstance3D:
 	else:
 		mat.shader = preload("res://scripts/level/snow_ground.gdshader")
 	if g.has("camp_radius"): mat.set_shader_parameter("camp_radius", float(g.camp_radius))   # nieve pisada
+	if g.has("sparkle"): mat.set_shader_parameter("sparkle", float(g.sparkle))          # destellos de escarcha
 	# colores del suelo (snow_hi, snow_lo, ice, ice_vein, trampled...): roca en el nivel 3
 	for k in (g.get("colors", {}) as Dictionary):
 		var c: Array = g.colors[k]

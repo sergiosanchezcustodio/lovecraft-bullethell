@@ -9,7 +9,7 @@
 [ext_resource type="Resource" path="res://data/enemies/shoggoth_mimetico.tres" id="8"]
 [ext_resource type="Resource" path="res://data/enemies/shoggoth_caverna.tres" id="9"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
-[ext_resource type="Resource" path="res://data/weather/niebla.tres" id="weather_niebla"]
+[ext_resource type="Resource" path="res://data/weather/bruma_paso.tres" id="weather_niebla"]
 
 [resource]
 script = ExtResource("1")

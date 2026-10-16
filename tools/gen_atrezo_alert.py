@@ -709,7 +709,9 @@ def linterna():
     """Farol de puerto (rehecho a 64/m en la revisión de arte del 13-10-2026, más alto: 3,6 m):
     poste de hierro fundido con basa escalonada y pernos, fuste estriado con anillos, brazo con
     voluta y tornapunta, y un farol de barco colgado: jaula de cuatro barrotes, cristales que
-    brillan con la llama clara dentro, sombrerete cónico con chimenea y aro, y bandeja abajo."""
+    brillan con la llama clara dentro, sombrerete cónico con chimenea y aro, y bandeja abajo.
+    El farol cuelga en su propia parte ('lamp', pivote en el gancho del brazo) para que se
+    balancee con el viento (data/ambient.json, swing); la cadena es algo más larga (16-10-2026)."""
     M = Model(S=4, seed=106)
     H = 220
     for y in range(0, H):                                          # poste
@@ -739,11 +741,12 @@ def linterna():
     for a in range(0, 330, 8):                                      # voluta
         t = math.radians(a); r = 2 + a / 50
         for z in (-1, 0): M.put(int(round(14 + r * math.cos(t))), int(round(AY - 10 + r * math.sin(t))), z, P, IRON)
-    LX, LY = 32, AY - 30                                            # farol colgado
-    for y in range(LY + 26, AY): M.put(LX, y, 0, P, IRON_L if y % 2 else IRON)          # cadena
+    LX, LY = 32, AY - 40                                            # farol colgado
+    LP = 'lamp'
+    for y in range(LY + 30, AY): M.put(LX, y, 0, LP, IRON_L if y % 2 else IRON)          # cadena
     for x in range(LX - 7, LX + 8):                                 # bandeja
         for z in range(-7, 8):
-            if max(abs(x - LX), abs(z)) <= 7: M.put(x, LY, z, P, IRON); M.put(x, LY + 1, z, P, IRON if max(abs(x - LX), abs(z)) == 7 else IRON_D)
+            if max(abs(x - LX), abs(z)) <= 7: M.put(x, LY, z, LP, IRON); M.put(x, LY + 1, z, LP, IRON if max(abs(x - LX), abs(z)) == 7 else IRON_D)
     for y in range(LY + 2, LY + 20):                                # jaula y cristales
         for x in range(LX - 6, LX + 7):
             for z in range(-6, 7):
@@ -751,17 +754,17 @@ def linterna():
                 if m > 6: continue
                 bar = m == 6 and (abs(x - LX) == 6 and abs(z) == 6)
                 rib = m == 6 and (y in (LY + 2, LY + 10, LY + 19) or x == LX or z == 0)
-                if bar or rib: M.put(x, y, z, P, IRON); continue
-                if m == 6: M.put(x, y, z, P, GLASS_L, glow=1); continue
-                if m <= 2 and LY + 6 < y < LY + 14: M.put(x, y, z, P, LIGHT_C, glow=1)      # llama
+                if bar or rib: M.put(x, y, z, LP, IRON); continue
+                if m == 6: M.put(x, y, z, LP, GLASS_L, glow=1); continue
+                if m <= 2 and LY + 6 < y < LY + 14: M.put(x, y, z, LP, LIGHT_C, glow=1)      # llama
     for y in range(LY + 20, LY + 28):                               # sombrerete y chimenea
         w = 7 - (y - LY - 20)
         for x in range(LX - w, LX + w + 1):
             for z in range(-w, w + 1):
-                if max(abs(x - LX), abs(z)) == w or y == LY + 27: M.put(x, y, z, P, IRON)
+                if max(abs(x - LX), abs(z)) == w or y == LY + 27: M.put(x, y, z, LP, IRON)
     for a in range(0, 360, 20):                                     # aro
-        M.put(LX + int(round(3 * math.cos(math.radians(a)))), LY + 29 + int(round(3 * math.sin(math.radians(a)) * 0.6)), 0, P, IRON_L)
-    return M, {P: [0, 0, 0], 'light': [LX, LY + 10, 0]}
+        M.put(LX + int(round(3 * math.cos(math.radians(a)))), LY + 29 + int(round(3 * math.sin(math.radians(a)) * 0.6)), 0, LP, IRON_L)
+    return M, {'body': [0, 0, 0], 'lamp': [LX, AY, 0], 'light': [LX, LY + 10, 0]}
 
 
 def bote():
@@ -1353,13 +1356,23 @@ def puente():
     for k in range(0, 240):                                                     # estay a proa (hacia el puente)
         t = k / 239
         M.put(int(round(mx - (mx - 30) * t)), int(round(h1 + 96 - (h1 + 96 - h1 - 2) * t)), mz, P, ROPE_D)
-    for x in range(mx - 3, mx + 4):                                             # fanal encendido con su jaula
-        for y in range(h1 + 58, h1 + 67):
-            for z in (mz + 3, mz + 4):
-                cage = x in (mx - 3, mx + 3) or y in (h1 + 58, h1 + 66)
-                M.put(x, y, z, P, IRON if cage else LIGHT, glow=0 if cage else 1)
-    for y in range(h1 + 66, h1 + 70): M.put(mx, y, mz + 3, P, IRON)
-    return M, {P: [0, 0, 0]}
+    # fanal encendido colgado de una ménsula (16-10-2026): parte propia ('lamp', pivote en el
+    # gancho) para que se meza con el viento (data/ambient.json, swing), lejos del palo
+    LZ, HY = mz + 9, h1 + 71
+    for z in range(mz + 1, LZ + 1): M.put(mx, HY, z, P, IRON)                  # ménsula
+    for k in range(5): M.put(mx, HY - 5 + k, mz + 2 + k, P, IRON)               # tornapunta
+    LP = 'lamp'
+    for y in range(HY - 3, HY): M.put(mx, y, LZ, LP, IRON)                     # gancho
+    for x in range(mx - 2, mx + 3):                                             # jaula con el cristal encendido
+        for z in range(LZ - 2, LZ + 3):
+            for y in range(h1 + 58, h1 + 67):
+                edge = abs(x - mx) == 2 and abs(z - LZ) == 2
+                frame = y in (h1 + 58, h1 + 66) or edge
+                if frame: M.put(x, y, z, LP, IRON)
+                elif abs(x - mx) == 2 or abs(z - LZ) == 2: M.put(x, y, z, LP, LIGHT, glow=1)
+    for x in range(mx - 1, mx + 2):                                             # sombrerete
+        for z in range(LZ - 1, LZ + 2): M.put(x, h1 + 67, z, LP, IRON)
+    return M, {P: [0, 0, 0], LP: [mx, HY, LZ]}
 
 
 def _fine(fn, seed):

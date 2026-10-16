@@ -200,6 +200,27 @@ def material_of(c):
     return 'other'
 
 
+def spill_points(M, colors, n=6, drop=6, dirs=((1, 0), (-1, 0), (0, 1), (0, -1)), min_y=0):
+    """Bordes de cornisa con nieve de donde puede desprenderse (ambiente del paso, 16-10-2026):
+    voxels de esos colores con aire encima y, al lado (en una de `dirs`), un vacío de al menos
+    `drop` voxels hacia abajo, a partir de la altura `min_y`. Devuelve hasta n, repartidos (los más alejados entre sí), como
+    pivotes [x, y, z, dx, dz]: el punto en el aire junto al borde y hacia dónde cae. Llamarla
+    antes de vaciar el modelo (los huecos de dentro parecerían vacío)."""
+    V = M.V
+    cand = []
+    for (x, y, z), v in V.items():
+        if y < min_y or v[1] not in colors or (x, y + 1, z) in V: continue
+        for dx, dz in dirs:
+            if all((x + dx, y - k, z + dz) not in V for k in range(drop)):
+                cand.append((x + dx, y, z + dz, dx, dz))
+                break
+    if not cand: return {}
+    pts = [max(cand, key=lambda p: (p[1], p[0], p[2]))]
+    while len(pts) < min(n, len(cand)):
+        pts.append(max(cand, key=lambda p: min((p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2 + (p[2] - q[2]) ** 2 for q in pts)))
+    return {'spill_%d' % i: list(p) for i, p in enumerate(pts)}
+
+
 def refine(M, k=2, seed=0, strength=1.0, keep=None):
     """Devuelve el modelo a k veces su resolución (cada voxel pasa a k x k x k) con textura fina
     según el material de cada voxel: veta en la madera, trama en la tela, moteado y picaduras en

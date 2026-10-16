@@ -17,6 +17,7 @@ uniform vec3 edge_col : source_color = vec3(0.55, 0.70, 0.82);
 uniform vec2 wind = vec2(0.8, 0.6);
 uniform float camp_radius = 14.0;
 uniform float relief = 1.0;
+uniform float sparkle = 1.0;                  // destellos de escarcha (en roca oscura se veían como estrellas)
 
 varying vec3 wpos;
 varying vec3 wnrm;
@@ -99,7 +100,7 @@ void fragment() {
 		ALBEDO = col * shade;
 		// algún destello de cristal de nieve (muy pocos, pequeños)
 		float spark = step(0.996, hash(c + 91.0)) * (1.0 - ice_m) * (1.0 - tr);
-		EMISSION = vec3(0.9, 0.95, 1.0) * spark * 0.25;
+		EMISSION = vec3(0.9, 0.95, 1.0) * spark * 0.25 * sparkle;
 		ROUGHNESS = mix(0.9, 0.3, ice_m);
 		SPECULAR = mix(0.3, 0.6, ice_m);
 	}

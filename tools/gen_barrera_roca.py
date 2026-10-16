@@ -15,7 +15,7 @@ Uso: python tools/gen_barrera_roca.py
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model, lerp
+from voxlib import Model, lerp, spill_points
 
 W, D = 64, 64
 R_HI = (0.50, 0.48, 0.46); R_MID = (0.38, 0.37, 0.36); R_LO = (0.26, 0.25, 0.25)
@@ -117,6 +117,8 @@ def build(seed):
             for y in range(0, hh):
                 c = SNOW_SH if y == hh - 1 and M.hsh(x, y, z) > 0.5 else lerp(R_MID, R_LO, M.hsh(x, y, z))
                 M.put(x, y, z, P, c, over=False)
+    # bordes de las cornisas del frente con nieve: de ahí cae alguna vez (Ambient, 16-10-2026)
+    M.spills = spill_points(M, (SNOW, SNOW_SH), n=10, drop=8, dirs=((0, 1),), min_y=32)
     # vaciar: fuera lo que no se ve
     NB = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
     for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in NB)]:
@@ -127,6 +129,6 @@ def build(seed):
 if __name__ == '__main__':
     for i, seed in enumerate((101, 202, 303)):
         M = build(seed + 7)
-        n = M.export('models/barrera_roca_%d.json' % (i + 1), {P: [0, 0, 0]}, jitter=0.004,
+        n = M.export('models/barrera_roca_%d.json' % (i + 1), {P: [0, 0, 0], **M.spills}, jitter=0.004,
                      pivots_in_voxels=True, roughness=0.85, specular=0.25, no_bottom=True)
         print('barrera_roca_%d' % (i + 1), n, 'voxels')

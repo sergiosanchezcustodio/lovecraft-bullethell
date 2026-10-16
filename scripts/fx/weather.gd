@@ -77,6 +77,10 @@ func focus() -> Vector3:
 	var c := camera.center()
 	return Vector3(c.x, 0.0, c.z)
 
+## Viento de ahora, con sus rachas (m/s en el suelo): lo usan los faroles que se balancean.
+func wind_now() -> Vector3:
+	return data.wind_vector() * data.wind_at(_t) if data != null else Vector3.ZERO
+
 # ---------------- precipitación ----------------
 
 func _particles(n: int, lifetime: float) -> GPUParticles3D:

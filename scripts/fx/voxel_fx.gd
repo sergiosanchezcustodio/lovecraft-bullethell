@@ -623,6 +623,80 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.gravity = Vector3(0, -0.2, 0)
 			m.scale_min = 0.04; m.scale_max = 0.09
 			m.color_ramp = _ramp([[0.0, Color(0.55, 0.55, 0.55, 0.0)], [0.2, Color(0.5, 0.5, 0.5, 0.6)], [1.0, Color(0.5, 0.5, 0.5, 0.0)]])
+		"drip_splash":            # gota que cae de la bóveda: corona de gotitas (Ambient, túneles)
+			p.draw_pass_1 = cube("mix")
+			p.amount = 7
+			p.lifetime = 0.45
+			p.explosiveness = 1.0
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.3
+			m.spread = 40.0
+			m.initial_velocity_min = 0.7; m.initial_velocity_max = 1.3
+			m.gravity = Vector3(0, -7.0, 0)
+			m.scale_min = 0.018; m.scale_max = 0.03
+			m.color_ramp = _ramp([[0.0, Color(0.55, 0.62, 0.7, 0.9)], [1.0, Color(0.5, 0.58, 0.66, 0.0)]])
+		"snow_spill":             # nieve que se desprende de una cornisa y cae por la pared (Ambient, el paso)
+			p.draw_pass_1 = cube("mix")                          # sin luz: en la pared en sombra no se veía
+			p.amount = int(clampf(r * 40.0, 30.0, 70.0))
+			p.lifetime = 1.9
+			p.explosiveness = 0.35
+			p.visibility_aabb = AABB(Vector3(-4, -9, -4), Vector3(8, 11, 8))
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+			m.emission_box_extents = Vector3(r * 0.5, 0.05, 0.15)
+			m.direction = Vector3(0, -1, 0.3)
+			m.spread = 25.0
+			m.initial_velocity_min = 0.2; m.initial_velocity_max = 0.7
+			m.gravity = Vector3(0.3, -4.0, 0.1)
+			m.damping_min = 0.1; m.damping_max = 0.3
+			m.scale_min = 0.035; m.scale_max = 0.085
+			m.scale_curve = _curve([[0.0, 1.0], [0.85, 1.0], [1.0, 0.3]])
+			m.color_ramp = _ramp([[0.0, Color(0.55, 0.6, 0.7, 0.95)], [0.8, Color(0.5, 0.56, 0.66, 0.85)], [1.0, Color(0.5, 0.56, 0.66, 0.0)]])
+		"snow_puff":              # polvo de nieve al llegar abajo (Ambient, el paso)
+			p.draw_pass_1 = cube("mix")
+			p.amount = 14
+			p.lifetime = 1.4
+			p.explosiveness = 0.6
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.4
+			m.spread = 70.0
+			m.initial_velocity_min = 0.3; m.initial_velocity_max = 0.8
+			m.gravity = Vector3(0.2, -0.3, 0)
+			m.damping_min = 0.6; m.damping_max = 0.9
+			m.scale_min = r * 0.25; m.scale_max = r * 0.4
+			m.scale_curve = _curve([[0.0, 0.5], [1.0, 1.2]])
+			m.color_ramp = _ramp([[0.0, Color(0.42, 0.45, 0.5, 0.0)], [0.15, Color(0.42, 0.45, 0.5, 0.45)], [1.0, Color(0.42, 0.45, 0.5, 0.0)]])
+		"spray":                  # rocío de una ola que rompe contra la borda (Ambient, la tormenta): -Z es hacia dentro
+			p.draw_pass_1 = cube("mix")
+			p.amount = int(clampf(r * 50.0, 50.0, 130.0))
+			p.lifetime = 1.2
+			p.explosiveness = 0.8
+			p.visibility_aabb = AABB(Vector3(-6, -3, -6), Vector3(12, 8, 12))
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+			m.emission_box_extents = Vector3(r * 0.5, 0.1, 0.1)
+			m.direction = Vector3(0, 1, -0.55).normalized()
+			m.spread = 18.0
+			m.initial_velocity_min = 4.2; m.initial_velocity_max = 6.8
+			m.gravity = Vector3(1.5, -9.8, 0.4)                  # el viento de la tormenta
+			m.damping_min = 0.3; m.damping_max = 0.5
+			m.scale_min = 0.05; m.scale_max = 0.14
+			m.scale_curve = _curve([[0.0, 0.6], [0.3, 1.0], [1.0, 0.5]])
+			m.color_ramp = _ramp([[0.0, Color(0.78, 0.84, 0.88, 0.95)], [0.7, Color(0.7, 0.77, 0.83, 0.7)], [1.0, Color(0.62, 0.7, 0.76, 0.0)]])
+		"foam":                   # espuma que corre por la cubierta y se deshace (Ambient, la tormenta): -Z hacia dentro
+			p.draw_pass_1 = cube("mix")
+			p.amount = int(clampf(r * 14.0, 14.0, 40.0))
+			p.lifetime = 1.8
+			p.explosiveness = 0.7
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+			m.emission_box_extents = Vector3(r * 0.5, 0.02, 0.15)
+			m.direction = Vector3(0, 0, -1)
+			m.spread = 25.0
+			m.flatness = 1.0
+			m.initial_velocity_min = 0.8; m.initial_velocity_max = 2.0
+			m.gravity = Vector3.ZERO
+			m.damping_min = 1.0; m.damping_max = 1.4
+			m.scale_min = 0.05; m.scale_max = 0.1
+			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.3]])
+			m.color_ramp = _ramp([[0.0, Color(0.68, 0.74, 0.78, 0.8)], [1.0, Color(0.6, 0.66, 0.7, 0.0)]])
 	m.color = tint
 	var key := "%s|%.1f|%s" % [recipe, r, tint.to_html()]
 	if _mat_cache.has(key): p.process_material = _mat_cache[key]
