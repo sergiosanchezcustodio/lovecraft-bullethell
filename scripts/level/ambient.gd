@@ -218,6 +218,8 @@ var _eyes: Array[Dictionary] = []               ## ojos entre los árboles del b
 var _eye_spots: Array = []
 var _eye_t := 0.0
 var _windows_watch := false
+var _moss: Array = []                           ## puntos bajo las cortinas de musgo de los cipreses
+var _next_moss := 1.0
 var _frogs: Array = []                          ## [punto en el agua, s hasta el próximo croar, s callada]
 var _sounds: Array = []                         ## [reproductor 3D, dB, alcance]: el fuego
 var _walked := {}                               ## jugador -> [última posición, m hasta el próximo crujido]
@@ -290,6 +292,7 @@ func _ready() -> void:
 	if cfg.has("eyes"): _find_eye_spots(cfg.eyes)
 	_windows_watch = bool(cfg.get("windows_watch", false))
 	if cfg.has("frogs"): _find_frogs(cfg.frogs)
+	if cfg.has("moss_drips"): _find_moss(cfg.moss_drips)
 	if cfg.has("loop"): _start_loop(cfg.loop)
 	if cfg.has("crowd") and not sfx_muted():
 		_crowd = _loop_player(String(cfg.crowd.file), false) as AudioStreamPlayer
@@ -430,6 +433,8 @@ func _process(delta: float) -> void:
 	if _windows_watch: _windows_step()
 	if not _frogs.is_empty(): _frog_step(delta)
 	if not _ripples.is_empty(): _ripple_step(delta)
+	if not _drops.is_empty(): _drop_step(delta)
+	if not _moss.is_empty(): _moss_step(delta)
 	if _crowd != null: _crowd_step(delta)
 	_hook_t -= delta
 	if _hook_t <= 0.0:                                          # pasos: cada jugador nuevo, enganchado
@@ -481,6 +486,8 @@ func _bubbles(delta: float) -> void:
 			var e := VoxelFx.emitter("sea_bubbles", _rng.randf_range(0.2, 0.45), true)
 			e.position = Vector3(p.x, y, p.y)
 			add_child(e)
+			if not sea:                                                 # gas del pantano: revienta con su onda
+				for k in 3: get_tree().create_timer(0.4 + k * 0.35).timeout.connect(_ripple.bind(Vector3(p.x, 0.03, p.y), 0.25, 0.5))
 			get_tree().create_timer(2.5).timeout.connect(e.queue_free)
 			return
 
@@ -795,6 +802,9 @@ func _drip_step(delta: float) -> void:
 			add_child(d)
 			_drops.append([d, 0.0, y, sea])
 			break
+
+## Gotas que caen (de la bóveda o del musgo): salpican y dejan su onda al llegar.
+func _drop_step(delta: float) -> void:
 	for dr: Array in _drops.duplicate():
 		var d: MeshInstance3D = dr[0]
 		dr[1] += 9.8 * delta
@@ -1071,6 +1081,42 @@ func _watch_step(delta: float, t: float) -> void:
 				if close: continue
 				_watch_place(i, c)
 				break
+
+# ------------------------------------------------------------------ musgo que gotea
+
+func _find_moss(c: Dictionary) -> void:
+	var models: Array = c.get("among", [])
+	for h: Node in arena.get_node("Props").get_children():
+		var m := h.get_child(0) as Node3D
+		if m == null or not String(m.name) in models: continue
+		var bb := _world_aabb(h as Node3D)
+		_moss.append([(h as Node3D).global_position, maxf(bb.size.x, bb.size.z) * 0.4, bb.size.y * 0.55])
+
+## Una gota cae de las cortinas de musgo de un ciprés a la vista y deja su onda en el agua.
+func _moss_step(delta: float) -> void:
+	_next_moss -= delta
+	if _next_moss > 0.0: return
+	var ev: Array = cfg.moss_drips.get("every", [0.25, 0.8])
+	_next_moss = _rng.randf_range(ev[0], ev[1])
+	var f := _focus()
+	var obstacles: ObstacleMap = arena.get_meta("obstacles")
+	for attempt in 8:
+		var tr: Array = _moss[_rng.randi() % _moss.size()]
+		var base: Vector3 = tr[0]
+		if Vector2(base.x - f.x, base.z - f.z).length() > 14.0: continue
+		var a := _rng.randf() * TAU
+		var p := base + Vector3(cos(a), 0, sin(a)) * _rng.randf_range(0.6, float(tr[1]))
+		var wet := obstacles != null and obstacles.water_at(Vector2(p.x, p.z)) > 0.4
+		var d := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.02, 0.08, 0.02)
+		bm.material = _drop_material()
+		d.mesh = bm
+		d.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		d.position = Vector3(p.x, float(tr[2]), p.z)
+		add_child(d)
+		_drops.append([d, 0.0, 0.03, wet])
+		return
 
 # ------------------------------------------------------------------ ranas
 

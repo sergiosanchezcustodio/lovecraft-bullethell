@@ -828,14 +828,17 @@ BARCA_PAINT = {1: ((0.70, 0.68, 0.62), (0.44, 0.13, 0.10)), 2: ((0.24, 0.36, 0.4
 def barca(variant=1):
     """Barca de remos amarrada al muelle, a flote (revisión de arte del 14-10-2026), 64/m, 2,6 m:
     casco de tingladillo con la pintura de su variante (blanca con franja roja, azul petróleo con
-    crema, verde con pardo), regala y roda de madera, bancadas, los remos recogidos dentro, agua
-    de sentina, un rollo de cabo, una nasa o un cubo, y la amarra que sube desde la proa (+x)
+    crema, verde con pardo), regala y roda de madera, bancadas, los remos recogidos dentro, el
+    enjaretado del fondo (16-10-2026: por encima de la flotación; con el plan en el fondo, el mar
+    de la arena asomaba dentro y la barca parecía llena de agua), un rollo de cabo, una nasa o un
+    cubo, y la amarra que sube desde la proa (+x)
     hasta el borde del muelle (0,9 m más arriba y 0,6 m por delante). El origen está en la línea
     de flotación: lo que queda por debajo de y = 0 va bajo el agua."""
     M = Model(S=4, seed=110 + variant)
     rng = M.rng
     HULL, BAND = BARCA_PAINT[variant]
     L, W, HH, DRAFT = 82, 26, 30, 10
+    FLOOR = 9                                                                        # enjaretado: 14 cm sobre el agua
     def width(x):
         f = abs(x) / L
         if x > 0: return W * max(0.0, 1 - f ** 1.7) ** 0.8                          # proa afilada
@@ -861,8 +864,14 @@ def barca(variant=1):
                 for y in range(yb, g + 1): M.put(x, y, z, P, hull_c(x, y, z, u))
             else:
                 for y in (yb, yb + 1): M.put(x, y, z, P, WOOD_D if (z // 5) % 2 else WOOD)   # plan
-                if yb + 2 <= -3:
-                    M.put(x, yb + 2, z, P, (0.12, 0.16, 0.14) if M.hsh(x, z, 1) > 0.1 else (0.24, 0.28, 0.26))   # agua de sentina
+                if yb < FLOOR:                                                    # enjaretado del fondo, seco
+                    c = WOOD if (z + 2) % 7 else (0.10, 0.08, 0.06)              # tablas con su junta
+                    if (x // 9 + z // 7) % 5 == 0: c = lerp(c, WOOD_D, 0.5)
+                    if M.noise(x, 0, z, 6.0) > 0.72: c = lerp(c, (0.28, 0.30, 0.26), 0.4)   # humedad
+                    M.put(x, FLOOR, z, P, c)
+                    if FLOOR - 1 > yb + 1: M.put(x, FLOOR - 1, z, P, WOOD_D)
+                    for y in range(yb + 2, FLOOR - 1):                            # costillas debajo: macizo, sin hueco
+                        M.put(x, y, z, P, WOOD_D)
     for x in range(-L, L):                                                           # regala de madera
         w = width(x)
         if w < 2: continue
