@@ -9,6 +9,7 @@
 Escribe resources/sfx/<nombre>.wav (sintetizados) y resources/sfx/<nombre>_N.ogg (Kenney).
 La tabla de qué suena en cada evento está en data/sfx.json.
 Uso: python tools/gen_sfx.py <carpeta con los packs de Kenney descomprimidos>
+     python tools/gen_sfx.py --ambiente   (solo los del ambiente de los escenarios)
 """
 import os, sys, shutil, wave, glob
 import numpy as np
@@ -89,6 +90,83 @@ def synth():
     save('chant', lp(c, 1200) * np.minimum(tt / 0.15, 1) * np.minimum((d - tt) / 0.4, 1))
 
 
+def ambiente():
+    """Sonidos de ambiente de los escenarios (16-10-2026), con su propio azar para no cambiar los
+    de synth(): gotas en la gruta con su eco, golpes de ola contra el casco, crujidos del gancho
+    de los faroles que se mecen, truenos y el viento en bucle (sin costura: el final se funde con
+    el principio)."""
+    r = np.random.default_rng(1016)
+    def nz(d): return r.standard_normal(int(d * SR))
+    def cave(x, tail=0.9, level=0.25):                       # eco de cueva: cola de ruido que decae
+        ir = r.standard_normal(int(tail * SR)) * np.exp(-t(tail) / (tail * 0.28))
+        ir = lp(ir, 1800)
+        ir[0] = 0
+        wet = signal.fftconvolve(x, ir)[:len(x) + len(ir) - 1]
+        out = np.zeros(len(wet)); out[:len(x)] += x
+        return out + wet / (np.max(np.abs(wet)) + 1e-9) * np.max(np.abs(x)) * level
+    for i, (f0, rise) in enumerate(((1050, 1.9), (1380, 1.6), (880, 2.2))):
+        d = 0.18                                             # gota: tono que sube (la burbuja) y se apaga
+        tt = t(d)
+        f = f0 * (1 + rise * tt / d)
+        tone = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tt / 0.035) * np.minimum(tt / 0.001, 1)
+        click = hp(nz(d), 3000) * np.exp(-tt / 0.003) * 0.15
+        save('drip_%d' % i, cave(tone + click))
+    for i in range(2):                                       # ola contra el casco: golpe sordo y rocío
+        d = 1.8
+        tt = t(d)
+        thud = np.sin(2 * np.pi * (70 + 15 * i) * tt) * np.exp(-tt / 0.12) * np.minimum(tt / 0.004, 1)
+        body = lp(nz(d), 700) * np.exp(-tt / 0.35) * np.minimum(tt / 0.01, 1)
+        late = np.clip((tt - 0.15) / 0.1, 0, 1)
+        hiss = bp(nz(d), 1800, 7000) * late * np.exp(-np.clip(tt - 0.15, 0, None) / 0.5) * 0.45
+        save('wave_hit_%d' % i, thud * 0.9 + body + hiss)
+    for i, (rate, fres) in enumerate(((38, 950), (55, 1400), (28, 700))):
+        d = 0.7                                              # crujido: tirones del gancho (pegar y soltar)
+        tt = t(d)
+        rr = rate * (1 + 0.5 * np.sin(np.pi * tt / d) + 0.15 * np.sin(2 * np.pi * 7 * tt))
+        ph = np.cumsum(rr) / SR
+        pulses = (np.diff(np.floor(ph), prepend=0) > 0).astype(float) * (0.6 + 0.4 * r.random(len(tt)))
+        b, a = signal.iirpeak(fres / (SR / 2), 9)
+        res = signal.lfilter(b, a, pulses) + 0.5 * signal.lfilter(*signal.iirpeak(fres * 2.3 / (SR / 2), 12), pulses)
+        save('creak_%d' % i, res * np.sin(np.pi * tt / d) ** 1.5)
+    for i in range(2):                                       # trueno: estallido y retumbo que se aleja
+        d = 4.5
+        tt = t(d)
+        crack = bp(nz(d), 900, 5000) * np.exp(-tt / 0.06)
+        crack /= np.max(np.abs(crack))
+        rumble = hp(lp(nz(d), 130 - 30 * i, 4), 25)              # grave: cada parte con su propio nivel
+        rumble /= np.std(rumble)
+        rolls = lp(nz(d), 2.5, 1)
+        rolls = np.clip(0.75 + 0.5 * rolls / np.std(rolls), 0.2, 1.6)  # retumbos que van y vienen
+        tail = np.minimum(tt / 0.3, 1) * np.exp(-tt / 1.5)
+        save('thunder_%d' % i, crack * 0.25 + rumble * rolls * tail * 0.3)
+    d, fade = 12.0, 2.0                                      # viento en bucle
+    n = int((d + fade) * SR)
+    tt = np.arange(n) / SR
+    g = lp(r.standard_normal(n), 0.25, 1)                   # rachas lentas
+    g = np.clip(0.6 + 0.35 * g / (np.std(g) + 1e-9), 0.15, 1.6)
+    base = lp(r.standard_normal(n), 500) * g
+    whistle = np.zeros(n)
+    for fc, ph in ((620, 0.0), (910, 1.7)):                  # silbido que sube y baja con las rachas
+        fsw = fc * (1 + 0.25 * np.sin(2 * np.pi * tt / 5.3 + ph))
+        k = 0
+        step = 2048
+        out = np.zeros(n)
+        src = r.standard_normal(n)
+        while k < n:
+            bb, aa = signal.iirpeak(min(fsw[k], SR / 2 - 100) / (SR / 2), 25)
+            out[k:k + step] = signal.lfilter(bb, aa, src[k:k + step])
+            k += step
+        whistle += out * g ** 2 * 0.25
+    w = base + whistle
+    m = int(fade * SR)
+    loop = w[:int(d * SR)].copy()
+    loop[:m] = loop[:m] * np.linspace(0, 1, m) + w[int(d * SR):int(d * SR) + m] * np.linspace(1, 0, m)
+    x = loop / (np.max(np.abs(loop)) + 1e-9) * 0.9                    # save() con fundido al final rompería el bucle
+    with wave.open(os.path.join(OUT, 'wind_loop.wav'), 'wb') as wv:
+        wv.setnchannels(1); wv.setsampwidth(2); wv.setframerate(SR)
+        wv.writeframes((x * 32767).astype(np.int16).tobytes())
+
+
 # evento -> archivos de Kenney (se copian como <evento>_N.ogg)
 KENNEY = {
     'hit': ['impactSoft_medium_000', 'impactSoft_medium_001', 'impactSoft_medium_002'],
@@ -123,6 +201,10 @@ def copy_kenney(src):
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
-    synth()
-    if len(sys.argv) > 1: copy_kenney(sys.argv[1])
+    if '--ambiente' in sys.argv:                             # solo los del ambiente (no necesita Kenney)
+        ambiente()
+    else:
+        synth()
+        ambiente()
+        if len(sys.argv) > 1: copy_kenney(sys.argv[1])
     print('listo en', OUT)

@@ -268,218 +268,242 @@
   {
    "model": "alr_borda",
    "pos": [
-    28.3,
+    28.15,
     -18
    ],
-   "rot": 90,
-   "scale": 1.0
+   "rot": -90,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
-    28.3,
+    28.15,
     -14
    ],
-   "rot": 90,
-   "scale": 1.0
+   "rot": -90,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
-    28.3,
+    28.15,
     -10
    ],
-   "rot": 90,
-   "scale": 1.0
+   "rot": -90,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
-    28.3,
+    28.15,
     -6
    ],
-   "rot": 90,
-   "scale": 1.0
+   "rot": -90,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
-    28.3,
+    28.15,
     -2
    ],
-   "rot": 90,
-   "scale": 1.0
+   "rot": -90,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
-    28.3,
+    28.15,
     2
    ],
-   "rot": 90,
-   "scale": 1.0
+   "rot": -90,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
-    28.3,
+    28.15,
     6
    ],
-   "rot": 90,
-   "scale": 1.0
+   "rot": -90,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
-    28.3,
+    28.15,
     10
    ],
-   "rot": 90,
-   "scale": 1.0
+   "rot": -90,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
-    28.3,
+    28.15,
     14
    ],
-   "rot": 90,
-   "scale": 1.0
+   "rot": -90,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
-    28.3,
+    28.15,
     18
    ],
-   "rot": 90,
-   "scale": 1.0
+   "rot": -90,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     -26,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     -22,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     -18,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     -14,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     -10,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     -6,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     -2,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     2,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     6,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     10,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     14,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     18,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     22,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_borda",
    "pos": [
     26,
-    20.3
+    20.15
    ],
-   "rot": 0,
-   "scale": 1.0
+   "rot": 180,
+   "scale": 1.0,
+   "y": 0.0
   },
   {
    "model": "alr_linterna",
@@ -732,6 +756,16 @@
    ],
    "rot": 7.3,
    "scale": 1.02
+  },
+  {
+   "model": "alr_borda_esquina",
+   "pos": [
+    28.15,
+    20.15
+   ],
+   "rot": 0,
+   "scale": 1.0,
+   "y": 0.0
   }
  ],
  "mask": {

@@ -15,6 +15,7 @@ var camera: GameCamera
 var amount := 1.0                            ## 1 completo, 0,5 reducido (configuración)
 var env: Environment
 var lightning_count := 0                     ## rayos caídos (tests)
+var flash := 0.0                             ## brillo del rayo ahora (0..1): el ambiente aclara la espuma
 var _t := 0.0
 var _precip: GPUParticles3D
 var _precip_mat: ParticleProcessMaterial
@@ -296,11 +297,16 @@ func _lightning(delta: float) -> void:
 		if _next_bolt <= 0.0:
 			_bolt_t = 0.0
 			lightning_count += 1
+			# el trueno llega después del destello (16-10-2026)
+			get_tree().create_timer(_rng.randf_range(0.4, 1.6)).timeout.connect(func() -> void: Sfx.play("thunder"))
 			_next_bolt = data.lightning_every * _rng.randf_range(0.5, 1.5)
 	else:
 		_bolt_t += delta
 	var k := flash_at(_bolt_t) * (1.0 if int(Settings.get_value("flashes")) == 1 else 0.25)   # accesibilidad
 	if _bolt_t > 0.7: _bolt_t = -1.0
+	flash = k
+	var lit := 1.0 + k * 1.6
+	if _precip_mat: _precip_mat.color = Color(lit, lit, lit, 1.0)                # la cortina de lluvia se ilumina
 	# destello contenido: con más, la escena se quemaba en blanco y la noche parecía de día
 	if _flash: _flash.light_energy = k * FLASH_LIGHT
 	if env: env.ambient_light_energy = _base_ambient + k * FLASH_AMBIENT

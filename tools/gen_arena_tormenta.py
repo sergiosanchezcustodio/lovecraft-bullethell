@@ -18,10 +18,12 @@ A = Arena("tormenta", seed=1925, half=HX, spawn_clear=4.0,
 
 for x in range(-24, 30, 12):                                 # la superestructura al norte: el puente en medio
     A.add("alr_puente" if x == 0 else "alr_caseta", x, -HZ, rot=0)
-for z in range(-18, 22, 4):                                   # borda baja al este (lado de la cámara)
-    A.add("alr_borda", HX + 0.3, z, rot=90)
-for x in range(-26, 30, 4):                                   # y al sur
-    A.add("alr_borda", x, HZ + 0.3, rot=0)
+# borda baja al este y al sur (lado de la cámara), a ras de la cubierta y con el casco hacia el
+# mar (16-10-2026: antes quedaba a la altura del agua, por estar más allá de la orilla, y del revés)
+for z in range(-18, 22, 4):
+    A.add("alr_borda", HX + 0.15, z, rot=-90, y=0.0)
+for x in range(-26, 30, 4):
+    A.add("alr_borda", x, HZ + 0.15, rot=180, y=0.0)
 for x, z in ((-16, -8), (0, -6), (16, -8), (-8, 8), (12, 10)):
     A.add("alr_linterna", x, z, rot=A.rng.choice([0, 90, 180, 270]), scale=1.1)
 A.add("alr_bote", -18.0, 12.0, rot=10)
@@ -31,6 +33,7 @@ for x, z in ((-22, -12), (-4, 14), (22, 4), (8, -14)):
 A.scatter("alr_rollo", 6, 5.0, 1.0, 1.3)
 A.scatter("alr_fardos", 5, 6.0, 0.9, 1.1)
 A.scatter("inn_barril", 6, 5.0, 1.0, 1.2)
+A.add("alr_borda_esquina", HX + 0.15, HZ + 0.15, rot=0, y=0.0)   # al final: no mueve lo repartido
 
 COLL = dict(COLLIDERS)
 COLL.update({

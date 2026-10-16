@@ -915,7 +915,10 @@ def borda():
     de óxido), regala de teca barnizada con veta y empalmes que vuela a los dos lados, cuadernas
     con curvas en la base por dentro, trancanil, imbornales con marco de hierro y verdín, una
     cornamusa, una gatera para los cabos, un cáncamo y un cabillero con cabillas. Baja (1 m)
-    porque va del lado de la cámara (32/m). Fuera: z < 0; cubierta: z > 0."""
+    porque va del lado de la cámara (32/m). Fuera: z < 0; cubierta: z > 0.
+    Debajo, el costado del casco hasta el agua (16-10-2026): tracas negras, cinta de roce, regueros
+    de óxido bajo los imbornales, verdín, percebes y la franja roja de la flotación (el mar de la
+    tormenta está 2 m por debajo de la cubierta)."""
     M = Model(S=2, seed=108)
     X0, X1, HB = -64, 64, 28
     scup = [x for x in range(X0 + 10, X1, 24)]                          # imbornales
@@ -950,6 +953,22 @@ def borda():
             for y in range(top - int(6 + M.hsh(x, 5, 5) * 14), top):
                 v = M.V.get((x, y, -2))
                 if v: v[1] = lerp(v[1], RUST, 0.55)
+    # costado del casco: de la cubierta al agua (2,3 m), solo la cara de fuera
+    WL = -64                                                            # flotación (mar a -2 m)
+    for x in range(X0, X1):
+        streak = any(sx <= x < sx + 6 for sx in scup)
+        run = int(12 + M.hsh(x // 6, 7, 7) * 30)                        # largo del reguero bajo el imbornal
+        for y in range(WL - 10, 0):
+            c = plank_col(x, y - 2, True)
+            if streak and y > -run: c = lerp(c, RUST if (x + y) % 3 else SLIME_G, 0.5 * (1 + y / run))
+            elif y > -40 and M.hsh(x // 2, 8, 8) > 0.93 and M.noise(x, y, 3, 6.0) > 0.4: c = lerp(c, RUST, 0.35)
+            if WL + 3 <= y < WL + 12 and M.noise(x, y, 4, 5.0) > 0.45: c = lerp(c, SLIME_G, 0.55)   # verdín
+            if y < WL + 3:                                              # franja roja de la flotación
+                c = lerp((0.30, 0.09, 0.07), (0.20, 0.07, 0.06), 0.4 * M.noise(x, y, 6, 4.0))
+                if M.hsh(x, y, 9) > 0.9: c = (0.55, 0.52, 0.45)         # percebes
+            for z in (-2, -1): M.put(x, y, z, P, c)
+        for y in (-7, -6, -5):                                          # cinta de roce
+            M.put(x, y, -3, P, lerp(TEAK_D, (0.12, 0.09, 0.06), 0.5 * M.hsh(x // 8, y, 2)))
     # regala de teca: vuela a los dos lados, con veta y empalmes en rayo de Júpiter
     for x in range(X0, X1):
         for y in range(HB, HB + 3):
@@ -999,6 +1018,26 @@ def borda():
         if i % 2 == 0:                                                  # cabo adujado colgando
             for y in range(10, 20):
                 M.put(px - 1, y, 4, P, ROPE if y % 2 else ROPE_D); M.put(px + 1, y, 4, P, ROPE_D if y % 2 else ROPE)
+    return M, {P: [0, 0, 0]}
+
+
+def borda_esquina():
+    """Pie de la esquina donde se juntan las dos bordas de la cubierta del Emma (16-10-2026): del
+    agua a la regala, negro con regueros de óxido, la cinta de roce y la regala de teca encima."""
+    M = Model(S=2, seed=113)
+    HB = 28
+    for x in range(-6, 6):
+        for z in range(-6, 6):
+            for y in range(-74, HB):
+                c = lerp(HULL, HULL_L, 0.3 * M.hsh(x, y // 4, z))
+                if y % 4 == 0: c = lerp(c, (0.03, 0.03, 0.03), 0.6)
+                if y > -30 and M.noise(x, y, z, 5.0) > 0.7: c = lerp(c, RUST, 0.45)
+                if y < -61: c = lerp((0.30, 0.09, 0.07), (0.20, 0.07, 0.06), 0.4 * M.noise(x, y, z, 4.0))
+                M.put(x, y, z, P, c)
+            for y in range(HB, HB + 3): M.put(x, y, z, P, TEAK_L if y == HB + 2 else TEAK)
+    for y in (-7, -6, -5):                                              # cinta de roce
+        for k in range(-7, 7):
+            M.put(k, y, -7, P, TEAK_D); M.put(6, y, k, P, TEAK_D)
     return M, {P: [0, 0, 0]}
 
 
@@ -1384,7 +1423,7 @@ def _fine(fn, seed):
     return go
 
 
-PIECES = {'borda': borda, 'puente': _fine(puente, 109), 'caseta': caseta, 'casco': casco, 'bolardo': bolardo, 'grua': grua, 'fardos': _fine(fardos, 104), 'rollo': rollo,
+PIECES = {'borda': borda, 'borda_esquina': borda_esquina, 'puente': _fine(puente, 109), 'caseta': caseta, 'casco': casco, 'bolardo': bolardo, 'grua': grua, 'fardos': _fine(fardos, 104), 'rollo': rollo,
           'linterna': linterna, 'bote': bote, 'barca': barca, 'barca_2': lambda: barca(2), 'barca_3': lambda: barca(3)}
 
 if __name__ == '__main__':

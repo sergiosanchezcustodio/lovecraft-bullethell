@@ -13,7 +13,10 @@ extends Node3D
 ##   la luz de luna, burbujas que suben en el mar, remolinos de ceniza o nieve, sin sombras de
 ##   nubes (interiores y grutas), gotas que caen de la bóveda (ondas en el mar, salpicaduras en la
 ##   roca), nieve que se desprende de las cornisas (pivotes "spill" de las rocas y del acantilado)
-##   y olas que rompen contra la borda con rocío y espuma por la cubierta.
+##   y olas que rompen contra la borda con rocío y espuma por la cubierta (que brillan con los
+##   relámpagos).
+## Sonido (16-10-2026): gotas, golpes de ola y crujidos de los faroles (Sfx: drip, wave_hit,
+## creak) y un bucle de viento por arena ("loop") que sube con las rachas del clima.
 ## Las ventanas que se encienden y el cristal con cielo son capas del modelo (VoxelBuilder,
 ## glow 2 y 3) y no necesitan nada de aquí. Las banderas, igual (parte "flag").
 ## Nada de esto tiene colisión ni afecta a la partida. `ambient=false` lo quita (comparar).
@@ -135,6 +138,10 @@ var _spills: Array = []                         ## [punto del borde (mundo), hac
 var _next_spill := 4.0
 var _sprays: Array = []                         ## [punto en la borda, base con -Z hacia la cubierta, largo]
 var _next_spray := 1.5
+var _lit: Array = []                            ## [emisor, tinte]: rocío y espuma que aclara el rayo
+var _loop: AudioStreamPlayer
+var _loop_db := -80.0
+var _flash_was := 0.0
 var demo := false
 
 func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
@@ -172,6 +179,7 @@ func _ready() -> void:
 	if cfg.get("dust", false): _dust_beams()
 	if cfg.has("spills"): _find_spills(cfg.spills)
 	if cfg.has("spray"): _find_sprays(cfg.spray)
+	if cfg.has("loop"): _start_loop(cfg.loop)
 
 ## Farol que cuelga: su parte gira sobre el gancho y se lleva la luz y el halo de niebla.
 func _add_swing(h: Node3D, c: Dictionary) -> void:
@@ -205,6 +213,12 @@ func _swing_step(delta: float, t: float) -> void:
 		s.d = (s.d as Vector2).limit_length(s.max)
 		var d: Vector2 = s.d
 		var part: Node3D = s.part
+		var out_now := (s.v as Vector2).dot(d) > 0.0                    # se aleja del centro
+		if s.get("out", false) and not out_now and d.length() > deg_to_rad(9.0) and _rng.randf() < 0.35:
+			var gp := part.global_position
+			var f := _focus()
+			if Vector2(gp.x - f.x, gp.z - f.z).length() < 12.0: Sfx.play("creak")
+		s["out"] = out_now
 		if d.length() < 0.0005:
 			part.basis = Basis.IDENTITY
 			continue
@@ -257,6 +271,8 @@ func _process(delta: float) -> void:
 	if cfg.has("drips"): _drip_step(delta)
 	if not _spills.is_empty(): _spill_step(delta)
 	if not _sprays.is_empty(): _spray_step(delta)
+	if _loop != null: _loop_step(delta)
+	if not _lit.is_empty() or _flash_was > 0.0: _flash_step()
 
 func _focus() -> Vector3:
 	return camera.center() if camera != null else Vector3.ZERO
@@ -321,6 +337,60 @@ func _whirl_step(delta: float) -> void:
 			get_tree().create_timer(2.0).timeout.connect(e.queue_free)
 			_whirls.erase(w)
 
+# ------------------------------------------------------------------ sonido de fondo y rayos
+
+func _weather() -> Weather:
+	var g := get_parent()
+	return g.weather as Weather if g != null and "weather" in g and g.weather != null else null
+
+## Bucle de viento de la arena (sin costura: tools/gen_sfx.py --ambiente), con fundido de entrada.
+func _start_loop(c: Dictionary) -> void:
+	if Sfx.muted: return
+	var path := "res://resources/sfx/%s" % String(c.get("file", "wind_loop.wav"))
+	if not ResourceLoader.exists(path): return
+	var st := (load(path) as AudioStreamWAV).duplicate() as AudioStreamWAV
+	st.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	st.loop_begin = 0
+	st.loop_end = int(st.get_length() * st.mix_rate)
+	_loop = AudioStreamPlayer.new()
+	_loop.stream = st
+	_loop.bus = "Efectos" if AudioServer.get_bus_index("Efectos") >= 0 else "Master"
+	_loop.volume_db = -60.0
+	_loop.pitch_scale = float(c.get("pitch", 1.0))
+	add_child(_loop)
+	_loop.play(_rng.randf() * st.get_length())
+
+## Las rachas del clima lo suben (hasta unos 8 dB) y lo afinan un poco.
+func _loop_step(delta: float) -> void:
+	var c: Dictionary = cfg.loop
+	var target := float(c.get("db", -20.0))
+	var pitch := float(c.get("pitch", 1.0))
+	var w := _weather()
+	if w != null and w.data != null and float(c.get("gusts", 1.0)) > 0.0:
+		var ratio := w.wind_now().length() / maxf(w.data.wind, 0.1)
+		target += 6.0 * log(maxf(ratio, 0.5)) / log(2.0) * float(c.get("gusts", 1.0))
+		pitch *= 1.0 + 0.05 * (ratio - 1.0)
+	_loop_db = lerpf(_loop_db, target, minf(delta * (0.6 if _loop_db < target - 20.0 else 2.0), 1.0))
+	_loop.volume_db = _loop_db
+	_loop.pitch_scale = lerpf(_loop.pitch_scale, pitch, minf(delta * 2.0, 1.0))
+
+## El rayo aclara un instante el rocío y la espuma (sin luz propia, no los alcanza la del rayo).
+func _flash_step() -> void:
+	var w := _weather()
+	var k: float = w.flash if w != null else 0.0
+	_lit = _lit.filter(func(e: Array) -> bool: return is_instance_valid(e[0]))
+	if k <= 0.001 and _flash_was <= 0.001: return
+	_flash_was = k
+	for e: Array in _lit:
+		var t: Color = e[1]
+		var f := 1.0 + 2.2 * k
+		((e[0] as GPUParticles3D).process_material as ParticleProcessMaterial).color = Color(t.r * f, t.g * f, t.b * f, t.a)
+
+func _lit_emitter(recipe: String, r: float, tint := Color.WHITE) -> GPUParticles3D:
+	var e := VoxelFx.emitter(recipe, r, true, true, tint)
+	_lit.append([e, tint])
+	return e
+
 # ------------------------------------------------------------------ gotas de la bóveda
 
 ## Una gota cae de la bóveda (fuera de la vista) y, al llegar, salpica y deja ondas en el mar o,
@@ -365,6 +435,8 @@ func _drip_step(delta: float) -> void:
 		add_child(sp)
 		get_tree().create_timer(0.8).timeout.connect(sp.queue_free)
 		_ripple(at, 0.55 if dr[3] else 0.3, 0.8 if dr[3] else 0.45)          # en la roca, la película de agua del suelo
+		var near := Vector2(at.x - _focus().x, at.z - _focus().z).length()
+		Sfx.play("drip", -clampf((near - 4.0) * 0.8, 0.0, 10.0))       # las lejanas, más bajas
 	for r: Array in _ripples.duplicate():
 		r[2] += delta / 1.6
 		(r[1] as ShaderMaterial).set_shader_parameter("life", r[2])
@@ -496,12 +568,13 @@ func _spray_step(delta: float) -> void:
 	var b: Basis = s[1]
 	var at: Vector3 = (s[0] as Vector3) + b.x * _rng.randf_range(-0.35, 0.35) * float(s[2])
 	var r := _rng.randf_range(1.2, 2.6)                            # unas rompen más fuerte que otras
-	var sp := VoxelFx.emitter("spray", r, true)
+	var sp := _lit_emitter("spray", r)
 	sp.position = at
 	sp.basis = b
 	add_child(sp)
 	get_tree().create_timer(1.8).timeout.connect(sp.queue_free)
-	var crest := VoxelFx.emitter("snow_puff", r * 0.45, true, false, Color(1.3, 1.38, 1.45, 0.55))   # la cresta asoma por la borda
+	Sfx.play("wave_hit", (r - 2.6) * 3.0)                          # las flojas suenan menos
+	var crest := _lit_emitter("snow_puff", r * 0.45, Color(1.3, 1.38, 1.45, 0.55))   # la cresta asoma por la borda
 	crest.position = at
 	add_child(crest)
 	get_tree().create_timer(1.6).timeout.connect(crest.queue_free)
@@ -509,7 +582,7 @@ func _spray_step(delta: float) -> void:
 
 ## Espuma por la cubierta cuando cae el rocío (-Z de la base hacia dentro).
 func _foam(at: Vector3, b: Basis, r: float) -> void:
-	var fo := VoxelFx.emitter("foam", r, true)
+	var fo := _lit_emitter("foam", r)
 	fo.position = at
 	fo.basis = b
 	add_child(fo)
