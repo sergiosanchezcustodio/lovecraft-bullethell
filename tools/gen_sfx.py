@@ -169,6 +169,7 @@ def ambiente():
     pasos(r)
     fuente(r)
     campana(r)
+    ranas(r)
 
 
 def save_loop(name, w, d, fade):
@@ -448,6 +449,31 @@ def campana(r):
     wet = signal.fftconvolve(x, ir)[:len(x)]
     wet *= np.std(x) / (np.std(wet) + 1e-9)
     save('bell_0', x * 0.75 + wet * 0.5)
+
+
+def ranas(r):
+    """Croar de ranas (16-10-2026): dos ranas pequeñas (un "cric-cric" de pulsos rápidos y agudos)
+    y dos grandes (el mugido grave y zumbón de la rana toro)."""
+    for i, (f0, pulses, rate, dur_p) in enumerate(((620, 3, 11, 0.045), (540, 2, 9, 0.05))):
+        out = []
+        for k in range(pulses):
+            m = int(dur_p * SR)
+            tt = np.arange(m) / SR
+            ph = 2 * np.pi * np.cumsum(f0 * (1 + 0.15 * tt / tt[-1]) * np.ones(m)) / SR
+            buzz = np.sign(np.sin(ph)) * 0.6 + np.sin(ph)
+            am = (0.5 + 0.5 * np.sin(2 * np.pi * 90 * tt)) * np.sin(np.pi * tt / tt[-1])
+            out.append(bp(buzz * am, 300, 3000))
+            out.append(np.zeros(int(SR / rate) - m))
+        save('frog_%d' % i, np.concatenate(out))
+    for i, f0 in enumerate((110, 92)):
+        d = 0.55
+        tt = t(d)
+        f = f0 * (1 - 0.12 * tt / d)
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        tone = sum(np.sin(k * ph) / k for k in range(1, 8))
+        am = 1 + 0.5 * np.sin(2 * np.pi * 24 * tt)
+        e = np.minimum(tt / 0.04, 1) * np.minimum((d - tt) / 0.12, 1)
+        save('frog_%d' % (i + 2), lp(tone * am * e, 1100))
 
 
 def lluvia(r):

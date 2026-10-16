@@ -218,6 +218,7 @@ var _eyes: Array[Dictionary] = []               ## ojos entre los árboles del b
 var _eye_spots: Array = []
 var _eye_t := 0.0
 var _windows_watch := false
+var _frogs: Array = []                          ## [punto en el agua, s hasta el próximo croar, s callada]
 var _sounds: Array = []                         ## [reproductor 3D, dB, alcance]: el fuego
 var _walked := {}                               ## jugador -> [última posición, m hasta el próximo crujido]
 var _next_idle_creak := 6.0
@@ -288,6 +289,7 @@ func _ready() -> void:
 	if cfg.has("bell"): _find_bell(cfg.bell)
 	if cfg.has("eyes"): _find_eye_spots(cfg.eyes)
 	_windows_watch = bool(cfg.get("windows_watch", false))
+	if cfg.has("frogs"): _find_frogs(cfg.frogs)
 	if cfg.has("loop"): _start_loop(cfg.loop)
 	if cfg.has("crowd") and not sfx_muted():
 		_crowd = _loop_player(String(cfg.crowd.file), false) as AudioStreamPlayer
@@ -426,6 +428,8 @@ func _process(delta: float) -> void:
 	if cfg.has("bell"): _bell_step(delta)
 	if not _eye_spots.is_empty(): _eye_step(delta)
 	if _windows_watch: _windows_step()
+	if not _frogs.is_empty(): _frog_step(delta)
+	if not _ripples.is_empty(): _ripple_step(delta)
 	if _crowd != null: _crowd_step(delta)
 	_hook_t -= delta
 	if _hook_t <= 0.0:                                          # pasos: cada jugador nuevo, enganchado
@@ -682,7 +686,9 @@ func _on_step(pl: Node3D) -> void:
 	var pos := pl.global_position
 	var kind := String(cfg.get("step", "snow"))
 	var obstacles: ObstacleMap = arena.get_meta("obstacles")
-	if obstacles != null and obstacles.water_at(Vector2(pos.x, pos.z)) > 0.3: kind = "water"
+	if obstacles != null and obstacles.water_at(Vector2(pos.x, pos.z)) > 0.3:
+		kind = "water"
+		_ripple(Vector3(pos.x, 0.03, pos.z), 0.6, 0.7)                 # estela: ondas a cada paso al vadear
 	sfx_at("step_" + kind, pos)
 
 ## El cántico: más fuerte cuantos más cultistas quedan; sin ninguno (al caer el sacerdote se
@@ -804,6 +810,11 @@ func _drip_step(delta: float) -> void:
 		_ripple(at, 0.55 if dr[3] else 0.3, 0.8 if dr[3] else 0.45)          # en la roca, la película de agua del suelo
 		var near := Vector2(at.x - _focus().x, at.z - _focus().z).length()
 		sfx_at("drip", at, -clampf((near - 4.0) * 0.8, 0.0, 10.0))       # las lejanas, más bajas
+
+## Las ondas (gotas, el chorro de la fuente, la estela al vadear) se abren y se borran.
+## 16-10-2026: antes solo se movían donde había gotas; fuera de los túneles se quedaban quietas
+## e invisibles y no se borraban nunca.
+func _ripple_step(delta: float) -> void:
 	for r: Array in _ripples.duplicate():
 		r[2] += delta / 1.6
 		(r[1] as ShaderMaterial).set_shader_parameter("life", r[2])
@@ -1060,6 +1071,40 @@ func _watch_step(delta: float, t: float) -> void:
 				if close: continue
 				_watch_place(i, c)
 				break
+
+# ------------------------------------------------------------------ ranas
+
+## Ranas repartidas por el agua somera de la arena.
+func _find_frogs(c: Dictionary) -> void:
+	var obstacles: ObstacleMap = arena.get_meta("obstacles")
+	if obstacles == null or not obstacles.has_water(): return
+	var half: Vector2 = arena.get_meta("size") * 0.5
+	for k in 400:
+		if _frogs.size() >= int(c.get("n", 18)): break
+		var p := Vector2(_rng.randf_range(-half.x, half.x), _rng.randf_range(-half.y, half.y))
+		if obstacles.water_at(p) < 0.5: continue
+		_frogs.append([Vector3(p.x, 0.05, p.y), _rng.randf_range(0.5, 4.0), 0.0])
+
+## Croan a su aire; cerca de un jugador se callan y tardan unos segundos en volver a croar.
+func _frog_step(delta: float) -> void:
+	var c: Dictionary = cfg.frogs
+	var g := get_parent()
+	var players: Array = g.players if g != null and "players" in g else []
+	var f := _focus()
+	var hush := float(c.get("hush", 6.0))
+	for fr: Array in _frogs:
+		var p: Vector3 = fr[0]
+		for pl in players:
+			if is_instance_valid(pl) and pl.health > 0.0 and (pl as Node3D).global_position.distance_to(p) < hush:
+				fr[2] = _rng.randf_range(3.0, 6.0)                     # se calla
+		if fr[2] > 0.0:
+			fr[2] -= delta
+			continue
+		fr[1] -= delta
+		if fr[1] > 0.0: continue
+		var dist := Vector2(p.x - f.x, p.z - f.z).length()
+		fr[1] = _rng.randf_range(0.6, 2.5) if _rng.randf() < 0.7 else _rng.randf_range(4.0, 9.0)
+		if dist < 20.0: sfx_at("frog", p, -dist * 0.35)
 
 # ------------------------------------------------------------------ la campana del templo
 

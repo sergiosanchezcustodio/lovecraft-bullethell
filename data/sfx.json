@@ -645,6 +645,22 @@
 				"bell_0.wav"
 			],
 			"bus": "Ambiente"
+		},
+		"frog": {
+			"db": -21,
+			"pitch": [
+				0.85,
+				1.2
+			],
+			"voices": 3,
+			"gap": 0.12,
+			"files": [
+				"frog_0.wav",
+				"frog_1.wav",
+				"frog_2.wav",
+				"frog_3.wav"
+			],
+			"bus": "Ambiente"
 		}
 	}
 }

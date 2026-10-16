@@ -722,6 +722,29 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.gravity = Vector3(0, -7.0, 0)
 			m.scale_min = 0.02; m.scale_max = 0.035
 			m.color_ramp = _ramp([[0.0, Color(0.62, 0.72, 0.72, 0.9)], [1.0, Color(0.6, 0.7, 0.7, 0.0)]])
+		"leaves":                 # hojas que se desprenden de la copa y caen girando con el viento
+			p.draw_pass_1 = cube("lit")
+			p.amount = 10
+			p.lifetime = 5.0
+			p.preprocess = 5.0
+			p.visibility_aabb = AABB(Vector3(-6, -4, -6), Vector3(12, 6, 12))
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r
+			m.direction = Vector3(0.6, -0.2, 0.3)
+			m.spread = 50.0
+			m.initial_velocity_min = 0.1; m.initial_velocity_max = 0.4
+			m.gravity = Vector3(0.25, -0.45, 0.12)               # caen despacio, empujadas por el viento
+			m.damping_min = 0.3; m.damping_max = 0.6
+			m.turbulence_enabled = true
+			m.turbulence_noise_scale = 2.0
+			m.turbulence_influence_min = 0.02; m.turbulence_influence_max = 0.05
+			m.angle_min = -180.0; m.angle_max = 180.0
+			m.angular_velocity_min = -220.0; m.angular_velocity_max = 220.0
+			m.particle_flag_rotate_y = true
+			m.scale_min = 0.08; m.scale_max = 0.12
+			m.scale_curve = _curve([[0.0, 1.0], [0.9, 1.0], [1.0, 0.0]])
+			m.color_initial_ramp = _ramp([[0.0, Color(0.55, 0.42, 0.14)], [0.4, Color(0.62, 0.3, 0.1)],
+				[0.7, Color(0.35, 0.42, 0.16)], [1.0, Color(0.48, 0.36, 0.18)]])
 	m.color = tint
 	var key := "%s|%.1f|%s" % [recipe, r, tint.to_html()]
 	if _mat_cache.has(key): p.process_material = _mat_cache[key]
