@@ -440,6 +440,8 @@ func _process(delta: float) -> void:
 	if not _frogs.is_empty(): _frog_step(delta)
 	if not _ripples.is_empty(): _ripple_step(delta)
 	if not _drops.is_empty(): _drop_step(delta)
+	if not _prints.is_empty(): _prints_step(delta)
+	if cfg.has("gust_embers"): _gust_embers_step()
 	if not _moss.is_empty(): _moss_step(delta)
 	if _crowd != null: _crowd_step(delta)
 	_hook_t -= delta
@@ -520,27 +522,22 @@ func _whirl_step(delta: float) -> void:
 
 # ------------------------------------------------------------------ el mar
 
-## Barca amarrada junto al muro: el oleaje la acerca y la aleja (la amarra no la deja irse) y,
-## cuando llega, lo golpea con un toc de madera.
+## Barca amarrada a un pilote (16-10-2026; antes golpeaba el muro del muelle y no gustó): el
+## oleaje la balancea de lado a lado alrededor del pilote, que está delante de su proa.
 var moored_models: Array = []
+const BARCA_PILE := 1.73                                          ## m de la popa al pilote (gen_arena_muelle.py)
 func _moor(b: Array, t: float, s: float) -> void:
 	var h: Node3D = b[0]
 	var base: Vector3 = b[9]
-	if (b[10] as Vector3) == Vector3.ZERO:                          # hacia el muro: donde baja la distancia a la orilla
-		var p := Vector2(base.x, base.z)
-		var e := 0.5
-		var gx := shore_dist(p + Vector2(e, 0), _sea) - shore_dist(p - Vector2(e, 0), _sea)
-		var gz := shore_dist(p + Vector2(0, e), _sea) - shore_dist(p - Vector2(0, e), _sea)
-		b[10] = -Vector3(gx, 0, gz).normalized()
+	if (b[10] as Vector3) == Vector3.ZERO:                          # el pilote: delante de la proa (+x del modelo)
+		b[10] = base + Vector3(cos(float(b[4])), 0, -sin(float(b[4]))) * BARCA_PILE
+	var pile: Vector3 = b[10]
 	var T := float(_sea.get("period", 0.0)) if float(_sea.get("period", 0.0)) > 0.0 else lerpf(4.2, 7.5, float(_sea.state))
-	var u := sin(TAU * t / T + s)
-	var surge := 0.16 * maxf(u, -0.6)                               # hacia el muro llega más deprisa que se va
-	h.position.x = base.x + (b[10] as Vector3).x * surge
-	h.position.z = base.z + (b[10] as Vector3).z * surge
-	if u > 0.97 and float(b[11]) < t - T * 0.6:                       # toca el muro
-		b[11] = t
-		var f := _focus()
-		if Vector2(h.position.x - f.x, h.position.z - f.z).length() < 14.0: sfx_at("boat_knock", h.position)
+	var ang := 0.09 * sin(TAU * t / (T * 1.7) + s) + 0.03 * sin(TAU * t / (T * 0.9) + s * 2.1)
+	var off := (base - pile).rotated(Vector3.UP, ang)
+	h.position.x = pile.x + off.x
+	h.position.z = pile.z + off.z
+	h.basis = Basis(Vector3.UP, ang) * h.basis
 
 ## El viento del clima mueve la marejadilla y las rachas la encrespan (sea.gdshader).
 func _sea_wind() -> void:
@@ -769,6 +766,62 @@ func _on_step(pl: Node3D) -> void:
 		kind = "water"
 		_ripple(Vector3(pos.x, 0.03, pos.z), 0.6, 0.7)                 # estela: ondas a cada paso al vadear
 	sfx_at("step_" + kind, pos)
+	if cfg.get("footprints", false) and kind == "snow": _footprint(pl)
+
+## Huella en la nieve donde pisa (se borra en unos segundos), alternando pie izquierdo y derecho.
+var _prints: Array = []                         ## [malla, material, edad]
+var _foot := {}
+func _footprint(pl: Node3D) -> void:
+	var p: Player = pl
+	var fwd := Vector3(sin(p.visual.rotation.y), 0, cos(p.visual.rotation.y))
+	var side := Vector3(fwd.z, 0, -fwd.x)
+	var s: float = -1.0 if _foot.get(pl, 1.0) > 0.0 else 1.0
+	_foot[pl] = s
+	var mi := MeshInstance3D.new()
+	var bm := BoxMesh.new()
+	bm.size = Vector3(0.11, 0.008, 0.2)
+	mi.mesh = bm
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.albedo_color = Color(0.42, 0.48, 0.58, 0.45)
+	mi.material_override = m
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(mi)
+	mi.global_position = p.global_position + side * s * 0.1 + Vector3(0, 0.012, 0)
+	mi.rotation.y = p.visual.rotation.y
+	_prints.append([mi, m, 0.0])
+	if _prints.size() > 80:
+		(_prints[0][0] as Node).queue_free()
+		_prints.remove_at(0)
+
+func _prints_step(delta: float) -> void:
+	for pr: Array in _prints.duplicate():
+		pr[2] += delta
+		if pr[2] > 6.0:
+			var k := 1.0 - (float(pr[2]) - 6.0) / 4.0
+			if k <= 0.0:
+				(pr[0] as Node).queue_free()
+				_prints.erase(pr)
+				continue
+			(pr[1] as StandardMaterial3D).albedo_color.a = 0.45 * k
+
+## Ascuas que suben de las hogueras cuando las aviva una racha.
+var _gust_was := 0.0
+func _gust_embers_step() -> void:
+	var w := _weather()
+	if w == null or w.data == null: return
+	var ratio := w.wind_now().length() / maxf(w.data.wind, 0.1)
+	if ratio > 1.35 and _gust_was <= 1.35:
+		var f := _focus()
+		for h: Node in arena.get_node("Props").get_children():
+			var m := h.get_child(0) as Node3D
+			if m == null or not String(m.name) in cfg.gust_embers: continue
+			var gp := (h as Node3D).global_position
+			if Vector2(gp.x - f.x, gp.z - f.z).length() < 16.0:
+				VoxelFx.puff(self, gp + Vector3(0, 0.6, 0), "embers", 0.7, Color.WHITE, 1.5)
+				VoxelFx.puff(self, gp + Vector3(0, 1.0, 0), "embers", 0.5, Color.WHITE, 1.5)
+	_gust_was = ratio
 
 ## El cántico: más fuerte cuantos más cultistas quedan; sin ninguno (al caer el sacerdote se
 ## acaba el nivel y se van), se apaga despacio.
@@ -1454,7 +1507,7 @@ func _perch_step(delta: float, t: float) -> void:
 			bd.call -= delta
 			if bd.call <= 0.0:
 				bd.call = _rng.randf_range(8.0, 22.0)
-				if Vector2(b.position.x - f.x, b.position.z - f.z).length() < 13.0: sfx_at("bird_gull", b.position, -4.0)
+				if Vector2(b.position.x - f.x, b.position.z - f.z).length() < 13.0: sfx_at("bird_" + String(c.get("kind", "gull")), b.position, -4.0)
 			for pl in players:
 				if not is_instance_valid(pl) or pl.health <= 0.0: continue
 				var off: Vector3 = b.position - (pl as Node3D).global_position
@@ -1466,7 +1519,7 @@ func _perch_step(delta: float, t: float) -> void:
 					bd.v = (away + Vector3(_rng.randf_range(-0.3, 0.3), 0, _rng.randf_range(-0.3, 0.3))).normalized() * 3.5 + Vector3(0, 2.6, 0)
 					(_perch_spots[bd.spot] as Array)[1] = false
 					_fold(b, false)
-					sfx_at("bird_gull", b.position, -2.0)
+					sfx_at("bird_" + String(c.get("kind", "gull")), b.position, -2.0)
 					break
 		else:
 			bd.t += delta
@@ -1476,7 +1529,7 @@ func _perch_step(delta: float, t: float) -> void:
 			bd.v = v
 			b.position += v * delta
 			b.basis = Basis.looking_at(Vector3(v.x, v.y * 0.4, v.z).normalized(), Vector3.UP)
-			_flap(b, "gull", t + float(bd.ph), 0.0)
+			_flap(b, String(c.get("kind", "gull")), t + float(bd.ph), 0.0)
 			if bd.t > 7.0 or Vector2(b.position.x - f.x, b.position.z - f.z).length() > 30.0:
 				b.queue_free()
 				_perch.erase(bd)

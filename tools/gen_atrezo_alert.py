@@ -902,12 +902,13 @@ def barca(variant=1):
         for y in range(HH - 6, HH + 2):
             for a in range(0, 360, 15):
                 M.put(-24 + int(5 * math.cos(math.radians(a))), y, 12 + int(5 * math.sin(math.radians(a))), P, IRON_L if y != HH + 1 else IRON)
-    # amarra: de la cornamusa de la proa hasta el muelle (+x 38 voxels, +48 de altura: llega a la tabla)
+    # amarra: de la cornamusa de la proa a un pilote que queda delante (16-10-2026; antes subía al
+    # muelle): BARCA_PILE de la arena (1,73 m de la popa al centro del pilote), a 0,55 m del agua
     x0, y0 = L - 4, gun(L) + 2
     for i in range(80):
         t = i / 79
-        x = x0 + 38 * t
-        y = y0 + 48 * t - 14 * math.sin(math.pi * t)                                  # catenaria
+        x = x0 + 23 * t
+        y = y0 - 11 * t - 6 * math.sin(math.pi * t)                                   # catenaria
         for d in (0, 1): M.put(int(x), int(y) + d, 0, P, ROPE if i % 3 else ROPE_D)
     nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
     for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]

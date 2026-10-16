@@ -216,6 +216,47 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_curve = _curve([[0.0, 0.5], [1.0, 1.0]])
 			m.color_ramp = _ramp([[0.0, Color(0.6, 0.95, 0.3, 0.0)], [0.25, Color(0.35, 0.6, 0.12, 0.4)],
 				[1.0, Color(0.5, 0.7, 0.3, 0.0)]])
+		"fire":                   # fuego de antorchas y hogueras (16-10-2026): lenguas que lamen hacia arriba,
+			# se retuercen con la turbulencia, se encogen y pasan de amarillo a naranja y a rojo oscuro
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 230.0, 32.0, 110.0))
+			p.lifetime = 0.42 + r * 0.9
+			p.preprocess = 1.0
+			p.visibility_aabb = AABB(Vector3(-2, -0.5, -2), Vector3(4, 4, 4))
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.75
+			m.direction = Vector3.UP
+			m.spread = 10.0
+			m.initial_velocity_min = 0.5 + r * 1.2; m.initial_velocity_max = 1.0 + r * 2.4
+			m.gravity = Vector3(0, 1.3 + r * 2.0, 0)
+			m.radial_accel_min = -1.6; m.radial_accel_max = -0.6       # se juntan hacia el centro: forma de llama
+			m.damping_min = 0.2; m.damping_max = 0.6
+			m.turbulence_enabled = true
+			m.turbulence_noise_scale = 1.2 + r * 2.0
+			m.turbulence_noise_speed = Vector3(0, -1.2, 0)
+			m.turbulence_noise_strength = 1.6
+			m.turbulence_influence_min = 0.06; m.turbulence_influence_max = 0.16
+			m.angle_min = -40.0; m.angle_max = 40.0
+			m.scale_min = r * 0.22; m.scale_max = r * 0.42
+			m.scale_curve = _curve([[0.0, 0.55], [0.18, 1.0], [0.6, 0.6], [1.0, 0.05]])
+			m.color_ramp = _ramp([[0.0, Color(0.55, 0.42, 0.2, 0.8)], [0.18, Color(0.55, 0.28, 0.07, 0.8)],
+				[0.5, Color(0.45, 0.12, 0.02, 0.7)], [0.8, Color(0.24, 0.04, 0.0, 0.5)], [1.0, Color(0.06, 0.01, 0.0, 0.0)]])
+		"fire_core":              # el corazón del fuego: blanco amarillento, bajo, que late deprisa
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 120.0, 16.0, 50.0))
+			p.lifetime = 0.25 + r * 0.35
+			p.preprocess = 1.0
+			p.visibility_aabb = AABB(Vector3(-2, -0.5, -2), Vector3(4, 3, 4))
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.45
+			m.direction = Vector3.UP
+			m.spread = 8.0
+			m.initial_velocity_min = 0.3 + r; m.initial_velocity_max = 0.6 + r * 1.6
+			m.gravity = Vector3(0, 0.8, 0)
+			m.radial_accel_min = -1.0; m.radial_accel_max = -0.4
+			m.scale_min = r * 0.22; m.scale_max = r * 0.36
+			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.2]])
+			m.color_ramp = _ramp([[0.0, Color(0.62, 0.55, 0.36, 0.7)], [0.6, Color(0.58, 0.36, 0.1, 0.6)], [1.0, Color(0.5, 0.2, 0.03, 0.0)]])
 		"breath":                 # vaho del aliento con frío: una nubecilla que sale hacia delante (+Z) y se deshace
 			p.draw_pass_1 = cube("mix")
 			p.amount = 10

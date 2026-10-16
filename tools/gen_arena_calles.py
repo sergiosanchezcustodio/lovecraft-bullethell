@@ -51,9 +51,9 @@ for x, z in ((26.5, 16.0), (16.0, 26.5), (-14.0, 26.0)):
     A.add("inn_barril", x, z)
 A.add("inn_redes", 26.0, -10.0, rot=90)
 A.add("inn_redes", -22.0, 26.0, rot=0)
-for t in range(-30, 34, 5):
-    A.add("inn_pilote", t, HALF + 0.3, rot=0)
-    A.add("inn_pilote", HALF + 0.3, t, rot=0)
+for t in range(-30, 34, 5):                                    # en el agua, un 50 % más altos (16-10-2026)
+    A.add("inn_pilote_alto", t, HALF + 0.55, rot=0)
+    A.add("inn_pilote_alto", HALF + 0.55, t, rot=0)
 A.scatter("inn_escombros", 4, 12.0, 0.8, 1.2)
 A.scatter("inn_barril", 4, 10.0, 1.0, 1.0)
 # la sirena de bronce (gen_sirena.py) en la roca de la fuente, mirando a la cámara; al final, para
@@ -64,9 +64,10 @@ for x, z in ((HALF - 1.4, -2.5), (HALF - 1.4, 17.5), (2.5, HALF - 1.4), (-17.5, 
     A.add("inn_farola", x, z, rot=0, scale=1.2)
 # escalera de piedra que baja al agua (gen_escalera_muelle.py) con una barca amarrada al pie; fuera
 # el pilote que caería encima (16-10-2026)
-A.props = [p for p in A.props if not (p["model"] == "inn_pilote" and 11.5 < p["pos"][0] < 15.6 and abs(p["pos"][1] - (HALF + 0.3)) < 1.5)]
+A.props = [p for p in A.props if not (p["model"] == "inn_pilote_alto" and 11.5 < p["pos"][0] < 15.6 and abs(p["pos"][1] - (HALF + 0.55)) < 1.5)]
 A.add("inn_escalera_muelle", 12.0, HALF, rot=0, y=0.0)
-A.add("alr_barca", 16.6, HALF + 1.9, rot=90)
+A.add("alr_barca", 16.6, HALF + 2.6, rot=90, y=-1.05)                   # amarrada a su pilote, delante de la proa
+A.add("inn_pilote_alto", 16.6 + 0.0, HALF + 2.6 - 1.73, rot=0, y=-1.15)
 
 COLL = dict(COLLIDERS)
 COLL.update({
@@ -87,6 +88,7 @@ COLL.update({
     "inn_cajas_3": {"type": "box", "shrink": 0.85},
     "inn_nasa": {"type": "box", "shrink": 0.9},
     "inn_pilote": {"type": "cylinder", "radius": 0.18},
+    "inn_pilote_alto": {"type": "cylinder", "radius": 0.18},
     "inn_escombros": {"type": "cylinder", "radius": 0.7},
     "inn_farola": {"type": "cylinder", "radius": 0.2},
     "inn_barril": {"type": "cylinder", "radius": 0.35},
@@ -107,5 +109,5 @@ A.write({
               "background": [0.12, 0.15, 0.17], "fog_color": [0.26, 0.30, 0.33], "fog_density": 0.0},
     "lamp": {"color": [1.0, 0.78, 0.48], "energy": 2.2, "range": 8.0},
     "colliders": COLL,
-    "no_shadow": ["inn_pilote"],
+    "no_shadow": ["inn_pilote", "inn_pilote_alto"],
 })

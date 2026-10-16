@@ -1780,13 +1780,19 @@ def nasa():
     return M, {P: [0, 0, 0]}
 
 
-def pilote():
+def pilote_alto():
+    """Pilote del agua, un 50 % más alto (16-10-2026): el mismo, con 1,9 m."""
+    return pilote(1.5)
+
+
+def pilote(k=1.0):
     """Pilote del muelle (rehecho a 64/m en la revisión de arte del 13-10-2026): tronco gris
     curtido con vetas y grietas, la cabeza rajada y gastada, dos zunchos de hierro oxidado con
     regueros, una cornamusa de hierro, la franja de la marea con verdín, algas que cuelgan y
     percebes abajo, y un cabo dado de vueltas con su nudo y el chicote colgando."""
     M = Model(S=4, seed=78)
-    H, R = 80, 10.5
+    H, R = int(80 * k), 10.5
+    def zy(y): return int(round(y * k))                                # lo de arriba sube con el pilote
     for y in range(0, H):
         r = R - (1.5 if y > H - 4 else 0)
         for x in range(-12, 13):
@@ -1803,7 +1809,7 @@ def pilote():
                 if y < 26:                                                                 # marea: verdín, algas, percebes
                     c = lerp(c, SLIME_P, 0.6 + 0.3 * M.noise(x, y, z, 3.0))
                     if y < 18 and M.hsh(x, y, z) > 0.8: c = BARN if M.hsh(x, 2, z) > 0.4 else (0.40, 0.38, 0.33)
-                if y in (46, 47, 48, 64, 65, 66) and d > r - 1.5: c = IRON if M.hsh(x, y, z) > 0.25 else RUST
+                if y in [zy(q) for q in (46, 64)] + [zy(q) + 1 for q in (46, 64)] + [zy(q) + 2 for q in (46, 64)] and d > r - 1.5: c = IRON if M.hsh(x, y, z) > 0.25 else RUST
                 M.put(x, y, z, P, c)
     for y in range(32, 46):                                            # regueros de óxido bajo los zunchos
         for a in range(0, 360, 40):
@@ -1972,7 +1978,7 @@ def coche():
 
 PIECES = {'casa': casa, 'casa_2': lambda: casa(2), 'autobus': autobus, 'poste': poste, 'valla': valla, 'barril': barril,
           'redes': redes, 'barca': barca, 'farola': farola, 'juncos': juncos,
-          'fachada': fachada, 'templo_v1': templo, 'escombros_mano': escombros, 'escombros': escombros_v2, 'fuente_v1': fuente_v1, 'fuente': fuente,
+          'fachada': fachada, 'templo_v1': templo, 'escombros_mano': escombros, 'escombros': escombros_v2, 'fuente_v1': fuente_v1, 'fuente': fuente, 'pilote_alto': pilote_alto,
           'carretilla': carretilla, 'cajas': cajas, 'cajas_2': lambda: cajas(2), 'cajas_3': lambda: cajas(3), 'nasa': nasa, 'pilote': pilote, 'coche': coche}
 
 if __name__ == '__main__':

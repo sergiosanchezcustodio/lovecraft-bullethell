@@ -143,8 +143,14 @@ def hoguera():
         R = rng.uniform(19, 23)
         _log(M, (math.cos(aa) * R, 3, math.sin(aa) * R), (math.cos(aa) * 3.5, rng.uniform(32, 40), math.sin(aa) * 3.5),
              rng.uniform(2.4, 2.8), k + 3, charred=0.55)
-    # llamas: varias lenguas que se retuercen
-    tongues = [(0, 0, 78, 9)] + [(math.cos(i * 0.9 + 0.3) * rng.uniform(5, 9), math.sin(i * 0.9 + 0.3) * rng.uniform(5, 9), rng.randint(40, 62), rng.uniform(4.5, 6.5)) for i in range(7)]
+    # llamas: las pone Ambient (fuego de partículas en el pivote "fire", 16-10-2026: las lenguas de
+    # voxels eran un cono quieto). Quedan solo las brasas del centro.
+    for x in range(-7, 8):
+        for z in range(-7, 8):
+            if math.hypot(x, z) < 7 and M.hsh(x, 5, z) > 0.35:
+                M.put(x, 5 + int(M.hsh(x, 6, z) * 3), z, P, EMBER if M.hsh(x, 7, z) > 0.4 else EMBER_D, glow=1)
+    tongues = []
+    _unused = [(0, 0, 78, 9)] + [(math.cos(i * 0.9 + 0.3) * rng.uniform(5, 9), math.sin(i * 0.9 + 0.3) * rng.uniform(5, 9), rng.randint(40, 62), rng.uniform(4.5, 6.5)) for i in range(7)]
     for (tx, tz, h, r0) in tongues:
         ph = rng.uniform(0, 6)
         for y in range(6, 6 + h):
@@ -160,9 +166,7 @@ def hoguera():
                     elif f > 0.65 or d > r * 0.8: c = FLAME_R if f > 0.5 else FLAME
                     else: c = FLAME
                     M.put(x, y, z, P, c, glow=1)
-    for _ in range(26):                                                        # chispas
-        M.put(int(rng.uniform(-14, 14)), int(rng.uniform(70, 110)), int(rng.uniform(-14, 14)), P, SPARK, glow=1)
-    return M, {P: [0, 0, 0], 'light': [0, 40, 0]}
+    return M, {P: [0, 0, 0], 'light': [0, 40, 0], 'fire': [0, 8, 0]}
 
 
 def monolito():
@@ -614,9 +618,12 @@ def poste():
                 c = (0.18, 0.14, 0.10) if (y + int(math.atan2(z, x) * 4)) % 3 else (0.10, 0.08, 0.06)
                 if M.hsh(x, y, z) > 0.9: c = (1.0, 0.45, 0.15)
                 M.put(x, y, z, P, c, glow=1 if c == (1.0, 0.45, 0.15) else 0)
-    flames(M, 0, 0, H + 14, 48, 10)
-    for k in range(16):                                                             # chispas
-        M.put(rng.randint(-10, 10), H + 64 + rng.randint(0, 30), rng.randint(-10, 10), P, (1.0, 0.75, 0.35), glow=1)
+    # la llama la pone Ambient (fuego de partículas en el pivote "fire", 16-10-2026); arriba de los
+    # trapos, la brasa que arde
+    for x in range(-8, 9):
+        for z in range(-8, 9):
+            if math.hypot(x, z) < 8 and M.hsh(x, H + 18, z) > 0.3:
+                M.put(x, H + 18, z, P, (1.0, 0.55, 0.18) if M.hsh(x, 1, z) > 0.5 else (0.85, 0.25, 0.06), glow=1)
     for k in range(12):                                                             # círculo de piedras y ceniza
         a = k / 12 * math.tau
         cx, cz = 30 * math.cos(a), 30 * math.sin(a)
@@ -629,7 +636,7 @@ def poste():
             if 12 < math.hypot(x, z) < 25 and M.noise(x, 0, z, 4.0) > 0.4: M.put(x, 0, z, P, (0.22, 0.21, 0.20), over=False)
     nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
     for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
-    return M, {P: [0, 0, 0], 'light': [0, H + 30, 0]}
+    return M, {P: [0, 0, 0], 'light': [0, H + 30, 0], 'fire': [0, H + 19, 0]}
 
 
 def piragua():

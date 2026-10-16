@@ -257,6 +257,10 @@
    "type": "cylinder",
    "radius": 0.2
   },
+  "inn_pilote_alto": {
+   "type": "cylinder",
+   "radius": 0.2
+  },
   "alr_barca": {
    "type": "box",
    "shrink": 0.85
@@ -272,6 +276,7 @@
  },
  "no_shadow": [
   "inn_pilote",
+  "inn_pilote_alto",
   "alr_barca",
   "alr_barca_2",
   "alr_barca_3"
@@ -886,699 +891,699 @@
    "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -44.0,
-    32.62
-   ],
-   "rot": 48.3,
-   "scale": 1.1
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
-    32.25,
-    -44.0
-   ],
-   "rot": 280.9,
-   "scale": 1.05
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
-    -41.0,
-    32.12
-   ],
-   "rot": 101.5,
-   "scale": 1.12
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
-    31.98,
-    -41.0
-   ],
-   "rot": 227.9,
-   "scale": 1.08
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
-    -38.0,
     32.68
    ],
-   "rot": 260.8,
-   "scale": 1.13
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
-    32.39,
-    -38.0
-   ],
-   "rot": 359.0,
+   "rot": 48.3,
    "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
+   "pos": [
+    32.59,
+    -44.0
+   ],
+   "rot": 146.9,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote_alto",
+   "pos": [
+    -41.0,
+    32.75
+   ],
+   "rot": 200.5,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote_alto",
+   "pos": [
+    32.74,
+    -41.0
+   ],
+   "rot": 144.5,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote_alto",
+   "pos": [
+    -38.0,
+    32.69
+   ],
+   "rot": 235.1,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote_alto",
+   "pos": [
+    32.64,
+    -38.0
+   ],
+   "rot": 232.5,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote_alto",
    "pos": [
     -35.0,
-    32.94
+    32.52
    ],
-   "rot": 215.1,
-   "scale": 1.08
+   "rot": 142.2,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.18,
+    32.68,
     -35.0
    ],
-   "rot": 231.0,
-   "scale": 1.09
+   "rot": 228.9,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -32.0,
-    32.12
+    32.63
    ],
-   "rot": 283.2,
-   "scale": 1.07
+   "rot": 0.6,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.18,
+    32.62,
     -32.0
    ],
-   "rot": 312.4,
-   "scale": 1.18
+   "rot": 180.7,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -29.0,
-    32.65
+    32.58
    ],
-   "rot": 329.6,
-   "scale": 1.02
+   "rot": 355.1,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.86,
+    32.53,
     -29.0
    ],
-   "rot": 115.1,
-   "scale": 1.19
+   "rot": 306.2,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -26.0,
-    32.53
+    32.63
    ],
-   "rot": 39.2,
-   "scale": 1.07
+   "rot": 213.0,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.43,
+    32.61,
     -26.0
    ],
-   "rot": 148.8,
-   "scale": 1.16
+   "rot": 2.1,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -23.0,
-    31.93
+    32.72
    ],
-   "rot": 144.8,
-   "scale": 1.2
+   "rot": 137.9,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.24,
+    32.54,
     -23.0
    ],
-   "rot": 66.3,
-   "scale": 1.05
+   "rot": 187.0,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -20.0,
-    31.92
+    32.58
    ],
-   "rot": 82.6,
-   "scale": 1.14
+   "rot": 331.7,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    33.03,
+    32.71,
     -20.0
    ],
-   "rot": 185.5,
-   "scale": 1.12
+   "rot": 24.1,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -17.0,
-    32.4
+    32.61
    ],
-   "rot": 235.9,
-   "scale": 1.12
+   "rot": 222.8,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.49,
+    32.7,
     -17.0
    ],
-   "rot": 194.1,
-   "scale": 1.17
+   "rot": 266.0,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -14.0,
-    32.99
+    32.52
    ],
-   "rot": 302.1,
-   "scale": 1.02
+   "rot": 33.6,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.94,
+    32.75,
     -14.0
    ],
-   "rot": 49.5,
-   "scale": 1.04
+   "rot": 238.3,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -11.0,
-    32.48
+    32.73
    ],
-   "rot": 223.5,
-   "scale": 1.09
+   "rot": 167.2,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.98,
+    32.69,
     -11.0
    ],
-   "rot": 154.9,
-   "scale": 1.06
+   "rot": 333.4,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -8.0,
-    32.44
+    32.68
    ],
-   "rot": 220.9,
-   "scale": 1.03
+   "rot": 81.2,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.04,
+    32.69,
     -8.0
    ],
    "rot": 191.1,
-   "scale": 1.17
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
-    -5.0,
-    32.9
-   ],
-   "rot": 168.6,
-   "scale": 1.03
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
-    32.25,
-    -5.0
-   ],
-   "rot": 178.0,
-   "scale": 1.06
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
-    -2.0,
-    31.91
-   ],
-   "rot": 327.3,
-   "scale": 1.18
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
-    33.07,
-    -2.0
-   ],
-   "rot": 184.2,
-   "scale": 1.15
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
-    1.0,
-    32.64
-   ],
-   "rot": 68.6,
    "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    33.09,
+    -5.0,
+    32.75
+   ],
+   "rot": 168.6,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote_alto",
+   "pos": [
+    32.59,
+    -5.0
+   ],
+   "rot": 327.6,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote_alto",
+   "pos": [
+    -2.0,
+    32.7
+   ],
+   "rot": 213.1,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote_alto",
+   "pos": [
+    32.71,
+    -2.0
+   ],
+   "rot": 200.3,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote_alto",
+   "pos": [
+    1.0,
+    32.73
+   ],
+   "rot": 356.0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_pilote_alto",
+   "pos": [
+    32.79,
     1.0
    ],
    "rot": 326.1,
-   "scale": 1.03
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     4.0,
-    31.94
+    32.51
    ],
-   "rot": 45.1,
-   "scale": 1.16
+   "rot": 83.7,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    33.04,
+    32.57,
     4.0
    ],
    "rot": 51.7,
-   "scale": 1.05
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     7.0,
-    31.97
+    32.52
    ],
-   "rot": 110.1,
-   "scale": 1.07
+   "rot": 353.5,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.43,
+    32.54,
     7.0
    ],
    "rot": 162.2,
-   "scale": 1.19
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     10.0,
-    32.83
+    32.73
    ],
-   "rot": 28.2,
-   "scale": 1.17
+   "rot": 1.8,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.77,
+    32.71,
     10.0
    ],
-   "rot": 80.3,
-   "scale": 1.15
+   "rot": 250.7,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     13.0,
-    32.4
+    32.68
    ],
-   "rot": 315.0,
-   "scale": 1.04
+   "rot": 77.5,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    31.91,
+    32.69,
     13.0
    ],
-   "rot": 223.2,
-   "scale": 1.2
+   "rot": 351.2,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    33.0,
+    32.8,
     16.0
    ],
-   "rot": 195.9,
-   "scale": 1.06
+   "rot": 50.5,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.9,
+    32.53,
     19.0
    ],
-   "rot": 6.7,
-   "scale": 1.03
+   "rot": 240.8,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     22.0,
-    32.26
+    32.66
    ],
-   "rot": 169.0,
-   "scale": 1.02
+   "rot": 163.3,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.61,
+    32.72,
     22.0
    ],
-   "rot": 170.0,
-   "scale": 1.15
+   "rot": 169.0,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     25.0,
-    32.31
+    32.68
    ],
-   "rot": 274.4,
-   "scale": 1.05
+   "rot": 170.0,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.09,
+    32.6,
     25.0
    ],
-   "rot": 1.2,
-   "scale": 1.01
+   "rot": 184.6,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     28.0,
-    32.74
+    32.75
    ],
-   "rot": 286.6,
-   "scale": 1.14
+   "rot": 252.1,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.48,
+    32.72,
     28.0
    ],
-   "rot": 149.9,
-   "scale": 1.05
+   "rot": 173.9,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     31.0,
-    32.15
+    32.6
    ],
-   "rot": 60.9,
-   "scale": 1.11
+   "rot": 28.7,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.26,
+    32.68,
     31.0
    ],
-   "rot": 323.0,
-   "scale": 1.09
+   "rot": 106.6,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     34.0,
-    32.77
+    32.58
    ],
-   "rot": 235.0,
-   "scale": 1.09
+   "rot": 261.0,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.58,
+    32.54,
     34.0
    ],
-   "rot": 38.9,
-   "scale": 1.2
+   "rot": 285.5,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     37.0,
-    32.83
+    32.79
    ],
-   "rot": 5.4,
-   "scale": 1.09
+   "rot": 196.8,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.0,
+    32.64,
     37.0
    ],
-   "rot": 167.6,
-   "scale": 1.17
+   "rot": 32.5,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     40.0,
-    32.5
+    32.66
    ],
-   "rot": 333.4,
-   "scale": 1.04
+   "rot": 79.2,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.42,
+    32.78,
     40.0
    ],
-   "rot": 356.8,
-   "scale": 1.09
+   "rot": 221.9,
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     43.0,
-    32.28
+    32.53
    ],
    "rot": 187.4,
-   "scale": 1.05
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
-    32.94,
+    32.76,
     43.0
    ],
    "rot": 292.6,
-   "scale": 1.02
+   "scale": 1.0
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -30.72,
     -32.51
    ],
    "rot": 211.3,
-   "scale": 1.06,
+   "scale": 1.03,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -28.26,
     -32.77
    ],
    "rot": 257.9,
-   "scale": 1.17,
+   "scale": 1.09,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -25.37,
     -32.69
    ],
    "rot": 28.6,
-   "scale": 1.06,
+   "scale": 1.03,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -22.0,
     -32.87
    ],
    "rot": 263.8,
-   "scale": 1.13,
+   "scale": 1.07,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -18.78,
     -32.79
    ],
    "rot": 145.3,
-   "scale": 1.18,
+   "scale": 1.09,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -16.05,
     -32.61
    ],
    "rot": 137.8,
-   "scale": 1.07,
+   "scale": 1.04,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -13.15,
     -32.71
    ],
    "rot": 43.8,
-   "scale": 1.03,
+   "scale": 1.01,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -10.21,
     -32.86
    ],
    "rot": 354.0,
-   "scale": 1.07,
+   "scale": 1.04,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -7.06,
     -32.66
    ],
    "rot": 357.7,
-   "scale": 1.18,
+   "scale": 1.09,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -3.81,
     -32.61
    ],
    "rot": 96.2,
-   "scale": 1.11,
+   "scale": 1.06,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     -0.69,
     -32.73
    ],
    "rot": 319.6,
-   "scale": 1.11,
+   "scale": 1.06,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     1.74,
     -32.83
    ],
    "rot": 98.7,
-   "scale": 1.15,
+   "scale": 1.08,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     4.6,
     -32.52
    ],
    "rot": 65.9,
-   "scale": 1.17,
+   "scale": 1.08,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     8.33,
     -32.82
    ],
    "rot": 273.0,
-   "scale": 1.11,
+   "scale": 1.05,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     11.14,
     -32.54
    ],
    "rot": 229.7,
-   "scale": 1.06,
+   "scale": 1.03,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     14.29,
     -32.85
    ],
    "rot": 69.5,
-   "scale": 1.05,
+   "scale": 1.02,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     17.36,
     -32.65
    ],
    "rot": 52.6,
-   "scale": 1.14,
+   "scale": 1.07,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     20.13,
     -32.93
@@ -1588,99 +1593,159 @@
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     22.82,
     -32.94
    ],
    "rot": 179.3,
-   "scale": 1.03,
+   "scale": 1.01,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     25.99,
     -32.65
    ],
    "rot": 152.6,
-   "scale": 1.06,
+   "scale": 1.03,
    "y": -1.35
   },
   {
-   "model": "inn_pilote",
+   "model": "inn_pilote_alto",
    "pos": [
     28.64,
     -32.54
    ],
    "rot": 226.4,
-   "scale": 1.13,
+   "scale": 1.06,
    "y": -1.35
   },
   {
    "model": "alr_barca",
    "pos": [
     19.0,
-    -33.9
+    -34.6
    ],
    "rot": -90,
    "scale": 1.0,
    "y": -1.25
   },
   {
+   "model": "inn_pilote_alto",
+   "pos": [
+    19.0,
+    -32.87
+   ],
+   "rot": 0,
+   "scale": 1.0,
+   "y": -1.35
+  },
+  {
    "model": "alr_barca_2",
    "pos": [
     23.5,
-    -34.1
+    -34.7
    ],
    "rot": -84,
    "scale": 1.0,
    "y": -1.25
   },
   {
+   "model": "inn_pilote_alto",
+   "pos": [
+    23.68,
+    -32.98
+   ],
+   "rot": 0,
+   "scale": 1.0,
+   "y": -1.35
+  },
+  {
    "model": "alr_barca_3",
    "pos": [
     28.0,
-    -33.9
+    -34.6
    ],
    "rot": -95,
    "scale": 1.0,
    "y": -1.25
   },
   {
+   "model": "inn_pilote_alto",
+   "pos": [
+    27.85,
+    -32.88
+   ],
+   "rot": 0,
+   "scale": 1.0,
+   "y": -1.35
+  },
+  {
    "model": "alr_barca_2",
    "pos": [
     -24.0,
-    33.9
+    34.6
    ],
    "rot": 92,
    "scale": 1.0,
    "y": -1.25
   },
   {
+   "model": "inn_pilote_alto",
+   "pos": [
+    -24.06,
+    32.87
+   ],
+   "rot": 0,
+   "scale": 1.0,
+   "y": -1.35
+  },
+  {
    "model": "alr_barca",
    "pos": [
     -6.0,
-    34.0
+    34.6
    ],
    "rot": 86,
    "scale": 1.0,
    "y": -1.25
   },
   {
+   "model": "inn_pilote_alto",
+   "pos": [
+    -5.88,
+    32.87
+   ],
+   "rot": 0,
+   "scale": 1.0,
+   "y": -1.35
+  },
+  {
    "model": "alr_barca_3",
    "pos": [
     12.0,
-    33.9
+    34.6
    ],
    "rot": 90,
    "scale": 1.0,
    "y": -1.25
   },
   {
+   "model": "inn_pilote_alto",
+   "pos": [
+    12.0,
+    32.87
+   ],
+   "rot": 0,
+   "scale": 1.0,
+   "y": -1.35
+  },
+  {
    "model": "alr_barca",
    "pos": [
-    33.9,
+    34.6,
     16.0
    ],
    "rot": 180,
@@ -1688,14 +1753,34 @@
    "y": -1.25
   },
   {
+   "model": "inn_pilote_alto",
+   "pos": [
+    32.87,
+    16.0
+   ],
+   "rot": 0,
+   "scale": 1.0,
+   "y": -1.35
+  },
+  {
    "model": "alr_barca_3",
    "pos": [
-    34.0,
+    34.6,
     -10.0
    ],
    "rot": 176,
    "scale": 1.0,
    "y": -1.25
+  },
+  {
+   "model": "inn_pilote_alto",
+   "pos": [
+    32.87,
+    -10.12
+   ],
+   "rot": 0,
+   "scale": 1.0,
+   "y": -1.35
   },
   {
    "model": "alr_linterna",
@@ -1747,10 +1832,21 @@
    "model": "alr_barca",
    "pos": [
     20.7,
-    33.9
+    34.6
    ],
    "rot": 90,
-   "scale": 1.0
+   "scale": 1.0,
+   "y": -1.25
+  },
+  {
+   "model": "inn_pilote_alto",
+   "pos": [
+    20.7,
+    32.87
+   ],
+   "rot": 0,
+   "scale": 1.0,
+   "y": -1.35
   }
  ],
  "mask": {
