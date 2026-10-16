@@ -94,8 +94,8 @@ def ambiente():
     """Sonidos de ambiente de los escenarios (16-10-2026), con su propio azar para no cambiar los
     de synth(): gotas en la gruta con su eco, golpes de ola contra el casco, crujidos del gancho
     de los faroles que se mecen, truenos, el viento y la lluvia en bucle (sin costura: el final se
-    funde con el principio), los graznidos de las bandadas, el fuego, y los crujidos del suelo y la
-    lluvia tras los cristales del estudio."""
+    funde con el principio), los graznidos de las bandadas, el fuego, los crujidos del suelo y la
+    lluvia tras los cristales del estudio, el cántico de los cultistas, la bandera y los pasos."""
     r = np.random.default_rng(1016)
     def nz(d): return r.standard_normal(int(d * SR))
     def cave(x, tail=0.9, level=0.25):                       # eco de cueva: cola de ruido que decae
@@ -164,6 +164,9 @@ def ambiente():
     lluvia(r)
     fuego(r)
     estudio(r)
+    cantico(r)
+    bandera(r)
+    pasos(r)
 
 
 def save_loop(name, w, d, fade):
@@ -285,6 +288,122 @@ def estudio(r):
     taps /= np.max(np.abs(taps)) + 1e-9
     w = muffled * 0.3 + taps * 0.55
     save_loop('rain_window_loop', w, d, fade)
+
+
+def save_raw(name, x):
+    """Sin fundido al final (bucles que ya son periódicos)."""
+    x = np.asarray(x, dtype=np.float64)
+    x = x / (np.max(np.abs(x)) + 1e-9) * 0.9
+    with wave.open(os.path.join(OUT, name + '.wav'), 'wb') as wv:
+        wv.setnchannels(1); wv.setsampwidth(2); wv.setframerate(SR)
+        wv.writeframes((x * 32767).astype(np.int16).tobytes())
+
+
+def cantico(r):
+    """Cántico lejano de los cultistas (16-10-2026): un coro grave que salmodia "Ph'nglui mglw'nafh
+    Cthulhu R'lyeh wgah'nagl fhtagn" sobre una nota recitada, siete voces algo desafinadas y a
+    destiempo, vocales por formantes y eco de lejos. Dos rezos de 8 s; la junta cae en el silencio
+    entre rezos y el eco se calcula en círculo: el bucle no tiene costura."""
+    cycle, reps = 8.0, 2
+    d = cycle * reps
+    n = int(d * SR)
+    VOW = {'a': ((650, 5), (1080, 7), (2650, 9)), 'o': ((420, 5), (760, 7), (2500, 9)),
+           'u': ((310, 5), (700, 7), (2300, 9)), 'i': ((300, 5), (1850, 8), (2700, 9))}
+    rezo = [('a', 0, .5), ('u', 0, .45), ('i', -2, .45), ('a', 0, .6), ('u', -3, .55), ('o', 0, .45),
+            ('a', 0, .5), ('u', -2, .7), ('o', 0, .45), ('a', -3, .5), ('a', 0, .45), ('u', -5, 1.0)]
+    vow_w = {v: np.zeros(n) for v in VOW}
+    env = np.zeros(n)
+    note = np.zeros(n)
+    cons = np.zeros(n)
+    for c in range(reps):
+        t0 = c * cycle + 0.2
+        for k, (v, semi, dur) in enumerate(rezo):
+            if c == 1 and k == len(rezo) - 1: semi = -7                   # el segundo rezo acaba más abajo
+            a0, a1 = int(t0 * SR), int((t0 + dur) * SR)
+            m = a1 - a0
+            x = np.linspace(0, 1, m)
+            e = np.minimum(x * dur / 0.07, 1) * np.minimum((1 - x) * dur / 0.09, 1)
+            env[a0:a1] = np.maximum(env[a0:a1], e)
+            vow_w[v][a0:a1] = np.maximum(vow_w[v][a0:a1], e)
+            note[a0:a1] = semi
+            cb = min(int(0.03 * SR), m)
+            cons[a0:a0 + cb] += np.exp(-np.arange(cb) / (cb * 0.3))
+            t0 += dur + 0.04
+    note = lp(note, 12)                                       # deslizar de una nota a otra
+    for v in vow_w: vow_w[v] = lp(vow_w[v], 25)
+    chorus = np.zeros(n)
+    for i in range(7):
+        f0 = (98.0 if i < 5 else 65.4) * (1 + r.uniform(-0.012, 0.012))
+        shift = int(r.uniform(-0.05, 0.05) * SR)
+        f = f0 * 2 ** (np.roll(note, shift) / 12) * (1 + 0.004 * np.sin(2 * np.pi * (4.5 + i * 0.3) * np.arange(n) / SR))
+        ph = np.cumsum(f) / SR
+        src = 2 * (ph % 1.0) - 1                              # diente de sierra: la voz antes de la boca
+        voice = np.zeros(n)
+        for v, forms in VOW.items():
+            fv = sum(signal.lfilter(*signal.iirpeak(fc / (SR / 2), q), src) for fc, q in forms)
+            voice += fv * np.roll(vow_w[v], shift)
+        chorus += voice * np.roll(env, shift)
+    chorus += bp(r.standard_normal(n), 1500, 5000) * cons * 0.4      # consonantes
+    chorus = lp(chorus, 1600)                                        # lejos
+    tail = 2.5
+    ir = r.standard_normal(int(tail * SR)) * np.exp(-t(tail) / 0.7)
+    ir = lp(ir, 1200)
+    ir_full = np.zeros(n); ir_full[:len(ir)] = ir
+    wet = np.real(np.fft.ifft(np.fft.fft(chorus) * np.fft.fft(ir_full)))   # eco en círculo: sin costura
+    wet *= np.std(chorus) / (np.std(wet) + 1e-9)
+    save_raw('chant_loop', chorus * 0.55 + wet * 0.8)
+
+
+def bandera(r):
+    """Bandera que aletea (16-10-2026): ráfagas de tela que golpea a 6-14 veces por segundo y algún
+    chasquido; en bucle. Ambient la sube con las rachas del clima."""
+    d, fade = 8.0, 2.0
+    n = int((d + fade) * SR)
+    rate = lp(r.standard_normal(n), 0.8, 1)
+    rate = 9 + 4 * rate / np.std(rate)
+    ph = np.cumsum(np.clip(rate, 5, 15)) / SR
+    am = (0.5 + 0.5 * np.sin(2 * np.pi * ph)) ** 4
+    gust = lp(r.standard_normal(n), 0.4, 1)
+    gust = np.clip(0.7 + 0.35 * gust / np.std(gust), 0.25, 1.4)
+    cloth = bp(r.standard_normal(n), 180, 2600) * am * gust
+    cloth /= np.std(cloth)
+    snaps = bp(_bursts(r, n, 0.9, (0.6, 1.0), 0.006), 700, 4500)
+    w = cloth * 0.5 + snaps / (np.max(np.abs(snaps)) + 1e-9) * 0.8 * np.repeat(gust[::1], 1)
+    save_loop('flag_loop', w, d, fade)
+
+
+def pasos(r):
+    """Pasos (16-10-2026), cuatro de cada: nieve que cruje, tablas, piedra, barro y agua somera."""
+    for i in range(4):
+        d = 0.22
+        tt = t(d)
+        imp = np.zeros(len(tt)); k = r.integers(0, int(0.12 * SR), 120); imp[k] = r.uniform(0.2, 1, len(k))
+        crunch = bp(imp, 900, 5000) * np.minimum(tt / 0.012, 1) * np.exp(-tt / 0.07)
+        save('step_snow_%d' % i, crunch + lp(r.standard_normal(len(tt)), 220) * np.exp(-tt / 0.04) * 0.6)
+        d = 0.18
+        tt = t(d)
+        f0 = 140 + 30 * r.random()
+        knock = np.sin(2 * np.pi * f0 * tt) * np.exp(-tt / 0.04) + 0.5 * np.sin(2 * np.pi * (480 + 60 * r.random()) * tt) * np.exp(-tt / 0.022)
+        save('step_wood_%d' % i, knock + hp(r.standard_normal(len(tt)), 2000) * np.exp(-tt / 0.002) * 0.4)
+        d = 0.16
+        tt = t(d)
+        tap = bp(r.standard_normal(len(tt)), 1500, 6000) * np.exp(-tt / 0.006)
+        scuff = bp(r.standard_normal(len(tt)), 700, 3000) * np.exp(-((tt - 0.05) / 0.035) ** 2) * 0.35
+        save('step_stone_%d' % i, tap + scuff + np.sin(2 * np.pi * 90 * tt) * np.exp(-tt / 0.03) * 0.5)
+        d = 0.26
+        tt = t(d)
+        fc = 300 + 700 * np.clip(tt / 0.16, 0, 1)
+        nz = lp(r.standard_normal(len(tt)), 1500)
+        out = np.zeros(len(tt)); step = 512
+        for a0 in range(0, len(tt), step):                   # chapoteo de barro: resonancia que sube
+            b, aa = signal.iirpeak(fc[a0] / (SR / 2), 6)
+            out[a0:a0 + step] = signal.lfilter(b, aa, nz[a0:a0 + step])
+        save('step_mud_%d' % i, out * np.minimum(tt / 0.01, 1) * np.exp(-tt / 0.09))
+        d = 0.3
+        tt = t(d)
+        spl = bp(r.standard_normal(len(tt)), 400, 4500) * np.minimum(tt / 0.005, 1) * np.exp(-tt / 0.08)
+        blub = np.sin(2 * np.pi * np.cumsum(600 + 2500 * tt) / SR) * np.exp(-np.maximum(tt - 0.04, 0) / 0.03) * (tt > 0.04) * 0.3
+        save('step_water_%d' % i, spl + blub)
 
 
 def lluvia(r):

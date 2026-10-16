@@ -60,14 +60,15 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 		fx.position = Vector3(pv[0], pv[1], pv[2]) * vs + Vector3(0, float(e.get("dy", 0.0)), 0)
 		holder.add_child(fx)
 	var out := {}
-	if c.has("sound") and pivots.has("light") and not Sfx.muted:       # el fuego que chisporrotea
+	var sat := String((c.get("sound", {}) as Dictionary).get("at", "light"))
+	if c.has("sound") and pivots.has(sat) and not Sfx.muted:          # el fuego que chisporrotea, la bandera
 		var sp := _loop_player(String(c.sound.file), true)
 		if sp != null:
-			var lp: Array = pivots["light"]
+			var lp: Array = pivots[sat]
 			sp.position = Vector3(lp[0], lp[1], lp[2]) * vs
 			sp.pitch_scale = float(c.sound.get("pitch", 1.0))
 			holder.add_child(sp)
-			out["sound"] = [sp, float(c.sound.get("db", -18.0)), float(c.sound.get("range", 8.0))]
+			out["sound"] = [sp, float(c.sound.get("db", -18.0)), float(c.sound.get("range", 8.0)), float(c.sound.get("wind", 0.0))]
 	if c.has("bob") and in_sea: out["bob"] = float(c.bob)
 	if c.has("swing") and (m.get_meta("part_nodes") as Dictionary).has(String(c.swing.get("part", ""))): out["swing"] = c.swing
 	if c.has("glow"): out["glow"] = c
@@ -180,6 +181,12 @@ var _flash_was := 0.0
 var _sounds: Array = []                         ## [reproductor 3D, dB, alcance]: el fuego
 var _walked := {}                               ## jugador -> [última posición, m hasta el próximo crujido]
 var _next_idle_creak := 6.0
+var _crowd: AudioStreamPlayer                   ## el cántico de los cultistas mientras quedan
+var _crowd_db := -80.0
+var _crowd_n := 0
+var _count_t := 0.0
+var _hook_t := 0.0
+var _hooked := {}
 var demo := false
 
 func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
@@ -219,6 +226,11 @@ func _ready() -> void:
 	if cfg.has("spills"): _find_spills(cfg.spills)
 	if cfg.has("spray"): _find_sprays(cfg.spray)
 	if cfg.has("loop"): _start_loop(cfg.loop)
+	if cfg.has("crowd") and not Sfx.muted:
+		_crowd = _loop_player(String(cfg.crowd.file), false) as AudioStreamPlayer
+		if _crowd != null:
+			add_child(_crowd)
+			_crowd.play(_rng.randf() * _crowd.stream.get_length())
 	VoxelBuilder.sky_glass_material().set_shader_parameter("rain", float(cfg.get("glass_rain", 0.0)))
 
 ## Farol que cuelga: su parte gira sobre el gancho y se lleva la luz y el halo de niebla.
@@ -314,6 +326,16 @@ func _process(delta: float) -> void:
 	if _loop != null: _loop_step(delta)
 	if not _sounds.is_empty(): _sound_step()
 	if cfg.has("creaks"): _creak_step(delta)
+	if _crowd != null: _crowd_step(delta)
+	_hook_t -= delta
+	if _hook_t <= 0.0:                                          # pasos: cada jugador nuevo, enganchado
+		_hook_t = 1.0
+		var g := get_parent()
+		if g != null and "players" in g:
+			for pl in g.players:
+				if is_instance_valid(pl) and not _hooked.has(pl):   # (con bind, is_connected no lo reconoce)
+					_hooked[pl] = true
+					pl.stepped.connect(_on_step.bind(pl))
 	if not _lit.is_empty() or _flash_was > 0.0: _flash_step()
 
 func _focus() -> Vector3:
@@ -415,7 +437,37 @@ func _sound_step() -> void:
 			continue
 		if not p.playing: p.play(_rng.randf() * p.stream.get_length())
 		var k := clampf(dist / reach, 0.0, 1.2)
-		p.volume_db = float(s[1]) - 20.0 * k * k
+		var db := float(s[1]) - 20.0 * k * k
+		if s.size() > 3 and float(s[3]) > 0.0:                      # la bandera: las rachas la agitan
+			var w := _weather()
+			if w != null and w.data != null: db += float(s[3]) * 8.0 * log(maxf(w.wind_now().length() / maxf(w.data.wind, 0.1), 0.5)) / log(2.0)
+		p.volume_db = db
+
+## Un paso, con el sonido del suelo de la arena (o de agua si vadea).
+func _on_step(pl: Node3D) -> void:
+	var pos := pl.global_position
+	var kind := String(cfg.get("step", "snow"))
+	var obstacles: ObstacleMap = arena.get_meta("obstacles")
+	if obstacles != null and obstacles.water_at(Vector2(pos.x, pos.z)) > 0.3: kind = "water"
+	Sfx.play_at("step_" + kind, pos)
+
+## El cántico: más fuerte cuantos más cultistas quedan; sin ninguno (al caer el sacerdote se
+## acaba el nivel y se van), se apaga despacio.
+func _crowd_step(delta: float) -> void:
+	var c: Dictionary = cfg.crowd
+	_count_t -= delta
+	if _count_t <= 0.0:
+		_count_t = 0.5
+		_crowd_n = 0
+		var g := get_parent()
+		if g != null and "world" in g and g.world != null:
+			var tag := StringName(String(c.get("tag", "humana")))
+			for e in g.world.enemies:
+				if is_instance_valid(e) and e is Enemy and (e as Enemy).is_alive() and (e as Enemy).data.tags.has(tag): _crowd_n += 1
+	var target := -80.0
+	if _crowd_n > 0: target = float(c.get("db", -20.0)) + 20.0 * log(clampf(float(_crowd_n) / float(c.get("full", 6)), 0.25, 1.0)) / log(10.0)
+	_crowd_db = lerpf(_crowd_db, target, minf(delta * (0.35 if target < _crowd_db else 0.8), 1.0))
+	_crowd.volume_db = _crowd_db
 
 ## El suelo de tablas cruje: bajo los pies de quien anda y, de vez en cuando, solo.
 func _creak_step(delta: float) -> void:

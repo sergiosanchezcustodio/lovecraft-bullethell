@@ -8,6 +8,7 @@ signal damaged(d: Damage)
 signal downed                    ## vida a cero
 signal revived                   ## un compañero lo ha levantado (cooperativo)
 signal eliminated                ## se acabó su tiempo derribado: fuera hasta el siguiente nivel
+signal stepped                   ## un pie toca el suelo al andar (pasos: Ambient)
 
 const LAYER_WORLD := 1
 const LAYER_PLAYERS := 2
@@ -480,7 +481,9 @@ func _animate(delta: float) -> void:
 		t = _action_t / Anims.duration(data.model, _action)
 	elif anim == "walk":
 		# cadencia proporcional a la velocidad real: los pies no patinan
+		var before := _anim_t
 		_anim_t += delta * (motor.velocity.length() / data.move_speed) / Anims.duration(data.model, "walk")
+		if floorf(_anim_t * 2.0 - 0.5) != floorf(before * 2.0 - 0.5): stepped.emit()   # pies abajo en 0,25 y 0,75
 		t = fposmod(_anim_t, 1.0)
 	else:
 		_anim_t += delta / Anims.duration(data.model, anim)
