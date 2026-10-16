@@ -1248,29 +1248,11 @@
   {
    "model": "inn_pilote",
    "pos": [
-    16.0,
-    32.1
-   ],
-   "rot": 170.9,
-   "scale": 1.09
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
     33.0,
     16.0
    ],
    "rot": 195.9,
    "scale": 1.06
-  },
-  {
-   "model": "inn_pilote",
-   "pos": [
-    19.0,
-    32.24
-   ],
-   "rot": 196.3,
-   "scale": 1.13
   },
   {
    "model": "inn_pilote",
@@ -1750,6 +1732,25 @@
    ],
    "rot": -90,
    "scale": 1.2
+  },
+  {
+   "model": "inn_escalera_muelle",
+   "pos": [
+    16.0,
+    32.0
+   ],
+   "rot": 0,
+   "scale": 1.0,
+   "y": 0.0
+  },
+  {
+   "model": "alr_barca",
+   "pos": [
+    20.7,
+    33.9
+   ],
+   "rot": 90,
+   "scale": 1.0
   }
  ],
  "mask": {

@@ -697,6 +697,31 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.05; m.scale_max = 0.1
 			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.3]])
 			m.color_ramp = _ramp([[0.0, Color(0.68, 0.74, 0.78, 0.8)], [1.0, Color(0.6, 0.66, 0.7, 0.0)]])
+		"spout":                  # chorro de agua (la sirena de la fuente): gotas en arco a lo largo de +Z
+			p.draw_pass_1 = cube("mix")
+			p.amount = 90
+			p.lifetime = r                                       # aquí r es lo que tarda en caer (s)
+			p.preprocess = r
+			p.visibility_aabb = AABB(Vector3(-3, -4, -3), Vector3(6, 6, 6))
+			m.direction = Vector3(0, 0, 1)
+			m.spread = 1.6
+			m.initial_velocity_min = 2.15; m.initial_velocity_max = 2.25
+			m.gravity = Vector3(0, -9.8, 0)
+			m.scale_min = 0.03; m.scale_max = 0.05
+			m.color_ramp = _ramp([[0.0, Color(0.52, 0.62, 0.62, 0.85)], [0.8, Color(0.6, 0.7, 0.7, 0.8)], [1.0, Color(0.6, 0.7, 0.7, 0.0)]])
+		"spout_splash":           # donde cae el chorro: gotitas que saltan sin parar
+			p.draw_pass_1 = cube("mix")
+			p.amount = 24
+			p.lifetime = 0.45
+			p.preprocess = 0.45
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.4
+			m.direction = Vector3.UP
+			m.spread = 38.0
+			m.initial_velocity_min = 0.6; m.initial_velocity_max = 1.3
+			m.gravity = Vector3(0, -7.0, 0)
+			m.scale_min = 0.02; m.scale_max = 0.035
+			m.color_ramp = _ramp([[0.0, Color(0.62, 0.72, 0.72, 0.9)], [1.0, Color(0.6, 0.7, 0.7, 0.0)]])
 	m.color = tint
 	var key := "%s|%.1f|%s" % [recipe, r, tint.to_html()]
 	if _mat_cache.has(key): p.process_material = _mat_cache[key]

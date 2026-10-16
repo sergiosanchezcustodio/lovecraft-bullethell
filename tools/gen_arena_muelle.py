@@ -52,6 +52,12 @@ for m, x, z, rot in (("alr_barca", 19.0, -HALF - 1.9, -90), ("alr_barca_2", 23.5
 for x, z, r in ((HALF - 1.4, -4.0, 0), (HALF - 1.4, 20.0, 0), (3.0, HALF - 1.4, -90), (-18.0, HALF - 1.4, -90)):
     A.add("alr_linterna", x, z, rot=r, scale=1.2)
 
+# escalera de piedra que baja al agua (gen_escalera_muelle.py) con una barca amarrada al pie; fuera
+# los pilotes que caerían encima (16-10-2026)
+A.props = [p for p in A.props if not (p["model"] == "inn_pilote" and 15.5 < p["pos"][0] < 20.2 and abs(p["pos"][1] - HALF) < 1.5)]
+A.add("inn_escalera_muelle", 16.0, HALF, rot=0, y=0.0)
+A.add("alr_barca", 20.7, HALF + 1.9, rot=90)
+
 COLL = dict(COLLIDERS)
 COLL.update({
     "alr_casco": {"type": "box", "shrink": 0.95},

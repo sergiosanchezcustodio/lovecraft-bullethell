@@ -62,6 +62,11 @@ A.add("inn_sirena", 0.0, 0.0, rot=45, y=36 / 32)
 # farolas en el borde del muelle: su luz se refleja en el agua del puerto (16-10-2026)
 for x, z in ((HALF - 1.4, -2.5), (HALF - 1.4, 17.5), (2.5, HALF - 1.4), (-17.5, HALF - 1.4)):
     A.add("inn_farola", x, z, rot=0, scale=1.2)
+# escalera de piedra que baja al agua (gen_escalera_muelle.py) con una barca amarrada al pie; fuera
+# el pilote que caería encima (16-10-2026)
+A.props = [p for p in A.props if not (p["model"] == "inn_pilote" and 11.5 < p["pos"][0] < 15.6 and abs(p["pos"][1] - (HALF + 0.3)) < 1.5)]
+A.add("inn_escalera_muelle", 12.0, HALF, rot=0, y=0.0)
+A.add("alr_barca", 16.6, HALF + 1.9, rot=90)
 
 COLL = dict(COLLIDERS)
 COLL.update({

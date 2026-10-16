@@ -66,13 +66,20 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 			mi.material_override = _glow_material(model, c)
 	var pivots: Dictionary = m.get_meta("pivots")
 	var vs := float(m.get_meta("voxel_size"))
+	var out_ripples: Array = []
 	for e: Dictionary in c.get("emit", []):
 		var at := String(e.get("at", ""))
 		if not pivots.has(at): continue
 		var pv: Array = pivots[at]
 		var fx := VoxelFx.emitter(String(e.recipe), float(e.get("r", 0.4)))
 		fx.position = Vector3(pv[0], pv[1], pv[2]) * vs + Vector3(0, float(e.get("dy", 0.0)), 0)
+		if e.has("dir"):                                            # +Z de la receta hacia ahí (el chorro)
+			var dv := Vector3(e.dir[0], e.dir[1], e.dir[2]).normalized()
+			fx.basis = Basis.looking_at(-dv, Vector3.UP if absf(dv.y) < 0.95 else Vector3.FORWARD)
 		holder.add_child(fx)
+		if e.get("ripples", false):                                 # ondas en el agua donde cae
+			var rp: Array = out_ripples
+			rp.append(fx.position)
 	var out := {}
 	var sat := String((c.get("sound", {}) as Dictionary).get("at", "light"))
 	if c.has("sound") and pivots.has(sat) and not sfx_muted():          # el fuego que chisporrotea, la bandera
@@ -83,6 +90,7 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 			sp.pitch_scale = float(c.sound.get("pitch", 1.0))
 			holder.add_child(sp)
 			out["sound"] = [sp, float(c.sound.get("db", -18.0)), float(c.sound.get("range", 8.0)), float(c.sound.get("wind", 0.0))]
+	if not out_ripples.is_empty(): out["ripples"] = out_ripples
 	if c.has("bob") and in_sea: out["bob"] = float(c.bob)
 	if c.has("swing") and (m.get_meta("part_nodes") as Dictionary).has(String(c.swing.get("part", ""))): out["swing"] = c.swing
 	if c.has("glow"): out["glow"] = c
@@ -197,6 +205,10 @@ var _lit: Array = []                            ## [emisor, tinte]: rocío y esp
 var _loop: AudioStreamPlayer
 var _loop_db := -80.0
 var _flash_was := 0.0
+var _ripplers: Array = []                       ## [punto del agua donde cae un chorro, tiempo hasta la próxima onda]
+var _perch: Array[Dictionary] = []              ## gaviotas posadas (o que se van volando)
+var _perch_spots: Array = []                    ## [punto, ocupado]
+var _perch_t := 0.0
 var _sounds: Array = []                         ## [reproductor 3D, dB, alcance]: el fuego
 var _walked := {}                               ## jugador -> [última posición, m hasta el próximo crujido]
 var _next_idle_creak := 6.0
@@ -235,6 +247,7 @@ func _ready() -> void:
 			_lights.append([l, l.light_energy, int(MODES.get(String(g.glow), 1)), float(g.get("amount", 0.2)), float(g.get("speed", 1.0)), seed_of(h.global_position)])
 		if it.has("swing"): _add_swing(h, it.swing)
 		if it.has("sound"): _sounds.append(it.sound)
+		for lp: Vector3 in it.get("ripples", []): _ripplers.append([h.to_global(lp), 0.0])
 	for n in ["Ground", "Sea"]:
 		var mi := arena.get_node_or_null(n) as MeshInstance3D
 		if mi != null and mi.material_override is ShaderMaterial:
@@ -260,6 +273,7 @@ func _ready() -> void:
 	if cfg.get("dust", false): _dust_beams()
 	if cfg.has("spills"): _find_spills(cfg.spills)
 	if cfg.has("spray"): _find_sprays(cfg.spray)
+	if cfg.has("perch"): _find_perches(cfg.perch)
 	if cfg.has("loop"): _start_loop(cfg.loop)
 	if cfg.has("crowd") and not sfx_muted():
 		_crowd = _loop_player(String(cfg.crowd.file), false) as AudioStreamPlayer
@@ -388,6 +402,12 @@ func _process(delta: float) -> void:
 	if _loop != null: _loop_step(delta)
 	if not _sounds.is_empty(): _sound_step()
 	if cfg.has("creaks"): _creak_step(delta)
+	for rp: Array in _ripplers:                                     # el chorro que cae
+		rp[1] -= delta
+		if rp[1] <= 0.0:
+			rp[1] = _rng.randf_range(0.18, 0.35)
+			_ripple(rp[0] + Vector3(_rng.randf_range(-0.06, 0.06), 0.01, _rng.randf_range(-0.06, 0.06)), 0.35, 0.65)
+	if not _perch_spots.is_empty(): _perch_step(delta, t)
 	if _crowd != null: _crowd_step(delta)
 	_hook_t -= delta
 	if _hook_t <= 0.0:                                          # pasos: cada jugador nuevo, enganchado
@@ -538,7 +558,6 @@ func _sea_lamps() -> void:
 	_sea_mat.set_shader_parameter("lamp_pos", pos)
 	_sea_mat.set_shader_parameter("lamp_col", col)
 	_sea_mat.set_shader_parameter("lamp_n", mini(cand.size(), 8))
-	if OS.get_cmdline_user_args().has("amb_dbg=true") and Engine.get_process_frames() % 300 == 0: print("REFLEJOS faroles=%d de %d rocas=%d" % [cand.size(), lights.size(), _rocks.size()])
 
 func _water_y(p: Vector2) -> float:
 	var t := fmod(Time.get_ticks_msec() / 1000.0, 3600.0)
@@ -917,6 +936,109 @@ func _foam(at: Vector3, b: Basis, r: float) -> void:
 	fo.basis = b
 	add_child(fo)
 	get_tree().create_timer(2.2).timeout.connect(fo.queue_free)
+
+# ------------------------------------------------------------------ gaviotas posadas
+
+## Sitios donde se posan: lo alto de los pilotes (y de lo que diga "on") y la albardilla del
+## muelle, a lo largo de los bordes sur y este.
+func _find_perches(c: Dictionary) -> void:
+	var models: Array = c.get("on", [])
+	for h: Node in arena.get_node("Props").get_children():
+		var m := h.get_child(0) as Node3D
+		if m == null or not String(m.name) in models: continue
+		var hn := h as Node3D
+		var bb := _world_aabb(hn)
+		_perch_spots.append([Vector3(hn.global_position.x, bb.end.y + 0.06, hn.global_position.z), false])
+	var half: Vector2 = arena.get_meta("size") * 0.5
+	for k in int(c.get("edge", 0)):                                 # en el borde del muelle
+		var along := _rng.randf_range(-half.x + 4.0, half.x - 4.0)
+		var p := Vector3(along, 0.07, half.y - 0.12) if k % 2 == 0 else Vector3(half.x - 0.12, 0.07, along)
+		_perch_spots.append([p, false])
+	_perch_spots.shuffle()
+	for i in mini(int(c.get("n", 5)), _perch_spots.size()): _perch_land(i, c)
+
+func _perch_land(spot_i: int, c: Dictionary) -> void:
+	var spot: Array = _perch_spots[spot_i]
+	spot[1] = true
+	var b := Node3D.new()
+	var m := VoxelBuilder.load_model("res://models/amb_%s.json" % String(c.get("kind", "gull")))
+	for mi: MeshInstance3D in m.get_meta("meshes"): mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	b.add_child(m)
+	add_child(b)
+	b.position = spot[0]
+	b.rotation.y = _rng.randf() * TAU
+	_fold(b, true)
+	_perch.append({"node": b, "spot": spot_i, "fly": false, "t": 0.0, "v": Vector3.ZERO, "turn": _rng.randf_range(2.0, 6.0),
+		"call": _rng.randf_range(6.0, 18.0), "ph": _rng.randf() * TAU})
+
+## Alas plegadas a lo largo del cuerpo (posada) o abiertas (volando).
+func _fold(b: Node3D, folded: bool) -> void:
+	var nodes: Dictionary = b.get_child(0).get_meta("part_nodes")
+	if nodes.has("wing_r"): (nodes["wing_r"] as Node3D).rotation = Vector3(0, -1.45 if folded else 0.0, -0.15 if folded else 0.0)
+	if nodes.has("wing_l"): (nodes["wing_l"] as Node3D).rotation = Vector3(0, 1.45 if folded else 0.0, 0.15 if folded else 0.0)
+
+## Posadas: giran la cabeza (el cuerpo) a ratos y graznan; si alguien se acerca, echan a volar
+## lejos de él. Las que se van vuelven a posarse más tarde en un sitio fuera de la vista.
+func _perch_step(delta: float, t: float) -> void:
+	var c: Dictionary = cfg.perch
+	var g := get_parent()
+	var players: Array = g.players if g != null and "players" in g else []
+	var f := _focus()
+	var flee := float(c.get("flee", 3.5))
+	for bd: Dictionary in _perch.duplicate():
+		var b: Node3D = bd.node
+		if not bd.fly:
+			bd.turn -= delta
+			if bd.turn <= 0.0:
+				bd.turn = _rng.randf_range(2.0, 6.0)
+				create_tween().tween_property(b, "rotation:y", b.rotation.y + _rng.randf_range(-1.2, 1.2), 0.25)
+			bd.call -= delta
+			if bd.call <= 0.0:
+				bd.call = _rng.randf_range(8.0, 22.0)
+				if Vector2(b.position.x - f.x, b.position.z - f.z).length() < 13.0: sfx_at("bird_gull", b.position, -4.0)
+			for pl in players:
+				if not is_instance_valid(pl) or pl.health <= 0.0: continue
+				var off: Vector3 = b.position - (pl as Node3D).global_position
+				off.y = 0.0
+				if off.length() < flee:                                # ¡que viene alguien!
+					bd.fly = true
+					bd.t = 0.0
+					var away := off.normalized() if off.length() > 0.01 else Vector3.FORWARD
+					bd.v = (away + Vector3(_rng.randf_range(-0.3, 0.3), 0, _rng.randf_range(-0.3, 0.3))).normalized() * 3.5 + Vector3(0, 2.6, 0)
+					(_perch_spots[bd.spot] as Array)[1] = false
+					_fold(b, false)
+					sfx_at("bird_gull", b.position, -2.0)
+					break
+		else:
+			bd.t += delta
+			var v: Vector3 = bd.v
+			v.y = maxf(v.y - delta * 0.9, 0.6)                        # sube y luego planea
+			v += Vector3(v.x, 0, v.z).normalized() * delta * 1.5        # coge velocidad
+			bd.v = v
+			b.position += v * delta
+			b.basis = Basis.looking_at(Vector3(v.x, v.y * 0.4, v.z).normalized(), Vector3.UP)
+			_flap(b, "gull", t + float(bd.ph), 0.0)
+			if bd.t > 7.0 or Vector2(b.position.x - f.x, b.position.z - f.z).length() > 30.0:
+				b.queue_free()
+				_perch.erase(bd)
+				var rs: Array = c.get("respawn", [15, 35])
+				_perch_t = maxf(_perch_t, _rng.randf_range(rs[0], rs[1]))
+	# vuelven: a un sitio libre, fuera de la vista y lejos de los jugadores
+	if _perch.size() < int(c.get("n", 5)):
+		_perch_t -= delta
+		if _perch_t <= 0.0:
+			_perch_t = 3.0
+			for i in _perch_spots.size():
+				var sp: Array = _perch_spots[i]
+				if sp[1]: continue
+				var p: Vector3 = sp[0]
+				if Vector2(p.x - f.x, p.z - f.z).length() < 14.0: continue
+				var near := false
+				for pl in players:
+					if is_instance_valid(pl) and (pl as Node3D).global_position.distance_to(p) < 6.0: near = true
+				if near: continue
+				_perch_land(i, c)
+				break
 
 # ------------------------------------------------------------------ bandadas
 

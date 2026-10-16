@@ -270,7 +270,23 @@ nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
 for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]:
     del M.V[k]                                                           # hueca: solo lo que se ve
 
+# el chorro que le sale de la boca (Ambient, data/ambient.json: emit "spout" en "mouth" con su
+# dirección y "spout_splash" donde cae; 16-10-2026): la boca, hacia dónde mira y el punto del agua
+# del pilón (0,5 m sobre el suelo; el origen del modelo está en lo alto de la roca, a 1,125 m)
+SPOUT_V = 2.2                                                           # m/s
+mouth = apply(HR, (0.0, -0.5 * RY, RZ * 0.98))
+MOUTH = (HC[0] + mouth[0], HC[1] + mouth[1], HC[2] + mouth[2])
+d = apply(HR, (-0.25, 0.32, 1.0))                                      # en arco, por encima de la cola
+n_ = math.sqrt(sum(q * q for q in d))
+SPOUT_DIR = tuple(q / n_ for q in d)
+WATER_Y = 0.5 - 1.125
+a_, b_, c_ = -4.9, SPOUT_V * SPOUT_DIR[1], MOUTH[1] - WATER_Y
+T_LAND = (-b_ - math.sqrt(b_ * b_ - 4 * a_ * c_)) / (2 * a_)
+SPLASH = (MOUTH[0] + SPOUT_DIR[0] * SPOUT_V * T_LAND, WATER_Y, MOUTH[2] + SPOUT_DIR[2] * SPOUT_V * T_LAND)
+
 if __name__ == '__main__':
-    n = M.export(os.path.join(os.path.dirname(__file__), '..', 'models', 'inn_sirena.json'), {P: [0, 0, 0]}, jitter=0.01,
+    piv = {P: [0, 0, 0], 'mouth': [v(q) for q in MOUTH], 'splash': [v(q) for q in SPLASH]}
+    print('chorro: dir %s, cae en %.2f s a %s m' % (tuple(round(q, 3) for q in SPOUT_DIR), T_LAND, tuple(round(q, 2) for q in SPLASH)))
+    n = M.export(os.path.join(os.path.dirname(__file__), '..', 'models', 'inn_sirena.json'), piv, jitter=0.01,
                  pivots_in_voxels=True, roughness=0.45, specular=0.5, no_bottom=False)
     print('inn_sirena: %d voxels' % n)

@@ -167,6 +167,7 @@ def ambiente():
     cantico(r)
     bandera(r)
     pasos(r)
+    fuente(r)
 
 
 def save_loop(name, w, d, fade):
@@ -404,6 +405,25 @@ def pasos(r):
         spl = bp(r.standard_normal(len(tt)), 400, 4500) * np.minimum(tt / 0.005, 1) * np.exp(-tt / 0.08)
         blub = np.sin(2 * np.pi * np.cumsum(600 + 2500 * tt) / SR) * np.exp(-np.maximum(tt - 0.04, 0) / 0.03) * (tt > 0.04) * 0.3
         save('step_water_%d' % i, spl + blub)
+
+
+def fuente(r):
+    """Chorro de la fuente que cae en el pilón (16-10-2026): chapoteo continuo, con burbujas
+    (tonos que suben, como las gotas) y algún golpe más fuerte; en bucle."""
+    d, fade = 8.0, 2.0
+    n = int((d + fade) * SR)
+    flow = bp(r.standard_normal(n), 500, 5000)
+    flow /= np.std(flow)
+    mod = lp(r.standard_normal(n), 6, 1)
+    flow *= np.clip(0.8 + 0.4 * mod / np.std(mod), 0.3, 1.4)
+    bub = np.zeros(n)
+    for k in r.integers(0, n - int(0.05 * SR), int(45 * (d + fade))):
+        m = int(r.uniform(0.012, 0.03) * SR)
+        tt = np.arange(m) / SR
+        f0 = r.uniform(500, 1600)
+        bub[k:k + m] += np.sin(2 * np.pi * np.cumsum(f0 * (1 + 2.5 * tt / tt[-1])) / SR) * np.exp(-tt / (m / SR * 0.35)) * r.uniform(0.3, 1)
+    w = flow * 0.35 + bub * 0.45
+    save_loop('fountain_loop', w, d, fade)
 
 
 def lluvia(r):
