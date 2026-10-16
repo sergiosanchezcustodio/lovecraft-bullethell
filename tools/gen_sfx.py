@@ -94,7 +94,8 @@ def ambiente():
     """Sonidos de ambiente de los escenarios (16-10-2026), con su propio azar para no cambiar los
     de synth(): gotas en la gruta con su eco, golpes de ola contra el casco, crujidos del gancho
     de los faroles que se mecen, truenos, el viento y la lluvia en bucle (sin costura: el final se
-    funde con el principio) y los graznidos de las bandadas."""
+    funde con el principio), los graznidos de las bandadas, el fuego, y los crujidos del suelo y la
+    lluvia tras los cristales del estudio."""
     r = np.random.default_rng(1016)
     def nz(d): return r.standard_normal(int(d * SR))
     def cave(x, tail=0.9, level=0.25):                       # eco de cueva: cola de ruido que decae
@@ -161,6 +162,8 @@ def ambiente():
     save_loop('wind_loop', w, d, fade)
     aves(r)
     lluvia(r)
+    fuego(r)
+    estudio(r)
 
 
 def save_loop(name, w, d, fade):
@@ -228,6 +231,60 @@ def aves(r):
     for i in range(2):
         parts = [squeak(0.035 + 0.015 * r.random(), 4200 + 600 * r.random(), 2600 + 400 * r.random()) for _ in range(4 + i)]
         save('bird_bat_%d' % i, _notes(parts, 0.07 + 0.03 * i))
+
+
+def _bursts(r, n, rate, amp, length):
+    """Tren de chasquidos al azar: `rate` por segundo, cada uno un golpe de ruido de `length` s."""
+    imp = np.zeros(n)
+    k = r.integers(0, n, int(rate * n / SR))
+    imp[k] = r.uniform(amp[0], amp[1], len(k)) * r.choice([-1, 1], len(k))
+    m = int(length * SR)
+    kern = r.standard_normal(m) * np.exp(-np.arange(m) / (m * 0.25))
+    return signal.fftconvolve(imp, kern)[:n]
+
+
+def fuego(r):
+    """Fuego en bucle (16-10-2026): rumor grave que aletea, siseo y chasquidos de la leña, con
+    algún estallido; sin costura. Las hogueras y las antorchas del ritual (Ambient, "sound")."""
+    d, fade = 8.0, 2.0
+    n = int((d + fade) * SR)
+    flick = lp(r.standard_normal(n), 3, 1)
+    flick = np.clip(0.75 + 0.35 * flick / np.std(flick), 0.3, 1.5)
+    roar = lp(r.standard_normal(n), 260) * flick
+    roar /= np.std(roar)
+    hiss = bp(r.standard_normal(n), 2200, 6500) * flick
+    hiss /= np.std(hiss)
+    small = bp(_bursts(r, n, 28, (0.2, 0.7), 0.004), 1500, 7000)
+    pops = bp(_bursts(r, n, 1.6, (0.8, 1.0), 0.012), 600, 5000)
+    w = roar * 0.35 + hiss * 0.05 + small / (np.std(small) + 1e-9) * 0.12 + pops / (np.max(np.abs(pops)) + 1e-9) * 0.9
+    save_loop('fire_loop', w, d, fade)
+
+
+def estudio(r):
+    """El estudio (16-10-2026): crujidos de las tablas del suelo (pegar y soltar lento, con el
+    cuerpo grave de la madera) y la lluvia oída tras los ventanales (apagada, con golpecitos de
+    gota en el cristal), en bucle."""
+    for i, (rate, f1, f2, d) in enumerate(((16, 260, 520, 0.8), (22, 330, 760, 0.6), (12, 210, 430, 1.0))):
+        tt = t(d)
+        rr = rate * (1 + 0.6 * np.sin(np.pi * tt / d) ** 2 + 0.2 * np.sin(2 * np.pi * 3 * tt + i))
+        ph = np.cumsum(rr) / SR
+        pulses = (np.diff(np.floor(ph), prepend=0) > 0).astype(float) * (0.5 + 0.5 * r.random(len(tt)))
+        body = signal.lfilter(*signal.iirpeak(f1 / (SR / 2), 7), pulses) + 0.6 * signal.lfilter(*signal.iirpeak(f2 / (SR / 2), 10), pulses)
+        body += 0.25 * signal.lfilter(*signal.iirpeak(f2 * 2.7 / (SR / 2), 14), pulses)
+        save('floor_creak_%d' % i, lp(body, 3000) * np.sin(np.pi * tt / d) ** 1.2)
+    d, fade = 10.0, 2.0
+    n = int((d + fade) * SR)
+    muffled = lp(hp(r.standard_normal(n), 120), 1100)
+    muffled /= np.std(muffled)
+    taps = np.zeros(n)
+    for fc in (2900, 3600, 4400):                            # gotas que dan en el cristal
+        imp = np.zeros(n)
+        k = r.integers(0, n, int(14 * n / SR))
+        imp[k] = r.uniform(0.3, 1.0, len(k))
+        taps += signal.lfilter(*signal.iirpeak(fc / (SR / 2), 30), imp)
+    taps /= np.max(np.abs(taps)) + 1e-9
+    w = muffled * 0.3 + taps * 0.55
+    save_loop('rain_window_loop', w, d, fade)
 
 
 def lluvia(r):

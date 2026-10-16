@@ -50,7 +50,7 @@ static func make() -> GPUParticles3D:
 ## `mark`: aro y marca en el suelo (las olas, que estallan en hilera, van sin ella).
 static func burst(parent: Node, pos: Vector3, size := 1.0, tint := Color(0, 0, 0, 0), sound := "auto", mark := true) -> void:
 	if sound == "auto": sound = "splash" if tint.a <= 0.0 else "roar"
-	if sound != "": Sfx.play(sound)
+	if sound != "": Sfx.play_at(sound, pos)
 	var p := make()
 	if tint.a > 0.0:                                          # otro color (la nube verde de Cthulhu)
 		var g := Gradient.new()

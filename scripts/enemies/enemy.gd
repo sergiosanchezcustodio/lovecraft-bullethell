@@ -284,7 +284,7 @@ func stun(seconds: float) -> void:
 func take_damage(d: Damage) -> void:
 	if shield_t > 0.0: return
 	if not is_alive(): return
-	Sfx.play("hit")
+	Sfx.play_at("hit", global_position)
 	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
 	for tag in data.tags: k *= float(d.bonus.get(tag, 1.0))    # rasgos contra este tipo de enemigo
 	if data.elite or data.unique: k *= float(d.bonus.get(Player.ELITE_TAG, 1.0))   # Medallón del cazador
@@ -302,7 +302,7 @@ func take_damage(d: Damage) -> void:
 	if health <= 0.0: _die()
 
 func _die() -> void:
-	Sfx.play("die")
+	Sfx.play_at("die", global_position)
 	if _curse_t > 0.0 and int(_curse.get("spread", 0)) > 0: _spread_curse()
 	if _inject_t > 0.0 and _ally_time > 0.0:            # se levanta como aliado
 		world.fx.add_child(Reanimated.new().setup(world, data, global_position, facing, _ally_time, _inject_bonus))

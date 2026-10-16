@@ -62,7 +62,7 @@ func _spawn_angle() -> void:
 		return
 
 func _open_angle(pos: Vector3, r: float) -> void:
-	Sfx.play("angles")
+	Sfx.play_at("angles", pos)
 	var node := _angle_mesh(r)
 	node.position = pos
 	node.set_meta("warn_r", r * 1.6)                    # el bot (SmartBot) se aparta

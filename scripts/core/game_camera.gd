@@ -13,6 +13,8 @@ extends Camera3D
 @export var zoom_speed := 2.5
 
 var targets: Array[Node3D] = []
+var _ear: AudioListener3D                  ## oído (16-10-2026): sobre el centro de la vista, para el lado de los sonidos
+const EAR_BACK := 10.0                     ## m hacia la cámara: lo cercano suena casi al centro
 
 func _ready() -> void:
 	# La cámara se mueve en _process siguiendo la posición INTERPOLADA de sus objetivos
@@ -26,6 +28,10 @@ func _ready() -> void:
 	near = 0.5
 	far = distance * 2.0 + 40.0
 	snap()
+	_ear = AudioListener3D.new()
+	_ear.top_level = true
+	add_child(_ear)
+	_ear.make_current()
 
 var _size := 0.0
 
@@ -94,6 +100,7 @@ func _process(delta: float) -> void:
 	_size = lerpf(_size, needed_size(), 1.0 - exp(-zoom_speed * delta))
 	size = maxf(_size, view_size)
 	position = position.lerp(desired_position(), 1.0 - exp(-follow_speed * delta))
+	if _ear != null: _ear.global_transform = Transform3D(global_basis, center() + global_basis.z * EAR_BACK)
 	if _shake > 0.001:
 		position += (transform.basis.x * randf_range(-1, 1) + transform.basis.y * randf_range(-1, 1)) * _shake
 		_shake = move_toward(_shake, 0.0, delta * maxf(_shake * 3.0, 0.2))

@@ -1,5 +1,5 @@
 {
-	"_comentario": "Efectos de sonido (hito 8.1): evento -> archivos de resources/sfx (al azar), volumen en dB, tono al azar [min, max], voces a la vez y separación mínima en s. Sintetizados (tools/gen_sfx.py) y CC0 de Kenney (kenney.nl). `group` (armas, golpes): todas las del grupo comparten un tope de voces y se atenúan cuanto más suenan a la vez (Sfx.GROUPS); el volumen de las armas se regula aparte en Configuración > Audio. Ambiente de los escenarios (16-10-2026, Ambient y Weather): drip, wave_hit, creak, thunder y los graznidos de las bandadas (bird_<ave>); la lluvia en bucle (rain_loop.wav) la pone Weather y el viento en bucle (wind_loop.wav) lo pone Ambient aparte. `bus`: Ambiente (volumen propio en Configuración > Audio).",
+	"_comentario": "Efectos de sonido (hito 8.1): evento -> archivos de resources/sfx (al azar), volumen en dB, tono al azar [min, max], voces a la vez y separación mínima en s. Sintetizados (tools/gen_sfx.py) y CC0 de Kenney (kenney.nl). `group` (armas, golpes): todas las del grupo comparten un tope de voces y se atenúan cuanto más suenan a la vez (Sfx.GROUPS); el volumen de las armas se regula aparte en Configuración > Audio. Ambiente de los escenarios (16-10-2026, Ambient y Weather): drip, wave_hit, creak, thunder los graznidos de las bandadas (bird_<ave>) y los crujidos del suelo del estudio (floor_creak); el fuego (fire_loop.wav) lo pone Ambient en cada hoguera y antorcha; la lluvia en bucle (rain_loop.wav) la pone Weather y el viento en bucle (wind_loop.wav) lo pone Ambient aparte. `bus`: Ambiente (volumen propio en Configuración > Audio).",
 	"eventos": {
 		"shot_revolver": {
 			"db": -18,
@@ -540,6 +540,21 @@
 			"files": [
 				"bird_bat_0.wav",
 				"bird_bat_1.wav"
+			],
+			"bus": "Ambiente"
+		},
+		"floor_creak": {
+			"db": -17,
+			"pitch": [
+				0.85,
+				1.12
+			],
+			"voices": 2,
+			"gap": 0.6,
+			"files": [
+				"floor_creak_0.wav",
+				"floor_creak_1.wav",
+				"floor_creak_2.wav"
 			],
 			"bus": "Ambiente"
 		}

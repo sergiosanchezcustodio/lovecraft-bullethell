@@ -122,7 +122,7 @@ func _physics_process_step(delta: float) -> void:
 		if w.timer > 0.0: continue
 		Damage.ctx = tag_of(w)                   # lo que cree este disparo daña en nombre de esta arma
 		if not _fire(w): continue                # el machete espera a tener a alguien cerca
-		Sfx.play(sound_of(w.data))
+		Sfx.play_at(sound_of(w.data), player.global_position)      # en cooperativo, del lado de quien dispara
 		w.timer = w.stat("cooldown")
 		if w.data.spinup > 1.0:                  # Nagant: cuanto más dispara seguido, más rápido
 			var step := w.stat("cooldown") / maxf(w.data.spinup_time, 0.1)

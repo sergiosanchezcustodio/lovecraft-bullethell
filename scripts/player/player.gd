@@ -217,7 +217,7 @@ func _physics_process_step(delta: float) -> void:
 		position.x = p2.x; position.z = p2.y
 	if leash.is_valid(): global_position = leash.call(global_position)
 	if motor.is_dodging() and not was_dodging:
-		Sfx.play("dodge")
+		Sfx.play_at("dodge", global_position)
 		_action = data.dodge_anim         # la animación del esquive empieza con el impulso
 		_action_t = 0.0
 		_on_dodge()
@@ -665,7 +665,7 @@ func take_damage(d: Damage) -> void:
 	if nodens_ready() and (d.physical > 0.0 or d.mental > 0.0):   # Escudo de Nodens: absorbe el golpe entero
 		_nodens_t = 0.0
 		_hurt_time = 0.0
-		Sfx.play("magic")
+		Sfx.play_at("magic", global_position)
 		return
 	if Difficulty.damage() != 1.0 or Difficulty.mental() != 1.0:    # dificultad (12-10-2026)
 		var sd := Damage.new(d.physical * Difficulty.damage(), d.mental * Difficulty.mental())
@@ -688,7 +688,7 @@ func take_damage(d: Damage) -> void:
 	var src := "otro"
 	if d.source is Enemy and is_instance_valid(d.source): src = String((d.source as Enemy).data.id)
 	recv_add(src, d.physical, d.mental * mental_resist * data.mental_mult)
-	Sfx.play("hit_player" if d.physical > 0.0 else "chant")
+	Sfx.play_at("hit_player" if d.physical > 0.0 else "chant", global_position)
 	_rumble(d.physical + d.mental * 0.5)
 	if d.mental > 0.0:
 		sanity = maxf(0.0, sanity - d.mental * mental_resist * data.mental_mult)
@@ -707,7 +707,7 @@ func take_damage(d: Damage) -> void:
 		if revivable:
 			down_left = rules.down_time
 			revive_progress = 0.0
-		Sfx.play("down")
+		Sfx.play_at("down", global_position)
 		downed.emit()
 
 ## Ha abatido a un enemigo (CombatWorld.record_kill): Colmillo de ghoul, Salterio y Tablilla

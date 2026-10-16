@@ -251,13 +251,14 @@ func _ready() -> void:
 		director.final_event.connect(func(e: Enemy) -> void:
 			if level.boss_music != "": Music.play(level.boss_music, 2.0)   # música del jefe
 			if args.get_bool("log"): print("MUSICA ", Music.current())
-			Sfx.play("roar" if e != null and e.data.unique else "growl")
+			if e != null: Sfx.play_at("roar" if e.data.unique else "growl", e.global_position)
+			else: Sfx.play("growl")
 			announce(level.final_text, 3.5))
 		director.boss_event.connect(func(e: Enemy, text: String) -> void:
 			announce(text, 4.0)
 			if args.get_bool("log"): print("JEFE %s t=%.0f" % [e.data.id, director.time]))
 		director.mid_event.connect(func(e: Enemy, text: String) -> void:
-			Sfx.play("growl")
+			Sfx.play_at("growl", e.global_position)
 			announce(text, 3.5)
 			if args.get_bool("log"): print("MINIJEFE %s t=%.0f" % [e.data.id, director.time]))
 		director.level_completed.connect(_on_level_completed)
@@ -267,7 +268,7 @@ func _ready() -> void:
 			for k in 5: world.fx.add_child.call_deferred(Pickup.new().setup(world, player.position + Vector3(-4 + k * 2, 0, 3), k as Pickup.Kind))
 		director.chest_spawned.connect(func(c: ArcaneChest) -> void:
 			c.opened.connect(func(_c: ArcaneChest, by: Player) -> void:
-				Sfx.play("chest")
+				Sfx.play_at("chest", c.global_position)
 				earn(c.money)
 				_try_evolve(by)
 				if args.get_bool("log"): print("BAUL abierto por J%d" % (by.index + 1))

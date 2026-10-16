@@ -127,7 +127,7 @@ func _erupt(e: Enemy, target: Player) -> void:
 
 ## Golpe en el suelo: daño y empuje a los jugadores de dentro, polvo y temblor.
 static func _impact(e: Enemy, at: Vector3, r: float, dmg: float, shake: float, sound := true) -> void:
-	if sound: Sfx.play("slam")
+	if sound: Sfx.play_at("slam", at)
 	WadeSplash.burst(e.world.fx, at, r * 0.7, EARTH, "")
 	var cam := e.get_viewport().get_camera_3d() as GameCamera
 	if cam != null and shake > 0.0: cam.shake(shake * 0.05)

@@ -60,10 +60,44 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 		fx.position = Vector3(pv[0], pv[1], pv[2]) * vs + Vector3(0, float(e.get("dy", 0.0)), 0)
 		holder.add_child(fx)
 	var out := {}
+	if c.has("sound") and pivots.has("light") and not Sfx.muted:       # el fuego que chisporrotea
+		var sp := _loop_player(String(c.sound.file), true)
+		if sp != null:
+			var lp: Array = pivots["light"]
+			sp.position = Vector3(lp[0], lp[1], lp[2]) * vs
+			sp.pitch_scale = float(c.sound.get("pitch", 1.0))
+			holder.add_child(sp)
+			out["sound"] = [sp, float(c.sound.get("db", -18.0)), float(c.sound.get("range", 8.0))]
 	if c.has("bob") and in_sea: out["bob"] = float(c.bob)
 	if c.has("swing") and (m.get_meta("part_nodes") as Dictionary).has(String(c.swing.get("part", ""))): out["swing"] = c.swing
 	if c.has("glow"): out["glow"] = c
 	return out
+
+## Reproductor de un bucle de resources/sfx (sin costura; el bucle se marca aquí), en el bus
+## Ambiente. `at` = en el mundo (3D, del lado en que se ve; el volumen lo pone Ambient).
+static var _loop_streams := {}
+static func _loop_player(file: String, at: bool) -> Node:
+	var path := "res://resources/sfx/" + file
+	if not ResourceLoader.exists(path): return null
+	if not _loop_streams.has(path):
+		var st := (load(path) as AudioStreamWAV).duplicate() as AudioStreamWAV
+		st.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		st.loop_begin = 0
+		st.loop_end = int(st.get_length() * st.mix_rate)
+		_loop_streams[path] = st
+	var p: Node
+	if at:
+		var p3 := AudioStreamPlayer3D.new()
+		p3.attenuation_model = AudioStreamPlayer3D.ATTENUATION_DISABLED
+		p3.doppler_tracking = AudioStreamPlayer3D.DOPPLER_TRACKING_DISABLED
+		p3.max_db = 6.0
+		p = p3
+	else:
+		p = AudioStreamPlayer.new()
+	p.set("stream", _loop_streams[path])
+	p.set("bus", "Ambiente" if AudioServer.get_bus_index("Ambiente") >= 0 else "Master")
+	p.set("volume_db", -80.0)
+	return p
 
 static func _sway_material(model: String, c: Dictionary, base: Material, wind: Vector2) -> ShaderMaterial:
 	var key := "sway|%s|%s" % [model, var_to_str(wind)]
@@ -143,6 +177,9 @@ var _lit: Array = []                            ## [emisor, tinte]: rocío y esp
 var _loop: AudioStreamPlayer
 var _loop_db := -80.0
 var _flash_was := 0.0
+var _sounds: Array = []                         ## [reproductor 3D, dB, alcance]: el fuego
+var _walked := {}                               ## jugador -> [última posición, m hasta el próximo crujido]
+var _next_idle_creak := 6.0
 var demo := false
 
 func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
@@ -168,6 +205,7 @@ func _ready() -> void:
 			var l: OmniLight3D = it.light
 			_lights.append([l, l.light_energy, int(MODES.get(String(g.glow), 1)), float(g.get("amount", 0.2)), float(g.get("speed", 1.0)), seed_of(h.global_position)])
 		if it.has("swing"): _add_swing(h, it.swing)
+		if it.has("sound"): _sounds.append(it.sound)
 	for n in ["Ground", "Sea"]:
 		var mi := arena.get_node_or_null(n) as MeshInstance3D
 		if mi != null and mi.material_override is ShaderMaterial:
@@ -181,6 +219,7 @@ func _ready() -> void:
 	if cfg.has("spills"): _find_spills(cfg.spills)
 	if cfg.has("spray"): _find_sprays(cfg.spray)
 	if cfg.has("loop"): _start_loop(cfg.loop)
+	VoxelBuilder.sky_glass_material().set_shader_parameter("rain", float(cfg.get("glass_rain", 0.0)))
 
 ## Farol que cuelga: su parte gira sobre el gancho y se lleva la luz y el halo de niebla.
 func _add_swing(h: Node3D, c: Dictionary) -> void:
@@ -218,7 +257,7 @@ func _swing_step(delta: float, t: float) -> void:
 		if s.get("out", false) and not out_now and d.length() > deg_to_rad(9.0) and _rng.randf() < 0.25:
 			var gp := part.global_position
 			var f := _focus()
-			if Vector2(gp.x - f.x, gp.z - f.z).length() < 12.0: Sfx.play("creak")
+			if Vector2(gp.x - f.x, gp.z - f.z).length() < 12.0: Sfx.play_at("creak", gp)
 		s["out"] = out_now
 		if d.length() < 0.0005:
 			part.basis = Basis.IDENTITY
@@ -273,6 +312,8 @@ func _process(delta: float) -> void:
 	if not _spills.is_empty(): _spill_step(delta)
 	if not _sprays.is_empty(): _spray_step(delta)
 	if _loop != null: _loop_step(delta)
+	if not _sounds.is_empty(): _sound_step()
+	if cfg.has("creaks"): _creak_step(delta)
 	if not _lit.is_empty() or _flash_was > 0.0: _flash_step()
 
 func _focus() -> Vector3:
@@ -361,6 +402,44 @@ func _start_loop(c: Dictionary) -> void:
 	add_child(_loop)
 	_loop.play(_rng.randf() * st.get_length())
 
+## Bucles en el sitio (el fuego): más fuerte cuanto más cerca del centro de la vista; lejos, parados.
+func _sound_step() -> void:
+	var f := _focus()
+	for s: Array in _sounds:
+		var p: AudioStreamPlayer3D = s[0]
+		var gp := p.global_position
+		var dist := Vector2(gp.x - f.x, gp.z - f.z).length()
+		var reach: float = s[2]
+		if dist > reach + 2.0:
+			if p.playing: p.stop()
+			continue
+		if not p.playing: p.play(_rng.randf() * p.stream.get_length())
+		var k := clampf(dist / reach, 0.0, 1.2)
+		p.volume_db = float(s[1]) - 20.0 * k * k
+
+## El suelo de tablas cruje: bajo los pies de quien anda y, de vez en cuando, solo.
+func _creak_step(delta: float) -> void:
+	var c: Dictionary = cfg.creaks
+	var g := get_parent()
+	var walk: Array = c.get("walk", [3.0, 7.0])
+	if g != null and "players" in g:
+		for pl in g.players:
+			if not is_instance_valid(pl) or pl.health <= 0.0: continue
+			var pos: Vector3 = pl.global_position
+			if not _walked.has(pl): _walked[pl] = [pos, _rng.randf_range(walk[0], walk[1])]
+			var w: Array = _walked[pl]
+			w[1] -= Vector2(pos.x - w[0].x, pos.z - w[0].z).length()
+			w[0] = pos
+			if w[1] <= 0.0:
+				w[1] = _rng.randf_range(walk[0], walk[1])
+				if _rng.randf() < float(c.get("chance", 0.4)): Sfx.play_at("floor_creak", pos)
+	_next_idle_creak -= delta
+	if _next_idle_creak <= 0.0:
+		var idle: Array = c.get("idle", [10, 25])
+		_next_idle_creak = _rng.randf_range(idle[0], idle[1])
+		var f := _focus()
+		Sfx.play_at("floor_creak", f + Vector3(_rng.randf_range(-10, 10), 0, _rng.randf_range(-8, 8)), -7.0)   # la casa que se asienta
+
 ## Las rachas del clima lo suben (hasta unos 8 dB) y lo afinan un poco.
 func _loop_step(delta: float) -> void:
 	var c: Dictionary = cfg.loop
@@ -437,7 +516,7 @@ func _drip_step(delta: float) -> void:
 		get_tree().create_timer(0.8).timeout.connect(sp.queue_free)
 		_ripple(at, 0.55 if dr[3] else 0.3, 0.8 if dr[3] else 0.45)          # en la roca, la película de agua del suelo
 		var near := Vector2(at.x - _focus().x, at.z - _focus().z).length()
-		Sfx.play("drip", -clampf((near - 4.0) * 0.8, 0.0, 10.0))       # las lejanas, más bajas
+		Sfx.play_at("drip", at, -clampf((near - 4.0) * 0.8, 0.0, 10.0))       # las lejanas, más bajas
 	for r: Array in _ripples.duplicate():
 		r[2] += delta / 1.6
 		(r[1] as ShaderMaterial).set_shader_parameter("life", r[2])
@@ -574,7 +653,7 @@ func _spray_step(delta: float) -> void:
 	sp.basis = b
 	add_child(sp)
 	get_tree().create_timer(1.8).timeout.connect(sp.queue_free)
-	Sfx.play("wave_hit", (r - 2.6) * 3.0)                          # las flojas suenan menos
+	Sfx.play_at("wave_hit", at, (r - 2.6) * 3.0)                   # las flojas suenan menos
 	var crest := _lit_emitter("snow_puff", r * 0.45, Color(1.3, 1.38, 1.45, 0.55))   # la cresta asoma por la borda
 	crest.position = at
 	add_child(crest)
@@ -637,7 +716,7 @@ func _birds(delta: float, t: float) -> void:
 		var dist := Vector2(center.x - f.x, center.z - f.z).length()
 		if fl.next_call <= 0.0:
 			fl.next_call = _rng.randf_range(2.0, 5.0) if kind == "bat" else _rng.randf_range(3.5, 9.0)
-			if dist < 15.0: Sfx.play("bird_" + kind, -dist * 0.4)
+			if dist < 15.0: Sfx.play_at("bird_" + kind, center, -dist * 0.4)
 		var gone: bool = dist > 34.0 and fl.t > fl.circle_time
 		if gone or fl.t > 90.0:
 			for b: Node3D in fl.members: b.queue_free()
