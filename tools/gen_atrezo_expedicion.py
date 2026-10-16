@@ -719,7 +719,7 @@ def cabana():
             frame = x in (WX0, WX1 - 1) or y in (WY0, WY1 - 1) or x == (WX0 + WX1) // 2 or y == (WY0 + WY1) // 2
             for z in (HZ - 1, HZ):
                 if frame: M.put(x, y, z, P, WOOD_D)
-                else: M.put(x, y, z, P, (1.0, 0.76, 0.42) if (x + y) % 7 else (1.0, 0.86, 0.6), glow=1)
+                else: M.put(x, y, z, P, (1.0, 0.76, 0.42) if (x + y) % 7 else (1.0, 0.86, 0.6), glow=2)   # a ratos (16-10-2026)
     for x0 in (WX0 - 10, WX1):                                        # contraventanas abiertas
         for x in range(x0, x0 + 10):
             for y in range(WY0, WY1):
@@ -758,7 +758,7 @@ def cabana():
         if z > 0 and DX0 - 4 < x < DX1 + 4: return None               # la entrada, despejada
         return max(abs(x + 0.5) - HX - 1, abs(z + 0.5) - HZ - 1)
     drift(M, inside, 12, 7)
-    return M, {P: [0, 0, 0]}
+    return M, {P: [0, 0, 0], 'smoke': [(CX0 + CX1) // 2, top + 2, (CZ0 + CZ1) // 2]}   # la estufa encendida
 
 
 PIECES = {'farol': farol, 'iglu': iglu, 'cabana': cabana, 'tienda': tienda, 'caja_mano': caja, 'bidon': bidon,

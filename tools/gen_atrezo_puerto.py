@@ -125,10 +125,10 @@ class House:
                     put(u, y, 1, c)
                     continue
                 if bar: c = TRIM_D
-                elif lit: c = LIT if M.hsh(pu, pv, 7) > 0.25 else LIT_D
-                else: c = GLASS if M.hsh(pu, pv + u, 8) > 0.2 else GLASS_L
+                else: c = LIT if M.hsh(pu, pv, 7) > 0.25 else LIT_D
                 put(u, y, 0, c)
-                if lit and not bar: M.V[self._key(u, y, 0, face)][2] = 1
+                # las de luz, siempre encendidas; las demás, a ratos (glow 2, 16-10-2026)
+                if not bar: M.V[self._key(u, y, 0, face)][2] = 1 if lit else 2
         if sill:
             for u in range(x0 - 2, x0 + w + 2): put(u, y0 - 2, 1, TRIM); put(u, y0 - 2, 2, TRIM_D)
         for u in range(x0 - 2, x0 + w + 2): put(u, y0 + h + 1, 1, TRIM_D)

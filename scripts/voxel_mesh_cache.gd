@@ -12,4 +12,5 @@ extends Resource
 @export var parts := PackedStringArray()      ## parte de cada capa
 @export var layer_pivots: Array[Vector3] = []
 @export var glows: Array[bool] = []
+@export var kinds: Array[int] = []            ## 0 normal, 1 luz, 2 ventana que se enciende, 3 cristal con cielo
 @export var meshes: Array[ArrayMesh] = []

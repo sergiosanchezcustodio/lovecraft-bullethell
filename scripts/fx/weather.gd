@@ -25,6 +25,7 @@ var _mist: Array[ShaderMaterial] = []
 var _mist_nodes: Array[MeshInstance3D] = []
 var _clouds: MeshInstance3D
 var _cloud_mat: ShaderMaterial
+var _cloud_off := Vector2.ZERO
 var _flash: DirectionalLight3D
 var _base_ambient := 0.35
 var _next_bolt := 0.0
@@ -271,8 +272,14 @@ func _process(delta: float) -> void:
 		_mist[i].set_shader_parameter("offset", wind_off * (1.0 + i * 0.6))
 	if _clouds:
 		_clouds.global_position = Vector3(f.x, 0.02, f.z)
-		_cloud_mat.set_shader_parameter("offset", wind_off * 0.8)
+		# 16-10-2026: deriva propia y lenta (con las rachas iban a 2-3 m/s y se notaban poco como nubes)
+		_cloud_off += Vector2(wv.x, wv.z).normalized() * clampf(data.wind * 0.25, 0.35, 1.4) * delta
+		_cloud_mat.set_shader_parameter("offset", _cloud_off)
 	if data.lightning_every > 0.0: _lightning(delta)
+
+## Sin sombras de nubes (grutas e interiores: Ambient, data/ambient.json "clouds": false)
+func hide_clouds() -> void:
+	if _clouds: _clouds.visible = false
 
 ## Distancia recorrida por el viento hasta ahora (integral aproximada de la fuerza media).
 func _wind_travel() -> float:

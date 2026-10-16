@@ -459,7 +459,7 @@ def choza():
             mull = x in (wx - 1, wx) or y == wy
             if fr: M.put(x, y, fz, P, BATTEN)
             elif mull: M.put(x, y, Z1 - 1, P, BATTEN)
-            else: M.put(x, y, Z1 - 1, P, WIN_L, glow=1)
+            else: M.put(x, y, Z1 - 1, P, WIN_L, glow=2)                    # se enciende a ratos (16-10-2026)
     for y in range(wy - 7, wy + 8):                                           # contraventana abierta y otra descolgada
         for k in range(8):
             M.put(wx - 9 - k, y, fz, P, SHUT if (k % 4) else lerp(SHUT, (0.1, 0.1, 0.1), 0.5))
@@ -545,7 +545,7 @@ def choza():
     for y in range(RY - 12, RY - 3): M.put(-4, y, Z1 + 12, P, ROPE)          # amuleto de huesos bajo el tejadillo
     for (dx, dy) in ((-1, -1), (1, -1), (0, -2), (-2, -3), (2, -3), (0, -4)):
         M.put(-4 + dx, RY - 12 + dy, Z1 + 12, P, BONE if dy % 2 else BONE_D)
-    return M, {P: [0, 0, 0]}
+    return M, {P: [0, 0, 0], 'smoke': [32, RY + 43, -13]}               # humo del tubo de la estufa
 
 
 def poste():

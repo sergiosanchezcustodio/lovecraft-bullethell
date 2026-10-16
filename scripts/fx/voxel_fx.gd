@@ -537,6 +537,92 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.gravity = Vector3(0, -2.0, 0)
 			m.scale_min = 0.08; m.scale_max = 0.18
 			m.color_ramp = _ramp([[0.0, Color(0.85, 0.85, 0.9, 0.7)], [1.0, Color(0.8, 0.8, 0.85, 0.0)]])
+		# --- ambiente de los escenarios (16-10-2026): vivas todo el nivel, sin daño ---
+		"fireflies":              # luciérnagas: vagan despacio y se encienden a ratos (caja: Ambient)
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 3.0, 8.0, 40.0))
+			p.lifetime = 6.0
+			p.preprocess = 6.0
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+			m.emission_box_extents = Vector3(r, 0.6, r)
+			m.spread = 180.0
+			m.initial_velocity_min = 0.08; m.initial_velocity_max = 0.3
+			m.gravity = Vector3(0, 0.02, 0)
+			m.scale_min = 0.04; m.scale_max = 0.06
+			m.color_ramp = _ramp([[0.0, Color(0.6, 0.75, 0.2, 0.0)], [0.12, Color(0.6, 0.75, 0.2, 0.0)], [0.18, Color(0.75, 0.9, 0.3, 1.0)],
+				[0.3, Color(0.6, 0.75, 0.2, 0.0)], [0.55, Color(0.6, 0.75, 0.2, 0.0)], [0.62, Color(0.75, 0.9, 0.3, 1.0)],
+				[0.72, Color(0.6, 0.75, 0.2, 0.0)], [1.0, Color(0.6, 0.75, 0.2, 0.0)]])
+		"moths":                  # polillas alrededor de una lámpara: revolotean atraídas por la luz
+			p.draw_pass_1 = cube("lit")
+			p.amount = 6
+			p.lifetime = 2.5
+			p.preprocess = 2.5
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r
+			m.spread = 180.0
+			m.initial_velocity_min = 0.8; m.initial_velocity_max = 1.6
+			m.radial_accel_min = -3.5; m.radial_accel_max = -2.0
+			m.gravity = Vector3.ZERO
+			m.scale_min = 0.03; m.scale_max = 0.045
+			m.color_ramp = _ramp([[0.0, Color(0.75, 0.7, 0.58, 0.0)], [0.1, Color(0.75, 0.7, 0.58, 1.0)],
+				[0.9, Color(0.75, 0.7, 0.58, 1.0)], [1.0, Color(0.75, 0.7, 0.58, 0.0)]])
+		"dust_beam":              # polvo que flota en la luz (rayos de luna del estudio)
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 8.0, 10.0, 40.0))
+			p.lifetime = 8.0
+			p.preprocess = 8.0
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+			m.emission_box_extents = Vector3(r * 0.5, 1.2, r * 0.5)
+			m.spread = 180.0
+			m.initial_velocity_min = 0.02; m.initial_velocity_max = 0.08
+			m.gravity = Vector3(0.01, -0.01, 0)
+			m.scale_min = 0.02; m.scale_max = 0.035
+			m.color_ramp = _ramp([[0.0, Color(0.3, 0.33, 0.4, 0.0)], [0.3, Color(0.3, 0.33, 0.4, 0.3)],
+				[0.7, Color(0.3, 0.33, 0.4, 0.3)], [1.0, Color(0.3, 0.33, 0.4, 0.0)]])
+		"glow_motes":             # motas de luz que suben despacio (grutas, el arrecife)
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 4.0, 10.0, 40.0))
+			p.lifetime = 7.0
+			p.preprocess = 7.0
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+			m.emission_box_extents = Vector3(r, 0.5, r)
+			m.spread = 180.0
+			m.initial_velocity_min = 0.03; m.initial_velocity_max = 0.12
+			m.gravity = Vector3(0, 0.05, 0)
+			m.scale_min = 0.025; m.scale_max = 0.045
+			m.color_ramp = _ramp([[0.0, Color(0.2, 0.7, 0.6, 0.0)], [0.3, Color(0.25, 0.75, 0.65, 0.9)],
+				[0.6, Color(0.2, 0.6, 0.55, 0.5)], [1.0, Color(0.2, 0.6, 0.55, 0.0)]])
+		"sea_bubbles":            # algo respira bajo el agua: burbujas que suben y revientan
+			p.draw_pass_1 = cube("mix")
+			p.amount = int(clampf(r * 14.0, 6.0, 20.0))
+			p.lifetime = 1.4
+			p.explosiveness = 0.5
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r
+			m.spread = 10.0
+			m.initial_velocity_min = 0.05; m.initial_velocity_max = 0.2
+			m.gravity = Vector3.ZERO
+			m.scale_min = 0.05; m.scale_max = 0.12
+			m.scale_curve = _curve([[0.0, 0.2], [0.8, 1.0], [0.85, 1.3], [0.9, 0.0], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.55, 0.65, 0.68, 0.8)], [0.8, Color(0.75, 0.85, 0.88, 0.9)], [1.0, Color(0.8, 0.9, 0.92, 0.0)]])
+		"whirl":                  # remolino de ceniza o nieve que cruza el suelo (Ambient lo mueve)
+			p.draw_pass_1 = cube("mix")
+			p.amount = 40
+			p.lifetime = 1.6
+			p.local_coords = true
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
+			m.emission_ring_axis = Vector3.UP
+			m.emission_ring_radius = r * 0.5
+			m.emission_ring_inner_radius = r * 0.2
+			m.emission_ring_height = 0.1
+			m.direction = Vector3(0, 1, 0)
+			m.spread = 15.0
+			m.initial_velocity_min = 0.8; m.initial_velocity_max = 1.6
+			m.orbit_velocity_min = 0.9; m.orbit_velocity_max = 1.4
+			m.radial_accel_min = 0.2; m.radial_accel_max = 0.6
+			m.gravity = Vector3(0, -0.2, 0)
+			m.scale_min = 0.04; m.scale_max = 0.09
+			m.color_ramp = _ramp([[0.0, Color(0.55, 0.55, 0.55, 0.0)], [0.2, Color(0.5, 0.5, 0.5, 0.6)], [1.0, Color(0.5, 0.5, 0.5, 0.0)]])
 	m.color = tint
 	var key := "%s|%.1f|%s" % [recipe, r, tint.to_html()]
 	if _mat_cache.has(key): p.process_material = _mat_cache[key]

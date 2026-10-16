@@ -18,7 +18,7 @@ const FACES := [
 static var _cache := {}
 ## Caché en disco de las mallas construidas (ver VoxelMeshCache). Sube BUILDER_VERSION
 ## cuando cambie la forma de construir las mallas, para invalidar lo guardado.
-const BUILDER_VERSION := 4
+const BUILDER_VERSION := 7
 const DISK_CACHE_DIR := "user://voxcache"
 static var use_disk_cache := true
 static var _mats := {}   # "rugosidad/especular" -> material compartido
@@ -63,6 +63,10 @@ static func load_model(path: String) -> Node3D:
 		mi.mesh = layer.mesh
 		mi.material_override = _glow_mat if layer.glow else model.material
 		if pname == "flag" and not layer.glow: mi.material_override = _flag_material(model.material)   # ondea al viento
+		if pname == "cloth" and not layer.glow: mi.material_override = _cloth_material(model.material)   # ropa tendida, redes
+		if int(layer.get("kind", 0)) == KIND_WINDOW: mi.material_override = window_material()
+		elif int(layer.get("kind", 0)) == KIND_SKY: mi.material_override = sky_glass_material()
+		mi.set_meta("kind", int(layer.get("kind", 1 if layer.glow else 0)))
 		pivot_node.add_child(mi)
 	# Jerarquía: cada parte con padre pasa a colgar de él, con la posición relativa a su pivote
 	var parents: Dictionary = model.get("parents", {})
@@ -148,7 +152,8 @@ static func _get_model(path: String) -> Dictionary:
 		if c != null and c.meshes.size() == c.parts.size():
 			var layers_c: Array[Dictionary] = []
 			for i in c.parts.size():
-				layers_c.append({"part": c.parts[i], "pivot": c.layer_pivots[i], "glow": c.glows[i], "mesh": c.meshes[i]})
+				var kd: int = c.kinds[i] if i < c.kinds.size() else int(c.glows[i])
+				layers_c.append({"part": c.parts[i], "pivot": c.layer_pivots[i], "glow": c.glows[i], "kind": kd, "mesh": c.meshes[i]})
 			var m := {"pivots": c.pivots, "parents": c.parents, "layers": layers_c, "voxel_size": c.voxel_size,
 				"material": _material(c.roughness, c.specular)}
 			_cache[path] = m
@@ -163,7 +168,8 @@ static func _get_model(path: String) -> Dictionary:
 		all[p] = true
 		if not occ.has(v[3]): occ[v[3]] = {}
 		occ[v[3]][p] = true
-		var key: String = v[3] + ("#glow" if v.size() > 7 and v[7] == 1 else "")
+		var g := int(v[7]) if v.size() > 7 else 0                   # 1 luz, 2 ventana que se enciende, 3 cristal con cielo
+		var key: String = v[3] + ("" if g <= 0 else ["", "#glow", "#gwin", "#gsky"][clampi(g, 1, 3)])
 		if not parts.has(key): parts[key] = []
 		parts[key].append([p, Color(v[4], v[5], v[6])])
 	var keys := parts.keys()
@@ -174,8 +180,9 @@ static func _get_model(path: String) -> Dictionary:
 		var pname := key.get_slice("#", 0)
 		var pv: Array = data.pivots[pname]
 		var pivot := Vector3(pv[0], pv[1], pv[2])
-		layers.append({"part": pname, "pivot": pivot, "glow": key.ends_with("#glow"),
-			"mesh": _build(parts[key], occ[pname], all, pivot, vs, bool(data.get("no_bottom", false)))})
+		var kind := 1 if key.ends_with("#glow") else (2 if key.ends_with("#gwin") else (3 if key.ends_with("#gsky") else 0))
+		layers.append({"part": pname, "pivot": pivot, "glow": kind > 0, "kind": kind,
+			"mesh": _build(parts[key], occ[pname], all, pivot, vs, bool(data.get("no_bottom", false)), kind == KIND_WINDOW)})
 	# Material por modelo: las criaturas son de piel húmeda (valores por defecto);
 	# ropa, plumas y atrezo declaran en el JSON una superficie mate.
 	var rough := float(data.get("roughness", 0.38))
@@ -230,6 +237,7 @@ static func _save_disk_cache(path: String, disk_path: String, model: Dictionary,
 		c.parts.append(layer.part)
 		c.layer_pivots.append(layer.pivot)
 		c.glows.append(layer.glow)
+		c.kinds.append(int(layer.get("kind", 0)))
 		c.meshes.append(layer.mesh)
 	ResourceSaver.save(c, disk_path)
 
@@ -257,6 +265,41 @@ static func _flag_material(base: StandardMaterial3D) -> ShaderMaterial:
 		_flag_mats[base] = m
 	return _flag_mats[base]
 
+## Capas especiales (glow 2 y 3 en el JSON, 16-10-2026, ambiente de los escenarios)
+const KIND_WINDOW := 2      ## ventana que se enciende y se apaga sola (window_glow.gdshader)
+const KIND_SKY := 3         ## cristal que refleja el cielo de noche con estrellas (sky_glass.gdshader)
+static var _window_mat: ShaderMaterial
+static var _sky_mat: ShaderMaterial
+static func window_material() -> ShaderMaterial:
+	if _window_mat == null:
+		_window_mat = ShaderMaterial.new()
+		_window_mat.shader = preload("res://scripts/fx/window_glow.gdshader")
+		_window_mat.set_shader_parameter("colors_srgb", colors_are_srgb())
+	return _window_mat
+static func sky_glass_material() -> ShaderMaterial:
+	if _sky_mat == null:
+		_sky_mat = ShaderMaterial.new()
+		_sky_mat.shader = preload("res://scripts/fx/sky_glass.gdshader")
+		_sky_mat.set_shader_parameter("colors_srgb", colors_are_srgb())
+	return _sky_mat
+
+## Material de la parte "cloth" (ropa tendida, redes; 16-10-2026): cuelga de su pivote y se mece
+## con el viento (sway.gdshader con `hang`).
+static var _cloth_mats := {}
+static func _cloth_material(base: StandardMaterial3D) -> ShaderMaterial:
+	if not _cloth_mats.has(base):
+		var m := ShaderMaterial.new()
+		m.shader = preload("res://scripts/fx/sway.gdshader")
+		m.set_shader_parameter("colors_srgb", colors_are_srgb())
+		m.set_shader_parameter("roughness_v", base.roughness)
+		m.set_shader_parameter("specular_v", base.metallic_specular)
+		m.set_shader_parameter("hang", true)
+		m.set_shader_parameter("amplitude", 0.09)
+		m.set_shader_parameter("height", 1.0)
+		m.set_shader_parameter("speed", 1.8)
+		_cloth_mats[base] = m
+	return _cloth_mats[base]
+
 static func _ensure_glow_material() -> void:
 	if _glow_mat != null: return
 	_glow_mat = StandardMaterial3D.new()
@@ -271,12 +314,14 @@ static func colors_are_srgb() -> bool:
 
 ## no_bottom (JSON "no_bottom": true, atrezo fijo): sin las caras que miran hacia abajo, que la
 ## cámara isométrica nunca ve; en piezas planas (témpanos, costa) son casi la mitad.
-static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vector3, vs: float, no_bottom := false) -> ArrayMesh:
+static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vector3, vs: float, no_bottom := false, ids := false) -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var comp := _components(voxels) if ids else {}
 	for item in voxels:
 		var p: Vector3i = item[0]
 		var col: Color = item[1]
+		if ids: st.set_uv(Vector2(float(comp[p]), 0.0))       # ventana a la que pertenece (window_glow.gdshader)
 		for f in FACES:
 			var n: Vector3i = f[0]
 			# Solo se quitan las caras que tapa un voxel de la MISMA parte. Entre partes
@@ -296,6 +341,29 @@ static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vecto
 				st.set_color(col * shades[i])
 				st.add_vertex((Vector3(p) + corners[i] - pivot) * vs)
 	return st.commit()
+
+## Ventanas (voxels con glow 2): cada grupo de voxels a menos de 2 de otro (salta el parteluz y
+## los junquillos de 1 voxel) es una ventana con su número, para que se enciendan por separado.
+static func _components(voxels: Array) -> Dictionary:
+	var cell := {}
+	for item in voxels: cell[item[0]] = -1
+	var n := 0
+	for item in voxels:
+		var s: Vector3i = item[0]
+		if cell[s] >= 0: continue
+		n += 1
+		cell[s] = n
+		var stack: Array[Vector3i] = [s]
+		while not stack.is_empty():
+			var p: Vector3i = stack.pop_back()
+			for dx in [-2, -1, 0, 1, 2]:
+				for dy in [-2, -1, 0, 1, 2]:
+					for dz in [-2, -1, 0, 1, 2]:
+						var q := p + Vector3i(dx, dy, dz)
+						if cell.get(q, 0) == -1:
+							cell[q] = n
+							stack.append(q)
+	return cell
 
 static func _ao(p: Vector3i, n: Vector3i, corner: Vector3, all: Dictionary) -> float:
 	# Oclusión ambiental clásica voxel: mira 2 laterales + diagonal junto al vértice

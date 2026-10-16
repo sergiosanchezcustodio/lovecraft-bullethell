@@ -167,8 +167,9 @@ def casa(variant=1):
                     col = PLANK if (abs(a * 1.3 - b) < 1.3 or abs(a * 1.3 + b) < 1.3) else DARK
                     if b in (-hh + 2, hh - 3): col = PLANK_D
                     put(a, b, col, out=1 if col != DARK else 0)
-                elif state == 'luz':
-                    put(a, b, TRIM if sash else LIGHT, glow=0 if sash else 1)
+                elif state in ('luz', 'oscura'):
+                    # 16-10-2026: se enciende y se apaga sola (glow 2, window_glow.gdshader)
+                    put(a, b, TRIM if sash else LIGHT, glow=0 if sash else 2)
                 elif state == 'rota':
                     put(a, b, TRIM if sash else (GLASS if M.hsh(a, b, cx) < 0.3 else DARK))
                 else:
@@ -234,7 +235,9 @@ def casa(variant=1):
                 for z in range(-9, 1): M.put(x, y, z, P, (0.48, 0.44, 0.40))
             for z in (-9, 0):
                 for x in range(-37, -25): M.put(x, y, z, P, (0.48, 0.44, 0.40))
-    return M, {P: [0, 0, 0]}
+    piv = {P: [0, 0, 0]}
+    if variant == 1: piv['smoke'] = [-31, RIDGE + 12, -4]       # humea (la verde, abandonada, no)
+    return M, piv
 
 
 # ---------------- autobús de Joe Sargent ----------------
@@ -617,19 +620,19 @@ def redes():
             if not mesh: continue
             if M.noise(x, y, 0, 9.0) > 0.72: continue                                 # agujeros
             c = KNOT if (u % 6 == 0 and v % 6 == 0) else NETC
-            M.put(x, y, z, P, c)
+            M.put(x, y, z, 'cloth', c)                                                # cuelga y se mece (sway.gdshader)
         if x % 10 == 0:                                                              # corchos
             for dy in range(3):
-                for dx in range(3): M.put(x + dx, t - 1 - dy, 1, P, CORK)
+                for dx in range(3): M.put(x + dx, t - 1 - dy, 1, 'cloth', CORK)
         yb = t - drape
         if x % 12 == 0:                                                              # plomos
-            for dx in range(2): M.put(x + dx, yb, 0, P, LEAD_C); M.put(x + dx, yb - 1, 0, P, LEAD_C)
+            for dx in range(2): M.put(x + dx, yb, 0, 'cloth', LEAD_C); M.put(x + dx, yb - 1, 0, 'cloth', LEAD_C)
     for _ in range(14):                                                              # algas enredadas
         x = rng.randint(-PX + 10, PX - 10); y = rng.randint(50, 100)
-        for k in range(rng.randint(4, 12)): M.put(x + k // 4, y - k, 1, P, (0.20, 0.32, 0.16) if k % 3 else (0.14, 0.22, 0.10))
+        for k in range(rng.randint(4, 12)): M.put(x + k // 4, y - k, 1, 'cloth', (0.20, 0.32, 0.16) if k % 3 else (0.14, 0.22, 0.10))
     for t in range(-7, 8):                                                           # un pez enredado
         for k in range(-2, 3):
-            if abs(k) <= 2 * math.sqrt(max(0, 1 - (t / 8) ** 2)): M.put(20 + t, 70 + k, 2, P, (0.62, 0.66, 0.68) if k > -1 else (0.30, 0.38, 0.44))
+            if abs(k) <= 2 * math.sqrt(max(0, 1 - (t / 8) ** 2)): M.put(20 + t, 70 + k, 2, 'cloth', (0.62, 0.66, 0.68) if k > -1 else (0.30, 0.38, 0.44))
     for y in range(0, 26):                                                           # cesto de mimbre
         r = 14 + (y // 8)
         for a in range(0, 360, 3):
@@ -648,7 +651,7 @@ def redes():
         M.put(int(5 + r * math.cos(math.radians(a))), 1 + a // 360, int(34 + r * math.sin(math.radians(a))), P, (0.58, 0.50, 0.34))
     nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
     for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
-    return M, {P: [0, 0, 0]}
+    return M, {P: [0, 0, 0], 'cloth': [0, 120, 0]}
 
 
 def barca():

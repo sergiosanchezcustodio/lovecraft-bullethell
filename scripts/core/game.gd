@@ -206,6 +206,8 @@ func _ready() -> void:
 		for wid in wlist:
 			var w := player.weapons.add_weapon(load("res://data/weapons/%s.tres" % wid))
 			w.level = clampi(args.get_int("wlevel", 1), 1, w.data.max_level)
+	elif args.get_bool("noweapons"):                 # clips del ambiente: sin disparar a nada
+		for w in player.weapons.weapons.duplicate(): player.weapons.remove_weapon(w.data.id)
 	elif args.has("wlevel"):
 		for w in player.weapons.weapons: w.level = clampi(args.get_int("wlevel", 1), 1, w.data.max_level)
 	for up_id in args.get_str("items").split(",", false):     # items=iman,vida: objetos del J1 al empezar
@@ -218,6 +220,7 @@ func _ready() -> void:
 	if players.size() > 1:                          # correa: nadie se sale del encuadre máximo
 		for q in players: q.leash = func(pos: Vector3) -> Vector3: return camera.leash(pos)
 	_env = env
+	add_child(Ambient.new().setup(arena, camera, arena_path.get_file().get_basename()))   # ambiente del escenario
 	_make_announcer()
 	if not args.get_bool("nolevel"):
 		var level_id := (String(GameSession.level) if not GameSession.carry.is_empty() else args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1"))

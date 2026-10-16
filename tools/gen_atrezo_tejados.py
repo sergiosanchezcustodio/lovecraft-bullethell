@@ -100,7 +100,7 @@ def gilman():
                 for b in range(-11, 11):
                     edge = a in (-6, 5) or b in (-11, 10) or b == 0
                     if edge: c, g = TRIM, 0
-                    elif state == 'luz': c, g = LIT, 1
+                    elif state in ('luz', 'oscura'): c, g = LIT, 2          # se enciende y se apaga sola (16-10-2026)
                     elif state == 'tapiada': c, g = (PLANK if (b + 11) % 5 else PLANK_D), 0
                     elif state == 'rota': c, g = (GLASS if M.hsh(a, b, cx + fi) < 0.25 else DARK), 0
                     else: c, g = (GLASS if (a + b) % 7 == 0 else DARK), 0
@@ -209,8 +209,8 @@ def buhardilla():
                     if front:
                         if z in (cx - 10, cx - 9, cx + 8, cx + 9) or y in (y0, y0 + 1, y1 - 1, y1 - 2): c = TRIM
                         elif z in (cx - 1, cx) or y == (y0 + y1) // 2: c = TRIM                          # parteluz
-                        else: c = LIT if lit else (0.06, 0.07, 0.08)
-                        M.put(x, y, z, P, c, glow=1 if c == LIT else 0)
+                        else: c = LIT                                                                  # 16-10-2026: las dos, a ratos
+                        M.put(x, y, z, P, c, glow=2 if c == LIT else 0)
                     else:
                         M.put(x, y, z, P, slate(x, y, z))
             M.put(HX - inset(y0) + 1, y0, cx, P, TRIM)
@@ -283,7 +283,7 @@ def chimenea():
                     for z in range(-4, 5):
                         if math.hypot(x - cx, z) < r - 2: M.put(x, y, z, P, SOOT)
     _hollow(M)
-    return M, {P: [0, 0, 0]}
+    return M, {P: [0, 0, 0], 'smoke': [-13, H + 26, 0]}          # humea por el primer sombrerete
 
 
 def claraboya():
@@ -326,6 +326,8 @@ def claraboya():
                 if y < BH + 6: c = lerp(c, (0.22, 0.30, 0.18), 0.5)                    # verdín abajo
                 if M.noise(x, y, z, 4.0) > 0.66: c = lerp(c, GRIME, 0.6)                # hollín
                 if (x + 2 * y + z) % 13 == 0: c = lerp(c, (0.62, 0.70, 0.72), 0.5)      # reflejos
+                if M.noise(x, y, z, 4.0) <= 0.66 and y >= BH + 6:                       # cristal limpio: refleja el cielo (glow 3)
+                    M.put(x, y, z, P, lerp((0.07, 0.09, 0.14), (0.10, 0.13, 0.19), M.noise(x, y, z, 6.0)), glow=3); continue
                 M.put(x, y, z, P, c)
     for k in range(18):                                                              # paño entreabierto y varilla
         for j in range(18):
@@ -462,10 +464,10 @@ def tendedero():
                 if kind == 'towel' and (top - y) in range(6, 10): c = CLOTH_R
                 if kind == 'sheet' and M.hsh(i, 3, 3) > 0.5 and abs(x - x0 - w * 0.6) < 6 and abs(y - top + hh * 0.5) < 6: c = lerp(col, (0.6, 0.5, 0.4), 0.4)  # remiendo
                 c = lerp(c, (0.5, 0.5, 0.48), 0.12 * M.noise(x, y, i, 6.0))
-                M.put(x, y, zc + dz, P, c)
+                M.put(x, y, zc + dz, 'cloth', c)                          # cuelga de la cuerda y se mece (sway.gdshader)
         for px in (x0 + 1, x0 + w - 2):                              # pinzas
             for k in range(4): M.put(px, rope_y(px) + 1 - k, zc + 1, P, PEG)
-    return M, {P: [0, 0, 0]}
+    return M, {P: [0, 0, 0], 'cloth': [0, 126, 0]}
 
 
 def pretil():

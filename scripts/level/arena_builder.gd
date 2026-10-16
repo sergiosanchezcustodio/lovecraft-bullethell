@@ -38,6 +38,10 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	var props := Node3D.new()
 	props.name = "Props"
 	root.add_child(props)
+	# ambiente (data/ambient.json): balanceo, brillo animado, flotar y partículas por pieza
+	var amb_items: Array = []
+	var aw: Array = (Ambient.config().get("arenas", {}) as Dictionary).get(path.get_file().get_basename(), {}).get("wind", [0.8, 0.6])
+	var wind := Vector2(aw[0], aw[1])
 	for p: Dictionary in data.props:
 		var holder := Node3D.new()
 		holder.position = Vector3(p.pos[0], 0, p.pos[1])
@@ -55,11 +59,20 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 				mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		props.add_child(holder)
 		_collider(holder, m, data.colliders.get(p.model, {}), obstacles, not masked)
+		var north_sea: bool = data.has("ground") and data.ground.has("margin_north") and p.pos[1] < -size.y * 0.5   # muelle: agua al norte
+		var in_sea: bool = data.has("sea") and (p.pos[0] > size.x * 0.5 or p.pos[1] > size.y * 0.5 or north_sea)
+		var amb := Ambient.dress(holder, m, p.model, in_sea, wind)
 		if (m.get_meta("pivots") as Dictionary).has("light"):
-			lights.append(_lamp(holder, m, data.lamp, fog_volumes))
+			var lamp := _lamp(holder, m, data.lamp, fog_volumes)
+			lights.append(lamp)
+			if not amb.is_empty(): amb["light"] = lamp
+		if not amb.is_empty():
+			amb["holder"] = holder
+			amb_items.append(amb)
 		for k: String in (m.get_meta("pivots") as Dictionary):
 			if k.begins_with("smoke"): _smoke(holder, m, k)
 	root.set_meta("lights", lights)
+	root.set_meta("ambient", amb_items)
 	root.set_meta("obstacles", obstacles)
 	if not masked: root.add_child(_walls(size))
 	return root

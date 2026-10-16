@@ -129,7 +129,7 @@ def casco():
                     d = math.hypot(dx, dy2)
                     if d > 3.4: continue
                     if d > 2.2: M.put(x + dx, py + dy2, s * (h + 1), P, BRASS)
-                    else: M.put(x + dx, py + dy2, s * h, P, LIGHT if lit else (GLASS if d > 0.8 else (0.25, 0.28, 0.30)), glow=1 if lit else 0)
+                    else: M.put(x + dx, py + dy2, s * h, P, LIGHT, glow=2)        # se enciende a ratos (16-10-2026)
             for k in range(4, 4 + int(8 + 10 * M.hsh(x, s, 3))):
                 v = M.V.get((x, py - k, s * h))
                 if v: v[1] = lerp(v[1], RUST, 0.55 * (1 - k / 22))
@@ -234,10 +234,9 @@ def casco():
                     if y >= yt - 2: c = WOOD
                     side = z in (z0, z1 - 1)
                     if side and yb + 12 <= y < yb + 22 and (x - x0) % 14 in range(4, 10) and not any(abs(x - d) < 8 for d in door_xs):
-                        lit = M.hsh((x - x0) // 14, yb, z) > lit_every
-                        c = LIGHT if lit else GLASS
+                        c = LIGHT                                                              # a ratos (glow 2, 16-10-2026)
                         if (x - x0) % 14 == 7 or y == yb + 17: c = WHITE_D                    # parteluz
-                        M.put(x, y, z, P, c, glow=1 if c == LIGHT else 0)
+                        M.put(x, y, z, P, c, glow=2 if c == LIGHT else 0)
                         continue
                     if side and any(abs(x - d) < 5 for d in door_xs) and y < yb + 24:
                         c = DOOR if any(abs(x - d) < 4 for d in door_xs) else WHITE_D
@@ -1178,8 +1177,7 @@ def _caseta(M, x0, x1, z0, h, lit_every=3, doors=(), ladders=(), roof_props=True
                     M.put(px + dx, py + dy, 0, P, c)
                     if r < 3.6: M.put(px + dx, py + dy, front, P, c)
                 else:
-                    if lit: M.put(px + dx, py + dy, front, P, LIGHT, glow=1)
-                    else: M.put(px + dx, py + dy, front, P, (0.30, 0.34, 0.38) if (dx, dy) in ((-1, 1), (-2, 1), (-1, 2)) else GLASS)
+                    M.put(px + dx, py + dy, front, P, LIGHT, glow=2)              # se enciende a ratos (16-10-2026)
         rust.append((px + 1, py - 5, 9 + (px % 5)))
     # tubería de vapor con abrazaderas y bajante
     ty = h - 7

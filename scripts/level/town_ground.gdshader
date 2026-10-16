@@ -9,6 +9,8 @@ shader_type spatial;
 // cuadran; juntas con limo que brilla apenas). wet (0..1): lluvia; oscurece
 // y abrillanta todo. Los charcos son brillo especular falso: sin reflejos reales.
 
+#include "res://scripts/fx/night_sky.gdshaderinc"
+
 uniform int kind = 0;
 uniform float cell = 0.03125;
 uniform float wet = 0.5;
@@ -271,6 +273,10 @@ void fragment() {
 		}
 		ALBEDO = col * shade;
 		EMISSION = glow + crack_glow * crack * 0.7;
+		if (night > 0.0 && wetm > 0.55) {                             // estrellas en charcos y pozas (16-10-2026)
+			vec2 sp = pc + vec2(sin(TIME * 0.9 + pc.y * 3.0), cos(TIME * 0.7 + pc.x * 3.0)) * 0.02;
+			EMISSION += (star_at(floor(sp * 16.0), TIME, 0.005) * night * 1.1 + shooting_star(sp)) * wetm;
+		}
 		ROUGHNESS = mix(mix(rough, 0.45, wet), 0.04, wetm);
 		SPECULAR = mix(mix(spec, 0.5, wet), 0.9, wetm);
 	}

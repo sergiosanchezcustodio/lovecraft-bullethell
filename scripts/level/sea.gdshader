@@ -7,6 +7,8 @@
 shader_type spatial;
 render_mode cull_disabled, shadows_disabled;
 
+#include "res://scripts/fx/night_sky.gdshaderinc"
+
 uniform vec3 deep : source_color = vec3(0.07, 0.17, 0.27);
 uniform vec3 mid : source_color = vec3(0.14, 0.32, 0.44);
 uniform vec3 shallow : source_color = vec3(0.26, 0.50, 0.60);
@@ -18,6 +20,7 @@ uniform float cell = 0.125;
 uniform vec2 shore = vec2(32.0, 32.0);       // la orilla: x = shore.x (este) y z = shore.y (sur)
 uniform float north_shore = -100000.0;       // orilla norte (un muelle con agua detrás); por defecto, ninguna
 uniform vec2 drift = vec2(0.05, 0.03);       // deriva del hielo menudo (m/s)
+uniform float swell = 1.0;                   // líneas de ola que avanzan hacia la orilla (ambiente, 16-10-2026)
 
 varying vec3 wpos;
 
@@ -79,13 +82,23 @@ void fragment() {
 	b = step(0.5, b) * brash_amount;
 	col = mix(col, brash * (0.92 + 0.1 * hash(qc)), b);
 
-	// espuma contra la plataforma (asoma en los entrantes del frente)
-	float band = 2.3 + 0.35 * sin(t * 0.9 + p.x * 0.4 + p.y * 0.4);
-	float fo = step(dist, band) * step(0.62, vnoise(p * 3.0 + vec2(t * 0.4, -t * 0.3))) * step(0.5, hash(c + floor(t * 2.0)));
+	// olas que llegan a la orilla: crestas paralelas a la costa que avanzan y se rompen a trozos
+	float along = (p.x < shore.x) ? p.x : p.y;
+	float ph = dist * 0.85 + t * 1.25 + 1.5 * sin(along * 0.11 + t * 0.07);
+	float crestl = step(0.94, sin(ph)) * step(0.45, vnoise(vec2(along * 0.35, ph * 0.3))) * (1.0 - smoothstep(4.0, 16.0, dist));
+	col = mix(col, crest * 1.08, crestl * swell * 0.55);
+	// espuma contra la plataforma (asoma en los entrantes del frente): resaca que sube y baja
+	float surge = 0.5 + 0.5 * sin(t * 0.55 + along * 0.05);
+	float band = 1.6 + 1.5 * surge * swell + 0.35 * sin(t * 0.9 + p.x * 0.4 + p.y * 0.4);
+	float fo = step(dist, band) * step(0.62 - 0.12 * step(dist, band - 0.5), vnoise(p * 3.0 + vec2(t * 0.4, -t * 0.3))) * step(0.5, hash(c + floor(t * 2.0)));
 	col = mix(col, foam, fo * 0.6);
 
 	float ice = max(b, fo);
 	ALBEDO = col;
+	if (night > 0.0) {                       // estrellas reflejadas que tiemblan con las olas
+		vec2 sp = wpos.xz + n.xz * 0.35;
+		EMISSION = (star_at(floor(sp * 16.0), t, 0.005) * night * 1.1 + shooting_star(sp)) * (1.0 - ice) * (0.6 + 0.4 * h);
+	}
 	ROUGHNESS = mix(0.3, 0.8, ice);
 	SPECULAR = mix(0.35, 0.3, ice);
 }

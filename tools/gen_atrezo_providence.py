@@ -123,7 +123,8 @@ def muro(variant=1):
                         u = x - w[0]
                         if variant == 2 and w == wins[4] and (u - 8) ** 2 + (y - 60) ** 2 < 40: continue   # cristal roto
                         fr = u in (0, 1, 15, 16, 30, 31) or (y - WY0) % 20 in (0, 1)
-                        M.put(x, y, z, P, FRAME if fr else (GLASS_L if (u + y) % 11 == 0 else GLASS))
+                        if fr: M.put(x, y, z, P, FRAME)
+                        else: M.put(x, y, z, P, lerp((0.06, 0.08, 0.14), (0.09, 0.12, 0.19), (y - WY0) / (WY1 - WY0)), glow=3)   # refleja el cielo (16-10-2026)
                     continue
                 c, joint = brick_c(x, y)
                 if face:
