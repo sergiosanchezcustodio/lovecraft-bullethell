@@ -209,6 +209,9 @@ var _ripplers: Array = []                       ## [punto del agua donde cae un 
 var _perch: Array[Dictionary] = []              ## gaviotas posadas (o que se van volando)
 var _perch_spots: Array = []                    ## [punto, ocupado]
 var _perch_t := 0.0
+var _watchers: Array[Dictionary] = []           ## vecinos que miran en silencio
+var _watch_spots: Array = []
+var _watch_t := 0.0
 var _sounds: Array = []                         ## [reproductor 3D, dB, alcance]: el fuego
 var _walked := {}                               ## jugador -> [última posición, m hasta el próximo crujido]
 var _next_idle_creak := 6.0
@@ -274,6 +277,8 @@ func _ready() -> void:
 	if cfg.has("spills"): _find_spills(cfg.spills)
 	if cfg.has("spray"): _find_sprays(cfg.spray)
 	if cfg.has("perch"): _find_perches(cfg.perch)
+	if cfg.has("sea_mist") and _sea_mat != null: _make_sea_mist(cfg.sea_mist)
+	if cfg.has("watchers"): _find_watch_spots(cfg.watchers)
 	if cfg.has("loop"): _start_loop(cfg.loop)
 	if cfg.has("crowd") and not sfx_muted():
 		_crowd = _loop_player(String(cfg.crowd.file), false) as AudioStreamPlayer
@@ -408,6 +413,7 @@ func _process(delta: float) -> void:
 			rp[1] = _rng.randf_range(0.18, 0.35)
 			_ripple(rp[0] + Vector3(_rng.randf_range(-0.06, 0.06), 0.01, _rng.randf_range(-0.06, 0.06)), 0.35, 0.65)
 	if not _perch_spots.is_empty(): _perch_step(delta, t)
+	if not _watch_spots.is_empty(): _watch_step(delta, t)
 	if _crowd != null: _crowd_step(delta)
 	_hook_t -= delta
 	if _hook_t <= 0.0:                                          # pasos: cada jugador nuevo, enganchado
@@ -937,6 +943,112 @@ func _foam(at: Vector3, b: Basis, r: float) -> void:
 	add_child(fo)
 	get_tree().create_timer(2.2).timeout.connect(fo.queue_free)
 
+# ------------------------------------------------------------------ niebla sobre el agua
+
+## Dos capas de jirones bajos sobre el mar (sea_fog.gdshader), del tamaño del mar.
+func _make_sea_mist(c: Dictionary) -> void:
+	var sea := arena.get_node("Sea") as MeshInstance3D
+	var col: Array = c.get("color", [0.42, 0.47, 0.5])
+	var w := _weather()
+	var wv := Vector2(0.8, 0.3)
+	if w != null and w.data != null: wv = Vector2(w.data.wind_vector().x, w.data.wind_vector().z)
+	for k in 2:
+		var mi := MeshInstance3D.new()
+		var pm := PlaneMesh.new()
+		pm.size = (sea.mesh as PlaneMesh).size
+		mi.mesh = pm
+		var m := ShaderMaterial.new()
+		m.shader = preload("res://scripts/fx/sea_fog.gdshader")
+		m.set_shader_parameter("color", Color(col[0], col[1], col[2]) * (1.0 + 0.12 * k))
+		m.set_shader_parameter("amount", float(c.get("amount", 0.5)) * (1.0 - 0.35 * k))
+		m.set_shader_parameter("shore", _sea.shore)
+		m.set_shader_parameter("north_shore", float(_sea.north))
+		m.set_shader_parameter("wind", wv.normalized() * (0.3 + 0.2 * k))
+		m.set_shader_parameter("seed", 17.0 * k)
+		mi.material_override = m
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.position = sea.position + Vector3(0, 0.5 + 0.45 * k, 0)
+		add_child(mi)
+
+# ------------------------------------------------------------------ vecinos que miran
+
+## Sitios al fondo (junto a las casas, al norte y al oeste) donde quedarse mirando.
+func _find_watch_spots(c: Dictionary) -> void:
+	var half: Vector2 = arena.get_meta("size") * 0.5
+	var obstacles: ObstacleMap = arena.get_meta("obstacles")
+	var band: Array = c.get("band", [2.5, 8.0])
+	for k in 60:
+		var u := _rng.randf_range(-half.x + 3.0, half.x - 3.0)
+		var v := -half.x + _rng.randf_range(band[0], band[1])
+		var p := Vector2(u, v) if k % 2 == 0 else Vector2(v, u)
+		if obstacles != null and obstacles.is_blocked(p, 0.6): continue
+		_watch_spots.append([Vector3(p.x, 0, p.y), false])
+	var f := _focus()
+	for i in _watch_spots.size():
+		if _watchers.size() >= int(c.get("n", 3)): break
+		var sp: Array = _watch_spots[i]
+		if (sp[0] as Vector3).distance_to(Vector3(f.x, 0, f.z)) > 12.0: _watch_place(i, c)
+
+func _watch_place(i: int, c: Dictionary) -> void:
+	var sp: Array = _watch_spots[i]
+	sp[1] = true
+	var models: Array = c.get("models", ["habitante_pescador"])
+	var name := String(models[_rng.randi() % models.size()])
+	var b := Node3D.new()
+	var m := VoxelBuilder.load_model("res://models/%s.json" % name)
+	b.add_child(m)
+	add_child(b)
+	b.position = sp[0]
+	b.rotation.y = _rng.randf() * TAU
+	_watchers.append({"node": b, "model": m, "name": name, "spot": i, "ph": _rng.randf()})
+
+## Quietos, se giran despacio hacia quien pasa; si alguien se les acerca, ya no están (se
+## deshacen en bruma). Vuelven más tarde en otro sitio, fuera de la vista.
+func _watch_step(delta: float, t: float) -> void:
+	var c: Dictionary = cfg.watchers
+	var g := get_parent()
+	var players: Array = g.players if g != null and "players" in g else []
+	var f := _focus()
+	for wd: Dictionary in _watchers.duplicate():
+		var b: Node3D = wd.node
+		Anims.pose(String(wd.name), "idle", wd.model, fposmod(t / Anims.duration(String(wd.name), "idle") + float(wd.ph), 1.0))
+		var near: Node3D = null
+		var nd := INF
+		for pl in players:
+			if not is_instance_valid(pl) or pl.health <= 0.0: continue
+			var dd := (pl as Node3D).global_position.distance_to(b.position)
+			if dd < nd: nd = dd; near = pl
+		if near == null: continue
+		if nd < float(c.get("near", 6.0)):                             # ya no está
+			VoxelFx.puff(self, b.position + Vector3(0, 0.9, 0), "smoke", 0.7, Color(0.6, 0.65, 0.68), 2.5)
+			(_watch_spots[wd.spot] as Array)[1] = false
+			b.queue_free()
+			_watchers.erase(wd)
+			var rs: Array = c.get("respawn", [12, 30])
+			_watch_t = maxf(_watch_t, _rng.randf_range(rs[0], rs[1]))
+			continue
+		if nd < float(c.get("look", 16.0)):                            # lo sigue con la mirada
+			var to := near.global_position - b.position
+			var target := atan2(to.x, to.z)
+			b.rotation.y = rotate_toward(b.rotation.y, target, delta * 1.2)
+	if _watchers.size() < int(c.get("n", 3)):
+		_watch_t -= delta
+		if _watch_t <= 0.0:
+			_watch_t = 2.0
+			var idx := range(_watch_spots.size())
+			idx.shuffle()
+			for i: int in idx:
+				var sp: Array = _watch_spots[i]
+				if sp[1]: continue
+				var p: Vector3 = sp[0]
+				if Vector2(p.x - f.x, p.z - f.z).length() < 14.0: continue
+				var close := false
+				for pl in players:
+					if is_instance_valid(pl) and (pl as Node3D).global_position.distance_to(p) < 10.0: close = true
+				if close: continue
+				_watch_place(i, c)
+				break
+
 # ------------------------------------------------------------------ gaviotas posadas
 
 ## Sitios donde se posan: lo alto de los pilotes (y de lo que diga "on") y la albardilla del
@@ -948,13 +1060,25 @@ func _find_perches(c: Dictionary) -> void:
 		if m == null or not String(m.name) in models: continue
 		var hn := h as Node3D
 		var bb := _world_aabb(hn)
-		_perch_spots.append([Vector3(hn.global_position.x, bb.end.y + 0.06, hn.global_position.z), false])
+		_perch_spots.append([Vector3(hn.global_position.x, bb.end.y + 0.06, hn.global_position.z), false, false])
+	var feed: Array = c.get("feed", [])                              # cajas de pescado: bajan a picotear
+	var feeding: Array = []
+	for h: Node in arena.get_node("Props").get_children():
+		var m := h.get_child(0) as Node3D
+		if m == null or not String(m.name) in feed: continue
+		var hn := h as Node3D
+		var bb := _world_aabb(hn)
+		var top := Vector3(hn.global_position.x + _rng.randf_range(-0.15, 0.15), bb.end.y + 0.04, hn.global_position.z + _rng.randf_range(-0.15, 0.15))
+		feeding.append([top, false, true])
 	var half: Vector2 = arena.get_meta("size") * 0.5
 	for k in int(c.get("edge", 0)):                                 # en el borde del muelle
 		var along := _rng.randf_range(-half.x + 4.0, half.x - 4.0)
 		var p := Vector3(along, 0.07, half.y - 0.12) if k % 2 == 0 else Vector3(half.x - 0.12, 0.07, along)
-		_perch_spots.append([p, false])
+		_perch_spots.append([p, false, false])
 	_perch_spots.shuffle()
+	feeding.shuffle()
+	var nf := mini(int(c.get("feeders", 3)), feeding.size())           # unas cuantas en las cajas, el resto en los pilotes
+	_perch_spots = feeding.slice(0, nf) + _perch_spots + feeding.slice(nf)
 	for i in mini(int(c.get("n", 5)), _perch_spots.size()): _perch_land(i, c)
 
 func _perch_land(spot_i: int, c: Dictionary) -> void:
@@ -969,7 +1093,7 @@ func _perch_land(spot_i: int, c: Dictionary) -> void:
 	b.rotation.y = _rng.randf() * TAU
 	_fold(b, true)
 	_perch.append({"node": b, "spot": spot_i, "fly": false, "t": 0.0, "v": Vector3.ZERO, "turn": _rng.randf_range(2.0, 6.0),
-		"call": _rng.randf_range(6.0, 18.0), "ph": _rng.randf() * TAU})
+		"call": _rng.randf_range(6.0, 18.0), "ph": _rng.randf() * TAU, "peck": bool(spot[2]), "peck_t": _rng.randf_range(0.3, 1.2)})
 
 ## Alas plegadas a lo largo del cuerpo (posada) o abiertas (volando).
 func _fold(b: Node3D, folded: bool) -> void:
@@ -988,6 +1112,13 @@ func _perch_step(delta: float, t: float) -> void:
 	for bd: Dictionary in _perch.duplicate():
 		var b: Node3D = bd.node
 		if not bd.fly:
+			if bd.peck:                                                 # picotea el pescado
+				bd.peck_t -= delta
+				if bd.peck_t <= 0.0:
+					bd.peck_t = _rng.randf_range(0.5, 1.6)
+					var tw := create_tween()
+					tw.tween_property(b, "rotation:x", -0.6, 0.09)
+					tw.tween_property(b, "rotation:x", 0.0, 0.16)
 			bd.turn -= delta
 			if bd.turn <= 0.0:
 				bd.turn = _rng.randf_range(2.0, 6.0)
