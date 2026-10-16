@@ -263,12 +263,14 @@ def monolito():
         for z in range(-int(wz(Y1)), int(wz(Y1)) + 1):
             if (x, Y1 - 1, z) in M.V and M.noise(x, 0, z, 4.0) > 0.7: M.V[(x, Y1 - 1, z)] = [P, BLOOD_D, 0]
     # ofrendas al pie: velas negras encendidas, cuenco y huesos
-    for (cx, cz, h) in ((-30, 30, 10), (-22, 29, 7), (26, 30, 12), (35, 24, 6), (16, 31, 9), (-35, 18, 8)):
+    candles = {}
+    for k, (cx, cz, h) in enumerate(((-30, 30, 10), (-22, 29, 7), (26, 30, 12), (35, 24, 6), (16, 31, 9), (-35, 18, 8))):
         for y in range(10, 10 + h):
             for x in range(cx - 1, cx + 2):
                 for z in range(cz - 1, cz + 2):
                     if abs(x - cx) + abs(z - cz) < 2: M.put(x, y, z, P, WAX)
-        for y in range(10 + h, 10 + h + 3): M.put(cx, y, cz, P, (1.0, 0.70, 0.30) if y < 10 + h + 2 else (1.0, 0.90, 0.60), glow=1)
+        M.put(cx, 10 + h, cz, P, (0.12, 0.10, 0.08))                                 # pabilo; la llama, de partículas (Ambient)
+        candles['candle_%d' % k] = [cx, 10 + h + 1, cz]
         M.put(cx + 1, 10, cz, P, WAX); M.put(cx, 10, cz + 1, P, (0.16, 0.16, 0.16))  # cera derramada
     for x in range(-6, 7):                                                           # cuenco de barro con sangre
         for z in range(23, 37):
@@ -284,7 +286,7 @@ def monolito():
                 M.put(int(cx + i * math.cos(a) - w * math.sin(a)), 0 + (1 if abs(i) > 4 else 0), int(cz + i * math.sin(a) + w * math.cos(a)), P, BONE if w == 0 else BONE_D)
     nb = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
     for k in [k for k in M.V if all((k[0] + a, k[1] + b, k[2] + c) in M.V for a, b, c in nb)]: del M.V[k]
-    return M, {P: [0, 0, 0]}
+    return M, {**candles, P: [0, 0, 0]}
 
 
 FOL = (0.19, 0.26, 0.13); FOL_D = (0.11, 0.16, 0.09); FOL_L = (0.29, 0.35, 0.17); FOL_R = (0.42, 0.30, 0.15)

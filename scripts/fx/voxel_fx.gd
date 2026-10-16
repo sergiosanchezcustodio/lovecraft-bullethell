@@ -257,6 +257,43 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = r * 0.22; m.scale_max = r * 0.36
 			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.2]])
 			m.color_ramp = _ramp([[0.0, Color(0.62, 0.55, 0.36, 0.7)], [0.6, Color(0.58, 0.36, 0.1, 0.6)], [1.0, Color(0.5, 0.2, 0.03, 0.0)]])
+		"candle":                 # llama de vela: una lágrima pequeña que tiembla
+			p.draw_pass_1 = cube("add")
+			p.amount = 14
+			p.lifetime = 0.35
+			p.preprocess = 0.5
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = 0.008
+			m.direction = Vector3.UP
+			m.spread = 6.0
+			m.initial_velocity_min = 0.08; m.initial_velocity_max = 0.16
+			m.gravity = Vector3(0, 0.25, 0)
+			m.turbulence_enabled = true
+			m.turbulence_noise_scale = 3.0
+			m.turbulence_influence_min = 0.03; m.turbulence_influence_max = 0.08
+			m.scale_min = 0.018; m.scale_max = 0.028
+			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.25]])
+			m.color_ramp = _ramp([[0.0, Color(0.62, 0.55, 0.36, 0.9)], [0.5, Color(0.6, 0.32, 0.08, 0.8)], [1.0, Color(0.4, 0.12, 0.02, 0.0)]])
+		"ash_fall":               # pavesas grises que caen despacio (lejos del fuego), revoloteando
+			p.draw_pass_1 = cube("mix")
+			p.amount = 60
+			p.lifetime = 9.0
+			p.preprocess = 9.0
+			p.local_coords = false
+			p.visibility_aabb = AABB(Vector3(-20, -10, -20), Vector3(40, 20, 40))
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+			m.emission_box_extents = Vector3(r, 0.5, r)
+			m.direction = Vector3(0.3, -1, 0.2)
+			m.spread = 30.0
+			m.initial_velocity_min = 0.15; m.initial_velocity_max = 0.35
+			m.gravity = Vector3(0.05, -0.08, 0.03)
+			m.turbulence_enabled = true
+			m.turbulence_noise_scale = 4.0
+			m.turbulence_influence_min = 0.004; m.turbulence_influence_max = 0.01
+			m.angle_min = -180.0; m.angle_max = 180.0
+			m.angular_velocity_min = -90.0; m.angular_velocity_max = 90.0
+			m.scale_min = 0.025; m.scale_max = 0.045
+			m.color_ramp = _ramp([[0.0, Color(0.3, 0.29, 0.28, 0.0)], [0.1, Color(0.32, 0.3, 0.28, 0.7)], [0.85, Color(0.28, 0.27, 0.26, 0.7)], [1.0, Color(0.28, 0.27, 0.26, 0.0)]])
 		"breath":                 # vaho del aliento con frío: una nubecilla que sale hacia delante (+Z) y se deshace
 			p.draw_pass_1 = cube("mix")
 			p.amount = 10

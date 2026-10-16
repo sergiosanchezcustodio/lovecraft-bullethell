@@ -256,7 +256,7 @@ func _ready() -> void:
 		if it.has("glow") and it.has("light"):
 			var g: Dictionary = it.glow
 			var l: OmniLight3D = it.light
-			_lights.append([l, l.light_energy, int(MODES.get(String(g.glow), 1)), float(g.get("amount", 0.2)), float(g.get("speed", 1.0)), seed_of(h.global_position)])
+			_lights.append([l, l.light_energy, int(MODES.get(String(g.glow), 1)), float(g.get("amount", 0.2)), float(g.get("speed", 1.0)), seed_of(h.global_position), l.position])
 		if it.has("swing"): _add_swing(h, it.swing)
 		if it.has("sound"): _sounds.append(it.sound)
 		for lp: Vector3 in it.get("ripples", []): _ripplers.append([h.to_global(lp), 0.0])
@@ -293,6 +293,9 @@ func _ready() -> void:
 	_windows_watch = bool(cfg.get("windows_watch", false))
 	moored_models = cfg.get("moored", [])
 	if cfg.has("frogs"): _find_frogs(cfg.frogs)
+	if cfg.get("ash_fall", false):
+		_ash = VoxelFx.emitter("ash_fall", 14.0)
+		add_child(_ash)
 	if cfg.has("moss_drips"): _find_moss(cfg.moss_drips)
 	if cfg.has("loop"): _start_loop(cfg.loop)
 	if cfg.has("crowd") and not sfx_muted():
@@ -401,6 +404,10 @@ func _process(delta: float) -> void:
 		h.basis = (tilt * Basis(Vector3.UP, b[4])).scaled(Vector3.ONE * float(b[5]))
 	for l: Array in _lights:
 		(l[0] as OmniLight3D).light_energy = l[1] * anim_k(l[2], l[3], l[4], t, l[5])
+		if int(l[2]) == 2:                                          # llama: la luz baila un poco y las sombras con ella
+			var sd: float = l[5]
+			var j := float(l[3]) * 0.35 / maxf((l[0] as Node3D).get_parent().scale.x, 0.01)
+			(l[0] as Node3D).position = (l[6] as Vector3) + Vector3(sin(t * 7.1 + sd) * sin(t * 2.3 + sd), 0.5 + 0.5 * sin(t * 5.3 + sd * 1.7), sin(t * 6.3 + sd * 2.1) * sin(t * 1.9 + sd)) * j
 	if not _swings.is_empty(): _swing_step(delta, t)
 	if not _clouds_done:
 		_clouds_done = true
@@ -442,6 +449,9 @@ func _process(delta: float) -> void:
 	if not _drops.is_empty(): _drop_step(delta)
 	if not _prints.is_empty(): _prints_step(delta)
 	if cfg.has("gust_embers"): _gust_embers_step()
+	if _ash != null:
+		var fa := _focus()
+		_ash.global_position = Vector3(fa.x, 7.0, fa.z)
 	if not _moss.is_empty(): _moss_step(delta)
 	if _crowd != null: _crowd_step(delta)
 	_hook_t -= delta
@@ -808,6 +818,7 @@ func _prints_step(delta: float) -> void:
 
 ## Ascuas que suben de las hogueras cuando las aviva una racha.
 var _gust_was := 0.0
+var _ash: GPUParticles3D
 func _gust_embers_step() -> void:
 	var w := _weather()
 	if w == null or w.data == null: return
