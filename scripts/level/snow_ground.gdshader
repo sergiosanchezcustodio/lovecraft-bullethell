@@ -1,4 +1,5 @@
 shader_type spatial;
+#include "res://scripts/fx/aurora.gdshaderinc"
 // Suelo de nieve en voxel fino (rehecho el 30-09-2026 para igualar la resolución de los
 // modelos): celdas de 1/32 m (el grano del atrezo; antes 12,5 cm, que se veía tosco al lado
 // de los personajes). Relieve en escalones de un voxel (ventisqueros grandes y sastrugi
@@ -101,6 +102,7 @@ void fragment() {
 		// algún destello de cristal de nieve (muy pocos, pequeños)
 		float spark = step(0.996, hash(c + 91.0)) * (1.0 - ice_m) * (1.0 - tr);
 		EMISSION = vec3(0.9, 0.95, 1.0) * spark * 0.25 * sparkle;
+		if (aurora > 0.0) EMISSION += aurora_at(pc, TIME) * ice_m * 0.55;   // el hielo refleja la aurora
 		ROUGHNESS = mix(0.9, 0.3, ice_m);
 		SPECULAR = mix(0.3, 0.6, ice_m);
 	}

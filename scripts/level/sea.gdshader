@@ -16,6 +16,7 @@ shader_type spatial;
 render_mode cull_disabled, shadows_disabled;
 
 #include "res://scripts/fx/night_sky.gdshaderinc"
+#include "res://scripts/fx/aurora.gdshaderinc"
 
 uniform vec3 deep : source_color = vec3(0.07, 0.17, 0.27);
 uniform vec3 mid : source_color = vec3(0.14, 0.32, 0.44);
@@ -35,6 +36,8 @@ uniform float gust = 1.0;                    // rachas: 1 lo normal, más con la
 uniform float coast_amp = 0.0;               // costa natural: cuánto avanza la tierra (ArenaBuilder.coast_offset)
 uniform float period_override = 0.0;         // periodo del mar de fondo (s); 0: según el estado
 // faroles junto al agua (Ambient, cada fotograma): su reflejo es un rastro de luz que tiembla
+uniform vec4 beam = vec4(0.0);               // faro (17-10-2026): xy de dónde sale, z hacia dónde mira (rad), w medio ancho (rad)
+uniform float beam_k = 0.0;
 uniform int lamp_n = 0;
 uniform vec4 lamp_pos[8];                    // xyz del farol, w = intensidad
 uniform vec4 lamp_col[8];
@@ -247,6 +250,10 @@ void fragment() {
 		vec2 sp = wpos.xz + n.xz * 0.35;
 		em = (star_at(floor(sp * 16.0), t, 0.005) * night * 1.1 + shooting_star(sp)) * (1.0 - ice) * (0.6 + 0.4 * hq);
 	}
+	if (aurora > 0.0) {                      // aurora reflejada, rota por las olas
+		vec2 ap = floor((wpos.xz + n.xz * 0.6) * 16.0) / 16.0;
+		em += aurora_at(ap, t) * (1.0 - ice) * (0.55 + 0.45 * hq);
+	}
 	// reflejo de los faroles: alrededor del punto donde el agua lo refleja hacia la cámara (a 1,73
 	// veces su altura, hacia el que mira), estirado por las olas en trozos que tiemblan
 	vec2 vd = vec2(0.70710678, 0.70710678);
@@ -265,6 +272,13 @@ void fragment() {
 		float dash = step(0.42, vnoise(vec2(al * 5.5 - t * 1.2, ac * 2.5 + t * 0.5)));
 		float fall = exp(-abs(k - 1.0) * 1.5);
 		em += lamp_col[i].rgb * lamp_col[i].rgb * L.w * core * dash * fall * (1.0 - ice * 0.8);   // al cuadrado: más cálido, no blanco
+	}
+	if (beam_k > 0.0) {                      // el haz del faro barre el agua: destellos donde pasa
+		vec2 rel = wpos.xz - beam.xy;
+		float da = abs(mod(atan(rel.y, rel.x) - beam.z + 3.14159265, 6.2831853) - 3.14159265);
+		float k = (1.0 - smoothstep(beam.w * 0.4, beam.w, da)) * beam_k;
+		k *= clamp(1.4 - length(rel) / 80.0, 0.0, 1.0);
+		em += vec3(1.0, 0.9, 0.7) * k * (0.06 + 0.7 * pow(hq, 4.0)) * (1.0 - ice * 0.5);
 	}
 	EMISSION = em;
 	ROUGHNESS = mix(0.22, 0.85, ice);

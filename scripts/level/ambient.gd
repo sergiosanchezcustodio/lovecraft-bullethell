@@ -236,6 +236,18 @@ var _roost: Array = []                          ## [punto]: copas de donde salen
 var _startle_cd := 0.0
 var _startle_q: Array = []                      ## ruidos pendientes [s hasta que salen, dónde]
 var _next_colony := 25.0                        ## s hasta que sale sola una colonia (startle.idle)
+var _beam: SpotLight3D                          ## el faro que barre el puerto
+var _beam_mats: Array[ShaderMaterial] = []
+var _beam_a := 0.0
+var _glows: Array = []                          ## [malla, material, edad, vida]: huellas de luz en el agua
+var _gators: Array[Dictionary] = []             ## ojos de caimán en las pozas
+var _gator_t := 4.0
+var fear := 0.0                                 ## 0..1: cuánta cordura falta (la más baja de los jugadores)
+var _fear_t := 0.0
+var _shades: Array[Dictionary] = []             ## sombras al borde de la vista
+var _shade_t := 6.0
+var _whisper: AudioStreamPlayer
+var _whisper_db := -80.0
 
 func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
 	arena = p_arena
@@ -270,6 +282,7 @@ func _ready() -> void:
 		if mi != null and mi.material_override is ShaderMaterial:
 			var sm := mi.material_override as ShaderMaterial
 			sm.set_shader_parameter("night", night)
+			sm.set_shader_parameter("aurora", float(cfg.get("aurora", 0.0)))
 			_mats_sky.append(sm)
 			if n == "Ground": _ground_mat = sm
 			if n == "Sea":
@@ -299,6 +312,12 @@ func _ready() -> void:
 	moored_models = cfg.get("moored", [])
 	if cfg.has("frogs"): _find_frogs(cfg.frogs)
 	if cfg.has("mist_holes"): _find_fires(cfg.mist_holes)
+	if cfg.has("lighthouse") and _sea_mat != null: _make_lighthouse(cfg.lighthouse)
+	if bool(fear_cfg().get("on", true)) and not sfx_muted():
+		_whisper = _loop_player("whisper_loop.wav", false) as AudioStreamPlayer
+		if _whisper != null:
+			add_child(_whisper)
+			_whisper.play(_rng.randf() * _whisper.stream.get_length())
 	if cfg.has("startle"): _find_roosts(cfg.startle)
 	if cfg.get("ash_fall", false):
 		_ash = VoxelFx.emitter("ash_fall", 14.0)
@@ -473,6 +492,10 @@ func _process(delta: float) -> void:
 	if not _lit.is_empty() or _flash_was > 0.0: _flash_step()
 	if not _fires.is_empty(): _mist_hole_step(t)
 	if not _roost.is_empty(): _startle_step(delta)
+	if _beam != null: _lighthouse_step(delta)
+	if not _glows.is_empty(): _glow_step(delta)
+	if cfg.has("gators"): _gator_step(delta)
+	if bool(fear_cfg().get("on", true)): _fear_step(delta)
 
 func _focus() -> Vector3:
 	return camera.center() if camera != null else Vector3.ZERO
@@ -784,6 +807,7 @@ func _on_step(pl: Node3D) -> void:
 	if obstacles != null and obstacles.water_at(Vector2(pos.x, pos.z)) > 0.3:
 		kind = "water"
 		_ripple(Vector3(pos.x, 0.03, pos.z), 0.6, 0.7)                 # estela: ondas a cada paso al vadear
+		if cfg.has("glow_steps"): _glow_print(Vector3(pos.x, 0.035, pos.z), cfg.glow_steps)
 	sfx_at("step_" + kind, pos)
 	if cfg.get("footprints", false) and kind == "snow": _footprint(pl)
 
@@ -1433,10 +1457,10 @@ func _eye_step(delta: float) -> void:
 				var rs: Array = c.get("respawn", [6, 16])
 				_eye_t = maxf(_eye_t, _rng.randf_range(rs[0], rs[1]))
 				break
-	if _eyes.size() < int(c.get("n", 4)):
+	if _eyes.size() < int(c.get("n", 4)) + int(round(fear * float(c.get("fear_n", 4)))):   # con miedo, más
 		_eye_t -= delta
 		if _eye_t <= 0.0:
-			_eye_t = 2.5 if _eyes.size() > 1 else 0.3
+			_eye_t = (2.5 if _eyes.size() > 1 else 0.3) * (1.0 - fear * 0.7)
 			var idx := range(_eye_spots.size())
 			idx.shuffle()
 			for i: int in idx:
@@ -1740,7 +1764,7 @@ func _startle_step(delta: float) -> void:
 	if w != null and w.flash > 0.6 and _flash_was <= 0.6: _on_sound("thunder", null)   # el fogonazo del rayo
 	var idle: Array = cfg.startle.get("idle", [])
 	if idle.size() == 2:                                            # de vez en cuando salen solos, a cazar
-		_next_colony -= delta
+		_next_colony -= delta * (1.0 + fear * 3.0)                  # con miedo, mucho más a menudo
 		if _next_colony <= 0.0:
 			_next_colony = _rng.randf_range(idle[0], idle[1]) if not demo else 6.0
 			var f := _focus()
@@ -1774,3 +1798,277 @@ func _bats_out(src: Vector3, calm := false) -> void:
 	if OS.get_cmdline_user_args().has("log=true"):
 		var g := get_parent()
 		print("MURCIELAGOS%s t=%.1f en %s" % [" (solos)" if calm else "", g.director.time if g != null and "director" in g and g.director != null else -1.0, best])
+
+# ---------------- el faro del arrecife ----------------
+
+## Faro mar adentro (`lighthouse`: pos [x, z], height, period s, width grados, energy, reach m):
+## un foco que gira y barre el puerto; su haz se ve en la niebla del agua y en el mar.
+func _make_lighthouse(c: Dictionary) -> void:
+	var pos: Array = c.get("pos", [50, 40])
+	_beam = SpotLight3D.new()
+	_beam.light_color = Color(1.0, 0.9, 0.72)
+	_beam.light_energy = float(c.get("energy", 9.0))
+	_beam.spot_range = float(c.get("range", 95.0))
+	_beam.spot_angle = float(c.get("width", 5.0))
+	_beam.spot_attenuation = 0.4
+	_beam.spot_angle_attenuation = 0.6
+	_beam.shadow_enabled = false
+	_beam.light_volumetric_fog_energy = 0.0
+	_beam.position = Vector3(pos[0], float(c.get("height", 9.0)), pos[1])
+	add_child(_beam)
+	_beam_mats.append(_sea_mat)
+	for n in get_children():
+		var mi := n as MeshInstance3D
+		if mi != null and mi.material_override is ShaderMaterial \
+				and (mi.material_override as ShaderMaterial).shader == preload("res://scripts/fx/sea_fog.gdshader"):
+			_beam_mats.append(mi.material_override)
+	_beam_a = _rng.randf() * TAU
+
+func _lighthouse_step(delta: float) -> void:
+	var c: Dictionary = cfg.lighthouse
+	_beam_a = fmod(_beam_a + delta * TAU / float(c.get("period", 14.0)), TAU)
+	var dir := Vector3(cos(_beam_a), 0, sin(_beam_a))
+	var reach := float(c.get("reach", 48.0))                     # donde el haz toca el suelo
+	_beam.look_at(_beam.position + dir * reach - Vector3(0, _beam.position.y, 0), Vector3.UP)
+	var hw := deg_to_rad(float(c.get("width", 5.0)) * 1.3)
+	for m in _beam_mats:
+		m.set_shader_parameter("beam", Vector4(_beam.position.x, _beam.position.z, _beam_a, hw))
+		m.set_shader_parameter("beam_k", float(c.get("glow", 1.0)))
+
+# ---------------- huellas de luz en el agua ----------------
+
+## Al pisar el agua somera se enciende el plancton (`glow_steps`: color, r, life).
+func _glow_print(at: Vector3, c: Dictionary) -> void:
+	var mi := MeshInstance3D.new()
+	var pm := PlaneMesh.new()
+	var r := float(c.get("r", 0.4))
+	pm.size = Vector2.ONE * r * 2.6
+	mi.mesh = pm
+	var m := ShaderMaterial.new()
+	m.shader = preload("res://scripts/fx/glow_print.gdshader")
+	var col: Array = c.get("color", [0.25, 0.95, 0.75])
+	m.set_shader_parameter("tint", Color(col[0], col[1], col[2]))
+	m.set_shader_parameter("radius", r)
+	m.set_shader_parameter("seed", _rng.randf() * 100.0)
+	mi.material_override = m
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.position = at
+	add_child(mi)
+	_glows.append([mi, m, 0.0, float(c.get("life", 3.5))])
+	if _glows.size() > 60:
+		(_glows[0][0] as Node).queue_free()
+		_glows.remove_at(0)
+
+func _glow_step(delta: float) -> void:
+	for gl: Array in _glows.duplicate():
+		gl[2] += delta
+		var k: float = gl[2] / gl[3]
+		if k >= 1.0:
+			(gl[0] as Node).queue_free()
+			_glows.erase(gl)
+			continue
+		(gl[1] as ShaderMaterial).set_shader_parameter("life", k)
+
+# ---------------- ojos de caimán en las pozas ----------------
+
+## Asoman en el agua somera a la vista (a 6-13 m del centro, nunca a menos de 7 de un jugador),
+## se deslizan despacio y, si alguien se acerca (`near`), se hunden con una onda; otros asoman
+## luego en otra poza (`gators`: n, near, speed, respawn, color).
+func _gator_step(delta: float) -> void:
+	var c: Dictionary = cfg.gators
+	var g := get_parent()
+	var players: Array = g.players if g != null and "players" in g else []
+	var obstacles: ObstacleMap = arena.get_meta("obstacles")
+	for gd: Dictionary in _gators.duplicate():
+		var b: Node3D = gd.node
+		b.position += (gd.dir as Vector3) * float(c.get("speed", 0.12)) * delta
+		if obstacles != null and obstacles.water_at(Vector2(b.position.x, b.position.z)) < 0.5:
+			gd.dir = -(gd.dir as Vector3)                          # no sale del agua
+			b.rotation.y += PI
+		gd.life -= delta
+		var close: bool = gd.life <= 0.0
+		for pl in players:
+			if is_instance_valid(pl) and pl.health > 0.0 and (pl as Node3D).global_position.distance_to(b.position) < float(c.get("near", 5.0)):
+				close = true
+		if close:
+			_ripple(Vector3(b.position.x, 0.03, b.position.z), 0.7, 0.75)
+			var tw := create_tween()
+			tw.tween_property(b, "position:y", -0.15, 0.35)
+			tw.tween_callback(b.queue_free)
+			_gators.erase(gd)
+			var rs: Array = c.get("respawn", [6, 16])
+			_gator_t = maxf(_gator_t, _rng.randf_range(rs[0], rs[1]) * (1.0 - fear * 0.6))
+	var want := int(c.get("n", 2)) + int(round(fear * 2.0))
+	if _gators.size() >= want or obstacles == null: return
+	_gator_t -= delta
+	if _gator_t > 0.0: return
+	_gator_t = _rng.randf_range(2.0, 5.0)
+	var f := _focus()
+	for _i in 12:
+		var p := obstacles.random_water(_rng, Vector2(f.x, f.z), 4.0, 14.0, 0.9)
+		if p == Vector2.INF or obstacles.water_at(p) < 0.7: continue
+		var ok := on_screen(Vector3(p.x, 0.0, p.y), 0.85)
+		for pl in players:
+			if is_instance_valid(pl) and Vector2((pl as Node3D).global_position.x, (pl as Node3D).global_position.z).distance_to(p) < 7.0: ok = false
+		for other: Dictionary in _gators:
+			if Vector2((other.node as Node3D).position.x, (other.node as Node3D).position.z).distance_to(p) < 3.0: ok = false
+		if ok:
+			_gator_rise(Vector3(p.x, 0.0, p.y), c)
+			return
+
+func _gator_rise(at: Vector3, c: Dictionary) -> void:
+	var b := Node3D.new()
+	var dark := StandardMaterial3D.new()
+	dark.albedo_color = Color(0.09, 0.11, 0.07)
+	dark.roughness = 0.35
+	var parts: Array = [[Vector3(0.2, 0.035, 0.6), Vector3(0, 0.0, 0.2)]]   # el morro que apenas asoma
+	for sx in [-1, 1]: parts.append([Vector3(0.07, 0.06, 0.08), Vector3(sx * 0.07, 0.02, -0.04)])   # los bultos de los ojos
+	for pr: Array in parts:
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = pr[0]
+		bm.material = dark
+		mi.mesh = bm
+		mi.position = pr[1]
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		b.add_child(mi)
+	var eye_col: Array = c.get("color", [0.95, 0.75, 0.25])
+	for sx in [-1, 1]:
+		var e := MeshInstance3D.new()
+		var em := BoxMesh.new()
+		em.size = Vector3(0.06, 0.03, 0.045)
+		em.material = _eye_mat(Color(eye_col[0], eye_col[1], eye_col[2]))
+		e.mesh = em
+		e.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		e.position = Vector3(sx * 0.075, 0.06, 0.0)
+		b.add_child(e)
+	add_child(b)
+	var a := _rng.randf() * TAU
+	b.rotation.y = a
+	b.position = at + Vector3(0, -0.12, 0)
+	create_tween().tween_property(b, "position:y", 0.0, 0.8)
+	_ripple(Vector3(at.x, 0.03, at.z), 0.5, 0.5)
+	_gators.append({"node": b, "dir": Vector3(sin(a), 0, cos(a)), "life": _rng.randf_range(12.0, 25.0)})
+	if OS.get_cmdline_user_args().has("log=true"): print("CAIMAN en %.1f, %.1f" % [at.x, at.z])
+
+# ---------------- el ambiente con la cordura baja ----------------
+
+## ¿Se ve el punto del suelo `p`? (`margin` 1 = hasta el borde de la pantalla)
+func on_screen(p: Vector3, margin := 1.0) -> bool:
+	if camera == null: return true
+	var f := _focus()
+	var d := p - f
+	var sx := (d.x - d.z) * 0.70710678                            # derecha de la pantalla
+	var sy := (d.x + d.z) * 0.70710678 * 0.5                      # abajo (el suelo, visto a 30°)
+	var half_h := camera.size * 0.5
+	return absf(sx) < half_h * 16.0 / 9.0 * margin and absf(sy) < half_h * margin
+
+static func fear_cfg() -> Dictionary:
+	return config().get("fear", {})
+
+## El miedo (0..1) sube cuando la cordura de algún jugador baja de `from` (por defecto la mitad).
+## Con miedo: susurros, sombras al borde de la vista que se deshacen si te acercas, y más ojos,
+## caimanes y murciélagos donde los hay ("fear" en la raíz de data/ambient.json).
+func _fear_step(delta: float) -> void:
+	var fc := fear_cfg()
+	_fear_t -= delta
+	if _fear_t <= 0.0:
+		_fear_t = 0.25
+		var g := get_parent()
+		var from := float(fc.get("from", 0.5))
+		var target := 0.0
+		if g != null and "players" in g:
+			for pl in g.players:
+				if not is_instance_valid(pl) or pl.health <= 0.0 or pl.data == null or pl.data.max_sanity <= 0.0: continue
+				var r: float = pl.sanity / pl.data.max_sanity
+				target = maxf(target, clampf((from - r) / from, 0.0, 1.0))
+		var was := fear
+		fear = move_toward(fear, target, 0.25 * (0.25 if target < fear else 1.0))   # sube rápido, se va despacio
+		if OS.get_cmdline_user_args().has("log=true") and int(was * 4.0) != int(fear * 4.0):
+			print("MIEDO %.2f" % fear)
+	if _whisper != null:
+		var tdb := lerpf(-50.0, float(fc.get("whisper_db", -14.0)), sqrt(fear)) if fear > 0.02 else -80.0
+		_whisper_db = move_toward(_whisper_db, tdb, delta * 20.0)
+		_whisper.volume_db = _whisper_db
+	_shade_step(delta, fc)
+
+func _shade_step(delta: float, fc: Dictionary) -> void:
+	var g := get_parent()
+	var players: Array = g.players if g != null and "players" in g else []
+	var full := float(fc.get("alpha", 0.6))
+	for sd: Dictionary in _shades.duplicate():
+		var b: Node3D = sd.node
+		sd.t += delta
+		var near := false
+		for pl in players:
+			if is_instance_valid(pl) and Vector2((pl as Node3D).global_position.x - b.position.x, (pl as Node3D).global_position.z - b.position.z).length() < 6.0:
+				near = true
+		var out: bool = near or sd.t > sd.life or fear < 0.05
+		var a: float = move_toward(sd.a, 0.0 if out else full, delta * (3.0 if near else 0.5))
+		sd.a = a
+		for m: StandardMaterial3D in sd.mats: m.albedo_color.a = minf(a / full, 1.0) * 0.9 if m.albedo_color.r > 0.5 else a
+		if out: b.position.y += delta * 0.4                          # se deshace hacia arriba
+		if out and a <= 0.01:
+			b.queue_free()
+			_shades.erase(sd)
+	if fear < 0.15 or camera == null: return
+	_shade_t -= delta * fear
+	if _shade_t > 0.0 or _shades.size() >= int(ceil(fear * float(fc.get("shades", 3)))): return
+	var ev: Array = fc.get("every", [3.0, 7.0])
+	_shade_t = _rng.randf_range(ev[0], ev[1])
+	var f := _focus()
+	var obstacles: ObstacleMap = arena.get_meta("obstacles")
+	var half_h := camera.size * 0.5                               # alto visible (m) / 2
+	var half_w := half_h * 16.0 / 9.0
+	var right := Vector3(1, 0, -1).normalized()                   # derecha de la pantalla, en el suelo
+	var down := Vector3(1, 0, 1).normalized()                     # abajo de la pantalla, en el suelo
+	for _i in 12:                                                 # en el borde de la vista
+		var side := _rng.randi() % 2
+		var u := (_rng.randf() * 2.0 - 1.0)
+		# por los lados o por arriba y abajo, nunca en las esquinas (los paneles de los jugadores)
+		var sx := (1.0 if _rng.randf() < 0.5 else -1.0) * half_w * 0.88 if side == 0 else u * half_w * 0.5
+		var sy := u * half_h * 0.4 if side == 0 else (1.0 if _rng.randf() < 0.5 else -1.0) * half_h * 0.75
+		var p := f + right * sx + down * sy * 2.0                 # en el suelo, lo vertical de la pantalla mide el doble
+		if obstacles != null and obstacles.is_blocked(Vector2(p.x, p.z), 0.4): continue
+		var ok := true
+		for pl in players:
+			if is_instance_valid(pl) and (pl as Node3D).global_position.distance_to(Vector3(p.x, 0, p.z)) < 7.0: ok = false
+		if not ok: continue
+		_spawn_shade(Vector3(p.x, 0.0, p.z), fc)
+		return
+
+func _spawn_shade(at: Vector3, fc: Dictionary) -> void:
+	var b := Node3D.new()
+	var m := VoxelBuilder.load_model("res://models/%s.json" % String(fc.get("model", "cultista")))
+	var mats: Array = []
+	for mi: MeshInstance3D in m.get_meta("meshes"):
+		var sm := StandardMaterial3D.new()
+		sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		sm.albedo_color = Color(0.015, 0.012, 0.02, 0.0)
+		sm.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_ALWAYS          # sin ver las piezas de dentro a través
+		mi.material_override = sm
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mats.append(sm)
+	b.add_child(m)
+	for sx in [-1, 1]:                                           # dos ojos pálidos: de noche es lo único que se ve
+		var e := MeshInstance3D.new()
+		var em := BoxMesh.new()
+		em.size = Vector3(0.045, 0.025, 0.02)
+		var eye := StandardMaterial3D.new()
+		eye.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		eye.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		eye.albedo_color = Color(0.85, 0.82, 0.6, 0.0)
+		em.material = eye
+		e.mesh = em
+		e.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		e.position = Vector3(sx * 0.055, float(fc.get("eye_y", 1.56)), 0.17)
+		b.add_child(e)
+		mats.append(eye)
+	add_child(b)
+	b.position = at
+	b.scale = Vector3.ONE * _rng.randf_range(1.0, 1.25)
+	var f := _focus()
+	b.rotation.y = atan2(f.x - at.x, f.z - at.z)                  # mira hacia el centro de la vista
+	_shades.append({"node": b, "mats": mats, "a": 0.0, "t": 0.0, "life": _rng.randf_range(3.0, 6.0)})
+	if OS.get_cmdline_user_args().has("log=true"): print("SOMBRA en %.1f, %.1f (vista %.1f, %.1f)" % [at.x, at.z, f.x, f.z])

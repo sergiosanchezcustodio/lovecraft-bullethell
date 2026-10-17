@@ -170,6 +170,7 @@ def ambiente():
     fuente(r)
     campana(r)
     ranas(r)
+    susurros(r)
 
 
 def save_loop(name, w, d, fade):
@@ -515,6 +516,45 @@ KENNEY = {
     'glass': ['glass_001', 'glass_002'],
     'down': ['impactBell_heavy_000'],
 }
+
+
+def susurros(r):
+    """Susurros en bucle (17-10-2026) para la cordura baja: varias voces que musitan frases sin
+    sentido, solo aire (ruido por formantes de vocal, sin tono), con sibilantes y chasquidos de
+    labios; unas cerca y claras, otras lejos y apagadas. Ambient lo sube cuanto menos cordura."""
+    d, fade = 14.0, 2.0
+    n = int((d + fade) * SR)
+    VOW = [((700, 4), (1150, 6), (2600, 8)), ((450, 4), (800, 6), (2500, 8)), ((320, 4), (2200, 7), (2900, 8)),
+           ((350, 4), (750, 6), (2350, 8)), ((550, 4), (1750, 6), (2550, 8))]
+    out = np.zeros(n)
+    for v in range(5):
+        far = v >= 3
+        voice = np.zeros(n)
+        t0 = r.uniform(0, 1.5)
+        while t0 < d + fade - 1.0:
+            for _ in range(r.integers(3, 8)):                       # una frase: sílabas seguidas
+                dur = r.uniform(0.09, 0.22)
+                a0 = int(t0 * SR); m = int(dur * SR)
+                if a0 + m >= n: break
+                x = np.linspace(0, 1, m)
+                e = np.sin(np.pi * x) ** 1.5
+                src = r.standard_normal(m)
+                fr = VOW[r.integers(len(VOW))]
+                syl = sum(signal.lfilter(*signal.iirpeak(fc * r.uniform(0.9, 1.1) / (SR / 2), q), src) for fc, q in fr)
+                voice[a0:a0 + m] += syl / (np.std(syl) + 1e-9) * e
+                if r.random() < 0.45:                               # s, sh, f
+                    sm = int(r.uniform(0.05, 0.14) * SR)
+                    if a0 + m + sm < n:
+                        sib = hp(r.standard_normal(sm), r.choice([3500, 5000, 6500]))
+                        voice[a0 + m:a0 + m + sm] += sib / (np.std(sib) + 1e-9) * np.sin(np.pi * np.linspace(0, 1, sm)) * 0.7
+                if r.random() < 0.08:                               # chasquido de labios
+                    voice[a0] += 3.0
+                t0 += dur + r.uniform(0.01, 0.06)
+            t0 += r.uniform(0.8, 3.0)                               # respira
+        voice = bp(voice, 250, 7500)
+        if far: voice = lp(voice, 1800) * 0.45
+        out += voice * r.uniform(0.6, 1.0)
+    save_loop('whisper_loop', out, d, fade)
 
 
 def copy_kenney(src):
