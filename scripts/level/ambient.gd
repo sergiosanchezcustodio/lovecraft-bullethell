@@ -231,6 +231,11 @@ var _count_t := 0.0
 var _hook_t := 0.0
 var _hooked := {}
 var demo := false
+var _fires: Array = []                          ## [x, z, radio, semilla]: huecos que abre el calor en la niebla baja
+var _roost: Array = []                          ## [punto]: copas de donde salen murciélagos espantados
+var _startle_cd := 0.0
+var _startle_q: Array = []                      ## ruidos pendientes [s hasta que salen, dónde]
+var _next_colony := 25.0                        ## s hasta que sale sola una colonia (startle.idle)
 
 func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
 	arena = p_arena
@@ -242,7 +247,7 @@ func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
 	demo = OS.get_cmdline_user_args().has("amb_demo=true")       # clips: todo enseguida
 	if demo:
 		_next_shoot = 1.0; _next_flock = 0.3; _next_bubble = 0.8; _next_whirl = 0.5
-		_next_spill = 1.0; _next_spray = 0.5; _next_drip = 0.3
+		_next_spill = 1.0; _next_spray = 0.5; _next_drip = 0.3; _next_colony = 3.0
 	return self
 
 func _ready() -> void:
@@ -293,6 +298,8 @@ func _ready() -> void:
 	_windows_watch = bool(cfg.get("windows_watch", false))
 	moored_models = cfg.get("moored", [])
 	if cfg.has("frogs"): _find_frogs(cfg.frogs)
+	if cfg.has("mist_holes"): _find_fires(cfg.mist_holes)
+	if cfg.has("startle"): _find_roosts(cfg.startle)
 	if cfg.get("ash_fall", false):
 		_ash = VoxelFx.emitter("ash_fall", 14.0)
 		add_child(_ash)
@@ -310,7 +317,7 @@ func _add_swing(h: Node3D, c: Dictionary) -> void:
 	var m := h.get_child(0) as Node3D
 	var part: Node3D = (m.get_meta("part_nodes") as Dictionary)[String(c.part)]
 	for n in h.get_children():
-		if n is OmniLight3D or n is FogVolume: n.reparent(part, true)
+		if n is OmniLight3D or n is FogVolume or n is GPUParticles3D: n.reparent(part, true)   # la llama va dentro
 	var p := float(c.get("period", 1.9))
 	_swings.append({"part": part, "d": Vector2.ZERO, "v": Vector2.ZERO, "seed": seed_of(h.global_position),
 		"k": pow(TAU / p, 2.0), "deg": float(c.get("deg", 0.65)), "max": deg_to_rad(float(c.get("max", 28.0))),
@@ -425,7 +432,7 @@ func _process(delta: float) -> void:
 		_ground_rain()
 		if cfg.get("puddle_lamps", false): _ground_lamps()
 	if cfg.get("breath", false): _breath_step(delta)
-	if cfg.has("birds"): _birds(delta, t)
+	if cfg.has("birds") or not _flocks.is_empty(): _birds(delta, t)
 	if cfg.has("bubbles"): _bubbles(delta)
 	if cfg.has("whirls"): _whirl_step(delta)
 	if cfg.has("drips"): _drip_step(delta)
@@ -464,6 +471,8 @@ func _process(delta: float) -> void:
 					_hooked[pl] = true
 					pl.stepped.connect(_on_step.bind(pl))
 	if not _lit.is_empty() or _flash_was > 0.0: _flash_step()
+	if not _fires.is_empty(): _mist_hole_step(t)
+	if not _roost.is_empty(): _startle_step(delta)
 
 func _focus() -> Vector3:
 	return camera.center() if camera != null else Vector3.ZERO
@@ -1569,9 +1578,9 @@ const BIRD_SPEED := {"petrel": 6.5, "skua": 6.0, "gull": 5.0, "crow": 5.5, "bat"
 const BIRD_FLAP := {"petrel": 4.5, "skua": 3.6, "gull": 3.0, "crow": 4.2, "bat": 10.0}
 
 func _birds(delta: float, t: float) -> void:
-	var c: Dictionary = cfg.birds
+	var c: Dictionary = cfg.get("birds", {})
 	_next_flock -= delta
-	if _next_flock <= 0.0 and _flocks.size() < 2:
+	if not c.is_empty() and _next_flock <= 0.0 and _flocks.size() < 2:
 		var ev: Array = c.get("every", [10, 20])
 		_next_flock = _rng.randf_range(ev[0], ev[1]) if not demo else 4.0
 		_spawn_flock(c)
@@ -1603,6 +1612,10 @@ func _birds(delta: float, t: float) -> void:
 			if kind == "bat":                                       # vuelo quebrado
 				p += basis * Vector3(sin(fl.t * 5.0 + ph) * 0.6, sin(fl.t * 7.0 + ph * 2.0) * 0.4, 0)
 			p.y = fl.h + off.y + sin(fl.t * 0.8 + ph) * 0.25
+			if fl.has("h0"):                                        # despegan de la copa y suben
+				var k := smoothstep(0.0, 1.6, fl.t + ph * 0.05)
+				p.y = lerpf(float(fl.h0) + off.y * 0.3, p.y, k)
+				p = center + (p - center) * Vector3(lerpf(0.35, 1.0, k), 1.0, lerpf(0.35, 1.0, k))
 			b.position = p
 			var bank: float = -0.35 * float(fl.turn) if fl.t < fl.circle_time else sin(fl.t * 0.9 + ph) * 0.12
 			b.basis = basis * Basis(Vector3(0, 0, 1), bank)
@@ -1617,7 +1630,7 @@ func _birds(delta: float, t: float) -> void:
 			for b: Node3D in fl.members: b.queue_free()
 			_flocks.erase(fl)
 
-func _spawn_flock(c: Dictionary) -> void:
+func _spawn_flock(c: Dictionary, from := {}) -> void:
 	var kinds: Array = c.get("kinds", ["gull"])
 	var kind := String(kinds[_rng.randi() % kinds.size()])
 	var sz: Array = c.get("size", [2, 5])
@@ -1631,6 +1644,9 @@ func _spawn_flock(c: Dictionary) -> void:
 		"h": _rng.randf_range(hh[0], hh[1]), "members": [], "offsets": [], "phases": [], "storm": bool(c.get("storm", false)),
 		"circle_time": 0.0, "radius": 1.0, "a0": 0.0, "turn": 1.0, "c": f, "p": f - dir * 30.0 + side * _rng.randf_range(-8, 8), "dir": dir,
 		"next_call": _rng.randf_range(1.0, 4.0)}
+	if not from.is_empty():                                         # salen de un sitio (espantados): suben desde ahí
+		fl.p = from.p; fl.dir = from.dir; fl.h0 = from.h0; fl.next_call = 0.3
+		fl.speed *= 0.8
 	if _rng.randf() < float(c.get("circle", 0.0)):                 # dan vueltas un rato y se van
 		fl.circle_time = _rng.randf_range(10.0, 20.0)
 		fl.radius = _rng.randf_range(5.0, 8.0)
@@ -1666,3 +1682,95 @@ func _flap(b: Node3D, kind: String, t: float, ft: float) -> void:
 	var ang := sin(t * freq * TAU) * amp + (0.12 if amp < 0.1 else 0.0)
 	if nodes.has("wing_r"): (nodes["wing_r"] as Node3D).rotation.z = ang
 	if nodes.has("wing_l"): (nodes["wing_l"] as Node3D).rotation.z = -ang
+
+# ---------------- niebla que aparta el calor ----------------
+
+## Hogueras y antorchas (`mist_holes`: {modelo: radio}): cada una abre un hueco en la bruma baja.
+func _find_fires(c: Dictionary) -> void:
+	for h: Node in arena.get_node("Props").get_children():
+		var m := h.get_child(0) as Node3D
+		if m == null or not c.has(String(m.name)): continue
+		var p := (h as Node3D).global_position
+		_fires.append([p.x, p.z, float(c[String(m.name)]) * (h as Node3D).scale.x, seed_of(p)])
+
+## El hueco se abre y se cierra despacio (el calor sube a bocanadas) y las rachas lo empujan.
+## Solo los 8 más cerca de la vista.
+func _mist_hole_step(t: float) -> void:
+	var w := _weather()
+	if w == null or not w.has_mist(): return
+	var f := _focus()
+	var wv := w.wind_now()
+	var ratio := wv.length() / maxf(w.data.wind, 0.1) if w.data != null else 1.0
+	var near: Array = []
+	for fi: Array in _fires:
+		var d := Vector2(fi[0] - f.x, fi[1] - f.z).length()
+		if d < 22.0: near.append([d, fi])
+	near.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	var out: Array = []
+	for e: Array in near.slice(0, 8):
+		var fi: Array = e[1]
+		var s: float = fi[3]
+		var breath := 0.5 + 0.5 * sin(t * 0.45 + s) * sin(t * 0.17 + s * 1.9)
+		var r: float = float(fi[2]) * (0.65 + 0.45 * breath) / clampf(ratio, 0.8, 1.6)   # con racha se cierra
+		var push := Vector2(wv.x, wv.z) * 0.35 * breath                                  # el viento se lleva el hueco a sotavento
+		out.append(Vector4(float(fi[0]) + push.x, float(fi[1]) + push.y, r, 0.5 + 0.5 * breath))
+	w.set_mist_holes(out)
+
+# ---------------- murciélagos que se espantan ----------------
+
+## Copas del bosque (`startle.among`) a la vista desde dentro: de ahí salen.
+func _find_roosts(c: Dictionary) -> void:
+	var models: Array = c.get("among", [])
+	for h: Node in arena.get_node("Props").get_children():
+		var m := h.get_child(0) as Node3D
+		if m == null or not String(m.name) in models: continue
+		var bb := _world_aabb(h as Node3D)
+		_roost.append(Vector3(bb.get_center().x, bb.end.y - 0.8, bb.get_center().z))
+	var sfx := autoload("Sfx")
+	if sfx != null and sfx.has_signal("played"): sfx.played.connect(_on_sound)
+
+func _on_sound(ev: String, pos: Variant) -> void:
+	if _startle_cd > 0.0 or not ev in (cfg.startle.get("events", ["roar", "slam", "thunder", "screech"]) as Array): return
+	_startle_cd = float(cfg.startle.get("cooldown", 9.0)) if not demo else 2.0
+	_startle_q.append([_rng.randf_range(0.15, 0.45), pos if pos is Vector3 else _focus()])   # un instante de reacción
+
+func _startle_step(delta: float) -> void:
+	_startle_cd -= delta
+	var w := _weather()
+	if w != null and w.flash > 0.6 and _flash_was <= 0.6: _on_sound("thunder", null)   # el fogonazo del rayo
+	var idle: Array = cfg.startle.get("idle", [])
+	if idle.size() == 2:                                            # de vez en cuando salen solos, a cazar
+		_next_colony -= delta
+		if _next_colony <= 0.0:
+			_next_colony = _rng.randf_range(idle[0], idle[1]) if not demo else 6.0
+			var f := _focus()
+			_bats_out(f + Vector3(_rng.randf_range(-12, 12), 0, _rng.randf_range(-12, 12)), true)
+	for q: Array in _startle_q.duplicate():
+		q[0] -= delta
+		if q[0] > 0.0: continue
+		_startle_q.erase(q)
+		_bats_out(q[1])
+
+## Una nube de murciélagos sale de la copa más cercana al ruido (de las que están a la vista)
+## y cruza la vista chillando. `calm`: salen solos a cazar (menos y sin el chillido fuerte).
+func _bats_out(src: Vector3, calm := false) -> void:
+	var f := _focus()
+	var best := Vector3.INF
+	var bd := INF
+	for r: Vector3 in _roost:
+		if Vector2(r.x - f.x, r.z - f.z).length() > 15.0: continue
+		var d := Vector2(r.x - src.x, r.z - src.z).length()
+		if d < bd: bd = d; best = r
+	if best == Vector3.INF: return
+	var c: Dictionary = cfg.startle
+	var away := Vector3(f.x - best.x, 0, f.z - best.z)                  # salen del bosque y cruzan la vista
+	if away.length() < 0.5: away = Vector3(1, 0, 1)
+	away = away.normalized().rotated(Vector3.UP, _rng.randf_range(-0.5, 0.5))
+	var sz: Array = c.get("size", [8, 14])
+	if calm: sz = [maxi(3, int(sz[0]) / 2), maxi(4, int(sz[1]) / 2)]
+	_spawn_flock({"kinds": ["bat"], "size": sz, "height": [best.y - 0.5, best.y + 1.2]},
+		{"p": best, "dir": away, "h0": best.y})
+	sfx_at("bird_bat", best, -4.0 if calm else 2.0)
+	if OS.get_cmdline_user_args().has("log=true"):
+		var g := get_parent()
+		print("MURCIELAGOS%s t=%.1f en %s" % [" (solos)" if calm else "", g.director.time if g != null and "director" in g and g.director != null else -1.0, best])

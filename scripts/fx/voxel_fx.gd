@@ -274,6 +274,26 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.018; m.scale_max = 0.028
 			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.25]])
 			m.color_ramp = _ramp([[0.0, Color(0.62, 0.55, 0.36, 0.9)], [0.5, Color(0.6, 0.32, 0.08, 0.8)], [1.0, Color(0.4, 0.12, 0.02, 0.0)]])
+		"lantern":                # llama de farol tras la jaula (17-10-2026): mayor que la de vela, con
+			# un corazón claro abajo; `r` es el radio de la mecha
+			p.draw_pass_1 = cube("add")
+			p.amount = 26
+			p.lifetime = 0.42
+			p.preprocess = 0.5
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.35
+			m.direction = Vector3.UP
+			m.spread = 5.0
+			m.initial_velocity_min = r * 2.0; m.initial_velocity_max = r * 3.6
+			m.gravity = Vector3(0, r * 4.0, 0)
+			m.radial_accel_min = -r * 6.0; m.radial_accel_max = -r * 2.0
+			m.turbulence_enabled = true
+			m.turbulence_noise_scale = 3.0
+			m.turbulence_influence_min = 0.02; m.turbulence_influence_max = 0.06
+			m.scale_min = r * 0.45; m.scale_max = r * 0.7
+			m.scale_curve = _curve([[0.0, 0.7], [0.25, 1.0], [1.0, 0.2]])
+			m.color_ramp = _ramp([[0.0, Color(0.7, 0.62, 0.42, 0.95)], [0.3, Color(0.66, 0.42, 0.12, 0.85)],
+				[0.75, Color(0.5, 0.18, 0.03, 0.6)], [1.0, Color(0.3, 0.08, 0.01, 0.0)]])
 		"ash_fall":               # pavesas grises que caen despacio (lejos del fuego), revoloteando
 			p.draw_pass_1 = cube("mix")
 			p.amount = 60

@@ -3,6 +3,8 @@
 // y empujado por el viento (`offset`); el ruido de valores con umbrales daba grano y
 // cuadrícula. Donde el plano corta a los personajes o al decorado se funde con la
 // profundidad (sin línea dura). `flash` lo aclara durante un rayo.
+// `holes` (17-10-2026): huecos que abre el calor de las hogueras (x, z, radio, calor; los pone
+// Ambient): la bruma se aparta con el borde deshilachado y algo cálido.
 shader_type spatial;
 render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, shadows_disabled, fog_disabled;
 
@@ -12,6 +14,8 @@ uniform float scale = 9.0;              // m por unidad de ruido
 uniform vec2 offset = vec2(0.0);        // desplazamiento del viento (m)
 uniform float flash = 0.0;
 uniform float exposure_comp = 0.6;      // el tonemapper aclara lo que no se ilumina
+uniform vec4 holes[8];
+uniform int hole_count = 0;
 uniform sampler2D depth_tex : hint_depth_texture, filter_nearest;
 
 varying vec3 world_pos;
@@ -58,6 +62,18 @@ void fragment() {
 	// borde del plano: se desvanece para que no se vea su contorno
 	vec2 c = UV * 2.0 - 1.0;
 	float edge = 1.0 - smoothstep(0.7, 1.0, max(abs(c.x), abs(c.y)));
-	ALBEDO = mix(tint, vec3(0.9, 0.93, 1.0), flash * 0.6) * exposure_comp;
-	ALPHA = shape * opacity * soft * edge;
+	float clear = 1.0;
+	float warm = 0.0;
+	for (int i = 0; i < hole_count; i++) {
+		vec4 h = holes[i];
+		vec2 dv = world_pos.xz - h.xy;
+		if (dot(dv, dv) > h.z * h.z * 2.6) continue;              // lejos: ni ruido ni hueco
+		float wob = fbm(dv * 0.9 + vec2(TIME * 0.35, -TIME * 0.27) + h.xy) * h.z * 0.45;   // borde deshilachado que se mueve
+		float dist = length(dv) + wob;
+		float k = smoothstep(h.z * 0.45, h.z, dist);
+		clear = min(clear, k);
+		warm = max(warm, (1.0 - smoothstep(h.z * 0.7, h.z * 1.4, dist)) * h.w);
+	}
+	ALBEDO = mix(mix(tint, vec3(0.42, 0.24, 0.1), warm * 0.45), vec3(0.9, 0.93, 1.0), flash * 0.6) * exposure_comp;
+	ALPHA = shape * opacity * soft * edge * clear;
 }

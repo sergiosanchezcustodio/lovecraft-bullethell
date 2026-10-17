@@ -16,6 +16,10 @@ extends Node
 ##   que ya suena del grupo, así la mezcla no crece con las armas ni con los jugadores. Las del
 ##   grupo "armas" y "golpes" siguen además el volumen de armas de la configuración (`vol_weapons`).
 
+## Cada evento que se pide, suene o no (silenciado incluido): el ambiente reacciona a los ruidos
+## fuertes (murciélagos que se espantan). `pos` es null si no tiene sitio.
+signal played(ev: String, pos: Variant)
+
 const POOL := 24
 const POOL_3D := 16
 const GROUPS := {"armas": {"voices": 4, "duck": 2.5}, "golpes": {"voices": 5, "duck": 2.0}}
@@ -67,6 +71,7 @@ func play_at(ev: String, pos: Vector3, vol_db := 0.0) -> void:
 	_play(ev, vol_db, pos)
 
 func _play(ev: String, vol_db: float, pos: Variant) -> void:
+	played.emit(ev, pos)
 	if muted or not has_event(ev): return
 	var def: Dictionary = _defs[ev]
 	var now := Time.get_ticks_msec()

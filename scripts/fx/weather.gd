@@ -326,6 +326,18 @@ func _process(delta: float) -> void:
 	if data.lightning_every > 0.0: _lightning(delta)
 	if _rain != null: _rain_step(delta)
 
+## Huecos en la niebla baja (Ambient: el calor de las hogueras), [Vector4(x, z, radio, calor)].
+func set_mist_holes(h: Array) -> void:
+	var arr := PackedVector4Array()
+	for v: Vector4 in h: arr.append(v)
+	arr.resize(8)
+	for m in _mist:
+		m.set_shader_parameter("holes", arr)
+		m.set_shader_parameter("hole_count", mini(h.size(), 8))
+
+func has_mist() -> bool:
+	return not _mist.is_empty()
+
 ## Sin sombras de nubes (grutas e interiores: Ambient, data/ambient.json "clouds": false)
 func hide_clouds() -> void:
 	if _clouds: _clouds.visible = false

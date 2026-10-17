@@ -708,8 +708,8 @@ PAINT_W = (0.74, 0.72, 0.66); PAINT_R = (0.46, 0.14, 0.11); BARN_W = (0.70, 0.68
 def linterna():
     """Farol de puerto (rehecho a 64/m en la revisión de arte del 13-10-2026, más alto: 3,6 m):
     poste de hierro fundido con basa escalonada y pernos, fuste estriado con anillos, brazo con
-    voluta y tornapunta, y un farol de barco colgado: jaula de cuatro barrotes, cristales que
-    brillan con la llama clara dentro, sombrerete cónico con chimenea y aro, y bandeja abajo.
+    voluta y tornapunta, y un farol de barco colgado: jaula de cuatro barrotes, abierta (sin
+    cristal) con la llama de partículas dentro, sombrerete cónico con chimenea y aro, y bandeja abajo.
     El farol cuelga en su propia parte ('lamp', pivote en el gancho del brazo) para que se
     balancee con el viento (data/ambient.json, swing); la cadena es algo más larga (16-10-2026)."""
     M = Model(S=4, seed=106)
@@ -755,8 +755,9 @@ def linterna():
                 bar = m == 6 and (abs(x - LX) == 6 and abs(z) == 6)
                 rib = m == 6 and (y in (LY + 2, LY + 10, LY + 19) or x == LX or z == 0)
                 if bar or rib: M.put(x, y, z, LP, IRON); continue
-                if m == 6: M.put(x, y, z, LP, GLASS_L, glow=1); continue
-                if m <= 2 and LY + 6 < y < LY + 14: M.put(x, y, z, LP, LIGHT_C, glow=1)      # llama
+                # sin cristal (17-10-2026): la llama es de partículas (data/ambient.json, emit)
+                if m <= 2 and y < LY + 6: M.put(x, y, z, LP, IRON_L if y == LY + 5 else IRON_D)   # depósito
+                elif m == 0 and y in (LY + 6, LY + 7): M.put(x, y, z, LP, LIGHT_C, glow=1)     # mecha
     for y in range(LY + 20, LY + 28):                               # sombrerete y chimenea
         w = 7 - (y - LY - 20)
         for x in range(LX - w, LX + w + 1):
@@ -764,7 +765,7 @@ def linterna():
                 if max(abs(x - LX), abs(z)) == w or y == LY + 27: M.put(x, y, z, LP, IRON)
     for a in range(0, 360, 20):                                     # aro
         M.put(LX + int(round(3 * math.cos(math.radians(a)))), LY + 29 + int(round(3 * math.sin(math.radians(a)) * 0.6)), 0, LP, IRON_L)
-    return M, {'body': [0, 0, 0], 'lamp': [LX, AY, 0], 'light': [LX, LY + 10, 0]}
+    return M, {'body': [0, 0, 0], 'lamp': [LX, AY, 0], 'light': [LX, LY + 10, 0], 'fire': [LX, LY + 8, 0]}
 
 
 def bote():

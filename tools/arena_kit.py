@@ -146,4 +146,4 @@ POLAR_DUSK = {"sun_rot": [-18, 35], "sun_color": [1.0, 0.80, 0.62], "sun_energy"
               "background": [0.20, 0.25, 0.33], "fog_color": [0.30, 0.36, 0.46], "fog_density": 0.0}
 
 ICE_BARRIER = ["barrera_hielo_1", "barrera_hielo_2", "barrera_hielo_3"]
-LAMP = {"color": [1.0, 0.72, 0.4], "energy": 2.2, "range": 8.0}
+LAMP = {"color": [1.0, 0.72, 0.4], "energy": 2.2, "range": 8.0, "fog": 0.18}   # halo tenue: se ve la llama (17-10-2026)

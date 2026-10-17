@@ -512,7 +512,7 @@ def bandera():
 
 def farol():
     """Farol de poste: poste de madera con vetas, brazo con tornapunta y voluta de hierro,
-    farol de cuatro cristales con marco, tejadillo y asa, nieve encima y al pie, y cuña de
+    farol de cuatro caras abiertas con marco, tejadillo y asa, nieve encima y al pie, y cuña de
     piedras. Pivote "light" en la llama."""
     M = Model(S=3, seed=27)
     H = 104                                                        # 2,15 m
@@ -546,12 +546,14 @@ def farol():
             for z in range(-5, 5):
                 ex = x in (LX - 5, LX + 4); ez = z in (-5, 4)
                 if not (ex or ez): continue
-                if (ex and ez) or y in (LY - 8, LY + 6): M.put(x, y, z, P, IRON)
-                else: M.put(x, y, z, P, (1.0, 0.82, 0.50), glow=1)
-    for y in range(LY - 7, LY + 4):                                  # llama
-        w = 2 if y < LY + 1 else 1
-        for x in range(LX - w, LX + w):
-            for z in range(-w, w): M.put(x, y, z, P, (1.0, 0.72, 0.30), glow=1)
+                if (ex and ez) or y in (LY - 8, LY + 6, LY - 1): M.put(x, y, z, P, IRON)
+                # sin cristal (17-10-2026): se ve la llama de partículas dentro (data/ambient.json, emit)
+    for x in range(LX - 2, LX + 2):                                  # depósito de aceite con la mecha
+        for z in range(-2, 2):
+            for y in range(LY - 8, LY - 5): M.put(x, y, z, P, IRON_L if y == LY - 6 else IRON)
+    for y in (LY - 5, LY - 4):
+        for x in (LX - 1, LX):
+            for z in (-1, 0): M.put(x, y, z, P, (1.0, 0.75, 0.35), glow=1)   # la mecha que arde
     for i, y in enumerate(range(LY + 7, LY + 12)):                  # tejadillo
         w = 7 - i
         for x in range(LX - w, LX + w):
@@ -565,7 +567,7 @@ def farol():
                 if max(abs(x), abs(z)) in (3, 4) and M.hsh(x, y, z) > 0.45:
                     M.put(x, y, z, P, (0.35, 0.34, 0.33) if M.hsh(z, x, y) > 0.5 else (0.26, 0.25, 0.25))
     drift(M, lambda x, z: math.hypot(x + 0.5, z + 0.5) - 4, 14, 7)
-    return M, {P: [0, 0, 0], 'light': [LX, LY, 0]}
+    return M, {P: [0, 0, 0], 'light': [LX, LY, 0], 'fire': [LX, LY - 4, 0]}
 
 
 # ---------------- iglú ----------------

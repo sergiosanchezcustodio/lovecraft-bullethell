@@ -288,7 +288,7 @@
    0.4
   ],
   "energy": 2.2,
-  "range": 8.0
+  "range": 8.0, "fog": 0.18
  },
  "colliders": {
   "atrezo_tienda": {
