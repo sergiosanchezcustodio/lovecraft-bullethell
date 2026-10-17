@@ -261,7 +261,7 @@
    1.0
   ],
   "sun_energy": 0.5,
-  "exposure": 1.15,
+  "exposure": 0.85,
   "ambient_color": [
    0.56,
    0.62,

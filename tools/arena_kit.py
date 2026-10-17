@@ -145,7 +145,7 @@ COLLIDERS = {
 }
 
 # Luz del crepúsculo polar (nivel 1, aprobada el 30-09-2026)
-POLAR_DUSK = {"sun_rot": [-18, 35], "sun_color": [1.0, 0.80, 0.62], "sun_energy": 0.6, "exposure": 1.2,
+POLAR_DUSK = {"sun_rot": [-18, 35], "sun_color": [1.0, 0.80, 0.62], "sun_energy": 0.6, "exposure": 1.0,
               "ambient_color": [0.50, 0.58, 0.72], "ambient_energy": 0.32,
               "background": [0.20, 0.25, 0.33], "fog_color": [0.30, 0.36, 0.46], "fog_density": 0.0}
 

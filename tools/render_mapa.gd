@@ -27,6 +27,7 @@ func _init() -> void:
 	var arena := ArenaBuilder.build(level.arena, false)
 	vp.add_child(arena)
 	ArenaBuilder.apply_light(arena.get_meta("light", {}), sun, env)
+	Atmosphere.set_lift(env, float(arena.get_meta("light", {}).get("gamma", 1.0)))   # noches legibles, como en la partida
 	env.fog_density = 0.0
 	var size: Vector2 = arena.get_meta("size")
 	var cam := Camera3D.new()

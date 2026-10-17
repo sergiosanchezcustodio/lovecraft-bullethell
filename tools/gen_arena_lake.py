@@ -73,7 +73,7 @@ A.write({
     "barrier": {"models": ICE_BARRIER, "sides": ["north", "west"],
                 "line": HALF + 4.5, "spacing": 7.0, "from": -HALF - 12.0, "to": HALF + 16.0, "y": -1.0, "plateau": 7.2},
     # día gris en la meseta: sol alto y velado, frío; más contraste que el crepúsculo del nivel 1
-    "light": {"sun_rot": [-38, 140], "sun_color": [0.86, 0.90, 1.0], "sun_energy": 0.5, "exposure": 1.15,
+    "light": {"sun_rot": [-38, 140], "sun_color": [0.86, 0.90, 1.0], "sun_energy": 0.5, "exposure": 0.85,
               "ambient_color": [0.56, 0.62, 0.72], "ambient_energy": 0.42,
               "background": [0.42, 0.46, 0.52], "fog_color": [0.55, 0.60, 0.66], "fog_density": 0.0},
     "lamp": LAMP,
