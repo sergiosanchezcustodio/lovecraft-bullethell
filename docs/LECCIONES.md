@@ -1,0 +1,85 @@
+# Lecciones técnicas aprendidas
+
+Sacadas de `CLAUDE.md` el 17-10-2026. Léelas antes de tocar generadores de modelos, shaders, interpolación, menús o rendimiento, y añade aquí las nuevas.
+
+
+- **Orden de vértices:** Godot considera cara frontal el sentido horario. Con el orden al revés se ven huecos negros y desaparece el suelo.
+- **Caché de clases:** si se borra `.godot/`, hay que ejecutar `godot --headless --path . --import` antes de lanzar; si no, `VoxelBuilder` aparece como no declarado.
+- **Rendimiento de los generadores:** nunca buscar superficies recorriendo todo el diccionario de voxels. Hay que recorrer la columna directamente (`front()` / `top()` en `gen_acechador.py`); la versión ingenua superó los 5 minutos.
+- **Púas finas:** por debajo de ~0,5 unidades base de radio en la punta se fragmentan en puntos sueltos a esta resolución.
+- **Colores de vértice:** los colores de los modelos se calibraron en Compatibility, que no convierte sRGB a lineal. En Forward+ hay que marcar `vertex_color_is_srgb`, o todo sale el doble de claro y lavado. `VoxelBuilder.colors_are_srgb()` lo decide según el renderizador; úsalo en cualquier material con colores de vértice.
+- **Renderizado:** el juego usa Forward+ (D-15). Compatibility queda como reserva con `--rendering-method gl_compatibility`. El entorno sale de `Atmosphere.make_environment()`, que tiene valores distintos por renderizador:
+  - En Forward+, Filmic levanta los negros y lava los colores. ACES con exposición 1,6, sin bloom y con niebla de 0,02 reproduce el aspecto aprobado.
+  - Con 150 modelos, Forward+ rinde el doble que Compatibility (`docs/RENDIMIENTO.md`).
+- **Personajes humanos:** el primer Dyer se rechazó. Estaba esculpido con elipsoides y relieves de un voxel (nariz, ribetes, gafas, correa, botones), y a esta escala cada relieve se convertía en un bulto deforme; la capucha, además, ocultaba la forma de la cabeza. Los humanos se hacen a bloques limpios (`vbox` y `bevel`), con los detalles pintados sobre superficies planas. La cara se dibuja en el plano frontal de la cabeza con píxeles de 1 voxel y sin relieve, y se usa muy poco ruido de color. Los tonos de piel, pelo y prendas deben distinguirse bien, porque bajo luz cálida el crema de la piel y el gris claro se confunden. Revisa siempre también la espalda y el perfil.
+- **Identidad de un animal:** lo que hace reconocible a una especie es su silueta y su patrón de color, no el detalle. El pingüino todo blanco parecía un huevo; con la silueta de emperador y el frac en tonos pálidos se reconoce al instante.
+- **Material por modelo:** con el material húmedo de las criaturas, las caras planas de la ropa reflejan los faroles casi en blanco. Ropa, plumas y atrezo van mates.
+- **Superficies escalonadas:** los elipsoides grandes dejan un escalón en cada capa de voxels, y la luz cenital los convierte en motas. Para ropa, madera y piedra usa `sell` (superelipsoide), que da caras planas.
+- **Efectos breves en capturas:** un rayo de 0,35 s cada 2,2 s casi nunca cae en una captura a segundos redondos. Para comprobarlo, imprime cuándo se dispara y captura cada pocas centésimas alrededor de ese instante.
+- **Pelo claro bajo la luz cálida:** un rubio platino se confundía con la piel, de frente y de espaldas. Pelo muy claro solo si el tono es claramente distinto de la piel; si no, oscuro.
+- **Colores claros sobre la nieve:** un rayo aditivo o atenuado se pierde sobre el suelo blanco iluminado. Hace falta un núcleo opaco y saturado (naranja dorado) y dejar lo aditivo para el halo.
+- **Includes de shaders:** un `varying` no se puede asignar dentro de una función auxiliar, ni siquiera en un `.gdshaderinc`. Se asigna en `vertex()`.
+- **Fondo grande en voxel:** a 32 voxels por metro, una pared de 80 m tendría millones de voxels. La barrera se modela a 16 y se exporta a 8 por metro (`half_res`). A 16, el peor 1 % de fotogramas bajaba de 71 a 60 FPS; a 8, con el zoom de juego se ve igual.
+- **Colores oscuros bajo la luna:** un agua con albedo de 0,05 sale negra del todo con la luz de luna. Para que un fondo oscuro se lea como agua hace falta un albedo de 0,15 a 0,3.
+- **Alas y viseras en isométrica:** la cámara mira desde arriba, así que un ala o una visera que sobresale 3 voxels tapa las dos filas de la cara que quedan debajo, y desaparecen los ojos. Como mucho 2 voxels de ala, y los ojos una fila más abajo (`face(..., eye_y=47)` en `tools/humano.py`).
+- **Colores de personajes bajo luz cálida:** un rubio claro se confunde con la piel, y dos tonos oliva distintos se ven iguales. Hay que separar los personajes por valor (claro, medio y oscuro) además de por tono.
+- **Detalles que apuntan a la cámara:** en vista isométrica, lo que apunta justo hacia la cámara desaparece en la proyección (el pico del pingüino de frente). Comprueba cada modelo a varios giros.
+- **Ojos brillantes:** una esfera `glow` dentro de un párpado oscuro tiene que asomar lo suficiente (desplazada ~0,75 ub hacia fuera), o solo se ven motas sueltas.
+- **Capturas abiertas en el visor de fotos:** Windows bloquea el fichero y Python no puede sobrescribirlo (`OSError: Invalid argument`). Guarda con otro nombre.
+- **Rutas en Python desde Git Bash:** las rutas `/c/...` solo se traducen cuando van como argumento. Dentro del código Python usa `C:/...`.
+- **Niebla volumétrica y cámara ortográfica:** la niebla volumétrica global no sirve con nuestra cámara: solo oscurece la escena y no dispersa la luz de los faroles (limitación conocida con cámaras cenitales u ortográficas).
+  - **Lo que sí funciona:** volúmenes locales (`FogVolume` elipsoidal, densidad 0,35) alrededor de cada farol, con la niebla volumétrica activada y la densidad global a 0. Dan halos cálidos y cuestan unos 0,13 ms por fotograma.
+- **Legibilidad del jugador:** con luz de luna, la parka marrón de Dyer se funde con el suelo oscuro. Se resuelve con tres cosas:
+  - Un farol propio (luz cálida de 4,5 m de alcance que también ilumina a las criaturas cercanas).
+  - Un anillo de color grueso.
+  - Una silueta cuando lo tapa el decorado. La oclusión se mide contra el **centro** del personaje: solo cuenta lo que está más de 1,05 m por delante de él. Medirla fragmento a fragmento hacía que el brazo lejano se viera a través del torso (en isométrica queda más de medio metro por detrás), y con 0,75 m la cara se marcaba al inclinarse en el esquive.
+- **Suelo sin juntas:** unos huecos de 1 cm entre losas dibujaban una cuadrícula y dejaban ver el mar que pasa por debajo, con destellos de los faroles. Las losas van contiguas.
+- **Colisión al aparecer:** si un `CharacterBody3D` aparece dentro de una colisión, `move_and_slide` lo expulsa.
+- **Bot con esquive:** el bot no debe esquivar en el primer fotograma. Si lo hace, sale disparado hacia delante y parece que no respeta la posición inicial.
+- **Packed arrays en GDScript:** un `PackedInt32Array` sacado de un diccionario o metido en otro array es una copia. `(dic[k] as PackedInt32Array).append(x)` y `for a in [arr1, arr2]: a.resize(n)` no cambian el original. Hay que volver a guardarlo, o trabajar con la variable miembro directamente. Pasó dos veces en el hito 1.4.
+- **`POSITION` en un shader de vértices:** si una rama lo escribe, hay que escribirlo en todas. En las que no, el vértice queda sin posición y la malla desaparece sin ningún error.
+- **Colores sin iluminar y tonemapper:** ACES con exposición 1,6 también procesa los materiales `unshaded` y quema los colores saturados, de modo que el violeta sale blanco. Balas y avisos multiplican su color por un factor menor que 1 (`exposure_comp`).
+- **Clases internas de GDScript:** no son nombres globales. Un `class X extends Y:` dentro de otro fichero solo se alcanza como `Fichero.X`. Si otras clases las crean por nombre, cada una va en su fichero con `class_name`.
+- **Arrays tipados en `.tres`:** un `Array[EnemyData]` se escribe `Array[ExtResource("id_del_script")]([...])`, no `Array[Resource]`.
+- **Coste por fotograma en GDScript:** con 150 enemigos, llamar a `find_children` y reasignar materiales en cada fotograma, y recalcular las posiciones de reposo leyendo metadatos, bajaba la partida de 170 a 81 FPS. `VoxelBuilder` guarda en metadatos las partes, las posiciones de reposo y las mallas de cada modelo (`parts`, `rest`, `rest_by_name`, `meshes`), y los materiales solo se tocan cuando cambia el estado.
+- **Referencias a objetos liberados:** copiar un objeto ya liberado dentro de un array tipado (`Array[Object]`) da error. Para recordar un objetivo que puede morir en cualquier momento, guarda su `get_instance_id()`.
+- **Aviso `ObjectDB instances leaked` al salir:** aparece si se fuerza la salida (`--quit-after`) mientras una corrutina espera un temporizador. No pasa al jugar normalmente.
+- **Vibración con monitores de más de 60 Hz:** es el efecto de mover en `_physics_process` sin interpolación. En isométrica se nota sobre todo de lado y en diagonal, porque hacia arriba y hacia abajo el personaje recorre la mitad de píxeles.
+- **Gemas y materiales sin iluminar:** un color dorado sin iluminar, tras el tonemapper (ACES 1,6), sale casi blanco o naranja rojizo según se trate como sRGB o no. Para objetos pequeños que deben verse bonitos, mejor material iluminado, algo metálico y con una emisión suave. Ojo con los reflejos puntuales muy nítidos: en una gema parecían ojos (rugosidad 0,5).
+- **Mallas hechas con SurfaceTool:** el orden de los vértices decide qué cara se ve. Si una malla pequeña se ve rara o del color de su cara interior, prueba `cull_mode = CULL_DISABLED` o invierte el orden.
+- **Edificios en voxel:** a 32 voxels por metro, un edificio macizo tendría cientos de miles de voxels. Se hacen huecos (paredes de 2-3 voxels, tejado de 1 más 2 de nieve), y el iglú como cáscara esférica de grosor uniforme; medirla en horizontal dejaba un agujero en la cúspide. Aun así, la cabaña tiene unos 100.000 voxels: la caché de mallas es imprescindible.
+- **Rampas a 45° en voxel:** la tienda piramidal (escalones de un voxel) se veía rayada. Se rehízo como tienda de cumbrera, con faldones más empinados y color uniforme por paños.
+- **Scripts largos en la herramienta de Bash:** un heredoc muy largo se corta ("unexpected EOF while looking for matching"). Para ediciones grandes, escribe el script en el scratchpad y ejecútalo.
+- **Partículas con billboard:** `BILLBOARD_PARTICLES` descarta la escala de cada partícula si no se activa `billboard_keep_scale`. Todos los copos de nieve medían 1 m.
+- **Bloom general y partículas pequeñas:** con `glow_bloom` > 0 cada punto claro se convierte en una bola borrosa. En la portada, el bloom es 0 y el brillo sale solo del umbral HDR.
+- **Rayos del clima sobre nieve:** un destello de luz direccional de 2,2 más 0,9 de ambiente convierte la noche en día sobre el suelo blanco. Con 0,45 y 0,18 se lee como un fogonazo frío.
+- **Propiedades antes de `script` en un `.tres`:** Godot las ignora (aún no sabe de qué clase es el recurso). Van siempre después de la línea `script = ExtResource(...)`.
+- **Colores en `.tres`:** `Color(r, g, b)` con tres componentes no se carga; hacen falta los cuatro.
+- **Referencias circulares entre RefCounted:** dos objetos que se guardan el uno al otro (el equipo y el progreso de cada jugador) no se liberan nunca, ni al reiniciar la escena; aparece como "N resources still in use at exit". Uno de los dos debe guardar al otro con `weakref()`. Para localizarlo: `godot --verbose ... --quit-after N` y mirar qué scripts siguen en uso.
+- **Foco del mando con ventanas encima:** Godot busca el control más cercano en la dirección pulsada entre todos los visibles, también los que están detrás de una ventana. Toda ventana modal debe encerrar el foco (`MenuKit.trap_focus`).
+- **Relámpagos y luz ambiental:** si el ambiente sale del cielo, cada relámpago ilumina el valle como si fuera de día. Usa ambiente de color fijo y deja el destello al cielo, a un contraluz rasante y a una luz puntual.
+- **Montañas voxel:** un cono con pendiente uniforme o bloques aplanados se ven como pirámides escalonadas. Hacen falta cárcavas, un contorno quebrado de agujas (ruido de crestas de celda pequeña) y pocas mesetas.
+- **NumPy y JSON:** los enteros de NumPy (`int64`) no se pueden serializar; conviértelos con `int()` o `float()` antes de `json.dump`.
+- **Animar una ilustración:** se genera un mapa de máscaras y se modula la imagen con él en un shader, sin pintar nada nuevo encima. Una llama es un blob cálido y brillante; su luz, ese blob difuminado; y el cielo son los píxeles azules y claros dentro del ventanal. Las formas oscuras (tracería, silueta) quedan fuera solas. Mide la variación por zonas antes de darla por buena: a ojo se sobrestima lo sutil que es.
+- **Shaders de canvas:** `TEXTURE` solo existe dentro de `fragment()`; para usarla en una función auxiliar hay que pasarla como `sampler2D`. Para superponer un halo bajo un texto que aparece, usa la composición "encima" con los colores ponderados por su alfa; una mezcla simple tiñe el texto con el color del halo mientras es transparente.
+- **Texturas 4K mostradas a 1080p:** activa `mipmaps/generate=true` en su `.import` y usa `TEXTURE_FILTER_LINEAR_WITH_MIPMAPS`, o saldrán dientes de sierra y brillos que bailan al hacer zoom.
+- **Tests y datos de equilibrio:** los tests no deben comprobar valores que se retocan al equilibrar (ritmos, experiencia, vida). Cuando haga falta, que construyan sus propios datos. Si un test falla tras un ajuste de equilibrio, el que está mal es el test.
+- **Controles de los menús:** el `ui_accept` de Godot no trae ningún botón del mando y sí trae Espacio, que es la tecla de esquivar. `UiInput.configure()` añade A (aceptar) y B (volver) y quita Espacio. El menú de mejoras ignora las pulsaciones durante su primer medio segundo.
+- **Élites ahogadas en la horda:** las armas apuntan al más cercano o a la zona más densa, así que una élite rodeada de la oleada casi no recibe disparos. `LevelData.final_spawn_scale` (0,3) reduce las apariciones durante el evento final.
+- **Turbulencia en `ParticleProcessMaterial`:** arrastra la velocidad de cada partícula hacia la del campo de ruido en cada paso. Con influencias normales (0,05-0,1), las partículas lentas se quedan paradas donde nacen; por eso no se veían las motas de la primera portada. Para caídas lentas, influencia de 0,002-0,006.
+- **`preprocess` en partículas de vida larga:** no llegaba a repartir la ceniza por la pantalla. Es más fiable emitir en una caja que cubra toda la zona, con fundido de entrada y salida en la rampa de color.
+- **Niebla en shader:** el ruido de valores con umbrales (`smoothstep` estrecho) da grano y formas en cuadrícula que se ven artificiales. Funciona mejor:
+  - Ruido de gradiente con octavas giradas, y pocas octavas.
+  - Formas grandes y alargadas, con perspectiva.
+  - Modular la niebla pintada (aclararla y oscurecerla) en vez de añadir otra capa encima.
+- **Llamas animadas sobre una ilustración:** la cera junto a la llama también es clara y cálida.
+  - La llama se separa cortando cada mancha por el cuello de la mecha: donde la anchura se estrecha o salta al borde de la vela.
+  - El desplazamiento crece de 0 en la base a 1 en la punta, con margen a los lados y por encima, pero nunca por debajo.
+- **Aviso de recursos sin liberar con música:** al forzar la salida con `--quit-after` con música sonando, a veces sale `1 resources still in use at exit`. Es intermitente y no aparece con `mute=true`.
+- **Sutil no es invisible:** una variación del 1,8 % de brillo no se percibe en movimiento. Para que una animación de ambiente se note hace falta del orden del 10-20 % en su zona.
+- **Movimientos lentos de un `Control`:** Godot redondea su posición a píxeles enteros (`gui/common/snap_controls_to_pixels`), así que un zoom o un desplazamiento lento avanza a saltos y parece que la imagen vibra; en la portada eran saltos de 2 px a 4K. Anímalos en un `Node2D` padre, que no se redondea. Para comprobarlo, mide el desplazamiento entre fotogramas con correlación de fase.
+- **Grabar en pantalla completa exclusiva:** si la ventana pierde el foco, Godot deja de dibujar y `--write-movie` repite el último fotograma. Graba en ventana.
+- **Pantalla completa en Windows:** `WINDOW_MODE_FULLSCREEN` deja la ventana 1-2 píxeles más pequeña que el monitor; usa `WINDOW_MODE_EXCLUSIVE_FULLSCREEN`.
+- **Grabar vídeo en pantalla completa:** con `--write-movie` a 4K cada fotograma tarda 2,5 s. `Engine.get_write_movie_path()` sirve para detectar la grabación y quedarse en ventana. Buscar `--write-movie` en `OS.get_cmdline_args()` no funciona.
+- **`cat` sin entrada:** un `cat > fichero` sin heredoc se queda esperando la entrada estándar para siempre.
+
