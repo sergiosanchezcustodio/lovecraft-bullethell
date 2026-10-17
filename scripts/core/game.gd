@@ -128,6 +128,8 @@ func _ready() -> void:
 	arena = ArenaBuilder.build(arena_path, fogvol)
 	add_child(arena)
 	ArenaBuilder.apply_light(arena.get_meta("light", {}), moon, env)
+	# sombras levantadas: la de la arena ("gamma", noches legibles) por el brillo de la configuración
+	Atmosphere.set_lift(env, float(arena.get_meta("light", {}).get("gamma", 1.0)) * Settings.brightness_gamma())
 	_base_fog = env.fog_density
 	_base_ambient = env.ambient_light_energy
 	world = CombatWorld.new()

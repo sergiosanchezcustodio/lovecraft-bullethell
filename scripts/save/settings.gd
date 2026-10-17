@@ -9,6 +9,8 @@ const PATH := "user://settings.json"
 const RESOLUTIONS: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1600, 900), Vector2i(1920, 1080), Vector2i(2560, 1440), Vector2i(3840, 2160)]
 const FPS_LIMITS: Array[int] = [0, 60, 120, 144, 240]          ## 0 = sin límite
 const SCALES_3D: Array[float] = [0.5, 0.67, 0.75, 1.0]
+## Brillo (17-10-2026): gamma que multiplica la de cada arena (Atmosphere.set_lift); índice 3 = 1
+const BRIGHTNESS: Array[float] = [0.8, 0.87, 0.93, 1.0, 1.08, 1.16, 1.25, 1.35]
 const BUS_MUSIC := &"Musica"
 const BUS_SFX := &"Efectos"
 const BUS_AMBIENT := &"Ambiente"               ## sonido de los escenarios (16-10-2026), dentro de Efectos
@@ -22,6 +24,7 @@ const REMAP_ACTIONS := [
 
 var defaults := {
 	"fullscreen": true, "resolution": 2, "vsync": true, "fps_limit": 0, "scale_3d": 1.0,
+	"brightness": 3,                        ## índice en BRIGHTNESS
 	"vol_master": 1.0, "vol_music": 0.8, "vol_sfx": 0.9, "vol_weapons": 0.7, "vol_ambient": 0.8,
 	"distortion": 1.0, "vibration": true, "show_fps": false,
 	"weather": 2,                           ## clima: 0 apagado, 1 reducido, 2 completo
@@ -55,6 +58,10 @@ func _ready() -> void:
 func get_value(key: String) -> Variant:
 	if _overrides.has(key): return _overrides[key]
 	return values.get(key, defaults.get(key))
+
+## Gamma del brillo elegido (1 = el de fábrica).
+func brightness_gamma() -> float:
+	return BRIGHTNESS[clampi(int(get_value("brightness")), 0, BRIGHTNESS.size() - 1)]
 
 func set_value(key: String, v: Variant) -> void:
 	values[key] = v

@@ -76,7 +76,7 @@ A.write({
             "colors": {"deep": [0.02, 0.06, 0.05], "mid": [0.04, 0.11, 0.08], "shallow": [0.07, 0.18, 0.12],
                        "crest": [0.14, 0.26, 0.18], "foam": [0.30, 0.40, 0.32]}},
     # noche cerrada, luna tras las nubes: la luz es la verde que sube del agua
-    "light": {"sun_rot": [-40, 20], "sun_color": [0.55, 0.66, 0.70], "sun_energy": 0.32, "exposure": 1.35,
+    "light": {"gamma": 1.55, "sun_rot": [-40, 20], "sun_color": [0.55, 0.66, 0.70], "sun_energy": 0.32, "exposure": 1.35,
               "ambient_color": [0.30, 0.42, 0.36], "ambient_energy": 0.6,
               "background": [0.04, 0.07, 0.06], "fog_color": [0.12, 0.20, 0.16], "fog_density": 0.0},
     "lamp": {"color": [0.45, 0.95, 0.6], "energy": 0.9, "range": 6.0, "fog": 0.1},

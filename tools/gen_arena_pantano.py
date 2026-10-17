@@ -104,7 +104,7 @@ A.write({
             "colors": {"deep": [0.03, 0.05, 0.04], "mid": [0.06, 0.09, 0.07], "shallow": [0.10, 0.13, 0.09],
                        "crest": [0.16, 0.20, 0.14], "foam": [0.32, 0.36, 0.28]}},
     # noche de luna con niebla verdosa
-    "light": {"sun_rot": [-34, 25], "sun_color": [0.62, 0.72, 0.78], "sun_energy": 0.42, "exposure": 1.3,
+    "light": {"gamma": 1.45, "sun_rot": [-34, 25], "sun_color": [0.62, 0.72, 0.78], "sun_energy": 0.42, "exposure": 1.3,
               "ambient_color": [0.38, 0.46, 0.40], "ambient_energy": 0.44,
               "background": [0.08, 0.11, 0.09], "fog_color": [0.20, 0.25, 0.20], "fog_density": 0.0},
     "lamp": {"color": [1.0, 0.62, 0.38], "energy": 2.2, "range": 8.0},

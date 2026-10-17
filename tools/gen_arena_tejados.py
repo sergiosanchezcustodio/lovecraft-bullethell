@@ -61,7 +61,7 @@ A.write({
                "kind": "planks", "wet": 0.6,
                "colors": {"base_hi": [0.40, 0.36, 0.32], "base_lo": [0.22, 0.20, 0.18], "joint": [0.02, 0.02, 0.02]}},
     # noche cerrada: luna fría tras las nubes; las ventanas del hotel y las farolas de abajo, cálidas
-    "light": {"sun_rot": [-48, 210], "sun_color": [0.62, 0.70, 0.90], "sun_energy": 0.38, "exposure": 1.3,
+    "light": {"gamma": 1.25, "sun_rot": [-48, 210], "sun_color": [0.62, 0.70, 0.90], "sun_energy": 0.38, "exposure": 1.3,
               "ambient_color": [0.40, 0.46, 0.56], "ambient_energy": 0.46,
               "background": [0.015, 0.02, 0.03], "fog_color": [0.18, 0.21, 0.25], "fog_density": 0.0},
     "lamp": {"color": [1.0, 0.78, 0.48], "energy": 2.6, "range": 9.0},

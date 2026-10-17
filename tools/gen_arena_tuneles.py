@@ -43,7 +43,7 @@ A.write({
     "sea": {"sides": ["south", "east"], "level": -1.0},
     "barrier": {"models": ["barrera_roca_1", "barrera_roca_2", "barrera_roca_3"], "sides": ["north", "west"],
                 "line": HALF + 4.5, "spacing": 7.0, "from": -HALF - 12.0, "to": HALF + 14.0, "y": -1.0, "plateau": 7.2},
-    "light": {"sun_rot": [-70, 160], "sun_color": [0.45, 0.60, 0.70], "sun_energy": 0.18, "exposure": 1.3,
+    "light": {"gamma": 1.5, "sun_rot": [-70, 160], "sun_color": [0.45, 0.60, 0.70], "sun_energy": 0.18, "exposure": 1.3,
               "ambient_color": [0.22, 0.32, 0.40], "ambient_energy": 0.40,
               "background": [0.03, 0.04, 0.06], "fog_color": [0.06, 0.09, 0.12], "fog_density": 0.0},
     "lamp": LAMP,

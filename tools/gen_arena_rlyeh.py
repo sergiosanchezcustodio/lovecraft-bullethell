@@ -54,7 +54,7 @@ A.write({
             "colors": {"deep": [0.02, 0.06, 0.05], "mid": [0.05, 0.11, 0.09], "shallow": [0.08, 0.17, 0.13],
                        "crest": [0.16, 0.28, 0.20], "foam": [0.36, 0.48, 0.38]}},
     # cielo verdoso de después de la tormenta; la puerta y los corales dan luz verde
-    "light": {"sun_rot": [-35, 30], "sun_color": [0.62, 0.78, 0.68], "sun_energy": 0.42, "exposure": 1.3,
+    "light": {"gamma": 1.5, "sun_rot": [-35, 30], "sun_color": [0.62, 0.78, 0.68], "sun_energy": 0.42, "exposure": 1.3,
               "ambient_color": [0.34, 0.46, 0.40], "ambient_energy": 0.58,
               "background": [0.05, 0.09, 0.07], "fog_color": [0.14, 0.22, 0.18], "fog_density": 0.0},
     "lamp": {"color": [0.45, 1.0, 0.6], "energy": 1.4, "range": 7.0, "fog": 0.1},

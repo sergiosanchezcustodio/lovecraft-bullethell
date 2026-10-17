@@ -103,7 +103,8 @@
    0.22,
    0.18
   ],
-  "fog_density": 0.0
+  "fog_density": 0.0,
+  "gamma": 1.5
  },
  "lamp": {
   "color": [

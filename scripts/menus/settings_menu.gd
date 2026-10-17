@@ -88,6 +88,14 @@ func _video() -> void:
 		OptionRow.idx(Settings.SCALES_3D, float(Settings.get_value("scale_3d")), 3), func(i: int) -> void:
 			Settings.set_value("scale_3d", Settings.SCALES_3D[i])
 			Settings.apply_video())
+	var steps: Array[String] = []
+	for k in Settings.BRIGHTNESS.size(): steps.append("%+d" % (k - 3) if k != 3 else "0")
+	var pattern := BrightnessPattern.new()
+	_choice("Brillo", steps, int(Settings.get_value("brightness")), func(i: int) -> void:
+		Settings.set_value("brightness", i)
+		pattern.queue_redraw())
+	_list.add_child(pattern)
+	_note("Ajusta hasta que el ojo de la izquierda apenas se vea y el de la derecha se vea bien.")
 
 func _audio() -> void:
 	for pair in [["Volumen general", "vol_master"], ["Música", "vol_music"], ["Efectos", "vol_sfx"],

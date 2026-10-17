@@ -75,8 +75,8 @@ A.write({
             "colors": {"deep": [0.03, 0.05, 0.04], "mid": [0.06, 0.08, 0.06], "shallow": [0.10, 0.12, 0.08],
                        "crest": [0.16, 0.18, 0.12], "foam": [0.32, 0.34, 0.26]}},
     # noche sin luna: la luz es la de las hogueras y las antorchas
-    "light": {"sun_rot": [-50, 30], "sun_color": [0.45, 0.52, 0.62], "sun_energy": 0.25, "exposure": 1.35,
-              "ambient_color": [0.34, 0.40, 0.38], "ambient_energy": 0.58,
+    "light": {"gamma": 1.5, "sun_rot": [-50, 30], "sun_color": [0.45, 0.52, 0.62], "sun_energy": 0.25, "exposure": 1.35,
+              "ambient_color": [0.34, 0.40, 0.38], "ambient_energy": 0.9,
               "background": [0.04, 0.05, 0.05], "fog_color": [0.14, 0.16, 0.13], "fog_density": 0.0},
     "lamp": {"color": [1.0, 0.58, 0.28], "energy": 2.6, "range": 9.0, "fog": 0.25},
     "colliders": COLL,

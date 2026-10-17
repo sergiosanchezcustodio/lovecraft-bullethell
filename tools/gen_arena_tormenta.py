@@ -58,7 +58,7 @@ A.write({
     "sea": {"sides": ["south", "east"], "level": -2.0, "brash": 0.0,
             "colors": {"deep": [0.03, 0.05, 0.07], "mid": [0.07, 0.11, 0.14], "shallow": [0.14, 0.20, 0.24],
                        "crest": [0.40, 0.48, 0.52], "foam": [0.70, 0.76, 0.78]}},
-    "light": {"sun_rot": [-38, 30], "sun_color": [0.62, 0.70, 0.82], "sun_energy": 0.38, "exposure": 1.3,
+    "light": {"gamma": 1.35, "sun_rot": [-38, 30], "sun_color": [0.62, 0.70, 0.82], "sun_energy": 0.38, "exposure": 1.3,
               "ambient_color": [0.38, 0.44, 0.50], "ambient_energy": 0.52,
               "background": [0.05, 0.07, 0.09], "fog_color": [0.16, 0.20, 0.24], "fog_density": 0.0},
     "lamp": {"color": [1.0, 0.78, 0.50], "energy": 3.1, "range": 9.0, "fog": 0.25},

@@ -27,3 +27,26 @@ static func make_environment() -> Environment:
 		env.glow_bloom = 0.0
 		env.fog_density = 0.02
 	return env
+
+## Levanta las sombras con una curva gamma aplicada tras el tono (corrección de color 1D):
+## y = x^(1/gamma). 1 no cambia nada; 1,3-1,5 aclara la noche sin quemar faroles ni hogueras.
+## La usan la luz de cada arena ("gamma" en su JSON) y el brillo de la configuración.
+static func set_lift(env: Environment, gamma: float) -> void:
+	if absf(gamma - 1.0) < 0.005:
+		env.adjustment_color_correction = null
+		env.adjustment_enabled = false
+		return
+	var g := Gradient.new()
+	var offs := PackedFloat32Array()
+	var cols := PackedColorArray()
+	for i in 33:
+		var x := i / 32.0
+		var y := pow(x, 1.0 / gamma)
+		offs.append(x); cols.append(Color(y, y, y))
+	g.offsets = offs
+	g.colors = cols
+	var tex := GradientTexture1D.new()
+	tex.gradient = g
+	tex.width = 256
+	env.adjustment_enabled = true
+	env.adjustment_color_correction = tex

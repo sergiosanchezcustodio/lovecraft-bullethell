@@ -37,6 +37,7 @@ Consúltalos cuando haga falta (son largos):
 - **Shaders:** nada de `fract(sin(x) * 43758)` con argumentos grandes; usa el hash de `night_sky.gdshaderinc`.
 - **Bots y capturas:** `mute=true`; las ejecuciones de prueba van en ventana.
 - **Pantalla completa** exclusiva por defecto; la interfaz escala desde 1920×1080.
+- **Luz de las arenas:** las noches se aclaran con `"gamma"` en el `light` de la arena (curva tras el tono, `Atmosphere.set_lift`), no subiendo ambiente o exposición, que el tono ACES aplasta. Apunta a una mediana de brillo de 0,16-0,22 en las noches (detalle en `docs/ESTADO.md`).
 
 ## Decisiones cerradas
 
