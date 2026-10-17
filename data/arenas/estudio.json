@@ -510,24 +510,6 @@
    "scale": 1.0
   },
   {
-   "model": "prv_muro_bajo",
-   "pos": [
-    26,
-    24.2
-   ],
-   "rot": 0,
-   "scale": 1.0
-  },
-  {
-   "model": "prv_muro_bajo",
-   "pos": [
-    24.2,
-    26
-   ],
-   "rot": 90,
-   "scale": 1.0
-  },
-  {
    "model": "prv_pilar",
    "pos": [
     -12,

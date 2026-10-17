@@ -940,26 +940,6 @@
    "y": -4.0
   },
   {
-   "model": "inn_casa",
-   "pos": [
-    36.0,
-    34.2
-   ],
-   "rot": 180,
-   "scale": 1.0,
-   "y": -5.5
-  },
-  {
-   "model": "inn_casa",
-   "pos": [
-    34.2,
-    36.0
-   ],
-   "rot": -90,
-   "scale": 1.0,
-   "y": -5.5
-  },
-  {
    "model": "tej_buhardilla",
    "pos": [
     40.0,
@@ -974,46 +954,6 @@
    "pos": [
     43.0,
     40.0
-   ],
-   "rot": -90,
-   "scale": 1.0,
-   "y": -4.0
-  },
-  {
-   "model": "inn_casa_2",
-   "pos": [
-    44.0,
-    34.2
-   ],
-   "rot": 180,
-   "scale": 1.0,
-   "y": -5.5
-  },
-  {
-   "model": "inn_casa_2",
-   "pos": [
-    34.2,
-    44.0
-   ],
-   "rot": -90,
-   "scale": 1.0,
-   "y": -5.5
-  },
-  {
-   "model": "tej_buhardilla",
-   "pos": [
-    48.0,
-    43.0
-   ],
-   "rot": 180,
-   "scale": 1.0,
-   "y": -4.0
-  },
-  {
-   "model": "tej_buhardilla",
-   "pos": [
-    43.0,
-    48.0
    ],
    "rot": -90,
    "scale": 1.0,

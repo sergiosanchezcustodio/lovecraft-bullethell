@@ -23,11 +23,14 @@ class Arena:
         self.foot = foot or {}                  # radio que ocupa cada pieza a escala 1 (resto, 1,2 m)
         self.spawn_clear = spawn_clear          # radio libre alrededor de la salida
 
-    def add(self, model, x, z, rot=None, scale=1.0, y=None):
-        """y: altura propia de la pieza (por defecto, el suelo; o el agua si está en el mar)."""
+    def add(self, model, x, z, rot=None, scale=1.0, y=None, past_corner=False):
+        """y: altura propia de la pieza (por defecto, el suelo; o el agua si está en el mar).
+        past_corner: la pieza sigue una fila del borde más allá de la esquina sureste; cuenta al
+        repartir las demás (para que no se muevan), pero no se escribe: las dos filas se cruzaban en X."""
         p = {"model": model, "pos": [round(x, 2), round(z, 2)],
              "rot": round(self.rng.uniform(0, 360) if rot is None else rot, 1), "scale": round(scale, 2)}
         if y is not None: p["y"] = round(y, 2)
+        if past_corner: p["_drop"] = True
         self.props.append(p)
 
     def free(self, x, z, r):
@@ -65,8 +68,9 @@ class Arena:
                 j = self.rng.uniform(-0.6, 0.6)
                 m = models[self.rng.randrange(len(models))]
                 s = self.rng.uniform(smin, smax)
-                if side == 'south': self.add(m, t, H + inset + j, scale=s)
-                else: self.add(m, H + inset + j, t, scale=s)
+                past = t > H + inset + 0.5
+                if side == 'south': self.add(m, t, H + inset + j, scale=s, past_corner=past)
+                else: self.add(m, H + inset + j, t, scale=s, past_corner=past)
             t += step
 
     def coast(self, models=('costa_1', 'costa_2', 'costa_3'), step=7.5):
@@ -105,7 +109,7 @@ class Arena:
             if p["model"] in VARIANTS:
                 vs = VARIANTS[p["model"]]
                 p["model"] = vs[int(abs(p["pos"][0] * 7.3 + p["pos"][1] * 13.1)) % len(vs)]
-        layout["props"] = self.props
+        layout["props"] = [p for p in self.props if not p.get("_drop")]
         path = "data/arenas/%s.json" % self.name
         with open(path, "w") as f:
             json.dump(layout, f, indent=1)

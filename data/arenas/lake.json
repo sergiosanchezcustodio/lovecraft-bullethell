@@ -287,7 +287,8 @@
    0.4
   ],
   "energy": 2.2,
-  "range": 8.0, "fog": 0.18
+  "range": 8.0,
+  "fog": 0.18
  },
  "colliders": {
   "atrezo_tienda": {
@@ -1345,78 +1346,6 @@
    ],
    "rot": 253.2,
    "scale": 1.02
-  },
-  {
-   "model": "monticulo_2",
-   "pos": [
-    35.2,
-    33.21
-   ],
-   "rot": 198.5,
-   "scale": 1.31
-  },
-  {
-   "model": "monticulo_3",
-   "pos": [
-    34.05,
-    35.2
-   ],
-   "rot": 333.7,
-   "scale": 1.33
-  },
-  {
-   "model": "monticulo_1",
-   "pos": [
-    37.6,
-    33.64
-   ],
-   "rot": 293.0,
-   "scale": 1.24
-  },
-  {
-   "model": "monticulo_1",
-   "pos": [
-    33.85,
-    37.6
-   ],
-   "rot": 148.5,
-   "scale": 1.05
-  },
-  {
-   "model": "monticulo_2",
-   "pos": [
-    40.0,
-    33.78
-   ],
-   "rot": 210.6,
-   "scale": 1.41
-  },
-  {
-   "model": "monticulo_1",
-   "pos": [
-    33.33,
-    40.0
-   ],
-   "rot": 5.4,
-   "scale": 1.19
-  },
-  {
-   "model": "monticulo_2",
-   "pos": [
-    42.4,
-    33.87
-   ],
-   "rot": 282.0,
-   "scale": 1.23
-  },
-  {
-   "model": "monticulo_2",
-   "pos": [
-    33.32,
-    42.4
-   ],
-   "rot": 325.1,
-   "scale": 1.16
   },
   {
    "model": "monticulo_1",

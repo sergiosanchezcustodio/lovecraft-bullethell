@@ -314,7 +314,8 @@
    0.4
   ],
   "energy": 2.2,
-  "range": 8.0, "fog": 0.18
+  "range": 8.0,
+  "fog": 0.18
  },
  "colliders": {
   "atrezo_tienda": {
@@ -1061,78 +1062,6 @@
    ],
    "rot": 21.1,
    "scale": 1.8
-  },
-  {
-   "model": "atrezo_roca_grande",
-   "pos": [
-    34.4,
-    33.97
-   ],
-   "rot": 137.1,
-   "scale": 2.09
-  },
-  {
-   "model": "atrezo_roca_grande",
-   "pos": [
-    33.87,
-    34.4
-   ],
-   "rot": 106.9,
-   "scale": 2.02
-  },
-  {
-   "model": "atrezo_roca_grande",
-   "pos": [
-    37.2,
-    33.96
-   ],
-   "rot": 182.5,
-   "scale": 1.79
-  },
-  {
-   "model": "atrezo_roca_grande",
-   "pos": [
-    33.14,
-    37.2
-   ],
-   "rot": 75.8,
-   "scale": 2.04
-  },
-  {
-   "model": "atrezo_roca_grande",
-   "pos": [
-    40.0,
-    33.47
-   ],
-   "rot": 358.7,
-   "scale": 1.91
-  },
-  {
-   "model": "atrezo_roca_grande",
-   "pos": [
-    34.03,
-    40.0
-   ],
-   "rot": 172.2,
-   "scale": 1.73
-  },
-  {
-   "model": "atrezo_roca_grande",
-   "pos": [
-    42.8,
-    33.47
-   ],
-   "rot": 219.5,
-   "scale": 1.86
-  },
-  {
-   "model": "atrezo_roca_grande",
-   "pos": [
-    33.13,
-    42.8
-   ],
-   "rot": 175.2,
-   "scale": 1.75
   },
   {
    "model": "atrezo_roca_grande",

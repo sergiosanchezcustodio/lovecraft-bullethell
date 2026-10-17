@@ -25,10 +25,11 @@ for t in range(-28, 32, 4):                                         # el pretil 
     A.add("tej_pretil", float(t), HALF + 0.3, rot=0)
     A.add("tej_pretil", HALF + 0.3, float(t), rot=90)
 for t in range(-36, 48, 8):                                         # abajo, los tejados de la calle (dos filas)
-    A.add(["inn_casa", "inn_casa_2"][(int(t) // 8) % 2], float(t), HALF + 4.2, rot=180, y=-5.5)
-    A.add(["inn_casa", "inn_casa_2"][(int(t) // 8) % 2], HALF + 4.2, float(t), rot=-90, y=-5.5)
-    A.add("tej_buhardilla", float(t) + 4.0, HALF + 13.0, rot=180, y=-4.0)
-    A.add("tej_buhardilla", HALF + 13.0, float(t) + 4.0, rot=-90, y=-4.0)
+    past, past2 = t > HALF + 4.2, t + 4.0 > HALF + 13.0             # cada fila acaba en la esquina (se cruzaban en X)
+    A.add(["inn_casa", "inn_casa_2"][(int(t) // 8) % 2], float(t), HALF + 4.2, rot=180, y=-5.5, past_corner=past)
+    A.add(["inn_casa", "inn_casa_2"][(int(t) // 8) % 2], HALF + 4.2, float(t), rot=-90, y=-5.5, past_corner=past)
+    A.add("tej_buhardilla", float(t) + 4.0, HALF + 13.0, rot=180, y=-4.0, past_corner=past2)
+    A.add("tej_buhardilla", HALF + 13.0, float(t) + 4.0, rot=-90, y=-4.0, past_corner=past2)
 for t in (-22.0, 0.0, 22.0):
     A.add("inn_farola", t, HALF + 9.0, rot=0, y=-5.5, scale=1.3)    # farolas de la calle, abajo
     A.add("inn_farola", HALF + 9.0, t, rot=0, y=-5.5, scale=1.3)

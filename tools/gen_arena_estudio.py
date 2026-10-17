@@ -25,8 +25,8 @@ for i, x in enumerate(range(-int(HALF) + 6, int(HALF) + 12, 12)):
 for i, z in enumerate(range(-int(HALF) + 6, int(HALF) + 12, 12)):
     A.add(WALLS[(i + 2) % 5], -HALF, z, rot=90)
 for t in range(-int(HALF) + 2, int(HALF) + 4, 4):
-    A.add("prv_muro_bajo", t, HALF + 0.2, rot=0)
-    A.add("prv_muro_bajo", HALF + 0.2, t, rot=90)
+    A.add("prv_muro_bajo", t, HALF + 0.2, rot=0, past_corner=t > HALF)       # sin pasar de la esquina
+    A.add("prv_muro_bajo", HALF + 0.2, t, rot=90, past_corner=t > HALF)
 
 # pilares de hierro en cuadrícula (la estructura del edificio)
 for x in (-12, 0, 12):

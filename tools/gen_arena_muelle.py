@@ -43,8 +43,9 @@ while t < HALF + 12.0:
     for side in ("south", "east"):
         j = A.rng.uniform(0.5, 0.8)
         A.rng.uniform(0, 1); A.rng.uniform(1.0, 1.2)
-        if side == "south": A.add("inn_pilote_alto", t, HALF + j, scale=1.0)
-        else: A.add("inn_pilote_alto", HALF + j, t, scale=1.0)
+        past = t > HALF + 1.0                                       # sin pasar de la esquina
+        if side == "south": A.add("inn_pilote_alto", t, HALF + j, scale=1.0, past_corner=past)
+        else: A.add("inn_pilote_alto", HALF + j, t, scale=1.0, past_corner=past)
     t += 3.0
 for x in range(-31, 32, 3):                                   # pilotes del canto norte, en el agua
     A.add("inn_pilote_alto", x + A.rng.uniform(-0.4, 0.4), -HALF - 0.5 - A.rng.uniform(0, 0.5), y=SEA - 0.15, scale=A.rng.uniform(1.0, 1.1))
