@@ -217,7 +217,22 @@
 		"cristal": "Cristal de hielo que no se derrite, de las tierras donde camina el viento. El que lo toca se queda helado.",
 		"fosforos": "Caja de fósforos que se encienden solos. Su llama no es del todo de este mundo.",
 		"diente": "No es un diente: es un trozo de shoggoth endurecido que cambia de forma cuando su dueño está en peligro.",
-		"idolo": "Ídolo de piedra verdinegra de los pantanos de Luisiana. Atrae a los que sueñan con él, y no vienen con las manos vacías."
+		"idolo": "Ídolo de piedra verdinegra de los pantanos de Luisiana. Atrae a los que sueñan con él, y no vienen con las manos vacías.",
+		"coraza_pabodie": "Pabodie la cosió con lona de las tiendas y placas de cuero de los trineos. No para una garra, pero la desvía.",
+		"amuleto_kadath": "Ónice negro con una cumbre tallada bajo la luna. Quien lo lleva sueña con un castillo de ónice y despierta con la cabeza más fría.",
+		"metronomo_zann": "Marcaba el compás de una música que no era de este mundo. A su ritmo, las manos cargan más deprisa.",
+		"lente_wilmarth": "Wilmarth la pulió para leer las piedras negras de Vermont. Lo que se mira a través de ella parece más grande, y también lo que arde.",
+		"arena_irem": "Arena de la Ciudad sin Nombre, que no termina de caer nunca. Todo lo que toca dura un poco más.",
+		"teodolito_lake": "Con él trazó Lake el mapa de las montañas antes de la tormenta. Enseña a apuntar a lo que está lejos.",
+		"sales_amoniaco": "Un frasco de farmacia de Arkham. Un golpe de olor y el cuerpo recuerda que tiene que seguir en pie.",
+		"mira_telescopica": "Una mira alemana de la guerra, con la retícula teñida de rojo. Busca el punto débil sin que se lo pidan.",
+		"mochila": "Lo que un buen expedicionario lleva siempre encima, por si acaso. Nunca sabes qué vas a encontrar al fondo.",
+		"armeria": "Un armero de Boston que no hace preguntas. Siempre hay un arma de más en el equipaje.",
+		"tarot": "Madame Varga juraba que no eran suyas. Las cartas enseñan lo que vendrá, y a veces dejan elegir qué no.",
+		"medalla": "La medalla del patrón de los viajeros. Se dice que ha devuelto a más de uno del borde mismo.",
+		"diario_expedicion": "Notas de cada jornada, mapas y lo aprendido. Quien lo relee por la noche amanece sabiendo un poco más.",
+		"pacto": "Un contrato firmado en el bosque, con sello de cera roja. Lo que piden a cambio crece con lo que dan. Se puede quemar; también reescribir.",
+		"linterna": "Una lámpara de queroseno de las buenas. Mientras su luz alcanza, lo que acecha en la oscuridad pesa un poco menos."
 	},
 	"places": {
 		"p1_n1": "Costa del mar de Ross, Antártida, 1930. La expedición de la Universidad de Miskatonic monta aquí su campamento: tiendas, una cabaña de troncos, un iglú y los faroles. Al norte, la Barrera de hielo; al sur, el mar. Algo vino de las cavernas de abajo.",

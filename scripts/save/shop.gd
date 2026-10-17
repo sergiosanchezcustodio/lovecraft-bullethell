@@ -108,16 +108,30 @@ static func buy(save: SaveData, e: Entry) -> bool:
 		_: save.purchases[e.id] = level_of(save, e) + 1
 	return true
 
-## Efectos de lo comprado en la partida: multiplicadores ("health", "sanity", "damage",
-## "speed", "money") y huecos ("weapon_slots", "item_slots", que suman).
+## Valor de cada efecto sin comprar nada: los multiplicadores parten de 1 y lo que se suma
+## (huecos, armadura en %, regeneración, crítico, mejoras de un nivel), de 0.
+const DEFAULTS := {"health": 1.0, "sanity": 1.0, "damage": 1.0, "speed": 1.0, "money": 1.0,
+	"reflex": 1.0, "magnet": 1.0, "insight": 1.0, "fortune": 1.0,    # hito 5.4
+	"area": 1.0, "duration": 1.0, "reach": 1.0,                      # 17-10-2026
+	"guard": 0.0, "ward": 0.0, "haste": 0.0, "regen": 0.0, "crit": 0.0,
+	"start_item": 0.0, "start_weapon": 0.0, "banish": 0.0, "second_life": 0.0, "head_start": 0.0,
+	"pact": 0.0, "lantern": 0.0,
+	"weapon_slots": 0, "item_slots": 0}
+
+## Efectos de lo comprado en la partida (ver DEFAULTS). Lo que el jugador ha desactivado
+## (`SaveData.toggles`, el Pacto) no cuenta.
 static func bonuses(save: SaveData) -> Dictionary:
-	var out := {"health": 1.0, "sanity": 1.0, "damage": 1.0, "speed": 1.0, "money": 1.0,
-		"reflex": 1.0, "magnet": 1.0, "insight": 1.0, "fortune": 1.0,    # hito 5.4
-		"weapon_slots": 0, "item_slots": 0}
+	var out := DEFAULTS.duplicate()
 	if save == null: return out
 	for it: ShopItem in DebugOptions.list_resources("res://data/shop"):
 		var lv := mini(int(save.purchases.get(String(it.id), 0)), it.max_level())
-		if lv <= 0 or not out.has(it.stat): continue
+		if lv <= 0 or not out.has(it.stat) or not is_active(save, String(it.id)): continue
 		if it.stat.ends_with("_slots"): out[it.stat] = int(out[it.stat]) + int(it.per_level * lv)
 		else: out[it.stat] = float(out[it.stat]) + it.per_level * lv
 	return out
+
+## Lo que se puede activar y desactivar (el Pacto): ¿está activo? Por defecto, sí.
+static func is_active(save: SaveData, id: String) -> bool:
+	return save == null or bool(save.toggles.get(id, true))
+
+const TOGGLES: Array[String] = ["pacto"]

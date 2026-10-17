@@ -33,6 +33,7 @@ var upgrade_pool: Array[UpgradeData] = []
 var attr_gains: Array[String] = []        ## atributo ganado en cada subida aún sin elegir mejora
 var weapon_slots := 4                     ## armas que puede llevar (D-28; la tienda da la 5.ª)
 var item_slots := 4                       ## objetos (pasivas) distintos que puede llevar
+var banished := {}                        ## lo descartado con las Cartas del tarot (key_of): ya no sale
 ## Cooperativo: la experiencia es común (D-07). Referencia débil: el equipo ya guarda a sus
 ## miembros y, con dos fuertes, ninguno de los dos se liberaba nunca (ni al reiniciar).
 var team: TeamXp:
@@ -76,6 +77,7 @@ func roll_options(weapons: WeaponSystem, rng: RandomNumberGenerator, n: int = -1
 		if luck > 1.0 and rng.randf() < luck - 1.0: n += 1
 	var cands: Array[Option] = []
 	for wd in weapon_pool:
+		if banished.has("w:" + String(wd.id)): continue
 		var owned := weapons.get_weapon(wd.id)
 		var o := Option.new()
 		if owned == null:
@@ -89,6 +91,7 @@ func roll_options(weapons: WeaponSystem, rng: RandomNumberGenerator, n: int = -1
 			o.to_level = owned.level + 1
 			cands.append(o)
 	for up in upgrade_pool:
+		if banished.has("u:" + String(up.id)): continue
 		var lv: int = passives.get(up.id, 0)
 		if lv == 0 and _items_owned() >= item_slots: continue       # sin hueco para otro objeto
 		if lv < up.max_level:
@@ -124,6 +127,10 @@ func roll_options(weapons: WeaponSystem, rng: RandomNumberGenerator, n: int = -1
 	return out
 
 const OWNED_WEIGHT := 8.0
+
+## Clave de lo que ofrece una opción (para descartarla): "w:<arma>" o "u:<objeto>".
+static func key_of(o: Option) -> String:
+	return ("u:" + String(o.upgrade.id)) if o.kind == Option.Kind.PASSIVE else ("w:" + String(o.weapon.id))
 
 ## Peso al sortear: subir un arma u objeto que ya lleva pesa más que algo nuevo.
 static func _weight(o: Option) -> float:

@@ -75,3 +75,33 @@ func test_reels_must_stop_before_choosing() -> void:
 	add_child_autofree(pk2)
 	pk2.settle()
 	assert_true(pk2.settled(), "confirmar lo para todo")
+
+## Cartas del tarot (tienda, 17-10-2026): LB descarta la opción marcada; gira otra que no estaba
+## y lo descartado ya no vuelve a salir.
+func test_lb_descarta_la_opcion_marcada() -> void:
+	var p := Player.new().setup(load("res://data/characters/dyer.tres"), _pad(), Color.YELLOW)
+	add_child_autofree(p)
+	for up: UpgradeData in DebugOptions.list_resources("res://data/upgrades"): p.progress.upgrade_pool.append(up)
+	p.shop = {"banish": 1.0}
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	var opts := p.progress.roll_options(p.weapons, rng, 3)
+	var menu := CoopLevelUp.new([{"player": p, "options": opts, "title": "t"}] as Array[Dictionary], Callable(), true)
+	add_child_autofree(menu)
+	var pk: CoopLevelUp.Picker = menu._pickers[0]
+	pk.settle()
+	var gone := PlayerProgress.key_of(pk.options[0])
+	var others := [PlayerProgress.key_of(pk.options[1]), PlayerProgress.key_of(pk.options[2])]
+	_buttons[JOY_BUTTON_LEFT_SHOULDER] = true
+	menu._t = 1.0
+	menu._process(0.016)
+	assert_eq(p.banishes_left(), 0, "gastado")
+	assert_true(p.progress.banished.has(gone))
+	assert_ne(PlayerProgress.key_of(pk.options[0]), gone, "otra en su lugar")
+	assert_false(PlayerProgress.key_of(pk.options[0]) in others, "y no repite las que ya estaban")
+	_buttons.clear()
+	menu._process(0.016)
+	pk.settle()
+	_buttons[JOY_BUTTON_LEFT_SHOULDER] = true
+	menu._process(0.016)
+	assert_eq(p.progress.banished.size(), 1, "sin descartes, LB no hace nada")

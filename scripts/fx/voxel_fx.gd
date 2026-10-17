@@ -703,6 +703,44 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.025; m.scale_max = 0.045
 			m.color_ramp = _ramp([[0.0, Color(0.2, 0.7, 0.6, 0.0)], [0.3, Color(0.25, 0.75, 0.65, 0.9)],
 				[0.6, Color(0.2, 0.6, 0.55, 0.5)], [1.0, Color(0.2, 0.6, 0.55, 0.0)]])
+		"diamond_dust":           # polvo de diamante (17-10-2026): cristales de hielo que flotan en la luz
+			# de los faroles y destellan al girar (rampa con varios picos: cada uno brilla y se apaga)
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 22.0, 16.0, 60.0))
+			p.lifetime = 6.0
+			p.preprocess = 6.0
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r
+			m.spread = 180.0
+			m.initial_velocity_min = 0.02; m.initial_velocity_max = 0.08
+			m.gravity = Vector3(0.03, -0.04, 0.02)
+			m.turbulence_enabled = true
+			m.turbulence_noise_scale = 2.0
+			m.turbulence_influence_min = 0.003; m.turbulence_influence_max = 0.008
+			m.scale_min = 0.012; m.scale_max = 0.024
+			m.color_ramp = _ramp([[0.0, Color(0.7, 0.85, 1.0, 0.0)], [0.12, Color(0.75, 0.88, 1.0, 0.25)],
+				[0.2, Color(1.0, 1.0, 1.0, 1.0)], [0.28, Color(0.7, 0.85, 1.0, 0.15)], [0.5, Color(0.7, 0.85, 1.0, 0.3)],
+				[0.58, Color(1.0, 0.95, 0.85, 1.0)], [0.66, Color(0.7, 0.85, 1.0, 0.2)], [0.85, Color(0.95, 1.0, 1.0, 0.9)],
+				[1.0, Color(0.7, 0.85, 1.0, 0.0)]])
+		"gnats":                  # nube de mosquitos sobre el agua: puntitos que zumban en un ovillo
+			p.draw_pass_1 = cube("add")
+			p.amount = 40
+			p.lifetime = 1.2
+			p.preprocess = 1.2
+			p.local_coords = true
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r
+			m.spread = 180.0
+			m.initial_velocity_min = 0.4; m.initial_velocity_max = 1.0
+			m.gravity = Vector3.ZERO
+			m.radial_accel_min = -3.5; m.radial_accel_max = -2.0             # vuelven al centro del ovillo
+			m.turbulence_enabled = true
+			m.turbulence_noise_scale = 4.0
+			m.turbulence_noise_speed = Vector3(0.6, 0.3, 0.5)
+			m.turbulence_influence_min = 0.3; m.turbulence_influence_max = 0.5
+			m.scale_min = 0.016; m.scale_max = 0.024
+			m.color_ramp = _ramp([[0.0, Color(0.42, 0.44, 0.36, 0.0)], [0.15, Color(0.5, 0.52, 0.44, 0.9)],
+				[0.85, Color(0.5, 0.52, 0.44, 0.9)], [1.0, Color(0.42, 0.44, 0.36, 0.0)]])   # de noche, motas que pillan la luz
 		"sea_bubbles":            # algo respira bajo el agua: burbujas que suben y revientan
 			p.draw_pass_1 = cube("mix")
 			p.amount = int(clampf(r * 14.0, 6.0, 20.0))

@@ -28,6 +28,23 @@ ITEMS = {
     'magnetismo': "a red horseshoe magnet with silver tips attracting small golden gems",
     'erudicion': "a thick antique leather-bound book with brass corners, open, with glowing pages",
     'fortuna': "a four-leaf clover pressed under glass in a small round brass locket",
+    # tienda: potenciadores nuevos (17-10-2026)
+    'coraza_pabodie': "a 1920s polar expedition padded canvas vest with stitched leather plates and brass rivets",
+    'amuleto_kadath': "an onyx amulet carved with a tiny mountain peak under a crescent moon, set in tarnished silver, softly glowing blue",
+    'metronomo_zann': "an antique wooden pyramid metronome with a brass pendulum, a violin bow leaning against it",
+    'lente_wilmarth': "a large brass magnifying lens on an articulated stand, the glass faintly glowing green",
+    'arena_irem': "a small leather pouch spilling glowing golden desert sand, with a tiny carved stone column fragment",
+    'teodolito_lake': "an antique brass surveyor's theodolite on a short wooden tripod with a small telescope",
+    'sales_amoniaco': "a small round brown glass smelling salts bottle with a cork stopper, plain unlabeled glass, white crystals inside, a few crystals spilled beside it",
+    'mira_telescopica': "a long black rifle scope with brass rings and a glowing red crosshair lens",
+    # tienda: mejoras nuevas (17-10-2026)
+    'mochila': "a worn canvas expedition backpack with leather straps, a rolled blanket and a tin cup tied to it",
+    'armeria': "a small wooden gun rack with two old rifles and a revolver hanging on pegs",
+    'tarot': "three antique tarot cards fanned out, the front card showing a strange tentacled moon, gold edges",
+    'medalla': "a silver Saint Christopher medal on a thin chain, slightly worn, with a faint warm glow",
+    'diario_expedicion': "a thick leather expedition diary with a compass embossed on the cover, a pencil and a pressed flower",
+    'pacto': "an old parchment contract with a dripping red wax seal and a black quill pen, faint purple smoke",
+    'linterna': "a 1920s brass kerosene hurricane lantern with a glass globe and a bright warm flame inside",
     # tienda: mejoras
     'sexta_arma': "a leather bandolier belt with two empty holsters and brass buckles",
     'sexto_objeto': "an old leather satchel bag with two buckled straps and many small pockets",

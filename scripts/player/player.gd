@@ -70,6 +70,12 @@ const KILL_BLAST_DAMAGE := 14.0
 const HIT_SLOW := Vector2(1.5, 0.5)   ## s y velocidad del Cristal de Ithaqua
 const HIT_BURN := Vector2(3.0, 6.0)   ## s y daño por segundo de los Fósforos de Cthugha
 const DECOY_RADIUS := 7.0
+## Tienda (17-10-2026)
+const LANTERN_RANGE := 1.4       ## farol propio con la Linterna de queroseno
+const LANTERN_SANITY := 1.5      ## y la cordura vuelve más deprisa
+const SECOND_LIFE_HEALTH := 0.5  ## vida con la que te levanta la Medalla de San Cristóbal
+var second_lives_used := 0       ## Medalla de San Cristóbal gastadas en este nivel
+var banishes_used := 0           ## descartes de las Cartas del tarot en este nivel
 var _nodens_t := 0.0             ## s cargando el Escudo de Nodens
 var _nodens_fx: MeshInstance3D
 var _ankh_used := false
@@ -235,6 +241,7 @@ func _sanity_context() -> void:
 		if is_instance_valid(l) and Vector2(l.global_position.x - here.x, l.global_position.z - here.z).length() <= rules.light_radius:
 			k *= rules.regen_near_light
 			break
+	if float(shop.get("lantern", 0.0)) > 0.0: k *= LANTERN_SANITY         # Linterna de queroseno (tienda)
 	var calm := 0.0
 	if world != null:
 		var mate := false
@@ -618,6 +625,15 @@ func rebuild_stats() -> void:
 	}
 	v["dodge_speed"] = style.speed if style else base.dodge_speed   # Crampones lo multiplican
 	for k in ITEM_STATS: v[k] = base.get(k)              # objetos (D-38): desde la base cada vez
+	# tienda (17-10-2026): Amuleto de Kadath, Metrónomo de Zann, Lente de Wilmarth, Arena de Irem,
+	# Teodolito de Lake, Sales de amoníaco y Mira telescópica
+	v["mental_mult"] *= 1.0 - float(shop.get("ward", 0.0))
+	v["weapon_cooldown_mult"] *= 1.0 - float(shop.get("haste", 0.0))
+	v["area_mult"] *= float(shop.get("area", 1.0))
+	v["duration_mult"] *= float(shop.get("duration", 1.0))
+	v["range_mult"] *= float(shop.get("reach", 1.0))
+	v["health_regen"] += float(shop.get("regen", 0.0))
+	v["crit_chance"] += float(shop.get("crit", 0.0))
 	for up in progress.upgrade_pool if progress else []:
 		up.apply_levels(v, base, int(progress.passives.get(up.id, 0)))
 	v["move_speed"] *= debug_speed
@@ -629,6 +645,8 @@ func rebuild_stats() -> void:
 		if weapons: weapons.bonus_changed()
 	if sanity_state: sanity_state.duration_mult = data.crisis_mult
 	if motor: motor.data = data
+	var lamp := get_node_or_null("CarryLight") as OmniLight3D      # Linterna de queroseno (tienda)
+	if lamp != null: lamp.omni_range = 4.5 * (LANTERN_RANGE if float(shop.get("lantern", 0.0)) > 0.0 else 1.0)
 	health = minf(health + maxf(data.max_health - old_health, 0.0), data.max_health)
 	sanity = minf(sanity + maxf(data.max_sanity - old_sanity, 0.0), data.max_sanity)
 
@@ -680,8 +698,9 @@ func take_damage(d: Damage) -> void:
 		var k := 1.0
 		for tag in (d.source as Enemy).data.tags: k *= float(data.resist_tags.get(tag, 1.0))
 		if k != 1.0: d = d.scaled(k)
-	if (data.physical_resist != 1.0 or data.armor > 0.0) and d.physical > 0.0:   # aguante físico y armadura
-		var ph := d.physical * data.physical_resist
+	var guard := 1.0 - float(shop.get("guard", 0.0))              # Coraza de Pabodie (tienda)
+	if (data.physical_resist != 1.0 or data.armor > 0.0 or guard != 1.0) and d.physical > 0.0:   # aguante físico y armadura
+		var ph := d.physical * data.physical_resist * guard
 		ph = maxf(ph - data.armor, ph * ARMOR_FLOOR)          # la armadura nunca quita más del 80 %
 		var r := Damage.new(ph, d.mental)
 		r.knockback = d.knockback; r.source = d.source; r.bonus = d.bonus
@@ -704,6 +723,14 @@ func take_damage(d: Damage) -> void:
 		Sfx.play("level_up")
 		var game := get_tree().current_scene if is_inside_tree() else null
 		if game != null and game.has_method("announce"): game.announce("El ankh de Nephren te devuelve a la vida", 2.0)
+		return
+	if health <= 0.0 and second_lives_used < int(shop.get("second_life", 0.0)):   # Medalla de San Cristóbal (tienda)
+		second_lives_used += 1
+		health = data.max_health * SECOND_LIFE_HEALTH
+		_hurt_time = 0.0
+		Sfx.play("level_up")
+		var game2 := get_tree().current_scene if is_inside_tree() else null
+		if game2 != null and game2.has_method("announce"): game2.announce("La medalla de San Cristóbal te protege", 2.0)
 		return
 	if health <= 0.0:
 		motor.locked = true
@@ -793,6 +820,10 @@ func _nodens_step(delta: float) -> void:
 		_nodens_fx.position.y = 0.85
 		visual.add_child(_nodens_fx)
 	if _nodens_fx != null: _nodens_fx.visible = nodens_ready()
+
+## Descartes que le quedan en este nivel (Cartas del tarot, tienda).
+func banishes_left() -> int:
+	return maxi(int(shop.get("banish", 0.0)) - banishes_used, 0)
 
 ## Cambios de opciones que le quedan en este nivel (Llave de plata).
 func rerolls_left() -> int:

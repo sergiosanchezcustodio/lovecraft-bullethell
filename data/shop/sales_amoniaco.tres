@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItem" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/items/icons/sales_amoniaco.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"sales_amoniaco"
+display_name = "Sales de amoníaco"
+description = "Recuperas 0,1 de vida por segundo por nivel."
+section = 0
+order = 16
+prices = Array[int]([200, 400, 800, 1300, 2000])
+stat = "regen"
+per_level = 0.1
+icon = ExtResource("2")

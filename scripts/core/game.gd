@@ -53,6 +53,7 @@ var run_money := 0                            ## dólares ganados en esta partid
 var _someone_fell := false                    ## alguien ha caído en este nivel (logro "Sin un rasguño")
 var _ach_t := 0.0
 var money_mult := 1.0                         ## Codicia (tienda)
+var shop_bonus := {}                          ## lo comprado en la tienda (Shop.bonuses)
 var camera: GameCamera
 var world: CombatWorld
 var level: LevelData
@@ -172,9 +173,12 @@ func _ready() -> void:
 	if args.has("shop"):                              # pruebas: N niveles en cada potenciador, sin tocar la partida
 		var n := args.get_int("shop")
 		for it: ShopItem in DebugOptions.list_resources("res://data/shop"):
-			if bonus.has(it.stat) and not it.stat.ends_with("_slots") and it.stat != "money":
-				bonus[it.stat] = 1.0 + it.per_level * mini(n, it.max_level())
-	money_mult = float(bonus.money)
+			if it.section == ShopItem.Section.POWERUP and bonus.has(it.stat) and it.stat != "money":
+				bonus[it.stat] = float(Shop.DEFAULTS[it.stat]) + it.per_level * mini(n, it.max_level())
+	var pact := float(bonus.pact)                     # Pacto con el Hombre Negro: más horror, más premio
+	money_mult = float(bonus.money) * (1.0 + pact * 1.5)
+	bonus.insight = float(bonus.insight) * (1.0 + pact * 1.5)
+	shop_bonus = bonus
 	for q in players:
 		q.shop = bonus
 		q.progress.weapon_slots += int(bonus.weapon_slots)
@@ -226,6 +230,7 @@ func _ready() -> void:
 		var level_id := (String(GameSession.level) if not GameSession.carry.is_empty() else args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1"))
 		level = load("res://data/levels/%s.tres" % level_id).duplicate()
 		_apply_carry()                                 # progreso del nivel anterior de la parte
+		_shop_start()
 		if args.get_bool("log"): print("INICIO %s nivel=%d armas=%s" % [level_id, player.progress.level, player.weapons.weapons.map(func(w: WeaponSystem.Weapon) -> String: return "%s:%d" % [w.data.id, w.level])])
 		if args.has("final_at"): level.final_time = args.get_float("final_at")
 		if args.get_bool("boss") and level.final_next != null:      # boss=true: el jefe es el evento final
@@ -248,6 +253,7 @@ func _ready() -> void:
 		for eid in args.get_str("enemies").split(",", false):    # enemies=profundo: solo esos (probar uno nuevo)
 			director.pool_override.append(load("res://data/enemies/%s.tres" % eid))
 		director.players = players.size()           # la dificultad crece con los jugadores
+		director.pact = 1.0 + float(shop_bonus.get("pact", 0.0))
 		director.final_event.connect(func(e: Enemy) -> void:
 			if level.boss_music != "": Music.play(level.boss_music, 2.0)   # música del jefe
 			if args.get_bool("log"): print("MUSICA ", Music.current())
@@ -644,6 +650,26 @@ func _apply_carry() -> void:
 		q.rebuild_stats()
 		q.health = q.data.max_health
 	if team != null: team.level = player.progress.level
+
+## Lo que la tienda da al empezar (17-10-2026). Al empezar una parte (sin progreso que venga
+## del nivel anterior): un objeto al azar (Mochila del expedicionario) y una segunda arma al
+## azar (Armería). Al pasar al siguiente nivel de la parte: una subida de nivel (Diario de
+## expedición).
+func _shop_start() -> void:
+	if GameSession.carry.is_empty():
+		for q in players:
+			if float(shop_bonus.get("start_item", 0.0)) > 0.0:
+				var ups := q.progress.upgrade_pool.filter(func(u: UpgradeData) -> bool: return int(q.progress.passives.get(u.id, 0)) == 0)
+				if not ups.is_empty():
+					var u: UpgradeData = ups[_rng.randi() % ups.size()]
+					q.progress.passives[u.id] = 1
+					q.rebuild_stats()
+			if float(shop_bonus.get("start_weapon", 0.0)) > 0.0 and q.weapons.weapons.size() < q.progress.weapon_slots:
+				var ws := q.progress.weapon_pool.filter(func(w: WeaponData) -> bool: return q.weapons.get_weapon(w.id) == null)
+				if not ws.is_empty(): q.weapons.add_weapon(ws[_rng.randi() % ws.size()])
+	elif float(shop_bonus.get("head_start", 0.0)) > 0.0:
+		for q in players: q.progress.gain_level()
+		if team != null: team.level = player.progress.level
 
 ## Siguiente nivel de la parte: el progreso de cada jugador pasa con él (GameSession.carry).
 func _next_level(id: String) -> void:

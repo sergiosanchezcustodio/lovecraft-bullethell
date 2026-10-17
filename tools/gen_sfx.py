@@ -171,6 +171,7 @@ def ambiente():
     campana(r)
     ranas(r)
     susurros(r)
+    ambiente2(r)
 
 
 def save_loop(name, w, d, fade):
@@ -555,6 +556,105 @@ def susurros(r):
         if far: voice = lp(voice, 1800) * 0.45
         out += voice * r.uniform(0.6, 1.0)
     save_loop('whisper_loop', out, d, fade)
+
+
+def ambiente2(r):
+    """Más sonidos del ambiente (17-10-2026): el hielo que cruje, aullidos lejanos de perros, grava
+    que cae de las ruinas, el "Tekeli-li" de los shoggoths muy lejos, la campana de la boya del
+    puerto y chillidos de rata."""
+    def far(x, tail=1.6, dec=0.5, cut=1600, wet_k=0.7):     # lejos: apagado y con eco
+        x = lp(x, cut)
+        ir = r.standard_normal(int(tail * SR)) * np.exp(-t(tail) / dec)
+        ir = lp(ir, cut * 0.8)
+        wet = signal.fftconvolve(x, ir)[:len(x)]
+        wet *= np.std(x) / (np.std(wet) + 1e-9)
+        return x + wet * wet_k
+
+    # hielo que cruje: un chasquido seco y una serie de crujidos que corren, con un "pew" grave
+    for k in range(2):
+        d = 1.6
+        n = int(d * SR)
+        x = np.zeros(n)
+        pos = 0.0
+        while pos < 0.9:
+            i = int(pos * SR)
+            m = int(r.uniform(0.004, 0.02) * SR)
+            x[i:i + m] += r.standard_normal(m) * np.exp(-np.arange(m) / (m * 0.25)) * r.uniform(0.3, 1.0)
+            pos += r.exponential(0.035)
+        x = bp(x, 300, 6000)
+        tt = t(d)
+        pew = np.sin(2 * np.pi * (900 * np.exp(-tt * 9) + 120) * tt) * np.exp(-tt / 0.18) * 0.5   # el hielo "canta"
+        x = x / (np.max(np.abs(x)) + 1e-9) + pew
+        save('ice_crack_%d' % k, far(x, 1.2, 0.35, 5000, 0.4))
+
+    # aullidos lejanos: subida, nota larga con vibrato y caída; dos o tres perros a destiempo
+    for k in range(2):
+        d = 6.0
+        tt = t(d)
+        x = np.zeros(len(tt))
+        for v in range(2 + k):
+            t0 = r.uniform(0, 1.2)
+            dur = r.uniform(2.8, 3.8)
+            u = np.clip((tt - t0) / dur, 0, 1)
+            f = (330 + 140 * np.sin(np.pi * np.minimum(u * 1.4, 1.0)) - 80 * np.maximum(u - 0.7, 0) / 0.3) * r.uniform(0.85, 1.15)
+            f *= 1 + 0.012 * np.sin(2 * np.pi * 5.5 * tt)
+            ph = 2 * np.pi * np.cumsum(f) / SR
+            e = np.sin(np.pi * u) ** 0.6 * (tt > t0) * (tt < t0 + dur)
+            voice = (np.sin(ph) + 0.35 * np.sin(2 * ph) + 0.12 * np.sin(3 * ph)) * e
+            x += voice * r.uniform(0.6, 1.0)
+        x += bp(r.standard_normal(len(tt)), 600, 2500) * 0.02
+        save('howl_%d' % k, far(x, 2.5, 0.8, 1300, 1.0))
+
+    # grava que cae: piedrecitas que golpean y ruedan
+    for k in range(2):
+        d = 1.4
+        n = int(d * SR)
+        x = np.zeros(n)
+        for _ in range(r.integers(10, 18)):
+            i = int(r.uniform(0, 0.9) ** 1.5 * SR)
+            m = int(r.uniform(0.006, 0.03) * SR)
+            if i + m >= n: continue
+            hit = r.standard_normal(m) * np.exp(-np.arange(m) / (m * 0.2))
+            x[i:i + m] += bp(hit, r.uniform(800, 2000), r.uniform(3000, 7000)) * r.uniform(0.2, 1.0)
+        dust = lp(r.standard_normal(n), 900) * np.exp(-t(d) / 0.5) * 0.08
+        save('gravel_%d' % k, far(x + dust, 1.0, 0.3, 6000, 0.5))
+
+    # "Tekeli-li": cuatro notas de flauta aguda que silba, la última doble, y mucho eco
+    d = 3.2
+    tt = t(d)
+    x = np.zeros(len(tt))
+    notes = ((0.0, 0.16, 1180), (0.2, 0.13, 1500), (0.37, 0.12, 1320), (0.52, 0.22, 1320))
+    for t0, dur, f0 in notes:
+        u = np.clip((tt - t0) / dur, 0, 1)
+        e = np.sin(np.pi * u) ** 0.8 * (tt >= t0) * (tt < t0 + dur)
+        f = f0 * (1 + 0.03 * np.sin(2 * np.pi * 9 * tt)) * (1 - 0.04 * u)
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        x += (np.sin(ph) + 0.25 * np.sin(2 * ph)) * e
+        x += bp(r.standard_normal(len(tt)), 2500, 6000) * e * 0.15        # el aire del silbido
+    save('tekeli_0', far(x, 2.8, 0.9, 2500, 1.4))
+
+    # campana de boya: pequeña y aguda, golpe seco y batido
+    d = 3.5
+    tt = t(d)
+    f0 = 560.0
+    x = np.zeros(len(tt))
+    for k, (ratio, amp, dec) in enumerate(((1.0, 1.0, 1.6), (2.4, 0.5, 0.9), (2.9, 0.3, 0.7), (4.1, 0.2, 0.4), (5.4, 0.1, 0.25))):
+        x += amp * np.sin(2 * np.pi * f0 * ratio * tt + k) * np.exp(-tt / dec) * (1 + 0.08 * np.sin(2 * np.pi * 3.1 * tt))
+    x *= np.minimum(tt / 0.002, 1)
+    x += hp(r.standard_normal(len(tt)), 2500) * np.exp(-tt / 0.006) * 0.4
+    save('buoy_bell_0', far(x, 1.6, 0.5, 4000, 0.6))
+
+    # rata: chillidos cortos y agudos
+    for k in range(2):
+        parts = []
+        for _ in range(r.integers(2, 4)):
+            dd = r.uniform(0.05, 0.11)
+            tt = t(dd)
+            f = r.uniform(3200, 4200) * (1 + 0.25 * np.sin(np.pi * tt / dd))
+            ph = 2 * np.pi * np.cumsum(f) / SR
+            parts.append((np.sin(ph) + 0.3 * np.sin(2 * ph)) * np.sin(np.pi * tt / dd))
+        x = _notes(parts, r.uniform(0.03, 0.08))
+        save('rat_%d' % k, far(x, 0.5, 0.15, 9000, 0.3))
 
 
 def copy_kenney(src):

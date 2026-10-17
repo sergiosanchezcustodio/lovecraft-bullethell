@@ -76,6 +76,20 @@ func _show_tab(i: int) -> void:
 		rows.append(row)
 		if _first == null: _first = row
 		if e.id == _focus_id: focus = row
+		if e.id in Shop.TOGGLES and Shop.level_of(save, e) > 0:   # el Pacto se rompe y se renueva
+			var on := Shop.is_active(save, e.id)
+			var tb := MenuKit.button(("Activo: sí (pulsa para romperlo)" if on else "Activo: no (pulsa para renovarlo)"),
+				Color(0.85, 0.35, 0.95) if on else UiKit.TEXT_DIM, 20)
+			tb.custom_minimum_size = Vector2(810, 44)
+			tb.pressed.connect(func() -> void:
+				save.toggles[e.id] = not Shop.is_active(save, e.id)
+				Saves.save()
+				_focus_id = e.id + ":toggle"
+				_say("Pacto %s." % ("renovado" if Shop.is_active(save, e.id) else "roto"))
+				_show_tab(_tab))
+			_list.add_child(tb)
+			rows.append(tb)
+			if _focus_id == e.id + ":toggle": focus = tb
 	MenuKit.chain_focus(rows)                                 # arriba y abajo no salen de la lista
 	_money.text = "Dinero: %s $" % MenuKit.money(save.money if save else 0)
 	var target := focus if focus != null else _first

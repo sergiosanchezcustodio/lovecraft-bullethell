@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItem" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/items/icons/mira_telescopica.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"mira_telescopica"
+display_name = "Mira telescópica"
+description = "Un 2 % más de probabilidad de crítico por nivel."
+section = 0
+order = 17
+prices = Array[int]([200, 400, 800, 1300, 2000])
+stat = "crit"
+per_level = 0.02
+icon = ExtResource("2")

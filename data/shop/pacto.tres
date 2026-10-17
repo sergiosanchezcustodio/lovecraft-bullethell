@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItem" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/items/icons/pacto.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"pacto"
+display_name = "Pacto con el Hombre Negro"
+description = "Por nivel: un 10 % más de enemigos y de su vida, y un 15 % más de dólares y de experiencia. Se puede romper y renovar abajo."
+section = 3
+order = 15
+prices = Array[int]([500, 1000, 1500, 2000, 2500])
+stat = "pact"
+per_level = 0.1
+icon = ExtResource("2")

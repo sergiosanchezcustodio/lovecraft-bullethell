@@ -109,6 +109,8 @@ func _process(delta: float) -> void:
 				pk.move(d)
 		if q.input.just_pressed(InputBindings.PAGE_NEXT) and pk.settled():
 			pk.reroll()
+		if q.input.just_pressed(InputBindings.PAGE_PREV) and pk.settled():
+			pk.banish()
 		if _t >= INPUT_DELAY and q.input.just_pressed(InputBindings.CONFIRM):
 			if pk.settled(): _choose(pk, pk.cursor)
 			else: pk.settle()
@@ -308,7 +310,46 @@ class Picker extends PanelContainer:
 	## Ayuda del pie, con los cambios de la Llave de plata si le quedan.
 	func hint() -> String:
 		var n := player.rerolls_left() if player != null else 0
-		return HINT + ("\nRB o E: otras opciones (%d)" % n if n > 0 else "")
+		var b := player.banishes_left() if player != null else 0
+		var extra := PackedStringArray()
+		if b > 0: extra.append("LB o Q: descartar (%d)" % b)
+		if n > 0: extra.append("RB o E: otras opciones (%d)" % n)
+		return HINT + ("\n" + " · ".join(extra) if not extra.is_empty() else "")
+
+	## Cartas del tarot (tienda): la opción marcada se descarta (no vuelve a salir en este
+	## nivel) y en su lugar gira otra.
+	func banish() -> bool:
+		if done or player.banishes_left() <= 0 or options.is_empty(): return false
+		var gone := options[cursor]
+		var rng := RandomNumberGenerator.new()
+		rng.randomize()
+		player.progress.banished[PlayerProgress.key_of(gone)] = true
+		var taken := options.map(func(o: PlayerProgress.Option) -> String: return PlayerProgress.key_of(o))
+		var fresh: PlayerProgress.Option = null
+		for o in player.progress.roll_options(player.weapons, rng, 40):
+			if not PlayerProgress.key_of(o) in taken:
+				fresh = o
+				break
+		player.banishes_used += 1
+		Sfx.play("page")
+		if fresh == null:                              # no queda nada más: la opción desaparece
+			options.remove_at(cursor)
+			cursor = maxi(0, mini(cursor, options.size() - 1))
+		else:
+			options[cursor] = fresh
+		for i in _stopped.size():
+			if i >= options.size():
+				_frames[i].visible = false
+				continue
+			if i == cursor and fresh != null and not _filler.is_empty():
+				_stopped[i] = false
+				_next_tick[i] = 0.0
+				_show_filler(i)
+			else:
+				_show_option(i)
+		_time = 0.0
+		_status.text = " " if not _filler.is_empty() else hint()
+		return true
 
 	## Llave de plata: otras opciones, tantas como antes, y los rodillos vuelven a girar.
 	func reroll() -> bool:

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItem" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/items/icons/medalla.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"medalla"
+display_name = "Medalla de San Cristóbal"
+description = "Una vez por nivel comprado, al caer te levantas con la mitad de la vida (después del ankh, si lo llevas)."
+section = 3
+order = 13
+prices = Array[int]([5000, 8000])
+stat = "second_life"
+per_level = 1.0
+icon = ExtResource("2")

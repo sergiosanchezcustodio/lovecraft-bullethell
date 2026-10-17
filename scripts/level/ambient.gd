@@ -260,6 +260,8 @@ func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
 	if demo:
 		_next_shoot = 1.0; _next_flock = 0.3; _next_bubble = 0.8; _next_whirl = 0.5
 		_next_spill = 1.0; _next_spray = 0.5; _next_drip = 0.3; _next_colony = 3.0
+		_crack_t = 1.5; _howl_t = 2.0; _gravel_t = 1.0; _tekeli_t = 2.0; _paper_t = 0.5
+		_cat_t = 1.0; _phantom_t = 1.0; _wflash_t = 1.5; _rat_t = 1.0
 	return self
 
 func _ready() -> void:
@@ -313,6 +315,17 @@ func _ready() -> void:
 	if cfg.has("frogs"): _find_frogs(cfg.frogs)
 	if cfg.has("mist_holes"): _find_fires(cfg.mist_holes)
 	if cfg.has("lighthouse") and _sea_mat != null: _make_lighthouse(cfg.lighthouse)
+	if cfg.has("gnats"): _make_gnats(cfg.gnats)
+	if cfg.has("buoys") and _sea_mat != null:                        # en la orilla este y en la sur
+		var sh: Vector2 = _sea.shore
+		var off: Array = cfg.buoys.get("off", [7.0, 7.0])
+		_make_buoys([[sh.x + float(off[0]), sh.y - 9.0], [sh.x - 9.0, sh.y + float(off[1])]])   # junto a la esquina del muelle
+	if cfg.has("window_flash"): _make_window_flash()
+	if cfg.has("deck_water"):
+		_make_deck_water(cfg.deck_water)
+		var sfx := autoload("Sfx")                                      # la ola que barre la cubierta (Hazards)
+		if sfx != null and sfx.has_signal("played"):
+			sfx.played.connect(func(ev: String, _pos: Variant) -> void: if ev == "wave": _deck_wave(1.0))
 	if bool(fear_cfg().get("on", true)) and not sfx_muted():
 		_whisper = _loop_player("whisper_loop.wav", false) as AudioStreamPlayer
 		if _whisper != null:
@@ -496,6 +509,18 @@ func _process(delta: float) -> void:
 	if not _glows.is_empty(): _glow_step(delta)
 	if cfg.has("gators"): _gator_step(delta)
 	if bool(fear_cfg().get("on", true)): _fear_step(delta)
+	if cfg.has("ice_cracks") or not _cracks.is_empty(): _crack_step(delta)
+	if cfg.has("howls"): _howl_step(delta)
+	if cfg.has("gravel"): _gravel_step(delta)
+	if cfg.has("tekeli"): _tekeli_step(delta)
+	if cfg.has("papers"): _paper_step(delta)
+	if not _buoys.is_empty(): _buoy_step(delta, t)
+	if cfg.has("cats"): _cat_step(delta)
+	if not _gnats.is_empty(): _gnat_step(delta, t)
+	if cfg.has("phantoms"): _phantom_step(delta)
+	if _wflash != null: _window_flash_step(delta)
+	if cfg.has("rats"): _rat_step(delta)
+	if _deck != null: _deck_step(delta)
 
 func _focus() -> Vector3:
 	return camera.center() if camera != null else Vector3.ZERO
@@ -987,6 +1012,9 @@ func _drop_step(delta: float) -> void:
 		add_child(sp)
 		get_tree().create_timer(0.8).timeout.connect(sp.queue_free)
 		_ripple(at, 0.55 if dr[3] else 0.3, 0.8 if dr[3] else 0.45)          # en la roca, la película de agua del suelo
+		if dr[3] and cfg.has("drip_glow"):                                    # el plancton se enciende
+			_glow_print(at + Vector3(0, 0.1, 0), cfg.drip_glow)
+			if OS.get_cmdline_user_args().has("log=true"): print("PLANCTON en %.1f, %.1f" % [at.x, at.z])
 		var near := Vector2(at.x - _focus().x, at.z - _focus().z).length()
 		sfx_at("drip", at, -clampf((near - 4.0) * 0.8, 0.0, 10.0))       # las lejanas, más bajas
 
@@ -1953,13 +1981,13 @@ func _gator_rise(at: Vector3, c: Dictionary) -> void:
 
 # ---------------- el ambiente con la cordura baja ----------------
 
-## ¿Se ve el punto del suelo `p`? (`margin` 1 = hasta el borde de la pantalla)
+## ¿Se ve el punto `p`? (`margin` 1 = hasta el borde de la pantalla)
 func on_screen(p: Vector3, margin := 1.0) -> bool:
 	if camera == null: return true
 	var f := _focus()
 	var d := p - f
 	var sx := (d.x - d.z) * 0.70710678                            # derecha de la pantalla
-	var sy := (d.x + d.z) * 0.70710678 * 0.5                      # abajo (el suelo, visto a 30°)
+	var sy := (d.x + d.z) * 0.70710678 * 0.5 - d.y * 0.866        # abajo (el suelo visto a 30°; lo alto sube)
 	var half_h := camera.size * 0.5
 	return absf(sx) < half_h * 16.0 / 9.0 * margin and absf(sy) < half_h * margin
 
@@ -2072,3 +2100,543 @@ func _spawn_shade(at: Vector3, fc: Dictionary) -> void:
 	b.rotation.y = atan2(f.x - at.x, f.z - at.z)                  # mira hacia el centro de la vista
 	_shades.append({"node": b, "mats": mats, "a": 0.0, "t": 0.0, "life": _rng.randf_range(3.0, 6.0)})
 	if OS.get_cmdline_user_args().has("log=true"): print("SOMBRA en %.1f, %.1f (vista %.1f, %.1f)" % [at.x, at.z, f.x, f.z])
+
+# ---------------- tanda de ambiente del 17-10-2026 (2) ----------------
+
+## Un punto al azar del borde de la vista (en el suelo): `side` 0 izquierda o derecha, 1 arriba o abajo.
+func _edge_point(margin := 1.05) -> Vector3:
+	var f := _focus()
+	var half_h := camera.size * 0.5 if camera != null else 7.5
+	var half_w := half_h * 16.0 / 9.0
+	var sx := (1.0 if _rng.randf() < 0.5 else -1.0) * half_w * margin
+	var sy := (_rng.randf() * 2.0 - 1.0) * half_h * 0.6
+	return f + Vector3(1, 0, -1).normalized() * sx + Vector3(1, 0, 1).normalized() * sy * 2.0
+
+func _players() -> Array:
+	var g := get_parent()
+	return g.players if g != null and "players" in g else []
+
+func _nearest_player(p: Vector3) -> float:
+	var best := INF
+	for pl in _players():
+		if is_instance_valid(pl) and pl.health > 0.0:
+			best = minf(best, Vector2((pl as Node3D).global_position.x - p.x, (pl as Node3D).global_position.z - p.z).length())
+	return best
+
+# -- hielo que cruje (`ice_cracks`: every [s, s]) --
+var _crack_t := 12.0
+var _cracks: Array = []                         ## [nodo, materiales, edad]
+
+func _crack_step(delta: float) -> void:
+	var c: Dictionary = cfg.ice_cracks
+	_crack_t -= delta * (1.0 + fear)
+	if _crack_t <= 0.0:
+		var ev: Array = c.get("every", [18, 35])
+		_crack_t = _rng.randf_range(ev[0], ev[1]) if not demo else 4.0
+		var ps := _players()
+		if not ps.is_empty() and is_instance_valid(ps[0]):
+			var pl: Node3D = ps[_rng.randi() % ps.size()]
+			var obstacles: ObstacleMap = arena.get_meta("obstacles")
+			for _i in 8:
+				var a := _rng.randf() * TAU
+				var p := pl.global_position + Vector3(cos(a), 0, sin(a)) * _rng.randf_range(2.0, 4.5)
+				if obstacles != null and obstacles.is_blocked(Vector2(p.x, p.z), 1.0): continue
+				_crack_at(Vector3(p.x, 0.0, p.z))
+				break
+	for cr: Array in _cracks.duplicate():
+		cr[2] += delta
+		var age: float = cr[2]
+		var a := clampf(age / 0.5, 0.0, 1.0) * (1.0 - clampf((age - 4.0) / 8.0, 0.0, 1.0))   # se abre y la escarcha la cubre
+		var nodes: Array = cr[1]
+		for i in nodes.size():
+			var seg: MeshInstance3D = nodes[i]
+			seg.visible = float(i) / nodes.size() <= age / 0.45      # corre en medio segundo
+			(seg.material_override as StandardMaterial3D).albedo_color.a = a * 0.85
+		if age > 12.0:
+			(cr[0] as Node).queue_free()
+			_cracks.erase(cr)
+
+## Grieta quebrada: tramos cortos que cambian de rumbo, con alguna rama.
+func _crack_at(at: Vector3) -> void:
+	var root := Node3D.new()
+	add_child(root)
+	root.position = at + Vector3(0, 0.01, 0)
+	var segs: Array = []
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color = Color(0.22, 0.34, 0.5, 0.0)
+	var heads: Array = [[Vector2.ZERO, _rng.randf() * TAU, 1.0]]
+	var built := 0
+	while not heads.is_empty() and built < 40:
+		var h: Array = heads.pop_back()
+		var p: Vector2 = h[0]
+		var ang: float = h[1]
+		var w: float = h[2]
+		for _s in _rng.randi_range(6, 12):
+			ang += _rng.randf_range(-0.6, 0.6)
+			var l := _rng.randf_range(0.12, 0.28)
+			var q := p + Vector2(cos(ang), sin(ang)) * l
+			var mi := MeshInstance3D.new()
+			var bm := BoxMesh.new()
+			bm.size = Vector3(l, 0.006, 0.035 * w)
+			mi.mesh = bm
+			var m := mat.duplicate() as StandardMaterial3D
+			mi.material_override = m
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			var mid := (p + q) * 0.5
+			mi.position = Vector3(mid.x, 0, mid.y)
+			mi.rotation.y = -ang
+			root.add_child(mi)
+			segs.append(mi)
+			built += 1
+			if _rng.randf() < 0.18 and w > 0.5: heads.append([q, ang + _rng.randf_range(-1.2, 1.2), w * 0.6])
+			p = q
+	_cracks.append([root, segs, 0.0])
+	sfx_at("ice_crack", at)
+
+# -- aullidos lejanos (`howls`: every, from [x, z]) --
+var _howl_t := 20.0
+
+func _howl_step(delta: float) -> void:
+	var c: Dictionary = cfg.howls
+	_howl_t -= delta
+	if _howl_t > 0.0: return
+	var ev: Array = c.get("every", [35, 70])
+	_howl_t = _rng.randf_range(ev[0], ev[1]) if not demo else 5.0
+	var fr: Array = c.get("from", [20, 19])
+	var src := Vector3(fr[0], 0, fr[1])
+	var f := _focus()
+	var d := Vector2(src.x - f.x, src.z - f.z).length()
+	sfx_at("howl", src, -clampf((d - 10.0) * 0.4, 0.0, 10.0))
+
+# -- grava que cae de las ruinas (`gravel`: among, every) --
+var _gravel_t := 5.0
+var _stones: Array = []                         ## [nodo, velocidad, edad, rebotado]
+
+func _gravel_step(delta: float) -> void:
+	var c: Dictionary = cfg.gravel
+	_gravel_t -= delta
+	if _gravel_t <= 0.0:
+		var ev: Array = c.get("every", [5, 12])
+		_gravel_t = _rng.randf_range(ev[0], ev[1]) if not demo else 1.5
+		var cand: Array = []                                        # puntos de lo alto de las piezas que se ven
+		for h: Node in arena.get_node("Props").get_children():
+			var m := h.get_child(0) as Node3D
+			if m == null or not String(m.name) in c.get("among", []): continue
+			if (h as Node3D).global_position.distance_to(_focus()) > 30.0: continue
+			var bb := _world_aabb(h as Node3D)
+			for _k in 3:
+				var q := Vector3(_rng.randf_range(bb.position.x, bb.end.x), bb.end.y - 0.1, _rng.randf_range(bb.position.z, bb.end.z))
+				if on_screen(q, 0.85): cand.append(q)
+		if not cand.is_empty():
+			var top: Vector3 = cand[_rng.randi() % cand.size()]
+			top += Vector3(1, 0, 1).normalized() * 0.3                 # por la cara que se ve
+			var n := _rng.randi_range(4, 9)
+			for i in n:
+				var st := MeshInstance3D.new()
+				var bm := BoxMesh.new()
+				var sz := _rng.randf_range(0.06, 0.14)
+				bm.size = Vector3(sz, sz * 0.8, sz)
+				var mat := StandardMaterial3D.new()
+				mat.albedo_color = Color(0.36, 0.36, 0.38).darkened(_rng.randf() * 0.3)
+				bm.material = mat
+				st.mesh = bm
+				add_child(st)
+				st.position = top + Vector3(_rng.randf_range(-0.3, 0.3), _rng.randf_range(-0.2, 0.2), _rng.randf_range(-0.3, 0.3))
+				_stones.append([st, Vector3(_rng.randf_range(-0.4, 0.4), _rng.randf_range(-0.5, 0.5), _rng.randf_range(-0.4, 0.4)) + Vector3(1, 0, 1) * 0.3, -i * 0.08, false])
+			VoxelFx.puff(self, top, "dust", 0.4, Color(0.6, 0.58, 0.55), 1.2)
+			sfx_at("gravel", top)
+			if OS.get_cmdline_user_args().has("log=true"): print("GRAVA en %.1f, %.1f, %.1f" % [top.x, top.y, top.z])
+	for s: Array in _stones.duplicate():
+		var st: MeshInstance3D = s[0]
+		s[2] += delta
+		if s[2] < 0.0: continue
+		var v: Vector3 = s[1]
+		v.y -= 9.8 * delta
+		st.position += v * delta
+		st.rotation += Vector3(3, 2, 4) * delta
+		if st.position.y < 0.03:
+			st.position.y = 0.03
+			if not s[3]:
+				s[3] = true
+				v = Vector3(v.x * 0.4, -v.y * 0.25, v.z * 0.4)
+			else:
+				v = Vector3.ZERO
+		s[1] = v
+		if s[2] > 6.0:
+			st.queue_free()
+			_stones.erase(s)
+
+# -- "Tekeli-li" lejano (`tekeli`: every) --
+var _tekeli_t := 40.0
+
+func _tekeli_step(delta: float) -> void:
+	_tekeli_t -= delta * (1.0 + fear)
+	if _tekeli_t > 0.0: return
+	var ev: Array = cfg.tekeli.get("every", [50, 110])
+	_tekeli_t = _rng.randf_range(ev[0], ev[1]) if not demo else 6.0
+	sfx_at("tekeli", _edge_point(1.6))
+
+# -- papeles que arrastra el viento (`papers`: n, every) --
+var _paper_t := 2.0
+var _papers: Array[Dictionary] = []
+
+func _paper_step(delta: float) -> void:
+	var c: Dictionary = cfg.papers
+	var w := _weather()
+	var wv := Vector3(0.8, 0, 0.4)
+	if w != null: wv = w.wind_now()
+	var wind := Vector2(wv.x, wv.z)
+	if wind.length() < 0.3: wind = wind.normalized() * 0.3 if wind.length() > 0.01 else Vector2(0.3, 0.1)
+	_paper_t -= delta
+	if _paper_t <= 0.0 and _papers.size() < int(c.get("n", 3)):
+		var ev: Array = c.get("every", [4, 10])
+		_paper_t = _rng.randf_range(ev[0], ev[1]) if not demo else 1.0
+		var f := _focus()
+		var half_h := camera.size * 0.5 if camera != null else 7.5
+		var start := f - Vector3(wind.x, 0, wind.y).normalized() * half_h * 2.2 \
+			+ Vector3(-wind.y, 0, wind.x).normalized() * _rng.randf_range(-half_h, half_h)
+		var pp := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.21, 0.004, 0.28)
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = Color(0.86, 0.83, 0.74).darkened(_rng.randf() * 0.25)
+		mat.roughness = 0.95
+		bm.material = mat
+		pp.mesh = bm
+		add_child(pp)
+		pp.position = start + Vector3(0, 0.02, 0)
+		_papers.append({"node": pp, "t": 0.0, "hop": 0.0, "hv": 0.0, "spin": _rng.randf_range(-3, 3), "k": _rng.randf_range(0.7, 1.2)})
+	var g_ratio := 1.0
+	if w != null and w.data != null: g_ratio = wv.length() / maxf(w.data.wind, 0.1)
+	for pd: Dictionary in _papers.duplicate():
+		var pp: Node3D = pd.node
+		pd.t += delta
+		var v := wind * float(pd.k) * (0.6 + 0.9 * g_ratio)
+		pp.position += Vector3(v.x, 0, v.y) * delta
+		if pd.hop <= 0.0 and _rng.randf() < delta * 0.8 * g_ratio:     # una racha lo levanta
+			pd.hv = _rng.randf_range(0.8, 2.0)
+		pd.hv -= 4.0 * delta
+		pd.hop = maxf(0.0, float(pd.hop) + float(pd.hv) * delta)
+		if pd.hop <= 0.0: pd.hv = 0.0
+		pp.position.y = 0.02 + float(pd.hop)
+		var air: float = clampf(float(pd.hop) * 3.0, 0.0, 1.0)
+		pp.rotation = Vector3(sin(pd.t * 5.0) * 1.2 * air, pp.rotation.y + float(pd.spin) * delta * (0.3 + air), cos(pd.t * 4.0) * 0.9 * air)
+		if pd.t > 14.0 or (pd.t > 2.0 and not on_screen(pp.position, 1.6)):
+			pp.queue_free()
+			_papers.erase(pd)
+
+# -- boyas con campana (`buoys`: [[x, z], ...]) --
+var _buoys: Array[Dictionary] = []
+
+func _make_buoys(list: Array) -> void:
+	var red := StandardMaterial3D.new()
+	red.albedo_color = Color(0.55, 0.12, 0.08)
+	red.roughness = 0.6
+	var dark := StandardMaterial3D.new()
+	dark.albedo_color = Color(0.12, 0.12, 0.12)
+	var brass := StandardMaterial3D.new()
+	brass.albedo_color = Color(0.55, 0.45, 0.22)
+	brass.metallic = 0.6
+	brass.roughness = 0.4
+	for xz: Array in list:
+		var b := Node3D.new()
+		var parts := [[CylinderMesh.new(), red, Vector3(0, 0.15, 0), Vector3(0.55, 0.5, 0.55)],
+			[CylinderMesh.new(), dark, Vector3(0, -0.05, 0), Vector3(0.6, 0.12, 0.6)]]
+		for pr: Array in parts:
+			var mi := MeshInstance3D.new()
+			var cm: CylinderMesh = pr[0]
+			cm.top_radius = 0.5; cm.bottom_radius = 0.5; cm.height = 1.0; cm.radial_segments = 8
+			cm.material = pr[1]
+			mi.mesh = cm
+			mi.position = pr[2]
+			mi.scale = pr[3]
+			b.add_child(mi)
+		for i in 4:                                                 # la jaula de la campana
+			var a := TAU * i / 4.0 + PI / 4.0
+			var bar := MeshInstance3D.new()
+			var bm := BoxMesh.new()
+			bm.size = Vector3(0.04, 0.9, 0.04)
+			bm.material = dark
+			bar.mesh = bm
+			bar.position = Vector3(cos(a) * 0.17, 0.85, sin(a) * 0.17)
+			b.add_child(bar)
+		var top := MeshInstance3D.new()
+		var tm := BoxMesh.new()
+		tm.size = Vector3(0.4, 0.05, 0.4)
+		tm.material = dark
+		top.mesh = tm
+		top.position = Vector3(0, 1.3, 0)
+		b.add_child(top)
+		var bell := MeshInstance3D.new()
+		var cb := CylinderMesh.new()
+		cb.top_radius = 0.07; cb.bottom_radius = 0.13; cb.height = 0.2; cb.radial_segments = 8
+		cb.material = brass
+		bell.mesh = cb
+		bell.position = Vector3(0, 1.1, 0)
+		b.add_child(bell)
+		add_child(b)
+		b.position = Vector3(xz[0], float(_sea.get("level", 0.0)), xz[1])
+		_buoys.append({"node": b, "tilt": Vector2.ZERO, "last": 0.0, "side": 0.0})
+
+func _buoy_step(delta: float, t: float) -> void:
+	for bd: Dictionary in _buoys:
+		var b: Node3D = bd.node
+		var p := Vector2(b.position.x, b.position.z)
+		var r := 0.6
+		var h0 := sea_height(p, t, _sea)
+		var sx := (sea_height(p + Vector2(r, 0), t, _sea) - sea_height(p - Vector2(r, 0), t, _sea)) / (2.0 * r)
+		var sz := (sea_height(p + Vector2(0, r), t, _sea) - sea_height(p - Vector2(0, r), t, _sea)) / (2.0 * r)
+		var lag := 1.0 - exp(-delta / 0.4)
+		bd.tilt = (bd.tilt as Vector2).lerp(Vector2(sx, sz) * 2.5 + Vector2(sin(t * 1.3), cos(t * 1.1)) * 0.06, lag)
+		var tl: Vector2 = bd.tilt
+		b.position.y = float(_sea.get("level", 0.0)) + h0 * 0.9
+		b.basis = Basis.from_euler(Vector3(-tl.y, 0.0, tl.x))
+		var side := signf(tl.x + tl.y)                              # al cambiar de lado, el badajo golpea
+		if side != float(bd.side) and absf(tl.x + tl.y) > 0.05 and t - float(bd.last) > 2.5:
+			bd.last = t
+			var d := Vector2(b.position.x - _focus().x, b.position.z - _focus().z).length()
+			if d < 30.0: sfx_at("buoy_bell", b.position, -clampf((d - 8.0) * 0.5, 0.0, 12.0))
+		bd.side = side
+
+# -- gatos callejeros (`cats`: every, model) --
+var _cat_t := 8.0
+var _cats: Array[Dictionary] = []
+
+func _cat_step(delta: float) -> void:
+	var c: Dictionary = cfg.cats
+	_cat_t -= delta
+	if _cat_t <= 0.0 and _cats.is_empty():
+		var ev: Array = c.get("every", [20, 45])
+		_cat_t = _rng.randf_range(ev[0], ev[1]) if not demo else 3.0
+		var obstacles: ObstacleMap = arena.get_meta("obstacles")
+		for _i in 10:
+			var a := _edge_point(0.75)
+			var b := a + (_focus() - a).normalized().rotated(Vector3.UP, _rng.randf_range(-0.9, 0.9)) * _rng.randf_range(7.0, 11.0)
+			if obstacles != null and (obstacles.is_blocked(Vector2(a.x, a.z), 0.3) or obstacles.is_blocked(Vector2(b.x, b.z), 0.3)): continue
+			if _nearest_player(a) < 6.0: continue
+			var node := Node3D.new()
+			var m := VoxelBuilder.load_model("res://models/%s.json" % String(c.get("model", "gato")))
+			node.add_child(m)
+			add_child(node)
+			node.scale = Vector3.ONE * float(c.get("scale", 0.8))
+			node.position = a
+			var dir := (b - a).normalized()
+			node.rotation.y = atan2(dir.x, dir.z)
+			_cats.append({"node": node, "model": m, "to": b, "t": 0.0, "speed": _rng.randf_range(3.0, 4.2), "name": String(c.get("model", "gato"))})
+			break
+	for cd: Dictionary in _cats.duplicate():
+		var node: Node3D = cd.node
+		cd.t += delta
+		var to: Vector3 = cd.to
+		var d := to - node.position
+		d.y = 0.0
+		var spd: float = cd.speed * (1.6 if _nearest_player(node.position) < 4.0 else 1.0)   # si alguien se acerca, corre más
+		Anims.pose(String(cd.name), "run", cd.model, fmod(float(cd.t) * spd / 3.0, 1.0))
+		if d.length() < 0.3 or cd.t > 8.0:                           # se mete en un hueco y ya no está
+			var tw := create_tween()
+			tw.tween_property(node, "scale", Vector3.ONE * 0.01, 0.25)
+			tw.tween_callback(node.queue_free)
+			_cats.erase(cd)
+			continue
+		node.position += d.normalized() * minf(spd * delta, d.length())
+
+# -- mosquitos sobre el agua (`gnats`: n) --
+var _gnats: Array = []                          ## [emisor, punto de reposo]
+
+func _make_gnats(c: Dictionary) -> void:
+	var obstacles: ObstacleMap = arena.get_meta("obstacles")
+	if obstacles == null or not obstacles.has_water(): return
+	for _i in int(c.get("n", 14)):
+		var p := obstacles.random_water(_rng, Vector2.ZERO, 0.0, 26.0, 0.5)
+		if p == Vector2.INF: continue
+		var e := VoxelFx.emitter("gnats", 0.35)
+		e.position = Vector3(p.x, _rng.randf_range(0.9, 1.5), p.y)
+		add_child(e)
+		_gnats.append([e, e.position])
+
+func _gnat_step(delta: float, t: float) -> void:
+	for gn: Array in _gnats:
+		var e: Node3D = gn[0]
+		var home: Vector3 = gn[1]
+		var target := home + Vector3(sin(t * 0.7 + home.x), sin(t * 1.1 + home.z) * 0.2, cos(t * 0.6 + home.z)) * 0.4
+		for pl in _players():                                       # se apartan del que pasa
+			if not is_instance_valid(pl): continue
+			var d := Vector2(target.x - (pl as Node3D).global_position.x, target.z - (pl as Node3D).global_position.z)
+			if d.length() < 2.2: target += Vector3(d.x, 0, d.y).normalized() * (2.2 - d.length())
+		e.position = e.position.lerp(target, 1.0 - exp(-delta * 2.0))
+
+# -- sombras sin dueño (`phantoms`: models, every) --
+var _phantom_t := 6.0
+var _phantoms: Array[Dictionary] = []
+
+func _phantom_step(delta: float) -> void:
+	var c: Dictionary = cfg.phantoms
+	_phantom_t -= delta * (1.0 + fear * 2.0)
+	if _phantom_t <= 0.0 and _phantoms.size() < 2:
+		var ev: Array = c.get("every", [8, 16])
+		_phantom_t = _rng.randf_range(ev[0], ev[1]) if not demo else 2.0
+		var models: Array = c.get("models", ["engendro"])
+		var start := _edge_point(0.9)
+		var dir := (_focus() - start).normalized().rotated(Vector3.UP, _rng.randf_range(-0.5, 0.5))
+		var holder := Node3D.new()                                  # la sombra: el modelo tumbado y aplastado contra el suelo
+		var lying := Node3D.new()
+		var m := VoxelBuilder.load_model("res://models/%s.json" % String(models[_rng.randi() % models.size()]))
+		var mats: Array = []
+		for mi: MeshInstance3D in m.get_meta("meshes"):
+			var sm := StandardMaterial3D.new()
+			sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			sm.albedo_color = Color(0.0, 0.0, 0.0, 0.0)
+			sm.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_ALWAYS
+			mi.material_override = sm
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			mats.append(sm)
+		lying.add_child(m)
+		lying.rotation.x = -PI * 0.5
+		holder.add_child(lying)
+		add_child(holder)
+		var s := _rng.randf_range(1.4, 2.2)
+		holder.scale = Vector3(s, 0.02, s)
+		holder.position = start + Vector3(0, 0.03, 0)
+		holder.rotation.y = atan2(dir.x, dir.z) + PI
+		_phantoms.append({"node": holder, "mats": mats, "dir": dir, "t": 0.0, "life": _rng.randf_range(9.0, 14.0)})
+		if OS.get_cmdline_user_args().has("log=true"): print("SOMBRA SIN DUENO en %.1f, %.1f" % [start.x, start.z])
+	for pd: Dictionary in _phantoms.duplicate():
+		var holder: Node3D = pd.node
+		pd.t += delta
+		holder.position += (pd.dir as Vector3) * float(c.get("speed", 0.9)) * delta
+		var a := clampf(pd.t / 2.0, 0.0, 1.0) * clampf((float(pd.life) - pd.t) / 2.0, 0.0, 1.0) * float(c.get("alpha", 0.45))
+		for sm: StandardMaterial3D in pd.mats: sm.albedo_color.a = a
+		if pd.t > pd.life:
+			holder.queue_free()
+			_phantoms.erase(pd)
+
+# -- relámpago tras los ventanales del estudio (`window_flash`: every, energy) --
+var _wflash_t := 10.0
+var _wflash: SpotLight3D
+var _wflash_k := -1.0
+
+func _make_window_flash() -> void:
+	_wflash = SpotLight3D.new()                                     # el destello que entra por el ventanal
+	_wflash.light_color = Color(0.75, 0.82, 1.0)
+	_wflash.light_energy = 0.0
+	_wflash.spot_range = 22.0
+	_wflash.spot_angle = 30.0
+	_wflash.shadow_enabled = false
+	add_child(_wflash)
+	_wpane = MeshInstance3D.new()                                   # y en el suelo, el dibujo de la tracería
+	var pm := PlaneMesh.new()
+	pm.size = Vector2(3.0, 7.0)
+	_wpane.mesh = pm
+	_wpane_mat = ShaderMaterial.new()
+	_wpane_mat.shader = preload("res://scripts/fx/window_light.gdshader")
+	_wpane.material_override = _wpane_mat
+	_wpane.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(_wpane)
+
+var _wpane: MeshInstance3D
+var _wpane_mat: ShaderMaterial
+
+func _window_flash_step(delta: float) -> void:
+	var c: Dictionary = cfg.window_flash
+	_wflash_t -= delta
+	if _wflash_t <= 0.0:
+		var ev: Array = c.get("every", [12, 25])
+		_wflash_t = _rng.randf_range(ev[0], ev[1]) if not demo else 3.0
+		var f := _focus()
+		var wall: Array = c.get("wall", [-24.0, -24.0])                # x del muro oeste, z del muro norte
+		var north := _rng.randf() < 0.5
+		var along := clampf((f.x if north else f.z) + _rng.randf_range(-6.0, 6.0), -20.0, 20.0)
+		var from := Vector3(along, 6.0, wall[1] - 1.0) if north else Vector3(wall[0] - 1.0, 6.0, along)
+		var into := Vector3(0, 0, 1) if north else Vector3(1, 0, 0)
+		_wflash.position = from
+		_wflash.look_at(from + into * 5.0 + Vector3(0, -6.0, 0), Vector3.UP)
+		var foot := Vector3(from.x, 0.0, from.z) + into * 4.6           # la mancha empieza junto a la pared
+		_wpane.position = foot + Vector3(0, 0.015, 0)
+		_wpane.rotation.y = 0.0 if north else PI * 0.5                  # su largo hacia dentro de la sala
+		_wflash_k = 0.0
+		if OS.get_cmdline_user_args().has("log=true"): print("RELAMPAGO t=%d en %s" % [Time.get_ticks_msec(), from])
+		get_tree().create_timer(_rng.randf_range(0.8, 2.2)).timeout.connect(func() -> void: sfx_at("thunder", from, -10.0))
+	if _wflash_k >= 0.0:
+		_wflash_k += delta
+		var e := Weather.flash_at(_wflash_k) if _wflash_k < 1.2 else 0.0
+		_wflash.light_energy = e * float(c.get("energy", 6.0))
+		_wpane_mat.set_shader_parameter("k", e)
+		if _wflash_k >= 1.2: _wflash_k = -1.0
+
+# -- ratas que corren junto a las paredes (`rats`: every, wall) --
+var _rat_t := 6.0
+var _rats: Array[Dictionary] = []
+
+func _rat_step(delta: float) -> void:
+	var c: Dictionary = cfg.rats
+	_rat_t -= delta * (1.0 + fear)
+	if _rat_t <= 0.0 and _rats.size() < 2:
+		var ev: Array = c.get("every", [10, 22])
+		_rat_t = _rng.randf_range(ev[0], ev[1]) if not demo else 2.0
+		var wall: Array = c.get("wall", [-23.4, -23.4])
+		var f := _focus()
+		var north := _rng.randf() < 0.5
+		var a0 := clampf((f.x if north else f.z) + _rng.randf_range(-7.0, 7.0), -21.0, 21.0)
+		var sgn := 1.0 if _rng.randf() < 0.5 else -1.0
+		var a1 := clampf(a0 + sgn * _rng.randf_range(4.0, 8.0), -22.0, 22.0)
+		var p0 := Vector3(a0, 0, wall[1]) if north else Vector3(wall[0], 0, a0)
+		var p1 := Vector3(a1, 0, wall[1]) if north else Vector3(wall[0], 0, a1)
+		if on_screen(p0, 0.95) and _nearest_player(p0) > 3.0:
+			var node := Node3D.new()
+			var m := VoxelBuilder.load_model("res://models/rata.json")
+			node.add_child(m)
+			add_child(node)
+			node.scale = Vector3.ONE * float(c.get("scale", 0.7))
+			node.position = p0
+			var dir := (p1 - p0).normalized()
+			node.rotation.y = atan2(dir.x, dir.z)
+			_rats.append({"node": node, "model": m, "to": p1, "t": 0.0})
+			sfx_at("rat", p0)
+	for rd: Dictionary in _rats.duplicate():
+		var node: Node3D = rd.node
+		rd.t += delta
+		Anims.pose("rata", "run", rd.model, fmod(float(rd.t) * 3.5, 1.0))
+		var d: Vector3 = (rd.to as Vector3) - node.position
+		if d.length() < 0.2 or rd.t > 6.0:                          # se mete por un agujero del rodapié
+			var tw := create_tween()
+			tw.tween_property(node, "scale", Vector3.ONE * 0.01, 0.15)
+			tw.tween_callback(node.queue_free)
+			_rats.erase(rd)
+			continue
+		node.position += d.normalized() * minf(4.5 * delta, d.length())
+
+# -- agua que corre por la cubierta (`deck_water`: flow [x, z]) --
+var _deck: ShaderMaterial
+var _deck_k := 0.0
+var _deck_front := -30.0
+
+func _make_deck_water(c: Dictionary) -> void:
+	var size: Vector2 = arena.get_meta("size")
+	var mi := MeshInstance3D.new()
+	var pm := PlaneMesh.new()
+	pm.size = size
+	mi.mesh = pm
+	_deck = ShaderMaterial.new()
+	_deck.shader = preload("res://scripts/fx/deck_water.gdshader")
+	var fl: Array = c.get("flow", [0.3, 0.95])
+	_deck.set_shader_parameter("flow", Vector2(fl[0], fl[1]))
+	mi.material_override = _deck
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.position = Vector3(0, 0.012, 0)
+	add_child(mi)
+
+func _deck_wave(strength: float) -> void:
+	if _deck == null: return
+	_deck_k = maxf(_deck_k, strength)
+	var size: Vector2 = arena.get_meta("size")
+	_deck_front = -size.length() * 0.5
+
+func _deck_step(delta: float) -> void:
+	if _deck_k <= 0.0: return
+	_deck_k = maxf(0.0, _deck_k - delta / float(cfg.deck_water.get("fade", 5.0)))
+	_deck_front += delta * float(cfg.deck_water.get("speed", 9.0))
+	_deck.set_shader_parameter("k", _deck_k)
+	_deck.set_shader_parameter("front", _deck_front)

@@ -30,6 +30,7 @@ const HARD_CAP := 240
 var players := 1                           ## jugadores: escala vida y aparición (GDD 4.6)
 ## Depuración (menú de pausa > Depuración):
 var target_alive := -1                     ## > 0: mantiene exactamente tantos enemigos vivos
+var pact := 1.0                              ## Pacto con el Hombre Negro (tienda): más enemigos y más vida
 var spawning_paused := false               ## no aparece nadie (el evento final tampoco)
 var pool_override: Array[EnemyData] = []   ## no vacío: solo aparecen estos, con el mismo peso
 var _acc := 0.0
@@ -127,7 +128,7 @@ func team_item(stat: String) -> float:
 
 ## Ídolo de Cthulhu (D-38): más enemigos.
 func _idol() -> float:
-	return team_item("idol_mult") if world != null else 1.0
+	return (team_item("idol_mult") if world != null else 1.0) * pact
 
 ## Baúles arcanos (D-31): uno cada `chest_every` s (±25 %), como mucho `chest_max` cerrados,
 ## en un sitio libre a 6-12 m de un jugador en pie.
@@ -280,7 +281,7 @@ func spawn(d: EnemyData, pos: Vector3) -> Enemy:
 	var e := Enemy.new().setup(d, world, obstacles)
 	e.health_scale = LevelData.coop(level.coop_health, players)     # más jugadores, más aguante
 	if d.unique: e.health_scale = 1.0 + (e.health_scale - 1.0) * 0.5   # los únicos, la mitad (con 4: ×1,65)
-	e.health_scale *= level.health_mult * Difficulty.health()
+	e.health_scale *= level.health_mult * Difficulty.health() * pact   # Pacto con el Hombre Negro (tienda)
 	e.health *= e.health_scale
 	e.position = pos
 	e.died.connect(_on_died)

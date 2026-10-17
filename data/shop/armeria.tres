@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItem" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/shop_item.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/items/icons/armeria.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"armeria"
+display_name = "Armería"
+description = "Empiezas cada parte con una segunda arma al azar."
+section = 3
+order = 11
+prices = Array[int]([6000])
+stat = "start_weapon"
+per_level = 1.0
+icon = ExtResource("2")

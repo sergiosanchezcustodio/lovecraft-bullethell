@@ -11,6 +11,7 @@ var updated := ""                        ## última vez que se guardó
 var play_time := 0.0                     ## s jugados en total (solo en partida)
 var money := 0                           ## dinero de la tienda: sobrevive a la muerte
 var purchases := {}                      ## id de artículo -> nivel comprado
+var toggles := {}                        ## id de artículo -> activo (lo que se puede apagar: el Pacto)
 var pets := []                           ## compañeros desbloqueados (ids)
 var characters := []                     ## personajes desbloqueados además de los iniciales (ids)
 var levels_won := []                     ## niveles superados (ids, p. ej. "p1_n1")
@@ -82,7 +83,7 @@ func to_dict() -> Dictionary:
 	return {"version": VERSION, "created": created, "updated": updated, "play_time": play_time,
 		"money": money, "purchases": purchases, "pets": pets, "characters": characters,
 		"levels_won": levels_won, "stats": stats, "unlock_all": unlock_all, "achievements": achievements,
-		"seen": seen, "outfits": outfits, "worn": worn}
+		"seen": seen, "outfits": outfits, "worn": worn, "toggles": toggles}
 
 ## Lee un diccionario de cualquier versión conocida; los campos que falten toman su valor
 ## por defecto.
@@ -94,6 +95,7 @@ static func from_dict(d: Dictionary) -> SaveData:
 	s.play_time = float(d.get("play_time", 0.0))
 	s.money = int(d.get("money", 0))
 	s.purchases = d.get("purchases", {})
+	s.toggles = (d.get("toggles", {}) as Dictionary).duplicate()
 	s.pets = d.get("pets", [])
 	s.characters = d.get("characters", [])
 	s.levels_won = d.get("levels_won", [])

@@ -661,6 +661,88 @@
 				"frog_3.wav"
 			],
 			"bus": "Ambiente"
+		},
+		"ice_crack": {
+			"db": -16,
+			"pitch": [
+				0.85,
+				1.15
+			],
+			"voices": 1,
+			"gap": 2.0,
+			"files": [
+				"ice_crack_0.wav",
+				"ice_crack_1.wav"
+			],
+			"bus": "Ambiente"
+		},
+		"howl": {
+			"db": -22,
+			"pitch": [
+				0.92,
+				1.05
+			],
+			"voices": 1,
+			"gap": 6.0,
+			"files": [
+				"howl_0.wav",
+				"howl_1.wav"
+			],
+			"bus": "Ambiente"
+		},
+		"gravel": {
+			"db": -18,
+			"pitch": [
+				0.85,
+				1.2
+			],
+			"voices": 2,
+			"gap": 0.5,
+			"files": [
+				"gravel_0.wav",
+				"gravel_1.wav"
+			],
+			"bus": "Ambiente"
+		},
+		"tekeli": {
+			"db": -26,
+			"pitch": [
+				0.9,
+				1.05
+			],
+			"voices": 1,
+			"gap": 8.0,
+			"files": [
+				"tekeli_0.wav"
+			],
+			"bus": "Ambiente"
+		},
+		"buoy_bell": {
+			"db": -20,
+			"pitch": [
+				0.97,
+				1.03
+			],
+			"voices": 2,
+			"gap": 1.2,
+			"files": [
+				"buoy_bell_0.wav"
+			],
+			"bus": "Ambiente"
+		},
+		"rat": {
+			"db": -24,
+			"pitch": [
+				0.9,
+				1.15
+			],
+			"voices": 1,
+			"gap": 0.8,
+			"files": [
+				"rat_0.wav",
+				"rat_1.wav"
+			],
+			"bus": "Ambiente"
 		}
 	}
 }
