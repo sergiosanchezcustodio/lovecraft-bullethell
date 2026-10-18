@@ -6,8 +6,10 @@ extends Control
 ## Cada efecto se configura o se quita por separado en data/title/portada.tres
 ## (TitleScreenConfig). Para probar, detrás de `--`:
 ##   off=velas,farolillos,niebla,luna,relampago,ojos,acercamiento,ceniza,titulo,halo,
-##       niebla_titulo,aviso,musica,cuervo
+##       niebla_titulo,aviso,musica,cuervo,polillas,rafaga,paginas,gotas
 ##   raven=s             el cuervo llega en ese segundo (raven=-1: ya posado)
+##   gust=s              la primera ráfaga en ese segundo
+##   drips_every=s       una gota cada tantos segundos
 ##   shots=2,6,9 tag=x   capturas en esos segundos     t=6   empieza en ese segundo
 ##   strike=3            relámpago en ese segundo      eyes=3  brillo de ojos en ese segundo
 ##   perf=8              mide el rendimiento
@@ -52,6 +54,9 @@ var prompt: Label
 var fade: ColorRect
 var ash: Array[GPUParticles2D] = []
 var raven: TitleRaven              ## cuervo que se posa en la calavera
+var moths: TitleMoths
+var gust: TitleGust
+var drips: TitleDrips
 var t := 0.0
 var _next_strike := 6.0
 var _strike_t := -1.0
@@ -95,6 +100,7 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 	t = args.get_float("t", 0.0)
+	if gust: gust.set("_t", t)                     # su tiempo cuenta desde el arranque de la portada
 	if skip_to_menu and Saves.slot >= 0:
 		skip_to_menu = false
 		t = _end_intro()
@@ -109,7 +115,8 @@ func _apply_off(list: String) -> void:
 		"luna": "moon_enabled", "relampago": "lightning_enabled", "ojos": "eyes_enabled",
 		"acercamiento": "zoom_enabled", "ceniza": "ash_enabled", "titulo": "title_enabled",
 		"halo": "halo_enabled", "niebla_titulo": "title_fog_enabled", "aviso": "prompt_enabled",
-		"musica": "music_enabled", "cuervo": "raven_enabled"}
+		"musica": "music_enabled", "cuervo": "raven_enabled",
+		"polillas": "moths_enabled", "rafaga": "gust_enabled", "paginas": "gust_pages", "gotas": "drips_enabled"}
 	for n in list.split(",", false):
 		if names.has(n): cfg.set(names[n], false)
 
@@ -139,6 +146,20 @@ func _build_stage() -> void:
 	bg_mat.set_shader_parameter("luces", luces)
 	bg.material = bg_mat
 	stage.add_child(bg)
+	# lo que va bajo la niebla del suelo: gotas y papel del escritorio
+	if cfg.drips_enabled:
+		drips = TitleDrips.new().setup(bg.texture)
+		drips.every_min = args.get_float("drips_every", cfg.drips_every_min)
+		drips.every_max = args.get_float("drips_every", cfg.drips_every_max)
+		drips.sound = cfg.drips_sound
+		stage.add_child(drips)
+	if cfg.gust_enabled:
+		gust = TitleGust.new(bg.texture, args.get_float("gust", cfg.gust_first))
+		gust.gap_min = cfg.gust_gap_min
+		gust.gap_max = cfg.gust_gap_max
+		gust.pages = cfg.gust_pages
+		gust.bg_mat = bg_mat
+		stage.add_child(gust)
 	var fog := ColorRect.new()
 	_full(fog)
 	fog_mat = ShaderMaterial.new()
@@ -153,6 +174,10 @@ func _build_stage() -> void:
 	sky_mat.set_shader_parameter("zonas", zonas)
 	sky.material = sky_mat
 	stage.add_child(sky)
+	if cfg.moths_enabled:
+		moths = TitleMoths.new(cfg.moths_count)
+		stage.add_child(moths)
+		if gust: gust.moths = moths
 	if cfg.raven_enabled:
 		raven = TitleRaven.new(args.get_float("raven", cfg.raven_first))
 		stage.add_child(raven)

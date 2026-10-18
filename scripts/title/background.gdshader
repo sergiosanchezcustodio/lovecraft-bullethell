@@ -3,6 +3,7 @@
 //   (mascara_luces.B) oscila con ella. Solo la llama baila (B): nada en la base, más en la
 //   punta, así que la mecha y la cera no se mueven.
 // - Farolillos (mascara_luces R y G): no se mueven; su cristal y su halo respiran despacio.
+// - Ráfaga (`gust`): todas las llamas se tumban hacia un lado, tiemblan más y bajan un momento.
 shader_type canvas_item;
 
 uniform sampler2D velas : filter_linear;
@@ -18,6 +19,7 @@ uniform float lantern_breath = 0.06;         // variación de brillo del cristal
 uniform float lantern_halo = 0.10;           // intensidad del halo
 uniform float lantern_period = 5.0;          // s de una respiración
 uniform vec3 lantern_color : source_color = vec3(1.0, 0.62, 0.28);
+uniform float gust = 0.0;                    // ráfaga de aire (TitleGust, 0..1): todas las velas se tumban y tiemblan a la vez
 
 // Parpadeo de vela en [-1, 1]: casi estable, con oscilaciones rápidas pequeñas y, de vez
 // en cuando, una bajada breve.
@@ -37,12 +39,14 @@ void fragment() {
 		// vaivén lento de la punta y estirones hacia arriba
 		float sx = sin(t * 2.1 + ph) * 0.55 + sin(t * 5.3 + ph * 2.7) * 0.3 + sin(t * 11.7 + ph * 5.1) * 0.15;
 		float sy = 0.5 + 0.5 * (sin(t * 3.7 + ph * 1.9) * 0.6 + sin(t * 8.9 + ph * 3.3) * 0.4);
-		uv += vec2(-sx, sy * 0.8) * v.b * flame_sway / design;
+		sx += gust * (2.6 + 0.9 * sin(t * 23.0 + ph * 5.0) + 0.6 * sin(t * 41.0 + ph * 9.0));
+		uv += vec2(-sx, sy * 0.8 * (1.0 - 0.6 * gust)) * v.b * flame_sway / design;
 	}
 	vec4 c = texture(TEXTURE, uv);
 	if (candles_enabled) {
 		float f = flicker(v.g, t);
-		c.rgb *= 1.0 + f * (flicker_strength * v.r + spill_strength * l.b);
+		c.rgb *= 1.0 + f * (1.0 + 2.5 * gust) * (flicker_strength * v.r + spill_strength * l.b);
+		c.rgb *= 1.0 - gust * (0.22 * v.r + 0.12 * l.b);       // la llama se achica y su luz baja
 	}
 	if (lanterns_enabled) {
 		// fase suave según la posición: cada farolillo respira a su ritmo, sin saltos en el halo

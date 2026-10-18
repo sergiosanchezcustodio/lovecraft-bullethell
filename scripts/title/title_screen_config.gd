@@ -50,6 +50,23 @@ extends Resource
 @export var raven_enabled := true
 @export var raven_first := 4.5          ## s hasta que llega por primera vez
 
+@export_group("Polillas")
+@export var moths_enabled := true             ## alrededor de la vela grande, con su sombra en el pergamino
+@export var moths_count := 3
+
+@export_group("Ráfaga de aire")
+@export var gust_enabled := true              ## tumba y hace temblar todas las velas a la vez
+@export var gust_pages := true                ## y levanta el borde del pergamino
+@export var gust_first := 14.0
+@export var gust_gap_min := 25.0
+@export var gust_gap_max := 50.0
+
+@export_group("Gotas")
+@export var drips_enabled := true             ## caen de la bóveda y abren anillos en los reflejos del suelo
+@export var drips_every_min := 2.5
+@export var drips_every_max := 6.0
+@export var drips_sound := true
+
 @export_group("Acercamiento lento")
 @export var zoom_enabled := true
 @export var zoom_amount := 0.03              ## 3 %
