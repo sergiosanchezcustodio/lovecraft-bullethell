@@ -62,7 +62,7 @@ func _spawn_angle() -> void:
 		return
 
 func _open_angle(pos: Vector3, r: float) -> void:
-	Sfx.play_at("angles", pos)
+	Auto.sfx_at("angles", pos)
 	var node := _angle_mesh(r)
 	node.position = pos
 	node.set_meta("warn_r", r * 1.6)                    # el bot (SmartBot) se aparta
@@ -156,7 +156,7 @@ func _step_waves(delta: float) -> void:
 			continue
 		if not w.hit:                                       # rompe la ola
 			w.hit = true
-			Sfx.play("wave")
+			Auto.sfx("wave")
 			mat.albedo_color = Color(0.75, 0.88, 1.0, 0.6)
 			var b := obstacles.bounds if obstacles != null else Rect2(-32, -32, 64, 64)
 			for x in range(int(b.position.x), int(b.end.x), 4):

@@ -224,7 +224,7 @@ func _physics_process_step(delta: float) -> void:
 		position.x = p2.x; position.z = p2.y
 	if leash.is_valid(): global_position = leash.call(global_position)
 	if motor.is_dodging() and not was_dodging:
-		Sfx.play_at("dodge", global_position)
+		Auto.sfx_at("dodge", global_position)
 		_action = data.dodge_anim         # la animación del esquive empieza con el impulso
 		_action_t = 0.0
 		_on_dodge()
@@ -335,7 +335,7 @@ var _rumble_ms := 0
 func _rumble(amount: float) -> void:
 	if input == null or amount <= 0.0: return
 	var dev := input.joy_device()
-	if dev < 0 or not bool(Settings.get_value("vibration")): return
+	if dev < 0 or not bool(Auto.setting("vibration", false)): return
 	var now := Time.get_ticks_msec()
 	if now - _rumble_ms < 150: return
 	_rumble_ms = now
@@ -686,7 +686,7 @@ func take_damage(d: Damage) -> void:
 	if nodens_ready() and (d.physical > 0.0 or d.mental > 0.0):   # Escudo de Nodens: absorbe el golpe entero
 		_nodens_t = 0.0
 		_hurt_time = 0.0
-		Sfx.play_at("magic", global_position)
+		Auto.sfx_at("magic", global_position)
 		return
 	if Difficulty.damage() != 1.0 or Difficulty.mental() != 1.0:    # dificultad (12-10-2026)
 		var sd := Damage.new(d.physical * Difficulty.damage(), d.mental * Difficulty.mental())
@@ -710,7 +710,7 @@ func take_damage(d: Damage) -> void:
 	var src := "otro"
 	if d.source is Enemy and is_instance_valid(d.source): src = String((d.source as Enemy).data.id)
 	recv_add(src, d.physical, d.mental * mental_resist * data.mental_mult)
-	Sfx.play_at("hit_player" if d.physical > 0.0 else "chant", global_position)
+	Auto.sfx_at("hit_player" if d.physical > 0.0 else "chant", global_position)
 	_rumble(d.physical + d.mental * 0.5)
 	if d.mental > 0.0:
 		sanity = maxf(0.0, sanity - d.mental * mental_resist * data.mental_mult)
@@ -720,7 +720,7 @@ func take_damage(d: Damage) -> void:
 	if health <= 0.0 and data.ankh > 0.0 and not _ankh_used:       # Ankh de Nephren: se levanta una vez
 		_ankh_used = true
 		health = data.max_health * ANKH_HEALTH
-		Sfx.play("level_up")
+		Auto.sfx("level_up")
 		var game := get_tree().current_scene if is_inside_tree() else null
 		if game != null and game.has_method("announce"): game.announce("El ankh de Nephren te devuelve a la vida", 2.0)
 		return
@@ -728,7 +728,7 @@ func take_damage(d: Damage) -> void:
 		second_lives_used += 1
 		health = data.max_health * SECOND_LIFE_HEALTH
 		_hurt_time = 0.0
-		Sfx.play("level_up")
+		Auto.sfx("level_up")
 		var game2 := get_tree().current_scene if is_inside_tree() else null
 		if game2 != null and game2.has_method("announce"): game2.announce("La medalla de San Cristóbal te protege", 2.0)
 		return
@@ -737,7 +737,7 @@ func take_damage(d: Damage) -> void:
 		if revivable:
 			down_left = rules.down_time
 			revive_progress = 0.0
-		Sfx.play_at("down", global_position)
+		Auto.sfx_at("down", global_position)
 		downed.emit()
 
 ## Ha abatido a un enemigo (CombatWorld.record_kill): Colmillo de ghoul, Salterio y Tablilla

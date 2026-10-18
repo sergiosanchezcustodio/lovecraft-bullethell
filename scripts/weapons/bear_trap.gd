@@ -49,7 +49,7 @@ func _physics_process(delta: float) -> void:
 func _spring() -> void:
 	sprung = true
 	_t = 0.0
-	Sfx.play_at("hit", global_position)
+	Auto.sfx_at("hit", global_position)
 	_model.queue_free()
 	_model = VoxelBuilder.load_model("res://models/proj_cepo_cerrado.json")
 	add_child(_model)

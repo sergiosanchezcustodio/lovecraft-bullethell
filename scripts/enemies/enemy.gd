@@ -137,7 +137,7 @@ func _ready() -> void:
 	_flash_mat = StandardMaterial3D.new()
 	_flash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_flash_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_flash_mat.albedo_color = Color(1, 1, 1, 0.75 if int(Settings.get_value("flashes")) == 1 else 0.2)   # accesibilidad
+	_flash_mat.albedo_color = Color(1, 1, 1, 0.75 if int(Auto.setting("flashes", 1)) == 1 else 0.2)   # accesibilidad
 	_attack_timer = data.attack_cooldown * randf_range(0.5, 1.0)
 	anim_t = randf()
 	if data.aura_drain > 0.0 and data.aura_radius > 0.0: _make_aura()
@@ -284,7 +284,7 @@ func stun(seconds: float) -> void:
 func take_damage(d: Damage) -> void:
 	if shield_t > 0.0: return
 	if not is_alive(): return
-	Sfx.play_at("hit", global_position)
+	Auto.sfx_at("hit", global_position)
 	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
 	for tag in data.tags: k *= float(d.bonus.get(tag, 1.0))    # rasgos contra este tipo de enemigo
 	if data.elite or data.unique: k *= float(d.bonus.get(Player.ELITE_TAG, 1.0))   # Medallón del cazador
@@ -302,7 +302,7 @@ func take_damage(d: Damage) -> void:
 	if health <= 0.0: _die()
 
 func _die() -> void:
-	Sfx.play_at("die", global_position)
+	Auto.sfx_at("die", global_position)
 	if _curse_t > 0.0 and int(_curse.get("spread", 0)) > 0: _spread_curse()
 	if _inject_t > 0.0 and _ally_time > 0.0:            # se levanta como aliado
 		world.fx.add_child(Reanimated.new().setup(world, data, global_position, facing, _ally_time, _inject_bonus))

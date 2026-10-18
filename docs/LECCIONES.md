@@ -83,3 +83,4 @@ Sacadas de `CLAUDE.md` el 17-10-2026. Léelas antes de tocar generadores de mode
 - **Grabar vídeo en pantalla completa:** con `--write-movie` a 4K cada fotograma tarda 2,5 s. `Engine.get_write_movie_path()` sirve para detectar la grabación y quedarse en ventana. Buscar `--write-movie` en `OS.get_cmdline_args()` no funciona.
 - **`cat` sin entrada:** un `cat > fichero` sin heredoc se queda esperando la entrada estándar para siempre.
 
+- **Autoloads en el código de la partida:** las herramientas que se lanzan con `-s` (`tools/render_mapa.gd` y otras) no crean los autoloads (`Sfx`, `Settings`, `Saves`…). Si un script de la partida los nombra directamente (`Sfx.play_at(...)`), no compila él ni nada que dependa de él, y la herramienta llena la salida de "Identifier not found". Usa `Auto.sfx`, `Auto.sfx_at`, `Auto.setting(clave, por_defecto)` y `Auto.node("Saves")` (`scripts/core/auto.gd`). Los menús y `game.gd` pueden seguir nombrándolos.

@@ -40,7 +40,9 @@ static func is_head(outfit_id: String) -> bool:
 static var override := {}
 static func worn_for(character_id: String) -> Dictionary:
 	if not override.is_empty(): return override
-	return Saves.current.worn_by(character_id) if Saves.current != null else {}
+	var saves := Auto.node("Saves")                 # autoload, buscado al usarlo (ver Auto)
+	var cur: Variant = saves.get("current") if saves else null
+	return cur.worn_by(character_id) if cur != null else {}
 
 ## Viste un modelo de personaje con lo que lleva puesto ({"head": id, "body": id, "feet": id, "acc": id}).
 static func apply(root: Node3D, character_model: String, worn: Dictionary) -> void:

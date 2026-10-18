@@ -33,7 +33,7 @@ static func level_for(p: Player) -> float:
 	return clampf((START - f) / START, 0.0, 1.0) * 0.8
 
 func _process(_delta: float) -> void:
-	var strength := float(Settings.get_value("distortion"))
+	var strength := float(Auto.setting("distortion", 1.0))
 	var lv := Vector4.ZERO
 	for p in players:
 		if p.index < 4: lv[p.index] = level_for(p)

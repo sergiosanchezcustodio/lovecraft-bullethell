@@ -94,7 +94,7 @@ const SHAKE_MAX := 0.12                    ## m: ninguno pasa de aquí
 
 func shake(amount: float) -> void:
 	# a la mitad (12-10-2026: resultaba incómodo) y con techo; la configuración lo reduce o lo quita
-	_shake = maxf(_shake, minf(amount * SHAKE_SCALE, SHAKE_MAX) * float(Settings.get_value("shake")))
+	_shake = maxf(_shake, minf(amount * SHAKE_SCALE, SHAKE_MAX) * float(Auto.setting("shake", 1.0)))
 
 func _process(delta: float) -> void:
 	_size = lerpf(_size, needed_size(), 1.0 - exp(-zoom_speed * delta))

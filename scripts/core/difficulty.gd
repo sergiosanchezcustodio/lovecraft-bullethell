@@ -21,7 +21,7 @@ static var forced := -1                 ## los tests la fijan (sus topes no depe
 static func level() -> int:
 	if forced >= 0: return forced
 	if Engine.get_main_loop() == null or not (Engine.get_main_loop() as SceneTree).root.has_node("Settings"): return 1
-	return clampi(int(Settings.get_value("difficulty")), 0, NAMES.size() - 1)
+	return clampi(int(Auto.setting("difficulty", 1)), 0, NAMES.size() - 1)
 
 static func rate(t := INF) -> float: return _o("rate", RATE[level()]) * ramp(t)
 static func cap(t := INF) -> float: return _o("cap", CAP[level()]) * lerpf(ramp(t), 1.0, 0.5)

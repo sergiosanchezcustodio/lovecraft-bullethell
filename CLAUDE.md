@@ -36,6 +36,7 @@ Consúltalos cuando haga falta (son largos):
 - **Rendimiento:** el 1 % peor varía mucho entre ejecuciones y la primera tras regenerar un modelo construye su malla: repite siempre la medición.
 - **Shaders:** nada de `fract(sin(x) * 43758)` con argumentos grandes; usa el hash de `night_sky.gdshaderinc`.
 - **Bots y capturas:** `mute=true`; las ejecuciones de prueba van en ventana.
+- **Autoloads en código de partida:** usa `Auto.sfx_at`, `Auto.sfx`, `Auto.setting` y `Auto.node` (`scripts/core/auto.gd`), no `Sfx.`/`Settings.` directamente: si no, las herramientas con `-s` (mapas de la Biblioteca) no compilan esos scripts.
 - **Pantalla completa** exclusiva por defecto; la interfaz escala desde 1920×1080.
 - **Luz de las arenas:** las noches se aclaran con `"gamma"` en el `light` de la arena (curva tras el tono, `Atmosphere.set_lift`), no subiendo ambiente o exposición, que el tono ACES aplasta. Apunta a una mediana de brillo de 0,16-0,22 en las noches (detalle en `docs/ESTADO.md`).
 
