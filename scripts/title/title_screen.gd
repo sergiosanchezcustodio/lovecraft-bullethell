@@ -6,7 +6,8 @@ extends Control
 ## Cada efecto se configura o se quita por separado en data/title/portada.tres
 ## (TitleScreenConfig). Para probar, detrás de `--`:
 ##   off=velas,farolillos,niebla,luna,relampago,ojos,acercamiento,ceniza,titulo,halo,
-##       niebla_titulo,aviso,musica
+##       niebla_titulo,aviso,musica,cuervo
+##   raven=s             el cuervo llega en ese segundo (raven=-1: ya posado)
 ##   shots=2,6,9 tag=x   capturas en esos segundos     t=6   empieza en ese segundo
 ##   strike=3            relámpago en ese segundo      eyes=3  brillo de ojos en ese segundo
 ##   perf=8              mide el rendimiento
@@ -50,6 +51,7 @@ var title_mat: ShaderMaterial
 var prompt: Label
 var fade: ColorRect
 var ash: Array[GPUParticles2D] = []
+var raven: TitleRaven              ## cuervo que se posa en la calavera
 var t := 0.0
 var _next_strike := 6.0
 var _strike_t := -1.0
@@ -107,7 +109,7 @@ func _apply_off(list: String) -> void:
 		"luna": "moon_enabled", "relampago": "lightning_enabled", "ojos": "eyes_enabled",
 		"acercamiento": "zoom_enabled", "ceniza": "ash_enabled", "titulo": "title_enabled",
 		"halo": "halo_enabled", "niebla_titulo": "title_fog_enabled", "aviso": "prompt_enabled",
-		"musica": "music_enabled"}
+		"musica": "music_enabled", "cuervo": "raven_enabled"}
 	for n in list.split(",", false):
 		if names.has(n): cfg.set(names[n], false)
 
@@ -151,6 +153,9 @@ func _build_stage() -> void:
 	sky_mat.set_shader_parameter("zonas", zonas)
 	sky.material = sky_mat
 	stage.add_child(sky)
+	if cfg.raven_enabled:
+		raven = TitleRaven.new(args.get_float("raven", cfg.raven_first))
+		stage.add_child(raven)
 	# ceniza en tres capas: copos lejanos pequeños, medianos y unos pocos cercanos, grandes y
 	# desenfocados (caen más deprisa: parecen más cerca)
 	ash.append(_make_ash(cfg.ash_amount, 1.0, Vector2(0.08, 0.18), cfg.ash_alpha, 1.0))
@@ -377,6 +382,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		pressed = (event as InputEventJoypadButton).button_index in PRESS_BUTTONS
 	if not pressed: return
 	get_viewport().set_input_as_handled()
+	if raven: raven.scare()
 	if t < _end_intro():
 		t = _end_intro()                                     # salta la presentación
 	else:

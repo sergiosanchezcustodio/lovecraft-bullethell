@@ -46,6 +46,10 @@ extends Resource
 @export var eyes_period := 9.0               ## s entre un brillo y el siguiente
 @export var eyes_color := Color(0.85, 1.0, 0.75)
 
+@export_group("Cuervo")
+@export var raven_enabled := true
+@export var raven_first := 4.5          ## s hasta que llega por primera vez
+
 @export_group("Acercamiento lento")
 @export var zoom_enabled := true
 @export var zoom_amount := 0.03              ## 3 %

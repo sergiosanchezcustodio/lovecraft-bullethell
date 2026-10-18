@@ -81,15 +81,20 @@ static func load_model(path: String) -> Node3D:
 		empty.position = Vector3(pv[0], pv[1], pv[2]) * model.voxel_size
 		root.add_child(empty)
 		order.append(pp)
+	# posiciones de los pivotes antes de colgar nada: con cadenas de dos niveles (mano -> brazo ->
+	# cuerpo), el brazo puede estar ya colgado del cuerpo y su posición ser relativa a él
+	var pivot_pos := {}
+	for pname in order: pivot_pos[pname] = (root.get_node(pname) as Node3D).position
 	for pname in order:
 		if not parents.has(pname): continue
-		var n: Node3D = root.get_node(pname)
-		var parent: Node3D = root.get_node_or_null(String(parents[pname]))
+		var n: Node3D = root.get_node_or_null(pname)
+		if n == null: n = root.find_child(pname, true, false)
+		var pp := String(parents[pname])
+		var parent: Node3D = root.find_child(pp, true, false)
 		if parent == null: continue
-		var pos := n.position - parent.position
-		root.remove_child(n)
+		n.get_parent().remove_child(n)
 		parent.add_child(n)
-		n.position = pos
+		n.position = pivot_pos[pname] - pivot_pos[pp]
 	# Para animar sin buscar ni recalcular en cada fotograma (Anims.reset/rest)
 	var parts: Array[Node3D] = []
 	var rest: Array[Vector3] = []
