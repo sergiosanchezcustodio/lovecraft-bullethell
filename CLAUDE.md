@@ -27,6 +27,11 @@ Consúltalos cuando haga falta (son largos):
 - **Fase 8 (pulido y distribución):** en curso. Sonido, música provisional, accesibilidad y builds de Windows y macOS hechas; falta subir a itch.io (necesita la cuenta del autor). 50 armas y 50 objetos (D-38).
 - **Trabajo reciente (09-10 a 17-10-2026), pendiente de revisión:** dificultad (Investigador, Normal, Pesadilla) y equilibrio con `SmartBot` y `tools/simular.py`; efectos de armas en cubitos (`VoxelFx`); escenarios rehechos con más resolución (`arte=v1` enseña la versión anterior); ambiente vivo en los 15 escenarios (`data/ambient.json`, `Ambient`); tienda con 15 objetos más; revisión de arte dentro del juego (`review/peticiones.json`, `tools/vigilar_revision.py`).
 - **Subidas de nivel por turnos en cooperativo (D-39, 20-10-2026), pendiente de prueba con varios mandos:** experiencia común, sube un jugador cada vez (`TeamXp.turn`), ventana centrada con su color; los bots eligen sin pausar.
+- **Sigue aquí (sesión del 20-10-2026):**
+  - Equilibrio de D-39 comprobado con 2 jugadores (8 partidas por versión: no es más fácil, el J1 va medio nivel por delante; detalle en `docs/ESTADO.md`). Falta, si se quiere, la misma comparación con 4 (`python tools/simular.py p1 --n 8 --par 2 --ts 2 --bots 3`, en este repositorio y en `../lb_antes`).
+  - `../lb_antes`: copia de trabajo (git worktree) del commit 9c130c7, sin turnos y con el registro por jugador; solo sirve para esa comparación. Borrarla: `git worktree remove --force ../lb_antes && git worktree prune`.
+  - Fase 9 (online): propuesta de anfitrión y clientes con ENet, conexión por UPnP o por IP/código, mezcla de locales y remotos, una cámara por PC, hitos 9.1-9.6. Faltan las respuestas del autor para cerrar D-10.
+  - Ofrecido y sin respuesta: poner al día la tabla de `docs/ROADMAP.md` (las fases 6 y 8 siguen en "Plan aprobado") y añadir un criterio de aceptación a la fase 8.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
 ### Reglas que no hay que olvidar
