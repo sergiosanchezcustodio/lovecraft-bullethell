@@ -51,6 +51,7 @@ var team: TeamXp                              ## experiencia compartida del coop
 var menus: PlayerMenus                        ## ficha y mapa de cada jugador (hito 2.12)
 var run_money := 0                            ## dólares ganados en esta partida (D-31)
 var _someone_fell := false                    ## alguien ha caído en este nivel (logro "Sin un rasguño")
+var _downs := {}                              ## índice del jugador -> veces derribado o caído en el nivel (simulaciones)
 var _ach_t := 0.0
 var money_mult := 1.0                         ## Codicia (tienda)
 var shop_bonus := {}                          ## lo comprado en la tienda (Shop.bonuses)
@@ -363,6 +364,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 		Achievements.add(Saves.current, "revives")
 		announce("J%d vuelve a la lucha" % (i + 1), 1.5))
 	q.downed.connect(func() -> void: _someone_fell = true)
+	q.downed.connect(func() -> void: _downs[q.index] = int(_downs.get(q.index, 0)) + 1)
 	q.eliminated.connect(func() -> void:
 		announce("J%d, eliminado hasta el siguiente nivel" % (i + 1), 2.0)
 		_check_all_down())
@@ -526,6 +528,13 @@ func _on_downed(q: Player) -> void:
 		return
 	_game_over()
 
+## Simulaciones (tools/simular.py): nivel, vida más baja y caídas de cada jugador al acabar el nivel.
+func _log_players() -> void:
+	var parts := PackedStringArray()
+	for q in players:
+		parts.append("J%d nv=%d vida_min=%d caidas=%d" % [q.index + 1, q.progress.level, roundi(maxf(q.min_hp, 0.0) * 100), int(_downs.get(q.index, 0))])
+	print("JUGADORES %s  %s" % [level.id, " | ".join(parts)])
+
 func _check_all_down() -> void:
 	if _ended or players.any(func(c: Player) -> bool: return c.health > 0.0): return
 	_game_over()
@@ -535,6 +544,7 @@ func _game_over() -> void:
 	_ended = true
 	if args.get_bool("log") and director != null:
 		print("FIN DERROTA %s t=%d abatidos=%d nivel_j1=%d" % [level.id, int(director.time), director.killed_total, player.progress.level])
+		_log_players()
 		for q in players:
 			var rv := {}
 			for k in q.received: rv[k] = [roundi(q.received[k][0]), roundi(q.received[k][1])]
@@ -555,6 +565,7 @@ func _on_level_completed() -> void:
 	if not _someone_fell: Achievements.add(Saves.current, "flawless")
 	if args.get_bool("log"): print("NIVEL SUPERADO %s t=%d s  abatidos=%d  dólares=%d  nivel_j1=%d  vida_min=%d" % [level.id, director.time, kills, run_money, player.progress.level, roundi(maxf(player.min_hp, 0.0) * 100)])
 	if args.get_bool("log"): for q in players: print("ESTADISTICAS J%d %s" % [q.index + 1, world.stats_of(q.index)])
+	if args.get_bool("log"): _log_players()
 	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)):
 		Saves.current.levels_won.append(String(level.id))
 	_check_achievements.call_deferred()              # después de contar la baja del enemigo final (élite)

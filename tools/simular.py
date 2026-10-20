@@ -8,7 +8,9 @@ resultado (15-10-2026). Lanza varias partidas a la vez, cada una en su ventana p
             --char dyer, --extra "clave=valor ..."
 
 Imprime cada final ("SUPERADO p1_n2 t=…" / "DERROTA p1_n3 t=…") y un resumen por nivel:
-intentos, superados y en qué segundo se cae. Con `--json salida.json` guarda los datos.
+intentos, superados y en qué segundo se cae. En cooperativo, también cada jugador por nivel
+(20-10-2026): nivel medio, vida más baja media y caídas (línea "JUGADORES" de la partida).
+Con `--json salida.json` guarda los datos.
 """
 import subprocess, sys, re, json, time, threading, os, collections
 
@@ -30,6 +32,7 @@ if '--char' in args: cmd += ['character=' + opt('--char', 'dyer')]
 cmd += opt('--extra', '').split()
 
 results = []
+players = collections.defaultdict(list)   # (nivel, 'J2') -> [(nv, vida_min, caídas)]
 lock = threading.Lock()
 
 def run(k):
@@ -42,6 +45,12 @@ def run(k):
         if m: ev.append(('SUPERADO', m.group(1), int(m.group(2)), int(m.group(3)), int(m.group(4) or -1)))
         m = re.match(r'FIN DERROTA (\S+) t=(\d+) abatidos=(\d+) nivel_j1=(\d+)', line)
         if m: ev.append(('DERROTA', m.group(1), int(m.group(2)), int(m.group(4))))
+        m = re.match(r'JUGADORES (\S+)  (.*)', line)
+        if m:
+            with lock:
+                for part in m.group(2).split(' | '):
+                    pm = re.match(r'(J\d) nv=(\d+) vida_min=(-?\d+) caidas=(\d+)', part)
+                    if pm: players[(m.group(1), pm.group(1))].append((int(pm.group(2)), int(pm.group(3)), int(pm.group(4))))
         m = re.match(r'RECIBIDO J1 (.*)', line)
         if m: print('   recibido:', m.group(1), flush=True)
         m = re.match(r'ESTADISTICAS J1 (.*)', line)
@@ -67,5 +76,16 @@ for ev in results:
 print('\nnivel     superados  caídas (s)')
 for lv in sorted(tries):
     print('%-9s %2d / %-4d %s' % (lv, wins[lv], tries[lv], ' '.join(str(x) for x in sorted(falls[lv]))))
+if len({j for _, j in players}) > 1:
+    print('\nnivel     jugador  nivel medio  vida mín. media  caídas  (n)')
+    for lv, j in sorted(players):
+        rows = players[(lv, j)]
+        print('%-9s %-8s %11.1f  %14.0f %%  %6d  (%d)' % (lv, j, sum(r[0] for r in rows) / len(rows),
+              sum(r[1] for r in rows) / len(rows), sum(r[2] for r in rows), len(rows)))
+    print('\njugador  vida mín. media  caídas (todos los niveles)')
+    for j in sorted({j for _, j in players}):
+        rows = [r for (lv, jj), rr in players.items() if jj == j for r in rr]
+        print('%-8s %14.0f %%  %6d' % (j, sum(r[1] for r in rows) / len(rows), sum(r[2] for r in rows)))
 if '--json' in args:
-    json.dump(results, open(opt('--json', 'sim.json'), 'w'), ensure_ascii=False, indent=1)
+    json.dump({'results': results, 'players': {'%s %s' % k: v for k, v in players.items()}},
+              open(opt('--json', 'sim.json'), 'w'), ensure_ascii=False, indent=1)
