@@ -15,11 +15,11 @@ Consúltalos cuando haga falta (son largos):
 
 ## Estado actual (resumen)
 
-*Actualizado: 17-10-2026.* El detalle de cada fase e hito (qué se hizo, archivos, opciones de prueba, equilibrio, rendimiento y capturas) está en **`docs/ESTADO.md`**: búscalo ahí antes de tocar un sistema. Al terminar un cambio, apunta el detalle en `docs/ESTADO.md` y, si cambia el panorama, actualiza este resumen. Las lecciones técnicas están en **`docs/LECCIONES.md`**.
+*Actualizado: 20-10-2026.* El detalle de cada fase e hito (qué se hizo, archivos, opciones de prueba, equilibrio, rendimiento y capturas) está en **`docs/ESTADO.md`**: búscalo ahí antes de tocar un sistema. Al terminar un cambio, apunta el detalle en `docs/ESTADO.md` y, si cambia el panorama, actualiza este resumen. Las lecciones técnicas están en **`docs/LECCIONES.md`**.
 
 - **Fases 0 y 1:** hechas (falta la partida de 5 minutos del autor).
 - **Fase 2 (menús, guardado y cooperativo local, hitos 2.1 a 2.17):** hecha. Falta la prueba del autor con varios mandos para cerrarla.
-- **Fase 3 (pipeline de contenido):** en curso. Evoluciones de las 50 armas hechas; contenido por datos (cómo añadir un enemigo sin tocar código: ver `docs/ESTADO.md`).
+- **Fase 3 (pipeline de contenido):** hecha (20-10-2026). Evoluciones de las 50 armas, contenido por datos (cómo añadir un enemigo sin tocar código: ver `docs/ESTADO.md`) y generador de escenarios (`tools/arena_kit.py`).
 - **Fase 4 (parte 1, Antártida, niveles 1-5 y el shoggoth primigenio):** hecha, falta la partida del autor.
 - **Fase 5 (intro, relatos, tienda, Armitage y West):** hecha, pendiente de revisión. 13 personajes, 15 compañeros.
 - **Fase 6 (parte 2, Innsmouth, hasta Padre Dagon):** hecha, falta la partida del autor.

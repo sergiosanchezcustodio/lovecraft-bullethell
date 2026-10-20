@@ -18,7 +18,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 0 | Documentación y decisiones | **Hecha** (24-09-2026) | — |
 | 1 | Prototipo jugable (*vertical slice*) | **Hecha** (26-09-2026; queda tu partida de 5 minutos como comprobación) | Ninguna (D-02, D-03, D-05, D-14, D-15 y D-16, resueltas) |
 | 2 | Menús, guardado y cooperativo local | **Hecha** salvo tu prueba con varios mandos (2.17) | Ninguna (D-07, D-16 a D-18 y D-22 a D-25, resueltas) |
-| 3 | Pipeline de contenido | **En curso** (03-10-2026): D-06 resuelta; enemigos, niveles y animaciones por datos | Ninguna |
+| 3 | Pipeline de contenido | **Hecha** (20-10-2026): enemigos, armas, evoluciones (D-06), niveles, patrones, animaciones y escenarios por datos | Ninguna |
 | 4 | Parte 1 completa | **Hecha** salvo tu partida (04-10-2026) | Ninguna (D-04 y D-19, resueltas) |
 | 5 | Arranque, relatos y ampliación de la tienda | **Hecha** salvo tu revisión (08-10-2026) | Ninguna |
 | 6 | Parte 2 completa | **Plan aprobado** (06-10-2026) | Ninguna (D-13 y jefes colosales, resueltas) |
@@ -114,6 +114,8 @@ Ampliada el 26-09-2026: adelanta de la fase 5 el guardado, el menú principal, l
 Sistema de datos para enemigos, armas, oleadas y niveles. Generador de escenarios voxel. Patrones de balas reutilizables. Comando para previsualizar cualquier enemigo con sus animaciones.
 
 **Aceptación:** añadir un enemigo nuevo solo requiere su generador y su archivo de datos, sin tocar el código de los sistemas.
+
+Hecha el 20-10-2026. Se cumple la aceptación: el Profundo se añadió solo con datos (03-10-2026) y las fases 4, 6 y 7 sumaron sus enemigos igual (50 en `data/enemies/`), validados por `tests/test_content.gd`. Las evoluciones de las 50 armas salen de `tools/gen_evoluciones.gd`; el generador de escenarios general (`tools/arena_kit.py`) llegó en el hito 4.1; `still` y `anim` previsualizan cualquier modelo con sus animaciones.
 
 ## Fase 4: Parte 1 completa (*En las montañas de la locura*)
 
