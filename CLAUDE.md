@@ -26,6 +26,7 @@ Consúltalos cuando haga falta (son largos):
 - **Fase 7 (parte 3, La llamada de Cthulhu, hasta Cthulhu):** hecha, falta la partida del autor.
 - **Fase 8 (pulido y distribución):** en curso. Sonido, música provisional, accesibilidad y builds de Windows y macOS hechas; falta subir a itch.io (necesita la cuenta del autor). 50 armas y 50 objetos (D-38).
 - **Trabajo reciente (09-10 a 17-10-2026), pendiente de revisión:** dificultad (Investigador, Normal, Pesadilla) y equilibrio con `SmartBot` y `tools/simular.py`; efectos de armas en cubitos (`VoxelFx`); escenarios rehechos con más resolución (`arte=v1` enseña la versión anterior); ambiente vivo en los 15 escenarios (`data/ambient.json`, `Ambient`); tienda con 15 objetos más; revisión de arte dentro del juego (`review/peticiones.json`, `tools/vigilar_revision.py`).
+- **Subidas de nivel por turnos en cooperativo (D-39, 20-10-2026), pendiente de prueba con varios mandos:** experiencia común, sube un jugador cada vez (`TeamXp.turn`), ventana centrada con su color; los bots eligen sin pausar.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
 
 ### Reglas que no hay que olvidar

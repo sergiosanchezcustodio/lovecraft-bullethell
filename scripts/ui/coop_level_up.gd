@@ -1,11 +1,13 @@
 class_name CoopLevelUp
 extends CanvasLayer
 ## Subida de nivel (D-16), en solitario y en cooperativo: la partida se pausa y cada jugador
-## que sube elige su mejora con su propio mando o teclado. En cooperativo, cada uno en su
-## cuadrante (J1 arriba a la izquierda, J2 arriba a la derecha, J3 abajo a la izquierda, J4
-## abajo a la derecha) y a la vez; en solitario, una ventana centrada y más grande. Los bots
-## eligen solos. Al elegir, su panel queda marcado; cuando han elegido todos, se cierra.
-## `pick` (Callable(player, option)) aplica cada elección en cuanto se hace.
+## que sube elige su mejora con su propio mando o teclado. La partida la abre siempre con un
+## solo jugador, en la ventana centrada (`solo`); en cooperativo las subidas van por turnos
+## (D-39) y la ventana lleva el color de quien elige (entrada "accent"). Con varias entradas,
+## cada una va en su cuadrante (J1 arriba a la izquierda, J2 arriba a la derecha, J3 abajo a
+## la izquierda, J4 abajo a la derecha) y eligen a la vez: así era el cooperativo hasta el
+## 20-10-2026. Los bots eligen solos. Al elegir, su panel queda marcado; cuando han elegido
+## todos, se cierra. `pick` (Callable(player, option)) aplica cada elección en cuanto se hace.
 ##
 ## Navegación (30-09-2026): arriba/abajo con el stick, la cruceta o las flechas, repitiendo al
 ## mantener. La cruceta abajo es también "mapa" (InputBindings.MAP), por eso JoypadInput no la
@@ -23,7 +25,7 @@ extends CanvasLayer
 
 signal finished
 
-var entries: Array[Dictionary] = []          ## {player, options, title}
+var entries: Array[Dictionary] = []          ## {player, options, title, attr?, accent?}
 var pick: Callable
 var solo := false
 var _pickers: Array[Picker] = []
@@ -56,9 +58,10 @@ func _ready() -> void:
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(dim)
 	for e in entries:
-		var pk := Picker.new(e.player, e.options, e.title, solo, String(e.get("attr", "")), filler())
-		pk.clicked.connect(func(i: int) -> void:
-			if _t >= INPUT_DELAY and not pk.done: _choose(pk, i))
+		var pk := Picker.new(e.player, e.options, e.title, solo, String(e.get("attr", "")), filler(),
+			e.get("accent", Color.TRANSPARENT))
+		pk.clicked.connect(func(i: int) -> void:      # el ratón, solo para quien juega con teclado
+			if _t >= INPUT_DELAY and not pk.done and _uses_keyboard(pk.player.input): _choose(pk, i))
 		add_child(pk)
 		_pickers.append(pk)
 
@@ -174,7 +177,7 @@ class Picker extends PanelContainer:
 	var _solo := false
 
 	func _init(p: Player, p_options: Array[PlayerProgress.Option], title: String, solo := false,
-			attr := "", p_filler: Array[Dictionary] = []) -> void:
+			attr := "", p_filler: Array[Dictionary] = [], p_accent := Color.TRANSPARENT) -> void:
 		player = p
 		options = p_options
 		_attr = attr
@@ -190,7 +193,7 @@ class Picker extends PanelContainer:
 			anchor_right = qx * 0.5 + 0.46
 			anchor_top = 0.15 if qy == 0 else 0.52
 			anchor_bottom = 0.48 if qy == 0 else 0.85
-		var accent := UiKit.XP if solo else p.color
+		var accent := p_accent if p_accent.a > 0.0 else (UiKit.XP if solo else p.color)
 		add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.92), Color(accent, 0.8), 10))
 		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 12 if solo else 6)
@@ -261,7 +264,7 @@ class Picker extends PanelContainer:
 			card.gui_input.connect(func(ev: InputEvent) -> void:
 				if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT: clicked.emit(i))
 			card.mouse_entered.connect(func() -> void:
-				if not done:
+				if not done and (player == null or CoopLevelUp._uses_keyboard(player.input)):
 					cursor = i
 					_paint())
 			box.add_child(card)

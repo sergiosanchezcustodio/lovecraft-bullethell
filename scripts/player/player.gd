@@ -121,6 +121,7 @@ func setup(p_data: CharacterData, p_input: PlayerInput, p_color: Color) -> Playe
 	motor = PlayerMotor.new(data)
 	rules = load("res://data/progression/default.tres")
 	progress = PlayerProgress.new(rules)
+	progress.color = color
 	progress.leveled_up.connect(func(_l: int) -> void: gain_attribute())
 	rebuild_stats()
 	health = data.max_health

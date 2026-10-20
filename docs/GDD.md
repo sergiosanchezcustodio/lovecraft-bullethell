@@ -106,7 +106,7 @@ Todas las acciones se pueden reasignar desde el menú de opciones.
 - **Conexión en caliente:** si un mando se desconecta, su personaje queda en pausa y protegido hasta que se reconecte o el jugador abandone.
 - **Pausas y menús personales (D-16):** en solitario, cualquier menú pausa. En cooperativo solo pausan dos cosas:
   - *Start:* pausa la partida para todos.
-  - *Subida de nivel:* pausa para todos. Cada jugador elige su mejora a la vez en su cuadrante y la partida se reanuda cuando todos han elegido.
+  - *Subida de nivel:* va por turnos (D-39). Cuando le toca a una persona, la partida se pausa para todos y elige en la ventana del centro, con su color. La subida de un bot no pausa: se anuncia lo que coge.
   - *Ficha y mapa en cooperativo:* se abren y se cierran con su botón (no se mantienen pulsados) en el cuadrante del jugador, semitransparentes y sin pausar ni bloquear a los demás. El personaje sigue controlable mientras están abiertos. Si la ficha tiene páginas, se pasan con los gatillos superiores.
 - **Capa de entrada:** los personajes nunca leen `Input` directamente; reciben acciones de una capa de abstracción por jugador. Imprescindible para el cooperativo local y deja preparado el online.
 
@@ -215,7 +215,7 @@ Cuando la cordura llega a cero, el personaje sufre una crisis temporal de 4–6 
 - Sin fuego amigo. Única excepción: la paranoia, cuyos disparos restan cordura a los compañeros (D-17).
 - **Reanimación:** un jugador con la vida a cero queda derribado un tiempo; un compañero lo reanima quedándose junto a él. Si nadie lo hace, queda eliminado hasta el siguiente nivel.
 - La dificultad escala con el número de jugadores (vida de los enemigos y densidad de aparición), con valores por datos.
-- **Experiencia compartida (D-07):** la que recoge cualquier jugador cuenta para todos. Todos suben de nivel a la vez y cada uno elige su propia mejora. La curva de experiencia escala con el número de jugadores, por datos.
+- **Experiencia compartida (D-07) y subidas por turnos (D-39):** la que recoge cualquier jugador va a una barra común. Cada vez que se llena sube un solo jugador, por turnos (J1, J2, J3, J4 y vuelta a empezar), y solo él elige mejora y gana el punto de atributo. Cada subida cuesta según el nivel de quien tiene el turno, multiplicado por un factor según los jugadores (por datos), de forma que cada jugador mejora al mismo ritmo que si subieran todos a la vez. La barra lleva el color de quien sube la próxima vez. Los derribados y los eliminados también eligen en su turno.
 
 ### 4.7 Muerte y recuperación
 - Con la vida a cero, el personaje queda **derribado** (sección 4.6).
@@ -567,6 +567,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-35 | Un rasgo por personaje | Fase 2 | **Resuelta** |
 | D-36 | Quince compañeros | Fase 2 | **Resuelta** |
 | D-37 | Reglas de daño de las armas | Fase 2 | **Resuelta** |
+| D-39 | Subidas de nivel por turnos en cooperativo | Fase 2 | **Resuelta** |
 
 D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherencias y huecos detectados al redactar este documento (sección 13). Las decisiones bloqueantes de las fases 1 y 2 se resolvieron el 24-09-2026.
 
@@ -580,7 +581,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
   *Resuelta:* lo decide cada arma en sus datos, con "al más cercano" por defecto. Sin opción de jugador de momento.
 - **D-06 — Evoluciones de armas.** ¿Combinaciones de arma y pasiva al estilo "survivors"?
 - **D-07 — Experiencia en cooperativo.** ¿Individual o compartida?
-  *Resuelta:* compartida. Todos suben de nivel a la vez y cada uno elige su mejora. Curva escalada por número de jugadores.
+  *Resuelta:* compartida. Curva escalada por número de jugadores. Desde el 20-10-2026 se sube por turnos (D-39); antes subían todos a la vez y cada uno elegía su mejora.
 - **D-08 — Cordura.** Resuelta: se incluye. Quedan por ajustar los valores numéricos.
 - **D-09 — Desbloqueos.** ¿Hay desbloqueos permanentes (personajes, armas)? ¿El modo *Por partes* exige haber llegado antes a esa parte en la campaña?
   *Resuelta (25-09-2026):* progresión permanente con tienda, como en Extremadura Survivors (sección 8.1). La subida de nivel dentro de la partida sigue empezando de cero en cada partida. Queda por concretar si *Por partes* exige haber llegado a esa parte.
@@ -594,7 +595,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
 - **D-15 — Renderizador.** El proyecto usa Compatibility, elegido para capturar sin GPU. ¿Se mantiene o se pasa a Forward+?
   *Resuelta:* Forward+. El cambio se hace en la fase 1, revisando el aspecto de los modelos. Compatibility queda como reserva por línea de comandos, y la prueba de carga mide los dos.
 - **D-16 — Pausas y menús personales.** ¿Se pausa la partida al elegir mejora, abrir la ficha o el mapa, en solitario y en cooperativo? ¿Qué pasa con el personaje de quien tiene el menú abierto?
-  *Resuelta:* en solitario, todo menú pausa. En cooperativo solo pausan Start y la subida de nivel, en la que todos eligen a la vez. Ficha y mapa se abren y cierran sin pausa y con el personaje controlable (sección 3.2).
+  *Resuelta:* en solitario, todo menú pausa. En cooperativo solo pausan Start y la subida de nivel de una persona (por turnos desde D-39; antes todos elegían a la vez, cada uno en su cuadrante). Ficha y mapa se abren y cierran sin pausa y con el personaje controlable (sección 3.2).
 - **D-17 — Paranoia.** La especificación dice "sin fuego amigo", pero la paranoia hace que las armas apunten a los compañeros con daño reducido.
   *Resuelta:* los disparos del paranoico restan cordura, no vida, con daño muy reducido (dato). Es la única excepción a "sin fuego amigo". *A vigilar en las pruebas de la fase 2:* el riesgo de crisis en cadena entre jugadores.
 - **D-18 — Personajes en la fase 2.** El cooperativo llega en la fase 2, pero la selección de personaje llega en la fase 5 y la fase 1 solo modela a Dyer. ¿Con qué juegan los jugadores 2 a 4?
@@ -633,6 +634,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
 - **D-06 (ampliación, 09-10-2026).** Todas las armas evolucionan, cada una con un objeto distinto (los 50 se usan una vez), rindiendo 1,4 veces su nivel 5. Lista y cambios en `tools/gen_evoluciones.gd`.
 - **D-37 — Reglas de daño de las armas (03-10-2026).** *Resuelta:* cada arma parte de un mismo daño por segundo a un solo objetivo (nivel 1, si todo acierta; 14, la mediana del arsenal) multiplicado por sus rasgos: corto alcance ×1,3 y largo ×0,85; un objetivo ×1,15 y área ×0,8; un proyectil ×1,15 y varios ×0,85; cadencia baja ×1,2 y alta ×0,85; cuesta cordura ×1,2 (vida o esquive ×1,3); teledirigida ×0,8 y al azar ×1,15; control (aturde, inmoviliza, atrae, congela, frena, debilita, hace vulnerable o levanta aliados) ×0,6. Las de puro apoyo (bengalas, red, resonador, polvo) quedan fuera. `DamageRules` lo calcula, `tools/reglas_dano.gd` lo aplica y un test admite ±15 %.
 - **D-38 — Arsenal III y 50 objetos (09-10-2026).** *Resuelta (hecha en los hitos 8.6 a 8.9):* 16 armas nuevas (5.4) y 45 objetos nuevos (5.5), hasta 50 y 50. Los objetos pasan de cambiar una estadística a ser modificadores generales que leen todas las armas, con disparadores (al abatir, al impactar, al esquivar). Iconos con Replicate en el estilo de los actuales.
+- **D-39 — Subidas de nivel por turnos en cooperativo (20-10-2026).** *Resuelta:* como en Vampire Survivors, la experiencia sigue siendo común, pero cada vez que se llena la barra sube un solo jugador, por turnos. Solo él elige mejora, en la ventana del centro con su color, y gana el punto de atributo y los efectos de subir (curaciones de Whipple y West, el compañero). Cada subida cuesta según el nivel de quien tiene el turno (cada uno sigue su curva); el factor por jugadores pasa de ×1,5, ×1,9 y ×2,3 a ×0,75, ×0,63 y ×0,58 (lo de antes entre N), para que cada uno mejore al mismo ritmo. Los derribados y los eliminados eligen igualmente. La subida de un bot no pausa la partida. El turno pasa al siguiente nivel de la parte. Motivos: un solo menú grande que se lee mejor y que los demás ven, pausas sin esperar al más lento, y más sencillo para el online (fase 9).
 - **D-19 — Pasivos sin mecánica.** El pasivo de Dyer (frío y ralentización) y el de Johansen (inmunidad al empuje) dependen de efectos sobre el jugador que no están definidos, y el de Legrasse necesita saber si los híbridos de Innsmouth cuentan como "enemigos humanos". *Resuelta (03-10-2026):* D-35 quitó los de Dyer y Johansen. Para Legrasse llevan la etiqueta `humana` los cultistas, los habitantes de Innsmouth, los acólitos de la Orden de Dagon y los híbridos que aún andan entre los hombres (hasta los híbridos avanzados); los Profundos completos y las criaturas, no.
 
 ---

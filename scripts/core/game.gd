@@ -412,15 +412,14 @@ func earn(amount: int) -> void:
 
 ## Subida de nivel: pausa y elige una de tres mejoras (D-16). Si hay varias subidas
 ## pendientes, se encadenan.
-## En solitario, el menú de siempre en el centro. En cooperativo (D-16), todos los que suben
-## eligen a la vez, cada uno en su cuadrante (CoopLevelUp); los bots eligen solos.
+## En cooperativo (D-39), las subidas van por turnos (TeamXp): sube un jugador cada vez, que
+## elige solo en la ventana del centro, con su color, mientras los demás esperan. Si varios
+## tienen subidas pendientes (Diario de expedición, depuración), eligen uno tras otro, por
+## orden. Los bots eligen solos sin parar la partida y se anuncia lo que han cogido.
 func _open_level_up() -> void:
 	if _menu_open or _ended or _pause != null: return
 	if args.get_bool("nolevelup"):                   # banco de armas (tools/banco_armas.py): sin mejoras
 		for q in players: q.progress.pending = 0
-		return
-	if players.size() > 1:
-		_open_coop_level_up()
 		return
 	var q: Player = null
 	for c in players:
@@ -433,53 +432,29 @@ func _open_level_up() -> void:
 		q.progress.pending = 0
 		_open_level_up.call_deferred()
 		return
+	var coop := players.size() > 1
 	if args.get_bool("autopick") or _is_bot(q):
 		var pick: PlayerProgress.Option = options[0] if not _is_bot(q) else options[_rng.randi() % options.size()]
 		if q.input is SmartBot: pick = SmartBot.pick(options, q, _rng)
 		q.progress.choose(pick, q)
+		if coop and not args.get_bool("autopick"): announce("J%d · %s: %s" % [q.index + 1, q.data.display_name, pick.title()], 1.6)
 		_open_level_up.call_deferred()
 		return
 	_menu_open = true
 	get_tree().paused = true
 	var title := "Nivel %d" % (q.progress.level - q.progress.pending + 1)
-	if players.size() > 1: title = "J%d · %s · %s" % [q.index + 1, q.data.display_name, title]
+	if coop: title = "Turno de J%d · %s · %s" % [q.index + 1, q.data.display_name, title]
 	var attr := "" if q.progress.attr_gains.is_empty() else String(q.progress.attr_gains[0])  # D-27: lo enseña el rodillo
-	# la misma ventana que en cooperativo, centrada (antes, Menus.LevelUpMenu: fila de botones
-	# con el foco de Godot, que con el mando no bajaba y a ratos no respondía)
-	var menu := CoopLevelUp.new([{"player": q, "options": options, "title": title, "attr": attr}] as Array[Dictionary],
+	# la misma ventana en solitario y en cooperativo, centrada (antes, Menus.LevelUpMenu: fila de
+	# botones con el foco de Godot, que con el mando no bajaba y a ratos no respondía)
+	var entry := {"player": q, "options": options, "title": title, "attr": attr}
+	if coop: entry["accent"] = q.color
+	var menu := CoopLevelUp.new([entry] as Array[Dictionary],
 		func(pq: Player, o: PlayerProgress.Option) -> void: pq.progress.choose(o, pq), true)
 	menu.finished.connect(func() -> void:
 		_menu_open = false
 		get_tree().paused = false
 		_open_level_up.call_deferred())
-	add_child(menu)
-
-func _open_coop_level_up() -> void:
-	var entries: Array[Dictionary] = []
-	for q in players:
-		if q.progress.pending <= 0: continue
-		var options := q.progress.roll_options(q.weapons, _rng)
-		if options.is_empty():
-			q.progress.pending = 0
-			continue
-		var title := "J%d · Nivel %d" % [q.index + 1, q.progress.level - q.progress.pending + 1]
-		var attr := "" if q.progress.attr_gains.is_empty() else String(q.progress.attr_gains[0])
-		entries.append({"player": q, "options": options, "title": title, "attr": attr})
-	if entries.is_empty(): return
-	if args.get_bool("autopick") or entries.all(func(e: Dictionary) -> bool: return _is_bot(e.player)):
-		for e in entries:
-			var ep: Player = e.player
-			var o: PlayerProgress.Option = SmartBot.pick(e.options, ep, _rng) if ep.input is SmartBot else e.options[_rng.randi() % e.options.size()]
-			ep.progress.choose(o, ep)
-		_open_level_up.call_deferred()
-		return
-	_menu_open = true
-	get_tree().paused = true
-	var menu := CoopLevelUp.new(entries, func(q: Player, o: PlayerProgress.Option) -> void: q.progress.choose(o, q))
-	menu.finished.connect(func() -> void:
-		_menu_open = false
-		get_tree().paused = false
-		_open_level_up.call_deferred())                # quedan subidas (varios niveles de golpe)
 	add_child(menu)
 
 func toggle_pause() -> void:
@@ -638,7 +613,7 @@ func _apply_carry() -> void:
 		for q in players:
 			if q.index < GameSession.carry.size(): GameSession.restore(q, GameSession.carry[q.index])
 		if team != null:
-			team.level = player.progress.level
+			team.turn = GameSession.team_turn % players.size()
 			team.xp = GameSession.team_xp
 		return
 	var stage := Campaign.number_of(String(level.id))
@@ -651,7 +626,6 @@ func _apply_carry() -> void:
 		q.progress.pending = 0
 		q.rebuild_stats()
 		q.health = q.data.max_health
-	if team != null: team.level = player.progress.level
 
 ## Lo que la tienda da al empezar (17-10-2026). Al empezar una parte (sin progreso que venga
 ## del nivel anterior): un objeto al azar (Mochila del expedicionario) y una segunda arma al
@@ -671,13 +645,13 @@ func _shop_start() -> void:
 				if not ws.is_empty(): q.weapons.add_weapon(ws[_rng.randi() % ws.size()])
 	elif float(shop_bonus.get("head_start", 0.0)) > 0.0:
 		for q in players: q.progress.gain_level()
-		if team != null: team.level = player.progress.level
 
 ## Siguiente nivel de la parte: el progreso de cada jugador pasa con él (GameSession.carry).
 func _next_level(id: String) -> void:
 	GameSession.carry.clear()
 	for q in players: GameSession.carry.append(GameSession.snapshot(q))
 	GameSession.team_xp = team.xp if team != null else 0.0
+	GameSession.team_turn = team.turn if team != null else 0
 	GameSession.level = StringName(id)
 	Saves.save()
 	get_tree().paused = false

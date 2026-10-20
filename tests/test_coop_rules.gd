@@ -1,6 +1,6 @@
 extends GutTest
-## Reglas del cooperativo (hito 2.10): experiencia compartida, reanimación, escalado de la
-## dificultad y subida de nivel por cuadrante.
+## Reglas del cooperativo (hito 2.10): experiencia compartida con subidas por turnos (D-39),
+## reanimación, escalado de la dificultad y subida de nivel por cuadrante.
 
 const DT := 1.0 / 60.0
 var world: CombatWorld
@@ -20,18 +20,51 @@ func _player(id: String, pos: Vector3, i: int = 0) -> Player:
 	p.add_child(p.weapons)
 	return p
 
-func test_la_experiencia_es_de_todos_y_suben_a_la_vez() -> void:
+func test_la_experiencia_es_de_todos_y_se_sube_por_turnos() -> void:
 	var rules: ProgressionData = load("res://data/progression/default.tres")
 	var a := PlayerProgress.new(rules)
 	var b := PlayerProgress.new(rules)
 	var team := TeamXp.new(rules, [a, b] as Array[PlayerProgress])
-	assert_almost_eq(team.xp_to_next(), rules.xp_to_next(1) * rules.coop_xp(2), 0.001, "curva más larga")
-	a.add_xp(team.xp_to_next() + 0.1)              # la recoge uno solo
+	assert_almost_eq(team.xp_to_next(), rules.xp_to_next(1) * rules.coop_xp(2), 0.001)
+	assert_eq(team.next(), a, "empieza J1")
+	b.add_xp(team.xp_to_next() + 0.1)              # la recoge el J2, pero el turno es del J1
 	assert_eq(a.level, 2)
-	assert_eq(b.level, 2, "sube también el otro")
+	assert_eq(b.level, 1, "el otro espera su turno")
 	assert_eq(a.pending, 1)
-	assert_eq(b.pending, 1)
-	assert_almost_eq(b.xp_fraction(), a.xp_fraction(), 0.0001)
+	assert_eq(b.pending, 0)
+	assert_eq(team.next(), b)
+	assert_almost_eq(b.xp_fraction(), a.xp_fraction(), 0.0001, "la barra es común")
+	a.add_xp(team.xp_to_next())
+	assert_eq(b.level, 2, "ahora sube el J2")
+	assert_eq(team.next(), a, "y vuelve al J1")
+
+func test_cada_subida_cuesta_segun_el_nivel_de_quien_tiene_el_turno() -> void:
+	var rules: ProgressionData = load("res://data/progression/default.tres")
+	var a := PlayerProgress.new(rules)
+	var b := PlayerProgress.new(rules)
+	var team := TeamXp.new(rules, [a, b] as Array[PlayerProgress])
+	a.level = 6                                    # p. ej. con el Diario de expedición
+	assert_almost_eq(team.xp_to_next(), rules.xp_to_next(6) * rules.coop_xp(2), 0.001)
+	team.turn = 1
+	assert_almost_eq(team.xp_to_next(), rules.xp_to_next(1) * rules.coop_xp(2), 0.001)
+
+func test_cada_jugador_mejora_al_ritmo_de_antes() -> void:
+	# antes subían todos a la vez con la curva ×1,5, ×1,9 y ×2,3; ahora uno por turno: entre N
+	var rules: ProgressionData = load("res://data/progression/default.tres")
+	var before := [1.0, 1.5, 1.9, 2.3]
+	for n in range(1, 5):
+		assert_almost_eq(rules.coop_xp(n) * n, before[n - 1], 0.05, "%d jugadores" % n)
+
+func test_la_barra_lleva_el_color_de_quien_sube() -> void:
+	var rules: ProgressionData = load("res://data/progression/default.tres")
+	var a := PlayerProgress.new(rules)
+	var b := PlayerProgress.new(rules)
+	a.color = Color.RED
+	b.color = Color.BLUE
+	var team := TeamXp.new(rules, [a, b] as Array[PlayerProgress])
+	assert_eq(b.xp_color(), Color.RED)
+	team.add(team.xp_to_next())
+	assert_eq(a.xp_color(), Color.BLUE)
 
 func test_un_companero_al_lado_reanima_al_derribado() -> void:
 	var down := _player("dyer", Vector3.ZERO, 0)

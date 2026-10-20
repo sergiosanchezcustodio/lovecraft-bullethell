@@ -8,8 +8,10 @@ extends Resource
 @export var magnet_speed := 11.0           ## velocidad de las gemas al volar (m/s); el radio es del personaje
 @export var options_per_level := 3
 @export_group("Cooperativo")
-## Curva de experiencia compartida según los jugadores (1, 2, 3, 4): la del nivel por esto (D-07).
-@export var coop_xp_scale: Array[float] = [1.0, 1.5, 1.9, 2.3]
+## Coste de cada subida en cooperativo según los jugadores (1, 2, 3, 4): la curva del nivel de
+## quien tiene el turno por esto (D-39). Sube uno por turno, así que es la de antes (×1,5, ×1,9,
+## ×2,3, cuando subían todos a la vez) entre N: cada jugador mejora al mismo ritmo que entonces.
+@export var coop_xp_scale: Array[float] = [1.0, 0.75, 0.63, 0.58]
 @export var down_time := 30.0              ## s derribado antes de quedar eliminado
 @export var revive_time := 3.0             ## s junto al derribado para levantarlo
 @export var revive_radius := 1.5           ## m a los que hay que estar

@@ -21,6 +21,7 @@ static var level := &"p1_n1"
 ## como empezó el nivel actual: "Reintentar" vuelve a él. Vacío: se empieza de cero.
 static var carry: Array = []
 static var team_xp := 0.0
+static var team_turn := 0                ## cooperativo: a quién le toca la próxima subida (D-39)
 
 static func is_set() -> bool:
 	return not seats.is_empty()
@@ -30,6 +31,7 @@ static func clear() -> void:
 	level = &"p1_n1"
 	carry.clear()
 	team_xp = 0.0
+	team_turn = 0
 
 ## Foto del progreso de un jugador para el siguiente nivel.
 static func snapshot(q: Player) -> Dictionary:

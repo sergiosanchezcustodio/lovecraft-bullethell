@@ -40,6 +40,7 @@ var team: TeamXp:
 	get: return _team_ref.get_ref() if _team_ref != null else null
 	set(v): _team_ref = weakref(v) if v != null else null
 var _team_ref: WeakRef
+var color := Color(0.18, 0.42, 0.78)      ## del jugador: la barra común se pinta con el de quien tiene el turno
 
 func _init(p_rules: ProgressionData) -> void:
 	rules = p_rules
@@ -66,6 +67,16 @@ func gain_level() -> void:
 func xp_fraction() -> float:
 	if team != null: return team.xp / team.xp_to_next()
 	return xp / xp_to_next()
+
+## Experiencia que falta para la próxima subida (la del equipo en cooperativo).
+func xp_missing() -> float:
+	if team != null: return team.xp_to_next() - team.xp
+	return xp_to_next() - xp
+
+## Color de la barra: en cooperativo, el de quien sube la próxima vez (D-39).
+func xp_color() -> Color:
+	if team != null and team.next() != null: return team.next().color
+	return color
 
 ## Hasta `n` opciones distintas y válidas: armas nuevas que aún no tiene, subir armas
 ## que no están al máximo y pasivas que no están al máximo.

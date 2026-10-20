@@ -117,8 +117,8 @@ func _build() -> void:
 		p.sanity = 0.0
 		_say("Cordura a cero: la crisis empieza al seguir jugando"))
 	_action("Subir un nivel", func() -> void:
-		p.progress.add_xp(p.progress.xp_to_next() - p.progress.xp + 0.01)
-		_say("Nivel %d: elegirás la mejora al seguir jugando" % p.progress.level))
+		p.progress.add_xp(p.progress.xp_missing() + 0.01)       # en cooperativo, sube quien tenga el turno
+		_say("Subida de nivel: la mejora se elige al seguir jugando"))
 
 	_header("Armas")
 	for wd: WeaponData in DebugOptions.list_resources("res://data/weapons"):

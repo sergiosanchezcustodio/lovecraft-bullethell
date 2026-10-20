@@ -261,6 +261,7 @@ class PlayerPanel extends PanelContainer:
 		_health.value = p.health / d.max_health
 		_sanity.value = p.sanity / d.max_sanity
 		_xp.value = p.progress.xp_fraction()
+		_xp.fill = p.progress.xp_color()                 # cooperativo: color de quien sube la próxima vez
 		_level_lbl.text = "Nv. %d" % p.progress.level
 		_dodge.value = p.motor.dodge_ready_fraction()
 		var key := ""
@@ -285,10 +286,11 @@ class PlayerPanel extends PanelContainer:
 		modulate = Color(0.55, 0.55, 0.6, 0.8) if down else Color.WHITE
 
 
-## Experiencia en 10 casillas en relieve: llenas en azul, la que se está llenando a medias y
-## las demás claras y apagadas.
+## Experiencia en 10 casillas en relieve: llenas en azul (en cooperativo, del color de quien
+## sube la próxima vez), la que se está llenando a medias y las demás claras y apagadas.
 class LevelCells extends Control:
 	var value := 0.0                            ## 0..1
+	var fill := FILL
 	var _shown := 0.0
 	const N := 10
 	const FILL := Color(0.18, 0.42, 0.78)
@@ -307,7 +309,7 @@ class LevelCells extends Control:
 			var r := Rect2(Vector2(i * (w + gap), 0), Vector2(w, size.y))
 			var f := clampf(_shown * N - i, 0.0, 1.0)
 			_cell(r, EMPTY)
-			if f > 0.0: _cell(Rect2(r.position, Vector2(r.size.x * f, r.size.y)), FILL)
+			if f > 0.0: _cell(Rect2(r.position, Vector2(r.size.x * f, r.size.y)), fill)
 
 	## Casilla en relieve: canto claro arriba y a la izquierda, oscuro abajo y a la derecha.
 	func _cell(r: Rect2, c: Color) -> void:
