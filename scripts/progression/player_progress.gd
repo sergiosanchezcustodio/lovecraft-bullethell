@@ -73,6 +73,10 @@ func xp_missing() -> float:
 	if team != null: return team.xp_to_next() - team.xp
 	return xp_to_next() - xp
 
+## ¿Sube este jugador la próxima vez? (solo en cooperativo)
+func is_next() -> bool:
+	return team != null and team.next() == self
+
 ## Color de la barra: en cooperativo, el de quien sube la próxima vez (D-39).
 func xp_color() -> Color:
 	if team != null and team.next() != null: return team.next().color

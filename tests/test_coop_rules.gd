@@ -65,6 +65,9 @@ func test_la_barra_lleva_el_color_de_quien_sube() -> void:
 	assert_eq(b.xp_color(), Color.RED)
 	team.add(team.xp_to_next())
 	assert_eq(a.xp_color(), Color.BLUE)
+	assert_true(b.is_next(), "el marco va a quien sube la próxima vez")
+	assert_false(a.is_next())
+	assert_false(PlayerProgress.new(rules).is_next(), "en solitario, sin marco")
 
 func test_un_companero_al_lado_reanima_al_derribado() -> void:
 	var down := _player("dyer", Vector3.ZERO, 0)

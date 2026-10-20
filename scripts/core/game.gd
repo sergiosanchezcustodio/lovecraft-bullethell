@@ -416,6 +416,7 @@ func earn(amount: int) -> void:
 ## elige solo en la ventana del centro, con su color, mientras los demás esperan. Si varios
 ## tienen subidas pendientes (Diario de expedición, depuración), eligen uno tras otro, por
 ## orden. Los bots eligen solos sin parar la partida y se anuncia lo que han cogido.
+const LEVEL_UP_COOP_SPEED := 1.6
 func _open_level_up() -> void:
 	if _menu_open or _ended or _pause != null: return
 	if args.get_bool("nolevelup"):                   # banco de armas (tools/banco_armas.py): sin mejoras
@@ -448,7 +449,9 @@ func _open_level_up() -> void:
 	# la misma ventana en solitario y en cooperativo, centrada (antes, Menus.LevelUpMenu: fila de
 	# botones con el foco de Godot, que con el mando no bajaba y a ratos no respondía)
 	var entry := {"player": q, "options": options, "title": title, "attr": attr}
-	if coop: entry["accent"] = q.color
+	if coop:
+		entry["accent"] = q.color
+		entry["speed"] = LEVEL_UP_COOP_SPEED            # más pausas que en solitario: rodillos más cortos
 	var menu := CoopLevelUp.new([entry] as Array[Dictionary],
 		func(pq: Player, o: PlayerProgress.Option) -> void: pq.progress.choose(o, pq), true)
 	menu.finished.connect(func() -> void:

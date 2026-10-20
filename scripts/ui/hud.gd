@@ -262,6 +262,7 @@ class PlayerPanel extends PanelContainer:
 		_sanity.value = p.sanity / d.max_sanity
 		_xp.value = p.progress.xp_fraction()
 		_xp.fill = p.progress.xp_color()                 # cooperativo: color de quien sube la próxima vez
+		_xp.mine = p.progress.is_next()                  # y su barra, enmarcada
 		_level_lbl.text = "Nv. %d" % p.progress.level
 		_dodge.value = p.motor.dodge_ready_fraction()
 		var key := ""
@@ -287,10 +288,12 @@ class PlayerPanel extends PanelContainer:
 
 
 ## Experiencia en 10 casillas en relieve: llenas en azul (en cooperativo, del color de quien
-## sube la próxima vez), la que se está llenando a medias y las demás claras y apagadas.
+## sube la próxima vez), la que se está llenando a medias y las demás claras y apagadas. En
+## cooperativo, la del jugador al que le toca subir lleva un marco que late (`mine`).
 class LevelCells extends Control:
 	var value := 0.0                            ## 0..1
 	var fill := FILL
+	var mine := false
 	var _shown := 0.0
 	const N := 10
 	const FILL := Color(0.18, 0.42, 0.78)
@@ -310,6 +313,9 @@ class LevelCells extends Control:
 			var f := clampf(_shown * N - i, 0.0, 1.0)
 			_cell(r, EMPTY)
 			if f > 0.0: _cell(Rect2(r.position, Vector2(r.size.x * f, r.size.y)), fill)
+		if mine:
+			var k := 0.55 + 0.45 * sin(Time.get_ticks_msec() * 0.006)
+			draw_rect(Rect2(Vector2(-2.5, -2.5), size + Vector2(5, 5)), Color(fill.lightened(0.35), k), false, 2.0)
 
 	## Casilla en relieve: canto claro arriba y a la izquierda, oscuro abajo y a la derecha.
 	func _cell(r: Rect2, c: Color) -> void:

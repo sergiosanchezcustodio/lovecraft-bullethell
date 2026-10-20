@@ -18,14 +18,15 @@ extends CanvasLayer
 ## Tragaperras (03-10-2026): un rodillo bajo el título recorre los siete atributos y se para
 ## en el que sube (entrada "attr"), y cada tarjeta gira con armas y objetos al azar hasta
 ## pararse en su opción, una tras otra (REEL_STOPS). Confirmar durante el giro lo para todo;
-## elegir solo se puede con los rodillos parados.
+## elegir solo se puede con los rodillos parados. En cooperativo giran más deprisa (entrada
+## "speed", 20-10-2026): con las subidas por turnos hay más pausas.
 ##
 ## Llave de plata (D-38): con RB o E, quien la lleva vuelve a tirar sus opciones (las veces que
 ## le queden en el nivel); los rodillos giran otra vez.
 
 signal finished
 
-var entries: Array[Dictionary] = []          ## {player, options, title, attr?, accent?}
+var entries: Array[Dictionary] = []          ## {player, options, title, attr?, accent?, speed?}
 var pick: Callable
 var solo := false
 var _pickers: Array[Picker] = []
@@ -60,6 +61,7 @@ func _ready() -> void:
 	for e in entries:
 		var pk := Picker.new(e.player, e.options, e.title, solo, String(e.get("attr", "")), filler(),
 			e.get("accent", Color.TRANSPARENT))
+		pk.speed = float(e.get("speed", 1.0))
 		pk.clicked.connect(func(i: int) -> void:      # el ratón, solo para quien juega con teclado
 			if _t >= INPUT_DELAY and not pk.done and _uses_keyboard(pk.player.input): _choose(pk, i))
 		add_child(pk)
@@ -175,6 +177,7 @@ class Picker extends PanelContainer:
 	var _stopped: Array[bool] = []
 	var _next_tick: Array[float] = []
 	var _solo := false
+	var speed := 1.0              ## ritmo de los rodillos (>1, más deprisa)
 
 	func _init(p: Player, p_options: Array[PlayerProgress.Option], title: String, solo := false,
 			attr := "", p_filler: Array[Dictionary] = [], p_accent := Color.TRANSPARENT) -> void:
@@ -287,7 +290,7 @@ class Picker extends PanelContainer:
 
 	func spin(delta: float) -> void:
 		if settled(): return
-		_time += delta
+		_time += delta * speed
 		if not _attr_done:
 			if _time >= ATTR_STOP:
 				_attr_done = true
