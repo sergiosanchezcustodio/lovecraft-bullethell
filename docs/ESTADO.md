@@ -742,7 +742,7 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Velocidad del juego, altura de la cámara, información en pantalla y música.
   - Los ajustes se conservan al reiniciar hasta "Restablecer todo".
 - **Música:** en `resources/Music/`. La intro suena en la portada y `Musica_nivel1.mp3` en el nivel 1; los niveles sin música propia usan esa (`LevelData.music`).
-- **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
+- **Confirmado (21-10-2026):** la regla "sin tiaras ni joyas" solo afecta a las criaturas; híbridos, cultistas y sacerdotes pueden llevarlas (GDD, sección 13, punto 5).
 
 - **Bordes sin X en la esquina sureste (17-10-2026), pendiente de tu revisión:** las filas del borde sur y este (`Arena.edge` en `arena_kit.py`, y los bucles propios del muelle, los tejados y el estudio) seguían 12 m más allá de la esquina y se cruzaban en X. Ahora esas piezas se marcan con `Arena.add(..., past_corner=True)`: cuentan al repartir las demás (así nada más se mueve) pero `write` no las escribe. Arenas regeneradas: Lake, paso, ciudad, carretera, tejados, pantano, arrecife, estudio, ritual, muelle y R'lyeh (de 2 a 12 piezas menos cada una), con sus mapas de la Biblioteca. La ciudad conserva su `lamp` de antes (el kit ya pondría `fog` 0,18).
 - **Escenarios de noche más legibles y ajuste de brillo (17-10-2026), pendiente de tu revisión:**

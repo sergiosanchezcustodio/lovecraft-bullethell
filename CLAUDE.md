@@ -30,8 +30,7 @@ Consúltalos cuando haga falta (son largos):
 - **Sigue aquí (sesión del 20-10-2026):**
   - Equilibrio de D-39 comprobado con 2 y con 4 jugadores (8 partidas por versión): la dificultad no cambia de forma apreciable; el orden de turno deja al último jugador entre medio y un nivel por detrás del J1. Detalle en `docs/ESTADO.md`.
   - Fase 9 (online): propuesta de anfitrión y clientes con ENet, conexión por UPnP o por IP/código, mezcla de locales y remotos, una cámara por PC, hitos 9.1-9.6. Faltan las respuestas del autor para cerrar D-10.
-  - Ofrecido y sin respuesta: poner al día la tabla de `docs/ROADMAP.md` (las fases 6 y 8 siguen en "Plan aprobado") y añadir un criterio de aceptación a la fase 8.
-- **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
+  - `docs/ROADMAP.md` al día (21-10-2026): fases 6 y 8, hitos 8.10 a 8.16 con el trabajo posterior al plan y una propuesta de aceptación de la fase 8, pendiente de que el autor la apruebe.
 
 ### Reglas que no hay que olvidar
 
@@ -53,7 +52,7 @@ Consúltalos cuando haga falta (son largos):
 - **Cámara:** ortográfica isométrica fija (rotación -30° en X, 45° en Y).
 - **Estilo gráfico:** voxel 3D detallado, "Minecraft mejorado", a 32 voxels por metro de juego (`VOXEL = 0.03125`).
 - **Diseño de personajes (humanos: jugables, cultistas, híbridos):** a bloques limpios, con detalles pintados y casi sin relieve (decidido el 25-09-2026 tras rechazar un Dyer esculpido). Las criaturas pueden seguir siendo orgánicas, como el Acechador.
-- **Diseño de los profundos:** clásicos, oscuros, sin ropa ni adornos externos (nada de tiaras ni joyas). Solo anatomía: escamas, púas, aletas, agallas, garras.
+- **Diseño de los profundos:** clásicos, oscuros, sin ropa ni adornos externos (nada de tiaras ni joyas). Solo anatomía: escamas, púas, aletas, agallas, garras. La regla solo afecta a las criaturas: híbridos, cultistas y sacerdotes sí pueden llevar tiaras, joyas y amuletos (confirmado el 21-10-2026).
 - **Atmósfera:** oscuridad, luz de luna fría, luz cálida puntual, contraluz verdosa, niebla ligera.
 
 ### Estilos probados y descartados

@@ -21,9 +21,9 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 3 | Pipeline de contenido | **Hecha** (20-10-2026): enemigos, armas, evoluciones (D-06), niveles, patrones, animaciones y escenarios por datos | Ninguna |
 | 4 | Parte 1 completa | **Hecha** salvo tu partida (04-10-2026) | Ninguna (D-04 y D-19, resueltas) |
 | 5 | Arranque, relatos y ampliación de la tienda | **Hecha** salvo tu revisión (08-10-2026) | Ninguna |
-| 6 | Parte 2 completa | **Plan aprobado** (06-10-2026) | Ninguna (D-13 y jefes colosales, resueltas) |
+| 6 | Parte 2 completa | **Hecha** salvo tu partida (08-10-2026) | Ninguna (D-13 y jefes colosales, resueltas) |
 | 7 | Parte 3 completa | **Hecha** salvo tu partida (08-10-2026) | Ninguna (Ángulos devoradores y Cthulhu, resueltos) |
-| 8 | Pulido y distribución | **Plan aprobado** (08-10-2026) | Ninguna (D-01 y D-12, resueltas) |
+| 8 | Pulido y distribución | **En curso:** hitos 8.1 a 8.3 y 8.6 a 8.16 hechos, pendientes de tu revisión; 8.4 espera tus partidas y 8.5, tu cuenta de itch.io | Ninguna (D-01 y D-12, resueltas) |
 | 9 | Online | Pendiente | D-10 |
 | 10 | Guardado en la nube con GitHub | Pendiente | D-11 |
 
@@ -188,6 +188,13 @@ Cinco niveles, sus diez criaturas y Cthulhu. Decidido el 08-10-2026: los Ángulo
 
 Audio, equilibrado, accesibilidad, rendimiento final y distribución. Decidido el 08-10-2026: publicar primero en **itch.io** (D-12) y efectos de sonido de **bancos libres CC0**.
 
+**Aceptación** (propuesta del 21-10-2026, pendiente de tu aprobación):
+- Las tres partes se completan en Normal en solitario y en cooperativo, con bots y con tus partidas como referencia: difíciles, nunca exasperantes (D-13).
+- Sonido y música en todos los niveles y menús, y las opciones de accesibilidad (8.3) funcionan.
+- Rendimiento: la prueba de carga de la fase 1 (150 enemigos y 1.000 balas) y el peor momento de cada parte mantienen 60 fps en el equipo de desarrollo, medidos dos veces.
+- Una partida completa con bots termina sin errores en la consola y con los tests en verde.
+- Builds de Windows y macOS publicadas en itch.io, descargadas y arrancadas en un equipo limpio, con la página terminada (capturas, texto y portada).
+
 | Hito | Contenido | Estado |
 |---|---|---|
 | 8.1 | **Sistema de sonido y efectos:** gestor de efectos con buses, variaciones de tono y límite de voces; efectos CC0 de disparos, impactos, golpes, esquive, recoger gemas, subida de nivel, menús, criaturas por familia y jefes; citados en la ficha | Hecho, pendiente de que lo escuches (08-10-2026) |
@@ -199,6 +206,13 @@ Audio, equilibrado, accesibilidad, rendimiento final y distribución. Decidido e
 | 8.7 | **Objetos II:** los que necesitan sistemas: escudo de Nodens, *ankh*, escamas, señuelo y petardos al esquivar, esquive doble, llave de plata (cambiar opciones), disparadores al abatir e impactar, diente de *shoggoth* e ídolo de Cthulhu (~12) | Hecho, pendiente de revisión (09-10-2026): 13 objetos; 50 en total |
 | 8.8 | **Arsenal III (GDD 5.4):** las 16 armas, con entregas nuevas (cepos, rebote, cadencia creciente, agujero negro, rayo giratorio, nube que deriva, enemigos contra enemigos), reglas de daño (D-37), sonidos y textos | Hecho, pendiente de revisión (09-10-2026): 50 armas (16 físicas, 17 de fuego, 17 mágicas), con icono |
 | 8.9 | **Iconos y cierre:** 61 iconos con Replicate (~3 $), textos de la Biblioteca, peso de armas y objetos en la subida de nivel (con 100 opciones deben seguir saliendo mejoras de lo que se lleva) y prueba con bots | Hecho, pendiente de revisión (09-10-2026) |
+| 8.10 | **Atrezo y escenarios rehechos** con referencias de FLUX: más detalle y resolución en los 15 escenarios (`arte=v1` enseña la versión anterior) | Hecho, pendiente de revisión (09 a 14-10-2026) |
+| 8.11 | **Efectos de armas en cubitos** (`VoxelFx`): llamas, humo, brasas, burbujas, vapor y explosiones | Hecho, pendiente de revisión (11-10-2026) |
+| 8.12 | **Dificultad** (Investigador, Normal y Pesadilla) y **equilibrio con simulaciones** (`SmartBot`, `tools/simular.py`) | Hecho, pendiente de revisión (12 a 15-10-2026) |
+| 8.13 | **Revisión de arte dentro del juego** (temporal, solo en desarrollo: `review/peticiones.json`, `tools/vigilar_revision.py`) | Hecho (12-10-2026) |
+| 8.14 | **Ambiente vivo** en los 15 escenarios (`data/ambient.json`, `Ambient`), noches más legibles (`"gamma"` de la arena), bordes y mapas de la Biblioteca | Hecho, pendiente de revisión (16 y 17-10-2026) |
+| 8.15 | **Tienda ampliada** con 15 objetos, y cuervo y tres animaciones más en la portada | Hecho, pendiente de revisión (17 y 18-10-2026) |
+| 8.16 | **Subidas de nivel por turnos en cooperativo** (D-39): experiencia común, sube un jugador cada vez; equilibrio comprobado con 2 y 4 jugadores | Hecho, pendiente de tu prueba con varios mandos (20 y 21-10-2026) |
 
 ## Fase 9: Online
 
