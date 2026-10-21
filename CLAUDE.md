@@ -30,7 +30,7 @@ Consúltalos cuando haga falta (son largos):
 - **Sigue aquí (sesión del 20-10-2026):**
   - Equilibrio de D-39 comprobado con 2 y con 4 jugadores (8 partidas por versión): la dificultad no cambia de forma apreciable; el orden de turno deja al último jugador entre medio y un nivel por detrás del J1. Detalle en `docs/ESTADO.md`.
   - Fase 9 (online): propuesta de anfitrión y clientes con ENet, conexión por UPnP o por IP/código, mezcla de locales y remotos, una cámara por PC, hitos 9.1-9.6. Faltan las respuestas del autor para cerrar D-10.
-  - `docs/ROADMAP.md` al día (21-10-2026): fases 6 y 8, hitos 8.10 a 8.16 con el trabajo posterior al plan y una propuesta de aceptación de la fase 8, pendiente de que el autor la apruebe.
+  - `docs/ROADMAP.md` al día (21-10-2026): fases 6 y 8, hitos 8.10 a 8.16 con el trabajo posterior al plan y criterio de aceptación de la fase 8 (aprobado).
 
 ### Reglas que no hay que olvidar
 

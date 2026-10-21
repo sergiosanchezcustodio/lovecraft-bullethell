@@ -188,7 +188,7 @@ Cinco niveles, sus diez criaturas y Cthulhu. Decidido el 08-10-2026: los Ángulo
 
 Audio, equilibrado, accesibilidad, rendimiento final y distribución. Decidido el 08-10-2026: publicar primero en **itch.io** (D-12) y efectos de sonido de **bancos libres CC0**.
 
-**Aceptación** (propuesta del 21-10-2026, pendiente de tu aprobación):
+**Aceptación** (aprobada el 21-10-2026):
 - Las tres partes se completan en Normal en solitario y en cooperativo, con bots y con tus partidas como referencia: difíciles, nunca exasperantes (D-13).
 - Sonido y música en todos los niveles y menús, y las opciones de accesibilidad (8.3) funcionan.
 - Rendimiento: la prueba de carga de la fase 1 (150 enemigos y 1.000 balas) y el peor momento de cada parte mantienen 60 fps en el equipo de desarrollo, medidos dos veces.
