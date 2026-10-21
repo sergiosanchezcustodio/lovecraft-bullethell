@@ -29,7 +29,6 @@ Consúltalos cuando haga falta (son largos):
 - **Subidas de nivel por turnos en cooperativo (D-39, 20-10-2026), pendiente de prueba con varios mandos:** experiencia común, sube un jugador cada vez (`TeamXp.turn`), ventana centrada con su color; los bots eligen sin pausar.
 - **Sigue aquí (sesión del 20-10-2026):**
   - Equilibrio de D-39 comprobado con 2 y con 4 jugadores (8 partidas por versión): la dificultad no cambia de forma apreciable; el orden de turno deja al último jugador entre medio y un nivel por detrás del J1. Detalle en `docs/ESTADO.md`.
-  - `../lb_antes`: copia de trabajo (git worktree) del commit 9c130c7, sin turnos; ya no hace falta. Borrarla: `git worktree remove --force ../lb_antes && git worktree prune`.
   - Fase 9 (online): propuesta de anfitrión y clientes con ENet, conexión por UPnP o por IP/código, mezcla de locales y remotos, una cámara por PC, hitos 9.1-9.6. Faltan las respuestas del autor para cerrar D-10.
   - Ofrecido y sin respuesta: poner al día la tabla de `docs/ROADMAP.md` (las fases 6 y 8 siguen en "Plan aprobado") y añadir un criterio de aceptación a la fase 8.
 - **Pendiente de confirmar:** si la regla "sin tiaras ni joyas" de los Profundos se limita a las criaturas (GDD, sección 13, punto 5).
