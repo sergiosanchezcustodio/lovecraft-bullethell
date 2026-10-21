@@ -62,7 +62,10 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 		e.runner.fire(e.data.param("croak_pattern", null), func() -> Vector3: return target.global_position if is_instance_valid(target) else e.global_position)
 		_croak_cd = float(e.data.param("croak_cooldown", 6.5))
 	var orbit := float(e.data.param("orbit", 6.0))
-	var radial := to_p.normalized() * (d - orbit) * 0.8
+	# al acercarse, por el mapa de flujo como los demás (21-10-2026: en línea recta se quedaba
+	# empujando contra una tienda a 10 m del jugador y el nivel no acababa en 20 minutos)
+	var dir := toward(e, target) if d > orbit else to_p.normalized()
+	var radial := dir * (d - orbit) * 0.8
 	var tangent := Vector3(-to_p.z, 0, to_p.x).normalized() * _orbit_dir * 0.7
 	var v := (radial + tangent * e.data.move_speed)
 	if v.length() < 0.6: e.anim = "idle"

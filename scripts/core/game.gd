@@ -65,6 +65,8 @@ var hud: Hud
 var kills := 0
 var _menu_open := false
 var _ended := false
+var _final_alive := 0.0                          ## segundos que lleva vivo el enemigo final (registro)
+var _log_slot := 0                                ## último tramo de 30 s escrito en el registro
 var _pause: Menus.PauseMenu
 var _debug: DebugMenu
 var _info: Label                               ## depuración: FPS, enemigos, balas
@@ -945,7 +947,10 @@ func _process_step(delta: float) -> void:
 	# tiempo jugado del hueco: en tiempo real, sin contar pausas ni la velocidad del juego
 	if not get_tree().paused and not _ended: Saves.add_play_time(delta / maxf(Engine.time_scale, 0.001))
 	if args.get_bool("debug") and fmod(_t, 0.5) < delta: print("t=%.1f jugador=%s" % [_t, player.global_position])
-	if args.get_bool("log") and director != null and fmod(director.time, 30.0) < delta:
+	# cada 30 s del director (21-10-2026: con fmod(time, 30) < delta casi nunca se escribía, porque
+	# el director avanza con su propio paso y rara vez caía dentro del margen)
+	if args.get_bool("log") and director != null and int(director.time / 30.0) > _log_slot:
+		_log_slot = int(director.time / 30.0)
 		print("t=%3d s  vivos=%d  abatidos=%d  nivel=%d  vida=%d  cordura=%d  balas=%d" % [director.time, director.alive.size(),
 			kills, player.progress.level, player.health, player.sanity, world.bullets.count])
 		if world.flow != null:                          # enemigos que no pueden llegar o se han atascado
@@ -956,6 +961,16 @@ func _process_step(delta: float) -> void:
 				if not world.flow.reachable(Vector2(e.global_position.x, e.global_position.z)): lost += 1
 				if e._detour_t > 0.0: stuck += 1
 			print("         inalcanzables=%d  desatascándose=%d" % [lost, stuck])
+	if args.get_bool("log") and director != null and director.final_target() != null:
+		_final_alive += delta                           # el enemigo que cierra el nivel tarda: dónde está y cuánto le queda
+		var f := director.final_target()
+		if _final_alive > 30.0 and fmod(_final_alive, 10.0) < delta:
+			var near := INF
+			for q in players: near = minf(near, q.global_position.distance_to(f.global_position))
+			print("         final=%s vida=%d%% pos=%.1f,%.1f,%.1f  jugador más cerca=%.1f m  alcanzable=%s  estado=%s  desatascándose=%s" % [f.data.id,
+				roundi(f.health / (f.data.max_health * f.health_scale) * 100), f.global_position.x, f.global_position.y, f.global_position.z, near,
+				world.flow == null or world.flow.reachable(Vector2(f.global_position.x, f.global_position.z)),
+				f.behavior.get("state"), f._detour_t > 0.0])
 	if args.has("perf"): _perf(delta)
 	if args.get_bool("jitter"): _jitter(delta)
 	if args.get_int("bullet_rain") > 0: _bullet_rain(args.get_int("bullet_rain"))

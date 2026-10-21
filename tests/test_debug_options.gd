@@ -121,7 +121,7 @@ func test_el_menu_se_monta_y_sus_filas_cambian_la_partida() -> void:
 	assert_true(player.god)
 	_row(m, "Esquive").step(1)
 	assert_eq(String(player.data.dodge_style.id), DebugOptions.get_value("dodge", ""))
-	_row(m, "Revólver Webly").step(2)                      # sin ella -> nivel 2
+	_row(m, "Webly Mk VI").step(2)                         # sin ella -> nivel 2
 	assert_eq(player.weapons.get_weapon(&"webly").level, 2)
 	_row(m, "Altura visible").step(1)
 	assert_eq(g.camera.view_size, 20.0)

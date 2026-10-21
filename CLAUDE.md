@@ -130,7 +130,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `autopick=true`: elige sola la primera mejora (para bots y capturas).
   - `xp=`, `hp=` y `san=`: experiencia, vida y cordura iniciales.
   - `autorestart=N`: en la pantalla final, reintenta sola tras N s.
-  - `log=true`: cada 30 s de juego imprime vivos, abatidos, nivel, vida, cordura y balas.
+  - `log=true`: cada 30 s de juego imprime vivos, abatidos, nivel, vida, cordura y balas; si el enemigo final tarda en morir (más de 30 s), cada 10 s su posición, vida y estado (`final=`).
   - `prof=true` (junto con `perf=`): reparto del tiempo de CPU por sistema (`Prof`).
   - `mute=true`: sin música (también en la portada).
   - `test_save=N`: crea la partida de pruebas (todo desbloqueado) en el hueco N y sale.
