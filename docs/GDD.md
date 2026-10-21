@@ -539,7 +539,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-07 | Experiencia en cooperativo | Fase 2 | **Resuelta** |
 | D-08 | Cordura | — | Resuelta: se incluye. Valores numéricos por ajustar en pruebas |
 | D-09 | Desbloqueos y acceso al modo *Por partes* | Fase 5 | **Resuelta** (progresión permanente con tienda) |
-| D-10 | Modelo online | Fase 9 | Pendiente |
+| D-10 | Modelo online | Fase 9 | **Resuelta**: anfitrión y clientes con ENet, conexión directa |
 | D-11 | Guardado en la nube | Fase 10 | Pendiente |
 | D-12 | Plataforma de distribución | Fase 8; condiciona D-10 y D-11 | **Resuelta**: itch.io primero |
 | D-13 | Reto al empezar cada parte en la campaña | Fase 6 | **Resuelta** |
@@ -586,6 +586,14 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
 - **D-09 — Desbloqueos.** ¿Hay desbloqueos permanentes (personajes, armas)? ¿El modo *Por partes* exige haber llegado antes a esa parte en la campaña?
   *Resuelta (25-09-2026):* progresión permanente con tienda, como en Extremadura Survivors (sección 8.1). La subida de nivel dentro de la partida sigue empezando de cero en cada partida. Queda por concretar si *Por partes* exige haber llegado a esa parte.
 - **D-10 — Modelo online.** Anfitrión y clientes con ENet, red de Steam o WebRTC; cómo se conectan los jugadores; si se mezclan jugadores locales y remotos; cámara propia por jugador remoto.
+  *Resuelta (21-10-2026):*
+  - **Red:** anfitrión con autoridad (simula la partida) y clientes con ENet. Conexión directa: el anfitrión abre el puerto con UPnP y los demás entran por IP o por un código corto que la codifica. Sin servidor propio; con CGNAT o un router sin UPnP, abrir el puerto a mano o usar una VPN (Tailscale, ZeroTier).
+  - **Jugadores:** se mezclan locales y remotos, hasta 4 en total; cada PC puede llevar varios con sus mandos.
+  - **Cámara:** una por PC, que sigue a sus jugadores locales; los que quedan fuera de pantalla se señalan con una flecha de su color.
+  - **Guardado:** cada uno en su partida. El anfitrión elige el nivel en su mapa y solo a él le cuenta el avance de la campaña; cada invitado juega con lo que tiene desbloqueado y se lleva el dinero y los logros.
+  - **Pausas y subidas:** como en local. Las subidas por turnos (D-39) y la pausa paran la partida para todos.
+  - **Desconexiones:** un bot toma el personaje hasta el final del nivel y el jugador puede volver al empezar el siguiente. Si se va el anfitrión, la partida acaba para todos y los invitados guardan lo conseguido.
+  - **Entrada:** "Jugar online" lleva a Crear o Unirse; al unirse se entra en la selección de personaje del anfitrión, como en local. No se entra en partidas ya empezadas.
 - **D-11 — Guardado en la nube.** Gist privado del jugador mediante el flujo de autorización por dispositivo de GitHub, servidor propio o guardado en la nube de la plataforma de distribución.
 - **D-12 — Plataforma de distribución.** itch.io, Steam u otra. *Resuelta (08-10-2026):* **itch.io primero** (versión temprana, subida con butler); Steam se puede añadir más adelante. Efectos de sonido de bancos libres CC0, citados en la ficha del proyecto.
 - **D-13 — Reto al empezar cada parte.** El personaje conserva sus mejoras, pero la parte siguiente arranca con enemigos de escalón 1. *Recomendación de la especificación:* estadísticas base de los enemigos más altas en cada parte.
