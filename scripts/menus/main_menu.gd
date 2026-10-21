@@ -2,7 +2,7 @@ class_name MainMenu
 extends Control
 ## Menú principal, debajo del título de la portada: Jugar, Tienda, Biblioteca (con los logros como un tomo), Configuración y Salir.
 ## Quieto a propósito (GDD 8.1): lo importante es qué opción está señalada.
-## Jugar abre la elección de local u online (online, desactivado hasta la fase 9, D-24).
+## Jugar abre la elección de local u online (online desde la fase 9, D-10).
 ## B / Esc vuelve a la elección de partida.
 
 signal play_local
@@ -81,16 +81,20 @@ func _open_play() -> void:
 	local.custom_minimum_size = Vector2(480, 64)
 	local.pressed.connect(func() -> void: play_local.emit())
 	box.add_child(local)
-	var online := MenuKit.button("Jugar online  ·  Próximamente", MenuKit.INK, 26)
+	var online := MenuKit.button("Jugar online", MenuKit.INK, 30)
 	online.custom_minimum_size = Vector2(480, 64)
-	online.disabled = true
-	online.add_theme_color_override("font_disabled_color", UiKit.TEXT_DIM)
-	online.add_theme_stylebox_override("disabled", UiKit.panel(Color(0.04, 0.04, 0.05, 0.8), Color(UiKit.TEXT_DIM, 0.2)))
+	online.pressed.connect(func() -> void:          # sustituye a esta ventana al cerrarse
+		p.tree_exited.connect(_open_online, CONNECT_ONE_SHOT)
+		p.queue_free())
 	box.add_child(online)
 	box.add_child(MenuKit.hint("B o Esc: volver"))
 	_closes_with_cancel(p)
 	_push(p, 0)
 	local.grab_focus.call_deferred()
+
+## "Jugar online" (fase 9, D-10). Capturas y pruebas: `open=menu_online`.
+func _open_online() -> void:
+	if is_inside_tree(): _push(OnlineMenu.new(), 0)
 
 func _open_shop() -> void:
 	var s := ShopMenu.new()

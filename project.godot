@@ -24,6 +24,7 @@ Settings="*res://scripts/save/settings.gd"
 Devices="*res://scripts/input/device_manager.gd"
 Sfx="*res://scripts/core/sfx.gd"
 MenuRepeat="*res://scripts/ui/menu_repeat.gd"
+Net="*res://scripts/net/net_session.gd"
 
 [display]
 

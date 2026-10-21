@@ -24,7 +24,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 6 | Parte 2 completa | **Hecha** salvo tu partida (08-10-2026) | Ninguna (D-13 y jefes colosales, resueltas) |
 | 7 | Parte 3 completa | **Hecha** salvo tu partida (08-10-2026) | Ninguna (Ángulos devoradores y Cthulhu, resueltos) |
 | 8 | Pulido y distribución | **En curso:** hitos 8.1 a 8.3 y 8.6 a 8.16 hechos, pendientes de tu revisión; 8.4 espera tus partidas y 8.5, tu cuenta de itch.io | Ninguna (D-01 y D-12, resueltas) |
-| 9 | Online | **Plan propuesto** (21-10-2026), pendiente de aprobación | Ninguna (D-10, resuelta) |
+| 9 | Online | **Plan aprobado** (21-10-2026) | Ninguna (D-10, resuelta) |
 | 10 | Guardado en la nube con GitHub | Pendiente | D-11 |
 
 ---
@@ -220,11 +220,11 @@ Según D-10 (resuelta el 21-10-2026 en el GDD): anfitrión con autoridad y clien
 
 **Aceptación:** una parte completa jugada entre dos PCs por internet, mezclando jugadores locales y remotos, sin desincronizaciones visibles con 150 ms de latencia; desconexión y vuelta de un invitado entre niveles; tests en verde.
 
-### Hitos de la fase 9 (propuesta del 21-10-2026, pendiente de aprobación)
+### Hitos de la fase 9 (plan aprobado el 21-10-2026)
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 9.1 | **Base de red:** sesión de red (ENet, anfitrión y clientes), UPnP, código de sala que codifica IP y puerto, menú "Jugar online" con Crear y Unirse, y pruebas con dos instancias en el mismo PC (latencia y pérdida simuladas) | Pendiente |
+| 9.1 | **Base de red:** sesión de red (ENet, anfitrión y clientes), UPnP, código de sala que codifica IP y puerto, menú "Jugar online" con Crear y Unirse, y pruebas con dos instancias en el mismo PC (latencia y pérdida simuladas) | Hecho, pendiente de tu prueba (21-10-2026); el selector del código con el mando pasa al 9.2 |
 | 9.2 | **Sala y selección de personaje en red:** `SelectState` sincronizado, cada invitado con sus desbloqueos, listos y nivel elegido por el anfitrión | Pendiente |
 | 9.3 | **Partida en red:** los clientes envían su entrada (un `PlayerInput` remoto) y reciben instantáneas del estado (jugadores, enemigos, balas, gemas y efectos) con interpolación; predicción del movimiento y el esquive propios | Pendiente |
 | 9.4 | **Cámara por PC e interfaz:** cámara de los jugadores locales, flechas de los que quedan fuera, HUD por PC, y pausa y subidas por turnos para todos | Pendiente |

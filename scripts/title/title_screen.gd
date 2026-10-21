@@ -17,7 +17,8 @@ extends Control
 ##                       open=slots_borrar, además la confirmación de borrado; open=menu (menú
 ##                       principal), open=menu_jugar, open=menu_config tab=0..3, open=menu_tienda tab=0..3, open=menu_logros,
 ##                       open=menu_biblioteca tome=N cursor=N
-##                       open=menu_revision (revisión de arte, temporal)
+##                       open=menu_revision (revisión de arte, temporal), open=menu_online
+##                       (con net_host=true o net_join=<código|IP>: abre la sala o se une)
 ## Cualquier botón principal (A, B, X, Y, Start, Select; Intro, Espacio o Esc) salta la
 ## presentación y, con el aviso visible, abre la ventana de huecos de partida (D-22).
 
@@ -344,6 +345,7 @@ func _process(delta: float) -> void:
 		if Saves.slot < 0: Saves.use(0)
 		_open_main_menu()
 		if what == "menu_jugar": _menu._open_play.call_deferred()
+		elif what == "menu_online": _menu._open_online.call_deferred()
 		elif what == "menu_config": _menu.open_settings_tab.call_deferred(args.get_int("tab", 0))
 		elif what == "menu_tienda": _menu.open_shop_tab.call_deferred(args.get_int("tab", 0))
 		elif what == "menu_logros": _menu._open_achievements.call_deferred()
