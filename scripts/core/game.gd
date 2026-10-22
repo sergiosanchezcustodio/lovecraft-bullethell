@@ -161,7 +161,7 @@ func _ready() -> void:
 			# primero de este PC (pruebas con dos ventanas)
 			var inp: PlayerInput
 			if not seat.is_local(): inp = PlayerInput.new()
-			elif first_local and args.has("bot"): inp = _make_input()
+			elif args.has("bot") and (first_local or seat.device <= -10): inp = _make_input()   # y los de prueba
 			else: inp = Devices.make_input(seat.device)
 			var sp := _spawn_player(ch, inp)
 			sp.remote = not seat.is_local()

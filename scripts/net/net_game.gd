@@ -77,7 +77,6 @@ var game: Node                               ## la partida (game.gd)
 var net: NetSession
 var host := false
 var started := false
-var bytes_out := 0                           ## bytes de fotos y estados mandados (medir el ancho de banda)
 var pause_tree := true                       ## pausa la partida mientras espera a los demás (los tests no)
 var _ready_peers := {}                       ## anfitrión: PC -> true cuando ha avisado
 var _interp: NetInterp                       ## invitado: lo que llega del anfitrión
@@ -226,6 +225,11 @@ func _wait_overlay(text: String) -> void:
 # ---------------------------------------------------------------- bucle
 
 func _process(delta: float) -> void:
+	var t0 := Prof.start()
+	_process_step(delta)
+	Prof.stop("red", t0)
+
+func _process_step(delta: float) -> void:
 	if not host and not started:
 		_ready_t -= delta
 		if _ready_t <= 0.0: _send_ready()
@@ -274,8 +278,14 @@ func _show_quiet(s: float) -> void:
 
 ## Registro (log=true): cada 5 s, lo que ve este PC, para comparar las dos ventanas.
 var _log_t := 0.0
-var _log_bytes := 0
+var _log_sent := {}                          ## PC -> bytes mandados hasta el último registro
+var _log_wire := 0                           ## bytes reales (comprimidos) hasta el último registro
+var _wire_bw := [0.0, 0, 0.0]                ## lo mismo que _bw, con los bytes reales del PC
+var _bw := {}                                ## PC -> [suma de kB/s, registros, pico] (resumen al salir)
 var _log_on := false
+const TYPE_NAMES := {READY: "READY", GO: "GO", PSTATE: "PSTATE", SNAP: "SNAP", SPAWN: "SPAWN", DIE: "DIE",
+	ANIM: "ANIM", EVENT: "EVENT", NEXT: "NEXT", RESTART: "RESTART", BULLETS: "BULLETS", GEMS: "GEMS",
+	TAKEN: "TAKEN", PROG: "PROG", WORLD: "WORLD", HALT: "HALT", RESUME: "RESUME", PICK: "PICK", PAUSE: "PAUSE"}
 func _log(delta: float) -> void:
 	_log_t += delta
 	if _log_t < 5.0: return
@@ -286,14 +296,49 @@ func _log(delta: float) -> void:
 	var n := 0
 	for nid in _enemies: if is_instance_valid(_enemies[nid]): n += 1
 	var team: TeamXp = game.get("team")
-	print("RED %s t=%.1f enemigos=%d abatidos=%d xp=%.0f balas=%d gemas=%d %s  sale=%.1f kB/s  ping=%d" % ["anfitrion" if host else "invitado",
+	var total := 0.0
+	var per := PackedStringArray()
+	for id: int in net.sent_to:                      # lo mandado a cada PC (con cabeceras)
+		var r := (int(net.sent_to[id]) - int(_log_sent.get(id, 0))) / _log_t / 1024.0
+		total += r
+		if net.peers.has(id):
+			per.append("%s %.1f" % [net.peers[id].get("name", id), r])
+			var b: Array = _bw.get(id, [0.0, 0, 0.0, ""])
+			_bw[id] = [b[0] + r, b[1] + 1, maxf(b[2], r), String(net.peers[id].get("name", id))]
+	_log_sent = net.sent_to.duplicate()
+	var wire := (net.wire_sent - _log_wire) / _log_t / 1024.0   # lo que sale de verdad (comprimido)
+	_log_wire = net.wire_sent
+	_wire_bw = [_wire_bw[0] + wire, _wire_bw[1] + 1, maxf(_wire_bw[2], wire)]
+	print("RED %s t=%.1f enemigos=%d abatidos=%d xp=%.0f balas=%d gemas=%d %s  sale=%.1f kB/s%s real=%.1f  ping=%d" % ["anfitrion" if host else "invitado",
 		game.director.time if game.director != null else 0.0, n, game.kills, team.xp if team != null else 0.0,
-		game.world.bullets.count, game.gems.count, " ".join(pos),
-		(bytes_out - _log_bytes) / _log_t / 1024.0, int(net.peers.get(net.my_id, {}).get("ping", 0)) if not host else 0])
-	_log_bytes = bytes_out
+		game.world.bullets.count, game.gems.count, " ".join(pos), total,
+		" (" + ", ".join(per) + ")" if per.size() > 1 else "", wire, int(net.peers.get(net.my_id, {}).get("ping", 0)) if not host else 0])
 	_log_t = 0.0
 
+## Al salir (log=true): media y pico de lo mandado a cada PC y reparto por tipo de mensaje.
+func _exit_tree() -> void:
+	if not _log_on or _bw.is_empty(): return
+	var per := PackedStringArray()
+	for id: int in _bw:
+		var b: Array = _bw[id]
+		per.append("%s media %.1f pico %.1f" % [b[3], b[0] / maxf(b[1], 1), b[2]])
+	var all := 0
+	for t: int in net.sent_type: all += int(net.sent_type[t])
+	var types := net.sent_type.keys()
+	types.sort_custom(func(a: int, b: int) -> bool: return int(net.sent_type[a]) > int(net.sent_type[b]))
+	var share := PackedStringArray()
+	for t: int in types.slice(0, 6):
+		var tn: Variant = TYPE_NAMES.get(t, NetSession.Msg.find_key(t))
+		share.append("%s %d %%" % [tn if tn != null else str(t), roundi(100.0 * int(net.sent_type[t]) / maxf(all, 1))])
+	print("RED ancho de banda (kB/s por PC, sin comprimir): %s | comprimido, en total: media %.1f pico %.1f | por tipo: %s" % [
+		", ".join(per), _wire_bw[0] / maxf(_wire_bw[1], 1), _wire_bw[2], ", ".join(share)])
+
 func _physics_process(_delta: float) -> void:
+	var t0 := Prof.start()
+	_physics_step()
+	Prof.stop("red_envia", t0)
+
+func _physics_step() -> void:
 	_tick += 1
 	var now := float(Time.get_ticks_msec())
 	if host:
@@ -304,7 +349,10 @@ func _physics_process(_delta: float) -> void:
 			_taken.clear()
 		if started and _tick % PROG_EVERY == 0: _send_progress()
 		if _tick % LATE_EVERY == 0 and not GameSession.returning.is_empty(): _send_late()
-		if started and _tick % SNAP_EVERY == 0 and not _in_gap(): _send_snap()
+		if started and _tick % SNAP_EVERY == 0 and not _in_gap():
+			var t1 := Prof.start()
+			_send_snap()
+			Prof.stop("red_foto", t1)
 		for peer in _peer_interp:
 			var ip: NetInterp = _peer_interp[peer]
 			var t := ip.render_ms(now)
@@ -387,6 +435,13 @@ static func _cm(v: float) -> int:
 static func _angle8(a: float) -> int:
 	return int(roundf(fposmod(a, TAU) / TAU * 256.0)) & 255
 
+## Anfitrión: los invitados con la partida montada (a los que se mandan fotos y eventos).
+func _guests_ready() -> Array:
+	var out := []
+	for id: int in net.peers:
+		if id != 1 and _ready_peers.has(id): out.append(id)
+	return out
+
 func _send_snap() -> void:
 	var s := StreamPeerBuffer.new()
 	s.put_u32(Time.get_ticks_msec())
@@ -405,10 +460,7 @@ func _send_snap() -> void:
 	for nid: int in live:
 		var e: Enemy = _enemies[nid]
 		write_enemy(s, nid, e, _anim_id(e.anim))
-	for id in net.peers:
-		if id != 1 and _ready_peers.has(id):
-			net.send(id, SNAP, s.data_array, false)
-			bytes_out += s.data_array.size()
+	net.send_many(_guests_ready(), SNAP, s.data_array, false)
 
 func _send_pstate() -> void:
 	var s := StreamPeerBuffer.new()
@@ -419,7 +471,6 @@ func _send_pstate() -> void:
 	s.put_u8(mine.size())
 	for q in mine: write_player(s, q)
 	net.send(1, PSTATE, s.data_array, false)
-	bytes_out += s.data_array.size()
 
 func _anim_id(anim: String) -> int:
 	if not _anim_ids.has(anim):
@@ -700,10 +751,7 @@ func _flush_bullets() -> void:
 	s.put_u32(_bul_t)
 	s.put_u16(_bul_n)
 	s.put_data(_bul.data_array)
-	for id in net.peers:
-		if id != 1 and _ready_peers.has(id):
-			net.send(id, BULLETS, s.data_array, false)
-			bytes_out += s.data_array.size()
+	net.send_many(_guests_ready(), BULLETS, s.data_array, false)
 	_bul = StreamPeerBuffer.new()
 	_bul_n = 0
 
@@ -792,8 +840,7 @@ func _world_event(kind: String, a: Array) -> void:
 
 func _flush_world() -> void:
 	if _world_out.is_empty(): return
-	for id in net.peers:
-		if id != 1 and _ready_peers.has(id): net.send(id, WORLD, _world_out)
+	net.send_many(_guests_ready(), WORLD, _world_out)
 	_world_out = []
 
 ## Anfitrión: lo que aparece entre los efectos y hay que repetir en los invitados.

@@ -55,6 +55,16 @@ var external_ip := ""
 var upnp_ok := false
 var upnp_status := ""
 var lag_ms := 0
+## Lo mandado (hito 9.6a, medir el ancho de banda): bytes por PC de destino y por tipo de mensaje,
+## con una estimación de las cabeceras de UDP y ENet por paquete (`PACKET_OVERHEAD`).
+var sent_to := {}                            ## PC -> bytes
+var sent_type := {}                          ## tipo -> bytes (a todos)
+const PACKET_OVERHEAD := 40                  ## B: IP 20 + UDP 8 + ENet ~12
+var wire_sent := 0                           ## B que de verdad salen (ENet, ya comprimidos, sin IP ni UDP)
+## Compresión de ENet (hito 9.6a): la misma en todos los PC, o no se entienden.
+var compression := ENetConnection.COMPRESS_RANGE_CODER
+const COMPRESSIONS := {"none": ENetConnection.COMPRESS_NONE, "range": ENetConnection.COMPRESS_RANGE_CODER,
+	"fastlz": ENetConnection.COMPRESS_FASTLZ, "zlib": ENetConnection.COMPRESS_ZLIB, "zstd": ENetConnection.COMPRESS_ZSTD}
 var loss := 0.0
 
 var _api: SceneMultiplayer
@@ -71,6 +81,7 @@ func _ready() -> void:
 	var la := LaunchArgs.from_cmdline()
 	lag_ms = la.get_int("net_lag", 0)
 	loss = la.get_float("net_loss", 0.0)
+	if la.has("net_compress"): compression = COMPRESSIONS.get(la.get_str("net_compress"), compression)   # pruebas
 	if la.has("net_name"): player_name = la.get_str("net_name").left(20)   # pruebas: dos copias en el mismo PC
 	if player_name == DEFAULT_NAME:                  # nombre del usuario del PC, si no se ha dado otro
 		var who := OS.get_environment("USERNAME")
@@ -92,6 +103,7 @@ func host(p_port: int = RoomCode.BASE_PORT, use_upnp: bool = true) -> Error:
 		err = _enet.create_server(p_port + k, MAX_PLAYERS + 2)   # sitio para poder rechazar con motivo
 		if err == OK:
 			port = p_port + k
+			_enet.host.compress(compression)
 			break
 	if err != OK:
 		_enet = null
@@ -123,6 +135,7 @@ func join(address: String, p_port: int = RoomCode.BASE_PORT) -> Error:
 		_enet = null
 		failed.emit("Dirección no válida: %s" % address)
 		return err
+	_enet.host.compress(compression)
 	_start_api()
 	var server := _enet.get_peer(1)
 	if server != null: server.set_timeout(32, 4000, 8000)
@@ -156,6 +169,13 @@ func close(reason: String = "") -> void:
 ## Manda un mensaje de la partida (`type` >= USER) a `to` (0: a todos los demás).
 func send(to: int, type: int, data: Variant = null, reliable: bool = true) -> void:
 	_send(to, type, data, reliable)
+
+## Lo mismo a varios PC, serializado una sola vez (las fotos del mundo, a cada invitado listo).
+func send_many(ids: Array, type: int, data: Variant = null, reliable: bool = true) -> void:
+	if _api == null or ids.is_empty(): return
+	var b := _pack(type, data, reliable)
+	for id: int in ids: _put(id, b, reliable)
+	sent_type[type] = int(sent_type.get(type, 0)) + (b.size() + PACKET_OVERHEAD) * ids.size()
 
 ## Códigos para dar a los demás: el de la red de casa y, si UPnP abrió el puerto, el de internet.
 func codes() -> Dictionary:
@@ -192,6 +212,13 @@ func _start_api() -> void:
 
 func _process(delta: float) -> void:
 	if _api == null: return
+	var t0 := Prof.start()
+	_poll(delta)
+	Prof.stop("red_recibe", t0)
+
+func _poll(delta: float) -> void:
+	if _enet.get_connection_status() != MultiplayerPeer.CONNECTION_DISCONNECTED:   # antes del poll, que puede cerrarla
+		wire_sent += int(_enet.host.pop_statistic(ENetConnection.HOST_TOTAL_SENT_DATA))
 	_api.poll()
 	if _api == null: return                          # una señal del poll pudo cerrar la sesión
 	var now := Time.get_ticks_msec()
@@ -266,9 +293,27 @@ func _on_packet(from: int, bytes: PackedByteArray) -> void:
 
 func _send(to: int, type: int, data: Variant, reliable: bool) -> void:
 	if _api == null: return
+	var b := _pack(type, data, reliable)
+	var n := 0
+	if to == 0:
+		for id: int in peers:
+			if id != my_id:
+				sent_to[id] = int(sent_to.get(id, 0)) + b.size() + PACKET_OVERHEAD
+				n += 1
+	else:
+		sent_to[to] = int(sent_to.get(to, 0)) + b.size() + PACKET_OVERHEAD
+		n = 1
+	sent_type[type] = int(sent_type.get(type, 0)) + (b.size() + PACKET_OVERHEAD) * n
+	_api.send_bytes(b, to, MultiplayerPeer.TRANSFER_MODE_RELIABLE if reliable else MultiplayerPeer.TRANSFER_MODE_UNRELIABLE)
+
+func _pack(type: int, data: Variant, reliable: bool) -> PackedByteArray:
 	var b := PackedByteArray([type, 1 if reliable else 0])
 	b.append_array(var_to_bytes(data))
-	_api.send_bytes(b, to, MultiplayerPeer.TRANSFER_MODE_RELIABLE if reliable else MultiplayerPeer.TRANSFER_MODE_UNRELIABLE)
+	return b
+
+func _put(id: int, b: PackedByteArray, reliable: bool) -> void:
+	sent_to[id] = int(sent_to.get(id, 0)) + b.size() + PACKET_OVERHEAD
+	_api.send_bytes(b, id, MultiplayerPeer.TRANSFER_MODE_RELIABLE if reliable else MultiplayerPeer.TRANSFER_MODE_UNRELIABLE)
 
 func _handle(from: int, bytes: PackedByteArray) -> void:
 	var type := bytes[0]

@@ -116,13 +116,16 @@ func _process(delta: float) -> void:
 	_angle = fmod(_angle + _speed * delta, 360.0)
 	var center := player.get_global_transform_interpolated().origin if is_instance_valid(player) else global_position
 	var k := clampf(minf((_life - _left) / FADE, (_left + FADE) / FADE), 0.0, 1.0)   # aparecen y se apagan
+	# con escala 0, Godot no puede descomponer la matriz al girarla ("det == 0"): mínimo y ocultas
+	var ks := maxf(k, 0.001)
 	for i in _count:
 		var a := deg_to_rad(_angle) + TAU * i / _count
 		var pg := _pages[i]
+		pg.visible = k > 0.0
 		if look == "ancla":
 			pg.global_position = center + Vector3(cos(a) * _radius, 0.7, sin(a) * _radius)
 			pg.rotation = Vector3(0, -a, PI * 0.5)                                         # tumbada, la caña hacia el personaje
-			pg.scale = Vector3.ONE * k * 1.4
+			pg.scale = Vector3.ONE * ks * 1.4
 			for j in _chain.size():
 				var f := float(j + 1) / (_chain.size() + 1)
 				_chain[j].global_position = center + Vector3(cos(a) * _radius * f, 0.9 - 0.2 * f, sin(a) * _radius * f)
@@ -130,5 +133,5 @@ func _process(delta: float) -> void:
 			continue
 		pg.global_position = center + Vector3(cos(a) * _radius, 1.0 + 0.12 * sin(_t * 6.0 + i), sin(a) * _radius)
 		pg.rotation = Vector3(0.35 * sin(_t * 9.0 + i * 2.0), -a, 0.2)                   # aletean al girar
-		pg.scale = Vector3.ONE * k
+		pg.scale = Vector3.ONE * ks
 	if not active: _left -= delta

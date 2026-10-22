@@ -636,7 +636,7 @@ func _whip(w: Weapon) -> bool:
 ## Cepos: uno nuevo a 1,5-3,5 m hacia el enemigo más cercano (o donde mira), como mucho
 ## `count` puestos a la vez.
 func _trap(w: Weapon, target_pos: Vector3) -> bool:
-	var live: Array = (_traps.get(w, []) as Array).filter(func(t: Node) -> bool: return is_instance_valid(t) and not t.sprung)
+	var live: Array = (_traps.get(w, []) as Array).filter(func(t: Variant) -> bool: return is_instance_valid(t) and not t.sprung)   # sin tipo: puede venir liberada
 	_traps[w] = live
 	if live.size() >= int(w.stat("count")): return false
 	var dir := _dir_to(target_pos).rotated(Vector3.UP, randf_range(-0.9, 0.9))

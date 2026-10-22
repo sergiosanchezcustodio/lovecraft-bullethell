@@ -9,7 +9,8 @@ extends Control
 ## de niveles. Opciones detrás de `--` (capturas): join=N une N jugadores de prueba;
 ## ready=N deja listos los N primeros; pets=N deja a los N primeros eligiendo compañero; pick=id,id… elige personaje en cada marco;
 ## turn=grados los deja girados; map=true abre el mapa; auto_start=true, además, entra
-## en el nivel 1 o en el de start_level= (probar el paso a la partida; en red, net_wait=N espera antes a N PCs más);
+## en el nivel 1 o en el de start_level= (probar el paso a la partida; en red, net_wait=N espera antes a N PCs más
+## y net_players=N a N jugadores);
 ## acts=right,confirm… pulsa eso (ver `_play_acts`).
 ##
 ## En red (hito 9.2, D-10) es también la sala: arriba, el código y los conectados. El
@@ -103,12 +104,17 @@ func _ready() -> void:
 	if args.has("acts"): _play_acts(args.get_str("acts").split(",", false))
 
 ## Pruebas: `acts=right,confirm,…` pulsa eso con el primer dispositivo, una cada 0,4 s, desde
-## el segundo 2 (en red, ya dentro de la sala). `wait` deja pasar un turno.
+## el segundo 2 (en red, ya dentro de la sala). `wait` deja pasar un turno; `2:join` pulsa con
+## el dispositivo de prueba 2 (otro jugador de este PC, que en partida lleva el bot de `bot=`).
 func _play_acts(list: PackedStringArray) -> void:
 	await get_tree().create_timer(2.0).timeout
 	for a in list:
 		if not is_inside_tree() or _leaving: return
-		if a != "wait": _do(Devices.last_device, a)
+		var dev := Devices.last_device
+		if ":" in a:                                       # "2:join": con el 2.º dispositivo de prueba
+			dev = -9 - int(a.get_slice(":", 0))
+			a = a.get_slice(":", 1)
+		if a != "wait": _do(dev, a)
 		await get_tree().create_timer(0.4).timeout
 
 func _build() -> void:
@@ -273,6 +279,7 @@ func _open_map() -> void:
 	if not is_inside_tree() or _leaving or not state.all_ready() or _map != null: return
 	if args.get_bool("auto_start"):                    # pruebas: directo al nivel 1
 		if net_select != null and Net.peers.size() - 1 < args.get_int("net_wait", 0): return   # net_wait=N: espera a N PCs más
+		if state.joined().size() < args.get_int("net_players", 0): return                   # net_players=N: y a N jugadores
 		_start(args.get_str("start_level", "p1_n1"))      # start_level=p2_n5: otro nivel
 		return
 	_map = LevelMap.new()

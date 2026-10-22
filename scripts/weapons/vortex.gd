@@ -89,6 +89,7 @@ func _process(_delta: float) -> void:
 		var a := _t * (2.0 + 0.4 * i) + TAU * i / _spheres.size()
 		var r := 0.45 + 0.25 * sin(_t * 3.0 + i)
 		_spheres[i].position = Vector3(cos(a) * r, 1.0 + 0.35 * sin(a * 1.3 + i), sin(a) * r)
-		_spheres[i].scale = Vector3.ONE * k * (0.8 + 0.3 * sin(_t * 5.0 + i * 2.0))
+		_spheres[i].scale = Vector3.ONE * maxf(k, 0.001) * (0.8 + 0.3 * sin(_t * 5.0 + i * 2.0))   # escala 0: "det == 0" al girar
+		_spheres[i].visible = k > 0.0
 		_spheres[i].rotation = Vector3(_t * 2.0 + i, _t * 1.3, i * 0.7)
 	_light.light_energy = 1.5 * k
