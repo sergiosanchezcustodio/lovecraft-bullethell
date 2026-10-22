@@ -417,3 +417,22 @@ func test_opcion_a_partir_de_su_clave() -> void:
 	q.weapons.get_weapon(&"webly").level = q.weapons.get_weapon(&"webly").data.max_level
 	assert_null(q.progress.option_for("w:webly", q.weapons), "al máximo ya no vale")
 	assert_null(q.progress.option_for("w:nada", q.weapons))
+
+func test_flecha_hacia_los_que_no_se_ven() -> void:
+	var view := Vector2(1920, 1080)
+	assert_null(OffscreenArrows.place(Vector2(900, 500), view), "se ve: sin flecha")
+	var at: Array = OffscreenArrows.place(Vector2(3000, 600), view)
+	var pos: Vector2 = at[0]
+	assert_almost_eq(pos.x, 1920.0 - OffscreenArrows.EDGE, 0.5, "a la derecha, en el borde")
+	assert_gt((at[1] as Vector2).x, 0.9, "apunta a la derecha")
+	at = OffscreenArrows.place(Vector2(960, -900), view)
+	assert_almost_eq((at[0] as Vector2).y, OffscreenArrows.TOP_EDGE, 0.5, "arriba, por debajo de los paneles")
+	at = OffscreenArrows.place(Vector2(-500, 2000), view)
+	var p: Vector2 = at[0]
+	assert_true(p.x >= OffscreenArrows.EDGE - 0.5 and p.y <= 1080.0 - OffscreenArrows.EDGE + 0.5, "esquina: dentro del margen")
+
+func test_color_del_ping() -> void:
+	assert_eq(Hud.PlayerPanel.ping_color(40), Hud.PlayerPanel.PING_OK)
+	assert_eq(Hud.PlayerPanel.ping_color(180), Hud.PlayerPanel.PING_MID)
+	assert_eq(Hud.PlayerPanel.ping_color(400), Hud.PlayerPanel.PING_BAD)
+	assert_eq(Hud.PlayerPanel.ping_color(-1), UiKit.TEXT_DIM, "sin conexión")

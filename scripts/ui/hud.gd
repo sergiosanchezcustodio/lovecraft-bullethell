@@ -6,6 +6,8 @@ extends CanvasLayer
 ## recarga del esquive y aviso de crisis. Si el jugador cae, su panel se apaga. Arriba en
 ## el centro: parte y nivel, objetivo y tiempo. Paneles compactos y translúcidos para no
 ## tapar balas.
+## En red (hito 9.4b), el panel de un jugador de otro PC lleva debajo (encima, en los de
+## abajo) el nombre de su PC y un punto con el ping: verde, amarillo o rojo.
 
 var players: Array[Player] = []
 var director: WaveDirector
@@ -14,6 +16,7 @@ var _time_lbl: Label
 var _objective_lbl: Label
 var _money_lbl: Label
 var money := Callable()                      ## () -> int: dólares de la partida (los pone game.gd)
+var net_info := Callable()                   ## (Player) -> [PC, ping en ms (-1: sin conexión)] o [] si es de este PC
 
 ## Compatibilidad: el J1.
 var player: Player:
@@ -132,6 +135,10 @@ class PlayerPanel extends PanelContainer:
 	var _weapons_row: HBoxContainer
 	var _items_row: HBoxContainer
 	var _weapons_key := ""                      ## armas y niveles pintados (solo se rehace al cambiar)
+	var _net_row: HBoxContainer
+	var _net_dot: Label
+	var _net_lbl: Label
+	var _hud: Hud
 	var _items_key := ""
 
 	const MARGIN := 16.0
@@ -142,6 +149,17 @@ class PlayerPanel extends PanelContainer:
 	const CELL := Vector2(36, 32)               ## casilla de arma u objeto: caben 5 en la fila
 	const ICON := 16.0                          ## iconos de vida, cordura y esquive
 	const ICONS := "res://resources/PantallasMenus/iconos/ficha_%s.png"
+	const PING_OK := Color(0.4, 0.9, 0.45)
+	const PING_MID := Color(1.0, 0.82, 0.3)
+	const PING_BAD := Color(0.95, 0.3, 0.25)
+	const PING_GOOD_MS := 120                   ## por debajo, verde
+	const PING_FAIR_MS := 250                   ## por debajo, amarillo; si no, rojo
+
+	## Color del punto del ping (-1: sin conexión, gris).
+	static func ping_color(ms: int) -> Color:
+		if ms < 0: return UiKit.TEXT_DIM
+		if ms < PING_GOOD_MS: return PING_OK
+		return PING_MID if ms < PING_FAIR_MS else PING_BAD
 
 	func _init(player: Player, hud: Hud) -> void:
 		p = player
@@ -187,6 +205,16 @@ class PlayerPanel extends PanelContainer:
 		_dodge = _bar(box, "esquive", UiKit.GOLD, 54)
 		_weapons_row = _cells(box, 68)
 		_items_row = _cells(box, 100)
+		_net_row = HBoxContainer.new()                           # PC y ping (en red, los de otros PC)
+		_net_row.add_theme_constant_override("separation", 6)
+		_net_row.position = Vector2(0, -32 if bottom else SIZE.y + 14)
+		_net_dot = UiKit.label("●", 20, PING_OK)
+		_net_row.add_child(_net_dot)
+		_net_lbl = UiKit.label("", 14, UiKit.TEXT)
+		_net_row.add_child(_net_lbl)
+		_net_row.visible = false
+		box.add_child(_net_row)
+		_hud = hud
 		_crisis_lbl = UiKit.label("", 12, UiKit.SANITY)          # superpuesto abajo: no ocupa sitio
 		_crisis_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		_crisis_lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
@@ -285,6 +313,12 @@ class PlayerPanel extends PanelContainer:
 			_down_lbl.text = "Derribado · %d s" % ceili(p.down_left) + ("  ·  %d %%" % pct if pct > 0 else "")
 		else: _down_lbl.text = "Caído"
 		modulate = Color(0.55, 0.55, 0.6, 0.8) if down else Color.WHITE
+		var ni: Array = _hud.net_info.call(p) if _hud.net_info.is_valid() else []
+		_net_row.visible = not ni.is_empty()
+		if not ni.is_empty():
+			var ms := int(ni[1])
+			_net_dot.add_theme_color_override("font_color", ping_color(ms))
+			_net_lbl.text = String(ni[0]) if ms < 0 else "%s · %d ms" % [ni[0], ms]
 
 
 ## Experiencia en 10 casillas en relieve: llenas en azul (en cooperativo, del color de quien

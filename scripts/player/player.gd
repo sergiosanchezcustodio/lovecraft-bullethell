@@ -659,7 +659,8 @@ func rebuild_stats() -> void:
 	if motor: motor.data = data
 	var lamp := get_node_or_null("CarryLight") as OmniLight3D      # Linterna de queroseno (tienda)
 	if lamp != null: lamp.omni_range = 4.5 * (LANTERN_RANGE if float(shop.get("lantern", 0.0)) > 0.0 else 1.0)
-	health = minf(health + maxf(data.max_health - old_health, 0.0), data.max_health)
+	# derribado o eliminado (la experiencia es común: sube igual), no: se levantaba sin que lo reanimaran
+	if health > 0.0: health = minf(health + maxf(data.max_health - old_health, 0.0), data.max_health)
 	sanity = minf(sanity + maxf(data.max_sanity - old_sanity, 0.0), data.max_sanity)
 
 ## Locura acumulada (GDD 4.5): cada crisis del nivel quita un poco de cordura máxima.

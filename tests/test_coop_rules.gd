@@ -136,3 +136,17 @@ func test_la_subida_por_cuadrante_termina_cuando_eligen_todos() -> void:
 	assert_true(done[0])
 	assert_eq(a.progress.pending, 0)
 	assert_eq(b.progress.pending, 0)
+
+func test_subir_de_nivel_no_levanta_al_derribado() -> void:
+	# la experiencia es común: el derribado también sube, y con más vida máxima recibía la
+	# diferencia y se levantaba sin que lo reanimaran
+	var down := _player("dyer", Vector3.ZERO, 0)
+	_player("olmstead", Vector3(10, 0, 0), 1)
+	down.revivable = true
+	down.take_damage(Damage.new(9999, 0))
+	var before := down.data.max_health
+	for k in down.attrs: down.attrs[k] += 5
+	down.rebuild_stats()
+	assert_gt(down.data.max_health, before)
+	assert_eq(down.health, 0.0)
+	assert_true(down.is_downed())

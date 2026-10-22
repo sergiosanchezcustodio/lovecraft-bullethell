@@ -30,6 +30,9 @@ extends Node
 ##   parar. La pausa la pide cualquier PC (PAUSE) y la quita quien la puso o el anfitrión. El
 ##   reloj de las marionetas sigue corriendo durante la parada (el anfitrión manda fotos
 ##   quietas), así que lo que estaba en cola sale a su hora y nada da saltos al seguir.
+## - Conexión (hito 9.4b): si al invitado no le llegan fotos en más de QUIET s, un aviso
+##   arriba («Sin noticias del anfitrión…») con los segundos que lleva; se quita solo al volver.
+##   A los QUIET_LEAVE s sale también el botón «Salir al menú principal».
 ##
 ## Formato de las fotos (bytes): ver `write_player`, `write_enemy` y `_on_enemy_bullet`.
 
@@ -94,6 +97,13 @@ var _next_oid := 1
 var halt := {}                               ## parada en curso (los dos lados); vacía, la partida corre
 var _halt_n := 0                             ## anfitrión: número de la última parada (n)
 var _remote_bots := {}                       ## anfitrión: índice de jugador -> true si en su PC lo lleva un bot
+var _snap_at := 0                            ## invitado: ms (de este PC) de la última foto
+var _quiet: CanvasLayer                      ## invitado: aviso de que no llegan fotos
+var _quiet_lbl: Label
+var _gap := PackedFloat32Array()             ## anfitrión, pruebas (snap_gap=t,dur): sin fotos de t a t+dur s de juego
+const QUIET := 2.0                           ## s sin fotos hasta el aviso
+const QUIET_LEAVE := 10.0                    ## y hasta el botón de salir
+var _quiet_btn: Button
 
 func _init(p_game: Node, p_net: NetSession) -> void:
 	game = p_game
@@ -132,6 +142,7 @@ func _ready() -> void:
 		_enemies_root = game.get_node_or_null("Enemies")
 	var la: Variant = game.get("args")
 	_log_on = la is LaunchArgs and (la as LaunchArgs).get_bool("log")
+	if host and la is LaunchArgs and (la as LaunchArgs).has("snap_gap"): _gap = (la as LaunchArgs).get_floats("snap_gap")
 	_wait_overlay("Esperando a los demás jugadores…" if host else "Esperando al anfitrión…")
 	if pause_tree: get_tree().paused = true
 	if host: _check_all_ready()
@@ -209,6 +220,47 @@ func _process(delta: float) -> void:
 		_ready_t -= delta
 		if _ready_t <= 0.0: _send_ready()
 	if started and not get_tree().paused and _log_on: _log(delta)
+	if not host and started: _show_quiet(silence())
+
+## Invitado: s desde la última foto del anfitrión (0 antes de la primera).
+func silence() -> float:
+	if host or _snap_at == 0: return 0.0
+	return (Time.get_ticks_msec() - _snap_at) / 1000.0
+
+func _show_quiet(s: float) -> void:
+	if s <= QUIET:
+		if _quiet != null:
+			_quiet.queue_free()
+			_quiet = null
+			if _log_on: print("RED vuelven las fotos")
+		return
+	if _quiet == null:
+		_quiet = CanvasLayer.new()
+		_quiet.layer = 35
+		_quiet.process_mode = Node.PROCESS_MODE_ALWAYS
+		var panel := PanelContainer.new()
+		panel.add_theme_stylebox_override("panel", UiKit.panel(Color(0.03, 0.03, 0.05, 0.85), Color(0.95, 0.3, 0.25, 0.8), 8))
+		var col := VBoxContainer.new()
+		col.add_theme_constant_override("separation", 8)
+		panel.add_child(col)
+		_quiet_lbl = UiKit.label("", 24, UiKit.TEXT)
+		_quiet_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		col.add_child(_quiet_lbl)
+		_quiet_btn = UiKit.button("Salir al menú principal")
+		_quiet_btn.custom_minimum_size = Vector2(320, 50)
+		_quiet_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		_quiet_btn.visible = false
+		_quiet_btn.pressed.connect(func() -> void: if game.has_method("_quit"): game.call("_quit"))
+		col.add_child(_quiet_btn)
+		_quiet.add_child(panel)
+		panel.resized.connect(func() -> void: panel.position = Vector2((panel.get_viewport_rect().size.x - panel.size.x) * 0.5, 215.0))   # bajo los anuncios
+		add_child(_quiet)
+		if _log_on: print("RED sin noticias del anfitrión")
+	_quiet_lbl.text = "  Sin noticias del anfitrión… %d s  " % int(s)
+	if s > QUIET_LEAVE and not _quiet_btn.visible:   # la partida está parada: ofrece salir (con el foco, para el mando)
+		_quiet_btn.visible = true
+		_quiet_btn.grab_focus()
+		if _log_on: print("RED botón de salir")
 
 ## Registro (log=true): cada 5 s, lo que ve este PC, para comparar las dos ventanas.
 var _log_t := 0.0
@@ -241,7 +293,7 @@ func _physics_process(_delta: float) -> void:
 			net.send(0, TAKEN, _taken.duplicate())
 			_taken.clear()
 		if started and _tick % PROG_EVERY == 0: _send_progress()
-		if started and _tick % SNAP_EVERY == 0: _send_snap()
+		if started and _tick % SNAP_EVERY == 0 and not _in_gap(): _send_snap()
 		for peer in _peer_interp:
 			var ip: NetInterp = _peer_interp[peer]
 			var t := ip.render_ms(now)
@@ -267,6 +319,11 @@ func _physics_process(_delta: float) -> void:
 			_release_bullets(t)
 			_release_world(t)
 		if _tick % 60 == 0: _interp.prune(now + _interp.offset)
+
+func _in_gap() -> bool:
+	if _gap.size() < 2 or game.director == null: return false
+	var t: float = game.director.time
+	return t >= _gap[0] and t < _gap[0] + _gap[1]
 
 func _peer_of(q: Player) -> int:
 	return GameSession.seats[q.index].peer if q.index < GameSession.seats.size() else 1
@@ -523,6 +580,7 @@ func _on_snap(bytes: PackedByteArray) -> void:
 	s.data_array = bytes
 	var t := float(s.get_u32())
 	_interp.observe(t, Time.get_ticks_msec())
+	_snap_at = Time.get_ticks_msec()
 	var dtime := s.get_float()
 	var kills := s.get_u16()
 	var txp := s.get_float()

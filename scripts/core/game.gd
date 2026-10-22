@@ -370,6 +370,12 @@ func _ready() -> void:
 		gems.mirror = is_guest()                      # la experiencia la cuenta el anfitrión
 		net_game = NetGame.new(self, Net)
 		add_child(net_game)
+		hud.net_info = _net_info                       # hito 9.4b: PC y ping en los paneles de los demás
+		hud.add_child(OffscreenArrows.new().setup(players, camera))   # y flechas hacia los que no se ven
+	if args.has("down_at"):                        # pruebas: el J1 de este PC cae a los t s de juego
+		get_tree().create_timer(args.get_float("down_at"), false).timeout.connect(func() -> void:
+			player.god = false
+			player.take_damage(Damage.new(99999.0, 0.0)))
 	if args.has("pause_at"):                       # pruebas: pausa a los t s de juego y la quita a los dur s
 		var pa := args.get_floats("pause_at")
 		get_tree().create_timer(pa[0], false).timeout.connect(func() -> void:
@@ -565,6 +571,7 @@ func toggle_pause() -> void:
 ## Abre el menú de pausa (en un invitado, solo Continuar y Menú principal).
 func _open_pause() -> void:
 	_pause = Menus.PauseMenu.new(is_guest())
+	if is_guest(): _pause.ping = func() -> int: return int(Net.peers.get(GameSession.my_peer, {}).get("ping", -1))
 	_pause.resume.connect(toggle_pause)
 	_pause.restart.connect(_restart)
 	_pause.debug.connect(_open_debug)
@@ -702,6 +709,16 @@ func _halt_shot() -> void:
 	get_viewport().get_texture().get_image().save_png(path)
 	print("captura: ", ProjectSettings.globalize_path(path))
 
+## Panel del HUD de un jugador de otro PC: [nombre de su PC, ping hasta él en ms] (-1 si se ha
+## ido). El ping de los invitados lo mide el anfitrión: de un invitado a otro se suman los dos.
+func _net_info(q: Player) -> Array:
+	if not q.remote: return []
+	var peer := _peer_of(q)
+	if not Net.peers.has(peer): return ["sin conexión", -1]
+	var mine := int(Net.peers.get(GameSession.my_peer, {}).get("ping", 0))
+	var ms := mine if peer == 1 else int(Net.peers[peer].get("ping", 0)) + (mine if is_guest() else 0)
+	return [_pc_name(peer), ms]
+
 ## Nombre del PC en la sala.
 func _pc_name(peer: int) -> String:
 	return String(Net.peers.get(peer, {}).get("name", "otro jugador")) if Net != null else "otro jugador"
@@ -786,9 +803,18 @@ func _on_downed(q: Player) -> void:
 	if _ended: return
 	if players.size() > 1 and players.any(func(c: Player) -> bool: return c.health > 0.0):
 		announce("J%d, derribado: ¡reanimadlo!" % (q.index + 1), 2.0)
+		if q.remote: _remote_down_sfx(q)
 		return
 	if is_guest(): return                            # la derrota la decide el anfitrión
 	_game_over()
+
+## En red, un jugador de otro PC cae (llega con su estado, sin el sonido de su PC): donde está
+## si se ve; si no, sin posición y más bajo, para que se oiga aunque esté lejos.
+func _remote_down_sfx(q: Player) -> void:
+	var p := q.global_position + Vector3(0, 0.9, 0)
+	if OffscreenArrows.place(camera.unproject_position(p), get_viewport().get_visible_rect().size) == null:
+		Auto.sfx_at("down", q.global_position)
+	else: Auto.sfx("down", -7.0)
 
 ## Simulaciones (tools/simular.py): nivel, vida más baja y caídas de cada jugador al acabar el nivel.
 func _log_players() -> void:
@@ -1214,6 +1240,9 @@ func _process_step(delta: float) -> void:
 		var alive: Array[Node3D] = []
 		for q in players:
 			if not q.is_eliminated and not q.remote: alive.append(q)   # los derribados también (en red, solo los de este PC)
+		if alive.is_empty() and net_game != null:      # en red, si los de este PC están eliminados, a los que siguen
+			for q in players:
+				if not q.is_eliminated: alive.append(q)
 		if not alive.is_empty(): camera.targets = alive
 	# tiempo jugado del hueco: en tiempo real, sin contar pausas ni la velocidad del juego
 	if not get_tree().paused and not _ended: Saves.add_play_time(delta / maxf(Engine.time_scale, 0.001))

@@ -92,6 +92,10 @@ class PauseMenu extends CanvasLayer:
 	signal quit
 	var _buttons: Array[Button] = []
 	var guest := false                          ## en red, un invitado: solo Continuar y Menú principal
+	var ping := Callable()                      ## en red, invitado: () -> ms hasta el anfitrión (debajo, con su punto)
+	var _ping_dot: Label
+	var _ping_lbl: Label
+	var _ping_t := 0.0
 
 	func _init(p_guest := false) -> void:
 		guest = p_guest
@@ -117,8 +121,29 @@ class PauseMenu extends CanvasLayer:
 			b.pressed.connect(func() -> void: sig.emit())
 			box.add_child(b)
 			_buttons.append(b)
+		if ping.is_valid():                         # conexión con el anfitrión, como en los paneles del HUD
+			var row := HBoxContainer.new()
+			row.alignment = BoxContainer.ALIGNMENT_CENTER
+			row.add_theme_constant_override("separation", 8)
+			_ping_dot = UiKit.label("●", 22)
+			row.add_child(_ping_dot)
+			_ping_lbl = UiKit.label("", 18, UiKit.TEXT_DIM)
+			row.add_child(_ping_lbl)
+			box.add_child(row)
+			_show_ping()
 		box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
 		_buttons[0].grab_focus.call_deferred()
+
+	func _process(delta: float) -> void:
+		_ping_t += delta
+		if _ping_lbl != null and _ping_t >= 0.5:      # el ping llega cada 2 s
+			_ping_t = 0.0
+			_show_ping()
+
+	func _show_ping() -> void:
+		var ms := int(ping.call())
+		_ping_dot.add_theme_color_override("font_color", Hud.PlayerPanel.ping_color(ms))
+		_ping_lbl.text = "Conexión con el anfitrión: %d ms" % ms if ms >= 0 else "Sin conexión con el anfitrión"
 
 	## B en el mando: vuelve al juego (Esc y Start ya los atiende pause_watch). Oculta, con la
 	## depuración encima, no hace nada: B es "volver" en ese menú.
