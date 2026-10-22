@@ -91,8 +91,10 @@ class PauseMenu extends CanvasLayer:
 	signal debug
 	signal quit
 	var _buttons: Array[Button] = []
+	var guest := false                          ## en red, un invitado: solo Continuar y Menú principal
 
-	func _init() -> void:
+	func _init(p_guest := false) -> void:
+		guest = p_guest
 		layer = 30
 		process_mode = Node.PROCESS_MODE_ALWAYS
 
@@ -107,7 +109,8 @@ class PauseMenu extends CanvasLayer:
 		var t := UiKit.label("Pausa", 40)
 		t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(t)
-		for pair in [["Continuar", resume], ["Reiniciar", restart], ["Depuración", debug], ["Menú principal", quit]]:
+		var rows := [["Continuar", resume], ["Menú principal", quit]] if guest else 			[["Continuar", resume], ["Reiniciar", restart], ["Depuración", debug], ["Menú principal", quit]]
+		for pair in rows:
 			var b := UiKit.button(pair[0])
 			b.custom_minimum_size = Vector2(300, 56)
 			var sig: Signal = pair[1]

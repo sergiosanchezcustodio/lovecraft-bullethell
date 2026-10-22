@@ -12,6 +12,16 @@ class FakeGame extends Node3D:
 	var gems: GemManager
 	var kills := 0
 	var won := false
+	var ng: NetGame                                  ## la suya (paradas del anfitrión)
+	var halts: Array = []
+	var resumes: Array = []
+	var picks: Array = []
+	func net_halt(d: Dictionary) -> void: halts.append(d)
+	func net_resume(d: Dictionary) -> void: resumes.append(d)
+	func net_picked(i: int, d: Dictionary) -> void: picks.append([i, d])
+	func net_pause_asked(peer: int, on: bool) -> void:
+		if on: ng.halt_all({"k": "pause", "peer": peer})
+		else: ng.resume_all()
 	func _init() -> void:
 		world = CombatWorld.new()
 		add_child(world)
@@ -303,3 +313,107 @@ func test_el_progreso_viaja_entero() -> void:
 	assert_eq(int(b.attrs["speed"]), 17)
 	assert_almost_eq(float(b.shop["health"]), 1.3, 0.001)
 	assert_false(NetGame.apply_progress(b, copy), "lo mismo otra vez: sin subida")
+
+func test_paradas_para_todos() -> void:
+	host = NetSession.new()
+	add_child_autofree(host)
+	assert_eq(host.host(PORT + 1, false), OK)
+	guest = NetSession.new()
+	add_child_autofree(guest)
+	guest.join("127.0.0.1", host.port)
+	assert_true(await _until(func() -> bool: return guest.state == NetSession.State.CONNECTED))
+	for k in 3:                                       # J1 del anfitrión; J2 y J3 de la invitada (J3, un bot)
+		var seat := GameSession.Seat.new()
+		seat.slot = k
+		seat.peer = 1 if k == 0 else guest.my_id
+		GameSession.seats.append(seat)
+	GameSession.online = true
+	var hg := FakeGame.new()
+	var gg := FakeGame.new()
+	add_child_autofree(hg)
+	add_child_autofree(gg)
+	hg.add_player(0, false)
+	var h2 := hg.add_player(1, true)
+	var h3 := hg.add_player(2, true)
+	gg.add_player(0, true)
+	var g2 := gg.add_player(1, false)
+	var g3 := gg.add_player(2, false)
+	g3.input = BotInput.new("circle")
+	for q in [h2, g2]:
+		q.weapons = WeaponSystem.new().setup(q, q.world)
+		q.add_child(q.weapons)
+		q.weapons.add_weapon(load("res://data/weapons/webly.tres"))
+	var hn := NetGame.new(hg, host)
+	hn.pause_tree = false
+	hg.ng = hn
+	hg.add_child(hn)
+	var gn := NetGame.new(gg, guest)
+	gn.pause_tree = false
+	gg.add_child(gn)
+	assert_true(await _until(func() -> bool: return hn.started and gn.started), "los dos arrancan")
+	assert_true(hn.is_remote_bot(h3), "el anfitrión sabe que al J3 lo lleva un bot")
+	assert_false(hn.is_remote_bot(h2))
+	# la invitada pide la pausa: se para en los dos, puesta por ella
+	gn.ask_pause(true)
+	assert_true(await _until(func() -> bool: return gg.halts.size() == 1 and hg.halts.size() == 1), "parada en los dos")
+	assert_eq(String(gg.halts[0].k), "pause")
+	assert_eq(int(gg.halts[0].peer), guest.my_id)
+	gn.ask_pause(false)
+	assert_true(await _until(func() -> bool: return gg.resumes.size() == 1), "y la quita")
+	assert_true(hn.halt.is_empty() and gn.halt.is_empty())
+	# lo elegido fuera de una subida no cuenta
+	gn.send_pick(g2, g2.progress.option_for("w:webly", g2.weapons))
+	for k in 20: await get_tree().physics_frame
+	assert_eq(hg.picks.size(), 0)
+	# le toca subir a la J2: su PC elige y el anfitrión lo recibe
+	hn.halt_all({"k": "lvup", "peer": guest.my_id, "i": 1, "title": "Turno de J2", "attr": "speed"})
+	assert_true(await _until(func() -> bool: return gg.halts.size() == 2), "llega la subida")
+	assert_eq(int(gg.halts[1].i), 1)
+	g2.rerolls_used = 1
+	g2.progress.banished["u:iman"] = true
+	gn.send_pick(g2, g2.progress.option_for("w:webly", g2.weapons))
+	assert_true(await _until(func() -> bool: return hg.picks.size() == 1), "llega lo elegido")
+	var d: Dictionary = hg.picks[0][1]
+	assert_eq(String(d.key), "w:webly")
+	assert_eq(int(d.rerolls), 1)
+	assert_eq(Array(d.banished), ["u:iman"])
+	hn.resume_all("J2 · Dyer: Webley 2")
+	assert_true(await _until(func() -> bool: return gg.resumes.size() == 2), "sigue en los dos")
+	assert_eq(String(gg.resumes[1].text), "J2 · Dyer: Webley 2")
+	assert_eq(int(gg.resumes[1].peer), guest.my_id, "quien eligió no lo vuelve a anunciar")
+	assert_false(bool(gg.resumes[1].all))
+	# lo elegido para una subida anterior (llega tarde) no vale para la siguiente
+	var old_n := int(gg.halts[1].n)
+	hn.halt_all({"k": "lvup", "peer": guest.my_id, "i": 1, "title": "Turno de J2", "attr": ""})
+	assert_true(await _until(func() -> bool: return gg.halts.size() == 3), "otra subida")
+	assert_ne(int(gg.halts[2].n), old_n)
+	guest.send(1, NetGame.PICK, {"n": old_n, "i": 1, "key": "w:webly"})
+	for k in 20: await get_tree().physics_frame
+	assert_eq(hg.picks.size(), 1, "la tardía no cuenta")
+	# el anfitrión elige por ella: el anuncio sale también en su PC
+	hn.resume_all("J2 · Dyer: Webley 3 (elegida por el anfitrión)", true)
+	assert_true(await _until(func() -> bool: return gg.resumes.size() == 3))
+	assert_true(bool(gg.resumes[2].all))
+
+func test_opcion_a_partir_de_su_clave() -> void:
+	var g := FakeGame.new()
+	add_child_autofree(g)
+	var q := g.add_player(0, false)
+	q.weapons = WeaponSystem.new().setup(q, g.world)
+	q.add_child(q.weapons)
+	q.weapons.add_weapon(load("res://data/weapons/webly.tres")).level = 2
+	q.progress.weapon_pool.append(load("res://data/weapons/granada.tres"))
+	q.progress.upgrade_pool.append(load("res://data/upgrades/iman.tres"))
+	var o := q.progress.option_for("w:webly", q.weapons)
+	assert_eq(o.kind, PlayerProgress.Option.Kind.WEAPON_LEVEL)
+	assert_eq(o.to_level, 3)
+	o = q.progress.option_for("w:granada", q.weapons)
+	assert_eq(o.kind, PlayerProgress.Option.Kind.NEW_WEAPON)
+	q.progress.passives["iman"] = 1
+	o = q.progress.option_for("u:iman", q.weapons)
+	assert_eq(o.kind, PlayerProgress.Option.Kind.PASSIVE)
+	assert_eq(o.to_level, 2)
+	assert_eq(PlayerProgress.key_of(o), "u:iman")
+	q.weapons.get_weapon(&"webly").level = q.weapons.get_weapon(&"webly").data.max_level
+	assert_null(q.progress.option_for("w:webly", q.weapons), "al máximo ya no vale")
+	assert_null(q.progress.option_for("w:nada", q.weapons))

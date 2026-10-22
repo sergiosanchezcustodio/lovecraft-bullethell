@@ -68,6 +68,8 @@ var _ended := false
 var _final_alive := 0.0                          ## segundos que lleva vivo el enemigo final (registro)
 var _log_slot := 0                                ## último tramo de 30 s escrito en el registro
 var _pause: Menus.PauseMenu
+var _shot_tag := ""                            ## sufijo de las capturas (tag=, y _inv en un invitado)
+var _halt_ui: CanvasLayer                      ## en red: aviso de la parada que ha puesto otro PC
 var _debug: DebugMenu
 var _info: Label                               ## depuración: FPS, enemigos, balas
 var _rng := RandomNumberGenerator.new()
@@ -360,14 +362,19 @@ func _ready() -> void:
 		get_tree().create_timer(args.get_float("debug_menu", 1.0)).timeout.connect(func() -> void:
 			toggle_pause()
 			_open_debug())
+	_shot_tag = ("_" + args.get_str("tag")) if args.has("tag") else ""
+	if is_guest(): _shot_tag += "_inv"                 # dos ventanas en el mismo PC: que no se pisen
 	if args.has("shots") or args.has("game_shots"):    # game_shots=: solo aquí (la selección también lee shots=)
-		var tag := ("_" + args.get_str("tag")) if args.has("tag") else ""
-		if is_guest(): tag += "_inv"                    # dos ventanas en el mismo PC: que no se pisen
-		add_child(ShotTaker.new(args.get_floats("game_shots" if args.has("game_shots") else "shots"), "res://shots/game%s" % tag))
+		add_child(ShotTaker.new(args.get_floats("game_shots" if args.has("game_shots") else "shots"), "res://shots/game%s" % _shot_tag))
 	if GameSession.online and Net.is_active():         # partida en red (hito 9.3a)
 		gems.mirror = is_guest()                      # la experiencia la cuenta el anfitrión
 		net_game = NetGame.new(self, Net)
 		add_child(net_game)
+	if args.has("pause_at"):                       # pruebas: pausa a los t s de juego y la quita a los dur s
+		var pa := args.get_floats("pause_at")
+		get_tree().create_timer(pa[0], false).timeout.connect(func() -> void:
+			toggle_pause()
+			get_tree().create_timer(pa[1] if pa.size() > 1 else 3.0, true).timeout.connect(toggle_pause))
 
 ## ¿Este PC es un invitado de una partida en red? (El mundo lo manda el anfitrión.)
 func is_guest() -> bool:
@@ -440,10 +447,11 @@ func _spawn_pet(id: String, owner: Player) -> void:
 	owner.pet = pet                                  # la ficha lo enseña
 	add_child(pet)
 
-## ¿Lo maneja la máquina? (elige sola sus mejoras)
-## (En red, los de otros PC también, hasta el 9.4: el anfitrión coge su primera opción.)
+## ¿Lo maneja la máquina? (elige sola sus mejoras sin parar la partida). En red, un jugador de
+## otro PC lo es si allí lo lleva un bot: elige aquí, con SmartBot.
 func _is_bot(q: Player) -> bool:
-	return q.input is BotInput or q.remote
+	if q.remote: return net_game != null and net_game.is_remote_bot(q)
+	return q.input is BotInput and not args.get_bool("bots_pause")   # pruebas: como una persona
 
 # ---------------- flujo de la partida ----------------
 func _on_enemy_died(e: Enemy) -> void:
@@ -487,35 +495,63 @@ func _open_level_up() -> void:
 		return
 	var coop := players.size() > 1
 	if args.get_bool("autopick") or _is_bot(q):
-		var pick: PlayerProgress.Option = options[0] if not _is_bot(q) or q.remote else options[_rng.randi() % options.size()]
-		if q.input is SmartBot: pick = SmartBot.pick(options, q, _rng)
+		var pick: PlayerProgress.Option = options[0] if not _is_bot(q) else options[_rng.randi() % options.size()]
+		if q.input is SmartBot or (q.remote and _is_bot(q)): pick = SmartBot.pick(options, q, _rng)
 		q.progress.choose(pick, q)
-		if coop and not args.get_bool("autopick"): announce("J%d · %s: %s" % [q.index + 1, q.data.display_name, pick.title()], 1.6)
+		if coop and not args.get_bool("autopick"):
+			var said := _pick_text(q, pick)
+			announce(said, 1.6)
+			if net_game != null and q.remote: net_game.say(said)   # el bot es de otro PC: que lo vean todos
 		_open_level_up.call_deferred()
 		return
 	_menu_open = true
 	get_tree().paused = true
 	var title := "Nivel %d" % (q.progress.level - q.progress.pending + 1)
-	if coop: title = "Turno de J%d · %s · %s" % [q.index + 1, q.data.display_name, title]
+	if net_game != null: title = "Turno de J%d · %s (%s) · %s" % [q.index + 1, q.data.display_name, _pc_name(_peer_of(q)), title]
+	elif coop: title = "Turno de J%d · %s · %s" % [q.index + 1, q.data.display_name, title]
 	var attr := "" if q.progress.attr_gains.is_empty() else String(q.progress.attr_gains[0])  # D-27: lo enseña el rodillo
+	if net_game != null:                          # en red, la partida se para en todos los PC
+		net_game.halt_all({"k": "lvup", "peer": _peer_of(q), "i": q.index, "title": title, "attr": attr})
+		if q.remote: return                        # elige en su PC (llega con net_picked)
 	# la misma ventana en solitario y en cooperativo, centrada (antes, Menus.LevelUpMenu: fila de
 	# botones con el foco de Godot, que con el mando no bajaba y a ratos no respondía)
-	var entry := {"player": q, "options": options, "title": title, "attr": attr}
-	if coop:
-		entry["accent"] = q.color
-		entry["speed"] = LEVEL_UP_COOP_SPEED            # más pausas que en solitario: rodillos más cortos
-	var menu := CoopLevelUp.new([entry] as Array[Dictionary],
-		func(pq: Player, o: PlayerProgress.Option) -> void: pq.progress.choose(o, pq), true)
+	var said := [""]
+	var menu := _level_up_window(q, options, title, attr, func(pq: Player, o: PlayerProgress.Option) -> void:
+		pq.progress.choose(o, pq)
+		said[0] = _pick_text(pq, o))
 	menu.finished.connect(func() -> void:
 		_menu_open = false
-		get_tree().paused = false
+		if net_game != null: net_game.resume_all(said[0])
+		else: get_tree().paused = false
 		_open_level_up.call_deferred())
 	add_child(menu)
+
+## La ventana de subida de un jugador (CoopLevelUp centrada, con su color en cooperativo).
+func _level_up_window(q: Player, options: Array[PlayerProgress.Option], title: String, attr: String, pick: Callable) -> CoopLevelUp:
+	var entry := {"player": q, "options": options, "title": title, "attr": attr}
+	if players.size() > 1:
+		entry["accent"] = q.color
+		entry["speed"] = LEVEL_UP_COOP_SPEED            # más pausas que en solitario: rodillos más cortos
+	var menu := CoopLevelUp.new([entry] as Array[Dictionary], pick, true)
+	var after := args.get_float("pick_after", -1.0)   # pruebas: elige sola la opción marcada a los N s
+	if after >= 0.0: menu.auto_pick_after = after
+	return menu
+
+static func _pick_text(q: Player, o: PlayerProgress.Option) -> String:
+	return "J%d · %s: %s" % [q.index + 1, q.data.display_name, o.title()]
+
+## PC que maneja a un jugador (en local, el 1). Si su PC se ha ido, lo lleva un bot de aquí.
+func _peer_of(q: Player) -> int:
+	if not q.remote: return GameSession.my_peer
+	return GameSession.seats[q.index].peer if q.index < GameSession.seats.size() else 1
 
 func toggle_pause() -> void:
 	if _menu_open or _ended: return
 	if menus != null and _pause == null and menus.solo() and menus.close_all(): return   # Esc cierra la ficha o el mapa
 	if _debug != null: return                     # el menú de depuración atiende Esc y Start
+	if net_game != null and net_game.started:
+		_net_toggle_pause()
+		return
 	if _pause != null:
 		_pause.queue_free()
 		_pause = null
@@ -523,13 +559,182 @@ func toggle_pause() -> void:
 		if DebugOptions.values.has("time_scale"): Engine.time_scale = DebugOptions.values["time_scale"]
 		_open_level_up.call_deferred()             # subidas pendientes (p. ej. de la depuración)
 		return
-	_pause = Menus.PauseMenu.new()
+	_open_pause()
+	get_tree().paused = true
+
+## Abre el menú de pausa (en un invitado, solo Continuar y Menú principal).
+func _open_pause() -> void:
+	_pause = Menus.PauseMenu.new(is_guest())
 	_pause.resume.connect(toggle_pause)
 	_pause.restart.connect(_restart)
 	_pause.debug.connect(_open_debug)
 	_pause.quit.connect(_quit)
 	add_child(_pause)
-	get_tree().paused = true
+
+func _close_pause() -> void:
+	if _pause != null: _pause.queue_free()
+	_pause = null
+
+# ---------------- red (hito 9.4a): paradas para todos ----------------
+## En red, la pausa para la partida en todos los PC (D-10). La pide cualquiera; la quita quien
+## la puso o el anfitrión (por si alguien se ausenta).
+func _net_toggle_pause() -> void:
+	var h := net_game.halt
+	if is_guest():
+		if h.is_empty(): net_game.ask_pause(true)
+		elif h.get("k") == "pause" and int(h.get("peer", 0)) == GameSession.my_peer: net_game.ask_pause(false)
+		return
+	if h.is_empty():
+		net_game.halt_all({"k": "pause", "peer": 1})
+	elif h.get("k") == "pause":
+		net_game.resume_all()
+
+## Anfitrión: un invitado pide la pausa o quitarla.
+func net_pause_asked(peer: int, on: bool) -> void:
+	var h := net_game.halt
+	if on:
+		if h.is_empty() and not _menu_open and not _ended and _debug == null: net_game.halt_all({"k": "pause", "peer": peer})
+	elif h.get("k") == "pause" and int(h.get("peer", 0)) == peer:
+		net_game.resume_all()
+
+## La partida se para en todos los PC (NetGame.halt_all o HALT). Quien la ha parado tiene su
+## ventana (la pausa o la subida); los demás, un aviso.
+func net_halt(d: Dictionary) -> void:
+	if args.get_bool("halt_shots"): _halt_shot()
+	if args.get_bool("log"): print("PARADA %s pc=%d j=%d t=%.1f" % [d.get("k"), int(d.get("peer", 1)), int(d.get("i", -1)) + 1, director.time if director else 0.0])
+	var mine := int(d.get("peer", 1)) == GameSession.my_peer
+	var who := _pc_name(int(d.get("peer", 1)))
+	if d.get("k") == "pause":
+		if mine:
+			_open_pause()
+			return
+		var buttons := [["Menú principal", _quit]]
+		if not is_guest(): buttons.push_front(["Continuar", func() -> void: net_game.resume_all()])
+		_show_halt("En pausa: la ha puesto %s" % who, buttons)
+		return
+	var i := int(d.get("i", 0))
+	if i >= players.size(): return
+	var q: Player = players[i]
+	if mine:
+		if is_guest(): _open_net_level_up(q, d)       # en el anfitrión, la ventana ya está abierta
+		return
+	var text := "Turno de J%d · %s (%s)\neligiendo mejora…" % [i + 1, q.data.display_name, who]
+	_show_halt(text, [])
+	if is_guest(): return
+	# anfitrión: si tarda (se ha ausentado), puede elegir por él
+	var n := int(d.get("n", 0))
+	get_tree().create_timer(args.get_float("afk_pick", NET_AFK_PICK), true).timeout.connect(func() -> void:
+		if int(net_game.halt.get("n", -1)) == n and _halt_ui != null:
+			_show_halt(text, [["Elegir por J%d" % (i + 1), _pick_for.bind(i)]])
+			if args.get_bool("halt_shots"): _halt_shot()
+			if args.get_bool("afk_press"): get_tree().create_timer(1.5, true).timeout.connect(_pick_for.bind(i)))   # pruebas
+
+## Anfitrión: elige por el jugador de otro PC que no se decide (como lo haría un bot).
+func _pick_for(i: int) -> void:
+	if net_game.halt.get("k") != "lvup" or int(net_game.halt.get("i", -1)) != i: return   # ya eligió
+	var q: Player = players[i]
+	var options := q.progress.roll_options(q.weapons, _rng)
+	if options.is_empty(): return
+	net_picked(i, {"key": PlayerProgress.key_of(SmartBot.pick(options, q, _rng)), "by_host": true})
+
+## Invitado: le toca subir a un jugador de este PC. Tira sus opciones (el progreso acaba de
+## llegar) y manda lo elegido al anfitrión, que lo aplica y sigue.
+func _open_net_level_up(q: Player, d: Dictionary) -> void:
+	var options := q.progress.roll_options(q.weapons, _rng)
+	if options.is_empty(): return
+	var menu := _level_up_window(q, options, String(d.get("title", "")), String(d.get("attr", "")),
+		func(pq: Player, o: PlayerProgress.Option) -> void: net_game.send_pick(pq, o))
+	menu.name = "NetLevelUp"
+	add_child(menu)
+
+## Anfitrión: lo que ha elegido el jugador de otro PC en su subida.
+const NET_AFK_PICK := 30.0                       ## s hasta que el anfitrión puede elegir por otro PC (afk_pick=)
+func net_picked(i: int, d: Dictionary) -> void:
+	var q: Player = players[i]
+	if d.get("banished") is Array:
+		for k: Variant in d.banished: q.progress.banished[String(k)] = true
+	q.rerolls_used = int(d.get("rerolls", q.rerolls_used))
+	q.banishes_used = int(d.get("banishes", q.banishes_used))
+	var o := q.progress.option_for(String(d.get("key", "")), q.weapons)
+	if o == null:                                    # ya no vale (no debería pasar): la primera que salga
+		var opts := q.progress.roll_options(q.weapons, _rng)
+		o = opts[0] if not opts.is_empty() else null
+	var said := ""
+	var by_host := bool(d.get("by_host", false))
+	if o != null:
+		q.progress.choose(o, q)
+		said = _pick_text(q, o) + (" (elegida por el anfitrión)" if by_host else "")
+	else: q.progress.pending = maxi(q.progress.pending - 1, 0)
+	_menu_open = false
+	net_game.resume_all(said, by_host)
+	_open_level_up.call_deferred()
+
+## Anfitrión: se ha ido el PC que elegía (su jugador ya lo lleva un bot) o que puso la pausa.
+func net_halt_gone(d: Dictionary) -> void:
+	if d.get("k") == "lvup":
+		_menu_open = false
+		net_game.resume_all()
+		_open_level_up.call_deferred()                 # ahora es un bot de aquí: elige solo
+	else: net_game.resume_all()
+
+## La partida sigue: fuera ventanas y avisos de la parada, y el anuncio de lo elegido.
+func net_resume(d: Dictionary) -> void:
+	if _halt_ui != null:
+		_halt_ui.queue_free()
+		_halt_ui = null
+	_close_pause()
+	var w := get_node_or_null("NetLevelUp")
+	if w != null: w.queue_free()
+	if not _ended: get_tree().paused = false
+	if DebugOptions.values.has("time_scale"): Engine.time_scale = DebugOptions.values["time_scale"]
+	var text := String(d.get("text", ""))
+	if text != "" and (int(d.get("peer", 1)) != GameSession.my_peer or bool(d.get("all", false))): announce(text, 1.8)
+	if args.get_bool("log"): print("SIGUE t=%.1f %s" % [director.time if director else 0.0, text])
+	if not is_guest(): _open_level_up.call_deferred()
+
+## Pruebas (halt_shots=true): una captura de cada parada, al segundo y poco.
+var _halt_shots := 0
+func _halt_shot() -> void:
+	_halt_shots += 1
+	var path := "res://shots/game%s_parada%d.png" % [_shot_tag, _halt_shots]
+	await get_tree().create_timer(1.2, true).timeout
+	await RenderingServer.frame_post_draw
+	get_viewport().get_texture().get_image().save_png(path)
+	print("captura: ", ProjectSettings.globalize_path(path))
+
+## Nombre del PC en la sala.
+func _pc_name(peer: int) -> String:
+	return String(Net.peers.get(peer, {}).get("name", "otro jugador")) if Net != null else "otro jugador"
+
+## Aviso de una parada puesta por otro PC, con sus botones ([texto, Callable]).
+func _show_halt(text: String, buttons: Array) -> void:
+	if _halt_ui != null: _halt_ui.queue_free()
+	_halt_ui = CanvasLayer.new()
+	_halt_ui.layer = 30
+	_halt_ui.process_mode = Node.PROCESS_MODE_ALWAYS
+	var dim := ColorRect.new()
+	dim.color = Color(0.0, 0.0, 0.02, 0.5)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_halt_ui.add_child(dim)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 14)
+	_halt_ui.add_child(box)
+	var l := UiKit.label(text, 32, UiKit.TEXT)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(l)
+	var first: Button = null
+	for pair: Array in buttons:
+		var b := UiKit.button(String(pair[0]))
+		b.custom_minimum_size = Vector2(300, 56)
+		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		var f: Callable = pair[1]
+		b.pressed.connect(func() -> void: f.call())
+		box.add_child(b)
+		if first == null: first = b
+	box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
+	add_child(_halt_ui)
+	if first != null: first.grab_focus.call_deferred()
 
 ## Menú de depuración, encima de la pausa (que se oculta mientras tanto).
 func _open_debug() -> void:

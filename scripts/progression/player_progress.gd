@@ -147,6 +147,37 @@ const OWNED_WEIGHT := 8.0
 static func key_of(o: Option) -> String:
 	return ("u:" + String(o.upgrade.id)) if o.kind == Option.Kind.PASSIVE else ("w:" + String(o.weapon.id))
 
+## La opción que corresponde a una clave de `key_of` con lo que lleva ahora el jugador (en red,
+## lo que ha elegido en su PC). Null si ya no vale: arma sin hueco o al máximo, objeto al máximo.
+func option_for(key: String, weapons: WeaponSystem) -> Option:
+	var id := StringName(key.substr(2))
+	var o := Option.new()
+	if key.begins_with("u:"):
+		for up in upgrade_pool:
+			if up.id != id: continue
+			var lv: int = passives.get(up.id, 0)
+			if lv >= up.max_level or (lv == 0 and _items_owned() >= item_slots): return null
+			o.kind = Option.Kind.PASSIVE
+			o.upgrade = up
+			o.to_level = lv + 1
+			return o
+		return null
+	if not key.begins_with("w:") or weapons == null: return null
+	var owned := weapons.get_weapon(id)
+	if owned != null:
+		if owned.level >= owned.data.max_level: return null
+		o.kind = Option.Kind.WEAPON_LEVEL
+		o.weapon = owned.data
+		o.to_level = owned.level + 1
+		return o
+	for wd in weapon_pool:
+		if wd.id != id: continue
+		if weapons.weapons.size() >= weapon_slots: return null
+		o.kind = Option.Kind.NEW_WEAPON
+		o.weapon = wd
+		return o
+	return null
+
 ## Peso al sortear: subir un arma u objeto que ya lleva pesa más que algo nuevo.
 static func _weight(o: Option) -> float:
 	return OWNED_WEIGHT if o.kind != Option.Kind.NEW_WEAPON and o.to_level > 1 else 1.0

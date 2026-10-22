@@ -24,6 +24,12 @@ extends Node
 ##   rompibles, las recompensas, los baúles y los peligros del escenario viajan como sucesos
 ##   (WORLD, fiables, con el ms del anfitrión) y el invitado los repite cuando su reloj llega a
 ##   ese ms; los golpes dañan a los jugadores de cada PC. Recoger y abrir lo decide el anfitrión.
+## - Paradas (hito 9.4a, D-10): las subidas por turnos y la pausa paran la partida en todos los
+##   PC. Las decide el anfitrión (HALT y RESUME). Cuando le toca subir a un jugador de otro PC,
+##   ese PC abre la ventana con sus opciones y manda lo elegido (PICK); los bots eligen sin
+##   parar. La pausa la pide cualquier PC (PAUSE) y la quita quien la puso o el anfitrión. El
+##   reloj de las marionetas sigue corriendo durante la parada (el anfitrión manda fotos
+##   quietas), así que lo que estaba en cola sale a su hora y nada da saltos al seguir.
 ##
 ## Formato de las fotos (bytes): ver `write_player`, `write_enemy` y `_on_enemy_bullet`.
 
@@ -42,6 +48,10 @@ const GEMS := NetSession.USER + 21           ## anfitrión -> invitados: [primer
 const TAKEN := NetSession.USER + 22          ## anfitrión -> invitados: ids de gemas recogidas
 const PROG := NetSession.USER + 23           ## anfitrión -> invitados: [jugador, progreso]
 const WORLD := NetSession.USER + 24          ## anfitrión -> invitados: [[ms, suceso, datos], ...]
+const HALT := NetSession.USER + 25           ## anfitrión -> invitados: se para {k: lvup|pause, peer, n, i, title, attr}
+const RESUME := NetSession.USER + 26         ## anfitrión -> invitados: sigue {peer, text, all}
+const PICK := NetSession.USER + 27           ## invitado -> anfitrión: mejora elegida {n, i, key, banished, rerolls, banishes}
+const PAUSE := NetSession.USER + 28          ## invitado -> anfitrión: pide (true) o quita (false) la pausa
 
 const SNAP_EVERY := 3                        ## pasos de física entre fotos del anfitrión (20 Hz)
 const PSTATE_EVERY := 2                      ## y entre estados de un invitado (30 Hz)
@@ -81,6 +91,9 @@ var _world_out := []                         ## anfitrión: sucesos del mundo de
 var _ev_queue: Array = []                    ## invitado: sucesos del mundo por repetir [ms, suceso, datos]
 var _objs := {}                              ## id -> rompible, recompensa o baúl (los dos lados)
 var _next_oid := 1
+var halt := {}                               ## parada en curso (los dos lados); vacía, la partida corre
+var _halt_n := 0                             ## anfitrión: número de la última parada (n)
+var _remote_bots := {}                       ## anfitrión: índice de jugador -> true si en su PC lo lleva un bot
 
 func _init(p_game: Node, p_net: NetSession) -> void:
 	game = p_game
@@ -138,7 +151,21 @@ func is_mine(q: Player) -> bool:
 
 func _send_ready() -> void:
 	_ready_t = READY_EVERY
-	net.send(1, READY, true)
+	net.send(1, READY, {"bots": my_bots()})
+
+## Jugadores de este PC que lleva la máquina: eligen sus mejoras sin parar la partida. Con
+## bots_pause=true (pruebas) cuentan como personas: paran la partida y abren la ventana.
+func my_bots() -> Array:
+	var out := []
+	var la: Variant = game.get("args")
+	if la is LaunchArgs and (la as LaunchArgs).get_bool("bots_pause"): return out
+	for q: Player in game.players:
+		if not q.remote and q.input is BotInput: out.append(q.index)
+	return out
+
+## Anfitrión: ¿al jugador (de otro PC) lo lleva un bot en su PC?
+func is_remote_bot(q: Player) -> bool:
+	return q.remote and _remote_bots.has(q.index)
 
 func _check_all_ready() -> void:
 	if started: return
@@ -400,12 +427,22 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 		match type:
 			READY:
 				_ready_peers[from] = true
+				if data is Dictionary and data.get("bots") is Array:
+					for i: Variant in data.bots:
+						if int(i) < game.players.size() and _peer_of(game.players[int(i)]) == from: _remote_bots[int(i)] = true
 				if started:                                  # llegó tarde o se perdió el GO
 					net.send(from, GO, _timing())
 					_send_objects(from)
 				else: _check_all_ready()
 			PSTATE:
 				if data is PackedByteArray: _on_pstate(from, data)
+			PICK:
+				if data is Dictionary and halt.get("k") == "lvup" and int(halt.get("peer", 0)) == from \
+						and int(data.get("i", -1)) == int(halt.get("i", -2)) and int(data.get("n", -1)) == int(halt.get("n", -2)) \
+					and game.has_method("net_picked"):
+					game.net_picked(int(data.i), data)
+			PAUSE:
+				if game.has_method("net_pause_asked"): game.net_pause_asked(from, bool(data))
 		return
 	if from != 1: return
 	match type:
@@ -448,6 +485,15 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 			if data is Array:
 				for ev: Variant in data:
 					if ev is Array and (ev as Array).size() == 3 and ev[2] is Array: _ev_queue.append(ev)
+		HALT:
+			if data is Dictionary:
+				halt = data
+				if pause_tree: get_tree().paused = true
+				if game.has_method("net_halt"): game.net_halt(halt)
+		RESUME:
+			if halt.is_empty(): return
+			halt = {}
+			if game.has_method("net_resume"): game.net_resume(data if data is Dictionary else {})
 		PROG:
 			if data is Array and (data as Array).size() == 2 and data[1] is Dictionary:
 				var i := int(data[0])
@@ -529,6 +575,8 @@ func _on_event(d: Dictionary) -> void:
 			dir.level_completed.emit()
 		"lost":
 			if game.has_method("net_lost"): game.net_lost()
+		"say":
+			if game.has_method("announce"): game.announce(String(d.get("text", "")), 1.6)
 
 # ---------------------------------------------------------------- combate (hito 9.3b)
 
@@ -770,6 +818,47 @@ func _apply_world(kind: String, a: Array, ahead: float) -> void:
 		_:
 			w.apply_net(kind, a)
 
+# ---------------------------------------------------------------- paradas (hito 9.4a)
+
+## Anfitrión: para la partida en todos los PC. d = {k: "lvup", peer, i, title, attr} (le toca
+## subir al jugador i, de ese PC) o {k: "pause", peer} (pausa puesta por ese PC). Antes de una
+## subida manda el progreso del jugador, para que su PC tire las opciones con lo que lleva.
+## Cada parada lleva su número (n): lo elegido para una subida anterior (si el anfitrión eligió
+## por él y el PICK llegó tarde) no vale para la siguiente.
+func halt_all(d: Dictionary) -> void:
+	_halt_n += 1
+	d["n"] = _halt_n
+	if d.get("k") == "lvup":
+		_prog_sig.erase(int(d.get("i", -1)))
+		_send_progress()
+	halt = d
+	net.send(0, HALT, d)
+	if pause_tree: get_tree().paused = true
+	if game.has_method("net_halt"): game.net_halt(d)
+
+## Anfitrión: la partida sigue en todos los PC. `text` (lo que ha elegido quien subía) lo
+## anuncian los PC que no son el suyo; con `all`, todos (el anfitrión ha elegido por él).
+func resume_all(text := "", all := false) -> void:
+	if halt.is_empty(): return
+	var d := {"peer": int(halt.get("peer", 1)), "text": text, "all": all}
+	halt = {}
+	net.send(0, RESUME, d)
+	if game.has_method("net_resume"): game.net_resume(d)
+
+## Invitado: lo que ha elegido su jugador en la subida (la aplica el anfitrión y la devuelve
+## con el progreso). Van también los descartes y cambios gastados (Cartas del tarot, Llave).
+func send_pick(q: Player, o: PlayerProgress.Option) -> void:
+	net.send(1, PICK, {"n": int(halt.get("n", 0)), "i": q.index, "key": PlayerProgress.key_of(o), "banished": q.progress.banished.keys(),
+		"rerolls": q.rerolls_used, "banishes": q.banishes_used})
+
+## Invitado: pide la pausa para todos (o quitarla, si la puso él).
+func ask_pause(on: bool) -> void:
+	net.send(1, PAUSE, on)
+
+## Anuncio en todos los PC (lo que elige un bot de otro PC, por ejemplo).
+func say(text: String) -> void:
+	_event({"k": "say", "text": text})
+
 # ---------------------------------------------------------------- conexiones
 
 ## Anfitrión: los jugadores de un PC que se ha ido pasan a un bot hasta el final del nivel (D-10).
@@ -788,6 +877,8 @@ func _on_roster() -> void:
 			if game.has_method("announce"): game.announce("J%d se ha desconectado: lo lleva la máquina" % (q.index + 1), 2.5)
 	for id in _ready_peers.keys():
 		if not net.peers.has(id): _ready_peers.erase(id)
+	if not halt.is_empty() and not net.peers.has(int(halt.get("peer", 1))) and game.has_method("net_halt_gone"):
+		game.net_halt_gone(halt)                       # se fue quien elegía o quien puso la pausa
 	if not started: _check_all_ready()
 
 ## La sesión se ha cerrado (se fue el anfitrión, o este PC salió): de vuelta al menú online.

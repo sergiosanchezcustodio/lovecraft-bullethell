@@ -32,6 +32,7 @@ var solo := false
 var _pickers: Array[Picker] = []
 var _t := 0.0
 var _closing := -1.0
+var auto_pick_after := -1.0                  ## pruebas (pick_after=): elige sola la opción marcada a los N s
 
 const INPUT_DELAY := 0.35                    ## sin confirmar al abrirse (venían de jugar)
 const BOT_DELAY := 0.8
@@ -96,6 +97,9 @@ func _process(delta: float) -> void:
 	for pk in _pickers:
 		if pk.done: continue
 		var q: Player = pk.player
+		if auto_pick_after >= 0.0:                 # pruebas: también los bots esperan
+			if _t >= auto_pick_after and pk.settled(): _choose(pk, pk.cursor)
+			continue
 		if q.input is BotInput:
 			if pk.settled() and _t >= BOT_DELAY: _choose(pk, randi() % pk.options.size())
 			continue
