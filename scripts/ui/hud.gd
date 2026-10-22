@@ -81,6 +81,10 @@ func _process_step(_delta: float) -> void:
 			var left := int(director.level.final_time - director.time)
 			_objective_lbl.text = "Resiste · %d:%02d para el final" % [left / 60, left % 60]
 
+## Lo que dice ahora el objetivo ("Resiste · 2:10 para el final"), para quien espera a volver.
+func objective_text() -> String:
+	return _objective_lbl.text if _objective_lbl != null else ""
+
 ## Retrato: la cabeza del modelo del personaje, renderizada una vez en un SubViewport.
 func portrait_texture(p: Player) -> Texture2D:
 	var vp := SubViewport.new()

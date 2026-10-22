@@ -11,6 +11,9 @@ extends Node
 ## Conexión: el cliente se presenta (HELLO, con la versión del protocolo); el anfitrión lo
 ## acepta (WELCOME) o lo rechaza con el motivo (REJECT) y reparte la lista de conectados
 ## (ROSTER) al cambiar y cada 2 s con el ping de cada uno, que mide él (PING / PONG).
+## Con la partida empezada no entra nadie, salvo quien vuelve (hito 9.5a): si `admit` lo deja
+## (ocupa los puestos de un PC que se fue), entra con WELCOME {late: true} y espera al
+## siguiente nivel.
 ##
 ## Pruebas: `net_lag=150` retrasa cada mensaje recibido esos ms (si lo llevan las dos copias,
 ## el ping sube el doble), `net_loss=0.05` pierde esa fracción de los no fiables y
@@ -27,7 +30,7 @@ signal message(from: int, type: int, data: Variant)   ## mensajes de la partida 
 enum State { OFF, HOSTING, CONNECTING, CONNECTED }
 enum Msg { HELLO = 1, WELCOME, REJECT, ROSTER, PING, PONG }
 const USER := 16                             ## primer tipo libre para la partida
-const PROTOCOL := 6                          ## súbelo al cambiar el formato de cualquier mensaje
+const PROTOCOL := 8                          ## súbelo al cambiar el formato de cualquier mensaje
 const MAX_PLAYERS := 4                       ## jugadores en total, sumando los de cada PC
 const HELLO_TIMEOUT := 5.0                   ## s para presentarse tras conectar
 const CONNECT_TIMEOUT := 8.0                 ## s para conectar con el anfitrión
@@ -41,6 +44,9 @@ const DEFAULT_NAME := "Investigador"
 var player_name := DEFAULT_NAME
 var locals := 1                              ## jugadores de este PC
 var accepting := true                        ## anfitrión: false con la partida empezada (D-10: no se entra a medias)
+## Anfitrión, con la partida empezada: (id, nombre) -> puestos que ocupa al volver (0: no entra).
+var admit := Callable()
+var late := false                            ## invitado: ha vuelto con la partida empezada (espera al siguiente nivel)
 var protocol := PROTOCOL                     ## distinto solo en los tests (rechazo por versión)
 ## id -> {name, locals, ping}. El anfitrión es el 1.
 var peers: Dictionary = {}
@@ -140,6 +146,8 @@ func close(reason: String = "") -> void:
 	var was := state
 	state = State.OFF
 	my_id = 0
+	late = false
+	admit = Callable()
 	peers = {}
 	_pending.clear()
 	_inbox.clear()
@@ -274,6 +282,7 @@ func _handle(from: int, bytes: PackedByteArray) -> void:
 		Msg.WELCOME:
 			if state == State.CONNECTING and data is Dictionary:
 				my_id = _api.get_unique_id()
+				late = bool(data.get("late", false))
 				state = State.CONNECTED
 				joined.emit()
 		Msg.REJECT:
@@ -293,10 +302,12 @@ func _on_hello(from: int, data: Variant) -> void:
 	if not _pending.has(from): return
 	_pending.erase(from)
 	var why := ""
+	var back := 0                                                # puestos que recupera quien vuelve
 	if not data is Dictionary or int(data.get("proto", -1)) != PROTOCOL:
 		why = "Versión distinta del juego: actualizad los dos a la misma"
 	elif not accepting:
-		why = "La partida ya ha empezado: espera a que vuelvan a la sala"
+		if admit.is_valid(): back = int(admit.call(from, String(data.get("name", "")).left(20)))
+		if back <= 0: why = "La partida ya ha empezado: espera a que vuelvan a la sala"
 	elif player_count() + 1 > MAX_PLAYERS:                       # con sitio para uno: los demás se unen en la selección
 		why = "La sala está llena"
 	if why != "":
@@ -305,8 +316,8 @@ func _on_hello(from: int, data: Variant) -> void:
 			if _api != null and _api.get_peers().has(from): _api.disconnect_peer(from)
 		get_tree().create_timer(0.3).timeout.connect(kick)   # que llegue el motivo antes de cortar
 		return
-	peers[from] = {"name": String(data.get("name", "Jugador")).left(20), "locals": 1, "ping": 0}
-	_send(from, Msg.WELCOME, {"id": from}, true)
+	peers[from] = {"name": String(data.get("name", "Jugador")).left(20), "locals": maxi(back, 1), "ping": 0}
+	_send(from, Msg.WELCOME, {"id": from, "late": back > 0}, true)
 	_send_roster()
 	roster_changed.emit()
 

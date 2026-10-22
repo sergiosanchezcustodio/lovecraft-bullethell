@@ -372,6 +372,8 @@ func _ready() -> void:
 		add_child(net_game)
 		hud.net_info = _net_info                       # hito 9.4b: PC y ping en los paneles de los demás
 		hud.add_child(OffscreenArrows.new().setup(players, camera))   # y flechas hacia los que no se ven
+	if args.has("quit_at"):                        # pruebas: "Menú principal" a los t s de juego (en red, deja la sala)
+		get_tree().create_timer(args.get_float("quit_at"), false).timeout.connect(_quit)
 	if args.has("down_at"):                        # pruebas: el J1 de este PC cae a los t s de juego
 		get_tree().create_timer(args.get_float("down_at"), false).timeout.connect(func() -> void:
 			player.god = false
@@ -465,6 +467,13 @@ func _on_enemy_died(e: Enemy) -> void:
 	if Saves.current != null: Saves.current.stats["kills"] += 1
 	if e.data.elite: Achievements.add(Saves.current, "elites")
 	gems.drop(e.global_position, e.data.xp, e.data.tier)
+	earn(e.data.money)
+
+## Invitado: muere un enemigo (lo dice el anfitrión, hito 9.5b). Las bajas de la partida llegan
+## en la foto; aquí cuenta en su partida guardada: estadísticas, logros y dólares.
+func net_enemy_died(e: Enemy) -> void:
+	if Saves.current != null: Saves.current.stats["kills"] += 1
+	if e.data.elite: Achievements.add(Saves.current, "elites")
 	earn(e.data.money)
 
 ## Dólares (D-31): se suman al hueco en el momento, así que se conservan aunque se caiga.
@@ -712,7 +721,11 @@ func _halt_shot() -> void:
 ## Panel del HUD de un jugador de otro PC: [nombre de su PC, ping hasta él en ms] (-1 si se ha
 ## ido). El ping de los invitados lo mide el anfitrión: de un invitado a otro se suman los dos.
 func _net_info(q: Player) -> Array:
-	if not q.remote: return []
+	if not q.remote:                               # anfitrión: el de un PC que se fue lo lleva la máquina
+		var seat: GameSession.Seat = GameSession.seats[q.index] if q.index < GameSession.seats.size() else null
+		if seat == null or seat.peer == GameSession.my_peer or Net.peers.has(seat.peer): return []
+		var back := GameSession.returning.values().has(seat.peer)
+		return ["%s · %s" % [seat.name, "vuelve en el siguiente nivel" if back else "lo lleva la máquina"], -1]
 	var peer := _peer_of(q)
 	if not Net.peers.has(peer): return ["sin conexión", -1]
 	var mine := int(Net.peers.get(GameSession.my_peer, {}).get("ping", 0))
@@ -1391,7 +1404,7 @@ func net_next(d: Dictionary) -> void:
 	if args.get_bool("autonext"): get_tree().reload_current_scene.call_deferred()   # pruebas: sin relato
 	else: get_tree().change_scene_to_file.call_deferred("res://scenes/relato.tscn")
 
-func net_restart() -> void:
+func net_restart() -> void:   # el PC de cada puesto ya viene puesto (NetGame.apply_seat_peers)
 	Saves.save()
 	get_tree().paused = false
 	Engine.time_scale = 1.0
@@ -1400,15 +1413,34 @@ func net_restart() -> void:
 func net_lost() -> void:
 	_game_over()
 
-## Se cerró la sala (el anfitrión se fue): al menú online, con el motivo.
+## Se cerró la sala (el anfitrión cerró la partida o se perdió la conexión, hito 9.5b): lo
+## conseguido ya está guardado (los dólares se apuntan al ganarlos); pantalla final con el
+## motivo y el resumen, y de ahí al menú principal.
 func net_closed(reason: String) -> void:
+	if net_game != null and net_game.silence() > NetGame.QUIET:   # llevaba un rato sin noticias: se cayó
+		reason = "Se ha perdido la conexión con el anfitrión"
+	elif reason == "El anfitrión ha cerrado la sala":
+		reason = "El anfitrión ha cerrado la partida"
 	Saves.save()
-	get_tree().paused = false
+	if args.get_bool("log"): print("RED cerrada: %s" % reason)
+	for n in [_pause, _halt_ui, get_node_or_null("NetLevelUp")]:
+		if n != null and is_instance_valid(n): (n as Node).queue_free()
+	_pause = null
+	_halt_ui = null
+	_menu_open = false
+	for c in get_children():                          # la de "El anfitrión decide cómo seguir", si estaba
+		if c is Menus.EndScreen: c.queue_free()
+	_ended = true
 	Engine.time_scale = 1.0
-	TitleScreen.skip_to_menu = true
-	TitleScreen.reopen_online = true
-	OnlineMenu.notice = reason
-	get_tree().change_scene_to_file.call_deferred("res://scenes/title.tscn")
+	get_tree().paused = true
+	var lines := _summary()
+	if Saves.current != null: lines.append("Ahora tienes %s $" % MenuKit.money(Saves.current.money))
+	var s := Menus.EndScreen.new(reason, lines, Color(0.95, 0.55, 0.3))
+	s.waiting = "Lo conseguido queda guardado en tu partida"
+	s.leave_text = "Menú principal"
+	s.quit.connect(_quit)
+	add_child(s)
+	if args.get_bool("halt_shots"): _halt_shot()
 
 ## F1: recorre los estilos de esquive para compararlos.
 const DODGE_STYLES: Array[String] = ["deslizar", "rodar", "plancha", "salto", "destello"]

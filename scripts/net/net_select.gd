@@ -10,10 +10,13 @@ extends Node
 ## ha aplicado de cada PC (`acks`); al llegar, el invitado copia el reparto y vuelve a aplicar
 ## encima las suyas que aún no estaban (así nada salta hacia atrás con mucho ping).
 ## Cuando se va un PC, sus puestos quedan libres. Al elegir nivel, el anfitrión manda START
-## con los jugadores y cada PC llena su `GameSession` con `fill_session`.
+## con los jugadores y cada PC llena su `GameSession` con `fill_session`. Un PC que vuelve con
+## la partida empezada (hito 9.5a) espera aquí sin entrar en la sala; su START llega al pasar
+## de nivel y trae además el progreso de cada jugador (carry, team_xp, team_turn).
 
 signal map_changed(open: bool)               ## el anfitrión abre o cierra el mapa de niveles
 signal started(level: String, players: Array)
+signal late_info(where: String, goal: String)  ## quien vuelve (hito 9.5a): nivel y objetivo de la partida
 
 const PROFILE := NetSession.USER             ## invitado -> anfitrión: su perfil
 const ACTION := NetSession.USER + 1          ## invitado -> anfitrión: [dispositivo, acción, número]
@@ -22,6 +25,7 @@ const SEATS := NetSession.USER + 3           ## anfitrión -> todos: {seats, map
 ## Acciones que no cambian nada (solo se ven en el PC que las pulsa): no se mandan.
 const LOCAL_ONLY := ["cursor-1", "cursor1", "shake", "exit"]
 const START := NetSession.USER + 4           ## anfitrión -> todos: {level, players}
+const LATE := NetSession.USER + 5            ## anfitrión -> quien vuelve, cada segundo: [nivel, objetivo]
 
 var net: NetSession
 var state: SelectState
@@ -111,6 +115,7 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 		return
 	if from != 1: return
 	match type:
+		LATE: if data is Array and (data as Array).size() == 2: late_info.emit(String(data[0]), String(data[1]))
 		PROFILES: state.profiles_from_wire(data, all_pets)
 		SEATS:
 			if not data is Dictionary: return
@@ -121,7 +126,14 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 			state.seats_from_wire(data.get("seats"))
 			for p: Array in _pending: state.act(net.my_id, int(p[1]), String(p[2]))   # las que aún no estaban
 		START:
-			if data is Dictionary: started.emit(String(data.get("level", "")), data.get("players", []) as Array)
+			if not data is Dictionary: return
+			var carry: Variant = data.get("carry")
+			started.emit(String(data.get("level", "")), data.get("players", []) as Array)   # llena GameSession
+			if carry is Array:                         # vuelve a una partida empezada: con su progreso
+				GameSession.carry = (carry as Array).duplicate(true)
+				GameSession.team_xp = float(data.get("team_xp", 0.0))
+				GameSession.team_turn = int(data.get("team_turn", 0))
+			net.late = false
 
 ## Anfitrión: quien ya no está en la sala deja sus puestos.
 func _on_roster() -> void:

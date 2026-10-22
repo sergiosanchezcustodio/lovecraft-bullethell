@@ -24,6 +24,12 @@ var _rng := RandomNumberGenerator.new()
 var _react := 0.0                 ## s hasta la siguiente lectura (reflejos)
 var _move := Vector2.ZERO
 var _last_dir := Vector3.ZERO
+var _ignored: Array = []                   ## [posición, s que quedan]: objetivos a los que no llegaba
+var _stall_goal := Vector3.INF
+var _stall_d := INF
+var _stall_t := 0.0
+const STALL_TIME := 2.0                    ## s sin acercarse a una gema o recompensa: se da por inalcanzable
+const IGNORE_TIME := 12.0
 
 func _init(p_skill: float = 0.8) -> void:
 	super._init("smart", 0.0)
@@ -101,6 +107,7 @@ func _think() -> Vector2:
 		goal = leader.global_position; goal_w = 2.5
 	else:
 		goal = _pickup_target(me)
+		_check_stall(me, goal)
 		goal_w = float(OS.get_cmdline_user_args().has("gems_lo=true")) * -1.5 + 3.0
 		if reach < 6.0 and not hp_low_now(p):              # armas cortas: hacia el enemigo más cercano
 			var ne: Node3D = w.nearest_enemy(me, 9.0)
@@ -201,6 +208,33 @@ func _wall_push(w: CombatWorld, me: Vector3) -> Vector3:
 					break
 	return push * 0.6
 
+## Si no se acerca al objetivo (detrás del decorado, pegado a una pared), lo descarta un rato:
+## si no, quedarse quieto le puntuaba más que chocar y se atascaba (22-10-2026).
+func _check_stall(me: Vector3, goal: Vector3) -> void:
+	var dt := lerpf(0.25, 0.06, skill)                 # lo que tarda en volver a pensar
+	for i in range(_ignored.size() - 1, -1, -1):
+		_ignored[i][1] -= dt
+		if _ignored[i][1] <= 0.0: _ignored.remove_at(i)
+	if goal == Vector3.INF or goal.distance_to(_stall_goal) > 0.3:
+		_stall_goal = goal
+		_stall_d = INF
+		_stall_t = 0.0
+		return
+	var d := Vector2(goal.x - me.x, goal.z - me.z).length()
+	if d < _stall_d - 0.2:
+		_stall_d = d
+		_stall_t = 0.0
+		return
+	_stall_t += dt
+	if _stall_t >= STALL_TIME:
+		_ignored.append([goal, IGNORE_TIME])
+		_stall_goal = Vector3.INF
+
+func _is_ignored(q: Vector3) -> bool:
+	for it in _ignored:
+		if Vector2(q.x - it[0].x, q.z - it[0].z).length() < 0.5: return true
+	return false
+
 func _pickup_target(me: Vector3) -> Vector3:
 	var best := Vector3.INF
 	var best_d := 12.0
@@ -209,7 +243,7 @@ func _pickup_target(me: Vector3) -> Vector3:
 		for i in g.count:
 			var q: Vector3 = g._pos[i]
 			var dd := Vector2(q.x - me.x, q.z - me.z).length()
-			if dd < best_d:
+			if dd < best_d and not _is_ignored(q):
 				best_d = dd
 				best = q
 	for grp in [&"chests", &"pickups", &"breakable"]:
@@ -218,7 +252,7 @@ func _pickup_target(me: Vector3) -> Vector3:
 			if c == null or not is_instance_valid(c): continue
 			if grp == &"chests" and c.is_open: continue
 			var dd := Vector2(c.global_position.x - me.x, c.global_position.z - me.z).length()
-			if dd < best_d * (1.6 if grp != &"breakable" else 0.8):
+			if dd < best_d * (1.6 if grp != &"breakable" else 0.8) and not _is_ignored(c.global_position):
 				best_d = dd
 				best = c.global_position
 	return best

@@ -257,5 +257,6 @@ func stats_of(index: int) -> Dictionary:
 func enemies_in_circle(pos: Vector3, r: float) -> Array[Node3D]:
 	var out: Array[Node3D] = []
 	for id in grid.query_circle(Vector2(pos.x, pos.z), r):
-		out.append(_grid_targets[id])
+		var t: Object = _grid_targets[id]
+		if is_instance_valid(t): out.append(t)        # la rejilla es del principio del paso: pudo morir y liberarse después
 	return out

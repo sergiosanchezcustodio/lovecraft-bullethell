@@ -436,3 +436,26 @@ func test_color_del_ping() -> void:
 	assert_eq(Hud.PlayerPanel.ping_color(180), Hud.PlayerPanel.PING_MID)
 	assert_eq(Hud.PlayerPanel.ping_color(400), Hud.PlayerPanel.PING_BAD)
 	assert_eq(Hud.PlayerPanel.ping_color(-1), UiKit.TEXT_DIM, "sin conexión")
+
+func test_quien_vuelve_recupera_los_puestos_de_su_pc() -> void:
+	GameSession.clear()
+	for k in 4:
+		var s := GameSession.Seat.new()
+		s.slot = k
+		s.peer = [1, 50, 50, 60][k]
+		s.name = ["Anfitrion", "Ana", "Ana", "Luis"][k]
+		GameSession.seats.append(s)
+	var connected := {1: {"name": "Anfitrion"}}         # se han ido los dos invitados
+	assert_eq(GameSession.departed(connected), {50: "Ana", 60: "Luis"})
+	assert_eq(GameSession.claim(70, "Luis", connected), 1, "el del mismo nombre")
+	assert_eq(GameSession.claim(71, "Otro", connected), 2, "si no, el primero que quede")
+	assert_eq(GameSession.claim(72, "Más", connected), 0, "y no hay más")
+	connected[70] = {"name": "Luis"}
+	assert_eq(GameSession.apply_returns(connected), [70], "el 71 se fue antes de entrar")
+	assert_eq(NetGame.seat_peers(), [1, 50, 50, 70])
+	assert_true(GameSession.returning.is_empty())
+	var wire := GameSession.seats_to_wire()
+	assert_eq(int(wire[3].peer), 70)
+	NetGame.apply_seat_peers([1, 80, 80, 70])
+	assert_eq(GameSession.seats[1].peer, 80)
+	GameSession.clear()

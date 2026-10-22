@@ -94,6 +94,21 @@ func test_con_la_partida_empezada_no_entra_nadie() -> void:
 	assert_string_contains(why[0], "empezado")
 	assert_eq(host.peers.size(), 1)
 
+func test_con_la_partida_empezada_entra_quien_vuelve() -> void:
+	host.accepting = false
+	host.admit = func(_id: int, who: String) -> int: return 2 if who == "Vuelve" else 0
+	var c := _client("Vuelve")
+	c.join("127.0.0.1", host.port)
+	assert_true(await _until(func() -> bool: return c.state == NetSession.State.CONNECTED), "entra")
+	assert_true(c.late, "y sabe que espera al siguiente nivel")
+	assert_eq(int(host.peers[c.my_id].locals), 2, "con los puestos que recupera")
+	var d := _client("Otra")
+	var why := []
+	d.failed.connect(func(r: String) -> void: why.append(r))
+	d.join("127.0.0.1", host.port)
+	assert_true(await _until(func() -> bool: return not why.is_empty()), "los demás, no")
+	assert_string_contains(why[0], "empezado")
+
 func test_si_se_va_un_cliente_sale_de_la_lista() -> void:
 	var c := _client("Invitada")
 	c.join("127.0.0.1", host.port)

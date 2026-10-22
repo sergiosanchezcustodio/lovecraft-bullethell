@@ -34,6 +34,9 @@ static var team_xp := 0.0
 static var team_turn := 0                ## cooperativo: a quién le toca la próxima subida (D-39)
 static var online := false               ## partida en red (hito 9.2)
 static var my_peer := 1                  ## id de este PC en la sala (el anfitrión es el 1)
+## Anfitrión (hito 9.5a): PC que ha vuelto con la partida empezada -> PC que se fue, cuyos
+## puestos recupera al empezar el siguiente nivel (o al reintentar).
+static var returning := {}
 
 static func is_set() -> bool:
 	return not seats.is_empty()
@@ -46,6 +49,7 @@ static func clear() -> void:
 	team_turn = 0
 	online = false
 	my_peer = 1
+	returning.clear()
 
 ## Vestuario de un jugador de otro PC con ese personaje, o null si no lo hay (el de los de
 ## este PC está en nuestra partida).
@@ -78,3 +82,48 @@ static func restore(q: Player, d: Dictionary) -> void:
 	q.rebuild_stats()
 	q.health = q.data.max_health
 	q.sanity = q.data.max_sanity
+
+# ---------------------------------------------------------------- vuelta a la partida (hito 9.5a)
+
+## PC que se fueron (sus puestos los lleva la máquina) y que nadie ha reclamado aún: id -> nombre.
+static func departed(connected: Dictionary) -> Dictionary:
+	var out := {}
+	var claimed := returning.values()
+	for s in seats:
+		if s.peer != 1 and not connected.has(s.peer) and not claimed.has(s.peer): out[s.peer] = s.name
+	return out
+
+## Anfitrión: un PC entra con la partida empezada. Ocupa los puestos de un PC que se fue (el
+## del mismo nombre si lo hay; si no, el primero). Devuelve cuántos puestos recupera (0: ninguno).
+static func claim(new_peer: int, pc_name: String, connected: Dictionary) -> int:
+	var gone := departed(connected)
+	if gone.is_empty(): return 0
+	var old: int = gone.keys()[0]
+	for id: int in gone:
+		if String(gone[id]) == pc_name:
+			old = id
+			break
+	returning[new_peer] = old
+	return seats.filter(func(s: Seat) -> bool: return s.peer == old).size()
+
+## Anfitrión, al empezar el siguiente nivel: los que han vuelto (y siguen conectados) recuperan
+## sus puestos. Devuelve sus ids.
+static func apply_returns(connected: Dictionary) -> Array:
+	var back := []
+	for new_peer: int in returning:
+		if not connected.has(new_peer): continue
+		for s in seats:
+			if s.peer == int(returning[new_peer]):
+				s.peer = new_peer
+				s.name = String(connected[new_peer].get("name", s.name)) if connected[new_peer] is Dictionary else s.name
+		back.append(new_peer)
+	returning.clear()
+	return back
+
+## Los puestos como los manda START (`NetSelect.fill_session` los lee).
+static func seats_to_wire() -> Array:
+	var out := []
+	for s in seats:
+		out.append({"slot": s.slot, "peer": s.peer, "device": s.device, "character": String(s.character),
+			"pet": String(s.pet), "worn": s.worn.duplicate(), "name": s.name, "shop": s.shop.duplicate()})
+	return out

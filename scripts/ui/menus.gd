@@ -166,6 +166,7 @@ class EndScreen extends CanvasLayer:
 	signal next_level
 	var has_next := false                       ## "Siguiente nivel", primero y con el foco
 	var waiting := ""                           ## en red, un invitado: este aviso y solo "Salir"
+	var leave_text := "Salir de la partida"     ## el botón de salir, con `waiting`
 	var title := ""
 	var lines: PackedStringArray = []
 	var accent := UiKit.GOLD
@@ -199,8 +200,9 @@ class EndScreen extends CanvasLayer:
 			var w := UiKit.label(waiting, 22, UiKit.TEXT_DIM)
 			w.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			box.add_child(w)
-			var leave := UiKit.button("Salir de la partida", accent)
+			var leave := UiKit.button(leave_text, accent)
 			leave.custom_minimum_size = Vector2(300, 56)
+			leave.size_flags_horizontal = Control.SIZE_SHRINK_CENTER   # no tan ancho como un título largo
 			leave.pressed.connect(func() -> void: quit.emit())
 			box.add_child(leave)
 			box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)

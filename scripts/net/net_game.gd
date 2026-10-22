@@ -33,6 +33,11 @@ extends Node
 ## - Conexión (hito 9.4b): si al invitado no le llegan fotos en más de QUIET s, un aviso
 ##   arriba («Sin noticias del anfitrión…») con los segundos que lleva; se quita solo al volver.
 ##   A los QUIET_LEAVE s sale también el botón «Salir al menú principal».
+## - Vuelta (hito 9.5a, D-10): los jugadores de un PC que se va los lleva la máquina hasta el
+##   final del nivel (y desde el principio en los siguientes, si no vuelve). Un PC que entra con
+##   la partida empezada recupera esos puestos (`GameSession.claim`) y espera en su selección;
+##   al pasar de nivel o reintentar, NEXT y RESTART llevan el PC de cada puesto y él recibe
+##   START con los jugadores y el progreso de cada uno.
 ##
 ## Formato de las fotos (bytes): ver `write_player`, `write_enemy` y `_on_enemy_bullet`.
 
@@ -59,6 +64,7 @@ const PAUSE := NetSession.USER + 28          ## invitado -> anfitrión: pide (tr
 const SNAP_EVERY := 3                        ## pasos de física entre fotos del anfitrión (20 Hz)
 const PSTATE_EVERY := 2                      ## y entre estados de un invitado (30 Hz)
 const READY_EVERY := 0.5                     ## s entre avisos de READY
+const LATE_EVERY := 60                       ## pasos entre avisos a quien vuelve (1 s)
 const POS_K := 100.0                         ## posiciones y velocidades en cm (int16: ±327 m)
 const STAT_K := 10.0                         ## vida y cordura en décimas (uint16)
 const PLAYER_BYTES := 17
@@ -104,6 +110,7 @@ var _gap := PackedFloat32Array()             ## anfitrión, pruebas (snap_gap=t,
 const QUIET := 2.0                           ## s sin fotos hasta el aviso
 const QUIET_LEAVE := 10.0                    ## y hasta el botón de salir
 var _quiet_btn: Button
+var _closed := false                         ## la sesión se ha cerrado (sale la pantalla final)
 
 func _init(p_game: Node, p_net: NetSession) -> void:
 	game = p_game
@@ -142,6 +149,9 @@ func _ready() -> void:
 		_enemies_root = game.get_node_or_null("Enemies")
 	var la: Variant = game.get("args")
 	_log_on = la is LaunchArgs and (la as LaunchArgs).get_bool("log")
+	if host:
+		net.admit = _admit
+		_release_gone(false)                           # los de un PC que no ha vuelto: la máquina, desde el principio
 	if host and la is LaunchArgs and (la as LaunchArgs).has("snap_gap"): _gap = (la as LaunchArgs).get_floats("snap_gap")
 	_wait_overlay("Esperando a los demás jugadores…" if host else "Esperando al anfitrión…")
 	if pause_tree: get_tree().paused = true
@@ -181,7 +191,7 @@ func is_remote_bot(q: Player) -> bool:
 func _check_all_ready() -> void:
 	if started: return
 	for id in net.peers:
-		if id != 1 and not _ready_peers.has(id): return
+		if id != 1 and not _ready_peers.has(id) and not GameSession.returning.has(id): return   # quien vuelve, al siguiente
 	_go()
 
 func _go() -> void:
@@ -220,7 +230,7 @@ func _process(delta: float) -> void:
 		_ready_t -= delta
 		if _ready_t <= 0.0: _send_ready()
 	if started and not get_tree().paused and _log_on: _log(delta)
-	if not host and started: _show_quiet(silence())
+	if not host and started and not _closed: _show_quiet(silence())
 
 ## Invitado: s desde la última foto del anfitrión (0 antes de la primera).
 func silence() -> float:
@@ -293,6 +303,7 @@ func _physics_process(_delta: float) -> void:
 			net.send(0, TAKEN, _taken.duplicate())
 			_taken.clear()
 		if started and _tick % PROG_EVERY == 0: _send_progress()
+		if _tick % LATE_EVERY == 0 and not GameSession.returning.is_empty(): _send_late()
 		if started and _tick % SNAP_EVERY == 0 and not _in_gap(): _send_snap()
 		for peer in _peer_interp:
 			var ip: NetInterp = _peer_interp[peer]
@@ -471,11 +482,32 @@ func send_lost() -> void:
 	_event({"k": "lost"})
 
 func send_next(level_id: String) -> void:
+	var back := GameSession.apply_returns(net.peers)
 	net.send(0, NEXT, {"level": level_id, "carry": GameSession.carry.duplicate(true),
-		"team_xp": GameSession.team_xp, "team_turn": GameSession.team_turn})
+		"team_xp": GameSession.team_xp, "team_turn": GameSession.team_turn, "peers": seat_peers()})
+	_send_start(back)
 
 func send_restart() -> void:
-	net.send(0, RESTART, true)
+	var back := GameSession.apply_returns(net.peers)
+	net.send(0, RESTART, {"peers": seat_peers()})
+	_send_start(back)
+
+## El PC de cada puesto (cambia cuando alguien vuelve).
+static func seat_peers() -> Array:
+	return GameSession.seats.map(func(s: GameSession.Seat) -> int: return s.peer)
+
+## Invitados: el PC de cada puesto, como lo lleva el anfitrión.
+static func apply_seat_peers(p: Variant) -> void:
+	if not p is Array or (p as Array).size() != GameSession.seats.size(): return
+	for i in GameSession.seats.size(): GameSession.seats[i].peer = int(p[i])
+
+## Anfitrión: a los PC que vuelven, lo que necesitan para entrar (el START de la selección, con
+## el progreso de cada jugador).
+func _send_start(back: Array) -> void:
+	for id: int in back:
+		net.send(id, NetSelect.START, {"level": String(GameSession.level), "players": GameSession.seats_to_wire(),
+			"carry": GameSession.carry.duplicate(true), "team_xp": GameSession.team_xp, "team_turn": GameSession.team_turn})
+		if _log_on: print("RED vuelve el PC %d" % id)
 
 # ---------------------------------------------------------------- mensajes
 
@@ -523,12 +555,17 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 				_enemies.erase(data)
 				_interp.tracks.erase(data)
 				if is_instance_valid(e):
-					if game.has_method("earn"): game.earn(e.data.money)   # cada PC cobra en su partida (D-10)
+					if game.has_method("net_enemy_died"): game.net_enemy_died(e)   # cada PC cobra y cuenta en su partida (D-10)
 					e.puppet_die()
 		ANIM: if data is Array and (data as Array).size() == 2: _anim_names[int(data[0])] = String(data[1])
 		EVENT: if data is Dictionary: _on_event(data)
-		NEXT: if data is Dictionary and game.has_method("net_next"): game.net_next(data)
-		RESTART: if game.has_method("net_restart"): game.net_restart()
+		NEXT:
+			if data is Dictionary and game.has_method("net_next"):
+				apply_seat_peers(data.get("peers"))
+				game.net_next(data)
+		RESTART:
+			if data is Dictionary: apply_seat_peers(data.get("peers"))
+			if game.has_method("net_restart"): game.net_restart()
 		BULLETS: if data is PackedByteArray: _on_bullets(data)
 		GEMS:
 			var gm: GemManager = game.get("gems")
@@ -922,6 +959,33 @@ func say(text: String) -> void:
 ## Anfitrión: los jugadores de un PC que se ha ido pasan a un bot hasta el final del nivel (D-10).
 func _on_roster() -> void:
 	if not host: return
+	_release_gone(true)
+	for id in GameSession.returning.keys():           # volvió y se ha vuelto a ir antes de entrar
+		if not net.peers.has(id): GameSession.returning.erase(id)
+	for id in _ready_peers.keys():
+		if not net.peers.has(id): _ready_peers.erase(id)
+	if not halt.is_empty() and not net.peers.has(int(halt.get("peer", 1))) and game.has_method("net_halt_gone"):
+		game.net_halt_gone(halt)                       # se fue quien elegía o quien puso la pausa
+	if not started: _check_all_ready()
+
+## Anfitrión: a quien espera para volver, en qué nivel va la partida y el objetivo del HUD.
+func _send_late() -> void:
+	var where := "Parte %d · Nivel %d" % [game.level.part, game.level.number] if game.level != null else ""
+	var goal: String = game.hud.objective_text() if game.hud != null else ""
+	for id in GameSession.returning:
+		if net.peers.has(id): net.send(id, NetSelect.LATE, [where, goal])
+
+## Anfitrión: un PC entra con la partida empezada (NetSession.admit). Recupera los puestos de un
+## PC que se fue y entra al empezar el siguiente nivel.
+func _admit(id: int, pc_name: String) -> int:
+	var n := GameSession.claim(id, pc_name, net.peers)
+	if n > 0:
+		if game.has_method("announce"): game.announce("%s ha vuelto: entrará en el siguiente nivel" % pc_name, 2.5)
+		if _log_on: print("RED vuelve %s (PC %d) a %d puestos" % [pc_name, id, n])
+	return n
+
+## Anfitrión: los jugadores de un PC que no está los lleva la máquina (un bot que sigue a otro).
+func _release_gone(say: bool) -> void:
 	for q: Player in game.players:
 		if q.remote and not net.peers.has(_peer_of(q)):
 			var bot := BotInput.new("follow", 3.0 + q.index * 0.7)
@@ -932,14 +996,13 @@ func _on_roster() -> void:
 					bot.leader = r
 					break
 			q.net_release(bot)
-			if game.has_method("announce"): game.announce("J%d se ha desconectado: lo lleva la máquina" % (q.index + 1), 2.5)
-	for id in _ready_peers.keys():
-		if not net.peers.has(id): _ready_peers.erase(id)
-	if not halt.is_empty() and not net.peers.has(int(halt.get("peer", 1))) and game.has_method("net_halt_gone"):
-		game.net_halt_gone(halt)                       # se fue quien elegía o quien puso la pausa
-	if not started: _check_all_ready()
+			if say and game.has_method("announce"): game.announce("J%d se ha desconectado: lo lleva la máquina" % (q.index + 1), 2.5)
 
 ## La sesión se ha cerrado (se fue el anfitrión, o este PC salió): de vuelta al menú online.
 func _on_closed(reason: String) -> void:
 	if not is_inside_tree() or reason == "": return
-	if game.has_method("net_closed"): game.net_closed(reason)
+	_closed = true
+	if game.has_method("net_closed"): game.net_closed(reason)   # mira antes cuánto llevaba sin noticias
+	if _quiet != null:                                 # la pantalla final ya lo dice
+		_quiet.queue_free()
+		_quiet = null

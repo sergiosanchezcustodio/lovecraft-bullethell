@@ -49,11 +49,13 @@ var _stick := {}                            ## dispositivo -> dirección del sti
 var _leaving := false
 var _opening := false
 var net_select: NetSelect                    ## en red; null en local
+const LATE_WAIT := "De vuelta: entrarás al empezar el siguiente nivel"
 var _me := SelectState.LOCAL                 ## PC de los jugadores de esta pantalla
 var _stage: Control
 var _modal: Control                          ## confirmación de salir de la sala
 var _wait: PanelContainer                    ## aviso en el centro (conectando, eligiendo nivel)
 var _wait_label: Label
+var _wait_sub: Label                         ## segunda línea, más pequeña (quien vuelve: lo que pasa en la partida)
 var _wait_dim: ColorRect                     ## oscurece los marcos detrás del aviso
 var _room_code: Label                        ## "Sala", "Sala de …"
 var _room_code_val: Label                    ## el código, en la letra del texto: la de los títulos dibuja el 0 como una o
@@ -206,7 +208,7 @@ func _feedback(seat: int, fb: String) -> void:
 ## Invitado: la acción se ve al momento en su copia y va al anfitrión (`NetSelect.predict`);
 ## lo que solo se ve aquí (ficha, sacudida, salir) no viaja.
 func _guest_action(dev: int, act: String) -> void:
-	if net_select.map_open or Net.state != NetSession.State.CONNECTED: return
+	if net_select.map_open or Net.state != NetSession.State.CONNECTED or Net.late: return   # quien vuelve, espera
 	var seat := state.seat_of(dev, _me)
 	_feedback(seat, net_select.predict(dev, act))
 
@@ -331,6 +333,8 @@ func _start_net(mine: SelectState.Profile, all_pets: Array) -> void:
 	net_select.apply_action = _apply
 	net_select.map_changed.connect(func(open: bool) -> void:
 		if not net_select.is_host(): _show_wait("El anfitrión está eligiendo nivel…" if open else ""))
+	net_select.late_info.connect(func(where: String, goal: String) -> void:   # quien vuelve: cómo va la partida
+		if Net.late and not _leaving: _show_wait(LATE_WAIT, "Ahora: %s · %s" % [where, goal]))
 	net_select.started.connect(func(level_id: String, players: Array) -> void:
 		if not _leaving: _enter(level_id, players))
 	add_child(net_select)
@@ -355,6 +359,10 @@ func _start_net(mine: SelectState.Profile, all_pets: Array) -> void:
 ## Invitado: copia la sala del anfitrión y entra con su perfil y su dispositivo.
 func _enter_room(mine: SelectState.Profile) -> void:
 	_me = Net.my_id
+	if Net.late:                                          # vuelve a una partida empezada (hito 9.5a)
+		_show_wait(LATE_WAIT)
+		_fill_room()
+		return
 	state.profiles = {SelectState.LOCAL: SelectState.Profile.new()}   # hasta que llegue la del anfitrión
 	net_select.enter(mine, Devices.last_device)
 	_fill_room()
@@ -393,15 +401,25 @@ func _build_room() -> void:
 	sb.content_margin_left = 48; sb.content_margin_right = 48
 	sb.content_margin_top = 26; sb.content_margin_bottom = 26
 	_wait.add_theme_stylebox_override("panel", sb)
+	var wbox := VBoxContainer.new()
+	wbox.add_theme_constant_override("separation", 10)
+	_wait.add_child(wbox)
 	_wait_label = MenuKit.title("", 34, MenuKit.INK)
-	_wait.add_child(_wait_label)
+	_wait_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	wbox.add_child(_wait_label)
+	_wait_sub = UiKit.label("", 22, UiKit.TEXT_DIM)
+	_wait_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_wait_sub.visible = false
+	wbox.add_child(_wait_sub)
 	_wait.visible = false
 	_stage.add_child(_wait)
 
 ## Aviso en el centro ("" lo quita).
-func _show_wait(text: String) -> void:
+func _show_wait(text: String, sub := "") -> void:
 	if _wait == null: return
 	_wait_label.text = text
+	_wait_sub.text = sub
+	_wait_sub.visible = sub != ""
 	_wait.visible = text != ""
 	_wait_dim.visible = _wait.visible
 	_wait.reset_size()
