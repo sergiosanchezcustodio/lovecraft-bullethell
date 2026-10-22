@@ -8,6 +8,9 @@ extends Node3D
 signal died(enemy: Enemy)
 
 var data: EnemyData
+## Marioneta (hito 9.3a): en el PC de un invitado, el enemigo solo se dibuja. No piensa, no
+## ataca y no pierde vida: su posición, animación y estado llegan del anfitrión (NetGame).
+var puppet := false
 var world: CombatWorld
 var obstacles: ObstacleMap
 var behavior: EnemyBehavior
@@ -128,7 +131,7 @@ func _ready() -> void:
 	visual.add_child(model)
 	if data.ethereal: _make_ethereal(model)
 	runner = PatternRunner.new().setup(world)
-	if GiantMoves.applies(data):
+	if GiantMoves.applies(data) and not puppet:
 		giant = GiantMoves.new()
 		runner.over_walls = true
 	if data.attack == null: pace_mult = Difficulty.melee_speed()
@@ -141,7 +144,8 @@ func _ready() -> void:
 	_attack_timer = data.attack_cooldown * randf_range(0.5, 1.0)
 	anim_t = randf()
 	if data.aura_drain > 0.0 and data.aura_radius > 0.0: _make_aura()
-	behavior.start(self)
+	if puppet: anim_hold = true                # la fase de la animación llega con cada foto
+	else: behavior.start(self)
 	world.add_enemy(self)
 	reset_physics_interpolation.call_deferred()
 
@@ -282,6 +286,9 @@ func stun(seconds: float) -> void:
 	_stun = maxf(_stun, seconds * (0.5 if data.elite else 1.0))
 
 func take_damage(d: Damage) -> void:
+	if puppet:                                 # el daño de verdad lo cuenta el anfitrión
+		_flash = 0.07
+		return
 	if shield_t > 0.0: return
 	if not is_alive(): return
 	Auto.sfx_at("hit", global_position)
@@ -306,6 +313,16 @@ func _die() -> void:
 	if _curse_t > 0.0 and int(_curse.get("spread", 0)) > 0: _spread_curse()
 	if _inject_t > 0.0 and _ally_time > 0.0:            # se levanta como aliado
 		world.fx.add_child(Reanimated.new().setup(world, data, global_position, facing, _ally_time, _inject_bonus))
+	_death_fx()
+
+## Muerte de una marioneta (lo avisa el anfitrión).
+func puppet_die() -> void:
+	if is_queued_for_deletion(): return
+	health = 0.0
+	Auto.sfx_at("die", global_position)
+	_death_fx()
+
+func _death_fx() -> void:
 	var fx := DeathBurst.new()
 	fx.setup(model_name, data.body_radius, model, data.elite or data.unique)
 	fx.position = global_position
@@ -410,6 +427,10 @@ var _ai_vel := Vector3.ZERO
 
 func _physics_process(delta: float) -> void:
 	if not is_alive(): return
+	if puppet:
+		_spawn_t += delta
+		_wade = move_toward(_wade, 1.0 if wades() else 0.0, WadeSplash.EASE * delta)
+		return
 	var t0 := Prof.start()
 	_spawn_t += delta
 	if world.freeze_t > 0.0:                         # tiempo congelado (recompensa): ni se mueve ni ataca
@@ -560,3 +581,28 @@ func _status(c: Color) -> StandardMaterial3D:
 		_status_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_status_mat.albedo_color = c
 	return _status_mat
+
+# ---------------- red (hito 9.3a) ----------------
+## Estado visible que viaja con cada foto: destello y tintes de estado.
+func net_flags() -> int:
+	var f := 0
+	if _flash > 0.0: f |= 1
+	if _stasis_t > 0.0 or world.freeze_t > 0.0: f |= 2
+	if _curse_t > 0.0: f |= 4
+	if _burn_t > 0.0: f |= 8
+	if _poison_t > 0.0: f |= 16
+	if _madden_t > 0.0: f |= 32
+	if _confuse_t > 0.0: f |= 64
+	if _inject_t > 0.0: f |= 128
+	return f
+
+## Marioneta: pone los tintes de la foto (los relojes no corren aquí: la foto los enciende o apaga).
+func net_apply_flags(f: int) -> void:
+	if f & 1: _flash = maxf(_flash, 0.07)
+	_stasis_t = 1.0 if f & 2 else 0.0
+	_curse_t = 1.0 if f & 4 else 0.0
+	_burn_t = 1.0 if f & 8 else 0.0
+	_poison_t = 1.0 if f & 16 else 0.0
+	_madden_t = 1.0 if f & 32 else 0.0
+	_confuse_t = 1.0 if f & 64 else 0.0
+	_inject_t = 1.0 if f & 128 else 0.0

@@ -41,6 +41,11 @@ var mid_alive: Array[Enemy] = []            ## minijefes intermedios vivos (HUD)
 var completed := false
 var loot_left := 0.0                     ## s que quedan para recoger el botín tras superar el nivel (lo lleva game.gd)
 var _chest_t := -1.0                       ## s hasta el próximo baúl arcano
+## En red (hito 9.3a). Espejo: en un invitado no hace aparecer nada; el reloj, el evento final
+## y el fin del nivel los pone NetGame con lo que manda el anfitrión. `spread_spawns`: en el
+## anfitrión, aparecen alrededor de un jugador al azar (cada PC tiene su cámara).
+var mirror := false
+var spread_spawns := false
 
 func setup(p_level: LevelData, p_world: CombatWorld, p_obstacles: ObstacleMap, p_camera: GameCamera, p_root: Node3D) -> WaveDirector:
 	level = p_level; world = p_world; obstacles = p_obstacles; camera = p_camera; enemies_root = p_root
@@ -52,7 +57,7 @@ func max_alive() -> int:
 	return mini(HARD_CAP, int(round(level.max_alive * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.cap(time))))
 
 func _physics_process(delta: float) -> void:
-	if completed: return
+	if completed or mirror: return
 	time += delta
 	_chest_step(delta)
 	if spawning_paused: return
@@ -142,6 +147,7 @@ func _chest_step(delta: float) -> void:
 	spawn_chest()
 
 func spawn_chest() -> ArcaneChest:
+	if mirror: return null
 	var alive := world.players.filter(func(p: Player) -> bool: return p.health > 0.0)
 	var center: Vector3 = alive[rng.randi() % alive.size()].global_position if not alive.is_empty() else Vector3.ZERO
 	var pos := center
@@ -245,6 +251,9 @@ func _emerge(d: EnemyData) -> bool:
 ## Punto de aparición fuera de cámara, dentro de la arena y lejos de obstáculos.
 func spawn_point(radius: float) -> Vector3:
 	var center := camera.center() if camera != null else Vector3.ZERO
+	if spread_spawns and world != null:
+		var standing := world.players.filter(func(p: Player) -> bool: return p.health > 0.0)
+		if not standing.is_empty(): center = (standing[rng.randi() % standing.size()] as Player).global_position
 	var half_h := (camera.view_size if camera != null else 15.0) / sin(deg_to_rad(30.0)) * 0.5
 	var half_w := (camera.view_size if camera != null else 15.0) * 16.0 / 9.0 * 0.5
 	var ring := sqrt(half_h * half_h + half_w * half_w) * 0.75 + 2.0

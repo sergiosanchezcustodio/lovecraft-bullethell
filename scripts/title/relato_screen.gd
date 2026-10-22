@@ -101,14 +101,7 @@ func _all_shown() -> bool:
 
 func _go() -> void:
 	set_process(false)
-	if GameSession.online and GameSession.my_peer != 1:
-		# invitado: hasta la partida en red (hito 9.3) juega el anfitrión, con bots en su lugar
-		OnlineMenu.notice = "La partida en red llega en el siguiente hito: de momento juega el anfitrión, con bots en vuestro lugar."
-		TitleScreen.skip_to_menu = true
-		TitleScreen.reopen_online = true
-		get_tree().change_scene_to_file.call_deferred("res://scenes/title.tscn")
-		return
-	get_tree().change_scene_to_file.call_deferred(GAME)
+	get_tree().change_scene_to_file.call_deferred(GAME)   # en red, la partida espera a que lleguen todos (NetGame)
 
 func _input(event: InputEvent) -> void:
 	var down := false

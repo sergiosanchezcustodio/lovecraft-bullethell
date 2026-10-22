@@ -18,6 +18,11 @@ var input: PlayerInput
 var motor: PlayerMotor
 var color := Color(1.0, 0.82, 0.3)
 var index := 0                   ## J1 = 0 … J4 = 3
+## En red (hito 9.3a): lo maneja otro PC. No lee su entrada ni recibe daño aquí; su posición,
+## vida, cordura y estado llegan por la red (`net_apply`). Cada PC manda en sus jugadores (D-10).
+var remote := false
+var dodge_count := 0             ## esquives empezados (la red lo usa para repetirlos en los demás PC)
+var _net_flags := 0              ## jugador remoto: estado que no se calcula aquí (ver `net_flags`)
 ## Correa del cooperativo (hito 2.9): recoloca al jugador para que no salga del encuadre
 ## máximo de la cámara compartida. Sin asignar, no hace nada.
 var leash := Callable()
@@ -189,6 +194,10 @@ func _physics_process(delta: float) -> void:
 	Prof.stop("jugadores_fisica", t0)
 
 func _physics_process_step(delta: float) -> void:
+	if remote:                                   # lo mueve la red (NetGame)
+		if _hurt_time >= 0.0: _hurt_time += delta
+		if health <= 0.0 and down_left > 0.0: down_left = maxf(down_left - delta, 0.0)
+		return
 	if health <= 0.0:
 		_downed_step(delta)
 		return
@@ -229,6 +238,7 @@ func _physics_process_step(delta: float) -> void:
 		_action = data.dodge_anim         # la animación del esquive empieza con el impulso
 		_action_t = 0.0
 		_on_dodge()
+		dodge_count += 1
 		dodged.emit()
 	if _hurt_time >= 0.0: _hurt_time += delta
 
@@ -344,7 +354,7 @@ func _rumble(amount: float) -> void:
 	Input.start_joy_vibration(dev, 0.2 + 0.3 * k, 0.25 * k, 0.12 + 0.12 * k)
 
 func drain_sanity(amount: float) -> void:
-	if health <= 0.0 or god: return
+	if health <= 0.0 or god or remote: return
 	sanity = maxf(0.0, sanity - amount * mental_resist * data.mental_mult)
 
 ## Derribado: corre el tiempo y avanza la reanimación si hay un compañero al lado (si se
@@ -432,17 +442,18 @@ func _process_step(delta: float) -> void:
 	# Crisis de locura: anillo violeta que late y tinte violeta en cada congelación
 	var ss := sanity_state
 	if _crisis_look and ss.in_crisis != _crisis_look._on: _crisis_look.set_on(ss.in_crisis)
+	var frozen := (_net_flags & NET_FROZEN) != 0 if remote else ss.is_frozen()
+	var trembling := (_net_flags & NET_TREMBLING) != 0 if remote else ss.is_trembling()
 	if ss.in_crisis:
 		_ring_mat.albedo_color = UiKit.SANITY.lerp(Color.WHITE, 0.25 + 0.25 * sin(Time.get_ticks_msec() * 0.012))
 	else:
 		_ring_mat.albedo_color = color
-	var frozen := ss.is_frozen()
 	if frozen != _frozen_on:
 		_frozen_on = frozen
 		for mi: MeshInstance3D in model.get_meta("meshes"):
 			mi.material_overlay = _frozen_mat if frozen else _xray
 	# Temblor de aviso antes de cada congelación de la parálisis
-	var shake := Vector3(randf_range(-0.04, 0.04), 0, randf_range(-0.04, 0.04)) if sanity_state.is_trembling() else Vector3.ZERO
+	var shake := Vector3(randf_range(-0.04, 0.04), 0, randf_range(-0.04, 0.04)) if trembling else Vector3.ZERO
 	visual.global_position = here + shake
 	# Parpadeo durante la invulnerabilidad tras un golpe
 	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
@@ -677,9 +688,9 @@ func damage_mult(category: int) -> float:
 func is_invulnerable() -> bool:
 	return motor.is_invulnerable() or (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes)
 
-## ¿Puede recibir un impacto ahora?
+## ¿Puede recibir un impacto ahora? (Uno de otro PC, aquí nunca: lo decide su PC.)
 func is_hittable() -> bool:
-	return health > 0.0 and not god and not is_invulnerable()
+	return health > 0.0 and not god and not remote and not is_invulnerable()
 
 ## Recibe un ataque: la parte física resta vida y la mental, cordura.
 func take_damage(d: Damage) -> void:
@@ -860,3 +871,68 @@ func _make_ring() -> MeshInstance3D:
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mi.position.y = 0.03
 	return mi
+
+# ---------------- red (hito 9.3a) ----------------
+const NET_CRISIS := 1
+const NET_FROZEN := 2
+const NET_TREMBLING := 4
+const NET_HURT := 8                  ## parpadea tras un golpe
+const NET_ELIMINATED := 16
+
+## Lo que los demás PC no pueden calcular de este jugador (crisis, parálisis, golpe reciente).
+func net_flags() -> int:
+	if remote: return _net_flags                 # el anfitrión reenvía lo que le llega
+	var f := 0
+	if sanity_state.in_crisis: f |= NET_CRISIS
+	if sanity_state.is_frozen(): f |= NET_FROZEN
+	if sanity_state.is_trembling(): f |= NET_TREMBLING
+	if _hurt_time >= 0.0 and _hurt_time < data.hit_iframes: f |= NET_HURT
+	if is_eliminated: f |= NET_ELIMINATED
+	return f
+
+## Jugador de otro PC: aplica su estado (posición interpolada y lo demás de la foto más
+## reciente). Los cambios de vida dan las mismas señales que en su PC (derribado, levantado,
+## eliminado), para que cada partida los anuncie y cuente.
+func net_apply(pos: Vector3, yaw: float, vel: Vector3, dodges: int, hp: float, san: float, flags: int) -> void:
+	position = Vector3(pos.x, 0.0, pos.z)
+	motor.facing = Vector3(sin(yaw), 0.0, cos(yaw))
+	motor.velocity = vel
+	velocity = vel
+	if dodges != dodge_count:
+		dodge_count = dodges
+		if hp > 0.0 and data.dodge_anim != "":
+			_action = data.dodge_anim
+			_action_t = 0.0
+			Auto.sfx_at("dodge", global_position)
+	var was := health
+	health = hp
+	sanity = san
+	_net_flags = flags
+	sanity_state.in_crisis = (flags & NET_CRISIS) != 0
+	if flags & NET_HURT:
+		if _hurt_time < 0.0 or _hurt_time >= data.hit_iframes: _hurt_time = 0.0
+	else: _hurt_time = -1.0
+	if was > 0.0 and hp <= 0.0:
+		motor.locked = true
+		if revivable:
+			down_left = rules.down_time
+			revive_progress = 0.0
+		downed.emit()
+	elif was <= 0.0 and hp > 0.0:
+		down_left = -1.0
+		revive_progress = 0.0
+		motor.locked = false
+		Anims.reset(model)
+		if _down_ring: _down_ring.visible = false
+		revived.emit()
+	if flags & NET_ELIMINATED and not is_eliminated:
+		is_eliminated = true
+		down_left = 0.0
+		eliminated.emit()
+
+## Deja de llegar su estado (su PC se ha ido): lo lleva este PC con `input` (un bot).
+func net_release(new_input: PlayerInput) -> void:
+	remote = false
+	input = new_input
+	_net_flags = 0
+	motor.locked = health <= 0.0

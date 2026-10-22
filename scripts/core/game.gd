@@ -73,6 +73,7 @@ var _info: Label                               ## depuración: FPS, enemigos, ba
 var _rng := RandomNumberGenerator.new()
 var _env: Environment
 var weather: Weather
+var net_game: NetGame                         ## partida en red (hito 9.3a); null en local
 var _base_fog := Atmosphere.make_environment().fog_density
 var _base_ambient := Atmosphere.make_environment().ambient_light_energy
 
@@ -147,28 +148,22 @@ func _ready() -> void:
 	# Jugadores: los de la selección de personaje (J1..J4) o, lanzando la partida directa, el
 	# J1 de siempre más `bots=N` jugadores de compañía.
 	if GameSession.is_set():
-		var stand_ins := []                               # sin tipo: `has` recibe entradas de cualquier clase
+		var first_local := true
 		for i in GameSession.seats.size():
 			var seat: GameSession.Seat = GameSession.seats[i]
 			var ch := String(seat.character)
-			if i == 0: ch = args.get_str("character", String(DebugOptions.get_value("character", ch)))
-			# en red, hasta que llegue la partida en red (hito 9.3), un bot lleva a los de otros PC
-			var stand_in: BotInput = null
+			if i == 0 and not GameSession.online: ch = args.get_str("character", String(DebugOptions.get_value("character", ch)))
+			# en red (hito 9.3a), los de otros PC los mueve la red (Player.remote); `bot=` lleva al
+			# primero de este PC (pruebas con dos ventanas)
 			var inp: PlayerInput
-			if not seat.is_local():
-				stand_in = BotInput.new("follow", 3.0 + i * 0.7)
-				stand_in.phase = TAU * (i + 1) / 4.0
-				stand_ins.append(stand_in)
-				inp = stand_in
-			else: inp = Devices.make_input(seat.device) if not (i == 0 and args.has("bot")) else _make_input()
+			if not seat.is_local(): inp = PlayerInput.new()
+			elif first_local and args.has("bot"): inp = _make_input()
+			else: inp = Devices.make_input(seat.device)
 			var sp := _spawn_player(ch, inp)
-			if stand_in != null: stand_in.body = sp
+			sp.remote = not seat.is_local()
+			if inp is SmartBot: (inp as SmartBot).body = sp
+			if seat.is_local(): first_local = false
 			if seat.pet != &"": _spawn_pet(String(seat.pet), sp)
-		for b in stand_ins:                             # siguen al primero de este PC
-			for r in players:
-				if not stand_ins.has(r.input):
-					b.leader = r
-					break
 	else:
 		var p0 := _spawn_player(args.get_str("character", String(DebugOptions.get_value("character", "dyer"))), _make_input())
 		if p0.input is SmartBot: (p0.input as SmartBot).body = p0
@@ -188,6 +183,10 @@ func _ready() -> void:
 		bot.body = bp
 		bot.leader = players[0]
 	player = players[0]
+	for q in players:                                 # el J1 de la depuración y las pruebas: el primero de este PC
+		if not q.remote:
+			player = q
+			break
 	if args.has("pet"): _spawn_pet(args.get_str("pet"), player)   # probar un compañero
 	var bonus := Shop.bonuses(Saves.current)          # lo comprado en la tienda (D-31)
 	if args.has("shop"):                              # pruebas: N niveles en cada potenciador, sin tocar la partida
@@ -239,10 +238,12 @@ func _ready() -> void:
 	if args.has("items"): player.rebuild_stats()
 	camera = GameCamera.new()
 	camera.view_size = args.get_float("cam", 15.0)
-	for q in players: camera.targets.append(q)
+	for q in players:                                 # en red, cada PC sigue a los suyos (D-10)
+		if not q.remote: camera.targets.append(q)
 	add_child(camera)
-	if players.size() > 1:                          # correa: nadie se sale del encuadre máximo
-		for q in players: q.leash = func(pos: Vector3) -> Vector3: return camera.leash(pos)
+	if camera.targets.size() > 1:                   # correa: nadie se sale del encuadre máximo
+		for q in players:
+			if not q.remote: q.leash = func(pos: Vector3) -> Vector3: return camera.leash(pos)
 	_env = env
 	add_child(Ambient.new().setup(arena, camera, arena_path.get_file().get_basename()))   # ambiente del escenario
 	_make_announcer()
@@ -273,6 +274,8 @@ func _ready() -> void:
 		for eid in args.get_str("enemies").split(",", false):    # enemies=profundo: solo esos (probar uno nuevo)
 			director.pool_override.append(load("res://data/enemies/%s.tres" % eid))
 		director.players = players.size()           # la dificultad crece con los jugadores
+		director.mirror = is_guest()                  # invitado: el mundo lo manda el anfitrión
+		director.spread_spawns = GameSession.online
 		director.pact = 1.0 + float(shop_bonus.get("pact", 0.0))
 		director.final_event.connect(func(e: Enemy) -> void:
 			if level.boss_music != "": Music.play(level.boss_music, 2.0)   # música del jefe
@@ -289,7 +292,8 @@ func _ready() -> void:
 			if args.get_bool("log"): print("MINIJEFE %s t=%.0f" % [e.data.id, director.time]))
 		director.level_completed.connect(_on_level_completed)
 		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
-		if not args.get_bool("nobreakables"): add_child(BreakableSpawner.new().setup(world, arena.get_meta("size")))
+		# rompibles y peligros del escenario: en red, solo en el anfitrión (llegan a los invitados en el 9.3c)
+		if not args.get_bool("nobreakables") and not is_guest(): add_child(BreakableSpawner.new().setup(world, arena.get_meta("size")))
 		if args.get_bool("pickup_test"):               # las cinco recompensas en fila delante del J1
 			for k in 5: world.fx.add_child.call_deferred(Pickup.new().setup(world, player.position + Vector3(-4 + k * 2, 0, 3), k as Pickup.Kind))
 		director.chest_spawned.connect(func(c: ArcaneChest) -> void:
@@ -301,7 +305,7 @@ func _ready() -> void:
 				Achievements.add(Saves.current, "chests"))
 			announce("Ha aparecido un baúl arcano", 1.5))
 		add_child(director)
-		if level.angle_every > 0.0 or level.wave_every > 0.0:      # peligros del escenario (hito 7.4)
+		if (level.angle_every > 0.0 or level.wave_every > 0.0) and not is_guest():      # peligros del escenario (hito 7.4)
 			add_child(Hazards.new().setup(level, world, arena.get_meta("obstacles")))
 		announce(level.display_name, 3.0)
 		Music.play(level.music_path())
@@ -346,9 +350,21 @@ func _ready() -> void:
 		get_tree().create_timer(args.get_float("debug_menu", 1.0)).timeout.connect(func() -> void:
 			toggle_pause()
 			_open_debug())
-	if args.has("shots"):
+	if args.has("shots") or args.has("game_shots"):    # game_shots=: solo aquí (la selección también lee shots=)
 		var tag := ("_" + args.get_str("tag")) if args.has("tag") else ""
-		add_child(ShotTaker.new(args.get_floats("shots"), "res://shots/game%s" % tag))
+		add_child(ShotTaker.new(args.get_floats("game_shots" if args.has("game_shots") else "shots"), "res://shots/game%s" % tag))
+	if GameSession.online and Net.is_active():         # partida en red (hito 9.3a)
+		if is_guest():
+			for q in players: q.weapons.process_mode = Node.PROCESS_MODE_DISABLED   # disparos visuales: 9.3b
+		net_game = NetGame.new(self, Net)
+		add_child(net_game)
+
+## ¿Este PC es un invitado de una partida en red? (El mundo lo manda el anfitrión.)
+func is_guest() -> bool:
+	return GameSession.online and GameSession.my_peer != 1
+
+func is_net_host() -> bool:
+	return net_game != null and not is_guest()
 
 ## Crea un jugador (J1..J4 según el orden) con su personaje, su entrada y sus armas iniciales.
 func _spawn_player(character: String, input: PlayerInput) -> Player:
@@ -409,8 +425,9 @@ func _spawn_pet(id: String, owner: Player) -> void:
 	add_child(pet)
 
 ## ¿Lo maneja la máquina? (elige sola sus mejoras)
+## (En red, los de otros PC también, hasta el 9.4: el anfitrión coge su primera opción.)
 func _is_bot(q: Player) -> bool:
-	return q.input is BotInput
+	return q.input is BotInput or q.remote
 
 # ---------------- flujo de la partida ----------------
 func _on_enemy_died(e: Enemy) -> void:
@@ -454,7 +471,7 @@ func _open_level_up() -> void:
 		return
 	var coop := players.size() > 1
 	if args.get_bool("autopick") or _is_bot(q):
-		var pick: PlayerProgress.Option = options[0] if not _is_bot(q) else options[_rng.randi() % options.size()]
+		var pick: PlayerProgress.Option = options[0] if not _is_bot(q) or q.remote else options[_rng.randi() % options.size()]
 		if q.input is SmartBot: pick = SmartBot.pick(options, q, _rng)
 		q.progress.choose(pick, q)
 		if coop and not args.get_bool("autopick"): announce("J%d · %s: %s" % [q.index + 1, q.data.display_name, pick.title()], 1.6)
@@ -520,6 +537,12 @@ func _quit() -> void:
 	Saves.save()
 	get_tree().paused = false
 	Engine.time_scale = 1.0
+	if net_game != null:                              # en red: deja la sala (si es el anfitrión, la cierra)
+		Net.close()
+		TitleScreen.skip_to_menu = true
+		TitleScreen.reopen_online = true
+		get_tree().change_scene_to_file("res://scenes/title.tscn")
+		return
 	if Saves.slot < 0:
 		get_tree().quit()
 		return
@@ -543,6 +566,7 @@ func _on_downed(q: Player) -> void:
 	if players.size() > 1 and players.any(func(c: Player) -> bool: return c.health > 0.0):
 		announce("J%d, derribado: ¡reanimadlo!" % (q.index + 1), 2.0)
 		return
+	if is_guest(): return                            # la derrota la decide el anfitrión
 	_game_over()
 
 ## Simulaciones (tools/simular.py): nivel, vida más baja y caídas de cada jugador al acabar el nivel.
@@ -554,11 +578,13 @@ func _log_players() -> void:
 
 func _check_all_down() -> void:
 	if _ended or players.any(func(c: Player) -> bool: return c.health > 0.0): return
+	if is_guest(): return
 	_game_over()
 
 func _game_over() -> void:
 	if _ended: return
 	_ended = true
+	if is_net_host(): net_game.send_lost()
 	if args.get_bool("log") and director != null:
 		print("FIN DERROTA %s t=%d abatidos=%d nivel_j1=%d" % [level.id, int(director.time), director.killed_total, player.progress.level])
 		_log_players()
@@ -583,7 +609,8 @@ func _on_level_completed() -> void:
 	if args.get_bool("log"): print("NIVEL SUPERADO %s t=%d s  abatidos=%d  dólares=%d  nivel_j1=%d  vida_min=%d" % [level.id, director.time, kills, run_money, player.progress.level, roundi(maxf(player.min_hp, 0.0) * 100)])
 	if args.get_bool("log"): for q in players: print("ESTADISTICAS J%d %s" % [q.index + 1, world.stats_of(q.index)])
 	if args.get_bool("log"): _log_players()
-	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)):
+	# el avance de la campaña solo cuenta en la partida del anfitrión (D-10)
+	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))
 	_check_achievements.call_deferred()              # después de contar la baja del enemigo final (élite)
 	Saves.save()
@@ -614,6 +641,7 @@ func _loot_time() -> void:
 func _end_screen(title: String, accent: Color, next_id := "") -> void:
 	var s := Menus.EndScreen.new(title, _summary(), accent)
 	s.has_next = next_id != ""
+	if is_guest(): s.waiting = "El anfitrión decide cómo seguir"   # en red, solo puede salir
 	s.next_level.connect(func() -> void: _next_level(next_id))
 	s.restart.connect(_restart)
 	s.quit.connect(_quit)
@@ -679,18 +707,24 @@ func _shop_start() -> void:
 
 ## Siguiente nivel de la parte: el progreso de cada jugador pasa con él (GameSession.carry).
 func _next_level(id: String) -> void:
+	if is_guest(): return                            # lo decide el anfitrión (llega con net_next)
 	GameSession.carry.clear()
 	for q in players: GameSession.carry.append(GameSession.snapshot(q))
 	GameSession.team_xp = team.xp if team != null else 0.0
 	GameSession.team_turn = team.turn if team != null else 0
 	GameSession.level = StringName(id)
+	if is_net_host(): net_game.send_next(id)
 	Saves.save()
 	get_tree().paused = false
 	Engine.time_scale = 1.0
-	if args.get_bool("autonext"): _restart()                 # pruebas: sin relato
+	if args.get_bool("autonext"): get_tree().reload_current_scene.call_deferred()   # pruebas: sin relato
 	else: get_tree().change_scene_to_file.call_deferred("res://scenes/relato.tscn")
 
 func _restart() -> void:
+	if is_guest():                                   # en red, reintenta el anfitrión
+		announce("Solo el anfitrión puede reintentar", 1.5)
+		return
+	if is_net_host(): net_game.send_restart()
 	print("reinicio")
 	Saves.save()
 	get_tree().paused = false
@@ -957,7 +991,7 @@ func _process_step(delta: float) -> void:
 	if players.size() > 1:                           # la cámara encuadra a los que siguen en pie
 		var alive: Array[Node3D] = []
 		for q in players:
-			if not q.is_eliminated: alive.append(q)        # los derribados también: hay que ir a por ellos
+			if not q.is_eliminated and not q.remote: alive.append(q)   # los derribados también (en red, solo los de este PC)
 		if not alive.is_empty(): camera.targets = alive
 	# tiempo jugado del hueco: en tiempo real, sin contar pausas ni la velocidad del juego
 	if not get_tree().paused and not _ended: Saves.add_play_time(delta / maxf(Engine.time_scale, 0.001))
@@ -1092,6 +1126,38 @@ func _jitter(delta: float) -> void:
 		# y también el movimiento aparente respecto a la cámara (lo que ve el ojo)
 		print("JITTER fotogramas=%d  px/s medio=%.0f  variación=%.2f  fps=%.0f" % [_jit_rates.size(), m, sd / m, Engine.get_frames_per_second()])
 		get_tree().quit()
+
+# ---------------- red (hito 9.3a): lo que manda el anfitrión ----------------
+## Siguiente nivel: el progreso de todos (como lo lleva el anfitrión) y el nivel.
+func net_next(d: Dictionary) -> void:
+	GameSession.carry = (d.get("carry") as Array).duplicate(true) if d.get("carry") is Array else []
+	GameSession.team_xp = float(d.get("team_xp", 0.0))
+	GameSession.team_turn = int(d.get("team_turn", 0))
+	GameSession.level = StringName(String(d.get("level", GameSession.level)))
+	Saves.save()
+	get_tree().paused = false
+	Engine.time_scale = 1.0
+	if args.get_bool("autonext"): get_tree().reload_current_scene.call_deferred()   # pruebas: sin relato
+	else: get_tree().change_scene_to_file.call_deferred("res://scenes/relato.tscn")
+
+func net_restart() -> void:
+	Saves.save()
+	get_tree().paused = false
+	Engine.time_scale = 1.0
+	get_tree().reload_current_scene.call_deferred()
+
+func net_lost() -> void:
+	_game_over()
+
+## Se cerró la sala (el anfitrión se fue): al menú online, con el motivo.
+func net_closed(reason: String) -> void:
+	Saves.save()
+	get_tree().paused = false
+	Engine.time_scale = 1.0
+	TitleScreen.skip_to_menu = true
+	TitleScreen.reopen_online = true
+	OnlineMenu.notice = reason
+	get_tree().change_scene_to_file.call_deferred("res://scenes/title.tscn")
 
 ## F1: recorre los estilos de esquive para compararlos.
 const DODGE_STYLES: Array[String] = ["deslizar", "rodar", "plancha", "salto", "destello"]

@@ -27,7 +27,7 @@ signal message(from: int, type: int, data: Variant)   ## mensajes de la partida 
 enum State { OFF, HOSTING, CONNECTING, CONNECTED }
 enum Msg { HELLO = 1, WELCOME, REJECT, ROSTER, PING, PONG }
 const USER := 16                             ## primer tipo libre para la partida
-const PROTOCOL := 2                          ## súbelo al cambiar el formato de cualquier mensaje
+const PROTOCOL := 3                          ## súbelo al cambiar el formato de cualquier mensaje
 const MAX_PLAYERS := 4                       ## jugadores en total, sumando los de cada PC
 const HELLO_TIMEOUT := 5.0                   ## s para presentarse tras conectar
 const CONNECT_TIMEOUT := 8.0                 ## s para conectar con el anfitrión
@@ -61,6 +61,7 @@ var _t_roster := 0.0
 var _t_connect := 0.0
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS          # con la partida en pausa, la conexión sigue viva
 	var la := LaunchArgs.from_cmdline()
 	lag_ms = la.get_int("net_lag", 0)
 	loss = la.get_float("net_loss", 0.0)

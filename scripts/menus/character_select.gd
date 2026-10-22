@@ -9,7 +9,8 @@ extends Control
 ## de niveles. Opciones detrás de `--` (capturas): join=N une N jugadores de prueba;
 ## ready=N deja listos los N primeros; pets=N deja a los N primeros eligiendo compañero; pick=id,id… elige personaje en cada marco;
 ## turn=grados los deja girados; map=true abre el mapa; auto_start=true, además, entra
-## en el nivel 1 (probar el paso a la partida); acts=right,confirm… pulsa eso (ver `_play_acts`).
+## en el nivel 1 (probar el paso a la partida; en red, net_wait=N espera antes a N PCs más);
+## acts=right,confirm… pulsa eso (ver `_play_acts`).
 ##
 ## En red (hito 9.2, D-10) es también la sala: arriba, el código y los conectados. El
 ## anfitrión lleva el estado (`NetSelect`); los invitados ven sus acciones al momento, las
@@ -269,6 +270,7 @@ func _open_map() -> void:
 	_opening = false
 	if not is_inside_tree() or _leaving or not state.all_ready() or _map != null: return
 	if args.get_bool("auto_start"):                    # pruebas: directo al nivel 1
+		if net_select != null and Net.peers.size() - 1 < args.get_int("net_wait", 0): return   # net_wait=N: espera a N PCs más
 		_start("p1_n1")
 		return
 	_map = LevelMap.new()
