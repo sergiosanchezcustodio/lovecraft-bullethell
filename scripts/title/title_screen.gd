@@ -67,12 +67,15 @@ var _slots: SlotMenu                ## ventana de huecos abierta
 var _menu: MainMenu                 ## menú principal abierto
 ## Al volver de la partida se entra directamente en el menú principal (sin presentación).
 static var skip_to_menu := false
+## Al volver de la sala online (hito 9.2), se abre también la ventana de Jugar online.
+static var reopen_online := false
 ## Botones que valen para "Pulsa Start" (D-22): cualquiera de los principales.
 const PRESS_KEYS := [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE, KEY_ESCAPE]
 const PRESS_BUTTONS := [JOY_BUTTON_A, JOY_BUTTON_B, JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_START, JOY_BUTTON_BACK]
 
 func _ready() -> void:
 	args = LaunchArgs.from_cmdline()
+	if Net.is_active(): Net.close()                  # volver a la portada es dejar la sala
 	cfg = (load("res://data/title/portada.tres") as TitleScreenConfig).duplicate()
 	_apply_off(args.get_str("off"))
 	if cfg.music_enabled: Music.play(cfg.music, cfg.music_fade_in)
@@ -105,7 +108,12 @@ func _ready() -> void:
 	if skip_to_menu and Saves.slot >= 0:
 		skip_to_menu = false
 		t = _end_intro()
-		_open_main_menu.call_deferred()
+		var online := reopen_online
+		reopen_online = false
+		var go := func() -> void:
+			_open_main_menu()
+			if online: _menu._open_online.call_deferred()
+		go.call_deferred()
 	if args.has("shots"):
 		var tag := ("_" + args.get_str("tag")) if args.has("tag") else ""
 		add_child(ShotTaker.new(args.get_floats("shots"), "res://shots/titulo%s" % tag))

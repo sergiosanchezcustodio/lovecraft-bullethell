@@ -54,3 +54,22 @@ func test_ips_privadas() -> void:
 	assert_false(RoomCode.is_private("172.32.0.1"))
 	assert_false(RoomCode.is_private("83.45.201.7"))
 	assert_false(RoomCode.is_private("127.0.0.1"))
+
+## Selector del código con el mando (hito 9.2): casillas, letras y paso a texto.
+func test_selector_del_codigo_con_el_mando() -> void:
+	var p := RoomCodePicker.new()
+	autofree(p)
+	p.cycle(1)                                       # casilla vacía: empieza en 0
+	assert_eq(p.text(), "0")
+	p.cycle(-1)
+	assert_eq(p.text(), "Z", "da la vuelta al alfabeto")
+	p.move(1); p.cycle(-1)
+	assert_eq(p.text(), "ZZ", "vacía hacia abajo: la última")
+	p.move(-5)
+	assert_eq(p.pos, 0, "no se sale por la izquierda")
+	var code := RoomCode.encode("192.168.1.20", RoomCode.BASE_PORT + 2)
+	p.set_text(code.to_lower().replace("-", " "))
+	assert_eq(p.text(), code, "lo escrito a mano pasa a las casillas")
+	assert_eq(RoomCode.parse(p.text()), {"ip": "192.168.1.20", "port": RoomCode.BASE_PORT + 2})
+	p.set_text("83.45.201.7")
+	assert_eq(p.text(), "", "una IP no cabe en las casillas")

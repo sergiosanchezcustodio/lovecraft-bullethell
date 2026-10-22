@@ -147,13 +147,28 @@ func _ready() -> void:
 	# Jugadores: los de la selección de personaje (J1..J4) o, lanzando la partida directa, el
 	# J1 de siempre más `bots=N` jugadores de compañía.
 	if GameSession.is_set():
+		var stand_ins := []                               # sin tipo: `has` recibe entradas de cualquier clase
 		for i in GameSession.seats.size():
 			var seat: GameSession.Seat = GameSession.seats[i]
 			var ch := String(seat.character)
 			if i == 0: ch = args.get_str("character", String(DebugOptions.get_value("character", ch)))
-			var inp := Devices.make_input(seat.device) if not (i == 0 and args.has("bot")) else _make_input()
+			# en red, hasta que llegue la partida en red (hito 9.3), un bot lleva a los de otros PC
+			var stand_in: BotInput = null
+			var inp: PlayerInput
+			if not seat.is_local():
+				stand_in = BotInput.new("follow", 3.0 + i * 0.7)
+				stand_in.phase = TAU * (i + 1) / 4.0
+				stand_ins.append(stand_in)
+				inp = stand_in
+			else: inp = Devices.make_input(seat.device) if not (i == 0 and args.has("bot")) else _make_input()
 			var sp := _spawn_player(ch, inp)
+			if stand_in != null: stand_in.body = sp
 			if seat.pet != &"": _spawn_pet(String(seat.pet), sp)
+		for b in stand_ins:                             # siguen al primero de este PC
+			for r in players:
+				if not stand_ins.has(r.input):
+					b.leader = r
+					break
 	else:
 		var p0 := _spawn_player(args.get_str("character", String(DebugOptions.get_value("character", "dyer"))), _make_input())
 		if p0.input is SmartBot: (p0.input as SmartBot).body = p0

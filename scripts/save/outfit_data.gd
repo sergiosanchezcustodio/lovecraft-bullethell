@@ -40,6 +40,8 @@ static func is_head(outfit_id: String) -> bool:
 static var override := {}
 static func worn_for(character_id: String) -> Dictionary:
 	if not override.is_empty(): return override
+	var remote: Variant = GameSession.remote_worn(character_id)   # jugador de otro PC (en red)
+	if remote != null: return remote
 	var saves := Auto.node("Saves")                 # autoload, buscado al usarlo (ver Auto)
 	var cur: Variant = saves.get("current") if saves else null
 	return cur.worn_by(character_id) if cur != null else {}

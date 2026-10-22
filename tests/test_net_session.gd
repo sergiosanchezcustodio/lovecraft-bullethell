@@ -72,9 +72,10 @@ func test_sala_llena_con_cuatro_jugadores() -> void:
 	host.locals = 2                                  # dos en el PC del anfitrión
 	host.peers[1].locals = 2
 	var a := _client("Tercera")
-	a.locals = 2
 	a.join("127.0.0.1", host.port)
 	assert_true(await _until(func() -> bool: return a.state == NetSession.State.CONNECTED))
+	host.set_locals(a.my_id, 2)                      # se le une otro jugador en la selección
+	assert_true(await _until(func() -> bool: return int(a.peers.get(a.my_id, {}).get("locals", 0)) == 2), "la lista lo cuenta")
 	var b := _client("Sobra")
 	var why := []
 	b.failed.connect(func(r: String) -> void: why.append(r))
@@ -82,6 +83,16 @@ func test_sala_llena_con_cuatro_jugadores() -> void:
 	assert_true(await _until(func() -> bool: return not why.is_empty()))
 	assert_string_contains(why[0], "llena")
 	assert_eq(host.player_count(), 4)
+
+func test_con_la_partida_empezada_no_entra_nadie() -> void:
+	host.accepting = false
+	var c := _client("Tarde")
+	var why := []
+	c.failed.connect(func(r: String) -> void: why.append(r))
+	c.join("127.0.0.1", host.port)
+	assert_true(await _until(func() -> bool: return not why.is_empty()))
+	assert_string_contains(why[0], "empezado")
+	assert_eq(host.peers.size(), 1)
 
 func test_si_se_va_un_cliente_sale_de_la_lista() -> void:
 	var c := _client("Invitada")

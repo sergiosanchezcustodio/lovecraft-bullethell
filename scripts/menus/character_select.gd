@@ -9,7 +9,13 @@ extends Control
 ## de niveles. Opciones detrás de `--` (capturas): join=N une N jugadores de prueba;
 ## ready=N deja listos los N primeros; pets=N deja a los N primeros eligiendo compañero; pick=id,id… elige personaje en cada marco;
 ## turn=grados los deja girados; map=true abre el mapa; auto_start=true, además, entra
-## en el nivel 1 (probar el paso a la partida).
+## en el nivel 1 (probar el paso a la partida); acts=right,confirm… pulsa eso (ver `_play_acts`).
+##
+## En red (hito 9.2, D-10) es también la sala: arriba, el código y los conectados. El
+## anfitrión lleva el estado (`NetSelect`); los invitados ven sus acciones al momento, las
+## mandan y copian lo que reparte, cada uno con sus desbloqueos. Solo el anfitrión ve el mapa de niveles. Sin
+## puestos en este PC, B pregunta si salir de la sala (o cerrarla, el anfitrión). Pruebas
+## con dos ventanas: `select net_host=true net_upnp=false` y `select net_join=127.0.0.1`.
 
 const BG := "res://resources/PantallasMenus/fondo_titulo_sin_texto_1080p_definitivo.png"
 const DESIGN := Vector2(1920, 1080)
@@ -41,6 +47,17 @@ var _map: LevelMap
 var _stick := {}                            ## dispositivo -> dirección del stick ya contada
 var _leaving := false
 var _opening := false
+var net_select: NetSelect                    ## en red; null en local
+var _me := SelectState.LOCAL                 ## PC de los jugadores de esta pantalla
+var _stage: Control
+var _modal: Control                          ## confirmación de salir de la sala
+var _wait: PanelContainer                    ## aviso en el centro (conectando, eligiendo nivel)
+var _wait_label: Label
+var _wait_dim: ColorRect                     ## oscurece los marcos detrás del aviso
+var _room_code: Label                        ## "Sala", "Sala de …"
+var _room_code_val: Label                    ## el código, en la letra del texto: la de los títulos dibuja el 0 como una o
+var _room_status: Label
+var _room_list: Label
 
 func _ready() -> void:
 	args = LaunchArgs.from_cmdline()
@@ -49,26 +66,20 @@ func _ready() -> void:
 	var chars: Array[CharacterData] = []
 	for r in DebugOptions.list_resources("res://data/characters"): chars.append(r)
 	chars.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return a.order < b.order)
-	var pets: Array[PetData] = []
-	for r in DebugOptions.list_resources("res://data/pets"):
-		if (r as PetData).price == 0 or (Saves.current != null and Saves.current.has_pet(String((r as PetData).id))): pets.append(r)
-	var unlocked: Array = []
-	for c in chars:
-		if Saves.current != null and Saves.current.has_character(String(c.id)): unlocked.append(String(c.id))
-	var owned: Array = []                               # vestuario comprado (D-34)
-	var worn := {}
-	if Saves.current != null:
-		for o in OutfitData.all():
-			if Saves.current.has_outfit(String(o.id)): owned.append(o)
-		for c in chars: worn[String(c.id)] = Saves.current.worn_by(String(c.id))
-	state = SelectState.new().setup(chars, unlocked, pets, owned, worn)
+	var all_pets: Array = DebugOptions.list_resources("res://data/pets")
+	var mine := SelectState.profile_from_save(Saves.current, chars, all_pets)   # desbloqueos y vestuario (D-34)
+	state = SelectState.new().setup(chars, [], [] as Array[PetData])
+	state.profiles[SelectState.LOCAL] = mine
 	_build()
 	state.changed.connect(_refresh)
-	Devices.joy_disconnected.connect(func(d: int) -> void:
-		var s := state.seat_of(d)
-		if s >= 0: state.leave(s))
-	# el que ha llegado hasta aquí desde el menú entra ya como J1
-	state.join(Devices.last_device)
+	Devices.joy_disconnected.connect(func(d: int) -> void: _do(d, "leave"))
+	if args.get_bool("net_host") and not Net.is_active():          # pruebas: abre la sala aquí mismo
+		Net.host(RoomCode.BASE_PORT, args.get_bool("net_upnp", true))
+	elif args.has("net_join") and not Net.is_active():
+		var a := RoomCode.parse(args.get_str("net_join"))
+		if not a.is_empty(): Net.join(a.ip, a.port)
+	if Net.is_active(): _start_net(mine, all_pets)
+	else: state.join(Devices.last_device)               # el que ha llegado desde el menú entra ya como J1
 	_demo_from_args()
 	_refresh()
 	if args.has("pick"):                                # capturas: pick=peaslee,varga… un personaje por marco
@@ -86,6 +97,16 @@ func _ready() -> void:
 		for f in _frames: f.set_turn(deg_to_rad(args.get_float("turn")))
 	if args.has("shots"):
 		add_child(ShotTaker.new(args.get_floats("shots"), "res://shots/seleccion%s" % (("_" + args.get_str("tag")) if args.has("tag") else "")))
+	if args.has("acts"): _play_acts(args.get_str("acts").split(",", false))
+
+## Pruebas: `acts=right,confirm,…` pulsa eso con el primer dispositivo, una cada 0,4 s, desde
+## el segundo 2 (en red, ya dentro de la sala). `wait` deja pasar un turno.
+func _play_acts(list: PackedStringArray) -> void:
+	await get_tree().create_timer(2.0).timeout
+	for a in list:
+		if not is_inside_tree() or _leaving: return
+		if a != "wait": _do(Devices.last_device, a)
+		await get_tree().create_timer(0.4).timeout
 
 func _build() -> void:
 	var bg := TextureRect.new()
@@ -102,6 +123,7 @@ func _build() -> void:
 	var stage := Control.new()                  # todo en coordenadas de 1920x1080, centrado
 	stage.size = DESIGN
 	add_child(stage)
+	_stage = stage
 	var t := MenuKit.title("Elige a tu investigador", 50)
 	t.size = Vector2(DESIGN.x, 70)
 	t.position = Vector2(0, 18)
@@ -130,40 +152,62 @@ func _build() -> void:
 
 func _refresh() -> void:
 	for f in _frames: f.refresh()
-	if state.all_ready() and _map == null and not _leaving:
+	if state.all_ready() and _map == null and not _leaving and (net_select == null or net_select.is_host()):
 		_open_map.call_deferred()
 
 # ---------------------------------------------------------------- entrada por dispositivo
 
 func _input(event: InputEvent) -> void:
-	if _map != null or _leaving: return
+	if _map != null or _leaving or _modal != null: return
 	var d: Variant = Devices.device_of(event)
 	if d == null: return
 	var dev: int = d
+	if net_select != null and net_select.is_host() and _is_copy(event):
+		get_viewport().set_input_as_handled()
+		_copy_code()
+		return
 	# giro del modelo mientras se mantiene LB/RB o Q/E (se atiende también al soltar)
 	var spin := _spin_input(event)
 	if spin != 2:
-		var seat_s := state.seat_of(dev)
-		if seat_s >= 0: _frames[seat_s].spin = spin
+		_do(dev, "spin%d" % spin)
 		get_viewport().set_input_as_handled()
 		return
 	var act := _action(event, dev)
 	if act == "": return
 	get_viewport().set_input_as_handled()
-	var seat := state.seat_of(dev)
-	if seat < 0:
-		if act in ["join", "confirm"]: state.join(dev)
-		elif act == "back" and state.joined().is_empty(): _back_to_menu()
-		return
-	match act:
-		"up": if not state.vert(seat, -1): _frames[seat].move_cursor(-1)
-		"down": if not state.vert(seat, 1): _frames[seat].move_cursor(1)
-		"left": state.move(seat, -1)
-		"right": state.move(seat, 1)
-		"confirm", "join":
-			if not state.confirm(seat): _frames[seat].shake()
-		"back":
-			if not state.back(seat) and state.joined().is_empty(): _back_to_menu()
+	_do(dev, act)
+
+## Una acción de un dispositivo de este PC: se aplica aquí (en local o siendo el anfitrión)
+## o se manda al anfitrión.
+func _do(dev: int, act: String) -> void:
+	if net_select != null and not net_select.is_host(): _guest_action(dev, act)
+	else: _apply(_me, dev, act)
+
+## Aplica una acción de un jugador (de este PC o, en el anfitrión, de otro). Lo que solo se
+## ve en un PC (la ficha marcada, la sacudida) solo pasa si el jugador es de este.
+func _apply(peer: int, dev: int, act: String) -> void:
+	if _map != null or _leaving: return
+	var seat := state.seat_of(dev, peer)
+	var fb := state.act(peer, dev, act)
+	if peer == _me: _feedback(seat, fb)
+
+## Lo que solo ve el PC del jugador tras su acción (ver `SelectState.act`).
+func _feedback(seat: int, fb: String) -> void:
+	match fb:
+		"cursor-1": _frames[seat].move_cursor(-1)
+		"cursor1": _frames[seat].move_cursor(1)
+		"shake": _frames[seat].shake()
+		"exit": _leave_screen()
+		"freed":
+			# en red, quedarse sin puesto no saca de la sala: hace falta otra B (y confirmarlo)
+			if net_select == null and state.joined().is_empty(): _back_to_menu()
+
+## Invitado: la acción se ve al momento en su copia y va al anfitrión (`NetSelect.predict`);
+## lo que solo se ve aquí (ficha, sacudida, salir) no viaja.
+func _guest_action(dev: int, act: String) -> void:
+	if net_select.map_open or Net.state != NetSession.State.CONNECTED: return
+	var seat := state.seat_of(dev, _me)
+	_feedback(seat, net_select.predict(dev, act))
 
 ## Giro con LB/RB o Q/E: -1 o 1 al pulsar, 0 al soltar, 2 si el evento no es de giro.
 func _spin_input(event: InputEvent) -> int:
@@ -229,34 +273,180 @@ func _open_map() -> void:
 		return
 	_map = LevelMap.new()
 	add_child(_map)
+	if net_select != null: net_select.map_open = true
 	_map.chosen.connect(_start)
 	_map.closed.connect(func() -> void:
 		_map = null
+		if net_select != null: net_select.map_open = false
 		state.unready_all())
 
+## El anfitrión (o el único PC) elige nivel: empieza para todos.
 func _start(level_id: String) -> void:
-	GameSession.clear()
-	GameSession.level = StringName(level_id)
-	for i in state.joined():
-		var s: SelectState.Seat = state.seats[i]
-		var seat := GameSession.Seat.new()
-		seat.slot = i
-		seat.device = s.device
-		seat.guid = Devices.guid(s.device) if s.device >= Devices.KEYBOARD else ""
-		seat.character = state.characters[s.character].id
-		var pet: PetData = state.pets[s.pet]
-		seat.pet = pet.id if pet else &""
-		GameSession.seats.append(seat)
-		if Saves.current != null and not state.outfits.is_empty():   # el vestuario queda puesto
-			Saves.current.worn[String(seat.character)] = s.worn.duplicate()
+	var players := NetSelect.players_of(state)
+	if net_select != null: net_select.start(level_id, players)
+	_enter(level_id, players)
+
+## Pasa a la partida con esos jugadores: el relato del nivel y después la partida.
+func _enter(level_id: String, players: Array) -> void:
+	NetSelect.fill_session(level_id, players, _me, net_select != null)
+	var pr: SelectState.Profile = state.profiles.get(_me)
+	if Saves.current != null and pr != null and not pr.outfits.is_empty():   # el vestuario queda puesto
+		for s in GameSession.seats:
+			if s.is_local(): Saves.current.worn[String(s.character)] = s.worn.duplicate()
 	if Saves.current != null: Saves.save()
 	_leaving = true
-	get_tree().change_scene_to_file("res://scenes/relato.tscn")   # el relato del nivel y después la partida
+	get_tree().change_scene_to_file("res://scenes/relato.tscn")
 
-func _back_to_menu() -> void:
+## Vuelve al menú principal; desde la red, con la ventana online abierta y `notice` en ella.
+func _back_to_menu(notice: String = "") -> void:
 	_leaving = true
 	TitleScreen.skip_to_menu = true
+	if net_select != null or notice != "":
+		TitleScreen.reopen_online = true
+		OnlineMenu.notice = notice
 	get_tree().change_scene_to_file("res://scenes/title.tscn")
+
+## B sin puestos en este PC: en local, al menú; en red, pregunta antes de dejar la sala.
+func _leave_screen() -> void:
+	if net_select == null:
+		_back_to_menu()
+		return
+	var host := net_select.is_host()
+	_modal = MenuKit.Confirm.new("¿Cerrar la sala? Los demás volverán al menú." if host else "¿Salir de la sala?",
+		"Cerrar la sala" if host else "Salir")
+	add_child(_modal)
+	_modal.answered.connect(func(yes: bool) -> void:
+		_modal = null
+		if not yes: return
+		_leaving = true
+		Net.close()
+		_back_to_menu())
+
+# ---------------------------------------------------------------- red
+
+func _start_net(mine: SelectState.Profile, all_pets: Array) -> void:
+	net_select = NetSelect.new(Net, state, all_pets)
+	net_select.apply_action = _apply
+	net_select.map_changed.connect(func(open: bool) -> void:
+		if not net_select.is_host(): _show_wait("El anfitrión está eligiendo nivel…" if open else ""))
+	net_select.started.connect(func(level_id: String, players: Array) -> void:
+		if not _leaving: _enter(level_id, players))
+	add_child(net_select)
+	Net.closed.connect(func(reason: String) -> void:   # vacío: la ha cerrado este PC (al salir)
+		if not _leaving and reason != "" and is_inside_tree(): _back_to_menu(reason))
+	Net.failed.connect(func(reason: String) -> void:
+		if not _leaving and is_inside_tree(): _back_to_menu(reason))
+	Net.roster_changed.connect(_fill_room)
+	Net.upnp_done.connect(func(_ok: bool, _m: String) -> void: _fill_room())
+	_build_room()
+	if Net.is_host():
+		state.join(Devices.last_device)
+	elif Net.state == NetSession.State.CONNECTED:
+		_enter_room(mine)
+	else:                                                 # conectando (pruebas: net_join=)
+		_show_wait("Conectando…")
+		Net.joined.connect(func() -> void:
+			_show_wait("")
+			_enter_room(mine), CONNECT_ONE_SHOT)
+	_fill_room()
+
+## Invitado: copia la sala del anfitrión y entra con su perfil y su dispositivo.
+func _enter_room(mine: SelectState.Profile) -> void:
+	_me = Net.my_id
+	state.profiles = {SelectState.LOCAL: SelectState.Profile.new()}   # hasta que llegue la del anfitrión
+	net_select.enter(mine, Devices.last_device)
+	_fill_room()
+
+func _build_room() -> void:
+	var head := HBoxContainer.new()
+	head.position = Vector2(28, 12)
+	head.add_theme_constant_override("separation", 14)
+	_stage.add_child(head)
+	_room_code = MenuKit.title("", 30, MenuKit.INK)
+	_room_code.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	head.add_child(_room_code)
+	_room_code_val = UiKit.label("", 28, MenuKit.INK)
+	_room_code_val.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(_room_code_val)
+	_room_status = UiKit.label("", 16, UiKit.TEXT_DIM)
+	_room_status.position = Vector2(30, 54)
+	_room_status.size = Vector2(620, 24)
+	_room_status.clip_text = true
+	_stage.add_child(_room_status)
+	_room_list = UiKit.label("", 17, UiKit.TEXT)
+	_room_list.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_room_list.position = Vector2(DESIGN.x - 640, 54)
+	_room_list.size = Vector2(612, 24)
+	_room_list.clip_text = true
+	_stage.add_child(_room_list)
+	_wait_dim = ColorRect.new()
+	_wait_dim.color = Color(0.0, 0.0, 0.02, 0.62)
+	_wait_dim.position = Vector2(0, TOP - 6)
+	_wait_dim.size = Vector2(DESIGN.x, DESIGN.y - TOP - 50)     # los marcos, sin la cabecera ni la ayuda
+	_wait_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_wait_dim.visible = false
+	_stage.add_child(_wait_dim)
+	_wait = PanelContainer.new()
+	var sb := UiKit.panel(Color(0.02, 0.022, 0.03, 0.96), Color(MenuKit.INK, 0.6), 10)
+	sb.content_margin_left = 48; sb.content_margin_right = 48
+	sb.content_margin_top = 26; sb.content_margin_bottom = 26
+	_wait.add_theme_stylebox_override("panel", sb)
+	_wait_label = MenuKit.title("", 34, MenuKit.INK)
+	_wait.add_child(_wait_label)
+	_wait.visible = false
+	_stage.add_child(_wait)
+
+## Aviso en el centro ("" lo quita).
+func _show_wait(text: String) -> void:
+	if _wait == null: return
+	_wait_label.text = text
+	_wait.visible = text != ""
+	_wait_dim.visible = _wait.visible
+	_wait.reset_size()
+	_wait.position = (DESIGN - _wait.size) * 0.5
+
+func _fill_room() -> void:
+	if _room_code == null or not Net.is_active(): return
+	if Net.is_host():
+		var c := Net.codes()
+		var code: String = c.internet if c.internet != "" else c.lan
+		_room_code.text = "Sala" if code != "" else "Sala abierta"
+		_room_code_val.text = code
+		var bits := PackedStringArray()
+		if c.internet != "" and c.lan != "": bits.append("en casa: %s" % c.lan)
+		bits.append(Net.upnp_status)
+		bits.append("Select o C: copiar")
+		_room_status.text = "  ·  ".join(bits)
+	else:
+		var host_name := String(Net.peers.get(1, {}).get("name", ""))
+		_room_code.text = ("Sala de %s" % host_name) if host_name != "" else "Sala"
+		_room_code_val.text = ""
+		var ping := int(Net.peers.get(Net.my_id, {}).get("ping", 0))
+		_room_status.text = ("Ping %d ms" % ping) if ping > 0 else ("Conectando…" if Net.state != NetSession.State.CONNECTED else "Midiendo el ping…")
+	var ids := Net.peers.keys()
+	ids.sort()
+	var names := PackedStringArray()
+	for id in ids:
+		var p: Dictionary = Net.peers[id]
+		var who := String(p.name) + (" (tú)" if id == Net.my_id else "")
+		if id != 1 and int(p.ping) > 0: who += " %d ms" % int(p.ping)
+		names.append(who)
+	_room_list.text = "En la sala: " + "  ·  ".join(names)
+
+func _is_copy(event: InputEvent) -> bool:
+	if event is InputEventJoypadButton:
+		return (event as InputEventJoypadButton).pressed and (event as InputEventJoypadButton).button_index == JOY_BUTTON_BACK
+	if event is InputEventKey:
+		var k := event as InputEventKey
+		return k.pressed and not k.echo and k.physical_keycode == KEY_C
+	return false
+
+func _copy_code() -> void:
+	var c := Net.codes()
+	var code: String = c.internet if c.internet != "" else c.lan
+	if code == "": return
+	DisplayServer.clipboard_set(code)
+	_room_status.text = "Copiado: %s" % code
 
 ## Capturas: jugadores de prueba con dispositivos ficticios.
 func _demo_from_args() -> void:
@@ -302,6 +492,7 @@ class _Frame extends Control:
 	var _arrows: Array[Label] = []
 	var _wbox: PanelContainer
 	var _empty: VBoxContainer
+	var _who: Label                           ## en red, el nombre del PC del jugador
 	var _pet: Panel
 	var _pet_title: Label
 	var _pet_name: Label
@@ -309,7 +500,6 @@ class _Frame extends Control:
 	var _pet_note: Label
 	var _shake := 0.0
 	var _base_x := 0.0
-	var spin := 0                             ## -1, 0 o 1 mientras se mantiene LB/RB (Q/E)
 
 	func _init(p_owner: CharacterSelect, p_index: int) -> void:
 		owner_screen = p_owner
@@ -335,6 +525,11 @@ class _Frame extends Control:
 		jl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		jl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_jbox.add_child(jl)
+		_who = UiKit.label("", 16, color)
+		_who.position = Vector2(12, 108)
+		_who.size = Vector2(150, 22)
+		_who.clip_text = true
+		add_child(_who)
 		# el personaje en 3D, en su propio mundo, a la escala de la partida
 		_view = _Preview.new(Vector2(240, VIEW_H), PX_PER_M * MODEL_ZOOM, index)
 		_view.position = Vector2((FRAME.x - 240) * 0.5, 4)
@@ -534,6 +729,8 @@ class _Frame extends Control:
 		_panel.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9 if on else 0.6),
 			Color(color, 0.85 if on and seat.stage == SelectState.Stage.READY else (0.45 if on else 0.18)), 10))
 		_jbox.visible = on
+		_who.visible = on and owner_screen.net_select != null
+		if on: _who.text = st.profile_of(index).name
 		if not on:
 			_head.visible = true
 			for a in _arrows: a.visible = false
@@ -541,11 +738,8 @@ class _Frame extends Control:
 		var c: CharacterData = st.characters[seat.character]
 		_head.visible = false
 		_view.set_model(c.model, st.worn_of(index))
-		var locked := st.is_locked(seat.character)
-		var holder := -1                            # quién lo ha confirmado ya (D-23)
-		for j in st.seats.size():
-			if j != index and st.seats[j] != null and (st.seats[j] as SelectState.Seat).stage != SelectState.Stage.CHARACTER 					and (st.seats[j] as SelectState.Seat).character == seat.character:
-				holder = j
+		var locked := st.is_locked(seat.character, index)
+		var holder := st.holder_of(seat.character, index)   # quién lo ha confirmado ya (D-23)
 		var unavailable := seat.stage == SelectState.Stage.CHARACTER and (locked or holder >= 0)
 		_view.modulate = Color(0.25, 0.25, 0.3) if unavailable else Color.WHITE
 		_name.text = c.display_name
@@ -614,12 +808,13 @@ class _Frame extends Control:
 				_status.text = "¡Listo!"
 				_status.add_theme_color_override("font_color", color)
 		_paint_outfit(seat, color)
-		var pet: PetData = st.pets[seat.pet]
+		var pets := st.pets_of(index)
+		var pet: PetData = pets[seat.pet] if seat.pet < pets.size() else null
 		var picking := seat.stage == SelectState.Stage.PET
 		_pet_name.text = pet.display_name if pet else "Sin compañero"
-		for a in _pet_arrows: a.visible = picking and st.pets.size() > 1
+		for a in _pet_arrows: a.visible = picking and pets.size() > 1
 		_pet_view.set_model(pet.model if pet else "")
-		_pet_note.text = "" if pet else ("Se consiguen en la tienda" if st.pets.size() == 1 else "Irás solo")
+		_pet_note.text = "" if pet else ("Se consiguen en la tienda" if pets.size() == 1 else "Irás solo")
 		var active := picking or seat.stage == SelectState.Stage.READY
 		_pet_title.add_theme_color_override("font_color", UiKit.GOLD if active else Color(UiKit.GOLD, 0.45))
 		_pet_name.add_theme_color_override("font_color", color if active else UiKit.TEXT_DIM)
@@ -644,6 +839,7 @@ class _Frame extends Control:
 		var st := owner_screen.state
 		var seat: SelectState.Seat = st.seats[index] if st else null
 		var on_pet := seat != null and seat.stage == SelectState.Stage.PET
+		var spin := seat.spin if seat != null else 0
 		_view.spin = 0 if on_pet else spin
 		_pet_view.spin = spin if on_pet else 0
 		if _shake > 0.0:

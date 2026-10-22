@@ -13,7 +13,8 @@ extends Node
 ## (ROSTER) al cambiar y cada 2 s con el ping de cada uno, que mide él (PING / PONG).
 ##
 ## Pruebas: `net_lag=150` retrasa cada mensaje recibido esos ms (si lo llevan las dos copias,
-## el ping sube el doble) y `net_loss=0.05` pierde esa fracción de los no fiables.
+## el ping sube el doble), `net_loss=0.05` pierde esa fracción de los no fiables y
+## `net_name=Ana` da otro nombre (dos copias en el mismo PC).
 
 signal hosted(port: int)                     ## sala abierta
 signal joined                                ## cliente aceptado por el anfitrión
@@ -26,7 +27,7 @@ signal message(from: int, type: int, data: Variant)   ## mensajes de la partida 
 enum State { OFF, HOSTING, CONNECTING, CONNECTED }
 enum Msg { HELLO = 1, WELCOME, REJECT, ROSTER, PING, PONG }
 const USER := 16                             ## primer tipo libre para la partida
-const PROTOCOL := 1                          ## súbelo al cambiar el formato de cualquier mensaje
+const PROTOCOL := 2                          ## súbelo al cambiar el formato de cualquier mensaje
 const MAX_PLAYERS := 4                       ## jugadores en total, sumando los de cada PC
 const HELLO_TIMEOUT := 5.0                   ## s para presentarse tras conectar
 const CONNECT_TIMEOUT := 8.0                 ## s para conectar con el anfitrión
@@ -39,6 +40,7 @@ var port := 0
 const DEFAULT_NAME := "Investigador"
 var player_name := DEFAULT_NAME
 var locals := 1                              ## jugadores de este PC
+var accepting := true                        ## anfitrión: false con la partida empezada (D-10: no se entra a medias)
 var protocol := PROTOCOL                     ## distinto solo en los tests (rechazo por versión)
 ## id -> {name, locals, ping}. El anfitrión es el 1.
 var peers: Dictionary = {}
@@ -62,6 +64,7 @@ func _ready() -> void:
 	var la := LaunchArgs.from_cmdline()
 	lag_ms = la.get_int("net_lag", 0)
 	loss = la.get_float("net_loss", 0.0)
+	if la.has("net_name"): player_name = la.get_str("net_name").left(20)   # pruebas: dos copias en el mismo PC
 	if player_name == DEFAULT_NAME:                  # nombre del usuario del PC, si no se ha dado otro
 		var who := OS.get_environment("USERNAME")
 		if who.is_empty(): who = OS.get_environment("USER")
@@ -90,6 +93,7 @@ func host(p_port: int = RoomCode.BASE_PORT, use_upnp: bool = true) -> Error:
 	_start_api()
 	state = State.HOSTING
 	my_id = 1
+	accepting = true
 	peers = {1: {"name": player_name, "locals": locals, "ping": 0}}
 	local_ip = RoomCode.local_ip()
 	external_ip = ""
@@ -148,6 +152,15 @@ func send(to: int, type: int, data: Variant = null, reliable: bool = true) -> vo
 func codes() -> Dictionary:
 	return {"lan": RoomCode.encode(local_ip, port) if local_ip != "" else "",
 		"internet": RoomCode.encode(external_ip, port) if upnp_ok else ""}
+
+## Anfitrión: cuántos jugadores lleva un PC (los puestos que ocupa en la selección). Cuenta
+## para dejar entrar a otro PC y sale en la lista de conectados.
+func set_locals(id: int, n: int) -> void:
+	if state != State.HOSTING or not peers.has(id) or int(peers[id].locals) == n: return
+	peers[id].locals = n
+	if id == 1: locals = n
+	_send_roster()
+	roster_changed.emit()
 
 func player_count() -> int:
 	var n := 0
@@ -281,7 +294,9 @@ func _on_hello(from: int, data: Variant) -> void:
 	var why := ""
 	if not data is Dictionary or int(data.get("proto", -1)) != PROTOCOL:
 		why = "Versión distinta del juego: actualizad los dos a la misma"
-	elif player_count() + clampi(int(data.get("locals", 1)), 1, MAX_PLAYERS) > MAX_PLAYERS:
+	elif not accepting:
+		why = "La partida ya ha empezado: espera a que vuelvan a la sala"
+	elif player_count() + 1 > MAX_PLAYERS:                       # con sitio para uno: los demás se unen en la selección
 		why = "La sala está llena"
 	if why != "":
 		_send(from, Msg.REJECT, why, true)
@@ -289,7 +304,7 @@ func _on_hello(from: int, data: Variant) -> void:
 			if _api != null and _api.get_peers().has(from): _api.disconnect_peer(from)
 		get_tree().create_timer(0.3).timeout.connect(kick)   # que llegue el motivo antes de cortar
 		return
-	peers[from] = {"name": String(data.get("name", "Jugador")).left(20), "locals": clampi(int(data.get("locals", 1)), 1, MAX_PLAYERS), "ping": 0}
+	peers[from] = {"name": String(data.get("name", "Jugador")).left(20), "locals": 1, "ping": 0}
 	_send(from, Msg.WELCOME, {"id": from}, true)
 	_send_roster()
 	roster_changed.emit()

@@ -225,7 +225,7 @@ Según D-10 (resuelta el 21-10-2026 en el GDD): anfitrión con autoridad y clien
 | Hito | Contenido | Estado |
 |---|---|---|
 | 9.1 | **Base de red:** sesión de red (ENet, anfitrión y clientes), UPnP, código de sala que codifica IP y puerto, menú "Jugar online" con Crear y Unirse, y pruebas con dos instancias en el mismo PC (latencia y pérdida simuladas) | Hecho, pendiente de tu prueba (21-10-2026); el selector del código con el mando pasa al 9.2 |
-| 9.2 | **Sala y selección de personaje en red:** `SelectState` sincronizado, cada invitado con sus desbloqueos, listos y nivel elegido por el anfitrión | Pendiente |
+| 9.2 | **Sala y selección de personaje en red:** `SelectState` sincronizado, cada invitado con sus desbloqueos, listos y nivel elegido por el anfitrión; selector del código con el mando (plan aprobado el 22-10-2026: la sala es la propia selección; hasta el 9.3 el anfitrión juega con bots en lugar de los invitados) | Hecho, pendiente de tu prueba (22-10-2026) |
 | 9.3 | **Partida en red:** los clientes envían su entrada (un `PlayerInput` remoto) y reciben instantáneas del estado (jugadores, enemigos, balas, gemas y efectos) con interpolación; predicción del movimiento y el esquive propios | Pendiente |
 | 9.4 | **Cámara por PC e interfaz:** cámara de los jugadores locales, flechas de los que quedan fuera, HUD por PC, y pausa y subidas por turnos para todos | Pendiente |
 | 9.5 | **Desconexiones y guardado:** bot al caer la conexión y vuelta al siguiente nivel, fin de partida si se va el anfitrión, dinero y logros en la partida de cada invitado | Pendiente |

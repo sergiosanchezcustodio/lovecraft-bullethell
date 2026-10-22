@@ -6,13 +6,22 @@ extends RefCounted
 ## Vacía (partida lanzada directamente, pruebas): la partida usa sus opciones de siempre.
 
 ## Un jugador: hueco (0..3), dispositivo (Devices.KEYBOARD o un mando), su GUID para
-## reconocerlo si se reconecta, personaje y compañero ("" = ninguno).
+## reconocerlo si se reconecta, personaje y compañero ("" = ninguno). En red (hito 9.2), el PC
+## del que es (`peer`), el nombre de ese PC y su vestuario (el de los demás PC no está en
+## nuestra partida).
 class Seat:
 	var slot := 0
 	var device := -1
 	var guid := ""
 	var character := &"dyer"
 	var pet := &""
+	var peer := 1
+	var name := ""
+	var worn := {}
+
+	## ¿Lo maneja este PC? (Sin red, todos.)
+	func is_local() -> bool:
+		return peer == GameSession.my_peer
 
 static var seats: Array[Seat] = []
 static var level := &"p1_n1"
@@ -22,6 +31,8 @@ static var level := &"p1_n1"
 static var carry: Array = []
 static var team_xp := 0.0
 static var team_turn := 0                ## cooperativo: a quién le toca la próxima subida (D-39)
+static var online := false               ## partida en red (hito 9.2)
+static var my_peer := 1                  ## id de este PC en la sala (el anfitrión es el 1)
 
 static func is_set() -> bool:
 	return not seats.is_empty()
@@ -32,6 +43,15 @@ static func clear() -> void:
 	carry.clear()
 	team_xp = 0.0
 	team_turn = 0
+	online = false
+	my_peer = 1
+
+## Vestuario de un jugador de otro PC con ese personaje, o null si no lo hay (el de los de
+## este PC está en nuestra partida).
+static func remote_worn(character_id: String) -> Variant:
+	for s in seats:
+		if String(s.character) == character_id and not s.is_local(): return s.worn
+	return null
 
 ## Foto del progreso de un jugador para el siguiente nivel.
 static func snapshot(q: Player) -> Dictionary:

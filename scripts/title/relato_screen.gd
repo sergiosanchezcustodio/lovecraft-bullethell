@@ -4,7 +4,7 @@ extends Control
 ## del nivel y sus frases (data/library/relatos.json) apareciendo una tras otra sobre el mapa
 ## del lugar, oscurecido. Pulsar adelanta (muestra lo que falta o, si ya está todo, empieza);
 ## mantener pulsado 0,8 s lo salta, con un aro que se llena. Sin relato, va directo a la partida.
-## Capturas: `godot --path . -- relato level=p1_n1 shots=3,9 tag=x`.
+## Capturas: `godot --path . -- relato level=p1_n1 shots=3,9 tag=x`. `skip_relato=true` lo salta.
 
 const LINE_DELAY := 2.3          ## s entre frase y frase
 const FADE := 0.7
@@ -29,7 +29,7 @@ func _ready() -> void:
 	_tag = la.get_str("tag", "relato")
 	var id := la.get_str("level", String(GameSession.level)) if la.has("level") else String(GameSession.level)
 	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json"))
-	if not (d is Dictionary) or not (d as Dictionary).has(id):
+	if not (d is Dictionary) or not (d as Dictionary).has(id) or la.get_bool("skip_relato"):   # pruebas: skip_relato=true
 		_go()
 		return
 	var black := ColorRect.new()
@@ -101,6 +101,13 @@ func _all_shown() -> bool:
 
 func _go() -> void:
 	set_process(false)
+	if GameSession.online and GameSession.my_peer != 1:
+		# invitado: hasta la partida en red (hito 9.3) juega el anfitrión, con bots en su lugar
+		OnlineMenu.notice = "La partida en red llega en el siguiente hito: de momento juega el anfitrión, con bots en vuestro lugar."
+		TitleScreen.skip_to_menu = true
+		TitleScreen.reopen_online = true
+		get_tree().change_scene_to_file.call_deferred("res://scenes/title.tscn")
+		return
 	get_tree().change_scene_to_file.call_deferred(GAME)
 
 func _input(event: InputEvent) -> void:

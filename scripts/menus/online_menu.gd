@@ -1,35 +1,47 @@
 class_name OnlineMenu
 extends Control
-## "Jugar online" (hito 9.1, D-10): crear una sala o unirse a una con su código o su IP.
-## La sala muestra los códigos (el de la red de casa y, si UPnP abrió el puerto, el de
-## internet) y los conectados con su ping. La selección de personaje en red llega en el 9.2.
-## B / Esc vuelve atrás (cerrando la sala o la conexión); desde la elección, cierra la ventana.
-## Pruebas: `net_host=true` abre la sala al entrar y `net_join=<código|IP>` se une sola
-## (con `open=menu_online` en la portada); `net_upnp=false` no toca el router.
+## "Jugar online" (hitos 9.1 y 9.2, D-10): crear una sala o unirse a una con su código o su IP.
+## Crear abre la sala y pasa a la selección de personaje, que hace también de sala (código y
+## conectados arriba); unirse conecta y, al entrar, pasa a la selección del anfitrión.
+## El código se escribe con el teclado o, con el mando, en las casillas de debajo
+## (`RoomCodePicker`). B / Esc vuelve atrás (cortando la conexión a medias); desde la
+## elección, cierra la ventana. Pruebas: `net_host=true` abre la sala al entrar y
+## `net_join=<código|IP>` se une sola (con `open=menu_online` en la portada); `net_upnp=false`
+## no toca el router.
+
+const SELECT_SCENE := "res://scenes/select.tscn"
+
+## Aviso para la próxima vez que se abra (por qué se ha vuelto de la sala).
+static var notice := ""
+static var _args_used := false
 
 var _box: VBoxContainer
-var _view := ""                            ## "", "host" o "join"
+var _view := ""                            ## "" o "join"
 var _status: Label
-var _roster: VBoxContainer
-var _codes: VBoxContainer
 var _field: LineEdit
+var _picker: RoomCodePicker
 var _connect_btn: Button
+var _leaving := false
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var w: Array = MenuKit.window(self, MenuKit.INK, 720)
 	_box = w[1]
-	Net.roster_changed.connect(_fill_roster)
-	Net.upnp_done.connect(_on_upnp)
 	Net.failed.connect(_on_failed)
 	Net.closed.connect(_on_closed)
 	Net.joined.connect(_on_joined)
 	_show_choice()
+	if notice != "":
+		_on_failed(notice)
+		notice = ""
 	var la := LaunchArgs.from_cmdline()
+	if _args_used: return                         # las opciones de prueba valen solo la primera vez
+	_args_used = true
 	if la.get_bool("net_host"): _host.call_deferred()
 	elif la.has("net_join"):
 		_show_join()
 		_field.text = la.get_str("net_join")
+		_picker.set_text(_field.text)
 		_connect.call_deferred()
 
 func _exit_tree() -> void:
@@ -48,7 +60,7 @@ func _clear() -> void:
 	for c in _box.get_children():
 		_box.remove_child(c)
 		c.queue_free()
-	_status = null; _roster = null; _codes = null; _field = null; _connect_btn = null
+	_status = null; _field = null; _picker = null; _connect_btn = null
 
 func _button(text: String, cb: Callable) -> Button:
 	var b := MenuKit.button(text, MenuKit.INK, 28)
@@ -82,29 +94,15 @@ func _show_choice() -> void:
 	_text("Hasta cuatro jugadores en total, en uno o varios PC.", 20, UiKit.TEXT_DIM)
 	var create := _button("Crear sala", _host)
 	_button("Unirse a una sala", _show_join)
+	_text("La primera vez, Windows puede preguntar si deja pasar la conexión: acepta en redes privadas y públicas.", 17, UiKit.TEXT_DIM)
 	_box.add_child(MenuKit.hint("B o Esc: volver"))
 	_focus(create)
 
+## Abre la sala y pasa a la selección (que hace de sala). Si no se puede, `failed` dice por qué.
 func _host() -> void:
-	_clear()
-	_view = "host"
-	_box.add_child(MenuKit.title("Sala abierta", 44))
-	_codes = VBoxContainer.new()
-	_codes.add_theme_constant_override("separation", 6)
-	_box.add_child(_codes)
-	_box.add_child(MenuKit.title("En la sala", 28))
-	_roster = VBoxContainer.new()
-	_box.add_child(_roster)
-	_text("La primera vez, Windows puede preguntar si deja pasar la conexión: acepta en redes privadas y públicas.", 17, UiKit.TEXT_DIM)
-	var copy := _button("Copiar el código", _copy_code)
-	_button("Cerrar la sala", func() -> void:
-		Net.close()
-		_show_choice())
-	_box.add_child(MenuKit.hint("B o Esc: cerrar la sala"))
-	_focus(copy)
-	if Net.host(RoomCode.BASE_PORT, LaunchArgs.from_cmdline().get_bool("net_upnp", true)) != OK: return   # `failed` ya ha dicho por qué
-	_fill_codes()
-	_fill_roster()
+	if _leaving: return
+	if Net.host(RoomCode.BASE_PORT, LaunchArgs.from_cmdline().get_bool("net_upnp", true)) != OK: return
+	_go_to_select()
 
 func _show_join() -> void:
 	_clear()
@@ -122,12 +120,18 @@ func _show_join() -> void:
 	var row := CenterContainer.new()
 	row.add_child(_field)
 	_box.add_child(row)
+	_picker = RoomCodePicker.new()
+	_box.add_child(_picker)
+	_field.text_changed.connect(func(t: String) -> void: _picker.set_text(t))
+	_picker.changed.connect(func(t: String) -> void: _field.text = t)
+	_picker.submitted.connect(_connect)
 	_connect_btn = _button("Conectar", _connect)
+	# arriba y abajo: campo, casillas y botón (en las casillas, arriba y abajo cambian la letra)
+	_field.focus_neighbor_bottom = _field.get_path_to(_picker)
+	_connect_btn.focus_neighbor_top = _connect_btn.get_path_to(_picker)
 	_status = _text("", 20, UiKit.TEXT_DIM)
-	_roster = VBoxContainer.new()
-	_box.add_child(_roster)
-	_box.add_child(MenuKit.hint("Intro: conectar  ·  Ctrl+V: pegar  ·  B o Esc: volver"))
-	_focus(_field)
+	_box.add_child(MenuKit.hint("Mando: cruceta para las letras · A: conectar · X: pegar  ·  Teclado: Intro conecta · Ctrl+V pega  ·  B o Esc: volver"))
+	_focus(_picker if Devices.last_device != Devices.KEYBOARD else _field)
 
 # ---------------------------------------------------------------- acciones
 
@@ -142,22 +146,14 @@ func _connect() -> void:
 	_status.text = "Conectando con %s:%d…" % [a.ip, a.port]
 	if Net.join(a.ip, a.port) == OK: _connect_btn.disabled = true
 
-func _copy_code() -> void:
-	var c := Net.codes()
-	var code: String = c.internet if c.internet != "" else c.lan
-	if code == "": return
-	DisplayServer.clipboard_set(code)
-	if _status == null: _status = _text("", 18, UiKit.TEXT_DIM)
-	_status.text = "Copiado: %s" % code
-
-func _on_upnp(_ok: bool, _message: String) -> void:
-	_fill_codes()
-
 func _on_joined() -> void:
 	if _view != "join": return
-	_status.text = "Dentro. Esperando a que el anfitrión empiece…"
-	_field.editable = false
-	_fill_roster()
+	_status.text = "Dentro. Entrando en la sala…"
+	_go_to_select()
+
+func _go_to_select() -> void:
+	_leaving = true
+	get_tree().change_scene_to_file(SELECT_SCENE)
 
 func _on_failed(reason: String) -> void:
 	if _status == null: _status = _text("", 20, UiKit.TEXT_DIM)
@@ -166,58 +162,11 @@ func _on_failed(reason: String) -> void:
 	if _connect_btn != null: _connect_btn.disabled = false
 
 func _on_closed(reason: String) -> void:
-	if reason == "" or not is_inside_tree(): return       # la cerró este PC
+	if reason == "" or not is_inside_tree() or _leaving: return       # la cerró este PC
 	if _view == "join":
 		var typed := _field.text if _field != null else ""
 		_show_join()
 		_field.text = typed                          # para reintentar sin escribirlo otra vez
+		_picker.set_text(typed)
 	else: _show_choice()
 	_on_failed(reason)
-
-# ---------------------------------------------------------------- relleno
-
-func _fill_codes() -> void:
-	if _codes == null: return
-	for c in _codes.get_children(): c.queue_free()
-	var c := Net.codes()
-	if c.lan != "": _codes.add_child(_code_line("En tu red (misma casa)", c.lan))
-	if c.internet != "": _codes.add_child(_code_line("Por internet", c.internet))
-	var up := UiKit.label("%s  ·  puerto %d (UDP)" % [Net.upnp_status, Net.port], 18, UiKit.TEXT_DIM)
-	up.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_codes.add_child(up)
-	if c.internet == "" and not Net.upnp_status.begins_with("Buscando"):
-		var help := UiKit.label("Para jugar por internet: abre ese puerto en el router hacia %s, o usad Tailscale o ZeroTier y daos la IP que os asigne." % (Net.local_ip if Net.local_ip != "" else "este PC"), 17, UiKit.TEXT_DIM)
-		help.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		help.custom_minimum_size.x = 640
-		_codes.add_child(help)
-
-func _code_line(what: String, code: String) -> Control:
-	var row := HBoxContainer.new()
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 18)
-	row.add_child(UiKit.label(what, 22, UiKit.TEXT_DIM))
-	var c := UiKit.label(code, 40, MenuKit.INK)   # la fuente de la portada dibuja el 0 como una o
-	row.add_child(c)
-	return row
-
-func _fill_roster() -> void:
-	if _roster == null: return
-	for c in _roster.get_children(): c.queue_free()
-	var ids := Net.peers.keys()
-	ids.sort()
-	for k in ids.size():
-		var id: int = ids[k]
-		var p: Dictionary = Net.peers[id]
-		var who := String(p.name) + ("  (anfitrión)" if id == 1 else "") + ("  ·  tú" if id == Net.my_id else "")
-		var extra := ""
-		if id != 1: extra = ("  ·  %d ms" % int(p.ping)) if int(p.ping) > 0 else "  ·  midiendo…"
-		var n := int(p.locals)
-		var many := ("  ·  %d jugadores" % n) if n > 1 else ""
-		var l := UiKit.label(who + many + extra, 22, Devices.COLORS[mini(k, Devices.COLORS.size() - 1)])
-		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_roster.add_child(l)
-	if _view == "host" and ids.size() == 1:
-		var wait := UiKit.label("Esperando a que se una alguien…", 20, UiKit.TEXT_DIM)
-		wait.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_roster.add_child(wait)
