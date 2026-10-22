@@ -139,7 +139,8 @@ static func players_of(st: SelectState) -> Array:
 		var s: SelectState.Seat = st.seats[i]
 		var pet: PetData = st.pets_of(i)[s.pet] if s.pet < st.pets_of(i).size() else null
 		out.append({"slot": i, "peer": s.peer, "device": s.device, "character": String(st.characters[s.character].id),
-			"pet": String(pet.id) if pet else "", "worn": s.worn.duplicate(), "name": st.profile_of(i).name})
+			"pet": String(pet.id) if pet else "", "worn": s.worn.duplicate(), "name": st.profile_of(i).name,
+			"shop": st.profile_of(i).shop.duplicate()})
 	return out
 
 ## Llena `GameSession` con los jugadores (de `players_of` o de START). `me`: el PC que juega
@@ -159,6 +160,7 @@ static func fill_session(level: String, players: Array, me: int, online: bool) -
 		seat.pet = StringName(String(d.get("pet", "")))
 		seat.worn = (d.get("worn", {}) as Dictionary).duplicate() if d.get("worn", {}) is Dictionary else {}
 		seat.name = String(d.get("name", ""))
+		seat.shop = SelectState.Profile.clean_shop(d.get("shop", {}))
 		if seat.is_local() and (seat.device == Devices.KEYBOARD or Input.get_connected_joypads().has(seat.device)):
 			seat.guid = Devices.guid(seat.device)
 		GameSession.seats.append(seat)

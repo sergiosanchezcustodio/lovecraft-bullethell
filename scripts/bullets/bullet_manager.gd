@@ -52,6 +52,10 @@ const HEIGHT := 0.8                          ## altura de vuelo (a la altura del
 
 var world: CombatWorld
 var count := 0
+## En red (hito 9.3b), anfitrión: se llama con cada bala enemiga nueva (pos, vel, radio, tamaño,
+## daño físico, mental, vida, estilo, atraviesa el decorado) para mandarla a los invitados.
+var on_enemy_spawn := Callable()
+var _bursting := false                       ## las chispas de una que se abre no se mandan: cada PC la abre
 
 var _pos := PackedVector3Array()
 var _prev := PackedVector3Array()            ## posición en el paso de física anterior (para interpolar el dibujo)
@@ -175,6 +179,19 @@ func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, 
 	_slowed[i] = 0
 	_owner[i] = owner
 	count += 1
+	if team == Team.ENEMY and on_enemy_spawn.is_valid() and not _bursting:
+		on_enemy_spawn.call(pos, vel, radius, size, damage.physical, damage.mental, life, style, owner == OVER_WALLS)
+
+## En red, invitado: una bala enemiga que nació en el anfitrión hace `ahead` s (ya ha volado eso).
+func spawn_remote(style: int, pos: Vector3, vel: Vector3, radius: float, size: float, phys: float, ment: float,
+		life: float, over_walls: bool, ahead: float) -> void:
+	if count >= MAX_BULLETS or ahead >= life: return
+	spawn(Team.ENEMY, style as Style, pos, vel, radius, size, Damage.new(phys, ment), life, 0, 1.0, -1, 0, 0.0,
+		Effect.NONE, 0.0, OVER_WALLS if over_walls else -1)
+	var i := count - 1
+	_pos[i] += _vel[i] * ahead
+	_prev[i] = _pos[i]
+	_age[i] = ahead
 
 ## Registra los rasgos de daño de un tirador y devuelve su índice para spawn().
 func register_bonus(bonus: Dictionary) -> int:
@@ -296,6 +313,11 @@ func _steer(i: int, delta: float) -> void:
 func _collide_enemy_bullet(i: int) -> bool:
 	var p := Vector2(_pos[i].x, _pos[i].z)
 	for pl in world.players:
+		if pl.remote:                                # de otro PC: lo que le pase lo decide su PC; aquí
+			if not pl.net_solid(): continue          # la bala solo desaparece al tocarlo (sin daño)
+			var rr := _radius[i] + pl.data.hurt_radius
+			if p.distance_squared_to(Vector2(pl.global_position.x, pl.global_position.z)) <= rr * rr: return true
+			continue
 		if not pl.is_hittable(): continue
 		var r := _radius[i] + pl.data.hurt_radius
 		if p.distance_squared_to(Vector2(pl.global_position.x, pl.global_position.z)) <= r * r:
@@ -364,10 +386,12 @@ func _burst(i: int) -> void:
 	d.tag = _tag[i]
 	var spd := maxf(_vel[i].length() * 0.6, 6.0)
 	var a0 := randf() * TAU
+	_bursting = true
 	for k in n:
 		var a := a0 + TAU * k / n
 		spawn(_team[i], _style[i], _pos[i], Vector3(cos(a), 0, sin(a)) * spd, _radius[i] * 0.8, _size[i] * 0.7,
 			d, 0.45, 0, _push[i] * 0.5, _bonus[i], 0)
+	_bursting = false
 
 func _clash_key(p: Vector3) -> int:
 	var cx := int(floor(p.x / CLASH_CELL)) + CLASH_N / 2

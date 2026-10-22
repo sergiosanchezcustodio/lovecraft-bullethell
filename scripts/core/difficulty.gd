@@ -17,9 +17,11 @@ const MELEE_SPEED := [1.0, 1.18, 1.32]  ## velocidad de los de cuerpo a cuerpo
 const HEALTH := [1.0, 1.0, 1.2]         ## vida de los enemigos
 
 static var forced := -1                 ## los tests la fijan (sus topes no dependen del ajuste guardado)
+static var net := -1                    ## en red, invitado: la del anfitrión (la pone NetGame; la partida la borra al empezar)
 
 static func level() -> int:
 	if forced >= 0: return forced
+	if net >= 0: return net
 	if Engine.get_main_loop() == null or not (Engine.get_main_loop() as SceneTree).root.has_node("Settings"): return 1
 	return clampi(int(Auto.setting("difficulty", 1)), 0, NAMES.size() - 1)
 

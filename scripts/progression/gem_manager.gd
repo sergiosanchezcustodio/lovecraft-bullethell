@@ -19,6 +19,15 @@ const TIER_COLORS: Array[Color] = [Color(1.0, 0.78, 0.22), Color(0.35, 0.92, 0.3
 	Color(1.0, 0.24, 0.20), Color(0.72, 0.32, 1.0)]
 const STRIDE := 16
 
+## En red (hito 9.3b): cada gema lleva un id. El anfitrión avisa de cada puñado que suelta
+## (`dropped`, con la semilla de sus saltos: el invitado las suelta iguales) y de cada gema que
+## recoge alguien (`collected`). En el invitado (`mirror`) las gemas vuelan igual hacia los
+## jugadores, pero no dan experiencia: la cuenta el anfitrión.
+signal dropped(first_id: int, pos: Vector3, value: float, tier: int, seed: int)
+signal collected(id: int)
+var mirror := false
+var next_id := 1
+
 var world: CombatWorld
 var rules: ProgressionData
 var count := 0
@@ -29,13 +38,14 @@ var _value := PackedFloat32Array()
 var _age := PackedFloat32Array()
 var _homing := PackedByteArray()
 var _tier := PackedByteArray()
+var _id := PackedInt32Array()
 var _mm: MultiMesh
 var _buffer := PackedFloat32Array()
 
 func _init() -> void:
 	name = "Gems"
 	_pos.resize(MAX_GEMS); _prev.resize(MAX_GEMS); _vel.resize(MAX_GEMS); _value.resize(MAX_GEMS)
-	_age.resize(MAX_GEMS); _homing.resize(MAX_GEMS); _tier.resize(MAX_GEMS)
+	_age.resize(MAX_GEMS); _homing.resize(MAX_GEMS); _tier.resize(MAX_GEMS); _id.resize(MAX_GEMS)
 
 func _ready() -> void:
 	_mm = MultiMesh.new()
@@ -87,20 +97,36 @@ func _gem_mesh() -> ArrayMesh:
 	st.generate_normals()            # vértices sin compartir: una normal por faceta (tallado plano)
 	return st.commit()
 
-## Suelta experiencia en una posición, repartida en gemas que saltan un poco.
-func drop(pos: Vector3, value: float, tier: int = 1) -> void:
+## Suelta experiencia en una posición, repartida en gemas que saltan un poco. En red, el
+## invitado las suelta con el id y la semilla del anfitrión (`first_id` >= 0).
+func drop(pos: Vector3, value: float, tier: int = 1, first_id := -1, seed := -1) -> void:
 	var n := clampi(int(ceil(value / 5.0)), 1, 6)
+	var rng := RandomNumberGenerator.new()
+	if seed < 0: seed = randi()
+	rng.seed = seed
+	var from := first_id if first_id >= 0 else next_id
+	if first_id < 0:
+		next_id += n
+		dropped.emit(from, pos, value, tier, seed)
 	for k in n:
 		if count >= MAX_GEMS: return
-		var a := randf() * TAU
+		var a := rng.randf() * TAU
 		_pos[count] = Vector3(pos.x, 0.5, pos.z)
 		_prev[count] = _pos[count]
-		_vel[count] = Vector3(cos(a) * randf_range(0.8, 2.2), randf_range(2.5, 4.0), sin(a) * randf_range(0.8, 2.2))
+		_vel[count] = Vector3(cos(a) * rng.randf_range(0.8, 2.2), rng.randf_range(2.5, 4.0), sin(a) * rng.randf_range(0.8, 2.2))
 		_value[count] = value / n
 		_age[count] = 0.0
 		_homing[count] = 0
 		_tier[count] = clampi(tier, 1, 5)
+		_id[count] = from + k
 		count += 1
+
+## En red, invitado: alguien la ha recogido en el anfitrión (si aquí sigue, se quita).
+func remove_id(id: int) -> void:
+	for i in count:
+		if _id[i] == id:
+			_remove(i)
+			return
 
 ## Gema suelta (que aún no vuela hacia nadie) más cercana a `pos` dentro de `r`: su índice o -1.
 func free_gem_near(pos: Vector3, r: float) -> int:
@@ -148,8 +174,10 @@ func _physics_process(delta: float) -> void:
 			_homing[i] = 1
 			var to := target.global_position + Vector3(0, 0.8, 0) - p
 			if to.length() < 0.45:
-				target.progress.add_xp(_value[i] * target.data.xp_mult * target.pet_xp_mult)
-				Auto.sfx_at("gem", target.global_position)
+				if not mirror:
+					target.progress.add_xp(_value[i] * target.data.xp_mult * target.pet_xp_mult)
+					collected.emit(_id[i])
+				if not target.remote: Auto.sfx_at("gem", target.global_position)
 				_remove(i)
 				continue
 			_vel[i] = _vel[i].lerp(to.normalized() * rules.magnet_speed, 1.0 - exp(-10.0 * delta))
@@ -167,7 +195,7 @@ func _physics_process(delta: float) -> void:
 func _remove(i: int) -> void:
 	var last := count - 1
 	_pos[i] = _pos[last]; _prev[i] = _prev[last]; _vel[i] = _vel[last]; _value[i] = _value[last]
-	_age[i] = _age[last]; _homing[i] = _homing[last]; _tier[i] = _tier[last]
+	_age[i] = _age[last]; _homing[i] = _homing[last]; _tier[i] = _tier[last]; _id[i] = _id[last]
 	count = last
 
 func _process(_delta: float) -> void:

@@ -9,11 +9,16 @@ class FakeGame extends Node3D:
 	var players: Array[Player] = []
 	var director: WaveDirector
 	var world: CombatWorld
+	var gems: GemManager
 	var kills := 0
 	var won := false
 	func _init() -> void:
 		world = CombatWorld.new()
 		add_child(world)
+		gems = GemManager.new()
+		gems.world = world
+		gems.rules = load("res://data/progression/default.tres")
+		world.add_child(gems)
 		var roots := Node3D.new()
 		roots.name = "Enemies"
 		add_child(roots)
@@ -88,9 +93,10 @@ func test_jugador_ida_y_vuelta() -> void:
 	q.dodge_count = 300
 	q.health = 87.25
 	q.sanity = 41.0
+	q.revive_progress = q.rules.revive_time * 0.5
 	var s := StreamPeerBuffer.new()
 	NetGame.write_player(s, q)
-	assert_eq(s.data_array.size(), 16)
+	assert_eq(s.data_array.size(), 17)
 	s.seek(0)
 	var r := NetGame.read_player(s)
 	assert_eq(r[0], 2)
@@ -103,6 +109,7 @@ func test_jugador_ida_y_vuelta() -> void:
 	assert_eq(v[5], 300 & 255)
 	assert_almost_eq(v[6], 87.3, 0.051)
 	assert_almost_eq(v[7], 41.0, 0.051)
+	assert_almost_eq(v[9], 0.5, 0.005, "reanimación a medias")
 
 func test_enemigo_ida_y_vuelta() -> void:
 	var world := CombatWorld.new()
@@ -116,7 +123,7 @@ func test_enemigo_ida_y_vuelta() -> void:
 	e._burn_t = 2.0
 	var s := StreamPeerBuffer.new()
 	NetGame.write_enemy(s, 513, e, 7)
-	assert_eq(s.data_array.size(), 13)
+	assert_eq(s.data_array.size(), 14)
 	s.seek(0)
 	var r := NetGame.read_enemy(s)
 	assert_eq(r[0], 513)
@@ -129,6 +136,7 @@ func test_enemigo_ida_y_vuelta() -> void:
 	assert_almost_eq(v[5], 0.75, 0.005)
 	assert_almost_eq(v[6], 0.5, 0.005)
 	assert_eq(int(v[7]) & 8, 8, "arde")
+	assert_eq(v[8], 50, "daña al tocar, lo normal")
 
 # ---------------------------------------------------------------- partida mínima
 
@@ -200,6 +208,54 @@ func test_el_invitado_ve_los_enemigos_y_el_anfitrion_al_invitado() -> void:
 	var pw := weakref(p)
 	p = null
 	assert_true(await _until(func() -> bool: return gn._enemies.is_empty() and pw.get_ref() == null), "la marioneta muere")
+	# una bala enemiga nace en el anfitrión: la invitada la tiene, ya adelantada lo que haya volado
+	hg.world.bullets.spawn(BulletManager.Team.ENEMY, BulletManager.Style.PHYSICAL, Vector3(20, 0, 20), Vector3(1, 0, 0),
+		0.15, 0.3, Damage.new(7, 2), 5.0)
+	assert_true(await _until(func() -> bool: return gg.world.bullets.count == 1), "llega la bala")
+	assert_almost_eq(gg.world.bullets._phys[0], 7.0, 0.01)
+	assert_almost_eq(gg.world.bullets._ment[0], 2.0, 0.01)
+	assert_almost_eq(gg.world.bullets._pos[0].z, 20.0, 0.01)
+	assert_gt(gg.world.bullets._pos[0].x, 20.0, "sale adelantada")
+	# gemas: las suelta el anfitrión y la invitada las ve con el mismo id y en el mismo sitio
+	hg.gems.drop(Vector3(30, 0, 30), 12.0, 2)
+	assert_true(await _until(func() -> bool: return gg.gems.count == hg.gems.count), "las mismas gemas")
+	assert_eq(gg.gems._id[0], hg.gems._id[0])
+	for k in 90: await get_tree().physics_frame          # que caigan
+	var land := func(gm: GemManager, id: int) -> Vector3:
+		for i in gm.count: if gm._id[i] == id: return gm._pos[i]
+		return Vector3.INF
+	var id1: int = hg.gems._id[1]
+	assert_lt(land.call(gg.gems, id1).distance_to(land.call(hg.gems, id1)), 0.01, "misma semilla, mismos saltos")
+	hg.gems._remove(0)
+	hg.gems.collected.emit(gg.gems._id[0])
+	assert_true(await _until(func() -> bool: return gg.gems.count == hg.gems.count), "la recogida llega")
 	# el nivel se supera en el anfitrión: también en la invitada
 	hg.director.level_completed.emit()
 	assert_true(await _until(func() -> bool: return gg.director.completed), "nivel superado en los dos")
+
+func test_el_progreso_viaja_entero() -> void:
+	var g := FakeGame.new()
+	add_child_autofree(g)
+	var a := g.add_player(0, false)
+	var b := g.add_player(1, true)
+	for q in [a, b]:
+		q.weapons = WeaponSystem.new().setup(q, g.world)
+		q.add_child(q.weapons)
+	a.weapons.add_weapon(load("res://data/weapons/webly.tres")).level = 3
+	a.weapons.add_weapon(load("res://data/weapons/granada.tres"))
+	a.progress.level = 6
+	a.progress.passives = {"iman": 2}
+	a.attrs["speed"] = 17
+	a.shop = Shop.DEFAULTS.duplicate()
+	a.shop["health"] = 1.3
+	b.weapons.add_weapon(load("res://data/weapons/machete.tres"))
+	var d := NetGame.progress_of(a)
+	var copy: Dictionary = bytes_to_var(var_to_bytes(d))      # como llega por la red
+	assert_true(NetGame.apply_progress(b, copy), "ha subido de nivel")
+	assert_eq(b.progress.level, 6)
+	assert_eq(b.weapons.weapons.map(func(w: WeaponSystem.Weapon) -> String: return String(w.data.id)), ["webly", "granada"])
+	assert_eq(b.weapons.get_weapon(&"webly").level, 3)
+	assert_eq(b.progress.passives, {"iman": 2})
+	assert_eq(int(b.attrs["speed"]), 17)
+	assert_almost_eq(float(b.shop["health"]), 1.3, 0.001)
+	assert_false(NetGame.apply_progress(b, copy), "lo mismo otra vez: sin subida")

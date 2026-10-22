@@ -101,6 +101,7 @@ func set_weather(wd: WeatherData) -> void:
 func _ready() -> void:
 	var t_start := Time.get_ticks_msec()
 	args = LaunchArgs.from_cmdline()
+	Difficulty.net = -1                            # en red, el invitado recibe la del anfitrión (NetGame)
 	Prof.enabled = args.get_bool("prof")
 	UiInput.configure()
 	OutfitData.override = {}                       # outfit=bombin,botas_nieve: prendas para probar
@@ -199,9 +200,15 @@ func _ready() -> void:
 	bonus.insight = float(bonus.insight) * (1.0 + pact * 1.5)
 	shop_bonus = bonus
 	for q in players:
-		q.shop = bonus
-		q.progress.weapon_slots += int(bonus.weapon_slots)
-		q.progress.item_slots += int(bonus.item_slots)
+		# en red (hito 9.3b), cada jugador con lo comprado en su PC
+		var seat: GameSession.Seat = GameSession.seats[q.index] if GameSession.online and q.index < GameSession.seats.size() else null
+		var b := bonus
+		if seat != null and not seat.is_local() and not seat.shop.is_empty():
+			b = seat.shop.duplicate()
+			b.insight = float(b.insight) * (1.0 + pact * 1.5)
+		q.shop = b
+		q.progress.weapon_slots += int(b.weapon_slots)
+		q.progress.item_slots += int(b.item_slots)
 		q.rebuild_stats()
 		q.health = q.data.max_health
 		q.sanity = q.data.max_sanity
@@ -352,10 +359,10 @@ func _ready() -> void:
 			_open_debug())
 	if args.has("shots") or args.has("game_shots"):    # game_shots=: solo aquí (la selección también lee shots=)
 		var tag := ("_" + args.get_str("tag")) if args.has("tag") else ""
+		if is_guest(): tag += "_inv"                    # dos ventanas en el mismo PC: que no se pisen
 		add_child(ShotTaker.new(args.get_floats("game_shots" if args.has("game_shots") else "shots"), "res://shots/game%s" % tag))
 	if GameSession.online and Net.is_active():         # partida en red (hito 9.3a)
-		if is_guest():
-			for q in players: q.weapons.process_mode = Node.PROCESS_MODE_DISABLED   # disparos visuales: 9.3b
+		gems.mirror = is_guest()                      # la experiencia la cuenta el anfitrión
 		net_game = NetGame.new(self, Net)
 		add_child(net_game)
 
@@ -384,13 +391,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 		q.progress.upgrade_pool.append(up)
 	q.progress.leveled_up.connect(func(l: int) -> void: Achievements.record(Saves.current, "best_level", l))
 	q.progress.leveled_up.connect(func(_l: int) -> void:
-		Sfx.play("level_up")
-		VoxelFx.puff(q, q.global_position, "rise", 0.6, Color.WHITE, 1.4)      # columna de luz (11-10-2026)
-		q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
-		if q.data.team_heal_on_level > 0.0:                   # rasgo de West: cura a los compañeros cercanos
-			for o in players:
-				if o != q and o.health > 0.0 and o.global_position.distance_to(q.global_position) <= 6.0:
-					o.health = minf(o.health + o.data.max_health * q.data.team_heal_on_level, o.data.max_health)
+		level_fx(q)
 		_open_level_up.call_deferred())
 	q.downed.connect(_on_downed.bind(q))
 	q.revived.connect(func() -> void:
@@ -415,6 +416,18 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	q.add_child(q.weapons)
 	for wid in q.data.starting_weapons: q.weapons.add_weapon(load("res://data/weapons/%s.tres" % wid))
 	return q
+
+## Al subir de nivel: sonido, columna de luz y las curas de Whipple y West. En red, la vida
+## solo cambia en los jugadores de este PC (la de los demás la manda su PC); en el invitado
+## lo llama NetGame cuando el anfitrión avisa de la subida.
+func level_fx(q: Player) -> void:
+	Sfx.play("level_up")
+	VoxelFx.puff(q, q.global_position, "rise", 0.6, Color.WHITE, 1.4)      # columna de luz (11-10-2026)
+	if not q.remote: q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
+	if q.data.team_heal_on_level > 0.0:                   # rasgo de West: cura a los compañeros cercanos
+		for o in players:
+			if o != q and not o.remote and o.health > 0.0 and o.global_position.distance_to(q.global_position) <= 6.0:
+				o.health = minf(o.health + o.data.max_health * q.data.team_heal_on_level, o.data.max_health)
 
 ## Compañero de un jugador (D-20): lo sigue toda la partida.
 func _spawn_pet(id: String, owner: Player) -> void:
@@ -693,17 +706,18 @@ func _apply_carry() -> void:
 func _shop_start() -> void:
 	if GameSession.carry.is_empty():
 		for q in players:
-			if float(shop_bonus.get("start_item", 0.0)) > 0.0:
+			if float(q.shop.get("start_item", 0.0)) > 0.0:
 				var ups := q.progress.upgrade_pool.filter(func(u: UpgradeData) -> bool: return int(q.progress.passives.get(u.id, 0)) == 0)
 				if not ups.is_empty():
 					var u: UpgradeData = ups[_rng.randi() % ups.size()]
 					q.progress.passives[u.id] = 1
 					q.rebuild_stats()
-			if float(shop_bonus.get("start_weapon", 0.0)) > 0.0 and q.weapons.weapons.size() < q.progress.weapon_slots:
+			if float(q.shop.get("start_weapon", 0.0)) > 0.0 and q.weapons.weapons.size() < q.progress.weapon_slots:
 				var ws := q.progress.weapon_pool.filter(func(w: WeaponData) -> bool: return q.weapons.get_weapon(w.id) == null)
 				if not ws.is_empty(): q.weapons.add_weapon(ws[_rng.randi() % ws.size()])
-	elif float(shop_bonus.get("head_start", 0.0)) > 0.0:
-		for q in players: q.progress.gain_level()
+	else:
+		for q in players:
+			if float(q.shop.get("head_start", 0.0)) > 0.0: q.progress.gain_level()
 
 ## Siguiente nivel de la parte: el progreso de cada jugador pasa con él (GameSession.carry).
 func _next_level(id: String) -> void:

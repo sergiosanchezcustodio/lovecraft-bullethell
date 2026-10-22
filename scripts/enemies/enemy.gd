@@ -430,6 +430,7 @@ func _physics_process(delta: float) -> void:
 	if puppet:
 		_spawn_t += delta
 		_wade = move_toward(_wade, 1.0 if wades() else 0.0, WadeSplash.EASE * delta)
+		_puppet_touch(delta)
 		return
 	var t0 := Prof.start()
 	_spawn_t += delta
@@ -606,3 +607,31 @@ func net_apply_flags(f: int) -> void:
 	_madden_t = 1.0 if f & 32 else 0.0
 	_confuse_t = 1.0 if f & 64 else 0.0
 	_inject_t = 1.0 if f & 128 else 0.0
+
+## Contacto que viaja en la foto: 0 si ahora no daña al tocar; si no, el daño de contacto de
+## su ficha multiplicado por esto / 50 (embestidas, debilitado).
+var net_contact := 0
+
+func net_contact_byte() -> int:
+	if not behavior.touches(self) or _madden_t > 0.0: return 0
+	var cd := behavior.contact_damage(self)
+	if _weak_t > 0.0: cd = cd.scaled(_weak_k)
+	var base := data.contact_physical if data.contact_physical > 0.0 else data.contact_mental
+	if base <= 0.0: return 0
+	var k := (cd.physical if data.contact_physical > 0.0 else cd.mental) / base
+	return clampi(roundi(k * 50.0), 1, 255)
+
+## Marioneta: golpea por contacto (y drena con su aura) a los jugadores de este PC, que son los
+## que deciden aquí lo que les pasa (D-10).
+func _puppet_touch(delta: float) -> void:
+	for p in world.players:
+		if p.remote: continue
+		if data.aura_drain > 0.0 and p.global_position.distance_to(global_position) <= data.aura_radius:
+			p.drain_sanity(data.aura_drain * delta)
+		if net_contact <= 0: continue
+		var r := data.body_radius + p.data.hurt_radius
+		var pp := p.global_position
+		if Vector2(pp.x - position.x, pp.z - position.z).length_squared() < r * r:
+			var d := Damage.new(data.contact_physical, data.contact_mental).scaled(net_contact / 50.0)
+			d.source = self
+			p.take_damage(d)

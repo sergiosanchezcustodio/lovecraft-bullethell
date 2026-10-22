@@ -12,8 +12,15 @@ extends Node
 ##   anfitrión (EVENT). El siguiente nivel y el reintento, también (NEXT, RESTART).
 ## - Al empezar, todos esperan a todos: los invitados avisan (READY, repetido hasta que llega
 ##   GO) y el anfitrión arranca cuando han avisado todos los de la sala.
+## - Combate (hito 9.3b): las balas enemigas viajan al nacer (BULLETS) y cada PC las mueve igual,
+##   con el retraso de las marionetas; lo que golpean a los jugadores de un PC lo decide ese PC,
+##   igual que el contacto de las marionetas (la foto dice cuánto daña cada enemigo al tocar).
+##   Las armas de los jugadores funcionan en todos los PC, pero el daño a los enemigos solo
+##   cuenta en el anfitrión. Las gemas se sueltan igual en todos (GEMS: id y semilla) y la
+##   experiencia la cuenta el anfitrión (TAKEN, la barra común en cada foto). El progreso de
+##   cada jugador (nivel, armas, objetos, atributos y tienda) lo reparte el anfitrión (PROG).
 ##
-## Formato de las fotos (bytes): ver `write_player` y `write_enemy`.
+## Formato de las fotos (bytes): ver `write_player`, `write_enemy` y `_on_enemy_bullet`.
 
 const READY := NetSession.USER + 10          ## invitado -> anfitrión: partida montada
 const GO := NetSession.USER + 11             ## anfitrión -> invitado: empieza
@@ -25,12 +32,20 @@ const ANIM := NetSession.USER + 16           ## anfitrión -> invitados: [índic
 const EVENT := NetSession.USER + 17          ## anfitrión -> invitados: {k: final|mid|boss|won|lost, id, text}
 const NEXT := NetSession.USER + 18           ## anfitrión -> invitados: {level, carry, team_xp, team_turn}
 const RESTART := NetSession.USER + 19        ## anfitrión -> invitados: reintentar el nivel
+const BULLETS := NetSession.USER + 20        ## anfitrión -> invitados: balas enemigas nuevas (no fiable)
+const GEMS := NetSession.USER + 21           ## anfitrión -> invitados: [primer id, x, z, valor, escalón, semilla]
+const TAKEN := NetSession.USER + 22          ## anfitrión -> invitados: ids de gemas recogidas
+const PROG := NetSession.USER + 23           ## anfitrión -> invitados: [jugador, progreso]
 
 const SNAP_EVERY := 3                        ## pasos de física entre fotos del anfitrión (20 Hz)
 const PSTATE_EVERY := 2                      ## y entre estados de un invitado (30 Hz)
 const READY_EVERY := 0.5                     ## s entre avisos de READY
 const POS_K := 100.0                         ## posiciones y velocidades en cm (int16: ±327 m)
 const STAT_K := 10.0                         ## vida y cordura en décimas (uint16)
+const PLAYER_BYTES := 17
+const BULLET_BYTES := 18
+const BULLETS_PER_MSG := 55                  ## unos 1000 bytes: cabe en un paquete sin trocear
+const PROG_EVERY := 15                       ## pasos entre comprobaciones del progreso (anfitrión)
 
 var game: Node                               ## la partida (game.gd)
 var net: NetSession
@@ -49,6 +64,12 @@ var _tick := 0
 var _ready_t := 0.0
 var _overlay: CanvasLayer
 var _enemies_root: Node3D
+var _bul := StreamPeerBuffer.new()           ## anfitrión: balas enemigas de este paso
+var _bul_n := 0
+var _bul_t := 0
+var _bul_queue: Array = []                   ## invitado: [ms del anfitrión, datos de la bala] por soltar
+var _taken := []                             ## anfitrión: gemas recogidas en este paso
+var _prog_sig := {}                          ## anfitrión: jugador -> firma del último progreso mandado
 
 func _init(p_game: Node, p_net: NetSession) -> void:
 	game = p_game
@@ -70,9 +91,17 @@ func _ready() -> void:
 			d.mid_event.connect(func(e: Enemy, text: String) -> void: _event({"k": "mid", "id": _nid(e), "text": text}))
 			d.boss_event.connect(func(e: Enemy, text: String) -> void: _event({"k": "boss", "id": _nid(e), "text": text}))
 			d.level_completed.connect(func() -> void: _event({"k": "won"}))
+		if game.world != null: game.world.bullets.on_enemy_spawn = _on_enemy_bullet
+		var gm: GemManager = game.get("gems")
+		if gm != null:
+			gm.dropped.connect(func(first: int, pos: Vector3, value: float, tier: int, seed: int) -> void:
+				if started: net.send(0, GEMS, [first, pos.x, pos.z, value, tier, seed]))
+			gm.collected.connect(func(id: int) -> void: _taken.append(id))
 	else:
 		_interp = NetInterp.new()
 		_enemies_root = game.get_node_or_null("Enemies")
+	var la: Variant = game.get("args")
+	_log_on = la is LaunchArgs and (la as LaunchArgs).get_bool("log")
 	_wait_overlay("Esperando a los demás jugadores…" if host else "Esperando al anfitrión…")
 	if pause_tree: get_tree().paused = true
 	if host: _check_all_ready()
@@ -81,8 +110,8 @@ func _ready() -> void:
 ## Lo que el anfitrión puede haber cambiado del nivel (pruebas: final_at, mid_at) y el HUD enseña.
 func _timing() -> Dictionary:
 	var lv: LevelData = game.director.level if game.director != null else null
-	if lv == null: return {}
-	return {"final_time": lv.final_time, "mid_times": Array(lv.mid_times)}
+	if lv == null: return {"difficulty": Difficulty.level()}
+	return {"final_time": lv.final_time, "mid_times": Array(lv.mid_times), "difficulty": Difficulty.level()}
 
 ## ¿Es de este PC el jugador?
 func is_mine(q: Player) -> bool:
@@ -133,21 +162,25 @@ func _process(delta: float) -> void:
 	if not host and not started:
 		_ready_t -= delta
 		if _ready_t <= 0.0: _send_ready()
-	if started and not get_tree().paused and game.args.get_bool("log"): _log(delta)
+	if started and not get_tree().paused and _log_on: _log(delta)
 
 ## Registro (log=true): cada 5 s, lo que ve este PC, para comparar las dos ventanas.
 var _log_t := 0.0
 var _log_bytes := 0
+var _log_on := false
 func _log(delta: float) -> void:
 	_log_t += delta
 	if _log_t < 5.0: return
 	var pos := PackedStringArray()
 	for q: Player in game.players:
-		pos.append("J%d%s(%.1f,%.1f) v%d" % [q.index + 1, "r" if q.remote else "", q.global_position.x, q.global_position.z, roundi(q.health)])
+		pos.append("J%d%s(%.1f,%.1f) v%d c%d n%d a%d" % [q.index + 1, "r" if q.remote else "", q.global_position.x, q.global_position.z,
+			roundi(q.health), roundi(q.sanity), q.progress.level, q.weapons.weapons.size() if q.weapons else 0])
 	var n := 0
 	for nid in _enemies: if is_instance_valid(_enemies[nid]): n += 1
-	print("RED %s t=%.1f enemigos=%d abatidos=%d %s  sale=%.1f kB/s  ping=%d" % ["anfitrion" if host else "invitado",
-		game.director.time if game.director != null else 0.0, n, game.kills, " ".join(pos),
+	var team: TeamXp = game.get("team")
+	print("RED %s t=%.1f enemigos=%d abatidos=%d xp=%.0f balas=%d gemas=%d %s  sale=%.1f kB/s  ping=%d" % ["anfitrion" if host else "invitado",
+		game.director.time if game.director != null else 0.0, n, game.kills, team.xp if team != null else 0.0,
+		game.world.bullets.count, game.gems.count, " ".join(pos),
 		(bytes_out - _log_bytes) / _log_t / 1024.0, int(net.peers.get(net.my_id, {}).get("ping", 0)) if not host else 0])
 	_log_bytes = bytes_out
 	_log_t = 0.0
@@ -156,6 +189,11 @@ func _physics_process(_delta: float) -> void:
 	_tick += 1
 	var now := float(Time.get_ticks_msec())
 	if host:
+		_flush_bullets()
+		if not _taken.is_empty():
+			net.send(0, TAKEN, _taken.duplicate())
+			_taken.clear()
+		if started and _tick % PROG_EVERY == 0: _send_progress()
 		if started and _tick % SNAP_EVERY == 0: _send_snap()
 		for peer in _peer_interp:
 			var ip: NetInterp = _peer_interp[peer]
@@ -174,6 +212,11 @@ func _physics_process(_delta: float) -> void:
 		if not h.is_empty() and game.director != null:
 			game.director.time = lerpf(float(h[0][0]), float(h[1][0]), float(h[2]))
 			game.kills = int(h[1][1])
+			var team: TeamXp = game.get("team")
+			if team != null:
+				team.xp = float(h[1][2])
+				team.turn = int(h[1][3]) % maxi(team.members.size(), 1)
+		if _interp.has_clock: _release_bullets(t)
 		if _tick % 60 == 0: _interp.prune(now + _interp.offset)
 
 func _peer_of(q: Player) -> int:
@@ -181,7 +224,7 @@ func _peer_of(q: Player) -> int:
 
 # ---------------------------------------------------------------- fotos
 
-## Jugador (16 bytes): índice, x, z, rumbo, vx, vz, esquives, vida, cordura, estado.
+## Jugador (17 bytes): índice, x, z, rumbo, vx, vz, esquives, vida, cordura, estado, reanimación.
 static func write_player(s: StreamPeerBuffer, q: Player) -> void:
 	s.put_u8(q.index)
 	s.put_16(_cm(q.global_position.x))
@@ -193,14 +236,15 @@ static func write_player(s: StreamPeerBuffer, q: Player) -> void:
 	s.put_u16(clampi(roundi(q.health * STAT_K), 0, 65535))
 	s.put_u16(clampi(roundi(q.sanity * STAT_K), 0, 65535))
 	s.put_u8(q.net_flags())
+	s.put_u8(clampi(roundi(q.revive_progress / maxf(q.rules.revive_time, 0.01) * 255.0), 0, 255) if q.rules != null else 0)
 
-## [índice, valores]: valores = [x, z, rumbo, vx, vz, esquives, vida, cordura, estado].
+## [índice, valores]: valores = [x, z, rumbo, vx, vz, esquives, vida, cordura, estado, reanimación 0..1].
 static func read_player(s: StreamPeerBuffer) -> Array:
 	var i := s.get_u8()
 	return [i, [s.get_16() / POS_K, s.get_16() / POS_K, s.get_u8() / 256.0 * TAU, s.get_16() / POS_K, s.get_16() / POS_K,
-		s.get_u8(), s.get_u16() / STAT_K, s.get_u16() / STAT_K, s.get_u8()]]
+		s.get_u8(), s.get_u16() / STAT_K, s.get_u16() / STAT_K, s.get_u8(), s.get_u8() / 255.0]]
 
-## Enemigo (13 bytes): nid, x, y, z, rumbo, animación, fase, vida (fracción), estado.
+## Enemigo (14 bytes): nid, x, y, z, rumbo, animación, fase, vida (fracción), estado, contacto.
 static func write_enemy(s: StreamPeerBuffer, nid: int, e: Enemy, anim_id: int) -> void:
 	s.put_u16(nid)
 	s.put_16(_cm(e.position.x))
@@ -211,12 +255,13 @@ static func write_enemy(s: StreamPeerBuffer, nid: int, e: Enemy, anim_id: int) -
 	s.put_u8(int(fposmod(e.anim_t, 1.0) * 256.0) & 255)
 	s.put_u8(clampi(ceili(e.health / maxf(e.data.max_health * e.health_scale, 0.001) * 255.0), 0, 255))
 	s.put_u8(e.net_flags())
+	s.put_u8(e.net_contact_byte())
 
-## [nid, valores]: valores = [x, y, z, rumbo, animación, fase, vida 0..1, estado].
+## [nid, valores]: valores = [x, y, z, rumbo, animación, fase, vida 0..1, estado, contacto].
 static func read_enemy(s: StreamPeerBuffer) -> Array:
 	var nid := s.get_u16()
 	return [nid, [s.get_16() / POS_K, s.get_16() / POS_K, s.get_16() / POS_K, s.get_u8() / 256.0 * TAU,
-		s.get_u8(), s.get_u8() / 256.0, s.get_u8() / 255.0, s.get_u8()]]
+		s.get_u8(), s.get_u8() / 256.0, s.get_u8() / 255.0, s.get_u8(), s.get_u8()]]
 
 static func _cm(v: float) -> int:
 	return clampi(roundi(v * POS_K), -32768, 32767)
@@ -229,6 +274,9 @@ func _send_snap() -> void:
 	s.put_u32(Time.get_ticks_msec())
 	s.put_float(game.director.time if game.director != null else 0.0)
 	s.put_u16(clampi(game.kills, 0, 65535))
+	var team: TeamXp = game.get("team")
+	s.put_float(team.xp if team != null else 0.0)
+	s.put_u8(team.turn if team != null else 0)
 	s.put_u8(game.players.size())
 	for q: Player in game.players: write_player(s, q)
 	var live := []
@@ -270,7 +318,7 @@ func _apply_player(q: Player, smp: Array) -> void:
 	var w: float = smp[2]
 	var pos := Vector3(lerpf(a[0], b[0], w), 0.0, lerpf(a[1], b[1], w))
 	var vel := Vector3(lerpf(a[3], b[3], w), 0.0, lerpf(a[4], b[4], w))
-	q.net_apply(pos, lerp_angle(a[2], b[2], w), vel, int(b[5]), float(b[6]), float(b[7]), int(b[8]))
+	q.net_apply(pos, lerp_angle(a[2], b[2], w), vel, int(b[5]), float(b[6]), float(b[7]), int(b[8]), float(b[9]))
 
 func _apply_enemy(e: Enemy, smp: Array) -> void:
 	if smp.is_empty(): return
@@ -289,6 +337,7 @@ func _apply_enemy(e: Enemy, smp: Array) -> void:
 		e.anim_t = float(b[5])
 	e.health = maxf(float(b[6]) * e.data.max_health * e.health_scale, 0.001)
 	e.net_apply_flags(int(b[7]))
+	e.net_contact = int(b[8])
 
 # ---------------------------------------------------------------- enemigos (anfitrión)
 
@@ -337,6 +386,7 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 		GO:
 			if started: return
 			var lv: LevelData = game.director.level if game.director != null else null
+			if data is Dictionary and data.has("difficulty"): Difficulty.net = clampi(int(data.difficulty), 0, Difficulty.NAMES.size() - 1)
 			if data is Dictionary and lv != null:         # los horarios del nivel, como los tiene el anfitrión
 				lv.final_time = float(data.get("final_time", lv.final_time))
 				var mids: Variant = data.get("mid_times")
@@ -352,11 +402,28 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 				var e: Enemy = _enemies[data]
 				_enemies.erase(data)
 				_interp.tracks.erase(data)
-				if is_instance_valid(e): e.puppet_die()
+				if is_instance_valid(e):
+					if game.has_method("earn"): game.earn(e.data.money)   # cada PC cobra en su partida (D-10)
+					e.puppet_die()
 		ANIM: if data is Array and (data as Array).size() == 2: _anim_names[int(data[0])] = String(data[1])
 		EVENT: if data is Dictionary: _on_event(data)
 		NEXT: if data is Dictionary and game.has_method("net_next"): game.net_next(data)
 		RESTART: if game.has_method("net_restart"): game.net_restart()
+		BULLETS: if data is PackedByteArray: _on_bullets(data)
+		GEMS:
+			var gm: GemManager = game.get("gems")
+			if gm != null and data is Array and (data as Array).size() == 6:
+				gm.drop(Vector3(float(data[1]), 0.0, float(data[2])), float(data[3]), int(data[4]), int(data[0]), int(data[5]))
+		TAKEN:
+			var gm: GemManager = game.get("gems")
+			if gm != null and data is Array:
+				for id: Variant in data: gm.remove_id(int(id))
+		PROG:
+			if data is Array and (data as Array).size() == 2 and data[1] is Dictionary:
+				var i := int(data[0])
+				if i >= 0 and i < game.players.size():
+					var q: Player = game.players[i]
+					if apply_progress(q, data[1]) and game.has_method("level_fx"): game.level_fx(q)
 
 func _on_pstate(from: int, bytes: PackedByteArray) -> void:
 	var s := StreamPeerBuffer.new()
@@ -368,30 +435,32 @@ func _on_pstate(from: int, bytes: PackedByteArray) -> void:
 	ip.observe(t, Time.get_ticks_msec())
 	var n := s.get_u8()
 	for k in n:
-		if s.get_available_bytes() < 16: return
+		if s.get_available_bytes() < PLAYER_BYTES: return
 		var r := read_player(s)
 		var i: int = r[0]
 		if i < game.players.size() and (game.players[i] as Player).remote and _peer_of(game.players[i]) == from:
 			ip.push(i, t, r[1])
 
 func _on_snap(bytes: PackedByteArray) -> void:
-	if bytes.size() < 11: return
+	if bytes.size() < 16: return
 	var s := StreamPeerBuffer.new()
 	s.data_array = bytes
 	var t := float(s.get_u32())
 	_interp.observe(t, Time.get_ticks_msec())
 	var dtime := s.get_float()
 	var kills := s.get_u16()
-	_interp.push("h", t, [dtime, kills])
+	var txp := s.get_float()
+	var turn := s.get_u8()
+	_interp.push("h", t, [dtime, kills, txp, turn])
 	var n := s.get_u8()
 	for k in n:
-		if s.get_available_bytes() < 16: return
+		if s.get_available_bytes() < PLAYER_BYTES: return
 		var r := read_player(s)
 		_interp.push("p%d" % int(r[0]), t, r[1])
 	if s.get_available_bytes() < 2: return
 	var m := s.get_u16()
 	for k in m:
-		if s.get_available_bytes() < 13: return
+		if s.get_available_bytes() < 14: return
 		var r := read_enemy(s)
 		if _enemies.has(r[0]): _interp.push(r[0], t, r[1])
 
@@ -430,6 +499,110 @@ func _on_event(d: Dictionary) -> void:
 			dir.level_completed.emit()
 		"lost":
 			if game.has_method("net_lost"): game.net_lost()
+
+# ---------------------------------------------------------------- combate (hito 9.3b)
+
+## Anfitrión: una bala enemiga nueva (BulletManager.on_enemy_spawn). Van en tandas de cada paso
+## con el ms en que nacieron; por bala (18 bytes): x, z, vx, vz (cm), estilo, radio y tamaño (cm),
+## daño físico y mental (décimas), vida (centésimas de s) y si atraviesa el decorado.
+func _on_enemy_bullet(pos: Vector3, vel: Vector3, radius: float, size: float, phys: float, ment: float,
+		life: float, style: int, over_walls: bool) -> void:
+	if not started: return
+	if _bul_n == 0: _bul_t = Time.get_ticks_msec()
+	_bul.put_16(_cm(pos.x)); _bul.put_16(_cm(pos.z))
+	_bul.put_16(_cm(vel.x)); _bul.put_16(_cm(vel.z))
+	_bul.put_u8(style)
+	_bul.put_u8(clampi(roundi(radius * 100.0), 1, 255))
+	_bul.put_u8(clampi(roundi(size * 100.0), 1, 255))
+	_bul.put_u16(clampi(roundi(phys * STAT_K), 0, 65535))
+	_bul.put_u16(clampi(roundi(ment * STAT_K), 0, 65535))
+	_bul.put_u16(clampi(roundi(life * 100.0), 0, 65535))
+	_bul.put_u8(1 if over_walls else 0)
+	_bul_n += 1
+	if _bul_n >= BULLETS_PER_MSG: _flush_bullets()
+
+func _flush_bullets() -> void:
+	if _bul_n == 0: return
+	var s := StreamPeerBuffer.new()
+	s.put_u32(_bul_t)
+	s.put_u16(_bul_n)
+	s.put_data(_bul.data_array)
+	for id in net.peers:
+		if id != 1 and _ready_peers.has(id):
+			net.send(id, BULLETS, s.data_array, false)
+			bytes_out += s.data_array.size()
+	_bul = StreamPeerBuffer.new()
+	_bul_n = 0
+
+## Invitado: las balas que llegan esperan a que el reloj de las marionetas llegue a su ms de
+## nacimiento (así salen de donde se ve al enemigo) y, si llegan tarde, salen adelantadas.
+func _on_bullets(bytes: PackedByteArray) -> void:
+	if bytes.size() < 6: return
+	var s := StreamPeerBuffer.new()
+	s.data_array = bytes
+	var t := float(s.get_u32())
+	var n := s.get_u16()
+	for k in n:
+		if s.get_available_bytes() < BULLET_BYTES: return
+		var b := [t, s.get_16() / POS_K, s.get_16() / POS_K, s.get_16() / POS_K, s.get_16() / POS_K, s.get_u8(),
+			s.get_u8() / 100.0, s.get_u8() / 100.0, s.get_u16() / STAT_K, s.get_u16() / STAT_K, s.get_u16() / 100.0, s.get_u8() == 1]
+		_bul_queue.append(b)
+
+func _release_bullets(render_t: float) -> void:
+	if _bul_queue.is_empty() or game.world == null: return
+	var left := []
+	for b: Array in _bul_queue:
+		if float(b[0]) > render_t:
+			left.append(b)
+			continue
+		var ahead := minf((render_t - float(b[0])) / 1000.0, 1.0)
+		game.world.bullets.spawn_remote(int(b[5]), Vector3(b[1], 0.0, b[2]), Vector3(b[3], 0.0, b[4]), b[6], b[7], b[8], b[9], b[10], b[11], ahead)
+	_bul_queue = left
+
+## Lo que el anfitrión reparte del progreso de un jugador: lo de `GameSession.snapshot` más lo
+## comprado en su tienda.
+static func progress_of(q: Player) -> Dictionary:
+	var d := GameSession.snapshot(q)
+	d["shop"] = q.shop.duplicate()
+	return d
+
+## Aplica el progreso que manda el anfitrión (sin tocar vida ni cordura, salvo lo que suba el
+## máximo). Devuelve true si el jugador ha subido de nivel.
+static func apply_progress(q: Player, d: Dictionary) -> bool:
+	var before := q.progress.level
+	q.progress.level = int(d.get("level", before))
+	q.progress.xp = float(d.get("xp", 0.0))
+	q.progress.pending = 0
+	if d.get("passives") is Dictionary: q.progress.passives = (d.passives as Dictionary).duplicate()
+	if d.get("attrs") is Dictionary: q.attrs = (d.attrs as Dictionary).duplicate()
+	if d.get("attrs_level1") is Dictionary: q.attrs_level1 = (d.attrs_level1 as Dictionary).duplicate()
+	if d.get("weapons") is Array:
+		var want := {}
+		for e: Variant in d.weapons:
+			if e is Array and (e as Array).size() == 2: want[String(e[0])] = int(e[1])
+		for w in q.weapons.weapons.duplicate():
+			if not want.has(String(w.data.id)): q.weapons.remove_weapon(w.data.id)
+		for id: String in want:
+			var w := q.weapons.get_weapon(StringName(id))
+			if w == null:
+				var path := "res://data/weapons/%s.tres" % id
+				if not ResourceLoader.exists(path): continue
+				w = q.weapons.add_weapon(load(path))
+			if w != null: w.level = clampi(want[id], 1, w.data.max_level)
+	var shop := SelectState.Profile.clean_shop(d.get("shop", {}))
+	if not shop.is_empty(): q.shop = shop
+	q.rebuild_stats()
+	return q.progress.level > before
+
+## Anfitrión: manda el progreso de los jugadores que ha cambiado desde la última vez.
+func _send_progress() -> void:
+	for q: Player in game.players:
+		if q.weapons == null: continue
+		var d := progress_of(q)
+		var sig := var_to_str(d).hash()
+		if _prog_sig.get(q.index, 0) == sig: continue
+		_prog_sig[q.index] = sig
+		net.send(0, PROG, [q.index, d])
 
 # ---------------------------------------------------------------- conexiones
 

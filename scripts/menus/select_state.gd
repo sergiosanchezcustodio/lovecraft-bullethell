@@ -28,13 +28,15 @@ class Profile:
 	var pets: Array = [null]             ## PetData desbloqueados; el 0 es "ninguno"
 	var outfits: Array = []              ## OutfitData comprados
 	var saved_worn := {}                 ## id de personaje -> lo que llevaba la última vez
+	var shop := {}                       ## lo comprado en la tienda (`Shop.bonuses`; hito 9.3b: cada uno juega con lo suyo)
 
 	func to_wire() -> Dictionary:
 		var p := []
 		for x in pets: if x != null: p.append(String((x as PetData).id))
 		var o := []
 		for x in outfits: o.append(String((x as OutfitData).id))
-		return {"name": name, "unlocked": unlocked.duplicate(), "pets": p, "outfits": o, "worn": saved_worn.duplicate(true)}
+		return {"name": name, "unlocked": unlocked.duplicate(), "pets": p, "outfits": o, "worn": saved_worn.duplicate(true),
+			"shop": shop.duplicate()}
 
 	## Desde un mensaje: solo ids que existen en este juego (`all_pets`: los PetData que hay).
 	static func from_wire(d: Variant, all_pets: Array) -> Profile:
@@ -53,7 +55,17 @@ class Profile:
 		if worn is Dictionary:
 			for c in worn:
 				if worn[c] is Dictionary: pr.saved_worn[String(c)] = _clean_worn(worn[c])
+		pr.shop = clean_shop(d.get("shop", {}))
 		return pr
+
+	## Lo comprado, solo con las claves que existen y en número (vacío: sin datos).
+	static func clean_shop(d: Variant) -> Dictionary:
+		if not d is Dictionary or (d as Dictionary).is_empty(): return {}
+		var out := Shop.DEFAULTS.duplicate()
+		for k in out:
+			var v: Variant = (d as Dictionary).get(k, out[k])
+			if v is float or v is int: out[k] = clampf(float(v), 0.0, 100.0)
+		return out
 
 	## Un vestuario con solo prendas que existen, cada una en su hueco.
 	static func _clean_worn(w: Dictionary) -> Dictionary:
@@ -105,6 +117,7 @@ static func profile_from_save(save: SaveData, p_characters: Array[CharacterData]
 	for r: PetData in all_pets:
 		if r.price == 0 or (save != null and save.has_pet(String(r.id))): pr.pets.append(r)
 	if save == null: return pr
+	pr.shop = Shop.bonuses(save)
 	for c in p_characters:
 		if save.has_character(String(c.id)): pr.unlocked.append(String(c.id))
 		pr.saved_worn[String(c.id)] = save.worn_by(String(c.id))

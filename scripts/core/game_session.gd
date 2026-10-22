@@ -18,6 +18,7 @@ class Seat:
 	var peer := 1
 	var name := ""
 	var worn := {}
+	var shop := {}                       ## lo comprado en la tienda de su PC (vacío: el de este PC)
 
 	## ¿Lo maneja este PC? (Sin red, todos.)
 	func is_local() -> bool:

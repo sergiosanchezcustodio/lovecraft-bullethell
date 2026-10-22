@@ -878,6 +878,7 @@ const NET_FROZEN := 2
 const NET_TREMBLING := 4
 const NET_HURT := 8                  ## parpadea tras un golpe
 const NET_ELIMINATED := 16
+const NET_INVULN := 32               ## esquivando o recién golpeado: las balas lo atraviesan
 
 ## Lo que los demás PC no pueden calcular de este jugador (crisis, parálisis, golpe reciente).
 func net_flags() -> int:
@@ -888,12 +889,18 @@ func net_flags() -> int:
 	if sanity_state.is_trembling(): f |= NET_TREMBLING
 	if _hurt_time >= 0.0 and _hurt_time < data.hit_iframes: f |= NET_HURT
 	if is_eliminated: f |= NET_ELIMINATED
+	if god or is_invulnerable(): f |= NET_INVULN
 	return f
+
+## Jugador de otro PC: ¿para aquí las balas enemigas? (en pie y sin invulnerabilidad; el daño
+## lo decide su PC, aquí la bala solo desaparece)
+func net_solid() -> bool:
+	return health > 0.0 and (_net_flags & NET_INVULN) == 0
 
 ## Jugador de otro PC: aplica su estado (posición interpolada y lo demás de la foto más
 ## reciente). Los cambios de vida dan las mismas señales que en su PC (derribado, levantado,
 ## eliminado), para que cada partida los anuncie y cuente.
-func net_apply(pos: Vector3, yaw: float, vel: Vector3, dodges: int, hp: float, san: float, flags: int) -> void:
+func net_apply(pos: Vector3, yaw: float, vel: Vector3, dodges: int, hp: float, san: float, flags: int, revive := 0.0) -> void:
 	position = Vector3(pos.x, 0.0, pos.z)
 	motor.facing = Vector3(sin(yaw), 0.0, cos(yaw))
 	motor.velocity = vel
@@ -925,6 +932,7 @@ func net_apply(pos: Vector3, yaw: float, vel: Vector3, dodges: int, hp: float, s
 		Anims.reset(model)
 		if _down_ring: _down_ring.visible = false
 		revived.emit()
+	if hp <= 0.0 and rules != null: revive_progress = revive * rules.revive_time   # la lleva su PC; aquí, para el HUD y el anillo
 	if flags & NET_ELIMINATED and not is_eliminated:
 		is_eliminated = true
 		down_left = 0.0
