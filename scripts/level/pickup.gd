@@ -13,6 +13,11 @@ const WEIGHTS := [0.3, 0.25, 0.25, 0.1, 0.1]
 const LIFE := 25.0
 const POWER_TIME := 5.0
 
+## En red (hito 9.3c): en el anfitrión, al recogerla (`money`: los dólares que da); en el
+## invitado (`mirror`) no se recoge sola, la quita NetGame.
+signal picked(pickup: Pickup, by: Player, money: int)
+var mirror := false
+
 var world: CombatWorld
 var kind := Kind.FOOD
 var _t := 0.0
@@ -58,25 +63,33 @@ func _process(delta: float) -> void:
 	if _t > LIFE: queue_free()
 
 func _physics_process(_delta: float) -> void:
+	if mirror: return
 	for p in world.players:
 		if p.health <= 0.0: continue
 		var off := p.global_position - global_position
 		off.y = 0.0
 		if off.length() < 0.9:
-			Auto.sfx_at("pickup", global_position)
-			VoxelFx.puff(get_parent(), global_position + Vector3(0, 0.4, 0), "sparkle", 0.35)
-			_give(p)
-			queue_free()
+			var n := randi_range(15, 40) if kind == Kind.MONEY else 0
+			take(p, n)
+			picked.emit(self, p, n)
 			return
 
-func _give(p: Player) -> void:
+## La recoge `p` (en cualquier PC): destellos, efecto y fuera. La vida y la cordura solo las
+## cambia el PC del jugador; los dólares, todos (cada uno en su partida).
+func take(p: Player, money: int) -> void:
+	if is_queued_for_deletion(): return
+	Auto.sfx_at("pickup", global_position)
+	VoxelFx.puff(get_parent(), global_position + Vector3(0, 0.4, 0), "sparkle", 0.35)
+	_give(p, money)
+	queue_free()
+
+func _give(p: Player, money: int) -> void:
 	var game := get_tree().current_scene
 	match kind:
-		Kind.FOOD: p.health = minf(p.data.max_health, p.health + p.data.max_health * 0.3 * p.data.pickup_heal_mult)
-		Kind.POTION: p.sanity = minf(p.data.max_sanity, p.sanity + p.data.max_sanity * 0.3 * p.data.pickup_heal_mult)
+		Kind.FOOD: if not p.remote: p.health = minf(p.data.max_health, p.health + p.data.max_health * 0.3 * p.data.pickup_heal_mult)
+		Kind.POTION: if not p.remote: p.sanity = minf(p.data.max_sanity, p.sanity + p.data.max_sanity * 0.3 * p.data.pickup_heal_mult)
 		Kind.MONEY:
-			var n := randi_range(15, 40)
-			if game != null and game.has_method("earn"): game.earn(n)
+			if game != null and game.has_method("earn"): game.earn(money)
 		Kind.FLAMER: give_flamer(p)
 		Kind.FREEZE: world.freeze_time(POWER_TIME)
 	if game != null and game.has_method("announce"): game.announce(NAMES[kind], 1.5)

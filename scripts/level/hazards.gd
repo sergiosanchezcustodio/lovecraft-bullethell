@@ -11,6 +11,11 @@ extends Node3D
 ##   y le quita `wave_damage`.
 ## Los jugadores se mueven con `Player.push` (velocidad externa de un paso).
 
+## En red (hito 9.3c): el anfitrión avisa de cada grieta o ola (`spawned`) y el invitado
+## (`mirror`, sin relojes propios) la abre igual; cada PC atrae, empuja y daña a sus jugadores.
+signal spawned(kind: String, at: Vector3)
+var mirror := false
+
 var level: LevelData
 var world: CombatWorld
 var obstacles: ObstacleMap
@@ -28,6 +33,10 @@ func setup(p_level: LevelData, p_world: CombatWorld, p_obstacles: ObstacleMap) -
 	return self
 
 func _physics_process(delta: float) -> void:
+	if mirror:
+		_step_angles(delta)
+		_step_waves(delta)
+		return
 	if level.angle_every > 0.0:
 		_angle_t -= delta
 		if _angle_t <= 0.0:
@@ -41,8 +50,13 @@ func _physics_process(delta: float) -> void:
 	_step_angles(delta)
 	_step_waves(delta)
 
+## Los jugadores en pie (para elegir dónde sale algo).
 func _standing() -> Array:
 	return world.players.filter(func(p: Player) -> bool: return p.health > 0.0)
+
+## Los de este PC en pie (a los que se atrae, empuja y daña).
+func _mine() -> Array:
+	return world.players.filter(func(p: Player) -> bool: return p.health > 0.0 and not p.remote)
 
 # --- Ángulos devoradores ---
 func _spawn_angle() -> void:
@@ -54,12 +68,16 @@ func _spawn_angle() -> void:
 		var a := rng.randf() * TAU
 		var c := Vector2(p.global_position.x, p.global_position.z) + Vector2(cos(a), sin(a)) * rng.randf_range(1.0, 4.0)
 		if obstacles != null and obstacles.is_blocked(c, 0.5): continue
-		var pos := Vector3(c.x, 0, c.y)
-		var tg := Telegraph.new().setup(r, level.angle_warn, Color(0.35, 0.9, 0.5, 0.75))
-		tg.position = pos
-		world.fx.add_child(tg)
-		tg.finished.connect(func() -> void: _open_angle(pos, r))
+		spawn_angle_at(Vector3(c.x, 0, c.y))
 		return
+
+func spawn_angle_at(pos: Vector3) -> void:
+	var r := level.angle_radius
+	var tg := Telegraph.new().setup(r, level.angle_warn, Color(0.35, 0.9, 0.5, 0.75))
+	tg.position = pos
+	world.fx.add_child(tg)
+	tg.finished.connect(func() -> void: _open_angle(pos, r))
+	spawned.emit("angle", pos)
 
 func _open_angle(pos: Vector3, r: float) -> void:
 	Auto.sfx_at("angles", pos)
@@ -85,7 +103,7 @@ func _step_angles(delta: float) -> void:
 			node.queue_free()
 			_open.remove_at(i)
 			continue
-		for p: Player in _standing():
+		for p: Player in _mine():
 			var to: Vector3 = h.pos - p.global_position
 			to.y = 0.0
 			var d := to.length()
@@ -129,7 +147,10 @@ func _spawn_wave() -> void:
 	if who.is_empty(): return
 	var p: Player = who[rng.randi() % who.size()]
 	var b := obstacles.bounds if obstacles != null else Rect2(-32, -32, 64, 64)
-	var z := clampf(p.global_position.z + rng.randf_range(-2.0, 2.0), b.position.y + 2.0, b.end.y - 2.0)
+	spawn_wave_at(clampf(p.global_position.z + rng.randf_range(-2.0, 2.0), b.position.y + 2.0, b.end.y - 2.0))
+
+func spawn_wave_at(z: float) -> void:
+	var b := obstacles.bounds if obstacles != null else Rect2(-32, -32, 64, 64)
 	var half := level.wave_width * 0.5
 	var band := MeshInstance3D.new()                      # aviso: una franja azul de lado a lado
 	var pm := PlaneMesh.new()
@@ -144,6 +165,7 @@ func _spawn_wave() -> void:
 	band.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	world.fx.add_child(band)
 	_waves.append({"z": z, "half": half, "t": level.wave_warn, "node": band, "hit": false})
+	spawned.emit("wave", Vector3(0, 0, z))
 
 func _step_waves(delta: float) -> void:
 	for i in range(_waves.size() - 1, -1, -1):
@@ -161,11 +183,11 @@ func _step_waves(delta: float) -> void:
 			var b := obstacles.bounds if obstacles != null else Rect2(-32, -32, 64, 64)
 			for x in range(int(b.position.x), int(b.end.x), 4):
 				WadeSplash.burst(world.fx, Vector3(x, 0, w.z), 1.2, Color(0, 0, 0, 0), "auto" if x == int(b.position.x) else "", false)
-			for p: Player in _standing():
+			for p: Player in _mine():
 				if absf(p.global_position.z - w.z) < w.half:
 					p.take_damage(Damage.new(level.wave_damage, 0.0))
 		if w.t > -0.5:                                      # empuja medio segundo hacia el sur
-			for p: Player in _standing():
+			for p: Player in _mine():
 				if absf(p.global_position.z - w.z) < w.half + 0.5: p.push += Vector3(0.4, 0, 1.0).normalized() * level.wave_push
 			continue
 		(w.node as Node).queue_free()

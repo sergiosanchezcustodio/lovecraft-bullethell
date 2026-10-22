@@ -60,20 +60,8 @@ func _spawn_minions(e: Enemy) -> void:
 		game.director.spawn(d, e.global_position + Vector3(cos(a), 0, sin(a)) * 2.5)
 
 func _announce(e: Enemy) -> void:
-	Auto.sfx_at("roar", e.global_position)
-	var l := Label3D.new()
-	l.text = "¡TEKELI-LI!"
-	l.font_size = 110
-	l.outline_size = 18
-	l.modulate = Color(0.75, 1.0, 0.55)
-	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	l.no_depth_test = true
-	l.position = e.global_position + Vector3(0, 4.0, 0)
-	e.world.fx.add_child(l)
-	var tw := l.create_tween()
-	tw.tween_property(l, "position:y", l.position.y + 1.5, 1.8)
-	tw.parallel().tween_property(l, "modulate:a", 0.0, 1.8).set_ease(Tween.EASE_IN)
-	tw.tween_callback(l.queue_free)
+	e.world.sfx("roar", e.global_position)
+	e.world.shout("¡TEKELI-LI!", e.global_position + Vector3(0, 4.0, 0), Color(0.75, 1.0, 0.55), 110, 1.5, 1.8)
 
 func can_shoot(_e: Enemy) -> bool:
 	return phase == 1 and state == State.CRAWL

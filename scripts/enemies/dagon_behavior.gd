@@ -65,12 +65,10 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 		e.reset_physics_interpolation()
 		if bool(e.data.param("cloud", false)):                  # se recompone de una nube verde (Cthulhu)
 			for k in 6:
-				WadeSplash.burst(e.world.fx, e.global_position + Vector3(randf_range(-3, 3), randf_range(0, 4), randf_range(-3, 3)), 4.0, Color(0.35, 0.9, 0.45, 0.9))
+				e.world.splash(e.global_position + Vector3(randf_range(-3, 3), randf_range(0, 4), randf_range(-3, 3)), 4.0, Color(0.35, 0.9, 0.45, 0.9))
 			_shake(e, 0.8)
 		e.world.focus = e                                      # las armas le apuntan aunque no sea el más cercano
-		var game := e.get_tree().current_scene
-		if game != null and game.get("camera") != null:        # que quepa en el encuadre
-			game.camera.view_size = maxf(game.camera.view_size, CAMERA_SIZE)
+		e.world.view_at_least(CAMERA_SIZE)                     # que quepa en el encuadre
 	var p := phase_for(e)
 	if p != phase:
 		phase = p
@@ -83,8 +81,7 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 	if _hidden or _clip == "roar" or _clip == "emerge": return Vector3.ZERO
 	_act -= delta; _wave -= delta; _minion -= delta; _sink -= delta
 	if phase == 3:                                   # aura: drena cordura cerca de la orilla
-		for q in e.world.players:
-			if q.global_position.distance_to(e.global_position) <= 9.0: q.drain_sanity(2.0 * delta)
+		_drain(e, delta)
 		if _sink <= 0.0 and _clip == "":
 			_sink = float(e.data.param("sink_every", 14.0))
 			_dive(e, target)
@@ -133,26 +130,33 @@ func _slam(e: Enemy, target: Player) -> void:
 	var side := e.facing.cross(Vector3.UP).dot(to_target(e, at))
 	_play(e, "slam_both" if phase >= 2 else ("slam_l" if side > 0.0 else "slam_r"))
 	for s in spots:
-		var tg := Telegraph.new().setup(r, warn, Color(Damage.COLOR_PHYSICAL, 0.85))
+		var tg := Telegraph.enemy(r, warn, Color(Damage.COLOR_PHYSICAL, 0.85))
 		tg.position = s
 		e.world.fx.add_child(tg)
 		var eid := e.get_instance_id()
 		tg.finished.connect(func() -> void:
 			var e2 := instance_from_id(eid) as Enemy
 			if e2 == null or not e2.is_alive(): return
-			Auto.sfx_at("slam", e2.global_position)
-			WadeSplash.burst(e2.world.fx, s, r * 0.9)
+			e2.world.sfx("slam", e2.global_position)
+			e2.world.splash(s, r * 0.9)
 			_shake(e2, 0.25)
-			for q in e2.world.players:
-				if q.health > 0.0 and Vector2(q.global_position.x - s.x, q.global_position.z - s.z).length() < r + q.data.hurt_radius:
-					var d := Damage.new(float(e2.data.param("slam_damage", 22.0)), 0.0)
-					d.knockback = (q.global_position - s).normalized()
-					q.take_damage(d))
+			var d := Damage.new(float(e2.data.param("slam_damage", 22.0)), 0.0)
+			d.source = e2
+			e2.world.strike(s, r, d))
 
 func to_target(e: Enemy, at: Vector3) -> Vector3:
 	var v := at - e.global_position
 	v.y = 0.0
 	return v.normalized()
+
+func _drain(e: Enemy, delta: float) -> void:
+	for q in e.world.players:
+		if q.global_position.distance_to(e.global_position) <= 9.0: q.drain_sanity(2.0 * delta)
+
+## Marioneta (en red, invitado): el aura de la tercera fase, para los jugadores de este PC
+## (la fase sale de la vida, que llega en la foto).
+func puppet_step(e: Enemy, delta: float) -> void:
+	if phase_for(e) == 3: _drain(e, delta)
 
 # --- llamada a los Profundos ---
 func _summon(e: Enemy) -> void:
@@ -165,14 +169,13 @@ func _summon(e: Enemy) -> void:
 
 # --- rugido al cambiar de fase ---
 func _roar(e: Enemy) -> void:
-	Auto.sfx_at("roar", e.global_position)
+	e.world.sfx("roar", e.global_position)
 	_play(e, "roar")
 	e.shield_t = float(e.data.param("roar_shield", 1.5))
 	_shake(e, 0.6)
 
 func _shake(e: Enemy, amount: float) -> void:
-	var game := e.get_tree().current_scene
-	if game != null and game.get("camera") != null: game.camera.shake(amount)
+	e.world.shake(amount)
 
 # --- se hunde y sale en otro punto de la orilla ---
 func _dive(e: Enemy, target: Player) -> void:
@@ -180,9 +183,9 @@ func _dive(e: Enemy, target: Player) -> void:
 	_hidden = true
 	var down := Anims.duration(e.model_name, "sink")
 	e.shield_t = down + 1.8
-	WadeSplash.burst(e.world.fx, e.global_position, 3.0)
+	e.world.splash(e.global_position, 3.0)
 	var to := spot_for(e.obstacles, target.global_position, e.global_position)   # siempre otra sima
-	var tg := Telegraph.new().setup(3.5, 1.0, Color(0.35, 0.75, 0.85, 0.7), false)
+	var tg := Telegraph.enemy(3.5, 1.0, Color(0.35, 0.75, 0.85, 0.7), false)
 	tg.position = to
 	var eid := e.get_instance_id()
 	e.get_tree().create_timer(down + 0.6, false).timeout.connect(func() -> void:
@@ -195,7 +198,7 @@ func _dive(e: Enemy, target: Player) -> void:
 		e3.position = to
 		e3.reset_physics_interpolation()
 		_hidden = false
-		WadeSplash.burst(e3.world.fx, to, 3.0)
+		e3.world.splash(to, 3.0)
 		_shake(e3, 0.4)
 		_play(e3, "emerge"))
 	if OS.get_cmdline_user_args().has("log=true"): print("DAGON se hunde")

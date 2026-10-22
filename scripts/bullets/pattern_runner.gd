@@ -29,7 +29,7 @@ func fire(p: BulletPattern, p_aim: Callable) -> void:
 	_burst = 0
 	_timer = 0.0
 	if p.telegraph_time > 0.0:
-		var t := Telegraph.new().setup(p.telegraph_radius, p.telegraph_time,
+		var t := Telegraph.enemy(p.telegraph_radius, p.telegraph_time,
 			Color(Damage.color_for(p.damage().kind()), 0.75))
 		t.position = Vector3(global_position.x, 0, global_position.z)
 		t.finished.connect(_begin)

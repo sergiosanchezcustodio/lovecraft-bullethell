@@ -12,6 +12,7 @@ var world: CombatWorld
 var money := 30
 var heal := 0.15                             ## fracción de vida y cordura para quien lo abre
 var is_open := false
+var mirror := false                          ## en red, invitado: lo abre el anfitrión (NetGame)
 var _t := 0.0
 var _open_t := 0.0
 var _lid: Node3D
@@ -111,7 +112,7 @@ func _physics_process(delta: float) -> void:
 		_open_t += delta
 		if _open_t >= LIFE_AFTER: queue_free()
 		return
-	if world == null: return
+	if world == null or mirror: return
 	for p in world.players:
 		if p.health <= 0.0: continue
 		if Vector2(p.global_position.x - position.x, p.global_position.z - position.z).length() <= OPEN_RADIUS:
@@ -122,8 +123,9 @@ func _physics_process(delta: float) -> void:
 func open(by: Player) -> void:
 	if is_open: return
 	is_open = true
-	by.health = minf(by.data.max_health, by.health + by.data.max_health * heal)
-	by.sanity = minf(by.data.max_sanity, by.sanity + by.data.max_sanity * heal)
+	if not by.remote:                            # en red, la vida y la cordura las cambia su PC
+		by.health = minf(by.data.max_health, by.health + by.data.max_health * heal)
+		by.sanity = minf(by.data.max_sanity, by.sanity + by.data.max_sanity * heal)
 	_coins.emitting = true
 	VoxelFx.puff(get_parent(), global_position + Vector3(0, 0.5, 0), "sparkle", 0.6)   # destellos (11-10-2026)
 	var label := Label3D.new()                                                       # "+35 $" que sube

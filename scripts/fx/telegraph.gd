@@ -9,12 +9,24 @@ var radius := 1.0
 var duration := 1.0
 var color := Color(1.0, 0.36, 0.18, 0.7)
 var fill := true
+var net := false                                    ## aviso de un enemigo: en red, se repite en los invitados
 var _t := 0.0
 var _mat: ShaderMaterial
 
 func setup(p_radius: float, p_duration: float, p_color: Color, p_fill: bool = true) -> Telegraph:
 	radius = p_radius; duration = maxf(p_duration, 0.01); color = p_color; fill = p_fill
 	return self
+
+## Aviso de un ataque de enemigo (en red, NetGame lo repite en los invitados; los de las armas,
+## los compañeros y el escenario no viajan: cada PC hace los suyos).
+static func enemy(p_radius: float, p_duration: float, p_color: Color, p_fill: bool = true) -> Telegraph:
+	var t := Telegraph.new().setup(p_radius, p_duration, p_color, p_fill)
+	t.net = true
+	return t
+
+## Lo que lleva de aviso (s).
+func elapsed() -> float:
+	return _t
 
 func _ready() -> void:
 	add_to_group(&"enemy_warnings")                 # el bot (SmartBot) sale de los avisos

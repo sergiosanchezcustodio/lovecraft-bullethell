@@ -43,5 +43,6 @@ func _physics_process(delta: float) -> void:
 	for p in world.players:
 		var off := p.global_position - global_position
 		off.y = 0.0
+		if p.remote: continue                       # en red: cada PC, a sus jugadores
 		if off.length() < radius + p.data.hurt_radius * 0.5 and not p.is_downed() and not p.is_eliminated:
 			p.take_damage(Damage.new(dps * TICK, mental_dps * TICK))

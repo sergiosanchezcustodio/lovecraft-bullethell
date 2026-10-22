@@ -38,7 +38,7 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 	if _cd <= 0.0 and to.length() < float(e.data.param("charge_range", 8.0)):
 		_dir = to.normalized()
 		var length := float(e.data.param("charge_speed", 11.0)) * float(e.data.param("charge_time", 0.7))
-		var mark := Telegraph.new().setup(1.0, float(e.data.param("windup", 0.8)) + 0.2, Color(Damage.COLOR_PHYSICAL, 0.7))
+		var mark := Telegraph.enemy(1.0, float(e.data.param("windup", 0.8)) + 0.2, Color(Damage.COLOR_PHYSICAL, 0.7))
 		mark.position = e.global_position + _dir * length * 0.5
 		mark.position.y = 0.0
 		mark.rotation.y = atan2(_dir.x, _dir.z)

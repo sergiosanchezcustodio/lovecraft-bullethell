@@ -12,6 +12,9 @@ var hit_radius := 0.45
 var health := 18.0
 var _model: Node3D
 var _model_id := "atrezo_caja"
+var model_index := 0                         ## cuál de MODELS (en red, el del anfitrión)
+var yaw := 0.0
+var mirror := false                          ## en red, invitado: lo rompe el anfitrión
 var _flash := 0.0
 var _mat: StandardMaterial3D
 const MODELS := [["rompible_vasija", 1.0], ["rompible_suministros", 1.1]]
@@ -19,14 +22,16 @@ const MODELS := [["rompible_vasija", 1.0], ["rompible_suministros", 1.1]]
 func setup(p_world: CombatWorld, pos: Vector3) -> Breakable:
 	world = p_world
 	position = pos
+	model_index = randi() % MODELS.size()
+	yaw = randf() * TAU
 	add_to_group(&"breakable")
 	return self
 
 func _ready() -> void:
-	var m: Array = MODELS[randi() % MODELS.size()]
+	var m: Array = MODELS[clampi(model_index, 0, MODELS.size() - 1)]
 	var holder := Node3D.new()
 	holder.scale = Vector3.ONE * float(m[1])
-	holder.rotation.y = randf() * TAU
+	holder.rotation.y = yaw
 	add_child(holder)
 	_model_id = m[0]
 	_model = VoxelBuilder.load_model("res://models/%s.json" % m[0])
@@ -42,8 +47,9 @@ func is_alive() -> bool:
 
 func take_damage(d: Damage) -> void:
 	if health <= 0.0: return
-	health -= d.physical + d.mental
 	_flash = 0.08
+	if mirror: return
+	health -= d.physical + d.mental
 	if health <= 0.0: _break()
 
 func _process(delta: float) -> void:
@@ -52,14 +58,20 @@ func _process(delta: float) -> void:
 		for mi: MeshInstance3D in _model.get_meta("meshes"): mi.material_overlay = _mat if _flash > 0.0 else null
 
 func _break() -> void:
+	shatter()
+	world.fx.add_child(Pickup.new().setup(world, global_position, Pickup.roll()))
+	broken.emit(self)
+
+## Se rompe (sin recompensa: en red, el invitado la recibe aparte).
+func shatter() -> void:
+	if is_queued_for_deletion(): return
+	health = 0.0
 	Auto.sfx_at("glass", global_position)
 	world.remove_breakable(self)
 	var fx := DeathBurst.new()
 	fx.setup(_model_id, 0.4, _model)
 	fx.position = global_position
 	world.fx.add_child(fx)
-	world.fx.add_child(Pickup.new().setup(world, global_position, Pickup.roll()))
-	broken.emit(self)
 	queue_free()
 
 # estados de los enemigos: un barril no se aturde ni se maldice

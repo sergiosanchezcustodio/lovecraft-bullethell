@@ -431,6 +431,8 @@ func _physics_process(delta: float) -> void:
 		_spawn_t += delta
 		_wade = move_toward(_wade, 1.0 if wades() else 0.0, WadeSplash.EASE * delta)
 		_puppet_touch(delta)
+		behavior.puppet_step(self, delta)
+		if guard_ring != null: guard_ring.rotation.y += 0.05
 		return
 	var t0 := Prof.start()
 	_spawn_t += delta
@@ -499,11 +501,13 @@ func _physics_process(delta: float) -> void:
 		position = Vector3(np.x, position.y, np.y)
 	if velocity.length() > 0.1:
 		facing = facing.slerp(velocity.normalized(), 1.0 - exp(-10.0 * delta)).normalized()
+	if guard_ring != null: guard_ring.rotation.y += 0.05
 	# Contacto con los jugadores
 	if data.aura_drain > 0.0:                   # presencia: drena cordura a los de dentro del aura
 		for p in world.players:
 			if p.global_position.distance_to(global_position) <= data.aura_radius: p.drain_sanity(data.aura_drain * delta)
 	for p in world.players if behavior.touches(self) and _madden_t <= 0.0 else []:
+		if p.remote: continue                       # en red: lo decide su PC (marioneta, _puppet_touch)
 		var r := data.body_radius + p.data.hurt_radius
 		var pp := p.global_position
 		if Vector2(pp.x - position.x, pp.z - position.z).length_squared() < r * r:
@@ -607,6 +611,37 @@ func net_apply_flags(f: int) -> void:
 	_madden_t = 1.0 if f & 32 else 0.0
 	_confuse_t = 1.0 if f & 64 else 0.0
 	_inject_t = 1.0 if f & 128 else 0.0
+
+## Más estado para la foto (hito 9.3c): 1 oculto (bajo el agua), 2 anillo de los guardianes.
+func net_flags2() -> int:
+	var f := 0
+	if visual != null and not visual.visible: f |= 1
+	if guard_ring != null: f |= 2
+	return f
+
+func net_apply_flags2(f: int) -> void:
+	if visual != null: visual.visible = (f & 1) == 0
+	if ((f & 2) != 0) != (guard_ring != null): set_guard_ring((f & 2) != 0)
+
+## Anillo dorado que gira mientras le protegen sus guardianes (Guardián del faro).
+var guard_ring: MeshInstance3D
+
+func set_guard_ring(on: bool) -> void:
+	if not on:
+		if guard_ring != null: guard_ring.queue_free()
+		guard_ring = null
+		return
+	if guard_ring != null: return
+	guard_ring = MeshInstance3D.new()
+	var tm := TorusMesh.new()
+	tm.inner_radius = 1.1; tm.outer_radius = 1.3
+	guard_ring.mesh = tm
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.albedo_color = Color(0.85, 0.70, 0.30) * 0.8
+	guard_ring.material_override = m
+	guard_ring.position.y = 1.2
+	add_child(guard_ring)
 
 ## Contacto que viaja en la foto: 0 si ahora no daña al tocar; si no, el daño de contacto de
 ## su ficha multiplicado por esto / 50 (embestidas, debilitado).

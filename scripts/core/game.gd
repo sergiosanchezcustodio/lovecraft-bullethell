@@ -73,7 +73,8 @@ var _info: Label                               ## depuración: FPS, enemigos, ba
 var _rng := RandomNumberGenerator.new()
 var _env: Environment
 var weather: Weather
-var net_game: NetGame                         ## partida en red (hito 9.3a); null en local
+var net_game: NetGame                          ## partida en red (hito 9.3a); null en local
+var hazards: Hazards                           ## peligros del escenario (si el nivel tiene)
 var _base_fog := Atmosphere.make_environment().fog_density
 var _base_ambient := Atmosphere.make_environment().ambient_light_energy
 
@@ -307,13 +308,15 @@ func _ready() -> void:
 			c.opened.connect(func(_c: ArcaneChest, by: Player) -> void:
 				Sfx.play_at("chest", c.global_position)
 				earn(c.money)
-				_try_evolve(by)
+				if not is_guest(): _try_evolve(by)         # en red, las armas de todos las lleva el anfitrión
 				if args.get_bool("log"): print("BAUL abierto por J%d" % (by.index + 1))
 				Achievements.add(Saves.current, "chests"))
 			announce("Ha aparecido un baúl arcano", 1.5))
 		add_child(director)
-		if (level.angle_every > 0.0 or level.wave_every > 0.0) and not is_guest():      # peligros del escenario (hito 7.4)
-			add_child(Hazards.new().setup(level, world, arena.get_meta("obstacles")))
+		if level.angle_every > 0.0 or level.wave_every > 0.0:      # peligros del escenario (hito 7.4)
+			hazards = Hazards.new().setup(level, world, arena.get_meta("obstacles"))
+			hazards.mirror = is_guest()               # en red, los saca el anfitrión (NetGame)
+			add_child(hazards)
 		announce(level.display_name, 3.0)
 		Music.play(level.music_path())
 		if args.get_bool("log"): print("MUSICA ", Music.current())

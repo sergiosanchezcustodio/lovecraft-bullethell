@@ -237,14 +237,14 @@ func _emerge(d: EnemyData) -> bool:
 	var w := obstacles.random_water(rng, Vector2(who.global_position.x, who.global_position.z), 5.0, 9.0, d.body_radius)
 	if w == Vector2.INF: return false
 	var pos := Vector3(w.x, 0, w.y)
-	var tg := Telegraph.new().setup(d.body_radius + 0.5, EMERGE_WARN, Color(0.35, 0.75, 0.85, 0.7), false)
+	var tg := Telegraph.enemy(d.body_radius + 0.5, EMERGE_WARN, Color(0.35, 0.75, 0.85, 0.7), false)
 	tg.position = pos
 	world.fx.add_child(tg)
 	_emerging += 1                     # cuenta para el tope mientras sale
 	tg.finished.connect(func() -> void:
 		_emerging -= 1
 		if completed: return
-		WadeSplash.burst(world.fx, pos)
+		world.splash(pos)
 		spawn(d, pos))
 	return true
 

@@ -64,6 +64,90 @@ func add_breakable(b: Node3D) -> void:
 func remove_breakable(b: Node3D) -> void:
 	breakables.erase(b)
 
+# ---------------------------------------------------------------- lo que hacen los enemigos (hito 9.3c)
+## Golpes en un círculo, sonidos, salpicaduras, polvo y temblores de los ataques de los enemigos
+## pasan por aquí. En red, en el anfitrión, `on_net` recibe cada uno (tipo y datos) y NetGame lo
+## repite en los invitados con `apply_net`; los golpes solo dañan a los jugadores de cada PC.
+var on_net := Callable()
+
+## Golpe en un círculo: daña (y empuja hacia fuera) a los jugadores en pie de este PC que estén
+## dentro. `dmg.source` es el enemigo que golpea.
+func strike(at: Vector3, r: float, dmg: Damage, push := true) -> void:
+	_strike(at, r, dmg, push)
+	if on_net.is_valid(): on_net.call("strike", [at, r, dmg.physical, dmg.mental, dmg.source, push])
+
+func _strike(at: Vector3, r: float, dmg: Damage, push: bool) -> void:
+	for p in players:
+		if p.remote or p.health <= 0.0: continue
+		var off := Vector2(p.global_position.x - at.x, p.global_position.z - at.z)
+		if off.length() < r + p.data.hurt_radius:
+			var d := Damage.new(dmg.physical, dmg.mental)
+			d.source = dmg.source
+			d.tag = dmg.tag
+			if push: d.knockback = Vector3(off.x, 0.0, off.y).normalized()
+			p.take_damage(d)
+
+func sfx(sound: String, at: Vector3) -> void:
+	Auto.sfx_at(sound, at)
+	if on_net.is_valid(): on_net.call("sfx", [sound, at])
+
+func splash(at: Vector3, size := 1.0, tint := Color(0, 0, 0, 0), sound := "auto", mark := true) -> void:
+	WadeSplash.burst(fx, at, size, tint, sound, mark)
+	if on_net.is_valid(): on_net.call("splash", [at, size, tint, sound, mark])
+
+func ground_hit(at: Vector3, r: float, tint: Color) -> void:
+	VoxelFx.ground_hit(fx, at, r, tint)
+	if on_net.is_valid(): on_net.call("ground", [at, r, tint])
+
+func shake(amount: float) -> void:
+	var cam := get_viewport().get_camera_3d() as GameCamera if is_inside_tree() else null
+	if cam != null: cam.shake(amount)
+	if on_net.is_valid(): on_net.call("shake", [amount])
+
+## Que la cámara de cada PC abarque al menos esto (los jefes grandes).
+func view_at_least(size: float) -> void:
+	var cam := get_viewport().get_camera_3d() as GameCamera if is_inside_tree() else null
+	if cam != null: cam.view_size = maxf(cam.view_size, size)
+	if on_net.is_valid(): on_net.call("view", [size])
+
+## Grito que sube y se desvanece encima de algo (jefes que llaman a los suyos).
+func shout(text: String, at: Vector3, tint: Color, size := 90, rise := 1.2, time := 1.6) -> void:
+	_shout(text, at, tint, size, rise, time)
+	if on_net.is_valid(): on_net.call("shout", [text, at, tint, size, rise, time])
+
+func _shout(text: String, at: Vector3, tint: Color, size: int, rise: float, time: float) -> void:
+	var l := Label3D.new()
+	l.text = text
+	l.font_size = size
+	l.outline_size = int(size * 0.17)
+	l.modulate = tint
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.no_depth_test = true
+	l.position = at
+	fx.add_child(l)
+	var tw := l.create_tween()
+	tw.tween_property(l, "position:y", l.position.y + rise, time)
+	tw.parallel().tween_property(l, "modulate:a", 0.0, time).set_ease(Tween.EASE_IN)
+	tw.tween_callback(l.queue_free)
+
+## En red, invitado: repite lo que ha hecho el anfitrión (`source`: la marioneta, o null).
+func apply_net(kind: String, a: Array, source: Node3D = null) -> void:
+	match kind:
+		"strike":
+			var d := Damage.new(float(a[2]), float(a[3]))
+			d.source = source
+			_strike(a[0], float(a[1]), d, bool(a[5]))
+		"sfx": Auto.sfx_at(String(a[0]), a[1])
+		"splash": WadeSplash.burst(fx, a[0], float(a[1]), a[2], String(a[3]), bool(a[4]))
+		"ground": VoxelFx.ground_hit(fx, a[0], float(a[1]), a[2])
+		"shake":
+			var cam := get_viewport().get_camera_3d() as GameCamera
+			if cam != null: cam.shake(float(a[0]))
+		"view":
+			var cam := get_viewport().get_camera_3d() as GameCamera
+			if cam != null: cam.view_size = maxf(cam.view_size, float(a[0]))
+		"shout": _shout(String(a[0]), a[1], a[2], int(a[3]), float(a[4]), float(a[5]))
+
 static func is_enemy(t: Node3D) -> bool:
 	return not t.is_in_group(&"breakable")
 

@@ -51,12 +51,12 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 	if _cd <= 0.0 and d < float(e.data.param("dive_range", 9.0)):
 		_to = target.global_position
 		_to.y = 0.0
-		var mark := Telegraph.new().setup(float(e.data.param("dive_radius", 1.3)),
+		var mark := Telegraph.enemy(float(e.data.param("dive_radius", 1.3)),
 			float(e.data.param("telegraph", 0.7)) + float(e.data.param("dive_time", 0.4)), Color(Damage.COLOR_PHYSICAL, 0.8))
 		mark.position = _to
 		e.world.fx.add_child(mark)
 		_cd = float(e.data.param("dive_cooldown", 4.0))
-		Auto.sfx_at("screech", e.global_position)
+		e.world.sfx("screech", e.global_position)
 		_enter(State.AIM)
 		return Vector3.ZERO
 	var orbit := float(e.data.param("orbit", 5.0))
@@ -66,14 +66,9 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 
 func _strike(e: Enemy) -> void:
 	var r := float(e.data.param("dive_radius", 1.3))
-	for p in e.world.players:
-		var off := p.global_position - e.global_position
-		off.y = 0.0
-		if off.length() < r + p.data.hurt_radius:
-			var dmg := Damage.new(float(e.data.param("dive_damage", 12.0)), 0.0)
-			dmg.source = e
-			dmg.knockback = off.normalized()
-			p.take_damage(dmg)
+	var dmg := Damage.new(float(e.data.param("dive_damage", 12.0)), 0.0)
+	dmg.source = e
+	e.world.strike(Vector3(e.global_position.x, 0.0, e.global_position.z), r, dmg)
 	_dir = -_dir
 
 func _enter(s: State) -> void:

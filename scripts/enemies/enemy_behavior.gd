@@ -94,6 +94,10 @@ func contact_damage(e: Enemy) -> Damage:
 	return d
 
 ## ¿Puede dañar por contacto ahora? (los voladores, solo cuando están abajo)
+## En red (invitado): lo que hace en cada paso cuando es una marioneta (no piensa ni ataca).
+func puppet_step(_e: Enemy, _delta: float) -> void:
+	pass
+
 func touches(_e: Enemy) -> bool:
 	return true
 

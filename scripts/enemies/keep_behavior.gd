@@ -22,7 +22,6 @@ var _minion := 3.0
 var _side := 1.0
 var _shield_done := false
 var _guards: Array[int] = []                ## instance_id de los protectores vivos
-var _ring: MeshInstance3D
 var _dives := 0                             ## zambullidas hechas
 var _dive_t := 0.0                          ## > 0: bajo el agua
 var _rise: Vector3                          ## por dónde saldrá
@@ -71,20 +70,8 @@ func _summon(e: Enemy) -> void:
 		if d.emerge and game.director._emerge(d): continue      # los que salen del agua, de las pozas
 		var a := randf() * TAU
 		game.director.spawn(d, e.global_position + Vector3(cos(a), 0, sin(a)) * 2.5)
-	Auto.sfx_at("chant", e.global_position)
-	var l := Label3D.new()
-	l.text = String(e.data.param("minion_text", "¡Ïa! ¡Dagon!"))
-	l.font_size = 90
-	l.outline_size = 16
-	l.modulate = Color(0.55, 0.95, 0.75)
-	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	l.no_depth_test = true
-	l.position = e.global_position + Vector3(0, 3.2, 0)
-	e.world.fx.add_child(l)
-	var tw := l.create_tween()
-	tw.tween_property(l, "position:y", l.position.y + 1.2, 1.6)
-	tw.parallel().tween_property(l, "modulate:a", 0.0, 1.6).set_ease(Tween.EASE_IN)
-	tw.tween_callback(l.queue_free)
+	e.world.sfx("chant", e.global_position)
+	e.world.shout(String(e.data.param("minion_text", "¡Ïa! ¡Dagon!")), e.global_position + Vector3(0, 3.2, 0), Color(0.55, 0.95, 0.75))
 
 func _shield(e: Enemy) -> void:
 	var at := float(e.data.param("shield_at", 0.0))
@@ -100,28 +87,16 @@ func _shield(e: Enemy) -> void:
 				var a := TAU * i / n
 				var g: Enemy = game.director.spawn(d, e.global_position + Vector3(cos(a), 0, sin(a)) * 3.0)
 				if g != null: _guards.append(g.get_instance_id())
-		_ring = MeshInstance3D.new()
-		var tm := TorusMesh.new()
-		tm.inner_radius = 1.1; tm.outer_radius = 1.3
-		_ring.mesh = tm
-		var m := StandardMaterial3D.new()
-		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		m.albedo_color = Color(0.85, 0.70, 0.30) * 0.8
-		_ring.material_override = m
-		_ring.position.y = 1.2
-		e.add_child(_ring)
+		e.set_guard_ring(true)
 	if _guards.is_empty(): return
 	_guards.assign(_guards.filter(func(id: int) -> bool:
 		var o := instance_from_id(id)
 		return o != null and is_instance_valid(o) and (o as Enemy).is_alive()))
 	if _guards.is_empty():
-		if _ring != null and OS.get_cmdline_user_args().has("log=true"): print("ESCUDO roto")
-		if _ring != null:
-			_ring.queue_free()
-			_ring = null
+		if e.guard_ring != null and OS.get_cmdline_user_args().has("log=true"): print("ESCUDO roto")
+		e.set_guard_ring(false)
 		return
 	e.shield_t = 0.25                                           # invulnerable mientras viva alguno
-	if _ring != null: _ring.rotation.y += 0.05
 
 func touches(_e: Enemy) -> bool:
 	return _dive_t <= 0.0
@@ -136,7 +111,7 @@ func _dive(e: Enemy, target: Player, delta: float) -> bool:
 		if _dives >= at.size() or e.health > e.data.max_health * e.health_scale * float(at[_dives]): return false
 		_dives += 1
 		_dive_t = float(e.data.param("dive_time", 2.5))
-		WadeSplash.burst(e.world.fx, e.global_position, 1.6)
+		e.world.splash(e.global_position, 1.6)
 		e.visual.visible = false
 		var c := target.global_position if target != null else e.global_position
 		var w := Vector2.INF
@@ -151,7 +126,7 @@ func _dive(e: Enemy, target: Player, delta: float) -> bool:
 						break
 		_rise = Vector3(w.x, 0, w.y) if w != Vector2.INF else e.global_position
 		var warn := minf(1.0, _dive_t * 0.5)
-		var tg := Telegraph.new().setup(e.data.body_radius * e.model_scale + 0.8, warn, Color(0.35, 0.75, 0.85, 0.7), false)
+		var tg := Telegraph.enemy(e.data.body_radius * e.model_scale + 0.8, warn, Color(0.35, 0.75, 0.85, 0.7), false)
 		tg.position = _rise
 		var eid := e.get_instance_id()
 		e.get_tree().create_timer(_dive_t - warn, false).timeout.connect(func() -> void:
@@ -165,7 +140,7 @@ func _dive(e: Enemy, target: Player, delta: float) -> bool:
 	e.position = _rise
 	e.reset_physics_interpolation()
 	e.visual.visible = true
-	WadeSplash.burst(e.world.fx, _rise, 1.6)
+	e.world.splash(_rise, 1.6)
 	var pat: BulletPattern = e.data.param("dive_pattern", null)
 	if pat != null and target != null:
 		e.runner.fire(pat, func() -> Vector3: return target.global_position if is_instance_valid(target) else e.global_position)
@@ -182,17 +157,15 @@ func _slam_at(e: Enemy, target: Player) -> void:
 		spots.append(spots[0] + Vector3(cos(a), 0, sin(a)) * _rng.randf_range(r * 1.6, r * 2.6))
 	super.play_attack_anim(e, "pounce")
 	for at in spots:
-		var tg := Telegraph.new().setup(r, warn, Color(Damage.COLOR_PHYSICAL, 0.8))
+		var tg := Telegraph.enemy(r, warn, Color(Damage.COLOR_PHYSICAL, 0.8))
 		tg.position = at
 		e.world.fx.add_child(tg)
 		var eid := e.get_instance_id()
 		tg.finished.connect(func() -> void:
 			var e2 := instance_from_id(eid) as Enemy
 			if e2 == null or not e2.is_alive(): return
-			Auto.sfx_at("slam", e2.global_position)
-			WadeSplash.burst(e2.world.fx, at, r * 0.8)
-			for p in e2.world.players:
-				if p.health > 0.0 and Vector2(p.global_position.x - at.x, p.global_position.z - at.z).length() < r + p.data.hurt_radius:
-					var d := Damage.new(float(e2.data.param("slam_damage", 20.0)), 0.0)
-					d.knockback = (p.global_position - at).normalized()
-					p.take_damage(d))
+			e2.world.sfx("slam", e2.global_position)
+			e2.world.splash(at, r * 0.8)
+			var d := Damage.new(float(e2.data.param("slam_damage", 20.0)), 0.0)
+			d.source = e2
+			e2.world.strike(at, r, d))

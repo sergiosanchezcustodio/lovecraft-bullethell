@@ -75,7 +75,7 @@ func _begin_pounce(e: Enemy, target: Player) -> void:
 	_to = target.global_position
 	_to.y = 0.0
 	var r := float(e.data.param("land_radius", 1.7))
-	_mark = Telegraph.new().setup(r, float(e.data.param("telegraph", 0.9)) + 0.45,
+	_mark = Telegraph.enemy(r, float(e.data.param("telegraph", 0.9)) + 0.45,
 		Color(Damage.COLOR_PHYSICAL, 0.8))
 	_mark.position = _to
 	e.world.fx.add_child(_mark)
@@ -84,11 +84,9 @@ func _begin_pounce(e: Enemy, target: Player) -> void:
 
 func _land(e: Enemy) -> void:
 	var r := float(e.data.param("land_radius", 1.7))
-	for p in e.world.players:
-		if p.global_position.distance_to(e.global_position) < r + p.data.hurt_radius:
-			var d := Damage.new(float(e.data.param("land_damage", 18.0)), 0.0)
-			d.knockback = (p.global_position - e.global_position).normalized()
-			p.take_damage(d)
+	var d := Damage.new(float(e.data.param("land_damage", 18.0)), 0.0)
+	d.source = e
+	e.world.strike(Vector3(e.global_position.x, 0.0, e.global_position.z), r, d)
 	var pat: BulletPattern = e.data.param("land_pattern", null)
 	if pat != null:
 		e.runner.busy = false

@@ -121,9 +121,10 @@ func test_enemigo_ida_y_vuelta() -> void:
 	e.anim_t = 0.75
 	e.health = e.data.max_health * 0.5
 	e._burn_t = 2.0
+	e.set_guard_ring(true)
 	var s := StreamPeerBuffer.new()
 	NetGame.write_enemy(s, 513, e, 7)
-	assert_eq(s.data_array.size(), 14)
+	assert_eq(s.data_array.size(), 15)
 	s.seek(0)
 	var r := NetGame.read_enemy(s)
 	assert_eq(r[0], 513)
@@ -137,6 +138,13 @@ func test_enemigo_ida_y_vuelta() -> void:
 	assert_almost_eq(v[6], 0.5, 0.005)
 	assert_eq(int(v[7]) & 8, 8, "arde")
 	assert_eq(v[8], 50, "daña al tocar, lo normal")
+	assert_eq(int(v[9]) & 2, 2, "con el anillo de los guardianes")
+	var m := Enemy.new().setup(load("res://data/enemies/pinguino.tres"), world, null)
+	autofree(m)
+	m.net_apply_flags2(int(v[9]))
+	assert_not_null(m.guard_ring, "la marioneta lo pone")
+	m.net_apply_flags2(0)
+	assert_null(m.guard_ring, "y lo quita")
 
 # ---------------------------------------------------------------- partida mínima
 
@@ -229,6 +237,42 @@ func test_el_invitado_ve_los_enemigos_y_el_anfitrion_al_invitado() -> void:
 	hg.gems._remove(0)
 	hg.gems.collected.emit(gg.gems._id[0])
 	assert_true(await _until(func() -> bool: return gg.gems.count == hg.gems.count), "la recogida llega")
+	# un golpe en un círculo del anfitrión: daña a la J2 en su PC (y el anfitrión no la toca)
+	g2.god = false
+	var before := g2.health
+	var hit := Damage.new(10.0, 0.0)
+	hg.world.strike(Vector3(2, 0, -9), 1.5, hit)
+	assert_true(await _until(func() -> bool: return g2.health < before), "el golpe llega a la invitada")
+	assert_true(await _until(func() -> bool: return absf(h2.health - g2.health) < 0.05), "y el anfitrión ve su vida")
+	# un aviso de enemigo se repite; uno de un arma no
+	hg.world.fx.add_child(Telegraph.enemy(2.0, 1.5, Color.RED))
+	var tgs := func() -> int: return gg.world.fx.get_children().filter(func(n: Node) -> bool: return n is Telegraph).size()
+	assert_true(await _until(func() -> bool: return tgs.call() == 1), "llega el aviso")
+	hg.world.fx.add_child(Telegraph.new().setup(2.0, 1.5, Color.RED))
+	for k in 20: await get_tree().physics_frame
+	assert_eq(tgs.call(), 1, "el de un arma no viaja")
+	# un rompible: aparece en los dos y, al romperlo el anfitrión, se rompe en la invitada
+	var b := Breakable.new().setup(hg.world, Vector3(10, 0, 10))
+	hg.world.fx.add_child(b)
+	var gb := func() -> Array: return gg.world.fx.get_children().filter(func(n: Node) -> bool: return n is Breakable and not n.is_queued_for_deletion())
+	assert_true(await _until(func() -> bool: return gb.call().size() == 1), "llega el rompible")
+	var mb: Breakable = gb.call()[0]
+	assert_true(mb.mirror)
+	assert_eq(mb.model_index, b.model_index)
+	mb.take_damage(Damage.new(1000.0, 0.0))
+	assert_true(mb.is_alive(), "en la invitada no se rompe solo")
+	b.take_damage(Damage.new(1000.0, 0.0))
+	assert_true(await _until(func() -> bool: return gb.call().is_empty()), "se rompe en la invitada")
+	# comida: la recoge la J2 (lo decide el anfitrión) y la cura su PC
+	for n in hg.world.fx.get_children(): if n is Pickup: n.queue_free()      # la del rompible, fuera
+	await get_tree().physics_frame
+	var food := Pickup.new().setup(hg.world, Vector3(12, 0, 12), Pickup.Kind.FOOD)
+	hg.world.fx.add_child(food)
+	var gp := func() -> Array: return gg.world.fx.get_children().filter(func(n: Node) -> bool: return n is Pickup and not n.is_queued_for_deletion())
+	assert_true(await _until(func() -> bool: return gp.call().size() >= 1), "llega la comida")
+	var hp := g2.health
+	g2.global_position = Vector3(12, 0, 12)
+	assert_true(await _until(func() -> bool: return g2.health > hp), "la J2 la recoge y se cura")
 	# el nivel se supera en el anfitrión: también en la invitada
 	hg.director.level_completed.emit()
 	assert_true(await _until(func() -> bool: return gg.director.completed), "nivel superado en los dos")

@@ -64,7 +64,7 @@ func step(e: Enemy, target: Player, delta: float) -> bool:
 	_to = Vector3(land.x, 0, land.y)
 	_warn_t = 0.0
 	if OS.get_cmdline_user_args().has("log=true"): print("SALTO %s %.1f m" % [e.data.id, a.distance_to(land)])
-	var tg := Telegraph.new().setup(_radius(e), LEAP_WARN + LEAP_TIME, Color(Damage.COLOR_PHYSICAL, 0.8))
+	var tg := Telegraph.enemy(_radius(e), LEAP_WARN + LEAP_TIME, Color(Damage.COLOR_PHYSICAL, 0.8))
 	tg.position = _to
 	e.world.fx.add_child(tg)
 	return true
@@ -85,7 +85,7 @@ func _fly(e: Enemy, delta: float) -> bool:
 		_air_t = -1.0
 		e.position.y = 0.0
 		_impact(e, _to, _radius(e), maxf(12.0, e.data.contact_physical * 1.5), 6.0)
-		VoxelFx.ground_hit(e.world.fx, _to, _radius(e), Color(0.6, 0.58, 0.55))   # polvo, cascotes y marca
+		e.world.ground_hit(_to, _radius(e), Color(0.6, 0.58, 0.55))   # polvo, cascotes y marca
 	return true
 
 ## Dónde caer: hacia el jugador, lo más cerca de él que se pueda (sin pasarse), en un sitio con
@@ -117,7 +117,7 @@ func _erupt(e: Enemy, target: Player) -> void:
 	var eid := e.get_instance_id()
 	for i in n:
 		var at := from + dir * (e.data.body_radius + 0.8 + i * ERUPT_STEP)
-		var tg := Telegraph.new().setup(ERUPT_RADIUS, ERUPT_WARN + i * ERUPT_DELAY, Color(Damage.COLOR_PHYSICAL, 0.7))
+		var tg := Telegraph.enemy(ERUPT_RADIUS, ERUPT_WARN + i * ERUPT_DELAY, Color(Damage.COLOR_PHYSICAL, 0.7))
 		tg.position = at
 		e.world.fx.add_child(tg)
 		tg.finished.connect(func() -> void:
@@ -127,13 +127,9 @@ func _erupt(e: Enemy, target: Player) -> void:
 
 ## Golpe en el suelo: daño y empuje a los jugadores de dentro, polvo y temblor.
 static func _impact(e: Enemy, at: Vector3, r: float, dmg: float, shake: float, sound := true) -> void:
-	if sound: Auto.sfx_at("slam", at)
-	WadeSplash.burst(e.world.fx, at, r * 0.7, EARTH, "")
-	var cam := e.get_viewport().get_camera_3d() as GameCamera
-	if cam != null and shake > 0.0: cam.shake(shake * 0.05)
-	for p in e.world.players:
-		if p.health > 0.0 and Vector2(p.global_position.x - at.x, p.global_position.z - at.z).length() < r + p.data.hurt_radius:
-			var d := Damage.new(dmg, 0.0)
-			d.source = e
-			d.knockback = (p.global_position - at).normalized()
-			p.take_damage(d)
+	if sound: e.world.sfx("slam", at)
+	e.world.splash(at, r * 0.7, EARTH, "")
+	if shake > 0.0: e.world.shake(shake * 0.05)
+	var d := Damage.new(dmg, 0.0)
+	d.source = e
+	e.world.strike(at, r, d)

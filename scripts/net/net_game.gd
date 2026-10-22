@@ -19,6 +19,11 @@ extends Node
 ##   cuenta en el anfitrión. Las gemas se sueltan igual en todos (GEMS: id y semilla) y la
 ##   experiencia la cuenta el anfitrión (TAKEN, la barra común en cada foto). El progreso de
 ##   cada jugador (nivel, armas, objetos, atributos y tienda) lo reparte el anfitrión (PROG).
+## - Mundo (hito 9.3c): lo que hacen los enemigos y solo se ve o golpea en un círculo
+##   (`CombatWorld.strike`, `sfx`, `splash`…), sus avisos en el suelo (`Telegraph.enemy`), los
+##   rompibles, las recompensas, los baúles y los peligros del escenario viajan como sucesos
+##   (WORLD, fiables, con el ms del anfitrión) y el invitado los repite cuando su reloj llega a
+##   ese ms; los golpes dañan a los jugadores de cada PC. Recoger y abrir lo decide el anfitrión.
 ##
 ## Formato de las fotos (bytes): ver `write_player`, `write_enemy` y `_on_enemy_bullet`.
 
@@ -36,6 +41,7 @@ const BULLETS := NetSession.USER + 20        ## anfitrión -> invitados: balas e
 const GEMS := NetSession.USER + 21           ## anfitrión -> invitados: [primer id, x, z, valor, escalón, semilla]
 const TAKEN := NetSession.USER + 22          ## anfitrión -> invitados: ids de gemas recogidas
 const PROG := NetSession.USER + 23           ## anfitrión -> invitados: [jugador, progreso]
+const WORLD := NetSession.USER + 24          ## anfitrión -> invitados: [[ms, suceso, datos], ...]
 
 const SNAP_EVERY := 3                        ## pasos de física entre fotos del anfitrión (20 Hz)
 const PSTATE_EVERY := 2                      ## y entre estados de un invitado (30 Hz)
@@ -43,6 +49,7 @@ const READY_EVERY := 0.5                     ## s entre avisos de READY
 const POS_K := 100.0                         ## posiciones y velocidades en cm (int16: ±327 m)
 const STAT_K := 10.0                         ## vida y cordura en décimas (uint16)
 const PLAYER_BYTES := 17
+const ENEMY_BYTES := 15
 const BULLET_BYTES := 18
 const BULLETS_PER_MSG := 55                  ## unos 1000 bytes: cabe en un paquete sin trocear
 const PROG_EVERY := 15                       ## pasos entre comprobaciones del progreso (anfitrión)
@@ -70,6 +77,10 @@ var _bul_t := 0
 var _bul_queue: Array = []                   ## invitado: [ms del anfitrión, datos de la bala] por soltar
 var _taken := []                             ## anfitrión: gemas recogidas en este paso
 var _prog_sig := {}                          ## anfitrión: jugador -> firma del último progreso mandado
+var _world_out := []                         ## anfitrión: sucesos del mundo de este paso
+var _ev_queue: Array = []                    ## invitado: sucesos del mundo por repetir [ms, suceso, datos]
+var _objs := {}                              ## id -> rompible, recompensa o baúl (los dos lados)
+var _next_oid := 1
 
 func _init(p_game: Node, p_net: NetSession) -> void:
 	game = p_game
@@ -97,6 +108,12 @@ func _ready() -> void:
 			gm.dropped.connect(func(first: int, pos: Vector3, value: float, tier: int, seed: int) -> void:
 				if started: net.send(0, GEMS, [first, pos.x, pos.z, value, tier, seed]))
 			gm.collected.connect(func(id: int) -> void: _taken.append(id))
+		if game.world != null:
+			game.world.on_net = _on_world
+			game.world.fx.child_entered_tree.connect(_on_fx_child)
+			for c in game.world.fx.get_children(): _on_fx_child(c)    # los rompibles del principio
+		var hz: Hazards = game.get("hazards")
+		if hz != null: hz.spawned.connect(func(kind: String, at: Vector3) -> void: _world_event("haz", [kind, at]))
 	else:
 		_interp = NetInterp.new()
 		_enemies_root = game.get_node_or_null("Enemies")
@@ -133,7 +150,9 @@ func _go() -> void:
 	started = true
 	if host:
 		for id in net.peers:
-			if id != 1: net.send(id, GO, _timing())
+			if id != 1:
+				net.send(id, GO, _timing())
+				_send_objects(id)
 	if pause_tree: get_tree().paused = false
 	if _overlay != null:
 		_overlay.queue_free()
@@ -190,6 +209,7 @@ func _physics_process(_delta: float) -> void:
 	var now := float(Time.get_ticks_msec())
 	if host:
 		_flush_bullets()
+		_flush_world()
 		if not _taken.is_empty():
 			net.send(0, TAKEN, _taken.duplicate())
 			_taken.clear()
@@ -216,7 +236,9 @@ func _physics_process(_delta: float) -> void:
 			if team != null:
 				team.xp = float(h[1][2])
 				team.turn = int(h[1][3]) % maxi(team.members.size(), 1)
-		if _interp.has_clock: _release_bullets(t)
+		if _interp.has_clock:
+			_release_bullets(t)
+			_release_world(t)
 		if _tick % 60 == 0: _interp.prune(now + _interp.offset)
 
 func _peer_of(q: Player) -> int:
@@ -244,7 +266,7 @@ static func read_player(s: StreamPeerBuffer) -> Array:
 	return [i, [s.get_16() / POS_K, s.get_16() / POS_K, s.get_u8() / 256.0 * TAU, s.get_16() / POS_K, s.get_16() / POS_K,
 		s.get_u8(), s.get_u16() / STAT_K, s.get_u16() / STAT_K, s.get_u8(), s.get_u8() / 255.0]]
 
-## Enemigo (14 bytes): nid, x, y, z, rumbo, animación, fase, vida (fracción), estado, contacto.
+## Enemigo (15 bytes): nid, x, y, z, rumbo, animación, fase, vida (fracción), estado, contacto, más estado.
 static func write_enemy(s: StreamPeerBuffer, nid: int, e: Enemy, anim_id: int) -> void:
 	s.put_u16(nid)
 	s.put_16(_cm(e.position.x))
@@ -256,12 +278,13 @@ static func write_enemy(s: StreamPeerBuffer, nid: int, e: Enemy, anim_id: int) -
 	s.put_u8(clampi(ceili(e.health / maxf(e.data.max_health * e.health_scale, 0.001) * 255.0), 0, 255))
 	s.put_u8(e.net_flags())
 	s.put_u8(e.net_contact_byte())
+	s.put_u8(e.net_flags2())
 
-## [nid, valores]: valores = [x, y, z, rumbo, animación, fase, vida 0..1, estado, contacto].
+## [nid, valores]: valores = [x, y, z, rumbo, animación, fase, vida 0..1, estado, contacto, más estado].
 static func read_enemy(s: StreamPeerBuffer) -> Array:
 	var nid := s.get_u16()
 	return [nid, [s.get_16() / POS_K, s.get_16() / POS_K, s.get_16() / POS_K, s.get_u8() / 256.0 * TAU,
-		s.get_u8(), s.get_u8() / 256.0, s.get_u8() / 255.0, s.get_u8(), s.get_u8()]]
+		s.get_u8(), s.get_u8() / 256.0, s.get_u8() / 255.0, s.get_u8(), s.get_u8(), s.get_u8()]]
 
 static func _cm(v: float) -> int:
 	return clampi(roundi(v * POS_K), -32768, 32767)
@@ -338,6 +361,7 @@ func _apply_enemy(e: Enemy, smp: Array) -> void:
 	e.health = maxf(float(b[6]) * e.data.max_health * e.health_scale, 0.001)
 	e.net_apply_flags(int(b[7]))
 	e.net_contact = int(b[8])
+	e.net_apply_flags2(int(b[9]))
 
 # ---------------------------------------------------------------- enemigos (anfitrión)
 
@@ -376,7 +400,9 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 		match type:
 			READY:
 				_ready_peers[from] = true
-				if started: net.send(from, GO, _timing())   # llegó tarde o se perdió el GO
+				if started:                                  # llegó tarde o se perdió el GO
+					net.send(from, GO, _timing())
+					_send_objects(from)
 				else: _check_all_ready()
 			PSTATE:
 				if data is PackedByteArray: _on_pstate(from, data)
@@ -418,6 +444,10 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 			var gm: GemManager = game.get("gems")
 			if gm != null and data is Array:
 				for id: Variant in data: gm.remove_id(int(id))
+		WORLD:
+			if data is Array:
+				for ev: Variant in data:
+					if ev is Array and (ev as Array).size() == 3 and ev[2] is Array: _ev_queue.append(ev)
 		PROG:
 			if data is Array and (data as Array).size() == 2 and data[1] is Dictionary:
 				var i := int(data[0])
@@ -460,7 +490,7 @@ func _on_snap(bytes: PackedByteArray) -> void:
 	if s.get_available_bytes() < 2: return
 	var m := s.get_u16()
 	for k in m:
-		if s.get_available_bytes() < 14: return
+		if s.get_available_bytes() < ENEMY_BYTES: return
 		var r := read_enemy(s)
 		if _enemies.has(r[0]): _interp.push(r[0], t, r[1])
 
@@ -603,6 +633,142 @@ func _send_progress() -> void:
 		if _prog_sig.get(q.index, 0) == sig: continue
 		_prog_sig[q.index] = sig
 		net.send(0, PROG, [q.index, d])
+
+# ---------------------------------------------------------------- mundo (hito 9.3c)
+
+## Anfitrión: algo que ha hecho un enemigo (CombatWorld.on_net). El enemigo que golpea viaja
+## como su id de red.
+func _on_world(kind: String, a: Array) -> void:
+	if kind == "strike":
+		a = a.duplicate()
+		a[4] = _nid(a[4] as Enemy) if a[4] is Enemy else 0
+	_world_event(kind, a)
+
+func _world_event(kind: String, a: Array) -> void:
+	if started: _world_out.append([Time.get_ticks_msec(), kind, a])
+
+func _flush_world() -> void:
+	if _world_out.is_empty(): return
+	for id in net.peers:
+		if id != 1 and _ready_peers.has(id): net.send(id, WORLD, _world_out)
+	_world_out = []
+
+## Anfitrión: lo que aparece entre los efectos y hay que repetir en los invitados.
+func _on_fx_child(n: Node) -> void:
+	if n is Telegraph:
+		var tg := n as Telegraph
+		if tg.net: _world_event("tg", [tg.position, tg.radius, tg.duration, tg.color, tg.fill, tg.rotation.y, tg.scale])
+	elif n is Breakable:
+		var b := n as Breakable
+		var oid := _add_obj(b)
+		_world_event("brk+", _obj_args(b))
+		b.broken.connect(func(_x: Breakable) -> void:
+			_objs.erase(oid)
+			_world_event("brk-", [oid]))
+	elif n is Pickup:
+		var p := n as Pickup
+		var oid := _add_obj(p)
+		_world_event("pk+", _obj_args(p))
+		p.picked.connect(func(_x: Pickup, by: Player, money: int) -> void:
+			_objs.erase(oid)
+			_world_event("pk-", [oid, by.index, money]))
+		p.tree_exiting.connect(func() -> void: _objs.erase(oid))
+	elif n is ArcaneChest:
+		var c := n as ArcaneChest
+		var oid := _add_obj(c)
+		_world_event("ch+", _obj_args(c))
+		c.opened.connect(func(_x: ArcaneChest, by: Player) -> void:
+			_objs.erase(oid)
+			_world_event("ch!", [oid, by.index]))
+
+func _add_obj(n: Node) -> int:
+	var oid := _next_oid
+	_next_oid += 1
+	_objs[oid] = n
+	n.set_meta("oid", oid)
+	return oid
+
+func _obj_args(n: Node) -> Array:
+	var oid := int(n.get_meta("oid", 0))
+	if n is Breakable: return [oid, (n as Breakable).position, (n as Breakable).model_index, (n as Breakable).yaw]
+	if n is Pickup: return [oid, (n as Pickup).position, int((n as Pickup).kind)]
+	if n is ArcaneChest: return [oid, (n as ArcaneChest).position, (n as ArcaneChest).money, (n as ArcaneChest).heal]
+	return [oid]
+
+## Anfitrión: a un invitado que acaba de empezar, lo que ya hay (rompibles, recompensas, baúles).
+func _send_objects(peer: int) -> void:
+	var evs := []
+	for oid in _objs:
+		var n: Node = _objs[oid]
+		if not is_instance_valid(n) or n.is_queued_for_deletion(): continue
+		if n is ArcaneChest and (n as ArcaneChest).is_open: continue
+		var kind := "brk+" if n is Breakable else ("pk+" if n is Pickup else "ch+")
+		evs.append([0, kind, _obj_args(n)])
+	if not evs.is_empty(): net.send(peer, WORLD, evs)
+
+## Invitado: repite los sucesos cuyo ms ya ha llegado al reloj de las marionetas.
+func _release_world(render_t: float) -> void:
+	if _ev_queue.is_empty(): return
+	var left := []
+	for ev: Array in _ev_queue:
+		if float(ev[0]) > render_t:
+			left.append(ev)
+			continue
+		_apply_world(String(ev[1]), ev[2], maxf((render_t - float(ev[0])) / 1000.0, 0.0))
+	_ev_queue = left
+
+func _apply_world(kind: String, a: Array, ahead: float) -> void:
+	var w: CombatWorld = game.world
+	if w == null: return
+	match kind:
+		"tg":
+			if ahead >= float(a[2]): return
+			var tg := Telegraph.new().setup(float(a[1]), float(a[2]) - ahead, a[3], bool(a[4]))
+			tg.position = a[0]
+			tg.rotation.y = float(a[5])
+			tg.scale = a[6]
+			w.fx.add_child(tg)
+		"brk+":
+			var b := Breakable.new().setup(w, a[1])
+			b.model_index = int(a[2])
+			b.yaw = float(a[3])
+			b.mirror = true
+			_objs[int(a[0])] = b
+			w.fx.add_child(b)
+		"brk-":
+			var b: Variant = _objs.get(int(a[0]))
+			_objs.erase(int(a[0]))
+			if b is Breakable and is_instance_valid(b): (b as Breakable).shatter()
+		"pk+":
+			var p := Pickup.new().setup(w, a[1], int(a[2]) as Pickup.Kind)
+			p.mirror = true
+			_objs[int(a[0])] = p
+			w.fx.add_child(p)
+		"pk-":
+			var p: Variant = _objs.get(int(a[0]))
+			_objs.erase(int(a[0]))
+			var i := int(a[1])
+			if p is Pickup and is_instance_valid(p) and i < game.players.size(): (p as Pickup).take(game.players[i], int(a[2]))
+		"ch+":
+			var c := ArcaneChest.new().setup(w, a[1], int(a[2]), float(a[3]))
+			c.mirror = true
+			_objs[int(a[0])] = c
+			w.fx.add_child(c)
+			if game.director != null: game.director.chest_spawned.emit(c)   # la partida lo anuncia y atiende
+		"ch!":
+			var c: Variant = _objs.get(int(a[0]))
+			_objs.erase(int(a[0]))
+			var i := int(a[1])
+			if c is ArcaneChest and is_instance_valid(c) and i < game.players.size(): (c as ArcaneChest).open(game.players[i])
+		"haz":
+			var hz: Hazards = game.get("hazards")
+			if hz == null: return
+			if String(a[0]) == "angle": hz.spawn_angle_at(a[1])
+			else: hz.spawn_wave_at((a[1] as Vector3).z)
+		"strike":
+			w.apply_net(kind, a, _enemies.get(int(a[4])))
+		_:
+			w.apply_net(kind, a)
 
 # ---------------------------------------------------------------- conexiones
 
