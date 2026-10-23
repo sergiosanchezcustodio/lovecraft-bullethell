@@ -13,7 +13,9 @@
 ![Jugadores](https://img.shields.io/badge/jugadores-1%E2%80%934%20local%20y%20online-8e44ad)
 ![Tests](https://img.shields.io/badge/tests-GUT%20%C2%B7%20393%20en%20verde-2e7d32)
 ![Versión](https://img.shields.io/badge/versi%C3%B3n-0.9.0-e0a100)
-[![Licencia: GPL v3](https://img.shields.io/badge/licencia-GPLv3-blue)](LICENSE)
+[![Licencia: código GPLv3, recursos reservados](https://img.shields.io/badge/licencia-c%C3%B3digo%20GPLv3%20%C2%B7%20recursos%20reservados-blue)](LICENCIA.md)
+
+**Español** · [English](README.en.md)
 
 [Características](#características) · [Capturas](#capturas) · [Campaña](#la-campaña) · [Personajes](#personajes) · [Armas](#armas-y-objetos) · [Bestiario](#bestiario) · [Instalación](#instalación-y-ejecución) · [Desarrollo](#para-desarrolladores) · [Hoja de ruta](#hoja-de-ruta)
 
@@ -532,7 +534,7 @@ El detalle está en [`docs/RENDIMIENTO.md`](docs/RENDIMIENTO.md) y en el diario.
 
 ### Imágenes de este README
 
-Salen de capturas automáticas del juego: `sh tools/capturas_readme.sh` juega las partidas con bots y fotografía menús y modelos, y `python tools/montar_readme.py` las reduce a 960 px, monta las láminas de modelos, caras e iconos (leyendo los mismos datos que usa el juego) y hace el GIF con ffmpeg.
+Salen de capturas automáticas del juego: `sh tools/capturas_readme.sh` juega las partidas con bots y fotografía menús y modelos, y `python tools/montar_readme.py` las reduce a 960 px, monta las láminas de modelos, caras e iconos (leyendo los mismos datos que usa el juego) y hace con ffmpeg el GIF y un vídeo MP4 con sonido. También deja `docs/img/vista_previa.jpg` (1280 × 640), la imagen que enseña GitHub al compartir el enlace del repositorio.
 
 ## Hoja de ruta
 
@@ -563,8 +565,8 @@ Salen de capturas automáticas del juego: `sh tools/capturas_readme.sh` juega la
 
 ## Licencia
 
-Este proyecto se distribuye bajo la **GNU General Public License v3.0**. Texto completo en [`LICENSE`](LICENSE).
+Licencia mixta; el detalle está en [`LICENCIA.md`](LICENCIA.md).
 
-En corto: puedes copiar, ejecutar, modificar y redistribuir el código, incluso con fines comerciales, siempre que cualquier versión modificada que redistribuyas se publique también bajo GPL-3.0 y con el código fuente disponible.
-
-La licencia cubre el código y el arte original del proyecto. Las piezas de terceros incluidas conservan su propia licencia (Godot y GUT, MIT; la fuente IM FELL, SIL OFL 1.1; los sonidos y la música CC0, dominio público), y la licencia no concede derechos sobre marcas de terceros.
+- **El código** (scripts, *shaders*, escenas, herramientas, tests, datos de juego y documentación) se publica bajo la **GNU General Public License v3.0**, con el texto completo en [`LICENSE`](LICENSE). Puedes copiarlo, modificarlo y redistribuirlo, incluso con fines comerciales, siempre que lo que redistribuyas basado en él se publique también bajo GPL-3.0 y con su código fuente.
+- **Los recursos del juego** (el arte, la música del autor, los textos del juego y el nombre *Lovecraft Library: Surviving Cthulhu*) tienen **todos los derechos reservados**. Se pueden usar para jugar, compilar o probar el proyecto, pero no para reutilizarlos en otros.
+- Las piezas de terceros conservan su propia licencia (ver [Derechos y créditos](#derechos-y-créditos)).

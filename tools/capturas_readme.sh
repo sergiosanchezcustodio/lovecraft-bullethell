@@ -27,11 +27,12 @@ B="bot=smart autopick=true god=true timescale=2 noweapons=true cam=20 cfg_flashe
 run $G level=p1_n5 character=dyer $B tag=readme_jefe1 $C
 run $G level=p2_n5 character=olmstead $B boss=true tag=readme_jefe2 $C
 run $G level=p3_n5 character=legrasse $B tag=readme_jefe3 $C
-# Vídeo para el GIF: partida a cuatro en las calles de Innsmouth (30 s de juego, 900 fotogramas)
+# Vídeo para el GIF y el MP4: partida a cuatro en las calles de Innsmouth (30 s de juego, 900 fotogramas).
+# Sin mute=true, que en la grabación silencia también los efectos: el MP4 lleva el sonido del juego.
 mkdir -p shots/videos
 run godot --path . --write-movie shots/videos/readme_partida.avi --fixed-fps 30 --quit-after 900 -- \
 	level=p2_n2 character=legrasse bots=3 bot_chars=varga,elwood,malone bot=smart autopick=true god=true \
-	cfg_flashes=0 xp=2500 max_alive=110 spawn_rate=12 $C
+	cfg_flashes=0 xp=2500 max_alive=110 spawn_rate=12 window=true
 # Portada y menús
 godot --headless --path . -- test_save=1 saves=readme_saves > /dev/null 2>&1
 run $G title shots=11 tag=readme $C

@@ -9,9 +9,14 @@
    - Iconos de las armas, de sus evoluciones y de los objetos, leídos de data/ en el orden de las
      tablas del README (armas por tipo y nombre; objetos por nombre).
    - El GIF de la partida, del vídeo shots/videos/readme_partida.avi, con ffmpeg.
+   - La imagen para compartir el enlace (docs/img/vista_previa.jpg, 1280 x 640): se sube a mano en
+     GitHub, Settings > General > Social preview.
+   - El vídeo con sonido (shots/videos/readme_partida.mp4, por debajo de los 10 MB que GitHub admite
+     en las cuentas gratuitas): GitHub solo lo reproduce si se sube desde la web (arrastrándolo al
+     editor del README o a un comentario), que da el enlace que se pone en el README.
 Si cambia qué captura se usa, cambia la lista del final.
 """
-import glob, os, re, subprocess
+import glob, os, re, subprocess, tempfile
 from PIL import Image
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
@@ -156,12 +161,26 @@ def gif(src, dst, start, secs, w=640, fps=10, colors=128):
                     os.path.join(OUT, dst)], check=True)
 
 
+def video(src, dst, secs, w=W, kbps=2350):
+    """MP4 de los primeros secs segundos del vídeo, a dos pasadas para clavar el tamaño (con la lluvia,
+    la horda y las gemas, a calidad constante salían 30 MB). Sonido igualado a -18 LUFS y fundido al final."""
+    vf = 'scale=%d:-2:flags=lanczos,fade=t=out:st=%g:d=1' % (w, secs - 1)
+    log = os.path.join(tempfile.gettempdir(), 'montar_readme_x264')
+    base = ['ffmpeg', '-y', '-loglevel', 'error', '-t', str(secs), '-i', find(src), '-vf', vf,
+            '-c:v', 'libx264', '-preset', 'slow', '-b:v', '%dk' % kbps, '-passlogfile', log]
+    subprocess.run(base + ['-pass', '1', '-an', '-f', 'mp4', os.devnull], check=True)
+    subprocess.run(base + ['-pass', '2', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '112k',
+                           '-af', 'loudnorm=I=-18:TP=-1.5:LRA=11,afade=t=out:st=%g:d=1.5' % (secs - 2),
+                           '-movflags', '+faststart', os.path.join(SHOTS, 'videos', dst)], check=True)
+
+
 JEFES = ['game_readme_jefe1_008.0s.png', 'game_readme_jefe2_016.0s.png', 'game_readme_jefe3_030.0s.png']
 JEFES_CROP = [(0.0, 0.2, 0.6, 1.0), (0.4, 0.02, 1.0, 0.82), (0.4, 0.02, 1.0, 0.82)]   # el jefe y el jugador, en 4:3
 
 os.makedirs(OUT, exist_ok=True)
 for f in glob.glob(os.path.join(OUT, '*.jpg')): os.remove(f)
 shot('titulo_readme_011.0s.png', 'portada.jpg')
+shot('titulo_readme_011.0s.png', 'vista_previa.jpg', 1280, (0.0371, 0.0, 0.9629, 0.86))   # 2:1, sin el «Pulsa Start»
 # Partida: dos por parte, y dos más de la tercera
 shot('game_readme_p1n1_110.0s.png', 'p1_campamento.jpg')
 shot('game_readme_p1n3_110.0s.png', 'p1_paso.jpg')
@@ -202,6 +221,7 @@ weapons, evolutions = weapon_icons()
 icons(weapons, 'armas.jpg')
 icons(evolutions, 'evoluciones.jpg')
 icons(item_icons(), 'objetos.jpg')
-# GIF de la partida
-gif('readme_partida.avi', 'partida.gif', 20, 6)
+# GIF y vídeo de la partida
+gif('readme_partida.avi', 'partida.gif', 12, 6)
+video('readme_partida.avi', 'readme_partida.mp4', 30)
 print(sorted(os.listdir(OUT)))

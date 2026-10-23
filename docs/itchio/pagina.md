@@ -51,7 +51,7 @@ En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores ha
 - Basado en los relatos de H. P. Lovecraft (dominio público en la Unión Europea). Sin relación con «Call of Cthulhu», marca de Chaosium.
 - Desarrollado con ayuda de inteligencia artificial: código, modelos voxel generados por programas y textos con Claude (Anthropic), bajo la dirección del autor; iconos con FLUX (Black Forest Labs). Ilustraciones de portada y tienda, del autor.
 - Efectos de sonido: Kenney (kenney.nl, CC0) y sintetizados. Música: del autor y pistas CC0 de OpenGameArt (lista completa en el juego).
-- © 2026 Sergio Sánchez Custodio. Todos los derechos reservados.
+- © 2026 Sergio Sánchez Custodio. Código con licencia GPLv3; arte, música propia, textos y nombre del juego: todos los derechos reservados.
 
 ## Requisitos
 
