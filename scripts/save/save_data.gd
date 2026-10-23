@@ -125,6 +125,22 @@ static func from_dict(d: Dictionary) -> SaveData:
 static func game_version() -> String:
 	return String(ProjectSettings.get_setting("application/config/version", ""))
 
+## Compara versiones "0.9.10" > "0.9.2" por partes numéricas: 1 si a es más nueva, −1 si b, 0 si iguales
+## (o alguna vacía: no se sabe).
+static func compare_versions(a: String, b: String) -> int:
+	if a == "" or b == "": return 0
+	var pa := a.split(".")
+	var pb := b.split(".")
+	for k in maxi(pa.size(), pb.size()):
+		var x := int(pa[k]) if k < pa.size() else 0
+		var y := int(pb[k]) if k < pb.size() else 0
+		if x != y: return 1 if x > y else -1
+	return 0
+
+## Se guardó con una versión del juego más nueva que esta (el menú de huecos lo avisa).
+func from_newer_game() -> bool:
+	return compare_versions(saved_with, game_version()) > 0
+
 ## Migraciones entre versiones del formato. Cada cambio de formato sube VERSION y añade
 ## aquí su paso (versión N -> N+1).
 static func migrate(d: Dictionary) -> Dictionary:

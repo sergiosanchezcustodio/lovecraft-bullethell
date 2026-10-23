@@ -1038,6 +1038,9 @@ func say(text: String) -> void:
 # ---------------------------------------------------------------- conexiones
 
 ## Anfitrión: los jugadores de un PC que se ha ido pasan a un bot hasta el final del nivel (D-10).
+## Anfitrión: un PC se fue a mitad de este nivel (la pantalla final ofrece la carpeta de registros).
+var guest_lost := false
+
 func _on_roster() -> void:
 	if not host: return
 	_release_gone(true)
@@ -1064,11 +1067,11 @@ func _seat_name(i: int) -> String:
 
 ## Qué ha parado la partida, en pocas palabras (registro).
 func _halt_text(d: Dictionary) -> String:
-	if d.get("k") == "lvup": return "subida de J%d · %s" % [int(d.get("i", 0)) + 1, _where()]
-	return "pausa de %s · %s" % [_seat_name_of_peer(int(d.get("peer", 1))), _where()]
+	if d.get("k") == "lvup": return "subida de J%d · %s" % [int(d.get("i", 0)) + 1, where()]
+	return "pausa de %s · %s" % [_seat_name_of_peer(int(d.get("peer", 1))), where()]
 
 ## Nivel y minuto de partida ("p1_n3 2:14"): para encontrar en el registro lo que cuenta un jugador.
-func _where() -> String:
+func where() -> String:
 	var lv: Variant = game.get("level")
 	var t := int(game.director.time) if game.director != null else 0
 	return "%s %d:%02d" % [String((lv as LevelData).id) if lv is LevelData else "?", t / 60, t % 60]
@@ -1087,6 +1090,7 @@ func _admit(id: int, pc_name: String) -> int:
 func _release_gone(say: bool) -> void:
 	for q: Player in game.players:
 		if q.remote and not net.peers.has(_peer_of(q)):
+			if say: guest_lost = true
 			var bot := BotInput.new("follow", 3.0 + q.index * 0.7)
 			bot.phase = TAU * (q.index + 1) / 4.0
 			bot.body = q

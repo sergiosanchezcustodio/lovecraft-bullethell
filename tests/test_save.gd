@@ -86,3 +86,13 @@ func test_guarda_la_version_del_juego() -> void:
 	assert_eq(back.saved_with, "9.9.9")
 	var old := SaveData.from_dict({"version": 1, "created": "2026-09-01T10:00:00", "money": 5})
 	assert_eq(old.created_with, "", "las partidas de antes no saben con qué versión se crearon")
+
+func test_compara_versiones() -> void:
+	assert_eq(SaveData.compare_versions("0.9.10", "0.9.2"), 1)
+	assert_eq(SaveData.compare_versions("0.9.0", "0.10.0"), -1)
+	assert_eq(SaveData.compare_versions("1.0", "1.0.0"), 0)
+	assert_eq(SaveData.compare_versions("", "0.9.0"), 0, "sin versión no se sabe")
+	var s := SaveData.create()
+	assert_false(s.from_newer_game())
+	s.saved_with = "99.0.0"
+	assert_true(s.from_newer_game())

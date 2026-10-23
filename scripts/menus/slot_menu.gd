@@ -77,6 +77,10 @@ func _card(i: int, d: SaveData) -> Button:
 		for pair in [["Tiempo jugado", SaveData.format_time(d.play_time)], ["Objetos comprados", str(d.items_bought())],
 				["Compañeros", str(d.pets.size())], ["Dinero", MenuKit.money(d.money) + " $"]]:
 			v.add_child(_line(pair[0], pair[1]))
+		if d.from_newer_game():                          # se jugó con una build más nueva: puede faltar algo
+			var nv := UiKit.label("Guardada con la v%s (esta es la v%s)" % [d.saved_with, SaveData.game_version()], 16, UiKit.TEXT_DIM)
+			nv.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			v.add_child(nv)
 	for c in v.get_children(): (c as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return b
 

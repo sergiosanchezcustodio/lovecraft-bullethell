@@ -168,13 +168,20 @@ class PauseMenu extends CanvasLayer:
 
 ## Fin de partida: caída o nivel superado, con un resumen y reintentar o salir.
 class EndScreen extends CanvasLayer:
+	static func _logs_button() -> Button:
+		var logs := UiKit.button("Abrir la carpeta de registros de conexión", UiKit.TEXT_DIM, 18)
+		logs.custom_minimum_size = Vector2(420, 44)
+		logs.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		logs.pressed.connect(NetLog.open_folder)
+		return logs
+
 	signal restart
 	signal quit
 	signal next_level
 	var has_next := false                       ## "Siguiente nivel", primero y con el foco
 	var waiting := ""                           ## en red, un invitado: este aviso y solo "Salir"
 	var leave_text := "Salir de la partida"     ## el botón de salir, con `waiting`
-	var logs_button := false                    ## con `waiting`: botón de la carpeta de registros de red
+	var logs_button := false                    ## botón de la carpeta de registros de red (tras un corte)
 	var title := ""
 	var lines: PackedStringArray = []
 	var accent := UiKit.GOLD
@@ -213,12 +220,7 @@ class EndScreen extends CanvasLayer:
 			leave.size_flags_horizontal = Control.SIZE_SHRINK_CENTER   # no tan ancho como un título largo
 			leave.pressed.connect(func() -> void: quit.emit())
 			box.add_child(leave)
-			if logs_button:                           # se cortó: el registro es lo que hay que enviar
-				var logs := UiKit.button("Abrir la carpeta de registros de conexión", UiKit.TEXT_DIM, 18)
-				logs.custom_minimum_size = Vector2(420, 44)
-				logs.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-				logs.pressed.connect(NetLog.open_folder)
-				box.add_child(logs)
+			if logs_button: box.add_child(_logs_button())   # se cortó: el registro es lo que hay que enviar
 			box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
 			leave.grab_focus.call_deferred()
 			return
@@ -236,5 +238,6 @@ class EndScreen extends CanvasLayer:
 		out.custom_minimum_size = Vector2(300, 56)
 		out.pressed.connect(func() -> void: quit.emit())
 		box.add_child(out)
+		if logs_button: box.add_child(_logs_button())
 		box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
 		(nxt if nxt != null else again).grab_focus.call_deferred()

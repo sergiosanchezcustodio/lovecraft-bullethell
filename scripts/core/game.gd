@@ -383,6 +383,18 @@ func _ready() -> void:
 		get_tree().create_timer(pa[0], false).timeout.connect(func() -> void:
 			toggle_pause()
 			get_tree().create_timer(pa[1] if pa.size() > 1 else 3.0, true).timeout.connect(toggle_pause))
+	if args.has("mark_at"):                        # pruebas: como pulsar F9 a los t s
+		get_tree().create_timer(args.get_float("mark_at"), false).timeout.connect(net_mark)
+
+## F9 en red: apunta una marca en el registro de red, sin parar la partida, para señalar algo
+## raro durante una prueba (lo que se ve en pantalla, a qué hora, en qué nivel y minuto).
+func net_mark() -> void:
+	if net_game == null: return
+	_marks += 1
+	net_game._say("marca %d del jugador · %s" % [_marks, net_game.where()])
+	announce("Marca %d apuntada en el registro" % _marks, 1.2)
+
+var _marks := 0
 
 ## ¿Este PC es un invitado de una partida en red? (El mundo lo manda el anfitrión.)
 func is_guest() -> bool:
@@ -902,10 +914,12 @@ func _end_screen(title: String, accent: Color, next_id := "") -> void:
 	var s := Menus.EndScreen.new(title, _summary(), accent)
 	s.has_next = next_id != ""
 	if is_guest(): s.waiting = "El anfitrión decide cómo seguir"   # en red, solo puede salir
+	s.logs_button = net_game != null and net_game.guest_lost     # se fue alguien: el registro sirve
 	s.next_level.connect(func() -> void: _next_level(next_id))
 	s.restart.connect(_restart)
 	s.quit.connect(_quit)
 	add_child(s)
+	if args.get_bool("halt_shots"): _halt_shot()          # pruebas: también la pantalla final
 	if args.get_bool("quit_on_end") and not (args.get_bool("autonext") and next_id != ""):   # simulaciones (tools/simular.py)
 		print("FIN SIMULACION")
 		get_tree().quit()
@@ -1448,6 +1462,10 @@ func net_closed(reason: String) -> void:
 const DODGE_STYLES: Array[String] = ["deslizar", "rodar", "plancha", "salto", "destello"]
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_F9 and net_game != null:
+		net_mark()
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_F1:
 		var cur := String(player.data.dodge_style.id) if player.data.dodge_style else "deslizar"
 		var next := DODGE_STYLES[(DODGE_STYLES.find(cur) + 1) % DODGE_STYLES.size()]
