@@ -174,3 +174,14 @@ func test_dos_registros_a_la_vez_no_se_pisan() -> void:
 	b.close()
 	assert_false(FileAccess.get_file_as_string(a.path).contains("Invitado"))
 	for f in DirAccess.get_files_at(a.dir): DirAccess.remove_absolute(a.dir + "/" + f)
+
+func test_otras_versiones_en_la_sala() -> void:
+	var s := NetSession.new()
+	s.version = "0.9.0"
+	s.peers = {1: {"name": "Ana", "ver": "0.9.0"}, 5: {"name": "Luis", "ver": "0.9.0"}}
+	assert_eq(s.other_versions().size(), 0)
+	s.peers[7] = {"name": "Eva", "ver": "0.8.5"}
+	assert_eq(s.other_versions(), PackedStringArray(["Eva"]))
+	s.peers.erase(7)
+	assert_eq(s.other_versions().size(), 0, "se va quien tenía otra: ya se puede empezar")
+	s.free()

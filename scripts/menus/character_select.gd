@@ -277,6 +277,9 @@ func _open_map() -> void:
 	await get_tree().create_timer(0.35).timeout      # que se vea el "Listo" del último
 	_opening = false
 	if not is_inside_tree() or _leaving or not state.all_ready() or _map != null: return
+	if net_select != null and not Net.other_versions().is_empty():   # el juego sería otro en cada PC
+		_fill_room()
+		return
 	if args.get_bool("auto_start"):                    # pruebas: directo al nivel 1
 		if net_select != null and Net.peers.size() - 1 < args.get_int("net_wait", 0): return   # net_wait=N: espera a N PCs más
 		if state.joined().size() < args.get_int("net_players", 0): return                   # net_players=N: y a N jugadores
@@ -350,6 +353,8 @@ func _start_net(mine: SelectState.Profile, all_pets: Array) -> void:
 	Net.failed.connect(func(reason: String) -> void:
 		if not _leaving and is_inside_tree(): _back_to_menu(reason))
 	Net.roster_changed.connect(_fill_room)
+	Net.roster_changed.connect(func() -> void:          # se fue quien tenía otra versión: ya se puede empezar
+		if is_inside_tree() and state.all_ready(): _refresh())
 	Net.upnp_done.connect(func(_ok: bool, _m: String) -> void: _fill_room())
 	_build_room()
 	if Net.is_host():
@@ -450,6 +455,10 @@ func _fill_room() -> void:
 		bits.append(Net.upnp_status)
 		bits.append("Select o C: copiar")
 		_room_status.text = "  ·  ".join(bits)
+		var others := Net.other_versions()
+		if not others.is_empty():
+			_room_status.text = "No se puede empezar: %s %s otra versión (tú, la v%s)" % [
+				", ".join(others), "tiene" if others.size() == 1 else "tienen", Net.version]
 	else:
 		var host_name := String(Net.peers.get(1, {}).get("name", ""))
 		_room_code.text = ("Sala de %s" % host_name) if host_name != "" else "Sala"
@@ -459,7 +468,7 @@ func _fill_room() -> void:
 		if ping > Hud.PlayerPanel.PING_FAIR_MS: _room_status.text += "  ·  conexión lenta: se notará algo de retraso"
 		var host_ver := String(Net.peers.get(1, {}).get("ver", Net.version))
 		if host_ver != Net.version:                      # se entienden, pero el juego puede ser otro
-			_room_status.text = "El anfitrión tiene la v%s y tú la v%s: usad la misma" % [host_ver, Net.version]
+			_room_status.text = "Otra versión (anfitrión v%s, tú v%s): no se puede empezar" % [host_ver, Net.version]
 	var ids := Net.peers.keys()
 	ids.sort()
 	var names := PackedStringArray()

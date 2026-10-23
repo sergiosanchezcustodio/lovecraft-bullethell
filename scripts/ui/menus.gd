@@ -107,6 +107,13 @@ class PauseMenu extends CanvasLayer:
 		dim.color = Color(0.0, 0.0, 0.02, 0.6)
 		dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		add_child(dim)
+		var ver := UiKit.label("v" + String(ProjectSettings.get_setting("application/config/version", "?")), 18, UiKit.TEXT_DIM)
+		ver.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)   # a mano al apuntar un fallo
+		ver.offset_left = -140
+		ver.offset_right = -24
+		ver.offset_top = -44
+		ver.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		dim.add_child(ver)
 		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 14)
 		add_child(box)

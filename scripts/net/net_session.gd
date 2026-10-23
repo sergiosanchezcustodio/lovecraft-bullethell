@@ -100,6 +100,13 @@ func is_active() -> bool:
 func is_host() -> bool:
 	return state == State.HOSTING
 
+## Nombres de los PC con otra versión del juego (la sala no deja empezar mientras haya alguno).
+func other_versions() -> PackedStringArray:
+	var out := PackedStringArray()
+	for id: int in peers:
+		if String(peers[id].get("ver", version)) != version: out.append(String(peers[id].get("name", "?")))
+	return out
+
 ## Abre la sala en el primer puerto libre desde `p_port` (los 8 del código de sala).
 func host(p_port: int = RoomCode.BASE_PORT, use_upnp: bool = true) -> Error:
 	close()

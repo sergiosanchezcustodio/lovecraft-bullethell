@@ -15,7 +15,7 @@ Guía para los jugadores (hito 9.6c). Hasta cuatro jugadores en total, repartido
 
 1. Menú principal → **Jugar** → **Jugar online** → **Unirse a una sala**.
 2. Escribe o pega el código (con el mando, elige las letras con el selector). También vale una IP, como `83.45.201.7`.
-3. Arriba a la derecha de la sala están los conectados con su ping. Si alguien pasa de 250 ms sale en rojo con «(lenta)»: se puede jugar, pero se notará algo de retraso. Si alguien tiene otra versión, sale a su lado en rojo (y el invitado lo ve también debajo del nombre de la sala): actualizad los dos a la misma antes de empezar.
+3. Arriba a la derecha de la sala están los conectados con su ping. Si alguien pasa de 250 ms sale en rojo con «(lenta)»: se puede jugar, pero se notará algo de retraso. Si alguien tiene otra versión, sale a su lado en rojo y **la partida no empieza** hasta que se vaya o entre con la misma versión (debajo del nombre de la sala se ve el motivo).
 4. Ya en la sala, cada jugador de tu PC se une con **Start** (o **Intro**) y elige personaje y compañero con sus desbloqueos.
 
 ## Durante la partida
@@ -23,6 +23,7 @@ Guía para los jugadores (hito 9.6c). Hasta cuatro jugadores en total, repartido
 - **Cada PC tiene su cámara** y sigue a sus jugadores. Los de otros PC que no se ven tienen una **flecha** en el borde con su distancia; si están derribados, la flecha late: ¡id a levantarlos!
 - En el panel de cada jugador de otro PC se ve su PC y su **ping**: verde (bien), amarillo (se nota algo) o rojo (más de 250 ms: el juego sigue, pero los enemigos se ven con algo de retraso).
 - **Subidas de nivel y pausa paran la partida en todos los PC.** Quien sube elige en su pantalla; si tarda más de 30 s, el anfitrión puede elegir en su lugar.
+- La versión del juego sale también abajo a la derecha de la pausa: apúntala si avisas de un fallo.
 - **Dinero, logros y estadísticas** se guardan en la partida de cada uno. **El avance de la campaña** (niveles superados) solo en la del anfitrión.
 
 ## Si alguien se desconecta
@@ -45,7 +46,7 @@ El juego usa el **puerto UDP 24680** (si está ocupado, el siguiente: 24681… h
 |---|---|
 | «No responde nadie en esa dirección» | Código o IP mal escritos, el anfitrión ha cerrado la sala o el puerto no está abierto. |
 | «Versión distinta del juego: actualizad los dos a la misma» | Uno tiene una versión más nueva. Si la diferencia es grande, puede que ni siquiera salga este mensaje: comprobad las versiones (abajo a la derecha del menú principal). |
-| «El anfitrión tiene la v… y tú la v…: usad la misma» (en la sala) | Os entendéis, pero el juego no es el mismo: la partida puede ir distinta en cada PC. |
+| «No se puede empezar: … tiene otra versión» u «Otra versión (anfitrión v…, tú v…)» (en la sala) | Os entendéis, pero el juego no es el mismo y la partida iría distinta en cada PC. Actualizad a la misma versión. |
 | «La sala está llena» | Ya hay cuatro jugadores. |
 | «La partida ya ha empezado: espera a que vuelvan a la sala» | Solo puede entrar con la partida empezada quien se fue de ella. |
 
