@@ -949,3 +949,9 @@ Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a
 - `tools/marcas.py`: juntar los registros de los dos PC en una sola lista ordenada por hora.
 - La marca (F9, LB+RB) guarda una captura pequeña en la carpeta de registros.
 - `tools/marcas.py` avisa si un registro no tiene «Fin de la sesión» (el juego se cerró de golpe).
+
+Ofrecidas al cerrar las cabezas nuevas de los trece personajes (23-10-2026):
+- Bajar el farol propio sobre la cara del jugador: a tamaño de juego quema la piel y la cara se ve casi blanca.
+- Parpadeo de vez en cuando (la fila de los ojos en piel unos fotogramas).
+- Mueca de dolor breve al recibir daño, con el mismo sistema que la cara de pánico (`CrisisLook`).
+- Elwood con bigote de morsa, más británico, en vez del militar ancho.
