@@ -176,20 +176,22 @@ def botas_nieve(M, bd):
 
 def hair_of(c):
     """Color del pelo del personaje: el más repetido en la cabeza (sin sombrero) por encima
-    de las orejas, que no sea la piel de la cara."""
+    de las orejas y en la mitad de atrás (delante, las cejas, de un solo tono, ganaban al pelo
+    con textura), que no sea la piel de la cara."""
     with open('models/%s.json' % c) as f:
         vox = json.load(f)['voxels']
-    skin = None
-    for v in vox:
-        if v[3] == 'head' and v[0] == 0 and v[1] == 70: skin = tuple(v[4:7])
-    count = {}
-    for v in vox:
-        if v[3] != 'head' or v[1] < 74: continue
-        col = tuple(v[4:7])
-        if skin and sum(abs(a - b) for a, b in zip(col, skin)) < 0.25: continue
-        count[col] = count.get(col, 0) + 1
-    if not count: return (0.25, 0.18, 0.12)
-    return max(count, key=count.get)
+    skin, zs = None, -999                  # la piel: el voxel de delante entre las cejas (el último
+    for v in vox:                          # de la columna podía ser la melena de la espalda)
+        if v[3] == 'head' and v[0] == -1 and v[1] == 76 and v[2] > zs: skin, zs = tuple(v[4:7]), v[2]
+    for parts in (('head',), ('head', 'hat')):   # Malone lleva el pelo con el sombrero (moño)
+        count = {}
+        for v in vox:
+            if v[3] not in parts or v[1] < 74 or v[2] >= 0: continue
+            col = tuple(v[4:7])
+            if skin and sum(abs(a - b) for a, b in zip(col, skin)) < 0.25: continue
+            count[col] = count.get(col, 0) + 1
+        if count: return max(count, key=count.get)
+    return (0.25, 0.18, 0.12)
 
 
 def casco_brodie(M, bd):

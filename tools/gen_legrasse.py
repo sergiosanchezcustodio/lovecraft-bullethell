@@ -16,9 +16,11 @@ SUIT = (0.16, 0.19, 0.31); SUIT_SH = (0.12, 0.14, 0.24)
 SHIRT = (0.87, 0.86, 0.82); TIE = (0.10, 0.10, 0.12)
 BADGE = (0.92, 0.74, 0.30)
 SHOE = (0.10, 0.09, 0.09); SOLE = (0.05, 0.05, 0.05)
-HAT = (0.22, 0.22, 0.24); HAT_SH = (0.17, 0.17, 0.19); BAND = (0.38, 0.26, 0.16)
-SKIN = (0.84, 0.64, 0.50); SKIN_SH = (0.74, 0.54, 0.42); LIP = (0.56, 0.34, 0.29)
-HAIR = (0.20, 0.15, 0.12); MOUSTACHE = (0.24, 0.17, 0.12)
+HAT = (0.27, 0.27, 0.29); HAT_SH = (0.20, 0.20, 0.22); BAND = (0.40, 0.24, 0.15); BOW = (0.32, 0.19, 0.12)
+SKIN = (0.84, 0.64, 0.50); SKIN_SH = (0.74, 0.54, 0.42)
+EAR_IN = (0.62, 0.44, 0.34); MOUTH = (0.56, 0.37, 0.30)
+HAIR = (0.20, 0.15, 0.12); BROW = (0.14, 0.10, 0.08); MOUSTACHE = (0.15, 0.11, 0.08)
+IRIS = (0.38, 0.24, 0.13)
 BUTTON = (0.20, 0.18, 0.14)
 B = -1
 
@@ -46,26 +48,67 @@ slab(M, T, COAT, 58, 62, 0, -1.5, 21, 19, 12, 10, ch=1)                  # cuell
 cu.neck(M, SKIN)
 
 cu.arms(M, COAT, SKIN, b=B, cuff=COAT_SH)                               # bocamangas de la gabardina
-cu.head(M, SKIN, SKIN_SH)
-# fedora: ala ancha plana (asoma 2,5: más taparía los ojos desde la cámara), copa con cinta
-# y pellizco delantero
+# cabeza rehecha el 23-10-2026 siguiendo las referencias de FLUX en local
+# (tools/local/ref_cabeza_legrasse_*_300?.png; la de antes, models/legrasse_v1.json):
+# más cuadrada, cejas gruesas y caídas hacia la nariz, ojos con iris, nariz en cuña, bigote de
+# manillar con las puntas hacia arriba y fedora con la copa pellizcada
+cu.head(M, SKIN, SKIN_SH, nose=False, r=3, rb=2)
+cu.face_art(M, 77, [                       # pintado sobre la cara (x = -8 ... 7)
+    'hhSSSSSSSSSSSShh',                    # 77: frente, a la sombra del ala
+    'hh............hh',
+    'h..............h',
+    '................',                    # 74: párpado (la ceja encima se comía los ojos)
+    '..wppw....wppw..',                    # 73: ojos, iris oscuro en el centro
+    '..wiiw....wiiw..',
+    '................',
+    '................',
+    '................',
+    '................',
+    '................',
+    '......oooo......',                    # 66: boca, una raya en tono de piel (roja parecía abierta)
+], {'h': HAIR, 'S': SKIN_SH, 'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'o': MOUTH})
+cu.face_art(M, 76, [                       # en relieve (asoma 1)
+    '.bbbb......bbbb.',                    # 76: cejas, altas por fuera...
+    '...bbbb..bbbb...',                    # ...y bajas junto a la nariz (ceño)
+    '................',
+    '.......nn.......',                    # 73: tabique
+    '.......nn.......',
+    '......snns......',                    # 71: punta de la nariz
+    '......snns......',
+    '..m...mmmm...m..',                    # 69: bigote de manillar justo bajo la nariz,
+    '..mmmmmmmmmmmm..',                    #     con las puntas hacia arriba
+    '....mmmmmmmm....',
+], {'b': BROW, 'n': SKIN, 's': SKIN_SH, 'm': MOUSTACHE}, dz=1)
+for s in (-1, 1):                          # oreja: hueco más oscuro en la cara de fuera
+    x = 8 if s > 0 else -9
+    for y in (72, 73):
+        for z in (-1, 0): M.put(x, y, z, H, EAR_IN)
+# fedora: ala ancha (asoma 2,5 por delante: más taparía los ojos desde la cámara) con el borde
+# vuelto hacia arriba por los lados y detrás, cinta con lazo y copa con hendidura y pellizco
 slab(M, H, HAT_SH, 78, 79, 0, 0.5, 21, 21, 19.5, 19.5, ch=3)
+for (x, y, z) in [k for k, v in M.V.items() if k[1] == 78 and v[1] == HAT_SH]:
+    edge = any((x + dx, 78, z + dz) not in M.V for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+    if edge and z <= 3: M.put(x, 79, z, H, HAT_SH)
 slab(M, H, BAND, 79, 81, 0, 0.3, 15, 15, 15, 15, ch=2)
+for y in (79, 80):                         # lazo de la cinta, en el lado izquierdo
+    for z in (-3, -2): M.put(8, y, z, H, BOW)
+M.put(8, 79, -4, H, BOW)
 slab(M, H, HAT, 81, 86, 0, 0.3, 15, 13, 15, 12, ch=2)
-for x in range(-2, 2):
-    for y in (85,):
-        z = M.front(x, y)
-        if z is not None: M.V.pop((x, y, z), None)
-cu.eyes(M, HAIR, brow_style='poblada', y=72)
-cu.moustache(M, MOUSTACHE, xs=range(-4, 4), y=69, rows=2)               # bigote poblado
-for x in (-4, 3): cu.paint_face(M, x, 67, MOUSTACHE, dz=1)
-cu.mouth(M, LIP, y=66)
-cu.hair_back(M, SKIN, HAIR, top=78)
+for z in range(-2, 8):                     # hendidura en lo alto de la copa, de delante atrás
+    for x in (-1, 0): M.V.pop((x, 85, z), None)       # (sin pintar: en sombra parecía una ranura)
+for x in range(-8, 8):                     # copa que se estrecha por delante arriba (pellizco)
+    z = M.front(x, 85)
+    if z is not None and abs(x + 0.5) > 2: M.V.pop((x, 85, z), None)
+cu.hair_back(M, SKIN, HAIR, top=78, bottom=68, neck=False)   # pelo corto: la nuca, al aire
+for (x, y, z), v in M.V.items():           # con el nacimiento del pelo algo más bajo en el centro
+    if v[0] == H and v[1] == SKIN and y == 67 and z < -2 and abs(x + 0.5) < 5: v[1] = HAIR
 cu.sideburns(M, HAIR, 71, 78)
+for (x, y, z), v in M.V.items():           # pelo también sobre la oreja (de perfil quedaba piel)
+    if v[0] == H and v[1] == SKIN and 75 <= y < 78 and abs(x + 0.5) >= 6.5 and z <= 3: v[1] = HAIR
 
 cu.seams(M, (COAT,))
 cu.finish(M, 'legrasse', {COAT: 'lona', COAT_SH: 'lona', SUIT: 'lana', SUIT_SH: 'lana', SHOE: 'cuero',
                           SOLE: 'cuero', HAT: 'lana', HAT_SH: 'lana', BAND: 'punto', HAIR: 'pelo',
                           MOUSTACHE: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
-          flat=(LIP, BADGE, BUTTON, TIE), b=B,
-          hat=(HAT_SH, BAND, HAT,))
+          flat=(BADGE, BUTTON, TIE, BROW, IRIS, MOUTH, EAR_IN), b=B,
+          hat=(HAT_SH, BAND, HAT, BOW))

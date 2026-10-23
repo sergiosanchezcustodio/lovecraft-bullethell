@@ -292,13 +292,14 @@ def hand_(M, part, hx, col, mitten=False):
 
 # ---------------- cabeza y cara ----------------
 
-def head(M, skin, skin_sh, ears=True, nose=True, w=15.0, d=15.0, fem=False):
+def head(M, skin, skin_sh, ears=True, nose=True, w=15.0, d=15.0, fem=False, r=4, rb=None):
     """Cabeza redondeada (30-09-2026, referencia del autor): esquinas de radio 4, coronilla
-    y mandíbula en cuarto de círculo, nariz que asoma 1 (fem: más pequeña) y orejas redondas."""
-    if fem: w, rb = min(w, 14.0), 4
-    else: rb = 3
+    y mandíbula en cuarto de círculo, nariz que asoma 1 (fem: más pequeña) y orejas redondas.
+    r=3 y rb=2 la hacen más cuadrada (mandíbula marcada) y dejan la cara plana más ancha."""
+    if fem: w, rb = min(w, 14.0), 4 if rb is None else rb
+    elif rb is None: rb = 3
     _note(M, head_w=w, head_d=d)
-    rslab(M, H, skin, 64, 81, 0, 0.5, w, d, r=4, rt=4, rb=rb)
+    rslab(M, H, skin, 64, 81, 0, 0.5, w, d, r=r, rt=4, rb=rb)
     if nose:                                          # asoma 1 (2 parecía de payaso)
         if fem: rslab(M, H, skin_sh, 69, 71, 0, 0.5 + d / 2, 2, 2, r=0, rt=0, rb=0)
         else: rslab(M, H, skin_sh, 69, 72, 0, 0.5 + d / 2, 3, 2, r=1, rt=1, rb=0)
@@ -355,12 +356,13 @@ def moustache(M, col, xs=range(-3, 3), y=69, rows=1):
         for x in xs: paint_face(M, x, yy, col, dz=1)
 
 
-def hair_back(M, skin, hair, top=200, zmax=-2):
-    """Pelo en la nuca (lo que quede de piel detrás de z = zmax, por debajo de `top`) y el
-    cuello por detrás, cubierto por el pelo."""
+def hair_back(M, skin, hair, top=200, zmax=-2, bottom=64, neck=True):
+    """Pelo en la nuca (lo que quede de piel detrás de z = zmax, entre `bottom` y `top`) y el
+    cuello por detrás, cubierto por el pelo. Pelo corto: bottom más alto y neck=False."""
     for (x, y, z), v in M.V.items():
-        if v[0] == H and v[1] == skin and z < zmax and 64 <= y < top:
+        if v[0] == H and v[1] == skin and z < zmax and bottom <= y < top:
             v[1] = hair
+    if not neck: return
     for (x, y, z), v in M.V.items():
         if v[0] == T and v[1] == skin and z < 0 and y >= 62:
             v[1] = hair
@@ -420,6 +422,17 @@ def lips(M, col, y=67):
     for x in (-2, -1, 0, 1): paint_face(M, x, y, col)
     lo = tuple(min(1.0, c * 1.15) for c in col)
     for x in (-1, 0): paint_face(M, x, y - 1, lo)
+
+
+def face_art(M, top, rows, legend, dz=0, part=H):
+    """Cara dibujada a mano (23-10-2026): cada fila de `rows` es una tira de 16 caracteres de
+    x = -8 a x = 7 (de izquierda a derecha mirando la cara de frente); la primera va en y = top
+    y las demás hacia abajo. Cada carácter es un color de `legend`; '.' deja lo que haya.
+    dz=0 pinta la superficie delantera y dz=1 pone un voxel encima (cejas, nariz, bigote); para
+    que algo asome 2, se llama otra vez con dz=1."""
+    for i, row in enumerate(rows):
+        for j, ch in enumerate(row):
+            if ch != '.': front(M, j - 8, top - i, legend[ch], dz, part)
 
 
 def sideburns(M, hair, y0=70, y1=76):
