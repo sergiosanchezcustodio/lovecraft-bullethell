@@ -18,7 +18,8 @@ STRAP = (0.34, 0.21, 0.11); BAG = (0.44, 0.27, 0.13); BUCKLE = (0.80, 0.68, 0.40
 TROUSER = (0.40, 0.34, 0.25)
 BOOT = (0.30, 0.18, 0.10); SOLE = (0.12, 0.08, 0.06)
 SKIN = (0.90, 0.71, 0.58); SKIN_SH = (0.80, 0.61, 0.50); LIP = (0.68, 0.34, 0.32); CHEEK = (0.88, 0.60, 0.50)
-BROW = (0.45, 0.20, 0.10)
+BROW = (0.40, 0.18, 0.09); LASH = (0.14, 0.08, 0.06); IRIS = (0.20, 0.36, 0.18)
+FRECKLE = (0.80, 0.52, 0.38); LIP_LO = (0.76, 0.42, 0.40)
 BUTTON = (0.40, 0.33, 0.22)
 AX = cu.ARM_X_F
 
@@ -55,10 +56,30 @@ cu.arms(M, SHIRT, SKIN, fore=SKIN, ax=AX, slim=True)
 for s, _, _, _, fa in cu.sides():
     slab(M, fa, SHIRT_SH, 43, 46, AX * s * 1.02, 0.5, 7.5, 7.5, 8, 8, ch=1)
 
-cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
-cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
-cu.cheeks(M, CHEEK)
-cu.lips(M, LIP)
+# cara rehecha el 23-10-2026 como la de Legrasse (referencias tools/local/ref_cabeza_peaslee_*):
+# cejas finas, pestañas con el rabillo hacia arriba, ojos verdes, nariz pequeña, pecas, mejillas
+# y labios
+cu.head(M, SKIN, SKIN_SH, ears=False, fem=True, nose=False)
+cu.face_art(M, 75, [
+    '..L..........L..',                    # 75: rabillo de las pestañas
+    '..LLL......LLL..',                    # 74: pestañas, solo por fuera (enteras daban cara de sueño)
+    '..wppw....wppw..',                    # 73: ojos
+    '..wiiw....wiiw..',
+    '....f.f..f.f....',                    # 71: pecas
+    '..cc.f......cc..',                    # 70: mejillas
+    '...f........f...',
+    '................',
+    '......rrrr......',                    # 67: labios
+    '.......ll.......',
+], {'L': LASH, 'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'f': FRECKLE, 'c': CHEEK, 'r': LIP, 'l': LIP_LO})
+cu.face_art(M, 76, [                       # en relieve (el ala tapa la fila 77 desde la cámara)
+    '...bbb....bbb...',                    # 76: cejas finas
+    '................',
+    '................',
+    '................',
+    '.......nn.......',                    # 72: nariz pequeña
+    '.......ss.......',
+], {'b': BROW, 'n': SKIN, 's': SKIN_SH}, dz=1)
 # pelo: tapa las orejas y la nuca, raya al lado y mechones largos que enmarcan la cara
 cu.hair_back(M, SKIN, HAIR, top=80, zmax=2)
 for (x, y, z), v in M.V.items():
@@ -73,13 +94,11 @@ for i, y in enumerate(range(52, 72, 3)):                                # tramos
     slab(M, 'hair', HAIR if i % 2 else HAIR_SH, y, y + 3, off, -8.5 - (71 - y) * 0.03, 4, 4.5, 3.5, 3.5, ch=1)
 slab(M, 'hair', HAIR_TIE, 52, 54, 0, -8.8, 4.5, 4.5, 4, 4, ch=0)         # lazo
 slab(M, 'hair', HAIR, 48, 52, 0, -8.8, 3.5, 2, 3, 2, ch=0)               # punta
-# fedora de fieltro: ala ancha algo caída delante y detrás (asoma 2,5), cinta oscura,
+# fedora de fieltro: ala ancha algo caída detrás (asoma 2,5), cinta oscura,
 # copa con pellizco delantero y hendidura a lo largo
 slab(M, H, HAT_SH, 78, 79, 0, 0.5, 21, 21, 20, 20, ch=3)
-for z in (-10, 10):                                                     # ala caída en las puntas
-    for x in range(-4, 4):
-        k = (x, 78, z if z > 0 else z + 0)
-        if (x, 78, z - (1 if z > 0 else -1)) in M.V: M.put(x, 77, z - (1 if z > 0 else -1), H, HAT_SH)
+for x in range(-4, 4):                                                  # ala caída por detrás (por delante
+    if (x, 78, -9) in M.V: M.put(x, 77, -9, H, HAT_SH)                  # tapaba las cejas y los ojos)
 slab(M, H, BAND, 79, 81, 0, 0.3, 15, 15, 15, 15, ch=2)
 slab(M, H, HAT, 81, 87, 0, 0.3, 15, 13, 15, 12.5, ch=2)
 for x in range(-2, 2):                                                   # pellizco delantero
@@ -93,6 +112,6 @@ cu.seams(M, (SHIRT,))
 cu.finish(M, 'peaslee', {SHIRT: 'lona', SHIRT_SH: 'lona', TROUSER: 'lana', BOOT: 'cuero', SOLE: 'cuero',
                          STRAP: 'cuero', BAG: 'cuero', HAT: 'lana', HAT_SH: 'lana', HAIR: 'pelo', HAIR_SH: 'pelo',
                          SKIN: 'piel', SKIN_SH: 'piel'},
-          flat=(LIP, BROW, CHEEK, BUTTON, BUCKLE, HAIR_TIE, BAND), ax=AX,
+          flat=(LIP, LIP_LO, BROW, LASH, IRIS, FRECKLE, CHEEK, BUTTON, BUCKLE, HAIR_TIE, BAND), ax=AX,
           extra_pivots={'hair': [0, 76, -8]}, extra_parents={'hair': 'head'},
           hat=(HAT_SH, BAND, HAT,))

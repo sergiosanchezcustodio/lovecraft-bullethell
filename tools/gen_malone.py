@@ -17,7 +17,8 @@ HAT = (0.42, 0.10, 0.14); HAT_SH = (0.33, 0.08, 0.11); BAND = (0.08, 0.07, 0.08)
 HAIR = (0.08, 0.07, 0.08)      # negro azabache: el platino, bajo la luz cálida, se confundía con la piel
 SHOE = (0.90, 0.88, 0.84); SHOE_TIP = (0.12, 0.10, 0.09); SOLE = (0.05, 0.05, 0.05)
 SKIN = (0.92, 0.76, 0.66); SKIN_SH = (0.82, 0.65, 0.56); LIP = (0.72, 0.10, 0.14); CHEEK = (0.90, 0.66, 0.58)
-BROW = (0.10, 0.08, 0.08); BUTTON = (0.12, 0.12, 0.13)
+BROW = (0.10, 0.08, 0.08); LASH = (0.07, 0.06, 0.06); IRIS = (0.20, 0.14, 0.11); LIP_LO = (0.80, 0.20, 0.24)
+BUTTON = (0.12, 0.12, 0.13)
 AX = cu.ARM_X_F
 
 M = cu.new(1927)
@@ -52,10 +53,31 @@ cu.opening(M, 59, 63, 2, 2, TIE)
 cu.neck(M, SKIN)
 for x, y in ((5, 56), (6, 56), (5, 57), (6, 57), (4, 57)): cu.front(M, x, y, FLOWER, dz=1)   # clavel
 
-cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
-cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
-cu.cheeks(M, CHEEK, y=70)
-cu.lips(M, LIP)
+# cara rehecha el 23-10-2026 como la de Legrasse (referencias tools/local/ref_cabeza_malone_*):
+# el ala tapa desde la cámara hasta la fila 76, así que la cara va una fila más abajo: una ceja
+# levantada (segura de sí), pestañas con rabillo, ojos oscuros, nariz pequeña y media sonrisa
+# con los labios rojos
+cu.head(M, SKIN, SKIN_SH, ears=False, fem=True, nose=False)
+cu.face_art(M, 74, [
+    '..L..........L..',                    # 74: rabillo de las pestañas
+    '..LLL......LLL..',                    # 73: pestañas, solo por fuera (enteras daban cara de sueño)
+    '..wppw....wppw..',                    # 72: ojos
+    '..wiiw....wiiw..',
+    '................',
+    '..cc........cc..',                    # 69: mejillas
+    '..........r.....',                    # 68: la comisura que sube (media sonrisa)
+    '......rrrr......',                    # 67: labios
+    '.......ll.......',
+], {'L': LASH, 'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'c': CHEEK, 'r': LIP, 'l': LIP_LO})
+cu.face_art(M, 76, [                       # en relieve
+    '...bbb..........',                    # 76: la ceja levantada...
+    '..b.......bbbb..',                    # ...y la otra recta, más baja
+    '................',
+    '................',
+    '................',
+    '.......nn.......',                    # 71: nariz pequeña
+    '.......ss.......',
+], {'b': BROW, 'n': SKIN, 's': SKIN_SH}, dz=1)
 cu.bob(M, HAIR, bottom=66, top=80, fringe=78, side_z=3)
 cu.rslab(M, H, HAIR, 63, 71, 0, -8.5, 9, 5, r=2.5, rt=2.5, rb=2.5)       # moño bajo en la nuca
 slab(M, H, (0.55, 0.10, 0.14), 66, 68, 0, -8.5, 9.5, 9.5, 5.5, 5.5, ch=1)  # cinta granate
@@ -73,5 +95,5 @@ for x in range(-1, 3):
 cu.seams(M, (SUIT, STRIPE))
 cu.finish(M, 'malone', {SUIT: 'lana', SUIT_SH: 'lana', STRIPE: 'lana', HAT: 'lana', HAT_SH: 'lana',
                         HAIR: 'pelo', SKIN: 'piel', SKIN_SH: 'piel', SHOE: 'cuero', SHOE_TIP: 'cuero'},
-          flat=(LIP, BROW, CHEEK, BUTTON, FLOWER, TIE, BAND, SHIRT), ax=AX,
+          flat=(LIP, LIP_LO, BROW, LASH, IRIS, CHEEK, BUTTON, FLOWER, TIE, BAND, SHIRT), ax=AX,
           hat=(HAT_SH, BAND, HAT,))

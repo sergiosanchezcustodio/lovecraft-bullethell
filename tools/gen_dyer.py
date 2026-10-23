@@ -20,7 +20,8 @@ MITT = (0.33, 0.22, 0.14); MITT_SH = (0.26, 0.17, 0.11)
 CAP = (0.39, 0.25, 0.15)
 SKIN = (0.89, 0.69, 0.55); SKIN_SH = (0.79, 0.59, 0.46); LIP = (0.60, 0.36, 0.30); CHEEK = (0.88, 0.58, 0.48)
 HAIR = (0.40, 0.30, 0.22); BEARD = (0.58, 0.44, 0.31); BEARD_SH = (0.42, 0.33, 0.25)
-BROW = (0.30, 0.22, 0.16)
+BROW = (0.24, 0.17, 0.12); IRIS = (0.13, 0.17, 0.24); NOSE_RED = (0.88, 0.56, 0.48)
+CAP_SH = (0.30, 0.19, 0.11)
 SCARF = (0.66, 0.19, 0.14); SCARF_SH = (0.54, 0.14, 0.11)
 BELT = (0.22, 0.15, 0.10); TOGGLE = (0.30, 0.20, 0.12)
 GREN = (0.28, 0.32, 0.24); HANDLE = (0.76, 0.62, 0.40)
@@ -52,28 +53,46 @@ slab(M, 'scarf', SCARF_SH, 46, 47, 3, -7.5, 5, 5, 1.5, 1.5, ch=0)
 # brazos
 cu.arms(M, PARKA, MITT, cuff=FUR, mitten=True)
 
-# cabeza (redondeada, 30-09-2026)
-cu.head(M, SKIN, SKIN_SH, ears=False, w=16)
+# cabeza (redondeada, 30-09-2026; cara rehecha el 23-10-2026 como la de Legrasse, con las
+# referencias tools/local/ref_cabeza_dyer_*): cejas caídas (bondadoso), ojos con iris, nariz en
+# cuña y mejillas rojas del frío, bigote más oscuro sobre la barba y botón en el gorro
+cu.head(M, SKIN, SKIN_SH, ears=False, w=16, nose=False, r=3)
 cu.beard(M, BEARD)
-# gorro de trampero: copa abombada, banda de borreguillo gruesa y orejeras redondeadas
+# gorro de trampero: copa abombada con botón, banda de borreguillo gruesa y orejeras redondeadas
 cu.rslab(M, H, CAP, 78, 87, 0, 0.3, 17, 17, r=4, rt=3, rb=0)
+cu.rslab(M, H, CAP_SH, 87, 88, -0.5, 0.3, 2, 2, r=0, rt=0, rb=0)          # botón
 cu.rslab(M, H, FUR, 77, 81, 0, 0.5, 19, 19, r=5, rt=1.5, rb=1.5)
 for s_ in (-1, 1):
     cu.rslab(M, H, CAP, 67, 78, 8.5 * s_ - 0.5, -0.5, 2, 7, r=1, rt=0, rb=2)
     cu.rslab(M, H, FUR, 66, 68, 8.5 * s_ - 0.5, -0.5, 3, 7.5, r=1, rt=0, rb=1)
-# cara pintada sobre la piel
-cu.eyes(M, BROW, brow_style='caida')
-cu.cheeks(M, CHEEK, y=72)
-for x in range(-4, 3): cu.paint_face(M, x, 69, BEARD_SH, dz=1)                  # bigote
-for x in (-3, 2): cu.paint_face(M, x, 68, BEARD_SH, dz=1)
-for x in (-1, 0): cu.paint_face(M, x, 67, LIP)                                  # boca
+cu.face_art(M, 75, [                       # pintado (la banda de borreguillo tapa la fila 76)
+    '................',
+    '................',
+    '..wppw....wppw..',                    # 73: ojos
+    '..wiiw....wiiw..',
+    '..cc........cc..',                    # 71: mejillas rojas del frío
+    '................',
+    '................',
+    '................',
+    '.......LL.......',                    # 67: labio, entre el bigote y la barba
+], {'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'c': CHEEK, 'L': LIP})
+cu.face_art(M, 75, [                       # en relieve
+    '...bbbb..bbbb...',                    # 75: cejas, caídas por fuera (bondadoso)
+    '..b..........b..',
+    '.......nn.......',                    # 73: tabique
+    '.......nn.......',
+    '......snns......',                    # 71: punta de la nariz, roja del frío
+    '......rnnr......',
+    '....mmmmmmmm....',                    # 69: bigote, más oscuro que la barba
+    '...mmm....mmm...',
+], {'b': BROW, 'n': SKIN, 's': SKIN_SH, 'r': NOSE_RED, 'm': BEARD_SH}, dz=1)
 cu.hair_back(M, SKIN, HAIR)
 
 cu.seams(M, (PARKA,))
 cu.finish(M, 'dyer', {PARKA: 'lona', PARKA_SH: 'lona', FUR: 'borreguillo', TROUSER: 'lana',
-                      BOOT: 'cuero', SOLE: 'cuero', MITT: 'cuero', MITT_SH: 'cuero', CAP: 'cuero',
+                      BOOT: 'cuero', SOLE: 'cuero', MITT: 'cuero', MITT_SH: 'cuero', CAP: 'cuero', CAP_SH: 'cuero',
                       SCARF: 'punto', SCARF_SH: 'punto', HAIR: 'pelo', BEARD: 'pelo', BEARD_SH: 'pelo',
                       SKIN: 'piel', SKIN_SH: 'piel', BELT: 'cuero'},
-          flat=(LIP, BROW, TOGGLE, CHEEK),
+          flat=(LIP, BROW, TOGGLE, CHEEK, IRIS, NOSE_RED),
           extra_pivots={'scarf': [3, 61, -7.5]}, extra_parents={'scarf': 'torso'},
-          hat=(CAP, FUR,))
+          hat=(CAP, CAP_SH, FUR,))

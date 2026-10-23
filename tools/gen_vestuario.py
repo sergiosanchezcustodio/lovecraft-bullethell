@@ -300,40 +300,55 @@ def _face_z(bd):
     return int(round(0.5 + bd['head_d'] / 2)) + 1
 
 
-def gafas_ver(M, bd):
-    """Gafas redondas de montura dorada: dos aros alrededor de los ojos, puente y patillas."""
+def face_of(c):
+    """Dónde tiene los ojos el personaje: la fila de abajo de sus blancos (las caras dibujadas a
+    mano del 23-10-2026 no los tienen todas a la misma altura), y los voxels de su cabeza."""
+    with open('models/%s.json' % c) as f:
+        vox = [v for v in json.load(f)['voxels'] if v[3] == 'head']
+    whites = [v[1] for v in vox if v[2] >= 3 and sum(abs(a - b) for a, b in zip(v[4:7], cu.EYE_W)) < 0.05]
+    return (min(whites) if whites else 73), {(v[0], v[1], v[2]) for v in vox}
+
+
+def _front_z(head, x, y):
+    zs = [z for (hx, hy, z) in head if hx == x and hy == y]
+    return max(zs) if zs else 7
+
+
+def gafas_ver(M, bd, face):
+    """Gafas redondas de montura dorada: dos aros alrededor de los ojos (de 4×2), puente y
+    patillas pegadas a los lados de la cabeza. Siguen la cara: cada voxel va justo delante."""
     GOLD = (0.80, 0.64, 0.26)
-    w, d = _head_box(bd)
-    z = _face_z(bd)
-    for x0 in (-6, 1):                                                 # aros: 5 de ancho, 4 de alto
-        for x in range(x0, x0 + 5):
-            for y in (72, 75):
-                if x in (x0, x0 + 4): continue
-                M.put(x, y, z, H, GOLD)
-        for y in (73, 74):
-            M.put(x0, y, z, H, GOLD); M.put(x0 + 4, y, z, H, GOLD)
-    M.put(-1, 74, z, H, GOLD); M.put(0, 74, z, H, GOLD)               # puente
-    hx = int(w / 2) + 1
-    for zz in range(-2, z + 1):                                        # patillas
-        M.put(-hx, 74, zz, H, GOLD); M.put(hx - 1, 74, zz, H, GOLD)
+    y0, head = face
+    put = lambda x, y: M.put(x, y, _front_z(head, x, y) + 1, H, GOLD)
+    for x0 in (-7, 1):                                                 # aros: 6 de ancho, 4 de alto
+        for x in range(x0 + 1, x0 + 5): put(x, y0 - 1); put(x, y0 + 2)
+        for y in (y0, y0 + 1): put(x0, y); put(x0 + 5, y)
+    put(-1, y0 + 1); put(0, y0 + 1)                                    # puente
+    y = y0 + 1
+    for s in (-1, 1):                                                  # patillas, por fuera de la cabeza
+        ring = _front_z(head, -7 if s < 0 else 6, y) + 1
+        for z in range(-2, ring):
+            xs = [x for (x, hy, hz) in head if hy == y and hz == z]
+            if xs: M.put(min(xs) - 1 if s < 0 else max(xs) + 1, y, z, H, GOLD)
     return {}
 
 
-def gafas_nieve(M, bd):
-    """Gafas de nieve inuit: placa de hueso con dos rendijas y correa de cuero."""
+def gafas_nieve(M, bd, face):
+    """Gafas de nieve inuit: placa de hueso con dos rendijas (a la altura de los ojos) y correa."""
     BONE = (0.84, 0.78, 0.64); SLIT = (0.04, 0.04, 0.05); STRAP = (0.30, 0.20, 0.12)
     w, d = _head_box(bd)
     z = _face_z(bd)
+    dy = face[0] - 73                                                  # la placa se hizo para ojos en 73-74
     for x in range(-7, 7):
         for y in range(72, 77):
             if y in (72, 76) and x in (-7, 6): continue
-            M.put(x, y, z, H, BONE)
+            M.put(x, y + dy, z, H, BONE)
     for x in (-5, -4, -3, 2, 3, 4):
-        M.put(x, 74, z, H, SLIT)
-    slab(M, H, STRAP, 73, 76, 0, 0.0, w + 1.2, w + 1.2, d + 1.2, d + 1.2, ch=3)
+        M.put(x, 74 + dy, z, H, SLIT)
+    slab(M, H, STRAP, 73 + dy, 76 + dy, 0, 0.0, w + 1.2, w + 1.2, d + 1.2, d + 1.2, ch=3)
     for x in range(-7, 7):                                             # la correa no tapa la placa
         for y in range(73, 76):
-            M.put(x, y, z, H, BONE if x not in (-5, -4, -3, 2, 3, 4) or y != 74 else SLIT)
+            M.put(x, y + dy, z, H, BONE if x not in (-5, -4, -3, 2, 3, 4) or y != 74 else SLIT)
     return {STRAP: 'cuero'}
 
 
@@ -469,7 +484,9 @@ def build(name, c):
     bd = body_of(c)
     M = cu.new(9100 + CHARS.index(c))
     fn = GARMENTS[name]
-    mats = fn(M, bd, hair_of(c)) if fn is cinta_pelo else fn(M, bd)
+    if fn is cinta_pelo: mats = fn(M, bd, hair_of(c))
+    elif fn in (gafas_ver, gafas_nieve): mats = fn(M, bd, face_of(c))
+    else: mats = fn(M, bd)
     materiales.texturize(M, mats)
     piv, parents = cu.pivots(bd['finish_b'], bd['finish_ax'])
     out = 'models/vest_%s_%s.json' % (name, c)

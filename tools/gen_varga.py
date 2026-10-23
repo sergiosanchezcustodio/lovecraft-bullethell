@@ -19,7 +19,8 @@ HAIR = (0.09, 0.07, 0.08)
 BAND = (0.10, 0.09, 0.11); FEATHER = (0.50, 0.28, 0.62); FEATHER_SH = (0.38, 0.20, 0.48); GEM = (0.40, 0.20, 0.52)
 STOCKING = (0.14, 0.12, 0.15); SHOE = (0.07, 0.06, 0.07); SOLE = (0.03, 0.03, 0.03)
 SKIN = (0.93, 0.80, 0.72); SKIN_SH = (0.84, 0.70, 0.63); LIP = (0.55, 0.14, 0.22); CHEEK = (0.90, 0.70, 0.66)
-BROW = (0.12, 0.08, 0.08)
+BROW = (0.12, 0.08, 0.08); LASH = (0.08, 0.06, 0.07); SHADOW = (0.46, 0.30, 0.42)
+IRIS = (0.24, 0.15, 0.12); LIP_LO = (0.64, 0.20, 0.27)
 AX = cu.ARM_X_F
 
 M = cu.new(1924)
@@ -45,10 +46,31 @@ cu.arms(M, DRESS, SKIN, cuff=DRESS_SH, cuff_wide=False, ax=AX, slim=True)
 for s, _, _, arm, _ in cu.sides():                                      # la estola cubre el hombro
     slab(M, arm, STOLE, 53, 61, AX * s, 0, 8, 8.5, 8.5, 9, ch=1)
     slab(M, arm, FRINGE, 52, 53, AX * s, 0, 8, 8, 8.5, 8.5, ch=1)
-cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
-cu.eyes(M, BROW, brow_style='caida', lashes=cu.EYE)
-cu.cheeks(M, CHEEK, y=70)
-cu.lips(M, LIP)
+# cara rehecha el 23-10-2026 como la de Legrasse (referencias tools/local/ref_cabeza_varga_*):
+# cejas finas y altas (las caídas le ponían cara de enfado), ojos ahumados con sombra ciruela y
+# rabillo, nariz pequeña y labios granate oscuro
+cu.head(M, SKIN, SKIN_SH, ears=False, fem=True, nose=False)
+cu.face_art(M, 75, [
+    '..Leee....eeeL..',                    # 75: sombra de ojos y rabillo de las pestañas
+    '..LLL......LLL..',                    # 74: pestañas, solo por fuera (enteras daban cara de sueño)
+    '..wppw....wppw..',                    # 73: ojos
+    '..wiiw....wiiw..',
+    '................',
+    '..cc........cc..',                    # 70: mejillas
+    '................',
+    '................',
+    '......rrrr......',                    # 67: labios
+    '.......ll.......',
+], {'L': LASH, 'e': SHADOW, 'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'c': CHEEK, 'r': LIP, 'l': LIP_LO})
+cu.face_art(M, 77, [                       # en relieve
+    '...bbb....bbb...',                    # 77: cejas finas y altas, sobre la sombra
+    '................',
+    '................',
+    '................',
+    '................',
+    '.......nn.......',                    # 72: nariz pequeña
+    '.......ss.......',
+], {'b': BROW, 'n': SKIN, 's': SKIN_SH}, dz=1)
 cu.bob(M, HAIR, bottom=67, top=83, fringe=78, side_z=3)
 cu.long_hair(M, HAIR, bottom=46, width=16)                               # melena lisa larga, a media espalda
 cu.hair_back(M, SKIN, HAIR, top=82, zmax=2)
@@ -64,5 +86,5 @@ for i, y in enumerate(range(80, 94)):                                    # pluma
 cu.seams(M, (DRESS,))
 cu.finish(M, 'varga', {DRESS: 'lana', DRESS_SH: 'lana', STOLE: 'lana', HAIR: 'pelo',
                        SHOE: 'cuero', SOLE: 'cuero', SKIN: 'piel', SKIN_SH: 'piel'},
-          flat=(LIP, BROW, CHEEK, PEARL, FRINGE, GEM, FEATHER, FEATHER_SH, BAND, STOCKING), ax=AX,
+          flat=(LIP, LIP_LO, BROW, LASH, SHADOW, IRIS, CHEEK, PEARL, FRINGE, GEM, FEATHER, FEATHER_SH, BAND, STOCKING), ax=AX,
           hat=(BAND, GEM, FEATHER, FEATHER_SH,))

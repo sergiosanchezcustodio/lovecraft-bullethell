@@ -18,8 +18,10 @@ TIE = (0.20, 0.30, 0.56)
 TROUSER = (0.36, 0.30, 0.24)
 SHOE = (0.36, 0.22, 0.13); SOLE = (0.14, 0.10, 0.08)
 CAP = (0.44, 0.37, 0.29); CAP_SH = (0.34, 0.28, 0.22)
-SKIN = (0.88, 0.70, 0.57); SKIN_SH = (0.79, 0.60, 0.49); LIP = (0.62, 0.38, 0.33); CHEEK = (0.87, 0.60, 0.50)
-HAIR = (0.33, 0.22, 0.14); BROW = (0.27, 0.18, 0.12)
+SKIN = (0.88, 0.70, 0.57); SKIN_SH = (0.79, 0.60, 0.49); CHEEK = (0.89, 0.62, 0.52)
+MOUTH = (0.66, 0.43, 0.37); LIP_LO = (0.82, 0.58, 0.49); EAR_IN = (0.66, 0.48, 0.38); IRIS = (0.24, 0.18, 0.09)
+HAIR = (0.33, 0.22, 0.14); BROW = (0.22, 0.14, 0.09)
+VISOR = (0.30, 0.25, 0.19)
 BUTTON = (0.20, 0.17, 0.14)
 GUN = (0.16, 0.16, 0.18); GRIP = (0.40, 0.25, 0.14); HOLSTER = (0.30, 0.18, 0.10)
 B = -2
@@ -49,20 +51,47 @@ slab(M, T, GUN, 42, 44, 8.5, 7, 2, 2, 2, 2, ch=0)
 slab(M, T, GRIP, 44, 47, 8.5, 6.5, 2, 2, 3, 3, ch=0)
 
 cu.arms(M, JACKET, SKIN, b=B, cuff=SHIRT, cuff_wide=False)
-cu.head(M, SKIN, SKIN_SH)
-# gorra de plato: copa algo más ancha que la cabeza, plato inclinado hacia delante y visera
+# cabeza rehecha el 23-10-2026 como la de Legrasse (referencias tools/local/ref_cabeza_olmstead_*):
+# cara de joven, cejas rectas, ojos con iris oscuro (claro daba cara de sueño), nariz corta y
+# mejillas sonrosadas; gorra con el plato que vuela sobre la visera y botón
+cu.head(M, SKIN, SKIN_SH, nose=False, r=3, rb=3)
+cu.face_art(M, 77, [
+    'hh............hh',                    # 77: pelo en las sienes, bajo la visera
+    'hh............hh',
+    'h..............h',
+    '................',
+    '..wppw....wppw..',                    # 73: ojos
+    '..wiiw....wiiw..',
+    '................',
+    '..cc........cc..',                    # 70: mejillas
+    '................',
+    '................',
+    '......oooo......',                    # 67: boca recta en tono de piel (con las comisuras
+    '.......ll.......',                    #     arriba parecía un emoticono) y labio de abajo
+], {'h': HAIR, 'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'c': CHEEK, 'o': MOUTH, 'l': LIP_LO})
+cu.face_art(M, 75, [                       # la visera tapa la fila 76 desde la cámara
+    '..bbbb....bbbb..',                    # 75: cejas rectas, de una fila
+    '................',
+    '................',
+    '.......nn.......',                    # 72: tabique
+    '......snns......',                    # 71: punta de la nariz
+    '.......ss.......',
+], {'b': BROW, 'n': SKIN, 's': SKIN_SH}, dz=1)
+cu.ear_holes(M, EAR_IN)
+# gorra de plato: copa algo más ancha que la cabeza, plato que vuela hacia delante sobre la
+# visera (asoma 2: más taparía los ojos) y botón arriba
 slab(M, H, CAP, 77, 81, 0, 0, 16, 16, 16, 16, ch=2)
 slab(M, H, CAP_SH, 81, 83, 0, 1, 15, 14, 16, 14, ch=2)
-slab(M, H, CAP_SH, 77, 78, 0, 8.5, 12, 12, 3, 3, ch=1)                 # visera (asoma 2: más taparía los ojos)
-cu.eyes(M, BROW, brow_style='recta')
-cu.cheeks(M, CHEEK)
-cu.mouth(M, LIP)
-cu.hair_back(M, SKIN, HAIR, top=77)
+slab(M, H, CAP_SH, 78, 81, 0, 8, 14, 14, 2, 2, ch=1)                   # el plato, sobre la visera
+slab(M, H, VISOR, 77, 78, 0, 8.5, 12, 12, 3, 3, ch=1)                  # visera
+slab(M, H, CAP_SH, 83, 84, -0.5, 1, 2, 2, 2, 2, ch=0)                  # botón
+cu.hair_back(M, SKIN, HAIR, top=77, bottom=68, neck=False, point=5)
 cu.sideburns(M, HAIR, 72, 77)
+cu.hair_over_ears(M, SKIN, HAIR, 75, 77)
 
 cu.seams(M, (JACKET,))
 cu.finish(M, 'olmstead', {JACKET: 'lana', JACKET_SH: 'lana', VEST: 'lana', TROUSER: 'lana',
-                          SHOE: 'cuero', SOLE: 'cuero', HOLSTER: 'cuero', CAP: 'lana', CAP_SH: 'lana',
+                          SHOE: 'cuero', SOLE: 'cuero', HOLSTER: 'cuero', CAP: 'lana', CAP_SH: 'lana', VISOR: 'lana',
                           HAIR: 'pelo', SKIN: 'piel', SKIN_SH: 'piel', TIE: 'punto'},
-          flat=(LIP, BROW, CHEEK, BUTTON, GUN), b=B,
-          hat=(CAP, CAP_SH,))
+          flat=(BROW, CHEEK, BUTTON, GUN, IRIS, MOUTH, LIP_LO, EAR_IN), b=B,
+          hat=(CAP, CAP_SH, VISOR))

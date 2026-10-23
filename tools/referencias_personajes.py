@@ -18,7 +18,7 @@ import generar_local as gl
 LEAD = 'High quality 3D voxel art character, MagicaVoxel style render, a voxel model of'
 STYLE = ('The character is built entirely from small cubic voxels with a clearly visible cube grid on every '
          'surface, blocky with stepped jagged edges made of cubes and no smooth curves, like a high-resolution '
-         'Minecraft-style figure, even the hat, the hair, the moustache and the face are made of cubes, the eyes '
+         'Minecraft-style figure, even the hat, the hair and the face are made of cubes, the eyes '
          'and eyebrows are square pixels painted on the flat front of the blocky head, soft global illumination, '
          'ambient occlusion between the cubes, warm key light and a cool green rim light, rich but slightly muted '
          'colors, plain flat dark grey background, no text, no letters')
@@ -40,6 +40,28 @@ CHARACTERS = {
                  'face, blue eyes, navy blue double breasted pea coat with brass buttons over a cream turtleneck'),
     'dyer': ('a 1930s Antarctic expedition geologist: brown leather trapper hat with sheepskin lining and ear flaps, '
              'short brown beard and moustache, red scarf, tan canvas parka with sheepskin trim'),
+    'elwood': ('a 1918 British army sergeant, a weathered veteran: olive green Brodie steel helmet with a wide flat '
+               'brim, short brown toothbrush moustache, stern squinting eyes, square jaw, olive wool tunic with '
+               'webbing straps'),
+    'iwanicki': ('a 1920s Polish catholic priest in his sixties: short grey hair receding at the temples, bushy grey '
+                 'eyebrows, kind wrinkled face, black cassock with a white clerical collar and a silver crucifix'),
+    'armitage': ('an elderly 1920s university librarian professor: bald on top with white hair on the sides, full white '
+                 'beard and white moustache, gold rimmed round spectacles, kind wise eyes, dark grey frock coat and '
+                 'a black bow tie'),
+    'west': ('a 1920s young pale scientist: slicked back blond hair, small round black rimmed glasses, cold pale eyes, '
+             'thin face, clean shaven, white lab coat over a dark suit'),
+    'peaslee': ('a 1930s young woman archaeologist: brown felt adventurer fedora with a dark band, long copper red hair '
+                'in a braid, green eyes, freckles, khaki shirt with a leather strap across the chest'),
+    'varga': ('a 1920s Hungarian spiritualist medium woman: long straight jet black hair with a blunt fringe, a black '
+              'headband with a violet jewel and a purple feather, pale skin, dark red lipstick, smoky eyes, pearl '
+              'necklace, black velvet dress and a plum stole'),
+    'whipple': ('a 1920s woman doctor: auburn brown hair in a high bun, thin light gold round glasses, kind serious '
+                'eyes, white lab coat over a grey dress, stethoscope around the neck'),
+    'blake': ('a 1920s woman writer: teal cloche hat with a gold ribbon band and bow, wavy blonde bob haircut, red '
+              'lipstick, burgundy coat with a cream scarf'),
+    'malone': ('a 1920s woman gangster: burgundy fedora hat tilted to one side, sleek jet black hair in a low bun with '
+               'a side wave, red lipstick, sharp confident eyes, grey pinstripe suit with a burgundy tie and a white '
+               'carnation'),
 }
 
 

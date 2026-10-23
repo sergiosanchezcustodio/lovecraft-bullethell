@@ -79,10 +79,7 @@ cu.face_art(M, 76, [                       # en relieve (asoma 1)
     '..mmmmmmmmmmmm..',                    #     con las puntas hacia arriba
     '....mmmmmmmm....',
 ], {'b': BROW, 'n': SKIN, 's': SKIN_SH, 'm': MOUSTACHE}, dz=1)
-for s in (-1, 1):                          # oreja: hueco más oscuro en la cara de fuera
-    x = 8 if s > 0 else -9
-    for y in (72, 73):
-        for z in (-1, 0): M.put(x, y, z, H, EAR_IN)
+cu.ear_holes(M, EAR_IN)
 # fedora: ala ancha (asoma 2,5 por delante: más taparía los ojos desde la cámara) con el borde
 # vuelto hacia arriba por los lados y detrás, cinta con lazo y copa con hendidura y pellizco
 slab(M, H, HAT_SH, 78, 79, 0, 0.5, 21, 21, 19.5, 19.5, ch=3)
@@ -99,12 +96,9 @@ for z in range(-2, 8):                     # hendidura en lo alto de la copa, de
 for x in range(-8, 8):                     # copa que se estrecha por delante arriba (pellizco)
     z = M.front(x, 85)
     if z is not None and abs(x + 0.5) > 2: M.V.pop((x, 85, z), None)
-cu.hair_back(M, SKIN, HAIR, top=78, bottom=68, neck=False)   # pelo corto: la nuca, al aire
-for (x, y, z), v in M.V.items():           # con el nacimiento del pelo algo más bajo en el centro
-    if v[0] == H and v[1] == SKIN and y == 67 and z < -2 and abs(x + 0.5) < 5: v[1] = HAIR
+cu.hair_back(M, SKIN, HAIR, top=78, bottom=68, neck=False, point=5)   # pelo corto: la nuca, al aire
 cu.sideburns(M, HAIR, 71, 78)
-for (x, y, z), v in M.V.items():           # pelo también sobre la oreja (de perfil quedaba piel)
-    if v[0] == H and v[1] == SKIN and 75 <= y < 78 and abs(x + 0.5) >= 6.5 and z <= 3: v[1] = HAIR
+cu.hair_over_ears(M, SKIN, HAIR)
 
 cu.seams(M, (COAT,))
 cu.finish(M, 'legrasse', {COAT: 'lona', COAT_SH: 'lona', SUIT: 'lana', SUIT_SH: 'lana', SHOE: 'cuero',

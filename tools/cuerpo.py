@@ -356,11 +356,14 @@ def moustache(M, col, xs=range(-3, 3), y=69, rows=1):
         for x in xs: paint_face(M, x, yy, col, dz=1)
 
 
-def hair_back(M, skin, hair, top=200, zmax=-2, bottom=64, neck=True):
+def hair_back(M, skin, hair, top=200, zmax=-2, bottom=64, neck=True, point=0):
     """Pelo en la nuca (lo que quede de piel detrás de z = zmax, entre `bottom` y `top`) y el
-    cuello por detrás, cubierto por el pelo. Pelo corto: bottom más alto y neck=False."""
+    cuello por detrás, cubierto por el pelo. Pelo corto: bottom más alto y neck=False; con
+    point, el nacimiento del pelo baja una fila más en el centro (|x| < point)."""
     for (x, y, z), v in M.V.items():
         if v[0] == H and v[1] == skin and z < zmax and bottom <= y < top:
+            v[1] = hair
+        elif v[0] == H and v[1] == skin and z < zmax and y == bottom - 1 and abs(x + 0.5) < point:
             v[1] = hair
     if not neck: return
     for (x, y, z), v in M.V.items():
@@ -431,8 +434,25 @@ def face_art(M, top, rows, legend, dz=0, part=H):
     dz=0 pinta la superficie delantera y dz=1 pone un voxel encima (cejas, nariz, bigote); para
     que algo asome 2, se llama otra vez con dz=1."""
     for i, row in enumerate(rows):
+        assert len(row) == 16, row
         for j, ch in enumerate(row):
             if ch != '.': front(M, j - 8, top - i, legend[ch], dz, part)
+
+
+def hair_over_ears(M, skin, hair, y0=75, y1=78):
+    """Pelo a los lados de la cabeza por encima de la oreja: de perfil quedaba piel entre la
+    nuca y la patilla."""
+    for (x, y, z), v in M.V.items():
+        if v[0] == H and v[1] == skin and y0 <= y < y1 and abs(x + 0.5) >= 6.5 and z <= 3: v[1] = hair
+
+
+def ear_holes(M, col, w=15.0, ys=(72, 73), zs=(-1, 0)):
+    """El hueco de las orejas de head(): unos voxels más oscuros en su cara de fuera."""
+    for s in (-1, 1):
+        cx = (w / 2 + 0.5) * s
+        x = int(math.floor(cx - 1)) if s < 0 else int(math.ceil(cx + 1)) - 1
+        for y in ys:
+            for z in zs: M.put(x, y, z, H, col)
 
 
 def sideburns(M, hair, y0=70, y1=76):

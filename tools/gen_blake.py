@@ -17,7 +17,8 @@ HAT = (0.13, 0.33, 0.36); HAT_SH = (0.10, 0.26, 0.29); HATBAND = (0.72, 0.62, 0.
 HAIR = (0.58, 0.44, 0.25)
 STOCKING = (0.62, 0.50, 0.44); SHOE = (0.30, 0.16, 0.10); SOLE = (0.10, 0.06, 0.04)
 SKIN = (0.91, 0.74, 0.62); SKIN_SH = (0.81, 0.63, 0.53); LIP = (0.64, 0.20, 0.22); CHEEK = (0.88, 0.62, 0.54)
-BROW = (0.40, 0.28, 0.16); BUTTON = (0.20, 0.08, 0.08); PEN = (0.82, 0.70, 0.40)
+BROW = (0.40, 0.28, 0.16); LASH = (0.16, 0.11, 0.08); IRIS = (0.18, 0.30, 0.48); LIP_LO = (0.74, 0.28, 0.30)
+BUTTON = (0.20, 0.08, 0.08); PEN = (0.82, 0.70, 0.40)
 AX = cu.ARM_X_F
 
 M = cu.new(1935)
@@ -43,10 +44,29 @@ for y in range(45, 58, 3):                                              # rayas 
 cu.neck(M, SKIN)
 
 cu.arms(M, COAT, SKIN, cuff=COAT_SH, ax=AX, slim=True)
-cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
-cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
-cu.cheeks(M, CHEEK, y=70)
-cu.lips(M, LIP)
+# cara rehecha el 23-10-2026 como la de Legrasse (referencias tools/local/ref_cabeza_blake_*):
+# el cloché baja hasta las cejas, así que la cara va una fila más abajo: cejas finas, pestañas con
+# rabillo, ojos azules, nariz pequeña y labios rojos
+cu.head(M, SKIN, SKIN_SH, ears=False, fem=True, nose=False)
+cu.face_art(M, 74, [
+    '..L..........L..',                    # 74: rabillo de las pestañas
+    '..LLL......LLL..',                    # 73: pestañas, solo por fuera (enteras daban cara de sueño)
+    '..wppw....wppw..',                    # 72: ojos
+    '..wiiw....wiiw..',
+    '................',
+    '..cc........cc..',                    # 69: mejillas
+    '................',
+    '......rrrr......',                    # 67: labios
+    '.......ll.......',
+], {'L': LASH, 'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'c': CHEEK, 'r': LIP, 'l': LIP_LO})
+cu.face_art(M, 75, [                       # en relieve
+    '...bbb....bbb...',                    # 75: cejas finas, justo bajo el ala
+    '................',
+    '................',
+    '................',
+    '.......nn.......',                    # 71: nariz pequeña
+    '.......ss.......',
+], {'b': BROW, 'n': SKIN, 's': SKIN_SH}, dz=1)
 cu.bob(M, HAIR, bottom=67, top=80, fringe=78, side_z=3)
 cu.long_hair(M, HAIR, bottom=56, sh=tuple(c * 0.85 for c in HAIR))   # melena ondulada hasta los hombros
 cu.hair_back(M, SKIN, HAIR, top=80, zmax=2)
@@ -60,5 +80,5 @@ slab(M, H, HATBAND, 80, 83, 6.5, 6, 2.5, 2.5, 3, 3, ch=0)                # lazo
 cu.seams(M, (COAT,))
 cu.finish(M, 'blake', {COAT: 'lana', COAT_SH: 'lana', SCARF: 'punto', SCARF_SH: 'punto', HAT: 'lana',
                        HAT_SH: 'lana', SHOE: 'cuero', SOLE: 'cuero', HAIR: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
-          flat=(LIP, BROW, CHEEK, BUTTON, PEN, HATBAND, STOCKING), ax=AX,
+          flat=(LIP, LIP_LO, BROW, LASH, IRIS, CHEEK, BUTTON, PEN, HATBAND, STOCKING), ax=AX,
           hat=(HAT_SH, HAT, HATBAND,))

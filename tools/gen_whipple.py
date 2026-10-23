@@ -17,7 +17,8 @@ STETH = (0.18, 0.18, 0.20); STETH_M = (0.72, 0.74, 0.76)
 HAIR = (0.36, 0.21, 0.13)
 STOCKING = (0.72, 0.60, 0.53); SHOE = (0.08, 0.07, 0.07); SOLE = (0.03, 0.03, 0.03)
 SKIN = (0.90, 0.72, 0.60); SKIN_SH = (0.80, 0.62, 0.51); LIP = (0.66, 0.36, 0.36); CHEEK = (0.88, 0.62, 0.53)
-BROW = (0.30, 0.18, 0.11); FRAME = (0.70, 0.62, 0.44)      # montura fina de metal claro
+BROW = (0.30, 0.18, 0.11); FRAME = (0.58, 0.40, 0.22)      # montura de bronce
+IRIS = (0.30, 0.20, 0.11); LIP_LO = (0.76, 0.44, 0.44)
 PEN = (0.20, 0.30, 0.55)
 AX = cu.ARM_X_F
 
@@ -47,16 +48,29 @@ for x in (-4, -3, 2, 3): cu.front(M, x, 61, STETH, dz=1)
 for x, y in ((-4, 50), (-3, 50), (-4, 49), (-3, 49)): cu.front(M, x, y, STETH_M, dz=1)
 
 cu.arms(M, COAT, SKIN, cuff=COAT_SH, cuff_wide=False, ax=AX, slim=True)
-cu.head(M, SKIN, SKIN_SH, ears=False, fem=True)
-cu.eyes(M, BROW, brow_style='recta', lashes=cu.EYE)
-cu.cheeks(M, CHEEK, y=70)
-cu.lips(M, LIP)
-# gafas: montura clara a los lados y en el puente (oscura parecía un antifaz)
-# gafas: montura clara y fina alrededor de cada ojo, pintada (oscura parecía un antifaz)
-for x0 in (-6, 1):
-    for x in range(x0, x0 + 5): cu.paint_face(M, x, 72, FRAME)
-    for y in (73, 74, 75): cu.paint_face(M, x0, y, FRAME); cu.paint_face(M, x0 + 4, y, FRAME)
-for x in (-1, 0): cu.paint_face(M, x, 75, FRAME)                         # puente
+# cara rehecha el 23-10-2026 como la de Legrasse (referencias tools/local/ref_cabeza_whipple_*):
+# cejas rectas, gafas redondas de montura de bronce (clara se perdía en la piel y oscura parecía
+# un antifaz) con los ojos dentro, nariz pequeña y labios
+cu.head(M, SKIN, SKIN_SH, ears=False, fem=True, nose=False)
+cu.face_art(M, 77, [                       # en relieve
+    '...bbb....bbb...',                    # 77: cejas rectas
+    '................',
+    '................',
+    '................',
+    '.......nn.......',                    # 73: nariz pequeña
+    '.......ss.......',
+], {'b': BROW, 'n': SKIN, 's': SKIN_SH}, dz=1)
+cu.face_art(M, 75, [                       # pintado (después del relieve: el puente va sobre la nariz)
+    '..gggg....gggg..',                    # 75: gafas redondas
+    '.gwppwggggwppwg.',                    # 74: ojos dentro, y el puente
+    '.gwiiwg..gwiiwg.',
+    '..gggg....gggg..',
+    '..cc........cc..',                    # 71: mejillas
+    '................',
+    '................',
+    '......rrrr......',                    # 68: labios
+    '.......ll.......',
+], {'g': FRAME, 'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'c': CHEEK, 'r': LIP, 'l': LIP_LO})
 # pelo castaño recogido: raya en medio, tapa las orejas, y moño alto en la nuca
 cu.hair_back(M, SKIN, HAIR, top=82, zmax=2)
 slab(M, H, HAIR, 78, 81, 0, 0.5, 14.5, 14, 15, 14.5, ch=2)
@@ -74,4 +88,4 @@ slab(M, H, (0.26, 0.15, 0.09), 82, 83, 0, -6.5, 8.5, 8.5, 7.5, 7.5, ch=2)  # cin
 cu.seams(M, (COAT,))
 cu.finish(M, 'whipple', {COAT: 'lona', COAT_SH: 'lona', DRESS: 'lana', DRESS_SH: 'lana', SHOE: 'cuero',
                          SOLE: 'cuero', HAIR: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
-          flat=(LIP, BROW, CHEEK, FRAME, PEN, STETH, STETH_M, STOCKING), ax=AX)
+          flat=(LIP, LIP_LO, BROW, IRIS, CHEEK, FRAME, PEN, STETH, STETH_M, STOCKING), ax=AX)
