@@ -918,3 +918,10 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - El tiempo de la ráfaga cuenta desde el arranque de la portada (`t=` los adelanta igual). Vídeo de todo junto: `shots/videos/portada_ambiente.mp4`.
   - Ojo: la medición `title perf=` da 120-140 ms por fotograma en esta sesión con todo apagado y también con la versión anterior; no es de estos efectos, pero conviene repetirla con la ventana en primer plano.
 - **Herramientas sin avisos de autoloads (18-10-2026):** `tools/render_mapa.gd` sacaba "Identifier not found: Sfx" (y luego `Settings`, `Saves`) porque con `-s` no hay autoloads y el jugador, las armas, los enemigos y los efectos los nombraban directamente. Ahora pasan por `Auto` (`scripts/core/auto.gd`: `sfx`, `sfx_at`, `setting`, `node`). Los mapas salían bien igualmente; ahora la salida queda limpia.
+
+## Ideas propuestas y sin hacer (23-10-2026)
+
+Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
+- `tools/marcas.py`: juntar los registros de los dos PC en una sola lista ordenada por hora.
+- La marca (F9, LB+RB) guarda una captura pequeña en la carpeta de registros.
+- `tools/marcas.py` avisa si un registro no tiene «Fin de la sesión» (el juego se cerró de golpe).
