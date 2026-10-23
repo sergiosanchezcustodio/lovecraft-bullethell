@@ -95,6 +95,7 @@ func _show_choice() -> void:
 	var create := _button("Crear sala", _host)
 	_button("Unirse a una sala", _show_join)
 	_text("La primera vez, Windows puede preguntar si deja pasar la conexión: acepta en redes privadas y públicas.", 17, UiKit.TEXT_DIM)
+	_text("Si ves algo raro jugando, pulsa F9 o mantén LB+RB: queda una marca en los registros de conexión de todos.", 17, UiKit.TEXT_DIM)
 	if DirAccess.dir_exists_absolute(NetLog.DIR):     # registros de partidas anteriores (para enviarlos si algo falló)
 		var logs := MenuKit.button("Abrir la carpeta de registros de conexión", MenuKit.INK, 18)
 		logs.custom_minimum_size = Vector2(420, 42)

@@ -23,6 +23,7 @@ Guía para los jugadores (hito 9.6c). Hasta cuatro jugadores en total, repartido
 - **Cada PC tiene su cámara** y sigue a sus jugadores. Los de otros PC que no se ven tienen una **flecha** en el borde con su distancia; si están derribados, la flecha late: ¡id a levantarlos!
 - En el panel de cada jugador de otro PC se ve su PC y su **ping**: verde (bien), amarillo (se nota algo) o rojo (más de 250 ms: el juego sigue, pero los enemigos se ven con algo de retraso).
 - **Subidas de nivel y pausa paran la partida en todos los PC.** Quien sube elige en su pantalla; si tarda más de 30 s, el anfitrión puede elegir en su lugar.
+- **Si ves algo raro**, pulsa **F9** o mantén **LB+RB**: queda una marca en los registros de todos los PC (y los demás ven «… ha puesto una marca»). Así es fácil encontrar el momento al revisarlo.
 - La versión del juego sale también abajo a la derecha de la pausa: apúntala si avisas de un fallo.
 - **Dinero, logros y estadísticas** se guardan en la partida de cada uno. **El avance de la campaña** (niveles superados) solo en la del anfitrión.
 
