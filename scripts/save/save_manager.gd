@@ -48,6 +48,7 @@ func save() -> bool:
 	if slot < 0 or current == null: return false
 	DirAccess.make_dir_recursive_absolute(dir)
 	current.updated = Time.get_datetime_string_from_system()
+	current.saved_with = SaveData.game_version()
 	var tmp := path(slot) + ".tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f == null:

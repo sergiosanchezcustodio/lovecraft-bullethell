@@ -75,3 +75,14 @@ func test_la_partida_de_pruebas_lo_tiene_todo() -> void:
 	assert_true(d.has_level("p3_n5"))
 	var normal := SaveData.create()
 	assert_false(normal.has_level("p1_n2"))
+
+func test_guarda_la_version_del_juego() -> void:
+	var s := SaveData.create()
+	assert_eq(s.created_with, SaveData.game_version())
+	assert_ne(s.created_with, "")
+	s.saved_with = "9.9.9"
+	var back := SaveData.from_dict(JSON.parse_string(JSON.stringify(s.to_dict())))
+	assert_eq(back.created_with, s.created_with)
+	assert_eq(back.saved_with, "9.9.9")
+	var old := SaveData.from_dict({"version": 1, "created": "2026-09-01T10:00:00", "money": 5})
+	assert_eq(old.created_with, "", "las partidas de antes no saben con qué versión se crearon")

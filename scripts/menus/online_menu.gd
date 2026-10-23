@@ -98,7 +98,7 @@ func _show_choice() -> void:
 	if DirAccess.dir_exists_absolute(NetLog.DIR):     # registros de partidas anteriores (para enviarlos si algo falló)
 		var logs := MenuKit.button("Abrir la carpeta de registros de conexión", MenuKit.INK, 18)
 		logs.custom_minimum_size = Vector2(420, 42)
-		logs.pressed.connect(func() -> void: OS.shell_open(ProjectSettings.globalize_path(NetLog.DIR)))
+		logs.pressed.connect(NetLog.open_folder)
 		var row := CenterContainer.new()
 		row.add_child(logs)
 		_box.add_child(row)

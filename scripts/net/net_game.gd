@@ -1064,8 +1064,14 @@ func _seat_name(i: int) -> String:
 
 ## Qué ha parado la partida, en pocas palabras (registro).
 func _halt_text(d: Dictionary) -> String:
-	if d.get("k") == "lvup": return "subida de J%d" % (int(d.get("i", 0)) + 1)
-	return "pausa de %s" % _seat_name_of_peer(int(d.get("peer", 1)))
+	if d.get("k") == "lvup": return "subida de J%d · %s" % [int(d.get("i", 0)) + 1, _where()]
+	return "pausa de %s · %s" % [_seat_name_of_peer(int(d.get("peer", 1))), _where()]
+
+## Nivel y minuto de partida ("p1_n3 2:14"): para encontrar en el registro lo que cuenta un jugador.
+func _where() -> String:
+	var lv: Variant = game.get("level")
+	var t := int(game.director.time) if game.director != null else 0
+	return "%s %d:%02d" % [String((lv as LevelData).id) if lv is LevelData else "?", t / 60, t % 60]
 
 func _seat_name_of_peer(peer: int) -> String:
 	return String(net.peers.get(peer, {}).get("name", "PC %d" % peer))

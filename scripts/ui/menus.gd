@@ -174,6 +174,7 @@ class EndScreen extends CanvasLayer:
 	var has_next := false                       ## "Siguiente nivel", primero y con el foco
 	var waiting := ""                           ## en red, un invitado: este aviso y solo "Salir"
 	var leave_text := "Salir de la partida"     ## el botón de salir, con `waiting`
+	var logs_button := false                    ## con `waiting`: botón de la carpeta de registros de red
 	var title := ""
 	var lines: PackedStringArray = []
 	var accent := UiKit.GOLD
@@ -212,6 +213,12 @@ class EndScreen extends CanvasLayer:
 			leave.size_flags_horizontal = Control.SIZE_SHRINK_CENTER   # no tan ancho como un título largo
 			leave.pressed.connect(func() -> void: quit.emit())
 			box.add_child(leave)
+			if logs_button:                           # se cortó: el registro es lo que hay que enviar
+				var logs := UiKit.button("Abrir la carpeta de registros de conexión", UiKit.TEXT_DIM, 18)
+				logs.custom_minimum_size = Vector2(420, 44)
+				logs.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+				logs.pressed.connect(NetLog.open_folder)
+				box.add_child(logs)
 			box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
 			leave.grab_focus.call_deferred()
 			return

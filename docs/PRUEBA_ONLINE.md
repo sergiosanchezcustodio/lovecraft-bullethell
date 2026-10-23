@@ -38,4 +38,4 @@ Mirad en cada PC y apuntad cualquier cosa rara:
 ## Después
 
 - [ ] Cada uno abre *Jugar online → Abrir la carpeta de registros de conexión* y me pasa el registro más reciente (`red_<fecha>.log`) y, si hubo algún error, también `godot.log` (la carpeta de arriba).
-- [ ] Apunta la hora aproximada de cualquier cosa rara: el registro tiene la hora en cada línea, y cada 5 s el estado de la partida, el ping y lo que se manda.
+- [ ] Apunta la hora aproximada de cualquier cosa rara (o pulsa pausa justo después: el registro apunta cada pausa con el nivel y el minuto): el registro tiene la hora en cada línea, y cada 5 s el estado de la partida, el ping y lo que se manda.

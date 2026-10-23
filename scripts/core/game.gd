@@ -1439,6 +1439,7 @@ func net_closed(reason: String) -> void:
 	var s := Menus.EndScreen.new(reason, lines, Color(0.95, 0.55, 0.3))
 	s.waiting = "Lo conseguido queda guardado en tu partida"
 	s.leave_text = "Menú principal"
+	s.logs_button = reason != "El anfitrión ha cerrado la partida"   # un corte: el registro sirve
 	s.quit.connect(_quit)
 	add_child(s)
 	if args.get_bool("halt_shots"): _halt_shot()

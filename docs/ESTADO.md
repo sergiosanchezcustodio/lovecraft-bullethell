@@ -467,6 +467,10 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
     - **Versión en la pausa**, abajo a la derecha (`shots/game_pausa96_parada1.png`).
     - **`tools/exportar.sh` pregunta la versión** antes de exportar (Intro la deja); `sh tools/exportar.sh 0.9.1` la cambia sin preguntar y, sin terminal, deja la que hay.
     - Test `test_otras_versiones_en_la_sala`. Builds rehechas.
+  - **Registro, guardado y pantalla final (23-10-2026):**
+    - **Paradas con nivel y minuto** en el registro de red: «parada: pausa de Ana · p1_n3 2:14» (también las subidas), para encontrar lo que cuente un jugador (`NetGame._where`).
+    - **Versión en el guardado:** `SaveData.created_with` (al crear la partida) y `saved_with` (al guardar por última vez). Campos nuevos con valor por defecto, sin cambiar el formato (`VERSION` sigue en 1); las partidas de antes quedan con `created_with` vacío. Test `test_guarda_la_version_del_juego`.
+    - **Botón de la carpeta de registros en la pantalla final del invitado** cuando la conexión se corta (no cuando el anfitrión cierra con normalidad): `EndScreen.logs_button`, `NetLog.open_folder` (la usa también *Jugar online*). Probado matando el anfitrión a mitad de nivel: `shots/game_corte96_inv_parada2.png`.
   - **Hito 9.6a (carga con 4 jugadores): hecho (22-10-2026).**
     - **Medir:** `NetSession` cuenta lo que manda a cada PC y por tipo de mensaje (`sent_to`, `sent_type`, con 40 B de cabeceras por paquete) y lo que sale de verdad ya comprimido (`wire_sent`, de las estadísticas de ENet). Con `log=true`, el registro cada 5 s da `sale=… kB/s (Ana 6.0, Luis 6.0) real=…` y, al salir, la media y el pico por PC y el reparto por tipo. Con `prof=true`, la red sale en el perfil: `red_envia` (con `red_foto`, construir la foto), `red_recibe` y `red`.
     - **Compresión:** ENet comprime ahora todo con su range coder (`NetSession.compression`; `net_compress=none|range|fastlz|zlib|zstd` para comparar). Con 75 vivos y un invitado: 25,6 kB/s sin comprimir, 17,7 con range coder y 17,7 con ZSTD. Si un PC de una versión anterior intenta entrar, ya no le sale «Versión distinta»: no se entienden ni para eso.

@@ -38,6 +38,10 @@ func open(role: String, detail: String) -> void:
 	line("Versión %s · protocolo %d · %s %s" % [ProjectSettings.get_setting("application/config/version", "?"),
 		NetSession.PROTOCOL, OS.get_name(), OS.get_version()])
 
+## Abre la carpeta de registros en el explorador (menú online y pantalla final del invitado).
+static func open_folder() -> void:
+	OS.shell_open(ProjectSettings.globalize_path(DIR))
+
 func is_open() -> bool:
 	return _f != null
 

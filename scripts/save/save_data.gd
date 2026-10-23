@@ -8,6 +8,10 @@ const VERSION := 1
 
 var created := ""                        ## fecha de creación (ISO)
 var updated := ""                        ## última vez que se guardó
+## Versión del juego (application/config/version) al crear la partida y al guardarla por última
+## vez: si cambia el formato, se sabe de dónde viene. Vacía en las partidas de antes de guardarla.
+var created_with := ""
+var saved_with := ""
 var play_time := 0.0                     ## s jugados en total (solo en partida)
 var money := 0                           ## dinero de la tienda: sobrevive a la muerte
 var purchases := {}                      ## id de artículo -> nivel comprado
@@ -31,6 +35,8 @@ static func create() -> SaveData:
 	var d := SaveData.new()
 	d.created = Time.get_datetime_string_from_system()
 	d.updated = d.created
+	d.created_with = game_version()
+	d.saved_with = d.created_with
 	return d
 
 ## Partida de pruebas con todo desbloqueado y dinero de sobra.
@@ -81,6 +87,7 @@ func items_bought() -> int:
 
 func to_dict() -> Dictionary:
 	return {"version": VERSION, "created": created, "updated": updated, "play_time": play_time,
+		"created_with": created_with, "saved_with": saved_with,
 		"money": money, "purchases": purchases, "pets": pets, "characters": characters,
 		"levels_won": levels_won, "stats": stats, "unlock_all": unlock_all, "achievements": achievements,
 		"seen": seen, "outfits": outfits, "worn": worn, "toggles": toggles}
@@ -92,6 +99,8 @@ static func from_dict(d: Dictionary) -> SaveData:
 	d = migrate(d)
 	s.created = str(d.get("created", ""))
 	s.updated = str(d.get("updated", s.created))
+	s.created_with = str(d.get("created_with", ""))
+	s.saved_with = str(d.get("saved_with", ""))
 	s.play_time = float(d.get("play_time", 0.0))
 	s.money = int(d.get("money", 0))
 	s.purchases = d.get("purchases", {})
@@ -112,6 +121,9 @@ static func from_dict(d: Dictionary) -> SaveData:
 	# JSON guarda los enteros como float: los niveles comprados se vuelven a enteros
 	for k in s.purchases: s.purchases[k] = int(s.purchases[k])
 	return s
+
+static func game_version() -> String:
+	return String(ProjectSettings.get_setting("application/config/version", ""))
 
 ## Migraciones entre versiones del formato. Cada cambio de formato sube VERSION y añade
 ## aquí su paso (versión N -> N+1).

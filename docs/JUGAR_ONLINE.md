@@ -52,7 +52,7 @@ El juego usa el **puerto UDP 24680** (si está ocupado, el siguiente: 24681… h
 
 ## Registros de conexión
 
-Cada partida online deja un registro en la carpeta de registros (botón **Abrir la carpeta de registros de conexión** en *Jugar online*; en Windows, `%APPDATA%\Godot\app_userdata\Lovecraft Bullet Hell\logs\red`). Si algo va mal, envía el de esa partida (el más reciente) y, si puedes, el `godot.log` de la carpeta de arriba. Los registros llevan las IP de la partida.
+Cada partida online deja un registro en la carpeta de registros (botón **Abrir la carpeta de registros de conexión** en *Jugar online*; en Windows, `%APPDATA%\Godot\app_userdata\Lovecraft Bullet Hell\logs\red`). Si se corta la conexión, el botón también sale en la pantalla final. Si algo va mal, envía el de esa partida (el más reciente) y, si puedes, el `godot.log` de la carpeta de arriba. Los registros llevan las IP de la partida.
 
 ## Texto para itch.io
 
