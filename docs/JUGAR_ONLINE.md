@@ -1,6 +1,6 @@
 # Jugar online
 
-Guía para los jugadores (hito 9.6c). Hasta cuatro jugadores en total, repartidos entre uno y cuatro PC: por ejemplo, dos en el sofá de un PC y otros dos, cada uno en su casa. Un PC crea la sala (el **anfitrión**) y los demás se unen con un código (los **invitados**). Todos tienen que tener la misma versión del juego.
+Guía para los jugadores (hito 9.6c). Hasta cuatro jugadores en total, repartidos entre uno y cuatro PC: por ejemplo, dos en el sofá de un PC y otros dos, cada uno en su casa. Un PC crea la sala (el **anfitrión**) y los demás se unen con un código (los **invitados**). Todos tienen que tener la misma versión del juego: sale abajo a la derecha del menú principal (por ejemplo, `v0.9.0`).
 
 ## Crear una sala (anfitrión)
 
@@ -15,7 +15,8 @@ Guía para los jugadores (hito 9.6c). Hasta cuatro jugadores en total, repartido
 
 1. Menú principal → **Jugar** → **Jugar online** → **Unirse a una sala**.
 2. Escribe o pega el código (con el mando, elige las letras con el selector). También vale una IP, como `83.45.201.7`.
-3. Ya en la sala, cada jugador de tu PC se une con **Start** (o **Intro**) y elige personaje y compañero con sus desbloqueos.
+3. Arriba a la derecha de la sala están los conectados con su ping. Si alguien pasa de 250 ms sale en rojo con «(lenta)»: se puede jugar, pero se notará algo de retraso. Si alguien tiene otra versión, sale a su lado en rojo (y el invitado lo ve también debajo del nombre de la sala): actualizad los dos a la misma antes de empezar.
+4. Ya en la sala, cada jugador de tu PC se une con **Start** (o **Intro**) y elige personaje y compañero con sus desbloqueos.
 
 ## Durante la partida
 
@@ -43,7 +44,8 @@ El juego usa el **puerto UDP 24680** (si está ocupado, el siguiente: 24681… h
 | Mensaje | Qué pasa |
 |---|---|
 | «No responde nadie en esa dirección» | Código o IP mal escritos, el anfitrión ha cerrado la sala o el puerto no está abierto. |
-| «Versión distinta del juego: actualizad los dos a la misma» | Uno tiene una versión más nueva. Si la diferencia es grande, puede que ni siquiera salga este mensaje: comprobad las versiones. |
+| «Versión distinta del juego: actualizad los dos a la misma» | Uno tiene una versión más nueva. Si la diferencia es grande, puede que ni siquiera salga este mensaje: comprobad las versiones (abajo a la derecha del menú principal). |
+| «El anfitrión tiene la v… y tú la v…: usad la misma» (en la sala) | Os entendéis, pero el juego no es el mismo: la partida puede ir distinta en cada PC. |
 | «La sala está llena» | Ya hay cuatro jugadores. |
 | «La partida ya ha empezado: espera a que vuelvan a la sala» | Solo puede entrar con la partida empezada quien se fue de ella. |
 

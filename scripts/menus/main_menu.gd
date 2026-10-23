@@ -39,6 +39,13 @@ func _ready() -> void:
 		l.offset_left = 24
 		l.offset_top = -44
 		add_child(l)
+	var ver := UiKit.label("v" + String(ProjectSettings.get_setting("application/config/version", "?")), 18, UiKit.TEXT_DIM)
+	ver.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)   # la versión: en red, la misma en todos los PC
+	ver.offset_left = -140
+	ver.offset_right = -24
+	ver.offset_top = -44
+	ver.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	add_child(ver)
 	var h := MenuKit.hint("A o Intro: elegir  ·  B o Esc: cambiar de partida")
 	h.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	h.offset_top = -40

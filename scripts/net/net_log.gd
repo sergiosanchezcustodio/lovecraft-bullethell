@@ -35,7 +35,8 @@ func open(role: String, detail: String) -> void:
 	_known.clear()
 	if _f == null: return
 	line("%s · %s" % [role, detail])
-	line("Protocolo %d · %s %s" % [NetSession.PROTOCOL, OS.get_name(), OS.get_version()])
+	line("Versión %s · protocolo %d · %s %s" % [ProjectSettings.get_setting("application/config/version", "?"),
+		NetSession.PROTOCOL, OS.get_name(), OS.get_version()])
 
 func is_open() -> bool:
 	return _f != null
@@ -55,7 +56,7 @@ func close(reason := "") -> void:
 func roster(peers: Dictionary, me: int) -> void:
 	for id: int in peers:
 		if id != me and not _known.has(id):
-			line("Entra %s (PC %d)" % [peers[id].get("name", "?"), id])
+			line("Entra %s (PC %d, versión %s)" % [peers[id].get("name", "?"), id, peers[id].get("ver", "?")])
 	for id: int in _known:
 		if not peers.has(id): line("Se va %s (PC %d)" % [_known[id], id])
 	_known.clear()

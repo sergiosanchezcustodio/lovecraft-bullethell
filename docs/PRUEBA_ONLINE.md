@@ -4,7 +4,7 @@ Lista para tu prueba real con otra persona (hito 9.6c). Es lo que falta para dar
 
 ## Antes
 
-- [ ] Los dos con la **misma build** (la de `builds/windows/` o `builds/macos/`, hecha el mismo día). Si no coinciden, no se entienden.
+- [ ] Los dos con la **misma build** (la de `builds/windows/` o `builds/macos/`): comprobad que la versión de abajo a la derecha del menú principal es la misma (`v0.9.0`).
 - [ ] Cada uno con su partida guardada (un hueco cualquiera). El avance de la campaña cuenta en la del anfitrión.
 - [ ] Hablando por voz aparte (Discord, teléfono): es lo más cómodo para comentar lo que veis.
 - [ ] Ten a mano `docs/JUGAR_ONLINE.md` por si el router no abre el puerto solo.
@@ -13,7 +13,7 @@ Lista para tu prueba real con otra persona (hito 9.6c). Es lo que falta para dar
 
 - [ ] Crea la sala. Apunta lo que dice debajo del código (UPnP): «Puerto 24680 abierto» o el motivo por el que no.
 - [ ] Si no lo abre: puerto UDP 24680 a mano en el router y la IP pública, o una red virtual (Tailscale, ZeroTier, Radmin VPN).
-- [ ] La otra persona entra con el código. Apunta el ping que ve cada uno en la sala.
+- [ ] La otra persona entra con el código. Apunta el ping que ve cada uno en la sala (arriba a la derecha; en rojo y con «(lenta)» si pasa de 250 ms).
 - [ ] Mezclad locales y remotos: al menos un PC con **dos jugadores** (dos mandos, o mando y teclado).
 
 ## Partida (una parte entera, mejor la 1)

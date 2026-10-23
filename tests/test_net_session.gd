@@ -148,12 +148,12 @@ func test_registro_de_red_en_un_fichero() -> void:
 	lg.dir = "user://logs/red_prueba_registro"
 	for f in DirAccess.get_files_at(lg.dir): DirAccess.remove_absolute(lg.dir + "/" + f)
 	lg.open("Anfitrión", "Ana, puerto 24680")
-	lg.roster({1: {"name": "Ana"}, 7: {"name": "Luis"}}, 1)
+	lg.roster({1: {"name": "Ana"}, 7: {"name": "Luis", "ver": "0.9.0"}}, 1)
 	lg.roster({1: {"name": "Ana"}}, 1)
 	lg.close("prueba")
 	var text := FileAccess.get_file_as_string(lg.path)
 	assert_string_contains(text, "Anfitrión · Ana, puerto 24680")
-	assert_string_contains(text, "Entra Luis (PC 7)")
+	assert_string_contains(text, "Entra Luis (PC 7, versión 0.9.0)")
 	assert_string_contains(text, "Se va Luis (PC 7)")
 	assert_string_contains(text, "Fin de la sesión: prueba")
 	for k in NetLog.KEEP + 3:                        # se quedan los últimos

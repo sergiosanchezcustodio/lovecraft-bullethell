@@ -215,6 +215,8 @@ class PlayerPanel extends PanelContainer:
 		_net_dot = UiKit.label("●", 20, PING_OK)
 		_net_row.add_child(_net_dot)
 		_net_lbl = UiKit.label("", 14, UiKit.TEXT)
+		for l: Label in [_net_dot, _net_lbl]:                   # se lee también sobre la nieve
+			l.add_theme_constant_override("outline_size", 5)
 		_net_row.add_child(_net_lbl)
 		_net_row.visible = false
 		box.add_child(_net_row)

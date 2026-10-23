@@ -61,7 +61,7 @@ var _wait_dim: ColorRect                     ## oscurece los marcos detrás del 
 var _room_code: Label                        ## "Sala", "Sala de …"
 var _room_code_val: Label                    ## el código, en la letra del texto: la de los títulos dibuja el 0 como una o
 var _room_status: Label
-var _room_list: Label
+var _room_list: RichTextLabel                ## quién está, con el ping de color y si tiene otra versión
 
 func _ready() -> void:
 	args = LaunchArgs.from_cmdline()
@@ -390,11 +390,17 @@ func _build_room() -> void:
 	_room_status.size = Vector2(620, 24)
 	_room_status.clip_text = true
 	_stage.add_child(_room_status)
-	_room_list = UiKit.label("", 17, UiKit.TEXT)
-	_room_list.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_room_list.position = Vector2(DESIGN.x - 640, 54)
-	_room_list.size = Vector2(612, 24)
-	_room_list.clip_text = true
+	_room_list = RichTextLabel.new()
+	_room_list.bbcode_enabled = true
+	_room_list.scroll_active = false
+	_room_list.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_room_list.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_room_list.add_theme_font_size_override("normal_font_size", 17)
+	_room_list.add_theme_color_override("default_color", UiKit.TEXT)
+	_room_list.add_theme_color_override("font_outline_color", Color(0.01, 0.01, 0.02))
+	_room_list.add_theme_constant_override("outline_size", 2)
+	_room_list.position = Vector2(DESIGN.x - 740, 54)
+	_room_list.size = Vector2(712, 28)
 	_stage.add_child(_room_list)
 	_wait_dim = ColorRect.new()
 	_wait_dim.color = Color(0.0, 0.0, 0.02, 0.62)
@@ -450,15 +456,24 @@ func _fill_room() -> void:
 		_room_code_val.text = ""
 		var ping := int(Net.peers.get(Net.my_id, {}).get("ping", 0))
 		_room_status.text = ("Ping %d ms" % ping) if ping > 0 else ("Conectando…" if Net.state != NetSession.State.CONNECTED else "Midiendo el ping…")
+		if ping > Hud.PlayerPanel.PING_FAIR_MS: _room_status.text += "  ·  conexión lenta: se notará algo de retraso"
+		var host_ver := String(Net.peers.get(1, {}).get("ver", Net.version))
+		if host_ver != Net.version:                      # se entienden, pero el juego puede ser otro
+			_room_status.text = "El anfitrión tiene la v%s y tú la v%s: usad la misma" % [host_ver, Net.version]
 	var ids := Net.peers.keys()
 	ids.sort()
 	var names := PackedStringArray()
 	for id in ids:
 		var p: Dictionary = Net.peers[id]
-		var who := String(p.name) + (" (tú)" if id == Net.my_id else "")
-		if id != 1 and int(p.ping) > 0: who += " %d ms" % int(p.ping)
+		var who := String(p.name).replace("[", "(") + (" (tú)" if id == Net.my_id else "")
+		var ms := int(p.ping)
+		if id != 1 and ms > 0:                           # con el color de los paneles; lenta, dicho
+			who += " [color=#%s]%d ms%s[/color]" % [Hud.PlayerPanel.ping_color(ms).to_html(false), ms,
+				" (lenta)" if ms > Hud.PlayerPanel.PING_FAIR_MS else ""]
+		var ver := String(p.get("ver", Net.version))
+		if ver != Net.version: who += " [color=#%s](v%s)[/color]" % [Hud.PlayerPanel.PING_BAD.to_html(false), ver]
 		names.append(who)
-	_room_list.text = "En la sala: " + "  ·  ".join(names)
+	_room_list.text = "[right]En la sala: %s  ·  v%s[/right]" % ["  ·  ".join(names), Net.version]
 
 func _is_copy(event: InputEvent) -> bool:
 	if event is InputEventJoypadButton:

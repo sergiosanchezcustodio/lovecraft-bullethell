@@ -30,7 +30,7 @@ signal message(from: int, type: int, data: Variant)   ## mensajes de la partida 
 enum State { OFF, HOSTING, CONNECTING, CONNECTED }
 enum Msg { HELLO = 1, WELCOME, REJECT, ROSTER, PING, PONG }
 const USER := 16                             ## primer tipo libre para la partida
-const PROTOCOL := 8                          ## súbelo al cambiar el formato de cualquier mensaje
+const PROTOCOL := 9                          ## súbelo al cambiar el formato de cualquier mensaje
 const MAX_PLAYERS := 4                       ## jugadores en total, sumando los de cada PC
 const HELLO_TIMEOUT := 5.0                   ## s para presentarse tras conectar
 const CONNECT_TIMEOUT := 8.0                 ## s para conectar con el anfitrión
@@ -60,6 +60,9 @@ var lag_ms := 0
 var sent_to := {}                            ## PC -> bytes
 var sent_type := {}                          ## tipo -> bytes (a todos)
 const PACKET_OVERHEAD := 40                  ## B: IP 20 + UDP 8 + ENet ~12
+## Versión del juego (application/config/version): viaja al entrar y la sala avisa si no coincide
+## (con el mismo protocolo se entienden, pero los datos del juego pueden ser otros).
+var version := String(ProjectSettings.get_setting("application/config/version", "?"))
 var netlog := NetLog.new()                   ## registro de la sesión en user://logs/red/ (hito 9.6c)
 var wire_sent := 0                           ## B que de verdad salen (ENet, ya comprimidos, sin IP ni UDP)
 ## Compresión de ENet (hito 9.6a): la misma en todos los PC, o no se entienden.
@@ -83,6 +86,7 @@ func _ready() -> void:
 	lag_ms = la.get_int("net_lag", 0)
 	loss = la.get_float("net_loss", 0.0)
 	roster_changed.connect(func() -> void: if netlog.is_open(): netlog.roster(peers, my_id))
+	if la.has("net_version"): version = la.get_str("net_version")   # pruebas: otra versión
 	if la.has("net_compress"): compression = COMPRESSIONS.get(la.get_str("net_compress"), compression)   # pruebas
 	if la.has("net_name"): player_name = la.get_str("net_name").left(20)   # pruebas: dos copias en el mismo PC
 	if player_name == DEFAULT_NAME:                  # nombre del usuario del PC, si no se ha dado otro
@@ -119,7 +123,7 @@ func host(p_port: int = RoomCode.BASE_PORT, use_upnp: bool = true) -> Error:
 	state = State.HOSTING
 	my_id = 1
 	accepting = true
-	peers = {1: {"name": player_name, "locals": locals, "ping": 0}}
+	peers = {1: {"name": player_name, "locals": locals, "ping": 0, "ver": version}}
 	local_ip = RoomCode.local_ip()
 	external_ip = ""
 	upnp_ok = false
@@ -272,7 +276,7 @@ func _on_peer_disconnected(id: int) -> void:
 		roster_changed.emit()
 
 func _on_connected() -> void:
-	_send(1, Msg.HELLO, {"proto": protocol, "name": player_name, "locals": locals}, true)
+	_send(1, Msg.HELLO, {"proto": protocol, "name": player_name, "locals": locals, "ver": version}, true)
 
 func _on_connection_failed() -> void:
 	_end_later("No se pudo conectar con el anfitrión", true)
@@ -373,7 +377,8 @@ func _on_hello(from: int, data: Variant) -> void:
 			if _api != null and _api.get_peers().has(from): _api.disconnect_peer(from)
 		get_tree().create_timer(0.3).timeout.connect(kick)   # que llegue el motivo antes de cortar
 		return
-	peers[from] = {"name": String(data.get("name", "Jugador")).left(20), "locals": maxi(back, 1), "ping": 0}
+	peers[from] = {"name": String(data.get("name", "Jugador")).left(20), "locals": maxi(back, 1), "ping": 0,
+		"ver": String(data.get("ver", "?")).left(16)}
 	_send(from, Msg.WELCOME, {"id": from, "late": back > 0}, true)
 	_send_roster()
 	roster_changed.emit()
