@@ -142,3 +142,35 @@ func test_nadie_en_la_direccion_falla_sin_colgarse() -> void:
 	c.join("127.0.0.1", PORT + 1)                     # ahí no escucha nadie
 	assert_true(await _until(func() -> bool: return not why.is_empty(), NetSession.CONNECT_TIMEOUT + 2.0))
 	assert_eq(c.state, NetSession.State.OFF)
+
+func test_registro_de_red_en_un_fichero() -> void:
+	var lg := NetLog.new()
+	lg.dir = "user://logs/red_prueba_registro"
+	for f in DirAccess.get_files_at(lg.dir): DirAccess.remove_absolute(lg.dir + "/" + f)
+	lg.open("Anfitrión", "Ana, puerto 24680")
+	lg.roster({1: {"name": "Ana"}, 7: {"name": "Luis"}}, 1)
+	lg.roster({1: {"name": "Ana"}}, 1)
+	lg.close("prueba")
+	var text := FileAccess.get_file_as_string(lg.path)
+	assert_string_contains(text, "Anfitrión · Ana, puerto 24680")
+	assert_string_contains(text, "Entra Luis (PC 7)")
+	assert_string_contains(text, "Se va Luis (PC 7)")
+	assert_string_contains(text, "Fin de la sesión: prueba")
+	for k in NetLog.KEEP + 3:                        # se quedan los últimos
+		lg.open("Invitado", str(k))
+		lg.close()
+	assert_eq(DirAccess.get_files_at(lg.dir).size(), NetLog.KEEP)
+	for f in DirAccess.get_files_at(lg.dir): DirAccess.remove_absolute(lg.dir + "/" + f)
+
+func test_dos_registros_a_la_vez_no_se_pisan() -> void:
+	var a := NetLog.new()
+	var b := NetLog.new()
+	a.dir = "user://logs/red_prueba_dos"
+	b.dir = a.dir
+	a.open("Anfitrión", "A")
+	b.open("Invitado", "B")
+	assert_ne(a.path, b.path)
+	a.close()
+	b.close()
+	assert_false(FileAccess.get_file_as_string(a.path).contains("Invitado"))
+	for f in DirAccess.get_files_at(a.dir): DirAccess.remove_absolute(a.dir + "/" + f)

@@ -95,6 +95,13 @@ func _show_choice() -> void:
 	var create := _button("Crear sala", _host)
 	_button("Unirse a una sala", _show_join)
 	_text("La primera vez, Windows puede preguntar si deja pasar la conexión: acepta en redes privadas y públicas.", 17, UiKit.TEXT_DIM)
+	if DirAccess.dir_exists_absolute(NetLog.DIR):     # registros de partidas anteriores (para enviarlos si algo falló)
+		var logs := MenuKit.button("Abrir la carpeta de registros de conexión", MenuKit.INK, 18)
+		logs.custom_minimum_size = Vector2(420, 42)
+		logs.pressed.connect(func() -> void: OS.shell_open(ProjectSettings.globalize_path(NetLog.DIR)))
+		var row := CenterContainer.new()
+		row.add_child(logs)
+		_box.add_child(row)
 	_box.add_child(MenuKit.hint("B o Esc: volver"))
 	_focus(create)
 

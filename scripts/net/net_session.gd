@@ -60,6 +60,7 @@ var lag_ms := 0
 var sent_to := {}                            ## PC -> bytes
 var sent_type := {}                          ## tipo -> bytes (a todos)
 const PACKET_OVERHEAD := 40                  ## B: IP 20 + UDP 8 + ENet ~12
+var netlog := NetLog.new()                   ## registro de la sesión en user://logs/red/ (hito 9.6c)
 var wire_sent := 0                           ## B que de verdad salen (ENet, ya comprimidos, sin IP ni UDP)
 ## Compresión de ENet (hito 9.6a): la misma en todos los PC, o no se entienden.
 var compression := ENetConnection.COMPRESS_RANGE_CODER
@@ -81,6 +82,7 @@ func _ready() -> void:
 	var la := LaunchArgs.from_cmdline()
 	lag_ms = la.get_int("net_lag", 0)
 	loss = la.get_float("net_loss", 0.0)
+	roster_changed.connect(func() -> void: if netlog.is_open(): netlog.roster(peers, my_id))
 	if la.has("net_compress"): compression = COMPRESSIONS.get(la.get_str("net_compress"), compression)   # pruebas
 	if la.has("net_name"): player_name = la.get_str("net_name").left(20)   # pruebas: dos copias en el mismo PC
 	if player_name == DEFAULT_NAME:                  # nombre del usuario del PC, si no se ha dado otro
@@ -107,9 +109,13 @@ func host(p_port: int = RoomCode.BASE_PORT, use_upnp: bool = true) -> Error:
 			break
 	if err != OK:
 		_enet = null
-		failed.emit("No se pudo abrir el puerto %d (¿otra copia del juego abierta?)" % p_port)
+		var why := "No se pudo abrir el puerto %d (¿otra copia del juego abierta?)" % p_port
+		netlog.open("Anfitrión", player_name)
+		netlog.close(why)
+		failed.emit(why)
 		return err
 	_start_api()
+	netlog.open("Anfitrión", "%s, puerto %d, %s" % [player_name, port, "con UPnP" if use_upnp else "sin UPnP"])
 	state = State.HOSTING
 	my_id = 1
 	accepting = true
@@ -137,6 +143,7 @@ func join(address: String, p_port: int = RoomCode.BASE_PORT) -> Error:
 		return err
 	_enet.host.compress(compression)
 	_start_api()
+	netlog.open("Invitado", "%s → %s, puerto %d" % [player_name, address, p_port])
 	var server := _enet.get_peer(1)
 	if server != null: server.set_timeout(32, 4000, 8000)
 	state = State.CONNECTING
@@ -151,6 +158,7 @@ func close(reason: String = "") -> void:
 				_api.connection_failed, _api.server_disconnected, _api.peer_packet]:
 			for c in s.get_connections(): s.disconnect(c.callable)
 	if _enet != null: _enet.close()
+	netlog.close(reason)
 	if _upnp != null:
 		_upnp.close()
 		_upnp = null
@@ -273,6 +281,7 @@ func _on_connection_failed() -> void:
 ## conexión ahí mismo no es seguro. `as_failure`: avisa con `failed` (no llegó a entrar).
 func _end_later(reason: String, as_failure: bool) -> void:
 	var go := func() -> void:
+		if as_failure: netlog.line("No se pudo: " + reason)   # si no, lo apunta close()
 		close("" if as_failure else reason)
 		if as_failure: failed.emit(reason)
 	go.call_deferred()
@@ -281,6 +290,7 @@ func _on_upnp(ok: bool, ext: String, msg: String) -> void:
 	upnp_ok = ok
 	external_ip = ext
 	upnp_status = msg
+	netlog.line("UPnP: %s%s" % [msg, (" · IP externa " + ext) if ok else ""])
 	upnp_done.emit(ok, msg)
 
 func _on_packet(from: int, bytes: PackedByteArray) -> void:
@@ -328,6 +338,7 @@ func _handle(from: int, bytes: PackedByteArray) -> void:
 			if state == State.CONNECTING and data is Dictionary:
 				my_id = _api.get_unique_id()
 				late = bool(data.get("late", false))
+				netlog.line("Dentro de la sala como PC %d%s" % [my_id, " (vuelve con la partida empezada)" if late else ""])
 				state = State.CONNECTED
 				joined.emit()
 		Msg.REJECT:
@@ -356,6 +367,7 @@ func _on_hello(from: int, data: Variant) -> void:
 	elif player_count() + 1 > MAX_PLAYERS:                       # con sitio para uno: los demás se unen en la selección
 		why = "La sala está llena"
 	if why != "":
+		netlog.line("Rechazado %s: %s" % [String(data.get("name", "?")) if data is Dictionary else "?", why])
 		_send(from, Msg.REJECT, why, true)
 		var kick := func() -> void:
 			if _api != null and _api.get_peers().has(from): _api.disconnect_peer(from)

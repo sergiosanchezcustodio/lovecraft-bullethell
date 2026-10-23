@@ -148,6 +148,13 @@ func _ready() -> void:
 		_enemies_root = game.get_node_or_null("Enemies")
 	var la: Variant = game.get("args")
 	_log_on = la is LaunchArgs and (la as LaunchArgs).get_bool("log")
+	_log_sent = net.sent_to.duplicate()               # los contadores son de toda la sesión: desde aquí
+	_log_wire = net.wire_sent
+	_type_start = net.sent_type.duplicate()
+	var seats := PackedStringArray()
+	for q: Player in game.players: seats.append("J%d %s (%s)" % [q.index + 1, q.data.id, _seat_name(q.index)])
+	var lv: Variant = game.get("level")
+	_say("partida: %s · %s" % [String((lv as LevelData).id) if lv is LevelData else "?", ", ".join(seats)])
 	if host:
 		net.admit = _admit
 		_release_gone(false)                           # los de un PC que no ha vuelto: la máquina, desde el principio
@@ -233,7 +240,7 @@ func _process_step(delta: float) -> void:
 	if not host and not started:
 		_ready_t -= delta
 		if _ready_t <= 0.0: _send_ready()
-	if started and not get_tree().paused and _log_on: _log(delta)
+	if started and not get_tree().paused: _log(delta)   # al fichero siempre; a la consola con log=true
 	if not host and started and not _closed: _show_quiet(silence())
 
 ## Invitado: s desde la última foto del anfitrión (0 antes de la primera).
@@ -246,7 +253,7 @@ func _show_quiet(s: float) -> void:
 		if _quiet != null:
 			_quiet.queue_free()
 			_quiet = null
-			if _log_on: print("RED vuelven las fotos")
+			_say("vuelven las fotos")
 		return
 	if _quiet == null:
 		_quiet = CanvasLayer.new()
@@ -269,23 +276,31 @@ func _show_quiet(s: float) -> void:
 		_quiet.add_child(panel)
 		panel.resized.connect(func() -> void: panel.position = Vector2((panel.get_viewport_rect().size.x - panel.size.x) * 0.5, 215.0))   # bajo los anuncios
 		add_child(_quiet)
-		if _log_on: print("RED sin noticias del anfitrión")
+		_say("sin noticias del anfitrión")
 	_quiet_lbl.text = "  Sin noticias del anfitrión… %d s  " % int(s)
 	if s > QUIET_LEAVE and not _quiet_btn.visible:   # la partida está parada: ofrece salir (con el foco, para el mando)
 		_quiet_btn.visible = true
 		_quiet_btn.grab_focus()
-		if _log_on: print("RED botón de salir")
+		_say("botón de salir")
 
-## Registro (log=true): cada 5 s, lo que ve este PC, para comparar las dos ventanas.
+## Apunta algo en el registro de red (y en la consola, con log=true, con "RED" delante).
+func _say(text: String) -> void:
+	if _log_on: print("RED " + text)
+	net.netlog.line(text)
+
+## Registro: cada 5 s, lo que ve este PC (para comparar las ventanas, y en el fichero de red).
 var _log_t := 0.0
 var _log_sent := {}                          ## PC -> bytes mandados hasta el último registro
+var _type_start := {}                        ## bytes por tipo al empezar el nivel
 var _log_wire := 0                           ## bytes reales (comprimidos) hasta el último registro
 var _wire_bw := [0.0, 0, 0.0]                ## lo mismo que _bw, con los bytes reales del PC
 var _bw := {}                                ## PC -> [suma de kB/s, registros, pico] (resumen al salir)
 var _log_on := false
 const TYPE_NAMES := {READY: "READY", GO: "GO", PSTATE: "PSTATE", SNAP: "SNAP", SPAWN: "SPAWN", DIE: "DIE",
 	ANIM: "ANIM", EVENT: "EVENT", NEXT: "NEXT", RESTART: "RESTART", BULLETS: "BULLETS", GEMS: "GEMS",
-	TAKEN: "TAKEN", PROG: "PROG", WORLD: "WORLD", HALT: "HALT", RESUME: "RESUME", PICK: "PICK", PAUSE: "PAUSE"}
+	TAKEN: "TAKEN", PROG: "PROG", WORLD: "WORLD", HALT: "HALT", RESUME: "RESUME", PICK: "PICK", PAUSE: "PAUSE",
+	NetSelect.PROFILE: "PROFILE", NetSelect.ACTION: "ACTION", NetSelect.PROFILES: "PROFILES", NetSelect.SEATS: "SEATS",
+	NetSelect.START: "START", NetSelect.LATE: "LATE"}
 func _log(delta: float) -> void:
 	_log_t += delta
 	if _log_t < 5.0: return
@@ -302,35 +317,38 @@ func _log(delta: float) -> void:
 		var r := (int(net.sent_to[id]) - int(_log_sent.get(id, 0))) / _log_t / 1024.0
 		total += r
 		if net.peers.has(id):
-			per.append("%s %.1f" % [net.peers[id].get("name", id), r])
+			per.append("%s %.1f%s" % [net.peers[id].get("name", id), r, (" %d ms" % int(net.peers[id].get("ping", 0))) if host else ""])
 			var b: Array = _bw.get(id, [0.0, 0, 0.0, ""])
 			_bw[id] = [b[0] + r, b[1] + 1, maxf(b[2], r), String(net.peers[id].get("name", id))]
 	_log_sent = net.sent_to.duplicate()
 	var wire := (net.wire_sent - _log_wire) / _log_t / 1024.0   # lo que sale de verdad (comprimido)
 	_log_wire = net.wire_sent
 	_wire_bw = [_wire_bw[0] + wire, _wire_bw[1] + 1, maxf(_wire_bw[2], wire)]
-	print("RED %s t=%.1f enemigos=%d abatidos=%d xp=%.0f balas=%d gemas=%d %s  sale=%.1f kB/s%s real=%.1f  ping=%d" % ["anfitrion" if host else "invitado",
+	_say("%s t=%.1f enemigos=%d abatidos=%d xp=%.0f balas=%d gemas=%d %s  sale=%.1f kB/s%s real=%.1f  ping=%d" % ["anfitrion" if host else "invitado",
 		game.director.time if game.director != null else 0.0, n, game.kills, team.xp if team != null else 0.0,
 		game.world.bullets.count, game.gems.count, " ".join(pos), total,
 		" (" + ", ".join(per) + ")" if per.size() > 1 else "", wire, int(net.peers.get(net.my_id, {}).get("ping", 0)) if not host else 0])
 	_log_t = 0.0
 
-## Al salir (log=true): media y pico de lo mandado a cada PC y reparto por tipo de mensaje.
+## Al salir: media y pico de lo mandado a cada PC y reparto por tipo de mensaje.
 func _exit_tree() -> void:
-	if not _log_on or _bw.is_empty(): return
+	if _bw.is_empty(): return
 	var per := PackedStringArray()
 	for id: int in _bw:
 		var b: Array = _bw[id]
 		per.append("%s media %.1f pico %.1f" % [b[3], b[0] / maxf(b[1], 1), b[2]])
+	var by_type := {}                                  # en este nivel
 	var all := 0
-	for t: int in net.sent_type: all += int(net.sent_type[t])
-	var types := net.sent_type.keys()
-	types.sort_custom(func(a: int, b: int) -> bool: return int(net.sent_type[a]) > int(net.sent_type[b]))
+	for t: int in net.sent_type:
+		by_type[t] = int(net.sent_type[t]) - int(_type_start.get(t, 0))
+		all += by_type[t]
+	var types := by_type.keys().filter(func(t: int) -> bool: return int(by_type[t]) > 0)
+	types.sort_custom(func(a: int, b: int) -> bool: return int(by_type[a]) > int(by_type[b]))
 	var share := PackedStringArray()
 	for t: int in types.slice(0, 6):
 		var tn: Variant = TYPE_NAMES.get(t, NetSession.Msg.find_key(t))
-		share.append("%s %d %%" % [tn if tn != null else str(t), roundi(100.0 * int(net.sent_type[t]) / maxf(all, 1))])
-	print("RED ancho de banda (kB/s por PC, sin comprimir): %s | comprimido, en total: media %.1f pico %.1f | por tipo: %s" % [
+		share.append("%s %d %%" % [tn if tn != null else str(t), roundi(100.0 * int(by_type[t]) / maxf(all, 1))])
+	_say("ancho de banda (kB/s por PC, sin comprimir): %s | comprimido, en total: media %.1f pico %.1f | por tipo: %s" % [
 		", ".join(per), _wire_bw[0] / maxf(_wire_bw[1], 1), _wire_bw[2], ", ".join(share)])
 
 func _physics_process(_delta: float) -> void:
@@ -526,19 +544,30 @@ func _nid(e: Enemy) -> int:
 	return int(e.get_meta("nid", 0)) if e != null and is_instance_valid(e) else 0
 
 func _event(d: Dictionary) -> void:
+	_say_event(d)
 	net.send(0, EVENT, d)
+
+const EVENT_TEXT := {"won": "nivel superado", "lost": "derrota", "final": "aparece el enemigo final", "boss": "jefe", "mid": "enemigo especial"}
+
+## Los sucesos que cambian el nivel, con el reloj y las bajas (para comparar los registros de cada PC).
+func _say_event(d: Dictionary) -> void:
+	var k := String(d.get("k", ""))
+	if EVENT_TEXT.has(k):
+		_say("%s · t=%.1f abatidos=%d" % [EVENT_TEXT[k], game.director.time if game.director != null else 0.0, game.kills])
 
 ## Anfitrión: derrota (la decide él, con la vida que le llega de cada PC).
 func send_lost() -> void:
 	_event({"k": "lost"})
 
 func send_next(level_id: String) -> void:
+	_say("siguiente nivel: %s" % level_id)
 	var back := GameSession.apply_returns(net.peers)
 	net.send(0, NEXT, {"level": level_id, "carry": GameSession.carry.duplicate(true),
 		"team_xp": GameSession.team_xp, "team_turn": GameSession.team_turn, "peers": seat_peers()})
 	_send_start(back)
 
 func send_restart() -> void:
+	_say("reintento")
 	var back := GameSession.apply_returns(net.peers)
 	net.send(0, RESTART, {"peers": seat_peers()})
 	_send_start(back)
@@ -558,7 +587,7 @@ func _send_start(back: Array) -> void:
 	for id: int in back:
 		net.send(id, NetSelect.START, {"level": String(GameSession.level), "players": GameSession.seats_to_wire(),
 			"carry": GameSession.carry.duplicate(true), "team_xp": GameSession.team_xp, "team_turn": GameSession.team_turn})
-		if _log_on: print("RED vuelve el PC %d" % id)
+		_say("vuelve el PC %d" % id)
 
 # ---------------------------------------------------------------- mensajes
 
@@ -633,11 +662,13 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 		HALT:
 			if data is Dictionary:
 				halt = data
+				_say("parada: %s" % _halt_text(halt))
 				if pause_tree: get_tree().paused = true
 				if game.has_method("net_halt"): game.net_halt(halt)
 		RESUME:
 			if halt.is_empty(): return
 			halt = {}
+			_say("sigue" + (": " + String(data.get("text", "")) if data is Dictionary and String(data.get("text", "")) != "" else ""))
 			if game.has_method("net_resume"): game.net_resume(data if data is Dictionary else {})
 		PROG:
 			if data is Array and (data as Array).size() == 2 and data[1] is Dictionary:
@@ -697,6 +728,7 @@ func _puppet_spawn(d: Array) -> void:
 	_enemies[int(d[0])] = e
 
 func _on_event(d: Dictionary) -> void:
+	_say_event(d)
 	var dir: WaveDirector = game.director
 	var e: Enemy = _enemies.get(int(d.get("id", 0)))
 	match String(d.get("k", "")):
@@ -974,6 +1006,7 @@ func halt_all(d: Dictionary) -> void:
 		_prog_sig.erase(int(d.get("i", -1)))
 		_send_progress()
 	halt = d
+	_say("parada: %s" % _halt_text(d))
 	net.send(0, HALT, d)
 	if pause_tree: get_tree().paused = true
 	if game.has_method("net_halt"): game.net_halt(d)
@@ -984,6 +1017,7 @@ func resume_all(text := "", all := false) -> void:
 	if halt.is_empty(): return
 	var d := {"peer": int(halt.get("peer", 1)), "text": text, "all": all}
 	halt = {}
+	_say("sigue" + (": " + text if text != "" else ""))
 	net.send(0, RESUME, d)
 	if game.has_method("net_resume"): game.net_resume(d)
 
@@ -1024,11 +1058,23 @@ func _send_late() -> void:
 
 ## Anfitrión: un PC entra con la partida empezada (NetSession.admit). Recupera los puestos de un
 ## PC que se fue y entra al empezar el siguiente nivel.
+## Nombre del PC de un puesto (para el registro).
+func _seat_name(i: int) -> String:
+	return GameSession.seats[i].name if i < GameSession.seats.size() else "?"
+
+## Qué ha parado la partida, en pocas palabras (registro).
+func _halt_text(d: Dictionary) -> String:
+	if d.get("k") == "lvup": return "subida de J%d" % (int(d.get("i", 0)) + 1)
+	return "pausa de %s" % _seat_name_of_peer(int(d.get("peer", 1)))
+
+func _seat_name_of_peer(peer: int) -> String:
+	return String(net.peers.get(peer, {}).get("name", "PC %d" % peer))
+
 func _admit(id: int, pc_name: String) -> int:
 	var n := GameSession.claim(id, pc_name, net.peers)
 	if n > 0:
 		if game.has_method("announce"): game.announce("%s ha vuelto: entrará en el siguiente nivel" % pc_name, 2.5)
-		if _log_on: print("RED vuelve %s (PC %d) a %d puestos" % [pc_name, id, n])
+		_say("vuelve %s (PC %d) a %d puestos" % [pc_name, id, n])
 	return n
 
 ## Anfitrión: los jugadores de un PC que no está los lleva la máquina (un bot que sigue a otro).
@@ -1043,6 +1089,7 @@ func _release_gone(say: bool) -> void:
 					bot.leader = r
 					break
 			q.net_release(bot)
+			_say("J%d lo lleva la máquina (se fue su PC)" % (q.index + 1))
 			if say and game.has_method("announce"): game.announce("J%d se ha desconectado: lo lleva la máquina" % (q.index + 1), 2.5)
 
 ## La sesión se ha cerrado (se fue el anfitrión, o este PC salió): de vuelta al menú online.

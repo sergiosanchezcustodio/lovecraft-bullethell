@@ -1423,6 +1423,7 @@ func net_closed(reason: String) -> void:
 		reason = "El anfitrión ha cerrado la partida"
 	Saves.save()
 	if args.get_bool("log"): print("RED cerrada: %s" % reason)
+	Net.netlog.line("Pantalla final: %s" % reason)
 	for n in [_pause, _halt_ui, get_node_or_null("NetLevelUp")]:
 		if n != null and is_instance_valid(n): (n as Node).queue_free()
 	_pause = null
