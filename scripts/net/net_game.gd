@@ -60,6 +60,7 @@ const HALT := NetSession.USER + 25           ## anfitrión -> invitados: se para
 const RESUME := NetSession.USER + 26         ## anfitrión -> invitados: sigue {peer, text, all}
 const PICK := NetSession.USER + 27           ## invitado -> anfitrión: mejora elegida {n, i, key, banished, rerolls, banishes}
 const PAUSE := NetSession.USER + 28          ## invitado -> anfitrión: pide (true) o quita (false) la pausa
+const MARK := NetSession.USER + 29           ## marca de un jugador (F9, LB+RB) [PC, n, dónde]: el anfitrión la reparte
 
 const SNAP_EVERY := 3                        ## pasos de física entre fotos del anfitrión (20 Hz)
 const PSTATE_EVERY := 2                      ## y entre estados de un invitado (30 Hz)
@@ -298,7 +299,7 @@ var _bw := {}                                ## PC -> [suma de kB/s, registros, 
 var _log_on := false
 const TYPE_NAMES := {READY: "READY", GO: "GO", PSTATE: "PSTATE", SNAP: "SNAP", SPAWN: "SPAWN", DIE: "DIE",
 	ANIM: "ANIM", EVENT: "EVENT", NEXT: "NEXT", RESTART: "RESTART", BULLETS: "BULLETS", GEMS: "GEMS",
-	TAKEN: "TAKEN", PROG: "PROG", WORLD: "WORLD", HALT: "HALT", RESUME: "RESUME", PICK: "PICK", PAUSE: "PAUSE",
+	TAKEN: "TAKEN", PROG: "PROG", WORLD: "WORLD", HALT: "HALT", RESUME: "RESUME", PICK: "PICK", PAUSE: "PAUSE", MARK: "MARK",
 	NetSelect.PROFILE: "PROFILE", NetSelect.ACTION: "ACTION", NetSelect.PROFILES: "PROFILES", NetSelect.SEATS: "SEATS",
 	NetSelect.START: "START", NetSelect.LATE: "LATE"}
 func _log(delta: float) -> void:
@@ -612,6 +613,11 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 					game.net_picked(int(data.i), data)
 			PAUSE:
 				if game.has_method("net_pause_asked"): game.net_pause_asked(from, bool(data))
+			MARK:
+				if data is Array and (data as Array).size() == 3:
+					_say_mark(data)
+					var others: Array = net.peers.keys().filter(func(id: int) -> bool: return id != 1 and id != from)
+					net.send_many(others, MARK, data)     # y a los demás invitados
 		return
 	if from != 1: return
 	match type:
@@ -659,6 +665,8 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 			if data is Array:
 				for ev: Variant in data:
 					if ev is Array and (ev as Array).size() == 3 and ev[2] is Array: _ev_queue.append(ev)
+		MARK:
+			if data is Array and (data as Array).size() == 3: _say_mark(data)
 		HALT:
 			if data is Dictionary:
 				halt = data
@@ -1040,6 +1048,7 @@ func say(text: String) -> void:
 ## Anfitrión: los jugadores de un PC que se ha ido pasan a un bot hasta el final del nivel (D-10).
 ## Anfitrión: un PC se fue a mitad de este nivel (la pantalla final ofrece la carpeta de registros).
 var guest_lost := false
+var gone_notes := PackedStringArray()        ## "Ana se desconectó en el 0:14" (pantalla final)
 
 func _on_roster() -> void:
 	if not host: return
@@ -1070,6 +1079,16 @@ func _halt_text(d: Dictionary) -> String:
 	if d.get("k") == "lvup": return "subida de J%d · %s" % [int(d.get("i", 0)) + 1, where()]
 	return "pausa de %s · %s" % [_seat_name_of_peer(int(d.get("peer", 1))), where()]
 
+## Marca de un jugador de este PC (F9 o LB+RB): en el registro de este PC y en el de los demás,
+## para que coincidan al revisarlos.
+func mark(n: int) -> void:
+	var d := [net.player_name, n, where()]
+	_say("marca %d del jugador · %s" % [n, d[2]])
+	net.send(0 if host else 1, MARK, d)
+
+func _say_mark(d: Array) -> void:
+	_say("marca %d de %s · %s (aquí: %s)" % [int(d[1]), String(d[0]).left(20), String(d[2]).left(24), where()])
+
 ## Nivel y minuto de partida ("p1_n3 2:14"): para encontrar en el registro lo que cuenta un jugador.
 func where() -> String:
 	var lv: Variant = game.get("level")
@@ -1090,7 +1109,10 @@ func _admit(id: int, pc_name: String) -> int:
 func _release_gone(say: bool) -> void:
 	for q: Player in game.players:
 		if q.remote and not net.peers.has(_peer_of(q)):
-			if say: guest_lost = true
+			if say:
+				guest_lost = true
+				var note := "%s se desconectó en el %s" % [_seat_name(q.index), where().get_slice(" ", 1)]
+				if not gone_notes.has(note): gone_notes.append(note)
 			var bot := BotInput.new("follow", 3.0 + q.index * 0.7)
 			bot.phase = TAU * (q.index + 1) / 4.0
 			bot.body = q

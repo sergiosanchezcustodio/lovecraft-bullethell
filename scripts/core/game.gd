@@ -391,10 +391,28 @@ func _ready() -> void:
 func net_mark() -> void:
 	if net_game == null: return
 	_marks += 1
-	net_game._say("marca %d del jugador · %s" % [_marks, net_game.where()])
+	net_game.mark(_marks)
 	announce("Marca %d apuntada en el registro" % _marks, 1.2)
 
 var _marks := 0
+var _mark_hold := {}                             ## mando -> s con LB+RB pulsados (-1: ya marcó)
+const MARK_HOLD := 0.6
+
+## LB+RB mantenidos en un mando de este PC: la marca de F9 (los dos a la vez no hacen nada más
+## jugando; sueltos pasan páginas en la ficha y la subida).
+func _watch_mark_pads(delta: float) -> void:
+	for pad in Input.get_connected_joypads():
+		var both := Input.is_joy_button_pressed(pad, JOY_BUTTON_LEFT_SHOULDER) and Input.is_joy_button_pressed(pad, JOY_BUTTON_RIGHT_SHOULDER)
+		if not both or get_tree().paused:
+			_mark_hold.erase(pad)
+			continue
+		var h := float(_mark_hold.get(pad, 0.0))
+		if h < 0.0: continue
+		h += delta
+		if h >= MARK_HOLD:
+			net_mark()
+			h = -1.0
+		_mark_hold[pad] = h
 
 ## ¿Este PC es un invitado de una partida en red? (El mundo lo manda el anfitrión.)
 func is_guest() -> bool:
@@ -911,7 +929,9 @@ func _loot_time() -> void:
 	director.loot_left = 0.0
 
 func _end_screen(title: String, accent: Color, next_id := "") -> void:
-	var s := Menus.EndScreen.new(title, _summary(), accent)
+	var lines := _summary()
+	if net_game != null: lines.append_array(net_game.gone_notes)   # quién se fue y cuándo
+	var s := Menus.EndScreen.new(title, lines, accent)
 	s.has_next = next_id != ""
 	if is_guest(): s.waiting = "El anfitrión decide cómo seguir"   # en red, solo puede salir
 	s.logs_button = net_game != null and net_game.guest_lost     # se fue alguien: el registro sirve
@@ -1251,6 +1271,7 @@ func _process(delta: float) -> void:
 
 func _process_step(delta: float) -> void:
 	_t += delta
+	if net_game != null: _watch_mark_pads(delta)
 	if args.has("sim_time") and director != null and director.time >= args.get_float("sim_time") and not _ended:
 		_ended = true                                  # banco de armas: corta a los N s de juego
 		var rv := {"vida": 0.0, "cordura": 0.0}
