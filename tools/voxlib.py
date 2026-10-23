@@ -154,15 +154,18 @@ class Model:
 
     # ---------- salida ----------
     def export(self, path, pivots, jitter=0.018, default_col=(0.5, 0.5, 0.5), pivots_in_voxels=False,
-               roughness=None, specular=None, parents=None, no_bottom=False):
+               roughness=None, specular=None, parents=None, no_bottom=False, skip=None):
         """roughness/specular: material del modelo. Sin indicarlos, piel húmeda (0,38 / 0,6);
-        para ropa, plumas, madera o piedra conviene una superficie mate (~0,9 / 0,25)."""
+        para ropa, plumas, madera o piedra conviene una superficie mate (~0,9 / 0,25).
+        skip: voxel -> caras que VoxelBuilder no construye (bits +x, -x, +y, -y, +z, -z), las
+        que dan al hueco cerrado de su parte (ver inner_faces); van como noveno valor."""
         out = []
         for (x, y, z), (p, c, g) in self.V.items():
             if isinstance(c, str):
                 c = default_col
             j = self.rng.uniform(-jitter, jitter) if jitter else 0.0
             out.append([x, y, z, p] + [round(max(0.0, min(1.0, q + j)), 3) for q in c] + [g])
+            if skip and skip.get((x, y, z)): out[-1].append(skip[(x, y, z)])
         S = self.S
         k_piv = 1 if pivots_in_voxels else S
         data = {"voxel_size": 1.0 / (16 * S),
@@ -175,6 +178,39 @@ class Model:
         with open(path, "w") as f:
             json.dump(data, f)
         return len(out)
+
+
+def inner_faces(M, parts, floor=None):
+    """Caras de cada voxel que dan al hueco cerrado de su propia parte (23-10-2026): en un modelo
+    vaciado son casi la mitad de la malla y nunca se ven, ni al girar la parte, porque el hueco va
+    con ella. Devuelve voxel -> bits (+x, -x, +y, -y, +z, -z) para export(skip=). floor: por
+    debajo de esa y no se entra desde fuera (un tronco cortado bajo el agua cuenta como cerrado)."""
+    import numpy as np
+    from scipy import ndimage
+    out = {}
+    dirs = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+    for part in parts:
+        keys = [k for k, v in M.V.items() if v[0] == part]
+        if not keys: continue
+        P = np.array(keys, dtype=np.int64)
+        lo = P.min(0) - 2
+        occ = np.zeros(tuple(P.max(0) - lo + 3), bool)
+        I = tuple((P - lo).T)
+        occ[I] = True
+        free = ~occ
+        if floor is not None:
+            free[:, :max(0, floor - lo[1]), :] = False
+        lab, _ = ndimage.label(free)
+        edge = set(np.unique(np.concatenate([lab[0].ravel(), lab[-1].ravel(), lab[:, -1].ravel(),
+                                             lab[:, :, 0].ravel(), lab[:, :, -1].ravel()])))
+        if floor is None: edge |= set(np.unique(lab[:, 0].ravel()))
+        inner = free & ~np.isin(lab, list(edge))
+        bits = np.zeros(len(keys), np.int64)
+        for i, (a, b, c) in enumerate(dirs):
+            bits |= inner[I[0] + a, I[1] + b, I[2] + c].astype(np.int64) << i
+        for k, m in zip(keys, bits.tolist()):
+            if m: out[k] = m
+    return out
 
 
 # ---------- más resolución y textura fina (revisión de arte, 13-10-2026) ----------

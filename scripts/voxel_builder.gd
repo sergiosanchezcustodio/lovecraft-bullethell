@@ -176,7 +176,9 @@ static func _get_model(path: String) -> Dictionary:
 		var g := int(v[7]) if v.size() > 7 else 0                   # 1 luz, 2 ventana que se enciende, 3 cristal con cielo
 		var key: String = v[3] + ("" if g <= 0 else ["", "#glow", "#gwin", "#gsky"][clampi(g, 1, 3)])
 		if not parts.has(key): parts[key] = []
-		parts[key].append([p, Color(v[4], v[5], v[6])])
+		# noveno valor (opcional): caras que dan al hueco cerrado de su parte y no se construyen
+		# (bits +x, -x, +y, -y, +z, -z en el orden de FACES; voxlib.inner_faces)
+		parts[key].append([p, Color(v[4], v[5], v[6]), int(v[8]) if v.size() > 8 else 0])
 	var keys := parts.keys()
 	keys.sort()   # partes base antes que sus capas "#glow"
 	var vs: float = data.get("voxel_size", VOXEL)   # escala propia por modelo (jefes colosales, LOD)
@@ -326,14 +328,17 @@ static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vecto
 	for item in voxels:
 		var p: Vector3i = item[0]
 		var col: Color = item[1]
+		var inner: int = item[2]
 		if ids: st.set_uv(Vector2(float(comp[p]), 0.0))       # ventana a la que pertenece (window_glow.gdshader)
-		for f in FACES:
+		for fi in FACES.size():
+			var f: Array = FACES[fi]
 			var n: Vector3i = f[0]
 			# Solo se quitan las caras que tapa un voxel de la MISMA parte. Entre partes
 			# distintas se conservan todas: al girar un brazo, una pierna o la cabeza queda
 			# al aire lo que tapaban (con el brazo pegado al tronco, el costado se veía hueco).
 			if own.has(p + n): continue
 			if no_bottom and n.y < 0: continue
+			if inner & (1 << fi): continue                        # da al hueco cerrado de su parte
 			var corners: Array = f[1]
 			var shades := []
 			for c in corners:
