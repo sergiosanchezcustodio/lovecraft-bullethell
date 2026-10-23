@@ -63,6 +63,7 @@ const PACKET_OVERHEAD := 40                  ## B: IP 20 + UDP 8 + ENet ~12
 ## Versión del juego (application/config/version): viaja al entrar y la sala avisa si no coincide
 ## (con el mismo protocolo se entienden, pero los datos del juego pueden ser otros).
 var version := String(ProjectSettings.get_setting("application/config/version", "?"))
+var marks := 0                               ## marcas de este PC en la sesión (F9, LB+RB): siguen de un nivel a otro
 var netlog := NetLog.new()                   ## registro de la sesión en user://logs/red/ (hito 9.6c)
 var wire_sent := 0                           ## B que de verdad salen (ENet, ya comprimidos, sin IP ni UDP)
 ## Compresión de ENet (hito 9.6a): la misma en todos los PC, o no se entienden.
@@ -110,6 +111,7 @@ func other_versions() -> PackedStringArray:
 ## Abre la sala en el primer puerto libre desde `p_port` (los 8 del código de sala).
 func host(p_port: int = RoomCode.BASE_PORT, use_upnp: bool = true) -> Error:
 	close()
+	marks = 0
 	var err := ERR_CANT_CREATE
 	for k in RoomCode.PORTS:
 		_enet = ENetMultiplayerPeer.new()
@@ -146,6 +148,7 @@ func host(p_port: int = RoomCode.BASE_PORT, use_upnp: bool = true) -> Error:
 ## Se conecta a una sala. `address` es una IP (v4 o v6) o un nombre de equipo.
 func join(address: String, p_port: int = RoomCode.BASE_PORT) -> Error:
 	close()
+	marks = 0
 	_enet = ENetMultiplayerPeer.new()
 	var err := _enet.create_client(address, p_port)
 	if err != OK:

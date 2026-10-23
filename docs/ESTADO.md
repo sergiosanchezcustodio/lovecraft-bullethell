@@ -482,7 +482,11 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
     - **La pantalla final del anfitrión dice quién se fue y cuándo:** «Ana se desconectó en el 0:14» (`NetGame.gone_notes`). Captura `shots/game_fin97h_parada1.png`.
     - **Aviso en los demás PC** al llegar una marca: «Anfitrion ha puesto una marca» (`shots/game_marca97_inv_009.6s.png`).
     - **Explicación de la marca en *Jugar online*** (`shots/titulo_online97_009.0s.png`).
-    - **Marcas en el resumen de cada nivel** del registro («| MARCAS en este nivel: 2», en mayúsculas para encontrarlo). La numeración vuelve a 1 en cada nivel; cada marca lleva el suyo.
+    - **Marcas en el resumen de cada nivel** del registro («| MARCAS en este nivel: 2», en mayúsculas para encontrarlo). 
+    - **Marcas en la pantalla final** del nivel, en todos los PC: «2 marcas en este nivel (F9 o LB+RB)» (`NetGame.level_marks`; `shots/game_fin98h_parada1.png`).
+    - **La numeración sigue durante toda la sesión** (`Net.marks`, a cero al crear o unirse a una sala): marca 1 en el nivel 1, marca 2 en el 2.
+    - **`python tools/marcas.py`**: saca de los registros solo las marcas, con 8 líneas antes y 3 después (`--antes`, `--despues`), fichero a fichero; sin argumentos lee los de este PC (Windows, macOS o Linux) y si no, los que se le pasen (los del otro PC).
+    - Borrados los registros de mis pruebas de la carpeta de registros, para que la tuya empiece limpia.
   - **Hito 9.6a (carga con 4 jugadores): hecho (22-10-2026).**
     - **Medir:** `NetSession` cuenta lo que manda a cada PC y por tipo de mensaje (`sent_to`, `sent_type`, con 40 B de cabeceras por paquete) y lo que sale de verdad ya comprimido (`wire_sent`, de las estadísticas de ENet). Con `log=true`, el registro cada 5 s da `sale=… kB/s (Ana 6.0, Luis 6.0) real=…` y, al salir, la media y el pico por PC y el reparto por tipo. Con `prof=true`, la red sale en el perfil: `red_envia` (con `red_foto`, construir la foto), `red_recibe` y `red`.
     - **Compresión:** ENet comprime ahora todo con su range coder (`NetSession.compression`; `net_compress=none|range|fastlz|zlib|zstd` para comparar). Con 75 vivos y un invitado: 25,6 kB/s sin comprimir, 17,7 con range coder y 17,7 con ZSTD. Si un PC de una versión anterior intenta entrar, ya no le sale «Versión distinta»: no se entienden ni para eso.

@@ -37,5 +37,5 @@ Mirad en cada PC y apuntad cualquier cosa rara:
 
 ## Después
 
-- [ ] Cada uno abre *Jugar online → Abrir la carpeta de registros de conexión* y me pasa el registro más reciente (`red_<fecha>.log`) y, si hubo algún error, también `godot.log` (la carpeta de arriba).
+- [ ] Cada uno abre *Jugar online → Abrir la carpeta de registros de conexión* y me pasa los registros de la prueba (`python tools/marcas.py` los resume: cada marca con lo que pasaba alrededor) (`red_<fecha>.log`) y, si hubo algún error, también `godot.log` (la carpeta de arriba).
 - [ ] Cuando veáis algo raro, pulsad **F9** o mantened **LB+RB** en el mando (apunta una marca con el nivel y el minuto en los registros de todos los PC, sin parar la partida; comprobad que con el mando sale el aviso «Marca apuntada») y decid por voz qué era. Si no, la hora aproximada: el registro tiene la hora en cada línea, y cada 5 s el estado de la partida, el ping y lo que se manda.

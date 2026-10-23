@@ -390,11 +390,10 @@ func _ready() -> void:
 ## raro durante una prueba (lo que se ve en pantalla, a qué hora, en qué nivel y minuto).
 func net_mark() -> void:
 	if net_game == null: return
-	_marks += 1
-	net_game.mark(_marks)
-	announce("Marca %d apuntada en el registro" % _marks, 1.2)
+	Net.marks += 1
+	net_game.mark(Net.marks)
+	announce("Marca %d apuntada en el registro" % Net.marks, 1.2)
 
-var _marks := 0
 var _mark_hold := {}                             ## mando -> s con LB+RB pulsados (-1: ya marcó)
 const MARK_HOLD := 0.6
 
@@ -930,7 +929,10 @@ func _loot_time() -> void:
 
 func _end_screen(title: String, accent: Color, next_id := "") -> void:
 	var lines := _summary()
-	if net_game != null: lines.append_array(net_game.gone_notes)   # quién se fue y cuándo
+	if net_game != null:
+		lines.append_array(net_game.gone_notes)       # quién se fue y cuándo
+		if net_game.level_marks > 0:                   # para comentarlas antes de seguir
+			lines.append(MenuKit.count(net_game.level_marks, "marca") + " en este nivel (F9 o LB+RB)")
 	var s := Menus.EndScreen.new(title, lines, accent)
 	s.has_next = next_id != ""
 	if is_guest(): s.waiting = "El anfitrión decide cómo seguir"   # en red, solo puede salir

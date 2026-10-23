@@ -351,7 +351,7 @@ func _exit_tree() -> void:
 		share.append("%s %d %%" % [tn if tn != null else str(t), roundi(100.0 * int(by_type[t]) / maxf(all, 1))])
 	_say("ancho de banda (kB/s por PC, sin comprimir): %s | comprimido, en total: media %.1f pico %.1f | por tipo: %s%s" % [
 		", ".join(per), _wire_bw[0] / maxf(_wire_bw[1], 1), _wire_bw[2], ", ".join(share),
-		(" | MARCAS en este nivel: %d" % _level_marks) if _level_marks > 0 else ""])
+		(" | MARCAS en este nivel: %d" % level_marks) if level_marks > 0 else ""])
 
 func _physics_process(_delta: float) -> void:
 	var t0 := Prof.start()
@@ -1083,15 +1083,15 @@ func _halt_text(d: Dictionary) -> String:
 ## Marca de un jugador de este PC (F9 o LB+RB): en el registro de este PC y en el de los demás,
 ## para que coincidan al revisarlos.
 func mark(n: int) -> void:
-	_level_marks += 1
+	level_marks += 1
 	var d := [net.player_name, n, where()]
 	_say("marca %d del jugador · %s" % [n, d[2]])
 	net.send(0 if host else 1, MARK, d)
 
-var _level_marks := 0                        ## marcas de todos los PC en este nivel (resumen)
+var level_marks := 0                        ## marcas de todos los PC en este nivel (resumen)
 
 func _say_mark(d: Array) -> void:
-	_level_marks += 1
+	level_marks += 1
 	if game.has_method("announce"): game.announce("%s ha puesto una marca" % String(d[0]).left(20), 1.5)
 	_say("marca %d de %s · %s (aquí: %s)" % [int(d[1]), String(d[0]).left(20), String(d[2]).left(24), where()])
 
