@@ -973,3 +973,9 @@ Ofrecidas al cerrar las cabezas nuevas de los trece personajes (23-10-2026):
 - Parpadeo de vez en cuando (la fila de los ojos en piel unos fotogramas).
 - Mueca de dolor breve al recibir daño, con el mismo sistema que la cara de pánico (`CrisisLook`).
 - Elwood con bigote de morsa, más británico, en vez del militar ancho.
+
+Ofrecidas al cerrar el rediseño de Padre Dagon (23-10-2026):
+- Quitar también las caras de dentro a Cthulhu (487.000 triángulos) y a otros modelos grandes vaciados (`voxlib.inner_faces`): más rendimiento en el combate final.
+- Mandíbula de Dagon que se abre al rugir (pieza propia y `anim_dagon.gd`).
+- Imagen nueva de Dagon en el README (la de `docs/img` enseña la de antes).
+- Avisos «Interpolated instance triggered from outside physics process» de las recompensas de comida y de poción, vistos en la partida de prueba del 23-10-2026: Godot los da por probablemente inofensivos, pero ensucian la salida.
