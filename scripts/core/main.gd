@@ -8,6 +8,7 @@ extends Node
 ##   godot --path . -- intro ...            -> ficha del proyecto e intro (scenes/intro.tscn)
 ##   godot --path . -- select ...            -> selección de personaje (scenes/select.tscn)
 ##   godot --path . -- test_save=3           -> crea la partida de pruebas (todo desbloqueado) en ese hueco
+##   godot --path . -- cloud_check cloud_token=… -> prueba la copia en la nube contra GitHub
 ## La ventana sigue la configuración (Settings: pantalla completa por defecto). Las ejecuciones
 ## de prueba (capturas, rendimiento, bots, visor, grabación de vídeo) van en ventana.
 ## `window=true` fuerza la ventana y `fullscreen=true`, la pantalla completa. La interfaz escala
@@ -20,6 +21,9 @@ func _ready() -> void:
 		Saves.make_test_save(clampi(la.get_int("test_save") - 1, 0, Saves.SLOTS - 1))
 		print("Partida de pruebas creada en el hueco %d: %s" % [la.get_int("test_save"), Saves.path(Saves.slot)])
 		get_tree().quit()
+		return
+	if first == "cloud_check":                  # prueba de la nube contra GitHub (hito 10.1)
+		add_child(preload("res://scripts/cloud/cloud_check.gd").new())
 		return
 	_window_mode(la, first)
 	# Sin argumentos se abre la pantalla de título; con opciones de partida, la partida

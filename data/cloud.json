@@ -1,0 +1,4 @@
+{
+	"_comentario": "OAuth App de GitHub del juego (fase 10, D-11), con Device Flow activado. El client_id es público: no es un secreto.",
+	"client_id": ""
+}

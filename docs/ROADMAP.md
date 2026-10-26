@@ -25,7 +25,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 7 | Parte 3 completa | **Hecha** salvo tu partida (08-10-2026) | Ninguna (Ángulos devoradores y Cthulhu, resueltos) |
 | 8 | Pulido y distribución | **En curso:** hitos 8.1 a 8.3 y 8.6 a 8.16 hechos, pendientes de tu revisión; 8.4 espera tus partidas y 8.5, tu cuenta de itch.io | Ninguna (D-01 y D-12, resueltas) |
 | 9 | Online | **Plan aprobado** (21-10-2026) | Ninguna (D-10, resuelta) |
-| 10 | Guardado en la nube con GitHub | Pendiente | D-11 |
+| 10 | Guardado en la nube con GitHub | **En curso:** plan aprobado (26-10-2026); 10.1 hecho | Ninguna (D-11, resuelta) |
 
 ---
 
@@ -236,4 +236,13 @@ Según D-10 (resuelta el 21-10-2026 en el GDD): anfitrión con autoridad y clien
 
 ## Fase 10: Guardado en la nube con GitHub
 
-Según D-11.
+Según D-11 (resuelta el 26-10-2026): copia de los tres huecos y de los controles en un gist secreto del jugador, conectado con el flujo de autorización por dispositivo de GitHub. La partida local sigue mandando; sin conexión se juega igual.
+
+**Aceptación:** con dos PC y la misma cuenta, lo jugado en uno aparece en el otro al abrir la ventana de huecos; si se ha jugado en los dos sin conexión, el juego pregunta cuál quedarse; sin conexión o con la cuenta desconectada, todo funciona como antes.
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 10.1 | **Cliente de GitHub:** flujo por dispositivo, buscar, crear, leer, escribir y borrar el gist (encontrado por su fichero marcador), autoload `Cloud` con el token en `user://cloud.json`; tests con transporte falso y prueba de verdad (`cloud_check`) | Hecho (26-10-2026). Falta el `client_id` de la OAuth App del autor (`data/cloud.json`) |
+| 10.2 | **Sincronización:** `SaveData` versión 2 (revisión, base y PC), subida tras cada guardado y bajada al abrir los huecos, conflicto con elección del jugador, controles | Pendiente |
+| 10.3 | **Interfaz:** pestaña Nube en Configuración, ventana con el código, estado en cada hueco y avisos | Pendiente |
+| 10.4 | **Cierre:** documentación, guía para jugadores, builds (TLS) y prueba del autor con dos PC | Pendiente |

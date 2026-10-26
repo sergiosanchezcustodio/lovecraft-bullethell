@@ -467,7 +467,7 @@ Ilustración de la biblioteca (tuya, en `resources/PantallasMenus/`) con animaci
 ## 8. Guardado y progresión permanente
 
 - **Local:** archivo en `user://` con versión de formato. Guarda la configuración (controles, audio, vídeo), las estadísticas históricas y la partida en curso al terminar cada nivel, para poder salir y retomarla desde el nivel siguiente.
-- **Nube (fase 10, D-11):** el formato local debe ser serializable y versionado desde el principio, para poder subirlo más adelante sin cambios.
+- **Nube (fase 10, D-11):** copia de los tres huecos y los controles en un gist secreto de GitHub del jugador (ver D-11).
 
 ### 8.1 Estructura de menús y progresión permanente (D-09, D-20)
 
@@ -540,7 +540,7 @@ Los relatos de H. P. Lovecraft son de dominio público en España y la UE, y tod
 | D-08 | Cordura | — | Resuelta: se incluye. Valores numéricos por ajustar en pruebas |
 | D-09 | Desbloqueos y acceso al modo *Por partes* | Fase 5 | **Resuelta** (progresión permanente con tienda) |
 | D-10 | Modelo online | Fase 9 | **Resuelta**: anfitrión y clientes con ENet, conexión directa |
-| D-11 | Guardado en la nube | Fase 10 | Pendiente |
+| D-11 | Guardado en la nube | Fase 10 | **Resuelta**: gist secreto del jugador en GitHub, con autorización por dispositivo |
 | D-12 | Plataforma de distribución | Fase 8; condiciona D-10 y D-11 | **Resuelta**: itch.io primero |
 | D-13 | Reto al empezar cada parte en la campaña | Fase 6 | **Resuelta** |
 | D-14 | Parálisis frente a la duración de las crisis | Fase 1 | **Resuelta** |
@@ -596,7 +596,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
   - **Desconexiones:** un bot toma el personaje hasta el final del nivel y el jugador puede volver al empezar el siguiente. Si se va el anfitrión, la partida acaba para todos y los invitados guardan lo conseguido.
   - **Entrada:** "Jugar online" lleva a Crear o Unirse; al unirse se entra en la selección de personaje del anfitrión, como en local. No se entra en partidas ya empezadas.
   - **Autoridad en partida (22-10-2026, al plantear el 9.3):** cada PC manda en sus jugadores (movimiento, esquive, golpes de balas enemigas y de contacto, vida, cordura y crisis) y envía su estado; el anfitrión manda en el mundo (enemigos, oleadas, daño a los enemigos, balas enemigas, gemas, objetos, experiencia, subidas y fin de nivel) y avisa a cada PC de los ataques avisados que alcanzan a sus jugadores. Así lo que se esquiva en pantalla es lo que cuenta, sin predicción ni correcciones. Las armas de los jugadores funcionan solo de forma visual en cada PC; el daño de verdad lo calcula el anfitrión. Es cooperativo entre amigos: que cada PC decida sus golpes no supone un riesgo de trampas que importe.
-- **D-11 — Guardado en la nube.** Gist privado del jugador mediante el flujo de autorización por dispositivo de GitHub, servidor propio o guardado en la nube de la plataforma de distribución.
+- **D-11 — Guardado en la nube.** Gist privado del jugador mediante el flujo de autorización por dispositivo de GitHub, servidor propio o guardado en la nube de la plataforma de distribución. *Resuelta (26-10-2026):* **gist secreto en la cuenta de GitHub del jugador**, conectada desde el juego con el flujo de autorización por dispositivo (el juego enseña un código y el jugador lo escribe en `github.com/login/device`; permiso `gist` solo). Se suben los tres huecos y los controles; el vídeo y el audio se quedan en cada PC. La partida local sigue mandando: la nube es una copia y sin conexión se juega igual. Los conflictos se deciden por revisiones, no por la hora de cada PC; si han cambiado los dos lados, el jugador elige. Se descartó un Worker de Cloudflare con código anónimo (como en Extremadura Survivors): exige mantener un servidor.
 - **D-12 — Plataforma de distribución.** itch.io, Steam u otra. *Resuelta (08-10-2026):* **itch.io primero** (versión temprana, subida con butler); Steam se puede añadir más adelante. Efectos de sonido de bancos libres CC0, citados en la ficha del proyecto.
 - **D-13 — Reto al empezar cada parte.** El personaje conserva sus mejoras, pero la parte siguiente arranca con enemigos de escalón 1. *Recomendación de la especificación:* estadísticas base de los enemigos más altas en cada parte.
   *Resuelta (06-10-2026):* cada parte es más difícil que la anterior aunque los personajes vuelvan a empezar desde el nivel 1, porque entre partes se mejoran de forma permanente con la tienda (potenciadores, personajes, compañeros y huecos). Las estadísticas base de los enemigos suben por parte (`LevelData.health_mult` desde 1,2 en el primer nivel de la parte 2, más daño y ritmo de aparición). El equilibrio se mide con bots en dos casos: sin compras y con las compras esperables tras la parte anterior. Objetivo del autor: que no sea fácil, pero nunca exasperante. Jefes colosales (06-10-2026): modelo propio a 16 voxels/m (`voxel_size` en el JSON) y solo la parte que asoma del agua. La regla de "sin tiaras ni joyas" solo afecta a los Profundos: los sacerdotes humanos de la Orden llevan su tiara.
