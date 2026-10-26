@@ -4,7 +4,7 @@ extends RefCounted
 ## versión anterior se migra (`from_dict`), así que el formato puede crecer sin romper las
 ## partidas existentes y se podrá subir a la nube tal cual (fase 10).
 
-const VERSION := 1
+const VERSION := 2
 
 var created := ""                        ## fecha de creación (ISO)
 var updated := ""                        ## última vez que se guardó
@@ -30,6 +30,12 @@ var seen := {"enemies": [], "weapons": [], "items": [], "places": []}
 ## Partida de pruebas: todo lo que existe y lo que se añada (personajes, compañeros, niveles,
 ## artículos de la tienda) está disponible, sin tener que comprarlo ni ganarlo.
 var unlock_all := false
+## Copia en la nube (fase 10, versión 2 del formato): `rev` sube en cada guardado; `cloud_base` es
+## la revisión de la nube con la que coincidía la última vez (−1: nunca), y `device`, el PC que la
+## guardó. Así se sabe qué lado ha cambiado sin fiarse de la hora de cada PC (`CloudSync.decide`).
+var rev := 0
+var cloud_base := -1
+var device := ""
 
 static func create() -> SaveData:
 	var d := SaveData.new()
@@ -90,7 +96,8 @@ func to_dict() -> Dictionary:
 		"created_with": created_with, "saved_with": saved_with,
 		"money": money, "purchases": purchases, "pets": pets, "characters": characters,
 		"levels_won": levels_won, "stats": stats, "unlock_all": unlock_all, "achievements": achievements,
-		"seen": seen, "outfits": outfits, "worn": worn, "toggles": toggles}
+		"seen": seen, "outfits": outfits, "worn": worn, "toggles": toggles,
+		"rev": rev, "cloud_base": cloud_base, "device": device}
 
 ## Lee un diccionario de cualquier versión conocida; los campos que falten toman su valor
 ## por defecto.
@@ -109,6 +116,9 @@ static func from_dict(d: Dictionary) -> SaveData:
 	s.characters = d.get("characters", [])
 	s.levels_won = d.get("levels_won", [])
 	s.unlock_all = bool(d.get("unlock_all", false))
+	s.rev = int(d.get("rev", 0))
+	s.cloud_base = int(d.get("cloud_base", -1))
+	s.device = str(d.get("device", ""))
 	var st: Dictionary = d.get("stats", {})
 	for k in s.stats: s.stats[k] = int(st.get(k, 0))
 	for k in st:
@@ -149,6 +159,9 @@ static func migrate(d: Dictionary) -> Dictionary:
 		# versión 0 (sin número): solo se llamaba "time" al tiempo jugado
 		if d.has("time") and not d.has("play_time"): d["play_time"] = d["time"]
 		v = 1
+	if v < 2:
+		# versión 1: sin revisiones para la nube (rev 0, nunca subida)
+		v = 2
 	d["version"] = v
 	return d
 

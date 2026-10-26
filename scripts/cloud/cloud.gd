@@ -9,9 +9,11 @@ extends Node
 ## `cloud=nombre` (otro fichero, `user://cloud_<nombre>.json`) y `cloud_marker=` (otro gist).
 
 signal changed                               ## cambió el estado (conectado, conectando, error…)
+signal synced                                ## acabó una sincronización (los huecos pueden haber cambiado)
 
 const PATH := "user://cloud.json"
 const CONFIG := "res://data/cloud.json"
+var auto_delay := 2.0                        ## s que se agrupan los guardados antes de subirlos
 
 var path := _default_path()
 var client_id := ""
@@ -27,6 +29,20 @@ var pending := {}
 ## client_id), "expired_token" o "access_denied" (al conectar).
 var error := ""
 var busy := false
+## Subir sola cada partida al guardarla (la ventana de huecos sincroniza siempre).
+var auto := true
+## Partidas que han cambiado aquí y en la nube: [{"slot", "local": SaveData, "cloud": SaveData}].
+var conflicts: Array = []
+var last_sync := ""                          ## hora de la última sincronización buena
+var syncing := false
+## Huecos borrados aquí que quizá sigan en la nube: fichero -> revisión que tenían.
+var deleted := {}
+## A quién se sincroniza (los autoloads; las pruebas ponen los suyos y `wire = false`).
+var saves: Node
+var settings: Object
+var wire := true
+var _queued := {}
+var _waiting := false
 var _cancel := false
 var _launch_token := false                  ## el token vino por `cloud_token=`: no se escribe en disco
 
@@ -48,6 +64,12 @@ func _ready() -> void:
 	elif la.has("cloud_token"): path = "user://cloud_token.json"   # el token de prueba no pisa la cuenta de verdad
 	if la.has("cloud_marker"): gist.marker = la.get_str("cloud_marker")
 	load_file()
+	if wire:
+		saves = Saves
+		settings = Settings
+		Saves.saved.connect(func(i: int) -> void: _queue(CloudSync.slot_file(i)))
+		Saves.deleted.connect(_on_deleted)
+		Settings.controls_changed.connect(func() -> void: _queue(CloudSync.CONTROLS))
 	if la.has("cloud_token"):
 		_set_token(la.get_str("cloud_token"))
 		_launch_token = true
@@ -108,6 +130,7 @@ func disconnect_github() -> void:
 	login = ""
 	gist_id = ""
 	error = ""
+	conflicts.clear()
 	save_file()
 	changed.emit()
 
@@ -161,6 +184,130 @@ func push(files: Dictionary) -> bool:
 	changed.emit()
 	return ok
 
+# --- Sincronización (hito 10.2) ---------------------------------------------------------------
+
+## Compara los huecos y los controles con la nube y sube, baja o apunta conflictos
+## (`CloudSync.decide`). `only`: ficheros a mirar (vacío, todos). `in_game`: no cambia la partida
+## del hueco en uso, que se está jugando. true si se pudo hablar con la nube.
+func sync(only: Array = [], in_game := false) -> bool:
+	if not connected(): return false
+	while syncing: await synced                    # de una en una
+	syncing = true
+	var files: Variant = await fetch()
+	var ok := files is Dictionary
+	if ok:
+		var out := {}
+		var after: Array[Callable] = []            # lo que se apunta aquí cuando la subida sale bien
+		for i in saves.SLOTS:
+			var name := CloudSync.slot_file(i)
+			if only.is_empty() or only.has(name): _sync_slot(i, name, files, out, after, in_game)
+		if only.is_empty() or only.has(CloudSync.CONTROLS): _sync_controls(files, out, after)
+		if not out.is_empty():
+			ok = await push(out)
+			if ok:
+				for c in after: c.call()
+	if ok: last_sync = Time.get_datetime_string_from_system()
+	save_file()
+	syncing = false
+	synced.emit()
+	changed.emit()
+	return ok
+
+func _sync_slot(i: int, name: String, files: Dictionary, out: Dictionary, after: Array[Callable], in_game: bool) -> void:
+	var local: SaveData = saves.peek(i)              # lo guardado (la partida en uso puede ir por delante)
+	var cloud_d: Variant = _parse(files.get(name))
+	match CloudSync.decide(local.to_dict() if local != null else null, cloud_d, int(deleted.get(name, -1))):
+		CloudSync.UPLOAD:
+			var d := local.to_dict()
+			d.cloud_base = local.rev
+			out[name] = JSON.stringify(d, "	")
+			after.append(saves.mark_synced.bind(i, local.rev))
+		CloudSync.DOWNLOAD:
+			if in_game and i == saves.slot: return
+			var d := SaveData.from_dict(cloud_d)
+			d.cloud_base = d.rev
+			saves.store(i, d)
+			deleted.erase(name)
+			_drop_conflict(i)
+		CloudSync.DELETE_CLOUD:
+			out[name] = null
+			after.append(func() -> void: deleted.erase(name))
+		CloudSync.CONFLICT:
+			_drop_conflict(i)
+			conflicts.append({"slot": i, "local": local, "cloud": SaveData.from_dict(cloud_d)})
+		_:
+			if local == null: deleted.erase(name)
+
+## Los controles: si han cambiado en los dos sitios, se quedan los de este PC.
+func _sync_controls(files: Dictionary, out: Dictionary, after: Array[Callable]) -> void:
+	var lc: Dictionary = settings.controls_dict()
+	var cc: Variant = _parse(files.get(CloudSync.CONTROLS))
+	var what := CloudSync.decide(lc, cc)
+	if what == CloudSync.DOWNLOAD:
+		settings.store_controls(cc)
+	elif what in [CloudSync.UPLOAD, CloudSync.CONFLICT]:
+		if what == CloudSync.CONFLICT: lc.rev = maxi(int(lc.rev), int(cc.rev)) + 1
+		lc.cloud_base = lc.rev
+		out[CloudSync.CONTROLS] = JSON.stringify(lc, "	")
+		after.append(settings.store_controls.bind(lc))
+
+## Resuelve el conflicto de un hueco: con la copia de la nube o con la de este PC (que se sube
+## como revisión nueva). true si quedó resuelto.
+func resolve(slot: int, keep_cloud: bool) -> bool:
+	var c := conflict_of(slot)
+	if c.is_empty(): return false
+	var cloud: SaveData = c.cloud
+	if keep_cloud:
+		cloud.cloud_base = cloud.rev
+		saves.store(slot, cloud)
+		_drop_conflict(slot)
+		changed.emit()
+		return true
+	var local: SaveData = saves.peek(slot)
+	if local == null: local = c.local
+	var rev := maxi(local.rev, cloud.rev) + 1
+	var d := local.to_dict()
+	d.rev = rev
+	d.cloud_base = rev
+	if not await push({CloudSync.slot_file(slot): JSON.stringify(d, "	")}): return false
+	saves.mark_synced(slot, rev)
+	_drop_conflict(slot)
+	changed.emit()
+	return true
+
+func conflict_of(slot: int) -> Dictionary:
+	for c: Dictionary in conflicts:
+		if c.slot == slot: return c
+	return {}
+
+func _drop_conflict(slot: int) -> void:
+	conflicts = conflicts.filter(func(c: Dictionary) -> bool: return c.slot != slot)
+
+## Subida automática: agrupa lo guardado durante `auto_delay` y lo sincroniza sin bajar nada
+## encima de la partida en uso.
+func _queue(name: String) -> void:
+	if not connected() or not auto: return
+	_queued[name] = true
+	if _waiting: return
+	_waiting = true
+	await get_tree().create_timer(auto_delay, true).timeout
+	_waiting = false
+	var names := _queued.keys()
+	_queued.clear()
+	await sync(names, true)
+
+func _on_deleted(slot: int, rev: int) -> void:
+	var name := CloudSync.slot_file(slot)
+	deleted[name] = rev
+	_drop_conflict(slot)
+	save_file()
+	_queue(name)
+
+static func _parse(text: Variant) -> Variant:
+	if text == null: return null
+	var d: Variant = JSON.parse_string(String(text))
+	return d if d is Dictionary else null
+
 # --- Detalles -----------------------------------------------------------------------------------
 
 func _meta() -> Dictionary:
@@ -192,6 +339,9 @@ func load_file() -> void:
 		login = String(d.get("login", ""))
 		gist_id = String(d.get("gist_id", ""))
 		device_id = String(d.get("device_id", ""))
+		auto = bool(d.get("auto", true))
+		last_sync = String(d.get("last_sync", ""))
+		deleted = d.get("deleted", {})
 	if device_id == "":
 		device_id = "%08x%08x" % [randi(), randi()]
 		save_file()
@@ -204,4 +354,5 @@ func save_file() -> void:
 	if f == null:
 		push_error("No se pudo guardar " + path)
 		return
-	f.store_string(JSON.stringify({"token": "" if _launch_token else token, "login": login, "gist_id": gist_id, "device_id": device_id}, "\t"))
+	f.store_string(JSON.stringify({"token": "" if _launch_token else token, "login": login, "gist_id": gist_id, "device_id": device_id,
+		"auto": auto, "last_sync": last_sync, "deleted": deleted}, "\t"))

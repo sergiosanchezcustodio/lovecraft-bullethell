@@ -7,6 +7,9 @@ extends Node
 
 const SLOTS := 3
 
+signal saved(slot: int)                  ## se guardó un hueco (la nube lo sube: `Cloud`)
+signal deleted(slot: int, rev: int)      ## se borró un hueco con esa revisión
+
 var dir := "user://saves"                ## los tests usan otra carpeta
 var slot := -1                           ## hueco en uso (0..2), -1 = ninguno
 var current: SaveData
@@ -43,24 +46,47 @@ func use(i: int) -> SaveData:
 		save()
 	return current
 
-## Guarda la partida en uso.
+## Guarda la partida en uso (una revisión más).
 func save() -> bool:
 	if slot < 0 or current == null: return false
-	DirAccess.make_dir_recursive_absolute(dir)
 	current.updated = Time.get_datetime_string_from_system()
 	current.saved_with = SaveData.game_version()
-	var tmp := path(slot) + ".tmp"
+	current.rev += 1
+	current.device = Cloud.device_name
+	if not store(slot, current): return false
+	saved.emit(slot)
+	return true
+
+## Escribe una partida en un hueco tal cual, sin contar revisión (lo que baja de la nube).
+func store(i: int, d: SaveData) -> bool:
+	DirAccess.make_dir_recursive_absolute(dir)
+	var tmp := path(i) + ".tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f == null:
 		push_error("No se pudo guardar la partida: " + tmp)
 		return false
-	f.store_string(JSON.stringify(current.to_dict(), "\t"))
+	f.store_string(JSON.stringify(d.to_dict(), "	"))
 	f.close()
-	var err := DirAccess.rename_absolute(tmp, path(slot))
+	var err := DirAccess.rename_absolute(tmp, path(i))
 	if err != OK:
-		push_error("No se pudo guardar la partida (%d): %s" % [err, path(slot)])
+		push_error("No se pudo guardar la partida (%d): %s" % [err, path(i)])
 		return false
+	if i == slot: current = d
 	return true
+
+## Apunta que la nube tiene la revisión `rev` de un hueco (después de subirlo). Solo toca las
+## revisiones: si se guardó otra vez mientras subía, eso no se pierde y queda por subir.
+func mark_synced(i: int, rev: int) -> void:
+	var d := peek(i)
+	if d == null: return
+	d.rev = maxi(d.rev, rev)
+	d.cloud_base = rev
+	if i == slot and current != null:
+		current.rev = maxi(current.rev, rev)
+		current.cloud_base = rev
+	var keep := current
+	store(i, d)
+	current = keep                       # la partida en uso sigue siendo el mismo objeto
 
 ## Crea en un hueco la partida de pruebas (todo desbloqueado), sustituyendo lo que hubiera.
 func make_test_save(i: int) -> void:
@@ -70,7 +96,10 @@ func make_test_save(i: int) -> void:
 
 ## Borra un hueco: queda como nuevo.
 func delete(i: int) -> void:
-	if exists(i): DirAccess.remove_absolute(path(i))
+	if exists(i):
+		var d := peek(i)
+		DirAccess.remove_absolute(path(i))
+		deleted.emit(i, d.rev if d != null else 0)
 	if i == slot:
 		slot = -1
 		current = null

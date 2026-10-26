@@ -37,7 +37,10 @@ var defaults := {
 	"intro": 1,                             ## ficha e intro al arrancar: 0 siempre, 1 solo la primera vez (hito 5.2)
 	"intro_seen": false,
 	"keys": {}, "joy": {},                  ## reasignaciones: acción -> tecla / botón
+	"controls_rev": 0, "controls_base": 0,  ## copia de los controles en la nube (como SaveData.rev y cloud_base)
 }
+signal controls_changed                     ## se reasignó algo (la nube lo sube: `Cloud`)
+
 var values := {}
 var path := PATH                            ## los tests usan otro fichero
 var dev_window := false                     ## ejecución de pruebas: siempre en ventana (main.gd)
@@ -182,7 +185,8 @@ func set_key(action: StringName, key: int) -> void:
 		var other: StringName = pair[0]
 		if other != action and key_for(other) == key: keys[String(other)] = old
 	keys[String(action)] = key
-	set_value("keys", keys)
+	values["keys"] = keys
+	_controls_saved()
 
 func set_joy(action: StringName, button: int) -> void:
 	var joy: Dictionary = (get_value("joy") as Dictionary).duplicate()
@@ -192,11 +196,30 @@ func set_joy(action: StringName, button: int) -> void:
 		if other in [&"up", &"down", &"left", &"right"]: continue     # el mando se mueve con el stick
 		if other != action and joy_for(other) == button: joy[String(other)] = old
 	joy[String(action)] = button
-	set_value("joy", joy)
+	values["joy"] = joy
+	_controls_saved()
 
 func reset_controls() -> void:
 	values["keys"] = {}
 	values["joy"] = {}
+	_controls_saved()
+
+func _controls_saved() -> void:
+	values["controls_rev"] = int(get_value("controls_rev")) + 1
+	save_file()
+	controls_changed.emit()
+
+## Controles para la nube: {"rev", "cloud_base", "keys", "joy"}.
+func controls_dict() -> Dictionary:
+	return {"rev": int(get_value("controls_rev")), "cloud_base": int(get_value("controls_base")),
+		"keys": (get_value("keys") as Dictionary).duplicate(), "joy": (get_value("joy") as Dictionary).duplicate()}
+
+## Pone los controles que bajan de la nube (o marca los de aquí como subidos, con los mismos).
+func store_controls(d: Dictionary) -> void:
+	values["keys"] = (d.get("keys", {}) as Dictionary).duplicate()
+	values["joy"] = (d.get("joy", {}) as Dictionary).duplicate()
+	values["controls_rev"] = int(d.get("rev", 0))
+	values["controls_base"] = int(d.get("rev", 0))
 	save_file()
 
 const JOY_NAMES := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_X: "X", JOY_BUTTON_Y: "Y",
