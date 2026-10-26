@@ -4,6 +4,8 @@ extends Control
 ## jugado, objetos comprados, compañeros desbloqueados y dinero) y, debajo de cada uno
 ## con partida, un botón para borrarlo con confirmación. Elegir un hueco vacío empieza
 ## una partida nueva. B / Esc cierra la ventana.
+## Con la cuenta de GitHub conectada (fase 10), al abrirse sincroniza con la nube: baja lo jugado
+## en otros PC, enseña el estado de la copia de cada hueco y pregunta por los conflictos.
 
 signal chosen(slot: int)
 signal closed
@@ -12,10 +14,35 @@ var _cards: Array[Button] = []
 var _deletes: Array[Button] = []
 var _root: Control
 var _busy := false                       ## hay una confirmación abierta
+var _cloud_line := ""                    ## estado de la nube al pie
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build(0)
+	_sync_cloud()
+
+## Sincroniza con la nube y redibuja los huecos; después, los conflictos.
+func _sync_cloud() -> void:
+	if not Cloud.connected(): return
+	_cloud_line = "Comprobando la nube…"
+	_build(_focused())
+	var ok: bool = await Cloud.sync()
+	if not is_inside_tree(): return
+	_cloud_line = "" if ok else Cloud.error_text(Cloud.error)
+	if Cloud.conflicts.is_empty():
+		_build(_focused())
+		return
+	_busy = true
+	await CloudConflictMenu.resolve_all(self)
+	if not is_inside_tree(): return
+	_busy = false
+	_build(_focused())
+
+func _focused() -> int:
+	var f := get_viewport().gui_get_focus_owner()
+	for i in _cards.size():
+		if _cards[i] == f or _deletes[i] == f: return i
+	return 0
 
 func _build(focus_slot: int) -> void:
 	if _root: _root.queue_free()
@@ -46,6 +73,10 @@ func _build(focus_slot: int) -> void:
 		del.focus_mode = Control.FOCUS_ALL if d != null else Control.FOCUS_NONE
 		col.add_child(del)
 		_deletes.append(del)
+	if _cloud_line != "":
+		var cl := UiKit.label(_cloud_line, 18, UiKit.TEXT_DIM)
+		cl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(cl)
 	box.add_child(MenuKit.hint("Flechas o cruceta: moverse  ·  A o Intro: elegir  ·  B o Esc: volver"))
 	_cards[clampi(focus_slot, 0, _cards.size() - 1)].grab_focus.call_deferred()
 
@@ -81,6 +112,11 @@ func _card(i: int, d: SaveData) -> Button:
 			var nv := UiKit.label("Guardada con la v%s (esta es la v%s)" % [d.saved_with, SaveData.game_version()], 16, UiKit.TEXT_DIM)
 			nv.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			v.add_child(nv)
+		var cs := Cloud.slot_status(i, d)
+		if cs != "":
+			var cl := UiKit.label(cs, 16, MenuKit.DANGER if not Cloud.conflict_of(i).is_empty() else UiKit.TEXT_DIM)
+			cl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			v.add_child(cl)
 	for c in v.get_children(): (c as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return b
 

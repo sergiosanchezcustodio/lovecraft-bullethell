@@ -1,18 +1,20 @@
 class_name SettingsMenu
 extends Control
-## Configuración: pestañas de vídeo, audio, controles y juego. Cada cambio se aplica y se
+## Configuración: pestañas de vídeo, audio, controles, juego y nube (hito 10.3). Cada cambio se aplica y se
 ## guarda al momento (Settings). LB/RB o Q/E cambian de pestaña; B / Esc cierra.
 ## Controles: al confirmar una fila se espera la tecla o el botón nuevo (Esc cancela). Si
 ## otra acción lo usaba, se intercambian.
 
 signal closed
 
-const TABS := ["Vídeo", "Audio", "Controles", "Juego"]
+const TABS := ["Vídeo", "Audio", "Controles", "Juego", "Nube"]
 
 var _tab := 0
 var _tabs: Array[Button] = []
 var _list: VBoxContainer
 var _first: Control
+var _cloud_status: Label
+var _demo_opened := false
 var _capture: Dictionary = {}            ## {"row", "action", "joy"} mientras se espera una tecla o botón
 
 func _ready() -> void:
@@ -44,6 +46,7 @@ func _ready() -> void:
 	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_list.add_theme_constant_override("separation", 6)
 	margin.add_child(_list)
+	Cloud.changed.connect(_on_cloud_changed)
 	box.add_child(MenuKit.hint("Arriba/abajo: elegir  ·  Izquierda/derecha o A: cambiar  ·  LB/RB o Q/E: pestaña  ·  B o Esc: volver"))
 	_show_tab(0)
 
@@ -58,11 +61,13 @@ func _show_tab(i: int) -> void:
 		_list.remove_child(c)
 		c.queue_free()
 	_first = null
+	_cloud_status = null
 	match i:
 		0: _video()
 		1: _audio()
 		2: _controls()
 		3: _game()
+		4: _cloud()
 	if _first: _first.grab_focus.call_deferred()
 
 # ---------------------------------------------------------------- pestañas
@@ -164,6 +169,61 @@ func _game() -> void:
 			if yes: Settings.reset_all()
 			_show_tab(3)))
 
+## Copia de las partidas en la nube (fase 10): conectar, sincronizar y desconectar.
+func _cloud() -> void:
+	_header("Copia en la nube con GitHub")
+	_cloud_status = UiKit.label(_cloud_text(), 20, UiKit.TEXT)
+	_cloud_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_list.add_child(_cloud_status)
+	if not Cloud.connected():
+		var open := func() -> void:
+			var m := CloudConnectMenu.new()
+			add_child(m)
+			m.closed.connect(_show_tab.bind(4))
+		_action("Conectar con GitHub", open)
+		if Cloud.demo == "codigo" and not _demo_opened:      # capturas: `cloud_demo=codigo`
+			_demo_opened = true
+			open.call_deferred()
+		_note("Guarda una copia de tus tres partidas y de tus controles en un gist secreto de tu cuenta de GitHub, para seguir jugando en otro PC. Las partidas siguen guardándose aquí como siempre: sin conexión se juega igual.")
+		_note("Hace falta una cuenta de GitHub (gratis). El juego solo pide permiso para los gists.")
+		return
+	_toggle("Subir cada partida al guardarla", Cloud.auto, func(on: bool) -> void:
+		Cloud.auto = on
+		Cloud.save_file())
+	var now := _action("Sincronizar ahora", Callable())
+	now.run = func() -> void:
+		if Cloud.syncing: return
+		now.set_value_text("Sincronizando…")
+		await Cloud.sync()
+		if not is_instance_valid(now): return
+		now.set_value_text("")
+		await CloudConflictMenu.resolve_all(self)
+		if is_inside_tree(): _show_tab(4)
+	_action("Desconectar este PC", func() -> void:
+		var c := MenuKit.Confirm.new("¿Desconectar la cuenta de GitHub de este PC?
+
+La copia se queda en la nube y tus partidas, aquí.", "Desconectar")
+		add_child(c)
+		c.answered.connect(func(yes: bool) -> void:
+			if yes: Cloud.disconnect_github()
+			_show_tab(4)))
+	_note("Se suben las tres partidas y los controles; el vídeo y el audio son de cada PC. Al abrir la elección de partida se baja lo jugado en otros PC. Si una partida ha cambiado aquí y en otro PC, el juego pregunta con cuál quedarse.")
+	_note("El gist es secreto: no aparece en tu perfil, pero lo puede abrir quien tenga su enlace. Las partidas no llevan datos personales.")
+
+func _on_cloud_changed() -> void:
+	if _cloud_status != null and is_instance_valid(_cloud_status): _cloud_status.text = _cloud_text()
+
+func _cloud_text() -> String:
+	if not Cloud.connected():
+		var e := Cloud.error_text(Cloud.error)
+		return "Sin conectar." + ("  " + e if e != "" else "")
+	var t := "Conectado como %s." % Cloud.login
+	if Cloud.syncing: t += "  Sincronizando…"
+	elif Cloud.error != "": t += "  " + Cloud.error_text(Cloud.error)
+	elif Cloud.last_sync != "": t += "  Última copia: %s." % Cloud.when(Cloud.last_sync)
+	if not Cloud.conflicts.is_empty(): t += "  %s por decidir." % MenuKit.count(Cloud.conflicts.size(), "partida")
+	return t
+
 # ---------------------------------------------------------------- controles: captura
 
 func _remap_row(action: StringName, label: String, joy: bool) -> void:
@@ -195,6 +255,7 @@ func _input(event: InputEvent) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not _capture.is_empty() or get_child_count() > 1 and get_child(get_child_count() - 1) is MenuKit.Confirm: return
+	if get_child(get_child_count() - 1) is CloudConnectMenu or get_child(get_child_count() - 1) is CloudConflictMenu: return
 	var tab_step := 0
 	if event is InputEventJoypadButton and event.pressed:
 		var b := (event as InputEventJoypadButton).button_index

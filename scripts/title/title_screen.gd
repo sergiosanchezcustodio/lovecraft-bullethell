@@ -15,7 +15,7 @@ extends Control
 ##   perf=8              mide el rendimiento
 ##   open=slots          abre la ventana de huecos al terminar la presentación (capturas);
 ##                       open=slots_borrar, además la confirmación de borrado; open=menu (menú
-##                       principal), open=menu_jugar, open=menu_config tab=0..3, open=menu_tienda tab=0..3, open=menu_logros,
+##                       principal), open=menu_jugar, open=menu_config tab=0..4, open=menu_tienda tab=0..3, open=menu_logros,
 ##                       open=menu_biblioteca tome=N cursor=N
 ##                       open=menu_revision (revisión de arte, temporal), open=menu_online
 ##                       (con net_host=true o net_join=<código|IP>: abre la sala o se une)

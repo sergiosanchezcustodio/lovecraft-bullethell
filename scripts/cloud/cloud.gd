@@ -7,6 +7,8 @@ extends Node
 ## fichero de configuración ni subirse con los controles.
 ## Pruebas: `cloud_token=` (un token con permiso `gist`, p. ej. el de `gh auth token`),
 ## `cloud=nombre` (otro fichero, `user://cloud_<nombre>.json`) y `cloud_marker=` (otro gist).
+## Capturas sin red (`cloud_demo=`): `conectado` hace como si hubiera cuenta, `codigo` enseña un
+## código de ejemplo al conectar y `conflicto`, además, un conflicto en el primer hueco con partida.
 
 signal changed                               ## cambió el estado (conectado, conectando, error…)
 signal synced                                ## acabó una sincronización (los huecos pueden haber cambiado)
@@ -44,6 +46,7 @@ var wire := true
 var _queued := {}
 var _waiting := false
 var _cancel := false
+var demo := ""                               ## `cloud_demo=` (capturas): ver arriba
 var _launch_token := false                  ## el token vino por `cloud_token=`: no se escribe en disco
 
 static func _default_path() -> String:
@@ -73,6 +76,13 @@ func _ready() -> void:
 	if la.has("cloud_token"):
 		_set_token(la.get_str("cloud_token"))
 		_launch_token = true
+	demo = la.get_str("cloud_demo")
+	if demo != "":
+		path = "user://cloud_demo.json"
+		_launch_token = true
+		if demo != "codigo":
+			_set_token("demo")
+			login = "investigador"
 
 func connected() -> bool:
 	return token != ""
@@ -82,13 +92,14 @@ func connected() -> bool:
 ## Conecta con GitHub por el flujo de dispositivo: deja el código en `pending` (para la ventana)
 ## y espera a que el jugador lo apruebe, lo rechace, caduque o se cancele. true si quedó conectado.
 func connect_github() -> bool:
-	if client_id == "":
+	if client_id == "" and demo == "":
 		_fail("no_client")
 		return false
 	_cancel = false
 	error = ""
 	busy = true
 	changed.emit()
+	if demo != "": return await _demo_connect()
 	var d: Dictionary = await gist.start_device(client_id)
 	if d.is_empty():
 		_fail(gist.last_error)
@@ -191,6 +202,7 @@ func push(files: Dictionary) -> bool:
 ## del hueco en uso, que se está jugando. true si se pudo hablar con la nube.
 func sync(only: Array = [], in_game := false) -> bool:
 	if not connected(): return false
+	if demo != "": return await _demo_sync()
 	while syncing: await synced                    # de una en una
 	syncing = true
 	var files: Variant = await fetch()
@@ -257,6 +269,10 @@ func resolve(slot: int, keep_cloud: bool) -> bool:
 	var c := conflict_of(slot)
 	if c.is_empty(): return false
 	var cloud: SaveData = c.cloud
+	if demo != "":
+		_drop_conflict(slot)
+		changed.emit()
+		return true
 	if keep_cloud:
 		cloud.cloud_base = cloud.rev
 		saves.store(slot, cloud)
@@ -302,6 +318,62 @@ func _on_deleted(slot: int, rev: int) -> void:
 	_drop_conflict(slot)
 	save_file()
 	_queue(name)
+
+# --- Textos para los menús (hito 10.3) ---------------------------------------------------------
+
+## Qué ha pasado, para el jugador ("" si nada).
+static func error_text(e: String) -> String:
+	match e:
+		"": return ""
+		"net": return "Sin conexión con GitHub. Se intentará otra vez en el siguiente guardado."
+		"auth": return "GitHub ya no reconoce la conexión de este PC. Conecta otra vez."
+		"limit": return "GitHub pide esperar un poco antes de seguir."
+		"no_client": return "Esta versión del juego no trae la conexión con GitHub configurada."
+		"expired_token": return "El código ha caducado. Vuelve a intentarlo."
+		"access_denied": return "Se canceló la autorización en GitHub."
+	return "GitHub ha dado un error. Se intentará otra vez más tarde."
+
+## Estado de la copia de un hueco con partida ("" sin cuenta).
+func slot_status(slot: int, d: SaveData) -> String:
+	if not connected() or d == null: return ""
+	if not conflict_of(slot).is_empty(): return "Ha cambiado aquí y en otro PC"
+	if d.cloud_base < 0: return "Sin copia en la nube"
+	if d.rev > d.cloud_base: return "Por subir a la nube"
+	return "Copia en la nube al día"
+
+## Fecha de guardado para el jugador: "26-10-2026 18:05".
+static func when(iso: String) -> String:
+	if iso.length() < 16: return iso
+	return "%s-%s-%s %s" % [iso.substr(8, 2), iso.substr(5, 2), iso.substr(0, 4), iso.substr(11, 5)]
+
+# --- Capturas sin red -------------------------------------------------------------------------
+
+func _demo_connect() -> bool:
+	pending = {"user_code": "WDJB-MJHT", "verification_uri": "https://github.com/login/device"}
+	changed.emit()
+	while not _cancel: await get_tree().create_timer(0.2, true).timeout
+	pending = {}
+	_fail("")
+	return false
+
+func _demo_sync() -> bool:
+	await get_tree().create_timer(0.5, true).timeout
+	if demo == "conflicto" and conflicts.is_empty():
+		for i in saves.SLOTS:
+			var local: SaveData = saves.peek(i)
+			if local == null: continue
+			var other := SaveData.from_dict(local.to_dict())
+			other.money += 1350
+			other.play_time += 2.6 * 3600.0
+			other.levels_won = other.levels_won + ["p1_n3", "p1_n4"]
+			other.updated = "2026-10-25T23:41:07"
+			other.device = "PORTATIL-SALON"
+			conflicts.append({"slot": i, "local": local, "cloud": other})
+			break
+	last_sync = Time.get_datetime_string_from_system()
+	synced.emit()
+	changed.emit()
+	return true
 
 static func _parse(text: Variant) -> Variant:
 	if text == null: return null
