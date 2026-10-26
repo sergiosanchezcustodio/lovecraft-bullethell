@@ -39,7 +39,7 @@ En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores ha
 </div>
 
 > [!NOTE]
-> **Versión 0.9.0, en desarrollo.** La campaña completa se juega de principio a fin: las tres partes, solo, en cooperativo local o por red. Quedan la prueba por internet entre casas distintas, el equilibrio final con partidas de jugadores reales, la publicación en itch.io y el guardado en la nube. El estado detallado está en la [hoja de ruta](#hoja-de-ruta).
+> **Versión 0.9.0, en desarrollo.** La campaña completa se juega de principio a fin: las tres partes, solo, en cooperativo local o por red. Quedan la prueba por internet entre casas distintas, el equilibrio final con partidas de jugadores reales, la publicación en itch.io y activar el guardado en la nube, ya programado. El estado detallado está en la [hoja de ruta](#hoja-de-ruta).
 
 ## Índice
 
@@ -81,7 +81,7 @@ En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores ha
 
 ### Progreso y menús
 
-- **Tres huecos de guardado**, con dinero, desbloqueos y logros por hueco.
+- **Tres huecos de guardado**, con dinero, desbloqueos y logros por hueco, y **copia en la nube** con tu cuenta de GitHub (un gist secreto) para seguir en otro PC; si una partida ha cambiado en dos PC, el juego pregunta con cuál quedarse ([guía](docs/GUARDADO_NUBE.md)).
 - **Tienda de antigüedades:** potenciadores permanentes, personajes, compañeros y **vestuario** (26 prendas que se ven sobre el modelo).
 - **La Biblioteca:** bestiario, arsenal y lugares, con notas de diario de los años 20 y los mapas de cada escenario.
 - **18 logros** con recompensa, intro y **relatos** que cuentan cada nivel antes de jugarlo.
@@ -507,7 +507,7 @@ La lista completa está en [`CLAUDE.md`](CLAUDE.md). En partida, **Pausa → Dep
 godot --headless --path . -s addons/gut/gut_cmdln.gd
 ```
 
-393 tests con [GUT 9.4](https://github.com/bitwes/Gut): movimiento, combate, balas, armas y evoluciones, oleadas, progresión, cordura, cooperativo, red, compañeros, economía, tienda, logros, guardado, configuración, menús, contenido y animaciones. Lo visual se comprueba con capturas automáticas desde la terminal.
+419 tests con [GUT 9.4](https://github.com/bitwes/Gut): movimiento, combate, balas, armas y evoluciones, oleadas, progresión, cordura, cooperativo, red, compañeros, economía, tienda, logros, guardado, nube, configuración, menús, contenido y animaciones. Lo visual se comprueba con capturas automáticas desde la terminal.
 
 ### Rendimiento
 
@@ -529,6 +529,7 @@ El detalle está en [`docs/RENDIMIENTO.md`](docs/RENDIMIENTO.md) y en el diario.
 - [`docs/ESTADO.md`](docs/ESTADO.md): diario detallado de cada hito y cambio.
 - [`docs/LECCIONES.md`](docs/LECCIONES.md): lecciones técnicas aprendidas.
 - [`docs/JUGAR_ONLINE.md`](docs/JUGAR_ONLINE.md) y [`docs/PRUEBA_ONLINE.md`](docs/PRUEBA_ONLINE.md): guía para jugar por red y lista de la prueba por internet.
+- [`docs/GUARDADO_NUBE.md`](docs/GUARDADO_NUBE.md): guía de la copia de las partidas en la nube.
 - [`CLAUDE.md`](CLAUDE.md): estado actual, arquitectura, pipeline y comandos.
 - [`docs/PROMPT_juego_lovecraft.md`](docs/PROMPT_juego_lovecraft.md): la especificación original, sin cambios.
 
@@ -550,7 +551,7 @@ Salen de capturas automáticas del juego: `sh tools/capturas_readme.sh` juega la
 | 7 | Parte 3: Providence, Luisiana, el Pacífico, R'lyeh y Cthulhu | ✅ Hecha |
 | 8 | Pulido y distribución: sonido, música, accesibilidad, 50 armas y 50 objetos, escenarios rehechos, efectos en cubitos, dificultades, ambiente vivo, subidas por turnos, caras nuevas | 🔨 En curso: falta el equilibrio final con partidas reales y subir a itch.io |
 | 9 | Juego online: sala, selección y partida en red, pausa y subidas para todos, desconexiones y vuelta | ✅ Hecha, pendiente de la prueba por internet |
-| 10 | Guardado en la nube | ⏳ Pendiente |
+| 10 | Guardado en la nube: copia de las partidas y los controles en un gist de GitHub, conflictos entre PC | ✅ Hecha, pendiente de activarla (aplicación de GitHub) y de la prueba con dos PC |
 
 ## Derechos y créditos
 

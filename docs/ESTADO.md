@@ -982,6 +982,11 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Capturas sin red con `cloud_demo=conectado|codigo|conflicto` (cuenta de mentira, código de ejemplo con la ventana abierta sola, conflicto de ejemplo en el primer hueco con partida; usan `user://cloud_demo.json` y no guardan el token). Revisadas en `shots/menus/titulo__nube_{off,on,codigo,conflicto,huecos}_*.png`.
   - Prueba de verdad de la ventana de huecos: `test_save=2 saves=nube_a`, luego `title saves=nube_a open=slots cloud_token=… cloud_marker=lovecraft_prueba.json` sube la partida y `title saves=nube_b …` (carpeta vacía) la baja y la enseña «Copia en la nube al día» (`shots/menus/titulo__nube_real_b_005.0s.png`). Gist de prueba borrado después.
   - Tests: 419 de 419.
+- **Fase 10, hito 10.4: cierre (26-10-2026):**
+  - Build: la de Windows exportada (en una carpeta temporal) pasa `cloud_check` contra GitHub con HTTPS: lleva sus propios certificados. La de macOS usa el mismo mecanismo de Godot; queda comprobarla en un Mac.
+  - Guía para jugadores en `docs/GUARDADO_NUBE.md`: conectar, qué se sube y cuándo, conflictos, dónde está el gist y qué quiere decir secreto, desconectar y revocar, errores, y cómo registrar la OAuth App (para el autor). Enlazada desde los dos README, que ya cuentan la nube (y 419 tests).
+  - Lecciones nuevas en `docs/LECCIONES.md`: métodos de `Dictionary` como `Callable`, estado que dejan las pruebas en `user://`, señales de un autoload con funciones anónimas y HTTPS en la build.
+  - **Para activarla falta** el `client_id` de la OAuth App del autor en `data/cloud.json` (pasos en la guía). Después, la prueba del autor con dos PC: jugar en uno, abrir la elección de partida en el otro, y jugar en los dos sin conexión para ver el conflicto.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 
@@ -1001,3 +1006,9 @@ Ofrecidas al cerrar el rediseño de Padre Dagon (23-10-2026):
 - Mandíbula de Dagon que se abre al rugir (pieza propia y `anim_dagon.gd`).
 - Imagen nueva de Dagon en el README (la de `docs/img` enseña la de antes).
 - Avisos «Interpolated instance triggered from outside physics process» de las recompensas de comida y de poción, vistos en la partida de prueba del 23-10-2026: Godot los da por probablemente inofensivos, pero ensucian la salida.
+
+Ofrecidas al cerrar la fase 10 (26-10-2026):
+- Código QR en la ventana de conectar, para escribir el código desde el móvil.
+- Al conectar, si la nube tiene partidas y este PC no, decirlo en la ventana («Se han bajado 2 partidas»).
+- Botón «Ver la copia en GitHub» en la pestaña Nube (abre el gist en el navegador).
+- Copia de seguridad local de la partida que se descarta en un conflicto (`slot_N.descartada.json`), por si acaso.

@@ -39,7 +39,7 @@ In the Library of Miskatonic University, a handful of investigators have begun t
 </div>
 
 > [!NOTE]
-> **Version 0.9.0, in development.** The full campaign can be played from start to finish: all three parts, solo, in local co-op or over the network. Still to come: the online test between different homes, final balancing with real players, the itch.io release and cloud saves. The detailed status is in the [roadmap](#roadmap).
+> **Version 0.9.0, in development.** The full campaign can be played from start to finish: all three parts, solo, in local co-op or over the network. Still to come: the online test between different homes, final balancing with real players, the itch.io release and switching on cloud saves, which are already built. The detailed status is in the [roadmap](#roadmap).
 
 > [!IMPORTANT]
 > **The game is currently in Spanish only.** The names of characters, weapons, items and creatures on this page are translated; the screenshots show them as they appear in the game.
@@ -84,7 +84,7 @@ In the Library of Miskatonic University, a handful of investigators have begun t
 
 ### Progress and menus
 
-- **Three save slots**, each with its own money, unlocks and achievements.
+- **Three save slots**, each with its own money, unlocks and achievements, plus a **cloud copy** in your GitHub account (a secret gist) to carry on from another PC; if a save has changed on two PCs, the game asks which one to keep ([guide](docs/GUARDADO_NUBE.md), in Spanish).
 - **Antique shop:** permanent boosts, characters, companions and **outfits** (26 pieces shown on the model).
 - **The Library:** bestiary, arsenal and places, with 1920s journal notes and maps of every level.
 - **18 achievements** with rewards, an intro and **stories** that tell each level before you play it.
@@ -512,7 +512,7 @@ The full list is in [`CLAUDE.md`](CLAUDE.md). In-game, **Pause → Debug** lets 
 godot --headless --path . -s addons/gut/gut_cmdln.gd
 ```
 
-393 tests with [GUT 9.4](https://github.com/bitwes/Gut): movement, combat, bullets, weapons and evolutions, waves, progression, sanity, co-op, networking, companions, economy, shop, achievements, saves, settings, menus, content and animations. Visuals are checked with automatic screenshots from the terminal.
+419 tests with [GUT 9.4](https://github.com/bitwes/Gut): movement, combat, bullets, weapons and evolutions, waves, progression, sanity, co-op, networking, companions, economy, shop, achievements, saves, cloud, settings, menus, content and animations. Visuals are checked with automatic screenshots from the terminal.
 
 ### Performance
 
@@ -534,6 +534,7 @@ Details in [`docs/RENDIMIENTO.md`](docs/RENDIMIENTO.md) and in the journal.
 - [`docs/ESTADO.md`](docs/ESTADO.md): detailed journal of every milestone and change.
 - [`docs/LECCIONES.md`](docs/LECCIONES.md): technical lessons learned.
 - [`docs/JUGAR_ONLINE.md`](docs/JUGAR_ONLINE.md) and [`docs/PRUEBA_ONLINE.md`](docs/PRUEBA_ONLINE.md): guide to playing online and checklist for the internet test.
+- [`docs/GUARDADO_NUBE.md`](docs/GUARDADO_NUBE.md): guide to cloud saves (in Spanish).
 - [`CLAUDE.md`](CLAUDE.md): current status, architecture, pipeline and commands.
 - [`docs/PROMPT_juego_lovecraft.md`](docs/PROMPT_juego_lovecraft.md): the original specification, unchanged.
 
@@ -555,7 +556,7 @@ They come from automatic in-game screenshots: `sh tools/capturas_readme.sh` play
 | 7 | Part 3: Providence, Louisiana, the Pacific, R'lyeh and Cthulhu | ✅ Done |
 | 8 | Polish and release: sound, music, accessibility, 50 weapons and 50 items, rebuilt levels, voxel effects, difficulties, living ambience, turn-based level-ups, new faces | 🔨 In progress: final balancing with real games and the itch.io release remain |
 | 9 | Online play: room, selection and networked game, pause and level-ups for everyone, disconnections and rejoining | ✅ Done, pending the internet test |
-| 10 | Cloud saves | ⏳ Pending |
+| 10 | Cloud saves: saves and controls copied to a GitHub gist, conflicts between PCs | ✅ Done, waiting to be switched on (GitHub app) and for the two-PC test |
 
 ## Rights and credits
 
