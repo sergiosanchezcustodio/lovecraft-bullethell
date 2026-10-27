@@ -988,6 +988,13 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Lecciones nuevas en `docs/LECCIONES.md`: métodos de `Dictionary` como `Callable`, estado que dejan las pruebas en `user://`, señales de un autoload con funciones anónimas y HTTPS en la build.
   - **Para activarla falta** el `client_id` de la OAuth App del autor en `data/cloud.json` (pasos en la guía). Después, la prueba del autor con dos PC: jugar en uno, abrir la elección de partida en el otro, y jugar en los dos sin conexión para ver el conflicto.
 
+- **Cthulhu sin las caras de dentro (27-10-2026, idea del cierre de Dagon):**
+  - `tools/gen_cthulhu.py` vacía ahora cada parte por separado, como Dagon: quita lo que tiene voxels **de la misma parte** a 1 y 2 en las seis direcciones. Antes contaba cualquier parte, así que el tronco quedaba abierto donde lo tapaban los brazos y la barba: al girarlos podía verse el hueco, y las caras de dentro no se podían quitar. Después, `voxlib.inner_faces(..., floor=-16)` marca las que dan al hueco (noveno valor).
+  - Malla: de 487.000 a 317.000 triángulos (−35 %; menos que en Dagon porque las alas y los tentáculos son finos y no tienen hueco). Voxels: de 131.500 a 138.500 (los del tronco bajo los brazos ya no se quitan). Comprobado que el hueco de cada parte no da al exterior en ningún punto.
+  - Se ve igual: las capturas de antes y después (`still 0` y `still 180`) no cambian ningún píxel más de 6/255, y en el golpe con los dos brazos (`anim 30 cthulhu slam_both`) no se abre nada.
+  - **Rendimiento** (`level=p3_n5 final_at=1 bot=circle god=true noweapons=true perf=20 cfg_fps_limit=0 cfg_vsync=false`, tras construir la caché): con el nuevo, 7,10 ms de media y 8,2 ms en el 1 % peor (cinco mediciones); con el de antes, 7,36 y 8,5 ms (dos de tres; la primera dio 7,8). Unos 0,3 ms menos.
+  - Tests: 419 de 419.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
@@ -1002,7 +1009,7 @@ Ofrecidas al cerrar las cabezas nuevas de los trece personajes (23-10-2026):
 - Elwood con bigote de morsa, más británico, en vez del militar ancho.
 
 Ofrecidas al cerrar el rediseño de Padre Dagon (23-10-2026):
-- Quitar también las caras de dentro a Cthulhu (487.000 triángulos) y a otros modelos grandes vaciados (`voxlib.inner_faces`): más rendimiento en el combate final.
+- Quitar las caras de dentro a otros modelos grandes vaciados (`voxlib.inner_faces`; Cthulhu ya está, 27-10-2026). Estimado ese día: la fuente de Innsmouth (61 %), el trineo (57 %), el muro y la escalera de R'lyeh y el arco (~49 %), el autobús (35 %).
 - Mandíbula de Dagon que se abre al rugir (pieza propia y `anim_dagon.gd`).
 - Imagen nueva de Dagon en el README (la de `docs/img` enseña la de antes).
 - Avisos «Interpolated instance triggered from outside physics process» de las recompensas de comida y de poción, vistos en la partida de prueba del 23-10-2026: Godot los da por probablemente inofensivos, pero ensucian la salida.

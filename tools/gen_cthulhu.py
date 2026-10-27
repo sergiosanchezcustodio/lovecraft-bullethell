@@ -13,12 +13,12 @@ Estilo del primigenio menor y del engendro, en adulto (13-10-2026; la versión d
 en gen_cthulhu_v2.py): piel verde azulada con manchas claras en el manto, vientre crema con
 placas, ojos amarillos rasgados con pupila de rendija, tentáculos casi negros con ventosas y
 alas violetas (más oscuras junto a los huesos).
-Hueco: solo la cáscara. Partes como Dagon (torso, head, arm_l, arm_r) para anim_dagon.gd.
+Hueco: solo la cáscara de cada parte, sin las caras que dan al hueco (voxlib.inner_faces). Partes como Dagon (torso, head, arm_l, arm_r) para anim_dagon.gd.
 Uso: python tools/gen_cthulhu.py
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(__file__))
-from voxlib import Model, lerp
+from voxlib import Model, lerp, inner_faces
 
 T, H, AL, AR = 'torso', 'head', 'arm_l', 'arm_r'
 SKIN = (0.18, 0.40, 0.34); SKIN_L = (0.27, 0.51, 0.42); SKIN_D = (0.11, 0.26, 0.23); SPOT = (0.32, 0.56, 0.47)
@@ -202,11 +202,16 @@ for (x, y, z), v in list(M.V.items()):
     M.V[(x, y, z)] = [v[0], c, v[2]]
 for (x, y, z), v in list(M.V.items()):                            # placas del vientre
     if v[1] == BELLY and y % 5 == 0: v[1] = BELLY_D
+# Vaciado por partes (27-10-2026, como Dagon): fuera lo que tiene voxels de la misma parte a 1 y 2 en
+# las seis direcciones. Antes contaba cualquier parte, y el tronco quedaba abierto bajo el brazo y la
+# barba: al girarlos se veía el hueco, y las caras de dentro no se podían quitar.
 dirs = [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]
-inside = [k for k in M.V if all((k[0] + a * d, k[1] + b * d, k[2] + c * d) in M.V for a, b, c in dirs for d in (1, 2))]
+inside = [k for k, v in M.V.items() if all(M.V.get((k[0] + a * d, k[1] + b * d, k[2] + c * d), (None,))[0] == v[0]
+                                           for a, b, c in dirs for d in (1, 2))]
 for k in inside: del M.V[k]
 for k in [k for k in M.V if k[1] < -16]: del M.V[k]
 piv = {T: [0, -4, 0], H: [0, 62, 14], AL: [-42, 50, 4], AR: [42, 50, 4]}
+skip = inner_faces(M, (T, H, AL, AR), floor=-16)                   # sin las caras que dan al hueco
 n = M.export('models/cthulhu.json', piv, jitter=0.01, pivots_in_voxels=True, roughness=0.4, specular=0.5,
-             parents={H: T, AL: T, AR: T})
-print('cthulhu: %d voxels' % n)
+             parents={H: T, AL: T, AR: T}, skip=skip)
+print('cthulhu: %d voxels, %d con caras de dentro' % (n, len(skip)))
