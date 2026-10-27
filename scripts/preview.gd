@@ -5,7 +5,7 @@ extends Node3D
 ## <modelos>: un nombre de models/, "lineup" (los cuatro profundos) o varios separados por comas.
 ## Opciones clave=valor: propiedades del Environment (fog_density=0.03), de las luces
 ## (moon.light_energy=0.6, lamp.*, rim.*), de la cámara (cam.size=4), size=2400x1100, tag=sufijo,
-## frames=N (fotogramas de animación) y floor=false.
+## frames=N (fotogramas de animación), floor=false y face=cerrados|dolor (cara de los personajes).
 
 const LINEUP: Array[String] = ["profundo", "bruto", "acechador", "abisal"]
 const GAP := 0.3   # separación entre modelos de un grupo, en metros
@@ -49,6 +49,8 @@ func _ready() -> void:
 		var m := VoxelBuilder.load_model("res://models/%s.json" % bits[0])
 		for g in bits.slice(1):
 			VoxelBuilder.dress(m, "res://models/vest_%s_%s.json" % [g, bits[0]], OutfitData.is_head(g))
+		if la.has("face"):                  # face=abiertos|cerrados|dolor: parpadeo y mueca (FaceLook)
+			m.add_child(FaceLook.new().setup(m, "res://models/%s.json" % bits[0]))
 		var holder := Node3D.new()
 		holder.rotation_degrees.y = yaw
 		holder.add_child(m)

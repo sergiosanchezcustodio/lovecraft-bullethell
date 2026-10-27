@@ -199,6 +199,9 @@ func _cloud() -> void:
 		now.set_value_text("")
 		await CloudConflictMenu.resolve_all(self)
 		if is_inside_tree(): _show_tab(4)
+	if Cloud.gist_url() != "":
+		_action("Ver la copia en GitHub", func() -> void:
+			if Cloud.demo == "": OS.shell_open(Cloud.gist_url()))   # capturas: sin navegador
 	_action("Desconectar este PC", func() -> void:
 		var c := MenuKit.Confirm.new("¿Desconectar la cuenta de GitHub de este PC?
 

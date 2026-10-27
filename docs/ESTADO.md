@@ -1003,6 +1003,32 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **Rendimiento** (`bot=circle god=true autopick=true perf=20 cfg_fps_limit=0 cfg_vsync=false`, tras construir la caché): en R'lyeh (`p3_n5 final_at=1 noweapons=true`, con Cthulhu), de 6,93 a 6,01 ms de media y de 8,6 a 7,3 ms en el 1 % peor (tres mediciones de cada versión), con 15 → 10,6 millones de primitivas; en las calles de Innsmouth (`p2_n2`, siete de cada), de 4,81 a 4,42 ms de media y de 9,4 a 7,0 millones de primitivas. Ahí el 1 % peor va de 6,6 a 9,0 ms con las dos versiones y no se ve diferencia clara.
   - Tests: 419 de 419.
 
+- **El farol propio ya no quema la cara (27-10-2026, idea del cierre de las cabezas nuevas), pendiente de tu revisión:**
+  - El farol iba a 1,5 m de altura y a unos 40 cm del pecho, entre el jugador y la cámara: la cara y el pecho recibían tres veces más luz que las piernas y salían casi blancos (solo se leían cejas y bigote).
+  - Ahora son dos luces (`Player`): `CarryLight`, la de siempre, ilumina el mundo y a las criaturas pero no a los jugadores (`light_cull_mask`), así que el charco de luz del suelo no cambia; `CarryFill` ilumina solo a los jugadores (`VIS_PLAYER`, la capa de dibujo 2, que `_set_vis_layer` pone al modelo con su vestuario), desde más lejos y más alta (`FILL_POS` 0,9 / 2,3 / 1,1, energía `FILL_ENERGY` 1,2, alcance 4 m, atenuación 1), así que la luz se reparte por todo el cuerpo. La de otro jugador cercano también lo ilumina; su farol, ya no.
+  - Se leen la nariz y las mejillas rojas de Dyer, las gafas y los labios de Whipple y los ojos de Legrasse; el personaje sigue destacando en las noches (calles de Innsmouth y ritual). Hojas: `shots/revision/2026-10-27/farol_cara_dyer.png` (campamento) y `farol_cara_noche.png` (Whipple en las calles y Legrasse en el ritual; antes y después, de cerca y a tamaño de juego).
+  - Tests: 419 de 419.
+
+- **Parpadeo y mueca de dolor (27-10-2026, ideas del cierre de las cabezas nuevas), pendiente de tu revisión:**
+  - `FaceLook` (`scripts/player/face_look.gd`), en la cabeza de cada jugador: cada 2,5-6 s (a veces dos seguidos) cierra los ojos 0,12 s con unos párpados del color de la piel (la fila de abajo, más oscura, hace de pestañas); al recibir un golpe, 0,4 s de mueca: ojos apretados en «/ \» (por dentro arriba, por fuera abajo) y dientes apretados que tapan los labios. Las piezas son caras +z delante de los voxels, con el mismo material que el modelo, así que se iluminan como la cara. En las crisis no sale (va la cara de pánico) y en red la mueca sale también con los golpes de los jugadores de otros PC.
+  - Datos en `data/faces.json`, de `python tools/gen_caras_juego.py`: las caras dibujadas a mano tienen los ojos de 4×2 en x = −6..−3 y 2..5, y solo cambia la fila (71 a 74), que se busca por los blancos. El párpado es la media de la piel alrededor de los ojos (la piel tiene textura; lo pintado, como pestañas, gafas o mejillas, es de color plano). La boca de la mueca va sobre los labios (rojizos y planos) y, sin labios a la vista, seis filas bajo los ojos, por delante del bigote o la barba. En la mueca también se tapan con piel las pestañas y la sombra de ojos de alrededor (no lo que va en relieve ni las gafas pintadas: su color es el del puente) y los restos de labio (la media sonrisa de Malone). Las cabezas de antes (`arte=v1`) no tienen datos y no parpadean. **Si cambia la cara de un personaje, ejecútalo otra vez.**
+  - Capturas: `face=cerrados|dolor` en la partida y en el visor (`still 20 dyer face=dolor`). Hojas de los trece (abiertos, cerrados y mueca): `shots/revision/2026-10-27/caras_parpadeo_dolor_1.png` y `_2.png`.
+  - Tests: `tests/test_face_look.gd` (4: todos los personajes con cara, parpadeo, mueca que dura un momento, sin mueca en las crisis y modelos sin cara). En total, 423 de 423.
+
+- **Mandíbula de Padre Dagon (27-10-2026, idea del cierre de su rediseño), pendiente de tu revisión:**
+  - `tools/gen_dagon.py`: parte nueva `jaw`, que cuelga de la cabeza con la bisagra atrás, a la altura de las comisuras (pivote 0, 132, 60 en voxels). Es lo de la cabeza por debajo de la boca tallada (y, fuera de ella, por debajo de las comisuras) y por delante de la bisagra, más los dientes de abajo (`LOWER`): lengua, encía de abajo, labio inferior y papada. Se separa después de rellenar el hueco y antes de vaciar otra vez, así que cabeza y mandíbula quedan cerradas cada una por sus voxels (`inner_faces`). El corte, que se ve al abrir, va de garganta en la cabeza y de encía oscura en la mandíbula, solo por dentro: lo que da al aire sigue siendo piel y en reposo no se nota la junta.
+  - Con la boca cerrada se ve igual que antes (capturas `still` de antes y después desde tres lados: un píxel distinto); tronco y brazos, idénticos. 295.000 voxels y 534.000 triángulos (antes 283.000 y 517.000: las caras del corte).
+  - `anim_dagon.gd`: al rugir, la mandíbula se abre 0,42 rad (`JAW_OPEN`) en el primer cuarto, se queda abierta temblando un poco y se cierra al final. Cthulhu y el Dagon de antes (`arte=v1`), que usan la misma animación, no tienen mandíbula y no cambian.
+  - En el visor, la contraluz verdosa saca un brillo verde en el corte de la mandíbula, que es plano y mira hacia arriba (con `rim.light_energy=0` se ve rojo); en la partida, con la luz del arrecife, no se nota. Hoja `shots/revision/2026-10-27/dagon_mandibula.png` (rugido en el visor y en la partida).
+  - Tests: 423 de 423.
+
+- **Nube: código QR, ver la copia en GitHub y copia de la partida descartada (27-10-2026, ideas del cierre de la fase 10), pendiente de tu revisión:**
+  - **QR** en la ventana de conectar, al lado de `github.com/login/device`: con el móvil se abre la página sin escribirla (el código de 8 letras hay que escribirlo igual: GitHub no da un enlace con el código dentro). Godot no trae generador, así que va en `QrCode` (`scripts/ui/qr_code.gd`): modo bytes, corrección M, versiones 1 a 10 y la máscara de menor penalización. Comprobado módulo a módulo contra la librería `qrcode` de Python (ocho textos de la versión 1 a la 10, las ocho máscaras) y leído con OpenCV, también de la captura de la ventana. Si GitHub devolviera otra dirección (`verification_uri`), el QR se rehace con ella.
+  - **Ver la copia en GitHub** en la pestaña Nube (con cuenta y gist): abre `gist.github.com/<usuario>/<gist>` en el navegador (`Cloud.gist_url`), donde también está el historial de subidas. La cuenta de `cloud_demo` lleva un gist de mentira para que salga en las capturas (sin abrir el navegador).
+  - **Copia de la partida descartada:** al resolver un conflicto (`Cloud.resolve`), la que se descarta (la de este PC o la de la nube) se escribe aparte con `Saves.backup` en `slot_N.descartada_<fecha>.json` junto a los huecos (si coinciden en el segundo, `_2`, `_3`…; `Saves.backups(i)` las lista); el juego no las lee. Van como nunca subidas (`cloud_base` −1): si se renombra una a `slot_N.json`, la nube la da por conflicto y se elige otra vez (probado en el test). Los textos de la ventana de conflicto ya no dicen «se perderá», sino que queda una copia aparte; la guía (`docs/GUARDADO_NUBE.md`) explica dónde está y cómo recuperarla.
+  - Capturas: `shots/menus/titulo__nube_qr_014.0s.png` y `titulo__nube_gist_014.0s.png` (`title saves=demo_saves open=menu_config tab=4 cloud_demo=codigo|conectado shots=14`).
+  - Tests: `tests/test_qr_code.gd` (3: versión y patrones fijos, huella de la matriz contra la referencia, versiones y límite) y en `test_cloud_sync.gd` la copia de la descartada en los dos sentidos, recuperarla, que no se pisen y el enlace del gist. En total, 428 de 428.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
@@ -1011,18 +1037,11 @@ Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a
 - `tools/marcas.py` avisa si un registro no tiene «Fin de la sesión» (el juego se cerró de golpe).
 
 Ofrecidas al cerrar las cabezas nuevas de los trece personajes (23-10-2026):
-- Bajar el farol propio sobre la cara del jugador: a tamaño de juego quema la piel y la cara se ve casi blanca.
-- Parpadeo de vez en cuando (la fila de los ojos en piel unos fotogramas).
-- Mueca de dolor breve al recibir daño, con el mismo sistema que la cara de pánico (`CrisisLook`).
 - Elwood con bigote de morsa, más británico, en vez del militar ancho.
 
 Ofrecidas al cerrar el rediseño de Padre Dagon (23-10-2026):
-- Mandíbula de Dagon que se abre al rugir (pieza propia y `anim_dagon.gd`).
 - Imagen nueva de Dagon en el README (la de `docs/img` enseña la de antes).
 - Avisos «Interpolated instance triggered from outside physics process» de las recompensas de comida y de poción, vistos en la partida de prueba del 23-10-2026: Godot los da por probablemente inofensivos, pero ensucian la salida.
 
 Ofrecidas al cerrar la fase 10 (26-10-2026):
-- Código QR en la ventana de conectar, para escribir el código desde el móvil.
 - Al conectar, si la nube tiene partidas y este PC no, decirlo en la ventana («Se han bajado 2 partidas»).
-- Botón «Ver la copia en GitHub» en la pestaña Nube (abre el gist en el navegador).
-- Copia de seguridad local de la partida que se descarta en un conflicto (`slot_N.descartada.json`), por si acaso.

@@ -11,6 +11,7 @@ extends Node3D
 ##   weapons=granada,webly   armas iniciales (por defecto, la del personaje)
 ##   wlevel=3                nivel inicial de esas armas
 ##   god=true                el jugador no recibe daño
+##   face=cerrados|dolor     deja la cara de los jugadores así (FaceLook; capturas)
 ##   bullet_rain=1000        mantiene N balas enemigas vivas alrededor (prueba de carga)
 ##   level=p1_n1             nivel a jugar (por defecto); nolevel=true: campo de pruebas sin oleadas
 ##   timescale=4             acelera el tiempo de juego (verificar el evento final)

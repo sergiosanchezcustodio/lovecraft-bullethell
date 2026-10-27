@@ -12,6 +12,9 @@ signal stepped                   ## un pie toca el suelo al andar (pasos: Ambien
 
 const LAYER_WORLD := 1
 const LAYER_PLAYERS := 2
+## Capa de dibujo de los modelos de los jugadores: el farol propio no los ilumina (de tan cerca les
+## quemaba la cara y el pecho); los ilumina una luz suave aparte (CarryFill), solo en esta capa.
+const VIS_PLAYER := 1 << 1
 
 var data: CharacterData
 var input: PlayerInput
@@ -50,6 +53,7 @@ var pet_xp_mult := 1.0          ## experiencia extra por gema (búho de los sue�
 var visual: Node3D          ## contenedor que gira hacia donde mira; dentro, el modelo voxel
 var model: Node3D
 var _crisis_look: CrisisLook
+var _face: FaceLook              ## parpadeo y mueca de dolor
 var health := 0.0
 var sanity := 0.0
 var weapons: WeaponSystem
@@ -78,6 +82,8 @@ const DECOY_RADIUS := 7.0
 ## Tienda (17-10-2026)
 const LANTERN_RANGE := 1.4       ## farol propio con la Linterna de queroseno
 const LANTERN_SANITY := 1.5      ## y la cordura vuelve más deprisa
+const FILL_POS := Vector3(0.9, 2.3, 1.1)   ## luz de los jugadores (CarryFill), respecto al cuerpo
+const FILL_ENERGY := 1.2
 const SECOND_LIFE_HEALTH := 0.5  ## vida con la que te levanta la Medalla de San Cristóbal
 var second_lives_used := 0       ## Medalla de San Cristóbal gastadas en este nivel
 var banishes_used := 0           ## descartes de las Cartas del tarot en este nivel
@@ -159,6 +165,9 @@ func _ready() -> void:
 	add_child(visual)
 	model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
 	OutfitData.apply(model, data.model, OutfitData.worn_for(String(data.id)))   # vestuario (D-34)
+	_face = FaceLook.new().setup(model, VoxelBuilder.variant_path("res://models/%s.json" % data.model))
+	add_child(_face)
+	_set_vis_layer(model)
 	visual.add_child(model)
 	# Silueta del color del jugador cuando lo tapa el decorado
 	_xray = ShaderMaterial.new()
@@ -185,8 +194,25 @@ func _ready() -> void:
 	lamp.light_energy = 1.1
 	lamp.omni_range = 4.5
 	lamp.omni_attenuation = 1.4
+	lamp.light_cull_mask = 0xFFFFF & ~VIS_PLAYER       # el mundo y las criaturas, no los jugadores
 	add_child(lamp)
+	# Luz de los jugadores: más lejos (hacia la cámara y más alta) y repartida, para que la cara
+	# y el pecho no salgan blancos a tamaño de juego (27-10-2026)
+	var fill := OmniLight3D.new()
+	fill.name = "CarryFill"
+	fill.position = FILL_POS
+	fill.light_color = lamp.light_color
+	fill.light_energy = FILL_ENERGY
+	fill.omni_range = 4.0
+	fill.omni_attenuation = 1.0
+	fill.light_cull_mask = VIS_PLAYER
+	add_child(fill)
 	reset_physics_interpolation.call_deferred()      # no interpolar desde el origen al aparecer
+
+## Pasa el modelo (con su vestuario) a la capa de los jugadores.
+static func _set_vis_layer(node: Node) -> void:
+	if node is VisualInstance3D: (node as VisualInstance3D).layers = VIS_PLAYER
+	for c in node.get_children(): _set_vis_layer(c)
 
 func _physics_process(delta: float) -> void:
 	var t0 := Prof.start()
@@ -442,6 +468,7 @@ func _process_step(delta: float) -> void:
 	# Crisis de locura: anillo violeta que late y tinte violeta en cada congelación
 	var ss := sanity_state
 	if _crisis_look and ss.in_crisis != _crisis_look._on: _crisis_look.set_on(ss.in_crisis)
+	_face.suppressed = ss.in_crisis
 	var frozen := (_net_flags & NET_FROZEN) != 0 if remote else ss.is_frozen()
 	var trembling := (_net_flags & NET_TREMBLING) != 0 if remote else ss.is_trembling()
 	if ss.in_crisis:
@@ -729,6 +756,7 @@ func take_damage(d: Damage) -> void:
 		sanity = maxf(0.0, sanity - d.mental * mental_resist * data.mental_mult)
 		sanity_state.on_mental_damage()
 	_hurt_time = 0.0
+	_face.hurt()
 	damaged.emit(d)
 	if health <= 0.0 and data.ankh > 0.0 and not _ankh_used:       # Ankh de Nephren: se levanta una vez
 		_ankh_used = true
@@ -918,7 +946,9 @@ func net_apply(pos: Vector3, yaw: float, vel: Vector3, dodges: int, hp: float, s
 	_net_flags = flags
 	sanity_state.in_crisis = (flags & NET_CRISIS) != 0
 	if flags & NET_HURT:
-		if _hurt_time < 0.0 or _hurt_time >= data.hit_iframes: _hurt_time = 0.0
+		if _hurt_time < 0.0 or _hurt_time >= data.hit_iframes:
+			_hurt_time = 0.0
+			_face.hurt()
 	else: _hurt_time = -1.0
 	if was > 0.0 and hp <= 0.0:
 		motor.locked = true

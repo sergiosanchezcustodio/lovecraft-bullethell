@@ -2,11 +2,15 @@ class_name CloudConnectMenu
 extends Control
 ## Conectar la cuenta de GitHub (hito 10.3): pide un código a GitHub, lo enseña en grande, abre
 ## github.com/login/device en el navegador y lo copia al portapapeles, y espera a que el jugador lo
-## autorice. Al conectar, sincroniza y resuelve los conflictos que haya. B / Esc cancela.
+## autorice. Al conectar, sincroniza y resuelve los conflictos que haya. B / Esc cancela. Al lado de
+## la dirección, un código QR con ella (27-10-2026): con el móvil se abre la página sin escribirla.
 
 signal closed
 
+const URL := "https://github.com/login/device"
+
 var _code: Label
+var _qr: TextureRect
 var _status: Label
 var _buttons: HBoxContainer
 var _opened := false
@@ -18,8 +22,22 @@ func _ready() -> void:
 	var box: VBoxContainer = w[1]
 	box.add_child(MenuKit.title("Conectar con GitHub", 44))
 	box.add_child(_text("1. Abre esta página en el navegador (se abre sola):", UiKit.TEXT))
-	var url := MenuKit.title("github.com/login/device", 30, UiKit.GOLD)
-	box.add_child(url)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 28)
+	box.add_child(row)
+	var col := VBoxContainer.new()
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(col)
+	col.add_child(MenuKit.title("github.com/login/device", 30, UiKit.GOLD))
+	var phone := _text("o, con el móvil, escanea este código", UiKit.TEXT_DIM, 18)
+	phone.custom_minimum_size.x = 420
+	col.add_child(phone)
+	_qr = TextureRect.new()
+	_qr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_qr.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+	row.add_child(_qr)
+	_show_qr(URL)
 	box.add_child(_text("2. Escribe este código y autoriza el juego:", UiKit.TEXT))
 	_code = MenuKit.title("Pidiendo el código…", 72, MenuKit.INK)
 	box.add_child(_code)
@@ -59,6 +77,8 @@ func _run() -> void:
 func _refresh() -> void:
 	if _done or not Cloud.pending.has("user_code"): return
 	_code.text = Cloud.pending.user_code
+	var uri := String(Cloud.pending.get("verification_uri", URL))
+	if uri != _qr.get_meta("url", ""): _show_qr(uri)
 	if _status.text == "": _status.text = "Esperando a que lo autorices en GitHub…"
 	if not _opened:
 		_opened = true
@@ -66,9 +86,14 @@ func _refresh() -> void:
 		_status.text = "Esperando a que lo autorices en GitHub… (el código ya está copiado)"
 		_open_page()
 
+func _show_qr(url: String) -> void:
+	var img := QrCode.image(url, 5, Color(0.05, 0.04, 0.04), Color(0.95, 0.93, 0.88))
+	if img != null: _qr.texture = ImageTexture.create_from_image(img)
+	_qr.set_meta("url", url)
+
 func _open_page() -> void:
 	if Cloud.demo != "": return                        # capturas: sin navegador
-	OS.shell_open(String(Cloud.pending.get("verification_uri", "https://github.com/login/device")))
+	OS.shell_open(String(Cloud.pending.get("verification_uri", URL)))
 
 func _close() -> void:
 	if _done: return

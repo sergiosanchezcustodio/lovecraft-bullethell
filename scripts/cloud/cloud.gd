@@ -22,6 +22,7 @@ var client_id := ""
 var token := ""
 var login := ""                              ## usuario de GitHub
 var gist_id := ""
+var last_backup := ""                   ## ruta de la última partida descartada en un conflicto (Saves.backup)
 var device_id := ""                          ## este PC (al azar, la primera vez)
 var device_name := ""
 var gist := GitHubGist.new()
@@ -83,6 +84,7 @@ func _ready() -> void:
 		if demo != "codigo":
 			_set_token("demo")
 			login = "investigador"
+			gist_id = "0123456789abcdef0123456789abcdef"   # de mentira: el botón de ver la copia
 
 func connected() -> bool:
 	return token != ""
@@ -264,7 +266,8 @@ func _sync_controls(files: Dictionary, out: Dictionary, after: Array[Callable]) 
 		after.append(settings.store_controls.bind(lc))
 
 ## Resuelve el conflicto de un hueco: con la copia de la nube o con la de este PC (que se sube
-## como revisión nueva). true si quedó resuelto.
+## como revisión nueva). La que se descarta se guarda aparte en este PC (`Saves.backup`, en
+## `last_backup`), por si acaso. true si quedó resuelto.
 func resolve(slot: int, keep_cloud: bool) -> bool:
 	var c := conflict_of(slot)
 	if c.is_empty(): return false
@@ -274,6 +277,8 @@ func resolve(slot: int, keep_cloud: bool) -> bool:
 		changed.emit()
 		return true
 	if keep_cloud:
+		var mine: SaveData = saves.peek(slot)
+		last_backup = saves.backup(slot, mine if mine != null else c.local)
 		cloud.cloud_base = cloud.rev
 		saves.store(slot, cloud)
 		_drop_conflict(slot)
@@ -286,10 +291,16 @@ func resolve(slot: int, keep_cloud: bool) -> bool:
 	d.rev = rev
 	d.cloud_base = rev
 	if not await push({CloudSync.slot_file(slot): JSON.stringify(d, "	")}): return false
+	last_backup = saves.backup(slot, cloud)
 	saves.mark_synced(slot, rev)
 	_drop_conflict(slot)
 	changed.emit()
 	return true
+
+## Página del gist en GitHub ("" sin gist): ahí se ven la copia y su historial.
+func gist_url() -> String:
+	if gist_id == "": return ""
+	return "https://gist.github.com/%s/%s" % [login, gist_id] if login != "" else "https://gist.github.com/" + gist_id
 
 func conflict_of(slot: int) -> Dictionary:
 	for c: Dictionary in conflicts:

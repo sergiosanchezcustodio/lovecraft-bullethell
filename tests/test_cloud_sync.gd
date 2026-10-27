@@ -67,7 +67,9 @@ func _pc(tag: String) -> Node:
 	var s: Node = SavesScript.new()
 	s.dir = "user://saves_nube_%s" % tag
 	add_child_autofree(s)
-	for i in s.SLOTS: s.delete(i)
+	for i in s.SLOTS:
+		s.delete(i)
+		for f in s.backups(i): DirAccess.remove_absolute(f)
 	var c: Node = CloudScript.new()
 	c.wire = false
 	c.path = "user://cloud_pruebas_%s.json" % tag
@@ -89,6 +91,13 @@ func _play(c: Node, slot: int, money: int) -> void:
 	c.saves.use(slot)
 	c.saves.current.money += money
 	c.saves.save()
+
+## Dinero de las copias de partidas descartadas de un hueco.
+func _backup_money(c: Node, slot: int) -> Array:
+	var out := []
+	for f: String in c.saves.backups(slot):
+		out.append(int(JSON.parse_string(FileAccess.get_file_as_string(f)).money))
+	return out
 
 func _money(c: Node, slot: int) -> int:
 	var d: SaveData = c.saves.peek(slot)
@@ -152,6 +161,8 @@ func test_conflicto_y_eleccion() -> void:
 	assert_eq(_money(b, 0), 120, "hasta elegir, no cambia nada")
 	assert_true(await b.resolve(0, false))           # se queda la de este PC
 	assert_eq(b.conflicts, [])
+	assert_eq(_backup_money(b, 0), [110], "la de la nube queda aparte en este PC")
+	assert_eq(b.last_backup, b.saves.backups(0)[0])
 	await a.sync()
 	assert_eq(_money(a, 0), 120, "la elegida llega al otro PC")
 	assert_eq(a.conflicts, [])
@@ -166,9 +177,20 @@ func test_elegir_la_de_la_nube() -> void:
 	assert_eq(b.conflicts.size(), 1)
 	assert_true(await b.resolve(1, true))
 	assert_eq(_money(b, 1), 100)
+	assert_eq(_backup_money(b, 1), [5], "la de este PC queda aparte")
+	assert_true(b.saves.backups(0).is_empty() and b.saves.backups(2).is_empty())
 	assert_eq(b.saves.current.money, 100, "también la partida en uso")
 	assert_true(await b.sync())
 	assert_eq(b.conflicts, [], "queda en sintonía")
+	# recuperar la copia: se pone en el hueco, la nube la da por conflicto y se elige esta
+	var copy := SaveData.from_dict(JSON.parse_string(FileAccess.get_file_as_string(b.saves.backups(1)[0])))
+	b.saves.store(1, copy)
+	assert_true(await b.sync())
+	assert_eq(b.conflicts.size(), 1, "la recuperada sale como conflicto")
+	assert_true(await b.resolve(1, false))
+	assert_eq(_money(b, 1), 5, "y queda la recuperada")
+	await a.sync()
+	assert_eq(_money(a, 1), 5, "también en el otro PC")
 
 func test_en_partida_no_cambia_el_hueco_en_uso() -> void:
 	var a := _pc("a")
@@ -228,3 +250,21 @@ func test_controles() -> void:
 	assert_eq(int(JSON.parse_string(hub.file("controles.json")).keys.dodge), KEY_ALT)
 	await b.sync()
 	assert_eq(int(b.settings.d.keys.dodge), KEY_ALT)
+
+func test_copias_descartadas_no_se_pisan() -> void:
+	var a := _pc("a")
+	_play(a, 2, 7)
+	var d: SaveData = a.saves.peek(2)
+	a.saves.backup(2, d)
+	d.money = 8
+	a.saves.backup(2, d)
+	assert_eq(_backup_money(a, 2), [7, 8], "dos en el mismo segundo")
+	assert_eq(a.saves.peek(2).money, 7, "el hueco no se toca")
+
+func test_enlace_del_gist() -> void:
+	var a := _pc("a")
+	a.gist_id = ""
+	assert_eq(a.gist_url(), "", "sin gist, sin enlace")
+	a.gist_id = "abc123"
+	a.login = "investigador"
+	assert_eq(a.gist_url(), "https://gist.github.com/investigador/abc123")

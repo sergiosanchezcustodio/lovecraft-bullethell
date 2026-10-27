@@ -74,6 +74,33 @@ func store(i: int, d: SaveData) -> bool:
 	if i == slot: current = d
 	return true
 
+## Copia aparte de una partida que se descarta (un conflicto con la nube, 27-10-2026), junto a los
+## huecos: `slot_N.descartada_<fecha>.json`, que el juego no lee. Para recuperarla, se renombra a
+## `slot_N.json`: va como nunca subida (`cloud_base` -1), así que la nube la da por conflicto y se
+## elige otra vez. Devuelve la ruta, o "" si no se pudo escribir.
+func backup(i: int, d: SaveData) -> String:
+	DirAccess.make_dir_recursive_absolute(dir)
+	var stamp := Time.get_datetime_string_from_system().replace(":", "").replace("T", "_")
+	var p := dir.path_join("slot_%d.descartada_%s.json" % [i + 1, stamp])
+	var n := 2
+	while FileAccess.file_exists(p):                # dos en el mismo segundo: no se pisan
+		p = dir.path_join("slot_%d.descartada_%s_%d.json" % [i + 1, stamp, n])
+		n += 1
+	var f := FileAccess.open(p, FileAccess.WRITE)
+	if f == null: return ""
+	var dd := d.to_dict()
+	dd.cloud_base = -1
+	f.store_string(JSON.stringify(dd, "	"))
+	return p
+
+## Copias de partidas descartadas de un hueco (rutas, de la más antigua a la más nueva).
+func backups(i: int) -> PackedStringArray:
+	var out := PackedStringArray()
+	for f in DirAccess.get_files_at(dir):
+		if f.begins_with("slot_%d.descartada_" % (i + 1)): out.append(dir.path_join(f))
+	out.sort()
+	return out
+
 ## Apunta que la nube tiene la revisión `rev` de un hueco (después de subirlo). Solo toca las
 ## revisiones: si se guardó otra vez mientras subía, eso no se pierde y queda por subir.
 func mark_synced(i: int, rev: int) -> void:

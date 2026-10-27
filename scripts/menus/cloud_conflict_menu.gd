@@ -1,8 +1,9 @@
 class_name CloudConflictMenu
 extends Control
 ## Conflicto de un hueco (hito 10.3): se jugó en este PC y en otro sin pasar por la nube. Enseña
-## las dos partidas lado a lado y el jugador elige con cuál se queda (con confirmación: la otra se
-## pierde). B / Esc lo deja para luego: el conflicto sigue apuntado y vuelve a salir en los huecos.
+## las dos partidas lado a lado y el jugador elige con cuál se queda (con confirmación: la otra deja
+## de usarse, aunque queda una copia aparte en este PC, `Saves.backup`). B / Esc lo deja para luego:
+## el conflicto sigue apuntado y vuelve a salir en los huecos.
 
 signal done(resolved: bool)
 
@@ -30,7 +31,7 @@ func _ready() -> void:
 	var w: Array = MenuKit.window(self, MenuKit.DANGER, 1100)
 	var box: VBoxContainer = w[1]
 	box.add_child(MenuKit.title("La Partida %d ha cambiado en dos sitios" % (slot + 1), 42))
-	var l := UiKit.label("Se ha jugado en este PC y en otro sin pasar por la nube. Elige con cuál te quedas: la otra se perderá.", 20, UiKit.TEXT)
+	var l := UiKit.label("Se ha jugado en este PC y en otro sin pasar por la nube. Elige con cuál te quedas: de la otra se guarda una copia aparte en este PC, por si acaso.", 20, UiKit.TEXT)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.custom_minimum_size.x = 1000
@@ -94,7 +95,7 @@ func _card(head: String, d: SaveData, other: SaveData) -> Button:
 func _choose(keep_cloud: bool) -> void:
 	if _busy: return
 	_busy = true
-	var q := MenuKit.Confirm.new("¿Quedarte con la de %s?\n\nLa de %s se perderá." % [
+	var q := MenuKit.Confirm.new("¿Quedarte con la de %s?\n\nLa de %s deja de usarse (queda una copia aparte en la carpeta de partidas de este PC)." % [
 		"la nube" if keep_cloud else "este PC", "este PC" if keep_cloud else "la nube"], "Quedarme con esta", "Cancelar", MenuKit.INK)
 	add_child(q)
 	var yes: bool = await q.answered

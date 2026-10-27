@@ -19,7 +19,8 @@ Sigue las referencias de FLUX en local (python tools/referencias_criaturas.py da
 Solo anatomía (CLAUDE.md: los Profundos sin ropa ni adornos). Hueco: solo la cáscara, y sin las
 caras que dan al hueco (voxlib.inner_faces).
 
-Partes y pivotes: torso (cintura, en el agua), head (nuca), arm_l / arm_r (hombros).
+Partes y pivotes: torso (cintura, en el agua), head (nuca), arm_l / arm_r (hombros) y jaw
+(mandíbula, cuelga de la cabeza; bisagra atrás, a la altura de las comisuras).
 Animaciones: scripts/anim/anim_dagon.gd. Uso: python tools/gen_dagon.py
 """
 import sys, os, math
@@ -28,7 +29,7 @@ from scipy import ndimage
 sys.path.insert(0, os.path.dirname(__file__))
 from voxlib import Model, lerp, _ih, inner_faces
 
-T, H, AL, AR = 'torso', 'head', 'arm_l', 'arm_r'
+T, H, AL, AR, JAW = 'torso', 'head', 'arm_l', 'arm_r', 'jaw'
 S = 2                                                             # voxels por ub
 M = Model(S=S, seed=1931)
 V = M.V
@@ -128,8 +129,9 @@ def hollow(normals=False, core=None):
     normal de cada voxel que queda, del degradado de la ocupación suavizada de su parte; en core
     deja lo que quita (voxel -> parte)."""
     out = {}
-    for part in (T, H, AL, AR):
+    for part in (T, H, AL, AR, JAW):
         keys = [k for k, v in V.items() if v[0] == part]
+        if not keys: continue
         P = np.array(keys, dtype=np.int64)
         lo = P.min(0) - 5
         occ = np.zeros(tuple(P.max(0) - lo + 6), bool)
@@ -272,6 +274,7 @@ for x in range(-(W + 3) * S, (W + 3) * S + 1):                   # labio crema a
         z = front(x, y, H)
         if z is not None: V[(x, y, z)] = [H, LIP_L if dm <= 1.5 else LIP, 0]
 
+LOWER = set()                                                    # dientes de abajo: van con la mandíbula
 def tooth(x0, y0, z0, down, L, w, tx, tz, k):
     """Diente de L voxels desde la raíz, hacia abajo (arriba) o hacia arriba (abajo): w de ancho en
     la raíz que se afila hasta 1, torcido tx y tz voxels en la punta; amarillento en la raíz,
@@ -287,6 +290,7 @@ def tooth(x0, y0, z0, down, L, w, tx, tz, k):
         for a in range(ww):
             for b in range(ww):
                 M.put(x0 + dx + a - ww // 2, y, z0 + dz - b, H, c)
+                if not down: LOWER.add((x0 + dx + a - ww // 2, y, z0 + dz - b))
 
 for upper in (True, False):                                      # dos filas desiguales, torcidas, alguno roto o que falta
     x = -int(19.5 * S); k = 0 if upper else 100
@@ -609,10 +613,30 @@ for c, k in sorted(cells.items()):
 # de otra parte (púas de la cabeza en la nuca), rompe la cáscara: se rellena el hueco y se vacía otra
 # vez, y así cada parte queda cerrada por sus propios voxels (inner_faces quita las caras de dentro).
 for k, part in CORE.items(): V[k] = [part, TEAL_D, 0]
+
+# Mandíbula (27-10-2026): lo de la cabeza por debajo de la boca (y, fuera de ella, de las comisuras)
+# y por delante de la bisagra, atrás a la altura de las comisuras, con los dientes de abajo. Se abre
+# al rugir (anim_dagon.gd). El corte, que se ve al abrirla, va del color de la garganta; solo por
+# dentro: lo que da al aire sigue siendo piel y en reposo no se nota la junta.
+JH, JZ = (HY - 6) * S, (HZ + 4) * S                              # bisagra
+def under_mouth(x, y):
+    return y < (mouth_edges(x)[1] if abs(x) <= W * S else JH)
+for k, v in V.items():
+    if v[0] == H and k[2] > JZ and under_mouth(k[0], k[1]): v[0] = JAW
+for k in LOWER:
+    if k in V: V[k][0] = JAW
+DIRS = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+cut = []
+for (x, y, z), v in V.items():
+    if v[0] not in (H, JAW): continue
+    other = JAW if v[0] == H else H
+    if any(V.get((x + a, y + b, z + c), (None,))[0] == other for a, b, c in DIRS) and             all((x + a, y + b, z + c) in V for a, b, c in DIRS):
+        cut.append((x, y, z))
+for k in cut: V[k][1] = THROAT if V[k][0] == H else GUM_D
 hollow()
 for k in [k for k in V if k[1] < -16 * S]: del V[k]              # lo que queda muy hondo
-piv = {T: [0, -4 * S, 0], H: [0, 60 * S, 14 * S], AL: [-38 * S, 50 * S, 4 * S], AR: [38 * S, 50 * S, 4 * S]}
-skip = inner_faces(M, (T, H, AL, AR), floor=-16 * S)              # sin las caras de dentro: la mitad de la malla
+piv = {T: [0, -4 * S, 0], H: [0, 60 * S, 14 * S], AL: [-38 * S, 50 * S, 4 * S], AR: [38 * S, 50 * S, 4 * S], JAW: [0, JH, JZ]}
+skip = inner_faces(M, (T, H, AL, AR, JAW), floor=-16 * S)              # sin las caras de dentro: la mitad de la malla
 n = M.export('models/dagon.json', piv, jitter=0.01, pivots_in_voxels=True, roughness=0.5, specular=0.45,
-             parents={H: T, AL: T, AR: T}, skip=skip)
+             parents={H: T, AL: T, AR: T, JAW: H}, skip=skip)
 print('dagon: %d voxels, %d con caras de dentro' % (n, len(skip)))
