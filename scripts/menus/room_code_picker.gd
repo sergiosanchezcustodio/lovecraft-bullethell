@@ -88,5 +88,5 @@ func _paint() -> void:
 		_labels[i].text = cells[i] if cells[i] != "" else BLANK
 		_labels[i].add_theme_color_override("font_color", MenuKit.INK if cells[i] != "" else UiKit.TEXT_DIM)
 		var box := _labels[i].get_parent() as PanelContainer
-		box.add_theme_stylebox_override("panel", UiKit.panel(Color(0.08, 0.08, 0.1, 0.95) if on else Color(0.05, 0.05, 0.07, 0.9),
-			Color(MenuKit.INK, 0.95 if on else 0.3), 6))
+		box.add_theme_stylebox_override("panel", MenuKit.box(Color(0.16, 0.1, 0.05, 0.95) if on else Color(0.04, 0.03, 0.025, 0.9),
+			Color(MenuKit.BRASS, 0.95 if on else 0.3), 2 if on else 1))

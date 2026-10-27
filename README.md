@@ -559,6 +559,7 @@ Salen de capturas automáticas del juego: `sh tools/capturas_readme.sh` juega la
 - **Motor:** [Godot Engine](https://godotengine.org/) (licencia MIT).
 - **Tests:** [GUT](https://github.com/bitwes/Gut) (licencia MIT), en `addons/gut/`.
 - **Fuente de la portada:** *IM FELL English SC*, de Igino Marini, con licencia [SIL Open Font License 1.1](resources/fonts/OFL_IMFellEnglishSC.txt).
+- **Fuente de los menús:** *EB Garamond*, de Georg Duffner y Octavio Pardo, con licencia [SIL Open Font License 1.1](resources/fonts/OFL_EBGaramond.txt).
 - **Efectos de sonido:** [Kenney](https://kenney.nl/) (CC0) y sintetizados para el juego.
 - **Música:** del autor (portada y primer nivel) y pistas CC0 de [OpenGameArt](https://opengameart.org/) de Eldritch Grim, Juhani Junkala, isaiah658 y otros; la lista completa, con autor y enlace, está en [`data/musica.json`](data/musica.json).
 - **Diseño, ilustraciones de la portada y la tienda:** Sergio Sánchez Custodio.

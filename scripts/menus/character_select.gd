@@ -125,10 +125,8 @@ func _build() -> void:
 	bg.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
-	var dim := ColorRect.new()
-	dim.color = Color(0.0, 0.0, 0.02, 0.72)
-	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(dim)
+	add_child(MenuKit.veil(1.1))
+	theme = MenuKit.theme()                     # biblioteca gótica, como los menús (27-10-2026)
 	var stage := Control.new()                  # todo en coordenadas de 1920x1080, centrado
 	stage.size = DESIGN
 	add_child(stage)
@@ -415,13 +413,10 @@ func _build_room() -> void:
 	_wait_dim.visible = false
 	_stage.add_child(_wait_dim)
 	_wait = PanelContainer.new()
-	var sb := UiKit.panel(Color(0.02, 0.022, 0.03, 0.96), Color(MenuKit.INK, 0.6), 10)
-	sb.content_margin_left = 48; sb.content_margin_right = 48
-	sb.content_margin_top = 26; sb.content_margin_bottom = 26
-	_wait.add_theme_stylebox_override("panel", sb)
 	var wbox := VBoxContainer.new()
 	wbox.add_theme_constant_override("separation", 10)
 	_wait.add_child(wbox)
+	MenuKit.dress(_wait, MenuKit.BRASS, Vector2(48, 28), 110.0)
 	_wait_label = MenuKit.title("", 34, MenuKit.INK)
 	_wait_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	wbox.add_child(_wait_label)
@@ -561,8 +556,8 @@ class _Frame extends Control:
 		var color := Devices.COLORS[index]
 		_panel = Panel.new()
 		_panel.size = FRAME
-		_panel.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9), Color(color, 0.25), 10))
 		add_child(_panel)
+		MenuKit.dress(_panel, MenuKit.BRASS, Vector2.ZERO, 72.0)   # madera y latón; refresh() lo tiñe
 		_head = MenuKit.title("J%d" % (index + 1), 26, color)   # puesto vacío: arriba, centrado
 		_head.size = Vector2(FRAME.x, 40)
 		_head.position = Vector2(0, 10)
@@ -570,7 +565,7 @@ class _Frame extends Control:
 		_jbox = PanelContainer.new()                           # puesto ocupado: recuadro como el del arma
 		_jbox.position = Vector2(12, 12)
 		_jbox.custom_minimum_size = Vector2(92, 92)
-		_jbox.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.5), Color(color, 0.7), 10))
+		_jbox.add_theme_stylebox_override("panel", _frame(Color(0, 0, 0, 0.5), Color(MenuKit.BRASS.lerp(color, 0.6), 0.85), 2))
 		add_child(_jbox)
 		var jl := MenuKit.title("J%d" % (index + 1), 54, color)
 		jl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -593,7 +588,7 @@ class _Frame extends Control:
 		# arma inicial, arriba a la derecha
 		_wbox = PanelContainer.new()
 		_wbox.position = Vector2(FRAME.x - 104, 12)
-		_wbox.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.5), Color(UiKit.GOLD, 0.6), 10))
+		_wbox.add_theme_stylebox_override("panel", _frame(Color(0, 0, 0, 0.5), Color(MenuKit.BRASS, 0.7), 2))
 		add_child(_wbox)
 		_weapon = TipIcon.new(Vector2(72, 72))
 		_weapon.placeholder = "Arma"
@@ -625,7 +620,7 @@ class _Frame extends Control:
 		_outfit.position = Vector2(14, 418)
 		_outfit.custom_minimum_size = Vector2(FRAME.x - 28, FRAME.y - 430)
 		_outfit.size = _outfit.custom_minimum_size
-		_outfit.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.97), Color(color, 0.6), 10))
+		_outfit.add_theme_stylebox_override("panel", _frame(Color(0.03, 0.022, 0.018, 0.97), Color(MenuKit.BRASS.lerp(color, 0.5), 0.75), 2))
 		add_child(_outfit)
 		var ob := VBoxContainer.new()
 		ob.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -657,6 +652,7 @@ class _Frame extends Control:
 		_pet.position = Vector2(0, FRAME.y + PET_GAP)
 		_pet.size = Vector2(FRAME.x, PET_H)
 		add_child(_pet)
+		MenuKit.dress(_pet, MenuKit.BRASS, Vector2.ZERO, 60.0)
 		_pet_title = MenuKit.title("Elige compañero", 24, UiKit.GOLD)
 		_pet_title.size = Vector2(FRAME.x, 32)
 		_pet_title.position = Vector2(0, 8)
@@ -689,13 +685,19 @@ class _Frame extends Control:
 	const STAT_KEYS := {"vida": "health", "cordura": "sanity", "esquive": "dodge", "velocidad": "speed",
 		"magia": "magic", "fisico": "physical", "fuego": "firearm"}
 
+	## Recuadro de latón con los márgenes de siempre (10 y 8 px: los anchos de la ficha se midieron con ellos).
+	static func _frame(bg: Color, border: Color, width: int) -> StyleBoxFlat:
+		var sb := MenuKit.box(bg, border, width)
+		sb.content_margin_left = 10; sb.content_margin_right = 10
+		return sb
+
 	## Columna de la ficha: icono (con su descripción emergente), nombre y valor, en un
 	## recuadro dorado. Atributos con su abreviatura (POD); estadísticas con su nombre.
 	## Anchos fijos (tag_w, val_w: medidos con la fuente para el texto más largo, "+100 %")
 	## y textos recortados, para que el recuadro no cambie de ancho con los valores.
 	func _column(names: Array, into: Dictionary, tag_w: float, val_w: float) -> PanelContainer:
 		var box := PanelContainer.new()
-		box.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.45), Color(UiKit.GOLD, 0.55), 8))
+		box.add_theme_stylebox_override("panel", _frame(Color(0, 0, 0, 0.4), Color(MenuKit.BRASS, 0.5), 1))
 		var v := VBoxContainer.new()
 		v.add_theme_constant_override("separation", 2)
 		box.add_child(v)
@@ -777,8 +779,8 @@ class _Frame extends Control:
 		var on := seat != null
 		_empty.visible = not on
 		for c in [_view, _info, _pet, _wbox]: (c as CanvasItem).visible = on
-		_panel.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9 if on else 0.6),
-			Color(color, 0.85 if on and seat.stage == SelectState.Stage.READY else (0.45 if on else 0.18)), 10))
+		var ready := on and seat.stage == SelectState.Stage.READY        # el latón se enciende con su color
+		MenuKit.retint(_panel, MenuKit.BRASS.lerp(color, 0.5 if ready else 0.3) * (1.15 if ready else (0.95 if on else 0.5)), 0.95 if on else 0.7)
 		_jbox.visible = on
 		_who.visible = on and owner_screen.net_select != null
 		if on: _who.text = st.profile_of(index).name
@@ -870,7 +872,7 @@ class _Frame extends Control:
 		_pet_title.add_theme_color_override("font_color", UiKit.GOLD if active else Color(UiKit.GOLD, 0.45))
 		_pet_name.add_theme_color_override("font_color", color if active else UiKit.TEXT_DIM)
 		_pet_view.modulate = Color.WHITE if active else Color(0.55, 0.55, 0.6)
-		_pet.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.9), Color(color, 0.85 if picking else 0.25), 10))
+		MenuKit.retint(_pet, MenuKit.BRASS.lerp(color, 0.45 if picking else 0.2) * (1.1 if picking else 0.75), 0.95)
 
 	func _paint_outfit(seat: SelectState.Seat, color: Color) -> void:
 		_outfit.visible = seat.stage == SelectState.Stage.OUTFIT

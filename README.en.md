@@ -564,6 +564,7 @@ They come from automatic in-game screenshots: `sh tools/capturas_readme.sh` play
 - **Engine:** [Godot Engine](https://godotengine.org/) (MIT license).
 - **Tests:** [GUT](https://github.com/bitwes/Gut) (MIT license), in `addons/gut/`.
 - **Title screen font:** *IM FELL English SC*, by Igino Marini, under the [SIL Open Font License 1.1](resources/fonts/OFL_IMFellEnglishSC.txt).
+- **Menu font:** *EB Garamond*, by Georg Duffner and Octavio Pardo, under the [SIL Open Font License 1.1](resources/fonts/OFL_EBGaramond.txt).
 - **Sound effects:** [Kenney](https://kenney.nl/) (CC0) and synthesized for the game.
 - **Music:** by the author (title screen and first level) and CC0 tracks from [OpenGameArt](https://opengameart.org/) by Eldritch Grim, Juhani Junkala, isaiah658 and others; the full list, with authors and links, is in [`data/musica.json`](data/musica.json).
 - **Design, title screen and shop illustrations:** Sergio Sánchez Custodio.

@@ -23,6 +23,9 @@ extends CanvasLayer
 ##
 ## Llave de plata (D-38): con RB o E, quien la lleva vuelve a tirar sus opciones (las veces que
 ## le queden en el nivel); los rodillos giran otra vez.
+##
+## Biblioteca gótica (27-10-2026): el panel es de madera y latón con esquinas (MenuKit.dress), el
+## latón teñido del color de quien elige; la tarjeta marcada lleva la luz de vela de los menús.
 
 signal finished
 
@@ -54,11 +57,7 @@ func _init(p_entries: Array[Dictionary], p_pick: Callable, p_solo := false) -> v
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func _ready() -> void:
-	var dim := ColorRect.new()
-	dim.color = Color(0.0, 0.0, 0.02, 0.55 if solo else 0.45)
-	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(dim)
+	add_child(MenuKit.veil(0.75 if solo else 0.55))
 	for e in entries:
 		var pk := Picker.new(e.player, e.options, e.title, solo, String(e.get("attr", "")), filler(),
 			e.get("accent", Color.TRANSPARENT))
@@ -182,6 +181,8 @@ class Picker extends PanelContainer:
 	var _next_tick: Array[float] = []
 	var _solo := false
 	var speed := 1.0              ## ritmo de los rodillos (>1, más deprisa)
+	var _on_style: StyleBox       ## tarjeta marcada (luz de vela) y las demás
+	var _off_style: StyleBox
 
 	func _init(p: Player, p_options: Array[PlayerProgress.Option], title: String, solo := false,
 			attr := "", p_filler: Array[Dictionary] = [], p_accent := Color.TRANSPARENT) -> void:
@@ -201,21 +202,25 @@ class Picker extends PanelContainer:
 			anchor_top = 0.15 if qy == 0 else 0.52
 			anchor_bottom = 0.48 if qy == 0 else 0.85
 		var accent := p_accent if p_accent.a > 0.0 else (UiKit.XP if solo else p.color)
-		add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.92), Color(accent, 0.8), 10))
+		var metal := MenuKit.BRASS if p_accent.a <= 0.0 and solo else MenuKit.BRASS.lerp(accent, 0.5)
+		theme = MenuKit.theme()
+		_on_style = MenuKit.lit_box(metal, 12 if solo else 8)
+		_off_style = MenuKit.box(Color(0.05, 0.036, 0.028, 0.6), Color(metal, 0.2), 1)
 		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 12 if solo else 6)
 		box.alignment = BoxContainer.ALIGNMENT_CENTER
 		add_child(box)
-		var head := UiKit.label(title, 32 if solo else 20, accent)
-		head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		box.add_child(head)
+		if solo: MenuKit.heading(box, title, 40, accent)
+		else:
+			var head := MenuKit.title(title, 22, accent)
+			box.add_child(head)
 		if _attr != "":                                          # rodillo del atributo
 			var ar := HBoxContainer.new()
 			ar.alignment = BoxContainer.ALIGNMENT_CENTER
 			ar.add_theme_constant_override("separation", 10)
 			ar.add_child(UiKit.label("+1", 26 if solo else 18, UiKit.GOLD))
 			var af := PanelContainer.new()
-			af.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.45), Color(UiKit.GOLD, 0.7), 6))
+			af.add_theme_stylebox_override("panel", MenuKit.box(Color(0, 0, 0, 0.45), Color(MenuKit.BRASS, 0.8), 1))
 			_attr_tex = TextureRect.new()
 			_attr_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			_attr_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -239,7 +244,7 @@ class Picker extends PanelContainer:
 			row.add_theme_constant_override("separation", 14)
 			card.add_child(row)
 			var frame := PanelContainer.new()
-			frame.add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.35), Color(_accent(o), 0.6), 6))
+			frame.add_theme_stylebox_override("panel", _frame_style(_accent(o)))
 			frame.custom_minimum_size = Vector2(icon_px, icon_px)
 			var tex := TextureRect.new()
 			tex.texture = _icon(o)
@@ -259,6 +264,7 @@ class Picker extends PanelContainer:
 			col.add_child(kind)
 			_kinds.append(kind)
 			var t := UiKit.label(("%d  " % (i + 1) if solo else "") + o.title(), 24 if solo else 17, UiKit.TEXT)
+			t.add_theme_font_override("font", MenuKit.font())
 			col.add_child(t)
 			_titles.append(t)
 			var d := UiKit.label(o.text(), 17 if solo else 13, UiKit.TEXT_DIM)
@@ -282,6 +288,11 @@ class Picker extends PanelContainer:
 		_paint()
 		for i in options.size():
 			if not _stopped[i]: _show_filler(i)
+		MenuKit.dress(self, metal, Vector2(34, 26) if solo else Vector2(20, 14), 130.0 if solo else 70.0)
+
+	## Marco del icono de una opción: latón con el color de la opción.
+	static func _frame_style(c: Color) -> StyleBoxFlat:
+		return MenuKit.box(Color(0, 0, 0, 0.4), Color(MenuKit.BRASS.lerp(c, 0.5), 0.75), 1)
 
 	## Rodillos parados: ya se puede elegir.
 	func settled() -> bool:
@@ -392,7 +403,7 @@ class Picker extends PanelContainer:
 		_kinds[i].text = f.kind
 		_kinds[i].add_theme_color_override("font_color", f.accent)
 		_descs[i].text = " "
-		_frames[i].add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.35), Color(1, 1, 1, 0.25), 6))
+		_frames[i].add_theme_stylebox_override("panel", MenuKit.box(Color(0, 0, 0, 0.4), Color(MenuKit.BRASS, 0.3), 1))
 
 	func _show_option(i: int) -> void:
 		var o := options[i]
@@ -402,7 +413,7 @@ class Picker extends PanelContainer:
 		_kinds[i].text = _kind(o)
 		_kinds[i].add_theme_color_override("font_color", _accent(o))
 		_descs[i].text = o.text()
-		_frames[i].add_theme_stylebox_override("panel", UiKit.panel(Color(0, 0, 0, 0.35), Color(_accent(o), 0.6), 6))
+		_frames[i].add_theme_stylebox_override("panel", _frame_style(_accent(o)))
 
 	func _pop(c: Control) -> void:
 		c.scale = Vector2.ONE * 1.25
@@ -441,7 +452,5 @@ class Picker extends PanelContainer:
 	func _paint() -> void:
 		for i in _cards.size():
 			var on := i == cursor
-			var border := Color(UiKit.GOLD, 0.95) if on else Color(1, 1, 1, 0.12)
-			var bg := Color(0.12, 0.1, 0.06, 0.95) if on else Color(0.05, 0.05, 0.07, 0.8)
-			_cards[i].add_theme_stylebox_override("panel", UiKit.panel(bg, border, 6))
+			_cards[i].add_theme_stylebox_override("panel", _on_style if on else _off_style)
 			_cards[i].modulate = Color(1, 1, 1, 0.45) if done and not on else Color.WHITE

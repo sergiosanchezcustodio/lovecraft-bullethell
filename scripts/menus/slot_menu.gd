@@ -51,7 +51,7 @@ func _build(focus_slot: int) -> void:
 	var w: Array = MenuKit.window(self)
 	_root = w[0]
 	var box: VBoxContainer = w[1]
-	box.add_child(MenuKit.title("Elige partida", 52))
+	MenuKit.heading(box, "Elige partida", 52)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 28)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER

@@ -20,7 +20,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var w: Array = MenuKit.window(self, MenuKit.INK, 820)
 	var box: VBoxContainer = w[1]
-	box.add_child(MenuKit.title("Conectar con GitHub", 44))
+	MenuKit.heading(box, "Conectar con GitHub", 44)
 	box.add_child(_text("1. Abre esta página en el navegador (se abre sola):", UiKit.TEXT))
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER

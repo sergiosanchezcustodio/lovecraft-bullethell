@@ -14,7 +14,7 @@ var _popup: Control                       ## ventana abierta encima (jugar, tien
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 12)
+	col.add_theme_constant_override("separation", 4)
 	col.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	col.custom_minimum_size = Vector2(380, 0)
 	add_child(col)
@@ -22,8 +22,8 @@ func _ready() -> void:
 			["Configuración", _open_settings], ["Salir", _ask_quit]]
 	if Review.available(): opts.insert(4, ["Revisión de arte (temporal)", _open_review])   # solo en desarrollo
 	for pair in opts:
-		var b := MenuKit.button(pair[0], MenuKit.INK, 30)
-		b.custom_minimum_size = Vector2(380, 54)
+		var b := MenuKit.plain_button(pair[0], 34)        # sin caja, sobre la ilustración (27-10-2026)
+		b.custom_minimum_size = Vector2(380, 52)
 		b.pressed.connect(pair[1])
 		col.add_child(b)
 		_buttons.append(b)
@@ -83,7 +83,7 @@ func _open_play() -> void:
 	p.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var w: Array = MenuKit.window(p, MenuKit.INK, 560)
 	var box: VBoxContainer = w[1]
-	box.add_child(MenuKit.title("Jugar", 46))
+	MenuKit.heading(box, "Jugar", 46)
 	var local := MenuKit.button("Jugar en local", MenuKit.INK, 30)
 	local.custom_minimum_size = Vector2(480, 64)
 	local.pressed.connect(func() -> void: play_local.emit())

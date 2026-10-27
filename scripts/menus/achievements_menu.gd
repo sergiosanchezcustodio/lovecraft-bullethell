@@ -17,7 +17,7 @@ func _ready() -> void:
 	var box: VBoxContainer = w[1]
 	var list := Achievements.all()
 	var done := list.filter(func(a: AchievementData) -> bool: return Achievements.is_done(save, a)).size()
-	box.add_child(MenuKit.title("Logros", 48))
+	MenuKit.heading(box, "Logros", 48)
 	var sub := UiKit.label("%d de %d conseguidos" % [done, list.size()], 22, UiKit.GOLD)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(sub)

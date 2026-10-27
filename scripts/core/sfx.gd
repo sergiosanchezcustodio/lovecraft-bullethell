@@ -63,7 +63,10 @@ func has_event(ev: String) -> bool:
 	return _streams.has(ev) and not (_streams[ev] as Array).is_empty()
 
 ## Suena `ev`. vol_db se suma al de la tabla.
+var last_accept_ms := -100000                  ## cuándo sonó el último «aceptar» (MenuKit no suena al cerrar justo después)
+
 func play(ev: String, vol_db := 0.0) -> void:
+	if ev == "ui_accept": last_accept_ms = Time.get_ticks_msec()
 	_play(ev, vol_db, null)
 
 ## Suena `ev` en `pos` (en el mundo): a la izquierda o a la derecha según dónde se ve.

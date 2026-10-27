@@ -34,6 +34,7 @@ extends Node3D
 ##   autorestart=2           en la pantalla final, reintenta sola tras N s (probar el reinicio)
 ##   mute=true               sin música (también en la portada)
 ##   debug_menu=1            abre la pausa y el menú de depuración a ese segundo (capturas)
+##   sheet_at=2 / map_at=2   abre la ficha o el mapa del J1 a ese segundo (capturas)
 ##   character=johansen      personaje del J1 (dyer, olmstead, legrasse, johansen)
 ##   model=dyer_chibi        otro modelo para el J1 (probar prototipos)
 ##   bots=3                  jugadores de compañía manejados por la máquina (J2..J4, hito 2.9)
@@ -375,6 +376,9 @@ func _ready() -> void:
 		hud.add_child(OffscreenArrows.new().setup(players, camera))   # y flechas hacia los que no se ven
 	if args.has("quit_at"):                        # pruebas: "Menú principal" a los t s de juego (en red, deja la sala)
 		get_tree().create_timer(args.get_float("quit_at"), false).timeout.connect(_quit)
+	for kind: StringName in [&"sheet", &"map"]:      # pruebas: la ficha o el mapa del J1 a los t s
+		if args.has(kind + "_at"):
+			get_tree().create_timer(args.get_float(kind + "_at"), false).timeout.connect(func() -> void: menus.toggle(player, kind))
 	if args.has("down_at"):                        # pruebas: el J1 de este PC cae a los t s de juego
 		get_tree().create_timer(args.get_float("down_at"), false).timeout.connect(func() -> void:
 			player.god = false
@@ -772,27 +776,20 @@ func _show_halt(text: String, buttons: Array) -> void:
 	_halt_ui = CanvasLayer.new()
 	_halt_ui.layer = 30
 	_halt_ui.process_mode = Node.PROCESS_MODE_ALWAYS
-	var dim := ColorRect.new()
-	dim.color = Color(0.0, 0.0, 0.02, 0.5)
-	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_halt_ui.add_child(dim)
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 14)
-	_halt_ui.add_child(box)
-	var l := UiKit.label(text, 32, UiKit.TEXT)
+	var win: Array = MenuKit.window(_halt_ui, MenuKit.INK, 520)
+	var box: VBoxContainer = win[1]
+	var l := UiKit.label(text, 28, UiKit.TEXT)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(l)
 	var first: Button = null
 	for pair: Array in buttons:
-		var b := UiKit.button(String(pair[0]))
-		b.custom_minimum_size = Vector2(300, 56)
+		var b := MenuKit.button(String(pair[0]), MenuKit.INK, 26)
+		b.custom_minimum_size = Vector2(320, 56)
 		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		var f: Callable = pair[1]
 		b.pressed.connect(func() -> void: f.call())
 		box.add_child(b)
 		if first == null: first = b
-	box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
 	add_child(_halt_ui)
 	if first != null: first.grab_focus.call_deferred()
 
@@ -1037,7 +1034,8 @@ func _make_announcer() -> void:
 	announcer.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	announcer.position.y = 140
 	announcer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	announcer.add_theme_font_size_override("font_size", 38)
+	announcer.add_theme_font_override("font", MenuKit.font())     # la de los títulos (27-10-2026)
+	announcer.add_theme_font_size_override("font_size", 46)
 	announcer.add_theme_color_override("font_color", Color(0.92, 0.88, 0.8))
 	announcer.add_theme_color_override("font_outline_color", Color(0.02, 0.02, 0.03))
 	announcer.add_theme_constant_override("outline_size", 10)

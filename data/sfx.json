@@ -398,6 +398,20 @@
 				"ui_back_0.ogg"
 			]
 		},
+		"menu_open": {
+			"db": -15,
+			"pitch": [
+				0.8,
+				0.92
+			],
+			"voices": 1,
+			"gap": 0.15,
+			"files": [
+				"page_0.ogg",
+				"page_1.ogg",
+				"page_2.ogg"
+			]
+		},
 		"page": {
 			"db": -10,
 			"pitch": [

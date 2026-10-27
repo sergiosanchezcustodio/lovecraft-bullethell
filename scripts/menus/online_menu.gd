@@ -90,7 +90,7 @@ func _focus(c: Control) -> void:
 func _show_choice() -> void:
 	_clear()
 	_view = ""
-	_box.add_child(MenuKit.title("Jugar online", 46))
+	MenuKit.heading(_box, "Jugar online", 46)
 	_text("Hasta cuatro jugadores en total, en uno o varios PC.", 20, UiKit.TEXT_DIM)
 	var create := _button("Crear sala", _host)
 	_button("Unirse a una sala", _show_join)
@@ -115,15 +115,17 @@ func _host() -> void:
 func _show_join() -> void:
 	_clear()
 	_view = "join"
-	_box.add_child(MenuKit.title("Unirse a una sala", 44))
+	MenuKit.heading(_box, "Unirse a una sala", 44)
 	_text("Escribe el código que te ha dado el anfitrión (o su IP).", 20, UiKit.TEXT_DIM)
 	_field = LineEdit.new()
 	_field.placeholder_text = "K7Q2-M9XA   o   83.45.201.7"
 	_field.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_field.custom_minimum_size = Vector2(520, 60)
 	_field.add_theme_font_size_override("font_size", 28)
-	_field.add_theme_stylebox_override("normal", UiKit.panel(Color(0.06, 0.06, 0.08, 0.95), Color(MenuKit.INK, 0.4)))
-	_field.add_theme_stylebox_override("focus", UiKit.panel(Color(0.08, 0.08, 0.1, 0.95), Color(MenuKit.INK, 0.9)))
+	var fn := MenuKit.box(Color(0.03, 0.022, 0.018, 0.95), Color(MenuKit.BRASS, 0.4), 1)
+	fn.content_margin_left = 14; fn.content_margin_right = 14
+	_field.add_theme_stylebox_override("normal", fn)
+	_field.add_theme_stylebox_override("focus", MenuKit.lit_box())
 	_field.text_submitted.connect(func(_t: String) -> void: _connect())
 	var row := CenterContainer.new()
 	row.add_child(_field)

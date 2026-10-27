@@ -25,7 +25,7 @@ func _ready() -> void:
 	var win_root: Control = w[0]
 	(win_root.get_child(0) as ColorRect).color = Color(0, 0, 0.02, 0.12)   # sin oscurecer la escena
 	(win_root.get_child(1) as Control).anchor_left = 0.47                  # la ventana, a la derecha
-	box.add_child(MenuKit.title("Tienda", 48))
+	MenuKit.heading(box, "Tienda", 48)
 	_money = UiKit.label("", 24, UiKit.GOLD)
 	_money.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_money)
@@ -63,8 +63,8 @@ func _show_tab(i: int) -> void:
 	_tab = i
 	for k in _tabs.size():
 		_tabs[k].add_theme_color_override("font_color", UiKit.GOLD if k == i else UiKit.TEXT_DIM)
-		_tabs[k].add_theme_stylebox_override("normal", UiKit.panel(Color(0.1, 0.1, 0.13, 0.95) if k == i else Color(0.05, 0.05, 0.07, 0.8),
-			Color(UiKit.GOLD, 0.8 if k == i else 0.2)))
+		_tabs[k].add_theme_stylebox_override("normal", MenuKit.box(Color(0.16, 0.1, 0.05, 0.9) if k == i else Color(0.04, 0.03, 0.025, 0.6),
+			Color(MenuKit.BRASS, 0.85 if k == i else 0.25), 1))
 	for c in _list.get_children():
 		_list.remove_child(c)
 		c.queue_free()

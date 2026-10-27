@@ -18,7 +18,7 @@ func _ready() -> void:
 	var won: Array = Saves.current.levels_won if Saves.current else []
 	var w: Array = MenuKit.window(self, MenuKit.INK, 1500)
 	var box: VBoxContainer = w[1]
-	box.add_child(MenuKit.title("Elige parte", 50))
+	MenuKit.heading(box, "Elige parte", 50)
 	var dev := OS.is_debug_build()
 	var cols := HBoxContainer.new()
 	cols.add_theme_constant_override("separation", 26)
@@ -62,7 +62,6 @@ func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
 	var b := MenuKit.button("Jugar esta parte" if playable else ("Próximamente" if open else "Bloqueada"), MenuKit.INK, 24)
 	b.custom_minimum_size = Vector2(460, 62)
 	b.disabled = not playable
-	b.add_theme_stylebox_override("disabled", UiKit.panel(Color(0.03, 0.03, 0.04, 0.7), Color(UiKit.TEXT_DIM, 0.12)))
 	b.focus_entered.connect(func() -> void:
 		_info_title.text = "Parte %d · %s" % [pi + 1, part.title]
 		_info_text.text = "%s. Cinco niveles seguidos: el nivel, las armas y los objetos de cada investigador pasan de uno al siguiente." % part.place)
@@ -89,7 +88,6 @@ func _level_button(l: Dictionary, won: Array) -> Button:
 	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	b.disabled = not playable
 	b.add_theme_color_override("font_disabled_color", Color(UiKit.TEXT_DIM, 0.55 if not unlocked else 0.9))
-	b.add_theme_stylebox_override("disabled", UiKit.panel(Color(0.03, 0.03, 0.04, 0.7), Color(UiKit.TEXT_DIM, 0.12)))
 	b.focus_entered.connect(func() -> void:
 		_info_title.text = l.name
 		_info_text.text = "Criaturas: %s" % l.creatures)

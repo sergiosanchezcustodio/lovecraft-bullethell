@@ -14,18 +14,13 @@ var _value: Label
 func _init(p_title: String, p_names: Array[String], p_index: int, p_on_change: Callable, p_run: Callable,
 		accent: Color = UiKit.GOLD, action_accent: Color = Color(0.45, 0.9, 0.75)) -> void:
 	title = p_title; names = p_names; index = p_index; on_change = p_on_change; run = p_run
-	var styled := UiKit.button("", action_accent if run.is_valid() else accent, 18)
-	for s in ["normal", "hover", "focus", "pressed", "disabled"]:
-		add_theme_stylebox_override(s, styled.get_theme_stylebox(s if s != "disabled" else "normal"))
-	for c in ["font_color", "font_focus_color", "font_hover_color"]:
-		add_theme_color_override(c, styled.get_theme_color(c))
+	MenuKit.style_row(self)                         # biblioteca gótica (27-10-2026)
 	add_theme_color_override("font_disabled_color", UiKit.TEXT_DIM)
-	styled.free()
-	add_theme_font_size_override("font_size", 18)
+	add_theme_font_size_override("font_size", 19)
 	alignment = HORIZONTAL_ALIGNMENT_LEFT
 	custom_minimum_size = Vector2(0, 40)
 	text = ("▸ " if run.is_valid() else "") + title
-	_value = UiKit.label("", 18, UiKit.GOLD)
+	_value = UiKit.label("", 19, MenuKit.VALUE)
 	_value.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
 	_value.offset_left = -420
 	_value.offset_right = -12

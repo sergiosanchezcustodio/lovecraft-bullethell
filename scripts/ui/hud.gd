@@ -53,6 +53,12 @@ func _ready() -> void:
 	_money_lbl = UiKit.label("", 18, UiKit.GOLD)
 	_money_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	top.add_child(_money_lbl)
+	for l: Label in [title, _time_lbl, _objective_lbl, _money_lbl]:    # Garamond, como los menús (27-10-2026)
+		l.add_theme_font_override("font", MenuKit.body_font(true))
+	title.add_theme_font_size_override("font_size", 20)          # la x de Garamond es más baja: un poco más grandes
+	_time_lbl.add_theme_font_size_override("font_size", 36)
+	_objective_lbl.add_theme_font_size_override("font_size", 21)
+	_money_lbl.add_theme_font_size_override("font_size", 23)
 	top.resized.connect(func() -> void: top.position.x = (get_viewport().get_visible_rect().size.x - top.size.x) * 0.5)
 
 func _process(_delta: float) -> void:

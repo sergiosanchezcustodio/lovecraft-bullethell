@@ -3,6 +3,8 @@ extends RefCounted
 ## Menús de la partida: subida de nivel (elige 1 de 3 mejoras; pausa la partida en
 ## solitario, D-16), pausa y fin de partida (caída o nivel superado). Todos son capas
 ## que siguen funcionando con el árbol en pausa y se manejan con teclado, mando o ratón.
+## La pausa y el fin de partida van en una ventana de biblioteca gótica (MenuKit, 27-10-2026).
+## LevelUpMenu ya no lo abre la partida (CoopLevelUp); se queda para sus tests.
 
 
 ## Subida de nivel: tres tarjetas; se elige con las flechas o la cruceta y
@@ -103,10 +105,9 @@ class PauseMenu extends CanvasLayer:
 		process_mode = Node.PROCESS_MODE_ALWAYS
 
 	func _ready() -> void:
-		var dim := ColorRect.new()
-		dim.color = Color(0.0, 0.0, 0.02, 0.6)
-		dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		add_child(dim)
+		var w: Array = MenuKit.window(self, MenuKit.INK, 440)
+		var dim: Control = w[0]
+		var box: VBoxContainer = w[1]
 		var ver := UiKit.label("v" + String(ProjectSettings.get_setting("application/config/version", "?")), 18, UiKit.TEXT_DIM)
 		ver.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)   # a mano al apuntar un fallo
 		ver.offset_left = -140
@@ -114,16 +115,12 @@ class PauseMenu extends CanvasLayer:
 		ver.offset_top = -44
 		ver.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		dim.add_child(ver)
-		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 14)
-		add_child(box)
-		var t := UiKit.label("Pausa", 40)
-		t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		box.add_child(t)
+		MenuKit.heading(box, "Pausa", 48)
 		var rows := [["Continuar", resume], ["Menú principal", quit]] if guest else 			[["Continuar", resume], ["Reiniciar", restart], ["Depuración", debug], ["Menú principal", quit]]
 		for pair in rows:
-			var b := UiKit.button(pair[0])
-			b.custom_minimum_size = Vector2(300, 56)
+			var b := MenuKit.button(pair[0], MenuKit.INK, 28)
+			b.custom_minimum_size = Vector2(340, 58)
 			var sig: Signal = pair[1]
 			b.pressed.connect(func() -> void: sig.emit())
 			box.add_child(b)
@@ -138,7 +135,6 @@ class PauseMenu extends CanvasLayer:
 			row.add_child(_ping_lbl)
 			box.add_child(row)
 			_show_ping()
-		box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
 		_buttons[0].grab_focus.call_deferred()
 
 	func _process(delta: float) -> void:
@@ -169,7 +165,7 @@ class PauseMenu extends CanvasLayer:
 ## Fin de partida: caída o nivel superado, con un resumen y reintentar o salir.
 class EndScreen extends CanvasLayer:
 	static func _logs_button() -> Button:
-		var logs := UiKit.button("Abrir la carpeta de registros de conexión", UiKit.TEXT_DIM, 18)
+		var logs := MenuKit.button("Abrir la carpeta de registros de conexión", MenuKit.INK, 20)
 		logs.custom_minimum_size = Vector2(420, 44)
 		logs.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		logs.pressed.connect(NetLog.open_folder)
@@ -194,19 +190,15 @@ class EndScreen extends CanvasLayer:
 		process_mode = Node.PROCESS_MODE_ALWAYS
 
 	func _ready() -> void:
-		var dim := ColorRect.new()
-		dim.color = Color(0.0, 0.0, 0.02, 0.0)
-		dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		add_child(dim)
-		create_tween().tween_property(dim, "color:a", 0.7, 1.0)
-		var box := VBoxContainer.new()
-		box.add_theme_constant_override("separation", 14)
-		add_child(box)
-		var t := UiKit.label(title, 52, accent)
-		t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		box.add_child(t)
+		var win: Array = MenuKit.window(self, MenuKit.INK, 620)
+		var root: Control = win[0]
+		var box: VBoxContainer = win[1]
+		box.add_theme_constant_override("separation", 12)
+		root.modulate.a = 0.0                          # entra despacio: la partida se ve terminar
+		create_tween().tween_property(root, "modulate:a", 1.0, 0.9)
+		MenuKit.heading(box, title, 56, accent)
 		for l in lines:
-			var ll := UiKit.label(l, 20, UiKit.TEXT)
+			var ll := UiKit.label(l, 22, UiKit.TEXT)
 			ll.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			box.add_child(ll)
 		var gap := Control.new(); gap.custom_minimum_size.y = 12
@@ -215,29 +207,30 @@ class EndScreen extends CanvasLayer:
 			var w := UiKit.label(waiting, 22, UiKit.TEXT_DIM)
 			w.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			box.add_child(w)
-			var leave := UiKit.button(leave_text, accent)
-			leave.custom_minimum_size = Vector2(300, 56)
+			var leave := MenuKit.button(leave_text, MenuKit.INK, 28)
+			leave.custom_minimum_size = Vector2(360, 58)
 			leave.size_flags_horizontal = Control.SIZE_SHRINK_CENTER   # no tan ancho como un título largo
 			leave.pressed.connect(func() -> void: quit.emit())
 			box.add_child(leave)
 			if logs_button: box.add_child(_logs_button())   # se cortó: el registro es lo que hay que enviar
-			box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
 			leave.grab_focus.call_deferred()
 			return
 		var nxt: Button = null
 		if has_next:
-			nxt = UiKit.button("Siguiente nivel", accent)
-			nxt.custom_minimum_size = Vector2(300, 56)
+			nxt = MenuKit.button("Siguiente nivel", MenuKit.INK, 28)
+			nxt.custom_minimum_size = Vector2(360, 58)
+			nxt.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			nxt.pressed.connect(func() -> void: next_level.emit())
 			box.add_child(nxt)
-		var again := UiKit.button("Reintentar", accent)
-		again.custom_minimum_size = Vector2(300, 56)
+		var again := MenuKit.button("Reintentar", MenuKit.INK, 28)
+		again.custom_minimum_size = Vector2(360, 58)
+		again.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		again.pressed.connect(func() -> void: restart.emit())
 		box.add_child(again)
-		var out := UiKit.button("Menú principal", accent)
-		out.custom_minimum_size = Vector2(300, 56)
+		var out := MenuKit.button("Menú principal", MenuKit.INK, 28)
+		out.custom_minimum_size = Vector2(360, 58)
+		out.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		out.pressed.connect(func() -> void: quit.emit())
 		box.add_child(out)
 		if logs_button: box.add_child(_logs_button())
-		box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
 		(nxt if nxt != null else again).grab_focus.call_deferred()

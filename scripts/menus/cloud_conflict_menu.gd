@@ -30,7 +30,7 @@ func _ready() -> void:
 	var c := Cloud.conflict_of(slot)
 	var w: Array = MenuKit.window(self, MenuKit.DANGER, 1100)
 	var box: VBoxContainer = w[1]
-	box.add_child(MenuKit.title("La Partida %d ha cambiado en dos sitios" % (slot + 1), 42))
+	MenuKit.heading(box, "La Partida %d ha cambiado en dos sitios" % (slot + 1), 42)
 	var l := UiKit.label("Se ha jugado en este PC y en otro sin pasar por la nube. Elige con cuál te quedas: de la otra se guarda una copia aparte en este PC, por si acaso.", 20, UiKit.TEXT)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

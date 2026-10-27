@@ -23,19 +23,16 @@ func _init(p_game: Node) -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func _ready() -> void:
-	var dim := ColorRect.new()
-	dim.color = Color(0.0, 0.0, 0.02, 0.72)
-	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var dim := MenuKit.veil()
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(dim)
-	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override("panel", UiKit.panel(Color(0.03, 0.035, 0.05, 0.94), Color(ACCENT, 0.5), 8))
+	var panel := PanelContainer.new()                   # madera y latón, como los menús (27-10-2026)
+	panel.theme = MenuKit.theme()
 	add_child(panel)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 10)
 	panel.add_child(box)
-	var t := UiKit.label("Depuración", 34, ACCENT)
-	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(t)
+	MenuKit.heading(box, "Depuración", 40, ACCENT)
 	_scroll = ScrollContainer.new()
 	_scroll.custom_minimum_size = Vector2(760, 760)
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -56,6 +53,7 @@ func _ready() -> void:
 	var hint := UiKit.label("Arriba/abajo: elegir · Izquierda/derecha o A: cambiar · B o Esc: volver · Start: seguir jugando", 15, UiKit.TEXT_DIM)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(hint)
+	MenuKit.dress(panel, MenuKit.BRASS, Vector2(36, 26), 120.0)
 	panel.resized.connect(func() -> void: panel.position = (get_viewport().get_visible_rect().size - panel.size) * 0.5)
 	if _first: _first.grab_focus.call_deferred()
 

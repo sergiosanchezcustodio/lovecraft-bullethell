@@ -145,10 +145,12 @@ class Sheet extends Control:
 		paged = not solo                         # en un cuadrante, las tres columnas no se leerían
 		if paged: design = Vector2(680, 900)
 		_stage.size = design
+		_stage.theme = MenuKit.theme()
+		var metal := MenuKit.BRASS.lerp(p.color, 0.45)    # madera y latón con el color del jugador (27-10-2026)
 		var bg := Panel.new()
 		bg.size = design
-		bg.add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.022, 0.03, 0.95 if solo else 0.85), Color(p.color, 0.8), 12))
 		_stage.add_child(bg)
+		MenuKit.dress(bg, metal, Vector2.ZERO, 120.0 if solo else 90.0)
 		_title = MenuKit.title("J%d  ·  Ficha del investigador" % (p.index + 1), 30, p.color)
 		_title.size = Vector2(design.x, 44)
 		_title.position = Vector2(0, 10)
@@ -163,7 +165,9 @@ class Sheet extends Control:
 			var frame := PanelContainer.new()
 			frame.custom_minimum_size = Vector2(640 if paged else col_w, row.size.y)
 			_frames.append(frame)
-			frame.add_theme_stylebox_override("panel", UiKit.panel(Color(0.03, 0.033, 0.045, 0.9), Color(p.color, 0.35), 10))
+			var fs := MenuKit.box(Color(0.03, 0.022, 0.018, 0.55), Color(metal, 0.35), 1)
+			fs.content_margin_left = 10; fs.content_margin_right = 10
+			frame.add_theme_stylebox_override("panel", fs)
 			row.add_child(frame)
 			var v := VBoxContainer.new()
 			v.add_theme_constant_override("separation", 6)
@@ -427,8 +431,8 @@ class ArenaMap extends PanelContainer:
 		p = player
 		game = p_game
 		var solo := p_game == null or (p_game.get("players") as Array).size() == 1
-		add_theme_stylebox_override("panel", UiKit.panel(Color(0.02, 0.025, 0.035, 0.95 if solo else 0.82), Color(p.color, 0.8), 10))
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		theme = MenuKit.theme()
 		var box := VBoxContainer.new()
 		add_child(box)
 		var t := MenuKit.title("J%d · Mapa del nivel" % (p.index + 1), 24, p.color)
@@ -441,6 +445,7 @@ class ArenaMap extends PanelContainer:
 		var hint := UiKit.label("Gatillos o + y −: zoom  ·  Cruceta abajo o M, B o Esc: cerrar", 13, UiKit.TEXT_DIM)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(hint)
+		MenuKit.dress(self, MenuKit.BRASS.lerp(p.color, 0.45), Vector2(22, 16), 90.0)
 
 	func _process(delta: float) -> void:
 		var z := _zoom_input()
