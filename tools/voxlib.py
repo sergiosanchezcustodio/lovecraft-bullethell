@@ -154,11 +154,14 @@ class Model:
 
     # ---------- salida ----------
     def export(self, path, pivots, jitter=0.018, default_col=(0.5, 0.5, 0.5), pivots_in_voxels=False,
-               roughness=None, specular=None, parents=None, no_bottom=False, skip=None):
+               roughness=None, specular=None, parents=None, no_bottom=False, skip=None, inner=True):
         """roughness/specular: material del modelo. Sin indicarlos, piel húmeda (0,38 / 0,6);
         para ropa, plumas, madera o piedra conviene una superficie mate (~0,9 / 0,25).
         skip: voxel -> caras que VoxelBuilder no construye (bits +x, -x, +y, -y, +z, -z), las
-        que dan al hueco cerrado de su parte (ver inner_faces); van como noveno valor."""
+        que dan al hueco cerrado de su parte (ver inner_faces); van como noveno valor. Sin skip,
+        se calculan solas (27-10-2026); inner=False las deja todas."""
+        if skip is None and inner:
+            skip = inner_faces(self, {v[0] for v in self.V.values()})
         out = []
         for (x, y, z), (p, c, g) in self.V.items():
             if isinstance(c, str):

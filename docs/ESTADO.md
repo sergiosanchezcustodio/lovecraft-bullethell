@@ -995,6 +995,14 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **Rendimiento** (`level=p3_n5 final_at=1 bot=circle god=true noweapons=true perf=20 cfg_fps_limit=0 cfg_vsync=false`, tras construir la caché): con el nuevo, 7,10 ms de media y 8,2 ms en el 1 % peor (cinco mediciones); con el de antes, 7,36 y 8,5 ms (dos de tres; la primera dio 7,8). Unos 0,3 ms menos.
   - Tests: 419 de 419.
 
+- **Atrezo y escenarios sin las caras de dentro (27-10-2026, a continuación de Cthulhu):**
+  - De los 41 millones de triángulos de todos los modelos (sin los `_v1`/`_v2`), 7,6 millones daban al hueco cerrado de su parte. Se han quitado en los 73 que ahorran al menos 20.000 triángulos (el 97 % del total): de 28,3 a 20,9 millones en esos 73. Los que más: la fuente de Innsmouth (de 750.000 a 288.000), el arco, el autobús, el muro y la escalera de R'lyeh, el templo, el trineo, el depósito, el puente del Alert, los monolitos, las columnas del arrecife, los icebergs, las costas y las barreras de roca. El resto no compensa lo que crece el repositorio (cada JSON reescrito se guarda entero).
+  - `tools/caras_dentro.py [--min N] [--dry] modelos…` lo hace sin volver a ejecutar los generadores: añade el noveno valor y no toca nada más del JSON (comprobado en la fuente: mismos voxels, colores, pivotes y material). No toca los que ya lo llevan (Dagon, Cthulhu).
+  - `voxlib.Model.export` ya lo calcula solo cuando no se le pasa `skip` (`inner=False` para no hacerlo), así que al regenerar cualquier modelo no se pierde. `gen_rlyeh_criaturas.py` y `gen_shoggoth_caverna.py` desempaquetaban exactamente 8 valores por voxel y ahora toman `v[:8]`.
+  - Se ve igual: 17 de los modelos capturados antes y después (`still 30`) no cambian ni un píxel.
+  - **Rendimiento** (`bot=circle god=true autopick=true perf=20 cfg_fps_limit=0 cfg_vsync=false`, tras construir la caché): en R'lyeh (`p3_n5 final_at=1 noweapons=true`, con Cthulhu), de 6,93 a 6,01 ms de media y de 8,6 a 7,3 ms en el 1 % peor (tres mediciones de cada versión), con 15 → 10,6 millones de primitivas; en las calles de Innsmouth (`p2_n2`, siete de cada), de 4,81 a 4,42 ms de media y de 9,4 a 7,0 millones de primitivas. Ahí el 1 % peor va de 6,6 a 9,0 ms con las dos versiones y no se ve diferencia clara.
+  - Tests: 419 de 419.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
@@ -1009,7 +1017,6 @@ Ofrecidas al cerrar las cabezas nuevas de los trece personajes (23-10-2026):
 - Elwood con bigote de morsa, más británico, en vez del militar ancho.
 
 Ofrecidas al cerrar el rediseño de Padre Dagon (23-10-2026):
-- Quitar las caras de dentro a otros modelos grandes vaciados (`voxlib.inner_faces`; Cthulhu ya está, 27-10-2026). Estimado ese día: la fuente de Innsmouth (61 %), el trineo (57 %), el muro y la escalera de R'lyeh y el arco (~49 %), el autobús (35 %).
 - Mandíbula de Dagon que se abre al rugir (pieza propia y `anim_dagon.gd`).
 - Imagen nueva de Dagon en el README (la de `docs/img` enseña la de antes).
 - Avisos «Interpolated instance triggered from outside physics process» de las recompensas de comida y de poción, vistos en la partida de prueba del 23-10-2026: Godot los da por probablemente inofensivos, pero ensucian la salida.

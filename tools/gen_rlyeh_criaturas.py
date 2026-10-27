@@ -14,7 +14,7 @@ def recolor(src, dst, fn, glow_fn):
     d = json.load(open('models/%s.json' % src))
     rng = random.Random(dst)
     for v in d['voxels']:
-        x, y, z, part, r, g, b, gl = v
+        x, y, z, part, r, g, b, gl = v[:8]                # el noveno, si lo hay: caras de dentro
         if gl: v[4:7] = glow_fn(r, g, b); continue
         nr, ng, nb, ngl = fn(x, y, z, r, g, b, rng)
         v[4:8] = [round(nr, 3), round(ng, 3), round(nb, 3), ngl]

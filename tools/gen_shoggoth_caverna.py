@@ -14,7 +14,7 @@ glow = {(v[0], v[1], v[2]) for v in d['voxels'] if v[7]}
 def near_glow(x, y, z):
     return sum((x + a, y + b, z + c) in glow for a in (-1, 0, 1) for b in (-1, 0, 1) for c in (-1, 0, 1))
 for v in d['voxels']:
-    x, y, z, part, r, g, b, gl = v
+    x, y, z, part, r, g, b, gl = v[:8]                # el noveno, si lo hay: caras de dentro
     if gl: v[4:7] = IRIS; continue
     if r + g + b < 0.13 and near_glow(x, y, z) >= 3:               # pupila (negra en el original): roja y brilla
         v[4:7] = PUPIL; v[7] = 1; continue
