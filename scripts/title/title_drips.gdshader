@@ -10,12 +10,24 @@ uniform vec4 rect;                  // x, y, ancho, alto (px de 1920×1080)
 uniform vec4 drips[N];              // x, y del impacto, edad (s; negativa mientras cae), tamaño
 uniform float fall_time = 0.35;
 uniform float squash = 0.32;        // el suelo se ve de lado: los anillos, aplastados
+uniform vec2 floor_poly[6];         // suelo a la vista: fuera de él (muebles) no hay anillos
+
+bool on_floor(vec2 p) {
+	bool inside = false;
+	for (int i = 0, j = 5; i < 6; j = i++) {
+		vec2 a = floor_poly[i];
+		vec2 b = floor_poly[j];
+		if ((a.y > p.y) != (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) inside = !inside;
+	}
+	return inside;
+}
 
 void fragment() {
 	vec2 p = rect.xy + UV * rect.zw;
 	vec2 disp = vec2(0.0);
 	float glow = 0.0;
 	float a = 0.0;
+	float fl = on_floor(p) ? 1.0 : 0.0;
 	for (int i = 0; i < N; i++) {
 		vec4 d = drips[i];
 		if (d.w <= 0.0) continue;
@@ -36,9 +48,9 @@ void fragment() {
 			if (rr < 0.0) continue;
 			float crest = exp(-pow((r - rr) / 3.2, 2.0)) * amp * (1.0 - float(k) * 0.3);
 			float trough = exp(-pow((r - rr + 5.0) / 3.2, 2.0)) * amp * (1.0 - float(k) * 0.3);
-			disp += normalize(e + 1e-4) * vec2(1.0, squash) * (crest - trough) * 6.0;
-			glow += crest * 0.32 - trough * 0.12;
-			a = max(a, clamp((crest + trough) * 2.0, 0.0, 1.0));
+			disp += normalize(e + 1e-4) * vec2(1.0, squash) * (crest - trough) * 6.0 * fl;
+			glow += (crest * 0.32 - trough * 0.12) * fl;
+			a = max(a, clamp((crest + trough) * 2.0, 0.0, 1.0) * fl);
 		}
 		// brinco al chocar
 		float splash = exp(-age * 18.0) * smoothstep(3.0 * d.w, 0.0, length(vec2(q.x, (q.y + 4.0 * d.w) * 0.6)));

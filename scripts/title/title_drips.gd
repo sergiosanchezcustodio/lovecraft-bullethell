@@ -3,8 +3,14 @@ extends ColorRect
 ## Gotas de la bóveda en la portada (18-10-2026): cada pocos segundos cae una gota al suelo
 ## mojado, salpica y abre anillos que deforman los reflejos de las velas (title_drips.gdshader).
 ## Suenan muy bajo (`drip`). Este nodo es el rectángulo del suelo (1920×1080).
+## Solo caen en el suelo de piedra (FLOOR, revisado a mano sobre la ilustración: entre el
+## escritorio de la izquierda y el mueble de la derecha), y los anillos no pasan de ahí: se
+## cortan al llegar a los muebles (28-10-2026; antes caían también sobre el escritorio).
 
 const RECT := Rect2(600, 520, 1100, 560)       ## suelo mojado con los reflejos y el aire por donde caen
+const FLOOR := [Vector2(805, 826), Vector2(1370, 826), Vector2(1352, 1060), Vector2(890, 1060),
+	Vector2(872, 950), Vector2(845, 905)]       ## suelo a la vista (px de 1920×1080)
+const MARGIN := 22.0                           ## px que deja hasta el borde del suelo
 const N := 6
 const FALL := 0.35
 
@@ -28,6 +34,7 @@ func setup(art: Texture2D) -> TitleDrips:
 	m.set_shader_parameter("art", art)
 	m.set_shader_parameter("rect", Vector4(RECT.position.x, RECT.position.y, RECT.size.x, RECT.size.y))
 	m.set_shader_parameter("fall_time", FALL)
+	m.set_shader_parameter("floor_poly", PackedVector2Array(FLOOR))
 	material = m
 	return self
 
@@ -35,14 +42,27 @@ func setup(art: Texture2D) -> TitleDrips:
 func drop(at := Vector2(-1, -1)) -> void:
 	for i in N:
 		if _d[i].w > 0.0: continue
-		if at.x < 0.0:
-			# más cerca (abajo), más grandes; el suelo se ve más estrecho al fondo
-			var y := _rng.randf_range(818.0, 1060.0)
-			var near := inverse_lerp(818.0, 1060.0, y)
-			at = Vector2(_rng.randf_range(lerpf(760.0, 640.0, near), lerpf(1560.0, 1690.0, near)), y)
+		if at.x < 0.0: at = random_spot()
 		var size := lerpf(0.7, 1.35, inverse_lerp(818.0, 1060.0, at.y))
 		_d[i] = Vector4(at.x, at.y, -FALL, size)
 		return
+
+## Un sitio al azar del suelo, lejos de sus bordes.
+func random_spot() -> Vector2:
+	var poly := PackedVector2Array(FLOOR)
+	var box := Rect2(poly[0], Vector2.ZERO)
+	for v in poly: box = box.expand(v)
+	for tries in 200:
+		var p := Vector2(_rng.randf_range(box.position.x, box.end.x), _rng.randf_range(box.position.y, box.end.y))
+		if on_floor(p): return p
+	return box.get_center()
+
+## Si `p` está en el suelo con su margen (a los lados y por delante; los anillos se ven aplastados).
+static func on_floor(p: Vector2) -> bool:
+	var poly := PackedVector2Array(FLOOR)
+	for o in [Vector2.ZERO, Vector2(MARGIN, 0), Vector2(-MARGIN, 0), Vector2(0, MARGIN * 0.4), Vector2(0, -MARGIN * 0.4)]:
+		if not Geometry2D.is_point_in_polygon(p + o, poly): return false
+	return true
 
 func _process(delta: float) -> void:
 	_next -= delta
