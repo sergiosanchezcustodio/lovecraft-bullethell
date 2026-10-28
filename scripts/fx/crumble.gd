@@ -25,6 +25,7 @@ static func start(fx_parent: Node, model: Node3D, ember: Color, big := false) ->
 	c._life = BIG_LIFE if big else LIFE
 	c.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	fx_parent.add_child(c)
+	model.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # al cambiarlo de padre no siempre se entera de que el nuevo no interpola
 	model.reparent(c)
 	c._model = model
 	for it: Array in dress(model, ember): c._meshes.append(it[0])

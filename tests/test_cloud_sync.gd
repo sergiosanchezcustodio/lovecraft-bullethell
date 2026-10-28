@@ -268,3 +268,17 @@ func test_enlace_del_gist() -> void:
 	a.gist_id = "abc123"
 	a.login = "investigador"
 	assert_eq(a.gist_url(), "https://gist.github.com/investigador/abc123")
+
+func test_dice_lo_que_se_ha_bajado_y_subido() -> void:
+	var a := _pc("a")
+	var b := _pc("b")
+	_play(a, 0, 100)
+	_play(a, 2, 30)
+	assert_true(await a.sync())
+	assert_eq(a.last_up, 2)
+	assert_eq(a.sync_report(), "Se han subido 2 de este PC.")
+	assert_true(await b.sync())
+	assert_eq(b.last_down, 2, "el PC nuevo baja las dos")
+	assert_eq(b.sync_report(), "Se han bajado 2 partidas de la nube.")
+	assert_true(await b.sync())
+	assert_eq(b.sync_report(), "La nube ya estaba al día.")

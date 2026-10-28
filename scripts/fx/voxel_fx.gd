@@ -49,6 +49,7 @@ static func ensure_floor(parent: Node) -> void:
 static func ground_hit(parent: Node, pos: Vector3, r: float, tint: Color, debris := true) -> void:
 	if parent == null or not parent.is_inside_tree(): return
 	var root := Node3D.new()
+	root.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # quieto (se crea también fuera de la física)
 	parent.add_child(root)
 	root.global_position = Vector3(pos.x, 0.0, pos.z)
 	var ring := emitter("ring_dust", r, true, false, Color(tint.r, tint.g, tint.b))
@@ -72,6 +73,7 @@ static func ground_hit(parent: Node, pos: Vector3, r: float, tint: Color, debris
 static func puff(parent: Node, pos: Vector3, recipe: String, r: float, tint := Color.WHITE, life := 1.5) -> void:
 	if parent == null or not parent.is_inside_tree(): return
 	var e := emitter(recipe, r, true, false, tint)
+	e.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	parent.add_child(e)
 	e.global_position = pos
 	e.get_tree().create_timer(life).timeout.connect(e.queue_free)

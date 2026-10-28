@@ -20,8 +20,10 @@ static func keep(fx_parent: Node, mark: MeshInstance3D, life := LINGER) -> void:
 	if gm == null or not is_instance_valid(gm):
 		gm = GroundMarks.new()
 		gm.name = "GroundMarks"
+		gm.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # quietas; llegan desde _process
 		fx_parent.add_child(gm)
 		fx_parent.set_meta("ground_marks", gm)
+	mark.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	mark.reparent(gm)
 	gm._marks.append([mark, mark.material_override, life, FADE])
 	var extra := gm._marks.size() - limit

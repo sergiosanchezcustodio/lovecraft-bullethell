@@ -421,7 +421,19 @@ func net_mark() -> void:
 	if net_game == null: return
 	Net.marks += 1
 	net_game.mark(Net.marks)
+	_mark_shot(Net.marks)
 	announce("Marca %d apuntada en el registro" % Net.marks, 1.2)
+
+## Captura pequeña de lo que se veía al marcar, junto al registro (<registro>_marca_N.png; la
+## saca tools/marcas.py). Se guarda en otro hilo para no dar un tirón.
+func _mark_shot(n: int) -> void:
+	if Net.netlog == null or Net.netlog.path == "": return
+	var img := get_viewport().get_texture().get_image()
+	if img == null or img.is_empty(): return
+	var to := "%s_marca_%d.png" % [Net.netlog.path.get_basename(), n]
+	WorkerThreadPool.add_task(func() -> void:
+		img.resize(640, int(640.0 * img.get_height() / img.get_width()), Image.INTERPOLATE_BILINEAR)
+		img.save_png(to))
 
 var _mark_hold := {}                             ## mando -> s con LB+RB pulsados (-1: ya marcó)
 const MARK_HOLD := 0.6

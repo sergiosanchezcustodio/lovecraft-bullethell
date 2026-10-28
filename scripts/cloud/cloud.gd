@@ -37,6 +37,8 @@ var auto := true
 ## Partidas que han cambiado aquí y en la nube: [{"slot", "local": SaveData, "cloud": SaveData}].
 var conflicts: Array = []
 var last_sync := ""                          ## hora de la última sincronización buena
+var last_down := 0                           ## partidas que bajó la última sincronización (ventana de conectar)
+var last_up := 0                             ## y las que subió
 var syncing := false
 ## Huecos borrados aquí que quizá sigan en la nube: fichero -> revisión que tenían.
 var deleted := {}
@@ -81,7 +83,7 @@ func _ready() -> void:
 	if demo != "":
 		path = "user://cloud_demo.json"
 		_launch_token = true
-		if demo != "codigo":
+		if demo != "codigo" and demo != "bajadas":
 			_set_token("demo")
 			login = "investigador"
 			gist_id = "0123456789abcdef0123456789abcdef"   # de mentira: el botón de ver la copia
@@ -207,6 +209,8 @@ func sync(only: Array = [], in_game := false) -> bool:
 	if demo != "": return await _demo_sync()
 	while syncing: await synced                    # de una en una
 	syncing = true
+	last_down = 0
+	last_up = 0
 	var files: Variant = await fetch()
 	var ok := files is Dictionary
 	if ok:
@@ -236,6 +240,7 @@ func _sync_slot(i: int, name: String, files: Dictionary, out: Dictionary, after:
 			d.cloud_base = local.rev
 			out[name] = JSON.stringify(d, "	")
 			after.append(saves.mark_synced.bind(i, local.rev))
+			after.append(func() -> void: last_up += 1)
 		CloudSync.DOWNLOAD:
 			if in_game and i == saves.slot: return
 			var d := SaveData.from_dict(cloud_d)
@@ -243,6 +248,7 @@ func _sync_slot(i: int, name: String, files: Dictionary, out: Dictionary, after:
 			saves.store(i, d)
 			deleted.erase(name)
 			_drop_conflict(i)
+			last_down += 1
 		CloudSync.DELETE_CLOUD:
 			out[name] = null
 			after.append(func() -> void: deleted.erase(name))
@@ -264,6 +270,15 @@ func _sync_controls(files: Dictionary, out: Dictionary, after: Array[Callable]) 
 		lc.cloud_base = lc.rev
 		out[CloudSync.CONTROLS] = JSON.stringify(lc, "	")
 		after.append(settings.store_controls.bind(lc))
+
+## Lo que hizo la última sincronización, en una frase («Se han bajado 2 partidas de la nube.»).
+func sync_report() -> String:
+	var parts: Array[String] = []
+	if last_down > 0: parts.append("se %s %d partida%s de la nube" % ["ha bajado" if last_down == 1 else "han bajado", last_down, "" if last_down == 1 else "s"])
+	if last_up > 0: parts.append("se %s %d de este PC" % ["ha subido" if last_up == 1 else "han subido", last_up])
+	if parts.is_empty(): return "La nube ya estaba al día."
+	var t := " y ".join(parts)
+	return t[0].to_upper() + t.substr(1) + "."
 
 ## Resuelve el conflicto de un hueco: con la copia de la nube o con la de este PC (que se sube
 ## como revisión nueva). La que se descarta se guarda aparte en este PC (`Saves.backup`, en
@@ -362,6 +377,13 @@ static func when(iso: String) -> String:
 func _demo_connect() -> bool:
 	pending = {"user_code": "WDJB-MJHT", "verification_uri": "https://github.com/login/device"}
 	changed.emit()
+	if demo == "bajadas":                           # capturas: se conecta sola y baja dos partidas
+		await get_tree().create_timer(1.5, true).timeout
+		pending = {}
+		_set_token("demo")
+		login = "investigador"
+		changed.emit()
+		return true
 	while not _cancel: await get_tree().create_timer(0.2, true).timeout
 	pending = {}
 	_fail("")
@@ -369,6 +391,8 @@ func _demo_connect() -> bool:
 
 func _demo_sync() -> bool:
 	await get_tree().create_timer(0.5, true).timeout
+	last_down = 2 if demo == "bajadas" else 0           # capturas de la ventana de conectar
+	last_up = 0
 	if demo == "conflicto" and conflicts.is_empty():
 		for i in saves.SLOTS:
 			var local: SaveData = saves.peek(i)

@@ -69,9 +69,13 @@ func _run() -> void:
 		return
 	_code.text = "Conectado"
 	_status.text = "Cuenta de GitHub: %s. Comprobando la nube…" % Cloud.login
-	await Cloud.sync()
+	var ok_sync: bool = await Cloud.sync()
 	if not is_inside_tree() or _done: return
 	await CloudConflictMenu.resolve_all(self)
+	if not is_inside_tree() or _done: return
+	if ok_sync:                                   # qué ha pasado, antes de cerrar (p. ej. «Se han bajado 2 partidas»)
+		_status.text = "Cuenta de GitHub: %s. %s" % [Cloud.login, Cloud.sync_report()]
+		await get_tree().create_timer(2.5, true).timeout
 	if is_inside_tree() and not _done: _close()
 
 func _refresh() -> void:

@@ -38,6 +38,7 @@ func setup(p_world: CombatWorld, pos: Vector3, p_kind: Kind) -> Pickup:
 
 func _ready() -> void:
 	add_to_group(&"pickups")
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # no se mueve; gira y flota en _process
 	_holder = Node3D.new()
 	_holder.scale = Vector3.ONE * 1.3
 	add_child(_holder)

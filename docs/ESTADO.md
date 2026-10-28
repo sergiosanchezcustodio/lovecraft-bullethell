@@ -1119,19 +1119,24 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
     - **En calidad Baja, sin huellas de enemigos** (`enemy_prints` en `data/quality.json`; `Ambient` ni los recorre). Las de los jugadores se quedan.
     - Tests: dos más (Baja sin huellas de enemigos; cada suelo de las 15 arenas tiene su sonido de aparición). En total, 458 de 458. `tools/render_mapa.gd` sigue compilando con `Ambient`.
 
+- **Ideas pendientes técnicas (28-10-2026), pendientes de tu revisión** (elegidas por el autor de la lista de abajo; queda sin hacer el bigote de morsa de Elwood, que es cuestión de gusto):
+  - **`tools/marcas.py`:** `--juntar` pone los registros de varios PC en una sola lista ordenada por hora, cada línea con la letra de su fichero (`--todo` para la lista entera y no solo alrededor de las marcas). Los relojes de dos PC no van iguales: la diferencia sale de las marcas, que se apuntan en todos («marca 1 del jugador · p1_n1 0:05» en uno y «marca 1 de Ana · p1_n1 0:05» en el otro), con la mediana de los pares, y se corrige («reloj corregido −7 s, por 2 marcas»). Avisa de los registros que no acaban en «Fin de la sesión» (el juego se cerró de golpe o sigue abierto) y dice la captura de cada marca. Probado con anfitrión e invitado en este PC (`mark_at=6` y `mark_at=9`) y con una copia del registro del invitado adelantada 7 s.
+  - **Captura de cada marca:** al marcar (F9, LB+RB), una captura de 640 px de lo que se veía, junto al registro (`<registro>_marca_N.png`, en otro hilo para no dar tirón; `Game._mark_shot`). Al borrar un registro viejo se borran sus capturas.
+  - **Avisos «Interpolated instance triggered from outside physics process»:** no eran solo las recompensas. Buscados en los 15 niveles con bots (`timescale=3`): aves, faroles, boyas y huellas del ambiente (`Ambient` entero sin interpolación, y las piezas del escenario que mueve: luces de llama, lo que flota, faroles que se mecen), recompensas (`Pickup`), anillo del jugador (su latido al recoger gemas va ahora en la física), manchas (`GroundMarks`), estallido de muerte (`DeathBurst`), polvo y destellos (`VoxelFx.ground_hit` y `puff`), salpicaduras (`WadeSplash`) y el modelo que se desmorona (`Crumble`: al cambiarlo de padre con `reparent` no se enteraba de que el nuevo no interpola). Las recompensas ya no avisan. Quedan avisos sueltos (uno por partida, que es lo que enseña Godot) de efectos que se crean fuera de la física: hay 98 sitios que añaden efectos a `world.fx` y Godot solo dice el primero de cada ejecución, así que no compensa seguirlos uno a uno; son inofensivos (el efecto no se mueve).
+  - **Nube:** al conectar, la ventana dice lo que ha hecho antes de cerrarse: «Se han bajado 2 partidas de la nube.», «Se ha subido 1 de este PC.» o «La nube ya estaba al día.» (`Cloud.last_down`, `last_up`, `sync_report`). Captura sin red con `cloud_demo=bajadas` (se conecta sola a los 1,5 s y baja dos de mentira): `title saves=demo_saves open=menu_config tab=4 cloud_demo=bajadas`.
+  - **README:** imagen nueva de Padre Dagon (`docs/img/jefe_dagon.jpg`, en la pelea, con la boca abierta).
+  - Tests: uno más de la nube (lo que se baja y se sube). En total, 459 de 459.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
-- `tools/marcas.py`: juntar los registros de los dos PC en una sola lista ordenada por hora.
-- La marca (F9, LB+RB) guarda una captura pequeña en la carpeta de registros.
-- `tools/marcas.py` avisa si un registro no tiene «Fin de la sesión» (el juego se cerró de golpe).
+- (Las tres, hechas el 28-10-2026: ver «Ideas pendientes técnicas».)
 
 Ofrecidas al cerrar las cabezas nuevas de los trece personajes (23-10-2026):
 - Elwood con bigote de morsa, más británico, en vez del militar ancho.
 
 Ofrecidas al cerrar el rediseño de Padre Dagon (23-10-2026):
-- Imagen nueva de Dagon en el README (la de `docs/img` enseña la de antes).
-- Avisos «Interpolated instance triggered from outside physics process» de las recompensas de comida y de poción, vistos en la partida de prueba del 23-10-2026: Godot los da por probablemente inofensivos, pero ensucian la salida.
+- (Las dos, hechas el 28-10-2026.)
 
 Ofrecidas al cerrar la fase 10 (26-10-2026):
-- Al conectar, si la nube tiene partidas y este PC no, decirlo en la ventana («Se han bajado 2 partidas»).
+- (Hecha el 28-10-2026.)

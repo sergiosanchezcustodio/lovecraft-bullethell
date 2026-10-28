@@ -69,6 +69,7 @@ static func burst(parent: Node, pos: Vector3, size := 1.0, tint := Color(0, 0, 0
 	pm.initial_velocity_min = 2.0
 	pm.initial_velocity_max = 4.5
 	pm.scale_max = 0.09
+	p.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	parent.add_child(p)
 	p.global_position = pos
 	p.emitting = true

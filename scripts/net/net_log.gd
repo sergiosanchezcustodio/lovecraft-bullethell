@@ -73,5 +73,9 @@ func _prune() -> void:
 	for f in DirAccess.get_files_at(dir):
 		if f.begins_with("red_") and f.ends_with(".log"): files.append(f)
 	files.sort()
+	var all := DirAccess.get_files_at(dir)
 	while files.size() >= KEEP:
-		DirAccess.remove_absolute("%s/%s" % [dir, files.pop_front()])
+		var old := files.pop_front() as String
+		DirAccess.remove_absolute("%s/%s" % [dir, old])
+		for f in all:                                # y las capturas de sus marcas (<registro>_marca_N.png)
+			if f.begins_with(old.get_basename() + "_marca_"): DirAccess.remove_absolute("%s/%s" % [dir, f])

@@ -189,7 +189,7 @@ func _cloud() -> void:
 			add_child(m)
 			m.closed.connect(_show_tab.bind(4))
 		_action("Conectar con GitHub", open)
-		if Cloud.demo == "codigo" and not _demo_opened:      # capturas: `cloud_demo=codigo`
+		if Cloud.demo in ["codigo", "bajadas"] and not _demo_opened:   # capturas: `cloud_demo=codigo|bajadas`
 			_demo_opened = true
 			open.call_deferred()
 		_note("Guarda una copia de tus tres partidas y de tus controles en un gist secreto de tu cuenta de GitHub, para seguir jugando en otro PC. Las partidas siguen guardándose aquí como siempre: sin conexión se juega igual.")

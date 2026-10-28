@@ -221,6 +221,10 @@ static func _set_vis_layer(node: Node) -> void:
 	for c in node.get_children(): _set_vis_layer(c)
 
 func _physics_process(delta: float) -> void:
+	# el anillo late al recoger gemas: su escala, en la física (va dentro del jugador, que se
+	# interpola; cambiarla en _process avisaba «Interpolated instance triggered…»)
+	var rs := Vector3.ONE * (1.0 + 0.22 * _gem_pulse)
+	if _ring != null and _ring.scale != rs: _ring.scale = rs
 	var t0 := Prof.start()
 	_physics_process_step(delta)
 	Prof.stop("jugadores_fisica", t0)
@@ -484,7 +488,6 @@ func _process_step(delta: float) -> void:
 		_ring_mat.albedo_color = UiKit.SANITY.lerp(Color.WHITE, 0.25 + 0.25 * sin(Time.get_ticks_msec() * 0.012))
 	else:
 		_ring_mat.albedo_color = color.lerp(Color.WHITE, 0.6 * _gem_pulse)
-	if _ring != null: _ring.scale = Vector3.ONE * (1.0 + 0.22 * _gem_pulse)
 	_gem_pulse = move_toward(_gem_pulse, 0.0, delta * 4.0)
 	if _muzzle != null:
 		_muzzle.visible = _muzzle_t > 0.0

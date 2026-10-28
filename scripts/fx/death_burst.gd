@@ -54,6 +54,7 @@ static func palette_of(p_model: String, root: Node3D) -> Array:
 	return out
 
 func _ready() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # quieto; se crea y se deshace fuera de la física
 	var r := radius * (1.5 if big else 1.0)
 	var chunks := VoxelFx.emitter("chunks", r, true)
 	var key := "%s|%.1f" % [model, r]                 # material con sus colores, uno por modelo

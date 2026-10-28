@@ -262,6 +262,9 @@ func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
 	arena = p_arena
 	camera = p_camera
 	name = "Ambient"
+	# todo lo de aquí se mueve en _process (aves, faroles, boyas, huellas…): sin interpolación de
+	# física, que avisaba («Interpolated instance triggered from outside physics process»)
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	cfg = (config().get("arenas", {}) as Dictionary).get(arena_id, {})
 	ground = String(cfg.get("step", "snow"))
 	_enemy_prints_on = bool(Quality.value("enemy_prints", true))   # en calidad Baja, solo las de los jugadores
@@ -281,11 +284,13 @@ func _ready() -> void:
 		var h: Node3D = it.holder
 		if it.has("bob"):                                       # [.., giro, escala, radio, altura y vuelco suavizados]
 			var bb := _world_aabb(h)
+			h.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # se mueve en _process
 			_bobs.append([h, h.position.y, float(it.bob), seed_of(h.global_position), h.rotation.y, h.scale.x,
 				clampf(maxf(bb.size.x, bb.size.z) * 0.3, 0.3, 4.0), 0.0, Vector2.ZERO, h.position, Vector3.ZERO, 0.0])
 		if it.has("glow") and it.has("light"):
 			var g: Dictionary = it.glow
 			var l: OmniLight3D = it.light
+			l.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # tiembla y baila en _process
 			_lights.append([l, l.light_energy, int(MODES.get(String(g.glow), 1)), float(g.get("amount", 0.2)), float(g.get("speed", 1.0)), seed_of(h.global_position), l.position])
 		if it.has("swing"): _add_swing(h, it.swing)
 		if it.has("sound"): _sounds.append(it.sound)
@@ -362,6 +367,7 @@ func _add_swing(h: Node3D, c: Dictionary) -> void:
 	for n in h.get_children():
 		if n is OmniLight3D or n is FogVolume or n is GPUParticles3D: n.reparent(part, true)   # la llama va dentro
 	var p := float(c.get("period", 1.9))
+	part.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # se mece en _process
 	_swings.append({"part": part, "d": Vector2.ZERO, "v": Vector2.ZERO, "seed": seed_of(h.global_position),
 		"k": pow(TAU / p, 2.0), "deg": float(c.get("deg", 0.65)), "max": deg_to_rad(float(c.get("max", 28.0))),
 		"turb": float(c.get("turb", 0.8)), "inv": h.global_basis.orthonormalized().inverse()})
