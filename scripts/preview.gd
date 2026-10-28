@@ -160,6 +160,9 @@ func _process(_delta: float) -> void:
 			if anim == "hit":                         # reacción al golpe de su familia, sobre el reposo
 				Anims.pose(mn, "idle", models[i], 0.0)
 				if Anims.has_hit(mn): Anims.hit(mn, models[i], clampf(t, 0.0, 1.0))
+			elif anim == "death":                     # muerte de su familia (hito 12.7), sin deshacerse
+				Anims.reset(models[i])
+				if Anims.death_time(mn) > 0.0: Anims.death(mn, models[i], clampf(t, 0.0, 1.0))
 			elif anim == "windup":                    # preparación de un ataque (hito 12.5): 1 s de aviso y el golpe
 				Anims.pose(mn, "idle", models[i], 0.0)
 				var tt := clampf(t, 0.0, 1.0) * 1.4

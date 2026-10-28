@@ -38,6 +38,7 @@ extends Node3D
 ##   hitstop=false           sin micro-pausa al impactar
 ##   boss_intro=false        sin la entrada de los jefes (BossIntro): solo el aviso, como antes
 ##   crumble=false / marks=N  sin desmoronarse / tope de manchas en el suelo (0, ninguna; por defecto, el de la calidad gráfica)
+##   falls=false             sin la caída de cada familia al morir (hito 12.7)
 ##   demo_kill=t             mata a la vez a todos los enemigos a ese segundo (capturas de las muertes)
 ##   character=johansen      personaje del J1 (dyer, olmstead, legrasse, johansen)
 ##   model=dyer_chibi        otro modelo para el J1 (probar prototipos)
@@ -344,6 +345,7 @@ func _ready() -> void:
 	DamageNumbers.set_mode(Auto.setting("damage_numbers", 2))   # hito 11.2 (cfg_damage_numbers=0|1|2)
 	Quality.apply_game(env, moon)                        # calidad gráfica (hito 11.5); las opciones de abajo mandan
 	Crumble.enabled = args.get_bool("crumble", Crumble.enabled)
+	Crumble.falls = args.get_bool("falls", true)
 	Enemy.rise_enabled = args.get_bool("rise", true)   # hito 11.6
 	GroundMarks.limit = args.get_int("marks", GroundMarks.limit)
 	hud = Hud.new().setup(players, director)

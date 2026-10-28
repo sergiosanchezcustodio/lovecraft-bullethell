@@ -32,6 +32,19 @@ static func burst(m: Node3D, t: float) -> void:
 	Anims.part(m, "pod_l").rotation.z = -k * 0.5
 	Anims.part(m, "pod_r").rotation.z = k * 0.5
 
+## Muerte (hito 12.7; fragmentos, pólipos, shoggoths): la masa se derrite, se aplasta y se
+## extiende con un último temblor, y los pseudópodos caen al suelo.
+const DEATH_KIND := "melt"
+const DEATH_TIME := 0.9
+static func death(m: Node3D, k: float) -> void:
+	var f := Anims.ease(k)
+	var wob := sin(k * TAU * 2.5) * (1.0 - k) * 0.08
+	m.scale = Vector3(1.0 + 0.55 * f + wob, maxf(1.0 - 0.8 * f - wob, 0.05), 1.0 + 0.55 * f - wob)
+	m.position.y = -0.05 * f
+	Anims.part(m, "top").position.y = Anims.rest(m, "top").y - 0.1 * f
+	Anims.part(m, "pod_l").rotation.z = -1.2 * f
+	Anims.part(m, "pod_r").rotation.z = 1.2 * f
+
 ## Preparación (hito 12.5; Madre de los pólipos, shoggoths antes de saltar): la masa se hincha
 ## y vibra, con los pseudópodos abiertos; al soltar, se encoge de golpe y rebota.
 static func windup(m: Node3D, b: float, th: float, t: float) -> void:

@@ -285,6 +285,34 @@ static func windup(m: Node3D, b: float, th: float, t: float) -> void:
 		if parts.has(f): (parts[f] as Node3D).rotation.x += -0.35 * b
 	m.position.z += 0.06 * th
 
+## Muerte (hito 12.7; cultistas, vecinos, híbridos, sacerdotes): se le doblan las rodillas y
+## cae de rodillas con la cabeza colgando, y se desploma de bruces con los brazos por delante.
+const DEATH_KIND := "kneel"
+const DEATH_TIME := 0.8
+static func death(m: Node3D, k: float) -> void:
+	var kn := Anims.ease(k / 0.4)                              # de rodillas
+	var fall := Anims.ease((k - 0.42) / 0.5)                   # de bruces
+	var thud := Anims.jolt(clampf((k - 0.36) / 0.3, 0.0, 1.0), 0.25)   # rebote al clavar las rodillas
+	# de bruces girando sobre las rodillas (ya en el suelo), no sobre los pies, que están hundidos
+	var knee := Anims.rest(m, "leg_l").y * 0.5 if has(m, "leg_l") else 0.45
+	var a := 1.35 * fall
+	m.rotation.x = a
+	m.position = Vector3(0.0, -0.4 * kn + 0.03 * thud + knee * (1.0 - cos(a)), -knee * sin(a) + 0.12 * fall)
+	Anims.part(m, "torso").rotation.x = 0.25 * kn - 0.15 * fall
+	Anims.part(m, "head").rotation.x = 0.55 * kn - 0.3 * fall
+	Anims.part(m, "head").rotation.z = 0.15 * kn
+	Anims.part(m, "arm_l").rotation.x = 0.1 * kn - 1.6 * fall
+	Anims.part(m, "arm_r").rotation.x = 0.25 * kn - 1.4 * fall
+	Anims.part(m, "arm_l").rotation.z = 0.12 * kn
+	Anims.part(m, "arm_r").rotation.z = -0.12 * kn
+	var legs := kn * (1.0 - fall)                              # al irse de bruces, las piernas se estiran detrás
+	Anims.part(m, "leg_l").rotation.x = -0.35 * legs
+	Anims.part(m, "leg_r").rotation.x = -0.3 * legs
+	bend(m, "shin_l", 1.6 * legs)
+	bend(m, "shin_r", 1.6 * legs)
+	bend(m, "fore_l", -0.4 * fall)
+	bend(m, "fore_r", -0.4 * fall)
+
 ## Golpe (cultistas, vecinos, híbridos, sacerdotes): se dobla por la cintura, se lleva las
 ## manos al vientre, la cabeza cae y se recompone (28-10-2026).
 const HIT_TIME := 0.42

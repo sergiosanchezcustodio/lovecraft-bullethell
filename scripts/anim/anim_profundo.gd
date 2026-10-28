@@ -45,6 +45,26 @@ static func pounce(m: Node3D, t: float) -> void:
 	Anims.part(m, "leg_l").rotation.x = reach * 0.9 - crouch * 0.25
 	Anims.part(m, "leg_r").rotation.x = reach * 0.9 - crouch * 0.25
 
+## Muerte (hito 12.7; Profundos, Acechador, engendros, Madre Hydra): se le doblan las piernas,
+## se derrumba hacia delante con los brazos flojos y se hunde en el charco que deja.
+const DEATH_KIND := "puddle"
+const DEATH_TIME := 0.75
+static func death(m: Node3D, k: float) -> void:
+	var c := Anims.ease(k / 0.55)                              # se derrumba
+	var sink := Anims.ease((k - 0.45) / 0.55)                  # se hunde
+	m.position.y = -0.18 * c - 0.35 * sink
+	m.rotation.x = 0.55 * c
+	m.rotation.z = 0.12 * c
+	Anims.part(m, "torso").rotation.x = 0.2 * c
+	Anims.part(m, "head").rotation.x = 0.4 * c
+	Anims.part(m, "head").rotation.z = -0.25 * c
+	Anims.part(m, "arm_l").rotation.x = -0.5 * c
+	Anims.part(m, "arm_r").rotation.x = -0.35 * c
+	Anims.part(m, "arm_l").rotation.z = -0.35 * c
+	Anims.part(m, "arm_r").rotation.z = 0.45 * c
+	Anims.part(m, "leg_l").rotation.x = -0.6 * c
+	Anims.part(m, "leg_r").rotation.x = -0.5 * c
+
 ## Preparación (hito 12.5; Acechador, engendros, Madre Hydra, primigenio): se agazapa, echa las
 ## garras atrás y abiertas, alza la barbilla hacia su presa y tiembla de tensión; al soltar, se
 ## lanza un palmo hacia delante con las garras por delante.

@@ -59,6 +59,19 @@ static func has_windup(model_name: String) -> bool:
 static func windup(model_name: String, m: Node3D, build: float, thrust: float, t: float) -> void:
 	script_for(model_name).call("windup", m, build, thrust, t)
 
+## Muerte de la familia (hito 12.7): `static func death(m, k)` (k de 0 a 1 en DEATH_TIME s, desde
+## el reposo) y DEATH_KIND ("kneel", "puddle", "melt" o "fall"). Sin ella (0), se deshace sin caer.
+static func death_time(model_name: String) -> float:
+	var s: Script = script_for(model_name)
+	return float(s.get("DEATH_TIME")) if s != null and s.get("DEATH_TIME") != null else 0.0
+
+static func death_kind(model_name: String) -> String:
+	var s: Script = script_for(model_name)
+	return String(s.get("DEATH_KIND")) if s != null and s.get("DEATH_KIND") != null else ""
+
+static func death(model_name: String, m: Node3D, k: float) -> void:
+	script_for(model_name).call("death", m, k)
+
 ## Gestos de reposo del modelo: los suyos (FIDGETS_OF del script) o los de la familia (FIDGETS).
 static func fidgets(model_name: String) -> Array:
 	var s: Script = script_for(model_name)

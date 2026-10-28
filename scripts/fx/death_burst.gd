@@ -13,9 +13,14 @@ static var _palettes := {}                     ## modelo -> 4 colores (de más a
 var model := "pinguino"
 var radius := 0.5
 var big := false                               ## élite o ser único
+var delay := 0.0                               ## s hasta que saltan los trozos (mientras cae, hito 12.7)
+var puddle := false                            ## deja un charco que crece (Profundos y masas, hito 12.7)
+const PUDDLE_GROW := 0.9
 var _t := 0.0
 var _stain_mat: ShaderMaterial
 var _stain: MeshInstance3D
+var _pool: MeshInstance3D
+var _burst_done := false
 var _cols: Array = FALLBACK
 
 func setup(p_model: String, p_radius: float, model_root: Node3D = null, p_big := false) -> void:
@@ -55,6 +60,21 @@ static func palette_of(p_model: String, root: Node3D) -> Array:
 
 func _ready() -> void:
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # quieto; se crea y se deshace fuera de la física
+	if puddle: _make_puddle()
+	if delay <= 0.0: _burst()
+
+## Charco que crece bajo el que se derrumba o se derrite, del color oscuro de su cuerpo, húmedo
+## y con burbujas lentas (ground_fx, modo limo); luego se queda como las manchas.
+func _make_puddle() -> void:
+	VoxelFx.ensure_floor(get_parent())
+	_pool = VoxelFx.ground(10, 0.1)
+	_pool.position.y = 0.035
+	var dark: Color = _cols[1].darkened(0.55)
+	_pool.material_override.set_shader_parameter("tint", Color(dark.r, dark.g, dark.b))
+	add_child(_pool)
+
+func _burst() -> void:
+	_burst_done = true
 	var r := radius * (1.5 if big else 1.0)
 	var chunks := VoxelFx.emitter("chunks", r, true)
 	var key := "%s|%.1f" % [model, r]                 # material con sus colores, uno por modelo
@@ -87,7 +107,16 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
-	_stain_mat.set_shader_parameter("age", clampf(_t / LIFE, 0.0, 1.0))
-	if _t > LIFE:                                   # la mancha seca se queda un rato (hito 11.1)
+	if _pool != null:
+		var g := Anims.ease(_t / PUDDLE_GROW)
+		var pr := radius * (1.9 if big else 1.5) * (0.2 + 0.8 * g)
+		_pool.scale = Vector3(pr, 1.0, pr)
+	if not _burst_done:
+		if _t < delay: return
+		_burst()
+	var st := _t - delay
+	_stain_mat.set_shader_parameter("age", clampf(st / LIFE, 0.0, 1.0))
+	if st > LIFE:                                   # la mancha seca se queda un rato (hito 11.1)
 		GroundMarks.keep(get_parent(), _stain)
+		if _pool != null: GroundMarks.keep(get_parent(), _pool)
 		queue_free()

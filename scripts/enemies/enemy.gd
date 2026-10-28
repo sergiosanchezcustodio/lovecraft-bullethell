@@ -516,17 +516,22 @@ func puppet_die() -> void:
 
 func _death_fx() -> void:
 	_rise_end()
+	# cae a su manera (hito 12.7: de rodillas, derrumbado, derretido, de lado) y luego se deshace;
+	# los trozos saltan cuando empieza a deshacerse
+	var fall := model_name if data.death != &"crumble" and not data.ethereal and Anims.death_time(model_name) > 0.0 else ""
+	var light: Color = DeathBurst.palette_of(model_name, model)[0]
+	for c: Color in DeathBurst.palette_of(model_name, model): if c.get_luminance() > light.get_luminance(): light = c
 	var fx := DeathBurst.new()
 	fx.setup(model_name, data.body_radius, model, data.elite or data.unique)
+	fx.puddle = Anims.death_kind(fall) in ["puddle", "melt"] and _wade <= 0.5
 	fx.position = global_position
+	# el modelo se queda y se deshace en cubos (hito 11.1); la brasa, de su color más claro
+	if Crumble.start(world.fx, model, light.lerp(Color(1.0, 0.45, 0.15), 0.55), data.elite or data.unique, fall):
+		fx.delay = Crumble.delay_for(fall)
 	world.fx.add_child(fx)
 	if _wade > 0.5:                                   # cae al agua: ondas grandes (hito 11.4)
 		Ripples.add(world.fx, global_position, 1.4 + data.body_radius * 2.0, 0.8, 1.6)
 		Ripples.add(world.fx, global_position, 0.8 + data.body_radius, 0.6, 1.2)
-	# el modelo se queda y se deshace en cubos (hito 11.1); la brasa, de su color más claro
-	var light: Color = DeathBurst.palette_of(model_name, model)[0]
-	for c: Color in DeathBurst.palette_of(model_name, model): if c.get_luminance() > light.get_luminance(): light = c
-	Crumble.start(world.fx, model, light.lerp(Color(1.0, 0.45, 0.15), 0.55), data.elite or data.unique)
 	died.emit(self)
 	queue_free()
 

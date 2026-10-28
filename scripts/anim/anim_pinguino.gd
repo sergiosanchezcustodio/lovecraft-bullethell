@@ -34,6 +34,22 @@ static func charge(m: Node3D, t: float) -> void:
 	Anims.part(m, "arm_l").rotation = Vector3(thrust * 0.9, 0.0, -0.3 - back * 0.3)
 	Anims.part(m, "arm_r").rotation = Vector3(thrust * 0.9, 0.0, 0.3 + back * 0.3)
 
+## Muerte (hito 12.7): se tambalea y cae de lado, con las aletas abiertas y la cabeza que golpea
+## el suelo.
+const DEATH_KIND := "fall"
+const DEATH_TIME := 0.7
+static func death(m: Node3D, k: float) -> void:
+	var wob := sin(clampf(k / 0.3, 0.0, 1.0) * PI) * 0.18          # un vaivén antes de irse
+	var f := Anims.ease((k - 0.2) / 0.6)
+	f = f * f                                                    # cae cada vez más deprisa
+	var thud := Anims.jolt(clampf((k - 0.78) / 0.22, 0.0, 1.0), 0.3)
+	m.rotation.z = -wob + 1.45 * f - 0.08 * thud
+	m.rotation.x = 0.15 * f
+	m.position.y = -0.05 * f
+	Anims.part(m, "arm_l").rotation.z = -0.9 * f
+	Anims.part(m, "arm_r").rotation.z = 0.5 * f
+	Anims.part(m, "head").rotation.z = 0.35 * f + 0.2 * thud
+
 ## Golpe: se tambalea de lado a lado como un tentetieso, con las aletas abiertas para no caerse,
 ## y retrocede un paso (28-10-2026).
 const HIT_TIME := 0.6
