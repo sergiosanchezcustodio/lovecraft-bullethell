@@ -507,6 +507,7 @@ func _process(delta: float) -> void:
 	if not _drops.is_empty(): _drop_step(delta)
 	_print_clock += delta
 	_enemy_prints(delta)
+	_pet_prints(delta)
 	if cfg.has("gust_embers"): _gust_embers_step()
 	if _ash != null:
 		var fa := _focus()
@@ -935,6 +936,49 @@ func _enemy_prints(delta: float) -> void:
 				_walkers.erase(id)
 				_foot.erase(id)
 				_wet.erase(id)
+
+## Huellas de los compañeros que van por el suelo (hito 12.10): patas a pares, a un lado y a otro,
+## o un rastro por el centro los que reptan (`PetData.prints`), según su ancho (`print_width`).
+## Los voladores y el dhole bajo tierra, no. En todas las calidades: son cuatro como mucho.
+var _pet_walk_t := 0.0
+func _pet_prints(delta: float) -> void:
+	_pet_walk_t -= delta
+	if _pet_walk_t > 0.0: return
+	_pet_walk_t = 0.05
+	var obstacles: ObstacleMap = arena.get_meta("obstacles") if arena != null and arena.has_meta("obstacles") else null
+	var base := String(cfg.get("step", "snow"))
+	for pet in get_tree().get_nodes_in_group("pets"): _pet_print(pet, obstacles, base)
+
+## Una huella de `pet` si ha andado una zancada desde la anterior (sin nombrar la clase Pet, por
+## lo mismo que Enemy).
+func _pet_print(pet: Node3D, obstacles: ObstacleMap, base: String) -> void:
+	var d = pet.get("data")
+	if d == null or d.prints == "" or d.fly_height > 0.0 or pet.hidden: return
+	var id: int = pet.get_instance_id()
+	var pos: Vector3 = pet.global_position
+	var w: Array = _walkers.get(id, [])
+	if w.is_empty():
+		_walkers[id] = [pet, pos]
+		return
+	var r: float = d.print_width
+	var smear: bool = d.prints == "smear"
+	if pos.distance_to(w[1]) < (0.3 + r * 0.8 if smear else 0.18 + r * 0.6): return
+	w[1] = pos
+	var kind := base
+	if obstacles != null and obstacles.water_at(Vector2(pos.x, pos.z)) > 0.3: kind = "water"
+	var pk := _print_kind(kind, id)
+	if pk.is_empty(): return
+	var f: Vector3 = (pet.facing as Vector3).normalized()
+	var yaw := atan2(f.x, f.z)
+	if smear:
+		Footprints.add(self, pos, yaw, Vector2(r * 0.8, 0.3 + r * 0.8), pk[0], pk[1] * 0.7)
+		return
+	var s: float = -float(_foot.get(id, 1.0))
+	_foot[id] = s
+	var side := Vector3(cos(yaw), 0, -sin(yaw))
+	var paw := Vector2(r * 0.2, r * 0.26)
+	Footprints.add(self, pos + side * s * r * 0.3, yaw, paw, pk[0], pk[1] * 0.85)
+	Footprints.add(self, pos + side * s * r * 0.3 - f * r * 0.9, yaw, paw, pk[0], pk[1] * 0.85)   # la de atrás
 
 ## Ascuas que suben de las hogueras cuando las aviva una racha.
 var _gust_was := 0.0

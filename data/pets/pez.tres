@@ -17,3 +17,4 @@ attack_every = 3.5
 attack_range = 6.0
 knockback = 2.5
 prints = "smear"
+print_width = 0.22

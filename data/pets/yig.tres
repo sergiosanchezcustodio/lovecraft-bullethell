@@ -18,3 +18,4 @@ attack_range = 5.0
 effect_time = 4.0
 knockback = 0.2
 prints = "smear"
+print_width = 0.15

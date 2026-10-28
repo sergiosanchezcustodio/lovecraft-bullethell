@@ -44,7 +44,11 @@ func set_on(on: bool) -> void:
 	if _face: _face.visible = on
 
 func _process(delta: float) -> void:
-	if not _on: return
+	if not _on:
+		# VoxelFx.emitter lo enciende al entrar en escena (restart diferido, después de este
+		# _ready): sin esto, los jirones salían desde el principio de la partida
+		if _wisps.emitting: _wisps.emitting = false
+		return
 	_t += delta
 	var pulse := 0.5 + 0.5 * sin(_t * 7.0)
 	_light.light_energy = 0.9 + 0.8 * pulse

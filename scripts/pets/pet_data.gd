@@ -45,6 +45,7 @@ enum Kind { BITE, CLAW, SPIT, INSIGHT, FORAGE, DEVOUR, DIVE, FETCH, CONFUSE, HEA
 ## Huellas en la nieve y el barro de los que andan por el suelo (Ambient): "paws" (patas), "smear"
 ## (rastro por el centro: los que reptan) o nada.
 @export var prints := "paws"
+@export var print_width := 0.3               ## m de ancho del cuerpo: escala las huellas y la zancada
 
 ## Efecto pasivo o de cantidad para un nivel del jugador.
 func bonus_at(level: int) -> float:

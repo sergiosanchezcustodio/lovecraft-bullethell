@@ -346,7 +346,7 @@ func _trail_step(v: float) -> void:
 	match data.trail:
 		"feathers": r = 0.0 if _perch_k > 0.0 else clampf(run * 0.6 + (0.8 if _cheer_t >= 0.0 else 0.0), 0.0, 1.0)
 		"sparks", "dust": r = 0.35 + 0.65 * minf(run, 1.0)
-		"mist": r = 0.25 + 0.75 * minf(run, 1.0)
+		"mist": r = 0.45 + 0.55 * minf(run, 1.0)
 	_trail.emitting = r > 0.02 and not hidden
 	_trail.amount_ratio = clampf(r, 0.0, 1.0)
 

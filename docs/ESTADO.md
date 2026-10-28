@@ -1243,6 +1243,13 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - `Pet._react` (elige la reacción y adónde ir), `_react_pose` (la funde encima de la pose: `cower`, `cheer`, `whine`, `hiss` en `anim_cuadrupedo`; `cower`, `cheer`, `whine`, `perch` en `anim_volador`; las demás familias, genéricas) y `_perch_step` (el hombro: la pieza `arm_r` del jugador, sin pivote nuevo). Cada PC lo calcula con lo que ve.
   - Opción `pets=gato,perro` (un compañero por jugador, en orden, con `bots=N`). Hoja en `shots/revision/2026-10-28/companeros_reaccionan.png` (gato y perro, cuervo, dos perros olfateándose, cuervo en el hombro, perro escondido de Madre Hydra y celebración).
   - Tests en `test_pet_reactions`. 491 de 491.
+- **Fase 12, hito 12.10: rastro de los compañeros (28-10-2026), pendiente de tu revisión:**
+  - Estelas de partículas (`PetData.trail` y `trail_color`, recetas `pet_*` en `VoxelFx`): plumas planas que caen balanceándose del búho, el byakhee, el cuervo y la gaviota al aletear (no posados; `VoxelFx.feather()`, el cubo iluminado aplastado), chispas rosas del Mi-Go, polvo violeta de la polilla y bruma cian apagada del sabueso de Tíndalos. Más cuanto más deprisa van (`Pet._trail_step`). En calidad Baja, no (`pet_trails` en `data/quality.json`).
+  - Huellas en la nieve y el barro (y mojadas al salir del agua) con `Footprints`, como las de jugadores y enemigos: patas a pares (delante y detrás) a un lado y a otro, o un rastro por el centro los que reptan (dhole, pez, shoggoth y serpiente de Yig; `PetData.prints`), según su ancho (`PetData.print_width`). Los voladores y el dhole bajo tierra, no. En todas las calidades (`Ambient._pet_prints`, `_pet_print`).
+  - De paso, un fallo de antes: los jirones morados de la crisis de cordura (`CrisisLook`) salían siempre, desde el principio de la partida, en todos los jugadores: `VoxelFx.emitter` lo enciende con un `restart` diferido que llegaba después de apagarlo. Ahora `CrisisLook` lo vuelve a apagar mientras no hay crisis. Se veían en todas las capturas (también en la hoja del 11.8).
+  - Ojo al capturar: la configuración de este PC tiene la calidad en Baja, así que las estelas no salen sin `cfg_quality=2`.
+  - Hoja `shots/revision/2026-10-28/companeros_rastro.png` (plumas del cuervo, polvo de la polilla, bruma del sabueso, chispas del Mi-Go, huellas del perro en la nieve y en el barro).
+  - Tests en `test_pet_trails` (6). 497 de 497.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

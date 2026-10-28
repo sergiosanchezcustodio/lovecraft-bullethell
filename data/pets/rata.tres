@@ -17,3 +17,4 @@ attack_every = 20.0
 bonus = 0.2
 bonus_per_level = 0.01
 bonus_max = 0.35
+print_width = 0.18

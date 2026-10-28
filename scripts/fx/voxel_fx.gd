@@ -7,6 +7,7 @@ class_name VoxelFx
 static var _cube_add: BoxMesh
 static var _cube_mix: BoxMesh
 static var _cube_lit: BoxMesh
+static var _feather: BoxMesh                   ## cubo iluminado aplastado: plumas (hito 12.10)
 static var _ground_shader: Shader
 static var _tex_cache := {}                   ## rampas y curvas ya creadas (por sus puntos)
 static var _mat_cache := {}                   ## receta|radio -> material de proceso compartido
@@ -18,6 +19,13 @@ static func cube(kind: String) -> BoxMesh:
 		_cube_mix = _make_cube(BaseMaterial3D.BLEND_MODE_MIX, false)
 		_cube_lit = _make_cube(BaseMaterial3D.BLEND_MODE_MIX, true)
 	return {"add": _cube_add, "mix": _cube_mix, "lit": _cube_lit}[kind]
+
+## Pluma: el cubo iluminado, plano y alargado (con el giro de la partícula cae balanceándose).
+static func feather() -> BoxMesh:
+	if _feather == null:
+		_feather = cube("lit").duplicate()
+		_feather.size = Vector3(0.5, 0.12, 1.0)
+	return _feather
 
 static func _make_cube(blend: int, lit: bool) -> BoxMesh:
 	var box := BoxMesh.new()
@@ -874,7 +882,7 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.02; m.scale_max = 0.035
 			m.color_ramp = _ramp([[0.0, Color(0.62, 0.72, 0.72, 0.9)], [1.0, Color(0.6, 0.7, 0.7, 0.0)]])
 		"pet_feathers":           # plumas que se le caen a un compañero al aletear (hito 12.10; tinte: color)
-			p.draw_pass_1 = cube("lit")
+			p.draw_pass_1 = feather()
 			p.amount = 5
 			p.lifetime = 2.6
 			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
@@ -889,7 +897,7 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.angle_min = -180.0; m.angle_max = 180.0
 			m.angular_velocity_min = -160.0; m.angular_velocity_max = 160.0
 			m.particle_flag_rotate_y = true
-			m.scale_min = 0.05; m.scale_max = 0.08
+			m.scale_min = 0.07; m.scale_max = 0.1
 			m.scale_curve = _curve([[0.0, 1.0], [0.85, 1.0], [1.0, 0.0]])
 			m.color_ramp = _ramp([[0.0, Color(1, 1, 1, 1)], [0.85, Color(0.9, 0.9, 0.9, 1)], [1.0, Color(0.8, 0.8, 0.8, 0)]])
 		"pet_sparks":             # chispas que suelta el Mini-Mi-Go: saltan, caen y se apagan (tinte: color)
@@ -906,7 +914,7 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.color_ramp = _ramp([[0.0, Color(1.6, 1.5, 1.6, 1.0)], [0.3, Color(1, 1, 1, 1)], [1.0, Color(0.6, 0.6, 0.6, 0.0)]])
 		"pet_mist":               # bruma de los ángulos: jirones bajos que se arrastran y se deshacen (tinte: color)
 			p.draw_pass_1 = cube("mix")
-			p.amount = 14
+			p.amount = 22
 			p.lifetime = 1.6
 			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
 			m.emission_sphere_radius = r
@@ -915,19 +923,19 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.initial_velocity_min = 0.05; m.initial_velocity_max = 0.25
 			m.gravity = Vector3(0, 0.05, 0)
 			m.damping_min = 0.5; m.damping_max = 1.0
-			m.scale_min = 0.12; m.scale_max = 0.22
+			m.scale_min = 0.07; m.scale_max = 0.14
 			m.scale_curve = _curve([[0.0, 0.4], [0.4, 1.0], [1.0, 1.3]])
-			m.color_ramp = _ramp([[0.0, Color(1, 1, 1, 0.0)], [0.2, Color(1, 1, 1, 0.45)], [1.0, Color(0.8, 0.8, 0.9, 0.0)]])
+			m.color_ramp = _ramp([[0.0, Color(1, 1, 1, 0.0)], [0.2, Color(1, 1, 1, 0.65)], [1.0, Color(0.8, 0.8, 0.9, 0.0)]])
 		"pet_dust":               # polvo de las alas de la polilla: motas que caen y destellan (tinte: color)
 			p.draw_pass_1 = cube("add")
-			p.amount = 12
+			p.amount = 16
 			p.lifetime = 1.4
 			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
 			m.emission_sphere_radius = r
 			m.spread = 180.0
 			m.initial_velocity_min = 0.05; m.initial_velocity_max = 0.2
 			m.gravity = Vector3(0, -0.4, 0)
-			m.scale_min = 0.02; m.scale_max = 0.035
+			m.scale_min = 0.03; m.scale_max = 0.05
 			m.color_ramp = _ramp([[0.0, Color(1, 1, 1, 0.0)], [0.2, Color(1, 1, 1, 0.8)], [1.0, Color(1, 1, 1, 0.0)]])
 		"leaves":                 # hojas que se desprenden de la copa y caen girando con el viento
 			p.draw_pass_1 = cube("lit")

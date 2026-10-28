@@ -16,3 +16,4 @@ bonus_per_level = 0.15
 bonus_max = 5.0
 follow_gap = 0.9
 prints = "smear"
+print_width = 0.4

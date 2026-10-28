@@ -18,4 +18,4 @@ effect_time = 3.0
 fly_height = 1.2
 follow_gap = 1.1
 trail = "dust"
-trail_color = Color(0.75, 0.7, 0.6, 1)
+trail_color = Color(0.8, 0.5, 1, 1)
