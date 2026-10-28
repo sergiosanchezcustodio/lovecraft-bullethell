@@ -5,6 +5,7 @@ Casco Brodie (plato de ala ancha) verde oliva, guerrera de uniforme oliva con ci
 correajes de lona, cartucheras, polainas enrolladas sobre las botas, bigote de cepillo y
 cara curtida. Corpulento, como Johansen. Estilo 4 (tools/cuerpo.py).
 Uso: python tools/gen_elwood.py
+     python tools/gen_elwood.py --morsa   # variante con bigote de morsa (models/elwood_morsa.json, para comparar)
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
@@ -23,6 +24,10 @@ HAIR = (0.30, 0.22, 0.15); MOUSTACHE = (0.25, 0.17, 0.11); BROW = (0.20, 0.14, 0
 IRIS = (0.18, 0.15, 0.10); MOUTH = (0.68, 0.47, 0.38); EAR_IN = (0.62, 0.44, 0.34)
 HELMET_RIM = (0.40, 0.43, 0.33); STRAP = (0.32, 0.22, 0.13)
 B = 3
+# variante propuesta el 28-10-2026: bigote de morsa, más británico, que tapa la boca y cae por las
+# comisuras; no sustituye al de cepillo hasta que el autor lo elija
+MORSA = '--morsa' in sys.argv
+MOUSTACHE_L = (0.36, 0.26, 0.17)
 
 M = cu.new(1918)
 cu.boots(M, BOOT, SOLE, top=7)
@@ -65,6 +70,7 @@ cu.face_art(M, 74, [
     '................',
     '................',
     '................',
+    '................' if MORSA else          # (el de morsa tapa la boca)
     '......oooo......',                    # 65: boca, separada del bigote (pegada parecía abierta)
 ], {'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'c': CHEEK, 'o': MOUTH})
 cu.face_art(M, 74, [                       # en relieve
@@ -74,9 +80,18 @@ cu.face_art(M, 74, [                       # en relieve
     '.......nn.......',
     '......snns......',                    # 70: punta de la nariz
     '......snns......',
+] + ([
+    '....lmmmmmml....',                    # 68: bigote de morsa, espeso bajo la nariz...
+    '...mmmmmmmmmm...',
+    '..mmmmmmmmmmmm..',                    # ...tapa la boca...
+    '..mm........mm..',                    # ...y cae un poco por las comisuras (más largo
+                                           #    y ancho parecía una barba entera)
+] if MORSA else [
     '.....mmmmmm.....',                    # 68: bigote militar, más ancho abajo (estrecho
     '....mmmmmmmm....',                    #     y negro recordaba a otro bigote)
-], {'b': BROW, 'n': SKIN, 's': SKIN_SH, 'm': MOUSTACHE}, dz=1)
+]), {'b': BROW, 'n': SKIN, 's': SKIN_SH, 'm': MOUSTACHE, 'l': MOUSTACHE_L}, dz=1)
+if MORSA:                                  # más espeso en el centro: asoma 2
+    cu.face_art(M, 67, ['.....llllll.....', '....mmmmmmmm....'], {'m': MOUSTACHE, 'l': MOUSTACHE_L}, dz=1)
 cu.ear_holes(M, EAR_IN)
 cu.hair_back(M, SKIN, HAIR, top=78, bottom=68, neck=False, point=5)   # pelo corto, de soldado
 cu.sideburns(M, HAIR, 72, 78)
@@ -99,8 +114,8 @@ for y in range(64, 78):                    # barboquejo, por fuera de la cara a 
         for z in (2, 3): M.put(x, y, z, H, STRAP, 0, False)
 
 cu.seams(M, (TUNIC,))
-cu.finish(M, 'elwood', {TUNIC: 'lana', TUNIC_SH: 'lana', WEBBING: 'lona', POUCH: 'lona', TROUSER: 'lana',
+cu.finish(M, 'elwood_morsa' if MORSA else 'elwood', {TUNIC: 'lana', TUNIC_SH: 'lana', WEBBING: 'lona', POUCH: 'lona', TROUSER: 'lana',
                         PUTTEE: 'lana', PUTTEE_SH: 'lana', BOOT: 'cuero', SOLE: 'cuero', HAIR: 'pelo',
-                        MOUSTACHE: 'pelo', SKIN: 'piel', SKIN_SH: 'piel', STRAP: 'cuero'},
+                        MOUSTACHE: 'pelo', MOUSTACHE_L: 'pelo', SKIN: 'piel', SKIN_SH: 'piel', STRAP: 'cuero'},
           flat=(BRASS, CHEEK, BROW, IRIS, MOUTH, EAR_IN), b=B,
           hat=(HELMET_SH, HELMET, HELMET_RIM, STRAP))

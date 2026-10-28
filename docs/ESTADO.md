@@ -1142,6 +1142,7 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **Tienda:** las filas crecen si la descripción ocupa tres líneas (`ShopMenu._row`); las de una o dos siguen con 92 px.
   - Las ideas pendientes del final de este diario están hechas, salvo el bigote de Elwood (cuestión de gusto: decídelo tú). Lo que queda del plan es tuyo: las partidas de prueba, la prueba online por internet, la OAuth App de la nube y subir a itch.io.
   - Tests: 467 de 467.
+- **Bigote de morsa para Elwood (28-10-2026), propuesta para que elijas:** la última idea pendiente. No sustituye al de cepillo: `python tools/gen_elwood.py --morsa` escribe `models/elwood_morsa.json` y `elwood.json` sale igual que antes. Espeso bajo la nariz (asoma 2 en el centro, con la fila de arriba algo más clara), tapa la boca y cae un poco por las comisuras; más largo y ancho parecía una barba entera. Comparación en `shots/revision/2026-10-28/elwood_bigote_morsa.png` (arriba con la cámara del juego, abajo de frente) o con `godot --path . -- still 45 elwood,elwood_morsa`. Si lo eliges, pasa a ser el de `gen_elwood.py` (y después `gen_vestuario.py` y `gen_caras_juego.py`).
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 
@@ -1149,7 +1150,7 @@ Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a
 - (Las tres, hechas el 28-10-2026: ver «Ideas pendientes técnicas».)
 
 Ofrecidas al cerrar las cabezas nuevas de los trece personajes (23-10-2026):
-- Elwood con bigote de morsa, más británico, en vez del militar ancho.
+- (Elwood con bigote de morsa: hecho como variante el 28-10-2026, falta que elijas.)
 
 Ofrecidas al cerrar el rediseño de Padre Dagon (23-10-2026):
 - (Las dos, hechas el 28-10-2026.)
