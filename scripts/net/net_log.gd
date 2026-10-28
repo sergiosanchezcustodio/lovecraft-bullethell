@@ -42,6 +42,26 @@ func open(role: String, detail: String) -> void:
 static func open_folder() -> void:
 	OS.shell_open(ProjectSettings.globalize_path(DIR))
 
+## Final del nombre de la captura de una marca de otro PC: "_de_Ana" (solo letras, cifras y _;
+## tools/marcas.py lo rehace igual con el nombre del registro).
+static func shot_suffix(from: String) -> String:
+	if from == "": return ""
+	var re := RegEx.create_from_string("[^A-Za-z0-9]")
+	return "_de_" + re.sub(from, "_", true)
+
+## La captura de marca más reciente de la carpeta ("" si no hay ninguna).
+static func latest_shot() -> String:
+	var best := ""
+	var best_t := 0
+	if not DirAccess.dir_exists_absolute(DIR): return ""
+	for f in DirAccess.get_files_at(DIR):
+		if not (f.begins_with("red_") and "_marca_" in f and f.ends_with(".png")): continue
+		var t := FileAccess.get_modified_time("%s/%s" % [DIR, f])
+		if t >= best_t:
+			best_t = t
+			best = "%s/%s" % [DIR, f]
+	return best
+
 func is_open() -> bool:
 	return _f != null
 

@@ -135,7 +135,7 @@ func _line(label: String, value: String) -> HBoxContainer:
 func _ask_delete(i: int, d: SaveData) -> void:
 	if _busy or d == null: return
 	_busy = true
-	var c := MenuKit.Confirm.new("¿Borrar la Partida %d?\n\nSe perderá todo su progreso: %s de juego, %s $, %s y %s." % [
+	var c := MenuKit.Confirm.new("¿Borrar la Partida %d?\n\nSe perderá todo su progreso: %s de juego, %s $, %s y %s." % [
 		i + 1, SaveData.format_time(d.play_time), MenuKit.money(d.money), MenuKit.count(d.items_bought(), "objeto"),
 		MenuKit.count(d.pets.size(), "compañero")], "Borrar")
 	add_child(c)

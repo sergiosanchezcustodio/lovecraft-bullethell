@@ -165,8 +165,18 @@ static func _marks(b: Button, metal: Color) -> void:
 		var w := b.get_theme_font("font").get_string_size(b.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
 		var cy := m.size.y * 0.5
 		var r := maxf(4.0, font_size * 0.17)
+		# dónde va el texto: centrado o, en las filas alineadas a un lado, desde su margen
+		var sb := b.get_theme_stylebox("normal")
+		var left := sb.get_margin(SIDE_LEFT) if sb != null else 0.0
+		var right := m.size.x - (sb.get_margin(SIDE_RIGHT) if sb != null else 0.0)
+		if b.icon != null: left += b.icon.get_width() + b.get_theme_constant("h_separation")
+		var x0 := m.size.x * 0.5 - w * 0.5
+		if b.alignment == HORIZONTAL_ALIGNMENT_LEFT: x0 = left
+		elif b.alignment == HORIZONTAL_ALIGNMENT_RIGHT: x0 = right - w
+		var x1 := minf(x0 + w, right)
 		for side: float in [-1.0, 1.0]:
-			var cx := m.size.x * 0.5 + side * (w * 0.5 + r * 3.2)
+			var cx := x0 - r * 3.2 if side < 0.0 else x1 + r * 3.2
+			if cx - r * 1.5 < 0.0 or cx + r * 1.5 > m.size.x: continue   # sin sitio junto al texto: no pisa ni texto ni borde
 			var pts := PackedVector2Array([Vector2(cx, cy - r), Vector2(cx + r, cy), Vector2(cx, cy + r), Vector2(cx - r, cy)])
 			m.draw_circle(Vector2(cx, cy), r * 2.2, Color(CANDLE, 0.12))
 			m.draw_colored_polygon(pts, metal.lightened(0.35)))

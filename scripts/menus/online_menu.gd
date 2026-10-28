@@ -103,6 +103,14 @@ func _show_choice() -> void:
 		var row := CenterContainer.new()
 		row.add_child(logs)
 		_box.add_child(row)
+		var shot := NetLog.latest_shot()
+		if shot != "":                                # lo que se veía en la última marca
+			var see := MenuKit.button("Ver la captura de la última marca", MenuKit.INK, 18)
+			see.custom_minimum_size = Vector2(420, 42)
+			see.pressed.connect(func() -> void: OS.shell_open(ProjectSettings.globalize_path(shot)))
+			var row2 := CenterContainer.new()
+			row2.add_child(see)
+			_box.add_child(row2)
 	_box.add_child(MenuKit.hint("B o Esc: volver"))
 	_focus(create)
 

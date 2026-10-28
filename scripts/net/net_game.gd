@@ -1093,6 +1093,7 @@ var level_marks := 0                        ## marcas de todos los PC en este ni
 func _say_mark(d: Array) -> void:
 	level_marks += 1
 	if game.has_method("announce"): game.announce("%s ha puesto una marca" % String(d[0]).left(20), 1.5)
+	if game.has_method("mark_shot"): game.mark_shot(int(d[1]), String(d[0]).left(20))   # lo que se veía aquí
 	_say("marca %d de %s · %s (aquí: %s)" % [int(d[1]), String(d[0]).left(20), String(d[2]).left(24), where()])
 
 ## Nivel y minuto de partida ("p1_n3 2:14"): para encontrar en el registro lo que cuenta un jugador.

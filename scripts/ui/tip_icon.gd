@@ -17,6 +17,7 @@ var placeholder := ""
 
 var _tex: TextureRect
 var _ph: Label
+static var hold := false                      ## con una ventana encima (el mapa de niveles), ninguna burbuja
 var _bubble: PanelContainer
 var _bubble_title: Label
 var _bubble_text: Label
@@ -72,7 +73,7 @@ func _fill() -> void:
 	_bubble.reset_size()
 
 func _process(delta: float) -> void:
-	var on := is_visible_in_tree() and (_hover or selected or has_focus()) and tip_title != ""
+	var on := is_visible_in_tree() and (_hover or selected or has_focus()) and tip_title != "" and not hold
 	_t = _t + delta if on else 0.0
 	var want := on and _t >= DELAY
 	if want and not _bubble.visible:

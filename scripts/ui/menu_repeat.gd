@@ -27,6 +27,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().node_added.connect(_on_node_added)
 	get_viewport().gui_focus_changed.connect(_on_focus_changed)
+	if LaunchArgs.from_cmdline().get_bool("ui_check"):   # revisión de textos que pisan los marcos
+		add_child(preload("res://scripts/ui/ui_overlap_check.gd").new())
 
 func _input(event: InputEvent) -> void:
 	# las repeticiones del teclado del sistema, fuera: repite este nodo, igual que con el mando

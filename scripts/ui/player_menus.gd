@@ -153,17 +153,17 @@ class Sheet extends Control:
 		MenuKit.dress(bg, metal, Vector2.ZERO, 120.0 if solo else 90.0)
 		_title = MenuKit.title("J%d  ·  Ficha del investigador" % (p.index + 1), 30, p.color)
 		_title.size = Vector2(design.x, 44)
-		_title.position = Vector2(0, 10)
+		_title.position = Vector2(0, 20)                 # por debajo del filete fino (15-17 px del borde)
 		_stage.add_child(_title)
 		var row := HBoxContainer.new()
-		row.position = Vector2(20, 60)
-		row.size = Vector2(design.x - 40, design.y - 100)
+		row.position = Vector2(24, 66)
+		row.size = Vector2(design.x - 48, design.y - 112)
 		row.add_theme_constant_override("separation", 16)
 		_stage.add_child(row)
 		var col_w := (row.size.x - 16 * 2) / 3.0         # tres columnas iguales: mismo margen a los dos lados
 		for i in 3:
 			var frame := PanelContainer.new()
-			frame.custom_minimum_size = Vector2(640 if paged else col_w, row.size.y)
+			frame.custom_minimum_size = Vector2(row.size.x if paged else col_w, row.size.y)
 			_frames.append(frame)
 			var fs := MenuKit.box(Color(0.03, 0.022, 0.018, 0.55), Color(metal, 0.35), 1)
 			fs.content_margin_left = 10; fs.content_margin_right = 10
@@ -176,7 +176,7 @@ class Sheet extends Control:
 		var hint := UiKit.label(("LB/RB o Q/E: página  ·  " if paged else "") + "Select, B o Esc: cerrar", 14, UiKit.TEXT_DIM)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		hint.size = Vector2(design.x, 24)
-		hint.position = Vector2(0, design.y - 34)
+		hint.position = Vector2(0, design.y - 44)
 		_stage.add_child(hint)
 
 	func _ready() -> void:
@@ -445,7 +445,7 @@ class ArenaMap extends PanelContainer:
 		var hint := UiKit.label("Gatillos o + y −: zoom  ·  Cruceta abajo o M, B o Esc: cerrar", 13, UiKit.TEXT_DIM)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(hint)
-		MenuKit.dress(self, MenuKit.BRASS.lerp(p.color, 0.45), Vector2(22, 16), 90.0)
+		MenuKit.dress(self, MenuKit.BRASS.lerp(p.color, 0.45), Vector2(26, 26), 90.0)   # dentro del filete fino
 
 	func _process(delta: float) -> void:
 		var z := _zoom_input()

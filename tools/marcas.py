@@ -10,8 +10,12 @@ con la letra de su fichero. Los relojes de dos PC no van iguales: la diferencia 
 marcas, que se apuntan en todos («marca 3 del jugador · p1_n2 1:05» en uno y «marca 3 de Ana ·
 p1_n2 1:05» en el otro), y se corrige.
 
+Sin ficheros, solo la última sesión de este PC (user://logs/red); si hay otros registros que
+se solapan con ella en el tiempo (dos ventanas en el mismo PC), salen juntos, como con --juntar.
+
 Uso (desde la raíz):
-    python tools/marcas.py                      # los registros de este PC (user://logs/red)
+    python tools/marcas.py                      # la última sesión de este PC
+    python tools/marcas.py --todos              # todos los registros de este PC
     python tools/marcas.py red_2026-10-23_*.log # los que te pasen (los de otro PC, por ejemplo)
     python tools/marcas.py --antes 12 --despues 6
     python tools/marcas.py --juntar mio.log suyo.log          # los dos PC en una lista
@@ -30,7 +34,7 @@ END = "Fin de la sesión"
 LINE = re.compile(r"^\[(\d\d):(\d\d):(\d\d)\] (.*)$")
 STAMP = re.compile(r"red_(\d{4})-(\d\d)-(\d\d)_(\d\d)-(\d\d)-(\d\d)")
 # "marca 3 del jugador · p1_n2 1:05" (en su PC) o "marca 3 de Ana · p1_n2 1:05 (aquí: …)" (en los demás)
-MARK = re.compile(r"^marca (\d+) (?:del jugador|de .+?) · (.+?)(?: \(aquí: .*\))?$")
+MARK = re.compile(r"^marca (\d+) (?:del jugador|de (.+?)) · (.+?)(?: \(aquí: .*\))?$")
 
 
 def default_dir() -> str:
@@ -49,11 +53,13 @@ def is_mark(line: str) -> bool:
 
 
 def shot_of(path: str, line: str) -> str:
-    """Captura de una marca (la guarda el juego junto al registro: <registro>_marca_N.png)."""
+    """Captura de una marca (la guarda el juego junto al registro: <registro>_marca_N.png, o
+    <registro>_marca_N_de_<nombre>.png con la de otro PC: lo que se veía aquí en ese momento)."""
     m = MARK.match(line.split("] ", 1)[-1])
-    if not m or "del jugador" not in line:
+    if not m:
         return ""
-    p = "%s_marca_%s.png" % (os.path.splitext(path)[0], m.group(1))
+    who = "_de_" + re.sub(r"[^A-Za-z0-9]", "_", m.group(2)) if m.group(2) else ""
+    p = "%s_marca_%s%s.png" % (os.path.splitext(path)[0], m.group(1), who)
     return os.path.normpath(p) if os.path.exists(p) else ""
 
 
@@ -123,13 +129,29 @@ def offset(base: list, other: list) -> tuple:
         for t, text, _ in rows:
             m = MARK.match(text)
             if m:
-                d.setdefault((m.group(1), m.group(2)[:24]), t)
+                d.setdefault((m.group(1), m.group(3)[:24]), t)
         return d
     a, b = keys(base), keys(other)
     diffs = [(a[k] - b[k]).total_seconds() for k in a if k in b]
     if not diffs:
         return 0.0, 0
     return statistics.median(diffs), len(diffs)
+
+
+def span(path: str) -> tuple:
+    rows = parse(path)
+    return (rows[0][0], rows[-1][0]) if rows else (None, None)
+
+
+def last_session(files: list) -> list:
+    """El registro más reciente y los que se solapan con él en el tiempo (dos ventanas en un PC)."""
+    spans = {f: span(f) for f in files}
+    files = [f for f in files if spans[f][0] is not None]
+    if not files:
+        return []
+    last = max(files, key=lambda f: spans[f][0])
+    a0, a1 = spans[last]
+    return sorted(f for f in files if spans[f][0] <= a1 and spans[f][1] >= a0)
 
 
 def merge(files: list, before: int, after: int, everything: bool) -> None:
@@ -169,6 +191,7 @@ def main() -> None:
     ap.add_argument("--despues", type=int, default=3, help="líneas después de cada marca (3)")
     ap.add_argument("--juntar", action="store_true", help="los registros de varios PC en una lista por hora")
     ap.add_argument("--todo", action="store_true", help="con --juntar, la lista entera")
+    ap.add_argument("--todos", action="store_true", help="sin ficheros: todos los registros de este PC, no solo la última sesión")
     a = ap.parse_args()
     files = []
     for f in a.files:
@@ -179,6 +202,10 @@ def main() -> None:
         if not files:
             print(f"No hay registros en {d}")
             return
+        if not a.todos:
+            files = last_session(files)
+            print("Última sesión: %s  (--todos para verlos todos)\n" % ", ".join(os.path.basename(f) for f in files))
+            a.juntar = a.juntar or len(files) > 1
     unfinished = []
     for f in files:
         with open(f, encoding="utf-8", errors="replace") as fh:

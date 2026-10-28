@@ -29,8 +29,8 @@ const PET_H := 240.0
 const PET_GAP := 10.0
 ## Escala de los compañeros en su visor, la misma para todos (se ven proporcionados: el perro
 ## más grande que el murciélago), y tamaño del visor: cabe el más alto (el perro, 0,85 m).
-const PET_PX_PER_M := 160.0
-const PET_VIEW := Vector2(380, 150)
+const PET_PX_PER_M := 130.0
+const PET_VIEW := Vector2(380, 120)
 const ICONS := "res://resources/PantallasMenus/iconos/ficha_%s.png"
 ## Píxeles por metro del personaje: los mismos que en la partida (1080 px para 15 m de alto).
 const PX_PER_M := 1080.0 / 15.0
@@ -64,6 +64,7 @@ var _room_status: Label
 var _room_list: RichTextLabel                ## quién está, con el ping de color y si tiene otra versión
 
 func _ready() -> void:
+	TipIcon.hold = false
 	args = LaunchArgs.from_cmdline()
 	UiInput.configure()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -285,10 +286,12 @@ func _open_map() -> void:
 		return
 	_map = LevelMap.new()
 	add_child(_map)
+	TipIcon.hold = true                               # las burbujas de la ficha irían encima del mapa
 	if net_select != null: net_select.map_open = true
 	_map.chosen.connect(_start)
 	_map.closed.connect(func() -> void:
 		_map = null
+		TipIcon.hold = false
 		if net_select != null: net_select.map_open = false
 		state.unready_all())
 
@@ -560,10 +563,10 @@ class _Frame extends Control:
 		MenuKit.dress(_panel, MenuKit.BRASS, Vector2.ZERO, 72.0)   # madera y latón; refresh() lo tiñe
 		_head = MenuKit.title("J%d" % (index + 1), 26, color)   # puesto vacío: arriba, centrado
 		_head.size = Vector2(FRAME.x, 40)
-		_head.position = Vector2(0, 10)
+		_head.position = Vector2(0, 22)                    # dentro del filete fino (15-17 px del borde)
 		add_child(_head)
 		_jbox = PanelContainer.new()                           # puesto ocupado: recuadro como el del arma
-		_jbox.position = Vector2(12, 12)
+		_jbox.position = Vector2(20, 20)
 		_jbox.custom_minimum_size = Vector2(92, 92)
 		_jbox.add_theme_stylebox_override("panel", _frame(Color(0, 0, 0, 0.5), Color(MenuKit.BRASS.lerp(color, 0.6), 0.85), 2))
 		add_child(_jbox)
@@ -572,7 +575,7 @@ class _Frame extends Control:
 		jl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_jbox.add_child(jl)
 		_who = UiKit.label("", 16, color)
-		_who.position = Vector2(12, 108)
+		_who.position = Vector2(22, 116)
 		_who.size = Vector2(150, 22)
 		_who.clip_text = true
 		add_child(_who)
@@ -587,7 +590,7 @@ class _Frame extends Control:
 			_arrows.append(a)
 		# arma inicial, arriba a la derecha
 		_wbox = PanelContainer.new()
-		_wbox.position = Vector2(FRAME.x - 104, 12)
+		_wbox.position = Vector2(FRAME.x - 112, 20)
 		_wbox.add_theme_stylebox_override("panel", _frame(Color(0, 0, 0, 0.5), Color(MenuKit.BRASS, 0.7), 2))
 		add_child(_wbox)
 		_weapon = TipIcon.new(Vector2(72, 72))
@@ -653,30 +656,31 @@ class _Frame extends Control:
 		_pet.size = Vector2(FRAME.x, PET_H)
 		add_child(_pet)
 		MenuKit.dress(_pet, MenuKit.BRASS, Vector2.ZERO, 60.0)
-		_pet_title = MenuKit.title("Elige compañero", 24, UiKit.GOLD)
-		_pet_title.size = Vector2(FRAME.x, 32)
-		_pet_title.position = Vector2(0, 8)
+		# todo entre los 20 px de arriba y de abajo: el filete fino va a 15-17 px del borde
+		_pet_title = MenuKit.title("Elige compañero", 22, UiKit.GOLD)
+		_pet_title.size = Vector2(FRAME.x, 30)
+		_pet_title.position = Vector2(0, 18)
 		_pet.add_child(_pet_title)
-		_pet_name = MenuKit.title("", 21, color)
-		_pet_name.size = Vector2(FRAME.x - 100, 28)
-		_pet_name.position = Vector2(50, 40)
+		_pet_name = MenuKit.title("", 20, color)
+		_pet_name.size = Vector2(FRAME.x - 100, 26)
+		_pet_name.position = Vector2(50, 46)
 		_pet.add_child(_pet_name)
 		for side in [-1, 1]:
 			var a := UiKit.label("◀" if side < 0 else "▶", 24, UiKit.TEXT)
-			a.position = Vector2(24 if side < 0 else FRAME.x - 44, 38)
+			a.position = Vector2(26 if side < 0 else FRAME.x - 46, 42)
 			_pet.add_child(a)
 			_pet_arrows.append(a)
 		_pet_view = _Preview.new(PET_VIEW, PET_PX_PER_M, index + 2)
-		_pet_view.position = Vector2((FRAME.x - PET_VIEW.x) * 0.5, 66)
+		_pet_view.position = Vector2((FRAME.x - PET_VIEW.x) * 0.5, 72)
 		_pet.add_child(_pet_view)
 		_pet_note = UiKit.label("", 16, UiKit.TEXT_DIM)
 		_pet_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_pet_note.size = Vector2(FRAME.x, 24)
-		_pet_note.position = Vector2(0, 128)
+		_pet_note.position = Vector2(0, 120)
 		_pet.add_child(_pet_note)
 		_status = MenuKit.title("", 20, color)
 		_status.size = Vector2(FRAME.x, 26)
-		_status.position = Vector2(0, PET_H - 32)
+		_status.position = Vector2(0, PET_H - 48)
 		_pet.add_child(_status)
 
 	## Nombre de cada estadística derivada (Attributes.FORMULAS) y su fila en la ficha.
