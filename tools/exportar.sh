@@ -5,8 +5,11 @@
 # Antes pregunta si subir la versión del juego (application/config/version en project.godot):
 # en red, la sala no deja empezar a PCs con versiones distintas, así que cada build que se
 # reparte debe llevar la suya. Con la versión como argumento no pregunta; sin terminal
-# (ejecuciones automáticas) deja la que hay.
+# (ejecuciones automáticas) deja la que hay. Antes de exportar, tools/revisar_costados.py
+# comprueba los costados de todos los personajes y prendas y, si falla, no sigue.
 set -e
+# los costados de personajes y prendas, enteros (si una manga borra el tronco, se ve al andar)
+python tools/revisar_costados.py
 actual=$(sed -n 's/^config\/version="\(.*\)"$/\1/p' project.godot)
 nueva="$1"
 if [ -z "$nueva" ] && [ -t 0 ]; then

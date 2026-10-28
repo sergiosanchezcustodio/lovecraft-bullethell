@@ -8,7 +8,11 @@ class_name Review
 ##   exportada res:// no se puede escribir y el menú no aparece.
 
 const FILE := "res://review/peticiones.json"
+## Variantes para elegir (28-10-2026): {"propuestas": [{modelo, nombre, nota, encuadre}]}; la
+## pestaña Propuestas solo sale si hay alguna. encuadre "cabeza" acerca la vista grande a la cabeza.
+const PROPOSALS := "res://review/propuestas.json"
 const SECTIONS := [
+	{"id": "propuestas", "title": "Propuestas"},
 	{"id": "personajes", "title": "Personajes"},
 	{"id": "mascotas", "title": "Compañeros"},
 	{"id": "enemigos", "title": "Enemigos"},
@@ -27,11 +31,27 @@ const PLACES := {"alr": "muelle y cubierta del Alert", "arr": "Arrecife del Diab
 static func available() -> bool:
 	return not OS.has_feature("template")
 
+## Las pestañas que se enseñan: Propuestas solo si hay alguna.
+static func sections() -> Array:
+	return SECTIONS.filter(func(s: Dictionary) -> bool: return s.id != "propuestas" or not proposals().is_empty())
+
+static func proposals() -> Array:
+	var p := ProjectSettings.globalize_path(PROPOSALS)
+	if not FileAccess.file_exists(p): return []
+	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(p))
+	return d.get("propuestas", []) if d is Dictionary else []
+
 ## [{id, name, model, image, file, info}] de una sección. `model`: nombre del modelo voxel (se
 ## renderiza); `image`: ruta de un PNG; `file`: lo que se vigila para recargar.
 static func entries(section: String) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	match section:
+		"propuestas":
+			for p: Dictionary in proposals():
+				var e := _model(String(p.modelo), String(p.nombre), String(p.modelo))
+				if p.has("nota"): e.info += "\n" + String(p.nota)
+				e.focus = String(p.get("encuadre", ""))
+				out.append(e)
 		"personajes", "mascotas":
 			for e in Library.entries(null, "people"):
 				var pet := String(e.section) == "Compañeros"

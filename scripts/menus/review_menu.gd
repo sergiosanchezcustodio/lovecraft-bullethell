@@ -20,6 +20,7 @@ var _stamps: Array[int] = []
 var _queue: Array[int] = []                  ## miniaturas por hacer (unas pocas por fotograma)
 var _sel := -1
 var _tabs: Array[Button] = []
+var _sections: Array = []                   ## las pestañas que salen (Review.sections)
 var _grid: GridContainer
 var _scroll: ScrollContainer
 var _big_img: TextureRect
@@ -51,8 +52,9 @@ func _ready() -> void:
 	top.add_theme_constant_override("separation", 10)
 	root.add_child(top)
 	top.add_child(MenuKit.title("Revisión de arte (temporal)", 34))
-	for i in Review.SECTIONS.size():
-		var b := MenuKit.button(String(Review.SECTIONS[i].title), MenuKit.INK, 20)
+	_sections = Review.sections()
+	for i in _sections.size():
+		var b := MenuKit.button(String(_sections[i].title), MenuKit.INK, 20)
 		b.custom_minimum_size = Vector2(0, 44)
 		b.pressed.connect(_show_section.bind(i))
 		top.add_child(b)
@@ -125,7 +127,7 @@ func _show_section(i: int) -> void:
 	for c in _grid.get_children(): c.queue_free()
 	for c in _host.get_children(): c.queue_free()
 	_cards.clear(); _thumbs.clear(); _stamps.clear(); _queue.clear()
-	_entries = Review.entries(String(Review.SECTIONS[i].id))
+	_entries = Review.entries(String(_sections[i].id))
 	for k in _entries.size():
 		var e := _entries[k]
 		var b := Button.new()
@@ -178,8 +180,8 @@ func _show_big(e: Dictionary) -> void:
 	_big_pivot = Node3D.new()
 	_big_vp.add_child(_big_pivot)
 	_big_pivot.add_child(m)
-	var b := _model_aabb(m)
-	m.position = -b.get_center()                       # gira sobre su centro
+	var b := _model_aabb(m, "head" if String(e.get("focus", "")) == "cabeza" else "")
+	m.position = -b.get_center()                       # gira sobre su centro (o el de la cabeza)
 	var radius := b.size.length() * 0.5
 	var cam := Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -206,15 +208,19 @@ func _show_big(e: Dictionary) -> void:
 	we.environment = env
 	_big_vp.add_child(we)
 
-static func _model_aabb(m: Node3D) -> AABB:
+## part: solo lo que cuelga de esa parte (la cabeza, con lo que lleva encima).
+static func _model_aabb(m: Node3D, part := "") -> AABB:
 	var out := AABB()
 	var first := true
 	for mi: MeshInstance3D in m.get_meta("meshes"):
 		var xf := Transform3D()
 		var n: Node = mi
+		var inside := part == ""
 		while n != m and n is Node3D:
+			if n.name == part: inside = true
 			xf = (n as Node3D).transform * xf
 			n = n.get_parent()
+		if not inside: continue
 		var b: AABB = xf * mi.get_aabb()
 		out = b if first else out.merge(b)
 		first = false
@@ -222,7 +228,9 @@ static func _model_aabb(m: Node3D) -> AABB:
 
 func _make_thumb(k: int) -> void:
 	var e := _entries[k]
-	if String(e.model) != "": _thumbs[k].texture = ModelIcon.make(_host, String(e.model), "full", THUMB)
+	if String(e.model) != "":
+		var mode := "head" if String(e.get("focus", "")) == "cabeza" else "full"
+		_thumbs[k].texture = ModelIcon.make(_host, String(e.model), mode, THUMB)
 	else: _thumbs[k].texture = Review.load_png(String(e.image))
 
 # ------------------------------------------------------------------ peticiones
@@ -230,14 +238,14 @@ func _make_thumb(k: int) -> void:
 func _on_send() -> void:
 	var txt := _text.text.strip_edges()
 	if txt == "" or _sel < 0: return
-	Review.add_request(String(Review.SECTIONS[_section].id), _entries[_sel], txt)
+	Review.add_request(String(_sections[_section].id), _entries[_sel], txt)
 	_text.text = ""
 	Sfx.play("ui_accept")
 	_refresh_log()
 
 func _refresh_log() -> void:
 	if _sel < 0: return
-	var list := Review.requests_for(String(Review.SECTIONS[_section].id), String(_entries[_sel].id))
+	var list := Review.requests_for(String(_sections[_section].id), String(_entries[_sel].id))
 	if list.is_empty():
 		_log.text = "[color=#888]Sin peticiones para esta imagen.[/color]"
 		return

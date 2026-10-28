@@ -1,0 +1,16 @@
+{
+	"propuestas": [
+		{
+			"modelo": "elwood",
+			"nombre": "Elwood: bigote de cepillo (el de ahora)",
+			"encuadre": "cabeza",
+			"nota": "El que tiene ahora, aprobado el 26-10-2026."
+		},
+		{
+			"modelo": "elwood_morsa",
+			"nombre": "Elwood: bigote de morsa (propuesta)",
+			"encuadre": "cabeza",
+			"nota": "Más británico: espeso, tapa la boca y cae por las comisuras. Si lo eliges, pide «el de morsa» en esta ficha."
+		}
+	]
+}
