@@ -16,6 +16,8 @@ var last_device := KEYBOARD              ## el último que pulsó algo (menús)
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	if OS.get_environment("LOVECRAFT_FUERA") == "1":   # tools/godot_sin_foco.sh arranca en bajo consumo
+		OS.low_processor_usage_mode = false            # (para no subir la prioridad); la prueba va igual
 	if JoypadInput.disabled():                      # pruebas de Claude Code: sin mandos
 		_ignore_pads()
 		return
