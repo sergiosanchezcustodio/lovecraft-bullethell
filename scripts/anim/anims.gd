@@ -48,6 +48,17 @@ static func hit_time(model_name: String, fallback: float) -> float:
 static func hit(model_name: String, m: Node3D, k: float) -> void:
 	script_for(model_name).call("hit", m, k)
 
+## Preparación antes de un ataque con aviso en el suelo (hito 12.5): el script de la familia puede
+## tener `static func windup(m, build, thrust, t)`, que se suma a la pose ya puesta. build va de 0 a
+## 1 mientras dura el aviso (se prepara y aguanta) y vuelve a 0 al soltar; thrust es el golpe hacia
+## delante al soltar (0, 1 y 0); t, segundos, para el temblor. Sin ella, Enemy agacha el modelo entero.
+static func has_windup(model_name: String) -> bool:
+	var s: Script = script_for(model_name)
+	return s != null and s.has_method("windup")
+
+static func windup(model_name: String, m: Node3D, build: float, thrust: float, t: float) -> void:
+	script_for(model_name).call("windup", m, build, thrust, t)
+
 ## Gestos de reposo del modelo: los suyos (FIDGETS_OF del script) o los de la familia (FIDGETS).
 static func fidgets(model_name: String) -> Array:
 	var s: Script = script_for(model_name)

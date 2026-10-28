@@ -874,6 +874,8 @@ func _on_world(kind: String, a: Array) -> void:
 	if kind == "strike":
 		a = a.duplicate()
 		a[4] = _nid(a[4] as Enemy) if a[4] is Enemy else 0
+	elif kind == "windup":                               # preparación de un ataque (hito 12.5)
+		a = [_nid(a[0] as Enemy), a[1]]
 	_world_event(kind, a)
 
 func _world_event(kind: String, a: Array) -> void:
@@ -998,6 +1000,9 @@ func _apply_world(kind: String, a: Array, ahead: float) -> void:
 			else: hz.spawn_wave_at((a[1] as Vector3).z)
 		"strike":
 			w.apply_net(kind, a, _enemies.get(int(a[4])))
+		"windup":
+			var e: Variant = _enemies.get(int(a[0]))
+			if e != null and is_instance_valid(e) and ahead < float(a[1]): (e as Enemy).windup(float(a[1]) - ahead, false)
 		_:
 			w.apply_net(kind, a)
 

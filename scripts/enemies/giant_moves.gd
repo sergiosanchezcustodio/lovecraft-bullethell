@@ -67,6 +67,7 @@ func step(e: Enemy, target: Player, delta: float) -> bool:
 	var tg := Telegraph.enemy(_radius(e), LEAP_WARN + LEAP_TIME, Color(Damage.COLOR_PHYSICAL, 0.8))
 	tg.position = _to
 	e.world.fx.add_child(tg)
+	e.windup(LEAP_WARN)                                   # se agacha para saltar (hito 12.5)
 	return true
 
 func _radius(e: Enemy) -> float:
@@ -115,6 +116,7 @@ func _erupt(e: Enemy, target: Player) -> void:
 	var n := mini(int((dist + 3.0) / ERUPT_STEP), 14)    # llega hasta el jugador y un poco más allá
 	var dmg := float(e.data.param("erupt_damage", 14.0))
 	var eid := e.get_instance_id()
+	e.windup(ERUPT_WARN)
 	for i in n:
 		var at := from + dir * (e.data.body_radius + 0.8 + i * ERUPT_STEP)
 		var tg := Telegraph.enemy(ERUPT_RADIUS, ERUPT_WARN + i * ERUPT_DELAY, Color(Damage.COLOR_PHYSICAL, 0.7))

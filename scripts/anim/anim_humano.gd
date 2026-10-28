@@ -269,6 +269,22 @@ static func throw(m: Node3D, t: float) -> void:
 	Anims.part(m, "arm_l").rotation.x = -back * 0.35
 	bend(m, "fore_r", -back * 1.3 + fwd * 0.2)                             # codo atrás al coger impulso
 
+## Preparación (hito 12.5; cultistas, sacerdotes, Barnabas): echa la espalda atrás y alza los
+## brazos abiertos por encima de la cabeza, con las manos temblando; al soltar, los baja hacia
+## delante, hacia quien ataca.
+static func windup(m: Node3D, b: float, th: float, t: float) -> void:
+	var shake := sin(t * 55.0) * 0.05 * b
+	Anims.part(m, "torso").rotation.x += -0.2 * b + 0.28 * th
+	Anims.part(m, "head").rotation.x += -0.35 * b + 0.15 * th
+	Anims.part(m, "arm_l").rotation.x += -2.5 * b - 1.3 * th + shake
+	Anims.part(m, "arm_r").rotation.x += -2.5 * b - 1.3 * th - shake
+	Anims.part(m, "arm_l").rotation.z += -0.4 * b
+	Anims.part(m, "arm_r").rotation.z += 0.4 * b
+	var parts: Dictionary = m.get_meta("part_nodes")
+	for f in ["fore_l", "fore_r"]:
+		if parts.has(f): (parts[f] as Node3D).rotation.x += -0.35 * b
+	m.position.z += 0.06 * th
+
 ## Golpe (cultistas, vecinos, híbridos, sacerdotes): se dobla por la cintura, se lleva las
 ## manos al vientre, la cabeza cae y se recompone (28-10-2026).
 const HIT_TIME := 0.42

@@ -28,7 +28,8 @@ static func disabled() -> bool:
 
 ## Los mandos conectados (ninguno con los mandos desactivados).
 static func pads() -> Array[int]:
-	return [] if disabled() else Input.get_connected_joypads()
+	var none: Array[int] = []                    # un [] suelto no tiene tipo y da error al devolverlo
+	return none if disabled() else Input.get_connected_joypads()
 
 ## Se traga los eventos de los mandos antes que nadie: va el último en la raíz, y _input se
 ## reparte de atrás adelante (Devices la pone ahí con los mandos desactivados).

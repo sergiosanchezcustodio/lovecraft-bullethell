@@ -33,6 +33,8 @@ func fire(p: BulletPattern, p_aim: Callable) -> void:
 			Color(Damage.color_for(p.damage().kind()), 0.75))
 		t.position = Vector3(global_position.x, 0, global_position.z)
 		t.finished.connect(_begin)
+		var e := get_parent() as Enemy
+		if e != null: e.windup(p.telegraph_time)                 # se prepara con el cuerpo (hito 12.5)
 		world.fx.add_child(t)
 	else:
 		_begin()

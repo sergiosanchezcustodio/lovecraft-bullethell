@@ -48,6 +48,19 @@ static func roar(m: Node3D, t: float) -> void:
 	Anims.part(m, "arm_r").rotation.z = -0.5 * k
 	m.position.y = 0.3 * k
 
+## Preparación (hito 12.5; los anillos de Padre Dagon y Cthulhu): se yergue echado atrás con los
+## brazos abiertos y la boca entreabierta que tiembla; al soltar, se inclina hacia delante.
+static func windup(m: Node3D, b: float, th: float, t: float) -> void:
+	Anims.part(m, "torso").rotation.x += -0.14 * b + 0.18 * th
+	Anims.part(m, "head").rotation.x += -0.32 * b + 0.22 * th
+	Anims.part(m, "arm_l").rotation.z += -0.5 * b
+	Anims.part(m, "arm_r").rotation.z += 0.5 * b
+	Anims.part(m, "arm_l").rotation.x += -0.35 * b - 0.3 * th
+	Anims.part(m, "arm_r").rotation.x += -0.35 * b - 0.3 * th
+	if (m.get_meta("part_nodes") as Dictionary).has("jaw"):
+		Anims.part(m, "jaw").rotation.x += JAW_OPEN * (0.6 * b + 0.4 * th) + 0.025 * sin(t * 60.0) * b
+	m.position.y += 0.25 * b - 0.12 * th
+
 ## Se hunde en el mar (t = 1: bajo el agua) y emerge (al revés).
 static func sink(m: Node3D, t: float) -> void:
 	m.position.y = -8.0 * Anims.ease(t)

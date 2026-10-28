@@ -91,6 +91,9 @@ var _hit_t := HIT_POSE
 var _hit_len := HIT_POSE                    ## lo que dura su reacción (la de su familia, Anims.hit_time)
 var _hit_own := false                       ## su juego de animaciones tiene reacción propia (Anims.hit)
 var _hit_dir := Vector3.ZERO
+const WINDUP_RELEASE := 0.32               ## s del golpe hacia delante al terminar la preparación (hito 12.5)
+var _wu_t := -1.0                           ## preparación antes de un ataque con aviso: s desde que empezó; -1, ninguna
+var _wu_len := 0.0                          ## lo que dura el aviso
 var _ripple_from := Vector3.INF            ## dónde dejó la última onda en el agua (hito 11.4)
 var _top_h := -1.0                          ## altura del modelo sin escalar (números de daño); -1, sin medir
 var _attack_timer := 0.0
@@ -466,6 +469,25 @@ func _hit_pose(d: Damage) -> void:
 		dir.y = 0.0
 	_hit_dir = dir.normalized() if dir.length_squared() > 0.0001 else Vector3.ZERO
 
+## Se prepara para un ataque con aviso en el suelo que llega dentro de `seconds` (hito 12.5): su
+## familia se agazapa, se yergue o se hincha mientras dura el aviso y suelta el golpe al final.
+## Lo llaman el lanzador de patrones y los saltos y erupciones de los grandes; en red, el anfitrión
+## lo repite en los invitados (`net` = false: ya llega de la red).
+func windup(seconds: float, net := true) -> void:
+	if seconds < 0.1: return
+	_wu_t = 0.0
+	_wu_len = seconds
+	if net and world != null and world.on_net.is_valid(): world.on_net.call("windup", [self, seconds])
+
+## (preparación, golpe) en este momento: la preparación sube en el 60 % del aviso y aguanta; al
+## terminar, baja en WINDUP_RELEASE s mientras el golpe va y vuelve.
+func windup_amount() -> Vector2:
+	if _wu_t < 0.0: return Vector2.ZERO
+	if _wu_t < _wu_len: return Vector2(Anims.ease(_wu_t / (_wu_len * 0.6)), 0.0)
+	var u := (_wu_t - _wu_len) / WINDUP_RELEASE
+	if u >= 1.0: return Vector2.ZERO
+	return Vector2(1.0 - Anims.ease(u * 1.6), Anims.jolt(u, 0.3))
+
 ## Cifra de daño encima del modelo (DamageNumbers).
 func _number(amount: float, strong: bool, dot: bool) -> void:
 	if not DamageNumbers.enabled or world == null: return
@@ -737,6 +759,17 @@ func _process(delta: float) -> void:
 		if _hit_dir != Vector3.ZERO:
 			visual.basis = Basis(Vector3.UP.cross(_hit_dir), 0.2 * s) * visual.basis
 		_hit_t += delta
+	var wu := Vector2.ZERO
+	var wu_own := false
+	if _wu_t >= 0.0:                                  # preparándose para atacar (hito 12.5)
+		wu = windup_amount()
+		_wu_t += delta
+		if _wu_t >= _wu_len + WINDUP_RELEASE: _wu_t = -1.0
+		wu_own = Anims.has_windup(model_name)
+		if not wu_own:                                # sin gesto propio: se agacha entero y se echa atrás
+			var big := 0.5 if model_scale > 1.5 else 1.0
+			visual.scale *= Vector3(1.0 + (0.08 * wu.x - 0.05 * wu.y) * big, 1.0 - (0.12 * wu.x - 0.1 * wu.y) * big, 1.0 + (0.08 * wu.x - 0.05 * wu.y) * big)
+			visual.basis = Basis(Vector3(facing.z, 0.0, -facing.x).normalized() if facing.length_squared() > 0.0001 else Vector3.RIGHT, (-0.1 * wu.x + 0.14 * wu.y) * big) * visual.basis
 	if _aura_mat: _aura_mat.set_shader_parameter("color", Color(0.45, 0.2, 0.7, 0.14 + 0.07 * sin(_spawn_t * 2.5)))
 	if not anim_hold and _stasis_t <= 0.0 and world.freeze_t <= 0.0:   # congelado: la animación se detiene
 		anim_t = fposmod(anim_t + delta / Anims.duration(model_name, anim), 1.0)
@@ -747,6 +780,7 @@ func _process(delta: float) -> void:
 	var crowd := world.enemies.size() > CROWD and (Engine.get_process_frames() + get_instance_id()) % 2 == 1
 	if model_scale > 1.5 or (not crowd and (cam == null or cam.is_position_in_frustum(visual.global_position + Vector3(0, 1.0, 0)))):
 		Anims.pose(model_name, anim, model, anim_t)
+		if wu_own and wu != Vector2.ZERO: Anims.windup(model_name, model, wu.x, wu.y, _spawn_t)
 		# la reacción de su familia, encima de la pose (que la deshace en el siguiente fotograma)
 		if _hit_own and _hit_t < _hit_len:
 			Anims.hit(model_name, model, clampf(_hit_t / _hit_len, 0.0, 1.0))

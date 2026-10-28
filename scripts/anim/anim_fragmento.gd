@@ -32,6 +32,15 @@ static func burst(m: Node3D, t: float) -> void:
 	Anims.part(m, "pod_l").rotation.z = -k * 0.5
 	Anims.part(m, "pod_r").rotation.z = k * 0.5
 
+## Preparación (hito 12.5; Madre de los pólipos, shoggoths antes de saltar): la masa se hincha
+## y vibra, con los pseudópodos abiertos; al soltar, se encoge de golpe y rebota.
+static func windup(m: Node3D, b: float, th: float, t: float) -> void:
+	var v := sin(t * 32.0) * 0.025 * b
+	Anims.part(m, "body").scale *= Vector3.ONE * (1.0 + 0.14 * b - 0.12 * th + v)
+	Anims.part(m, "top").scale *= Vector3.ONE * (1.0 + 0.22 * b - 0.15 * th - v)
+	Anims.part(m, "pod_l").rotation.z += -0.6 * b + 0.3 * th
+	Anims.part(m, "pod_r").rotation.z += 0.6 * b - 0.3 * th
+
 ## Golpe: la masa tiembla en ondas que se calman, ancha y baja, alta y estrecha (28-10-2026).
 const HIT_TIME := 0.7
 static func hit(m: Node3D, k: float) -> void:

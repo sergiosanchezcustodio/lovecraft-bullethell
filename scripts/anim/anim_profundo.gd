@@ -45,6 +45,23 @@ static func pounce(m: Node3D, t: float) -> void:
 	Anims.part(m, "leg_l").rotation.x = reach * 0.9 - crouch * 0.25
 	Anims.part(m, "leg_r").rotation.x = reach * 0.9 - crouch * 0.25
 
+## Preparación (hito 12.5; Acechador, engendros, Madre Hydra, primigenio): se agazapa, echa las
+## garras atrás y abiertas, alza la barbilla hacia su presa y tiembla de tensión; al soltar, se
+## lanza un palmo hacia delante con las garras por delante.
+static func windup(m: Node3D, b: float, th: float, t: float) -> void:
+	var shake := sin(t * 40.0) * 0.025 * b
+	m.position.y -= 0.07 * b
+	m.position.z += 0.22 * th
+	m.rotation.x += 0.16 * b - 0.22 * th
+	Anims.part(m, "torso").rotation.z += shake
+	Anims.part(m, "head").rotation.x += -0.3 * b + 0.1 * th
+	Anims.part(m, "arm_l").rotation.x += 0.7 * b - 1.1 * th
+	Anims.part(m, "arm_r").rotation.x += 0.7 * b - 1.1 * th
+	Anims.part(m, "arm_l").rotation.z += -0.4 * b
+	Anims.part(m, "arm_r").rotation.z += 0.4 * b
+	Anims.part(m, "leg_l").rotation.x += -0.25 * b
+	Anims.part(m, "leg_r").rotation.x += -0.25 * b
+
 ## Golpe (Profundos, Acechador, Hydra): da un respingo hacia atrás con la cabeza echada atrás y
 ## las garras abiertas, como un animal que sisea (28-10-2026).
 const HIT_TIME := 0.38

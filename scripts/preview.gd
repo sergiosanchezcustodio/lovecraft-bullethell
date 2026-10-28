@@ -160,6 +160,12 @@ func _process(_delta: float) -> void:
 			if anim == "hit":                         # reacción al golpe de su familia, sobre el reposo
 				Anims.pose(mn, "idle", models[i], 0.0)
 				if Anims.has_hit(mn): Anims.hit(mn, models[i], clampf(t, 0.0, 1.0))
+			elif anim == "windup":                    # preparación de un ataque (hito 12.5): 1 s de aviso y el golpe
+				Anims.pose(mn, "idle", models[i], 0.0)
+				var tt := clampf(t, 0.0, 1.0) * 1.4
+				var b := Anims.ease(tt / 0.6) if tt < 1.0 else 1.0 - Anims.ease((tt - 1.0) / 0.32 * 1.6)
+				var th := Anims.jolt(clampf((tt - 1.0) / 0.32, 0.0, 1.0), 0.3) if tt >= 1.0 else 0.0
+				if Anims.has_windup(mn): Anims.windup(mn, models[i], b, th, tt)
 			else:
 				Anims.pose(mn, anim, models[i], fposmod(t, 1.0))
 		if frame >= 5 and frame < 5 + nframes:
