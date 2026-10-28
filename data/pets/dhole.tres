@@ -18,3 +18,4 @@ attack_range = 7.0
 radius = 1.8
 stun = 0.8
 knockback = 1.8
+prints = "smear"

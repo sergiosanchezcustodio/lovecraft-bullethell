@@ -38,6 +38,13 @@ enum Kind { BITE, CLAW, SPIT, INSIGHT, FORAGE, DEVOUR, DIVE, FETCH, CONFUSE, HEA
 @export var effect_time := 3.0               ## s de veneno o de confusión
 @export var fly_height := 0.0                ## m sobre el suelo (búho); 0 = por el suelo
 @export var follow_gap := 1.6                ## distancia a la que sigue a su jugador
+## Estela (hito 12.10): "feathers" (plumas que caen al aletear), "sparks" (chispas), "mist"
+## (bruma que se arrastra), "dust" (polvo de las alas) o nada; con el color `trail_color`.
+@export var trail := ""
+@export var trail_color := Color(0.12, 0.12, 0.14)
+## Huellas en la nieve y el barro de los que andan por el suelo (Ambient): "paws" (patas), "smear"
+## (rastro por el centro: los que reptan) o nada.
+@export var prints := "paws"
 
 ## Efecto pasivo o de cantidad para un nivel del jugador.
 func bonus_at(level: int) -> float:

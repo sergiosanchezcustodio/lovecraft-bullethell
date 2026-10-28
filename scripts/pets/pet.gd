@@ -56,6 +56,7 @@ var _boss_t := 0.0
 var _boss: Node3D = null
 var _perch_k := 0.0
 var _ring_mi: MeshInstance3D
+var _trail: GPUParticles3D                   ## estela (hito 12.10), si tiene y la calidad la deja
 const LEASH := 8.0                           ## más lejos del jugador que esto, deja lo que hace
 
 func setup(p_data: PetData, p_owner: Player, p_world: CombatWorld, p_game: Node = null) -> Pet:
@@ -79,6 +80,10 @@ func _ready() -> void:
 		_visual.add_child(_model)
 	_ring_mi = _ring()
 	_visual.add_child(_ring_mi)
+	if data.trail != "" and bool(Quality.value("pet_trails", true)):
+		_trail = VoxelFx.emitter("pet_" + data.trail, 0.18, false, false, data.trail_color)
+		_trail.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+		_visual.add_child(_trail)
 	behavior.start()
 	owner_player.progress.leveled_up.connect(func(_l: int) -> void:
 		behavior.leveled()
@@ -328,6 +333,22 @@ func _process(delta: float) -> void:
 	_model.position.y += fly * fly_k            # la animación pone la raíz; el vuelo y el erizado van encima
 	_model.scale *= 1.0 + 0.15 * maxf(_bristle_k, 0.5 * Anims.ease(_mood_k) if _shown == &"hiss" else 0.0)
 	_perch_step(delta, p + Vector3(0, fly * fly_k, 0))
+	_trail_step(v)
+
+## La estela: sale de donde va el cuerpo (en vuelo, a su altura) y más cuanto más deprisa va. Las
+## plumas solo al aletear (moviéndose o celebrando), no posado; las chispas y el polvo, siempre
+## algo; la bruma, sobre todo al moverse.
+func _trail_step(v: float) -> void:
+	if _trail == null: return
+	_trail.position = _model.position + Vector3(0.0, 0.2, 0.0)
+	var run := clampf(v / maxf(0.1, owner_player.data.move_speed), 0.0, 1.5)
+	var r := 0.0
+	match data.trail:
+		"feathers": r = 0.0 if _perch_k > 0.0 else clampf(run * 0.6 + (0.8 if _cheer_t >= 0.0 else 0.0), 0.0, 1.0)
+		"sparks", "dust": r = 0.35 + 0.65 * minf(run, 1.0)
+		"mist": r = 0.25 + 0.75 * minf(run, 1.0)
+	_trail.emitting = r > 0.02 and not hidden
+	_trail.amount_ratio = clampf(r, 0.0, 1.0)
 
 ## El cuervo en el hombro derecho de su jugador: vuela hasta él, se posa mirando hacia donde
 ## mira el jugador y se va al echar a andar.

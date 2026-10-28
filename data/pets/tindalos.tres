@@ -17,3 +17,5 @@ attack_every = 3.0
 attack_range = 6.0
 stun = 1.2
 knockback = 0.3
+trail = "mist"
+trail_color = Color(0.42, 0.5, 0.6, 1)

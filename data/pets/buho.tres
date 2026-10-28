@@ -16,3 +16,5 @@ bonus_per_level = 0.01
 bonus_max = 0.3
 fly_height = 1.5
 follow_gap = 1.0
+trail = "feathers"
+trail_color = Color(0.55, 0.44, 0.32, 1)
