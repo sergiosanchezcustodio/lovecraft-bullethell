@@ -17,15 +17,21 @@ var _scorch_mat: ShaderMaterial
 var _scorch: MeshInstance3D
 
 const LIFE := 4.0
+const MAX_LIT := 8                         ## explosiones con luz a la vez (hito 11.3): las demás, sin ella
+static var max_lit := MAX_LIT              ## el de la calidad gráfica (Quality, hito 11.5)
+static var lit := 0
 
 func _ready() -> void:
 	Auto.sfx_at("explosion", global_position)
+	Gusts.push(get_parent(), global_position, 0.1 + radius * 0.05, radius * 3.0)   # mueve telas y plantas (hito 11.4)
 	Damage.ctx = _wtag
-	_light = OmniLight3D.new()
-	_light.light_color = Color(1.0, 0.62, 0.28)
-	_light.omni_range = radius * 3.0
-	_light.position.y = 0.8
-	add_child(_light)
+	if lit < max_lit:
+		lit += 1
+		_light = OmniLight3D.new()
+		_light.light_color = Color(1.0, 0.62, 0.28)
+		_light.omni_range = radius * 3.0
+		_light.position.y = 0.8
+		add_child(_light)
 	# destello del centro: solo los primeros fotogramas, debajo de la bola de cubos
 	_ball = MeshInstance3D.new()
 	var bm := BoxMesh.new()
@@ -71,10 +77,20 @@ func _flat_disc(c: Color) -> MeshInstance3D:
 	add_child(mi)
 	return mi
 
+func _drop_light() -> void:
+	_light.queue_free()
+	_light = null
+	lit -= 1
+
+func _exit_tree() -> void:
+	if _light != null: _drop_light()
+
 func _process(delta: float) -> void:
 	Damage.ctx = _wtag
 	_t += delta
-	_light.light_energy = 9.0 * maxf(0.0, 1.0 - _t / 0.3)
+	if _light != null:
+		_light.light_energy = 9.0 * maxf(0.0, 1.0 - _t / 0.3)
+		if _t > 0.3: _drop_light()                 # apagada, fuera (antes seguía 4 s con energía 0)
 	var grow := clampf(_t / 0.06, 0.0, 1.0)
 	_ball.scale = Vector3.ONE * radius * lerpf(0.3, 0.9, grow)
 	_ball_mat.albedo_color.a = maxf(0.0, 1.0 - _t / 0.12)

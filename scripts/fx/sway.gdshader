@@ -14,6 +14,19 @@ uniform float speed = 1.1;                    // rad/s
 uniform vec2 wind = vec2(0.8, 0.6);           // dirección del viento (mundo)
 uniform bool hang = false;
 uniform bool unshaded_glow = false;           // capa de luz de la misma pieza
+global uniform vec4 gust_a;                   // ráfagas de explosiones y esquives (Gusts, hito 11.4):
+global uniform vec4 gust_b;                   // x, z, fuerza (m) y radio
+
+// Empuje de una ráfaga sobre la pieza que está en `at` (en el mundo): hacia fuera, con un
+// temblor que se apaga con su fuerza.
+vec3 gust_push(vec4 g, vec2 at, float t) {
+	vec2 d = at - g.xy;
+	float dist = length(d);
+	float f = g.z * (1.0 - smoothstep(g.w * 0.25, g.w, dist));
+	if (f <= 0.0) return vec3(0.0);
+	vec2 dir = dist > 0.01 ? d / dist : vec2(0.7, 0.7);
+	return vec3(dir.x, 0.0, dir.y) * f * (0.75 + 0.45 * sin(t * 17.0 + dist * 2.5));
+}
 
 void vertex() {
 	if (colors_srgb) {
@@ -27,6 +40,8 @@ void vertex() {
 	vec3 w = normalize(to_local * vec3(wind.x, 0.0, wind.y));
 	vec3 side = normalize(to_local * vec3(-wind.y, 0.0, wind.x));
 	VERTEX += (w * (0.35 + s) * gust + side * 0.25 * sin(TIME * speed * 1.6 + ph * 2.3)) * amplitude * k;
+	vec3 blast = gust_push(gust_a, NODE_POSITION_WORLD.xz, TIME) + gust_push(gust_b, NODE_POSITION_WORLD.xz, TIME);
+	VERTEX += to_local * blast * k;
 }
 
 void fragment() {

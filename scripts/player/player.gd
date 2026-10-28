@@ -113,6 +113,11 @@ var _blend_len := 0.0
 var _snow: GPUParticles3D        ## nieve que levanta al deslizarse
 const UPPER_BODY: Array[String] = ["arm_r", "arm_l", "torso", "fore_r", "fore_l"]
 var _ring_mat: StandardMaterial3D
+var _ring: MeshInstance3D
+const MUZZLE_TIME := 0.07
+var _muzzle: OmniLight3D
+var _muzzle_t := 0.0
+var _gem_pulse := 0.0                         ## el anillo se ensancha y aclara al recoger gemas (hito 11.2)
 var _frozen_mat: StandardMaterial3D
 var _frozen_on := false
 var _xray: ShaderMaterial
@@ -175,7 +180,8 @@ func _ready() -> void:
 	_xray.set_shader_parameter("color", Color(color, 0.6))
 	for mi: MeshInstance3D in model.get_meta("meshes"):
 		mi.material_overlay = _xray
-	add_child(_make_ring())
+	_ring = _make_ring()
+	add_child(_ring)
 	_crisis_look = CrisisLook.new().setup(model)      # aura morada y cara de pánico en las crisis
 	add_child(_crisis_look)
 	_snow = _make_snow_spray()
@@ -261,6 +267,7 @@ func _physics_process_step(delta: float) -> void:
 	if leash.is_valid(): global_position = leash.call(global_position)
 	if motor.is_dodging() and not was_dodging:
 		Auto.sfx_at("dodge", global_position)
+		if world != null: Gusts.push(world.fx, global_position, 0.07, 2.2)   # lo que roza se mueve (hito 11.4)
 		_action = data.dodge_anim         # la animación del esquive empieza con el impulso
 		_action_t = 0.0
 		_on_dodge()
@@ -476,7 +483,13 @@ func _process_step(delta: float) -> void:
 	if ss.in_crisis:
 		_ring_mat.albedo_color = UiKit.SANITY.lerp(Color.WHITE, 0.25 + 0.25 * sin(Time.get_ticks_msec() * 0.012))
 	else:
-		_ring_mat.albedo_color = color
+		_ring_mat.albedo_color = color.lerp(Color.WHITE, 0.6 * _gem_pulse)
+	if _ring != null: _ring.scale = Vector3.ONE * (1.0 + 0.22 * _gem_pulse)
+	_gem_pulse = move_toward(_gem_pulse, 0.0, delta * 4.0)
+	if _muzzle != null:
+		_muzzle.visible = _muzzle_t > 0.0
+		_muzzle.light_energy = 3.0 * maxf(_muzzle_t / MUZZLE_TIME, 0.0)
+		_muzzle_t -= delta
 	if frozen != _frozen_on:
 		_frozen_on = frozen
 		for mi: MeshInstance3D in model.get_meta("meshes"):
@@ -492,6 +505,7 @@ func _process_step(delta: float) -> void:
 	_wade = move_toward(_wade, 1.0 if in_water() else 0.0, WadeSplash.EASE * delta)
 	visual.position.y -= _wade * WadeSplash.SINK        # metido en el agua hasta los tobillos
 	_splash.emitting = _wade > 0.5 and motor.velocity.length() > 0.3
+	_ripple_step()
 	var style := data.dodge_style
 	_snow.emitting = _action != "" and (style == null or style.snow_spray)
 	# Destello: el modelo desaparece en su tramo y deja una estela de imágenes fantasma
@@ -789,7 +803,10 @@ func take_damage(d: Damage) -> void:
 	recv_add(src, d.physical, d.mental * mental_resist * data.mental_mult)
 	Auto.sfx_at("hit_player" if d.physical > 0.0 else "chant", global_position)
 	_rumble(d.physical + d.mental * 0.5)
-	if d.physical >= data.max_health * 0.12 and not (input is BotInput): HitStop.hit(45, true)   # golpe fuerte (hito 11.1)
+	if d.physical >= data.max_health * 0.12:
+		if not (input is BotInput): HitStop.hit(45, true)   # golpe fuerte (hito 11.1)
+		var cam := get_viewport().get_camera_3d() as GameCamera   # y tiembla la cámara de este PC (hito 11.2)
+		if cam != null: cam.shake(clampf(d.physical / data.max_health, 0.12, 0.4) * 0.6)
 	if d.mental > 0.0:
 		sanity = maxf(0.0, sanity - d.mental * mental_resist * data.mental_mult)
 		sanity_state.on_mental_damage()
@@ -915,6 +932,37 @@ func play_once(anim: String) -> void:
 		_override_t = 0.0
 
 ## Anillo plano del color del jugador, sin sombreado, para distinguirlo siempre.
+## Fogonazo de luz al disparar un arma de fuego (hito 11.3): una luz por jugador que se reutiliza,
+## así que nunca hay más de cuatro.
+func muzzle_flash(dir: Vector3) -> void:
+	if _muzzle == null:
+		_muzzle = OmniLight3D.new()
+		_muzzle.name = "MuzzleLight"
+		_muzzle.light_color = Color(1.0, 0.72, 0.38)
+		_muzzle.omni_range = 4.0
+		_muzzle.omni_attenuation = 1.6
+		_muzzle.shadow_enabled = false
+		add_child(_muzzle)
+	_muzzle.position = dir * 0.6 + Vector3(0.0, 0.9, 0.0)
+	_muzzle_t = MUZZLE_TIME
+
+## Ondas al andar por el agua somera (hito 11.4): una cada RIPPLE_STEP m recorridos.
+const RIPPLE_STEP := 0.45
+var _ripple_from := Vector3.INF
+
+func _ripple_step() -> void:
+	if _wade < 0.5 or world == null:
+		_ripple_from = Vector3.INF
+		return
+	var here := visual.global_position
+	if _ripple_from == Vector3.INF or here.distance_to(_ripple_from) >= RIPPLE_STEP:
+		_ripple_from = here
+		Ripples.add(world.fx, here, 0.8 if _action == "" else 1.3, 0.55)
+
+## Ha recogido una gema: el anillo late (se suman, con tope).
+func gem_pulse() -> void:
+	_gem_pulse = minf(_gem_pulse + 0.45, 1.0)
+
 func _make_ring() -> MeshInstance3D:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)

@@ -59,6 +59,7 @@ func _ready() -> void:
 		WeatherData.Precip.ASH: _make_precip(false); _make_embers()
 		WeatherData.Precip.RAIN: _make_precip(true); _make_splashes(); _make_rain_sound()
 	if data.drift > 0.0: _make_drift()
+	_make_near()
 	if data.mist > 0.0:
 		_make_mist(0.3, 1.0, 1.0)
 		_make_mist(0.95, 0.55, 1.9)
@@ -103,6 +104,58 @@ func focus() -> Vector3:
 ## Viento de ahora, con sus rachas (m/s en el suelo): lo usan los faroles que se balancean.
 func wind_now() -> Vector3:
 	return data.wind_vector() * data.wind_at(_t) if data != null else Vector3.ZERO
+
+# ---------------- primer plano (hito 11.4) ----------------
+
+const NEAR_DIST := 4.0                         ## m delante de la cámara
+var _near: GPUParticles3D
+var _near_mat: ParticleProcessMaterial
+
+## Unos pocos copos (o esporas) grandes, blandos y casi transparentes, entre la cámara y la
+## escena: dan profundidad, como los copos cercanos de la portada. Van en los ejes de la cámara.
+func _make_near() -> void:
+	if data.near_amount <= 0.0 or data.precip == WeatherData.Precip.RAIN or camera == null: return
+	var spores := data.precip == WeatherData.Precip.NONE
+	if spores and data.mist <= 0.0: return
+	var c := data.precip_color
+	if spores: c = Color(0.85, 0.92, 0.62, 0.5)
+	elif data.precip == WeatherData.Precip.ASH: c = Color(0.62, 0.58, 0.55, 0.6)
+	_near = _particles(int((10 if spores else 16) * data.near_amount), 7.0)
+	_near.local_coords = true
+	_near.sorting_offset = 100.0
+	_near_mat = ParticleProcessMaterial.new()
+	_near_mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	_near_mat.emission_box_extents = Vector3(15.0, 9.5, 0.5)    # la vista entera (15 m de alto)
+	_near_mat.gravity = Vector3.ZERO
+	_near_mat.spread = 25.0
+	_near_mat.scale_min = 0.25 if spores else 0.35
+	_near_mat.scale_max = 0.5 if spores else 0.85
+	_near_mat.turbulence_enabled = true
+	_near_mat.turbulence_noise_scale = 6.0
+	_near_mat.turbulence_influence_min = 0.004
+	_near_mat.turbulence_influence_max = 0.01
+	var ramp := _fade_ramp(Color(c, c.a * (0.65 if spores else 0.3)))
+	_near_mat.color_ramp = ramp
+	_near.process_material = _near_mat
+	var q := QuadMesh.new()
+	q.size = Vector2.ONE
+	var m := _unshaded(Color.WHITE, true)
+	var g := GradientTexture2D.new()               # disco blando: parece desenfocado
+	g.fill = GradientTexture2D.FILL_RADIAL
+	g.fill_from = Vector2(0.5, 0.5)
+	g.fill_to = Vector2(1.0, 0.5)
+	var gr := Gradient.new()
+	gr.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
+	gr.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.55), Color(1, 1, 1, 0)])
+	g.gradient = gr
+	g.width = 64; g.height = 64
+	m.albedo_texture = g
+	m.no_depth_test = true
+	m.render_priority = 5
+	if spores:
+		m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	q.material = m
+	_near.draw_pass_1 = q
 
 # ---------------- precipitación ----------------
 
@@ -309,6 +362,16 @@ func _process(delta: float) -> void:
 		_precip_mat.initial_velocity_min = v.length() * 0.85
 		_precip_mat.initial_velocity_max = v.length() * 1.15
 	if _extra: _extra.global_position = f + Vector3(0, 0.05, 0)
+	if _near != null and camera != null and is_instance_valid(camera):
+		# pegado a la cámara: delante de todo y quieto en la pantalla aunque ella se mueva
+		_near.global_transform = Transform3D(camera.global_basis, camera.global_position - camera.global_basis.z * NEAR_DIST)
+		var wl := camera.global_basis.inverse() * (wv * w)          # viento en ejes de la pantalla
+		var drift := Vector3(wl.x, wl.y * 0.3, 0.0)
+		var fall := Vector3(0.0, -0.35 if data.precip != WeatherData.Precip.NONE else 0.12, 0.0)
+		var v := drift * 0.35 + fall
+		_near_mat.direction = v.normalized() if v.length() > 0.01 else Vector3.DOWN
+		_near_mat.initial_velocity_min = v.length() * 0.7
+		_near_mat.initial_velocity_max = v.length() * 1.3
 	if _drift:
 		_drift.global_position = f + Vector3(0, 0.4, 0) - wv * w * 1.2
 		_drift_mat.direction = wv

@@ -1057,6 +1057,48 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Capturas: `shots/partida/2026-10-27/game__desmorona_cerca_*.png` (muerte de un grupo con `cam=8 demo_kill=12`), `game__inclina_*.png` (zigzag de cerca) y `game__paso_*.png` (el paso de cerca).
   - Tests: `tests/test_hit_fx.gd` (5: micro-pausa y vuelta, cuándo no se hace, las pequeñas esperan hueco, se desmorona y manchas con tope). En total, 433 de 433.
 
+- **Fase 11, hito 11.2: sensación de combate (28-10-2026), pendiente de tu revisión.** («continúa con el resto»)
+  - **Números de daño** (`DamageNumbers`, `scripts/fx/damage_numbers.gd`): cifra en Garamond gruesa con contorno oscuro que salta encima del enemigo (altura de su modelo, medida una vez), sube 0,9 m frenando y se desvanece en 0,8 s. Los golpes seguidos al mismo enemigo (0,25 s) se suman en la misma cifra, que vuelve a saltar, así que un lanzallamas o una quemadura no llenan la pantalla. Crema normal, dorada y más grande con bonificación (rasgos, vulnerable) o en un golpe fuerte a una élite, anaranjada y pequeña el daño continuo. Como mucho 40 a la vez (se reutiliza la más vieja) y las etiquetas se reciclan. En los invitados la cifra es aproximada (sin las bonificaciones del anfitrión). Se quitan en Configuración, Accesibilidad, «Números de daño» (`damage_numbers`; `cfg_damage_numbers=false` para pruebas).
+  - **El enemigo golpeado se aplasta y se inclina** hacia donde lo empujan, y vuelve con un rebote (0,22 s; en los grandes y los únicos, a un tercio). `visual.rotation` se pone entera cada fotograma (si no, la inclinación se quedaba pegada).
+  - **Temblor de cámara con ruido suave** (`GameCamera._noise`, 22 cambios por segundo) en vez de un salto al azar en cada fotograma, con un giro mínimo alrededor de la vista (hasta 2,4°). Además tiembla la cámara de tu PC cuando recibes un golpe de al menos el 12 % de tu vida. Mismo tope y misma opción de Configuración que antes.
+  - **Gemas que se aspiran:** al notarte dan un saltito hacia atrás y hacia arriba, arrancan despacio y aceleran hasta 1,7 veces la velocidad de antes (`GemManager._pull`); al llegar, el anillo del jugador se ensancha y se aclara un momento (`Player.gem_pulse`).
+  - **Rendimiento:** en las calles de Innsmouth, sin diferencia (4,15-4,37 ms con los números y 4,41-4,66 ms sin: ruido). Con carga extrema, unos 0,5 ms. La primera versión costaba 1 ms: cambiar el texto, el tamaño o el color de un `Label3D` rehace su malla, y se hacía en cada golpe y cada fotograma; ahora se escribe una vez por fotograma solo si cambia, y el desvanecido va con `transparency`.
+  - Capturas: `shots/partida/2026-10-28/game__numeros_*.png`.
+  - Tests: `tests/test_combat_feel.gd` (5: se suman, tope, quitadas, ruido suave y acotado, gemas que aceleran y llegan). En total, 438 de 438.
+
+- **Fase 11, hito 11.3: luz y postproceso (28-10-2026), pendiente de tu revisión.**
+  - **Gradación de color por parte** (`data/grades.json`, `Atmosphere.set_grade`): sobre la curva de la gamma de cada arena, cada canal se desplaza en las sombras (pesa más hacia 1/3) y en las luces (hacia 2/3) sin tocar el negro ni el blanco, y cambia la saturación. Antártida, fría (sombras azules, luces algo cálidas, saturación 0,95); Innsmouth, verde sucia (sombras verdosas, luces amarillentas, 0,9); parte 3, violeta (sombras violetas, luces algo verdes). Sutil a propósito: la mediana de brillo no cambia (0,557 → 0,561 en el campamento, 0,208 → 0,212 en las calles, 0,212 → 0,216 en el estudio). La parte sale del id del nivel; `grade=off|p1|p2|p3` para comparar.
+  - **Fogonazo de luz** en las armas de fuego (`Player.muzzle_flash`, desde `WeaponSystem` junto al fogonazo de cubos): una luz cálida por jugador que se reutiliza en cada disparo (0,07 s), así que nunca hay más de cuatro.
+  - **Luz de las explosiones con tope** (`Explosion.MAX_LIT`, 8 a la vez; las demás, sin luz) y que se quita al apagarse (0,3 s): antes seguía 4 s con energía 0.
+  - **Cordura baja más visible** (`sanity_fx.gdshader`): además del borde violeta y la desaturación, los bordes se oscurecen (hasta un 60 % en las esquinas) y los colores se separan hacia fuera (aberración cromática, hasta un 0,9 % de la pantalla), más cuanto más baja la cordura. El centro no se toca, así que las balas se siguen viendo; la opción «Distorsiones» lo reduce o lo quita como antes.
+  - Capturas en `shots/partida/2026-10-28/`: `game__grade_<nivel>_off|def_*` (cada parte sin y con gradación), `game__cordura_antes|12|0_*` (cordura baja antes y ahora, y crisis) y `game__fogonazo_*` (Thompson con `weapons=thompson dummies=3`).
+  - Tests: `tests/test_light_grade.gd` (4). En total, 442 de 442.
+
+- **Fase 11, hito 11.4: mundo vivo (28-10-2026), pendiente de tu revisión.**
+  - **Ondas en el agua somera** (`Ripples`, `scripts/fx/ripples.gd` y `water_rings.gdshader`, los dos aros de `ripple.gdshader` pero todos en un MultiMesh: un solo dibujo, 64 a la vez como mucho): los jugadores dejan una cada 0,45 m que recorren por el agua (más grande si esquivan) y los enemigos, cada 0,6 m más su radio, también en los invitados. Un cuerpo que cae al agua deja dos ondas grandes. Se ven en el pantano, el arrecife y el ritual. La espuma de «los que salen del mar» no se ha hecho: ningún enemigo entra desde el mar.
+  - **Ráfagas** (`Gusts`, `scripts/fx/gusts.gd`): cada explosión (fuerza según su radio, hasta 3 veces el radio) y cada esquive (más suave, 2,2 m) empujan hacia fuera lo que lleva `sway.gdshader` (árboles, juncos, cañas, ropa tendida, redes) o `flag_wave.gdshader` (banderas), con un temblor que se apaga en menos de un segundo. Van en dos parámetros globales de los shaders (`gust_a`, `gust_b`, en `[shader_globals]` de project.godot); la nueva ocupa el hueco de la más débil. Las llamas no se han tocado (no usan esos shaders).
+  - **Primer plano** (`Weather._make_near`): unos pocos copos de nieve o ceniza grandes, blandos y casi transparentes (disco con borde difuminado) entre la cámara y la escena, pegados a la cámara y llevados por el viento; con niebla y sin precipitación, esporas claras que suben (pantano, grutas, arrecife). Con lluvia, nada. `near_amount` en cada `WeatherData` (0 los quita); el clima de la configuración los reduce como al resto.
+  - Capturas en `shots/partida/2026-10-28/`: `game__ondas_*` (pantano, `level=p2_n4 pos=-1.9,3.6`), `game__rafaga_*` (granadas junto a los juncos) y `game__primer_*` (copos cercanos en el campamento y esporas en el pantano).
+  - Tests: dos más en `tests/test_light_grade.gd` (ondas con tope, ráfagas en dos huecos que se apagan). En total, 444 de 444.
+
+- **Fase 11, hito 11.5: calidad configurable (28-10-2026), pendiente de tu revisión.**
+  - **Cuatro preajustes** en Configuración, Vídeo, «Calidad gráfica» (`quality`; `Quality`, `scripts/core/quality.gd`; los valores en `data/quality.json`). **Alta es como se veía el juego hasta ahora** (MSAA 4x, sombras de la luna de 4096 con filtro bajo, 60 m, sin SSAO, 24 manchas, 8 explosiones con luz): lo comprueba un test contra la configuración del proyecto.
+    - Baja: sin MSAA y con FXAA, sombras de 2048 duras y a 40 m, sin los halos de niebla de los faroles, sin desmoronarse, 8 manchas y 3 explosiones con luz.
+    - Media: MSAA 2x, sombras de 2048 con filtro muy bajo a 50 m, 16 manchas, 6 luces.
+    - Ultra: como Alta más oclusión ambiental (SSAO corto: radio 0,6 m, para los huecos entre voxels y el pie de las piezas), sombras de 8192 con filtro medio, 40 manchas y 12 luces.
+  - El suavizado y las sombras se aplican al momento (`Settings.apply_video`); lo de la partida, al montar el siguiente nivel (`Game` llama a `Quality.apply_game`). Las opciones de prueba (`crumble=`, `marks=`, `fogvol=`) mandan sobre el preajuste; `cfg_quality=0..3` elige uno para una ejecución. El clima (Vídeo) y la resolución del 3D siguen siendo opciones aparte.
+  - **Rendimiento** (`perf=15 cfg_fps_limit=0 cfg_vsync=false bot=circle`, dos de cada, RTX 3070 Ti a 1080p):
+
+    | Arena | Baja | Media | Alta | Ultra |
+    |---|---|---|---|---|
+    | Campamento (`p1_n1`) | 4,44-4,53 ms | | 4,71-4,85 ms | 5,45-5,47 ms |
+    | Calles de Innsmouth (`p2_n2`) | 3,47-3,61 ms | | 4,03-4,06 ms | 5,28-5,33 ms |
+    | R'lyeh (`p3_n5`) | 3,87-3,92 ms | 4,21-4,25 ms | 4,39-4,74 ms | 5,41-5,55 ms |
+
+  - Capturas: `shots/partida/2026-10-28/game__calidad_0|2|3_*` (Baja, Alta y Ultra en las calles: en Baja no hay halos en los faroles; en Ultra, sombra de contacto bajo bancos, bordillos y el coche).
+  - Tests: dos más en `tests/test_light_grade.gd` (cuatro preajustes completos; Alta, como antes). En total, 446 de 446.
+  - **Fase 11 hecha**, pendiente de tu revisión (hitos 11.1-11.5).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

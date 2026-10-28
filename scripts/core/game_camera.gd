@@ -91,6 +91,9 @@ var _shake := 0.0                  ## m de temblor (jefes: rugidos y golpes); se
 ## Tiembla la cámara (hito 6.6): amount en metros; se suma y decae en unas décimas.
 const SHAKE_SCALE := 0.45                  ## los temblores, a menos de la mitad
 const SHAKE_MAX := 0.12                    ## m: ninguno pasa de aquí
+const SHAKE_FREQ := 22.0                   ## cambios de dirección por segundo (ruido suave)
+const SHAKE_ROLL := 0.35                   ## rad de giro por metro de temblor (0,12 m: 2,4°)
+var _shake_t := 0.0
 
 func shake(amount: float) -> void:
 	# a la mitad (12-10-2026: resultaba incómodo) y con techo; la configuración lo reduce o lo quita
@@ -102,5 +105,22 @@ func _process(delta: float) -> void:
 	position = position.lerp(desired_position(), 1.0 - exp(-follow_speed * delta))
 	if _ear != null: _ear.global_transform = Transform3D(global_basis, center() + global_basis.z * EAR_BACK)
 	if _shake > 0.001:
-		position += (transform.basis.x * randf_range(-1, 1) + transform.basis.y * randf_range(-1, 1)) * _shake
+		# ruido suave (hito 11.2) en vez de un salto al azar en cada fotograma, que según la
+		# frecuencia del monitor vibraba más o menos; y un giro mínimo alrededor de la vista
+		_shake_t += delta * SHAKE_FREQ
+		var n := Vector3(_noise(_shake_t, 0), _noise(_shake_t, 101), _noise(_shake_t, 211))
+		position += (transform.basis.x * n.x + transform.basis.y * n.y) * _shake
+		rotation.z = n.z * _shake * SHAKE_ROLL
 		_shake = move_toward(_shake, 0.0, delta * maxf(_shake * 3.0, 0.2))
+	elif rotation.z != 0.0:
+		rotation.z = 0.0
+
+## Ruido suave de -1 a 1 (valores al azar en los enteros, unidos con una curva).
+static func _noise(t: float, seed: int) -> float:
+	var i := floori(t)
+	var f := t - i
+	f = f * f * (3.0 - 2.0 * f)
+	return lerpf(_rand(i + seed), _rand(i + 1 + seed), f)
+
+static func _rand(i: int) -> float:
+	return float(hash(i * 7919) & 0xffff) / 32767.5 - 1.0

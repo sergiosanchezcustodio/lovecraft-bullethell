@@ -37,6 +37,7 @@ var _vel := PackedVector3Array()
 var _value := PackedFloat32Array()
 var _age := PackedFloat32Array()
 var _homing := PackedByteArray()
+var _pull := PackedFloat32Array()             ## s volando hacia el jugador (-1, aún no): arrancan despacio y aceleran (hito 11.2)
 var _tier := PackedByteArray()
 var _id := PackedInt32Array()
 var _mm: MultiMesh
@@ -45,7 +46,7 @@ var _buffer := PackedFloat32Array()
 func _init() -> void:
 	name = "Gems"
 	_pos.resize(MAX_GEMS); _prev.resize(MAX_GEMS); _vel.resize(MAX_GEMS); _value.resize(MAX_GEMS)
-	_age.resize(MAX_GEMS); _homing.resize(MAX_GEMS); _tier.resize(MAX_GEMS); _id.resize(MAX_GEMS)
+	_age.resize(MAX_GEMS); _homing.resize(MAX_GEMS); _pull.resize(MAX_GEMS); _tier.resize(MAX_GEMS); _id.resize(MAX_GEMS)
 
 func _ready() -> void:
 	_mm = MultiMesh.new()
@@ -117,6 +118,7 @@ func drop(pos: Vector3, value: float, tier: int = 1, first_id := -1, seed := -1)
 		_value[count] = value / n
 		_age[count] = 0.0
 		_homing[count] = 0
+		_pull[count] = -1.0
 		_tier[count] = clampi(tier, 1, 5)
 		_id[count] = from + k
 		count += 1
@@ -178,9 +180,17 @@ func _physics_process(delta: float) -> void:
 					target.progress.add_xp(_value[i] * target.data.xp_mult * target.pet_xp_mult)
 					collected.emit(_id[i])
 				if not target.remote: Auto.sfx_at("gem", target.global_position)
+				target.gem_pulse()
 				_remove(i)
 				continue
-			_vel[i] = _vel[i].lerp(to.normalized() * rules.magnet_speed, 1.0 - exp(-10.0 * delta))
+			if _pull[i] < 0.0:                         # al notarlo, un saltito hacia atrás antes de volar
+				var away := Vector3(-to.x, 0.0, -to.z).normalized()
+				_vel[i] = away * 1.6 + Vector3(0.0, 2.8, 0.0)
+				_pull[i] = 0.0
+			_pull[i] += delta
+			var ramp := minf(_pull[i] / 0.45, 1.0)
+			var speed := rules.magnet_speed * lerpf(0.3, 1.7, ramp * ramp)
+			_vel[i] = _vel[i].lerp(to.normalized() * speed, 1.0 - exp(-lerpf(4.0, 16.0, ramp) * delta))
 		else:
 			_vel[i].y -= 12.0 * delta                      # cae
 			_vel[i].x *= exp(-3.0 * delta); _vel[i].z *= exp(-3.0 * delta)
@@ -195,7 +205,7 @@ func _physics_process(delta: float) -> void:
 func _remove(i: int) -> void:
 	var last := count - 1
 	_pos[i] = _pos[last]; _prev[i] = _prev[last]; _vel[i] = _vel[last]; _value[i] = _value[last]
-	_age[i] = _age[last]; _homing[i] = _homing[last]; _tier[i] = _tier[last]; _id[i] = _id[last]
+	_age[i] = _age[last]; _homing[i] = _homing[last]; _pull[i] = _pull[last]; _tier[i] = _tier[last]; _id[i] = _id[last]
 	count = last
 
 func _process(_delta: float) -> void:

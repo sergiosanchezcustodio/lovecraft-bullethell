@@ -32,6 +32,8 @@ var defaults := {
 	"bullet_palette": 0,                    ## 0 normal, 1 alto contraste (daltonismo)
 	"flashes": 1,                           ## destellos (golpes, rayos): 0 reducidos, 1 normales
 	"shake": 1.0,                           ## temblor de cámara (0..1)
+	"damage_numbers": true,                 ## cifras de daño sobre los enemigos (hito 11.2)
+	"quality": 2,                           ## calidad gráfica: 0 baja, 1 media, 2 alta, 3 ultra (Quality, hito 11.5)
 	"difficulty": 1,                        ## 0 investigador (la de antes), 1 normal, 2 pesadilla (Difficulty)
 	"madness": true,                        ## locura acumulada (GDD 4.5)
 	"intro": 1,                             ## ficha e intro al arrancar: 0 siempre, 1 solo la primera vez (hito 5.2)
@@ -120,6 +122,7 @@ func apply_video() -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if get_value("vsync") else DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = int(get_value("fps_limit"))
 	get_viewport().scaling_3d_scale = float(get_value("scale_3d"))
+	Quality.apply_viewport(get_viewport())
 	_update_fps_label()
 
 # ---------------------------------------------------------------- audio

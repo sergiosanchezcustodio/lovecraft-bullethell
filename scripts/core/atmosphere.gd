@@ -32,7 +32,23 @@ static func make_environment() -> Environment:
 ## y = x^(1/gamma). 1 no cambia nada; 1,3-1,5 aclara la noche sin quemar faroles ni hogueras.
 ## La usan la luz de cada arena ("gamma" en su JSON) y el brillo de la configuración.
 static func set_lift(env: Environment, gamma: float) -> void:
-	if absf(gamma - 1.0) < 0.005:
+	set_grade(env, gamma, {})
+
+## Gradación de color de cada parte (hito 11.3, `data/grades.json`): "p1", "p2"…; vacía si no hay.
+static func grade_for(key: String) -> Dictionary:
+	var f := FileAccess.open("res://data/grades.json", FileAccess.READ)
+	if f == null: return {}
+	var all: Variant = JSON.parse_string(f.get_as_text())
+	return (all as Dictionary).get(key, {}) if all is Dictionary else {}
+
+## La curva de set_lift y, encima, la gradación de la parte: cada canal se desplaza en las sombras
+## (pesa más hacia 1/3) y en las luces (hacia 2/3), sin tocar el negro ni el blanco; y la saturación.
+static func set_grade(env: Environment, gamma: float, grade: Dictionary) -> void:
+	var sh: Array = grade.get("shadows", [0.0, 0.0, 0.0])
+	var hi: Array = grade.get("highlights", [0.0, 0.0, 0.0])
+	var sat := float(grade.get("saturation", 1.0))
+	env.adjustment_saturation = sat
+	if absf(gamma - 1.0) < 0.005 and grade.is_empty():
 		env.adjustment_color_correction = null
 		env.adjustment_enabled = false
 		return
@@ -42,7 +58,11 @@ static func set_lift(env: Environment, gamma: float) -> void:
 	for i in 33:
 		var x := i / 32.0
 		var y := pow(x, 1.0 / gamma)
-		offs.append(x); cols.append(Color(y, y, y))
+		var ws := 4.0 * y * (1.0 - y) * (1.0 - y)
+		var wh := 4.0 * y * y * (1.0 - y)
+		var c := Color(y, y, y)
+		for k in 3: c[k] = clampf(y + float(sh[k]) * ws + float(hi[k]) * wh, 0.0, 1.0)
+		offs.append(x); cols.append(c)
 	g.offsets = offs
 	g.colors = cols
 	var tex := GradientTexture1D.new()

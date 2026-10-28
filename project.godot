@@ -48,3 +48,14 @@ textures/vram_compression/import_etc2_astc=true
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
+[shader_globals]
+
+gust_a={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 1)
+}
+gust_b={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 1)
+}

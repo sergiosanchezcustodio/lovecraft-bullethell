@@ -89,6 +89,10 @@ func _video() -> void:
 	_choice("Límite de FPS", fps, OptionRow.idx(Settings.FPS_LIMITS, int(Settings.get_value("fps_limit")), 0), func(i: int) -> void:
 		Settings.set_value("fps_limit", Settings.FPS_LIMITS[i])
 		Settings.apply_video())
+	_choice("Calidad gráfica", Quality.names(), int(Settings.get_value("quality")), func(i: int) -> void:
+		Settings.set_value("quality", i)
+		Settings.apply_video())
+	_note("Suavizado, sombras, oclusión ambiental (Ultra), niebla de los faroles, enemigos que se desmoronan y manchas. Lo de la partida cambia al empezar el siguiente nivel.")
 	_choice("Resolución del 3D (rendimiento)", OptionRow.fmt(Settings.SCALES_3D, "%d %%", 100.0),
 		OptionRow.idx(Settings.SCALES_3D, float(Settings.get_value("scale_3d")), 3), func(i: int) -> void:
 			Settings.set_value("scale_3d", Settings.SCALES_3D[i])
@@ -154,6 +158,9 @@ func _game() -> void:
 	var sh: Array[String] = ["Sin temblor", "25 %", "50 %", "75 %", "100 %"]
 	_choice("Temblor de la cámara", sh, int(round(float(Settings.get_value("shake")) * 4.0)), func(i: int) -> void:
 		Settings.set_value("shake", i / 4.0))
+	_toggle("Números de daño", Settings.get_value("damage_numbers"), func(on: bool) -> void:
+		Settings.set_value("damage_numbers", on)
+		DamageNumbers.enabled = on)
 	var intro: Array[String] = ["Siempre", "Solo la primera vez"]
 	_choice("Ficha e intro al arrancar", intro, int(Settings.get_value("intro")), func(i: int) -> void:
 		Settings.set_value("intro", i))

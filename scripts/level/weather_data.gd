@@ -25,6 +25,9 @@ enum Precip { NONE, SNOW, ASH, RAIN }
 @export var fall_speed := 1.4                   ## m/s hacia abajo
 @export var flake_size := 0.05                  ## m
 @export var precip_color := Color(0.92, 0.95, 1.0, 0.85)
+## Primer plano (hito 11.4): copos de nieve o ceniza grandes y desenfocados delante de la escena,
+## o esporas si no llueve ni nieva y hay niebla. 0 los quita; 1, los de siempre. Con lluvia, nada.
+@export var near_amount := 1.0
 @export_group("Ventisca")
 @export var drift := 0.3                        ## 0..1: nieve que corre a ras de suelo
 @export var drift_color := Color(0.9, 0.93, 0.98, 0.35)

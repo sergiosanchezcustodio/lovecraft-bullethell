@@ -1,0 +1,6 @@
+{
+	"_doc": "Gradación de color por parte (hito 11.3). shadows y highlights: cuánto se suma a cada canal (r, g, b) en las sombras y en las luces, tras el tono (Atmosphere.set_grade); saturation: 1 no cambia nada. grade=off|p1|p2|p3 al lanzar la partida para comparar.",
+	"p1": {"name": "Antártida, fría", "shadows": [-0.03, 0.0, 0.05], "highlights": [0.02, 0.01, -0.01], "saturation": 0.95},
+	"p2": {"name": "Innsmouth, verde sucia", "shadows": [-0.03, 0.035, 0.005], "highlights": [0.025, 0.02, -0.035], "saturation": 0.9},
+	"p3": {"name": "R'lyeh, violeta", "shadows": [0.035, -0.03, 0.05], "highlights": [-0.01, 0.025, 0.0], "saturation": 1.0}
+}

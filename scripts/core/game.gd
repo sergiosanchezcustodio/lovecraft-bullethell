@@ -36,7 +36,7 @@ extends Node3D
 ##   debug_menu=1            abre la pausa y el menú de depuración a ese segundo (capturas)
 ##   sheet_at=2 / map_at=2   abre la ficha o el mapa del J1 a ese segundo (capturas)
 ##   hitstop=false           sin micro-pausa al impactar
-##   crumble=false / marks=N  sin desmoronarse / tope de manchas en el suelo (0, ninguna; por defecto 24)
+##   crumble=false / marks=N  sin desmoronarse / tope de manchas en el suelo (0, ninguna; por defecto, el de la calidad gráfica)
 ##   demo_kill=t             mata a la vez a todos los enemigos a ese segundo (capturas de las muertes)
 ##   character=johansen      personaje del J1 (dyer, olmstead, legrasse, johansen)
 ##   model=dyer_chibi        otro modelo para el J1 (probar prototipos)
@@ -118,7 +118,7 @@ func _ready() -> void:
 		if o != null: OutfitData.override[OutfitData.KEYS[o.slot]] = o_id
 	var env := Atmosphere.make_environment()
 	# Los volúmenes de niebla solo existen en Forward+ (Compatibility da error)
-	var fogvol := args.get_bool("fogvol", true) and RenderingServer.get_current_rendering_method() != "gl_compatibility"
+	var fogvol := args.get_bool("fogvol", bool(Quality.value("fogvol", true))) and RenderingServer.get_current_rendering_method() != "gl_compatibility"
 	if fogvol:
 		env.volumetric_fog_enabled = true
 		env.volumetric_fog_density = 0.0      # solo los volúmenes locales
@@ -133,8 +133,10 @@ func _ready() -> void:
 	add_child(moon)
 	# arena del nivel (LevelData.arena); arena=ruta para probar otra
 	var arena_path := "res://data/arenas/campamento.json"
+	var part_key := "p1"                           # gradación de color de la parte (hito 11.3)
 	if not args.get_bool("nolevel"):
 		var lid := (String(GameSession.level) if not GameSession.carry.is_empty() else args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1"))
+		part_key = lid.get_slice("_", 0)
 		var ld: LevelData = load("res://data/levels/%s.tres" % lid)
 		if ld != null: arena_path = ld.arena
 	arena_path = args.get_str("arena", arena_path)
@@ -142,7 +144,10 @@ func _ready() -> void:
 	add_child(arena)
 	ArenaBuilder.apply_light(arena.get_meta("light", {}), moon, env)
 	# sombras levantadas: la de la arena ("gamma", noches legibles) por el brillo de la configuración
-	Atmosphere.set_lift(env, float(arena.get_meta("light", {}).get("gamma", 1.0)) * Settings.brightness_gamma())
+	# y la gradación de color de la parte (hito 11.3; grade=off|p1|p2|p3 para comparar)
+	var grade_key := args.get_str("grade", part_key)
+	Atmosphere.set_grade(env, float(arena.get_meta("light", {}).get("gamma", 1.0)) * Settings.brightness_gamma(),
+		{} if grade_key == "off" else Atmosphere.grade_for(grade_key))
 	_base_fog = env.fog_density
 	_base_ambient = env.ambient_light_energy
 	world = CombatWorld.new()
@@ -330,8 +335,10 @@ func _ready() -> void:
 	_start_weather()
 	Engine.time_scale = args.get_float("timescale", 1.0)
 	HitStop.enabled = args.get_bool("hitstop", true)     # micro-pausa al impactar (hito 11.1)
-	Crumble.enabled = args.get_bool("crumble", true)
-	GroundMarks.limit = args.get_int("marks", 24)
+	DamageNumbers.enabled = bool(Auto.setting("damage_numbers", true))   # hito 11.2 (cfg_damage_numbers=false)
+	Quality.apply_game(env, moon)                        # calidad gráfica (hito 11.5); las opciones de abajo mandan
+	Crumble.enabled = args.get_bool("crumble", Crumble.enabled)
+	GroundMarks.limit = args.get_int("marks", GroundMarks.limit)
 	hud = Hud.new().setup(players, director)
 	hud.money = func() -> int: return run_money
 	add_child(hud)

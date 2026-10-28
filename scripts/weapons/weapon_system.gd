@@ -279,6 +279,7 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 	if w.data.category == WeaponData.Category.FIREARM and Engine.get_physics_frames() != w.muzzle_frame:
 		w.muzzle_frame = Engine.get_physics_frames()
 		world.bullets.muzzle(player.global_position + dir * 0.55)
+		player.muzzle_flash(dir)                       # y un destello de luz (hito 11.3)
 	world.bullets.spawn(BulletManager.Team.PLAYER, style,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
 		size, Damage.new(dmg(w, false) * dmg_k, 0.0), life, int(w.stat("pierce")),
