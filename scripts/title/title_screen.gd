@@ -7,7 +7,7 @@ extends Control
 ## (TitleScreenConfig). Para probar, detrás de `--`:
 ##   off=velas,farolillos,niebla,luna,relampago,ojos,acercamiento,ceniza,titulo,halo,
 ##       niebla_titulo,aviso,musica,cuervo,polillas,rafaga,paginas,gotas
-##   raven=s             el cuervo llega en ese segundo (raven=-1: ya posado)
+##   raven=s             el cuervo (quitado de momento) llega en ese segundo (raven=-1: ya posado)
 ##   gust=s              la primera ráfaga en ese segundo
 ##   drips_every=s       una gota cada tantos segundos
 ##   shots=2,6,9 tag=x   capturas en esos segundos     t=6   empieza en ese segundo
@@ -187,7 +187,7 @@ func _build_stage() -> void:
 		moths = TitleMoths.new(cfg.moths_count)
 		stage.add_child(moths)
 		if gust: gust.moths = moths
-	if cfg.raven_enabled:
+	if cfg.raven_enabled or args.has("raven"):      # quitado de momento: raven=s lo trae para probarlo
 		raven = TitleRaven.new(args.get_float("raven", cfg.raven_first))
 		stage.add_child(raven)
 	# ceniza en tres capas: copos lejanos pequeños, medianos y unos pocos cercanos, grandes y

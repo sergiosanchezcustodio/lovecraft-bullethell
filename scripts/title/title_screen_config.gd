@@ -47,7 +47,7 @@ extends Resource
 @export var eyes_color := Color(0.85, 1.0, 0.75)
 
 @export_group("Cuervo")
-@export var raven_enabled := true
+@export var raven_enabled := false            ## quitado el 28-10-2026 hasta rehacerlo (no convencía al autor); `raven=s` lo trae para probarlo
 @export var raven_first := 4.5          ## s hasta que llega por primera vez
 
 @export_group("Polillas")
