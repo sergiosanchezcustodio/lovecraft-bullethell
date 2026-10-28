@@ -163,6 +163,10 @@ func _process(_delta: float) -> void:
 			if anim == "hit":                         # reacción al golpe de su familia, sobre el reposo
 				Anims.pose(mn, "idle", models[i], 0.0)
 				if Anims.has_hit(mn): Anims.hit(mn, models[i], clampf(t, 0.0, 1.0))
+			elif anim == "unease" or anim == "crisis":  # cordura baja y crisis (hito 12.2), sobre el reposo
+				Anims.pose(mn, "idle", models[i], fmod(t * 2.0, 1.0))
+				if anim == "unease": Anims.script_for(mn).call("unease", models[i], 1.0, t * 6.0)
+				else: Anims.script_for(mn).call("crisis", models[i], 1.0, t * 6.0)
 			elif anim == "alive":                     # jefes vivos (hito 12.8): mira a un lado y a otro, respira y parpadea
 				Anims.pose(mn, "idle", models[i], fmod(t * 2.0, 1.0))
 				Anims.alive(models[i], t * 9.0, 0.7 * sin(t * TAU), fmod(t, 0.5) > 0.44)

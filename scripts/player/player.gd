@@ -117,6 +117,9 @@ var _was_down := false           ## estaba abatido en el último fotograma (hito
 var _down_t := 0.0               ## s desde que cayó
 var _up_t := -1.0                ## s desde que lo levantaron (-1: no se está levantando)
 var _down_snap: Array = []       ## pose en que cayó o en que lo levantaron, para fundir desde ella
+const UNEASE_AT := 0.35          ## por debajo de esta fracción de cordura se le nota (hito 12.2)
+var _mind_t := 0.0               ## reloj de los gestos de la cordura baja
+var _crisis_w := 0.0             ## cuánto tiene las manos en la cabeza (crisis), 0..1
 var _blend_t := 1.0
 var _blend_len := 0.0
 var _snow: GPUParticles3D        ## nieve que levanta al deslizarse
@@ -628,6 +631,20 @@ func _animate(delta: float) -> void:
 		elif _action == "":
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
+	_mind_step(delta)
+
+## Cordura baja (hito 12.2): encorvado, manos que tiemblan y mirada inquieta, más cuanto más baja;
+## a cero (la crisis), las manos a la cabeza. Con la cordura que ve este PC, así que vale para
+## los jugadores de otros PC. No durante el esquive.
+func _mind_step(delta: float) -> void:
+	var s := Anims.script_for(data.model)
+	if s == null or not s.has_method("unease"): return
+	_mind_t += delta
+	_crisis_w = move_toward(_crisis_w, 1.0 if sanity <= 0.01 and _action == "" else 0.0, delta * 4.0)
+	var k := clampf((UNEASE_AT - sanity / maxf(data.max_sanity, 1.0)) / UNEASE_AT, 0.0, 1.0)
+	if _action != "": k = 0.0
+	if k > 0.0: s.call("unease", model, k, _mind_t)
+	if _crisis_w > 0.0: s.call("crisis", model, Anims.ease(_crisis_w), _mind_t)
 
 ## Hacia el compañero más cercano en pie: (cuánto alarga la mano, 0..1; giro de la cabeza, rad).
 func _reach() -> Vector2:

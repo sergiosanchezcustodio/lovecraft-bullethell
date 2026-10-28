@@ -1213,6 +1213,11 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Coste: nada apreciable (tres asignaciones por jefe y fotograma).
   - Visor: `godot --path . -- anim 20 dagon alive` (mira a un lado y a otro y parpadea). Hoja en `shots/revision/2026-10-28/jefes_vivos.png` (Dagon, Cthulhu y Hydra mirando a la izquierda, al frente y a la derecha; Dagon y Hydra con los ojos abiertos y cerrados).
   - Test en `test_boss_alive`. 485 de 485.
+- **Fase 12, hito 12.2: cordura baja (28-10-2026), pendiente de tu revisión:**
+  - Por debajo del 35 % de cordura (`Player.UNEASE_AT`), encima del andar y del reposo: encorvado, las manos recogidas que tiemblan y la mirada que se queda y salta de un lado a otro, más cuanto más baja (`unease` en `anim_humano`). En la crisis (cordura a cero), las manos a la cabeza con los codos fuera, la cabeza gacha y temblando, fundido en 0,25 s (`crisis`; los ángulos, resueltos numéricamente con el orden de giros de Godot para que la mano quede en la sien). No durante el esquive.
+  - `Player._mind_step`, con la cordura que ve cada PC (viaja en las fotos), así que vale para los jugadores de otros PC.
+  - Visor: `godot --path . -- anim 30 dyer,varga,johansen unease` (y `crisis`). Hoja en `shots/revision/2026-10-28/cordura_baja.png` (cordura baja, crisis de frente y de lado, y en partida con `san=6` y `san=0`).
+  - Tests en `test_player_mind`. 487 de 487.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

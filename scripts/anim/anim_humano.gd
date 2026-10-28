@@ -286,6 +286,46 @@ static func windup(m: Node3D, b: float, th: float, t: float) -> void:
 		if parts.has(f): (parts[f] as Node3D).rotation.x += -0.35 * b
 	m.position.z += 0.06 * th
 
+## Cordura baja (hito 12.2), encima del andar y el reposo: encorvado, las manos recogidas que
+## tiemblan y la mirada que se queda y salta de un lado a otro, más cuanto más baja (k 0..1).
+## t en s (reloj propio del jugador).
+static func unease(m: Node3D, k: float, t: float) -> void:
+	Anims.part(m, "torso").rotation.x += 0.16 * k
+	Anims.part(m, "head").rotation.x += 0.1 * k
+	var g := t * (0.7 + 0.8 * k)
+	var i := floorf(g)
+	var look := lerpf(_glance(i), _glance(i + 1.0), smoothstep(0.8, 1.0, g - i))
+	Anims.part(m, "head").rotation.y += look * 0.65 * k
+	var shake := (sin(t * 47.0) * 0.05 + sin(t * 31.0) * 0.03) * k
+	Anims.part(m, "arm_l").rotation.x += shake - 0.15 * k
+	Anims.part(m, "arm_r").rotation.x += -shake - 0.15 * k
+	var parts: Dictionary = m.get_meta("part_nodes")
+	for f in ["fore_l", "fore_r"]:
+		if parts.has(f): (parts[f] as Node3D).rotation.x += -0.35 * k + shake
+
+## Hacia dónde mira en cada salto de la mirada (-1..1), siempre igual para el mismo salto.
+static func _glance(i: float) -> float:
+	return fposmod(i * 0.618034 + 0.31, 1.0) * 2.0 - 1.0
+
+## Crisis de cordura (hito 12.2): las manos a la cabeza, los codos abiertos, la cabeza gacha y
+## encogido, temblando; w (0..1) funde desde la pose de debajo.
+static func crisis(m: Node3D, w: float, t: float) -> void:
+	var shake := sin(t * 40.0) * 0.04
+	_toward(m, "torso", Vector3(0.3, 0.0, 0.0), w)
+	_toward(m, "head", Vector3(0.25, sin(t * 2.3) * 0.2, 0.0), w)
+	# brazo alzado de lado y girado, para que el codo quede fuera y la mano en la sien
+	# (resuelto con el orden de giros de Godot: hombro a 59 voxels, codo 13 más abajo)
+	_toward(m, "arm_l", Vector3(-2.6 + shake, -1.6, 0.3), w)
+	_toward(m, "arm_r", Vector3(-2.6 - shake, 1.6, -0.3), w)
+	_toward(m, "fore_l", Vector3(-1.9, 0.0, 0.0), w)
+	_toward(m, "fore_r", Vector3(-1.9, 0.0, 0.0), w)
+
+static func _toward(m: Node3D, pname: String, rot: Vector3, w: float) -> void:
+	var parts: Dictionary = m.get_meta("part_nodes")
+	if not parts.has(pname): return
+	var n: Node3D = parts[pname]
+	n.rotation = n.rotation.lerp(rot, w)
+
 ## Abatido en cooperativo (hito 12.1): de rodillas (kn) y tendido de lado apoyado en el codo
 ## izquierdo (s), girando sobre la rodilla, que ya está en el suelo. Pose absoluta, tras reset.
 const LIE_ROLL := -1.2                       ## rad que rueda sobre su costado izquierdo
