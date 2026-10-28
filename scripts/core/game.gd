@@ -35,6 +35,9 @@ extends Node3D
 ##   mute=true               sin música (también en la portada)
 ##   debug_menu=1            abre la pausa y el menú de depuración a ese segundo (capturas)
 ##   sheet_at=2 / map_at=2   abre la ficha o el mapa del J1 a ese segundo (capturas)
+##   hitstop=false           sin micro-pausa al impactar
+##   crumble=false / marks=N  sin desmoronarse / tope de manchas en el suelo (0, ninguna; por defecto 24)
+##   demo_kill=t             mata a la vez a todos los enemigos a ese segundo (capturas de las muertes)
 ##   character=johansen      personaje del J1 (dyer, olmstead, legrasse, johansen)
 ##   model=dyer_chibi        otro modelo para el J1 (probar prototipos)
 ##   bots=3                  jugadores de compañía manejados por la máquina (J2..J4, hito 2.9)
@@ -326,6 +329,9 @@ func _ready() -> void:
 		if args.get_bool("log"): print("MUSICA ", Music.current())
 	_start_weather()
 	Engine.time_scale = args.get_float("timescale", 1.0)
+	HitStop.enabled = args.get_bool("hitstop", true)     # micro-pausa al impactar (hito 11.1)
+	Crumble.enabled = args.get_bool("crumble", true)
+	GroundMarks.limit = args.get_int("marks", 24)
 	hud = Hud.new().setup(players, director)
 	hud.money = func() -> int: return run_money
 	add_child(hud)
@@ -379,6 +385,10 @@ func _ready() -> void:
 	for kind: StringName in [&"sheet", &"map"]:      # pruebas: la ficha o el mapa del J1 a los t s
 		if args.has(kind + "_at"):
 			get_tree().create_timer(args.get_float(kind + "_at"), false).timeout.connect(func() -> void: menus.toggle(player, kind))
+	if args.has("demo_kill"):                      # pruebas: todos los enemigos mueren a los t s
+		get_tree().create_timer(args.get_float("demo_kill"), false).timeout.connect(func() -> void:
+			for e in world.enemies.duplicate():
+				if is_instance_valid(e) and e is Enemy and e.is_alive(): e.take_damage(Damage.new(1.0e7, 0.0)))
 	if args.has("down_at"):                        # pruebas: el J1 de este PC cae a los t s de juego
 		get_tree().create_timer(args.get_float("down_at"), false).timeout.connect(func() -> void:
 			player.god = false
@@ -811,6 +821,10 @@ func _open_debug() -> void:
 
 ## "Menú principal" (pausa y pantalla final): guarda y vuelve al menú de la portada. Sin
 ## hueco elegido (partida lanzada directamente), sale del juego.
+## Al irse la partida (menú, reintentar, siguiente nivel): que no quede el juego parado.
+func _exit_tree() -> void:
+	HitStop.stop()
+
 func _quit() -> void:
 	Saves.save()
 	get_tree().paused = false

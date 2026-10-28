@@ -38,6 +38,7 @@ Consúltalos cuando haga falta (son largos):
   - **Revisión del autor (26-10-2026):** cabezas nuevas de los 13 personajes, aprobadas («bien»); Padre Dagon nuevo, aprobado («me gusta más»).
   - **Fase 10 (guardado en la nube con GitHub, 26-10-2026):** D-11 resuelta: gist secreto del jugador, conectado con el flujo por dispositivo de GitHub; se suben los tres huecos y los controles, y la partida local sigue mandando. Plan aprobado (hitos 10.1-10.4 en `docs/ROADMAP.md`). **Hito 10.1 hecho:** `GitHubGist` y autoload `Cloud` (`scripts/cloud/`), probado de verdad con `cloud_check cloud_token=$(gh auth token) cloud_marker=lovecraft_prueba.json cloud_delete=true`. **Hito 10.2 hecho:** sincronización por revisiones (`SaveData` v2, `CloudSync.decide`, `Cloud.sync`, subida automática al guardar, conflictos con `Cloud.resolve`, controles). **Hito 10.3 hecho:** pestaña Nube en Configuración, ventana del código (`CloudConnectMenu`), conflictos (`CloudConflictMenu`) y estado de la copia en cada hueco; capturas sin red con `cloud_demo=conectado|codigo|conflicto`. Falta el `client_id` de la OAuth App del autor en `data/cloud.json`. **Hito 10.4 hecho** (guía `docs/GUARDADO_NUBE.md`, README, build de Windows probada contra GitHub): la fase 10 está hecha. Para activarla falta que el autor registre la OAuth App y ponga su `client_id` en `data/cloud.json` (pasos en la guía); después, su prueba con dos PC. **Siguiente:** lo que elija el autor (subir a itch.io, la prueba online, las ideas del final de `docs/ESTADO.md`).
   - **Menús de biblioteca gótica (27-10-2026), pendiente de revisión:** madera, latón, esquinas de filigrana y luz de vela en el botón marcado, en todos los menús de fuera y de dentro de la partida; texto en EB Garamond (también la cabecera del HUD); una página suena al abrir cada ventana y `ui_back` al cerrarla. Todo en `MenuKit` (`window`, `dress`, `heading`, `button`). Detalle en `docs/ESTADO.md`.
+  - **Fase 11 (calidad gráfica, animación y efectos, 27-10-2026):** plan en `docs/ROADMAP.md` (hitos 11.1-11.5, pedidos todos por el autor). **Hito 11.1 hecho, pendiente de revisión:** micro-pausa al impactar (`HitStop`), enemigos que se desmoronan al morir (`Crumble`), manchas que se quedan (`GroundMarks`), andar con peso e inclinación al acelerar y frenar (`Player._lean_step`). Siguiente: 11.2 (sensación de combate).
   - `docs/ROADMAP.md` al día (21-10-2026): fases 6 y 8, hitos 8.10 a 8.16 con el trabajo posterior al plan y criterio de aceptación de la fase 8 (aprobado).
 
 ### Reglas que no hay que olvidar
@@ -130,7 +131,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `dodge=deslizar|rodar|plancha|salto|destello`: estilo de esquive (F1 los recorre en partida).
   - `dummies=N`: muñecos de práctica que reciben daño.
   - `emitters=true`: tres emisores de prueba, uno por tipo de daño.
-  - `weapons=dinamita,revolver` y `wlevel=N`: armas iniciales y su nivel.
+  - `weapons=granada,webly` y `wlevel=N`: armas iniciales (ids de `data/weapons/`) y su nivel.
   - `god=true`: el jugador no recibe daño.
   - `bullet_rain=N`: mantiene N balas enemigas vivas (prueba de carga).
   - `level=p1_n1`: nivel a jugar (por defecto). `nolevel=true` deja el campo de pruebas sin oleadas.
@@ -147,6 +148,8 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `saves=carpeta`: otra carpeta de partidas dentro de `user://` (capturas y pruebas sin tocar las tuyas). `slot=N`: juega con ese hueco.
   - `window=true` / `fullscreen=true`: fuerza ventana o pantalla completa.
   - `debug_menu=N`: abre la pausa y el menú de depuración a los N s (capturas).
+  - `sheet_at=t` / `map_at=t`: abre la ficha o el mapa del J1 a los t s. `demo_kill=t`: mata a todos los enemigos a los t s (capturas de las muertes).
+  - `hitstop=false`, `crumble=false` y `marks=N`: sin micro-pausa al impactar, sin desmoronarse y tope de manchas en el suelo (por defecto 24).
 - **Encadenar comandos:** un `godot ... | grep error` devuelve 1 cuando no hay errores, así que no lo encadenes con `&&`.
 
 Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobrescribiría el detallado. Ejecuta `gen_acechador.py` después, o renombra la salida.

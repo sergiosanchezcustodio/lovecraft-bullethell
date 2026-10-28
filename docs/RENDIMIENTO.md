@@ -114,7 +114,7 @@ Criterio de aceptación de la fase 1: 150 enemigos y 1.000 balas a la vez.
 
 **Comando:**
 ```
-godot --path . --disable-vsync -- bot=circle god=true autopick=true weapons=dinamita,revolver wlevel=3 spawn_rate=40 max_alive=150 final_at=9999 bullet_rain=1000 perf=15 prof=true
+godot --path . --disable-vsync -- bot=circle god=true autopick=true weapons=granada,webly wlevel=3 spawn_rate=40 max_alive=150 final_at=9999 bullet_rain=1000 perf=15 prof=true
 ```
 Añade `--rendering-method gl_compatibility` para medir Compatibility.
 

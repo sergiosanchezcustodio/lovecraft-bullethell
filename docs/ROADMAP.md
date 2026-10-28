@@ -246,3 +246,17 @@ Según D-11 (resuelta el 26-10-2026): copia de los tres huecos y de los controle
 | 10.2 | **Sincronización:** `SaveData` versión 2 (revisión, base y PC), subida tras cada guardado y bajada al abrir los huecos, conflicto con elección del jugador, controles | Hecho (26-10-2026) |
 | 10.3 | **Interfaz:** pestaña Nube en Configuración, ventana con el código, estado en cada hueco y avisos | Hecho (26-10-2026) |
 | 10.4 | **Cierre:** documentación, guía para jugadores, builds (TLS) y prueba del autor con dos PC | Hecho (26-10-2026): guía `docs/GUARDADO_NUBE.md`, README y build de Windows probada contra GitHub. Falta el `client_id` (pasos en la guía) y tu prueba con dos PC |
+
+## Fase 11: Calidad gráfica, animación y efectos
+
+Pedida por el autor el 27-10-2026 («quiero hacer todo lo que sugieres, comienza por el primer bloque»): más calidad gráfica, animaciones mejores y más fluidas, y más efectos visuales. Todo se comprueba con capturas, vídeo a la frecuencia del monitor y medición de rendimiento antes y después (las arenas grandes van a 4-6 ms: lo que cueste se queda en las calidades altas). En red, lo visual se hace en cada PC; nada de esto cambia la simulación.
+
+**Aceptación:** el autor ve en partida (solo y en cooperativo) que golpes, muertes y movimiento pesan más y se leen mejor; el rendimiento en Media no empeora más de 0,3 ms en las arenas más caras; con «Bajo» se juega en un portátil modesto.
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 11.1 | **Impacto y cuerpo:** micro-pausa al impactar (solo los golpes fuertes, las muertes de élites y únicos, y nunca en red ni con bots acelerados), temblor del enemigo golpeado; andar con peso (paso asimétrico, cadera y hombros, cabeza estable, brazos y cabeza con retraso), inclinación al acelerar y rebote al frenar; el modelo del enemigo se desmorona en cubos al morir; manchas de icor y de quemado que duran más (con tope) | Hecho (27-10-2026), pendiente de tu revisión: `HitStop`, `Crumble`, `GroundMarks`, andar con peso e inclinación (`Player._lean_step`); sin coste medible en juego normal |
+| 11.2 | **Sensación de combate:** números de daño opcionales (críticos más grandes), destello y empujón del modelo más legibles, temblor de cámara con ruido suave y caída exponencial, gemas que se aspiran en curva con destello | Pendiente |
+| 11.3 | **Luz y postproceso:** fogonazo de luz en las armas de fuego y en las explosiones (con tope de luces), gradación de color por parte (fría en la Antártida, verde sucia en Innsmouth, violeta en R'lyeh), efectos de cordura baja más visibles (viñeta y aberración) | Pendiente |
+| 11.4 | **Mundo vivo:** ondas en el agua al pasar y al caer cuerpos, espuma de los que salen del mar, cuerdas, telas y llamas que se mueven con el esquive y las explosiones, partículas de primer plano desenfocadas (nieve, ceniza, esporas) | Pendiente |
+| 11.5 | **Calidad configurable:** preajustes Bajo, Media, Alta y Ultra (suavizado, SSAO, sombras, niebla volumétrica, partículas, tope de luces y de manchas), con medición en cada arena | Pendiente |

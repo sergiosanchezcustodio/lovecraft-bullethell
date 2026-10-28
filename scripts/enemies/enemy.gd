@@ -306,7 +306,12 @@ func take_damage(d: Damage) -> void:
 	if health <= 0.0: world.record_kill(d.tag, global_position)
 	_flash = 0.07
 	_knock += Vector3(d.knockback.x, 0, d.knockback.z) * (2.5 if not data.elite else 0.6)
-	if health <= 0.0: _die()
+	var big := data.elite or data.unique
+	if big and not d.dot and dealt >= data.max_health * health_scale * 0.08 and health > 0.0:
+		HitStop.hit(30)                                # golpe fuerte a una élite: micro-pausa (hito 11.1)
+	if health <= 0.0:
+		if big: HitStop.hit(70, true)
+		_die()
 
 func _die() -> void:
 	Auto.sfx_at("die", global_position)
@@ -327,6 +332,10 @@ func _death_fx() -> void:
 	fx.setup(model_name, data.body_radius, model, data.elite or data.unique)
 	fx.position = global_position
 	world.fx.add_child(fx)
+	# el modelo se queda y se deshace en cubos (hito 11.1); la brasa, de su color más claro
+	var light: Color = DeathBurst.palette_of(model_name, model)[0]
+	for c: Color in DeathBurst.palette_of(model_name, model): if c.get_luminance() > light.get_luminance(): light = c
+	Crumble.start(world.fx, model, light.lerp(Color(1.0, 0.45, 0.15), 0.55), data.elite or data.unique)
 	died.emit(self)
 	queue_free()
 
@@ -529,8 +538,12 @@ func _far_from_players() -> bool:
 	return true
 
 func _process(delta: float) -> void:
+	if is_queued_for_deletion(): return               # muerto: su modelo, si se desmorona, ya es de Crumble
 	var t0 := Prof.start()
 	visual.global_position = get_global_transform_interpolated().origin - Vector3(0, _wade * WadeSplash.SINK, 0)
+	if _flash > 0.0:                                   # tiembla un instante al recibir el golpe (hito 11.1)
+		var a := 0.035 * clampf(data.body_radius, 0.4, 1.5)
+		visual.global_position += Vector3(randf_range(-a, a), 0.0, randf_range(-a, a))
 	visual.rotation.y = atan2(facing.x, facing.z)
 	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale   # aparece creciendo
 	if _aura_mat: _aura_mat.set_shader_parameter("color", Color(0.45, 0.2, 0.7, 0.14 + 0.07 * sin(_spawn_t * 2.5)))

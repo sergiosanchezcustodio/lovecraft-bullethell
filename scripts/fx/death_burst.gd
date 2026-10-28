@@ -15,6 +15,7 @@ var radius := 0.5
 var big := false                               ## élite o ser único
 var _t := 0.0
 var _stain_mat: ShaderMaterial
+var _stain: MeshInstance3D
 var _cols: Array = FALLBACK
 
 func setup(p_model: String, p_radius: float, model_root: Node3D = null, p_big := false) -> void:
@@ -78,6 +79,7 @@ func _ready() -> void:
 	var splat := VoxelFx.ground(6, r * 1.3)
 	splat.position.y = 0.03
 	_stain_mat = splat.material_override
+	_stain = splat
 	var dark: Color = _cols[1].darkened(0.35)
 	_stain_mat.set_shader_parameter("tint", Color(dark.r, dark.g, dark.b))
 	add_child(splat)
@@ -85,5 +87,6 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_t += delta
 	_stain_mat.set_shader_parameter("age", clampf(_t / LIFE, 0.0, 1.0))
-	_stain_mat.set_shader_parameter("fade", clampf((LIFE - _t) / 0.8, 0.0, 1.0))
-	if _t > LIFE: queue_free()
+	if _t > LIFE:                                   # la mancha seca se queda un rato (hito 11.1)
+		GroundMarks.keep(get_parent(), _stain)
+		queue_free()

@@ -456,6 +456,8 @@ func _process(delta: float) -> void:
 
 func _process_step(delta: float) -> void:
 	if health <= 0.0:
+		visual.rotation.x = 0.0; visual.rotation.z = 0.0
+		_lean = Vector2.ZERO; _lean_vel = Vector2.ZERO
 		_downed_visual(delta)
 		return
 	visual.visible = true
@@ -482,6 +484,7 @@ func _process_step(delta: float) -> void:
 	# Temblor de aviso antes de cada congelación de la parálisis
 	var shake := Vector3(randf_range(-0.04, 0.04), 0, randf_range(-0.04, 0.04)) if trembling else Vector3.ZERO
 	visual.global_position = here + shake
+	_lean_step(here, delta, frozen)
 	# Parpadeo durante la invulnerabilidad tras un golpe
 	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
 	_animate(delta)
@@ -501,6 +504,39 @@ func _process_step(delta: float) -> void:
 			if _ghost_t <= 0.0 and world != null:
 				_ghost_t = 0.05
 				world.fx.add_child(Afterimage.new().setup(model, color.lerp(Color(0.85, 0.95, 1.0), 0.6), 0.28))
+
+## Inclinación (hito 11.1): hacia donde acelera, atrás al frenar (con un pequeño rebote: un
+## muelle poco amortiguado) y hacia dentro en las curvas. La aceleración sale de la posición
+## dibujada (la diferencia entre su velocidad, apenas suavizada, y la misma muy suavizada), así
+## que vale también para los jugadores de otros PC. En el contenedor, como el giro.
+const LEAN_K := 0.045                          ## rad por m/s de diferencia
+const LEAN_MAX := 0.2
+var _lean := Vector2.ZERO                      ## x: adelante; y: de lado (rotation.z)
+var _lean_vel := Vector2.ZERO
+var _lean_prev := Vector3.INF
+var _v_fast := Vector3.ZERO
+var _v_slow := Vector3.ZERO
+
+func _lean_step(here: Vector3, delta: float, frozen: bool) -> void:
+	if delta <= 0.0: return
+	var v := Vector3.ZERO if _lean_prev == Vector3.INF else (here - _lean_prev) / delta
+	_lean_prev = here
+	v.y = 0.0
+	if v.length() > 25.0: v = _v_fast                # reaparece o la colocan: no es un acelerón
+	_v_fast = _v_fast.lerp(v, 1.0 - exp(-25.0 * delta))
+	_v_slow = _v_slow.lerp(_v_fast, 1.0 - exp(-7.0 * delta))
+	var target := Vector2.ZERO
+	if _action == "" and not frozen:
+		var d := _v_fast - _v_slow
+		var yaw := visual.rotation.y
+		var fwd := Vector3(sin(yaw), 0.0, cos(yaw))
+		var right := Vector3(cos(yaw), 0.0, -sin(yaw))
+		target = Vector2(clampf(d.dot(fwd) * LEAN_K, -LEAN_MAX, LEAN_MAX), clampf(-d.dot(right) * LEAN_K, -LEAN_MAX, LEAN_MAX))
+	var dt := minf(delta, 1.0 / 30.0)
+	_lean_vel += ((target - _lean) * 160.0 - _lean_vel * 13.0) * dt
+	_lean += _lean_vel * dt
+	visual.rotation.x = _lean.x
+	visual.rotation.z = _lean.y
 
 ## Animación por capas: una base (reposo, andar o esquive) que se funde al cambiar y,
 ## encima, el gesto de lanzar solo en brazos y torso, con entrada y salida suaves.
@@ -556,7 +592,8 @@ func in_water() -> bool:
 ## Sube al instante lo que haga falta, pero baja poco a poco (GROUND_EASE m/s): en la
 ## voltereta el punto más bajo cambia de golpe al rodar y, bajando de golpe, daba tirones.
 func _keep_above_ground(delta: float) -> void:
-	var inv := visual.global_transform.affine_inverse()
+	# altura sobre los pies medida en el mundo: el contenedor puede ir inclinado (hito 11.1)
+	var inv := Transform3D(Basis(), -visual.global_position)
 	var lowest := INF
 	for mi: MeshInstance3D in model.get_meta("meshes"):
 		var xf := inv * mi.global_transform
@@ -752,6 +789,7 @@ func take_damage(d: Damage) -> void:
 	recv_add(src, d.physical, d.mental * mental_resist * data.mental_mult)
 	Auto.sfx_at("hit_player" if d.physical > 0.0 else "chant", global_position)
 	_rumble(d.physical + d.mental * 0.5)
+	if d.physical >= data.max_health * 0.12 and not (input is BotInput): HitStop.hit(45, true)   # golpe fuerte (hito 11.1)
 	if d.mental > 0.0:
 		sanity = maxf(0.0, sanity - d.mental * mental_resist * data.mental_mult)
 		sanity_state.on_mental_damage()

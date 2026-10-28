@@ -14,6 +14,7 @@ var _ball_mat: StandardMaterial3D
 var _wave: MeshInstance3D
 var _wave_mat: ShaderMaterial
 var _scorch_mat: ShaderMaterial
+var _scorch: MeshInstance3D
 
 const LIFE := 4.0
 
@@ -46,6 +47,7 @@ func _ready() -> void:
 	scorch.position.y = 0.03
 	add_child(scorch)
 	_scorch_mat = scorch.material_override
+	_scorch = scorch
 	var fx := Node3D.new()
 	fx.position.y = 0.5
 	add_child(fx)
@@ -82,5 +84,6 @@ func _process(delta: float) -> void:
 	_wave_mat.set_shader_parameter("color", Color(1.0, 0.8, 0.5, 0.85 * (1.0 - w)))
 	_wave.visible = _t < 0.3
 	_scorch_mat.set_shader_parameter("age", clampf(_t / LIFE, 0.0, 1.0))
-	_scorch_mat.set_shader_parameter("fade", clampf((LIFE - _t) / 1.5, 0.0, 1.0))
-	if _t >= LIFE: queue_free()
+	if _t >= LIFE:                                  # el quemado se queda un rato (hito 11.1)
+		GroundMarks.keep(get_parent(), _scorch, GroundMarks.LINGER + 2.0)
+		queue_free()

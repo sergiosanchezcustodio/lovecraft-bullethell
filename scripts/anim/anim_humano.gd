@@ -5,6 +5,7 @@ extends RefCounted
 ## despacio según la velocidad real, para que los pies no patinen.
 ## Esquives: "slide" (deslizamiento) y "roll" (voltereta). Cada personaje elige el suyo en
 ## CharacterData.dodge_anim; la animación puede durar más que el impulso del esquive.
+const ARM_LAG := 0.32                         ## retraso de los brazos respecto a las piernas (rad del ciclo)
 const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive": 0.5,
 	"jump": 0.45, "flash": 0.3, "throw": 0.55}
 
@@ -60,6 +61,7 @@ static func _walk_jointed(m: Node3D, t: float) -> void:
 	var w := t * TAU
 	var s := sin(w)
 	var c := cos(w)
+	var sa := sin(w - ARM_LAG)                     # brazos y codos, con algo de retraso (hito 11.1)
 	# piernas: muslo adelante y atrás; la rodilla se dobla en el paso (pierna en el aire)
 	var swing_l := maxf(0.0, -c)                   # pierna izquierda avanzando por el aire
 	var swing_r := maxf(0.0, c)
@@ -68,15 +70,20 @@ static func _walk_jointed(m: Node3D, t: float) -> void:
 	bend(m, "shin_l", 0.1 + swing_l * 1.05)
 	bend(m, "shin_r", 0.1 + swing_r * 1.05)
 	# brazos a contrapaso, abiertos un poco; el codo se dobla más cuando el brazo va delante
-	Anims.part(m, "arm_l").rotation = Vector3(-s * 0.6, 0.0, -0.06)
-	Anims.part(m, "arm_r").rotation = Vector3(s * 0.6, 0.0, 0.06)
-	bend(m, "fore_l", -0.3 - maxf(0.0, s) * 0.55)
-	bend(m, "fore_r", -0.3 - maxf(0.0, -s) * 0.55)
+	Anims.part(m, "arm_l").rotation = Vector3(-sa * 0.6, 0.0, -0.06)
+	Anims.part(m, "arm_r").rotation = Vector3(sa * 0.6, 0.0, 0.06)
+	bend(m, "fore_l", -0.3 - maxf(0.0, sin(w - ARM_LAG * 1.6)) * 0.55)
+	bend(m, "fore_r", -0.3 - maxf(0.0, -sin(w - ARM_LAG * 1.6)) * 0.55)
 	# cuerpo: rebote (arriba con la pierna de apoyo recta), balanceo hacia la pierna de apoyo,
-	# giro de hombros y la cabeza compensando para mirar al frente
-	m.position = Vector3(-c * 0.035, 0.07 * (0.5 + 0.5 * cos(2.0 * w)), 0.0)
-	Anims.part(m, "torso").rotation = Vector3(0.1, s * 0.13, c * 0.06)
-	Anims.part(m, "head").rotation = Vector3(0.04, -s * 0.09, -c * 0.045)
+	# giro de hombros y la cabeza compensando para mirar al frente. Con peso (hito 11.1): el
+	# cuerpo se queda arriba más rato y baja de golpe al apoyar, el tronco cabecea un poco en el
+	# apoyo y la cabeza absorbe parte del rebote.
+	var a := absf(s)
+	var bob := 0.075 * (1.0 - a * a * a)
+	m.position = Vector3(-c * 0.035, bob, 0.0)
+	Anims.part(m, "torso").rotation = Vector3(0.1 + 0.05 * pow(a, 6.0), s * 0.13, c * 0.06)
+	Anims.part(m, "head").rotation = Vector3(0.04 - 0.04 * pow(a, 6.0), -s * 0.09, -c * 0.045)
+	Anims.part(m, "head").position.y = Anims.rest(m, "head").y - bob * 0.35
 	# bufanda y coleta: echadas atrás por la marcha y con retraso respecto al rebote
 	bend(m, "scarf", 0.38 + sin(2.0 * w - 0.9) * 0.16, cos(w - 0.6) * 0.14)
 	bend(m, "hair", 0.32 + sin(2.0 * w - 1.1) * 0.2, cos(w - 0.8) * 0.18)
