@@ -41,6 +41,16 @@ cu.opening(M, 53, 56, 5, 5, DRESS)
 for x in range(-11, 11, 2):
     for y in (51, 52):
         cu.front(M, x, y, FRINGE, dz=1); cu.back(M, x, y, FRINGE)
+# puntas de la estola que cuelgan por delante, con flecos (hito 12.3): pieza aparte, `stole`,
+# que se mece con retraso al andar, como los faldones
+STOLE_SH = (0.28, 0.11, 0.26)
+for s in (-1, 1):
+    for y in range(40, 54):
+        for x in range(5, 10):
+            cu.front(M, s * x, y, STOLE_SH if x == 9 or y == 40 else STOLE, dz=1, part='stole')
+    for x in range(5, 10):
+        for y in (37, 38, 39):
+            if (x + y) % 2 == 0 or y == 39: cu.front(M, s * x, y, FRINGE, dz=1, part='stole')
 
 cu.arms(M, DRESS, SKIN, cuff=DRESS_SH, cuff_wide=False, ax=AX, slim=True)
 for s, _, _, arm, _ in cu.sides():                                      # la estola cubre el hombro
@@ -87,4 +97,5 @@ cu.seams(M, (DRESS,))
 cu.finish(M, 'varga', {DRESS: 'lana', DRESS_SH: 'lana', STOLE: 'lana', HAIR: 'pelo',
                        SHOE: 'cuero', SOLE: 'cuero', SKIN: 'piel', SKIN_SH: 'piel'},
           flat=(LIP, LIP_LO, BROW, LASH, SHADOW, IRIS, CHEEK, PEARL, FRINGE, GEM, FEATHER, FEATHER_SH, BAND, STOCKING), ax=AX,
-          hat=(BAND, GEM, FEATHER, FEATHER_SH,), skirt=True)
+          hat=(BAND, GEM, FEATHER, FEATHER_SH,), skirt=True,
+          extra_pivots={'stole': [0, 54, 8]}, extra_parents={'stole': 'torso'})

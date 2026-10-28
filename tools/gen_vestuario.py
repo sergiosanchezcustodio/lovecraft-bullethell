@@ -488,6 +488,9 @@ def build(name, c):
     if fn is cinta_pelo: mats = fn(M, bd, hair_of(c))
     elif fn in (gafas_ver, gafas_nieve): mats = fn(M, bd, face_of(c))
     else: mats = fn(M, bd)
+    for V in (M.V, M.under_kept()):          # faldones (hito 12.3): lo de por debajo de la cadera
+        for k, v in V.items():               # cuelga de la cadera y se mueve con retraso
+            if v[0] == cu.T and k[1] < cu.HIP: v[0] = 'skirt'
     materiales.texturize(M, mats)
     under = cu.new(9100 + CHARS.index(c))   # lo que tapó otra parte, con la misma textura
     under.V = {k: list(v) for k, v in M.under_kept().items()}

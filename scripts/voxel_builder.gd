@@ -128,6 +128,7 @@ static func dress(root: Node3D, garment_path: String, hides_hat := false) -> boo
 	for pname in (g.get_meta("part_nodes") as Dictionary):
 		var src: Node3D = g.get_meta("part_nodes")[pname]
 		var dst: Node3D = nodes.get(pname)
+		if dst == null and pname == "skirt": dst = nodes.get("torso")   # cuerpos de antes del hito 12.3
 		if dst == null: continue
 		for c in src.get_children():
 			if c is MeshInstance3D:

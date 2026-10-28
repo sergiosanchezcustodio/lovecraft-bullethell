@@ -144,7 +144,7 @@ def west():
     cu.seams(M, (LAB,))
     cu.finish(M, 'west', {LAB: 'lona', LAB_SH: 'lona', SUIT: 'lana', SHOE: 'cuero', SOLE: 'cuero',
                           HAIR: 'pelo', HAIR_SH: 'pelo', PALE: 'piel', PALE_SH: 'piel', GLOVE: 'cuero'},
-              flat=(FRAME, SERUM, GLASS, TIE, STAIN, BROW, IRIS, MOUTH, EAR_IN), b=B)
+              flat=(FRAME, SERUM, GLASS, TIE, STAIN, BROW, IRIS, MOUTH, EAR_IN), b=B, skirt=True)
 
 
 armitage()

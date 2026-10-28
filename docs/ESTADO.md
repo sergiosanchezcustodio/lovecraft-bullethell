@@ -1224,6 +1224,12 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Una sola pieza y no paneles delante y detrás: con dos paneles, en la sotana y los vestidos se abría una raja en los costados al andar.
   - La estola de Varga no se mueve: va sobre los hombros, sin extremos que cuelguen. Las prendas del vestuario (abrigos, bata, vestido) todavía no tienen faldón aparte.
   - Vídeo `shots/videos/ropa_con_retraso.mp4` (los cinco en zigzag) y hoja `shots/revision/2026-10-28/ropa_con_retraso.png`. `revisar_costados.py`: 368 modelos, todos enteros. 487 de 487.
+- **Fase 12, hito 12.3 (resto): estola, voltereta, Blake, West y vestuario (28-10-2026), pendiente de tu revisión:**
+  - Varga lleva dos puntas de la estola colgando por delante, hasta la cintura, con flecos (pieza `stole`, ×1,3 en el muelle). En el esquive la ropa se mueve un 35 % (`Player.CLOTH_DODGE`): con la velocidad de la voltereta salía volando.
+  - El abrigo de Blake y la bata de West también tienen faldón (`skirt=True`). Los trece personajes tienen el pivote `skirt` (en los que no tienen faldón, los mismos voxels que antes).
+  - Prendas del vestuario: lo de por debajo de la cadera pasa a `skirt` (`gen_vestuario.build`), así que los abrigos, la bata, el vestido y el chubasquero se mecen en cualquiera. `VoxelBuilder.dress` lo cuelga del tronco en un cuerpo sin pivote `skirt` (modelos de antes). `under_kept` (voxlib) también quita las piernas que tapa `skirt`.
+  - La trenza de Peaslee (`hair`) ya se movía con el muelle desde la primera parte.
+  - Hoja `shots/revision/2026-10-28/ropa_estola_prendas.png` (Varga de frente y de lado; Dyer con el abrigo de nieve, Peaslee con la bata y Olmstead con el vestido, en zigzag). `revisar_costados.py`: 368 modelos enteros. 487 de 487.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

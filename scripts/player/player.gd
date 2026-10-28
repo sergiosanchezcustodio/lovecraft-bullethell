@@ -124,7 +124,8 @@ var _crisis_w := 0.0             ## cuánto tiene las manos en la cabeza (crisis
 ## pelo atrás al andar (más al acelerar), adelante al frenar y hacia fuera al girar.
 const CLOTH_K := 70.0            ## rigidez del muelle (1/s²)
 const CLOTH_C := 7.0             ## amortiguación (poca: al frenar se pasa y vuelve)
-const CLOTH_PARTS := {"skirt": 1.0, "scarf": 0.8, "hair": 0.6}
+const CLOTH_PARTS := {"skirt": 1.0, "stole": 1.3, "scarf": 0.8, "hair": 0.6}
+const CLOTH_DODGE := 0.35        ## en el esquive, la ropa se mueve menos (con su velocidad salía volando)
 var _cloth := Vector2.ZERO       ## giro de la ropa (x: atrás, z: de lado), rad
 var _cloth_v := Vector2.ZERO
 var _cloth_yaw := 0.0
@@ -653,6 +654,7 @@ func _cloth_step(delta: float) -> void:
 	var fwd := Vector3(sin(yaw), 0.0, cos(yaw))
 	var speed := motor.velocity.dot(fwd) / maxf(data.move_speed, 0.1)
 	var want := Vector2(clampf(0.22 * speed, -0.3, 0.45), clampf(-0.05 * turn * maxf(speed, 0.0), -0.35, 0.35))
+	if _action != "": want *= CLOTH_DODGE
 	_cloth_v += (CLOTH_K * (want - _cloth) - CLOTH_C * _cloth_v) * delta
 	_cloth += _cloth_v * delta
 	var parts: Dictionary = model.get_meta("part_nodes")

@@ -81,4 +81,4 @@ cu.seams(M, (COAT,))
 cu.finish(M, 'blake', {COAT: 'lana', COAT_SH: 'lana', SCARF: 'punto', SCARF_SH: 'punto', HAT: 'lana',
                        HAT_SH: 'lana', SHOE: 'cuero', SOLE: 'cuero', HAIR: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
           flat=(LIP, LIP_LO, BROW, LASH, IRIS, CHEEK, BUTTON, PEN, HATBAND, STOCKING), ax=AX,
-          hat=(HAT_SH, HAT, HATBAND,))
+          hat=(HAT_SH, HAT, HATBAND,), skirt=True)
