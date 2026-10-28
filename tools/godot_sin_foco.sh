@@ -15,7 +15,9 @@
 #   apunta en Windows como «Games» (MMCSS), y eso le quita tiempo de CPU a tu juego; en modo de
 #   bajo consumo no lo hace. Devices lo quita enseguida: la prueba va igual, con prioridad normal.
 # Los mandos los ignora la propia partida (JoypadInput.disabled).
-# Sin ventana (--headless, -s, --import), arranca tal cual.
+# Sin ventana (--headless, --import), arranca tal cual. Un script con -s y ventana (hojas de
+# posturas que dibujan en un SubViewport) también la abre de 3×3 y sin foco: no pasa por main.gd,
+# así que se queda así, y sus SubViewport se dibujan igual.
 GODOT="/c/Tools/Godot/Godot_v4.4.1-stable_win64_console.exe"
 dir="."
 prev=""
@@ -24,7 +26,7 @@ movie=0
 for a in "$@"; do
 	[ "$prev" = "--path" ] && dir="$a"
 	case "$a" in
-		--headless|-s|--script|--import|--export-*) exec "$GODOT" "$@" ;;
+		--headless|--import|--export-*) exec "$GODOT" "$@" ;;
 		--resolution|--position|-f|--fullscreen|-m|--maximized) own=1 ;;
 		--write-movie) movie=1 ;;
 	esac

@@ -5,10 +5,10 @@ violetas (gorguera, hombros y coberteras), pico negro azulado brillante con la c
 ojos de iris ámbar que brillan, patas largas negras y escamosas con uñas.
 Se modela en centímetros (un cuervo mide ~64 cm de pico a cola) a K voxels por cm; mira hacia +Z.
 Partes: body, head, jaw (mandíbula inferior, para graznar), tail, leg_l y leg_r (tarso y dedos,
-giran en el talón), arm_l/hand_l y arm_r/hand_r (ala abierta articulada en la muñeca: la mano
-cuelga del brazo) y fold_l y fold_r (alas plegadas, posado; se muestran unas u otras).
-Las abiertas van en horizontal (largo en X, borde de ataque hacia +Z); las anima
-scripts/title/title_raven.gd.
+giran en el talón), el ala abierta en cuatro piezas encadenadas (arm_*, fore_*, hand_* y tip_*:
+hombro, codo, muñeca y punta; rehecha el 28-10-2026, pluma a pluma) y fold_l y fold_r (alas
+plegadas, posado; se muestran unas u otras). Las abiertas van en horizontal (largo en X, borde de
+ataque hacia +Z); las anima scripts/title/title_raven.gd.
 Uso: python tools/gen_cuervo_portada.py  ->  models/cuervo_portada.json
 """
 import sys, os, math
@@ -167,62 +167,108 @@ for s in (-1, 1):
 
 
 # --- alas ---------------------------------------------------------------------------------
-ARM = 19.0                        # cm del hombro a la muñeca
-SPAN = 44.0                       # cm del hombro a la punta
+# Ala abierta pluma a pluma, en cuatro piezas que se doblan al aletear y al plegarla: brazo
+# (hombro a codo, terciarias), antebrazo (codo a muñeca, secundarias), mano (primarias por dentro)
+# y punta (las primarias largas, que se curvan con el aire). Va en horizontal (largo en X, borde
+# de ataque hacia +Z); las anima scripts/title/title_raven.gd.
+ELBOW = 8.0                       # cm del hombro al codo
+WRIST = 19.0                      # ... a la muñeca
+TIP = 31.0                        # ... a donde se doblan las primarias largas
+WY = 24.0                         # altura del ala (cm)
+UNDER = (0.085, 0.088, 0.105)     # cara de abajo de las remeras, gris negruzco con brillo
+RACHIS_U = (0.15, 0.15, 0.17)     # raquis por debajo, más claro
+
+
+def lead(d):
+    """Borde de ataque (z, cm) a `d` cm del hombro: se abulta hacia la muñeca (el álula) y la
+    mano se curva hacia atrás."""
+    if d < WRIST:
+        return 5.5 + 1.8 * math.sin(d / WRIST * math.pi * 0.5)
+    h = (d - WRIST) / 26.0
+    return 7.3 - 9.0 * h ** 1.5
+
+
+def wing_part(s, d):
+    names = ('arm', 'fore', 'hand', 'tip')
+    i = 0 if d < ELBOW else 1 if d < WRIST else 2 if d < TIP else 3
+    return names[i] + ('_l' if s < 0 else '_r')
+
+
+def feather(s, root_d, root_z, ang, length, width, finger, tone, layer):
+    """Una remera: de (root_d, root_z) hacia atrás girada `ang` rad hacia fuera, con el raquis y
+    el borde de fuera en sombra (lo tapa la siguiente). `finger`: desde qué fracción del largo
+    se estrecha en dedo (primarias emarginadas). `layer`: altura sobre las de debajo."""
+    ca, sa = math.cos(ang), math.sin(ang)
+    st = 0.5 / K
+    u = 0.0
+    while u <= length:
+        t = u / length
+        w = width * (1.0 if t < finger else 1.0 - 0.45 * min(1.0, (t - finger) / 0.12))
+        if t > 0.82: w *= math.sqrt(max(0.0, 1 - ((t - 0.82) / 0.18) ** 2))      # punta redondeada
+        v = -w * 0.5
+        while v <= w * 0.5:
+            d = root_d + u * sa + v * ca
+            z = root_z - u * ca + v * sa
+            c_t = min(1.0, max(0.0, (lead(d) - z) / 18.0))
+            camber = 1.1 * math.sin(c_t * math.pi) * (1 - 0.6 * min(1.0, d / 46.0))
+            y = WY + camber + layer / K
+            if abs(v) < 0.35 / K * 1.2 and t < 0.9: c, cu = DARK, RACHIS_U          # raquis
+            elif v > w * 0.5 - 0.7 / K: c, cu = EDGE, EDGE                          # la siguiente la tapa
+            else:
+                g = tone * (0.9 + 0.2 * M.hsh(vox(s * (6.0 + d)) // 2, 7, vox(z) // 3))   # vetas
+                c = tuple(min(1.0, q * g) for q in BLACK)
+                cu = tuple(min(1.0, q * (0.75 + 0.5 * t) * g) for q in UNDER)        # más clara hacia la punta
+            xi, yi, zi = vox(s * (6.0 + d)), vox(y), vox(z)
+            part = wing_part(s, d)
+            M.put(xi, yi, zi, part, c)
+            M.put(xi, yi - 1, zi, part, cu, over=False)                            # grosor y cara de abajo
+            v += st
+        u += st
 
 
 def spread(s):
-    """Ala abierta en dos piezas: brazo (hombro a muñeca, secundarias) y mano (primarias).
-    Forma de ala de cuervo: borde de ataque curvo (abultado junto a la muñeca), mano ancha y
-    redondeada con las primarias sueltas como dedos de punta afilada. Pluma a pluma: tres filas
-    de coberteras festoneadas (pequeñas, medianas y mayores) y las remeras de una en una, cada
-    una con su tono, su raquis y la sombra de la siguiente. Grosor de 3 voxels en el borde de
-    ataque a 1 en las remeras, y curvatura (el centro de la cuerda más alto)."""
-    arm, hand = ('arm_l', 'hand_l') if s < 0 else ('arm_r', 'hand_r')
-    FW = 2.3                                           # ancho de una remera (cm)
-    for ii in range(vox(SPAN) + 1):
-        d = ii / K                                     # cm desde el hombro
-        t = d / SPAN
-        part = arm if d < ARM else hand
-        x = s * (6.0 + d)
-        fi = math.floor(d / FW)                        # remera a la que pertenece esta columna
-        fe = d / FW - fi                               # posición dentro de la remera (0..1)
-        if d < ARM:
-            lead = 5.2 + 1.6 * math.sin(d / ARM * math.pi * 0.5)          # se abulta hacia la muñeca
-            chord = 18.5 - 1.0 * d / ARM
-            chord -= 1.1 * (1 - math.sin(fe * math.pi))                   # festón de las secundarias
-        else:
-            h = (d - ARM) / (SPAN - ARM)
-            lead = 6.8 - 6.5 * h ** 1.6                                   # la mano se curva hacia atrás
-            chord = 17.5 - 6.0 * h
-            if h > 0.3:                                                   # primarias: dedos en punta
-                tip = 1 - abs(fe - 0.45) / 0.45                           # 1 en el centro de la pluma
-                chord = chord * (0.55 + 0.45 * max(tip, 0.0) ** 0.6) + 3.0 * (h - 0.3)
-            chord *= 1 - max(0.0, h - 0.85) / 0.15 * 0.5                 # punta redondeada
-        tone = 0.75 + 0.5 * M.hsh(int(fi), 3, s + 5)                      # cada remera, su tono
-        for kk in range(vox(lead - chord), vox(lead) + 1):
+    """Ala abierta de cuervo: ancha, con el borde de salida de las secundarias festoneado y las
+    primarias abiertas en abanico, las de fuera estrechadas en dedos sueltos."""
+    # secundarias y terciarias: hacia atrás, un poco abiertas hacia fuera las de fuera
+    n = 12
+    for f in range(n):
+        d = 0.8 + f * (WRIST - 0.8) / (n - 1)
+        L = 13.5 + 1.8 * math.sin(f / (n - 1) * math.pi * 0.8)
+        feather(s, d, lead(d) - 3.0, 0.03 + 0.12 * f / (n - 1), L, 2.5, 2.0, 0.85 + 0.35 * M.hsh(f, 1, s + 3), 0)
+    # primarias: en abanico desde la mano, de hacia atrás a casi hacia fuera
+    lengths = (16.5, 18.0, 19.5, 21.5, 23.5, 25.5, 26.5, 26.0, 23.0, 16.0)
+    for f in range(10):
+        q = f / 9
+        d = WRIST + 0.5 + q * 10.5
+        ang = 0.22 + 1.05 * q ** 1.2
+        finger = 0.5 if 4 <= f <= 8 else 2.0
+        feather(s, d, lead(d) - 2.5, ang, lengths[f], 2.6 if f < 9 else 2.0, finger,
+                0.85 + 0.35 * M.hsh(f, 2, s + 3), 1 if f % 2 else 0)
+    # coberteras: cubren el borde de ataque y la base de las remeras, en tres filas festoneadas
+    for ii in range(vox(46.0)):
+        d = ii / K
+        if d > 40: break
+        ld = lead(d)
+        depth = (6.5 if d < WRIST else 6.5 - 4.5 * (d - WRIST) / 21.0)
+        if depth <= 0.5: continue
+        for kk in range(vox(ld - depth), vox(ld) + 1):
             z = (kk + .5) / K
-            c_t = (lead - z) / max(chord, 0.1)          # 0 borde de ataque .. 1 borde de salida
-            # coberteras en tres filas festoneadas: cada fila acaba en curvas sobre la siguiente
-            row_ends = (0.14, 0.27, 0.45)
-            band = next((b for b, e in enumerate(row_ends)
-                         if c_t < e - 0.04 * math.sin(((d * 1.4 + b * 0.7) % 1.6) / 1.6 * math.pi)), 3)
-            if band < 3:
-                end = row_ends[band] - 0.04 * math.sin(((d * 1.4 + band * 0.7) % 1.6) / 1.6 * math.pi)
-                if end - c_t < 0.035: c = EDGE                            # sombra bajo el festón
-                elif end - c_t < 0.07 and M.hsh(ii, band, kk) < 0.5: c = DARK if band < 2 or M.hsh(ii, 9, kk) > 0.15 else BLUE
-                else: c = BLACK if (ii + kk) % 5 else DARK
+            c_t = (ld - z) / depth                         # 0 borde de ataque .. 1 final de las coberteras
+            row = 0 if c_t < 0.38 else 1 if c_t < 0.7 else 2
+            ends = (0.38, 0.7, 1.0)
+            wav = 0.06 * math.sin(((d * 1.3 + row * 0.6) % 1.7) / 1.7 * math.pi)
+            if ends[row] - c_t < 0.07 + wav: c = EDGE
             else:
-                if fe < 0.12: c = EDGE                                    # la remera de al lado la tapa
-                elif abs(fe - 0.4) < 0.07: c = DARK                       # raquis
-                else: c = tuple(min(1.0, q * tone) for q in BLACK)
-            camber = 1.0 * math.sin(min(c_t, 1.0) * math.pi) * (1 - 0.5 * t)
-            y0 = vox(24.0 + camber)
-            xi = int(math.floor(x * K))
-            M.put(xi, y0, kk, part, c)
-            th = 2 if c_t < 0.22 else (1 if c_t < 0.5 else 0)
-            for q in range(1, th + 1):
-                M.put(xi, y0 - q, kk, part, EDGE if q == th else BLACK)
+                h = M.hsh(ii // 2, row, kk // 2)
+                c = DARK if h < 0.22 else (BLUE if h > 0.97 else BLACK)
+            camber = 1.1 * math.sin(min(1.0, (ld - z) / 18.0) * math.pi) * (1 - 0.6 * min(1.0, d / 46.0))
+            y0 = vox(WY + camber) + 3 - row                   # cada fila, un escalón por encima de la siguiente
+            if row < 2 and ends[row] - c_t < 0.1 + wav: y0 -= 1     # el borde de la fila baja: se nota el festón
+            th = y0 - vox(WY + camber) + 1
+            part = wing_part(s, d)
+            xi = vox(s * (6.0 + d))
+            for q in range(th + 1):
+                M.put(xi, y0 - q, kk, part, c if q == 0 else (BLACK if q < th else UNDER))
 
 
 def folded(part, s):
@@ -260,26 +306,28 @@ folded('fold_r', 1)
 SHINE = (0.20, 0.32, 0.70)
 for (x, y, z), v in list(M.V.items()):
     part, c, g = v
-    if g or part not in ('body', 'head', 'tail', 'fold_l', 'fold_r', 'arm_l', 'arm_r', 'hand_l', 'hand_r') or c in (EDGE, LEG, SCUTE, CLAW, BEAK, CULMEN):
+    if g or part not in ('body', 'head', 'tail', 'fold_l', 'fold_r') or c in (EDGE, LEG, SCUTE, CLAW, BEAK, CULMEN):
         continue
     up = (x, y + 1, z) not in M.V
     front = (x, y, z + 1) not in M.V and (part == 'head' or M.hsh(x, y, z + 7) < 0.3)
     if up or front:
         k = 0.55 if (part == 'head' or y > 21 * K) else 0.38
         if front and not up: k *= 0.5
-        if part.startswith(('arm', 'hand')): k *= 0.0
         if M.hsh(x, y, z) < 0.35: k *= 0.5
         M.V[(x, y, z)] = [part, tuple(c[q] + (SHINE[q] - c[q]) * k for q in range(3)), g]
 
 piv = lambda x, y, z: [x * K, y * K, z * K]
 n = M.export("models/cuervo_portada.json",
              {"body": piv(0, 8, 0), "head": piv(0, 27, 7), "jaw": piv(0, 30, 13.5),
-              "arm_l": piv(-6, 24, 5.5), "arm_r": piv(6, 24, 5.5),
-              "hand_l": piv(-6 - ARM, 24, 5.4), "hand_r": piv(6 + ARM, 24, 5.4),
+              "arm_l": piv(-6, WY, lead(0)), "arm_r": piv(6, WY, lead(0)),
+              "fore_l": piv(-6 - ELBOW, WY, lead(ELBOW)), "fore_r": piv(6 + ELBOW, WY, lead(ELBOW)),
+              "hand_l": piv(-6 - WRIST, WY, lead(WRIST)), "hand_r": piv(6 + WRIST, WY, lead(WRIST)),
+              "tip_l": piv(-6 - TIP, WY, lead(TIP)), "tip_r": piv(6 + TIP, WY, lead(TIP)),
               "leg_l": piv(-2.4, 9, 0), "leg_r": piv(2.4, 9, 0), "tail": piv(0, 13, -10.5),
               "fold_l": piv(-6.6, 25, 5), "fold_r": piv(6.6, 25, 5)},
              pivots_in_voxels=True, roughness=0.62, specular=0.35, jitter=0.006,
              parents={"head": "body", "jaw": "head", "arm_l": "body", "arm_r": "body",
-                      "hand_l": "arm_l", "hand_r": "arm_r", "leg_l": "body", "leg_r": "body",
+                      "fore_l": "arm_l", "fore_r": "arm_r", "hand_l": "fore_l", "hand_r": "fore_r",
+                      "tip_l": "hand_l", "tip_r": "hand_r", "leg_l": "body", "leg_r": "body",
                       "tail": "body", "fold_l": "body", "fold_r": "body"})
 print("cuervo_portada", n, "voxels")
