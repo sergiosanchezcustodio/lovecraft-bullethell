@@ -44,7 +44,8 @@ class Model:
         """Lo pisado que se conserva: todo menos las piernas que tapa una falda, una sotana o un
         abrigo largo (parte torso), que al andar asomarían por delante de la tela."""
         return {k: v for k, v in self.under.items()
-                if k in self.V and not (v[0] in self.LEGS and self.V[k][0] == 'torso')}
+                if k in self.V and v[0] != self.V[k][0]                # vuelto a poner por su parte: sobra
+                and not (v[0] in self.LEGS and self.V[k][0] == 'torso')}
 
     # ---------- volúmenes (coordenadas en ub) ----------
     def ell(self, cx, cy, cz, rx, ry, rz, part, col, over=True, glow=0):
