@@ -10,6 +10,7 @@
 script = ExtResource("1")
 id = &"cthulhu_recompuesto"
 display_name = "Cthulhu, recompuesto"
+alive = true
 model = "cthulhu"
 model_scale = 1.15
 unique = true

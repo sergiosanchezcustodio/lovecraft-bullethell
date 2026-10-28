@@ -1206,6 +1206,13 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Visor: `godot --path . -- still 30 sacerdote,profundo_anciano,engendro hurt=0.65`. Opciones `wounds=false|0.7`.
   - Hojas: `shots/revision/2026-10-28/heridas_hoja.png` (30 %, 65 % y 100 % de vida perdida) y `elites_marca.png` (tres acechadores élite con la marca azul y su aura violeta).
   - Test en `test_enemy_wounds`. 484 de 484.
+- **Fase 12, hito 12.8: jefes vivos (28-10-2026), pendiente de tu revisión:**
+  - Padre Dagon, Madre Hydra y Cthulhu (también el recompuesto) respiran (el pecho se ensancha cada 4,5 s), parpadean despacio cada 3,5-7 s y giran la cabeza hacia el jugador en pie más cercano, con retraso y hasta 0,55 rad a cada lado. Encima de cualquier animación (golpes, rugido, preparación).
+  - Una capa común, `Anims.alive` (los tres comparten nombres de piezas), que se activa por datos (`EnemyData.alive = true` en sus fichas) y que `Enemy._alive_step` alimenta con la mirada y el parpadeo. Al parpadear, los ojos (la capa de luz de la cabeza) se tapan con un párpado del color medio de su cabeza (`Anims._lid_for`, uno por malla): ocultarlos dejaba un hueco negro. En Hydra se apagan también las puntas luminosas de la barba, como un pulso.
+  - En red, cada PC lo calcula con las posiciones de los jugadores que ve (también los de otros PC), así que miran a lo mismo.
+  - Coste: nada apreciable (tres asignaciones por jefe y fotograma).
+  - Visor: `godot --path . -- anim 20 dagon alive` (mira a un lado y a otro y parpadea). Hoja en `shots/revision/2026-10-28/jefes_vivos.png` (Dagon, Cthulhu y Hydra mirando a la izquierda, al frente y a la derecha; Dagon y Hydra con los ojos abiertos y cerrados).
+  - Test en `test_boss_alive`. 485 de 485.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

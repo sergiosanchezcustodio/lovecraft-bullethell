@@ -87,6 +87,46 @@ static func jolt(k: float, peak := 0.18) -> float:
 
 ## Nodo de una parte del modelo. Más rápido que get_node(), que convierte el texto en
 ## NodePath en cada llamada (importa con 150 enemigos animados).
+static var _lids := {}                  ## malla de la cabeza -> material del párpado (color medio de su piel)
+
+## Jefes vivos (hito 12.8), encima de cualquier animación: el pecho respira (t en s), la cabeza
+## gira `look` rad hacia quien vigila y los ojos (la capa de luz de la cabeza) se cierran al
+## parpadear: se tapan con un párpado del color medio de la cabeza (ocultarlos dejaba un hueco).
+## Los ojos y su material se buscan una vez y se guardan en el modelo.
+static func alive(m: Node3D, t: float, look: float, blink: bool) -> void:
+	var br := sin(t * TAU / 4.5)
+	part(m, "torso").scale = Vector3(1.0 + 0.014 * br, 1.0 + 0.006 * br, 1.0 + 0.02 * br)
+	var head := part(m, "head")
+	head.rotation.y += look
+	if not m.has_meta("eyes"):
+		var eyes: Array = []
+		var lid: Material = null
+		for mi: MeshInstance3D in m.get_meta("meshes"):
+			if mi.get_parent() != head: continue
+			if int(mi.get_meta("kind", 0)) == 1: eyes.append(mi)
+			elif lid == null and int(mi.get_meta("kind", 0)) == 0: lid = _lid_for(mi.mesh)
+		m.set_meta("eyes", eyes)
+		m.set_meta("eye_lid", lid)
+		m.set_meta("eye_mat", eyes[0].material_override if not eyes.is_empty() else null)
+	var want: Material = m.get_meta("eye_lid") if blink and m.get_meta("eye_lid") != null else m.get_meta("eye_mat")
+	for mi: MeshInstance3D in m.get_meta("eyes"):
+		if mi.material_override != want: mi.material_override = want
+
+static func _lid_for(mesh: Mesh) -> Material:
+	if _lids.has(mesh): return _lids[mesh]
+	var cols: PackedColorArray = mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR]
+	var sum := Color(0, 0, 0)
+	var step := maxi(1, cols.size() / 2000)
+	var n := 0
+	for i in range(0, cols.size(), step):
+		sum += cols[i]
+		n += 1
+	var lid := StandardMaterial3D.new()
+	lid.albedo_color = Color(sum.r / n, sum.g / n, sum.b / n) * 0.8 if n > 0 else Color(0.2, 0.2, 0.2)
+	lid.roughness = 0.6
+	_lids[mesh] = lid
+	return lid
+
 static func part(m: Node3D, name: String) -> Node3D:
 	return m.get_meta("part_nodes")[name]
 

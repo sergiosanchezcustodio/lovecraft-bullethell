@@ -19,6 +19,7 @@ extends Resource
 @export var spawn_weight := 1.0
 @export var tags: Array[StringName] = []   ## p. ej. &"marina", &"humana" (pasivos de personajes)
 @export var death := &""                     ## "crumble": se deshace sin la caída de su familia (hito 12.7)
+@export var alive := false                    ## jefes vivos (hito 12.8): respira, parpadea y sigue con la cabeza al jugador más cercano
 @export var ethereal := false                ## atraviesa el decorado y se ve semitransparente (pesadillas; hito 7.1)
 @export var rise := &""                      ## cómo aparece (hito 11.6): "" según dónde (agua, vuela, etéreo o suelo), ground, water, fog, air o none
 @export var soft := false                    ## cuerpo blando (fragmentos, shoggoths, engendros): se estira y se aplasta el doble (hito 11.7)

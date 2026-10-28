@@ -94,6 +94,8 @@ static var _wound_mat: ShaderMaterial
 static var _elite_glow := {}                ## material de luz -> su copia más brillante
 static var _wounded := {}                   ## material del modelo -> su copia con las grietas (una para todos)
 var _wound_meshes: Array = []
+var _look := 0.0                            ## jefes vivos (hito 12.8): giro de la cabeza hacia el jugador más cercano
+var _blink_at := 3.0                        ## s de _spawn_t en que parpadea
 var _wound_k := -1.0
 var _aura_mat: ShaderMaterial                ## presencia: disco violeta en el suelo (drena cordura)
 var _flash := 0.0
@@ -811,6 +813,7 @@ func _process(delta: float) -> void:
 	if model_scale > 1.5 or (not crowd and (cam == null or cam.is_position_in_frustum(visual.global_position + Vector3(0, 1.0, 0)))):
 		Anims.pose(model_name, anim, model, anim_t)
 		if wu_own and wu != Vector2.ZERO: Anims.windup(model_name, model, wu.x, wu.y, _spawn_t)
+		if data.alive: _alive_step(delta)
 		# la reacción de su familia, encima de la pose (que la deshace en el siguiente fotograma)
 		if _hit_own and _hit_t < _hit_len:
 			Anims.hit(model_name, model, clampf(_hit_t / _hit_len, 0.0, 1.0))
@@ -831,6 +834,23 @@ func _process(delta: float) -> void:
 		for mi: MeshInstance3D in model.get_meta("meshes"):
 			mi.material_overlay = want
 	Prof.stop("enemigos_anim", t0)
+
+## Jefes vivos (hito 12.8): respiran, parpadean despacio cada pocos segundos y la cabeza sigue
+## al jugador más cercano, con retraso (hasta 0,55 rad a cada lado). Cada PC con sus jugadores.
+func _alive_step(delta: float) -> void:
+	var to := Vector3.ZERO
+	var bd := INF
+	for q in world.players:
+		if q.health <= 0.0: continue
+		var d := q.global_position - global_position
+		if d.length_squared() < bd:
+			bd = d.length_squared()
+			to = d
+	var want := 0.0
+	if bd < INF: want = clampf(wrapf(atan2(to.x, to.z) - visual.rotation.y, -PI, PI), -0.55, 0.55)
+	_look = lerpf(_look, want, 1.0 - exp(-delta * 2.5))
+	if _spawn_t > _blink_at + 0.22: _blink_at = _spawn_t + randf_range(3.5, 7.0)
+	Anims.alive(model, _spawn_t, _look, _spawn_t > _blink_at)
 
 ## Élites (hito 12.6): ojos y luces más vivos y grietas que crecen con la vida perdida (también
 ## en los únicos y los grandes). Las grietas, una segunda pasada (wounds.gdshader) en una copia

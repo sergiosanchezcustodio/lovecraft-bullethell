@@ -10,6 +10,7 @@
 script = ExtResource("1")
 id = &"dagon"
 display_name = "Padre Dagon"
+alive = true
 model = "dagon"
 model_scale = 1.25
 unique = true

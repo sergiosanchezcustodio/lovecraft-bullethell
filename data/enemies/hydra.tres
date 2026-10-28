@@ -9,6 +9,7 @@
 script = ExtResource("1")
 id = &"hydra"
 display_name = "Madre Hydra"
+alive = true
 model = "hydra"
 model_scale = 3.0
 unique = true
