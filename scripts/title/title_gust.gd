@@ -56,6 +56,7 @@ func _process(delta: float) -> void:
 			_g = -1.0
 			strength = 0.0
 			_next = _t + _rng.randf_range(gap_min, gap_max)
+	visible = pages                              # sin el papel, el rectángulo ni se dibuja
 	var m := material as ShaderMaterial
 	m.set_shader_parameter("lift", LIFT * strength if pages else 0.0)
 	m.set_shader_parameter("time", _t)

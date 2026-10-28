@@ -56,7 +56,7 @@ extends Resource
 
 @export_group("Ráfaga de aire")
 @export var gust_enabled := true              ## tumba y hace temblar todas las velas a la vez
-@export var gust_pages := true                ## y levanta el borde del pergamino
+@export var gust_pages := false               ## y levanta el borde del pergamino (quitado el 28-10-2026: no gustaba)
 @export var gust_first := 14.0
 @export var gust_gap_min := 25.0
 @export var gust_gap_max := 50.0
