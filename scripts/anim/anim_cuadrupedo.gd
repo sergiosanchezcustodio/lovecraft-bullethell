@@ -90,3 +90,42 @@ static func fidget_shake(m: Node3D, t: float) -> void:
 	_p(m, "head").rotation = Vector3(0.0, 0.0, -0.4 * s)
 	_p(m, "tail").rotation = Vector3(0.0, 0.0, 0.6 * s)
 	m.position.y = 0.01 * absf(s)
+
+# ---- reacciones (hito 12.9), encima de la pose; k de 0 a 1 para fundirlas ----
+
+## Se esconde detrás de su jugador con un jefe cerca: agachado, la cabeza gacha y el rabo metido.
+static func cower(m: Node3D, k: float, _t: float) -> void:
+	_p(m, "body").position.y -= 0.04 * k
+	_p(m, "body").rotation.x += -0.08 * k
+	_p(m, "head").rotation.x += 0.35 * k
+	_p(m, "tail").rotation.x += 0.7 * k
+	for l in ["leg_fl", "leg_fr", "leg_bl", "leg_br"]: _p(m, l).rotation.x *= 1.0 - 0.5 * k
+
+## Celebra la subida de nivel (t de 0 a 1): dos saltos con las patas delanteras arriba y el rabo
+## a toda velocidad.
+static func cheer(m: Node3D, k: float, t: float) -> void:
+	var hop := absf(sin(t * TAU))
+	m.position.y += 0.16 * hop * k
+	_p(m, "body").rotation.x += -0.25 * hop * k
+	_p(m, "head").rotation.x += -0.3 * k
+	_p(m, "leg_fl").rotation.x += -0.7 * hop * k
+	_p(m, "leg_fr").rotation.x += -0.7 * hop * k
+	_p(m, "tail").rotation.z += sin(t * 60.0) * 0.6 * k
+
+## Gime junto a su jugador caído: tumbado, el morro entre las patas y temblando.
+static func whine(m: Node3D, k: float, t: float) -> void:
+	_p(m, "body").position.y -= 0.07 * k
+	_p(m, "leg_fl").rotation.x = lerpf(_p(m, "leg_fl").rotation.x, -1.3, k)
+	_p(m, "leg_fr").rotation.x = lerpf(_p(m, "leg_fr").rotation.x, -1.3, k)
+	_p(m, "leg_bl").rotation.x = lerpf(_p(m, "leg_bl").rotation.x, 1.2, k)
+	_p(m, "leg_br").rotation.x = lerpf(_p(m, "leg_br").rotation.x, 1.2, k)
+	_p(m, "head").rotation.x += (0.3 + sin(t * 31.0) * 0.03) * k
+	_p(m, "tail").rotation.z *= 1.0 - k
+
+## Bufa (el gato al perro): arqueado, la cabeza adelante y el rabo tieso hacia arriba.
+static func hiss(m: Node3D, k: float, t: float) -> void:
+	_p(m, "body").position.y += 0.03 * k
+	_p(m, "body").rotation.x += 0.1 * k
+	_p(m, "head").rotation.x += -0.15 * k
+	_p(m, "head").position.z += (0.02 + 0.01 * sin(t * 40.0)) * k
+	_p(m, "tail").rotation.x += -0.9 * k

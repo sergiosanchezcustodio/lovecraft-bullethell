@@ -55,3 +55,29 @@ static func fidget_roll(m: Node3D, t: float) -> void:
 	var c := (Anims.rest(m, "body").y + Anims.rest(m, "head").y) * 0.5      # gira sobre su centro
 	m.rotation.z = wrapf(a, -PI, PI)         # acaba en 0, no en 2π: el fundido al reposo no deshace la vuelta
 	m.position += Vector3(c * sin(a), c * (1.0 - cos(a)) + 0.12 * sin(t * PI), 0.0)
+
+# ---- reacciones (hito 12.9), encima de la pose; k de 0 a 1 para fundirlas ----
+
+## Con un jefe cerca vuela bajo, pegado a su jugador, con las alas más recogidas.
+static func cower(m: Node3D, k: float, _t: float) -> void:
+	_p(m, "wing_l").rotation.z *= 1.0 - 0.4 * k
+	_p(m, "wing_r").rotation.z *= 1.0 - 0.4 * k
+	_p(m, "head").rotation.x += 0.3 * k
+
+## Celebra la subida de nivel: una voltereta en el aire aleteando fuerte.
+static func cheer(m: Node3D, k: float, t: float) -> void:
+	if k > 0.5: fidget_roll(m, t)
+
+## En el suelo junto a su jugador caído: las alas plegadas, la cabeza gacha y temblando.
+static func whine(m: Node3D, k: float, t: float) -> void:
+	perch(m, k, t)
+	_p(m, "head").rotation.x += (0.35 + sin(t * 31.0) * 0.04) * k
+
+## Posado (en el hombro de su jugador o en el suelo): las alas plegadas, mirando alrededor a tirones.
+static func perch(m: Node3D, k: float, t: float) -> void:
+	_p(m, "wing_l").rotation.z = lerpf(_p(m, "wing_l").rotation.z, -0.08, k)
+	_p(m, "wing_r").rotation.z = lerpf(_p(m, "wing_r").rotation.z, 0.08, k)
+	m.position.y *= 1.0 - k
+	m.rotation.x *= 1.0 - k
+	var look := floorf(t * 0.7)
+	_p(m, "head").rotation.y = lerpf(_p(m, "head").rotation.y, (fposmod(look * 0.618, 1.0) * 2.0 - 1.0) * 0.8, k)

@@ -1236,6 +1236,13 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - En red, cada PC ensucia a todos los jugadores con lo que andan. Coste: cuatro jugadores dibujados dos veces, nada apreciable.
   - Opción `dirt=false|0.8` (sin mancha, o fija a ese nivel). Hoja `shots/revision/2026-10-28/ropa_sucia.png` (Legrasse con `dirt=0.9` en las tres partes).
   - Tests en `test_player_dirt`. 489 de 489.
+- **Fase 12, hito 12.9: compañeros que reaccionan (28-10-2026), pendiente de tu revisión:**
+  - Con un jefe a menos de 11 m, se pone al otro lado de su jugador, agachado con el rabo metido (los voladores, bajos y con las alas recogidas). Al subir de nivel su jugador, celebra: el perro y los cuadrúpedos dan saltos con las patas delanteras arriba y el rabo a toda velocidad; los voladores, una voltereta en el aire; los demás, saltitos. Si su jugador cae, se tumba a su lado con el morro entre las patas, temblando (los voladores, en el suelo con las alas plegadas). No hay sonidos de compañeros, así que gemir es solo visual.
+  - En cooperativo, con su jugador quieto, va a olfatear a otro compañero que esté a menos de 4,5 m (se ponen morro con morro); el gato al perro le bufa a distancia, arqueado, erizado y con el rabo tieso. El cuervo, con su jugador quieto 2 s, vuela a su hombro derecho, se posa con las alas plegadas mirando alrededor (algo más pequeño y sin su anillo) y se va cuando echa a andar.
+  - Nada interrumpe lo que hace su comportamiento: si tiene un objetivo (morder, picar, embestir), lo hace (con el jefe cerca, el perro también va a morderle).
+  - `Pet._react` (elige la reacción y adónde ir), `_react_pose` (la funde encima de la pose: `cower`, `cheer`, `whine`, `hiss` en `anim_cuadrupedo`; `cower`, `cheer`, `whine`, `perch` en `anim_volador`; las demás familias, genéricas) y `_perch_step` (el hombro: la pieza `arm_r` del jugador, sin pivote nuevo). Cada PC lo calcula con lo que ve.
+  - Opción `pets=gato,perro` (un compañero por jugador, en orden, con `bots=N`). Hoja en `shots/revision/2026-10-28/companeros_reaccionan.png` (gato y perro, cuervo, dos perros olfateándose, cuervo en el hombro, perro escondido de Madre Hydra y celebración).
+  - Tests en `test_pet_reactions`. 491 de 491.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

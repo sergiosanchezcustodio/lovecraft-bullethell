@@ -38,6 +38,24 @@ var _anim_t := 0.0
 var _act_t := -1.0
 var _bristle_k := 0.0
 
+## Reacciones (hito 12.9): se esconde detrás de su jugador con un jefe cerca, celebra su subida de
+## nivel, gime tumbado junto a él si cae, se olfatea con otros compañeros (el gato le bufa al perro)
+## y el cuervo se posa en su hombro cuando está quieto. Las calcula cada PC con lo que ve.
+const BOSS_NEAR := 11.0
+const BUDDY_NEAR := 4.5                     ## m a los que va a olfatear a otro compañero (con su jugador quieto)
+const PERCH_AFTER := 2.0                     ## s quieto su jugador hasta que el cuervo se posa
+const CHEER_TIME := 1.0
+const MOOD_POSE := {&"hide": "cower", &"mourn": "whine", &"hiss": "hiss", &"perch": "perch"}
+var mood := &""                              ## hide, mourn, sniff, hiss, perch o nada
+var _shown := &""                            ## la reacción que se ve (funde al cambiar)
+var _mood_k := 0.0
+var _cheer_t := -1.0
+var _buddy: Pet = null
+var _owner_still := 0.0
+var _boss_t := 0.0
+var _boss: Node3D = null
+var _perch_k := 0.0
+var _ring_mi: MeshInstance3D
 const LEASH := 8.0                           ## más lejos del jugador que esto, deja lo que hace
 
 func setup(p_data: PetData, p_owner: Player, p_world: CombatWorld, p_game: Node = null) -> Pet:
@@ -59,9 +77,13 @@ func _ready() -> void:
 	if data.model != "":
 		_model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
 		_visual.add_child(_model)
-	_visual.add_child(_ring())
+	_ring_mi = _ring()
+	_visual.add_child(_ring_mi)
 	behavior.start()
-	owner_player.progress.leveled_up.connect(func(_l: int) -> void: behavior.leveled())
+	owner_player.progress.leveled_up.connect(func(_l: int) -> void:
+		behavior.leveled()
+		_cheer_t = 0.0)
+	add_to_group("pets")
 	reset_physics_interpolation.call_deferred()
 
 ## Anillo fino del color de su jugador, en el suelo: se ve a quién acompaña y dónde está.
@@ -141,6 +163,7 @@ func _physics_process(delta: float) -> void:
 	var far := clampf((global_position.distance_to(home) - 2.0) / 3.0, 0.0, 1.0)
 	speed = owner_player.data.move_speed * (1.1 + 0.9 * far) * owner_player.data.pet_mult   # Silbato de Lake
 	behavior.step(delta)
+	_react(delta)
 	var to := goal - global_position
 	to.y = 0.0
 	var stop := 0.5 if target != null else 0.35
@@ -158,11 +181,88 @@ func _physics_process(delta: float) -> void:
 	if world != null and world.obstacles != null and data.fly_height <= 0.0:   # los que vuelan pasan por encima
 		var p2 := world.obstacles.push_out(Vector2(position.x, position.z), 0.3)
 		position.x = p2.x; position.z = p2.y
-	if _velocity.length() > 0.2: facing = facing.slerp(_velocity.normalized(), 1.0 - exp(-12.0 * delta)).normalized()
+	if (mood == &"sniff" or mood == &"hiss") and is_instance_valid(_buddy) and _velocity.length() < 0.4:
+		var b := _buddy.global_position - global_position
+		b.y = 0.0
+		if b.length() > 0.01: facing = facing.slerp(b.normalized(), 1.0 - exp(-8.0 * delta)).normalized()
+	elif _velocity.length() > 0.2: facing = facing.slerp(_velocity.normalized(), 1.0 - exp(-12.0 * delta)).normalized()
 	elif target != null and is_instance_valid(target):
 		var f := target.global_position - global_position
 		f.y = 0.0
 		if f.length() > 0.01: facing = f.normalized()
+
+## Elige la reacción de este paso y, si hace falta, adónde ir. No interrumpe lo que hace su
+## comportamiento (atacar, embestir, esconderse bajo tierra).
+func _react(delta: float) -> void:
+	mood = &""
+	_owner_still = _owner_still + delta if owner_player.motor.velocity.length() < 0.3 else 0.0
+	_boss_t -= delta
+	if _boss_t <= 0.0:
+		_boss_t = 0.25
+		_boss = _boss_near(owner_player.global_position)
+	if target != null or rush or hidden: return
+	var home := owner_player.global_position
+	if owner_player.health <= 0.0:
+		mood = &"mourn"
+		goal = home + facing_of_owner().cross(Vector3.UP) * 0.7
+		return
+	if is_instance_valid(_boss):
+		mood = &"hide"
+		var away := home - _boss.global_position
+		away.y = 0.0
+		goal = home + away.normalized() * 0.9
+		speed = maxf(speed, owner_player.data.move_speed * 1.6)
+		return
+	if data.model == "cuervo" and _owner_still > PERCH_AFTER:
+		mood = &"perch"
+		goal = home
+		return
+	_buddy = _buddy_near() if _owner_still > 1.0 else null
+	if _buddy != null:                           # se acerca a olfatearlo (o a bufarle, a distancia)
+		mood = &"hiss" if data.model == "gato" and _buddy.data.model == "perro" else &"sniff"
+		var gap := 1.4 if mood == &"hiss" else 0.7
+		var off := global_position - _buddy.global_position
+		off.y = 0.0
+		goal = _buddy.global_position + off.normalized() * gap if off.length() > 0.01 else global_position
+		speed = minf(speed, owner_player.data.move_speed * 0.6)
+
+func _boss_near(home: Vector3) -> Node3D:
+	if world == null: return null
+	for e in world.enemies:
+		if is_instance_valid(e) and e.data.unique and e.is_alive() and e.global_position.distance_to(home) < BOSS_NEAR: return e
+	return null
+
+func _buddy_near() -> Pet:
+	for p in get_tree().get_nodes_in_group("pets"):
+		if p != self and not (p as Pet).hidden and (p as Pet).global_position.distance_to(global_position) < BUDDY_NEAR: return p
+	return null
+
+## Las reacciones encima de la pose: la de su familia si la tiene (cower, whine, hiss, perch,
+## cheer en su script de animación) o una genérica (agacharse, saltar).
+func _react_pose(delta: float) -> float:
+	var t := Time.get_ticks_msec() * 0.001
+	if mood != _shown:
+		_mood_k = move_toward(_mood_k, 0.0, delta * 4.0)
+		if _mood_k <= 0.0: _shown = mood
+	elif mood != &"":
+		_mood_k = move_toward(_mood_k, 1.0, delta * 4.0)
+	var s := Anims.script_for(data.model)
+	var k := Anims.ease(_mood_k)
+	var fly_k := 1.0
+	if _shown != &"" and k > 0.0 and MOOD_POSE.has(_shown):
+		var fn: String = MOOD_POSE[_shown]
+		if s != null and s.has_method(fn): s.call(fn, _model, k, t)
+		elif _shown == &"hide" or _shown == &"mourn": _model.scale.y *= 1.0 - 0.18 * k
+		if _shown == &"hide": fly_k = 1.0 - 0.55 * k             # los que vuelan, bajos y pegados a él
+		elif _shown == &"mourn": fly_k = 1.0 - k                  # en el suelo, a su lado
+	if _cheer_t >= 0.0:
+		_cheer_t += delta
+		var c := clampf(_cheer_t / CHEER_TIME, 0.0, 1.0)
+		var ck := minf(1.0, minf(c, 1.0 - c) * 8.0)
+		if s != null and s.has_method("cheer"): s.call("cheer", _model, ck, c)
+		else: _model.position.y += 0.15 * absf(sin(c * TAU)) * ck
+		if _cheer_t >= CHEER_TIME: _cheer_t = -1.0
+	return fly_k
 
 ## Gestos de reposo: tras unos segundos quieto, olfatea, se lame una pata, se acicala…
 ## (Anims.fidgets), sin repetir el anterior. Moverse o atacar lo corta.
@@ -209,6 +309,7 @@ func _process(delta: float) -> void:
 	elif v > owner_player.data.move_speed * 1.2: anim = "run"
 	elif v > 0.3: anim = "walk"
 	anim = _fidget_step(anim, delta)
+	if mood == &"sniff" and anim == "idle" and Anims.has_anim(data.model, "fidget_sniff"): anim = "fidget_sniff"
 	if anim != _anim:
 		_blend_snap = Anims.snapshot(_model)               # funde desde la pose de ahora
 		_blend_t = 0.0
@@ -217,11 +318,32 @@ func _process(delta: float) -> void:
 		_anim_t = 0.0
 	var dur := Anims.duration(data.model, anim)
 	if anim == "bite": _anim_t = clampf(_act_t / dur, 0.0, 1.0)
-	elif anim == _fidget: _anim_t = clampf(_fidget_t / dur, 0.0, 1.0)
+	elif anim == _fidget and _fidget != "": _anim_t = clampf(_fidget_t / dur, 0.0, 1.0)
 	else: _anim_t = fposmod(_anim_t + delta / dur * (clampf(v / 2.5, 0.6, 1.6) if anim != "idle" else 1.0), 1.0)
 	Anims.pose(data.model, anim, _model, _anim_t)
 	if _blend_t < _blend_len:
 		_blend_t += delta
 		Anims.blend_from(_model, _blend_snap, Anims.ease(_blend_t / _blend_len))
-	_model.position.y += fly                    # la animación pone la raíz; el vuelo y el erizado van encima
-	_model.scale *= 1.0 + 0.15 * _bristle_k
+	var fly_k := _react_pose(delta)
+	_model.position.y += fly * fly_k            # la animación pone la raíz; el vuelo y el erizado van encima
+	_model.scale *= 1.0 + 0.15 * maxf(_bristle_k, 0.5 * Anims.ease(_mood_k) if _shown == &"hiss" else 0.0)
+	_perch_step(delta, p + Vector3(0, fly * fly_k, 0))
+
+## El cuervo en el hombro derecho de su jugador: vuela hasta él, se posa mirando hacia donde
+## mira el jugador y se va al echar a andar.
+func _perch_step(delta: float, free_pos: Vector3) -> void:
+	_perch_k = move_toward(_perch_k, 1.0 if mood == &"perch" else 0.0, delta * 2.0)
+	if _ring_mi: _ring_mi.visible = _perch_k < 0.5
+	if _perch_k <= 0.0 or owner_player.model == null: return
+	var parts: Dictionary = owner_player.model.get_meta("part_nodes")
+	if not parts.has("arm_r"): return
+	var shoulder := (parts["arm_r"] as Node3D).global_position
+	var out := shoulder - (parts["torso"] as Node3D).global_position     # hacia fuera, lejos de la cabeza
+	out.y = 0.0
+	shoulder += out.normalized() * 0.07 + Vector3(0.0, 0.07, 0.0)
+	var k := Anims.ease(_perch_k)
+	var arc := sin(k * PI) * 0.35                    # llega en un pequeño arco
+	_visual.global_position = free_pos.lerp(shoulder, k) + Vector3(0.0, arc, 0.0)
+	_visual.rotation.y = lerp_angle(_visual.rotation.y, owner_player.visual.rotation.y, k)
+	_model.position.y -= data.fly_height * lift * k   # la altura de vuelo ya va en la posición
+	_model.scale *= lerpf(1.0, 0.7, k)               # en el hombro, algo más pequeño (tapaba la cabeza)

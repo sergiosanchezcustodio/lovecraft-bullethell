@@ -48,6 +48,7 @@ extends Node3D
 ##   bot_chars=olmstead,…    personajes de esos bots (por defecto, los de inicio y los demás)
 ##   chest_every=5           un baúl arcano cada tantos segundos (por defecto, el del nivel)
 ##   pet=perro|gato          compañero del J1
+##   pets=gato,perro         un compañero por jugador, en orden (con bots=N; reacciones, hito 12.9)
 ##   panel=sheet|map         abre la ficha o el mapa (panel_player=N, panel_page=N, panel_at=s)
 
 const PLAYER_COLORS: Array[Color] = [Color(1.0, 0.82, 0.3), Color(0.35, 0.75, 1.0), Color(0.55, 1.0, 0.45), Color(1.0, 0.45, 0.8)]
@@ -211,6 +212,9 @@ func _ready() -> void:
 			player = q
 			break
 	if args.has("pet"): _spawn_pet(args.get_str("pet"), player)   # probar un compañero
+	if args.has("pets"):                            # pets=gato,perro: uno por jugador, en orden (hito 12.9)
+		var ids := args.get_str("pets").split(",")
+		for i in mini(ids.size(), players.size()): _spawn_pet(ids[i], players[i])
 	var bonus := Shop.bonuses(Saves.current)          # lo comprado en la tienda (D-31)
 	if args.has("shop"):                              # pruebas: N niveles en cada potenciador, sin tocar la partida
 		var n := args.get_int("shop")
