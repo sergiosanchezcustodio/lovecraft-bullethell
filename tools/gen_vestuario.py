@@ -179,7 +179,7 @@ def hair_of(c):
     de las orejas y en la mitad de atrás (delante, las cejas, de un solo tono, ganaban al pelo
     con textura), que no sea la piel de la cara."""
     with open('models/%s.json' % c) as f:
-        vox = json.load(f)['voxels']
+        vox = [v for v in json.load(f)['voxels'] if not (len(v) > 8 and v[8] & 64)]   # sin lo tapado por otra parte
     skin, zs = None, -999                  # la piel: el voxel de delante entre las cejas (el último
     for v in vox:                          # de la columna podía ser la melena de la espalda)
         if v[3] == 'head' and v[0] == -1 and v[1] == 76 and v[2] > zs: skin, zs = tuple(v[4:7]), v[2]
@@ -304,7 +304,7 @@ def face_of(c):
     """Dónde tiene los ojos el personaje: la fila de abajo de sus blancos (las caras dibujadas a
     mano del 23-10-2026 no los tienen todas a la misma altura), y los voxels de su cabeza."""
     with open('models/%s.json' % c) as f:
-        vox = [v for v in json.load(f)['voxels'] if v[3] == 'head']
+        vox = [v for v in json.load(f)['voxels'] if v[3] == 'head' and not (len(v) > 8 and v[8] & 64)]
     whites = [v[1] for v in vox if v[2] >= 3 and sum(abs(a - b) for a, b in zip(v[4:7], cu.EYE_W)) < 0.05]
     return (min(whites) if whites else 73), {(v[0], v[1], v[2]) for v in vox}
 
@@ -483,14 +483,19 @@ GARMENTS = {'bombin': bombin, 'casco_minero': casco_minero, 'gorro_nieve': gorro
 def build(name, c):
     bd = body_of(c)
     M = cu.new(9100 + CHARS.index(c))
+    M.keep_under = True                      # manga y tronco se solapan: los dos enteros (28-10-2026)
     fn = GARMENTS[name]
     if fn is cinta_pelo: mats = fn(M, bd, hair_of(c))
     elif fn in (gafas_ver, gafas_nieve): mats = fn(M, bd, face_of(c))
     else: mats = fn(M, bd)
     materiales.texturize(M, mats)
+    under = cu.new(9100 + CHARS.index(c))   # lo que tapó otra parte, con la misma textura
+    under.V = {k: list(v) for k, v in M.under_kept().items()}
+    materiales.texturize(under, mats)
     piv, parents = cu.pivots(bd['finish_b'], bd['finish_ax'])
     out = 'models/vest_%s_%s.json' % (name, c)
-    return M.export(out, piv, jitter=0.0, pivots_in_voxels=True, roughness=0.9, specular=0.25, parents=parents)
+    return M.export(out, piv, jitter=0.0, pivots_in_voxels=True, roughness=0.9, specular=0.25, parents=parents,
+                    extra=under.V)
 
 
 if __name__ == '__main__':

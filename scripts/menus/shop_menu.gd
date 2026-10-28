@@ -129,6 +129,9 @@ func _row(e: Shop.Entry) -> Button:
 	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	d.custom_minimum_size.x = 500
 	col.add_child(d)
+	# con tres líneas de descripción no cabe en 92 px: la fila crece con lo que lleva
+	d.resized.connect(func() -> void:
+		b.custom_minimum_size.y = maxf(92.0, col.get_combined_minimum_size().y + 28.0))
 	var tag := ""
 	var color := UiKit.GOLD
 	if maxed:

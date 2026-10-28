@@ -1133,6 +1133,14 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **Mejoras pequeñas:** `python tools/marcas.py` sin ficheros enseña solo la última sesión (y junta los registros que se solapan con ella en el tiempo, como dos ventanas en un PC; `--todos` para todos). Cada PC guarda también una captura cuando marca otro (`<registro>_marca_N_de_<nombre>.png`, lo que se veía allí en ese momento) y `marcas.py` las enseña. Botón «Ver la captura de la última marca» en *Jugar online* (`NetLog.latest_shot`). Probado con anfitrión e invitado en este PC: cuatro capturas (dos por marca) y los dos registros juntos.
   - Tests: 462 de 462.
 
+- **Costados de las chaquetas al andar y filas de la tienda (28-10-2026), pendientes de tu revisión** (pedido por el autor con una captura de Peaslee con el abrigo de nieve):
+  - **El fallo:** el brazo y el tronco se solapan unos voxels a la altura del hombro y el costado. `voxlib.Model` guarda un voxel por sitio, así que la manga, que se pone después, borraba esas columnas del tronco. Con el brazo quieto no se notaba (la manga las tapaba), pero al balancearlo quedaba una franja sin tela en el costado, con la camisa de debajo a la vista. Pasaba en todas las prendas con manga del vestuario (abrigos, chaquetas, bata, chubasquero, vestido) y, en menos medida, en los propios personajes (de 30 a 120 voxels por brazo).
+  - **El arreglo:** `Model.keep_under` guarda lo que pisa otra parte (`under`) y `export` lo saca también, marcado con el bit 64 del noveno valor. `VoxelBuilder` hunde 0,03 voxels las caras de esos voxels, para que donde coinciden con las de la otra parte se vea la otra, sin parpadeo. No se guardan las piernas que tapa una falda, una sotana o un abrigo largo (`under_kept`): asomarían por delante de la tela al andar. Lo activan los humanos (`cuerpo.new`, con la misma textura y luz en `finish`) y el vestuario (`gen_vestuario.build`). `BUILDER_VERSION` 8.
+  - Regenerados los 13 personajes y las 26 prendas; las caras de `data/faces.json` no cambian (`gen_caras_juego.py`, `hair_of` y `face_of` no cuentan lo tapado). Comprobado con el andar de cerca por los dos lados en Peaslee con el abrigo de nieve, Dyer con la chaqueta de aviador, Johansen, Legrasse, Malone y Varga.
+  - **Tienda:** las filas crecen si la descripción ocupa tres líneas (`ShopMenu._row`); las de una o dos siguen con 92 px.
+  - Las ideas pendientes del final de este diario están hechas, salvo el bigote de Elwood (cuestión de gusto: decídelo tú). Lo que queda del plan es tuyo: las partidas de prueba, la prueba online por internet, la OAuth App de la nube y subir a itch.io.
+  - Tests: 462 de 462.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

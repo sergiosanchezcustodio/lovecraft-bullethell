@@ -33,6 +33,7 @@ EYE = (0.08, 0.06, 0.05); EYE_W = (0.93, 0.91, 0.87)
 
 def new(seed):
     M = Model(S=3, seed=seed)                     # voxel_size = 1/48 m
+    M.keep_under = True                           # lo que pisa otra parte también sale (el costado bajo el brazo)
     # medidas del cuerpo, para que las prendas del vestuario (gen_vestuario.py) le encajen
     M.body = {'b': 0, 'fem': False, 'ax': ARM_X, 'slim': False, 'head_w': 15.0, 'head_d': 15.0}
     return M
@@ -497,21 +498,26 @@ def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, t
     de la cabeza pasan a la parte `hat`, que se oculta al ponerse una prenda de cabeza.
     roughness/specular: mate por defecto (ropa); las criaturas de piel húmeda, ~0,45 / 0,5."""
     hat = set(hat)
-    for v in M.V.values():
-        if v[0] == H and v[1] in hat: v[0] = 'hat'
-    materiales.texturize(M, mats)
     flat = set(flat) | {EYE, EYE_W}
-    for k, v in M.V.items():
-        x, y, z = k
-        if v[1] in flat: continue
-        shade = 0.9 + 0.12 * y / top
-        shade *= 0.95 if z < -4 else 1.0
-        v[1] = tuple(max(0.0, min(1.0, c * shade)) for c in v[1])
+    main = M.V
+    under = {k: list(v) for k, v in M.under_kept().items()} if M.keep_under else {}
+    for V in (main, under):                           # lo pisado por otra parte, con la misma textura y luz
+        M.V = V
+        for v in M.V.values():
+            if v[0] == H and v[1] in hat: v[0] = 'hat'
+        materiales.texturize(M, mats)
+        for k, v in M.V.items():
+            x, y, z = k
+            if v[1] in flat: continue
+            shade = 0.9 + 0.12 * y / top
+            shade *= 0.95 if z < -4 else 1.0
+            v[1] = tuple(max(0.0, min(1.0, c * shade)) for c in v[1])
+    M.V = main
     piv, parents = pivots(b, ax)
     if extra_pivots: piv.update(extra_pivots)
     if extra_parents: parents.update(extra_parents)
     n = M.export('models/%s.json' % name, piv, jitter=0.0, pivots_in_voxels=True, roughness=roughness, specular=specular,
-                 parents=parents)
+                 parents=parents, extra=under)
     body = dict(getattr(M, 'body', {}), finish_b=b, finish_ax=ax)
     with open('models/%s.json' % name) as f: data = json.load(f)
     data['body'] = body                               # medidas para el vestuario

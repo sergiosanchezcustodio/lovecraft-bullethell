@@ -18,7 +18,8 @@ const FACES := [
 static var _cache := {}
 ## Caché en disco de las mallas construidas (ver VoxelMeshCache). Sube BUILDER_VERSION
 ## cuando cambie la forma de construir las mallas, para invalidar lo guardado.
-const BUILDER_VERSION := 7
+const BUILDER_VERSION := 8
+const UNDER_SINK := 0.03                         ## voxels que se hunden las caras de lo tapado por otra parte (bit 64)
 const DISK_CACHE_DIR := "user://voxcache"
 static var use_disk_cache := true
 static var _mats := {}   # "rugosidad/especular" -> material compartido
@@ -329,6 +330,9 @@ static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vecto
 		var p: Vector3i = item[0]
 		var col: Color = item[1]
 		var inner: int = item[2]
+		# bit 64: voxel tapado por el de otra parte en el mismo sitio (el costado bajo el brazo):
+		# sus caras se hunden un poco para que, donde coinciden, se vea la otra (voxlib.under_kept)
+		var sink := Vector3.ZERO
 		if ids: st.set_uv(Vector2(float(comp[p]), 0.0))       # ventana a la que pertenece (window_glow.gdshader)
 		for fi in FACES.size():
 			var f: Array = FACES[fi]
@@ -340,6 +344,7 @@ static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vecto
 			if no_bottom and n.y < 0: continue
 			if inner & (1 << fi): continue                        # da al hueco cerrado de su parte
 			var corners: Array = f[1]
+			sink = Vector3(n) * UNDER_SINK if inner & 64 else Vector3.ZERO
 			var shades := []
 			for c in corners:
 				shades.append(_ao(p, n, c, all))
@@ -349,7 +354,7 @@ static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vecto
 			for i in idx:
 				st.set_normal(Vector3(n))
 				st.set_color(col * shades[i])
-				st.add_vertex((Vector3(p) + corners[i] - pivot) * vs)
+				st.add_vertex((Vector3(p) + corners[i] - sink - pivot) * vs)
 	return st.commit()
 
 ## Ventanas (voxels con glow 2): cada grupo de voxels a menos de 2 de otro (salta el parteluz y

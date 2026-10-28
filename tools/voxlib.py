@@ -21,15 +21,30 @@ class Model:
         self.V = {}                     # (x,y,z) voxel -> [parte, color, glow]
         self.rng = random.Random(seed)
         self._h = {}
+        # keep_under: al pisar un voxel de otra parte, se guarda en `under` y export lo saca también
+        # (ver under_kept). El brazo y el tronco se solapan: al mover el brazo, el costado tiene que
+        # seguir entero (28-10-2026). Lo activan los humanos (cuerpo.new) y el vestuario.
+        self.keep_under = False
+        self.under = {}
 
     # ---------- voxels sueltos (coordenadas voxel) ----------
     def put(self, x, y, z, part, col, glow=0, over=True):
         k = (int(math.floor(x)), int(math.floor(y)), int(math.floor(z)))
         if over or k not in self.V:
+            if self.keep_under and k in self.V and self.V[k][0] != part:
+                self.under[k] = self.V[k]
             self.V[k] = [part, col, glow]
 
     def has(self, k):
         return k in self.V
+
+    LEGS = ('leg_l', 'leg_r', 'shin_l', 'shin_r')
+
+    def under_kept(self):
+        """Lo pisado que se conserva: todo menos las piernas que tapa una falda, una sotana o un
+        abrigo largo (parte torso), que al andar asomarían por delante de la tela."""
+        return {k: v for k, v in self.under.items()
+                if k in self.V and not (v[0] in self.LEGS and self.V[k][0] == 'torso')}
 
     # ---------- volúmenes (coordenadas en ub) ----------
     def ell(self, cx, cy, cz, rx, ry, rz, part, col, over=True, glow=0):
@@ -154,14 +169,21 @@ class Model:
 
     # ---------- salida ----------
     def export(self, path, pivots, jitter=0.018, default_col=(0.5, 0.5, 0.5), pivots_in_voxels=False,
-               roughness=None, specular=None, parents=None, no_bottom=False, skip=None, inner=True):
+               roughness=None, specular=None, parents=None, no_bottom=False, skip=None, inner=True,
+               extra=None):
         """roughness/specular: material del modelo. Sin indicarlos, piel húmeda (0,38 / 0,6);
         para ropa, plumas, madera o piedra conviene una superficie mate (~0,9 / 0,25).
         skip: voxel -> caras que VoxelBuilder no construye (bits +x, -x, +y, -y, +z, -z), las
         que dan al hueco cerrado de su parte (ver inner_faces); van como noveno valor. Sin skip,
-        se calculan solas (27-10-2026); inner=False las deja todas."""
+        se calculan solas (27-10-2026); inner=False las deja todas.
+        extra: {voxel: [parte, color, glow]} que comparten sitio con otro de otra parte (`under`);
+        van marcados (bit 64 del noveno valor) y VoxelBuilder hunde un poco sus caras: donde
+        coinciden con las de la otra parte, se ve la otra. Sin extra, con keep_under, los de
+        under_kept() tal cual."""
         if skip is None and inner:
             skip = inner_faces(self, {v[0] for v in self.V.values()})
+        if extra is None and self.keep_under:
+            extra = self.under_kept()
         out = []
         for (x, y, z), (p, c, g) in self.V.items():
             if isinstance(c, str):
@@ -169,6 +191,10 @@ class Model:
             j = self.rng.uniform(-jitter, jitter) if jitter else 0.0
             out.append([x, y, z, p] + [round(max(0.0, min(1.0, q + j)), 3) for q in c] + [g])
             if skip and skip.get((x, y, z)): out[-1].append(skip[(x, y, z)])
+        for (x, y, z), (p, c, g) in (extra or {}).items():
+            if isinstance(c, str):
+                c = default_col
+            out.append([x, y, z, p] + [round(max(0.0, min(1.0, q)), 3) for q in c] + [g, 64])
         S = self.S
         k_piv = 1 if pivots_in_voxels else S
         data = {"voxel_size": 1.0 / (16 * S),

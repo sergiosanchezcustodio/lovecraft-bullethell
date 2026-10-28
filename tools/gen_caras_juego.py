@@ -18,7 +18,7 @@ def _reddish(c):
 
 
 def face(path):
-    vox = [v for v in json.load(open(path))['voxels'] if v[3] == 'head']
+    vox = [v for v in json.load(open(path))['voxels'] if v[3] == 'head' and not (len(v) > 8 and v[8] & 64)]   # sin lo tapado
     front = {}
     for v in vox:
         k = (v[0], v[1])
