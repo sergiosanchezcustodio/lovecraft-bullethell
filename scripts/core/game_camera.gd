@@ -81,7 +81,50 @@ func center() -> Vector3:
 	return c / targets.size()
 
 func desired_position() -> Vector3:
-	return center() + Vector3(0, 0.8, 0) + transform.basis.z * distance
+	return _framed_center() + Vector3(0, 0.8, 0) + transform.basis.z * distance
+
+# ---------------------------------------------------------------- encuadre de un jefe
+
+var _focus: Node3D = null
+var _focus_left := 0.0                     ## s reales que le quedan
+var _focus_w := 0.0                        ## 0: encuadre normal; 1: jugadores y jefe a la vez
+var _focus_h := 2.0                        ## m de alto del jefe (Madre Hydra, Dagon: muchos)
+const FOCUS_IN := 0.5                      ## s reales para ir y para volver
+const FOCUS_MAX := 1.25                    ## el encuadre, hasta max_view_size por esto
+
+## Encuadra a la vez a los jugadores y a `who` (de `height` m de alto) durante `secs` s de tiempo
+## real (BossIntro).
+func focus(who: Node3D, secs: float, height := 2.0) -> void:
+	_focus = who
+	_focus_left = secs
+	_focus_h = maxf(height, 1.0)
+
+## Centro de la vista: el de los jugadores o, encuadrando a un jefe, el punto medio con él.
+func _framed_center() -> Vector3:
+	var c := center()
+	if _focus_w <= 0.0 or not is_instance_valid(_focus): return c
+	var b := _focus.get_global_transform_interpolated().origin
+	b += global_basis.y * (_focus_h * 0.25)              # un poco arriba: que quepa su cabeza
+	return c.lerp((c + Vector3(b.x, c.y, b.z)) * 0.5, Anims.ease(_focus_w))
+
+## Alto visible encuadrando a un jefe: el que hace falta para que quepan él y los jugadores.
+func _framed_size(normal: float) -> float:
+	if _focus_w <= 0.0 or not is_instance_valid(_focus): return normal
+	var c := center()
+	var rel := _focus.get_global_transform_interpolated().origin - c
+	var ax := ground_axes()
+	var need_h := absf(rel.dot(ax[1])) * SCREEN_Y_K + 2.0 * margin + _focus_h * 0.9   # y su altura
+	var need_w := absf(rel.dot(ax[0])) + 2.0 * margin
+	var s := clampf(maxf(need_h, need_w / _aspect()), normal, max_view_size * FOCUS_MAX)
+	return lerpf(normal, s, Anims.ease(_focus_w))
+
+func _focus_step(delta: float) -> float:
+	var rd := delta / maxf(Engine.time_scale, 0.05)       # tiempo real: la cámara lenta no la frena
+	_focus_left -= rd
+	var on := _focus_left > 0.0 and is_instance_valid(_focus)
+	_focus_w = move_toward(_focus_w, 1.0 if on else 0.0, rd / FOCUS_IN)
+	if _focus_w <= 0.0: _focus = null
+	return rd if _focus_w > 0.0 else delta
 
 func snap() -> void:
 	position = desired_position()
@@ -100,9 +143,10 @@ func shake(amount: float) -> void:
 	_shake = maxf(_shake, minf(amount * SHAKE_SCALE, SHAKE_MAX) * float(Auto.setting("shake", 1.0)))
 
 func _process(delta: float) -> void:
-	_size = lerpf(_size, needed_size(), 1.0 - exp(-zoom_speed * delta))
+	var fd := _focus_step(delta) if _focus != null else delta    # encuadrando a un jefe, en tiempo real
+	_size = lerpf(_size, _framed_size(needed_size()), 1.0 - exp(-zoom_speed * fd))
 	size = maxf(_size, view_size)
-	position = position.lerp(desired_position(), 1.0 - exp(-follow_speed * delta))
+	position = position.lerp(desired_position(), 1.0 - exp(-follow_speed * fd))
 	if _ear != null: _ear.global_transform = Transform3D(global_basis, center() + global_basis.z * EAR_BACK)
 	if _shake > 0.001:
 		# ruido suave (hito 11.2) en vez de un salto al azar en cada fotograma, que según la

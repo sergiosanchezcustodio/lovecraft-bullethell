@@ -36,6 +36,7 @@ extends Node3D
 ##   debug_menu=1            abre la pausa y el menú de depuración a ese segundo (capturas)
 ##   sheet_at=2 / map_at=2   abre la ficha o el mapa del J1 a ese segundo (capturas)
 ##   hitstop=false           sin micro-pausa al impactar
+##   boss_intro=false        sin la entrada de los jefes (BossIntro): solo el aviso, como antes
 ##   crumble=false / marks=N  sin desmoronarse / tope de manchas en el suelo (0, ninguna; por defecto, el de la calidad gráfica)
 ##   demo_kill=t             mata a la vez a todos los enemigos a ese segundo (capturas de las muertes)
 ##   character=johansen      personaje del J1 (dyer, olmstead, legrasse, johansen)
@@ -61,6 +62,7 @@ var _ach_t := 0.0
 var money_mult := 1.0                         ## Codicia (tienda)
 var shop_bonus := {}                          ## lo comprado en la tienda (Shop.bonuses)
 var camera: GameCamera
+var _boss_intro := true                          ## entrada de los jefes (BossIntro; boss_intro=false la quita)
 var world: CombatWorld
 var level: LevelData
 var director: WaveDirector
@@ -302,9 +304,11 @@ func _ready() -> void:
 			if args.get_bool("log"): print("MUSICA ", Music.current())
 			if e != null: Sfx.play_at("roar" if e.data.unique else "growl", e.global_position)
 			else: Sfx.play("growl")
-			announce(level.final_text, 3.5))
+			if e != null and _boss_intro: BossIntro.play(self, camera, e, level.final_text)   # entrada del jefe
+			else: announce(level.final_text, 3.5))
 		director.boss_event.connect(func(e: Enemy, text: String) -> void:
-			announce(text, 4.0)
+			if e != null and _boss_intro: BossIntro.play(self, camera, e, text)
+			else: announce(text, 4.0)
 			if args.get_bool("log"): print("JEFE %s t=%.0f" % [e.data.id, director.time]))
 		director.mid_event.connect(func(e: Enemy, text: String) -> void:
 			Sfx.play_at("growl", e.global_position)
@@ -336,6 +340,7 @@ func _ready() -> void:
 	_start_weather()
 	Engine.time_scale = args.get_float("timescale", 1.0)
 	HitStop.enabled = args.get_bool("hitstop", true)     # micro-pausa al impactar (hito 11.1)
+	_boss_intro = args.get_bool("boss_intro", true)
 	DamageNumbers.set_mode(Auto.setting("damage_numbers", 2))   # hito 11.2 (cfg_damage_numbers=0|1|2)
 	Quality.apply_game(env, moon)                        # calidad gráfica (hito 11.5); las opciones de abajo mandan
 	Crumble.enabled = args.get_bool("crumble", Crumble.enabled)
