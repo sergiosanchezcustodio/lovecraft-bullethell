@@ -25,6 +25,15 @@ var _model: Node3D
 var _visual: Node3D
 var _velocity := Vector3.ZERO
 var _anim := "idle"
+var _blend_snap: Array = []                 ## pose de la que se parte al cambiar de animación
+var _blend_t := 1.0
+var _blend_len := 0.0
+var _fidget := ""                           ## gesto de reposo en curso (Anims.fidgets)
+var _fidget_t := 0.0
+var _still_t := 0.0
+var _fidget_at := 4.0
+var _last_fidget := ""
+const FIDGET_GAP := Vector2(4.0, 9.0)       ## s quieto entre un gesto y el siguiente
 var _anim_t := 0.0
 var _act_t := -1.0
 var _bristle_k := 0.0
@@ -155,6 +164,30 @@ func _physics_process(delta: float) -> void:
 		f.y = 0.0
 		if f.length() > 0.01: facing = f.normalized()
 
+## Gestos de reposo: tras unos segundos quieto, olfatea, se lame una pata, se acicala…
+## (Anims.fidgets), sin repetir el anterior. Moverse o atacar lo corta.
+func _fidget_step(anim: String, delta: float) -> String:
+	if anim != "idle" or hidden:
+		_still_t = 0.0
+		_fidget = ""
+		_fidget_at = randf_range(FIDGET_GAP.x, FIDGET_GAP.y)
+		return anim
+	_still_t += delta
+	if _fidget == "" and _still_t >= _fidget_at:
+		var pool := Anims.fidgets(data.model).filter(func(f: String) -> bool: return f != _last_fidget)
+		if not pool.is_empty():
+			_fidget = pool[randi() % pool.size()]
+			_last_fidget = _fidget
+			_fidget_t = 0.0
+		_fidget_at = _still_t + randf_range(FIDGET_GAP.x, FIDGET_GAP.y)
+	if _fidget == "": return anim
+	_fidget_t += delta
+	if _fidget_t >= Anims.duration(data.model, _fidget):
+		_fidget = ""
+		_fidget_at = _still_t + randf_range(FIDGET_GAP.x, FIDGET_GAP.y)
+		return anim
+	return _fidget
+
 func facing_of_owner() -> Vector3:
 	return owner_player.motor.facing
 
@@ -175,12 +208,20 @@ func _process(delta: float) -> void:
 		if _act_t >= Anims.duration(data.model, "bite"): _act_t = -1.0
 	elif v > owner_player.data.move_speed * 1.2: anim = "run"
 	elif v > 0.3: anim = "walk"
+	anim = _fidget_step(anim, delta)
 	if anim != _anim:
+		_blend_snap = Anims.snapshot(_model)               # funde desde la pose de ahora
+		_blend_t = 0.0
+		_blend_len = 0.08 if anim == "bite" else 0.2
 		_anim = anim
 		_anim_t = 0.0
 	var dur := Anims.duration(data.model, anim)
 	if anim == "bite": _anim_t = clampf(_act_t / dur, 0.0, 1.0)
+	elif anim == _fidget: _anim_t = clampf(_fidget_t / dur, 0.0, 1.0)
 	else: _anim_t = fposmod(_anim_t + delta / dur * (clampf(v / 2.5, 0.6, 1.6) if anim != "idle" else 1.0), 1.0)
 	Anims.pose(data.model, anim, _model, _anim_t)
+	if _blend_t < _blend_len:
+		_blend_t += delta
+		Anims.blend_from(_model, _blend_snap, Anims.ease(_blend_t / _blend_len))
 	_model.position.y += fly                    # la animación pone la raíz; el vuelo y el erizado van encima
 	_model.scale *= 1.0 + 0.15 * _bristle_k

@@ -618,9 +618,7 @@ func _fidget_step(anim: String, delta: float) -> String:
 		return anim
 	_still_t += delta
 	if _fidget == "" and _still_t >= _fidget_at:
-		var s: Script = Anims.script_for(data.model)
-		var pool: Array = s.get("FIDGETS") if s != null and s.get("FIDGETS") != null else []
-		pool = pool.filter(func(f: String) -> bool: return f != _last_fidget)
+		var pool := Anims.fidgets(data.model).filter(func(f: String) -> bool: return f != _last_fidget)
 		if not pool.is_empty():
 			_fidget = pool[randi() % pool.size()]
 			_last_fidget = _fidget

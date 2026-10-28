@@ -35,10 +35,25 @@ func test_gestos_de_reposo_empiezan_y_acaban_en_reposo() -> void:
 			Anims.pose("dyer", f, m, t)
 			assert_lt(_pose_gap(m), 0.06, "%s en t=%.0f" % [f, t])
 
+func test_gestos_de_los_companeros() -> void:
+	assert_eq(Anims.fidgets("perro"), ["fidget_sniff", "fidget_scratch", "fidget_shake"])
+	assert_has(Anims.fidgets("gato"), "fidget_lick")
+	assert_eq(Anims.fidgets("cabra"), ["fidget_sniff", "fidget_shake"], "sin los suyos, los de la familia")
+	assert_has(Anims.fidgets("buho"), "fidget_preen")
+	assert_eq(Anims.fidgets("pez"), [], "sin gestos")
+	for name in ["perro", "gato", "rata", "buho", "cuervo"]:
+		var m := VoxelBuilder.load_model("res://models/%s.json" % name)
+		add_child_autofree(m)
+		for f: String in Anims.fidgets(name):
+			assert_true(Anims.has_anim(name, f), "%s %s" % [name, f])
+			for t in [0.0, 1.0]:
+				Anims.pose(name, f, m, t)
+				assert_lt(_pose_gap(m, name), 0.06, "%s %s en t=%.0f" % [name, f, t])
+
 ## Lo que se aparta del reposo (idle en t=0) la pose actual: el mayor giro de una parte.
-func _pose_gap(m: Node3D) -> float:
+func _pose_gap(m: Node3D, model := "dyer") -> float:
 	var now := Anims.snapshot(m)
-	Anims.pose("dyer", "idle", m, 0.0)
+	Anims.pose(model, "idle", m, 0.0)
 	var rest := Anims.snapshot(m)
 	var gap := 0.0
 	for i in now.size(): gap = maxf(gap, absf(_flat(now[i]) - _flat(rest[i])))

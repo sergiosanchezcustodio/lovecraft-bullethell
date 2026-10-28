@@ -48,6 +48,15 @@ static func hit_time(model_name: String, fallback: float) -> float:
 static func hit(model_name: String, m: Node3D, k: float) -> void:
 	script_for(model_name).call("hit", m, k)
 
+## Gestos de reposo del modelo: los suyos (FIDGETS_OF del script) o los de la familia (FIDGETS).
+static func fidgets(model_name: String) -> Array:
+	var s: Script = script_for(model_name)
+	if s == null: return []
+	var of: Variant = s.get("FIDGETS_OF")
+	if of is Dictionary and (of as Dictionary).has(model_name): return (of as Dictionary)[model_name]
+	var f: Variant = s.get("FIDGETS")
+	return f if f is Array else []
+
 ## Golpe rápido que vuelve con rebote: 0 al empezar, 1 en el punto fuerte, y de vuelta a 0.
 static func jolt(k: float, peak := 0.18) -> float:
 	return Anims.ease(clampf(k / peak, 0.0, 1.0)) * (1.0 - Anims.ease(clampf((k - peak) / (1.0 - peak), 0.0, 1.0)))
