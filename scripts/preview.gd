@@ -160,6 +160,9 @@ func _process(_delta: float) -> void:
 			if anim == "hit":                         # reacción al golpe de su familia, sobre el reposo
 				Anims.pose(mn, "idle", models[i], 0.0)
 				if Anims.has_hit(mn): Anims.hit(mn, models[i], clampf(t, 0.0, 1.0))
+			elif anim == "down_reach":                # abatido alargando la mano hacia un compañero (hito 12.1)
+				Anims.reset(models[i])
+				Anims.script_for(mn).call("down_wait", models[i], t, clampf(t * 2.0, 0.0, 1.0), 0.6)
 			elif anim == "death":                     # muerte de su familia (hito 12.7), sin deshacerse
 				Anims.reset(models[i])
 				if Anims.death_time(mn) > 0.0: Anims.death(mn, models[i], clampf(t, 0.0, 1.0))

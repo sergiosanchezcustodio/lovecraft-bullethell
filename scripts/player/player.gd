@@ -113,6 +113,10 @@ var _action := ""                ## animación de acción en curso (el esquive) 
 var _action_t := 0.0
 var _ghost_t := 0.0
 var _blend_snap: Array = []      ## pose de la que se parte al cambiar de animación
+var _was_down := false           ## estaba abatido en el último fotograma (hito 12.1)
+var _down_t := 0.0               ## s desde que cayó
+var _up_t := -1.0                ## s desde que lo levantaron (-1: no se está levantando)
+var _down_snap: Array = []       ## pose en que cayó o en que lo levantaron, para fundir desde ella
 var _blend_t := 1.0
 var _blend_len := 0.0
 var _snow: GPUParticles3D        ## nieve que levanta al deslizarse
@@ -426,19 +430,31 @@ func revive() -> void:
 	revive_progress = 0.0
 	motor.locked = false
 	_hurt_time = 0.0
-	Anims.reset(model)
 	if _down_ring: _down_ring.visible = false
 	revived.emit()
 
 func is_downed() -> bool:
 	return health <= 0.0 and not is_eliminated
 
-## Tendido boca abajo con el anillo de la reanimación; eliminado, se hunde y desaparece.
+## Abatido (hito 12.1): cae de rodillas y rueda de lado hasta quedar apoyado en el codo, y
+## mientras espera respira con esfuerzo y alarga la mano hacia el compañero más cercano (más
+## cuanto más cerca, y del todo si lo está levantando). Sin esas animaciones, tendido de bruces
+## como antes. Con el anillo de la reanimación; eliminado, se hunde y desaparece.
 func _downed_visual(delta: float) -> void:
 	var here := get_global_transform_interpolated().origin
 	Anims.reset(model)
-	model.rotation.x = PI * 0.47                      # de bruces, hacia donde miraba
-	model.position.y = 0.22
+	_down_t += delta
+	if Anims.has_anim(data.model, "down"):
+		var fall := Anims.duration(data.model, "down")
+		if _down_t < fall:
+			Anims.pose(data.model, "down", model, _down_t / fall)
+		else:
+			var r := _reach()
+			Anims.script_for(data.model).call("down_wait", model, fmod(_down_t - fall, 3.0) / 3.0, r.x, r.y)
+		if not _down_snap.is_empty(): Anims.blend_from(model, _down_snap, Anims.ease(_down_t / 0.15))
+	else:
+		model.rotation.x = PI * 0.47                  # de bruces, hacia donde miraba
+		model.position.y = 0.22
 	visual.global_position = here
 	_snow.emitting = false
 	if not revivable: return
@@ -458,7 +474,7 @@ func _downed_visual(delta: float) -> void:
 	if is_eliminated:
 		_elim_t += delta
 		_down_ring.visible = false
-		model.position.y = 0.22 - _elim_t * 0.5
+		model.position.y -= _elim_t * 0.5
 		visual.visible = _elim_t < 1.2
 		return
 	_down_ring.visible = true
@@ -471,6 +487,11 @@ func _process(delta: float) -> void:
 	Prof.stop("jugadores_anim", t0)
 
 func _process_step(delta: float) -> void:
+	if (health <= 0.0) != _was_down:                 # cae o lo levantan (aquí: vale también para los de otros PC)
+		_was_down = health <= 0.0
+		_down_snap = Anims.snapshot(model)
+		_down_t = 0.0
+		_up_t = -1.0 if _was_down else 0.0
 	if health <= 0.0:
 		visual.rotation.x = 0.0; visual.rotation.z = 0.0
 		_lean = Vector2.ZERO; _lean_vel = Vector2.ZERO
@@ -508,7 +529,8 @@ func _process_step(delta: float) -> void:
 	_lean_step(here, delta, frozen)
 	# Parpadeo durante la invulnerabilidad tras un golpe
 	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
-	_animate(delta)
+	if _up_t >= 0.0: _get_up_step(delta)
+	else: _animate(delta)
 	_keep_above_ground(delta)
 	_wade = move_toward(_wade, 1.0 if in_water() else 0.0, WadeSplash.EASE * delta)
 	visual.position.y -= _wade * WadeSplash.SINK        # metido en el agua hasta los tobillos
@@ -606,6 +628,39 @@ func _animate(delta: float) -> void:
 		elif _action == "":
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
+
+## Hacia el compañero más cercano en pie: (cuánto alarga la mano, 0..1; giro de la cabeza, rad).
+func _reach() -> Vector2:
+	if world == null: return Vector2.ZERO
+	var best: Player = null
+	var bd := INF
+	for q in world.players:
+		if q == self or q.health <= 0.0: continue
+		var d := q.global_position.distance_to(global_position)
+		if d < bd:
+			bd = d
+			best = q
+	if best == null: return Vector2.ZERO
+	var reach := clampf(1.0 - (bd - rules.revive_radius) / 6.0, 0.0, 1.0) * 0.7
+	if revive_progress > 0.0: reach = maxf(reach, 0.7 + 0.3 * clampf(revive_progress / rules.revive_time, 0.0, 1.0))
+	var to := best.global_position - global_position
+	var look := wrapf(atan2(to.x, to.z) - visual.rotation.y, -PI, PI)
+	return Vector2(reach, look)
+
+## Se levanta (hito 12.1): se empuja del suelo con la mano, queda de rodillas y se pone de pie;
+## si echa a andar, más deprisa. Al acabar funde con su animación de siempre.
+func _get_up_step(delta: float) -> void:
+	var up := Anims.duration(data.model, "get_up") if Anims.has_anim(data.model, "get_up") else 0.0
+	_up_t += delta * (2.0 if motor.velocity.length() > 0.5 else 1.0)
+	if _up_t >= up:
+		_up_t = -1.0
+		_blend_snap = Anims.snapshot(model)
+		_blend_t = 0.0
+		_blend_len = 0.15
+		_animate(delta)
+		return
+	Anims.pose(data.model, "get_up", model, _up_t / up)
+	if not _down_snap.is_empty(): Anims.blend_from(model, _down_snap, Anims.ease(_up_t / 0.1))
 
 ## Gestos de reposo (28-10-2026): tras unos segundos quieto (sin andar, esquivar ni lanzar,
 ## y fuera de una crisis), un gesto al azar de los que tenga su juego de animaciones (mirar
@@ -1087,7 +1142,6 @@ func net_apply(pos: Vector3, yaw: float, vel: Vector3, dodges: int, hp: float, s
 		down_left = -1.0
 		revive_progress = 0.0
 		motor.locked = false
-		Anims.reset(model)
 		if _down_ring: _down_ring.visible = false
 		revived.emit()
 	if hp <= 0.0 and rules != null: revive_progress = revive * rules.revive_time   # la lleva su PC; aquí, para el HUD y el anillo

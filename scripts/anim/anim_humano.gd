@@ -8,7 +8,8 @@ extends RefCounted
 const ARM_LAG := 0.32                         ## retraso de los brazos respecto a las piernas (rad del ciclo)
 const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive": 0.5,
 	"jump": 0.45, "flash": 0.3, "throw": 0.55,
-	"fidget_look": 2.6, "fidget_stretch": 2.8, "fidget_check": 2.4, "fidget_shift": 1.8}
+	"fidget_look": 2.6, "fidget_stretch": 2.8, "fidget_check": 2.4, "fidget_shift": 1.8,
+	"down": 0.9, "down_wait": 3.0, "get_up": 0.75}
 ## Gestos de reposo (28-10-2026): Player los pone de vez en cuando si el personaje lleva un rato
 ## quieto. Empiezan y acaban en la pose de reposo, y se funden al entrar y al salir.
 const FIDGETS := ["fidget_look", "fidget_stretch", "fidget_check", "fidget_shift"]
@@ -284,6 +285,64 @@ static func windup(m: Node3D, b: float, th: float, t: float) -> void:
 	for f in ["fore_l", "fore_r"]:
 		if parts.has(f): (parts[f] as Node3D).rotation.x += -0.35 * b
 	m.position.z += 0.06 * th
+
+## Abatido en cooperativo (hito 12.1): de rodillas (kn) y tendido de lado apoyado en el codo
+## izquierdo (s), girando sobre la rodilla, que ya está en el suelo. Pose absoluta, tras reset.
+const LIE_ROLL := -1.2                       ## rad que rueda sobre su costado izquierdo
+static func _down_pose(m: Node3D, kn: float, s: float) -> void:
+	var knee := Anims.rest(m, "leg_l").y * 0.5 if has(m, "leg_l") else 0.45
+	var a := LIE_ROLL * s
+	m.rotation.z = a
+	var k := Vector3(0.0, knee, 0.0)
+	m.position = Vector3(0.0, -0.4 * kn, 0.0) + k - Basis(Vector3.BACK, a) * k
+	var legs := kn * (1.0 - s)                                  # tendido, las piernas casi rectas
+	Anims.part(m, "leg_l").rotation.x = -0.35 * legs - 0.15 * s
+	Anims.part(m, "leg_r").rotation.x = -0.3 * legs - 0.45 * s
+	bend(m, "shin_l", 1.6 * legs + 0.3 * s)
+	bend(m, "shin_r", 1.6 * legs + 0.6 * s)
+	Anims.part(m, "torso").rotation = Vector3(0.25 * kn * (1.0 - s), 0.0, 0.45 * s)   # se incorpora sobre el codo
+	Anims.part(m, "head").rotation = Vector3(0.45 * kn * (1.0 - s), 0.0, 0.55 * s)
+	Anims.part(m, "arm_l").rotation = Vector3(-0.5 * s, 0.0, 1.0 * s)                # el codo de apoyo, al suelo
+	bend(m, "fore_l", -1.2 * s)
+	Anims.part(m, "arm_r").rotation = Vector3(0.15 * kn * (1.0 - s) - 0.3 * s, 0.0, -0.2 * s)
+	bend(m, "fore_r", -0.3 * s)
+
+## Cae (0,9 s): se le doblan las rodillas, la cabeza cae y rueda de lado hasta quedar apoyado
+## en el codo.
+static func down(m: Node3D, t: float) -> void:
+	var kn := Anims.ease(t / 0.35)
+	var s := Anims.ease((t - 0.3) / 0.6)
+	_down_pose(m, kn, s)
+
+## Esperando a que lo levanten: respira con esfuerzo, gira la cabeza hacia `look` (rad, hacia
+## el compañero más cercano) y alarga la mano derecha hacia él con `reach` (0..1).
+static func down_wait(m: Node3D, t: float, reach := 0.0, look := 0.0) -> void:
+	_down_pose(m, 1.0, 1.0)
+	var w := t * TAU
+	var breath := sin(w)
+	Anims.part(m, "torso").rotation.z += 0.05 * breath
+	Anims.part(m, "torso").rotation.x += 0.03 * breath
+	var head := Anims.part(m, "head")
+	head.rotation.y = clampf(look, -1.0, 1.0)
+	head.rotation.z += 0.04 * sin(w * 0.5)
+	var arm := Anims.part(m, "arm_r")
+	arm.rotation.x += -1.25 * reach + 0.04 * sin(w * 2.0) * reach          # la mano tiembla un poco
+	arm.rotation.z += -0.35 * reach + clampf(look, -1.0, 1.0) * 0.25 * reach
+	bend(m, "fore_r", -0.3 * (1.0 - reach) - 0.15 * reach)
+
+## Se levanta (0,75 s): se empuja con la mano del suelo hasta quedar de rodillas y se pone de
+## pie echando el peso adelante.
+static func get_up(m: Node3D, t: float) -> void:
+	var s := 1.0 - Anims.ease(t / 0.45)
+	var kn := 1.0 - Anims.ease((t - 0.35) / 0.65)
+	_down_pose(m, kn, s)
+	var push := Anims.jolt(clampf(t / 0.5, 0.0, 1.0), 0.5)                  # la mano empuja del suelo
+	Anims.part(m, "arm_l").rotation.x += -0.4 * push
+	bend(m, "fore_l", -1.2 * s - 0.4 * push)
+	var rise := sin(clampf((t - 0.35) / 0.65, 0.0, 1.0) * PI)               # peso adelante al levantarse
+	Anims.part(m, "torso").rotation.x += 0.35 * rise
+	Anims.part(m, "leg_r").rotation.x += -0.5 * rise
+	bend(m, "shin_r", 0.9 * rise)
 
 ## Muerte (hito 12.7; cultistas, vecinos, híbridos, sacerdotes): se le doblan las rodillas y
 ## cae de rodillas con la cabeza colgando, y se desploma de bruces con los brazos por delante.
