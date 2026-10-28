@@ -50,6 +50,7 @@ Consúltalos cuando haga falta (son largos):
 - **Rendimiento:** el 1 % peor varía mucho entre ejecuciones y la primera tras regenerar un modelo construye su malla: repite siempre la medición.
 - **Shaders:** nada de `fract(sin(x) * 43758)` con argumentos grandes; usa el hash de `night_sky.gdshaderinc`.
 - **Bots y capturas:** `mute=true`; las ejecuciones de prueba van en ventana.
+- **Pruebas sin robar el mando ni el foco (28-10-2026):** el autor juega a otras cosas con el mando en este PC mientras pruebo. Desde Claude Code (`CLAUDECODE=1`), `~/bin/godot` pasa por `tools/godot_sin_foco.sh` (la ventana se abre sin quitar el foco: `override.cfg` pasajero con `no_focus`) y la partida no hace caso a los mandos (`JoypadInput.disabled`, «Mandos desactivados» en la consola). Para probar con mando de verdad, `mando=true`. Lanza Godot siempre con el comando `godot` de Git Bash, no con el ejecutable directamente.
 - **Autoloads en código de partida:** usa `Auto.sfx_at`, `Auto.sfx`, `Auto.setting` y `Auto.node` (`scripts/core/auto.gd`), no `Sfx.`/`Settings.` directamente: si no, las herramientas con `-s` (mapas de la Biblioteca) no compilan esos scripts.
 - **Pantalla completa** exclusiva por defecto; la interfaz escala desde 1920×1080.
 - **Calidad gráfica** (`Quality`, `data/quality.json`): Alta es la de siempre y la que se usa en las mediciones; un efecto nuevo con coste apreciable debe poder bajarse en Baja o Media.
@@ -91,7 +92,7 @@ Consúltalos cuando haga falta (son largos):
    - Por eso el giro y la posición de un modelo van siempre en un nodo contenedor, nunca en la raíz.
 
 Entorno de desarrollo (Windows 11 + Git Bash):
-- **Godot 4.4.1** en `C:\Tools\Godot\`. El comando `godot` ejecuta `Godot_v4.4.1-stable_win64_console.exe`, para que la salida aparezca en la terminal. En Git Bash lo resuelve el lanzador `~/bin/godot`; en PowerShell y cmd, `C:\Tools\Godot\godot.cmd` (la carpeta está en el PATH de usuario).
+- **Godot 4.4.1** en `C:\Tools\Godot\`. El comando `godot` ejecuta `Godot_v4.4.1-stable_win64_console.exe`, para que la salida aparezca en la terminal. En Git Bash lo resuelve el lanzador `~/bin/godot` (desde Claude Code, a través de `tools/godot_sin_foco.sh`); en PowerShell y cmd, `C:\Tools\Godot\godot.cmd` (la carpeta está en el PATH de usuario).
 - **Python 3.12** como `python`. En Windows, `python3` abre la Microsoft Store en lugar de ejecutar el script.
 - No hace falta xvfb: las capturas abren una ventana un momento y se cierran solas.
 
@@ -156,6 +157,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `cfg_quality=0..3` (Baja…Ultra) y `cfg_damage_numbers=0|1|2`: calidad gráfica y números de daño para esta ejecución.
   - `ui_check=true` (en cualquier escena): apunta con «UICHK» los textos que pisan el filete de una ventana (20 px del borde), su filigrana o el borde de un recuadro (`scripts/ui/ui_overlap_check.gd`).
   - `card=true`: con `shots=`, enseña también el rótulo del nivel al empezar (`LevelCard`; sin él, las capturas no lo llevan).
+  - `mando=true`: en las pruebas lanzadas desde Claude Code, deja usar los mandos (sin él, la partida no les hace caso).
   - `rise=false`: los enemigos aparecen creciendo, como antes. `rise_demo=pinguino,pesadilla,…` y `rise_at=t`: hacen aparecer esos enemigos alrededor del J1 a los t s (capturas de la aparición).
 - **Encadenar comandos:** un `godot ... | grep error` devuelve 1 cuando no hay errores, así que no lo encadenes con `&&`.
 

@@ -16,9 +16,24 @@ var last_device := KEYBOARD              ## el último que pulsó algo (menús)
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	if JoypadInput.disabled():                      # pruebas de Claude Code: sin mandos
+		_ignore_pads()
+		return
 	Input.joy_connection_changed.connect(func(device: int, connected: bool) -> void:
 		if connected: joy_connected.emit(device)
 		else: joy_disconnected.emit(device))
+
+## Sin mandos: fuera de las acciones (menús) y un filtro que se traga sus eventos, siempre el
+## último hijo de la raíz.
+func _ignore_pads() -> void:
+	print("Mandos desactivados: prueba lanzada desde Claude Code (mando=true para usarlos)")
+	UiInput.strip_pads()
+	var root := get_tree().root
+	var f := JoypadInput.PadFilter.new()
+	f.name = "PadFilter"
+	root.add_child.call_deferred(f)
+	root.child_entered_tree.connect(func(n: Node) -> void:
+		if n != f and f.is_inside_tree(): root.move_child.call_deferred(f, -1))
 
 func _input(event: InputEvent) -> void:
 	var d: Variant = device_of(event)
@@ -33,7 +48,7 @@ static func device_of(event: InputEvent) -> Variant:
 	return null
 
 func is_connected_joy(device: int) -> bool:
-	return device == KEYBOARD or device in Input.get_connected_joypads()
+	return device == KEYBOARD or device in JoypadInput.pads()
 
 func guid(device: int) -> String:
 	return "teclado" if device == KEYBOARD else Input.get_joy_guid(device)
@@ -41,7 +56,7 @@ func guid(device: int) -> String:
 ## Busca un mando conectado por su GUID (tras reconectarse). -2 si no está.
 func find_by_guid(g: String) -> int:
 	if g == "teclado": return KEYBOARD
-	for d in Input.get_connected_joypads():
+	for d in JoypadInput.pads():
 		if Input.get_joy_guid(d) == g: return d
 	return -2
 

@@ -9,8 +9,17 @@ static func configure() -> void:
 	for e in InputMap.action_get_events("ui_accept"):
 		if e is InputEventKey and (e as InputEventKey).keycode == KEY_SPACE:
 			InputMap.action_erase_event("ui_accept", e)
+	if JoypadInput.disabled():                      # pruebas de Claude Code: sin mandos
+		strip_pads()
+		return
 	_add_joy("ui_accept", JOY_BUTTON_A)
 	_add_joy("ui_cancel", JOY_BUTTON_B)
+
+## Quita los botones y sticks de mando de todas las acciones (JoypadInput.disabled).
+static func strip_pads() -> void:
+	for action in InputMap.get_actions():
+		for e in InputMap.action_get_events(action):
+			if e is InputEventJoypadButton or e is InputEventJoypadMotion: InputMap.action_erase_event(action, e)
 
 static func _add_joy(action: StringName, button: JoyButton) -> void:
 	for e in InputMap.action_get_events(action):

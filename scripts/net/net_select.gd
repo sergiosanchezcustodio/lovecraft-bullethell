@@ -173,6 +173,6 @@ static func fill_session(level: String, players: Array, me: int, online: bool) -
 		seat.worn = (d.get("worn", {}) as Dictionary).duplicate() if d.get("worn", {}) is Dictionary else {}
 		seat.name = String(d.get("name", ""))
 		seat.shop = SelectState.Profile.clean_shop(d.get("shop", {}))
-		if seat.is_local() and (seat.device == Devices.KEYBOARD or Input.get_connected_joypads().has(seat.device)):
+		if seat.is_local() and (seat.device == Devices.KEYBOARD or JoypadInput.pads().has(seat.device)):
 			seat.guid = Devices.guid(seat.device)
 		GameSession.seats.append(seat)

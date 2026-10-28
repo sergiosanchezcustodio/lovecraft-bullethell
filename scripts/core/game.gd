@@ -443,7 +443,7 @@ const MARK_HOLD := 0.6
 ## LB+RB mantenidos en un mando de este PC: la marca de F9 (los dos a la vez no hacen nada más
 ## jugando; sueltos pasan páginas en la ficha y la subida).
 func _watch_mark_pads(delta: float) -> void:
-	for pad in Input.get_connected_joypads():
+	for pad in JoypadInput.pads():
 		var both := Input.is_joy_button_pressed(pad, JOY_BUTTON_LEFT_SHOULDER) and Input.is_joy_button_pressed(pad, JOY_BUTTON_RIGHT_SHOULDER)
 		if not both or get_tree().paused:
 			_mark_hold.erase(pad)

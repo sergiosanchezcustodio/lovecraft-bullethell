@@ -465,7 +465,7 @@ class ArenaMap extends PanelContainer:
 		if keyboard:
 			if Input.is_physical_key_pressed(KEY_EQUAL) or Input.is_physical_key_pressed(KEY_KP_ADD) or Input.is_key_pressed(KEY_PLUS): z += 1.0
 			if Input.is_physical_key_pressed(KEY_MINUS) or Input.is_physical_key_pressed(KEY_KP_SUBTRACT): z -= 1.0
-		for d in devs:
+		for d in ([] if JoypadInput.disabled() else devs):
 			z += Input.get_joy_axis(d, JOY_AXIS_TRIGGER_RIGHT) - Input.get_joy_axis(d, JOY_AXIS_TRIGGER_LEFT)
 		return clampf(z, -1.0, 1.0)
 

@@ -27,3 +27,4 @@ review/peticiones.json*
 # Accesos directos y archivos de importación de las referencias de Replicate
 *.lnk
 tools/replicate/*.png.import
+override.cfg
