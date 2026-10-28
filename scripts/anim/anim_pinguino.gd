@@ -33,3 +33,16 @@ static func charge(m: Node3D, t: float) -> void:
 	Anims.part(m, "head").rotation.x = -back * 0.2 + thrust * 0.35
 	Anims.part(m, "arm_l").rotation = Vector3(thrust * 0.9, 0.0, -0.3 - back * 0.3)
 	Anims.part(m, "arm_r").rotation = Vector3(thrust * 0.9, 0.0, 0.3 + back * 0.3)
+
+## Golpe: se tambalea de lado a lado como un tentetieso, con las aletas abiertas para no caerse,
+## y retrocede un paso (28-10-2026).
+const HIT_TIME := 0.6
+static func hit(m: Node3D, k: float) -> void:
+	var fade := 1.0 - Anims.ease(k)
+	var wob := sin(k * TAU * 2.0) * fade                                     # dos vaivenes
+	m.rotation.z += 0.28 * wob
+	m.rotation.x += -0.16 * Anims.jolt(k, 0.15)                               # echado atrás
+	m.position.z -= 0.08 * Anims.jolt(k, 0.25)
+	Anims.part(m, "arm_l").rotation.z += -0.7 * fade
+	Anims.part(m, "arm_r").rotation.z += 0.7 * fade
+	Anims.part(m, "head").rotation.z += -0.2 * wob

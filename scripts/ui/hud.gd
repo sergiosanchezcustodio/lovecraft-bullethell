@@ -91,7 +91,9 @@ func _process_step(_delta: float) -> void:
 func objective_text() -> String:
 	return _objective_lbl.text if _objective_lbl != null else ""
 
-## Retrato: la cabeza del modelo del personaje, renderizada una vez en un SubViewport.
+## Retrato: la cabeza del modelo del personaje en un SubViewport que solo se vuelve a dibujar
+## cuando cambia la cara: parpadea, pone la mueca al recibir un golpe y la de pánico en las
+## crisis, a la vez que el modelo de la partida (PortraitFace, 28-10-2026).
 func portrait_texture(p: Player) -> Texture2D:
 	var vp := SubViewport.new()
 	# Se renderiza una sola vez: sin interpolación de física, o la cámara y el modelo aún
@@ -102,9 +104,14 @@ func portrait_texture(p: Player) -> Texture2D:
 	vp.own_world_3d = true
 	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
 	add_child(vp)
-	var m := VoxelBuilder.load_model("res://models/%s.json" % p.data.model)
+	var path := VoxelBuilder.variant_path("res://models/%s.json" % p.data.model)
+	var m := VoxelBuilder.load_model(path)
 	OutfitData.apply(m, p.data.model, OutfitData.worn_for(String(p.data.id)))
 	vp.add_child(m)
+	var face := FaceLook.new().setup(m, path)
+	face.driven = true
+	vp.add_child(face)
+	vp.add_child(PortraitFace.new(p, vp, face, CrisisLook._make_face(m)))
 	var head: Vector3 = Anims.rest(m, "head") + Vector3(0, 0.2, 0)
 	var cam := Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -127,6 +134,28 @@ func portrait_texture(p: Player) -> Texture2D:
 	vp.add_child(we)
 	return vp.get_texture()
 
+
+## Copia en el retrato la cara del jugador (abierta, parpadeo, mueca o pánico) y, si cambia,
+## pide un fotograma más al SubViewport (que si no, no se vuelve a dibujar).
+class PortraitFace extends Node:
+	var p: Player
+	var vp: SubViewport
+	var face: FaceLook
+	var panic: Node3D
+	var _last := -1
+
+	func _init(player: Player, viewport: SubViewport, f: FaceLook, panic_face: Node3D) -> void:
+		p = player; vp = viewport; face = f; panic = panic_face
+
+	func _process(_delta: float) -> void:
+		if not is_instance_valid(p): return
+		var crisis := p.sanity_state != null and p.sanity_state.in_crisis
+		var s := 3 if crisis else (p.face_look().state() if p.face_look() != null else 0)
+		if s == _last: return
+		_last = s
+		face.show_state(s if s < 3 else 0)
+		if panic != null: panic.visible = s == 3
+		vp.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 ## Panel de un jugador en su esquina (diseño del autor, 30-09-2026; al 60 % de su primer
 ## tamaño, con los iconos lo menos reducidos posible): a la izquierda "J1" y el nivel, la

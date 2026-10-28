@@ -102,6 +102,11 @@ var _attr_rng := RandomNumberGenerator.new()
 var _anim := "idle"
 var _anim_t := 0.0
 var _hurt_time := -1.0           ## tiempo desde el último golpe (-1 = nunca)
+var _fidget := ""                ## gesto de reposo en curso (anim_humano.FIDGETS)
+var _fidget_t := 0.0
+var _still_t := 0.0              ## s quieto, sin esquivar ni lanzar
+var _fidget_at := 6.0            ## s quieto hasta el siguiente gesto (al azar en FIDGET_GAP)
+const FIDGET_GAP := Vector2(5.0, 10.0)
 var _override := ""              ## gesto del tren superior (lanzar) que se suma a la animación
 var _override_t := 0.0
 var _action := ""                ## animación de acción en curso (el esquive) y su tiempo
@@ -567,6 +572,7 @@ func _animate(delta: float) -> void:
 	var anim := "idle"
 	if _action != "": anim = _action
 	elif motor.velocity.length() > 0.1: anim = "walk"
+	anim = _fidget_step(anim, delta)
 	if anim != _anim:
 		var was_action := _anim in ["slide", "roll", "dive", "jump", "flash"]
 		_blend_snap = Anims.snapshot(model)
@@ -578,6 +584,8 @@ func _animate(delta: float) -> void:
 	var t: float
 	if _action != "":
 		t = _action_t / Anims.duration(data.model, _action)
+	elif _fidget != "":
+		t = _fidget_t / Anims.duration(data.model, _fidget)
 	elif anim == "walk":
 		# cadencia proporcional a la velocidad real: los pies no patinan
 		var before := _anim_t
@@ -598,6 +606,38 @@ func _animate(delta: float) -> void:
 		elif _action == "":
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
+
+## Gestos de reposo (28-10-2026): tras unos segundos quieto (sin andar, esquivar ni lanzar,
+## y fuera de una crisis), un gesto al azar de los que tenga su juego de animaciones (mirar
+## alrededor, estirarse, revisar el arma, cambiar el peso). Moverse lo corta (con fundido).
+func _fidget_step(anim: String, delta: float) -> String:
+	var calm := anim == "idle" and _override == "" and not sanity_state.in_crisis and not is_downed()
+	if not calm:
+		_still_t = 0.0
+		_fidget = ""
+		return anim
+	_still_t += delta
+	if _fidget == "" and _still_t >= _fidget_at:
+		var s: Script = Anims.script_for(data.model)
+		var pool: Array = s.get("FIDGETS") if s != null and s.get("FIDGETS") != null else []
+		pool = pool.filter(func(f: String) -> bool: return f != _last_fidget)
+		if not pool.is_empty():
+			_fidget = pool[randi() % pool.size()]
+			_last_fidget = _fidget
+			_fidget_t = 0.0
+		_fidget_at = _still_t + randf_range(FIDGET_GAP.x, FIDGET_GAP.y)
+	if _fidget == "": return anim
+	_fidget_t += delta
+	if _fidget_t >= Anims.duration(data.model, _fidget):
+		_fidget = ""
+		_fidget_at = _still_t + randf_range(FIDGET_GAP.x, FIDGET_GAP.y)
+		return anim
+	return _fidget
+var _last_fidget := ""
+
+## Su cara (parpadeo y mueca), para que el retrato del HUD la copie.
+func face_look() -> FaceLook:
+	return _face
 
 ## ¿Está en agua somera? (capa "water" del mapa de la arena, hito 6.4)
 func in_water() -> bool:

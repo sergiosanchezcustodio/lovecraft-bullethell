@@ -31,3 +31,11 @@ static func bite(m: Node3D, t: float) -> void:
 	var k := sin(clampf(t, 0.0, 1.0) * PI)
 	m.scale = Vector3(1.0 + 0.2 * k, 1.0 + 0.25 * k, 1.0 + 0.2 * k)
 	_p(m, "top").position.y += 0.03 * k
+
+## Golpe: como el fragmento, la masa tiembla en ondas que se calman (28-10-2026).
+const HIT_TIME := 0.7
+static func hit(m: Node3D, k: float) -> void:
+	var fade := pow(1.0 - k, 1.6)
+	var w := sin(k * TAU * 3.0) * fade
+	var w2 := sin(k * TAU * 3.0 + 1.6) * fade
+	m.scale *= Vector3(1.0 + 0.12 * w, 1.0 - 0.15 * w, 1.0 + 0.12 * w2)

@@ -34,6 +34,24 @@ static func pose(model_name: String, anim: String, m: Node3D, t: float) -> void:
 	if has_anim(model_name, anim):
 		script_for(model_name).call(anim, m, t)
 
+## Reacción al golpe propia de la familia (28-10-2026): el script de animación puede tener
+## `static func hit(m, k)` (k de 0 a 1 en HIT_TIME s), que se suma a la pose ya puesta. Sin ella,
+## Enemy aplasta el modelo entero, como antes. Devuelve si la tiene.
+static func has_hit(model_name: String) -> bool:
+	var s: Script = script_for(model_name)
+	return s != null and s.get("HIT_TIME") != null
+
+static func hit_time(model_name: String, fallback: float) -> float:
+	var s: Script = script_for(model_name)
+	return float(s.get("HIT_TIME")) if s != null and s.get("HIT_TIME") != null else fallback
+
+static func hit(model_name: String, m: Node3D, k: float) -> void:
+	script_for(model_name).call("hit", m, k)
+
+## Golpe rápido que vuelve con rebote: 0 al empezar, 1 en el punto fuerte, y de vuelta a 0.
+static func jolt(k: float, peak := 0.18) -> float:
+	return Anims.ease(clampf(k / peak, 0.0, 1.0)) * (1.0 - Anims.ease(clampf((k - peak) / (1.0 - peak), 0.0, 1.0)))
+
 ## Nodo de una parte del modelo. Más rápido que get_node(), que convierte el texto en
 ## NodePath en cada llamada (importa con 150 enemigos animados).
 static func part(m: Node3D, name: String) -> Node3D:

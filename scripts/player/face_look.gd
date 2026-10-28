@@ -25,6 +25,7 @@ var _closed := 0.0                          ## s que le quedan con los ojos cerr
 var _hurt_left := 0.0
 var suppressed := false                     ## en las crisis (la cara de pánico va encima)
 var _fixed := ""                            ## face=cerrados|dolor: deja esa cara (capturas)
+var driven := false                         ## la mueve otro: el retrato del HUD copia la cara del jugador
 
 func setup(model: Node3D, model_path: String) -> FaceLook:
 	_rng.randomize()
@@ -90,8 +91,18 @@ static func _quads(cells: Array, pivot: Vector3, vs: float, mat: Material) -> Me
 func hurt() -> void:
 	_hurt_left = HURT_TIME
 
-func _process(delta: float) -> void:
+## La cara que enseña ahora: 0 abierta, 1 parpadeo, 2 mueca (el retrato del HUD la copia).
+func state() -> int:
+	if _blink == null: return 0
+	return 2 if _hurt.visible else (1 if _blink.visible else 0)
+
+func show_state(s: int) -> void:
 	if _blink == null: return
+	_hurt.visible = s == 2
+	_blink.visible = s == 1
+
+func _process(delta: float) -> void:
+	if _blink == null or driven: return
 	_hurt_left = maxf(_hurt_left - delta, 0.0)
 	_wait -= delta
 	if _wait <= 0.0:

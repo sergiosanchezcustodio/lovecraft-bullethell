@@ -5,7 +5,7 @@ extends Node3D
 ## <modelos>: un nombre de models/, "lineup" (los cuatro profundos) o varios separados por comas.
 ## Opciones clave=valor: propiedades del Environment (fog_density=0.03), de las luces
 ## (moon.light_energy=0.6, lamp.*, rim.*), de la cámara (cam.size=4), size=2400x1100, tag=sufijo,
-## frames=N (fotogramas de animación), floor=false y face=cerrados|dolor (cara de los personajes).
+## frames=N (fotogramas de animación; la animación «hit» es la reacción al golpe de cada familia), floor=false y face=cerrados|dolor (cara de los personajes).
 
 const LINEUP: Array[String] = ["profundo", "bruto", "acechador", "abisal"]
 const GAP := 0.3   # separación entre modelos de un grupo, en metros
@@ -156,7 +156,12 @@ func _process(_delta: float) -> void:
 	if mode == "anim":
 		var t := (frame - 5) / float(nframes)
 		for i in models.size():
-			Anims.pose(names[i].split("+")[0], anim, models[i], fposmod(t, 1.0))
+			var mn := names[i].split("+")[0]
+			if anim == "hit":                         # reacción al golpe de su familia, sobre el reposo
+				Anims.pose(mn, "idle", models[i], 0.0)
+				if Anims.has_hit(mn): Anims.hit(mn, models[i], clampf(t, 0.0, 1.0))
+			else:
+				Anims.pose(mn, anim, models[i], fposmod(t, 1.0))
 		if frame >= 5 and frame < 5 + nframes:
 			await RenderingServer.frame_post_draw
 			get_viewport().get_texture().get_image().save_png("res://shots/%s_%s_%03d%s.png" % [fname, anim, frame - 5, tag])

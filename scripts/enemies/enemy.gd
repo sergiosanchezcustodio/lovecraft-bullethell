@@ -88,6 +88,8 @@ var _flash_on := false
 var _flash_mat: StandardMaterial3D
 const HIT_POSE := 0.22                      ## s que dura el aplastado y la inclinación al recibir un golpe (hito 11.2)
 var _hit_t := HIT_POSE
+var _hit_len := HIT_POSE                    ## lo que dura su reacción (la de su familia, Anims.hit_time)
+var _hit_own := false                       ## su juego de animaciones tiene reacción propia (Anims.hit)
 var _hit_dir := Vector3.ZERO
 var _ripple_from := Vector3.INF            ## dónde dejó la última onda en el agua (hito 11.4)
 var _top_h := -1.0                          ## altura del modelo sin escalar (números de daño); -1, sin medir
@@ -455,6 +457,9 @@ func take_damage(d: Damage) -> void:
 ## Golpe recibido (hito 11.2): se aplasta un poco y se inclina hacia donde lo empujan.
 func _hit_pose(d: Damage) -> void:
 	_hit_t = 0.0
+	# reacción de su familia (doblarse, tambalearse, temblar); los colosales, solo aplastados
+	_hit_own = model_scale <= 1.5 and Anims.has_hit(model_name)
+	_hit_len = Anims.hit_time(model_name, HIT_POSE) if _hit_own else HIT_POSE
 	var dir := Vector3(d.knockback.x, 0.0, d.knockback.z)
 	if dir.length_squared() < 0.0001 and d.source is Node3D:
 		dir = global_position - (d.source as Node3D).global_position
@@ -724,10 +729,11 @@ func _process(delta: float) -> void:
 	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale   # aparece creciendo (al cambiar de forma)
 	_air_step(delta)
 	if _rise != Rise.NONE: _rise_step(delta)
-	if _hit_t < HIT_POSE:                             # golpe: se aplasta y se inclina, y vuelve con rebote (hito 11.2)
-		var hk := _hit_t / HIT_POSE
+	if _hit_t < _hit_len:                             # golpe: se aplasta y se inclina, y vuelve con rebote (hito 11.2)
+		var hk := clampf(_hit_t / HIT_POSE, 0.0, 1.0)
 		var s := sin(hk * PI * 1.5) * (1.0 - hk) * (0.35 if model_scale > 1.5 or data.unique else 1.0) * (1.5 if data.soft else 1.0)
-		visual.scale *= Vector3(1.0 + 0.1 * s, 1.0 - 0.12 * s, 1.0 + 0.1 * s)
+		if not _hit_own:                              # la familia sin reacción propia, aplastada entera
+			visual.scale *= Vector3(1.0 + 0.1 * s, 1.0 - 0.12 * s, 1.0 + 0.1 * s)
 		if _hit_dir != Vector3.ZERO:
 			visual.basis = Basis(Vector3.UP.cross(_hit_dir), 0.2 * s) * visual.basis
 		_hit_t += delta
@@ -741,6 +747,9 @@ func _process(delta: float) -> void:
 	var crowd := world.enemies.size() > CROWD and (Engine.get_process_frames() + get_instance_id()) % 2 == 1
 	if model_scale > 1.5 or (not crowd and (cam == null or cam.is_position_in_frustum(visual.global_position + Vector3(0, 1.0, 0)))):
 		Anims.pose(model_name, anim, model, anim_t)
+		# la reacción de su familia, encima de la pose (que la deshace en el siguiente fotograma)
+		if _hit_own and _hit_t < _hit_len:
+			Anims.hit(model_name, model, clampf(_hit_t / _hit_len, 0.0, 1.0))
 	_flash -= delta
 	# tinte: destello al recibir daño; si no, turquesa en estasis o violeta maldito.
 	# Solo se toca el material al cambiar.

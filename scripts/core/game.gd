@@ -329,7 +329,8 @@ func _ready() -> void:
 			hazards = Hazards.new().setup(level, world, arena.get_meta("obstacles"))
 			hazards.mirror = is_guest()               # en red, los saca el anfitrión (NetGame)
 			add_child(hazards)
-		announce(level.display_name, 3.0)
+		if not args.has("shots") or args.get_bool("card"):   # capturas: sin el rótulo, salvo card=true
+			LevelCard.enter(self, level_id, level.display_name)
 		Music.play(level.music_path())
 		if args.get_bool("log"): print("MUSICA ", Music.current())
 	_start_weather()
@@ -1053,8 +1054,14 @@ func _next_level(id: String) -> void:
 	Saves.save()
 	get_tree().paused = false
 	Engine.time_scale = 1.0
-	if args.get_bool("autonext"): get_tree().reload_current_scene.call_deferred()   # pruebas: sin relato
-	else: get_tree().change_scene_to_file.call_deferred("res://scenes/relato.tscn")
+	_to_next_scene()
+
+## Funde a negro (LevelCard.leave) y pasa al relato del siguiente nivel o, en pruebas, lo
+## empieza sin relato (autonext=true).
+func _to_next_scene() -> void:
+	LevelCard.leave(self, func() -> void:
+		if args.get_bool("autonext"): get_tree().reload_current_scene()
+		else: get_tree().change_scene_to_file("res://scenes/relato.tscn"))
 
 func _restart() -> void:
 	if is_guest():                                   # en red, reintenta el anfitrión
@@ -1478,8 +1485,7 @@ func net_next(d: Dictionary) -> void:
 	Saves.save()
 	get_tree().paused = false
 	Engine.time_scale = 1.0
-	if args.get_bool("autonext"): get_tree().reload_current_scene.call_deferred()   # pruebas: sin relato
-	else: get_tree().change_scene_to_file.call_deferred("res://scenes/relato.tscn")
+	_to_next_scene()
 
 func net_restart() -> void:   # el PC de cada puesto ya viene puesto (NetGame.apply_seat_peers)
 	Saves.save()

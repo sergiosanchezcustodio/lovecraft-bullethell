@@ -44,3 +44,15 @@ static func pounce(m: Node3D, t: float) -> void:
 	Anims.part(m, "arm_r").rotation.x = -reach * 1.1 + crouch * 0.2
 	Anims.part(m, "leg_l").rotation.x = reach * 0.9 - crouch * 0.25
 	Anims.part(m, "leg_r").rotation.x = reach * 0.9 - crouch * 0.25
+
+## Golpe (Profundos, Acechador, Hydra): da un respingo hacia atrás con la cabeza echada atrás y
+## las garras abiertas, como un animal que sisea (28-10-2026).
+const HIT_TIME := 0.38
+static func hit(m: Node3D, k: float) -> void:
+	var s := Anims.jolt(k, 0.14)
+	Anims.part(m, "torso").rotation.x += -0.3 * s
+	Anims.part(m, "head").rotation.x += -0.4 * s
+	Anims.part(m, "arm_l").rotation.z += -0.5 * s
+	Anims.part(m, "arm_r").rotation.z += 0.5 * s
+	Anims.part(m, "arm_l").rotation.x += -0.3 * s
+	Anims.part(m, "arm_r").rotation.x += -0.3 * s

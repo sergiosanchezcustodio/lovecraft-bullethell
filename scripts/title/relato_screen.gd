@@ -99,9 +99,16 @@ func _process(delta: float) -> void:
 func _all_shown() -> bool:
 	return _t >= 0.4 + (_lines.size() - 1) * LINE_DELAY + FADE
 
+var _gone := false
 func _go() -> void:
+	if _gone: return                                      # una vez (soltar y mantener pueden coincidir)
+	_gone = true
 	set_process(false)
-	get_tree().change_scene_to_file.call_deferred(GAME)   # en red, la partida espera a que lleguen todos (NetGame)
+	if not is_inside_tree() or get_child_count() == 0:     # sin relato (skip_relato): directo
+		get_tree().change_scene_to_file.call_deferred(GAME)
+		return
+	# funde a negro: la partida empieza saliendo de negro con el rótulo del nivel (LevelCard)
+	LevelCard.leave(self, func() -> void: get_tree().change_scene_to_file(GAME))   # en red, la partida espera a que lleguen todos (NetGame)
 
 func _input(event: InputEvent) -> void:
 	var down := false

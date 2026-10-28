@@ -31,3 +31,11 @@ static func burst(m: Node3D, t: float) -> void:
 	Anims.part(m, "top").position.y = Anims.rest(m, "top").y + k * 0.06
 	Anims.part(m, "pod_l").rotation.z = -k * 0.5
 	Anims.part(m, "pod_r").rotation.z = k * 0.5
+
+## Golpe: la masa tiembla en ondas que se calman, ancha y baja, alta y estrecha (28-10-2026).
+const HIT_TIME := 0.7
+static func hit(m: Node3D, k: float) -> void:
+	var fade := pow(1.0 - k, 1.6)
+	var w := sin(k * TAU * 3.0) * fade
+	var w2 := sin(k * TAU * 3.0 + 1.6) * fade
+	m.scale *= Vector3(1.0 + 0.16 * w, 1.0 - 0.2 * w, 1.0 + 0.16 * w2)

@@ -7,7 +7,11 @@ extends RefCounted
 ## CharacterData.dodge_anim; la animación puede durar más que el impulso del esquive.
 const ARM_LAG := 0.32                         ## retraso de los brazos respecto a las piernas (rad del ciclo)
 const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive": 0.5,
-	"jump": 0.45, "flash": 0.3, "throw": 0.55}
+	"jump": 0.45, "flash": 0.3, "throw": 0.55,
+	"fidget_look": 2.6, "fidget_stretch": 2.8, "fidget_check": 2.4, "fidget_shift": 1.8}
+## Gestos de reposo (28-10-2026): Player los pone de vez en cuando si el personaje lleva un rato
+## quieto. Empiezan y acaban en la pose de reposo, y se funden al entrar y al salir.
+const FIDGETS := ["fidget_look", "fidget_stretch", "fidget_check", "fidget_shift"]
 
 ## Piezas opcionales: antebrazos y espinillas (codos y rodillas), bufanda y coleta. Los
 ## modelos partidos con tools/humano.py split_limbs las tienen; los demás, no, y las
@@ -37,6 +41,57 @@ static func idle(m: Node3D, t: float) -> void:
 	Anims.part(m, "head").rotation.y = sin(w * 0.5) * 0.15
 	Anims.part(m, "arm_l").rotation.z = -0.05 - sin(w) * 0.02
 	Anims.part(m, "arm_r").rotation.z = 0.05 + sin(w) * 0.02
+
+## Curva de un gesto: sube en `rise`, se mantiene y baja desde `fall` (0..1, suave).
+static func _hold(t: float, rise: float, fall: float) -> float:
+	return Anims.ease(clampf(t / rise, 0.0, 1.0)) * (1.0 - Anims.ease(clampf((t - fall) / (1.0 - fall), 0.0, 1.0)))
+
+## Gesto: mira a un lado y al otro, con el tronco acompañando un poco (vigila la oscuridad).
+static func fidget_look(m: Node3D, t: float) -> void:
+	idle(m, fposmod(t, 1.0))                                                # acaba donde empieza el reposo
+	var env := _hold(t, 0.12, 0.82)
+	var turn := sin(clampf((t - 0.08) / 0.84, 0.0, 1.0) * TAU) * env    # a un lado, al otro y al frente
+	Anims.part(m, "head").rotation.y = turn * 0.85
+	Anims.part(m, "head").rotation.x = -0.06 * env
+	Anims.part(m, "torso").rotation.y = turn * 0.22
+
+## Gesto: se estira con los brazos arriba, echa la cabeza atrás y los baja.
+static func fidget_stretch(m: Node3D, t: float) -> void:
+	idle(m, 0.0)
+	var up := _hold(t, 0.3, 0.62)
+	var shake := sin(t * TAU * 3.0) * 0.06 * up                             # un temblor al tensar
+	Anims.part(m, "arm_l").rotation = Vector3(-2.7 * up + shake, 0.0, -0.32 * up)
+	Anims.part(m, "arm_r").rotation = Vector3(-2.7 * up - shake, 0.0, 0.32 * up)
+	bend(m, "fore_l", -0.14 - 0.35 * up)
+	bend(m, "fore_r", -0.14 - 0.35 * up)
+	Anims.part(m, "torso").rotation.x = -0.14 * up
+	Anims.part(m, "torso").scale = Vector3(1.0, 1.0 + 0.03 * up, 1.0)
+	Anims.part(m, "head").rotation.x = -0.3 * up
+	m.position.y = 0.025 * up                                               # de puntillas
+
+## Gesto: levanta la mano derecha y mira el arma (o lo que lleve), le da la vuelta y la baja.
+static func fidget_check(m: Node3D, t: float) -> void:
+	idle(m, 0.0)
+	var up := _hold(t, 0.22, 0.75)
+	var twist := sin(clampf((t - 0.25) / 0.45, 0.0, 1.0) * TAU) * up        # le da la vuelta
+	Anims.part(m, "arm_r").rotation = Vector3(-0.75 * up, 0.35 * twist, 0.12 * up)
+	bend(m, "fore_r", -0.14 - 1.25 * up, 0.25 * twist)
+	Anims.part(m, "head").rotation = Vector3(0.38 * up, -0.32 * up, 0.0)
+	Anims.part(m, "torso").rotation.y = -0.12 * up
+
+## Gesto: cambia el peso de pierna, rueda los hombros y vuelve.
+static func fidget_shift(m: Node3D, t: float) -> void:
+	idle(m, fposmod(t, 1.0))
+	var env := _hold(t, 0.25, 0.7)
+	var roll := sin(clampf(t, 0.0, 1.0) * TAU) * env
+	m.rotation.z = 0.05 * env                                               # el peso a la izquierda
+	m.position.x = -0.02 * env
+	bend(m, "shin_r", 0.03 + 0.28 * env)                                    # rodilla floja
+	Anims.part(m, "leg_r").rotation.x = -0.12 * env
+	Anims.part(m, "torso").rotation.z = -0.06 * env
+	Anims.part(m, "arm_l").rotation.x = 0.18 * roll                         # hombros que ruedan
+	Anims.part(m, "arm_r").rotation.x = -0.18 * roll
+	Anims.part(m, "head").rotation.z = 0.08 * env
 
 ## Paso ligero sobre la nieve: zancada amplia (a 4,5 m/s, unos 2,2 m por ciclo), brazos a
 ## contrapaso, leve giro de hombros y un pequeño rebote en cada apoyo.
@@ -213,3 +268,20 @@ static func throw(m: Node3D, t: float) -> void:
 	Anims.part(m, "torso").rotation.y = -back * 0.22 + fwd * 0.18
 	Anims.part(m, "arm_l").rotation.x = -back * 0.35
 	bend(m, "fore_r", -back * 1.3 + fwd * 0.2)                             # codo atrás al coger impulso
+
+## Golpe (cultistas, vecinos, híbridos, sacerdotes): se dobla por la cintura, se lleva las
+## manos al vientre, la cabeza cae y se recompone (28-10-2026).
+const HIT_TIME := 0.42
+static func hit(m: Node3D, k: float) -> void:
+	var s := Anims.jolt(k, 0.16)
+	Anims.part(m, "torso").rotation.x += 0.42 * s
+	Anims.part(m, "head").rotation.x += 0.3 * s
+	Anims.part(m, "arm_l").rotation.x += -0.55 * s
+	Anims.part(m, "arm_r").rotation.x += -0.55 * s
+	Anims.part(m, "arm_l").rotation.z += 0.25 * s                            # hacia el vientre
+	Anims.part(m, "arm_r").rotation.z += -0.25 * s
+	bend(m, "fore_l", -0.14 - 0.7 * s)
+	bend(m, "fore_r", -0.14 - 0.7 * s)
+	bend(m, "shin_l", 0.03 + 0.2 * s)
+	bend(m, "shin_r", 0.03 + 0.2 * s)
+	m.position.y -= 0.03 * s
