@@ -1,0 +1,6 @@
+{
+	"_doc": "Ropa que se ensucia por nivel (hito 12.4, Player._dirt_step y scripts/fx/dirt.gdshader). Por parte (p1, p2, p3) y, si hace falta, por arena (su nombre, gana a la parte). color: de la mancha; reach: m desde los pies cuando está del todo sucio; top: cuánto se posa en lo que mira arriba (nieve en hombros y sombrero); wet: brillo de mojado; time: s andando hasta ensuciarse del todo (quieto, a un tercio).",
+	"p1": {"color": [0.9, 0.94, 1.0], "reach": 0.48, "top": 0.55, "wet": 0.1, "time": 150},
+	"p2": {"color": [0.36, 0.27, 0.16], "reach": 0.55, "top": 0.0, "wet": 0.55, "time": 180},
+	"p3": {"color": [0.2, 0.4, 0.27], "reach": 0.55, "top": 0.18, "wet": 0.45, "time": 180}
+}

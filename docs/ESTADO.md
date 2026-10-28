@@ -1230,6 +1230,12 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Prendas del vestuario: lo de por debajo de la cadera pasa a `skirt` (`gen_vestuario.build`), así que los abrigos, la bata, el vestido y el chubasquero se mecen en cualquiera. `VoxelBuilder.dress` lo cuelga del tronco en un cuerpo sin pivote `skirt` (modelos de antes). `under_kept` (voxlib) también quita las piernas que tapa `skirt`.
   - La trenza de Peaslee (`hair`) ya se movía con el muelle desde la primera parte.
   - Hoja `shots/revision/2026-10-28/ropa_estola_prendas.png` (Varga de frente y de lado; Dyer con el abrigo de nieve, Peaslee con la bata y Olmstead con el vestido, en zigzag). `revisar_costados.py`: 368 modelos enteros. 487 de 487.
+- **Fase 12, hito 12.4: ropa que se ensucia por nivel (28-10-2026), pendiente de tu revisión:**
+  - Desde los pies sube una mancha que crece durante el nivel: nieve en la Antártida (que también se posa en lo que mira arriba: sombrero y hombros), barro mojado en Innsmouth y verdín en R'lyeh. El borde va roto en celdas de voxel y las de barro y verdín brillan como mojadas. Andando se ensucia del todo en 2,5-3 min; quieto, a un tercio del ritmo. Cada nivel crea los jugadores de nuevo, así que empieza limpio.
+  - Segunda pasada (`scripts/fx/dirt.gdshader`) sobre una copia del material compartida (como las grietas); la mancha de cada jugador (`dirt`) y la altura de sus pies, parámetros de instancia. Color, alcance, nieve arriba, brillo y tiempo, por parte en `data/dirt.json` (una arena puede tener la suya). `Player._dirt_dress`, `_dirt_step`, `Player.dirt_config`; la partida lo pone con la parte del nivel.
+  - En red, cada PC ensucia a todos los jugadores con lo que andan. Coste: cuatro jugadores dibujados dos veces, nada apreciable.
+  - Opción `dirt=false|0.8` (sin mancha, o fija a ese nivel). Hoja `shots/revision/2026-10-28/ropa_sucia.png` (Legrasse con `dirt=0.9` en las tres partes).
+  - Tests en `test_player_dirt`. 489 de 489.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

@@ -129,6 +129,15 @@ const CLOTH_DODGE := 0.35        ## en el esquive, la ropa se mueve menos (con s
 var _cloth := Vector2.ZERO       ## giro de la ropa (x: atrás, z: de lado), rad
 var _cloth_v := Vector2.ZERO
 var _cloth_yaw := 0.0
+## Ropa que se ensucia (hito 12.4): nieve, barro o verdín que sube desde los pies durante el nivel.
+## La configuración de la parte la pone la partida (dirt_config); `dirt` es de cada jugador.
+static var dirt_cfg := {}
+static var dirt_force := -1.0      ## dirt=0.8: fijo a ese nivel (capturas)
+static var _dirt_mat: ShaderMaterial
+static var _dirty := {}            ## material del modelo -> su copia con la segunda pasada
+var dirt := 0.0
+var _dirt_meshes: Array = []
+var _dirt_feet := INF
 var _blend_t := 1.0
 var _blend_len := 0.0
 var _snow: GPUParticles3D        ## nieve que levanta al deslizarse
@@ -201,6 +210,7 @@ func _ready() -> void:
 	_xray.set_shader_parameter("color", Color(color, 0.6))
 	for mi: MeshInstance3D in model.get_meta("meshes"):
 		mi.material_overlay = _xray
+	_dirt_dress()
 	_ring = _make_ring()
 	add_child(_ring)
 	_crisis_look = CrisisLook.new().setup(model)      # aura morada y cara de pánico en las crisis
@@ -544,6 +554,7 @@ func _process_step(delta: float) -> void:
 	if _up_t >= 0.0: _get_up_step(delta)
 	else: _animate(delta)
 	_cloth_step(delta)
+	_dirt_step(delta)
 	_keep_above_ground(delta)
 	_wade = move_toward(_wade, 1.0 if in_water() else 0.0, WadeSplash.EASE * delta)
 	visual.position.y -= _wade * WadeSplash.SINK        # metido en el agua hasta los tobillos
@@ -642,6 +653,52 @@ func _animate(delta: float) -> void:
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
 	_mind_step(delta)
+
+## Configuración de la mancha del nivel (data/dirt.json): la de la arena o, si no, la de la parte.
+static func dirt_config(part_key: String, arena_name: String) -> Dictionary:
+	var all: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/dirt.json"))
+	return all.get(arena_name, all.get(part_key, {}))
+
+## Pone la segunda pasada de la mancha en las mallas del modelo (sin las de luz) y la ajusta a la
+## configuración del nivel (una para todos: el color y el alcance son de la parte).
+func _dirt_dress() -> void:
+	_dirt_meshes = []
+	if dirt_cfg.is_empty(): return
+	if _dirt_mat == null:
+		_dirt_mat = ShaderMaterial.new()
+		_dirt_mat.shader = preload("res://scripts/fx/dirt.gdshader")
+	var col: Array = dirt_cfg.get("color", [0.5, 0.5, 0.5])
+	_dirt_mat.set_shader_parameter("tint", Color(col[0], col[1], col[2]))
+	_dirt_mat.set_shader_parameter("reach", float(dirt_cfg.get("reach", 0.35)))
+	_dirt_mat.set_shader_parameter("top", float(dirt_cfg.get("top", 0.0)))
+	_dirt_mat.set_shader_parameter("wet", float(dirt_cfg.get("wet", 0.0)))
+	var vs := float(model.get_meta("voxel_size", VoxelBuilder.VOXEL)) * model.scale.x
+	for mi: MeshInstance3D in model.get_meta("meshes"):
+		var base := mi.material_override as StandardMaterial3D
+		if base == null or int(mi.get_meta("kind", 0)) != 0: continue
+		if not _dirty.has(base):
+			var m2 := base.duplicate() as StandardMaterial3D
+			m2.next_pass = _dirt_mat
+			_dirty[base] = m2
+		mi.material_override = _dirty[base]
+		mi.set_instance_shader_parameter("vox", vs)
+		mi.set_instance_shader_parameter("dirt", 0.0)
+		_dirt_meshes.append(mi)
+
+## Se ensucia andando (quieto, a un tercio del ritmo) hasta estar del todo sucio a los `time` s.
+func _dirt_step(delta: float) -> void:
+	if _dirt_meshes.is_empty(): return
+	var before := dirt
+	var walk := clampf(motor.velocity.length() / maxf(data.move_speed, 0.1), 0.0, 1.0)
+	dirt = dirt_force if dirt_force >= 0.0 else minf(1.0, dirt + delta * (0.33 + 0.67 * walk) / float(dirt_cfg.get("time", 180.0)))
+	var feet := visual.global_position.y
+	var moved := absf(feet - _dirt_feet) > 0.005
+	if not moved and absf(dirt - before) < 0.0005 and _dirt_feet != INF: return
+	_dirt_feet = feet
+	for mi: MeshInstance3D in _dirt_meshes:
+		if not is_instance_valid(mi): continue
+		mi.set_instance_shader_parameter("dirt", dirt)
+		mi.set_instance_shader_parameter("feet_y", feet)
 
 ## Ropa y pelo con retraso (hito 12.3), encima de la pose: con la velocidad en el sentido en que
 ## mira (atrás al andar) y el giro por la velocidad (hacia fuera); el muelle pone el retraso y,

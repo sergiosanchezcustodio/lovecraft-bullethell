@@ -39,6 +39,7 @@ extends Node3D
 ##   boss_intro=false        sin la entrada de los jefes (BossIntro): solo el aviso, como antes
 ##   crumble=false / marks=N  sin desmoronarse / tope de manchas en el suelo (0, ninguna; por defecto, el de la calidad gráfica)
 ##   falls=false             sin la caída de cada familia al morir (hito 12.7)
+##   dirt=false|0.8          sin la ropa que se ensucia, o fija a ese nivel (hito 12.4)
 ##   wounds=false|0.7        sin las grietas de herida de élites, únicos y grandes, o fijas a ese nivel (hito 12.6)
 ##   demo_kill=t             mata a la vez a todos los enemigos a ese segundo (capturas de las muertes)
 ##   character=johansen      personaje del J1 (dyer, olmstead, legrasse, johansen)
@@ -144,6 +145,9 @@ func _ready() -> void:
 		var ld: LevelData = load("res://data/levels/%s.tres" % lid)
 		if ld != null: arena_path = ld.arena
 	Enemy.part_tint = Enemy.PART_TINTS.get(part_key, Color(0.45, 0.2, 0.7))   # auras de las élites (hito 12.6)
+	# ropa que se ensucia (hito 12.4; dirt=false la quita, dirt=0.8 la deja fija para capturas)
+	Player.dirt_cfg = {} if args.get_str("dirt", "") == "false" else Player.dirt_config(part_key, arena_path.get_file().get_basename())
+	Player.dirt_force = args.get_float("dirt", -1.0) if args.get_str("dirt", "").is_valid_float() else -1.0
 	arena_path = args.get_str("arena", arena_path)
 	arena = ArenaBuilder.build(arena_path, fogvol)
 	add_child(arena)
