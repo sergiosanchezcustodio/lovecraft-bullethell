@@ -483,28 +483,33 @@ def pivots(b=0, ax=ARM_X):
     piv = {'torso': [0, HIP, 0], 'head': [0, NECK, 0], 'hat': [0, NECK, 0],
            'arm_l': [-ax, SHOULDER, 0], 'arm_r': [ax, SHOULDER, 0],
            'fore_l': [-ax * 1.02, ELBOW, 0.5], 'fore_r': [ax * 1.02, ELBOW, 0.5],
-           'leg_l': [-5, HIP, 0], 'leg_r': [5, HIP, 0], 'shin_l': [-5, KNEE, 0], 'shin_r': [5, KNEE, 0]}
+           'leg_l': [-5, HIP, 0], 'leg_r': [5, HIP, 0], 'shin_l': [-5, KNEE, 0], 'shin_r': [5, KNEE, 0],
+           'skirt': [0, HIP, 0]}                     # faldones (hito 12.3): cuelgan de la cadera
     if ax < ARM_X:                                    # mujer: piernas algo más juntas
         for k in ('leg_l', 'shin_l'): piv[k][0] = -4.5
         for k in ('leg_r', 'shin_r'): piv[k][0] = 4.5
-    parents = {'shin_l': 'leg_l', 'shin_r': 'leg_r', 'fore_l': 'arm_l', 'fore_r': 'arm_r', 'hat': 'head'}
+    parents = {'shin_l': 'leg_l', 'shin_r': 'leg_r', 'fore_l': 'arm_l', 'fore_r': 'arm_r', 'hat': 'head',
+               'skirt': 'torso'}
     return piv, parents
 
 
 def finish(M, name, mats, flat=(), b=0, extra_pivots=None, extra_parents=None, top=85.0, ax=ARM_X, hat=(),
-           roughness=0.9, specular=0.25):
+           roughness=0.9, specular=0.25, skirt=False):
     """Texturas por material, luz (arriba algo más claro, la espalda algo más oscura) y
     exportación con los pivotes comunes. hat: colores del sombrero (o diadema): esos voxels
     de la cabeza pasan a la parte `hat`, que se oculta al ponerse una prenda de cabeza.
-    roughness/specular: mate por defecto (ropa); las criaturas de piel húmeda, ~0,45 / 0,5."""
+    roughness/specular: mate por defecto (ropa); las criaturas de piel húmeda, ~0,45 / 0,5.
+    skirt: lo del tronco por debajo de la cadera (faldones, bata, sotana, falda) pasa a la parte
+    `skirt`, que cuelga de la cadera y se mueve con retraso al andar, girar y frenar (hito 12.3)."""
     hat = set(hat)
     flat = set(flat) | {EYE, EYE_W}
     main = M.V
     under = {k: list(v) for k, v in M.under_kept().items()} if M.keep_under else {}
     for V in (main, under):                           # lo pisado por otra parte, con la misma textura y luz
         M.V = V
-        for v in M.V.values():
+        for k, v in M.V.items():
             if v[0] == H and v[1] in hat: v[0] = 'hat'
+            if skirt and v[0] == T and k[1] < HIP: v[0] = 'skirt'
         materiales.texturize(M, mats)
         for k, v in M.V.items():
             x, y, z = k

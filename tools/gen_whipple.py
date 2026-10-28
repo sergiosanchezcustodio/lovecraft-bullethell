@@ -88,4 +88,4 @@ slab(M, H, (0.26, 0.15, 0.09), 82, 83, 0, -6.5, 8.5, 8.5, 7.5, 7.5, ch=2)  # cin
 cu.seams(M, (COAT,))
 cu.finish(M, 'whipple', {COAT: 'lona', COAT_SH: 'lona', DRESS: 'lana', DRESS_SH: 'lana', SHOE: 'cuero',
                          SOLE: 'cuero', HAIR: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
-          flat=(LIP, LIP_LO, BROW, IRIS, CHEEK, FRAME, PEN, STETH, STETH_M, STOCKING), ax=AX)
+          flat=(LIP, LIP_LO, BROW, IRIS, CHEEK, FRAME, PEN, STETH, STETH_M, STOCKING), ax=AX, skirt=True)

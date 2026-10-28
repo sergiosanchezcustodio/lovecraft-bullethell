@@ -75,7 +75,7 @@ def armitage():
     cu.seams(M, (COAT,))
     cu.finish(M, 'armitage', {COAT: 'lana', COAT_SH: 'lana', VEST: 'lana', TROUSER: 'lana', SHOE: 'cuero',
                               SOLE: 'cuero', HAIR: 'pelo', HAIR_SH: 'pelo', SKIN: 'piel', SKIN_SH: 'piel', BOOK: 'cuero'},
-              flat=(CHEEK, GOLD, TIE, PAGE, IRIS, EAR_IN), b=B)
+              flat=(CHEEK, GOLD, TIE, PAGE, IRIS, EAR_IN), b=B, skirt=True)
 
 
 def west():

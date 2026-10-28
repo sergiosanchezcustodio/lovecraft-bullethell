@@ -1218,6 +1218,12 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - `Player._mind_step`, con la cordura que ve cada PC (viaja en las fotos), así que vale para los jugadores de otros PC.
   - Visor: `godot --path . -- anim 30 dyer,varga,johansen unease` (y `crisis`). Hoja en `shots/revision/2026-10-28/cordura_baja.png` (cordura baja, crisis de frente y de lado, y en partida con `san=6` y `san=0`).
   - Tests en `test_player_mind`. 487 de 487.
+- **Fase 12, hito 12.3 (primera parte): ropa con retraso en cinco personajes (28-10-2026), pendiente de tu revisión antes de seguir:**
+  - Gabardina de Legrasse, levita de Armitage, bata (y vestido) de Whipple, sotana de Iwanicki y vestido de Varga: lo del tronco por debajo de la cadera es ahora una pieza, `skirt`, que cuelga de la cadera (`cuerpo.finish(..., skirt=True)`; el pivote `skirt` está en `cuerpo.pivots` para todos los humanos y las prendas, aunque no tengan faldón).
+  - Un muelle en `Player._cloth_step` (por eje: atrás y de lado) con la velocidad en el sentido en que mira (atrás al andar, más al acelerar por el retraso), el giro por la velocidad (hacia fuera) y poca amortiguación (al frenar se pasa adelante y vuelve). Mueve también la bufanda de Dyer (×0,8) y el pelo de Peaslee (×0,6) encima de su oscilación de siempre. Con la velocidad que se dibuja, así que vale para los de otros PC.
+  - Una sola pieza y no paneles delante y detrás: con dos paneles, en la sotana y los vestidos se abría una raja en los costados al andar.
+  - La estola de Varga no se mueve: va sobre los hombros, sin extremos que cuelguen. Las prendas del vestuario (abrigos, bata, vestido) todavía no tienen faldón aparte.
+  - Vídeo `shots/videos/ropa_con_retraso.mp4` (los cinco en zigzag) y hoja `shots/revision/2026-10-28/ropa_con_retraso.png`. `revisar_costados.py`: 368 modelos, todos enteros. 487 de 487.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

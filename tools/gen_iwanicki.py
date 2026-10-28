@@ -79,4 +79,4 @@ cu.hair_back(M, SKIN, HAIR, bottom=67, neck=False, point=5)
 cu.seams(M, (CASSOCK,))
 cu.finish(M, 'iwanicki', {CASSOCK: 'lana', CASSOCK_SH: 'lana', SASH: 'punto', SASH_SH: 'punto', SOCK: 'lana',
                           SHOE: 'cuero', SOLE: 'cuero', HAIR: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
-          flat=(BROW, SILVER, BUTTON, COLLAR, IRIS, WRINKLE, MOUTH, EAR_IN), b=B)
+          flat=(BROW, SILVER, BUTTON, COLLAR, IRIS, WRINKLE, MOUTH, EAR_IN), b=B, skirt=True)

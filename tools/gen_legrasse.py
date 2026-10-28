@@ -105,4 +105,4 @@ cu.finish(M, 'legrasse', {COAT: 'lona', COAT_SH: 'lona', SUIT: 'lana', SUIT_SH: 
                           SOLE: 'cuero', HAT: 'lana', HAT_SH: 'lana', BAND: 'punto', HAIR: 'pelo',
                           MOUSTACHE: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
           flat=(BADGE, BUTTON, TIE, BROW, IRIS, MOUTH, EAR_IN), b=B,
-          hat=(HAT_SH, BAND, HAT, BOW))
+          hat=(HAT_SH, BAND, HAT, BOW), skirt=True)

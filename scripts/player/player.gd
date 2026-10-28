@@ -120,6 +120,14 @@ var _down_snap: Array = []       ## pose en que cayó o en que lo levantaron, pa
 const UNEASE_AT := 0.35          ## por debajo de esta fracción de cordura se le nota (hito 12.2)
 var _mind_t := 0.0               ## reloj de los gestos de la cordura baja
 var _crisis_w := 0.0             ## cuánto tiene las manos en la cabeza (crisis), 0..1
+## Ropa y pelo con retraso (hito 12.3): un muelle por eje que empuja los faldones, la bufanda y el
+## pelo atrás al andar (más al acelerar), adelante al frenar y hacia fuera al girar.
+const CLOTH_K := 70.0            ## rigidez del muelle (1/s²)
+const CLOTH_C := 7.0             ## amortiguación (poca: al frenar se pasa y vuelve)
+const CLOTH_PARTS := {"skirt": 1.0, "scarf": 0.8, "hair": 0.6}
+var _cloth := Vector2.ZERO       ## giro de la ropa (x: atrás, z: de lado), rad
+var _cloth_v := Vector2.ZERO
+var _cloth_yaw := 0.0
 var _blend_t := 1.0
 var _blend_len := 0.0
 var _snow: GPUParticles3D        ## nieve que levanta al deslizarse
@@ -534,6 +542,7 @@ func _process_step(delta: float) -> void:
 	visual.visible = not (_hurt_time >= 0.0 and _hurt_time < data.hit_iframes and fmod(_hurt_time, 0.12) < 0.06)
 	if _up_t >= 0.0: _get_up_step(delta)
 	else: _animate(delta)
+	_cloth_step(delta)
 	_keep_above_ground(delta)
 	_wade = move_toward(_wade, 1.0 if in_water() else 0.0, WadeSplash.EASE * delta)
 	visual.position.y -= _wade * WadeSplash.SINK        # metido en el agua hasta los tobillos
@@ -632,6 +641,26 @@ func _animate(delta: float) -> void:
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
 	_mind_step(delta)
+
+## Ropa y pelo con retraso (hito 12.3), encima de la pose: con la velocidad en el sentido en que
+## mira (atrás al andar) y el giro por la velocidad (hacia fuera); el muelle pone el retraso y,
+## al frenar, el vaivén. Con lo que se dibuja, así que vale para los jugadores de otros PC.
+func _cloth_step(delta: float) -> void:
+	if delta <= 0.0: return
+	var yaw := visual.rotation.y
+	var turn := wrapf(yaw - _cloth_yaw, -PI, PI) / delta
+	_cloth_yaw = yaw
+	var fwd := Vector3(sin(yaw), 0.0, cos(yaw))
+	var speed := motor.velocity.dot(fwd) / maxf(data.move_speed, 0.1)
+	var want := Vector2(clampf(0.22 * speed, -0.3, 0.45), clampf(-0.05 * turn * maxf(speed, 0.0), -0.35, 0.35))
+	_cloth_v += (CLOTH_K * (want - _cloth) - CLOTH_C * _cloth_v) * delta
+	_cloth += _cloth_v * delta
+	var parts: Dictionary = model.get_meta("part_nodes")
+	for pname: String in CLOTH_PARTS:
+		if not parts.has(pname): continue
+		var n: Node3D = parts[pname]
+		n.rotation.x += _cloth.x * CLOTH_PARTS[pname]
+		n.rotation.z += _cloth.y * CLOTH_PARTS[pname]
 
 ## Cordura baja (hito 12.2): encorvado, manos que tiemblan y mirada inquieta, más cuanto más baja;
 ## a cero (la crisis), las manos a la cabeza. Con la cordura que ve este PC, así que vale para
