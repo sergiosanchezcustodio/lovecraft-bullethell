@@ -30,6 +30,11 @@ static func _hop(m: Node3D, t: float, h: float) -> void:
 	_p(m, "leg_br").rotation.x = 0.9 * push
 	_p(m, "leg_fl").rotation.x = -0.5 * up
 	_p(m, "leg_fr").rotation.x = -0.5 * up
+	# se aplasta al agacharse y al caer, y se estira en el aire (hito 11.7)
+	var sq := sin(clampf(t / 0.25, 0.0, 1.0) * PI) + sin(clampf((t - 0.85) / 0.15, 0.0, 1.0) * PI)
+	var k := h / 0.12
+	var st := sin(air * PI * 0.5 + 0.3) * up
+	m.scale = Vector3(1.0 + (0.09 * sq - 0.05 * st) * k, 1.0 + (-0.13 * sq + 0.1 * st) * k, 1.0 + (0.09 * sq - 0.05 * st) * k)
 
 ## Escupitajo: echa la cabeza atrás, hincha la garganta y la lanza hacia delante.
 static func bite(m: Node3D, t: float) -> void:

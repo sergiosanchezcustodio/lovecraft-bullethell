@@ -24,6 +24,7 @@ contact_mental = 6.0
 aura_radius = 5.0
 aura_drain = 2.0
 movement = &"charge"
+soft = true
 params = {"charge_cooldown": 3.0, "charge_mult": 1.5, "charge_range": 11.0, "charge_speed": 12.0, "charge_time": 0.9, "rest": 1.0, "windup": 1.0}
 attack = ExtResource("2")
 attack_cooldown = 3.5

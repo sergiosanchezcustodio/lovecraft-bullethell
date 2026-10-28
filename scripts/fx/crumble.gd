@@ -21,16 +21,26 @@ var _t := 0.0
 ## demasiados a la vez o el modelo no sirve: el enemigo lo libera como siempre.
 static func start(fx_parent: Node, model: Node3D, ember: Color, big := false) -> bool:
 	if not enabled or alive >= MAX_ALIVE or fx_parent == null or model == null or not model.has_meta("meshes"): return false
-	if _mat == null:
-		_mat = ShaderMaterial.new()
-		_mat.shader = preload("res://scripts/fx/crumble.gdshader")
-		_mat.set_shader_parameter("colors_srgb", VoxelBuilder.colors_are_srgb())
 	var c := Crumble.new()
 	c._life = BIG_LIFE if big else LIFE
 	c.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	fx_parent.add_child(c)
 	model.reparent(c)
 	c._model = model
+	for it: Array in dress(model, ember): c._meshes.append(it[0])
+	alive += 1
+	return true
+
+## Pone el material de deshacerse a las mallas de `model`, entero (cut 0). Devuelve
+## [[malla, material de antes, sombra de antes], …] para devolverlo con `undress` (aparecer en
+## la niebla, hito 11.6: el mismo efecto al revés).
+static func dress(model: Node3D, ember: Color) -> Array:
+	if _mat == null:
+		_mat = ShaderMaterial.new()
+		_mat.shader = preload("res://scripts/fx/crumble.gdshader")
+		_mat.set_shader_parameter("colors_srgb", VoxelBuilder.colors_are_srgb())
+	var out := []
+	if model == null or not model.has_meta("meshes"): return out
 	var vs := float(model.get_meta("voxel_size", VoxelBuilder.VOXEL)) * model.global_basis.get_scale().y
 	var box := AABB()
 	var first := true
@@ -42,6 +52,7 @@ static func start(fx_parent: Node, model: Node3D, ember: Color, big := false) ->
 	for mi: MeshInstance3D in model.get_meta("meshes"):
 		if not is_instance_valid(mi): continue
 		var base := mi.material_override as StandardMaterial3D
+		out.append([mi, mi.material_override, mi.cast_shadow])
 		mi.material_overlay = null
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF   # se ahorra la pasada de sombras
 		mi.material_override = _mat
@@ -51,9 +62,20 @@ static func start(fx_parent: Node, model: Node3D, ember: Color, big := false) ->
 		mi.set_instance_shader_parameter("glow", 1.0 if int(mi.get_meta("kind", 0)) > 0 else 0.0)
 		mi.set_instance_shader_parameter("ember", ember)
 		mi.set_instance_shader_parameter("roughness_v", base.roughness if base != null else 0.6)
-		c._meshes.append(mi)
-	alive += 1
-	return true
+		mi.set_instance_shader_parameter("cut", 0.0)
+	return out
+
+static func set_cut(dressed: Array, cut: float) -> void:
+	for it: Array in dressed:
+		if is_instance_valid(it[0]): (it[0] as MeshInstance3D).set_instance_shader_parameter("cut", cut)
+
+static func undress(dressed: Array) -> void:
+	for it: Array in dressed:
+		if not is_instance_valid(it[0]): continue
+		var mi: MeshInstance3D = it[0]
+		mi.material_override = it[1]
+		mi.cast_shadow = it[2]
+		mi.set_instance_shader_parameter("cut", 0.0)
 
 func _process(delta: float) -> void:
 	_t += delta

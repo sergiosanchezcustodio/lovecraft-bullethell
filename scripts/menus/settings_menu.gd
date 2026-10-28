@@ -158,9 +158,10 @@ func _game() -> void:
 	var sh: Array[String] = ["Sin temblor", "25 %", "50 %", "75 %", "100 %"]
 	_choice("Temblor de la cámara", sh, int(round(float(Settings.get_value("shake")) * 4.0)), func(i: int) -> void:
 		Settings.set_value("shake", i / 4.0))
-	_toggle("Números de daño", Settings.get_value("damage_numbers"), func(on: bool) -> void:
-		Settings.set_value("damage_numbers", on)
-		DamageNumbers.enabled = on)
+	var dn: Array[String] = ["No", "Solo los golpes fuertes", "Todos"]
+	_choice("Números de daño", dn, DamageNumbers.mode_of(Settings.get_value("damage_numbers")), func(i: int) -> void:
+		Settings.set_value("damage_numbers", i)
+		DamageNumbers.set_mode(i))
 	var intro: Array[String] = ["Siempre", "Solo la primera vez"]
 	_choice("Ficha e intro al arrancar", intro, int(Settings.get_value("intro")), func(i: int) -> void:
 		Settings.set_value("intro", i))

@@ -13,7 +13,19 @@ const SIZE := 50                               ## tamaño de la fuente (la fuert
 const NORMAL := Color(1.0, 0.95, 0.84)
 const STRONG := Color(1.0, 0.7, 0.22)          ## golpe fuerte (mucha vida de golpe) o con bonificación
 const DOT := Color(0.95, 0.62, 0.42)           ## daño continuo (quemaduras, ácido)
-static var enabled := true                     ## lo pone Game con la configuración
+static var enabled := true                     ## lo pone Game con la configuración (set_mode)
+static var strong_only := false                ## solo los golpes fuertes (dorados): partidas muy llenas
+
+## Modo de la configuración (`damage_numbers`): 0 sin cifras, 1 solo los golpes fuertes, 2 todas.
+## Las configuraciones de antes guardaban sí o no.
+static func mode_of(v: Variant) -> int:
+	if v is bool: return 2 if v else 0
+	return clampi(int(v), 0, 2)
+
+static func set_mode(v: Variant) -> void:
+	var m := mode_of(v)
+	enabled = m > 0
+	strong_only = m == 1
 static var _font: FontVariation
 
 var _items: Array = []                         ## [Label3D, id del objetivo, total, edad, deriva x, origen, color, por escribir]
@@ -23,6 +35,7 @@ var _spare: Array[Label3D] = []                ## etiquetas ya usadas, para no c
 ## Suma `amount` a la cifra de `target` (o abre otra) en `at`, el punto de encima del enemigo.
 static func add(fx_parent: Node, target: Object, amount: float, at: Vector3, strong := false, dot := false) -> void:
 	if not enabled or fx_parent == null or amount <= 0.0: return
+	if strong_only and not strong: return
 	var dn: DamageNumbers = fx_parent.get_meta("damage_numbers") if fx_parent.has_meta("damage_numbers") else null
 	if dn == null or not is_instance_valid(dn):
 		dn = DamageNumbers.new()

@@ -1,5 +1,5 @@
 {
-	"_comentario": "Efectos de sonido (hito 8.1): evento -> archivos de resources/sfx (al azar), volumen en dB, tono al azar [min, max], voces a la vez y separación mínima en s. Sintetizados (tools/gen_sfx.py) y CC0 de Kenney (kenney.nl). `group` (armas, golpes): todas las del grupo comparten un tope de voces y se atenúan cuanto más suenan a la vez (Sfx.GROUPS); el volumen de las armas se regula aparte en Configuración > Audio. Ambiente de los escenarios (16-10-2026, Ambient y Weather): drip, wave_hit, creak, thunder los graznidos de las bandadas (bird_<ave>) y los crujidos del suelo del estudio (floor_creak); el fuego (fire_loop.wav) y la bandera (flag_loop.wav) los pone Ambient en su pieza, y el cántico de los cultistas (chant_loop.wav) en el ritual; los pasos (step_<suelo>) los lanza Ambient con cada pisada del jugador; la lluvia en bucle (rain_loop.wav) la pone Weather y el viento en bucle (wind_loop.wav) lo pone Ambient aparte. `bus`: Ambiente (volumen propio en Configuración > Audio).",
+	"_comentario": "Efectos de sonido (hito 8.1): evento -> archivos de resources/sfx (al azar), volumen en dB, tono al azar [min, max], voces a la vez y separación mínima en s. Sintetizados (tools/gen_sfx.py) y CC0 de Kenney (kenney.nl). `group` (armas, golpes): todas las del grupo comparten un tope de voces y se atenúan cuanto más suenan a la vez (Sfx.GROUPS); el volumen de las armas se regula aparte en Configuración > Audio. Ambiente de los escenarios (16-10-2026, Ambient y Weather): drip, wave_hit, creak, thunder los graznidos de las bandadas (bird_<ave>) y los crujidos del suelo del estudio (floor_creak); el fuego (fire_loop.wav) y la bandera (flag_loop.wav) los pone Ambient en su pieza, y el cántico de los cultistas (chant_loop.wav) en el ritual; los pasos (step_<suelo>) los lanza Ambient con cada pisada del jugador; la lluvia en bucle (rain_loop.wav) la pone Weather y el viento en bucle (wind_loop.wav) lo pone Ambient aparte. `bus`: Ambiente (volumen propio en Configuración > Audio). Aparición de los enemigos (hito 11.6): rise_snow, rise_mud, rise_stone y rise_wood (sale del suelo), rise_fog (se materializa) y rise_air (baja del cielo); los que salen del agua suenan con splash.",
 	"eventos": {
 		"shot_revolver": {
 			"db": -18,
@@ -757,6 +757,91 @@
 				"rat_1.wav"
 			],
 			"bus": "Ambiente"
+		},
+		"rise_snow": {
+			"db": -17,
+			"pitch": [
+				0.55,
+				0.72
+			],
+			"voices": 2,
+			"gap": 0.2,
+			"files": [
+				"step_snow_0.wav",
+				"step_snow_1.wav",
+				"step_snow_2.wav",
+				"step_snow_3.wav"
+			]
+		},
+		"rise_mud": {
+			"db": -15,
+			"pitch": [
+				0.55,
+				0.72
+			],
+			"voices": 2,
+			"gap": 0.2,
+			"files": [
+				"step_mud_0.wav",
+				"step_mud_1.wav",
+				"step_mud_2.wav",
+				"step_mud_3.wav"
+			]
+		},
+		"rise_stone": {
+			"db": -19,
+			"pitch": [
+				0.7,
+				0.9
+			],
+			"voices": 2,
+			"gap": 0.2,
+			"files": [
+				"gravel_0.wav",
+				"gravel_1.wav"
+			]
+		},
+		"rise_wood": {
+			"db": -19,
+			"pitch": [
+				0.6,
+				0.8
+			],
+			"voices": 2,
+			"gap": 0.2,
+			"files": [
+				"floor_creak_0.wav",
+				"floor_creak_1.wav",
+				"floor_creak_2.wav"
+			]
+		},
+		"rise_fog": {
+			"db": -23,
+			"pitch": [
+				0.45,
+				0.6
+			],
+			"voices": 2,
+			"gap": 0.3,
+			"files": [
+				"magic_0.ogg",
+				"magic_1.ogg",
+				"magic_2.ogg"
+			]
+		},
+		"rise_air": {
+			"db": -20,
+			"pitch": [
+				0.6,
+				0.78
+			],
+			"voices": 2,
+			"gap": 0.2,
+			"files": [
+				"dodge_0.ogg",
+				"dodge_1.ogg",
+				"dodge_2.ogg"
+			]
 		}
 	}
 }

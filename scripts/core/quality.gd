@@ -35,6 +35,7 @@ static func apply_viewport(vp: Viewport) -> void:
 	if q.is_empty(): return
 	vp.msaa_3d = [Viewport.MSAA_DISABLED, Viewport.MSAA_2X, Viewport.MSAA_4X, Viewport.MSAA_8X][clampi(int(q.get("msaa", 2)), 0, 3)]
 	vp.screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA if bool(q.get("fxaa", false)) else Viewport.SCREEN_SPACE_AA_DISABLED
+	vp.use_taa = bool(q.get("taa", false))
 	RenderingServer.directional_shadow_atlas_set_size(int(q.get("shadow", 4096)), true)
 	RenderingServer.directional_soft_shadow_filter_set_quality(clampi(int(q.get("shadow_soft", 2)), 0, 5) as RenderingServer.ShadowQuality)
 

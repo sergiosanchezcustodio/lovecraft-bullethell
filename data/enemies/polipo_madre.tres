@@ -27,6 +27,7 @@ contact_mental = 5.0
 aura_radius = 5.0
 aura_drain = 1.2
 movement = &"keep"
+soft = true
 params = {"keep": 5.0, "strafe": 0.35, "extra_pattern": ExtResource("3"), "extra_every": 7.0, "minion": ExtResource("4"), "minion_every": 9.0, "minion_count": 3, "minion_text": "La masa blanca se divide…"}
 attack = ExtResource("2")
 attack_cooldown = 4.5

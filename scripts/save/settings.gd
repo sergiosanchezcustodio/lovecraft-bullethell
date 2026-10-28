@@ -32,7 +32,7 @@ var defaults := {
 	"bullet_palette": 0,                    ## 0 normal, 1 alto contraste (daltonismo)
 	"flashes": 1,                           ## destellos (golpes, rayos): 0 reducidos, 1 normales
 	"shake": 1.0,                           ## temblor de cámara (0..1)
-	"damage_numbers": true,                 ## cifras de daño sobre los enemigos (hito 11.2)
+	"damage_numbers": 2,                    ## cifras de daño: 0 no, 1 solo los golpes fuertes, 2 todas (hito 11.2)
 	"quality": 2,                           ## calidad gráfica: 0 baja, 1 media, 2 alta, 3 ultra (Quality, hito 11.5)
 	"difficulty": 1,                        ## 0 investigador (la de antes), 1 normal, 2 pesadilla (Difficulty)
 	"madness": true,                        ## locura acumulada (GDD 4.5)

@@ -27,6 +27,7 @@ contact_mental = 5.0
 aura_radius = 5.0
 aura_drain = 1.1
 movement = &"keep"
+soft = true
 params = {"keep": 4.5, "strafe": 0.4, "extra_pattern": ExtResource("3"), "extra_every": 6.5, "minion": ExtResource("4"), "minion_every": 12.0, "minion_count": 3, "minion_text": "¡Ïa! Cthulhu fhtagn!", "slam_every": 5.5, "slam_radius": 2.2, "slam_damage": 14.0, "slam_warn": 1.0, "slam_count": 2}
 attack = ExtResource("2")
 attack_cooldown = 4.0

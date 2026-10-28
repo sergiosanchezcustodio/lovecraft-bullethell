@@ -3,7 +3,7 @@ extends GutTest
 ## gemas que arrancan despacio, aceleran y hacen latir el anillo al llegar (GemManager).
 
 func after_each() -> void:
-	DamageNumbers.enabled = true
+	DamageNumbers.set_mode(2)
 
 func test_los_golpes_seguidos_se_suman() -> void:
 	var fx := Node3D.new()
@@ -76,3 +76,27 @@ func test_las_gemas_aceleran_y_llegan() -> void:
 	assert_eq(gems.count, 0, "llega")
 	assert_lt(t, 0.8, "en poco rato")
 	assert_gt(p._gem_pulse, 0.0, "el anillo late")
+
+func test_solo_los_golpes_fuertes() -> void:
+	var fx := Node3D.new()
+	add_child_autofree(fx)
+	DamageNumbers.set_mode(1)
+	DamageNumbers.add(fx, fx, 10.0, Vector3.ZERO)
+	assert_false(fx.has_meta("damage_numbers"), "los normales no salen")
+	DamageNumbers.add(fx, fx, 10.0, Vector3.ZERO, true)
+	assert_eq((fx.get_meta("damage_numbers") as DamageNumbers).count(), 1, "los fuertes sí")
+
+func test_modo_de_las_configuraciones_de_antes() -> void:
+	assert_eq(DamageNumbers.mode_of(true), 2)
+	assert_eq(DamageNumbers.mode_of(false), 0)
+	assert_eq(DamageNumbers.mode_of(1), 1)
+
+func test_las_llamas_se_agitan_con_las_rafagas() -> void:
+	var fx := Node3D.new()
+	add_child_autofree(fx)
+	assert_eq(Gusts.gutter_at(Vector3(2, 0, 0)), 0.0, "sin ráfagas, quietas")
+	Gusts.push(fx, Vector3.ZERO, 0.2, 6.0)
+	assert_eq(Gusts.gutter_at(Vector3(1, 0, 0)), 1.0, "una explosión al lado casi la apaga")
+	assert_eq(Gusts.gutter_at(Vector3(20, 0, 0)), 0.0, "lejos, nada")
+	assert_lt(Gusts.gutter_k(1.0, 0.0, 0.0), 0.6)
+	assert_eq(Gusts.gutter_k(0.0, 0.0, 0.0), 1.0)

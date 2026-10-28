@@ -335,9 +335,10 @@ func _ready() -> void:
 	_start_weather()
 	Engine.time_scale = args.get_float("timescale", 1.0)
 	HitStop.enabled = args.get_bool("hitstop", true)     # micro-pausa al impactar (hito 11.1)
-	DamageNumbers.enabled = bool(Auto.setting("damage_numbers", true))   # hito 11.2 (cfg_damage_numbers=false)
+	DamageNumbers.set_mode(Auto.setting("damage_numbers", 2))   # hito 11.2 (cfg_damage_numbers=0|1|2)
 	Quality.apply_game(env, moon)                        # calidad gráfica (hito 11.5); las opciones de abajo mandan
 	Crumble.enabled = args.get_bool("crumble", Crumble.enabled)
+	Enemy.rise_enabled = args.get_bool("rise", true)   # hito 11.6
 	GroundMarks.limit = args.get_int("marks", GroundMarks.limit)
 	hud = Hud.new().setup(players, director)
 	hud.money = func() -> int: return run_money
@@ -396,6 +397,12 @@ func _ready() -> void:
 		get_tree().create_timer(args.get_float("demo_kill"), false).timeout.connect(func() -> void:
 			for e in world.enemies.duplicate():
 				if is_instance_valid(e) and e is Enemy and e.is_alive(): e.take_damage(Damage.new(1.0e7, 0.0)))
+	if args.has("rise_demo") and director != null:   # pruebas: aparecen esos enemigos alrededor del J1 a los rise_at s
+		get_tree().create_timer(args.get_float("rise_at", 1.5), false).timeout.connect(func() -> void:
+			var ids := args.get_str("rise_demo").split(",")
+			for i in ids.size():
+				var a := TAU * i / ids.size()
+				director.spawn(load("res://data/enemies/%s.tres" % ids[i]), player.global_position + Vector3(cos(a), 0, sin(a)) * 3.2))
 	if args.has("down_at"):                        # pruebas: el J1 de este PC cae a los t s de juego
 		get_tree().create_timer(args.get_float("down_at"), false).timeout.connect(func() -> void:
 			player.god = false

@@ -25,6 +25,15 @@ extends Node3D
 const PATH := "res://data/ambient.json"
 const MODES := {"pulse": 1, "flame": 2, "electric": 3}
 static var _cfg = null
+static var ground := "snow"                     ## suelo de la arena ("step"): color del polvo de lo que sale de él
+
+## Color del polvo que levanta lo que sale del suelo (hito 11.6).
+static func dust_tint() -> Color:
+	match ground:
+		"snow": return Color(0.82, 0.87, 0.95)
+		"mud": return Color(0.32, 0.29, 0.22)
+		"wood": return Color(0.45, 0.38, 0.3)
+	return Color(0.6, 0.58, 0.55)
 static var _mats := {}                          ## material compartido por modelo y capa
 
 static func config() -> Dictionary:
@@ -254,6 +263,8 @@ func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
 	camera = p_camera
 	name = "Ambient"
 	cfg = (config().get("arenas", {}) as Dictionary).get(arena_id, {})
+	ground = String(cfg.get("step", "snow"))
+	_enemy_prints_on = bool(Quality.value("enemy_prints", true))   # en calidad Baja, solo las de los jugadores
 	night = float(cfg.get("night", 0.0))
 	_rng.seed = hash(arena_id)
 	demo = OS.get_cmdline_user_args().has("amb_demo=true")       # clips: todo enseguida
@@ -445,6 +456,8 @@ func _process(delta: float) -> void:
 		(l[0] as OmniLight3D).light_energy = l[1] * anim_k(l[2], l[3], l[4], t, l[5])
 		if int(l[2]) == 2:                                          # llama: la luz baila un poco y las sombras con ella
 			var sd: float = l[5]
+			var gu := Gusts.gutter_at((l[0] as Node3D).global_position)   # una ráfaga la agita (hito 11.4)
+			if gu > 0.0: (l[0] as OmniLight3D).light_energy *= Gusts.gutter_k(gu, t, sd)
 			var j := float(l[3]) * 0.35 / maxf((l[0] as Node3D).get_parent().scale.x, 0.01)
 			(l[0] as Node3D).position = (l[6] as Vector3) + Vector3(sin(t * 7.1 + sd) * sin(t * 2.3 + sd), 0.5 + 0.5 * sin(t * 5.3 + sd * 1.7), sin(t * 6.3 + sd * 2.1) * sin(t * 1.9 + sd)) * j
 	if not _swings.is_empty(): _swing_step(delta, t)
@@ -486,7 +499,8 @@ func _process(delta: float) -> void:
 	if not _frogs.is_empty(): _frog_step(delta)
 	if not _ripples.is_empty(): _ripple_step(delta)
 	if not _drops.is_empty(): _drop_step(delta)
-	if not _prints.is_empty(): _prints_step(delta)
+	_print_clock += delta
+	_enemy_prints(delta)
 	if cfg.has("gust_embers"): _gust_embers_step()
 	if _ash != null:
 		var fa := _focus()
@@ -834,45 +848,87 @@ func _on_step(pl: Node3D) -> void:
 		_ripple(Vector3(pos.x, 0.03, pos.z), 0.6, 0.7)                 # estela: ondas a cada paso al vadear
 		if cfg.has("glow_steps"): _glow_print(Vector3(pos.x, 0.035, pos.z), cfg.glow_steps)
 	sfx_at("step_" + kind, pos)
-	if cfg.get("footprints", false) and kind == "snow": _footprint(pl)
+	_footprint(pl, kind)
 
-## Huella en la nieve donde pisa (se borra en unos segundos), alternando pie izquierdo y derecho.
-var _prints: Array = []                         ## [malla, material, edad]
-var _foot := {}
-func _footprint(pl: Node3D) -> void:
+# ---------------- huellas (hito 11.8) ----------------
+# En la nieve y el barro, de los jugadores y de los enemigos que andan; al salir del agua,
+# mojadas sobre la piedra o las tablas, cada vez más tenues (se secan). Footprints las dibuja.
+const WET_TIME := 3.0                           ## s que dura mojado quien sale del agua
+var _print_clock := 0.0
+var _wet := {}                                  ## id -> cuándo pisó agua por última vez
+var _foot := {}                                 ## id -> lado del último pie (±1)
+var _walkers := {}                              ## id de enemigo -> [nodo, donde dejó la última huella]
+var _walk_t := 0.0
+var _enemy_prints_on := true
+
+## Qué huella deja quien pisa `kind` ("snow", "mud", "stone", "wood" o "water"): [clase, fuerza] o [].
+func _print_kind(kind: String, id: int) -> Array:
+	if kind == "water":
+		_wet[id] = _print_clock
+		return []
+	if not cfg.get("footprints", true): return []
+	if kind == "snow" or kind == "mud": return [kind, 1.0]
+	var dry := _print_clock - float(_wet.get(id, -99.0))
+	if dry < WET_TIME: return ["wet", 1.0 - dry / WET_TIME]
+	return []
+
+func _footprint(pl: Node3D, kind: String) -> void:
+	var pk := _print_kind(kind, pl.get_instance_id())
+	if pk.is_empty(): return
 	var p: Player = pl
-	var fwd := Vector3(sin(p.visual.rotation.y), 0, cos(p.visual.rotation.y))
-	var side := Vector3(fwd.z, 0, -fwd.x)
-	var s: float = -1.0 if _foot.get(pl, 1.0) > 0.0 else 1.0
-	_foot[pl] = s
-	var mi := MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = Vector3(0.11, 0.008, 0.2)
-	mi.mesh = bm
-	var m := StandardMaterial3D.new()
-	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	m.albedo_color = Color(0.42, 0.48, 0.58, 0.45)
-	mi.material_override = m
-	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(mi)
-	mi.global_position = p.global_position + side * s * 0.1 + Vector3(0, 0.012, 0)
-	mi.rotation.y = p.visual.rotation.y
-	_prints.append([mi, m, 0.0])
-	if _prints.size() > 80:
-		(_prints[0][0] as Node).queue_free()
-		_prints.remove_at(0)
+	var yaw := p.visual.rotation.y
+	var side := Vector3(cos(yaw), 0, -sin(yaw))
+	var s: float = -float(_foot.get(pl.get_instance_id(), 1.0))
+	_foot[pl.get_instance_id()] = s
+	Footprints.add(self, p.global_position + side * s * 0.1, yaw, Vector2(0.11, 0.2), pk[0], pk[1])
 
-func _prints_step(delta: float) -> void:
-	for pr: Array in _prints.duplicate():
-		pr[2] += delta
-		if pr[2] > 6.0:
-			var k := 1.0 - (float(pr[2]) - 6.0) / 4.0
-			if k <= 0.0:
-				(pr[0] as Node).queue_free()
-				_prints.erase(pr)
-				continue
-			(pr[1] as StandardMaterial3D).albedo_color.a = 0.45 * k
+## Huellas de los enemigos que andan por el suelo (no los que vuelan, los etéreos ni los que
+## aparecen): una cada zancada, según su tamaño; los blandos dejan un rastro por el centro.
+func _enemy_prints(delta: float) -> void:
+	if not _enemy_prints_on: return
+	_walk_t -= delta
+	if _walk_t > 0.0: return
+	_walk_t = 0.08
+	var g := get_parent()
+	if g == null or not ("world" in g) or g.world == null: return
+	var obstacles: ObstacleMap = arena.get_meta("obstacles") if arena != null and arena.has_meta("obstacles") else null
+	var base := String(cfg.get("step", "snow"))
+	var n := 0
+	for e in g.world.enemies:
+		# sin nombrar la clase Enemy: arrastraría al jugador y a Sfx a tools/render_mapa.gd
+		if n >= 48: break
+		if not is_instance_valid(e) or not e.is_alive() or e.get("data") == null: continue
+		var d = e.data
+		if d.ethereal or d.movement == &"dive" or e.global_position.y > 0.15 or e.rising(): continue
+		n += 1
+		var id: int = e.get_instance_id()
+		var pos: Vector3 = e.global_position
+		var w: Array = _walkers.get(id, [])
+		if w.is_empty():
+			_walkers[id] = [e, pos]
+			continue
+		var r: float = d.body_radius
+		if pos.distance_to(w[1]) < 0.45 + r * 0.7: continue
+		w[1] = pos
+		var kind := base
+		if obstacles != null and obstacles.water_at(Vector2(pos.x, pos.z)) > 0.3: kind = "water"
+		var pk := _print_kind(kind, id)
+		if pk.is_empty(): continue
+		var f: Vector3 = e.facing
+		var yaw := atan2(f.x, f.z)
+		if d.soft:                                   # rastro: una mancha alargada por el centro
+			Footprints.add(self, pos, yaw, Vector2(r * 1.3, 0.45 + r * 0.7), pk[0], pk[1] * 0.8)
+			continue
+		var s: float = -float(_foot.get(id, 1.0))
+		_foot[id] = s
+		var side := Vector3(cos(yaw), 0, -sin(yaw))
+		Footprints.add(self, pos + side * s * r * 0.35, yaw, Vector2(0.08 + r * 0.12, 0.14 + r * 0.16), pk[0], pk[1])
+	if _walkers.size() > 160:                        # quita los que ya no están
+		for id in _walkers.keys():
+			if not is_instance_valid(_walkers[id][0]):
+				_walkers.erase(id)
+				_foot.erase(id)
+				_wet.erase(id)
 
 ## Ascuas que suben de las hogueras cuando las aviva una racha.
 var _gust_was := 0.0

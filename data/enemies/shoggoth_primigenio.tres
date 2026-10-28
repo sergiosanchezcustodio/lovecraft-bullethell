@@ -27,6 +27,7 @@ contact_mental = 8.0
 aura_radius = 6.0
 aura_drain = 2.5
 movement = &"boss"
+soft = true
 params = {"charge_cooldown": 2.8, "charge_mult": 1.5, "charge_range": 13.0, "charge_speed": 13.0, "charge_time": 1.0, "minion": ExtResource("5"), "minion_count": 3, "minion_every": 4.5, "phase2_every": 1.5, "phase2_pattern": ExtResource("3"), "phase3_every": 2.4, "phase3_pattern": ExtResource("4"), "phase_shield": 1.2, "rest": 0.9, "windup": 0.9}
 attack = ExtResource("2")
 attack_cooldown = 3.0

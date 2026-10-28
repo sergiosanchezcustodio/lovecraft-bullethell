@@ -118,6 +118,7 @@ func test_el_aura_de_la_elite_drena_cordura() -> void:
 	var p := _player("dyer", Vector3.ZERO)
 	var d: EnemyData = (load("res://data/enemies/acechador.tres") as EnemyData).duplicate()
 	assert_gt(d.aura_drain, 0.0, "el Acechador tiene presencia")
+	d.rise = &"none"                               # que no espere a aparecer (hito 11.6)
 	var e := Enemy.new().setup(d, world, null)
 	e.position = Vector3(2, 0, 0)
 	world.add_child(e)

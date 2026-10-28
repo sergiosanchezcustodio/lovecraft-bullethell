@@ -20,3 +20,4 @@ money = 3
 contact_physical = 8.0
 contact_mental = 4.0
 movement = &"crawl"
+soft = true

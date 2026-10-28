@@ -93,6 +93,23 @@ var _ripple_from := Vector3.INF            ## dónde dejó la última onda en el
 var _top_h := -1.0                          ## altura del modelo sin escalar (números de daño); -1, sin medir
 var _attack_timer := 0.0
 var _spawn_t := 0.0
+const RISE_TIME := 0.5                      ## s que tarda en aparecer (hito 11.6); las élites y los grandes, RISE_BIG
+const RISE_BIG := 0.85
+const RISE_FOG := Color(0.55, 0.75, 1.0)    ## borde de lo que se materializa en la niebla
+const RISE_FLY := 5.0                       ## m desde los que bajan los que vuelan
+static var rise_enabled := true             ## rise=false: aparecen creciendo, como antes
+enum Rise { NONE, GROUND, WATER, FOG, AIR }
+var _rise := Rise.NONE
+var _rise_t := 0.0
+var _rise_wait := 0.0                       ## s de física que le quedan quieto (lo de jugar no depende del dibujo)
+var _rise_life := RISE_TIME
+var _rise_h := 1.5                          ## m que se hunde al empezar (su altura)
+var _rise_mats: Array = []                  ## mallas con el material de deshacerse (niebla)
+const LAND_TIME := 0.28                     ## s que dura el aplastado al aterrizar (hito 11.7)
+var _prev_y := INF                          ## altura dibujada del fotograma anterior
+var _vy := 0.0                              ## velocidad vertical dibujada (m/s)
+var _land := 0.0                            ## fuerza del último aterrizaje (0 sin él)
+var _land_t := LAND_TIME
 
 func setup(p_data: EnemyData, p_world: CombatWorld, p_obstacles: ObstacleMap) -> Enemy:
 	data = p_data
@@ -115,6 +132,7 @@ static func _make_ethereal(m: Node3D) -> void:
 
 ## Cambia de forma (shoggoth mimético): otro modelo y otra escala, con un destello.
 func swap_model(new_model: String, new_scale: float = 1.0) -> void:
+	_rise_end()
 	if model != null: model.queue_free()
 	model_name = new_model
 	model_scale = new_scale
@@ -153,7 +171,115 @@ func _ready() -> void:
 	if puppet: anim_hold = true                # la fase de la animación llega con cada foto
 	else: behavior.start(self)
 	world.add_enemy(self)
+	_rise_start()
 	reset_physics_interpolation.call_deferred()
+
+# ---- aparición (hito 11.6, 28-10-2026) ----
+
+## Cómo aparece: lo que diga su ficha o, si no, según dónde y qué es. Los únicos (jefes y
+## minijefes) tienen su propia entrada.
+func _rise_kind() -> Rise:
+	if not rise_enabled or data.unique: return Rise.NONE
+	match String(data.rise):
+		"none": return Rise.NONE
+		"ground": return Rise.GROUND
+		"water": return Rise.WATER
+		"fog": return Rise.FOG
+		"air": return Rise.AIR
+	if data.movement == &"dive": return Rise.AIR
+	if data.ethereal: return Rise.FOG
+	if obstacles != null and obstacles.water_at(Vector2(global_position.x, global_position.z)) > 0.3: return Rise.WATER
+	return Rise.GROUND
+
+## Sale del suelo o del agua, baja del cielo o se materializa en la niebla en vez de crecer de
+## golpe. Mientras dura no anda, no ataca ni hace daño por contacto (se le puede dar). Es solo
+## de cada PC: en los invitados la marioneta hace lo mismo al nacer.
+func _rise_start() -> void:
+	_rise = _rise_kind()
+	if _rise == Rise.NONE: return
+	_spawn_t = 0.35                                 # sin crecer
+	_rise_life = RISE_BIG if data.elite or model_scale > 1.5 else RISE_TIME
+	_rise_wait = _rise_life
+	_rise_h = (_model_height() + 0.1) * model_scale
+	var at := Vector3(global_position.x, 0.0, global_position.z)
+	var cam := get_viewport().get_camera_3d()
+	var seen := cam != null and (cam.is_position_in_frustum(at) or cam.is_position_in_frustum(at + Vector3(0, _rise_h, 0)))
+	if not seen and _rise != Rise.FOG: return       # polvo y agua solo a la vista (casi todos nacen fuera de cámara)
+	match _rise:
+		Rise.GROUND:
+			VoxelFx.ground_hit(world.fx, at, 0.5 + data.body_radius * 1.4, Ambient.dust_tint(), false)
+		Rise.WATER:                                 # espuma y ondas (también lo que sale del mar)
+			Ripples.add(world.fx, at, 0.8 + data.body_radius * 1.5, 0.9, 1.4)
+			Ripples.add(world.fx, at, 0.4 + data.body_radius, 0.8, 0.9)
+			if not data.emerge: WadeSplash.burst(world.fx, at, 0.5 + data.body_radius * 0.6, Color(0, 0, 0, 0), "auto", false)
+		Rise.FOG:
+			_rise_mats = Crumble.dress(model, RISE_FOG)
+			Crumble.set_cut(_rise_mats, 1.02)
+	if not seen: return
+	match _rise:                                    # y su sonido, también solo a la vista (en el agua, el de la salpicadura)
+		Rise.GROUND: Auto.sfx_at("rise_" + Ambient.ground, at)
+		Rise.FOG: Auto.sfx_at("rise_fog", at)
+		Rise.AIR: Auto.sfx_at("rise_air", at + Vector3(0, RISE_FLY, 0))
+
+## Altura del modelo sin escalar (m), de sus mallas.
+func _model_height() -> float:
+	if not model.has_meta("meshes"): return 1.5
+	var box := AABB()
+	var first := true
+	for mi: MeshInstance3D in model.get_meta("meshes"):
+		if not is_instance_valid(mi) or mi.mesh == null: continue
+		var b := mi.global_transform * mi.get_aabb()
+		box = b if first else box.merge(b)
+		first = false
+	return box.end.y - visual.global_position.y if not first else 1.5
+
+func rising() -> bool:
+	return _rise_wait > 0.0
+
+func _rise_step(delta: float) -> void:
+	_rise_t += delta
+	var k := clampf(_rise_t / _rise_life, 0.0, 1.0)
+	var out := 1.0 - pow(1.0 - k, 3.0)              # deprisa al principio y se asienta
+	match _rise:
+		Rise.GROUND, Rise.WATER:
+			visual.global_position.y -= _rise_h * (1.0 - out)
+			var st := sin(k * PI)                     # se estira al salir
+			visual.scale *= Vector3(1.0 - 0.12 * st, 1.0 + 0.15 * st, 1.0 - 0.12 * st)
+		Rise.AIR:
+			visual.global_position.y += RISE_FLY * (1.0 - out)
+		Rise.FOG:
+			Crumble.set_cut(_rise_mats, 1.02 * (1.0 - k * k * (3.0 - 2.0 * k)))
+	if k >= 1.0: _rise_end()
+
+## Estirar y aplastar con los saltos (hito 11.7): se estira al subir o caer deprisa y se aplasta
+## al tocar el suelo, con rebote. Sale de la altura dibujada, así que vale para cualquier salto
+## (acechador, gigantes, picados de los que vuelan) y para las marionetas de la red. Los blandos,
+## el doble; los grandes y los únicos, menos.
+func _air_step(delta: float) -> void:
+	if delta <= 0.0: return
+	var y := visual.global_position.y
+	var vy := 0.0 if _prev_y == INF else (y - _prev_y) / delta
+	_prev_y = y
+	if _vy < -2.5 and vy > -0.6:                    # acaba de tocar el suelo
+		_land = clampf(-_vy / 7.0, 0.35, 1.0)
+		_land_t = 0.0
+	_vy = vy
+	var amp := (2.0 if data.soft else 1.0) * (0.4 if model_scale > 1.5 or data.unique else 1.0)
+	var st := clampf(absf(vy) / 9.0, 0.0, 1.0) * 0.14 * amp
+	var sq := 0.0
+	if _land_t < LAND_TIME:
+		var k := _land_t / LAND_TIME
+		sq = sin(k * PI * 1.5) * (1.0 - k) * 0.22 * _land * amp
+		_land_t += delta
+	if st > 0.0 or sq != 0.0:
+		var w := 1.0 - st * 0.5 + sq * 0.7
+		visual.scale *= Vector3(w, 1.0 + st - sq, w)
+
+func _rise_end() -> void:
+	if not _rise_mats.is_empty():
+		Crumble.undress(_rise_mats)
+		_rise_mats = []
+	_rise = Rise.NONE
 
 func _exit_tree() -> void:
 	if world != null: world.remove_enemy(self)
@@ -362,6 +488,7 @@ func puppet_die() -> void:
 	_death_fx()
 
 func _death_fx() -> void:
+	_rise_end()
 	var fx := DeathBurst.new()
 	fx.setup(model_name, data.body_radius, model, data.elite or data.unique)
 	fx.position = global_position
@@ -476,7 +603,8 @@ func _physics_process(delta: float) -> void:
 	if puppet:
 		_spawn_t += delta
 		_wade = move_toward(_wade, 1.0 if wades() else 0.0, WadeSplash.EASE * delta)
-		_puppet_touch(delta)
+		if _rise_wait > 0.0: _rise_wait -= delta
+		else: _puppet_touch(delta)
 		behavior.puppet_step(self, delta)
 		if guard_ring != null: guard_ring.rotation.y += 0.05
 		return
@@ -487,6 +615,11 @@ func _physics_process(delta: float) -> void:
 		return
 	if shield_t > 0.0: shield_t -= delta
 	if _update_status(delta):                  # congelado en el tiempo (o muerto por la maldición)
+		Prof.stop("enemigos_fisica", t0)
+		return
+	if _rise_wait > 0.0:                             # apareciendo: quieto y sin hacer daño (los estados sí cuentan)
+		_rise_wait -= delta
+		velocity = Vector3.ZERO
 		Prof.stop("enemigos_fisica", t0)
 		return
 	var target := target_player()
@@ -588,10 +721,12 @@ func _process(delta: float) -> void:
 		var a := 0.035 * clampf(data.body_radius, 0.4, 1.5)
 		visual.global_position += Vector3(randf_range(-a, a), 0.0, randf_range(-a, a))
 	visual.rotation = Vector3(0.0, atan2(facing.x, facing.z), 0.0)
-	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale   # aparece creciendo
+	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale   # aparece creciendo (al cambiar de forma)
+	_air_step(delta)
+	if _rise != Rise.NONE: _rise_step(delta)
 	if _hit_t < HIT_POSE:                             # golpe: se aplasta y se inclina, y vuelve con rebote (hito 11.2)
 		var hk := _hit_t / HIT_POSE
-		var s := sin(hk * PI * 1.5) * (1.0 - hk) * (0.35 if model_scale > 1.5 or data.unique else 1.0)
+		var s := sin(hk * PI * 1.5) * (1.0 - hk) * (0.35 if model_scale > 1.5 or data.unique else 1.0) * (1.5 if data.soft else 1.0)
 		visual.scale *= Vector3(1.0 + 0.1 * s, 1.0 - 0.12 * s, 1.0 + 0.1 * s)
 		if _hit_dir != Vector3.ZERO:
 			visual.basis = Basis(Vector3.UP.cross(_hit_dir), 0.2 * s) * visual.basis

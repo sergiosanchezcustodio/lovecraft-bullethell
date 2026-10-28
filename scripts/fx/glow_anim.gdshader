@@ -12,6 +12,14 @@ uniform float speed = 1.0;
 
 varying float k;
 
+global uniform vec4 gust_a;                   // ráfagas (Gusts, hito 11.4): las llamas se agitan y casi se apagan
+global uniform vec4 gust_b;
+
+float gutter(vec4 g, vec2 at) {
+	if (g.z <= 0.0) return 0.0;
+	return g.z * (1.0 - smoothstep(g.w * 0.25, g.w, length(at - g.xy)));
+}
+
 float h1(float x) { return fract(sin(x * 12.9898) * 43758.5453); }
 
 float anim_k(float t, float s) {
@@ -30,7 +38,12 @@ void vertex() {
 	if (colors_srgb) {
 		COLOR.rgb = mix(pow((COLOR.rgb + vec3(0.055)) * (1.0 / 1.055), vec3(2.4)), COLOR.rgb * (1.0 / 12.92), lessThan(COLOR.rgb, vec3(0.04045)));
 	}
-	k = anim_k(TIME, fract(dot(NODE_POSITION_WORLD.xz, vec2(0.173, 0.311))) * 100.0);
+	float s = fract(dot(NODE_POSITION_WORLD.xz, vec2(0.173, 0.311))) * 100.0;
+	k = anim_k(TIME, s);
+	if (mode == 2) {                              // llama: la misma cuenta que Gusts.gutter_k
+		float gu = clamp((gutter(gust_a, NODE_POSITION_WORLD.xz) + gutter(gust_b, NODE_POSITION_WORLD.xz)) / 0.15, 0.0, 1.0);
+		k *= 1.0 - gu * (0.45 + 0.25 * sin(TIME * 41.0 + s));
+	}
 }
 
 void fragment() {

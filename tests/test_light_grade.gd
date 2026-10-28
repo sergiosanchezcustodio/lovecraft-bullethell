@@ -75,7 +75,7 @@ func test_cuatro_preajustes_completos() -> void:
 	var p := Quality.presets()
 	assert_eq(p.size(), 4)
 	for q: Dictionary in p:
-		for k in ["name", "msaa", "fxaa", "ssao", "shadow", "shadow_soft", "shadow_dist", "fogvol", "crumble", "marks", "lights"]:
+		for k in ["name", "msaa", "fxaa", "taa", "ssao", "shadow", "shadow_soft", "shadow_dist", "fogvol", "crumble", "marks", "lights", "enemy_prints"]:
 			assert_true(q.has(k), "%s: %s" % [q.get("name"), k])
 
 func test_alta_es_como_antes() -> void:

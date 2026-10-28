@@ -20,6 +20,7 @@ money = 5
 contact_physical = 11.0
 contact_mental = 6.0
 movement = &"mimic"
+soft = true
 params = {"reveal_pattern": ExtResource("2"), "reveal_range": 5.0, "speed_mult": 1.7, "true_model": "shoggoth_grande", "true_scale": 1.6}
 attack = ExtResource("2")
 attack_cooldown = 6.0
