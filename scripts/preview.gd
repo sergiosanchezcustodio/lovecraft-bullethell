@@ -51,6 +51,9 @@ func _ready() -> void:
 			VoxelBuilder.dress(m, "res://models/vest_%s_%s.json" % [g, bits[0]], OutfitData.is_head(g))
 		if la.has("face"):                  # face=abiertos|cerrados|dolor: parpadeo y mueca (FaceLook)
 			m.add_child(FaceLook.new().setup(m, "res://models/%s.json" % bits[0]))
+		if la.has("hurt"):                  # hurt=0..1: grietas de herida (hito 12.6)
+			for mi: MeshInstance3D in Enemy.wound_dress(m, bits[0]):
+				mi.set_instance_shader_parameter("hurt", la.get_float("hurt"))
 		var holder := Node3D.new()
 		holder.rotation_degrees.y = yaw
 		holder.add_child(m)

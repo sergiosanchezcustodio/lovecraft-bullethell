@@ -1198,6 +1198,14 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - `Player` detecta la caída y la vuelta al dibujar (`_was_down`), así que vale igual para los jugadores de otros PC: probado con dos ventanas (la invitada cae con `down_at=3` y el anfitrión la ve caer, esperar y levantarse; sin errores). `revive` y `net_apply` ya no devuelven el modelo al reposo (la animación de levantarse parte de la pose de tendido).
   - Hojas en `shots/revision/2026-10-28/abatido_hoja.png` (Dyer, Legrasse y Varga: caer, levantarse y alargar la mano), `abatido_levantarse_partida.png` (en partida con `bots=1 down_at=2`: el compañero lo levanta; en una captura no se ve por el parpadeo de invulnerabilidad de siempre) y `abatido_red.png`. Visor: `godot --path . -- anim 60 dyer down` (`get_up`, `down_reach`).
   - Tests en `test_player_downed` (la caída acaba donde empieza la espera, levantarse empieza ahí y acaba de pie; ninguna parte salta). 483 de 483.
+- **Fase 12, hito 12.6: daño visible y élites (28-10-2026), pendiente de tu revisión:**
+  - **Heridas:** élites, únicos (jefes y minijefes) y enemigos grandes (escala > 1,5) se agrietan según la vida perdida: grietas en celdas de voxel, oscuras con un filo del color de su sangre (roja en los humanos, icor oliva en las masas, verdoso apagado en los demás), más y más anchas cuanto más herido. Es una segunda pasada (`scripts/fx/wounds.gdshader`) sobre una copia del material que comparten todos los enemigos con ese material; lo de cada uno (`hurt`, `tint`, `vox`) son parámetros de instancia. Sano, el vértice se colapsa (no pinta nada). Las grietas van en coordenadas de cada pieza y se mueven con ella. Los enemigos normales no las llevan (serían 150 modelos dibujados dos veces y mueren enseguida).
+  - **Élites:** un 10 % más grandes, ojos y luces más vivos (su capa de luz ×1,4) y una marca a sus pies del color de la parte (azul en la Antártida, verde en Innsmouth, rojo en R'lyeh; `Enemy.PART_TINTS`, lo pone la partida). El aura violeta de los que drenan cordura sigue igual (violeta = daño mental). Los muy grandes (radio ≥ 2 m) no llevan marca.
+  - En red: la vida de las marionetas llega en cada foto, así que en los invitados las grietas crecen igual (probado con dos ventanas en Innsmouth, sin errores).
+  - Calidad: en Baja, sin grietas (`wounds` en `data/quality.json`). Coste medido en Media con Dagon y Cthulhu heridos (`wounds=0.7`) frente a sin grietas (`wounds=false`): la misma media (6,9-7,0 ms, dos tandas por caso); con Cthulhu, 1,2 millones de triángulos más.
+  - Visor: `godot --path . -- still 30 sacerdote,profundo_anciano,engendro hurt=0.65`. Opciones `wounds=false|0.7`.
+  - Hojas: `shots/revision/2026-10-28/heridas_hoja.png` (30 %, 65 % y 100 % de vida perdida) y `elites_marca.png` (tres acechadores élite con la marca azul y su aura violeta).
+  - Test en `test_enemy_wounds`. 484 de 484.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

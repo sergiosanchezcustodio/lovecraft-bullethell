@@ -81,8 +81,21 @@ var _wander := Vector3.ZERO
 var _wander_t := 0.0
 var _status_mat: StandardMaterial3D         ## tinte de la estasis o la maldición
 var _overlay: Material = null               ## el que lleva puesto el modelo ahora
-var _aura: MeshInstance3D                   ## presencia: disco violeta en el suelo
-var _aura_mat: ShaderMaterial
+var _mark_mat: ShaderMaterial               ## élites (hito 12.6): disco del color de la parte a sus pies
+## Élites y heridas (hito 12.6): el color de la parte (lo pone la partida), algo más grandes, y
+## grietas que crecen con la vida perdida en élites, únicos y grandes.
+static var part_tint := Color(0.45, 0.2, 0.7)
+const PART_TINTS := {"p1": Color(0.1, 0.42, 1.0), "p2": Color(0.1, 0.85, 0.35), "p3": Color(0.85, 0.25, 0.1)}
+const ELITE_SIZE := 1.1
+const ELITE_EYES := 1.4                     ## brillo de su capa de luz (ojos, bioluminiscencia)
+static var wounds := true                   ## wounds=false: sin grietas (comparar)
+static var wounds_force := -1.0             ## wounds=0.7: grietas fijas a ese nivel (medir su coste)
+static var _wound_mat: ShaderMaterial
+static var _elite_glow := {}                ## material de luz -> su copia más brillante
+static var _wounded := {}                   ## material del modelo -> su copia con las grietas (una para todos)
+var _wound_meshes: Array = []
+var _wound_k := -1.0
+var _aura_mat: ShaderMaterial                ## presencia: disco violeta en el suelo (drena cordura)
 var _flash := 0.0
 var _flash_on := false
 var _flash_mat: StandardMaterial3D
@@ -146,6 +159,7 @@ func swap_model(new_model: String, new_scale: float = 1.0) -> void:
 	_spawn_t = 0.0                                 # vuelve a crecer desde pequeño
 	anim_t = 0.0
 	_top_h = -1.0
+	_dress_model()
 
 func _ready() -> void:
 	visual = Node3D.new()
@@ -159,6 +173,7 @@ func _ready() -> void:
 	model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
 	visual.add_child(model)
 	if data.ethereal: _make_ethereal(model)
+	_dress_model()
 	runner = PatternRunner.new().setup(world)
 	if GiantMoves.applies(data) and not puppet:
 		giant = GiantMoves.new()
@@ -172,7 +187,10 @@ func _ready() -> void:
 	_flash_mat.albedo_color = Color(1, 1, 1, 0.75 if int(Auto.setting("flashes", 1)) == 1 else 0.2)   # accesibilidad
 	_attack_timer = data.attack_cooldown * randf_range(0.5, 1.0)
 	anim_t = randf()
-	if data.aura_drain > 0.0 and data.aura_radius > 0.0: _make_aura()
+	if data.aura_drain > 0.0 and data.aura_radius > 0.0:
+		_aura_mat = _disc(Color(0.45, 0.2, 0.7, 0.18), data.aura_radius)
+	if data.elite and data.body_radius * model_scale < 2.0:
+		_mark_mat = _disc(Color(part_tint, 0.3), maxf(data.body_radius * model_scale * 2.0, 1.0))
 	if puppet: anim_hold = true                # la fase de la animación llega con cada foto
 	else: behavior.start(self)
 	world.add_enemy(self)
@@ -753,7 +771,7 @@ func _process(delta: float) -> void:
 		var a := 0.035 * clampf(data.body_radius, 0.4, 1.5)
 		visual.global_position += Vector3(randf_range(-a, a), 0.0, randf_range(-a, a))
 	visual.rotation = Vector3(0.0, atan2(facing.x, facing.z), 0.0)
-	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale   # aparece creciendo (al cambiar de forma)
+	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale * (ELITE_SIZE if data.elite else 1.0)   # aparece creciendo (al cambiar de forma)
 	_air_step(delta)
 	if _rise != Rise.NONE: _rise_step(delta)
 	if _hit_t < _hit_len:                             # golpe: se aplasta y se inclina, y vuelve con rebote (hito 11.2)
@@ -776,6 +794,13 @@ func _process(delta: float) -> void:
 			visual.scale *= Vector3(1.0 + (0.08 * wu.x - 0.05 * wu.y) * big, 1.0 - (0.12 * wu.x - 0.1 * wu.y) * big, 1.0 + (0.08 * wu.x - 0.05 * wu.y) * big)
 			visual.basis = Basis(Vector3(facing.z, 0.0, -facing.x).normalized() if facing.length_squared() > 0.0001 else Vector3.RIGHT, (-0.1 * wu.x + 0.14 * wu.y) * big) * visual.basis
 	if _aura_mat: _aura_mat.set_shader_parameter("color", Color(0.45, 0.2, 0.7, 0.14 + 0.07 * sin(_spawn_t * 2.5)))
+	if _mark_mat: _mark_mat.set_shader_parameter("color", Color(part_tint, 0.26 + 0.1 * sin(_spawn_t * 3.0)))
+	if not _wound_meshes.is_empty():                  # heridas que crecen con la vida perdida (hito 12.6)
+		var hk := wounds_force if wounds_force >= 0.0 else clampf(1.0 - health / maxf(data.max_health * health_scale, 0.001), 0.0, 1.0)
+		if absf(hk - _wound_k) > 0.01:
+			_wound_k = hk
+			for mi: MeshInstance3D in _wound_meshes:
+				if is_instance_valid(mi): mi.set_instance_shader_parameter("hurt", hk)
 	if not anim_hold and _stasis_t <= 0.0 and world.freeze_t <= 0.0:   # congelado: la animación se detiene
 		anim_t = fposmod(anim_t + delta / Anims.duration(model_name, anim), 1.0)
 	# fuera de la vista no se aplica la pose (la animación sigue corriendo): con 200 enemigos
@@ -807,22 +832,66 @@ func _process(delta: float) -> void:
 			mi.material_overlay = want
 	Prof.stop("enemigos_anim", t0)
 
-## Aura de presencia (GDD 4.4): disco violeta tenue que late alrededor de la élite.
-func _make_aura() -> void:
-	_aura = MeshInstance3D.new()
+## Élites (hito 12.6): ojos y luces más vivos y grietas que crecen con la vida perdida (también
+## en los únicos y los grandes). Las grietas, una segunda pasada (wounds.gdshader) en una copia
+## de su material; los demás enemigos no la llevan (serían 150 modelos dibujados dos veces).
+func _dress_model() -> void:
+	_wound_meshes = []
+	_wound_k = -1.0
+	if data.elite:
+		for mi: MeshInstance3D in model.get_meta("meshes"):
+			var base := mi.material_override as StandardMaterial3D
+			if base == null or int(mi.get_meta("kind", 0)) != 1: continue
+			if not _elite_glow.has(base):
+				var g := base.duplicate() as StandardMaterial3D
+				g.albedo_color = Color(ELITE_EYES, ELITE_EYES, ELITE_EYES)
+				_elite_glow[base] = g
+			mi.material_override = _elite_glow[base]
+	if wounds and (data.elite or data.unique or model_scale > 1.5) and not data.ethereal:
+		_wound_meshes = wound_dress(model, model_name)
+
+## Pone las grietas a un modelo (también en el visor, `hurt=`): devuelve sus mallas, a las que se
+## les cambia `hurt` (0..1). Sangre roja en los humanos, icor verde en las masas y verdoso en los demás.
+static func wound_dress(m: Node3D, mname: String) -> Array:
+	if _wound_mat == null:
+		_wound_mat = ShaderMaterial.new()
+		_wound_mat.shader = preload("res://scripts/fx/wounds.gdshader")
+	var kind := Anims.death_kind(mname)
+	var blood := Color(0.55, 0.04, 0.03) if kind == "kneel" else (Color(0.42, 0.62, 0.1) if kind == "melt" else Color(0.3, 0.42, 0.2))
+	var vs := float(m.get_meta("voxel_size", VoxelBuilder.VOXEL))
+	var out := []
+	for mi: MeshInstance3D in m.get_meta("meshes"):
+		var base := mi.material_override as StandardMaterial3D
+		if base == null or int(mi.get_meta("kind", 0)) != 0: continue
+		if not _wounded.has(base):
+			var m2 := base.duplicate() as StandardMaterial3D
+			m2.next_pass = _wound_mat
+			_wounded[base] = m2
+		mi.material_override = _wounded[base]
+		mi.set_instance_shader_parameter("vox", vs)
+		mi.set_instance_shader_parameter("tint", blood)
+		mi.set_instance_shader_parameter("hurt", 0.0)
+		out.append(mi)
+	return out
+
+## Disco difuminado que late en el suelo: el aura de presencia (GDD 4.4, violeta, de su radio) o
+## la marca de las élites (hito 12.6, del color de la parte, bajo sus pies).
+func _disc(c: Color, radius: float) -> ShaderMaterial:
+	var mi := MeshInstance3D.new()
 	var pm := PlaneMesh.new()
 	pm.size = Vector2(2, 2)
-	_aura.mesh = pm
-	_aura_mat = ShaderMaterial.new()
-	_aura_mat.shader = preload("res://scripts/fx/telegraph.gdshader")
-	_aura_mat.set_shader_parameter("fill", true)
-	_aura_mat.set_shader_parameter("soft", true)
-	_aura_mat.set_shader_parameter("color", Color(0.45, 0.2, 0.7, 0.18))
-	_aura.material_override = _aura_mat
-	_aura.scale = Vector3.ONE * data.aura_radius
-	_aura.position.y = 0.05
-	_aura.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	visual.add_child(_aura)
+	mi.mesh = pm
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://scripts/fx/telegraph.gdshader")
+	mat.set_shader_parameter("fill", true)
+	mat.set_shader_parameter("soft", true)
+	mat.set_shader_parameter("color", c)
+	mi.material_override = mat
+	mi.scale = Vector3.ONE * radius
+	mi.position.y = 0.05
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	visual.add_child(mi)
+	return mat
 
 ## Material de tinte de estado (uno por enemigo, se cambia su color).
 func _status(c: Color) -> StandardMaterial3D:

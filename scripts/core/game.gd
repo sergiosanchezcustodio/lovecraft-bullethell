@@ -39,6 +39,7 @@ extends Node3D
 ##   boss_intro=false        sin la entrada de los jefes (BossIntro): solo el aviso, como antes
 ##   crumble=false / marks=N  sin desmoronarse / tope de manchas en el suelo (0, ninguna; por defecto, el de la calidad gráfica)
 ##   falls=false             sin la caída de cada familia al morir (hito 12.7)
+##   wounds=false|0.7        sin las grietas de herida de élites, únicos y grandes, o fijas a ese nivel (hito 12.6)
 ##   demo_kill=t             mata a la vez a todos los enemigos a ese segundo (capturas de las muertes)
 ##   character=johansen      personaje del J1 (dyer, olmstead, legrasse, johansen)
 ##   model=dyer_chibi        otro modelo para el J1 (probar prototipos)
@@ -142,6 +143,7 @@ func _ready() -> void:
 		part_key = lid.get_slice("_", 0)
 		var ld: LevelData = load("res://data/levels/%s.tres" % lid)
 		if ld != null: arena_path = ld.arena
+	Enemy.part_tint = Enemy.PART_TINTS.get(part_key, Color(0.45, 0.2, 0.7))   # auras de las élites (hito 12.6)
 	arena_path = args.get_str("arena", arena_path)
 	arena = ArenaBuilder.build(arena_path, fogvol)
 	add_child(arena)
@@ -346,6 +348,8 @@ func _ready() -> void:
 	Quality.apply_game(env, moon)                        # calidad gráfica (hito 11.5); las opciones de abajo mandan
 	Crumble.enabled = args.get_bool("crumble", Crumble.enabled)
 	Crumble.falls = args.get_bool("falls", true)
+	Enemy.wounds = args.get_str("wounds", "true") != "false" and (bool(Quality.value("wounds", true)) or args.has("wounds"))   # en Baja, sin grietas
+	Enemy.wounds_force = args.get_float("wounds", -1.0) if args.get_str("wounds", "").is_valid_float() else -1.0
 	Enemy.rise_enabled = args.get_bool("rise", true)   # hito 11.6
 	GroundMarks.limit = args.get_int("marks", GroundMarks.limit)
 	hud = Hud.new().setup(players, director)
