@@ -42,7 +42,22 @@ func _ready() -> void:
 
 func _window_mode(la: LaunchArgs, first: String) -> void:
 	var dev := la.has("shots") or la.has("perf") or la.has("bot") or first in ["still", "anim", "bench"] 		or Engine.get_write_movie_path() != ""
-	Settings.dev_window = (dev and not la.get_bool("fullscreen")) or la.get_bool("window")
+	var hidden := OS.get_environment("LOVECRAFT_FUERA") == "1"   # prueba de Claude Code (tools/godot_sin_foco.sh)
+	Settings.dev_window = ((dev or hidden) and not la.get_bool("fullscreen")) or la.get_bool("window")
 	Settings.force_fullscreen = la.get_bool("fullscreen")
 	Settings.apply_video()
+	if hidden and Settings.dev_window: _hide_window(la.get_bool("ver"))
 	Settings.apply_ui()
+
+## Pruebas de Claude Code: el lanzador abre la ventana diminuta (Godot no deja abrirla fuera de
+## la pantalla); aquí recupera su tamaño y se va a la derecha de todas las pantallas, donde se
+## dibuja y captura igual sin tapar lo que tenga delante el autor. ver=true la deja a la vista.
+func _hide_window(in_view: bool) -> void:
+	var size := Vector2i(ProjectSettings.get_setting("display/window/size/viewport_width"),
+		ProjectSettings.get_setting("display/window/size/viewport_height"))
+	DisplayServer.window_set_size(size)
+	var right := 0
+	for i in DisplayServer.get_screen_count():
+		right = maxi(right, DisplayServer.screen_get_position(i).x + DisplayServer.screen_get_size(i).x)
+	var usable := DisplayServer.screen_get_usable_rect()
+	DisplayServer.window_set_position(usable.position + (usable.size - size) / 2 if in_view else Vector2i(right + 200, 100))
