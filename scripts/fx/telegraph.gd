@@ -10,6 +10,10 @@ var duration := 1.0
 var color := Color(1.0, 0.36, 0.18, 0.7)
 var fill := true
 var net := false                                    ## aviso de un enemigo: en red, se repite en los invitados
+var mirrored := false                               ## el repetido en un invitado (NetGame)
+var legend := &""                                   ## tipo para la leyenda (Tips); vacío: por su color
+## Avisa de cada aviso nuevo (la leyenda de la primera partida, `Tips`, hito 13.3).
+static var on_shown := Callable()
 var _t := 0.0
 var _mat: ShaderMaterial
 
@@ -41,6 +45,7 @@ func _ready() -> void:
 	material_override = _mat
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	position.y = 0.04
+	if on_shown.is_valid(): on_shown.call(self)
 
 func progress() -> float:
 	return clampf(_t / duration, 0.0, 1.0)

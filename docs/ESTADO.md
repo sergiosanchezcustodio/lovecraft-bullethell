@@ -1331,6 +1331,11 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
     | 6 candidato | 1/8 | 74-154 |
 
     Con la nueva se pasa de 3 de cada 4 a 1 de cada 4 y después a 1 de cada 8, en vez de caer de golpe a ninguna. La Pesadilla de antes queda entre el 5 y el 6: la dificultad de tres guardada pasa ahora a 1, 3 o 6. Tests 537 de 537.
+- **Fase 13, hito 13.3: consejos de la primera partida y leyenda de los avisos (29-10-2026), pendiente de tu revisión.**
+  - Consejos (`Tips`, `scripts/ui/tips.gd`; textos en `data/tutorial.json`): un cartel abajo en el centro («Consejo» y el texto) cuando pasa algo por primera vez: moverse (1,5 s), esquivar (9 s), la primera gema, la primera subida (al cerrar la ventana), la cordura por debajo del 70 %, el primer baúl arcano, la primera élite, el enemigo final, un compañero caído (cooperativo), la pausa (40 s) y la ficha y el mapa (75 s). Uno cada vez, con 1,2 s entre ellos; dura 4 s más lo que tarda en leerse; suena una página. Cada uno, una vez por hueco (`SaveData.seen["tips"]`).
+  - Leyenda: junto al primer aviso en el suelo de cada tipo, una etiqueta con el borde de su color, centrada bajo el círculo, mientras dura (al menos 2,5 s): «Golpe: sal del círculo», «Ataque a la cordura…», «Golpe y cordura…», «Algo va a salir de aquí» (los anillos de aparición) y «Grieta: atrae y engulle, aléjate» (los ángulos). El tipo sale del color (`Tips.warning_kind`) o de `Telegraph.legend`; los avisos de las armas y los compañeros no llevan. `Telegraph.on_shown` avisa de cada uno; en red, los repetidos en el invitado (`Telegraph.mirrored`) también.
+  - Configuración > Juego: «Consejos en la partida» (`tips`, sí por defecto) y, si ya se han visto en este hueco, «Volver a ver los consejos». Sin hueco o con bots no sale nada; `tips=true` los saca igual para capturas (lo visto, solo en memoria). Cada uno se imprime («CONSEJO id»).
+  - Hoja `shots/revision/2026-10-29/consejos.png` (cartel, leyenda y la opción). Tests en `test_tips` (3). 540 de 540.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

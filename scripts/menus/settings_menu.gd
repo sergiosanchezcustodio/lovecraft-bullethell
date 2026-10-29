@@ -141,6 +141,13 @@ func _game() -> void:
 	# La dificultad está en la pausa, del 1 al 10 por características, mientras el autor la calibra (D-42)
 	_toggle("Locura acumulada (cada crisis baja la cordura máxima)", Settings.get_value("madness"), func(on: bool) -> void:
 		Settings.set_value("madness", on))
+	_toggle("Consejos en la partida", Settings.get_value("tips"), func(on: bool) -> void:
+		Settings.set_value("tips", on))
+	if Saves.current != null and Saves.current.has_seen("tips", "move"):
+		_action("Volver a ver los consejos", func() -> void:      # en este hueco (hito 13.3)
+			Saves.current.seen["tips"] = []
+			Saves.save()
+			_show_tab(3))
 	_note("Accesibilidad")
 	var sizes: Array[String] = ["Pequeño", "Normal", "Grande", "Muy grande"]
 	_choice("Tamaño de la interfaz", sizes, int(Settings.get_value("ui_scale")), func(i: int) -> void:

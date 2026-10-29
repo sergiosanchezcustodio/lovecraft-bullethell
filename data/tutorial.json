@@ -1,0 +1,23 @@
+{
+	"_doc": "Consejos de la primera partida (hito 13.3, Tips): cada uno sale una vez por hueco cuando pasa lo que dice 'when' (move, dodge, pause, sheet: a esos s del nivel; gem, levelup, sanity, chest, elite, final, down: la primera vez que pasa). 'warnings': la etiqueta del primer aviso en el suelo de cada tipo.",
+	"tips": [
+		{"id": "move", "when": "move", "at": 1.5, "text": "Muévete con el stick izquierdo o con WASD. Tus armas disparan solas."},
+		{"id": "dodge", "when": "dodge", "at": 9.0, "text": "Esquiva con A o con Espacio: mientras esquivas, nada te hace daño."},
+		{"id": "gem", "when": "gem", "text": "Las criaturas sueltan gemas de experiencia: pasa por encima para recogerlas y subir de nivel."},
+		{"id": "levelup", "when": "levelup", "text": "Cada subida mejora un arma, te da una nueva o mejora al investigador. Las armas al máximo evolucionan con su objeto."},
+		{"id": "sanity", "when": "sanity", "text": "Tu cordura (la barra violeta) baja cerca de las criaturas y con sus ataques violetas. A cero, entras en crisis: aléjate para recuperarla."},
+		{"id": "chest", "when": "chest", "text": "Ha aparecido un baúl arcano: ábrelo para conseguir un objeto o hacer evolucionar un arma."},
+		{"id": "elite", "when": "elite", "text": "Una élite: más grande, más dura y con su marca a los pies. Suelta mejor botín."},
+		{"id": "down", "when": "down", "text": "Un compañero ha caído: quédate a su lado para levantarlo antes de que se le acabe el tiempo."},
+		{"id": "final", "when": "final", "text": "El enemigo final del nivel: acaba con él para superarlo."},
+		{"id": "pause", "when": "pause", "at": 40.0, "text": "Start o Esc pausa la partida."},
+		{"id": "sheet", "when": "sheet", "at": 75.0, "text": "Select o Tab abre la ficha del investigador; la cruceta abajo o M, el mapa del nivel."}
+	],
+	"warnings": {
+		"fisico": "Golpe: sal del círculo",
+		"mental": "Ataque a la cordura: sal del círculo",
+		"mixto": "Golpe y cordura: sal del círculo",
+		"aparece": "Algo va a salir de aquí",
+		"grieta": "Grieta: atrae y engulle, aléjate"
+	}
+}

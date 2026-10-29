@@ -28,7 +28,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 10 | Guardado en la nube con GitHub | **Hecha** (26-10-2026) salvo el `client_id` de tu OAuth App y tu prueba con dos PC | Ninguna (D-11, resuelta) |
 | 11 | Calidad gráfica, animación y efectos | **Hecha** (28-10-2026) salvo tu revisión | Ninguna |
 | 12 | Detalles de personajes, enemigos, compañeros y escenarios | **Hecha** (29-10-2026) salvo tu revisión | Ninguna (D-41, resuelta) |
-| 13 | Calibración, modos de juego, narrativa, sonido, herramientas y distribución | **En curso:** plan aprobado (29-10-2026); 13.1 hecho | Las de cada hito (al final de la fase) |
+| 13 | Calibración, modos de juego, narrativa, sonido, herramientas y distribución | **En curso:** plan aprobado (29-10-2026); 13.1 a 13.3 hechos | Las de cada hito (al final de la fase) |
 
 ---
 
@@ -320,7 +320,7 @@ Pedida por el autor el 29-10-2026 («me gustan todas, establece un plan para hac
 
 **Aceptación:** el autor juega cada modo y cada sistema nuevo (solo y en cooperativo), encuentra su dificultad con el informe y el historial, y tiene en la mano una build de demo y un tráiler listos para itch.io.
 
-*Estado (29-10-2026):* plan aprobado por el autor («si, adelante»). **Hechos el 13.1 y el 13.2**, pendientes de su revisión (la tabla nueva del 4 al 6, aprobada por él).
+*Estado (29-10-2026):* plan aprobado por el autor («si, adelante»). **Hechos el 13.1, el 13.2 y el 13.3**, pendientes de su revisión (la tabla nueva del 4 al 6, aprobada por él).
 
 ### Bloque A: calibrar (lo primero, porque ayuda a probar todo lo demás)
 
@@ -333,7 +333,7 @@ Pedida por el autor el 29-10-2026 («me gustan todas, establece un plan para hac
 
 | Hito | Contenido | Cómo |
 |---|---|---|
-| 13.3 | **Primer nivel guiado** (13) y **leyenda de los avisos** (14): en la primera partida de un hueco, carteles breves y saltables en el momento justo (moverse y esquivar, la primera gema, la primera subida, la cordura al bajar del 70 %, el primer baúl, compañero abatido en cooperativo). La primera vez que aparece cada tipo de aviso en el suelo, una etiqueta corta junto a él («Círculo: va a caer algo») | Guion por datos (`data/tutorial.json`: suceso que lo dispara y texto), lo visto en `SaveData`; opción «Consejos» en Configuración > Juego para volver a verlos. La etiqueta, en `Telegraph`, una sola vez por tipo y hueco |
+| 13.3 | **Primer nivel guiado** (13) y **leyenda de los avisos** (14): en la primera partida de un hueco, carteles breves y saltables en el momento justo (moverse y esquivar, la primera gema, la primera subida, la cordura al bajar del 70 %, el primer baúl, compañero abatido en cooperativo). La primera vez que aparece cada tipo de aviso en el suelo, una etiqueta corta junto a él («Círculo: va a caer algo») | Guion por datos (`data/tutorial.json`: suceso que lo dispara y texto), lo visto en `SaveData`; opción «Consejos» en Configuración > Juego para volver a verlos. La etiqueta, en `Telegraph`, una sola vez por tipo y hueco. **Hecho (29-10-2026), pendiente de tu revisión:** `Tips`, `data/tutorial.json`, `Telegraph.on_shown`; «Consejos en la partida» en Configuración > Juego |
 
 ### Bloque C: jugabilidad
 

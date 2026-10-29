@@ -376,6 +376,7 @@ func _ready() -> void:
 	hud.money = func() -> int: return run_money
 	add_child(hud)
 	add_child(SanityFx.new().setup(players))         # distorsiones de cordura baja
+	if director != null: add_child(Tips.new(self))   # consejos de la primera partida (hito 13.3)
 	menus = PlayerMenus.new().setup(self, players)
 	add_child(menus)
 	if args.has("panel"):                            # capturas: panel=sheet|map, panel_player=2, panel_page=1

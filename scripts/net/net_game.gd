@@ -962,6 +962,7 @@ func _apply_world(kind: String, a: Array, ahead: float) -> void:
 		"tg":
 			if ahead >= float(a[2]): return
 			var tg := Telegraph.new().setup(float(a[1]), float(a[2]) - ahead, a[3], bool(a[4]))
+			tg.mirrored = true
 			tg.position = a[0]
 			tg.rotation.y = float(a[5])
 			tg.scale = a[6]

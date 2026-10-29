@@ -74,6 +74,7 @@ func _spawn_angle() -> void:
 func spawn_angle_at(pos: Vector3) -> void:
 	var r := level.angle_radius
 	var tg := Telegraph.new().setup(r, level.angle_warn, Color(0.35, 0.9, 0.5, 0.75))
+	tg.legend = &"grieta"
 	tg.position = pos
 	world.fx.add_child(tg)
 	tg.finished.connect(func() -> void: _open_angle(pos, r))
