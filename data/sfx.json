@@ -704,6 +704,20 @@
 			],
 			"bus": "Ambiente"
 		},
+		"ship_horn": {
+			"db": -8,
+			"pitch": [
+				0.96,
+				1.04
+			],
+			"voices": 1,
+			"gap": 6.0,
+			"files": [
+				"ship_horn_0.wav",
+				"ship_horn_1.wav"
+			],
+			"bus": "Ambiente"
+		},
 		"howl": {
 			"db": -22,
 			"pitch": [

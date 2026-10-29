@@ -1273,6 +1273,7 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Opciones de prueba: `amb_demo=true` hace salir el primer Profundo al segundo; `log=true` apunta `PROFUNDO`, `BARCO`, `CHARCOS` (tamaño, porcentaje y ms) y `CHARCO pisado`.
   - Hoja `shots/revision/2026-10-29/vida_al_fondo.png` (latido y aro de luz, Profundo en el arrecife y en el muelle, luces de un barco, luz de la aurora en la nieve, gotas en un charco y el mapa de charcos).
   - Tests en `test_background_life` (8). 512 de 512.
+  - Mejoras pedidas al cerrarlo (29-10-2026): al hundirse, el Profundo deja tres tandas de burbujas con su onda, cada una un poco más allá, hacia donde miraba (`Ambient._bubble_trail`, `BUBBLE_PUFFS`); y de vez en cuando (`horn`, 25-50 s) un barco de los que se ven toca la sirena de niebla: tono grave y áspero que acaba en un gruñido que baja, lejano y con eco (`ship_horn`, `python tools/gen_sfx.py --latido`, que hace también el latido). `log=true` apunta `SIRENA`. Tests: 9 en `test_background_life`, 513 de 513.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

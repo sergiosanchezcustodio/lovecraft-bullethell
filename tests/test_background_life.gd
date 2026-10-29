@@ -70,8 +70,12 @@ func test_un_profundo_asoma_mira_y_se_hunde() -> void:
 	for i in 30: a._lurk_step(0.05, i * 0.05)       # 1,5 s: ya asoma y empieza a hundirse
 	assert_true(ld.sink, "al rato se hunde")
 	assert_gt(b.position.y + float(ld.top), 0.3, "había asomado la cabeza y los hombros")
-	for i in 40: a._lurk_step(0.05, 1.5 + i * 0.05)
+	for i in 20: a._lurk_step(0.05, 1.5 + i * 0.05)
+	assert_eq(a._lurkers.size(), 1, "ya abajo, aún suben sus burbujas")
+	assert_false(b.visible)
+	for i in 50: a._lurk_step(0.05, 2.5 + i * 0.05)
 	assert_eq(a._lurkers.size(), 0, "y se va")
+	assert_eq(int(ld.puffs), Ambient.BUBBLE_PUFFS.size(), "después de todas las burbujas")
 	a.free()
 
 func test_los_profundos_asoman_en_el_muelle_y_el_arrecife() -> void:
@@ -102,4 +106,18 @@ func test_un_barco_cabecea_y_la_lluvia_lo_tapa() -> void:
 		tilts.append(b.rotation.z)
 	assert_gt(alphas.max() - alphas.min(), 0.3, "la lluvia lo tapa y lo destapa")
 	assert_gt(tilts.max() - tilts.min(), 0.05, "cabecea con la mar")
+	a.free()
+
+func test_de_vez_en_cuando_un_barco_toca_la_sirena() -> void:
+	var a := Ambient.new()
+	var c := {"horn": [20, 30]}
+	a._horn_t = 0.5
+	assert_false(a._horn_step(0.1, c), "aún no")
+	assert_false(a._horn_step(0.5, c), "le toca, pero no hay barcos")
+	assert_almost_eq(a._horn_t, 3.0, 0.01, "lo vuelve a intentar enseguida")
+	a._sea = {"shore": Vector2(10, 10), "north": -100000.0, "level": -2.0, "coast": 0.0}
+	a._make_ship(Vector2(20, 0), Vector2(0, 0.3))
+	a._ships[0].k = 1.0
+	assert_true(a._horn_step(3.0, c), "con un barco a la vista, suena")
+	assert_between(a._horn_t, 20.0, 30.0, "y hasta la siguiente, un buen rato")
 	a.free()

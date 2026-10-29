@@ -678,6 +678,25 @@ def latido():
         save('heartbeat_%d' % k, x * (1.0 - 0.15 * k))
 
 
+def sirena():
+    """Sirena de niebla de un barco a lo lejos (tormenta, 29-10-2026): un tono grave y áspero
+    que se sostiene y acaba en un gruñido que baja, apagado por la distancia y con mucho eco."""
+    r = np.random.default_rng(1213)
+    for k, (f0, d) in enumerate(((118.0, 3.2), (104.0, 2.6))):
+        tt = t(d + 2.5)
+        hold = d - 0.5
+        f = np.where(tt < hold, f0, f0 * (1.0 - 0.22 * np.clip((tt - hold) / 0.45, 0, 1)))   # el gruñido final
+        f = f * (1 + 0.004 * np.sin(2 * np.pi * 5.3 * tt))
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        x = sum(np.sin(n * ph) / n ** 0.9 for n in range(1, 12))                              # diente de sierra suave
+        a = np.clip(tt / 0.25, 0, 1) * np.clip((d - tt) / 0.12, 0, 1)
+        x = lp(x * a, 700) + lp(r.standard_normal(len(tt)), 400) * a * 0.08
+        ir = r.standard_normal(int(2.5 * SR)) * np.exp(-t(2.5) / 0.8)
+        wet = signal.fftconvolve(x, lp(ir, 500))[:len(x)]
+        wet *= np.std(x) / (np.std(wet) + 1e-9)
+        save('ship_horn_%d' % k, lp(x * 0.45 + wet * 0.8, 900))
+
+
 def copy_kenney(src):
     files = {os.path.splitext(os.path.basename(p))[0]: p for p in glob.glob(os.path.join(src, '**', '*.ogg'), recursive=True)}
     for ev, names in KENNEY.items():
@@ -688,8 +707,9 @@ def copy_kenney(src):
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
-    if '--latido' in sys.argv:                               # solo el latido de R'lyeh (hito 12.12)
+    if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
         latido()
+        sirena()
     elif '--ambiente' in sys.argv:                             # solo los del ambiente (no necesita Kenney)
         ambiente()
     else:

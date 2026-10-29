@@ -2975,9 +2975,10 @@ func _lurk_step(delta: float, t: float) -> void:
 		var k: float
 		if ld.sink: k = 1.0 - clampf((float(ld.age) - float(ld.at)) / (0.5 if ld.fast else 1.4), 0.0, 1.0)
 		else: k = smoothstep(0.0, 1.0, clampf(float(ld.age) / 2.2, 0.0, 1.0))
-		if ld.sink and k <= 0.0:
-			b.queue_free()
-			_lurkers.erase(ld)
+		if ld.sink and k <= 0.0:                                    # ya abajo: unas burbujas donde estaba y se va
+			if _bubble_trail(ld, b):
+				b.queue_free()
+				_lurkers.erase(ld)
 			continue
 		var wy := float(ld.wy)
 		if ld.sea:
@@ -2999,6 +3000,23 @@ func _lurk_step(delta: float, t: float) -> void:
 	_lurk_t = _rng.randf_range(ev[0], ev[1]) * (1.0 - fear * 0.5)
 	var p := _lurk_spot(c)
 	if p != Vector3.INF: _lurk_rise(p, c)
+
+## Burbujas que suben un rato donde se hundió, cada vez un poco más allá (hacia donde miraba).
+## true cuando ya han salido todas.
+const BUBBLE_PUFFS := [0.0, 0.7, 1.5]
+func _bubble_trail(ld: Dictionary, b: Node3D) -> bool:
+	if not ld.has("gone"):
+		ld.gone = float(ld.age)
+		ld.puffs = 0
+		b.visible = false
+	var since := float(ld.age) - float(ld.gone)
+	while int(ld.puffs) < BUBBLE_PUFFS.size() and since >= float(BUBBLE_PUFFS[ld.puffs]):
+		var ahead := Vector3(sin(b.rotation.y), 0.0, cos(b.rotation.y)) * 0.35 * float(ld.puffs)
+		var at := Vector3(b.position.x, float(ld.wy) + 0.05, b.position.z) + ahead
+		VoxelFx.puff(self, at, "sea_bubbles", 0.3, Color.WHITE, 2.0)
+		_ripple(at - Vector3(0, 0.02, 0), 0.3, 0.5)
+		ld.puffs = int(ld.puffs) + 1
+	return since > float(BUBBLE_PUFFS.back()) + 0.6
 
 ## Un sitio para asomar: agua a la vista, lejos de los jugadores y de otro que asome.
 func _lurk_spot(c: Dictionary) -> Vector3:
@@ -3077,6 +3095,7 @@ func _nearest_node(p: Vector3) -> Node3D:
 # alguna portilla; cabecean con la mar y la lluvia las tapa y las destapa --
 var _ships: Array[Dictionary] = []
 var _ship_t := 0.5
+var _horn_t := 12.0                             ## s hasta que algún barco toque la sirena
 
 func _ship_step(delta: float, t: float) -> void:
 	var c: Dictionary = cfg.ship_lights
@@ -3099,6 +3118,7 @@ func _ship_step(delta: float, t: float) -> void:
 		var curtain := smoothstep(0.15, 0.75, 0.5 + 0.5 * sin(t * 0.31 + float(sd.ph) * 5.0) * sin(t * 0.19 + float(sd.ph) * 3.0))   # cortinas de lluvia
 		var a := float(sd.k) * lerpf(0.2, 1.0, curtain)
 		for mt: Array in sd.mats: (mt[0] as StandardMaterial3D).albedo_color.a = float(mt[1]) * a
+	_horn_step(delta, c)
 	if _ships.size() >= int(c.get("n", 2)): return
 	_ship_t -= delta
 	if _ship_t > 0.0: return
@@ -3118,6 +3138,20 @@ func _ship_step(delta: float, t: float) -> void:
 		_make_ship(p, along * float(c.get("speed", 0.35)) * _rng.randf_range(0.7, 1.3))
 		if OS.get_cmdline_user_args().has("log=true"): print("BARCO en %.1f, %.1f" % [p.x, p.y])
 		return
+
+## De vez en cuando (horn: [s, s]) un barco de los que se ven toca la sirena de niebla.
+func _horn_step(delta: float, c: Dictionary) -> bool:
+	_horn_t -= delta
+	if _horn_t > 0.0: return false
+	var ev: Array = c.get("horn", [25, 50])
+	_horn_t = _rng.randf_range(ev[0], ev[1])
+	for sd: Dictionary in _ships:
+		if float(sd.k) > 0.6:
+			sfx_at("ship_horn", (sd.node as Node3D).position)
+			if OS.get_cmdline_user_args().has("log=true"): print("SIRENA en %s, t=%d ms" % [(sd.node as Node3D).position, Time.get_ticks_msec()])
+			return true
+	_horn_t = 3.0                                                   # ninguno a la vista: dentro de poco
+	return false
 
 static var _dot: GradientTexture2D
 static func _soft_dot() -> GradientTexture2D:
