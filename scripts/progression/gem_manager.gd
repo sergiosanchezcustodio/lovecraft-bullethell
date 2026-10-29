@@ -177,7 +177,8 @@ func _physics_process(delta: float) -> void:
 			var to := target.global_position + Vector3(0, 0.8, 0) - p
 			if to.length() < 0.45:
 				if not mirror:
-					target.progress.add_xp(_value[i] * target.data.xp_mult * target.pet_xp_mult)
+					target.progress.add_xp(_value[i] * target.data.xp_mult * Pacts.value("xp")
+						* (1.0 if Pacts.has("pet_idle") else target.pet_xp_mult))   # pactos (hito 13.6)
 					collected.emit(_id[i])
 				if not target.remote: Auto.sfx_at("gem", target.global_position)
 				target.gem_pulse()

@@ -139,10 +139,11 @@ func _idol() -> float:
 ## en un sitio libre a 6-12 m de un jugador en pie.
 func _chest_step(delta: float) -> void:
 	if level.chest_every <= 0.0: return
-	if _chest_t < 0.0: _chest_t = level.chest_every * rng.randf_range(0.75, 1.25)
+	var every := level.chest_every * Pacts.value("chest_every")      # La noche más cerrada, Susurros (hito 13.6)
+	if _chest_t < 0.0: _chest_t = every * rng.randf_range(0.75, 1.25)
 	_chest_t -= delta * team_item("chest_mult")             # Vara de zahorí
 	if _chest_t > 0.0: return
-	_chest_t = level.chest_every * rng.randf_range(0.75, 1.25)
+	_chest_t = every * rng.randf_range(0.75, 1.25)
 	if get_tree().get_nodes_in_group(&"chests").filter(func(c: Node) -> bool: return not c.is_open).size() >= level.chest_max: return
 	spawn_chest()
 
@@ -158,7 +159,8 @@ func spawn_chest() -> ArcaneChest:
 		if obstacles != null and (not obstacles.bounds.grow(-2.0).has_point(p2) or not _spawnable(p2, 0.7)): continue
 		pos = c
 		break
-	var chest := ArcaneChest.new().setup(world, pos, rng.randi_range(level.chest_money.x, level.chest_money.y), level.chest_heal)
+	var cash := roundi(rng.randi_range(level.chest_money.x, level.chest_money.y) * Pacts.value("chest_money"))
+	var chest := ArcaneChest.new().setup(world, pos, cash, 0.0 if Pacts.has("no_heal") else level.chest_heal)
 	world.fx.add_child(chest)
 	chest_spawned.emit(chest)
 	return chest
@@ -249,6 +251,22 @@ func _emerge(d: EnemyData) -> bool:
 	return true
 
 ## Punto de aparición fuera de cámara, dentro de la arena y lejos de obstáculos.
+## Estirpe dividida (hito 13.6): la élite muerta se parte en dos criaturas corrientes del nivel.
+func _split(e: Enemy) -> void:
+	var at := e.global_position
+	for k in 2:
+		var d: EnemyData = null
+		for tries in 8:
+			var c := pick()
+			if c != null and c.tier < 4:
+				d = c
+				break
+		if d == null: return
+		var a := rng.randf() * TAU
+		var p := at + Vector3(cos(a), 0.0, sin(a)) * 0.9
+		if not _spawnable(Vector2(p.x, p.z), d.body_radius): p = at
+		spawn(d, p)
+
 func spawn_point(radius: float) -> Vector3:
 	var center := camera.center() if camera != null else Vector3.ZERO
 	if spread_spawns and world != null:
@@ -292,6 +310,7 @@ func spawn(d: EnemyData, pos: Vector3) -> Enemy:
 	if d.unique: e.health_scale = 1.0 + (e.health_scale - 1.0) * 0.5   # los únicos, la mitad (con 4: ×1,65)
 	var boss := d.unique or d == level.final_enemy or d == level.final_next or d in level.mid_enemies
 	e.health_scale *= level.health_mult * (Difficulty.boss_health() if boss else Difficulty.health()) * pact   # Pacto con el Hombre Negro (tienda)
+	e.health_scale *= Pacts.value("enemy_health")                       # Carne obstinada (hito 13.6)
 	e.health *= e.health_scale
 	e.position = pos
 	e.died.connect(_on_died)
@@ -304,6 +323,8 @@ func spawn(d: EnemyData, pos: Vector3) -> Enemy:
 func _on_died(e: Enemy) -> void:
 	alive.erase(e)
 	killed_total += 1
+	if not mirror and e.data.tier >= 4 and not e.data.unique and e != _final and Pacts.has("split_elites"):
+		_split(e)
 	if e == _final and not completed:
 		if level.final_next != null and _final.data != level.final_next:   # tras el final, el jefe
 			_final = spawn(level.final_next, spawn_point(level.final_next.body_radius))

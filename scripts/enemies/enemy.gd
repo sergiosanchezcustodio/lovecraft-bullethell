@@ -683,7 +683,7 @@ func _physics_process(delta: float) -> void:
 	if (_far or world.enemies.size() > CROWD) and (Engine.get_physics_frames() + get_instance_id()) % 2 == 1:
 		velocity = _ai_vel
 	else:
-		velocity = behavior.update(self, target, delta) * pace_mult 			* (Difficulty.melee_speed() if data.attack == null else Difficulty.shooter_speed())   # en vivo (D-42)
+		velocity = behavior.update(self, target, delta) * pace_mult 			* (Difficulty.melee_speed() if data.attack == null else Difficulty.shooter_speed()) * Pacts.value("enemy_speed")   # en vivo (D-42; Furia del abismo, hito 13.6)
 		_ai_vel = velocity
 	if Engine.get_physics_frames() % 15 == get_instance_id() % 15: _far = _far_from_players()
 	if _slow_t > 0.0: velocity *= _slow_k

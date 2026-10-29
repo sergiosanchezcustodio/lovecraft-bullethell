@@ -565,7 +565,7 @@ func send_next(level_id: String) -> void:
 	_say("siguiente nivel: %s" % level_id)
 	var back := GameSession.apply_returns(net.peers)
 	net.send(0, NEXT, {"level": level_id, "carry": GameSession.carry.duplicate(true),
-		"team_xp": GameSession.team_xp, "team_turn": GameSession.team_turn, "peers": seat_peers()})
+		"team_xp": GameSession.team_xp, "team_turn": GameSession.team_turn, "peers": seat_peers(), "pacts": Pacts.active()})
 	_send_start(back)
 
 func send_restart() -> void:
@@ -588,7 +588,8 @@ static func apply_seat_peers(p: Variant) -> void:
 func _send_start(back: Array) -> void:
 	for id: int in back:
 		net.send(id, NetSelect.START, {"level": String(GameSession.level), "players": GameSession.seats_to_wire(),
-			"carry": GameSession.carry.duplicate(true), "team_xp": GameSession.team_xp, "team_turn": GameSession.team_turn})
+			"carry": GameSession.carry.duplicate(true), "team_xp": GameSession.team_xp, "team_turn": GameSession.team_turn,
+			"pacts": Pacts.active()})
 		_say("vuelve el PC %d" % id)
 
 # ---------------------------------------------------------------- mensajes
@@ -649,6 +650,7 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 		NEXT:
 			if data is Dictionary and game.has_method("net_next"):
 				apply_seat_peers(data.get("peers"))
+				if data.get("pacts") is Array: Pacts.set_active(data.pacts)   # los del anfitrión (hito 13.6)
 				game.net_next(data)
 		RESTART:
 			if data is Dictionary: apply_seat_peers(data.get("peers"))

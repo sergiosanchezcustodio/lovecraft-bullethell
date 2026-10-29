@@ -5,6 +5,8 @@ extends Control
 ## Una parte se abre al superar la anterior. En las versiones de desarrollo (OS.is_debug_build)
 ## se puede elegir además cualquier nivel suelto, para depurar.
 ## Debajo, el escenario y las criaturas del nivel señalado. B / Esc vuelve a la selección.
+## Al elegir, la ventana de los pactos del Necronomicón (hito 13.6, `PactMenu`): «Sellar y
+## jugar» empieza; B vuelve al mapa. `pact_menu=false` (pruebas) empieza sin preguntar.
 
 signal chosen(level_id: String)
 signal closed
@@ -53,6 +55,9 @@ func _ready() -> void:
 	box.add_child(_info_text)
 	box.add_child(MenuKit.hint(("Desarrollo: también se puede elegir un nivel suelto  ·  " if dev else "") + "A o Intro: jugar  ·  B o Esc: volver a la selección"))
 	if _first: _first.grab_focus.call_deferred()
+	var la := LaunchArgs.from_cmdline()                # capturas: pacts=noche,furia pact_open=true
+	if la.has("pacts"): Pacts.set_active(Array(la.get_str("pacts").split(",", false)))
+	if la.get_bool("pact_open") and _first: _pick.call_deferred(Campaign.first_of(0), _first)
 
 ## Botón de una parte: empieza por su primer nivel.
 func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
@@ -65,7 +70,7 @@ func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
 	b.focus_entered.connect(func() -> void:
 		_info_title.text = "Parte %d · %s" % [pi + 1, part.title]
 		_info_text.text = "%s. Cinco niveles seguidos: el nivel, las armas y los objetos de cada investigador pasan de uno al siguiente." % part.place)
-	b.pressed.connect(func() -> void: chosen.emit(first))
+	b.pressed.connect(func() -> void: _pick(first, b))
 	if playable and _first == null: _first = b
 	return b
 
@@ -91,8 +96,23 @@ func _level_button(l: Dictionary, won: Array) -> Button:
 	b.focus_entered.connect(func() -> void:
 		_info_title.text = l.name
 		_info_text.text = "Criaturas: %s" % l.creatures)
-	b.pressed.connect(func() -> void: chosen.emit(l.id))
+	b.pressed.connect(func() -> void: _pick(l.id, b))
 	return b
+
+## Antes de empezar, los pactos (el mapa se esconde mientras tanto).
+func _pick(level_id: String, from: Button) -> void:
+	if not LaunchArgs.from_cmdline().get_bool("pact_menu", true):
+		chosen.emit(level_id)
+		return
+	var m := PactMenu.new(level_id, Pacts.active())
+	visible = false
+	m.done.connect(func(ids: Array) -> void:
+		Pacts.set_active(ids)
+		chosen.emit(level_id))
+	m.closed.connect(func() -> void:
+		visible = true
+		from.grab_focus.call_deferred())
+	get_parent().add_child(m)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):

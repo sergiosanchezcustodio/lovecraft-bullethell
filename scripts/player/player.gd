@@ -258,6 +258,9 @@ func _physics_process(delta: float) -> void:
 	if _ring != null and _ring.scale != rs: _ring.scale = rs
 	var t0 := Prof.start()
 	_physics_process_step(delta)
+	if not remote and Pacts.has("no_heal"):        # Sin consuelo (hito 13.6): nada sube la vida, salvo que te levanten
+		if _hp_seen > 0.0 and health > _hp_seen: health = _hp_seen
+		_hp_seen = health
 	Prof.stop("jugadores_fisica", t0)
 
 func _physics_process_step(delta: float) -> void:
@@ -331,7 +334,7 @@ func _sanity_context() -> void:
 			if d <= rules.mate_radius: mate = true
 			if d <= rules.revive_radius and not q.sanity_state.in_crisis: calm = maxf(calm, q.data.revive_speed)
 		if mate: k *= rules.regen_near_mate
-	ss.regen_mult = k
+	ss.regen_mult = 0.0 if Pacts.has("no_regen") else k                # Susurros constantes (hito 13.6)
 	ss.calm_speed = calm
 
 ## Movimiento durante una crisis: huida (lejos del horror más cercano, sin control),
@@ -408,6 +411,7 @@ var last_hit := {}
 var hud_lie := Vector2(-1, -1)
 ## Objetivo de la reliquia (hito 13.5, `Objective`): quien la lleva anda más despacio.
 var carry_slow := 1.0
+var _hp_seen := 0.0                     ## vida del paso anterior (pacto Sin consuelo)
 static var bench_immortal := OS.get_cmdline_user_args().has("immortal=true")
 func recv_add(src: String, ph: float, me: float, via := &"otro") -> void:
 	if not received.has(src): received[src] = [0.0, 0.0]
@@ -953,7 +957,7 @@ func rebuild_stats() -> void:
 	if sanity_state: sanity_state.duration_mult = data.crisis_mult
 	if motor: motor.data = data
 	var lamp := get_node_or_null("CarryLight") as OmniLight3D      # Linterna de queroseno (tienda)
-	if lamp != null: lamp.omni_range = 4.5 * (LANTERN_RANGE if float(shop.get("lantern", 0.0)) > 0.0 else 1.0)
+	if lamp != null: lamp.omni_range = 4.5 * (LANTERN_RANGE if float(shop.get("lantern", 0.0)) > 0.0 else 1.0) * Pacts.value("lamp")   # La noche más cerrada (hito 13.6)
 	# derribado o eliminado (la experiencia es común: sube igual), no: se levantaba sin que lo reanimaran
 	if health > 0.0: health = minf(health + maxf(data.max_health - old_health, 0.0), data.max_health)
 	sanity = minf(sanity + maxf(data.max_sanity - old_sanity, 0.0), data.max_sanity)

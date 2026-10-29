@@ -1352,6 +1352,22 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - En red, los lleva el anfitrión como los baúles: `NetGame` manda `ob+` al salir (y a quien entra después), `ob~` con el estado cada 0,15 s y `ob!` al acabar; el invitado tiene una copia (`Objective.mirror`) y el mismo panel. Los dólares se cuentan en cada PC; el baúl y las gemas los suelta el anfitrión. Quien lleva la reliquia anda más despacio en su PC. `PROTOCOL` 13. Probado con dos ventanas: el invitado ve el ritual y su avance.
   - Con bots no salen (para que las simulaciones de la dificultad sigan comparables), salvo pedidos. Pruebas: `objective=rescate|ritual|reliquia objective_at=t` (ese, a los t s), `objective_near=true` (a los pies del J1) y `objectives=false` (ninguno); con `log=true`, dónde sale y cómo acaba.
   - Hoja `shots/revision/2026-10-29/objetivos.png` (arriba, al salir; abajo, en marcha: el superviviente escoltado, el ritual con sus defensores y la reliquia a cuestas). Tests en `test_objectives` (6). 549 de 549.
+- **Fase 13, hito 13.6: pactos del Necronomicón (29-10-2026, D-44), pendiente de tu revisión.**
+  - Al elegir parte en el mapa (o un nivel suelto, en desarrollo) se abre la ventana de los pactos (`PactMenu`): ocho maldiciones, cada una con su premio; A sella o rompe (hasta tres), «Sellar y jugar» (o «Jugar sin pactos») empieza y B vuelve al mapa. Duran hasta que se cambien: en la pantalla del nivel superado, «Pactos del Necronomicón…» deja cambiarlos y sigue al siguiente nivel. Al empezar, aviso «Pactos: …»; salen en el resumen y en el informe de la pantalla final y en el registro de dificultad (`dificultad.txt` y `dificultad_partidas.jsonl`, clave `pacts`).
+  - Los ocho (`data/pacts.json`; maldición → premio):
+    - **Carne obstinada:** criaturas con un 35 % más de vida → +40 % de experiencia.
+    - **Furia del abismo:** un 15 % más rápidas → +40 % de dólares.
+    - **La noche más cerrada:** menos luz (gamma × 0,8) y el farol alumbra un 35 % menos → baúles más ricos (×1,6) y más a menudo (cada ¾ del tiempo).
+    - **Estirpe dividida:** cada élite que muere se parte en dos criaturas corrientes del nivel (`WaveDirector._split`) → +40 % de experiencia.
+    - **Sin consuelo:** nada cura (comida, pociones, baúles, subir de nivel, compañeros, botiquín; sí te pueden levantar) → +50 % de dólares. Lo hace el jugador: tras cada paso no deja subir la vida por encima de la del paso anterior.
+    - **Susurros constantes:** la cordura no se recupera sola → baúles como la noche.
+    - **Rastro de icor:** la bala enemiga que pasa a menos de 2,2 m de un jugador puede dejar un charco verdoso que quema (5 s, 6 de daño por s; como mucho 8 a la vez y uno cada 0,5 s; en el informe, «El icor del pacto») → +30 % de experiencia y de dólares. Primero salían donde se apagaban las balas, lejos y a menudo bajo el decorado: no se veían.
+    - **Solo ante el horror:** el compañero solo te sigue (no ataca ni ayuda; el búho no da su experiencia) → +30 % de experiencia y de dólares.
+  - `Pacts` (`scripts/core/pacts.gd`) los lee del JSON, guarda los sellados en `GameSession.pacts` (no los borra `clear`) y da sus efectos (`value`, multiplicadores; `has`, marcas) con una caché: se leen en vivo en las mismas palancas que la dificultad (vida al aparecer, velocidad, experiencia de las gemas, `game.earn`, baúles, gamma de la arena, farol, regeneración de cordura, compañero).
+  - Superar un nivel con pactos lo apunta en el hueco (`SaveData.seen["pacts"]`, «nivel:pacto»; la ventana marca «superado aquí») y en `stats.pact_levels` y `pact3_levels`. Dos logros nuevos: «Pacto de sangre» (un nivel con un pacto, 300 $) y «Los tres sellos» (con tres, 800 $).
+  - En cooperativo los elige el J1; en red, el anfitrión: viajan con START (sala) y con NEXT (siguiente nivel y quien vuelve), antes de montar la partida, así que el invitado tiene la misma luz y el mismo farol. `PROTOCOL` 14. Probado con dos ventanas: los dos PC con `["noche", "furia"]`.
+  - Con bots no hay pactos salvo pedidos. Pruebas: `pacts=noche,icor,estirpe` (en la partida o en la selección), `pact_open=true` (con `map=true`, abre la ventana) y `pact_menu=false` (el mapa empieza sin preguntar).
+  - Hoja `shots/revision/2026-10-29/pactos.png` (ventana, aviso al empezar, charcos de icor y nivel superado). Tests en `test_pacts` (6). 555 de 555.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

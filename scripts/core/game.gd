@@ -126,6 +126,7 @@ func _ready() -> void:
 	args = LaunchArgs.from_cmdline()
 	Difficulty.net = null                          # en red, el invitado recibe la del anfitrión (NetGame)
 	Difficulty.refresh()
+	if args.has("pacts"): Pacts.set_active(Array(args.get_str("pacts").split(",", false)))   # pacts=noche,furia (hito 13.6)
 	Prof.enabled = args.get_bool("prof")
 	UiInput.configure()
 	OutfitData.override = {}                       # outfit=bombin,botas_nieve: prendas para probar
@@ -167,7 +168,7 @@ func _ready() -> void:
 	# sombras levantadas: la de la arena ("gamma", noches legibles) por el brillo de la configuración
 	# y la gradación de color de la parte (hito 11.3; grade=off|p1|p2|p3 para comparar)
 	var grade_key := args.get_str("grade", part_key)
-	Atmosphere.set_grade(env, float(arena.get_meta("light", {}).get("gamma", 1.0)) * Settings.brightness_gamma(),
+	Atmosphere.set_grade(env, float(arena.get_meta("light", {}).get("gamma", 1.0)) * Settings.brightness_gamma() * Pacts.value("light"),
 		{} if grade_key == "off" else Atmosphere.grade_for(grade_key))
 	_base_fog = env.fog_density
 	_base_ambient = env.ambient_light_energy
@@ -384,6 +385,10 @@ func _ready() -> void:
 	if director != null and args.get_bool("objectives", true) and (not bots or args.has("objective")):
 		objectives = ObjectiveDirector.new().setup(self)              # objetivos a mitad de nivel (13.5)
 		add_child(objectives)
+	if args.get_bool("log"): print("PACTOS ", Pacts.active())
+	if not Pacts.active().is_empty() and director != null:           # pactos sellados (13.6): tras el rótulo del nivel
+		get_tree().create_timer(4.5, false).timeout.connect(func() -> void:
+			if not _ended: announce("Pactos: " + Pacts.names(Pacts.active()), 3.0))
 	menus = PlayerMenus.new().setup(self, players)
 	add_child(menus)
 	if args.has("panel"):                            # capturas: panel=sheet|map, panel_player=2, panel_page=1
@@ -567,7 +572,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 func level_fx(q: Player) -> void:
 	Sfx.play("level_up")
 	VoxelFx.puff(q, q.global_position, "rise", 0.6, Color.WHITE, 1.4)      # columna de luz (11-10-2026)
-	if not q.remote: q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
+	if not q.remote and not Pacts.has("no_heal"): q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
 	if q.data.team_heal_on_level > 0.0:                   # rasgo de West: cura a los compañeros cercanos
 		for o in players:
 			if o != q and not o.remote and o.health > 0.0 and o.global_position.distance_to(q.global_position) <= 6.0:
@@ -604,7 +609,7 @@ func net_enemy_died(e: Enemy) -> void:
 
 ## Dólares (D-31): se suman al hueco en el momento, así que se conservan aunque se caiga.
 func earn(amount: int) -> void:
-	var n := int(round(amount * money_mult * (director.team_item("money_mult") if director else 1.0)))   # Oro de Obed
+	var n := int(round(amount * money_mult * (director.team_item("money_mult") if director else 1.0) * Pacts.value("money")))   # Oro de Obed; pactos (hito 13.6)
 	if n <= 0: return
 	run_money += n
 	if Saves.current != null:
@@ -941,8 +946,10 @@ func _summary() -> PackedStringArray:
 		var parts := PackedStringArray()
 		for q in players: parts.append("J%d %d" % [q.index + 1, q.progress.level])
 		lv = "Niveles: " + "  ·  ".join(parts)
-	return PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills, lv,
+	var out := PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills, lv,
 		"Dólares ganados: %s $" % MenuKit.money(run_money)])
+	if not Pacts.active().is_empty(): out.append("Pactos: " + Pacts.names(Pacts.active()))
+	return out
 
 ## Una muestra por segundo de juego: vida y cordura de los jugadores de este PC y los vivos.
 func _report_sample() -> void:
@@ -1031,6 +1038,7 @@ func _on_level_completed() -> void:
 	# el avance de la campaña solo cuenta en la partida del anfitrión (D-10)
 	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))
+	Pacts.record_win(Saves.current, String(level.id), Pacts.active())   # sellos del mapa y logros (13.6)
 	_check_achievements.call_deferred()              # después de contar la baja del enemigo final (élite)
 	Saves.save()
 	announce("Nivel superado", 2.0)
@@ -1073,6 +1081,8 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 	if result != "" and not reports.is_empty() and level != null and (human or args.get_bool("report_log")):
 		FallReport.log_run(result, String(level.id), director.time if director != null else 0.0, reports)
 	s.has_next = next_id != ""
+	s.pacts_open = next_id != "" and not is_guest()       # sellar otros pactos antes del siguiente (13.6)
+	s.pacts.connect(func() -> void: _pacts_then_next(s, next_id))
 	if is_guest(): s.waiting = "El anfitrión decide cómo seguir"   # en red, solo puede salir
 	s.logs_button = net_game != null and net_game.guest_lost     # se fue alguien: el registro sirve
 	s.next_level.connect(func() -> void: _next_level(next_id))
@@ -1143,6 +1153,19 @@ func _shop_start() -> void:
 			if float(q.shop.get("head_start", 0.0)) > 0.0: q.progress.gain_level()
 
 ## Siguiente nivel de la parte: el progreso de cada jugador pasa con él (GameSession.carry).
+## Pactos del Necronomicón antes del siguiente nivel (hito 13.6): «Sellar y jugar» sigue; B vuelve.
+func _pacts_then_next(s: Menus.EndScreen, next_id: String) -> void:
+	var m := PactMenu.new(next_id, Pacts.active())
+	m.process_mode = Node.PROCESS_MODE_ALWAYS
+	s.visible = false
+	m.done.connect(func(ids: Array) -> void:
+		Pacts.set_active(ids)
+		_next_level(next_id))
+	m.closed.connect(func() -> void:
+		s.visible = true
+		s.focus_next())
+	add_child(m)
+
 func _next_level(id: String) -> void:
 	if is_guest(): return                            # lo decide el anfitrión (llega con net_next)
 	GameSession.carry.clear()

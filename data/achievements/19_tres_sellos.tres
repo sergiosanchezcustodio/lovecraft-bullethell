@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/PantallasMenus/iconos/ficha_CUL.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"tres_sellos"
+display_name = "Los tres sellos"
+description = "Supera un nivel con tres pactos sellados."
+order = 19
+stat = "pact3_levels"
+target = 1
+reward_money = 800
+icon = ExtResource("2")

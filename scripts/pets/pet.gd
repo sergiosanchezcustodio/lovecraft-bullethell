@@ -167,7 +167,7 @@ func _physics_process(delta: float) -> void:
 	# se da prisa cuanto más lejos está: un poco más rápido que el jugador cuando lo sigue
 	var far := clampf((global_position.distance_to(home) - 2.0) / 3.0, 0.0, 1.0)
 	speed = owner_player.data.move_speed * (1.1 + 0.9 * far) * owner_player.data.pet_mult   # Silbato de Lake
-	behavior.step(delta)
+	if not Pacts.has("pet_idle"): behavior.step(delta)   # Solo ante el horror (hito 13.6): solo sigue
 	_react(delta)
 	var to := goal - global_position
 	to.y = 0.0

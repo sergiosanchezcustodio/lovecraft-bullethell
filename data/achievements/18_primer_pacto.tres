@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/PantallasMenus/iconos/ficha_magia.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"primer_pacto"
+display_name = "Pacto de sangre"
+description = "Supera un nivel con al menos un pacto del Necronomicón."
+order = 18
+stat = "pact_levels"
+target = 1
+reward_money = 300
+icon = ExtResource("2")

@@ -37,6 +37,9 @@ static var my_peer := 1                  ## id de este PC en la sala (el anfitri
 ## Anfitrión (hito 9.5a): PC que ha vuelto con la partida empezada -> PC que se fue, cuyos
 ## puestos recupera al empezar el siguiente nivel (o al reintentar).
 static var returning := {}
+## Pactos del Necronomicón sellados (hito 13.6, `Pacts`): duran hasta que se cambien, también
+## entre niveles (clear no los toca); en red, los del anfitrión.
+static var pacts: Array = []
 
 static func is_set() -> bool:
 	return not seats.is_empty()

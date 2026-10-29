@@ -48,6 +48,13 @@ var _imp_n := 0
 enum Effect { NONE, STASIS, INJECT, PARANOIA, ROOT, BOUNCE }
 
 const MAX_BULLETS := 4096
+const ICOR_NEAR := 2.2                       ## pacto Rastro de icor (hito 13.6): la bala enemiga que pasa a menos de
+const ICOR_CHANCE := 0.015                   ## tantos m de un jugador deja un charco con esta probabilidad por paso
+const ICOR_GAP := 0.5                        ## s como mínimo entre charcos
+const ICOR_MAX := 8                          ## charcos de icor a la vez
+const ICOR_COLOR := Color(0.3, 0.28, 0.04)
+var _icor_left := 0
+var _icor_gap := 0.0
 const HEIGHT := 0.8                          ## altura de vuelo (a la altura del pecho)
 
 var world: CombatWorld
@@ -278,6 +285,10 @@ func _physics_process(delta: float) -> void:
 	var i := 0
 	var frozen := world != null and world.freeze_t > 0.0
 	_resolve_clashes()                                # antes de mover nada: los índices aún valen
+	_icor_left = 0                                    # charcos de icor que aún caben (0: sin pacto)
+	_icor_gap -= delta
+	if world != null and world.fx != null and _icor_gap <= 0.0 and Pacts.has("bullet_trail"):
+		_icor_left = ICOR_MAX - get_tree().get_nodes_in_group(&"pact_icor").size()
 	while i < count:
 		_prev[i] = _pos[i]
 		if frozen and _team[i] == Team.ENEMY:          # tiempo congelado: las balas enemigas, quietas
@@ -320,9 +331,14 @@ func _collide_enemy_bullet(i: int) -> bool:
 			var rr := _radius[i] + pl.data.hurt_radius
 			if p.distance_squared_to(Vector2(pl.global_position.x, pl.global_position.z)) <= rr * rr: return true
 			continue
+		var d2 := p.distance_squared_to(Vector2(pl.global_position.x, pl.global_position.z))
+		if _icor_left > 0 and d2 <= ICOR_NEAR * ICOR_NEAR and pl.health > 0.0 and randf() < ICOR_CHANCE:   # pasa rozando
+			_icor_at(_pos[i])
+			_icor_left = 0
+			_icor_gap = ICOR_GAP
 		if not pl.is_hittable(): continue
 		var r := _radius[i] + pl.data.hurt_radius
-		if p.distance_squared_to(Vector2(pl.global_position.x, pl.global_position.z)) <= r * r:
+		if d2 <= r * r:
 			var d := Damage.new(_phys[i], _ment[i])
 			d.knockback = _vel[i].normalized()
 			d.via = &"bala"
@@ -466,6 +482,15 @@ func impact(pos: Vector3, look: int) -> void:
 	_imp_age[_imp_n] = 0.0
 	_imp_look[_imp_n] = look
 	_imp_n += 1
+
+## Rastro de icor: un charco que quema donde pasa rozando la bala (cada PC, los de sus
+## jugadores: solo les dañan a ellos, como el limo).
+func _icor_at(p: Vector3) -> void:
+	var z := EnemyZone.new().setup(world, p, 0.85, 5.0, 6.0, 0.0)
+	z.color = ICOR_COLOR
+	z.who = &"icor"
+	z.add_to_group(&"pact_icor")
+	world.fx.add_child(z)
 
 func _remove(i: int) -> void:
 	var last := count - 1

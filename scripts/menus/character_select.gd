@@ -101,6 +101,7 @@ func _ready() -> void:
 		for k in args.get_int("cursor") + 1: _frames[0].move_cursor(1)
 	if args.has("turn"):                                # capturas: todos girados ese ángulo (grados)
 		for f in _frames: f.set_turn(deg_to_rad(args.get_float("turn")))
+	if args.has("pacts"): Pacts.set_active(Array(args.get_str("pacts").split(",", false)))   # pacts=noche,furia (hito 13.6)
 	if args.has("shots"):
 		add_child(ShotTaker.new(args.get_floats("shots"), "res://shots/seleccion%s" % (("_" + args.get_str("tag")) if args.has("tag") else "")))
 	if args.has("acts"): _play_acts(args.get_str("acts").split(",", false))

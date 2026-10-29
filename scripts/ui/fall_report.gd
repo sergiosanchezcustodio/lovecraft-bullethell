@@ -20,7 +20,7 @@ const VIAS := {"bala": "balas", "contacto": "contacto", "golpe": "golpes", "zona
 	"peligro": "el escenario", "presencia": "presencia", "aura": "aura", "aliado": "un compañero", "otro": "otros"}
 ## Orígenes que no son enemigos.
 const OTHERS := {"presencia": "La presencia de las criaturas", "angulo": "Los ángulos devoradores",
-	"ola": "La ola", "paranoia": "La paranoia de un compañero", "otro": "Otros"}
+	"ola": "La ola", "paranoia": "La paranoia de un compañero", "icor": "El icor del pacto", "otro": "Otros"}
 const PHYS := Color(0.86, 0.26, 0.2)
 const MIND := Color(0.66, 0.4, 0.98)
 
@@ -137,6 +137,7 @@ static func common_lines(reports: Array) -> PackedStringArray:
 		out.append("Enemigos vivos a la vez: %d de media, %d como mucho" % [roundi(float(reports[0].alive_avg)), int(reports[0].alive_max)])
 	var g := Difficulty.general()
 	out.append("Dificultad: %s" % (("%d en todo" % g) if g > 0 else Difficulty.describe()))
+	if not Pacts.active().is_empty(): out.append("Pactos: " + Pacts.names(Pacts.active()))   # hito 13.6
 	return out
 
 ## El panel: un bloque por jugador (en dos columnas con tres o cuatro) y lo común debajo.
@@ -217,10 +218,11 @@ static func log_run(result: String, level_id: String, t: float, reports: Array) 
 			var h: Dictionary = (r.falls as Array).back().hit
 			fell = "%s|%s" % [h.get("src", ""), h.get("via", "")]
 		people.append({"who": r.who, "hp": roundi(r.hp), "san": roundi(r.san), "fell": fell})
-	DifficultyMenu.append_log("%s · %s · %s · %s · %s · %s" % [stamp, level_id, _clock(t), result,
-		Difficulty.describe(), " | ".join(text)])
+	var pacts := "" if Pacts.active().is_empty() else " · pactos: " + ", ".join(Pacts.active())
+	DifficultyMenu.append_log("%s · %s · %s · %s · %s%s · %s" % [stamp, level_id, _clock(t), result,
+		Difficulty.describe(), pacts, " | ".join(text)])
 	var rec := {"date": stamp, "level": level_id, "t": roundi(t), "result": result,
-		"levels": Difficulty.levels(), "players": people}
+		"levels": Difficulty.levels(), "players": people, "pacts": Pacts.active()}
 	_append(runs_path(), JSON.stringify(rec))
 
 static func _append(path: String, line: String) -> void:

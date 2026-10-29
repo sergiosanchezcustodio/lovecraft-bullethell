@@ -176,7 +176,10 @@ class EndScreen extends CanvasLayer:
 	signal restart
 	signal quit
 	signal next_level
+	signal pacts
 	var has_next := false                       ## "Siguiente nivel", primero y con el foco
+	var pacts_open := false                     ## botón de los pactos del Necronomicón (hito 13.6), tras el de seguir
+	var _first: Button
 	var waiting := ""                           ## en red, un invitado: este aviso y solo "Salir"
 	var leave_text := "Salir de la partida"     ## el botón de salir, con `waiting`
 	var logs_button := false                    ## botón de la carpeta de registros de red (tras un corte)
@@ -235,6 +238,12 @@ class EndScreen extends CanvasLayer:
 			nxt.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			nxt.pressed.connect(func() -> void: next_level.emit())
 			box.add_child(nxt)
+		if pacts_open:
+			var pb := MenuKit.button("Pactos del Necronomicón…", MenuKit.INK, 24)
+			pb.custom_minimum_size = Vector2(360, 52)
+			pb.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			pb.pressed.connect(func() -> void: pacts.emit())
+			box.add_child(pb)
 		var again := MenuKit.button("Reintentar", MenuKit.INK, 28)
 		again.custom_minimum_size = Vector2(360, 58)
 		again.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -246,4 +255,9 @@ class EndScreen extends CanvasLayer:
 		out.pressed.connect(func() -> void: quit.emit())
 		box.add_child(out)
 		if logs_button: box.add_child(_logs_button())
-		(nxt if nxt != null else again).grab_focus.call_deferred()
+		_first = nxt if nxt != null else again
+		_first.grab_focus.call_deferred()
+
+	## Vuelve a dar el foco (al cerrar una ventana encima, como la de los pactos).
+	func focus_next() -> void:
+		if _first != null: _first.grab_focus.call_deferred()
