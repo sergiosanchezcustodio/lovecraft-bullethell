@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Godot para las pruebas lanzadas desde Claude Code (CLAUDECODE=1, ver ~/bin/godot), para que el
-# autor pueda jugar a otra cosa en el mismo PC mientras. Pone un override.cfg pasajero, que Godot
+# autor pueda jugar a otra cosa en el mismo PC mientras.
+# - Escritorio aparte (29-10-2026): la ventana se abre en otro escritorio de Windows, invisible
+#   (tools/escritorio_aparte.py). Con no_focus, Windows le daba igualmente el foco unos 90 ms al
+#   crearla (medido): bastaba para que el juego del autor perdiera el foco y el mando. Desde otro
+#   escritorio no puede quitárselo. Se dibuja y se captura igual (Vulkan en la misma tarjeta).
+#   ver=true o mando=true: en el escritorio de siempre (para verla o probar con el mando).
+# Además, pone un override.cfg pasajero, que Godot
 # lee al arrancar y se borra a los 4 s (si otra prueba lo ha vuelto a escribir entre medias, lo
 # borra la última; uno que no sea de aquí no se toca), con:
 # - display/window/size/no_focus: la ventana se abre sin quitar el foco (ShowWindow con SW_SHOWNA,
@@ -23,10 +29,12 @@ dir="."
 prev=""
 own=0
 movie=0
+seen=0
 for a in "$@"; do
 	[ "$prev" = "--path" ] && dir="$a"
 	case "$a" in
 		--headless|--import|--export-*) exec "$GODOT" "$@" ;;
+		ver=true|mando=true) seen=1 ;;
 		--resolution|--position|-f|--fullscreen|-m|--maximized) own=1 ;;
 		--write-movie) movie=1 ;;
 	esac
@@ -40,7 +48,9 @@ fi
 export LOVECRAFT_FUERA=1
 ov="$dir/override.cfg"
 MARK="; pasajero de tools/godot_sin_foco.sh"
-if [ -f "$ov" ] && ! grep -q "$MARK" "$ov"; then exec "$GODOT" "${pre[@]}" "$@"; fi
+run=("$GODOT")
+[ $seen = 0 ] && run=(python "$dir/tools/escritorio_aparte.py" "$(cygpath -w "$GODOT")")
+if [ -f "$ov" ] && ! grep -q "$MARK" "$ov"; then exec "${run[@]}" "${pre[@]}" "$@"; fi
 {
 	echo "$MARK"
 	echo "[application]"
@@ -51,4 +61,4 @@ if [ -f "$ov" ] && ! grep -q "$MARK" "$ov"; then exec "$GODOT" "${pre[@]}" "$@";
 } > "$ov"
 ( sleep 4
   [ -f "$ov" ] && [ $(( $(date +%s) - $(stat -c %Y "$ov") )) -ge 4 ] && grep -q "$MARK" "$ov" && rm -f "$ov" ) >/dev/null 2>&1 &
-exec "$GODOT" "${pre[@]}" "$@"
+exec "${run[@]}" "${pre[@]}" "$@"
