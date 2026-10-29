@@ -794,6 +794,21 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.gravity = Vector3(0, -7.0, 0)
 			m.scale_min = 0.018; m.scale_max = 0.03
 			m.color_ramp = _ramp([[0.0, Color(0.55, 0.62, 0.7, 0.9)], [1.0, Color(0.5, 0.58, 0.66, 0.0)]])
+		"step_splash":            # al pisar agua o un charco: corona de gotas que salta (hito 12.12; tinte: color)
+			p.draw_pass_1 = cube("mix")
+			p.amount = int(clampf(r * 22.0, 6.0, 16.0))
+			p.lifetime = 0.42
+			p.explosiveness = 1.0
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
+			m.emission_ring_axis = Vector3.UP
+			m.emission_ring_radius = r * 0.35
+			m.emission_ring_inner_radius = r * 0.2
+			m.emission_ring_height = 0.0
+			m.spread = 28.0
+			m.initial_velocity_min = 0.9; m.initial_velocity_max = 1.7
+			m.gravity = Vector3(0, -9.0, 0)
+			m.scale_min = 0.022; m.scale_max = 0.04
+			m.color_ramp = _ramp([[0.0, Color(0.75, 0.82, 0.88, 0.9)], [1.0, Color(0.7, 0.78, 0.85, 0.0)]])
 		"snow_spill":             # nieve que se desprende de una cornisa y cae por la pared (Ambient, el paso)
 			p.draw_pass_1 = cube("mix")                          # sin luz: en la pared en sombra no se veía
 			p.amount = int(clampf(r * 40.0, 30.0, 70.0))

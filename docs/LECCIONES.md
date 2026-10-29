@@ -145,6 +145,11 @@ Sacadas de `CLAUDE.md` el 17-10-2026. Léelas antes de tocar generadores de mode
 - **Textos dentro de los marcos de `MenuKit.dress`:** el filete fino va a 15-17 px del borde del panel (en px del panel, antes de escalar). Deja el texto a 20 px o más de cada borde, también los títulos y las ayudas de abajo; las esquinas de filigrana tapan más en las ventanas grandes. `ui_check=true` lo revisa en cualquier pantalla que se abra sola. Los rombos de `MenuKit.button` se colocan junto al texto según su alineación: con texto a la izquierda no hay sitio a ese lado.
 - **Avisos «Interpolated instance triggered from outside physics process»:** salen cuando algo que interpola cambia de transformada fuera de la física (en `_process`, un `reparent`, un efecto que se coloca después de añadirlo). Godot avisa solo de la primera vez, así que se arreglan de uno en uno: partidas con bots en los 15 niveles (`timescale=3 perf=45`) y `grep` del aviso. Lo que no se mueve en la física (efectos, ambiente, recompensas) va con `physics_interpolation_mode = OFF` antes de añadirlo; lo que va dentro de algo que se interpola (el anillo del jugador) se cambia en la física. Al cambiar de padre con `reparent` a un nodo que no interpola, el modelo no siempre se entera: ponle `OFF` a él mismo antes.
 
+## Leer una imagen dibujada por la tarjeta (29-10-2026, charcos del hito 12.12)
+
+- Un `SubViewport` para leer una imagen una vez (el mapa de charcos del hito 12.12): con `UPDATE_ONCE` y la cámara sin `make_current()` no dibujaba nada y `get_image()` daba el gris de fondo; con `UPDATE_ALWAYS` y `cam.make_current()` ya dentro del árbol, sí (y se libera después de leer). Leer la imagen de la tarjeta para el juego un fotograma: unos 60 ms, casi igual a 624 que a 1248 px de lado.
+- En las ventanas de prueba el viewport mide 2258 × 1270, no 1920 × 1080: lo que da `unproject_position` hay que escalarlo para buscarlo en la captura.
+
 ## Animar un modelo que se pinta en 2D (28-10-2026, cuervo de la portada)
 
 - Si un modelo 3D se dibuja en un SubViewport y se coloca en 2D, colócalo por el punto que tiene que quedarse quieto (los dedos sobre la percha) y no por un punto fijo del render: `Camera3D.unproject_position` da dónde cae de verdad con la postura del momento. Resta la traslación del pivote si quieres que los botes y los saltos sí se vean.

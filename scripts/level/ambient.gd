@@ -23,7 +23,7 @@ extends Node3D
 ## Nada de esto tiene colisión ni afecta a la partida. `ambient=false` lo quita (comparar).
 
 const PATH := "res://data/ambient.json"
-const MODES := {"pulse": 1, "flame": 2, "electric": 3}
+const MODES := {"pulse": 1, "flame": 2, "electric": 3, "heart": 4}
 static var _cfg = null
 static var ground := "snow"                     ## suelo de la arena ("step"): color del polvo de lo que sale de él
 
@@ -165,6 +165,7 @@ static func _glow_material(model: String, c: Dictionary) -> ShaderMaterial:
 ## La misma cuenta que glow_anim.gdshader (para que la luz real tiemble con su llama).
 static func anim_k(mode: int, amount: float, speed: float, t: float, s: float) -> float:
 	if mode == 1: return 1.0 + amount * sin(t * speed * 1.3 + s)
+	if mode == 4: return 1.0 + amount * (heart_beat * 2.0 - 0.35)
 	if mode == 2: return 1.0 + amount * (0.55 * sin(t * 7.3 * speed + s) * sin(t * 3.1 * speed + s * 1.7) + 0.45 * sin(t * 13.7 * speed + s * 2.3))
 	var u := t / 6.5 + s * 0.13
 	var slot := floorf(u)
@@ -278,7 +279,7 @@ func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
 	_rng.seed = hash(arena_id)
 	demo = OS.get_cmdline_user_args().has("amb_demo=true")       # clips: todo enseguida
 	if demo:
-		_next_shoot = 1.0; _next_flock = 0.3; _next_bubble = 0.8; _next_whirl = 0.5
+		_next_shoot = 1.0; _lurk_t = 0.8; _next_flock = 0.3; _next_bubble = 0.8; _next_whirl = 0.5
 		_next_spill = 1.0; _next_spray = 0.5; _next_drip = 0.3; _next_colony = 3.0
 		_crack_t = 1.5; _howl_t = 2.0; _gravel_t = 1.0; _tekeli_t = 2.0; _paper_t = 0.5
 		_cat_t = 1.0; _phantom_t = 1.0; _wflash_t = 1.5; _rat_t = 1.0
@@ -298,6 +299,7 @@ func _ready() -> void:
 			var l: OmniLight3D = it.light
 			l.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # tiembla y baila en _process
 			_lights.append([l, l.light_energy, int(MODES.get(String(g.glow), 1)), float(g.get("amount", 0.2)), float(g.get("speed", 1.0)), seed_of(h.global_position), l.position])
+		if it.has("glow") and String((it.glow as Dictionary).get("glow", "")) == "heart": _hearts.append(h.global_position)
 		if it.has("swing"): _add_swing(h, it.swing)
 		for fx: GPUParticles3D in it.get("candles", []): _candles.append([fx, 0.0, it.get("light")])
 		if it.has("sound"): _sounds.append(it.sound)
@@ -366,6 +368,11 @@ func _ready() -> void:
 			add_child(_crowd)
 			_crowd.play(_rng.randf() * _crowd.stream.get_length())
 	VoxelBuilder.sky_glass_material().set_shader_parameter("rain", float(cfg.get("glass_rain", 0.0)))
+	if not _hearts.is_empty():                                         # el material de brillo de las piezas que laten
+		for k: String in _mats:
+			if k.begins_with("glow|") and _mats[k] is ShaderMaterial and int((_mats[k] as ShaderMaterial).get_shader_parameter("mode")) == 4:
+				_heart_mats.append(_mats[k])
+	_make_puddle_map.call_deferred()
 
 ## Farol que cuelga: su parte gira sobre el gancho y se lleva la luz y el halo de niebla.
 func _add_swing(h: Node3D, c: Dictionary) -> void:
@@ -593,6 +600,9 @@ func _process(delta: float) -> void:
 	if _wflash != null: _window_flash_step(delta)
 	if cfg.has("rats"): _rat_step(delta)
 	if _deck != null: _deck_step(delta)
+	if not _hearts.is_empty(): _heart_step(delta)
+	if cfg.has("lurkers"): _lurk_step(delta, t)
+	if cfg.has("ship_lights") and not _sea.is_empty(): _ship_step(delta, t)
 
 func _focus() -> Vector3:
 	return camera.center() if camera != null else Vector3.ZERO
@@ -905,6 +915,13 @@ func _on_step(pl: Node3D) -> void:
 		kind = "water"
 		_ripple(Vector3(pos.x, 0.03, pos.z), 0.6, 0.7)                 # estela: ondas a cada paso al vadear
 		if cfg.has("glow_steps"): _glow_print(Vector3(pos.x, 0.035, pos.z), cfg.glow_steps)
+		_splash(pl, Vector3(pos.x, 0.03, pos.z), 0.55)
+	elif puddle_at(Vector2(pos.x, pos.z)):                          # un charco (hito 12.12)
+		kind = "water"
+		if OS.get_cmdline_user_args().has("log=true"): print("CHARCO pisado en %.1f, %.1f" % [pos.x, pos.z])
+		_ripple(Vector3(pos.x, 0.025, pos.z), 0.4, 0.6)
+		_splash(pl, Vector3(pos.x, 0.025, pos.z), 0.4)
+	_shore_foam(pos, obstacles)
 	sfx_at("step_" + kind, pos)
 	_footprint(pl, kind)
 
@@ -1195,7 +1212,7 @@ static func _drop_material() -> StandardMaterial3D:
 		_mats["drop"] = m
 	return _mats["drop"]
 
-func _ripple(at: Vector3, radius: float, alpha: float) -> void:
+func _ripple(at: Vector3, radius: float, alpha: float, tint := Color(0.42, 0.5, 0.58)) -> void:
 	var mi := MeshInstance3D.new()
 	var pm := PlaneMesh.new()
 	pm.size = Vector2.ONE * radius * 2.2
@@ -1203,7 +1220,7 @@ func _ripple(at: Vector3, radius: float, alpha: float) -> void:
 	var m := ShaderMaterial.new()
 	m.shader = preload("res://scripts/fx/ripple.gdshader")
 	m.set_shader_parameter("radius", radius)
-	m.set_shader_parameter("tint", Color(0.42, 0.5, 0.58, alpha))
+	m.set_shader_parameter("tint", Color(tint.r, tint.g, tint.b, alpha))
 	mi.material_override = m
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mi.position = at
@@ -2269,6 +2286,14 @@ func _edge_point(margin := 1.05) -> Vector3:
 	var sy := (_rng.randf() * 2.0 - 1.0) * half_h * 0.6
 	return f + Vector3(1, 0, -1).normalized() * sx + Vector3(1, 0, 1).normalized() * sy * 2.0
 
+## Punto del suelo al azar dentro de la vista (m: fracción de media pantalla a cada lado).
+func _view_point(m := 0.8) -> Vector3:
+	var f := _focus()
+	var half_h := camera.size * 0.5 if camera != null else 7.5
+	var sx := _rng.randf_range(-1.0, 1.0) * half_h * 16.0 / 9.0 * m
+	var sy := _rng.randf_range(-1.0, 1.0) * half_h * m
+	return f + Vector3(1, 0, -1).normalized() * sx + Vector3(1, 0, 1).normalized() * sy * 2.0
+
 func _players() -> Array:
 	var g := get_parent()
 	return g.players if g != null and "players" in g else []
@@ -2797,6 +2822,369 @@ func _deck_step(delta: float) -> void:
 	_deck_front += delta * float(cfg.deck_water.get("speed", 9.0))
 	_deck.set_shader_parameter("k", _deck_k)
 	_deck.set_shader_parameter("front", _deck_front)
+
+# ---------------- vida al fondo y agua más viva (hito 12.12) ----------------
+
+## Gotas que saltan al pisar agua: más cuanto más deprisa va.
+func _splash(pl: Node3D, at: Vector3, r: float) -> void:
+	var v := Vector2.ZERO
+	if "velocity" in pl: v = Vector2(pl.velocity.x, pl.velocity.z)
+	var tn: Array = cfg.get("splash_tint", [1, 1, 1])
+	VoxelFx.puff(self, at, "step_splash", r * clampf(v.length() / 4.0, 0.5, 1.6), Color(tn[0], tn[1], tn[2]), 0.6)
+
+# -- espuma en la orilla: al pisar el borde del agua (de una poza o de lo que se vadea, o del mar
+# donde llega casi a ras del suelo), un aro de espuma blanca y gotas --
+const FOAM_REACH := 0.6                         ## m: hay tierra seca a esta distancia = es la orilla
+func _shore_foam(pos: Vector3, obstacles: ObstacleMap) -> void:
+	if not is_shore(Vector2(pos.x, pos.z), obstacles, _sea): return
+	_ripple(Vector3(pos.x, 0.04, pos.z), 0.55, 0.85, Color(0.86, 0.9, 0.92))
+	VoxelFx.puff(self, Vector3(pos.x, 0.04, pos.z), "step_splash", 0.5, Color(1.05, 1.05, 1.05), 0.6)
+
+## ¿Es p la orilla? Agua aquí y tierra seca a FOAM_REACH, o el mar casi a ras a menos de medio metro.
+static func is_shore(p: Vector2, obstacles: ObstacleMap, sea: Dictionary) -> bool:
+	if not sea.is_empty() and float(sea.get("level", 0.0)) > -0.4 and absf(shore_dist(p, sea)) < 0.5: return true
+	if obstacles == null or obstacles.water_at(p) <= 0.05: return false
+	for d: Vector2 in [Vector2(FOAM_REACH, 0), Vector2(-FOAM_REACH, 0), Vector2(0, FOAM_REACH), Vector2(0, -FOAM_REACH)]:
+		if obstacles.water_at(p + d) <= 0.05: return true
+	return false
+
+# -- charcos: dónde están los que pinta el suelo del pueblo. town_ground.gdshader los saca de un
+# ruido con sin() que el procesador no repite igual que la tarjeta, así que al empezar se dibuja
+# el suelo una vez desde arriba, solo los charcos (puddle_mask), y se lee la imagen --
+const PUDDLE_PX := 0.125                        ## m por píxel al dibujarlo (una celda del suelo); luego, la mitad
+var _puddles: Image
+var _puddle_rect := Rect2()
+
+func _make_puddle_map() -> void:
+	if DisplayServer.get_name() == "headless" or arena == null: return
+	var gmi := arena.get_node_or_null("Ground") as MeshInstance3D
+	if gmi == null or not (gmi.material_override is ShaderMaterial): return
+	var sm := gmi.material_override as ShaderMaterial
+	if sm.shader == null or sm.shader.resource_path.get_file() != "town_ground.gdshader": return
+	var wet: Variant = sm.get_shader_parameter("wet")
+	if wet != null and float(wet) <= 0.0: return
+	var ab := gmi.global_transform * gmi.get_aabb()
+	_puddle_rect = Rect2(ab.position.x, ab.position.z, ab.size.x, ab.size.z)
+	var px := Vector2i(clampi(int(ceil(ab.size.x / PUDDLE_PX)), 16, 2048), clampi(int(ceil(ab.size.z / PUDDLE_PX)), 16, 2048))
+	var vp := SubViewport.new()
+	vp.own_world_3d = true
+	vp.size = px
+	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	var cam := Camera3D.new()
+	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	cam.keep_aspect = Camera3D.KEEP_HEIGHT
+	cam.size = ab.size.z
+	cam.near = 0.1
+	cam.far = 200.0
+	cam.transform = Transform3D(Basis(Vector3.RIGHT, -PI * 0.5), Vector3(ab.get_center().x, ab.end.y + 50.0, ab.get_center().z))
+	var mi := MeshInstance3D.new()
+	mi.mesh = gmi.mesh
+	mi.transform = gmi.global_transform
+	var m2 := sm.duplicate() as ShaderMaterial
+	m2.set_shader_parameter("puddle_mask", true)
+	mi.material_override = m2
+	vp.add_child(cam)
+	vp.add_child(mi)
+	add_child(vp)
+	cam.make_current()
+	await RenderingServer.frame_post_draw
+	await RenderingServer.frame_post_draw
+	if not is_instance_valid(vp): return
+	var t0 := Time.get_ticks_usec()
+	_puddles = vp.get_texture().get_image()
+	vp.queue_free()
+	_puddles.shrink_x2()                       # media de 2 × 2: las juntas mojadas (rayas) quedan grises; los charcos, blancos
+	var t1 := Time.get_ticks_usec() - t0
+	if OS.get_cmdline_user_args().has("log=true"):
+		var n := 0
+		for y in _puddles.get_height():
+			for x in _puddles.get_width():
+				if _puddles.get_pixel(x, y).r > 0.75: n += 1
+		print("CHARCOS %d x %d, %.1f %% de charco, %.1f ms" % [_puddles.get_width(), _puddles.get_height(), 100.0 * n / (_puddles.get_width() * _puddles.get_height()), t1 / 1000.0])
+
+## ¿Hay un charco en p? (sin mapa: no; a 25 cm por píxel)
+func puddle_at(p: Vector2) -> bool:
+	if _puddles == null or not _puddle_rect.has_point(p): return false
+	var x := int((p.x - _puddle_rect.position.x) / _puddle_rect.size.x * _puddles.get_width())
+	var y := int((p.y - _puddle_rect.position.y) / _puddle_rect.size.y * _puddles.get_height())
+	return _puddles.get_pixel(clampi(x, 0, _puddles.get_width() - 1), clampi(y, 0, _puddles.get_height() - 1)).r > 0.75
+
+# -- el corazón de R'lyeh (glow "heart"): las piezas laten a la vez, lub-dub; cada latido echa
+# una onda de luz por el suelo y retumba. Más deprisa con la cordura baja y cuando llega el ser
+# del final (heart: period, final_period, ring, color) --
+static var heart_beat := 0.0                    ## 0..1: el latido ahora (glow_anim.gdshader y las luces)
+var _hearts: Array = []                         ## [posición de la pieza]
+var _heart_mats: Array[ShaderMaterial] = []
+var _heart_ph := 0.0
+var _heart_fast := false
+
+## Lub fuerte al empezar el ciclo (u 0..1) y dub más flojo poco después.
+static func beat_at(u: float) -> float:
+	var lub := exp(-pow(u / 0.06, 2.0)) + exp(-pow((u - 1.0) / 0.06, 2.0))
+	var dub := 0.6 * exp(-pow((u - 0.17) / 0.06, 2.0))
+	return clampf(lub + dub, 0.0, 1.0)
+
+func _heart_step(delta: float) -> void:
+	var c: Dictionary = cfg.get("heart", {})
+	var g := get_parent()
+	if not _heart_fast and g != null and "director" in g and g.director != null and not (g.director as WaveDirector).final_event.is_connected(_on_final):
+		(g.director as WaveDirector).final_event.connect(_on_final)
+	var period := float(c.get("final_period", 0.95)) if _heart_fast else float(c.get("period", 1.9))
+	period /= 1.0 + fear * 0.4
+	var was := _heart_ph
+	_heart_ph = fposmod(_heart_ph + delta / period, 1.0)
+	heart_beat = beat_at(_heart_ph)
+	for m: ShaderMaterial in _heart_mats: m.set_shader_parameter("beat", heart_beat)
+	if _heart_ph >= was: return
+	var col: Array = c.get("color", [0.25, 0.95, 0.55])                # lub: la onda de luz y el golpe
+	var f := _focus()
+	var best := INF
+	var at := Vector3.ZERO
+	for hp: Vector3 in _hearts:
+		if on_screen(hp, 1.15): _ripple(Vector3(hp.x, 0.04, hp.z), float(c.get("ring", 4.0)), 0.5, Color(col[0], col[1], col[2]))
+		var d := Vector2(hp.x - f.x, hp.z - f.z).length()
+		if d < best:
+			best = d
+			at = hp
+	if best < 40.0: sfx_at("heartbeat", at, -clampf((best - 5.0) * 0.45, 0.0, 14.0))
+
+func _on_final(_e: Enemy) -> void:
+	_heart_fast = true
+
+# -- Profundos que asoman en el agua (lurkers: model, n, near, every [s, s], stay [s, s], show m):
+# en el mar o en las pozas hondas, a la vista y lejos de los jugadores, sale despacio la cabeza y
+# los hombros, mira al más cercano y se hunde al rato o si alguien se le acerca --
+var _lurkers: Array[Dictionary] = []
+var _lurk_t := 5.0
+
+func _lurk_step(delta: float, t: float) -> void:
+	var c: Dictionary = cfg.lurkers
+	var near_m := float(c.get("near", 7.0))
+	for ld: Dictionary in _lurkers.duplicate():
+		var b: Node3D = ld.node
+		ld.age = float(ld.age) + delta
+		var near := _nearest_player(b.position)
+		if not ld.sink and (float(ld.age) > float(ld.stay) or near < near_m):
+			ld.sink = true
+			ld.at = ld.age
+			ld.fast = near < near_m
+			var wp := Vector3(b.position.x, float(ld.wy) + 0.03, b.position.z)
+			_ripple(wp, 0.8, 0.7)
+			VoxelFx.puff(self, wp, "step_splash", 0.7, Color.WHITE, 0.6)
+			if near < 20.0: sfx_at("splash", wp, -8.0 - near * 0.4)
+		var k: float
+		if ld.sink: k = 1.0 - clampf((float(ld.age) - float(ld.at)) / (0.5 if ld.fast else 1.4), 0.0, 1.0)
+		else: k = smoothstep(0.0, 1.0, clampf(float(ld.age) / 2.2, 0.0, 1.0))
+		if ld.sink and k <= 0.0:
+			b.queue_free()
+			_lurkers.erase(ld)
+			continue
+		var wy := float(ld.wy)
+		if ld.sea:
+			wy = _water_y(Vector2(b.position.x, b.position.z))
+			ld.wy = wy
+		var hidden: float = wy - float(ld.top) - 0.1
+		var shown: float = wy - float(ld.top) + float(ld.show)
+		b.position.y = lerpf(hidden, shown, k) + sin(t * 1.1 + float(ld.ph) * 6.0) * 0.03
+		Anims.pose(String(ld.name), "idle", ld.model, fposmod(t / Anims.duration(String(ld.name), "idle") + float(ld.ph), 1.0))
+		var pl := _nearest_node(b.position)
+		if pl != null:
+			var to := pl.global_position - b.position
+			b.rotation.y = rotate_toward(b.rotation.y, atan2(to.x, to.z), delta * 0.8)
+	var want := int(c.get("n", 1)) + int(round(fear * 1.5))
+	if _lurkers.size() >= want: return
+	_lurk_t -= delta
+	if _lurk_t > 0.0: return
+	var ev: Array = c.get("every", [8, 18])
+	_lurk_t = _rng.randf_range(ev[0], ev[1]) * (1.0 - fear * 0.5)
+	var p := _lurk_spot(c)
+	if p != Vector3.INF: _lurk_rise(p, c)
+
+## Un sitio para asomar: agua a la vista, lejos de los jugadores y de otro que asome.
+func _lurk_spot(c: Dictionary) -> Vector3:
+	var f := _focus()
+	var obstacles: ObstacleMap = arena.get_meta("obstacles")
+	var far := float(c.get("near", 7.0)) + 2.0
+	for i in 48:
+		var p := Vector2.INF
+		var sea := false
+		if not _sea.is_empty() and (i % 2 == 0 or obstacles == null):
+			var s := _view_point(0.9)
+			p = Vector2(s.x, s.z)
+			if shore_dist(p, _sea) < 1.5: continue
+			sea = true
+		elif obstacles != null:
+			p = obstacles.random_water(_rng, Vector2(f.x, f.z), far, 15.0, 0.9)
+			if p == Vector2.INF or obstacles.water_at(p) < 0.8: continue
+		else: continue
+		if not sea and obstacles.has_mask() and obstacles.distance(p) < 1.5: continue   # que no lo tape el decorado
+		var at := Vector3(p.x, 0.0, p.y)
+		if not on_screen(at, 0.9 if sea else 0.75) or _nearest_player(at) < far: continue
+		var ok := true
+		for o: Dictionary in _lurkers:
+			if Vector2((o.node as Node3D).position.x - p.x, (o.node as Node3D).position.z - p.y).length() < 4.0: ok = false
+		if ok: return Vector3(p.x, 1.0 if sea else 0.0, p.y)          # y: 1 = en el mar
+	return Vector3.INF
+
+func _lurk_rise(spot: Vector3, c: Dictionary) -> void:
+	var mname := String(c.get("model", "profundo"))
+	var b := Node3D.new()
+	b.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	var m := VoxelBuilder.load_model("res://models/%s.json" % mname)
+	b.add_child(m)
+	add_child(b)
+	var sea := spot.y > 0.5
+	var wy := _water_y(Vector2(spot.x, spot.z)) if sea else 0.02
+	var top := _aabb_in(b).end.y
+	b.position = Vector3(spot.x, wy - top - 0.1, spot.z)
+	var pl := _nearest_node(b.position)
+	if pl != null: b.rotation.y = atan2(pl.global_position.x - spot.x, pl.global_position.z - spot.z) + _rng.randf_range(-0.6, 0.6)
+	_ripple(Vector3(spot.x, wy + 0.03, spot.z), 0.9, 0.6)
+	var st: Array = c.get("stay", [5, 10])
+	_lurkers.append({"node": b, "model": m, "name": mname, "age": 0.0, "stay": _rng.randf_range(st[0], st[1]),
+		"show": float(c.get("show", 0.75)), "top": top, "wy": wy, "sea": sea, "sink": false, "at": 0.0,
+		"fast": false, "ph": _rng.randf()})
+	if OS.get_cmdline_user_args().has("log=true"): print("PROFUNDO asoma en %.1f, %.1f" % [spot.x, spot.z])
+
+## La caja de las mallas de `root` en su propio espacio (sin pasar por el árbol).
+static func _aabb_in(root: Node3D) -> AABB:
+	var out := AABB()
+	var first := true
+	for mi: MeshInstance3D in root.find_children("*", "MeshInstance3D", true, false):
+		var t := mi.transform
+		var n := mi.get_parent()
+		while n != root and n is Node3D:
+			t = (n as Node3D).transform * t
+			n = n.get_parent()
+		var b := t * mi.get_aabb()
+		out = b if first else out.merge(b)
+		first = false
+	return out
+
+func _nearest_node(p: Vector3) -> Node3D:
+	var best: Node3D = null
+	var bd := INF
+	for pl in _players():
+		if is_instance_valid(pl) and pl.health > 0.0:
+			var d := (pl as Node3D).global_position.distance_to(p)
+			if d < bd:
+				bd = d
+				best = pl
+	return best
+
+# -- luces de barcos a lo lejos en la tormenta (ship_lights: n, dist [m, m] de la orilla, speed):
+# un casco oscuro que apenas se ve, la luz blanca del palo, la roja o la verde del costado y
+# alguna portilla; cabecean con la mar y la lluvia las tapa y las destapa --
+var _ships: Array[Dictionary] = []
+var _ship_t := 0.5
+
+func _ship_step(delta: float, t: float) -> void:
+	var c: Dictionary = cfg.ship_lights
+	var dist: Array = c.get("dist", [5.0, 14.0])
+	for sd: Dictionary in _ships.duplicate():
+		var b: Node3D = sd.node
+		b.position += Vector3((sd.vel as Vector2).x, 0.0, (sd.vel as Vector2).y) * delta
+		var p := Vector2(b.position.x, b.position.z)
+		var r := 1.2
+		var sx := (sea_height(p + Vector2(r, 0), t, _sea) - sea_height(p - Vector2(r, 0), t, _sea)) / (2.0 * r)
+		var sz := (sea_height(p + Vector2(0, r), t, _sea) - sea_height(p - Vector2(0, r), t, _sea)) / (2.0 * r)
+		b.position.y = float(_sea.get("level", 0.0)) + sea_height(p, t, _sea) * 0.7
+		b.basis = Basis.from_euler(Vector3(-sz * 1.5 + sin(t * 0.7 + float(sd.ph)) * 0.08, float(sd.yaw), sx * 1.5 + sin(t * 0.9 + float(sd.ph) * 2.0) * 0.12))
+		var gone := not on_screen(b.position, 1.5) or shore_dist(p, _sea) < float(dist[0]) * 0.7
+		sd.k = clampf(float(sd.k) + delta * (-0.5 if gone else 0.35), 0.0, 1.0)
+		if gone and float(sd.k) <= 0.0:
+			b.queue_free()
+			_ships.erase(sd)
+			continue
+		var curtain := smoothstep(0.15, 0.75, 0.5 + 0.5 * sin(t * 0.31 + float(sd.ph) * 5.0) * sin(t * 0.19 + float(sd.ph) * 3.0))   # cortinas de lluvia
+		var a := float(sd.k) * lerpf(0.2, 1.0, curtain)
+		for mt: Array in sd.mats: (mt[0] as StandardMaterial3D).albedo_color.a = float(mt[1]) * a
+	if _ships.size() >= int(c.get("n", 2)): return
+	_ship_t -= delta
+	if _ship_t > 0.0: return
+	_ship_t = _rng.randf_range(2.0, 6.0)
+	for _i in 24:
+		var s := _view_point(0.95)
+		var p := Vector2(s.x, s.z)
+		var d := shore_dist(p, _sea)
+		if d < float(dist[0]) or d > float(dist[1]): continue
+		var ok := true
+		for o: Dictionary in _ships:
+			if Vector2((o.node as Node3D).position.x - p.x, (o.node as Node3D).position.z - p.y).length() < 6.0: ok = false
+		if not ok: continue
+		var gx := shore_dist(p + Vector2(0.5, 0), _sea) - shore_dist(p - Vector2(0.5, 0), _sea)
+		var gz := shore_dist(p + Vector2(0, 0.5), _sea) - shore_dist(p - Vector2(0, 0.5), _sea)
+		var along := Vector2(-gz, gx).normalized() * (1.0 if _rng.randf() < 0.5 else -1.0)   # a lo largo de la costa
+		_make_ship(p, along * float(c.get("speed", 0.35)) * _rng.randf_range(0.7, 1.3))
+		if OS.get_cmdline_user_args().has("log=true"): print("BARCO en %.1f, %.1f" % [p.x, p.y])
+		return
+
+static var _dot: GradientTexture2D
+static func _soft_dot() -> GradientTexture2D:
+	if _dot == null:
+		_dot = GradientTexture2D.new()
+		_dot.fill = GradientTexture2D.FILL_RADIAL
+		_dot.fill_from = Vector2(0.5, 0.5)
+		_dot.fill_to = Vector2(1.0, 0.5)
+		var g := Gradient.new()
+		g.set_color(0, Color(1, 1, 1, 1))
+		g.set_color(1, Color(1, 1, 1, 0))
+		g.add_point(0.25, Color(1, 1, 1, 0.35))
+		_dot.gradient = g
+		_dot.width = 64
+		_dot.height = 64
+	return _dot
+
+func _make_ship(p: Vector2, vel: Vector2) -> void:
+	var b := Node3D.new()
+	b.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	var mats: Array = []
+	var side := Color(0.9, 0.12, 0.08) if _rng.randf() < 0.5 else Color(0.15, 0.9, 0.35)
+	var parts := [[Vector3(2.8, 0.45, 0.8), Vector3(0, 0.1, 0), Color(0.03, 0.035, 0.04), 0.85],   # casco
+		[Vector3(0.9, 0.35, 0.6), Vector3(-0.3, 0.5, 0), Color(0.035, 0.04, 0.045), 0.85],          # caseta
+		[Vector3(0.05, 1.5, 0.05), Vector3(0.4, 1.0, 0), Color(0.03, 0.03, 0.035), 0.8],            # palo
+		[Vector3(0.09, 0.09, 0.09), Vector3(0.4, 1.78, 0), Color(1.0, 0.95, 0.82), 1.0],          # luz del palo
+		[Vector3(0.08, 0.08, 0.08), Vector3(0.9, 0.42, 0.42), side, 1.0]]                          # luz del costado
+	for i in _rng.randi_range(2, 4):                                                               # portillas
+		parts.append([Vector3(0.1, 0.08, 0.02), Vector3(-0.6 + i * 0.24, 0.52, 0.31), Color(1.0, 0.72, 0.35), 0.9])
+	for pr: Array in parts:
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = pr[0]
+		var mt := StandardMaterial3D.new()
+		mt.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mt.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		var pc: Color = pr[2]
+		mt.albedo_color = Color(pc.r, pc.g, pc.b, 0.0)
+		bm.material = mt
+		mi.mesh = bm
+		mi.position = pr[1]
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		b.add_child(mi)
+		mats.append([mt, pr[3]])
+	for hl: Array in [[Vector3(0.4, 1.78, 0), 1.1, Color(1.0, 0.9, 0.7), 0.55], [Vector3(0.9, 0.42, 0.42), 0.6, side, 0.45]]:
+		var halo := MeshInstance3D.new()                                               # las luces, borrosas en la lluvia
+		var qm := QuadMesh.new()
+		qm.size = Vector2(hl[1], hl[1])
+		var hm := StandardMaterial3D.new()
+		hm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		hm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		hm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+		hm.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+		hm.albedo_texture = _soft_dot()
+		var hc: Color = hl[2]
+		hm.albedo_color = Color(hc.r, hc.g, hc.b, 0.0)
+		qm.material = hm
+		halo.mesh = qm
+		halo.position = hl[0]
+		halo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		b.add_child(halo)
+		mats.append([hm, hl[3]])
+	add_child(b)
+	b.position = Vector3(p.x, float(_sea.get("level", 0.0)), p.y)
+	var yaw := atan2(-vel.y, vel.x)                                                     # la proa (+X del barco) hacia donde va
+	b.rotation.y = yaw
+	_ships.append({"node": b, "vel": vel, "yaw": yaw, "mats": mats, "k": 0.0, "ph": _rng.randf()})
 
 func _exit_tree() -> void:
 	step_now = ""

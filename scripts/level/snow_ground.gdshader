@@ -102,7 +102,8 @@ void fragment() {
 		// algún destello de cristal de nieve (muy pocos, pequeños)
 		float spark = step(0.996, hash(c + 91.0)) * (1.0 - ice_m) * (1.0 - tr);
 		EMISSION = vec3(0.9, 0.95, 1.0) * spark * 0.25 * sparkle;
-		if (aurora > 0.0) EMISSION += aurora_at(pc, TIME) * ice_m * 0.55;   // el hielo refleja la aurora
+		if (aurora > 0.0) EMISSION += aurora_at(pc, TIME) * ice_m * 0.55   // el hielo refleja la aurora
+			+ aurora_light(pc, TIME) * (1.0 - ice_m) * 0.05;          // y la nieve recoge su luz (hito 12.12)
 		ROUGHNESS = mix(0.9, 0.3, ice_m);
 		SPECULAR = mix(0.3, 0.6, ice_m);
 	}

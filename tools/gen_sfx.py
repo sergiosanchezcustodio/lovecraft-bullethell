@@ -657,6 +657,27 @@ def ambiente2(r):
         save('rat_%d' % k, far(x, 0.5, 0.15, 9000, 0.3))
 
 
+def latido():
+    """El corazón de R'lyeh (hito 12.12): dos golpes graves, lub y dub, muy lejos y con eco."""
+    r = np.random.default_rng(1212)
+    d = 1.4
+    tt = t(d)
+    x = np.zeros(len(tt))
+    for t0, f0, amp in ((0.0, 52.0, 1.0), (0.2, 44.0, 0.65)):
+        u = np.clip(tt - t0, 0, None)
+        on = (tt >= t0)
+        f = f0 * (1.0 + 0.6 * np.exp(-u / 0.03))                  # el golpe baja de tono al sonar
+        ph = 2 * np.pi * np.cumsum(f * on) / SR
+        x += np.sin(ph) * np.exp(-u / 0.13) * (1 - np.exp(-u / 0.006)) * on * amp
+        x += lp(r.standard_normal(len(tt)), 180) * np.exp(-u / 0.05) * on * amp * 0.35   # el roce, apagado
+    x = lp(x, 400)
+    ir = r.standard_normal(int(1.0 * SR)) * np.exp(-t(1.0) / 0.35)  # retumba en la piedra
+    wet = signal.fftconvolve(x, lp(ir, 300))[:len(x)]
+    x = x + wet * (np.std(x) / (np.std(wet) + 1e-9)) * 0.5
+    for k in range(2):
+        save('heartbeat_%d' % k, x * (1.0 - 0.15 * k))
+
+
 def copy_kenney(src):
     files = {os.path.splitext(os.path.basename(p))[0]: p for p in glob.glob(os.path.join(src, '**', '*.ogg'), recursive=True)}
     for ev, names in KENNEY.items():
@@ -667,7 +688,9 @@ def copy_kenney(src):
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
-    if '--ambiente' in sys.argv:                             # solo los del ambiente (no necesita Kenney)
+    if '--latido' in sys.argv:                               # solo el latido de R'lyeh (hito 12.12)
+        latido()
+    elif '--ambiente' in sys.argv:                             # solo los del ambiente (no necesita Kenney)
         ambiente()
     else:
         synth()

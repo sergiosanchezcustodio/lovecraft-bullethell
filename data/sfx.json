@@ -690,6 +690,20 @@
 			],
 			"bus": "Ambiente"
 		},
+		"heartbeat": {
+			"db": -10,
+			"pitch": [
+				0.95,
+				1.05
+			],
+			"voices": 1,
+			"gap": 0.4,
+			"files": [
+				"heartbeat_0.wav",
+				"heartbeat_1.wav"
+			],
+			"bus": "Ambiente"
+		},
 		"howl": {
 			"db": -22,
 			"pitch": [

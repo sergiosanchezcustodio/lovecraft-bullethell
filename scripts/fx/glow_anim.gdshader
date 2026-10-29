@@ -1,6 +1,7 @@
 // Brillo animado de las capas de luz (ambiente de los escenarios, 16-10-2026): 1 late despacio
 // (cristales, corales, la puerta de R'lyeh), 2 tiembla como una llama (faroles, antorchas,
-// hogueras) y 3 es una bombilla que falla de vez en cuando (estudio). La luz real de la pieza
+// hogueras), 3 es una bombilla que falla de vez en cuando (estudio) y 4 late como un corazón, todas
+// a la vez (R'lyeh, hito 12.12: `beat` lo pone Ambient). La luz real de la pieza
 // sigue la misma cuenta (Ambient.anim_k), con la semilla de su posición.
 shader_type spatial;
 render_mode unshaded;
@@ -9,6 +10,7 @@ uniform bool colors_srgb = true;
 uniform int mode = 1;
 uniform float amount = 0.2;
 uniform float speed = 1.0;
+uniform float beat = 0.0;                     // modo 4: el latido ahora (0..1)
 
 varying float k;
 
@@ -24,6 +26,7 @@ float h1(float x) { return fract(sin(x * 12.9898) * 43758.5453); }
 
 float anim_k(float t, float s) {
 	if (mode == 1) return 1.0 + amount * sin(t * speed * 1.3 + s);
+	if (mode == 4) return 1.0 + amount * (beat * 2.0 - 0.35);
 	if (mode == 2) return 1.0 + amount * (0.55 * sin(t * 7.3 * speed + s) * sin(t * 3.1 * speed + s * 1.7) + 0.45 * sin(t * 13.7 * speed + s * 2.3));
 	float u = t / 6.5 + s * 0.13;
 	float slot = floor(u);

@@ -50,6 +50,7 @@ uniform vec3 crack_glow : source_color = vec3(0.25, 0.85, 0.45);  // grietas del
 uniform vec3 barnacle : source_color = vec3(0.55, 0.55, 0.50);
 // marisma (hito 6.1): más allá de x o z = marsh (0: sin marisma) todo se encharca
 uniform float marsh = 0.0;
+uniform bool puddle_mask = false;            // hito 12.12: solo los charcos, en blanco (Ambient lo dibuja una vez desde arriba)
 // muelle (hito 6.2): más allá de x o z = dock (0: sin muelle) el adoquín pasa a tablas
 uniform float dock = 0.0;
 uniform vec3 dock_hi : source_color = vec3(0.44, 0.38, 0.31);
@@ -372,5 +373,6 @@ void fragment() {
 		}
 		ROUGHNESS = mix(mix(rough, 0.45, wet), 0.04, wetm);
 		SPECULAR = mix(mix(spec, 0.5, wet), 0.9, wetm);
+		if (puddle_mask) { ALBEDO = vec3(0.0); EMISSION = vec3(step(0.3, wetm)); }
 	}
 }
