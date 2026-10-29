@@ -697,6 +697,29 @@ def sirena():
         save('ship_horn_%d' % k, lp(x * 0.45 + wet * 0.8, 900))
 
 
+def olas(r):
+    """Rumor de olas que rompen en el arrecife (hito 12.13, marea que sube; 29-10-2026): cada ola
+    llega creciendo (ruido que se abre hacia los agudos), rompe y se retira siseando; tres por
+    vuelta, a intervalos algo distintos, sobre un fondo grave. En bucle sin costura."""
+    d, fade = 12.0, 2.0
+    n = int((d + fade) * SR)
+    w = lp(r.standard_normal(n), 220) * 0.9                    # fondo: el mar lejano
+    for start in (0.3, 4.4, 8.1, 12.3):                        # la última cae en el fundido de la junta
+        k0 = int(start * SR)
+        rise, crash, back = r.uniform(1.2, 1.6), r.uniform(0.25, 0.4), r.uniform(1.6, 2.2)
+        m = int((rise + crash + back) * SR)
+        if k0 + m > n: m = n - k0
+        tt = np.arange(m) / SR
+        a = np.where(tt < rise, (tt / rise) ** 2,
+            np.where(tt < rise + crash, 1.0, np.exp(-(tt - rise - crash) / (back * 0.35))))
+        x = r.standard_normal(m)
+        low = lp(x, 500) * 1.4
+        high = hp(x, 1500) * np.clip((tt - rise * 0.6) / rise, 0, 1) * 0.9   # la espuma, al romper
+        hiss = hp(x, 3500) * np.where(tt > rise + crash, 0.7, 0.0)           # al retirarse
+        w[k0:k0 + m] += (low + high + hiss) * a * r.uniform(0.8, 1.1)
+    save_loop('surf_loop', w, d, fade)
+
+
 def copy_kenney(src):
     files = {os.path.splitext(os.path.basename(p))[0]: p for p in glob.glob(os.path.join(src, '**', '*.ogg'), recursive=True)}
     for ev, names in KENNEY.items():
@@ -710,6 +733,8 @@ if __name__ == '__main__':
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
         latido()
         sirena()
+    elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)
+        olas(np.random.default_rng(31))
     elif '--ambiente' in sys.argv:                             # solo los del ambiente (no necesita Kenney)
         ambiente()
     else:

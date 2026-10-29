@@ -87,3 +87,8 @@ func test_rlyeh_inclina_la_camara_y_el_temblor_se_suma() -> void:
 	cam._process(0.016)
 	assert_eq(cam.rotation.z, 0.0, "y vuelve")
 	assert_eq(PlayerMotor.CAMERA_YAW, 45.0, "los controles no dependen del giro de la cámara")
+
+func test_las_olas_suben_con_la_marea() -> void:
+	var c: Dictionary = (Ambient.config().arenas as Dictionary).arrecife.changes.tide
+	assert_true(ResourceLoader.exists("res://resources/sfx/" + String(c.surf)), "el bucle de olas existe")
+	assert_lt(float(c.surf_db[0]), float(c.surf_db[1]), "con la marea alta, más fuerte")

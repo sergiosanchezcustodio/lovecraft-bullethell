@@ -200,6 +200,7 @@ var _lights: Array = []                         ## [OmniLight3D, energía, modo,
 var _swings: Array[Dictionary] = []             ## faroles que cuelgan: parte, ángulo y velocidad
 var _candles: Array = []                        ## [llama, s que le quedan apagada (0: encendida), luz de su pieza]
 static var step_now := ""                       ## suelo de la arena en juego (Explosion: la nieve que aparta)
+static var blizzard_now := 0.0                  ## cuánto se ha cerrado la ventisca (Hud: retratos empañados)
 var _mats_sky: Array[ShaderMaterial] = []       ## suelo y mar: estrellas y fugaces
 var _shoot_t := -1.0
 var _next_shoot := 8.0
@@ -3227,7 +3228,8 @@ func _make_ship(p: Vector2, vel: Vector2) -> void:
 # el evento final) y se queda en 1 después. Lo que cambia el juego (la marea) sale del reloj del
 # director, así que en red todos los PC lo ven igual. Opción de prueba: changes=0.8 los fija ahí.
 # - tide: la marea del arrecife (file: tools/gen_marea.py; max m; sea: m que sube el mar). El
-#   agua nueva frena como la de siempre (ObstacleMap.tide_level) y el suelo la dibuja.
+#   agua nueva frena como la de siempre (ObstacleMap.tide_level) y el suelo la dibuja. surf: bucle
+#   de olas (gen_sfx.py --olas) que pasa de surf_db[0] a surf_db[1] dB con la marea.
 # - blizzard: la ventisca del paso se cierra: el clima pasa de `calm` a lo peor de su WeatherData
 #   (Weather.set_intensity) y un velo de nieve tapa la pantalla salvo alrededor de los jugadores
 #   (whiteout.gdshader: veil, cuánto tapa; clear [m, m], el radio despejado al principio y al final).
@@ -3236,6 +3238,7 @@ var _changes_k := -1.0                          ## el valor fijado con changes= 
 var _sea_base := 0.0
 var _veil: ShaderMaterial
 var _veil_rect: ColorRect
+var _surf: AudioStreamPlayer                    ## el rumor de las olas, que sube con la marea
 
 ## De 0 a 1 entre from y to (fracción de final_time), suave.
 static func change_k(c: Dictionary, t: float, final_time: float) -> float:
@@ -3252,6 +3255,11 @@ func _changes_ready() -> void:
 			_ground_mat.set_shader_parameter("tide_tex", obstacles.tide_texture())
 		var sea := arena.get_node_or_null("Sea") as Node3D
 		if sea != null: _sea_base = sea.position.y
+		if c.tide.has("surf") and not sfx_muted():
+			_surf = _loop_player(String(c.tide.surf), false) as AudioStreamPlayer
+			if _surf != null:
+				add_child(_surf)
+				_surf.play(_rng.randf() * _surf.stream.get_length())
 	if c.has("blizzard") and DisplayServer.get_name() != "headless":
 		var layer := CanvasLayer.new()
 		layer.layer = -1                                            # encima del mundo, debajo del HUD
@@ -3287,12 +3295,16 @@ func _tide_step(c: Dictionary, k: float) -> void:
 	var obstacles: ObstacleMap = arena.get_meta("obstacles")
 	if obstacles != null: obstacles.tide_level = lvl
 	if _ground_mat != null: _ground_mat.set_shader_parameter("tide", lvl)
+	if _surf != null:                                               # las olas se oyen más con la marea alta
+		var db: Array = c.get("surf_db", [-34.0, -16.0])
+		_surf.volume_db = lerpf(float(db[0]), float(db[1]), k)
 	var sea := arena.get_node_or_null("Sea") as Node3D
 	if sea != null:
 		sea.position.y = _sea_base + float(c.get("sea", 0.4)) * k
 		if not _sea.is_empty(): _sea.level = sea.position.y
 
 func _blizzard_step(c: Dictionary, k: float) -> void:
+	blizzard_now = k * float(c.get("veil", 0.8))
 	var w := _weather()
 	if w != null: w.set_intensity(k, float(c.get("calm", 0.12)))
 	if _veil == null or camera == null: return
@@ -3315,3 +3327,4 @@ func _blizzard_step(c: Dictionary, k: float) -> void:
 
 func _exit_tree() -> void:
 	step_now = ""
+	blizzard_now = 0.0

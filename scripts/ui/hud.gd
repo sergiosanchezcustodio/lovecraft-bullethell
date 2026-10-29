@@ -191,6 +191,8 @@ class PlayerPanel extends PanelContainer:
 	var _items_key := ""
 	var _portrait_mat: ShaderMaterial
 	var _state := Vector2.ZERO                  ## sangre y mirada perdida del retrato, suavizadas
+	var _down := 0.0                            ## abatido (sin color) y vaho de la ventisca, suavizados
+	var _mist := 0.0
 
 	const MARGIN := 16.0
 	const SIZE := Vector2(272, 132)
@@ -337,12 +339,21 @@ class PlayerPanel extends PanelContainer:
 		for w in p.weapons.weapons: _cell(_weapons_row, w.data.get_icon(), w.data.display_name, w.level)
 
 	## Sangre con poca vida (toda, abatido) y mirada perdida con poca cordura (toda, en la crisis):
-	## van hacia su valor poco a poco, para que un golpe no cambie el retrato de golpe.
+	## van hacia su valor poco a poco, para que un golpe no cambie el retrato de golpe. Abatido,
+	## además, sin color; y en la ventisca del paso, empañado (Ambient.blizzard_now).
 	func _portrait_step() -> void:
 		if _portrait_mat == null: return
 		var to := Hud.portrait_state(p.health / maxf(p.data.max_health, 1.0), p.sanity / maxf(p.data.max_sanity, 1.0),
 			p.sanity_state != null and p.sanity_state.in_crisis, p.is_downed())
 		var dt := get_process_delta_time()
+		var dn := move_toward(_down, 1.0 if p.is_downed() else 0.0, dt * 1.5)
+		if dn != _down:
+			_down = dn
+			_portrait_mat.set_shader_parameter("down", dn)
+		var mi := move_toward(_mist, Ambient.blizzard_now, dt * 0.5)
+		if mi != _mist:
+			_mist = mi
+			_portrait_mat.set_shader_parameter("mist", mi)
 		var s := Vector2(move_toward(_state.x, to.x, dt * 0.8), move_toward(_state.y, to.y, dt * 0.6))
 		if s == _state: return
 		_state = s

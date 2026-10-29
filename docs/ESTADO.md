@@ -1288,6 +1288,11 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Retratos del HUD con estado: un sombreador encima de la cabeza (`scripts/ui/portrait_state.gdshader`, ceñido a su silueta por el alfa): sangre desde la mitad de la vida, con manchas que crecen y chorretones (toda al caer); mirada perdida desde el 40 % de la cordura, la cara se desdobla, se mece despacio y pierde el color hacia el violeta (toda en la crisis); escarcha en la Antártida (parte 1, `Hud.frost`, la pone `game.gd`), que entra por el borde de la silueta y por arriba, con cristales que brillan. `Hud.portrait_state` da los valores y el panel va hacia ellos poco a poco. El retrato no se vuelve a dibujar por esto (el sombreador va en el `TextureRect`): coste despreciable.
   - Probar: `level=p2_n1 hp=30` (sangre), `san=10` (mirada perdida), `level=p1_n1` (escarcha).
   - Hoja `shots/revision/2026-10-29/libro_y_retratos.png`; vídeo en fotogramas en `shots/videos/libro/`. Tests en `test_portrait_book` (3). 522 de 522.
+- **Mejoras de los hitos 12.13 y 12.14 (29-10-2026), pendientes de tu revisión:**
+  - Rumor de olas en el arrecife que sube con la marea: bucle sintetizado (`python tools/gen_sfx.py --olas`, `surf_loop.wav`: tres olas por vuelta que llegan creciendo, rompen con espuma y se retiran siseando, sobre el mar lejano) que pasa de −34 a −16 dB con la marea (`surf` y `surf_db` en el `tide` de `data/ambient.json`).
+  - Retrato del abatido sin color (gris apagado; la sangre sigue roja encima), además de la sangre.
+  - Retrato empañado en la ventisca del paso: un vaho de nieve que corre por encima, tanto como se ha cerrado (`Ambient.blizzard_now`).
+  - Hoja `shots/revision/2026-10-29/retratos_mejoras.png`. Test nuevo en `test_scene_changes`. 523 de 523.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 
