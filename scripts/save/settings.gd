@@ -35,6 +35,7 @@ var defaults := {
 	"damage_numbers": 2,                    ## cifras de daño: 0 no, 1 solo los golpes fuertes, 2 todas (hito 11.2)
 	"quality": 2,                           ## calidad gráfica: 0 baja, 1 media, 2 alta, 3 ultra (Quality, hito 11.5)
 	"dif_levels": {},                       ## dificultad (D-42, temporal): característica -> 1..10; sin ella, 3 (Difficulty)
+	"hallucinations": true,                 ## alucinaciones con poca cordura (hito 13.4, Hallucinations)
 	"tips": true,                           ## consejos de la primera partida (hito 13.3, Tips)
 	"madness": true,                        ## locura acumulada (GDD 4.5)
 	"intro": 1,                             ## ficha e intro al arrancar: 0 siempre, 1 solo la primera vez (hito 5.2)

@@ -369,8 +369,8 @@ class PlayerPanel extends PanelContainer:
 	func refresh() -> void:
 		var d := p.data
 		_portrait_step()
-		_health.value = p.health / d.max_health
-		_sanity.value = p.sanity / d.max_sanity
+		_health.value = p.hud_lie.x if p.hud_lie.x >= 0.0 else p.health / d.max_health   # alucinación (13.4)
+		_sanity.value = p.hud_lie.y if p.hud_lie.y >= 0.0 else p.sanity / d.max_sanity
 		_xp.value = p.progress.xp_fraction()
 		_xp.fill = p.progress.xp_color()                 # cooperativo: color de quien sube la próxima vez
 		_xp.mine = p.progress.is_next()                  # y su barra, enmarcada

@@ -402,6 +402,9 @@ var received := {}
 ## ({src, via, ph, me}): el informe al caer (hito 13.1, `FallReport`).
 var received_via := {}
 var last_hit := {}
+## Alucinación del HUD (hito 13.4, `Hallucinations`): vida y cordura (fracción) que enseña su
+## panel en vez de las de verdad; −1, la de verdad.
+var hud_lie := Vector2(-1, -1)
 static var bench_immortal := OS.get_cmdline_user_args().has("immortal=true")
 func recv_add(src: String, ph: float, me: float, via := &"otro") -> void:
 	if not received.has(src): received[src] = [0.0, 0.0]

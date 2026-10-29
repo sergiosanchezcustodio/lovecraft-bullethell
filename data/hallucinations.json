@@ -1,0 +1,8 @@
+{
+	"_doc": "Alucinaciones con poca cordura (hito 13.4, Hallucinations): por debajo del 30 % de cordura, una cada 'every' s (de [con el 30 %, a cero], ±30 %); 'weights', cuánto sale cada tipo; 'max_phantoms', criaturas falsas a la vez por jugador; 'tint', el tinte del color del jugador en cooperativo; 'phantom_speed', m/s.",
+	"every": [12.0, 3.0],
+	"weights": {"phantom": 5, "gem": 3, "hud": 2},
+	"max_phantoms": 3,
+	"tint": 0.22,
+	"phantom_speed": 2.4
+}
