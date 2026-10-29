@@ -290,6 +290,7 @@ func _physics_process_step(delta: float) -> void:
 	var dodge := input.just_pressed(InputBindings.DODGE) and not (ss.is_kind(&"huida") or ss.is_kind(&"vagar"))
 	velocity = motor.step(delta, move, dodge)
 	if in_water() and not motor.is_dodging(): velocity *= WadeSplash.SLOW   # agua somera: frena
+	if carry_slow != 1.0 and not motor.is_dodging(): velocity *= carry_slow  # lleva la reliquia (13.5)
 	velocity += push
 	push = Vector3.ZERO
 	if ss.is_kind(&"huida"): velocity *= rules.flee_speed
@@ -405,6 +406,8 @@ var last_hit := {}
 ## Alucinación del HUD (hito 13.4, `Hallucinations`): vida y cordura (fracción) que enseña su
 ## panel en vez de las de verdad; −1, la de verdad.
 var hud_lie := Vector2(-1, -1)
+## Objetivo de la reliquia (hito 13.5, `Objective`): quien la lleva anda más despacio.
+var carry_slow := 1.0
 static var bench_immortal := OS.get_cmdline_user_args().has("immortal=true")
 func recv_add(src: String, ph: float, me: float, via := &"otro") -> void:
 	if not received.has(src): received[src] = [0.0, 0.0]

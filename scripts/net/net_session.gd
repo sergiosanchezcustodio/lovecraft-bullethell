@@ -30,7 +30,7 @@ signal message(from: int, type: int, data: Variant)   ## mensajes de la partida 
 enum State { OFF, HOSTING, CONNECTING, CONNECTED }
 enum Msg { HELLO = 1, WELCOME, REJECT, ROSTER, PING, PONG }
 const USER := 16                             ## primer tipo libre para la partida
-const PROTOCOL := 12                          ## súbelo al cambiar el formato de cualquier mensaje
+const PROTOCOL := 13                          ## súbelo al cambiar el formato de cualquier mensaje
 const MAX_PLAYERS := 4                       ## jugadores en total, sumando los de cada PC
 const HELLO_TIMEOUT := 5.0                   ## s para presentarse tras conectar
 const CONNECT_TIMEOUT := 8.0                 ## s para conectar con el anfitrión

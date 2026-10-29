@@ -1,0 +1,27 @@
+{
+	"_doc": "Objetivos a mitad de nivel (hito 13.5, ObjectiveDirector y Objective). Por nivel, 'per_level' (de..a); el primero a los 'first' s, los siguientes 'gap' después, ninguno a menos de 'before_final' s del evento final. 'weights': cuánto sale cada tipo. Por tipo: 'distance' (m del jugador al punto de salida), 'goal' (m de ahí a la meta), 'limit' (s para cumplirlo), 'rewards' (una al azar: money [de, a] $, xp (valor de las gemas) o chest). rescue: 'drain' (vida por s del superviviente por criatura encima, sobre 100) y 'survivors' por parte (modelos con anim_humano; se evita el de un jugador). ritual: 'need' (s dentro), 'radius' (m) y 'guards' (criaturas al empezar; luego una cada 4,5 s con alguien dentro).",
+	"per_level": [1, 2],
+	"first": [50.0, 90.0],
+	"gap": [70.0, 110.0],
+	"before_final": 40.0,
+	"weights": {"rescue": 1, "ritual": 1, "relic": 1},
+	"kinds": {
+		"rescue": {
+			"distance": [9.0, 14.0], "goal": [16.0, 22.0], "limit": 90.0, "drain": 14.0,
+			"rewards": [{"money": [45, 70]}, {"xp": 40}],
+			"survivors": {
+				"p1": ["peaslee", "johansen", "elwood", "olmstead", "dyer"],
+				"p2": ["habitante_mujer", "habitante_pescador", "habitante_viejo"],
+				"p3": ["habitante_viejo", "malone", "legrasse", "whipple"]
+			}
+		},
+		"ritual": {
+			"distance": [8.0, 12.0], "limit": 70.0, "need": 12.0, "radius": 2.6, "guards": 4,
+			"rewards": [{"chest": 1}, {"money": [35, 55]}]
+		},
+		"relic": {
+			"distance": [8.0, 13.0], "goal": [16.0, 24.0], "limit": 90.0,
+			"rewards": [{"chest": 1}, {"xp": 50}]
+		}
+	}
+}

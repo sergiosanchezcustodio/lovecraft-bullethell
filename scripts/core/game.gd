@@ -80,6 +80,7 @@ var level: LevelData
 var director: WaveDirector
 var announcer: Label
 var gems: GemManager
+var objectives: ObjectiveDirector                ## objetivos a mitad de nivel (hito 13.5)
 var hud: Hud
 var kills := 0
 var _menu_open := false
@@ -378,6 +379,11 @@ func _ready() -> void:
 	add_child(SanityFx.new().setup(players))         # distorsiones de cordura baja
 	if director != null: add_child(Tips.new(self))   # consejos de la primera partida (hito 13.3)
 	if director != null: add_child(Hallucinations.new().setup(self))   # con poca cordura (hito 13.4)
+	# con bots no salen (las simulaciones de la dificultad siguen comparables), salvo pedidos
+	var bots := player != null and player.input is BotInput and not args.get_bool("objectives")
+	if director != null and args.get_bool("objectives", true) and (not bots or args.has("objective")):
+		objectives = ObjectiveDirector.new().setup(self)              # objetivos a mitad de nivel (13.5)
+		add_child(objectives)
 	menus = PlayerMenus.new().setup(self, players)
 	add_child(menus)
 	if args.has("panel"):                            # capturas: panel=sheet|map, panel_player=2, panel_page=1

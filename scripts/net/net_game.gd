@@ -918,6 +918,15 @@ func _on_fx_child(n: Node) -> void:
 		c.opened.connect(func(_x: ArcaneChest, by: Player) -> void:
 			_objs.erase(oid)
 			_world_event("ch!", [oid, by.index]))
+	elif n is Objective:                                  # objetivos a mitad de nivel (hito 13.5)
+		var o := n as Objective
+		if o.mirror: return
+		var oid := _add_obj(o)
+		_world_event("ob+", _obj_args(o))
+		o.synced.connect(func(st: Array) -> void: _world_event("ob~", [oid] + st))
+		o.finished.connect(func(_x: Objective, ok: bool) -> void:
+			_objs.erase(oid)
+			_world_event("ob!", [oid, ok]))
 
 func _add_obj(n: Node) -> int:
 	var oid := _next_oid
@@ -931,6 +940,7 @@ func _obj_args(n: Node) -> Array:
 	if n is Breakable: return [oid, (n as Breakable).position, (n as Breakable).model_index, (n as Breakable).yaw]
 	if n is Pickup: return [oid, (n as Pickup).position, int((n as Pickup).kind)]
 	if n is ArcaneChest: return [oid, (n as ArcaneChest).position, (n as ArcaneChest).money, (n as ArcaneChest).heal]
+	if n is Objective: return [oid] + (n as Objective).net_args() + [(n as Objective).net_state()]
 	return [oid]
 
 ## Anfitrión: a un invitado que acaba de empezar, lo que ya hay (rompibles, recompensas, baúles).
@@ -940,7 +950,8 @@ func _send_objects(peer: int) -> void:
 		var n: Node = _objs[oid]
 		if not is_instance_valid(n) or n.is_queued_for_deletion(): continue
 		if n is ArcaneChest and (n as ArcaneChest).is_open: continue
-		var kind := "brk+" if n is Breakable else ("pk+" if n is Pickup else "ch+")
+		if n is Objective and (n as Objective).is_over(): continue
+		var kind := "brk+" if n is Breakable else ("pk+" if n is Pickup else ("ob+" if n is Objective else "ch+"))
 		evs.append([0, kind, _obj_args(n)])
 	if not evs.is_empty(): net.send(peer, WORLD, evs)
 
@@ -999,6 +1010,20 @@ func _apply_world(kind: String, a: Array, ahead: float) -> void:
 			_objs.erase(int(a[0]))
 			var i := int(a[1])
 			if c is ArcaneChest and is_instance_valid(c) and i < game.players.size(): (c as ArcaneChest).open(game.players[i])
+		"ob+":
+			var o := Objective.from_net(w, a.slice(1, 9))
+			o.apply_state(a[9])
+			_objs[int(a[0])] = o
+			w.fx.add_child(o)
+			var od: ObjectiveDirector = game.get("objectives")
+			if od != null: od.adopt(o)                        # la partida lo anuncia y lo enseña
+		"ob~":
+			var o: Variant = _objs.get(int(a[0]))
+			if o is Objective and is_instance_valid(o): (o as Objective).apply_state(a.slice(1))
+		"ob!":
+			var o: Variant = _objs.get(int(a[0]))
+			_objs.erase(int(a[0]))
+			if o is Objective and is_instance_valid(o): (o as Objective).end(bool(a[1]))
 		"haz":
 			var hz: Hazards = game.get("hazards")
 			if hz == null: return
