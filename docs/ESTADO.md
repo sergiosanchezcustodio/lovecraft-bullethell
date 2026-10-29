@@ -1311,6 +1311,13 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
 
     Del 4 al 5 hay un salto grande (de 3 de 4 a ninguna) y del 8 en adelante el bot no dura ni un minuto y medio. El bot no juega como una persona (reacciona algo tarde y no compra): sirve para comparar niveles, no para decir dónde está el límite de un jugador.
   - Captura del menú: `shots/revision/2026-10-29/dificultad_menu.png`. Tests en `test_difficulty` (7). 530 de 530.
+- **Fase 13, hito 13.1: informe al caer (29-10-2026), pendiente de tu revisión.** Plan de la fase 13 aprobado por el autor («si, adelante»).
+  - En la pantalla final (al caer y al superar el nivel), a la derecha del resumen, un informe de cada jugador de este PC (`FallReport`, `scripts/ui/fall_report.gd`): quién le abatió (enemigo, vía, daño del golpe y minuto; en cooperativo, todas sus caídas), quién le quitó más vida (los tres primeros, con las vías de cada uno: «Fragmento protoplásmico 71 (balas 35, contacto 35)»), el reparto por vía («contacto 73 % · balas 27 %»), quién le quitó más cordura, una gráfica de su vida y su cordura del último minuto, los enemigos vivos a la vez (media y máximo) y la dificultad en uso. Con tres o cuatro jugadores, en dos columnas.
+  - Cada golpe lleva su vía y su origen (`Damage.via` y `Damage.who`): «bala» (las balas enemigas guardan en `tag` el id del enemigo que las disparó, `PatternRunner`), «contacto», «golpe» (lo que no dice otra cosa y lo da un enemigo: saltos, embestidas, golpes en un círculo), «zona» (los charcos, `EnemyZone.who`), «peligro» (ángulos y olas), «aura» y «presencia» (cordura: `Player.drain_sanity(cantidad, origen, vía)` lo apunta) y «aliado» (la paranoia). `Player.received_via` («origen|vía» → [vida, cordura]) y `last_hit`; `received` sigue como estaba para las simulaciones (la presencia ahora se apunta con la resistencia mental aplicada, lo que de verdad quita). La partida toma vida, cordura y vivos cada segundo del director y apunta las caídas.
+  - En red, cada PC hace el de sus jugadores; las balas enemigas llevan el nid de quien las disparó (20 bytes por bala en vez de 18; `PROTOCOL` 12) y el invitado lo traduce a su enemigo al recibirlas. Probado con dos ventanas: el invitado ve «Fragmento protoplásmico (balas)».
+  - Registro: cada partida jugada por una persona se apunta en `user://logs/dificultad.txt` (resultado, nivel, minuto, características y el informe) y en `user://logs/dificultad_partidas.jsonl` (una línea JSON, para el historial del 13.2). Las de bots no (`report_log=true` lo fuerza). `no_report=true` quita el panel.
+  - Pruebas: `halt_shots=true quit_on_end=true` captura la pantalla final y sale (ahora espera a la captura). Ejemplo: `level=p1_n1 bot=smart cfg_difficulty=9 timescale=3 autopick=true mute=true cfg_quality=2 halt_shots=true quit_on_end=true tag=_informe` (con `bots=3`, cuatro jugadores).
+  - Hoja `shots/revision/2026-10-29/informe_al_caer.png` (solo y con cuatro). Tests en `test_fall_report` (5). 535 de 535.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 
@@ -1325,3 +1332,6 @@ Ofrecidas al cerrar el rediseño de Padre Dagon (23-10-2026):
 
 Ofrecidas al cerrar la fase 10 (26-10-2026):
 - (Hecha el 28-10-2026.)
+
+Ofrecidas tras la dificultad del 1 al 10 (29-10-2026), 22 de todo tipo:
+- El autor las quiere todas: son la fase 13 (`docs/ROADMAP.md`, plan propuesto). La idea 3 («usar la dificultad de mi última partida») ya la cumplía `dif_levels`, que se conserva entre sesiones; en el plan pasa a ser un historial de combinaciones con su resultado.

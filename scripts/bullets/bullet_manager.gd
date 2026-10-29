@@ -180,13 +180,15 @@ func spawn(team: Team, style: Style, pos: Vector3, vel: Vector3, radius: float, 
 	_owner[i] = owner
 	count += 1
 	if team == Team.ENEMY and on_enemy_spawn.is_valid() and not _bursting:
-		on_enemy_spawn.call(pos, vel, radius, size, damage.physical, damage.mental, life, style, owner == OVER_WALLS)
+		on_enemy_spawn.call(pos, vel, radius, size, damage.physical, damage.mental, life, style, owner == OVER_WALLS, damage.source)
 
 ## En red, invitado: una bala enemiga que nació en el anfitrión hace `ahead` s (ya ha volado eso).
 func spawn_remote(style: int, pos: Vector3, vel: Vector3, radius: float, size: float, phys: float, ment: float,
-		life: float, over_walls: bool, ahead: float) -> void:
+		life: float, over_walls: bool, ahead: float, who := &"") -> void:
 	if count >= MAX_BULLETS or ahead >= life: return
-	spawn(Team.ENEMY, style as Style, pos, vel, radius, size, Damage.new(phys, ment), life, 0, 1.0, -1, 0, 0.0,
+	var dmg := Damage.new(phys, ment)
+	dmg.tag = who                                    # quién la disparó (informe al caer)
+	spawn(Team.ENEMY, style as Style, pos, vel, radius, size, dmg, life, 0, 1.0, -1, 0, 0.0,
 		Effect.NONE, 0.0, OVER_WALLS if over_walls else -1)
 	var i := count - 1
 	_pos[i] += _vel[i] * ahead
@@ -323,6 +325,8 @@ func _collide_enemy_bullet(i: int) -> bool:
 		if p.distance_squared_to(Vector2(pl.global_position.x, pl.global_position.z)) <= r * r:
 			var d := Damage.new(_phys[i], _ment[i])
 			d.knockback = _vel[i].normalized()
+			d.via = &"bala"
+			d.who = _tag[i]                          # el id del enemigo que la disparó (PatternRunner)
 			pl.take_damage(d)
 			return true
 	return false
@@ -375,7 +379,10 @@ func _hits_mate(i: int) -> bool:
 		if pl.index == _owner[i] or not pl.is_hittable(): continue
 		var r := _radius[i] + pl.data.hurt_radius
 		if p.distance_squared_to(Vector2(pl.global_position.x, pl.global_position.z)) <= r * r:
-			pl.take_damage(Damage.new(0.0, _effect_val[i]))
+			var d := Damage.new(0.0, _effect_val[i])
+			d.via = &"aliado"
+			d.who = &"paranoia"
+			pl.take_damage(d)
 			return true
 	return false
 

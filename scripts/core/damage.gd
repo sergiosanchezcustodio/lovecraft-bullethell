@@ -17,6 +17,11 @@ var bonus := {}
 ## zona, onda…) guarda el suyo al crearse y lo vuelve a poner antes de dañar.
 var tag := &""
 var dot := false                 ## daño continuo (quemadura…): no dispara los objetos al impactar
+## Contra los jugadores (informe al caer, hito 13.1): por dónde llega ("bala", "contacto", "golpe",
+## "zona", "peligro"…; vacío: "golpe" si lo da un enemigo) y quién, cuando `source` no está (las
+## balas enemigas guardan el id del enemigo en `tag`).
+var via := &""
+var who := &""
 static var ctx := &""
 
 func _init(p_physical: float = 0.0, p_mental: float = 0.0) -> void:
@@ -35,6 +40,8 @@ func scaled(k: float) -> Damage:
 	d.source = source
 	d.bonus = bonus
 	d.tag = tag
+	d.via = via
+	d.who = who
 	return d
 
 ## Colores del lenguaje visual de los daños (balas, avisos, barras).

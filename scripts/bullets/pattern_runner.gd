@@ -53,6 +53,10 @@ func _physics_process(delta: float) -> void:
 	var aim := Vector3(target.x - origin.x, 0, target.z - origin.z)
 	var dmg := pattern.damage()
 	if damage_mult != 1.0: dmg = dmg.scaled(damage_mult)
+	var e := get_parent() as Enemy                             # de quién (informe al caer y red)
+	if e != null:
+		dmg.tag = e.data.id
+		dmg.source = e
 	for dir in pattern.directions(aim, _burst):
 		world.bullets.spawn(BulletManager.Team.ENEMY, pattern.style(), origin + dir * 0.5,
 			dir * pattern.speed * Difficulty.bullet_speed(), pattern.radius, pattern.size, dmg, pattern.lifetime,

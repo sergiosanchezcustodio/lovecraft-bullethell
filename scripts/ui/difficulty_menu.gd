@@ -122,6 +122,11 @@ func _show_general() -> void:
 	else:
 		_general.set_value_text("◀  Personalizada  ▶")
 
+## Una línea al registro de dificultad (también la del informe de cada partida, `FallReport`).
+static func append_log(line: String) -> void:
+	print("DIFICULTAD ", line)
+	FallReport._append(LOG, line)
+
 ## Cada cambio, con el nivel y el minuto, para saber luego qué se probó y dónde.
 func _log(cat: String, lv: int) -> void:
 	var where := ""
@@ -130,10 +135,5 @@ func _log(cat: String, lv: int) -> void:
 		var t := int(d.time)
 		where = "%s · %02d:%02d · " % [String(d.level.id) if d.level != null else "?", t / 60, t % 60]
 	var line := "%s · %s%s → %d · %s" % [Time.get_datetime_string_from_system(false, true), where, cat, lv, Difficulty.describe()]
-	print("DIFICULTAD ", line)
-	DirAccess.make_dir_recursive_absolute(LOG.get_base_dir())
-	var f := FileAccess.open(LOG, FileAccess.READ_WRITE) if FileAccess.file_exists(LOG) else FileAccess.open(LOG, FileAccess.WRITE)
-	if f == null: return
-	f.seek_end()
-	f.store_line(line)
+	append_log(line)
 	_status.text = "Apuntado en el registro de dificultad (%s)." % ProjectSettings.globalize_path(LOG).get_file()

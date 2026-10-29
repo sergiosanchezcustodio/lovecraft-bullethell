@@ -183,6 +183,7 @@ class EndScreen extends CanvasLayer:
 	var title := ""
 	var lines: PackedStringArray = []
 	var accent := UiKit.GOLD
+	var report: Control = null                  ## informe al caer (hito 13.1, `FallReport.panel`), a la derecha
 
 	func _init(p_title: String, p_lines: PackedStringArray, p_accent: Color) -> void:
 		title = p_title
@@ -199,6 +200,16 @@ class EndScreen extends CanvasLayer:
 		root.modulate.a = 0.0                          # entra despacio: la partida se ve terminar
 		create_tween().tween_property(root, "modulate:a", 1.0, 0.9)
 		MenuKit.heading(box, title, 56, accent)
+		if report != null:                             # con informe: el resumen y los botones a la
+			var cols := HBoxContainer.new()            # izquierda, el informe a la derecha
+			cols.add_theme_constant_override("separation", 40)
+			box.add_child(cols)
+			box = VBoxContainer.new()
+			box.add_theme_constant_override("separation", 12)
+			box.custom_minimum_size.x = 460
+			box.alignment = BoxContainer.ALIGNMENT_CENTER
+			cols.add_child(box)
+			cols.add_child(report)
 		for l in lines:
 			var ll := UiKit.label(l, 22, UiKit.TEXT)
 			ll.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

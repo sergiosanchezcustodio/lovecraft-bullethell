@@ -65,6 +65,12 @@ var run_money := 0                            ## dólares ganados en esta partid
 var _someone_fell := false                    ## alguien ha caído en este nivel (logro "Sin un rasguño")
 var _downs := {}                              ## índice del jugador -> veces derribado o caído en el nivel (simulaciones)
 var _ach_t := 0.0
+## Informe al caer (hito 13.1, `FallReport`): cada segundo del director, vida y cordura de los
+## jugadores de este PC (índice -> PackedVector2Array) y los vivos; las caídas de cada uno.
+var _rep_slot := -1
+var _rep_hist := {}
+var _rep_alive := PackedInt32Array()
+var _rep_falls := {}
 var money_mult := 1.0                         ## Codicia (tienda)
 var shop_bonus := {}                          ## lo comprado en la tienda (Shop.bonuses)
 var camera: GameCamera
@@ -930,10 +936,35 @@ func _summary() -> PackedStringArray:
 	return PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills, lv,
 		"Dólares ganados: %s $" % MenuKit.money(run_money)])
 
+## Una muestra por segundo de juego: vida y cordura de los jugadores de este PC y los vivos.
+func _report_sample() -> void:
+	for q in players:
+		if q.remote: continue
+		if not _rep_hist.has(q.index): _rep_hist[q.index] = PackedVector2Array()
+		var h: PackedVector2Array = _rep_hist[q.index]
+		h.append(Vector2(q.health / maxf(q.data.max_health, 1.0), q.sanity / maxf(q.data.max_sanity, 1.0)))
+		if h.size() > 600: h = h.slice(h.size() - 600)
+		_rep_hist[q.index] = h
+	_rep_alive.append(world.enemies.size() if world != null else director.alive.size())   # también las marionetas (invitado)
+
+## Los informes de los jugadores de este PC (vacío en las ejecuciones sin director).
+func _reports() -> Array:
+	var out: Array = []
+	if director == null: return out
+	for q in players:
+		if q.remote: continue
+		var who := "J%d · %s" % [q.index + 1, q.data.display_name]
+		out.append(FallReport.build(who, q.color, q.received_via, _rep_falls.get(q.index, []),
+			_rep_hist.get(q.index, PackedVector2Array()), _rep_alive))
+	return out
+
 ## Cae un jugador. En cooperativo queda derribado y los demás pueden reanimarlo; la partida
 ## se acaba cuando no queda nadie en pie (derribados y eliminados no cuentan).
 func _on_downed(q: Player) -> void:
 	if _ended: return
+	if not q.remote:                                 # para el informe al caer (hito 13.1)
+		if not _rep_falls.has(q.index): _rep_falls[q.index] = []
+		_rep_falls[q.index].append({"t": director.time if director != null else 0.0, "hit": q.last_hit.duplicate()})
 	if players.size() > 1 and players.any(func(c: Player) -> bool: return c.health > 0.0):
 		announce("J%d, derribado: ¡reanimadlo!" % (q.index + 1), 2.0)
 		if q.remote: _remote_down_sfx(q)
@@ -979,7 +1010,7 @@ func _game_over() -> void:
 	await get_tree().create_timer(0.6, true, false, true).timeout
 	Engine.time_scale = 1.0
 	get_tree().paused = true
-	_end_screen("Has caído" if players.size() == 1 else "Habéis caído", Color(0.86, 0.22, 0.18))
+	_end_screen("Has caído" if players.size() == 1 else "Habéis caído", Color(0.86, 0.22, 0.18), "", "caida")
 
 func _on_level_completed() -> void:
 	if _ended: return
@@ -997,7 +1028,7 @@ func _on_level_completed() -> void:
 	announce("Nivel superado", 2.0)
 	await _loot_time()
 	get_tree().paused = true
-	_end_screen("Nivel superado", UiKit.GOLD, Campaign.next_in_part(String(level.id)))
+	_end_screen("Nivel superado", UiKit.GOLD, Campaign.next_in_part(String(level.id)), "superado")
 
 ## Tras superar el nivel, LOOT_TIME s para recoger lo que han soltado el jefe y los últimos
 ## enemigos: no aparece nadie más, los que quedan caen (sueltan sus gemas), se deshacen las balas
@@ -1018,13 +1049,21 @@ func _loot_time() -> void:
 		director.loot_left -= 0.1
 	director.loot_left = 0.0
 
-func _end_screen(title: String, accent: Color, next_id := "") -> void:
+func _end_screen(title: String, accent: Color, next_id := "", result := "") -> void:
 	var lines := _summary()
+	var reports := _reports()
 	if net_game != null:
 		lines.append_array(net_game.gone_notes)       # quién se fue y cuándo
 		if net_game.level_marks > 0:                   # para comentarlas antes de seguir
 			lines.append(MenuKit.count(net_game.level_marks, "marca") + " en este nivel (F9 o LB+RB)")
 	var s := Menus.EndScreen.new(title, lines, accent)
+	if announcer != null: create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS) 		.tween_property(announcer, "modulate:a", 0.0, 0.3)   # un aviso a medias asomaría por encima
+	if not reports.is_empty() and not args.get_bool("no_report"): s.report = FallReport.panel(reports)
+	# al registro de dificultad, solo si juega alguna persona en este PC (los bots y las simulaciones
+	# lo llenarían de pruebas; el que sustituye a un PC que se fue no cuenta; `report_log=true` lo fuerza)
+	var human := players.any(func(q: Player) -> bool: return not q.remote and not (q.input is BotInput))
+	if result != "" and not reports.is_empty() and level != null and (human or args.get_bool("report_log")):
+		FallReport.log_run(result, String(level.id), director.time if director != null else 0.0, reports)
 	s.has_next = next_id != ""
 	if is_guest(): s.waiting = "El anfitrión decide cómo seguir"   # en red, solo puede salir
 	s.logs_button = net_game != null and net_game.guest_lost     # se fue alguien: el registro sirve
@@ -1032,7 +1071,9 @@ func _end_screen(title: String, accent: Color, next_id := "") -> void:
 	s.restart.connect(_restart)
 	s.quit.connect(_quit)
 	add_child(s)
-	if args.get_bool("halt_shots"): _halt_shot()          # pruebas: también la pantalla final
+	if args.get_bool("halt_shots"):                       # pruebas: también la pantalla final
+		if args.get_bool("quit_on_end"): await _halt_shot()  # (y con quit_on_end, sale después)
+		else: _halt_shot()
 	if args.get_bool("quit_on_end") and not (args.get_bool("autonext") and next_id != ""):   # simulaciones (tools/simular.py)
 		print("FIN SIMULACION")
 		get_tree().quit()
@@ -1380,6 +1421,9 @@ func _process_step(delta: float) -> void:
 		print("BANCO abatidos=%d %s RECIBIDO %d %d crisis=%d" % [director.killed_total, world.stats_of(0), rv.vida, rv.cordura, player.sanity_state.crises])
 		get_tree().quit()
 		return
+	if director != null and not _ended and int(director.time) > _rep_slot:
+		_rep_slot = int(director.time)
+		_report_sample()
 	_ach_t += delta
 	if _ach_t >= 1.0 and not _ended:
 		_ach_t = 0.0

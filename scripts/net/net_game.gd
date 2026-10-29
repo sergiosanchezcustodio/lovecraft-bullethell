@@ -70,8 +70,8 @@ const POS_K := 100.0                         ## posiciones y velocidades en cm (
 const STAT_K := 10.0                         ## vida y cordura en décimas (uint16)
 const PLAYER_BYTES := 17
 const ENEMY_BYTES := 15
-const BULLET_BYTES := 18
-const BULLETS_PER_MSG := 55                  ## unos 1000 bytes: cabe en un paquete sin trocear
+const BULLET_BYTES := 20
+const BULLETS_PER_MSG := 55                  ## unos 1100 bytes: cabe en un paquete sin trocear
 const PROG_EVERY := 15                       ## pasos entre comprobaciones del progreso (anfitrión)
 
 var game: Node                               ## la partida (game.gd)
@@ -769,10 +769,11 @@ func _on_event(d: Dictionary) -> void:
 # ---------------------------------------------------------------- combate (hito 9.3b)
 
 ## Anfitrión: una bala enemiga nueva (BulletManager.on_enemy_spawn). Van en tandas de cada paso
-## con el ms en que nacieron; por bala (18 bytes): x, z, vx, vz (cm), estilo, radio y tamaño (cm),
-## daño físico y mental (décimas), vida (centésimas de s) y si atraviesa el decorado.
+## con el ms en que nacieron; por bala (20 bytes): x, z, vx, vz (cm), estilo, radio y tamaño (cm),
+## daño físico y mental (décimas), vida (centésimas de s), si atraviesa el decorado y el enemigo
+## que la disparó (su nid, para el informe al caer del invitado; 0: ninguno).
 func _on_enemy_bullet(pos: Vector3, vel: Vector3, radius: float, size: float, phys: float, ment: float,
-		life: float, style: int, over_walls: bool) -> void:
+		life: float, style: int, over_walls: bool, src: Object = null) -> void:
 	if not started: return
 	if _bul_n == 0: _bul_t = Time.get_ticks_msec()
 	_bul.put_16(_cm(pos.x)); _bul.put_16(_cm(pos.z))
@@ -784,6 +785,7 @@ func _on_enemy_bullet(pos: Vector3, vel: Vector3, radius: float, size: float, ph
 	_bul.put_u16(clampi(roundi(ment * STAT_K), 0, 65535))
 	_bul.put_u16(clampi(roundi(life * 100.0), 0, 65535))
 	_bul.put_u8(1 if over_walls else 0)
+	_bul.put_u16(_nid(src as Enemy) if src is Enemy else 0)
 	_bul_n += 1
 	if _bul_n >= BULLETS_PER_MSG: _flush_bullets()
 
@@ -809,6 +811,8 @@ func _on_bullets(bytes: PackedByteArray) -> void:
 		if s.get_available_bytes() < BULLET_BYTES: return
 		var b := [t, s.get_16() / POS_K, s.get_16() / POS_K, s.get_16() / POS_K, s.get_16() / POS_K, s.get_u8(),
 			s.get_u8() / 100.0, s.get_u8() / 100.0, s.get_u16() / STAT_K, s.get_u16() / STAT_K, s.get_u16() / 100.0, s.get_u8() == 1]
+		var shooter: Variant = _enemies.get(s.get_u16())           # quién: se mira ya, que puede morir antes
+		b.append(shooter.data.id if is_instance_valid(shooter) and shooter is Enemy else &"")
 		_bul_queue.append(b)
 
 func _release_bullets(render_t: float) -> void:
@@ -819,7 +823,7 @@ func _release_bullets(render_t: float) -> void:
 			left.append(b)
 			continue
 		var ahead := minf((render_t - float(b[0])) / 1000.0, 1.0)
-		game.world.bullets.spawn_remote(int(b[5]), Vector3(b[1], 0.0, b[2]), Vector3(b[3], 0.0, b[4]), b[6], b[7], b[8], b[9], b[10], b[11], ahead)
+		game.world.bullets.spawn_remote(int(b[5]), Vector3(b[1], 0.0, b[2]), Vector3(b[3], 0.0, b[4]), b[6], b[7], b[8], b[9], b[10], b[11], ahead, b[12])
 	_bul_queue = left
 
 ## Lo que el anfitrión reparte del progreso de un jugador: lo de `GameSession.snapshot` más lo

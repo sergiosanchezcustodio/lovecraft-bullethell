@@ -91,6 +91,7 @@ static func toward(e: Enemy, target: Node3D) -> Vector3:
 func contact_damage(e: Enemy) -> Damage:
 	var d := Damage.new(e.data.contact_physical, e.data.contact_mental)
 	d.source = e
+	d.via = &"contacto"
 	return d
 
 ## ¿Puede dañar por contacto ahora? (los voladores, solo cuando están abajo)

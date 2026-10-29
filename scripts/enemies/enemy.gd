@@ -735,7 +735,7 @@ func _physics_process(delta: float) -> void:
 	# Contacto con los jugadores
 	if data.aura_drain > 0.0:                   # presencia: drena cordura a los de dentro del aura
 		for p in world.players:
-			if p.global_position.distance_to(global_position) <= data.aura_radius: p.drain_sanity(data.aura_drain * delta)
+			if p.global_position.distance_to(global_position) <= data.aura_radius: p.drain_sanity(data.aura_drain * delta, String(data.id))
 	for p in world.players if behavior.touches(self) and _madden_t <= 0.0 else []:
 		if p.remote: continue                       # en red: lo decide su PC (marioneta, _puppet_touch)
 		var r := data.body_radius + p.data.hurt_radius
@@ -996,11 +996,12 @@ func _puppet_touch(delta: float) -> void:
 	for p in world.players:
 		if p.remote: continue
 		if data.aura_drain > 0.0 and p.global_position.distance_to(global_position) <= data.aura_radius:
-			p.drain_sanity(data.aura_drain * delta)
+			p.drain_sanity(data.aura_drain * delta, String(data.id))
 		if net_contact <= 0: continue
 		var r := data.body_radius + p.data.hurt_radius
 		var pp := p.global_position
 		if Vector2(pp.x - position.x, pp.z - position.z).length_squared() < r * r:
 			var d := Damage.new(data.contact_physical, data.contact_mental).scaled(net_contact / 50.0)
 			d.source = self
+			d.via = &"contacto"
 			p.take_damage(d)

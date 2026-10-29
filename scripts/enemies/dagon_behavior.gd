@@ -151,7 +151,7 @@ func to_target(e: Enemy, at: Vector3) -> Vector3:
 
 func _drain(e: Enemy, delta: float) -> void:
 	for q in e.world.players:
-		if q.global_position.distance_to(e.global_position) <= 9.0: q.drain_sanity(2.0 * delta)
+		if q.global_position.distance_to(e.global_position) <= 9.0: q.drain_sanity(2.0 * delta, String(e.data.id))
 
 ## Marioneta (en red, invitado): el aura de la tercera fase, para los jugadores de este PC
 ## (la fase sale de la vida, que llega en la foto).

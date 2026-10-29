@@ -21,4 +21,5 @@ func _slime(e: Enemy, delta: float) -> void:
 		_drop = float(e.data.param("drop_every", 1.6))
 		var z := EnemyZone.new().setup(e.world, e.global_position, float(e.data.param("slime_radius", 1.0)),
 			float(e.data.param("slime_life", 6.0)), float(e.data.param("slime_dps", 4.0)), float(e.data.param("slime_mental", 2.0)))
+		z.who = e.data.id
 		e.world.fx.add_child(z)

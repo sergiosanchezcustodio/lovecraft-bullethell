@@ -393,17 +393,24 @@ func _presence_step(delta: float) -> void:
 				w += k * near
 			presence = minf(w * PRESENCE_BASE * Difficulty.horror(), PRESENCE_MAX)
 	if presence > 0.0:
-		drain_sanity(presence * delta)
-		recv_add("presencia", 0.0, presence * delta)
+		drain_sanity(presence * delta, "presencia", &"presencia")
 
 ## Daño recibido por origen (simulaciones de equilibrio: "RECIBIDO J1 {...}" con log=true):
 ## id del enemigo -> [vida, cordura].
 var received := {}
+## Lo mismo por origen y vía ("pinguino|contacto" -> [vida, cordura]) y el último golpe
+## ({src, via, ph, me}): el informe al caer (hito 13.1, `FallReport`).
+var received_via := {}
+var last_hit := {}
 static var bench_immortal := OS.get_cmdline_user_args().has("immortal=true")
-func recv_add(src: String, ph: float, me: float) -> void:
+func recv_add(src: String, ph: float, me: float, via := &"otro") -> void:
 	if not received.has(src): received[src] = [0.0, 0.0]
 	received[src][0] += ph
 	received[src][1] += me
+	var key := src + "|" + String(via)
+	if not received_via.has(key): received_via[key] = [0.0, 0.0]
+	received_via[key][0] += ph
+	received_via[key][1] += me
 	min_hp = minf(min_hp, health / maxf(data.max_health, 1.0))   # take_damage ya ha restado el golpe
 var min_hp := 1.0                       ## la vida más baja del nivel, en fracción (simulaciones)
 
@@ -421,9 +428,12 @@ func _rumble(amount: float) -> void:
 	var k := clampf(amount / 30.0, 0.0, 1.0)
 	Input.start_joy_vibration(dev, 0.2 + 0.3 * k, 0.25 * k, 0.12 + 0.12 * k)
 
-func drain_sanity(amount: float) -> void:
+## `src` y `via`: de quién y cómo, para el informe al caer (vacío: no se apunta).
+func drain_sanity(amount: float, src := "", via := &"aura") -> void:
 	if health <= 0.0 or god or remote: return
+	var got := minf(amount * mental_resist * data.mental_mult, sanity)
 	sanity = maxf(0.0, sanity - amount * mental_resist * data.mental_mult)
+	if src != "" and got > 0.0: recv_add(src, 0.0, got, via)
 
 ## Derribado: corre el tiempo y avanza la reanimación si hay un compañero al lado (si se
 ## aparta, lo avanzado se va perdiendo despacio).
@@ -983,6 +993,7 @@ func take_damage(d: Damage) -> void:
 	if Difficulty.damage() != 1.0 or Difficulty.mental() != 1.0:    # dificultad (12-10-2026)
 		var sd := Damage.new(d.physical * Difficulty.damage(), d.mental * Difficulty.mental())
 		sd.knockback = d.knockback; sd.source = d.source; sd.bonus = d.bonus; sd.tag = d.tag
+		sd.via = d.via; sd.who = d.who
 		d = sd
 	if d.source is Enemy and data.thorns > 0.0 and d.physical > 0.0 and (d.source as Enemy).is_alive():
 		_item_hit(d.source, d.physical * data.thorns, "escamas")     # Escamas de Profundo
@@ -996,12 +1007,16 @@ func take_damage(d: Damage) -> void:
 		ph = maxf(ph - data.armor, ph * ARMOR_FLOOR)          # la armadura nunca quita más del 80 %
 		var r := Damage.new(ph, d.mental)
 		r.knockback = d.knockback; r.source = d.source; r.bonus = d.bonus
+		r.via = d.via; r.who = d.who
 		d = r
 	health = maxf(0.0, health - d.physical)
 	if bench_immortal: health = maxf(health, 1.0)        # banco de objetos: recibe el daño pero no cae
 	var src := "otro"
 	if d.source is Enemy and is_instance_valid(d.source): src = String((d.source as Enemy).data.id)
-	recv_add(src, d.physical, d.mental * mental_resist * data.mental_mult)
+	elif d.who != &"": src = String(d.who)
+	var via := d.via if d.via != &"" else (&"golpe" if d.source is Enemy else &"otro")
+	recv_add(src, d.physical, d.mental * mental_resist * data.mental_mult, via)
+	last_hit = {"src": src, "via": via, "ph": d.physical, "me": d.mental * mental_resist * data.mental_mult}
 	Auto.sfx_at("hit_player" if d.physical > 0.0 else "chant", global_position)
 	_rumble(d.physical + d.mental * 0.5)
 	if d.physical >= data.max_health * 0.12:

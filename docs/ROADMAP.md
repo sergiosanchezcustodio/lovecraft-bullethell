@@ -26,6 +26,9 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 8 | Pulido y distribución | **En curso:** hitos 8.1 a 8.3 y 8.6 a 8.16 hechos, pendientes de tu revisión; 8.4 espera tus partidas y 8.5, tu cuenta de itch.io | Ninguna (D-01 y D-12, resueltas) |
 | 9 | Online | **Plan aprobado** (21-10-2026) | Ninguna (D-10, resuelta) |
 | 10 | Guardado en la nube con GitHub | **Hecha** (26-10-2026) salvo el `client_id` de tu OAuth App y tu prueba con dos PC | Ninguna (D-11, resuelta) |
+| 11 | Calidad gráfica, animación y efectos | **Hecha** (28-10-2026) salvo tu revisión | Ninguna |
+| 12 | Detalles de personajes, enemigos, compañeros y escenarios | **Hecha** (29-10-2026) salvo tu revisión | Ninguna (D-41, resuelta) |
+| 13 | Calibración, modos de juego, narrativa, sonido, herramientas y distribución | **En curso:** plan aprobado (29-10-2026); 13.1 hecho | Las de cada hito (al final de la fase) |
 
 ---
 
@@ -303,3 +306,81 @@ Elegida por el autor el 28-10-2026 de una lista de sugerencias (19 de 22). Como 
 - 12.3: muchas prendas (26) más los 13 cuerpos: propongo empezar por los cinco más visibles (gabardina de Legrasse, levita de Armitage, bata de Whipple, sotana de Iwanicki y vestido con estola de Varga) y enseñártelos antes de seguir.
 
 Orden propuesto: 12.5, 12.7 y 12.1 primero (las que más se notan al jugar), luego 12.6, 12.8, 12.2, 12.3, 12.4, compañeros (12.9-12.10), escenarios (12.11-12.13) y por último 12.14.
+
+---
+
+## Fase 13: Calibración, modos de juego, narrativa, sonido, herramientas y distribución
+
+Pedida por el autor el 29-10-2026 («me gustan todas, establece un plan para hacerlas»): las 22 sugerencias que le ofrecí tras la dificultad del 1 al 10 (D-42). Normas de la fase:
+- **Todo lo que cambia la partida funciona también en red** (D-10): lo decide el anfitrión y viaja en GO, RESUME o en fotos y sucesos (sube `PROTOCOL` en cada hito que añada mensajes) y se prueba con dos ventanas.
+- **Lo que se guarda** (pactos superados, récords, fragmentos, entradas del diario) va en `SaveData` (sube `VERSION`, con su paso en `migrate()`) y viaja a la nube con el resto del hueco.
+- **Los textos son propios**, escritos al estilo de los relatos (Lovecraft es de dominio público, pero sus traducciones al español no lo son).
+- **Coste:** lo que cueste se puede bajar en Baja o Media; se mide antes y después en las arenas más caras.
+- **Datos antes que código:** pactos, objetivos, combinaciones, alucinaciones, fragmentos y plantillas del diario se definen en `data/`.
+
+**Aceptación:** el autor juega cada modo y cada sistema nuevo (solo y en cooperativo), encuentra su dificultad con el informe y el historial, y tiene en la mano una build de demo y un tráiler listos para itch.io.
+
+*Estado (29-10-2026):* plan aprobado por el autor («si, adelante»). **Hecho el 13.1**, pendiente de su revisión.
+
+### Bloque A: calibrar (lo primero, porque ayuda a probar todo lo demás)
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 13.1 | **Informe al caer** (sugerencia 1): en la pantalla final, quién hizo más daño (enemigo y ataque), reparto por tipo (balas, contacto, cordura), vida y cordura de los últimos 60 s en una línea pequeña, vivos a la vez y características de dificultad en uso. En cooperativo, uno por jugador | Registro de golpes recibidos por jugador (quién y con qué ataque, junto al `Damage`), muestreo de vida y cordura cada segundo; panel nuevo en la pantalla final (`Menus`). En red, cada PC lo hace de sus jugadores. Se apunta también en `user://logs/dificultad.txt`. **Hecho (29-10-2026), pendiente de tu revisión:** `FallReport`, `Damage.via`/`who`, `Player.received_via`; en red, el nid del tirador en cada bala (`PROTOCOL` 12) |
+| 13.2 | **Historial de dificultades** (3) y **reparto del 4 al 6** (2): cada partida apunta su resultado (superado o caída, minuto, nivel) junto a sus características; en el menú de dificultad, las últimas 10 combinaciones con su resultado, para volver a una con A. Para el salto del 4 al 5, una tabla nueva simulada con el bot que tú apruebas o descartas | Resultado al final de cada partida en el registro; lista en `DifficultyMenu`. Tablas candidatas en `Difficulty.CATS` comparadas con `tools/simular.py --dif 3..7` (8 partidas por nivel). *Nota:* la dificultad elegida ya se conserva entre sesiones (`dif_levels`); por eso la idea 3 pasa a ser un historial con resultados |
+
+### Bloque B: primeros pasos
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 13.3 | **Primer nivel guiado** (13) y **leyenda de los avisos** (14): en la primera partida de un hueco, carteles breves y saltables en el momento justo (moverse y esquivar, la primera gema, la primera subida, la cordura al bajar del 70 %, el primer baúl, compañero abatido en cooperativo). La primera vez que aparece cada tipo de aviso en el suelo, una etiqueta corta junto a él («Círculo: va a caer algo») | Guion por datos (`data/tutorial.json`: suceso que lo dispara y texto), lo visto en `SaveData`; opción «Consejos» en Configuración > Juego para volver a verlos. La etiqueta, en `Telegraph`, una sola vez por tipo y hueco |
+
+### Bloque C: jugabilidad
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 13.4 | **Alucinaciones con poca cordura** (6): por debajo del 30 %, enemigos falsos que se deshacen en niebla al tocarlos o dispararlos, gemas que no se pueden recoger y, por momentos, la barra de vida o el contador marcando lo que no es. Más frecuentes cuanto más baja la cordura | `Hallucinations` (por PC, solo visual: los falsos no entran en `CombatWorld`), tipos y frecuencias en `data/hallucinations.json`. Opción para quitarlas en Accesibilidad, junto a «Distorsión» |
+| 13.5 | **Objetivos a mitad de nivel** (5): de vez en cuando aparece uno opcional con su recompensa (oro, un baúl o experiencia): rescatar a un superviviente (llegar hasta él y escoltarlo a un punto), cortar un ritual (quedarse dentro del círculo N segundos mientras te atacan) o llevar una reliquia (cogerla frena al que la lleva). Uno o dos por nivel | Por datos (`data/objectives.json`: tipo, partes, recompensa y duración), `ObjectiveDirector` junto a `WaveDirector`, flecha en pantalla y aviso en el HUD. En red, los lleva el anfitrión (como los baúles) |
+| 13.6 | **Pactos del Necronomicón** (4): antes de cada nivel, en el mapa, hasta tres maldiciones a elegir, cada una con su premio (más oro, más experiencia o mejores baúles). Ejemplos: las balas enemigas dejan un rastro que hace daño; sin curación al subir de nivel; la noche más cerrada; las élites se dividen al morir; el compañero no ayuda. Logros por superar niveles con pactos | Por datos (`data/pacts.json`), aplicados con las mismas palancas que la dificultad y los peligros; los superados, en `SaveData`. En cooperativo los elige el J1 (en red, el anfitrión) y se ven en la sala |
+| 13.7 | **Combinaciones en cooperativo** (7): cuando el ataque de un jugador toca lo que dejó el de otro, pasa algo nuevo: fuego sobre ácido da una nube tóxica; la onda empuja las llamas; un rayo que cruza una zona arcana se divide; una explosión sobre hielo o agua levanta metralla. Unas 8 combinaciones, con un rótulo pequeño la primera vez | Tabla por rasgos de daño (`data/combos.json`), comprobada en `DamageZone`, `Beam`, `Shockwave` y `Explosion`; no cuentan como armas (no suben ni evolucionan). En red, las decide el anfitrión |
+| 13.8 | **Modo sin fin «La noche eterna»** (8): se abre al vencer a Cthulhu. Eliges arena entre las 15 y aguantas oleadas que mezclan enemigos de las tres partes, con jefes cada 5 minutos y una dificultad que sube sola. Récord de tiempo por personaje y arena | `LevelData` sin evento final y con escalada por tiempo (`data/levels/sin_fin.tres`), entrada en el menú de Jugar; récords en `SaveData`. En red, también |
+| 13.9 | **Partida del día** (9): cada día, la misma arena, el mismo personaje, el mismo compañero y los mismos pactos para todos (salen de la fecha), y un intento que cuenta. Récord propio por día, con racha | Semilla de la fecha que elige todo y fija el azar de la partida (oleadas, baúles y subidas); récords en `SaveData` y en la nube. Sin clasificación con otros jugadores, que necesitaría un servidor (ver decisiones) |
+
+### Bloque D: ambientación y narrativa
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 13.10 | **Diario del investigador** (10): al terminar cada nivel (superado o no), una entrada en el estilo de los años veinte con lo que pasó: el peor minuto, la criatura que más le hirió, si alguien cayó y quién lo levantó, el arma que más hizo, la cordura al final. Se lee en la pantalla final y queda en la Biblioteca, por personaje | Plantillas con huecos y variantes (`data/diary.json`), rellenas con los datos del 13.1; página nueva en `LibraryMenu` con la letra de los relatos |
+| 13.11 | **Fragmentos** (11) y **final según la cordura** (12): en cada nivel se puede encontrar una página suelta (brilla en el suelo; una por nivel, en un sitio al azar entre varios posibles); juntas completan relatos nuevos en la Biblioteca. Si se llega al final de Cthulhu con la cordura por debajo del 25 %, el epílogo es otro: el investigador no vuelve del todo | Páginas por datos (`data/fragments.json`), recogida como un objeto del suelo, guardadas en `SaveData`; epílogo alternativo como un relato más, elegido al cerrar la parte 3 |
+
+### Bloque E: interfaz, sonido y música
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 13.12 | **Modo foto** (15): desde la pausa, cámara libre (mover, girar, acercar), sin HUD, con la partida congelada, profundidad de campo y gradación a elegir; la foto va a `Imágenes/Lovecraft Library` | `PhotoMode` (capa y cámara aparte sobre la escena en pausa), captura del viewport. En red, solo en el PC que lo abre y si la pausa es de todos |
+| 13.13 | **Música por capas** (16) y **avisos sonoros de lo que no se ve** (17): la pista del nivel suma una capa de percusión y otra de coros según los enemigos vivos y deja solo los coros con el jefe; las élites y los ataques fuertes que llegan desde fuera de cámara suenan por su lado (izquierda o derecha) | Capas sincronizadas en `Music` (`AudioStreamSynchronized`), volumen de cada una por intensidad; capas en `data/musica.json`. Avisos en el borde de la pantalla del lado del origen, con tope. Ver decisiones (de dónde salen las capas) |
+
+### Bloque F: herramientas
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 13.14 | **Capturas de comparación** (18) y **medición de los 15 niveles** (19): un comando que fotografía las 15 arenas desde los mismos puntos en Baja y en Alta y las compara con las de referencia (hoja con las diferencias marcadas); otro que mide el rendimiento de las 15 en Media y Alta y escribe una tabla con la anterior al lado | `tools/comparar_arenas.py` (capturas con `shots=`, `pos=`, `cfg_quality=`; diferencia por bloques con PIL) y `tools/medir_niveles.py` (`perf=`, dos ejecuciones por nivel, se queda con la mejor); `tools/exportar.sh` ofrece ejecutarlos antes de una build |
+| 13.15 | **Builds automáticas** (20): al subir una etiqueta de versión (`v0.9.1`), GitHub Actions ejecuta los tests, genera las builds de Windows y macOS y las deja en una Release de borrador | `.github/workflows/build.yml` con Godot 4.4.1 y sus plantillas de exportación; tests con GUT sin ventana. Sin firma de macOS (como hoy). Ver decisiones (minutos de Actions) |
+
+### Bloque G: distribución
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 13.16 | **Tráiler** (21): unos 60-75 s con escenas preparadas (portada y libro, cooperativo en la Antártida, marea del arrecife, ventisca, entrada de Padre Dagon y de Cthulhu, el diario), rótulos y música; en 1080p | Escenas con bot y opciones de prueba grabadas con `--write-movie` a 60 fps, montaje con `ffmpeg` desde un guion (`tools/trailer.py`) |
+| 13.17 | **Demo de la parte 1** (22): build aparte con la Antártida y el shoggoth, el resto bloqueado con un cartel («En el juego completo»), y la página de itch.io con el tráiler | Etiqueta de exportación `demo` que limita `Campaign`; preset en `export_presets.cfg`. La subida, con tu cuenta de itch.io (hito 8.5) |
+
+**Decisiones abiertas** (las pregunto antes del hito que las necesita, con una recomendación):
+- 13.4: en cooperativo local hay una sola pantalla para todos. Propongo que los enemigos falsos los vean todos, pero que salgan junto al jugador con la cordura baja y lleven un tinte de su color, y que el HUD que miente sea solo el de su panel.
+- 13.6: cuántos pactos y si se eligen también en el sin fin y en la partida del día. Propongo hasta tres, también en el sin fin, y fijos en la partida del día.
+- 13.9: sin servidor no hay clasificación con otros jugadores. Propongo récords propios (en el gist de la nube) y, para comparar con amigos, un código del resultado que se pueda compartir.
+- 13.11: quién escribe los fragmentos y el epílogo. Propongo escribirlos yo, al estilo de los relatos, y que tú los revises.
+- 13.13: la música actual son pistas CC0 sin capas. Propongo sintetizar las capas de percusión y coros con `tools/gen_sfx.py` encima de cada pista (provisionales) y cambiarlas por las tuyas cuando las tengas.
+- 13.15: el repositorio es público, así que Actions no cuesta nada; aun así propongo construir solo al subir una etiqueta (no en cada `push`), para no llenar la lista de ejecuciones.
+- 13.17: qué entra en la demo además de la parte 1 (personajes, tienda, cooperativo, online). Propongo los cuatro personajes de inicio, la tienda y el cooperativo local, sin online.
+
+Orden propuesto: A (13.1 y 13.2) primero, porque te sirve ya para calibrar; luego B (13.3); C, de 13.4 a 13.9; D (13.10 y 13.11); E (13.12 y 13.13); F (13.14 y 13.15), y G al final (13.16 y 13.17), cuando todo lo demás esté hecho.

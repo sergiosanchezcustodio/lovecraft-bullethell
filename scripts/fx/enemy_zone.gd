@@ -10,6 +10,7 @@ var life := 6.0
 var dps := 4.0
 var mental_dps := 2.0
 var color := Color(0.06, 0.14, 0.09)
+var who := &""                            ## el enemigo que la dejó (informe al caer)
 var _t := 0.0
 var _tick := 0.0
 var _mat: ShaderMaterial
@@ -45,4 +46,7 @@ func _physics_process(delta: float) -> void:
 		off.y = 0.0
 		if p.remote: continue                       # en red: cada PC, a sus jugadores
 		if off.length() < radius + p.data.hurt_radius * 0.5 and not p.is_downed() and not p.is_eliminated:
-			p.take_damage(Damage.new(dps * TICK, mental_dps * TICK))
+			var d := Damage.new(dps * TICK, mental_dps * TICK)
+			d.via = &"zona"
+			d.who = who
+			p.take_damage(d)

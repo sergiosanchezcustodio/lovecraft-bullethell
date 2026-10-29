@@ -111,7 +111,9 @@ func _step_angles(delta: float) -> void:
 			var pull: float = level.angle_pull * (1.0 - d / (hr * 1.6)) * k
 			p.push += to / d * pull
 			if d < hr * 0.45:                          # en el centro: engulle
-				p.take_damage(Damage.new(level.angle_damage * delta, level.angle_damage * 0.5 * delta))
+				var dd := Damage.new(level.angle_damage * delta, level.angle_damage * 0.5 * delta)
+				dd.via = &"peligro"; dd.who = &"angulo"
+				p.take_damage(dd)
 
 ## La grieta: esquirlas negras y verdes en ángulos que no cuadran, que giran despacio.
 func _angle_mesh(r: float) -> Node3D:
@@ -185,7 +187,9 @@ func _step_waves(delta: float) -> void:
 				WadeSplash.burst(world.fx, Vector3(x, 0, w.z), 1.2, Color(0, 0, 0, 0), "auto" if x == int(b.position.x) else "", false)
 			for p: Player in _mine():
 				if absf(p.global_position.z - w.z) < w.half:
-					p.take_damage(Damage.new(level.wave_damage, 0.0))
+					var dw := Damage.new(level.wave_damage, 0.0)
+					dw.via = &"peligro"; dw.who = &"ola"
+					p.take_damage(dw)
 		if w.t > -0.5:                                      # empuja medio segundo hacia el sur
 			for p: Player in _mine():
 				if absf(p.global_position.z - w.z) < w.half + 0.5: p.push += Vector3(0.4, 0, 1.0).normalized() * level.wave_push

@@ -84,6 +84,8 @@ func _strike(at: Vector3, r: float, dmg: Damage, push: bool) -> void:
 			var d := Damage.new(dmg.physical, dmg.mental)
 			d.source = dmg.source
 			d.tag = dmg.tag
+			d.via = dmg.via
+			d.who = dmg.who
 			if push: d.knockback = Vector3(off.x, 0.0, off.y).normalized()
 			p.take_damage(d)
 
