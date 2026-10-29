@@ -732,8 +732,16 @@ func _cloth_step(delta: float) -> void:
 	var speed := motor.velocity.dot(fwd) / maxf(data.move_speed, 0.1)
 	var want := Vector2(clampf(0.22 * speed, -0.3, 0.45), clampf(-0.05 * turn * maxf(speed, 0.0), -0.35, 0.35))
 	if _action != "": want *= CLOTH_DODGE
-	_cloth_v += (CLOTH_K * (want - _cloth) - CLOTH_C * _cloth_v) * delta
-	_cloth += _cloth_v * delta
+	# en pasos de 1/60 s como mucho: con fotogramas largos (un tirón, timescale=) el muelle
+	# explícito se dispara hasta el infinito y la pieza desaparece
+	var steps := mini(ceili(delta * 60.0), 12)
+	var h := delta / steps
+	for i in steps:
+		_cloth_v += (CLOTH_K * (want - _cloth) - CLOTH_C * _cloth_v) * h
+		_cloth += _cloth_v * h
+	if not (_cloth.is_finite() and _cloth_v.is_finite()) or _cloth.length() > 3.0:
+		_cloth = Vector2.ZERO
+		_cloth_v = Vector2.ZERO
 	var parts: Dictionary = model.get_meta("part_nodes")
 	for pname: String in CLOTH_PARTS:
 		if not parts.has(pname): continue

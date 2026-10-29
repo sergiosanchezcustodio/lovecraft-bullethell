@@ -21,6 +21,7 @@ var characters := []                     ## personajes desbloqueados además de 
 var levels_won := []                     ## niveles superados (ids, p. ej. "p1_n1")
 var stats := {"runs": 0, "kills": 0, "deaths": 0, "revives": 0}
 var achievements := {}                   ## logros cumplidos: id -> fecha (D-32)
+var records := {}                        ## récords: {"endless": {"personaje|nivel": s}} (hito 13.8)
 ## Biblioteca: lo visto o tenido alguna vez (enemies, weapons, items, places) -> lista de ids.
 ## Vestuario (D-34): prendas compradas (ids) y lo que lleva puesto cada personaje
 ## (id de personaje -> {"head": id, "body": id, "feet": id}; sin clave, lo suyo).
@@ -96,7 +97,7 @@ func to_dict() -> Dictionary:
 		"created_with": created_with, "saved_with": saved_with,
 		"money": money, "purchases": purchases, "pets": pets, "characters": characters,
 		"levels_won": levels_won, "stats": stats, "unlock_all": unlock_all, "achievements": achievements,
-		"seen": seen, "outfits": outfits, "worn": worn, "toggles": toggles,
+		"seen": seen, "outfits": outfits, "worn": worn, "toggles": toggles, "records": records,
 		"rev": rev, "cloud_base": cloud_base, "device": device}
 
 ## Lee un diccionario de cualquier versión conocida; los campos que falten toman su valor
@@ -124,6 +125,7 @@ static func from_dict(d: Dictionary) -> SaveData:
 	for k in st:
 		if not s.stats.has(k): s.stats[k] = st[k]
 	s.achievements = (d.get("achievements", {}) as Dictionary).duplicate()
+	s.records = (d.get("records", {}) as Dictionary).duplicate(true)
 	s.outfits = (d.get("outfits", []) as Array).duplicate()
 	s.worn = (d.get("worn", {}) as Dictionary).duplicate(true)
 	var sn: Dictionary = d.get("seen", {})

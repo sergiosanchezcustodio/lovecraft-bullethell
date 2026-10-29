@@ -170,3 +170,8 @@ Sacadas de `CLAUDE.md` el 17-10-2026. Léelas antes de tocar generadores de mode
 
 - Las partidas de prueba (bots, capturas, simulaciones) escriben en el mismo `user://` que las partidas del autor. Un registro pensado para él (`user://logs/dificultad.txt`) se llenaba con mis partidas de prueba: lo que se apunte para el jugador, solo si juega una persona (ningún `BotInput` en este PC), con una opción para forzarlo al probar.
 - Un solo fichero de tests con `-gconfig= -gtest=…` no pasa por `tests/pre_run.gd`: lo que deje fijado ese gancho (como `Difficulty.forced = 0`) no vale. Fíjalo en el `before_each` del test si dependes de ello.
+
+## Muelles en `_process` (29-10-2026, ropa de la fase 12)
+
+- Un muelle integrado a mano con un solo paso por fotograma (`v += (k·(x₀−x) − c·v)·dt; x += v·dt`) es estable solo si `dt·√k` es pequeño. Con `k = 70` basta un fotograma de 0,17 s (`timescale=5` a 30 fps, o un tirón al cargar) para que crezca sin parar hasta el infinito, y la pieza desaparece sin aviso propio: solo `!v.is_finite()` en `instance_set_transform`. Integra en subpasos de 1/60 s como mucho y devuelve el estado a cero si deja de ser finito.
+- Para encontrar qué nodo tiene la transformación no finita: recorre el árbol cada pocos segundos buscando un `Node3D` con `global_transform` no finito e imprime su ruta.

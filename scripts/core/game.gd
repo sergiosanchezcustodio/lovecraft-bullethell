@@ -154,8 +154,8 @@ func _ready() -> void:
 	var part_key := "p1"                           # gradación de color de la parte (hito 11.3)
 	if not args.get_bool("nolevel"):
 		var lid := (String(GameSession.level) if not GameSession.carry.is_empty() else args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1"))
-		part_key = lid.get_slice("_", 0)
-		var ld: LevelData = load("res://data/levels/%s.tres" % lid)
+		part_key = Endless.base_of(lid).get_slice("_", 0)
+		var ld: LevelData = load("res://data/levels/%s.tres" % Endless.base_of(lid))   # sin fin: el de su escenario (13.8)
 		if ld != null: arena_path = ld.arena
 	Enemy.part_tint = Enemy.PART_TINTS.get(part_key, Color(0.45, 0.2, 0.7))   # auras de las élites (hito 12.6)
 	Hud.frost = 0.85 if part_key == "p1" else 0.0                     # retratos con escarcha en la Antártida (hito 12.14)
@@ -303,7 +303,11 @@ func _ready() -> void:
 	_make_announcer()
 	if not args.get_bool("nolevel"):
 		var level_id := (String(GameSession.level) if not GameSession.carry.is_empty() else args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1"))
-		level = load("res://data/levels/%s.tres" % level_id).duplicate()
+		if Endless.is_endless(level_id):              # «La noche eterna» (hito 13.8)
+			level = Endless.make_level(level_id)
+			add_child(Endless.new().setup(level))
+		else:
+			level = load("res://data/levels/%s.tres" % level_id).duplicate()
 		_apply_carry()                                 # progreso del nivel anterior de la parte
 		_shop_start()
 		if args.get_bool("log"): print("INICIO %s nivel=%d armas=%s" % [level_id, player.progress.level, player.weapons.weapons.map(func(w: WeaponSystem.Weapon) -> String: return "%s:%d" % [w.data.id, w.level])])
@@ -1028,13 +1032,32 @@ func _game_over() -> void:
 			for k in q.received: rv[k] = [roundi(q.received[k][0]), roundi(q.received[k][1])]
 			print("RECIBIDO J%d crisis=%d %s" % [q.index + 1, q.sanity_state.crises if "crises" in q.sanity_state else -1, JSON.stringify(rv)])
 	if Saves.current != null: Saves.current.stats["deaths"] += 1
+	if level != null and level.endless and director != null: _endless_record()
 	_check_achievements()
 	Saves.save()
 	Engine.time_scale = 0.35                       # la caída, a cámara lenta un momento
 	await get_tree().create_timer(0.6, true, false, true).timeout
 	Engine.time_scale = 1.0
 	get_tree().paused = true
-	_end_screen("Has caído" if players.size() == 1 else "Habéis caído", Color(0.86, 0.22, 0.18), "", "caida")
+	var title := "Has caído" if players.size() == 1 else "Habéis caído"
+	if level != null and level.endless: title = "La noche eterna"
+	_end_screen(title, Color(0.86, 0.22, 0.18), "", "caida")
+
+## Sin fin (hito 13.8): el tiempo aguantado y el récord de cada jugador de este PC con su
+## personaje en este escenario.
+var _endless_lines := PackedStringArray()
+func _endless_record() -> void:
+	var t := director.time
+	var base := Endless.base_of(String(level.id))
+	_endless_lines = PackedStringArray()
+	if Saves.current == null: return                 # sin hueco no hay récords (el tiempo ya va en el resumen)
+	for q in players:
+		if q.remote: continue
+		var who := q.data.display_name + ": " if players.size() > 1 else ""
+		var ch := String(q.data.id)
+		var prev := Endless.best(Saves.current, ch, base)
+		if Endless.record(Saves.current, ch, base, t): _endless_lines.append(who + ("¡Nuevo récord! (antes, %s)" % Endless.clock(prev) if prev > 0.0 else "¡Primer récord!"))
+		else: _endless_lines.append(who + "Récord: %s" % Endless.clock(prev))
 
 func _on_level_completed() -> void:
 	if _ended: return
@@ -1076,6 +1099,7 @@ func _loot_time() -> void:
 
 func _end_screen(title: String, accent: Color, next_id := "", result := "") -> void:
 	var lines := _summary()
+	if not _endless_lines.is_empty(): lines = _endless_lines + lines   # sin fin: tiempo y récords (13.8)
 	var reports := _reports()
 	if net_game != null:
 		lines.append_array(net_game.gone_notes)       # quién se fue y cuándo
@@ -1432,7 +1456,7 @@ func _check_achievements() -> void:
 ## Biblioteca: el lugar, las armas y objetos que llevan los jugadores y los enemigos que
 ## están en pantalla. No guarda aquí: lo hace la partida al acabar o al salir.
 func _record_seen(save: SaveData) -> void:
-	if level != null: save.mark_seen("places", String(level.id))
+	if level != null: save.mark_seen("places", Endless.base_of(String(level.id)))
 	for q in players:
 		if q.weapons != null:
 			for w in q.weapons.weapons: save.mark_seen("weapons", String(w.data.id))

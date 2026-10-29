@@ -18,6 +18,7 @@ var panels: Array[PlayerPanel] = []
 var _time_lbl: Label
 var _objective_lbl: Label
 var _money_lbl: Label
+var _endless_best := 0.0                     ## sin fin: récord del J1 en este escenario
 var money := Callable()                      ## () -> int: dólares de la partida (los pone game.gd)
 var net_info := Callable()                   ## (Player) -> [PC, ping en ms (-1: sin conexión)] o [] si es de este PC
 
@@ -44,6 +45,9 @@ func _ready() -> void:
 	top.alignment = BoxContainer.ALIGNMENT_BEGIN
 	add_child(top)
 	var lvl_name := "Parte %d · Nivel %d" % [director.level.part, director.level.number] if director != null else "Campo de pruebas"
+	if director != null and director.level.endless:          # sin fin (hito 13.8): el récord de J1 aquí
+		lvl_name = "La noche eterna"
+		if player != null: _endless_best = Endless.best(Auto.save(), String(player.data.id), Endless.base_of(String(director.level.id)))
 	var title := UiKit.label(lvl_name, 16, UiKit.TEXT_DIM)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	top.add_child(title)
@@ -91,6 +95,12 @@ func _process_step(_delta: float) -> void:
 		elif director.time >= director.level.final_time and director.level.final_enemy != null:
 			var f := director.final_target()
 			_objective_lbl.text = "Acaba con %s" % (f.data.display_name if f != null else director.level.final_enemy.display_name)
+		elif director.level.endless:
+			var nxt := director.next_mid_time()
+			var parts := PackedStringArray()
+			if nxt > 0.0: parts.append("Siguiente horror en %s" % Endless.clock(nxt - director.time))
+			if _endless_best > 0.0: parts.append(("Récord %s" if director.time < _endless_best else "¡Récord! (%s)") % Endless.clock(_endless_best))
+			_objective_lbl.text = "  ·  ".join(parts)
 		else:
 			var left := int(director.level.final_time - director.time)
 			_objective_lbl.text = "Resiste · %d:%02d para el final" % [left / 60, left % 60]

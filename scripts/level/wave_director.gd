@@ -186,6 +186,12 @@ func _mid_step() -> void:
 		e.died.connect(func(x: Enemy) -> void: mid_alive.erase(x))
 		mid_event.emit(e, text)
 
+## Segundo del próximo evento intermedio (los jefes del sin fin), o 0 si no quedan.
+func next_mid_time() -> float:
+	for t in level.mid_times:                     # por el reloj: también en el invitado (espejo)
+		if t > time: return t
+	return 0.0
+
 ## El enemigo que hay que matar ahora para superar el nivel (el final, o el jefe tras él).
 func final_target() -> Enemy:
 	return _final if is_instance_valid(_final) and _final.is_alive() else null

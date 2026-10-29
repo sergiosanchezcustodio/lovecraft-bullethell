@@ -302,7 +302,8 @@ func _zap_fx(at: Vector3, r: float, pts: Array[Vector3]) -> void:
 func _done(id: String, at: Vector3, extra: Array) -> void:
 	fired[id] = int(fired.get(id, 0)) + 1
 	if _log: print("COMBO %s en (%.1f, %.1f) t=%.2f" % [id, at.x, at.z, Engine.get_physics_frames() / float(Engine.physics_ticks_per_second)])
-	if Saves.current != null and not mirror: Saves.current.stats["combos"] = int(Saves.current.stats.get("combos", 0)) + 1
+	var save := Auto.save()
+	if save != null and not mirror: save.stats["combos"] = int(save.stats.get("combos", 0)) + 1
 	_label(id, at)
 	if world.on_net.is_valid(): world.on_net.call("combo", [id, at, extra])
 
@@ -324,13 +325,15 @@ func replay(a: Array) -> void:
 		"charco_conductor": _zap_fx(at, float(x[0]), [])
 	fired[id] = int(fired.get(id, 0)) + 1
 	if _log: print("COMBO REPETIDA %s en (%.1f, %.1f)" % [id, at.x, at.z])
-	if Saves.current != null: Saves.current.stats["combos"] = int(Saves.current.stats.get("combos", 0)) + 1
+	var save := Auto.save()
+	if save != null: save.stats["combos"] = int(save.stats.get("combos", 0)) + 1
 	_label(id, at)
 
 ## La primera vez de cada una en el hueco (sin hueco, en esta partida): su nombre encima.
 func _label(id: String, at: Vector3) -> void:
-	if Saves.current != null:
-		if not Saves.current.mark_seen("combos", id): return
+	var save := Auto.save()
+	if save != null:
+		if not save.mark_seen("combos", id): return
 	elif _labeled.has(id): return
 	_labeled[id] = true
 	var p := _p(id)

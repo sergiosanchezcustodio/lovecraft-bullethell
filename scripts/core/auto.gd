@@ -23,3 +23,8 @@ static func sfx_at(ev: String, pos: Vector3) -> void:
 static func setting(key: String, default: Variant = null) -> Variant:
 	var s := node("Settings")
 	return s.call("get_value", key) if s else default
+
+## Saves.current: la partida guardada en uso (null sin hueco o en las herramientas)
+static func save() -> SaveData:
+	var s := node("Saves")
+	return s.get("current") as SaveData if s else null

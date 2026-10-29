@@ -80,6 +80,9 @@ func is_survival() -> bool:
 
 const DEFAULT_MUSIC := "res://resources/Music/Musica_nivel1.mp3"
 
+## Modo sin fin (hito 13.8, `Endless.make_level`): sin evento final; un jefe cada 5 minutos.
+var endless := false
+
 func music_path() -> String:
 	return music if music != "" else DEFAULT_MUSIC
 

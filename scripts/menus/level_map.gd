@@ -14,6 +14,7 @@ signal closed
 var _info_title: Label
 var _info_text: Label
 var _first: Button
+var _endless_btn: Button
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -44,6 +45,16 @@ func _ready() -> void:
 			if dev: col.add_child(_level_button(l, won))
 			else: col.add_child(_level_line(l, won))
 		pi += 1
+	if Endless.unlocked(Saves.current) or dev:       # modo sin fin (hito 13.8): al vencer a Cthulhu
+		var eb := MenuKit.button("La noche eterna" + ("" if Endless.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
+		eb.custom_minimum_size = Vector2(460, 58)
+		eb.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		eb.focus_entered.connect(func() -> void:
+			_info_title.text = "La noche eterna"
+			_info_text.text = "Modo sin fin: eliges escenario y aguantas oleadas de las tres partes, con un horror cada cinco minutos. Récord por personaje y escenario.")
+		eb.pressed.connect(func() -> void: _endless(eb))
+		box.add_child(eb)
+		_endless_btn = eb
 	var sep := HSeparator.new()
 	box.add_child(sep)
 	_info_title = MenuKit.title("", 28)
@@ -58,6 +69,7 @@ func _ready() -> void:
 	var la := LaunchArgs.from_cmdline()                # capturas: pacts=noche,furia pact_open=true
 	if la.has("pacts"): Pacts.set_active(Array(la.get_str("pacts").split(",", false)))
 	if la.get_bool("pact_open") and _first: _pick.call_deferred(Campaign.first_of(0), _first)
+	if la.get_bool("endless_open") and _endless_btn: _endless.call_deferred(_endless_btn)   # capturas
 
 ## Botón de una parte: empieza por su primer nivel.
 func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
@@ -98,6 +110,18 @@ func _level_button(l: Dictionary, won: Array) -> Button:
 		_info_text.text = "Criaturas: %s" % l.creatures)
 	b.pressed.connect(func() -> void: _pick(l.id, b))
 	return b
+
+## «La noche eterna»: elegir escenario y, después, los pactos (D-44: también en el sin fin).
+func _endless(from: Button) -> void:
+	var m := EndlessMenu.new()
+	visible = false
+	m.picked.connect(func(base: String) -> void:
+		visible = true
+		_pick(Endless.id_for(base), from))
+	m.closed.connect(func() -> void:
+		visible = true
+		from.grab_focus.call_deferred())
+	get_parent().add_child(m)
 
 ## Antes de empezar, los pactos (el mapa se esconde mientras tanto).
 func _pick(level_id: String, from: Button) -> void:

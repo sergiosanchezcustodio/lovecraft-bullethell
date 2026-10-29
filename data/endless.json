@@ -1,0 +1,14 @@
+{
+	"_doc": "Modo sin fin «La noche eterna» (hito 13.8, Endless). 'unlock': nivel que lo abre. 'skip_enemies': los que dependen de su escenario (además de los únicos y los del muelle). 'bosses': un jefe cada 'boss_every' s, en este orden y vuelta a empezar (los grandes finales, que dependen de su escenario, no). Escalada: un escalón de enemigos más cada 'tier_every' s (hasta el 5), +'health_per_5min' de vida cada 5 minutos, 'alive_per_min' más a la vez por minuto (hasta 'alive_max') y una élite más cada 'elite_every' s.",
+	"unlock": "p3_n5",
+	"skip_enemies": ["acechador_tejados", "profundo_emergente"],
+	"bosses": ["acechador", "diacono", "pesadilla_relieve", "antiguo_despierto", "sumo_sacerdote", "sacerdote_culto", "shoggoth_caverna", "barnabas", "engendro_mayor", "guardian_ciudad", "pththya", "primigenio_menor"],
+	"boss_every": 300.0,
+	"bosses_max": 24,
+	"spawn_rate": [[0, 0.6], [300, 3.0], [900, 5.0], [1800, 7.0], [3600, 9.0]],
+	"tier_every": 120.0,
+	"health_per_5min": 0.25,
+	"alive_per_min": 3.0,
+	"alive_max": 160,
+	"elite_every": 600.0
+}
