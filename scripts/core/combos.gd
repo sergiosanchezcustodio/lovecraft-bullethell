@@ -323,6 +323,7 @@ func replay(a: Array) -> void:
 		"prisma": _split_fx(at, x[0], float(x[1]), float(x[2]))
 		"charco_conductor": _zap_fx(at, float(x[0]), [])
 	fired[id] = int(fired.get(id, 0)) + 1
+	if _log: print("COMBO REPETIDA %s en (%.1f, %.1f)" % [id, at.x, at.z])
 	if Saves.current != null: Saves.current.stats["combos"] = int(Saves.current.stats.get("combos", 0)) + 1
 	_label(id, at)
 
