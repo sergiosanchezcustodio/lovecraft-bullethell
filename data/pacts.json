@@ -1,14 +1,14 @@
 {
-	"_doc": "Pactos del Necronomicón (hito 13.6, Pacts; D-44): antes de cada nivel, hasta tres, cada uno con su maldición y su premio. 'effects': multiplicadores (enemy_health, enemy_speed, xp, money, chest_money, chest_every, light (gamma de la noche), lamp (alcance del farol)) y marcas (split_elites, no_heal, no_regen, bullet_trail, pet_idle), que se aplican en vivo con las mismas palancas que la dificultad. 'icon': letra del sello.",
+	"_doc": "Pactos del Necronomicón (hito 13.6, Pacts; D-44): antes de cada nivel, hasta tres, cada uno con su maldición y su premio. 'effects': multiplicadores (enemy_health, enemy_speed, xp, money, chest_money, chest_every, light (gamma de la noche), lamp (alcance del farol)) y marcas (split_elites, no_heal, no_regen, bullet_trail, pet_idle), que se aplican en vivo con las mismas palancas que la dificultad. 'short': nombre corto (sello del HUD).",
 	"max": 3,
 	"pacts": [
-		{"id": "carne", "name": "Carne obstinada", "curse": "Las criaturas aguantan un 35 % más.", "reward": "+40 % de experiencia", "effects": {"enemy_health": 1.35, "xp": 1.4}},
-		{"id": "furia", "name": "Furia del abismo", "curse": "Las criaturas son un 15 % más rápidas.", "reward": "+40 % de dólares", "effects": {"enemy_speed": 1.15, "money": 1.4}},
-		{"id": "noche", "name": "La noche más cerrada", "curse": "Menos luz, y tu farol alumbra menos.", "reward": "Baúles más ricos y más a menudo", "effects": {"light": 0.8, "lamp": 0.65, "chest_money": 1.6, "chest_every": 0.75}},
-		{"id": "estirpe", "name": "Estirpe dividida", "curse": "Las élites se parten en dos criaturas al morir.", "reward": "+40 % de experiencia", "effects": {"split_elites": 1, "xp": 1.4}},
-		{"id": "consuelo", "name": "Sin consuelo", "curse": "Nada cura: ni comida, ni pociones, ni baúles, ni subir de nivel.", "reward": "+50 % de dólares", "effects": {"no_heal": 1, "money": 1.5}},
-		{"id": "susurros", "name": "Susurros constantes", "curse": "La cordura no se recupera sola.", "reward": "Baúles más ricos y más a menudo", "effects": {"no_regen": 1, "chest_money": 1.6, "chest_every": 0.75}},
-		{"id": "icor", "name": "Rastro de icor", "curse": "Algunas balas enemigas dejan un charco que quema.", "reward": "+30 % de experiencia y de dólares", "effects": {"bullet_trail": 1, "xp": 1.3, "money": 1.3}},
-		{"id": "soledad", "name": "Solo ante el horror", "curse": "Tu compañero no ataca ni ayuda.", "reward": "+30 % de experiencia y de dólares", "effects": {"pet_idle": 1, "xp": 1.3, "money": 1.3}}
+		{"id": "carne", "short": "Carne", "name": "Carne obstinada", "curse": "Las criaturas aguantan un 35 % más.", "reward": "+40 % de experiencia", "effects": {"enemy_health": 1.35, "xp": 1.4}},
+		{"id": "furia", "short": "Furia", "name": "Furia del abismo", "curse": "Las criaturas son un 15 % más rápidas.", "reward": "+40 % de dólares", "effects": {"enemy_speed": 1.15, "money": 1.4}},
+		{"id": "noche", "short": "Noche", "name": "La noche más cerrada", "curse": "Menos luz, y tu farol alumbra menos.", "reward": "Baúles más ricos y más a menudo", "effects": {"light": 0.8, "lamp": 0.65, "chest_money": 1.6, "chest_every": 0.75}},
+		{"id": "estirpe", "short": "Estirpe", "name": "Estirpe dividida", "curse": "Las élites se parten en dos criaturas al morir.", "reward": "+40 % de experiencia", "effects": {"split_elites": 1, "xp": 1.4}},
+		{"id": "consuelo", "short": "Sin consuelo", "name": "Sin consuelo", "curse": "Nada cura: ni comida, ni pociones, ni baúles, ni subir de nivel.", "reward": "+50 % de dólares", "effects": {"no_heal": 1, "money": 1.5}},
+		{"id": "susurros", "short": "Susurros", "name": "Susurros constantes", "curse": "La cordura no se recupera sola.", "reward": "Baúles más ricos y más a menudo", "effects": {"no_regen": 1, "chest_money": 1.6, "chest_every": 0.75}},
+		{"id": "icor", "short": "Icor", "name": "Rastro de icor", "curse": "Algunas balas enemigas dejan un charco que quema.", "reward": "+30 % de experiencia y de dólares", "effects": {"bullet_trail": 1, "xp": 1.3, "money": 1.3}},
+		{"id": "soledad", "short": "Soledad", "name": "Solo ante el horror", "curse": "Tu compañero no ataca ni ayuda.", "reward": "+30 % de experiencia y de dólares", "effects": {"pet_idle": 1, "xp": 1.3, "money": 1.3}}
 	]
 }

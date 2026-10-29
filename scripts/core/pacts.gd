@@ -82,6 +82,14 @@ static func names(ids: Array) -> String:
 		if not p.is_empty(): out.append(String(p.name))
 	return ", ".join(out)
 
+## Sello de la cabecera del HUD: «✦ Noche · Icor» (vacío sin pactos).
+static func seal(ids: Array) -> String:
+	var out := PackedStringArray()
+	for id: Variant in ids:
+		var p := find(String(id))
+		if not p.is_empty(): out.append(String(p.get("short", p.name)))
+	return "" if out.is_empty() else "✦ " + " · ".join(out)
+
 ## Nivel superado con pactos: los apunta en el hueco y cuenta para los logros.
 static func record_win(save: SaveData, level_id: String, ids: Array) -> void:
 	if save == null or ids.is_empty(): return

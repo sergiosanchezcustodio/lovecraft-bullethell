@@ -30,8 +30,29 @@ func _ready() -> void:
 	var buttons: Array = []
 	for p: Dictionary in Pacts.all():
 		var b := MenuKit.button("", MenuKit.INK, 20)
-		b.custom_minimum_size = Vector2(1100, 64)
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.custom_minimum_size = Vector2(1100, 72)
+		var col := VBoxContainer.new()                   # dos líneas: nombre, y maldición → premio
+		col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		col.offset_left = 22; col.offset_right = -18; col.offset_top = 6; col.offset_bottom = -6
+		col.add_theme_constant_override("separation", 0)
+		col.alignment = BoxContainer.ALIGNMENT_CENTER
+		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(col)
+		var name_l := UiKit.label("", 22, UiKit.TEXT)
+		name_l.add_theme_font_override("font", MenuKit.body_font(true))
+		col.add_child(name_l)
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override("separation", 10)
+		col.add_child(line)
+		var curse := UiKit.label(String(p.curse), 18, Color(0.88, 0.5, 0.44))
+		var arrow := UiKit.label("→", 18, UiKit.TEXT_DIM)
+		var reward := UiKit.label(String(p.reward), 18, UiKit.GOLD)
+		for l: Label in [curse, arrow, reward]:
+			l.add_theme_font_override("font", MenuKit.body_font(false))
+			l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			line.add_child(l)
+		name_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.set_meta("name_l", name_l)
 		var id := String(p.id)
 		b.pressed.connect(func() -> void: _toggle(id))
 		b.set_meta("pact", p)
@@ -66,10 +87,9 @@ func _refresh() -> void:
 		var b: Button = _rows[id]
 		var p: Dictionary = b.get_meta("pact")
 		var on := picked.has(id)
-		var seal := "✦ " if on else "○ "
-		var mark := "   · superado aquí" if bool(b.get_meta("won")) else ""
-		b.text = "%s%s — %s  →  %s%s" % [seal, p.name, p.curse, p.reward, mark]
-		b.add_theme_color_override("font_color", Color(1.0, 0.55, 0.45) if on else UiKit.TEXT)
+		var name_l: Label = b.get_meta("name_l")
+		name_l.text = "%s%s%s" % ["✦  " if on else "○  ", p.name, "   · superado aquí" if bool(b.get_meta("won")) else ""]
+		name_l.add_theme_color_override("font_color", Color(1.0, 0.5, 0.4) if on else UiKit.TEXT)
 	_count.text = "Hasta %d maldiciones, cada una con su premio. Duran hasta que las cambies.  ·  Selladas: %d de %d" % [
 		Pacts.max_count(), picked.size(), Pacts.max_count()]
 	_go.text = "Jugar sin pactos" if picked.is_empty() else "Sellar y jugar"

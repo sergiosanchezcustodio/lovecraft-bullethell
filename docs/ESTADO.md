@@ -1368,6 +1368,7 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - En cooperativo los elige el J1; en red, el anfitrión: viajan con START (sala) y con NEXT (siguiente nivel y quien vuelve), antes de montar la partida, así que el invitado tiene la misma luz y el mismo farol. `PROTOCOL` 14. Probado con dos ventanas: los dos PC con `["noche", "furia"]`.
   - Con bots no hay pactos salvo pedidos. Pruebas: `pacts=noche,icor,estirpe` (en la partida o en la selección), `pact_open=true` (con `map=true`, abre la ventana) y `pact_menu=false` (el mapa empieza sin preguntar).
   - Hoja `shots/revision/2026-10-29/pactos.png` (ventana, aviso al empezar, charcos de icor y nivel superado). Tests en `test_pacts` (6). 555 de 555.
+  - Mejoras pedidas por el autor (29-10-2026): en la ventana, cada pacto en dos líneas (el nombre; debajo, la maldición en rojo, una flecha y el premio en dorado), y en la cabecera del HUD, bajo los dólares, un sello rojo con los sellados por su nombre corto («✦ Noche · Icor · Estirpe», `short` en `data/pacts.json`, `Pacts.seal`). Capturas `shots/seleccion_pactos2_002.5s.png` y `shots/game_pactos_hud_009.0s.png`.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 
