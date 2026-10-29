@@ -76,6 +76,7 @@ func _ready() -> void:
 	state = SelectState.new().setup(chars, [], [] as Array[PetData])
 	state.profiles[SelectState.LOCAL] = mine
 	_build()
+	BookTransition.arrive(self)                                       # viene del libro de la portada: desde negro
 	state.changed.connect(_refresh)
 	Devices.joy_disconnected.connect(func(d: int) -> void: _do(d, "leave"))
 	if args.get_bool("net_host") and not Net.is_active():          # pruebas: abre la sala aquí mismo

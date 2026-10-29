@@ -9,6 +9,9 @@ extends CanvasLayer
 ## En red (hito 9.4b), el panel de un jugador de otro PC lleva debajo (encima, en los de
 ## abajo) el nombre de su PC y un punto con el ping: verde, amarillo o rojo.
 
+const PORTRAIT_SHADER := preload("res://scripts/ui/portrait_state.gdshader")
+static var frost := 0.0                     ## escarcha en los retratos (la Antártida; la pone game.gd)
+
 var players: Array[Player] = []
 var director: WaveDirector
 var panels: Array[PlayerPanel] = []
@@ -135,6 +138,13 @@ func portrait_texture(p: Player) -> Texture2D:
 	return vp.get_texture()
 
 
+## Estado del retrato (hito 12.14): x, la sangre (desde la mitad de la vida; toda al caer); y, la
+## mirada perdida (desde el 40 % de la cordura; toda en la crisis).
+static func portrait_state(hp: float, san: float, crisis: bool, downed: bool) -> Vector2:
+	var blood := 1.0 if downed else clampf((0.5 - hp) / 0.4, 0.0, 1.0)
+	var lost := 1.0 if crisis else clampf((0.4 - san) / 0.32, 0.0, 1.0)
+	return Vector2(blood, lost)
+
 ## Copia en el retrato la cara del jugador (abierta, parpadeo, mueca o pánico) y, si cambia,
 ## pide un fotograma más al SubViewport (que si no, no se vuelve a dibujar).
 class PortraitFace extends Node:
@@ -179,6 +189,8 @@ class PlayerPanel extends PanelContainer:
 	var _net_lbl: Label
 	var _hud: Hud
 	var _items_key := ""
+	var _portrait_mat: ShaderMaterial
+	var _state := Vector2.ZERO                  ## sangre y mirada perdida del retrato, suavizadas
 
 	const MARGIN := 16.0
 	const SIZE := Vector2(272, 132)
@@ -226,6 +238,11 @@ class PlayerPanel extends PanelContainer:
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE      # antes que el tamaño: si no, se queda al de la imagen
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		portrait.texture = hud.portrait_texture(p)
+		_portrait_mat = ShaderMaterial.new()             # sangre, mirada perdida y escarcha (hito 12.14)
+		_portrait_mat.shader = PORTRAIT_SHADER
+		_portrait_mat.set_shader_parameter("seed", 13.7 * (p.index + 1))
+		_portrait_mat.set_shader_parameter("frost", Hud.frost)
+		portrait.material = _portrait_mat
 		portrait.position = Vector2(0, 22)
 		portrait.size = Vector2(LEFT_W, 86)
 		box.add_child(portrait)
@@ -319,6 +336,19 @@ class PlayerPanel extends PanelContainer:
 		if p.weapons == null: return
 		for w in p.weapons.weapons: _cell(_weapons_row, w.data.get_icon(), w.data.display_name, w.level)
 
+	## Sangre con poca vida (toda, abatido) y mirada perdida con poca cordura (toda, en la crisis):
+	## van hacia su valor poco a poco, para que un golpe no cambie el retrato de golpe.
+	func _portrait_step() -> void:
+		if _portrait_mat == null: return
+		var to := Hud.portrait_state(p.health / maxf(p.data.max_health, 1.0), p.sanity / maxf(p.data.max_sanity, 1.0),
+			p.sanity_state != null and p.sanity_state.in_crisis, p.is_downed())
+		var dt := get_process_delta_time()
+		var s := Vector2(move_toward(_state.x, to.x, dt * 0.8), move_toward(_state.y, to.y, dt * 0.6))
+		if s == _state: return
+		_state = s
+		_portrait_mat.set_shader_parameter("blood", s.x)
+		_portrait_mat.set_shader_parameter("lost", s.y)
+
 	func _paint_items() -> void:
 		for c in _items_row.get_children(): c.queue_free()
 		for up in p.progress.upgrade_pool:
@@ -327,6 +357,7 @@ class PlayerPanel extends PanelContainer:
 
 	func refresh() -> void:
 		var d := p.data
+		_portrait_step()
 		_health.value = p.health / d.max_health
 		_sanity.value = p.sanity / d.max_sanity
 		_xp.value = p.progress.xp_fraction()

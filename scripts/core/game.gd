@@ -148,6 +148,7 @@ func _ready() -> void:
 		var ld: LevelData = load("res://data/levels/%s.tres" % lid)
 		if ld != null: arena_path = ld.arena
 	Enemy.part_tint = Enemy.PART_TINTS.get(part_key, Color(0.45, 0.2, 0.7))   # auras de las élites (hito 12.6)
+	Hud.frost = 0.85 if part_key == "p1" else 0.0                     # retratos con escarcha en la Antártida (hito 12.14)
 	# ropa que se ensucia (hito 12.4; dirt=false la quita, dirt=0.8 la deja fija para capturas)
 	Player.dirt_cfg = {} if args.get_str("dirt", "") == "false" else Player.dirt_config(part_key, arena_path.get_file().get_basename())
 	Player.dirt_force = args.get_float("dirt", -1.0) if args.get_str("dirt", "").is_valid_float() else -1.0

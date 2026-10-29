@@ -1282,6 +1282,12 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Equilibrio del arrecife con `SmartBot` (4 partidas con marea y 4 con `changes=0`, `--ts 2`): SIM
   - Hoja `shots/revision/2026-10-29/escenario_cambia.png` (marea baja, a medias y alta; ventisca al principio, a medias y al final; R'lyeh inclinada).
   - Tests en `test_scene_changes` (6). 519 de 519.
+- **Fase 12, hito 12.14: el libro de la portada a la selección y retratos con estado (29-10-2026), pendiente de tu revisión.** Con él, la fase 12 está hecha.
+  - Libro (D-41: la ilustración de la Biblioteca, `libro.png`, animada; el libro voxel que se eligió primero no existe): «Jugar en local» ya no corta a la selección. `BookTransition` (`scripts/title/book_transition.gd`) funde a negro, aparece el libro alejándose un poco, pasan dos páginas (la derecha gira sobre el lomo con `scale.x = cos`, se oscurece de canto y se levanta un poco; suena `page`) y la vista se acerca a la página nueva mientras funde a negro; la selección llega desde negro (`BookTransition.arrive`). Unos 2,6 s; cualquier botón lo salta. La sala online sigue como antes (el paso depende de la red). Capturas o vídeo: `title saves=demo_saves open=menu_libro t=20`.
+  - Arreglo de paso: entre dos escenas quedaba un fotograma gris (el color de fondo de Godot); ahora es negro (`environment/defaults/default_clear_color` en `project.godot`).
+  - Retratos del HUD con estado: un sombreador encima de la cabeza (`scripts/ui/portrait_state.gdshader`, ceñido a su silueta por el alfa): sangre desde la mitad de la vida, con manchas que crecen y chorretones (toda al caer); mirada perdida desde el 40 % de la cordura, la cara se desdobla, se mece despacio y pierde el color hacia el violeta (toda en la crisis); escarcha en la Antártida (parte 1, `Hud.frost`, la pone `game.gd`), que entra por el borde de la silueta y por arriba, con cristales que brillan. `Hud.portrait_state` da los valores y el panel va hacia ellos poco a poco. El retrato no se vuelve a dibujar por esto (el sombreador va en el `TextureRect`): coste despreciable.
+  - Probar: `level=p2_n1 hp=30` (sangre), `san=10` (mirada perdida), `level=p1_n1` (escarcha).
+  - Hoja `shots/revision/2026-10-29/libro_y_retratos.png`; vídeo en fotogramas en `shots/videos/libro/`. Tests en `test_portrait_book` (3). 522 de 522.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

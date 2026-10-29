@@ -17,7 +17,8 @@ extends Control
 ##                       open=slots_borrar, además la confirmación de borrado; open=menu (menú
 ##                       principal), open=menu_jugar, open=menu_config tab=0..4, open=menu_tienda tab=0..3, open=menu_logros,
 ##                       open=menu_biblioteca tome=N cursor=N
-##                       open=menu_revision (revisión de arte, temporal), open=menu_online
+##                       open=menu_revision (revisión de arte, temporal), open=menu_online,
+##                       open=menu_libro (Jugar en local: el libro que se abre hacia la selección)
 ##                       (con net_host=true o net_join=<código|IP>: abre la sala o se une)
 ## Cualquier botón principal (A, B, X, Y, Start, Select; Intro, Espacio o Esc) salta la
 ## presentación y, con el aviso visible, abre la ventana de huecos de partida (D-22).
@@ -357,6 +358,7 @@ func _process(delta: float) -> void:
 		elif what == "menu_config": _menu.open_settings_tab.call_deferred(args.get_int("tab", 0))
 		elif what == "menu_tienda": _menu.open_shop_tab.call_deferred(args.get_int("tab", 0))
 		elif what == "menu_logros": _menu._open_achievements.call_deferred()
+		elif what == "menu_libro": _menu.play_local.emit.call_deferred()     # el libro hacia la selección
 		elif what == "menu_biblioteca": _menu.open_library_at.call_deferred(args.get_int("tome", -1), args.get_int("cursor", 0))
 		elif what == "menu_revision":
 			_menu._open_review.call_deferred()
@@ -453,7 +455,7 @@ func _open_main_menu() -> void:
 		_open_slots())
 	_menu.play_local.connect(func() -> void:
 		_done = true
-		get_tree().change_scene_to_file(SELECT_SCENE))
+		BookTransition.play(self, SELECT_SCENE))                  # se abre el libro (hito 12.14)
 
 var _frames: Array[float] = []
 func _perf(delta: float) -> void:
