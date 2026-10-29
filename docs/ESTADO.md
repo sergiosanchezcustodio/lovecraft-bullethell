@@ -1321,7 +1321,7 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
 - **Fase 13, hito 13.2: historial de dificultades y reparto del 4 al 6 (29-10-2026), pendiente de tu revisión.**
   - Historial en Pausa > «Dificultad (temporal)» > «Partidas jugadas» (`DifficultyMenu.history`, del registro de partidas del 13.1): las últimas 10 combinaciones jugadas, la más reciente arriba, con sus partidas, las superadas y los minutos de las caídas; debajo, la fecha y el nivel de la última y, si es personalizada, solo lo que cambia («daño 6, velocidad 5; el resto, 4»). La que está en uso lleva «(la de ahora)». A vuelve a una (`Difficulty.set_levels`, se apunta en el registro); B vuelve al menú. La idea 3 de la lista («usar la de mi última partida») ya la cumplía `dif_levels`, que se conserva entre sesiones.
   - Capturas sin tocar tus registros: `dif_runs=<fichero>` lee otro registro de partidas; `dif_hist=true` (con `debug_menu=N dif_menu=true`) abre el historial. Capturas `shots/revision/2026-10-29/dificultad_historial.png`.
-  - Reparto del 4 al 6, **propuesto, pendiente de que decidas**: tabla candidata en la que los niveles 5 a 10 valen lo que las posiciones 4,5 · 5,25 · 6 · 7 · 8,5 · 10 de la de ahora (el 7 nuevo es el 6 de ahora y el 10 no cambia; élites en pasos de 0,25). Simulada con el bot (Dyer, p1_n1, 8 partidas por caso, `--ts 2 --par 2`):
+  - Reparto del 4 al 6, **aplicado** (el autor eligió «Aplicar la candidata»): tabla nueva en la que los niveles 5 a 10 valen lo que las posiciones 4,5 · 5,25 · 6 · 7 · 8,5 · 10 de la de ahora (el 7 nuevo es el 6 de ahora y el 10 no cambia; élites en pasos de 0,25). Simulada con el bot (Dyer, p1_n1, 8 partidas por caso, `--ts 2 --par 2`):
 
     | Caso | Superados | Caídas (s) |
     |---|---|---|
@@ -1330,7 +1330,7 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
     | 5 candidato | 2/8 | 99-179 |
     | 6 candidato | 1/8 | 74-154 |
 
-    Con la candidata se pasa de 3 de cada 4 a 1 de cada 4 y después a 1 de cada 8, en vez de caer de golpe a ninguna. Sin aplicar hasta que decidas. Tests 537 de 537.
+    Con la nueva se pasa de 3 de cada 4 a 1 de cada 4 y después a 1 de cada 8, en vez de caer de golpe a ninguna. La Pesadilla de antes queda entre el 5 y el 6: la dificultad de tres guardada pasa ahora a 1, 3 o 6. Tests 537 de 537.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

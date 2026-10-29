@@ -2,8 +2,10 @@ class_name Difficulty
 extends RefCounted
 ## Dificultad del 1 al 10 por características (29-10-2026, D-42, temporal: para que el autor
 ## calibre el juego desde la pausa). El 3 de cada característica es la dificultad "Normal" de
-## antes (10-10 a 29-10-2026); el 1 es casi "Investigador" (la de antes de esa fecha) y el 5,
-## "Pesadilla". Cada una se mueve sola (`set_cat`) o todas a la vez (`set_all`); se guarda en
+## antes (10-10 a 29-10-2026); el 1 es casi "Investigador" (la de antes de esa fecha) y el 6,
+## algo más que "Pesadilla" (hito 13.2: los niveles 5 a 10 se repartieron para suavizar el salto
+## del 4 al 5; valen lo que las posiciones 4,5 · 5,25 · 6 · 7 · 8,5 · 10 de la primera tabla, en la
+## que el 5 era Pesadilla; con el bot, el 4 pasa 6 de 8 y el 5, 2 de 8). Cada una se mueve sola (`set_cat`) o todas a la vez (`set_all`); se guarda en
 ## Settings ("dif_levels") y vale para los tres huecos. En red, la del anfitrión (`net`).
 ## Se lee en vivo: cambiarla en la pausa se nota al seguir (la vida, en los que salgan después).
 ##
@@ -19,28 +21,28 @@ const NEUTRAL := 0                       ## `forced = 0`: todos los multiplicado
 ## Características, en el orden del menú: nombre, qué cambia y sus valores del 1 al 10.
 const CATS := {
 	"numero": {"name": "Número de enemigos", "help": "Ritmo de aparición y enemigos vivos a la vez",
-		"rate": [1.0, 1.8, 2.6, 3.3, 4.0, 4.8, 5.6, 6.5, 7.5, 8.5],
-		"cap": [1.0, 1.25, 1.5, 1.65, 1.8, 1.95, 2.1, 2.3, 2.5, 2.7],
-		"ramp": [1.0, 0.7, 0.4, 0.45, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]},       ## del ritmo al empezar (ver ramp)
+		"rate": [1.0, 1.8, 2.6, 3.3, 3.65, 4.2, 4.8, 5.6, 7.0, 8.5],
+		"cap": [1.0, 1.25, 1.5, 1.65, 1.72, 1.84, 1.95, 2.1, 2.4, 2.7],
+		"ramp": [1.0, 0.7, 0.4, 0.45, 0.48, 0.5, 0.5, 0.5, 0.5, 0.5]},       ## del ritmo al empezar (ver ramp)
 	"vida": {"name": "Vida de los enemigos", "help": "Hordas y élites (los jefes, aparte)",
-		"health": [0.8, 0.9, 1.0, 1.1, 1.2, 1.35, 1.5, 1.7, 1.95, 2.25]},
+		"health": [0.8, 0.9, 1.0, 1.1, 1.15, 1.24, 1.35, 1.5, 1.82, 2.25]},
 	"jefes": {"name": "Vida de los jefes", "help": "Jefes del final y minijefes",
-		"boss": [0.7, 0.85, 1.0, 1.1, 1.2, 1.35, 1.5, 1.7, 1.95, 2.25]},
+		"boss": [0.7, 0.85, 1.0, 1.1, 1.15, 1.24, 1.35, 1.5, 1.82, 2.25]},
 	"dano": {"name": "Daño de los enemigos", "help": "La vida que quitan",
-		"damage": [1.0, 1.2, 1.4, 1.6, 1.8, 2.05, 2.3, 2.6, 2.95, 3.3]},
+		"damage": [1.0, 1.2, 1.4, 1.6, 1.7, 1.86, 2.05, 2.3, 2.78, 3.3]},
 	"cordura": {"name": "Daño a la cordura", "help": "Ataques mentales y la cordura que roban de cerca",
-		"mental": [1.0, 1.35, 1.7, 1.95, 2.2, 2.5, 2.8, 3.1, 3.5, 3.9],
-		"horror": [0.4, 0.7, 1.0, 1.25, 1.5, 1.75, 2.0, 2.3, 2.6, 3.0]},
+		"mental": [1.0, 1.35, 1.7, 1.95, 2.08, 2.28, 2.5, 2.8, 3.3, 3.9],
+		"horror": [0.4, 0.7, 1.0, 1.25, 1.38, 1.56, 1.75, 2.0, 2.45, 3.0]},
 	"velocidad": {"name": "Velocidad de los enemigos", "help": "Los de cuerpo a cuerpo y, desde el 4, los que disparan",
-		"melee": [1.0, 1.09, 1.18, 1.25, 1.32, 1.39, 1.46, 1.53, 1.6, 1.68],
-		"shooter": [1.0, 1.0, 1.0, 1.03, 1.06, 1.09, 1.12, 1.15, 1.18, 1.2]},
+		"melee": [1.0, 1.09, 1.18, 1.25, 1.28, 1.34, 1.39, 1.46, 1.56, 1.68],
+		"shooter": [1.0, 1.0, 1.0, 1.03, 1.04, 1.07, 1.09, 1.12, 1.16, 1.2]},
 	"balas": {"name": "Balas enemigas", "help": "Velocidad de sus balas",
-		"bullet": [0.85, 0.92, 1.0, 1.06, 1.12, 1.18, 1.25, 1.32, 1.4, 1.5]},
+		"bullet": [0.85, 0.92, 1.0, 1.06, 1.09, 1.14, 1.18, 1.25, 1.36, 1.5]},
 	"agresividad": {"name": "Agresividad", "help": "Cada cuánto disparan y cuánto avisan en el suelo",
-		"attack": [0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.75],
-		"warn": [1.2, 1.1, 1.0, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65]},
+		"attack": [0.8, 0.9, 1.0, 1.1, 1.15, 1.22, 1.3, 1.4, 1.55, 1.75],
+		"warn": [1.2, 1.1, 1.0, 0.95, 0.92, 0.89, 0.85, 0.8, 0.72, 0.65]},
 	"elites": {"name": "Élites", "help": "Cuántas puede haber a la vez",
-		"elites": [0.5, 0.75, 1.0, 1.0, 1.5, 1.5, 2.0, 2.0, 2.5, 3.0]},
+		"elites": [0.5, 0.75, 1.0, 1.0, 1.25, 1.5, 1.5, 2.0, 2.25, 3.0]},
 }
 
 static var forced := -1:                ## los tests la fijan: 0 neutra, 1..10 todas a ese nivel

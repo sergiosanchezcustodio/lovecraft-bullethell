@@ -1,6 +1,6 @@
 extends GutTest
 ## Dificultad del 1 al 10 por características (D-42, temporal): el 3 es la Normal de antes, el 1
-## casi Investigador y el 5 Pesadilla; tablas completas, red, migración y el menú de la pausa.
+## casi Investigador y el 6 algo más que Pesadilla (reparto del 13.2); tablas completas, red, migración y el menú de la pausa.
 
 func after_each() -> void:
 	Difficulty.forced = 0                                  # como la deja pre_run.gd
@@ -34,9 +34,11 @@ func test_el_1_es_investigador_y_el_5_pesadilla() -> void:
 	Difficulty.forced = 1
 	assert_eq([Difficulty.value("numero", "rate"), Difficulty.value("numero", "cap"), Difficulty.damage(), Difficulty.mental(),
 		Difficulty.horror(), Difficulty.melee_speed()], [1.0, 1.0, 1.0, 1.0, 0.4, 1.0])
-	Difficulty.forced = 5
+	Difficulty.forced = 5                                  # reparto del 13.2: entre el 4 y la Pesadilla de antes
 	assert_eq([Difficulty.value("numero", "rate"), Difficulty.value("numero", "cap"), Difficulty.damage(), Difficulty.mental(),
-		Difficulty.horror(), Difficulty.melee_speed(), Difficulty.health()], [4.0, 1.8, 1.8, 2.2, 1.5, 1.32, 1.2])
+		Difficulty.horror(), Difficulty.melee_speed(), Difficulty.health()], [3.65, 1.72, 1.7, 2.08, 1.38, 1.28, 1.15])
+	Difficulty.forced = 6                                  # algo más que la Pesadilla de antes
+	assert_eq([Difficulty.value("numero", "rate"), Difficulty.damage(), Difficulty.health(), Difficulty.elites(2)], [4.2, 1.86, 1.24, 3])
 
 func test_neutra_para_los_tests_y_elites_al_menos_una() -> void:
 	Difficulty.forced = 0
@@ -55,18 +57,18 @@ func test_en_red_manda_la_del_anfitrion() -> void:
 	assert_eq(lv.vida, 7)
 	assert_eq(lv.dano, 10, "dentro de 1..10")
 	assert_eq(lv.numero, 3, "lo que no llega, el 3")
-	assert_almost_eq(Difficulty.health(), 1.5, 0.001)
+	assert_almost_eq(Difficulty.health(), 1.35, 0.001)
 	assert_eq(Difficulty.general(), -1, "personalizada")
 	Difficulty.net = null
 
-func test_la_de_tres_pasa_a_1_3_o_5() -> void:
+func test_la_de_tres_pasa_a_1_3_o_6() -> void:
 	var s = load("res://scripts/save/settings.gd").new()
 	s.path = "user://test_settings_dificultad.json"
 	var f := FileAccess.open(s.path, FileAccess.WRITE)
 	f.store_string(JSON.stringify({"difficulty": 2}))
 	f.close()
 	s.load_file()
-	assert_eq(int(s.values.dif_levels.vida), 5, "Pesadilla -> 5")
+	assert_eq(int(s.values.dif_levels.vida), 6, "Pesadilla -> 6")
 	f = FileAccess.open(s.path, FileAccess.WRITE)
 	f.store_string(JSON.stringify({"difficulty": 1}))
 	f.close()

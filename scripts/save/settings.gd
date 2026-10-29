@@ -79,8 +79,8 @@ func load_file() -> void:
 	if parsed is not Dictionary: return
 	for k in parsed:
 		if k != "version" and defaults.has(k): values[k] = parsed[k]
-	if parsed.has("difficulty") and not parsed.has("dif_levels"):   # la de tres (hasta el 29-10-2026): 1, 3 o 5
-		var lv: int = [1, 3, 5][clampi(int(parsed.difficulty), 0, 2)]
+	if parsed.has("difficulty") and not parsed.has("dif_levels"):   # la de tres (hasta el 29-10-2026): 1, 3 o 6
+		var lv: int = [1, 3, 6][clampi(int(parsed.difficulty), 0, 2)]      # (Pesadilla, el 6 desde el reparto del 13.2)
 		var d := {}
 		for c in Difficulty.CATS: d[c] = lv
 		values["dif_levels"] = d

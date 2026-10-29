@@ -320,14 +320,14 @@ Pedida por el autor el 29-10-2026 («me gustan todas, establece un plan para hac
 
 **Aceptación:** el autor juega cada modo y cada sistema nuevo (solo y en cooperativo), encuentra su dificultad con el informe y el historial, y tiene en la mano una build de demo y un tráiler listos para itch.io.
 
-*Estado (29-10-2026):* plan aprobado por el autor («si, adelante»). **Hechos el 13.1 y el historial del 13.2**, pendientes de su revisión; la tabla candidata del 4 al 6, simulada, espera su decisión.
+*Estado (29-10-2026):* plan aprobado por el autor («si, adelante»). **Hechos el 13.1 y el 13.2**, pendientes de su revisión (la tabla nueva del 4 al 6, aprobada por él).
 
 ### Bloque A: calibrar (lo primero, porque ayuda a probar todo lo demás)
 
 | Hito | Contenido | Cómo |
 |---|---|---|
 | 13.1 | **Informe al caer** (sugerencia 1): en la pantalla final, quién hizo más daño (enemigo y ataque), reparto por tipo (balas, contacto, cordura), vida y cordura de los últimos 60 s en una línea pequeña, vivos a la vez y características de dificultad en uso. En cooperativo, uno por jugador | Registro de golpes recibidos por jugador (quién y con qué ataque, junto al `Damage`), muestreo de vida y cordura cada segundo; panel nuevo en la pantalla final (`Menus`). En red, cada PC lo hace de sus jugadores. Se apunta también en `user://logs/dificultad.txt`. **Hecho (29-10-2026), pendiente de tu revisión:** `FallReport`, `Damage.via`/`who`, `Player.received_via`; en red, el nid del tirador en cada bala (`PROTOCOL` 12) |
-| 13.2 | **Historial de dificultades** (3) y **reparto del 4 al 6** (2): cada partida apunta su resultado (superado o caída, minuto, nivel) junto a sus características; en el menú de dificultad, las últimas 10 combinaciones con su resultado, para volver a una con A. Para el salto del 4 al 5, una tabla nueva simulada con el bot que tú apruebas o descartas | Resultado al final de cada partida en el registro; lista en `DifficultyMenu`. Tablas candidatas en `Difficulty.CATS` comparadas con `tools/simular.py --dif 3..7` (8 partidas por nivel). *Nota:* la dificultad elegida ya se conserva entre sesiones (`dif_levels`); por eso la idea 3 pasa a ser un historial con resultados |
+| 13.2 | **Historial de dificultades** (3) y **reparto del 4 al 6** (2): cada partida apunta su resultado (superado o caída, minuto, nivel) junto a sus características; en el menú de dificultad, las últimas 10 combinaciones con su resultado, para volver a una con A. Para el salto del 4 al 5, una tabla nueva simulada con el bot que tú apruebas o descartas | Resultado al final de cada partida en el registro; lista en `DifficultyMenu`. Tablas candidatas en `Difficulty.CATS` comparadas con `tools/simular.py --dif 3..7` (8 partidas por nivel). *Nota:* la dificultad elegida ya se conserva entre sesiones (`dif_levels`); por eso la idea 3 pasa a ser un historial con resultados. **Hecho (29-10-2026), pendiente de tu revisión:** «Partidas jugadas» en el menú; niveles 5 a 10 repartidos (bot: 4 → 6/8, 5 → 2/8, 6 → 1/8; aprobado) |
 
 ### Bloque B: primeros pasos
 

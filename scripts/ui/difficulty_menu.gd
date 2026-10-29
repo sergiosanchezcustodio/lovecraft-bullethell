@@ -42,7 +42,7 @@ func _ready() -> void:
 	box.add_theme_constant_override("separation", 8)
 	panel.add_child(box)
 	MenuKit.heading(box, "Dificultad (temporal)", 40, ACCENT)
-	var note := UiKit.label("Para calibrar el juego: el 3 es la de siempre; el 1, casi Investigador; el 5, Pesadilla.", 16, UiKit.TEXT_DIM)
+	var note := UiKit.label("Para calibrar el juego: el 3 es la de siempre; el 1, casi Investigador; el 6, algo más que Pesadilla.", 16, UiKit.TEXT_DIM)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(note)
 	_list = VBoxContainer.new()
