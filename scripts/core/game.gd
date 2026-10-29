@@ -46,6 +46,7 @@ extends Node3D
 ##   model=dyer_chibi        otro modelo para el J1 (probar prototipos)
 ##   bots=3                  jugadores de compañía manejados por la máquina (J2..J4, hito 2.9)
 ##   bot_chars=olmstead,…    personajes de esos bots (por defecto, los de inicio y los demás)
+##   weapons2=lanzaquimicos  armas de prueba del J2 (weapons3, weapons4; combinaciones, hito 13.7)
 ##   chest_every=5           un baúl arcano cada tantos segundos (por defecto, el del nivel)
 ##   pet=perro|gato          compañero del J1
 ##   pets=gato,perro         un compañero por jugador, en orden (con bots=N; reacciones, hito 12.9)
@@ -177,6 +178,7 @@ func _ready() -> void:
 	world.bounds = Rect2(-size * 0.5 - Vector2(6, 6), size + Vector2(12, 12))
 	world.obstacles = arena.get_meta("obstacles")
 	add_child(world)
+	Combos.attach(world, is_guest())                 # combinaciones en cooperativo (hito 13.7)
 	gems = GemManager.new()
 	gems.world = world
 	gems.rules = load("res://data/progression/default.tres")
@@ -278,6 +280,13 @@ func _ready() -> void:
 		for w in player.weapons.weapons.duplicate(): player.weapons.remove_weapon(w.data.id)
 	elif args.has("wlevel"):
 		for w in player.weapons.weapons: w.level = clampi(args.get_int("wlevel", 1), 1, w.data.max_level)
+	for q in players:                                 # weapons2=lanzaquimicos: armas de prueba del J2 (y 3, 4; hito 13.7)
+		var key := "weapons%d" % (q.index + 1)
+		if q.index == 0 or not args.has(key): continue
+		for w in q.weapons.weapons.duplicate(): q.weapons.remove_weapon(w.data.id)
+		for wid in args.get_str(key).split(",", false):
+			var w := q.weapons.add_weapon(load("res://data/weapons/%s.tres" % wid))
+			w.level = clampi(args.get_int("wlevel", 1), 1, w.data.max_level)
 	for up_id in args.get_str("items").split(",", false):     # items=iman,vida: objetos del J1 al empezar
 		player.progress.passives[up_id] = args.get_int("ilevel", 1)
 	if args.has("items"): player.rebuild_stats()

@@ -37,6 +37,9 @@ var _extra: Array[GPUParticles3D] = []
 func _ready() -> void:
 	Damage.ctx = _wtag
 	_ready_voxel()
+	add_to_group(&"combo_zones")
+	Combos.zone(self)                            # sobre lo que dejó otro jugador (hito 13.7)
+	Damage.ctx = _wtag
 
 ## Zonas en cubitos (11-10-2026): mancha animada en el suelo (`ground_fx`) y partículas.
 ## Fuego: llamas que acaban en humo y chispas. Ácido: burbujas que revientan y vapor.

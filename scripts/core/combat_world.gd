@@ -149,6 +149,9 @@ func apply_net(kind: String, a: Array, source: Node3D = null) -> void:
 			var cam := get_viewport().get_camera_3d() as GameCamera
 			if cam != null: cam.view_size = maxf(cam.view_size, float(a[0]))
 		"shout": _shout(String(a[0]), a[1], a[2], int(a[3]), float(a[4]), float(a[5]))
+		"combo":                                       # combinación decidida por el anfitrión (hito 13.7)
+			var c: Variant = get_meta("combos") if has_meta("combos") else null
+			if c != null and is_instance_valid(c): (c as Combos).replay(a)
 
 static func is_enemy(t: Node3D) -> bool:
 	return not t.is_in_group(&"breakable")

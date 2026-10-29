@@ -150,5 +150,6 @@ func _explode() -> void:
 	fx.radius = radius
 	fx.position = end
 	world.fx.add_child(fx)
+	Combos.blast(world, end, radius, _wtag)      # sobre gas de otro o sobre el agua (hito 13.7)
 	if is_instance_valid(_ring): _ring.queue_free()
 	queue_free()

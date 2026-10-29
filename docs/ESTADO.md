@@ -1369,6 +1369,21 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Con bots no hay pactos salvo pedidos. Pruebas: `pacts=noche,icor,estirpe` (en la partida o en la selección), `pact_open=true` (con `map=true`, abre la ventana) y `pact_menu=false` (el mapa empieza sin preguntar).
   - Hoja `shots/revision/2026-10-29/pactos.png` (ventana, aviso al empezar, charcos de icor y nivel superado). Tests en `test_pacts` (6). 555 de 555.
   - Mejoras pedidas por el autor (29-10-2026): en la ventana, cada pacto en dos líneas (el nombre; debajo, la maldición en rojo, una flecha y el premio en dorado), y en la cabecera del HUD, bajo los dólares, un sello rojo con los sellados por su nombre corto («✦ Noche · Icor · Estirpe», `short` en `data/pacts.json`, `Pacts.seal`). Capturas `shots/seleccion_pactos2_002.5s.png` y `shots/game_pactos_hud_009.0s.png`.
+- **Fase 13, hito 13.7: combinaciones en cooperativo (29-10-2026), pendiente de tu revisión.**
+  - Cuando el ataque de un jugador toca lo que dejó el de otro, pasa algo nuevo. Ocho (`Combos`, `scripts/core/combos.gd`; números en `data/combos.json`):
+    - **Nube tóxica:** fuego sobre el ácido de otro (o al revés): una nube de gas 1,4 veces mayor, 5 s, 22 de daño por s y vulnerables. Se consume el ácido.
+    - **Polvo ardiente:** fuego sobre el polvo de otro: estalla (34 de daño con caída hacia el borde, aturde 0,7 s).
+    - **Deflagración:** una explosión o un fuego sobre el gas de otro: explosión 1,5 veces mayor que la nube, 48 de daño.
+    - **Metralla:** una explosión sobre el agua (pozas, charcos, marea): 14 esquirlas en todas direcciones, 9 de daño cada una. La única que no necesita a otro jugador.
+    - **Tormenta de fuego:** la onda (fórmula, resonador) empuja hacia fuera las llamas de otro, un 30 % más grandes, un 40 % más fuertes y 2 s más largas.
+    - **Miasma:** la onda extiende el gas de otro (×1,6 de radio, ×1,25 de daño, 2,5 s más).
+    - **Prisma arcano:** el rayo (trapezoedro) que cruza el signo de otro se abre en dos más, a ±35°, con el 70 % del daño.
+    - **Charco conductor:** la electricidad (tesla) que toca a un enemigo en el ácido de otro salta a todos los del charco (60 % del daño, aturde 0,5 s).
+  - Las armas avisan: `DamageZone` al nacer (grupo `combo_zones`), `ThrownExplosive` al explotar, `Shockwave` al salir, `WeaponSystem._beam` y `_chain`; el `Sigil` va en el grupo `combo_sigils`. El dueño sale de la etiqueta del daño («J2:molotov», `Combos.owner_of`). Cada una espera 0,6 s antes de repetirse, y lo que se consume o se aviva ya no vuelve a combinarse. Su daño va con la etiqueta `combo`: no cuenta para ninguna arma (no suben ni evolucionan).
+  - La primera vez de cada una en el hueco (`SaveData.seen["combos"]`; sin hueco, en esta partida) sale un rótulo encima, «Nube tóxica / fuego sobre ácido», que sube y se apaga. `stats.combos` las cuenta.
+  - En red las decide el anfitrión (en el invitado `Combos.of` no devuelve nada): manda el suceso `combo` (id, sitio y lo que hace falta para verlo) y el invitado repite lo que se ve (`Combos.replay`: la nube, la explosión, las esquirlas, los rayos, las llamas de su copia y el rótulo). No lo he probado aún con dos ventanas: lo cubren los tests.
+  - Pruebas: `weapons2=lanzaquimicos` (y `weapons3`, `weapons4`): armas de los bots; `combos_solo=true` deja combinarse las de un mismo jugador; con `log=true`, «COMBO id en (x, z) t=». Con bots y dos armas, en 25 s salen de 3 a 7 de cada una.
+  - Hoja `shots/revision/2026-10-29/combinaciones.png` (nube tóxica, deflagración, prisma y tormenta; las capturas sueltas en `combos/`). Tests en `test_combos` (9). 564 de 564.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

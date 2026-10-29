@@ -365,6 +365,7 @@ func _beam(w: Weapon, target_pos: Vector3) -> bool:
 	var fx := Beam.new()
 	fx.setup(origin + Vector3(0, 1.0, 0), dir, length, half, w.stat("duration"))
 	world.fx.add_child(fx)
+	Combos.beam(world, origin, dir, length, half, dmg(w), tag_of(w))   # a través del signo de otro (hito 13.7)
 	fired.emit(w)
 	return true
 
@@ -495,6 +496,7 @@ func _chain(w: Weapon, target_pos: Vector3) -> bool:
 		d.bonus = player.data.bonus_tags
 		cur.take_damage(d)
 		if cur.has_method("stun") and cur.is_alive(): cur.stun(w.stat("stun"))
+		Combos.chain(world, cur, dmg(w) * k, tag_of(w))             # en el ácido de otro (hito 13.7)
 		k *= 0.85
 		var next: Node3D = null
 		var best := INF

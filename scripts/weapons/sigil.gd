@@ -33,6 +33,7 @@ func setup(p_world: CombatWorld, pos: Vector3, p_radius: float, p_life: float, p
 
 func _ready() -> void:
 	Damage.ctx = _wtag
+	add_to_group(&"combo_sigils")                # el rayo de otro jugador se abre al cruzarlo (hito 13.7)
 	# signo en celdas (11-10-2026): anillos con runas que giran, estrella de cinco puntas que
 	# gira al revés y motas violetas que suben
 	var g := VoxelFx.ground(7, radius)
