@@ -22,7 +22,7 @@ lock = threading.Lock()
 def run(w):
     cmd = ('godot --path . --resolution 640x360 -- level=%s fresh=true bot=smart god=true mute=true weather=no '
            'weapons=%s wlevel=%s nolevelup=true sim_time=%s timescale=4 final_at=99999 max_alive=70 spawn_rate=14 '
-           'cfg_difficulty=1 neutral=true character=%s') % (opt('--nivel', 'p1_n3'), w, opt('--wlevel', '5'), T, opt('--char', 'olmstead'))
+           'cfg_difficulty=3 neutral=true character=%s') % (opt('--nivel', 'p1_n3'), w, opt('--wlevel', '5'), T, opt('--char', 'olmstead'))
     p = subprocess.run(cmd, shell=True, cwd=ROOT, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=900)
     m = re.search(r'BANCO abatidos=(\d+) (\{.*\})', p.stdout)
     out = None

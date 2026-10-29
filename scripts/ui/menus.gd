@@ -91,6 +91,7 @@ class PauseMenu extends CanvasLayer:
 	signal resume
 	signal restart
 	signal debug
+	signal difficulty                           ## temporal (D-42): calibrar la dificultad
 	signal quit
 	var _buttons: Array[Button] = []
 	var guest := false                          ## en red, un invitado: solo Continuar y Menú principal
@@ -117,7 +118,7 @@ class PauseMenu extends CanvasLayer:
 		dim.add_child(ver)
 		box.add_theme_constant_override("separation", 14)
 		MenuKit.heading(box, "Pausa", 48)
-		var rows := [["Continuar", resume], ["Menú principal", quit]] if guest else 			[["Continuar", resume], ["Reiniciar", restart], ["Depuración", debug], ["Menú principal", quit]]
+		var rows := [["Continuar", resume], ["Menú principal", quit]] if guest else 			[["Continuar", resume], ["Dificultad (temporal)", difficulty], ["Reiniciar", restart], ["Depuración", debug], ["Menú principal", quit]]
 		for pair in rows:
 			var b := MenuKit.button(pair[0], MenuKit.INK, 28)
 			b.custom_minimum_size = Vector2(340, 58)
@@ -156,10 +157,11 @@ class PauseMenu extends CanvasLayer:
 			get_viewport().set_input_as_handled()
 			resume.emit()
 
-	## Vuelve a mostrarse al salir de la depuración, con el foco en su botón.
-	func show_again() -> void:
+	## Vuelve a mostrarse al salir de la depuración o la dificultad, con el foco en su botón.
+	func show_again(button := "Depuración") -> void:
 		visible = true
-		_buttons[2].grab_focus.call_deferred()
+		for b in _buttons:
+			if b.text == button: b.grab_focus.call_deferred()
 
 
 ## Fin de partida: caída o nivel superado, con un resumen y reintentar o salir.

@@ -41,7 +41,7 @@ var _lure_pos := Vector3.ZERO
 const VULNERABLE_MULT := 1.25
 # Arsenal II (hito 2.7)
 var giant: GiantMoves                        ## salto y erupciones de los grandes (o null)
-var pace_mult := 1.0                         ## dificultad: los de cuerpo a cuerpo, más rápidos
+var pace_mult := 1.0                         ## ritmo propio (la dificultad va aparte, en vivo: Difficulty)
 var anchored := false                       ## no se mueve ni lo empujan (Dagon, en la orilla)
 var _wade := 0.0                            ## 0..1: metido en agua somera (hunde el modelo)
 var _slow_t := 0.0                          ## s que va más lento (Polvo de Ibn-Ghazi)
@@ -180,7 +180,6 @@ func _ready() -> void:
 	if GiantMoves.applies(data) and not puppet:
 		giant = GiantMoves.new()
 		runner.over_walls = true
-	if data.attack == null: pace_mult = Difficulty.melee_speed()
 	runner.position.y = 0.6
 	add_child(runner)
 	_flash_mat = StandardMaterial3D.new()
@@ -684,7 +683,7 @@ func _physics_process(delta: float) -> void:
 	if (_far or world.enemies.size() > CROWD) and (Engine.get_physics_frames() + get_instance_id()) % 2 == 1:
 		velocity = _ai_vel
 	else:
-		velocity = behavior.update(self, target, delta) * pace_mult
+		velocity = behavior.update(self, target, delta) * pace_mult 			* (Difficulty.melee_speed() if data.attack == null else Difficulty.shooter_speed())   # en vivo (D-42)
 		_ai_vel = velocity
 	if Engine.get_physics_frames() % 15 == get_instance_id() % 15: _far = _far_from_players()
 	if _slow_t > 0.0: velocity *= _slow_k
@@ -746,7 +745,7 @@ func _physics_process(delta: float) -> void:
 			p.take_damage(cd.scaled(_weak_k) if _weak_t > 0.0 else cd)
 	# Ataque a distancia
 	if data.attack != null and target != null and _stun <= 0.0 and _confuse_t <= 0.0 and _madden_t <= 0.0 and behavior.can_shoot(self):
-		_attack_timer -= delta
+		_attack_timer -= delta * Difficulty.attack()                 # agresividad (D-42)
 		if _attack_timer <= 0.0 and not runner.busy and target.global_position.distance_to(global_position) < data.attack_range:
 			runner.fire(data.attack, func() -> Vector3: return target.global_position if is_instance_valid(target) else global_position)
 			if data.attack_anim != "": behavior.play_attack_anim(self, data.attack_anim)

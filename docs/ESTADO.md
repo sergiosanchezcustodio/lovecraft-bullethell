@@ -1293,6 +1293,24 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Retrato del abatido sin color (gris apagado; la sangre sigue roja encima), además de la sangre.
   - Retrato empañado en la ventisca del paso: un vaho de nieve que corre por encima, tanto como se ha cerrado (`Ambient.blizzard_now`).
   - Hoja `shots/revision/2026-10-29/retratos_mejoras.png`. Test nuevo en `test_scene_changes`. 523 de 523.
+- **Dificultad del 1 al 10 por características (29-10-2026, D-42, temporal), pendiente de tu calibración.** Pedida por el autor para calibrar el juego: diez niveles, el actual es el 3.
+  - Nueve características, cada una del 1 al 10 (tablas en `Difficulty.CATS`, `scripts/core/difficulty.gd`). El 3 es la Normal de antes, el 1 casi Investigador (con los enemigos algo más frágiles) y el 5 Pesadilla:
+    - Número de enemigos: ritmo de aparición 1,0 · 1,8 · **2,6** · 3,3 · 4,0 · 4,8 · 5,6 · 6,5 · 7,5 · 8,5 y vivos a la vez 1,0 · 1,25 · **1,5** · … · 2,7 (con el tope fijo de 240 vivos); la rampa del principio va con ella.
+    - Vida de los enemigos (hordas y élites) y vida de los jefes (los del final, `final_next`, los minijefes y los únicos), aparte: 0,8/0,7 · 0,9/0,85 · **1,0** · … · 2,25.
+    - Daño de los enemigos 1,0 · 1,2 · **1,4** · … · 3,3. Daño a la cordura: mental 1,0 · 1,35 · **1,7** · … · 3,9 y presencia 0,4 · 0,7 · **1,0** · … · 3,0.
+    - Velocidad: los de cuerpo a cuerpo 1,0 · 1,09 · **1,18** · … · 1,68; los que disparan, 1,0 hasta el 3 (como antes) y hasta 1,2.
+    - Nuevas: balas enemigas (velocidad, 0,85 · 0,92 · **1,0** · … · 1,5), agresividad (cadencia de sus disparos 0,8 · … · **1,0** · … · 1,75 y aviso en el suelo de los ataques con balas 1,2 · … · **1,0** · … · 0,65; los saltos y embestidas conservan su aviso, que va unido a su ataque) y élites a la vez (×0,5 · ×0,75 · **×1** · … · ×3, al menos una si el nivel tiene).
+  - Pausa > «Dificultad (temporal)» (`DifficultyMenu`, `scripts/ui/difficulty_menu.gd`): la general arriba (mueve todas; «Personalizada» si no coinciden), cada característica con lo que multiplica al lado («3 · ritmo ×2,6 · vivos ×1,5») y «Volver al 3». Se lee en vivo: al seguir jugando se nota; la vida, en los que salgan después. Se guarda en la configuración (`dif_levels`) y vale para los tres huecos; cada cambio se apunta en `user://logs/dificultad.txt` con fecha, nivel, minuto y los diez valores. El invitado no la ve en su pausa: manda la del anfitrión, que llega al empezar y al seguir tras cada pausa (`RESUME`; `PROTOCOL` 11).
+  - Configuración > Juego ya no tiene la dificultad; la guardada pasa a 1, 3 o 5. Herramientas: `simular.py --dif N` (3 por defecto) y los bancos de armas y objetos, en 3.
+  - **Tabla del bot** (`SmartBot`, Dyer, parte 1 nivel 1, sin compras, 4 partidas por nivel, `--ts 2`; superados y cuándo cae):
+
+    | Dificultad | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+    |---|---|---|---|---|---|---|---|---|---|---|
+    | Superados | 4/4 | 4/4 | 3/4 | 3/4 | 0/4 | 0/4 | 0/4 | 0/4 | 0/4 | 0/4 |
+    | Caídas (s) | | | 167 | 181 | 102-245 | 50-144 | 49-189 | 47-83 | 25-49 | 20-57 |
+
+    Del 4 al 5 hay un salto grande (de 3 de 4 a ninguna) y del 8 en adelante el bot no dura ni un minuto y medio. El bot no juega como una persona (reacciona algo tarde y no compra): sirve para comparar niveles, no para decir dónde está el límite de un jugador.
+  - Captura del menú: `shots/revision/2026-10-29/dificultad_menu.png`. Tests en `test_difficulty` (7). 530 de 530.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

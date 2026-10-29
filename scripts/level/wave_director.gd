@@ -208,7 +208,7 @@ func pick() -> EnemyData:
 	var cands: Array[EnemyData] = []
 	var weights: Array[float] = []
 	for d in level.pool:
-		if d.tier >= 4 and elites >= level.elite_cap: continue
+		if d.tier >= 4 and elites >= Difficulty.elites(level.elite_cap): continue
 		if d.unique: continue                       # seres únicos (D-04): solo como evento
 		var w := LevelData.weight(d.tier, level.number) * d.spawn_weight
 		if w <= 0.0: continue
@@ -290,7 +290,8 @@ func spawn(d: EnemyData, pos: Vector3) -> Enemy:
 	var e := Enemy.new().setup(d, world, obstacles)
 	e.health_scale = LevelData.coop(level.coop_health, players)     # más jugadores, más aguante
 	if d.unique: e.health_scale = 1.0 + (e.health_scale - 1.0) * 0.5   # los únicos, la mitad (con 4: ×1,65)
-	e.health_scale *= level.health_mult * Difficulty.health() * pact   # Pacto con el Hombre Negro (tienda)
+	var boss := d.unique or d == level.final_enemy or d == level.final_next or d in level.mid_enemies
+	e.health_scale *= level.health_mult * (Difficulty.boss_health() if boss else Difficulty.health()) * pact   # Pacto con el Hombre Negro (tienda)
 	e.health *= e.health_scale
 	e.position = pos
 	e.died.connect(_on_died)

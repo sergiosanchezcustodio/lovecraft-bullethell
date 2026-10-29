@@ -29,12 +29,13 @@ func fire(p: BulletPattern, p_aim: Callable) -> void:
 	_burst = 0
 	_timer = 0.0
 	if p.telegraph_time > 0.0:
-		var t := Telegraph.enemy(p.telegraph_radius, p.telegraph_time,
+		var warn := p.telegraph_time * Difficulty.warn()           # agresividad: menos aviso (D-42)
+		var t := Telegraph.enemy(p.telegraph_radius, warn,
 			Color(Damage.color_for(p.damage().kind()), 0.75))
 		t.position = Vector3(global_position.x, 0, global_position.z)
 		t.finished.connect(_begin)
 		var e := get_parent() as Enemy
-		if e != null: e.windup(p.telegraph_time)                 # se prepara con el cuerpo (hito 12.5)
+		if e != null: e.windup(warn)                             # se prepara con el cuerpo (hito 12.5)
 		world.fx.add_child(t)
 	else:
 		_begin()
@@ -54,7 +55,7 @@ func _physics_process(delta: float) -> void:
 	if damage_mult != 1.0: dmg = dmg.scaled(damage_mult)
 	for dir in pattern.directions(aim, _burst):
 		world.bullets.spawn(BulletManager.Team.ENEMY, pattern.style(), origin + dir * 0.5,
-			dir * pattern.speed, pattern.radius, pattern.size, dmg, pattern.lifetime,
+			dir * pattern.speed * Difficulty.bullet_speed(), pattern.radius, pattern.size, dmg, pattern.lifetime,
 			0, 1.0, -1, 0, 0.0, BulletManager.Effect.NONE, 0.0, BulletManager.OVER_WALLS if over_walls else -1)
 	_burst += 1
 	_timer = pattern.burst_interval

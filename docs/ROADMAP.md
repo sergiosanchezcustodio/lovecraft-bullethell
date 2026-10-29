@@ -213,6 +213,7 @@ Audio, equilibrado, accesibilidad, rendimiento final y distribución. Decidido e
 | 8.14 | **Ambiente vivo** en los 15 escenarios (`data/ambient.json`, `Ambient`), noches más legibles (`"gamma"` de la arena), bordes y mapas de la Biblioteca | Hecho, pendiente de revisión (16 y 17-10-2026) |
 | 8.15 | **Tienda ampliada** con 15 objetos, y cuervo y tres animaciones más en la portada | Hecho, pendiente de revisión (17 y 18-10-2026) |
 | 8.16 | **Subidas de nivel por turnos en cooperativo** (D-39): experiencia común, sube un jugador cada vez; equilibrio comprobado con 2 y 4 jugadores | Hecho, pendiente de tu prueba con varios mandos (20 y 21-10-2026) |
+| 8.17 | **Dificultad del 1 al 10 por características** (D-42, temporal, para calibrar): nueve características en la pausa, el 3 es la Normal de antes; tabla del bot del 1 al 10 | Hecho (29-10-2026), pendiente de tu calibración |
 
 ## Fase 9: Online
 

@@ -34,7 +34,7 @@ var defaults := {
 	"shake": 1.0,                           ## temblor de cámara (0..1)
 	"damage_numbers": 2,                    ## cifras de daño: 0 no, 1 solo los golpes fuertes, 2 todas (hito 11.2)
 	"quality": 2,                           ## calidad gráfica: 0 baja, 1 media, 2 alta, 3 ultra (Quality, hito 11.5)
-	"difficulty": 1,                        ## 0 investigador (la de antes), 1 normal, 2 pesadilla (Difficulty)
+	"dif_levels": {},                       ## dificultad (D-42, temporal): característica -> 1..10; sin ella, 3 (Difficulty)
 	"madness": true,                        ## locura acumulada (GDD 4.5)
 	"intro": 1,                             ## ficha e intro al arrancar: 0 siempre, 1 solo la primera vez (hito 5.2)
 	"intro_seen": false,
@@ -79,6 +79,11 @@ func load_file() -> void:
 	if parsed is not Dictionary: return
 	for k in parsed:
 		if k != "version" and defaults.has(k): values[k] = parsed[k]
+	if parsed.has("difficulty") and not parsed.has("dif_levels"):   # la de tres (hasta el 29-10-2026): 1, 3 o 5
+		var lv: int = [1, 3, 5][clampi(int(parsed.difficulty), 0, 2)]
+		var d := {}
+		for c in Difficulty.CATS: d[c] = lv
+		values["dif_levels"] = d
 
 func save_file() -> void:
 	var d := values.duplicate(true)

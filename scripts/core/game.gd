@@ -83,7 +83,7 @@ var _log_slot := 0                                ## último tramo de 30 s escri
 var _pause: Menus.PauseMenu
 var _shot_tag := ""                            ## sufijo de las capturas (tag=, y _inv en un invitado)
 var _halt_ui: CanvasLayer                      ## en red: aviso de la parada que ha puesto otro PC
-var _debug: DebugMenu
+var _debug: CanvasLayer                         ## la depuración o la dificultad, encima de la pausa
 var _info: Label                               ## depuración: FPS, enemigos, balas
 var _rng := RandomNumberGenerator.new()
 var _env: Environment
@@ -117,7 +117,8 @@ func set_weather(wd: WeatherData) -> void:
 func _ready() -> void:
 	var t_start := Time.get_ticks_msec()
 	args = LaunchArgs.from_cmdline()
-	Difficulty.net = -1                            # en red, el invitado recibe la del anfitrión (NetGame)
+	Difficulty.net = null                          # en red, el invitado recibe la del anfitrión (NetGame)
+	Difficulty.refresh()
 	Prof.enabled = args.get_bool("prof")
 	UiInput.configure()
 	OutfitData.override = {}                       # outfit=bombin,botas_nieve: prendas para probar
@@ -416,7 +417,8 @@ func _ready() -> void:
 	if args.has("debug_menu"):                     # abre la pausa y la depuración (capturas)
 		get_tree().create_timer(args.get_float("debug_menu", 1.0)).timeout.connect(func() -> void:
 			toggle_pause()
-			_open_debug())
+			if args.get_bool("dif_menu"): _open_difficulty()         # la dificultad (D-42)
+			else: _open_debug())
 	_shot_tag = ("_" + args.get_str("tag")) if args.has("tag") else ""
 	if is_guest(): _shot_tag += "_inv"                 # dos ventanas en el mismo PC: que no se pisen
 	if args.has("shots") or args.has("game_shots"):    # game_shots=: solo aquí (la selección también lee shots=)
@@ -694,6 +696,7 @@ func _open_pause() -> void:
 	_pause.resume.connect(toggle_pause)
 	_pause.restart.connect(_restart)
 	_pause.debug.connect(_open_debug)
+	_pause.difficulty.connect(_open_difficulty)
 	_pause.quit.connect(_quit)
 	add_child(_pause)
 
@@ -872,18 +875,28 @@ func _show_halt(text: String, buttons: Array) -> void:
 ## Menú de depuración, encima de la pausa (que se oculta mientras tanto).
 func _open_debug() -> void:
 	if _debug != null: return
-	_debug = DebugMenu.new(self)
+	var dm := DebugMenu.new(self)
+	dm.restart.connect(_restart)
+	_over_pause(dm, "Depuración")
+
+## Pausa > Dificultad (temporal, D-42): del 1 al 10 por características.
+func _open_difficulty() -> void:
+	if _debug != null: return
+	_over_pause(DifficultyMenu.new(self), "Dificultad (temporal)")
+
+## Un menú encima de la pausa (con back y close): al volver, el foco en su botón.
+func _over_pause(m: CanvasLayer, button: String) -> void:
+	_debug = m
 	_pause.visible = false
-	_debug.back.connect(func() -> void:
+	m.connect("back", func() -> void:
 		_debug.queue_free()
 		_debug = null
-		_pause.show_again())
-	_debug.close.connect(func() -> void:
+		_pause.show_again(button))
+	m.connect("close", func() -> void:
 		_debug.queue_free()
 		_debug = null
 		toggle_pause())
-	_debug.restart.connect(_restart)
-	add_child(_debug)
+	add_child(m)
 
 ## "Menú principal" (pausa y pantalla final): guarda y vuelve al menú de la portada. Sin
 ## hueco elegido (partida lanzada directamente), sale del juego.

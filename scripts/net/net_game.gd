@@ -168,8 +168,8 @@ func _ready() -> void:
 ## Lo que el anfitrión puede haber cambiado del nivel (pruebas: final_at, mid_at) y el HUD enseña.
 func _timing() -> Dictionary:
 	var lv: LevelData = game.director.level if game.director != null else null
-	if lv == null: return {"difficulty": Difficulty.level()}
-	return {"final_time": lv.final_time, "mid_times": Array(lv.mid_times), "difficulty": Difficulty.level()}
+	if lv == null: return {"difficulty": Difficulty.levels()}
+	return {"final_time": lv.final_time, "mid_times": Array(lv.mid_times), "difficulty": Difficulty.levels()}
 
 ## ¿Es de este PC el jugador?
 func is_mine(q: Player) -> bool:
@@ -625,7 +625,7 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 		GO:
 			if started: return
 			var lv: LevelData = game.director.level if game.director != null else null
-			if data is Dictionary and data.has("difficulty"): Difficulty.net = clampi(int(data.difficulty), 0, Difficulty.NAMES.size() - 1)
+			if data is Dictionary and data.get("difficulty") is Dictionary: Difficulty.set_net(data.difficulty)
 			if data is Dictionary and lv != null:         # los horarios del nivel, como los tiene el anfitrión
 				lv.final_time = float(data.get("final_time", lv.final_time))
 				var mids: Variant = data.get("mid_times")
@@ -678,6 +678,7 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 			if halt.is_empty(): return
 			halt = {}
 			_say("sigue" + (": " + String(data.get("text", "")) if data is Dictionary and String(data.get("text", "")) != "" else ""))
+			if data is Dictionary and data.get("difficulty") is Dictionary: Difficulty.set_net(data.difficulty)   # la pudo cambiar en la pausa
 			if game.has_method("net_resume"): game.net_resume(data if data is Dictionary else {})
 		PROG:
 			if data is Array and (data as Array).size() == 2 and data[1] is Dictionary:
@@ -1029,7 +1030,7 @@ func halt_all(d: Dictionary) -> void:
 ## anuncian los PC que no son el suyo; con `all`, todos (el anfitrión ha elegido por él).
 func resume_all(text := "", all := false) -> void:
 	if halt.is_empty(): return
-	var d := {"peer": int(halt.get("peer", 1)), "text": text, "all": all}
+	var d := {"peer": int(halt.get("peer", 1)), "text": text, "all": all, "difficulty": Difficulty.levels()}   # se pudo cambiar en la pausa (D-42)
 	halt = {}
 	_say("sigue" + (": " + text if text != "" else ""))
 	net.send(0, RESUME, d)

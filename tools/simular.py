@@ -4,7 +4,7 @@ resultado (15-10-2026). Lanza varias partidas a la vez, cada una en su ventana p
   python tools/simular.py p1 --n 6                 # parte 1 encadenada, en solitario, 6 partidas
   python tools/simular.py p2 --n 6 --bots 3        # cooperativo de 4 (J1 y 3 compañeros bot)
   python tools/simular.py p1_n3 --n 4              # un nivel suelto
-  opciones: --par N (a la vez, 3), --ts N (timescale, 2: a 4 el bot reacciona tarde y cae el doble de pronto), --skill 0.8, --shop N, --dif N (0..2),
+  opciones: --par N (a la vez, 3), --ts N (timescale, 2: a 4 el bot reacciona tarde y cae el doble de pronto), --skill 0.8, --shop N, --dif N (1..10, 3 por defecto),
             --char dyer, --extra "clave=valor ..."
 
 Imprime cada final ("SUPERADO p1_n2 t=…" / "DERROTA p1_n3 t=…") y un resumen por nivel:
@@ -24,7 +24,7 @@ chain = re.fullmatch(r'p\d', target) is not None
 level = target + '_n1' if chain else target
 cmd = ['godot', '--path', '.', '--resolution', '640x360', '--',
        'level=' + level, 'bot=smart', 'mute=true', 'log=true', 'quit_on_end=true', 'timescale=' + TS,
-       'skill=' + opt('--skill', '0.8'), 'cfg_difficulty=' + opt('--dif', '1'), 'weather=no']
+       'skill=' + opt('--skill', '0.8'), 'cfg_difficulty=' + opt('--dif', '3'), 'weather=no']
 if chain: cmd += ['autonext=true']
 if '--bots' in args: cmd += ['bots=' + opt('--bots', '3')]
 if '--shop' in args: cmd += ['shop=' + opt('--shop', '0')]
