@@ -86,6 +86,12 @@ static func set_cat(cat: String, lv: int) -> void:
 	cur[cat] = clampi(lv, 1, LEVELS)
 	_save(cur)
 
+## Todas a la vez (el historial de la pausa, hito 13.2): las que falten, al 3.
+static func set_levels(d: Dictionary) -> void:
+	var cur := {}
+	for c in CATS: cur[c] = clampi(int(d.get(c, BASE)), 1, LEVELS)
+	_save(cur)
+
 static func set_all(lv: int) -> void:
 	var cur := {}
 	for c in CATS: cur[c] = clampi(lv, 1, LEVELS)
@@ -158,9 +164,9 @@ static func _o(key: String, v: float) -> float:
 static func _arg_level(cat: String, v: int) -> int:
 	return int(_args().get(cat, v))
 
-## Para el registro: "numero 3, vida 4, …".
-static func describe() -> String:
-	var lv := levels()
+## Para el registro: "numero 3, vida 4, …" (de la actual o de `lv`).
+static func describe(lv: Dictionary = {}) -> String:
+	if lv.is_empty(): lv = levels()
 	var parts: Array[String] = []
-	for c in CATS: parts.append("%s %d" % [c, lv[c]])
+	for c in CATS: parts.append("%s %d" % [c, int(lv.get(c, BASE))])
 	return ", ".join(parts)

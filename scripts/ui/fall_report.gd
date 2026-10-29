@@ -8,6 +8,12 @@ extends RefCounted
 ## Los datos los apuntan `Player.recv_add` (origen y vía de cada golpe) y game.gd (cada segundo).
 
 const RUNS := "user://logs/dificultad_partidas.jsonl"
+
+## El registro de partidas; `dif_runs=res://…` lee otro (capturas del historial con datos de ejemplo).
+static func runs_path() -> String:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("dif_runs="): return a.substr(9)
+	return RUNS
 const HIST := 60                              ## s de vida y cordura que se dibujan
 ## Cómo se llama cada vía en el informe.
 const VIAS := {"bala": "balas", "contacto": "contacto", "golpe": "golpes", "zona": "charcos",
@@ -215,7 +221,7 @@ static func log_run(result: String, level_id: String, t: float, reports: Array) 
 		Difficulty.describe(), " | ".join(text)])
 	var rec := {"date": stamp, "level": level_id, "t": roundi(t), "result": result,
 		"levels": Difficulty.levels(), "players": people}
-	_append(RUNS, JSON.stringify(rec))
+	_append(runs_path(), JSON.stringify(rec))
 
 static func _append(path: String, line: String) -> void:
 	DirAccess.make_dir_recursive_absolute(path.get_base_dir())

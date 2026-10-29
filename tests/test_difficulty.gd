@@ -80,3 +80,33 @@ func test_el_menu_dice_lo_que_multiplica() -> void:
 	assert_eq(n.size(), 10)
 	assert_eq(n[2], "3  ·  ritmo ×2,6  ·  vivos ×1,5")
 	assert_eq(DifficultyMenu.names_for("vida")[9], "10  ·  ×2,25")
+
+func test_historial_agrupa_por_combinacion() -> void:
+	var path := "user://test_historial_dificultad.jsonl"
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	var all3 := {}
+	var mix := {}
+	for c in Difficulty.CATS:
+		all3[c] = 3
+		mix[c] = 4 if c == "vida" else 3
+	f.store_line(JSON.stringify({"date": "2026-10-29 10:00:00", "level": "p1_n1", "t": 63, "result": "caida", "levels": all3}))
+	f.store_line(JSON.stringify({"date": "2026-10-29 10:10:00", "level": "p1_n1", "t": 300, "result": "superado", "levels": all3}))
+	f.store_line("no es json")
+	f.store_line(JSON.stringify({"date": "2026-10-29 10:20:00", "level": "p1_n2", "t": 130, "result": "caida", "levels": mix}))
+	f.close()
+	var h := DifficultyMenu.history(path)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	assert_eq(h.size(), 2, "dos combinaciones")
+	assert_eq(String(h[0].level), "p1_n2", "la más reciente primero")
+	assert_eq(DifficultyMenu.general_of(h[0].levels), -1)
+	assert_eq(DifficultyMenu.general_of(h[1].levels), 3)
+	assert_eq([int(h[1].games), int(h[1].won)], [2, 1])
+	assert_string_contains(DifficultyMenu.results_text(h[1]), "caídas 1:03")
+	assert_eq(DifficultyMenu.history(path).size(), 0, "sin fichero, vacío")
+
+func test_diferencias_de_una_personalizada() -> void:
+	var lv := {}
+	for c in Difficulty.CATS: lv[c] = 4
+	lv["dano"] = 6
+	lv["velocidad"] = 5
+	assert_eq(DifficultyMenu.differences(lv), "daño 6, velocidad 5; el resto, 4")

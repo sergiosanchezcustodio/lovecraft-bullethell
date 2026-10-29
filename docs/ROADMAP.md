@@ -320,7 +320,7 @@ Pedida por el autor el 29-10-2026 («me gustan todas, establece un plan para hac
 
 **Aceptación:** el autor juega cada modo y cada sistema nuevo (solo y en cooperativo), encuentra su dificultad con el informe y el historial, y tiene en la mano una build de demo y un tráiler listos para itch.io.
 
-*Estado (29-10-2026):* plan aprobado por el autor («si, adelante»). **Hecho el 13.1**, pendiente de su revisión.
+*Estado (29-10-2026):* plan aprobado por el autor («si, adelante»). **Hechos el 13.1 y el historial del 13.2**, pendientes de su revisión; la tabla candidata del 4 al 6, simulada, espera su decisión.
 
 ### Bloque A: calibrar (lo primero, porque ayuda a probar todo lo demás)
 
