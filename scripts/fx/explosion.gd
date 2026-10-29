@@ -60,6 +60,28 @@ func _ready() -> void:
 	for r in ["fireball", "blast_smoke", "sparks", "debris"]:
 		fx.add_child(VoxelFx.emitter(r, radius, true))
 	VoxelFx.ensure_floor(get_parent())                 # suelo para que reboten los cascotes
+	WallScorch.at(get_parent(), global_position, radius * 1.1)   # hollín en la pared de al lado (hito 12.11)
+	if Ambient.step_now == "snow": _snow_blast()
+
+## En la nieve, la aparta: centro barrido y reborde amontonado (hito 12.11), que se queda como
+## las manchas (GroundMarks); en el agua somera, no.
+func _snow_blast() -> void:
+	var w := get_parent().get_parent() as CombatWorld
+	if w != null and w.obstacles != null and w.obstacles.water_at(Vector2(global_position.x, global_position.z)) > 0.3: return
+	var mi := MeshInstance3D.new()
+	var pm := PlaneMesh.new()
+	pm.size = Vector2(2, 2)
+	mi.mesh = pm
+	var m := ShaderMaterial.new()
+	m.shader = preload("res://scripts/fx/snow_blast.gdshader")
+	m.set_shader_parameter("seed", randf() * 100.0)
+	m.render_priority = -1                             # debajo del quemado
+	mi.material_override = m
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.scale = Vector3(radius * 1.3, 1.0, radius * 1.3)
+	add_child(mi)
+	mi.global_position = Vector3(global_position.x, 0.035, global_position.z)
+	GroundMarks.keep(get_parent(), mi, GroundMarks.LINGER + 10.0)
 
 func _flat_disc(c: Color) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()

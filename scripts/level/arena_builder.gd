@@ -5,6 +5,7 @@ extends RefCounted
 ## suelo, mar, piezas de atrezo con colisión, luces de los faroles y límites.
 
 const LAYER_WORLD := 1
+const VIS_DECOR := 4                    ## capa de dibujo del decorado: lo que reciben las quemaduras (WallScorch)
 ## Suelos de la parte 2 (town_ground.gdshader): nombre en el JSON -> `kind` del shader.
 const TOWN_KINDS := {"mud": 0, "cobble": 1, "planks": 2, "reef": 3, "rlyeh": 4}
 
@@ -80,6 +81,10 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 	root.set_meta("ambient", amb_items)
 	root.set_meta("obstacles", obstacles)
 	if not masked: root.add_child(_walls(size))
+	# el decorado, en su capa de dibujo: solo él recibe el hollín de las explosiones (WallScorch);
+	# el suelo, el mar y lo llano de detrás no (el suelo ya tiene su quemado)
+	for mi: MeshInstance3D in root.find_children("*", "MeshInstance3D", true, false):
+		if not String(mi.name) in ["Ground", "Sea", "Plateau", "CoastTop"]: mi.layers |= VIS_DECOR
 	return root
 
 ## Luz propia de la arena (JSON "light"): sol o luna y entorno. Claves opcionales: sun_rot

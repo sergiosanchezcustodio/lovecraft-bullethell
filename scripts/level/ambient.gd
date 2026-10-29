@@ -76,6 +76,7 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 	var pivots: Dictionary = m.get_meta("pivots")
 	var vs := float(m.get_meta("voxel_size"))
 	var out_ripples: Array = []
+	var candles: Array = []
 	for e: Dictionary in c.get("emit", []):
 		var at := String(e.get("at", ""))
 		if not pivots.has(at): continue
@@ -86,6 +87,7 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 			var dv := Vector3(e.dir[0], e.dir[1], e.dir[2]).normalized()
 			fx.basis = Basis.looking_at(-dv, Vector3.UP if absf(dv.y) < 0.95 else Vector3.FORWARD)
 		holder.add_child(fx)
+		if String(e.recipe) == "candle": candles.append(fx)          # las apagan las ondas (hito 12.11)
 		if e.get("ripples", false):                                 # ondas en el agua donde cae
 			var rp: Array = out_ripples
 			rp.append(fx.position)
@@ -100,6 +102,7 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 			holder.add_child(sp)
 			out["sound"] = [sp, float(c.sound.get("db", -18.0)), float(c.sound.get("range", 8.0)), float(c.sound.get("wind", 0.0))]
 	if not out_ripples.is_empty(): out["ripples"] = out_ripples
+	if not candles.is_empty(): out["candles"] = candles
 	if c.has("bob") and in_sea: out["bob"] = float(c.bob)
 	if c.has("swing") and (m.get_meta("part_nodes") as Dictionary).has(String(c.swing.get("part", ""))): out["swing"] = c.swing
 	if c.has("glow"): out["glow"] = c
@@ -194,6 +197,8 @@ var _rocks: Array = []                          ## [Vector2 centro, radio]: lo q
 var _rock_t := 0.0
 var _lights: Array = []                         ## [OmniLight3D, energía, modo, amount, speed, semilla]
 var _swings: Array[Dictionary] = []             ## faroles que cuelgan: parte, ángulo y velocidad
+var _candles: Array = []                        ## [llama, s que le quedan apagada (0: encendida), luz de su pieza]
+static var step_now := ""                       ## suelo de la arena en juego (Explosion: la nieve que aparta)
 var _mats_sky: Array[ShaderMaterial] = []       ## suelo y mar: estrellas y fugaces
 var _shoot_t := -1.0
 var _next_shoot := 8.0
@@ -268,6 +273,7 @@ func setup(p_arena: Node3D, p_camera: GameCamera, arena_id: String) -> Ambient:
 	cfg = (config().get("arenas", {}) as Dictionary).get(arena_id, {})
 	ground = String(cfg.get("step", "snow"))
 	_enemy_prints_on = bool(Quality.value("enemy_prints", true))   # en calidad Baja, solo las de los jugadores
+	step_now = String(cfg.get("step", ""))
 	night = float(cfg.get("night", 0.0))
 	_rng.seed = hash(arena_id)
 	demo = OS.get_cmdline_user_args().has("amb_demo=true")       # clips: todo enseguida
@@ -293,6 +299,7 @@ func _ready() -> void:
 			l.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # tiembla y baila en _process
 			_lights.append([l, l.light_energy, int(MODES.get(String(g.glow), 1)), float(g.get("amount", 0.2)), float(g.get("speed", 1.0)), seed_of(h.global_position), l.position])
 		if it.has("swing"): _add_swing(h, it.swing)
+		for fx: GPUParticles3D in it.get("candles", []): _candles.append([fx, 0.0, it.get("light")])
 		if it.has("sound"): _sounds.append(it.sound)
 		for lp: Vector3 in it.get("ripples", []): _ripplers.append([h.to_global(lp), 0.0])
 	for n in ["Ground", "Sea"]:
@@ -372,6 +379,48 @@ func _add_swing(h: Node3D, c: Dictionary) -> void:
 		"k": pow(TAU / p, 2.0), "deg": float(c.get("deg", 0.65)), "max": deg_to_rad(float(c.get("max", 28.0))),
 		"turb": float(c.get("turb", 0.8)), "inv": h.global_basis.orthonormalized().inverse()})
 
+## Lo que empujan ahora las ráfagas (Gusts: explosiones, ondas, esquives) en `pos`, hacia fuera
+## de cada una: fuerza en m por su caída con la distancia (la misma cuenta que gutter_at).
+static func _blast_push(pos: Vector3) -> Vector2:
+	var out := Vector2.ZERO
+	for g in Gusts.current:
+		if g.z <= 0.0: continue
+		var rel := Vector2(pos.x - g.x, pos.z - g.y)
+		var dist := rel.length()
+		if dist >= g.w: continue
+		out += (rel / maxf(dist, 0.01)) * g.z * (1.0 - smoothstep(g.w * 0.25, g.w, dist))
+	return out
+
+const SWING_KICK := 40.0                        ## rad/s² por m de ráfaga: una explosión al lado lo mece unos 20°
+
+## Velas (hito 12.11): una ráfaga fuerte (una explosión o una onda cerca, no un esquive) las
+## apaga con un hilo de humo y se vuelven a encender solas a los pocos segundos; la luz de su
+## pieza (el monolito del ritual) baja con las que quedan apagadas.
+const CANDLE_OUT := 0.95                        ## agitación (Gusts.gutter_at) que la apaga
+func _candle_step(delta: float) -> void:
+	var lit := {}                                # luz -> [encendidas, total]
+	for c: Array in _candles:
+		var fx: GPUParticles3D = c[0]
+		if not is_instance_valid(fx): continue
+		if c[1] > 0.0:
+			c[1] -= delta
+			if c[1] <= 0.0:
+				c[1] = 0.0
+				fx.restart()                     # vuelve a prender
+		elif Gusts.gutter_at(fx.global_position) >= CANDLE_OUT:
+			c[1] = _rng.randf_range(2.5, 4.5)
+			fx.emitting = false
+			VoxelFx.puff(self, fx.global_position + Vector3(0, 0.03, 0), "breath", 0.02, Color(0.55, 0.55, 0.58), 2.0)
+		var l = c[2]
+		if l != null and is_instance_valid(l):
+			var n: Array = lit.get(l, [0, 0])
+			n[0] += 1 if c[1] <= 0.0 else 0
+			n[1] += 1
+			lit[l] = n
+	for l: OmniLight3D in lit:
+		var n: Array = lit[l]
+		if n[0] < n[1]: l.light_energy *= 0.3 + 0.7 * float(n[0]) / float(n[1])
+
 ## Péndulo amortiguado empujado por el viento: se inclina a sotavento tanto más cuanto más
 ## sopla, y la turbulencia (cerca de su frecuencia propia) lo mece; las rachas lo agitan más.
 func _swing_step(delta: float, t: float) -> void:
@@ -388,6 +437,7 @@ func _swing_step(delta: float, t: float) -> void:
 		var turb: float = s.turb
 		var target: Vector2 = along * a * (1.0 + turb * (0.7 * sin(t * 3.1 + sd) + 0.3 * sin(t * 1.9 + sd * 1.7))) 			+ side * a * turb * 0.45 * sin(t * 2.6 + sd * 2.3)
 		var acc: Vector2 = -(s.k as float) * ((s.d as Vector2) - target) - 0.7 * (s.v as Vector2)
+		acc += _blast_push((s.part as Node3D).global_position) * SWING_KICK    # una explosión lo empuja (hito 12.11)
 		s.v += acc * dt
 		s.d = (s.d as Vector2) + (s.v as Vector2) * dt
 		s.d = (s.d as Vector2).limit_length(s.max)
@@ -467,6 +517,7 @@ func _process(delta: float) -> void:
 			var j := float(l[3]) * 0.35 / maxf((l[0] as Node3D).get_parent().scale.x, 0.01)
 			(l[0] as Node3D).position = (l[6] as Vector3) + Vector3(sin(t * 7.1 + sd) * sin(t * 2.3 + sd), 0.5 + 0.5 * sin(t * 5.3 + sd * 1.7), sin(t * 6.3 + sd * 2.1) * sin(t * 1.9 + sd)) * j
 	if not _swings.is_empty(): _swing_step(delta, t)
+	if not _candles.is_empty(): _candle_step(delta)
 	if not _clouds_done:
 		_clouds_done = true
 		var g := get_parent()
@@ -2746,3 +2797,6 @@ func _deck_step(delta: float) -> void:
 	_deck_front += delta * float(cfg.deck_water.get("speed", 9.0))
 	_deck.set_shader_parameter("k", _deck_k)
 	_deck.set_shader_parameter("front", _deck_front)
+
+func _exit_tree() -> void:
+	step_now = ""

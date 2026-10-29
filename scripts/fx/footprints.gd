@@ -69,7 +69,7 @@ func _add(pos: Vector3, yaw: float, size: Vector2, kind: String, strength: float
 	_life[i] = float(k[2])
 	_alpha[i] = float(k[1]) * clampf(strength, 0.0, 1.0)
 	_col[i] = k[0]
-	var b := Basis(Vector3.UP, yaw).scaled(Vector3(size.x, 1.0, size.y))
+	var b := Basis(Vector3.UP, yaw) * Basis.from_scale(Vector3(size.x, 1.0, size.y))   # escala en la huella, no en el mundo (con scaled se torcían)
 	multimesh.set_instance_transform(i, Transform3D(b, Vector3(pos.x, pos.y + 0.04, pos.z)))   # como las manchas (VoxelFx.ground): el suelo de algunas arenas pasa de 0
 	multimesh.set_instance_color(i, Color(_col[i], _alpha[i]))
 

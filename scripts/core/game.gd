@@ -49,6 +49,8 @@ extends Node3D
 ##   chest_every=5           un baúl arcano cada tantos segundos (por defecto, el del nivel)
 ##   pet=perro|gato          compañero del J1
 ##   pets=gato,perro         un compañero por jugador, en orden (con bots=N; reacciones, hito 12.9)
+##   blast=x,z,t;…           explosiones en esos puntos a esos s (faroles, velas, hollín y nieve, hito 12.11)
+##   crate=x,z,t;…           un rompible en ese punto que se rompe a esos s (astillas, hito 12.11)
 ##   panel=sheet|map         abre la ficha o el mapa (panel_player=N, panel_page=N, panel_at=s)
 
 const PLAYER_COLORS: Array[Color] = [Color(1.0, 0.82, 0.3), Color(0.35, 0.75, 1.0), Color(0.55, 1.0, 0.45), Color(1.0, 0.45, 0.8)]
@@ -360,6 +362,8 @@ func _ready() -> void:
 	Enemy.wounds_force = args.get_float("wounds", -1.0) if args.get_str("wounds", "").is_valid_float() else -1.0
 	Enemy.rise_enabled = args.get_bool("rise", true)   # hito 11.6
 	GroundMarks.limit = args.get_int("marks", GroundMarks.limit)
+	Debris.limit = GroundMarks.limit * Debris.PER_MARK       # restos de los rompibles (hito 12.11)
+	WallScorch.limit = GroundMarks.limit / 2                 # quemaduras en las paredes (hito 12.11)
 	hud = Hud.new().setup(players, director)
 	hud.money = func() -> int: return run_money
 	add_child(hud)
@@ -394,6 +398,20 @@ func _ready() -> void:
 	if args.get_int("dummies") > 0: _dummies(args.get_int("dummies"))
 	if args.get_bool("emitters"): _emitters()
 	if args.has("fx_demo"): _fx_demo(args.get_str("fx_demo"))
+	if args.has("blast"):                            # pruebas: blast=x,z,t;x,z,t explosiones ahí a esos s (hito 12.11)
+		for b in args.get_str("blast").split(";"):
+			var v := b.split(",")
+			get_tree().create_timer(float(v[2]), false).timeout.connect(func() -> void:
+				var fx := Explosion.new()
+				fx.radius = 2.2
+				fx.position = Vector3(float(v[0]), 0.0, float(v[1]))
+				world.fx.add_child(fx))
+	if args.has("crate"):                            # pruebas: crate=x,z,t;… un rompible ahí que se rompe a esos s (hito 12.11)
+		for b in args.get_str("crate").split(";"):
+			var v := b.split(",")
+			var br := Breakable.new().setup(world, Vector3(float(v[0]), 0.0, float(v[1])))
+			add_child(br)
+			get_tree().create_timer(float(v[2]), false).timeout.connect(func() -> void: if is_instance_valid(br): br.shatter())
 	if args.has("debug_menu"):                     # abre la pausa y la depuración (capturas)
 		get_tree().create_timer(args.get_float("debug_menu", 1.0)).timeout.connect(func() -> void:
 			toggle_pause()

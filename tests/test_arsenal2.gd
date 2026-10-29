@@ -78,7 +78,7 @@ func test_el_resonador_deshace_las_balas_que_alcanza() -> void:
 	_enemy_bullet(Vector3(12, 0, 0), Vector3.ZERO)
 	var w := _weapon(p, "resonador")
 	assert_true(p.weapons._pulse(w), "hay balas cerca: vibra")
-	var wave: Shockwave = world.fx.get_child(world.fx.get_child_count() - 1)
+	var wave: Shockwave = world.fx.get_children().filter(func(n: Node) -> bool: return n is Shockwave).back()
 	_run(wave, 0.5)
 	assert_eq(wave.cleared, 2)
 	assert_eq(world.bullets.count, 1, "la lejana sigue")

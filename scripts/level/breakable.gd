@@ -72,6 +72,7 @@ func shatter() -> void:
 	fx.setup(_model_id, 0.4, _model)
 	fx.position = global_position
 	world.fx.add_child(fx)
+	Debris.scatter(world.fx, global_position, DeathBurst.palette_of(_model_id, _model))   # astillas que se quedan (hito 12.11)
 	queue_free()
 
 # estados de los enemigos: un barril no se aturde ni se maldice

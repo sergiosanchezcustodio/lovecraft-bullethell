@@ -41,6 +41,7 @@ func _ready() -> void:
 	var dust := VoxelFx.emitter("ring_dust", _radius, true)
 	dust.position.y = 0.1
 	add_child(dust)
+	Gusts.push(get_parent(), global_position, 0.12 + _radius * 0.02, _radius * 1.3)   # telas, faroles y velas (hito 12.11)
 	_process(0.0)
 
 func current_radius() -> float:

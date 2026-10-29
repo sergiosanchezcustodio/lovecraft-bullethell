@@ -1250,6 +1250,17 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Ojo al capturar: la configuración de este PC tiene la calidad en Baja, así que las estelas no salen sin `cfg_quality=2`.
   - Hoja `shots/revision/2026-10-28/companeros_rastro.png` (plumas del cuervo, polvo de la polilla, bruma del sabueso, chispas del Mi-Go, huellas del perro en la nieve y en el barro).
   - Tests en `test_pet_trails` (6). 497 de 497.
+- **Fase 12, hito 12.11: luz que reacciona y destrucción que se queda (29-10-2026), pendiente de tu revisión:**
+  - Faroles colgados: una explosión cercana les da un empujón hacia fuera (`Ambient._blast_push`, que lee las ráfagas de `Gusts`; `SWING_KICK`). En el muelle, el farol pasa de unos 4° de viento a 26° y se calma en unos 2 s. Las ondas (`Shockwave`) también empujan ahora telas, plantas y faroles (`Gusts.push`).
+  - Velas del ritual (las del monolito, receta `candle`): una explosión u onda cerca las apaga unos segundos y la luz de la pieza baja con ellas; después vuelven a prender (`Ambient._candle_step`, `CANDLE_OUT`). Un esquive al lado no las apaga.
+  - Rompibles: al romperse dejan astillas y tiestos de sus colores en el suelo, que a los 22 s se hunden (`Debris`, un MultiMesh con tope: el de las manchas por 8, `Debris.limit`).
+  - Explosiones en la nieve: apartan la nieve (centro barrido, reborde amontonado en terrones; `snow_blast.gdshader`), que se queda como las manchas (`GroundMarks`). En el agua somera, no.
+  - Hollín: una explosión junto al decorado (a menos del radio, según `ObstacleMap`) le deja hollín con una calca que proyecta hacia abajo y solo pinta el decorado (capa de dibujo `ArenaBuilder.VIS_DECOR`, que llevan todas las mallas de la arena menos el suelo, el mar, la meseta y lo alto de la costa): en las paredes queda en vertical, más fuerte abajo y difuminado hacia arriba, y encima de cajas y barriles, una mancha. 30 s y tope (`WallScorch.limit`, la mitad del de las manchas). Sobre la madera oscura de la cabaña se nota poco (la oscurece un 50-70 %, medido); en piedra y hielo, más.
+  - Probado primero con una calca por pared, girada hacia ella: no se veía nunca (la cara del muro y la máscara de obstáculos no coinciden). La calca hacia abajo es más sencilla y pinta todas las caras a la vez.
+  - De paso: las huellas (`Footprints`) se escalaban en el marco global (`Basis.scaled`); ahora en el suyo. Dos tests buscaban la onda como último hijo de `world.fx`, donde ahora puede estar `Gusts`.
+  - Opciones de prueba: `blast=x,z,t;…` (explosiones ahí a esos s) y `crate=x,z,t;…` (un rompible que se rompe a esos s).
+  - Hoja `shots/revision/2026-10-29/escenario_reacciona.png` (cabaña antes y después, nieve apartada y hollín en los barriles, astillas, velas antes, apagadas y vueltas a prender).
+  - Tests en `test_scene_reacts` (7). 504 de 504.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

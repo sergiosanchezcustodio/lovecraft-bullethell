@@ -159,7 +159,7 @@ func test_la_onda_empuja_aturde_y_golpea_una_vez() -> void:
 	var far := _enemy([] as Array[StringName], Vector3(12, 0, 0))
 	world.rebuild_grid()
 	assert_true(p.weapons._fire(w))
-	var wave: Shockwave = world.fx.get_child(world.fx.get_child_count() - 1)
+	var wave: Shockwave = world.fx.get_children().filter(func(n: Node) -> bool: return n is Shockwave).back()
 	for i in 60: wave._physics_process(1.0 / 60.0)
 	assert_almost_eq(near.health, 1000.0 - p.weapons.dmg(w), 0.01, "una sola vez")
 	assert_gt(near._stun, 0.0)
