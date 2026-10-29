@@ -373,6 +373,7 @@ func _ready() -> void:
 			if k.begins_with("glow|") and _mats[k] is ShaderMaterial and int((_mats[k] as ShaderMaterial).get_shader_parameter("mode")) == 4:
 				_heart_mats.append(_mats[k])
 	_make_puddle_map.call_deferred()
+	if cfg.has("changes"): _changes_ready()
 
 ## Farol que cuelga: su parte gira sobre el gancho y se lleva la luz y el halo de niebla.
 func _add_swing(h: Node3D, c: Dictionary) -> void:
@@ -601,6 +602,7 @@ func _process(delta: float) -> void:
 	if cfg.has("rats"): _rat_step(delta)
 	if _deck != null: _deck_step(delta)
 	if not _hearts.is_empty(): _heart_step(delta)
+	if cfg.has("changes"): _changes_step(delta, t)
 	if cfg.has("lurkers"): _lurk_step(delta, t)
 	if cfg.has("ship_lights") and not _sea.is_empty(): _ship_step(delta, t)
 
@@ -3219,6 +3221,97 @@ func _make_ship(p: Vector2, vel: Vector2) -> void:
 	var yaw := atan2(-vel.y, vel.x)                                                     # la proa (+X del barco) hacia donde va
 	b.rotation.y = yaw
 	_ships.append({"node": b, "vel": vel, "yaw": yaw, "mats": mats, "k": 0.0, "ph": _rng.randf()})
+
+# ---------------- el escenario cambia durante el nivel (hito 12.13, D-41) ----------------
+# "changes" en la arena: cada cambio sube de 0 a 1 entre `from` y `to` (fracción del tiempo hasta
+# el evento final) y se queda en 1 después. Lo que cambia el juego (la marea) sale del reloj del
+# director, así que en red todos los PC lo ven igual. Opción de prueba: changes=0.8 los fija ahí.
+# - tide: la marea del arrecife (file: tools/gen_marea.py; max m; sea: m que sube el mar). El
+#   agua nueva frena como la de siempre (ObstacleMap.tide_level) y el suelo la dibuja.
+# - blizzard: la ventisca del paso se cierra: el clima pasa de `calm` a lo peor de su WeatherData
+#   (Weather.set_intensity) y un velo de nieve tapa la pantalla salvo alrededor de los jugadores
+#   (whiteout.gdshader: veil, cuánto tapa; clear [m, m], el radio despejado al principio y al final).
+# - tilt: R'lyeh se inclina al acercarse Cthulhu (solo la cámara: deg, y sway de vaivén lento).
+var _changes_k := -1.0                          ## el valor fijado con changes= (<0: el del reloj)
+var _sea_base := 0.0
+var _veil: ShaderMaterial
+var _veil_rect: ColorRect
+
+## De 0 a 1 entre from y to (fracción de final_time), suave.
+static func change_k(c: Dictionary, t: float, final_time: float) -> float:
+	if final_time <= 0.0: return 1.0
+	return smoothstep(float(c.get("from", 0.0)), float(c.get("to", 1.0)), t / final_time)
+
+func _changes_ready() -> void:
+	var c: Dictionary = cfg.changes
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("changes="): _changes_k = clampf(a.get_slice("=", 1).to_float(), 0.0, 1.0)
+	if c.has("tide"):
+		var obstacles: ObstacleMap = arena.get_meta("obstacles")
+		if obstacles != null and obstacles.load_tide(String(c.tide.file)) and _ground_mat != null:
+			_ground_mat.set_shader_parameter("tide_tex", obstacles.tide_texture())
+		var sea := arena.get_node_or_null("Sea") as Node3D
+		if sea != null: _sea_base = sea.position.y
+	if c.has("blizzard") and DisplayServer.get_name() != "headless":
+		var layer := CanvasLayer.new()
+		layer.layer = -1                                            # encima del mundo, debajo del HUD
+		_veil = ShaderMaterial.new()
+		_veil.shader = preload("res://scripts/fx/whiteout.gdshader")
+		var tn: Array = c.blizzard.get("tint", [0.78, 0.84, 0.92])
+		_veil.set_shader_parameter("tint", Color(tn[0], tn[1], tn[2]))
+		_veil_rect = ColorRect.new()
+		_veil_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+		_veil_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_veil_rect.material = _veil
+		layer.add_child(_veil_rect)
+		add_child(layer)
+
+func _changes_step(_delta: float, t: float) -> void:
+	var c: Dictionary = cfg.changes
+	var g := get_parent()
+	var d: WaveDirector = g.director if g != null and "director" in g else null
+	var now := d.time if d != null else 0.0
+	var ft := d.level.final_time if d != null and d.level != null else 240.0
+	if c.has("tide"): _tide_step(c.tide, _k(c.tide, now, ft))
+	if c.has("blizzard"): _blizzard_step(c.blizzard, _k(c.blizzard, now, ft))
+	if c.has("tilt") and camera != null:
+		var k := _k(c.tilt, now, ft)
+		var deg := float(c.tilt.get("deg", 4.0)) * k + float(c.tilt.get("sway", 1.2)) * k * sin(t * 0.21) * sin(t * 0.13 + 1.0)
+		camera.tilt = deg_to_rad(deg) * float(Auto.setting("shake", 1.0))     # sin temblores, sin mareo
+
+func _k(c: Dictionary, now: float, ft: float) -> float:
+	return _changes_k if _changes_k >= 0.0 else change_k(c, now, ft)
+
+func _tide_step(c: Dictionary, k: float) -> void:
+	var lvl := float(c.get("max", 1.5)) * k
+	var obstacles: ObstacleMap = arena.get_meta("obstacles")
+	if obstacles != null: obstacles.tide_level = lvl
+	if _ground_mat != null: _ground_mat.set_shader_parameter("tide", lvl)
+	var sea := arena.get_node_or_null("Sea") as Node3D
+	if sea != null:
+		sea.position.y = _sea_base + float(c.get("sea", 0.4)) * k
+		if not _sea.is_empty(): _sea.level = sea.position.y
+
+func _blizzard_step(c: Dictionary, k: float) -> void:
+	var w := _weather()
+	if w != null: w.set_intensity(k, float(c.get("calm", 0.12)))
+	if _veil == null or camera == null: return
+	var view := get_viewport().get_visible_rect().size
+	var arr := PackedVector4Array()
+	for pl in _players():
+		if arr.size() >= 4: break
+		if not is_instance_valid(pl) or camera.is_position_behind(pl.global_position): continue
+		var sp := camera.unproject_position(pl.global_position + Vector3(0, 0.8, 0)) / view
+		arr.append(Vector4(sp.x, sp.y, 1.0 if pl.health > 0.0 else 0.0, 0.0))
+	arr.resize(4)
+	var cl: Array = c.get("clear", [9.0, 4.5])
+	_veil.set_shader_parameter("players", arr)
+	_veil.set_shader_parameter("clear", lerpf(cl[0], cl[1], k) / maxf(camera.size, 1.0))
+	_veil.set_shader_parameter("strength", float(c.get("veil", 0.8)) * k)
+	_veil.set_shader_parameter("aspect", view.x / maxf(view.y, 1.0))
+	if w != null and w.data != null:
+		var wv := camera.global_basis.inverse() * w.data.wind_vector()       # el viento en ejes de la pantalla
+		_veil.set_shader_parameter("wind", Vector2(wv.x, -wv.y) * 0.05 * lerpf(0.6, 1.4, k))
 
 func _exit_tree() -> void:
 	step_now = ""

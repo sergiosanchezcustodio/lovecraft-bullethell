@@ -130,6 +130,7 @@ func snap() -> void:
 	position = desired_position()
 
 var _shake := 0.0                  ## m de temblor (jefes: rugidos y golpes); se apaga solo
+var tilt := 0.0                    ## rad de giro alrededor de la vista (R'lyeh que se inclina, hito 12.13; Ambient)
 
 ## Tiembla la cámara (hito 6.6): amount en metros; se suma y decae en unas décimas.
 const SHAKE_SCALE := 0.45                  ## los temblores, a menos de la mitad
@@ -154,10 +155,10 @@ func _process(delta: float) -> void:
 		_shake_t += delta * SHAKE_FREQ
 		var n := Vector3(_noise(_shake_t, 0), _noise(_shake_t, 101), _noise(_shake_t, 211))
 		position += (transform.basis.x * n.x + transform.basis.y * n.y) * _shake
-		rotation.z = n.z * _shake * SHAKE_ROLL
+		rotation.z = tilt + n.z * _shake * SHAKE_ROLL
 		_shake = move_toward(_shake, 0.0, delta * maxf(_shake * 3.0, 0.2))
-	elif rotation.z != 0.0:
-		rotation.z = 0.0
+	elif rotation.z != tilt:
+		rotation.z = tilt
 
 ## Ruido suave de -1 a 1 (valores al azar en los enteros, unidos con una curva).
 static func _noise(t: float, seed: int) -> float:

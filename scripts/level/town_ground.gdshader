@@ -40,6 +40,8 @@ uniform vec3 ballast_hi : source_color = vec3(0.42, 0.40, 0.37);
 uniform vec3 ballast_lo : source_color = vec3(0.24, 0.22, 0.20);
 // agua somera del pantano (hito 6.4): la capa "water" del mapa de la arena (la misma que frena)
 uniform sampler2D water_tex : filter_linear, repeat_disable;
+uniform sampler2D tide_tex : filter_linear, repeat_disable;   // hito 12.13: m hasta el agua (/16), de tools/gen_marea.py
+uniform float tide = 0.0;                     // m que ha subido la marea (Ambient)
 uniform vec2 water_origin = vec2(-50.0);
 uniform float water_extent = 0.0;            // 0: sin agua
 uniform vec3 water_deep : source_color = vec3(0.13, 0.19, 0.21);
@@ -310,6 +312,7 @@ void fragment() {
 		col = mix(col, puddle, wetm);
 		if (water_extent > 0.0) {                                      // ciénaga: agua quieta con lentejas
 			float wv = texture(water_tex, (pc - water_origin) / water_extent).r;
+			if (tide > 0.0) wv = max(wv, 0.5 + (tide - texture(tide_tex, (pc - water_origin) / water_extent).r * 255.0 / 16.0) * 0.35);
 			wv += (fbm(pc * 0.9 + 13.0) - 0.5) * 0.35;                  // orilla irregular, no a celdas de 25 cm
 			float inw = step(0.5, wv);
 			float shore = step(0.38, wv) * (1.0 - inw);                 // barro mojado en la orilla

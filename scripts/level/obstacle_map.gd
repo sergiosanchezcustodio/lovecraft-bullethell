@@ -18,6 +18,8 @@ var _origin := Vector2.ZERO
 var _dist_step := 1.0 / 32.0
 var boss_spots: Array[Vector2] = []      ## simas de las que sale el jefe (arena "boss_spots", hito 6.6)
 var _water := PackedByteArray()          ## N × N: agua somera (0..255), si la arena la tiene (hito 6.4)
+var _tide := PackedByteArray()           ## N × N: m hasta el agua, en 1/16 m (tools/gen_marea.py, hito 12.13)
+var tide_level := 0.0                    ## m que ha subido la marea: lo que está a menos del agua, también lo es
 
 func add_circle(center: Vector2, radius: float) -> void:
 	_circles.append(Vector3(center.x, center.y, radius))
@@ -48,12 +50,28 @@ func load_mask(def: Dictionary) -> bool:
 	bounds = Rect2(_origin + lo * _cell, (hi - lo) * _cell)
 	return true
 
-## ¿Hay agua somera en ese punto? (0: seco, 1: agua). Por celda, sin interpolar.
+## ¿Hay agua somera en ese punto? (0: seco, 1: agua). Por celda, sin interpolar. Con marea, lo
+## que está a menos de tide_level m del agua también: 0,5 justo en la orilla nueva.
 func water_at(pos: Vector2) -> float:
 	if _water.is_empty(): return 0.0
 	var i := int(floor((pos.x - _origin.x) / _cell)); var j := int(floor((pos.y - _origin.y) / _cell))
 	if i < 0 or j < 0 or i >= _n or j >= _n: return 0.0
-	return _water[j * _n + i] / 255.0
+	var w := _water[j * _n + i] / 255.0
+	if tide_level > 0.0 and not _tide.is_empty():
+		w = maxf(w, clampf(0.5 + (tide_level - _tide[j * _n + i] / 16.0) * 1.5, 0.0, 1.0))
+	return w
+
+## Carga el mapa de la marea (tools/gen_marea.py); false si no encaja con el mapa del agua.
+func load_tide(path: String) -> bool:
+	var t := FileAccess.get_file_as_bytes(path)
+	if _water.is_empty() or t.size() != _n * _n: return false
+	_tide = t
+	return true
+
+## La marea como textura (L8, N × N, m hasta el agua en 1/16 m) para el suelo, o null.
+func tide_texture() -> ImageTexture:
+	if _tide.is_empty(): return null
+	return ImageTexture.create_from_image(Image.create_from_data(_n, _n, false, Image.FORMAT_L8, _tide))
 
 ## Punto de agua somera al azar entre rmin y rmax de center, libre para un cuerpo de radio r
 ## (Vector2.INF si no hay). Para los que salen del agua (hito 6.4).

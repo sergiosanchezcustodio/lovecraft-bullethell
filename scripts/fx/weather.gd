@@ -8,7 +8,8 @@ extends Node3D
 ## - niebla: dos capas de bancos bajos (weather_mist.gdshader);
 ## - sombras de nubes sobre el suelo (weather_clouds.gdshader, mezcla multiplicativa);
 ## - rayos: destello de una luz direccional y de la luz ambiental.
-## No toca a jugadores ni enemigos.
+## No toca a jugadores ni enemigos. `set_intensity` lo suaviza todo sin rehacerlo (la ventisca que
+## se cierra durante el nivel, hito 12.13: el WeatherData es el clima en lo peor).
 
 var data: WeatherData
 var camera: GameCamera
@@ -33,6 +34,9 @@ var _next_bolt := 0.0
 var _bolt_t := -1.0
 var _rng := RandomNumberGenerator.new()
 var _rain: AudioStreamPlayer                 ## lluvia en bucle (16-10-2026), más fuerte con las rachas
+var intensity := 1.0                         ## 0..1 (hito 12.13): cuánto del clima de data hay ahora
+var _calm := 0.0                             ## lo que queda con intensidad 0 (fracción de lo peor)
+var _fog_base := -1.0                        ## la niebla general del entorno sin este clima
 
 const AREA := 24.0                           ## medio lado de la zona cubierta (m)
 const TOP := 9.0                             ## altura a la que nace la precipitación
@@ -53,6 +57,7 @@ func setup(p_data: WeatherData, p_camera: GameCamera, p_env: Environment, p_amou
 func _ready() -> void:
 	if env != null:
 		_base_ambient = env.ambient_light_energy
+		_fog_base = env.fog_density
 		if data.fog_density >= 0.0: env.fog_density = data.fog_density
 	match data.precip:
 		WeatherData.Precip.SNOW: _make_precip(false)
@@ -352,7 +357,7 @@ func _process(delta: float) -> void:
 	_t += delta
 	var f := focus()
 	var wv := data.wind_vector()
-	var w := data.wind_at(_t)
+	var w := data.wind_at(_t) * _wind_now_k()
 	if _precip:
 		# nace a barlovento para que, al caer inclinada, cubra la vista
 		var lead := wv * w * (TOP / maxf(data.fall_speed, 0.1)) * 0.5
@@ -388,6 +393,24 @@ func _process(delta: float) -> void:
 		_cloud_mat.set_shader_parameter("offset", _cloud_off)
 	if data.lightning_every > 0.0: _lightning(delta)
 	if _rain != null: _rain_step(delta)
+
+## Cuánto del clima hay ahora (hito 12.13): 0 deja `calm` de la nieve, la ventisca y los copos
+## cercanos (amount_ratio, sin rehacer las partículas), la niebla baja a la mitad de su paso, el
+## viento a la mitad y la niebla general en la del entorno; 1, todo lo de data.
+func set_intensity(k: float, calm := 0.12) -> void:
+	intensity = clampf(k, 0.0, 1.0)
+	_calm = calm
+	var r := lerpf(calm, 1.0, intensity)
+	for p: GPUParticles3D in [_precip, _drift, _near]:
+		if p != null: p.amount_ratio = r
+	for i in _mist.size():
+		_mist[i].set_shader_parameter("opacity", data.mist * (1.0 if i == 0 else 0.55) * lerpf(0.5, 1.0, intensity))
+	if env != null and data.fog_density >= 0.0 and _fog_base >= 0.0:
+		env.fog_density = lerpf(_fog_base, data.fog_density, intensity)
+
+## Fuerza del viento ahora, con la intensidad.
+func _wind_now_k() -> float:
+	return lerpf(0.5, 1.0, intensity)
 
 ## Huecos en la niebla baja (Ambient: el calor de las hogueras), [Vector4(x, z, radio, calor)].
 func set_mist_holes(h: Array) -> void:
