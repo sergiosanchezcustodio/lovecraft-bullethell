@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="OutfitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/outfit_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"botas_montar"
+display_name = "Botas de montar"
+description = "Negras, de caña alta y con espuela."
+slot = 2
+price = 1800
+order = 7

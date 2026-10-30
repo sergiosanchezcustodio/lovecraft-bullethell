@@ -1094,6 +1094,133 @@ def harapos(M, bd):
     return {RAG: 'lona', RAG_SH: 'lona'}
 
 
+# ------------------------------------------------------------------ fase 14: pies (30-10-2026)
+
+def _foot_cx(bd, s):
+    return (4.5 if bd['fem'] else 5) * s
+
+
+def botas_agua(M, bd):
+    """Botas de agua de goma verde oscuro hasta media pierna, con la suela gruesa y una franja."""
+    GREEN = (0.16, 0.24, 0.16); SOLE = (0.08, 0.07, 0.06); BAND = (0.26, 0.36, 0.22)
+    _boot(M, bd, GREEN, SOLE, 20, pad=2)
+    for (x, y, z), v in M.V.items():
+        if v[1] == GREEN and y in (18, 19): v[1] = BAND
+    return {}
+
+
+def zapatos_bicolor(M, bd):
+    """Zapatos bicolores de gánster: blancos con puntera y talón marrones, y calcetín negro."""
+    WHITE = (0.92, 0.90, 0.84); BROWN = (0.36, 0.20, 0.10); SOLE = (0.10, 0.08, 0.06); SOCK = (0.06, 0.06, 0.07)
+    for s, _, shin, _, _ in cu.sides():
+        cx = _foot_cx(bd, s)
+        slab(M, shin, SOLE, 0, 1, cx, 1.5, 10, 10, 16, 16, ch=1)
+        slab(M, shin, WHITE, 1, 4, cx, 1.5, 10, 9.5, 16, 14, ch=1)
+        slab(M, shin, SOCK, 4, 9, cx, -0.3, 9.5, 9.5, 10, 10, ch=1)
+    for (x, y, z), v in M.V.items():
+        if v[1] == WHITE and (z >= 6 or z <= -5): v[1] = BROWN
+    return {WHITE: 'cuero', BROWN: 'cuero'}
+
+
+def sandalias_calcetines(M, bd):
+    """Sandalias de cuero con calcetines blancos hasta media pierna: el turista de Arkham."""
+    SOCK = (0.92, 0.91, 0.86); STRIPE = (0.40, 0.52, 0.72); LEATHER = (0.48, 0.30, 0.16); SOLE = (0.22, 0.14, 0.08)
+    for s, _, shin, _, _ in cu.sides():
+        cx = _foot_cx(bd, s)
+        slab(M, shin, SOLE, 0, 1, cx, 1.5, 10.5, 10.5, 16.5, 16.5, ch=1)
+        slab(M, shin, SOCK, 1, 4, cx, 1.5, 10, 9.5, 16, 14, ch=1)
+        slab(M, shin, SOCK, 4, 18, cx, -0.3, 10, 10, 10.5, 10.5, ch=1)
+        for y in (16, 17):
+            slab(M, shin, STRIPE, y, y + 1, cx, -0.3, 10.2, 10.2, 10.7, 10.7, ch=1)
+    for (x, y, z), v in M.V.items():                                       # tiras de la sandalia
+        if v[1] == SOCK and y <= 4 and (z % 4 == 0 or y == 4) and M.exposed((x, y, z)): v[1] = LEATHER
+    return {SOCK: 'punto', STRIPE: 'punto', LEATHER: 'cuero'}
+
+
+def botas_montar(M, bd):
+    """Botas de montar negras de caña alta hasta la rodilla, con espuela de latón."""
+    BLACK = (0.19, 0.11, 0.07); SOLE = (0.05, 0.04, 0.03); BRASS = (0.80, 0.62, 0.28); CUFF = (0.36, 0.22, 0.12)
+    _boot(M, bd, BLACK, SOLE, 27, cuff=CUFF, pad=1.5)
+    for s, _, shin, _, _ in cu.sides():
+        cx = int(round(_foot_cx(bd, s)))
+        zs = [z for (x, y, z), v in M.V.items() if v[0] == shin and y == 4 and x == cx]
+        if zs:
+            M.put(cx, 4, min(zs) - 1, shin, BRASS); M.put(cx, 4, min(zs) - 2, shin, BRASS)
+            M.put(cx - 1, 4, min(zs) - 1, shin, BRASS)
+    return {BLACK: 'cuero'}
+
+
+def raquetas_nieve(M, bd):
+    """Raquetas de nieve de madera y tripa trenzada bajo unas botas de piel."""
+    WOOD = (0.52, 0.36, 0.18); GUT = (0.76, 0.66, 0.46); HIDE = (0.40, 0.30, 0.20); FUR = (0.86, 0.82, 0.74)
+    _boot(M, bd, HIDE, HIDE, 12, cuff=FUR, pad=1.5)
+    for s, _, shin, _, _ in cu.sides():
+        cx = _foot_cx(bd, s) * 1.25
+        for x in range(int(cx - 7), int(cx + 7)):
+            for z in range(-13, 15):
+                q = ((x + 0.5 - cx) / 6.5) ** 2 + ((z + 0.5 - 0.5) / (13.5 if z > 0 else 12.5)) ** 2
+                if q > 1 or (x, 0, z) in M.V: continue
+                rim = q > 0.72
+                if not rim and (x + z) % 3 != 0: continue                   # trenzado
+                M.put(x, 0, z, shin, WOOD if rim else GUT)
+    return {HIDE: 'cuero', FUR: 'borreguillo'}
+
+
+def zapatillas(M, bd):
+    """Zapatillas de casa de cuadros escoceses con borla de lana."""
+    RED = (0.56, 0.14, 0.14); GREEN = (0.16, 0.30, 0.20); YEL = (0.86, 0.72, 0.32); POM = (0.92, 0.88, 0.80)
+    for s, _, shin, _, _ in cu.sides():
+        cx = _foot_cx(bd, s)
+        slab(M, shin, GREEN, 0, 1, cx, 1.5, 11, 11, 17, 17, ch=2)
+        slab(M, shin, RED, 1, 5, cx, 1.5, 11, 10.5, 17, 15, ch=2)
+    for (x, y, z), v in M.V.items():
+        if v[1] == RED and (x % 4 == 0 or y == 3): v[1] = GREEN if (x + y) % 2 else YEL
+    for s, _, shin, _, _ in cu.sides():                                    # borla encima de la puntera
+        x = int(round(_foot_cx(bd, s)))
+        for dx in (-1, 0):
+            z = max(vz for (vx, vy, vz), v in M.V.items() if vx == x + dx and vy == 4 and v[0] == shin)
+            for dy in (5, 6):
+                M.put(x + dx, dy, z - 1, shin, POM); M.put(x + dx, dy, z - 2, shin, POM)
+    return {RED: 'punto', GREEN: 'punto', POM: 'borreguillo'}
+
+
+def botas_buzo(M, bd):
+    """Botas de buzo de plomo con puntera de latón y correas de cuero, pesadísimas."""
+    LEAD = (0.30, 0.31, 0.33); BRASS = (0.78, 0.60, 0.26); STRAP = (0.30, 0.20, 0.12)
+    for s, _, shin, _, _ in cu.sides():
+        cx = _foot_cx(bd, s)
+        slab(M, shin, LEAD, 0, 4, cx, 1.5, 12, 12, 18, 18, ch=1)
+        slab(M, shin, LEAD, 4, 13, cx, -0.3, 11.5, 11, 12.5, 12, ch=1)
+        for y in (6, 7, 10, 11):
+            slab(M, shin, STRAP, y, y + 1, cx, -0.3, 12, 12, 13, 13, ch=1)
+        slab(M, shin, BRASS, 12, 13, cx, -0.3, 12, 12, 13, 13, ch=1)          # aro de arriba
+    for (x, y, z), v in M.V.items():                                       # puntera de latón
+        if v[1] == LEAD and y < 4 and z >= 8: v[1] = BRASS
+    return {STRAP: 'cuero'}
+
+
+def pies_membrana(M, bd):
+    """Pies descalzos grises y verdosos de los de Innsmouth: dedos largos unidos por membrana y
+    uñas negras, con la piel escamosa hasta media pierna."""
+    SKIN = (0.46, 0.52, 0.44); SKIN_D = (0.34, 0.40, 0.33); WEB = (0.56, 0.64, 0.50); NAIL = (0.08, 0.08, 0.06)
+    SCALE = (0.38, 0.46, 0.40)
+    for s, _, shin, _, _ in cu.sides():
+        cx = _foot_cx(bd, s)
+        slab(M, shin, SKIN, 0, 3, cx, 0.8, 11.5, 11.5, 16, 15, ch=1)          # planta
+        slab(M, shin, SKIN, 3, 14, cx, -0.3, 10, 9.5, 10.5, 10, ch=1)          # tobillo y pierna
+        x0 = int(round(cx)) - 5
+        for i in range(4):                                                  # cuatro dedos largos
+            x = x0 + i * 3
+            for z in range(8, 13):
+                M.put(x, 0, z, shin, SKIN_D); M.put(x, 1, z, shin, SKIN_D)
+            M.put(x, 0, 13, shin, NAIL); M.put(x, 1, 13, shin, NAIL)
+            if i < 3:
+                for z in range(8, 11): M.put(x + 1, 0, z, shin, WEB); M.put(x + 2, 0, z, shin, WEB)
+    for (x, y, z), v in M.V.items():
+        if v[1] == SKIN and y > 3 and _speck(x, y // 2, z, 5): v[1] = SCALE
+    return {SKIN: 'piel', SKIN_D: 'piel', WEB: 'piel'}
+
+
 GARMENTS = {'bombin': bombin, 'casco_minero': casco_minero, 'gorro_nieve': gorro_nieve, 'chistera': chistera,
             'chaqueta_aviador': chaqueta_aviador, 'abrigo_piel': abrigo_piel,
             'botas_militares': botas_militares, 'botas_nieve': botas_nieve,
@@ -1113,7 +1240,11 @@ GARMENTS = {'bombin': bombin, 'casco_minero': casco_minero, 'gorro_nieve': gorro
             'uniforme_enfermera': uniforme_enfermera, 'mono_mecanico': mono_mecanico, 'esmoquin': esmoquin,
             'vestido_charleston': vestido_charleston, 'jersey_marinero': jersey_marinero, 'parka_inuit': parka_inuit,
             'sotana_exorcista': sotana_exorcista, 'capa_terciopelo': capa_terciopelo, 'uniforme_lake': uniforme_lake,
-            'harapos': harapos}
+            'harapos': harapos,
+            # pies
+            'botas_agua': botas_agua, 'zapatos_bicolor': zapatos_bicolor, 'sandalias_calcetines': sandalias_calcetines,
+            'botas_montar': botas_montar, 'raquetas_nieve': raquetas_nieve, 'zapatillas': zapatillas,
+            'botas_buzo': botas_buzo, 'pies_membrana': pies_membrana}
 
 
 def build(name, c):

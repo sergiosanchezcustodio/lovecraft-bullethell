@@ -37,6 +37,15 @@ PRENDAS = [
     ('capa_terciopelo', 'Capa de terciopelo', 'Carmesí forrada de morado, con broche dorado.', BODY, 3200, {}),
     ('uniforme_lake', 'Uniforme de la expedición', 'Caqui, de la expedición Lake de la Miskatonic.', BODY, 2000, {}),
     ('harapos', 'Harapos', 'Lo que queda de la ropa después de tres noches.', BODY, 500, {}),
+    # pies
+    ('botas_agua', 'Botas de agua', 'Goma verde para los charcos del muelle.', FEET, 900, {}),
+    ('zapatos_bicolor', 'Zapatos bicolores', 'Blancos y marrones, de gánster con estilo.', FEET, 1600, {}),
+    ('sandalias_calcetines', 'Sandalias y calcetines', 'Lo que se pone el turista de Arkham.', FEET, 700, {}),
+    ('botas_montar', 'Botas de montar', 'Negras, de caña alta y con espuela.', FEET, 1800, {}),
+    ('raquetas_nieve', 'Raquetas de nieve', 'Madera y tripa trenzada, para no hundirse en la Antártida.', FEET, 1500, {}),
+    ('zapatillas', 'Zapatillas de casa', 'De cuadros y con borla, a juego con el gorro de dormir.', FEET, 600, {}),
+    ('botas_buzo', 'Botas de buzo', 'Plomo y latón, a juego con el casco.', FEET, 2500, {}),
+    ('pies_membrana', 'Pies de Innsmouth', 'Descalzos, con membrana entre los dedos. Ya no tiene remedio.', FEET, 3000, {}),
 ]
 
 TEMPLATE = '''[gd_resource type="Resource" script_class="OutfitData" load_steps=2 format=3]
