@@ -24,6 +24,10 @@ const DIR := "res://data/outfits"
 ## alto), "lantern" (linterna delante) o "cane" (bastón). Ver `Player._hold_step`.
 @export var hold := ""
 
+## Piezas del personaje que esta prenda oculta, separadas por comas (la trenza de Peaslee, `hair`,
+## bajo el casco de buzo y la capucha).
+@export var hides := ""
+
 ## Personaje sobre el que se dibuja el icono de la tienda (la prenda sola, con sus medidas).
 @export var icon_char := "dyer"
 
@@ -103,10 +107,19 @@ static func apply(root: Node3D, character_model: String, worn: Dictionary) -> vo
 		var o := find(String(worn[k]))
 		if o == null: continue
 		VoxelBuilder.dress(root, o.model_path(character_model), o.slot == Slot.HEAD)
-		if o.slot == Slot.BODY: cover(root)
+		cover(root, o)
 
-## Oculta lo del personaje que tapa una prenda de cuerpo (UNDER_BODY).
-static func cover(root: Node3D) -> void:
+## Oculta lo del personaje que tapa la prenda: con una de cuerpo, UNDER_BODY; además, sus `hides`.
+static func cover(root: Node3D, o: OutfitData) -> void:
 	var nodes: Dictionary = root.get_meta("part_nodes")
-	for pname: String in UNDER_BODY:
+	var parts: Array = Array(o.hides.split(",", false))
+	if o.slot == Slot.BODY: parts.append_array(UNDER_BODY)
+	for pname: String in parts:
 		if nodes.has(pname): (nodes[pname] as Node3D).visible = false
+
+## El tentáculo (pieza `tail`) se retuerce solo: su giro en el instante t, sumado a `base` (en la
+## partida, lo que ya le da el muelle de la ropa; en los menús, nada).
+static func wiggle_tail(model: Node3D, t: float, base := Vector3.ZERO) -> void:
+	var tl: Node3D = (model.get_meta("part_nodes", {}) as Dictionary).get("tail")
+	if tl == null: return
+	tl.rotation = base + Vector3(0.05 * sin(t * 1.3 + 1.0), 0.07 * sin(t * 0.9), 0.06 * sin(t * 1.7))

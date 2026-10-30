@@ -52,7 +52,7 @@ func _ready() -> void:
 			VoxelBuilder.dress(m, "res://models/vest_%s_%s.json" % [g, bits[0]], OutfitData.is_head(g))
 			worn[g] = g
 			var o := OutfitData.find(g)
-			if o != null and o.slot == OutfitData.Slot.BODY: OutfitData.cover(m)   # estola, granadas
+			if o != null: OutfitData.cover(m, o)   # estola, granadas, trenza
 		OutfitData.pose_hold(m, OutfitData.hold_of(worn), 1.0)   # paraguas, linterna, bastón (fase 14)
 		if la.has("face"):                  # face=abiertos|cerrados|dolor: parpadeo y mueca (FaceLook)
 			m.add_child(FaceLook.new().setup(m, "res://models/%s.json" % bits[0]))

@@ -699,10 +699,15 @@ var outfit_set := ""
 ## Lo que lleva puesto ({hueco: prenda}): la ficha lo dibuja vestido.
 var outfit_worn := {}
 var _tail_t := 0.0
+var _torch_glow: TorchGlow                     ## mancha de la linterna en Baja (sin luz de verdad)
 func _hold_step(delta: float) -> void:
 	if not OutfitData.HOLDS.has(_hold): return
 	_hold_w = move_toward(_hold_w, 1.0 if _action == "" and _override == "" and _fidget == "" else 0.0, delta * 6.0)
 	OutfitData.pose_hold(model, _hold, _hold_w)
+	if _hold == "lantern" and _torch_glow == null and not bool(Quality.value("torch_light", true)):
+		_torch_glow = TorchGlow.new()
+		visual.add_child(_torch_glow)
+	if _torch_glow != null: _torch_glow.visible = _hold_w > 0.6 and visual.visible
 
 ## Configuración de la mancha del nivel (data/dirt.json): la de la arena o, si no, la de la parte.
 static func dirt_config(part_key: String, arena_name: String) -> Dictionary:
@@ -780,10 +785,7 @@ func _cloth_step(delta: float) -> void:
 		n.rotation.z += _cloth.y * CLOTH_PARTS[pname]
 	if parts.has("tail"):                        # el tentáculo, además, se retuerce solo
 		_tail_t += delta
-		var tl: Node3D = parts["tail"]
-		tl.rotation.x += 0.05 * sin(_tail_t * 1.3 + 1.0)
-		tl.rotation.y += 0.07 * sin(_tail_t * 0.9)
-		tl.rotation.z += 0.06 * sin(_tail_t * 1.7)
+		OutfitData.wiggle_tail(model, _tail_t, (parts["tail"] as Node3D).rotation)
 
 ## Partida del día (hito 13.9): el azar de los atributos y la cordura, de la semilla del día.
 func reseed(s: int) -> void:

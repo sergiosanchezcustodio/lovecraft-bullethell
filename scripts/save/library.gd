@@ -55,6 +55,15 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				e["worn"] = OutfitSets.as_worn(s)
 				e["dim"] = not done
 				out.append(e)
+			var all := OutfitData.all()                # y las prendas sueltas, por hueco
+			all.sort_custom(func(a: OutfitData, b: OutfitData) -> bool: return a.slot < b.slot or (a.slot == b.slot and a.order < b.order))
+			for o in all:
+				var mine := save != null and (save.unlock_all or save.has_outfit(String(o.id)))
+				var e := _e(String(o.id), o.display_name, true, o.description, "", "", o.icon(),
+					["%s · %s $" % [OutfitData.SECTION_NAMES[o.slot], MenuKit.money(o.price)], "Tuya" if mine else "En la tienda"],
+					"Prendas · " + OutfitData.SECTION_NAMES[o.slot])
+				e["dim"] = not mine
+				out.append(e)
 		"stories":                                     # páginas sueltas y epílogos (hito 13.11)
 			for s: Dictionary in Fragments.stories():
 				var pages: Array = s.pages

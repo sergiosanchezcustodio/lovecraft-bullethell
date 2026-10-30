@@ -10,3 +10,4 @@ description = "Cobre y latón con ojo de buey, para bajar al arrecife."
 slot = 0
 price = 5000
 order = 24
+hides = "hair"

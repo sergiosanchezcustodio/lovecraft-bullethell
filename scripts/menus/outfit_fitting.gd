@@ -81,9 +81,14 @@ func next_character(dir := 1) -> void:
 func character() -> CharacterData:
 	return _chars[_ci] if not _chars.is_empty() else null
 
+var _wiggle_t := 0.0
+
 func _process(delta: float) -> void:
 	_holder.rotation.y += SPIN * delta
-	if _model != null: OutfitData.pose_hold(_model, _hold, 1.0)
+	if _model != null:
+		OutfitData.pose_hold(_model, _hold, 1.0)
+		_wiggle_t += delta
+		OutfitData.wiggle_tail(_model, _wiggle_t)                 # el tentáculo, vivo también aquí
 	if _pending < 0.0: return
 	_pending -= delta
 	if _pending <= 0.0:

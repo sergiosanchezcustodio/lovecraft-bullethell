@@ -12,7 +12,7 @@ PRENDAS = [
     # cabeza
     ('gorra_marinero', 'Gorra de marinero', 'Lana azul de los pescadores de Innsmouth, con verdín del salitre.', HEAD, 1200, {}),
     ('fez', 'Fez de la Orden', 'Granate con borla, de la Orden Esotérica de Dagon.', HEAD, 1800, {}),
-    ('capucha_cultista', 'Capucha de cultista', 'Negra, con la cara en sombra: solo se ven los ojos.', HEAD, 3000, {}),
+    ('capucha_cultista', 'Capucha de cultista', 'Negra, con la cara en sombra: solo se ven los ojos.', HEAD, 3000, {'hides': 'hair'}),
     ('tiara', 'Tiara de los Marsh', 'Oro raro de Innsmouth, con perlas y una piedra que brilla.', HEAD, 4000, {}),
     ('gorra_chofer', 'Gorra de chófer', 'Negra, con visera de charol, para llevar un Packard.', HEAD, 1300, {}),
     ('sombrero_hule', 'Sombrero de hule', 'Sueste amarillo de pescador, a juego con el chubasquero.', HEAD, 1200, {}),
@@ -22,7 +22,7 @@ PRENDAS = [
     ('corona_algas', 'Corona de algas', 'Algas, conchas y una estrella de mar, de los que vuelven del mar.', HEAD, 2500, {}),
     ('fedora_ganster', 'Fedora de gánster', 'Gris perla con cinta negra, de Chicago.', HEAD, 2000, {}),
     ('gorro_dormir', 'Gorro de dormir', 'Rayas y borla, para las pesadillas.', HEAD, 800, {}),
-    ('casco_buzo', 'Casco de buzo', 'Cobre y latón con ojo de buey, para bajar al arrecife.', HEAD, 5000, {}),
+    ('casco_buzo', 'Casco de buzo', 'Cobre y latón con ojo de buey, para bajar al arrecife.', HEAD, 5000, {'hides': 'hair'}),
     # cuerpo
     ('gabardina', 'Gabardina', 'Beis, cruzada y con cinturón, de detective de Boston.', BODY, 2400, {}),
     ('tunica_cultista', 'Túnica de cultista', 'Negra hasta los pies, con ribete rojo y el signo bordado.', BODY, 3000, {}),

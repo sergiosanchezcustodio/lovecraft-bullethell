@@ -1016,3 +1016,4 @@ class _Preview extends SubViewportContainer:
 		var mn := _model_name.get_slice("{", 0)
 		Anims.pose(mn, "idle", _model, fposmod(_t / Anims.duration(mn, "idle"), 1.0))
 		OutfitData.pose_hold(_model, _hold, 1.0)                  # paraguas, linterna, bastón
+		OutfitData.wiggle_tail(_model, _t)                        # el tentáculo se retuerce

@@ -10,3 +10,4 @@ description = "Negra, con la cara en sombra: solo se ven los ojos."
 slot = 0
 price = 3000
 order = 14
+hides = "hair"

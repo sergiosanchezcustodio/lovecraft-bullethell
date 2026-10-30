@@ -544,11 +544,18 @@ def capucha_cultista(M, bd, face):
             if (x in (-6, 5) or y in (65, 80)) and (x, y) not in ((-6, 65), (5, 65), (-6, 80), (5, 80)): continue
             M.V.pop((x, y, z))
     head = face[1]
-    for x in range(-5, 5):                                               # la sombra de dentro, delante de la cara
-        for y in range(66, 80):
-            M.put(x, y, _front_z(head, x, y) + 1, H, SHADOW)
+    hole = lambda x, y, z: -6 <= x <= 5 and 65 <= y <= 80 and z >= zf - 1
+    for (x, y, z) in head:                                               # lo que asoma (melena, lazos):
+        if y < 56: continue                                              # una capa de tela por encima
+        for n in ((x + 1, y, z), (x - 1, y, z), (x, y + 1, z), (x, y, z + 1), (x, y, z - 1)):
+            if n not in head and n not in M.V and not hole(*n): M.put(n[0], n[1], n[2], H, CLOTH)
+    zt = max(_front_z(head, x, y) for x in range(-6, 6) for y in range(65, 81)) + 1
+    for x in range(-6, 6):                                               # la sombra de dentro, delante de la cara:
+        for y in range(65, 81):                                          # maciza, o el flequillo asomaba por
+            for z in range(_front_z(head, x, y) + 1, zt + 1):            # los escalones
+                M.put(x, y, z, H, SHADOW)
     for x in (-5, -4, 3, 4):
-        M.put(x, y0, _front_z(head, x, y0) + 2, H, EYE, 1)
+        M.put(x, y0, zt + 1, H, EYE, 1)
     b = bd['b'] + (-4 if bd['fem'] else 0)
     slab(M, T, CLOTH_SH, 55, 63, 0, -0.5, 24 + b, 18 + b * 0.5, 17, 15, ch=3)   # esclavina sobre los hombros
     for (x, y, z), v in M.V.items():
