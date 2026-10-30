@@ -137,5 +137,116 @@
 			"fuente": "https://opengameart.org/content/a-dispirited-epic",
 			"licencia": "CC0"
 		}
-	]
+	],
+	"capas": {
+		"res://resources/Music/Musica_nivel1.mp3": {
+			"coros": "res://resources/Music/capas/coros_Musica_nivel1.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p1.ogg",
+			"nota": "D#",
+			"claridad": 0.282
+		},
+		"res://resources/Music/cc0/jefe_a_dispirited_epic.ogg": {
+			"coros": "res://resources/Music/capas/coros_jefe_a_dispirited_epic.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p3.ogg",
+			"nota": "C",
+			"claridad": 0.208
+		},
+		"res://resources/Music/cc0/jefe_bio_hazard.ogg": {
+			"coros": "res://resources/Music/capas/coros_jefe_bio_hazard.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p2.ogg",
+			"nota": "E",
+			"claridad": 0.262
+		},
+		"res://resources/Music/cc0/jefe_heavy_battle.ogg": {
+			"coros": "res://resources/Music/capas/coros_jefe_heavy_battle.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p1.ogg",
+			"nota": "C",
+			"claridad": 0.17
+		},
+		"res://resources/Music/cc0/p1_n2_wastelands.ogg": {
+			"coros": "res://resources/Music/capas/coros_p1_n2_wastelands.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p1.ogg",
+			"nota": "D",
+			"claridad": 0.254
+		},
+		"res://resources/Music/cc0/p1_n3_cavern.ogg": {
+			"coros": "res://resources/Music/capas/coros_p1_n3_cavern.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p1.ogg",
+			"nota": "D#",
+			"claridad": 0.177
+		},
+		"res://resources/Music/cc0/p1_n4_the_maw.ogg": {
+			"coros": "res://resources/Music/capas/coros_p1_n4_the_maw.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p1.ogg",
+			"nota": "B",
+			"claridad": 0.176
+		},
+		"res://resources/Music/cc0/p1_n5_hunter_class_lifeform.ogg": {
+			"coros": "res://resources/Music/capas/coros_p1_n5_hunter_class_lifeform.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p1.ogg",
+			"nota": "E",
+			"claridad": 0.166
+		},
+		"res://resources/Music/cc0/p2_n1_unsolved_investigation.ogg": {
+			"coros": "res://resources/Music/capas/coros_p2_n1_unsolved_investigation.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p2.ogg",
+			"nota": "E",
+			"claridad": 0.291
+		},
+		"res://resources/Music/cc0/p2_n2_night_of_the_streets.ogg": {
+			"coros": "res://resources/Music/capas/coros_p2_n2_night_of_the_streets.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p2.ogg",
+			"nota": "C",
+			"claridad": 0.209
+		},
+		"res://resources/Music/cc0/p2_n3_hallow_quest.ogg": {
+			"coros": "res://resources/Music/capas/coros_p2_n3_hallow_quest.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p2.ogg",
+			"nota": "B",
+			"claridad": 0.154
+		},
+		"res://resources/Music/cc0/p2_n4_insistent.ogg": {
+			"coros": "res://resources/Music/capas/coros_p2_n4_insistent.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p2.ogg",
+			"nota": "F",
+			"claridad": 0.304
+		},
+		"res://resources/Music/cc0/p2_n5_at_the_end_of_hope.ogg": {
+			"coros": "res://resources/Music/capas/coros_p2_n5_at_the_end_of_hope.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p2.ogg",
+			"nota": "C",
+			"claridad": 0.207
+		},
+		"res://resources/Music/cc0/p3_n1_dungeon_deep.ogg": {
+			"coros": "res://resources/Music/capas/coros_p3_n1_dungeon_deep.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p3.ogg",
+			"nota": "F#",
+			"claridad": 0.304
+		},
+		"res://resources/Music/cc0/p3_n2_bloody_tribute.ogg": {
+			"coros": "res://resources/Music/capas/coros_p3_n2_bloody_tribute.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p3.ogg",
+			"nota": "C",
+			"claridad": 0.29
+		},
+		"res://resources/Music/cc0/p3_n3_pirate_indenture.ogg": {
+			"coros": "res://resources/Music/capas/coros_p3_n3_pirate_indenture.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p3.ogg",
+			"nota": "D",
+			"claridad": 0.236
+		},
+		"res://resources/Music/cc0/p3_n4_storm_chasers.ogg": {
+			"coros": "res://resources/Music/capas/coros_p3_n4_storm_chasers.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p3.ogg",
+			"nota": "A",
+			"claridad": 0.202
+		},
+		"res://resources/Music/cc0/p3_n5_the_9th_circle.ogg": {
+			"coros": "res://resources/Music/capas/coros_p3_n5_the_9th_circle.ogg",
+			"percusion": "res://resources/Music/capas/percusion_p3.ogg",
+			"nota": "C",
+			"claridad": 0.183
+		}
+	},
+	"_capas": "Capas de la música (hito 13.13, provisionales, tools/gen_capas_musica.py): para cada pista, la de coros (a su nota base) y la de percusión (una por parte). Music las suma según los enemigos vivos y deja solo los coros con el jefe. Cambia cualquiera por la tuya poniendo aquí su ruta."
 }

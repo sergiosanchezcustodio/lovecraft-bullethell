@@ -37,6 +37,8 @@ var defaults := {
 	"dif_levels": {},                       ## dificultad (D-42, temporal): característica -> 1..10; sin ella, 3 (Difficulty)
 	"hallucinations": true,                 ## alucinaciones con poca cordura (hito 13.4, Hallucinations)
 	"tips": true,                           ## consejos de la primera partida (hito 13.3, Tips)
+	"music_layers": true,                   ## música por capas (hito 13.13, Music.set_intensity)
+	"offscreen_cues": true,                 ## avisos de lo que llega de fuera de cámara (hito 13.13, OffscreenCues)
 	"madness": true,                        ## locura acumulada (GDD 4.5)
 	"intro": 1,                             ## ficha e intro al arrancar: 0 siempre, 1 solo la primera vez (hito 5.2)
 	"intro_seen": false,

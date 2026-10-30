@@ -720,6 +720,39 @@ def olas(r):
     save_loop('surf_loop', w, d, fade)
 
 
+def avisos():
+    """Avisos de lo que llega de fuera de cámara (hito 13.13): la élite, un bramido grave que crece
+    (como un cuerno lejano, con el gruñido de la criatura dentro); el ataque fuerte, un silbido
+    que sube y acaba en un chasquido. Cortos y claros: suenan por su lado (izquierda o derecha)."""
+    r = np.random.default_rng(1313)
+    d = 1.1
+    tt = t(d)
+    f = 70.0 * (1 + 0.25 * np.clip(tt / 0.5, 0, 1)) * (1 + 0.01 * np.sin(2 * np.pi * 6 * tt))
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    horn = sum(np.sin(k * ph) / k ** 0.8 for k in range(1, 10))
+    a = np.clip(tt / 0.35, 0, 1) ** 1.5 * np.clip((d - tt) / 0.35, 0, 1)
+    rough = 1 + 0.5 * bp(r.standard_normal(len(tt)), 25, 70) / 0.05
+    x = lp(horn * a * np.clip(rough, 0, 2.5), 900) + lp(r.standard_normal(len(tt)), 250) * a * 0.3
+    ir = r.standard_normal(int(0.8 * SR)) * np.exp(-t(0.8) / 0.25)
+    wet = signal.fftconvolve(x, lp(ir, 700))[:len(x)]
+    save('cue_elite', x + wet * np.std(x) / (np.std(wet) + 1e-9) * 0.5)
+    d = 0.75
+    tt = t(d)
+    n = r.standard_normal(len(tt))
+    sweep = np.zeros(len(tt))
+    for i, fc in enumerate(np.linspace(500, 3500, 40)):           # el silbido sube por bandas
+        lo, hi = int(i * len(tt) / 40 * 0.85), int((i + 1) * len(tt) / 40 * 0.85)
+        seg = bp(n, fc * 0.8, fc * 1.25)
+        sweep[lo:hi] = seg[lo:hi]
+    sweep *= np.clip(tt / 0.5, 0, 1) ** 2
+    end = int(0.62 * SR)
+    snap = np.zeros(len(tt))
+    m = len(tt) - end
+    snap[end:] = hp(r.standard_normal(m), 1200) * np.exp(-np.arange(m) / (0.03 * SR))
+    snap[end:] += np.sin(2 * np.pi * 95 * np.arange(m) / SR) * np.exp(-np.arange(m) / (0.08 * SR)) * 1.5
+    save('cue_attack', sweep * 0.6 + snap)
+
+
 def copy_kenney(src):
     files = {os.path.splitext(os.path.basename(p))[0]: p for p in glob.glob(os.path.join(src, '**', '*.ogg'), recursive=True)}
     for ev, names in KENNEY.items():
@@ -733,6 +766,8 @@ if __name__ == '__main__':
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
         latido()
         sirena()
+    elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
+        avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)
         olas(np.random.default_rng(31))
     elif '--ambiente' in sys.argv:                             # solo los del ambiente (no necesita Kenney)

@@ -85,6 +85,8 @@ var _mark_mat: ShaderMaterial               ## élites (hito 12.6): disco del co
 ## Élites y heridas (hito 12.6): el color de la parte (lo pone la partida), algo más grandes, y
 ## grietas que crecen con la vida perdida en élites, únicos y grandes.
 static var part_tint := Color(0.45, 0.2, 0.7)
+## Avisa de cada enemigo que aparece (las élites de fuera de cámara, `OffscreenCues`, hito 13.13).
+static var on_appear := Callable()
 const PART_TINTS := {"p1": Color(0.1, 0.42, 1.0), "p2": Color(0.1, 0.85, 0.35), "p3": Color(0.85, 0.25, 0.1)}
 const ELITE_SIZE := 1.1
 const ELITE_EYES := 1.4                     ## brillo de su capa de luz (ojos, bioluminiscencia)
@@ -195,6 +197,7 @@ func _ready() -> void:
 	if puppet: anim_hold = true                # la fase de la animación llega con cada foto
 	else: behavior.start(self)
 	world.add_enemy(self)
+	if on_appear.is_valid(): on_appear.call(self)
 	_rise_start()
 	reset_physics_interpolation.call_deferred()
 

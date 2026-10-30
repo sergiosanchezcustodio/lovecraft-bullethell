@@ -473,6 +473,13 @@ func _ready() -> void:
 		add_child(net_game)
 		hud.net_info = _net_info                       # hito 9.4b: PC y ping en los paneles de los demás
 		hud.add_child(OffscreenArrows.new().setup(players, camera))   # y flechas hacia los que no se ven
+	var cues := OffscreenCues.new().setup(camera)   # élites y ataques fuertes de fuera de cámara (hito 13.13)
+	hud.add_child(cues)
+	if args.has("cue_demo"):                       # capturas: un ataque por la derecha y una élite arriba a la izquierda
+		get_tree().create_timer(args.get_float("cue_demo", 2.0), false).timeout.connect(func() -> void:
+			var ax := GameCamera.ground_axes()
+			cues.cue("attack", player.global_position + ax[0] * 26.0 - ax[1] * 6.0)
+			cues.cue("elite", player.global_position - ax[0] * 22.0 + ax[1] * 22.0))
 	if args.has("quit_at"):                        # pruebas: "Menú principal" a los t s de juego (en red, deja la sala)
 		get_tree().create_timer(args.get_float("quit_at"), false).timeout.connect(_quit)
 	for kind: StringName in [&"sheet", &"map"]:      # pruebas: la ficha o el mapa del J1 a los t s
@@ -958,6 +965,7 @@ func _over_pause(m: CanvasLayer, button: String) -> void:
 ## Al irse la partida (menú, reintentar, siguiente nivel): que no quede el juego parado.
 func _exit_tree() -> void:
 	HitStop.stop()
+	Music.set_intensity(0.0, 0.0)                    # sin la partida, las capas se apagan
 
 ## Página suelta del nivel (hito 13.11), si aún no está en el hueco: en uno de sus sitios.
 ## Con bots solo si se pide (`fragment_near=true` la pone al lado del J1; `fragments=false`, ninguna).
@@ -1081,6 +1089,29 @@ func _check_all_down() -> void:
 	if _ended or players.any(func(c: Player) -> bool: return c.health > 0.0): return
 	if is_guest(): return
 	_game_over()
+
+## Música por capas (hito 13.13): dos veces por segundo, la intensidad según los vivos frente al
+## tope y si hay un jefe (o minijefe) vivo.
+var _music_t := 0.0
+var _music_logged := -1
+func _music_step(delta: float) -> void:
+	_music_t -= delta
+	if _music_t > 0.0 or world == null or director == null: return
+	_music_t = 0.5
+	if _ended:
+		Music.set_intensity(0.0, 0.0)
+		return
+	var boss := false
+	for e in world.enemies:
+		if e is Enemy and (e as Enemy).data != null and (e as Enemy).data.unique and (e as Enemy).is_alive():
+			boss = true
+			break
+	var k: Vector2 = Music.intensity_for(world.enemies.size(), director.max_alive(), boss)
+	Music.set_intensity(k.x, k.y)
+	if args.get_bool("log_music") and int(director.time) % 10 == 0 and int(director.time) != _music_logged:
+		_music_logged = int(director.time)
+		print("CAPAS t=%d vivos=%d tope=%d jefe=%s pide=%.2f/%.2f suena=%.2f/%.2f" % [_music_logged, world.enemies.size(),
+			director.max_alive(), boss, k.x, k.y, Music.layer_level("percusion"), Music.layer_level("coros")])
 
 func _game_over() -> void:
 	if _ended: return
@@ -1588,6 +1619,7 @@ func _process(delta: float) -> void:
 
 func _process_step(delta: float) -> void:
 	_t += delta
+	_music_step(delta)
 	if net_game != null: _watch_mark_pads(delta)
 	if args.has("sim_time") and director != null and director.time >= args.get_float("sim_time") and not _ended:
 		_ended = true                                  # banco de armas: corta a los N s de juego

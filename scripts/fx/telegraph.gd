@@ -14,6 +14,8 @@ var mirrored := false                               ## el repetido en un invitad
 var legend := &""                                   ## tipo para la leyenda (Tips); vacío: por su color
 ## Avisa de cada aviso nuevo (la leyenda de la primera partida, `Tips`, hito 13.3).
 static var on_shown := Callable()
+## Avisa de cada aviso de enemigo (los ataques fuertes de fuera de cámara, `OffscreenCues`, hito 13.13).
+static var on_warning := Callable()
 var _t := 0.0
 var _mat: ShaderMaterial
 
@@ -46,6 +48,7 @@ func _ready() -> void:
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	position.y = 0.04
 	if on_shown.is_valid(): on_shown.call(self)
+	if net and on_warning.is_valid(): on_warning.call(self)
 
 func progress() -> float:
 	return clampf(_t / duration, 0.0, 1.0)

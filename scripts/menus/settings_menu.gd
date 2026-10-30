@@ -115,6 +115,12 @@ func _audio() -> void:
 		_choice(pair[0], steps, int(round(float(Settings.get_value(key)) * 10.0)), func(i: int) -> void:
 			Settings.set_value(key, i / 10.0)
 			Settings.apply_audio())
+	_toggle("Música que crece con el combate", Settings.get_value("music_layers"), func(on: bool) -> void:
+		Settings.set_value("music_layers", on))
+	_note("Suma percusión y coros a la pista cuantos más enemigos hay; con el jefe, solo los coros.")
+	_toggle("Avisos de lo que llega de fuera de la pantalla", Settings.get_value("offscreen_cues"), func(on: bool) -> void:
+		Settings.set_value("offscreen_cues", on))
+	_note("Las élites y los ataques fuertes que no se ven suenan por su lado y se marcan en el borde.")
 
 func _controls() -> void:
 	_header("Teclado")
