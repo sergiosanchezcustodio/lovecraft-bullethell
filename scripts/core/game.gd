@@ -1022,10 +1022,12 @@ func _epilogue() -> void:
 		var k := q.sanity / maxf(q.data.max_sanity, 1.0)
 		if k < EPILOGUE_MAD and (mad == null or k < mad.sanity / maxf(mad.data.max_sanity, 1.0)): mad = q
 	var id := "epilogo_locura" if mad != null else "epilogo"
+	if Demo.on(): id = Demo.END_RELATO                  # la demo (13.17): tras el shoggoth
 	var who := mad if mad != null else player
 	if Saves.current != null:
-		Saves.current.mark_seen("epilogues", id)
-		if mad != null: Achievements.add(Saves.current, "epilogue_mad")
+		if not Demo.on():
+			Saves.current.mark_seen("epilogues", id)
+			if mad != null: Achievements.add(Saves.current, "epilogue_mad")
 	RelatoScreen.next = {"id": id, "fill": {"nombre": who.data.display_name}, "menu": true}
 	Saves.save()
 	get_tree().paused = false
@@ -1272,7 +1274,7 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 			lines.append(MenuKit.count(net_game.level_marks, "marca") + " en este nivel (F9 o LB+RB)")
 	var s := Menus.EndScreen.new(title, lines, accent)
 	s.diary = _diary(result)
-	s.epilogue = result == "superado" and next_id == "" and level != null and String(level.id) == Campaign.last_id()
+	s.epilogue = result == "superado" and next_id == "" and level != null and String(level.id) == Demo.last_level()
 	s.epilogue_open.connect(_epilogue)
 	if not s.diary.is_empty(): Saves.save()                # el diario, ya en el hueco
 	if announcer != null: create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS) 		.tween_property(announcer, "modulate:a", 0.0, 0.3)   # un aviso a medias asomaría por encima

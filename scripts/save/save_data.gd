@@ -84,7 +84,7 @@ func mark_seen(kind: String, id: String) -> bool:
 	return true
 
 func has_level(id: String) -> bool:
-	return unlock_all or Campaign.is_unlocked(id, levels_won)
+	return (unlock_all and Demo.level_ok(id)) or Campaign.is_unlocked(id, levels_won)
 
 ## Objetos comprados en la tienda (cada nivel de un potenciador cuenta como uno).
 func items_bought() -> int:

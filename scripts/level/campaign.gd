@@ -30,6 +30,7 @@ static func levels() -> Array[Dictionary]:
 	return out
 
 static func is_unlocked(id: String, won: Array) -> bool:
+	if not Demo.level_ok(id): return false            # la demo: solo la parte 1 (13.17)
 	var all := levels()
 	for i in all.size():
 		if all[i].id == id: return i == 0 or won.has(all[i - 1].id)
@@ -65,6 +66,7 @@ static func first_of(part: int) -> String:
 
 ## Una parte se abre al superar el último nivel de la anterior (la primera, siempre).
 static func part_unlocked(part: int, won: Array) -> bool:
+	if not Demo.part_ok(part): return false
 	if part == 0: return true
 	var last := ""
 	for l in levels():

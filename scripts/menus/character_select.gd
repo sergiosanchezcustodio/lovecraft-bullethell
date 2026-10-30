@@ -864,6 +864,7 @@ class _Frame extends Control:
 		match seat.stage:
 			SelectState.Stage.CHARACTER:
 				if holder >= 0: _status.text = "Lo lleva J%d" % (holder + 1)
+				elif locked and not Demo.character_ok(c): _status.text = Demo.LOCKED
 				elif locked: _status.text = "Se compra en la tienda (%s)" % MenuKit.money(c.price)
 				else: _status.text = "A: elegir"
 				_status.add_theme_color_override("font_color", MenuKit.DANGER if unavailable else UiKit.TEXT_DIM)

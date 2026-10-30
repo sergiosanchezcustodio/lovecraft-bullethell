@@ -154,7 +154,7 @@ func seats_of(peer: int) -> Array[int]:
 ## ¿Está bloqueado el personaje para ese puesto (según lo desbloqueado en su PC)?
 func is_locked(ci: int, seat: int = -1) -> bool:
 	var c := characters[ci]
-	return c.price > 0 and not profile_of(seat).unlocked.has(String(c.id))
+	return c.price > 0 and (not Demo.character_ok(c) or not profile_of(seat).unlocked.has(String(c.id)))
 
 ## ¿Lo ha confirmado ya otro puesto?
 func taken_by_other(ci: int, seat: int) -> bool:

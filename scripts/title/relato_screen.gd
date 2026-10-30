@@ -47,7 +47,7 @@ func _ready() -> void:
 	black.color = Color(0.01, 0.01, 0.015)
 	black.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(black)
-	var map := "res://resources/maps/%s.png" % (Campaign.last_id() if id.begins_with("epilogo") else id)
+	var map := "res://resources/maps/%s.png" % (Campaign.last_id() if id.begins_with("epilogo") else ("p2_n1" if id == Demo.END_RELATO else id))
 	if ResourceLoader.exists(map):
 		var bg := TextureRect.new()
 		bg.texture = load(map)
@@ -67,7 +67,10 @@ func _ready() -> void:
 	for lv in Campaign.levels():
 		if String(lv.get("id", "")) == id: info = lv
 	var part := int(id.substr(1, 1)); var num := int(id.substr(4, 1))
-	if id.begins_with("epilogo"):
+	if id == Demo.END_RELATO:                            # la demo (13.17): lo que viene después
+		box.add_child(MenuKit.title("Fin de la demo", 26, Color(0.75, 0.68, 0.52)))
+		box.add_child(MenuKit.title("Continúa en el juego completo", 46))
+	elif id.begins_with("epilogo"):
 		box.add_child(MenuKit.title("Epílogo", 26, Color(0.75, 0.68, 0.52)))
 		box.add_child(MenuKit.title("El que no volvió del todo" if id == "epilogo_locura" else "Lo que vino después", 46))
 	else:

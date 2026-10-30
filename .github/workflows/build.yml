@@ -1,4 +1,4 @@
-# Builds de Windows y macOS (hito 13.15). Se lanza al subir una etiqueta de versión (v0.9.1,
+# Builds de Windows y macOS (hito 13.15), también de la demo de la parte 1 (hito 13.17). Se lanza al subir una etiqueta de versión (v0.9.1,
 # con tools/publicar.sh) o a mano desde la pestaña Actions de GitHub («Run workflow»).
 # Pasa los tests y la revisión de los costados, comprime los modelos y exporta con los perfiles
 # de export_presets.cfg, como tools/exportar.sh. Con etiqueta, deja los dos zip en una Release en
@@ -116,12 +116,23 @@ jobs:
             exit 1
           fi
           "$GODOT" --headless --path . --export-release "macOS" builds/macos/LovecraftLibrary.zip
+          mkdir -p builds/demo/windows builds/demo/macos
+          "$GODOT" --headless --path . --export-release "Windows Demo" builds/demo/windows/LovecraftLibraryDemo.exe 2>&1 | tee export_demo.log
+          if grep -q "Resources Modification" export_demo.log; then
+            echo "::error::rcedit no ha podido poner el icono y los datos del .exe de la demo"
+            exit 1
+          fi
+          "$GODOT" --headless --path . --export-release "macOS Demo" builds/demo/macos/LovecraftLibraryDemo.zip
           test -s builds/windows/LovecraftLibrary.exe
           test -s builds/macos/LovecraftLibrary.zip
+          test -s builds/demo/windows/LovecraftLibraryDemo.exe
+          test -s builds/demo/macos/LovecraftLibraryDemo.zip
           v=${{ steps.version.outputs.version }}
           mkdir -p dist
           (cd builds/windows && zip -q -9 "../../dist/LovecraftLibrary-${v}-windows.zip" LovecraftLibrary.exe)
           cp builds/macos/LovecraftLibrary.zip "dist/LovecraftLibrary-${v}-macos.zip"
+          (cd builds/demo/windows && zip -q -9 "../../../dist/LovecraftLibrary-${v}-demo-windows.zip" LovecraftLibraryDemo.exe)
+          cp builds/demo/macos/LovecraftLibraryDemo.zip "dist/LovecraftLibrary-${v}-demo-macos.zip"
           ls -la dist
 
       - name: Guardar las builds en la ejecución
@@ -140,6 +151,7 @@ jobs:
           cat > notas.md <<'EOF'
           **Windows:** descomprime y abre `LovecraftLibrary.exe`.
           **macOS:** descomprime; la primera vez, clic derecho sobre la aplicación y «Abrir» (no está firmada con un certificado de Apple).
+          **Demo** (`-demo-`): la parte 1 entera, cuatro investigadores y cooperativo local.
           En red, todos los PC tienen que llevar la misma versión.
           EOF
           gh release create "$GITHUB_REF_NAME" dist/*.zip --draft --generate-notes \

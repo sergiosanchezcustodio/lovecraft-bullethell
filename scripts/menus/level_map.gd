@@ -50,7 +50,7 @@ func _ready() -> void:
 	extra.add_theme_constant_override("separation", 26)
 	extra.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_child(extra)
-	if Daily.unlocked(Saves.current) or dev:         # partida del día (hito 13.9): tras el primer nivel
+	if (Daily.unlocked(Saves.current) or dev) and not Demo.on():   # partida del día (hito 13.9): tras el primer nivel
 		var db := MenuKit.button("Partida del día" + ("" if Daily.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
 		db.custom_minimum_size = Vector2(460, 58)
 		db.focus_entered.connect(func() -> void:
@@ -59,7 +59,7 @@ func _ready() -> void:
 		db.pressed.connect(func() -> void: _daily(db))
 		extra.add_child(db)
 		_daily_btn = db
-	if Endless.unlocked(Saves.current) or dev:       # modo sin fin (hito 13.8): al vencer a Cthulhu
+	if (Endless.unlocked(Saves.current) or dev) and not Demo.on():   # modo sin fin (hito 13.8): al vencer a Cthulhu
 		var eb := MenuKit.button("La noche eterna" + ("" if Endless.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
 		eb.custom_minimum_size = Vector2(460, 58)
 		eb.focus_entered.connect(func() -> void:
@@ -88,9 +88,10 @@ func _ready() -> void:
 ## Botón de una parte: empieza por su primer nivel.
 func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
 	var first := Campaign.first_of(pi)
-	var open := (Saves.current != null and Saves.current.unlock_all) or Campaign.part_unlocked(pi, won)
+	var demo_out := not Demo.part_ok(pi)               # la demo (13.17): solo la parte 1
+	var open := not demo_out and ((Saves.current != null and Saves.current.unlock_all) or Campaign.part_unlocked(pi, won))
 	var playable := open and Campaign.exists(first)
-	var b := MenuKit.button("Jugar esta parte" if playable else ("Próximamente" if open else "Bloqueada"), MenuKit.INK, 24)
+	var b := MenuKit.button(Demo.LOCKED if demo_out else ("Jugar esta parte" if playable else ("Próximamente" if open else "Bloqueada")), MenuKit.INK, 24)
 	b.custom_minimum_size = Vector2(460, 62)
 	b.disabled = not playable
 	b.focus_entered.connect(func() -> void:

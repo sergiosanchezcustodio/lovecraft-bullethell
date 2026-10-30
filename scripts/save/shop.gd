@@ -94,6 +94,7 @@ static func next_price(save: SaveData, e: Entry) -> int:
 	return e.prices[lv] if lv < e.prices.size() else -1
 
 static func can_buy(save: SaveData, e: Entry) -> bool:
+	if Demo.shop_locked(e): return false
 	var p := next_price(save, e)
 	return save != null and p >= 0 and save.money >= p
 

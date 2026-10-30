@@ -110,7 +110,7 @@ class PauseMenu extends CanvasLayer:
 		var w: Array = MenuKit.window(self, MenuKit.INK, 440)
 		var dim: Control = w[0]
 		var box: VBoxContainer = w[1]
-		var ver := UiKit.label("v" + String(ProjectSettings.get_setting("application/config/version", "?")), 18, UiKit.TEXT_DIM)
+		var ver := UiKit.label(Demo.version_text(), 18, UiKit.TEXT_DIM)
 		ver.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)   # a mano al apuntar un fallo
 		ver.offset_left = -140
 		ver.offset_right = -24
@@ -269,7 +269,7 @@ class EndScreen extends CanvasLayer:
 	## «Epílogo» (hito 13.11): después del último nivel, lo que vino después.
 	func _epilogue_button(box: VBoxContainer) -> Button:
 		if not epilogue: return null
-		var b := MenuKit.button("Epílogo", MenuKit.INK, 28)
+		var b := MenuKit.button("Fin de la demo" if Demo.on() else "Epílogo", MenuKit.INK, 28)
 		b.custom_minimum_size = Vector2(360, 58)
 		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		b.pressed.connect(func() -> void: epilogue_open.emit())

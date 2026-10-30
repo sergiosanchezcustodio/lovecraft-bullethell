@@ -134,7 +134,10 @@ func _row(e: Shop.Entry) -> Button:
 		b.custom_minimum_size.y = maxf(92.0, col.get_combined_minimum_size().y + 28.0))
 	var tag := ""
 	var color := UiKit.GOLD
-	if maxed:
+	if Demo.shop_locked(e):                                   # la demo (13.17)
+		tag = "Juego completo"
+		color = UiKit.TEXT_DIM
+	elif maxed:
 		tag = "Comprado" if e.prices.size() == 1 else "Completo"
 		color = Color(0.45, 0.9, 0.35)                        # verde
 	else:
@@ -159,6 +162,9 @@ func _icon(e: Shop.Entry) -> Texture2D:
 
 func _try_buy(e: Shop.Entry) -> void:
 	_focus_id = e.id
+	if Demo.shop_locked(e):
+		_say(Demo.LOCKED + ".")
+		return
 	if Shop.is_maxed(save, e):
 		_say("Ya lo tienes.")
 		return
