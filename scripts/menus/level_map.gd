@@ -15,6 +15,7 @@ var _info_title: Label
 var _info_text: Label
 var _first: Button
 var _endless_btn: Button
+var _daily_btn: Button
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -45,15 +46,27 @@ func _ready() -> void:
 			if dev: col.add_child(_level_button(l, won))
 			else: col.add_child(_level_line(l, won))
 		pi += 1
+	var extra := HBoxContainer.new()                 # modos aparte: del día y sin fin
+	extra.add_theme_constant_override("separation", 26)
+	extra.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_child(extra)
+	if Daily.unlocked(Saves.current) or dev:         # partida del día (hito 13.9): tras el primer nivel
+		var db := MenuKit.button("Partida del día" + ("" if Daily.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
+		db.custom_minimum_size = Vector2(460, 58)
+		db.focus_entered.connect(func() -> void:
+			_info_title.text = "Partida del día · %s" % Daily.pretty(Daily.today(), false)
+			_info_text.text = "El mismo escenario, investigador, compañero y pactos para todos, sacados de la fecha. El primer intento es el que cuenta.")
+		db.pressed.connect(func() -> void: _daily(db))
+		extra.add_child(db)
+		_daily_btn = db
 	if Endless.unlocked(Saves.current) or dev:       # modo sin fin (hito 13.8): al vencer a Cthulhu
 		var eb := MenuKit.button("La noche eterna" + ("" if Endless.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
 		eb.custom_minimum_size = Vector2(460, 58)
-		eb.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		eb.focus_entered.connect(func() -> void:
 			_info_title.text = "La noche eterna"
 			_info_text.text = "Modo sin fin: eliges escenario y aguantas oleadas de las tres partes, con un horror cada cinco minutos. Récord por personaje y escenario.")
 		eb.pressed.connect(func() -> void: _endless(eb))
-		box.add_child(eb)
+		extra.add_child(eb)
 		_endless_btn = eb
 	var sep := HSeparator.new()
 	box.add_child(sep)
@@ -70,6 +83,7 @@ func _ready() -> void:
 	if la.has("pacts"): Pacts.set_active(Array(la.get_str("pacts").split(",", false)))
 	if la.get_bool("pact_open") and _first: _pick.call_deferred(Campaign.first_of(0), _first)
 	if la.get_bool("endless_open") and _endless_btn: _endless.call_deferred(_endless_btn)   # capturas
+	if la.get_bool("daily_open") and _daily_btn: _daily.call_deferred(_daily_btn)
 
 ## Botón de una parte: empieza por su primer nivel.
 func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
@@ -110,6 +124,19 @@ func _level_button(l: Dictionary, won: Array) -> Button:
 		_info_text.text = "Criaturas: %s" % l.creatures)
 	b.pressed.connect(func() -> void: _pick(l.id, b))
 	return b
+
+## Partida del día: la ventana del día y, al jugar, directa (sus pactos son los del día, D-44).
+func _daily(from: Button) -> void:
+	var m := DailyMenu.new()
+	visible = false
+	m.play.connect(func(id: String) -> void:
+		visible = true
+		Pacts.set_active(Daily.pick(Daily.date_of(id)).pacts)
+		chosen.emit(id))
+	m.closed.connect(func() -> void:
+		visible = true
+		from.grab_focus.call_deferred())
+	get_parent().add_child(m)
 
 ## «La noche eterna»: elegir escenario y, después, los pactos (D-44: también en el sin fin).
 func _endless(from: Button) -> void:

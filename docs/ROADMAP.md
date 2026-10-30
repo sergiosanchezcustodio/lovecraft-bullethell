@@ -28,7 +28,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 10 | Guardado en la nube con GitHub | **Hecha** (26-10-2026) salvo el `client_id` de tu OAuth App y tu prueba con dos PC | Ninguna (D-11, resuelta) |
 | 11 | Calidad gráfica, animación y efectos | **Hecha** (28-10-2026) salvo tu revisión | Ninguna |
 | 12 | Detalles de personajes, enemigos, compañeros y escenarios | **Hecha** (29-10-2026) salvo tu revisión | Ninguna (D-41, resuelta) |
-| 13 | Calibración, modos de juego, narrativa, sonido, herramientas y distribución | **En curso:** plan aprobado (29-10-2026); 13.1 a 13.8 hechos | Las de cada hito (al final de la fase) |
+| 13 | Calibración, modos de juego, narrativa, sonido, herramientas y distribución | **En curso:** plan aprobado (29-10-2026); 13.1 a 13.9 hechos | Las de cada hito (al final de la fase) |
 
 ---
 
@@ -320,7 +320,7 @@ Pedida por el autor el 29-10-2026 («me gustan todas, establece un plan para hac
 
 **Aceptación:** el autor juega cada modo y cada sistema nuevo (solo y en cooperativo), encuentra su dificultad con el informe y el historial, y tiene en la mano una build de demo y un tráiler listos para itch.io.
 
-*Estado (29-10-2026):* plan aprobado por el autor («si, adelante»). **Hechos del 13.1 al 13.8**, pendientes de su revisión (la tabla nueva del 4 al 6, aprobada por él).
+*Estado (29-10-2026):* plan aprobado por el autor («si, adelante»). **Hechos del 13.1 al 13.9**, pendientes de su revisión (la tabla nueva del 4 al 6, aprobada por él).
 
 ### Bloque A: calibrar (lo primero, porque ayuda a probar todo lo demás)
 
@@ -344,7 +344,7 @@ Pedida por el autor el 29-10-2026 («me gustan todas, establece un plan para hac
 | 13.6 | **Pactos del Necronomicón** (4): antes de cada nivel, en el mapa, hasta tres maldiciones a elegir, cada una con su premio (más oro, más experiencia o mejores baúles). Ejemplos: las balas enemigas dejan un rastro que hace daño; sin curación al subir de nivel; la noche más cerrada; las élites se dividen al morir; el compañero no ayuda. Logros por superar niveles con pactos | Por datos (`data/pacts.json`), aplicados con las mismas palancas que la dificultad y los peligros; los superados, en `SaveData`. En cooperativo los elige el J1 (en red, el anfitrión) y se ven en la sala. **Hecho (29-10-2026), pendiente de tu revisión:** ocho pactos, `Pacts`, `PactMenu`, `data/pacts.json`; D-44 |
 | 13.7 | **Combinaciones en cooperativo** (7): cuando el ataque de un jugador toca lo que dejó el de otro, pasa algo nuevo: fuego sobre ácido da una nube tóxica; la onda empuja las llamas; un rayo que cruza una zona arcana se divide; una explosión sobre hielo o agua levanta metralla. Unas 8 combinaciones, con un rótulo pequeño la primera vez | Tabla por rasgos de daño (`data/combos.json`), comprobada en `DamageZone`, `Beam`, `Shockwave` y `Explosion`; no cuentan como armas (no suben ni evolucionan). En red, las decide el anfitrión. **Hecho (29-10-2026), pendiente de tu revisión:** las ocho, `Combos` y `data/combos.json` |
 | 13.8 | **Modo sin fin «La noche eterna»** (8): se abre al vencer a Cthulhu. Eliges arena entre las 15 y aguantas oleadas que mezclan enemigos de las tres partes, con jefes cada 5 minutos y una dificultad que sube sola. Récord de tiempo por personaje y arena | `LevelData` sin evento final y con escalada por tiempo (`data/levels/sin_fin.tres`), entrada en el menú de Jugar; récords en `SaveData`. En red, también. **Hecho (29-10-2026), pendiente de tu revisión:** `Endless`, `EndlessMenu` y `data/endless.json` |
-| 13.9 | **Partida del día** (9): cada día, la misma arena, el mismo personaje, el mismo compañero y los mismos pactos para todos (salen de la fecha), y un intento que cuenta. Récord propio por día, con racha | Semilla de la fecha que elige todo y fija el azar de la partida (oleadas, baúles y subidas); récords en `SaveData` y en la nube. Sin clasificación con otros jugadores, que necesitaría un servidor (ver decisiones) |
+| 13.9 | **Partida del día** (9): cada día, la misma arena, el mismo personaje, el mismo compañero y los mismos pactos para todos (salen de la fecha), y un intento que cuenta. Récord propio por día, con racha | Semilla de la fecha que elige todo y fija el azar de la partida (oleadas, baúles y subidas); récords en `SaveData` y en la nube. Sin clasificación con otros jugadores, que necesitaría un servidor (ver decisiones). **Hecho (30-10-2026), pendiente de tu revisión:** `Daily`, `DailyMenu` |
 
 ### Bloque D: ambientación y narrativa
 
@@ -377,7 +377,7 @@ Pedida por el autor el 29-10-2026 («me gustan todas, establece un plan para hac
 **Decisiones abiertas** (las pregunto antes del hito que las necesita, con una recomendación):
 - 13.4 (resuelta el 29-10-2026, D-43: la recomendada): en cooperativo local hay una sola pantalla para todos. Propongo que los enemigos falsos los vean todos, pero que salgan junto al jugador con la cordura baja y lleven un tinte de su color, y que el HUD que miente sea solo el de su panel.
 - 13.6 (resuelta el 29-10-2026, D-44: la recomendada): cuántos pactos y si se eligen también en el sin fin y en la partida del día. Propongo hasta tres, también en el sin fin, y fijos en la partida del día.
-- 13.9: sin servidor no hay clasificación con otros jugadores. Propongo récords propios (en el gist de la nube) y, para comparar con amigos, un código del resultado que se pueda compartir.
+- 13.9 (resuelta el 30-10-2026, D-45: la recomendada): sin servidor no hay clasificación con otros jugadores. Propongo récords propios (en el gist de la nube) y, para comparar con amigos, un código del resultado que se pueda compartir.
 - 13.11: quién escribe los fragmentos y el epílogo. Propongo escribirlos yo, al estilo de los relatos, y que tú los revises.
 - 13.13: la música actual son pistas CC0 sin capas. Propongo sintetizar las capas de percusión y coros con `tools/gen_sfx.py` encima de cada pista (provisionales) y cambiarlas por las tuyas cuando las tengas.
 - 13.15: el repositorio es público, así que Actions no cuesta nada; aun así propongo construir solo al subir una etiqueta (no en cada `push`), para no llenar la lista de ejecuciones.

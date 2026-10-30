@@ -177,3 +177,4 @@ static func fill_session(level: String, players: Array, me: int, online: bool) -
 		if seat.is_local() and (seat.device == Devices.KEYBOARD or JoypadInput.pads().has(seat.device)):
 			seat.guid = Devices.guid(seat.device)
 		GameSession.seats.append(seat)
+	if Daily.is_daily(level): Daily.dress_session(level)   # partida del día: su investigador y compañero (13.9)

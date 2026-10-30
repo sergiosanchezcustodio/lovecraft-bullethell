@@ -303,7 +303,10 @@ func _ready() -> void:
 	_make_announcer()
 	if not args.get_bool("nolevel"):
 		var level_id := (String(GameSession.level) if not GameSession.carry.is_empty() else args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1"))
-		if Endless.is_endless(level_id):              # «La noche eterna» (hito 13.8)
+		if Daily.is_daily(level_id):                  # partida del día (hito 13.9)
+			level = Daily.make_level(level_id)
+			add_child(Endless.new().setup(level))
+		elif Endless.is_endless(level_id):            # «La noche eterna» (hito 13.8)
 			level = Endless.make_level(level_id)
 			add_child(Endless.new().setup(level))
 		else:
@@ -369,6 +372,7 @@ func _ready() -> void:
 			hazards = Hazards.new().setup(level, world, arena.get_meta("obstacles"))
 			hazards.mirror = is_guest()               # en red, los saca el anfitrión (NetGame)
 			add_child(hazards)
+		if level.daily != "": _daily_seed()
 		if not args.has("shots") or args.get_bool("card"):   # capturas: sin el rótulo, salvo card=true
 			LevelCard.enter(self, level_id, level.display_name)
 		Music.play(level.music_path())
@@ -1032,7 +1036,8 @@ func _game_over() -> void:
 			for k in q.received: rv[k] = [roundi(q.received[k][0]), roundi(q.received[k][1])]
 			print("RECIBIDO J%d crisis=%d %s" % [q.index + 1, q.sanity_state.crises if "crises" in q.sanity_state else -1, JSON.stringify(rv)])
 	if Saves.current != null: Saves.current.stats["deaths"] += 1
-	if level != null and level.endless and director != null: _endless_record()
+	if level != null and level.daily != "" and director != null: _daily_record()
+	elif level != null and level.endless and director != null: _endless_record()
 	_check_achievements()
 	Saves.save()
 	Engine.time_scale = 0.35                       # la caída, a cámara lenta un momento
@@ -1040,8 +1045,38 @@ func _game_over() -> void:
 	Engine.time_scale = 1.0
 	get_tree().paused = true
 	var title := "Has caído" if players.size() == 1 else "Habéis caído"
-	if level != null and level.endless: title = "La noche eterna"
+	if level != null and level.endless: title = "Partida del día" if level.daily != "" else "La noche eterna"
 	_end_screen(title, Color(0.86, 0.22, 0.18), "", "caida")
+
+## Partida del día (hito 13.9): el azar de la partida sale de la fecha (oleadas, baúles,
+## peligros, subidas y atributos), igual para todos. Lo que depende del ritmo de cada uno
+## (quién aparece dónde respecto al jugador) cambia de una partida a otra.
+func _daily_seed() -> void:
+	var s := Daily.seed_of(level.daily)
+	seed(s)
+	_rng.seed = s + 1
+	director.rng.seed = s + 2
+	if hazards != null: hazards.rng.seed = s + 3
+	for q in players: q.reseed(s + 10 + q.index)
+
+## El primer intento del día cuenta: se apunta y sale su código para compartir (copiado al
+## portapapeles); los demás son de práctica.
+func _daily_record() -> void:
+	var t := director.time
+	var ch := String(players[0].data.id)
+	var counted := Daily.record(Saves.current, level.daily, t, director.killed_total, ch, players.size())
+	var code := Daily.encode(level.daily, t, director.killed_total, ch, players.size())
+	_endless_lines = PackedStringArray()
+	if counted:
+		_endless_lines.append("Intento del día · racha de %d" % Daily.streak(Saves.current, level.daily))
+		var copy := not args.has("bot") and not args.get_bool("halt_shots")
+		if copy: DisplayServer.clipboard_set(code)
+		_endless_lines.append("Código: %s%s" % [code, " (copiado)" if copy else ""])
+	elif Saves.current != null:
+		var r := Daily.result(Saves.current, level.daily)
+		_endless_lines.append("Práctica · el que cuenta: %s" % Endless.clock(float(r.get("t", 0.0))))
+	else:
+		_endless_lines.append("Código: %s" % code)
 
 ## Sin fin (hito 13.8): el tiempo aguantado y el récord de cada jugador de este PC con su
 ## personaje en este escenario.

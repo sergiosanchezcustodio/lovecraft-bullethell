@@ -47,7 +47,10 @@ func _ready() -> void:
 	var lvl_name := "Parte %d · Nivel %d" % [director.level.part, director.level.number] if director != null else "Campo de pruebas"
 	if director != null and director.level.endless:          # sin fin (hito 13.8): el récord de J1 aquí
 		lvl_name = "La noche eterna"
-		if player != null: _endless_best = Endless.best(Auto.save(), String(player.data.id), Endless.base_of(String(director.level.id)))
+		if director.level.daily != "":                    # partida del día (13.9): el intento que cuenta
+			lvl_name = "Partida del día"
+			_endless_best = float(Daily.result(Auto.save(), director.level.daily).get("t", 0.0))
+		elif player != null: _endless_best = Endless.best(Auto.save(), String(player.data.id), Endless.base_of(String(director.level.id)))
 	var title := UiKit.label(lvl_name, 16, UiKit.TEXT_DIM)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	top.add_child(title)
@@ -99,7 +102,8 @@ func _process_step(_delta: float) -> void:
 			var nxt := director.next_mid_time()
 			var parts := PackedStringArray()
 			if nxt > 0.0: parts.append("Siguiente horror en %s" % Endless.clock(nxt - director.time))
-			if _endless_best > 0.0: parts.append(("Récord %s" if director.time < _endless_best else "¡Récord! (%s)") % Endless.clock(_endless_best))
+			var words := ["El de hoy %s", "¡Mejor que el de hoy! (%s)"] if director.level.daily != "" else ["Récord %s", "¡Récord! (%s)"]
+			if _endless_best > 0.0: parts.append((words[0] if director.time < _endless_best else words[1]) % Endless.clock(_endless_best))
 			_objective_lbl.text = "  ·  ".join(parts)
 		else:
 			var left := int(director.level.final_time - director.time)

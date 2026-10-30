@@ -749,6 +749,11 @@ func _cloth_step(delta: float) -> void:
 		n.rotation.x += _cloth.x * CLOTH_PARTS[pname]
 		n.rotation.z += _cloth.y * CLOTH_PARTS[pname]
 
+## Partida del día (hito 13.9): el azar de los atributos y la cordura, de la semilla del día.
+func reseed(s: int) -> void:
+	_attr_rng.seed = s
+	if sanity_state != null: sanity_state.rng.seed = s + 100
+
 ## Cordura baja (hito 12.2): encorvado, manos que tiemblan y mirada inquieta, más cuanto más baja;
 ## a cero (la crisis), las manos a la cabeza. Con la cordura que ve este PC, así que vale para
 ## los jugadores de otros PC. No durante el esquive.

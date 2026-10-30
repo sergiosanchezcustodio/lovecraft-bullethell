@@ -19,6 +19,7 @@ static func is_endless(id: String) -> bool:
 	return id.begins_with(PREFIX)
 
 static func base_of(id: String) -> String:
+	if Daily.is_daily(id): return Daily.base_of(id)   # partida del día (13.9): el escenario de la fecha
 	return id.substr(PREFIX.length()) if is_endless(id) else id
 
 static func id_for(base: String) -> String:

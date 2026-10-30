@@ -1394,6 +1394,15 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **De paso, un fallo de la fase 12:** el muelle de la ropa (`Player._cloth_step`) se integraba en un solo paso por fotograma y, con fotogramas largos (`timescale=5`, o un tirón), se disparaba al infinito: la bufanda de Dyer desaparecía y Godot llenaba la consola de `!v.is_finite()` (unos 6 por segundo en todas las partidas aceleradas). Ahora va en pasos de 1/60 s como mucho y vuelve a cero si se sale de rango.
   - También: `Combos` usaba el autoload `Saves` y no dejaba compilar las herramientas con `-s`; ahora `Auto.save()`.
   - Hoja `shots/revision/2026-10-29/sin_fin.png` (capturas sueltas en `sin_fin/`). Tests en `test_endless` (5). 569 de 569.
+- **Fase 13, hito 13.9: partida del día (30-10-2026, D-45), pendiente de tu revisión.**
+  - Botón «Partida del día» en el mapa, junto a «La noche eterna»; se abre tras superar el primer nivel (en desarrollo, siempre). Cada día, para todos, el mismo escenario (uno de los 15), investigador (de los 13, aunque no lo tengas), compañero y de cero a dos pactos, sacados de la fecha con una semilla estable (`Daily.pick`, FNV-1a de «AAAA-MM-DD», la fecha del PC). Se juega como el modo sin fin sobre ese escenario (`Daily.make_level`, id `dia:2026-10-30`): los horrores cada 5 minutos y la dificultad que sube sola. Todos los jugadores llevan el investigador y el compañero del día (`Daily.dress_session`, también en red).
+  - El azar de la partida sale de la misma semilla (`game._daily_seed`): oleadas y baúles (`WaveDirector.rng`), peligros, opciones de las subidas (`_rng`), atributos y cordura de cada jugador (`Player.reseed`) y el `seed()` global. Lo que depende de cómo juega cada uno (dónde está al aparecer cada criatura) cambia.
+  - Ventana del día (`DailyMenu`): fecha, escenario, investigador, compañero y pactos; tu intento, la racha y la mejor racha; tu código; y los amigos comparados, con la diferencia («te saca 7:49»). «Comparar el código de un amigo» lee el portapapeles y lo guarda en el hueco; si es de otro día, lo dice.
+  - Al caer, el primer intento del día es el que cuenta: la pantalla final se titula «Partida del día» y pone «Intento del día · racha de N» y «Código: 09E0-0P00-1ARM (copiado)». Los siguientes son de práctica («Práctica · el que cuenta: 8:10»); el HUD los compara con el que cuenta («El de hoy 8:10»).
+  - El código: 60 bits (día desde el 1-1-2026, segundos, bajas, investigador, jugadores y 6 de comprobación contra erratas) en 12 letras de la base 32 de Crockford; se lee sin guiones, en minúsculas y con O por 0 o I/L por 1. No es a prueba de trampas (D-45).
+  - Todo en `SaveData.records.daily` (`days`, `best_streak`, `friends`), así que viaja con la copia de la nube.
+  - Pruebas: `daily_date=2026-10-30` fija la fecha, `select … map=true daily_open=true daily_code=09E0-FC05-3SSK` abre la ventana con un amigo, y `start_level=dia:2026-10-30` empieza directamente.
+  - Hoja `shots/revision/2026-10-30/partida_del_dia.png` (capturas en `dia/`). Tests en `test_daily` (5). 574 de 574.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 
