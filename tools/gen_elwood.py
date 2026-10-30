@@ -2,10 +2,10 @@
 casa de la bruja"). Personaje jugable (D-26).
 
 Casco Brodie (plato de ala ancha) verde oliva, guerrera de uniforme oliva con cinturón y
-correajes de lona, cartucheras, polainas enrolladas sobre las botas, bigote de cepillo y
+correajes de lona, cartucheras, polainas enrolladas sobre las botas, bigote de morsa y
 cara curtida. Corpulento, como Johansen. Estilo 4 (tools/cuerpo.py).
 Uso: python tools/gen_elwood.py
-     python tools/gen_elwood.py --morsa   # variante con bigote de morsa (models/elwood_morsa.json, para comparar)
+     python tools/gen_elwood.py --cepillo   # el bigote de cepillo de antes (models/elwood_cepillo.json, para comparar)
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
@@ -24,9 +24,9 @@ HAIR = (0.30, 0.22, 0.15); MOUSTACHE = (0.25, 0.17, 0.11); BROW = (0.20, 0.14, 0
 IRIS = (0.18, 0.15, 0.10); MOUTH = (0.68, 0.47, 0.38); EAR_IN = (0.62, 0.44, 0.34)
 HELMET_RIM = (0.40, 0.43, 0.33); STRAP = (0.32, 0.22, 0.13)
 B = 3
-# variante propuesta el 28-10-2026: bigote de morsa, más británico, que tapa la boca y cae por las
-# comisuras; no sustituye al de cepillo hasta que el autor lo elija
-MORSA = '--morsa' in sys.argv
+# bigote de morsa, más británico, que tapa la boca y cae por las comisuras: propuesto el 28-10-2026
+# y elegido por el autor el 30-10-2026 (petición 104); --cepillo saca el de antes
+MORSA = '--cepillo' not in sys.argv
 MOUSTACHE_L = (0.36, 0.26, 0.17)
 
 M = cu.new(1918)
@@ -114,7 +114,7 @@ for y in range(64, 78):                    # barboquejo, por fuera de la cara a 
         for z in (2, 3): M.put(x, y, z, H, STRAP, 0, False)
 
 cu.seams(M, (TUNIC,))
-cu.finish(M, 'elwood_morsa' if MORSA else 'elwood', {TUNIC: 'lana', TUNIC_SH: 'lana', WEBBING: 'lona', POUCH: 'lona', TROUSER: 'lana',
+cu.finish(M, 'elwood' if MORSA else 'elwood_cepillo', {TUNIC: 'lana', TUNIC_SH: 'lana', WEBBING: 'lona', POUCH: 'lona', TROUSER: 'lana',
                         PUTTEE: 'lana', PUTTEE_SH: 'lana', BOOT: 'cuero', SOLE: 'cuero', HAIR: 'pelo',
                         MOUSTACHE: 'pelo', MOUSTACHE_L: 'pelo', SKIN: 'piel', SKIN_SH: 'piel', STRAP: 'cuero'},
           flat=(BRASS, CHEEK, BROW, IRIS, MOUTH, EAR_IN), b=B,

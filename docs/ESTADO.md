@@ -1444,6 +1444,7 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **`sh tools/publicar.sh 0.9.1`:** con el árbol limpio, sube la versión, hace el commit «Versión 0.9.1» y la etiqueta `v0.9.1`, y pregunta antes de subirlo; si dices que no, explica cómo subirlo o deshacerlo. No repite una etiqueta que ya existe. Probado en un clon.
   - **Perfiles de exportación:** la versión del `.exe` y del `.app` estaba fija en 0.2.0; ahora están vacías y siguen a la del juego (0.9.0.0 en el `.exe`, 0.9.0 en el `Info.plist`).
   - **Probado:** tres ejecuciones a mano (la primera sacó el `.exe` sin icono: de ahí rcedit con wine). El `.exe` bajado de GitHub tiene el mismo icono y datos que el de `exportar.sh` y juega: con un bot y sin ventana (`--headless --fixed-fps 60`), a los 60 s, 26 abatidos y nivel 3. El paso de la Release solo corre con una etiqueta de verdad: se probará con la primera versión que publiques.
+- **Elwood con bigote de morsa (30-10-2026, petición 104 de la revisión de arte):** elegido por el autor («me gusta la propuesta, hazla»). Es ya el de `tools/gen_elwood.py` (el de cepillo de antes sale con `--cepillo`, en `models/elwood_cepillo.json`, que no se guarda); rehechos su vestuario (`gen_vestuario.py`: solo cambia la cinta del pelo) y las caras de la partida (`gen_caras_juego.py`). Quitado `models/elwood_morsa.json` y vaciado `review/propuestas.json`, así que la pestaña Propuestas no sale.
 - **Fase 13, hito 13.17: demo de la parte 1 (30-10-2026), pendiente de tu revisión.** Decidido por el autor: los cuatro personajes de inicio, la tienda y el cooperativo local, sin online.
   - **`Demo`** (`scripts/core/demo.gd`): se enciende con la etiqueta de exportación `demo` (perfiles nuevos «Windows Demo» y «macOS Demo» en `export_presets.cfg`, a `builds/demo/`; el `.exe` se llama `LovecraftLibraryDemo.exe` y la app de macOS lleva otro identificador) o, sin exportar, con `demo_build=true`.
   - **Qué cierra:** `Campaign` no abre más que la parte 1 (ni con «todo desbloqueado»); en el mapa, las partes 2 y 3 dicen «En el juego completo» y no salen la partida del día ni la noche eterna; «Jugar online · En el juego completo», desactivado; en la selección, los nueve personajes de pago, bloqueados con ese cartel (aunque se compraran en el juego completo), y en la tienda, «Juego completo» y sin compra (compañeros, potenciadores, mejoras y vestuario, sí). La versión de los menús dice «v0.9.0 · demo».
@@ -1467,7 +1468,7 @@ Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a
 - (Las tres, hechas el 28-10-2026: ver «Ideas pendientes técnicas».)
 
 Ofrecidas al cerrar las cabezas nuevas de los trece personajes (23-10-2026):
-- (Elwood con bigote de morsa: hecho como variante el 28-10-2026, falta que elijas.)
+- (Elwood con bigote de morsa: elegido el 30-10-2026.)
 
 Ofrecidas al cerrar el rediseño de Padre Dagon (23-10-2026):
 - (Las dos, hechas el 28-10-2026.)
