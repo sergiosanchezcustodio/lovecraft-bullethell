@@ -1,0 +1,129 @@
+# Builds de Windows y macOS (hito 13.15). Se lanza al subir una etiqueta de versión (v0.9.1,
+# con tools/publicar.sh) o a mano desde la pestaña Actions de GitHub («Run workflow»).
+# Pasa los tests y la revisión de los costados, comprime los modelos y exporta con los perfiles
+# de export_presets.cfg, como tools/exportar.sh. Con etiqueta, deja los dos zip en una Release en
+# borrador (para revisarla y publicarla a mano); a mano, solo en la ejecución (Artifacts).
+# Sin firma de macOS (firma ad hoc del propio Godot, como en local).
+name: Builds
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: builds-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: 4.4.1
+  GODOT: /home/runner/godot/godot
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Versión del juego
+        id: version
+        run: |
+          v=$(sed -n 's/^config\/version="\(.*\)"$/\1/p' project.godot)
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "${GITHUB_REF_NAME#v}" != "$v" ]; then
+            echo "::error::La etiqueta ${GITHUB_REF_NAME} no coincide con la versión de project.godot ($v). Usa tools/publicar.sh."
+            exit 1
+          fi
+          echo "Versión $v"
+
+      - name: Caché de Godot y sus plantillas
+        id: godot-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            /home/runner/godot
+            /home/runner/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_VERSION }}-win-mac
+
+      - name: Descargar Godot y las plantillas de Windows y macOS
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          base=https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable
+          mkdir -p /home/runner/godot
+          curl -sSL -o godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip -d /home/runner/godot
+          mv /home/runner/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 "$GODOT"
+          chmod +x "$GODOT"
+          tpl=/home/runner/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          mkdir -p "$tpl"
+          curl -sSL -o templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          # solo las que se usan: el paquete entero ocupa más de 1 GB
+          unzip -q -j -o templates.tpz templates/version.txt templates/windows_release_x86_64.exe \
+            templates/windows_release_x86_64_console.exe templates/macos.zip -d "$tpl"
+          rm godot.zip templates.tpz
+          ls -la "$tpl"
+
+      # Las importaciones (texturas comprimidas, sobre todo) tardan; Godot rehace solo las que cambian.
+      - name: Caché de las importaciones
+        uses: actions/cache@v4
+        with:
+          path: .godot
+          key: import-${{ env.GODOT_VERSION }}-${{ github.sha }}
+          restore-keys: import-${{ env.GODOT_VERSION }}-
+
+      - name: Importar el proyecto
+        run: |
+          "$GODOT" --headless --path . --import || true
+          "$GODOT" --headless --path . --import
+
+      - name: Tests
+        run: |
+          set -o pipefail
+          "$GODOT" --headless --path . -s addons/gut/gut_cmdln.gd 2>&1 | tee tests.log | grep -E "^\s*(Passing|Failing|Pending|Tests|Asserts)\s" || true
+          if grep -qE "^\s*Failing\s+[1-9]" tests.log || ! grep -qE "^\s*Passing\s+[1-9]" tests.log; then
+            grep -E "\[Failed\]|FAILED|SCRIPT ERROR" -A3 tests.log | head -80
+            echo "::error::Fallan tests"
+            exit 1
+          fi
+
+      - name: Costados de personajes y prendas
+        run: python3 tools/revisar_costados.py
+
+      - name: Comprimir los modelos y exportar
+        run: |
+          "$GODOT" --headless --path . -s tools/empaquetar_modelos.gd
+          mkdir -p builds/windows builds/macos
+          "$GODOT" --headless --path . --export-release "Windows Desktop" builds/windows/LovecraftLibrary.exe
+          "$GODOT" --headless --path . --export-release "macOS" builds/macos/LovecraftLibrary.zip
+          test -s builds/windows/LovecraftLibrary.exe
+          test -s builds/macos/LovecraftLibrary.zip
+          v=${{ steps.version.outputs.version }}
+          mkdir -p dist
+          (cd builds/windows && zip -q -9 "../../dist/LovecraftLibrary-${v}-windows.zip" LovecraftLibrary.exe)
+          cp builds/macos/LovecraftLibrary.zip "dist/LovecraftLibrary-${v}-macos.zip"
+          ls -la dist
+
+      - name: Guardar las builds en la ejecución
+        uses: actions/upload-artifact@v4
+        with:
+          name: LovecraftLibrary-${{ steps.version.outputs.version }}
+          path: dist/*.zip
+          compression-level: 0
+          retention-days: 30
+
+      - name: Release en borrador
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > notas.md <<'EOF'
+          **Windows:** descomprime y abre `LovecraftLibrary.exe`.
+          **macOS:** descomprime; la primera vez, clic derecho sobre la aplicación y «Abrir» (no está firmada con un certificado de Apple).
+          En red, todos los PC tienen que llevar la misma versión.
+          EOF
+          gh release create "$GITHUB_REF_NAME" dist/*.zip --draft --generate-notes \
+            --title "Lovecraft Library ${{ steps.version.outputs.version }}" --notes-file notas.md
