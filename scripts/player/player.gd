@@ -713,20 +713,37 @@ var _smokes: Array[GPUParticles3D] = []        ## humo de la pipa (se queda atr�
 var _breath_in := -1.0                         ## s hasta la próxima respiración del casco de buzo (-1: sin casco)
 const SMOKE_DRAG := 0.09                       ## cuánto se inclina el humo hacia atrás por m/s
 const BREATH_EVERY := Vector2(7.0, 12.0)       ## cada cuánto respira el casco (s, al azar)
+const BREATH_BOSS_NEAR := 12.0                 ## con un jefe a menos de esto (m), respira más deprisa
+const SMOKE_GREEN_AT := 0.3                    ## por debajo de esta cordura (fracción), el humo verdea
 var _flicker_t := 0.0
 const TORCH_FLICKER_AT := 0.35                 ## por debajo de esta cordura (fracción), la linterna falla
+## Ritmo de la respiración del casco: más deprisa con poca cordura (hasta 0,45) y con un jefe
+## cerca (×0,6). Multiplica el intervalo.
+func _breath_pace() -> float:
+	var pace := lerpf(0.45, 1.0, clampf(sanity / maxf(data.max_sanity, 1.0) / 0.4, 0.0, 1.0))
+	if world != null:
+		for e in world.enemies:
+			if is_instance_valid(e) and e.data.unique and e.is_alive() and e.global_position.distance_to(global_position) < BREATH_BOSS_NEAR:
+				pace *= 0.6
+				break
+	return pace
+
 func _hold_step(delta: float) -> void:
 	if not _smokes.is_empty():                   # el humo sigue a la cabeza (local_coords): al andar
 		var back := -velocity * SMOKE_DRAG        # se lo lleva el aire hacia atrás
 		back.y = 0.0
+		# con poca cordura (lo que las alucinaciones), el humo se vuelve verdoso
+		var green := clampf((SMOKE_GREEN_AT - sanity / maxf(data.max_sanity, 1.0)) / SMOKE_GREEN_AT * 1.5, 0.0, 1.0)
+		var tint := Color.WHITE.lerp(Color(0.8, 1.06, 0.78), green)
 		for e in _smokes:
 			var m := e.process_material as ParticleProcessMaterial
 			m.gravity = e.global_basis.inverse() * (Vector3(0.05, 0.16, 0.0) + back)
+			m.color = tint
 	if _breath_in >= 0.0 and visual.visible and not is_downed():   # el casco respira, metálico
 		_breath_in -= delta
 		if _breath_in < 0.0:
 			Auto.sfx_at("diver_breath", global_position)
-			_breath_in = randf_range(BREATH_EVERY.x, BREATH_EVERY.y)
+			_breath_in = randf_range(BREATH_EVERY.x, BREATH_EVERY.y) * _breath_pace()
 	if _bubbles != null:                         # el casco, al vadear (solo al cambiar: asignarlo en
 		var want := _wade > 0.5 and visual.visible   # cada fotograma volvía a empezar la emisión)
 		if _bubbles.emitting != want: _bubbles.emitting = want

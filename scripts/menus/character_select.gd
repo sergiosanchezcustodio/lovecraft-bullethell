@@ -905,6 +905,9 @@ class _Frame extends Control:
 		if not _outfit.visible: return
 		var set_name := OutfitSets.worn_name(seat.worn)          # conjunto entero (14.8)
 		_outfit_title.text = "Vestuario" if set_name == "" else "Conjunto: " + set_name
+		if set_name != "" and seat.peer == owner_screen._me:       # niveles superados con él (los de este PC)
+			var won := OutfitSets.levels_with(Saves.current, seat.worn)
+			if won > 0: _outfit_title.text += " · %d %s" % [won, "nivel" if won == 1 else "niveles"]
 		for k in OutfitData.KEYS.size():
 			var id := String(seat.worn.get(SelectState.OUTFIT_KEYS[k], ""))
 			var o := OutfitData.find(id) if id != "" else null
