@@ -38,9 +38,9 @@ slab(M, T, FUR, 36, 39, 0, 0, 25.5, 25.5, 14.5, 14.5, ch=1)                 # ba
 cu.belt(M, BELT)
 slab(M, T, SCARF, 59, 64, 0, 0.5, 15, 13, 12, 11, ch=1)                      # bufanda al cuello
 cu.neck(M, SKIN)
-for x in (-8, -5):                                                           # granadas de palo
-    slab(M, T, GREN, 45, 49, x + 1, 7.5, 3, 3, 3, 3, ch=1)
-    slab(M, T, HANDLE, 40, 45, x + 1, 7.3, 1.5, 1.5, 1.5, 1.5, ch=0)
+for x in (-8, -5):                                                           # granadas de palo (pieza `gear`:
+    slab(M, 'gear', GREN, 45, 49, x + 1, 7.5, 3, 3, 3, 3, ch=1)              # se oculta bajo una prenda de cuerpo)
+    slab(M, 'gear', HANDLE, 40, 45, x + 1, 7.3, 1.5, 1.5, 1.5, 1.5, ch=0)
 for y in range(46, 58):                                                      # tapeta con alamares
     M.put(0, y, M.front(0, y) or 7, T, PARKA_SH)
 for y in (48, 52, 56):
@@ -94,5 +94,5 @@ cu.finish(M, 'dyer', {PARKA: 'lona', PARKA_SH: 'lona', FUR: 'borreguillo', TROUS
                       SCARF: 'punto', SCARF_SH: 'punto', HAIR: 'pelo', BEARD: 'pelo', BEARD_SH: 'pelo',
                       SKIN: 'piel', SKIN_SH: 'piel', BELT: 'cuero'},
           flat=(LIP, BROW, TOGGLE, CHEEK, IRIS, NOSE_RED),
-          extra_pivots={'scarf': [3, 61, -7.5]}, extra_parents={'scarf': 'torso'},
+          extra_pivots={'scarf': [3, 61, -7.5], 'gear': [-5, 46, 7]}, extra_parents={'scarf': 'torso', 'gear': 'torso'},
           hat=(CAP, CAP_SH, FUR,))

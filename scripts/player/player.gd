@@ -124,7 +124,7 @@ var _crisis_w := 0.0             ## cuánto tiene las manos en la cabeza (crisis
 ## pelo atrás al andar (más al acelerar), adelante al frenar y hacia fuera al girar.
 const CLOTH_K := 70.0            ## rigidez del muelle (1/s²)
 const CLOTH_C := 7.0             ## amortiguación (poca: al frenar se pasa y vuelve)
-const CLOTH_PARTS := {"skirt": 1.0, "stole": 1.3, "scarf": 0.8, "hair": 0.6}
+const CLOTH_PARTS := {"skirt": 1.0, "stole": 1.3, "scarf": 0.8, "hair": 0.6, "tail": 0.45}
 const CLOTH_DODGE := 0.35        ## en el esquive, la ropa se mueve menos (con su velocidad salía volando)
 var _cloth := Vector2.ZERO       ## giro de la ropa (x: atrás, z: de lado), rad
 var _cloth_v := Vector2.ZERO
@@ -203,6 +203,7 @@ func _ready() -> void:
 	OutfitData.apply(model, data.model, worn)        # vestuario (D-34)
 	_hold = OutfitData.hold_of(worn)                 # paraguas, linterna (fase 14)
 	outfit_set = OutfitSets.worn_name(worn)          # conjunto entero puesto (14.8)
+	outfit_worn = worn
 	_face = FaceLook.new().setup(model, VoxelBuilder.variant_path("res://models/%s.json" % data.model))
 	add_child(_face)
 	_set_vis_layer(model)
@@ -695,6 +696,9 @@ var _hold := ""
 var _hold_w := 0.0
 ## Nombre del conjunto del vestuario que lleva entero ("" si ninguno; hito 14.8).
 var outfit_set := ""
+## Lo que lleva puesto ({hueco: prenda}): la ficha lo dibuja vestido.
+var outfit_worn := {}
+var _tail_t := 0.0
 func _hold_step(delta: float) -> void:
 	if not OutfitData.HOLDS.has(_hold): return
 	_hold_w = move_toward(_hold_w, 1.0 if _action == "" and _override == "" and _fidget == "" else 0.0, delta * 6.0)
@@ -774,6 +778,12 @@ func _cloth_step(delta: float) -> void:
 		var n: Node3D = parts[pname]
 		n.rotation.x += _cloth.x * CLOTH_PARTS[pname]
 		n.rotation.z += _cloth.y * CLOTH_PARTS[pname]
+	if parts.has("tail"):                        # el tentáculo, además, se retuerce solo
+		_tail_t += delta
+		var tl: Node3D = parts["tail"]
+		tl.rotation.x += 0.05 * sin(_tail_t * 1.3 + 1.0)
+		tl.rotation.y += 0.07 * sin(_tail_t * 0.9)
+		tl.rotation.z += 0.06 * sin(_tail_t * 1.7)
 
 ## Partida del día (hito 13.9): el azar de los atributos y la cordura, de la semilla del día.
 func reseed(s: int) -> void:

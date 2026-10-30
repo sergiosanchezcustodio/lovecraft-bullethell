@@ -34,8 +34,10 @@ static func _projected(m: Node3D, basis: Basis) -> Rect2:
 			first = false
 	return r
 
-## hold: postura del brazo (OutfitData.HOLDS) para las prendas que se sostienen (fase 14).
-static func make(host: Node, model_name: String, mode: String = "full", px: int = 128, fixed := 0.0, hold := "") -> Texture2D:
+## hold: postura del brazo (OutfitData.HOLDS) para las prendas que se sostienen (fase 14);
+## worn: el vestuario puesto ({hueco: prenda}), en la ficha y en la Biblioteca.
+static func make(host: Node, model_name: String, mode: String = "full", px: int = 128, fixed := 0.0, hold := "",
+		worn := {}) -> Texture2D:
 	var vp := SubViewport.new()
 	# se renderiza una sola vez: sin interpolación, o saldría a medio camino desde el origen
 	vp.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
@@ -46,6 +48,7 @@ static func make(host: Node, model_name: String, mode: String = "full", px: int 
 	host.add_child(vp)
 	var m := VoxelBuilder.load_model("res://models/%s.json" % model_name)
 	vp.add_child(m)
+	if not worn.is_empty(): OutfitData.apply(m, model_name, worn)
 	OutfitData.pose_hold(m, hold, 1.0)
 	var cam := Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL

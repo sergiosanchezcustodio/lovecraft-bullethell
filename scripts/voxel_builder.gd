@@ -119,7 +119,11 @@ static func load_model(path: String) -> Node3D:
 
 ## Viste un modelo con una prenda del vestuario (models/vest_*.json, con los mismos pivotes):
 ## las mallas de cada parte de la prenda pasan a la parte igual del modelo, así que se animan
-## con ella. Una prenda de cabeza oculta el sombrero del personaje (parte "hat").
+## con ella. Una prenda de cabeza oculta el sombrero del personaje (parte "hat"). Las piezas que
+## el personaje no tiene (GRAFT: el tentáculo) se le añaden colgando de la misma parte que en la
+## prenda, y entran en las listas de Anims.reset.
+const GRAFT := ["tail"]
+
 static func dress(root: Node3D, garment_path: String, hides_hat := false) -> bool:
 	if not model_exists(garment_path): return false
 	var g := load_model(garment_path)
@@ -129,6 +133,7 @@ static func dress(root: Node3D, garment_path: String, hides_hat := false) -> boo
 		var src: Node3D = g.get_meta("part_nodes")[pname]
 		var dst: Node3D = nodes.get(pname)
 		if dst == null and pname == "skirt": dst = nodes.get("torso")   # cuerpos de antes del hito 12.3
+		if dst == null and GRAFT.has(pname): dst = _graft(root, src)
 		if dst == null: continue
 		for c in src.get_children():
 			if c is MeshInstance3D:
@@ -140,12 +145,30 @@ static func dress(root: Node3D, garment_path: String, hides_hat := false) -> boo
 	if hides_hat and nodes.has("hat"): (nodes["hat"] as Node3D).visible = false
 	return true
 
+## Pieza de la prenda que el personaje no tiene: un nodo vacío en el mismo sitio, colgado de la
+## misma parte (los pivotes de prenda y personaje son los mismos).
+static func _graft(root: Node3D, src: Node3D) -> Node3D:
+	var nodes: Dictionary = root.get_meta("part_nodes")
+	var parent: Node3D = nodes.get(String(src.get_parent().name))
+	if parent == null: return null
+	var n := Node3D.new()
+	n.name = src.name
+	n.position = src.position
+	parent.add_child(n)
+	nodes[String(n.name)] = n
+	(root.get_meta("parts") as Array).append(n)
+	(root.get_meta("rest") as Array).append(n.position)
+	(root.get_meta("rest_by_name") as Dictionary)[n.name] = n.position
+	return n
+
 ## Puntos sin voxels de una prenda (fase 14): "smoke_*" echa humo de pipa desde la cabeza;
-## "beam" y "beam_to", la luz de la linterna desde el antebrazo derecho, en esa dirección.
+## "beam" y "beam_to", la luz de la linterna desde el antebrazo derecho, en esa dirección (no en
+## la calidad Baja: `torch_light` en data/quality.json).
 static func _marks(g: Node3D, nodes: Dictionary) -> void:
 	var piv: Dictionary = g.get_meta("pivots")
 	var vs := float(g.get_meta("voxel_size"))
-	if piv.has("beam") and piv.has("beam_to") and nodes.has("fore_r") and not (nodes["fore_r"] as Node3D).has_node("Beam"):
+	if piv.has("beam") and piv.has("beam_to") and nodes.has("fore_r") and not (nodes["fore_r"] as Node3D).has_node("Beam") \
+			and bool(Quality.value("torch_light", true)):
 		var fp: Array = piv["fore_r"]
 		var a: Array = piv["beam"]
 		var b: Array = piv["beam_to"]

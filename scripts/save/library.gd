@@ -15,6 +15,7 @@ const TOMES := [
 	{"id": "achievements", "title": "Logros", "roman": "VI"},
 	{"id": "diary", "title": "Diarios", "roman": "VII"},
 	{"id": "stories", "title": "Relatos", "roman": "VIII"},
+	{"id": "wardrobe", "title": "Vestuario", "roman": "IX"},
 ]
 const EPILOGUES := [["epilogo", "Epílogo · Lo que vino después"], ["epilogo_locura", "Epílogo · El que no volvió del todo"]]
 const RESULTS := {"won": "Superado", "lost": "Caído", "endless": "La noche eterna"}
@@ -29,10 +30,31 @@ static func text(kind: String, id: String) -> String:
 	return String((_texts.get(kind, {}) as Dictionary).get(id, ""))
 
 ## Entradas de un tomo: {id, name, known, text, model, mode, icon, facts: Array[String],
-## section (subtítulo de grupo, opcional)}.
+## section (subtítulo de grupo, opcional)}. Las del vestuario llevan además worn (lo que viste
+## el modelo) y dim (aún no se tiene entero: el nombre se lee, el modelo sale en sombra).
 static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	match tome:
+		"wardrobe":                                    # conjuntos del vestuario (fase 14)
+			for s: Dictionary in OutfitSets.all():
+				var done := save != null and (save.unlock_all or OutfitSets.is_complete(save, s))
+				var names := PackedStringArray()
+				var lack := PackedStringArray()
+				var miss := OutfitSets.missing(save, s) if save != null else []
+				for k: String in s.pieces:
+					var o := OutfitData.find(String(s.pieces[k]))
+					if o == null: continue
+					names.append(o.display_name)
+					if not done and miss.has(String(o.id)): lack.append(o.display_name)
+				var facts := [", ".join(names)]
+				if done: facts.append("Completo")
+				elif lack.size() == names.size(): facts.append("Aún no tienes ninguna de sus prendas: están en la tienda.")
+				else: facts.append("Te falta: " + ", ".join(lack))
+				var e := _e(String(s.id), String(s.name), true, String(s.description), String(s.get("shown", "dyer")), "full",
+					null, facts, "Conjuntos")
+				e["worn"] = OutfitSets.as_worn(s)
+				e["dim"] = not done
+				out.append(e)
 		"stories":                                     # páginas sueltas y epílogos (hito 13.11)
 			for s: Dictionary in Fragments.stories():
 				var pages: Array = s.pages
@@ -120,7 +142,7 @@ static func count_known(save: SaveData, tome: String) -> Vector2i:
 		var list := Achievements.all()
 		return Vector2i(list.filter(func(a: AchievementData) -> bool: return Achievements.is_done(save, a)).size(), list.size())
 	var es := entries(save, tome)
-	return Vector2i(es.filter(func(e: Dictionary) -> bool: return e.known).size(), es.size())
+	return Vector2i(es.filter(func(e: Dictionary) -> bool: return e.known and not e.get("dim", false)).size(), es.size())
 
 static func _e(id: String, name: String, known: bool, txt: String, model: String, mode: String,
 		icon: Texture2D, facts: Array, section := "") -> Dictionary:

@@ -34,13 +34,15 @@ cu.opening(M, 56, 61, 3, 7, SKIN)                                       # escote
 for x in range(-3, 3): cu.front(M, x, 58 if x in (-3, 2) else 57, PEARL, dz=1)   # collar de perlas
 cu.front(M, -1, 56, PEARL, dz=1); cu.front(M, 0, 56, PEARL, dz=1)
 cu.neck(M, SKIN)
-# estola sobre los hombros y los brazos, abierta por delante, con flecos
-slab(M, T, STOLE, 53, 61, 0, 0, 22, 21, 15.5, 14, ch=2)
-cu.opening(M, 53, 61, 5, 9, SKIN)
-cu.opening(M, 53, 56, 5, 5, DRESS)
+# estola sobre los hombros y los brazos, abierta por delante, con flecos: pieza `shawl`, que se
+# oculta bajo una prenda de cuerpo del vestuario (asomaba por los abrigos); debajo sigue el
+# vestido (keep_under)
+slab(M, 'shawl', STOLE, 53, 61, 0, 0, 22, 21, 15.5, 14, ch=2)
+cu.opening(M, 53, 61, 5, 9, SKIN, part='shawl')
+cu.opening(M, 53, 56, 5, 5, DRESS, part='shawl')
 for x in range(-11, 11, 2):
     for y in (51, 52):
-        cu.front(M, x, y, FRINGE, dz=1); cu.back(M, x, y, FRINGE)
+        cu.front(M, x, y, FRINGE, dz=1, part='shawl'); cu.back(M, x, y, FRINGE, part='shawl')
 # puntas de la estola que cuelgan por delante, con flecos (hito 12.3): pieza aparte, `stole`,
 # que se mece con retraso al andar, como los faldones
 STOLE_SH = (0.28, 0.11, 0.26)
@@ -54,8 +56,8 @@ for s in (-1, 1):
 
 cu.arms(M, DRESS, SKIN, cuff=DRESS_SH, cuff_wide=False, ax=AX, slim=True)
 for s, _, _, arm, _ in cu.sides():                                      # la estola cubre el hombro
-    slab(M, arm, STOLE, 53, 61, AX * s, 0, 8, 8.5, 8.5, 9, ch=1)
-    slab(M, arm, FRINGE, 52, 53, AX * s, 0, 8, 8, 8.5, 8.5, ch=1)
+    slab(M, 'shawl' + arm[-2:], STOLE, 53, 61, AX * s, 0, 8, 8.5, 8.5, 9, ch=1)   # shawl_l/_r, colgadas
+    slab(M, 'shawl' + arm[-2:], FRINGE, 52, 53, AX * s, 0, 8, 8, 8.5, 8.5, ch=1)  # del brazo (se ocultan igual)
 # cara rehecha el 23-10-2026 como la de Legrasse (referencias tools/local/ref_cabeza_varga_*):
 # cejas finas y altas (las caídas le ponían cara de enfado), ojos ahumados con sombra ciruela y
 # rabillo, nariz pequeña y labios granate oscuro
@@ -98,4 +100,5 @@ cu.finish(M, 'varga', {DRESS: 'lana', DRESS_SH: 'lana', STOLE: 'lana', HAIR: 'pe
                        SHOE: 'cuero', SOLE: 'cuero', SKIN: 'piel', SKIN_SH: 'piel'},
           flat=(LIP, LIP_LO, BROW, LASH, SHADOW, IRIS, CHEEK, PEARL, FRINGE, GEM, FEATHER, FEATHER_SH, BAND, STOCKING), ax=AX,
           hat=(BAND, GEM, FEATHER, FEATHER_SH,), skirt=True,
-          extra_pivots={'stole': [0, 54, 8]}, extra_parents={'stole': 'torso'})
+          extra_pivots={'stole': [0, 54, 8], 'shawl': [0, 57, 0], 'shawl_l': [-AX, 57, 0], 'shawl_r': [AX, 57, 0]},
+          extra_parents={'stole': 'torso', 'shawl': 'torso', 'shawl_l': 'arm_l', 'shawl_r': 'arm_r'})

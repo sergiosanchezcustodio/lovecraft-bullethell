@@ -795,12 +795,14 @@ def _skirt(M, bd, col, y0, flare=4.0, pad=0.0):
     slab(M, T, col, y0, 38, 0, 0.3, 27 + b + flare + pad, 26 + b + pad, 16 + flare * 0.8 + pad, 15 + pad, ch=3)
 
 
-def _leg_cover(M, bd, col, bottom=5, pad=2.0):
-    """Perneras encima de las del personaje, desde `bottom` hasta la cadera."""
+def _leg_cover(M, bd, col, bottom=5, pad=2.0, top=41):
+    """Perneras encima de las del personaje, desde `bottom` hasta la cadera. Con manga larga en
+    la misma prenda, `top=40`: la manga pisa la pernera en la fila de la cadera y, como un voxel
+    solo guarda una pieza debajo, el tronco de esa fila se perdía (hueco en el costado)."""
     for s, leg, shin, _, _ in cu.sides():
         cx = (4.5 if bd['fem'] else 5) * s
         slab(M, shin, col, bottom, 27, cx, 0, 9 + pad, 9 + pad, 10 + pad, 9.5 + pad, ch=1)
-        slab(M, leg, col, 27, 41, cx * 1.04, 0, 9 + pad, 11 + pad, 9 + pad, 10.5 + pad, ch=1)
+        slab(M, leg, col, 27, top, cx * 1.04, 0, 9 + pad, 11 + pad, 9 + pad, 10.5 + pad, ch=1)
 
 
 def _front_line(M, x, y0, y1, col, part=T, dz=0):
@@ -904,7 +906,7 @@ def mono_mecanico(M, bd):
     """Mono de mecánico azul, entero, con cremallera, bolsillos y manchas de grasa."""
     BLUE = (0.20, 0.30, 0.48); BLUE_SH = (0.15, 0.23, 0.38); GREASE = (0.07, 0.07, 0.06); ZIP = (0.62, 0.60, 0.54)
     _torso_cover(M, bd, BLUE, 36, pad=2.5)
-    _leg_cover(M, bd, BLUE, bottom=7, pad=2)
+    _leg_cover(M, bd, BLUE, bottom=7, pad=2, top=40)
     _sleeves(M, bd, BLUE, BLUE_SH, pad=2.5)
     for y in range(38, 61): _front_line(M, 0, y, y + 1, ZIP)
     for s in (-1, 1):                                                    # bolsillos del pecho
@@ -1051,7 +1053,7 @@ def uniforme_lake(M, bd):
     KHAKI = (0.62, 0.56, 0.40); KHAKI_SH = (0.50, 0.45, 0.31); BELT = (0.34, 0.22, 0.12)
     PATCH = (0.16, 0.30, 0.20); GOLD = (0.86, 0.70, 0.30); BTN = (0.30, 0.24, 0.14)
     _torso_cover(M, bd, KHAKI, 34, pad=2.5)
-    _leg_cover(M, bd, KHAKI, bottom=12, pad=1.5)
+    _leg_cover(M, bd, KHAKI, bottom=12, pad=1.5, top=40)
     b = _bb(bd)
     slab(M, T, BELT, 41, 44, 0, 0.3, 27 + b, 27 + b, 16.5, 16.5, ch=3)
     for s in (-1, 1):                                                    # bolsillos de parche
@@ -1228,7 +1230,7 @@ def torso_of(c):
     encima del pecho quede por fuera de su ropa."""
     with open('models/%s.json' % c) as f:
         return {(v[0], v[1], v[2]) for v in json.load(f)['voxels']
-                if v[3] in ('torso', 'skirt', 'stole', 'scarf') and not (len(v) > 8 and v[8] & 64)}
+                if v[3] in ('torso', 'skirt', 'stole', 'scarf', 'gear', 'shawl') and not (len(v) > 8 and v[8] & 64)}
 
 
 class _Chest:
@@ -1761,7 +1763,8 @@ def mochila(M, bd, torso):
 
 def tentaculo(M, bd, torso):
     """Un tentáculo que sale de la espalda, sube por detrás de la cabeza y cae por delante del
-    hombro derecho, con ventosas por debajo. Ya no lo esconde."""
+    hombro derecho, con ventosas por debajo. Ya no lo esconde. Pieza propia, `tail`, que cuelga
+    del tronco por la raíz: en la partida se mece al andar y se retuerce solo (Player._cloth_step)."""
     SKIN = (0.30, 0.42, 0.38); SKIN_D = (0.22, 0.31, 0.29); BELLY = (0.66, 0.52, 0.56); SUCKER = (0.82, 0.66, 0.70)
     ch = _Chest(bd, torso)
     zb = min(ch.back.get((x, y), 0) for x in range(-4, 4) for y in range(44, 52)) - 1
@@ -1782,9 +1785,11 @@ def tentaculo(M, bd, torso):
                     under = dy < -r * 0.35
                     if under: col = SUCKER if (k[0] + k[2] + k[1]) % 3 == 0 and r > 1.6 else BELLY
                     else: col = SKIN_D if band else SKIN
-                    M.put(k[0], k[1], k[2], T, col)
+                    M.put(k[0], k[1], k[2], 'tail', col)
     for (x, y, z) in list(M.V):                                           # no entra en el cuerpo
         if (x, y, z) in ch.shell: M.V.pop((x, y, z))
+    M.marks = {'tail': [2, 48, zb - 3]}
+    M.extra_parents = {'tail': 'torso'}
     return {}
 
 
@@ -1844,6 +1849,7 @@ def build(name, c):
     materiales.texturize(under, mats)
     piv, parents = cu.pivots(bd['finish_b'], bd['finish_ax'])
     piv.update(getattr(M, 'marks', {}))      # puntos sin voxels: de dónde sale el humo de la pipa
+    parents.update(getattr(M, 'extra_parents', {}))   # piezas propias de la prenda (el tentáculo)
     out = 'models/vest_%s_%s.json' % (name, c)
     return M.export(out, piv, jitter=0.0, pivots_in_voxels=True, roughness=0.9, specular=0.25, parents=parents,
                     extra=under.V)

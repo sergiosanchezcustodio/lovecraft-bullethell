@@ -94,7 +94,19 @@ static func hold_of(worn: Dictionary) -> String:
 	return ""
 
 ## Viste un modelo de personaje con lo que lleva puesto ({"head": id, "body": id, "feet": id, "acc": id}).
+## Piezas del personaje que una prenda de cuerpo tapa: la estola de Varga y las granadas de Dyer
+## asomaban por los abrigos.
+const UNDER_BODY := ["stole", "shawl", "shawl_l", "shawl_r", "gear"]
+
 static func apply(root: Node3D, character_model: String, worn: Dictionary) -> void:
 	for k in worn:
 		var o := find(String(worn[k]))
-		if o != null: VoxelBuilder.dress(root, o.model_path(character_model), o.slot == Slot.HEAD)
+		if o == null: continue
+		VoxelBuilder.dress(root, o.model_path(character_model), o.slot == Slot.HEAD)
+		if o.slot == Slot.BODY: cover(root)
+
+## Oculta lo del personaje que tapa una prenda de cuerpo (UNDER_BODY).
+static func cover(root: Node3D) -> void:
+	var nodes: Dictionary = root.get_meta("part_nodes")
+	for pname: String in UNDER_BODY:
+		if nodes.has(pname): (nodes[pname] as Node3D).visible = false

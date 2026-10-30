@@ -213,7 +213,7 @@ func _open_tome(i: int) -> void:
 			list.add_child(h)
 		var b := _row(String(e.name) if e.known else "???", 24)
 		b.custom_minimum_size.x = PAGE.x - 130
-		if not e.known: b.add_theme_color_override("font_color", INK_DIM)
+		if not e.known or e.get("dim", false): b.add_theme_color_override("font_color", INK_DIM)
 		b.focus_entered.connect(func() -> void: _show_entry(k))
 		list.add_child(b)
 	_left.add_child(_hint("Arriba/abajo: recorrer  ·  B o Esc: volver a los tomos"))
@@ -245,7 +245,7 @@ func _show_entry(k: int) -> void:
 		img.custom_minimum_size = Vector2(IMAGE_PX, IMAGE_PX)
 		img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		if not known: img.modulate = Color(0.12, 0.08, 0.05, 0.85)     # silueta
+		if not known or e.get("dim", false): img.modulate = Color(0.12, 0.08, 0.05, 0.85)     # silueta
 		frame.add_child(img)
 		_right.add_child(frame)
 	else:
@@ -285,12 +285,13 @@ func _unknown_text() -> String:
 func _image(e: Dictionary) -> Texture2D:
 	if e.icon != null: return e.icon
 	if String(e.model) == "": return null
-	var key := "%s:%s" % [e.model, e.mode]
+	var worn: Dictionary = e.get("worn", {})
+	var key := "%s:%s:%s" % [e.model, e.mode, e.id if not worn.is_empty() else ""]
 	if not _icons.has(key):
 		var fixed := 0.0
 		if _tome == "enemies" and String(e.model) != "":   # a escala, salvo los colosos: a la suya
 			fixed = maxf(_bestiary_scale(), ModelIcon.frame_size(String(e.model)) * ModelIcon.MARGIN)
-		_icons[key] = ModelIcon.make(self, String(e.model), String(e.mode), IMAGE_PX, fixed)
+		_icons[key] = ModelIcon.make(self, String(e.model), String(e.mode), IMAGE_PX, fixed, OutfitData.hold_of(worn), worn)
 	return _icons[key]
 
 ## Bestiario a escala: el encuadre lo marca el enemigo más grande.

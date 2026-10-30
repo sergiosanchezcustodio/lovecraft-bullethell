@@ -217,14 +217,15 @@ def back(M, x, y, col, part=T):
             return
 
 
-def opening(M, y0, y1, w0, w1, col, x0=0.0):
+def opening(M, y0, y1, w0, w1, col, x0=0.0, part=T):
     """Abertura en V (o en trapecio) pintada en la pechera: de ancho w0 abajo a w1 arriba,
-    centrada en x = x0 - 0,5 (el eje de simetría del cuerpo)."""
+    centrada en x = x0 - 0,5 (el eje de simetría del cuerpo). `part`: la pieza que se pinta (la
+    estola de Varga, que es aparte)."""
     for y in range(y0, y1):
         t = (y - y0 + 0.5) / max(y1 - y0, 1)
         w = w0 + (w1 - w0) * t
         for x in range(int(round(x0 - w / 2)), int(round(x0 + w / 2))):
-            front(M, x, y, col)
+            front(M, x, y, col, part=part)
 
 
 # ---------------- brazos ----------------
