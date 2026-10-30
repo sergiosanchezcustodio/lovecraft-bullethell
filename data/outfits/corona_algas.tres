@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="OutfitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/outfit_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"corona_algas"
+display_name = "Corona de algas"
+description = "Algas, conchas y una estrella de mar, de los que vuelven del mar."
+slot = 0
+price = 2500
+order = 21

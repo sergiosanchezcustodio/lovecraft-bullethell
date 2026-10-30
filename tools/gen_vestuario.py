@@ -10,7 +10,7 @@ Las de cabeza ocultan el sombrero del personaje (parte `hat`): cubren desde la a
 Salida: models/vest_<prenda>_<personaje>.json.
 Uso: python tools/gen_vestuario.py [prenda ...]
 """
-import sys, os, json
+import sys, os, json, math, inspect
 sys.path.insert(0, os.path.dirname(__file__))
 import cuerpo as cu
 from cuerpo import slab, rslab, T, H
@@ -305,7 +305,12 @@ def face_of(c):
     mano del 23-10-2026 no los tienen todas a la misma altura), y los voxels de su cabeza."""
     with open('models/%s.json' % c) as f:
         vox = [v for v in json.load(f)['voxels'] if v[3] == 'head' and not (len(v) > 8 and v[8] & 64)]
-    whites = [v[1] for v in vox if v[2] >= 3 and sum(abs(a - b) for a, b in zip(v[4:7], cu.EYE_W)) < 0.05]
+    rows = {}
+    for v in vox:
+        if v[2] >= 3 and sum(abs(a - b) for a, b in zip(v[4:7], cu.EYE_W)) < 0.05: rows[v[1]] = rows.get(v[1], 0) + 1
+    # los ojos son filas de pocos blancos (2 a 6): la barba blanca de Armitage, de 8 o más por fila
+    # y por debajo, pasaba por ellos y le ponía las gafas en la boca (corregido el 30-10-2026)
+    whites = [y for y, n in rows.items() if 2 <= n <= 6 and y >= 66]
     return (min(whites) if whites else 73), {(v[0], v[1], v[2]) for v in vox}
 
 
@@ -469,6 +474,313 @@ def zapatos_tacon(M, bd):
         slab(M, shin, RED, 5, 6, cx, 0, 10, 10, 11, 11, ch=1)                        # tira
     return {}
 
+# ------------------------------------------------------------------ fase 14: cabeza (30-10-2026)
+
+def _speck(x, y, z, n):
+    """Ruido fijo para manchas sueltas (verdín, lunares): verdadero en 1 de cada n voxels."""
+    return ((x * 73856093) ^ (y * 19349663) ^ (z * 83492791)) % n == 0
+
+
+def _hair_cap(M, bd, hair):
+    """Coronilla del color del pelo, para lo que no cubre la cabeza entera (como cinta_pelo): bajo
+    un sombrero del personaje oculto no siempre hay pelo."""
+    w, d = _head_box(bd)
+    rslab(M, H, hair, 76, 84, 0, 0.0, w + 1, d + 1, r=4, rt=4, rb=0)
+
+
+def _front_at(M, x, y, part=H):
+    zs = [z for (vx, vy, z), v in M.V.items() if vx == x and vy == y and v[0] == part]
+    return max(zs) if zs else None
+
+
+def gorra_marinero(M, bd):
+    """Gorra de lana azul marino de los pescadores de Innsmouth, ceñida, con visera corta de hule
+    y manchas de verdín del salitre."""
+    WOOL = (0.14, 0.18, 0.30); WOOL_SH = (0.10, 0.13, 0.22); PEAK = (0.06, 0.06, 0.07); MOSS = (0.32, 0.42, 0.24)
+    w, d = _head_box(bd)
+    slab(M, H, WOOL_SH, 76, 79, 0, 0.3, w + 1.6, w + 1.6, d + 1.6, d + 1.6, ch=3)
+    rslab(M, H, WOOL, 79, 85, 0, 0.0, w + 2.5, d + 2.5, r=4.5, rt=3, rb=0)
+    zf = int(round(0.3 + (d + 1.6) / 2))
+    slab(M, H, PEAK, 76, 78, 0, zf + 2, w - 2, w - 3, 4, 4, ch=1)
+    for (x, y, z), v in M.V.items():
+        if v[1] in (WOOL, WOOL_SH) and _speck(x, y, z, 9 if y < 80 else 17): v[1] = MOSS
+    return {WOOL: 'lana', WOOL_SH: 'lana'}
+
+
+def fez(M, bd):
+    """Fez granate de la Orden Esotérica de Dagon, con el signo dorado delante y borla negra."""
+    RED = (0.50, 0.08, 0.10); RED_SH = (0.40, 0.06, 0.08); BLACK = (0.06, 0.05, 0.05); GOLD = (0.88, 0.70, 0.28)
+    w, d = _head_box(bd)
+    slab(M, H, RED, 77, 89, 0, 0.0, w + 1, w - 3, d + 1, d - 3, ch=3)
+    slab(M, H, RED_SH, 77, 79, 0, 0.0, w + 1.4, w + 1.4, d + 1.4, d + 1.4, ch=3)
+    for x in range(0, int(w / 2) - 1):                                   # cordón por arriba...
+        M.put(x, 89, 0, H, BLACK)
+    xs = int(w / 2) - 1
+    for y in range(83, 89):                                              # ...que cae por el lado
+        M.put(xs, y, 0, H, BLACK)
+    for y in range(80, 84):                                              # borla
+        for x in (xs - 1, xs, xs + 1):
+            for z in (-1, 0, 1):
+                if y == 80 and abs(z) + abs(x - xs) > 1: continue
+                M.put(x, y, z, H, BLACK)
+    for x, y in ((-1, 84), (0, 84), (-2, 83), (1, 83), (-1, 82), (0, 82), (-1, 81), (0, 81)):   # el signo de la Orden
+        z = _front_at(M, x, y)
+        if z is not None: M.put(x, y, z + 1, H, GOLD)
+    return {RED: 'lana', RED_SH: 'lana'}
+
+
+def capucha_cultista(M, bd, face):
+    """Capucha negra de cultista con la cara en sombra: solo se ven dos ojos que brillan.
+    Cae sobre los hombros como una esclavina corta."""
+    CLOTH = (0.13, 0.11, 0.13); CLOTH_SH = (0.08, 0.07, 0.08); SHADOW = (0.012, 0.010, 0.012)
+    EYE = (0.95, 0.72, 0.28)
+    w, d = _head_box(bd)
+    rslab(M, H, CLOTH, 62, 90, 0, -1.0, w + 5, d + 5, r=6, rt=8, rb=0)
+    rslab(M, H, CLOTH, 84, 94, 0, -6.0, 6, 6, r=2.5, rt=3, rb=0)           # pico de la capucha, atrás
+    y0 = face[0]
+    zf = max(z for (x, y, z), v in M.V.items() if v[0] == H and y == y0)
+    for (x, y, z) in list(M.V):                                          # abertura de la cara
+        if M.V[(x, y, z)][0] == H and -6 <= x <= 5 and 65 <= y <= 80 and z >= zf - 1:
+            if (x in (-6, 5) or y in (65, 80)) and (x, y) not in ((-6, 65), (5, 65), (-6, 80), (5, 80)): continue
+            M.V.pop((x, y, z))
+    head = face[1]
+    for x in range(-5, 5):                                               # la sombra de dentro, delante de la cara
+        for y in range(66, 80):
+            M.put(x, y, _front_z(head, x, y) + 1, H, SHADOW)
+    for x in (-5, -4, 3, 4):
+        M.put(x, y0, _front_z(head, x, y0) + 2, H, EYE, 1)
+    b = bd['b'] + (-4 if bd['fem'] else 0)
+    slab(M, T, CLOTH_SH, 55, 63, 0, -0.5, 24 + b, 18 + b * 0.5, 17, 15, ch=3)   # esclavina sobre los hombros
+    for (x, y, z), v in M.V.items():
+        if v[1] == CLOTH and (x + 2 * y) % 7 == 0: v[1] = CLOTH_SH
+    return {CLOTH: 'lana', CLOTH_SH: 'lana'}
+
+
+def tiara(M, bd, hair):
+    """Tiara de oro de Innsmouth, la de las joyas raras de los Marsh: un aro con una placa alta
+    delante, de picos y volutas como olas, con perlas y una piedra verde que brilla."""
+    GOLD = (0.86, 0.68, 0.26); GOLD_SH = (0.62, 0.46, 0.14); PEARL = (0.93, 0.91, 0.85); GEM = (0.30, 0.78, 0.66)
+    w, d = _head_box(bd)
+    _hair_cap(M, bd, hair)
+    slab(M, H, GOLD_SH, 77, 79, 0, 0.3, w + 1.6, w + 1.6, d + 1.6, d + 1.6, ch=3)
+    for x in range(-7, 7):
+        z = _front_at(M, x, 78)
+        if z is None: continue
+        top = 80 + max(0, 6 - int(abs(x + 0.5) * 0.9)) + (1 if x % 3 == 0 else 0)
+        for y in range(79, top):
+            M.put(x, y, z, H, GOLD if (x + y) % 4 else GOLD_SH)
+            if y < top - 1: M.put(x, y, z - 1, H, GOLD_SH)
+    for x in (-5, 4):                                                     # perlas
+        z = _front_at(M, x, 80)
+        if z is not None: M.put(x, 80, z + 1, H, PEARL)
+    for x, y in ((-1, 82), (0, 82), (-1, 83), (0, 83)):
+        z = _front_at(M, x, y)
+        if z is not None: M.put(x, y, z + 1, H, GEM, 1)
+    return {hair: 'pelo'}
+
+
+def gorra_chofer(M, bd):
+    """Gorra de chófer negra, de plato, con visera de charol y una insignia dorada."""
+    BLACK = (0.13, 0.14, 0.20); BAND = (0.06, 0.06, 0.07); PEAK = (0.03, 0.03, 0.035); BADGE = (0.86, 0.70, 0.32)
+    w, d = _head_box(bd)
+    slab(M, H, BAND, 77, 80, 0, 0.3, w + 1.6, w + 1.6, d + 1.6, d + 1.6, ch=3)
+    slab(M, H, BLACK, 80, 84, 0, 0.0, w + 2, w + 4, d + 2, d + 4, ch=4)
+    slab(M, H, BLACK, 84, 85, 0, 0.0, w + 4, w + 3, d + 4, d + 3, ch=4)
+    zf = int(round(0.3 + (d + 1.6) / 2))
+    slab(M, H, PEAK, 77, 78, 0, zf + 2.5, w - 1, w - 1, 5, 5, ch=2)
+    for x, y in ((-1, 81), (0, 81), (-1, 82), (0, 82)):
+        z = _front_at(M, x, y)
+        if z is not None: M.put(x, y, z + 1, H, BADGE)
+    return {BLACK: 'lana'}
+
+
+def sombrero_hule(M, bd):
+    """Sombrero de hule amarillo de pescador (sueste): copa redonda y ala que cae, larga detrás."""
+    YEL = (0.90, 0.72, 0.16); YEL_SH = (0.74, 0.56, 0.10); STRAP = (0.20, 0.14, 0.08)
+    w, d = _head_box(bd)
+    rslab(M, H, YEL, 77, 85, 0, -0.5, w + 2, d + 2, r=6, rt=6, rb=0)       # copa baja y redonda
+    for i, y in enumerate((77, 76, 75)):                                 # ala que cae, corta delante
+        slab(M, H, YEL_SH, y, y + 1, 0, -1.5 - i * 0.5, w + 6 + i * 1.5, w + 6 + i * 1.5, d + 6 + i * 2, d + 6 + i * 2, ch=4)
+    for (x, y, z) in list(M.V):
+        if y < 77 and z > 4: M.V.pop((x, y, z))                          # delante no tapa los ojos
+    slab(M, H, YEL_SH, 70, 75, 0, -(d / 2 + 4.5), w + 6, w + 7, 2, 2, ch=1)   # el faldón de atrás
+    for (x, y, z), v in M.V.items():
+        if v[1] == YEL and y == 80: v[1] = YEL_SH                          # pespunte
+    for s in (-1, 1):                                                    # barboquejo
+        for y in range(66, 76):
+            M.put(int(s * (w / 2 + 1.5)) - (1 if s < 0 else 0), y, 1, H, STRAP)
+    return {}
+
+
+def casco_aviador(M, bd):
+    """Casco de aviador de cuero con orejeras y las gafas subidas a la frente, como los pilotos
+    de la expedición de la Miskatonic."""
+    LEATHER = (0.36, 0.22, 0.12); LEATHER_SH = (0.27, 0.16, 0.08); FUR = (0.84, 0.78, 0.64)
+    BRASS = (0.76, 0.60, 0.26); GLASS = (0.34, 0.54, 0.62); STRAP = (0.14, 0.10, 0.07)
+    w, d = _head_box(bd)
+    rslab(M, H, LEATHER, 77, 87, 0, -0.3, w + 2, d + 2, r=5, rt=5, rb=0)
+    slab(M, H, LEATHER, 69, 77, 0, -(d / 2 + 0.2), w + 2, w + 2, 3, 3, ch=1)   # nuca
+    for s in (-1, 1):                                                     # orejeras con borreguillo
+        slab(M, H, FUR, 67, 78, s * (w / 2 + 0.7), 0.2, 2, 2, 8, 8, ch=1)
+        slab(M, H, LEATHER, 66, 78, s * (w / 2 + 1.7), 0.2, 1.5, 1.5, 8, 8, ch=1)
+    for (x, y, z), v in M.V.items():
+        if v[1] == LEATHER and x in (-1, 0) and y > 80: v[1] = LEATHER_SH   # costura del centro
+    slab(M, H, STRAP, 80, 82, 0, -0.3, w + 2.6, w + 2.6, d + 2.6, d + 2.6, ch=3)   # correa de las gafas
+    for x0 in (-7, 1):
+        for x in range(x0, x0 + 6):
+            for y in range(79, 84):
+                z = _front_at(M, x, y)
+                if z is None: continue
+                edge = x in (x0, x0 + 5) or y in (79, 83)
+                M.put(x, y, z + 1, H, BRASS if edge else GLASS, 0 if edge else 0)
+    return {LEATHER: 'cuero', LEATHER_SH: 'cuero', FUR: 'borreguillo'}
+
+
+def birrete(M, bd):
+    """Birrete negro de catedrático de la Miskatonic: casquete, tabla cuadrada y borla dorada."""
+    BLACK = (0.07, 0.07, 0.08); BOARD = (0.10, 0.10, 0.11); GOLD = (0.86, 0.70, 0.26)
+    w, d = _head_box(bd)
+    slab(M, H, BLACK, 77, 82, 0, 0.3, w + 1.5, w + 1.5, d + 1.5, d + 1.5, ch=3)
+    slab(M, H, BOARD, 82, 83, 0, 0.3, w + 9, w + 9, w + 9, w + 9, ch=0)
+    M.put(-1, 83, 0, H, GOLD); M.put(0, 83, 0, H, GOLD)
+    e = int((w + 9) / 2)
+    for i in range(1, e):                                                 # cordón hasta la esquina
+        M.put(i, 83, int(i * 0.9), H, GOLD)
+    for y in range(76, 83):                                               # borla que cuelga
+        M.put(e, y, e - 1, H, GOLD)
+        if y < 79: M.put(e, y, e - 2, H, GOLD); M.put(e - 1, y, e - 1, H, GOLD)
+    return {BLACK: 'lana', BOARD: 'lana'}
+
+
+def panuelo_gitana(M, bd):
+    """Pañuelo de gitana rojo con lunares, anudado en la nuca con las puntas sueltas, y aros de oro."""
+    RED = (0.66, 0.12, 0.12); RED_SH = (0.52, 0.08, 0.08); DOT = (0.94, 0.80, 0.34); GOLD = (0.86, 0.70, 0.28)
+    w, d = _head_box(bd)
+    rslab(M, H, RED, 72, 87, 0, -0.8, w + 2, d + 2.5, r=5, rt=5, rb=0)
+    for (x, y, z) in list(M.V):                                          # la cara, al aire
+        if y < 79 and z >= 1: M.V.pop((x, y, z))
+    zb = -int(round(0.8 + (d + 2.5) / 2))
+    rslab(M, H, RED_SH, 73, 78, 0, zb - 0.5, 6, 3, r=1.5, rt=1.5, rb=1.5)   # el nudo
+    for s in (-1, 1):                                                    # las puntas
+        for i, y in enumerate(range(73, 63, -1)):
+            for k in (0, 1):
+                M.put(s * (1 + k + i // 4), y, zb - 1, H, RED)
+    for (x, y, z), v in M.V.items():
+        if v[1] == RED and (x * 7 + y * 3 + z * 5) % 11 == 0: v[1] = DOT
+    for s in (-1, 1):                                                    # aros
+        xo = int(w / 2) + 1 if s > 0 else -int(w / 2) - 2
+        for y, dz in ((70, 0), (69, -1), (69, 1), (68, 0)):
+            M.put(xo, y, dz, H, GOLD)
+    return {RED: 'lana', RED_SH: 'lana'}
+
+
+def corona_algas(M, bd, hair):
+    """Corona de algas y conchas, como la de los que vuelven del mar: un aro de algas con
+    conchas y una estrella de mar delante, y tiras que cuelgan por los lados y la nuca."""
+    KELP = (0.26, 0.32, 0.12); KELP_D = (0.17, 0.23, 0.08); SHELL = (0.93, 0.86, 0.78)
+    SHELL_P = (0.88, 0.62, 0.58); STAR = (0.88, 0.42, 0.20)
+    w, d = _head_box(bd)
+    _hair_cap(M, bd, hair)
+    slab(M, H, KELP, 77, 80, 0, 0.3, w + 1.8, w + 1.8, d + 1.8, d + 1.8, ch=3)
+    ring = [(x, z) for (x, y, z), v in M.V.items() if y == 77 and v[1] == KELP]
+    rs = set(ring)
+    zf = max(z for x, z in ring)
+    for x, z in ring:
+        outer = any((x + dx, z + dz) not in rs for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        if not outer or z > zf - 4: continue                             # no tapa la cara
+        n = 3 + ((x * 31 + z * 17) % 7)
+        for y in range(77 - n, 77): M.put(x, y, z, H, KELP if y % 2 else KELP_D)
+    for x, z in ring:                                                   # frondas hacia arriba
+        if (x * 13 + z * 7) % 9 == 0:
+            for y in range(80, 83 + (x + z) % 3): M.put(x, y, z, H, KELP_D)
+    for x0, col in ((-6, SHELL), (-2, SHELL_P), (3, SHELL)):
+        for x in (x0, x0 + 1):
+            for y in (79, 80):
+                z = _front_at(M, x, y)
+                if z is not None: M.put(x, y, z + 1, H, col)
+    xs = int(w / 2)
+    for y, z in ((79, 2), (80, 1), (80, 3), (81, 2), (78, 2)):           # estrella de mar, al lado
+        M.put(xs + 1, y, z, H, STAR)
+    return {hair: 'pelo'}
+
+
+def fedora_ganster(M, bd):
+    """Fedora gris perla de gánster de Chicago, con cinta negra ancha y la copa pellizcada."""
+    GREY = (0.70, 0.70, 0.68); GREY_SH = (0.58, 0.58, 0.56); BAND = (0.06, 0.06, 0.07)
+    w, d = _head_box(bd)
+    slab(M, H, GREY_SH, 77, 78, 0, 0.5, w + 8, w + 8, d + 6, d + 6, ch=4)
+    slab(M, H, BAND, 78, 81, 0, 0.3, w + 1.4, w + 1.4, d + 1.4, d + 1.4, ch=3)
+    slab(M, H, GREY, 81, 87, 0, 0.3, w + 1, w - 1.5, d + 1, d - 1.5, ch=3)
+    for z in range(-4, 5):                                              # hundido de la copa
+        for x in (-1, 0):
+            M.V.pop((x, 86, z), None)
+    for x in (-3, 2):                                                   # pellizco delante
+        for y in (84, 85, 86):
+            z = _front_at(M, x, y)
+            if z is not None: M.V.pop((x, y, z), None)
+    return {GREY: 'lana', GREY_SH: 'lana'}
+
+
+def gorro_dormir(M, bd):
+    """Gorro de dormir de rayas blancas y azules, largo, con la punta caída y una borla."""
+    WHITE = (0.90, 0.88, 0.82); STRIPE = (0.30, 0.40, 0.66); POM = (0.95, 0.93, 0.88)
+    w, d = _head_box(bd)
+    slab(M, H, WHITE, 76, 79, 0, 0.3, w + 1.6, w + 1.6, d + 1.6, d + 1.6, ch=3)
+    top = 0
+    for i, y in enumerate(range(79, 91)):                               # cono que se tuerce
+        k = w + 1 - i * 1.15
+        if k < 3: break
+        cx = i * i * 0.05
+        slab(M, H, WHITE, y, y + 1, cx, 0.0, k, k, k - 1, k - 1, ch=2 if k > 6 else 0)
+        top = y
+    xt = int(round((top - 79) ** 2 * 0.05)) + 2
+    for y in range(top - 6, top + 1):                                   # la punta cae por el lado
+        for x in (xt, xt + 1):
+            for z in (-1, 0):
+                M.put(x, y, z, H, WHITE)
+    for (x, y, z), v in M.V.items():
+        if v[1] == WHITE and y % 4 == 0: v[1] = STRIPE
+    rslab(M, H, POM, top - 10, top - 6, xt + 0.5, -0.5, 4, 4, r=1.5, rt=1.5, rb=1.5)
+    return {WHITE: 'punto', STRIPE: 'punto', POM: 'borreguillo'}
+
+
+def casco_buzo(M, bd):
+    """Casco de buzo de cobre y latón: cúpula que tapa la cabeza entera, ventana redonda
+    delante y dos pequeñas a los lados, válvula arriba y peto atornillado sobre los hombros."""
+    COPPER = (0.68, 0.40, 0.20); COPPER_SH = (0.54, 0.30, 0.14); BRASS = (0.80, 0.62, 0.28)
+    GLASS = (0.14, 0.26, 0.30); GLINT = (0.70, 0.86, 0.90); BOLT = (0.34, 0.28, 0.20)
+    w, d = _head_box(bd)
+    rslab(M, H, COPPER, 61, 91, 0, -0.5, w + 9, d + 9, r=8, rt=9, rb=3)
+    def window(cx, cy, r, axis):
+        for a in range(-int(r) - 2, int(r) + 3):
+            for b in range(-int(r) - 2, int(r) + 3):
+                q = math.hypot(a + 0.5, b + 0.5)
+                if q > r + 1.6: continue
+                if axis == 'z':
+                    x, y = cx + a, cy + b
+                    z = _front_at(M, x, y)
+                    if z is None: continue
+                    if q <= r: M.put(x, y, z, H, GLINT if (a, b) in ((-3, 2), (-2, 3), (-3, 3)) else GLASS)
+                    else: M.put(x, y, z + 1, H, BRASS)
+                else:
+                    y, z = cy + a, b
+                    xs = [vx for (vx, vy, vz), v in M.V.items() if vy == y and vz == z and v[0] == H]
+                    if not xs: continue
+                    x = max(xs) if axis > 0 else min(xs)
+                    if q <= r: M.put(x, y, z, H, GLASS)
+                    else: M.put(x + (1 if axis > 0 else -1), y, z, H, BRASS)
+    window(-1, 75, 5.2, 'z')
+    window(None, 75, 2.6, 1)
+    window(None, 75, 2.6, -1)
+    rslab(M, H, BRASS, 91, 94, 0, -1, 4, 4, r=1.5, rt=1, rb=0)          # válvula
+    b = bd['b'] + (-3 if bd['fem'] else 0)
+    slab(M, T, BRASS, 53, 63, 0, 0.0, 31 + b, 27 + b, 20, 18, ch=4)       # peto
+    for (x, y, z), v in M.V.items():
+        if v[0] == T and v[1] == BRASS and y == 55 and x % 4 == 0: v[1] = BOLT
+        if v[0] == H and v[1] == COPPER and (y + x) % 9 == 0: v[1] = COPPER_SH
+    return {}
+
+
 GARMENTS = {'bombin': bombin, 'casco_minero': casco_minero, 'gorro_nieve': gorro_nieve, 'chistera': chistera,
             'chaqueta_aviador': chaqueta_aviador, 'abrigo_piel': abrigo_piel,
             'botas_militares': botas_militares, 'botas_nieve': botas_nieve,
@@ -477,7 +789,12 @@ GARMENTS = {'bombin': bombin, 'casco_minero': casco_minero, 'gorro_nieve': gorro
             'turbante': turbante, 'sombrero_paja': sombrero_paja,
             'gafas_ver': gafas_ver, 'gafas_nieve': gafas_nieve, 'bufanda': bufanda,
             'abrigo_nieve': abrigo_nieve, 'chubasquero': chubasquero, 'chaleco': chaleco, 'vestido': vestido,
-            'bata': bata, 'botas_esquimales': botas_esquimales, 'zapatos_tacon': zapatos_tacon}
+            'bata': bata, 'botas_esquimales': botas_esquimales, 'zapatos_tacon': zapatos_tacon,
+            # fase 14 (30-10-2026): cabeza
+            'gorra_marinero': gorra_marinero, 'fez': fez, 'capucha_cultista': capucha_cultista, 'tiara': tiara,
+            'gorra_chofer': gorra_chofer, 'sombrero_hule': sombrero_hule, 'casco_aviador': casco_aviador,
+            'birrete': birrete, 'panuelo_gitana': panuelo_gitana, 'corona_algas': corona_algas,
+            'fedora_ganster': fedora_ganster, 'gorro_dormir': gorro_dormir, 'casco_buzo': casco_buzo}
 
 
 def build(name, c):
@@ -485,9 +802,11 @@ def build(name, c):
     M = cu.new(9100 + CHARS.index(c))
     M.keep_under = True                      # manga y tronco se solapan: los dos enteros (28-10-2026)
     fn = GARMENTS[name]
-    if fn is cinta_pelo: mats = fn(M, bd, hair_of(c))
-    elif fn in (gafas_ver, gafas_nieve): mats = fn(M, bd, face_of(c))
-    else: mats = fn(M, bd)
+    params = inspect.signature(fn).parameters        # lo que pide cada prenda: el pelo o los ojos
+    kw = {}
+    if 'hair' in params: kw['hair'] = hair_of(c)
+    if 'face' in params: kw['face'] = face_of(c)
+    mats = fn(M, bd, **kw)
     for V in (M.V, M.under_kept()):          # faldones (hito 12.3): lo de por debajo de la cadera
         for k, v in V.items():               # cuelga de la cadera y se mueve con retraso
             if v[0] == cu.T and k[1] < cu.HIP: v[0] = 'skirt'

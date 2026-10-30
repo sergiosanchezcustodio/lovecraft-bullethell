@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="OutfitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/outfit_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gorra_chofer"
+display_name = "Gorra de chófer"
+description = "Negra, con visera de charol, para llevar un Packard."
+slot = 0
+price = 1300
+order = 16
