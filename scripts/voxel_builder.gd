@@ -135,9 +135,25 @@ static func dress(root: Node3D, garment_path: String, hides_hat := false) -> boo
 				src.remove_child(c)
 				dst.add_child(c)
 				meshes.append(c as MeshInstance3D)
+	_marks(g, nodes)
 	g.free()
 	if hides_hat and nodes.has("hat"): (nodes["hat"] as Node3D).visible = false
 	return true
+
+## Puntos sin voxels de una prenda (fase 14): "smoke_*" echa humo de pipa desde la cabeza.
+static func _marks(g: Node3D, nodes: Dictionary) -> void:
+	var piv: Dictionary = g.get_meta("pivots")
+	var vs := float(g.get_meta("voxel_size"))
+	for k: String in piv:
+		if not k.begins_with("smoke") or not nodes.has("head") or not piv.has("head"): continue
+		var head: Node3D = nodes["head"]
+		if head.has_node(k): continue
+		var pv: Array = piv[k]
+		var hp: Array = piv["head"]
+		var e := VoxelFx.emitter("pipe", 0.05)
+		e.name = k
+		e.position = (Vector3(pv[0], pv[1], pv[2]) - Vector3(hp[0], hp[1], hp[2])) * vs
+		head.add_child(e)
 
 static func is_cached(path: String) -> bool:
 	return _cache.has(path)

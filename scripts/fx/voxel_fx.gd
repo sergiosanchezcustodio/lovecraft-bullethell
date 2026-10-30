@@ -189,6 +189,22 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_curve = _curve([[0.0, 0.35], [0.4, 0.8], [1.0, 1.6]])
 			m.color_ramp = _ramp([[0.0, Color(0.16, 0.15, 0.15, 0.0)], [0.08, Color(0.17, 0.16, 0.16, 0.75)],
 				[0.5, Color(0.22, 0.22, 0.23, 0.45)], [1.0, Color(0.28, 0.29, 0.30, 0.0)]])
+		"pipe":                   # humo de pipa (vestuario, fase 14): bocanadas finas que se quedan atrás
+			p.draw_pass_1 = cube("mix")
+			p.amount = 7
+			p.lifetime = 2.4
+			p.preprocess = 2.4
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.3
+			m.spread = 12.0
+			m.initial_velocity_min = 0.10; m.initial_velocity_max = 0.22
+			m.gravity = Vector3(0.05, 0.16, 0.0)
+			m.damping_min = 0.05; m.damping_max = 0.1
+			m.angle_min = -40.0; m.angle_max = 40.0
+			m.scale_min = r * 0.8; m.scale_max = r * 1.2
+			m.scale_curve = _curve([[0.0, 0.3], [0.5, 0.9], [1.0, 1.7]])
+			m.color_ramp = _ramp([[0.0, Color(0.56, 0.56, 0.57, 0.0)], [0.12, Color(0.58, 0.58, 0.59, 0.6)],
+				[0.6, Color(0.52, 0.52, 0.54, 0.3)], [1.0, Color(0.48, 0.49, 0.51, 0.0)]])
 		"embers":                 # chispas que saltan y caen
 			p.draw_pass_1 = cube("add")
 			p.amount = int(clampf(r * 4.0, 3.0, 10.0))

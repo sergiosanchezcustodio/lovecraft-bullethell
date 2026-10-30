@@ -23,8 +23,6 @@ const DIR := "res://data/outfits"
 ## Postura del brazo derecho mientras se lleva (fase 14): "" (ninguna), "umbrella" (paraguas en
 ## alto), "lantern" (linterna delante) o "cane" (bastón). Ver `Player._hold_step`.
 @export var hold := ""
-## Efecto que acompaña a la prenda: "" o "pipe_smoke" (humo de la pipa de vez en cuando).
-@export var fx := ""
 
 ## Personaje sobre el que se dibuja el icono de la tienda (la prenda sola, con sus medidas).
 @export var icon_char := "dyer"

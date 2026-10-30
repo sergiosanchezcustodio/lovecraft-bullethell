@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="OutfitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/outfit_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"mascara_gas"
+display_name = "Máscara de gas"
+description = "De la Gran Guerra. Por si el aire de R'lyeh."
+slot = 3
+price = 2400
+order = 9

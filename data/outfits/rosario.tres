@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="OutfitData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/outfit_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rosario"
+display_name = "Rosario"
+description = "Cuentas de madera y cruz de plata."
+slot = 3
+price = 900
+order = 16

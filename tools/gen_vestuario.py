@@ -1221,6 +1221,349 @@ def pies_membrana(M, bd):
     return {SKIN: 'piel', SKIN_D: 'piel', WEB: 'piel'}
 
 
+# ------------------------------------------------------------------ fase 14: complementos (30-10-2026)
+
+def torso_of(c):
+    """Voxels del tronco del personaje (con faldones, estola y bufanda): para que lo que va
+    encima del pecho quede por fuera de su ropa."""
+    with open('models/%s.json' % c) as f:
+        return {(v[0], v[1], v[2]) for v in json.load(f)['voxels']
+                if v[3] in ('torso', 'skirt', 'stole', 'scarf') and not (len(v) > 8 and v[8] & 64)}
+
+
+class _Chest:
+    """Superficie de delante y de detrás del pecho: la del personaje o, si es mayor, la del abrigo
+    más grueso del vestuario (así un collar no queda dentro de una gabardina)."""
+    def __init__(self, bd, torso, pad=3.2):
+        E = cu.new(1)
+        _torso_cover(E, bd, (0, 0, 0), 30, pad=pad)
+        self.shell = set(E.V) | set(torso)
+        self.front, self.back = {}, {}
+        for (x, y, z) in self.shell:
+            if z > self.front.get((x, y), -99): self.front[(x, y)] = z
+            if z < self.back.get((x, y), 99): self.back[(x, y)] = z
+        self.surface = [k for k in self.shell if any((k[0] + dx, k[1] + dy, k[2] + dz) not in self.shell
+                        for dx, dy, dz in ((1, 0, 0), (-1, 0, 0), (0, 0, 1), (0, 0, -1)))]
+
+    def z(self, x, y):
+        return self.front.get((x, y), 6)
+
+    def put(self, M, x, y, col, dz=1, glow=0):
+        if (x, y) in self.front: M.put(x, y, self.front[(x, y)] + dz, T, col, glow)
+
+    def band(self, M, col, fn, w=1.6, ymin=36, ymax=62):
+        """Correa por fuera del tronco: los voxels de la superficie donde |fn(x, y)| < w, uno más afuera."""
+        out = []
+        for (x, y, z) in self.surface:
+            if ymin <= y <= ymax and abs(fn(x, y)) < w:
+                zo = z + 1 if z >= 0 else z - 1
+                M.put(x, y, zo, T, col)
+                out.append((x, y, zo))
+        return out
+
+    def half_w(self, y):
+        xs = [x for (x, yy) in self.front if yy == y]
+        return (max(xs) - min(xs) + 1) / 2 if xs else 14
+
+
+def _neck_ring(M, bd, ch, col, y=62, step=1):
+    """Cordón alrededor del cuello, por encima de los hombros (de cualquier cuello de abrigo)."""
+    b = bd['b'] + (-4 if bd['fem'] else 0)
+    a, c = 9.5 + b * 0.25, 8.5
+    for i in range(0, 64, step):
+        t = i / 64 * math.tau
+        x, z = int(round(math.cos(t) * a - 0.5)), int(round(math.sin(t) * c + 0.5))
+        M.put(x, y, z, T, col)
+
+
+def _hang(M, ch, col, x_top, x_bot, y_top, y_bot, every=1, alt=None):
+    """Cadena que baja por delante del pecho de (x_top, y_top) a (x_bot, y_bot)."""
+    n = y_top - y_bot
+    for i in range(n + 1):
+        y = y_top - i
+        x = int(round(x_top + (x_bot - x_top) * i / max(n, 1)))
+        if i % every: continue
+        ch.put(M, x, y, alt if (alt is not None and (i // every) % 2) else col)
+
+
+def _fput(M, head, x, y, col, dz=1, glow=0):
+    M.put(x, y, _front_z(head, x, y) + dz, H, col, glow)
+
+
+def monoculo(M, bd, face):
+    """Monóculo de oro en el ojo derecho con cadenita que cae por el lado de la cara."""
+    GOLD = (0.84, 0.68, 0.28); GLASS = (0.74, 0.86, 0.90)
+    y0, head = face
+    x0 = 1
+    for x in range(x0 + 1, x0 + 5): _fput(M, head, x, y0 - 1, GOLD); _fput(M, head, x, y0 + 2, GOLD)
+    for y in (y0, y0 + 1): _fput(M, head, x0, y, GOLD); _fput(M, head, x0 + 5, y, GOLD)
+    _fput(M, head, x0 + 4, y0 + 1, GLASS)
+    xs = max(x for (x, y, z) in head if y == y0) + 1
+    for y in range(64, y0 + 1):                                           # cadenita por el lado
+        M.put(xs, y, 3 if y > 66 else 2, H, GOLD)
+    return {}
+
+
+def pipa(M, bd, face):
+    """Pipa de brezo en la comisura, con la brasa encendida: echa humo (VoxelBuilder.dress)."""
+    WOOD = (0.30, 0.16, 0.08); STEM = (0.08, 0.07, 0.06); EMBER = (1.0, 0.45, 0.12); ASH = (0.32, 0.30, 0.28)
+    y0, head = face
+    ym = y0 - 5
+    zf = _front_z(head, 2, ym)
+    for i, x in enumerate(range(1, 6)):                                   # boquilla que sale de la boca
+        M.put(x, ym, zf + 1 + i // 2, H, STEM)
+    zb = zf + 3
+    for x in (5, 6, 7):                                                   # cazoleta
+        for z in (zb, zb + 1, zb + 2):
+            for y in range(ym - 1, ym + 3):
+                if y == ym - 1 and (x in (5, 7) or z in (zb, zb + 2)): continue
+                M.put(x, y, z, H, WOOD)
+    M.put(6, ym + 2, zb + 1, H, EMBER, 1)
+    M.put(6, ym + 3, zb + 1, H, ASH)
+    M.marks = {'smoke_pipe': [6.5, ym + 3.5, zb + 1.5]}
+    return {WOOD: 'cuero'}
+
+
+def collar_signo(M, bd, torso):
+    """Colgante del Signo Primigenio: una estrella de piedra gris con el ojo verde que brilla,
+    de una cadena de plata."""
+    SILVER = (0.70, 0.72, 0.74); STONE = (0.46, 0.46, 0.42); STONE_D = (0.32, 0.32, 0.30); EYE = (0.30, 0.95, 0.50)
+    ch = _Chest(bd, torso)
+    _neck_ring(M, bd, ch, SILVER)
+    for s in (-1, 1): _hang(M, ch, SILVER, s * 6, s * 1, 61, 55)
+    star = ['...#...', '..###..', '#######', '.#####.', '.##.##.', '#.....#']
+    for r, row in enumerate(star):
+        for i, cch in enumerate(row):
+            if cch == '#': ch.put(M, i - 3, 54 - r, STONE if (i + r) % 3 else STONE_D)
+    ch.put(M, 0, 51, EYE, dz=2, glow=1)
+    return {}
+
+
+def bolsa_cartero(M, bd, torso):
+    """Bolsa de cartero de lona con solapa de cuero, cruzada del hombro derecho a la cadera."""
+    CANVAS = (0.44, 0.40, 0.28); LEATHER = (0.34, 0.20, 0.10); BUCKLE = (0.72, 0.60, 0.30)
+    ch = _Chest(bd, torso)
+    ch.band(M, LEATHER, lambda x, y: (y - 40) - (x + 9) * 1.05, w=1.7)
+    hw = ch.half_w(42)
+    x1 = -int(hw) - 1
+    for x in range(x1 - 4, x1 + 1):                                        # la bolsa, en el costado
+        for y in range(32, 43):
+            for z in range(-5, 6):
+                flap = y >= 38 and x == x1 - 4
+                M.put(x, y, z, T, LEATHER if flap or y >= 41 else CANVAS)
+    M.put(x1 - 5, 38, 0, T, BUCKLE); M.put(x1 - 5, 37, 0, T, BUCKLE)
+    return {CANVAS: 'lona', LEATHER: 'cuero'}
+
+
+def canana(M, bd, torso):
+    """Dos cananas cruzadas sobre el pecho, de cuero, cargadas de cartuchos de latón."""
+    LEATHER = (0.36, 0.22, 0.12); BRASS = (0.82, 0.64, 0.28)
+    ch = _Chest(bd, torso)
+    for k in (1.0, -1.0):
+        vox = ch.band(M, LEATHER, lambda x, y, k=k: (y - 48) - x * 1.1 * k, w=1.8, ymin=34)
+        for (x, y, z) in vox:
+            if z > 0 and y % 2 == 0 and abs((y - 48) - x * 1.1 * k) < 0.7: M.put(x, y, z + 1, T, BRASS)
+    return {LEATHER: 'cuero'}
+
+
+def antifaz(M, bd, face):
+    """Antifaz negro de seda con los ojos al aire, anudado detrás con las puntas sueltas."""
+    SILK = (0.06, 0.05, 0.07); SILK_SH = (0.12, 0.10, 0.14)
+    y0, head = face
+    w, d = _head_box(bd)
+    holes = {(x, y) for x in (-5, -4, 3, 4) for y in (y0, y0 + 1)}
+    slab(M, H, SILK, y0 - 1, y0 + 3, 0, 0.0, w + 1.2, w + 1.2, d + 1.2, d + 1.2, ch=3)
+    for (x, y, z) in list(M.V):
+        if (x, y) in holes and z > 0: M.V.pop((x, y, z))
+    for x in range(-8, 8):
+        for y in range(y0 - 1, y0 + 3):
+            if (x, y) not in holes and not (y in (y0 - 1, y0 + 2) and x in (-8, 7)): _fput(M, head, x, y, SILK)
+    zb = -int(round((d + 1.2) / 2)) - 1
+    for i, y in enumerate(range(y0, y0 - 7, -1)):                        # puntas del nudo
+        M.put(-1 - i // 3, y, zb, H, SILK_SH); M.put(i // 3, y, zb, H, SILK_SH)
+    return {}
+
+
+def mascara_gas(M, bd, face):
+    """Máscara de gas de la Gran Guerra: goma verde gris, dos cristales redondos y el filtro."""
+    RUBBER = (0.26, 0.30, 0.24); RUBBER_D = (0.18, 0.21, 0.17); GLASS = (0.30, 0.44, 0.46)
+    RIM = (0.56, 0.52, 0.42); CAN = (0.40, 0.42, 0.36)
+    y0, head = face
+    w, d = _head_box(bd)
+    rslab(M, H, RUBBER_D, 63, y0 + 6, 0, 0.3, w + 2, d + 2, r=4, rt=3, rb=2)
+    for (x, y, z) in list(M.V):
+        if z < -1 and y > 66: M.V.pop((x, y, z))                          # detrás, solo las correas
+    slab(M, H, RUBBER_D, y0 + 4, y0 + 6, 0, 0.3, w + 2.6, w + 2.6, d + 2.6, d + 2.6, ch=3)
+    for x in range(-8, 8):
+        for y in range(63, y0 + 6):
+            _fput(M, head, x, y, RUBBER)
+    for cx in (-5, 3):                                                    # cristales
+        for a in range(-3, 3):
+            for b in range(-3, 3):
+                q = math.hypot(a + 0.5, b + 0.5)
+                x, y = cx + a + 1, y0 + 1 + b
+                if q < 2.0: _fput(M, head, x, y, GLASS, dz=2)
+                elif q < 3.0: _fput(M, head, x, y, RIM, dz=2)
+    zf = max(_front_z(head, x, y0 - 4) for x in (-1, 0)) + 2
+    for x in range(-2, 2):                                                # filtro
+        for y in range(y0 - 7, y0 - 3):
+            for z in range(zf, zf + 5):
+                M.put(x, y, z, H, CAN if z < zf + 4 else RIM)
+    return {RUBBER: 'cuero', RUBBER_D: 'cuero'}
+
+
+def medico_peste(M, bd, face):
+    """Máscara de médico de la peste: capucha de cuero negro, ojos de cristal rojo y el pico largo."""
+    LEATHER = (0.12, 0.10, 0.09); LEATHER_SH = (0.20, 0.16, 0.12); GLASS = (0.70, 0.12, 0.08); RIM = (0.66, 0.54, 0.30)
+    BEAK = (0.30, 0.22, 0.15); BEAK_SH = (0.22, 0.16, 0.11)
+    y0, head = face
+    w, d = _head_box(bd)
+    rslab(M, H, LEATHER, 63, y0 + 9, 0, 0.0, w + 2, d + 2, r=5, rt=5, rb=1)
+    for x in range(-8, 8):
+        for y in range(63, y0 + 8):
+            _fput(M, head, x, y, LEATHER)
+    for cx in (-5, 3):
+        for a in range(-2, 2):
+            for b in range(-2, 2):
+                x, y = cx + a + 1, y0 + 1 + b
+                rim = a in (-2, 1) or b in (-2, 1)
+                _fput(M, head, x, y, RIM if rim else GLASS, dz=2, glow=0 if rim else 1)
+    zf = max(_front_z(head, x, y0 - 2) for x in (-1, 0)) + 1
+    for i in range(17):                                                   # pico largo que cae al final
+        r = 3.2 - i * 0.16
+        cy = y0 - 2 - i * 0.12 - max(0, i - 10) * 0.35
+        for x in range(-4, 4):
+            for y in range(int(cy - 4), int(cy + 4)):
+                if abs(x + 0.5) <= r and abs(y + 0.5 - cy) <= r * 0.9:
+                    M.put(x, y, zf + i, H, BEAK_SH if i % 4 == 3 else BEAK)
+    return {LEATHER: 'cuero', LEATHER_SH: 'cuero', BEAK: 'cuero'}
+
+
+def vendas_parche(M, bd, face):
+    """Vendas sucias alrededor de la frente con una mancha de sangre, parche negro en un ojo y
+    una tirita en la mejilla."""
+    GAUZE = (0.86, 0.84, 0.76); GAUZE_D = (0.70, 0.66, 0.56); BLOOD = (0.50, 0.08, 0.06); PATCH = (0.05, 0.05, 0.05)
+    PLASTER = (0.88, 0.74, 0.60)
+    y0, head = face
+    w, d = _head_box(bd)
+    slab(M, H, GAUZE, y0 + 4, y0 + 8, 0, 0.0, w + 1.2, w + 1.2, d + 1.2, d + 1.2, ch=3)
+    for (x, y, z), v in M.V.items():
+        if (x + y * 2) % 5 == 0: v[1] = GAUZE_D
+        if 1 <= x <= 3 and y >= y0 + 5 and z > 2: v[1] = BLOOD
+    for x in range(-7, -1):                                               # parche en el ojo izquierdo
+        for y in range(y0 - 1, y0 + 3):
+            if (x, y) in ((-7, y0 - 1), (-2, y0 - 1)): continue
+            _fput(M, head, x, y, PATCH)
+    for i in range(6):                                                    # cinta del parche hacia la venda
+        _fput(M, head, -2 + i, y0 + 3 + i // 2, PATCH)
+    for x in (3, 4, 5):
+        for y in (y0 - 3, y0 - 2): _fput(M, head, x, y, PLASTER)
+    return {GAUZE: 'lana', GAUZE_D: 'lana'}
+
+
+def clavel(M, bd, torso):
+    """Clavel rojo en el ojal de la solapa."""
+    RED = (0.78, 0.10, 0.12); RED_D = (0.56, 0.06, 0.08); GREEN = (0.20, 0.40, 0.16)
+    ch = _Chest(bd, torso, pad=2.6)
+    for x, y, c, dz in ((-7, 57, RED, 1), (-6, 57, RED, 1), (-8, 56, RED, 1), (-7, 56, RED_D, 2), (-6, 56, RED, 1),
+                        (-5, 56, RED, 1), (-7, 55, RED, 1), (-6, 55, RED, 1), (-6, 54, GREEN, 1), (-6, 53, GREEN, 1),
+                        (-5, 54, GREEN, 1), (-7, 58, RED_D, 1)):
+        ch.put(M, x, y, c, dz=dz)
+    return {}
+
+
+def panuelo_vaquero(M, bd, face):
+    """Pañuelo de vaquero rojo con dibujo blanco, tapando nariz y boca y anudado detrás."""
+    RED = (0.64, 0.12, 0.10); RED_D = (0.48, 0.08, 0.07); DOT = (0.90, 0.88, 0.82)
+    y0, head = face
+    w, d = _head_box(bd)
+    slab(M, H, RED_D, y0 - 3, y0 - 1, 0, 0.0, w + 1.2, w + 1.2, d + 1.2, d + 1.2, ch=3)
+    for (x, y, z) in list(M.V):
+        if z > 0: M.V.pop((x, y, z))
+    for x in range(-8, 8):
+        for y in range(62, y0 - 1):
+            if y < 66 and abs(x + 0.5) > (y - 61) * 1.6: continue           # pico que cae bajo la barbilla
+            _fput(M, head, x, y, RED)
+    for (x, y, z), v in M.V.items():
+        if v[1] == RED and (x * 3 + y * 5) % 9 == 0: v[1] = DOT
+    zb = -int(round((d + 1.2) / 2)) - 1
+    for i, y in enumerate(range(y0 - 2, y0 - 8, -1)):                    # nudo
+        M.put(-1, y, zb, H, RED_D); M.put(0 + i // 3, y, zb, H, RED_D)
+    return {RED: 'lana', RED_D: 'lana'}
+
+
+def estetoscopio(M, bd, torso):
+    """Estetoscopio colgado del cuello: el tubo negro, la campana de plata y las olivas."""
+    TUBE = (0.08, 0.08, 0.09); SILVER = (0.80, 0.82, 0.84)
+    ch = _Chest(bd, torso)
+    _neck_ring(M, bd, ch, TUBE)
+    _hang(M, ch, TUBE, 6, 5, 61, 49)
+    _hang(M, ch, TUBE, -6, -4, 61, 52)
+    for x in (4, 5, 6):
+        for y in (46, 47, 48): ch.put(M, x, y, SILVER, dz=1 if (x, y) != (5, 47) else 2)
+    for x in (-5, -3):                                                     # olivas
+        for y in (50, 51): ch.put(M, x, y, SILVER)
+    return {}
+
+
+def camara_fuelle(M, bd, torso):
+    """Cámara de fuelle colgada al pecho: caja negra, fuelle rojo, objetivo de latón."""
+    BLACK = (0.08, 0.08, 0.09); BELLOWS = (0.40, 0.10, 0.08); BELLOWS_D = (0.26, 0.06, 0.05)
+    BRASS = (0.80, 0.62, 0.28); GLASS = (0.20, 0.30, 0.36); STRAP = (0.30, 0.20, 0.12)
+    ch = _Chest(bd, torso)
+    _neck_ring(M, bd, ch, STRAP)
+    for s in (-1, 1): _hang(M, ch, STRAP, s * 7, s * 5, 61, 51)
+    z0 = max(ch.z(x, y) for x in range(-5, 5) for y in range(43, 51)) + 1
+    for x in range(-5, 5):
+        for y in range(43, 51):
+            for z in range(z0, z0 + 7):
+                if z < z0 + 2: c = BLACK
+                elif z < z0 + 6: c = BELLOWS if (z - z0) % 2 else BELLOWS_D
+                else: c = BLACK
+                if z >= z0 + 2 and (abs(x + 0.5) > 4 - (z - z0 - 2) * 0.3 or y in (43, 50)): continue
+                M.put(x, y, z, T, c)
+    for a in range(-2, 2):
+        for b in range(-2, 2):
+            M.put(a, 46 + b + 1, z0 + 7, T, GLASS if a in (-1, 0) and b in (-1, 0) else BRASS)
+    return {STRAP: 'cuero'}
+
+
+def rosario(M, bd, torso):
+    """Rosario de cuentas de madera con la cruz de plata, colgado largo sobre el pecho."""
+    BEAD = (0.38, 0.22, 0.12); BEAD_L = (0.52, 0.34, 0.18); SILVER = (0.80, 0.82, 0.84)
+    ch = _Chest(bd, torso)
+    _neck_ring(M, bd, ch, BEAD, step=2)
+    for s in (-1, 1): _hang(M, ch, BEAD, s * 6, 0, 61, 45, alt=BEAD_L)
+    for x, y in ((0, 44), (0, 43), (0, 42), (0, 41), (0, 40), (-1, 42), (1, 42)):
+        ch.put(M, x, y, SILVER)
+    return {}
+
+
+def ojos_innsmouth(M, bd, face):
+    """Los ojos saltones y sin párpados de la cara de Innsmouth: grandes, pálidos, con la pupila
+    en rendija, y dos agallas en el cuello."""
+    LID = (0.50, 0.56, 0.48); WHITE = (0.70, 0.74, 0.62); IRIS = (0.78, 0.74, 0.30); PUPIL = (0.03, 0.03, 0.03)
+    GILL = (0.36, 0.20, 0.20)
+    y0, head = face
+    for cx in (-7, 2):                                                    # globos de 5x5, separados
+        for a in range(5):
+            for b in range(5):
+                if (a in (0, 4)) and (b in (0, 4)): continue
+                x, y = cx + a, y0 - 2 + b
+                _fput(M, head, x, y, LID, dz=1)
+                inner = 0 < a < 4 and 0 < b < 4
+                _fput(M, head, x, y, IRIS if inner else WHITE, dz=2, glow=1 if inner else 0)
+        for a in (1, 2, 3):                                               # pupila en rendija horizontal
+            _fput(M, head, cx + a, y0, PUPIL, dz=3)
+    for s in (-1, 1):                                                     # agallas
+        for y in (65, 67):
+            xs = [x for (x, yy, z) in head if yy == y and z == 1]
+            if xs:
+                x = (max(xs) + 1) if s > 0 else (min(xs) - 1)
+                for z in (-1, 0, 1, 2): M.put(x, y, z, H, GILL)
+    return {}
+
+
 GARMENTS = {'bombin': bombin, 'casco_minero': casco_minero, 'gorro_nieve': gorro_nieve, 'chistera': chistera,
             'chaqueta_aviador': chaqueta_aviador, 'abrigo_piel': abrigo_piel,
             'botas_militares': botas_militares, 'botas_nieve': botas_nieve,
@@ -1244,7 +1587,13 @@ GARMENTS = {'bombin': bombin, 'casco_minero': casco_minero, 'gorro_nieve': gorro
             # pies
             'botas_agua': botas_agua, 'zapatos_bicolor': zapatos_bicolor, 'sandalias_calcetines': sandalias_calcetines,
             'botas_montar': botas_montar, 'raquetas_nieve': raquetas_nieve, 'zapatillas': zapatillas,
-            'botas_buzo': botas_buzo, 'pies_membrana': pies_membrana}
+            'botas_buzo': botas_buzo, 'pies_membrana': pies_membrana,
+            # complementos
+            'monoculo': monoculo, 'pipa': pipa, 'collar_signo': collar_signo, 'bolsa_cartero': bolsa_cartero,
+            'canana': canana, 'antifaz': antifaz, 'mascara_gas': mascara_gas, 'medico_peste': medico_peste,
+            'vendas_parche': vendas_parche, 'clavel': clavel, 'panuelo_vaquero': panuelo_vaquero,
+            'estetoscopio': estetoscopio, 'camara_fuelle': camara_fuelle, 'rosario': rosario,
+            'ojos_innsmouth': ojos_innsmouth}
 
 
 def build(name, c):
@@ -1256,6 +1605,7 @@ def build(name, c):
     kw = {}
     if 'hair' in params: kw['hair'] = hair_of(c)
     if 'face' in params: kw['face'] = face_of(c)
+    if 'torso' in params: kw['torso'] = torso_of(c)
     mats = fn(M, bd, **kw)
     for V in (M.V, M.under_kept()):          # faldones (hito 12.3): lo de por debajo de la cadera
         for k, v in V.items():               # cuelga de la cadera y se mueve con retraso
@@ -1265,6 +1615,7 @@ def build(name, c):
     under.V = {k: list(v) for k, v in M.under_kept().items()}
     materiales.texturize(under, mats)
     piv, parents = cu.pivots(bd['finish_b'], bd['finish_ax'])
+    piv.update(getattr(M, 'marks', {}))      # puntos sin voxels: de dónde sale el humo de la pipa
     out = 'models/vest_%s_%s.json' % (name, c)
     return M.export(out, piv, jitter=0.0, pivots_in_voxels=True, roughness=0.9, specular=0.25, parents=parents,
                     extra=under.V)

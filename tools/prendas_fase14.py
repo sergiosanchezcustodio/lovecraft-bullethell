@@ -46,6 +46,22 @@ PRENDAS = [
     ('zapatillas', 'Zapatillas de casa', 'De cuadros y con borla, a juego con el gorro de dormir.', FEET, 600, {}),
     ('botas_buzo', 'Botas de buzo', 'Plomo y latón, a juego con el casco.', FEET, 2500, {}),
     ('pies_membrana', 'Pies de Innsmouth', 'Descalzos, con membrana entre los dedos. Ya no tiene remedio.', FEET, 3000, {}),
+    # complementos
+    ('monoculo', 'Monóculo', 'De oro, con cadenita, para mirar por encima del hombro.', ACC, 1400, {}),
+    ('pipa', 'Pipa de brezo', 'Encendida, echa su humo.', ACC, 1600, {}),
+    ('collar_signo', 'Signo Primigenio', 'La estrella de piedra que los aparta. O eso dicen.', ACC, 3500, {}),
+    ('bolsa_cartero', 'Bolsa de cartero', 'Lona y cuero, cruzada, para las notas de campo.', ACC, 1000, {}),
+    ('canana', 'Cananas', 'Dos, cruzadas y cargadas.', ACC, 1500, {}),
+    ('antifaz', 'Antifaz', 'Seda negra, para los bailes de máscaras de Kingsport.', ACC, 1100, {}),
+    ('mascara_gas', 'Máscara de gas', 'De la Gran Guerra. Por si el aire de R\'lyeh.', ACC, 2400, {}),
+    ('medico_peste', 'Máscara de la peste', 'Pico largo y cristales rojos.', ACC, 3000, {}),
+    ('vendas_parche', 'Vendas y parche', 'Lo que dejó la última noche.', ACC, 700, {}),
+    ('clavel', 'Clavel', 'Rojo, en el ojal.', ACC, 500, {}),
+    ('panuelo_vaquero', 'Pañuelo de vaquero', 'Rojo, tapando la cara, para el polvo y los testigos.', ACC, 900, {}),
+    ('estetoscopio', 'Estetoscopio', 'Para escuchar lo que late donde no debería.', ACC, 1200, {}),
+    ('camara_fuelle', 'Cámara de fuelle', 'Para fotografiar lo que nadie creerá.', ACC, 2000, {}),
+    ('rosario', 'Rosario', 'Cuentas de madera y cruz de plata.', ACC, 900, {}),
+    ('ojos_innsmouth', 'Ojos de Innsmouth', 'Saltones, sin párpados, y unas agallas. La cara de Innsmouth.', ACC, 3500, {}),
 ]
 
 TEMPLATE = '''[gd_resource type="Resource" script_class="OutfitData" load_steps=2 format=3]
