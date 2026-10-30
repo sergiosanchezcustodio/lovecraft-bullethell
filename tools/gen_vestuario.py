@@ -781,6 +781,319 @@ def casco_buzo(M, bd):
     return {}
 
 
+# ------------------------------------------------------------------ fase 14: cuerpo (30-10-2026)
+
+def _bb(bd, fem_off=-3):
+    """Ancho extra del tronco de este personaje para faldones (como en el abrigo de piel)."""
+    return bd['b'] + (fem_off if bd['fem'] else 0)
+
+
+def _skirt(M, bd, col, y0, flare=4.0, pad=0.0):
+    """Faldón que cae de la cadera (y 38) hasta y0, abriéndose `flare` hacia abajo; por debajo de
+    la cadera build() lo pasa a la parte `skirt` (se mueve con retraso)."""
+    b = _bb(bd)
+    slab(M, T, col, y0, 38, 0, 0.3, 27 + b + flare + pad, 26 + b + pad, 16 + flare * 0.8 + pad, 15 + pad, ch=3)
+
+
+def _leg_cover(M, bd, col, bottom=5, pad=2.0):
+    """Perneras encima de las del personaje, desde `bottom` hasta la cadera."""
+    for s, leg, shin, _, _ in cu.sides():
+        cx = (4.5 if bd['fem'] else 5) * s
+        slab(M, shin, col, bottom, 27, cx, 0, 9 + pad, 9 + pad, 10 + pad, 9.5 + pad, ch=1)
+        slab(M, leg, col, 27, 41, cx * 1.04, 0, 9 + pad, 11 + pad, 9 + pad, 10.5 + pad, ch=1)
+
+
+def _front_line(M, x, y0, y1, col, part=T, dz=0):
+    for y in range(y0, y1):
+        z = M.front(x, y)
+        if z is not None and M.V[(x, y, z)][0] == part: M.put(x, y, z + dz, part, col)
+
+
+def gabardina(M, bd):
+    """Gabardina beis de detective hasta la rodilla: cruzada, con cinturón anudado, charreteras,
+    solapas anchas y trabillas en los puños."""
+    TAN = (0.70, 0.58, 0.40); TAN_SH = (0.56, 0.45, 0.30); BTN = (0.24, 0.17, 0.10)
+    _torso_cover(M, bd, TAN, 38, pad=3)
+    _skirt(M, bd, TAN, 20, flare=4, pad=1)
+    b = _bb(bd)
+    slab(M, T, TAN_SH, 42, 45, 0, 0.3, 27 + b, 27 + b, 17.5, 17.5, ch=3)     # cinturón
+    for y in (43, 44):
+        z = M.front(3, y)
+        if z is not None: M.put(3, y, z + 1, T, BTN); M.put(4, y, z + 1, T, BTN)
+    for y in range(26, 42): _front_line(M, 1, y, y + 1, TAN_SH)            # cruce
+    for y in (48, 53, 58):
+        for x in (-4, 4):
+            z = M.front(x, y)
+            if z is not None: M.put(x, y, z + 1, T, BTN)
+    for s in (-1, 1):                                                     # solapas
+        for y in range(52, 62):
+            x = int(s * (2 + (61 - y) * 0.35))
+            z = M.front(x, y)
+            if z is not None: M.put(x, y, z, T, TAN_SH); M.put(x + s, y, z, T, TAN_SH)
+    _sleeves(M, bd, TAN, TAN_SH, pad=3)
+    k = 0.85 if bd['slim'] else 1.0
+    for s, _, _, arm, _ in cu.sides():                                   # charreteras
+        cx = (bd['ax'] + bd.get('arm_b', bd['b']) / 2) * s
+        slab(M, arm, TAN_SH, 61, 63, cx, 0, 7 * k + 3, 7 * k + 3, 4, 4, ch=0)
+    return {TAN: 'lona', TAN_SH: 'lona'}
+
+
+def tunica_cultista(M, bd):
+    """Túnica negra de cultista hasta los pies, con ribete rojo, mangas anchas y el signo bordado
+    en el pecho."""
+    BLACK = (0.10, 0.09, 0.10); BLACK_SH = (0.07, 0.06, 0.07); RED = (0.55, 0.08, 0.08); GOLD = (0.80, 0.62, 0.26)
+    _torso_cover(M, bd, BLACK, 38, pad=3)
+    _skirt(M, bd, BLACK, 2, flare=6, pad=1)
+    for (x, y, z), v in M.V.items():
+        if v[1] == BLACK and y in (2, 3): v[1] = RED                       # ribete del bajo
+    for y in range(3, 62): _front_line(M, 0, y, y + 1, RED); _front_line(M, -1, y, y + 1, RED)
+    _sleeves(M, bd, BLACK, RED, pad=4.5, bottom=34)
+    for x, y in ((-4, 54), (-3, 55), (-3, 53), (-2, 54), (2, 54), (3, 55), (3, 53), (4, 54), (-1, 56), (0, 56),
+                 (-1, 52), (0, 52)):                                     # el signo
+        z = M.front(x, y)
+        if z is not None: M.put(x, y, z + 1, T, GOLD)
+    for (x, y, z), v in M.V.items():
+        if v[1] == BLACK and (x + y * 2) % 9 == 0: v[1] = BLACK_SH
+    return {BLACK: 'lana', BLACK_SH: 'lana'}
+
+
+def traje_buzo(M, bd):
+    """Traje de buzo de lona engomada, entero, con puños de goma y el cinturón de plomos."""
+    CANVAS = (0.56, 0.50, 0.40); CANVAS_SH = (0.44, 0.39, 0.30); RUBBER = (0.10, 0.09, 0.08)
+    LEAD = (0.36, 0.37, 0.39); LEATHER = (0.30, 0.20, 0.12)
+    _torso_cover(M, bd, CANVAS, 36, pad=3.5)
+    _leg_cover(M, bd, CANVAS, bottom=6, pad=2.5)
+    _sleeves(M, bd, CANVAS, RUBBER, pad=3.5)
+    b = _bb(bd)
+    slab(M, T, LEATHER, 39, 42, 0, 0.3, 29 + b, 29 + b, 18.5, 18.5, ch=3)
+    for x0 in (-11, -6, 3, 8):                                           # plomos
+        for x in (x0, x0 + 1, x0 + 2):
+            for y in range(38, 44):
+                z = M.front(x, y)
+                if z is not None: M.put(x, y, z + 1, T, LEAD)
+    for (x, y, z), v in M.V.items():
+        if v[1] == CANVAS and _speck(x, y, z, 7): v[1] = CANVAS_SH
+    return {CANVAS: 'lona', CANVAS_SH: 'lona', LEATHER: 'cuero'}
+
+
+def uniforme_enfermera(M, bd):
+    """Uniforme de enfermera del hospital de Arkham: vestido azul claro hasta media pierna,
+    delantal blanco con peto y la cruz roja, y puños blancos."""
+    BLUE = (0.52, 0.64, 0.78); BLUE_SH = (0.42, 0.53, 0.66); WHITE = (0.94, 0.93, 0.90); RED = (0.72, 0.10, 0.10)
+    _torso_cover(M, bd, BLUE, 38, pad=2.5)
+    _skirt(M, bd, BLUE, 12, flare=4)
+    k = 0.85 if bd['slim'] else 1.0
+    for s, _, _, arm, _ in cu.sides():                                   # mangas cortas con puño blanco
+        cx = (bd['ax'] + bd.get('arm_b', bd['b']) / 2) * s
+        slab(M, arm, BLUE, 52, 62, cx, 0, 8.5 * k + 2.5, 9 * k + 2.5, 9 * k + 2.5, 9 * k + 2.5, ch=1)
+        slab(M, arm, WHITE, 51, 53, cx, 0, 9 * k + 3, 9 * k + 3, 9.5 * k + 3, 9.5 * k + 3, ch=1)
+    for x in range(-6, 6):                                               # delantal y peto
+        for y in range(14, 58):
+            if y > 44 and abs(x + 0.5) > 4.5: continue
+            z = M.front(x, y)
+            if z is not None and M.V[(x, y, z)][0] == T: M.put(x, y, z + 1, T, WHITE)
+    for x, y in ((-1, 50), (0, 50), (-1, 51), (0, 51), (-1, 49), (0, 49), (-2, 50), (1, 50), (-1, 52), (0, 52)):
+        z = M.front(x, y)
+        if z is not None: M.put(x, y, z, T, RED)
+    for (x, y, z), v in M.V.items():
+        if v[1] == BLUE and y % 6 == 0: v[1] = BLUE_SH
+    return {BLUE: 'lona', BLUE_SH: 'lona', WHITE: 'lona'}
+
+
+def mono_mecanico(M, bd):
+    """Mono de mecánico azul, entero, con cremallera, bolsillos y manchas de grasa."""
+    BLUE = (0.20, 0.30, 0.48); BLUE_SH = (0.15, 0.23, 0.38); GREASE = (0.07, 0.07, 0.06); ZIP = (0.62, 0.60, 0.54)
+    _torso_cover(M, bd, BLUE, 36, pad=2.5)
+    _leg_cover(M, bd, BLUE, bottom=7, pad=2)
+    _sleeves(M, bd, BLUE, BLUE_SH, pad=2.5)
+    for y in range(38, 61): _front_line(M, 0, y, y + 1, ZIP)
+    for s in (-1, 1):                                                    # bolsillos del pecho
+        for x in range(int(3 * s), int(7 * s), s):
+            for y in (52, 53, 54, 55):
+                z = M.front(x, y)
+                if z is not None: M.put(x, y, z, T, BLUE_SH)
+    for (x, y, z), v in M.V.items():
+        if v[1] in (BLUE, BLUE_SH) and (_speck(x // 2, y // 2, z // 2, 41) or (y < 24 and _speck(x // 2, y // 2, z // 2, 13))): v[1] = GREASE
+    return {BLUE: 'lona', BLUE_SH: 'lona'}
+
+
+def esmoquin(M, bd):
+    """Esmoquin negro con solapas de raso, camisa blanca de pechera y pajarita."""
+    BLACK = (0.07, 0.07, 0.08); SATIN = (0.16, 0.16, 0.18); WHITE = (0.94, 0.93, 0.90); STUD = (0.20, 0.20, 0.22)
+    _torso_cover(M, bd, BLACK, 34, pad=2.5)
+    for y in range(46, 62):                                              # pechera en uve
+        half = max(0, int((y - 46) * 0.42))
+        for x in range(-half - 1, half + 1):
+            z = M.front(x, y)
+            if z is not None: M.put(x, y, z, T, WHITE)
+        for s in (-1, 1):                                                # solapas
+            x = (half + 1) * s if s > 0 else -half - 2
+            for dx in (0, s):
+                z = M.front(x + dx, y)
+                if z is not None and y > 47: M.put(x + dx, y, z, T, SATIN)
+    for y in (50, 54):
+        z = M.front(-1, y)
+        if z is not None: M.put(-1, y, z + 1, T, STUD)
+    for x in range(-4, 4):                                               # pajarita
+        for y in (60, 61):
+            if x in (-1, 0) or abs(x + 0.5) > 1.2:
+                z = M.front(x, y)
+                if z is not None: M.put(x, y, z + 1, T, BLACK)
+    _sleeves(M, bd, BLACK, WHITE, pad=2.5)
+    return {}
+
+
+def vestido_charleston(M, bd):
+    """Vestido de charlestón dorado de talle bajo hasta la rodilla, con flecos en filas,
+    lentejuelas que brillan y un collar largo de perlas."""
+    GOLD = (0.80, 0.66, 0.36); GOLD_SH = (0.62, 0.48, 0.24); SEQ = (1.0, 0.92, 0.66); PEARL = (0.94, 0.92, 0.86)
+    _torso_cover(M, bd, GOLD, 38, pad=2.5)
+    _skirt(M, bd, GOLD, 21, flare=3)
+    for (x, y, z), v in M.V.items():
+        if v[1] != GOLD: continue
+        if y < 38 and (y - 21) % 5 in (0, 1) and (x + z) % 2 == 0: v[1] = GOLD_SH   # filas de flecos
+        elif _speck(x, y, z, 13): v[1] = SEQ
+    for y in range(21, 25):                                              # flecos sueltos del bajo
+        for (x, yy, z) in list(M.V):
+            if yy == 25 and (x + z) % 2 == 0: M.put(x, y, z, T, GOLD_SH)
+    k = 0.85 if bd['slim'] else 1.0
+    for s, _, _, arm, _ in cu.sides():
+        cx = (bd['ax'] + bd.get('arm_b', bd['b']) / 2) * s
+        slab(M, arm, GOLD, 55, 62, cx, 0, 8.5 * k + 2.5, 9 * k + 2.5, 9 * k + 2.5, 9 * k + 2.5, ch=1)
+    for y in range(44, 61):                                              # collar de perlas en uve
+        x = int((y - 44) * 0.35)
+        for xx in (x, -x - 1):
+            z = M.front(xx, y)
+            if z is not None and y % 2 == 0: M.put(xx, y, z + 1, T, PEARL)
+    return {GOLD: 'lana', GOLD_SH: 'lana'}
+
+
+def jersey_marinero(M, bd):
+    """Jersey de marinero de rayas azul marino y crudo, de cuello alto."""
+    NAVY = (0.14, 0.18, 0.34); CREAM = (0.86, 0.82, 0.70)
+    _torso_cover(M, bd, CREAM, 38, pad=2)
+    b = _bb(bd)
+    slab(M, T, CREAM, 59, 66, 0, 0.3, 16 + b * 0.5, 15 + b * 0.5, 15, 14, ch=2)   # cuello vuelto
+    _sleeves(M, bd, CREAM, NAVY, pad=2)
+    for (x, y, z), v in M.V.items():
+        if v[1] == CREAM and y < 59 and y % 4 in (0, 1): v[1] = NAVY
+    return {NAVY: 'punto', CREAM: 'punto'}
+
+
+def parka_inuit(M, bd):
+    """Parka inuit de piel de caribú hasta medio muslo, con bandas bordadas, ribete de piel y
+    la capucha caída a la espalda."""
+    HIDE = (0.58, 0.44, 0.28); HIDE_SH = (0.46, 0.34, 0.20); FUR = (0.90, 0.86, 0.78)
+    RED = (0.70, 0.16, 0.12); BLUE = (0.18, 0.32, 0.58)
+    _torso_cover(M, bd, HIDE, 38, pad=3.5)
+    _skirt(M, bd, HIDE, 28, flare=3, pad=1.5)
+    b = _bb(bd)
+    slab(M, T, FUR, 26, 29, 0, 0.3, 32 + b, 32 + b, 21, 21, ch=3)          # ribete del bajo
+    for (x, y, z), v in M.V.items():
+        if v[1] == HIDE and y in (50, 51, 52): v[1] = RED if (x + z) % 4 < 2 else BLUE   # banda bordada
+        if v[1] == HIDE and y in (31, 32): v[1] = BLUE if (x + z) % 4 < 2 else RED
+    slab(M, T, FUR, 59, 64, 0, -4.0, 20 + b * 0.5, 18 + b * 0.5, 9, 9, ch=3)   # capucha caída
+    slab(M, T, HIDE_SH, 52, 60, 0, -9.5, 16 + b * 0.5, 18 + b * 0.5, 4, 5, ch=2)
+    _sleeves(M, bd, HIDE, FUR, pad=3.5)
+    return {HIDE: 'cuero', HIDE_SH: 'cuero', FUR: 'borreguillo'}
+
+
+def sotana_exorcista(M, bd):
+    """Sotana negra hasta los pies con roquete blanco de encaje encima y la estola morada con
+    cruces doradas, la del exorcista."""
+    BLACK = (0.08, 0.08, 0.09); WHITE = (0.92, 0.91, 0.88); LACE = (0.80, 0.79, 0.76)
+    PURPLE = (0.40, 0.14, 0.46); GOLD = (0.84, 0.68, 0.28)
+    _torso_cover(M, bd, WHITE, 38, pad=3)
+    _skirt(M, bd, BLACK, 2, flare=4, pad=0.5)
+    _skirt(M, bd, WHITE, 30, flare=6, pad=2)                             # roquete hasta medio muslo
+    for (x, y, z), v in M.V.items():
+        if v[1] == WHITE and y in (30, 31) and (x + z) % 2 == 0: v[1] = LACE
+    for s in (-1, 1):                                                    # estola
+        for y in range(24, 63):
+            for x in (int(s * 3), int(s * 4)):
+                z = M.front(x, y)
+                if z is not None: M.put(x, y, z + 1, T, PURPLE)
+        for x, y in ((int(s * 3), 28), (int(s * 4), 28), (int(s * 3), 29), (int(s * 4), 29), (int(s * 3), 27), (int(s * 4), 27)):
+            z = M.front(x, y)
+            if z is not None: M.put(x, y, z, T, GOLD)
+    _sleeves(M, bd, WHITE, LACE, pad=4, bottom=36)
+    return {WHITE: 'lona', BLACK: 'lana'}
+
+
+def capa_terciopelo(M, bd):
+    """Capa larga de terciopelo carmesí, forrada de morado, con cuello alto y broche dorado:
+    cubre los hombros y cae por la espalda (lo de abajo se mece al andar)."""
+    RED = (0.46, 0.06, 0.10); RED_SH = (0.34, 0.04, 0.07); LINING = (0.24, 0.10, 0.30); GOLD = (0.86, 0.70, 0.30)
+    b = _bb(bd, 0)
+    slab(M, T, RED, 53, 63, 0, -0.5, 30 + b, 26 + b, 19, 17, ch=4)          # esclavina sobre los hombros
+    for (x, y, z) in list(M.V):                                          # abierta delante
+        if z > 5 and abs(x + 0.5) < 3: M.V.pop((x, y, z))
+    slab(M, T, RED, 60, 67, 0, -2.5, 20 + b * 0.5, 22 + b * 0.5, 13, 14, ch=3)   # cuello alto
+    for (x, y, z) in list(M.V):
+        if y >= 63 and z > -3: M.V.pop((x, y, z))
+    for y in range(10, 54):                                              # caída por la espalda
+        t = (54 - y) / 44.0
+        w = 30 + b + 6 * t
+        slab(M, T, RED, y, y + 1, 0, -9.5 - 2 * t, w, w, 3, 3, ch=1)
+        for x in (-int(w / 2), int(w / 2) - 1):
+            M.put(x, y, int(-8 - 2 * t), T, LINING)
+    for x in (-3, 2):                                                    # broche
+        for y in (60, 61):
+            M.put(x, y, 6, T, GOLD); M.put(x + 1, y, 6, T, GOLD)
+    for (x, y, z), v in M.V.items():
+        if v[1] == RED and (x + y) % 5 == 0: v[1] = RED_SH
+    return {RED: 'lana', RED_SH: 'lana'}
+
+
+def uniforme_lake(M, bd):
+    """Uniforme caqui de la expedición Lake de la Miskatonic: guerrera con bolsillos de parche,
+    cinturón, pantalón a juego y el escudo de la universidad en el hombro."""
+    KHAKI = (0.62, 0.56, 0.40); KHAKI_SH = (0.50, 0.45, 0.31); BELT = (0.34, 0.22, 0.12)
+    PATCH = (0.16, 0.30, 0.20); GOLD = (0.86, 0.70, 0.30); BTN = (0.30, 0.24, 0.14)
+    _torso_cover(M, bd, KHAKI, 34, pad=2.5)
+    _leg_cover(M, bd, KHAKI, bottom=12, pad=1.5)
+    b = _bb(bd)
+    slab(M, T, BELT, 41, 44, 0, 0.3, 27 + b, 27 + b, 16.5, 16.5, ch=3)
+    for s in (-1, 1):                                                    # bolsillos de parche
+        for x in range(int(3 * s), int(8 * s), s):
+            for y in range(50, 56):
+                z = M.front(x, y)
+                if z is not None: M.put(x, y, z + (1 if y == 55 else 0), T, KHAKI_SH)
+    for y in (46, 50, 54, 58):
+        z = M.front(-1, y)
+        if z is not None: M.put(-1, y, z + 1, T, BTN)
+    _sleeves(M, bd, KHAKI, KHAKI_SH, pad=2.5)
+    for s, _, _, arm, _ in cu.sides():                                   # escudo en el hombro izquierdo
+        if s > 0: continue
+        cx = int((bd['ax'] + bd.get('arm_b', bd['b']) / 2) * s)
+        for y in range(54, 59):
+            for z in range(-1, 2):
+                xs = [vx for (vx, vy, vz), v in M.V.items() if vy == y and vz == z and v[0] == arm]
+                if xs: M.put(min(xs), y, z, arm, GOLD if (y in (54, 58) or z in (-1, 1)) else PATCH)
+    return {KHAKI: 'lona', KHAKI_SH: 'lona', BELT: 'cuero'}
+
+
+def harapos(M, bd):
+    """Harapos de superviviente: camisa gris rota y quemada, con el bajo a jirones, mangas de
+    largos distintos y manchas de hollín."""
+    RAG = (0.50, 0.46, 0.40); RAG_SH = (0.38, 0.35, 0.30); SOOT = (0.10, 0.09, 0.08); BLOOD = (0.36, 0.08, 0.06)
+    _torso_cover(M, bd, RAG, 30, pad=2)
+    for (x, y, z) in list(M.V):                                          # bajo a jirones y agujeros
+        if y < 30 + ((x * 7 + z * 3) % 6): M.V.pop((x, y, z))
+        elif _speck(x, y, z, 29) and M.exposed((x, y, z)): M.V.pop((x, y, z))
+    k = 0.85 if bd['slim'] else 1.0
+    for s, _, _, arm, fa in cu.sides():
+        cx = (bd['ax'] + bd.get('arm_b', bd['b']) / 2) * s
+        slab(M, arm, RAG, 46 if s < 0 else 52, 62, cx, 0, 7 * k + 2, 8.5 * k + 2, 7.5 * k + 2, 8.5 * k + 2, ch=1)
+        if s < 0: slab(M, fa, RAG, 40, 46, cx * 1.02, 0.5, 7 * k + 2, 7 * k + 2, 7.5 * k + 2, 7.5 * k + 2, ch=1)
+    for (x, y, z), v in M.V.items():
+        if v[1] != RAG: continue
+        if (x // 4 + (y // 5) * 3 + z // 4) % 7 == 0: v[1] = RAG_SH         # remiendos
+        if _speck(x // 2, y // 2, z // 2, 29) or (y < 34 and _speck(x // 2, y // 2, z // 2, 7)): v[1] = SOOT
+        if _speck(x // 2, (y + 7) // 2, z // 2, 113): v[1] = BLOOD
+    return {RAG: 'lona', RAG_SH: 'lona'}
+
+
 GARMENTS = {'bombin': bombin, 'casco_minero': casco_minero, 'gorro_nieve': gorro_nieve, 'chistera': chistera,
             'chaqueta_aviador': chaqueta_aviador, 'abrigo_piel': abrigo_piel,
             'botas_militares': botas_militares, 'botas_nieve': botas_nieve,
@@ -794,7 +1107,13 @@ GARMENTS = {'bombin': bombin, 'casco_minero': casco_minero, 'gorro_nieve': gorro
             'gorra_marinero': gorra_marinero, 'fez': fez, 'capucha_cultista': capucha_cultista, 'tiara': tiara,
             'gorra_chofer': gorra_chofer, 'sombrero_hule': sombrero_hule, 'casco_aviador': casco_aviador,
             'birrete': birrete, 'panuelo_gitana': panuelo_gitana, 'corona_algas': corona_algas,
-            'fedora_ganster': fedora_ganster, 'gorro_dormir': gorro_dormir, 'casco_buzo': casco_buzo}
+            'fedora_ganster': fedora_ganster, 'gorro_dormir': gorro_dormir, 'casco_buzo': casco_buzo,
+            # cuerpo
+            'gabardina': gabardina, 'tunica_cultista': tunica_cultista, 'traje_buzo': traje_buzo,
+            'uniforme_enfermera': uniforme_enfermera, 'mono_mecanico': mono_mecanico, 'esmoquin': esmoquin,
+            'vestido_charleston': vestido_charleston, 'jersey_marinero': jersey_marinero, 'parka_inuit': parka_inuit,
+            'sotana_exorcista': sotana_exorcista, 'capa_terciopelo': capa_terciopelo, 'uniforme_lake': uniforme_lake,
+            'harapos': harapos}
 
 
 def build(name, c):

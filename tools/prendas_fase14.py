@@ -23,6 +23,20 @@ PRENDAS = [
     ('fedora_ganster', 'Fedora de gánster', 'Gris perla con cinta negra, de Chicago.', HEAD, 2000, {}),
     ('gorro_dormir', 'Gorro de dormir', 'Rayas y borla, para las pesadillas.', HEAD, 800, {}),
     ('casco_buzo', 'Casco de buzo', 'Cobre y latón con ojo de buey, para bajar al arrecife.', HEAD, 5000, {}),
+    # cuerpo
+    ('gabardina', 'Gabardina', 'Beis, cruzada y con cinturón, de detective de Boston.', BODY, 2400, {}),
+    ('tunica_cultista', 'Túnica de cultista', 'Negra hasta los pies, con ribete rojo y el signo bordado.', BODY, 3000, {}),
+    ('traje_buzo', 'Traje de buzo', 'Lona engomada y cinturón de plomos, a juego con el casco.', BODY, 3500, {}),
+    ('uniforme_enfermera', 'Uniforme de enfermera', 'Del hospital de Arkham, con delantal y la cruz roja.', BODY, 1800, {}),
+    ('mono_mecanico', 'Mono de mecánico', 'Azul y con grasa, de los talleres del puerto.', BODY, 1200, {}),
+    ('esmoquin', 'Esmoquin', 'Negro con solapas de raso y pajarita, para las fiestas de Kingsport.', BODY, 2600, {}),
+    ('vestido_charleston', 'Vestido de charlestón', 'Dorado, de talle bajo, con flecos y lentejuelas.', BODY, 2800, {}),
+    ('jersey_marinero', 'Jersey de marinero', 'Rayas azules y crudas, de cuello alto.', BODY, 1000, {}),
+    ('parka_inuit', 'Parka inuit', 'Piel de caribú con bandas bordadas y capucha.', BODY, 2600, {}),
+    ('sotana_exorcista', 'Sotana de exorcista', 'Roquete de encaje y estola morada, para expulsar lo que no es.', BODY, 2400, {}),
+    ('capa_terciopelo', 'Capa de terciopelo', 'Carmesí forrada de morado, con broche dorado.', BODY, 3200, {}),
+    ('uniforme_lake', 'Uniforme de la expedición', 'Caqui, de la expedición Lake de la Miskatonic.', BODY, 2000, {}),
+    ('harapos', 'Harapos', 'Lo que queda de la ropa después de tres noches.', BODY, 500, {}),
 ]
 
 TEMPLATE = '''[gd_resource type="Resource" script_class="OutfitData" load_steps=2 format=3]
