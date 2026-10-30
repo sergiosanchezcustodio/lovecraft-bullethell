@@ -47,7 +47,7 @@ jobs:
           path: |
             /home/runner/godot
             /home/runner/.local/share/godot/export_templates
-          key: godot-${{ env.GODOT_VERSION }}-win-mac
+          key: godot-${{ env.GODOT_VERSION }}-win-mac-rcedit
 
       - name: Descargar Godot y las plantillas de Windows y macOS
         if: steps.godot-cache.outputs.cache-hit != 'true'
@@ -66,6 +66,19 @@ jobs:
             templates/windows_release_x86_64_console.exe templates/macos.zip -d "$tpl"
           rm godot.zip templates.tpz
           ls -la "$tpl"
+          # rcedit pone el icono y los datos del .exe (application/modify_resources); en Linux, con wine
+          curl -sSL -o /home/runner/godot/rcedit-x64.exe https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe
+
+      - name: Wine para rcedit
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends wine64 > /dev/null
+          WINEDEBUG=-all wineboot --init > /dev/null 2>&1 || true
+          wine=$(command -v wine64 || command -v wine)
+          mkdir -p /home/runner/.config/godot
+          printf '[gd_resource type="EditorSettings" format=3]\n\n[resource]\nexport/windows/rcedit = "/home/runner/godot/rcedit-x64.exe"\nexport/windows/wine = "%s"\n' "$wine" \
+            > /home/runner/.config/godot/editor_settings-4.4.tres
+          cat /home/runner/.config/godot/editor_settings-4.4.tres
 
       # Las importaciones (texturas comprimidas, sobre todo) tardan; Godot rehace solo las que cambian.
       - name: Caché de las importaciones
@@ -97,7 +110,11 @@ jobs:
         run: |
           "$GODOT" --headless --path . -s tools/empaquetar_modelos.gd
           mkdir -p builds/windows builds/macos
-          "$GODOT" --headless --path . --export-release "Windows Desktop" builds/windows/LovecraftLibrary.exe
+          "$GODOT" --headless --path . --export-release "Windows Desktop" builds/windows/LovecraftLibrary.exe 2>&1 | tee export.log
+          if grep -q "Resources Modification" export.log; then
+            echo "::error::rcedit no ha podido poner el icono y los datos del .exe"
+            exit 1
+          fi
           "$GODOT" --headless --path . --export-release "macOS" builds/macos/LovecraftLibrary.zip
           test -s builds/windows/LovecraftLibrary.exe
           test -s builds/macos/LovecraftLibrary.zip
