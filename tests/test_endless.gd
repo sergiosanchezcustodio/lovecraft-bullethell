@@ -52,6 +52,8 @@ func test_records() -> void:
 	assert_eq(int(s.stats.get("endless_best", 0)), 200)
 	var back := SaveData.from_dict(JSON.parse_string(JSON.stringify(s.to_dict())))
 	assert_eq(Endless.best(back, "dyer", "p1_n1"), 200.0, "se guarda")
+	Endless.record(s, "dyer", "p2_n1", 300.0)
+	assert_eq(Endless.best_of(s, "dyer"), 300.0, "el mejor del personaje en cualquier escenario")
 
 func test_abierto_al_vencer_a_cthulhu() -> void:
 	var s := SaveData.new()

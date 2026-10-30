@@ -117,6 +117,7 @@ static func record(save: SaveData, date: String, t: float, kills: int, character
 	if not d.has("days"): d["days"] = {}
 	d.days[date] = {"t": roundf(t * 10.0) / 10.0, "kills": kills, "character": character, "players": players}
 	d["best_streak"] = maxi(int(d.get("best_streak", 0)), streak(save, date))
+	save.stats["daily_streak"] = maxi(int(save.stats.get("daily_streak", 0)), int(d.best_streak))   # logro «Siete noches»
 	return true
 
 ## Días seguidos con intento que cuenta, acabando en `date` (o en el día anterior, si aún no

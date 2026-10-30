@@ -113,6 +113,15 @@ static func best(save: SaveData, character: String, base: String) -> float:
 	if save == null: return 0.0
 	return float((save.records.get("endless", {}) as Dictionary).get("%s|%s" % [character, base], 0.0))
 
+## Mejor tiempo con ese personaje en cualquier escenario (0 si no hay).
+static func best_of(save: SaveData, character: String) -> float:
+	if save == null: return 0.0
+	var out := 0.0
+	var all: Dictionary = save.records.get("endless", {})
+	for k: String in all:
+		if k.begins_with(character + "|"): out = maxf(out, float(all[k]))
+	return out
+
 ## Apunta el tiempo; true si es récord nuevo. También el mejor de todos (`stats.endless_best`,
 ## para el logro).
 static func record(save: SaveData, character: String, base: String, t: float) -> bool:

@@ -37,6 +37,7 @@ func test_un_intento_cuenta_y_racha() -> void:
 	assert_eq(Daily.streak(s, "2026-10-30"), 3)
 	assert_eq(Daily.streak(s, "2026-11-01"), 0, "un día sin jugar la corta")
 	assert_eq(Daily.best_streak(s), 3)
+	assert_eq(int(s.stats.get("daily_streak", 0)), 3, "para el logro «Siete noches»")
 	var back := SaveData.from_dict(JSON.parse_string(JSON.stringify(s.to_dict())))
 	assert_eq(Daily.streak(back, "2026-10-30"), 3, "se guarda")
 
@@ -61,3 +62,14 @@ func test_amigos() -> void:
 	Daily.add_friend(s, d)
 	assert_eq(Daily.friends(s, "2026-10-30").size(), 1, "sin repetir")
 	assert_eq(Daily.friends(s, "2026-10-29").size(), 0)
+
+func test_casillas_del_codigo() -> void:
+	var p := RoomCodePicker.new(12, Daily.ALPHABET)
+	add_child_autofree(p)
+	p.set_text("09e0 fc05 3ssk")
+	assert_eq(p.text(), "09E0-FC05-3SSK")
+	assert_false(Daily.decode(p.text()).is_empty())
+	var room := RoomCodePicker.new()
+	add_child_autofree(room)
+	room.set_text("K7Q2M9")
+	assert_eq(room.text(), "K7Q2-M9", "la de la sala, como antes")

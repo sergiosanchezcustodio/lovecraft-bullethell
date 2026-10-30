@@ -542,6 +542,7 @@ class _Frame extends Control:
 	var _status: Label
 	var _arrows: Array[Label] = []
 	var _wbox: PanelContainer
+	var _record: Label                        ## récord de «La noche eterna» con este personaje (13.8)
 	var _empty: VBoxContainer
 	var _who: Label                           ## en red, el nombre del PC del jugador
 	var _pet: Panel
@@ -595,6 +596,12 @@ class _Frame extends Control:
 		_wbox.position = Vector2(FRAME.x - 112, 20)
 		_wbox.add_theme_stylebox_override("panel", _frame(Color(0, 0, 0, 0.5), Color(MenuKit.BRASS, 0.7), 2))
 		add_child(_wbox)
+		_record = UiKit.label("", 14, UiKit.TEXT_DIM)
+		_record.position = Vector2(FRAME.x - 120, 222)
+		_record.size = Vector2(108, 48)
+		_record.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_record.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_record)
 		_weapon = TipIcon.new(Vector2(72, 72))
 		_weapon.placeholder = "Arma"
 		_wbox.add_child(_weapon)
@@ -807,6 +814,9 @@ class _Frame extends Control:
 		if not c.starting_weapons.is_empty(): wd = load("res://data/weapons/%s.tres" % c.starting_weapons[0])
 		_weapon.set_icon(wd.get_icon() if wd else null, wd.display_name if wd else "Sin arma", wd.description if wd else "")
 		_passive.text = "Rasgo: " + c.passive_text
+		var rec := Endless.best_of(Auto.save(), String(c.id))
+		_record.text = "Noche eterna
+%s" % Endless.clock(rec) if rec > 0.0 else ""
 		_fit_line(_name, 32, 24)
 		_fit_line(_role, 16, 13)
 		var at := Attributes.initial(c)

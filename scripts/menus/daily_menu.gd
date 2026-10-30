@@ -10,6 +10,7 @@ signal closed
 var date := ""
 var _friends: VBoxContainer
 var _note: Label
+var _picker: RoomCodePicker
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -56,12 +57,18 @@ func _ready() -> void:
 		play.emit(Daily.id_for(date))
 		queue_free())
 	box.add_child(b_play)
-	var b_cmp := MenuKit.button("Comparar el código de un amigo", MenuKit.INK, 22)
+	box.add_child(_center(UiKit.label("Código de un amigo", 19, UiKit.TEXT_DIM)))
+	_picker = RoomCodePicker.new(12, Daily.ALPHABET)   # con el mando, letra a letra (o X para pegar)
+	_picker.submitted.connect(_compare)
+	box.add_child(_picker)
+	var b_cmp := MenuKit.button("Comparar", MenuKit.INK, 22)
 	b_cmp.custom_minimum_size = Vector2(520, 52)
 	b_cmp.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b_cmp.pressed.connect(_compare)
 	box.add_child(b_cmp)
-	box.add_child(MenuKit.hint("Copia su código y pulsa «Comparar»  ·  B o Esc: volver al mapa"))
+	b_play.focus_neighbor_bottom = b_play.get_path_to(_picker)
+	b_cmp.focus_neighbor_top = b_cmp.get_path_to(_picker)
+	box.add_child(MenuKit.hint("Casillas: cruceta o teclado para las letras · X o Ctrl+V: pegar · A: comparar (vacías: lo que haya en el portapapeles)  ·  B o Esc: volver"))
 	b_play.grab_focus.call_deferred()
 	var la := LaunchArgs.from_cmdline()               # capturas: daily_code=7K2M-QX4A-90BD
 	if la.has("daily_code"): _compare_code.call_deferred(la.get_str("daily_code"))
@@ -84,14 +91,14 @@ static func _res_name(dir: String, id: String) -> String:
 	var path := "res://data/%s/%s.tres" % [dir, id]
 	return String(load(path).get("display_name")) if ResourceLoader.exists(path) else id
 
-## Lee el portapapeles; si es un código del día de hoy, lo guarda y lo enseña.
+## Lee las casillas (o, vacías, el portapapeles); si es un código de hoy, lo guarda y lo enseña.
 func _compare() -> void:
-	_compare_code(DisplayServer.clipboard_get())
+	_compare_code(_picker.text() if _picker.text() != "" else DisplayServer.clipboard_get())
 
 func _compare_code(code: String) -> void:
 	var d := Daily.decode(code)
 	if d.is_empty():
-		_note.text = "En el portapapeles no hay un código válido (12 letras, como 7K2M-QX4A-90BD)."
+		_note.text = "No es un código válido (12 letras, como 7K2M-QX4A-90BD): revisa las letras."
 		return
 	if String(d.date) != date:
 		_note.text = "Ese código es de la partida del %s, no de la de hoy." % Daily.pretty(String(d.date), false)

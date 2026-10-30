@@ -1403,6 +1403,7 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Todo en `SaveData.records.daily` (`days`, `best_streak`, `friends`), así que viaja con la copia de la nube.
   - Pruebas: `daily_date=2026-10-30` fija la fecha, `select … map=true daily_open=true daily_code=09E0-FC05-3SSK` abre la ventana con un amigo, y `start_level=dia:2026-10-30` empieza directamente.
   - Hoja `shots/revision/2026-10-30/partida_del_dia.png` (capturas en `dia/`). Tests en `test_daily` (5). 574 de 574.
+  - **Mejoras (30-10-2026):** logro «Siete noches» (la partida del día siete días seguidos, 500 $; `stats.daily_streak`); el récord de «La noche eterna» de cada investigador en su ficha de la selección, abajo a la derecha del modelo (`Endless.best_of`); y el código de un amigo se escribe también con el mando, letra a letra, en doce casillas (`RoomCodePicker` admite ahora otro número de casillas y otro alfabeto, y las teclas escriben, Ctrl+V pega y Retroceso borra). Capturas en `shots/revision/2026-10-30/mejoras/`. 575 de 575.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 
