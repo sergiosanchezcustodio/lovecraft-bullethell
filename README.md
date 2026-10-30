@@ -436,6 +436,14 @@ sh tools/exportar.sh          # comprime los modelos y exporta Windows y macOS e
 
 Salen un `.exe` único para Windows 10/11 de 64 bits y un `.app` universal para macOS 11 o posterior (Apple Silicon e Intel). La versión de Mac no está firmada con una cuenta de desarrollador de Apple: la primera vez hay que abrirla con **clic derecho → Abrir**.
 
+También las hace GitHub Actions (`.github/workflows/build.yml`): al subir una etiqueta de versión pasa los tests, exporta las dos y las deja en una Release en borrador, que se revisa y se publica a mano. Para publicar una versión:
+
+```bash
+sh tools/publicar.sh 0.9.1    # sube la versión, hace el commit y la etiqueta v0.9.1 y, si confirmas, lo sube
+```
+
+Sin etiqueta, desde la pestaña Actions de GitHub (*Builds → Run workflow*): las builds quedan 30 días en la ejecución, sin Release.
+
 ## Jugar online
 
 Hasta cuatro jugadores repartidos entre uno y cuatro PC. Un PC crea la sala (**Jugar → Jugar online → Crear sala**) y pasa su **código de 8 letras** a los demás, que se unen con él. Si el router abre el puerto solo (UPnP), el código sirve desde cualquier sitio; si no, hay que abrir el puerto 24680 a mano o usar una red privada virtual.

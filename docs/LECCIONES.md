@@ -182,3 +182,8 @@ Sacadas de `CLAUDE.md` el 17-10-2026. Léelas antes de tocar generadores de mode
 - Comparar píxel a píxel marca de todo. Funciona comparar bloques sobre la imagen reducida a 1/4 y difuminada, y medir el ruido de cada captura haciéndola dos veces (la «zona viva»), en vez de subir el umbral para todos.
 - No encadenes en la misma orden un cambio de un script y su uso nuevo: si el cambio falla, la orden siguiente se ejecuta con el script viejo (lanzó una medición de 16 minutos que hubo que parar).
 
+## Builds en GitHub Actions (hito 13.15, 30-10-2026)
+
+- En Linux, Godot exporta el `.exe` sin icono ni datos si no tiene rcedit, y solo lo avisa (`Resources Modification: Could not start rcedit`): la exportación «sale bien». Hace falta rcedit con wine (`export/windows/rcedit` y `export/windows/wine` en `~/.config/godot/editor_settings-4.4.tres`), y conviene que el workflow falle si sale el aviso.
+- `application/file_version` y `application/version` vacíos en `export_presets.cfg` hacen que el ejecutable lleve la versión del juego; con un valor fijo se queda atrás sin que nadie lo note.
+- Para comprobar un `.exe` exportado sin robar el foco: `--headless --audio-driver Dummy --fixed-fps 60 --quit-after N --log-file f.log -- …` (con `--fixed-fps`, N fotogramas son N/60 s de juego; sin él, en `--headless` los fotogramas pasan mucho más deprisa).
