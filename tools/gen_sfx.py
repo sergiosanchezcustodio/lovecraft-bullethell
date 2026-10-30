@@ -10,6 +10,7 @@ Escribe resources/sfx/<nombre>.wav (sintetizados) y resources/sfx/<nombre>_N.ogg
 La tabla de qué suena en cada evento está en data/sfx.json.
 Uso: python tools/gen_sfx.py <carpeta con los packs de Kenney descomprimidos>
      python tools/gen_sfx.py --ambiente   (solo los del ambiente de los escenarios)
+     python tools/gen_sfx.py --buzo       (solo la respiración del casco de buzo)
 """
 import os, sys, shutil, wave, glob
 import numpy as np
@@ -753,6 +754,33 @@ def avisos():
     save('cue_attack', sweep * 0.6 + snap)
 
 
+def respiracion_buzo():
+    """Respiración dentro del casco de buzo (vestuario, fase 14): una inspiración y una espiración
+    por el regulador, soplo con resonancias metálicas (el cobre del casco) y un leve silbido."""
+    r = np.random.default_rng(1414)
+    d = 2.6
+    tt = t(d)
+    n = r.standard_normal(len(tt))
+    def puff(a, b, rise):
+        x = np.clip((tt - a) / rise, 0, 1) * np.clip((b - tt) / 0.35, 0, 1)
+        return np.sin(np.clip(x, 0, 1) * np.pi / 2) ** 2
+    inhale = puff(0.05, 1.05, 0.45)
+    exhale = puff(1.35, 2.45, 0.12)
+    air = bp(n, 300, 2600) * inhale * 0.7 + bp(n, 200, 1800) * exhale
+    metal = sum(bp(n, f * 0.97, f * 1.03) * g for f, g in ((620, 1.0), (1240, 0.7), (2150, 0.5), (3300, 0.3)))
+    metal *= (inhale * 0.6 + exhale)
+    bubbles = np.zeros(len(tt))                                  # el regulador burbujea al espirar
+    for s in r.uniform(1.45, 2.3, 9):
+        i = int(s * SR); m = int(0.05 * SR)
+        f = r.uniform(500, 900)
+        k = np.arange(m)
+        bubbles[i:i + m] += np.sin(2 * np.pi * f * (1 + k / m * 0.6) * k / SR) * np.exp(-k / (0.012 * SR)) * 0.5
+    x = air + metal * 0.9 + bubbles
+    ir = r.standard_normal(int(0.25 * SR)) * np.exp(-t(0.25) / 0.05)    # dentro del casco: eco corto
+    wet = signal.fftconvolve(x, bp(ir, 400, 3000))[:len(x)]
+    save('diver_breath', x + wet * np.std(x) / (np.std(wet) + 1e-9) * 0.4)
+
+
 def copy_kenney(src):
     files = {os.path.splitext(os.path.basename(p))[0]: p for p in glob.glob(os.path.join(src, '**', '*.ogg'), recursive=True)}
     for ev, names in KENNEY.items():
@@ -766,6 +794,8 @@ if __name__ == '__main__':
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
         latido()
         sirena()
+    elif '--buzo' in sys.argv:                                 # solo la respiración del casco de buzo (fase 14)
+        respiracion_buzo()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)

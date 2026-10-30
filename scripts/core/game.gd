@@ -1239,10 +1239,12 @@ func _on_level_completed() -> void:
 	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))
 	Pacts.record_win(Saves.current, String(level.id), Pacts.active())   # sellos del mapa y logros (13.6)
+	var sets_won := {}                               # niveles superados con cada conjunto (la ficha los cuenta)
 	for q in players:                                # «De punta en blanco» (14.8): alguien de este PC con un conjunto entero
 		if not q.remote and not (q.input is BotInput) and q.outfit_set != "":
-			Achievements.add(Saves.current, "set_levels")
-			break
+			sets_won[OutfitSets.stat_key(q.outfit_worn)] = true
+	if not sets_won.is_empty(): Achievements.add(Saves.current, "set_levels")
+	for k: String in sets_won: Achievements.add(Saves.current, k)
 	_check_achievements.call_deferred()              # después de contar la baja del enemigo final (élite)
 	Saves.save()
 	announce("Nivel superado", 2.0)

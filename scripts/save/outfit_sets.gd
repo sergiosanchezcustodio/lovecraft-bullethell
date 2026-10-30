@@ -71,6 +71,17 @@ static func worn_set(worn: Dictionary) -> Dictionary:
 		if ok and (best.is_empty() or s.pieces.size() > (best.pieces as Dictionary).size()): best = s
 	return best
 
+## Clave de las estadísticas de la partida con los niveles superados con el conjunto puesto
+## ("" si no se lleva ninguno entero).
+static func stat_key(worn: Dictionary) -> String:
+	var s := worn_set(worn)
+	return "" if s.is_empty() else "set_" + String(s.id)
+
+## Niveles superados con el conjunto que se lleva puesto (0 si ninguno o sin partida).
+static func levels_with(save: SaveData, worn: Dictionary) -> int:
+	var k := stat_key(worn)
+	return 0 if save == null or k == "" else int(save.stats.get(k, 0))
+
 ## Nombre del conjunto que se lleva entero ("" si ninguno).
 static func worn_name(worn: Dictionary) -> String:
 	var s := worn_set(worn)

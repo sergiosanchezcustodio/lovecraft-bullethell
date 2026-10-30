@@ -206,7 +206,11 @@ func _ready() -> void:
 	outfit_worn = worn
 	var pn: Dictionary = model.get_meta("part_nodes")
 	if pn.has("fore_r"): _beam = (pn["fore_r"] as Node3D).get_node_or_null("Beam") as SpotLight3D
-	if pn.has("head"): _bubbles = (pn["head"] as Node3D).get_node_or_null("bubbles") as GPUParticles3D
+	if pn.has("head"):
+		_bubbles = (pn["head"] as Node3D).get_node_or_null("bubbles") as GPUParticles3D
+		for c in (pn["head"] as Node3D).get_children():
+			if c is GPUParticles3D and String(c.name).begins_with("smoke"): _smokes.append(c)
+	if String(worn.get("head", "")) == "casco_buzo": _breath_in = randf_range(2.0, BREATH_EVERY.y)
 	_face = FaceLook.new().setup(model, VoxelBuilder.variant_path("res://models/%s.json" % data.model))
 	add_child(_face)
 	_set_vis_layer(model)
@@ -705,9 +709,24 @@ var _tail_t := 0.0
 var _torch_glow: TorchGlow                     ## mancha de la linterna en Baja (sin luz de verdad)
 var _beam: SpotLight3D                         ## luz de la linterna (Media y más)
 var _bubbles: GPUParticles3D                   ## burbujas del casco de buzo
+var _smokes: Array[GPUParticles3D] = []        ## humo de la pipa (se queda atrás al andar)
+var _breath_in := -1.0                         ## s hasta la próxima respiración del casco de buzo (-1: sin casco)
+const SMOKE_DRAG := 0.09                       ## cuánto se inclina el humo hacia atrás por m/s
+const BREATH_EVERY := Vector2(7.0, 12.0)       ## cada cuánto respira el casco (s, al azar)
 var _flicker_t := 0.0
 const TORCH_FLICKER_AT := 0.35                 ## por debajo de esta cordura (fracción), la linterna falla
 func _hold_step(delta: float) -> void:
+	if not _smokes.is_empty():                   # el humo sigue a la cabeza (local_coords): al andar
+		var back := -velocity * SMOKE_DRAG        # se lo lleva el aire hacia atrás
+		back.y = 0.0
+		for e in _smokes:
+			var m := e.process_material as ParticleProcessMaterial
+			m.gravity = e.global_basis.inverse() * (Vector3(0.05, 0.16, 0.0) + back)
+	if _breath_in >= 0.0 and visual.visible and not is_downed():   # el casco respira, metálico
+		_breath_in -= delta
+		if _breath_in < 0.0:
+			Auto.sfx_at("diver_breath", global_position)
+			_breath_in = randf_range(BREATH_EVERY.x, BREATH_EVERY.y)
 	if _bubbles != null:                         # el casco, al vadear (solo al cambiar: asignarlo en
 		var want := _wade > 0.5 and visual.visible   # cada fotograma volvía a empezar la emisión)
 		if _bubbles.emitting != want: _bubbles.emitting = want

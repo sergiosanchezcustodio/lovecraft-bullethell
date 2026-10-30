@@ -56,3 +56,15 @@ func test_la_prenda_que_completa_un_conjunto() -> void:
 	assert_has(OutfitSets.completes(sv, "botas_buzo"), "Buzo")
 	assert_does_not_have(OutfitSets.completes(sv, "casco_buzo"), "Buzo", "ya la tiene")
 	assert_does_not_have(OutfitSets.completes(sv, "fez"), "Buzo")
+
+func test_niveles_superados_con_el_conjunto() -> void:
+	var sv := _save(0)
+	var buzo := {"head": "casco_buzo", "body": "traje_buzo", "feet": "botas_buzo"}
+	assert_eq(OutfitSets.stat_key(buzo), "set_buzo")
+	assert_eq(OutfitSets.stat_key({"head": "casco_buzo"}), "", "a medias no cuenta")
+	assert_eq(OutfitSets.levels_with(sv, buzo), 0)
+	Achievements.add(sv, OutfitSets.stat_key(buzo), 2)
+	assert_eq(OutfitSets.levels_with(sv, buzo), 2)
+	assert_eq(OutfitSets.levels_with(null, buzo), 0)
+	var back := SaveData.from_dict(sv.to_dict())
+	assert_eq(OutfitSets.levels_with(back, buzo), 2, "se guarda con la partida")

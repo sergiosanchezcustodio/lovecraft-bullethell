@@ -1,5 +1,5 @@
 {
-	"_comentario": "Efectos de sonido (hito 8.1): evento -> archivos de resources/sfx (al azar), volumen en dB, tono al azar [min, max], voces a la vez y separación mínima en s. Sintetizados (tools/gen_sfx.py) y CC0 de Kenney (kenney.nl). `group` (armas, golpes): todas las del grupo comparten un tope de voces y se atenúan cuanto más suenan a la vez (Sfx.GROUPS); el volumen de las armas se regula aparte en Configuración > Audio. Ambiente de los escenarios (16-10-2026, Ambient y Weather): drip, wave_hit, creak, thunder los graznidos de las bandadas (bird_<ave>) y los crujidos del suelo del estudio (floor_creak); el fuego (fire_loop.wav) y la bandera (flag_loop.wav) los pone Ambient en su pieza, y el cántico de los cultistas (chant_loop.wav) en el ritual; los pasos (step_<suelo>) los lanza Ambient con cada pisada del jugador; la lluvia en bucle (rain_loop.wav) la pone Weather y el viento en bucle (wind_loop.wav) lo pone Ambient aparte. `bus`: Ambiente (volumen propio en Configuración > Audio). Aparición de los enemigos (hito 11.6): rise_snow, rise_mud, rise_stone y rise_wood (sale del suelo), rise_fog (se materializa) y rise_air (baja del cielo); los que salen del agua suenan con splash. Avisos de fuera de cámara (hito 13.13, OffscreenCues): cue_elite y cue_attack, por su lado.",
+	"_comentario": "Efectos de sonido (hito 8.1): evento -> archivos de resources/sfx (al azar), volumen en dB, tono al azar [min, max], voces a la vez y separación mínima en s. Sintetizados (tools/gen_sfx.py) y CC0 de Kenney (kenney.nl). `group` (armas, golpes): todas las del grupo comparten un tope de voces y se atenúan cuanto más suenan a la vez (Sfx.GROUPS); el volumen de las armas se regula aparte en Configuración > Audio. Ambiente de los escenarios (16-10-2026, Ambient y Weather): drip, wave_hit, creak, thunder los graznidos de las bandadas (bird_<ave>) y los crujidos del suelo del estudio (floor_creak); el fuego (fire_loop.wav) y la bandera (flag_loop.wav) los pone Ambient en su pieza, y el cántico de los cultistas (chant_loop.wav) en el ritual; los pasos (step_<suelo>) los lanza Ambient con cada pisada del jugador; la lluvia en bucle (rain_loop.wav) la pone Weather y el viento en bucle (wind_loop.wav) lo pone Ambient aparte. `bus`: Ambiente (volumen propio en Configuración > Audio). Aparición de los enemigos (hito 11.6): rise_snow, rise_mud, rise_stone y rise_wood (sale del suelo), rise_fog (se materializa) y rise_air (baja del cielo); los que salen del agua suenan con splash. Avisos de fuera de cámara (hito 13.13, OffscreenCues): cue_elite y cue_attack, por su lado. Casco de buzo (fase 14): diver_breath, cada 7-12 s.",
 	"eventos": {
 		"shot_revolver": {
 			"db": -18,
@@ -893,6 +893,18 @@
 			"gap": 0.8,
 			"files": [
 				"cue_attack.wav"
+			]
+		},
+		"diver_breath": {
+			"db": -19,
+			"pitch": [
+				0.94,
+				1.04
+			],
+			"voices": 2,
+			"gap": 1.5,
+			"files": [
+				"diver_breath.wav"
 			]
 		}
 	}

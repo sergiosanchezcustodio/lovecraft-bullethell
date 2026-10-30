@@ -316,7 +316,10 @@ class Sheet extends Control:
 			xp.value = p.progress.xp / maxf(p.progress.xp_to_next(), 1.0))
 		col.add_child(_label("Rasgo: " + p.data.passive_text, 15, UiKit.TEXT, true))
 		if p.outfit_set != "":                   # conjunto del vestuario entero (14.8)
-			col.add_child(_label("Conjunto: " + p.outfit_set, 15, UiKit.GOLD, true))
+			var won := OutfitSets.levels_with(Saves.current, p.outfit_worn)
+			var t := "Conjunto: " + p.outfit_set
+			if won > 0: t += " · %d %s con él" % [won, "nivel superado" if won == 1 else "niveles superados"]
+			col.add_child(_label(t, 15, UiKit.GOLD, true))
 		# la imagen, centrada en lo que queda entre los datos y el compañero
 		var pic := _img(_model(p.data.model, 360, p.outfit_worn), 300, Color(p.color, 0.5))
 		pic.size_flags_vertical = Control.SIZE_EXPAND | Control.SIZE_SHRINK_CENTER
