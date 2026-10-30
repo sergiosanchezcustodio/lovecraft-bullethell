@@ -199,7 +199,9 @@ func _ready() -> void:
 	visual.top_level = true
 	add_child(visual)
 	model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
-	OutfitData.apply(model, data.model, OutfitData.worn_for(String(data.id)))   # vestuario (D-34)
+	var worn := OutfitData.worn_for(String(data.id))
+	OutfitData.apply(model, data.model, worn)        # vestuario (D-34)
+	_hold = OutfitData.hold_of(worn)                 # paraguas, linterna (fase 14)
 	_face = FaceLook.new().setup(model, VoxelBuilder.variant_path("res://models/%s.json" % data.model))
 	add_child(_face)
 	_set_vis_layer(model)
@@ -683,7 +685,24 @@ func _animate(delta: float) -> void:
 		elif _action == "":
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
+	_hold_step(delta)
 	_mind_step(delta)
+
+## Lo que lleva en la mano (vestuario, fase 14): el brazo derecho lo sostiene quieto (brazo y
+## antebrazo, en radianes) mientras no lanza, esquiva o hace un gesto; vuelve poco a poco.
+const HOLDS := {"umbrella": [-0.35, -1.45, 0.1], "lantern": [-0.35, -0.85, 0.0]}
+var _hold := ""
+var _hold_w := 0.0
+func _hold_step(delta: float) -> void:
+	if not HOLDS.has(_hold): return
+	_hold_w = move_toward(_hold_w, 1.0 if _action == "" and _override == "" and _fidget == "" else 0.0, delta * 6.0)
+	if _hold_w <= 0.0: return
+	var h: Array = HOLDS[_hold]
+	var arm := Anims.part(model, "arm_r")
+	arm.rotation.x = lerpf(arm.rotation.x, h[0], _hold_w)
+	arm.rotation.z = lerpf(arm.rotation.z, h[2], _hold_w)
+	var parts: Dictionary = model.get_meta("part_nodes")
+	if parts.has("fore_r"): (parts["fore_r"] as Node3D).rotation.x = lerpf((parts["fore_r"] as Node3D).rotation.x, h[1], _hold_w)
 
 ## Configuración de la mancha del nivel (data/dirt.json): la de la arena o, si no, la de la parte.
 static func dirt_config(part_key: String, arena_name: String) -> Dictionary:

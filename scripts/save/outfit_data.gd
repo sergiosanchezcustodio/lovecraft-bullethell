@@ -4,10 +4,14 @@ extends Resource
 ## una vez en la tienda y la puede llevar cualquier personaje. El modelo de cada personaje
 ## está en models/vest_<id>_<personaje>.json (tools/gen_vestuario.py).
 
-## ACCESSORY: gafas y bufanda; van con cualquier sombrero (no lo ocultan).
-enum Slot { HEAD, BODY, FEET, ACCESSORY }
-const SLOT_NAMES := ["Cabeza", "Cuerpo", "Pies", "Accesorio"]
-const KEYS := ["head", "body", "feet", "acc"]
+## ACCESSORY: gafas, bufanda, collares…; van con cualquier sombrero (no lo ocultan).
+## HANDS (fase 14): guantes y lo que se lleva en la mano; BACK: mochila, tentáculo.
+enum Slot { HEAD, BODY, FEET, ACCESSORY, HANDS, BACK }
+const SLOT_NAMES := ["Cabeza", "Cuerpo", "Pies", "Complemento", "Manos", "Espalda"]
+const SECTION_NAMES := ["Cabeza", "Cuerpo", "Pies", "Complementos", "Manos", "Espalda"]   ## en la tienda
+const KEYS := ["head", "body", "feet", "acc", "hands", "back"]
+## Huecos que, vacíos, no dejan nada ("Ninguno"); los demás dejan la ropa del personaje ("Lo suyo").
+const OPTIONAL: Array[int] = [Slot.ACCESSORY, Slot.HANDS, Slot.BACK]
 const DIR := "res://data/outfits"
 
 @export var id := &"bombin"
@@ -16,9 +20,25 @@ const DIR := "res://data/outfits"
 @export var slot := Slot.HEAD
 @export var price := 1500
 @export var order := 0
+## Postura del brazo derecho mientras se lleva (fase 14): "" (ninguna), "umbrella" (paraguas en
+## alto), "lantern" (linterna delante) o "cane" (bastón). Ver `Player._hold_step`.
+@export var hold := ""
+## Efecto que acompaña a la prenda: "" o "pipe_smoke" (humo de la pipa de vez en cuando).
+@export var fx := ""
+
+## Personaje sobre el que se dibuja el icono de la tienda (la prenda sola, con sus medidas).
+@export var icon_char := "dyer"
 
 func model_path(character_model: String) -> String:
 	return "res://models/vest_%s_%s.json" % [id, character_model]
+
+## Modelo del icono y la imagen ya dibujada (tools/iconos_vestuario.gd), si la hay.
+func icon_model() -> String:
+	return "vest_%s_%s" % [id, icon_char]
+
+func icon() -> Texture2D:
+	var p := "res://resources/outfits/icons/%s.png" % id
+	return load(p) if ResourceLoader.exists(p) else null
 
 static func all() -> Array[OutfitData]:
 	var out: Array[OutfitData] = []
@@ -30,6 +50,10 @@ static func all() -> Array[OutfitData]:
 static func find(outfit_id: String) -> OutfitData:
 	var path := DIR.path_join(outfit_id + ".tres")
 	return load(path) if ResourceLoader.exists(path) else null
+
+## Nombre de lo que deja un hueco vacío: «Ninguno» o «Lo suyo».
+static func empty_name(slot: int) -> String:
+	return "Ninguno" if OPTIONAL.has(slot) else "Lo suyo"
 
 static func is_head(outfit_id: String) -> bool:
 	var o := find(outfit_id)
@@ -45,6 +69,13 @@ static func worn_for(character_id: String) -> Dictionary:
 	var saves := Auto.node("Saves")                 # autoload, buscado al usarlo (ver Auto)
 	var cur: Variant = saves.get("current") if saves else null
 	return cur.worn_by(character_id) if cur != null else {}
+
+## Postura de brazo de lo que lleva puesto ("" si nada la pide).
+static func hold_of(worn: Dictionary) -> String:
+	for k in worn:
+		var o := find(String(worn[k]))
+		if o != null and o.hold != "": return o.hold
+	return ""
 
 ## Viste un modelo de personaje con lo que lleva puesto ({"head": id, "body": id, "feet": id, "acc": id}).
 static func apply(root: Node3D, character_model: String, worn: Dictionary) -> void:

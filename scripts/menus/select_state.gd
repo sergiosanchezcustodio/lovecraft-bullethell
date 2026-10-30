@@ -82,7 +82,7 @@ class Seat:
 	var pet := 0                         ## índice en los compañeros de su perfil (0 = ninguno)
 	var stage := Stage.CHARACTER
 	var worn := {}                       ## vestuario elegido: "head"/"body"/"feet" -> id de prenda
-	var outfit_row := 0                  ## fila del vestuario con el cursor (0 cabeza, 1 cuerpo, 2 pies)
+	var outfit_row := 0                  ## fila del vestuario con el cursor (OutfitData.Slot)
 	var spin := 0                        ## giro del modelo con LB/RB: -1, 0 o 1 (se ve en todos los PC)
 
 var characters: Array[CharacterData] = []

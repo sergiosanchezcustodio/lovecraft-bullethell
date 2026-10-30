@@ -29,6 +29,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 11 | Calidad gráfica, animación y efectos | **Hecha** (28-10-2026) salvo tu revisión | Ninguna |
 | 12 | Detalles de personajes, enemigos, compañeros y escenarios | **Hecha** (29-10-2026) salvo tu revisión | Ninguna (D-41, resuelta) |
 | 13 | Calibración, modos de juego, narrativa, sonido, herramientas y distribución | **Hecha (30-10-2026)**, pendiente de tu revisión: los 17 hitos; la subida de la demo y el tráiler a itch.io, con tu cuenta | Las de cada hito (al final de la fase) |
+| 14 | Vestuario ampliado y tienda de ropa | **En curso** (30-10-2026): pedida por el autor («haz todas») | Ninguna |
 
 ---
 
@@ -384,3 +385,22 @@ Pedida por el autor el 29-10-2026 («me gustan todas, establece un plan para hac
 - 13.17: qué entra en la demo además de la parte 1 (personajes, tienda, cooperativo, online). Propongo los cuatro personajes de inicio, la tienda y el cooperativo local, sin online. **Resuelta (30-10-2026):** así, como se proponía.
 
 Orden propuesto: A (13.1 y 13.2) primero, porque te sirve ya para calibrar; luego B (13.3); C, de 13.4 a 13.9; D (13.10 y 13.11); E (13.12 y 13.13); F (13.14 y 13.15), y G al final (13.16 y 13.17), cuando todo lo demás esté hecho.
+
+---
+
+## Fase 14: Vestuario ampliado y tienda de ropa
+
+Pedida por el autor el 30-10-2026: las 55 prendas propuestas («haz todas») y una tienda que no se sobrecargue ni se ralentice con tantas, con la sección de ropa y complementos mejor organizada. Hoy hay 26 prendas (12 de cabeza, 7 de cuerpo, 4 de pies y 3 complementos) generadas para los 13 personajes (`tools/gen_vestuario.py`) y la tienda renderiza el modelo de cada una al abrir la pestaña.
+
+**Aceptación:** las 83 prendas (26 de antes y 57 nuevas) puestas en los 13 personajes sin atravesar el cuerpo ni dejar huecos al andar (hoja de revisión por tanda), la tienda abre la pestaña de vestuario sin tirón, con secciones por hueco, conjuntos y un probador, y la selección deja elegir los seis huecos.
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 14.1 | **Huecos nuevos:** Manos (guantes y lo que se lleva en la mano) y Espalda (mochila, tentáculo), con su fila en el vestuario de la selección; postura de sostener para el paraguas y la linterna | `OutfitData.Slot` con `HANDS` y `BACK` (claves `hands` y `back`), `OutfitData.hold` y la capa de brazos de `Player`; la selección, con seis filas |
+| 14.2 | **Tienda de ropa:** el vestuario con secciones por hueco (Cabeza, Cuerpo, Pies, Complementos, Manos, Espalda y Conjuntos), iconos dibujados de antemano (no se renderiza nada al abrir) y un probador a la izquierda con la prenda marcada puesta en el investigador que elijas, girando | `tools/iconos_vestuario.gd` escribe `resources/outfits/icons/<id>.png`; `ShopMenu` rellena solo la sección abierta; `OutfitFitting` (un `SubViewport` que reutiliza el modelo) |
+| 14.3 | **Cabeza (13):** gorra de marinero de Innsmouth, fez de la Orden, capucha de cultista, tiara de los Marsh, gorra de chófer, sombrero de hule, casco de aviador, birrete de la Miskatonic, pañuelo de gitana, corona de algas y conchas, fedora de gánster, gorro de dormir y casco de buzo | Funciones nuevas en `gen_vestuario.py` y sus `.tres`; hoja de revisión con los 13 personajes |
+| 14.4 | **Cuerpo (13):** gabardina, túnica de cultista, traje de buzo, uniforme de enfermera, mono de mecánico, esmoquin, vestido de charlestón, jersey de marinero, parka inuit, sotana de exorcista, capa de terciopelo, uniforme de la expedición Lake y harapos de superviviente | Igual |
+| 14.5 | **Pies (8):** botas de agua, zapatos bicolores, sandalias con calcetines, botas de montar, raquetas de nieve, zapatillas de casa, botas de buzo y pies descalzos de Innsmouth | Igual |
+| 14.6 | **Complementos (15):** monóculo, pipa (con humo de vez en cuando), collar del Signo Primigenio, bolsa de cartero, canana, antifaz, máscara de gas, máscara de médico de la peste, vendas y parche, clavel, pañuelo de vaquero, estetoscopio, cámara de fuelle, rosario y ojos de Innsmouth | Igual; el humo de la pipa, `OutfitData.fx` |
+| 14.7 | **Manos y espalda (8):** guantes de cuero, de boxeo y manoplas; bastón, paraguas abierto y linterna eléctrica en la mano; mochila de expedición y tentáculo a la espalda | Igual, con los huecos del 14.1 |
+| 14.8 | **Conjuntos:** grupos con nombre (Cultista, Expedición Lake, Buzo, Gánster, Innsmouth, Médico de la peste…) que, puestos enteros, dan un rótulo en la ficha y un logro; en la tienda, la sección Conjuntos compra lo que falta con descuento | `data/outfit_sets.json`, `OutfitSets`; logro «De punta en blanco» |

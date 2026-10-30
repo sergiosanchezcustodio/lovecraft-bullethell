@@ -4,6 +4,8 @@ extends Control
 ## mejoras) con lo que hay, su nivel, lo que cuesta el siguiente y lo que hace. A compra (con
 ## confirmación), LB/RB o Q/E cambian de pestaña y B / Esc cierra. Lo comprado se guarda al
 ## momento. Detrás, la tienda de antigüedades con el anciano (ShopBackdrop).
+## Vestuario (fase 14): una sección por hueco (izquierda/derecha), iconos dibujados de antemano
+## (tools/iconos_vestuario.gd) y, a la izquierda, el probador (OutfitFitting) con la prenda marcada.
 
 signal closed
 
@@ -15,6 +17,13 @@ var _money: Label
 var _note: Label
 var _first: Control
 var _focus_id := ""                          ## artículo a enfocar al redibujar (tras comprar)
+const OUTFIT_TAB := int(ShopItem.Section.OUTFIT)
+var _sub := 0                                ## sección del vestuario (OutfitData.Slot)
+var _subs: HBoxContainer
+var _sub_btns: Array[Button] = []
+var _fitting: OutfitFitting
+var _fitting_box: CenterContainer
+var _hint: Label
 
 func _ready() -> void:
 	if save == null: save = Saves.current
@@ -40,6 +49,23 @@ func _ready() -> void:
 		b.pressed.connect(_show_tab.bind(i))
 		tabs.add_child(b)
 		_tabs.append(b)
+	_subs = HBoxContainer.new()                               # secciones del vestuario
+	_subs.alignment = BoxContainer.ALIGNMENT_CENTER
+	_subs.add_theme_constant_override("separation", 6)
+	box.add_child(_subs)
+	for k in OutfitData.SECTION_NAMES.size():
+		var b := MenuKit.button("", UiKit.GOLD, 16)
+		b.custom_minimum_size = Vector2(128, 38)
+		b.focus_mode = Control.FOCUS_NONE
+		b.pressed.connect(func() -> void: _show_sub(k))
+		_subs.add_child(b)
+		_sub_btns.append(b)
+	_fitting_box = CenterContainer.new()                      # el probador, a la izquierda
+	_fitting_box.anchor_right = 0.45
+	_fitting_box.anchor_bottom = 1.0
+	add_child(_fitting_box)
+	_fitting = OutfitFitting.new()
+	_fitting_box.add_child(_fitting)
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(840, 520)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -56,8 +82,17 @@ func _ready() -> void:
 	_note = UiKit.label("", 18, UiKit.TEXT)
 	_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_note)
-	box.add_child(MenuKit.hint("Arriba/abajo: elegir  ·  A o Intro: comprar  ·  LB/RB o Q/E: pestaña  ·  B o Esc: volver"))
+	_hint = MenuKit.hint("")
+	box.add_child(_hint)
+	var la := LaunchArgs.from_cmdline()                        # capturas: shop_sub=3 shop_char=2
+	_sub = la.get_int("shop_sub", 0)
+	for n in la.get_int("shop_char", 0): _fitting.next_character()
 	_show_tab(0)
+
+func _show_sub(k: int) -> void:
+	_sub = k
+	_focus_id = ""
+	_show_tab(_tab)
 
 func _show_tab(i: int) -> void:
 	_tab = i
@@ -71,7 +106,26 @@ func _show_tab(i: int) -> void:
 	_first = null
 	var focus: Control = null
 	var rows: Array = []
-	for e in Shop.in_section(i):
+	var outfits := i == OUTFIT_TAB
+	_subs.visible = outfits
+	_fitting_box.visible = outfits
+	_hint.text = ("Arriba/abajo: elegir  ·  Izquierda/derecha: sección  ·  A o Intro: comprar  ·  X o R: investigador  ·  LB/RB: pestaña  ·  B: volver" if outfits
+		else "Arriba/abajo: elegir  ·  A o Intro: comprar  ·  LB/RB o Q/E: pestaña  ·  B o Esc: volver")
+	var entries := Shop.in_section(i)
+	if outfits:
+		var counts := {}
+		for e in entries: counts[int(e.outfit.slot)] = int(counts.get(int(e.outfit.slot), 0)) + 1
+		for k in _sub_btns.size():
+			var mine := 0
+			for e in entries:
+				if int(e.outfit.slot) == k and Shop.is_maxed(save, e): mine += 1
+			_sub_btns[k].text = "%s  %d/%d" % [OutfitData.SECTION_NAMES[k], mine, int(counts.get(k, 0))]
+			_sub_btns[k].visible = counts.has(k)
+			_sub_btns[k].add_theme_color_override("font_color", UiKit.GOLD if k == _sub else UiKit.TEXT_DIM)
+			_sub_btns[k].add_theme_stylebox_override("normal", MenuKit.box(Color(0.16, 0.1, 0.05, 0.9) if k == _sub else Color(0.04, 0.03, 0.025, 0.6),
+				Color(MenuKit.BRASS, 0.85 if k == _sub else 0.25), 1))
+		entries = entries.filter(func(e: Shop.Entry) -> bool: return int(e.outfit.slot) == _sub)
+	for e in entries:
 		var row := _row(e)
 		rows.append(row)
 		if _first == null: _first = row
@@ -102,7 +156,8 @@ func _row(e: Shop.Entry) -> Button:
 	var price := Shop.next_price(save, e)
 	var afford := Shop.can_buy(save, e)
 	var b := MenuKit.button("", UiKit.GOLD, 22)
-	b.custom_minimum_size = Vector2(810, 92)
+	var compact := e.outfit != null                           # vestuario: filas más bajas, hay muchas
+	b.custom_minimum_size = Vector2(810, 76 if compact else 92)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var h := HBoxContainer.new()
 	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -111,7 +166,7 @@ func _row(e: Shop.Entry) -> Button:
 	b.add_child(h)
 	var pic := TextureRect.new()                              # imagen del artículo
 	pic.texture = _icon(e)
-	pic.custom_minimum_size = Vector2(76, 76)
+	pic.custom_minimum_size = Vector2(60, 60) if compact else Vector2(76, 76)
 	pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -131,7 +186,10 @@ func _row(e: Shop.Entry) -> Button:
 	col.add_child(d)
 	# con tres líneas de descripción no cabe en 92 px: la fila crece con lo que lleva
 	d.resized.connect(func() -> void:
-		b.custom_minimum_size.y = maxf(92.0, col.get_combined_minimum_size().y + 28.0))
+		b.custom_minimum_size.y = maxf(76.0 if compact else 92.0, col.get_combined_minimum_size().y + 28.0))
+	if compact:
+		var slot_key: String = OutfitData.KEYS[int(e.outfit.slot)]
+		b.focus_entered.connect(func() -> void: _fitting.show_worn({slot_key: String(e.outfit.id)}))
 	var tag := ""
 	var color := UiKit.GOLD
 	if Demo.shop_locked(e):                                   # la demo (13.17)
@@ -187,6 +245,26 @@ func _say(text: String) -> void:
 	var tw := create_tween()
 	tw.tween_interval(2.0)
 	tw.tween_property(_note, "modulate:a", 0.0, 0.6)
+
+## En el vestuario, izquierda/derecha cambian de sección y X o R de investigador en el probador.
+## En _input: la lista se queda con izquierda/derecha antes de que lleguen a _unhandled_input.
+func _input(event: InputEvent) -> void:
+	if _tab != OUTFIT_TAB or not is_visible_in_tree(): return
+	if get_child_count() > 1 and get_child(get_child_count() - 1) is MenuKit.Confirm: return
+	var step := 0
+	if event.is_action_pressed("ui_left"): step = -1
+	elif event.is_action_pressed("ui_right"): step = 1
+	var visible_subs: Array[int] = []
+	for k in _sub_btns.size():
+		if _sub_btns[k].visible: visible_subs.append(k)
+	if step != 0 and not visible_subs.is_empty():
+		get_viewport().set_input_as_handled()
+		_show_sub(visible_subs[posmod(visible_subs.find(_sub) + step, visible_subs.size())])
+		return
+	var swap: bool = (event is InputEventJoypadButton and event.pressed and (event as InputEventJoypadButton).button_index == JOY_BUTTON_X) 		or (event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_R)
+	if swap:
+		get_viewport().set_input_as_handled()
+		_fitting.next_character()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if get_child_count() > 1 and get_child(get_child_count() - 1) is MenuKit.Confirm: return

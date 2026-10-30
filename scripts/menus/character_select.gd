@@ -629,22 +629,25 @@ class _Frame extends Control:
 		cols.add_child(_column(STAT_ROWS, _stat_vals, 132, 62))
 		# vestuario (D-34): tapa las características mientras se elige
 		_outfit = PanelContainer.new()
-		_outfit.position = Vector2(14, 418)
-		_outfit.custom_minimum_size = Vector2(FRAME.x - 28, FRAME.y - 430)
+		_outfit.position = Vector2(14, 392)                # seis huecos (fase 14): algo más alto
+		_outfit.custom_minimum_size = Vector2(FRAME.x - 28, FRAME.y - 404)
 		_outfit.size = _outfit.custom_minimum_size
 		_outfit.add_theme_stylebox_override("panel", _frame(Color(0.03, 0.022, 0.018, 0.97), Color(MenuKit.BRASS.lerp(color, 0.5), 0.75), 2))
 		add_child(_outfit)
 		var ob := VBoxContainer.new()
 		ob.alignment = BoxContainer.ALIGNMENT_CENTER
-		ob.add_theme_constant_override("separation", 2)
+		ob.add_theme_constant_override("separation", 1)
 		_outfit.add_child(ob)
-		ob.add_child(MenuKit.title("Vestuario", 24, UiKit.GOLD))
+		ob.add_child(MenuKit.title("Vestuario", 22, UiKit.GOLD))
 		for k in OutfitData.KEYS.size():
 			var row := VBoxContainer.new()
-			var tag := UiKit.label(OutfitData.SLOT_NAMES[k], 14, UiKit.TEXT_DIM)
+			row.add_theme_constant_override("separation", -3)
+			var tag := UiKit.label(OutfitData.SLOT_NAMES[k], 13, UiKit.TEXT_DIM)
 			tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			row.add_child(tag)
-			var val := MenuKit.title("", 20, UiKit.TEXT)
+			var val := MenuKit.title("", 18, UiKit.TEXT)
+			val.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			val.custom_minimum_size.x = FRAME.x - 60
 			row.add_child(val)
 			ob.add_child(row)
 			_outfit_rows.append(val)
@@ -901,7 +904,7 @@ class _Frame extends Control:
 			var o := OutfitData.find(id) if id != "" else null
 			var on := k == seat.outfit_row
 			var l: Label = _outfit_rows[k]
-			l.text = ("◀  %s  ▶" if on else "%s") % (o.display_name if o else ("Ninguno" if k == OutfitData.Slot.ACCESSORY else "Lo suyo"))
+			l.text = ("◀  %s  ▶" if on else "%s") % (o.display_name if o else OutfitData.empty_name(k))
 			l.add_theme_color_override("font_color", color if on else UiKit.TEXT_DIM)
 
 	func _process(delta: float) -> void:

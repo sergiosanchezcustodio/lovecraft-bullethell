@@ -56,10 +56,11 @@ static func catalog() -> Array[Entry]:
 	for o in OutfitData.all():                       # vestuario (D-34): para todos los personajes
 		var e := Entry.new()
 		e.id = String(o.id); e.name = o.display_name; e.section = ShopItem.Section.OUTFIT
-		e.description = "%s · %s." % [OutfitData.SLOT_NAMES[o.slot], o.description.trim_suffix(".")]
+		e.description = o.description                 # el hueco ya lo dice la sección (fase 14)
 		e.prices = [o.price] as Array[int]
 		e.outfit = o
-		e.icon_model = "vest_%s_dyer" % o.id
+		e.icon = o.icon()                            # dibujado de antemano (fase 14); si no, se renderiza
+		e.icon_model = o.icon_model()
 		out.append(e)
 	return out
 
