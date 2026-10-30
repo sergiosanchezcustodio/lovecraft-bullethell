@@ -196,3 +196,7 @@ Sacadas de `CLAUDE.md` el 17-10-2026. Léelas antes de tocar generadores de mode
 ## Partículas colgadas del modelo del jugador (30-10-2026)
 
 Un `GPUParticles3D` con `local_coords = false` colgado de una parte del modelo del jugador (que está dentro del `Visual` con `top_level` y sin interpolación) solo enseñaba la partícula más nueva: el humo de la pipa se veía en el visor y no en la partida. Con `local_coords = true` salen todas, y siguen a la cabeza. Tampoco hay que asignar `emitting = true` en cada fotograma: con el emisor ya encendido, la emisión vuelve a empezar y apenas sale nada. Asígnalo solo cuando cambie.
+
+## Recetas con el mismo nombre en un `match` (30-10-2026)
+
+En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra con ese nombre más abajo. GDScript no avisa: el `match` coge la primera y la otra deja de usarse sin error. Antes de añadir un caso a un `match` largo, busca el nombre en el fichero.

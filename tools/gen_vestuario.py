@@ -767,14 +767,14 @@ def casco_buzo(M, bd):
                     x, y = cx + a, cy + b
                     z = _front_at(M, x, y)
                     if z is None: continue
-                    if q <= r: M.put(x, y, z, H, GLINT if (a, b) in ((-3, 2), (-2, 3), (-3, 3)) else GLASS)
+                    if q <= r: M.put(x, y, z, 'glass', GLINT if (a, b) in ((-3, 2), (-2, 3), (-3, 3)) else GLASS)
                     else: M.put(x, y, z + 1, H, BRASS)
                 else:
                     y, z = cy + a, b
                     xs = [vx for (vx, vy, vz), v in M.V.items() if vy == y and vz == z and v[0] == H]
                     if not xs: continue
                     x = max(xs) if axis > 0 else min(xs)
-                    if q <= r: M.put(x, y, z, H, GLASS)
+                    if q <= r: M.put(x, y, z, 'glass', GLASS)
                     else: M.put(x + (1 if axis > 0 else -1), y, z, H, BRASS)
     window(-1, 75, 5.2, 'z')
     window(None, 75, 2.6, 1)
@@ -786,6 +786,7 @@ def casco_buzo(M, bd):
         if v[0] == T and v[1] == BRASS and y == 55 and x % 4 == 0: v[1] = BOLT
         if v[0] == H and v[1] == COPPER and (y + x) % 9 == 0: v[1] = COPPER_SH
     M.marks = {'bubbles': [0, 95, -1]}                                  # de la válvula salen burbujas al vadear
+    M.extra_parents = {'glass': 'head'}                                 # el cristal, aparte: se empaña (Player)
     return {}
 
 
@@ -1858,6 +1859,8 @@ def build(name, c):
     piv, parents = cu.pivots(bd['finish_b'], bd['finish_ax'])
     piv.update(getattr(M, 'marks', {}))      # puntos sin voxels: de dónde sale el humo de la pipa
     parents.update(getattr(M, 'extra_parents', {}))   # piezas propias de la prenda (el tentáculo)
+    for part, par in getattr(M, 'extra_parents', {}).items():
+        if part not in piv: piv[part] = piv[par]      # sin pivote propio: el de la parte de la que cuelga
     out = 'models/vest_%s_%s.json' % (name, c)
     return M.export(out, piv, jitter=0.0, pivots_in_voxels=True, roughness=0.9, specular=0.25, parents=parents,
                     extra=under.V)

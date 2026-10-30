@@ -120,9 +120,9 @@ static func load_model(path: String) -> Node3D:
 ## Viste un modelo con una prenda del vestuario (models/vest_*.json, con los mismos pivotes):
 ## las mallas de cada parte de la prenda pasan a la parte igual del modelo, así que se animan
 ## con ella. Una prenda de cabeza oculta el sombrero del personaje (parte "hat"). Las piezas que
-## el personaje no tiene (GRAFT: el tentáculo) se le añaden colgando de la misma parte que en la
+## el personaje no tiene (GRAFT: el tentáculo, el cristal del casco de buzo) se le añaden colgando de la misma parte que en la
 ## prenda, y entran en las listas de Anims.reset.
-const GRAFT := ["tail"]
+const GRAFT := ["tail", "glass"]
 
 static func dress(root: Node3D, garment_path: String, hides_hat := false) -> bool:
 	if not model_exists(garment_path): return false
@@ -164,7 +164,7 @@ static func _graft(root: Node3D, src: Node3D) -> Node3D:
 ## Puntos sin voxels de una prenda (fase 14): "smoke_*" echa humo de pipa desde la cabeza;
 ## "bubbles", burbujas del casco de buzo (apagadas: las enciende Player al vadear);
 ## "beam" y "beam_to", la luz de la linterna desde el antebrazo derecho, en esa dirección (no en
-## la calidad Baja: `torch_light` en data/quality.json).
+## la calidad Baja: `torch_light` en data/quality.json), y sus chispas al fallar ("torch_sparks").
 static func _marks(g: Node3D, nodes: Dictionary) -> void:
 	var piv: Dictionary = g.get_meta("pivots")
 	var vs := float(g.get_meta("voxel_size"))
@@ -187,13 +187,21 @@ static func _marks(g: Node3D, nodes: Dictionary) -> void:
 		spot.position = from
 		spot.basis = Basis.looking_at(dir, Vector3.UP if absf(dir.y) < 0.95 else Vector3.BACK)
 		(nodes["fore_r"] as Node3D).add_child(spot)
+	if piv.has("beam") and nodes.has("fore_r") and not (nodes["fore_r"] as Node3D).has_node("torch_sparks"):
+		var fp: Array = piv["fore_r"]                   # chispas de la linterna al fallar (todas las calidades)
+		var a: Array = piv["beam"]
+		var sp := VoxelFx.emitter("torch_sparks", 0.05, true)
+		sp.name = "torch_sparks"
+		sp.emitting = false
+		sp.position = (Vector3(a[0], a[1], a[2]) - Vector3(fp[0], fp[1], fp[2])) * vs
+		(nodes["fore_r"] as Node3D).add_child(sp)
 	for k: String in piv:
 		if not (k.begins_with("smoke") or k == "bubbles") or not nodes.has("head") or not piv.has("head"): continue
 		var head: Node3D = nodes["head"]
 		if head.has_node(k): continue
 		var pv: Array = piv[k]
 		var hp: Array = piv["head"]
-		var e := VoxelFx.emitter("pipe" if k != "bubbles" else "bubbles", 0.05)
+		var e := VoxelFx.emitter("pipe" if k != "bubbles" else "diver_bubbles", 0.05)
 		e.name = k
 		# en el mundo (local_coords false, lo de VoxelFx) solo se veía la última partícula colgando
 		# del Visual del jugador; en coordenadas de la cabeza salen todas (y la siguen al andar)

@@ -1244,7 +1244,9 @@ func _on_level_completed() -> void:
 		if not q.remote and not (q.input is BotInput) and q.outfit_set != "":
 			sets_won[OutfitSets.stat_key(q.outfit_worn)] = true
 	if not sets_won.is_empty(): Achievements.add(Saves.current, "set_levels")
-	for k: String in sets_won: Achievements.add(Saves.current, k)
+	for k: String in sets_won:
+		Achievements.add(Saves.current, k)
+		if Saves.current != null: Achievements.record(Saves.current, "set_best", int(Saves.current.stats[k]))   # «Fiel al conjunto»
 	_check_achievements.call_deferred()              # después de contar la baja del enemigo final (élite)
 	Saves.save()
 	announce("Nivel superado", 2.0)

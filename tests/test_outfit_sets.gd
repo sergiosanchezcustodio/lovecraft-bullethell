@@ -68,3 +68,12 @@ func test_niveles_superados_con_el_conjunto() -> void:
 	assert_eq(OutfitSets.levels_with(null, buzo), 0)
 	var back := SaveData.from_dict(sv.to_dict())
 	assert_eq(OutfitSets.levels_with(back, buzo), 2, "se guarda con la partida")
+
+func test_logro_fiel_al_conjunto() -> void:
+	var sv := _save(0)
+	sv.stats["set_best"] = 4
+	var ids := Achievements.check(sv).map(func(a: AchievementData) -> String: return String(a.id))
+	assert_does_not_have(ids, "fiel_al_conjunto")
+	Achievements.record(sv, "set_best", 5)
+	ids = Achievements.check(sv).map(func(a: AchievementData) -> String: return String(a.id))
+	assert_has(ids, "fiel_al_conjunto")

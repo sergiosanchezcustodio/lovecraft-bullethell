@@ -211,6 +211,7 @@ func _ready() -> void:
 		for c in (pn["head"] as Node3D).get_children():
 			if c is GPUParticles3D and String(c.name).begins_with("smoke"): _smokes.append(c)
 	if String(worn.get("head", "")) == "casco_buzo": _breath_in = randf_range(2.0, BREATH_EVERY.y)
+	if pn.has("fore_r"): _sparks = (pn["fore_r"] as Node3D).get_node_or_null("torch_sparks") as GPUParticles3D
 	_face = FaceLook.new().setup(model, VoxelBuilder.variant_path("res://models/%s.json" % data.model))
 	add_child(_face)
 	_set_vis_layer(model)
@@ -221,6 +222,16 @@ func _ready() -> void:
 	_xray.set_shader_parameter("color", Color(color, 0.6))
 	for mi: MeshInstance3D in model.get_meta("meshes"):
 		mi.material_overlay = _xray
+	if pn.has("glass"):                             # vaho del casco de buzo, con la silueta detrás
+		_fog = StandardMaterial3D.new()
+		_fog.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_fog.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		_fog.albedo_color = Color(0.62, 0.7, 0.72, 0.0)
+		_fog.next_pass = _xray
+		for c in (pn["glass"] as Node3D).get_children():
+			if c is MeshInstance3D:
+				_glass_meshes.append(c)
+				(c as MeshInstance3D).material_overlay = _fog
 	_dirt_dress()
 	_ring = _make_ring()
 	add_child(_ring)
@@ -586,7 +597,7 @@ func _process_step(delta: float) -> void:
 	if frozen != _frozen_on:
 		_frozen_on = frozen
 		for mi: MeshInstance3D in model.get_meta("meshes"):
-			mi.material_overlay = _frozen_mat if frozen else _xray
+			mi.material_overlay = _frozen_mat if frozen else (_fog if mi in _glass_meshes else _xray)
 	# Temblor de aviso antes de cada congelación de la parálisis
 	var shake := Vector3(randf_range(-0.04, 0.04), 0, randf_range(-0.04, 0.04)) if trembling else Vector3.ZERO
 	visual.global_position = here + shake
@@ -711,6 +722,12 @@ var _beam: SpotLight3D                         ## luz de la linterna (Media y m�
 var _bubbles: GPUParticles3D                   ## burbujas del casco de buzo
 var _smokes: Array[GPUParticles3D] = []        ## humo de la pipa (se queda atrás al andar)
 var _breath_in := -1.0                         ## s hasta la próxima respiración del casco de buzo (-1: sin casco)
+var _fog: StandardMaterial3D                   ## vaho en el cristal del casco de buzo (con la silueta de next_pass)
+var _glass_meshes: Array[MeshInstance3D] = []
+var _fog_puff := 0.0                           ## el de cada respiración, que se va
+var _fog_a := -1.0
+var _sparks: GPUParticles3D                    ## chispas de la linterna al fallar
+var _dropped := false
 const SMOKE_DRAG := 0.09                       ## cuánto se inclina el humo hacia atrás por m/s
 const BREATH_EVERY := Vector2(7.0, 12.0)       ## cada cuánto respira el casco (s, al azar)
 const BREATH_BOSS_NEAR := 12.0                 ## con un jefe a menos de esto (m), respira más deprisa
@@ -743,7 +760,15 @@ func _hold_step(delta: float) -> void:
 		_breath_in -= delta
 		if _breath_in < 0.0:
 			Auto.sfx_at("diver_breath", global_position)
+			_fog_puff = 1.0
 			_breath_in = randf_range(BREATH_EVERY.x, BREATH_EVERY.y) * _breath_pace()
+	if _fog != null:                             # vaho: cada respiración empaña un poco el cristal, y
+		_fog_puff = maxf(_fog_puff - delta * 0.6, 0.0)   # con poca cordura se queda empañado
+		var fog := clampf((0.4 - sanity / maxf(data.max_sanity, 1.0)) / 0.4, 0.0, 1.0) * 0.38
+		var a := clampf(fog + _fog_puff * (0.14 + fog * 0.3), 0.0, 0.55)
+		if absf(a - _fog_a) > 0.01:
+			_fog_a = a
+			_fog.albedo_color.a = a
 	if _bubbles != null:                         # el casco, al vadear (solo al cambiar: asignarlo en
 		var want := _wade > 0.5 and visual.visible   # cada fotograma volvía a empezar la emisión)
 		if _bubbles.emitting != want: _bubbles.emitting = want
@@ -762,6 +787,9 @@ func _hold_step(delta: float) -> void:
 		var dip := pow(absf(sin(_flicker_t * 9.1) * sin(_flicker_t * 3.7 + 2.0)), 3.0)
 		var drop := 0.85 if fposmod(_flicker_t * 0.9 + sin(_flicker_t * 0.31) * 2.0, 3.0) < 0.12 * low * 3.0 else 0.0
 		f = clampf(1.0 - low * (0.5 * dip + 0.08 * sin(_flicker_t * 31.0)) - drop, 0.05, 1.0)
+		if (drop > 0.0) != _dropped:                 # al caer y al volver, chisporrotea
+			_dropped = drop > 0.0
+			if _sparks != null and _hold_w > 0.6 and visual.visible: _sparks.restart()
 	if _beam != null: _beam.light_energy = 2.2 * f
 	if _torch_glow != null: (_torch_glow.material_override as ShaderMaterial).set_shader_parameter("strength", TorchGlow.STRENGTH * f)
 
