@@ -1494,6 +1494,11 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **Logro «Fiel al conjunto»** (`data/achievements/24_fiel_al_conjunto.tres`, 2.500 $): cinco niveles con el mismo conjunto. La estadística `set_best` es el récord de los `set_<id>` (`Achievements.record`, con test).
   - **Corregido:** la receta de las burbujas del casco se llamaba `bubbles`, igual que las burbujas de ácido de las zonas (`DamageZone`). El `match` cogía la primera, así que desde `e4fc797` el ácido echaba burbujas de buzo. Ahora se llama `diver_bubbles`.
   - Hoja: `shots/revision_vaho_chispas.jpg`.
+- **Chasquido, fogonazo y conjuntos en la Biblioteca (30-10-2026), pendientes de revisión:**
+  - **La linterna chasquea** al chisporrotear: `torch_crackle`, crujidos secos y un zumbido de 50 Hz que se corta (`python tools/gen_sfx.py --buzo`, que hace también la respiración; −22 dB). Sintetizado y provisional; no lo he escuchado.
+  - **El cristal del casco refleja el fogonazo** de una explosión a menos de tres radios: un destello anaranjado de 0,4 s sobre el vaho (`Explosion.recent`, `Player._blast_flash`). Probar con `outfit=casco_buzo pos=0,0 blast=1.5,1.5,3`.
+  - **Biblioteca, tomo IX:** cada conjunto dice cuántos niveles llevas superados con él.
+  - Hoja: `shots/revision_fogonazo_biblioteca.jpg`.
 - **Elwood con bigote de morsa (30-10-2026, petición 104 de la revisión de arte):** elegido por el autor («me gusta la propuesta, hazla»). Es ya el de `tools/gen_elwood.py` (el de cepillo de antes sale con `--cepillo`, en `models/elwood_cepillo.json`, que no se guarda); rehechos su vestuario (`gen_vestuario.py`: solo cambia la cinta del pelo) y las caras de la partida (`gen_caras_juego.py`). Quitado `models/elwood_morsa.json` y vaciado `review/propuestas.json`, así que la pestaña Propuestas no sale.
 - **Fase 13, hito 13.17: demo de la parte 1 (30-10-2026), pendiente de tu revisión.** Decidido por el autor: los cuatro personajes de inicio, la tienda y el cooperativo local, sin online.
   - **`Demo`** (`scripts/core/demo.gd`): se enciende con la etiqueta de exportación `demo` (perfiles nuevos «Windows Demo» y «macOS Demo» en `export_presets.cfg`, a `builds/demo/`; el `.exe` se llama `LovecraftLibraryDemo.exe` y la app de macOS lleva otro identificador) o, sin exportar, con `demo_build=true`.

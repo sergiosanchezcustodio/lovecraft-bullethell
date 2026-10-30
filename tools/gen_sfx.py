@@ -10,7 +10,7 @@ Escribe resources/sfx/<nombre>.wav (sintetizados) y resources/sfx/<nombre>_N.ogg
 La tabla de qué suena en cada evento está en data/sfx.json.
 Uso: python tools/gen_sfx.py <carpeta con los packs de Kenney descomprimidos>
      python tools/gen_sfx.py --ambiente   (solo los del ambiente de los escenarios)
-     python tools/gen_sfx.py --buzo       (solo la respiración del casco de buzo)
+     python tools/gen_sfx.py --buzo       (solo la respiración del casco de buzo y la linterna que falla)
 """
 import os, sys, shutil, wave, glob
 import numpy as np
@@ -781,6 +781,23 @@ def respiracion_buzo():
     save('diver_breath', x + wet * np.std(x) / (np.std(wet) + 1e-9) * 0.4)
 
 
+def chispas_linterna():
+    """La linterna que falla (vestuario, fase 14): un chasquido eléctrico corto, unos crujidos
+    secos de contacto flojo y un zumbido de 50 Hz que se corta."""
+    r = np.random.default_rng(1415)
+    d = 0.42
+    tt = t(d)
+    x = np.zeros(len(tt))
+    for s in np.sort(r.uniform(0.0, 0.3, 7)):                       # crujidos: chasquidos muy cortos
+        i = int(s * SR); m = int(r.uniform(0.004, 0.012) * SR)
+        x[i:i + m] += hp(r.standard_normal(m), 2500) * np.exp(-np.arange(m) / (0.002 * SR)) * r.uniform(0.5, 1.0)
+    hum = np.sign(np.sin(2 * np.pi * 50 * tt)) * 0.5 + np.sin(2 * np.pi * 150 * tt) * 0.3
+    gate = (r.uniform(0, 1, len(tt) // 441 + 1) > 0.45).repeat(441)[:len(tt)]
+    x += bp(hum, 80, 1200) * gate * np.clip((0.32 - tt) / 0.05, 0, 1) * 0.25
+    x[:int(0.006 * SR)] += hp(r.standard_normal(int(0.006 * SR)), 1500) * 1.4    # el chasquido del principio
+    save('torch_crackle', x)
+
+
 def copy_kenney(src):
     files = {os.path.splitext(os.path.basename(p))[0]: p for p in glob.glob(os.path.join(src, '**', '*.ogg'), recursive=True)}
     for ev, names in KENNEY.items():
@@ -794,8 +811,9 @@ if __name__ == '__main__':
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
         latido()
         sirena()
-    elif '--buzo' in sys.argv:                                 # solo la respiración del casco de buzo (fase 14)
-        respiracion_buzo()
+    elif '--buzo' in sys.argv:                                 # vestuario (fase 14): la respiración del casco de
+        respiracion_buzo()                                     # buzo y el chisporroteo de la linterna
+        chispas_linterna()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)

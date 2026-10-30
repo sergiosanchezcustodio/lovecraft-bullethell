@@ -48,6 +48,8 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 					if not done and miss.has(String(o.id)): lack.append(o.display_name)
 				var facts := [", ".join(names)]
 				if done: facts.append("Completo")
+				var won := OutfitSets.levels_with(save, OutfitSets.as_worn(s))
+				if won > 0: facts.append("%d %s con él" % [won, "nivel superado" if won == 1 else "niveles superados"])
 				elif lack.size() == names.size(): facts.append("Aún no tienes ninguna de sus prendas: están en la tienda.")
 				else: facts.append("Te falta: " + ", ".join(lack))
 				var e := _e(String(s.id), String(s.name), true, String(s.description), String(s.get("shown", "dyer")), "full",

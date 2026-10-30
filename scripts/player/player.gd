@@ -226,7 +226,7 @@ func _ready() -> void:
 		_fog = StandardMaterial3D.new()
 		_fog.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		_fog.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		_fog.albedo_color = Color(0.62, 0.7, 0.72, 0.0)
+		_fog.albedo_color = Color(FOG_TINT, 0.0)
 		_fog.next_pass = _xray
 		for c in (pn["glass"] as Node3D).get_children():
 			if c is MeshInstance3D:
@@ -724,6 +724,8 @@ var _smokes: Array[GPUParticles3D] = []        ## humo de la pipa (se queda atr�
 var _breath_in := -1.0                         ## s hasta la próxima respiración del casco de buzo (-1: sin casco)
 var _fog: StandardMaterial3D                   ## vaho en el cristal del casco de buzo (con la silueta de next_pass)
 var _glass_meshes: Array[MeshInstance3D] = []
+const FOG_TINT := Color(0.62, 0.7, 0.72)
+const FLASH_TINT := Color(1.0, 0.72, 0.38)
 var _fog_puff := 0.0                           ## el de cada respiración, que se va
 var _fog_a := -1.0
 var _sparks: GPUParticles3D                    ## chispas de la linterna al fallar
@@ -734,6 +736,19 @@ const BREATH_BOSS_NEAR := 12.0                 ## con un jefe a menos de esto (m
 const SMOKE_GREEN_AT := 0.3                    ## por debajo de esta cordura (fracción), el humo verdea
 var _flicker_t := 0.0
 const TORCH_FLICKER_AT := 0.35                 ## por debajo de esta cordura (fracción), la linterna falla
+## Fogonazo de la explosión más cercana de las últimas (Explosion.recent), de 0 a 1: dura 0,4 s y
+## llega hasta tres radios.
+func _blast_flash() -> float:
+	var now := Time.get_ticks_msec()
+	var best := 0.0
+	for b: Dictionary in Explosion.recent:
+		var age := float(now - int(b.t)) / 400.0
+		if age >= 1.0: continue
+		var reach := float(b.r) * 3.0
+		var d := (b.pos as Vector3).distance_to(global_position)
+		if d < reach: best = maxf(best, (1.0 - age) * (1.0 - d / reach))
+	return clampf(best * 1.6, 0.0, 1.0)
+
 ## Ritmo de la respiración del casco: más deprisa con poca cordura (hasta 0,45) y con un jefe
 ## cerca (×0,6). Multiplica el intervalo.
 func _breath_pace() -> float:
@@ -766,9 +781,11 @@ func _hold_step(delta: float) -> void:
 		_fog_puff = maxf(_fog_puff - delta * 0.6, 0.0)   # con poca cordura se queda empañado
 		var fog := clampf((0.4 - sanity / maxf(data.max_sanity, 1.0)) / 0.4, 0.0, 1.0) * 0.38
 		var a := clampf(fog + _fog_puff * (0.14 + fog * 0.3), 0.0, 0.55)
-		if absf(a - _fog_a) > 0.01:
-			_fog_a = a
-			_fog.albedo_color.a = a
+		var flash := _blast_flash()                  # el fogonazo de una explosión cercana, en el cristal
+		if flash > 0.0 or absf(a - _fog_a) > 0.01:
+			_fog_a = a if flash <= 0.0 else -1.0
+			_fog.albedo_color = FOG_TINT.lerp(FLASH_TINT, flash)
+			_fog.albedo_color.a = maxf(a, flash * 0.75)
 	if _bubbles != null:                         # el casco, al vadear (solo al cambiar: asignarlo en
 		var want := _wade > 0.5 and visual.visible   # cada fotograma volvía a empezar la emisión)
 		if _bubbles.emitting != want: _bubbles.emitting = want
@@ -789,7 +806,9 @@ func _hold_step(delta: float) -> void:
 		f = clampf(1.0 - low * (0.5 * dip + 0.08 * sin(_flicker_t * 31.0)) - drop, 0.05, 1.0)
 		if (drop > 0.0) != _dropped:                 # al caer y al volver, chisporrotea
 			_dropped = drop > 0.0
-			if _sparks != null and _hold_w > 0.6 and visual.visible: _sparks.restart()
+			if _sparks != null and _hold_w > 0.6 and visual.visible:
+				_sparks.restart()
+				Auto.sfx_at("torch_crackle", global_position)
 	if _beam != null: _beam.light_energy = 2.2 * f
 	if _torch_glow != null: (_torch_glow.material_override as ShaderMaterial).set_shader_parameter("strength", TorchGlow.STRENGTH * f)
 

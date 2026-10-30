@@ -20,10 +20,16 @@ const LIFE := 4.0
 const MAX_LIT := 8                         ## explosiones con luz a la vez (hito 11.3): las demás, sin ella
 static var max_lit := MAX_LIT              ## el de la calidad gráfica (Quality, hito 11.5)
 static var lit := 0
+## Las de los últimos instantes (posición, radio y hora en ms): el cristal del casco de buzo refleja
+## su fogonazo (Player).
+static var recent: Array[Dictionary] = []
 
 func _ready() -> void:
 	Auto.sfx_at("explosion", global_position)
 	Gusts.push(get_parent(), global_position, 0.1 + radius * 0.05, radius * 3.0)   # mueve telas y plantas (hito 11.4)
+	var now := Time.get_ticks_msec()
+	recent = recent.filter(func(b: Dictionary) -> bool: return now - int(b.t) < 1000)
+	recent.append({"pos": global_position, "r": radius, "t": now})
 	Damage.ctx = _wtag
 	if lit < max_lit:
 		lit += 1
