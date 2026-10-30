@@ -16,6 +16,7 @@ var _chars: Array[CharacterData] = []
 var _ci := 0
 var _worn := {}
 var _pending := -1.0
+var _hold := ""
 
 func _ready() -> void:
 	var box := VBoxContainer.new()
@@ -82,6 +83,7 @@ func character() -> CharacterData:
 
 func _process(delta: float) -> void:
 	_holder.rotation.y += SPIN * delta
+	if _model != null: OutfitData.pose_hold(_model, _hold, 1.0)
 	if _pending < 0.0: return
 	_pending -= delta
 	if _pending <= 0.0:
@@ -94,5 +96,6 @@ func _build() -> void:
 	if _model != null: _model.queue_free()
 	_model = VoxelBuilder.load_model("res://models/%s.json" % c.model)
 	OutfitData.apply(_model, c.model, _worn)
+	_hold = OutfitData.hold_of(_worn)
 	_holder.add_child(_model)
 	_name.text = c.display_name

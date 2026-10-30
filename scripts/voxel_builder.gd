@@ -140,10 +140,29 @@ static func dress(root: Node3D, garment_path: String, hides_hat := false) -> boo
 	if hides_hat and nodes.has("hat"): (nodes["hat"] as Node3D).visible = false
 	return true
 
-## Puntos sin voxels de una prenda (fase 14): "smoke_*" echa humo de pipa desde la cabeza.
+## Puntos sin voxels de una prenda (fase 14): "smoke_*" echa humo de pipa desde la cabeza;
+## "beam" y "beam_to", la luz de la linterna desde el antebrazo derecho, en esa dirección.
 static func _marks(g: Node3D, nodes: Dictionary) -> void:
 	var piv: Dictionary = g.get_meta("pivots")
 	var vs := float(g.get_meta("voxel_size"))
+	if piv.has("beam") and piv.has("beam_to") and nodes.has("fore_r") and not (nodes["fore_r"] as Node3D).has_node("Beam"):
+		var fp: Array = piv["fore_r"]
+		var a: Array = piv["beam"]
+		var b: Array = piv["beam_to"]
+		var from := (Vector3(a[0], a[1], a[2]) - Vector3(fp[0], fp[1], fp[2])) * vs
+		var dir := (Vector3(b[0], b[1], b[2]) - Vector3(a[0], a[1], a[2])).normalized()
+		var spot := SpotLight3D.new()
+		spot.name = "Beam"
+		spot.light_color = Color(1.0, 0.93, 0.74)
+		spot.light_energy = 2.2
+		spot.spot_range = 7.0
+		spot.spot_angle = 22.0
+		spot.spot_attenuation = 0.8
+		spot.shadow_enabled = false
+		spot.light_volumetric_fog_energy = 1.5
+		spot.position = from
+		spot.basis = Basis.looking_at(dir, Vector3.UP if absf(dir.y) < 0.95 else Vector3.BACK)
+		(nodes["fore_r"] as Node3D).add_child(spot)
 	for k: String in piv:
 		if not k.begins_with("smoke") or not nodes.has("head") or not piv.has("head"): continue
 		var head: Node3D = nodes["head"]

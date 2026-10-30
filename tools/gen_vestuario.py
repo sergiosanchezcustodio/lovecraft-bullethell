@@ -1564,6 +1564,230 @@ def ojos_innsmouth(M, bd, face):
     return {}
 
 
+# ------------------------------------------------------------------ fase 14: manos y espalda (30-10-2026)
+
+HAND_TOP = 33                            # por debajo, la mano (y el puño de la manga)
+# giro total del antebrazo (brazo + antebrazo) en cada postura de OutfitData.HOLDS: el objeto se
+# construye ya girado para que, con el brazo en esa postura, quede como debe (derecho, delante)
+HOLD_ANGLES = {'umbrella': -0.35 - 1.45, 'lantern': -0.35 - 0.85, 'cane': -0.1 - 0.45}
+
+
+def hands_of(c):
+    """Voxels de las manos del personaje (antebrazos por debajo de HAND_TOP), por parte."""
+    with open('models/%s.json' % c) as f:
+        vox = json.load(f)['voxels']
+    out = {'fore_l': set(), 'fore_r': set()}
+    for v in vox:
+        if v[3] in out and v[1] <= HAND_TOP and not (len(v) > 8 and v[8] & 64): out[v[3]].add((v[0], v[1], v[2]))
+    return out
+
+
+def _grip(hands):
+    """Dónde agarra la mano derecha: centro de la mano, algo por debajo de la muñeca."""
+    vs = hands['fore_r']
+    xs = [x for x, y, z in vs]; zs = [z for x, y, z in vs]
+    return (round(sum(xs) / len(xs)), 27, round(sum(zs) / len(zs)) + 1)
+
+
+def _glove(M, hands, col, cuff=None, grow=1):
+    """Guante: la mano engordada `grow` voxels; con `cuff`, vuelta encima de la muñeca."""
+    for part, vs in hands.items():
+        r = range(-grow, grow + 1)
+        for (x, y, z) in vs:
+            for dx in r:
+                for dy in r:
+                    for dz in r:
+                        k = (x + dx, y + dy, z + dz)
+                        if k not in vs and k[1] <= HAND_TOP + 1: M.put(k[0], k[1], k[2], part, col)
+        if cuff is not None:
+            ys = {}
+            for (x, y, z) in vs:
+                if y >= HAND_TOP - 2: ys.setdefault(y, []).append((x, z))
+            pts = [p for y in ys for p in ys[y]]
+            if not pts: continue
+            x0 = min(p[0] for p in pts) - grow - 1; x1 = max(p[0] for p in pts) + grow + 1
+            z0 = min(p[1] for p in pts) - grow - 1; z1 = max(p[1] for p in pts) + grow + 1
+            for y in range(HAND_TOP - 1, HAND_TOP + 3):
+                for x in range(x0, x1 + 1):
+                    for z in range(z0, z1 + 1):
+                        if x in (x0, x1) or z in (z0, z1): M.put(x, y, z, part, cuff)
+
+
+def _held(M, hands, hold, shape, reach=60):
+    """Objeto en la mano derecha. shape(px, py, pz) -> color (o (color, glow)) o None, en
+    coordenadas de mundo con el brazo en la postura `hold` y el origen en el agarre. Se recorre
+    la rejilla del modelo en reposo y se gira cada punto a la postura, así no quedan huecos."""
+    gx, gy, gz = _grip(hands)
+    t = HOLD_ANGLES[hold]
+    c, s = math.cos(t), math.sin(t)
+    for qx in range(-reach, reach + 1):
+        for qy in range(-reach, reach + 1):
+            for qz in range(-reach, reach + 1):
+                py = qy * c - qz * s
+                pz = qy * s + qz * c
+                r = shape(qx, py, pz)
+                if r is None: continue
+                col, glow = r if isinstance(r[0], tuple) else (r, 0)
+                M.put(gx + qx, gy + qy, gz + qz, 'fore_r', col, glow)
+    return (gx, gy, gz), t
+
+
+def _to_rest(grip, t, p):
+    """Punto de mundo (relativo al agarre, con la postura) a coordenadas del modelo en reposo."""
+    gx, gy, gz = grip
+    c, s = math.cos(-t), math.sin(-t)
+    x, y, z = p
+    return [gx + x, gy + (y * c - z * s), gz + (y * s + z * c)]
+
+
+def guantes_cuero(M, bd, hands):
+    """Guantes de conducir de cuero marrón, con una vuelta a la muñeca."""
+    LEATHER = (0.34, 0.20, 0.10); CUFF = (0.24, 0.14, 0.07)
+    _glove(M, hands, LEATHER, CUFF)
+    return {LEATHER: 'cuero', CUFF: 'cuero'}
+
+
+def guantes_boxeo(M, bd, hands):
+    """Guantes de boxeo rojos, grandes y redondos, con el puño blanco."""
+    RED = (0.70, 0.10, 0.10); RED_SH = (0.54, 0.07, 0.07); WHITE = (0.92, 0.90, 0.86)
+    for part, vs in hands.items():
+        if not vs: continue
+        cx = sum(x for x, y, z in vs) / len(vs); cz = sum(z for x, y, z in vs) / len(vs) + 1
+        for x in range(int(cx) - 8, int(cx) + 9):
+            for y in range(19, 36):
+                for z in range(int(cz) - 9, int(cz) + 10):
+                    q = ((x + 0.5 - cx) / 6.0) ** 2 + ((y + 0.5 - 27.0) / 6.5) ** 2 + ((z + 0.5 - cz) / 7.0) ** 2
+                    if q <= 1.0: M.put(x, y, z, part, RED if y < 30 or (x + y) % 6 else RED_SH)
+                    elif y >= 31 and q <= 1.25: M.put(x, y, z, part, WHITE)
+    return {WHITE: 'cuero'}
+
+
+def manoplas(M, bd, hands):
+    """Manoplas de lana roja con un copo bordado y la vuelta blanca."""
+    RED = (0.62, 0.12, 0.12); WHITE = (0.92, 0.90, 0.84)
+    _glove(M, hands, RED, WHITE, grow=2)
+    for (x, y, z), v in M.V.items():
+        if v[1] == RED and y in (27, 28) and (x + z) % 3 == 0: v[1] = WHITE
+    return {RED: 'punto', WHITE: 'punto'}
+
+
+def baston(M, bd, hands):
+    """Bastón de ébano con puño de plata curvado: va apoyado en el suelo, por delante."""
+    EBONY = (0.20, 0.12, 0.08); SILVER = (0.86, 0.88, 0.90); TIP = (0.70, 0.56, 0.26)
+    def shape(x, y, z):
+        if -30.5 <= y <= 1.5 and math.hypot(x, z) <= 1.15:
+            return TIP if y < -29 else EBONY
+        if 0.5 <= y <= 4.5 and -1.2 <= x <= 1.2 and -1.2 <= z <= 6.0:   # puño curvado hacia delante
+            return SILVER
+        return None
+    _held(M, hands, 'cane', shape, reach=34)
+    return {}
+
+
+def paraguas(M, bd, hands):
+    """Paraguas negro abierto, en alto sobre la cabeza, con varillas y puño de madera."""
+    BLACK = (0.16, 0.17, 0.22); PANEL = (0.23, 0.24, 0.30); RIB = (0.62, 0.63, 0.66); WOOD = (0.46, 0.28, 0.14)
+    lean = (0.0, 1.0, -0.36)
+    n = math.sqrt(sum(a * a for a in lean)); ax = [a / n for a in lean]
+    L, R, DROP = 50.0, 27.0, 9.0
+    def shape(x, y, z):
+        u = x * ax[0] + y * ax[1] + z * ax[2]                             # a lo largo del mango
+        px, py, pz = x - u * ax[0], y - u * ax[1], z - u * ax[2]
+        r = math.sqrt(px * px + py * py + pz * pz)
+        if -3.5 <= u <= L + 2 and r <= 0.9:
+            return WOOD if u < 4 else BLACK
+        if -4.5 <= u <= -2.5 and r <= 2.6 and pz > -0.5:                 # puño curvo
+            return WOOD
+        if r <= R:
+            h = L - DROP * (r / R) ** 2                                  # tela: cúpula que cae
+            if abs(u - h) <= 0.9:
+                ang = math.atan2(px, pz)
+                k = (ang / (math.tau / 8)) % 1.0
+                if k < 0.07 or k > 0.93: return RIB
+                return PANEL if int(ang / (math.tau / 8) + 8) % 2 else BLACK
+        return None
+    _held(M, hands, 'umbrella', shape, reach=58)
+    return {}
+
+
+def linterna(M, bd, hands):
+    """Linterna eléctrica de latón y baquelita, encendida: alumbra hacia delante."""
+    BODY = (0.12, 0.10, 0.08); BRASS = (0.80, 0.62, 0.26); LENS = (1.0, 0.95, 0.76)
+    d = (0.0, -0.25, 1.0)
+    n = math.sqrt(sum(a * a for a in d)); ax = [a / n for a in d]
+    def shape(x, y, z):
+        u = x * ax[0] + y * ax[1] + z * ax[2]
+        px, py, pz = x - u * ax[0], y - u * ax[1], z - u * ax[2]
+        r = math.sqrt(px * px + py * py + pz * pz)
+        if -3 <= u <= 6 and r <= 1.9: return BRASS if u < -2 or 2 <= u < 3 else BODY
+        if 6 <= u <= 10 and r <= 1.9 + (u - 6) * 0.45:
+            if u >= 9.3: return (LENS, 1)
+            return BRASS
+        return None
+    grip, t = _held(M, hands, 'lantern', shape, reach=16)
+    M.marks = {'beam': _to_rest(grip, t, [ax[0] * 11, ax[1] * 11, ax[2] * 11]),
+               'beam_to': _to_rest(grip, t, [ax[0] * 21, ax[1] * 21, ax[2] * 21])}
+    return {}
+
+
+def mochila(M, bd, torso):
+    """Mochila de expedición de lona con el saco de dormir enrollado encima, un cazo colgado y
+    las correas por los hombros."""
+    CANVAS = (0.36, 0.38, 0.26); CANVAS_SH = (0.28, 0.30, 0.20); LEATHER = (0.32, 0.20, 0.10)
+    ROLL = (0.50, 0.22, 0.16); TIN = (0.62, 0.62, 0.60); BUCKLE = (0.70, 0.60, 0.32)
+    ch = _Chest(bd, torso)
+    zb = min(ch.back.get((x, y), 0) for x in range(-7, 7) for y in range(42, 60)) - 1
+    for x in range(-9, 9):                                                # cuerpo de la mochila
+        for y in range(38, 60):
+            for z in range(zb - 9, zb + 1):
+                if (x in (-9, 8) and y in (38, 59)) or (z == zb - 9 and x in (-9, 8)): continue
+                M.put(x, y, z, T, CANVAS if y < 56 else CANVAS_SH)
+    for x in range(-6, 6):                                                # bolsillo
+        for y in range(40, 49):
+            M.put(x, y, zb - 10, T, CANVAS_SH if y != 48 else LEATHER)
+    M.put(-1, 46, zb - 11, T, BUCKLE); M.put(0, 46, zb - 11, T, BUCKLE)
+    for x in range(-12, 12):                                              # saco de dormir enrollado
+        for y in range(59, 66):
+            for z in range(zb - 8, zb):
+                if (y - 62.5) ** 2 + (z - (zb - 4)) ** 2 <= 13: M.put(x, y, z, T, ROLL if x % 5 else LEATHER)
+    for y in range(41, 47):                                               # cazo en el costado
+        for z in range(zb - 7, zb - 2):
+            M.put(9, y, z, T, TIN); M.put(10, y, z, T, TIN)
+    for s in (-1, 1):                                                     # correas por delante
+        _hang(M, ch, LEATHER, s * 6, s * 7, 61, 44)
+        _hang(M, ch, LEATHER, s * 5, s * 6, 61, 44)
+    return {CANVAS: 'lona', CANVAS_SH: 'lona', LEATHER: 'cuero', ROLL: 'lana'}
+
+
+def tentaculo(M, bd, torso):
+    """Un tentáculo que sale de la espalda, sube por detrás de la cabeza y cae por delante del
+    hombro derecho, con ventosas por debajo. Ya no lo esconde."""
+    SKIN = (0.30, 0.42, 0.38); SKIN_D = (0.22, 0.31, 0.29); BELLY = (0.66, 0.52, 0.56); SUCKER = (0.82, 0.66, 0.70)
+    ch = _Chest(bd, torso)
+    zb = min(ch.back.get((x, y), 0) for x in range(-4, 4) for y in range(44, 52)) - 1
+    zf = ch.z(14, 58) + 2
+    steps = 90
+    for i in range(steps):
+        t = i / (steps - 1)
+        x = 2 + 13 * t
+        y = 48 + 31 * math.sin(math.pi * t * 0.92)
+        z = (zb - 3) + (zf - (zb - 3)) * t * t - 6 * math.sin(math.pi * t) * (1 - t)
+        r = 4.0 * (1 - t) + 1.0
+        band = int(t * 14) % 2
+        for dx in range(-5, 6):
+            for dy in range(-5, 6):
+                for dz in range(-5, 6):
+                    if dx * dx + dy * dy + dz * dz > r * r: continue
+                    k = (int(round(x + dx)), int(round(y + dy)), int(round(z + dz)))
+                    under = dy < -r * 0.35
+                    if under: col = SUCKER if (k[0] + k[2] + k[1]) % 3 == 0 and r > 1.6 else BELLY
+                    else: col = SKIN_D if band else SKIN
+                    M.put(k[0], k[1], k[2], T, col)
+    for (x, y, z) in list(M.V):                                           # no entra en el cuerpo
+        if (x, y, z) in ch.shell: M.V.pop((x, y, z))
+    return {}
+
+
 GARMENTS = {'bombin': bombin, 'casco_minero': casco_minero, 'gorro_nieve': gorro_nieve, 'chistera': chistera,
             'chaqueta_aviador': chaqueta_aviador, 'abrigo_piel': abrigo_piel,
             'botas_militares': botas_militares, 'botas_nieve': botas_nieve,
@@ -1593,7 +1817,10 @@ GARMENTS = {'bombin': bombin, 'casco_minero': casco_minero, 'gorro_nieve': gorro
             'canana': canana, 'antifaz': antifaz, 'mascara_gas': mascara_gas, 'medico_peste': medico_peste,
             'vendas_parche': vendas_parche, 'clavel': clavel, 'panuelo_vaquero': panuelo_vaquero,
             'estetoscopio': estetoscopio, 'camara_fuelle': camara_fuelle, 'rosario': rosario,
-            'ojos_innsmouth': ojos_innsmouth}
+            'ojos_innsmouth': ojos_innsmouth,
+            # manos y espalda
+            'guantes_cuero': guantes_cuero, 'guantes_boxeo': guantes_boxeo, 'manoplas': manoplas, 'baston': baston,
+            'paraguas': paraguas, 'linterna': linterna, 'mochila': mochila, 'tentaculo': tentaculo}
 
 
 def build(name, c):
@@ -1606,6 +1833,7 @@ def build(name, c):
     if 'hair' in params: kw['hair'] = hair_of(c)
     if 'face' in params: kw['face'] = face_of(c)
     if 'torso' in params: kw['torso'] = torso_of(c)
+    if 'hands' in params: kw['hands'] = hands_of(c)
     mats = fn(M, bd, **kw)
     for V in (M.V, M.under_kept()):          # faldones (hito 12.3): lo de por debajo de la cadera
         for k, v in V.items():               # cuelga de la cadera y se mueve con retraso

@@ -15,7 +15,7 @@ func _init() -> void:
 	var n := 0
 	for o in OutfitData.all():
 		if not ids.is_empty() and not ids.has(String(o.id)): continue
-		var tex := ModelIcon.make(root, o.icon_model(), "full", PX)
+		var tex := ModelIcon.make(root, o.icon_model(), "full", PX, 0.0, o.hold)
 		for i in 3: await process_frame
 		await RenderingServer.frame_post_draw
 		tex.get_image().save_png("%s/%s.png" % [OUT, o.id])

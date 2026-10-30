@@ -62,6 +62,16 @@ PRENDAS = [
     ('camara_fuelle', 'Cámara de fuelle', 'Para fotografiar lo que nadie creerá.', ACC, 2000, {}),
     ('rosario', 'Rosario', 'Cuentas de madera y cruz de plata.', ACC, 900, {}),
     ('ojos_innsmouth', 'Ojos de Innsmouth', 'Saltones, sin párpados, y unas agallas. La cara de Innsmouth.', ACC, 3500, {}),
+    # manos
+    ('guantes_cuero', 'Guantes de cuero', 'De conducir, marrones.', HANDS, 800, {}),
+    ('guantes_boxeo', 'Guantes de boxeo', 'Rojos. No sirven de nada contra un shoggoth.', HANDS, 1500, {}),
+    ('manoplas', 'Manoplas', 'De lana roja con copos, para la Antártida.', HANDS, 700, {}),
+    ('baston', 'Bastón de ébano', 'Con puño de plata.', HANDS, 1800, {'hold': 'cane'}),
+    ('paraguas', 'Paraguas', 'Negro y abierto, para la lluvia de Innsmouth.', HANDS, 1600, {'hold': 'umbrella'}),
+    ('linterna', 'Linterna eléctrica', 'Encendida: alumbra por delante.', HANDS, 2500, {'hold': 'lantern'}),
+    # espalda
+    ('mochila', 'Mochila de expedición', 'Con el saco de dormir y el cazo.', BACK, 1800, {}),
+    ('tentaculo', 'Tentáculo', 'Le sale de la espalda. Ya no lo esconde.', BACK, 4000, {}),
 ]
 
 TEMPLATE = '''[gd_resource type="Resource" script_class="OutfitData" load_steps=2 format=3]

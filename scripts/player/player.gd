@@ -690,19 +690,12 @@ func _animate(delta: float) -> void:
 
 ## Lo que lleva en la mano (vestuario, fase 14): el brazo derecho lo sostiene quieto (brazo y
 ## antebrazo, en radianes) mientras no lanza, esquiva o hace un gesto; vuelve poco a poco.
-const HOLDS := {"umbrella": [-0.35, -1.45, 0.1], "lantern": [-0.35, -0.85, 0.0]}
 var _hold := ""
 var _hold_w := 0.0
 func _hold_step(delta: float) -> void:
-	if not HOLDS.has(_hold): return
+	if not OutfitData.HOLDS.has(_hold): return
 	_hold_w = move_toward(_hold_w, 1.0 if _action == "" and _override == "" and _fidget == "" else 0.0, delta * 6.0)
-	if _hold_w <= 0.0: return
-	var h: Array = HOLDS[_hold]
-	var arm := Anims.part(model, "arm_r")
-	arm.rotation.x = lerpf(arm.rotation.x, h[0], _hold_w)
-	arm.rotation.z = lerpf(arm.rotation.z, h[2], _hold_w)
-	var parts: Dictionary = model.get_meta("part_nodes")
-	if parts.has("fore_r"): (parts["fore_r"] as Node3D).rotation.x = lerpf((parts["fore_r"] as Node3D).rotation.x, h[1], _hold_w)
+	OutfitData.pose_hold(model, _hold, _hold_w)
 
 ## Configuración de la mancha del nivel (data/dirt.json): la de la arena o, si no, la de la parte.
 static func dirt_config(part_key: String, arena_name: String) -> Dictionary:

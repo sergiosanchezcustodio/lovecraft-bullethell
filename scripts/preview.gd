@@ -47,8 +47,11 @@ func _ready() -> void:
 		# "dyer+bombin+botas_nieve": el personaje con prendas del vestuario puestas
 		var bits := n.split("+")
 		var m := VoxelBuilder.load_model("res://models/%s.json" % bits[0])
+		var worn := {}
 		for g in bits.slice(1):
 			VoxelBuilder.dress(m, "res://models/vest_%s_%s.json" % [g, bits[0]], OutfitData.is_head(g))
+			worn[g] = g
+		OutfitData.pose_hold(m, OutfitData.hold_of(worn), 1.0)   # paraguas, linterna, bastón (fase 14)
 		if la.has("face"):                  # face=abiertos|cerrados|dolor: parpadeo y mueca (FaceLook)
 			m.add_child(FaceLook.new().setup(m, "res://models/%s.json" % bits[0]))
 		if la.has("hurt"):                  # hurt=0..1: grietas de herida (hito 12.6)

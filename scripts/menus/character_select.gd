@@ -974,6 +974,8 @@ class _Preview extends SubViewportContainer:
 		_holder = Node3D.new()
 		_vp.add_child(_holder)
 
+	var _hold := ""
+
 	## Pone otro modelo ("" para ninguno), vestido con `worn` (vestuario, D-34).
 	func set_model(model_name: String, worn: Dictionary = {}) -> void:
 		var key := model_name + str(worn)
@@ -988,6 +990,7 @@ class _Preview extends SubViewportContainer:
 		if model_name == "": return
 		_model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
 		OutfitData.apply(_model, model_name, worn)
+		_hold = OutfitData.hold_of(worn)
 		_holder.add_child(_model)
 
 	## Lo deja girado un ángulo (como si el jugador lo hubiera girado con LB/RB).
@@ -1006,3 +1009,4 @@ class _Preview extends SubViewportContainer:
 		else: _holder.rotation.y = 0.35 + sin(_t * 0.6 + _phase) * 0.45   # se balancea, mirando al frente
 		var mn := _model_name.get_slice("{", 0)
 		Anims.pose(mn, "idle", _model, fposmod(_t / Anims.duration(mn, "idle"), 1.0))
+		OutfitData.pose_hold(_model, _hold, 1.0)                  # paraguas, linterna, bastón

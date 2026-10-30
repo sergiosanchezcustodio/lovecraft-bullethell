@@ -68,6 +68,24 @@ static func worn_for(character_id: String) -> Dictionary:
 	var cur: Variant = saves.get("current") if saves else null
 	return cur.worn_by(character_id) if cur != null else {}
 
+## Posturas del brazo derecho para lo que se sostiene: giro x del brazo, giro x del antebrazo y
+## giro z del brazo. tools/gen_vestuario.py construye cada objeto ya girado para esta postura
+## (HOLD_ANGLES allí): si cambian aquí, cámbialos también allí y regenera.
+const HOLDS := {"umbrella": [-0.35, -1.45, 0.1], "lantern": [-0.35, -0.85, 0.0], "cane": [-0.1, -0.45, 0.0]}
+
+## Lleva el brazo derecho del modelo hacia la postura `hold`, con peso w (0..1), encima de la
+## animación del fotograma.
+static func pose_hold(model: Node3D, hold: String, w: float) -> void:
+	if not HOLDS.has(hold) or w <= 0.0: return
+	var h: Array = HOLDS[hold]
+	var parts: Dictionary = model.get_meta("part_nodes", {})
+	var arm: Node3D = parts.get("arm_r")
+	if arm == null: return
+	arm.rotation.x = lerpf(arm.rotation.x, h[0], w)
+	arm.rotation.z = lerpf(arm.rotation.z, h[2], w)
+	var fore: Node3D = parts.get("fore_r")
+	if fore != null: fore.rotation.x = lerpf(fore.rotation.x, h[1], w)
+
 ## Postura de brazo de lo que lleva puesto ("" si nada la pide).
 static func hold_of(worn: Dictionary) -> String:
 	for k in worn:
