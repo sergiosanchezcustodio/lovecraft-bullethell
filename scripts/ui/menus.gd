@@ -92,6 +92,7 @@ class PauseMenu extends CanvasLayer:
 	signal restart
 	signal debug
 	signal difficulty                           ## temporal (D-42): calibrar la dificultad
+	signal photo                                ## modo foto (hito 13.12)
 	signal quit
 	var _buttons: Array[Button] = []
 	var guest := false                          ## en red, un invitado: solo Continuar y Menú principal
@@ -118,7 +119,7 @@ class PauseMenu extends CanvasLayer:
 		dim.add_child(ver)
 		box.add_theme_constant_override("separation", 14)
 		MenuKit.heading(box, "Pausa", 48)
-		var rows := [["Continuar", resume], ["Menú principal", quit]] if guest else 			[["Continuar", resume], ["Dificultad (temporal)", difficulty], ["Reiniciar", restart], ["Depuración", debug], ["Menú principal", quit]]
+		var rows := [["Continuar", resume], ["Modo foto", photo], ["Menú principal", quit]] if guest else 			[["Continuar", resume], ["Modo foto", photo], ["Dificultad (temporal)", difficulty], ["Reiniciar", restart], ["Depuración", debug], ["Menú principal", quit]]
 		for pair in rows:
 			var b := MenuKit.button(pair[0], MenuKit.INK, 28)
 			b.custom_minimum_size = Vector2(340, 58)

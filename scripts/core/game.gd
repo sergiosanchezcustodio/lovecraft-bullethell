@@ -34,6 +34,7 @@ extends Node3D
 ##   autorestart=2           en la pantalla final, reintenta sola tras N s (probar el reinicio)
 ##   mute=true               sin música (también en la portada)
 ##   debug_menu=1            abre la pausa y el menú de depuración a ese segundo (capturas)
+##   photo_at=t              abre la pausa y el modo foto a los t s (photo_auto=true: captura, foto y sale; hito 13.12)
 ##   sheet_at=2 / map_at=2   abre la ficha o el mapa del J1 a ese segundo (capturas)
 ##   hitstop=false           sin micro-pausa al impactar
 ##   boss_intro=false        sin la entrada de los jefes (BossIntro): solo el aviso, como antes
@@ -89,6 +90,7 @@ var _ended := false
 var _final_alive := 0.0                          ## segundos que lleva vivo el enemigo final (registro)
 var _log_slot := 0                                ## último tramo de 30 s escrito en el registro
 var _pause: Menus.PauseMenu
+var grade_gamma := 1.0                         ## curva de la luz de la arena (el modo foto la usa al cambiar la gradación)
 var _shot_tag := ""                            ## sufijo de las capturas (tag=, y _inv en un invitado)
 var _halt_ui: CanvasLayer                      ## en red: aviso de la parada que ha puesto otro PC
 var _debug: CanvasLayer                         ## la depuración o la dificultad, encima de la pausa
@@ -169,7 +171,8 @@ func _ready() -> void:
 	# sombras levantadas: la de la arena ("gamma", noches legibles) por el brillo de la configuración
 	# y la gradación de color de la parte (hito 11.3; grade=off|p1|p2|p3 para comparar)
 	var grade_key := args.get_str("grade", part_key)
-	Atmosphere.set_grade(env, float(arena.get_meta("light", {}).get("gamma", 1.0)) * Settings.brightness_gamma() * Pacts.value("light"),
+	grade_gamma = float(arena.get_meta("light", {}).get("gamma", 1.0)) * Settings.brightness_gamma() * Pacts.value("light")
+	Atmosphere.set_grade(env, grade_gamma,
 		{} if grade_key == "off" else Atmosphere.grade_for(grade_key))
 	_base_fog = env.fog_density
 	_base_ambient = env.ambient_light_energy
@@ -456,6 +459,10 @@ func _ready() -> void:
 			toggle_pause()
 			if args.get_bool("dif_menu"): _open_difficulty()         # la dificultad (D-42)
 			else: _open_debug())
+	if args.has("photo_at"):                       # abre la pausa y el modo foto (hito 13.12, capturas)
+		get_tree().create_timer(args.get_float("photo_at", 1.0)).timeout.connect(func() -> void:
+			toggle_pause()
+			_open_photo())
 	_shot_tag = ("_" + args.get_str("tag")) if args.has("tag") else ""
 	if is_guest(): _shot_tag += "_inv"                 # dos ventanas en el mismo PC: que no se pisen
 	if args.has("shots") or args.has("game_shots"):    # game_shots=: solo aquí (la selección también lee shots=)
@@ -736,6 +743,7 @@ func _open_pause() -> void:
 	_pause.restart.connect(_restart)
 	_pause.debug.connect(_open_debug)
 	_pause.difficulty.connect(_open_difficulty)
+	_pause.photo.connect(_open_photo)
 	_pause.quit.connect(_quit)
 	add_child(_pause)
 
@@ -851,6 +859,9 @@ func net_resume(d: Dictionary) -> void:
 		_halt_ui.queue_free()
 		_halt_ui = null
 	_close_pause()
+	if _debug is PhotoMode:                          # quien la tenía no la ha quitado: el anfitrión
+		_debug.queue_free()
+		_debug = null
 	var w := get_node_or_null("NetLevelUp")
 	if w != null: w.queue_free()
 	if not _ended: get_tree().paused = false
@@ -922,6 +933,11 @@ func _open_debug() -> void:
 func _open_difficulty() -> void:
 	if _debug != null: return
 	_over_pause(DifficultyMenu.new(self), "Dificultad (temporal)")
+
+## Pausa > Modo foto (hito 13.12): cámara libre con la partida congelada.
+func _open_photo() -> void:
+	if _debug != null: return
+	_over_pause(PhotoMode.new(self), "Modo foto")
 
 ## Un menú encima de la pausa (con back y close): al volver, el foco en su botón.
 func _over_pause(m: CanvasLayer, button: String) -> void:

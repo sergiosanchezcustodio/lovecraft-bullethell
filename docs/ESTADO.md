@@ -1417,6 +1417,14 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - Logros «Bibliotecario» (las quince páginas, 800 $) y «El que no volvió del todo» (500 $).
   - Capturas: `relato epilogue=epilogo_locura "nombre=Ludmila Varga"`; tomo con `title open=menu_biblioteca tome=7`.
   - Hoja `shots/revision/2026-10-30/fragmentos.png` (capturas en `fragmentos/`). Tests en `test_fragments` (5). 586 de 586.
+- **Fase 13, hito 13.12: modo foto (30-10-2026), pendiente de tu revisión.** Pausa > «Modo foto» (`PhotoMode`, `scripts/ui/photo_mode.gd`), con la partida congelada.
+  - **Cámara libre propia**, que empieza donde miraba la del juego: stick izquierdo o WASD la mueve por el suelo (sin salir del escenario), stick derecho o Q-E y R-F la gira e inclina (de −8° a −82°), LT-RT, Z-X o la rueda acercan. Isométrica o en perspectiva (38°, con el mismo alto visible en el punto que mira).
+  - **Sin HUD ni avisos:** oculta todas las capas de pantalla salvo las que son parte de la imagen (el velo de la ventisca y la viñeta de la cordura) y los números de daño; al salir lo devuelve todo como estaba, también la cámara y la gradación.
+  - **Opciones:** gradación (la de la partida, sin gradación, Antártida, Innsmouth, R'lyeh, sepia, blanco y negro o luna fría), profundidad de campo (no, suave o fuerte: enfoca el punto que mira), viñeta (no, suave o fuerte), investigadores (a la vista, sin los anillos del suelo u ocultos con sus compañeros), volver a la vista del juego y abrir la carpeta de fotos.
+  - **La foto:** A o Espacio. Quita el panel, guarda la imagen en `Imágenes/Lovecraft Library/lovecraft_<fecha>_<hora>.png`, y destello. Y o Tab oculta el panel para encuadrar; B o Esc vuelve a la pausa; Start, a jugar.
+  - **En red:** está en la pausa de todos los PC; solo la abre quien tiene la pausa (que para la partida en todos). Si el anfitrión la quita, el modo foto se cierra (`game.net_resume`).
+  - Pruebas: `photo_at=t` (abre la pausa y el modo foto), `photo_auto=true` (captura del panel en `shots/`, una foto y sale), `photo_dir=`, `photo_dof=0..2`, `photo_grade=N`, `photo_persp=true`, `photo_vignette=0..2`, `photo_hide=0..2`, `photo_yaw=`, `photo_pitch=` y `photo_zoom=`.
+  - Hoja `shots/revision/2026-10-30/modo_foto.png` (capturas en `modo_foto/`). Tests en `test_photo_mode` (3). 589 de 589.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 
