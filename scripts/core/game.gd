@@ -34,6 +34,8 @@ extends Node3D
 ##   autorestart=2           en la pantalla final, reintenta sola tras N s (probar el reinicio)
 ##   mute=true               sin música (también en la portada)
 ##   debug_menu=1            abre la pausa y el menú de depuración a ese segundo (capturas)
+##   no_spawn=true           el escenario solo: sin enemigos, evento final, baúles, rompibles, peligros ni armas (tools/comparar_arenas.py)
+##   tour=x,z;x,z            el J1 salta a cada punto a tour_at (2) + i·tour_every (2) s (capturas)
 ##   photo_at=t              abre la pausa y el modo foto a los t s (photo_auto=true: captura, foto y sale; hito 13.12)
 ##   sheet_at=2 / map_at=2   abre la ficha o el mapa del J1 a ese segundo (capturas)
 ##   hitstop=false           sin micro-pausa al impactar
@@ -325,6 +327,10 @@ func _ready() -> void:
 			var k := args.get_float("mid_at") / level.mid_times[0]
 			level.mid_times.assign(level.mid_times.map(func(t: float) -> float: return t * k))
 		if args.has("chest_every"): level.chest_every = args.get_float("chest_every")   # baúles más a menudo (capturas)
+		if args.get_bool("no_spawn"):                  # el escenario solo (hito 13.14): sin baúles ni peligros
+			level.chest_every = 0.0
+			level.angle_every = 0.0
+			level.wave_every = 0.0
 		if args.has("spawn_rate"): level.spawn_rate = [Vector2(0, args.get_float("spawn_rate"))] as Array[Vector2]
 		# Construir ya los modelos de todos los enemigos del nivel: si no, la primera aparición
 		# de cada uno (el Acechador, en el minuto 4) provocaría un tirón a mitad de partida.
@@ -359,7 +365,7 @@ func _ready() -> void:
 		director.level_completed.connect(_on_level_completed)
 		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
 		# rompibles y peligros del escenario: en red, solo en el anfitrión (llegan a los invitados en el 9.3c)
-		if not args.get_bool("nobreakables") and not is_guest(): add_child(BreakableSpawner.new().setup(world, arena.get_meta("size")))
+		if not args.get_bool("nobreakables") and not args.get_bool("no_spawn") and not is_guest(): add_child(BreakableSpawner.new().setup(world, arena.get_meta("size")))
 		if args.get_bool("pickup_test"):               # las cinco recompensas en fila delante del J1
 			for k in 5: world.fx.add_child.call_deferred(Pickup.new().setup(world, player.position + Vector3(-4 + k * 2, 0, 3), k as Pickup.Kind))
 		director.chest_spawned.connect(func(c: ArcaneChest) -> void:
@@ -371,6 +377,9 @@ func _ready() -> void:
 				Achievements.add(Saves.current, "chests"))
 			announce("Ha aparecido un baúl arcano", 1.5))
 		add_child(director)
+		director.spawning_paused = args.get_bool("no_spawn")   # capturas del escenario solo (hito 13.14)
+		if args.get_bool("no_spawn"):
+			for q in players: q.weapons.process_mode = Node.PROCESS_MODE_DISABLED   # ni dinamita al aire ni quemaduras
 		if level.angle_every > 0.0 or level.wave_every > 0.0:      # peligros del escenario (hito 7.4)
 			hazards = Hazards.new().setup(level, world, arena.get_meta("obstacles"))
 			hazards.mirror = is_guest()               # en red, los saca el anfitrión (NetGame)
@@ -475,6 +484,15 @@ func _ready() -> void:
 		hud.add_child(OffscreenArrows.new().setup(players, camera))   # y flechas hacia los que no se ven
 	var cues := OffscreenCues.new().setup(camera)   # élites y ataques fuertes de fuera de cámara (hito 13.13)
 	hud.add_child(cues)
+	if args.has("tour"):                           # tour=x,z;x,z: el J1 va a cada punto a tour_at + i·tour_every s (hito 13.14)
+		var stops := args.get_str("tour").split(";")
+		for i in stops.size():
+			var xz := stops[i].split(",")
+			var at := Vector3(float(xz[0]), 0.0, float(xz[1]))
+			get_tree().create_timer(args.get_float("tour_at", 2.0) + i * args.get_float("tour_every", 2.0), false).timeout.connect(func() -> void:
+				player.global_position = at
+				player.reset_physics_interpolation()
+				camera.snap())
 	if args.has("cue_demo"):                       # capturas: un ataque por la derecha y una élite arriba a la izquierda
 		get_tree().create_timer(args.get_float("cue_demo", 2.0), false).timeout.connect(func() -> void:
 			var ax := GameCamera.ground_axes()

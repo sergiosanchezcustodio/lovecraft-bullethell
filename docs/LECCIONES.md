@@ -175,3 +175,10 @@ Sacadas de `CLAUDE.md` el 17-10-2026. Léelas antes de tocar generadores de mode
 
 - Un muelle integrado a mano con un solo paso por fotograma (`v += (k·(x₀−x) − c·v)·dt; x += v·dt`) es estable solo si `dt·√k` es pequeño. Con `k = 70` basta un fotograma de 0,17 s (`timescale=5` a 30 fps, o un tirón al cargar) para que crezca sin parar hasta el infinito, y la pieza desaparece sin aviso propio: solo `!v.is_finite()` en `instance_set_transform`. Integra en subpasos de 1/60 s como mucho y devuelve el estado a cero si deja de ser finito.
 - Para encontrar qué nodo tiene la transformación no finita: recorre el árbol cada pocos segundos buscando un `Node3D` con `global_transform` no finito e imprime su ruta.
+
+## Comparar capturas de la partida (hito 13.14, 30-10-2026)
+
+- Dos capturas «iguales» de la partida nunca lo son: el clima (nubes que pasan, rayos), el ambiente (gotas, llamas, pájaros) y, sobre todo, lo que hace el propio jugador (sus armas disparan aunque no haya enemigos y dejan quemaduras; los peligros y baúles salen al azar). Para comparar arte hay que dejar el escenario solo (`no_spawn=true weather=no changes=0`).
+- Comparar píxel a píxel marca de todo. Funciona comparar bloques sobre la imagen reducida a 1/4 y difuminada, y medir el ruido de cada captura haciéndola dos veces (la «zona viva»), en vez de subir el umbral para todos.
+- No encadenes en la misma orden un cambio de un script y su uso nuevo: si el cambio falla, la orden siguiente se ejecuta con el script viejo (lanzó una medición de 16 minutos que hubo que parar).
+

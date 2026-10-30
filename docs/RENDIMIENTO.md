@@ -189,3 +189,25 @@ Mismo equipo, Forward+, 1920×1080 sin vsync. J1 y 3 bots (`bot=circle bots=3 go
 - Con 4 jugadores, la prueba de carga cuesta unos 4 ms más por fotograma. No hay un sistema culpable: la física de los enemigos sube de 2,0 a 3,2 ms (cada enemigo recorre los jugadores para elegir objetivo y comprobar el contacto) y las balas de 1,1 a 1,9 ms (cuatro jugadores disparando). Jugadores, armas y HUD suman menos de 1 ms. El resto es dibujo: la cámara se abre para que quepan todos y se ven más escenario y más enemigos a la vez.
 - La prueba de carga es extrema (150 enemigos y 1.000 balas a la vez). En la partida normal sobra margen. Si en un equipo de gama media la carga con 4 jugadores baja de 60, lo primero sería unir caras en `VoxelBuilder` (8-9 M de primitivas) y rebajar la resolución de la tienda y la cabaña del campamento.
 - Nuevas secciones del perfil: `jugadores_fisica`, `jugadores_anim`, `armas`, `hud` y `partida`.
+
+## Medición de los 15 niveles
+
+*Última: 30-10-2026, versión 0.9.0 (`python tools/medir_niveles.py`).* Bot sin daño, 80 enemigos como tope y 8 s medidos; la mejor de 2 ejecuciones. Entre paréntesis, la medición anterior (ninguna) y la diferencia. Milisegundos por fotograma: menos es mejor. Con 80 enemigos manda la CPU (la lógica de la partida), así que Media y Alta salen parecidas; entre ejecuciones, la media varía en torno a ±1 ms y el 1 % peor bastante más: fíate de las diferencias grandes o de las que se repiten.
+
+| Nivel | Media: media (antes) | Media: 1 % peor | Alta: media (antes) | Alta: 1 % peor | Primitivas (Alta) |
+|---|---|---|---|---|---|
+| p1_n1 · Campamento base en la costa del mar de Ross | 7,86 | 16,05 | 8,18 | 16,38 | 4,3 M |
+| p1_n2 · El campamento destruido de Lake | 7,68 | 19,24 | 7,51 | 16,39 | 10,4 M |
+| p1_n3 · El paso de la cordillera y sus cavernas | 7,24 | 18,93 | 7,61 | 18,78 | 4,2 M |
+| p1_n4 · La ciudad ciclópea de los Antiguos | 7,54 | 14,45 | 7,53 | 15,60 | 11,3 M |
+| p1_n5 · Los túneles y el abismo del mar subterráneo | 7,93 | 17,25 | 7,40 | 15,27 | 7,3 M |
+| p2_n1 · Newburyport y la carretera a Innsmouth | 7,07 | 11,26 | 8,13 | 15,67 | 13,3 M |
+| p2_n2 · Las calles de Innsmouth y el templo de la Orden | 9,67 | 16,41 | 9,81 | 17,67 | 11,0 M |
+| p2_n3 · El hotel Gilman House y la huida por los tejados | 8,98 | 17,30 | 8,76 | 15,34 | 10,2 M |
+| p2_n4 · Los pantanos y la vía muerta del tren a Rowley | 9,97 | 17,12 | 9,90 | 17,00 | 19,9 M |
+| p2_n5 · El Arrecife del Diablo y Y'ha-nthlei | 9,24 | 18,06 | 9,76 | 18,84 | 13,9 M |
+| p3_n1 · Providence: el estudio del escultor Wilcox | 7,20 | 15,06 | 7,31 | 14,81 | 13,1 M |
+| p3_n2 · Los pantanos de Luisiana: el ritual del culto | 10,39 | 19,82 | 7,56 | 13,00 | 14,0 M |
+| p3_n3 · Los muelles y la cubierta del Alert | 9,83 | 18,43 | 9,91 | 16,83 | 9,3 M |
+| p3_n4 · La tormenta en el Pacífico | 8,27 | 16,72 | 7,39 | 16,06 | 6,5 M |
+| p3_n5 · R'lyeh emergida: la puerta colosal | 8,93 | 18,06 | 8,38 | 16,60 | 11,6 M |

@@ -6,7 +6,8 @@
 # en red, la sala no deja empezar a PCs con versiones distintas, así que cada build que se
 # reparte debe llevar la suya. Con la versión como argumento no pregunta; sin terminal
 # (ejecuciones automáticas) deja la que hay. Antes de exportar, tools/revisar_costados.py
-# comprueba los costados de todos los personajes y prendas y, si falla, no sigue.
+# comprueba los costados de todos los personajes y prendas y, si falla, no sigue. Con terminal,
+# ofrece además comparar las 15 arenas con su referencia y medir los 15 niveles (hito 13.14).
 set -e
 # los costados de personajes y prendas, enteros (si una manga borra el tronco, se ve al andar)
 python tools/revisar_costados.py
@@ -21,6 +22,14 @@ if [ -n "$nueva" ] && [ "$nueva" != "$actual" ]; then
 	echo "Versión: $actual -> $nueva"
 else
 	echo "Versión: $actual"
+fi
+if [ -t 0 ]; then
+	printf '¿Comparar las 15 arenas con su referencia antes? (s/N): '
+	read -r r
+	if [ "$r" = "s" ]; then python tools/comparar_arenas.py; fi
+	printf '¿Medir el rendimiento de los 15 niveles (unos 15 minutos)? (s/N): '
+	read -r r
+	if [ "$r" = "s" ]; then python tools/medir_niveles.py; fi
 fi
 godot --headless --path . -s tools/empaquetar_modelos.gd
 mkdir -p builds/windows builds/macos
