@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/PantallasMenus/iconos/ficha_cordura.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"no_volvio"
+display_name = "El que no volvió del todo"
+description = "Vence a Cthulhu con menos de un cuarto de la cordura."
+order = 22
+stat = "epilogue_mad"
+target = 1
+reward_money = 500
+icon = ExtResource("2")

@@ -18,6 +18,10 @@ var _holding := false
 var _ring: Control
 var _shots: PackedFloat64Array
 var _tag := "relato"
+## Otro relato en vez del del nivel (hito 13.11, el epílogo): {id, fill (huecos como {nombre}),
+## menu (al terminar, al menú principal en vez de a la partida)}. Se vacía al usarlo.
+static var next := {}
+var _then_menu := false
 
 static func has_relato(level_id: String) -> bool:
 	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json"))
@@ -28,6 +32,13 @@ func _ready() -> void:
 	for s in la.get_str("shots").split(",", false): _shots.append(float(s))
 	_tag = la.get_str("tag", "relato")
 	var id := la.get_str("level", String(GameSession.level)) if la.has("level") else String(GameSession.level)
+	var fill: Dictionary = {}
+	if la.has("epilogue"): next = {"id": la.get_str("epilogue"), "fill": {"nombre": la.get_str("nombre", "William Dyer")}, "menu": true}   # capturas
+	if not next.is_empty():
+		id = String(next.id)
+		fill = next.get("fill", {})
+		_then_menu = bool(next.get("menu", false))
+		next = {}
 	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json"))
 	if not (d is Dictionary) or not (d as Dictionary).has(id) or la.get_bool("skip_relato"):   # pruebas: skip_relato=true
 		_go()
@@ -36,7 +47,7 @@ func _ready() -> void:
 	black.color = Color(0.01, 0.01, 0.015)
 	black.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(black)
-	var map := "res://resources/maps/%s.png" % id
+	var map := "res://resources/maps/%s.png" % (Campaign.last_id() if id.begins_with("epilogo") else id)
 	if ResourceLoader.exists(map):
 		var bg := TextureRect.new()
 		bg.texture = load(map)
@@ -56,13 +67,17 @@ func _ready() -> void:
 	for lv in Campaign.levels():
 		if String(lv.get("id", "")) == id: info = lv
 	var part := int(id.substr(1, 1)); var num := int(id.substr(4, 1))
-	box.add_child(MenuKit.title("Parte %d · Nivel %d" % [part, num], 26, Color(0.75, 0.68, 0.52)))
-	box.add_child(MenuKit.title(String(info.get("name", "")), 46))
+	if id.begins_with("epilogo"):
+		box.add_child(MenuKit.title("Epílogo", 26, Color(0.75, 0.68, 0.52)))
+		box.add_child(MenuKit.title("El que no volvió del todo" if id == "epilogo_locura" else "Lo que vino después", 46))
+	else:
+		box.add_child(MenuKit.title("Parte %d · Nivel %d" % [part, num], 26, Color(0.75, 0.68, 0.52)))
+		box.add_child(MenuKit.title(String(info.get("name", "")), 46))
 	var sep := HSeparator.new()
 	sep.modulate = Color(MenuKit.INK, 0.4)
 	box.add_child(sep)
 	for s in (d as Dictionary)[id]:
-		var l := UiKit.label(String(s), 28, Color(0.90, 0.86, 0.78))
+		var l := UiKit.label(String(s).format(fill), 28, Color(0.90, 0.86, 0.78))
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.modulate.a = 0.0
@@ -104,6 +119,10 @@ func _go() -> void:
 	if _gone: return                                      # una vez (soltar y mantener pueden coincidir)
 	_gone = true
 	set_process(false)
+	if _then_menu:                                      # el epílogo: de ahí, al menú principal
+		TitleScreen.skip_to_menu = Saves.slot >= 0
+		LevelCard.leave(self, func() -> void: get_tree().change_scene_to_file("res://scenes/title.tscn"))
+		return
 	if not is_inside_tree() or get_child_count() == 0:     # sin relato (skip_relato): directo
 		get_tree().change_scene_to_file.call_deferred(GAME)
 		return

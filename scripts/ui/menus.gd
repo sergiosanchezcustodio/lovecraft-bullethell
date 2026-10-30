@@ -188,6 +188,8 @@ class EndScreen extends CanvasLayer:
 	var accent := UiKit.GOLD
 	var report: Control = null                  ## informe al caer (hito 13.1, `FallReport.panel`), a la derecha
 	var diary: Array = []                       ## entradas del diario (hito 13.10): {who, color, title, text}
+	var epilogue := false                       ## al vencer el final de la campaña: «Epílogo», el primero (13.11)
+	signal epilogue_open
 
 	func _init(p_title: String, p_lines: PackedStringArray, p_accent: Color) -> void:
 		title = p_title
@@ -228,12 +230,14 @@ class EndScreen extends CanvasLayer:
 			leave.custom_minimum_size = Vector2(360, 58)
 			leave.size_flags_horizontal = Control.SIZE_SHRINK_CENTER   # no tan ancho como un título largo
 			leave.pressed.connect(func() -> void: quit.emit())
+			var ep := _epilogue_button(box)
 			box.add_child(leave)
 			_diary_button(box, leave)
+			if ep != null: leave = ep
 			if logs_button: box.add_child(_logs_button())   # se cortó: el registro es lo que hay que enviar
 			leave.grab_focus.call_deferred()
 			return
-		var nxt: Button = null
+		var nxt: Button = _epilogue_button(box)
 		if has_next:
 			nxt = MenuKit.button("Siguiente nivel", MenuKit.INK, 28)
 			nxt.custom_minimum_size = Vector2(360, 58)
@@ -260,6 +264,16 @@ class EndScreen extends CanvasLayer:
 		if logs_button: box.add_child(_logs_button())
 		_first = nxt if nxt != null else again
 		_first.grab_focus.call_deferred()
+
+	## «Epílogo» (hito 13.11): después del último nivel, lo que vino después.
+	func _epilogue_button(box: VBoxContainer) -> Button:
+		if not epilogue: return null
+		var b := MenuKit.button("Epílogo", MenuKit.INK, 28)
+		b.custom_minimum_size = Vector2(360, 58)
+		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		b.pressed.connect(func() -> void: epilogue_open.emit())
+		box.add_child(b)
+		return b
 
 	## «Diario del investigador» (hito 13.10): abre las entradas de este nivel encima.
 	func _diary_button(box: VBoxContainer, back: Button) -> void:

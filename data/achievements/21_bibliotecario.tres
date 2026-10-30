@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/PantallasMenus/iconos/ficha_INT.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"bibliotecario"
+display_name = "Bibliotecario"
+description = "Encuentra las quince páginas sueltas."
+order = 21
+stat = "fragments"
+target = 15
+reward_money = 800
+icon = ExtResource("2")

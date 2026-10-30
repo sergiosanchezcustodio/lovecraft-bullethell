@@ -52,6 +52,11 @@ static func number_of(id: String) -> int:
 		if l.id == id: return int(l.number)
 	return 1
 
+## Último nivel de la campaña (el de Cthulhu): tras él, el epílogo (hito 13.11).
+static func last_id() -> String:
+	var all := levels()
+	return String(all.back().id) if not all.is_empty() else ""
+
 ## Primer nivel de una parte (0..2).
 static func first_of(part: int) -> String:
 	for l in levels():

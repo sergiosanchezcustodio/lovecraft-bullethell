@@ -1,0 +1,42 @@
+{
+	"_doc": "Páginas sueltas (hito 13.11, Fragments): una por nivel de la campaña, que brilla en el suelo en uno de varios sitios posibles. Las de cada parte forman un relato, que se lee en la Biblioteca (tomo VIII, «Relatos»). Textos originales, revisables por el autor.",
+	"spots": 6,
+	"stories": [
+		{
+			"id": "gedney",
+			"title": "El cuaderno de Gedney",
+			"intro": "Páginas del cuaderno de Gedney, el estudiante que desapareció del campamento de Lake. Aparecen a lo largo del camino que siguieron quienes se lo llevaron.",
+			"pages": [
+				{"level": "p1_n1", "text": "19 de enero. El profesor Lake ha encontrado fósiles que no deberían existir: más antiguos que cualquier cosa que haya caminado sobre la Tierra. Los perros no dejan de aullar desde que los sacamos del hielo. Esta noche duermo con la lámpara encendida, y no soy el único."},
+				{"level": "p1_n2", "text": "Algo se ha movido en la tienda de disección. Lake dice que es el viento, pero el viento no deja huellas en forma de estrella. Los especímenes ya no están donde los dejamos. Escribo esto escondido entre las cajas; oigo un silbido que se acerca, musical, casi como una pregunta."},
+				{"level": "p1_n3", "text": "No sé cuántos días llevo con ellos. No me han hecho daño: me examinan, me miden y me llevan consigo por los pasos de la cordillera como quien lleva una curiosidad. Hablan entre ellos con silbidos. Creo que discuten sobre mí."},
+				{"level": "p1_n4", "text": "Hoy me han enseñado su ciudad. Es inmensa, y es antigua de un modo que la palabra «antigua» no alcanza. En los muros hay grabados que cuentan su historia: llegaron de las estrellas, construyeron, se sirvieron de unas criaturas que ellos mismos fabricaron… y esas criaturas se rebelaron."},
+				{"level": "p1_n5", "text": "Ya no tienen miedo de mí. Tienen miedo de lo que vive abajo, junto al mar sin luz, donde los túneles bajan y bajan. Lo oigo moverse como un tren en la oscuridad, y grita con voces robadas: «Tekeli-li». Si alguien encuentra estas páginas, que no baje. Que no baje nunca."}
+			]
+		},
+		{
+			"id": "viajante",
+			"title": "Cartas de un viajante",
+			"intro": "Cartas sin enviar de Harold Bishop, viajante de comercio de Arkham, a su mujer. Nunca volvió de Innsmouth.",
+			"pages": [
+				{"level": "p2_n1", "text": "Querida Ruth: el autobús a Innsmouth sale a las diez, y el conductor tiene una cara que no sabría describirte sin asustarte. En Newburyport nadie quiere hablar del pueblo; un viejo del bar se santiguó cuando le dije adónde iba. Venderé mis paños y volveré el jueves. Te quiere, Harold."},
+				{"level": "p2_n2", "text": "Ruth: el pueblo huele a pescado, y a algo más viejo que el pescado. Las calles están casi vacías, y los pocos que veo caminan de un modo raro, como si las piernas no les cupieran en los pantalones. Hay una iglesia que ya no es iglesia: la llaman la Orden de Dagón. Esta noche se canta allí, y el canto no termina."},
+				{"level": "p2_n3", "text": "Escribo deprisa. En el hotel alguien ha probado mi puerta tres veces durante la noche. Oí pasos en el pasillo, demasiados, y un croar bajo, como de ranas grandes. He salido por la ventana. Desde los tejados se ve el arrecife, y en el arrecife hay figuras que se mueven aunque la marea esté alta."},
+				{"level": "p2_n4", "text": "He seguido las vías muertas hacia Rowley. Me han buscado con linternas toda la noche; cuando pasaron junto a mí, entre los juncos, les vi la cara a la luz. Ruth, no eran caras. Lo peor es que uno de ellos me recordó a mi madre."},
+				{"level": "p2_n5", "text": "No sé si esta carta llegará. He vuelto al pueblo, y no sé por qué. He buscado en los archivos de la parroquia el apellido de soltera de mi madre, y he entendido por qué el agua me llama desde que llegué. No me esperes el jueves. Abajo, en Y'ha-nthlei, dicen que no se muere nunca."}
+			]
+		},
+		{
+			"id": "wilcox",
+			"title": "Los sueños de Wilcox",
+			"intro": "Hojas del diario de sueños del escultor Henry Wilcox, de Providence. Aparecen en los lugares con los que soñó sin haber estado nunca en ellos.",
+			"pages": [
+				{"level": "p3_n1", "text": "1 de marzo de 1925. He vuelto a soñar con la ciudad: bloques ciclópeos cubiertos de limo verde, ángulos equivocados y una voz que no es voz. Al despertar tenía barro bajo las uñas, y la arcilla del taller estaba modelada sin que yo la hubiera tocado."},
+				{"level": "p3_n2", "text": "8 de marzo. Esta noche el sueño no era la ciudad, sino un pantano lleno de hogueras. Unos hombres bailaban alrededor de una piedra y, entre las otras palabras, gritaban mi nombre. Nunca he estado en Luisiana. Sé, también, que ellos sí me conocen a mí."},
+				{"level": "p3_n3", "text": "15 de marzo. Un barco, el Alert, con la cubierta resbaladiza de agua y de sangre. Un ídolo en un cofre, envuelto en una bandera que no es de ningún país. En el sueño yo lo sostenía, y estaba caliente, como algo que respira."},
+				{"level": "p3_n4", "text": "22 de marzo. La fiebre no baja. El mar del sueño es negro y se levanta en olas más altas que el campanario. Los marineros rezan; yo no puedo, porque cada vez que abro la boca sale la otra lengua. Me han atado a la cama. Hacen bien."},
+				{"level": "p3_n5", "text": "23 de marzo. La puerta está abierta. Lo he visto salir, y no es como yo lo esculpí: es más grande, y mira. Me mira a mí. Si alguien lee esto, que sepa que el sueño no termina al despertar: solo cambia de lado."}
+			]
+		}
+	]
+}

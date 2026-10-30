@@ -279,6 +279,7 @@ func _unknown_text() -> String:
 		"weapons": return "Nadie la ha empuñado todavía."
 		"items": return "Nadie lo ha llevado todavía."
 		"places": return "Ningún investigador ha estado allí."
+		"stories": return "Esta página sigue perdida en algún lugar. Quizá brille en el suelo la próxima vez que pases por allí."
 	return "Aún no se ha unido a la expedición."
 
 func _image(e: Dictionary) -> Texture2D:

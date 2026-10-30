@@ -373,6 +373,7 @@ func _ready() -> void:
 			hazards.mirror = is_guest()               # en red, los saca el anfitrión (NetGame)
 			add_child(hazards)
 		if level.daily != "": _daily_seed()
+		_spawn_fragment(arena.get_meta("obstacles"))
 		if not args.has("shots") or args.get_bool("card"):   # capturas: sin el rótulo, salvo card=true
 			LevelCard.enter(self, level_id, level.display_name)
 		Music.play(level.music_path())
@@ -942,6 +943,45 @@ func _over_pause(m: CanvasLayer, button: String) -> void:
 func _exit_tree() -> void:
 	HitStop.stop()
 
+## Página suelta del nivel (hito 13.11), si aún no está en el hueco: en uno de sus sitios.
+## Con bots solo si se pide (`fragment_near=true` la pone al lado del J1; `fragments=false`, ninguna).
+func _spawn_fragment(obstacles: ObstacleMap) -> void:
+	if not args.get_bool("fragments", true) or level.endless: return
+	var id := String(level.id)
+	if Fragments.page_of(id).is_empty() or Fragments.has(Saves.current, id): return
+	var human := players.any(func(q: Player) -> bool: return not q.remote and not (q.input is BotInput))
+	if not human and not args.has("fragment_near") and not args.has("fragment_at"): return
+	var spots := Fragments.spots(id, obstacles)
+	if spots.is_empty(): return
+	var pos := spots[_rng.randi() % spots.size()]
+	if args.get_bool("fragment_near"): pos = player.global_position + Vector3(3.0, 0.0, 1.5)
+	if args.has("fragment_at"):                       # fragment_at=x,z (pruebas)
+		var xz := args.get_str("fragment_at").split(",")
+		pos = Vector3(float(xz[0]), 0.0, float(xz[1]))
+	add_child(Fragments.new().setup(world, id, pos))
+	if args.get_bool("log"): print("FRAGMENTO %s en (%.1f, %.1f)" % [id, pos.x, pos.z])
+
+## Epílogo (hito 13.11), tras vencer al final de la campaña: el de siempre o, si algún
+## investigador de este PC acaba con menos del 25 % de cordura, el de quien no vuelve del todo.
+const EPILOGUE_MAD := 0.25
+func _epilogue() -> void:
+	var mad: Player = null
+	for q in players:
+		if q.remote: continue
+		var k := q.sanity / maxf(q.data.max_sanity, 1.0)
+		if k < EPILOGUE_MAD and (mad == null or k < mad.sanity / maxf(mad.data.max_sanity, 1.0)): mad = q
+	var id := "epilogo_locura" if mad != null else "epilogo"
+	var who := mad if mad != null else player
+	if Saves.current != null:
+		Saves.current.mark_seen("epilogues", id)
+		if mad != null: Achievements.add(Saves.current, "epilogue_mad")
+	RelatoScreen.next = {"id": id, "fill": {"nombre": who.data.display_name}, "menu": true}
+	Saves.save()
+	get_tree().paused = false
+	Engine.time_scale = 1.0
+	if net_game != null: Net.close()                     # la campaña ha terminado: se deja la sala
+	get_tree().change_scene_to_file("res://scenes/relato.tscn")
+
 func _quit() -> void:
 	Saves.save()
 	get_tree().paused = false
@@ -1158,6 +1198,8 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 			lines.append(MenuKit.count(net_game.level_marks, "marca") + " en este nivel (F9 o LB+RB)")
 	var s := Menus.EndScreen.new(title, lines, accent)
 	s.diary = _diary(result)
+	s.epilogue = result == "superado" and next_id == "" and level != null and String(level.id) == Campaign.last_id()
+	s.epilogue_open.connect(_epilogue)
 	if not s.diary.is_empty(): Saves.save()                # el diario, ya en el hueco
 	if announcer != null: create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS) 		.tween_property(announcer, "modulate:a", 0.0, 0.3)   # un aviso a medias asomaría por encima
 	if not reports.is_empty() and not args.get_bool("no_report"): s.report = FallReport.panel(reports)

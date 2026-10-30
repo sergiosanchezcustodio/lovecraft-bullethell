@@ -89,5 +89,19 @@
 		"Losas que no cuadran, monolitos torcidos, escaleras que no llevan a ninguna parte.",
 		"Al fondo, una puerta colosal, entreabierta, con un resplandor verde en la rendija.",
 		"Los que yacen con Él empiezan a despertar. La puerta se abre del todo. Él sale."
+	],
+	"epilogo": [
+		"La isla volvió a hundirse antes del amanecer, y el mar cerró la herida como si nunca hubiera existido.",
+		"{nombre} regresó a Arkham en otoño. La Universidad de Miskatonic archivó su informe en una sección que no figura en ningún catálogo.",
+		"Durante años, en las noches de tormenta, los que estuvieron allí soñaron con una puerta entreabierta.",
+		"Pero los sueños se fueron haciendo raros, y el miedo, poco a poco, aprendió a dormir.",
+		"Él sigue soñando, allá abajo. Esta vez, al menos, sueña solo."
+	],
+	"epilogo_locura": [
+		"La isla volvió a hundirse antes del amanecer. {nombre} no quiso apartarse de la borda hasta que el último monolito desapareció bajo el agua.",
+		"Volvió a Arkham, pero no del todo: una parte de {nombre} se quedó junto a aquella puerta.",
+		"En el sanatorio dibuja la misma ciudad una y otra vez, con ángulos que hacen daño a la vista, y sonríe cuando llueve.",
+		"Los médicos anotan que de noche habla en una lengua que nadie le ha enseñado. Las enfermeras dicen que, a veces, algo le responde.",
+		"Él sigue soñando, allá abajo. Y ahora sabe que alguien, aquí arriba, sueña con Él."
 	]
 }

@@ -14,7 +14,9 @@ const TOMES := [
 	{"id": "people", "title": "Investigadores y compañeros", "roman": "V"},
 	{"id": "achievements", "title": "Logros", "roman": "VI"},
 	{"id": "diary", "title": "Diarios", "roman": "VII"},
+	{"id": "stories", "title": "Relatos", "roman": "VIII"},
 ]
+const EPILOGUES := [["epilogo", "Epílogo · Lo que vino después"], ["epilogo_locura", "Epílogo · El que no volvió del todo"]]
 const RESULTS := {"won": "Superado", "lost": "Caído", "endless": "La noche eterna"}
 const TEXTS_PATH := "res://data/library/textos.json"
 const CATEGORY := ["Física", "De fuego", "Mágica"]
@@ -31,6 +33,27 @@ static func text(kind: String, id: String) -> String:
 static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	match tome:
+		"stories":                                     # páginas sueltas y epílogos (hito 13.11)
+			for s: Dictionary in Fragments.stories():
+				var pages: Array = s.pages
+				for i in pages.size():
+					var lv := String(pages[i].level)
+					var facts := [String(s.intro)] if i == 0 else []
+					facts.append("Página %d de %d · %s" % [i + 1, pages.size(), DailyMenu._level_name(lv)])
+					var e := _e(lv, "Página %d" % (i + 1), save != null and (save.unlock_all or Fragments.has(save, lv)),
+						String(pages[i].text), "", "", null, facts, String(s.title))
+					e["title"] = String(s.title)                # en la página, el relato
+					out.append(e)
+			var rel: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json"))
+			for ep: Array in EPILOGUES:
+				var lines: Array = (rel as Dictionary).get(ep[0], []) if rel is Dictionary else []
+				var txt := "
+
+".join(PackedStringArray(lines.map(func(l: String) -> String:
+					var t := l.format({"nombre": "el investigador"}).replace(" de el ", " del ")
+					return t.left(1).to_upper() + t.substr(1))))
+				out.append(_e(String(ep[0]), String(ep[1]), _seen(save, "epilogues", StringName(ep[0])), txt, "", "", null,
+					["Tras vencer a Cthulhu" + (" con menos de un cuarto de la cordura" if ep[0] == "epilogo_locura" else "")], "Epílogos"))
 		"diary":                                       # diarios de los investigadores (hito 13.10)
 			var chars := _list("res://data/characters")
 			chars.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return a.order < b.order)
