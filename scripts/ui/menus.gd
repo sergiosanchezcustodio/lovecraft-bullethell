@@ -187,6 +187,7 @@ class EndScreen extends CanvasLayer:
 	var lines: PackedStringArray = []
 	var accent := UiKit.GOLD
 	var report: Control = null                  ## informe al caer (hito 13.1, `FallReport.panel`), a la derecha
+	var diary: Array = []                       ## entradas del diario (hito 13.10): {who, color, title, text}
 
 	func _init(p_title: String, p_lines: PackedStringArray, p_accent: Color) -> void:
 		title = p_title
@@ -228,6 +229,7 @@ class EndScreen extends CanvasLayer:
 			leave.size_flags_horizontal = Control.SIZE_SHRINK_CENTER   # no tan ancho como un título largo
 			leave.pressed.connect(func() -> void: quit.emit())
 			box.add_child(leave)
+			_diary_button(box, leave)
 			if logs_button: box.add_child(_logs_button())   # se cortó: el registro es lo que hay que enviar
 			leave.grab_focus.call_deferred()
 			return
@@ -254,9 +256,24 @@ class EndScreen extends CanvasLayer:
 		out.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		out.pressed.connect(func() -> void: quit.emit())
 		box.add_child(out)
+		_diary_button(box, out)
 		if logs_button: box.add_child(_logs_button())
 		_first = nxt if nxt != null else again
 		_first.grab_focus.call_deferred()
+
+	## «Diario del investigador» (hito 13.10): abre las entradas de este nivel encima.
+	func _diary_button(box: VBoxContainer, back: Button) -> void:
+		if diary.is_empty(): return
+		var b := MenuKit.button("Diario del investigador" if diary.size() == 1 else "Diarios de los investigadores", MenuKit.INK, 22)
+		b.custom_minimum_size = Vector2(360, 50)
+		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		b.pressed.connect(func() -> void:
+			var page := DiaryPage.new(diary)
+			page.process_mode = Node.PROCESS_MODE_ALWAYS
+			add_child(page)
+			page.tree_exited.connect(func() -> void: if is_inside_tree(): b.grab_focus.call_deferred()))
+		box.add_child(b)
+		if LaunchArgs.from_cmdline().get_bool("diary_open"): b.pressed.emit.call_deferred()   # capturas
 
 	## Vuelve a dar el foco (al cerrar una ventana encima, como la de los pactos).
 	func focus_next() -> void:

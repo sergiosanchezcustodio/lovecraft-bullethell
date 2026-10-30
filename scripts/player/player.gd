@@ -412,6 +412,13 @@ var hud_lie := Vector2(-1, -1)
 ## Objetivo de la reliquia (hito 13.5, `Objective`): quien la lleva anda más despacio.
 var carry_slow := 1.0
 var _hp_seen := 0.0                     ## vida del paso anterior (pacto Sin consuelo)
+## Diario (hito 13.10, `Diary`): vida y cordura perdidas por minuto del nivel, veces que ha
+## caído y quién lo levantó la última vez. `clock` es el reloj del nivel (lo pone game.gd).
+static var clock := 0.0
+var hurt_min := {}
+var downs := 0
+var last_reviver := ""
+var _reviver := ""
 static var bench_immortal := OS.get_cmdline_user_args().has("immortal=true")
 func recv_add(src: String, ph: float, me: float, via := &"otro") -> void:
 	if not received.has(src): received[src] = [0.0, 0.0]
@@ -421,6 +428,8 @@ func recv_add(src: String, ph: float, me: float, via := &"otro") -> void:
 	if not received_via.has(key): received_via[key] = [0.0, 0.0]
 	received_via[key][0] += ph
 	received_via[key][1] += me
+	var m := int(clock / 60.0)
+	hurt_min[m] = float(hurt_min.get(m, 0.0)) + ph + me
 	min_hp = minf(min_hp, health / maxf(data.max_health, 1.0))   # take_damage ya ha restado el golpe
 var min_hp := 1.0                       ## la vida más baja del nivel, en fracción (simulaciones)
 
@@ -455,6 +464,7 @@ func _downed_step(delta: float) -> void:
 		for q in world.players:
 			if q == self or q.health <= 0.0: continue
 			if q.global_position.distance_to(global_position) <= rules.revive_radius:
+				if q.data.revive_speed >= speed: _reviver = q.data.display_name
 				speed = maxf(speed, q.data.revive_speed)
 	if speed > 0.0: revive_progress += delta * speed
 	else: revive_progress = maxf(0.0, revive_progress - delta * 0.5)
@@ -473,6 +483,7 @@ func revive() -> void:
 	motor.locked = false
 	_hurt_time = 0.0
 	if _down_ring: _down_ring.visible = false
+	last_reviver = _reviver
 	revived.emit()
 
 func is_downed() -> bool:

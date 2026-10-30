@@ -564,7 +564,9 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 		Achievements.add(Saves.current, "revives")
 		announce("J%d vuelve a la lucha" % (i + 1), 1.5))
 	q.downed.connect(func() -> void: _someone_fell = true)
-	q.downed.connect(func() -> void: _downs[q.index] = int(_downs.get(q.index, 0)) + 1)
+	q.downed.connect(func() -> void:
+		_downs[q.index] = int(_downs.get(q.index, 0)) + 1
+		q.downs += 1)
 	q.eliminated.connect(func() -> void:
 		announce("J%d, eliminado hasta el siguiente nivel" % (i + 1), 2.0)
 		_check_all_down())
@@ -1048,6 +1050,20 @@ func _game_over() -> void:
 	if level != null and level.endless: title = "Partida del día" if level.daily != "" else "La noche eterna"
 	_end_screen(title, Color(0.86, 0.22, 0.18), "", "caida")
 
+## Diario del investigador (hito 13.10): una entrada por jugador de este PC; se guarda en su
+## diario si juega una persona (con `diary_save=true`, también los bots: pruebas).
+func _diary(result: String) -> Array:
+	var out: Array = []
+	if director == null or level == null or result == "": return out
+	var res := "endless" if level.endless and result == "caida" else ("won" if result == "superado" else "lost")
+	for q in players:
+		if q.remote: continue
+		var f := Diary.facts_of(q, world, level, res, director.time)
+		var e := Diary.compose(f, hash("%s|%s|%d|%d" % [f.date, f.level, q.index, director.killed_total]))
+		if not (q.input is BotInput) or args.get_bool("diary_save"): Diary.add(Saves.current, String(q.data.id), f, e)
+		out.append({"who": "J%d · %s" % [q.index + 1, q.data.display_name], "color": q.color, "title": e.title, "text": e.text})
+	return out
+
 ## Partida del día (hito 13.9): el azar de la partida sale de la fecha (oleadas, baúles,
 ## peligros, subidas y atributos), igual para todos. Lo que depende del ritmo de cada uno
 ## (quién aparece dónde respecto al jugador) cambia de una partida a otra.
@@ -1141,6 +1157,8 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 		if net_game.level_marks > 0:                   # para comentarlas antes de seguir
 			lines.append(MenuKit.count(net_game.level_marks, "marca") + " en este nivel (F9 o LB+RB)")
 	var s := Menus.EndScreen.new(title, lines, accent)
+	s.diary = _diary(result)
+	if not s.diary.is_empty(): Saves.save()                # el diario, ya en el hueco
 	if announcer != null: create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS) 		.tween_property(announcer, "modulate:a", 0.0, 0.3)   # un aviso a medias asomaría por encima
 	if not reports.is_empty() and not args.get_bool("no_report"): s.report = FallReport.panel(reports)
 	# al registro de dificultad, solo si juega alguna persona en este PC (los bots y las simulaciones
@@ -1505,6 +1523,7 @@ func _record_seen(save: SaveData) -> void:
 		save.mark_seen("enemies", String(e.data.id))
 
 func _process(delta: float) -> void:
+	if director != null: Player.clock = director.time   # el minuto de cada golpe, para el diario (13.10)
 	var t0 := Prof.start()
 	_process_step(delta)
 	Prof.stop("partida", t0)

@@ -13,7 +13,9 @@ const TOMES := [
 	{"id": "places", "title": "Lugares", "roman": "IV"},
 	{"id": "people", "title": "Investigadores y compañeros", "roman": "V"},
 	{"id": "achievements", "title": "Logros", "roman": "VI"},
+	{"id": "diary", "title": "Diarios", "roman": "VII"},
 ]
+const RESULTS := {"won": "Superado", "lost": "Caído", "endless": "La noche eterna"}
 const TEXTS_PATH := "res://data/library/textos.json"
 const CATEGORY := ["Física", "De fuego", "Mágica"]
 
@@ -29,6 +31,15 @@ static func text(kind: String, id: String) -> String:
 static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	match tome:
+		"diary":                                       # diarios de los investigadores (hito 13.10)
+			var chars := _list("res://data/characters")
+			chars.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return a.order < b.order)
+			for c: CharacterData in chars:
+				for d: Dictionary in Diary.entries(save, String(c.id)):
+					var e := _e(String(c.id), Diary.short_title(d), true, String(d.get("text", "")), "", "", null,
+						[String(RESULTS.get(String(d.get("result", "")), ""))], c.display_name)
+					e["title"] = String(d.get("title", ""))     # en la página, el título entero
+					out.append(e)
 		"enemies":
 			for e: EnemyData in _list("res://data/enemies"):
 				var facts := ["Escalón %d%s" % [e.tier, " · élite" if e.elite else ""], "Vida %d" % int(e.max_health),

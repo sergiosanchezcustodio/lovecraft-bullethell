@@ -1,0 +1,70 @@
+{
+	"_doc": "Diario del investigador (hito 13.10, Diary). Una entrada al terminar cada nivel, en primera persona, con frases elegidas de estas listas y rellenas con lo que pasó. Huecos: {min} (el peor minuto), {criatura}, {levanto} (quién te levantó), {veces} (cuántas caíste), {arma}, {bajas}, {tiempo} (aguantado, sin fin) y {o} (o/a según el investigador). 'years': año de la historia de cada parte; el día y el mes son los del PC. 'female': investigadoras.",
+	"years": {"1": 1931, "2": 1927, "3": 1926},
+	"female": ["peaslee", "varga", "whipple", "blake", "malone"],
+	"open": {
+		"won": [
+			"He salido con vida. No sé muy bien cómo, ni si todo lo que traigo conmigo es mío.",
+			"Lo hemos conseguido, al menos por esta vez. Escribo a la luz del farol, con los dedos entumecidos, para no olvidar nada; aunque quizá sería mejor olvidarlo todo.",
+			"Cuando por fin cesó el ruido me quedé un largo rato quiet{o}, escuchando. Nada respondió. Seguimos adelante.",
+			"Otra jornada superada. Me digo que cada paso nos acerca al final; no me atrevo a preguntarme al final de qué."
+		],
+		"lost": [
+			"Escribo esto más tarde, y con otra letra, porque la mía no se reconoce. Allí caí.",
+			"No llegué al final. Recuerdo el frío del suelo y unas formas que se inclinaban sobre mí; lo demás me lo han contado.",
+			"Fracasamos. Lo apunto sin adornos, como haría un buen científico: fracasamos, y aquello sigue allí.",
+			"Me sacaron de allí a rastras. Lo que dejé atrás sigue esperando, y sé que tendré que volver."
+		],
+		"endless": [
+			"Perdí la cuenta de las horas. La noche no terminaba, y ellos tampoco. Resistí {tiempo} antes de que la oscuridad me alcanzara.",
+			"Aguanté {tiempo}. Tengo la certeza de que seguían llegando cuando yo ya no podía verlos.",
+			"Dicen que resistí {tiempo}. A mí me pareció una sola noche, larguísima, que todavía no ha terminado."
+		]
+	},
+	"worst": {
+		"some": [
+			"Lo peor llegó hacia el minuto {min}: en muy poco tiempo perdí más sangre de la que nadie debería perder.",
+			"El minuto {min} lo recordaré siempre. Me llovían golpes de todas partes y no veía de dónde.",
+			"Hubo un momento, hacia el minuto {min}, en que creí que todo había terminado."
+		],
+		"none": [
+			"Apenas me rozaron, y eso me inquieta más que una herida: como si me dejaran para después.",
+			"Salí casi sin un rasguño. No me atrevo a llamarlo suerte."
+		]
+	},
+	"creature": [
+		"La herida más honda me la hizo eso que en la Biblioteca llaman «{criatura}».",
+		"De todo lo que me atacó, nada me hizo tanto daño como «{criatura}». Todavía noto su rastro en la piel.",
+		"Apunto el nombre para que otros estén avisados: «{criatura}». Fue lo que más me hirió."
+	],
+	"fall": {
+		"revived": [
+			"Caí {veces}, y fue {levanto} quien me levantó del suelo. Le debo la vida, y se lo he dicho.",
+			"Caí {veces}. Recuerdo la mano de {levanto} tirando de mí cuando ya no me quedaban fuerzas."
+		],
+		"alone": [
+			"Caí y nadie llegó a tiempo. No se lo reprocho: también ellos luchaban por su vida.",
+			"Caí, y desde el suelo vi a los demás seguir luchando sin mí. Es una imagen que no se borra."
+		]
+	},
+	"weapon": [
+		"Lo que más me sirvió fue {arma}. Conté {bajas} criaturas abatidas antes de perder la cuenta.",
+		"{arma}: no me falló ni una vez. {bajas} de esas cosas no volverán a levantarse.",
+		"Sin {arma} no estaría escribiendo esto."
+	],
+	"sanity": {
+		"high": [
+			"Tengo la cabeza clara. Me pregunto cuánto me durará.",
+			"Duermo mal, pero duermo. Es más de lo que pueden decir otros."
+		],
+		"mid": [
+			"Hay sonidos que me siguen cuando cierro los ojos. Un silbido, sobre todo.",
+			"Me sorprendo contando las sombras de la habitación, por si alguna sobra."
+		],
+		"low": [
+			"No estoy bien. Las palabras de esta página se mueven si las miro demasiado tiempo.",
+			"Algo me habló desde la oscuridad, y lo peor es que entendí lo que decía.",
+			"Escribo deprisa, antes de que vuelva. No sé qué es lo que vuelve."
+		]
+	}
+}

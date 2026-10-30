@@ -166,6 +166,7 @@ func _show_tome_cover(i: int) -> void:
 	_right.add_child(t)
 	_right.add_child(_rule())
 	var c := _ink("%s de %s" % [n.x, n.y] + (" conseguidos" if tome.id == "achievements" else " descubiertos"), 28, INK_DIM)
+	if tome.id == "diary": c.text = MenuKit.count(n.x, "entrada") if n.x > 0 else "Aún no hay nada escrito"
 	c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_right.add_child(c)
 	var bar := UiKit.Bar.new(RED_INK, 420, 10)
@@ -251,7 +252,7 @@ func _show_entry(k: int) -> void:
 		var gap := Control.new()
 		gap.custom_minimum_size.y = 40
 		_right.add_child(gap)
-	var n := _ink(String(e.name) if known else "???", 40, INK, true)
+	var n := _ink(String(e.get("title", e.name)) if known else "???", 40, INK, true)
 	n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	n.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_right.add_child(n)
