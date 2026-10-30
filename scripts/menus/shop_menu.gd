@@ -6,6 +6,7 @@ extends Control
 ## momento. Detrás, la tienda de antigüedades con el anciano (ShopBackdrop).
 ## Vestuario (fase 14): una sección por hueco (izquierda/derecha), iconos dibujados de antemano
 ## (tools/iconos_vestuario.gd) y, a la izquierda, el probador (OutfitFitting) con la prenda marcada.
+## La última sección, Conjuntos (14.8), compra de una vez lo que falta de cada uno, con descuento.
 
 signal closed
 
@@ -18,7 +19,8 @@ var _note: Label
 var _first: Control
 var _focus_id := ""                          ## artículo a enfocar al redibujar (tras comprar)
 const OUTFIT_TAB := int(ShopItem.Section.OUTFIT)
-var _sub := 0                                ## sección del vestuario (OutfitData.Slot)
+var _sub := 0                                ## sección del vestuario (OutfitData.Slot, o SETS_SUB)
+const SETS_SUB := 6                          ## la sección de los conjuntos, tras los seis huecos
 var _subs: HBoxContainer
 var _sub_btns: Array[Button] = []
 var _fitting: OutfitFitting
@@ -51,11 +53,11 @@ func _ready() -> void:
 		_tabs.append(b)
 	_subs = HBoxContainer.new()                               # secciones del vestuario
 	_subs.alignment = BoxContainer.ALIGNMENT_CENTER
-	_subs.add_theme_constant_override("separation", 6)
+	_subs.add_theme_constant_override("separation", 4)
 	box.add_child(_subs)
-	for k in OutfitData.SECTION_NAMES.size():
-		var b := MenuKit.button("", UiKit.GOLD, 16)
-		b.custom_minimum_size = Vector2(128, 38)
+	for k in OutfitData.SECTION_NAMES.size() + 1:              # y Conjuntos
+		var b := MenuKit.button("", UiKit.GOLD, 15)
+		b.custom_minimum_size = Vector2(0, 38)
 		b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(func() -> void: _show_sub(k))
 		_subs.add_child(b)
@@ -115,16 +117,28 @@ func _show_tab(i: int) -> void:
 	if outfits:
 		var counts := {}
 		for e in entries: counts[int(e.outfit.slot)] = int(counts.get(int(e.outfit.slot), 0)) + 1
+		var sets_done := 0
+		for s: Dictionary in OutfitSets.all():
+			if OutfitSets.is_complete(save, s): sets_done += 1
 		for k in _sub_btns.size():
 			var mine := 0
 			for e in entries:
 				if int(e.outfit.slot) == k and Shop.is_maxed(save, e): mine += 1
-			_sub_btns[k].text = "%s  %d/%d" % [OutfitData.SECTION_NAMES[k], mine, int(counts.get(k, 0))]
-			_sub_btns[k].visible = counts.has(k)
+			if k == SETS_SUB:
+				_sub_btns[k].text = "Conjuntos %d/%d" % [sets_done, OutfitSets.all().size()]
+			else:
+				_sub_btns[k].text = "%s %d/%d" % [OutfitData.SECTION_NAMES[k], mine, int(counts.get(k, 0))]
+			_sub_btns[k].visible = counts.has(k) or (k == SETS_SUB and not OutfitSets.all().is_empty())
 			_sub_btns[k].add_theme_color_override("font_color", UiKit.GOLD if k == _sub else UiKit.TEXT_DIM)
 			_sub_btns[k].add_theme_stylebox_override("normal", MenuKit.box(Color(0.16, 0.1, 0.05, 0.9) if k == _sub else Color(0.04, 0.03, 0.025, 0.6),
 				Color(MenuKit.BRASS, 0.85 if k == _sub else 0.25), 1))
 		entries = entries.filter(func(e: Shop.Entry) -> bool: return int(e.outfit.slot) == _sub)
+		if _sub == SETS_SUB:
+			for s: Dictionary in OutfitSets.all():
+				var srow := _set_row(s)
+				rows.append(srow)
+				if _first == null: _first = srow
+				if "set:" + String(s.id) == _focus_id: focus = srow
 	for e in entries:
 		var row := _row(e)
 		rows.append(row)
@@ -208,6 +222,82 @@ func _row(e: Shop.Entry) -> Button:
 	b.pressed.connect(_try_buy.bind(e))
 	_list.add_child(b)
 	return b
+
+## Fila de un conjunto (14.8): nombre, las prendas (las que faltan, en claro), iconos de cada una
+## y lo que cuesta lo que falta. Marcada, el probador lo enseña entero.
+func _set_row(s: Dictionary) -> Button:
+	var done := OutfitSets.is_complete(save, s)
+	var price := OutfitSets.price(save, s)
+	var b := MenuKit.button("", UiKit.GOLD, 22)
+	b.custom_minimum_size = Vector2(810, 96)
+	var h := HBoxContainer.new()
+	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	h.offset_left = 16; h.offset_right = -16; h.offset_top = 8; h.offset_bottom = -8
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	h.add_theme_constant_override("separation", 14)
+	b.add_child(h)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_theme_constant_override("separation", 2)
+	h.add_child(col)
+	col.add_child(UiKit.label(String(s.name), 22, UiKit.TEXT))
+	var pics := HBoxContainer.new()                           # una imagen por prenda; las que faltan, apagadas
+	pics.add_theme_constant_override("separation", 4)
+	pics.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(pics)
+	var missing := OutfitSets.missing(save, s)
+	var names := PackedStringArray()
+	for k: String in s.pieces:
+		var o := OutfitData.find(String(s.pieces[k]))
+		if o == null: continue
+		names.append(o.display_name)
+		var pic := TextureRect.new()
+		pic.texture = o.icon()
+		pic.custom_minimum_size = Vector2(40, 40)
+		pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if missing.has(String(o.id)): pic.modulate = Color(1, 1, 1, 0.35)
+		pics.add_child(pic)
+	var d := UiKit.label(", ".join(names), 14, UiKit.TEXT_DIM)
+	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	d.custom_minimum_size.x = 520
+	col.add_child(d)
+	d.resized.connect(func() -> void: b.custom_minimum_size.y = maxf(96.0, col.get_combined_minimum_size().y + 20.0))
+	var tag := "Completo"
+	var color := Color(0.45, 0.9, 0.35)
+	if not done:
+		tag = "%s $" % MenuKit.money(price)
+		color = UiKit.GOLD if OutfitSets.can_buy(save, s) else UiKit.TEXT_DIM
+	var t := UiKit.label(tag, 24, color)
+	t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	t.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	h.add_child(t)
+	var worn := OutfitSets.as_worn(s)
+	b.focus_entered.connect(func() -> void: _fitting.show_worn(worn))
+	b.pressed.connect(_try_buy_set.bind(s))
+	_list.add_child(b)
+	return b
+
+func _try_buy_set(s: Dictionary) -> void:
+	_focus_id = "set:" + String(s.id)
+	if OutfitSets.is_complete(save, s):
+		_say("Ya tienes todo el conjunto.")
+		return
+	var price := OutfitSets.price(save, s)
+	if not OutfitSets.can_buy(save, s):
+		_say("Te faltan %s $." % MenuKit.money(price - save.money))
+		return
+	var n := OutfitSets.missing(save, s).size()
+	var c := MenuKit.Confirm.new("¿Comprar %s (%d %s) por %s $?" % [String(s.name), n, "prenda" if n == 1 else "prendas", MenuKit.money(price)],
+		"Comprar", "Cancelar", UiKit.GOLD)
+	add_child(c)
+	c.answered.connect(func(yes: bool) -> void:
+		if yes and OutfitSets.buy(save, s):
+			Saves.save()
+			_say("Comprado: %s." % String(s.name))
+		_show_tab(_tab))
 
 ## Imagen de un artículo: la dibujada o, si no hay, su modelo renderizado (una vez).
 var _icons := {}

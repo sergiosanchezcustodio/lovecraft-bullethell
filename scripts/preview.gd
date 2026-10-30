@@ -159,6 +159,7 @@ func _floor(center: Vector3, size: float) -> void:
 func _process(_delta: float) -> void:
 	frame += 1
 	var fname := spec.replace(",", "-").replace("+", "_")
+	if fname.length() > 100: fname = fname.left(60) + "_" + fname.md5_text().left(8)   # muchas prendas: Windows no guarda nombres tan largos
 	if mode == "anim":
 		var t := (frame - 5) / float(nframes)
 		for i in models.size():

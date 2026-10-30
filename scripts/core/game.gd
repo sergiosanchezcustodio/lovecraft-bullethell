@@ -141,6 +141,7 @@ func _ready() -> void:
 	for o_id in args.get_str("outfit").split(",", false):
 		var o := OutfitData.find(o_id)
 		if o != null: OutfitData.override[OutfitData.KEYS[o.slot]] = o_id
+		else: OutfitData.override.merge(OutfitSets.as_worn(OutfitSets.find(o_id)), true)   # o un conjunto entero (14.8)
 	var env := Atmosphere.make_environment()
 	# Los volúmenes de niebla solo existen en Forward+ (Compatibility da error)
 	var fogvol := args.get_bool("fogvol", bool(Quality.value("fogvol", true))) and RenderingServer.get_current_rendering_method() != "gl_compatibility"
@@ -1238,6 +1239,10 @@ func _on_level_completed() -> void:
 	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))
 	Pacts.record_win(Saves.current, String(level.id), Pacts.active())   # sellos del mapa y logros (13.6)
+	for q in players:                                # «De punta en blanco» (14.8): alguien de este PC con un conjunto entero
+		if not q.remote and not (q.input is BotInput) and q.outfit_set != "":
+			Achievements.add(Saves.current, "set_levels")
+			break
 	_check_achievements.call_deferred()              # después de contar la baja del enemigo final (élite)
 	Saves.save()
 	announce("Nivel superado", 2.0)

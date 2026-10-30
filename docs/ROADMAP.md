@@ -29,7 +29,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 11 | Calidad gráfica, animación y efectos | **Hecha** (28-10-2026) salvo tu revisión | Ninguna |
 | 12 | Detalles de personajes, enemigos, compañeros y escenarios | **Hecha** (29-10-2026) salvo tu revisión | Ninguna (D-41, resuelta) |
 | 13 | Calibración, modos de juego, narrativa, sonido, herramientas y distribución | **Hecha (30-10-2026)**, pendiente de tu revisión: los 17 hitos; la subida de la demo y el tráiler a itch.io, con tu cuenta | Las de cada hito (al final de la fase) |
-| 14 | Vestuario ampliado y tienda de ropa | **En curso** (30-10-2026): pedida por el autor («haz todas») | Ninguna |
+| 14 | Vestuario ampliado y tienda de ropa | **Hecha** (30-10-2026), pendiente de revisión del autor | Ninguna |
 
 ---
 
@@ -403,4 +403,4 @@ Pedida por el autor el 30-10-2026: las 55 prendas propuestas («haz todas») y u
 | 14.5 | **Pies (8):** botas de agua, zapatos bicolores, sandalias con calcetines, botas de montar, raquetas de nieve, zapatillas de casa, botas de buzo y pies descalzos de Innsmouth | Igual **Hecho (30-10-2026).** |
 | 14.6 | **Complementos (15):** monóculo, pipa (con humo de vez en cuando), collar del Signo Primigenio, bolsa de cartero, canana, antifaz, máscara de gas, máscara de médico de la peste, vendas y parche, clavel, pañuelo de vaquero, estetoscopio, cámara de fuelle, rosario y ojos de Innsmouth | Igual; el humo de la pipa, `OutfitData.fx` **Hecho (30-10-2026).** |
 | 14.7 | **Manos y espalda (8):** guantes de cuero, de boxeo y manoplas; bastón, paraguas abierto y linterna eléctrica en la mano; mochila de expedición y tentáculo a la espalda | Igual, con los huecos del 14.1 **Hecho (30-10-2026).** |
-| 14.8 | **Conjuntos:** grupos con nombre (Cultista, Expedición Lake, Buzo, Gánster, Innsmouth, Médico de la peste…) que, puestos enteros, dan un rótulo en la ficha y un logro; en la tienda, la sección Conjuntos compra lo que falta con descuento | `data/outfit_sets.json`, `OutfitSets`; logro «De punta en blanco» |
+| 14.8 | **Conjuntos:** grupos con nombre (Cultista, Expedición Lake, Buzo, Gánster, Innsmouth, Médico de la peste…) que, puestos enteros, dan un rótulo en la ficha y un logro; en la tienda, la sección Conjuntos compra lo que falta con descuento | `data/outfit_sets.json`, `OutfitSets`; logro «De punta en blanco» **Hecho (30-10-2026).** |

@@ -202,6 +202,7 @@ func _ready() -> void:
 	var worn := OutfitData.worn_for(String(data.id))
 	OutfitData.apply(model, data.model, worn)        # vestuario (D-34)
 	_hold = OutfitData.hold_of(worn)                 # paraguas, linterna (fase 14)
+	outfit_set = OutfitSets.worn_name(worn)          # conjunto entero puesto (14.8)
 	_face = FaceLook.new().setup(model, VoxelBuilder.variant_path("res://models/%s.json" % data.model))
 	add_child(_face)
 	_set_vis_layer(model)
@@ -692,6 +693,8 @@ func _animate(delta: float) -> void:
 ## antebrazo, en radianes) mientras no lanza, esquiva o hace un gesto; vuelve poco a poco.
 var _hold := ""
 var _hold_w := 0.0
+## Nombre del conjunto del vestuario que lleva entero ("" si ninguno; hito 14.8).
+var outfit_set := ""
 func _hold_step(delta: float) -> void:
 	if not OutfitData.HOLDS.has(_hold): return
 	_hold_w = move_toward(_hold_w, 1.0 if _action == "" and _override == "" and _fidget == "" else 0.0, delta * 6.0)

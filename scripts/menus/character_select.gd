@@ -534,6 +534,7 @@ class _Frame extends Control:
 	var _cursor := -1                         ## icono marcado con el mando (-1: ninguno)
 	var _outfit: PanelContainer                ## vestuario (D-34)
 	var _outfit_rows: Array[Label] = []
+	var _outfit_title: Label                   ## «Vestuario» o el conjunto entero que lleva (14.8)
 	var _sheet_title: Label
 	var _sheet_cols: Control
 	var _passive: Label
@@ -638,7 +639,10 @@ class _Frame extends Control:
 		ob.alignment = BoxContainer.ALIGNMENT_CENTER
 		ob.add_theme_constant_override("separation", 1)
 		_outfit.add_child(ob)
-		ob.add_child(MenuKit.title("Vestuario", 22, UiKit.GOLD))
+		_outfit_title = MenuKit.title("Vestuario", 22, UiKit.GOLD)
+		_outfit_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		_outfit_title.custom_minimum_size.x = FRAME.x - 60
+		ob.add_child(_outfit_title)
 		for k in OutfitData.KEYS.size():
 			var row := VBoxContainer.new()
 			row.add_theme_constant_override("separation", -3)
@@ -899,6 +903,8 @@ class _Frame extends Control:
 		_sheet_title.visible = not _outfit.visible
 		_sheet_cols.visible = not _outfit.visible
 		if not _outfit.visible: return
+		var set_name := OutfitSets.worn_name(seat.worn)          # conjunto entero (14.8)
+		_outfit_title.text = "Vestuario" if set_name == "" else "Conjunto: " + set_name
 		for k in OutfitData.KEYS.size():
 			var id := String(seat.worn.get(SelectState.OUTFIT_KEYS[k], ""))
 			var o := OutfitData.find(id) if id != "" else null
