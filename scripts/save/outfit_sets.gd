@@ -51,6 +51,14 @@ static func buy(save: SaveData, s: Dictionary) -> bool:
 	for id in missing(save, s): save.outfits.append(id)
 	return true
 
+## Nombres de los conjuntos a los que solo les falta esta prenda.
+static func completes(save: SaveData, outfit_id: String) -> Array[String]:
+	var out: Array[String] = []
+	for s: Dictionary in all():
+		var m := missing(save, s)
+		if m.size() == 1 and m[0] == outfit_id: out.append(String(s.name))
+	return out
+
 ## Conjunto que se lleva entero ({} si ninguno). Si hay varios, el de más prendas.
 static func worn_set(worn: Dictionary) -> Dictionary:
 	var best := {}

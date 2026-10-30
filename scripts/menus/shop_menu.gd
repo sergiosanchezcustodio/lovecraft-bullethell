@@ -201,6 +201,10 @@ func _row(e: Shop.Entry) -> Button:
 	# con tres líneas de descripción no cabe en 92 px: la fila crece con lo que lleva
 	d.resized.connect(func() -> void:
 		b.custom_minimum_size.y = maxf(76.0 if compact else 92.0, col.get_combined_minimum_size().y + 28.0))
+	if compact and not maxed:                                 # la que completa un conjunto (14.8)
+		var sets := OutfitSets.completes(save, String(e.outfit.id))
+		if not sets.is_empty():
+			col.add_child(UiKit.label("Completa el conjunto «%s»" % "», «".join(sets), 15, UiKit.GOLD))
 	if compact:
 		var slot_key: String = OutfitData.KEYS[int(e.outfit.slot)]
 		b.focus_entered.connect(func() -> void: _fitting.show_worn({slot_key: String(e.outfit.id)}))
@@ -264,6 +268,8 @@ func _set_row(s: Dictionary) -> Button:
 	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	d.custom_minimum_size.x = 520
 	col.add_child(d)
+	if missing.size() == 1:
+		col.add_child(UiKit.label("Solo te falta una prenda", 15, UiKit.GOLD))
 	d.resized.connect(func() -> void: b.custom_minimum_size.y = maxf(96.0, col.get_combined_minimum_size().y + 20.0))
 	var tag := "Completo"
 	var color := Color(0.45, 0.9, 0.35)

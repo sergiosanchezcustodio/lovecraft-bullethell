@@ -59,10 +59,11 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 			all.sort_custom(func(a: OutfitData, b: OutfitData) -> bool: return a.slot < b.slot or (a.slot == b.slot and a.order < b.order))
 			for o in all:
 				var mine := save != null and (save.unlock_all or save.has_outfit(String(o.id)))
-				var e := _e(String(o.id), o.display_name, true, o.description, "", "", o.icon(),
+				var e := _e(String(o.id), o.display_name, true, o.description, o.icon_char, "full", null,
 					["%s · %s $" % [OutfitData.SECTION_NAMES[o.slot], MenuKit.money(o.price)], "Tuya" if mine else "En la tienda"],
 					"Prendas · " + OutfitData.SECTION_NAMES[o.slot])
 				e["dim"] = not mine
+				e["worn"] = {OutfitData.KEYS[o.slot]: String(o.id)}       # puesta en un investigador
 				out.append(e)
 		"stories":                                     # páginas sueltas y epílogos (hito 13.11)
 			for s: Dictionary in Fragments.stories():

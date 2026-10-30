@@ -193,3 +193,6 @@ Sacadas de `CLAUDE.md` el 17-10-2026. Léelas antes de tocar generadores de mode
 - Con fotogramas PNG, Godot tarda medio segundo en guardar cada uno a 1080p (unos 1,5 fps grabando): 17 s de partida, 11 minutos. Con AVI (MJPEG, `editor/movie_writer/mjpeg_quality=0.95` en project.godot) graba 7 veces más deprisa y el sonido va dentro. Para cortar un trozo exacto, `select=gte(n\,N)` por fotogramas, no `-ss`.
 - El destello blanco de golpe (`material_overlay` translúcido sin sombreado) se ve como una radiografía en los modelos grandes: se suman las caras de dentro y, con golpes seguidos, un jefe se queda casi blanco aunque el destello tenga un 20 % de opacidad. Para encontrarlo sirvió cruzar el número de fotograma del vídeo con lo que imprimía el enemigo en ese fotograma.
 
+## Partículas colgadas del modelo del jugador (30-10-2026)
+
+Un `GPUParticles3D` con `local_coords = false` colgado de una parte del modelo del jugador (que está dentro del `Visual` con `top_level` y sin interpolación) solo enseñaba la partícula más nueva: el humo de la pipa se veía en el visor y no en la partida. Con `local_coords = true` salen todas, y siguen a la cabeza. Tampoco hay que asignar `emitting = true` en cada fotograma: con el emisor ya encendido, la emisión vuelve a empezar y apenas sale nada. Asígnalo solo cuando cambie.

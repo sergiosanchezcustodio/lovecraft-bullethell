@@ -162,6 +162,7 @@ static func _graft(root: Node3D, src: Node3D) -> Node3D:
 	return n
 
 ## Puntos sin voxels de una prenda (fase 14): "smoke_*" echa humo de pipa desde la cabeza;
+## "bubbles", burbujas del casco de buzo (apagadas: las enciende Player al vadear);
 ## "beam" y "beam_to", la luz de la linterna desde el antebrazo derecho, en esa dirección (no en
 ## la calidad Baja: `torch_light` en data/quality.json).
 static func _marks(g: Node3D, nodes: Dictionary) -> void:
@@ -187,13 +188,17 @@ static func _marks(g: Node3D, nodes: Dictionary) -> void:
 		spot.basis = Basis.looking_at(dir, Vector3.UP if absf(dir.y) < 0.95 else Vector3.BACK)
 		(nodes["fore_r"] as Node3D).add_child(spot)
 	for k: String in piv:
-		if not k.begins_with("smoke") or not nodes.has("head") or not piv.has("head"): continue
+		if not (k.begins_with("smoke") or k == "bubbles") or not nodes.has("head") or not piv.has("head"): continue
 		var head: Node3D = nodes["head"]
 		if head.has_node(k): continue
 		var pv: Array = piv[k]
 		var hp: Array = piv["head"]
-		var e := VoxelFx.emitter("pipe", 0.05)
+		var e := VoxelFx.emitter("pipe" if k != "bubbles" else "bubbles", 0.05)
 		e.name = k
+		# en el mundo (local_coords false, lo de VoxelFx) solo se veía la última partícula colgando
+		# del Visual del jugador; en coordenadas de la cabeza salen todas (y la siguen al andar)
+		e.local_coords = true
+		if k == "bubbles": e.emitting = false
 		e.position = (Vector3(pv[0], pv[1], pv[2]) - Vector3(hp[0], hp[1], hp[2])) * vs
 		head.add_child(e)
 

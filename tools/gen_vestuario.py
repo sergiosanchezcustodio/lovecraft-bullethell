@@ -785,6 +785,7 @@ def casco_buzo(M, bd):
     for (x, y, z), v in M.V.items():
         if v[0] == T and v[1] == BRASS and y == 55 and x % 4 == 0: v[1] = BOLT
         if v[0] == H and v[1] == COPPER and (y + x) % 9 == 0: v[1] = COPPER_SH
+    M.marks = {'bubbles': [0, 95, -1]}                                  # de la válvula salen burbujas al vadear
     return {}
 
 

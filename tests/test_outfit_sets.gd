@@ -49,3 +49,10 @@ func test_el_conjunto_puesto() -> void:
 	assert_eq(OutfitSets.worn_name(worn), "Buzo")
 	worn.erase("feet")
 	assert_eq(OutfitSets.worn_name(worn), "")
+
+func test_la_prenda_que_completa_un_conjunto() -> void:
+	var sv := _save(0)
+	sv.outfits.append_array(["casco_buzo", "traje_buzo"])
+	assert_has(OutfitSets.completes(sv, "botas_buzo"), "Buzo")
+	assert_does_not_have(OutfitSets.completes(sv, "casco_buzo"), "Buzo", "ya la tiene")
+	assert_does_not_have(OutfitSets.completes(sv, "fez"), "Buzo")

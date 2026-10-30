@@ -245,7 +245,8 @@ func _show_entry(k: int) -> void:
 		img.custom_minimum_size = Vector2(IMAGE_PX, IMAGE_PX)
 		img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		if not known or e.get("dim", false): img.modulate = Color(0.12, 0.08, 0.05, 0.85)     # silueta
+		if not known: img.modulate = Color(0.12, 0.08, 0.05, 0.85)     # silueta
+		elif e.get("dim", false): img.modulate = Color(0.62, 0.56, 0.5, 0.7)   # vestuario que aún no tienes: desvaído
 		frame.add_child(img)
 		_right.add_child(frame)
 	else:

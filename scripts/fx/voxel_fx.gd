@@ -189,6 +189,20 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_curve = _curve([[0.0, 0.35], [0.4, 0.8], [1.0, 1.6]])
 			m.color_ramp = _ramp([[0.0, Color(0.16, 0.15, 0.15, 0.0)], [0.08, Color(0.17, 0.16, 0.16, 0.75)],
 				[0.5, Color(0.22, 0.22, 0.23, 0.45)], [1.0, Color(0.28, 0.29, 0.30, 0.0)]])
+		"bubbles":                # burbujas del casco de buzo (vestuario, fase 14): suben deprisa y se apagan
+			p.draw_pass_1 = cube("mix")
+			p.amount = 10
+			p.lifetime = 1.2
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 1.2
+			m.spread = 35.0
+			m.initial_velocity_min = 0.25; m.initial_velocity_max = 0.45
+			m.gravity = Vector3(0.0, 0.35, 0.0)
+			m.damping_min = 0.1; m.damping_max = 0.3
+			m.scale_min = r * 0.5; m.scale_max = r * 0.9
+			m.scale_curve = _curve([[0.0, 0.5], [0.3, 1.0], [1.0, 1.1]])
+			m.color_ramp = _ramp([[0.0, Color(0.75, 0.92, 0.98, 0.0)], [0.1, Color(0.80, 0.94, 1.0, 0.7)],
+				[0.8, Color(0.85, 0.96, 1.0, 0.45)], [1.0, Color(0.9, 0.98, 1.0, 0.0)]])
 		"pipe":                   # humo de pipa (vestuario, fase 14): bocanadas finas que se quedan atrás
 			p.draw_pass_1 = cube("mix")
 			p.amount = 7

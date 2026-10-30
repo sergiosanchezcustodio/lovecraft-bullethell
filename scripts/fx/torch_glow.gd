@@ -6,6 +6,7 @@ extends MeshInstance3D
 
 const AHEAD := 1.9                             ## m por delante de los pies
 const SIZE := Vector2(2.2, 2.8)                ## ancho y largo de la mancha (m)
+const STRENGTH := 0.38                         ## como en el shader; Player la baja al parpadear
 
 func _init() -> void:
 	name = "TorchGlow"

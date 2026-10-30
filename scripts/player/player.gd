@@ -204,6 +204,9 @@ func _ready() -> void:
 	_hold = OutfitData.hold_of(worn)                 # paraguas, linterna (fase 14)
 	outfit_set = OutfitSets.worn_name(worn)          # conjunto entero puesto (14.8)
 	outfit_worn = worn
+	var pn: Dictionary = model.get_meta("part_nodes")
+	if pn.has("fore_r"): _beam = (pn["fore_r"] as Node3D).get_node_or_null("Beam") as SpotLight3D
+	if pn.has("head"): _bubbles = (pn["head"] as Node3D).get_node_or_null("bubbles") as GPUParticles3D
 	_face = FaceLook.new().setup(model, VoxelBuilder.variant_path("res://models/%s.json" % data.model))
 	add_child(_face)
 	_set_vis_layer(model)
@@ -700,7 +703,14 @@ var outfit_set := ""
 var outfit_worn := {}
 var _tail_t := 0.0
 var _torch_glow: TorchGlow                     ## mancha de la linterna en Baja (sin luz de verdad)
+var _beam: SpotLight3D                         ## luz de la linterna (Media y más)
+var _bubbles: GPUParticles3D                   ## burbujas del casco de buzo
+var _flicker_t := 0.0
+const TORCH_FLICKER_AT := 0.35                 ## por debajo de esta cordura (fracción), la linterna falla
 func _hold_step(delta: float) -> void:
+	if _bubbles != null:                         # el casco, al vadear (solo al cambiar: asignarlo en
+		var want := _wade > 0.5 and visual.visible   # cada fotograma volvía a empezar la emisión)
+		if _bubbles.emitting != want: _bubbles.emitting = want
 	if not OutfitData.HOLDS.has(_hold): return
 	_hold_w = move_toward(_hold_w, 1.0 if _action == "" and _override == "" and _fidget == "" else 0.0, delta * 6.0)
 	OutfitData.pose_hold(model, _hold, _hold_w)
@@ -708,6 +718,16 @@ func _hold_step(delta: float) -> void:
 		_torch_glow = TorchGlow.new()
 		visual.add_child(_torch_glow)
 	if _torch_glow != null: _torch_glow.visible = _hold_w > 0.6 and visual.visible
+	# con poca cordura, la linterna falla como una pila floja: tiembla y a ratos casi se apaga
+	_flicker_t += delta
+	var low := clampf((TORCH_FLICKER_AT - sanity / maxf(data.max_sanity, 1.0)) / TORCH_FLICKER_AT, 0.0, 1.0)
+	var f := 1.0
+	if low > 0.0:
+		var dip := pow(absf(sin(_flicker_t * 9.1) * sin(_flicker_t * 3.7 + 2.0)), 3.0)
+		var drop := 0.85 if fposmod(_flicker_t * 0.9 + sin(_flicker_t * 0.31) * 2.0, 3.0) < 0.12 * low * 3.0 else 0.0
+		f = clampf(1.0 - low * (0.5 * dip + 0.08 * sin(_flicker_t * 31.0)) - drop, 0.05, 1.0)
+	if _beam != null: _beam.light_energy = 2.2 * f
+	if _torch_glow != null: (_torch_glow.material_override as ShaderMaterial).set_shader_parameter("strength", TorchGlow.STRENGTH * f)
 
 ## Configuración de la mancha del nivel (data/dirt.json): la de la arena o, si no, la de la parte.
 static func dirt_config(part_key: String, arena_name: String) -> Dictionary:
