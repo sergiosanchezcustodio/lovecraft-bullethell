@@ -1,0 +1,39 @@
+{
+	"_comentario": "Guion del tráiler (hito 13.16), para tools/trailer.py. Cada toma es una ejecución del juego grabada con --write-movie: 'args' van detrás de --, 'desde' es el segundo de juego en que empieza el trozo que se usa y 'dura' cuántos segundos. 'rotulo' sale abajo, de 'rotulo_desde' a 'rotulo_hasta' (s dentro de la toma). Cambia aquí los textos, el orden o las opciones y vuelve a montar: python tools/trailer.py --montar (las tomas grabadas se reutilizan; --rehacer id graba otra vez una).",
+	"fps": 60,
+	"resolucion": "1920x1080",
+	"comunes_partida": "mute=true cfg_quality=3 hud=false card=false god=true autopick=true window=true cfg_damage_numbers=1 tints=false nobreakables=true marks=12",
+	"musica": [
+		{"archivo": "resources/Music/Musica_Intro.mp3", "desde": 0, "en": 0, "hasta": "dagon", "volumen": 1.0},
+		{"archivo": "resources/Music/cc0/jefe_heavy_battle.ogg", "desde": 4, "en": "dagon", "hasta": "final", "volumen": 0.9},
+		{"archivo": "resources/Music/Musica_Intro.mp3", "desde": 0, "en": "final", "hasta": null, "volumen": 1.0}
+	],
+	"efectos": 0.4,
+	"tomas": [
+		{"id": "portada", "args": "title off=titulo,aviso,musica mute=true", "partida": false, "desde": 1.5, "dura": 6.0,
+		 "rotulo": "La Biblioteca guarda los relatos que nadie debería leer.", "rotulo_desde": 0.6, "rotulo_hasta": 5.4},
+		{"id": "libro", "args": "title open=menu_libro mute=true", "partida": false, "desde": 8.8, "dura": 2.2, "rotulo": ""},
+		{"id": "antartida", "args": "level=p1_n2 bot=smart bots=3 character=olmstead bot_chars=peaslee,johansen,varga pets=gato,perro,cuervo,gato wlevel=5 max_alive=60 spawn_rate=14",
+		 "desde": 5.5, "dura": 7.0,
+		 "rotulo": "De uno a cuatro investigadores, en el mismo sofá o en línea.", "rotulo_desde": 0.5, "rotulo_hasta": 6.4},
+		{"id": "armas", "args": "level=p1_n4 bot=smart character=legrasse weapons=necronomicon_completo,tesla,castillo_fuegos,thompson_chicago wlevel=8 max_alive=90 spawn_rate=24 cam=13",
+		 "desde": 8.0, "dura": 5.0,
+		 "rotulo": "Cincuenta armas. Algunas se pagan con la cordura.", "rotulo_desde": 0.4, "rotulo_hasta": 4.6},
+		{"id": "ventisca", "args": "level=p1_n3 bot=smart character=peaslee changes=1 max_alive=40 spawn_rate=10",
+		 "desde": 5.5, "dura": 4.0, "rotulo": "La ventisca se cierra.", "rotulo_desde": 0.4, "rotulo_hasta": 3.6},
+		{"id": "ritual", "args": "level=p3_n2 bot=smart character=iwanicki max_alive=50 spawn_rate=14",
+		 "desde": 6.0, "dura": 4.0, "rotulo": "En los pantanos, el culto sigue cantando.", "rotulo_desde": 0.4, "rotulo_hasta": 3.6},
+		{"id": "innsmouth", "args": "level=p2_n2 bot=smart character=olmstead san=8 max_alive=50 spawn_rate=14",
+		 "desde": 5.0, "dura": 5.0,
+		 "rotulo": "Y cuando la cordura se rompe, ya no sabes qué es real.", "rotulo_desde": 0.5, "rotulo_hasta": 4.6},
+		{"id": "dagon", "args": "level=p2_n5 bot=smart bots=1 character=johansen bot_chars=whipple final_next=true final_at=3 dif_jefes=10 max_alive=20 spawn_rate=6",
+		 "desde": 2.6, "dura": 7.0, "rotulo": ""},
+		{"id": "tormenta", "args": "level=p3_n4 bot=smart character=malone weapons=thompson_chicago,castillo_fuegos wlevel=6 max_alive=50 spawn_rate=14",
+		 "desde": 5.0, "dura": 4.0,
+		 "rotulo": "De la Antártida a los mares del Sur.", "rotulo_desde": 0.4, "rotulo_hasta": 3.6},
+		{"id": "cthulhu", "args": "level=p3_n5 bot=smart bots=1 character=legrasse bot_chars=elwood final_at=3 dif_jefes=10 max_alive=20 spawn_rate=6",
+		 "desde": 2.6, "dura": 8.5, "rotulo": ""},
+		{"id": "final", "args": "title off=aviso,musica mute=true", "partida": false, "desde": 3.5, "dura": 8.0,
+		 "rotulo": "Cooperativo de 1 a 4 jugadores · Windows y macOS", "rotulo_desde": 3.4, "rotulo_hasta": 8.0, "rotulo_arriba": false}
+	]
+}

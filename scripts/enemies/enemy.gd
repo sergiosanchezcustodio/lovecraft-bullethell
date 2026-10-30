@@ -91,6 +91,7 @@ const PART_TINTS := {"p1": Color(0.1, 0.42, 1.0), "p2": Color(0.1, 0.85, 0.35), 
 const ELITE_SIZE := 1.1
 const ELITE_EYES := 1.4                     ## brillo de su capa de luz (ojos, bioluminiscencia)
 static var wounds := true                   ## wounds=false: sin grietas (comparar)
+static var tints := true                    ## tints=false: sin el destello del golpe ni los tintes de estado (tráiler, hito 13.16)
 static var wounds_force := -1.0             ## wounds=0.7: grietas fijas a ese nivel (medir su coste)
 static var _wound_mat: ShaderMaterial
 static var _elite_glow := {}                ## material de luz -> su copia más brillante
@@ -823,7 +824,8 @@ func _process(delta: float) -> void:
 	# tinte: destello al recibir daño; si no, turquesa en estasis o violeta maldito.
 	# Solo se toca el material al cambiar.
 	var want: Material = null
-	if _flash > 0.0: want = _flash_mat
+	if not tints: pass
+	elif _flash > 0.0: want = _flash_mat
 	elif _stasis_t > 0.0 or world.freeze_t > 0.0: want = _status(Color(0.35, 0.95, 1.0, 0.5))
 	elif _curse_t > 0.0: want = _status(Color(0.55, 0.12, 0.7, 0.35 + 0.1 * sin(_spawn_t * 9.0)))
 	elif _burn_t > 0.0: want = _status(Color(1.0, 0.5, 0.12, 0.3 + 0.1 * sin(_spawn_t * 13.0)))

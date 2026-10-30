@@ -40,6 +40,9 @@ extends Node3D
 ##   sheet_at=2 / map_at=2   abre la ficha o el mapa del J1 a ese segundo (capturas)
 ##   hitstop=false           sin micro-pausa al impactar
 ##   boss_intro=false        sin la entrada de los jefes (BossIntro): solo el aviso, como antes
+##   final_next=true         el evento final saca directamente el jefe que viene después (Padre Dagon sin Madre Hydra)
+##   tints=false             sin el destello blanco de los enemigos al recibir un golpe ni los tintes de estado (estasis, veneno…)
+##   hud=false               sin el HUD (paneles, flechas y avisos); card=false, sin el rótulo del nivel (tráiler)
 ##   crumble=false / marks=N  sin desmoronarse / tope de manchas en el suelo (0, ninguna; por defecto, el de la calidad gráfica)
 ##   falls=false             sin la caída de cada familia al morir (hito 12.7)
 ##   dirt=false|0.8          sin la ropa que se ensucia, o fija a ese nivel (hito 12.4)
@@ -327,6 +330,10 @@ func _ready() -> void:
 			var k := args.get_float("mid_at") / level.mid_times[0]
 			level.mid_times.assign(level.mid_times.map(func(t: float) -> float: return t * k))
 		if args.has("chest_every"): level.chest_every = args.get_float("chest_every")   # baúles más a menudo (capturas)
+		if args.get_bool("final_next") and level.final_next != null:   # el jefe de después, directamente (tráiler: Padre Dagon)
+			level.final_enemy = level.final_next
+			level.final_text = level.final_next_text
+			level.final_next = null
 		if args.get_bool("no_spawn"):                  # el escenario solo (hito 13.14): sin baúles ni peligros
 			level.chest_every = 0.0
 			level.angle_every = 0.0
@@ -386,7 +393,7 @@ func _ready() -> void:
 			add_child(hazards)
 		if level.daily != "": _daily_seed()
 		_spawn_fragment(arena.get_meta("obstacles"))
-		if not args.has("shots") or args.get_bool("card"):   # capturas: sin el rótulo, salvo card=true
+		if (not args.has("shots") or args.get_bool("card")) and args.get_bool("card", true):   # capturas: sin el rótulo, salvo card=true; card=false lo quita
 			LevelCard.enter(self, level_id, level.display_name)
 		Music.play(level.music_path())
 		if args.get_bool("log"): print("MUSICA ", Music.current())
@@ -401,12 +408,14 @@ func _ready() -> void:
 	Enemy.wounds = args.get_str("wounds", "true") != "false" and (bool(Quality.value("wounds", true)) or args.has("wounds"))   # en Baja, sin grietas
 	Enemy.wounds_force = args.get_float("wounds", -1.0) if args.get_str("wounds", "").is_valid_float() else -1.0
 	Enemy.rise_enabled = args.get_bool("rise", true)   # hito 11.6
+	Enemy.tints = args.get_bool("tints", true)   # tráiler (hito 13.16): los jefes, a golpe continuo, se quedaban blancos
 	GroundMarks.limit = args.get_int("marks", GroundMarks.limit)
 	Debris.limit = GroundMarks.limit * Debris.PER_MARK       # restos de los rompibles (hito 12.11)
 	WallScorch.limit = GroundMarks.limit / 2                 # quemaduras en las paredes (hito 12.11)
 	hud = Hud.new().setup(players, director)
 	hud.money = func() -> int: return run_money
 	add_child(hud)
+	hud.visible = args.get_bool("hud", true)         # hud=false: sin panel ni avisos (tráiler, hito 13.16)
 	add_child(SanityFx.new().setup(players))         # distorsiones de cordura baja
 	if director != null: add_child(Tips.new(self))   # consejos de la primera partida (hito 13.3)
 	if director != null: add_child(Hallucinations.new().setup(self))   # con poca cordura (hito 13.4)
