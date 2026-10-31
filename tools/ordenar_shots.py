@@ -79,7 +79,7 @@ def main():
     for k, v in sorted(counts.items()): print('%-12s %5d' % (k, v))
     if DRY or not moved: return
     # rutas en la documentación
-    docs = [os.path.join(ROOT, 'CLAUDE.md')] + [os.path.join(ROOT, 'docs', f) for f in os.listdir(os.path.join(ROOT, 'docs')) if f.endswith('.md')]
+    docs = [os.path.join(ROOT, p, 'CLAUDE.md') for p in ('', 'tools', 'scripts', os.path.join('scripts', 'title'))] + [os.path.join(ROOT, 'docs', f) for f in os.listdir(os.path.join(ROOT, 'docs')) if f.endswith('.md')]
     rx = re.compile(r'shots/[A-Za-z0-9_.\-]+')
     for f in docs:
         t = open(f, encoding='utf-8').read()
