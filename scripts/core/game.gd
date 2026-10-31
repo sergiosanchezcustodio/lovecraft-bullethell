@@ -1186,6 +1186,8 @@ func _game_over() -> void:
 	if level != null and level.endless: title = "Partida del día" if level.daily != "" else "La noche eterna"
 	_end_screen(title, Color(0.86, 0.22, 0.18), "", "caida")
 
+var _challenge_record := false                   ## el desafío se acaba de superar mejorando el récord (diario)
+
 ## Diario del investigador (hito 13.10): una entrada por jugador de este PC; se guarda en su
 ## diario si juega una persona (con `diary_save=true`, también los bots: pruebas).
 func _diary(result: String) -> Array:
@@ -1195,6 +1197,9 @@ func _diary(result: String) -> Array:
 	for q in players:
 		if q.remote: continue
 		var f := Diary.facts_of(q, world, level, res, director.time)
+		if Challenge.is_challenge(String(level.id)):        # desafío: su nombre y si fue récord
+			f["challenge"] = String(Challenge.find(String(level.id)).get("name", ""))
+			f["record"] = _challenge_record
 		var e := Diary.compose(f, hash("%s|%s|%d|%d" % [f.date, f.level, q.index, director.killed_total]))
 		if not (q.input is BotInput) or args.get_bool("diary_save"): Diary.add(Saves.current, String(q.data.id), f, e)
 		out.append({"who": "J%d · %s" % [q.index + 1, q.data.display_name], "color": q.color, "title": e.title, "text": e.text})
@@ -1260,7 +1265,9 @@ func _on_level_completed() -> void:
 		won_title = "Desafío superado"
 		var prev := Challenge.best(Saves.current, String(level.id))
 		var t := director.time
+		_challenge_record = false
 		if Challenge.record_win(Saves.current, String(level.id), t) and Saves.current != null:   # récord de tiempo
+			_challenge_record = prev > 0.0
 			_endless_lines = PackedStringArray(["¡Nuevo récord! %s%s" % [Endless.clock(t), " (antes, %s)" % Endless.clock(prev) if prev > 0.0 else ""]])
 		elif Saves.current != null:
 			_endless_lines = PackedStringArray(["Tiempo: %s  ·  Récord: %s" % [Endless.clock(t), Endless.clock(prev)]])

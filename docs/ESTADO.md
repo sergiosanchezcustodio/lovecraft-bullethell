@@ -1554,6 +1554,11 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **La caída en GIF:** en «Ver la caída», Y (mando) o G (teclado) la guarda como GIF en bucle a velocidad real (384×216, 12 imágenes/s, unos 2,5 MB) en la carpeta del modo foto, `Imágenes/Lovecraft Library/caida_<fecha>.gif` (`photo_dir=` para pruebas). `GifWriter` (`scripts/fx/gif_writer.gd`): paleta común de los 256 colores más frecuentes y LZW con tabla plana, en un hilo. Comprobado leyéndolo con Pillow (60 imágenes, colores bien). Opción `replay_gif=true` (lo guarda al abrir la repetición).
   - **Tests:** `tests/test_gif_writer.gd` (1) y el de récords en `tests/test_challenge.gd`. 620 de 620.
 
+- **Dos detalles más (31-10-2026), pendientes de tu revisión.**
+  - **Abrir la carpeta del GIF:** tras guardarlo, X (mando) o F (teclado) abre la carpeta en «Ver la caída» (`ReplayView.open_folder`; con `halt_shots=true`, no).
+  - **Los desafíos en el diario y en la nube:** la entrada del diario de un desafío añade una frase con su nombre y el tiempo, distinta si es récord o si caíste (`data/diary.json`, lista `challenge` con `won`, `record` y `lost`; `{desafio}` y `{tiempo}`). Captura `shots/game_diario_desafio_parada1.png`. Los récords ya viajaban con la nube (van en `SaveData.records`); además, al elegir entre dos copias en un conflicto se ven los «Desafíos superados» de cada una. En el HUD, al ganar un desafío, «Desafío superado» en vez de «Nivel superado».
+  - **Tests:** uno más en `tests/test_challenge.gd`. 621 de 621.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

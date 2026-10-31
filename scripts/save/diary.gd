@@ -69,7 +69,8 @@ static func compose(f: Dictionary, seed_value: int) -> Dictionary:
 	var fill := {"min": str(int(f.get("worst_min", 1))), "criatura": String(f.get("creature", "")),
 		"levanto": String(f.get("reviver", "")), "veces": _times(int(f.get("downs", 0))),
 		"arma": String(f.get("weapon", "")), "bajas": str(int(f.get("kills", 0))),
-		"tiempo": Endless.clock(float(f.get("t", 0.0))), "o": "a" if fem else "o"}
+		"tiempo": Endless.clock(float(f.get("t", 0.0))), "o": "a" if fem else "o",
+		"desafio": String(f.get("challenge", ""))}
 	var out := PackedStringArray()
 	var open: Dictionary = d.get("open", {})
 	out.append(_one(open.get(String(f.get("result", "won")), open.get("won", [])), rng, fill))
@@ -84,6 +85,10 @@ static func compose(f: Dictionary, seed_value: int) -> Dictionary:
 		var ws: Array = d.get("weapon", [])
 		if int(f.get("kills", 0)) <= 0: ws = ws.filter(func(s: String) -> bool: return not "{bajas}" in s)
 		out.append(_one(ws, rng, fill))
+	if String(f.get("challenge", "")) != "":         # desafío (15.2): cómo fue, y si es récord
+		var r := String(f.get("result", ""))
+		var kind := ("record" if bool(f.get("record", false)) else "won") if r == "won" else "lost"
+		out.append(_one((d.get("challenge", {}) as Dictionary).get(kind, []), rng, fill))
 	var san := float(f.get("sanity", 1.0))
 	out.append(_one((d.sanity as Dictionary).get("high" if san > 0.6 else ("mid" if san > 0.3 else "low"), []), rng, fill))
 	var body := " ".join(Array(out).filter(func(s: String) -> bool: return s != ""))

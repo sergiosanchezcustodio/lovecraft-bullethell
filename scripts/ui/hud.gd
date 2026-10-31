@@ -91,7 +91,8 @@ func _process_step(_delta: float) -> void:
 		_time_lbl.text = "%02d:%02d" % [t / 60, t % 60]
 		if director.completed:
 			var l := int(ceil(director.loot_left))
-			_objective_lbl.text = "Nivel superado · recoge el botín %d" % l if l > 0 else "Nivel superado"
+			var done := "Desafío superado" if Challenge.is_challenge(String(director.level.id)) else "Nivel superado"
+			_objective_lbl.text = "%s · recoge el botín %d" % [done, l] if l > 0 else done
 		elif director.level.is_survival() and director.time >= director.level.final_time:
 			var s := int(ceil(director.survive_left()))
 			_objective_lbl.text = "Resiste a %s · %d:%02d" % [director.level.final_name, s / 60, s % 60]

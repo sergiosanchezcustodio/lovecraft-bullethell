@@ -74,3 +74,17 @@ func test_superados_se_cuentan_una_vez() -> void:
 	assert_true(s.levels_won.is_empty(), "no cuentan como niveles de campaña")
 	var back := SaveData.from_dict(s.to_dict())
 	assert_eq(Challenge.won_count(back), 2, "se guardan")
+
+func test_el_diario_habla_del_desafio() -> void:
+	var base := {"character": "dyer", "name": "William Dyer", "result": "won", "t": 300.0, "part": 1,
+		"place": "Campamento", "date": "2026-10-31", "challenge": "Frágil como el hielo"}
+	var won := Diary.compose(base, 1)
+	assert_true("Frágil como el hielo" in String(won.text), String(won.text))
+	var rec := base.duplicate()
+	rec["record"] = true
+	var e := Diary.compose(rec, 2)
+	var lines: Array = (Diary.data().challenge as Dictionary).record
+	var hit := false
+	for l: String in lines:
+		if l.format({"desafio": "Frágil como el hielo", "tiempo": "5:00"}).substr(1) in String(e.text): hit = true
+	assert_true(hit, "frase de récord: " + String(e.text))

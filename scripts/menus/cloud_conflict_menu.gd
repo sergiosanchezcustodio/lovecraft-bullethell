@@ -78,6 +78,7 @@ func _card(head: String, d: SaveData, other: SaveData) -> Button:
 	var lines := [
 		["Tiempo jugado", SaveData.format_time(d.play_time), d.play_time > other.play_time + 30.0],
 		["Niveles superados", str(d.levels_won.size()), d.levels_won.size() > other.levels_won.size()],
+		["Desafíos superados", str(Challenge.won_count(d)), Challenge.won_count(d) > Challenge.won_count(other)],
 		["Dinero", MenuKit.money(d.money) + " $", d.money > other.money],
 		["Objetos comprados", str(d.items_bought()), d.items_bought() > other.items_bought()],
 		["Compañeros", str(d.pets.size()), d.pets.size() > other.pets.size()]]

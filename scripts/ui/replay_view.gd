@@ -86,11 +86,16 @@ func save_gif() -> void:
 			f.close()
 		_gif_ok = f != null)
 
+## Abre la carpeta donde quedó el GIF (como «Abrir la carpeta» del modo foto).
+func open_folder() -> void:
+	if _gif_path != "" and not LaunchArgs.from_cmdline().get_bool("halt_shots"):   # en pruebas, no
+		OS.shell_open(_gif_path.get_base_dir())
+
 func _process(delta: float) -> void:
 	if _task >= 0 and WorkerThreadPool.is_task_completed(_task):
 		WorkerThreadPool.wait_for_task_completion(_task)
 		_task = -1
-		_hint.text = ("Guardado en %s  ·  A o B para volver" % _gif_path.get_file()) if _gif_ok else "No se pudo guardar el GIF  ·  A o B para volver"
+		_hint.text = ("Guardado: %s  ·  X o F: abrir la carpeta  ·  A o B para volver" % _gif_path.get_file()) if _gif_ok else "No se pudo guardar el GIF  ·  A o B para volver"
 		Auto.sfx("page")
 		print("GIF de la caída: ", _gif_path if _gif_ok else "error")
 	var length := frames.size() / DeathReplay.FPS
@@ -103,6 +108,8 @@ func _unhandled_input(e: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 	if (e is InputEventKey and e.pressed and not e.echo and (e as InputEventKey).keycode == KEY_G) 			or (e is InputEventJoypadButton and e.pressed and (e as InputEventJoypadButton).button_index == JOY_BUTTON_Y):
 		save_gif()
+	elif _gif_ok and ((e is InputEventKey and e.pressed and not e.echo and (e as InputEventKey).keycode == KEY_F) 			or (e is InputEventJoypadButton and e.pressed and (e as InputEventJoypadButton).button_index == JOY_BUTTON_X)):
+		open_folder()
 	elif e.is_action_pressed("ui_cancel") or e.is_action_pressed("ui_accept"):
 		queue_free()
 
