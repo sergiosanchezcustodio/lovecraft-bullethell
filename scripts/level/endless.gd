@@ -20,6 +20,7 @@ static func is_endless(id: String) -> bool:
 
 static func base_of(id: String) -> String:
 	if Daily.is_daily(id): return Daily.base_of(id)   # partida del día (13.9): el escenario de la fecha
+	if Challenge.is_challenge(id): return Challenge.base_of(id)   # desafío (15.2): el escenario de su nivel
 	return id.substr(PREFIX.length()) if is_endless(id) else id
 
 static func id_for(base: String) -> String:

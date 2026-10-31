@@ -97,6 +97,7 @@ func roll_options(weapons: WeaponSystem, rng: RandomNumberGenerator, n: int = -1
 		var o := Option.new()
 		if owned == null:
 			if weapons.weapons.size() >= weapon_slots: continue      # sin hueco para otra arma
+			if not Challenge.new_weapon_ok(wd): continue              # desafíos de una sola arma o solo arcanas (15.2)
 			o.kind = Option.Kind.NEW_WEAPON
 			o.weapon = wd
 			cands.append(o)

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/PantallasMenus/iconos/ficha_DES.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"todos_los_desafios"
+display_name = "Nada nos detiene"
+description = "Supera los quince desafíos."
+order = 26
+stat = "challenges_won"
+target = 15
+reward_money = 3000
+icon = ExtResource("2")

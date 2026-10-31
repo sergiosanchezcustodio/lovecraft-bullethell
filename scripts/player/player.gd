@@ -312,7 +312,7 @@ func _physics_process_step(delta: float) -> void:
 	var was_dodging := motor.is_dodging()
 	var ss := sanity_state
 	var move := _crisis_move(delta, input.move)
-	var dodge := input.just_pressed(InputBindings.DODGE) and not (ss.is_kind(&"huida") or ss.is_kind(&"vagar"))
+	var dodge := input.just_pressed(InputBindings.DODGE) and not (ss.is_kind(&"huida") or ss.is_kind(&"vagar")) 		and not Challenge.has("no_dodge")             # desafío sin esquive (hito 15.2)
 	velocity = motor.step(delta, move, dodge)
 	if in_water() and not motor.is_dodging(): velocity *= WadeSplash.SLOW   # agua somera: frena
 	if carry_slow != 1.0 and not motor.is_dodging(): velocity *= carry_slow  # lleva la reliquia (13.5)
@@ -1078,7 +1078,7 @@ func rebuild_stats() -> void:
 		data.dodge_anim = style.anim
 		data.dodge_speed = style.speed
 	var v := {
-		"max_health": base.max_health * Attributes.mult(attrs, "health") * float(shop.get("health", 1.0)),
+		"max_health": base.max_health * Attributes.mult(attrs, "health") * float(shop.get("health", 1.0)) * Challenge.value("max_health"),
 		"max_sanity": base.max_sanity * Attributes.mult(attrs, "sanity") * _madness_factor() * float(shop.get("sanity", 1.0)),
 		"move_speed": base.move_speed * Attributes.mult(attrs, "speed") * float(shop.get("speed", 1.0)),
 		"dodge_duration": (style.duration if style else base.dodge_duration) * data.dodge_length,

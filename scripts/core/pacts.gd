@@ -61,7 +61,7 @@ static func _effects() -> Dictionary:
 
 ## Producto de un multiplicador entre los sellados (1 si ninguno lo toca).
 static func value(key: String, ids: Variant = null) -> float:
-	if ids == null: return float(_effects().get(key, 1.0))
+	if ids == null: return float(_effects().get(key, 1.0)) * Challenge.value(key)   # y el desafío (15.2)
 	var v := 1.0
 	for id: Variant in (ids if ids is Array else active()):
 		var fx: Dictionary = find(String(id)).get("effects", {})
@@ -70,7 +70,7 @@ static func value(key: String, ids: Variant = null) -> float:
 
 ## ¿Algún sellado lleva esa marca?
 static func has(key: String, ids: Variant = null) -> bool:
-	if ids == null: return _effects().has(key)
+	if ids == null: return _effects().has(key) or Challenge.has(key)
 	for id: Variant in (ids if ids is Array else active()):
 		if (find(String(id)).get("effects", {}) as Dictionary).has(key): return true
 	return false

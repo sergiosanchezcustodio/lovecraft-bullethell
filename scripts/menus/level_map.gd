@@ -16,6 +16,7 @@ var _info_text: Label
 var _first: Button
 var _endless_btn: Button
 var _daily_btn: Button
+var _challenge_btn: Button
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -68,6 +69,15 @@ func _ready() -> void:
 		eb.pressed.connect(func() -> void: _endless(eb))
 		extra.add_child(eb)
 		_endless_btn = eb
+	if Challenge.any_unlocked(Saves.current) or dev:   # desafíos (hito 15.2): al superar un nivel
+		var cb := MenuKit.button("Desafíos" + ("" if Challenge.any_unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
+		cb.custom_minimum_size = Vector2(460, 58)
+		cb.focus_entered.connect(func() -> void:
+			_info_title.text = "Desafíos"
+			_info_text.text = "Cada nivel superado abre su desafío: el mismo escenario con reglas fijas (sin esquive, una sola arma, a oscuras…). Superados: %d de %d." % [Challenge.won_count(Saves.current), Challenge.all().size()])
+		cb.pressed.connect(func() -> void: _challenges(cb))
+		extra.add_child(cb)
+		_challenge_btn = cb
 	var sep := HSeparator.new()
 	box.add_child(sep)
 	_info_title = MenuKit.title("", 28)
@@ -84,6 +94,7 @@ func _ready() -> void:
 	if la.get_bool("pact_open") and _first: _pick.call_deferred(Campaign.first_of(0), _first)
 	if la.get_bool("endless_open") and _endless_btn: _endless.call_deferred(_endless_btn)   # capturas
 	if la.get_bool("daily_open") and _daily_btn: _daily.call_deferred(_daily_btn)
+	if la.get_bool("challenge_open") and _challenge_btn: _challenges.call_deferred(_challenge_btn)
 
 ## Botón de una parte: empieza por su primer nivel.
 func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
@@ -146,6 +157,19 @@ func _endless(from: Button) -> void:
 	m.picked.connect(func(base: String) -> void:
 		visible = true
 		_pick(Endless.id_for(base), from))
+	m.closed.connect(func() -> void:
+		visible = true
+		from.grab_focus.call_deferred())
+	get_parent().add_child(m)
+
+## Desafíos (hito 15.2): sin pactos, directo a jugar.
+func _challenges(from: Button) -> void:
+	var m := ChallengeMenu.new()
+	visible = false
+	m.picked.connect(func(id: String) -> void:
+		visible = true
+		Pacts.set_active([])
+		chosen.emit(id))
 	m.closed.connect(func() -> void:
 		visible = true
 		from.grab_focus.call_deferred())

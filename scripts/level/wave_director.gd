@@ -76,7 +76,7 @@ func _physics_process(delta: float) -> void:
 		final_event.emit(_final)
 	var scale := level.final_spawn_scale if _final_done else 1.0
 	if _boss_on: scale *= BOSS_SPAWN_SCALE         # con el jefe en pantalla, las oleadas casi paran
-	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.rate(time) * delta
+	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.rate(time) * Challenge.value("spawn_rate") * delta
 	while _acc >= 1.0:
 		if alive.size() + _emerging >= max_alive():
 			_acc = 1.0

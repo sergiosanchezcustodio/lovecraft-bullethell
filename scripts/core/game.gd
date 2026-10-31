@@ -318,8 +318,12 @@ func _ready() -> void:
 		elif Endless.is_endless(level_id):            # «La noche eterna» (hito 13.8)
 			level = Endless.make_level(level_id)
 			add_child(Endless.new().setup(level))
+		elif Challenge.is_challenge(level_id):        # desafío (hito 15.2)
+			level = Challenge.make_level(level_id)
 		else:
 			level = load("res://data/levels/%s.tres" % level_id).duplicate()
+		Challenge.begin(level_id)                      # sus reglas, antes de montar el progreso (15.2)
+		for q in players: q.rebuild_stats()            # (la vida máxima del desafío)
 		_apply_carry()                                 # progreso del nivel anterior de la parte
 		_shop_start()
 		if args.get_bool("log"): print("INICIO %s nivel=%d armas=%s" % [level_id, player.progress.level, player.weapons.weapons.map(func(w: WeaponSystem.Weapon) -> String: return "%s:%d" % [w.data.id, w.level])])
@@ -429,6 +433,10 @@ func _ready() -> void:
 		objectives = ObjectiveDirector.new().setup(self)              # objetivos a mitad de nivel (13.5)
 		add_child(objectives)
 	if args.get_bool("log"): print("PACTOS ", Pacts.active())
+	if Challenge.active() and director != null:                      # desafío (15.2): sus reglas, tras el rótulo
+		var ch := Challenge.find(String(level.id))
+		get_tree().create_timer(4.5, false).timeout.connect(func() -> void:
+			if not _ended: announce("Desafío: " + String(ch.get("text", "")), 4.0))
 	if not Pacts.active().is_empty() and director != null:           # pactos sellados (13.6): tras el rótulo del nivel
 		get_tree().create_timer(4.5, false).timeout.connect(func() -> void:
 			if not _ended: announce("Pactos: " + Pacts.names(Pacts.active()), 3.0))
@@ -1244,7 +1252,12 @@ func _on_level_completed() -> void:
 	if args.get_bool("log"): for q in players: print("ESTADISTICAS J%d %s" % [q.index + 1, world.stats_of(q.index)])
 	if args.get_bool("log"): _log_players()
 	# el avance de la campaña solo cuenta en la partida del anfitrión (D-10)
-	if Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
+	var won_title := "Nivel superado"
+	if Challenge.is_challenge(String(level.id)):     # desafío (15.2): aparte, no cuenta como nivel de campaña
+		won_title = "Desafío superado"
+		Challenge.record_win(Saves.current, String(level.id))
+		Achievements.record(Saves.current, "challenges_won", Challenge.won_count(Saves.current))
+	elif Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))
 	Pacts.record_win(Saves.current, String(level.id), Pacts.active())   # sellos del mapa y logros (13.6)
 	var sets_won := {}                               # niveles superados con cada conjunto (la ficha los cuenta)
@@ -1257,10 +1270,10 @@ func _on_level_completed() -> void:
 		if Saves.current != null: Achievements.record(Saves.current, "set_best", int(Saves.current.stats[k]))   # «Fiel al conjunto»
 	_check_achievements.call_deferred()              # después de contar la baja del enemigo final (élite)
 	Saves.save()
-	announce("Nivel superado", 2.0)
+	announce(won_title, 2.0)
 	await _loot_time()
 	get_tree().paused = true
-	_end_screen("Nivel superado", UiKit.GOLD, Campaign.next_in_part(String(level.id)), "superado")
+	_end_screen(won_title, UiKit.GOLD, Campaign.next_in_part(String(level.id)), "superado")
 
 ## Tras superar el nivel, LOOT_TIME s para recoger lo que han soltado el jefe y los últimos
 ## enemigos: no aparece nadie más, los que quedan caen (sueltan sus gemas), se deshacen las balas
@@ -1343,13 +1356,14 @@ func _apply_carry() -> void:
 			team.turn = GameSession.team_turn % players.size()
 			team.xp = GameSession.team_xp
 		return
-	var stage := Campaign.number_of(String(level.id))
+	var stage := Campaign.number_of(Challenge.base_of(String(level.id)))
 	if stage <= 1 or args.get_bool("fresh"): return
+	var wise := Challenge.active()                   # en un desafío, elegidas con criterio (15.2)
 	for q in players:
 		for k in DEV_LEVELS_PER_STAGE * (stage - 1):
 			q.progress.gain_level()
 			var opts := q.progress.roll_options(q.weapons, _rng)
-			if not opts.is_empty(): q.progress.choose(SmartBot.pick(opts, q, _rng) if q.input is SmartBot else opts[_rng.randi() % opts.size()], q)
+			if not opts.is_empty(): q.progress.choose(SmartBot.pick(opts, q, _rng) if q.input is SmartBot or wise else opts[_rng.randi() % opts.size()], q)
 		q.progress.pending = 0
 		q.rebuild_stats()
 		q.health = q.data.max_health
@@ -1368,7 +1382,7 @@ func _shop_start() -> void:
 					q.progress.passives[u.id] = 1
 					q.rebuild_stats()
 			if float(q.shop.get("start_weapon", 0.0)) > 0.0 and q.weapons.weapons.size() < q.progress.weapon_slots:
-				var ws := q.progress.weapon_pool.filter(func(w: WeaponData) -> bool: return q.weapons.get_weapon(w.id) == null)
+				var ws := q.progress.weapon_pool.filter(func(w: WeaponData) -> bool: return q.weapons.get_weapon(w.id) == null and Challenge.new_weapon_ok(w))
 				if not ws.is_empty(): q.weapons.add_weapon(ws[_rng.randi() % ws.size()])
 	else:
 		for q in players:

@@ -1,0 +1,20 @@
+{
+	"_doc": "Desafíos (hito 15.2, Challenge): uno por nivel, con reglas fijas, abierto al superar ese nivel. 'effects' usa las mismas claves que los pactos (data/pacts.json: enemy_health, enemy_speed, light, lamp, split_elites, no_heal, no_regen, bullet_trail, pet_idle…) más las propias: no_dodge (sin esquive), one_weapon (no se ofrecen armas nuevas ni da la Armería otra), arcane_only (las armas nuevas, solo arcanas), max_health (multiplica la vida máxima) y spawn_rate (multiplica el ritmo de aparición). Sin pactos: las reglas son las del desafío. Se empieza con las subidas que se tendrían a esa altura de la parte (como un nivel suelto), elegidas con criterio.",
+	"challenges": [
+		{"level": "p1_n1", "name": "Sin un paso atrás", "text": "No puedes esquivar.", "effects": {"no_dodge": 1}},
+		{"level": "p1_n2", "name": "Lo que quedó de Lake", "text": "Solo el arma con la que empiezas: no se ofrecen armas nuevas.", "effects": {"one_weapon": 1}},
+		{"level": "p1_n3", "name": "Noche en las cavernas", "text": "Casi a oscuras, y tu farol apenas alumbra.", "effects": {"light": 0.6, "lamp": 0.5}},
+		{"level": "p1_n4", "name": "Frágil como el hielo", "text": "Tienes la mitad de vida.", "effects": {"max_health": 0.5}},
+		{"level": "p1_n5", "name": "El abismo no consuela", "text": "Nada cura y la cordura no vuelve sola.", "effects": {"no_heal": 1, "no_regen": 1}},
+		{"level": "p2_n1", "name": "Todo el pueblo", "text": "Llegan el doble de rápido.", "effects": {"spawn_rate": 1.6}},
+		{"level": "p2_n2", "name": "La fe de la Orden", "text": "Las armas nuevas que te ofrecen son todas arcanas.", "effects": {"arcane_only": 1}},
+		{"level": "p2_n3", "name": "Huida por los tejados", "text": "Las criaturas son un 30 % más rápidas.", "effects": {"enemy_speed": 1.3}},
+		{"level": "p2_n4", "name": "Sangre de los Marsh", "text": "Aguantan más, y las élites se parten en dos al morir.", "effects": {"enemy_health": 1.25, "split_elites": 1}},
+		{"level": "p2_n5", "name": "Mareas de icor", "text": "Sin esquive, y algunas balas dejan un charco que quema.", "effects": {"no_dodge": 1, "bullet_trail": 1}},
+		{"level": "p3_n1", "name": "Pesadilla en soledad", "text": "Tu compañero no ayuda y no hay armas nuevas.", "effects": {"pet_idle": 1, "one_weapon": 1}},
+		{"level": "p3_n2", "name": "El ritual a oscuras", "text": "Menos luz y el culto llega en masa.", "effects": {"light": 0.7, "lamp": 0.6, "spawn_rate": 1.4}},
+		{"level": "p3_n3", "name": "Cubierta maldita", "text": "Solo armas arcanas nuevas, y la cordura no vuelve sola.", "effects": {"arcane_only": 1, "no_regen": 1}},
+		{"level": "p3_n4", "name": "Ojo de la tormenta", "text": "Mitad de vida y criaturas un 20 % más rápidas.", "effects": {"max_health": 0.5, "enemy_speed": 1.2}},
+		{"level": "p3_n5", "name": "Ante la puerta", "text": "Sin esquive, nada cura y aguantan un 20 % más.", "effects": {"no_dodge": 1, "no_heal": 1, "enemy_health": 1.2}}
+	]
+}

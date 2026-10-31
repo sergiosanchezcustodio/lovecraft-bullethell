@@ -1526,6 +1526,14 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **Opciones:** `replay=false` (sin grabar) y `replay_open=true` (abre la repetición en la pantalla final, para capturas con `halt_shots=true quit_on_end=true`). Captura en `shots/game_replay_parada1.png`.
   - **Tests:** `tests/test_death_replay.gd` (2). 609 de 609.
 
+- **Hito 15.2: modo desafío (30-10-2026), pendiente de tu revisión.** En el mapa, junto a la partida del día y la noche eterna, «Desafíos» (`ChallengeMenu`): uno por nivel, en tres columnas, cada uno con su nombre, sus reglas abajo y ✓ si ya está superado. Se abre el de cada nivel al superarlo (en desarrollo, todos). Sin pactos: se juega directamente.
+  - **Datos** (`data/challenges.json`): nombre, texto de las reglas y efectos de cada uno. Los 15: sin esquive (campamento), una sola arma (Lake), casi a oscuras (cavernas), mitad de vida (ciudad), nada cura y la cordura no vuelve (abismo), el doble de rápido (Newburyport), solo arcanas nuevas (calles), criaturas más rápidas (tejados), más vida y élites que se parten (pantanos), sin esquive y charcos de icor (arrecife), compañero quieto y una sola arma (Providence), menos luz y más culto (Luisiana), arcanas y sin recuperar cordura (Alert), mitad de vida y más rápidas (tormenta) y sin esquive, nada cura y más vida (R'lyeh). Para equilibrarlos hará falta tu partida.
+  - **`Challenge`** (`scripts/level/challenge.gd`): id «desafio:p1_n3» (viaja con START en red y se reintenta igual), `make_level` sobre el de la campaña con «Desafío · nombre», `begin` activa los efectos al cargar cualquier nivel (y los vacía si no es un desafío). Los efectos usan las palancas de los pactos (`Pacts.value`/`has` multiplican los del desafío) más cinco propias: `no_dodge` (`Player`), `one_weapon` y `arcane_only` (`Challenge.new_weapon_ok`, en `PlayerProgress.roll_options` y en la Armería de la tienda), `max_health` (`Player.rebuild_stats`) y `spawn_rate` (`WaveDirector`). `Endless.base_of` también los resuelve (escenario, lugar visto, diario).
+  - **Al empezar:** como un nivel suelto, 7 subidas por cada nivel anterior de la parte, pero elegidas con criterio (`SmartBot.pick`), no al azar. A los 4,5 s, «Desafío: <reglas>».
+  - **Al superarlo:** «Desafío superado»; no cuenta como nivel de campaña (`levels_won`) ni sigue con la parte; va a `SaveData.records["challenges"]`. Logros «A pesar de todo» (el primero, 300 $) y «Nada nos detiene» (los quince, 3.000 $), por la estadística `challenges_won`.
+  - **Opciones:** `level=desafio:p1_n4` y `challenge_open=true` (en el mapa, abre los desafíos). Capturas `shots/seleccion_desafios_002.0s.png` y `shots/game_desafio_006.0s.png`.
+  - **Tests:** `tests/test_challenge.gd` (5). 614 de 614.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
