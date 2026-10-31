@@ -43,7 +43,9 @@ func _ready() -> void:
 			if ch.is_empty(): continue
 			var open := Challenge.unlocked(Saves.current, base) and Demo.part_ok(pi)
 			var tick := "✓ " if Challenge.won(Saves.current, base) else ""
-			var b := MenuKit.button("%s%d.  %s" % [tick, l.number, String(ch.name) if open or dev else "Supera el nivel para abrirlo"], MenuKit.INK, 18)
+			var rec := Challenge.best(Saves.current, base)
+			var b := MenuKit.button("%s%d.  %s%s" % [tick, l.number, String(ch.name) if open or dev else "Supera el nivel para abrirlo",
+				("  ·  Récord %s" % Endless.clock(rec)) if rec > 0.0 else ""], MenuKit.INK, 18)
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			b.custom_minimum_size = Vector2(460, 62)

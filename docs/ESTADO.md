@@ -1548,6 +1548,12 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **Tests:** uno más en `tests/test_new_enemies.gd`. 619 de 619.
 - **La fase 15 está hecha (30-10-2026), pendiente de tu revisión.**
 
+- **Tres mejoras pequeñas de la fase 15 (31-10-2026), pendientes de tu revisión.**
+  - **Rótulo del desafío:** la cabecera del HUD dice «Desafío · <nombre>» en vez de «Parte 1 · Nivel 4», y la tarjeta del nivel, «Desafío · Parte 1 · Nivel 4 · …» (`shots/hud_desafio_recorte.png`).
+  - **Récords de los desafíos:** `Challenge.record_win` guarda el mejor tiempo (`records["challenges"][base]` = segundos; los superados antes, con `true`, salen sin tiempo) y `Challenge.best` lo lee. La pantalla final dice «¡Nuevo récord! m:ss (antes, …)» o «Tiempo · Récord», y el menú de desafíos, «Récord m:ss» junto al nombre (`shots/seleccion_desafios_record_003.0s.png`).
+  - **La caída en GIF:** en «Ver la caída», Y (mando) o G (teclado) la guarda como GIF en bucle a velocidad real (384×216, 12 imágenes/s, unos 2,5 MB) en la carpeta del modo foto, `Imágenes/Lovecraft Library/caida_<fecha>.gif` (`photo_dir=` para pruebas). `GifWriter` (`scripts/fx/gif_writer.gd`): paleta común de los 256 colores más frecuentes y LZW con tabla plana, en un hilo. Comprobado leyéndolo con Pillow (60 imágenes, colores bien). Opción `replay_gif=true` (lo guarda al abrir la repetición).
+  - **Tests:** `tests/test_gif_writer.gd` (1) y el de récords en `tests/test_challenge.gd`. 620 de 620.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

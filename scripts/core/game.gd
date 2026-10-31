@@ -1258,7 +1258,12 @@ func _on_level_completed() -> void:
 	var won_title := "Nivel superado"
 	if Challenge.is_challenge(String(level.id)):     # desafío (15.2): aparte, no cuenta como nivel de campaña
 		won_title = "Desafío superado"
-		Challenge.record_win(Saves.current, String(level.id))
+		var prev := Challenge.best(Saves.current, String(level.id))
+		var t := director.time
+		if Challenge.record_win(Saves.current, String(level.id), t) and Saves.current != null:   # récord de tiempo
+			_endless_lines = PackedStringArray(["¡Nuevo récord! %s%s" % [Endless.clock(t), " (antes, %s)" % Endless.clock(prev) if prev > 0.0 else ""]])
+		elif Saves.current != null:
+			_endless_lines = PackedStringArray(["Tiempo: %s  ·  Récord: %s" % [Endless.clock(t), Endless.clock(prev)]])
 		Achievements.record(Saves.current, "challenges_won", Challenge.won_count(Saves.current))
 	elif Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))

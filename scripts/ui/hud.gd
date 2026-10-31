@@ -45,6 +45,8 @@ func _ready() -> void:
 	top.alignment = BoxContainer.ALIGNMENT_BEGIN
 	add_child(top)
 	var lvl_name := "Parte %d · Nivel %d" % [director.level.part, director.level.number] if director != null else "Campo de pruebas"
+	if director != null and Challenge.is_challenge(String(director.level.id)):   # desafío (15.2)
+		lvl_name = "Desafío · %s" % String(Challenge.find(String(director.level.id)).get("name", ""))
 	if director != null and director.level.endless:          # sin fin (hito 13.8): el récord de J1 aquí
 		lvl_name = "La noche eterna"
 		if director.level.daily != "":                    # partida del día (13.9): el intento que cuenta

@@ -98,6 +98,7 @@ func _card(id: String, level_name: String) -> Control:
 
 ## «Parte 1 · Nivel 2 · En las montañas de la locura» del nivel `id` ("" si no es de la campaña).
 static func _over_line(id: String) -> String:
+	if Challenge.is_challenge(id): return "Desafío · " + _over_line(Challenge.base_of(id))   # (hito 15.2)
 	for l in Campaign.levels():
 		if String(l.id) != id: continue
 		var parts := Campaign.parts()

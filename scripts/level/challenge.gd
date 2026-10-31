@@ -49,18 +49,26 @@ static func any_unlocked(save: SaveData) -> bool:
 static func won(save: SaveData, base: String) -> bool:
 	return save != null and (save.records.get("challenges", {}) as Dictionary).has(base)
 
+## Mejor tiempo en superarlo (s; 0 si no hay: superado antes de guardarse los tiempos, o nunca).
+static func best(save: SaveData, base: String) -> float:
+	if save == null: return 0.0
+	var v: Variant = (save.records.get("challenges", {}) as Dictionary).get(base_of(base), 0.0)
+	return float(v) if v is float or v is int else 0.0
+
 static func won_count(save: SaveData) -> int:
 	return (save.records.get("challenges", {}) as Dictionary).size() if save != null else 0
 
-## Apunta el desafío superado; true si es la primera vez.
-static func record_win(save: SaveData, id: String) -> bool:
+## Apunta el desafío superado en `t` s y se queda con el mejor tiempo; true si es récord (o la
+## primera vez).
+static func record_win(save: SaveData, id: String, t: float) -> bool:
 	if save == null: return false
 	var base := base_of(id)
 	var rec: Dictionary = save.records.get("challenges", {})
-	var first := not rec.has(base)
-	rec[base] = true
+	var prev := best(save, base)
+	var better := not rec.has(base) or prev <= 0.0 or t < prev
+	if better: rec[base] = t
 	save.records["challenges"] = rec
-	return first
+	return better
 
 ## El nivel del desafío: el de la campaña, con su nombre.
 static func make_level(id: String) -> LevelData:

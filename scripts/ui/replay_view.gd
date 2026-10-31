@@ -10,6 +10,10 @@ var _tex: ImageTexture
 var _rect: TextureRect
 var _bar: ColorRect
 var _t := 0.0
+var _hint: Label
+var _task := -1                                ## guardando el GIF (WorkerThreadPool)
+var _gif_path := ""
+var _gif_ok := false
 
 func _init(p_frames: Array[Image]) -> void:
 	frames = p_frames
@@ -49,14 +53,46 @@ func _ready() -> void:
 	_bar.color = UiKit.GOLD
 	_bar.size = Vector2(0, 6)
 	track.add_child(_bar)
-	var hint := UiKit.label("Los últimos %d segundos, a media velocidad  ·  A o B para volver" % roundi(frames.size() / DeathReplay.FPS),
-		22, UiKit.TEXT_DIM)
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(hint)
+	_hint = UiKit.label(_hint_text(), 22, UiKit.TEXT_DIM)
+	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(_hint)
 	get_viewport().gui_release_focus()             # A y B, para esta ventana y no para los botones de debajo
 	Auto.sfx("page")
+	if LaunchArgs.from_cmdline().get_bool("replay_gif"): save_gif.call_deferred()   # pruebas
+
+func _hint_text() -> String:
+	return "Los últimos %d segundos, a media velocidad  ·  Y o G: guardar como GIF  ·  A o B para volver" % roundi(frames.size() / DeathReplay.FPS)
+
+## Carpeta de las fotos (la del modo foto): Imágenes/Lovecraft Library, o `photo_dir=`.
+static func gif_dir() -> String:
+	var la := LaunchArgs.from_cmdline()
+	if la.has("photo_dir"): return la.get_str("photo_dir")
+	return OS.get_system_dir(OS.SYSTEM_DIR_PICTURES).path_join(PhotoMode.DIR_NAME)
+
+## Guarda la repetición como GIF (a velocidad real) en un hilo, para compartirla.
+func save_gif() -> void:
+	if _task >= 0: return
+	var dir := gif_dir()
+	DirAccess.make_dir_recursive_absolute(dir)
+	_gif_path = dir.path_join("caida_%s.gif" % Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_"))
+	_hint.text = "Guardando el GIF…"
+	var fr := frames
+	var path := _gif_path
+	_task = WorkerThreadPool.add_task(func() -> void:
+		var bytes := GifWriter.encode(fr, roundi(100.0 / DeathReplay.FPS))
+		var f := FileAccess.open(path, FileAccess.WRITE)
+		if f != null:
+			f.store_buffer(bytes)
+			f.close()
+		_gif_ok = f != null)
 
 func _process(delta: float) -> void:
+	if _task >= 0 and WorkerThreadPool.is_task_completed(_task):
+		WorkerThreadPool.wait_for_task_completion(_task)
+		_task = -1
+		_hint.text = ("Guardado en %s  ·  A o B para volver" % _gif_path.get_file()) if _gif_ok else "No se pudo guardar el GIF  ·  A o B para volver"
+		Auto.sfx("page")
+		print("GIF de la caída: ", _gif_path if _gif_ok else "error")
 	var length := frames.size() / DeathReplay.FPS
 	_t = fmod(_t + delta * SPEED, length + 1.0)    # un segundo quieto en la última antes de volver
 	var i := mini(int(_t * DeathReplay.FPS), frames.size() - 1)
@@ -65,5 +101,10 @@ func _process(delta: float) -> void:
 
 func _unhandled_input(e: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
-	if e.is_action_pressed("ui_cancel") or e.is_action_pressed("ui_accept"):
+	if (e is InputEventKey and e.pressed and not e.echo and (e as InputEventKey).keycode == KEY_G) 			or (e is InputEventJoypadButton and e.pressed and (e as InputEventJoypadButton).button_index == JOY_BUTTON_Y):
+		save_gif()
+	elif e.is_action_pressed("ui_cancel") or e.is_action_pressed("ui_accept"):
 		queue_free()
+
+func _exit_tree() -> void:
+	if _task >= 0: WorkerThreadPool.wait_for_task_completion(_task)   # no dejar el hilo a medias

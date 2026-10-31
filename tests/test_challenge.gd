@@ -64,9 +64,11 @@ func test_armas_nuevas_segun_el_desafio() -> void:
 
 func test_superados_se_cuentan_una_vez() -> void:
 	var s := SaveData.new()
-	assert_true(Challenge.record_win(s, "desafio:p1_n1"))
-	assert_false(Challenge.record_win(s, "desafio:p1_n1"))
-	Challenge.record_win(s, "desafio:p2_n1")
+	assert_true(Challenge.record_win(s, "desafio:p1_n1", 300.0), "la primera vez es récord")
+	assert_false(Challenge.record_win(s, "desafio:p1_n1", 320.0), "más lento, no")
+	assert_true(Challenge.record_win(s, "desafio:p1_n1", 280.0), "más rápido, sí")
+	assert_almost_eq(Challenge.best(s, "p1_n1"), 280.0, 0.01)
+	Challenge.record_win(s, "desafio:p2_n1", 250.0)
 	assert_eq(Challenge.won_count(s), 2)
 	assert_true(Challenge.won(s, "p1_n1"))
 	assert_true(s.levels_won.is_empty(), "no cuentan como niveles de campaña")
