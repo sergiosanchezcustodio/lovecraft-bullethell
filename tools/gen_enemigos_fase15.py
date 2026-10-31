@@ -114,9 +114,10 @@ def tamborilero():
         y0 = min(k[1] for k in hand) + 2
         x0 = round(sum(k[0] for k in hand) / len(hand))
         z0 = max(k[2] for k in hand if k[1] <= y0 + 1)
+        s = -1 if x0 > 0 else 1                                      # hacia el centro del tambor
         for i in range(10):
-            M.put(x0, y0 - i // 3, z0 + i, part, STICK)
-        M.put(x0, y0 - 3, z0 + 10, part, HIDE); M.put(x0, y0 - 4, z0 + 10, part, HIDE)
+            M.put(x0 + s * (i * 2 // 3), y0 - i // 2, z0 + i, part, STICK)
+        M.put(x0 + s * 6, y0 - 5, z0 + 10, part, HIDE); M.put(x0 + s * 6, y0 - 6, z0 + 10, part, HIDE)
     cu.finish(M, 'tamborilero', dict(MATS), flat=(PAINT, HIDE, CORD, STICK, IDOL, DRUM_SH))
 
 

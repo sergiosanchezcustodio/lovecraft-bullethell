@@ -34,8 +34,11 @@ static func text(kind: String, id: String) -> String:
 ## el modelo) y dim (aún no se tiene entero: el nombre se lee, el modelo sale en sombra).
 ## Bestiario (hito 15.4): una baja más de esa criatura, y de qué investigador (vacío: no se sabe
 ## o no es de este PC). En `SaveData.records["bestiary"]`: {id: {"kills": n, "by": {pj: n}}}.
+const MUELLE := "_muelle"                     ## sufijo de las variantes del muelle (solo cambia cuánto salen)
+
 static func add_kill(save: SaveData, enemy_id: String, by: String) -> void:
 	if save == null: return
+	enemy_id = enemy_id.trim_suffix(MUELLE)        # cuentan con la criatura de siempre
 	var all: Dictionary = save.records.get("bestiary", {})
 	var r: Dictionary = all.get(enemy_id, {"kills": 0, "by": {}})
 	r["kills"] = int(r.get("kills", 0)) + 1
@@ -131,11 +134,13 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 					out.append(e)
 		"enemies":
 			for e: EnemyData in _list("res://data/enemies"):
+				if String(e.id).ends_with(MUELLE): continue    # variantes del muelle: la misma criatura (15.4)
 				var facts := ["Escalón %d%s" % [e.tier, " · élite" if e.elite else ""], "Vida %d" % int(e.max_health),
 					"Velocidad %.1f m/s" % e.move_speed]
 				if e.aura_drain > 0.0: facts.append("Aura: −%.1f de cordura por segundo" % e.aura_drain)
 				facts.append_array(kill_facts(save, String(e.id)))
-				out.append(_e(String(e.id), e.display_name, _seen(save, "enemies", e.id), text("enemies", e.id),
+				var seen := _seen(save, "enemies", e.id) or _seen(save, "enemies", StringName(String(e.id) + MUELLE))
+				out.append(_e(String(e.id), e.display_name, seen, text("enemies", e.id),
 					e.model, "full", null, facts))
 		"weapons":
 			for w in DamageRules.all_weapons():

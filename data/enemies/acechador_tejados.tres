@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1")
 id = &"acechador_tejados"
-display_name = "Acechador"
+display_name = "Acechador de los tejados"
 model = "acechador"
 tier = 3
 elite = true
