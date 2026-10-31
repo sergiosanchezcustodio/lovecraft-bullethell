@@ -50,6 +50,7 @@ const DRUM_EVERY := 0.6
 var drum_t := 0.0
 var _drum_next := 0.0
 var _revived := false
+var killed_by: StringName = &""               ## etiqueta del golpe que lo abatió («J1:webly»; bestiario, hito 15.4)
 var _down_t := 0.0
 var _getup_t := 0.0
 var anchored := false                       ## no se mueve ni lo empujan (Dagon, en la orilla)
@@ -480,7 +481,9 @@ func take_damage(d: Damage) -> void:
 		return
 	world.record_damage(d.tag, dealt)              # estadísticas de la ficha
 	if not d.dot: world.player_hit(d.tag, self)    # objetos al impactar (hito 8.7)
-	if health <= 0.0: world.record_kill(d.tag, global_position)
+	if health <= 0.0:
+		killed_by = d.tag
+		world.record_kill(d.tag, global_position)
 	_flash = 0.07
 	_knock += Vector3(d.knockback.x, 0, d.knockback.z) * (2.5 if not data.elite else 0.6)
 	_hit_pose(d)

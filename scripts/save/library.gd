@@ -32,6 +32,38 @@ static func text(kind: String, id: String) -> String:
 ## Entradas de un tomo: {id, name, known, text, model, mode, icon, facts: Array[String],
 ## section (subtítulo de grupo, opcional)}. Las del vestuario llevan además worn (lo que viste
 ## el modelo) y dim (aún no se tiene entero: el nombre se lee, el modelo sale en sombra).
+## Bestiario (hito 15.4): una baja más de esa criatura, y de qué investigador (vacío: no se sabe
+## o no es de este PC). En `SaveData.records["bestiary"]`: {id: {"kills": n, "by": {pj: n}}}.
+static func add_kill(save: SaveData, enemy_id: String, by: String) -> void:
+	if save == null: return
+	var all: Dictionary = save.records.get("bestiary", {})
+	var r: Dictionary = all.get(enemy_id, {"kills": 0, "by": {}})
+	r["kills"] = int(r.get("kills", 0)) + 1
+	if by != "":
+		var b: Dictionary = r.get("by", {})
+		b[by] = int(b.get(by, 0)) + 1
+		r["by"] = b
+	all[enemy_id] = r
+	save.records["bestiary"] = all
+
+## Líneas de la ficha: abatidas y quién abatió más.
+static func kill_facts(save: SaveData, enemy_id: String) -> Array:
+	var r: Dictionary = (save.records.get("bestiary", {}) as Dictionary).get(enemy_id, {}) if save != null else {}
+	var n := int(r.get("kills", 0))
+	if n <= 0: return []
+	var out := ["Abatidos: %d" % n]
+	var best := ""
+	var most := 0
+	var by: Dictionary = r.get("by", {})
+	for k: String in by:
+		if int(by[k]) > most:
+			most = int(by[k])
+			best = k
+	if best != "":
+		var c := load("res://data/characters/%s.tres" % best) as CharacterData if ResourceLoader.exists("res://data/characters/%s.tres" % best) else null
+		out.append("Quien más: %s (%d)" % [c.display_name if c != null else best, most])
+	return out
+
 static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	match tome:
@@ -102,6 +134,7 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				var facts := ["Escalón %d%s" % [e.tier, " · élite" if e.elite else ""], "Vida %d" % int(e.max_health),
 					"Velocidad %.1f m/s" % e.move_speed]
 				if e.aura_drain > 0.0: facts.append("Aura: −%.1f de cordura por segundo" % e.aura_drain)
+				facts.append_array(kill_facts(save, String(e.id)))
 				out.append(_e(String(e.id), e.display_name, _seen(save, "enemies", e.id), text("enemies", e.id),
 					e.model, "full", null, facts))
 		"weapons":

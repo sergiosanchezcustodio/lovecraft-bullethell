@@ -50,6 +50,51 @@ static func make(host: Node, model_name: String, mode: String = "full", px: int 
 	vp.add_child(m)
 	if not worn.is_empty(): OutfitData.apply(m, model_name, worn)
 	OutfitData.pose_hold(m, hold, 1.0)
+	_stage(vp, m, mode, fixed)
+	return vp.get_texture()
+
+## Modelo vivo (hito 15.4, bestiario): como `make` con "full", pero se dibuja en cada fotograma,
+## gira despacio y hace su animación de reposo (o de andar). Devuelve el SubViewport (su textura
+## es la imagen); hay que colgarlo de algo que se libere con la página.
+static func make_live(model_name: String, px: int = 128, fixed := 0.0) -> SubViewport:
+	var vp := SubViewport.new()
+	vp.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	vp.size = Vector2i(px, px)
+	vp.transparent_bg = true
+	vp.own_world_3d = true
+	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	var m := VoxelBuilder.load_model("res://models/%s.json" % model_name)
+	var turn := Node3D.new()                       # el giro, en un contenedor (nunca en la raíz del modelo)
+	turn.name = "Turn"
+	vp.add_child(turn)
+	turn.add_child(m)
+	_stage(vp, m, "full", fixed)
+	var spin := Spin.new()
+	spin.model_name = model_name
+	spin.model = m
+	spin.turn = turn
+	vp.add_child(spin)
+	return vp
+
+## Gira el modelo y le pone su animación de reposo (o de andar, si no tiene).
+class Spin extends Node:
+	const SPEED := 0.6                             ## rad/s
+	var model_name := ""
+	var model: Node3D
+	var turn: Node3D
+	var _t := 0.0
+	var _anim := ""
+	func _ready() -> void:
+		_anim = "idle" if Anims.has_anim(model_name, "idle") else ("walk" if Anims.has_anim(model_name, "walk") else "")
+		turn.rotation.y = -0.6
+	func _process(delta: float) -> void:
+		turn.rotation.y += SPEED * delta
+		if _anim == "": return
+		_t = fposmod(_t + delta / Anims.duration(model_name, _anim), 1.0)
+		Anims.pose(model_name, _anim, model, _t)
+
+## Cámara de tres cuartos y luces de estudio para `make` y `make_live`.
+static func _stage(vp: SubViewport, m: Node3D, mode: String, fixed: float) -> void:
 	var cam := Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	if mode == "head":
@@ -94,4 +139,3 @@ static func make(host: Node, model_name: String, mode: String = "full", px: int 
 	env.adjustment_saturation = 1.08
 	we.environment = env
 	vp.add_child(we)
-	return vp.get_texture()

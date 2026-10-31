@@ -1541,6 +1541,13 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **Oleadas y textos:** en el `pool` de esos niveles, en «Criaturas» del mapa (`data/campaign.json`) y en el bestiario (`data/library/textos.json`). El equilibrio, sin medir con el bot: lo verás en tu partida.
   - **Tests:** `tests/test_new_enemies.gd` (4). 618 de 618.
 
+- **Hito 15.4: bestiario vivo (30-10-2026), pendiente de tu revisión.** En el tomo I, la criatura vista gira despacio y hace su animación de reposo (o de andar) en su página (`ModelIcon.make_live`: el mismo encuadre y las mismas luces que el icono, con `ModelIcon._stage` compartido, pero dibujado en cada fotograma y con el giro en un contenedor; clase `ModelIcon.Spin`). Las que no has visto siguen en silueta. Bajo los datos, «Abatidos: N» y «Quien más: <investigador> (n)».
+  - **Bajas por criatura:** `Enemy.killed_by` (la etiqueta del golpe que lo abatió) y `Library.add_kill` en `game._on_enemy_died` (en el invitado, `net_enemy_died`, sin quién); en `SaveData.records["bestiary"]` = {id: {kills, by: {personaje: n}}}. Cuentan desde ahora: las partidas de antes no tienen el dato.
+  - **Opción:** `library_live=false` (las imágenes quietas de antes). Capturas `shots/titulo_bestiario_009.0s.png` y `_010.0s.png` (el Acechador girando).
+  - **Visto de paso (sin tocar):** el bestiario repite nombres de variantes (dos «Acechador», dos «Cultista armado del Alert»: el de los tejados y el del muelle).
+  - **Tests:** uno más en `tests/test_new_enemies.gd`. 619 de 619.
+- **La fase 15 está hecha (30-10-2026), pendiente de tu revisión.**
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

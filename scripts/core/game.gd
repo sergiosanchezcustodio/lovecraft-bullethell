@@ -669,6 +669,8 @@ func _is_bot(q: Player) -> bool:
 func _on_enemy_died(e: Enemy) -> void:
 	kills += 1
 	if Saves.current != null: Saves.current.stats["kills"] += 1
+	var by := world.player_of(e.killed_by)           # bajas por criatura y quién (bestiario, hito 15.4)
+	Library.add_kill(Saves.current, String(e.data.id), String(by.data.id) if by != null and not by.remote else "")
 	if e.data.elite: Achievements.add(Saves.current, "elites")
 	gems.drop(e.global_position, e.data.xp, e.data.tier)
 	earn(e.data.money)
@@ -677,6 +679,7 @@ func _on_enemy_died(e: Enemy) -> void:
 ## en la foto; aquí cuenta en su partida guardada: estadísticas, logros y dólares.
 func net_enemy_died(e: Enemy) -> void:
 	if Saves.current != null: Saves.current.stats["kills"] += 1
+	Library.add_kill(Saves.current, String(e.data.id), "")
 	if e.data.elite: Achievements.add(Saves.current, "elites")
 	earn(e.data.money)
 

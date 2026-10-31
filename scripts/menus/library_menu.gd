@@ -37,6 +37,7 @@ var _tome := ""                                ## "" = estantería
 var _rows: Array[Button] = []
 var _entries: Array[Dictionary] = []
 var _icons := {}
+var _live := LaunchArgs.from_cmdline().get_bool("library_live", true)   ## bestiario: modelos que giran (hito 15.4)
 var _shelf_focus := 0
 var _sub: Control                              ## logros abiertos encima
 
@@ -242,6 +243,11 @@ func _show_entry(k: int) -> void:
 		frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		var img := TextureRect.new()
 		img.texture = tex
+		if _tome == "enemies" and known and String(e.model) != "" and _live:   # bestiario vivo (hito 15.4)
+			var fixed := maxf(_bestiary_scale(), ModelIcon.frame_size(String(e.model)) * ModelIcon.MARGIN)
+			var vp := ModelIcon.make_live(String(e.model), IMAGE_PX, fixed)
+			img.add_child(vp)
+			img.texture = vp.get_texture()
 		img.custom_minimum_size = Vector2(IMAGE_PX, IMAGE_PX)
 		img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

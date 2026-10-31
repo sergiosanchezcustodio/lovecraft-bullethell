@@ -60,3 +60,15 @@ func test_el_tambor_acelera_a_los_cercanos() -> void:
 	_step(drum, 0.1)
 	assert_gt(near.drum_t, 0.0, "el cercano, al ritmo")
 	assert_eq(far.drum_t, 0.0, "el lejano, no")
+
+func test_el_bestiario_cuenta_bajas_y_quien_mas() -> void:
+	var s := SaveData.new()
+	assert_eq(Library.kill_facts(s, "pinguino"), [], "sin bajas, nada")
+	for i in 3: Library.add_kill(s, "pinguino", "dyer")
+	Library.add_kill(s, "pinguino", "peaslee")
+	Library.add_kill(s, "pinguino", "")
+	var f := Library.kill_facts(s, "pinguino")
+	assert_eq(f[0], "Abatidos: 5")
+	assert_true(String(f[1]).begins_with("Quien más: William Dyer (3)"), String(f[1]))
+	var back := SaveData.from_dict(s.to_dict())
+	assert_eq(Library.kill_facts(back, "pinguino")[0], "Abatidos: 5", "se guarda")
