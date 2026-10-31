@@ -1517,6 +1517,15 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **Sin el diario:** la toma del diario necesitaba acabar o perder una partida y no aportaba en un tráiler de un minuto; queda fuera (se puede añadir al guion).
   - 592 de 592.
 
+- **Fase 15 (30-10-2026), en curso:** propuesta al autor al ver que no quedaban ideas sin hacer y aprobada entera; plan en `docs/ROADMAP.md` (hitos 15.1-15.4). La música definitiva queda fuera (es del autor, D-40) y el bestiario ya existía: se mejora.
+- **Hito 15.1: repetición de la caída (30-10-2026), pendiente de tu revisión.** Al caer, la pantalla final tiene «Ver la caída» (tras el diario): los últimos 5 s de la partida a media velocidad, en bucle, con una barra de tiempo; A o B vuelven.
+  - **Grabación** (`DeathReplay`, `scripts/fx/death_replay.gd`): 12 imágenes por segundo de reloj real de la pantalla entera (con el HUD), leídas con `RenderingDevice.texture_get_data_async` (sin parar la GPU) y reducidas a 384×216 en RGB8 en un hilo (`WorkerThreadPool`); como mucho dos en curso. 60 imágenes, unos 15 MB. Se para sola con el árbol en pausa y `game._game_over` la congela tras la cámara lenta de la caída, que así sale en la repetición. Sin `RenderingDevice` (compatibilidad) no graba y no sale el botón; tampoco con menos de 1 s grabado.
+  - **Vista** (`ReplayView`, `scripts/ui/replay_view.gd`): capa sobre la pantalla final, con marco de `MenuKit`, a 1280×720; se cierra como `DiaryPage`.
+  - **Coste** (Alta, `bot=circle demo=14 perf=8`, dos veces cada una): media 6,99 y 7,05 ms con ella, 7,01 y 7,01 ms sin ella; el 1 % peor, 12,9 y 13,1 frente a 12,6 y 12,4 ms (dentro de lo que varía). Activada en las cuatro calidades (`replay` en `data/quality.json`, para poder quitarla en Baja si hiciera falta).
+  - **Colores:** la mediana de brillo de la repetición (0,49) coincide con la de una captura normal (0,50).
+  - **Opciones:** `replay=false` (sin grabar) y `replay_open=true` (abre la repetición en la pantalla final, para capturas con `halt_shots=true quit_on_end=true`). Captura en `shots/game_replay_parada1.png`.
+  - **Tests:** `tests/test_death_replay.gd` (2). 609 de 609.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

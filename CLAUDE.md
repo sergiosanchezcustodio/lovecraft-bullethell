@@ -20,7 +20,7 @@ Consúltalos cuando haga falta (son largos):
 - Fases 0 a 7 y 9 a 14 hechas; casi todas esperan la partida, la prueba o la revisión del autor (fases 11 a 14, la prueba online por internet con `docs/PRUEBA_ONLINE.md` y el cooperativo con varios mandos).
 - Fase 8 (pulido y distribución): falta subir a itch.io (necesita la cuenta del autor). Nube (fase 10): falta el `client_id` de la OAuth App del autor en `data/cloud.json`.
 - Dificultad del 1 al 10 por características (D-42), temporal, pendiente de la calibración del autor.
-- **Siguiente:** lo que elija el autor (revisar las fases 13 y 14, subir a itch.io, la prueba online). Ideas propuestas sin hacer: al final de `docs/ESTADO.md`.
+- **Fase 15 (30-10-2026), en curso** (hitos 15.1-15.4 en `docs/ROADMAP.md`): repetición de la caída (15.1, hecho), modo desafío, un enemigo nuevo por parte y bestiario vivo. Después, lo que elija el autor (revisar las fases 13 a 15, subir a itch.io, la prueba online).
 
 ### Reglas que no hay que olvidar
 

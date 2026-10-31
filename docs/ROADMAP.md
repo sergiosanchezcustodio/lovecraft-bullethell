@@ -404,3 +404,16 @@ Pedida por el autor el 30-10-2026: las 55 prendas propuestas («haz todas») y u
 | 14.6 | **Complementos (15):** monóculo, pipa (con humo de vez en cuando), collar del Signo Primigenio, bolsa de cartero, canana, antifaz, máscara de gas, máscara de médico de la peste, vendas y parche, clavel, pañuelo de vaquero, estetoscopio, cámara de fuelle, rosario y ojos de Innsmouth | Igual; el humo de la pipa, `OutfitData.fx` **Hecho (30-10-2026).** |
 | 14.7 | **Manos y espalda (8):** guantes de cuero, de boxeo y manoplas; bastón, paraguas abierto y linterna eléctrica en la mano; mochila de expedición y tentáculo a la espalda | Igual, con los huecos del 14.1 **Hecho (30-10-2026).** |
 | 14.8 | **Conjuntos:** grupos con nombre (Cultista, Expedición Lake, Buzo, Gánster, Innsmouth, Médico de la peste…) que, puestos enteros, dan un rótulo en la ficha y un logro; en la tienda, la sección Conjuntos compra lo que falta con descuento | `data/outfit_sets.json`, `OutfitSets`; logro «De punta en blanco» **Hecho (30-10-2026).** |
+
+## Fase 15: Repetición de la caída, modo desafío, enemigos nuevos y bestiario vivo
+
+Propuesta al autor el 30-10-2026 tras comprobar que no quedaban ideas sin hacer; la aprobó entera («quiero hacer todo, adelante»). La música definitiva queda fuera: la música es del autor (D-40). El bestiario ilustrado ya existía (tomo I), así que la idea pasa a mejorarlo.
+
+**Aceptación:** al caer se puede ver la caída a media velocidad sin coste apreciable en la partida; cada nivel superado abre su desafío, con reglas fijas y su logro; cada parte tiene una criatura nueva con modelo, animaciones, ficha y sitio en las oleadas; el bestiario enseña la criatura girando y animada, y cuántas has abatido.
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 15.1 | **Repetición de la caída:** la pantalla final, al caer, ofrece «Ver la caída»: los últimos 5 s a media velocidad, en bucle | `DeathReplay` (lectura asíncrona de la pantalla a 12 imágenes por segundo, reducida a 384×216 en un hilo), `ReplayView`, `EndScreen.replay`; `replay` en `data/quality.json`; `replay=false`, `replay_open=true` **Hecho (30-10-2026).** |
+| 15.2 | **Modo desafío:** reglas fijas por nivel (solo arcanas, sin esquive, una sola arma, sin recuperar cordura, niebla cerrada…), abierto al superar el nivel, desde el mapa, con su logro | `data/challenges.json`, `Challenge`, `ChallengeMenu`; en red viaja con la partida |
+| 15.3 | **Un enemigo nuevo por parte:** expedicionario de Lake (parte 1: se arrastra y se levanta si no lo rematas), nadador de la marea (parte 2: salta del agua en arco), tamborilero del pantano (parte 3: su tambor acelera a los cercanos) | Generadores en `tools/`, scripts de animación, `.tres` en `data/enemies/`, bestiario y oleadas |
+| 15.4 | **Bestiario vivo:** la criatura gira y se anima en su página; abatidas en total y quién abatió más | `LibraryMenu`, `SaveData.stats` |

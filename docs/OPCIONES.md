@@ -62,6 +62,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `hitstop=false`, `crumble=false` y `marks=N`: sin micro-pausa al impactar, sin desmoronarse y tope de manchas en el suelo (por defecto, el de la calidad gráfica). `falls=false`: sin la caída de cada familia al morir (hito 12.7). `wounds=false|0.7`: sin las grietas de herida o fijas a ese nivel (hito 12.6, medir su coste).
   - `cfg_quality=0..3` (Baja…Ultra) y `cfg_damage_numbers=0|1|2`: calidad gráfica y números de daño para esta ejecución.
   - `ui_check=true` (en cualquier escena): apunta con «UICHK» los textos que pisan el filete de una ventana (20 px del borde), su filigrana o el borde de un recuadro (`scripts/ui/ui_overlap_check.gd`).
+  - `replay=false`: sin grabar la repetición de la caída (hito 15.1). `replay_open=true`: la abre en la pantalla final (capturas, con `halt_shots=true quit_on_end=true`).
   - `boss_intro=false`: sin la entrada de los jefes (`BossIntro`), solo el aviso de texto, como antes.
   - `hp=` y `san=` también sirven para ver los retratos con estado (hito 12.14: sangre desde la mitad de la vida, mirada perdida desde el 40 % de la cordura).
   - `cfg_difficulty=N`: todas las características de la dificultad a N (1..10; D-42) en esta ejecución. `dif_<característica>=N` (p. ej. `dif_vida=6`) cambia una; `dif_<valor>=x` (p. ej. `dif_rate=4`), un multiplicador suelto. `dif_menu=true` con `debug_menu=N`: abre la dificultad en vez de la depuración. `python tools/simular.py … --dif N` (3 por defecto).

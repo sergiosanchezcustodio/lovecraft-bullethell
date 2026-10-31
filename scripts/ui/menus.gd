@@ -189,6 +189,7 @@ class EndScreen extends CanvasLayer:
 	var accent := UiKit.GOLD
 	var report: Control = null                  ## informe al caer (hito 13.1, `FallReport.panel`), a la derecha
 	var diary: Array = []                       ## entradas del diario (hito 13.10): {who, color, title, text}
+	var replay: Array[Image] = []               ## los últimos segundos antes de caer (hito 15.1, `DeathReplay`)
 	var epilogue := false                       ## al vencer el final de la campaña: «Epílogo», el primero (13.11)
 	signal epilogue_open
 
@@ -234,6 +235,7 @@ class EndScreen extends CanvasLayer:
 			var ep := _epilogue_button(box)
 			box.add_child(leave)
 			_diary_button(box, leave)
+			_replay_button(box)
 			if ep != null: leave = ep
 			if logs_button: box.add_child(_logs_button())   # se cortó: el registro es lo que hay que enviar
 			leave.grab_focus.call_deferred()
@@ -262,6 +264,7 @@ class EndScreen extends CanvasLayer:
 		out.pressed.connect(func() -> void: quit.emit())
 		box.add_child(out)
 		_diary_button(box, out)
+		_replay_button(box)
 		if logs_button: box.add_child(_logs_button())
 		_first = nxt if nxt != null else again
 		_first.grab_focus.call_deferred()
@@ -289,6 +292,18 @@ class EndScreen extends CanvasLayer:
 			page.tree_exited.connect(func() -> void: if is_inside_tree(): b.grab_focus.call_deferred()))
 		box.add_child(b)
 		if LaunchArgs.from_cmdline().get_bool("diary_open"): b.pressed.emit.call_deferred()   # capturas
+
+	func _replay_button(box: VBoxContainer) -> void:
+		if replay.is_empty(): return
+		var b := MenuKit.button("Ver la caída", MenuKit.INK, 22)
+		b.custom_minimum_size = Vector2(360, 50)
+		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		b.pressed.connect(func() -> void:
+			var v := ReplayView.new(replay)
+			add_child(v)
+			v.tree_exited.connect(func() -> void: if is_inside_tree(): b.grab_focus.call_deferred()))
+		box.add_child(b)
+		if LaunchArgs.from_cmdline().get_bool("replay_open"): b.pressed.emit.call_deferred()   # capturas
 
 	## Vuelve a dar el foco (al cerrar una ventana encima, como la de los pactos).
 	func focus_next() -> void:

@@ -420,6 +420,9 @@ func _ready() -> void:
 	add_child(SanityFx.new().setup(players))         # distorsiones de cordura baja
 	if director != null: add_child(Tips.new(self))   # consejos de la primera partida (hito 13.3)
 	if director != null: add_child(Hallucinations.new().setup(self))   # con poca cordura (hito 13.4)
+	if director != null and args.get_bool("replay", true) and Quality.value("replay", true):
+		_replay = DeathReplay.new()                  # los últimos segundos, para verlos al caer (hito 15.1)
+		add_child(_replay)
 	# con bots no salen (las simulaciones de la dificultad siguen comparables), salvo pedidos
 	var bots := player != null and player.input is BotInput and not args.get_bool("objectives")
 	if director != null and args.get_bool("objectives", true) and (not bots or args.has("objective")):
@@ -1143,6 +1146,10 @@ func _music_step(delta: float) -> void:
 		print("CAPAS t=%d vivos=%d tope=%d jefe=%s pide=%.2f/%.2f suena=%.2f/%.2f" % [_music_logged, world.enemies.size(),
 			director.max_alive(), boss, k.x, k.y, Music.layer_level("percusion"), Music.layer_level("coros")])
 
+## Repetición de la caída (hito 15.1): graba siempre y se congela al caer.
+var _replay: DeathReplay
+var _replay_frames: Array[Image] = []
+
 func _game_over() -> void:
 	if _ended: return
 	_ended = true
@@ -1162,6 +1169,7 @@ func _game_over() -> void:
 	Engine.time_scale = 0.35                       # la caída, a cámara lenta un momento
 	await get_tree().create_timer(0.6, true, false, true).timeout
 	Engine.time_scale = 1.0
+	if _replay != null: _replay_frames = _replay.freeze()
 	get_tree().paused = true
 	var title := "Has caído" if players.size() == 1 else "Habéis caído"
 	if level != null and level.endless: title = "Partida del día" if level.daily != "" else "La noche eterna"
@@ -1283,6 +1291,7 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 			lines.append(MenuKit.count(net_game.level_marks, "marca") + " en este nivel (F9 o LB+RB)")
 	var s := Menus.EndScreen.new(title, lines, accent)
 	s.diary = _diary(result)
+	if result == "caida" and _replay_frames.size() >= int(DeathReplay.FPS): s.replay = _replay_frames
 	s.epilogue = result == "superado" and next_id == "" and level != null and String(level.id) == Demo.last_level()
 	s.epilogue_open.connect(_epilogue)
 	if not s.diary.is_empty(): Saves.save()                # el diario, ya en el hueco
