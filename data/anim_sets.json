@@ -80,6 +80,9 @@
 		"primigenio_menor": "anim_profundo",
 		"cthulhu": "anim_dagon",
 		"armitage": "anim_humano",
-		"west": "anim_humano"
+		"west": "anim_humano",
+		"expedicionario": "anim_humano",
+		"tamborilero": "anim_humano",
+		"nadador": "anim_profundo"
 	}
 }

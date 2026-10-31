@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"expedicionario"
+display_name = "Expedicionario de Lake"
+model = "expedicionario"
+tier = 2
+spawn_weight = 0.8
+elite = false
+tags = Array[StringName]([&"humana"])
+revive = 0.5
+revive_time = 2.5
+max_health = 45.0
+hit_radius = 0.45
+body_radius = 0.45
+move_speed = 1.9
+xp = 2.0
+money = 3
+contact_physical = 9.0
+contact_mental = 2.5
+movement = &"crawl"
+attack_anim = ""

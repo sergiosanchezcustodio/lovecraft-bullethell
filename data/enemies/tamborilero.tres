@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"tamborilero"
+display_name = "Tamborilero del pantano"
+model = "tamborilero"
+tier = 2
+spawn_weight = 0.5
+elite = false
+tags = Array[StringName]([&"humana"])
+drum_radius = 6.0
+max_health = 60.0
+hit_radius = 0.5
+body_radius = 0.5
+move_speed = 2.0
+xp = 3.0
+money = 4
+contact_physical = 6.0
+contact_mental = 2.0
+movement = &"keep"
+params = {"keep": 8.0, "strafe": 0.35}
+attack_cooldown = 99.0
+attack_range = 0.0

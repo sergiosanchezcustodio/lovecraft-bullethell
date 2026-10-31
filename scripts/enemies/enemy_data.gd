@@ -25,6 +25,9 @@ extends Resource
 @export var soft := false                    ## cuerpo blando (fragmentos, shoggoths, engendros): se estira y se aplasta el doble (hito 11.7)
 @export var emerge := false                  ## sale del agua cerca de los jugadores, con aviso (si la arena tiene agua; hito 6.4)
 @export var swims := false                   ## nada en el agua somera del pantano (no se frena; hito 6.4)
+@export var revive := 0.0                     ## al caer la primera vez, se queda en el suelo `revive_time` s y se levanta con esta parte de la vida si nadie lo remata (expedicionario; hito 15.3)
+@export var revive_time := 2.5
+@export var drum_radius := 0.0                ## su tambor acelera a los enemigos a esta distancia (tamborilero; hito 15.3)
 @export_group("Cuerpo")
 @export var max_health := 30.0
 @export var hit_radius := 0.45

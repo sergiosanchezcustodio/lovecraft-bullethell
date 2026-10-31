@@ -1534,6 +1534,13 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **Opciones:** `level=desafio:p1_n4` y `challenge_open=true` (en el mapa, abre los desafíos). Capturas `shots/seleccion_desafios_002.0s.png` y `shots/game_desafio_006.0s.png`.
   - **Tests:** `tests/test_challenge.gd` (5). 614 de 614.
 
+- **Hito 15.3: un enemigo nuevo por parte (30-10-2026), pendiente de tu revisión.** Modelos con `python tools/gen_enemigos_fase15.py`; hoja `shots/expedicionario-tamborilero-nadador_20.png`.
+  - **Expedicionario de Lake** (parte 1, nivel 2; `expedicionario`, `anim_humano`): parka de lona hecha jirones con escarcha, piel azulada, ojos vacíos con un brillo frío, gorro y barba helados y el antebrazo izquierdo descarnado. Se arrastra a tirones (`crawl`). La primera vez que «muere» cae al suelo (animaciones `down` y `down_wait` de los humanos) con un resto de vida: cualquier golpe lo remata, y si nadie lo hace en 2,5 s se levanta (`get_up`, chasquido de hielo) con la mitad de la vida (`EnemyData.revive`/`revive_time`, `Enemy._fall_down`/`_down_step`). Hoja de la caída en `shots/expedicionario_caida_hoja.png`: el pie asoma un poco suelto bajo el faldón al estar tumbado.
+  - **Nadador de la marea** (parte 2, niveles 4 y 5; `nadador`, `anim_profundo`): Profundo joven y esbelto del generador paramétrico (`gen_variantes.build`), plateado y azul, con aletas largas y franjas que brillan. Sale del agua (`rise = water`, `emerge`), nada sin frenarse y ronda y salta en arco con aviso (`stalk`, como el Acechador pero más pequeño y sin croar).
+  - **Tamborilero del pantano** (parte 3, nivel 2; `tamborilero`, `anim_humano`): cultista de Luisiana con el torso desnudo pintado de costillas, cara de calavera, calzón remangado, descalzo y un tambor de piel colgado delante, con las baquetas en las manos (cuelgan algo hacia fuera: a revisar). Se queda a 8 m (`keep`) y no ataca; cada 0,6 s su tambor (sonido `heartbeat`) acelera un 35 % a los enemigos a 6 m (`EnemyData.drum_radius`, `Enemy.drum_t`, `DRUM_SPEED`).
+  - **Oleadas y textos:** en el `pool` de esos niveles, en «Criaturas» del mapa (`data/campaign.json`) y en el bestiario (`data/library/textos.json`). El equilibrio, sin medir con el bot: lo verás en tu partida.
+  - **Tests:** `tests/test_new_enemies.gd` (4). 618 de 618.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

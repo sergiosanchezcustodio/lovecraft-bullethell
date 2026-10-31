@@ -42,6 +42,16 @@ const VULNERABLE_MULT := 1.25
 # Arsenal II (hito 2.7)
 var giant: GiantMoves                        ## salto y erupciones de los grandes (o null)
 var pace_mult := 1.0                         ## ritmo propio (la dificultad va aparte, en vivo: Difficulty)
+## Hito 15.3. Expedicionario (`EnemyData.revive`): caído en el suelo (s que le quedan; cualquier
+## golpe lo remata) y levantándose (s). Tamborilero (`drum_radius`): `drum_t`, s que le quedan
+## al ritmo del tambor de uno cercano (`DRUM_SPEED`).
+const DRUM_SPEED := 1.35
+const DRUM_EVERY := 0.6
+var drum_t := 0.0
+var _drum_next := 0.0
+var _revived := false
+var _down_t := 0.0
+var _getup_t := 0.0
 var anchored := false                       ## no se mueve ni lo empujan (Dagon, en la orilla)
 var _wade := 0.0                            ## 0..1: metido en agua somera (hunde el modelo)
 var _slow_t := 0.0                          ## s que va más lento (Polvo de Ibn-Ghazi)
@@ -465,6 +475,9 @@ func take_damage(d: Damage) -> void:
 		return
 	var dealt := minf(d.physical * k, maxf(health, 0.0))
 	health -= d.physical * k
+	if health <= 0.0 and data.revive > 0.0 and not _revived:   # expedicionario: cae, pero aún no está muerto
+		_fall_down(d)
+		return
 	world.record_damage(d.tag, dealt)              # estadísticas de la ficha
 	if not d.dot: world.player_hit(d.tag, self)    # objetos al impactar (hito 8.7)
 	if health <= 0.0: world.record_kill(d.tag, global_position)
@@ -479,6 +492,47 @@ func take_damage(d: Damage) -> void:
 	if health <= 0.0:
 		if big: HitStop.hit(70, true)
 		_die()
+
+## Expedicionario (hito 15.3): la primera vez que «muere» cae al suelo con un poco de vida; un
+## golpe más lo remata y, si no llega, se levanta a los `revive_time` s con `revive` de su vida.
+func _fall_down(d: Damage) -> void:
+	_revived = true
+	health = 0.01
+	_down_t = data.revive_time
+	_flash = 0.07
+	_hit_pose(d)
+	anim = "down"
+	anim_t = 0.0
+	_wu_t = -1.0
+	Auto.sfx_at("down", global_position)
+
+func _down_step(delta: float) -> void:
+	if _down_t > 0.0:
+		_down_t -= delta
+		if anim == "down" and _down_t < data.revive_time - Anims.duration(model_name, "down"):
+			anim = "down_wait"
+			anim_t = 0.0
+		if _down_t <= 0.0:                            # nadie lo remató: se levanta
+			health = data.max_health * health_scale * data.revive
+			_getup_t = Anims.duration(model_name, "get_up")
+			anim = "get_up"
+			anim_t = 0.0
+			Auto.sfx_at("ice_crack", global_position)
+		return
+	_getup_t -= delta
+	if _getup_t <= 0.0: anim = "walk"
+
+## Tamborilero (hito 15.3): cada DRUM_EVERY s, un golpe de tambor que acelera a los cercanos.
+func _drum_step(delta: float) -> void:
+	_drum_next -= delta
+	if _drum_next > 0.0: return
+	_drum_next = DRUM_EVERY
+	var r2 := data.drum_radius * data.drum_radius
+	for n in world.enemies:
+		var e := n as Enemy
+		if e != null and e != self and e.is_alive() and e.global_position.distance_squared_to(global_position) <= r2:
+			e.drum_t = DRUM_EVERY + 0.2
+	if not _far: Auto.sfx_at("heartbeat", global_position)
 
 ## Golpe recibido (hito 11.2): se aplasta un poco y se inclina hacia donde lo empujan.
 func _hit_pose(d: Damage) -> void:
@@ -677,6 +731,12 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector3.ZERO
 		Prof.stop("enemigos_fisica", t0)
 		return
+	if _down_t > 0.0 or _getup_t > 0.0:              # caído o levantándose (expedicionario, 15.3)
+		_down_step(delta)
+		velocity = Vector3.ZERO
+		Prof.stop("enemigos_fisica", t0)
+		return
+	if data.drum_radius > 0.0: _drum_step(delta)
 	var target := target_player()
 	if giant != null and giant.step(self, target, delta):   # agachado o saltando: no anda
 		velocity = Vector3.ZERO
@@ -691,6 +751,9 @@ func _physics_process(delta: float) -> void:
 		_ai_vel = velocity
 	if Engine.get_physics_frames() % 15 == get_instance_id() % 15: _far = _far_from_players()
 	if _slow_t > 0.0: velocity *= _slow_k
+	if drum_t > 0.0:                                  # al ritmo del tambor (15.3)
+		drum_t -= delta
+		velocity *= DRUM_SPEED
 	var wet := wades()
 	if wet: velocity *= WadeSplash.SLOW                # agua somera: los marinos nadan, los demás vadean
 	_wade = move_toward(_wade, 1.0 if wet else 0.0, WadeSplash.EASE * delta)

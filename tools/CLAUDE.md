@@ -51,4 +51,7 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 | **Acechador** | Elegido y detallado (`gen_acechador.py`) | Agazapado como rana, manos apoyadas delante, ojos enormes arriba con pupila de rendija, colmillos entrelazados, cresta de púas color hueso con membrana, agallas en volante. Animaciones de acecho y salto. |
 | Clásico | Prototipo | Hombre-pez escuálido y encorvado, ojos amarillentos laterales, púas dorsales. |
 | Bruto | Prototipo | Masivo, mandíbula enorme con boca caída, ojos pequeños bajo el ceño, verrugas. Candidato a tanque o mini-jefe. |
+| **Expedicionario de Lake** | Hito 15.3 (`gen_enemigos_fase15.py`) | Hombre de la expedición de Lake congelado y vuelto a levantar: parka hecha jirones con escarcha, piel azulada, ojos con brillo frío, antebrazo descarnado. Humano (`anim_humano`). |
+| **Nadador de la marea** | Hito 15.3 (`gen_enemigos_fase15.py`, con `gen_variantes.build`) | Profundo joven y esbelto, plateado y azul, aletas largas y franjas que brillan. `anim_profundo`. |
+| **Tamborilero del pantano** | Hito 15.3 (`gen_enemigos_fase15.py`) | Cultista de Luisiana: torso desnudo pintado de costillas, cara de calavera, tambor de piel delante y baquetas. Humano (`anim_humano`). |
 | Abisal | Prototipo | Negro azulado, ojos cian brillantes, líneas bioluminiscentes, dientes largos. |

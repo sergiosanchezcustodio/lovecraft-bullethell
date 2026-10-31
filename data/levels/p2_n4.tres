@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/enemies/profundo.tres" id="2"]
@@ -10,6 +10,7 @@
 [ext_resource type="Resource" path="res://data/enemies/barnabas.tres" id="7"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
 [ext_resource type="Resource" path="res://data/weather/niebla_pantano.tres" id="weather"]
+[ext_resource type="Resource" path="res://data/enemies/nadador.tres" id="f15"]
 
 [resource]
 script = ExtResource("1")
@@ -22,7 +23,7 @@ arena = "res://data/arenas/pantano.json"
 health_mult = 1.2
 duration = 300.0
 music = "res://resources/Music/cc0/p2_n4_insistent.ogg"
-pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("6"), ExtResource("8"), ExtResource("9")])
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("6"), ExtResource("8"), ExtResource("9"), ExtResource("f15")])
 spawn_rate = Array[Vector2]([Vector2(0, 0.4), Vector2(45, 0.6), Vector2(90, 0.95), Vector2(150, 1.4), Vector2(210, 1.9), Vector2(300, 2.4)])
 max_alive = 75
 elite_cap = 2

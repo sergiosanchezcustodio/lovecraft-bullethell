@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/acechador_aterrizaje.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"nadador"
+display_name = "Nadador de la marea"
+model = "nadador"
+tier = 2
+spawn_weight = 0.6
+elite = false
+tags = Array[StringName]([&"marina"])
+rise = &"water"
+emerge = true
+swims = true
+max_health = 50.0
+hit_radius = 0.5
+body_radius = 0.5
+move_speed = 2.8
+xp = 2.5
+money = 3
+contact_physical = 8.0
+contact_mental = 1.5
+movement = &"stalk"
+params = {"land_damage": 12.0, "land_pattern": ExtResource("2"), "land_radius": 1.3, "orbit": 5.0, "pounce_cooldown": 5.0, "pounce_range": 9.0, "telegraph": 0.8}
+attack_cooldown = 99.0
+attack_range = 0.0
