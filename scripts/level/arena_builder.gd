@@ -104,43 +104,39 @@ static func apply_light(l: Dictionary, sun: DirectionalLight3D, env: Environment
 	if l.has("exposure") and RenderingServer.get_current_rendering_method() != "gl_compatibility":
 		env.tonemap_exposure = l.exposure
 
-## Suelo de nieve en losas de 0,5 m: nieve blanca (se ve gris azulada con la luz de luna), placas de hielo,
-## roca asomando y nieve pisada alrededor del campamento. Por detrás (norte y oeste)
-## se prolonga bajo los acantilados; por delante (sur y este) acaba en la orilla.
+const GROUND_QUAD := 8.0                 ## m de lado de las losas del suelo (hito 16.6)
+
+## Suelo: losas planas con el shader del tipo de suelo (nieve, barro, adoquín, tablas), que
+## dibuja el color y el relieve. Por detrás (norte y oeste) se prolonga bajo los acantilados;
+## por delante (sur y este) acaba en la orilla.
 static func _ground(data: Dictionary, size: Vector2, has_coast := false) -> MeshInstance3D:
 	var g: Dictionary = data.ground
 	var tile: float = g.tile
 	var back: float = g.margin_back
 	var front: float = g.get("margin_front", 0.0)     # sin mar: el suelo sigue por delante
-	var noise := FastNoiseLite.new()
-	noise.seed = int(g.seed)
-	noise.frequency = 0.06
-	var fine := FastNoiseLite.new()
-	fine.seed = int(g.seed) + 1
-	fine.frequency = 0.35
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var x0 := -size.x * 0.5 - back; var x1 := size.x * 0.5 + front
 	var z0 := -size.y * 0.5 - float(g.get("margin_north", back)); var z1 := size.y * 0.5 + front   # margin_north: muelle con agua al norte
+	# Losas grandes: el color y el relieve salen del shader por celdas de 12,5 cm y el color de
+	# vértice no se usa. Antes, una losa por `tile` (0,5 m) con su color de ruido: ~40.000 losas
+	# y 0,1 s al cargar cada nivel para nada (hito 16.6). Mismos bordes que antes.
+	var big := tile * maxf(1.0, floorf(GROUND_QUAD / tile))
 	var nx := int((x1 - x0) / tile); var nz := int((z1 - z0) / tile)
-	for i in nx:
-		for j in nz:
-			var x := x0 + i * tile; var z := z0 + j * tile
-			var cx := x + tile * 0.5; var cz := z + tile * 0.5
-			var n := noise.get_noise_2d(cx, cz)
-			var f := fine.get_noise_2d(cx, cz)
-			var c := Color(0.80, 0.84, 0.89).lerp(Color(0.88, 0.91, 0.95), f * 0.5 + 0.5)   # nieve
-			if n > 0.42: c = Color(0.60, 0.72, 0.80).lerp(Color(0.66, 0.77, 0.84), f * 0.5 + 0.5)  # hielo
-			elif n < -0.55: c = Color(0.30, 0.30, 0.31).lerp(Color(0.38, 0.37, 0.36), f * 0.5 + 0.5)  # roca
-			var d := Vector2(cx, cz).length()
-			if d < 14.0 and fine.get_noise_2d(cx * 0.4, cz * 0.4) > 0.05 - (14.0 - d) * 0.02:
-				c = c.lerp(Color(0.70, 0.71, 0.74), 0.55)                                    # nieve pisada
-			# losas contiguas (sin juntas: los huecos dibujaban una cuadrícula y dejaban ver el mar)
-			var q := [Vector3(x, 0, z), Vector3(x, 0, z + tile), Vector3(x + tile, 0, z + tile), Vector3(x + tile, 0, z)]
+	var gx1 := x0 + nx * tile; var gz1 := z0 + nz * tile
+	var x := x0
+	while x < gx1 - 0.001:
+		var xe := minf(x + big, gx1)
+		var z := z0
+		while z < gz1 - 0.001:
+			var ze := minf(z + big, gz1)
+			var q := [Vector3(x, 0, z), Vector3(x, 0, ze), Vector3(xe, 0, ze), Vector3(xe, 0, z)]
 			for k in [0, 2, 1, 0, 3, 2]:
 				st.set_normal(Vector3.UP)
-				st.set_color(c)
+				st.set_color(Color.WHITE)                  # el canto lleva color: mismo formato
 				st.add_vertex(q[k])
+			z = ze
+		x = xe
 	# Frente de la plataforma de hielo en la orilla (sur y este)
 	var ec: Array = g.get("edge_color", [0.55, 0.66, 0.74])                        # canto: hielo, o madera en un muelle
 	var edge := Color(ec[0], ec[1], ec[2])

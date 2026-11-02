@@ -221,6 +221,10 @@ static func forget(path: String) -> void:
 static func clear_cache() -> void:
 	_cache.clear()
 
+## Deja el modelo en la caché sin montarlo (hito 16.6: en el hilo de la carga durante el relato).
+static func warm(path: String) -> void:
+	_get_model(path)
+
 static func _get_model(path: String) -> Dictionary:
 	if _cache.has(path): return _cache[path]
 	_ensure_glow_material()

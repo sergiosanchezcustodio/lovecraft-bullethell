@@ -206,6 +206,18 @@ Mismo equipo, Forward+, 1920×1080 sin vsync. J1 y 3 bots (`bot=circle bots=3 go
 - **Pose de los enemigos** (Luisiana, `prof=true`): 1,31 → 0,38 ms por fotograma.
 - **Coste por llamada** (`Prof` dice ahora llamadas y µs por llamada): aparición 0,32 → 0,21 ms; muerte 0,58-1,26 → 0,26 ms.
 
+## Fase 16: tiempos de carga (hito 16.6, 02-11-2026)
+
+Primera partida tras arrancar el juego, en Alta, desde el relato (`relato level=… relato_go=2 loadtime=true`); «en negro» es desde que el relato pasa hasta que acaba el `_ready` de la partida.
+
+| Nivel | En negro antes → ahora | `_ready` de la partida antes → ahora | Arena (hilo, durante el relato) |
+|---|---|---|---|
+| p2_n4 · Pantanos | 2.450 → 658 ms | 1.170 → 608 ms | 450-530 ms |
+| p3_n2 · Luisiana | 2.147 → 500 ms | 891 → 450 ms | 450-650 ms |
+
+- Antes, en negro: escena de la partida y sus scripts ~1,3 s; arena 0,3-0,45 s (suelo 0,1, costa 0,13, decorado 0,1-0,14); armas, objetos y personajes ~0,15 s; resto ~0,45 s.
+- Saltando el relato en seguida (`relato_go=0.05`), la partida espera lo que falte: 0,7-1,6 s en negro, según lo que haya avanzado la carga.
+
 ## Medición de los 15 niveles
 
 *Última: 30-10-2026, versión 0.9.0 (`python tools/medir_niveles.py`).* Bot sin daño, 80 enemigos como tope y 8 s medidos; la mejor de 2 ejecuciones. Entre paréntesis, la medición anterior (ninguna) y la diferencia. Milisegundos por fotograma: menos es mejor. Con 80 enemigos manda la CPU (la lógica de la partida), así que Media y Alta salen parecidas; entre ejecuciones, la media varía en torno a ±1 ms y el 1 % peor bastante más: fíate de las diferencias grandes o de las que se repiten.

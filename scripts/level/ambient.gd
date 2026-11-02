@@ -48,10 +48,17 @@ static func enabled() -> bool:
 ## Los autoloads Sfx y Settings se buscan al usarlos: sin ellos (herramientas con -s, como
 ## tools/render_mapa.gd, que monta la arena) el nombre no compilaría y no suena nada.
 static func autoload(n: String) -> Node:
+	if Auto.off_main(): return null                         # montando la arena en un hilo (16.6)
 	var ml := Engine.get_main_loop()
 	return (ml as SceneTree).root.get_node_or_null(n) if ml is SceneTree else null
 
+static var _muted_snap := true
+## Copia de `sfx_muted` para el hilo que monta la arena durante el relato (hito 16.6).
+static func snap_muted() -> void:
+	_muted_snap = sfx_muted()
+
 static func sfx_muted() -> bool:
+	if Auto.off_main(): return _muted_snap
 	var s := autoload("Sfx")
 	return s == null or bool(s.get("muted"))
 

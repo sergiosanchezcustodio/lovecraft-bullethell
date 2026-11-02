@@ -22,6 +22,10 @@ var _tag := "relato"
 ## menu (al terminar, al menú principal en vez de a la partida)}. Se vacía al usarlo.
 static var next := {}
 var _then_menu := false
+## Momento (µs) en que el relato pasó a la partida: la partida mide desde ahí la pantalla en
+## negro (`loadtime=true`, hito 16.6). `relato_go=T` pasa solo a los T s (pruebas).
+static var left_usec := 0
+var _go_at := -1.0
 
 static func has_relato(level_id: String) -> bool:
 	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json"))
@@ -31,6 +35,7 @@ func _ready() -> void:
 	var la := LaunchArgs.from_cmdline()
 	for s in la.get_str("shots").split(",", false): _shots.append(float(s))
 	_tag = la.get_str("tag", "relato")
+	_go_at = la.get_float("relato_go", -1.0)
 	var id := la.get_str("level", String(GameSession.level)) if la.has("level") else String(GameSession.level)
 	var fill: Dictionary = {}
 	if la.has("epilogue"): next = {"id": la.get_str("epilogue"), "fill": {"nombre": la.get_str("nombre", "William Dyer")}, "menu": true}   # capturas
@@ -43,6 +48,9 @@ func _ready() -> void:
 	if not (d is Dictionary) or not (d as Dictionary).has(id) or la.get_bool("skip_relato"):   # pruebas: skip_relato=true
 		_go()
 		return
+	if not _then_menu and id != Demo.END_RELATO:          # mientras se lee, el nivel se monta en un hilo (16.6)
+		LevelPreload.enabled = la.get_bool("preload", true)
+		LevelPreload.begin(LevelPreload.level_id(la))
 	var black := ColorRect.new()
 	black.color = Color(0.01, 0.01, 0.015)
 	black.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -109,6 +117,7 @@ func _process(delta: float) -> void:
 		_hold += delta
 		if _hold >= HOLD_SKIP: _go()
 	if _ring: _ring.queue_redraw()
+	if _go_at >= 0.0 and _t >= _go_at: _go()
 	if not _shots.is_empty() and _t >= _shots[0]:
 		_shots.remove_at(0)
 		get_viewport().get_texture().get_image().save_png("res://shots/%s_%04.1fs.png" % [_tag, _t])
@@ -130,7 +139,11 @@ func _go() -> void:
 		get_tree().change_scene_to_file.call_deferred(GAME)
 		return
 	# funde a negro: la partida empieza saliendo de negro con el rótulo del nivel (LevelCard)
-	LevelCard.leave(self, func() -> void: get_tree().change_scene_to_file(GAME))   # en red, la partida espera a que lleguen todos (NetGame)
+	LevelCard.leave(self, func() -> void:
+		left_usec = Time.get_ticks_usec()
+		var ps := LevelPreload.game_scene()                     # cargada durante el relato (16.6)
+		if ps != null: get_tree().change_scene_to_packed(ps)
+		else: get_tree().change_scene_to_file(GAME))   # en red, la partida espera a que lleguen todos (NetGame)
 
 func _input(event: InputEvent) -> void:
 	var down := false

@@ -115,6 +115,15 @@ var _base_ambient := Atmosphere.make_environment().ambient_light_energy
 
 ## Clima del nivel (D-33): `weather=<id>` lo cambia (capturas) y `weather=no` lo quita. La
 ## configuración decide si va completo, reducido o apagado; el menú de depuración, cuál.
+## Reparto de la carga de la partida (`loadtime=true`, hito 16.6): cuánto tarda cada tramo de `_ready`.
+var _lap_t := 0
+var _laps := false
+func _lap(what: String) -> void:
+	if not _laps: return
+	var now := Time.get_ticks_usec()
+	print("CARGA   %-24s %6.1f ms" % [what, (now - _lap_t) / 1000.0])
+	_lap_t = now
+
 func _start_weather() -> void:
 	var wd: WeatherData = level.weather if level != null else null
 	var pick := args.get_str("weather", String(DebugOptions.get_value("weather", "")))
@@ -136,7 +145,9 @@ func set_weather(wd: WeatherData) -> void:
 
 func _ready() -> void:
 	var t_start := Time.get_ticks_msec()
+	_lap_t = Time.get_ticks_usec()
 	args = LaunchArgs.from_cmdline()
+	_laps = args.get_bool("loadtime")
 	Difficulty.net = null                          # en red, el invitado recibe la del anfitrión (NetGame)
 	Difficulty.refresh()
 	if args.has("pacts"): Pacts.set_active(Array(args.get_str("pacts").split(",", false)))   # pacts=noche,furia (hito 13.6)
@@ -166,7 +177,7 @@ func _ready() -> void:
 	var arena_path := "res://data/arenas/campamento.json"
 	var part_key := "p1"                           # gradación de color de la parte (hito 11.3)
 	if not args.get_bool("nolevel"):
-		var lid := (String(GameSession.level) if not GameSession.carry.is_empty() else args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1"))
+		var lid := LevelPreload.level_id(args)
 		part_key = Endless.base_of(lid).get_slice("_", 0)
 		var ld: LevelData = load("res://data/levels/%s.tres" % Endless.base_of(lid))   # sin fin: el de su escenario (13.8)
 		if ld != null: arena_path = ld.arena
@@ -176,7 +187,10 @@ func _ready() -> void:
 	Player.dirt_cfg = {} if args.get_str("dirt", "") == "false" else Player.dirt_config(part_key, arena_path.get_file().get_basename())
 	Player.dirt_force = args.get_float("dirt", -1.0) if args.get_str("dirt", "").is_valid_float() else -1.0
 	arena_path = args.get_str("arena", arena_path)
-	arena = ArenaBuilder.build(arena_path, fogvol)
+	_lap("entorno")
+	arena = LevelPreload.take(arena_path, fogvol)     # montada durante el relato (hito 16.6)
+	if arena == null: arena = ArenaBuilder.build(arena_path, fogvol)
+	_lap("arena")
 	add_child(arena)
 	ArenaBuilder.apply_light(arena.get_meta("light", {}), moon, env)
 	# sombras levantadas: la de la arena ("gamma", noches legibles) por el brillo de la configuración
@@ -187,16 +201,19 @@ func _ready() -> void:
 		{} if grade_key == "off" else Atmosphere.grade_for(grade_key))
 	_base_fog = env.fog_density
 	_base_ambient = env.ambient_light_energy
+	_lap("luz y gradación")
 	world = CombatWorld.new()
 	var size: Vector2 = arena.get_meta("size")
 	world.bounds = Rect2(-size * 0.5 - Vector2(6, 6), size + Vector2(12, 12))
 	world.obstacles = arena.get_meta("obstacles")
 	add_child(world)
 	Combos.attach(world, is_guest())                 # combinaciones en cooperativo (hito 13.7)
+	_lap("mundo")
 	gems = GemManager.new()
 	gems.world = world
 	gems.rules = load("res://data/progression/default.tres")
 	world.add_child(gems)
+	_lap("gemas")
 	# Jugadores: los de la selección de personaje (J1..J4) o, lanzando la partida directa, el
 	# J1 de siempre más `bots=N` jugadores de compañía.
 	if GameSession.is_set():
@@ -234,6 +251,7 @@ func _ready() -> void:
 		var bp := _spawn_player(ch, bot)
 		bot.body = bp
 		bot.leader = players[0]
+	_lap("jugadores")
 	player = players[0]
 	for q in players:                                 # el J1 de la depuración y las pruebas: el primero de este PC
 		if not q.remote:
@@ -243,6 +261,7 @@ func _ready() -> void:
 	if args.has("pets"):                            # pets=gato,perro: uno por jugador, en orden (hito 12.9)
 		var ids := args.get_str("pets").split(",")
 		for i in mini(ids.size(), players.size()): _spawn_pet(ids[i], players[i])
+	_lap("compañeros")
 	var bonus := Shop.bonuses(Saves.current)          # lo comprado en la tienda (D-31)
 	if args.has("shop"):                              # pruebas: N niveles en cada potenciador, sin tocar la partida
 		var n := args.get_int("shop")
@@ -304,6 +323,7 @@ func _ready() -> void:
 	for up_id in args.get_str("items").split(",", false):     # items=iman,vida: objetos del J1 al empezar
 		player.progress.passives[up_id] = args.get_int("ilevel", 1)
 	if args.has("items"): player.rebuild_stats()
+	_lap("tienda y pruebas")
 	camera = GameCamera.new()
 	camera.view_size = args.get_float("cam", 15.0)
 	for q in players:                                 # en red, cada PC sigue a los suyos (D-10)
@@ -314,9 +334,10 @@ func _ready() -> void:
 			if not q.remote: q.leash = func(pos: Vector3) -> Vector3: return camera.leash(pos)
 	_env = env
 	add_child(Ambient.new().setup(arena, camera, arena_path.get_file().get_basename()))   # ambiente del escenario
+	_lap("cámara y ambiente")
 	_make_announcer()
 	if not args.get_bool("nolevel"):
-		var level_id := (String(GameSession.level) if not GameSession.carry.is_empty() else args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1"))
+		var level_id := LevelPreload.level_id(args)
 		if Daily.is_daily(level_id):                  # partida del día (hito 13.9)
 			level = Daily.make_level(level_id)
 			add_child(Endless.new().setup(level))
@@ -357,6 +378,7 @@ func _ready() -> void:
 		enemies_root.name = "Enemies"
 		add_child(enemies_root)
 		director = WaveDirector.new().setup(level, world, arena.get_meta("obstacles"), camera, enemies_root)
+		_lap("nivel y director")
 		if args.has("max_alive"): director.max_alive_override = args.get_int("max_alive")
 		for eid in args.get_str("enemies").split(",", false):    # enemies=profundo: solo esos (probar uno nuevo)
 			director.pool_override.append(load("res://data/enemies/%s.tres" % eid))
@@ -403,17 +425,21 @@ func _ready() -> void:
 			add_child(hazards)
 		if level.daily != "": _daily_seed()
 		_spawn_fragment(arena.get_meta("obstacles"))
+		_lap("fragmento y peligros")
 		LevelWarmup.enabled = args.get_bool("warmup", true)   # modelos, paletas y shaders de sus enemigos, ya (hito 16.1)
 		ModelPool.enabled = args.get_bool("model_pool", true)  # y modelos de reserva para que aparezcan sin tirón
 		if player != null: LevelWarmup.start(self, level, player.global_position)
 		if ModelPool.enabled:
 			for d in LevelWarmup.enemies_of(level): ModelPool.stock("res://models/%s.json" % d.model)
 			ModelPool.fill_now()                           # mientras sale de negro
+			_lap("calentamiento y reserva")
 		if (not args.has("shots") or args.get_bool("card")) and args.get_bool("card", true):   # capturas: sin el rótulo, salvo card=true; card=false lo quita
 			LevelCard.enter(self, level_id, level.display_name)
 		Music.play(level.music_path())
 		if args.get_bool("log"): print("MUSICA ", Music.current())
+	_lap("música")
 	_start_weather()
+	_lap("clima")
 	Engine.time_scale = args.get_float("timescale", 1.0)
 	HitStop.enabled = args.get_bool("hitstop", true)     # micro-pausa al impactar (hito 11.1)
 	_boss_intro = args.get_bool("boss_intro", true)
@@ -430,6 +456,7 @@ func _ready() -> void:
 	GroundMarks.limit = args.get_int("marks", GroundMarks.limit)
 	Debris.limit = GroundMarks.limit * Debris.PER_MARK       # restos de los rompibles (hito 12.11)
 	WallScorch.limit = GroundMarks.limit / 2                 # quemaduras en las paredes (hito 12.11)
+	_lap("efectos")
 	hud = Hud.new().setup(players, director)
 	hud.money = func() -> int: return run_money
 	add_child(hud)
@@ -465,8 +492,12 @@ func _ready() -> void:
 	pause_watch.set_script(preload("res://scripts/ui/pause_watch.gd"))
 	pause_watch.set("game", self)
 	add_child(pause_watch)
+	_lap("interfaz y menús")
+	LevelPreload.release()
 	if args.get_bool("log") or args.get_bool("loadtime"):
 		print("CARGA de la partida: %d ms (desde el arranque del motor: %d ms)" % [Time.get_ticks_msec() - t_start, Time.get_ticks_msec()])
+		if RelatoScreen.left_usec > 0: print("CARGA desde el relato hasta aquí: %d ms" % ((Time.get_ticks_usec() - RelatoScreen.left_usec) / 1000))
+		print("CARGA arena %s (hilo %.0f ms, espera %.0f ms)" % ["montada durante el relato" if LevelPreload.last_hit else "montada aquí", LevelPreload.last_build_ms, LevelPreload.last_wait_ms])
 	if args.get_bool("loadtime"): get_tree().quit()
 	if args.get_float("xp") > 0.0: player.progress.add_xp(args.get_float("xp"))
 	if args.get_bool("gem_test"):                  # gemas quietas alrededor, sin recogida (verlas de cerca)

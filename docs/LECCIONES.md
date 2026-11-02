@@ -200,3 +200,11 @@ Un `GPUParticles3D` con `local_coords = false` colgado de una parte del modelo d
 ## Recetas con el mismo nombre en un `match` (30-10-2026)
 
 En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra con ese nombre más abajo. GDScript no avisa: el `match` coge la primera y la otra deja de usarse sin error. Antes de añadir un caso a un `match` largo, busca el nombre en el fichero.
+
+## Montar nodos en un hilo (hito 16.6, 02-11-2026)
+
+- **Se puede montar una escena entera en un `WorkerThreadPool` si no está en el árbol** (la arena: mallas, materiales, luces, partículas). Lo que no se puede es tocar nodos que sí están en el árbol: `get_node` desde otro hilo falla, y con él cualquier `Engine.get_main_loop().root.get_node_or_null(...)`, es decir, `Auto.node` y `Auto.setting`. Lo que el hilo necesite de los autoloads hay que copiarlo antes en el hilo principal (`Auto.snapshot`).
+- **Lo que el hilo pide al `RenderingServer` con respuesta se atiende cuando el hilo principal vacía la cola.** Si el hilo principal espera al hilo con `wait_for_task_completion` a secas, puede quedarse colgado: espera en un bucle con `RenderingServer.force_sync()` (`LevelPreload._wait`).
+- **Un recurso cargado en un hilo se descarga en cuanto nadie lo sujeta:** para que sirva de algo, guarda la referencia hasta que lo cargue quien lo va a usar.
+- **Cargar `game.tscn` costaba más de 1 s** la primera vez: son sus scripts y todo lo que nombran. `ResourceLoader.load_threaded_request` y `change_scene_to_packed` lo esconden detrás de cualquier pantalla que dure lo suficiente.
+- Mide antes de adelantar nada: el JSON de la arena tardaba 1 ms y sus modelos 75; el tiempo se iba en el suelo (un color por losa que nadie usaba) y en la costa, en GDScript.

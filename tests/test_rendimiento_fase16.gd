@@ -59,3 +59,52 @@ func test_el_lanzador_no_corre_hasta_que_dispara() -> void:
 	assert_false(r.is_physics_processing(), "parado al entrar en la escena")
 	r._begin()
 	assert_true(r.is_physics_processing(), "corre mientras dispara")
+
+# --- 16.6: carga durante el relato ---
+
+func test_el_suelo_son_pocas_losas_con_los_mismos_bordes() -> void:
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/arenas/pantano.json"))
+	var size := Vector2(data.size[0], data.size[1])
+	var g := ArenaBuilder._ground(data, size)
+	var n := (g.mesh as ArrayMesh).surface_get_array_len(0)
+	assert_lt(n, 20000, "losas grandes, no una por cada 0,5 m (%d vértices)" % n)
+	var ab := g.mesh.get_aabb()
+	assert_lt(ab.position.x, -size.x * 0.5, "llega al borde oeste y lo pasa")
+	assert_gt(ab.end.z, size.y * 0.5 - 0.01, "y al sur")
+	g.free()
+
+func test_la_arena_se_monta_en_un_hilo_y_la_partida_se_la_lleva() -> void:
+	LevelPreload.enabled = true
+	LevelPreload.begin("p2_n4")
+	var path := LevelPreload.arena_of("p2_n4")
+	assert_eq(path, (load("res://data/levels/p2_n4.tres") as LevelData).arena)
+	var a := LevelPreload.take(path, LevelPreload.fog_volumes())
+	assert_not_null(a, "montada")
+	assert_true(LevelPreload.last_hit)
+	assert_true(a.has_meta("obstacles") and a.get_node_or_null("Props") != null, "entera")
+	a.free()
+	LevelPreload.game_scene()
+	LevelPreload.release()
+	assert_false(LevelPreload.pending())
+
+func test_si_la_partida_pide_otra_arena_se_tira() -> void:
+	LevelPreload.begin("p1_n2")
+	assert_null(LevelPreload.take("res://data/arenas/pantano.json", LevelPreload.fog_volumes()), "otra arena: la monta la partida")
+	assert_false(LevelPreload.last_hit)
+	assert_false(LevelPreload.pending(), "y la montada no se queda colgando")
+	LevelPreload.game_scene()
+	LevelPreload.release()
+
+func test_fuera_del_hilo_principal_la_configuracion_sale_de_la_copia() -> void:
+	Auto.snapshot()
+	var main_q: Variant = Auto.setting("quality", -1)
+	var got := {}
+	var id := WorkerThreadPool.add_task(func() -> void:
+		got["off"] = Auto.off_main()
+		got["q"] = Auto.setting("quality", -1)
+		got["node"] = Auto.node("Settings"))
+	WorkerThreadPool.wait_for_task_completion(id)
+	assert_false(Auto.off_main())
+	assert_true(got.off, "en el hilo se sabe")
+	assert_eq(got.q, main_q, "la misma calidad que en el hilo principal")
+	assert_null(got.node, "y no busca en el árbol")
