@@ -5,6 +5,10 @@ extends Node3D
 ##   shots=1,3,5             capturas en esos segundos (shots/game_*.png) y salir
 ##   cam=15                  altura visible de la cámara en metros
 ##   perf=10                 mide el rendimiento durante N s (tras 2 s de calentamiento) y sale
+##   spikes=true             con perf=: qué pasa en cada fotograma de más de 16,7 ms (hito 16.1; activa prof)
+##   warmup=false            sin el calentamiento del nivel (modelos, paletas y shaders de sus enemigos; hito 16.1)
+##   model_pool=false        sin la reserva de modelos de enemigos (se montan al aparecer, como antes; hito 16.1)
+##   anim_lod=false          la pose de los enemigos en cada fotograma, sin tope de 60 Hz ni ritmo de multitud (hito 16.2)
 ##   demo=12                 criaturas de muestra quietas alrededor (legibilidad)
 ##   dummies=10              criaturas de práctica que reciben daño (probar armas)
 ##   emitters=true           tres emisores de prueba: patrón físico, mental y mixto
@@ -136,7 +140,7 @@ func _ready() -> void:
 	Difficulty.net = null                          # en red, el invitado recibe la del anfitrión (NetGame)
 	Difficulty.refresh()
 	if args.has("pacts"): Pacts.set_active(Array(args.get_str("pacts").split(",", false)))   # pacts=noche,furia (hito 13.6)
-	Prof.enabled = args.get_bool("prof")
+	Prof.enabled = args.get_bool("prof") or args.get_bool("spikes")
 	UiInput.configure()
 	OutfitData.override = {}                       # outfit=bombin,botas_nieve: prendas para probar
 	for o_id in args.get_str("outfit").split(",", false):
@@ -399,6 +403,12 @@ func _ready() -> void:
 			add_child(hazards)
 		if level.daily != "": _daily_seed()
 		_spawn_fragment(arena.get_meta("obstacles"))
+		LevelWarmup.enabled = args.get_bool("warmup", true)   # modelos, paletas y shaders de sus enemigos, ya (hito 16.1)
+		ModelPool.enabled = args.get_bool("model_pool", true)  # y modelos de reserva para que aparezcan sin tirón
+		if player != null: LevelWarmup.start(self, level, player.global_position)
+		if ModelPool.enabled:
+			for d in LevelWarmup.enemies_of(level): ModelPool.stock("res://models/%s.json" % d.model)
+			ModelPool.fill_now()                           # mientras sale de negro
 		if (not args.has("shots") or args.get_bool("card")) and args.get_bool("card", true):   # capturas: sin el rótulo, salvo card=true; card=false lo quita
 			LevelCard.enter(self, level_id, level.display_name)
 		Music.play(level.music_path())
@@ -415,6 +425,7 @@ func _ready() -> void:
 	Enemy.wounds_force = args.get_float("wounds", -1.0) if args.get_str("wounds", "").is_valid_float() else -1.0
 	Enemy.rise_enabled = args.get_bool("rise", true)   # hito 11.6
 	Enemy.flash_hold = args.get_bool("flash_hold", false)
+	Enemy.anim_lod = args.get_bool("anim_lod", true)    # hito 16.2
 	Enemy.tints = args.get_bool("tints", true)   # tráiler (hito 13.16): los jefes, a golpe continuo, se quedaban blancos
 	GroundMarks.limit = args.get_int("marks", GroundMarks.limit)
 	Debris.limit = GroundMarks.limit * Debris.PER_MARK       # restos de los rompibles (hito 12.11)
@@ -1009,6 +1020,7 @@ func _over_pause(m: CanvasLayer, button: String) -> void:
 ## Al irse la partida (menú, reintentar, siguiente nivel): que no quede el juego parado.
 func _exit_tree() -> void:
 	HitStop.stop()
+	ModelPool.clear()                                  # la reserva de modelos no está en el árbol (hito 16.1)
 	Music.set_intensity(0.0, 0.0)                    # sin la partida, las capas se apagan
 
 ## Página suelta del nivel (hito 13.11), si aún no está en el hueco: en uno de sus sitios.
@@ -1694,6 +1706,9 @@ func _process(delta: float) -> void:
 	var t0 := Prof.start()
 	_process_step(delta)
 	Prof.stop("partida", t0)
+	t0 = Prof.start()
+	ModelPool.refill()                                   # reserva de modelos, poco a poco (hito 16.1)
+	Prof.stop("reserva", t0)
 
 func _process_step(delta: float) -> void:
 	_t += delta
@@ -1788,12 +1803,15 @@ var _phys_ms := 0.0
 var _proc_ms := 0.0
 var _peak_enemies := 0
 var _peak_bullets := 0
+var _spikes: SpikeLog                     ## spikes=true (con perf=): los fotogramas de más de 16,7 ms (hito 16.1)
 
 ## Medición sencilla de tiempos de fotograma (para docs/RENDIMIENTO.md).
 func _perf(delta: float) -> void:
 	if _t < 2.0:
 		Prof.totals.clear()
 		return
+	if _spikes == null and args.get_bool("spikes"): _spikes = SpikeLog.new(get_viewport())
+	elif _spikes != null: _spikes.step(delta)
 	_frames.append(delta * 1000.0)
 	_phys_ms += Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0
 	_proc_ms += Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0
@@ -1811,6 +1829,9 @@ func _perf(delta: float) -> void:
 		RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
 		RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)])
 	if Prof.enabled: print("PERFIL (ms por fotograma) ", Prof.report(_frames.size()))
+	if _spikes != null:
+		print(_spikes.report())
+		print(_spikes.census(get_tree().root))
 	get_tree().quit()
 
 ## Lluvia de balas para la prueba de carga: repone balas de los tres tipos alrededor

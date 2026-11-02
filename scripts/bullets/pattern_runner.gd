@@ -21,6 +21,11 @@ func setup(p_world: CombatWorld) -> PatternRunner:
 	name = "PatternRunner"
 	return self
 
+## Quieto hasta que dispara (hito 16.5: con 80 enemigos eran 80 llamadas por paso). En _ready, porque
+## Godot activa _physics_process solo al entrar en el árbol si el script lo tiene.
+func _ready() -> void:
+	set_physics_process(_firing)
+
 func fire(p: BulletPattern, p_aim: Callable) -> void:
 	if busy: return
 	pattern = p
@@ -42,6 +47,7 @@ func fire(p: BulletPattern, p_aim: Callable) -> void:
 
 func _begin() -> void:
 	_firing = true
+	set_physics_process(true)
 	started_firing.emit()
 
 func _physics_process(delta: float) -> void:
@@ -65,5 +71,6 @@ func _physics_process(delta: float) -> void:
 	_timer = pattern.burst_interval
 	if _burst >= pattern.bursts:
 		_firing = false
+		set_physics_process(false)
 		busy = false
 		done.emit()

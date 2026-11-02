@@ -20,6 +20,7 @@ var _next_ms := 0
 var _busy := 0                                 ## lecturas o reducciones en curso (como mucho 2)
 var _frozen := false
 var _mutex := Mutex.new()
+var _tasks: Array[int] = []                    ## reducciones en el hilo, para esperarlas al salir
 
 func _ready() -> void:
 	name = "DeathReplay"
@@ -61,7 +62,19 @@ func _got(data: PackedByteArray, w: int, h: int, img_fmt: int) -> void:
 	if _frozen:
 		_busy -= 1
 		return
-	WorkerThreadPool.add_task(_shrink.bind(data, w, h, img_fmt))
+	var running: Array[int] = []
+	for id in _tasks:                          # las acabadas se esperan ya (no para: libera lo suyo)
+		if WorkerThreadPool.is_task_completed(id): WorkerThreadPool.wait_for_task_completion(id)
+		else: running.append(id)
+	_tasks = running
+	_tasks.append(WorkerThreadPool.add_task(_shrink.bind(data, w, h, img_fmt)))
+
+## Al salir (también al cerrar el juego): que ninguna reducción acabe con el nodo ya borrado
+## («Cannot call method 'lock' on a null value», 02-11-2026).
+func _exit_tree() -> void:
+	_frozen = true
+	for id in _tasks: WorkerThreadPool.wait_for_task_completion(id)
+	_tasks.clear()
 
 ## En un hilo: de la pantalla entera a W×H en dos pasos (el bilineal de una vez se salta píxeles).
 func _shrink(data: PackedByteArray, w: int, h: int, img_fmt: int) -> void:

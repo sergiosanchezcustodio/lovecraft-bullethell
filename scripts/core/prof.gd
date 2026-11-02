@@ -20,5 +20,5 @@ static func report(ticks: int) -> String:
 	var keys := totals.keys()
 	keys.sort_custom(func(a: String, b: String) -> bool: return totals[a] > totals[b])
 	for k: String in keys:
-		out.append("%s=%.2f ms" % [k, totals[k] / 1000.0 / maxf(ticks, 1)])
+		out.append("%s=%.2f ms (%d, %.0f µs)" % [k, totals[k] / 1000.0 / maxf(ticks, 1), calls[k], float(totals[k]) / maxf(calls[k], 1)])
 	return "  ".join(out)

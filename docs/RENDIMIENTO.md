@@ -190,6 +190,22 @@ Mismo equipo, Forward+, 1920×1080 sin vsync. J1 y 3 bots (`bot=circle bots=3 go
 - La prueba de carga es extrema (150 enemigos y 1.000 balas a la vez). En la partida normal sobra margen. Si en un equipo de gama media la carga con 4 jugadores baja de 60, lo primero sería unir caras en `VoxelBuilder` (8-9 M de primitivas) y rebajar la resolución de la tienda y la cabaña del campamento.
 - Nuevas secciones del perfil: `jugadores_fisica`, `jugadores_anim`, `armas`, `hud` y `partida`.
 
+## Fase 16, bloque A: picos y animación (02-11-2026)
+
+*Hitos 16.1, 16.2 y 16.5.* Alta, bot sin daño, 80 enemigos (`max_alive=80 spawn_rate=20`), 20 s medidos tras 2 de calentamiento, sin límite de fotogramas, en el escritorio aparte de Claude Code; tres ejecuciones por nivel y configuración, alternándolas (`spikes=true`). «Antes»: `warmup=false model_pool=false anim_lod=false`.
+
+| Nivel | Media antes → ahora | 1 % peor antes → ahora | Fotogramas de más de 16,7 ms (por 1.000) | Tirones de más de 25 ms (por ejecución) |
+|---|---|---|---|---|
+| p1_n2 · Campamento de Lake | 8,99 → 8,33 ms | 18,60 → 18,55 ms | 20,6 → 16,1 | 6,7 → 4,7 |
+| p2_n4 · Pantanos | 12,32 → 10,29 ms | 23,02 → 19,09 ms | 95,0 → 29,8 | 12,3 → 8,0 |
+| p3_n2 · Luisiana | 11,85 → 10,01 ms | 21,71 → 18,69 ms | 53,8 → 20,6 | 10,3 → 6,3 |
+
+- **De dónde salían los picos** (`spikes=true`): (1) la primera aparición de cada enemigo cargaba su malla, compilaba sus shaders (9-11 de una vez) y, al morir el primero, leía su malla de vuelta de la GPU para la paleta de los trozos: tirones de 50-80 ms en la primera oleada; (2) cada aparición costaba ~0,3 ms y cada muerte ~0,6 ms (la mitad, la paleta); (3) un fotograma lento hace que el siguiente lleve dos pasos de física, y la física de los enemigos (~30 µs por enemigo y paso) se duplica.
+- **Con 1 enemigo en Luisiana**, 6,96 ms de media y 8,95 de 1 % peor; con 80, 11,6 y 24: los enemigos explican casi toda la diferencia (pose 1,3 ms, resto de su `_process` ~1 ms, física 1,75 ms, y lo que el motor tarda en mover las mallas de sus partes).
+- **El 1 % peor sin límite de fotogramas exagera:** a 85-100 fps unos fotogramas llevan 0 pasos de física, otros 1 y otros 2. Con el juego a 60 fps cada uno lleva uno. Medido con `cfg_fps_limit=60` no sirve (el temporizador de Windows hace oscilar los fotogramas alrededor de 16,7 ms); los tirones de más de 25 ms son la mejor señal de lo que se nota jugando.
+- **Pose de los enemigos** (Luisiana, `prof=true`): 1,31 → 0,38 ms por fotograma.
+- **Coste por llamada** (`Prof` dice ahora llamadas y µs por llamada): aparición 0,32 → 0,21 ms; muerte 0,58-1,26 → 0,26 ms.
+
 ## Medición de los 15 niveles
 
 *Última: 30-10-2026, versión 0.9.0 (`python tools/medir_niveles.py`).* Bot sin daño, 80 enemigos como tope y 8 s medidos; la mejor de 2 ejecuciones. Entre paréntesis, la medición anterior (ninguna) y la diferencia. Milisegundos por fotograma: menos es mejor. Con 80 enemigos manda la CPU (la lógica de la partida), así que Media y Alta salen parecidas; entre ejecuciones, la media varía en torno a ±1 ms y el 1 % peor bastante más: fíate de las diferencias grandes o de las que se repiten.

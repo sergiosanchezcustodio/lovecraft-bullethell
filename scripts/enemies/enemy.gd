@@ -176,7 +176,7 @@ func swap_model(new_model: String, new_scale: float = 1.0) -> void:
 	if model != null: model.queue_free()
 	model_name = new_model
 	model_scale = new_scale
-	model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
+	model = ModelPool.take("res://models/%s.json" % model_name)   # de la reserva si hay (hito 16.1)
 	visual.add_child(model)
 	_spawn_t = 0.0                                 # vuelve a crecer desde pequeño
 	anim_t = 0.0
@@ -192,7 +192,7 @@ func _ready() -> void:
 	add_child(visual)
 	model_name = data.model
 	model_scale = data.model_scale
-	model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
+	model = ModelPool.take("res://models/%s.json" % model_name)   # de la reserva si hay (hito 16.1)
 	visual.add_child(model)
 	if data.ethereal: _make_ethereal(model)
 	_dress_model()
@@ -202,10 +202,7 @@ func _ready() -> void:
 		runner.over_walls = true
 	runner.position.y = 0.6
 	add_child(runner)
-	_flash_mat = StandardMaterial3D.new()
-	_flash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_flash_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_flash_mat.albedo_color = Color(1, 1, 1, 0.75 if int(Auto.setting("flashes", 1)) == 1 else 0.2)   # accesibilidad
+	_flash_mat = _shared_flash(false)
 	_attack_timer = data.attack_cooldown * randf_range(0.5, 1.0)
 	anim_t = randf()
 	if data.aura_drain > 0.0 and data.aura_radius > 0.0:
@@ -518,13 +515,27 @@ func _flash_is_big() -> bool:
 	return data.unique or model_scale > 1.5
 
 func _big_flash_material() -> StandardMaterial3D:
-	if _flash_big_mat == null:
-		_flash_big_mat = StandardMaterial3D.new()
-		_flash_big_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		_flash_big_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-		var v := FLASH_BIG_ADD if int(Auto.setting("flashes", 1)) == 1 else FLASH_BIG_ADD * 0.35   # accesibilidad
-		_flash_big_mat.albedo_color = Color(v, v, v)
+	if _flash_big_mat == null: _flash_big_mat = _shared_flash(true)
 	return _flash_big_mat
+
+## Materiales del destello, compartidos por todos los enemigos (hito 16.5: antes, uno nuevo por
+## enemigo al aparecer). Uno por tipo y por ajuste de accesibilidad (Destellos: normales o reducidos).
+static var _flash_mats := {}
+static func _shared_flash(big: bool) -> StandardMaterial3D:
+	var full := int(Auto.setting("flashes", 1)) == 1
+	var key := "%s|%s" % [big, full]
+	if not _flash_mats.has(key):
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		if big:                                    # jefes y gigantes: suma luz
+			m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+			var v := FLASH_BIG_ADD if full else FLASH_BIG_ADD * 0.35
+			m.albedo_color = Color(v, v, v)
+		else:
+			m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			m.albedo_color = Color(1, 1, 1, 0.75 if full else 0.2)
+		_flash_mats[key] = m
+	return _flash_mats[key]
 
 ## Expedicionario (hito 15.3): la primera vez que «muere» cae al suelo con un poco de vida; un
 ## golpe más lo remata y, si no llega, se levanta a los `revive_time` s con `revive` de su vida.
@@ -625,6 +636,7 @@ func puppet_die() -> void:
 	_death_fx()
 
 func _death_fx() -> void:
+	var t0 := Prof.start()
 	_rise_end()
 	# cae a su manera (hito 12.7: de rodillas, derrumbado, derretido, de lado) y luego se deshace;
 	# los trozos saltan cuando empieza a deshacerse
@@ -644,6 +656,7 @@ func _death_fx() -> void:
 		Ripples.add(world.fx, global_position, 0.8 + data.body_radius, 0.6, 1.2)
 	died.emit(self)
 	queue_free()
+	Prof.stop("muerte", t0)
 
 ## La maldición salta a los más cercanos que aún no la llevan.
 func _spread_curse() -> void:
@@ -735,7 +748,13 @@ func _madden_step(delta: float) -> void:
 		d.knockback = to.normalized()
 		best.take_damage(d)
 
-const CROWD := 120                         ## enemigos: con más, la pose va en fotogramas alternos
+const CROWD := 120                         ## enemigos: con más, piensan en pasos alternos y la pose va a medio ritmo
+const POSE_HZ := 60.0                      ## la pose, como mucho a este ritmo aunque el monitor vaya a 120 o 144 Hz (hito 16.2)
+const CROWD_POSE := 50                     ## con más enemigos, los pequeños se posan a `crowd_hz`
+static var crowd_hz := 30.0                ## lo pone la calidad gráfica (`anim_crowd_hz`; en Ultra, 60)
+static var anim_lod := true                ## anim_lod=false: la pose en cada fotograma, como antes (comparar)
+var _pose_acc := 1.0                       ## tiempo desde la última pose (empieza vencido: la primera, enseguida)
+var _posed_once := false
 const FAR := 16.0                          ## m: más lejos de todos los jugadores, piensa a medio ritmo
 var _far := false
 var _ai_vel := Vector3.ZERO
@@ -907,10 +926,29 @@ func _process(delta: float) -> void:
 	# fuera de la vista no se aplica la pose (la animación sigue corriendo): con 200 enemigos
 	# era una cuarta parte de su coste
 	var cam := get_viewport().get_camera_3d()
-	# con muchos en pantalla, la pose en fotogramas alternos (a más de 60 FPS no se nota)
-	var crowd := world.enemies.size() > CROWD and (Engine.get_process_frames() + get_instance_id()) % 2 == 1
-	if model_scale > 1.5 or (not crowd and (cam == null or cam.is_position_in_frustum(visual.global_position + Vector3(0, 1.0, 0)))):
+	# animación por niveles de detalle (hito 16.2): la pose, como mucho a 60 Hz (a más no se nota
+	# y el monitor puede ir a 120 o 144), y con mucha gente los pequeños a 30 (`crowd_hz`); con más
+	# de CROWD, a la mitad. La posición sigue yendo en cada fotograma; solo la pose de las partes
+	# se queda quieta entre una y otra. Los grandes, los jefes y las élites, siempre.
+	_pose_acc += delta
+	var big_one := model_scale > 1.5 or data.unique
+	var hz := POSE_HZ
+	var n := world.enemies.size()
+	if not big_one and not data.elite and n > CROWD_POSE: hz = minf(hz, crowd_hz)
+	if not big_one and n > CROWD: hz *= 0.5
+	if not anim_lod: hz = 100000.0
+	var period := 1.0 / hz
+	var due := big_one or _pose_acc >= period
+	if due and not big_one and (cam == null or cam.is_position_in_frustum(visual.global_position + Vector3(0, 1.0, 0))):
+		if _posed_once: _pose_acc = fmod(_pose_acc, period)
+		else:                                      # la primera pose, ya; luego, desfasados entre sí
+			_posed_once = true
+			_pose_acc = randf() * period
+	elif not big_one: due = false
+	if due:
+		var tp := Prof.start()
 		Anims.pose(model_name, anim, model, anim_t)
+		Prof.stop("enemigos_pose", tp)
 		if wu_own and wu != Vector2.ZERO: Anims.windup(model_name, model, wu.x, wu.y, _spawn_t)
 		if data.alive: _alive_step(delta)
 		# la reacción de su familia, encima de la pose (que la deshace en el siguiente fotograma)

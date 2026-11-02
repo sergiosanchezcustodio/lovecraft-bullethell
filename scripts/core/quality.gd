@@ -53,3 +53,4 @@ static func apply_game(env: Environment, moon: DirectionalLight3D) -> void:
 	Crumble.enabled = bool(q.get("crumble", true))
 	GroundMarks.limit = int(q.get("marks", 24))
 	Explosion.max_lit = int(q.get("lights", 8))
+	Enemy.crowd_hz = float(q.get("anim_crowd_hz", 30.0))   # hito 16.2

@@ -311,6 +311,7 @@ func _spawnable(p: Vector2, radius: float) -> bool:
 	return f == null or f.reachable(p)
 
 func spawn(d: EnemyData, pos: Vector3) -> Enemy:
+	var t0 := Prof.start()
 	var e := Enemy.new().setup(d, world, obstacles)
 	e.health_scale = LevelData.coop(level.coop_health, players)     # más jugadores, más aguante
 	if d.unique: e.health_scale = 1.0 + (e.health_scale - 1.0) * 0.5   # los únicos, la mitad (con 4: ×1,65)
@@ -324,6 +325,7 @@ func spawn(d: EnemyData, pos: Vector3) -> Enemy:
 	alive.append(e)
 	spawned_total += 1
 	enemy_spawned.emit(e)
+	Prof.stop("aparicion", t0)
 	return e
 
 func _on_died(e: Enemy) -> void:
