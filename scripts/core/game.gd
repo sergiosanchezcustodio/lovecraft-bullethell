@@ -42,6 +42,7 @@ extends Node3D
 ##   boss_intro=false        sin la entrada de los jefes (BossIntro): solo el aviso, como antes
 ##   final_next=true         el evento final saca directamente el jefe que viene después (Padre Dagon sin Madre Hydra)
 ##   tints=false             sin el destello blanco de los enemigos al recibir un golpe ni los tintes de estado (estasis, veneno…)
+##   flash_hold=true         el destello del golpe de los enemigos, siempre encendido (capturas)
 ##   hud=false               sin el HUD (paneles, flechas y avisos); card=false, sin el rótulo del nivel (tráiler)
 ##   crumble=false / marks=N  sin desmoronarse / tope de manchas en el suelo (0, ninguna; por defecto, el de la calidad gráfica)
 ##   falls=false             sin la caída de cada familia al morir (hito 12.7)
@@ -413,6 +414,7 @@ func _ready() -> void:
 	Enemy.wounds = args.get_str("wounds", "true") != "false" and (bool(Quality.value("wounds", true)) or args.has("wounds"))   # en Baja, sin grietas
 	Enemy.wounds_force = args.get_float("wounds", -1.0) if args.get_str("wounds", "").is_valid_float() else -1.0
 	Enemy.rise_enabled = args.get_bool("rise", true)   # hito 11.6
+	Enemy.flash_hold = args.get_bool("flash_hold", false)
 	Enemy.tints = args.get_bool("tints", true)   # tráiler (hito 13.16): los jefes, a golpe continuo, se quedaban blancos
 	GroundMarks.limit = args.get_int("marks", GroundMarks.limit)
 	Debris.limit = GroundMarks.limit * Debris.PER_MARK       # restos de los rompibles (hito 12.11)

@@ -346,6 +346,17 @@ static func _down_pose(m: Node3D, kn: float, s: float) -> void:
 	bend(m, "fore_l", -1.2 * s)
 	Anims.part(m, "arm_r").rotation = Vector3(0.15 * kn * (1.0 - s) - 0.3 * s, 0.0, -0.2 * s)
 	bend(m, "fore_r", -0.3 * s)
+	_skirt_with_legs(m)
+
+## Faldón, sotana o parka larga (parte `skirt`, que cuelga del tronco): tumbado, el tronco se
+## incorpora sobre el codo y el faldón se iba con él, así que las piernas salían por debajo y
+## la bota quedaba suelta en el suelo. Aquí sigue a las piernas, como si colgara de la cadera
+## (02-11-2026). El vaivén de la ropa se suma después.
+static func _skirt_with_legs(m: Node3D) -> void:
+	if not has(m, "skirt") or not has(m, "leg_l") or not has(m, "leg_r"): return
+	var legs_x := (Anims.part(m, "leg_l").rotation.x + Anims.part(m, "leg_r").rotation.x) * 0.5
+	var torso := Basis.from_euler(Anims.part(m, "torso").rotation)
+	Anims.part(m, "skirt").basis = torso.inverse() * Basis.from_euler(Vector3(legs_x, 0.0, 0.0))
 
 ## Cae (0,9 s): se le doblan las rodillas, la cabeza cae y rueda de lado hasta quedar apoyado
 ## en el codo.

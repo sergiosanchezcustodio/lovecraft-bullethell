@@ -65,6 +65,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `level=desafio:p1_n4`: juega el desafío de ese nivel (hito 15.2). `challenge_open=true` (selección con `map=true`): abre la ventana de los desafíos.
   - `library_live=false`: el bestiario con las imágenes quietas, sin girar (hito 15.4).
   - `replay=false`: sin grabar la repetición de la caída (hito 15.1). `replay_open=true`: la abre en la pantalla final (capturas, con `halt_shots=true quit_on_end=true`). `replay_gif=true`: además la guarda como GIF (en `photo_dir=` si se da).
+  - `flash_hold=true`: el destello del golpe de los enemigos, siempre encendido (capturas: dura 0,07 s y no sale en las normales). `tints=false`: sin destello ni tintes de estado.
   - `boss_intro=false`: sin la entrada de los jefes (`BossIntro`), solo el aviso de texto, como antes.
   - `hp=` y `san=` también sirven para ver los retratos con estado (hito 12.14: sangre desde la mitad de la vida, mirada perdida desde el 40 % de la cordura).
   - `cfg_difficulty=N`: todas las características de la dificultad a N (1..10; D-42) en esta ejecución. `dif_<característica>=N` (p. ej. `dif_vida=6`) cambia una; `dif_<valor>=x` (p. ej. `dif_rate=4`), un multiplicador suelto. `dif_menu=true` con `debug_menu=N`: abre la dificultad en vez de la depuración. `python tools/simular.py … --dif N` (3 por defecto).

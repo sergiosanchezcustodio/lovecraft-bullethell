@@ -15,12 +15,12 @@ Consúltalos cuando haga falta (son largos):
 
 ## Estado actual (resumen)
 
-*Actualizado: 30-10-2026.* El resumen largo de cada fase está en **`docs/RESUMEN_ESTADO.md`** y el detalle de cada hito (sistemas, archivos, opciones de prueba, equilibrio, capturas) en **`docs/ESTADO.md`**: búscalo ahí antes de tocar un sistema. Al terminar un cambio, apunta el detalle en `docs/ESTADO.md` y, si cambia el panorama, actualiza `docs/RESUMEN_ESTADO.md` y estas líneas.
+*Actualizado: 02-11-2026.* El resumen largo de cada fase está en **`docs/RESUMEN_ESTADO.md`** y el detalle de cada hito (sistemas, archivos, opciones de prueba, equilibrio, capturas) en **`docs/ESTADO.md`**: búscalo ahí antes de tocar un sistema. Al terminar un cambio, apunta el detalle en `docs/ESTADO.md` y, si cambia el panorama, actualiza `docs/RESUMEN_ESTADO.md` y estas líneas.
 
 - Fases 0 a 7 y 9 a 14 hechas; casi todas esperan la partida, la prueba o la revisión del autor (fases 11 a 14, la prueba online por internet con `docs/PRUEBA_ONLINE.md` y el cooperativo con varios mandos).
 - Fase 8 (pulido y distribución): falta subir a itch.io (necesita la cuenta del autor). Nube (fase 10): falta el `client_id` de la OAuth App del autor en `data/cloud.json`.
 - Dificultad del 1 al 10 por características (D-42), temporal, pendiente de la calibración del autor.
-- **Fase 15 (30-10-2026), hecha, pendiente de revisión** (hitos 15.1-15.4 en `docs/ROADMAP.md`): repetición de la caída (`DeathReplay`), modo desafío (`Challenge`, `data/challenges.json`), un enemigo nuevo por parte (expedicionario, nadador y tamborilero, `tools/gen_enemigos_fase15.py`) y bestiario vivo (`ModelIcon.make_live`, bajas por criatura). Después, lo que elija el autor (revisar las fases 13 a 15, subir a itch.io, la prueba online).
+- **Fase 15 (30-10-2026), hecha, pendiente de revisión** (hitos 15.1-15.4 en `docs/ROADMAP.md`): repetición de la caída (`DeathReplay`), modo desafío (`Challenge`, `data/challenges.json`), un enemigo nuevo por parte (expedicionario, nadador y tamborilero, `tools/gen_enemigos_fase15.py`) y bestiario vivo (`ModelIcon.make_live`, bajas por criatura). Mejoras del 02-11-2026 (destello de los jefes, faldón al caer, desafíos con el bot). **Fase 16 propuesta** en `docs/ROADMAP.md` (38 ideas en 7 bloques), sin aprobar: el autor elige qué se hace.
 
 ### Reglas que no hay que olvidar
 

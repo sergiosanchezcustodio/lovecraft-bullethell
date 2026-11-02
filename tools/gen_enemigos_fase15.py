@@ -64,7 +64,7 @@ def expedicionario():
     for x in range(-6, 6):                                           # barba helada
         for y in range(62, 67):
             if (x + y) % 2: cu.paint_face(M, x, y, FROST, dz=1)
-    cu.finish(M, 'expedicionario', dict(MATS), flat=(FROST, BONE, FLESH, HOLE), b=1, hat=(FUR,))
+    cu.finish(M, 'expedicionario', dict(MATS), flat=(FROST, BONE, FLESH, HOLE), b=1, hat=(FUR,), skirt=True)
 
 
 def tamborilero():

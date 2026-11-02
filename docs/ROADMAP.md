@@ -417,3 +417,82 @@ Propuesta al autor el 30-10-2026 tras comprobar que no quedaban ideas sin hacer;
 | 15.2 | **Modo desafío:** reglas fijas por nivel (solo arcanas, sin esquive, una sola arma, sin recuperar cordura, niebla cerrada…), abierto al superar el nivel, desde el mapa, con su logro | `data/challenges.json`, `Challenge`, `ChallengeMenu`; en red viaja con la partida (id «desafio:p1_n3») **Hecho (30-10-2026).** |
 | 15.3 | **Un enemigo nuevo por parte:** expedicionario de Lake (parte 1: se arrastra y se levanta si no lo rematas), nadador de la marea (parte 2: salta del agua en arco), tamborilero del pantano (parte 3: su tambor acelera a los cercanos) | `tools/gen_enemigos_fase15.py`, `EnemyData.revive`/`drum_radius`, `.tres` en `data/enemies/`, bestiario y oleadas **Hecho (30-10-2026).** |
 | 15.4 | **Bestiario vivo:** la criatura gira y se anima en su página; abatidas en total y quién abatió más | `ModelIcon.make_live`, `Library.add_kill`/`kill_facts` (`SaveData.records["bestiary"]`) **Hecho (30-10-2026).** |
+
+## Fase 16: rendimiento, jugabilidad del género, enemigos, modos, menús y gráficos (propuesta)
+
+**Propuesta, sin aprobar (02-11-2026).** Pedida por el autor («propón más puntos de optimización y mejora en el 16, con ideas de otros videojuegos similares»). Elige bloques o ideas sueltas; lo que no elijas queda aquí como reserva. Entre paréntesis, de qué juego viene cada idea: se toma el mecanismo y se lleva a los mitos y a lo que ya tiene el juego, sin copiar ningún juego concreto.
+
+### Bloque A: rendimiento (lo primero, porque todo lo demás añade carga)
+
+Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la CPU; la media va de 7 a 10 ms, pero **el 1 % peor pasa de 16,7 ms en 13 de los 15 niveles** (hasta 19,8 en Luisiana), y la animación de enemigos en GDScript ya era el primer coste de la prueba de carga (2,1 ms de 4,4).
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 16.1 | **Cazar los picos del 1 % peor:** que ningún nivel pase de 16,7 ms en Alta | Registrar los fotogramas de más de 16 ms con `prof` (qué sistema se dispara); calentar en la carga los shaders y materiales de cada nivel (dibujarlos una vez fuera de cámara, para que no se compilen en mitad de la partida); reciclar los efectos de `world.fx` (hoy se crean y se borran: 98 sitios) y quitar las listas que se crean en los bucles de cada fotograma |
+| 16.2 | **Animación por niveles de detalle:** los enemigos pequeños o lejanos se posan a 30 o 15 Hz y los de cerca a 60 | Ampliar lo de `CROWD` (fotogramas alternos) según el tamaño en pantalla; medir con `bench.tscn` y en los 15 niveles |
+| 16.3 | **Hordas con instancias:** los cinco enemigos más numerosos, en un `MultiMesh` por tipo con las partes giradas en el shader de vértices (sin un nodo por parte) | Prueba primero con el pingüino y el fragmento; si gana más de 1 ms con 150, se pasa al resto |
+| 16.4 | **Menos primitivas:** unir las caras coplanarias del decorado fijo y versiones más simples de las piezas grandes a lo lejos (los pantanos llegan a 19,9 M) | `VoxelBuilder` (sube `BUILDER_VERSION`); en Baja, la versión simple siempre |
+| 16.5 | **Materiales compartidos:** el destello y los tintes de estado como parámetros de instancia de un único material, no un material nuevo por enemigo | `Enemy._flash_mat`/`_status`; menos memoria y menos cambios de estado al dibujar |
+| 16.6 | **Carga del siguiente nivel durante el relato** y tiempos de carga medidos | `ResourceLoader.load_threaded_request` de la arena y los modelos mientras se lee el relato |
+
+### Bloque B: jugabilidad (ideas del género)
+
+| Hito | Contenido | De dónde |
+|---|---|---|
+| 16.7 | **Más allá del límite:** con todas las armas y objetos a tope, cada subida mejora un poco un arma (daño, cadencia, área…) sin tope, en vez de oro o curación | *Vampire Survivors* (Limit Break) |
+| 16.8 | **Evoluciones con dos ramas:** al evolucionar un arma, eliges entre dos versiones (p. ej. la Thompson: «ráfaga» o «tambor de 100») | *Deep Rock Galactic: Survivor* (overclocks) |
+| 16.9 | **Signos Mayores:** lo contrario de los pactos (que castigan): cartas que cambian las reglas a tu favor, una al empezar y otra a los 10 min (las explosiones dejan fuego arcano, los críticos encadenan, las gemas devuelven cordura…). Se desbloquean con logros | *Vampire Survivors* (Arcanas), *Death Must Die* (bendiciones) |
+| 16.10 | **La lámpara como recurso:** el farol gasta aceite; con poca luz, más oro y experiencia, pero las criaturas ven mejor que tú y la cordura baja antes; latas de aceite en los rompibles | *Darkest Dungeon* (antorcha); encaja con la atmósfera |
+| 16.11 | **Curiosidades del nivel:** ídolos, altares, cadáveres con mochila o libros abiertos en el suelo; al tocarlos, algo bueno o malo, y cada investigador tiene la suya (el padre Iwanicki purifica el altar; Armitage lee el libro sin perder cordura) | *Darkest Dungeon* (curiosidades) |
+| 16.12 | **El buhonero:** a mitad de algunos niveles aparece un vendedor (Zadok Allen en Innsmouth, un trampero en la Antártida); con el oro de la partida compras un objeto, una curación o una subida | *Brotato* (tienda entre oleadas) |
+| 16.13 | **Apuntado manual opcional:** con el stick derecho (o el ratón) apuntas las armas de apuntado libre; las demás siguen solas. Una opción por jugador | *20 Minutes Till Dawn*, *Brotato* |
+| 16.14 | **Grados de locura tras la campaña:** al vencer a Cthulhu, la campaña se puede repetir en grado 1 a 5, con variantes de los enemigos (más rápidos, con escudo, que se parten) y más premio | *Brotato* (niveles de peligro), *Vampire Survivors* (Ascend) |
+| 16.15 | **Pista de evoluciones en la subida:** la carta de un objeto avisa si completa la evolución de un arma que llevas («Con el revólver Webly: evoluciona»), con un brillo | *Vampire Survivors* (hoy la subida no lo dice) |
+
+### Bloque C: enemigos y jefes nuevos
+
+| Hito | Contenido | Qué aporta |
+|---|---|---|
+| 16.16 | **Parte 1:** *shoggoth excavador* (se mete bajo el hielo y sale bajo tus pies tras una grieta de aviso) y *Antiguo sembrador* (planta vainas de esporas que revientan al pisarlas: minas) | Ataque desde abajo y zonas prohibidas |
+| 16.17 | **Parte 2:** *guardián de la Orden de Dagón* (híbrido con escudo de bronce: para las balas de frente, hay que rodearlo) y *hija de los Marsh* (con tiara: canta y cura a los Profundos cercanos; hay que matarla primero) | Escudo frontal y curandera: dos papeles que no existen |
+| 16.18 | **Parte 3:** *sonámbulo de Providence* (sueña con R'lyeh: desaparece y reaparece a tu lado; tenerlo cerca quita cordura) e *ídolo vivo* (estatuilla de Cthulhu del tamaño de un hombre, quieta, que dispara en espiral y refuerza a los cercanos: una torreta) | Teletransporte y torreta |
+| 16.19 | **Un jefe intermedio por parte** en el nivel 3: Gedney, el estudiante desaparecido del campamento de Lake, convertido en otra cosa (parte 1); Obed Marsh rejuvenecido (parte 2); el viejo Castro, el cultista que habló con Legrasse (parte 3) | Hoy solo hay jefe al final de cada parte |
+| 16.20 | **Élites con rasgos:** cada élite saca uno o dos al azar (vampírica, explota al morir, deja icor, rápida, con escudo), con su icono sobre la cabeza | *Diablo*, *Halls of Torment* |
+
+### Bloque D: modos y opciones
+
+| Hito | Contenido | De dónde |
+|---|---|---|
+| 16.21 | **Expedición:** una tirada con un mapa de caminos que se bifurcan (combate, élite, buhonero, curiosidad, descanso, jefe); lo que ganas solo vale en esa expedición | *Slay the Spire*, *Vampire Survivors* (Adventures) |
+| 16.22 | **Desfile de jefes:** los tres jefes seguidos (más los intermedios del 16.19), con récord de tiempo | Clásico de los arcade |
+| 16.23 | **Velocidad del juego** (0,7 a 1,3) y **pausa automática** al desconectar un mando o perder el foco | Accesibilidad |
+| 16.24 | **Pesca en el muelle de Innsmouth** entre niveles: un minijuego tranquilo; los peces raros van al bestiario o se venden, y alguno no debería haber salido del agua | *Dredge*, *HoloCure* |
+| 16.25 | **Personajes secretos:** dos investigadores que se abren con condiciones (p. ej. Randolph Carter al juntar todos los fragmentos; Wilbur Whateley al superar los 15 desafíos) | *Vampire Survivors* |
+
+### Bloque E: menús e interfaz
+
+| Hito | Contenido | De dónde |
+|---|---|---|
+| 16.26 | **Archivo de expediciones:** en la Biblioteca, cada partida con su investigador, armas y objetos finales, minuto, causa de la caída y daño por arma; se puede repetir con la misma semilla | *Brotato*, *Halls of Torment* |
+| 16.27 | **Daño por arma en la pausa:** tabla con el daño total y por segundo de cada arma y objeto en esta partida | *HoloCure*, *Brotato* |
+| 16.28 | **Sala de trofeos:** en la Biblioteca, una vitrina 3D con un trofeo por jefe vencido, por logro grande y por conjunto completo, que se va llenando | *HoloCure* (la casa), *Hades* |
+| 16.29 | **Comparar antes de elegir:** en la tienda y en la subida, lo que cambia en tus estadísticas (en verde y rojo) | Buena práctica del género |
+| 16.30 | **Más vibración del mando**, con intensidad regulable: hoy solo vibra al recibir daño (`Player._rumble`); añadir explosiones cercanas, la entrada y la caída de los jefes, la subida de nivel y la crisis de cordura | Buena práctica del género |
+
+### Bloque F: gráficos
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 16.31 | **Reflejos en el agua** de los personajes y los faroles en charcos, mar y pantano (reflejo plano barato en Alta y Ultra) | `sea.gdshader` y el suelo de los pantanos; en Baja y Media, como ahora |
+| 16.32 | **Haces de luna** que entran por ventanales y huecos (estudio de Wilcox, templo de la Orden, ciudad de los Antiguos) | Conos con niebla, solo en Alta y Ultra |
+| 16.33 | **La noche avanza durante el nivel:** del crepúsculo a la noche cerrada (y el alba si cae el jefe) | `Atmosphere` con una curva de luz por nivel, sin salir de la mediana de 0,16-0,22 |
+| 16.34 | **Decorado que se rompe con las armas:** columnas, cajas y muros bajos que se desmoronan en voxels con las explosiones (como `Crumble`) y dejan cascotes | Rompibles ampliados, con tope por calidad |
+| 16.35 | **Cielos en la portada y los relatos:** auroras, la tormenta y el cielo de R'lyeh con nubes voxel, que la cámara de la partida nunca enseña | Escenas de los relatos |
+
+### Bloque G: técnica y distribución
+
+| Hito | Contenido | Cómo |
+|---|---|---|
+| 16.36 | **Steam Deck y portátiles:** preajuste «Portátil» (800p, 30-40 fps estables) y la interfaz revisada a 1280×800 | `data/quality.json`, `ui_check=true` a esa resolución |
+| 16.37 | **Linux:** build y prueba en GitHub Actions (Godot exporta sin cambios) | `.github/workflows/build.yml` |
+| 16.38 | **Informe de errores:** si el juego se cerró mal, al volver ofrece guardar un archivo con el registro y la configuración para mandártelo | `user://logs/` |

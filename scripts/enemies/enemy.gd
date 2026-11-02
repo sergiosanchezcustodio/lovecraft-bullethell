@@ -46,6 +46,9 @@ var pace_mult := 1.0                         ## ritmo propio (la dificultad va a
 ## golpe lo remata) y levantándose (s). Tamborilero (`drum_radius`): `drum_t`, s que le quedan
 ## al ritmo del tambor de uno cercano (`DRUM_SPEED`).
 const DRUM_SPEED := 1.35
+const FLASH_BIG := 0.06                     ## destello de jefes y gigantes (s)
+const FLASH_BIG_GAP := 0.2                  ## y su pausa mínima entre uno y otro (s)
+const FLASH_BIG_ADD := 0.2                  ## luz que suman (los demás, blanco al 75 %)
 const DRUM_EVERY := 0.6
 var drum_t := 0.0
 var _drum_next := 0.0
@@ -103,6 +106,7 @@ const ELITE_SIZE := 1.1
 const ELITE_EYES := 1.4                     ## brillo de su capa de luz (ojos, bioluminiscencia)
 static var wounds := true                   ## wounds=false: sin grietas (comparar)
 static var tints := true                    ## tints=false: sin el destello del golpe ni los tintes de estado (tráiler, hito 13.16)
+static var flash_hold := false              ## flash_hold=true: el destello del golpe, siempre encendido (capturas)
 static var wounds_force := -1.0             ## wounds=0.7: grietas fijas a ese nivel (medir su coste)
 static var _wound_mat: ShaderMaterial
 static var _elite_glow := {}                ## material de luz -> su copia más brillante
@@ -115,6 +119,8 @@ var _aura_mat: ShaderMaterial                ## presencia: disco violeta en el s
 var _flash := 0.0
 var _flash_on := false
 var _flash_mat: StandardMaterial3D
+var _flash_big_mat: StandardMaterial3D        ## jefes y gigantes: aclara sin tapar el modelo
+var _flash_cd := 0.0                          ## jefes y gigantes: pausa entre destellos
 const HIT_POSE := 0.22                      ## s que dura el aplastado y la inclinación al recibir un golpe (hito 11.2)
 var _hit_t := HIT_POSE
 var _hit_len := HIT_POSE                    ## lo que dura su reacción (la de su familia, Anims.hit_time)
@@ -458,7 +464,7 @@ func stun(seconds: float) -> void:
 
 func take_damage(d: Damage) -> void:
 	if puppet:                                 # el daño de verdad lo cuenta el anfitrión
-		_flash = 0.07
+		_hit_flash()
 		_hit_pose(d)
 		var guess := d.physical                # la cifra, aproximada (sin las bonificaciones)
 		for tag in data.tags: guess *= float(d.bonus.get(tag, 1.0))
@@ -472,7 +478,7 @@ func take_damage(d: Damage) -> void:
 	if data.elite or data.unique: k *= float(d.bonus.get(Player.ELITE_TAG, 1.0))   # Medallón del cazador
 	if _stasis_t > 0.0:                        # congelado: el daño se guarda para el final
 		_stasis_store += d.physical * k
-		_flash = 0.07
+		_hit_flash()
 		return
 	var dealt := minf(d.physical * k, maxf(health, 0.0))
 	health -= d.physical * k
@@ -484,7 +490,7 @@ func take_damage(d: Damage) -> void:
 	if health <= 0.0:
 		killed_by = d.tag
 		world.record_kill(d.tag, global_position)
-	_flash = 0.07
+	_hit_flash()
 	_knock += Vector3(d.knockback.x, 0, d.knockback.z) * (2.5 if not data.elite else 0.6)
 	_hit_pose(d)
 	var big := data.elite or data.unique
@@ -496,13 +502,37 @@ func take_damage(d: Damage) -> void:
 		if big: HitStop.hit(70, true)
 		_die()
 
+## Destello blanco del golpe. En los jefes y los gigantes (más de media pantalla) el blanco
+## casi opaco de los demás se veía como una silueta plana y, a golpe continuo, no se iba: ahí
+## aclara sumando luz (se ve el modelo debajo), dura menos y deja una pausa entre destellos,
+## así que parpadea al ritmo de los golpes (02-11-2026).
+func _hit_flash() -> void:
+	if _flash_is_big():
+		if _flash_cd > 0.0: return
+		_flash_cd = FLASH_BIG_GAP
+		_flash = FLASH_BIG
+		return
+	_flash = 0.07
+
+func _flash_is_big() -> bool:
+	return data.unique or model_scale > 1.5
+
+func _big_flash_material() -> StandardMaterial3D:
+	if _flash_big_mat == null:
+		_flash_big_mat = StandardMaterial3D.new()
+		_flash_big_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_flash_big_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+		var v := FLASH_BIG_ADD if int(Auto.setting("flashes", 1)) == 1 else FLASH_BIG_ADD * 0.35   # accesibilidad
+		_flash_big_mat.albedo_color = Color(v, v, v)
+	return _flash_big_mat
+
 ## Expedicionario (hito 15.3): la primera vez que «muere» cae al suelo con un poco de vida; un
 ## golpe más lo remata y, si no llega, se levanta a los `revive_time` s con `revive` de su vida.
 func _fall_down(d: Damage) -> void:
 	_revived = true
 	health = 0.01
 	_down_t = data.revive_time
-	_flash = 0.07
+	_hit_flash()
 	_hit_pose(d)
 	anim = "down"
 	anim_t = 0.0
@@ -887,11 +917,13 @@ func _process(delta: float) -> void:
 		if _hit_own and _hit_t < _hit_len:
 			Anims.hit(model_name, model, clampf(_hit_t / _hit_len, 0.0, 1.0))
 	_flash -= delta
+	_flash_cd -= delta
+	if flash_hold: _flash = 1.0
 	# tinte: destello al recibir daño; si no, turquesa en estasis o violeta maldito.
 	# Solo se toca el material al cambiar.
 	var want: Material = null
 	if not tints: pass
-	elif _flash > 0.0: want = _flash_mat
+	elif _flash > 0.0: want = _big_flash_material() if _flash_is_big() else _flash_mat
 	elif _stasis_t > 0.0 or world.freeze_t > 0.0: want = _status(Color(0.35, 0.95, 1.0, 0.5))
 	elif _curse_t > 0.0: want = _status(Color(0.55, 0.12, 0.7, 0.35 + 0.1 * sin(_spawn_t * 9.0)))
 	elif _burn_t > 0.0: want = _status(Color(1.0, 0.5, 0.12, 0.3 + 0.1 * sin(_spawn_t * 13.0)))
@@ -1008,7 +1040,7 @@ func net_flags() -> int:
 
 ## Marioneta: pone los tintes de la foto (los relojes no corren aquí: la foto los enciende o apaga).
 func net_apply_flags(f: int) -> void:
-	if f & 1: _flash = maxf(_flash, 0.07)
+	if f & 1 and _flash <= 0.0: _hit_flash()
 	_stasis_t = 1.0 if f & 2 else 0.0
 	_curse_t = 1.0 if f & 4 else 0.0
 	_burn_t = 1.0 if f & 8 else 0.0
