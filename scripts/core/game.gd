@@ -152,6 +152,7 @@ func _ready() -> void:
 	Difficulty.refresh()
 	if args.has("pacts"): Pacts.set_active(Array(args.get_str("pacts").split(",", false)))   # pacts=noche,furia (hito 13.6)
 	Prof.enabled = args.get_bool("prof") or args.get_bool("spikes")
+	HordeDraw.enabled = args.get_bool("horde", bool(Quality.value("horde", true)))   # hito 16.3
 	UiInput.configure()
 	OutfitData.override = {}                       # outfit=bombin,botas_nieve: prendas para probar
 	for o_id in args.get_str("outfit").split(",", false):

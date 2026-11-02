@@ -108,3 +108,70 @@ func test_fuera_del_hilo_principal_la_configuracion_sale_de_la_copia() -> void:
 	assert_true(got.off, "en el hilo se sabe")
 	assert_eq(got.q, main_q, "la misma calidad que en el hilo principal")
 	assert_null(got.node, "y no busca en el árbol")
+
+# --- 16.3: hordas con instancias ---
+
+func test_la_horda_graba_las_poses_de_su_familia() -> void:
+	var h := HordeMesh.get_type("pinguino")
+	if h == null:
+		pending("sin servidor de dibujo no se pueden leer las mallas")
+		return
+	assert_true(h.has_anim("walk") and h.has_anim("charge"), "sus animaciones")
+	assert_true(h.has_anim("_hit"), "y el golpe de su familia")
+	var a := h.row("walk", 0.0)
+	assert_eq(h.row("walk", 0.999), a + int(h.anim_rows["walk"][1]) - 1, "una fila por fotograma")
+	assert_ne(h.row("charge", 0.0), a, "cada animación en sus filas")
+	assert_same(h, HordeMesh.get_type("pinguino"), "se graba una vez")
+
+func _horde_enemy() -> Array:
+	var world := CombatWorld.new()
+	add_child_autofree(world)
+	var obstacles := ObstacleMap.new()
+	obstacles.bounds = Rect2(-32, -32, 64, 64)
+	var e := Enemy.new().setup(load("res://data/enemies/pinguino.tres"), world, obstacles)
+	world.add_child(e)
+	e._rise_wait = 0.0
+	e._spawn_t = 1.0
+	return [world, e]
+
+func test_un_enemigo_corriente_va_con_la_horda_y_vuelve_a_su_modelo_al_morir() -> void:
+	if HordeMesh.get_type("pinguino") == null:
+		pending("sin servidor de dibujo")
+		return
+	HordeDraw.enabled = true
+	var we := _horde_enemy()
+	var e: Enemy = we[1]
+	assert_true(e._horde_ok)
+	e._process(1.0 / 60.0)
+	assert_true(e._in_horde, "con la horda")
+	assert_null(e.model.get_parent(), "su modelo, fuera del árbol")
+	var m := e.model
+	e.take_damage(Damage.new(1e5, 0.0))
+	assert_not_null(m.get_parent(), "al morir vuelve a su modelo (que cae y se deshace)")
+
+func test_si_se_borra_sin_morir_su_modelo_no_se_queda_suelto() -> void:
+	if HordeMesh.get_type("pinguino") == null:
+		pending("sin servidor de dibujo")
+		return
+	HordeDraw.enabled = true
+	var we := _horde_enemy()
+	var e: Enemy = we[1]
+	e._process(1.0 / 60.0)
+	var ref := weakref(e.model)
+	e.free()
+	assert_null(ref.get_ref(), "borrado con él")
+
+func test_jefes_elites_y_grandes_siguen_con_nodos() -> void:
+	HordeDraw.enabled = true
+	var we := _horde_enemy()
+	var e: Enemy = we[1]
+	e.data = e.data.duplicate()
+	e.data.elite = true
+	assert_false(HordeDraw.eligible(e), "élite")
+	e.data.elite = false
+	e.model_scale = 2.0
+	assert_false(HordeDraw.eligible(e), "grande")
+	HordeDraw.enabled = false
+	e.model_scale = 1.0
+	assert_false(HordeDraw.eligible(e), "horde=false")
+	HordeDraw.enabled = true

@@ -27,7 +27,12 @@ var _home: Array[Vector3] = []
 var _phase: Array[float] = []
 var _holders: Array[Node3D] = []
 var _acc: Array[float] = []
-var _types := {}                       # modelo -> {horde, mmi, idx: Array[int]}
+var _types := {}                       # modelo -> {horde, layer, idx: Array[int]}
+var _slots: Array = []                 # la plaza de cada uno en su capa (como Enemy.horde_cell/slot)
+
+class Slot:
+	var horde_cell := Vector2i.ZERO
+	var horde_slot := -1
 
 func _ready() -> void:
 	args = LaunchArgs.from_cmdline()
@@ -52,7 +57,7 @@ func _ready() -> void:
 	if _mm:
 		for n: String in names:
 			var t0 := Time.get_ticks_usec()
-			var h := HordeMesh.build(n, ["walk"])
+			var h := HordeMesh.get_type(n)
 			var c := 0
 			for i in count: if names[i % names.size()] == n: c += 1
 			_types[n] = {"horde": h, "layer": HordeMesh.Layer.new(h, self), "idx": []}
@@ -64,6 +69,7 @@ func _ready() -> void:
 		_phase.append(randf())
 		_acc.append(randf())
 		model_names.append(n)
+		_slots.append(Slot.new())
 		if _mm:
 			(_types[n].idx as Array).append(i)
 			continue
@@ -152,8 +158,8 @@ func _update_mm() -> void:
 				var a := _t * 0.8 + _phase[i] * TAU
 				pos += Vector3(cos(a), 0, sin(a)) * 0.5
 				yaw = -a
-			layer.add(Transform3D(Basis(Vector3.UP, yaw), pos), h.row("walk", fposmod(_t / dur + _phase[i], 1.0)) if _animate else 0)
-		layer.commit()
+			layer.place(_slots[i], Transform3D(Basis(Vector3.UP, yaw), pos), Color(h.row("walk", fposmod(_t / dur + _phase[i], 1.0)) if _animate else 0, 0, 0, 0))
+		layer.flush()
 
 func _report() -> void:
 	var ft: Array[int] = _frames_usec.duplicate()

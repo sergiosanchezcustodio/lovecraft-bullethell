@@ -69,6 +69,15 @@ static func start(parent: Node, level: LevelData, at: Vector3) -> LevelWarmup:
 			else:
 				for it: Array in Crumble.dress(m, Color(1.0, 0.5, 0.2)):
 					(it[0] as MeshInstance3D).set_instance_shader_parameter("cut", 0.5)
+		# la horda (hito 16.3): se graban sus poses ahora y se dibuja una para compilar su shader
+		if HordeDraw.enabled and not d.unique and d.model_scale <= 1.5 and not d.ethereal:
+			var h := HordeMesh.get_type(d.model)
+			if h != null:
+				var mmi := h.multimesh(1)
+				var x := (k % 6) * 2.5 - 6.0; var z := (k / 6) * 2.5 - 6.0
+				mmi.multimesh.buffer = PackedFloat32Array([1, 0, 0, x, 0, 1, 0, 0, 0, 0, 1, z, 0, 0, 0, 0])
+				w.add_child(mmi)
+				k += 1
 	last_models = list.size()
 	return w
 

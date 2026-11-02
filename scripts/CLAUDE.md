@@ -37,6 +37,7 @@
 - **Enemigos** (`scripts/enemies/`):
   - `EnemyData` (`.tres` en `data/enemies/`) define cuerpo, contacto, comportamiento con sus parámetros, patrón de ataque y escalón.
   - `Enemy` lo aplica: separación de los demás, rodeo del decorado con `ObstacleMap` (sin cuerpo físico), daño por contacto, disparo, destello, retroceso y muerte con `DeathBurst`.
+  - **Hordas con instancias** (hito 16.3): los enemigos corrientes, una vez aparecidos, no dibujan su modelo de nodos (queda fuera del árbol) sino una plaza en un MultiMesh por tipo y celda de 6 m (`HordeDraw`, `HordeMesh.Layer` y `Cell`). Las poses de `Anims` se graban en una textura (`HordeMesh`, `horde.gdshader`) y el destello y los tintes van en el dato de cada instancia. Al morir vuelven a su modelo para caer. Una animación nueva en `Anims` sirve sin tocar nada si está en `DURATION`; un cambio que deba verse con nodos y no en la horda es un fallo. `horde=false` para comparar.
   - Los comportamientos son clases de `EnemyBehavior`:
     - `CrawlBehavior` (fragmento): persigue a tirones.
     - `BlindBehavior` (pingüino): va hacia donde oyó al jugador y embiste.

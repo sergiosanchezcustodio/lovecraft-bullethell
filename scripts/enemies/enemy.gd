@@ -145,6 +145,14 @@ var _rise_wait := 0.0                       ## s de física que le quedan quieto
 var _rise_life := RISE_TIME
 var _rise_h := 1.5                          ## m que se hunde al empezar (su altura)
 var _rise_mats: Array = []                  ## mallas con el material de deshacerse (niebla)
+## Hordas con instancias (hito 16.3): si se puede, en cuanto acaba de aparecer se dibuja con el
+## MultiMesh de su tipo (`HordeDraw`) y su modelo de nodos sale del árbol hasta que muere.
+var _horde_ok := false
+var _in_horde := false
+var _horde: HordeMesh
+var _hdraw: HordeDraw
+var horde_cell := Vector2i.ZERO              ## su celda y su plaza en la horda (HordeMesh.Layer)
+var horde_slot := -1
 const LAND_TIME := 0.28                     ## s que dura el aplastado al aterrizar (hito 11.7)
 var _prev_y := INF                          ## altura dibujada del fotograma anterior
 var _vy := 0.0                              ## velocidad vertical dibujada (m/s)
@@ -173,6 +181,7 @@ static func _make_ethereal(m: Node3D) -> void:
 ## Cambia de forma (shoggoth mimético): otro modelo y otra escala, con un destello.
 func swap_model(new_model: String, new_scale: float = 1.0) -> void:
 	_rise_end()
+	if _in_horde: _leave_horde()
 	if model != null: model.queue_free()
 	model_name = new_model
 	model_scale = new_scale
@@ -182,6 +191,7 @@ func swap_model(new_model: String, new_scale: float = 1.0) -> void:
 	anim_t = 0.0
 	_top_h = -1.0
 	_dress_model()
+	_horde_ok = HordeDraw.eligible(self)
 
 func _ready() -> void:
 	visual = Node3D.new()
@@ -196,6 +206,7 @@ func _ready() -> void:
 	visual.add_child(model)
 	if data.ethereal: _make_ethereal(model)
 	_dress_model()
+	_horde_ok = HordeDraw.eligible(self)
 	runner = PatternRunner.new().setup(world)
 	if GiantMoves.applies(data) and not puppet:
 		giant = GiantMoves.new()
@@ -325,6 +336,12 @@ func _rise_end() -> void:
 
 func _exit_tree() -> void:
 	if world != null: world.remove_enemy(self)
+	if _in_horde and is_instance_valid(_hdraw): _hdraw.remove(self, _horde)   # su plaza en la horda
+
+func _notification(what: int) -> void:
+	# el modelo de nodos, fuera del árbol mientras va con la horda: nadie más lo borraría
+	if what == NOTIFICATION_PREDELETE and model != null and is_instance_valid(model) and model.get_parent() == null:
+		model.free()
 
 func is_alive() -> bool:
 	return health > 0.0
@@ -612,6 +629,7 @@ func windup_amount() -> Vector2:
 ## Cifra de daño encima del modelo (DamageNumbers).
 func _number(amount: float, strong: bool, dot: bool) -> void:
 	if not DamageNumbers.enabled or world == null: return
+	if _top_h < 0.0 and _in_horde: _top_h = _horde.height
 	if _top_h < 0.0 and _spawn_t > 0.35 and model != null and model.has_meta("meshes"):
 		var inv := model.global_transform.affine_inverse()
 		_top_h = 0.8
@@ -637,6 +655,7 @@ func puppet_die() -> void:
 
 func _death_fx() -> void:
 	var t0 := Prof.start()
+	if _in_horde: _leave_horde()                     # cae y se deshace con su modelo de nodos
 	_rise_end()
 	# cae a su manera (hito 12.7: de rodillas, derrumbado, derretido, de lado) y luego se deshace;
 	# los trozos saltan cuando empieza a deshacerse
@@ -923,6 +942,11 @@ func _process(delta: float) -> void:
 				if is_instance_valid(mi): mi.set_instance_shader_parameter("hurt", hk)
 	if not anim_hold and _stasis_t <= 0.0 and world.freeze_t <= 0.0:   # congelado: la animación se detiene
 		anim_t = fposmod(anim_t + delta / Anims.duration(model_name, anim), 1.0)
+	if _horde_ok and _spawn_t >= 0.35 and _rise_wait <= 0.0 and _rise_mats.is_empty() and visual.visible:
+		_horde_step(delta, wu, wu_own)
+		Prof.stop("enemigos_anim", t0)
+		return
+	if _in_horde: _leave_horde()
 	# fuera de la vista no se aplica la pose (la animación sigue corriendo): con 200 enemigos
 	# era una cuarta parte de su coste
 	var cam := get_viewport().get_camera_3d()
@@ -960,15 +984,10 @@ func _process(delta: float) -> void:
 	# tinte: destello al recibir daño; si no, turquesa en estasis o violeta maldito.
 	# Solo se toca el material al cambiar.
 	var want: Material = null
+	var sc := _status_color() if tints and _flash <= 0.0 else Color(0, 0, 0, 0)
 	if not tints: pass
 	elif _flash > 0.0: want = _big_flash_material() if _flash_is_big() else _flash_mat
-	elif _stasis_t > 0.0 or world.freeze_t > 0.0: want = _status(Color(0.35, 0.95, 1.0, 0.5))
-	elif _curse_t > 0.0: want = _status(Color(0.55, 0.12, 0.7, 0.35 + 0.1 * sin(_spawn_t * 9.0)))
-	elif _burn_t > 0.0: want = _status(Color(1.0, 0.5, 0.12, 0.3 + 0.1 * sin(_spawn_t * 13.0)))
-	elif _poison_t > 0.0: want = _status(Color(0.35, 0.85, 0.15, 0.3 + 0.08 * sin(_spawn_t * 7.0)))
-	elif _madden_t > 0.0: want = _status(Color(1.0, 0.85, 0.15, 0.3 + 0.12 * sin(_spawn_t * 10.0)))
-	elif _confuse_t > 0.0: want = _status(Color(0.95, 0.75, 0.95, 0.22 + 0.1 * sin(_spawn_t * 11.0)))
-	elif _inject_t > 0.0: want = _status(Color(0.8, 0.95, 0.25, 0.14 + 0.06 * sin(_spawn_t * 12.0)))   # suero: tenue (el aliado, verde intenso)
+	elif sc.a > 0.0: want = _status(sc)
 	if want != _overlay:
 		_overlay = want
 		for mi: MeshInstance3D in model.get_meta("meshes"):
@@ -1054,6 +1073,54 @@ func _disc(c: Color, radius: float) -> ShaderMaterial:
 	return mat
 
 ## Material de tinte de estado (uno por enemigo, se cambia su color).
+## Tinte de estado (alfa 0 si no hay): turquesa en estasis, violeta maldito, fuego, veneno…
+func _status_color() -> Color:
+	if _stasis_t > 0.0 or world.freeze_t > 0.0: return Color(0.35, 0.95, 1.0, 0.5)
+	if _curse_t > 0.0: return Color(0.55, 0.12, 0.7, 0.35 + 0.1 * sin(_spawn_t * 9.0))
+	if _burn_t > 0.0: return Color(1.0, 0.5, 0.12, 0.3 + 0.1 * sin(_spawn_t * 13.0))
+	if _poison_t > 0.0: return Color(0.35, 0.85, 0.15, 0.3 + 0.08 * sin(_spawn_t * 7.0))
+	if _madden_t > 0.0: return Color(1.0, 0.85, 0.15, 0.3 + 0.12 * sin(_spawn_t * 10.0))
+	if _confuse_t > 0.0: return Color(0.95, 0.75, 0.95, 0.22 + 0.1 * sin(_spawn_t * 11.0))
+	if _inject_t > 0.0: return Color(0.8, 0.95, 0.25, 0.14 + 0.06 * sin(_spawn_t * 12.0))   # suero: tenue (el aliado, verde intenso)
+	return Color(0, 0, 0, 0)
+
+## Con la horda (hito 16.3): la fila de la pose (el golpe y la preparación del ataque, si la
+## familia los tiene, sustituyen a la animación mientras duran) y el destello o el tinte.
+func _horde_step(delta: float, wu: Vector2, wu_own: bool) -> void:
+	if not _in_horde: _enter_horde()
+	var row: int
+	if _hit_own and _hit_t < _hit_len and _horde.has_anim("_hit"):
+		row = _horde.row("_hit", clampf(_hit_t / _hit_len, 0.0, 1.0))
+	elif wu_own and wu != Vector2.ZERO and _horde.has_anim("_windup"):
+		row = _horde.row("_strike", wu.y) if wu.y > 0.01 else _horde.row("_windup", wu.x)
+	else:
+		row = _horde.row(anim, anim_t)
+	_flash -= delta
+	_flash_cd -= delta
+	if flash_hold: _flash = 1.0
+	var tint := Color(0, 0, 0, 0)
+	if tints:
+		if _flash > 0.0: tint = _flash_mat.albedo_color
+		else: tint = _status_color()
+	_hdraw.place(self, _horde, visual.global_transform, row, tint)
+
+func _enter_horde() -> void:
+	_in_horde = true
+	_horde = HordeMesh.get_type(model_name)
+	_hdraw = HordeDraw.of(world)
+	if _overlay != null:                              # que al volver no lleve un tinte viejo
+		_overlay = null
+		for mi: MeshInstance3D in model.get_meta("meshes"): mi.material_overlay = null
+	if model.get_parent() == visual: visual.remove_child(model)
+
+func _leave_horde() -> void:
+	_in_horde = false
+	if is_instance_valid(_hdraw): _hdraw.remove(self, _horde)
+	if model != null and is_instance_valid(model) and model.get_parent() == null:
+		visual.add_child(model)
+		Anims.pose(model_name, anim, model, anim_t)
+	_pose_acc = 1.0                                   # que se pose en seguida
+
 func _status(c: Color) -> StandardMaterial3D:
 	if _status_mat == null:
 		_status_mat = StandardMaterial3D.new()

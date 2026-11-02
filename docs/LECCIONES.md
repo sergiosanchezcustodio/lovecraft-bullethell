@@ -208,3 +208,11 @@ En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra c
 - **Un recurso cargado en un hilo se descarga en cuanto nadie lo sujeta:** para que sirva de algo, guarda la referencia hasta que lo cargue quien lo va a usar.
 - **Cargar `game.tscn` costaba más de 1 s** la primera vez: son sus scripts y todo lo que nombran. `ResourceLoader.load_threaded_request` y `change_scene_to_packed` lo esconden detrás de cualquier pantalla que dure lo suficiente.
 - Mide antes de adelantar nada: el JSON de la arena tardaba 1 ms y sus modelos 75; el tiempo se iba en el suelo (un color por losa que nadie usaba) y en la costa, en GDScript.
+
+## Hordas con MultiMesh (hito 16.3, 02-11-2026)
+
+- **Godot ya agrupa las mallas iguales en un dibujo instanciado** (Forward+): pasar a MultiMesh no quita dibujos, quita CPU (mover y recortar ~15 nodos por enemigo y posarlos en GDScript).
+- **La caja de un MultiMesh decide en qué sombras entra.** Con una sola caja para todos, cada cascada de la luna y cada cara de cada farol con sombra los dibujaba todos (5 veces más triángulos). Repartidos por celdas, cada una con su caja; pero las celdas muy pequeñas (3 m) doblan los dibujos y la GPU sube. 6 m fue lo mejor.
+- **`set_instance_transform` y `set_instance_custom_data` leen el búfer de la GPU** la primera vez que se tocan tras crear el MultiMesh o cambiar `instance_count` (y al mover instancias de sitio): tirones. Guarda una copia del búfer en un `PackedFloat32Array` propio y súbelo entero con `multimesh.buffer` una vez por fotograma.
+- **Un `PackedFloat32Array` guardado en un Dictionary o en un Array se copia al cambiarlo desde fuera** (copy-on-write): tócalo solo desde la clase que lo tiene como variable miembro (`HordeMesh.Cell.write`).
+- **Graba las poses en vez de reescribir las animaciones en el shader:** se posa un modelo de verdad con las mismas funciones de `Anims` y se guarda la transformación de cada parte por fotograma en una textura; el shader solo la lee. Cualquier animación nueva sirve sin tocar el shader.

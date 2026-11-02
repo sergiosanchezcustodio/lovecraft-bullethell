@@ -218,6 +218,19 @@ Primera partida tras arrancar el juego, en Alta, desde el relato (`relato level=
 - Antes, en negro: escena de la partida y sus scripts ~1,3 s; arena 0,3-0,45 s (suelo 0,1, costa 0,13, decorado 0,1-0,14); armas, objetos y personajes ~0,15 s; resto ~0,45 s.
 - Saltando el relato en seguida (`relato_go=0.05`), la partida espera lo que falte: 0,7-1,6 s en negro, según lo que haya avanzado la carga.
 
+## Fase 16: hordas con instancias (hito 16.3, 02-11-2026)
+
+80 enemigos, calidad Baja, tres ejecuciones (`comparar.py "horde=false" "horde=true" --niveles p1_n2,p2_n4,p3_n2 --veces 3 --perf 20`):
+
+| Nivel | Media (ms) | 1 % peor (ms) | Tirones > 25 ms |
+|---|---|---|---|
+| p1_n2 · Campamento de Lake | 8,66 → 7,58 | 18,3 → 16,7 | 4,0 → 4,0 |
+| p2_n4 · Pantanos | 10,4 → 9,4-9,8 | 18,5-19,2 → 19,2-21,4 | 4 → 7-10 |
+| p3_n2 · Luisiana | 11,62 → 9,13 | 22,0 → 18,3 | 11,7 → 6,7 |
+
+- En los pantanos varía mucho entre ejecuciones (una de cinco con la horda dio 14,5 ms de media por un tirón de física de 70 ms en una matanza; otra suelta, 20,3 → 19,2 de 1 % peor).
+- Lo que se gana es CPU: `enemigos_anim` de 1,4-1,5 a 0,8-1,1 ms por fotograma, el dibujo en CPU de 1,3 a 1,0-1,1 ms y unos 15 nodos menos por enemigo; la GPU sube 0,1-0,3 ms (las celdas recortan peor en las sombras que cada parte por separado).
+
 ## Medición de los 15 niveles
 
 *Última: 30-10-2026, versión 0.9.0 (`python tools/medir_niveles.py`).* Bot sin daño, 80 enemigos como tope y 8 s medidos; la mejor de 2 ejecuciones. Entre paréntesis, la medición anterior (ninguna) y la diferencia. Milisegundos por fotograma: menos es mejor. Con 80 enemigos manda la CPU (la lógica de la partida), así que Media y Alta salen parecidas; entre ejecuciones, la media varía en torno a ±1 ms y el 1 % peor bastante más: fíate de las diferencias grandes o de las que se repiten.
