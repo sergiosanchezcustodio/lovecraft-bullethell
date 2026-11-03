@@ -190,6 +190,7 @@ class Picker extends PanelContainer:
 	var speed := 1.0              ## ritmo de los rodillos (>1, más deprisa)
 	var evolution := false        ## elige rama de evolución (16.8): sin descartes ni otras opciones
 	var _hints: Array[Label] = [] ## aviso de evolución de cada carta (16.15)
+	var _cmps: Array[RichTextLabel] = []   ## lo que cambia en sus estadísticas (16.29)
 	var _on_style: StyleBox       ## tarjeta marcada (luz de vela) y las demás
 	var _off_style: StyleBox
 
@@ -294,6 +295,17 @@ class Picker extends PanelContainer:
 			col.add_child(d)
 			d.custom_minimum_size.y = (17 if solo else 13) * 2.7     # dos líneas: no cambia de alto al pararse
 			_descs.append(d)
+			var cmp := RichTextLabel.new()                           # antes → después, en verde o rojo (16.29)
+			cmp.bbcode_enabled = true
+			cmp.fit_content = true
+			cmp.scroll_active = false
+			cmp.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			cmp.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			cmp.add_theme_font_size_override("normal_font_size", 15 if solo else 11)
+			cmp.add_theme_color_override("default_color", UiKit.TEXT_DIM)
+			cmp.visible = false
+			col.add_child(cmp)
+			_cmps.append(cmp)
 			_stopped.append(_filler.is_empty())
 			_next_tick.append(0.0)
 			card.gui_input.connect(func(ev: InputEvent) -> void:
@@ -434,6 +446,7 @@ class Picker extends PanelContainer:
 		_kinds[i].add_theme_color_override("font_color", f.accent)
 		_descs[i].text = " "
 		_hints[i].visible = false
+		_cmps[i].visible = false
 		_frames[i].add_theme_stylebox_override("panel", MenuKit.box(Color(0, 0, 0, 0.4), Color(MenuKit.BRASS, 0.3), 1))
 
 	func _show_option(i: int) -> void:
@@ -446,6 +459,9 @@ class Picker extends PanelContainer:
 		_descs[i].text = o.text()
 		_hints[i].text = o.evo_hint
 		_hints[i].visible = o.evo_hint != ""
+		var rows := StatCompare.option(player, o)
+		_cmps[i].text = StatCompare.bbcode(rows)
+		_cmps[i].visible = not rows.is_empty()
 		_frames[i].add_theme_stylebox_override("panel", MenuKit.box(Color(0.04, 0.16, 0.07, 0.55), Color(EVO_COLOR, 0.95), 2)
 			if o.evo_ready else _frame_style(_accent(o)))
 

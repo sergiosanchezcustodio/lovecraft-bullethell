@@ -1800,6 +1800,22 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Pruebas:** `tests/test_run_archive.gd` (las 30 últimas, qué se puede repetir, la sesión que prepara, la entrada de la Biblioteca). 698 de 698. Repetir desde la Biblioteca de verdad: `title saves=<carpeta> open=menu_biblioteca tome=9 cursor=0 lib_replay=0 skip_relato=true log_ups=true` (sale «SEMILLA 4242 p1_n2 carter» y la misma primera subida).
 - **Capturas:** `shots/titulo_archivo_011.0s.png`. Opciones nuevas: `seed=N`, `archive_save=true`, `log_ups=true` (la semilla y las opciones de cada subida), `lib_replay=N`.
 
+## Fase 16, hito 16.29: comparar antes de elegir (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+`scripts/progression/stat_compare.gd` (`StatCompare`), una línea más en las cartas de `CoopLevelUp` y en las filas de `ShopMenu`.
+
+- **En la subida de nivel** (solitario y cooperativo), debajo de la descripción de cada carta, lo que cambia en una línea, el valor nuevo en verde si mejora y en rojo si empeora:
+  - objeto: su estadística con el valor de ahora y el de después («Vida 127 → 147», «Cordura de las mágicas +0 % → −12 %»: menos es mejor en recargas, coste de cordura, daño mental y crisis); los efectos secundarios (`also`) también; si es nuevo, «Objetos 2 → 3 de 4»;
+  - mejora de arma: las estadísticas que toca su siguiente nivel, con los objetos y el daño del personaje (las mismas cuentas que la ficha: `WeaponSystem.with_items` y `Player.damage_mult`): «Cantidad 1 → 2», «Daño por golpe 14,3 → 18,6»;
+  - arma nueva: «Armas 2 → 3 de 4»; evolución: lo que cambia del arma que lleva a la evolución (daño, cantidad, recarga, alcance, área…).
+  - Mientras giran las cartas (el rodillo del cooperativo), no sale.
+- **En la tienda,** en cada potenciador sin completar: «Ahora +0 % → +4 %» (factor, fracción, por segundo o cuenta, según el potenciador).
+- **Un hallazgo:** la comparación saca a la luz textos de nivel que no cuadran con lo que hace el nivel (`level_text` frente a `level_mods`): el Webly al 3 dice «Dispara un 20 % más rápido» y suma un atravesar; los bisturís al 3 dicen «+25 % de daño» y bajan la recarga un 4 %; la palanca al 2 dice «+25 % de daño» y suma un atravesar, y al 5, «+30 % de daño y un segundo disparo» sin el daño. **Sin tocar: es equilibrio; pendiente de tu decisión** (cambiar el texto o la mejora).
+- **Pruebas:** `tests/test_stat_compare.gd` (objeto de vida, menos es mejor en verde, nivel de arma, formato). 702 de 702.
+- **Capturas:** `shots/game_comparar_004.0s.png` (tres objetos), `shots/game_comparar11_004.0s.png` y `game_comparar12_004.0s.png` (mejoras de arma), `shots/titulo_tienda_cmp_011.0s.png` (la tienda).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

@@ -198,6 +198,18 @@ func _row(e: Shop.Entry) -> Button:
 	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	d.custom_minimum_size.x = 500
 	col.add_child(d)
+	var cmp := StatCompare.shop(save, e)                      # lo que da el siguiente nivel (16.29)
+	if not cmp.is_empty():
+		var rt := RichTextLabel.new()
+		rt.bbcode_enabled = true
+		rt.fit_content = true
+		rt.scroll_active = false
+		rt.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		rt.custom_minimum_size.x = 500
+		rt.add_theme_font_size_override("normal_font_size", 15)
+		rt.add_theme_color_override("default_color", UiKit.TEXT_DIM)
+		rt.text = StatCompare.bbcode(cmp)
+		col.add_child(rt)
 	# con tres líneas de descripción no cabe en 92 px: la fila crece con lo que lleva
 	d.resized.connect(func() -> void:
 		b.custom_minimum_size.y = maxf(76.0 if compact else 92.0, col.get_combined_minimum_size().y + 28.0))
