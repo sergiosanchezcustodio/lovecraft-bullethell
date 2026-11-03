@@ -1683,6 +1683,24 @@ Un evento intermedio (`mid_enemies`, `mid_times` y `mid_texts` de `LevelData`, c
 - **Pruebas:** una más en `tests/test_new_enemies.gd`. 666 de 666.
 - **Capturas:** `shots/gedney-obed_marsh-castro_25_f16f.png` y `_200_f16f.png` (modelos), `shots/gedney_25_f16g.png`, `shots/game_mid_gedney_020.0s.png`, `shots/game_mid_obed_020.0s.png` y `shots/game_mid_castro_020.0s.png` (con `mid_at=3`). El equilibrio, sin medir con el bot.
 
+## Fase 16, hito 16.20: élites con rasgos (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+`scripts/enemies/elite_traits.gd` (`EliteTraits`). Cada élite que no es jefe (`data.elite`, ni único, ni final, ni intermedio: el acechador, el de los tejados, el Antiguo guerrero, el profundo anciano y el sacerdote) saca al aparecer uno o, con un 35 %, dos rasgos al azar (`WaveDirector.spawn`, el anfitrión), guardados en `Enemy.traits` (máscara):
+
+- **Vampírica** (gota roja): mientras toca a un jugador se cura un 6 % de su vida por segundo, con chispas rojas.
+- **Estalla al morir** (estallido naranja): aviso de 0,9 s (`Telegraph.enemy`) y golpe de 2,4 m y 18 de daño (`world.strike`, `via` «estallido»), con temblor.
+- **Deja icor** (charco): cada 0,4 s, si ha andado 0,7 m, un charco de icor (`EnemyZone`, 0,75 m, 4,5 s, 6 de daño por segundo). Lo deja cada PC, también las marionetas, y daña a sus jugadores, como las demás zonas.
+- **Rápida** (doble flecha azul): ×1,4 de velocidad.
+- **Con escudo** (escudo de bronce): la burbuja de icor de los grados de locura (`Enemy.set_ward`) que para 3 golpes.
+
+Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados en código (`EliteTraits.icon`, uno por máscara, guardado) en un `Sprite3D` sobre la cabeza que se mueve un poco y se oculta con el modelo; la altura sale de la del modelo (`Enemy._number_height`, la de las cifras de daño, ahora aparte). En red, los rasgos viajan con el aviso de aparición (`SPAWN`, sexto valor; `PROTOCOL` 17): probado con dos ventanas, el invitado ve iconos, burbujas y charcos (`shots/game_redrasgos_inv_022.0s.png`).
+
+- **Pruebas:** `traits=N` (máscara) o `traits=vampira,estalla,icor,rapida,escudo` las pone a todas. Cuatro pruebas más en `tests/test_new_enemies.gd` (uno o dos rasgos, icono y escudo, cura y rastro, aviso y golpe). 670 de 670.
+- **Capturas:** `shots/game_rasgos_010.0s.png` y `shots/game_rasgos2_020.0s.png` (rastro de icor).
+- **Pendiente:** el equilibrio, sin medir con el bot; el icono del icor se parece algo a un bicho.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

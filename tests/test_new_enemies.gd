@@ -212,3 +212,57 @@ func test_los_jefes_intermedios_salen_en_su_nivel() -> void:
 		assert_true(lv.mid_enemies.any(func(x: EnemyData) -> bool: return x.id == d.id), "%s en %s" % pair)
 		assert_lt(lv.mid_times[0], lv.final_time, "antes del final")
 		assert_eq(lv.mid_texts.size(), lv.mid_enemies.size())
+
+## Fase 16, hito 16.20: élites con rasgos.
+func test_los_rasgos_salen_de_uno_en_uno_o_de_dos_en_dos() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	var two := 0
+	for i in 200:
+		var t := EliteTraits.roll(rng)
+		var n := 0
+		for k: int in EliteTraits.ALL: if t & k: n += 1
+		assert_between(n, 1, 2)
+		if n == 2: two += 1
+	assert_between(two, 40, 110, "uno de cada tres, más o menos, con dos")
+
+func test_rasgos_icono_escudo_y_rapidez() -> void:
+	var e := _enemy("antiguo_guerrero", Vector3.ZERO)
+	EliteTraits.apply(e, EliteTraits.SHIELD | EliteTraits.FAST)
+	assert_not_null(e.trait_icon, "icono sobre la cabeza")
+	assert_eq(e.trait_icon.texture.get_width(), 23, "dos iconos en fila")
+	assert_eq(e.ward, EliteTraits.SHIELD_HITS)
+
+func test_la_vampira_se_cura_tocando_y_la_de_icor_deja_rastro() -> void:
+	var p := Player.new().setup(load("res://data/characters/dyer.tres"), BotInput.new("idle"), Color.YELLOW)
+	world.add_child(p)
+	world.add_player(p)
+	p.position = Vector3(0.5, 0, 0)
+	var e := _enemy("antiguo_guerrero", Vector3.ZERO)
+	EliteTraits.apply(e, EliteTraits.VAMPIRE | EliteTraits.ICOR)
+	e.health *= 0.5
+	var h := e.health
+	world.fx = Node3D.new()
+	world.add_child(world.fx)
+	for i in 30: EliteTraits.step(e, DT)
+	assert_gt(e.health, h, "se cura")
+	assert_eq(world.fx.get_children().filter(func(x: Node) -> bool: return x is EnemyZone).size(), 1, "un charco")
+	e.position = Vector3(3, 0, 0)
+	for i in 30: EliteTraits.step(e, DT)
+	assert_eq(world.fx.get_children().filter(func(x: Node) -> bool: return x is EnemyZone).size(), 2, "otro al andar")
+
+func test_la_que_estalla_avisa_y_golpea() -> void:
+	var p := Player.new().setup(load("res://data/characters/dyer.tres"), BotInput.new("idle"), Color.YELLOW)
+	world.add_child(p)
+	world.add_player(p)
+	p.position = Vector3(1, 0, 0)
+	var e := _enemy("antiguo_guerrero", Vector3.ZERO)
+	EliteTraits.apply(e, EliteTraits.BLAST)
+	if world.fx == null:
+		world.fx = Node3D.new()
+		world.add_child(world.fx)
+	var hp := p.health
+	EliteTraits.on_death(e)
+	assert_eq(p.health, hp, "primero, el aviso")
+	await wait_seconds(EliteTraits.BLAST_WARN + 0.2)
+	assert_lt(p.health, hp, "y luego el golpe")

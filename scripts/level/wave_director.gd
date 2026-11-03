@@ -341,6 +341,7 @@ func spawn(d: EnemyData, pos: Vector3) -> Enemy:
 	enemies_root.add_child(e)
 	if not mirror and not boss and not d.elite and Madness.chance("ward") > 0.0 and rng.randf() < Madness.chance("ward"):
 		e.set_ward(1)                                                    # escudo de icor (grados de locura, 16.14)
+	if not mirror and not boss and d.elite: EliteTraits.apply(e, EliteTraits.roll(rng))   # rasgos de élite (16.20)
 	alive.append(e)
 	spawned_total += 1
 	enemy_spawned.emit(e)

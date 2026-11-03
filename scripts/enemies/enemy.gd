@@ -57,6 +57,12 @@ const DRUM_EVERY := 0.6
 ## Ídolo vivo (hito 16.18): los que están cerca de él (`idol_t` > 0) reciben menos daño.
 const IDOL_GUARD := 0.6
 var idol_t := 0.0
+## Élites con rasgos (hito 16.20, EliteTraits): máscara, icono y relojes de los rasgos.
+var traits := 0
+var trait_icon: Sprite3D
+var trait_t := 0.0
+var trait_fx := 0.0
+var trait_from := Vector3.INF
 var drum_t := 0.0
 var _drum_next := 0.0
 var _revived := false
@@ -649,9 +655,8 @@ func windup_amount() -> Vector2:
 	if u >= 1.0: return Vector2.ZERO
 	return Vector2(1.0 - Anims.ease(u * 1.6), Anims.jolt(u, 0.3))
 
-## Cifra de daño encima del modelo (DamageNumbers).
-func _number(amount: float, strong: bool, dot: bool) -> void:
-	if not DamageNumbers.enabled or world == null: return
+## Mide la altura del modelo (sin escalar) la primera vez que hace falta.
+func _number_height() -> void:
 	if _top_h < 0.0 and _in_horde: _top_h = _horde.height
 	if _top_h < 0.0 and _spawn_t > 0.35 and model != null and model.has_meta("meshes"):
 		var inv := model.global_transform.affine_inverse()
@@ -659,6 +664,11 @@ func _number(amount: float, strong: bool, dot: bool) -> void:
 		for mi: MeshInstance3D in model.get_meta("meshes"):
 			if is_instance_valid(mi) and mi.mesh != null:
 				_top_h = maxf(_top_h, (inv * mi.global_transform * mi.get_aabb()).end.y)
+
+## Cifra de daño encima del modelo (DamageNumbers).
+func _number(amount: float, strong: bool, dot: bool) -> void:
+	if not DamageNumbers.enabled or world == null: return
+	_number_height()
 	var h := (_top_h if _top_h > 0.0 else 1.2) * model_scale
 	DamageNumbers.add(world.fx, self, amount, global_position + Vector3(0.0, h + 0.25, 0.0), strong, dot)
 
@@ -667,6 +677,7 @@ func _die() -> void:
 	if _curse_t > 0.0 and int(_curse.get("spread", 0)) > 0: _spread_curse()
 	if _inject_t > 0.0 and _ally_time > 0.0:            # se levanta como aliado
 		world.fx.add_child(Reanimated.new().setup(world, data, global_position, facing, _ally_time, _inject_bonus))
+	if traits != 0: EliteTraits.on_death(self)
 	_death_fx()
 
 ## Muerte de una marioneta (lo avisa el anfitrión).
@@ -809,6 +820,7 @@ func _physics_process(delta: float) -> void:
 		if _rise_wait > 0.0: _rise_wait -= delta
 		else: _puppet_touch(delta)
 		behavior.puppet_step(self, delta)
+		if traits != 0: EliteTraits.step(self, delta)
 		if guard_ring != null: guard_ring.rotation.y += 0.05
 		return
 	var t0 := Prof.start()
@@ -845,6 +857,7 @@ func _physics_process(delta: float) -> void:
 		_ai_vel = velocity
 	if Engine.get_physics_frames() % 15 == get_instance_id() % 15: _far = _far_from_players()
 	if _slow_t > 0.0: velocity *= _slow_k
+	if traits & EliteTraits.FAST: velocity *= EliteTraits.FAST_MULT   # élite rápida (16.20)
 	if idol_t > 0.0: idol_t -= delta
 	if drum_t > 0.0:                                  # al ritmo del tambor (15.3)
 		drum_t -= delta
@@ -894,6 +907,7 @@ func _physics_process(delta: float) -> void:
 	if velocity.length() > 0.1:
 		facing = facing.slerp(velocity.normalized(), 1.0 - exp(-float(data.params.get("turn", 10.0)) * delta)).normalized()   # turn: el guardián gira despacio (16.17)
 	if guard_ring != null: guard_ring.rotation.y += 0.05
+	if traits != 0: EliteTraits.step(self, delta)
 	# Contacto con los jugadores
 	if data.aura_drain > 0.0:                   # presencia: drena cordura a los de dentro del aura
 		for p in world.players:
@@ -924,6 +938,10 @@ func _process(delta: float) -> void:
 	if is_queued_for_deletion(): return               # muerto: su modelo, si se desmorona, ya es de Crumble
 	var t0 := Prof.start()
 	visual.global_position = get_global_transform_interpolated().origin - Vector3(0, _wade * WadeSplash.SINK, 0)
+	if trait_icon != null:                            # icono de los rasgos sobre la cabeza (16.20)
+		trait_icon.visible = visual.visible
+		if _top_h < 0.0: _number_height()
+		trait_icon.position.y = ((_top_h if _top_h > 0.0 else 1.2) * ELITE_SIZE + 0.35) * model_scale + 0.1 * sin(_spawn_t * 2.5)
 	if _wade > 0.5:                                   # ondas al vadear, cada tanto recorrido (hito 11.4)
 		if _ripple_from == Vector3.INF or visual.global_position.distance_to(_ripple_from) >= 0.6 + data.body_radius:
 			_ripple_from = visual.global_position

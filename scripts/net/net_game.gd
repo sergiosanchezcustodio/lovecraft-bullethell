@@ -45,7 +45,7 @@ const READY := NetSession.USER + 10          ## invitado -> anfitrión: partida 
 const GO := NetSession.USER + 11             ## anfitrión -> invitado: empieza
 const PSTATE := NetSession.USER + 12         ## invitado -> anfitrión: [ms, jugadores] (no fiable)
 const SNAP := NetSession.USER + 13           ## anfitrión -> invitados: foto del mundo (no fiable)
-const SPAWN := NetSession.USER + 14          ## anfitrión -> invitados: [nid, enemigo, x, y, z]
+const SPAWN := NetSession.USER + 14          ## anfitrión -> invitados: [nid, enemigo, x, y, z, rasgos de élite (16.20)]
 const DIE := NetSession.USER + 15            ## anfitrión -> invitados: nid
 const ANIM := NetSession.USER + 16           ## anfitrión -> invitados: [índice, nombre de animación]
 const EVENT := NetSession.USER + 17          ## anfitrión -> invitados: {k: final|mid|boss|won|lost, id, text}
@@ -541,7 +541,7 @@ func _on_spawned(e: Enemy) -> void:
 		_enemies.erase(nid)
 		net.send(0, DIE, nid))
 	var id := e.data.resource_path.get_file().get_basename() if e.data.resource_path != "" else String(e.data.id)
-	net.send(0, SPAWN, [nid, id, e.position.x, e.position.y, e.position.z])
+	net.send(0, SPAWN, [nid, id, e.position.x, e.position.y, e.position.z, e.traits])
 
 func _nid(e: Enemy) -> int:
 	return int(e.get_meta("nid", 0)) if e != null and is_instance_valid(e) else 0
@@ -643,7 +643,7 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 					lv.mid_times = mt
 			_go()
 		SNAP: if data is PackedByteArray: _on_snap(data)
-		SPAWN: if data is Array and (data as Array).size() == 5: _puppet_spawn(data)
+		SPAWN: if data is Array and (data as Array).size() == 6: _puppet_spawn(data)
 		DIE:
 			if data is int and _enemies.has(data):
 				var e: Enemy = _enemies[data]
@@ -745,6 +745,7 @@ func _puppet_spawn(d: Array) -> void:
 	e.position = Vector3(float(d[2]), float(d[3]), float(d[4]))
 	var root: Node = _enemies_root if _enemies_root != null else game
 	root.add_child(e)
+	if int(d[5]) != 0: EliteTraits.apply(e, int(d[5]))   # rasgos de élite (16.20)
 	_enemies[int(d[0])] = e
 
 func _on_event(d: Dictionary) -> void:
