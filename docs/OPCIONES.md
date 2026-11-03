@@ -69,6 +69,8 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `cfg_quality=0..3` (Baja…Ultra) y `cfg_damage_numbers=0|1|2`: calidad gráfica y números de daño para esta ejecución.
   - `ui_check=true` (en cualquier escena): apunta con «UICHK» los textos que pisan el filete de una ventana (20 px del borde), su filigrana o el borde de un recuadro (`scripts/ui/ui_overlap_check.gd`).
   - `level=desfile:N`: el desfile de jefes desde el jefe N (hito 16.22; con 22 subidas al empezar). Con `autonext=true` pasa solo al siguiente.
+  - `level=expedicion:<tipo>:<nivel>:<fila>`: un nodo suelto de la expedición (hito 16.21; tipos `combate`, `elite`, `buhonero` y `jefe`; p. ej. `expedicion:buhonero:p2_n2:3`). Sin expedición en curso, sin bolsa ni subidas.
+  - Mapa de la expedición suelto: `godot --path . scenes/expedition_map.tscn -- exp_part=0 exp_seed=7` (`exp_row=N`: con N filas ya andadas, para capturas; `exp_auto=true`: elige solo cada segundo, y con `bot=smart autonext=true skip_relato=true` recorre la expedición entera).
   - `level=desafio:p1_n4`: juega el desafío de ese nivel (hito 15.2). `challenge_open=true` (selección con `map=true`): abre la ventana de los desafíos.
   - `library_live=false`: el bestiario con las imágenes quietas, sin girar (hito 15.4).
   - `replay=false`: sin grabar la repetición de la caída (hito 15.1). `replay_open=true`: la abre en la pantalla final (capturas, con `halt_shots=true quit_on_end=true`). `replay_gif=true`: además la guarda como GIF (en `photo_dir=` si se da).
