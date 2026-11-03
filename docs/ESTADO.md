@@ -1626,6 +1626,20 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
   - **Red:** cada PC compra con sus dólares para sus jugadores; el remedio se aplica allí; el objeto y el nivel los aplica el anfitrión (mensaje `BUY`, `NetGame.send_buy`, `Game.net_bought`). Probado con dos ventanas (Signos y buhonero; el invitado elige su Signo en su PC).
   - **Pruebas:** `peddler=true peddler_at=1 objective_near=true` (cerca), `peddler_stall=N` (la mercancía N a los pies del J1) y `purse=N`. Capturas `shots/game_buhonero_004.0s.png`, `game_buhonero_p2_004.0s.png` (Zadok, con los precios), `game_buhonero1_003.5s.png` (la baratija) y `game_buhonero2_003.5s.png` (el libro: «Nivel 2» con su atributo); modelos en `shots/ballenero-zadok_20_buhoneros.png`. `tests/test_peddler.gd` (3).
 
+## Fase 16, hito 16.14: grados de locura (03-11-2026)
+
+*Pendiente de revisión del autor (D-49).*
+
+- **Datos:** `data/madness.json`, cinco grados que se suman: multiplicadores en `effects` (`enemy_speed`, `enemy_health`, `enemy_bullet`, `elites`, `money`) y probabilidades en `chances` (`ward`, `split`; vale la del grado más alto que la nombra).
+- **`Madness`** (`scripts/core/madness.gd`): `grade()` (de `GameSession.madness`, solo si `enabled`, que pone la partida en los niveles de la campaña), `value`, `chance`, `describe`, `title`, `unlocked` (0 hasta vencer `p3_n5`; después, uno más que el mejor grado con el que se ha vencido) y `record_win` (`SaveData.records["madness"]`, el mejor por nivel). `Pacts.value` multiplica también por `Madness.value`, así que velocidad, vida y dólares van por las palancas de los pactos. Nuevas: `enemy_bullet` (`PatternRunner`) y `elites` (tope de élites del `WaveDirector`).
+- **Escudo de icor:** `Enemy.set_ward(n)`, una esfera con `scripts/fx/ward.gdshader` (borde que brilla y una banda que sube; se ve la criatura dentro). En `take_damage`, antes del daño: para un golpe (no los tics de veneno ni de fuego), suena `glass`, chispas verdes y destello. Lo pone el director al aparecer (corrientes, ni élites ni jefes). Va a los invitados en `net_flags2` (bit 4).
+- **Partirse:** `WaveDirector._split_small`, al morir una corriente no única ni pequeña: dos copias a 0,6 m con `set_small()` (`model_scale` × 0,72, en la horda también, que usa la transformación del `visual`) y el 45 % de la vida. `net_flags2` bit 8.
+- **Mapa:** fila «Grado de locura» bajo los modos aparte (`OptionRow`), con lo que suma cada grado en el texto de abajo. HUD: «Parte 1 · Nivel 3 · Grado V»; pantalla final: el grado.
+- **Red:** el grado viaja con los pactos en START (selección y PC que vuelven) y al pasar de nivel; `PROTOCOL` 16.
+- **Pruebas:** `tests/test_madness.gd` (5): datos, suma de grados, solo en la campaña, apertura y el escudo. 656 de 656.
+- **Capturas:** `shots/game_locura5_040.0s.png` (escudo), `shots/game_locura3_045.0s.png` y `shots/seleccion_locura_mapa_003.0s.png` (selector). En 40 s del nivel 2.1 con grado III se partieron dos criaturas.
+- **Iconos:** los tres Signos Mayores que faltaban (Hastur, Nyarlathotep y Tsathoggua) con ComfyUI; el de Hastur, rehecho con el Signo Amarillo de tres brazos. El cepo de oso, rehecho con fauces (semilla 1002). El bumerán y los puestos de tiro siguen igual: las otras semillas no mejoraban.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

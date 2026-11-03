@@ -82,7 +82,7 @@ func predict(device: int, act: String) -> String:
 func start(level: String, players: Array) -> void:
 	net.accepting = false
 	_flush()
-	net.send(0, START, {"level": level, "players": players, "pacts": Pacts.active()})
+	net.send(0, START, {"level": level, "players": players, "pacts": Pacts.active(), "madness": GameSession.madness})
 
 func _process(_delta: float) -> void:
 	_flush()
@@ -129,6 +129,7 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 			if not data is Dictionary: return
 			var carry: Variant = data.get("carry")
 			if data.get("pacts") is Array: Pacts.set_active(data.pacts)   # los del anfitrión (hito 13.6)
+			Madness.set_grade(int(data.get("madness", 0)))                  # y su grado de locura (16.14)
 			started.emit(String(data.get("level", "")), data.get("players", []) as Array)   # llena GameSession
 			if carry is Array:                         # vuelve a una partida empezada: con su progreso
 				GameSession.carry = (carry as Array).duplicate(true)

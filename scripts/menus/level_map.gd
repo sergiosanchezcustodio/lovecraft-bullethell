@@ -17,6 +17,7 @@ var _first: Button
 var _endless_btn: Button
 var _daily_btn: Button
 var _challenge_btn: Button
+var _madness_row: OptionRow
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -78,6 +79,19 @@ func _ready() -> void:
 		cb.pressed.connect(func() -> void: _challenges(cb))
 		extra.add_child(cb)
 		_challenge_btn = cb
+	var top := Madness.unlocked(Saves.current)        # grados de locura (16.14): al vencer a Cthulhu
+	if top > 0 or (dev and LaunchArgs.from_cmdline().get_bool("madness_open")):
+		top = maxi(top, 1)
+		var names: Array[String] = []
+		for g in top + 1: names.append(Madness.title(g))
+		var row := OptionRow.new("Grado de locura", names, mini(GameSession.madness, top), func(i: int) -> void:
+			Madness.set_grade(i)
+			_show_madness(i), Callable())
+		row.custom_minimum_size = Vector2(946, 54)
+		row.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		row.focus_entered.connect(func() -> void: _show_madness(GameSession.madness))
+		box.add_child(row)
+		_madness_row = row
 	var sep := HSeparator.new()
 	box.add_child(sep)
 	_info_title = MenuKit.title("", 28)
@@ -95,6 +109,16 @@ func _ready() -> void:
 	if la.get_bool("endless_open") and _endless_btn: _endless.call_deferred(_endless_btn)   # capturas
 	if la.get_bool("daily_open") and _daily_btn: _daily.call_deferred(_daily_btn)
 	if la.get_bool("challenge_open") and _challenge_btn: _challenges.call_deferred(_challenge_btn)
+	if la.get_bool("madness_open") and _madness_row: _madness_row.grab_focus.call_deferred()   # capturas
+	if la.has("madness") and _madness_row:
+		_madness_row.index = la.get_int("madness")
+		_madness_row.step(0)
+
+## Lo que trae el grado de locura señalado (16.14).
+func _show_madness(g: int) -> void:
+	_info_title.text = "Grado de locura · " + Madness.title(g)
+	_info_text.text = ("La campaña de siempre. Al vencer a Cthulhu se abre el grado siguiente." if g <= 0
+		else Madness.describe(g) + " El grado siguiente se abre al vencer a Cthulhu en este.")
 
 ## Botón de una parte: empieza por su primer nivel.
 func _part_button(pi: int, part: Dictionary, won: Array) -> Button:

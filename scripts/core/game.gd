@@ -152,6 +152,8 @@ func _ready() -> void:
 	Difficulty.net = null                          # en red, el invitado recibe la del anfitrión (NetGame)
 	Difficulty.refresh()
 	if args.has("pacts"): Pacts.set_active(Array(args.get_str("pacts").split(",", false)))   # pacts=noche,furia (hito 13.6)
+	if args.has("madness"): Madness.set_grade(args.get_int("madness"))          # madness=3 (hito 16.14)
+	Madness.enabled = false                       # hasta saber si el nivel es de la campaña
 	Prof.enabled = args.get_bool("prof") or args.get_bool("spikes")
 	HordeDraw.enabled = args.get_bool("horde", bool(Quality.value("horde", true)))   # hito 16.3
 	UiInput.configure()
@@ -353,6 +355,7 @@ func _ready() -> void:
 		else:
 			level = load("res://data/levels/%s.tres" % level_id).duplicate()
 		Challenge.begin(level_id)                      # sus reglas, antes de montar el progreso (15.2)
+		Madness.enabled = Campaign.exists(level_id) and not Challenge.active() and level.daily == "" and not level.endless   # 16.14
 		for q in players: q.rebuild_stats()            # (la vida máxima del desafío)
 		_apply_carry()                                 # progreso del nivel anterior de la parte
 		_shop_start()
@@ -1251,6 +1254,7 @@ func _summary() -> PackedStringArray:
 	var out := PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills, lv,
 		"Dólares ganados: %s $" % MenuKit.money(run_money)])
 	if not Pacts.active().is_empty(): out.append("Pactos: " + Pacts.names(Pacts.active()))
+	if Madness.grade() > 0: out.append(Madness.title(Madness.grade()))
 	return out
 
 ## Una muestra por segundo de juego: vida y cordura de los jugadores de este PC y los vivos.
@@ -1450,6 +1454,7 @@ func _on_level_completed() -> void:
 	elif Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))
 	Pacts.record_win(Saves.current, String(level.id), Pacts.active())   # sellos del mapa y logros (13.6)
+	Madness.record_win(Saves.current, String(level.id), Madness.grade())   # 16.14
 	var sets_won := {}                               # niveles superados con cada conjunto (la ficha los cuenta)
 	for q in players:                                # «De punta en blanco» (14.8): alguien de este PC con un conjunto entero
 		if not q.remote and not (q.input is BotInput) and q.outfit_set != "":

@@ -23,6 +23,9 @@ var hit_radius := 0.5
 var health := 1.0
 var health_scale := 1.0                  ## multiplicador de vida (cooperativo): vida máxima = data.max_health × esto
 var shield_t := 0.0
+var ward := 0                              ## escudo de icor: golpes que para (grados de locura, 16.14)
+var small := false                         ## nacida de partirse otra: más pequeña y no se parte
+var _ward_mesh: MeshInstance3D
 var _path_t := 0.0                      ## s hasta volver a mirar si hay línea libre al jugador
 var _stuck_ref := Vector2.INF               ## dónde estaba en la última comprobación de atasco
 var _stuck_t := 0.0
@@ -486,6 +489,12 @@ func take_damage(d: Damage) -> void:
 		return
 	if shield_t > 0.0: return
 	if not is_alive(): return
+	if ward > 0 and not d.dot:                 # el escudo de icor para el golpe y revienta (16.14)
+		set_ward(ward - 1)
+		Auto.sfx_at("glass", global_position)
+		VoxelFx.puff(world.fx, global_position + Vector3(0, 0.6 * model_scale, 0), "sparkle", 0.5, WARD_COLOR)
+		_hit_flash()
+		return
 	Auto.sfx_at("hit", global_position)
 	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
 	for tag in data.tags: k *= float(d.bonus.get(tag, 1.0))    # rasgos contra este tipo de enemigo
@@ -1160,11 +1169,46 @@ func net_flags2() -> int:
 	var f := 0
 	if visual != null and not visual.visible: f |= 1
 	if guard_ring != null: f |= 2
+	if ward > 0: f |= 4
+	if small: f |= 8
 	return f
 
 func net_apply_flags2(f: int) -> void:
 	if visual != null: visual.visible = (f & 1) == 0
 	if ((f & 2) != 0) != (guard_ring != null): set_guard_ring((f & 2) != 0)
+	if ((f & 4) != 0) != (ward > 0): set_ward(1 if (f & 4) != 0 else 0)
+	if (f & 8) != 0 and not small: set_small()
+
+## Escudo de icor (grados de locura, 16.14): una burbuja verdinegra que para `n` golpes.
+const WARD_COLOR := Color(0.45, 0.95, 0.55)
+static var _ward_mat: ShaderMaterial              ## uno para todos
+func set_ward(n: int) -> void:
+	ward = maxi(n, 0)
+	if ward <= 0:
+		if _ward_mesh != null: _ward_mesh.queue_free()
+		_ward_mesh = null
+		return
+	if _ward_mesh != null: return
+	_ward_mesh = MeshInstance3D.new()
+	var sm := SphereMesh.new()
+	var r := maxf(data.body_radius * model_scale * 1.5, 0.45)
+	sm.radius = r
+	sm.height = maxf(r * 2.0, _model_height() * model_scale * 1.15)
+	sm.radial_segments = 16
+	sm.rings = 8
+	_ward_mesh.mesh = sm
+	if _ward_mat == null:
+		_ward_mat = ShaderMaterial.new()
+		_ward_mat.shader = preload("res://scripts/fx/ward.gdshader")
+	_ward_mesh.material_override = _ward_mat
+	_ward_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_ward_mesh.position.y = sm.height * 0.5
+	add_child(_ward_mesh)
+
+## Nacida de partirse otra (grado III): más pequeña.
+func set_small() -> void:
+	small = true
+	model_scale *= WaveDirector.SPLIT_SCALE
 
 ## Anillo dorado que gira mientras le protegen sus guardianes (Guardián del faro).
 var guard_ring: MeshInstance3D

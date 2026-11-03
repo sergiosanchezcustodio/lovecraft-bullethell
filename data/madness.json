@@ -1,0 +1,16 @@
+{
+	"_doc": "Grados de locura (hito 16.14, D-49): al vencer a Cthulhu, la campaña se repite en grado 1 a 5. Cada grado suma lo suyo a los anteriores: 'effects' son multiplicadores (enemy_speed, enemy_health, enemy_bullet, elites y money, en las mismas palancas que los pactos) y 'chances', probabilidades: 'ward' (una criatura corriente trae un escudo de icor que para el primer golpe) y 'split' (una corriente, al morir, se parte en dos más pequeñas). El grado N+1 se abre al vencer a Cthulhu en el N.",
+	"unlock": "p3_n5",
+	"grades": [
+		{"grade": 1, "roman": "I", "name": "Inquietud", "text": "Las criaturas van un 12 % más deprisa.",
+			"effects": {"enemy_speed": 1.12, "money": 1.3}},
+		{"grade": 2, "roman": "II", "name": "Desvelo", "text": "Una de cada cinco trae un escudo de icor que para el primer golpe.",
+			"effects": {"money": 1.25}, "chances": {"ward": 0.2}},
+		{"grade": 3, "roman": "III", "name": "Delirio", "text": "Al morir, una de cada cuatro se parte en dos más pequeñas.",
+			"effects": {"money": 1.25}, "chances": {"split": 0.25}},
+		{"grade": 4, "roman": "IV", "name": "Frenesí", "text": "Aguantan un 25 % más y hay el doble de élites a la vez.",
+			"effects": {"enemy_health": 1.25, "elites": 2.0, "money": 1.25}},
+		{"grade": 5, "roman": "V", "name": "Locura", "text": "Sus balas vuelan un 20 % más deprisa y ellas, un 8 % más.",
+			"effects": {"enemy_bullet": 1.2, "enemy_speed": 1.08, "money": 1.2}, "chances": {"ward": 0.3}}
+	]
+}

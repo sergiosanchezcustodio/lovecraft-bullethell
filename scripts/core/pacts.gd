@@ -61,7 +61,7 @@ static func _effects() -> Dictionary:
 
 ## Producto de un multiplicador entre los sellados (1 si ninguno lo toca).
 static func value(key: String, ids: Variant = null) -> float:
-	if ids == null: return float(_effects().get(key, 1.0)) * Challenge.value(key)   # y el desafío (15.2)
+	if ids == null: return float(_effects().get(key, 1.0)) * Challenge.value(key) * Madness.value(key)   # y el desafío (15.2) y la locura (16.14)
 	var v := 1.0
 	for id: Variant in (ids if ids is Array else active()):
 		var fx: Dictionary = find(String(id)).get("effects", {})

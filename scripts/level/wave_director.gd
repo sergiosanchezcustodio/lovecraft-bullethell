@@ -218,7 +218,7 @@ func pick() -> EnemyData:
 	var cands: Array[EnemyData] = []
 	var weights: Array[float] = []
 	for d in level.pool:
-		if d.tier >= 4 and elites >= Difficulty.elites(level.elite_cap): continue
+		if d.tier >= 4 and elites >= Difficulty.elites(roundi(level.elite_cap * Pacts.value("elites"))): continue   # Frenesí (16.14)
 		if d.unique: continue                       # seres únicos (D-04): solo como evento
 		var w := LevelData.weight(d.tier, level.number) * d.spawn_weight
 		if w <= 0.0: continue
@@ -275,6 +275,21 @@ func _split(e: Enemy) -> void:
 		if not _spawnable(Vector2(p.x, p.z), d.body_radius): p = at
 		spawn(d, p)
 
+## Grado de locura III (16.14): una criatura corriente se parte en dos más pequeñas, con algo
+## menos de la mitad de su vida, que ya no se parten.
+const SPLIT_SCALE := 0.72
+const SPLIT_HEALTH := 0.45
+func _split_small(e: Enemy) -> void:
+	var at := e.global_position
+	for k in 2:
+		var a := rng.randf() * TAU
+		var p := at + Vector3(cos(a), 0.0, sin(a)) * 0.6
+		if not _spawnable(Vector2(p.x, p.z), e.data.body_radius * SPLIT_SCALE): p = at
+		var c := spawn(e.data, p)
+		c.set_small()
+		c.health *= SPLIT_HEALTH
+		c.health_scale *= SPLIT_HEALTH
+
 func spawn_point(radius: float) -> Vector3:
 	var center := camera.center() if camera != null else Vector3.ZERO
 	if spread_spawns and world != null:
@@ -324,6 +339,8 @@ func spawn(d: EnemyData, pos: Vector3) -> Enemy:
 	e.position = pos
 	e.died.connect(_on_died)
 	enemies_root.add_child(e)
+	if not mirror and not boss and not d.elite and Madness.chance("ward") > 0.0 and rng.randf() < Madness.chance("ward"):
+		e.set_ward(1)                                                    # escudo de icor (grados de locura, 16.14)
 	alive.append(e)
 	spawned_total += 1
 	enemy_spawned.emit(e)
@@ -335,6 +352,9 @@ func _on_died(e: Enemy) -> void:
 	killed_total += 1
 	if not mirror and e.data.tier >= 4 and not e.data.unique and e != _final and Pacts.has("split_elites"):
 		_split(e)
+	elif not mirror and e.data.tier < 4 and not e.data.unique and not e.small and e != _final \
+			and Madness.chance("split") > 0.0 and rng.randf() < Madness.chance("split"):
+		_split_small(e)
 	if e == _final and not completed:
 		if level.final_next != null and _final.data != level.final_next:   # tras el final, el jefe
 			_final = spawn(level.final_next, spawn_point(level.final_next.body_radius))

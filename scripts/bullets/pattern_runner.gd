@@ -65,7 +65,7 @@ func _physics_process(delta: float) -> void:
 		dmg.source = e
 	for dir in pattern.directions(aim, _burst):
 		world.bullets.spawn(BulletManager.Team.ENEMY, pattern.style(), origin + dir * 0.5,
-			dir * pattern.speed * Difficulty.bullet_speed(), pattern.radius, pattern.size, dmg, pattern.lifetime,
+			dir * pattern.speed * Difficulty.bullet_speed() * Pacts.value("enemy_bullet"), pattern.radius, pattern.size, dmg, pattern.lifetime,
 			0, 1.0, -1, 0, 0.0, BulletManager.Effect.NONE, 0.0, BulletManager.OVER_WALLS if over_walls else -1)
 	_burst += 1
 	_timer = pattern.burst_interval
