@@ -56,6 +56,11 @@ const LOOKS := {
 		[Vector3(0.06, 0.06, 0.06), Color(0.3, 0.3, 0.32), Vector3(-0.12, 0, -0.12)]],
 }
 
+## Malla y material de cada pieza (tamaño|color), compartidos: con una malla nueva en cada
+## lanzamiento, Godot compilaba un shader cada vez (un fotograma de 16-19 ms cada 2,25 s con la
+## granada a nivel 5; hito 16.1).
+static var _pieces := {}
+
 func _ready() -> void:
 	Damage.ctx = _wtag
 	position = start
@@ -63,13 +68,16 @@ func _ready() -> void:
 	add_child(_stick)
 	for piece: Array in LOOKS.get(look, LOOKS["dinamita"]):
 		var mi := MeshInstance3D.new()
-		var box := BoxMesh.new()
-		box.size = piece[0]
-		mi.mesh = box
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = piece[1]
-		mat.roughness = 0.8
-		mi.material_override = mat
+		var k := "%s|%s" % [piece[0], piece[1]]
+		if not _pieces.has(k):                       # malla y material compartidos por todos los lanzamientos
+			var box := BoxMesh.new()
+			box.size = piece[0]
+			var mat := StandardMaterial3D.new()
+			mat.albedo_color = piece[1]
+			mat.roughness = 0.8
+			_pieces[k] = [box, mat]
+		mi.mesh = _pieces[k][0]
+		mi.material_override = _pieces[k][1]
 		mi.position = piece[2]
 		_stick.add_child(mi)
 	_spark = OmniLight3D.new()                       # chispa de la mecha

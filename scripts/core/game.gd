@@ -890,7 +890,7 @@ func _open_level_up() -> void:
 	if q == null: return
 	var options := q.progress.next_options(q.weapons, q.up_rng)
 	Rumble.pulse(q, 0.3, 0.0, 0.12, "subida")         # (16.30)
-	if args.get_bool("log_ups"): print("SUBIDA J%d nv=%d %s" % [q.index + 1, q.progress.level, ", ".join(options.map(func(o: PlayerProgress.Option) -> String: return PlayerProgress.key_of(o)))])   # pruebas (16.26)
+	if args.get_bool("log_ups"): print("SUBIDA t=%.2f J%d nv=%d %s" % [Time.get_ticks_msec() / 1000.0, q.index + 1, q.progress.level, ", ".join(options.map(func(o: PlayerProgress.Option) -> String: return PlayerProgress.key_of(o)))])   # pruebas (16.26)
 	if options.is_empty():
 		q.progress.pending = 0
 		_open_level_up.call_deferred()

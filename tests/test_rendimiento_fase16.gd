@@ -175,3 +175,17 @@ func test_jefes_elites_y_grandes_siguen_con_nodos() -> void:
 	e.model_scale = 1.0
 	assert_false(HordeDraw.eligible(e), "horde=false")
 	HordeDraw.enabled = true
+
+## Las piezas de lo que se lanza (granada, dinamita…) comparten malla y material: con unos nuevos
+## en cada lanzamiento, Godot compilaba un shader cada vez (16.1, 03-11-2026).
+func test_lo_lanzado_comparte_mallas() -> void:
+	var a := ThrownExplosive.new()
+	var b := ThrownExplosive.new()
+	a.look = "granada"
+	b.look = "granada"
+	add_child_autofree(a)
+	add_child_autofree(b)
+	var ma := (a.get_child(0).get_child(0) as MeshInstance3D)
+	var mb := (b.get_child(0).get_child(0) as MeshInstance3D)
+	assert_same(ma.mesh, mb.mesh)
+	assert_same(ma.material_override, mb.material_override)
