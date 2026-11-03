@@ -63,3 +63,10 @@ func device_name() -> String:
 
 func joy_device() -> int:
 	return device
+
+## ¿Esta entrada lee el mando `p_device`? (también dentro de una CombinedInput; pausa automática, hito 16.23)
+static func uses(i: PlayerInput, p_device: int) -> bool:
+	if i is JoypadInput: return (i as JoypadInput).device == p_device
+	if i is CombinedInput:
+		for s in (i as CombinedInput).sources: if uses(s, p_device): return true
+	return false

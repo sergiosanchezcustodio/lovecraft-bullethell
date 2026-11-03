@@ -12,6 +12,7 @@ static var count := 0                      ## pausas hechas (tests y registro)
 static var _end_ms := 0
 static var _last_ms := -100000
 static var _base := 1.0
+static var normal := 1.0                   ## ritmo normal de la partida (velocidad del juego, hito 16.23)
 
 ## Pausa de `ms` milisegundos de tiempo real; `big` (muertes de élites) no espera al hueco.
 static func hit(ms: int, big := false) -> void:
@@ -21,7 +22,7 @@ static func hit(ms: int, big := false) -> void:
 	var now := Time.get_ticks_msec()
 	var active := now < _end_ms and Engine.time_scale == SCALE
 	if not active:
-		if Engine.time_scale != 1.0: return          # acelerado, cámara lenta o depuración
+		if not is_equal_approx(Engine.time_scale, normal): return   # acelerado, cámara lenta o depuración
 		if not big and now - _last_ms < GAP_MS: return
 		_base = Engine.time_scale
 	_last_ms = now

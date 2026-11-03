@@ -10,6 +10,7 @@ const RESOLUTIONS: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1600, 900), 
 const FPS_LIMITS: Array[int] = [0, 60, 120, 144, 240]          ## 0 = sin límite
 const SCALES_3D: Array[float] = [0.5, 0.67, 0.75, 1.0]
 ## Brillo (17-10-2026): gamma que multiplica la de cada arena (Atmosphere.set_lift); índice 3 = 1
+const GAME_SPEEDS: Array[float] = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3]   ## hito 16.23
 const BRIGHTNESS: Array[float] = [0.8, 0.87, 0.93, 1.0, 1.08, 1.16, 1.25, 1.35]
 const BUS_MUSIC := &"Musica"
 const BUS_SFX := &"Efectos"
@@ -40,6 +41,8 @@ var defaults := {
 	"music_layers": true,                   ## música por capas (hito 13.13, Music.set_intensity)
 	"offscreen_cues": true,                 ## avisos de lo que llega de fuera de cámara (hito 13.13, OffscreenCues)
 	"madness": true,                        ## locura acumulada (GDD 4.5)
+	"game_speed": 1.0,                      ## velocidad del juego (hito 16.23, GAME_SPEEDS); en red, siempre 1
+	"auto_pause": true,                     ## pausa al perder el foco o desconectar un mando (hito 16.23)
 	"intro": 1,                             ## ficha e intro al arrancar: 0 siempre, 1 solo la primera vez (hito 5.2)
 	"intro_seen": false,
 	"keys": {}, "joy": {},                  ## reasignaciones: acción -> tecla / botón

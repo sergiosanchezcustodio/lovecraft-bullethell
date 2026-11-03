@@ -176,6 +176,12 @@ func _game() -> void:
 	_choice("Números de daño", dn, DamageNumbers.mode_of(Settings.get_value("damage_numbers")), func(i: int) -> void:
 		Settings.set_value("damage_numbers", i)
 		DamageNumbers.set_mode(i))
+	_choice("Velocidad del juego", OptionRow.fmt(Settings.GAME_SPEEDS, "%d %%", 100.0),
+		OptionRow.idx(Settings.GAME_SPEEDS, float(Settings.get_value("game_speed")), 3), func(i: int) -> void:
+		Settings.set_value("game_speed", Settings.GAME_SPEEDS[i]))
+	_note("Todo va más despacio o más deprisa: enemigos, balas y tú. En la partida online, siempre al 100 %.")
+	_toggle("Pausa al perder el foco o desconectar un mando", Settings.get_value("auto_pause"), func(on: bool) -> void:
+		Settings.set_value("auto_pause", on))
 	var intro: Array[String] = ["Siempre", "Solo la primera vez"]
 	_choice("Ficha e intro al arrancar", intro, int(Settings.get_value("intro")), func(i: int) -> void:
 		Settings.set_value("intro", i))

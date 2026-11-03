@@ -448,7 +448,7 @@ func _ready() -> void:
 	_lap("música")
 	_start_weather()
 	_lap("clima")
-	Engine.time_scale = args.get_float("timescale", 1.0)
+	apply_speed()
 	HitStop.enabled = args.get_bool("hitstop", true)     # micro-pausa al impactar (hito 11.1)
 	_boss_intro = args.get_bool("boss_intro", true)
 	DamageNumbers.set_mode(Auto.setting("damage_numbers", 2))   # hito 11.2 (cfg_damage_numbers=0|1|2)
@@ -596,6 +596,9 @@ func _ready() -> void:
 		get_tree().create_timer(pa[0], false).timeout.connect(func() -> void:
 			toggle_pause()
 			get_tree().create_timer(pa[1] if pa.size() > 1 else 3.0, true).timeout.connect(toggle_pause))
+	if args.has("autopause_at"):                   # pruebas: como perder el foco a los t s (hito 16.23)
+		get_tree().create_timer(args.get_float("autopause_at"), false).timeout.connect(_auto_pause.bind("prueba"))
+	if not Devices.joy_disconnected.is_connected(_on_pad_lost): Devices.joy_disconnected.connect(_on_pad_lost)
 	if args.has("mark_at"):                        # pruebas: como pulsar F9 a los t s
 		get_tree().create_timer(args.get_float("mark_at"), false).timeout.connect(net_mark)
 
@@ -929,6 +932,37 @@ func _peer_of(q: Player) -> int:
 	if not q.remote: return GameSession.my_peer
 	return GameSession.seats[q.index].peer if q.index < GameSession.seats.size() else 1
 
+## Ritmo de la partida (hito 16.23): el de la depuración, el de `timescale=` (simulaciones) o la
+## velocidad del juego de la configuración (en red, siempre 1: cada PC iría a su ritmo).
+func speed() -> float:
+	if GameSession.online: return 1.0
+	return float(Auto.setting("game_speed", 1.0))
+
+func apply_speed() -> void:
+	HitStop.normal = speed()
+	if DebugOptions.values.has("time_scale"): Engine.time_scale = DebugOptions.values["time_scale"]
+	else: Engine.time_scale = args.get_float("timescale", speed()) if args != null else speed()
+	if args != null and args.get_bool("log"): print("VELOCIDAD x%s" % String.num(Engine.time_scale, 2))
+
+## Pausa automática (hito 16.23): al perder el foco la ventana (solo sin red: en red pararía a
+## todos por un alt-tab) o al desconectarse el mando de un jugador de este PC (también en red).
+## Pruebas: `autopause_at=T` simula perder el foco a los T s.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and not GameSession.online and not JoypadInput.disabled():
+		_auto_pause("foco")
+
+func _auto_pause(why: String) -> void:
+	if not bool(Auto.setting("auto_pause", true)) or not is_inside_tree() or _ended or _menu_open: return
+	if _pause != null or get_tree().paused or _debug != null: return
+	if args != null and args.get_bool("log"): print("PAUSA AUTOMATICA ", why)
+	toggle_pause()
+
+func _on_pad_lost(device: int) -> void:
+	for q: Player in players:
+		if not q.remote and JoypadInput.uses(q.input, device):
+			_auto_pause("mando %d" % device)
+			return
+
 func toggle_pause() -> void:
 	if _menu_open or _ended: return
 	if menus != null and _pause == null and menus.solo() and menus.close_all(): return   # Esc cierra la ficha o el mapa
@@ -940,7 +974,7 @@ func toggle_pause() -> void:
 		_pause.queue_free()
 		_pause = null
 		get_tree().paused = false
-		if DebugOptions.values.has("time_scale"): Engine.time_scale = DebugOptions.values["time_scale"]
+		apply_speed()                              # la velocidad pudo cambiar en la configuración
 		_open_level_up.call_deferred()             # subidas pendientes (p. ej. de la depuración)
 		return
 	_open_pause()
@@ -1091,7 +1125,7 @@ func net_resume(d: Dictionary) -> void:
 	var w := get_node_or_null("NetLevelUp")
 	if w != null: w.queue_free()
 	if not _ended: get_tree().paused = false
-	if DebugOptions.values.has("time_scale"): Engine.time_scale = DebugOptions.values["time_scale"]
+	apply_speed()
 	var text := String(d.get("text", ""))
 	if text != "" and (int(d.get("peer", 1)) != GameSession.my_peer or bool(d.get("all", false))): announce(text, 1.8)
 	if args.get_bool("log"): print("SIGUE t=%.1f %s" % [director.time if director else 0.0, text])
@@ -1358,7 +1392,7 @@ func _game_over() -> void:
 	Saves.save()
 	Engine.time_scale = 0.35                       # la caída, a cámara lenta un momento
 	await get_tree().create_timer(0.6, true, false, true).timeout
-	Engine.time_scale = 1.0
+	apply_speed()
 	if _replay != null: _replay_frames = _replay.freeze()
 	get_tree().paused = true
 	var title := "Has caído" if players.size() == 1 else "Habéis caído"

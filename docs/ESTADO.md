@@ -1701,6 +1701,15 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Capturas:** `shots/game_rasgos_010.0s.png` y `shots/game_rasgos2_020.0s.png` (rastro de icor).
 - **Pendiente:** el equilibrio, sin medir con el bot; el icono del icor se parece algo a un bicho.
 
+## Fase 16, hito 16.23: velocidad del juego y pausa automática (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+- **Velocidad del juego** (`Settings.game_speed`, `Settings.GAME_SPEEDS`: 70, 80, 90, 100, 110, 120 y 130 %), en Configuración > Juego > Accesibilidad. Es `Engine.time_scale`: todo va más despacio o más deprisa (enemigos, balas, jugador). `Game.speed()` y `Game.apply_speed()` la ponen al empezar, al quitar la pausa (pudo cambiar en la configuración), al seguir tras una parada de red y tras la cámara lenta de la caída; manda la de la depuración y, si se da, `timescale=` (simulaciones). En red, siempre 1 (cada PC iría a su ritmo). La micro-pausa de los golpes (`HitStop`) compara con `HitStop.normal`, la velocidad elegida, en lugar de con 1. Con `log=true`, «VELOCIDAD x0.8».
+- **Pausa automática** (`Settings.auto_pause`, sí por defecto): al perder el foco la ventana (`NOTIFICATION_APPLICATION_FOCUS_OUT`; solo sin red, para que un alt-tab no pare a todos, y nunca en las pruebas lanzadas desde Claude Code, con los mandos desactivados) y al desconectarse el mando de un jugador de este PC (`Devices.joy_disconnected`, `JoypadInput.uses`, que mira también dentro de `CombinedInput`; en red pide la pausa de todos, como Start). No salta con otra ventana o menú abierto, ni al acabar. Pruebas: `autopause_at=T` (como perder el foco a los T s; `log=true` dice «PAUSA AUTOMATICA»).
+- **Pruebas:** `tests/test_game_speed.gd` (velocidades, micro-pausa a la velocidad elegida y no acelerado, mando de cada jugador). 673 de 673. Probado en partida con `cfg_game_speed=0.8 autopause_at=3 log=true`.
+- **Capturas:** `shots/game_velocidad_009.0s.png` (la pausa automática). Las dos filas nuevas quedan más abajo de lo que enseña `shots/titulo_velcfg_006.0s.png` sin desplazar la lista.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
