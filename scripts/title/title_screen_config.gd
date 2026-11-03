@@ -32,6 +32,13 @@ extends Resource
 @export var moon_halo_period := 7.0          ## s de una respiración completa
 @export var moon_color := Color(0.55, 0.75, 1.0)
 
+@export_group("Nubes del ventanal")         ## hito 16.35: bancos de nube que pasan despacio
+@export var clouds_enabled := true
+@export var clouds_strength := 0.24
+@export var clouds_speed := 0.012            ## fracción del ancho por segundo
+@export var clouds_block := 0.0              ## lado de los bloques (fracción del alto); 0, suaves (sobre la pintura, los bloques parecían fallos de compresión)
+@export var clouds_color := Color(0.5, 0.66, 1.0)
+
 @export_group("Relámpago en el ventanal")
 @export var lightning_enabled := true
 @export var lightning_min_interval := 9.0

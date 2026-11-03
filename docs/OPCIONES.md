@@ -52,6 +52,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `moon_shafts=true|false`: fuerza o quita los haces de luna (hito 16.32; por defecto, los de la calidad: Alta y Ultra). Con `log=true`, cuántos y lo que tardan en montarse.
   - `night=0..1`: fija la hora de la noche (hito 16.33; 0 crepúsculo, 1 noche cerrada, la luz de siempre); `night=false` quita el ciclo y `dawn=true` amanece al empezar.
   - `decor_break=false`: el decorado no se rompe (hito 16.34). `decor_blast=t`: desde t s, explosiones en las cuatro piezas rompibles más cercanas al J1, para capturas; con `log=true`, cuántas piezas hay y lo que cuesta cada una al romperse.
+  - `sky=luna|luna_baja|luna_verde|aurora|tormenta|rlyeh` (en el relato): cambia su cielo (hito 16.35). En la portada, `off=nubes` quita las nubes del ventanal.
   - `log_rumble=true`: escribe cada pulso de vibración del mando, haya mando o no (hito 16.30).
   - `dmg_table=T`: abre la pausa y la tabla «Daño de la partida» a los T s (`dmg_player=N`: la del J N; hito 16.27).
   - `max_alive=N` y `spawn_rate=N`: tope de vivos y ritmo de aparición fijo (pruebas de carga).

@@ -1901,6 +1901,17 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Pruebas:** `tests/test_decor_break.gd` (borrar una caja del mapa, recto y girado, deja pasar y recalcula la distancia; sin mapa quita el círculo; qué piezas se pueden romper; un muro de piedra aguanta una explosión y cae a la segunda, deja cascotes y por donde estaba se pasa; el suceso de red; los cascotes por calidad). 727 de 727.
 - **Capturas:** `shots/game_dbk2_002.4s.png` (el busto deshaciéndose), `game_dbk2_010.0s.png` (los montones de cascotes), `game_dbk_*` (la secuencia).
 
+## Fase 16, hito 16.35: cielos en los relatos y la portada (03-11-2026)
+
+- **Relatos** (`RelatoScreen`): detrás del mapa del nivel, un cielo que la cámara de la partida nunca enseña (`scripts/title/relato_sky.gdshader`, un `ColorRect`). El mapa asoma por debajo, fundido por arriba y por los lados (`relato_map.gdshader`), y bajo el horizonte la tierra queda a oscuras, así que el texto se sigue leyendo igual.
+  - **Cuatro cielos** (modos): luna y nubes; aurora (cortinas verdes y moradas que ondulan, con rayos verticales, en la Antártida); tormenta (nubes cerradas, lluvia y un relámpago cada 3,5-8 s con su réplica y el rayo, que aclara los cantos de las nubes); R'lyeh (cielo verdoso, luna gibosa enferma, estrellas cálidas y nubes que giran despacio alrededor de la luna).
+  - **Nubes voxel:** el ruido se cuantiza en bloques y el canto de arriba de cada nube se aclara (la luz de la luna), más cerca de ella.
+  - **Cuál lleva cada relato** (`data/relato_skies.json`): la parte 1, aurora; la 2 y la 3, luna; y por nivel: la última noche antártica con luna baja, los tejados de Innsmouth en tormenta, el arrecife con luna verde, la tormenta del Pacífico y R'lyeh (también en el epílogo de la locura). Seis cielos con sus colores, nubes y luna.
+- **Portada** (`window_sky.gdshader`, efecto «nubes» de `TitleScreenConfig`): bancos de luz de luna que pasan despacio por el cielo pintado del ventanal, solo donde la máscara dice cielo (no sobre Cthulhu ni el parteluz), más fuertes cerca de la luna. Suaves: en bloques, sobre la pintura, parecían fallos de compresión (`clouds_block` los vuelve a poner). Se apaga con `off=nubes`.
+- **Opciones:** `sky=luna|luna_baja|luna_verde|aurora|tormenta|rlyeh` en el relato cambia el cielo; `relato level=pX_nY shots=…` para capturas.
+- **Pruebas:** `tests/test_relato_skies.gd` (el cielo de cada relato, que existan los que se usan y todos los relatos de nivel tengan uno, y las nubes de la portada). 730 de 730.
+- **Capturas:** `shots/rel_p1_n1_06.0s.png` (aurora), `rel_p2_n1_06.0s.png` (luna), `rel_storm_02.8s.png` (relámpago), `rel_p3_n5_06.0s.png` (R'lyeh), `titulo__nub_*.png` y `titulo__sin_008.0s.png` (la portada con y sin nubes).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

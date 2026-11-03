@@ -10,8 +10,13 @@ const LINE_DELAY := 2.3          ## s entre frase y frase
 const FADE := 0.7
 const HOLD_SKIP := 0.8
 const GAME := "res://scenes/game.tscn"
+const SKIES := "res://data/relato_skies.json"
 
 var _lines: Array[Label] = []
+var _sky: ShaderMaterial
+var _sky_mode := 0
+var _bolt_in := 0.0
+var _bolt_t := -1.0
 var _t := 0.0
 var _hold := 0.0
 var _holding := false
@@ -58,6 +63,7 @@ func _ready() -> void:
 	black.color = Color(0.01, 0.01, 0.015)
 	black.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(black)
+	_add_sky(la.get_str("sky", sky_for(id)))
 	var map := "res://resources/maps/%s.png" % (Campaign.last_id() if id.begins_with("epilogo") else ("p2_n1" if id == Demo.END_RELATO else id))
 	if ResourceLoader.exists(map):
 		var bg := TextureRect.new()
@@ -66,6 +72,10 @@ func _ready() -> void:
 		bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		bg.modulate = Color(0.2, 0.2, 0.23)
+		if _sky != null:                                  # asoma bajo el cielo (16.35)
+			var mm := ShaderMaterial.new()
+			mm.shader = preload("res://scripts/title/relato_map.gdshader")
+			bg.material = mm
 		add_child(bg)
 	var c := CenterContainer.new()
 	c.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -108,12 +118,62 @@ func _ready() -> void:
 	_ring.draw.connect(_draw_ring)
 	add_child(_ring)
 
+## Cielo del relato (hito 16.35, data/relato_skies.json): el del nivel o el de su parte.
+static func sky_for(id: String) -> String:
+	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(SKIES))
+	if not d is Dictionary: return ""
+	var lv: Dictionary = d.get("levels", {})
+	if lv.has(id): return String(lv[id])
+	return String((d.get("parts", {}) as Dictionary).get(id.substr(0, 2), ""))
+
+func _add_sky(key: String) -> void:
+	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(SKIES))
+	if key == "" or not d is Dictionary or not (d.get("skies", {}) as Dictionary).has(key): return
+	var s: Dictionary = d.skies[key]
+	_sky = ShaderMaterial.new()
+	_sky.shader = preload("res://scripts/title/relato_sky.gdshader")
+	_sky_mode = int(s.get("mode", 0))
+	_sky.set_shader_parameter("mode", _sky_mode)
+	for k: String in ["top", "horizon", "cloud_dark", "cloud_lit", "moon", "glow_a", "glow_b"]:
+		if s.has(k):
+			var c: Array = s[k]
+			_sky.set_shader_parameter({"top": "top_col", "horizon": "hor_col", "moon": "moon_col"}.get(k, k), Color(c[0], c[1], c[2]))
+	if s.has("cover"): _sky.set_shader_parameter("cover", float(s.cover))
+	if s.has("moon_pos"): _sky.set_shader_parameter("moon_pos", Vector2(s.moon_pos[0], s.moon_pos[1]))
+	_sky.set_shader_parameter("seed", float(hash(key) % 97))
+	var view := get_viewport_rect().size
+	_sky.set_shader_parameter("aspect", view.x / maxf(view.y, 1.0))
+	_sky.set_shader_parameter("dim", 0.75)
+	var rect := ColorRect.new()
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.material = _sky
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(rect)
+	_bolt_in = 2.5
+
+## Relámpagos de la tormenta: uno cada pocos segundos, con su réplica.
+func _sky_step(delta: float) -> void:
+	if _sky == null or _sky_mode != 2: return
+	_bolt_in -= delta
+	if _bolt_in <= 0.0:
+		_bolt_in = randf_range(3.5, 8.0)
+		_bolt_t = 0.0
+		_sky.set_shader_parameter("bolt_x", randf_range(0.15, 0.85))
+	if _bolt_t >= 0.0:
+		_bolt_t += delta
+		var f := maxf(0.0, 1.0 - _bolt_t / 0.12) + 0.6 * maxf(0.0, 1.0 - absf(_bolt_t - 0.22) / 0.08)
+		_sky.set_shader_parameter("flash", clampf(f, 0.0, 1.0))
+		if _bolt_t > 0.5:
+			_bolt_t = -1.0
+			_sky.set_shader_parameter("flash", 0.0)
+
 func _draw_ring() -> void:
 	if _hold <= 0.0: return
 	_ring.draw_arc(Vector2.ZERO, 26, -PI / 2, -PI / 2 + TAU * clampf(_hold / HOLD_SKIP, 0, 1), 40, MenuKit.INK, 5.0, true)
 
 func _process(delta: float) -> void:
 	_t += delta
+	_sky_step(delta)
 	for i in _lines.size():
 		_lines[i].modulate.a = clampf((_t - 0.4 - i * LINE_DELAY) / FADE, 0.0, 1.0)
 	if _holding:

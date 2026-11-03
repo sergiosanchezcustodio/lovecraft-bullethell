@@ -126,7 +126,8 @@ func _apply_off(list: String) -> void:
 		"acercamiento": "zoom_enabled", "ceniza": "ash_enabled", "titulo": "title_enabled",
 		"halo": "halo_enabled", "niebla_titulo": "title_fog_enabled", "aviso": "prompt_enabled",
 		"musica": "music_enabled", "cuervo": "raven_enabled",
-		"polillas": "moths_enabled", "rafaga": "gust_enabled", "paginas": "gust_pages", "gotas": "drips_enabled"}
+		"polillas": "moths_enabled", "rafaga": "gust_enabled", "paginas": "gust_pages", "gotas": "drips_enabled",
+		"nubes": "clouds_enabled"}
 	for n in list.split(",", false):
 		if names.has(n): cfg.set(names[n], false)
 
@@ -308,7 +309,8 @@ func _push_params() -> void:
 	fog_mat.set_shader_parameter("fog_color", cfg.fog_color)
 	for n in ["moon_enabled", "moon_pos",
 			"moon_radius", "moon_halo_strength", "moon_halo_period", "moon_color", "lightning_enabled",
-			"eyes_enabled", "eye_left", "eye_right", "eyes_color"]:
+			"eyes_enabled", "eye_left", "eye_right", "eyes_color",
+			"clouds_enabled", "clouds_strength", "clouds_speed", "clouds_block", "clouds_color"]:
 		sky_mat.set_shader_parameter(n, cfg.get(n))
 
 ## Escenario y título cubren la pantalla conservando la proporción (se recorta lo que sobre).
