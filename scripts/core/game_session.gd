@@ -43,6 +43,7 @@ static var pacts: Array = []
 static var expedition := {}                    ## expedición en curso (hito 16.21, Expedition.state)
 static var rush_time := 0.0                     ## desfile de jefes (hito 16.22): s sumados de los jefes ya vencidos
 static var madness := 0                         ## grado de locura elegido en el mapa (hito 16.14)
+static var fish_curse := false                  ## pesca (hito 16.24): se sacó algo maldito; el siguiente nivel, con media cordura
 
 static func is_set() -> bool:
 	return not seats.is_empty()

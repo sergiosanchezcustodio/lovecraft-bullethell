@@ -1737,6 +1737,24 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Con el bot:** Con `exp_auto=true bot=smart god=true autonext=true timescale=2` en la parte 1 (semilla 7) se recorre entera: combate (143 s, del nivel 1 al 10), buhonero (82 s), tres combates (139, 132 y 146 s), descanso (las dos subidas: del 20 al 22) y el shoggoth primigenio (103 s); unos 12 minutos de juego, frente a los 21 de la parte. El buhonero, a los 4 s (`shots/game_expbuh_009.0s.png`; con bots no hay objetivos, así que se prueba sin bot). Sin `god`, sin medir.
 - **Capturas:** `shots/expedicion_f16y_002.0s.png` (el mapa), `shots/seleccion_mapaexp_005.0s.png` (los cinco modos).
 
+## Fase 16, hito 16.24: pesca en el muelle de Innsmouth (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+`scripts/fishing/fishing.gd` (`Fishing`: datos, qué pica, el sedal y lo pescado), `scripts/fishing/fishing_scene.gd` (`FishingScene`, `scenes/fishing.tscn`), `data/fishing.json`, `tools/gen_peces.py` y `scripts/anim/anim_captura.gd`.
+
+- **Cuándo:** en la pantalla de nivel superado de un nivel de la parte 2 con otro detrás (`Fishing.offered`; sin red, ni modos), «Pescar en el muelle…» bajo «Siguiente nivel». Lleva el progreso como «Siguiente nivel» (`_next_level(id, true)`) y, de la pesca, al relato del siguiente.
+- **La escena:** la arena de las calles de Innsmouth (`calles`, con su luz, su niebla y su ambiente: gaviotas, boyas) y la cámara isométrica de siempre, más cerca (7,5 m); el investigador del J1 (con su vestuario) en el hueco entre dos pilotes del borde sur, con una caña, un corcho rojo y blanco y el sedal (una curva de 12 tramos que cuelga). Cinco lances:
+  1. **Lanzar:** A (o Intro, o Espacio) mantenido carga la fuerza (va y viene) y la caña se va atrás; al soltar, el corcho vuela en arco de 3 a 9,5 m.
+  2. **Esperar:** el corcho cabecea; de cero a dos amagos (se hunde un poco, con una onda); a los 2,5-6,5 s se hunde de verdad («¡Pica!») y hay 0,9 s para pulsar A. Pulsar antes lo espanta.
+  3. **Recoger** (`Fishing.Line`): A mantenido recoge hilo y sube la tensión; soltando, baja y se pierde algo de hilo. El pez da tirones (más fuertes y más a menudo cuanto más tira: `pull`), con el corcho dando sacudidas y la barra de tensión parpadeando: recoger durante un tirón la dispara. Tensión al tope: se parte el sedal.
+  4. **La captura** salta al muelle coleteando y sale su ficha con el modelo girando: las **comunes** se venden en la lonja; las **raras** se venden o se llevan a la Biblioteca; las **malditas** («no debería haber salido del agua», con un destello verde y latidos) se pueden además devolver al agua, y si no, el siguiente nivel empieza con la cordura a la mitad (`GameSession.fish_curse`, `Game._fish_curse`, con el aviso «Lo que sacaste del agua te sigue mirando»).
+  Al acabar, un resumen (lo pescado y los dólares) y «Seguir al siguiente nivel»; B / Esc deja de pescar.
+- **Las capturas** (`tools/gen_peces.py`, voxels de 1/96 m: un arenque a 32 por metro serían ocho voxels; a lo largo de X, partes `body`, `tail` y, en el rape, `lure`; `anim_captura`: nadar y coletear): arenque, caballa, platija, bacalao y anguila del muelle (comunes, 6-16 $), rape del Arrecife (con su farolillo que brilla) y pez de ojos tristes (ojos humanos con párpados; raras, 60 y 75 $), cría de profundo (renacuajo con bracitos palmeados y ojos amarillos que brillan) y mano palmeada (con garras y algas; malditas, 150 y 180 $). Pesos: comunes 82 %, raras 12 %, malditas 6 %.
+- **El bestiario:** sección «Pescado en el muelle de Innsmouth» al final del tomo I, cada una con su propio encuadre (a escala de los profundos serían un punto). Se conoce al pescarla; la nota entera, las comunes al pescarlas y las raras y malditas al llevarlas a la Biblioteca (si se vendieron: «Se vendió en la lonja antes de que nadie la estudiara…»). Cuántas se han pescado y cuántas hay en la Biblioteca: `SaveData.records["fishing"]`.
+- **Pruebas:** `tests/test_fishing.gd` (modelos y animación, rarezas, cuándo se ofrece, el sedal: sin soltar se parte y soltando en los tirones sale, el bestiario). 687 de 687. Escena suelta: `godot --path . scenes/fishing.tscn -- fish_auto=true fish_force=cria fish_pick=1 card_shot=true shots=7 tag=x pj=varga`; con la partida: `level=p2_n1 bot=smart god=true final_at=8 go_fishing=true fish_auto=true` (el bot del final pasa por la pesca y sigue: el 2.2 empieza con el progreso y con la maldición).
+- **Capturas:** `shots/pesca_f1_007.5s.png` (recogiendo), `shots/pesca_f2_007.0s.png` (¡pica!), `shots/pesca_f2_ficha_cria.png` (la ficha de una maldita), `shots/titulo_bpesca_010.0s.png` (la sección del bestiario).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

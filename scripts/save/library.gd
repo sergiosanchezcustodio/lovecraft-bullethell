@@ -34,7 +34,8 @@ static func text(kind: String, id: String) -> String:
 ## el modelo) y dim (aún no se tiene entero: el nombre se lee, el modelo sale en sombra).
 ## Bestiario (hito 15.4): una baja más de esa criatura, y de qué investigador (vacío: no se sabe
 ## o no es de este PC). En `SaveData.records["bestiary"]`: {id: {"kills": n, "by": {pj: n}}}.
-const MUELLE := "_muelle"                     ## sufijo de las variantes del muelle (solo cambia cuánto salen)
+const MUELLE := "_muelle"
+const SECTION_FISH := "Pescado en el muelle de Innsmouth"   ## (hito 16.24)                     ## sufijo de las variantes del muelle (solo cambia cuánto salen)
 
 static func add_kill(save: SaveData, enemy_id: String, by: String) -> void:
 	if save == null: return
@@ -142,6 +143,16 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				var seen := _seen(save, "enemies", e.id) or _seen(save, "enemies", StringName(String(e.id) + MUELLE))
 				out.append(_e(String(e.id), e.display_name, seen, text("enemies", e.id),
 					e.model, "full", null, facts))
+			for c: Dictionary in Fishing.catches():            # lo pescado en el muelle (hito 16.24)
+				var id := String(c.id)
+				var n := Fishing.caught(save, id)
+				var full := Fishing.full_entry(save, c)
+				var facts := [String(Fishing.RARITY_NAMES.get(String(c.rarity), "")) + " · se vende por %d $" % int(c.price)]
+				if n > 0: facts.append("Pescadas: %d" % n)
+				if String(c.rarity) != "comun": facts.append("En la Biblioteca: %d" % Fishing.kept(save, id) if full else "Aún no se ha traído ninguna a la Biblioteca")
+				out.append(_e("pesca_" + id, String(c.name), n > 0 or (save != null and save.unlock_all),
+					String(c.text) if full else "Se vendió en la lonja antes de que nadie la estudiara. Si vuelve a picar, quizá convenga traerla aquí.",
+					String(c.model), "full", null, facts, SECTION_FISH))
 		"weapons":
 			for w in DamageRules.all_weapons():
 				var facts := ["%s · %s" % [CATEGORY[w.category], w.description], "Daño %s · cada %.2f s · alcance %d m" % [

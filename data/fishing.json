@@ -1,0 +1,31 @@
+{
+	"_doc": "Pesca en el muelle de Innsmouth (hito 16.24, Fishing). Se ofrece al superar un nivel de la parte 'part' (0 = la primera) con otro detrás, sin red. 'casts': lances por visita. 'bite_wait': s hasta que pica (de min a max); 'nibbles': amagos antes (de min a max); 'strike_window': s para clavar el anzuelo cuando se hunde el corcho. 'reel': recoger hilo con A mantenido: 'rate' progreso por s, 'tension_up' y 'tension_down' por s (con A y sin A), 'slack' progreso que se pierde por s sin recoger; en cada tirón del pez la tensión sube 'burst_tension' × su 'pull' más por s y el progreso baja 'burst_back' × 'pull'; tirones cada 'burst_every' s (de min a max) y de 'burst_time' s. 'curse_sanity': cordura con la que se empieza el siguiente nivel tras sacar algo maldito (×). Capturas: 'rarity' comun (se vende sola), raro (venderla o llevarla a la Biblioteca) o maldito (además se puede devolver al agua, y si no, la maldición); 'weight', probabilidad; 'price', $; 'model', models/<model>.json (tools/gen_peces.py); 'text', la nota del bestiario.",
+	"part": 1,
+	"casts": 5,
+	"bite_wait": [2.5, 6.5],
+	"nibbles": [0, 2],
+	"strike_window": 0.9,
+	"reel": {"rate": 0.2, "tension_up": 0.32, "tension_down": 0.75, "slack": 0.05,
+		"burst_tension": 1.6, "burst_back": 0.12, "burst_every": [0.9, 2.2], "burst_time": 0.6},
+	"curse_sanity": 0.5,
+	"catches": [
+		{"id": "arenque", "name": "Arenque", "rarity": "comun", "weight": 24, "price": 6, "pull": 0.15, "model": "pez_arenque",
+			"text": "Plata barata del Atlántico. En Innsmouth ya casi nadie lo pesca: las redes salen llenas de cosas mejores, dicen, y no explican cuáles."},
+		{"id": "caballa", "name": "Caballa", "rarity": "comun", "weight": 20, "price": 9, "pull": 0.3, "model": "pez_caballa",
+			"text": "Nerviosa, de rayas negras como escritura. Muerde cualquier cosa que brille."},
+		{"id": "platija", "name": "Platija", "rarity": "comun", "weight": 14, "price": 12, "pull": 0.25, "model": "pez_platija",
+			"text": "Vive pegada al fondo, con los dos ojos del mismo lado, mirando siempre hacia arriba. Lo que haya visto pasar por encima, se lo calla."},
+		{"id": "bacalao", "name": "Bacalao", "rarity": "comun", "weight": 12, "price": 16, "pull": 0.45, "model": "pez_bacalao",
+			"text": "El que hizo rica a Nueva Inglaterra antes de que Innsmouth encontrara otro negocio. Este pesa como un recién nacido."},
+		{"id": "anguila", "name": "Anguila del muelle", "rarity": "comun", "weight": 12, "price": 14, "pull": 0.6, "model": "pez_anguila",
+			"text": "Sube por los pilotes en las noches sin luna. Los viejos del muelle no la comen: dicen que se alimenta en el Arrecife."},
+		{"id": "rape", "name": "Rape del Arrecife", "rarity": "raro", "weight": 7, "price": 60, "pull": 0.55, "model": "pez_rape",
+			"text": "De mucho más hondo de lo que llega ningún sedal. Su farolillo seguía encendido en el cubo, y alumbraba la palabra que alguien había rayado en el fondo: Y'ha-nthlei."},
+		{"id": "ojos", "name": "Pez de ojos tristes", "rarity": "raro", "weight": 5, "price": 75, "pull": 0.5, "model": "pez_ojos",
+			"text": "Piel pálida y blanda, y unos ojos con párpados que parpadean. El tabernero de la Gilman House se negó a comprarlo: dijo que tenía la mirada de los Marsh."},
+		{"id": "cria", "name": "Cría de profundo", "rarity": "maldito", "weight": 3, "price": 150, "pull": 0.8, "model": "pez_cria",
+			"text": "No debería haber salido del agua. Respira el aire a bocanadas y canta bajito, con una voz que se parece demasiado a la de un niño. Algo muy grande, abajo, la ha oído."},
+		{"id": "mano", "name": "Mano palmeada", "rarity": "maldito", "weight": 3, "price": 180, "pull": 0.7, "model": "pez_mano",
+			"text": "Arrancada a la altura de la muñeca, con las garras aún abiertas. Por la noche se cierra despacio. Lo que la perdió no ha dejado de buscarla."}
+	]
+}

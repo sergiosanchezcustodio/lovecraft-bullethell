@@ -63,4 +63,5 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 | **Gedney** | Hito 16.19 (`gen_enemigos_fase16.py`) | Jefe intermedio del 1.3: parka de la expedición reventada por protoplasma negro con ojos verdes (`_blob`), brazo derecho vuelto pseudópodo. `anim_humano`. |
 | **Obed Marsh** | Hito 16.19 (`gen_enemigos_fase16.py`) | Jefe intermedio del 2.3: levita azul con faldones y botones de oro, chaleco rojo, Innsmouth de grado 2. `anim_humano`. |
 | **El viejo Castro** | Hito 16.19 (`gen_enemigos_fase16.py`) | Jefe intermedio del 3.2: barba gris rala, camisa en jirones, pañuelo rojo, descalzo, ídolo colgado. `anim_humano`. |
+| **Capturas de la pesca** | Hito 16.24 (`gen_peces.py`, voxels de 1/96 m) | Nueve para el muelle de Innsmouth, a lo largo de X con partes `body`, `tail` (y `lure`), `anim_captura`: arenque, caballa, platija (plana, los dos ojos arriba), bacalao y anguila; rape del Arrecife (farolillo que brilla) y pez de ojos tristes (ojos humanos); cría de profundo y mano palmeada. |
 | Abisal | Prototipo | Negro azulado, ojos cian brillantes, líneas bioluminiscentes, dientes largos. |

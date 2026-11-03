@@ -1605,6 +1605,10 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 	s.has_next = next_id != ""
 	s.pacts_open = next_id != "" and not is_guest() and not BossRush.is_rush(next_id) and not Expedition.is_expedition(next_id)   # sellar otros pactos antes del siguiente (13.6)
 	s.pacts.connect(func() -> void: _pacts_then_next(s, next_id))
+	s.fishing_open = result == "superado" and not is_guest() and level != null and Fishing.offered(String(level.id), next_id, net_game != null)   # (16.24)
+	s.fishing.connect(func() -> void: _next_level(next_id, true))
+	if s.fishing_open and args.get_bool("go_fishing"):   # pruebas: a pescar al acabar
+		get_tree().create_timer(1.0, true, false, true).timeout.connect(func() -> void: _next_level(next_id, true))
 	if is_guest(): s.waiting = "El anfitrión decide cómo seguir"   # en red, solo puede salir
 	s.logs_button = net_game != null and net_game.guest_lost     # se fue alguien: el registro sirve
 	s.next_level.connect(func() -> void: _next_level(next_id))
@@ -1640,6 +1644,7 @@ func _apply_carry() -> void:
 		for q in players:
 			if q.index < GameSession.carry.size(): GameSession.restore(q, GameSession.carry[q.index])
 		if _expedition(): _expedition_start()
+		if GameSession.fish_curse: _fish_curse()
 		if team != null:
 			team.turn = GameSession.team_turn % players.size()
 			team.xp = GameSession.team_xp
@@ -1658,6 +1663,13 @@ func _apply_carry() -> void:
 		q.progress.pending = 0
 		q.rebuild_stats()
 		q.health = q.data.max_health
+
+## Pesca (16.24): se sacó del agua algo que no debía; se empieza con la cordura a la mitad.
+func _fish_curse() -> void:
+	GameSession.fish_curse = false
+	for q in players: q.sanity = q.data.max_sanity * float(Fishing.cfg().get("curse_sanity", 0.5))
+	get_tree().create_timer(2.5, false).timeout.connect(func() -> void: announce("Lo que sacaste del agua te sigue mirando", 3.0))
+	if args.get_bool("log"): print("MALDICION DE LA PESCA")
 
 ## Expedición (16.21): las subidas del descanso, de las élites y de las curiosidades, y la vida
 ## que quitó alguna, al empezar el nivel.
@@ -1730,7 +1742,7 @@ func _pacts_then_next(s: Menus.EndScreen, next_id: String) -> void:
 		s.focus_next())
 	add_child(m)
 
-func _next_level(id: String) -> void:
+func _next_level(id: String, fishing := false) -> void:
 	if is_guest(): return                            # lo decide el anfitrión (llega con net_next)
 	GameSession.carry.clear()
 	for q in players: GameSession.carry.append(GameSession.snapshot(q))
@@ -1741,6 +1753,9 @@ func _next_level(id: String) -> void:
 	Saves.save()
 	get_tree().paused = false
 	Engine.time_scale = 1.0
+	if fishing:                                      # pesca en el muelle (16.24): y de allí, al relato
+		LevelCard.leave(self, func() -> void: get_tree().change_scene_to_file(Fishing.SCENE))
+		return
 	_to_next_scene()
 
 ## Funde a negro (LevelCard.leave) y pasa al relato del siguiente nivel o, en pruebas, lo

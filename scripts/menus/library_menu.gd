@@ -244,7 +244,7 @@ func _show_entry(k: int) -> void:
 		var img := TextureRect.new()
 		img.texture = tex
 		if _tome == "enemies" and known and String(e.model) != "" and _live:   # bestiario vivo (hito 15.4)
-			var fixed := maxf(_bestiary_scale(), ModelIcon.frame_size(String(e.model)) * ModelIcon.MARGIN)
+			var fixed := _fixed_frame(e)
 			var vp := ModelIcon.make_live(String(e.model), IMAGE_PX, fixed)
 			img.add_child(vp)
 			img.texture = vp.get_texture()
@@ -265,7 +265,7 @@ func _show_entry(k: int) -> void:
 	_right.add_child(n)
 	_right.add_child(_rule())
 	if not known:
-		var u := _ink(_unknown_text(), 22, INK_DIM)
+		var u := _ink(_unknown_text(e), 22, INK_DIM)
 		u.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		u.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_right.add_child(u)
@@ -280,7 +280,8 @@ func _show_entry(k: int) -> void:
 		txt.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_right.add_child(txt)
 
-func _unknown_text() -> String:
+func _unknown_text(e := {}) -> String:
+	if String(e.get("section", "")) == Library.SECTION_FISH: return "Todavía no ha picado ninguna. Quizá en el muelle de Innsmouth, entre nivel y nivel."
 	match _tome:
 		"enemies": return "Aún no se ha visto. Las páginas están en blanco."
 		"weapons": return "Nadie la ha empuñado todavía."
@@ -297,9 +298,16 @@ func _image(e: Dictionary) -> Texture2D:
 	if not _icons.has(key):
 		var fixed := 0.0
 		if _tome == "enemies" and String(e.model) != "":   # a escala, salvo los colosos: a la suya
-			fixed = maxf(_bestiary_scale(), ModelIcon.frame_size(String(e.model)) * ModelIcon.MARGIN)
+			fixed = _fixed_frame(e)
 		_icons[key] = ModelIcon.make(self, String(e.model), String(e.mode), IMAGE_PX, fixed, OutfitData.hold_of(worn), worn)
 	return _icons[key]
+
+## Encuadre de una ficha del bestiario: el común, o el suyo si es más grande (los colosos) o si es
+## una captura de la pesca (16.24: un arenque, a escala de un profundo, sería un punto).
+func _fixed_frame(e: Dictionary) -> float:
+	var own := ModelIcon.frame_size(String(e.model)) * ModelIcon.MARGIN
+	if String(e.get("section", "")) == Library.SECTION_FISH: return own
+	return maxf(_bestiary_scale(), own)
 
 ## Bestiario a escala: el encuadre lo marca el enemigo más grande.
 var _scale := 0.0
@@ -310,7 +318,7 @@ func _bestiary_scale() -> float:
 	if _scale <= 0.0:
 		var sizes: Array[float] = []
 		for e in _entries:
-			if String(e.model) != "": sizes.append(ModelIcon.frame_size(String(e.model)))
+			if String(e.model) != "" and String(e.get("section", "")) != Library.SECTION_FISH: sizes.append(ModelIcon.frame_size(String(e.model)))
 		if sizes.is_empty(): return 0.0
 		sizes.sort()
 		_scale = sizes[mini(int(sizes.size() * SCALE_PCT), sizes.size() - 1)] * ModelIcon.MARGIN

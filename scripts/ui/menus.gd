@@ -178,6 +178,8 @@ class EndScreen extends CanvasLayer:
 	signal quit
 	signal next_level
 	signal pacts
+	signal fishing                              ## pesca en el muelle (hito 16.24)
+	var fishing_open := false                   ## botón «Pescar en el muelle», tras el de seguir
 	var has_next := false                       ## "Siguiente nivel", primero y con el foco
 	var pacts_open := false                     ## botón de los pactos del Necronomicón (hito 13.6), tras el de seguir
 	var _first: Button
@@ -253,6 +255,12 @@ class EndScreen extends CanvasLayer:
 			pb.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			pb.pressed.connect(func() -> void: pacts.emit())
 			box.add_child(pb)
+		if fishing_open:
+			var fb := MenuKit.button("Pescar en el muelle…", MenuKit.INK, 24)
+			fb.custom_minimum_size = Vector2(360, 52)
+			fb.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			fb.pressed.connect(func() -> void: fishing.emit())
+			box.add_child(fb)
 		var again := MenuKit.button("Reintentar", MenuKit.INK, 28)
 		again.custom_minimum_size = Vector2(360, 58)
 		again.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
