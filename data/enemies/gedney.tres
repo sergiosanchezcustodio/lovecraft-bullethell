@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/globulos_tekeli.tres" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/esquirlas_hielo.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/fragmento.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"gedney"
+display_name = "Gedney, lo que queda de él"
+model = "gedney"
+model_scale = 1.5
+unique = true
+tier = 4
+spawn_weight = 1.0
+elite = true
+max_health = 700.0
+hit_radius = 0.85
+body_radius = 0.85
+move_speed = 2.1
+xp = 30.0
+money = 40
+contact_physical = 14.0
+contact_mental = 6.0
+aura_radius = 4.0
+aura_drain = 1.5
+movement = &"boss"
+params = {"anim_fire": "throw", "anim_move": "walk", "anim_slow": "walk", "phase_text": "¡Tekeli-li! ¡Tekeli-li!", "anim_rest": "idle", "anim_windup": "throw", "charge_cooldown": 3.0, "charge_mult": 1.5, "charge_range": 10.0, "charge_speed": 11.0, "charge_time": 0.8, "minion": ExtResource("4"), "minion_count": 3, "minion_every": 5.0, "phase2_every": 1.8, "phase2_pattern": ExtResource("2"), "phase3_every": 2.6, "phase3_pattern": ExtResource("3"), "phase_shield": 1.0, "rest": 1.0, "windup": 0.8}
+attack = ExtResource("2")
+attack_cooldown = 3.5
+attack_range = 10.0
+attack_anim = "throw"

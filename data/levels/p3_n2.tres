@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/enemies/cultista.tres" id="2"]
@@ -6,6 +6,7 @@
 [ext_resource type="Resource" path="res://data/enemies/diablo.tres" id="4"]
 [ext_resource type="Resource" path="res://data/enemies/sacerdote_culto.tres" id="7"]
 [ext_resource type="Resource" path="res://data/enemies/idolo_vivo.tres" id="f16i"]
+[ext_resource type="Resource" path="res://data/enemies/castro.tres" id="f16m"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
 [ext_resource type="Resource" path="res://data/weather/niebla_pantano.tres" id="weather"]
 [ext_resource type="Resource" path="res://data/enemies/tamborilero.tres" id="f15"]
@@ -25,6 +26,9 @@ pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource(
 spawn_rate = Array[Vector2]([Vector2(0, 0.35), Vector2(45, 0.58), Vector2(90, 0.92), Vector2(150, 1.45), Vector2(210, 2.0), Vector2(300, 2.5)])
 max_alive = 75
 elite_cap = 1
+mid_enemies = Array[ExtResource("5")]([ExtResource("f16m")])
+mid_times = Array[float]([130.0])
+mid_texts = Array[String](["Entre los tambores, una voz cascada empieza el canto. El viejo Castro sabe las palabras…"])
 final_time = 240.0
 final_enemy = ExtResource("7")
 final_wave = 14

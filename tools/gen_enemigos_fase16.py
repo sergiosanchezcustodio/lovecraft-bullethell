@@ -18,6 +18,16 @@
                   partes body (el cuerpo), top (la cabeza), pod_l/pod_r (las alas) y base (el
                   pedestal, quieto), para anim_fragmento: respira, la cabeza ondula y se hincha
                   al disparar.
+  gedney          hito 16.19: Gedney, el estudiante del campamento de Lake que desapareció, vuelto
+                  otra cosa: la parka de la expedición reventada por masas de protoplasma negro
+                  con ojos verdes, el brazo derecho convertido en un pseudópodo, la cara a medio
+                  cubrir. Estilo de los humanos con la masa de los shoggoths encima.
+  obed_marsh      hito 16.19: el capitán Obed Marsh rejuvenecido por el pacto con los Profundos:
+                  levita de capitán azul marino con botones de oro, chaleco, corbatín, botas de
+                  mar, patillas negras, cadena de oro y el aspecto de Innsmouth de grado 2.
+  castro          hito 16.19: el viejo Castro, el marinero mestizo que habló con Legrasse: piel
+                  curtida, barba gris rala, camisa blanca hecha jirones, calzón remangado,
+                  descalzo, pañuelo rojo al cuello y un ídolo de piedra colgado del pecho.
 Los cuerpos van en sus generadores de siempre: el shoggoth excavador es el fragmento a S=3 con
 costra de hielo (`python tools/gen_fragmento.py 3 shoggoth_excavador 1940`) y el Antiguo
 sembrador, una variante de `tools/gen_antiguo.py`.
@@ -259,9 +269,133 @@ def idolo():
     print('idolo_vivo', n, 'voxels')
 
 
+PROTO = (0.04, 0.05, 0.05); PROTO_G = (0.08, 0.16, 0.12); PROTO_P = (0.14, 0.08, 0.18); PEYE = (0.72, 0.96, 0.40)
+
+
+def _blob(M, part, cx, cy, cz, r, eyes=2):
+    """Masa de protoplasma negro con brillo verde y violeta y ojos verdes que brillan (coords en voxels)."""
+    for x in range(int(cx - r) - 1, int(cx + r) + 2):
+        for y in range(int(cy - r) - 1, int(cy + r) + 2):
+            for z in range(int(cz - r) - 1, int(cz + r) + 2):
+                d = ((x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2 + (z + 0.5 - cz) ** 2) ** 0.5
+                if d <= r:
+                    n = M.noise(x, y, z, 3.0)
+                    M.put(x, y, z, part, PROTO_G if n > 0.62 else (PROTO_P if n < 0.3 else PROTO))
+    for i in range(eyes):
+        a = M.rng.uniform(-1.1, 1.1); b = M.rng.uniform(-0.6, 0.8)
+        ex, ey, ez = cx + math.sin(a) * r * 0.95, cy + math.sin(b) * r * 0.8, cz + math.cos(a) * r * 0.95
+        for dx in (-1, 0):
+            for dy in (-1, 0): M.put(int(ex) + dx, int(ey) + dy, int(ez), part, PEYE, glow=1)
+        M.put(int(ex), int(ey), int(ez) + 1, part, (0.02, 0.03, 0.02))
+
+
+def gedney():
+    MATS.clear()
+    SKIN = (0.66, 0.70, 0.72); SKIN_SH = (0.54, 0.58, 0.62)
+    PARKA = mat((0.46, 0.40, 0.30), 'lona'); FUR = mat((0.74, 0.70, 0.62), 'lana')
+    TRO = mat((0.24, 0.22, 0.20), 'lana'); BOOT = mat((0.16, 0.12, 0.09), 'cuero'); SOLE = (0.07, 0.06, 0.05)
+    M = cu.new(1621)
+    top = cu.boots(M, BOOT, SOLE, top=16)
+    cu.legs(M, TRO, bottom=top)
+    cu.torso(M, PARKA, b=2, bottom=28)
+    cu.skirt(M, PARKA, 4, top=34, b=2, flare=2, depth=14)
+    cu.neck(M, SKIN)
+    cu.arms(M, PARKA, SKIN, b=2, cuff=FUR)
+    cu.head(M, SKIN, SKIN_SH)
+    cu.eyes(M, (0.30, 0.30, 0.32), eye=(0.08, 0.06, 0.05), brow_style='recta')
+    cu.mouth(M, (0.24, 0.10, 0.12), wide=True)
+    slab(M, H, FUR, 77, 82, 0, -0.5, 15, 13, 15, 13, ch=2)             # gorro de piel
+    for k in [k for k, v in M.V.items() if v[0] == 'fore_r']: del M.V[k]   # el brazo derecho ya no es un brazo
+    for i in range(7):                                                 # pseudópodo que cuelga del codo
+        t = i / 6
+        _blob(M, 'fore_r', 16.5 + t * 2.5, 45 - t * 20, 1 + t * 6, 6.5 - t * 3.0, eyes=1 if i in (1, 4) else 0)
+    _blob(M, T, 3, 50, 8, 9.5, eyes=4)                                 # revienta el pecho
+    _blob(M, T, -7, 38, 7, 6.5, eyes=2)
+    _blob(M, T, 8, 33, 6, 5.0, eyes=1)
+    _blob(M, T, 0, 54, -8, 10.0, eyes=3)                               # y la espalda
+    _blob(M, T, -8, 60, -4, 6.0, eyes=1)
+    _blob(M, H, 4, 70, 5, 5.0, eyes=2)                                 # le cubre media cara
+    _blob(M, 'arm_l', -18, 56, 2, 4.6, eyes=1)
+    cu.finish(M, 'gedney', dict(MATS), flat=(PROTO, PROTO_G, PROTO_P, PEYE), b=2, hat=(FUR,), roughness=0.55, specular=0.5,
+              skirt=True)
+
+
+def obed():
+    MATS.clear()
+    COAT = mat((0.08, 0.10, 0.20), 'lana'); COAT_SH = mat((0.05, 0.06, 0.13), 'lana')
+    VEST = mat((0.42, 0.10, 0.10), 'lana'); SHIRT = mat((0.84, 0.82, 0.76), 'lana')
+    TRO = mat((0.16, 0.15, 0.14), 'lana'); BOOT = mat((0.08, 0.07, 0.06), 'cuero'); SOLE = (0.04, 0.04, 0.04)
+    HAIR = mat((0.06, 0.05, 0.05), 'pelo')
+    M = cu.new(1622)
+    top = cu.boots(M, BOOT, SOLE, top=20)
+    cu.legs(M, TRO, bottom=top)
+    cu.torso(M, COAT, b=2, bottom=30)
+    cu.skirt(M, COAT, 14, top=42, b=2, flare=3, depth=14)              # faldones de la levita
+    cu.opening(M, 30, 62, 6, 10, VEST)                                 # abierta sobre el chaleco
+    for y in range(56, 62):
+        for x in range(-2, 2): cu.front(M, x, y, SHIRT)                # pechera
+    for y in (58, 59):
+        for x in range(-3, 3): cu.front(M, x, y, (0.04, 0.04, 0.04), dz=1)   # corbatín
+    for y in range(36, 56, 4):                                         # botones de oro
+        for x in (-7, 6): cu.front(M, x, y, GOLD, dz=1)
+    for i in range(9):                                                 # cadena de reloj
+        cu.front(M, -5 + i, 44 - abs(i - 4) // 2, GOLD, dz=1)
+    cu.neck(M, SHIRT)
+    cu.arms(M, COAT, SKIN_I, b=2, cuff=GOLD)
+    cu.head(M, SKIN_I, SKIN_I_SH)
+    ns, nsh = cu.innsmouth(M, 2, SKIN_I, SKIN_I_SH)
+    cu.hair_back(M, ns, HAIR, bottom=66)
+    cu.sideburns(M, HAIR)
+    for x in range(-7, 7):                                             # pelo negro peinado hacia atrás
+        for z in range(-7, 7):
+            t = M.top(x, z)
+            if t is not None and t >= 79: M.put(x, t + 1, z, H, HAIR)
+    cu.finish(M, 'obed_marsh', dict(MATS), flat=(cu.FISH_EYE, cu.FISH_PUPIL, GOLD), b=2, roughness=0.7, specular=0.35,
+              skirt=True)
+
+
+def castro():
+    MATS.clear()
+    SKIN = (0.52, 0.38, 0.28); SKIN_SH = (0.42, 0.30, 0.22)
+    SHIRT = mat((0.80, 0.76, 0.66), 'lona'); SHIRT_SH = mat((0.64, 0.60, 0.52), 'lona')
+    TRO = mat((0.30, 0.28, 0.24), 'lona'); SCARF = mat((0.60, 0.12, 0.10), 'lana')
+    BEARD = (0.62, 0.60, 0.56); IDOL = (0.16, 0.24, 0.20)
+    M = cu.new(1623)
+    for s_, _, shin, _, _ in cu.sides():
+        slab(M, shin, SKIN, 0, 3, 5 * s_, 2, 8, 8, 13, 12, ch=1)
+    cu.legs(M, TRO, bottom=3)
+    for k, v in list(M.V.items()):                                     # remangado
+        if v[1] == TRO and k[1] < 15: v[1] = SKIN
+    cu.torso(M, SHIRT, b=0, bottom=30)
+    for (x, y, z), v in M.V.items():                                   # jirones
+        if v[1] == SHIRT and M.noise(x, y, z, 2.5) > 0.78: v[1] = SKIN
+        elif v[1] == SHIRT and (x + y) % 9 == 0: v[1] = SHIRT_SH
+    for y in range(58, 63):
+        for x in range(-6, 6): cu.front(M, x, y, SCARF, dz=1 if y == 58 else 0)
+    cu.neck(M, SKIN)
+    cu.arms(M, SHIRT, SKIN, fore=SKIN)
+    for y in range(44, 52): cu.front(M, 0, y, (0.20, 0.16, 0.10), dz=1)   # cordel
+    for dx in (-1, 0, 1):
+        for dy in range(40, 44): M.put(dx, dy, 10, T, IDOL)            # el ídolo colgado
+    cu.head(M, SKIN, SKIN_SH)
+    cu.eyes(M, BEARD, eye=(0.10, 0.08, 0.06), brow_style='poblada')
+    cu.mouth(M, (0.30, 0.16, 0.14))
+    for x in range(-7, 7):                                             # barba gris rala
+        for y in range(62, 69):
+            if (x * 3 + y) % 3 != 0: cu.paint_face(M, x, y, BEARD)
+    for x in range(-6, 6):                                             # arrugas
+        if x % 3 == 0: cu.paint_face(M, x, 77, SKIN_SH)
+    cu.hair_back(M, SKIN, BEARD, bottom=68)
+    slab(M, H, BEARD, 79, 81, 0, -2, 14, 13, 11, 10, ch=2, over=False)
+    cu.finish(M, 'castro', dict(MATS), flat=(BEARD, IDOL), roughness=0.85, specular=0.25)
+
+
 if __name__ == '__main__':
     vaina()
     guardian()
     hija_marsh()
     sonambulo()
     idolo()
+    gedney()
+    obed()
+    castro()

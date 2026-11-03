@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=12 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/enemies/pinguino.tres" id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="Resource" path="res://data/enemies/shoggoth_mimetico.tres" id="8"]
 [ext_resource type="Resource" path="res://data/enemies/shoggoth_caverna.tres" id="9"]
 [ext_resource type="Resource" path="res://data/enemies/shoggoth_excavador.tres" id="f16x"]
+[ext_resource type="Resource" path="res://data/enemies/gedney.tres" id="f16m"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
 [ext_resource type="Resource" path="res://data/weather/ventisca_paso.tres" id="weather_niebla"]
 
@@ -27,6 +28,9 @@ pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource(
 spawn_rate = Array[Vector2]([Vector2(0, 0.45), Vector2(45, 0.65), Vector2(90, 1.0), Vector2(150, 1.5), Vector2(210, 2.0), Vector2(300, 2.5)])
 max_alive = 75
 elite_cap = 2
+mid_enemies = Array[ExtResource("5")]([ExtResource("f16m")])
+mid_times = Array[float]([130.0])
+mid_texts = Array[String](["Una parka de la expedición de Lake avanza entre la ventisca. Dentro ya no hay solo un hombre…"])
 final_time = 240.0
 final_enemy = ExtResource("9")
 final_wave = 12

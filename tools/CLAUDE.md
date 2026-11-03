@@ -60,4 +60,7 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 | **Hija de los Marsh** | Hito 16.17 (`gen_enemigos_fase16.py`) | Joven de grado 1, pálida, melena negra, vestido verde mar con encaje y tiara de oro abierta. `anim_humano`. |
 | **Sonámbulo de Providence** | Hito 16.18 (`gen_enemigos_fase16.py`) | Camisón de rayas, gorro de dormir, descalzo, ojos cerrados con ojeras. `anim_humano`. |
 | **Ídolo vivo** | Hito 16.18 (`gen_enemigos_fase16.py`) | Estatuilla de Cthulhu de piedra verdinegra sobre un pedestal con jeroglíficos; ojos verdes. Partes `body`, `top`, `pod_l`, `pod_r` y `base` (quieta), con `anim_fragmento`. |
+| **Gedney** | Hito 16.19 (`gen_enemigos_fase16.py`) | Jefe intermedio del 1.3: parka de la expedición reventada por protoplasma negro con ojos verdes (`_blob`), brazo derecho vuelto pseudópodo. `anim_humano`. |
+| **Obed Marsh** | Hito 16.19 (`gen_enemigos_fase16.py`) | Jefe intermedio del 2.3: levita azul con faldones y botones de oro, chaleco rojo, Innsmouth de grado 2. `anim_humano`. |
+| **El viejo Castro** | Hito 16.19 (`gen_enemigos_fase16.py`) | Jefe intermedio del 3.2: barba gris rala, camisa en jirones, pañuelo rojo, descalzo, ídolo colgado. `anim_humano`. |
 | Abisal | Prototipo | Negro azulado, ojos cian brillantes, líneas bioluminiscentes, dientes largos. |

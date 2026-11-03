@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/barnabas_canto.tres" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/barnabas_ola.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/profundo.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/guardian_orden.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = &"obed_marsh"
+display_name = "El capitán Obed Marsh"
+model = "obed_marsh"
+model_scale = 1.5
+unique = true
+tier = 4
+spawn_weight = 1.0
+elite = true
+tags = Array[StringName]([&"humana", &"marina"])
+max_health = 700.0
+hit_radius = 0.75
+body_radius = 0.75
+move_speed = 2.0
+xp = 30.0
+money = 40
+contact_physical = 12.0
+contact_mental = 4.0
+movement = &"keep"
+params = {"keep": 5.0, "strafe": 0.55, "extra_pattern": ExtResource("3"), "extra_every": 6.0, "minion": ExtResource("4"), "minion_every": 12.0, "minion_count": 2, "minion_text": "¡Ïa! ¡Dagón paga bien!", "shield_at": 0.5, "shield_minion": ExtResource("5"), "shield_count": 4}
+attack = ExtResource("2")
+attack_cooldown = 4.0
+attack_range = 10.0
+attack_anim = "throw"

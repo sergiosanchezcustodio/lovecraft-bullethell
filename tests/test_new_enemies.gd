@@ -200,3 +200,15 @@ func test_el_idolo_no_se_mueve_y_ampara_a_los_cercanos() -> void:
 	idol.position = Vector3(1, 0, 0)                 # lo empujan: vuelve a su sitio
 	_step(idol, 1.0)
 	assert_lt(idol.position.length(), 0.1)
+
+## Fase 16, hito 16.19: un jefe intermedio en el nivel 3 de cada parte.
+func test_los_jefes_intermedios_salen_en_su_nivel() -> void:
+	for pair in [["gedney", "p1_n3"], ["obed_marsh", "p2_n3"], ["castro", "p3_n2"]]:
+		var d: EnemyData = load("res://data/enemies/%s.tres" % pair[0])
+		assert_true(d.unique and d.elite, pair[0] + " es único")
+		assert_true(FileAccess.file_exists("res://models/%s.json" % d.model), d.model)
+		assert_ne(Library.text("enemies", String(d.id)), "", "texto del bestiario de " + pair[0])
+		var lv: LevelData = load("res://data/levels/%s.tres" % pair[1])
+		assert_true(lv.mid_enemies.any(func(x: EnemyData) -> bool: return x.id == d.id), "%s en %s" % pair)
+		assert_lt(lv.mid_times[0], lv.final_time, "antes del final")
+		assert_eq(lv.mid_texts.size(), lv.mid_enemies.size())

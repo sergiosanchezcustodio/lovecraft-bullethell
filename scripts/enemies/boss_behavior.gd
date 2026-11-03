@@ -5,6 +5,7 @@ extends ChargeBehavior
 ##   2 (66-33 %): se detiene, abre ojos y dispara ráfagas (`phase2_pattern`) y escupe
 ##      fragmentos (`minion`) cada `minion_every` s;
 ##   3 (< 33 %): furia: embiste más rápido, sin descanso, y dispara la espiral (`phase3_pattern`).
+## Otros modelos (hito 16.19, Gedney): `anim_fire` y `anim_slow` para la fase 2, y `phase_text` para el grito.
 ## Al cambiar de fase chilla "¡Tekeli-li!" y queda invulnerable `phase_shield` s.
 var phase := 1
 var _fire := 0.0
@@ -26,7 +27,7 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 	_minion -= delta
 	match phase:
 		2:
-			e.anim = "burst" if _fire > 0.6 else "idle"
+			e.anim = String(e.data.param("anim_fire", "burst")) if _fire > 0.6 else String(e.data.param("anim_slow", "idle"))
 			if _fire <= 0.0 and target != null:
 				_fire = float(e.data.param("phase2_every", 1.6))
 				_shoot(e, target, e.data.param("phase2_pattern", null))
@@ -61,7 +62,7 @@ func _spawn_minions(e: Enemy) -> void:
 
 func _announce(e: Enemy) -> void:
 	e.world.sfx("roar", e.global_position)
-	e.world.shout("¡TEKELI-LI!", e.global_position + Vector3(0, 4.0, 0), Color(0.75, 1.0, 0.55), 110, 1.5, 1.8)
+	e.world.shout(String(e.data.param("phase_text", "¡TEKELI-LI!")), e.global_position + Vector3(0, 4.0, 0), Color(0.75, 1.0, 0.55), 110, 1.5, 1.8)
 
 func can_shoot(_e: Enemy) -> bool:
 	return phase == 1 and state == State.CRAWL

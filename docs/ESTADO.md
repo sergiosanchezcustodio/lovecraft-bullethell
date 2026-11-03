@@ -1670,6 +1670,19 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
 - **Pruebas:** tres más en `tests/test_new_enemies.gd` (en su nivel, el sonámbulo reaparece al lado del jugador, el ídolo ampara a los cercanos y vuelve a su sitio). 665 de 665.
 - **Capturas:** `shots/sonambulo_25_f16e.png`, `shots/sonambulo-idolo_vivo_25_f16d.png` (modelos), `shots/game_sonamb_014.0s.png` y `shots/game_idolo2_030.0s.png` (la espiral). El equilibrio, sin medir con el bot.
 
+## Fase 16, hito 16.19: jefes intermedios en el nivel 3 de cada parte (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+Un evento intermedio (`mid_enemies`, `mid_times` y `mid_texts` de `LevelData`, como el engendro del muelle) a los 130 s, con su aviso y el objetivo «Acaba con…» del HUD. Los tres son únicos y élites, a escala 1,45-1,5, con 620-700 de vida (los jefes de final, 1 600-2 400). Modelos en `tools/gen_enemigos_fase16.py`, con `anim_humano`.
+
+- **Gedney** (nivel 1.3, el paso de la cordillera): el estudiante que faltaba, con la parka de la expedición reventada por masas de protoplasma negro con ojos verdes (`_blob`) en el pecho, la espalda, un hombro y media cara, y el brazo derecho vuelto un pseudópodo. Usa `BossBehavior` (el del shoggoth primigenio) con sus fragmentos de esbirros, `globulos_tekeli` y `esquirlas_hielo`: embiste, se para a disparar y, por debajo de un tercio, furia. `BossBehavior` acepta ahora `anim_fire`, `anim_slow` y `phase_text` para modelos que no son shoggoths.
+- **El capitán Obed Marsh** (nivel 2.3, la huida por los tejados del Gilman House; antes de la horda del final): levita azul marino con faldones y botones de oro, chaleco rojo, pechera, corbatín, cadena de reloj, patillas y pelo negro, Innsmouth de grado 2. `KeepBehavior` con el canto y la ola de Barnabas, profundos cada 12 s («¡Ïa! ¡Dagón paga bien!») y, a media vida, cuatro guardianes de la Orden (16.17) en corro.
+- **El viejo Castro** (nivel 3.2, el ritual del pantano): piel curtida, barba gris rala, camisa blanca hecha jirones, pañuelo rojo, calzón remangado, descalzo y un ídolo de piedra colgado. `KeepBehavior` con aura de cordura, revólver, anillo ritual, cultistas con el «Ph'nglui mglw'nafh…» y, a media vida, tres tamborileros.
+- **Textos:** bestiario y «Criaturas» del mapa.
+- **Pruebas:** una más en `tests/test_new_enemies.gd`. 666 de 666.
+- **Capturas:** `shots/gedney-obed_marsh-castro_25_f16f.png` y `_200_f16f.png` (modelos), `shots/gedney_25_f16g.png`, `shots/game_mid_gedney_020.0s.png`, `shots/game_mid_obed_020.0s.png` y `shots/game_mid_castro_020.0s.png` (con `mid_at=3`). El equilibrio, sin medir con el bot.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

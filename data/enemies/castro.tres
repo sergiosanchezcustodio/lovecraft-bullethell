@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/revolver_culto.tres" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/ritual_anillo.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/cultista.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/tamborilero.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = &"castro"
+display_name = "El viejo Castro"
+model = "castro"
+model_scale = 1.45
+unique = true
+tier = 4
+spawn_weight = 1.0
+elite = true
+tags = Array[StringName]([&"humana"])
+aura_radius = 4.5
+aura_drain = 2.5
+max_health = 620.0
+hit_radius = 0.7
+body_radius = 0.7
+move_speed = 2.0
+xp = 30.0
+money = 40
+contact_physical = 10.0
+contact_mental = 6.0
+movement = &"keep"
+params = {"keep": 6.5, "strafe": 0.5, "extra_pattern": ExtResource("3"), "extra_every": 5.5, "minion": ExtResource("4"), "minion_every": 10.0, "minion_count": 3, "minion_text": "¡Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn!", "shield_at": 0.5, "shield_minion": ExtResource("5"), "shield_count": 3}
+attack = ExtResource("2")
+attack_cooldown = 3.5
+attack_range = 10.0
+attack_anim = "throw"
