@@ -28,6 +28,7 @@ static var _scene_requested := false
 ## Nivel que monta la partida con estos argumentos (lo mismo que `Game._ready`).
 static func level_id(args: LaunchArgs) -> String:
 	if not GameSession.carry.is_empty(): return String(GameSession.level)
+	if Expedition.active() and Expedition.is_expedition(String(GameSession.level)): return String(GameSession.level)   # (16.21)
 	return args.get_str("level", String(GameSession.level) if GameSession.is_set() else "p1_n1")
 
 ## Arena de ese nivel (la del nivel base en la noche eterna, el día y los desafíos).

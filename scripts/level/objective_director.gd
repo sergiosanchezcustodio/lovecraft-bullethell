@@ -47,6 +47,8 @@ func setup(p_game: Node) -> ObjectiveDirector:
 		var t := _rng.randf_range(float(at[0]), float(at[1]))
 		if args != null and args.has("peddler"):
 			if args.get_bool("peddler"): peddler_at = args.get_float("peddler_at", 5.0)
+		elif Expedition.peddler_now(String(level.id)):   # expedición (16.21): la parada del buhonero, enseguida
+			peddler_at = 4.0
 		elif peddler_due(pc, String(level.id), level.daily != "") and t < level.final_time - 20.0:
 			peddler_at = t
 	return self

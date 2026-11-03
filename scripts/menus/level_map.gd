@@ -70,6 +70,15 @@ func _ready() -> void:
 		eb.pressed.connect(func() -> void: _endless(eb))
 		extra.add_child(eb)
 		_endless_btn = eb
+	var exp_open := [0, 1, 2].filter(func(p: int) -> bool: return Expedition.unlocked(Saves.current, p) and Demo.part_ok(p))
+	if (not exp_open.is_empty() or dev) and not Demo.on() and not Net.is_active():   # expedición (hito 16.21): al superar una parte, sin red
+		var xb := MenuKit.button("Expedición" + ("" if not exp_open.is_empty() else "  ·  Desarrollo"), MenuKit.INK, 24)
+		xb.custom_minimum_size = Vector2(460, 58)
+		xb.focus_entered.connect(func() -> void:
+			_info_title.text = "Expedición"
+			_info_text.text = "Una tirada por una parte con un mapa de caminos que se bifurcan: combates, élites, el buhonero, curiosidades y descansos, y el jefe al final. Lo que ganas solo vale en esa expedición. Se abre la de cada parte al superarla. Sin red.")
+		xb.pressed.connect(func() -> void: _expedition(xb, exp_open if not dev else [0, 1, 2]))
+		extra.add_child(xb)
 	if (BossRush.unlocked(Saves.current) or dev) and not Demo.on():   # desfile de jefes (hito 16.22): al vencer a Cthulhu
 		var rb := MenuKit.button("Desfile de jefes" + ("" if BossRush.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
 		rb.custom_minimum_size = Vector2(460, 58)
@@ -91,6 +100,13 @@ func _ready() -> void:
 		cb.pressed.connect(func() -> void: _challenges(cb))
 		extra.add_child(cb)
 		_challenge_btn = cb
+	if extra.get_child_count() > 4:                  # cinco modos (16.21, 16.22): más estrechos, que quepan
+		extra.add_theme_constant_override("separation", 14)
+		for b: Button in extra.get_children():
+			b.custom_minimum_size.x = 0.0
+			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			b.add_theme_font_size_override("font_size", 21)
+		extra.custom_minimum_size.x = 1520
 	var top := Madness.unlocked(Saves.current)        # grados de locura (16.14): al vencer a Cthulhu
 	if top > 0 or (dev and LaunchArgs.from_cmdline().get_bool("madness_open")):
 		top = maxi(top, 1)
@@ -197,6 +213,50 @@ func _endless(from: Button) -> void:
 		visible = true
 		from.grab_focus.call_deferred())
 	get_parent().add_child(m)
+
+## Expedición (16.21): elegir la parte y al mapa. Sin pactos.
+func _expedition(from: Button, parts: Array) -> void:
+	var pop := Control.new()
+	pop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	get_parent().add_child(pop)
+	visible = false
+	var w: Array = MenuKit.window(pop, Color(0.42, 0.34, 0.18), 900)
+	var box: VBoxContainer = w[1]
+	MenuKit.heading(box, "Expedición", 42, UiKit.GOLD)
+	var first: Button = null
+	var pi := 0
+	for part: Dictionary in Campaign.parts():
+		var p := pi
+		var wins := Expedition.wins(Saves.current, p)
+		var b := MenuKit.button("%s%s" % [String(part.title), ("  ·  completadas: %d" % wins) if wins > 0 else ""], MenuKit.INK, 22)
+		b.custom_minimum_size = Vector2(760, 60)
+		b.disabled = not parts.has(p)
+		b.pressed.connect(func() -> void:
+			pop.queue_free()
+			visible = true
+			Pacts.set_active([])
+			Expedition.start(p)
+			chosen.emit(Expedition.MAP_ID))
+		box.add_child(b)
+		if first == null and not b.disabled: first = b
+		pi += 1
+	box.add_child(MenuKit.hint("A o Intro: empezar  ·  B o Esc: volver al mapa"))
+	var back := func() -> void:
+		pop.queue_free()
+		visible = true
+		from.grab_focus.call_deferred()
+	var cancel := _CancelCatcher.new()
+	cancel.on_cancel = back
+	pop.add_child(cancel)
+	if first != null: first.grab_focus.call_deferred()
+
+## Atiende B / Esc en una ventana hecha con código.
+class _CancelCatcher extends Node:
+	var on_cancel: Callable
+	func _unhandled_input(event: InputEvent) -> void:
+		if event.is_action_pressed("ui_cancel"):
+			get_viewport().set_input_as_handled()
+			on_cancel.call()
 
 ## Desafíos (hito 15.2): sin pactos, directo a jugar.
 func _challenges(from: Button) -> void:

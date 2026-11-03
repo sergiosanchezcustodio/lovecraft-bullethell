@@ -352,6 +352,8 @@ func _ready() -> void:
 			add_child(Endless.new().setup(level))
 		elif Challenge.is_challenge(level_id):        # desafío (hito 15.2)
 			level = Challenge.make_level(level_id)
+		elif Expedition.is_expedition(level_id):      # expedición (hito 16.21)
+			level = Expedition.make_level(level_id)
 		elif BossRush.is_rush(level_id):              # desfile de jefes (hito 16.22)
 			level = BossRush.make_level(level_id)
 			if BossRush.number_of(level_id) == 1 and GameSession.carry.is_empty(): GameSession.rush_time = 0.0
@@ -753,13 +755,17 @@ func earn(amount: int) -> void:
 	var n := int(round(amount * money_mult * (director.team_item("money_mult") if director else 1.0) * Pacts.value("money")))   # Oro de Obed; pactos (hito 13.6)
 	if n <= 0: return
 	run_money += n
-	if Saves.current != null:
+	if Saves.current != null and not _expedition():   # en la expedición, a su bolsa (16.21)
 		Saves.current.money += n
 		Saves.current.stats["money"] = int(Saves.current.stats.get("money", 0)) + n
 
 ## Dólares de este nivel que quedan para el buhonero (en este PC).
 func purse() -> int:
-	return run_money - run_spent
+	return run_money - run_spent + (int(Expedition.state().get("money", 0)) if _expedition() else 0)
+
+## ¿Nivel de una expedición (16.21)?
+func _expedition() -> bool:
+	return level != null and Expedition.is_expedition(String(level.id)) and Expedition.active()
 
 ## El buhonero (hito 16.12): `q`, de este PC, compra `g` por `price` dólares del nivel (también se
 ## restan de la partida guardada). Remedio: vida y cordura, aquí. Baratija (un objeto) y libro
@@ -1266,6 +1272,7 @@ func _epilogue() -> void:
 	get_tree().change_scene_to_file("res://scenes/relato.tscn")
 
 func _quit() -> void:
+	if level != null and Expedition.is_expedition(String(level.id)): GameSession.expedition = {}   # se abandona (16.21)
 	Saves.save()
 	get_tree().paused = false
 	Engine.time_scale = 1.0
@@ -1400,6 +1407,8 @@ func _game_over() -> void:
 	get_tree().paused = true
 	var title := "Has caído" if players.size() == 1 else "Habéis caído"
 	if level != null and level.endless: title = "Partida del día" if level.daily != "" else "La noche eterna"
+	if _expedition():                               # expedición (16.21): se acaba aquí
+		_endless_lines = PackedStringArray(["La expedición termina en el paso %d de %d" % [int(Expedition.state().row) + 1, (Expedition.state().rows as Array).size()]])
 	if level != null and BossRush.is_rush(String(level.id)):   # desfile de jefes (16.22): hasta dónde llegó
 		var bd := BossRush.boss_of(String(level.id))
 		_endless_lines = PackedStringArray(["Caído ante %s (jefe %d de %d)" % [bd.display_name if bd != null else "el jefe",
@@ -1481,8 +1490,12 @@ func _on_level_completed() -> void:
 	if args.get_bool("log"): _log_players()
 	# el avance de la campaña solo cuenta en la partida del anfitrión (D-10)
 	var won_title := "Nivel superado"
-	var rush := BossRush.is_rush(String(level.id))
-	if rush: won_title = _rush_won()                 # desfile de jefes (16.22)
+	var is_exp := _expedition()
+	var rush := BossRush.is_rush(String(level.id)) or is_exp   # ni campaña, ni pactos, ni locura
+	var exp_next := ""
+	if is_exp: exp_next = _expedition_won()         # expedición (16.21)
+	if BossRush.is_rush(String(level.id)): won_title = _rush_won()                 # desfile de jefes (16.22)
+	elif is_exp: won_title = "Expedición completada" if exp_next == "" else "Superado"
 	elif Challenge.is_challenge(String(level.id)):     # desafío (15.2): aparte, no cuenta como nivel de campaña
 		won_title = "Desafío superado"
 		var prev := Challenge.best(Saves.current, String(level.id))
@@ -1512,7 +1525,23 @@ func _on_level_completed() -> void:
 	announce(won_title, 2.0)
 	await _loot_time()
 	get_tree().paused = true
-	_end_screen(won_title, UiKit.GOLD, BossRush.next(String(level.id)) if rush else Campaign.next_in_part(String(level.id)), "superado")
+	var next_id := Campaign.next_in_part(String(level.id))
+	if BossRush.is_rush(String(level.id)): next_id = BossRush.next(String(level.id))
+	elif Expedition.is_expedition(String(level.id)): next_id = exp_next
+	_end_screen(won_title, UiKit.GOLD, next_id, "superado")
+
+## Expedición (16.21): la bolsa y el tiempo pasan al mapa; tras el jefe, el récord. Devuelve lo
+## que sigue (el mapa, o "" si se acabó).
+func _expedition_won() -> String:
+	var st := Expedition.state()
+	var next := Expedition.won(String(level.id), purse(), director.time)
+	_endless_lines = PackedStringArray(["Bolsa de la expedición: %d $ · Tiempo: %s" % [int(st.money), Endless.clock(float(st.time))]])
+	if next == "":
+		var prev := Expedition.wins(Saves.current, int(st.part))
+		if Expedition.record(Saves.current, int(st.part), float(st.time)):
+			_endless_lines.append("¡La más rápida!" if prev > 0 else "¡La primera expedición completada en esta parte!")
+		GameSession.expedition = {}
+	return next
 
 ## Desfile de jefes (16.22): suma el tiempo de este jefe y, tras el último, el récord de cada
 ## jugador de este PC con su personaje. Devuelve el título de la pantalla final.
@@ -1574,7 +1603,7 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 	if result != "" and not reports.is_empty() and level != null and (human or args.get_bool("report_log")):
 		FallReport.log_run(result, String(level.id), director.time if director != null else 0.0, reports)
 	s.has_next = next_id != ""
-	s.pacts_open = next_id != "" and not is_guest() and not BossRush.is_rush(next_id)   # sellar otros pactos antes del siguiente (13.6)
+	s.pacts_open = next_id != "" and not is_guest() and not BossRush.is_rush(next_id) and not Expedition.is_expedition(next_id)   # sellar otros pactos antes del siguiente (13.6)
 	s.pacts.connect(func() -> void: _pacts_then_next(s, next_id))
 	if is_guest(): s.waiting = "El anfitrión decide cómo seguir"   # en red, solo puede salir
 	s.logs_button = net_game != null and net_game.guest_lost     # se fue alguien: el registro sirve
@@ -1610,6 +1639,7 @@ func _apply_carry() -> void:
 	if not GameSession.carry.is_empty():
 		for q in players:
 			if q.index < GameSession.carry.size(): GameSession.restore(q, GameSession.carry[q.index])
+		if _expedition(): _expedition_start()
 		if team != null:
 			team.turn = GameSession.team_turn % players.size()
 			team.xp = GameSession.team_xp
@@ -1629,6 +1659,17 @@ func _apply_carry() -> void:
 		q.rebuild_stats()
 		q.health = q.data.max_health
 
+## Expedición (16.21): las subidas del descanso, de las élites y de las curiosidades, y la vida
+## que quitó alguna, al empezar el nivel.
+func _expedition_start() -> void:
+	var st := Expedition.state()
+	for q in players:
+		for k in int(st.get("bonus", 0)): q.progress.gain_level()
+		q.health = q.data.max_health * float(st.get("hurt", 1.0))
+	if int(st.get("bonus", 0)) > 0: get_tree().create_timer(SIGN_DELAY, false).timeout.connect(_open_level_up)
+	st.bonus = 0
+	st.hurt = 1.0
+
 ## Signos Mayores (hito 16.9): uno al empezar la parte y otro al empezar su tercer nivel
 ## (Signs.levels). No en los desafíos, que tienen sus reglas, ni en la partida del día. Se eligen
 ## en la ventana de la subida en cuanto pasa el rótulo del nivel. `signs=cthugha,yog`: los da
@@ -1644,6 +1685,7 @@ func _grant_signs() -> void:
 	if is_guest() or Challenge.active() or level.daily != "": return
 	var due := Signs.due(Campaign.number_of(String(level.id)))
 	if Endless.is_endless(String(level.id)) or BossRush.is_rush(String(level.id)): due = 1
+	if _expedition(): due = 1 + int(Expedition.state().get("signs", 0))   # expedición (16.21): y los de las curiosidades
 	var any := false
 	for q in players:
 		if q.remote:                                  # sus abiertos los sabe su PC: aquí, que elija
@@ -1705,7 +1747,7 @@ func _next_level(id: String) -> void:
 ## empieza sin relato (autonext=true).
 func _to_next_scene() -> void:
 	LevelCard.leave(self, func() -> void:
-		if args.get_bool("autonext"): get_tree().reload_current_scene()
+		if args.get_bool("autonext") and not Expedition.is_map(String(GameSession.level)): get_tree().reload_current_scene()   # (la expedición, a su mapa)
 		else: get_tree().change_scene_to_file("res://scenes/relato.tscn"))
 
 func _restart() -> void:
@@ -1714,6 +1756,12 @@ func _restart() -> void:
 		return
 	if is_net_host(): net_game.send_restart()
 	print("reinicio")
+	if level != null and Expedition.is_expedition(String(level.id)):   # expedición (16.21): otra nueva, por la misma parte
+		Expedition.start(int(Expedition.state().get("part", int(level.part) - 1)))
+		get_tree().paused = false
+		Engine.time_scale = 1.0
+		get_tree().change_scene_to_file("res://scenes/relato.tscn")
+		return
 	Saves.save()
 	get_tree().paused = false
 	Engine.time_scale = 1.0

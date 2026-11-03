@@ -1722,6 +1722,21 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Con el bot:** Dyer con `bot=smart god=true autonext=true timescale=2` encadena los seis: 21, 57, 39, 129, 26 y 341 s (unos 10 minutos en total) pasando del nivel 23 al 24. Los intermedios caían demasiado deprisa, así que en el desfile llevan el doble de vida (`health` en cada paso). Sin `god`, sin medir.
 - **Capturas:** `shots/game_desfile_012.0s.png` (Gedney, «1 de 6») y `shots/seleccion_mapadesfile_005.0s.png` (el botón en el mapa).
 
+## Fase 16, hito 16.21: expedición (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+`scripts/level/expedition.gd` (`Expedition`), `scripts/menus/expedition_map.gd` (`ExpeditionMap`, `scenes/expedition_map.tscn`) y `data/expedition.json`.
+
+- **Entrada:** botón «Expedición» en el mapa (con los otros cuatro modos, ahora más estrechos para que quepan cinco), que pide la parte: la de cada una se abre al superar su último nivel (`Expedition.unlocked`); sin pactos y **sin red** (no sale con una sala abierta). `Expedition.start` hace el mapa y pasa por el relato (que, con `expedicion:mapa`, lleva al mapa).
+- **El mapa** (`Expedition.generate`, determinista con la semilla): seis filas de dos o tres nodos y el jefe; la primera, combates; la última antes del jefe, un descanso y un buhonero; en medio, al azar con pesos (combate 40, élites 18, curiosidad 16, buhonero 14, descanso 12). Cada nodo lleva a uno o dos de la fila siguiente y ninguno se queda sin entrada. Los niveles base van del 1 al 4 de la parte según la fila. Se dibuja de izquierda a derecha con caminos a trazos (los andados, en oro); solo se pueden elegir los que salen del último visitado (arriba y abajo entre ellos). B o Esc: abandonar (con confirmación).
+- **Los nodos:** cada combate, élite, buhonero o jefe es un nivel «expedicion:<tipo>:<nivel>:<fila>» montado sobre el de la campaña (`make_level`): combate, el evento final a los 120 s; élites, a los 100 s con el triple de élites (con sus rasgos del 16.20), un 15 % más de vida y una subida de premio; buhonero, una parada de 70 s con el buhonero (16.12) a los 4 s, menos enemigos y una horda corta al final; jefe, el último nivel de la parte con el jefe a los 45 s. Sin intermedios, y la horda del Arrecife, de 30 s como mucho. Curiosidad y descanso se resuelven en el mapa: el descanso da dos subidas al empezar el siguiente nivel; la curiosidad, uno de seis sucesos con dos o tres opciones (dólares, niveles de un arma, un objeto nuevo, subidas, un Signo Mayor, y alguna con el siguiente nivel con menos vida), que cambian `GameSession.carry` y la bolsa.
+- **Lo que pasa de uno a otro:** el progreso (como en una parte), las subidas pendientes (`_expedition_start`, que también abre la ventana) y la **bolsa de la expedición** (`state.money`): los dólares de sus niveles no llegan al hueco (`Game.earn`) y el buhonero cobra de ella (`Game.purse`). Un Signo Mayor al empezar y los de las curiosidades.
+- **El final:** al vencer al jefe, «Expedición completada», con la bolsa y el tiempo total, y el récord de la parte (`SaveData.records["expeditions"]`: completadas y la más rápida). Al caer, «La expedición termina en el paso N de 7»; Reintentar empieza otra por la misma parte.
+- **Pruebas:** `tests/test_expedition.gd` (mapa sin huecos, semilla, caminos, niveles, curiosidades, récord). 682 de 682. Mapa suelto: `godot --path . scenes/expedition_map.tscn -- exp_part=0 exp_seed=7 exp_row=2 shots=2 tag=x`; con `exp_auto=true bot=smart autonext=true skip_relato=true` se recorre sola.
+- **Con el bot:** Con `exp_auto=true bot=smart god=true autonext=true timescale=2` en la parte 1 (semilla 7) se recorre entera: combate (143 s, del nivel 1 al 10), buhonero (82 s), tres combates (139, 132 y 146 s), descanso (las dos subidas: del 20 al 22) y el shoggoth primigenio (103 s); unos 12 minutos de juego, frente a los 21 de la parte. El buhonero, a los 4 s (`shots/game_expbuh_009.0s.png`; con bots no hay objetivos, así que se prueba sin bot). Sin `god`, sin medir.
+- **Capturas:** `shots/expedicion_f16y_002.0s.png` (el mapa), `shots/seleccion_mapaexp_005.0s.png` (los cinco modos).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

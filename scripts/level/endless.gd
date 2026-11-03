@@ -22,6 +22,7 @@ static func base_of(id: String) -> String:
 	if Daily.is_daily(id): return Daily.base_of(id)   # partida del día (13.9): el escenario de la fecha
 	if Challenge.is_challenge(id): return Challenge.base_of(id)   # desafío (15.2): el escenario de su nivel
 	if BossRush.is_rush(id): return BossRush.base_of(id)          # desfile de jefes (16.22)
+	if Expedition.is_expedition(id): return Expedition.base_of(id)   # expedición (16.21)
 	return id.substr(PREFIX.length()) if is_endless(id) else id
 
 static func id_for(base: String) -> String:

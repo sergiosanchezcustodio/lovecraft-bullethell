@@ -99,6 +99,7 @@ func _card(id: String, level_name: String) -> Control:
 ## «Parte 1 · Nivel 2 · En las montañas de la locura» del nivel `id` ("" si no es de la campaña).
 static func _over_line(id: String) -> String:
 	if Challenge.is_challenge(id): return "Desafío · " + _over_line(Challenge.base_of(id))   # (hito 15.2)
+	if Expedition.is_expedition(id): return "Expedición · %s · %s" % [String(Expedition.NAMES.get(Expedition.kind_of(id), "")), _over_line(Expedition.base_of(id))]   # (16.21)
 	if BossRush.is_rush(id): return "Desfile de jefes · %d de %d" % [BossRush.number_of(id), BossRush.stages().size()]   # (16.22)
 	for l in Campaign.levels():
 		if String(l.id) != id: continue

@@ -44,6 +44,9 @@ func _ready() -> void:
 		fill = next.get("fill", {})
 		_then_menu = bool(next.get("menu", false))
 		next = {}
+	if Expedition.is_map(id):                             # expedición (16.21): entre nivel y nivel, su mapa
+		get_tree().change_scene_to_file.call_deferred(Expedition.SCENE)
+		return
 	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json"))
 	if not (d is Dictionary) or not (d as Dictionary).has(id) or la.get_bool("skip_relato"):   # pruebas: skip_relato=true
 		_go()
