@@ -33,6 +33,15 @@ static func hint(save: SaveData, c: CharacterData) -> String:
 	var p := progress(save, c)
 	return "%s (%d de %d)" % [String(HINTS.get(c.secret, "Secreto")), p.x, p.y]
 
+## Armas de los secretos aún cerrados: no salen en la subida de nivel hasta abrir a su dueño
+## (que no se descubra antes de tiempo). Sin partida (pruebas), ninguna.
+static func locked_weapons(save: SaveData) -> Array[StringName]:
+	var out: Array[StringName] = []
+	if save == null: return out
+	for c in all():
+		if not save.has_character(String(c.id)): out.append_array(c.starting_weapons)
+	return out
+
 ## Abre los que ya cumplen su condición; devuelve los recién abiertos.
 static func check(save: SaveData) -> Array[CharacterData]:
 	var out: Array[CharacterData] = []

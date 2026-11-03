@@ -1772,7 +1772,20 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
   - Daño ajustado con `reglas_dano.gd -- aplicar`; al nivel 5, 62 y 17,5 por segundo (como el bumerán, 57, y el martillo, 12).
 - **Arte:** modelos en `tools/gen_secretos.py` (`cuerpo.py`, revisados de frente, de lado y de espaldas); vestuario regenerado para los dos; caras para el parpadeo con ojos que no son de 4×2 (`ODD_EYES` en `gen_caras_juego.py`: Carter, a medio cerrar; Wilbur, de 2×2). Iconos de las seis armas y los dos objetos con ComfyUI en local (el del gemelo, semilla 1001).
 - **Pruebas:** `tests/test_secrets.gd` (los dos, que no se compran y sus armas con dos ramas; cerrados hasta cumplir la condición, una sola vez; cerrados en la selección; la llave adormece). Ajustadas las que contaban personajes de inicio, armas por grupo (16, 17 y 19), armas base (52), rasgos (`crisis_mult` y `mental_mult` cuentan como rasgo) y ojos. 691 de 691 (un fallo suelto en `test_new_enemies.gd` que no se repite en tres pasadas).
+- **Sus armas no salen en la subida** de nivel hasta abrir a su dueño (`Secrets.locked_weapons`, en el reparto de `Game`): las de los demás investigadores sí salen para todos, pero estas descubrirían el secreto.
 - **Capturas:** `shots/seleccion_secretos_003.0s.png` (los dos cerrados), `shots/game_carter_009.0s.png` (las llaves), `shots/game_whateley_011.0s.png` (las pisadas). Opciones: `character=carter|whateley`; `select pick=carter,whateley` con una partida sin ellos.
+
+## Fase 16, hito 16.27: daño por arma en la pausa (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+`scripts/ui/damage_table.gd` (`DamageTable`) y `CombatWorld.table_of`.
+
+- **Pausa > «Daño de la partida»** (debajo de Continuar; no en los invitados, que solo tienen Continuar y Menú principal): una fila por cada fuente que ha hecho daño en este nivel, de más a menos, con su imagen, nombre (y nivel, si es un arma que lleva), qué es (arma física, de fuego o mágica, evolución, objeto, compañero), una barra con su daño frente al de la primera, su parte del total, el daño, el daño por segundo y los abatidos. Más de 12 fuentes: el resto, sumado en «Otros (N)». Al pie, el total, el daño por segundo de la partida y el tiempo jugado.
+- **Daño por segundo:** `CombatWorld` lleva un reloj (`clock`, en pasos de física: la pausa no cuenta) y el segundo en que cada etiqueta hizo daño por primera vez (`since`); el de cada fuente cuenta desde entonces, para que un arma cogida en el minuto 4 no salga rebajada. Los datos eran los de la ficha (`stats`, por etiqueta «J1:webly»); la ficha sigue igual.
+- **Cooperativo:** un jugador cada vez, con su color en el título; izquierda/derecha, LB/RB o Q/E cambian. B / Esc vuelve a la pausa; Start sigue jugando.
+- **Pruebas:** `tests/test_damage_table.gd` (orden, parte, daño por segundo desde la primera vez, solo las del jugador; el botón en la pausa). 694 de 694.
+- **Capturas:** `shots/game_dano_071.0s.png` (Carter al minuto), `shots/game_dano2_041.0s.png` (el J2 en cooperativo). Opción: `dmg_table=T` abre la pausa y la tabla a los T s (`dmg_player=N`, la del J N).
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

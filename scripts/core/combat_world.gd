@@ -10,6 +10,10 @@ extends Node3D
 var bullets: BulletManager
 ## Estadísticas de la partida por etiqueta de arma ("J1:webly"): [daño hecho, enemigos abatidos].
 var stats := {}
+## Daño por segundo de cada fuente (hito 16.27): reloj de la partida (en pasos de física, así
+## que la pausa no cuenta) y segundo en que cada etiqueta hizo daño por primera vez.
+var clock := 0.0
+var since := {}
 var breakables: Array[Node3D] = []           ## objetos rompibles: se golpean, no se apuntan
 var flow: FlowField                          ## mapa de flujo hacia los jugadores (rodear el decorado)
 var freeze_t := 0.0                          ## s de tiempo congelado (recompensa): enemigos y sus balas quietos
@@ -43,6 +47,7 @@ func remove_enemy(e: Node3D) -> void:
 	enemies.erase(e)
 
 func _physics_process(delta: float) -> void:
+	clock += delta
 	if freeze_t > 0.0: freeze_t -= delta
 	rebuild_grid()
 	if flow == null and obstacles != null and obstacles.has_mask() and not OS.get_cmdline_user_args().has("noflow=true"):
@@ -223,6 +228,7 @@ func record_damage(tag: StringName, amount: float) -> void:
 	var s: Array = stats.get(tag, [0.0, 0])
 	s[0] += amount
 	stats[tag] = s
+	if not since.has(tag): since[tag] = clock
 
 func record_kill(tag: StringName, pos := Vector3.INF) -> void:
 	if tag == &"": return
@@ -259,6 +265,25 @@ func stats_of(index: int) -> Dictionary:
 		out[ks.substr(prefix.length())] = stats[k]
 		total[0] += stats[k][0]; total[1] += stats[k][1]
 	return {"weapons": out, "total": total}
+
+## Tabla de daño de un jugador (hito 16.27): una fila por fuente {"id", "damage", "kills", "dps",
+## "share"}, de más a menos daño. El daño por segundo cuenta desde que esa fuente hizo daño por
+## primera vez (un arma cogida en el minuto 4 no sale rebajada por los cuatro primeros).
+func table_of(index: int) -> Array[Dictionary]:
+	var prefix := "J%d:" % (index + 1)
+	var rows: Array[Dictionary] = []
+	var total := 0.0
+	for k in stats:
+		var ks := String(k)
+		if not ks.begins_with(prefix): continue
+		var s: Array = stats[k]
+		if s[0] <= 0.0 and s[1] <= 0: continue
+		total += s[0]
+		rows.append({"id": ks.substr(prefix.length()), "damage": float(s[0]), "kills": int(s[1]),
+			"dps": float(s[0]) / maxf(clock - float(since.get(k, 0.0)), 1.0)})
+	for r in rows: r["share"] = r.damage / total if total > 0.0 else 0.0
+	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.damage > b.damage)
+	return rows
 
 func enemies_in_circle(pos: Vector3, r: float) -> Array[Node3D]:
 	var out: Array[Node3D] = []

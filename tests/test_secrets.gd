@@ -43,3 +43,10 @@ func test_la_llave_adormece() -> void:
 	assert_eq(w.delivery, WeaponData.Delivery.BOOMERANG)
 	assert_gt(w.stun, 0.0)
 	assert_eq(w.look, "llave")
+
+func test_sus_armas_no_salen_hasta_abrirlos() -> void:
+	var s := SaveData.new()
+	assert_eq(Secrets.locked_weapons(s), [&"llave_suenos", &"huellas_dunwich"])
+	s.characters.append("carter")
+	assert_eq(Secrets.locked_weapons(s), [&"huellas_dunwich"])
+	assert_true(Secrets.locked_weapons(null).is_empty(), "sin partida, todas")

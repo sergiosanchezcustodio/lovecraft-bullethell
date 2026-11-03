@@ -42,6 +42,7 @@ extends Node3D
 ##   tour=x,z;x,z            el J1 salta a cada punto a tour_at (2) + i·tour_every (2) s (capturas)
 ##   photo_at=t              abre la pausa y el modo foto a los t s (photo_auto=true: captura, foto y sale; hito 13.12)
 ##   sheet_at=2 / map_at=2   abre la ficha o el mapa del J1 a ese segundo (capturas)
+##   dmg_table=t             abre la pausa y la tabla de daño a los t s (dmg_player=N: la del J N; hito 16.27)
 ##   hitstop=false           sin micro-pausa al impactar
 ##   boss_intro=false        sin la entrada de los jefes (BossIntro): solo el aviso, como antes
 ##   final_next=true         el evento final saca directamente el jefe que viene después (Padre Dagon sin Madre Hydra)
@@ -547,6 +548,10 @@ func _ready() -> void:
 			toggle_pause()
 			if args.get_bool("dif_menu"): _open_difficulty()         # la dificultad (D-42)
 			else: _open_debug())
+	if args.has("dmg_table"):                      # abre la pausa y la tabla de daño (hito 16.27, capturas)
+		get_tree().create_timer(args.get_float("dmg_table", 1.0)).timeout.connect(func() -> void:
+			toggle_pause()
+			_open_damage())
 	if args.has("photo_at"):                       # abre la pausa y el modo foto (hito 13.12, capturas)
 		get_tree().create_timer(args.get_float("photo_at", 1.0)).timeout.connect(func() -> void:
 			toggle_pause()
@@ -666,8 +671,9 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	add_child(q)
 	world.add_player(q)
 	players.append(q)
+	var hidden := Secrets.locked_weapons(Saves.current)          # las de los secretos cerrados, no (16.25)
 	for w in DebugOptions.list_resources("res://data/weapons"):    # todas las armas, sin las evoluciones (D-06)
-		if not (w as WeaponData).evolved: q.progress.weapon_pool.append(w)
+		if not (w as WeaponData).evolved and not hidden.has((w as WeaponData).id): q.progress.weapon_pool.append(w)
 	for up in DebugOptions.list_resources("res://data/upgrades"):    # todos los objetos (D-38)
 		q.progress.upgrade_pool.append(up)
 	q.progress.leveled_up.connect(func(l: int) -> void: Achievements.record(Saves.current, "best_level", l))
@@ -998,6 +1004,7 @@ func _open_pause() -> void:
 	_pause.debug.connect(_open_debug)
 	_pause.difficulty.connect(_open_difficulty)
 	_pause.photo.connect(_open_photo)
+	_pause.damage.connect(_open_damage)
 	_pause.quit.connect(_quit)
 	add_child(_pause)
 
@@ -1207,6 +1214,11 @@ func _open_difficulty() -> void:
 func _open_photo() -> void:
 	if _debug != null: return
 	_over_pause(PhotoMode.new(self), "Modo foto")
+
+## Pausa > Daño de la partida (hito 16.27): tabla por arma, objeto y compañero.
+func _open_damage() -> void:
+	if _debug != null: return
+	_over_pause(DamageTable.new(self, args.get_int("dmg_player", 1) - 1), "Daño de la partida")
 
 ## Un menú encima de la pausa (con back y close): al volver, el foco en su botón.
 func _over_pause(m: CanvasLayer, button: String) -> void:

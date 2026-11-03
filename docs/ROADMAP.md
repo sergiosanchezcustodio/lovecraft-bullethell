@@ -474,7 +474,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | Hito | Contenido | De dónde |
 |---|---|---|
 | 16.26 | **Archivo de expediciones:** en la Biblioteca, cada partida con su investigador, armas y objetos finales, minuto, causa de la caída y daño por arma; se puede repetir con la misma semilla | *Brotato*, *Halls of Torment* |
-| 16.27 | **Daño por arma en la pausa:** tabla con el daño total y por segundo de cada arma y objeto en esta partida | *HoloCure*, *Brotato* |
+| 16.27 | **Daño por arma en la pausa:** tabla con el daño total y por segundo de cada arma y objeto en esta partida | *HoloCure*, *Brotato*. **Hecho (03-11-2026), pendiente de tu revisión:** «Daño de la partida» en la pausa: una fila por arma, objeto y compañero, de más a menos, con su parte del total (y barra), daño, daño por segundo (desde que hizo daño por primera vez) y abatidos; total al pie; en cooperativo, un jugador cada vez |
 | 16.28 | **Sala de trofeos:** en la Biblioteca, una vitrina 3D con un trofeo por jefe vencido, por logro grande y por conjunto completo, que se va llenando | *HoloCure* (la casa), *Hades* |
 | 16.29 | **Comparar antes de elegir:** en la tienda y en la subida, lo que cambia en tus estadísticas (en verde y rojo) | Buena práctica del género |
 | 16.30 | **Más vibración del mando**, con intensidad regulable: hoy solo vibra al recibir daño (`Player._rumble`); añadir explosiones cercanas, la entrada y la caída de los jefes, la subida de nivel y la crisis de cordura | Buena práctica del género |
