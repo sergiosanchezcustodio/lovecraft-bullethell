@@ -10,9 +10,9 @@
 		]},
 		{"title": "La sombra sobre Innsmouth", "place": "Nueva Inglaterra", "levels": [
 			{"id": "p2_n1", "name": "Newburyport y la carretera a Innsmouth", "creatures": "Habitantes de Innsmouth · Acólitos de la Orden de Dagon"},
-			{"id": "p2_n2", "name": "Las calles de Innsmouth y el templo de la Orden", "creatures": "Híbridos avanzados · Sacerdotes de la tiara"},
-			{"id": "p2_n3", "name": "El hotel Gilman House y la huida por los tejados", "creatures": "Profundos · La horda del Arrecife del Diablo"},
-			{"id": "p2_n4", "name": "Los pantanos y la vía muerta del tren a Rowley", "creatures": "Barnabas Marsh · Profundos ancianos de Y'ha-nthlei · Nadadores de la marea"},
+			{"id": "p2_n2", "name": "Las calles de Innsmouth y el templo de la Orden", "creatures": "Híbridos avanzados · Sacerdotes de la tiara · Guardianes de la Orden"},
+			{"id": "p2_n3", "name": "El hotel Gilman House y la huida por los tejados", "creatures": "Profundos · Guardianes de la Orden · Hijas de los Marsh · La horda del Arrecife del Diablo"},
+			{"id": "p2_n4", "name": "Los pantanos y la vía muerta del tren a Rowley", "creatures": "Barnabas Marsh · Profundos ancianos de Y'ha-nthlei · Nadadores de la marea · Hijas de los Marsh"},
 			{"id": "p2_n5", "name": "El Arrecife del Diablo y Y'ha-nthlei", "creatures": "Pth'thya-l'yi · Madre Hydra · Padre Dagon"}
 		]},
 		{"title": "La llamada de Cthulhu", "place": "Providence, Luisiana y el Pacífico", "levels": [

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"hija_marsh"
+display_name = "Hija de los Marsh"
+model = "hija_marsh"
+tier = 3
+spawn_weight = 0.35
+elite = false
+tags = Array[StringName]([&"humana"])
+max_health = 55.0
+hit_radius = 0.5
+body_radius = 0.5
+move_speed = 1.8
+xp = 4.0
+money = 6
+contact_physical = 4.0
+contact_mental = 4.0
+movement = &"sing"
+params = {"keep": 7.5, "sing_every": 2.6, "sing_heal": 0.12, "sing_radius": 6.0, "strafe": 0.4}
+attack_cooldown = 99.0
+attack_range = 0.0

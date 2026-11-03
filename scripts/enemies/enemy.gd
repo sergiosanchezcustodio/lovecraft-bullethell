@@ -482,6 +482,9 @@ func stun(seconds: float) -> void:
 
 func take_damage(d: Damage) -> void:
 	if puppet:                                 # el daño de verdad lo cuenta el anfitrión
+		if blocks(d):
+			_block_fx()
+			return
 		_hit_flash()
 		_hit_pose(d)
 		var guess := d.physical                # la cifra, aproximada (sin las bonificaciones)
@@ -495,6 +498,9 @@ func take_damage(d: Damage) -> void:
 		Auto.sfx_at("glass", global_position)
 		VoxelFx.puff(world.fx, global_position + Vector3(0, 0.6 * model_scale, 0), "sparkle", 0.5, WARD_COLOR)
 		_hit_flash()
+		return
+	if blocks(d):                              # el escudo del guardián para lo que llega de frente (16.17)
+		_block_fx()
 		return
 	Auto.sfx_at("hit", global_position)
 	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
@@ -879,7 +885,7 @@ func _physics_process(delta: float) -> void:
 		elif obstacles != null: np = obstacles.push_out(np, data.body_radius)
 		position = Vector3(np.x, position.y, np.y)
 	if velocity.length() > 0.1:
-		facing = facing.slerp(velocity.normalized(), 1.0 - exp(-10.0 * delta)).normalized()
+		facing = facing.slerp(velocity.normalized(), 1.0 - exp(-float(data.params.get("turn", 10.0)) * delta)).normalized()   # turn: el guardián gira despacio (16.17)
 	if guard_ring != null: guard_ring.rotation.y += 0.05
 	# Contacto con los jugadores
 	if data.aura_drain > 0.0:                   # presencia: drena cordura a los de dentro del aura
@@ -1207,6 +1213,29 @@ func set_ward(n: int) -> void:
 	_ward_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_ward_mesh.position.y = sm.height * 0.5
 	add_child(_ward_mesh)
+
+## Escudo frontal (guardián de la Orden, hito 16.17, `params.front_shield` = medio ángulo en
+## grados): para lo que llega de frente (balas, tajos, empujones); por los lados, por detrás, las
+## zonas y los daños continuos, no. La dirección sale de `Damage.dir`, del empuje o de quién lo da.
+const SHIELD_COLOR := Color(0.85, 0.62, 0.30)
+var _block_cd := 0.0
+func blocks(d: Damage) -> bool:
+	var arc := float(data.params.get("front_shield", 0.0))
+	if arc <= 0.0 or d.dot or buried: return false
+	var dir := d.dir if d.dir != Vector3.ZERO else d.knockback
+	if dir == Vector3.ZERO and d.source is Node3D and is_instance_valid(d.source):
+		dir = global_position - (d.source as Node3D).global_position
+	dir.y = 0.0
+	if dir.length_squared() < 0.0001: return false
+	return dir.normalized().dot(facing) < -cos(deg_to_rad(arc))
+
+func _block_fx() -> void:
+	var at := global_position + facing * (data.body_radius * model_scale + 0.1) + Vector3(0, 0.85 * model_scale, 0)
+	var now := Time.get_ticks_msec() / 1000.0
+	if now < _block_cd: return
+	_block_cd = now + 0.12
+	VoxelFx.puff(world.fx, at, "sparkle", 0.35, SHIELD_COLOR, 0.6)
+	Auto.sfx_at("bell", at)
 
 ## Nacida de partirse otra (grado III): más pequeña.
 func set_small() -> void:

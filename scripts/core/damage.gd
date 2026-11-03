@@ -16,6 +16,7 @@ var bonus := {}
 ## contexto `ctx` al crearse: WeaponSystem lo pone al disparar cada arma y cada efecto (bala,
 ## zona, onda…) guarda el suyo al crearse y lo vuelve a poner antes de dañar.
 var tag := &""
+var dir := Vector3.ZERO          ## hacia dónde va el golpe (las balas; si no, `knockback`): escudo del guardián (16.17)
 var dot := false                 ## daño continuo (quemadura…): no dispara los objetos al impactar
 ## Contra los jugadores (informe al caer, hito 13.1): por dónde llega ("bala", "contacto", "golpe",
 ## "zona", "peligro"…; vacío: "golpe" si lo da un enemigo) y quién, cuando `source` no está (las

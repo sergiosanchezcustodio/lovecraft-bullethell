@@ -56,4 +56,6 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 | **Tamborilero del pantano** | Hito 15.3 (`gen_enemigos_fase15.py`) | Cultista de Luisiana: torso desnudo pintado de costillas, cara de calavera, tambor de piel delante y baquetas. Humano (`anim_humano`). |
 | **Shoggoth excavador** | Hito 16.16 (`gen_fragmento.py 3 shoggoth_excavador 1940`) | Fragmento grande y negro con costras de escarcha, esquirlas de hielo clavadas y dientes de hielo. Se entierra y sale bajo el jugador. `anim_fragmento`. |
 | **Antiguo sembrador** | Hito 16.16 (`gen_antiguo.py`, variante `sembrador`) | Antiguo sin alas con liquen y sacos de esporas que brillan en amarillo; planta vainas (`vaina_esporas`, `gen_enemigos_fase16.py`). `anim_antiguo`. |
+| **Guardián de la Orden** | Hito 16.17 (`gen_enemigos_fase16.py`) | Híbrido de grado 3 corpulento con túnica verde marino, peto de bronce y escudo redondo de bronce con verdín y un pez en el umbo. `anim_humano`. |
+| **Hija de los Marsh** | Hito 16.17 (`gen_enemigos_fase16.py`) | Joven de grado 1, pálida, melena negra, vestido verde mar con encaje y tiara de oro abierta. `anim_humano`. |
 | Abisal | Prototipo | Negro azulado, ojos cian brillantes, líneas bioluminiscentes, dientes largos. |

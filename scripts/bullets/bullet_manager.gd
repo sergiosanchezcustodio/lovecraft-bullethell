@@ -356,6 +356,7 @@ func _collide_player_bullet(i: int) -> bool:
 		d.tag = _tag[i]
 		impact(_pos[i], _style[i])
 		d.knockback = _vel[i].normalized() * _push[i]
+		d.dir = _vel[i].normalized()
 		if _bonus[i] >= 0: d.bonus = bonus_sets[_bonus[i]]
 		t.take_damage(d)
 		if _effect[i] == Effect.STASIS and t.is_alive() and t.has_method("stasis"): t.stasis(_effect_val[i])

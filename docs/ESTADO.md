@@ -1650,6 +1650,16 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
 - **Pruebas:** tres más en `tests/test_new_enemies.gd` (en su nivel, el excavador se entierra y sale debajo, el sembrador planta y la vaina revienta). 659 de 659.
 - **Capturas:** `shots/shoggoth_excavador-antiguo_sembrador-antiguo_guerrero_35_f16.png` (modelos), `shots/game_excav2_*.png` (grietas, aviso y salida) y `shots/game_sembr_014.0s.png`. El equilibrio, sin medir con el bot.
 
+## Fase 16, hito 16.17: enemigos nuevos de la parte 2 (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+- **Guardián de la Orden de Dagón** (`guardian_orden`, escalón 3, niveles 2.2 y 2.3; `tools/gen_enemigos_fase16.py`, `anim_humano`): híbrido de grado 3 corpulento, túnica verde marino hasta la rodilla (faldón), peto de bronce con remaches, correaje y un escudo redondo de bronce con verdín, corona de olas y un pez en el umbo, en el antebrazo izquierdo. Persigue (`chase`) y gira despacio (`params.turn = 2.2`; `Enemy.facing` gira con `turn`, 10 por defecto). `params.front_shield = 65`: `Enemy.blocks(d)` para lo que llega en un cono de 65° de frente, con chispas de bronce y una campanada (`_block_fx`, una cada 0,12 s); la dirección sale de `Damage.dir` (nueva; las balas del jugador la ponen), del empuje o de quién da. Las zonas, los daños continuos y lo que llega de lado o por detrás pasan. En el invitado, la marioneta hace lo mismo (sin cifra).
+- **Hija de los Marsh** (`hija_marsh`, escalón 3, niveles 2.3 y 2.4): joven de grado 1, pálida, melena negra, vestido largo verde mar con encaje (faldón) y una tiara de oro abierta. `SingBehavior` (sobre `KeepBehavior`, a 7,5 m): cada 2,6 s canta y cura el 12 % de la vida máxima a las criaturas con la etiqueta `marina` a 6 m (ella no), con chispas en las curadas; las notas («♪», «♪ ♫» si ha curado) van con `world.shout` y el canto con `world.sfx` (se ven y se oyen en red).
+- **Textos:** «Criaturas» del mapa y bestiario.
+- **Pruebas:** tres más en `tests/test_new_enemies.gd` (en su nivel, el escudo para lo de frente y no lo de detrás, de lado ni las zonas, y la canción cura solo a los marinos cercanos). 662 de 662.
+- **Capturas:** `shots/guardian_orden-hija_marsh_20_f16c.png` (modelos) y `shots/game_orden_018.0s.png` (partida, con las notas). El equilibrio, sin medir con el bot.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

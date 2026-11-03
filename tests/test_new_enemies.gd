@@ -115,3 +115,49 @@ func test_el_sembrador_planta_vainas_que_revientan() -> void:
 	assert_true(pod._fuse > 0.0, "se enciende")
 	for i in 40: if is_instance_valid(pod): pod._physics_process(DT)
 	assert_true(not is_instance_valid(pod) or pod.is_queued_for_deletion(), "reventada")
+
+## Fase 16, hito 16.17: el guardián de la Orden y la hija de los Marsh.
+func test_los_de_la_parte_2_existen_y_salen_en_su_nivel() -> void:
+	for pair in [["guardian_orden", "p2_n2"], ["guardian_orden", "p2_n3"], ["hija_marsh", "p2_n3"], ["hija_marsh", "p2_n4"]]:
+		var d: EnemyData = load("res://data/enemies/%s.tres" % pair[0])
+		assert_true(FileAccess.file_exists("res://models/%s.json" % d.model), d.model)
+		assert_ne(Library.text("enemies", String(d.id)), "", "texto del bestiario de " + pair[0])
+		var lv: LevelData = load("res://data/levels/%s.tres" % pair[1])
+		assert_true(lv.pool.any(func(x: EnemyData) -> bool: return x.id == d.id), "%s en %s" % pair)
+
+func test_el_escudo_del_guardian_para_lo_de_frente() -> void:
+	var e := _enemy("guardian_orden", Vector3.ZERO)
+	e.facing = Vector3(0, 0, 1)
+	var hp := e.health
+	var front := Damage.new(20.0, 0.0)
+	front.dir = Vector3(0, 0, -1)                   # le llega de frente
+	e.take_damage(front)
+	assert_eq(e.health, hp, "de frente, nada")
+	var back := Damage.new(20.0, 0.0)
+	back.dir = Vector3(0, 0, 1)                     # por la espalda
+	e.take_damage(back)
+	assert_lt(e.health, hp, "por detrás, sí")
+	var hp2 := e.health
+	var side := Damage.new(20.0, 0.0)
+	side.dir = Vector3(1, 0, 0)                     # de lado
+	e.take_damage(side)
+	assert_lt(e.health, hp2, "de lado, también")
+	var zone := Damage.new(5.0, 0.0)                # sin dirección (zonas): pasa
+	var hp3 := e.health
+	e.take_damage(zone)
+	assert_lt(e.health, hp3)
+
+func test_la_hija_de_los_marsh_cura_a_los_marinos() -> void:
+	var singer := _enemy("hija_marsh", Vector3.ZERO)
+	var deep := _enemy("profundo", Vector3(3, 0, 0))
+	var cult := _enemy("acolito", Vector3(-3, 0, 0))
+	var far := _enemy("profundo", Vector3(20, 0, 0))
+	for e in [singer, deep, cult, far]: e.health *= 0.5    # (se apuntan solos en world.enemies)
+	world.rebuild_grid()
+	var hd := deep.health
+	var hc := cult.health
+	var hf := far.health
+	assert_eq((singer.behavior as SingBehavior).sing(singer), 1)
+	assert_gt(deep.health, hd, "el Profundo cercano se cura")
+	assert_eq(cult.health, hc, "el acólito, no (no es marino)")
+	assert_eq(far.health, hf, "el lejano, no")
