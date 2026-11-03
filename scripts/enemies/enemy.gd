@@ -54,6 +54,9 @@ const FLASH_BIG := 0.06                     ## destello de jefes y gigantes (s)
 const FLASH_BIG_GAP := 0.2                  ## y su pausa mínima entre uno y otro (s)
 const FLASH_BIG_ADD := 0.2                  ## luz que suman (los demás, blanco al 75 %)
 const DRUM_EVERY := 0.6
+## Ídolo vivo (hito 16.18): los que están cerca de él (`idol_t` > 0) reciben menos daño.
+const IDOL_GUARD := 0.6
+var idol_t := 0.0
 var drum_t := 0.0
 var _drum_next := 0.0
 var _revived := false
@@ -222,6 +225,8 @@ func _ready() -> void:
 	anim_t = randf()
 	if data.aura_drain > 0.0 and data.aura_radius > 0.0:
 		_aura_mat = _disc(Color(0.45, 0.2, 0.7, 0.18), data.aura_radius)
+	if data.params.has("guard_radius"):            # ídolo vivo (16.18): el corro que protege, también en red
+		_disc(Color(0.20, 0.55, 0.30, 0.07), float(data.params.guard_radius))
 	if data.elite and data.body_radius * model_scale < 2.0:
 		_mark_mat = _disc(Color(part_tint, 0.3), maxf(data.body_radius * model_scale * 2.0, 1.0))
 	if puppet: anim_hold = true                # la fase de la animación llega con cada foto
@@ -504,6 +509,7 @@ func take_damage(d: Damage) -> void:
 		return
 	Auto.sfx_at("hit", global_position)
 	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
+	if idol_t > 0.0: k *= IDOL_GUARD           # al amparo del ídolo vivo (16.18)
 	for tag in data.tags: k *= float(d.bonus.get(tag, 1.0))    # rasgos contra este tipo de enemigo
 	if data.elite or data.unique: k *= float(d.bonus.get(Player.ELITE_TAG, 1.0))   # Medallón del cazador
 	if _stun > 0.0 or _root_t > 0.0: k *= float(d.bonus.get(Player.HELD_TAG, 1.0))   # Signo de Tsathoggua (16.9)
@@ -839,6 +845,7 @@ func _physics_process(delta: float) -> void:
 		_ai_vel = velocity
 	if Engine.get_physics_frames() % 15 == get_instance_id() % 15: _far = _far_from_players()
 	if _slow_t > 0.0: velocity *= _slow_k
+	if idol_t > 0.0: idol_t -= delta
 	if drum_t > 0.0:                                  # al ritmo del tambor (15.3)
 		drum_t -= delta
 		velocity *= DRUM_SPEED

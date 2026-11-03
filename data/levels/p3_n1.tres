@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/enemies/pesadilla.tres" id="2"]
 [ext_resource type="Resource" path="res://data/enemies/cultista.tres" id="3"]
 [ext_resource type="Resource" path="res://data/enemies/pesadilla_relieve.tres" id="7"]
+[ext_resource type="Resource" path="res://data/enemies/sonambulo.tres" id="f16z"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
 
 [resource]
@@ -16,7 +17,7 @@ arena = "res://data/arenas/estudio.json"
 health_mult = 1.0
 duration = 300.0
 music = "res://resources/Music/cc0/p3_n1_dungeon_deep.ogg"
-pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3")])
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("f16z")])
 spawn_rate = Array[Vector2]([Vector2(0, 0.3), Vector2(45, 0.5), Vector2(90, 0.82), Vector2(150, 1.35), Vector2(210, 1.85), Vector2(300, 2.35)])
 max_alive = 75
 elite_cap = 1

@@ -1660,6 +1660,16 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
 - **Pruebas:** tres más en `tests/test_new_enemies.gd` (en su nivel, el escudo para lo de frente y no lo de detrás, de lado ni las zonas, y la canción cura solo a los marinos cercanos). 662 de 662.
 - **Capturas:** `shots/guardian_orden-hija_marsh_20_f16c.png` (modelos) y `shots/game_orden_018.0s.png` (partida, con las notas). El equilibrio, sin medir con el bot.
 
+## Fase 16, hito 16.18: enemigos nuevos de la parte 3 (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+- **Sonámbulo de Providence** (`sonambulo`, escalón 3, niveles 3.1 y 3.4; `tools/gen_enemigos_fase16.py`, `anim_humano`): un vecino de la oleada de sueños de 1925, en camisón largo de rayas, gorro de dormir con la punta por la nuca, descalzo, ojos cerrados con ojeras y la boca entreabierta. Aura de presencia (2,6 m, 3,5 de cordura por segundo; el disco violeta de siempre). `DreamBehavior`: anda despacio (1,4 m/s) y cada 5 s, si su objetivo está a más de 4 m, se desvanece en bruma violeta (`world.ground_hit`, `magic`) y reaparece a 1,8 m de él en un sitio libre, tras un aviso de 0,7 s (`Telegraph.enemy`, `rise_fog`). Desvanecido usa `Enemy.buried` (del 16.16): ni se ve, ni toca, ni se le puede dar.
+- **Ídolo vivo** (`idolo_vivo`, escalón 3, niveles 3.2 y 3.3): estatuilla de Cthulhu del tamaño de un hombre, de piedra verdinegra con vetas, agachada sobre un pedestal con jeroglíficos, cabeza de pulpo con barba de tentáculos, alas de membrana y ojos verdes que brillan (voxlib; partes `body`, `top`, `pod_l`/`pod_r` y `base` quieta, con `anim_fragmento`: respira, la cabeza ondula y se hincha al disparar). `IdolBehavior`: no se mueve (vuelve a su sitio si lo empujan), dispara `idolo_espiral` (cuatro balas en 16 ráfagas que giran 13°) cada 4 s a 11 m y cada 0,5 s ampara a los que están a 5 m: con `Enemy.idol_t` reciben un 40 % menos de daño (`IDOL_GUARD`). El corro, un disco verde tenue en el suelo (`params.guard_radius`, también en los invitados).
+- **Textos:** «Criaturas» del mapa y bestiario.
+- **Pruebas:** tres más en `tests/test_new_enemies.gd` (en su nivel, el sonámbulo reaparece al lado del jugador, el ídolo ampara a los cercanos y vuelve a su sitio). 665 de 665.
+- **Capturas:** `shots/sonambulo_25_f16e.png`, `shots/sonambulo-idolo_vivo_25_f16d.png` (modelos), `shots/game_sonamb_014.0s.png` y `shots/game_idolo2_030.0s.png` (la espiral). El equilibrio, sin medir con el bot.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

@@ -16,10 +16,10 @@
 			{"id": "p2_n5", "name": "El Arrecife del Diablo y Y'ha-nthlei", "creatures": "Pth'thya-l'yi · Madre Hydra · Padre Dagon"}
 		]},
 		{"title": "La llamada de Cthulhu", "place": "Providence, Luisiana y el Pacífico", "levels": [
-			{"id": "p3_n1", "name": "Providence: el estudio del escultor Wilcox", "creatures": "Pesadillas de la oleada de sueños · Cultistas"},
-			{"id": "p3_n2", "name": "Los pantanos de Luisiana: el ritual del culto", "creatures": "Diablos con alas de murciélago · Cultistas del Alert · Tamborileros del pantano"},
-			{"id": "p3_n3", "name": "Los muelles y la cubierta del Alert", "creatures": "Engendros de Cthulhu · Profundos servidores"},
-			{"id": "p3_n4", "name": "La tormenta en el Pacífico", "creatures": "La cosa blanca polipoide · Ángulos devoradores"},
+			{"id": "p3_n1", "name": "Providence: el estudio del escultor Wilcox", "creatures": "Pesadillas de la oleada de sueños · Cultistas · Sonámbulos de Providence"},
+			{"id": "p3_n2", "name": "Los pantanos de Luisiana: el ritual del culto", "creatures": "Diablos con alas de murciélago · Cultistas del Alert · Tamborileros del pantano · Ídolos vivos"},
+			{"id": "p3_n3", "name": "Los muelles y la cubierta del Alert", "creatures": "Engendros de Cthulhu · Profundos servidores · Ídolos vivos"},
+			{"id": "p3_n4", "name": "La tormenta en el Pacífico", "creatures": "La cosa blanca polipoide · Ángulos devoradores · Sonámbulos de Providence"},
 			{"id": "p3_n5", "name": "R'lyeh emergida: la puerta colosal", "creatures": "Primigenios menores · Emanaciones de la puerta · Cthulhu"}
 		]}
 	]

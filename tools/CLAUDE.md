@@ -58,4 +58,6 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 | **Antiguo sembrador** | Hito 16.16 (`gen_antiguo.py`, variante `sembrador`) | Antiguo sin alas con liquen y sacos de esporas que brillan en amarillo; planta vainas (`vaina_esporas`, `gen_enemigos_fase16.py`). `anim_antiguo`. |
 | **Guardián de la Orden** | Hito 16.17 (`gen_enemigos_fase16.py`) | Híbrido de grado 3 corpulento con túnica verde marino, peto de bronce y escudo redondo de bronce con verdín y un pez en el umbo. `anim_humano`. |
 | **Hija de los Marsh** | Hito 16.17 (`gen_enemigos_fase16.py`) | Joven de grado 1, pálida, melena negra, vestido verde mar con encaje y tiara de oro abierta. `anim_humano`. |
+| **Sonámbulo de Providence** | Hito 16.18 (`gen_enemigos_fase16.py`) | Camisón de rayas, gorro de dormir, descalzo, ojos cerrados con ojeras. `anim_humano`. |
+| **Ídolo vivo** | Hito 16.18 (`gen_enemigos_fase16.py`) | Estatuilla de Cthulhu de piedra verdinegra sobre un pedestal con jeroglíficos; ojos verdes. Partes `body`, `top`, `pod_l`, `pod_r` y `base` (quieta), con `anim_fragmento`. |
 | Abisal | Prototipo | Negro azulado, ojos cian brillantes, líneas bioluminiscentes, dientes largos. |

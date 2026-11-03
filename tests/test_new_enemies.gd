@@ -161,3 +161,42 @@ func test_la_hija_de_los_marsh_cura_a_los_marinos() -> void:
 	assert_gt(deep.health, hd, "el Profundo cercano se cura")
 	assert_eq(cult.health, hc, "el acólito, no (no es marino)")
 	assert_eq(far.health, hf, "el lejano, no")
+
+## Fase 16, hito 16.18: el sonámbulo de Providence y el ídolo vivo.
+func test_los_de_la_parte_3_existen_y_salen_en_su_nivel() -> void:
+	for pair in [["sonambulo", "p3_n1"], ["sonambulo", "p3_n4"], ["idolo_vivo", "p3_n2"], ["idolo_vivo", "p3_n3"]]:
+		var d: EnemyData = load("res://data/enemies/%s.tres" % pair[0])
+		assert_true(FileAccess.file_exists("res://models/%s.json" % d.model), d.model)
+		assert_ne(Library.text("enemies", String(d.id)), "", "texto del bestiario de " + pair[0])
+		var lv: LevelData = load("res://data/levels/%s.tres" % pair[1])
+		assert_true(lv.pool.any(func(x: EnemyData) -> bool: return x.id == d.id), "%s en %s" % pair)
+
+func test_el_sonambulo_aparece_al_lado() -> void:
+	var p := Player.new().setup(load("res://data/characters/dyer.tres"), BotInput.new("idle"), Color.YELLOW)
+	world.add_child(p)
+	world.add_player(p)
+	p.position = Vector3(10, 0, 0)
+	var e := _enemy("sonambulo", Vector3.ZERO)
+	(e.behavior as DreamBehavior)._blink = 0.0
+	_step(e, 0.05)
+	assert_true(e.buried, "desvanecido")
+	assert_false(e.visual.visible)
+	_step(e, 1.0)
+	assert_false(e.buried, "ha vuelto")
+	assert_lt(Vector2(e.position.x - 10.0, e.position.z).length(), 2.5, "al lado del jugador")
+
+func test_el_idolo_no_se_mueve_y_ampara_a_los_cercanos() -> void:
+	var idol := _enemy("idolo_vivo", Vector3.ZERO)
+	var near := _enemy("cultista", Vector3(3, 0, 0))
+	var far := _enemy("cultista", Vector3(15, 0, 0))
+	assert_eq((idol.behavior as IdolBehavior).guard(idol), 1)
+	assert_gt(near.idol_t, 0.0)
+	assert_eq(far.idol_t, 0.0)
+	var a := near.health
+	near.take_damage(Damage.new(10.0, 0.0))
+	var b := far.health
+	far.take_damage(Damage.new(10.0, 0.0))
+	assert_almost_eq(a - near.health, (b - far.health) * Enemy.IDOL_GUARD, 0.01, "el amparado recibe menos")
+	idol.position = Vector3(1, 0, 0)                 # lo empujan: vuelve a su sitio
+	_step(idol, 1.0)
+	assert_lt(idol.position.length(), 0.1)

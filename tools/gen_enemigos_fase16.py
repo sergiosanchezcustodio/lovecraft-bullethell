@@ -9,6 +9,15 @@
   hija_marsh      hito 16.17: una de las hijas de los Marsh. Joven de grado 1 (ojos saltones, piel
                   grisácea), pálida, con melena larga negra, vestido largo verde mar con encaje
                   y la tiara de oro extraño de la familia; las manos juntas al cantar.
+  sonambulo       hito 16.18: un vecino de Providence que sueña con R'lyeh. Camisón largo de
+                  rayas azul pálido, gorro de dormir, descalzo, pelo gris revuelto, ojos cerrados
+                  con ojeras moradas y la boca entreabierta. Estilo de los humanos.
+  idolo_vivo      hito 16.18: la estatuilla de Cthulhu del tamaño de un hombre, de piedra verdinegra
+                  sobre un pedestal con jeroglíficos: agachado, con cabeza de pulpo, barba de
+                  tentáculos, alas de membrana a la espalda y ojos que brillan. Orgánica (voxlib);
+                  partes body (el cuerpo), top (la cabeza), pod_l/pod_r (las alas) y base (el
+                  pedestal, quieto), para anim_fragmento: respira, la cabeza ondula y se hincha
+                  al disparar.
 Los cuerpos van en sus generadores de siempre: el shoggoth excavador es el fragmento a S=3 con
 costra de hielo (`python tools/gen_fragmento.py 3 shoggoth_excavador 1940`) y el Antiguo
 sembrador, una variante de `tools/gen_antiguo.py`.
@@ -156,7 +165,103 @@ def hija_marsh():
               hat=(GOLD, GOLD_SH), roughness=0.8, specular=0.3, skirt=True)
 
 
+def sonambulo():
+    MATS.clear()
+    GOWN = mat((0.78, 0.80, 0.82), 'lana'); STRIPE = mat((0.52, 0.60, 0.74), 'lana')
+    HAIR = mat((0.44, 0.44, 0.46), 'pelo')
+    SKIN = (0.84, 0.78, 0.72); SKIN_SH = (0.72, 0.66, 0.62)
+    M = cu.new(1619)
+    for s_, _, shin, _, _ in cu.sides():                               # descalzo
+        slab(M, shin, SKIN, 0, 3, 5 * s_, 2, 8, 8, 13, 12, ch=1)
+    cu.legs(M, SKIN_SH, bottom=3)
+    cu.torso(M, GOWN, b=0, bottom=30)
+    cu.skirt(M, GOWN, 8, top=40, b=0, flare=3, depth=13)
+    for (x, y, z), v in M.V.items():                                   # rayas verticales
+        if v[1] == GOWN and (x + 40) % 4 == 0: v[1] = STRIPE
+    for y in range(52, 61, 3): cu.front(M, 0, y, (0.90, 0.90, 0.88), dz=1)   # botonadura
+    cu.neck(M, SKIN)
+    cu.arms(M, GOWN, SKIN, cuff=STRIPE, cuff_wide=False)
+    for (x, y, z), v in M.V.items():
+        if v[0] in ('arm_l', 'arm_r', 'fore_l', 'fore_r') and v[1] == GOWN and (y // 3) % 2 == 0: v[1] = STRIPE
+    cu.head(M, SKIN, SKIN_SH)
+    LID = (0.42, 0.34, 0.36); BAG = (0.56, 0.46, 0.58); MOUTH = (0.30, 0.16, 0.18)
+    for x in (-5, -4, -3, 2, 3, 4):                                    # ojos cerrados con ojeras
+        cu.paint_face(M, x, 74, LID)
+        cu.paint_face(M, x, 73, BAG)
+    for x in (-6, -5, -4, -3, -2, 1, 2, 3, 4, 5): cu.paint_face(M, x, 76, HAIR, dz=1)   # cejas grises
+    for x in (-2, -1, 0, 1): cu.paint_face(M, x, 67, MOUTH)            # boca entreabierta
+    for x in (-1, 0): cu.paint_face(M, x, 66, MOUTH)
+    cu.hair_back(M, SKIN, HAIR, bottom=66)
+    for i in range(14):                                                # pelos revueltos
+        x = M.rng.randint(-7, 6); z = M.rng.randint(-7, 4)
+        t = M.top(x, z)
+        if t is not None: M.put(x, t + 1, z, H, HAIR)
+    CAP = (0.70, 0.74, 0.86); TASSEL = (0.92, 0.92, 0.90)              # gorro de dormir caído hacia atrás
+    slab(M, H, CAP, 79, 84, 0, -0.5, 16, 14, 16, 14, ch=2)
+    for k in range(10):                                                # la punta cae por la nuca
+        for x in (-1, 0):
+            for t in (0, 1): M.put(x, 83 - k + t, -8 - (k + 1) // 3, H, CAP)
+    for dx in (-1, 0, 1):
+        for dy in (0, 1): M.put(dx, 72 + dy, -12, H, TASSEL)
+    cu.finish(M, 'sonambulo', dict(MATS), flat=(LID, BAG, MOUTH, TASSEL), hat=(CAP, TASSEL), roughness=0.9, specular=0.2,
+              skirt=True)
+
+
+STONE = (0.16, 0.22, 0.18); STONE_D = (0.08, 0.11, 0.09); STONE_L = (0.28, 0.36, 0.28); IDOL_EYE = (0.55, 1.0, 0.45)
+PED = (0.30, 0.28, 0.24); PED_D = (0.18, 0.17, 0.15)
+
+
+def idolo():
+    M = Model(S=2, seed=1620)
+    M.box(-7, 0, -7, 7, 6, 7, 'base', PED)                             # pedestal con jeroglíficos
+    M.box(-8, 0, -8, 8, 1.5, 8, 'base', PED_D)
+    for (x, y, z), v in M.V.items():
+        if v[0] == 'base' and 3 <= y <= 10 and M.hsh(x // 2, y // 2, z // 2) > 0.72: v[1] = PED_D
+    M.ell(0, 12.0, -0.5, 4.6, 5.4, 4.0, 'body', STONE)                 # tronco agachado
+    for s in (-1, 1):
+        M.capsule((s * 2.8, 9.0, 0.5), (s * 4.0, 7.2, 4.0), 2.2, 1.6, 'body', STONE)   # muslos
+        for k in (-1, 0, 1):                                           # garras de los pies
+            M.cone((s * 4.0 + k * 0.9, 6.8, 4.5), (s * 4.0 + k * 1.2, 6.4, 6.5), 0.6, 'body', STONE_D, STONE_L)
+        M.capsule((s * 4.2, 15.0, 0.5), (s * 3.2, 10.5, 4.2), 1.3, 1.0, 'body', STONE)   # brazos sobre las rodillas
+        for k in (-1, 0, 1):
+            M.cone((s * 3.2 + k * 0.7, 10.0, 4.6), (s * 3.2 + k * 0.9, 8.6, 5.8), 0.5, 'body', STONE_D, STONE_L)
+    M.ell(0, 21.0, 0.5, 4.2, 4.6, 4.4, 'top', STONE)                   # cabeza de pulpo
+    M.ell(0, 23.6, -1.4, 3.6, 3.2, 3.6, 'top', STONE)
+    for i in range(7):                                                 # barba de tentáculos
+        a = (i - 3) * 0.32
+        x0, z0 = math.sin(a) * 3.0, 3.6 + math.cos(a) * 0.6
+        M.capsule((x0, 18.5, z0), (x0 * 1.3, 14.0 + (i % 2), z0 + 1.4), 0.75, 0.45, 'top', STONE)
+        M.ell(x0 * 1.35, 13.6 + (i % 2), z0 + 1.6, 0.6, 0.7, 0.6, 'top', STONE_L)
+    for s in (-1, 1):                                                  # ojos
+        M.ell(s * 1.9, 21.6, 4.2, 0.8, 0.6, 0.6, 'top', IDOL_EYE, glow=1)
+    for s, p in ((-1, 'pod_l'), (1, 'pod_r')):                         # alas de membrana a la espalda
+        for i in range(4):
+            a = 0.35 + i * 0.28
+            tip = (s * (3.0 + math.cos(a) * 7.0), 14.0 + math.sin(a) * 11.0, -5.0)
+            M.capsule((s * 2.4, 16.5, -3.4), tip, 0.55, 0.35, p, STONE_D)
+        for xv in range(5, 20):
+            for yv in range(30, 52):
+                x, y = xv / 2, yv / 2
+                ang = math.atan2(y - 14.0, x - 3.0)
+                r = math.hypot(x - 3.0, y - 14.0)
+                if 0.3 < ang < 1.3 and r < 7.2:
+                    for zv in (-10, -9):
+                        M.put(xv if s > 0 else -xv - 1, yv, zv, p, STONE if M.hsh(xv, yv, 1) > 0.25 else STONE_D, over=False)
+    for (x, y, z), v in M.V.items():                                   # vetas
+        if v[0] != 'base' and v[2] == 0:
+            n = M.noise(x, y, z, 3.0)
+            if n > 0.7: v[1] = STONE_L
+            elif n < 0.25: v[1] = STONE_D
+    for k in [k for k in M.V if k[1] < 0]: del M.V[k]
+    piv = {'base': [0, 0, 0], 'body': [0, 6.5, 0], 'top': [0, 17.5, 0.5],
+           'pod_l': [-2.4, 16.5, -3.4], 'pod_r': [2.4, 16.5, -3.4]}
+    n = M.export('models/idolo_vivo.json', piv, jitter=0.014, roughness=0.75, specular=0.3)
+    print('idolo_vivo', n, 'voxels')
+
+
 if __name__ == '__main__':
     vaina()
     guardian()
     hija_marsh()
+    sonambulo()
+    idolo()
