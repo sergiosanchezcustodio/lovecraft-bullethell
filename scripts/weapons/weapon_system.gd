@@ -539,8 +539,11 @@ func _boomerang(w: Weapon, target_pos: Vector3) -> bool:
 	for k in n:
 		var off := 0.0 if n == 1 else lerpf(-spread * 0.5, spread * 0.5, k / float(n - 1))
 		var bdir := base.rotated(Vector3.UP, off)
-		world.fx.add_child(Boomerang.new().setup(player, world, bdir, w.stat("range"),
-			w.stat("projectile_speed") + inherited_speed(bdir), w.stat("projectile_radius"), dmg(w), w.stat("knockback"), player.data.bonus_tags))
+		var bm := Boomerang.new().setup(player, world, bdir, w.stat("range"),
+			w.stat("projectile_speed") + inherited_speed(bdir), w.stat("projectile_radius"), dmg(w), w.stat("knockback"), player.data.bonus_tags)
+		bm.stun_s = w.stat("stun")                  # la Llave de los sueños adormece (16.25)
+		bm.look = w.data.look if w.data.look == "llave" else ""
+		world.fx.add_child(bm)
 	player.play_once("throw")
 	fired.emit(w)
 	return true
@@ -550,8 +553,16 @@ func _fissure(w: Weapon, target_pos: Vector3) -> bool:
 	var origin := player.global_position
 	var dir := Vector3(target_pos.x - origin.x, 0, target_pos.z - origin.z)
 	if dir.length() < 0.01: dir = player.motor.facing
-	world.fx.add_child(Fissure.new().setup(world, origin + dir.normalized() * 0.5, dir, w.stat("range"),
-		w.stat("projectile_speed") + inherited_speed(dir), w.stat("aoe_radius"), dmg(w), w.stat("stun"), player.data.bonus_tags))
+	dir = dir.normalized()
+	var n := int(w.stat("count"))                  # varias en abanico (las pisadas de Whateley, 16.25)
+	var spread := deg_to_rad(w.stat("spread_deg"))
+	for k in n:
+		var off := 0.0 if n == 1 else lerpf(-spread * 0.5, spread * 0.5, k / float(n - 1))
+		var fdir := dir.rotated(Vector3.UP, off)
+		var fi := Fissure.new().setup(world, origin + fdir * 0.5, fdir, w.stat("range"),
+			w.stat("projectile_speed") + inherited_speed(fdir), w.stat("aoe_radius"), dmg(w), w.stat("stun"), player.data.bonus_tags)
+		fi.look = w.data.look if w.data.look == "dunwich" else ""
+		world.fx.add_child(fi)
 	player.play_once("throw")
 	fired.emit(w)
 	return true

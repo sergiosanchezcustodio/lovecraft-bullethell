@@ -1755,6 +1755,25 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Pruebas:** `tests/test_fishing.gd` (modelos y animación, rarezas, cuándo se ofrece, el sedal: sin soltar se parte y soltando en los tirones sale, el bestiario). 687 de 687. Escena suelta: `godot --path . scenes/fishing.tscn -- fish_auto=true fish_force=cria fish_pick=1 card_shot=true shots=7 tag=x pj=varga`; con la partida: `level=p2_n1 bot=smart god=true final_at=8 go_fishing=true fish_auto=true` (el bot del final pasa por la pesca y sigue: el 2.2 empieza con el progreso y con la maldición).
 - **Capturas:** `shots/pesca_f1_007.5s.png` (recogiendo), `shots/pesca_f2_007.0s.png` (¡pica!), `shots/pesca_f2_ficha_cria.png` (la ficha de una maldita), `shots/titulo_bpesca_010.0s.png` (la sección del bestiario).
 
+## Fase 16, hito 16.25: personajes secretos (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+`scripts/save/secrets.gd` (`Secrets`), `CharacterData.secret`, `tools/gen_secretos.py`, `data/characters/carter.tres` y `whateley.tres`.
+
+- **Quiénes y cómo se abren** (`CharacterData.secret`; no se compran ni salen en la demo):
+  - **Randolph Carter** (`"fragmentos"`): al reunir todas las páginas sueltas de los relatos (`Fragments.total()`). Soñador de Boston: abrigo largo azul noche, chaleco gris, corbatín, sienes canosas, párpados pesados y la llave de plata (que brilla) colgada del pecho. Rasgo: las crisis le duran la mitad (`crisis_mult` 0,5). Esquive, destello. POD, INT y DES.
+  - **Wilbur Whateley** (`"desafios"`): al superar los 15 desafíos (`Challenge.won_count`). Enorme y encorvado (b = 2), abrigo corto pardo con remiendos cosidos, cara de cabra sin barbilla, orejas caídas, labios gruesos, ojos pequeños y juntos de blanco amarillento, pelo negro rizado, y las puntas de los tentáculos (con ventosas) asomando bajo el abrigo y por las botas. Rasgo: 40 % menos de daño mental (`mental_mult` 0,6). Esquive, salto. POD, FUE y CON.
+  - `Secrets.check(save)` los pasa a `SaveData.characters` al cumplir la condición: lo mira la pantalla final de cada nivel («¡Nuevo investigador: …! Ya puedes elegirlo.», y guarda) y la selección al abrirse (`SelectState.profile_from_save`).
+- **En la selección**, cerrados: el modelo en sombra, «???», «Investigador secreto», sin arma ni rasgo, y abajo lo que falta («Reúne las páginas sueltas (3 de 15)», «Supera los desafíos (0 de 15)»). En la Biblioteca se conocen al abrirse.
+- **Armas** (mágicas, entregas de siempre con aspecto propio: `look`):
+  - *Llave de los sueños* (`llave_suenos`, bumerán): la llave de plata de Carter, que brilla azulada y deja una estela; va y vuelve y **adormece** 0,5 s a lo que toca (`Boomerang.stun_s`, nuevo; sube con el nivel). Hasta tres llaves. Objeto: *Mapa de las Tierras del Sueño* (`mapa_sueno`, armas mágicas un 7 % más rápidas: `arcane_cooldown_mult`). Ramas: *Llave de la ignota Kadath* (cuatro llaves, adormece el doble) y *Llaves de Ulthar* (seis más rápidas, en abanico, adormecen menos).
+  - *Pisadas de lo invisible* (`huellas_dunwich`, grieta): el hermano de Wilbur avanza en línea hacia el grupo más denso; tierra negra que brilla violeta y esquirlas de icor (`Fissure.look = "dunwich"`; sin brillo no se veía en el barro de Dunwich). `_fissure` admite ahora varias en abanico (`count`, `spread_deg`). Objeto: *Diario cifrado de Wilbur* (`diario_wilbur`, aura de calma: `calm_aura`, que pasa a ser estadística de objeto como `arcane_cooldown_mult`). Ramas: *Lo que bajó de Sentinel Hill* (pisadas el doble de anchas, aturden más) y *El gemelo de Wilbur* (tres hileras a la vez, más largas).
+  - Daño ajustado con `reglas_dano.gd -- aplicar`; al nivel 5, 62 y 17,5 por segundo (como el bumerán, 57, y el martillo, 12).
+- **Arte:** modelos en `tools/gen_secretos.py` (`cuerpo.py`, revisados de frente, de lado y de espaldas); vestuario regenerado para los dos; caras para el parpadeo con ojos que no son de 4×2 (`ODD_EYES` en `gen_caras_juego.py`: Carter, a medio cerrar; Wilbur, de 2×2). Iconos de las seis armas y los dos objetos con ComfyUI en local (el del gemelo, semilla 1001).
+- **Pruebas:** `tests/test_secrets.gd` (los dos, que no se compran y sus armas con dos ramas; cerrados hasta cumplir la condición, una sola vez; cerrados en la selección; la llave adormece). Ajustadas las que contaban personajes de inicio, armas por grupo (16, 17 y 19), armas base (52), rasgos (`crisis_mult` y `mental_mult` cuentan como rasgo) y ojos. 691 de 691 (un fallo suelto en `test_new_enemies.gd` que no se repite en tres pasadas).
+- **Capturas:** `shots/seleccion_secretos_003.0s.png` (los dos cerrados), `shots/game_carter_009.0s.png` (las llaves), `shots/game_whateley_011.0s.png` (las pisadas). Opciones: `character=carter|whateley`; `select pick=carter,whateley` con una partida sin ellos.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

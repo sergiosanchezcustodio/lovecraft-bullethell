@@ -65,6 +65,8 @@
 		"castro": "El viejo Castro, un mestizo de muchos puertos, fue uno de los presos del pantano y el único que quiso hablar: le contó a Legrasse lo de los Grandes Antiguos, la ciudad de R'lyeh y el día en que las estrellas estarían en su sitio. Aquí no está preso. Dirige el canto entre las hogueras, con el ídolo colgado del pecho, y llama a los tamborileros cuando ve que la cosa se tuerce."
 	},
 	"weapons": {
+		"huellas_dunwich": "En Dunwich aparecieron una mañana pisadas del tamaño de un barril que aplastaban vallas y casas, y nadie vio qué las hacía. Wilbur sabe qué era, y le habla en voz baja cuando cree que nadie lo escucha.",
+		"llave_suenos": "La llave de plata que Randolph Carter encontró en una caja de roble tallado, envuelta en un pergamino que nadie sabe leer. Al girar en el aire abre, por un instante, una puerta a otro lado: los que la ven pasar se quedan un momento mirando lo que hay detrás.",
 		"webly": "Revólver del ejército británico, pesado y fiable. Su bala del .455 tumba a un hombre y hace retroceder a lo que no lo es.",
 		"granada": "Granada de palo alemana, de la Gran Guerra. Dyer lleva dos en el cinturón desde Arkham; jura que no son para la roca.",
 		"corredera": "Escopeta de bombeo de la policía de Nueva Orleans. A quemarropa no perdona.",
@@ -214,9 +216,15 @@
 		"umr_tawil": "El Más Antiguo, el guía de la Puerta. No abre la esfera del todo: la abre muchas veces.",
 		"cabra_negra": "La Cabra Negra de los Bosques no manda a sus crías: brota ella misma, y donde brota no queda nada en pie.",
 		"carcosa": "Junto al lago de Hali, bajo las lunas negras, las torres de Carcosa se ven desde todas partes. Y todas partes las ven a ellas.",
-		"faro_irem": "La luz de Irem, la ciudad de los pilares, se ve desde el otro lado del desierto. Gira despacio: no tiene prisa por encontrarte."
+		"faro_irem": "La luz de Irem, la ciudad de los pilares, se ve desde el otro lado del desierto. Gira despacio: no tiene prisa por encontrarte.",
+		"llave_kadath": "La llave que abrió a Carter el camino hasta la cima de Kadath, donde los dioses de la Tierra bailan en su castillo de ónice. Del otro lado de cada golpe, alguien sueña.",
+		"huellas_sentinel": "Ya no son las pisadas de algo que pasa: es la cosa entera, que baja de la colina de Sentinel hacia el pueblo. Wilbur la llama hermano.",
+		"llave_ulthar": "En Ulthar ningún hombre puede matar a un gato. Los gatos de Ulthar, a cambio, guardan las llaves de los que sueñan bien.",
+		"huellas_gemelo": "Lavinia tuvo gemelos. Uno se parecía más al padre."
 	},
 	"items": {
+		"diario_wilbur": "Un cuaderno cifrado en un alfabeto que Armitage tardó semanas en romper. Lo que dice no se puede leer de un tirón, pero quien lo lleva encima deja de temblar.",
+		"mapa_sueno": "Un mapa dibujado de memoria al despertar: Ulthar, el bosque encantado, el mar Cerenario y, en el borde, una montaña sin nombre. Cambia un poco cada noche.",
 		"vida": "Abrigo de piel de reno de la intendencia de la expedición. Abriga hasta en la Barrera de Ross.",
 		"cordura": "Diario de campo. Escribir lo visto ayuda a no volverse loco; casi siempre.",
 		"iman": "La brújula de Lake. En la Antártida no señala el norte, pero señala otras cosas.",
@@ -314,6 +322,8 @@
 		"p3_n5": "R'lyeh, emergida en el Pacífico a 47° 9′ S, 126° 43′ O. Losas enormes cuyos ángulos no cuadran, monolitos torcidos, escaleras que suben a ninguna parte y, al fondo, la puerta colosal, entreabierta, con un resplandor verde en la rendija. Johansen escribió que la geometría «era toda equivocada»."
 	},
 	"characters": {
+		"whateley": "Wilbur Whateley, de Dunwich, hijo de Lavinia y de un padre que nadie nombra. A los diez años parecía un hombre; a los quince, algo que vestía como uno. Siempre abrigado, siempre oliendo a establo, con un latín que aprendió en libros que no deberían existir. Quiere cerrar la puerta que su abuelo le enseñó a abrir. O eso dice.",
+		"carter": "Randolph Carter, de Boston, soñador. De niño encontró en el desván de su tío una llave de plata que abría algo que no era una puerta, y desde entonces ha caminado por las Tierras del Sueño más que por las calles de Arkham. Vuelve de cada pesadilla con una calma que asusta a los demás: sabe que siempre se despierta.",
 		"dyer": "Profesor de geología de la Miskatonic y jefe de la expedición antártica de 1930. Vio lo que había más allá de las montañas y volvió para advertir a la siguiente.",
 		"olmstead": "Joven viajero que quería conocer Nueva Inglaterra barata. Pasó una noche en Innsmouth y escapó por los pelos. Desde entonces no se mira mucho al espejo.",
 		"legrasse": "Inspector de la policía de Nueva Orleans. En 1907 asaltó un ritual en los pantanos y se llevó el ídolo. Sabe que el culto sigue vivo.",

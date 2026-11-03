@@ -204,7 +204,8 @@ func test_un_solo_rasgo_por_personaje() -> void:
 	var neutral := CharacterData.new()
 	var fields := ["resist_tags", "bonus_tags", "knockback_immune", "dodge_length", "arcane_cost_mult", "xp_mult",
 		"heal_on_level", "revive_speed", "calm_aura", "physical_resist", "dodge_cooldown_mult", "close_bonus",
-		"explosion_radius_mult", "melee_mult", "luck", "pickup_radius", "arcane_cooldown_mult", "team_heal_on_level"]
+		"explosion_radius_mult", "melee_mult", "luck", "pickup_radius", "arcane_cooldown_mult", "team_heal_on_level",
+		"crisis_mult", "mental_mult"]   # (los dos últimos, de los secretos: 16.25)
 	for r in DebugOptions.list_resources("res://data/characters"):
 		var c := r as CharacterData
 		var n := 0

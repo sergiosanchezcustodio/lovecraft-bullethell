@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/destello.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"carter"
+display_name = "Randolph Carter"
+model = "carter"
+role = "Soñador de Boston"
+passive_text = "Las crisis de locura le duran la mitad: sabe despertar."
+story = "La llave de plata"
+secret = "fragmentos"
+order = 14
+max_health = 95.0
+max_sanity = 120.0
+move_speed = 4.5
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"llave_suenos"])
+crisis_mult = 0.5
+attr_bonus = {"POD": 9, "INT": 7, "DES": 4}

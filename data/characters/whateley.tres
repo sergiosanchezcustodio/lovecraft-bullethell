@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/salto.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"whateley"
+display_name = "Wilbur Whateley"
+model = "whateley"
+role = "Hijo de Lavinia, de Dunwich"
+passive_text = "Medio de otro mundo: el daño mental le hace un 40 % menos."
+story = "El horror de Dunwich"
+secret = "desafios"
+order = 15
+max_health = 130.0
+max_sanity = 90.0
+move_speed = 4.3
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"huellas_dunwich"])
+mental_mult = 0.6
+attr_bonus = {"POD": 8, "FUE": 7, "CON": 5}

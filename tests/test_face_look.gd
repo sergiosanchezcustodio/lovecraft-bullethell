@@ -14,7 +14,8 @@ func test_todos_los_personajes_tienen_cara() -> void:
 		if not file.ends_with(".tres"): continue
 		var cd := load("res://data/characters/" + file) as CharacterData
 		var f: Dictionary = FaceLook.faces().get(cd.model, {})
-		assert_eq((f.get("eyes", []) as Array).size(), 16, "%s: dos ojos de 4×2" % cd.model)
+		var want := 8 if cd.model == "whateley" else 16          # Wilbur, ojos de 2×2 (16.25)
+		assert_eq((f.get("eyes", []) as Array).size(), want, "%s: dos ojos de 4×2" % cd.model)
 
 func test_parpadea_y_pone_mueca() -> void:
 	var mf := _face("dyer")

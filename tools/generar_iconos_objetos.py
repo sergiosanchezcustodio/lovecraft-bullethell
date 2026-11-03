@@ -80,6 +80,8 @@ ITEMS = {
     'salterio': "a small worn psalm book with a cross on the leather cover and a ribbon bookmark",
     'escapulario': "a cloth scapular with two small embroidered patches joined by cords",
     'laudano': "a small brown glass laudanum bottle with a cork and a paper label",
+    'mapa_sueno': "a rolled-out old parchment map of a fantasy dreamland with a strange mountain at its edge, glowing faintly blue",
+    'diario_wilbur': "a battered small leather notebook tied with string, its open pages covered in strange cipher script",
     'escamas': "a vest made of overlapping blue-green fish scales, iridescent",
     'nodens': "a large grey seashell shield with pale blue glowing edges",
     'ankh': "a golden Egyptian ankh cross with turquoise inlays, softly glowing",

@@ -11,6 +11,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 import cuerpo as cu
 
 EYE_X = (-6, -5, -4, -3, 2, 3, 4, 5)
+# Caras con otros ojos (hito 16.25): columnas de los ojos y fila de abajo (el párpado cerrado va
+# en esa y la de encima). Carter, con los ojos a medio cerrar (una fila y el párpado caído encima);
+# Wilbur, ojos pequeños de 2×2 muy juntos, con el blanco amarillento.
+ODD_EYES = {'carter': (EYE_X, 73), 'whateley': ((-4, -3, 2, 3), 73)}
 
 
 def _reddish(c):
@@ -25,9 +29,13 @@ def face(path):
         if k not in front or v[2] > front[k][0]: front[k] = (v[2], v[4:7])
     white = lambda x, y: (x, y) in front and sum(abs(a - b) for a, b in zip(front[(x, y)][1], cu.EYE_W)) < 0.05
     rows = [y for y in range(68, 78) if all(white(x, y) for x in (-6, -3, 2, 5))]   # bordes blancos de los dos ojos
-    if len(rows) != 2 or rows[1] != rows[0] + 1: return None
-    y0 = rows[0]
-    eyes = [[x, y, front[(x, y)][0]] for x in EYE_X for y in (y0, y0 + 1)]
+    name = os.path.basename(path)[:-5]
+    xs = EYE_X
+    if name in ODD_EYES:                                  # ojos que no son de 4×2 con blanco (16.25)
+        xs, y0 = ODD_EYES[name]
+    elif len(rows) != 2 or rows[1] != rows[0] + 1: return None
+    else: y0 = rows[0]
+    eyes = [[x, y, front[(x, y)][0]] for x in xs for y in (y0, y0 + 1)]
     # párpado del color de la piel: la piel tiene textura (cada voxel con su tono) y lo pintado
     # (cejas, pestañas, gafas, mejillas) es de un color plano, que se repite
     near = [tuple(front[(x, y)][1]) for x in range(-8, 8) for y in range(y0 - 3, y0 + 4)

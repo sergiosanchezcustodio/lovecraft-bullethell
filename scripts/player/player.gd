@@ -70,7 +70,7 @@ const ITEM_STATS: Array[String] = ["proj_count_add", "range_mult", "proj_speed_m
 	"health_regen", "sanity_regen", "heal_on_kill", "sanity_on_kill", "crisis_mult", "money_mult",
 	"chest_mult", "pickup_heal_mult", "pet_mult", "hit_iframes", "arcane_cost_mult", "thorns", "nodens_level",
 	"ankh", "dodge_charges", "decoy_time", "dodge_blast", "dodge_fury", "rerolls", "kill_blast", "hit_slow",
-	"hit_burn", "low_hp_bonus", "idol_mult"]
+	"hit_burn", "low_hp_bonus", "idol_mult", "arcane_cooldown_mult", "calm_aura"]   # (los dos últimos, 16.25)
 ## Objetos con mecánica (hito 8.7)
 const LOW_HP := 0.3              ## por debajo de esta parte de la vida cuenta el Diente de shoggoth
 const FURY_TIME := 2.0           ## s de daño extra tras esquivar (Elixir de Curwen)

@@ -37,7 +37,7 @@ func test_cada_arma_base_tiene_dos_ramas_distintas() -> void:
 		assert_true(alt.evolved, "%s marcada como evolución" % alt.id)
 		assert_eq(alt.evolution, &"", "una rama no vuelve a evolucionar")
 		assert_ne(alt.description, "", "%s con descripción" % alt.id)
-	assert_eq(n, 50, "las 50 armas base")
+	assert_eq(n, 52, "las 50 armas base y las dos de los secretos (16.25)")
 
 func _player() -> Player:
 	var world := CombatWorld.new()

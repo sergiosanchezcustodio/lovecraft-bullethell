@@ -117,6 +117,7 @@ static func profile_from_save(save: SaveData, p_characters: Array[CharacterData]
 	for r: PetData in all_pets:
 		if r.price == 0 or (save != null and save.has_pet(String(r.id))): pr.pets.append(r)
 	if save == null: return pr
+	Secrets.check(save)                                # los secretos que ya se ganaron (16.25)
 	pr.shop = Shop.bonuses(save)
 	for c in p_characters:
 		if save.has_character(String(c.id)): pr.unlocked.append(String(c.id))
@@ -154,7 +155,7 @@ func seats_of(peer: int) -> Array[int]:
 ## ¿Está bloqueado el personaje para ese puesto (según lo desbloqueado en su PC)?
 func is_locked(ci: int, seat: int = -1) -> bool:
 	var c := characters[ci]
-	return c.price > 0 and (not Demo.character_ok(c) or not profile_of(seat).unlocked.has(String(c.id)))
+	return (c.price > 0 or c.secret != "") and (not Demo.character_ok(c) or not profile_of(seat).unlocked.has(String(c.id)))   # (los secretos, 16.25)
 
 ## ¿Lo ha confirmado ya otro puesto?
 func taken_by_other(ci: int, seat: int) -> bool:

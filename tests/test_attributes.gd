@@ -20,7 +20,8 @@ func test_todos_reparten_veinte_puntos_en_tres_atributos() -> void:
 func test_cuatro_de_inicio_dos_hombres_y_dos_mujeres() -> void:
 	var start: Array = []
 	for r in DebugOptions.list_resources("res://data/characters"):
-		if not (r as CharacterData).in_shop: start.append(String((r as CharacterData).id))
+		var c := r as CharacterData
+		if not c.in_shop and c.secret == "": start.append(String(c.id))   # sin los secretos (16.25)
 	start.sort()
 	assert_eq(start, ["dyer", "olmstead", "peaslee", "whipple"])
 

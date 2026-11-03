@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"llave_suenos"
+display_name = "Llave de los sueños"
+description = "La llave de plata de Randolph Carter va hasta su alcance y vuelve, y deja adormilado un momento a todo lo que toca."
+category = 2
+delivery = 15
+targeting = 0
+cooldown = 1.7
+range = 7.0
+damage = 11.3
+count = 1.0
+spread_deg = 40.0
+projectile_speed = 12.0
+projectile_radius = 0.5
+knockback = 0.4
+stun = 0.5
+look = "llave"
+evolution = &"llave_kadath"
+evolution_alt = &"llave_ulthar"
+max_level = 5
+level_mods = Array[Dictionary]([{"damage*": 1.3}, {"count+": 1.0}, {"stun+": 0.3, "range*": 1.2}, {"count+": 1.0, "damage*": 1.2}])
+level_text = Array[String](["+30 % de daño", "Dos llaves", "Adormece más y llega más lejos", "Tres llaves y +20 % de daño"])
+evolves_with = &"mapa_sueno"

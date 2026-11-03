@@ -36,7 +36,7 @@ static func level_ok(id: String) -> bool:
 
 ## ¿Entra este investigador? En la demo, solo los de inicio.
 static func character_ok(c: CharacterData) -> bool:
-	return not on() or c.price <= 0
+	return not on() or (c.price <= 0 and c.secret == "")   # los secretos, fuera de la demo (16.25)
 
 ## ¿Está este artículo de la tienda fuera de la demo? (los personajes que no son de inicio)
 static func shop_locked(e: Shop.Entry) -> bool:

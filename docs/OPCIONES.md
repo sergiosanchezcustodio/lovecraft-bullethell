@@ -40,6 +40,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `dodge=deslizar|rodar|plancha|salto|destello`: estilo de esquive (F1 los recorre en partida).
   - `dummies=N`: muñecos de práctica que reciben daño.
   - `emitters=true`: tres emisores de prueba, uno por tipo de daño.
+  - `character=<id>`: personaje del J1 (`dyer`, `west`…; también los secretos `carter` y `whateley`, hito 16.25, aunque estén cerrados).
   - `weapons=granada,webly` y `wlevel=N`: armas iniciales (ids de `data/weapons/`) y su nivel.
   - `god=true`: el jugador no recibe daño.
   - `bullet_rain=N`: mantiene N balas enemigas vivas (prueba de carga).

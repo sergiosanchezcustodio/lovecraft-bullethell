@@ -41,6 +41,8 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 | **William Dyer** | Hito 1.2, segunda versión (`gen_dyer.py`), cabeza rehecha el 23-10-2026, 1,72 m | Diseño a bloques limpios con los detalles pintados. Gorro de trampero de cuero con banda de borreguillo y botón, cara con cejas caídas, mejillas y nariz rojas del frío, barba y bigote, pelo en la nuca, bufanda roja, parka de lona con bolsillos, botones y ribete de borreguillo, cinturón con tres cartuchos de dinamita (único relieve), manoplas, pantalón de lana y botas. Material mate. Animaciones: reposo, andar, esquive y lanzar. |
 | **Henry Armitage** | Fase 5 (`gen_armitage_west.py`), cabeza rehecha el 23-10-2026 | Bibliotecario anciano: calvo con pelo blanco a los lados, cejas blancas pobladas, gafas redondas de oro, barba y bigote blancos, levita gris marengo, pajarita negra y un libro bajo el brazo. |
 | **Herbert West** | Fase 5 (`gen_armitage_west.py`), cabeza rehecha el 23-10-2026 | Científico joven y pálido: pelo rubio peinado hacia atrás, gafas redondas negras, ojos claros y fríos, bata blanca sobre traje oscuro. |
+| **Randolph Carter** (secreto) | Hito 16.25 (`gen_secretos.py`) | Soñador de Boston: abrigo largo azul noche, chaleco gris, corbatín, sienes canosas, párpados pesados y la llave de plata que brilla en el pecho. |
+| **Wilbur Whateley** (secreto) | Hito 16.25 (`gen_secretos.py`) | Enorme y encorvado, abrigo corto pardo remendado, cara de cabra sin barbilla, orejas caídas, pelo negro rizado; puntas de tentáculo con ventosas bajo el abrigo y por las botas. |
 
 ### Bestiario actual
 

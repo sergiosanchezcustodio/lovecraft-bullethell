@@ -30,6 +30,9 @@ extends Resource
 @export var close_bonus := 0.0               ## daño extra a quemarropa: +close_bonus junto al enemigo, 0 al alcance máximo (Malone)
 @export var explosion_radius_mult := 1.0     ## radio de las explosiones de sus lanzados (Dyer: 1,25)
 @export var melee_mult := 1.0              ## daño de las armas cuerpo a cuerpo (Johansen: 1,25)
+## Investigador secreto (hito 16.25): no se compra, se abre con una condición (Secrets):
+## "fragmentos" (todas las páginas sueltas) o "desafios" (los 15 desafíos). "" = no lo es.
+@export var secret := ""
 @export var in_shop := false                 ## se compra en la tienda (precio en el hito 2.9; mientras, disponible)
 @export var order := 0                       ## orden en la selección de personaje
 @export_group("Atributos")

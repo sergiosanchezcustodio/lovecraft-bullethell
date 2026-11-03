@@ -815,12 +815,15 @@ class _Frame extends Control:
 		var holder := st.holder_of(seat.character, index)   # quién lo ha confirmado ya (D-23)
 		var unavailable := seat.stage == SelectState.Stage.CHARACTER and (locked or holder >= 0)
 		_view.modulate = Color(0.25, 0.25, 0.3) if unavailable else Color.WHITE
-		_name.text = c.display_name
-		_role.text = c.role
+		var hidden := locked and c.secret != ""            # investigador secreto aún cerrado (16.25): en sombra
+		if hidden: _view.modulate = Color(0.04, 0.04, 0.06)
+		_name.text = c.display_name if not hidden else "???"
+		_role.text = c.role if not hidden else "Investigador secreto"
 		var wd: WeaponData = null
 		if not c.starting_weapons.is_empty(): wd = load("res://data/weapons/%s.tres" % c.starting_weapons[0])
-		_weapon.set_icon(wd.get_icon() if wd else null, wd.display_name if wd else "Sin arma", wd.description if wd else "")
-		_passive.text = "Rasgo: " + c.passive_text
+		if hidden: wd = null
+		_weapon.set_icon(wd.get_icon() if wd else null, wd.display_name if wd else ("???" if hidden else "Sin arma"), wd.description if wd else "")
+		_passive.text = "Rasgo: " + (c.passive_text if not hidden else "???")
 		var rec := Endless.best_of(Auto.save(), String(c.id))
 		_record.text = "Noche eterna
 %s" % Endless.clock(rec) if rec > 0.0 else ""
@@ -872,6 +875,7 @@ class _Frame extends Control:
 			SelectState.Stage.CHARACTER:
 				if holder >= 0: _status.text = "Lo lleva J%d" % (holder + 1)
 				elif locked and not Demo.character_ok(c): _status.text = Demo.LOCKED
+				elif hidden: _status.text = Secrets.hint(Auto.save(), c)
 				elif locked: _status.text = "Se compra en la tienda (%s)" % MenuKit.money(c.price)
 				else: _status.text = "A: elegir"
 				_status.add_theme_color_override("font_color", MenuKit.DANGER if unavailable else UiKit.TEXT_DIM)

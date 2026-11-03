@@ -13,6 +13,7 @@ var speed := 14.0
 var half_width := 0.7
 var damage := 16.0
 var stun_s := 0.5
+var look := ""                               ## "dunwich": las pisadas del invisible (Whateley, hito 16.25); "": hielo
 var bonus := {}
 var hits := 0                                ## golpes (tests)
 var _hit := {}
@@ -44,7 +45,20 @@ func _ready() -> void:
 	_shard_mat.roughness = 0.2
 	_shard_mat.metallic = 0.2
 	_shard_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_spray = VoxelFx.emitter("spray", 0.4, false, false, Color(0.75, 0.88, 0.98))   # esquirlas en la punta (11-10-2026)
+	var spray_col := Color(0.75, 0.88, 0.98)
+	if look == "dunwich":                       # tierra negra y un icor violeta donde pisa lo que no se ve
+		_crack_mat.albedo_color = Color(0.10, 0.04, 0.12)   # brilla un poco: en el barro de Dunwich, si no, no se ve
+		_crack_mat.emission_enabled = true
+		_crack_mat.emission = Color(0.55, 0.18, 0.70)
+		_crack_mat.emission_energy_multiplier = 1.3
+		_shard_mat.albedo_color = Color(0.32, 0.20, 0.36)
+		_shard_mat.roughness = 0.7
+		_shard_mat.metallic = 0.0
+		_shard_mat.emission_enabled = true
+		_shard_mat.emission = Color(0.50, 0.20, 0.62)
+		_shard_mat.emission_energy_multiplier = 1.1
+		spray_col = Color(0.62, 0.36, 0.78)
+	_spray = VoxelFx.emitter("spray", 0.4, false, false, spray_col)   # esquirlas en la punta (11-10-2026)
 	add_child(_spray)
 
 func tip() -> float:

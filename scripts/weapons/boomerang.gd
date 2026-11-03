@@ -15,6 +15,8 @@ var damage := 10.0
 var push := 0.8
 var bonus := {}
 var returning := false
+var stun_s := 0.0                            ## s que deja aturdido a lo que toca (Llave de los sueños, hito 16.25)
+var look := ""                               ## "llave": la llave de plata de Carter (hito 16.25); "": de madera
 var hits := 0                                ## golpes (tests)
 var _hit := {}                               ## ids ya golpeados en este tramo
 var _out := 0.0                              ## m recorridos a la ida
@@ -36,6 +38,10 @@ func _ready() -> void:
 	Damage.ctx = _wtag
 	_spin = Node3D.new()
 	add_child(_spin)
+	if look == "llave":
+		_key()
+		reset_physics_interpolation.call_deferred()
+		return
 	for side in [-1, 1]:
 		var arm := MeshInstance3D.new()
 		var bm := BoxMesh.new()
@@ -90,7 +96,31 @@ func _physics_process(delta: float) -> void:
 		d.knockback = Vector3(away.x, 0, away.z).normalized() * push
 		d.bonus = bonus
 		e.take_damage(d)
+		if stun_s > 0.0 and e.is_alive() and e.has_method("stun"): e.stun(stun_s)
 		hits += 1
+
+## La llave de plata de Randolph Carter: ojo, caña y paletón de plata que brilla, girando.
+func _key() -> void:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = Color(0.82, 0.88, 0.98)
+	m.metallic = 0.6
+	m.roughness = 0.3
+	m.emission_enabled = true
+	m.emission = Color(0.55, 0.70, 1.0)
+	m.emission_energy_multiplier = 1.4
+	for b: Array in [[Vector3(0.05, 0.04, 0.18), Vector3(0, 0, 0.12)], [Vector3(0.05, 0.04, 0.18), Vector3(0, 0, -0.04)],   # el ojo
+			[Vector3(0.16, 0.04, 0.05), Vector3(-0.07, 0, 0.04)], [Vector3(0.16, 0.04, 0.05), Vector3(0.07, 0, 0.04)],
+			[Vector3(0.05, 0.04, 0.34), Vector3(0, 0, -0.27)],                                                         # la caña
+			[Vector3(0.10, 0.04, 0.05), Vector3(0.06, 0, -0.38)], [Vector3(0.07, 0.04, 0.05), Vector3(0.05, 0, -0.30)]]:   # el paletón
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = b[0]
+		mi.mesh = bm
+		mi.position = b[1] + Vector3(0, 0, 0.12)
+		mi.material_override = m
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_spin.add_child(mi)
+	add_child(VoxelFx.emitter("streak", 0.35, false, false, Color(0.65, 0.78, 1.0)))
 
 func _process(delta: float) -> void:
 	Damage.ctx = _wtag

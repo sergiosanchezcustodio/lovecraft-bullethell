@@ -1584,6 +1584,9 @@ func _loot_time() -> void:
 func _end_screen(title: String, accent: Color, next_id := "", result := "") -> void:
 	var lines := _summary()
 	if not _endless_lines.is_empty(): lines = _endless_lines + lines   # sin fin: tiempo y récords (13.8)
+	for c in Secrets.check(Saves.current):          # investigadores secretos (16.25)
+		lines.insert(0, "¡Nuevo investigador: %s! Ya puedes elegirlo." % c.display_name)
+		Saves.save()
 	var reports := _reports()
 	if net_game != null:
 		lines.append_array(net_game.gone_notes)       # quién se fue y cuándo
