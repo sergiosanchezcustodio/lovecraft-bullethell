@@ -1816,6 +1816,22 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Pruebas:** `tests/test_stat_compare.gd` (objeto de vida, menos es mejor en verde, nivel de arma, formato). 702 de 702.
 - **Capturas:** `shots/game_comparar_004.0s.png` (tres objetos), `shots/game_comparar11_004.0s.png` y `game_comparar12_004.0s.png` (mejoras de arma), `shots/titulo_tienda_cmp_011.0s.png` (la tienda).
 
+## Fase 16, hito 16.30: más vibración del mando (03-11-2026)
+
+*Pendiente de revisión del autor, con mando: aquí no se puede notar (Claude Code desactiva los mandos).*
+
+`scripts/input/rumble.gd` (`Rumble`).
+
+- **Fuerza regulable:** Configuración > Juego > Vibración del mando pasa de sí/no a No, Suave, Normal o Fuerte (`Settings.vibration`: 0, 0,5, 1 o 1,5; las configuraciones de antes, con true o false, quedan en Normal o No). Al cambiarla, un pulso en el último mando usado.
+- **Qué vibra** (cada jugador en su mando; el teclado, los bots y los jugadores de otros PC no; como mucho un pulso cada 0,12 s por mando):
+  - golpe recibido, como antes (`Player._rumble`, según lo fuerte, cada 0,15 s como mucho);
+  - explosión cercana (`Explosion._ready` → `Rumble.blast`): más cuanto más cerca, hasta 2,6 veces su radio; las de tus propias armas, hasta 1,6 veces, al 45 % y cada 0,25 s como mucho, para que la dinamita no zumbe sin parar;
+  - entrada de un jefe (y de las élites únicas del evento final), a todos;
+  - el jefe que cae (nivel superado), a todos, el más fuerte;
+  - cada subida de nivel, un toque corto del motor débil;
+  - crisis de cordura: dos latidos.
+- **Pruebas:** `tests/test_rumble.gd` (fuerzas y configuración de antes; la crisis, dos latidos; los de otros PC, no). 704 de 704. `log_rumble=true` escribe cada pulso («VIBRA J1 explosión 0,06 0,11 0,14 s»), haya mando o no: en una partida con granadas salen golpes, explosiones, subidas, la entrada del jefe y el nivel superado.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

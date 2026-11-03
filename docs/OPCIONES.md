@@ -48,6 +48,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `timescale=N`: acelera el juego. Las capturas de `shots=` usan tiempo de juego.
   - `final_at=s`: adelanta el evento final.
   - `seed=N`: semilla de la partida (hito 16.26; sin ella, una nueva). `archive_save=true`: apunta la partida en el archivo de expediciones aunque juegue un bot. `log_ups=true`: escribe la semilla y las opciones de cada subida.
+  - `log_rumble=true`: escribe cada pulso de vibración del mando, haya mando o no (hito 16.30).
   - `dmg_table=T`: abre la pausa y la tabla «Daño de la partida» a los T s (`dmg_player=N`: la del J N; hito 16.27).
   - `max_alive=N` y `spawn_rate=N`: tope de vivos y ritmo de aparición fijo (pruebas de carga).
   - `autopick=true`: elige sola la primera mejora (para bots y capturas).

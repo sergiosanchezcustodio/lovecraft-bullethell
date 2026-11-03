@@ -180,6 +180,7 @@ func setup(p_data: CharacterData, p_input: PlayerInput, p_color: Color) -> Playe
 	return self
 
 func _ready() -> void:
+	Rumble.add(self)                               # para las vibraciones de todos (16.30)
 	collision_layer = LAYER_PLAYERS
 	collision_mask = LAYER_WORLD
 	motion_mode = CharacterBody3D.MOTION_MODE_FLOATING   # juego cenital: sin gravedad ni suelos
@@ -459,17 +460,11 @@ var min_hp := 1.0                       ## la vida más baja del nivel, en fracc
 
 ## Vibración suave del mando al recibir daño (12-10-2026), según lo fuerte del golpe. Respeta
 ## Configuración > Juego > Vibración del mando y no se repite más de una vez cada 0,15 s.
-var _rumble_ms := 0
 
 func _rumble(amount: float) -> void:
-	if input == null or amount <= 0.0: return
-	var dev := input.joy_device()
-	if dev < 0 or not bool(Auto.setting("vibration", false)): return
-	var now := Time.get_ticks_msec()
-	if now - _rumble_ms < 150: return
-	_rumble_ms = now
+	if amount <= 0.0: return
 	var k := clampf(amount / 30.0, 0.0, 1.0)
-	Input.start_joy_vibration(dev, 0.2 + 0.3 * k, 0.25 * k, 0.12 + 0.12 * k)
+	Rumble.pulse(self, 0.2 + 0.3 * k, 0.25 * k, 0.12 + 0.12 * k, "golpe", 150)   # con su fuerza (16.30)
 
 ## `src` y `via`: de quién y cómo, para el informe al caer (vacío: no se apunta).
 func drain_sanity(amount: float, src := "", via := &"aura") -> void:

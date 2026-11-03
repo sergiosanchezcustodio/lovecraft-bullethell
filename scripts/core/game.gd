@@ -407,10 +407,12 @@ func _ready() -> void:
 			if e != null: Sfx.play_at("roar" if e.data.unique else "growl", e.global_position)
 			else: Sfx.play("growl")
 			if e != null and _boss_intro: BossIntro.play(self, camera, e, level.final_text)   # entrada del jefe
-			else: announce(level.final_text, 3.5))
+			else: announce(level.final_text, 3.5)
+			if e != null and (e.data.unique or e.data.elite): Rumble.all(0.35, 0.7, 0.7, "jefe"))   # (16.30)
 		director.boss_event.connect(func(e: Enemy, text: String) -> void:
 			if e != null and _boss_intro: BossIntro.play(self, camera, e, text)
 			else: announce(text, 4.0)
+			if e != null: Rumble.all(0.35, 0.7, 0.7, "jefe")
 			if args.get_bool("log"): print("JEFE %s t=%.0f" % [e.data.id, director.time]))
 		director.mid_event.connect(func(e: Enemy, text: String) -> void:
 			Sfx.play_at("growl", e.global_position)
@@ -458,6 +460,7 @@ func _ready() -> void:
 	apply_speed()
 	HitStop.enabled = args.get_bool("hitstop", true)     # micro-pausa al impactar (hito 11.1)
 	_boss_intro = args.get_bool("boss_intro", true)
+	Rumble.trace = args.get_bool("log_rumble")
 	DamageNumbers.set_mode(Auto.setting("damage_numbers", 2))   # hito 11.2 (cfg_damage_numbers=0|1|2)
 	Quality.apply_game(env, moon)                        # calidad gráfica (hito 11.5); las opciones de abajo mandan
 	Crumble.enabled = args.get_bool("crumble", Crumble.enabled)
@@ -697,6 +700,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 			var src := "bala" if d.source == null else String((d.source as Enemy).data.id) + (" (carga)" if d.physical > 8.0 else "")
 			print("  J%d golpe t=%.1f  -%d vida -%d cordura  de %s  -> vida %d" % [i + 1, director.time if director else 0.0, d.physical, d.mental, src, q.health]))
 	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void: Achievements.add(Saves.current, "crises"))
+	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void: Rumble.heartbeat(q))   # dos latidos (16.30)
 	q.sanity_state.crisis_started.connect(func(k: StringName) -> void:
 		var what := "Crisis: %s" % SanityState.NAMES.get(k, "locura")
 		announce(what if players.size() == 1 else "J%d · %s" % [i + 1, what], 2.5))
@@ -867,6 +871,7 @@ func _open_level_up() -> void:
 				break
 	if q == null: return
 	var options := q.progress.next_options(q.weapons, q.up_rng)
+	Rumble.pulse(q, 0.3, 0.0, 0.12, "subida")         # (16.30)
 	if args.get_bool("log_ups"): print("SUBIDA J%d nv=%d %s" % [q.index + 1, q.progress.level, ", ".join(options.map(func(o: PlayerProgress.Option) -> String: return PlayerProgress.key_of(o)))])   # pruebas (16.26)
 	if options.is_empty():
 		q.progress.pending = 0
@@ -1531,6 +1536,7 @@ func _endless_record() -> void:
 func _on_level_completed() -> void:
 	if _ended: return
 	_ended = true
+	Rumble.all(0.5, 1.0, 0.9, "nivel superado")      # el jefe cae (16.30)
 	earn(level.money_bonus)                          # bono por superar el nivel
 	if not _someone_fell: Achievements.add(Saves.current, "flawless")
 	if args.get_bool("log"): print("NIVEL SUPERADO %s t=%d s  abatidos=%d  dólares=%d  nivel_j1=%d  vida_min=%d" % [level.id, director.time, kills, run_money, player.progress.level, roundi(maxf(player.min_hp, 0.0) * 100)])

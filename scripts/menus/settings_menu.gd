@@ -185,8 +185,10 @@ func _game() -> void:
 	var intro: Array[String] = ["Siempre", "Solo la primera vez"]
 	_choice("Ficha e intro al arrancar", intro, int(Settings.get_value("intro")), func(i: int) -> void:
 		Settings.set_value("intro", i))
-	_toggle("Vibración del mando", Settings.get_value("vibration"), func(on: bool) -> void:
-		Settings.set_value("vibration", on))
+	_choice("Vibración del mando", Rumble.NAMES, Rumble.level_index(Settings.get_value("vibration")), func(i: int) -> void:
+		Settings.set_value("vibration", Rumble.LEVELS[i])
+		if i > 0 and Devices.last_device >= 0: Input.start_joy_vibration(Devices.last_device, 0.3 * Rumble.LEVELS[i], 0.5 * Rumble.LEVELS[i], 0.2))   # para notarla (16.30)
+	_note("Al recibir golpes, con las explosiones cercanas, los jefes, las subidas de nivel y las crisis de cordura.")
 	_toggle("Mostrar FPS", Settings.get_value("show_fps"), func(on: bool) -> void:
 		Settings.set_value("show_fps", on)
 		Settings.apply_video())

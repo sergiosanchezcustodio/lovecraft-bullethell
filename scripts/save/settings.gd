@@ -27,7 +27,7 @@ var defaults := {
 	"fullscreen": true, "resolution": 2, "vsync": true, "fps_limit": 0, "scale_3d": 1.0,
 	"brightness": 3,                        ## índice en BRIGHTNESS
 	"vol_master": 1.0, "vol_music": 0.8, "vol_sfx": 0.9, "vol_weapons": 0.7, "vol_ambient": 0.8,
-	"distortion": 1.0, "vibration": true, "show_fps": false,
+	"distortion": 1.0, "vibration": 1.0, "show_fps": false,
 	"weather": 2,                           ## clima: 0 apagado, 1 reducido, 2 completo
 	"ui_scale": 1,                          ## accesibilidad (hito 8.3): tamaño de la interfaz (UI_SCALES)
 	"bullet_palette": 0,                    ## 0 normal, 1 alto contraste (daltonismo)
