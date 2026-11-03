@@ -483,7 +483,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 
 | Hito | Contenido | Cómo |
 |---|---|---|
-| 16.31 | **Reflejos en el agua** de los personajes y los faroles en charcos, mar y pantano (reflejo plano barato en Alta y Ultra) | `sea.gdshader` y el suelo de los pantanos; en Baja y Media, como ahora |
+| 16.31 | **Reflejos en el agua** de los personajes y los faroles en charcos, mar y pantano (reflejo plano barato en Alta y Ultra) | `sea.gdshader` y el suelo de los pantanos; en Baja y Media, como ahora. **Hecho (03-11-2026), pendiente de tu revisión:** `WaterReflection`, una cámara espejo a media resolución que dibuja solo jugadores y faroles; charcos, pantano y mar la leen (`water_reflect.gdshaderinc`). Unos 0,15 ms en Alta; `reflections=`, `refl_debug=true` |
 | 16.32 | **Haces de luna** que entran por ventanales y huecos (estudio de Wilcox, templo de la Orden, ciudad de los Antiguos) | Conos con niebla, solo en Alta y Ultra |
 | 16.33 | **La noche avanza durante el nivel:** del crepúsculo a la noche cerrada (y el alba si cae el jefe) | `Atmosphere` con una curva de luz por nivel, sin salir de la mediana de 0,16-0,22 |
 | 16.34 | **Decorado que se rompe con las armas:** columnas, cajas y muros bajos que se desmoronan en voxels con las explosiones (como `Crumble`) y dejan cascotes | Rompibles ampliados, con tope por calidad |

@@ -64,3 +64,15 @@ gust_b={
 "type": "vec4",
 "value": Vector4(0, 0, 0, 1)
 }
+refl_tex={
+"type": "sampler2D",
+"value": ""
+}
+refl_vp={
+"type": "mat4",
+"value": Projection(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+}
+refl_on={
+"type": "float",
+"value": 0.0
+}

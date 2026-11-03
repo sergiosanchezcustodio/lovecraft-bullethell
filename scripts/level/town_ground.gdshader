@@ -7,9 +7,10 @@ shader_type spatial;
 // negra mojada en escalones, algas, percebes y grietas con luz verde de abajo), 4 R'lyeh (fase 7:
 // losas ciclópeas verdinegras cuya rejilla gira y se tuerce por zonas, así que los ángulos no
 // cuadran; juntas con limo que brilla apenas). wet (0..1): lluvia; oscurece
-// y abrillanta todo. Los charcos son brillo especular falso: sin reflejos reales.
+// y abrillanta todo. Los charcos son brillo especular falso; en Alta y Ultra, además, reflejan a los investigadores y los faroles (16.31, water_reflect).
 
 #include "res://scripts/fx/night_sky.gdshaderinc"
+#include "res://scripts/fx/water_reflect.gdshaderinc"
 
 uniform int kind = 0;
 uniform float rain = 0.0;                    // lluvia (0..1, Ambient): ondas en los charcos y el agua somera
@@ -373,6 +374,13 @@ void fragment() {
 		if (night > 0.0 && wetm > 0.55) {                             // estrellas en charcos y pozas (16-10-2026)
 			vec2 sp = pc + vec2(sin(TIME * 0.9 + pc.y * 3.0), cos(TIME * 0.7 + pc.x * 3.0)) * 0.02;
 			EMISSION += (star_at(floor(sp * 16.0), TIME, 0.005) * night * 1.1 + shooting_star(sp)) * wetm;
+		}
+		if (wetm > 0.3 || refl_on > 1.5) {                            // reflejo de los investigadores y los faroles (16.31; 2: en todo el suelo, pruebas)
+			vec2 wob = vec2(sin(wpos.z * 7.0 + TIME * 1.6), cos(wpos.x * 6.0 + TIME * 1.3)) * (0.012 + 0.03 * rain);
+			vec4 rf = water_reflection(wpos, wob);
+			float kr = rf.a * (refl_on > 1.5 ? 1.0 : clamp((wetm - 0.3) / 0.3, 0.0, 1.0) * 0.75);
+			ALBEDO *= 1.0 - kr * 0.7;
+			EMISSION += rf.rgb * kr;
 		}
 		ROUGHNESS = mix(mix(rough, 0.45, wet), 0.04, wetm);
 		SPECULAR = mix(mix(spec, 0.5, wet), 0.9, wetm);

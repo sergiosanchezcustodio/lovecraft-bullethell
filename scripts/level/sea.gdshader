@@ -16,6 +16,7 @@ shader_type spatial;
 render_mode cull_disabled, shadows_disabled;
 
 #include "res://scripts/fx/night_sky.gdshaderinc"
+#include "res://scripts/fx/water_reflect.gdshaderinc"
 #include "res://scripts/fx/aurora.gdshaderinc"
 
 uniform vec3 deep : source_color = vec3(0.07, 0.17, 0.27);
@@ -273,6 +274,10 @@ void fragment() {
 		float fall = exp(-abs(k - 1.0) * 1.5);
 		em += lamp_col[i].rgb * lamp_col[i].rgb * L.w * core * dash * fall * (1.0 - ice * 0.8);   // al cuadrado: más cálido, no blanco
 	}
+	vec4 rf = water_reflection(wpos, n.xz * 0.25 + vec2(gx, gz) * 0.2);   // investigadores y faroles (16.31), rotos por las olas
+	float kr = rf.a * (refl_on > 1.5 ? 1.0 : (1.0 - ice) * 0.6);
+	ALBEDO *= 1.0 - kr * 0.6;
+	em += rf.rgb * kr;
 	if (beam_k > 0.0) {                      // el haz del faro barre el agua: destellos donde pasa
 		vec2 rel = wpos.xz - beam.xy;
 		float da = abs(mod(atan(rel.y, rel.x) - beam.z + 3.14159265, 6.2831853) - 3.14159265);

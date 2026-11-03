@@ -341,6 +341,8 @@ func _ready() -> void:
 			if not q.remote: q.leash = func(pos: Vector3) -> Vector3: return camera.leash(pos)
 	_env = env
 	add_child(Ambient.new().setup(arena, camera, arena_path.get_file().get_basename()))   # ambiente del escenario
+	if args.get_bool("reflections", bool(Quality.value("reflections", false))) and WaterReflection.has_water(arena):
+		add_child(WaterReflection.new().setup(camera, arena))   # reflejos en el agua (16.31)
 	_lap("cámara y ambiente")
 	_make_announcer()
 	if not args.get_bool("nolevel"):
