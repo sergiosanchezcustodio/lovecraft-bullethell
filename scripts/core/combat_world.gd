@@ -162,6 +162,7 @@ func rebuild_grid() -> void:
 	_grid_targets.clear()
 	for e in enemies:
 		if not is_instance_valid(e) or not e.is_alive(): continue
+		if e is Enemy and (e as Enemy).buried: continue      # bajo tierra (16.16)
 		var p := e.global_position
 		grid.insert(Vector2(p.x, p.z), e.hit_radius)
 		_grid_targets.append(e)

@@ -72,3 +72,46 @@ func test_el_bestiario_cuenta_bajas_y_quien_mas() -> void:
 	assert_true(String(f[1]).begins_with("Quien más: William Dyer (3)"), String(f[1]))
 	var back := SaveData.from_dict(s.to_dict())
 	assert_eq(Library.kill_facts(back, "pinguino")[0], "Abatidos: 5", "se guarda")
+
+## Fase 16, hito 16.16: el shoggoth excavador y el Antiguo sembrador.
+func test_los_de_la_parte_1_existen_y_salen_en_su_nivel() -> void:
+	for pair in [["shoggoth_excavador", "p1_n3"], ["shoggoth_excavador", "p1_n5"], ["antiguo_sembrador", "p1_n4"], ["antiguo_sembrador", "p1_n5"]]:
+		var d: EnemyData = load("res://data/enemies/%s.tres" % pair[0])
+		assert_true(FileAccess.file_exists("res://models/%s.json" % d.model), d.model)
+		assert_ne(Library.text("enemies", String(d.id)), "", "texto del bestiario de " + pair[0])
+		var lv: LevelData = load("res://data/levels/%s.tres" % pair[1])
+		assert_true(lv.pool.any(func(x: EnemyData) -> bool: return x.id == d.id), "%s en %s" % pair)
+
+func test_el_excavador_se_entierra_y_sale_bajo_el_jugador() -> void:
+	var p := Player.new().setup(load("res://data/characters/dyer.tres"), BotInput.new("idle"), Color.YELLOW)
+	world.add_child(p)
+	world.add_player(p)
+	p.position = Vector3(6, 0, 0)
+	var e := _enemy("shoggoth_excavador", Vector3.ZERO)
+	world.enemies.append(e)
+	var b := e.behavior as BurrowBehavior
+	b._t = 10.0                                      # se entierra ya
+	_step(e, 0.6)
+	assert_true(e.buried, "bajo tierra")
+	assert_false(e.visual.visible)
+	world.rebuild_grid()
+	assert_null(world.nearest_enemy(Vector3.ZERO, 20.0), "no se le puede apuntar")
+	assert_ne(e.net_flags2() & 16, 0, "viaja en la foto")
+	var hp := e.health
+	e.take_damage(Damage.new(50.0, 0.0))
+	_step(e, 4.0)
+	assert_false(e.buried, "ha salido")
+	assert_lt(Vector2(e.position.x - 6.0, e.position.z).length(), 1.3, "debajo del jugador")
+
+func test_el_sembrador_planta_vainas_que_revientan() -> void:
+	var e := _enemy("antiguo_sembrador", Vector3.ZERO)
+	(e.behavior as SowBehavior)._sow = 0.0
+	_step(e, 0.05)
+	var pods := e.get_tree().get_nodes_in_group(&"spore_pods")
+	assert_eq(pods.size(), 1, "una vaina")
+	var pod := pods[0] as SporePod
+	pod._t = pod.life                                # nadie la pisa: revienta sola
+	pod._physics_process(DT)
+	assert_true(pod._fuse > 0.0, "se enciende")
+	for i in 40: if is_instance_valid(pod): pod._physics_process(DT)
+	assert_true(not is_instance_valid(pod) or pod.is_queued_for_deletion(), "reventada")

@@ -104,7 +104,7 @@ def build(open_wings, seed, tint=0.0, variant=''):
         M.capsule(hip, foot, 1.3, 0.9, p, SKD)
         M.ell(foot[0], 0.6, foot[2], 1.4, 0.6, 1.4, p, PD)
     # ---------- alas membranosas ----------
-    for s, p in ((-1, 'wing_l'), (1, 'wing_r')) if variant not in ('despierto', 'guerrero', 'mutilado', 'revivido') else ():
+    for s, p in ((-1, 'wing_l'), (1, 'wing_r')) if variant not in ('despierto', 'guerrero', 'mutilado', 'revivido', 'sembrador') else ():
         if open_wings:
             _wing(M, s, p)
         else:
@@ -116,6 +116,7 @@ def build(open_wings, seed, tint=0.0, variant=''):
                     M.put(int(round(s * ub(r))), yv, zz - int(ub(1.0)), p, MEMB if (yv // 3) % 2 else MEMB_D)
     if variant in ('guerrero', 'mutilado'): _guerrero(M)
     if variant == 'mutilado': _mutilado(M)
+    if variant == 'sembrador': _sembrador(M)
     for k in [k for k in M.V if k[1] < 0]: del M.V[k]
     piv = {'body': [0, BODY_Y0, 0], 'head': [0, 24.0, 0], 'arms': [0, 15.0, 0],
            'wing_l': [-4.5, 19.0, -1.5], 'wing_r': [4.5, 19.0, -1.5]}
@@ -340,6 +341,37 @@ def _guerrero(M):
         for dz in range(-2, 2): M.put(0, int(27.5 * S) + i, dz - i // 2, 'head', PLATE)
 
 
+SPORE = (0.86, 0.80, 0.36); SPORE_L = (1.0, 0.95, 0.60); SAC = (0.46, 0.40, 0.22); SAC_D = (0.28, 0.24, 0.14)
+LICHEN = (0.40, 0.46, 0.24); LICHEN_D = (0.26, 0.30, 0.16)
+
+
+def _sembrador(M):
+    """Antiguo sembrador (hito 16.16): un Antiguo de los jardines de esporas. Liquen y moho en el
+    barril y un racimo de sacos de esporas en las crestas, con un brillo amarillo enfermizo que se
+    ve dentro; de la cintura le cuelgan vainas a medio madurar."""
+    S = M.S
+    for (x, y, z), v in M.V.items():                                 # liquen y moho en manchas
+        if v[0] in ('body', 'head') and v[2] == 0:
+            n = M.noise(x + 17, y, z, 4.0)
+            if n > 0.58: v[1] = LICHEN if n > 0.68 else LICHEN_D
+    for i in range(5):                                               # sacos en las cinco crestas
+        a = i / 5 * math.tau
+        for k, y in enumerate((11.0, 16.0, 20.0)):
+            r = barrel_r(y) * 1.13 + 0.4
+            rs = (1.5, 1.8, 1.3)[k] * (0.85 + 0.3 * M.hsh(i, k, 3))
+            cx, cz = math.cos(a + 0.15 * k) * r, math.sin(a + 0.15 * k) * r
+            M.ell(cx, y, cz, rs, rs * 1.1, rs, 'body', SAC)
+            M.ell(cx * 1.06, y + 0.2, cz * 1.06, rs * 0.62, rs * 0.7, rs * 0.62, 'body', SPORE, glow=1)
+            for (xx, yy, zz), v in M.V.items():                      # vetas del saco
+                if v[1] == SAC and M.hsh(xx, yy, zz) > 0.78: v[1] = SAC_D
+    for i in range(5):                                               # vainas colgando de la cintura
+        a = i / 5 * math.tau + math.pi / 5 + 0.3
+        x, z = math.cos(a) * 6.6, math.sin(a) * 6.6
+        M.capsule((x * 0.8, 13.5, z * 0.8), (x, 10.0, z), 0.35, 0.3, 'arms', SAC_D)
+        M.ell(x, 9.0, z, 1.0, 1.4, 1.0, 'arms', SAC)
+        M.ell(x * 1.04, 9.0, z * 1.04, 0.5, 0.8, 0.5, 'arms', SPORE_L, glow=1)
+
+
 def _mutilado(M):
     """Antiguo mutilado: un guerrero (revisión de arte del 13-10-2026) al que le faltan dos puntas
     de la estrella y al que le arrancaron dos tentáculos (quedan los muñones), con manchas del limo
@@ -358,7 +390,8 @@ def _mutilado(M):
 for name, wings, seed, tint, var in (('antiguo', False, 7101, 0.0, 'revivido'), ('antiguo_alado', True, 7102, 0.25, ''),
                                      ('antiguo_guerrero', False, 7103, -0.1, 'guerrero'),
                                      ('antiguo_mutilado', False, 7104, 0.1, 'mutilado'),
-                                     ('antiguo_despierto', False, 7102, 0.25, 'despierto')):
+                                     ('antiguo_despierto', False, 7102, 0.25, 'despierto'),
+                                     ('antiguo_sembrador', False, 7105, -0.05, 'sembrador')):
     M, piv = build(wings, seed, tint, var)
     n = M.export('models/%s.json' % name, piv, jitter=0.012, roughness=0.5, specular=0.45)
     print(name, n, 'voxels')

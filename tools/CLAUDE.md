@@ -54,4 +54,6 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 | **Expedicionario de Lake** | Hito 15.3 (`gen_enemigos_fase15.py`) | Hombre de la expedición de Lake congelado y vuelto a levantar: parka hecha jirones con escarcha, piel azulada, ojos con brillo frío, antebrazo descarnado. Humano (`anim_humano`). |
 | **Nadador de la marea** | Hito 15.3 (`gen_enemigos_fase15.py`, con `gen_variantes.build`) | Profundo joven y esbelto, plateado y azul, aletas largas y franjas que brillan. `anim_profundo`. |
 | **Tamborilero del pantano** | Hito 15.3 (`gen_enemigos_fase15.py`) | Cultista de Luisiana: torso desnudo pintado de costillas, cara de calavera, tambor de piel delante y baquetas. Humano (`anim_humano`). |
+| **Shoggoth excavador** | Hito 16.16 (`gen_fragmento.py 3 shoggoth_excavador 1940`) | Fragmento grande y negro con costras de escarcha, esquirlas de hielo clavadas y dientes de hielo. Se entierra y sale bajo el jugador. `anim_fragmento`. |
+| **Antiguo sembrador** | Hito 16.16 (`gen_antiguo.py`, variante `sembrador`) | Antiguo sin alas con liquen y sacos de esporas que brillan en amarillo; planta vainas (`vaina_esporas`, `gen_enemigos_fase16.py`). `anim_antiguo`. |
 | Abisal | Prototipo | Negro azulado, ojos cian brillantes, líneas bioluminiscentes, dientes largos. |

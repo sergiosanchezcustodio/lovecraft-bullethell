@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=12 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/enemies/pinguino.tres" id="peng"]
@@ -9,6 +9,7 @@
 [ext_resource type="Resource" path="res://data/enemies/antiguo_guerrero.tres" id="8"]
 [ext_resource type="Resource" path="res://data/enemies/antiguo_mutilado.tres" id="9"]
 [ext_resource type="Resource" path="res://data/enemies/guardian_ciudad.tres" id="10"]
+[ext_resource type="Resource" path="res://data/enemies/antiguo_sembrador.tres" id="f16s"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
 [ext_resource type="Resource" path="res://data/weather/ceniza.tres" id="weather"]
 
@@ -23,7 +24,7 @@ arena = "res://data/arenas/ciudad.json"
 health_mult = 1.45
 duration = 300.0
 music = "res://resources/Music/cc0/p1_n4_the_maw.ogg"
-pool = Array[ExtResource("5")]([ExtResource("peng"), ExtResource("3"), ExtResource("4"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9")])
+pool = Array[ExtResource("5")]([ExtResource("peng"), ExtResource("3"), ExtResource("4"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("f16s")])
 spawn_rate = Array[Vector2]([Vector2(0, 0.3), Vector2(45, 0.5), Vector2(90, 0.8), Vector2(150, 1.3), Vector2(210, 1.8), Vector2(300, 2.3)])
 max_alive = 75
 elite_cap = 1

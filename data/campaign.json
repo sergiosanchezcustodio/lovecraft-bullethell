@@ -4,9 +4,9 @@
 		{"title": "En las montañas de la locura", "place": "Antártida", "levels": [
 			{"id": "p1_n1", "name": "Campamento base en la costa del mar de Ross", "creatures": "Pingüinos albinos ciegos · Fragmentos protoplásmicos"},
 			{"id": "p1_n2", "name": "El campamento destruido de Lake", "creatures": "Antiguos revividos · Antiguos alados · Expedicionarios de Lake"},
-			{"id": "p1_n3", "name": "El paso de la cordillera y sus cavernas", "creatures": "Shoggoths esclavos · Shoggoths miméticos"},
-			{"id": "p1_n4", "name": "La ciudad ciclópea de los Antiguos", "creatures": "Antiguos guerreros · Antiguos mutilados"},
-			{"id": "p1_n5", "name": "Los túneles y el abismo del mar subterráneo", "creatures": "Shoggoths de ojos luminosos · Antiguos del mar abisal · El shoggoth primigenio"}
+			{"id": "p1_n3", "name": "El paso de la cordillera y sus cavernas", "creatures": "Shoggoths esclavos · Shoggoths miméticos · Shoggoths excavadores"},
+			{"id": "p1_n4", "name": "La ciudad ciclópea de los Antiguos", "creatures": "Antiguos guerreros · Antiguos mutilados · Antiguos sembradores"},
+			{"id": "p1_n5", "name": "Los túneles y el abismo del mar subterráneo", "creatures": "Shoggoths de ojos luminosos · Antiguos del mar abisal · Shoggoths excavadores · Antiguos sembradores · El shoggoth primigenio"}
 		]},
 		{"title": "La sombra sobre Innsmouth", "place": "Nueva Inglaterra", "levels": [
 			{"id": "p2_n1", "name": "Newburyport y la carretera a Innsmouth", "creatures": "Habitantes de Innsmouth · Acólitos de la Orden de Dagon"},

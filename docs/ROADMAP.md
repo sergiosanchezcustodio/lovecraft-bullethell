@@ -453,7 +453,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 
 | Hito | Contenido | Qué aporta |
 |---|---|---|
-| 16.16 | **Parte 1:** *shoggoth excavador* (se mete bajo el hielo y sale bajo tus pies tras una grieta de aviso) y *Antiguo sembrador* (planta vainas de esporas que revientan al pisarlas: minas) | Ataque desde abajo y zonas prohibidas |
+| 16.16 | **Parte 1:** *shoggoth excavador* (se mete bajo el hielo y sale bajo tus pies tras una grieta de aviso) y *Antiguo sembrador* (planta vainas de esporas que revientan al pisarlas: minas) | Ataque desde abajo y zonas prohibidas. **Hecho (03-11-2026), pendiente de tu revisión:** el excavador en los niveles 3 y 5 (se entierra, avanza con grietas, aviso y sale debajo); el sembrador en los niveles 4 y 5 (hasta cuatro vainas que revientan al acercarse) |
 | 16.17 | **Parte 2:** *guardián de la Orden de Dagón* (híbrido con escudo de bronce: para las balas de frente, hay que rodearlo) y *hija de los Marsh* (con tiara: canta y cura a los Profundos cercanos; hay que matarla primero) | Escudo frontal y curandera: dos papeles que no existen |
 | 16.18 | **Parte 3:** *sonámbulo de Providence* (sueña con R'lyeh: desaparece y reaparece a tu lado; tenerlo cerca quita cordura) e *ídolo vivo* (estatuilla de Cthulhu del tamaño de un hombre, quieta, que dispara en espiral y refuerza a los cercanos: una torreta) | Teletransporte y torreta |
 | 16.19 | **Un jefe intermedio por parte** en el nivel 3: Gedney, el estudiante desaparecido del campamento de Lake, convertido en otra cosa (parte 1); Obed Marsh rejuvenecido (parte 2); el viejo Castro, el cultista que habló con Legrasse (parte 3) | Hoy solo hay jefe al final de cada parte |

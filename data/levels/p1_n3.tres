@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/enemies/pinguino.tres" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Resource" path="res://data/enemies/shoggoth_esclavo.tres" id="7"]
 [ext_resource type="Resource" path="res://data/enemies/shoggoth_mimetico.tres" id="8"]
 [ext_resource type="Resource" path="res://data/enemies/shoggoth_caverna.tres" id="9"]
+[ext_resource type="Resource" path="res://data/enemies/shoggoth_excavador.tres" id="f16x"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
 [ext_resource type="Resource" path="res://data/weather/ventisca_paso.tres" id="weather_niebla"]
 
@@ -22,7 +23,7 @@ arena = "res://data/arenas/paso.json"
 health_mult = 1.3
 duration = 300.0
 music = "res://resources/Music/cc0/p1_n3_cavern.ogg"
-pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("6"), ExtResource("7"), ExtResource("8")])
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("f16x")])
 spawn_rate = Array[Vector2]([Vector2(0, 0.45), Vector2(45, 0.65), Vector2(90, 1.0), Vector2(150, 1.5), Vector2(210, 2.0), Vector2(300, 2.5)])
 max_alive = 75
 elite_cap = 2

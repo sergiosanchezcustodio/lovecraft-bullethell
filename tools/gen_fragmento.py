@@ -99,6 +99,28 @@ for x in range(int(-2.6 * S), int(2.6 * S)):
         z = M.front(x, int(MY * S) + 2)
         if z is not None: M.put(x, int(MY * S) + 1, z, 'body', TOOTH)
 
+if NAME == 'shoggoth_excavador':             # hito 16.16: costra de hielo y escarcha y esquirlas clavadas
+    ICE = (0.62, 0.76, 0.86); ICE_L = (0.86, 0.93, 0.98); ICE_D = (0.36, 0.50, 0.62)
+    tops = {}
+    for (x, y, z) in M.V:
+        if (x, z) not in tops or y > tops[(x, z)]: tops[(x, z)] = y
+    for (x, z), y in tops.items():
+        n = M.noise(x + 90, y, z, 3.0)
+        if n < 0.56 or y < 6 * S or M.V[(x, y, z)][2] == 1: continue   # solo costras arriba: sigue negro
+        for d in range(2 if n > 0.66 else 1):
+            k = (x, y - d, z)
+            if k in M.V and M.V[k][2] == 0: M.V[k][1] = (ICE_L if n > 0.72 else ICE) if d == 0 else ICE_D
+    for i in range(9):                         # esquirlas de hielo que se llevó al salir del suelo
+        a = M.rng.uniform(0, math.tau); rr = M.rng.uniform(1.0, 5.2)
+        x, z = math.cos(a) * rr, math.sin(a) * rr * 0.9
+        t = M.top(int(x * S), int(z * S))
+        if t is None: continue
+        y0 = t / S - 0.4
+        h = M.rng.uniform(1.6, 3.2)
+        M.cone((x, y0, z), (x + math.cos(a) * h * 0.5, y0 + h, z + math.sin(a) * h * 0.5), 0.9, 'top' if y0 > 7.0 else 'body', ICE_D, ICE_L)
+    for (x, y, z), v in M.V.items():           # dientes de la boca, de hielo sucio
+        if v[1] == TOOTH: v[1] = ICE_L
+
 pivots = {'body': [0, 0, 0], 'top': [0.4, 6.0, 0.2],
           'pod_l': [-3.0, 2.2, 4.0], 'pod_r': [3.0, 2.2, 4.0]}
 n = M.export('models/%s.json' % NAME, pivots, jitter=0.01)

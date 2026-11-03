@@ -1640,6 +1640,16 @@ Detalle de lo hecho en cada fase e hito, sacado de `CLAUDE.md` el 17-10-2026 par
 - **Capturas:** `shots/game_locura5_040.0s.png` (escudo), `shots/game_locura3_045.0s.png` y `shots/seleccion_locura_mapa_003.0s.png` (selector). En 40 s del nivel 2.1 con grado III se partieron dos criaturas.
 - **Iconos:** los tres Signos Mayores que faltaban (Hastur, Nyarlathotep y Tsathoggua) con ComfyUI; el de Hastur, rehecho con el Signo Amarillo de tres brazos. El cepo de oso, rehecho con fauces (semilla 1002). El bumerán y los puestos de tiro siguen igual: las otras semillas no mejoraban.
 
+## Fase 16, hito 16.16: enemigos nuevos de la parte 1 (03-11-2026)
+
+*Pendiente de revisión del autor.* Primer hito del bloque C.
+
+- **Shoggoth excavador** (`shoggoth_excavador`, escalón 3, niveles 1.3 y 1.5): el fragmento a S=3, negro, con costras de escarcha arriba, esquirlas de hielo clavadas y dientes de hielo (`python tools/gen_fragmento.py 3 shoggoth_excavador 1940`; `anim_fragmento`). `BurrowBehavior` (`movement = burrow`): persigue 4,5 s, se hunde (0,45 s, polvo de hielo y `rise_snow`) y bajo tierra va a ×2,6 de velocidad hacia su objetivo dejando grietas (`world.ground_hit` cada 0,28 s, se ven en red); a 1,2 m o a los 2,4 s marca un aviso de 1,6 m (`Telegraph.enemy`, `ice_crack`) donde está el jugador, sale a los 0,9 s con 16 de daño (`world.strike`), temblor, `slam` y «¡Tekeli-li!», y se queda 1 s quieto. Enterrado: `Enemy.buried` (fuera de la rejilla de `CombatWorld`: ni se le apunta ni le dan las balas; `net_flags2` bit 16), `visual` oculto (sale solo de la horda) y sin contacto.
+- **Antiguo sembrador** (`antiguo_sembrador`, escalón 3, niveles 1.4 y 1.5): variante `sembrador` de `tools/gen_antiguo.py`, sin alas, con liquen en el barril, quince sacos de esporas con un núcleo amarillo que brilla y vainas colgando de la cintura. `SowBehavior` (hereda de `KeepBehavior`, a 7 m): cada 3,2 s planta a sus pies una `SporePod` (hasta cuatro, a 1,6 m como poco unas de otras). La vaina (`models/vaina_esporas.json`, de `tools/gen_enemigos_fase16.py`) brota en 0,9 s y late; a 0,9 m de un jugador se enciende (aviso amarillo de 1,6 m, 0,45 s) y revienta: 12 de vida y 8 de cordura, nube de esporas. Sola revienta a los 16 s. Las balas no le hacen nada. En red, la marioneta siembra con su reloj, como el limo del mutilado: cada vaina daña a los de su PC.
+- **Textos:** «Criaturas» del mapa (`data/campaign.json`) y bestiario (`data/library/textos.json`).
+- **Pruebas:** tres más en `tests/test_new_enemies.gd` (en su nivel, el excavador se entierra y sale debajo, el sembrador planta y la vaina revienta). 659 de 659.
+- **Capturas:** `shots/shoggoth_excavador-antiguo_sembrador-antiguo_guerrero_35_f16.png` (modelos), `shots/game_excav2_*.png` (grietas, aviso y salida) y `shots/game_sembr_014.0s.png`. El equilibrio, sin medir con el bot.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

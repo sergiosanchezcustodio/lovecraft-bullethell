@@ -25,6 +25,7 @@ var health_scale := 1.0                  ## multiplicador de vida (cooperativo):
 var shield_t := 0.0
 var ward := 0                              ## escudo de icor: golpes que para (grados de locura, 16.14)
 var small := false                         ## nacida de partirse otra: más pequeña y no se parte
+var buried := false                        ## bajo tierra (shoggoth excavador, 16.16): fuera de la rejilla, no se le da
 var _ward_mesh: MeshInstance3D
 var _path_t := 0.0                      ## s hasta volver a mirar si hay línea libre al jugador
 var _stuck_ref := Vector2.INF               ## dónde estaba en la última comprobación de atasco
@@ -1171,6 +1172,7 @@ func net_flags2() -> int:
 	if guard_ring != null: f |= 2
 	if ward > 0: f |= 4
 	if small: f |= 8
+	if buried: f |= 16
 	return f
 
 func net_apply_flags2(f: int) -> void:
@@ -1178,6 +1180,7 @@ func net_apply_flags2(f: int) -> void:
 	if ((f & 2) != 0) != (guard_ring != null): set_guard_ring((f & 2) != 0)
 	if ((f & 4) != 0) != (ward > 0): set_ward(1 if (f & 4) != 0 else 0)
 	if (f & 8) != 0 and not small: set_small()
+	buried = (f & 16) != 0
 
 ## Escudo de icor (grados de locura, 16.14): una burbuja verdinegra que para `n` golpes.
 const WARD_COLOR := Color(0.45, 0.95, 0.55)
