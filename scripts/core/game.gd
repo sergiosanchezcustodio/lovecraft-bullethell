@@ -363,6 +363,7 @@ func _ready() -> void:
 		Challenge.begin(level_id)                      # sus reglas, antes de montar el progreso (15.2)
 		Madness.enabled = Campaign.exists(level_id) and not Challenge.active() and level.daily == "" and not level.endless   # 16.14
 		for q in players: q.rebuild_stats()            # (la vida máxima del desafío)
+		_seed_players()                                # antes de las subidas de ventaja (16.26)
 		_apply_carry()                                 # progreso del nivel anterior de la parte
 		_shop_start()
 		_grant_signs()
@@ -437,7 +438,7 @@ func _ready() -> void:
 			hazards = Hazards.new().setup(level, world, arena.get_meta("obstacles"))
 			hazards.mirror = is_guest()               # en red, los saca el anfitrión (NetGame)
 			add_child(hazards)
-		if level.daily != "": _daily_seed()
+		_seed_world()
 		_spawn_fragment(arena.get_meta("obstacles"))
 		_lap("fragmento y peligros")
 		LevelWarmup.enabled = args.get_bool("warmup", true)   # modelos, paletas y shaders de sus enemigos, ya (hito 16.1)
@@ -865,7 +866,8 @@ func _open_level_up() -> void:
 				q = c
 				break
 	if q == null: return
-	var options := q.progress.next_options(q.weapons, _rng)
+	var options := q.progress.next_options(q.weapons, q.up_rng)
+	if args.get_bool("log_ups"): print("SUBIDA J%d nv=%d %s" % [q.index + 1, q.progress.level, ", ".join(options.map(func(o: PlayerProgress.Option) -> String: return PlayerProgress.key_of(o)))])   # pruebas (16.26)
 	if options.is_empty():
 		q.progress.pending = 0
 		_open_level_up.call_deferred()
@@ -874,8 +876,8 @@ func _open_level_up() -> void:
 	var sign := options[0].kind == PlayerProgress.Option.Kind.SIGN
 	var coop := players.size() > 1
 	if args.get_bool("autopick") or _is_bot(q):
-		var pick: PlayerProgress.Option = options[0] if not _is_bot(q) else options[_rng.randi() % options.size()]
-		if q.input is SmartBot or (q.remote and _is_bot(q)): pick = SmartBot.pick(options, q, _rng)
+		var pick: PlayerProgress.Option = options[0] if not _is_bot(q) else options[q.up_rng.randi() % options.size()]
+		if q.input is SmartBot or (q.remote and _is_bot(q)): pick = SmartBot.pick(options, q, q.up_rng)
 		if evo and args.has("evo_branch"): pick = options[clampi(args.get_int("evo_branch", 0), 0, options.size() - 1)]   # pruebas
 		var said := _choose_option(q, pick)
 		if evo or sign:
@@ -1070,7 +1072,7 @@ func net_halt(d: Dictionary) -> void:
 func _pick_for(i: int) -> void:
 	if net_game.halt.get("k") != "lvup" or int(net_game.halt.get("i", -1)) != i: return   # ya eligió
 	var q: Player = players[i]
-	var options := q.progress.next_options(q.weapons, _rng)
+	var options := q.progress.next_options(q.weapons, q.up_rng)
 	if options.is_empty(): return
 	net_picked(i, {"key": PlayerProgress.key_of(SmartBot.pick(options, q, _rng)), "by_host": true})
 
@@ -1080,7 +1082,7 @@ func _open_net_level_up(q: Player, d: Dictionary) -> void:
 	q.progress.evolving.clear()                   # la rama pendiente la dice el anfitrión (16.8)
 	if d.has("evo"): q.progress.evolving.append(StringName(String(d.evo)))
 	q.progress.signs_pending = 1 if d.has("sign") else 0    # Signo Mayor (16.9), con los logros de este PC
-	var options := q.progress.next_options(q.weapons, _rng)
+	var options := q.progress.next_options(q.weapons, q.up_rng)
 	q.progress.evolving.clear()
 	if options.is_empty() and d.has("sign"):           # ninguno abierto aquí: que siga
 		var none := PlayerProgress.Option.new()
@@ -1110,7 +1112,7 @@ func net_picked(i: int, d: Dictionary) -> void:
 		_open_level_up.call_deferred()
 		return
 	if o == null:                                    # ya no vale (no debería pasar): la primera que salga
-		var opts := q.progress.next_options(q.weapons, _rng)
+		var opts := q.progress.next_options(q.weapons, q.up_rng)
 		o = opts[0] if not opts.is_empty() else null
 	var said := ""
 	var by_host := bool(d.get("by_host", false))
@@ -1429,6 +1431,27 @@ func _game_over() -> void:
 
 var _challenge_record := false                   ## el desafío se acaba de superar mejorando el récord (diario)
 
+## Archivo de expediciones (hito 16.26): la partida, con quién la jugó, sus armas, la tabla de
+## daño y su semilla, si juega alguna persona en este PC (`archive_save=true`: también los bots).
+func _archive(result: String) -> void:
+	if director == null or level == null or result == "" or Saves.current == null: return
+	var human := players.any(func(q: Player) -> bool: return not q.remote and not (q.input is BotInput))
+	if not human and not args.get_bool("archive_save"): return
+	var ps: Array = []
+	for q in players:
+		if q.remote: continue
+		var cause := ""
+		var falls: Array = _rep_falls.get(q.index, [])
+		if not falls.is_empty():
+			var h: Dictionary = (falls[-1] as Dictionary).hit
+			cause = "%s (%s)" % [FallReport.name_of(String(h.get("src", "otro"))), FallReport.via_name(String(h.get("via", "otro")))]
+		ps.append(RunArchive.player_entry(q, world, cause))
+	var res := "endless" if level.endless and result == "caida" else ("won" if result == "superado" else "lost")
+	RunArchive.add(Saves.current, {"level": String(level.id), "result": res, "t": director.time,
+		"seed": run_seed if level.daily == "" else 0, "pacts": Pacts.active().duplicate(), "madness": Madness.grade(),
+		"online": net_game != null, "players": ps})
+	Saves.save()
+
 ## Diario del investigador (hito 13.10): una entrada por jugador de este PC; se guarda en su
 ## diario si juega una persona (con `diary_save=true`, también los bots: pruebas).
 func _diary(result: String) -> Array:
@@ -1449,13 +1472,26 @@ func _diary(result: String) -> Array:
 ## Partida del día (hito 13.9): el azar de la partida sale de la fecha (oleadas, baúles,
 ## peligros, subidas y atributos), igual para todos. Lo que depende del ritmo de cada uno
 ## (quién aparece dónde respecto al jugador) cambia de una partida a otra.
-func _daily_seed() -> void:
-	var s := Daily.seed_of(level.daily)
-	seed(s)
-	_rng.seed = s + 1
-	director.rng.seed = s + 2
-	if hazards != null: hazards.rng.seed = s + 3
-	for q in players: q.reseed(s + 10 + q.index)
+##
+## Semilla de la partida (hito 16.26): la del día, la del archivo de expediciones al repetir una
+## (`GameSession.replay_seed`, que se gasta), `seed=N` (pruebas) o una nueva. Se guarda con la
+## partida en el archivo. Va en dos tiempos: los jugadores y el azar de la partida antes de las
+## subidas de ventaja de los niveles avanzados (`_apply_carry`), el director y los peligros al crearlos.
+var run_seed := 0
+func _seed_players() -> void:
+	if level.daily != "": run_seed = Daily.seed_of(level.daily)
+	else:
+		run_seed = GameSession.replay_seed if GameSession.replay_seed != 0 else args.get_int("seed", 0)
+		GameSession.replay_seed = 0
+		if run_seed == 0: run_seed = (randi() % 2000000000) + 1
+	_rng.seed = run_seed + 1
+	for q in players: q.reseed(run_seed + 10 + q.index)
+	if args.get_bool("log_ups"): print("SEMILLA %d %s %s" % [run_seed, level.id, players[0].data.id if not players.is_empty() else ""])
+
+func _seed_world() -> void:
+	seed(run_seed)
+	director.rng.seed = run_seed + 2
+	if hazards != null: hazards.rng.seed = run_seed + 3
 
 ## El primer intento del día cuenta: se apunta y sale su código para compartir (copiado al
 ## portapapeles); los demás son de práctica.
@@ -1606,6 +1642,7 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 			lines.append(MenuKit.count(net_game.level_marks, "marca") + " en este nivel (F9 o LB+RB)")
 	var s := Menus.EndScreen.new(title, lines, accent)
 	s.diary = _diary(result)
+	_archive(result)
 	if result == "caida" and _replay_frames.size() >= int(DeathReplay.FPS): s.replay = _replay_frames
 	s.epilogue = result == "superado" and next_id == "" and level != null and String(level.id) == Demo.last_level()
 	s.epilogue_open.connect(_epilogue)
@@ -1673,8 +1710,8 @@ func _apply_carry() -> void:
 	for q in players:
 		for k in ups:
 			q.progress.gain_level()
-			var opts := q.progress.roll_options(q.weapons, _rng)
-			if not opts.is_empty(): q.progress.choose(SmartBot.pick(opts, q, _rng) if q.input is SmartBot or wise else opts[_rng.randi() % opts.size()], q)
+			var opts := q.progress.roll_options(q.weapons, q.up_rng)
+			if not opts.is_empty(): q.progress.choose(SmartBot.pick(opts, q, q.up_rng) if q.input is SmartBot or wise else opts[q.up_rng.randi() % opts.size()], q)
 		q.progress.pending = 0
 		q.rebuild_stats()
 		q.health = q.data.max_health

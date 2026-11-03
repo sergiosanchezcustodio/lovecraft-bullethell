@@ -163,6 +163,7 @@ func setup(p_data: CharacterData, p_input: PlayerInput, p_color: Color) -> Playe
 	attrs_level1 = Attributes.initial(p_data)
 	attrs = attrs_level1.duplicate()
 	_attr_rng.randomize()
+	up_rng.randomize()
 	input = p_input
 	color = p_color
 	motor = PlayerMotor.new(data)
@@ -892,8 +893,13 @@ func _cloth_step(delta: float) -> void:
 		OutfitData.wiggle_tail(model, _tail_t, (parts["tail"] as Node3D).rotation)
 
 ## Partida del día (hito 13.9): el azar de los atributos y la cordura, de la semilla del día.
+## Las subidas de nivel tienen su propio azar (hito 16.26): con el de la partida, que comparten
+## baúles y apariciones en el orden en que pasen, la misma semilla daba otras opciones.
+var up_rng := RandomNumberGenerator.new()
+
 func reseed(s: int) -> void:
 	_attr_rng.seed = s
+	up_rng.seed = s + 200
 	if sanity_state != null: sanity_state.rng.seed = s + 100
 
 ## Cordura baja (hito 12.2): encorvado, manos que tiemblan y mirada inquieta, más cuanto más baja;

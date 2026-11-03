@@ -16,6 +16,7 @@ const TOMES := [
 	{"id": "diary", "title": "Diarios", "roman": "VII"},
 	{"id": "stories", "title": "Relatos", "roman": "VIII"},
 	{"id": "wardrobe", "title": "Vestuario", "roman": "IX"},
+	{"id": "archive", "title": "Archivo de expediciones", "roman": "X"},
 ]
 const EPILOGUES := [["epilogo", "Epílogo · Lo que vino después"], ["epilogo_locura", "Epílogo · El que no volvió del todo"]]
 const RESULTS := {"won": "Superado", "lost": "Caído", "endless": "La noche eterna"}
@@ -124,6 +125,43 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 					return t.left(1).to_upper() + t.substr(1))))
 				out.append(_e(String(ep[0]), String(ep[1]), _seen(save, "epilogues", StringName(ep[0])), txt, "", "", null,
 					["Tras vencer a Cthulhu" + (" con menos de un cuarto de la cordura" if ep[0] == "epilogo_locura" else "")], "Epílogos"))
+		"archive":                                     # archivo de expediciones (hito 16.26)
+			var runs := RunArchive.runs(save)
+			for i in runs.size():
+				var r: Dictionary = runs[i]
+				var ps: Array = r.get("players", [])
+				if ps.is_empty(): continue
+				var p: Dictionary = ps[0]
+				var res := String(RESULTS.get(String(r.get("result", "")), ""))
+				var facts := ["%s · %s · %s" % [_date(String(r.get("date", ""))), String(r.get("time", "")), String(p.get("name", ""))],
+					"%s en el minuto %d (%s)" % [res, int(float(r.get("t", 0.0)) / 60.0) + 1, RunArchive.clock(float(r.get("t", 0.0)))]]
+				if String(p.get("cause", "")) != "": facts.append("Le abatió: " + String(p.cause))
+				var ws := PackedStringArray()
+				for w: Array in p.get("weapons", []): ws.append("%s %d" % [RunArchive.source_name(String(w[0])), int(w[1])])
+				if not ws.is_empty(): facts.append("Armas: " + ", ".join(ws))
+				var its := PackedStringArray()
+				for it: Array in p.get("items", []): its.append("%s %d" % [RunArchive.source_name(String(it[0])), int(it[1])])
+				if not its.is_empty(): facts.append("Objetos: " + ", ".join(its))
+				if ps.size() > 1:
+					var others := PackedStringArray()
+					for k in range(1, ps.size()): others.append("J%d %s" % [k + 1, String((ps[k] as Dictionary).get("name", ""))])
+					facts.append("Con " + ", ".join(others))
+				if not (r.get("pacts", []) as Array).is_empty(): facts.append("Pactos: " + Pacts.names(r.pacts))
+				var lines := PackedStringArray()
+				for row: Dictionary in p.get("table", []):
+					lines.append("%s: %s (%d %%), %s/s, %s" % [RunArchive.source_name(String(row.id), String(p.get("pet", ""))),
+						MenuKit.money(int(row.damage)), roundi(float(row.share) * 100.0), RunArchive.decimal(float(row.dps)), MenuKit.count(int(row.kills), "abatido")])
+				var txt := ("Daño de la partida:
+" + "
+".join(lines)) if not lines.is_empty() else "No llegó a hacer daño."
+				var e := _e(str(i), "%s · %s · %s" % [String(r.get("time", "")), RunArchive.place(r), res], true, txt, String(p.get("character", "")), "full", null, facts,
+					_date(String(r.get("date", ""))))
+				e["title"] = "%s · %s" % [RunArchive.place(r), res]     # en la página, sin la hora
+				var cd := "res://data/characters/%s.tres" % String(p.get("character", ""))
+				if ResourceLoader.exists(cd): e["model"] = (load(cd) as CharacterData).model
+				e["worn"] = p.get("worn", {})
+				e["run"] = r
+				out.append(e)
 		"diary":                                       # diarios de los investigadores (hito 13.10)
 			var chars := _list("res://data/characters")
 			chars.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return a.order < b.order)
@@ -207,6 +245,12 @@ static func count_known(save: SaveData, tome: String) -> Vector2i:
 		return Vector2i(list.filter(func(a: AchievementData) -> bool: return Achievements.is_done(save, a)).size(), list.size())
 	var es := entries(save, tome)
 	return Vector2i(es.filter(func(e: Dictionary) -> bool: return e.known and not e.get("dim", false)).size(), es.size())
+
+## "2026-11-03" -> "3 de noviembre de 2026".
+static func _date(d: String) -> String:
+	var p := d.split("-")
+	if p.size() != 3: return d
+	return "%d de %s de %s" % [int(p[2]), Diary.MONTHS[clampi(int(p[1]) - 1, 0, 11)], p[0]]
 
 static func _e(id: String, name: String, known: bool, txt: String, model: String, mode: String,
 		icon: Texture2D, facts: Array, section := "") -> Dictionary:

@@ -168,6 +168,7 @@ func _show_tome_cover(i: int) -> void:
 	_right.add_child(_rule())
 	var c := _ink("%s de %s" % [n.x, n.y] + (" conseguidos" if tome.id == "achievements" else " descubiertos"), 28, INK_DIM)
 	if tome.id == "diary": c.text = MenuKit.count(n.x, "entrada") if n.x > 0 else "Aún no hay nada escrito"
+	if tome.id == "archive": c.text = MenuKit.count(n.x, "partida") + " (las %d últimas)" % RunArchive.MAX if n.x > 0 else "Aún no se ha jugado ninguna"
 	c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_right.add_child(c)
 	var bar := UiKit.Bar.new(RED_INK, 420, 10)
@@ -216,8 +217,9 @@ func _open_tome(i: int) -> void:
 		b.custom_minimum_size.x = PAGE.x - 130
 		if not e.known or e.get("dim", false): b.add_theme_color_override("font_color", INK_DIM)
 		b.focus_entered.connect(func() -> void: _show_entry(k))
+		if tome.id == "archive": b.pressed.connect(func() -> void: _ask_replay(e))   # repetir con su semilla (16.26)
 		list.add_child(b)
-	_left.add_child(_hint("Arriba/abajo: recorrer  ·  B o Esc: volver a los tomos"))
+	_left.add_child(_hint("A: repetir con su semilla  ·  B o Esc: volver" if tome.id == "archive" else "Arriba/abajo: recorrer  ·  B o Esc: volver a los tomos"))
 	MenuKit.chain_focus(_rows)
 	if not _rows.is_empty(): _rows[0].grab_focus.call_deferred()
 
@@ -280,6 +282,25 @@ func _show_entry(k: int) -> void:
 		txt.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_right.add_child(txt)
 
+## Archivo de expediciones (hito 16.26): ¿volver a jugarla con la misma semilla?
+func _ask_replay(e: Dictionary) -> void:
+	if _sub != null: return
+	var run: Dictionary = e.get("run", {})
+	var back := get_viewport().gui_get_focus_owner()
+	if not RunArchive.replayable(run):
+		_sub = MenuKit.Confirm.new("Esta no se puede repetir: la partida del día, la expedición y el desfile de jefes dependen de algo que ya no está.", "Entendido", "Volver")
+	else:
+		var co := " Se juega en solitario, con el J1." if (run.get("players", []) as Array).size() > 1 else ""
+		_sub = MenuKit.Confirm.new("¿Repetir esta partida con la misma semilla? Las mismas oleadas, baúles y subidas, desde el principio del nivel." + co, "Repetir")
+	add_child(_sub)
+	_sub.answered.connect(func(yes: bool) -> void:
+		_sub = null
+		if yes and RunArchive.replayable(run):
+			if Saves.current != null: Saves.save()
+			RunArchive.prepare(run, Devices.last_device)
+			get_tree().change_scene_to_file("res://scenes/relato.tscn")
+		elif back != null and is_instance_valid(back): back.grab_focus.call_deferred())
+
 func _unknown_text(e := {}) -> String:
 	if String(e.get("section", "")) == Library.SECTION_FISH: return "Todavía no ha picado ninguna. Quizá en el muelle de Innsmouth, entre nivel y nivel."
 	match _tome:
@@ -340,6 +361,11 @@ func open_at(tome: int, cursor := 0) -> void:
 	_shelf_focus = tome
 	_open_tome(tome)
 	if cursor > 0 and cursor < _rows.size(): _rows[cursor].grab_focus.call_deferred()
+	var lr := LaunchArgs.from_cmdline()
+	if _tome == "archive" and lr.has("lib_replay") and not _entries.is_empty():   # pruebas (16.26): repite esa
+		get_tree().create_timer(1.0).timeout.connect(func() -> void:
+			_ask_replay(_entries[clampi(lr.get_int("lib_replay", 0), 0, _entries.size() - 1)])
+			if _sub != null: (_sub as MenuKit.Confirm).answered.emit(true))
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _sub != null or not event.is_action_pressed("ui_cancel"): return

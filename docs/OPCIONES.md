@@ -47,6 +47,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `level=p1_n1`: nivel a jugar (por defecto). `nolevel=true` deja el campo de pruebas sin oleadas.
   - `timescale=N`: acelera el juego. Las capturas de `shots=` usan tiempo de juego.
   - `final_at=s`: adelanta el evento final.
+  - `seed=N`: semilla de la partida (hito 16.26; sin ella, una nueva). `archive_save=true`: apunta la partida en el archivo de expediciones aunque juegue un bot. `log_ups=true`: escribe la semilla y las opciones de cada subida.
   - `dmg_table=T`: abre la pausa y la tabla «Daño de la partida» a los T s (`dmg_player=N`: la del J N; hito 16.27).
   - `max_alive=N` y `spawn_rate=N`: tope de vivos y ritmo de aparición fijo (pruebas de carga).
   - `autopick=true`: elige sola la primera mejora (para bots y capturas).
@@ -76,6 +77,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - Pesca en el muelle (hito 16.24): `godot --path . scenes/fishing.tscn -- pj=<personaje>` suelta (al acabar, se cierra; `next=<nivel>` para seguir a ese). `fish_auto=true` pesca sola (carga hasta el 70 %, clava y recoge soltando en los tirones), `fish_force=<captura>` hace que pique esa (`arenque`, `rape`, `cria`, `mano`…), `fish_pick=N` elige la opción N de su ficha, `card_shot=true` captura la ficha (`shots/pesca_<tag>_ficha_<captura>.png`), `seed=N`. En la partida, `go_fishing=true` pulsa «Pescar en el muelle…» al superar un nivel de la parte 2.
   - `level=desafio:p1_n4`: juega el desafío de ese nivel (hito 15.2). `challenge_open=true` (selección con `map=true`): abre la ventana de los desafíos.
   - `library_live=false`: el bestiario con las imágenes quietas, sin girar (hito 15.4).
+  - Archivo de expediciones (hito 16.26): `title saves=<carpeta> open=menu_biblioteca tome=9 cursor=N`; `lib_replay=N` repite la partida N (pulsa «Repetir» solo).
   - `replay=false`: sin grabar la repetición de la caída (hito 15.1). `replay_open=true`: la abre en la pantalla final (capturas, con `halt_shots=true quit_on_end=true`). `replay_gif=true`: además la guarda como GIF (en `photo_dir=` si se da).
   - `spikes=true` (con `perf=N`): registro de picos (hito 16.1, `SpikeLog`): cuántos fotogramas pasan de 16,7 ms y de 25 ms (tirones), el peor, compilaciones de shaders (cuándo y de qué tipo), pasos de física, nodos que entran en la escena por tipo, los sistemas de `Prof` que suben en los picos, los peores fotogramas uno a uno y cuántos nodos se ejecutan en cada fotograma. Activa `prof`. Al medir, sin límite de fotogramas (`--disable-vsync`): con `cfg_fps_limit=60` el temporizador de Windows hace oscilar cada fotograma alrededor de 16,7 ms y la cuenta no sirve.
   - `loadtime=true`: reparte la carga de la partida por tramos de `_ready` («CARGA   arena…») y dice si la arena venía montada del relato y cuánto se esperó por ella (hito 16.6); sin relato delante, sale al acabar de cargar. Con `relato level=pN_nM relato_go=T` (el relato pasa solo a los T s) mide también la pantalla en negro desde el relato («CARGA desde el relato hasta aquí»). `preload=false`: sin cargar la partida durante el relato (para comparar).

@@ -120,7 +120,7 @@ func _build() -> void:
 	for r: Dictionary in shown:
 		var src := _source(p, String(r.id))
 		_box.add_child(_row(src[1], src[0], src[2], float(r.damage) / maxf(top, 1.0), "%d %%" % roundi(float(r.share) * 100.0),
-			MenuKit.money(roundi(r.damage)), str(snappedf(float(r.dps), 0.1)), str(int(r.kills))))
+			MenuKit.money(roundi(r.damage)), RunArchive.decimal(float(r.dps)), str(int(r.kills))))
 	if rows.size() > ROWS:
 		var rest := rows.slice(ROWS)
 		var d := 0.0; var k := 0; var sh := 0.0
@@ -133,7 +133,7 @@ func _build() -> void:
 		total += float(r.damage); kills += int(r.kills)
 	var t := int(w.clock)
 	_box.add_child(_row(null, "Total", "%02d:%02d de partida" % [t / 60, t % 60], -1.0, "", MenuKit.money(roundi(total)),
-		str(snappedf(total / maxf(w.clock, 1.0), 0.1)), str(kills), true))
+		RunArchive.decimal(total / maxf(w.clock, 1.0)), str(kills), true))
 
 ## Una fila: imagen, nombre (y debajo, qué es), barra de la parte del total y cuatro cifras.
 func _row(icon: Texture2D, name: String, kind: String, bar: float, share: String, dmg: String, dps: String, kills: String, head := false) -> Control:

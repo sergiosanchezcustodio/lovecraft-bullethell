@@ -1787,6 +1787,19 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Pruebas:** `tests/test_damage_table.gd` (orden, parte, daño por segundo desde la primera vez, solo las del jugador; el botón en la pausa). 694 de 694.
 - **Capturas:** `shots/game_dano_071.0s.png` (Carter al minuto), `shots/game_dano2_041.0s.png` (el J2 en cooperativo). Opción: `dmg_table=T` abre la pausa y la tabla a los T s (`dmg_player=N`, la del J N).
 
+## Fase 16, hito 16.26: archivo de expediciones (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+`scripts/save/run_archive.gd` (`RunArchive`), tomo «archive» de `Library` y `LibraryMenu._ask_replay`.
+
+- **Qué se guarda:** al acabar cada nivel (superado, caído o la noche eterna), si juega alguna persona en este PC (`archive_save=true`: también los bots), una entrada en `SaveData.records.archive` (las 30 últimas, la más reciente primero; `Game._archive`): nivel, resultado, tiempo, semilla, pactos, grado de locura, fecha y hora, y por cada jugador de este PC su investigador, vestuario, compañero, nivel, armas y objetos con su nivel, quién le abatió («Pingüino albino ciego (contacto)», de la última caída) y las 8 primeras filas de su tabla de daño (`CombatWorld.table_of`, hito 16.27).
+- **En la Biblioteca,** tomo X, «Archivo de expediciones»: por fecha («3 de noviembre de 2026»), una fila por partida («18:31 · El campamento destruido de Lake · Caído»; con el modo delante si no es la campaña: desafío, noche eterna, partida del día, expedición, desfile). En la página, el investigador con su vestuario, la fecha, la hora y quién; «Caído en el minuto 1 (0:51)»; quién le abatió; armas, objetos, compañeros de cooperativo y pactos; y la tabla de daño («Llave de los sueños: 807 (61 %), 17,9/s, 20 abatidos»).
+- **Repetir con la misma semilla:** A en una fila pregunta y, si sí, prepara la sesión (`RunArchive.prepare`: J1 con el dispositivo del menú, su investigador, vestuario, compañero, pactos y locura; sin lo que traía del nivel anterior) y va al relato del nivel. No se repiten la partida del día (su azar es el de su fecha), la expedición (su mapa) ni el desfile de jefes (su tiempo sumado): lo dice y vuelve.
+- **Semilla de cada partida** (`Game._seed_players` y `_seed_world`): antes solo la partida del día tenía; ahora todas (la del archivo al repetir, `GameSession.replay_seed`, que se gasta; `seed=N` en pruebas; o una nueva). Para que la misma semilla dé las mismas subidas, cada jugador tiene su propio azar para ellas (`Player.up_rng`): con el de la partida, que comparten baúles y apariciones en el orden en que pasen, salían otras. Y se siembra antes de las subidas de ventaja de los niveles avanzados (`_apply_carry`), que antes eran al azar (también en la del día). Comprobado: dos partidas con `seed=4242` acaban con las mismas armas y objetos; lo que depende del ritmo (dónde aparece cada enemigo respecto al jugador) cambia, como en la del día.
+- **Pruebas:** `tests/test_run_archive.gd` (las 30 últimas, qué se puede repetir, la sesión que prepara, la entrada de la Biblioteca). 698 de 698. Repetir desde la Biblioteca de verdad: `title saves=<carpeta> open=menu_biblioteca tome=9 cursor=0 lib_replay=0 skip_relato=true log_ups=true` (sale «SEMILLA 4242 p1_n2 carter» y la misma primera subida).
+- **Capturas:** `shots/titulo_archivo_011.0s.png`. Opciones nuevas: `seed=N`, `archive_save=true`, `log_ups=true` (la semilla y las opciones de cada subida), `lib_replay=N`.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
