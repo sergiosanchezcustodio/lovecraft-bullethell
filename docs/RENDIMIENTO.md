@@ -237,18 +237,18 @@ Primera partida tras arrancar el juego, en Alta, desde el relato (`relato level=
 
 | Nivel | Alta: media (antes) | Alta: 1 % peor | Primitivas (Alta) |
 |---|---|---|---|
-| p1_n1 · Campamento base en la costa del mar de Ross | 7,69 (7,72, −0 %) | 13,41 (14,68, −9 %) | 8,7 M |
-| p1_n2 · El campamento destruido de Lake | 7,09 (7,45, −5 %) | 14,32 (18,00, −20 %) | 11,5 M |
-| p1_n3 · El paso de la cordillera y sus cavernas | 7,09 (7,79, −9 %) | 15,28 (16,99, −10 %) | 4,9 M |
-| p1_n4 · La ciudad ciclópea de los Antiguos | 7,04 (7,70, −9 %) | 14,10 (15,67, −10 %) | 11,9 M |
-| p1_n5 · Los túneles y el abismo del mar subterráneo | 7,72 (7,73, −0 %) | 16,50 (17,75, −7 %) | 8,0 M |
-| p2_n1 · Newburyport y la carretera a Innsmouth | 7,07 (7,20, −2 %) | 13,74 (18,41, −25 %) | 10,7 M |
-| p2_n2 · Las calles de Innsmouth y el templo de la Orden | 7,53 (8,45, −11 %) | 13,04 (16,24, −20 %) | 14,1 M |
-| p2_n3 · El hotel Gilman House y la huida por los tejados | 7,86 (7,72, +2 %) | 16,16 (17,43, −7 %) | 9,9 M |
-| p2_n4 · Los pantanos y la vía muerta del tren a Rowley | 9,08 (10,86, −16 %) | 15,10 (19,52, −23 %) | 16,5 M |
-| p2_n5 · El Arrecife del Diablo y Y'ha-nthlei | 8,09 (9,23, −12 %) | 17,35 (16,89, +3 %) | 14,4 M |
-| p3_n1 · Providence: el estudio del escultor Wilcox | 7,03 (7,10, −1 %) | 13,25 (14,31, −7 %) | 13,0 M |
-| p3_n2 · Los pantanos de Luisiana: el ritual del culto | 8,02 (10,04, −20 %) | 14,42 (22,97, −37 %) | 15,9 M |
-| p3_n3 · Los muelles y la cubierta del Alert | 7,10 (8,39, −15 %) | 12,47 (17,08, −27 %) | 7,8 M |
-| p3_n4 · La tormenta en el Pacífico | 7,43 (8,06, −8 %) | 14,32 (18,44, −22 %) | 10,2 M |
-| p3_n5 · R'lyeh emergida: la puerta colosal | 7,22 (8,02, −10 %) | 13,85 (17,65, −22 %) | 14,9 M |
+| p1_n1 · Campamento base en la costa del mar de Ross | 7,29 (7,69, −5 %) | 13,13 (13,41, −2 %) | 5,7 M |
+| p1_n2 · El campamento destruido de Lake | 7,21 (7,09, +2 %) | 18,59 (14,32, +30 %) | 10,1 M |
+| p1_n3 · El paso de la cordillera y sus cavernas | 7,15 (7,09, +1 %) | 15,80 (15,28, +3 %) | 5,6 M |
+| p1_n4 · La ciudad ciclópea de los Antiguos | 7,13 (7,04, +1 %) | 14,38 (14,10, +2 %) | 11,0 M |
+| p1_n5 · Los túneles y el abismo del mar subterráneo | 7,45 (7,72, −3 %) | 17,01 (16,50, +3 %) | 8,0 M |
+| p2_n1 · Newburyport y la carretera a Innsmouth | 7,03 (7,07, −1 %) | 14,06 (13,74, +2 %) | 12,6 M |
+| p2_n2 · Las calles de Innsmouth y el templo de la Orden | 7,57 (7,53, +1 %) | 14,40 (13,04, +10 %) | 14,8 M |
+| p2_n3 · El hotel Gilman House y la huida por los tejados | 7,30 (7,86, −7 %) | 13,94 (16,16, −14 %) | 8,8 M |
+| p2_n4 · Los pantanos y la vía muerta del tren a Rowley | 9,25 (9,08, +2 %) | 16,27 (15,10, +8 %) | 16,8 M |
+| p2_n5 · El Arrecife del Diablo y Y'ha-nthlei | 8,31 (8,09, +3 %) | 16,09 (17,35, −7 %) | 13,6 M |
+| p3_n1 · Providence: el estudio del escultor Wilcox | 7,14 (7,03, +2 %) | 17,06 (13,25, +29 %) | 9,8 M |
+| p3_n2 · Los pantanos de Luisiana: el ritual del culto | 8,34 (8,02, +4 %) | 14,18 (14,42, −2 %) | 12,8 M |
+| p3_n3 · Los muelles y la cubierta del Alert | 7,78 (7,10, +10 %) | 18,70 (12,47, +50 %) | 8,8 M |
+| p3_n4 · La tormenta en el Pacífico | 7,29 (7,43, −2 %) | 14,30 (14,32, −0 %) | 8,0 M |
+| p3_n5 · R'lyeh emergida: la puerta colosal | 7,49 (7,22, +4 %) | 14,42 (13,85, +4 %) | 15,9 M |
