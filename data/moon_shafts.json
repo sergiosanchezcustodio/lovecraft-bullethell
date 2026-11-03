@@ -1,0 +1,18 @@
+{
+	"_doc": "Haces de luna (hito 16.32, MoonShafts): solo en Alta y Ultra (Quality 'moon_shafts'). Por arena: color y energy (el haz en el aire), light (energía del foco que dibuja la mancha en el suelo y alumbra a quien pasa), density (lo espeso del haz), motes (motas de polvo por haz) y dir (hacia dónde va la luz; sin dir, la de la luna de la arena). 'windows': ventanales de las piezas del decorado: models da, por modelo, la x local (m) del centro de los ventanales que dejan pasar la luz (frame: false si no tienen parteluz ni travesaños), w su ancho y y0, y1 su alto (m). 'gaps': grietas en el techo: at, dónde cae en el suelo (x, z), r el radio (m), height la altura de la grieta y fade cuánto se funde el haz desde arriba (m).",
+	"estudio": {
+		"color": [0.62, 0.72, 1.0], "energy": 0.7, "light": 6.0, "density": 0.12, "motes": 50,
+		"dir": [0.82, -0.75, 0.27],
+		"windows": {
+			"w": 1.0, "y0": 0.69, "y1": 3.25,
+			"models": {"prv_muro": {"x": [-2.75, 3.25]}, "prv_muro_2": {"x": [-2.75, 1.25]}, "prv_muro_3": {"x": [-0.75], "frame": false}}
+		}
+	},
+	"tuneles": {
+		"color": [0.5, 0.74, 0.86], "energy": 0.6, "light": 5.0, "density": 0.22, "motes": 70, "height": 6.0, "fade": 4.0,
+		"gaps": [
+			{"at": [1, -7], "r": 1.3}, {"at": [9, 5], "r": 1.0}, {"at": [-5, -14], "r": 1.1},
+			{"at": [23, -5], "r": 1.4}, {"at": [19, 23], "r": 1.0}, {"at": [-9, 16], "r": 1.2}
+		]
+	}
+}

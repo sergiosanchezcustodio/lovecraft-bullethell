@@ -49,6 +49,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `final_at=s`: adelanta el evento final.
   - `seed=N`: semilla de la partida (hito 16.26; sin ella, una nueva). `archive_save=true`: apunta la partida en el archivo de expediciones aunque juegue un bot. `log_ups=true`: escribe la semilla y las opciones de cada subida.
   - `reflections=true|false`: fuerza o quita los reflejos en el agua (hito 16.31; por defecto, los de la calidad: Alta y Ultra). `refl_debug=true` enseña la imagen del reflejo en una esquina y la pone en todo el suelo.
+  - `moon_shafts=true|false`: fuerza o quita los haces de luna (hito 16.32; por defecto, los de la calidad: Alta y Ultra). Con `log=true`, cuántos y lo que tardan en montarse.
   - `log_rumble=true`: escribe cada pulso de vibración del mando, haya mando o no (hito 16.30).
   - `dmg_table=T`: abre la pausa y la tabla «Daño de la partida» a los T s (`dmg_player=N`: la del J N; hito 16.27).
   - `max_alive=N` y `spawn_rate=N`: tope de vivos y ritmo de aparición fijo (pruebas de carga).

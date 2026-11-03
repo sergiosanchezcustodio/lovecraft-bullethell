@@ -343,6 +343,9 @@ func _ready() -> void:
 	add_child(Ambient.new().setup(arena, camera, arena_path.get_file().get_basename()))   # ambiente del escenario
 	if args.get_bool("reflections", bool(Quality.value("reflections", false))) and WaterReflection.has_water(arena):
 		add_child(WaterReflection.new().setup(camera, arena))   # reflejos en el agua (16.31)
+	var arena_id := arena_path.get_file().get_basename()
+	if args.get_bool("moon_shafts", bool(Quality.value("moon_shafts", false))) and MoonShafts.has_shafts(arena_id):
+		arena.add_child(MoonShafts.new().setup(arena, arena_id))   # haces de luna (16.32)
 	_lap("cámara y ambiente")
 	_make_announcer()
 	if not args.get_bool("nolevel"):

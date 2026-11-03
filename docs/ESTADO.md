@@ -1863,6 +1863,23 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Pruebas:** `tests/test_water_reflection.gd` (la cámara espejo es un giro, queda bajo el suelo y mira al mismo punto; `has_water`; solo en Alta y Ultra). 711 de 711.
 - **Capturas:** `shots/game_refl_final_006.0s.png` (pantano, el reflejo en la orilla), `game_refl_c_004.0s.png` (calles con lluvia), `game_refl_reef_006.0s.png` y `game_refl_dbg_006.0s.png` (con `refl_debug`: dónde cae el reflejo).
 
+## Fase 16, hito 16.32: haces de luna (03-11-2026)
+
+- **Qué:** la luz de la luna entra por los ventanales de la pared oeste del estudio de Wilcox (p3_n1), en haces inclinados con las franjas del parteluz y los travesaños y una mancha con la forma del ventanal en el suelo, y cae por seis grietas del techo de los túneles (p1_n5), en columnas que se funden hacia arriba. Unas motas de polvo flotan dentro y la intensidad sube y baja despacio (nubes delante de la luna). Solo en Alta y Ultra.
+- **Cómo** (`scripts/fx/moon_shafts.gd`, `MoonShafts`, datos en `data/moon_shafts.json`): cada haz es la abertura (ventanal o grieta, lados U y V) barrida en la dirección de la luz D hasta el suelo. Tres piezas:
+  - en el aire, `moon_shaft.gdshader`: la malla es solo el contorno; cada píxel recorta el rayo de la vista con las seis caras del haz y con la profundidad de la escena (lo que hay delante lo corta) y suma doce muestras con la forma de la abertura y algo de polvo;
+  - en el suelo, un foco (`SpotLight3D`) 30 m detrás de la abertura con un proyector: la abertura vista desde el foco (textura de 96 px calculada rayo a rayo, compartida entre ventanales iguales). Alumbra también a quien cruza el haz;
+  - motas, `GPUParticles3D` en la caja del haz con `moon_mote.gdshader`, que solo las enseña dentro.
+  La forma está dos veces, `MoonShafts.mask` y `shaft_mask` (`moon_shaft.gdshaderinc`): si cambias una, cambia la otra.
+- **Trampa:** el proyector del foco usa la matriz de sombra, así que sin `shadow_enabled` no se dibuja (la luz sale redonda o, con el proyector puesto, nada), y con sombras la pared, con el foco detrás, lo tapa todo. Se dejan las sombras puestas con `shadow_caster_mask = Player.VIS_PLAYER` (Godot 4.4): solo los investigadores hacen sombra en el haz.
+- **Dirección:** en las grietas, la de la luna de la arena; en el estudio, una propia (`dir`, hacia el este y algo al sur): con la de su luna (que va hacia el noroeste) la luz no entraría por ninguna pared, y entrando de frente por las dos los haces se veían como franjas verticales que tapaban su propia mancha. Así entran solo por la pared oeste y cruzan la pantalla en diagonal. Ojo: las sombras de las estatuas siguen la luna de la arena, que viene del otro lado; si molesta, se puede girar su `sun_rot`.
+- **Equilibrio:** estudio, `energy` 0,7, `light` 6 y `density` 0,12 (con 0,9 los haces salían como columnas macizas); túneles, grietas a 6 m (a 11, palos de luz de lado a lado de la pantalla) que se funden en 4 m.
+- **Coste** (estudio, siete haces, sin límite de fotogramas, dos veces cada una): 3,65 y 3,69 ms sin haces, 3,71 y 3,71 ms con ellos (menos de 0,06 ms); al montarlos, 26 ms en el estudio y 51 ms en los túneles (las texturas del proyector).
+- **Opciones:** `moon_shafts=true|false` los fuerza o los quita; `log=true` escribe «HACES DE LUNA 7 haces, 2 texturas, 26,1 ms».
+- **Fuera:** el templo de la Orden (calles de Innsmouth, con lluvia y nubes cerradas) y la ciudad de los Antiguos (de día, con el sol bajo) no tienen dónde: allí un haz no se distinguiría. Para añadir otra arena basta su entrada en el JSON.
+- **Pruebas:** `tests/test_moon_shafts.gd` (la forma del ventanal y de la grieta; ventanales de la pared que recibe la luz y no de la que le llega rasante, con la abertura en la pared y la mancha en el suelo dentro del estudio; las grietas caen donde dice el JSON; solo en Alta y Ultra; cada foco con su proyector y sombras). 716 de 716.
+- **Capturas:** `shots/game_sh_d_005.0s.png` (el estudio), `game_sh_in_005.0s.png` (Dyer dentro de un haz), `game_sh_tun_005.0s.png` (túneles).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
