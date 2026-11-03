@@ -1,5 +1,5 @@
 {
-	"fecha": "30-10-2026",
+	"fecha": "03-11-2026",
 	"version": "0.9.0",
 	"veces": 2,
 	"resultados": {
@@ -13,12 +13,12 @@
 				"primitivas": 8785921
 			},
 			"2": {
-				"media": 8.18,
-				"peor": 16.38,
+				"media": 7.72,
+				"peor": 14.68,
 				"enemigos": 80,
-				"balas": 33,
-				"llamadas": 424,
-				"primitivas": 4304185
+				"balas": 52,
+				"llamadas": 672,
+				"primitivas": 6655923
 			}
 		},
 		"p1_n2": {
@@ -31,12 +31,12 @@
 				"primitivas": 10740525
 			},
 			"2": {
-				"media": 7.51,
-				"peor": 16.39,
+				"media": 7.45,
+				"peor": 18.0,
 				"enemigos": 80,
-				"balas": 37,
-				"llamadas": 595,
-				"primitivas": 10379665
+				"balas": 27,
+				"llamadas": 925,
+				"primitivas": 9001417
 			}
 		},
 		"p1_n3": {
@@ -49,12 +49,12 @@
 				"primitivas": 3802093
 			},
 			"2": {
-				"media": 7.61,
-				"peor": 18.78,
+				"media": 7.79,
+				"peor": 16.99,
 				"enemigos": 80,
-				"balas": 29,
-				"llamadas": 514,
-				"primitivas": 4223835
+				"balas": 45,
+				"llamadas": 984,
+				"primitivas": 5655021
 			}
 		},
 		"p1_n4": {
@@ -67,12 +67,12 @@
 				"primitivas": 9070539
 			},
 			"2": {
-				"media": 7.53,
-				"peor": 15.6,
+				"media": 7.7,
+				"peor": 15.67,
 				"enemigos": 80,
-				"balas": 22,
-				"llamadas": 995,
-				"primitivas": 11260389
+				"balas": 6,
+				"llamadas": 1413,
+				"primitivas": 10343333
 			}
 		},
 		"p1_n5": {
@@ -85,12 +85,12 @@
 				"primitivas": 6630385
 			},
 			"2": {
-				"media": 7.4,
-				"peor": 15.27,
+				"media": 7.73,
+				"peor": 17.75,
 				"enemigos": 80,
-				"balas": 7,
-				"llamadas": 769,
-				"primitivas": 7298305
+				"balas": 0,
+				"llamadas": 910,
+				"primitivas": 7660709
 			}
 		},
 		"p2_n1": {
@@ -103,12 +103,12 @@
 				"primitivas": 11509307
 			},
 			"2": {
-				"media": 8.13,
-				"peor": 15.67,
+				"media": 7.2,
+				"peor": 18.41,
 				"enemigos": 80,
 				"balas": 0,
-				"llamadas": 695,
-				"primitivas": 13277779
+				"llamadas": 689,
+				"primitivas": 12233705
 			}
 		},
 		"p2_n2": {
@@ -121,12 +121,12 @@
 				"primitivas": 10419247
 			},
 			"2": {
-				"media": 9.81,
-				"peor": 17.67,
+				"media": 8.45,
+				"peor": 16.24,
 				"enemigos": 80,
-				"balas": 86,
-				"llamadas": 1184,
-				"primitivas": 11004041
+				"balas": 51,
+				"llamadas": 1094,
+				"primitivas": 13312787
 			}
 		},
 		"p2_n3": {
@@ -139,12 +139,12 @@
 				"primitivas": 8661645
 			},
 			"2": {
-				"media": 8.76,
-				"peor": 15.34,
+				"media": 7.72,
+				"peor": 17.43,
 				"enemigos": 80,
-				"balas": 149,
-				"llamadas": 656,
-				"primitivas": 10185201
+				"balas": 19,
+				"llamadas": 640,
+				"primitivas": 7443913
 			}
 		},
 		"p2_n4": {
@@ -157,12 +157,12 @@
 				"primitivas": 20728345
 			},
 			"2": {
-				"media": 9.9,
-				"peor": 17.0,
+				"media": 10.86,
+				"peor": 19.52,
 				"enemigos": 80,
-				"balas": 31,
-				"llamadas": 1081,
-				"primitivas": 19929959
+				"balas": 45,
+				"llamadas": 1310,
+				"primitivas": 23429557
 			}
 		},
 		"p2_n5": {
@@ -175,12 +175,12 @@
 				"primitivas": 16165087
 			},
 			"2": {
-				"media": 9.76,
-				"peor": 18.84,
+				"media": 9.23,
+				"peor": 16.89,
 				"enemigos": 80,
-				"balas": 33,
-				"llamadas": 1034,
-				"primitivas": 13882569
+				"balas": 30,
+				"llamadas": 1319,
+				"primitivas": 15748367
 			}
 		},
 		"p3_n1": {
@@ -193,12 +193,12 @@
 				"primitivas": 10620945
 			},
 			"2": {
-				"media": 7.31,
-				"peor": 14.81,
+				"media": 7.1,
+				"peor": 14.31,
 				"enemigos": 80,
 				"balas": 0,
-				"llamadas": 637,
-				"primitivas": 13074723
+				"llamadas": 657,
+				"primitivas": 11764177
 			}
 		},
 		"p3_n2": {
@@ -211,12 +211,12 @@
 				"primitivas": 14931187
 			},
 			"2": {
-				"media": 7.56,
-				"peor": 13.0,
+				"media": 10.04,
+				"peor": 22.97,
 				"enemigos": 80,
-				"balas": 15,
-				"llamadas": 645,
-				"primitivas": 14032291
+				"balas": 39,
+				"llamadas": 1313,
+				"primitivas": 14948153
 			}
 		},
 		"p3_n3": {
@@ -229,12 +229,12 @@
 				"primitivas": 9163881
 			},
 			"2": {
-				"media": 9.91,
-				"peor": 16.83,
+				"media": 8.39,
+				"peor": 17.08,
 				"enemigos": 80,
-				"balas": 26,
-				"llamadas": 776,
-				"primitivas": 9266165
+				"balas": 86,
+				"llamadas": 1071,
+				"primitivas": 12194135
 			}
 		},
 		"p3_n4": {
@@ -247,12 +247,12 @@
 				"primitivas": 11709725
 			},
 			"2": {
-				"media": 7.39,
-				"peor": 16.06,
+				"media": 8.06,
+				"peor": 18.44,
 				"enemigos": 80,
-				"balas": 0,
-				"llamadas": 614,
-				"primitivas": 6475945
+				"balas": 44,
+				"llamadas": 1078,
+				"primitivas": 10263737
 			}
 		},
 		"p3_n5": {
@@ -265,12 +265,288 @@
 				"primitivas": 11475975
 			},
 			"2": {
-				"media": 8.38,
-				"peor": 16.6,
+				"media": 8.02,
+				"peor": 17.65,
 				"enemigos": 80,
 				"balas": 0,
-				"llamadas": 726,
-				"primitivas": 11567985
+				"llamadas": 982,
+				"primitivas": 10871541
+			}
+		}
+	},
+	"anterior": {
+		"fecha": "30-10-2026",
+		"version": "0.9.0",
+		"resultados": {
+			"p1_n1": {
+				"1": {
+					"media": 7.86,
+					"peor": 16.05,
+					"enemigos": 80,
+					"balas": 41,
+					"llamadas": 525,
+					"primitivas": 8785921
+				},
+				"2": {
+					"media": 8.18,
+					"peor": 16.38,
+					"enemigos": 80,
+					"balas": 33,
+					"llamadas": 424,
+					"primitivas": 4304185
+				}
+			},
+			"p1_n2": {
+				"1": {
+					"media": 7.68,
+					"peor": 19.24,
+					"enemigos": 80,
+					"balas": 37,
+					"llamadas": 758,
+					"primitivas": 10740525
+				},
+				"2": {
+					"media": 7.51,
+					"peor": 16.39,
+					"enemigos": 80,
+					"balas": 37,
+					"llamadas": 595,
+					"primitivas": 10379665
+				}
+			},
+			"p1_n3": {
+				"1": {
+					"media": 7.24,
+					"peor": 18.93,
+					"enemigos": 80,
+					"balas": 13,
+					"llamadas": 415,
+					"primitivas": 3802093
+				},
+				"2": {
+					"media": 7.61,
+					"peor": 18.78,
+					"enemigos": 80,
+					"balas": 29,
+					"llamadas": 514,
+					"primitivas": 4223835
+				}
+			},
+			"p1_n4": {
+				"1": {
+					"media": 7.54,
+					"peor": 14.45,
+					"enemigos": 80,
+					"balas": 4,
+					"llamadas": 860,
+					"primitivas": 9070539
+				},
+				"2": {
+					"media": 7.53,
+					"peor": 15.6,
+					"enemigos": 80,
+					"balas": 22,
+					"llamadas": 995,
+					"primitivas": 11260389
+				}
+			},
+			"p1_n5": {
+				"1": {
+					"media": 7.93,
+					"peor": 17.25,
+					"enemigos": 80,
+					"balas": 48,
+					"llamadas": 696,
+					"primitivas": 6630385
+				},
+				"2": {
+					"media": 7.4,
+					"peor": 15.27,
+					"enemigos": 80,
+					"balas": 7,
+					"llamadas": 769,
+					"primitivas": 7298305
+				}
+			},
+			"p2_n1": {
+				"1": {
+					"media": 7.07,
+					"peor": 11.26,
+					"enemigos": 80,
+					"balas": 0,
+					"llamadas": 705,
+					"primitivas": 11509307
+				},
+				"2": {
+					"media": 8.13,
+					"peor": 15.67,
+					"enemigos": 80,
+					"balas": 0,
+					"llamadas": 695,
+					"primitivas": 13277779
+				}
+			},
+			"p2_n2": {
+				"1": {
+					"media": 9.67,
+					"peor": 16.41,
+					"enemigos": 80,
+					"balas": 16,
+					"llamadas": 1043,
+					"primitivas": 10419247
+				},
+				"2": {
+					"media": 9.81,
+					"peor": 17.67,
+					"enemigos": 80,
+					"balas": 86,
+					"llamadas": 1184,
+					"primitivas": 11004041
+				}
+			},
+			"p2_n3": {
+				"1": {
+					"media": 8.98,
+					"peor": 17.3,
+					"enemigos": 80,
+					"balas": 84,
+					"llamadas": 764,
+					"primitivas": 8661645
+				},
+				"2": {
+					"media": 8.76,
+					"peor": 15.34,
+					"enemigos": 80,
+					"balas": 149,
+					"llamadas": 656,
+					"primitivas": 10185201
+				}
+			},
+			"p2_n4": {
+				"1": {
+					"media": 9.97,
+					"peor": 17.12,
+					"enemigos": 80,
+					"balas": 49,
+					"llamadas": 970,
+					"primitivas": 20728345
+				},
+				"2": {
+					"media": 9.9,
+					"peor": 17.0,
+					"enemigos": 80,
+					"balas": 31,
+					"llamadas": 1081,
+					"primitivas": 19929959
+				}
+			},
+			"p2_n5": {
+				"1": {
+					"media": 9.24,
+					"peor": 18.06,
+					"enemigos": 80,
+					"balas": 32,
+					"llamadas": 1170,
+					"primitivas": 16165087
+				},
+				"2": {
+					"media": 9.76,
+					"peor": 18.84,
+					"enemigos": 80,
+					"balas": 33,
+					"llamadas": 1034,
+					"primitivas": 13882569
+				}
+			},
+			"p3_n1": {
+				"1": {
+					"media": 7.2,
+					"peor": 15.06,
+					"enemigos": 80,
+					"balas": 0,
+					"llamadas": 520,
+					"primitivas": 10620945
+				},
+				"2": {
+					"media": 7.31,
+					"peor": 14.81,
+					"enemigos": 80,
+					"balas": 0,
+					"llamadas": 637,
+					"primitivas": 13074723
+				}
+			},
+			"p3_n2": {
+				"1": {
+					"media": 10.39,
+					"peor": 19.82,
+					"enemigos": 80,
+					"balas": 24,
+					"llamadas": 617,
+					"primitivas": 14931187
+				},
+				"2": {
+					"media": 7.56,
+					"peor": 13.0,
+					"enemigos": 80,
+					"balas": 15,
+					"llamadas": 645,
+					"primitivas": 14032291
+				}
+			},
+			"p3_n3": {
+				"1": {
+					"media": 9.83,
+					"peor": 18.43,
+					"enemigos": 80,
+					"balas": 27,
+					"llamadas": 775,
+					"primitivas": 9163881
+				},
+				"2": {
+					"media": 9.91,
+					"peor": 16.83,
+					"enemigos": 80,
+					"balas": 26,
+					"llamadas": 776,
+					"primitivas": 9266165
+				}
+			},
+			"p3_n4": {
+				"1": {
+					"media": 8.27,
+					"peor": 16.72,
+					"enemigos": 80,
+					"balas": 56,
+					"llamadas": 824,
+					"primitivas": 11709725
+				},
+				"2": {
+					"media": 7.39,
+					"peor": 16.06,
+					"enemigos": 80,
+					"balas": 0,
+					"llamadas": 614,
+					"primitivas": 6475945
+				}
+			},
+			"p3_n5": {
+				"1": {
+					"media": 8.93,
+					"peor": 18.06,
+					"enemigos": 80,
+					"balas": 0,
+					"llamadas": 866,
+					"primitivas": 11475975
+				},
+				"2": {
+					"media": 8.38,
+					"peor": 16.6,
+					"enemigos": 80,
+					"balas": 0,
+					"llamadas": 726,
+					"primitivas": 11567985
+				}
 			}
 		}
 	}
