@@ -66,7 +66,8 @@ static func snapshot(q: Player) -> Dictionary:
 	var ws := []
 	for w in q.weapons.weapons: ws.append([String(w.data.id), w.level])
 	return {"level": q.progress.level, "xp": q.progress.xp, "attrs": q.attrs.duplicate(),
-		"attrs_level1": q.attrs_level1.duplicate(), "passives": q.progress.passives.duplicate(), "weapons": ws}
+		"attrs_level1": q.attrs_level1.duplicate(), "passives": q.progress.passives.duplicate(), "weapons": ws,
+		"signs": Array(q.progress.signs).map(func(s: StringName) -> String: return String(s))}
 
 ## Devuelve a un jugador el progreso guardado (armas, objetos, nivel y atributos).
 static func restore(q: Player, d: Dictionary) -> void:
@@ -74,6 +75,9 @@ static func restore(q: Player, d: Dictionary) -> void:
 	q.progress.xp = float(d.xp)
 	q.progress.pending = 0
 	q.progress.passives = (d.passives as Dictionary).duplicate()
+	q.progress.signs.clear()                          # Signos Mayores (16.9)
+	if d.get("signs") is Array:
+		for s: Variant in d.signs: q.progress.signs.append(StringName(String(s)))
 	q.attrs = (d.attrs as Dictionary).duplicate()
 	q.attrs_level1 = (d.attrs_level1 as Dictionary).duplicate()
 	for w in q.weapons.weapons.duplicate(): q.weapons.remove_weapon(w.data.id)

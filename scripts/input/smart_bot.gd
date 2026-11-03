@@ -281,6 +281,7 @@ static func pick(options: Array, p: Player, rng: RandomNumberGenerator) -> Playe
 			PlayerProgress.Option.Kind.WEAPON_LEVEL: s += 10.0
 			PlayerProgress.Option.Kind.NEW_WEAPON: s += 9.5 if p.weapons.weapons.size() < 3 else 4.0
 			PlayerProgress.Option.Kind.PASSIVE: s += 7.0 if o.to_level > 1 else 5.5
+		if o.evo_ready: s += 3.0                      # completa una evolución (16.15)
 		if s > best_s:
 			best_s = s
 			best = o

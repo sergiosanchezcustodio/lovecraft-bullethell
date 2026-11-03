@@ -62,6 +62,7 @@ var progress: PlayerProgress
 const CALM_RADIUS := 4.0
 const ARMOR_FLOOR := 0.2         ## parte del golpe físico que siempre pasa la armadura
 const ELITE_TAG := "elite"       ## rasgo de daño contra élites y seres únicos (Enemy.take_damage)
+const HELD_TAG := "held"         ## contra aturdidos o inmovilizados (Signo de Tsathoggua, 16.9)
 ## Estadísticas de los objetos (D-38) que rebuild_stats rehace desde la base del personaje.
 const ITEM_STATS: Array[String] = ["proj_count_add", "range_mult", "proj_speed_mult", "area_mult",
 	"weapon_cooldown_mult", "duration_mult", "pierce_add", "crit_chance", "crit_bonus", "damage_mult",
@@ -1099,12 +1100,14 @@ func rebuild_stats() -> void:
 	v["range_mult"] *= float(shop.get("reach", 1.0))
 	v["health_regen"] += float(shop.get("regen", 0.0))
 	v["crit_chance"] += float(shop.get("crit", 0.0))
+	if has_sign(&"nyarlathotep"): v["crit_chance"] += Signs.value("nyarlathotep")   # hito 16.9
 	for up in progress.upgrade_pool if progress else []:
 		up.apply_levels(v, base, int(progress.passives.get(up.id, 0)))
 	v["move_speed"] *= debug_speed
 	for k in v: data.set(k, v[k])
 	var tags := base.bonus_tags.duplicate()                  # Medallón del cazador: contra élites y únicos
 	if data.elite_mult != 1.0: tags[ELITE_TAG] = data.elite_mult
+	if has_sign(&"tsathoggua"): tags[HELD_TAG] = Signs.value("tsathoggua")   # aturdidos o inmovilizados (16.9)
 	if tags != data.bonus_tags:
 		data.bonus_tags = tags
 		if weapons: weapons.bonus_changed()
@@ -1220,10 +1223,24 @@ func take_damage(d: Damage) -> void:
 ## de Eltdown (sus propios estallidos no encadenan otros).
 func on_kill(tag: StringName = &"", pos := Vector3.INF) -> void:
 	if health <= 0.0: return
+	if has_sign(&"hastur") and world != null:      # Signo de Hastur (16.9): un viento cada N bajas
+		_sign_kills += 1
+		if _sign_kills >= int(Signs.value("hastur")):
+			_sign_kills = 0
+			var wave := Shockwave.new().setup(self, world, HASTUR_RADIUS, 0.4, 0.0, 4.0, 1.0, data.bonus_tags)
+			wave.color = Color(0.95, 0.85, 0.35, 0.9)
+			world.fx.add_child(wave)
 	if data.heal_on_kill > 0.0: health = minf(data.max_health, health + data.heal_on_kill)
 	if data.sanity_on_kill > 0.0: sanity = minf(data.max_sanity, sanity + data.sanity_on_kill)
 	if data.kill_blast > 0.0 and pos != Vector3.INF and not String(tag).ends_with(":tablilla") and randf() < data.kill_blast:
 		blast(pos, KILL_BLAST_DAMAGE, "tablilla")
+
+## Signos Mayores (hito 16.9): ¿lleva este?
+func has_sign(id: StringName) -> bool:
+	return progress != null and progress.signs.has(id)
+
+var _sign_kills := 0                       ## bajas desde el último viento de Hastur
+const HASTUR_RADIUS := 5.0
 
 ## Ha golpeado a un enemigo (Enemy.take_damage): Cristal de Ithaqua y Fósforos de Cthugha.
 func on_hit(e: Node3D) -> void:

@@ -25,3 +25,4 @@ evolution = &"rifle_miskatonic"
 max_level = 5
 level_mods = Array[Dictionary]([{"pierce+": 1.0}, {"pierce+": 1.0, "cooldown*": 0.9}, {"cooldown*": 0.85}, {"count+": 1.0, "burst_delay+": 0.12}])
 level_text = Array[String](["+25 % de daño", "Atraviesa a dos enemigos más", "Dispara un 20 % más rápido", "+30 % de daño y un segundo disparo"])
+evolution_alt = &"rifle_caza_mayor"

@@ -181,6 +181,9 @@ func _physics_process(delta: float) -> void:
 						* (1.0 if Pacts.has("pet_idle") else target.pet_xp_mult))   # pactos (hito 13.6)
 					collected.emit(_id[i])
 				if not target.remote: Auto.sfx_at("gem", target.global_position)
+				if not target.remote and target.has_sign(&"hypnos"):        # Signos Mayores (16.9)
+					target.sanity = minf(target.data.max_sanity, target.sanity + Signs.value("hypnos"))
+				if not mirror and target.has_sign(&"yog"): attract(target.global_position, Signs.value("yog"))
 				target.gem_pulse()
 				_remove(i)
 				continue

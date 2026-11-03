@@ -23,6 +23,7 @@ projectile_size = 0.13
 knockback = 1.0
 evolves_with = &"velocidad"
 evolution = &"bar_asalto"
+evolution_alt = &"bar_tirador"
 max_level = 5
 level_mods = Array[Dictionary]([{"bounces+": 1.0}, {"count+": 1.0}, {"damage*": 1.25}, {"bounces+": 1.0, "cooldown*": 0.9}])
 level_text = Array[String](["Un rebote más", "Una bala más por ráfaga", "+25 % de daño", "Un rebote más y algo más de cadencia"])

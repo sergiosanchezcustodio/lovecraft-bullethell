@@ -25,3 +25,4 @@ level_mods = Array[Dictionary]([{"aoe_radius*": 1.2}, {"root+": 1.0}, {"cooldown
 level_text = Array[String](["Red un 20 % más amplia", "Inmoviliza 1 s más", "Se lanza antes y hace más daño", "Dos redes y más amplias"])
 evolves_with = &"escamas"
 evolution = &"red_innsmouth"
+evolution_alt = &"redes_arrastre"

@@ -25,3 +25,4 @@ level_mods = Array[Dictionary]([{"count+": 2.0, "spread_deg+": 6.0}, {"damage*":
 level_text = Array[String](["Dos perdigones más", "+25 % de daño", "Recarga un 20 % más rápido", "Cuatro perdigones más y más empuje"])
 evolves_with = &"bandolera"
 evolution = &"escopeta_trinchera"
+evolution_alt = &"escopeta_postas"

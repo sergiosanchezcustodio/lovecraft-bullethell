@@ -22,3 +22,4 @@ level_mods = Array[Dictionary]([{"duration+": 3.0}, {"damage*": 1.3}, {"hit_inte
 level_text = Array[String](["Dispara 3 s más", "+30 % de daño", "Dispara un 25 % más rápido", "Se monta antes y +20 % de daño"])
 evolves_with = &"manual_tiro"
 evolution = &"nido_ametralladoras"
+evolution_alt = &"puestos_tiro"

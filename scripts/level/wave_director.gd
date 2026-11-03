@@ -140,6 +140,7 @@ func _idol() -> float:
 func _chest_step(delta: float) -> void:
 	if level.chest_every <= 0.0: return
 	var every := level.chest_every * Pacts.value("chest_every")      # La noche más cerrada, Susurros (hito 13.6)
+	if Signs.any(world.players, &"dagon"): every *= Signs.value("dagon")   # Signo de Dagón (16.9)
 	if _chest_t < 0.0: _chest_t = every * rng.randf_range(0.75, 1.25)
 	_chest_t -= delta * team_item("chest_mult")             # Vara de zahorí
 	if _chest_t > 0.0: return
@@ -159,7 +160,8 @@ func spawn_chest() -> ArcaneChest:
 		if obstacles != null and (not obstacles.bounds.grow(-2.0).has_point(p2) or not _spawnable(p2, 0.7)): continue
 		pos = c
 		break
-	var cash := roundi(rng.randi_range(level.chest_money.x, level.chest_money.y) * Pacts.value("chest_money"))
+	var cash := roundi(rng.randi_range(level.chest_money.x, level.chest_money.y) * Pacts.value("chest_money")
+		* (2.0 if Signs.any(world.players, &"dagon") else 1.0))
 	var chest := ArcaneChest.new().setup(world, pos, cash, 0.0 if Pacts.has("no_heal") else level.chest_heal)
 	world.fx.add_child(chest)
 	chest_spawned.emit(chest)

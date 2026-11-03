@@ -8,6 +8,9 @@ extends Node
 ## anfitrión. Muestra el objetivo en curso arriba (texto, tiempo y avance) y una flecha hacia
 ## donde hay que ir. `objectives=false` los quita; `objective=rescate|ritual|reliquia` y
 ## `objective_at=t` sacan ese a los t s (capturas y pruebas).
+## El buhonero (hito 16.12) va aparte: uno en los niveles `peddler.levels` de cada parte (ni en los
+## desafíos, ni en la partida del día, ni en *La noche eterna*), cuando no haya otro objetivo en
+## curso. `peddler=true` lo saca en cualquier nivel (`peddler_at=t`), `peddler=false` lo quita.
 
 const DATA := "res://data/objectives.json"
 const KINDS := {"rescate": "rescue", "ritual": "ritual", "reliquia": "relic"}
@@ -19,6 +22,7 @@ var done := 0                                  ## cumplidos en este nivel
 var failed := 0
 var _times: Array[float] = []                  ## a qué s del nivel sale cada uno
 var _forced := ""
+var peddler_at := -1.0                         ## s del nivel en que sale el buhonero (-1: no sale)
 var _rng := RandomNumberGenerator.new()
 var _layer: CanvasLayer
 var _hud: ObjectiveHud
@@ -37,7 +41,24 @@ func setup(p_game: Node) -> ObjectiveDirector:
 		_times = [args.get_float("objective_at", 5.0)]
 	elif level != null and not game.is_guest():
 		_times = plan(cfg, level.final_time, _rng)
+	if level != null and not game.is_guest():
+		var pc: Dictionary = cfg.get("peddler", {})
+		var at: Array = pc.get("at", [100.0, 150.0])
+		var t := _rng.randf_range(float(at[0]), float(at[1]))
+		if args != null and args.has("peddler"):
+			if args.get_bool("peddler"): peddler_at = args.get_float("peddler_at", 5.0)
+		elif peddler_due(pc, String(level.id), level.daily != "") and t < level.final_time - 20.0:
+			peddler_at = t
 	return self
+
+## ¿Sale el buhonero en este nivel? En los niveles `levels` de cada parte de la campaña. Pura.
+static func peddler_due(pc: Dictionary, level_id: String, daily: bool) -> bool:
+	if daily or Challenge.active() or Endless.is_endless(level_id): return false
+	if Campaign.levels().all(func(l: Variant) -> bool: return String(l.id) != level_id): return false
+	var n := Campaign.number_of(level_id)
+	for x: Variant in pc.get("levels", [2, 4]):
+		if int(x) == n: return true
+	return false
 
 ## Cuándo sale cada objetivo del nivel: uno o dos (`per_level`), el primero en `first`, los
 ## siguientes `gap` después, y ninguno a menos de `before_final` s del evento final. Pura (tests).
@@ -66,7 +87,13 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	var dir: WaveDirector = game.get("director")
 	if dir == null or dir.mirror or game.is_guest(): return
-	if current != null or _times.is_empty() or dir.completed: return
+	if current != null or dir.completed: return
+	if peddler_at >= 0.0 and dir.time >= peddler_at:
+		var pd := make_peddler()
+		peddler_at = -1.0 if pd != null else dir.time + 3.0     # sin sitio libre: lo vuelve a intentar
+		if pd != null: _start(pd)
+		return
+	if _times.is_empty(): return
 	if dir.time < _times[0]: return
 	_times.remove_at(0)
 	var o := make(_forced if _forced != "" else _pick_kind())
@@ -109,6 +136,34 @@ func make(kind: String) -> Objective:
 	if kind == "rescue": o.model_name = _survivor_model(kc)
 	return o
 
+## El buhonero de la parte, cerca de un jugador en pie.
+func make_peddler() -> Objective:
+	var dir: WaveDirector = game.get("director")
+	var world: CombatWorld = game.get("world")
+	var pc: Dictionary = cfg.get("peddler", {})
+	var standing := world.players.filter(func(p: Player) -> bool: return p.health > 0.0)
+	if standing.is_empty(): return null
+	var who: Player = standing[_rng.randi() % standing.size()]
+	var dist: Array = pc.get("distance", [6.0, 9.0])
+	if game.args.get_bool("objective_near"): dist = [3.0, 4.5]
+	var a := _free_point(dir, who.global_position, float(dist[0]), float(dist[1]), 2.0)
+	if game.args.has("peddler_stall"):              # pruebas: la mercancía N, a los pies del J1
+		var n := (pc.get("goods", []) as Array).size()
+		var x: float = (game.args.get_int("peddler_stall", 0) - (n - 1) * 0.5) * Objective.STALL_GAP
+		a = (game.player as Player).global_position - Vector3(x, 0, Objective.MAT_FRONT).rotated(Vector3.UP, Objective.FACE)
+	if a == Vector3.INF: return null
+	var o := Objective.new().setup("peddler", world, dir, a, a)
+	o.limit = float(pc.get("limit", 50.0))
+	o.model_name = String(vendor(pc)[0])
+	o.reward = ["none", 0]
+	return o
+
+## [modelo, nombre] del buhonero de la parte de este nivel.
+func vendor(pc: Dictionary) -> Array:
+	var level: LevelData = game.get("level")
+	var by_part: Dictionary = pc.get("vendors", {})
+	return by_part.get("p%d" % (level.part if level != null else 1), by_part.get("p1", ["anciano", "el buhonero"]))
+
 func _pick_reward(list: Array) -> Array:
 	var r: Dictionary = list[_rng.randi() % list.size()]
 	if r.has("money"): return ["money", _rng.randi_range(int(r.money[0]), int(r.money[1]))]
@@ -150,6 +205,17 @@ func adopt(o: Objective) -> void:
 	current = o
 	o.finished.connect(_on_finished)
 	_hud.show_objective(o)
+	if o.kind == "peddler":                          # la compra la hace cada PC con sus dólares
+		var pc: Dictionary = cfg.get("peddler", {})
+		var level: LevelData = game.get("level")
+		o.goods = pc.get("goods", [])
+		o.price_mult = 1.0 + float(pc.get("part_price", 0.6)) * ((level.part if level != null else 1) - 1)
+		o.buy_hook = game.peddler_buy
+		o.purse_hook = game.purse
+		game.announce("Ha llegado el buhonero: %s" % String(vendor(pc)[1]), 3.0)
+		Auto.sfx("bell")
+		if game.args.get_bool("log"): print("BUHONERO %s t=%.0f" % [o.model_name, (game.director as WaveDirector).time])
+		return
 	game.announce("Objetivo: %s (recompensa: %s)" % [_title(o.kind), Objective.reward_text(o.reward)], 3.0)
 	Auto.sfx("page")
 	if game.args.get_bool("log"): print("OBJETIVO %s t=%.0f recompensa=%s" % [o.kind, (game.director as WaveDirector).time, o.reward])
@@ -161,6 +227,9 @@ func _on_finished(o: Objective, ok: bool) -> void:
 	if o == current: current = null
 	_hud.show_objective(null)
 	if game.args.get_bool("log"): print("OBJETIVO %s %s t=%.1f" % [o.kind, "cumplido" if ok else "fallido", o.t])
+	if o.kind == "peddler":
+		game.announce("El buhonero se ha ido", 2.0)
+		return
 	if not ok:
 		failed += 1
 		game.announce("Objetivo fallido", 2.0)

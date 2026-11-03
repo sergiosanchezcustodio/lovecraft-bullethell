@@ -27,3 +27,4 @@ level_mods = Array[Dictionary]([{"count+": 1.0}, {"damage*": 1.25}, {"homing*": 
 level_text = Array[String](["Un fuego fatuo más", "+25 % de daño", "Buscan mejor y vuelan más deprisa", "Dos fuegos más y +15 % de daño"])
 evolves_with = &"pipa"
 evolution = &"linterna_fatuos"
+evolution_alt = &"fuego_santelmo"

@@ -74,6 +74,7 @@ var players: Array[Player] = []               ## J1..J4 (hito 2.9)
 var team: TeamXp                              ## experiencia compartida del cooperativo (D-07)
 var menus: PlayerMenus                        ## ficha y mapa de cada jugador (hito 2.12)
 var run_money := 0                            ## dólares ganados en esta partida (D-31)
+var run_spent := 0                            ## y gastados con el buhonero (hito 16.12)
 var _someone_fell := false                    ## alguien ha caído en este nivel (logro "Sin un rasguño")
 var _downs := {}                              ## índice del jugador -> veces derribado o caído en el nivel (simulaciones)
 var _ach_t := 0.0
@@ -324,6 +325,8 @@ func _ready() -> void:
 	for up_id in args.get_str("items").split(",", false):     # items=iman,vida: objetos del J1 al empezar
 		player.progress.passives[up_id] = args.get_int("ilevel", 1)
 	if args.has("items"): player.rebuild_stats()
+	if args.has("evolve_at"):                          # pruebas (16.8): el J1 abre un baúl a los T s
+		get_tree().create_timer(args.get_float("evolve_at"), false).timeout.connect(func() -> void: _try_evolve(player))
 	_lap("tienda y pruebas")
 	camera = GameCamera.new()
 	camera.view_size = args.get_float("cam", 15.0)
@@ -353,6 +356,7 @@ func _ready() -> void:
 		for q in players: q.rebuild_stats()            # (la vida máxima del desafío)
 		_apply_carry()                                 # progreso del nivel anterior de la parte
 		_shop_start()
+		_grant_signs()
 		if args.get_bool("log"): print("INICIO %s nivel=%d armas=%s" % [level_id, player.progress.level, player.weapons.weapons.map(func(w: WeaponSystem.Weapon) -> String: return "%s:%d" % [w.data.id, w.level])])
 		if args.has("final_at"): level.final_time = args.get_float("final_at")
 		if args.get_bool("boss") and level.final_next != null:      # boss=true: el jefe es el evento final
@@ -459,7 +463,8 @@ func _ready() -> void:
 	WallScorch.limit = GroundMarks.limit / 2                 # quemaduras en las paredes (hito 12.11)
 	_lap("efectos")
 	hud = Hud.new().setup(players, director)
-	hud.money = func() -> int: return run_money
+	hud.money = purse
+	if args.has("purse"): run_money = int(args.get_float("purse", 0.0))   # pruebas del buhonero: dólares del nivel
 	add_child(hud)
 	hud.visible = args.get_bool("hud", true)         # hud=false: sin panel ni avisos (tráiler, hito 13.16)
 	add_child(SanityFx.new().setup(players))         # distorsiones de cordura baja
@@ -470,7 +475,7 @@ func _ready() -> void:
 		add_child(_replay)
 	# con bots no salen (las simulaciones de la dificultad siguen comparables), salvo pedidos
 	var bots := player != null and player.input is BotInput and not args.get_bool("objectives")
-	if director != null and args.get_bool("objectives", true) and (not bots or args.has("objective")):
+	if director != null and args.get_bool("objectives", true) and (not bots or args.has("objective") or args.get_bool("peddler")):
 		objectives = ObjectiveDirector.new().setup(self)              # objetivos a mitad de nivel (13.5)
 		add_child(objectives)
 	if args.get_bool("log"): print("PACTOS ", Pacts.active())
@@ -682,6 +687,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	q.weapons = WeaponSystem.new().setup(q, world)
 	q.add_child(q.weapons)
 	for wid in q.data.starting_weapons: q.weapons.add_weapon(load("res://data/weapons/%s.tres" % wid))
+	q.progress.sign_save = Saves.current            # Signos Mayores abiertos (16.9): los de este PC
 	return q
 
 ## Al subir de nivel: sonido, columna de luz y las curas de Whipple y West. En red, la vida
@@ -689,6 +695,11 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 ## lo llama NetGame cuando el anfitrión avisa de la subida.
 func level_fx(q: Player) -> void:
 	Sfx.play("level_up")
+	if q.has_sign(&"nodens"):                         # Signo de Nodens (16.9): cada PC, las balas que ve
+		var wave := Shockwave.new().setup(q, world, Signs.value("nodens"), 0.35, 0.0, 0.0, 0.0, {})
+		wave.clears = true
+		wave.color = Color(0.6, 0.85, 1.0, 0.9)
+		world.fx.add_child(wave)
 	VoxelFx.puff(q, q.global_position, "rise", 0.6, Color.WHITE, 1.4)      # columna de luz (11-10-2026)
 	if not q.remote and not Pacts.has("no_heal"): q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
 	if q.data.team_heal_on_level > 0.0:                   # rasgo de West: cura a los compañeros cercanos
@@ -737,6 +748,79 @@ func earn(amount: int) -> void:
 		Saves.current.money += n
 		Saves.current.stats["money"] = int(Saves.current.stats.get("money", 0)) + n
 
+## Dólares de este nivel que quedan para el buhonero (en este PC).
+func purse() -> int:
+	return run_money - run_spent
+
+## El buhonero (hito 16.12): `q`, de este PC, compra `g` por `price` dólares del nivel (también se
+## restan de la partida guardada). Remedio: vida y cordura, aquí. Baratija (un objeto) y libro
+## (una subida): el progreso lo lleva el anfitrión, así que un invitado se lo pide (BUY).
+var _poor_ms := 0
+func peddler_buy(q: Player, g: Dictionary, price: int) -> bool:
+	var id := String(g.get("id", ""))
+	if purse() < price:
+		if Time.get_ticks_msec() - _poor_ms > 1500:
+			_poor_ms = Time.get_ticks_msec()
+			announce("No te llega: faltan %d $" % (price - purse()), 1.5)
+			Auto.sfx("ui_back")
+		return false
+	var key := ""
+	match id:
+		"remedio":
+			var h := float(g.get("heal", 0.5))
+			q.health = minf(q.data.max_health, q.health + q.data.max_health * h)
+			q.sanity = minf(q.data.max_sanity, q.sanity + q.data.max_sanity * h)
+		"baratija":
+			key = trinket_key(q)
+			if key == "":
+				announce("No te cabe ningún objeto más", 1.5)
+				return false
+		"libro": key = "lvl"
+	run_spent += price
+	if Saves.current != null: Saves.current.money = maxi(Saves.current.money - price, 0)
+	var said := "%s: %s (−%d $)" % [("J%d · " % (q.index + 1)) if players.size() > 1 else "", String(g.get("name", id)), price]
+	if key.begins_with("u:"):
+		said += " → %s" % _upgrade_title(key)
+	announce(said.trim_prefix(": "), 2.5)
+	Auto.sfx("chest")
+	if args.get_bool("log"): print("COMPRA J%d %s %d $ %s" % [q.index + 1, id, price, key])
+	if key != "":
+		if is_guest(): net_game.send_buy(q, key)
+		else: apply_bought(q, key)
+	return true
+
+## Baratija: subir uno de los objetos que lleva o, si no hay, uno nuevo (con hueco). "" si nada.
+func trinket_key(q: Player) -> String:
+	var owned: Array[String] = []
+	var fresh: Array[String] = []
+	for up in q.progress.upgrade_pool:
+		var k := "u:" + String(up.id)
+		if q.progress.option_for(k, q.weapons) == null: continue
+		if int(q.progress.passives.get(up.id, 0)) > 0: owned.append(k)
+		else: fresh.append(k)
+	var pool := owned if not owned.is_empty() else fresh
+	return "" if pool.is_empty() else pool[_rng.randi() % pool.size()]
+
+func _upgrade_title(key: String) -> String:
+	for up in player.progress.upgrade_pool:
+		if "u:" + String(up.id) == key: return up.display_name
+	return key.substr(2)
+
+## Anfitrión (o partida sin red): aplica lo comprado a `q`.
+func apply_bought(q: Player, key: String) -> void:
+	if key == "lvl":                                  # un nivel de verdad: su atributo y su subida
+		q.progress.gain_level()
+		return
+	var o := q.progress.option_for(key, q.weapons)
+	if o == null or o.kind != PlayerProgress.Option.Kind.PASSIVE: return
+	q.progress.passives[o.upgrade.id] = o.to_level
+	q.rebuild_stats()
+
+## Anfitrión: un invitado ha comprado algo para su jugador `i` (NetGame, BUY).
+func net_bought(i: int, key: String) -> void:
+	if i < 0 or i >= players.size(): return
+	apply_bought(players[i], key)
+
 ## Subida de nivel: pausa y elige una de tres mejoras (D-16). Si hay varias subidas
 ## pendientes, se encadenan.
 ## En cooperativo (D-39), las subidas van por turnos (TeamXp): sube un jugador cada vez, que
@@ -750,23 +834,33 @@ func _open_level_up() -> void:
 		for q in players: q.progress.pending = 0
 		return
 	var q: Player = null
-	for c in players:
-		if c.progress.pending > 0:
+	for c in players:                                # primero, rama de evolución (16.8) o Signo Mayor (16.9)
+		if c.progress.has_special(c.weapons):
 			q = c
 			break
+	if q == null:
+		for c in players:
+			if c.progress.pending > 0:
+				q = c
+				break
 	if q == null: return
-	var options := q.progress.roll_options(q.weapons, _rng)
+	var options := q.progress.next_options(q.weapons, _rng)
 	if options.is_empty():
 		q.progress.pending = 0
 		_open_level_up.call_deferred()
 		return
+	var evo := options[0].kind == PlayerProgress.Option.Kind.EVOLUTION
+	var sign := options[0].kind == PlayerProgress.Option.Kind.SIGN
 	var coop := players.size() > 1
 	if args.get_bool("autopick") or _is_bot(q):
 		var pick: PlayerProgress.Option = options[0] if not _is_bot(q) else options[_rng.randi() % options.size()]
 		if q.input is SmartBot or (q.remote and _is_bot(q)): pick = SmartBot.pick(options, q, _rng)
-		q.progress.choose(pick, q)
-		if coop and not args.get_bool("autopick"):
-			var said := _pick_text(q, pick)
+		if evo and args.has("evo_branch"): pick = options[clampi(args.get_int("evo_branch", 0), 0, options.size() - 1)]   # pruebas
+		var said := _choose_option(q, pick)
+		if evo or sign:
+			announce(said, 3.0)
+			if net_game != null and q.remote: net_game.say(said)
+		elif coop and not args.get_bool("autopick"):
 			announce(said, 1.6)
 			if net_game != null and q.remote: net_game.say(said)   # el bot es de otro PC: que lo vean todos
 		_open_level_up.call_deferred()
@@ -774,28 +868,36 @@ func _open_level_up() -> void:
 	_menu_open = true
 	get_tree().paused = true
 	var title := "Nivel %d" % (q.progress.level - q.progress.pending + 1)
+	if evo: title = "Evolución · %s" % options[0].from.display_name
+	if sign: title = "Signo Mayor"
 	if net_game != null: title = "Turno de J%d · %s (%s) · %s" % [q.index + 1, q.data.display_name, _pc_name(_peer_of(q)), title]
 	elif coop: title = "Turno de J%d · %s · %s" % [q.index + 1, q.data.display_name, title]
-	var attr := "" if q.progress.attr_gains.is_empty() else String(q.progress.attr_gains[0])  # D-27: lo enseña el rodillo
+	var attr := "" if q.progress.attr_gains.is_empty() or evo or sign else String(q.progress.attr_gains[0])  # D-27: lo enseña el rodillo
 	if net_game != null:                          # en red, la partida se para en todos los PC
-		net_game.halt_all({"k": "lvup", "peer": _peer_of(q), "i": q.index, "title": title, "attr": attr})
+		var h := {"k": "lvup", "peer": _peer_of(q), "i": q.index, "title": title, "attr": attr}
+		if evo: h["evo"] = String(options[0].from.id)
+		if sign: h["sign"] = true
+		net_game.halt_all(h)
 		if q.remote: return                        # elige en su PC (llega con net_picked)
 	# la misma ventana en solitario y en cooperativo, centrada (antes, Menus.LevelUpMenu: fila de
 	# botones con el foco de Godot, que con el mando no bajaba y a ratos no respondía)
 	var said := [""]
 	var menu := _level_up_window(q, options, title, attr, func(pq: Player, o: PlayerProgress.Option) -> void:
-		pq.progress.choose(o, pq)
-		said[0] = _pick_text(pq, o))
+		said[0] = _choose_option(pq, o))
 	menu.finished.connect(func() -> void:
 		_menu_open = false
 		if net_game != null: net_game.resume_all(said[0])
-		else: get_tree().paused = false
+		else:
+			get_tree().paused = false
+			if evo or sign: announce(said[0], 3.0)
 		_open_level_up.call_deferred())
 	add_child(menu)
 
 ## La ventana de subida de un jugador (CoopLevelUp centrada, con su color en cooperativo).
 func _level_up_window(q: Player, options: Array[PlayerProgress.Option], title: String, attr: String, pick: Callable) -> CoopLevelUp:
 	var entry := {"player": q, "options": options, "title": title, "attr": attr}
+	if not options.is_empty() and options[0].kind in [PlayerProgress.Option.Kind.EVOLUTION, PlayerProgress.Option.Kind.SIGN]:
+		entry["evolution"] = true                    # ramas o signos: sin rodillos ni descartes (16.8, 16.9)
 	if players.size() > 1:
 		entry["accent"] = q.color
 		entry["speed"] = LEVEL_UP_COOP_SPEED            # más pausas que en solitario: rodillos más cortos
@@ -806,6 +908,18 @@ func _level_up_window(q: Player, options: Array[PlayerProgress.Option], title: S
 
 static func _pick_text(q: Player, o: PlayerProgress.Option) -> String:
 	return "J%d · %s: %s" % [q.index + 1, q.data.display_name, o.title()]
+
+## Aplica una opción de la ventana (mejora o rama de evolución) y da el texto que se anuncia.
+func _choose_option(q: Player, o: PlayerProgress.Option) -> String:
+	q.progress.choose(o, q)
+	if o.kind == PlayerProgress.Option.Kind.SIGN:
+		if args.get_bool("log"): print("SIGNO %s" % o.sign.get("id", ""))
+		var st := "%s: %s" % [o.title(), o.text()]
+		return "J%d · %s" % [q.index + 1, st] if players.size() > 1 else st
+	if o.kind != PlayerProgress.Option.Kind.EVOLUTION: return _pick_text(q, o)
+	if args.get_bool("log"): print("EVOLUCION %s" % o.weapon.id)
+	var text := "¡Evolución! %s → %s" % [o.from.display_name, o.weapon.display_name]
+	return "J%d · %s" % [q.index + 1, text] if players.size() > 1 else text
 
 ## PC que maneja a un jugador (en local, el 1). Si su PC se ha ido, lo lleva un bot de aquí.
 func _peer_of(q: Player) -> int:
@@ -903,14 +1017,24 @@ func net_halt(d: Dictionary) -> void:
 func _pick_for(i: int) -> void:
 	if net_game.halt.get("k") != "lvup" or int(net_game.halt.get("i", -1)) != i: return   # ya eligió
 	var q: Player = players[i]
-	var options := q.progress.roll_options(q.weapons, _rng)
+	var options := q.progress.next_options(q.weapons, _rng)
 	if options.is_empty(): return
 	net_picked(i, {"key": PlayerProgress.key_of(SmartBot.pick(options, q, _rng)), "by_host": true})
 
 ## Invitado: le toca subir a un jugador de este PC. Tira sus opciones (el progreso acaba de
 ## llegar) y manda lo elegido al anfitrión, que lo aplica y sigue.
 func _open_net_level_up(q: Player, d: Dictionary) -> void:
-	var options := q.progress.roll_options(q.weapons, _rng)
+	q.progress.evolving.clear()                   # la rama pendiente la dice el anfitrión (16.8)
+	if d.has("evo"): q.progress.evolving.append(StringName(String(d.evo)))
+	q.progress.signs_pending = 1 if d.has("sign") else 0    # Signo Mayor (16.9), con los logros de este PC
+	var options := q.progress.next_options(q.weapons, _rng)
+	q.progress.evolving.clear()
+	if options.is_empty() and d.has("sign"):           # ninguno abierto aquí: que siga
+		var none := PlayerProgress.Option.new()
+		none.kind = PlayerProgress.Option.Kind.SIGN
+		net_game.send_pick(q, none)
+		return
+	q.progress.signs_pending = 0
 	if options.is_empty(): return
 	var menu := _level_up_window(q, options, String(d.get("title", "")), String(d.get("attr", "")),
 		func(pq: Player, o: PlayerProgress.Option) -> void: net_game.send_pick(pq, o))
@@ -926,14 +1050,19 @@ func net_picked(i: int, d: Dictionary) -> void:
 	q.rerolls_used = int(d.get("rerolls", q.rerolls_used))
 	q.banishes_used = int(d.get("banishes", q.banishes_used))
 	var o := q.progress.option_for(String(d.get("key", "")), q.weapons)
+	if o == null and String(d.get("key", "")) == "s:":  # sin Signos abiertos en su PC (16.9)
+		q.progress.signs_pending = 0
+		_menu_open = false
+		net_game.resume_all("")
+		_open_level_up.call_deferred()
+		return
 	if o == null:                                    # ya no vale (no debería pasar): la primera que salga
-		var opts := q.progress.roll_options(q.weapons, _rng)
+		var opts := q.progress.next_options(q.weapons, _rng)
 		o = opts[0] if not opts.is_empty() else null
 	var said := ""
 	var by_host := bool(d.get("by_host", false))
 	if o != null:
-		q.progress.choose(o, q)
-		said = _pick_text(q, o) + (" (elegida por el anfitrión)" if by_host else "")
+		said = _choose_option(q, o) + (" (elegida por el anfitrión)" if by_host else "")
 	else: q.progress.pending = maxi(q.progress.pending - 1, 0)
 	_menu_open = false
 	net_game.resume_all(said, by_host)
@@ -1429,6 +1558,31 @@ func _apply_carry() -> void:
 		q.rebuild_stats()
 		q.health = q.data.max_health
 
+## Signos Mayores (hito 16.9): uno al empezar la parte y otro al empezar su tercer nivel
+## (Signs.levels). No en los desafíos, que tienen sus reglas, ni en la partida del día. Se eligen
+## en la ventana de la subida en cuanto pasa el rótulo del nivel. `signs=cthugha,yog`: los da
+## al J1 (pruebas); `signs=false`, ninguno.
+const SIGN_DELAY := LevelCard.CARD_AT + LevelCard.CARD_HOLD + 1.0   ## cuando se ha ido el rótulo del nivel
+func _grant_signs() -> void:
+	if args.has("signs"):
+		player.progress.signs.clear()
+		for s in args.get_str("signs").split(",", false):
+			if s != "false" and not Signs.find(s).is_empty(): player.progress.signs.append(StringName(s))
+		player.rebuild_stats()
+		return
+	if is_guest() or Challenge.active() or level.daily != "": return
+	var due := Signs.due(Campaign.number_of(String(level.id)))
+	if Endless.is_endless(String(level.id)): due = 1
+	var any := false
+	for q in players:
+		if q.remote:                                  # sus abiertos los sabe su PC: aquí, que elija
+			var s := SaveData.new()
+			s.unlock_all = true
+			q.progress.sign_save = s
+		q.progress.signs_pending = maxi(due - q.progress.signs.size(), 0)
+		any = any or q.progress.signs_pending > 0
+	if any: get_tree().create_timer(SIGN_DELAY, false).timeout.connect(_open_level_up)
+
 ## Lo que la tienda da al empezar (17-10-2026). Al empezar una parte (sin progreso que venga
 ## del nivel anterior): un objeto al azar (Mochila del expedicionario) y una segunda arma al
 ## azar (Armería). Al pasar al siguiente nivel de la parte: una subida de nivel (Diario de
@@ -1511,14 +1665,21 @@ func _make_announcer() -> void:
 	layer.add_child(announcer)
 
 ## Evolución (D-06): al abrir un baúl, la primera arma al nivel máximo cuyo objeto lleva el
-## jugador se convierte en su evolución.
+## jugador se convierte en su evolución. Con dos ramas (hito 16.8), se apunta y la ventana de
+## la subida le deja elegir (los bots, solos), antes que las subidas pendientes.
 func _try_evolve(q: Player) -> void:
 	if q == null or q.weapons == null: return
 	var w := q.weapons.evolvable(q.progress.passives)
-	if w == null: return
+	if w == null or q.progress.evolving.has(w.data.id): return
+	if w.data.branches().size() > 1:
+		q.progress.evolving.append(w.data.id)
+		_open_level_up.call_deferred()
+		return
 	var before := w.data.display_name
 	q.weapons.evolve(w)
-	announce("¡Evolución! %s → %s" % [before, w.data.display_name], 3.0)
+	var text := "¡Evolución! %s → %s" % [before, w.data.display_name]
+	if players.size() > 1: text = "J%d · %s" % [q.index + 1, text]
+	announce(text, 3.0)
 	if args.get_bool("log"): print("EVOLUCION %s" % w.data.id)
 
 func announce(text: String, seconds: float) -> void:

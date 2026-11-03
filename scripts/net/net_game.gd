@@ -61,6 +61,7 @@ const RESUME := NetSession.USER + 26         ## anfitrión -> invitados: sigue {
 const PICK := NetSession.USER + 27           ## invitado -> anfitrión: mejora elegida {n, i, key, banished, rerolls, banishes}
 const PAUSE := NetSession.USER + 28          ## invitado -> anfitrión: pide (true) o quita (false) la pausa
 const MARK := NetSession.USER + 29           ## marca de un jugador (F9, LB+RB) [PC, n, dónde]: el anfitrión la reparte
+const BUY := NetSession.USER + 30            ## invitado -> anfitrión: compra al buhonero {i, key} (hito 16.12)
 
 const SNAP_EVERY := 3                        ## pasos de física entre fotos del anfitrión (20 Hz)
 const PSTATE_EVERY := 2                      ## y entre estados de un invitado (30 Hz)
@@ -299,7 +300,7 @@ var _bw := {}                                ## PC -> [suma de kB/s, registros, 
 var _log_on := false
 const TYPE_NAMES := {READY: "READY", GO: "GO", PSTATE: "PSTATE", SNAP: "SNAP", SPAWN: "SPAWN", DIE: "DIE",
 	ANIM: "ANIM", EVENT: "EVENT", NEXT: "NEXT", RESTART: "RESTART", BULLETS: "BULLETS", GEMS: "GEMS",
-	TAKEN: "TAKEN", PROG: "PROG", WORLD: "WORLD", HALT: "HALT", RESUME: "RESUME", PICK: "PICK", PAUSE: "PAUSE", MARK: "MARK",
+	TAKEN: "TAKEN", PROG: "PROG", WORLD: "WORLD", HALT: "HALT", RESUME: "RESUME", PICK: "PICK", PAUSE: "PAUSE", MARK: "MARK", BUY: "BUY",
 	NetSelect.PROFILE: "PROFILE", NetSelect.ACTION: "ACTION", NetSelect.PROFILES: "PROFILES", NetSelect.SEATS: "SEATS",
 	NetSelect.START: "START", NetSelect.LATE: "LATE"}
 func _log(delta: float) -> void:
@@ -615,6 +616,11 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 					game.net_picked(int(data.i), data)
 			PAUSE:
 				if game.has_method("net_pause_asked"): game.net_pause_asked(from, bool(data))
+			BUY:
+				if data is Dictionary:
+					var i := int(data.get("i", -1))
+					if i >= 0 and i < game.players.size() and _peer_of(game.players[i]) == from and game.has_method("net_bought"):
+						game.net_bought(i, String(data.get("key", "")))
 			MARK:
 				if data is Array and (data as Array).size() == 3:
 					_say_mark(data)
@@ -843,6 +849,9 @@ static func apply_progress(q: Player, d: Dictionary) -> bool:
 	q.progress.xp = float(d.get("xp", 0.0))
 	q.progress.pending = 0
 	if d.get("passives") is Dictionary: q.progress.passives = (d.passives as Dictionary).duplicate()
+	if d.get("signs") is Array:                      # Signos Mayores (16.9)
+		q.progress.signs.clear()
+		for s: Variant in d.signs: q.progress.signs.append(StringName(String(s)))
 	if d.get("attrs") is Dictionary: q.attrs = (d.attrs as Dictionary).duplicate()
 	if d.get("attrs_level1") is Dictionary: q.attrs_level1 = (d.attrs_level1 as Dictionary).duplicate()
 	if d.get("weapons") is Array:
@@ -1075,6 +1084,9 @@ func send_pick(q: Player, o: PlayerProgress.Option) -> void:
 		"rerolls": q.rerolls_used, "banishes": q.banishes_used})
 
 ## Invitado: pide la pausa para todos (o quitarla, si la puso él).
+func send_buy(q: Player, key: String) -> void:
+	net.send(1, BUY, {"i": q.index, "key": key})
+
 func ask_pause(on: bool) -> void:
 	net.send(1, PAUSE, on)
 

@@ -20,6 +20,7 @@ zone_dps = 9.9
 drift = 0.8
 evolves_with = &"elixir"
 evolution = &"gas_mostaza"
+evolution_alt = &"fosgeno"
 max_level = 5
 level_mods = Array[Dictionary]([{"zone_radius*": 1.15}, {"zone_dps*": 1.25}, {"zone_time*": 1.25}, {"cooldown*": 0.85}])
 level_text = Array[String](["Nube un 15 % más grande", "+25 % de daño", "Dura un 25 % más", "Recarga un 15 % más rápido"])

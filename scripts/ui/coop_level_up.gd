@@ -45,6 +45,8 @@ const REPEAT_NEXT := 0.14                    ## y las siguientes
 const ATTR_STOP := 0.5                       ## s en que se para el rodillo del atributo
 const REEL_STOPS: Array[float] = [0.7, 0.95, 1.2]   ## y los de cada tarjeta
 const HINT := "Arriba y abajo para elegir · A o Intro para confirmar"
+const EVO_COLOR := Color(0.55, 0.95, 0.62)   ## evoluciones: el verde de lo que no es de este mundo (16.8, 16.15)
+const SIGN_COLOR := Color(0.7, 0.6, 1.0)     ## Signos Mayores: violeta (16.9)
 
 ## Lo que pasa por los rodillos mientras giran: {icon, title, kind, accent}.
 static var _filler: Array[Dictionary] = []
@@ -59,8 +61,11 @@ func _init(p_entries: Array[Dictionary], p_pick: Callable, p_solo := false) -> v
 func _ready() -> void:
 	add_child(MenuKit.veil(0.75 if solo else 0.55))
 	for e in entries:
-		var pk := Picker.new(e.player, e.options, e.title, solo, String(e.get("attr", "")), filler(),
-			e.get("accent", Color.TRANSPARENT))
+		var evo := bool(e.get("evolution", false))    # rama de evolución (16.8): sin rodillos
+		var reels: Array[Dictionary] = []
+		if not evo: reels = filler()
+		var pk := Picker.new(e.player, e.options, e.title, solo, String(e.get("attr", "")),
+			reels, e.get("accent", Color.TRANSPARENT), evo)
 		pk.speed = float(e.get("speed", 1.0))
 		pk.clicked.connect(func(i: int) -> void:      # el ratón, solo para quien juega con teclado
 			if _t >= INPUT_DELAY and not pk.done and _uses_keyboard(pk.player.input): _choose(pk, i))
@@ -86,7 +91,9 @@ static func filler() -> Array[Dictionary]:
 
 func _process(delta: float) -> void:
 	_t += delta
-	for pk in _pickers: pk.spin(delta)
+	for pk in _pickers:
+		pk.spin(delta)
+		pk.glow(_t)
 	if _closing >= 0.0:
 		_closing += delta
 		if _closing >= CLOSE_DELAY:
@@ -181,18 +188,23 @@ class Picker extends PanelContainer:
 	var _next_tick: Array[float] = []
 	var _solo := false
 	var speed := 1.0              ## ritmo de los rodillos (>1, más deprisa)
+	var evolution := false        ## elige rama de evolución (16.8): sin descartes ni otras opciones
+	var _hints: Array[Label] = [] ## aviso de evolución de cada carta (16.15)
 	var _on_style: StyleBox       ## tarjeta marcada (luz de vela) y las demás
 	var _off_style: StyleBox
 
 	func _init(p: Player, p_options: Array[PlayerProgress.Option], title: String, solo := false,
-			attr := "", p_filler: Array[Dictionary] = [], p_accent := Color.TRANSPARENT) -> void:
+			attr := "", p_filler: Array[Dictionary] = [], p_accent := Color.TRANSPARENT, p_evolution := false) -> void:
 		player = p
 		options = p_options
+		evolution = p_evolution
 		_attr = attr
 		_filler = p_filler
 		_solo = solo
 		if solo:
 			anchor_left = 0.3; anchor_right = 0.7; anchor_top = 0.16; anchor_bottom = 0.84
+			if evolution and options.size() <= 2:          # dos ramas: ventana más baja (16.8)
+				anchor_top = 0.27; anchor_bottom = 0.73
 		else:
 			var qx := p.index % 2
 			var qy := p.index / 2
@@ -202,6 +214,8 @@ class Picker extends PanelContainer:
 			anchor_top = 0.15 if qy == 0 else 0.52
 			anchor_bottom = 0.48 if qy == 0 else 0.85
 		var accent := p_accent if p_accent.a > 0.0 else (UiKit.XP if solo else p.color)
+		if evolution and p_accent.a <= 0.0 and not options.is_empty():   # el color de lo que se elige (16.8, 16.9)
+			accent = SIGN_COLOR if options[0].kind == PlayerProgress.Option.Kind.SIGN else EVO_COLOR
 		var metal := MenuKit.BRASS if p_accent.a <= 0.0 and solo else MenuKit.BRASS.lerp(accent, 0.5)
 		theme = MenuKit.theme()
 		_on_style = MenuKit.lit_box(metal, 12 if solo else 8)
@@ -246,6 +260,7 @@ class Picker extends PanelContainer:
 			var frame := PanelContainer.new()
 			frame.add_theme_stylebox_override("panel", _frame_style(_accent(o)))
 			frame.custom_minimum_size = Vector2(icon_px, icon_px)
+			frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER   # cuadrado aunque la tarjeta sea alta
 			var tex := TextureRect.new()
 			tex.texture = _icon(o)
 			tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -260,9 +275,16 @@ class Picker extends PanelContainer:
 			col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			col.alignment = BoxContainer.ALIGNMENT_CENTER
 			row.add_child(col)
+			var kind_row := HBoxContainer.new()
+			kind_row.add_theme_constant_override("separation", 12)
+			col.add_child(kind_row)
 			var kind := UiKit.label(_kind(o), 13 if solo else 11, _accent(o))
-			col.add_child(kind)
+			kind_row.add_child(kind)
 			_kinds.append(kind)
+			var hint_l := UiKit.label("", 13 if solo else 11, EVO_COLOR)   # aviso de evolución (16.15)
+			hint_l.visible = false
+			kind_row.add_child(hint_l)
+			_hints.append(hint_l)
 			var t := UiKit.label(("%d  " % (i + 1) if solo else "") + o.title(), 24 if solo else 17, UiKit.TEXT)
 			t.add_theme_font_override("font", MenuKit.font())
 			col.add_child(t)
@@ -288,6 +310,7 @@ class Picker extends PanelContainer:
 		_paint()
 		for i in options.size():
 			if not _stopped[i]: _show_filler(i)
+			else: _show_option(i)
 		MenuKit.dress(self, metal, Vector2(34, 26) if solo else Vector2(20, 14), 130.0 if solo else 70.0)
 
 	## Marco del icono de una opción: latón con el color de la opción.
@@ -328,8 +351,15 @@ class Picker extends PanelContainer:
 				_next_tick[i] = _time + lerpf(0.045, 0.14, pow(_time / stop, 2.0))
 		if settled() and not done: _status.text = hint()
 
+	## Brillo de las cartas que completan una evolución (16.15): el marco del icono late.
+	func glow(t: float) -> void:
+		for i in _frames.size():
+			var on := i < options.size() and _stopped[i] and options[i].evo_ready
+			_frames[i].self_modulate = Color.WHITE * (1.0 + 0.6 * (0.5 + 0.5 * sin(t * 5.0))) if on else Color.WHITE
+
 	## Ayuda del pie, con los cambios de la Llave de plata si le quedan.
 	func hint() -> String:
+		if evolution: return HINT
 		var n := player.rerolls_left() if player != null else 0
 		var b := player.banishes_left() if player != null else 0
 		var extra := PackedStringArray()
@@ -340,7 +370,7 @@ class Picker extends PanelContainer:
 	## Cartas del tarot (tienda): la opción marcada se descarta (no vuelve a salir en este
 	## nivel) y en su lugar gira otra.
 	func banish() -> bool:
-		if done or player.banishes_left() <= 0 or options.is_empty(): return false
+		if evolution or done or player.banishes_left() <= 0 or options.is_empty(): return false
 		var gone := options[cursor]
 		var rng := RandomNumberGenerator.new()
 		rng.randomize()
@@ -374,7 +404,7 @@ class Picker extends PanelContainer:
 
 	## Llave de plata: otras opciones, tantas como antes, y los rodillos vuelven a girar.
 	func reroll() -> bool:
-		if done or player.rerolls_left() <= 0 or player.weapons == null: return false
+		if evolution or done or player.rerolls_left() <= 0 or player.weapons == null: return false
 		var rng := RandomNumberGenerator.new()
 		rng.randomize()
 		var fresh := player.progress.roll_options(player.weapons, rng, options.size())
@@ -403,6 +433,7 @@ class Picker extends PanelContainer:
 		_kinds[i].text = f.kind
 		_kinds[i].add_theme_color_override("font_color", f.accent)
 		_descs[i].text = " "
+		_hints[i].visible = false
 		_frames[i].add_theme_stylebox_override("panel", MenuKit.box(Color(0, 0, 0, 0.4), Color(MenuKit.BRASS, 0.3), 1))
 
 	func _show_option(i: int) -> void:
@@ -413,7 +444,10 @@ class Picker extends PanelContainer:
 		_kinds[i].text = _kind(o)
 		_kinds[i].add_theme_color_override("font_color", _accent(o))
 		_descs[i].text = o.text()
-		_frames[i].add_theme_stylebox_override("panel", _frame_style(_accent(o)))
+		_hints[i].text = o.evo_hint
+		_hints[i].visible = o.evo_hint != ""
+		_frames[i].add_theme_stylebox_override("panel", MenuKit.box(Color(0.04, 0.16, 0.07, 0.55), Color(EVO_COLOR, 0.95), 2)
+			if o.evo_ready else _frame_style(_accent(o)))
 
 	func _pop(c: Control) -> void:
 		c.scale = Vector2.ONE * 1.25
@@ -422,6 +456,7 @@ class Picker extends PanelContainer:
 		tw.tween_property(c, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 	static func _icon(o: PlayerProgress.Option) -> Texture2D:
+		if o.kind == PlayerProgress.Option.Kind.SIGN: return Signs.icon(String(o.sign.get("id", "")))
 		if o.weapon != null: return o.weapon.get_icon()
 		return o.upgrade.icon if o.upgrade != null else null
 
@@ -429,12 +464,16 @@ class Picker extends PanelContainer:
 		match o.kind:
 			PlayerProgress.Option.Kind.NEW_WEAPON: return UiKit.GOLD
 			PlayerProgress.Option.Kind.WEAPON_LEVEL: return Color(1.0, 0.55, 0.25)
+			PlayerProgress.Option.Kind.EVOLUTION: return EVO_COLOR
+			PlayerProgress.Option.Kind.SIGN: return SIGN_COLOR
 		return o.upgrade.color
 
 	static func _kind(o: PlayerProgress.Option) -> String:
 		match o.kind:
 			PlayerProgress.Option.Kind.NEW_WEAPON: return "ARMA NUEVA"
 			PlayerProgress.Option.Kind.WEAPON_LEVEL: return "MEJORA DE ARMA"
+			PlayerProgress.Option.Kind.EVOLUTION: return "EVOLUCIÓN"
+			PlayerProgress.Option.Kind.SIGN: return "SIGNO MAYOR"
 		return "OBJETO"
 
 	func move(step: int) -> void:

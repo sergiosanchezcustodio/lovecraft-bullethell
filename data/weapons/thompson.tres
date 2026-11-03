@@ -23,6 +23,7 @@ projectile_size = 0.1
 knockback = 0.5
 evolves_with = &"oro_obed"
 evolution = &"thompson_chicago"
+evolution_alt = &"thompson_federal"
 max_level = 5
 level_mods = Array[Dictionary]([{"count+": 3.0}, {"damage*": 1.25}, {"cooldown*": 0.8}, {"count+": 4.0, "damage*": 1.2}])
 level_text = Array[String](["Tres balas más por ráfaga", "+25 % de daño", "Dispara un 20 % más a menudo", "Cuatro balas más y +20 % de daño"])

@@ -66,6 +66,7 @@ pull = 11.7
 orbit_look = ""
 evolves_with = &""
 evolution = &""
+evolution_alt = &""
 evolved = true
 max_level = 1
 level_mods = Array[Dictionary]([])

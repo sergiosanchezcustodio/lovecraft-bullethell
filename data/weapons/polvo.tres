@@ -27,3 +27,4 @@ level_mods = Array[Dictionary]([{"zone_radius*": 1.2, "aoe_radius*": 1.2}, {"zon
 level_text = Array[String](["Nube un 20 % más amplia", "La nube dura 2 s más", "Doble daño y frena más", "Nube más amplia y más frecuente"])
 evolves_with = &"mapa_leng"
 evolution = &"polvo_antiguos"
+evolution_alt = &"polvo_schacabao"

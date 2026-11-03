@@ -149,8 +149,11 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				if w.sanity_cost > 0.0: facts.append("Cuesta %s de cordura" % str(snappedf(w.sanity_cost, 0.1)))
 				if w.evolution != &"":                        # D-06
 					var up: UpgradeData = load("res://data/upgrades/%s.tres" % w.evolves_with)
-					var ev: WeaponData = load("res://data/weapons/%s.tres" % w.evolution)
-					facts.append("Al nivel %d con %s, un baúl arcano la convierte en %s" % [w.max_level, up.display_name, ev.display_name if _seen(save, "weapons", ev.id) else "???"])
+					var names := PackedStringArray()            # las dos ramas (hito 16.8)
+					for b in w.branches():
+						var ev: WeaponData = load("res://data/weapons/%s.tres" % b)
+						names.append(ev.display_name if _seen(save, "weapons", ev.id) else "???")
+					facts.append("Al nivel %d con %s, un baúl arcano la convierte en %s" % [w.max_level, up.display_name, " o en ".join(names)])
 				if w.evolved: facts.append("Evolución")
 				out.append(_e(String(w.id), w.display_name, _seen(save, "weapons", w.id), text("weapons", w.id),
 					"", "", w.get_icon(), facts))

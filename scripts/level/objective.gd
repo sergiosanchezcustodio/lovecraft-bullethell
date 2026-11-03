@@ -9,6 +9,9 @@ extends Node3D
 ##   avance se pierde despacio) mientras salen criaturas a defenderlo.
 ## - `relic`: una tablilla con un signo antiguo; quien la toca la lleva (más despacio,
 ##   `CARRY_SLOW`) hasta el círculo de entrega. Si cae, la suelta donde está.
+## - `peddler` (hito 16.12): el buhonero de la parte pone su manta con tres mercancías (remedio,
+##   baratija y libro). Quien se queda `HOLD` s encima de una la compra con los dólares del
+##   nivel (`buy_hook`, en su PC); cada jugador, una de cada. Se va al acabar su tiempo.
 ## Lo decide el anfitrión; en red, los invitados tienen una copia (`mirror`) que recibe su
 ## estado (`NetGame`: ob+, ob~ y ob!). Lo crea y lo atiende `ObjectiveDirector`.
 
@@ -35,6 +38,10 @@ var radius := 2.6                               ## ritual: radio del círculo
 var drain := 14.0                               ## rescate: vida por s por criatura encima
 var guards := 4                                 ## ritual: criaturas al empezar
 var mirror := false
+var goods: Array = []                           ## buhonero: mercancías (objectives.json, peddler.goods)
+var price_mult := 1.0                           ## buhonero: precios de la parte
+var buy_hook: Callable                          ## buhonero: (Player, mercancía, precio) -> bool
+var purse_hook: Callable                        ## buhonero: () -> int, los dólares que quedan en este PC
 
 var state := State.WAIT
 var t := 0.0
@@ -54,6 +61,18 @@ var _beam: MeshInstance3D
 var _light: OmniLight3D
 var _chant_t := 0.0
 var _net_body := Vector3.ZERO
+var _stalls: Array[Vector3] = []               ## buhonero: dónde está cada mercancía
+var _stall_rings: Array[MeshInstance3D] = []
+var _stall_labels: Array[Label3D] = []
+var _hold := {}                                 ## "jugador:mercancía" -> s encima
+var bought := {}                                ## "jugador:id" -> true (en este PC)
+
+const STALL_R := 0.55                           ## m de cada mercancía
+const STALL_GAP := 1.55                         ## m entre mercancías
+const MAT_FRONT := 1.55                         ## m de la manta delante del vendedor
+const HOLD := 0.7                               ## s encima para comprar
+const FACE := PI / 4                            ## de frente a la cámara
+const PEDDLER_CFG := "res://data/objectives.json"
 
 func setup(p_kind: String, p_world: CombatWorld, p_director: WaveDirector, p_a: Vector3, p_b: Vector3) -> Objective:
 	kind = p_kind
@@ -103,6 +122,7 @@ func target() -> Vector3:
 	match kind:
 		"rescue": return a if state == State.WAIT else b
 		"relic": return body if carrier < 0 else b
+		"peddler": return a + Vector3(0, 0, MAT_FRONT + 0.6).rotated(Vector3.UP, FACE)
 	return a
 
 func carrier_player() -> Player:
@@ -128,7 +148,9 @@ func _ready() -> void:
 		"relic":
 			_relic = _tablet()
 			add_child(_relic)
-	if kind != "ritual":
+		"peddler":
+			_stand()
+	if kind != "ritual" and kind != "peddler":
 		_ring_b = _ring(GOAL, Color(1.0, 0.78, 0.35))
 		_ring_b.top_level = true
 		_ring_b.position = b + Vector3(0, 0.04, 0)
@@ -203,6 +225,68 @@ func _candle(at: Vector3) -> void:
 	var h := randf_range(0.22, 0.4)
 	_box(Vector3(0.09, h, 0.09), Color(0.86, 0.82, 0.7), Vector3(0, h * 0.5, 0), c)
 	_box(Vector3(0.05, 0.08, 0.05), Color(1.0, 0.7, 0.3), Vector3(0, h + 0.05, 0), c, true)
+
+## Buhonero: el vendedor de cara a la cámara, una manta delante con las tres mercancías (con su
+## círculo y su precio encima) y un farol de luz cálida.
+func _stand() -> void:
+	if goods.is_empty():
+		var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(PEDDLER_CFG))
+		if d is Dictionary: goods = ((d as Dictionary).get("peddler", {}) as Dictionary).get("goods", [])
+	var root := Node3D.new()
+	root.rotation.y = FACE
+	add_child(root)
+	_model = VoxelBuilder.load_model("res://models/%s.json" % model_name)
+	root.add_child(_model)
+	var front := MAT_FRONT
+	_box(Vector3(4.6, 0.04, 1.35), Color(0.36, 0.13, 0.10), Vector3(0, 0.02, front), root)        # manta
+	_box(Vector3(4.4, 0.045, 0.12), Color(0.66, 0.50, 0.22), Vector3(0, 0.025, front + 0.52), root)   # su franja
+	_box(Vector3(0.5, 0.42, 0.42), Color(0.40, 0.27, 0.15), Vector3(-0.75, 0.21, -0.55), root)      # el fardo
+	_box(Vector3(0.36, 0.3, 0.36), Color(0.48, 0.33, 0.18), Vector3(-0.72, 0.57, -0.52), root)
+	var lamp := _box(Vector3(0.16, 0.24, 0.16), Color(1.0, 0.72, 0.32), Vector3(0.85, 0.12, 0.25), root, true)
+	_box(Vector3(0.2, 0.04, 0.2), Color(0.12, 0.1, 0.08), Vector3(0, 0.14, 0), lamp)
+	_light = _omni(Color(1.0, 0.72, 0.4), 6.0, Vector3(0, 1.4, 1.0))
+	var n := goods.size()
+	for i in n:
+		var g: Dictionary = goods[i]
+		var x := (i - (n - 1) * 0.5) * STALL_GAP
+		var at := Vector3(x, 0, front)
+		var holder := Node3D.new()
+		holder.position = at
+		root.add_child(holder)
+		if g.has("model"):
+			var m := VoxelBuilder.load_model("res://models/%s.json" % g.model)
+			m.rotation.y = -FACE
+			holder.add_child(m)
+		else:
+			_book(holder)
+		_stalls.append(a + Vector3(at.x, 0, at.z).rotated(Vector3.UP, FACE))
+		var ring := _ring(STALL_R, Color(1.0, 0.78, 0.35))
+		ring.top_level = true
+		ring.position = _stalls[i] + Vector3(0, 0.05, 0)
+		_stall_rings.append(ring)
+		var l := Label3D.new()
+		l.font_size = 52
+		l.pixel_size = 0.0075
+		l.outline_size = 16
+		l.outline_modulate = Color(0.05, 0.03, 0.02, 0.95)
+		l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		l.no_depth_test = true
+		l.top_level = true
+		l.position = _stalls[i] + Vector3(0, 0.1, 1.05).rotated(Vector3.UP, FACE)   # delante de la manta
+		l.font = MenuKit.font()
+		add_child(l)
+		_stall_labels.append(l)
+
+## Libro de saberes del buhonero: tapas de cuero rojo oscuro, cantos de papel y un cierre.
+func _book(r: Node3D) -> void:
+	_box(Vector3(0.42, 0.1, 0.32), Color(0.4, 0.1, 0.1), Vector3(0, 0.05, 0), r)
+	_box(Vector3(0.38, 0.06, 0.3), Color(0.86, 0.8, 0.64), Vector3(0.02, 0.06, 0), r)
+	_box(Vector3(0.42, 0.02, 0.32), Color(0.4, 0.1, 0.1), Vector3(0, 0.11, 0), r)
+	_box(Vector3(0.1, 0.03, 0.06), Color(0.85, 0.68, 0.3), Vector3(0, 0.125, 0), r, true)
+
+## Precio de una mercancía en esta parte.
+func price_of(g: Dictionary) -> int:
+	return int(round(float(g.get("price", 100)) * price_mult / 5.0)) * 5
 
 ## Reliquia: tablilla de esteatita verdosa con el signo antiguo grabado, que brilla.
 func _tablet() -> Node3D:
@@ -360,6 +444,7 @@ func _vanish() -> void:
 	tw.tween_property(self, "scale", Vector3.ONE * 0.01, 0.6).set_delay(0.5)
 	if _ring_b != null: tw.parallel().tween_property(_ring_b, "scale", Vector3.ONE * 0.01, 0.6).set_delay(0.5)
 	if _beam != null: tw.parallel().tween_property(_beam, "scale", Vector3(0.01, 1.0, 0.01), 0.6).set_delay(0.5)
+	for n in _stall_rings + _stall_labels: tw.parallel().tween_property(n, "scale", Vector3.ONE * 0.01, 0.6).set_delay(0.5)
 	tw.tween_callback(queue_free)
 
 # ---------------------------------------------------------------- dibujo
@@ -384,6 +469,7 @@ func _process(delta: float) -> void:
 		if _chant_t <= 0.0:
 			_chant_t = 6.0
 			Auto.sfx_at("chant", a)
+	if kind == "peddler" and not is_over(): _peddler_step(delta)
 	if is_over(): return
 	match kind:
 		"rescue":
@@ -420,6 +506,39 @@ func _process(delta: float) -> void:
 
 var _last_body := Vector3.ZERO
 
+## Buhonero, en cada PC: la pose de reposo, los precios (en rojo si no llegan) y las compras de
+## los jugadores de este PC que se quedan encima de una mercancía.
+func _peddler_step(delta: float) -> void:
+	if _model != null:
+		Anims.reset(_model)
+		Anims.pose(model_name, "idle", _model, fposmod(_anim_t / Anims.duration(model_name, "idle"), 1.0))
+	var purse: int = purse_hook.call() if purse_hook.is_valid() else 0
+	for i in _stalls.size():
+		var g: Dictionary = goods[i]
+		var price := price_of(g)
+		var fill := 0.0
+		if world != null:
+			for p in world.players:
+				if p.remote or p.health <= 0.0: continue
+				var key := "%d:%d" % [p.index, i]
+				var on := _flat(p.global_position).distance_to(_flat(_stalls[i])) <= STALL_R + 0.15
+				if not on or bought.has("%d:%s" % [p.index, g.id]):
+					_hold.erase(key)
+					continue
+				_hold[key] = float(_hold.get(key, 0.0)) + delta
+				fill = maxf(fill, _hold[key] / HOLD)
+				if _hold[key] >= HOLD:
+					_hold[key] = -9999.0                       # una vez por visita
+					if buy_hook.is_valid() and buy_hook.call(p, g, price):
+						bought["%d:%s" % [p.index, g.id]] = true
+						VoxelFx.puff(get_parent(), _stalls[i] + Vector3(0, 0.5, 0), "sparkle", 0.6)
+		_stall_rings[i].material_override.set_shader_parameter("progress", clampf(fill, 0.0, 1.0))
+		var all_bought := world != null and world.players.all(func(p: Player) -> bool:
+			return p.remote or bought.has("%d:%s" % [p.index, g.id]))
+		var l := _stall_labels[i]
+		l.text = "%s\n%s" % [g.get("name", ""), "Vendido" if all_bought else "%d $" % price]
+		l.modulate = Color(0.7, 0.7, 0.7) if all_bought else (Color(1.0, 0.86, 0.45) if purse >= price else Color(1.0, 0.58, 0.52))
+
 func _nearest_standing() -> Player:
 	if world == null: return null
 	var best: Player = null
@@ -445,6 +564,9 @@ func hud_text() -> String:
 		"relic":
 			if carrier < 0: return "Recoge la reliquia"
 			return "Lleva la reliquia al círculo (J%d la lleva, va más lento)" % (carrier + 1)
+		"peddler":
+			var purse: int = purse_hook.call() if purse_hook.is_valid() else 0
+			return "El buhonero: quédate sobre lo que quieras comprar · tienes %d $" % purse
 	return ""
 
 static func reward_text(r: Array) -> String:

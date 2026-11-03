@@ -5,6 +5,20 @@
 	"gap": [70.0, 110.0],
 	"before_final": 40.0,
 	"weights": {"rescue": 1, "ritual": 1, "relic": 1},
+	"peddler": {
+		"_doc": "El buhonero (hito 16.12): sale en los niveles 'levels' de cada parte, a los 'at' s (si hay un objetivo en curso, cuando acabe), y se queda 'limit' s. Vendedor por parte: [modelo, nombre]. Precios en dólares en la parte 1; cada parte, 'part_price' más. remedio: 'heal' de vida y cordura; baratija: un objeto (subir uno que llevas o, si no, uno nuevo); libro: una subida de nivel.",
+		"levels": [2, 4], "at": [100.0, 150.0], "limit": 50.0, "distance": [6.0, 9.0], "part_price": 0.6,
+		"vendors": {
+			"p1": ["ballenero", "Halvor Ness, ballenero noruego"],
+			"p2": ["zadok", "Zadok Allen"],
+			"p3": ["anciano", "el anticuario de Arkham"]
+		},
+		"goods": [
+			{"id": "remedio", "name": "Remedio", "price": 60, "heal": 0.5, "model": "recompensa_pocion"},
+			{"id": "baratija", "name": "Baratija", "price": 110, "model": "recompensa_reloj"},
+			{"id": "libro", "name": "Libro", "price": 170}
+		]
+	},
 	"kinds": {
 		"rescue": {
 			"distance": [9.0, 14.0], "goal": [16.0, 22.0], "limit": 90.0, "drain": 14.0,

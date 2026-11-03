@@ -315,6 +315,13 @@ class Sheet extends Control:
 			lvl.text = "Nivel %d" % p.progress.level
 			xp.value = p.progress.xp / maxf(p.progress.xp_to_next(), 1.0))
 		col.add_child(_label("Rasgo: " + p.data.passive_text, 15, UiKit.TEXT, true))
+		var sg := _label("", 15, CoopLevelUp.SIGN_COLOR, true)      # Signos Mayores (16.9)
+		sg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		col.add_child(sg)
+		_dyn.append(func() -> void:
+			var names := Array(p.progress.signs).map(func(id: StringName) -> String: return String(Signs.find(String(id)).get("name", id)))
+			sg.visible = not names.is_empty()
+			sg.text = " · ".join(PackedStringArray(names)))
 		if p.outfit_set != "":                   # conjunto del vestuario entero (14.8)
 			var won := OutfitSets.levels_with(Saves.current, p.outfit_worn)
 			var t := "Conjunto: " + p.outfit_set

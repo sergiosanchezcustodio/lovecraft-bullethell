@@ -114,6 +114,66 @@ def _evolutions():
 WEAPONS.update(_evolutions())
 
 
+# Segunda rama de cada evolución (hito 16.8): su propia descripción y un estilo distinto del de la
+# primera (hierro ennegrecido y brillo carmesí, frente al oro y el verde), para que no se confundan.
+EVO_B_STYLE = ("a dark battle-hardened relic version: blackened iron and dark steel, worn bone and deep crimson "
+               "details, small glowing red runes, a faint deep red otherworldly glow")
+EVO_B = {
+    'lanza_bomba': "a whaling bomb lance: a harpoon whose iron head is a small brass cylinder bomb with a short fuse, rope coiled on the shaft",
+    'bengala_magnesio': "a bundle of three short brass flare cartridges tied together, their tips blazing with blinding white magnesium light",
+    'bisturi_anatomista': "two long thin anatomist's scalpels crossed, razor sharp narrow blades with engraved ivory handles",
+    'bumeran_guerra': "a huge heavy wooden war boomerang, long as an oar, thick and hooked, carved with deep grooves",
+    'escopeta_postas': "a long-barreled pump-action shotgun with a heavy choke at the muzzle and a box of big buckshot shells",
+    'daga_obsidiana': "a black obsidian sacrificial knife with a jagged glassy blade and a carved stone handle",
+    'sable_husar': "a curved cavalry hussar sabre with a brass knuckle-guard hilt and a broad heavy blade",
+    'fuego_santelmo': "a single big ball of pale blue St. Elmo's fire crackling at the top of a short ship mast tip",
+    'lanza_termica': "an industrial thermal lance: a long thin steel tube with a hose and a narrow intense white-blue flame jet",
+    'letania': "a long string of prayer beads wrapped around an open small prayer book with glowing words rising from its pages",
+    'cohete_feria': "one big fat firework rocket on a long wooden stick, painted with stripes and stars, sparks at its fuse",
+    'racimo_granadas': "a leather belt with five small round WWI egg grenades hanging from it",
+    'agua_regia': "a small thick glass vial with a dropper cap, full of glowing orange-red fuming acid",
+    'prisma_eter': "a triangular crystal prism in a brass frame splitting a beam of light into a rainbow",
+    'puestos_tiro': "two Lewis machine guns side by side on low tripods behind a small wall of sandbags",
+    'lugers_feria': "two Luger P08 pistols with long barrels and ornate engraved silver plates, like fairground show guns",
+    'machetes_zafra': "two sugar-cane machetes crossed, wide hooked blades and worn wooden handles",
+    'piolet_pabodie': "a mountaineering ice axe with a long pick and an adze, a wooden shaft and a steel spike",
+    'carabina_mauser': "a Mauser C96 broomhandle pistol with its wooden holster stock attached as a shoulder stock, carbine style",
+    'cilindro_migo': "a shiny metal cylinder with three sockets and wires on its side, a living brain container of the Mi-Go",
+    'bomba_queroseno': "a round tin kerosene can with a short burning fuse stuck in its spout",
+    'al_azif': "an ancient Arabic manuscript of bound vellum pages with curling Arabic calligraphy, two pages flying out like blades",
+    'rifle_caza_mayor': "a big-game double rifle with two huge side-by-side barrels, an engraved action and a dark walnut stock",
+    'polvo_schacabao': "a small bone urn spilling crimson glittering powder",
+    'redes_arrastre': "a big trawl fishing net bunched up with cork floats and heavy lead weights",
+    'resonador_crawford': "a crude early prototype of an electrical resonator: exposed copper wires, a big cracked vacuum tube and a horn speaker",
+    'signo_koth': "a carved stone tablet with the Sign of Koth, a simple angular glyph glowing red",
+    'springfield_belleau': "a Springfield M1903 rifle with a bayonet attached and a muddy sling, WWI trench style",
+    'rayo_wardenclyffe': "a small model of Wardenclyffe tower: a tall wooden tower topped with a big copper dome crackling with electricity",
+    'thompson_federal': "a Thompson submachine gun with a straight box magazine and no drum, a plain wooden stock, 1920s federal agent weapon",
+    'trapezoedro_blake': "a black crystal polyhedron with red streaks resting in an open old metal box on a stone church floor",
+    'webly_seis_tiros': "a Webley revolver with its cylinder swung open showing six brass cartridges",
+    'suero_halsey': "three glass syringes of glowing green serum in a doctor's leather case",
+    'rayo_pnakotus': "two cone-shaped alien lightning guns side by side, made of strange metal with spiral grooves",
+    'recortada_matadero': "a sawed-off double-barrel shotgun with a box of fat lead slugs, splattered and grimy",
+    'fusil_cazacarros': "a long heavy anti-tank rifle with a bipod and a fast-loading bolt, several big cartridges beside it",
+    'mortero_incendiario': "a trench mortar tube with a big white phosphorus shell trailing smoke",
+    'bar_tirador': "a Browning Automatic Rifle with a bipod folded under the barrel and a small telescopic sight",
+    'nagant_siete': "a Nagant revolver with seven cartridges arranged in a circle around it",
+    'molinete_alert': "a ship's capstan windlass with an iron anchor chain wound around it",
+    'fosgeno': "a WWI gas shell standing upright, leaking a pale white-grey poison cloud",
+    'latigo_mayoral': "a long coachman's whip with a stiff wooden stock and a very long thin lash",
+    'cepo_oso': "a huge open bear trap with long sharp teeth like knives and a heavy chain, much bigger than a normal trap",
+    'ballesta_cranequin': "a heavy siege crossbow with a steel bow and a cranequin winch crank on its stock",
+    'chispas_fomalhaut': "a cluster of small fast fireballs streaking like comets from a glowing star",
+    'viento_ithaqua': "a tall narrow vortex of icy wind and snow shaped like a gaunt walking giant",
+    'umr_tawil': "a small swirling glowing orb inside a silver key-shaped frame, iridescent violet and gold",
+    'cabra_negra': "a huge mass of black twisted tentacles crowned with curling goat horns, bursting from dark forest ground",
+    'carcosa': "a miniature of strange alien towers under two black moons, reflected in a dark lake",
+    'faro_irem': "a tall stone pillar lighthouse of an ancient Arabian city with a long golden light beam",
+}
+for _k, _v in EVO_B.items():
+    WEAPONS.setdefault(_k, _v + ', ' + EVO_B_STYLE)
+
+
 def token():
     t = os.environ.get('REPLICATE_API_TOKEN', '')
     env = os.path.join(ROOT, '.env')

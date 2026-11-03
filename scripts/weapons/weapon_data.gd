@@ -130,12 +130,21 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 ## el siguiente baúl arcano la convierte en `evolution` (id de otra arma, con `evolved`).
 @export var evolves_with := &""
 @export var evolution := &""
+## Segunda rama (hito 16.8): si la tiene, al abrir el baúl se elige entre `evolution` y esta.
+@export var evolution_alt := &""
 @export var evolved := false                  ## es una evolución: no sale al subir de nivel
 @export var max_level := 5
 ## Mejora de cada nivel a partir del 2 (índice 0 = nivel 2). Claves "estadística*"
 ## multiplican y "estadística+" suman, p. ej. {"damage*": 1.25, "count+": 1}.
 @export var level_mods: Array[Dictionary] = []
 @export var level_text: Array[String] = []   ## descripción de cada mejora, para el menú
+
+## Ramas de su evolución (ids): una o dos (hito 16.8).
+func branches() -> Array[StringName]:
+	var out: Array[StringName] = []
+	if evolution != &"": out.append(evolution)
+	if evolution_alt != &"": out.append(evolution_alt)
+	return out
 
 ## Imagen del arma: la asignada o, si no la hay, resources/weapons/icons/<id>.png
 ## (tools/generar_iconos_armas.py). Null si no tiene.

@@ -25,3 +25,4 @@ level_mods = Array[Dictionary]([{"damage*": 1.25}, {"knockback*": 1.3, "pierce+"
 level_text = Array[String](["+25 % de daño", "Arrastra más y atraviesa a dos más", "Lanza un 20 % más rápido", "Dos arpones y +20 % de daño"])
 evolves_with = &"plomada"
 evolution = &"arpon_nantucket"
+evolution_alt = &"lanza_bomba"

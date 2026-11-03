@@ -82,9 +82,12 @@ func evolvable(passives: Dictionary) -> Weapon:
 		if int(passives.get(d.evolves_with, 0)) > 0: return w
 	return null
 
-## Convierte el arma en su evolución, que empieza a disparar enseguida.
-func evolve(w: Weapon) -> void:
-	var path := "res://data/weapons/%s.tres" % w.data.evolution
+## Convierte el arma en su evolución, que empieza a disparar enseguida. `to`: la rama elegida
+## (hito 16.8); vacía, la primera.
+func evolve(w: Weapon, to := &"") -> void:
+	if to == &"": to = w.data.evolution
+	if not to in w.data.branches(): return
+	var path := "res://data/weapons/%s.tres" % to
 	if not ResourceLoader.exists(path): return
 	w.data = load(path)
 	w.level = 1
@@ -254,9 +257,11 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 	var effect := BulletManager.Effect.NONE
 	var effect_val := w.stat("stasis")
 	var size := w.stat("projectile_size")
+	var pierce := int(w.stat("pierce"))
 	if w.stat("crit_chance") > 0.0 and randf() < w.stat("crit_chance"):   # crítico (Springfield)
 		dmg_k *= w.stat("crit_mult")
 		size *= 1.5
+		if player.has_sign(&"nyarlathotep"): pierce += 2                  # hito 16.9
 	if w.stat("ally_time") > 0.0:                                         # suero de West
 		effect = BulletManager.Effect.INJECT
 		effect_val = w.stat("ally_time")
@@ -282,7 +287,7 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 		player.muzzle_flash(dir)                       # y un destello de luz (hito 11.3)
 	world.bullets.spawn(BulletManager.Team.PLAYER, style,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
-		size, Damage.new(dmg(w, false) * dmg_k, 0.0), life, int(w.stat("pierce")),
+		size, Damage.new(dmg(w, false) * dmg_k, 0.0), life, pierce,
 		w.stat("knockback"), _bonus_set, int(w.stat("split_count")), w.stat("homing"), effect, effect_val, player.index)
 
 ## ¿En crisis de paranoia? (solo en cooperativo: en solitario no sale.)
@@ -590,6 +595,10 @@ func _throw(w: Weapon, target: Vector3) -> void:
 	if w.data.zone != WeaponData.Zone.NONE:
 		z = {"kind": w.data.zone, "radius": w.stat("zone_radius"), "time": w.stat("zone_time"),
 			"dps": w.stat("zone_dps") * player.damage_mult(w.data.category), "vulnerable": w.stat("vulnerable")}
+	elif w.stat("aoe_radius") > 0.0 and w.stat("root") <= 0.0 and w.stat("lure") <= 0.0 and player.has_sign(&"cthugha"):
+		# Signo de Cthugha (16.9): la explosión deja fuego (el daño de la explosión, repartido en 3 s)
+		z = {"kind": WeaponData.Zone.FIRE, "radius": w.stat("aoe_radius") * 0.6, "time": 3.0,
+			"dps": dmg(w, false) * Signs.value("cthugha"), "vulnerable": 0.0}
 	e.configure(w.data.look, w.stat("arc_height"), z, w.stat("lure"), player.data.bonus_tags)
 	e.net = w.stat("root")                                                # red de pesca
 	world.fx.add_child(e)

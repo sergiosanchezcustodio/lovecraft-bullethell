@@ -23,3 +23,4 @@ evolution = &"revolver_vigia"
 max_level = 5
 level_mods = Array[Dictionary]([{"damage*": 1.25}, {"pierce+": 1.0}, {"count+": 1.0, "burst_delay+": 0.14}, {"pierce+": 1.0, "damage*": 1.2}])
 level_text = Array[String](["+25 % de daño", "Dispara un 20 % más rápido", "Dos disparos seguidos", "Atraviesa a un enemigo y +20 % de daño"])
+evolution_alt = &"webly_seis_tiros"

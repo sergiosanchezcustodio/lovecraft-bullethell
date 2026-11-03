@@ -24,3 +24,4 @@ level_mods = Array[Dictionary]([{"damage*": 1.3}, {"count+": 1.0}, {"duration+":
 level_text = Array[String](["+30 % de daño", "Un orbe más", "Duran 3 s más y disparan más rápido", "Otro orbe y +20 % de daño"])
 evolves_with = &"cristal"
 evolution = &"enjambre_yuggoth"
+evolution_alt = &"cilindro_migo"

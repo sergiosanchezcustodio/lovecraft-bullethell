@@ -20,3 +20,4 @@ level_mods = Array[Dictionary]([{"damage*": 1.25}, {"aoe_radius*": 1.2}, {"coold
 level_text = Array[String](["+25 % de daño", "Tajo un 20 % más amplio", "Golpea un 20 % más rápido", "+30 % de daño y tajo más amplio"])
 evolves_with = &"guantes"
 evolution = &"machete_canaveral"
+evolution_alt = &"machetes_zafra"

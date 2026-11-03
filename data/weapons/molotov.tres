@@ -28,3 +28,4 @@ level_mods = Array[Dictionary]([{"zone_radius*": 1.2}, {"zone_dps*": 1.3}, {"cou
 level_text = Array[String](["Charco un 20 % más amplio", "+30 % de daño del fuego", "Lanza dos botellas", "Arde más tiempo y +25 % de daño"])
 evolves_with = &"petaca"
 evolution = &"coctel_emma"
+evolution_alt = &"bomba_queroseno"

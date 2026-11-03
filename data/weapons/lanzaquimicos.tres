@@ -29,3 +29,4 @@ level_mods = Array[Dictionary]([{"zone_radius*": 1.2}, {"vulnerable+": 1.5, "zon
 level_text = Array[String](["Charco un 20 % más amplio", "Vulnerables más tiempo y más daño", "Lanza dos frascos", "El ácido dura más y cubre más"])
 evolves_with = &"laudano"
 evolution = &"botica_arkham"
+evolution_alt = &"agua_regia"

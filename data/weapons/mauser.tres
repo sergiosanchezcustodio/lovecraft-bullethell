@@ -25,3 +25,4 @@ level_mods = Array[Dictionary]([{"damage*": 1.25}, {"count+": 1.0}, {"cooldown*"
 level_text = Array[String](["+25 % de daño", "Ráfagas de cuatro", "Dispara un 20 % más rápido", "+30 % de daño y atraviesan a un enemigo"])
 evolves_with = &"reloj"
 evolution = &"mauser_tillinghast"
+evolution_alt = &"carabina_mauser"

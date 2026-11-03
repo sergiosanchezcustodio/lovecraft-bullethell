@@ -21,3 +21,4 @@ level_mods = Array[Dictionary]([{"damage*": 1.3}, {"range*": 1.3}, {"aoe_radius*
 level_text = Array[String](["+30 % de daño", "La grieta llega un 30 % más lejos", "Grieta más ancha y aturde más", "Golpea antes y +25 % de daño"])
 evolves_with = &"crampones"
 evolution = &"martillo_barrera"
+evolution_alt = &"piolet_pabodie"

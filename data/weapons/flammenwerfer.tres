@@ -24,3 +24,4 @@ level_mods = Array[Dictionary]([{"damage*": 1.25}, {"duration+": 0.4}, {"range*"
 level_text = Array[String](["+25 % de daño", "Chorro más largo", "Llega más lejos y más ancho", "+30 % de daño y el fuego dura más"])
 evolves_with = &"fosforos"
 evolution = &"aliento_moloch"
+evolution_alt = &"lanza_termica"
