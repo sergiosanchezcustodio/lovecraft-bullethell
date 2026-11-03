@@ -583,6 +583,11 @@ func _ready() -> void:
 		add_child(net_game)
 		hud.net_info = _net_info                       # hito 9.4b: PC y ping en los paneles de los demás
 		hud.add_child(OffscreenArrows.new().setup(players, camera))   # y flechas hacia los que no se ven
+	if args.get_str("decor_break", "") != "false":     # decorado que se rompe con las explosiones (16.34)
+		var dbk := DecorBreak.new().setup(arena, world, is_guest())
+		dbk.piece_broken.connect(func(i: int) -> void:
+			if net_game != null and not is_guest(): net_game._event({"k": "decor", "i": i}))
+		arena.add_child(dbk)
 	var cues := OffscreenCues.new().setup(camera)   # élites y ataques fuertes de fuera de cámara (hito 13.13)
 	hud.add_child(cues)
 	if args.has("tour"):                           # tour=x,z;x,z: el J1 va a cada punto a tour_at + i·tour_every s (hito 13.14)

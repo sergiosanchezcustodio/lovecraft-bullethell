@@ -48,7 +48,7 @@ const SNAP := NetSession.USER + 13           ## anfitrión -> invitados: foto de
 const SPAWN := NetSession.USER + 14          ## anfitrión -> invitados: [nid, enemigo, x, y, z, rasgos de élite (16.20)]
 const DIE := NetSession.USER + 15            ## anfitrión -> invitados: nid
 const ANIM := NetSession.USER + 16           ## anfitrión -> invitados: [índice, nombre de animación]
-const EVENT := NetSession.USER + 17          ## anfitrión -> invitados: {k: final|mid|boss|won|lost, id, text}
+const EVENT := NetSession.USER + 17          ## anfitrión -> invitados: {k: final|mid|boss|won|lost|say|decor, id, text, i}
 const NEXT := NetSession.USER + 18           ## anfitrión -> invitados: {level, carry, team_xp, team_turn}
 const RESTART := NetSession.USER + 19        ## anfitrión -> invitados: reintentar el nivel
 const BULLETS := NetSession.USER + 20        ## anfitrión -> invitados: balas enemigas nuevas (no fiable)
@@ -776,6 +776,8 @@ func _on_event(d: Dictionary) -> void:
 			if game.has_method("net_lost"): game.net_lost()
 		"say":
 			if game.has_method("announce"): game.announce(String(d.get("text", "")), 1.6)
+		"decor":                                   # una pieza del decorado se rompe (hito 16.34)
+			if DecorBreak.current != null: DecorBreak.current.crumble(int(d.get("i", -1)))
 
 # ---------------------------------------------------------------- combate (hito 9.3b)
 

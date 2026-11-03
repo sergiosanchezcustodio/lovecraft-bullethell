@@ -27,6 +27,7 @@ static var recent: Array[Dictionary] = []
 func _ready() -> void:
 	Auto.sfx_at("explosion", global_position)
 	Rumble.blast(global_position, radius, String(_wtag).begins_with("J"))   # el mando de los que están cerca (16.30)
+	DecorBreak.blast(global_position, radius)                               # el decorado que alcanza (16.34)
 	Gusts.push(get_parent(), global_position, 0.1 + radius * 0.05, radius * 3.0)   # mueve telas y plantas (hito 11.4)
 	var now := Time.get_ticks_msec()
 	recent = recent.filter(func(b: Dictionary) -> bool: return now - int(b.t) < 1000)

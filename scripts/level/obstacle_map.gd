@@ -25,6 +25,94 @@ func add_circle(center: Vector2, radius: float) -> void:
 	_circles.append(Vector3(center.x, center.y, radius))
 	_grid.insert(center, radius)
 
+const CLEAR_REACH := 4.5                 ## m alrededor de lo quitado en que se recalcula la distancia
+
+## Quita lo bloqueado bajo una pieza del decorado que se ha roto (hito 16.34): las celdas cuyo
+## centro, en el espacio de la pieza (`inv`: del mundo a su contenedor), cae en la caja lo..hi
+## (x, z) más `margin`. Recalcula la distancia a lo bloqueado alrededor (CLEAR_REACH, por chaflán:
+## lo que está más lejos no la usa para chocar). Sin mapa, quita los círculos de dentro.
+## Devuelve cuántas celdas (o círculos) ha quitado.
+func clear_box(inv: Transform3D, lo: Vector2, hi: Vector2, margin := 0.12) -> int:
+	var xf := inv.affine_inverse()
+	var area := Rect2()
+	for k in 4:
+		var p := xf * Vector3(lo.x if k & 1 == 0 else hi.x, 0.0, lo.y if k & 2 == 0 else hi.y)
+		area = Rect2(Vector2(p.x, p.z), Vector2.ZERO) if k == 0 else area.expand(Vector2(p.x, p.z))
+	area = area.grow(margin)
+	var inside := func(w: Vector2) -> bool:
+		var l := inv * Vector3(w.x, 0.0, w.y)
+		return l.x >= lo.x - margin and l.x <= hi.x + margin and l.z >= lo.y - margin and l.z <= hi.y + margin
+	if _n == 0:
+		var keep: Array[Vector3] = []
+		for c in _circles:
+			if not inside.call(Vector2(c.x, c.y)): keep.append(c)
+		var gone := _circles.size() - keep.size()
+		_circles = keep
+		_grid = SpatialGrid.new(3.0)
+		for c in _circles: _grid.insert(Vector2(c.x, c.y), c.z)
+		return gone
+	var i0 := maxi(int(floor((area.position.x - _origin.x) / _cell)), 0)
+	var j0 := maxi(int(floor((area.position.y - _origin.y) / _cell)), 0)
+	var i1 := mini(int(floor((area.end.x - _origin.x) / _cell)), _n - 1)
+	var j1 := mini(int(floor((area.end.y - _origin.y) / _cell)), _n - 1)
+	var cleared := 0
+	for j in range(j0, j1 + 1):
+		for i in range(i0, i1 + 1):
+			var c := _origin + (Vector2(i, j) + Vector2(0.5, 0.5)) * _cell
+			if not inside.call(c): continue
+			var o := (j * _n + i) * 3
+			if _mask[o] != 0 or _mask[o + 1] != 0: cleared += 1
+			_mask[o] = 0
+			_mask[o + 1] = 0
+	if cleared > 0:
+		var m := int(ceil(CLEAR_REACH / _cell))
+		_recompute(i0 - m, j0 - m, i1 + m, j1 + m)
+	return cleared
+
+## Distancia a lo bloqueado en la ventana (i0, j0)-(i1, j1), por chaflán en dos pasadas. El borde
+## de la ventana conserva lo que tenía: así la distancia sigue igual de continua hacia fuera.
+func _recompute(i0: int, j0: int, i1: int, j1: int) -> void:
+	i0 = clampi(i0, 0, _n - 1); j0 = clampi(j0, 0, _n - 1)
+	i1 = clampi(i1, 0, _n - 1); j1 = clampi(j1, 0, _n - 1)
+	var w := i1 - i0 + 1
+	var h := j1 - j0 + 1
+	var d := PackedFloat32Array()
+	d.resize(w * h)
+	for j in h:
+		for i in w:
+			var o := ((j0 + j) * _n + i0 + i) * 3
+			var edge := i == 0 or j == 0 or i == w - 1 or j == h - 1
+			d[j * w + i] = 0.0 if _mask[o] != 0 else (_mask[o + 2] * _dist_step if edge else INF)
+	var a := _cell
+	var b := _cell * sqrt(2.0)
+	for j in h:                                  # de arriba abajo
+		for i in w:
+			var k := j * w + i
+			var v := d[k]
+			if v == 0.0: continue
+			if i > 0: v = minf(v, d[k - 1] + a)
+			if j > 0:
+				v = minf(v, d[k - w] + a)
+				if i > 0: v = minf(v, d[k - w - 1] + b)
+				if i < w - 1: v = minf(v, d[k - w + 1] + b)
+			d[k] = v
+	for j in range(h - 1, -1, -1):               # y de abajo arriba
+		for i in range(w - 1, -1, -1):
+			var k := j * w + i
+			var v := d[k]
+			if v == 0.0: continue
+			if i < w - 1: v = minf(v, d[k + 1] + a)
+			if j < h - 1:
+				v = minf(v, d[k + w] + a)
+				if i < w - 1: v = minf(v, d[k + w + 1] + b)
+				if i > 0: v = minf(v, d[k + w - 1] + b)
+			d[k] = v
+	for j in range(1, h - 1):
+		for i in range(1, w - 1):
+			var o := ((j0 + j) * _n + i0 + i) * 3
+			if _mask[o] != 0: continue
+			_mask[o + 2] = clampi(roundi(d[j * w + i] / _dist_step), 0, 255)
+
 ## Carga el mapa de lo transitable ({file, size, cell, origin, dist_step} del JSON de la
 ## arena). Los límites pasan a ser la caja de lo transitable.
 func load_mask(def: Dictionary) -> bool:
