@@ -47,6 +47,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `level=p1_n1`: nivel a jugar (por defecto). `nolevel=true` deja el campo de pruebas sin oleadas.
   - `timescale=N`: acelera el juego. Las capturas de `shots=` usan tiempo de juego.
   - `final_at=s`: adelanta el evento final.
+  - `dmg_table=T`: abre la pausa y la tabla «Daño de la partida» a los T s (`dmg_player=N`: la del J N; hito 16.27).
   - `max_alive=N` y `spawn_rate=N`: tope de vivos y ritmo de aparición fijo (pruebas de carga).
   - `autopick=true`: elige sola la primera mejora (para bots y capturas).
   - `xp=`, `hp=` y `san=`: experiencia, vida y cordura iniciales.
