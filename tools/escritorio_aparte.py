@@ -13,6 +13,9 @@ la primera vez y Windows lo quita al cerrarse el último programa que lo usa. El
 abierto en un escritorio que no se ve.
 """
 import ctypes
+import os
+import threading
+import time
 import subprocess
 import sys
 from ctypes import wintypes
@@ -76,6 +79,48 @@ k32.CreateProcessW.argtypes = [wintypes.LPCWSTR, wintypes.LPWSTR, ctypes.c_void_
                                ctypes.POINTER(PROCESS_INFORMATION)]
 
 
+class PROCESS_POWER_THROTTLING_STATE(ctypes.Structure):
+    _fields_ = [("Version", wintypes.ULONG), ("ControlMask", wintypes.ULONG), ("StateMask", wintypes.ULONG)]
+
+
+k32.SetProcessInformation.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD]
+
+
+def no_throttle(proc) -> None:
+    """Sin «ahorro de energía» (EcoQoS, 03-11-2026): en otro escritorio la ventana no se ve y Windows
+    trata el proceso como de fondo y le baja la frecuencia a ratos; los fotogramas de esos ratos
+    van el doble de lentos en todo (proceso, física y dibujo) y falsean el 1 % peor. Pedirlo no le
+    quita nada al juego del autor: la prioridad sigue normal (el modo de bajo consumo de Godot)."""
+    st = PROCESS_POWER_THROTTLING_STATE(1, 0x1, 0x0)  # PROCESS_POWER_THROTTLING_EXECUTION_SPEED, desactivado
+    k32.SetProcessInformation(proc, 4, ctypes.byref(st), ctypes.sizeof(st))  # ProcessPowerThrottling
+
+
+k32.OpenProcess.restype = wintypes.HANDLE
+k32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+
+
+def no_throttle_children(pid: int) -> None:
+    """El _console.exe abre el Godot de verdad como hijo: a ese también (lo busca durante 5 s)."""
+    try:
+        import psutil
+    except ImportError:
+        return
+    done = set()
+    for _ in range(50):
+        try:
+            for c in psutil.Process(pid).children(recursive=True):
+                if c.pid in done: continue
+                h = k32.OpenProcess(0x0200, False, c.pid)  # PROCESS_SET_INFORMATION
+                if h:
+                    no_throttle(h)
+                    k32.CloseHandle(h)
+                    done.add(c.pid)
+        except psutil.Error:
+            return
+        if done: return
+        time.sleep(0.1)
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         print(__doc__)
@@ -107,7 +152,9 @@ def main() -> int:
         print("escritorio_aparte: no se pudo lanzar (%d)" % ctypes.get_last_error(), file=sys.stderr)
         return 1
     k32.AssignProcessToJobObject(job, pi.hProcess)  # antes de que arranque: sus hijos (Godot de verdad) también
+    if os.environ.get("LOVECRAFT_ECO", "") != "1": no_throttle(pi.hProcess)
     k32.ResumeThread(pi.hThread)
+    if os.environ.get("LOVECRAFT_ECO", "") != "1": threading.Thread(target=no_throttle_children, args=(pi.dwProcessId,), daemon=True).start()
     try:
         k32.WaitForSingleObject(pi.hProcess, INFINITE)
     except KeyboardInterrupt:                      # Ctrl+C o timeout: que no quede Godot suelto en el escritorio invisible

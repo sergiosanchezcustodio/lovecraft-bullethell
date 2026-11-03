@@ -233,22 +233,22 @@ Primera partida tras arrancar el juego, en Alta, desde el relato (`relato level=
 
 ## Medición de los 15 niveles
 
-*Última: 03-11-2026, versión 0.9.0 (`python tools/medir_niveles.py`).* Bot sin daño, 80 enemigos como tope y 8 s medidos; la mejor de 2 ejecuciones. Entre paréntesis, la medición anterior (30-10-2026) y la diferencia. Milisegundos por fotograma: menos es mejor. Con 80 enemigos manda la CPU (la lógica de la partida), así que Media y Alta salen parecidas; entre ejecuciones, la media varía en torno a ±1 ms y el 1 % peor bastante más: fíate de las diferencias grandes o de las que se repiten.
+*Última: 03-11-2026, versión 0.9.0 (`python tools/medir_niveles.py`).* Bot sin daño, 80 enemigos como tope y 8 s medidos; la mejor de 2 ejecuciones. Entre paréntesis, la medición anterior (03-11-2026) y la diferencia. Milisegundos por fotograma: menos es mejor. Con 80 enemigos manda la CPU (la lógica de la partida), así que Media y Alta salen parecidas; entre ejecuciones, la media varía en torno a ±1 ms y el 1 % peor bastante más: fíate de las diferencias grandes o de las que se repiten.
 
 | Nivel | Alta: media (antes) | Alta: 1 % peor | Primitivas (Alta) |
 |---|---|---|---|
-| p1_n1 · Campamento base en la costa del mar de Ross | 7,72 (8,18, −6 %) | 14,68 (16,38, −10 %) | 6,7 M |
-| p1_n2 · El campamento destruido de Lake | 7,45 (7,51, −1 %) | 18,00 (16,39, +10 %) | 9,0 M |
-| p1_n3 · El paso de la cordillera y sus cavernas | 7,79 (7,61, +2 %) | 16,99 (18,78, −10 %) | 5,7 M |
-| p1_n4 · La ciudad ciclópea de los Antiguos | 7,70 (7,53, +2 %) | 15,67 (15,60, +0 %) | 10,3 M |
-| p1_n5 · Los túneles y el abismo del mar subterráneo | 7,73 (7,40, +4 %) | 17,75 (15,27, +16 %) | 7,7 M |
-| p2_n1 · Newburyport y la carretera a Innsmouth | 7,20 (8,13, −11 %) | 18,41 (15,67, +17 %) | 12,2 M |
-| p2_n2 · Las calles de Innsmouth y el templo de la Orden | 8,45 (9,81, −14 %) | 16,24 (17,67, −8 %) | 13,3 M |
-| p2_n3 · El hotel Gilman House y la huida por los tejados | 7,72 (8,76, −12 %) | 17,43 (15,34, +14 %) | 7,4 M |
-| p2_n4 · Los pantanos y la vía muerta del tren a Rowley | 10,86 (9,90, +10 %) | 19,52 (17,00, +15 %) | 23,4 M |
-| p2_n5 · El Arrecife del Diablo y Y'ha-nthlei | 9,23 (9,76, −5 %) | 16,89 (18,84, −10 %) | 15,7 M |
-| p3_n1 · Providence: el estudio del escultor Wilcox | 7,10 (7,31, −3 %) | 14,31 (14,81, −3 %) | 11,8 M |
-| p3_n2 · Los pantanos de Luisiana: el ritual del culto | 10,04 (7,56, +33 %) | 22,97 (13,00, +77 %) | 14,9 M |
-| p3_n3 · Los muelles y la cubierta del Alert | 8,39 (9,91, −15 %) | 17,08 (16,83, +1 %) | 12,2 M |
-| p3_n4 · La tormenta en el Pacífico | 8,06 (7,39, +9 %) | 18,44 (16,06, +15 %) | 10,3 M |
-| p3_n5 · R'lyeh emergida: la puerta colosal | 8,02 (8,38, −4 %) | 17,65 (16,60, +6 %) | 10,9 M |
+| p1_n1 · Campamento base en la costa del mar de Ross | 7,69 (7,72, −0 %) | 13,41 (14,68, −9 %) | 8,7 M |
+| p1_n2 · El campamento destruido de Lake | 7,09 (7,45, −5 %) | 14,32 (18,00, −20 %) | 11,5 M |
+| p1_n3 · El paso de la cordillera y sus cavernas | 7,09 (7,79, −9 %) | 15,28 (16,99, −10 %) | 4,9 M |
+| p1_n4 · La ciudad ciclópea de los Antiguos | 7,04 (7,70, −9 %) | 14,10 (15,67, −10 %) | 11,9 M |
+| p1_n5 · Los túneles y el abismo del mar subterráneo | 7,72 (7,73, −0 %) | 16,50 (17,75, −7 %) | 8,0 M |
+| p2_n1 · Newburyport y la carretera a Innsmouth | 7,07 (7,20, −2 %) | 13,74 (18,41, −25 %) | 10,7 M |
+| p2_n2 · Las calles de Innsmouth y el templo de la Orden | 7,53 (8,45, −11 %) | 13,04 (16,24, −20 %) | 14,1 M |
+| p2_n3 · El hotel Gilman House y la huida por los tejados | 7,86 (7,72, +2 %) | 16,16 (17,43, −7 %) | 9,9 M |
+| p2_n4 · Los pantanos y la vía muerta del tren a Rowley | 9,08 (10,86, −16 %) | 15,10 (19,52, −23 %) | 16,5 M |
+| p2_n5 · El Arrecife del Diablo y Y'ha-nthlei | 8,09 (9,23, −12 %) | 17,35 (16,89, +3 %) | 14,4 M |
+| p3_n1 · Providence: el estudio del escultor Wilcox | 7,03 (7,10, −1 %) | 13,25 (14,31, −7 %) | 13,0 M |
+| p3_n2 · Los pantanos de Luisiana: el ritual del culto | 8,02 (10,04, −20 %) | 14,42 (22,97, −37 %) | 15,9 M |
+| p3_n3 · Los muelles y la cubierta del Alert | 7,10 (8,39, −15 %) | 12,47 (17,08, −27 %) | 7,8 M |
+| p3_n4 · La tormenta en el Pacífico | 7,43 (8,06, −8 %) | 14,32 (18,44, −22 %) | 10,2 M |
+| p3_n5 · R'lyeh emergida: la puerta colosal | 7,22 (8,02, −10 %) | 13,85 (17,65, −22 %) | 14,9 M |

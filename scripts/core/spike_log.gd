@@ -17,6 +17,30 @@ var _prev_pipes := 0
 var _prev_phys_frames := 0
 var _rows: Array[Dictionary] = []          ## un diccionario por fotograma medido
 var _pipe_keys: Array[String] = []
+
+## Marcas al principio y al final de las fases del fotograma (un nodo que va el primero y otro el
+## último en _process y en _physics_process): así se sabe cuánto del fotograma es proceso, cuánto
+## física (todos sus pasos) y cuánto lo demás (dibujo, presentar, el motor).
+class PhaseMark extends Node:
+	var first := true
+	static var proc_start := 0
+	static var proc_end := 0
+	static var phys_us := 0                ## física acumulada desde el último proceso
+	static var _phys_start := 0
+	func _init(is_first: bool) -> void:
+		first = is_first
+		process_priority = -1000000 if is_first else 1000000
+		process_physics_priority = -1000000 if is_first else 1000000
+		process_mode = Node.PROCESS_MODE_ALWAYS
+	func _process(_d: float) -> void:
+		if first: proc_start = Time.get_ticks_usec()
+		else: proc_end = Time.get_ticks_usec()
+	func _physics_process(_d: float) -> void:
+		if first: _phys_start = Time.get_ticks_usec()
+		else: phys_us += Time.get_ticks_usec() - _phys_start
+
+var _marks: Array[PhaseMark] = []
+var _last_proc_start := 0
 var _born := {}                            ## nodos creados en este fotograma, por tipo
 var _born_spikes := {}                     ## y sumados en los fotogramas de pico
 var _born_all := {}
@@ -31,6 +55,10 @@ func _init(viewport: Viewport) -> void:
 	_prev_pipes = _pipes()
 	_prev_phys_frames = Engine.get_physics_frames()
 	viewport.get_tree().node_added.connect(_on_node_added)
+	for f in [true, false]:
+		var m := PhaseMark.new(f)
+		_marks.append(m)
+		viewport.get_tree().root.add_child.call_deferred(m)
 
 ## Tipo del nodo: el script si lo tiene (sin ruta), si no la clase y el nombre del padre.
 func _on_node_added(n: Node) -> void:
@@ -74,7 +102,16 @@ func step(delta: float) -> void:
 			var dv := int(_pipe_by[k]) - int(before.get(k, 0))
 			if dv > 0: ptypes[k] = dv
 	var phys := Engine.get_physics_frames()
+	# fases del fotograma anterior completo: proceso (de la primera marca a la última), física (sus
+	# pasos) y lo demás hasta este proceso (dibujo, presentar, el motor)
+	var proc_ms := maxf(PhaseMark.proc_end - _last_proc_start, 0) / 1000.0 if _last_proc_start > 0 else 0.0
+	var phys_ms := PhaseMark.phys_us / 1000.0
+	PhaseMark.phys_us = 0
+	_last_proc_start = PhaseMark.proc_start
 	_rows.append({
+		"proceso": proc_ms,
+		"fisica": phys_ms,
+		"otro": maxf(delta * 1000.0 - proc_ms - phys_ms, 0.0),   # dibujo, presentar y el motor
 		"ms": delta * 1000.0,
 		"t": Time.get_ticks_msec() / 1000.0,
 		"cpu": RenderingServer.viewport_get_measured_render_time_cpu(_vp),
@@ -136,7 +173,7 @@ func report() -> String:
 		out.append("PICOS compilaciones por tipo (desde el arranque): " + str(_pipe_by))
 	if spikes.is_empty(): return "\n".join(out)
 	var line := "PICOS media en picos / resto:"
-	for k in ["ms", "cpu", "gpu", "pasos", "nodos", "shaders"]:
+	for k in ["ms", "proceso", "fisica", "otro", "cpu", "gpu", "pasos", "nodos", "shaders"]:
 		line += "  %s=%.2f/%.2f" % [k, _avg(spikes, k), _avg(calm, k)]
 	out.append(line)
 	# los sistemas de Prof que más suben en los picos
@@ -159,8 +196,8 @@ func report() -> String:
 		top.sort_custom(func(a: String, b: String) -> bool: return r.prof[a] > r.prof[b])
 		var tops := ""
 		for j in mini(3, top.size()): tops += " %s=%.1f" % [top[j], r.prof[top[j]]]
-		out.append("PICO %.1f ms  t=%.2f cpu=%.1f gpu=%.1f pasos=%d nodos=%+d shaders=%d |%s | %s" % [r.ms, r.t,
-			r.cpu, r.gpu, r.pasos, r.nodos, r.shaders, tops, _top(r.get("born", {}), 5)])
+		out.append("PICO %.1f ms  t=%.2f proceso=%.1f fisica=%.1f otro=%.1f cpu=%.1f gpu=%.1f pasos=%d nodos=%+d shaders=%d |%s | %s" % [r.ms, r.t,
+			r.proceso, r.fisica, r.otro, r.cpu, r.gpu, r.pasos, r.nodos, r.shaders, tops, _top(r.get("born", {}), 5)])
 	return "\n".join(out)
 
 static func _top(d: Dictionary, n: int) -> String:
