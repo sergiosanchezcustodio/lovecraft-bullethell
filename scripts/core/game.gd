@@ -70,6 +70,8 @@ const PLAYER_COLORS: Array[Color] = [Color(1.0, 0.82, 0.3), Color(0.35, 0.75, 1.
 
 var args: LaunchArgs
 var arena: Node3D
+var _ambient: Ambient
+var _moon: DirectionalLight3D
 var player: Player                            ## el J1 (lo usan la depuración y las opciones de prueba)
 var players: Array[Player] = []               ## J1..J4 (hito 2.9)
 var team: TeamXp                              ## experiencia compartida del cooperativo (D-07)
@@ -172,6 +174,7 @@ func _ready() -> void:
 	var we := WorldEnvironment.new(); we.environment = env; add_child(we)
 	var moon := DirectionalLight3D.new()
 	moon.name = "Moon"
+	_moon = moon
 	moon.rotation_degrees = Vector3(-55, 20, 0)
 	moon.light_color = Color(0.6, 0.72, 0.85)
 	moon.light_energy = 0.55
@@ -340,10 +343,12 @@ func _ready() -> void:
 		for q in players:
 			if not q.remote: q.leash = func(pos: Vector3) -> Vector3: return camera.leash(pos)
 	_env = env
-	add_child(Ambient.new().setup(arena, camera, arena_path.get_file().get_basename()))   # ambiente del escenario
+	_ambient = Ambient.new().setup(arena, camera, arena_path.get_file().get_basename())
+	add_child(_ambient)                                                                  # ambiente del escenario
 	if args.get_bool("reflections", bool(Quality.value("reflections", false))) and WaterReflection.has_water(arena):
 		add_child(WaterReflection.new().setup(camera, arena))   # reflejos en el agua (16.31)
 	var arena_id := arena_path.get_file().get_basename()
+	arena.set_meta("arena_id", arena_id)
 	if args.get_bool("moon_shafts", bool(Quality.value("moon_shafts", false))) and MoonShafts.has_shafts(arena_id):
 		arena.add_child(MoonShafts.new().setup(arena, arena_id))   # haces de luna (16.32)
 	_lap("cámara y ambiente")
@@ -424,6 +429,9 @@ func _ready() -> void:
 			announce(text, 3.5)
 			if args.get_bool("log"): print("MINIJEFE %s t=%.0f" % [e.data.id, director.time]))
 		director.level_completed.connect(_on_level_completed)
+		var night_id := arena.get_meta("arena_id", "") as String
+		if NightCycle.amount(night_id) > 0.0 and args.get_str("night", "") != "false":   # la noche avanza (16.33)
+			add_child(NightCycle.new().setup(_moon, _env, director, _ambient, night_id))
 		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
 		# rompibles y peligros del escenario: en red, solo en el anfitrión (llegan a los invitados en el 9.3c)
 		if not args.get_bool("nobreakables") and not args.get_bool("no_spawn") and not is_guest(): add_child(BreakableSpawner.new().setup(world, arena.get_meta("size")))

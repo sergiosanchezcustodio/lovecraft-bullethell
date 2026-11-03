@@ -209,6 +209,13 @@ var _candles: Array = []                        ## [llama, s que le quedan apaga
 static var step_now := ""                       ## suelo de la arena en juego (Explosion: la nieve que aparta)
 static var blizzard_now := 0.0                  ## cuánto se ha cerrado la ventisca (Hud: retratos empañados)
 var _mats_sky: Array[ShaderMaterial] = []       ## suelo y mar: estrellas y fugaces
+var _stars_now := -1.0
+
+## Cuánto se ven las estrellas reflejadas (NightCycle, hito 16.33: casi ninguna al anochecer).
+func set_stars(k: float) -> void:
+	if absf(k - _stars_now) < 0.005: return
+	_stars_now = k
+	for sm in _mats_sky: sm.set_shader_parameter("night", k)
 var _shoot_t := -1.0
 var _next_shoot := 8.0
 var _flocks: Array[Dictionary] = []

@@ -1880,6 +1880,15 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Pruebas:** `tests/test_moon_shafts.gd` (la forma del ventanal y de la grieta; ventanales de la pared que recibe la luz y no de la que le llega rasante, con la abertura en la pared y la mancha en el suelo dentro del estudio; las grietas caen donde dice el JSON; solo en Alta y Ultra; cada foco con su proyector y sombras). 716 de 716.
 - **Capturas:** `shots/game_sh_d_005.0s.png` (el estudio), `game_sh_in_005.0s.png` (Dyer dentro de un haz), `game_sh_tun_005.0s.png` (túneles).
 
+## Fase 16, hito 16.33: la noche avanza durante el nivel (03-11-2026)
+
+- **Qué:** en las noches al aire libre (calles, tejados, pantano, arrecife, muelle y, con menos fuerza, ritual 0,8, R'lyeh 0,7 y tormenta 0,6), el nivel empieza en el crepúsculo: la luna más baja (10° más: sombras largas), más fuerte y cálida, el ambiente y el fondo hacia el morado y casi sin estrellas reflejadas. Llega a la luz aprobada de la arena (noche cerrada) al 85 % del tiempo hasta el evento final y se queda. Si cae el jefe, amanece en 12 s (luz cálida y baja, sin estrellas). Interiores, bajo tierra y la Antártida no cambian.
+- **Cómo** (`scripts/level/night_cycle.gd`, `NightCycle`, datos en `data/night.json`): toma la luz que dejó la arena (luna: energía, color e inclinación; ambiente, fondo y las estrellas de `Ambient`) y mezcla encima el crepúsculo (`dusk_k`, 1 al empezar y 0 en la noche cerrada) y el alba (`blend`). Va con el reloj del director, así que en red todos los PC lo ven igual, y el alba sale de `level_completed`, que también llega a los invitados. La tormenta reescribe el ambiente en cada relámpago desde su base: `NightCycle` le cambia esa base (`Weather._base_ambient`). Las estrellas, con `Ambient.set_stars`.
+- **Brillo:** la curva acaba exactamente en la luz de siempre (con `night=1`, la misma mediana que sin el ciclo: calles 0,157). Al principio, mediana 0,18 en las calles, 0,153 en el pantano y en el muelle (en la noche cerrada, 0,157, 0,129 y 0,122 en estas capturas desde la salida, sin tocar la luz de las arenas), por debajo de 0,22.
+- **Opciones:** `night=0..1` la fija (0 crepúsculo, 1 noche cerrada), `night=false` la quita y `dawn=true` amanece al empezar.
+- **Pruebas:** `tests/test_night_cycle.gd` (la curva va siempre a más noche y se queda; sin crepúsculo ni alba, la luz de la arena tal cual; el crepúsculo, más luz, más cálida, más baja y sin estrellas; el alba sin estrellas; qué arenas cambian; se aplica a la luna y al ambiente). 721 de 721.
+- **Capturas:** `shots/game_noche_p2_n2_0_005.0s.png` y `_1_` (calles, crepúsculo y noche), lo mismo con `p2_n4` (pantano) y `p3_n3` (muelle), `game_alba_002.0s.png` y `game_alba_014.0s.png` (el alba en el pantano), `game_noche_torm_008.0s.png` (tormenta).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
