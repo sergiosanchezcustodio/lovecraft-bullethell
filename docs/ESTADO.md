@@ -1912,6 +1912,16 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Pruebas:** `tests/test_relato_skies.gd` (el cielo de cada relato, que existan los que se usan y todos los relatos de nivel tengan uno, y las nubes de la portada). 730 de 730.
 - **Capturas:** `shots/rel_p1_n1_06.0s.png` (aurora), `rel_p2_n1_06.0s.png` (luna), `rel_storm_02.8s.png` (relámpago), `rel_p3_n5_06.0s.png` (R'lyeh), `titulo__nub_*.png` y `titulo__sin_008.0s.png` (la portada con y sin nubes).
 
+## Fase 16, hito 16.1: medición tras los bloques E y F y un tirón periódico menos (03-11-2026)
+
+- **Medición de los 15 niveles en Alta** (`tools/medir_niveles.py --calidades 2`, tabla en `docs/RENDIMIENTO.md`): 11 de 15 pasan de 16,7 ms en el 1 % peor (14,3-19,5 ms; los pantanos de Luisiana, 23,0). Casi todos se movieron 1-2 ms arriba o abajo respecto al 30-10, lo que varía de una ejecución a otra.
+- **Luisiana no empeoró:** la versión del 30-10, medida hoy igual (un `git worktree` de 9418b85, `tools/comparar.py --dir`), da 11,05 ms de media y 20,1 en el 1 % peor; la de hoy, 10,1 y 18,9. El 7,6/13,0 de la tabla anterior fue una ejecución buena y el 23,0 de hoy, una mala.
+- **Qué no es:** quitar uno a uno los reflejos, el decorado rompible, la noche o las élites deja la media entre 9,5 y 10,8 ms (ruido); la horda ayuda (sin ella, 1-2 ms peor); sin armas (sin muertes ni apariciones) el 1 % peor apenas baja (18,2 frente a 19,6), y el PC estaba en reposo. Con el nivel vacío, 7,0 ms y 9,1 en el 1 % peor; con 20 enemigos, la media casi igual (7,1) pero 13,6 en el 1 % peor.
+- **Un tirón cada 2,25 s, quitado:** `SpikeLog` dice ahora, en cada fotograma con compilaciones, de qué tipo son y qué entró en escena. En Luisiana se compilaba un shader («surface» y «specialization») cada 2,25 s, con fotogramas de 16-20 ms. Lo causaban los reflejos (16.31) y la noche (16.33) juntos: `WaterReflection._sync_env` duplicaba el `Environment` entero cada segundo y cada copia nueva compilaba. Ahora la copia se hace una vez y luego solo se copian los valores que cambian (`_sync_from`). Pasa en las arenas con agua y noche que avanza (calles, pantanos, arrecife, muelle…). Compilaciones durante la medición: de 20-24 a 12-17, todas al principio (la primera horda, las partículas del pantano).
+- **Lo que queda:** el 1 % peor no cambia de forma medible (Luisiana 9,75 ms de media y 19,9 en el 1 % peor; Rowley 10,7 y 20,5). En los picos que quedan, lo que mide `Prof` (unos 6 ms) y el dibujo en CPU (1 ms) explican solo unos 2 ms de los 12 de más; esos fotogramas traen dos pasos de física (1,05 frente a 0,56 de media) y la física de los enemigos se dobla (3,2 frente a 1,7 ms). Lo demás pasa fuera de los sistemas medidos (el motor).
+- **Herramientas:** `tools/comparar.py` (antes en una carpeta temporal) compara configuraciones alternándolas, con `--dir` para medir otra copia del proyecto.
+- **Pruebas:** `test_el_entorno_del_reflejo_no_se_rehace`. 731 de 731.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

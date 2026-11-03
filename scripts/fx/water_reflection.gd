@@ -98,16 +98,38 @@ static func mirrored(t: Transform3D, plane_y := 0.0) -> Transform3D:
 ## Su propio entorno: el de la partida sin niebla volumétrica (los halos de los faroles salían como
 ## columnas de luz: en ortográfica se estiran a lo largo de la vista), ni resplandor ni SSAO. Se
 ## copia cada segundo: la atmósfera cambia durante el nivel.
+## Lo que la cámara espejo no lleva (los halos de la niebla volumétrica salían como columnas).
+const ENV_OFF := ["volumetric_fog_enabled", "glow_enabled", "ssao_enabled", "ssr_enabled", "ssil_enabled"]
+
+## Su entorno es una copia del de la escena, hecha una vez; después solo se copian los valores que
+## cambian (la noche, 16.33, y los relámpagos los mueven sin parar). Antes se duplicaba entero cada
+## segundo y cada copia nueva compilaba un shader: un tirón de 16-20 ms cada 2,25 s en Luisiana.
 func _sync_env() -> void:
 	var src: Environment = get_viewport().find_world_3d().environment
-	if src == null: return
-	var e := src.duplicate() as Environment
-	e.volumetric_fog_enabled = false
-	e.glow_enabled = false
-	e.ssao_enabled = false
-	e.ssr_enabled = false
-	e.ssil_enabled = false
-	_cam.environment = e
+	if src != null: _sync_from(src)
+
+func _sync_from(src: Environment) -> void:
+	var e := _cam.environment
+	if e == null or _env_src != src:
+		_env_src = src
+		e = src.duplicate() as Environment
+		for k: String in ENV_OFF: e.set(k, false)
+		_cam.environment = e
+		return
+	for pr in _env_props(src):
+		var k: String = pr
+		var v: Variant = src.get(k)
+		if e.get(k) != v: e.set(k, v)
+
+var _env_src: Environment
+var _props: PackedStringArray = []
+
+func _env_props(src: Environment) -> PackedStringArray:
+	if _props.is_empty():
+		for d in src.get_property_list():
+			if int(d.usage) & PROPERTY_USAGE_STORAGE and not ENV_OFF.has(String(d.name)) and String(d.name) != "resource_name" 					and int(d.type) != TYPE_OBJECT:
+				_props.append(String(d.name))
+	return _props
 
 func _process(delta: float) -> void:
 	if camera == null or not is_instance_valid(camera): return

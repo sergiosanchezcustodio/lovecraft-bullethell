@@ -66,7 +66,13 @@ func step(delta: float) -> void:
 		prof[k] = (int(Prof.totals[k]) - int(_prev_prof.get(k, 0))) / 1000.0
 	_prev_prof = Prof.totals.duplicate()
 	var nodes := int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
+	var before := _pipe_by.duplicate()
 	var pipes := _pipes()
+	var ptypes := {}                       # de qué tipo son las de este fotograma
+	if pipes != _prev_pipes:
+		for k: String in _pipe_by:
+			var dv := int(_pipe_by[k]) - int(before.get(k, 0))
+			if dv > 0: ptypes[k] = dv
 	var phys := Engine.get_physics_frames()
 	_rows.append({
 		"ms": delta * 1000.0,
@@ -76,6 +82,7 @@ func step(delta: float) -> void:
 		"pasos": phys - _prev_phys_frames,
 		"nodos": nodes - _prev_nodes,
 		"shaders": pipes - _prev_pipes,
+		"ptypes": ptypes,
 		"prof": prof})
 	var acc := _born_spikes if delta * 1000.0 > LIMIT else {}
 	for k in _born:
@@ -118,6 +125,14 @@ func report() -> String:
 		var cl := "PICOS compilaciones (s desde el arranque: cuántas, ms del fotograma):"
 		for r in comp: cl += "  %.2f: %d, %.1f" % [r.t, r.shaders, r.ms]
 		out.append(cl)
+		# qué tipo y qué entró en escena en esos fotogramas (para saber qué las dispara)
+		var by_frame := "PICOS compilaciones, tipo y nodos nuevos:"
+		for r in comp:
+			var tps := PackedStringArray()
+			for k: String in r.ptypes: tps.append("%s %d" % [k, r.ptypes[k]])
+			by_frame += "
+    %.2f %.1f ms [%s] %s" % [r.t, r.ms, ", ".join(tps), _top(r.born, 5)]
+		out.append(by_frame)
 		out.append("PICOS compilaciones por tipo (desde el arranque): " + str(_pipe_by))
 	if spikes.is_empty(): return "\n".join(out)
 	var line := "PICOS media en picos / resto:"
