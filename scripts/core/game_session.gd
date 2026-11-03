@@ -40,6 +40,7 @@ static var returning := {}
 ## Pactos del Necronomicón sellados (hito 13.6, `Pacts`): duran hasta que se cambien, también
 ## entre niveles (clear no los toca); en red, los del anfitrión.
 static var pacts: Array = []
+static var rush_time := 0.0                     ## desfile de jefes (hito 16.22): s sumados de los jefes ya vencidos
 static var madness := 0                         ## grado de locura elegido en el mapa (hito 16.14)
 
 static func is_set() -> bool:

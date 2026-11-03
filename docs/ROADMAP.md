@@ -464,7 +464,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | Hito | Contenido | De dónde |
 |---|---|---|
 | 16.21 | **Expedición:** una tirada con un mapa de caminos que se bifurcan (combate, élite, buhonero, curiosidad, descanso, jefe); lo que ganas solo vale en esa expedición | *Slay the Spire*, *Vampire Survivors* (Adventures) |
-| 16.22 | **Desfile de jefes:** los tres jefes seguidos (más los intermedios del 16.19), con récord de tiempo | Clásico de los arcade |
+| 16.22 | **Desfile de jefes:** los tres jefes seguidos (más los intermedios del 16.19), con récord de tiempo | Clásico de los arcade. **Hecho (03-11-2026), pendiente de tu revisión:** «Desfile de jefes» en el mapa al vencer a Cthulhu: seis jefes seguidos (Gedney, shoggoth primigenio, Obed Marsh, Hydra y Dagon, Castro y Cthulhu) en sus escenarios, empezando con 22 subidas, el progreso de uno a otro y récord del tiempo total por personaje |
 | 16.23 | **Velocidad del juego** (0,7 a 1,3) y **pausa automática** al desconectar un mando o perder el foco | Accesibilidad. **Hecho (03-11-2026), pendiente de tu revisión:** «Velocidad del juego» del 70 al 130 % y «Pausa al perder el foco o desconectar un mando» en Configuración > Juego > Accesibilidad; en red, la velocidad es siempre 100 % y la pausa por foco no salta |
 | 16.24 | **Pesca en el muelle de Innsmouth** entre niveles: un minijuego tranquilo; los peces raros van al bestiario o se venden, y alguno no debería haber salido del agua | *Dredge*, *HoloCure* |
 | 16.25 | **Personajes secretos:** dos investigadores que se abren con condiciones (p. ej. Randolph Carter al juntar todos los fragmentos; Wilbur Whateley al superar los 15 desafíos) | *Vampire Survivors* |

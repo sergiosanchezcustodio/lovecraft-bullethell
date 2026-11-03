@@ -1,0 +1,17 @@
+{
+	"_doc": "Desfile de jefes (hito 16.22, BossRush): los jefes de la campaña seguidos, cada uno en su escenario, con el progreso de uno a otro (como los niveles de una parte) y récord del tiempo total. 'stages': nivel de la campaña del que sale el escenario y, si se da, 'boss' (si no, el jefe final de ese nivel, con el que le sigue) y 'health' (vida ×, para los intermedios, pensados para un nivel 3). 'boss_at': s hasta que sale. 'start_levels': subidas de nivel con las que se empieza (elegidas con criterio). 'spawn_rate' y 'max_alive': los que acompañan. 'unlock': nivel que lo abre.",
+	"unlock": "p3_n5",
+	"start_levels": 22,
+	"boss_at": 6.0,
+	"spawn_rate": 0.5,
+	"max_alive": 24,
+	"final_wave": 6,
+	"stages": [
+		{"level": "p1_n3", "boss": "gedney", "health": 2.0},
+		{"level": "p1_n5"},
+		{"level": "p2_n3", "boss": "obed_marsh", "health": 2.0},
+		{"level": "p2_n5"},
+		{"level": "p3_n2", "boss": "castro", "health": 2.0},
+		{"level": "p3_n5"}
+	]
+}

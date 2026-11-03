@@ -70,6 +70,18 @@ func _ready() -> void:
 		eb.pressed.connect(func() -> void: _endless(eb))
 		extra.add_child(eb)
 		_endless_btn = eb
+	if (BossRush.unlocked(Saves.current) or dev) and not Demo.on():   # desfile de jefes (hito 16.22): al vencer a Cthulhu
+		var rb := MenuKit.button("Desfile de jefes" + ("" if BossRush.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
+		rb.custom_minimum_size = Vector2(460, 58)
+		rb.focus_entered.connect(func() -> void:
+			_info_title.text = "Desfile de jefes"
+			var best := BossRush.best_any(Saves.current)
+			_info_text.text = "Los jefes de la campaña seguidos, cada uno en su escenario: Gedney, el shoggoth primigenio, Obed Marsh, Madre Hydra y Padre Dagon, el viejo Castro y Cthulhu. Empiezas fuerte y lo que ganas pasa de uno a otro. Sin pactos. Récord del tiempo total por personaje." + ("" if best <= 0.0 else " Tu récord: %s." % Endless.clock(best)))
+		rb.pressed.connect(func() -> void:
+			Pacts.set_active([])
+			GameSession.carry.clear()
+			chosen.emit(BossRush.id_for(1)))
+		extra.add_child(rb)
 	if Challenge.any_unlocked(Saves.current) or dev:   # desafíos (hito 15.2): al superar un nivel
 		var cb := MenuKit.button("Desafíos" + ("" if Challenge.any_unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
 		cb.custom_minimum_size = Vector2(460, 58)

@@ -352,6 +352,9 @@ func _ready() -> void:
 			add_child(Endless.new().setup(level))
 		elif Challenge.is_challenge(level_id):        # desafío (hito 15.2)
 			level = Challenge.make_level(level_id)
+		elif BossRush.is_rush(level_id):              # desfile de jefes (hito 16.22)
+			level = BossRush.make_level(level_id)
+			if BossRush.number_of(level_id) == 1 and GameSession.carry.is_empty(): GameSession.rush_time = 0.0
 		else:
 			level = load("res://data/levels/%s.tres" % level_id).duplicate()
 		Challenge.begin(level_id)                      # sus reglas, antes de montar el progreso (15.2)
@@ -1397,6 +1400,10 @@ func _game_over() -> void:
 	get_tree().paused = true
 	var title := "Has caído" if players.size() == 1 else "Habéis caído"
 	if level != null and level.endless: title = "Partida del día" if level.daily != "" else "La noche eterna"
+	if level != null and BossRush.is_rush(String(level.id)):   # desfile de jefes (16.22): hasta dónde llegó
+		var bd := BossRush.boss_of(String(level.id))
+		_endless_lines = PackedStringArray(["Caído ante %s (jefe %d de %d)" % [bd.display_name if bd != null else "el jefe",
+			BossRush.number_of(String(level.id)), BossRush.stages().size()]])
 	_end_screen(title, Color(0.86, 0.22, 0.18), "", "caida")
 
 var _challenge_record := false                   ## el desafío se acaba de superar mejorando el récord (diario)
@@ -1474,7 +1481,9 @@ func _on_level_completed() -> void:
 	if args.get_bool("log"): _log_players()
 	# el avance de la campaña solo cuenta en la partida del anfitrión (D-10)
 	var won_title := "Nivel superado"
-	if Challenge.is_challenge(String(level.id)):     # desafío (15.2): aparte, no cuenta como nivel de campaña
+	var rush := BossRush.is_rush(String(level.id))
+	if rush: won_title = _rush_won()                 # desfile de jefes (16.22)
+	elif Challenge.is_challenge(String(level.id)):     # desafío (15.2): aparte, no cuenta como nivel de campaña
 		won_title = "Desafío superado"
 		var prev := Challenge.best(Saves.current, String(level.id))
 		var t := director.time
@@ -1487,8 +1496,9 @@ func _on_level_completed() -> void:
 		Achievements.record(Saves.current, "challenges_won", Challenge.won_count(Saves.current))
 	elif Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))
-	Pacts.record_win(Saves.current, String(level.id), Pacts.active())   # sellos del mapa y logros (13.6)
-	Madness.record_win(Saves.current, String(level.id), Madness.grade())   # 16.14
+	if not rush:
+		Pacts.record_win(Saves.current, String(level.id), Pacts.active())   # sellos del mapa y logros (13.6)
+		Madness.record_win(Saves.current, String(level.id), Madness.grade())   # 16.14
 	var sets_won := {}                               # niveles superados con cada conjunto (la ficha los cuenta)
 	for q in players:                                # «De punta en blanco» (14.8): alguien de este PC con un conjunto entero
 		if not q.remote and not (q.input is BotInput) and q.outfit_set != "":
@@ -1502,7 +1512,26 @@ func _on_level_completed() -> void:
 	announce(won_title, 2.0)
 	await _loot_time()
 	get_tree().paused = true
-	_end_screen(won_title, UiKit.GOLD, Campaign.next_in_part(String(level.id)), "superado")
+	_end_screen(won_title, UiKit.GOLD, BossRush.next(String(level.id)) if rush else Campaign.next_in_part(String(level.id)), "superado")
+
+## Desfile de jefes (16.22): suma el tiempo de este jefe y, tras el último, el récord de cada
+## jugador de este PC con su personaje. Devuelve el título de la pantalla final.
+func _rush_won() -> String:
+	GameSession.rush_time += director.time
+	var total := GameSession.rush_time
+	var n := BossRush.number_of(String(level.id))
+	var of := BossRush.stages().size()
+	_endless_lines = PackedStringArray(["Jefe %d de %d · Tiempo total: %s" % [n, of, Endless.clock(total)]])
+	if BossRush.next(String(level.id)) != "": return "Jefe vencido"
+	_endless_lines = PackedStringArray(["Desfile completo · Tiempo total: %s" % Endless.clock(total)])
+	for q in players:
+		if q.remote or Saves.current == null: continue
+		var who := q.data.display_name + ": " if players.size() > 1 else ""
+		var prev := BossRush.best(Saves.current, String(q.data.id))
+		if BossRush.record(Saves.current, String(q.data.id), total):
+			_endless_lines.append(who + ("¡Nuevo récord! (antes, %s)" % Endless.clock(prev) if prev > 0.0 else "¡Primer récord!"))
+		else: _endless_lines.append(who + "Récord: %s" % Endless.clock(prev))
+	return "Desfile de jefes superado"
 
 ## Tras superar el nivel, LOOT_TIME s para recoger lo que han soltado el jefe y los últimos
 ## enemigos: no aparece nadie más, los que quedan caen (sueltan sus gemas), se deshacen las balas
@@ -1545,7 +1574,7 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 	if result != "" and not reports.is_empty() and level != null and (human or args.get_bool("report_log")):
 		FallReport.log_run(result, String(level.id), director.time if director != null else 0.0, reports)
 	s.has_next = next_id != ""
-	s.pacts_open = next_id != "" and not is_guest()       # sellar otros pactos antes del siguiente (13.6)
+	s.pacts_open = next_id != "" and not is_guest() and not BossRush.is_rush(next_id)   # sellar otros pactos antes del siguiente (13.6)
 	s.pacts.connect(func() -> void: _pacts_then_next(s, next_id))
 	if is_guest(): s.waiting = "El anfitrión decide cómo seguir"   # en red, solo puede salir
 	s.logs_button = net_game != null and net_game.guest_lost     # se fue alguien: el registro sirve
@@ -1577,7 +1606,7 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 const DEV_LEVELS_PER_STAGE := 7
 func _apply_carry() -> void:
 	if level == null: return
-	Difficulty.ramp_on = GameSession.carry.is_empty() and (Campaign.number_of(String(level.id)) <= 1 or args.get_bool("fresh"))
+	Difficulty.ramp_on = GameSession.carry.is_empty() and (Campaign.number_of(String(level.id)) <= 1 or args.get_bool("fresh")) and not BossRush.is_rush(String(level.id))
 	if not GameSession.carry.is_empty():
 		for q in players:
 			if q.index < GameSession.carry.size(): GameSession.restore(q, GameSession.carry[q.index])
@@ -1586,10 +1615,13 @@ func _apply_carry() -> void:
 			team.xp = GameSession.team_xp
 		return
 	var stage := Campaign.number_of(Challenge.base_of(String(level.id)))
-	if stage <= 1 or args.get_bool("fresh"): return
-	var wise := Challenge.active()                   # en un desafío, elegidas con criterio (15.2)
+	var ups := DEV_LEVELS_PER_STAGE * (stage - 1)
+	var rush := BossRush.is_rush(String(level.id))   # desfile de jefes (16.22): se empieza fuerte
+	if rush: ups = int(BossRush.cfg().get("start_levels", 22))
+	if (stage <= 1 and not rush) or args.get_bool("fresh"): return
+	var wise := Challenge.active() or rush           # en un desafío o el desfile, elegidas con criterio (15.2)
 	for q in players:
-		for k in DEV_LEVELS_PER_STAGE * (stage - 1):
+		for k in ups:
 			q.progress.gain_level()
 			var opts := q.progress.roll_options(q.weapons, _rng)
 			if not opts.is_empty(): q.progress.choose(SmartBot.pick(opts, q, _rng) if q.input is SmartBot or wise else opts[_rng.randi() % opts.size()], q)
@@ -1611,7 +1643,7 @@ func _grant_signs() -> void:
 		return
 	if is_guest() or Challenge.active() or level.daily != "": return
 	var due := Signs.due(Campaign.number_of(String(level.id)))
-	if Endless.is_endless(String(level.id)): due = 1
+	if Endless.is_endless(String(level.id)) or BossRush.is_rush(String(level.id)): due = 1
 	var any := false
 	for q in players:
 		if q.remote:                                  # sus abiertos los sabe su PC: aquí, que elija

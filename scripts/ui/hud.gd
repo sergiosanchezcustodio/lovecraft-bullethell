@@ -48,6 +48,8 @@ func _ready() -> void:
 	if Madness.grade() > 0: lvl_name += " · Grado %s" % String(Madness.info(Madness.grade()).get("roman", ""))   # 16.14
 	if director != null and Challenge.is_challenge(String(director.level.id)):   # desafío (15.2)
 		lvl_name = "Desafío · %s" % String(Challenge.find(String(director.level.id)).get("name", ""))
+	if director != null and BossRush.is_rush(String(director.level.id)):   # desfile de jefes (16.22)
+		lvl_name = "Desfile de jefes · %d de %d" % [BossRush.number_of(String(director.level.id)), BossRush.stages().size()]
 	if director != null and director.level.endless:          # sin fin (hito 13.8): el récord de J1 aquí
 		lvl_name = "La noche eterna"
 		if director.level.daily != "":                    # partida del día (13.9): el intento que cuenta

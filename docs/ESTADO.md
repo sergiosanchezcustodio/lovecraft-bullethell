@@ -1710,6 +1710,18 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Pruebas:** `tests/test_game_speed.gd` (velocidades, micro-pausa a la velocidad elegida y no acelerado, mando de cada jugador). 673 de 673. Probado en partida con `cfg_game_speed=0.8 autopause_at=3 log=true`.
 - **Capturas:** `shots/game_velocidad_009.0s.png` (la pausa automática). Las dos filas nuevas quedan más abajo de lo que enseña `shots/titulo_velcfg_006.0s.png` sin desplazar la lista.
 
+## Fase 16, hito 16.22: desfile de jefes (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+`scripts/level/boss_rush.gd` (`BossRush`) y `data/boss_rush.json`. Botón «Desfile de jefes» en el mapa (junto a la partida del día, la noche eterna y los desafíos), que se abre al vencer a Cthulhu (`unlock`), sin pactos. Seis pasos, cada uno un nivel `desfile:N` montado sobre el de la campaña (`make_level`; así viaja en red con START y se reintenta), en su escenario (`Endless.base_of` lo resuelve): Gedney en el 1.3, el shoggoth primigenio en el 1.5, Obed Marsh en el 2.3, Madre Hydra y Padre Dagon en el 2.5, el viejo Castro en el 3.2 y Cthulhu (y el recompuesto) en el 3.5. El jefe sale a los 6 s (`boss_at`) con 6 acompañantes; luego, pocos (0,5 por segundo, hasta 24 a la vez); sin intermedios, sin la horda del Arrecife, sin buhonero, sin locura ni subida de dificultad; un Signo Mayor al empezar.
+
+- **Progreso:** se empieza con 22 subidas elegidas con criterio (`start_levels`, como el arranque a mitad de parte de `_apply_carry`) y, al vencer a cada jefe, se pasa al siguiente con todo (`GameSession.carry`, como entre niveles de una parte). Sin la ventana de pactos entre jefes.
+- **Tiempo y récord:** cada jefe suma su tiempo a `GameSession.rush_time`; la pantalla final dice «Jefe N de 6 · Tiempo total» y, tras el último, «Desfile completo» y el récord de cada jugador de este PC con su personaje (`SaveData.records["boss_rush"]`, el menor tiempo). Al caer, «Caído ante X (jefe N de 6)». El HUD y el rótulo dicen «Desfile de jefes · N de 6».
+- **Pruebas:** `tests/test_boss_rush.gd` (orden y escenarios, nivel con el jefe enseguida, récord). 676 de 676. `level=desfile:1` (o `desfile:N`) lo empieza; con `autonext=true` pasa solo al siguiente.
+- **Con el bot:** Dyer con `bot=smart god=true autonext=true timescale=2` encadena los seis: 21, 57, 39, 129, 26 y 341 s (unos 10 minutos en total) pasando del nivel 23 al 24. Los intermedios caían demasiado deprisa, así que en el desfile llevan el doble de vida (`health` en cada paso). Sin `god`, sin medir.
+- **Capturas:** `shots/game_desfile_012.0s.png` (Gedney, «1 de 6») y `shots/seleccion_mapadesfile_005.0s.png` (el botón en el mapa).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

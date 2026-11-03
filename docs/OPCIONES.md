@@ -68,6 +68,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `hitstop=false`, `crumble=false` y `marks=N`: sin micro-pausa al impactar, sin desmoronarse y tope de manchas en el suelo (por defecto, el de la calidad gráfica). `falls=false`: sin la caída de cada familia al morir (hito 12.7). `wounds=false|0.7`: sin las grietas de herida o fijas a ese nivel (hito 12.6, medir su coste).
   - `cfg_quality=0..3` (Baja…Ultra) y `cfg_damage_numbers=0|1|2`: calidad gráfica y números de daño para esta ejecución.
   - `ui_check=true` (en cualquier escena): apunta con «UICHK» los textos que pisan el filete de una ventana (20 px del borde), su filigrana o el borde de un recuadro (`scripts/ui/ui_overlap_check.gd`).
+  - `level=desfile:N`: el desfile de jefes desde el jefe N (hito 16.22; con 22 subidas al empezar). Con `autonext=true` pasa solo al siguiente.
   - `level=desafio:p1_n4`: juega el desafío de ese nivel (hito 15.2). `challenge_open=true` (selección con `map=true`): abre la ventana de los desafíos.
   - `library_live=false`: el bestiario con las imágenes quietas, sin girar (hito 15.4).
   - `replay=false`: sin grabar la repetición de la caída (hito 15.1). `replay_open=true`: la abre en la pantalla final (capturas, con `halt_shots=true quit_on_end=true`). `replay_gif=true`: además la guarda como GIF (en `photo_dir=` si se da).
