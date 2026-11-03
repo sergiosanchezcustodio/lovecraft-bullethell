@@ -533,6 +533,9 @@ func _summary() -> void:
 	_bobber.visible = false
 	_gauge.visible = false
 	_prompt.text = ""
+	for a in Achievements.check(Saves.current):        # «Paciencia de pescador», «Lo que guarda la marea»
+		var reward := Achievements.reward_text(a)
+		_log.append("Logro: %s%s" % [a.display_name, ("  ·  " + reward) if reward != "" else ""])
 	Saves.save()
 	var w: Array = MenuKit.window(_ui, MenuKit.INK, 760)
 	var box: VBoxContainer = w[1]

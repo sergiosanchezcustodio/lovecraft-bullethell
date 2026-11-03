@@ -24,12 +24,14 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 6 | Parte 2 completa | **Hecha** salvo tu partida (08-10-2026) | Ninguna (D-13 y jefes colosales, resueltas) |
 | 7 | Parte 3 completa | **Hecha** salvo tu partida (08-10-2026) | Ninguna (Ángulos devoradores y Cthulhu, resueltos) |
 | 8 | Pulido y distribución | **En curso:** hitos 8.1 a 8.3 y 8.6 a 8.16 hechos, pendientes de tu revisión; 8.4 espera tus partidas y 8.5, tu cuenta de itch.io | Ninguna (D-01 y D-12, resueltas) |
-| 9 | Online | **Plan aprobado** (21-10-2026) | Ninguna (D-10, resuelta) |
+| 9 | Online | **Hecha** (23-10-2026) salvo tu prueba real por internet (`docs/PRUEBA_ONLINE.md`) | Ninguna (D-10, resuelta) |
 | 10 | Guardado en la nube con GitHub | **Hecha** (26-10-2026) salvo el `client_id` de tu OAuth App y tu prueba con dos PC | Ninguna (D-11, resuelta) |
 | 11 | Calidad gráfica, animación y efectos | **Hecha** (28-10-2026) salvo tu revisión | Ninguna |
 | 12 | Detalles de personajes, enemigos, compañeros y escenarios | **Hecha** (29-10-2026) salvo tu revisión | Ninguna (D-41, resuelta) |
 | 13 | Calibración, modos de juego, narrativa, sonido, herramientas y distribución | **Hecha (30-10-2026)**, pendiente de tu revisión: los 17 hitos; la subida de la demo y el tráiler a itch.io, con tu cuenta | Las de cada hito (al final de la fase) |
 | 14 | Vestuario ampliado y tienda de ropa | **Hecha** (30-10-2026), pendiente de revisión del autor | Ninguna |
+| 15 | Repetición de la caída, modo desafío, enemigos nuevos y bestiario vivo | **Hecha** (30-10-2026; mejoras el 02-11-2026), pendiente de tu revisión | Ninguna |
+| 16 | Rendimiento, jugabilidad del género, enemigos, modos, menús y gráficos | **Hecha** (03-11-2026) en el alcance elegido (D-46), pendiente de tu revisión: bloques A (16.4 fuera; 16.1 al borde: 1 % peor de 14-17,5 ms en Alta frente al límite de 16,7), B (16.8, 16.9, 16.12, 16.14 y 16.15), C, D, E y F; G no elegido. Por revisar las propuestas D-47, D-48 y D-49 | Ninguna (D-46, resuelta) |
 
 ---
 

@@ -24,5 +24,5 @@ evolves_with = &"vida"
 evolution = &"instrumental"
 max_level = 5
 level_mods = Array[Dictionary]([{"count+": 1.0}, {"cooldown*": 0.96}, {"pierce+": 1.0}, {"count+": 2.0, "cooldown*": 0.85}])
-level_text = Array[String](["Un bisturí más", "+25 % de daño", "Atraviesan a un enemigo más", "Dos bisturís más y lanza más rápido"])
+level_text = Array[String](["Un bisturí más", "Lanza un 4 % más rápido", "Atraviesan a un enemigo más", "Dos bisturís más y lanza un 15 % más rápido"])
 evolution_alt = &"bisturi_anatomista"

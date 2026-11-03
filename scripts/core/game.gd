@@ -1589,6 +1589,11 @@ func _on_level_completed() -> void:
 		if not q.remote and not (q.input is BotInput) and q.outfit_set != "":
 			sets_won[OutfitSets.stat_key(q.outfit_worn)] = true
 	if not sets_won.is_empty(): Achievements.add(Saves.current, "set_levels")
+	var secret_won := {}                             # los investigadores secretos (16.25): «La llave de plata», «Sangre de Dunwich»
+	for q in players:
+		if not q.remote and not (q.input is BotInput) and q.data != null and q.data.secret != "":
+			secret_won["won_" + String(q.data.id)] = true
+	for k: String in secret_won: Achievements.add(Saves.current, k)
 	for k: String in sets_won:
 		Achievements.add(Saves.current, k)
 		if Saves.current != null: Achievements.record(Saves.current, "set_best", int(Saves.current.stats[k]))   # «Fiel al conjunto»

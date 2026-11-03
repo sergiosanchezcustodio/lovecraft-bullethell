@@ -75,7 +75,7 @@ A.write({
                "colors": {"base_hi": [0.56, 0.42, 0.28], "base_lo": [0.36, 0.27, 0.18], "joint": [0.30, 0.22, 0.15],
                           "moss": [0.30, 0.26, 0.20]}},
     # noche: la luna fría por los ventanales, las lámparas cálidas dentro
-    "light": {"gamma": 1.45, "sun_rot": [-40, 60], "sun_color": [0.55, 0.62, 0.80], "sun_energy": 0.35, "exposure": 1.3,
+    "light": {"gamma": 1.45, "sun_rot": [-41, -108], "sun_color": [0.55, 0.62, 0.80], "sun_energy": 0.35, "exposure": 1.3,
               "ambient_color": [0.34, 0.34, 0.42], "ambient_energy": 0.75,
               "background": [0.05, 0.05, 0.07], "fog_color": [0.12, 0.12, 0.16], "fog_density": 0.0},
     "lamp": {"color": [1.0, 0.72, 0.42], "energy": 2.2, "range": 8.0, "fog": 0.2},

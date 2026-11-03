@@ -18,6 +18,12 @@ static func value(save: SaveData, a: AchievementData) -> int:
 	match a.stat:
 		"levels_won": return save.levels_won.size()
 		"characters": return STARTING_CHARACTERS + save.characters.size()
+		"fish_caught", "fish_species":                 # pesca en el muelle (16.24): piezas y especies sacadas
+			var n := 0
+			for r: Variant in (save.records.get("fishing", {}) as Dictionary).values():
+				var c := int((r as Dictionary).get("caught", 0))
+				n += c if a.stat == "fish_caught" else (1 if c > 0 else 0)
+			return n
 	return int(save.stats.get(a.stat, 0))
 
 static func is_done(save: SaveData, a: AchievementData) -> bool:

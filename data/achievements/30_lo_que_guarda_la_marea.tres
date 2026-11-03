@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"lo_que_guarda_la_marea"
+display_name = "Lo que guarda la marea"
+description = "Saca del agua las nueve criaturas del muelle, también las malditas."
+order = 30
+stat = "fish_species"
+target = 9
+reward_money = 450
+icon_model = "pez_ojos"
+icon_mode = "full"

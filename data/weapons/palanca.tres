@@ -24,5 +24,5 @@ evolves_with = &"cordura"
 evolution = &"rifle_miskatonic"
 max_level = 5
 level_mods = Array[Dictionary]([{"pierce+": 1.0}, {"pierce+": 1.0, "cooldown*": 0.9}, {"cooldown*": 0.85}, {"count+": 1.0, "burst_delay+": 0.12}])
-level_text = Array[String](["+25 % de daño", "Atraviesa a dos enemigos más", "Dispara un 20 % más rápido", "+30 % de daño y un segundo disparo"])
+level_text = Array[String](["Atraviesa a un enemigo más", "Atraviesa a otro más y dispara un 10 % más rápido", "Dispara un 15 % más rápido", "Un segundo disparo"])
 evolution_alt = &"rifle_caza_mayor"

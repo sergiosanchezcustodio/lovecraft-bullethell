@@ -151,7 +151,7 @@ func _add_sky(key: String) -> void:
 	add_child(rect)
 	_bolt_in = 2.5
 
-## Relámpagos de la tormenta: uno cada pocos segundos, con su réplica.
+## Relámpagos de la tormenta: uno cada pocos segundos, con su réplica y su trueno.
 func _sky_step(delta: float) -> void:
 	if _sky == null or _sky_mode != 2: return
 	_bolt_in -= delta
@@ -159,6 +159,9 @@ func _sky_step(delta: float) -> void:
 		_bolt_in = randf_range(3.5, 8.0)
 		_bolt_t = 0.0
 		_sky.set_shader_parameter("bolt_x", randf_range(0.15, 0.85))
+		# el trueno llega después del fogonazo, como en la partida
+		get_tree().create_timer(randf_range(0.4, 1.4)).timeout.connect(func() -> void:
+			if is_inside_tree() and not _gone: Auto.sfx("thunder"))
 	if _bolt_t >= 0.0:
 		_bolt_t += delta
 		var f := maxf(0.0, 1.0 - _bolt_t / 0.12) + 0.6 * maxf(0.0, 1.0 - absf(_bolt_t - 0.22) / 0.08)
