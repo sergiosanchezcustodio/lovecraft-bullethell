@@ -133,7 +133,7 @@ func _show_shelf() -> void:
 		var tome: Dictionary = Library.TOMES[i]
 		var n := Library.count_known(save, tome.id)
 		var b := _row("Tomo %s  ·  %s" % [tome.roman, tome.title], 30)
-		b.custom_minimum_size.y = 62
+		b.custom_minimum_size.y = 56                  # once tomos (16.28): sin pisar la esquina
 		var c := _ink("%d / %d" % [n.x, n.y], 22, INK_DIM)
 		c.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT)
 		c.offset_left = -110; c.offset_right = -14
@@ -168,6 +168,7 @@ func _show_tome_cover(i: int) -> void:
 	_right.add_child(_rule())
 	var c := _ink("%s de %s" % [n.x, n.y] + (" conseguidos" if tome.id == "achievements" else " descubiertos"), 28, INK_DIM)
 	if tome.id == "diary": c.text = MenuKit.count(n.x, "entrada") if n.x > 0 else "Aún no hay nada escrito"
+	if tome.id == "trophies": c.text = "%d de %d trofeos en las vitrinas" % [n.x, n.y]
 	if tome.id == "archive": c.text = MenuKit.count(n.x, "partida") + " (las %d últimas)" % RunArchive.MAX if n.x > 0 else "Aún no se ha jugado ninguna"
 	c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_right.add_child(c)
@@ -180,8 +181,8 @@ func _show_tome_cover(i: int) -> void:
 
 func _open_tome(i: int) -> void:
 	var tome: Dictionary = Library.TOMES[i]
-	if tome.id == "achievements":
-		_sub = AchievementsMenu.new()
+	if tome.id == "achievements" or tome.id == "trophies":
+		_sub = AchievementsMenu.new() if tome.id == "achievements" else _trophy_room()
 		add_child(_sub)
 		MenuKit.trap_focus(_sub)
 		_sub.tree_exited.connect(func() -> void:
@@ -357,10 +358,19 @@ func _hint(text: String) -> Label:
 	return l
 
 ## Capturas: abre un tomo con el cursor en una entrada.
+## La sala de trofeos (hito 16.28), con el foco en el hueco `_trophy_at` (capturas: cursor=N).
+var _trophy_at := -1
+func _trophy_room() -> Control:
+	var r := TrophyRoom.new()
+	r.save = save
+	r.cursor = _trophy_at
+	return r
+
 func open_at(tome: int, cursor := 0) -> void:
 	_shelf_focus = tome
+	_trophy_at = cursor if cursor > 0 else -1
 	_open_tome(tome)
-	if cursor > 0 and cursor < _rows.size(): _rows[cursor].grab_focus.call_deferred()
+	if _sub == null and cursor > 0 and cursor < _rows.size(): _rows[cursor].grab_focus.call_deferred()
 	var lr := LaunchArgs.from_cmdline()
 	if _tome == "archive" and lr.has("lib_replay") and not _entries.is_empty():   # pruebas (16.26): repite esa
 		get_tree().create_timer(1.0).timeout.connect(func() -> void:

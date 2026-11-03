@@ -22,6 +22,8 @@ Se carga al trabajar en `tools/`. Movido desde el `CLAUDE.md` de la raíz el 30-
    - Por eso el giro y la posición de un modelo van siempre en un nodo contenedor, nunca en la raíz.
 
 
+Para revisar modelos de cerca: `tools/hoja_modelos.gd` los renderiza en una hoja (ver `docs/OPCIONES.md`). Sala de trofeos (hito 16.28): `gen_trofeos.py` (vitrinas, peanas, sala y trofeos).
+
 Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobrescribiría el detallado. Ejecuta `gen_acechador.py` después, o renombra la salida.
 
 ### Personajes jugables modelados

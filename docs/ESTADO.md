@@ -1832,6 +1832,26 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
   - crisis de cordura: dos latidos.
 - **Pruebas:** `tests/test_rumble.gd` (fuerzas y configuración de antes; la crisis, dos latidos; los de otros PC, no). 704 de 704. `log_rumble=true` escribe cada pulso («VIBRA J1 explosión 0,06 0,11 0,14 s»), haya mando o no: en una partida con granadas salen golpes, explosiones, subidas, la entrada del jefe y el nivel superado.
 
+## Fase 16, hito 16.28: sala de trofeos (03-11-2026)
+
+*Pendiente de revisión del autor.*
+
+`scripts/save/trophies.gd` (`Trophies`, los datos) y `scripts/menus/trophy_room.gd` (`TrophyRoom`, la sala); modelos de `tools/gen_trofeos.py`.
+
+- **Dónde:** tomo XI de la Biblioteca, «Sala de trofeos» (en la estantería, cuántos hay de cuántos). A abre la sala encima del libro; B o Esc vuelve.
+- **Tres vitrinas** juntas en una sala con friso de madera, papel pintado de rombos y alfombra:
+  - **Conjuntos completos** (6 × 3): un maniquí por conjunto del vestuario, el investigador que lo enseña con el conjunto puesto (`OutfitData.apply`); en la placa, los niveles superados con él;
+  - **Jefes vencidos** (7 × 3): los 21 seres únicos de escalón 4 y 5, en el orden de la campaña (`Trophies.bosses`, leído de `data/campaign.json` y los niveles: los intermedios antes dentro de cada nivel); en la placa, cuántas veces y quién lo abatió más (lo del bestiario);
+  - **Logros grandes** (4 × 3): los de 500 $ de recompensa o más (`BIG_REWARD`), cada uno con su trofeo (`ACHIEVEMENT_MODELS`).
+- **Se va llenando:** cada hueco tiene su peana; lo ganado sale encima en miniatura (encogido para caber, `_fit`) y lo que falta deja la peana vacía, con «???» y qué hace falta en la placa (en los logros, cuánto llevas).
+- **La cámara** entra desde lejos y va de hueco en hueco sin subir ni bajar mucho (siempre se ven las tres baldas). El del foco gira despacio con su animación de reposo y lo ilumina un foco. Flechas o cruceta recorren (de una vitrina pasan a la de al lado, a la misma balda); LB/RB o Q/E saltan de vitrina. Abajo, la placa: vitrina y puesto, nombre, la nota y los datos.
+- **Modelos nuevos** (`python tools/gen_trofeos.py`): `vitrina_6x3`, `vitrina_7x3` y `vitrina_4x3` (madera oscura, fondo de terciopelo verde, placa de latón bajo cada hueco, cornisa con el Signo Arcano que brilla; huecos de 0,625 × 0,72 m), `trofeo_peana`, `sala_pared` y `sala_suelo` (a 16 voxels por metro: son el fondo), y diez trofeos a 48 por metro: copa de oro (10.000 abatidos), copa de obsidiana con el escudo verde (los quince desafíos), frasco de formol con un tentáculo (25 élites), cofre arcano con la junta violeta (50 baúles), retrato de la expedición (7 investigadores), los tres sellos en el pergamino, candelabro de siete velas (siete noches), atril con el libro abierto (las quince páginas), maniquí de frac (de punta en blanco) y medalla en su cojín (fiel al conjunto). «Fondos de la expedición» usa las monedas de la tienda (`icono_codicia`) y «El que no volvió del todo», el ídolo de Cthulhu (`cth_idolo`). Revisados de cerca con la hoja de modelos: el primer diseño de la garra se leía como bloques sueltos (ahora el frasco), la junta del cofre no se veía, el libro del atril era un amasijo y la pechera del frac con la pajarita parecía una calavera; rehechos.
+- **Carga:** las mallas que no están en la caché se construyen en otro hilo (`WorkerThreadPool`, `VoxelBuilder.warm`) mientras sale «Encendiendo las lámparas…»; la sala se monta al acabar. La primera vez, unos 3,5 s (antes de vaciar las vitrinas por dentro y bajar la sala a 16 por metro, 6 s congelado); con la caché, 0,5 s. `log=true` escribe «SALA DE TROFEOS 483 ms  24 de 51».
+- **Biblioteca:** con once tomos, las filas de la estantería bajan de 62 a 56 px para no pisar la esquina dorada.
+- **Herramientas:** `tools/hoja_modelos.gd` (`godot --path . -s tools/hoja_modelos.gd -- modelos=a,b,c px=320 out=shots/hoja.png`) renderiza varios modelos en una hoja para revisarlos de cerca; `tools/partida_trofeos.py` hace la partida de prueba `trofeos_saves` (doce jefes, cinco conjuntos y siete logros grandes).
+- **Pruebas:** `tests/test_trophies.gd` (jefes en orden de campaña; cada trofeo cabe en su vitrina y tiene modelo; logros grandes con trofeo propio; se va llenando y la Biblioteca lo cuenta). 708 de 708.
+- **Capturas:** `shots/titulo_trofeos_011.0s.png` (jefes), `titulo_trofeos2_011.0s.png` (conjuntos), `titulo_trofeos42_011.0s.png` (logros), `titulo_trofeos1_009.0s.png` (cargando), `shots/hoja_trofeos.png` y `hoja_trofeos2.png` (los trofeos de cerca), `titulo_biblio11_009.0s.png` (la estantería con once tomos).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

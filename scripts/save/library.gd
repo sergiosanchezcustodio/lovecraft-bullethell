@@ -17,6 +17,7 @@ const TOMES := [
 	{"id": "stories", "title": "Relatos", "roman": "VIII"},
 	{"id": "wardrobe", "title": "Vestuario", "roman": "IX"},
 	{"id": "archive", "title": "Archivo de expediciones", "roman": "X"},
+	{"id": "trophies", "title": "Sala de trofeos", "roman": "XI"},
 ]
 const EPILOGUES := [["epilogo", "Epílogo · Lo que vino después"], ["epilogo_locura", "Epílogo · El que no volvió del todo"]]
 const RESULTS := {"won": "Superado", "lost": "Caído", "endless": "La noche eterna"}
@@ -240,6 +241,7 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 	return out
 
 static func count_known(save: SaveData, tome: String) -> Vector2i:
+	if tome == "trophies": return Trophies.count(save)          # (hito 16.28)
 	if tome == "achievements":
 		var list := Achievements.all()
 		return Vector2i(list.filter(func(a: AchievementData) -> bool: return Achievements.is_done(save, a)).size(), list.size())
