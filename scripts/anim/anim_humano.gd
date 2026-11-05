@@ -343,6 +343,47 @@ static func slam(m: Node3D, t: float) -> void:
 	bend(m, "fore_r", -0.5 * up * (1.0 - down) * rest)
 	Anims.part(m, "torso").rotation.x = (-0.22 * up * (1.0 - down) + 0.38 * down) * rest
 
+# ---------------------------------------------------------------- según el suelo (hito 17.6)
+## Encima de andar (t, la fase del paso), según por dónde va: `wade` (0..1), vadeando: brazos
+## abiertos y las manos en alto, fuera del agua, rodillas altas y el tronco adelante; `mud` (0..1),
+## en el barro: pasos pesados, rodillas más dobladas, tronco adelante y un pisotón al apoyar.
+static func terrain(m: Node3D, t: float, wade: float, mud: float) -> void:
+	if wade <= 0.0 and mud <= 0.0: return
+	var w := t * TAU
+	var c := cos(w)
+	var swing_l := maxf(0.0, -c)                   # la pierna que va por el aire (como _walk_jointed)
+	var swing_r := maxf(0.0, c)
+	var arm_l := Anims.part(m, "arm_l")
+	var arm_r := Anims.part(m, "arm_r")
+	if wade > 0.0:
+		arm_l.rotation = arm_l.rotation.lerp(Vector3(arm_l.rotation.x * 0.4 - 0.35, 0.0, -0.55), wade)
+		arm_r.rotation = arm_r.rotation.lerp(Vector3(arm_r.rotation.x * 0.4 - 0.35, 0.0, 0.55), wade)
+		_toward(m, "fore_l", Vector3(-0.95, 0.0, 0.0), wade)
+		_toward(m, "fore_r", Vector3(-0.95, 0.0, 0.0), wade)
+		Anims.part(m, "torso").rotation.x += 0.1 * wade
+	var knee := 0.45 * wade + 0.6 * mud                       # rodillas más altas
+	Anims.part(m, "leg_l").rotation.x -= swing_l * knee * 0.55
+	Anims.part(m, "leg_r").rotation.x -= swing_r * knee * 0.55
+	var parts: Dictionary = m.get_meta("part_nodes")
+	if parts.has("shin_l"): (parts["shin_l"] as Node3D).rotation.x += swing_l * knee
+	if parts.has("shin_r"): (parts["shin_r"] as Node3D).rotation.x += swing_r * knee
+	if mud > 0.0:
+		var a := absf(sin(w))
+		Anims.part(m, "torso").rotation.x += 0.15 * mud
+		m.position.y -= 0.045 * mud * pow(1.0 - a, 4.0)           # el pisotón: se hunde un poco al apoyar
+		arm_l.rotation.x *= 1.0 + 0.4 * mud
+		arm_r.rotation.x *= 1.0 + 0.4 * mud
+
+## Resbalón (hito 17.6): en la nieve, la frenada (17.2) además agita los brazos en círculos para no
+## caerse. k (0..1): cuánto; t (s), el reloj del giro.
+static func slip(m: Node3D, k: float, t: float) -> void:
+	if k <= 0.0: return
+	var a := t * 16.0
+	Anims.part(m, "arm_l").rotation.x += sin(a) * 0.9 * k
+	Anims.part(m, "arm_r").rotation.x += sin(a + PI) * 0.9 * k
+	Anims.part(m, "arm_l").rotation.z += -0.35 * k
+	Anims.part(m, "arm_r").rotation.z += 0.35 * k
+
 # ---------------------------------------------------------------- celebraciones (hito 17.4)
 # Como los gestos al atacar (encima de andar, solo brazos y torso), pero sin que un disparo los
 # corte (Player.play_once con keep).

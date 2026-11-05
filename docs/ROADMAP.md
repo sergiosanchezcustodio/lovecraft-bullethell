@@ -520,7 +520,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | 17.3 | **Mirar al peligro:** la cabeza sigue al enemigo más cercano y, cuando aparece, al jefe | **Hecho (05-11-2026), pendiente de tu revisión:** cabeza y algo de tronco hacia el jefe (16 m) o el enemigo más cercano (7 m), suavizado; mientras apunta, manda el apuntado |
 | 17.4 | **Gestos al subir de nivel, evolucionar un arma y abrir un baúl** | **Hecho (05-11-2026), pendiente de tu revisión:** puño en alto, alzar algo que brilla y levantar la tapa; los ataques no los cortan |
 | 17.5 | **Pose de victoria** de cada investigador al superar un nivel o vencer a un jefe | **Hecho (05-11-2026), pendiente de tu revisión:** cinco poses repartidas entre los quince (puños arriba, saludo militar, tocarse el sombrero, mano alzada, reverencia), `CharacterData.victory` |
-| 17.6 | **Andar según el suelo:** brazos altos al vadear, pasos pesados en el barro y resbalones en el hielo | Pendiente |
+| 17.6 | **Andar según el suelo:** brazos altos al vadear, pasos pesados en el barro y resbalones en el hielo | **Hecho (05-11-2026), pendiente de tu revisión:** manos fuera del agua al vadear, pasos pesados con pisotón en el barro y la frenada resbalando en la nieve (no hay hielo aparte) |
 
 ### Bloque B: compañeros
 

@@ -8,7 +8,8 @@ extends SceneTree
 ##   model=   modelo de models/ (dyer por defecto)
 ##   anim=    animación de su script (Anims). Los gestos de un golpe se ponen encima de `base`
 ##            como en la partida (solo brazos y torso: over=true). Especiales: aim1 y aim2 (apuntar
-##            con una o dos manos; las columnas van del culatazo a reposo), aim_look (apunta a los lados).
+##            con una o dos manos; las columnas van del culatazo a reposo), aim_look (apunta a los lados),
+##            wade y mud (andar vadeando o por el barro, hito 17.6), slip (frenada en la nieve).
 ##   base=    animación de debajo (idle por defecto; walk, para verlo andando)
 ##   over=    true: como gesto encima de la base (Player.UPPER_BODY); false: pose entera
 ##   n=       columnas (6)
@@ -91,6 +92,16 @@ func _pose(model_name: String, m: Node3D, anim: String, base: String, t: float, 
 		var kick := exp(-float(i) / float(n) * 4.0) if anim != "aim_look" else 0.0
 		var look := lerpf(-1.2, 1.2, i / float(maxi(n - 1, 1))) if anim == "aim_look" else 0.0
 		s.call("aim", m, 1.0 if anim == "aim2" else 0.0, look, kick, 1.0)
+		return
+	if anim == "slip":                              # frenada resbalando en la nieve (hito 17.6)
+		Anims.pose(model_name, "idle", m, 0.25)
+		Anims.overlay(model_name, "brake", m, t, 1.0, ["leg_l", "leg_r", "shin_l", "shin_r", "torso", "head", "arm_l", "arm_r", "fore_l", "fore_r"])
+		var sk := Anims.ease(t / 0.1) * (1.0 - Anims.ease((t - 0.3) / 0.5))
+		s.call("slip", m, sk, t * Anims.duration(model_name, "brake"))
+		return
+	if anim == "wade" or anim == "mud":             # andar según el suelo (hito 17.6)
+		Anims.pose(model_name, "walk", m, t)
+		s.call("terrain", m, t, 1.0 if anim == "wade" else 0.0, 1.0 if anim == "mud" else 0.0)
 		return
 	if over:
 		Anims.pose(model_name, base, m, 0.25)

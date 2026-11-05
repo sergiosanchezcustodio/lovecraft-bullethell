@@ -144,12 +144,16 @@ func test_mira_al_enemigo_cercano() -> void:
 	e.global_position = Vector3(4, 0, 0.5)              # a su izquierda (mira hacia +Z)
 	world.add_enemy(e)
 	for i in 4: world._physics_process(1.0 / 60.0)      # la rejilla, al día
-	for i in 60: p._process(1.0 / 60.0)
+	for i in 60:
+		p._physics_process(1.0 / 60.0)
+		p._process(1.0 / 60.0)
 	var head := Anims.part(p.model, "head")
 	assert_gt(head.rotation.y, 0.6, "la cabeza se vuelve hacia él")
 	e.queue_free()
 	await get_tree().process_frame
-	for i in 90: p._process(1.0 / 60.0)
+	for i in 90:
+		p._physics_process(1.0 / 60.0)
+		p._process(1.0 / 60.0)
 	assert_lt(absf(head.rotation.y), 0.2, "y vuelve al frente")
 
 ## Celebraciones (hito 17.4): subir de nivel, evolucionar y abrir un baúl tienen su gesto, y un
@@ -179,3 +183,26 @@ func test_cada_investigador_tiene_su_pose_de_victoria() -> void:
 		assert_true(Anims.has_anim(c.model, c.victory), "%s: %s" % [f, c.victory])
 		seen[c.victory] = true
 	assert_eq(seen.size(), 5, "las cinco poses se usan")
+
+## Según el suelo (hito 17.6): vadeando, las manos van más altas; en el barro, el tronco más
+## adelante y las rodillas más dobladas.
+func test_vadear_y_barro_cambian_el_paso() -> void:
+	var m := VoxelBuilder.load_model("res://models/johansen.json")
+	add_child_autofree(m)
+	var hand := func() -> float:
+		var fore: Node3D = (m.get_meta("part_nodes") as Dictionary)["fore_r"]
+		return (fore.global_transform * Vector3(0, -0.25, 0)).y
+	var dry := 0.0
+	var wet := 0.0
+	for t in [0.0, 0.25, 0.5, 0.75]:                    # a lo largo del paso
+		Anims.pose("johansen", "walk", m, t)
+		dry += hand.call() / 4.0
+		Anims.pose("johansen", "walk", m, t)
+		Anims.script_for("johansen").call("terrain", m, t, 1.0, 0.0)
+		wet += hand.call() / 4.0
+	assert_gt(wet, dry + 0.1, "vadeando, la mano fuera del agua (%.2f → %.2f m)" % [dry, wet])
+	Anims.pose("johansen", "walk", m, 0.3)
+	var torso := Anims.part(m, "torso").rotation.x
+	Anims.pose("johansen", "walk", m, 0.3)
+	Anims.script_for("johansen").call("terrain", m, 0.3, 0.0, 1.0)
+	assert_gt(Anims.part(m, "torso").rotation.x, torso + 0.1, "en el barro, echado adelante")

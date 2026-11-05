@@ -282,6 +282,10 @@ func _physics_process(delta: float) -> void:
 	var rs := Vector3.ONE * (1.0 + 0.22 * _gem_pulse)
 	if _ring != null and _ring.scale != rs: _ring.scale = rs
 	var t0 := Prof.start()
+	_look_scan -= delta                          # a quién mirar (17.3): en la física, con la rejilla al día
+	if _look_scan <= 0.0:
+		_look_scan = LOOK_SCAN
+		_look_target = _danger()
 	_physics_process_step(delta)
 	if not remote and Pacts.has("no_heal"):        # Sin consuelo (hito 13.6): nada sube la vida, salvo que te levanten
 		if _hp_seen > 0.0 and health > _hp_seen: health = _hp_seen
@@ -692,6 +696,7 @@ func _animate(delta: float) -> void:
 		_anim_t += delta / Anims.duration(data.model, anim)
 		t = fposmod(_anim_t, 1.0)
 	Anims.pose(data.model, anim, model, t)
+	_terrain_step(anim, t, delta)
 	if _blend_t < _blend_len:
 		_blend_t += delta
 		Anims.blend_from(model, _blend_snap, Anims.ease(_blend_t / _blend_len))
@@ -722,10 +727,6 @@ var _look_target: Node3D
 var _look_scan := 0.0
 
 func _look_step(delta: float) -> void:
-	_look_scan -= delta
-	if _look_scan <= 0.0:
-		_look_scan = LOOK_SCAN
-		_look_target = _danger()
 	var want := 0.0
 	if _look_target != null and is_instance_valid(_look_target) and _look_target.is_alive() 			and _action == "" and not is_downed():
 		var to := _look_target.global_position - global_position
@@ -736,13 +737,14 @@ func _look_step(delta: float) -> void:
 	Anims.part(model, "head").rotation.y += _look_yaw * 0.8 * w
 	Anims.part(model, "torso").rotation.y += _look_yaw * 0.18 * w
 
-## A quién mirar: el jefe más cercano a tiro o, si no hay, el enemigo más cercano (o null).
+## A quién mirar: el jefe más cercano a tiro o, si no hay, el enemigo más cercano (o null). En
+## la física: en `_process` la rejilla puede tener enemigos ya borrados.
 func _danger() -> Node3D:
 	if world == null: return null
 	var best: Node3D = null
 	var bd := LOOK_BOSS * LOOK_BOSS
 	for e in world.enemies:
-		if not is_instance_valid(e) or not e.data.unique or not e.is_alive(): continue
+		if not is_instance_valid(e) or not (e is Enemy) or not e.data.unique or not e.is_alive(): continue   # muñecos de práctica, no
 		var d := e.global_position.distance_squared_to(global_position)
 		if d < bd:
 			bd = d
@@ -750,6 +752,21 @@ func _danger() -> Node3D:
 	return best if best != null else world.nearest_enemy(global_position, LOOK_NEAR)
 
 var _override_keep := false
+
+# ---------------------------------------------------------------- según el suelo (hito 17.6)
+## Vadeando (`_wade`) o en el barro (`Ambient.ground`), el paso cambia (anim_humano.terrain); se
+## funde al entrar y salir. En la nieve, la frenada resbala (`slip`).
+var _mud_w := 0.0
+var _slip_t := 0.0
+
+func _terrain_step(anim: String, t: float, delta: float) -> void:
+	var mud_want := 1.0 if Ambient.ground == "mud" and _wade < 0.5 else 0.0
+	_mud_w = move_toward(_mud_w, mud_want, delta * 3.0)
+	if anim != "walk": return
+	var s := Anims.script_for(data.model)
+	if s == null or not s.has_method("terrain"): return
+	var k := clampf(motor.velocity.length() / maxf(data.move_speed, 0.1), 0.0, 1.0)   # parado, nada
+	s.call("terrain", model, t, _wade * k, _mud_w * k)
 
 # ---------------------------------------------------------------- frenada (hito 17.2)
 ## Tras correr un rato (BRAKE_RUN s a más del 75 % de su velocidad), pararse en seco planta los
@@ -794,6 +811,11 @@ func _brake_step(delta: float) -> void:
 		var drop := float(Anims.script_for(data.model).get("BRAKE_DROP"))
 		Anims.overlay(data.model, "brake", model, u, w, BRAKE_PARTS)
 		model.position.y -= drop * w * (1.0 - Anims.ease((u - 0.35) / 0.65)) * Anims.ease(u / 0.15)
+		if Ambient.ground == "snow" and _wade < 0.5:                   # en la nieve, resbala (17.6)
+			_slip_t += delta
+			var sk := Anims.ease(u / 0.1) * (1.0 - Anims.ease((u - 0.3) / 0.5))
+			var sc := Anims.script_for(data.model)
+			if sc != null and sc.has_method("slip"): sc.call("slip", model, sk * w, _slip_t)
 	else:
 		Anims.overlay(data.model, "brake", model, u, 0.6, UPPER_BODY)
 

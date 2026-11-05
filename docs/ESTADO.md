@@ -1996,6 +1996,18 @@ El autor pidió las 20 propuestas de mejoras gráficas, sin empeorar apreciablem
 - Captura: `godot --path . --fixed-fps 30 -- character=elwood level=p1_n1 final_at=2 bot=idle god=true shots=3` (el saludo).
 - **Pruebas:** cada investigador tiene una pose que existe y se usan las cinco. 744 de 744.
 
+### Hito 17.6: andar según el suelo (05-11-2026)
+
+- Una capa más encima de andar (`anim_humano.terrain(m, t, wade, mud)`, `Player._terrain_step`), proporcional a la velocidad y fundida al entrar y salir:
+  - **Vadeando** (`Player._wade`): brazos abiertos, antebrazos doblados y las manos en alto, fuera del agua; rodillas altas en la pierna que va por el aire y el tronco algo adelante.
+  - **En el barro** (`Ambient.ground == "mud"`: carretera, pantano y ritual): rodillas más dobladas, tronco adelante (0,15 rad; con más, la cabeza se queda atrás), brazos que bracean más y un pisotón que hunde el cuerpo 4,5 cm al apoyar.
+  - **En la nieve** (campamento y lago): la frenada del 17.2 resbala, con los brazos en círculos a contratiempo (`anim_humano.slip`). No hay hielo aparte en las arenas: la nieve hace de hielo.
+- Piedra y madera, como siempre.
+- De paso, a quién mira el jugador (17.3) se busca en la física, no en `_process`: en el pantano, la rejilla tenía a veces enemigos ya borrados y daba error. Y no mira a los muñecos de práctica (no son `Enemy`).
+- Hoja de poses: `anim=wade`, `anim=mud` y `anim=slip` (con `over=false` las dos primeras).
+- **Coste:** unas pocas rotaciones más por jugador y fotograma, despreciable.
+- **Pruebas:** vadeando, la mano va más alta a lo largo del paso; en el barro, el tronco más adelante. 745 de 745.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
