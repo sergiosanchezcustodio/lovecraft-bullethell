@@ -160,6 +160,12 @@ var _rise_wait := 0.0                       ## s de física que le quedan quieto
 var _rise_life := RISE_TIME
 var _rise_h := 1.5                          ## m que se hunde al empezar (su altura)
 var _rise_mats: Array = []                  ## mallas con el material de deshacerse (niebla)
+## Entradas por familia (hito 17.11): los profundos que salen del agua trepan (los brazos tiran de
+## ellos) y al salir se sacuden el agua; los humanos salen de un jirón de niebla.
+const SHAKE_TIME := 0.55
+const RISE_MIST := Color(0.82, 0.86, 0.92)  ## borde de los que salen de la niebla (más gris que el de los etéreos)
+var _climb := false
+var _shake_t := -1.0
 ## Hordas con instancias (hito 16.3): si se puede, en cuanto acaba de aparecer se dibuja con el
 ## MultiMesh de su tipo (`HordeDraw`) y su modelo de nodos sale del árbol hasta que muere.
 var _horde_ok := false
@@ -259,7 +265,13 @@ func _rise_kind() -> Rise:
 	if data.movement == &"dive": return Rise.AIR
 	if data.ethereal: return Rise.FOG
 	if obstacles != null and obstacles.water_at(Vector2(global_position.x, global_position.z)) > 0.3: return Rise.WATER
+	if family() == "anim_humano": return Rise.FOG                # 17.11: los humanos, de la niebla
 	return Rise.GROUND
+
+## Familia de animación del modelo ("anim_humano", "anim_profundo"…).
+func family() -> String:
+	var s := Anims.script_for(model_name)
+	return s.resource_path.get_file().get_basename() if s != null else ""
 
 ## Sale del suelo o del agua, baja del cielo o se materializa en la niebla en vez de crecer de
 ## golpe. Mientras dura no anda, no ataca ni hace daño por contacto (se le puede dar). Es solo
@@ -274,7 +286,9 @@ func _rise_start() -> void:
 	var at := Vector3(global_position.x, 0.0, global_position.z)
 	var cam := get_viewport().get_camera_3d()
 	var seen := cam != null and (cam.is_position_in_frustum(at) or cam.is_position_in_frustum(at + Vector3(0, _rise_h, 0)))
-	if not seen and _rise != Rise.FOG: return       # polvo y agua solo a la vista (casi todos nacen fuera de cámara)
+	_climb = _rise == Rise.WATER and family() == "anim_profundo" and not data.emerge   # 17.11: trepa y se sacude
+	var mist := _rise == Rise.FOG and not data.ethereal         # un humano que sale de la niebla (17.11)
+	if not seen and (_rise != Rise.FOG or mist): return       # polvo, agua y niebla solo a la vista (casi todos nacen fuera de cámara)
 	match _rise:
 		Rise.GROUND:
 			VoxelFx.ground_hit(world.fx, at, 0.5 + data.body_radius * 1.4, Ambient.dust_tint(), false)
@@ -283,8 +297,9 @@ func _rise_start() -> void:
 			Ripples.add(world.fx, at, 0.4 + data.body_radius, 0.8, 0.9)
 			if not data.emerge: WadeSplash.burst(world.fx, at, 0.5 + data.body_radius * 0.6, Color(0, 0, 0, 0), "auto", false)
 		Rise.FOG:
-			_rise_mats = Crumble.dress(model, RISE_FOG)
+			_rise_mats = Crumble.dress(model, RISE_MIST if mist else RISE_FOG)
 			Crumble.set_cut(_rise_mats, 1.02)
+			if mist: VoxelFx.puff(world.fx, at + Vector3(0, 0.35, 0), "pet_mist", 0.5 + data.body_radius, Color(0.78, 0.82, 0.9), 1.6)   # el jirón de niebla
 	if not seen: return
 	match _rise:                                    # y su sonido, también solo a la vista (en el agua, el de la salpicadura)
 		Rise.GROUND: Auto.sfx_at("rise_" + Ambient.ground, at)
@@ -321,6 +336,31 @@ func _rise_step(delta: float) -> void:
 			Crumble.set_cut(_rise_mats, 1.02 * (1.0 - k * k * (3.0 - 2.0 * k)))
 	if k >= 1.0: _rise_end()
 
+## Se sacude el agua como un perro (hito 17.11): giros rápidos que se calman y gotas al principio.
+## En el contenedor del modelo: vale también con la horda.
+func _shake_step(delta: float) -> void:
+	var k := _shake_t / SHAKE_TIME
+	if _shake_t == 0.0 and world != null:
+		WadeSplash.burst(world.fx, global_position + Vector3(0, 0.6, 0), 0.35 + data.body_radius * 0.4, Color(0, 0, 0, 0), "auto", false)
+	_shake_t += delta
+	if k >= 1.0:
+		_shake_t = -1.0
+		return
+	var a := sin(_shake_t * TAU * 7.0) * 0.32 * (1.0 - k) * (0.5 if model_scale > 1.5 else 1.0)
+	visual.basis = Basis(Vector3.UP, a) * Basis(visual.basis.z.normalized() if visual.basis.z.length_squared() > 0.0001 else Vector3.FORWARD, a * 0.3) * visual.basis
+
+## Trepa al salir del agua (hito 17.11): los brazos arriba y delante, agarrándose, que tiran hacia
+## abajo según sube; el tronco echado adelante.
+func _climb_pose() -> void:
+	var k := clampf(_rise_t / _rise_life, 0.0, 1.0)
+	var pull := Anims.ease(k / 0.8)
+	var reach := -2.6 + 1.9 * pull + sin(k * PI * 4.0) * 0.18          # brazo a brazo
+	var parts: Dictionary = model.get_meta("part_nodes", {})
+	if parts.has("arm_l"): (parts["arm_l"] as Node3D).rotation.x = reach
+	if parts.has("arm_r"): (parts["arm_r"] as Node3D).rotation.x = -2.6 + 1.9 * pull - sin(k * PI * 4.0) * 0.18
+	if parts.has("torso"): (parts["torso"] as Node3D).rotation.x += 0.35 * (1.0 - pull)
+	if parts.has("head"): (parts["head"] as Node3D).rotation.x -= 0.25 * (1.0 - pull)
+
 ## Estirar y aplastar con los saltos (hito 11.7): se estira al subir o caer deprisa y se aplasta
 ## al tocar el suelo, con rebote. Sale de la altura dibujada, así que vale para cualquier salto
 ## (acechador, gigantes, picados de los que vuelan) y para las marionetas de la red. Los blandos,
@@ -346,6 +386,8 @@ func _air_step(delta: float) -> void:
 		visual.scale *= Vector3(w, 1.0 + st - sq, w)
 
 func _rise_end() -> void:
+	if _climb and _rise == Rise.WATER: _shake_t = 0.0      # 17.11: fuera del agua, se sacude
+	_climb = false
 	if not _rise_mats.is_empty():
 		Crumble.undress(_rise_mats)
 		_rise_mats = []
@@ -989,6 +1031,7 @@ func _process(delta: float) -> void:
 	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale * (ELITE_SIZE if data.elite else 1.0)   # aparece creciendo (al cambiar de forma)
 	_air_step(delta)
 	if _rise != Rise.NONE: _rise_step(delta)
+	if _shake_t >= 0.0: _shake_step(delta)
 	if _hit_t < _hit_len:                             # golpe: se aplasta y se inclina, y vuelve con rebote (hito 11.2)
 		var hk := clampf(_hit_t / HIT_POSE, 0.0, 1.0)
 		var s := sin(hk * PI * 1.5) * (1.0 - hk) * (0.35 if model_scale > 1.5 or data.unique else 1.0) * (1.5 if data.soft else 1.0)
@@ -1056,6 +1099,7 @@ func _process(delta: float) -> void:
 		if _hit_own and _hit_t < _hit_len:
 			Anims.hit(model_name, model, clampf(_hit_t / _hit_len, 0.0, 1.0))
 		if _hit_t < HIT_POSE and _hit_dir != Vector3.ZERO: _head_snap()
+		if _climb and _rise == Rise.WATER: _climb_pose()
 	_flash -= delta
 	_flash_cd -= delta
 	if flash_hold: _flash = 1.0

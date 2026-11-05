@@ -2064,6 +2064,21 @@ Sobre las reacciones del 12.9 (esconderse de un jefe, celebrar la subida, gemir 
 - Las capturas de partida no llegaban a ver el golpe (los enemigos mueren lejos con el bot quieto). Queda medido en una prueba: golpeado desde J1, la cabeza se echa atrás más de 5 cm.
 - **Pruebas:** la dirección sale de J1 sin empuje; un golpe fuerte da más `_hit_k`; el fuego no inclina; la cabeza se echa atrás. 753 de 753.
 
+### Hito 17.11: entradas por familia (05-11-2026)
+
+Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, materializarse en la niebla):
+- **Profundos que salen del agua** (familia `anim_profundo`, salvo los que ya tienen su propia salida, `emerge`):
+  - Trepan: los brazos arriba y delante, brazo a brazo, tiran de ellos según suben, con el tronco echado adelante (`Enemy._climb_pose`, encima de la pose).
+  - Al salir se sacuden como un perro durante 0,55 s, con giros rápidos que se calman y gotas al empezar (`_shake_step`, `WadeSplash.burst`).
+  - La sacudida va en el contenedor del modelo, así que también se ve con la horda.
+- **Humanos** (familia `anim_humano`, sin `rise` en su ficha y fuera del agua): salen de un jirón de niebla. Se materializan de abajo arriba con borde gris (`RISE_MIST`) y una bruma baja (`pet_mist`). Antes salían del suelo.
+  - El material de la niebla solo se pone si se ve (casi todos nacen fuera de cámara); si no, esperan lo mismo sin dibujarlo.
+- El expedicionario de Lake, `rise = ground`: sale de la nieve, como antes.
+- `Enemy.family()` da el nombre del script de animación de su modelo.
+- Herramienta nueva, `tools/hoja_entradas.gd`: un enemigo apareciendo en N momentos (`godot --path . -s tools/hoja_entradas.gd -- enemy=profundo rise=water n=8`). Lleva una cámara también en la ventana, porque el enemigo mira si se le ve.
+- En partida no se llegaba a ver: el director sigue mandando enemigos y la entrada dura medio segundo. Las hojas sí lo enseñan.
+- **Pruebas:** el cultista sale de la niebla, el expedicionario del suelo; el profundo del agua trepa con los brazos arriba y se sacude al salir. 754 de 754.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

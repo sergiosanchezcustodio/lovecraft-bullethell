@@ -7,6 +7,7 @@ script = ExtResource("1")
 id = &"expedicionario"
 display_name = "Expedicionario de Lake"
 model = "expedicionario"
+rise = &"ground"
 tier = 2
 spawn_weight = 0.8
 elite = false

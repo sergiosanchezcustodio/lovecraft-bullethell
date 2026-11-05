@@ -308,3 +308,31 @@ func test_el_golpe_echa_atras_la_cabeza() -> void:
 		e._process(1.0 / 60.0)
 		most = maxf(most, head.global_position.z - z0)
 	assert_gt(most, 0.05, "la cabeza se echa atrás %.3f m" % most)
+
+## Entradas por familia (hito 17.11): los humanos salen de la niebla; el expedicionario, de la
+## nieve; un profundo que sale del agua trepa y, al salir, se sacude.
+func test_entradas_por_familia() -> void:
+	var world := CombatWorld.new()
+	add_child_autofree(world)
+	var c := Enemy.new().setup(load("res://data/enemies/cultista.tres"), world, null)
+	world.add_child(c)
+	assert_eq(c._rise_kind(), Enemy.Rise.FOG, "el cultista, de la niebla")
+	var x := Enemy.new().setup(load("res://data/enemies/expedicionario.tres"), world, null)
+	world.add_child(x)
+	assert_eq(x._rise_kind(), Enemy.Rise.GROUND, "el expedicionario, de la nieve")
+	var d: EnemyData = (load("res://data/enemies/profundo.tres") as EnemyData).duplicate()
+	d.rise = &"water"
+	var p := Enemy.new().setup(d, world, null)
+	world.add_child(p)
+	assert_eq(p.family(), "anim_profundo")
+	p._rise_start()
+	assert_true(p._climb, "trepa")
+	var arm := Anims.part(p.model, "arm_l")
+	var most := 0.0
+	var shook := false
+	for i in 90:
+		p._process(1.0 / 60.0)
+		most = minf(most, arm.rotation.x)
+		if p._shake_t > 0.0: shook = true
+	assert_lt(most, -1.5, "los brazos arriba, agarrándose")
+	assert_true(shook, "y al salir se sacude")
