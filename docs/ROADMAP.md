@@ -544,7 +544,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 |---|---|---|
 | 17.13 | **Más objetos con viento** (el sombreador de los árboles): redes, lonas de las tiendas, toldos, ropa tendida y las barcas que aún no flotan | **Hecho (05-11-2026), pendiente de tu revisión:** las tiendas de lona ondean, el toldo del puerto se mece, el bote del muelle y las barcas del pantano flotan |
 | 17.14 | **Humo en las chimeneas y vapor en las alcantarillas**, por calidad | **Hecho (05-11-2026), pendiente de tu revisión:** el humo ya estaba; alcantarillas con vapor en Innsmouth y Arkham, apagadas en Baja |
-| 17.15 | **La fuente de Innsmouth** con agua que cae y ondas en el pilón | Pendiente |
+| 17.15 | **La fuente de Innsmouth** con agua que cae y ondas en el pilón | **Hecho (05-11-2026), pendiente de tu revisión:** el chorro ya estaba; el agua del pilón tiene ondas desde donde cae, rizo y destellos de luna |
 | 17.16 | **Siluetas en las ventanas:** de vez en cuando alguien se asoma a una ventana encendida y se aparta, o se mueve una cortina | Pendiente |
 | 17.17 | **Decorado que reacciona:** los juncos se apartan al pasar, las aves levantan el vuelo al acercarte, los barriles y faroles se tambalean con las explosiones | Pendiente |
 

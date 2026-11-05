@@ -12,6 +12,7 @@
   "alr_puente": {"swing": {"part": "lamp", "deg": 0.9, "turb": 0.9, "period": 1.6, "max": 30}},
   "atrezo_bandera": {"sound": {"file": "flag_loop.wav", "db": -21, "range": 10, "at": "flag", "wind": 1.0}},
   "alr_casco": {"sound": {"file": "flag_loop.wav", "db": -22, "range": 16, "at": "flag", "wind": 1.0}},
+  "inn_fuente": {"pool": {"r": 3.22, "y": 0.535, "center": [1.3, 0.97]}},
   "inn_sirena": {"emit": [{"recipe": "spout", "at": "mouth", "r": 0.64, "dir": [0.113, -0.106, 0.988]},
                           {"recipe": "spout_splash", "at": "splash", "r": 0.25, "ripples": true}],
                  "sound": {"file": "fountain_loop.wav", "db": -17, "range": 10, "at": "splash"}},

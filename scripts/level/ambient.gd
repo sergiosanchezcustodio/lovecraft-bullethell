@@ -95,6 +95,25 @@ func _vents(c: Dictionary) -> void:
 		h.add_child(e)
 	vents = placed
 
+## Lámina de agua animada de un pilón (hito 17.15, `pool` en data/ambient.json): `r` m de apotema,
+## a `y` m, con las ondas desde `center` (donde cae el chorro, en el sitio de la pieza).
+static func _pool(c: Dictionary) -> MeshInstance3D:
+	var r := float(c.get("r", 3.0))
+	var mi := MeshInstance3D.new()
+	mi.name = "Pool"
+	var pm := PlaneMesh.new()
+	pm.size = Vector2.ONE * r * 2.2
+	mi.mesh = pm
+	mi.position.y = float(c.get("y", 0.5))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var m := ShaderMaterial.new()
+	m.shader = preload("res://scripts/fx/fountain_pool.gdshader")
+	m.set_shader_parameter("radius", r)
+	var ce: Array = c.get("center", [0.0, 0.0])
+	m.set_shader_parameter("center", Vector2(ce[0], ce[1]))
+	mi.material_override = m
+	return mi
+
 static func model_cfg(model: String) -> Dictionary:
 	return (config().get("models", {}) as Dictionary).get(model, {})
 
@@ -109,6 +128,7 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 			mi.material_override = _sway_material(model, c, mi.material_override, wind)
 		elif c.has("glow") and kind == 1:
 			mi.material_override = _glow_material(model, c)
+	if c.has("pool"): holder.add_child(_pool(c.pool))                # la fuente de Innsmouth (17.15)
 	var pivots: Dictionary = m.get_meta("pivots")
 	var vs := float(m.get_meta("voxel_size"))
 	var out_ripples: Array = []

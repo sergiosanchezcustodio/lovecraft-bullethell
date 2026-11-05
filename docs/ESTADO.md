@@ -2121,6 +2121,17 @@ Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, mat
 - **Pruebas:** objetos con viento (configuración y la tela del toldo), y alcantarillas (en Baja no, separadas, las mismas en cada partida). 757 de 757.
 - La prueba del ídolo de `test_new_enemies` falló una vez con toda la batería y pasó en las cinco siguientes: es intermitente, no de este cambio.
 
+### Hito 17.15: la fuente de Innsmouth (05-11-2026)
+
+- El chorro de la sirena, su salpicadura, las ondas sueltas donde cae y el sonido ya estaban (16-10-2026). Faltaba el agua del pilón, que estaba pintada y quieta.
+- Lámina de agua encima de la del modelo (`fountain_pool.gdshader`, `Ambient._pool`, `pool` de `inn_fuente` en `data/ambient.json`), recortada al octógono del pilón. A voxels de 1/32 m, como el resto, y transparente:
+  - ondas que salen de donde cae el chorro y se apagan hacia el borde;
+  - un rizo lento por toda la lámina;
+  - destellos de luna que se encienden de uno en uno.
+- Las rocas y la sirena la tapan con la profundidad.
+- **Coste:** un plano y un sombreador sin luces; en todas las calidades.
+- **Pruebas:** la lámina a la altura del agua, con su radio y las ondas desde el chorro. 758 de 758.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

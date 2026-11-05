@@ -398,3 +398,15 @@ func test_vapor_alcantarillas() -> void:
 	b._vents({"count": 4, "seed": 3})
 	assert_eq(b.vents, a.vents, "las mismas en cada partida")
 	a.free(); b.free()
+
+## La fuente de Innsmouth (hito 17.15): el pilón lleva una lámina de agua con ondas desde donde
+## cae el chorro, a la altura del agua del modelo.
+func test_fuente_con_ondas() -> void:
+	var c := Ambient.model_cfg("inn_fuente")
+	assert_true(c.has("pool"))
+	var mi := Ambient._pool(c.pool)
+	assert_almost_eq(mi.position.y, 0.535, 0.01)
+	var m := mi.material_override as ShaderMaterial
+	assert_almost_eq(float(m.get_shader_parameter("radius")), 3.22, 0.01)
+	assert_ne(m.get_shader_parameter("center"), Vector2.ZERO, "las ondas salen del chorro, no del centro")
+	mi.free()
