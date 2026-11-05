@@ -519,8 +519,8 @@ class GameStub extends Node:
 ## apaga sola; las armas que no son de balas, no; en Baja y Media no hay luz.
 func test_fogonazo_de_los_disparos() -> void:
 	var p: Array = Quality.presets()
-	assert_false(bool(p[1].shot_light), "en Media no")
-	assert_true(bool(p[2].shot_light), "en Alta sí")
+	assert_false(bool(p[2].shot_light), "en Alta no (costaba)")
+	assert_true(bool(p[3].shot_light), "en Ultra sí")
 	var holder := Node3D.new()
 	add_child_autofree(holder)
 	var ws := WeaponSystem.new()
@@ -556,7 +556,7 @@ func test_rastros_que_se_quedan() -> void:
 	var px := tr.img.get_pixel(int((2.0 + 10.0) * 8.0), int((3.0 + 10.0) * 8.0))
 	assert_gt(px.a, 0.3, "hay rastro donde cayó")
 	assert_gt(px.g, px.r, "del color del icor")
-	for i in 12: tr.stamp(Vector3(2, 0, 3), 0.8, Color(0.05, 0.05, 0.05), 0.5)
-	px = tr.img.get_pixel(int((2.0 + 10.0) * 8.0), int((3.0 + 10.0) * 8.0))
-	assert_lte(px.a, GroundTraces.MAX_A + 0.01, "no tapa del todo el suelo")
+	var t0 := Time.get_ticks_usec()
+	for i in 200: tr.stamp(Vector3(randf_range(-8, 8), 0, randf_range(-8, 8)), 0.8, Color(0.05, 0.05, 0.05), 0.5)
+	assert_lt(Time.get_ticks_usec() - t0, 60000, "doscientos rastros, en menos de 60 ms (pinceles hechos)")
 	assert_eq(tr.img.get_pixel(0, 0).a, 0.0, "y lejos, nada")

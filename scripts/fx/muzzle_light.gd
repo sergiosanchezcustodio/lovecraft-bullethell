@@ -2,7 +2,8 @@ class_name MuzzleLight
 extends OmniLight3D
 ## Fogonazo de los disparos (hito 17.19): una luz cálida y corta en la mano del investigador que
 ## se enciende un instante con cada disparo de balas y alumbra el suelo y las paredes de al lado.
-## Una por jugador, sin sombras; solo en Alta y Ultra (`shot_light` en data/quality.json). Las
+## Una por jugador, sin sombras; solo en Ultra (`shot_light` en data/quality.json; en Alta costaba
+## unos 0,3 ms en las calles, fase 17). Las
 ## explosiones ya tenían la suya (Explosion, con tope `lights`).
 
 const PEAK := 1.8                               ## brillo del fogonazo

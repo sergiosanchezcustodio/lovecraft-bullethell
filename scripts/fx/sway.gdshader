@@ -53,9 +53,11 @@ void vertex() {
 	}
 	vec3 blast = gust_push(gust_a, NODE_POSITION_WORLD.xz, TIME) + gust_push(gust_b, NODE_POSITION_WORLD.xz, TIME);
 	VERTEX += to_local * blast * k;
-	if (part_r > 0.0) {                       // los juncos se apartan al pasar
+	vec2 who[4] = vec2[4](walk_a.xy, walk_a.zw, walk_b.xy, walk_b.zw);
+	float near = 1e9;                         // la mata entera, de una vez: casi todas están lejos
+	if (part_r > 0.0) for (int i = 0; i < 4; i++) near = min(near, distance(NODE_POSITION_WORLD.xz, who[i]));
+	if (near < part_r + 3.0) {                // los juncos se apartan al pasar
 		vec2 push = vec2(0.0);
-		vec2 who[4] = vec2[4](walk_a.xy, walk_a.zw, walk_b.xy, walk_b.zw);
 		for (int i = 0; i < 4; i++) {
 			vec2 d = rest_xz - who[i];
 			float dist = length(d);

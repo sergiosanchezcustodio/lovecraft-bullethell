@@ -2211,6 +2211,30 @@ Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, mat
 - Por calidad: `traces` en `data/quality.json`, apagado en Baja.
 - **Pruebas:** la mancha deja su rastro del color del icor; con muchas encima, no pasa del tope; lejos, nada. 763 de 763.
 
+### Cierre de la fase 17: rendimiento (05-11-2026)
+
+- **Primera medición de la fase entera**, en Alta, frente a `ca5b6cf` (antes de la fase 17, en otra copia), alternando las copias, 3 partidas por nivel con `bot=smart max_alive=80 spawn_rate=20`:
+  - se pasaba del tope en el ritual (p3_n2, +0,72 ms) y en las calles (p2_n2, +0,83 ms);
+  - venía de los hitos 17.13-17.20, porque tras el 17.12 todo estaba dentro del ruido.
+- **`qset=clave:valor,…`** (nuevo, `Quality.overrides`) cambia claves sueltas del preajuste al lanzar, para comparar (`qset=traces:false,vents:false`).
+- Con él, en las calles:
+  - los rastros costaban unos 0,4 ms;
+  - el fogonazo, unos 0,3 ms;
+  - el vapor, nada.
+- **Arreglos:**
+  - **Rastros:** se estampan con pinceles ya hechos (por tamaño, forma y color) y `Image.blend_rect`, nativo, en vez de píxel a píxel en GDScript. El tope de opacidad lo pone el sombreador, y la textura se sube cada 2 s.
+  - **Fogonazo:** pasa a Ultra (en Alta, apagado).
+  - **Juncos que se apartan:** cada mata mira primero si algún jugador está cerca de su centro. Si no, se salta el cálculo de todos sus vértices, que antes se hacía en las 108-136 matas de cada arena, también en la pasada de sombras.
+- **Medición final:**
+
+  | Nivel | Antes | Ahora | Diferencia |
+  |---|---|---|---|
+  | p3_n2 | 8,48 ms (1 % peor 17,8) | 8,75 ms (16,3) | +0,27 ms |
+  | p2_n2 | 8,07 ms (15,3) | 8,56 ms (17,2) | +0,49 ms |
+  | p2_n4 | 9,45 ms (18,3) | 9,41 ms (16,7) | −0,04 ms |
+
+  Dentro del tope de +0,5 ms. El 1 % peor varía arriba y abajo, como siempre entre ejecuciones.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

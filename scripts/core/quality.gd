@@ -27,7 +27,22 @@ static func current() -> Dictionary:
 	return all[clampi(int(Auto.setting("quality", DEFAULT)), 0, all.size() - 1)]
 
 static func value(key: String, default: Variant) -> Variant:
+	var o := overrides()
+	if o.has(key): return o[key]
 	return current().get(key, default)
+
+## `qset=clave:valor,clave:valor` al lanzar (17.20): cambia claves sueltas del preajuste para comparar
+## (`qset=traces:false,vents:false`). Los valores se leen como en el JSON.
+static var _over = null
+static func overrides() -> Dictionary:
+	if _over == null:
+		_over = {}
+		for a in OS.get_cmdline_user_args():
+			if not a.begins_with("qset="): continue
+			for kv in a.substr(5).split(",", false):
+				var p := kv.split(":", true, 1)
+				if p.size() == 2: _over[p[0]] = JSON.parse_string(p[1]) if JSON.parse_string(p[1]) != null else p[1]
+	return _over
 
 ## Suavizado y sombras de la luna: del visor y del servidor de dibujo, valen para todas las escenas.
 static func apply_viewport(vp: Viewport) -> void:

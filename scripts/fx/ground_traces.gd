@@ -5,11 +5,11 @@ extends Node
 ## una textura que cubre la arena (`PX_PER_M` píxeles por metro) y que leen los suelos
 ## (ground_traces.gdshaderinc). La mancha se desvanece como antes; el rastro se queda el resto del
 ## nivel. El tope es la propia textura: memoria fija, y lo que cae encima tapa lo de debajo hasta
-## `MAX_A`. La sube a la GPU como mucho cada `UPLOAD_EVERY` s. `traces` en data/quality.json.
+## `MAX_A` (lo pone el sombreador). La sube a la GPU como mucho cada `UPLOAD_EVERY` s. `traces` en data/quality.json.
 
 const PX_PER_M := 8.0
 const MAX_A := 0.62                             ## lo más que tapa el suelo
-const UPLOAD_EVERY := 0.3
+const UPLOAD_EVERY := 2.0
 static var current: GroundTraces                ## el de la arena en juego (null: sin rastros)
 
 var img: Image
@@ -43,40 +43,52 @@ func _enter_tree() -> void:
 func _exit_tree() -> void:
 	if current == self: current = null
 
-## Deja en el suelo, en `pos`, un rastro de `r` m del color `col` y opacidad `a`, de borde irregular.
+## Deja en el suelo, en `pos`, un rastro de `r` m del color `col` y opacidad `a`: una mancha de
+## borde irregular y unas gotas alrededor. Se estampa con pinceles ya hechos (`_brush`, por
+## tamaño, forma y color) y `blend_rect`, que es nativo: pintarlos píxel a píxel costaba en las
+## hordas. El tope de opacidad lo pone el sombreador (TRACE_MAX).
 func stamp(pos: Vector3, r: float, col: Color, a: float) -> void:
 	var n := img.get_width()
 	var k := n / extent
 	var cx := (pos.x - origin.x) * k
 	var cy := (pos.z - origin.y) * k
-	var rp := maxf(r * k, 1.5)
-	if cx < -rp * 2.0 or cy < -rp * 2.0 or cx > n + rp * 2.0 or cy > n + rp * 2.0: return
-	# la mancha, de borde irregular (ocho lóbulos al azar), y unas gotas alrededor
-	var lobes: Array[float] = []
-	for i in 8: lobes.append(randf_range(0.6, 1.0))
-	_blob(cx, cy, rp, lobes, col, a)
+	var rp := clampi(int(round(r * k)), 2, 28)
+	if cx < -rp * 2 or cy < -rp * 2 or cx > n + rp * 2 or cy > n + rp * 2: return
+	_put(_brush(rp, randi() % SHAPES, col, a), cx, cy)
 	for i in randi_range(2, 4):
 		var ang := randf() * TAU
 		var dist := rp * randf_range(1.15, 1.7)
-		_blob(cx + cos(ang) * dist, cy + sin(ang) * dist, maxf(rp * randf_range(0.15, 0.3), 0.6), [1.0], col, a * 0.85)
+		_put(_brush(clampi(int(round(rp * randf_range(0.15, 0.3))), 1, 6), SHAPES, col, a * 0.85), cx + cos(ang) * dist, cy + sin(ang) * dist)
 	stamps += 1
 	_dirty = true
 
-func _blob(cx: float, cy: float, rp: float, lobes: Array, col: Color, a: float) -> void:
-	var n := img.get_width()
-	var nl := lobes.size()
-	for y in range(maxi(int(cy - rp - 1), 0), mini(int(cy + rp + 2), n)):
-		for x in range(maxi(int(cx - rp - 1), 0), mini(int(cx + rp + 2), n)):
-			var d := Vector2(x + 0.5 - cx, y + 0.5 - cy)
-			var u := fposmod(atan2(d.y, d.x) / TAU * nl, float(nl))
-			var i0 := int(u) % nl
-			var edge := rp * lerpf(float(lobes[i0]), float(lobes[(i0 + 1) % nl]), u - floorf(u))
+func _put(b: Image, cx: float, cy: float) -> void:
+	img.blend_rect(b, Rect2i(Vector2i.ZERO, b.get_size()), Vector2i(int(cx) - b.get_width() / 2, int(cy) - b.get_height() / 2))
+
+const SHAPES := 4                               ## formas de mancha (la SHAPES, redonda: las gotas)
+static var _brushes := {}
+static func _brush(rp: int, shape: int, col: Color, a: float) -> Image:
+	var key := "%d|%d|%s|%d" % [rp, shape, col.to_html(false).left(6), int(a * 20.0)]
+	if _brushes.has(key): return _brushes[key]
+	if _brushes.size() > 400: _brushes.clear()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = shape * 7919 + rp
+	var lobes: Array[float] = []
+	for i in 8: lobes.append(1.0 if shape >= SHAPES else rng.randf_range(0.6, 1.0))
+	var side := rp * 2 + 2
+	var b := Image.create(side, side, false, Image.FORMAT_RGBA8)
+	b.fill(Color(col.r, col.g, col.b, 0.0))
+	var c := side * 0.5
+	for y in side:
+		for x in side:
+			var d := Vector2(x + 0.5 - c, y + 0.5 - c)
+			var u := fposmod(atan2(d.y, d.x) / TAU * 8.0, 8.0)
+			var i0 := int(u) % 8
+			var edge := rp * lerpf(lobes[i0], lobes[(i0 + 1) % 8], u - floorf(u))
 			if d.length() > edge: continue
-			var f := a * (0.8 + 0.2 * (1.0 - d.length() / maxf(edge, 0.01)))
-			var old := img.get_pixel(x, y)
-			var na := minf(old.a + f * (1.0 - old.a), MAX_A)
-			var c := old.lerp(col, f / maxf(na, 0.001)) if old.a > 0.0 else col
-			img.set_pixel(x, y, Color(c.r, c.g, c.b, na))
+			b.set_pixel(x, y, Color(col.r, col.g, col.b, a * (0.8 + 0.2 * (1.0 - d.length() / maxf(edge, 0.01)))))
+	_brushes[key] = b
+	return b
 
 func _process(delta: float) -> void:
 	_t -= delta
