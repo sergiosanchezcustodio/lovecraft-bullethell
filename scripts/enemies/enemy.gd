@@ -140,6 +140,7 @@ var _hit_t := HIT_POSE
 var _hit_len := HIT_POSE                    ## lo que dura su reacción (la de su familia, Anims.hit_time)
 var _hit_own := false                       ## su juego de animaciones tiene reacción propia (Anims.hit)
 var _hit_dir := Vector3.ZERO
+var _hit_k := 0.5                           ## fuerza del golpe (hito 17.10): cuánto se echa atrás
 const WINDUP_RELEASE := 0.32               ## s del golpe hacia delante al terminar la preparación (hito 12.5)
 var _wu_t := -1.0                           ## preparación antes de un ataque con aviso: s desde que empezó; -1, ninguna
 var _wu_len := 0.0                          ## lo que dura el aviso
@@ -537,7 +538,7 @@ func take_damage(d: Damage) -> void:
 		world.record_kill(d.tag, global_position)
 	_hit_flash()
 	_knock += Vector3(d.knockback.x, 0, d.knockback.z) * (2.5 if not data.elite else 0.6)
-	_hit_pose(d)
+	_hit_pose(d, dealt)
 	var big := data.elite or data.unique
 	# en dorado: con bonificación (rasgos, vulnerable) o un golpe fuerte a una élite
 	_number(d.physical * k, k > 1.05 or (big and not d.dot and dealt >= data.max_health * health_scale * 0.08), d.dot)
@@ -627,16 +628,45 @@ func _drum_step(delta: float) -> void:
 	if not _far: Auto.sfx_at("heartbeat", global_position)
 
 ## Golpe recibido (hito 11.2): se aplasta un poco y se inclina hacia donde lo empujan.
-func _hit_pose(d: Damage) -> void:
+func _hit_pose(d: Damage, dealt := -1.0) -> void:
 	_hit_t = 0.0
 	# reacción de su familia (doblarse, tambalearse, temblar); los colosales, solo aplastados
 	_hit_own = model_scale <= 1.5 and Anims.has_hit(model_name)
 	_hit_len = Anims.hit_time(model_name, HIT_POSE) if _hit_own else HIT_POSE
 	var dir := Vector3(d.knockback.x, 0.0, d.knockback.z)
+	if dir.length_squared() < 0.0001: dir = Vector3(d.dir.x, 0.0, d.dir.z)          # 17.10: la bala, aunque no empuje
 	if dir.length_squared() < 0.0001 and d.source is Node3D:
 		dir = global_position - (d.source as Node3D).global_position
 		dir.y = 0.0
+	if dir.length_squared() < 0.0001 and not d.dot:           # 17.10: lejos de quien lo causa (J1:…)
+		var who := _player_of(d.tag)
+		if who != null:
+			dir = global_position - who.global_position
+			dir.y = 0.0
 	_hit_dir = dir.normalized() if dir.length_squared() > 0.0001 else Vector3.ZERO
+	# 17.10: cuánto se echa atrás, según lo que le quita (un 15 % de su vida o más, del todo)
+	var full := data.max_health * health_scale * 0.15
+	_hit_k = 0.4 if d.dot or dealt < 0.0 else clampf(dealt / maxf(full, 0.001), 0.4, 1.0)
+
+## La cabeza da un latigazo hacia donde lo empujan (hito 17.10), encima de la pose: hacia atrás si
+## el golpe llega de frente, de lado si llega de lado. Con la horda no (va en la textura).
+func _head_snap() -> void:
+	var parts: Dictionary = model.get_meta("part_nodes", {})
+	if not parts.has("head"): return
+	var hd: Node3D = parts["head"]
+	var loc := visual.global_basis.orthonormalized().inverse() * _hit_dir       # en el espacio del modelo (mira a +Z)
+	var hs := sin(clampf(_hit_t / HIT_POSE, 0.0, 1.0) * PI) * _hit_k
+	hd.rotation.x += 0.5 * hs * loc.z
+	hd.rotation.z += -0.4 * hs * loc.x
+
+## El jugador de una etiqueta de daño («J2:webly» -> J2), o null.
+func _player_of(tag: StringName) -> Player:
+	var t := String(tag)
+	if world == null or t.length() < 2 or t[0] != "J" or not t[1].is_valid_int(): return null
+	var i := int(t[1]) - 1
+	for p in world.players:
+		if is_instance_valid(p) and p.index == i: return p
+	return null
 
 ## Se prepara para un ataque con aviso en el suelo que llega dentro de `seconds` (hito 12.5): su
 ## familia se agazapa, se yergue o se hincha mientras dura el aviso y suelta el golpe al final.
@@ -964,8 +994,9 @@ func _process(delta: float) -> void:
 		var s := sin(hk * PI * 1.5) * (1.0 - hk) * (0.35 if model_scale > 1.5 or data.unique else 1.0) * (1.5 if data.soft else 1.0)
 		if not _hit_own:                              # la familia sin reacción propia, aplastada entera
 			visual.scale *= Vector3(1.0 + 0.1 * s, 1.0 - 0.12 * s, 1.0 + 0.1 * s)
-		if _hit_dir != Vector3.ZERO:
-			visual.basis = Basis(Vector3.UP.cross(_hit_dir), 0.2 * s) * visual.basis
+		if _hit_dir != Vector3.ZERO:                  # se echa atrás hacia donde lo empujan (17.10: según la fuerza)
+			visual.basis = Basis(Vector3.UP.cross(_hit_dir), (0.12 + 0.26 * _hit_k) * s) * visual.basis
+			visual.global_position += _hit_dir * 0.08 * _hit_k * maxf(s, 0.0) * (0.4 if model_scale > 1.5 or data.unique else 1.0)
 		_hit_t += delta
 	var wu := Vector2.ZERO
 	var wu_own := false
@@ -1024,6 +1055,7 @@ func _process(delta: float) -> void:
 		# la reacción de su familia, encima de la pose (que la deshace en el siguiente fotograma)
 		if _hit_own and _hit_t < _hit_len:
 			Anims.hit(model_name, model, clampf(_hit_t / _hit_len, 0.0, 1.0))
+		if _hit_t < HIT_POSE and _hit_dir != Vector3.ZERO: _head_snap()
 	_flash -= delta
 	_flash_cd -= delta
 	if flash_hold: _flash = 1.0

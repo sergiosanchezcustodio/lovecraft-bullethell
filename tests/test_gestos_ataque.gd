@@ -258,3 +258,53 @@ func test_muere_segun_el_dano() -> void:
 	var c: Crumble = fx.get_child(fx.get_child_count() - 1)
 	for i in 12: c._process(1.0 / 60.0)
 	assert_gt(head.global_position.y, y0 + 0.3, "la cabeza sale volando")
+
+## Golpe según la dirección (hito 17.10): sin empuje, se echa atrás lejos de quien lo causa, y más
+## cuanto más le quita; el daño continuo no lo inclina.
+func test_golpe_segun_la_direccion() -> void:
+	var world := CombatWorld.new()
+	add_child_autofree(world)
+	var p := Player.new().setup(load("res://data/characters/dyer.tres"), PlayerInput.new(), Color.YELLOW)
+	world.add_child(p)
+	world.add_player(p)
+	p.global_position = Vector3(0, 0, -3)
+	var e := Enemy.new().setup(load("res://data/enemies/cultista.tres"), world, null)
+	world.add_child(e)
+	e.global_position = Vector3.ZERO
+	var d := Damage.new(1.0, 0.0)
+	d.tag = &"J1:webly"
+	e.take_damage(d)
+	assert_almost_eq(e._hit_dir.z, 1.0, 0.01, "lejos de J1")
+	var small := e._hit_k
+	var big := Damage.new(e.health * 0.5, 0.0)
+	big.tag = &"J1:webly"
+	e.take_damage(big)
+	assert_gt(e._hit_k, small, "un golpe fuerte lo echa más atrás")
+	var burn := Damage.new(0.5, 0.0)
+	burn.dot = true
+	burn.tag = &"J1:flammenwerfer"
+	e.take_damage(burn)
+	assert_eq(e._hit_dir, Vector3.ZERO, "el fuego no lo inclina")
+
+## Hito 17.10: lo que se ve. Golpeado desde J1 (detrás de él en -Z), la cabeza va hacia +Z.
+func test_el_golpe_echa_atras_la_cabeza() -> void:
+	var world := CombatWorld.new()
+	add_child_autofree(world)
+	var p := Player.new().setup(load("res://data/characters/dyer.tres"), PlayerInput.new(), Color.YELLOW)
+	world.add_child(p)
+	world.add_player(p)
+	p.global_position = Vector3(0, 0, -3)
+	var e := Enemy.new().setup(load("res://data/enemies/cultista.tres"), world, null)
+	world.add_child(e)
+	e.global_position = Vector3.ZERO
+	for i in 30: e._process(1.0 / 60.0)
+	var head := Anims.part(e.model, "head")
+	var z0 := head.global_position.z
+	var d := Damage.new(e.health * 0.3, 0.0)
+	d.tag = &"J1:webly"
+	e.take_damage(d)
+	var most := 0.0
+	for i in 12:
+		e._process(1.0 / 60.0)
+		most = maxf(most, head.global_position.z - z0)
+	assert_gt(most, 0.05, "la cabeza se echa atrás %.3f m" % most)

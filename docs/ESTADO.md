@@ -2055,6 +2055,15 @@ Sobre las reacciones del 12.9 (esconderse de un jefe, celebrar la subida, gemir 
 - **Coste:** el de deshacerse de siempre (un parámetro por malla y fotograma, unos fotogramas más).
 - **Pruebas:** el golpe que mata deja `killed_how`; `scaled` lo conserva; retrasos de los trozos; la explosión lanza la cabeza. 751 de 751.
 
+### Hito 17.10: golpe según la dirección (05-11-2026)
+
+- Ya existía (11.2): al recibir un golpe con empuje o con origen, el modelo se inclinaba 0,2 rad hacia donde lo empujaban. Faltaba que se notara y que valiera para más golpes:
+  - **Dirección:** sin empuje, la de la bala (`Damage.dir`); si no, la de su origen; si no, lejos del jugador que lo causa (`Enemy._player_of`, por la etiqueta «J2:…»). El daño continuo (fuego, zonas) no lo inclina, para que no se balancee a cada tic.
+  - **Fuerza** (`_hit_k`, 0,4 a 1): lo que le quita frente al 15 % de su vida. La inclinación va de 0,12 a 0,38 rad, y el modelo se desliza hacia atrás hasta 8 cm (un 40 % en jefes y gigantes).
+  - **Cabeza:** da un latigazo hacia atrás si el golpe llega de frente y de lado si llega de lado (`_head_snap`, encima de la pose). Con la horda solo se inclina y se desliza: la cabeza va en la textura.
+- Las capturas de partida no llegaban a ver el golpe (los enemigos mueren lejos con el bot quieto). Queda medido en una prueba: golpeado desde J1, la cabeza se echa atrás más de 5 cm.
+- **Pruebas:** la dirección sale de J1 sin empuje; un golpe fuerte da más `_hit_k`; el fuego no inclina; la cabeza se echa atrás. 753 de 753.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
