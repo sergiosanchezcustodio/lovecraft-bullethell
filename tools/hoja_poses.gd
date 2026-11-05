@@ -16,6 +16,8 @@ extends SceneTree
 ##   side=    true: segunda fila, vista de lado
 ##   w=, h=   tamaño de cada fila en px (320 por columna × 520)
 ##   out=     archivo (shots/poses_<modelo>_<anim>.png)
+##   zoom=, cy=, gap=   alto visible (2,3 m), altura del centro (0,85 m) y separación (1,4 m):
+##            para los compañeros, zoom=1 cy=0.2 gap=0.7
 
 const UPPER_BODY: Array[String] = ["arm_r", "arm_l", "torso", "fore_r", "fore_l"]
 
@@ -49,7 +51,7 @@ func _init() -> void:
 	world.add_child(sun)
 	var path := "res://models/%s.json" % model_name
 	var rows := 2 if side else 1
-	var gap := 1.4
+	var gap := float(_opts.get("gap", "1.4"))
 	for r in rows:
 		for i in n:
 			var holder := Node3D.new()                # el giro, en un contenedor (no en la raíz)
@@ -73,8 +75,8 @@ func _init() -> void:
 		var cam := Camera3D.new()
 		cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 		cam.keep_aspect = Camera3D.KEEP_HEIGHT
-		cam.size = 2.3
-		var target := Vector3(0.0, 0.85, -r * 40.0)
+		cam.size = float(_opts.get("zoom", "2.3"))
+		var target := Vector3(0.0, float(_opts.get("cy", "0.85")), -r * 40.0)
 		if r == 0:
 			cam.rotation_degrees = Vector3(-30, 45, 0)
 		else:

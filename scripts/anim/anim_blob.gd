@@ -1,8 +1,42 @@
 extends RefCounted
-## Animaciones del shoggoth bebé (compañero). Partes: body, top. El modelo mira hacia +Z.
-## Es una gota: se mueve estirándose y encogiéndose, sin patas; "bite" es tragarse una bala.
+## Animaciones del shoggoth bebé (compañero). Partes: body, top y bud (un brote escondido dentro
+## del cuerpo). El modelo mira hacia +Z. Es una gota: se mueve estirándose y encogiéndose, sin
+## patas; "bite" es tragarse una bala.
 
-const DURATION := {"idle": 1.6, "walk": 0.5, "run": 0.34, "bite": 0.3}
+const DURATION := {"idle": 1.6, "walk": 0.5, "run": 0.34, "bite": 0.3,
+	"fidget_split": 3.4, "fidget_hop": 1.2}
+## Gestos de reposo (hito 17.7): se parte en dos y se junta; da un saltito y se aplasta.
+const FIDGETS := ["fidget_split", "fidget_hop"]
+
+## Se parte en dos: el brote sale por un lado (el cuerpo se estira hacia allí), se separa, mira
+## alrededor dando botecitos y vuelve a meterse; el cuerpo tiembla al juntarse.
+static func fidget_split(m: Node3D, t: float) -> void:
+	idle(m, fmod(t * 2.0, 1.0))
+	var bud := _p(m, "bud")
+	if bud == null: return
+	var out := Anims.ease(t / 0.22) * (1.0 - Anims.ease((t - 0.74) / 0.2))
+	var pull := sin(clampf(t / 0.22, 0.0, 1.0) * PI) + sin(clampf((t - 0.74) / 0.2, 0.0, 1.0) * PI)
+	m.scale *= Vector3(1.0 + 0.12 * pull - 0.08 * out, 1.0 - 0.1 * pull - 0.06 * out, 1.0)   # se estira al soltarlo; sin él, más pequeño
+	bud.position.x += 0.38 * out
+	bud.position.y -= 0.02 * out
+	var alone := clampf((t - 0.25) / 0.47, 0.0, 1.0) * out
+	var hop := absf(sin(alone * PI * 3.0)) * alone
+	bud.position.y += 0.05 * hop
+	bud.rotation.y = sin(alone * TAU) * 0.8                                        # mira alrededor
+	var squash := (1.0 - hop) * alone
+	bud.scale = Vector3(1.0 + 0.15 * squash, 1.0 - 0.12 * squash + 0.1 * hop, 1.0 + 0.15 * squash)
+	var join := clampf((t - 0.9) / 0.1, 0.0, 1.0)                                  # al juntarse, tiembla
+	if join > 0.0: hit(m, join)
+
+## Saltito: se aplasta, salta, cae y se aplasta otra vez; el bulto de arriba se queda atrás.
+static func fidget_hop(m: Node3D, t: float) -> void:
+	var crouch := sin(clampf(t / 0.25, 0.0, 1.0) * PI)
+	var air := sin(clampf((t - 0.22) / 0.4, 0.0, 1.0) * PI)
+	var land := sin(clampf((t - 0.6) / 0.25, 0.0, 1.0) * PI)
+	var flat := crouch + land
+	m.scale = Vector3(1.0 + 0.18 * flat - 0.08 * air, 1.0 - 0.22 * flat + 0.15 * air, 1.0 + 0.18 * flat - 0.08 * air)
+	m.position.y += 0.16 * air
+	_p(m, "top").rotation.x = -0.35 * air + 0.25 * land
 
 static func _p(m: Node3D, n: String) -> Node3D:
 	return Anims.part(m, n)

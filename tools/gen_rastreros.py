@@ -2,7 +2,7 @@
 de Yig, Mini-Dhole y pez de Innsmouth. Estilo 4 (tramos de caras planas, detalles pintados),
 a 48 voxels por metro; miran hacia +Z.
 - cabra, tindalos, migo: body, head, leg_fl, leg_fr, leg_bl, leg_br, tail (anim_cuadrupedo.gd).
-- yig, dhole: head, s1..s4 (anim_serpiente.gd).
+- yig, dhole: head, s1..s4 (anim_serpiente.gd); yig, además, tongue (cuelga de head).
 - pez: body, leg_l, leg_r, fin_l, fin_r, tail (anim_pez.gd).
 Uso: python tools/gen_rastreros.py [cabra|tindalos|migo|yig|dhole|pez]
 """
@@ -157,10 +157,12 @@ def yig():
             M.put(x, y, 8, H, EYE, 1); M.put(x, y, 9, H, EYE, 1)
         M.put(x, 3, 9, H, PUPIL); M.put(x, 4, 9, H, PUPIL)
         M.put(x, 5, 8, H, DIAMOND); M.put(x, 5, 9, H, DIAMOND)                  # escama sobre el ojo
-    M.put(0, 1, 13, H, TONGUE); M.put(0, 1, 14, H, TONGUE)
-    M.put(-1, 1, 15, H, TONGUE); M.put(1, 1, 15, H, TONGUE)
+    # la lengua, aparte (hito 17.7): la animación la mete en la cabeza y la saca a latigazos
+    M.put(0, 1, 13, 'tongue', TONGUE); M.put(0, 1, 14, 'tongue', TONGUE)
+    M.put(-1, 1, 15, 'tongue', TONGUE); M.put(1, 1, 15, 'tongue', TONGUE)
     piv['head'] = [0, 1, 4]
-    return M, piv, (0.5, 0.45)
+    piv['tongue'] = [0, 1, 13]
+    return M, piv, (0.5, 0.45), {'tongue': H}
 
 
 def dhole():

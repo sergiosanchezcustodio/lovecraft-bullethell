@@ -2008,6 +2008,19 @@ El autor pidió las 20 propuestas de mejoras gráficas, sin empeorar apreciablem
 - **Coste:** unas pocas rotaciones más por jugador y fotograma, despreciable.
 - **Pruebas:** vadeando, la mano va más alta a lo largo del paso; en el barro, el tronco más adelante. 745 de 745.
 
+### Hito 17.7: gestos de reposo del shoggoth y la serpiente (05-11-2026)
+
+- **Shoggoth bebé** (`anim_blob`, `FIDGETS`):
+  - `fidget_split`: se parte en dos. El modelo tenía solo `body` y `top`, así que `gen_shoggoth.py` añade `bud`, una gota de 10×9 voxels con tres ojos escondida dentro del cuerpo. Sale por un lado mientras el cuerpo se estira y encoge, se separa 38 cm, mira alrededor dando botecitos, vuelve a meterse y el cuerpo tiembla al juntarse (el `hit` de siempre).
+  - `fidget_hop`: se aplasta, da un saltito y se aplasta al caer; el bulto de arriba se queda atrás.
+- **Serpiente de Yig** (`anim_serpiente`):
+  - La lengua es ahora una pieza aparte (`tongue`, cuelga de `head`, `gen_rastreros.py yig`). Va dentro de la cabeza salvo al morder y en los gestos (`_tongue`, desde su sitio de reposo). Las vistas quietas (tienda, bestiario) la siguen enseñando fuera.
+  - `fidget_coil`: se enrosca. Cada segmento es una cuerda de una espiral que gira hacia +X, cada vez más cerrada (`coil`). Alza la cabeza y saca la lengua tres veces.
+  - `fidget_tongue`: alza la cabeza, mira fijo y saca la lengua dos veces.
+  - El Mini-Dhole comparte script, pero no tiene `FIDGETS` propios: sigue igual.
+- Hoja de poses con `zoom=`, `cy=` y `gap=` para los compañeros (`model=shoggoth anim=fidget_split over=false zoom=1 cy=0.2 gap=0.7`).
+- **Pruebas:** cada uno tiene dos gestos que existen; la lengua sale en el gesto; enroscada, la cola se acerca; el brote sale y vuelve. 746 de 746.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

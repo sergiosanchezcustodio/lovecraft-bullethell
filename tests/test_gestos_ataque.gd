@@ -206,3 +206,30 @@ func test_vadear_y_barro_cambian_el_paso() -> void:
 	Anims.pose("johansen", "walk", m, 0.3)
 	Anims.script_for("johansen").call("terrain", m, 0.3, 0.0, 1.0)
 	assert_gt(Anims.part(m, "torso").rotation.x, torso + 0.1, "en el barro, echado adelante")
+
+## Gestos de reposo del shoggoth y la serpiente (hito 17.7): existen y se mueven; la lengua de
+## Yig va dentro de la cabeza salvo cuando la saca, y el brote del shoggoth sale y vuelve.
+func test_gestos_de_reposo_del_shoggoth_y_la_serpiente() -> void:
+	for n in ["shoggoth", "yig"]:
+		assert_eq(Anims.fidgets(n).size(), 2, n)
+		for f: String in Anims.fidgets(n): assert_true(Anims.has_anim(n, f), "%s: %s" % [n, f])
+	var y := VoxelBuilder.load_model("res://models/yig.json")
+	add_child_autofree(y)
+	var tongue: Node3D = (y.get_meta("part_nodes") as Dictionary)["tongue"]
+	Anims.pose("yig", "idle", y, 0.3)
+	var hidden := tongue.position.z
+	var out := -99.0
+	for i in 40:
+		Anims.pose("yig", "fidget_tongue", y, i / 40.0)
+		out = maxf(out, tongue.position.z)
+	assert_gt(out, hidden + 0.12, "la saca")
+	Anims.pose("yig", "fidget_coil", y, 0.5)
+	var s4 := Anims.part(y, "s4").position
+	Anims.pose("yig", "idle", y, 0.5)
+	assert_gt(s4.distance_to(Anims.part(y, "s4").position), 0.2, "enroscada, la cola se acerca")
+	var s := VoxelBuilder.load_model("res://models/shoggoth.json")
+	add_child_autofree(s)
+	Anims.pose("shoggoth", "fidget_split", s, 0.5)
+	assert_gt(Anims.part(s, "bud").position.x, 0.3, "el brote, fuera")
+	Anims.pose("shoggoth", "fidget_split", s, 1.0)
+	assert_almost_eq(Anims.part(s, "bud").position.x, 0.0, 0.01, "y otra vez dentro")

@@ -4,7 +4,8 @@ Una bolita negra llena de ojos: masa redondeada de protoplasma negro con brillo 
 violeta (como el fragmento, pero pequeña y achatada como una gota), un bulto arriba y una
 docena de ojos de distintos tamaños por todas partes, verdes, amarillos y alguno blanco, que
 brillan. Una boquita. Estilo 4, a 48 voxels por metro; mira hacia +Z.
-Partes: body, top (anim_blob.gd).
+Partes: body, top y bud (anim_blob.gd). `bud` es una gota pequeña escondida dentro del cuerpo:
+en el gesto de reposo (hito 17.7) sale por un lado, se separa como si se partiera en dos y vuelve.
 Uso: python tools/gen_shoggoth.py
 """
 import sys, os, math
@@ -19,6 +20,7 @@ M = new(5120)
 B, T = 'body', 'top'
 rslab(M, B, BLACK, 0, 11, 0, 0, 20, 18, r=7, rt=5, rb=2)
 rslab(M, T, BLACK, 9, 17, -1, -1, 13, 12, r=5, rt=4.5, rb=2)
+rslab(M, 'bud', BLACK, 1, 9, 0, 0, 10, 9, r=4, rt=3.5, rb=1.5)   # el brote, dentro del cuerpo (17.7)
 
 # brillo iridiscente: vetas verdes y violetas por ruido
 for (x, y, z), v in M.V.items():
@@ -58,10 +60,17 @@ for x, y, z, col in ((9, 6, 0, 0), (-10, 5, -2, 1), (3, 5, -8, 2), (-4, 8, -8, 0
                 if not zs: continue
                 zz = min(zs)
             M.put(xx, y + dy, zz, M.V[(xx, y + dy, zz)][0], EYE_COLS[col], 1)
+# ojos del brote, en su cara delantera (dentro del cuerpo no se ven)
+for x, y, k in ((-2, 5, 0), (2, 6, 1), (0, 3, 2)):
+    zs = [z for z in range(-15, 16) if M.V.get((x, y, z), [None])[0] == 'bud']
+    if zs:
+        z = max(zs)
+        M.put(x, y, z, 'bud', EYE_COLS[k], 1)
+        M.put(x - 1 if x <= 0 else x + 1, y, z, 'bud', EYE_COLS[k], 1)
 for x in (-1, 0):
     z = M.front(x, 2)
     if z is not None: M.put(x, 2, z, B, MOUTH)
 
-piv = {'body': [0, 0, 0], 'top': [-1, 10, -1]}
+piv = {'body': [0, 0, 0], 'top': [-1, 10, -1], 'bud': [0, 0, 0]}
 n = M.export('models/shoggoth.json', piv, jitter=0.0, pivots_in_voxels=True, roughness=0.3, specular=0.6)
 print('shoggoth', n, 'voxels')
