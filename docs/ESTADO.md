@@ -1977,6 +1977,13 @@ El autor pidió las 20 propuestas de mejoras gráficas, sin empeorar apreciablem
 - Coste: una búsqueda en la rejilla cada 0,12 s y un recorrido de la lista de enemigos buscando jefes, por jugador.
 - **Pruebas:** la cabeza se vuelve hacia un enemigo cercano y vuelve al frente cuando ya no está (`test_gestos_ataque.gd`). 742 de 742.
 
+### Hito 17.4: celebraciones (05-11-2026)
+
+- Tres gestos nuevos en `anim_humano`, encima de andar (brazos y torso): `cheer` (sube de nivel: alza el puño derecho y lo agita dos veces, el izquierdo cerrado al pecho; 0,9 s, desde `Game.level_fx`, así que también en los otros PC), `marvel` (evoluciona un arma: junta las manos delante como si sostuviera algo que brilla y lo alza; 1,1 s, desde `WeaponSystem.evolve`) y `open_chest` (abre un baúl arcano: se inclina, mete las manos bajo la tapa y tira hacia arriba; 0,9 s, desde `ArcaneChest.open`).
+- `Player.play_once(anim, keep)`: con `keep`, los gestos de atacar no lo cortan hasta el 85 % de su duración. Si un baúl evoluciona un arma, `marvel` sustituye a `open_chest`.
+- La subida abre su ventana con la partida parada: el puño se ve al cerrarla (el gesto avanza con el reloj del jugador).
+- **Pruebas:** un tajo no corta la celebración y, acabada, vuelve a atacar (`test_gestos_ataque.gd`). 744 de 744.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

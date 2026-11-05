@@ -741,6 +741,7 @@ func level_fx(q: Player) -> void:
 		wave.color = Color(0.6, 0.85, 1.0, 0.9)
 		world.fx.add_child(wave)
 	VoxelFx.puff(q, q.global_position, "rise", 0.6, Color.WHITE, 1.4)      # columna de luz (11-10-2026)
+	q.play_once("cheer", true)                                             # alza el puño (hito 17.4)
 	if not q.remote and not Pacts.has("no_heal"): q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
 	if q.data.team_heal_on_level > 0.0:                   # rasgo de West: cura a los compañeros cercanos
 		for o in players:

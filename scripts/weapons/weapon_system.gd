@@ -92,6 +92,7 @@ func evolve(w: Weapon, to := &"") -> void:
 	w.data = load(path)
 	w.level = 1
 	w.timer = 0.2
+	if player != null: player.play_once("marvel", true)   # lo alza, como si brillara (hito 17.4)
 
 ## Etiqueta de las estadísticas de un arma: "J1:webly".
 ## Han cambiado los rasgos de daño del jugador (objetos): las balas registran otro juego.

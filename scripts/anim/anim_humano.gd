@@ -7,14 +7,14 @@ extends RefCounted
 ## CharacterData.dodge_anim; la animación puede durar más que el impulso del esquive.
 const ARM_LAG := 0.32                         ## retraso de los brazos respecto a las piernas (rad del ciclo)
 const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive": 0.5,
-	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6, "brake": 0.5,
+	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6, "brake": 0.5, "cheer": 0.9, "marvel": 1.1, "open_chest": 0.9,
 	"fidget_look": 2.6, "fidget_stretch": 2.8, "fidget_check": 2.4, "fidget_shift": 1.8,
 	"down": 0.9, "down_wait": 3.0, "get_up": 0.75}
 ## Gestos de reposo (28-10-2026): Player los pone de vez en cuando si el personaje lleva un rato
 ## quieto. Empiezan y acaban en la pose de reposo, y se funden al entrar y al salir.
 const FIDGETS := ["fidget_look", "fidget_stretch", "fidget_check", "fidget_shift"]
 ## Gestos al atacar de los investigadores (hito 17.1): las hordas (HordeMesh) no los graban.
-const HORDE_SKIP := ["cast", "swing", "thrust", "slam", "brake"]
+const HORDE_SKIP := ["cast", "swing", "thrust", "slam", "brake", "cheer", "marvel", "open_chest"]
 
 ## Piezas opcionales: antebrazos y espinillas (codos y rodillas), bufanda y coleta. Los
 ## modelos partidos con tools/humano.py split_limbs las tienen; los demás, no, y las
@@ -340,6 +340,43 @@ static func slam(m: Node3D, t: float) -> void:
 	bend(m, "fore_l", -0.5 * up * (1.0 - down) * rest)
 	bend(m, "fore_r", -0.5 * up * (1.0 - down) * rest)
 	Anims.part(m, "torso").rotation.x = (-0.22 * up * (1.0 - down) + 0.38 * down) * rest
+
+# ---------------------------------------------------------------- celebraciones (hito 17.4)
+# Como los gestos al atacar (encima de andar, solo brazos y torso), pero sin que un disparo los
+# corte (Player.play_once con keep).
+
+## Sube de nivel: alza el puño derecho y lo agita dos veces; el izquierdo, cerrado al pecho.
+static func cheer(m: Node3D, t: float) -> void:
+	var up := Anims.ease(t / 0.25) * (1.0 - Anims.ease((t - 0.7) / 0.3))
+	var pump := sin(clampf((t - 0.25) / 0.45, 0.0, 1.0) * TAU * 2.0) * 0.16
+	Anims.part(m, "arm_r").rotation = Vector3((-2.85 + pump) * up, 0.0, 0.15 * up)
+	bend(m, "fore_r", -0.35 * up)
+	Anims.part(m, "arm_l").rotation.x = -0.45 * up
+	bend(m, "fore_l", -1.0 * up)
+	Anims.part(m, "torso").rotation.x = -0.12 * up                           # saca pecho
+
+## Evoluciona un arma: junta las manos delante como si sostuviera algo que brilla, lo mira y lo
+## alza por encima de la cabeza.
+static func marvel(m: Node3D, t: float) -> void:
+	var a := Anims.ease(t / 0.3)
+	var r := Anims.ease((t - 0.4) / 0.3)
+	var out := 1.0 - Anims.ease((t - 0.8) / 0.2)
+	var x := lerpf(-1.0 * a, -2.3, r) * out
+	Anims.part(m, "arm_l").rotation = Vector3(x, 0.32 * out, 0.0)
+	Anims.part(m, "arm_r").rotation = Vector3(x, -0.32 * out, 0.0)
+	bend(m, "fore_l", (-0.9 * a * (1.0 - r) - 0.3) * out)
+	bend(m, "fore_r", (-0.9 * a * (1.0 - r) - 0.3) * out)
+	Anims.part(m, "torso").rotation.x = (0.14 * a * (1.0 - r) - 0.14 * r) * out
+
+## Abre un baúl: se inclina, mete las manos bajo la tapa y la levanta de un tirón.
+static func open_chest(m: Node3D, t: float) -> void:
+	var d := Anims.ease(t / 0.3) * (1.0 - Anims.ease((t - 0.35) / 0.25))
+	var l := Anims.ease((t - 0.35) / 0.2) * (1.0 - Anims.ease((t - 0.65) / 0.35))
+	Anims.part(m, "torso").rotation.x = 0.45 * d - 0.1 * l
+	Anims.part(m, "arm_l").rotation = Vector3(-0.75 * d - 1.9 * l, 0.0, -0.18 * l)
+	Anims.part(m, "arm_r").rotation = Vector3(-0.75 * d - 1.9 * l, 0.0, 0.18 * l)
+	bend(m, "fore_l", -0.25 * (d + l))
+	bend(m, "fore_r", -0.25 * (d + l))
 
 ## Frenada (hito 17.2): al pararse en seco tras correr, planta el pie izquierdo delante con la
 ## pierna estirada, dobla la derecha, echa el cuerpo atrás y abre los brazos para no irse de

@@ -151,3 +151,20 @@ func test_mira_al_enemigo_cercano() -> void:
 	await get_tree().process_frame
 	for i in 90: p._process(1.0 / 60.0)
 	assert_lt(absf(head.rotation.y), 0.2, "y vuelve al frente")
+
+## Celebraciones (hito 17.4): subir de nivel, evolucionar y abrir un baúl tienen su gesto, y un
+## disparo no lo corta.
+func test_una_celebracion_no_la_corta_un_ataque() -> void:
+	var world := CombatWorld.new()
+	add_child_autofree(world)
+	var p := Player.new().setup(load("res://data/characters/dyer.tres"), PlayerInput.new(), Color.YELLOW)
+	p.world = world
+	world.add_child(p)
+	for g in ["cheer", "marvel", "open_chest"]: assert_true(Anims.has_anim("dyer", g), g)
+	p.play_once("cheer", true)
+	p._process(0.1)
+	p.gesture("swing", Vector3(1, 0, 0))
+	assert_eq(p._override, "cheer", "el tajo espera")
+	for i in 60: p._process(1.0 / 60.0)
+	p.gesture("swing", Vector3(1, 0, 0))
+	assert_eq(p._override, "swing", "acabada la celebración, vuelve a atacar")

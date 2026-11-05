@@ -749,6 +749,8 @@ func _danger() -> Node3D:
 			best = e
 	return best if best != null else world.nearest_enemy(global_position, LOOK_NEAR)
 
+var _override_keep := false
+
 # ---------------------------------------------------------------- frenada (hito 17.2)
 ## Tras correr un rato (BRAKE_RUN s a más del 75 % de su velocidad), pararse en seco planta los
 ## pies (anim "brake", piernas incluidas) y levanta un poco de nieve, barro o agua; darse la vuelta
@@ -1476,8 +1478,11 @@ func rerolls_left() -> int:
 	return maxi(int(data.rerolls) - rerolls_used, 0)
 
 ## Reproduce una animación puntual (p. ej. "throw") por encima de andar o estar quieto.
-func play_once(anim: String) -> void:
+## `keep` (celebraciones, hito 17.4): mientras dure, los gestos sin keep (los de atacar) no lo cortan.
+func play_once(anim: String, keep := false) -> void:
+	if _override_keep and _override != "" and _override_t < 0.85 and not keep: return
 	if Anims.has_anim(data.model, anim):
+		_override_keep = keep
 		if _override != "" and _action == "":       # otro gesto a medias: se funde desde donde iba
 			_blend_snap = Anims.snapshot(model)     # (si no, saltaba a la pose de andar; hito 17.1)
 			_blend_t = 0.0
