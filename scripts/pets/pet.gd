@@ -44,9 +44,21 @@ var _bristle_k := 0.0
 const BOSS_NEAR := 11.0
 const BUDDY_NEAR := 4.5                     ## m a los que va a olfatear a otro compañero (con su jugador quieto)
 const PERCH_AFTER := 2.0                     ## s quieto su jugador hasta que el cuervo se posa
-const CHEER_TIME := 1.0
-const MOOD_POSE := {&"hide": "cower", &"mourn": "whine", &"hiss": "hiss", &"perch": "perch"}
-var mood := &""                              ## hide, mourn, sniff, hiss, perch o nada
+const CHEER_TIME := 1.4
+const MOOD_POSE := {&"hide": "cower", &"mourn": "whine", &"hiss": "hiss", &"perch": "perch",
+	&"afraid": "cower", &"sleep": "sleep"}
+## Hito 17.8: con su jugador a menos de AFRAID_SANITY de cordura, se encoge y tiembla pegado a él;
+## si lleva SLEEP_AFTER s quieto sin enemigos a SLEEP_CLEAR m, se duerme a sus pies; al subir de
+## nivel le da una vuelta corriendo (CIRCLE_R m) además de celebrarlo.
+const AFRAID_SANITY := 0.3
+const SLEEP_AFTER := 20.0
+const SLEEP_CLEAR := 9.0
+const CIRCLE_R := 1.1
+var mood := &""                              ## hide, mourn, sniff, hiss, perch, afraid, sleep o nada
+var _circle_a := 0.0                         ## ángulo alrededor de su jugador al dar la vuelta
+var _clear_t := 0.0
+var _clear := true                           ## sin enemigos cerca (para dormirse)
+var _zzz: Label3D
 var _shown := &""                            ## la reacción que se ve (funde al cambiar)
 var _mood_k := 0.0
 var _cheer_t := -1.0
@@ -87,7 +99,19 @@ func _ready() -> void:
 	behavior.start()
 	owner_player.progress.leveled_up.connect(func(_l: int) -> void:
 		behavior.leveled()
+		var off := global_position - owner_player.global_position
+		_circle_a = atan2(off.x, off.z)
 		_cheer_t = 0.0)
+	_zzz = Label3D.new()                         # dormido (17.8): una «z» que sube; creada aquí, no en mitad del nivel
+	_zzz.text = "z"
+	_zzz.font_size = 48
+	_zzz.pixel_size = 0.004
+	_zzz.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_zzz.modulate = Color(0.85, 0.9, 1.0, 0.0)
+	_zzz.outline_size = 8
+	_zzz.no_depth_test = false
+	_zzz.visible = false
+	_visual.add_child(_zzz)
 	add_to_group("pets")
 	reset_physics_interpolation.call_deferred()
 
@@ -186,7 +210,11 @@ func _physics_process(delta: float) -> void:
 	if world != null and world.obstacles != null and data.fly_height <= 0.0:   # los que vuelan pasan por encima
 		var p2 := world.obstacles.push_out(Vector2(position.x, position.z), 0.3)
 		position.x = p2.x; position.z = p2.y
-	if (mood == &"sniff" or mood == &"hiss") and is_instance_valid(_buddy) and _velocity.length() < 0.4:
+	if mood == &"mourn" and _velocity.length() < 0.4:   # 17.8: lo mira, pegado a él
+		var o := owner_player.global_position - global_position
+		o.y = 0.0
+		if o.length() > 0.01: facing = facing.slerp(o.normalized(), 1.0 - exp(-6.0 * delta)).normalized()
+	elif (mood == &"sniff" or mood == &"hiss") and is_instance_valid(_buddy) and _velocity.length() < 0.4:
 		var b := _buddy.global_position - global_position
 		b.y = 0.0
 		if b.length() > 0.01: facing = facing.slerp(b.normalized(), 1.0 - exp(-8.0 * delta)).normalized()
@@ -205,11 +233,15 @@ func _react(delta: float) -> void:
 	if _boss_t <= 0.0:
 		_boss_t = 0.25
 		_boss = _boss_near(owner_player.global_position)
+	_clear_t -= delta
+	if _clear_t <= 0.0:
+		_clear_t = 0.5
+		_clear = world == null or world.nearest_enemy(owner_player.global_position, SLEEP_CLEAR) == null
 	if target != null or rush or hidden: return
 	var home := owner_player.global_position
 	if owner_player.health <= 0.0:
-		mood = &"mourn"
-		goal = home + facing_of_owner().cross(Vector3.UP) * 0.7
+		mood = &"mourn"                              # pegado a él (17.8: más cerca que antes)
+		goal = home + facing_of_owner().cross(Vector3.UP) * 0.45
 		return
 	if is_instance_valid(_boss):
 		mood = &"hide"
@@ -218,9 +250,23 @@ func _react(delta: float) -> void:
 		goal = home + away.normalized() * 0.9
 		speed = maxf(speed, owner_player.data.move_speed * 1.6)
 		return
+	if _cheer_t >= 0.0:                          # al subir de nivel, una vuelta alrededor (17.8)
+		_circle_a += TAU / CHEER_TIME * delta
+		var lead := _circle_a + 0.9                  # un poco por delante: lo persigue
+		goal = home + Vector3(sin(lead), 0.0, cos(lead)) * CIRCLE_R
+		speed = maxf(speed, TAU * CIRCLE_R / CHEER_TIME * 1.3)
+		return
 	if data.model == "cuervo" and _owner_still > PERCH_AFTER:
 		mood = &"perch"
 		goal = home
+		return
+	if owner_player.sanity < owner_player.data.max_sanity * AFRAID_SANITY:   # 17.8: se encoge, pegado a él
+		mood = &"afraid"
+		goal = home - facing_of_owner() * 0.55 + facing_of_owner().cross(Vector3.UP) * 0.35 * signf(data.follow_gap)
+		return
+	if _owner_still > SLEEP_AFTER and _clear and mood == &"":   # 17.8: se duerme a sus pies
+		mood = &"sleep"
+		goal = global_position if global_position.distance_to(home) < 1.6 else goal
 		return
 	_buddy = _buddy_near() if _owner_still > 1.0 else null
 	if _buddy != null:                           # se acerca a olfatearlo (o a bufarle, a distancia)
@@ -256,10 +302,17 @@ func _react_pose(delta: float) -> float:
 	var fly_k := 1.0
 	if _shown != &"" and k > 0.0 and MOOD_POSE.has(_shown):
 		var fn: String = MOOD_POSE[_shown]
-		if s != null and s.has_method(fn): s.call(fn, _model, k, t)
-		elif _shown == &"hide" or _shown == &"mourn": _model.scale.y *= 1.0 - 0.18 * k
+		var pk := k * (0.75 if _shown == &"afraid" else 1.0)
+		if s != null and s.has_method(fn): s.call(fn, _model, pk, t)
+		elif _shown == &"sleep": _sleep_pose(pk, t)
+		elif _shown == &"hide" or _shown == &"mourn" or _shown == &"afraid": _model.scale.y *= 1.0 - 0.18 * pk
 		if _shown == &"hide": fly_k = 1.0 - 0.55 * k             # los que vuelan, bajos y pegados a él
-		elif _shown == &"mourn": fly_k = 1.0 - k                  # en el suelo, a su lado
+		elif _shown == &"mourn" or _shown == &"sleep": fly_k = 1.0 - k   # en el suelo, a su lado
+		elif _shown == &"afraid":
+			fly_k = 1.0 - 0.45 * k
+			_model.scale *= 1.0 - 0.1 * k                         # más pequeño
+			_model.position.x += sin(t * 47.0) * 0.008 * k        # y tiembla
+	_zzz_step(_shown == &"sleep" and k > 0.5, t)
 	if _cheer_t >= 0.0:
 		_cheer_t += delta
 		var c := clampf(_cheer_t / CHEER_TIME, 0.0, 1.0)
@@ -268,6 +321,21 @@ func _react_pose(delta: float) -> float:
 		else: _model.position.y += 0.15 * absf(sin(c * TAU)) * ck
 		if _cheer_t >= CHEER_TIME: _cheer_t = -1.0
 	return fly_k
+
+## Dormido, si su familia no tiene pose propia: tumbado y respirando despacio.
+func _sleep_pose(k: float, t: float) -> void:
+	var b := sin(t * 1.6)
+	_model.scale *= Vector3(1.0 + (0.08 + 0.02 * b) * k, 1.0 - (0.22 - 0.03 * b) * k, 1.0 + 0.05 * k)
+
+## La «z» del que duerme: sube desde la cabeza y se desvanece, una cada 1,6 s.
+func _zzz_step(on: bool, t: float) -> void:
+	if _zzz == null: return
+	_zzz.visible = on
+	if not on: return
+	var u := fmod(t / 1.6, 1.0)
+	_zzz.position = Vector3(0.12 + 0.1 * u, 0.62 + 0.35 * u, 0.0)   # por encima del lomo de los más grandes
+	_zzz.modulate.a = sin(u * PI) * 0.9
+	_zzz.font_size = int(36 + 24 * u)
 
 ## Gestos de reposo: tras unos segundos quieto, olfatea, se lame una pata, se acicala…
 ## (Anims.fidgets), sin repetir el anterior. Moverse o atacar lo corta.
@@ -313,7 +381,9 @@ func _process(delta: float) -> void:
 		if _act_t >= Anims.duration(data.model, "bite"): _act_t = -1.0
 	elif v > owner_player.data.move_speed * 1.2: anim = "run"
 	elif v > 0.3: anim = "walk"
-	anim = _fidget_step(anim, delta)
+	var calm := mood != &"sleep" and mood != &"afraid"      # dormido o con miedo, sin gestos de reposo
+	anim = _fidget_step(anim if calm or anim != "idle" else "_still", delta)
+	if anim == "_still": anim = "idle"
 	if mood == &"sniff" and anim == "idle" and Anims.has_anim(data.model, "fidget_sniff"): anim = "fidget_sniff"
 	if anim != _anim:
 		_blend_snap = Anims.snapshot(_model)               # funde desde la pose de ahora

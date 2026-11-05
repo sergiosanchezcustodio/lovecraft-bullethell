@@ -527,7 +527,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | Hito | Contenido | Estado |
 |---|---|---|
 | 17.7 | **Gestos de reposo** del shoggoth bebé (se parte en dos y se junta) y de la serpiente (se enrosca y saca la lengua), los únicos que no tienen | **Hecho (05-11-2026), pendiente de tu revisión:** el shoggoth suelta un brote que se separa y vuelve, o da un saltito; la serpiente se enrosca o alza la cabeza, y saca la lengua (ahora pieza aparte) |
-| 17.8 | **Reaccionan a lo que le pasa a su dueño:** lo rodean al subir de nivel, se quedan pegados cuando cae abatido, se encogen con la cordura baja y se duermen si lleva mucho rato quieto | Pendiente |
+| 17.8 | **Reaccionan a lo que le pasa a su dueño:** lo rodean al subir de nivel, se quedan pegados cuando cae abatido, se encogen con la cordura baja y se duermen si lleva mucho rato quieto | **Hecho (05-11-2026), pendiente de tu revisión:** vuelta alrededor al subir de nivel, pegados y mirándolo si cae, encogidos y temblando con poca cordura, y dormidos (con una «z») si lleva 20 s quieto sin enemigos cerca |
 
 ### Bloque C: enemigos
 

@@ -28,6 +28,12 @@ static func fidget_split(m: Node3D, t: float) -> void:
 	var join := clampf((t - 0.9) / 0.1, 0.0, 1.0)                                  # al juntarse, tiembla
 	if join > 0.0: hit(m, join)
 
+## Dormido (hito 17.8): aplastado como un charco, el bulto caído y latiendo despacio.
+static func sleep(m: Node3D, k: float, t: float) -> void:
+	var b := sin(t * 1.4)
+	m.scale = m.scale.lerp(Vector3(1.18 + 0.02 * b, 0.72 + 0.03 * b, 1.18 + 0.02 * b), k)
+	_p(m, "top").rotation = _p(m, "top").rotation.lerp(Vector3(0.0, 0.0, 0.35), k)
+
 ## Saltito: se aplasta, salta, cae y se aplasta otra vez; el bulto de arriba se queda atrás.
 static func fidget_hop(m: Node3D, t: float) -> void:
 	var crouch := sin(clampf(t / 0.25, 0.0, 1.0) * PI)

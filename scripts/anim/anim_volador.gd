@@ -73,6 +73,15 @@ static func whine(m: Node3D, k: float, t: float) -> void:
 	perch(m, k, t)
 	_p(m, "head").rotation.x += (0.35 + sin(t * 31.0) * 0.04) * k
 
+## Dormido en el suelo (hito 17.8): posado, la cabeza metida entre las alas y respirando.
+static func sleep(m: Node3D, k: float, t: float) -> void:
+	_p(m, "wing_l").rotation.z = lerpf(_p(m, "wing_l").rotation.z, -0.08, k)
+	_p(m, "wing_r").rotation.z = lerpf(_p(m, "wing_r").rotation.z, 0.08, k)
+	m.position.y *= 1.0 - k
+	m.rotation.x *= 1.0 - k
+	_p(m, "head").rotation = _p(m, "head").rotation.lerp(Vector3(0.55, 0.9, 0.0), k)
+	m.scale *= 1.0 + 0.03 * sin(t * 1.6) * k
+
 ## Posado (en el hombro de su jugador o en el suelo): las alas plegadas, mirando alrededor a tirones.
 static func perch(m: Node3D, k: float, t: float) -> void:
 	_p(m, "wing_l").rotation.z = lerpf(_p(m, "wing_l").rotation.z, -0.08, k)

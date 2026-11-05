@@ -122,6 +122,12 @@ static func whine(m: Node3D, k: float, t: float) -> void:
 	_p(m, "head").rotation.x += (0.3 + sin(t * 31.0) * 0.03) * k
 	_p(m, "tail").rotation.z *= 1.0 - k
 
+## Dormido (hito 17.8): tumbado como al gemir, pero quieto, el morro en el suelo y respirando.
+static func sleep(m: Node3D, k: float, t: float) -> void:
+	whine(m, k, 0.0)
+	_p(m, "head").rotation.x += 0.15 * k
+	m.scale *= 1.0 + 0.03 * sin(t * 1.6) * k
+
 ## Bufa (el gato al perro): arqueado, la cabeza adelante y el rabo tieso hacia arriba.
 static func hiss(m: Node3D, k: float, t: float) -> void:
 	_p(m, "body").position.y += 0.03 * k

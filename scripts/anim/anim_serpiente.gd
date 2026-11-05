@@ -51,6 +51,12 @@ static func coil(m: Node3D, k: float) -> void:
 		p += dir * SEG_LEN
 		dir = dir.rotated(Vector3.UP, -deg_to_rad(62.0 + 16.0 * i))   # cada vez más cerrado
 
+## Dormida (hito 17.8): enroscada, la cabeza apoyada encima.
+static func sleep(m: Node3D, k: float, t: float) -> void:
+	coil(m, k)
+	_p(m, "head").rotation.x = 0.12 * k
+	_p(m, "head").position.y += (0.02 + 0.004 * sin(t * 1.6)) * k
+
 ## Alza la cabeza, mira fijo y saca la lengua dos veces.
 static func fidget_tongue(m: Node3D, t: float) -> void:
 	idle(m, fmod(t, 1.0))

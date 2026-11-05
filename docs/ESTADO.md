@@ -2021,6 +2021,23 @@ El autor pidió las 20 propuestas de mejoras gráficas, sin empeorar apreciablem
 - Hoja de poses con `zoom=`, `cy=` y `gap=` para los compañeros (`model=shoggoth anim=fidget_split over=false zoom=1 cy=0.2 gap=0.7`).
 - **Pruebas:** cada uno tiene dos gestos que existen; la lengua sale en el gesto; enroscada, la cola se acerca; el brote sale y vuelve. 746 de 746.
 
+### Hito 17.8: los compañeros reaccionan a lo que le pasa a su dueño (05-11-2026)
+
+Sobre las reacciones del 12.9 (esconderse de un jefe, celebrar la subida, gemir junto al caído, olfatearse, posarse), en `Pet._react` y `_react_pose`:
+- **Subida de nivel:** además de celebrarlo, le da una vuelta corriendo alrededor (radio 1,1 m, en `CHEER_TIME`, ahora 1,4 s). Persigue un punto un poco por delante en el círculo.
+- **Abatido:** se pega más (0,45 m en vez de 0,7) y se vuelve a mirarlo.
+- **Cordura baja** (menos del 30 %, `AFRAID_SANITY`): mood `afraid`. Va detrás de él, pegado, con la pose de esconderse al 75 %, un 10 % más pequeño y temblando. Los que vuelan bajan.
+- **Dormido:** con su jugador quieto 20 s (`SLEEP_AFTER`) y sin enemigos a 9 m (se mira cada 0,5 s), se tumba donde está y sube una «z» (`Label3D` creado al empezar, una cada 1,6 s).
+  - Cuadrúpedos: tumbados, el morro en el suelo.
+  - Voladores: en el suelo, la cabeza metida entre las alas.
+  - Serpientes: enroscadas.
+  - Shoggoth: aplastado como un charco.
+  - Los demás (sapo, pez): aplastados y respirando.
+  - Moverse lo despierta. Ni con miedo ni dormido hace gestos de reposo.
+- En una partida normal casi siempre hay enemigos a menos de 9 m, así que se duerme sobre todo al acabar el nivel o en la sala de práctica.
+- Captura: `godot --path . --fixed-fps 30 -- nolevel=true bot=idle dodge_every=9999 pet=perro shots=24` (el bot `idle` esquiva cada 2,5 s si no se le quita).
+- **Pruebas:** da casi una vuelta al subir de nivel; con la cordura baja, `afraid`; quieto 20 s, `sleep`, y un enemigo a 4 m lo despierta; se pega al caído; cada familia tiene `sleep`. 750 de 750.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

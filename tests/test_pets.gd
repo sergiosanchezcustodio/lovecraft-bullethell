@@ -225,3 +225,51 @@ func _parts_used(script: Script) -> Array:
 	for mt in re.search_all(script.source_code): if not out.has(mt.get_string(1)): out.append(mt.get_string(1))
 	if script.source_code.contains("SEGS"): out.append_array(["s1", "s2", "s3", "s4"])
 	return out
+
+## Hito 17.8: reaccionan a lo que le pasa a su jugador.
+func test_da_una_vuelta_al_subir_de_nivel() -> void:
+	var p := _player()
+	var pet := _pet("perro", p)
+	_run(pet, 1.5)
+	var off0 := pet.global_position - p.global_position
+	p.progress.leveled_up.emit(2)
+	var turned := 0.0
+	var prev := atan2(off0.x, off0.z)
+	for i in int(1.4 / DT):
+		world.rebuild_grid()
+		pet._physics_process(DT)
+		pet._cheer_t += DT                          # lo avanza _process (sin dibujo en la prueba)
+		var off := pet.global_position - p.global_position
+		var a := atan2(off.x, off.z)
+		turned += wrapf(a - prev, -PI, PI)
+		prev = a
+	assert_gt(absf(turned), PI * 1.2, "da (casi) una vuelta: %.1f rad" % turned)
+
+func test_se_encoge_con_la_cordura_baja_y_se_duerme_si_no_se_mueve() -> void:
+	var p := _player()
+	var pet := _pet("gato", p)
+	_run(pet, 1.0)
+	assert_eq(pet.mood, &"")
+	p.sanity = p.data.max_sanity * 0.1
+	_run(pet, 0.5)
+	assert_eq(pet.mood, &"afraid", "con la cordura baja")
+	p.sanity = p.data.max_sanity
+	_run(pet, Pet.SLEEP_AFTER + 1.0)
+	assert_eq(pet.mood, &"sleep", "su jugador lleva rato quieto")
+	var e := _dummy(p.global_position + Vector3(4, 0, 0))
+	world.add_enemy(e)
+	_run(pet, 0.7)
+	assert_ne(pet.mood, &"sleep", "con un enemigo cerca, despierto")
+
+func test_se_pega_a_su_jugador_caido() -> void:
+	var p := _player()
+	var pet := _pet("perro", p)
+	_run(pet, 1.0)
+	p.health = 0.0
+	_run(pet, 2.0)
+	assert_eq(pet.mood, &"mourn")
+	assert_lt(pet.global_position.distance_to(p.global_position), 0.8)
+
+func test_cada_familia_duerme() -> void:
+	for n in ["perro", "cuervo", "yig", "shoggoth"]:
+		assert_true(Anims.script_for(n).has_method("sleep"), n)
