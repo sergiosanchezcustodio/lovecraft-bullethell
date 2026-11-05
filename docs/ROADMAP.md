@@ -553,5 +553,5 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | Hito | Contenido | Estado |
 |---|---|---|
 | 17.18 | **Sucesos lejanos,** uno por arena: un tentáculo que asoma en el horizonte del arrecife, una silueta inmensa iluminada por un relámpago en la tormenta, las estatuas del estudio que giran la cabeza cuando no las miras… | **Hecho (05-11-2026), pendiente de tu revisión:** un suceso en cada arena (`DistantEvents`): tentáculos, Dagón, Cthulhu con el relámpago, antiguos alados y el byakhee que cruzan, procesiones y señales de faroles, y las esculturas del estudio que se giran cuando no las miras |
-| 17.19 | **Luz de los disparos y las explosiones** sobre paredes y suelo, en Alta y Ultra | Pendiente |
+| 17.19 | **Luz de los disparos y las explosiones** sobre paredes y suelo, en Alta y Ultra | **Hecho (05-11-2026), pendiente de tu revisión:** las explosiones ya la tenían; ahora cada disparo de balas da un fogonazo que alumbra el suelo y las paredes, en Alta y Ultra |
 | 17.20 | **Rastros que se quedan:** icor, ceniza y quemaduras en el suelo el resto del nivel, con tope | Pendiente |

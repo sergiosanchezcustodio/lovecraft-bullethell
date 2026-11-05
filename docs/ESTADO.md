@@ -2186,6 +2186,16 @@ Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, mat
 
   761 de 761.
 
+### Hito 17.19: luz de los disparos y las explosiones (05-11-2026)
+
+- Las explosiones ya tenían su luz (`Explosion`, con tope `lights` por calidad), y también las llamas, las zonas de fuego, las bolas de fuego, las bengalas y los rayos.
+- Faltaba el fogonazo de los disparos de balas. `MuzzleLight` (`scripts/fx/muzzle_light.gd`):
+  - una luz cálida y corta delante de cada investigador que se enciende con cada disparo y se apaga en unos 0,07 s;
+  - con las ráfagas no llega a apagarse del todo, y tiembla;
+  - alumbra el suelo, las paredes y las criaturas de al lado, pero no al que dispara, que salía lavado.
+- Una por jugador y sin sombras. Solo en Alta y Ultra (`shot_light` en `data/quality.json`).
+- **Pruebas:** en Media no y en Alta sí; las balas la encienden y se apaga sola; lo que se lanza no da fogonazo. 762 de 762.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

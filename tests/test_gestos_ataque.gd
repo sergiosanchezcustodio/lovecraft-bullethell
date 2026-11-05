@@ -514,3 +514,26 @@ func test_sucesos_lejanos() -> void:
 class GameStub extends Node:
 	var players: Array = []
 	var weather = null
+
+## Fogonazo de los disparos (hito 17.19): las balas encienden un instante la luz del jugador y se
+## apaga sola; las armas que no son de balas, no; en Baja y Media no hay luz.
+func test_fogonazo_de_los_disparos() -> void:
+	var p: Array = Quality.presets()
+	assert_false(bool(p[1].shot_light), "en Media no")
+	assert_true(bool(p[2].shot_light), "en Alta sí")
+	var holder := Node3D.new()
+	add_child_autofree(holder)
+	var ws := WeaponSystem.new()
+	holder.add_child(ws)
+	var l := MuzzleLight.attach(holder, ws, true)
+	assert_not_null(l)
+	var w := WeaponSystem.Weapon.new(load("res://data/weapons/webly.tres"))
+	ws.fired.emit(w)
+	l._process(1.0 / 60.0)
+	assert_true(l.visible)
+	assert_gt(l.light_energy, 1.0, "se enciende")
+	for i in 20: l._process(1.0 / 60.0)
+	assert_false(l.visible, "y se apaga sola en un tercio de segundo")
+	var t := WeaponSystem.Weapon.new(load("res://data/weapons/bengalas.tres"))
+	ws.fired.emit(t)
+	assert_false(l.visible, "lo que se lanza no da fogonazo")

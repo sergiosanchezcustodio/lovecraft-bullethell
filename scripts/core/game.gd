@@ -727,6 +727,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	q.madness = bool(Settings.get_value("madness"))
 	q.weapons = WeaponSystem.new().setup(q, world)
 	q.add_child(q.weapons)
+	MuzzleLight.attach(q, q.weapons)                # fogonazo de los disparos, en Alta y Ultra (17.19)
 	for wid in q.data.starting_weapons: q.weapons.add_weapon(load("res://data/weapons/%s.tres" % wid))
 	q.progress.sign_save = Saves.current            # Signos Mayores abiertos (16.9): los de este PC
 	return q
