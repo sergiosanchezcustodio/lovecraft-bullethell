@@ -274,6 +274,18 @@ static func window(parent: Node, accent: Color = INK, min_width: float = 0.0) ->
 	appear(panel)
 	return [root, box]
 
+## Hueco para la barra de desplazamiento de `scroll`, a la derecha de su contenido (`margin`), solo
+## mientras la barra se ve, y entonces otro igual (el hueco más la barra) a la izquierda: las filas
+## quedan centradas en la ventana, con barra o sin ella (05-11-2026; antes se dejaba siempre a la
+## derecha y las filas acababan 14 px antes, o 22 con la barra).
+static func scroll_gutter(scroll: ScrollContainer, margin: MarginContainer, gap := 14) -> void:
+	var bar := scroll.get_v_scroll_bar()
+	var fit := func() -> void:
+		margin.add_theme_constant_override("margin_right", gap if bar.visible else 0)
+		margin.add_theme_constant_override("margin_left", gap + int(bar.get_combined_minimum_size().x) if bar.visible else 0)
+	bar.visibility_changed.connect(fit)
+	fit.call()
+
 ## Viste un panel de madera y latón (gothic_panel.gdshader) con las esquinas de filigrana: lo
 ## que ya tenga dentro pasa a un margen; debajo, la madera y, encima, las esquinas. Sirve para un
 ## PanelContainer (ventanas, selector de mejoras, depuración) o un Panel suelto (la ficha).

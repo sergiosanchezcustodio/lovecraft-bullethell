@@ -4,10 +4,17 @@ extends Node
 ## (StyleBoxFlat con borde), y los apunta en la salida con «UICHK». Mira la pantalla cada
 ## segundo, así que sirve con cualquier menú que se abra solo (open=, sheet_at=, debug_menu=…).
 ## Lo añade MenuRepeat al arrancar; no hace nada sin la opción.
+## Desde el 05-11-2026 mira también el contenido descentrado en su ventana: lo que se ve dentro
+## del marco (textos, botones, imágenes, recuadros y lo que se dibuja a mano) deja a un lado
+## bastante más hueco que al otro, o una fila ancha no deja el mismo hueco a cada lado.
 
 const BAND := 20.0              ## px del borde de una ventana que ocupan el filete ancho, el fino (15-17) y un respiro
 const BOX_GAP := 3.0            ## px de respiro dentro del borde de un recuadro
 const CORNER_ALPHA := 0.3       ## opacidad de la filigrana a partir de la cual se ve pisada
+const OFF_X := 22.0             ## px de diferencia entre el hueco izquierdo y el derecho del contenido
+const OFF_Y := 40.0             ## y entre el de arriba y el de abajo (los títulos y botones lo igualan casi siempre)
+const EDGE := 6.0               ## px de diferencia entre los huecos de una fila ancha a cada lado del marco
+const WIDE := 0.6               ## parte del ancho de la ventana a partir de la cual una fila es «ancha»
 
 var _seen := {}
 var _t := 0.0
@@ -30,6 +37,8 @@ func scan() -> Array:
 	var frames: Array = []
 	_collect(get_tree().root, labels, frames)
 	var out: Array = []
+	for f: Array in frames:
+		if f[1] == "marco": out.append(_centering(f[0]))
 	for l: Control in labels:
 		var box := _text_box(l)
 		if box.size.x <= 1.0 or box.size.y <= 1.0: continue
@@ -42,6 +51,7 @@ func scan() -> Array:
 		for f: Array in frames:
 			var fr: Control = f[0]
 			if fr == l or not (group == null or group.is_ancestor_of(fr)): continue
+			if _layer(fr) != _layer(l): continue                     # el marcador, detrás de una ventana
 			if l.is_ancestor_of(fr) or fr.is_ancestor_of(l) == false and not _same_branch(fr, l, group): continue
 			if _z(fr) != _z(l) and not fr.is_ancestor_of(l): continue   # a otra altura (burbujas de ayuda): uno tapa al otro
 			var r := fr.get_global_rect()
@@ -239,3 +249,93 @@ func _on_corner(fr: Control, box: Rect2) -> bool:
 				x += step
 			y += step
 	return false
+
+## Contenido de una ventana vestida: si deja mucho más hueco a un lado que al otro, lo apunta.
+func _centering(fr: Control) -> String:
+	if fr.get_child_count() < 2: return ""
+	var g: Array = fr.get_meta("gothic", [])
+	var skip: Array = [fr.get_child(0)]                  # la madera
+	if g.size() >= 2: skip.append(g[1])                   # las esquinas
+	var area := Rect2()
+	for k in fr.get_children():
+		if k in skip or not k is Control: continue
+		area = _content_of(k as Control, area)
+	if area.size.x <= 1.0: return ""
+	var r := fr.get_global_rect()
+	var s := maxf(fr.get_global_transform().get_scale().x, 0.01)
+	var lft := (area.position.x - r.position.x) / s
+	var rgt := (r.end.x - area.end.x) / s
+	var top := (area.position.y - r.position.y) / s
+	var bot := (r.end.y - area.end.y) / s
+	var what := ""
+	if absf(lft - rgt) > OFF_X: what = "descentrado a lo ancho (hueco: izq. %.0f, der. %.0f px)" % [lft, rgt]
+	elif absf(top - bot) > OFF_Y: what = "descentrado a lo alto (hueco: arriba %.0f, abajo %.0f px)" % [top, bot]
+	if what == "": what = _wide_rows(fr, skip, r, s)
+	if what == "": return ""
+	var key := "centro|%s|%s" % [fr.get_path(), what.get_slice(" (", 0)]
+	if _seen.has(key): return ""
+	_seen[key] = true
+	var line := "UICHK %s %s" % [_short(fr), what]
+	print(line)
+	return line
+
+## Lo que se ve dentro de `c` (textos, botones, imágenes, recuadros), unido a `acc`.
+func _content_of(c: Control, acc: Rect2) -> Rect2:
+	if not c.visible or _alpha(c) < 0.3: return acc
+	var add := Rect2()
+	if (c is Label or c is Button) and _text_of(c) != "": add = _text_box(c)
+	if c is Button and not (c as Button).flat: add = c.get_global_rect()
+	elif c is TextureRect and (c as TextureRect).texture != null: add = c.get_global_rect()
+	elif (c is Panel or c is PanelContainer) and _visible_box(c.get_theme_stylebox("panel")): add = c.get_global_rect()
+	elif c is ScrollContainer or c is ItemList or c is TextEdit or c is LineEdit or c is Range: add = c.get_global_rect()
+	elif not c.get_signal_connection_list(&"draw").is_empty() or (c.get_script() != null and c.has_method("_draw")):
+		add = c.get_global_rect()                       # lo que se dibuja a mano (la gráfica del informe)
+	if add.size.x > 0.0:
+		var clip := _clip_of(c)
+		if clip.size.x > 0.0: add = add.intersection(clip)
+		if add.size.x > 0.0: acc = add if acc.size.x <= 0.0 else acc.merge(add)
+	if c is ScrollContainer: return acc                # lo de dentro puede estar desplazado
+	for k in c.get_children():
+		if k is Control: acc = _content_of(k as Control, acc)
+	return acc
+
+static func _visible_box(sb: StyleBox) -> bool:
+	if not sb is StyleBoxFlat: return sb is StyleBoxTexture
+	var f := sb as StyleBoxFlat
+	return f.bg_color.a > 0.15 or (f.border_color.a > 0.2 and f.border_width_left > 0)
+
+## Filas anchas (botones, recuadros, imágenes, listas de más del WIDE del ancho) que dejan más
+## hueco a un lado del marco que al otro: la primera que se encuentre, y cuántas son.
+func _wide_rows(fr: Control, skip: Array, r: Rect2, s: float) -> String:
+	var rows: Array = []
+	for k in fr.get_children():
+		if k in skip or not k is Control: continue
+		_wide_of(k as Control, r, rows)
+	var bad: Array = []
+	for c: Control in rows:
+		var g := c.get_global_rect()
+		var lft := (g.position.x - r.position.x) / s
+		var rgt := (r.end.x - g.end.x) / s
+		if absf(lft - rgt) > EDGE: bad.append([c, lft, rgt])
+	if bad.is_empty(): return ""
+	return "con filas desplazadas: %d de %d (la primera, %s: izq. %.0f, der. %.0f px)" % [bad.size(), rows.size(), _short(bad[0][0]), bad[0][1], bad[0][2]]
+
+func _wide_of(c: Control, r: Rect2, rows: Array) -> void:
+	if not c.visible or _alpha(c) < 0.3: return
+	var clip := _clip_of(c)
+	var g := c.get_global_rect()
+	if clip.size.x > 0.0 and clip.intersection(g).size.y < g.size.y * 0.5: return   # fuera de la vista
+	var drawn := (c is Button and not (c as Button).flat) or (c is TextureRect and (c as TextureRect).texture != null) 		or ((c is Panel or c is PanelContainer) and _visible_box(c.get_theme_stylebox("panel"))) 		or (c is ColorRect and (c as ColorRect).color.a > 0.3)
+	if drawn and g.size.x >= r.size.x * WIDE:
+		rows.append(c)
+		return                                         # lo de dentro va con él
+	for k in c.get_children():
+		if k is Control: _wide_of(k as Control, r, rows)
+
+## La capa de dibujo (CanvasLayer) en la que está `n`; 0 si ninguna.
+static func _layer(n: Node) -> int:
+	var p := n
+	while p != null:
+		if p is CanvasLayer: return (p as CanvasLayer).layer
+		p = p.get_parent()
+	return 0

@@ -26,7 +26,7 @@ func test_texto_sobre_el_filete() -> void:
 	var c := Check.new()
 	add_child_autofree(c)
 	await wait_frames(2)
-	var out: Array = c.scan()
+	var out: Array = c.scan().filter(func(x: String) -> bool: return x.contains("«"))   # (y, solo él arriba, descentrado)
 	assert_eq(out.size(), 1, str(out))
 	assert_string_contains(String(out[0]), "Elige compañero")
 
@@ -54,3 +54,71 @@ func test_recuadro_con_borde() -> void:
 	add_child_autofree(c)
 	await wait_frames(2)
 	assert_eq(c.scan().size(), 1)
+
+## 05-11-2026: filas anchas con más hueco a un lado del marco que al otro.
+func test_fila_desplazada() -> void:
+	var p := _panel()
+	var b := MenuKit.button("Pantalla completa", MenuKit.INK, 20)
+	b.position = Vector2(40, 140)
+	b.size = Vector2(400, 40)                    # 40 a la izquierda, 60 a la derecha
+	p.add_child(b)
+	var c := Check.new()
+	add_child_autofree(c)
+	await wait_frames(2)
+	var out: Array = c.scan()
+	assert_eq(out.size(), 1, str(out))
+	assert_string_contains(String(out[0]), "filas desplazadas")
+	b.position.x = 50                            # centrada
+	c._seen.clear()
+	await wait_frames(1)
+	assert_eq(c.scan().size(), 0)
+
+## El hueco de la barra de desplazamiento (MenuKit.scroll_gutter): sin barra, ninguno; con barra,
+## a los dos lados, para que las filas sigan centradas.
+func test_hueco_de_la_barra() -> void:
+	var sc := ScrollContainer.new()
+	sc.size = Vector2(400, 200)
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child_autofree(sc)
+	var m := MarginContainer.new()
+	m.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(m)
+	var list := VBoxContainer.new()
+	m.add_child(list)
+	MenuKit.scroll_gutter(sc, m)
+	var row := Control.new()
+	row.custom_minimum_size = Vector2(10, 50)
+	list.add_child(row)
+	await wait_frames(3)
+	assert_eq(m.get_theme_constant("margin_right"), 0, "sin barra, sin hueco")
+	assert_eq(m.get_theme_constant("margin_left"), 0)
+	for i in 10:
+		var r := Control.new()
+		r.custom_minimum_size = Vector2(10, 50)
+		list.add_child(r)
+	await wait_frames(3)
+	assert_true(sc.get_v_scroll_bar().visible)
+	assert_eq(m.get_theme_constant("margin_right"), 14, "con barra, su hueco")
+	assert_eq(m.get_theme_constant("margin_left"), 14 + int(sc.get_v_scroll_bar().get_combined_minimum_size().x), "y el mismo al otro lado")
+
+## El rótulo del nivel se quita deprisa cuando se abre la pausa o la pantalla final.
+func test_rotulo_se_quita() -> void:
+	var host := Node.new()
+	add_child_autofree(host)
+	var card := LevelCard.enter(host, "p1_n1", "Campamento")
+	await wait_frames(2)
+	card.dismiss()
+	await wait_seconds(0.45)
+	assert_false(is_instance_valid(card), "se ha ido")
+
+## Una estadística de las comparaciones no se parte entre dos líneas.
+func test_estadistica_entera() -> void:
+	var rows: Array[Dictionary] = [{"name": "Daño de la zona", "before": "13,3/s", "after": "18,62/s", "good": true},
+		{"name": "Atraviesa", "before": "0", "after": "2", "good": true}]
+	var s := StatCompare.bbcode(rows)
+	var parts := s.split("    ")
+	assert_eq(parts.size(), 2, "se rompe entre una y otra")
+	for p in parts:
+		var plain := RegEx.create_from_string(r"\[[^\]]*\]").sub(p, "", true)
+		assert_false(plain.contains(" "), "sin espacios que rompan dentro: " + plain)
+	assert_string_contains(s, "/" + char(0x2060) + "s")

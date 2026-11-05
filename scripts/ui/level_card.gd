@@ -22,6 +22,7 @@ static func enter(parent: Node, id: String, level_name: String) -> LevelCard:
 	var card := c._card(id, level_name)
 	card.modulate.a = 0.0
 	var tw := c.create_tween().set_parallel(true)
+	tw.set_meta(&"card", c)
 	tw.tween_property(black, "color:a", 0.0, FADE_IN).set_trans(Tween.TRANS_SINE).set_delay(0.1)
 	tw.tween_property(card, "modulate:a", 1.0, 0.6).set_delay(CARD_AT)
 	for side in ["offset_top", "offset_bottom"]:          # sube un poco al aparecer
@@ -31,6 +32,16 @@ static func enter(parent: Node, id: String, level_name: String) -> LevelCard:
 	tw.chain().tween_property(card, "modulate:a", 0.0, 0.9)
 	tw.chain().tween_callback(c.queue_free)
 	return c
+
+## Quita el rótulo deprisa (la pausa o la pantalla final, que abren debajo: el rótulo va en una
+## capa más alta y taparía su título; 05-11-2026).
+func dismiss() -> void:
+	for t in get_tree().get_processed_tweens():
+		if t.is_valid() and t.get_meta(&"card", null) == self: t.kill()
+	var tw := create_tween().set_parallel(true)
+	for k in get_children():
+		if k is CanvasItem: tw.tween_property(k, "modulate:a", 0.0, 0.25)
+	tw.chain().tween_callback(queue_free)
 
 ## Funde a negro y después llama a `then` (cambiar de escena).
 static func leave(parent: Node, then: Callable, secs := FADE_OUT) -> void:

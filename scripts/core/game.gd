@@ -464,7 +464,7 @@ func _ready() -> void:
 			ModelPool.fill_now()                           # mientras sale de negro
 			_lap("calentamiento y reserva")
 		if (not args.has("shots") or args.get_bool("card")) and args.get_bool("card", true):   # capturas: sin el rótulo, salvo card=true; card=false lo quita
-			LevelCard.enter(self, level_id, level.display_name)
+			_card = LevelCard.enter(self, level_id, level.display_name)
 		Music.play(level.music_path())
 		if args.get_bool("log"): print("MUSICA ", Music.current())
 	_lap("música")
@@ -1006,6 +1006,13 @@ func _on_pad_lost(device: int) -> void:
 			_auto_pause("mando %d" % device)
 			return
 
+var _card: LevelCard                            ## el rótulo del nivel, mientras se ve
+
+## Quita el rótulo del nivel si aún se ve (se abre un menú encima de la partida).
+func _drop_card() -> void:
+	if _card != null and is_instance_valid(_card) and not _card.is_queued_for_deletion(): _card.dismiss()
+	_card = null
+
 func toggle_pause() -> void:
 	if _menu_open or _ended: return
 	if menus != null and _pause == null and menus.solo() and menus.close_all(): return   # Esc cierra la ficha o el mapa
@@ -1020,6 +1027,7 @@ func toggle_pause() -> void:
 		apply_speed()                              # la velocidad pudo cambiar en la configuración
 		_open_level_up.call_deferred()             # subidas pendientes (p. ej. de la depuración)
 		return
+	_drop_card()
 	_open_pause()
 	get_tree().paused = true
 
@@ -1674,6 +1682,7 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 		lines.append_array(net_game.gone_notes)       # quién se fue y cuándo
 		if net_game.level_marks > 0:                   # para comentarlas antes de seguir
 			lines.append(MenuKit.count(net_game.level_marks, "marca") + " en este nivel (F9 o LB+RB)")
+	_drop_card()
 	var s := Menus.EndScreen.new(title, lines, accent)
 	s.diary = _diary(result)
 	_archive(result)

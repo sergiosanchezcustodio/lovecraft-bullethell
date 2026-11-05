@@ -58,6 +58,7 @@ func _build() -> void:
 	_box.add_child(_purse)
 	_area = Control.new()
 	_area.custom_minimum_size = Vector2(W, H)
+	_area.size_flags_horizontal = Control.SIZE_SHRINK_CENTER   # de su ancho y centrada: estirada, los nudos (que van por W) quedaban a la izquierda
 	_area.draw.connect(_draw_paths)
 	_box.add_child(_area)
 	var rows: Array = st.rows

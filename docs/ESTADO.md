@@ -2262,6 +2262,27 @@ Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, mat
 - **Arreglo:** una mancha sin `mode` (la nieve que levanta una explosión) rompía `GroundTraces.from_mark`. Ahora se salta: el quemado de esa explosión ya deja su rastro.
 - **Pruebas:** el sonido del suceso, una vez al asomar y otra al hundirse; la sombra (solo en lo que vuela, la copia solo da sombra y la silueta no da); y el lavado de los rastros. 765 de 765.
 
+### Ventanas centradas y textos que se salían (05-11-2026)
+
+El autor vio ventanas con el contenido algo descentrado y textos que invadían el marco.
+
+- **Revisión:**
+  - `ui_check` mira ahora también el contenido descentrado en su ventana y las filas anchas que no dejan el mismo hueco a cada lado del marco;
+  - ya no compara los textos de una capa (el marcador) con las ventanas de otra;
+  - `tools/recorrido_ui.py` abre una a una 50 ventanas con su captura y sus avisos.
+  - Primer recorrido: 8 con avisos, más otras 3 vistas en las capturas.
+  - Segundo: ninguno, salvo la tabla de daño vacía (falso: con daño está centrada).
+- **Arreglos:**
+  - **Listas con barra de desplazamiento** (configuración, logros, tienda y depuración): dejaban siempre 14 px a la derecha para la barra, aunque no hubiera barra. Las filas acababan antes que las pestañas, con 46 px a la izquierda y 60 a la derecha. `MenuKit.scroll_gutter` deja el hueco solo con la barra, y entonces otro igual a la izquierda.
+  - **Pantalla final:**
+    - si se caía en los primeros segundos, el rótulo del nivel (que va en una capa más alta) tapaba «Has caído». `LevelCard.dismiss()` lo quita al abrir la pantalla final y la pausa;
+    - con el informe, la columna izquierda dejaba 50 px vacíos a la izquierda de los botones y el informe llegaba al borde derecho. La columna es ahora de 400 px y el informe tiene 20 px de margen.
+  - **Mapa de la expedición:** el esquema, calculado para 1500 px, se estiraba a 1548 y quedaba 24 px a la izquierda. Ahora tiene su ancho y va centrado.
+  - **Biblioteca:** al abrir el Tomo V (y el IX) la lista salía desplazada y ocultaba la fila elegida. El deslizamiento hasta la opción con foco (`MenuRepeat`) se calculaba antes de que la lista se colocara; ahora espera un fotograma.
+  - **Comparar antes de elegir** (evolución, subidas, tienda): «15,12/s» se partía entre dos líneas. Cada cifra con su nombre va ahora entera (`StatCompare._nobreak`).
+- **Revisado y bien:** huecos, borrar, menú, Jugar, online, pestañas de configuración y nube, tienda (también el vestuario y sus subpestañas), los once tomos de la biblioteca, sala de trofeos, selección (mapa, desafíos y locura), pausa, depuración, dificultad, ficha, mapa del nivel, repetición, pesca y tabla de daño.
+- **Pruebas:** fila desplazada, hueco de la barra con y sin barra, el rótulo se quita y una estadística entera. 769 de 769. Lecciones en `docs/LECCIONES.md` («Ventanas centradas»).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

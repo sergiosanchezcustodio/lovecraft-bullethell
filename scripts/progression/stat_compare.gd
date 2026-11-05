@@ -161,5 +161,18 @@ static func bbcode(rows: Array[Dictionary], sep := "    ") -> String:
 	var parts := PackedStringArray()
 	for r: Dictionary in rows:
 		var c: Color = GOOD if r.good else BAD
-		parts.append("%s %s → [color=#%s]%s[/color]" % [r.name, r.before, c.to_html(false), r.after])
+		parts.append(_nobreak("%s %s → [color=#%s]%s[/color]" % [r.name, r.before, c.to_html(false), r.after]))
 	return sep.join(parts)
+
+## Una estadística no se parte entre dos líneas: se rompe solo entre una y otra (05-11-2026: «15,12/»
+## quedaba al final de una línea y la «s» al principio de la siguiente).
+static func _nobreak(s: String) -> String:
+	var out := ""
+	var tag := false
+	for ch in s:
+		if ch == "[": tag = true
+		elif ch == "]": tag = false
+		if not tag and ch == " ": out += char(0xA0)          # espacio que no rompe
+		elif not tag and ch == "/": out += "/" + char(0x2060)   # y la «/» unida a lo que sigue
+		else: out += ch
+	return out

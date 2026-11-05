@@ -81,7 +81,10 @@ func _on_focus_changed(c: Control) -> void:
 	var p := c.get_parent()
 	while p != null:
 		if p is ScrollContainer and p.has_meta(&"smooth_focus"):
-			_scroll_to(p as ScrollContainer, c)
+			# un fotograma después: al abrir una lista, el foco llega antes de que se coloque y
+			# con la vista aún sin tamaño la bajaba de más (el Tomo V salía desplazado; 05-11-2026)
+			await get_tree().process_frame
+			if is_instance_valid(p) and is_instance_valid(c) and c.has_focus(): _scroll_to(p as ScrollContainer, c)
 			return
 		p = p.get_parent()
 

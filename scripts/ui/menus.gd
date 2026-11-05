@@ -217,10 +217,13 @@ class EndScreen extends CanvasLayer:
 			box.add_child(cols)
 			box = VBoxContainer.new()
 			box.add_theme_constant_override("separation", 12)
-			box.custom_minimum_size.x = 460
-			box.alignment = BoxContainer.ALIGNMENT_CENTER
+			box.custom_minimum_size.x = 400             # los botones (360) casi a lo ancho: si no, quedaba
+			box.alignment = BoxContainer.ALIGNMENT_CENTER   # hueco a su izquierda y no a la derecha del informe
 			cols.add_child(box)
-			cols.add_child(report)
+			var rm := MarginContainer.new()             # el mismo respiro al otro lado (05-11-2026)
+			rm.add_theme_constant_override("margin_right", 20)
+			rm.add_child(report)
+			cols.add_child(rm)
 		for l in lines:
 			var ll := UiKit.label(l, 22, UiKit.TEXT)
 			ll.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

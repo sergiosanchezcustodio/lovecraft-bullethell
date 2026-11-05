@@ -43,9 +43,9 @@ func _ready() -> void:
 	_list.add_theme_constant_override("separation", 6)
 	var margin := MarginContainer.new()                 # las filas no tocan la barra de desplazamiento
 	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	margin.add_theme_constant_override("margin_right", 14)
 	margin.add_child(_list)
 	_scroll.add_child(margin)
+	MenuKit.scroll_gutter(_scroll, margin)
 	_build()
 	_status = UiKit.label(" ", 16, ACCENT)
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

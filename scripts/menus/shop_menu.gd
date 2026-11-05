@@ -75,8 +75,8 @@ func _ready() -> void:
 	box.add_child(scroll)
 	var margin := MarginContainer.new()
 	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	margin.add_theme_constant_override("margin_right", 14)
 	scroll.add_child(margin)
+	MenuKit.scroll_gutter(scroll, margin)
 	_list = VBoxContainer.new()
 	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_list.add_theme_constant_override("separation", 8)
