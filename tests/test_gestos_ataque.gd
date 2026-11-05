@@ -360,3 +360,41 @@ func test_hordas_menos_clonicas() -> void:
 	var el := Enemy.new().setup(d, world, null)
 	world.add_child(el)
 	assert_eq(el.var_size, 1.0, "la élite, de su tamaño")
+
+## Más objetos con viento (hito 17.13): las tiendas de lona ondean, el bote del muelle flota y el
+## toldo de la tienda del puerto es tela que cuelga de la pared.
+func test_objetos_con_viento() -> void:
+	for m in ["atrezo_tienda", "atrezo_tienda_rota"]:
+		var c := Ambient.model_cfg(m)
+		assert_true(c.has("sway") and float(c.get("flutter", 0.0)) > 0.0, "%s ondea" % m)
+	assert_true(Ambient.model_cfg("alr_bote").has("bob"), "el bote flota")
+	var d: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://models/prt_tienda.json"))
+	assert_true((d.pivots as Dictionary).has("cloth"), "el toldo cuelga de su pivote")
+	assert_true((d.voxels as Array).any(func(v: Array) -> bool: return v[3] == "cloth"), "el toldo es tela")
+
+## Vapor en las alcantarillas (hito 17.14): tapas en sitios libres de la calle, siempre las mismas,
+## con su vapor; en Baja, no.
+func test_vapor_alcantarillas() -> void:
+	var p: Array = Quality.presets()
+	assert_false(bool(p[0].vents), "en Baja no")
+	assert_true(bool(p[2].vents), "en Alta sí")
+	var e := VoxelFx.emitter("steam", 0.45)
+	assert_gt(e.amount, 0)
+	e.free()
+	var arena := Node3D.new()
+	var obs := ObstacleMap.new()
+	obs.bounds = Rect2(-20, -20, 40, 40)
+	arena.set_meta("obstacles", obs)
+	add_child_autofree(arena)
+	var a := Ambient.new()
+	a.arena = arena
+	a._vents({"count": 4, "seed": 3})
+	assert_eq(a.vents.size(), 4)
+	for i in a.vents.size():
+		for j in range(i + 1, a.vents.size()):
+			assert_gt(a.vents[i].distance_to(a.vents[j]), 7.0, "separadas")
+	var b := Ambient.new()
+	b.arena = arena
+	b._vents({"count": 4, "seed": 3})
+	assert_eq(b.vents, a.vents, "las mismas en cada partida")
+	a.free(); b.free()

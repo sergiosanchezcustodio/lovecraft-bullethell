@@ -189,6 +189,24 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_curve = _curve([[0.0, 0.35], [0.4, 0.8], [1.0, 1.6]])
 			m.color_ramp = _ramp([[0.0, Color(0.16, 0.15, 0.15, 0.0)], [0.08, Color(0.17, 0.16, 0.16, 0.75)],
 				[0.5, Color(0.22, 0.22, 0.23, 0.45)], [1.0, Color(0.28, 0.29, 0.30, 0.0)]])
+		"steam":                  # vapor de alcantarilla (hito 17.14): bocanadas blancas que suben deprisa y se deshacen
+			p.draw_pass_1 = cube("mix")
+			p.amount = int(clampf(r * 30.0, 8.0, 18.0))
+			p.lifetime = 2.2
+			p.preprocess = 2.2
+			p.visibility_aabb = AABB(Vector3(-2, -0.5, -2), Vector3(4, 4, 4))
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.6
+			m.spread = 18.0
+			m.initial_velocity_min = 0.5; m.initial_velocity_max = 0.9
+			m.gravity = Vector3(0.12, 0.1, -0.05)
+			m.damping_min = 0.3; m.damping_max = 0.5
+			m.angle_min = -40.0; m.angle_max = 40.0
+			m.angular_velocity_min = -20.0; m.angular_velocity_max = 20.0
+			m.scale_min = r * 0.4; m.scale_max = r * 0.65
+			m.scale_curve = _curve([[0.0, 0.3], [0.35, 1.0], [1.0, 2.1]])
+			m.color_ramp = _ramp([[0.0, Color(0.55, 0.58, 0.62, 0.0)], [0.15, Color(0.52, 0.55, 0.6, 0.26)],
+				[0.6, Color(0.48, 0.51, 0.56, 0.12)], [1.0, Color(0.45, 0.48, 0.53, 0.0)]])
 		"torch_sparks":           # la linterna que falla (vestuario, fase 14): un chisporroteo corto
 			p.draw_pass_1 = cube("add")
 			p.amount = 7

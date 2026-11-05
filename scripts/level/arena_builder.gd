@@ -67,7 +67,9 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 		_collider(holder, m, data.colliders.get(p.model, {}), obstacles, not masked)
 		var north_sea: bool = data.has("ground") and data.ground.has("margin_north") and p.pos[1] < -size.y * 0.5   # muelle: agua al norte
 		var in_sea: bool = data.has("sea") and (p.pos[0] > size.x * 0.5 or p.pos[1] > size.y * 0.5 or north_sea)
-		var amb := Ambient.dress(holder, m, p.model, in_sea, wind)
+		# 17.13: también flota lo que está en el agua somera (las barcas del pantano)
+		var in_water: bool = not in_sea and obstacles.has_water() and obstacles.water_at(Vector2(p.pos[0], p.pos[1])) > 0.3
+		var amb := Ambient.dress(holder, m, p.model, in_sea or in_water, wind)
 		if (m.get_meta("pivots") as Dictionary).has("light"):
 			var lamp := _lamp(holder, m, data.lamp, fog_volumes)
 			lights.append(lamp)

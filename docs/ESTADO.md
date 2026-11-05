@@ -2091,6 +2091,35 @@ Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, mat
 - `variety=false` lo quita para comparar. La hoja de entradas lo enseña en fila: `tools/hoja_entradas.gd -- enemy=cultista rise=none dur=0 variety=true|false`.
 - **Coste:** una multiplicación y, en los que se inclinan, dos giros de base por enemigo y fotograma.
 - **Pruebas:** en 12 cultistas, tamaños y ritmos distintos dentro de su margen y la vida de siempre; la élite, de su tamaño. 755 de 755.
+- **Rendimiento del bloque de animación (17.1-17.12)**, en Alta, frente al commit de antes de la fase 17 (`ca5b6cf`, en otra copia), alternando las dos copias, 3 partidas por nivel con `bot=smart max_alive=80 spawn_rate=20`:
+
+  | Nivel | Antes | Ahora |
+  |---|---|---|
+  | p1_n2 | 7,27 ms (1 % peor 19,1) | 7,33 ms (19,2) |
+  | p3_n2 | 8,66 ms (18,9) | 8,22 ms (17,8) |
+  | p2_n4 | 9,08 ms (18,9) | 9,23 ms (20,8) |
+
+  Todo dentro del ruido y por debajo del tope de +0,5 ms.
+
+### Hito 17.13: más objetos con viento (05-11-2026)
+
+- El sombreador del balanceo (`sway.gdshader`) tiene `flutter`: ondas rápidas que recorren la pieza, de la posición en el mundo y no de la cara, para que los voxels no se separen.
+- Las tiendas de lona del campamento y del lago (`atrezo_tienda`, `atrezo_tienda_rota`) se mecen y ondean (`data/ambient.json`); la rota, más.
+- El toldo de las tiendas del puerto (`prt_tienda`, `prt_tienda_inn`) es ahora la parte `cloth`: cuelga del borde de la pared y se mece como la ropa tendida. Regenerados con `python tools/gen_atrezo_puerto.py tienda tienda_inn`.
+- Las redes y la ropa tendida ya lo hacían (16-10-2026).
+- El bote del muelle (`alr_bote`) flota. Las barcas del pantano (`inn_barca`), que estaban en agua somera y no en el mar, flotan también: `ArenaBuilder` pasa `in_sea` cuando el mapa de lo transitable tiene agua bajo la pieza.
+- **Coste:** nada en la CPU; unas operaciones más por vértice en las piezas con `flutter`.
+
+### Hito 17.14: humo en las chimeneas y vapor en las alcantarillas (05-11-2026)
+
+- El humo de las chimeneas ya existía: los puntos `smoke` de las casas, la taberna, el almacén, la cabaña, la choza y el casco (receta `chimney`, `ArenaBuilder._smoke`).
+- Lo nuevo es el vapor. Alcantarilla de hierro fundido con reborde de piedra, cruz, anillo y ranuras (`tools/gen_alcantarilla.py`, `models/alcantarilla.json`).
+- `Ambient._vents` pone `count` tapas en sitios libres de la calle: ni decorado, ni agua, ni junto al punto de partida, a 7 m como poco unas de otras y siempre en el mismo sitio (`seed`). De cada una sale vapor (receta `steam`: bocanadas grises y tenues que suben y se deshacen).
+- Cinco en las calles de Innsmouth y cuatro en Arkham (`vents` en `data/ambient.json`).
+- Por calidad: `vents` en `data/quality.json`, apagado en Baja. Se montan al cargar la arena, nada en mitad del nivel.
+- **Coste:** un emisor de 13 partículas por tapa.
+- **Pruebas:** objetos con viento (configuración y la tela del toldo), y alcantarillas (en Baja no, separadas, las mismas en cada partida). 757 de 757.
+- La prueba del ídolo de `test_new_enemies` falló una vez con toda la batería y pasó en las cinco siguientes: es intermitente, no de este cambio.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

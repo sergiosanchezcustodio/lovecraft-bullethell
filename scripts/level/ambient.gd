@@ -25,6 +25,7 @@ extends Node3D
 const PATH := "res://data/ambient.json"
 const MODES := {"pulse": 1, "flame": 2, "electric": 3, "heart": 4}
 static var _cfg = null
+var vents: Array[Vector2] = []                  ## alcantarillas con vapor de esta arena (hito 17.14)
 static var ground := "snow"                     ## suelo de la arena ("step"): color del polvo de lo que sale de él
 
 ## Color del polvo que levanta lo que sale del suelo (hito 11.6).
@@ -65,6 +66,34 @@ static func sfx_muted() -> bool:
 static func sfx_at(ev: String, pos: Vector3, db := 0.0) -> void:
 	var s := autoload("Sfx")
 	if s != null: s.call("play_at", ev, pos, db)
+
+## Alcantarillas con vapor (hito 17.14): `count` tapas en sitios libres de la calle (ni decorado ni
+## agua), siempre los mismos en cada arena (`seed`); de cada una sale vapor. Se montan al cargar.
+func _vents(c: Dictionary) -> void:
+	var obstacles: ObstacleMap = arena.get_meta("obstacles")
+	if obstacles == null: return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(c.get("seed", 17))
+	var b := obstacles.bounds.grow(-3.0)
+	var placed: Array[Vector2] = []
+	var tries := 0
+	while placed.size() < int(c.get("count", 4)) and tries < 400:
+		tries += 1
+		var p := Vector2(rng.randf_range(b.position.x, b.end.x), rng.randf_range(b.position.y, b.end.y))
+		if obstacles.is_blocked(p, 1.2) or obstacles.water_at(p) > 0.05: continue
+		if p.length() < 4.0: continue                                   # lejos de donde empiezan
+		if placed.any(func(q: Vector2) -> bool: return q.distance_to(p) < 7.0): continue
+		placed.append(p)
+		var h := Node3D.new()
+		h.position = Vector3(p.x, 0.005, p.y)
+		h.rotation.y = rng.randf() * TAU
+		arena.add_child(h)
+		var m := VoxelBuilder.load_model("res://models/alcantarilla.json")
+		h.add_child(m)
+		var e := VoxelFx.emitter("steam", float(c.get("r", 0.45)))
+		e.position = Vector3(0, 0.08, 0)
+		h.add_child(e)
+	vents = placed
 
 static func model_cfg(model: String) -> Dictionary:
 	return (config().get("models", {}) as Dictionary).get(model, {})
@@ -151,6 +180,7 @@ static func _sway_material(model: String, c: Dictionary, base: Material, wind: V
 		m.set_shader_parameter("roughness_v", (base as StandardMaterial3D).roughness)
 		m.set_shader_parameter("specular_v", (base as StandardMaterial3D).metallic_specular)
 	m.set_shader_parameter("amplitude", float(c.sway))
+	m.set_shader_parameter("flutter", float(c.get("flutter", 0.0)))   # lonas (hito 17.13)
 	m.set_shader_parameter("height", float(c.get("height", 4.0)))
 	m.set_shader_parameter("speed", float(c.get("speed", 1.0)))
 	m.set_shader_parameter("wind", wind.normalized())
@@ -319,6 +349,7 @@ func _ready() -> void:
 		for fx: GPUParticles3D in it.get("candles", []): _candles.append([fx, 0.0, it.get("light")])
 		if it.has("sound"): _sounds.append(it.sound)
 		for lp: Vector3 in it.get("ripples", []): _ripplers.append([h.to_global(lp), 0.0])
+	if cfg.has("vents") and bool(Quality.value("vents", true)): _vents(cfg.vents)   # 17.14
 	for n in ["Ground", "Sea"]:
 		var mi := arena.get_node_or_null(n) as MeshInstance3D
 		if mi != null and mi.material_override is ShaderMaterial:

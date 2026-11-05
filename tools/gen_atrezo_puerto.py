@@ -373,13 +373,13 @@ def tienda(inn=False):
     for j, row in enumerate(WHEEL):
         for i, ch in enumerate(row):
             if ch != '.' and not inn: M.put(i - 4, G - j, fz + 3, P, GOLD)
-    # toldo a rayas, inclinado sobre la acera
+    # toldo a rayas, inclinado sobre la acera; es tela (`cloth`): cuelga de la pared y se mece (17.13)
     for x in range(-HX + 2, 10):
         for k in range(16):
             y = G - 10 - k // 2
-            M.put(x, y, fz + 3 + k, P, ((0.20, 0.34, 0.22) if inn else (0.62, 0.14, 0.12)) if (x // 4) % 2 else (0.84, 0.80, 0.70))
+            M.put(x, y, fz + 3 + k, 'cloth', ((0.20, 0.34, 0.22) if inn else (0.62, 0.14, 0.12)) if (x // 4) % 2 else (0.84, 0.80, 0.70))
         if x % 4 == 0:
-            M.put(x, G - 18, fz + 18, P, (0.62, 0.14, 0.12)); M.put(x, G - 19, fz + 18, P, (0.62, 0.14, 0.12))   # festón
+            M.put(x, G - 18, fz + 18, 'cloth', (0.62, 0.14, 0.12)); M.put(x, G - 19, fz + 18, 'cloth', (0.62, 0.14, 0.12))   # festón
     for x in (-HX + 3, 8):                                            # brazos del toldo
         for k in range(16): M.put(x, G - 10 - k // 2 - 1, fz + 3 + k, P, IRON)
     for x0 in (-44, -14, 16):                                         # ventanas de arriba
@@ -395,7 +395,7 @@ def tienda(inn=False):
         for r in range(2, 7):
             M.put(-30 + int(r * math.cos(math.radians(a))), 1 + (r % 2), fz + 10 + int(r * math.sin(math.radians(a))), P, ROPE if r % 2 else ROPE_D)
     B.chimney(-30, -10, extra=14, pots=2)
-    return M, {P: [0, 0, 0]}, B.smokes
+    return M, {P: [0, 0, 0], 'cloth': [0, G - 10, fz + 3]}, B.smokes   # el toldo cuelga de su borde de arriba
 
 
 def almacen():

@@ -13,6 +13,7 @@ uniform float height = 4.0;                   // m hasta donde llega el balanceo
 uniform float speed = 1.1;                    // rad/s
 uniform vec2 wind = vec2(0.8, 0.6);           // dirección del viento (mundo)
 uniform bool hang = false;
+uniform float flutter = 0.0;                  // lona (hito 17.13): ondas rápidas que recorren la pieza (m)
 uniform bool unshaded_glow = false;           // capa de luz de la misma pieza
 global uniform vec4 gust_a;                   // ráfagas de explosiones y esquives (Gusts, hito 11.4):
 global uniform vec4 gust_b;                   // x, z, fuerza (m) y radio
@@ -40,6 +41,11 @@ void vertex() {
 	vec3 w = normalize(to_local * vec3(wind.x, 0.0, wind.y));
 	vec3 side = normalize(to_local * vec3(-wind.y, 0.0, wind.x));
 	VERTEX += (w * (0.35 + s) * gust + side * 0.25 * sin(TIME * speed * 1.6 + ph * 2.3)) * amplitude * k;
+	if (flutter > 0.0) {                      // de la posición (no de la cara): los voxels no se separan
+		vec3 wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+		float f = sin(TIME * speed * 4.3 - dot(wp.xz, wind) * 5.0 + wp.y * 3.0) * (0.6 + 0.4 * gust);
+		VERTEX += side * f * flutter * k;
+	}
 	vec3 blast = gust_push(gust_a, NODE_POSITION_WORLD.xz, TIME) + gust_push(gust_b, NODE_POSITION_WORLD.xz, TIME);
 	VERTEX += to_local * blast * k;
 }
