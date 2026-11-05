@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"blake"
 display_name = "Henrietta Blake"
+victory = "win_ward"
 model = "blake"
 role = "Escritora, hermana de Robert Blake"
 passive_text = "Un 15 % más de experiencia por gema."

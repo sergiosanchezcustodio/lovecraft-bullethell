@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"malone"
 display_name = "Vera Malone"
+victory = "win_hat"
 model = "malone"
 role = "Contrabandista de Red Hook"
 passive_text = "Hasta un 50 % más de daño cuanto más cerca está el enemigo."

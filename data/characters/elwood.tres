@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"elwood"
 display_name = "Sargento Frank Elwood"
+victory = "win_salute"
 model = "elwood"
 role = "Veterano de la Gran Guerra"
 passive_text = "Recibe un 15 % menos de daño físico."

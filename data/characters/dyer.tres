@@ -21,6 +21,7 @@ dodge_duration = 0.32
 dodge_iframes = 0.36
 dodge_cooldown = 1.2
 dodge_anim = "slide"
+victory = "win_fist"
 dodge_style = ExtResource("2")
 luck = 1.0
 starting_weapons = Array[StringName]([&"granada"])

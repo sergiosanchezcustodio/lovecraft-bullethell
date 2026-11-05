@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"johansen"
 display_name = "Gustaf Johansen"
+victory = "win_fist"
 model = "johansen"
 role = "Segundo oficial del Emma"
 passive_text = "Un 25 % más de daño cuerpo a cuerpo."

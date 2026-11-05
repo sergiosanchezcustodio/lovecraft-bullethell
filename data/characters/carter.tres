@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"carter"
 display_name = "Randolph Carter"
+victory = "win_hat"
 model = "carter"
 role = "Soñador de Boston"
 passive_text = "Las crisis de locura le duran la mitad: sabe despertar."

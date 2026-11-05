@@ -8,13 +8,15 @@ extends RefCounted
 const ARM_LAG := 0.32                         ## retraso de los brazos respecto a las piernas (rad del ciclo)
 const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive": 0.5,
 	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6, "brake": 0.5, "cheer": 0.9, "marvel": 1.1, "open_chest": 0.9,
+	"win_fist": 1.6, "win_salute": 1.6, "win_hat": 1.6, "win_ward": 1.6, "win_bow": 1.6,
 	"fidget_look": 2.6, "fidget_stretch": 2.8, "fidget_check": 2.4, "fidget_shift": 1.8,
 	"down": 0.9, "down_wait": 3.0, "get_up": 0.75}
 ## Gestos de reposo (28-10-2026): Player los pone de vez en cuando si el personaje lleva un rato
 ## quieto. Empiezan y acaban en la pose de reposo, y se funden al entrar y al salir.
 const FIDGETS := ["fidget_look", "fidget_stretch", "fidget_check", "fidget_shift"]
 ## Gestos al atacar de los investigadores (hito 17.1): las hordas (HordeMesh) no los graban.
-const HORDE_SKIP := ["cast", "swing", "thrust", "slam", "brake", "cheer", "marvel", "open_chest"]
+const HORDE_SKIP := ["cast", "swing", "thrust", "slam", "brake", "cheer", "marvel", "open_chest",
+	"win_fist", "win_salute", "win_hat", "win_ward", "win_bow"]
 
 ## Piezas opcionales: antebrazos y espinillas (codos y rodillas), bufanda y coleta. Los
 ## modelos partidos con tools/humano.py split_limbs las tienen; los demás, no, y las
@@ -377,6 +379,63 @@ static func open_chest(m: Node3D, t: float) -> void:
 	Anims.part(m, "arm_r").rotation = Vector3(-0.75 * d - 1.9 * l, 0.0, 0.18 * l)
 	bend(m, "fore_l", -0.25 * (d + l))
 	bend(m, "fore_r", -0.25 * (d + l))
+
+# ---------------------------------------------------------------- victoria (hito 17.5)
+# Al superar el nivel, cada investigador la suya (CharacterData.victory), solo brazos y torso:
+# mientras recoge lo que queda puede seguir andando.
+
+## Sube en `a`, se mantiene y baja desde `b` (0..1).
+static func _held(t: float, a: float, b: float) -> float:
+	return Anims.ease(t / a) * (1.0 - Anims.ease((t - b) / (1.0 - b)))
+
+## Los dos puños arriba, agitándolos (Dyer, Johansen).
+static func win_fist(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.18, 0.75)
+	var pump := sin(clampf((t - 0.18) / 0.5, 0.0, 1.0) * TAU * 1.5) * 0.12
+	Anims.part(m, "arm_l").rotation = Vector3((-2.8 + pump) * k, 0.0, -0.22 * k)
+	Anims.part(m, "arm_r").rotation = Vector3((-2.8 - pump) * k, 0.0, 0.22 * k)
+	bend(m, "fore_l", -0.3 * k)
+	bend(m, "fore_r", -0.3 * k)
+	Anims.part(m, "torso").rotation.x = -0.15 * k
+
+## Saludo militar: la mano derecha a la frente, firme (Elwood, Legrasse).
+static func win_salute(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.2, 0.78)
+	Anims.part(m, "arm_r").rotation = Vector3(-1.45 * k, -0.35 * k, 0.8 * k)
+	bend(m, "fore_r", -2.15 * k)
+	Anims.part(m, "arm_l").rotation = Vector3(0.04 * k, 0.0, 0.05 * k)
+	bend(m, "fore_l", 0.0)
+	Anims.part(m, "torso").rotation.x = -0.07 * k
+
+## Se toca el ala del sombrero y abre la mano hacia fuera (Olmstead, Peaslee, Malone, Carter).
+static func win_hat(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.18, 0.8)
+	var out := Anims.ease((t - 0.35) / 0.25)
+	Anims.part(m, "arm_r").rotation = Vector3(lerpf(-2.5, -1.7, out) * k, 0.0, lerpf(0.35, 1.05, out) * k)
+	bend(m, "fore_r", lerpf(-1.5, -0.35, out) * k)
+	Anims.part(m, "arm_l").rotation.x = 0.08 * k
+	Anims.part(m, "torso").rotation = Vector3(0.12 * out * k, -0.12 * out * k, 0.0)   # un poco de reverencia
+
+## La mano izquierda alzada y abierta, la derecha al pecho: conjura o bendice (Armitage, Varga,
+## Iwanicki, Blake, Whateley).
+static func win_ward(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.22, 0.78)
+	var tremble := sin(t * 40.0) * 0.03 * k
+	Anims.part(m, "arm_l").rotation = Vector3(-2.85 * k + tremble, 0.0, -0.15 * k)
+	bend(m, "fore_l", -0.1 * k)
+	Anims.part(m, "arm_r").rotation = Vector3(-0.75 * k, -0.45 * k, 0.0)
+	bend(m, "fore_r", -1.5 * k)
+	Anims.part(m, "torso").rotation.x = -0.1 * k
+
+## Reverencia pequeña: la mano derecha al pecho, la izquierda abierta a un lado y el tronco apenas
+## inclinado (Whipple, West). Poco: la cabeza no cuelga del tronco y se quedaría atrás.
+static func win_bow(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.25, 0.72)
+	Anims.part(m, "torso").rotation.x = 0.14 * k
+	Anims.part(m, "arm_r").rotation = Vector3(-0.8 * k, -0.5 * k, 0.0)
+	bend(m, "fore_r", -1.55 * k)
+	Anims.part(m, "arm_l").rotation = Vector3(0.15 * k, 0.0, -0.85 * k)
+	bend(m, "fore_l", -0.2 * k)
 
 ## Frenada (hito 17.2): al pararse en seco tras correr, planta el pie izquierdo delante con la
 ## pierna estirada, dobla la derecha, echa el cuerpo atrás y abre los brazos para no irse de

@@ -168,3 +168,14 @@ func test_una_celebracion_no_la_corta_un_ataque() -> void:
 	for i in 60: p._process(1.0 / 60.0)
 	p.gesture("swing", Vector3(1, 0, 0))
 	assert_eq(p._override, "swing", "acabada la celebración, vuelve a atacar")
+
+## Victoria (hito 17.5): cada investigador tiene su pose y existe.
+func test_cada_investigador_tiene_su_pose_de_victoria() -> void:
+	var seen := {}
+	for f in DirAccess.open("res://data/characters").get_files():
+		if not f.ends_with(".tres"): continue
+		var c: CharacterData = load("res://data/characters/" + f)
+		assert_ne(c.victory, "", f)
+		assert_true(Anims.has_anim(c.model, c.victory), "%s: %s" % [f, c.victory])
+		seen[c.victory] = true
+	assert_eq(seen.size(), 5, "las cinco poses se usan")

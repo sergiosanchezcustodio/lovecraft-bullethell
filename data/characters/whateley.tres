@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"whateley"
 display_name = "Wilbur Whateley"
+victory = "win_ward"
 model = "whateley"
 role = "Hijo de Lavinia, de Dunwich"
 passive_text = "Medio de otro mundo: el daño mental le hace un 40 % menos."

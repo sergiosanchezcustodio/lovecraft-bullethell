@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"legrasse"
 display_name = "John R. Legrasse"
+victory = "win_salute"
 model = "legrasse"
 role = "Inspector de la policía de Nueva Orleans"
 passive_text = "25 % más daño contra cultistas y enemigos humanos."

@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"west"
 display_name = "Herbert West"
+victory = "win_bow"
 model = "west"
 role = "Médico, reanimador"
 passive_text = "Al subir de nivel cura un 15 % de la vida a los compañeros cercanos."

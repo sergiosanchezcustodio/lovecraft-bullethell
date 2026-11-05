@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"whipple"
 display_name = "Dra. Marian Whipple"
+victory = "win_bow"
 model = "whipple"
 role = "Doctora, sobrina del Dr. Elihu Whipple"
 passive_text = "Reanima a los compañeros un 50 % más rápido."

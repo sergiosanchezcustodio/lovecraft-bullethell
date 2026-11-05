@@ -52,6 +52,9 @@ extends Resource
 @export var dodge_cooldown := 1.2            ## s desde que empieza hasta poder repetir
 ## Animación del esquive (la fija su estilo; ver DodgeStyle).
 @export var dodge_anim := "slide"
+## Pose de victoria al superar un nivel (hito 17.5): "win_fist", "win_salute", "win_hat",
+## "win_ward" o "win_bow" (anim_humano). Vacío: win_fist.
+@export var victory := ""
 ## Estilo de esquive del personaje (data/dodges/). Si está, sus valores sustituyen a los
 ## de arriba al crear el jugador.
 @export var dodge_style: DodgeStyle

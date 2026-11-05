@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"olmstead"
 display_name = "Robert Olmstead"
+victory = "win_hat"
 model = "olmstead"
 role = "Viajero y narrador de Innsmouth"
 passive_text = "Esquive un 30 % más largo."

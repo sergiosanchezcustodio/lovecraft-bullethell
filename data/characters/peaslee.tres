@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"peaslee"
 display_name = "Amelia Peaslee"
+victory = "win_hat"
 model = "peaslee"
 role = "Arqueóloga, sobrina del profesor Peaslee"
 passive_text = "Más suerte: a veces, una cuarta mejora para elegir."

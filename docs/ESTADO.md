@@ -1982,7 +1982,19 @@ El autor pidió las 20 propuestas de mejoras gráficas, sin empeorar apreciablem
 - Tres gestos nuevos en `anim_humano`, encima de andar (brazos y torso): `cheer` (sube de nivel: alza el puño derecho y lo agita dos veces, el izquierdo cerrado al pecho; 0,9 s, desde `Game.level_fx`, así que también en los otros PC), `marvel` (evoluciona un arma: junta las manos delante como si sostuviera algo que brilla y lo alza; 1,1 s, desde `WeaponSystem.evolve`) y `open_chest` (abre un baúl arcano: se inclina, mete las manos bajo la tapa y tira hacia arriba; 0,9 s, desde `ArcaneChest.open`).
 - `Player.play_once(anim, keep)`: con `keep`, los gestos de atacar no lo cortan hasta el 85 % de su duración. Si un baúl evoluciona un arma, `marvel` sustituye a `open_chest`.
 - La subida abre su ventana con la partida parada: el puño se ve al cerrarla (el gesto avanza con el reloj del jugador).
-- **Pruebas:** un tajo no corta la celebración y, acabada, vuelve a atacar (`test_gestos_ataque.gd`). 744 de 744.
+- **Pruebas:** un tajo no corta la celebración y, acabada, vuelve a atacar (`test_gestos_ataque.gd`). 743 de 743.
+
+### Hito 17.5: pose de victoria (05-11-2026)
+
+- Al superar el nivel (`Game._on_level_completed`, también en los otros PC), cada investigador en pie hace la suya durante 1,6 s, en brazos y torso (sigue pudiendo andar mientras recoge lo que queda), con `keep`: `CharacterData.victory`.
+  - `win_fist`, los dos puños arriba: Dyer y Johansen.
+  - `win_salute`, saludo militar: Elwood y Legrasse.
+  - `win_hat`, se toca el ala del sombrero y abre la mano: Olmstead, Peaslee, Malone y Carter.
+  - `win_ward`, la mano izquierda alzada y la derecha al pecho: Armitage, Varga, Iwanicki, Blake y Whateley.
+  - `win_bow`, reverencia pequeña con la mano al pecho: Whipple y West. Primero era una reverencia honda y la cabeza se quedaba atrás (no cuelga del tronco) y la bata se abría como si se sentara: el tronco se inclina solo 0,14 rad.
+- Vencer al jefe es superar su nivel; los jefes intermedios (16.19) no tienen pose aparte.
+- Captura: `godot --path . --fixed-fps 30 -- character=elwood level=p1_n1 final_at=2 bot=idle god=true shots=3` (el saludo).
+- **Pruebas:** cada investigador tiene una pose que existe y se usan las cinco. 744 de 744.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

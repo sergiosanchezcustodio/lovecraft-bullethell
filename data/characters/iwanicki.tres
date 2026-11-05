@@ -7,6 +7,7 @@
 script = ExtResource("1")
 id = &"iwanicki"
 display_name = "Padre Iwanicki"
+victory = "win_ward"
 model = "iwanicki"
 role = "Sacerdote de la iglesia de San Estanislao"
 passive_text = "Aura que calma: él y los compañeros cercanos recuperan cordura."
