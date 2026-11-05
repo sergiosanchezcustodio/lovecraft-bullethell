@@ -429,3 +429,29 @@ func test_ventanas_con_ancho_y_sitio() -> void:
 			assert_gte(uv2[i].y, 0.0)
 		found = true
 	assert_true(found, "la casa tiene ventanas que se encienden")
+
+## Decorado que reacciona (hito 17.17): una explosión al lado tambalea un barril sobre su base y
+## vuelve a quedarse quieto; los juncos se apartan de los jugadores.
+func test_decorado_que_reacciona() -> void:
+	assert_gt(float(Ambient.model_cfg("inn_juncos").get("part", 0.0)), 0.0, "los juncos se apartan")
+	assert_true(Ambient.model_cfg("inn_barril").has("wobble"))
+	var a := Ambient.new()
+	var h := Node3D.new()
+	add_child_autofree(h)
+	h.rotation.y = 0.7
+	var base := h.basis
+	a._wobbles.append({"h": h, "base": base, "d": Vector2.ZERO, "v": Vector2.ZERO, "max": deg_to_rad(8.0)})
+	var keep := Gusts.current.duplicate()
+	Gusts.current = [Vector4(1.0, 0.0, 0.3, 4.0), Vector4(0, 0, 0, 1)]   # una explosión a 1 m
+	var most := 0.0
+	for i in 20:
+		a._wobble_step(1.0 / 60.0)
+		most = maxf(most, (a._wobbles[0].d as Vector2).length())
+	assert_gt(most, deg_to_rad(2.0), "se tambalea")
+	assert_lt((a._wobbles[0].d as Vector2).x, 0.0, "hacia el lado contrario a la explosión")
+	Gusts.current = [Vector4(0, 0, 0, 1), Vector4(0, 0, 0, 1)]
+	for i in 240: a._wobble_step(1.0 / 60.0)
+	assert_lt((a._wobbles[0].d as Vector2).length(), 0.002, "y se queda quieto")
+	assert_almost_eq(h.position, Vector3.ZERO, Vector3.ONE * 0.001, "sobre su base")
+	Gusts.current = keep
+	a.free()

@@ -160,6 +160,8 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 	if not out_ripples.is_empty(): out["ripples"] = out_ripples
 	if not candles.is_empty(): out["candles"] = candles
 	if c.has("bob") and in_sea: out["bob"] = float(c.bob)
+	if c.has("wobble") and not in_sea: out["wobble"] = float(c.wobble)   # se tambalea con las explosiones (17.17)
+	if c.has("part"): out["part"] = true
 	if c.has("swing") and (m.get_meta("part_nodes") as Dictionary).has(String(c.swing.get("part", ""))): out["swing"] = c.swing
 	if c.has("glow"): out["glow"] = c
 	return out
@@ -201,6 +203,7 @@ static func _sway_material(model: String, c: Dictionary, base: Material, wind: V
 		m.set_shader_parameter("specular_v", (base as StandardMaterial3D).metallic_specular)
 	m.set_shader_parameter("amplitude", float(c.sway))
 	m.set_shader_parameter("flutter", float(c.get("flutter", 0.0)))   # lonas (hito 17.13)
+	m.set_shader_parameter("part_r", float(c.get("part", 0.0)))       # juncos que se apartan (hito 17.17)
 	m.set_shader_parameter("height", float(c.get("height", 4.0)))
 	m.set_shader_parameter("speed", float(c.get("speed", 1.0)))
 	m.set_shader_parameter("wind", wind.normalized())
@@ -255,6 +258,8 @@ var _rocks: Array = []                          ## [Vector2 centro, radio]: lo q
 var _rock_t := 0.0
 var _lights: Array = []                         ## [OmniLight3D, energía, modo, amount, speed, semilla]
 var _swings: Array[Dictionary] = []             ## faroles que cuelgan: parte, ángulo y velocidad
+var _wobbles: Array[Dictionary] = []            ## lo que se tambalea con las explosiones (hito 17.17)
+var _parting := false                           ## hay juncos que se apartan: mandar dónde están los jugadores
 var _candles: Array = []                        ## [llama, s que le quedan apagada (0: encendida), luz de su pieza]
 static var step_now := ""                       ## suelo de la arena en juego (Explosion: la nieve que aparta)
 static var blizzard_now := 0.0                  ## cuánto se ha cerrado la ventisca (Hud: retratos empañados)
@@ -366,6 +371,10 @@ func _ready() -> void:
 			_lights.append([l, l.light_energy, int(MODES.get(String(g.glow), 1)), float(g.get("amount", 0.2)), float(g.get("speed", 1.0)), seed_of(h.global_position), l.position])
 		if it.has("glow") and String((it.glow as Dictionary).get("glow", "")) == "heart": _hearts.append(h.global_position)
 		if it.has("swing"): _add_swing(h, it.swing)
+		if it.has("wobble"):
+			h.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # se mueve en _process
+			_wobbles.append({"h": h, "base": h.basis, "d": Vector2.ZERO, "v": Vector2.ZERO, "max": deg_to_rad(float(it.wobble))})
+		if it.has("part"): _parting = true
 		for fx: GPUParticles3D in it.get("candles", []): _candles.append([fx, 0.0, it.get("light")])
 		if it.has("sound"): _sounds.append(it.sound)
 		for lp: Vector3 in it.get("ripples", []): _ripplers.append([h.to_global(lp), 0.0])
@@ -497,6 +506,44 @@ func _candle_step(delta: float) -> void:
 
 ## Péndulo amortiguado empujado por el viento: se inclina a sotavento tanto más cuanto más
 ## sopla, y la turbulencia (cerca de su frecuencia propia) lo mece; las rachas lo agitan más.
+## Barriles, cajas y farolas (hito 17.17): una explosión cerca los tambalea sobre su base, como un
+## muelle que se apaga en un segundo. Solo con ráfagas o mientras se mueven.
+const WOBBLE_KICK := 30.0                       ## rad/s² por m de ráfaga
+const WOBBLE_K := 70.0                          ## rigidez (1/s²): unas 1,3 oscilaciones por segundo
+func _wobble_step(delta: float) -> void:
+	var gusty := false
+	for g in Gusts.current: gusty = gusty or g.z > 0.002
+	var dt := minf(delta, 0.05)
+	for w: Dictionary in _wobbles:
+		var h: Node3D = w.h
+		if not is_instance_valid(h): continue
+		var d: Vector2 = w.d
+		var v: Vector2 = w.v
+		if not gusty and d.length_squared() < 1e-7 and v.length_squared() < 1e-6: continue
+		var acc := -WOBBLE_K * d - 4.5 * v
+		if gusty: acc += _blast_push(h.global_position) * WOBBLE_KICK
+		v += acc * dt
+		d = (d + v * dt).limit_length(w.max)
+		w.d = d
+		w.v = v
+		if d.length() < 0.0003:
+			h.basis = w.base
+			continue
+		var axis := Vector3(d.x, 0, d.y).cross(Vector3.UP).normalized()   # la punta va hacia d
+		h.basis = Basis(axis, d.length()) * (w.base as Basis)
+
+## Dónde están los jugadores, para los juncos que se apartan (sway.gdshader, walk_a/walk_b).
+func _walk_step() -> void:
+	var g := get_parent()
+	var players: Array = g.players if g != null and "players" in g else []
+	var far := 100000.0
+	var p: Array[Vector2] = [Vector2(far, far), Vector2(far, far), Vector2(far, far), Vector2(far, far)]
+	for i in mini(players.size(), 4):
+		var pl := players[i] as Node3D
+		if is_instance_valid(pl): p[i] = Vector2(pl.global_position.x, pl.global_position.z)
+	RenderingServer.global_shader_parameter_set(&"walk_a", Vector4(p[0].x, p[0].y, p[1].x, p[1].y))
+	RenderingServer.global_shader_parameter_set(&"walk_b", Vector4(p[2].x, p[2].y, p[3].x, p[3].y))
+
 func _swing_step(delta: float, t: float) -> void:
 	var g := get_parent()
 	var wv := Vector3.ZERO
@@ -591,6 +638,8 @@ func _process(delta: float) -> void:
 			var j := float(l[3]) * 0.35 / maxf((l[0] as Node3D).get_parent().scale.x, 0.01)
 			(l[0] as Node3D).position = (l[6] as Vector3) + Vector3(sin(t * 7.1 + sd) * sin(t * 2.3 + sd), 0.5 + 0.5 * sin(t * 5.3 + sd * 1.7), sin(t * 6.3 + sd * 2.1) * sin(t * 1.9 + sd)) * j
 	if not _swings.is_empty(): _swing_step(delta, t)
+	if not _wobbles.is_empty(): _wobble_step(delta)
+	if _parting: _walk_step()
 	if not _candles.is_empty(): _candle_step(delta)
 	if not _clouds_done:
 		_clouds_done = true
@@ -3391,5 +3440,8 @@ func _blizzard_step(c: Dictionary, k: float) -> void:
 		_veil.set_shader_parameter("wind", Vector2(wv.x, -wv.y) * 0.05 * lerpf(0.6, 1.4, k))
 
 func _exit_tree() -> void:
+	if _parting:
+		RenderingServer.global_shader_parameter_set(&"walk_a", Vector4.ONE * 100000.0)
+		RenderingServer.global_shader_parameter_set(&"walk_b", Vector4.ONE * 100000.0)
 	step_now = ""
 	blizzard_now = 0.0

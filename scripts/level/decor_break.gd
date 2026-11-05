@@ -265,10 +265,10 @@ func _process(delta: float) -> void:
 		p.shake -= delta
 		var k := maxf(p.shake, 0.0) / SHAKE_TIME
 		var off := Vector3(sin(p.shake * 90.0), 0.0, cos(p.shake * 77.0)) * 0.035 * k
-		p.holder.transform = Transform3D(p.base.basis, p.base.origin + off)
+		p.holder.position = p.base.origin + off            # solo la posición: el giro lo tambalea Ambient (17.17)
 		for mi: MeshInstance3D in p.model.get_meta("meshes"):
 			if is_instance_valid(mi): mi.material_overlay = _flash_mat if p.shake > SHAKE_TIME * 0.7 else null
-		if p.shake <= 0.0: p.holder.transform = p.base
+		if p.shake <= 0.0: p.holder.position = p.base.origin
 	for i in range(_crumbling.size() - 1, -1, -1):
 		var it: Array = _crumbling[i]
 		it[2] += delta

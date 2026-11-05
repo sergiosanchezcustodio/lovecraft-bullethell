@@ -546,7 +546,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | 17.14 | **Humo en las chimeneas y vapor en las alcantarillas**, por calidad | **Hecho (05-11-2026), pendiente de tu revisión:** el humo ya estaba; alcantarillas con vapor en Innsmouth y Arkham, apagadas en Baja |
 | 17.15 | **La fuente de Innsmouth** con agua que cae y ondas en el pilón | **Hecho (05-11-2026), pendiente de tu revisión:** el chorro ya estaba; el agua del pilón tiene ondas desde donde cae, rizo y destellos de luna |
 | 17.16 | **Siluetas en las ventanas:** de vez en cuando alguien se asoma a una ventana encendida y se aparta, o se mueve una cortina | **Hecho (05-11-2026), pendiente de tu revisión:** alguien a contraluz se asoma y se va, o se corre la cortina; todo en el sombreador |
-| 17.17 | **Decorado que reacciona:** los juncos se apartan al pasar, las aves levantan el vuelo al acercarte, los barriles y faroles se tambalean con las explosiones | Pendiente |
+| 17.17 | **Decorado que reacciona:** los juncos se apartan al pasar, las aves levantan el vuelo al acercarte, los barriles y faroles se tambalean con las explosiones | **Hecho (05-11-2026), pendiente de tu revisión:** las gaviotas y los faroles colgados ya lo hacían; ahora los juncos se apartan al pasar y los barriles, las cajas y las farolas se tambalean con las explosiones |
 
 ### Bloque E: escenarios
 

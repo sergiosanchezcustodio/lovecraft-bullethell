@@ -17,6 +17,10 @@ uniform float flutter = 0.0;                  // lona (hito 17.13): ondas rápid
 uniform bool unshaded_glow = false;           // capa de luz de la misma pieza
 global uniform vec4 gust_a;                   // ráfagas de explosiones y esquives (Gusts, hito 11.4):
 global uniform vec4 gust_b;                   // x, z, fuerza (m) y radio
+global uniform vec4 walk_a;                   // dónde están los jugadores (Ambient, hito 17.17): xz del 1 y el 2
+global uniform vec4 walk_b;                   // y del 3 y el 4 (lejísimos si no hay)
+uniform float part_r = 0.0;                   // juncos: se apartan a menos de esto (m) de un jugador
+uniform float part_push = 0.32;               // lo que se aparta lo más alto (m)
 
 // Empuje de una ráfaga sobre la pieza que está en `at` (en el mundo): hacia fuera, con un
 // temblor que se apaga con su fuerza.
@@ -34,6 +38,7 @@ void vertex() {
 		COLOR.rgb = mix(pow((COLOR.rgb + vec3(0.055)) * (1.0 / 1.055), vec3(2.4)), COLOR.rgb * (1.0 / 12.92), lessThan(COLOR.rgb, vec3(0.04045)));
 	}
 	float ph = dot(NODE_POSITION_WORLD.xz, vec2(1.31, 0.73));
+	vec2 rest_xz = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz;     // antes de moverse: no tiembla
 	float k = hang ? clamp(-VERTEX.y / height, 0.0, 1.0) : pow(clamp(VERTEX.y / height, 0.0, 1.0), 1.7);
 	float gust = 0.55 + 0.45 * sin(TIME * 0.29 + ph * 0.5) * sin(TIME * 0.17 + ph);
 	float s = sin(TIME * speed + ph) * 0.65 + sin(TIME * speed * 2.7 + ph * 1.9 + VERTEX.y * 1.7) * 0.25 * k;
@@ -48,6 +53,16 @@ void vertex() {
 	}
 	vec3 blast = gust_push(gust_a, NODE_POSITION_WORLD.xz, TIME) + gust_push(gust_b, NODE_POSITION_WORLD.xz, TIME);
 	VERTEX += to_local * blast * k;
+	if (part_r > 0.0) {                       // los juncos se apartan al pasar
+		vec2 push = vec2(0.0);
+		vec2 who[4] = vec2[4](walk_a.xy, walk_a.zw, walk_b.xy, walk_b.zw);
+		for (int i = 0; i < 4; i++) {
+			vec2 d = rest_xz - who[i];
+			float dist = length(d);
+			if (dist < part_r) push += (dist > 0.01 ? d / dist : vec2(0.7, 0.7)) * (1.0 - smoothstep(part_r * 0.3, part_r, dist));
+		}
+		VERTEX += to_local * vec3(push.x, -0.25 * length(push), push.y) * part_push * k;
+	}
 }
 
 void fragment() {

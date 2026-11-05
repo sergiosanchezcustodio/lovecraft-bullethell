@@ -2143,6 +2143,21 @@ Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, mat
 - **Coste:** unas operaciones más por vértice y por píxel en la capa de las ventanas.
 - **Pruebas:** la capa de las ventanas de una casa lleva el ancho y el sitio de cada vértice. 759 de 759.
 
+### Hito 17.17: decorado que reacciona (05-11-2026)
+
+- Ya estaban: las gaviotas posadas que levantan el vuelo al acercarte (`perch`), los faroles colgados que se mecen con las explosiones (12.11) y las plantas, telas y llamas que empujan las ráfagas (11.4).
+- **Juncos que se apartan al pasar:**
+  - `sway.gdshader` lee dos variables globales nuevas, `walk_a` y `walk_b` (en `project.godot`), con dónde están los jugadores; `Ambient._walk_step` las manda en cada fotograma, solo en las arenas con juncos.
+  - Lo que está a menos de `part` m de un jugador se aparta hacia fuera y un poco hacia abajo, más cuanto más alto. Se cuenta desde la posición de reposo, para que no tiemble.
+  - Lo llevan los juncos de la carretera, el pantano y el ritual (`inn_juncos`, `part: 0.9`).
+- **Barriles, cajas y farolas que se tambalean:**
+  - Una explosión cerca los inclina sobre su base: un muelle amortiguado (`Ambient._wobble_step`, `WOBBLE_K`) que lee las mismas ráfagas (`Gusts`) y se apaga en un segundo.
+  - Lo llevan los barriles (8°), las cajas (3-5°), las farolas (2,5° y 5°) y los postes (2°): `wobble` en `data/ambient.json`.
+  - Sin ráfagas y quietos, no se recorren.
+- `DecorBreak` mueve ahora solo la posición al recibir un golpe (antes toda la transformación), para no pisarse con el tambaleo.
+- **Coste:** un bucle de cuatro jugadores en los vértices de los juncos; el tambaleo, solo tras una explosión.
+- **Pruebas:** un barril se tambalea hacia el lado contrario a la explosión y vuelve a quedarse quieto sobre su base. 760 de 760.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
