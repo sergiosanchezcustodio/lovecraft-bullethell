@@ -32,6 +32,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 14 | Vestuario ampliado y tienda de ropa | **Hecha** (30-10-2026), pendiente de revisión del autor | Ninguna |
 | 15 | Repetición de la caída, modo desafío, enemigos nuevos y bestiario vivo | **Hecha** (30-10-2026; mejoras el 02-11-2026), pendiente de tu revisión | Ninguna |
 | 16 | Rendimiento, jugabilidad del género, enemigos, modos, menús y gráficos | **Hecha** (03-11-2026) en el alcance elegido (D-46), pendiente de tu revisión: bloques A (16.4 fuera; 16.1 al borde: 1 % peor de 14-17,5 ms en Alta frente al límite de 16,7), B (16.8, 16.9, 16.12, 16.14 y 16.15), C, D, E y F; G no elegido. Por revisar las propuestas D-47, D-48 y D-49 | Ninguna (D-46, resuelta) |
+| 17 | Animación y vida de los escenarios | **En curso** (05-11-2026): 20 hitos en cinco bloques (investigadores, compañeros, enemigos, objetos del escenario y escenarios), sin empeorar apreciablemente el rendimiento | Ninguna |
 
 ---
 
@@ -498,3 +499,59 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | 16.36 | *No elegido (02-11-2026).* **Steam Deck y portátiles:** preajuste «Portátil» (800p, 30-40 fps estables) y la interfaz revisada a 1280×800 | `data/quality.json`, `ui_check=true` a esa resolución |
 | 16.37 | *No elegido (02-11-2026).* **Linux:** build y prueba en GitHub Actions (Godot exporta sin cambios) | `.github/workflows/build.yml` |
 | 16.38 | *No elegido (02-11-2026).* **Informe de errores:** si el juego se cerró mal, al volver ofrece guardar un archivo con el registro y la configuración para mandártelo | `user://logs/` |
+
+## Fase 17: animación y vida de los escenarios
+
+**Pedida por el autor (05-11-2026):** «quiero todas, pero que [no] empeoren mucho el rendimiento, debe poder seguir jugándose bien». Son las 20 propuestas de mejoras gráficas del mismo día, ordenadas en cinco bloques.
+
+**Regla de rendimiento de la fase:**
+- Cada hito se mide antes y después en Alta (`python tools/comparar.py`, tres veces, en un nivel ligero y dos pesados).
+- Toda la fase junta no debe subir la media más de 0,5 ms ni el 1 % peor de forma apreciable.
+- Lo que cuesta va por calidad (`data/quality.json`), se quita en Baja o Media y tiene su opción `=false` para comparar.
+- Lo que afecta a los enemigos corrientes funciona también en las hordas con instancias (`HordeMesh`, 16.3), con datos por instancia y sin nodos nuevos por enemigo.
+- Las animaciones de partes van en `scripts/anim/`, los sombreadores y partículas reutilizan lo que hay, y nada crea mallas ni materiales nuevos en mitad del nivel (lección del 16.1).
+
+### Bloque A: investigadores
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 17.1 | **Gesto al atacar:** retroceso con cada disparo de las armas de fuego, tajo con las de cuerpo a cuerpo y gesto de lanzar con las arrojadizas (hoy solo la dinamita tiene gesto) | **Hecho (05-11-2026), pendiente de tu revisión:** apunta con una o dos manos y culatazo en cada bala (`shot`, `shot2`), conjuro, tajo, estocada, golpe de martillo y lanzar, según el arma (`WeaponData.gesture`); también en red. 0,02 ms con cuatro jugadores |
+| 17.2 | **Inclinarse en las curvas y frenar:** el cuerpo se ladea al girar deprisa y da un pequeño derrape al pararse | Pendiente |
+| 17.3 | **Mirar al peligro:** la cabeza sigue al enemigo más cercano y, cuando aparece, al jefe | Pendiente |
+| 17.4 | **Gestos al subir de nivel, evolucionar un arma y abrir un baúl** | Pendiente |
+| 17.5 | **Pose de victoria** de cada investigador al superar un nivel o vencer a un jefe | Pendiente |
+| 17.6 | **Andar según el suelo:** brazos altos al vadear, pasos pesados en el barro y resbalones en el hielo | Pendiente |
+
+### Bloque B: compañeros
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 17.7 | **Gestos de reposo** del shoggoth bebé (se parte en dos y se junta) y de la serpiente (se enrosca y saca la lengua), los únicos que no tienen | Pendiente |
+| 17.8 | **Reaccionan a lo que le pasa a su dueño:** lo rodean al subir de nivel, se quedan pegados cuando cae abatido, se encogen con la cordura baja y se duermen si lleva mucho rato quieto | Pendiente |
+
+### Bloque C: enemigos
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 17.9 | **Muertes según el daño:** el fuego los quema hasta la ceniza, las explosiones los lanzan en trozos y el rayo los deja temblando y humeando. Si no, la de su familia | Pendiente |
+| 17.10 | **Golpe según la dirección:** se echan hacia atrás en la dirección del impacto | Pendiente |
+| 17.11 | **Entradas por familia:** los profundos trepan desde el agua y se sacuden, los cultistas salen de la niebla | Pendiente |
+| 17.12 | **Hordas menos clónicas:** pequeñas diferencias de ritmo, tamaño y paso entre enemigos del mismo tipo | Pendiente |
+
+### Bloque D: objetos del escenario
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 17.13 | **Más objetos con viento** (el sombreador de los árboles): redes, lonas de las tiendas, toldos, ropa tendida y las barcas que aún no flotan | Pendiente |
+| 17.14 | **Humo en las chimeneas y vapor en las alcantarillas**, por calidad | Pendiente |
+| 17.15 | **La fuente de Innsmouth** con agua que cae y ondas en el pilón | Pendiente |
+| 17.16 | **Siluetas en las ventanas:** de vez en cuando alguien se asoma a una ventana encendida y se aparta, o se mueve una cortina | Pendiente |
+| 17.17 | **Decorado que reacciona:** los juncos se apartan al pasar, las aves levantan el vuelo al acercarte, los barriles y faroles se tambalean con las explosiones | Pendiente |
+
+### Bloque E: escenarios
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 17.18 | **Sucesos lejanos,** uno por arena: un tentáculo que asoma en el horizonte del arrecife, una silueta inmensa iluminada por un relámpago en la tormenta, las estatuas del estudio que giran la cabeza cuando no las miras… | Pendiente |
+| 17.19 | **Luz de los disparos y las explosiones** sobre paredes y suelo, en Alta y Ultra | Pendiente |
+| 17.20 | **Rastros que se quedan:** icor, ceniza y quemaduras en el suelo el resto del nivel, con tope | Pendiente |

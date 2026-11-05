@@ -7,12 +7,14 @@ extends RefCounted
 ## CharacterData.dodge_anim; la animación puede durar más que el impulso del esquive.
 const ARM_LAG := 0.32                         ## retraso de los brazos respecto a las piernas (rad del ciclo)
 const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive": 0.5,
-	"jump": 0.45, "flash": 0.3, "throw": 0.55,
+	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6,
 	"fidget_look": 2.6, "fidget_stretch": 2.8, "fidget_check": 2.4, "fidget_shift": 1.8,
 	"down": 0.9, "down_wait": 3.0, "get_up": 0.75}
 ## Gestos de reposo (28-10-2026): Player los pone de vez en cuando si el personaje lleva un rato
 ## quieto. Empiezan y acaban en la pose de reposo, y se funden al entrar y al salir.
 const FIDGETS := ["fidget_look", "fidget_stretch", "fidget_check", "fidget_shift"]
+## Gestos al atacar de los investigadores (hito 17.1): las hordas (HordeMesh) no los graban.
+const HORDE_SKIP := ["cast", "swing", "thrust", "slam"]
 
 ## Piezas opcionales: antebrazos y espinillas (codos y rodillas), bufanda y coleta. Los
 ## modelos partidos con tools/humano.py split_limbs las tienen; los demás, no, y las
@@ -269,6 +271,75 @@ static func throw(m: Node3D, t: float) -> void:
 	Anims.part(m, "torso").rotation.y = -back * 0.22 + fwd * 0.18
 	Anims.part(m, "arm_l").rotation.x = -back * 0.35
 	bend(m, "fore_r", -back * 1.3 + fwd * 0.2)                             # codo atrás al coger impulso
+
+# ---------------------------------------------------------------- gestos al atacar (hito 17.1)
+# Los de un golpe (cast, swing, thrust, slam, como throw) los pone Player.play_once encima de
+# andar, solo en brazos y torso (UPPER_BODY): no tocan otras partes. aim lo suma Player cada
+# fotograma mientras dispara.
+
+## Apuntar y retroceso, encima de la pose: w (0..1), cuánto apunta; look (rad), hacia dónde
+## respecto al frente; kick (0..1), el culatazo de cada disparo, que se apaga solo; two (0..1),
+## con las dos manos (rifles, escopetas, subfusiles), con la izquierda sujetando por delante.
+## El brazo gira primero en Y (rotation_order YXZ): estirado y vuelto hacia el disparo.
+static func aim(m: Node3D, two: float, look: float, kick: float, w: float) -> void:
+	if w <= 0.0: return
+	Anims.part(m, "torso").rotation.y += look * 0.35 * w
+	Anims.part(m, "torso").rotation.x += -0.07 * kick * w             # el culatazo lo echa atrás
+	Anims.part(m, "head").rotation.y += look * 0.45 * w
+	var one_r := Vector3(-1.5 - 0.38 * kick, look, 0.0)                 # pistola: el brazo salta arriba
+	var two_r := Vector3(-0.75 - 0.15 * kick, look - 0.3, 0.0)         # codo abajo, la mano en la culata
+	var two_l := Vector3(-1.4 - 0.2 * kick, look + 0.45, 0.0)          # la izquierda, estirada por delante
+	_toward(m, "arm_r", one_r.lerp(two_r, two), w)
+	_toward(m, "fore_r", Vector3(lerpf(-0.1 - 0.4 * kick, -0.95, two), 0.0, 0.0), w)
+	if two > 0.0:
+		_toward(m, "arm_l", two_l, w * two)
+		_toward(m, "fore_l", Vector3(-0.25, 0.0, 0.0), w * two)
+	m.position.z -= 0.025 * kick * w * (1.0 + two)
+
+## Conjuro (armas arcanas): alza las dos manos hacia delante, abiertas, y empuja.
+static func cast(m: Node3D, t: float) -> void:
+	var up := Anims.ease(t / 0.35) if t < 0.55 else 1.0 - Anims.ease((t - 0.55) / 0.45)
+	var push := sin(clampf((t - 0.3) / 0.3, 0.0, 1.0) * PI)
+	Anims.part(m, "arm_l").rotation = Vector3(-1.1 * up - 0.4 * push, -0.28 * up, 0.0)
+	Anims.part(m, "arm_r").rotation = Vector3(-1.1 * up - 0.4 * push, 0.28 * up, 0.0)
+	bend(m, "fore_l", -0.65 * up + 0.5 * push)
+	bend(m, "fore_r", -0.65 * up + 0.5 * push)
+	Anims.part(m, "torso").rotation.x = -0.1 * up + 0.14 * push
+
+## Tajo (machete, látigo, barridos): el brazo derecho se abre atrás y a un lado con el codo
+## doblado y cruza por delante, con el tronco, y vuelve.  0-0,3 se arma | 0,3-0,52 corta | 0,6-1 vuelve
+static func swing(m: Node3D, t: float) -> void:
+	var wind := Anims.ease(t / 0.3)
+	var cut := Anims.ease((t - 0.3) / 0.22)
+	var rest := 1.0 - Anims.ease((t - 0.6) / 0.4)
+	Anims.part(m, "arm_r").rotation = Vector3(-1.3 * wind * rest, lerpf(1.3 * wind, -0.95, cut) * rest, 0.0)
+	bend(m, "fore_r", (-0.8 * wind * (1.0 - cut) - 0.1) * rest)
+	Anims.part(m, "torso").rotation.y = (0.35 * wind - 0.8 * cut) * rest
+	Anims.part(m, "arm_l").rotation.x = 0.35 * cut * rest
+
+## Estocada (estoque, dagas): recoge el brazo con el codo atrás y lo lanza recto, con el hombro
+## derecho por delante.  0-0,3 recoge | 0,3-0,45 estocada | 0,55-1 vuelve
+static func thrust(m: Node3D, t: float) -> void:
+	var pull := Anims.ease(t / 0.3) * (1.0 - Anims.ease((t - 0.3) / 0.15))
+	var hit := Anims.ease((t - 0.3) / 0.15) * (1.0 - Anims.ease((t - 0.55) / 0.45))
+	Anims.part(m, "arm_r").rotation.x = 0.45 * pull - 1.55 * hit
+	bend(m, "fore_r", -1.3 * pull)
+	Anims.part(m, "torso").rotation.y = 0.15 * pull - 0.3 * hit
+	Anims.part(m, "torso").rotation.x = 0.16 * hit
+	Anims.part(m, "arm_l").rotation.x = 0.5 * hit
+
+## Golpe de martillo: las dos manos arriba, por encima de la cabeza, y abajo de golpe.
+##   0-0,4 alza | 0,4-0,5 golpea | 0,6-1 vuelve
+static func slam(m: Node3D, t: float) -> void:
+	var up := Anims.ease(t / 0.4)
+	var down := Anims.ease((t - 0.4) / 0.1)
+	var rest := 1.0 - Anims.ease((t - 0.6) / 0.4)
+	var x := lerpf(-2.6 * up, -0.7, down) * rest
+	Anims.part(m, "arm_l").rotation = Vector3(x, 0.3 * rest, 0.0)
+	Anims.part(m, "arm_r").rotation = Vector3(x, -0.3 * rest, 0.0)
+	bend(m, "fore_l", -0.5 * up * (1.0 - down) * rest)
+	bend(m, "fore_r", -0.5 * up * (1.0 - down) * rest)
+	Anims.part(m, "torso").rotation.x = (-0.22 * up * (1.0 - down) + 0.38 * down) * rest
 
 ## Preparación (hito 12.5; cultistas, sacerdotes, Barnabas): echa la espalda atrás y alza los
 ## brazos abiertos por encima de la cabeza, con las manos temblando; al soltar, los baja hacia

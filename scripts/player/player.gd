@@ -703,7 +703,59 @@ func _animate(delta: float) -> void:
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
 	_hold_step(delta)
+	_aim_step(delta)
 	_mind_step(delta)
+
+# ---------------------------------------------------------------- gestos al atacar (hito 17.1)
+## Los gestos, por número (en red, `gesture_seq`).
+const GESTURES: Array[String] = ["", "shot", "shot2", "cast", "throw", "swing", "thrust", "slam"]
+const AIM_HOLD := 0.35                         ## s que sigue apuntando tras la última bala (más la recarga)
+const AIM_HOLD_MAX := 1.1                      ## como mucho: con más recarga, baja el brazo entre disparos
+var gesture_seq := 0                           ## sube con cada gesto (5 bits): los demás PC lo repiten
+var gesture_id := 0
+var gesture_yaw := 0.0
+var _net_gesture := 0
+var _aim_w := 0.0
+var _aim_two := 0.0                            ## 0 pistola, 1 arma larga: se funde al cambiar de arma
+var _aim_want_two := 0.0
+var _aim_left := 0.0                           ## s que le quedan apuntando
+var _aim_yaw := 0.0
+var _kick := 0.0
+
+## Gesto al atacar (WeaponSystem): `kind` de GESTURES, hacia `dir`. "shot" y "shot2" apuntan y dan
+## el culatazo (`kick`, 0..1) y siguen apuntando lo que dura la recarga (`cooldown`); los demás
+## son gestos de un golpe encima de andar (play_once).
+func gesture(kind: String, dir: Vector3, kick := 1.0, cooldown := 0.0) -> void:
+	var id := GESTURES.find(kind)
+	if id <= 0: return
+	gesture_seq = (gesture_seq + 1) & 31
+	gesture_id = id
+	gesture_yaw = atan2(dir.x, dir.z) if Vector2(dir.x, dir.z).length_squared() > 0.0001 else visual.rotation.y
+	_do_gesture(kind, gesture_yaw, kick, cooldown)
+
+func _do_gesture(kind: String, yaw: float, kick: float, cooldown: float) -> void:
+	if kind == "shot" or kind == "shot2":
+		_aim_want_two = 1.0 if kind == "shot2" else 0.0
+		if _aim_w <= 0.0: _aim_two = _aim_want_two
+		_aim_left = minf(AIM_HOLD + cooldown, AIM_HOLD_MAX)
+		_aim_yaw = yaw
+		_kick = maxf(_kick, kick)
+	else:
+		play_once(kind)
+
+## Apunta mientras dispara: el brazo (o los dos) estirado hacia el disparo, el tronco y la cabeza
+## un poco hacia él, y el culatazo en cada bala. No durante el esquive ni abatido.
+func _aim_step(delta: float) -> void:
+	_aim_left -= delta
+	var want := 1.0 if _aim_left > 0.0 and _action == "" and not is_downed() else 0.0
+	_aim_w = move_toward(_aim_w, want, delta * (9.0 if want > _aim_w else 3.5))
+	_aim_two = move_toward(_aim_two, _aim_want_two, delta * 5.0)
+	_kick *= exp(-delta * 14.0)
+	if _aim_w <= 0.0: return
+	var s := Anims.script_for(data.model)
+	if s == null or not s.has_method("aim"): return
+	var look := clampf(wrapf(_aim_yaw - visual.rotation.y, -PI, PI), -1.2, 1.2)
+	s.call("aim", model, _aim_two, look, _kick, Anims.ease(_aim_w))
 
 ## Lo que lleva en la mano (vestuario, fase 14): el brazo derecho lo sostiene quieto (brazo y
 ## antebrazo, en radianes) mientras no lanza, esquiva o hace un gesto; vuelve poco a poco.
@@ -787,7 +839,7 @@ func _hold_step(delta: float) -> void:
 		var want := _wade > 0.5 and visual.visible   # cada fotograma volvía a empezar la emisión)
 		if _bubbles.emitting != want: _bubbles.emitting = want
 	if not OutfitData.HOLDS.has(_hold): return
-	_hold_w = move_toward(_hold_w, 1.0 if _action == "" and _override == "" and _fidget == "" else 0.0, delta * 6.0)
+	_hold_w = move_toward(_hold_w, 1.0 if _action == "" and _override == "" and _fidget == "" and _aim_w <= 0.0 else 0.0, delta * 6.0)
 	OutfitData.pose_hold(model, _hold, _hold_w)
 	if _hold == "lantern" and _torch_glow == null and not bool(Quality.value("torch_light", true)):
 		_torch_glow = TorchGlow.new()
@@ -1326,6 +1378,10 @@ func rerolls_left() -> int:
 ## Reproduce una animación puntual (p. ej. "throw") por encima de andar o estar quieto.
 func play_once(anim: String) -> void:
 	if Anims.has_anim(data.model, anim):
+		if _override != "" and _action == "":       # otro gesto a medias: se funde desde donde iba
+			_blend_snap = Anims.snapshot(model)     # (si no, saltaba a la pose de andar; hito 17.1)
+			_blend_t = 0.0
+			_blend_len = 0.1
 		_override = anim
 		_override_t = 0.0
 
@@ -1413,7 +1469,11 @@ func net_solid() -> bool:
 ## Jugador de otro PC: aplica su estado (posición interpolada y lo demás de la foto más
 ## reciente). Los cambios de vida dan las mismas señales que en su PC (derribado, levantado,
 ## eliminado), para que cada partida los anuncie y cuente.
-func net_apply(pos: Vector3, yaw: float, vel: Vector3, dodges: int, hp: float, san: float, flags: int, revive := 0.0) -> void:
+func net_apply(pos: Vector3, yaw: float, vel: Vector3, dodges: int, hp: float, san: float, flags: int, revive := 0.0, gest := -1, gyaw := 0.0) -> void:
+	if gest >= 0 and (gest >> 3) != _net_gesture:  # un gesto nuevo en su PC (hito 17.1)
+		_net_gesture = gest >> 3
+		var kind: String = GESTURES[gest & 7]
+		if kind != "": _do_gesture(kind, gyaw, 1.0, 0.3)
 	position = Vector3(pos.x, 0.0, pos.z)
 	motor.facing = Vector3(sin(yaw), 0.0, cos(yaw))
 	motor.velocity = vel

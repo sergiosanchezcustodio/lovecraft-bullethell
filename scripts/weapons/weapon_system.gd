@@ -125,6 +125,7 @@ func _physics_process_step(delta: float) -> void:
 		if w.timer > 0.0: continue
 		Damage.ctx = tag_of(w)                   # lo que cree este disparo daña en nombre de esta arma
 		if not _fire(w): continue                # el machete espera a tener a alguien cerca
+		_gesture(w)
 		Auto.sfx_at(sound_of(w.data), player.global_position)      # en cooperativo, del lado de quien dispara
 		w.timer = w.stat("cooldown")
 		if w.data.spinup > 1.0:                  # Nagant: cuanto más dispara seguido, más rápido
@@ -178,6 +179,7 @@ func _fire(w: Weapon) -> bool:
 	if paranoid() and w.data.delivery == WeaponData.Delivery.BULLET:
 		var mate := _nearest_mate(rng * 1.5)
 		if mate != null: target_pos = mate.global_position
+	_aim_dir = target_pos - origin
 	var n := int(w.stat("count"))
 	if w.data.delivery == WeaponData.Delivery.MELEE:
 		return _slash(w)
@@ -215,7 +217,6 @@ func _fire(w: Weapon) -> bool:
 				var a := randf() * TAU
 				jitter = Vector3(cos(a), 0, sin(a)) * maxf(w.stat("aoe_radius"), w.stat("zone_radius")) * randf_range(0.6, 1.1)
 			_throw(w, target_pos + jitter)
-		player.play_once("throw")
 	else:
 		var base := Vector3(target_pos.x - origin.x, 0, target_pos.z - origin.z).normalized()
 		# rasgo de Malone: más daño cuanto más cerca está el objetivo
@@ -238,6 +239,20 @@ func _fire(w: Weapon) -> bool:
 		_pay_sanity(w)                           # balas arcanas (fuegos fatuos, Rayo de Yith)
 	fired.emit(w)
 	return true
+
+## Gesto del investigador al atacar (hito 17.1, `WeaponData.gesture_of`). Las armas de balas
+## apuntan y dan el culatazo en cada bala (`_spawn_bullet`), y solo si hay a quién disparar: sin
+## objetivo disparan hacia delante, siempre, y el brazo iría arriba y abajo sin parar.
+var _aim_dir := Vector3.ZERO
+
+func _gesture(w: Weapon) -> void:
+	var g := w.data.gesture_of()
+	if g == "": return
+	if g == "shot" or g == "shot2":
+		if w.data.delivery != WeaponData.Delivery.BULLET and w.had_target:   # lanzallamas, bobina
+			player.gesture(g, _aim_dir, 0.25, w.stat("cooldown"))
+		return
+	player.gesture(g, _aim_dir)
 
 ## Velocidad que hereda un proyectil del jugador: la parte de su movimiento en la dirección
 ## del disparo (nunca hacia atrás), como mucho su velocidad al andar. Así, al correr y
@@ -285,6 +300,9 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 		w.muzzle_frame = Engine.get_physics_frames()
 		world.bullets.muzzle(player.global_position + dir * 0.55)
 		player.muzzle_flash(dir)                       # y un destello de luz (hito 11.3)
+	if w.had_target:
+		var g := w.data.gesture_of()
+		if g == "shot" or g == "shot2": player.gesture(g, dir, 1.0, w.stat("cooldown"))
 	world.bullets.spawn(BulletManager.Team.PLAYER, style,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
 		size, Damage.new(dmg(w, false) * dmg_k, 0.0), life, pierce,
@@ -392,7 +410,6 @@ func _slash(w: Weapon) -> bool:
 	fx.radius = r
 	fx.position = Vector3(origin.x, 0.0, origin.z)
 	world.fx.add_child(fx)
-	player.play_once("throw")                    # el brazo acompaña el tajo
 	fired.emit(w)
 	return true
 
@@ -444,7 +461,6 @@ func _cloud(w: Weapon, target_pos: Vector3) -> bool:
 		var away := Vector3(target_pos.x - player.global_position.x, 0, target_pos.z - player.global_position.z)
 		z.drift = (away.normalized() if away.length() > 0.1 else player.motor.facing) * w.stat("drift")
 	world.fx.add_child(z)
-	player.play_once("throw")
 	fired.emit(w)
 	return true
 
@@ -480,7 +496,6 @@ func _stab(w: Weapon) -> bool:
 		t.curse(w.stat("curse"), w.stat("curse_dps") * player.damage_mult(w.data.category), int(w.stat("curse_spread")),
 			player.data.bonus_tags)
 	world.fx.add_child(Stab.new().setup(origin, t.global_position))
-	player.play_once("throw")
 	fired.emit(w)
 	return true
 
@@ -524,7 +539,6 @@ func _turret(w: Weapon) -> bool:
 	var t := Turret.new().setup(world, player.global_position + player.motor.facing * 0.8, w.stat("duration"),
 		w.stat("hit_interval"), dmg(w), w.stat("range"), w.stat("projectile_speed"), _bonus_set)
 	world.fx.add_child(t)
-	player.play_once("throw")
 	fired.emit(w)
 	return true
 
@@ -544,7 +558,6 @@ func _boomerang(w: Weapon, target_pos: Vector3) -> bool:
 		bm.stun_s = w.stat("stun")                  # la Llave de los sueños adormece (16.25)
 		bm.look = w.data.look if w.data.look == "llave" else ""
 		world.fx.add_child(bm)
-	player.play_once("throw")
 	fired.emit(w)
 	return true
 
@@ -563,7 +576,6 @@ func _fissure(w: Weapon, target_pos: Vector3) -> bool:
 			w.stat("projectile_speed") + inherited_speed(fdir), w.stat("aoe_radius"), dmg(w), w.stat("stun"), player.data.bonus_tags)
 		fi.look = w.data.look if w.data.look == "dunwich" else ""
 		world.fx.add_child(fi)
-	player.play_once("throw")
 	fired.emit(w)
 	return true
 
@@ -589,7 +601,6 @@ func _thrust(w: Weapon) -> bool:
 	fx.color = Color(0.85, 0.88, 0.92, 0.95)
 	fx.blade = 1.1
 	world.fx.add_child(fx)
-	player.play_once("throw")
 	fired.emit(w)
 	return true
 
@@ -652,7 +663,6 @@ func _whip(w: Weapon) -> bool:
 		t.take_damage(d)
 	world.bullets.clear_enemy_bullets(origin + dir * length * 0.5, length * 0.3)   # la tralla corta balas
 	world.fx.add_child(WhipFx.new().setup(origin, dir, length, w.stat("spread_deg")))
-	player.play_once("throw")
 	fired.emit(w)
 	return true
 

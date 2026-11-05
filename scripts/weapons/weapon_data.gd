@@ -66,6 +66,10 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 ## "rifle" (estela larga), "smg" (trazadora corta), "blade" (hoja que gira), "spark" (chispa
 ## de colores), "harpoon" (arpón), "dart" (dardo). Las teledirigidas y las de Yith, las suyas.
 @export var bullet_look := ""
+## Gesto del investigador al atacar (hito 17.1): "shot" (pistola, con una mano), "shot2" (arma
+## larga, con las dos), "cast", "throw", "swing", "thrust", "slam" o "none". Vacío: según la
+## categoría, la entrega y el aspecto de la bala (`gesture_of`).
+@export var gesture := ""
 @export var sfx := ""                         ## sonido al disparar (data/sfx.json); vacío: según categoría y entrega (hito 8.1)
 @export var support := false                ## de puro apoyo (bengala, red...): fuera de las reglas de daño (DamageRules)
 @export var icon: Texture2D                  ## imagen del arma (ficha, HUD); sin ella, un hueco
@@ -140,6 +144,24 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var level_text: Array[String] = []   ## descripción de cada mejora, para el menú
 
 ## Ramas de su evolución (ids): una o dos (hito 16.8).
+## El gesto al atacar con esta arma ("" si ninguno): `gesture` o, si está vacío, el que le toca.
+func gesture_of() -> String:
+	if gesture != "": return "" if gesture == "none" else gesture
+	match delivery:
+		Delivery.ORBIT: return ""                                      # giran solas alrededor
+		Delivery.MELEE, Delivery.WHIP: return "swing"
+		Delivery.STAB, Delivery.THRUST: return "thrust"
+	if category == Category.MAGIC: return "cast"
+	match delivery:
+		Delivery.BULLET:
+			if bullet_look == "blade": return "throw"                  # bisturís, de muñeca
+			return "shot2" if bullet_look in ["rifle", "pellet", "smg", "harpoon"] else "shot"
+		Delivery.FLAME, Delivery.CHAIN, Delivery.BEAM, Delivery.TETHER: return "shot2"
+		Delivery.FISSURE: return "slam"
+		Delivery.SWEEP: return "swing"
+		Delivery.WAVE, Delivery.PULSE, Delivery.SIGIL, Delivery.DRONE: return "cast"
+	return "throw"
+
 func branches() -> Array[StringName]:
 	var out: Array[StringName] = []
 	if evolution != &"": out.append(evolution)

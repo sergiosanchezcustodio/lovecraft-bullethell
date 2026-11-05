@@ -7,6 +7,7 @@ script = ExtResource("1_h8yyn")
 id = &"carabina_mauser"
 display_name = "Carabina Mauser"
 description = "Con la culata puesta: un solo disparo que llega lejos y atraviesa a cinco."
+gesture = "shot2"
 bullet_look = ""
 sfx = ""
 support = false

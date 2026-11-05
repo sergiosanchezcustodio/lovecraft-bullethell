@@ -101,6 +101,6 @@ func test_explosiones() -> void:
 
 func test_en_red() -> void:
 	assert_not_null(load("res://scripts/net/net_game.gd"), "compila con el suceso «decor»")
-	assert_eq(NetSession.PROTOCOL, 18)
+	assert_true(NetSession.PROTOCOL >= 18, "el 18 trajo el decorado roto")
 	var on := Quality.presets().map(func(p: Dictionary) -> int: return int(p.get("decor_rubble", 0)))
 	assert_eq(on, [16, 28, 40, 56])

@@ -50,6 +50,8 @@ static func build(p_model: String) -> HordeMesh:
 	h.height = maxf(0.8, h.mesh.get_aabb().end.y)
 	var rows: Array = []                   # Array de Array[Transform3D] (una por parte)
 	var anims: Array = (s.get("DURATION") as Dictionary).keys()
+	var skip: Variant = s.get("HORDE_SKIP")                # lo que solo hacen los jugadores (hito 17.1)
+	if skip is Array: anims = anims.filter(func(a: String) -> bool: return not (skip as Array).has(a))
 	for a: String in anims:
 		var dur := Anims.duration(p_model, a)
 		var n := clampi(int(round(dur * FPS)), 1, MAX_ROWS)

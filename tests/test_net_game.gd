@@ -104,9 +104,10 @@ func test_jugador_ida_y_vuelta() -> void:
 	q.health = 87.25
 	q.sanity = 41.0
 	q.revive_progress = q.rules.revive_time * 0.5
+	q.gesture(&"shot2", Vector3(0, 0, -1))
 	var s := StreamPeerBuffer.new()
 	NetGame.write_player(s, q)
-	assert_eq(s.data_array.size(), 17)
+	assert_eq(s.data_array.size(), 19)
 	s.seek(0)
 	var r := NetGame.read_player(s)
 	assert_eq(r[0], 2)
@@ -120,6 +121,9 @@ func test_jugador_ida_y_vuelta() -> void:
 	assert_almost_eq(v[6], 87.3, 0.051)
 	assert_almost_eq(v[7], 41.0, 0.051)
 	assert_almost_eq(v[9], 0.5, 0.005, "reanimación a medias")
+	assert_eq(int(v[10]) & 7, Player.GESTURES.find("shot2"), "el gesto al atacar (hito 17.1)")
+	assert_eq(int(v[10]) >> 3, q.gesture_seq)
+	assert_almost_eq(angle_difference(v[11], PI), 0.0, 0.03, "y hacia dónde")
 
 func test_enemigo_ida_y_vuelta() -> void:
 	var world := CombatWorld.new()

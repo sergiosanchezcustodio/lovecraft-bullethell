@@ -1945,6 +1945,23 @@ Los iconos son de píxel (9×9 con borde negro, en fila si son dos), dibujados e
 - **Trueno en la tormenta de los relatos:** cada relámpago del cielo de tormenta (16.35) suena con el trueno de la partida, de 0,4 a 1,4 s después del fogonazo.
 - **Pruebas:** `tests/test_logros_mejoras.gd` (los logros existen y no llenan la vitrina, la pesca cuenta piezas y especies, los secretos tienen el suyo). 735 de 735.
 
+## Fase 17: animación y vida de los escenarios (05-11-2026)
+
+El autor pidió las 20 propuestas de mejoras gráficas, sin empeorar apreciablemente el rendimiento. Plan y regla de rendimiento en `docs/ROADMAP.md` (fase 17).
+
+### Hito 17.1: gesto al atacar (05-11-2026)
+
+- **Antes:** solo había un gesto, el de lanzar (`throw`), que usaban casi todas las armas que no disparan balas (también el machete y el látigo); las de balas no movían el brazo.
+- **Ahora cada arma tiene su gesto** (`WeaponData.gesture`, vacío por defecto: lo elige `gesture_of()` según la categoría, la entrega y el aspecto de la bala):
+  - `shot` (pistolas y revólveres) y `shot2` (rifles, escopetas, subfusiles, arpones y ballestas; también el lanzallamas y las bobinas): **apunta** hacia el disparo, con el brazo estirado (o el derecho con la mano en la culata y el izquierdo por delante), el tronco y la cabeza un poco hacia él, y **culatazo** en cada bala. Sigue apuntando lo que dura la recarga (más 0,35 s, hasta 1,1 s) y luego baja el brazo; solo si hay a quién disparar: sin objetivo, las armas disparan hacia delante siempre y el brazo subiría y bajaría sin parar. La carabina Mauser lleva `gesture = "shot2"` (su aspecto de bala no lo dice).
+  - De un golpe, encima de andar (`play_once`, solo brazos y torso): `cast` (armas arcanas: alza las manos y empuja), `swing` (machete, látigos, barridos: tajo que cruza por delante), `thrust` (estoques y dagas: estocada), `slam` (martillo y piolet: las dos manos arriba y abajo) y `throw` (lanzados, como antes). Las órbitas, ninguno.
+  - Un gesto que interrumpe a otro se funde desde donde iba (antes saltaba a la pose de andar).
+- **Código:** `anim_humano.gd` (`aim`, `cast`, `swing`, `thrust`, `slam`; `HORDE_SKIP`: las hordas no graban estos cuatro), `Player.gesture` y `_aim_step`, `WeaponSystem._gesture` (sustituye a los nueve `play_once("throw")` sueltos).
+- **En red:** el gesto viaja en la foto de cada jugador (número y cuenta, más su rumbo: 2 bytes; `PROTOCOL` 19), así que los de otros PC también apuntan y dan tajos.
+- **Rendimiento:** apuntar cuesta unos 5 µs por jugador y fotograma (0,02 ms con cuatro); los gestos de un golpe ya existían. Sin nodos ni materiales nuevos.
+- **Herramienta nueva:** `tools/hoja_poses.gd`, un modelo en N fases de una animación, desde la cámara de la partida y de lado (ver `docs/OPCIONES.md`). Hojas en `shots/poses_dyer_<gesto>.png`.
+- **Pruebas:** `tests/test_gestos_ataque.gd` (el gesto de cada arma; correr disparando, tajos que se interrumpen, conjuros y esquivar apuntando sin saltos; el brazo apunta y vuelve; las hordas no graban los gestos). 739 de 739.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

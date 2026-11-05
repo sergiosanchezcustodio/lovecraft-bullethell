@@ -410,7 +410,8 @@ func _peer_of(q: Player) -> int:
 
 # ---------------------------------------------------------------- fotos
 
-## Jugador (17 bytes): índice, x, z, rumbo, vx, vz, esquives, vida, cordura, estado, reanimación.
+## Jugador (19 bytes): índice, x, z, rumbo, vx, vz, esquives, vida, cordura, estado, reanimación,
+## gesto al atacar (número y cuenta, hito 17.1) y su rumbo.
 static func write_player(s: StreamPeerBuffer, q: Player) -> void:
 	s.put_u8(q.index)
 	s.put_16(_cm(q.global_position.x))
@@ -423,12 +424,15 @@ static func write_player(s: StreamPeerBuffer, q: Player) -> void:
 	s.put_u16(clampi(roundi(q.sanity * STAT_K), 0, 65535))
 	s.put_u8(q.net_flags())
 	s.put_u8(clampi(roundi(q.revive_progress / maxf(q.rules.revive_time, 0.01) * 255.0), 0, 255) if q.rules != null else 0)
+	s.put_u8((q.gesture_id & 7) | ((q.gesture_seq & 31) << 3))
+	s.put_u8(_angle8(q.gesture_yaw))
 
-## [índice, valores]: valores = [x, z, rumbo, vx, vz, esquives, vida, cordura, estado, reanimación 0..1].
+## [índice, valores]: valores = [x, z, rumbo, vx, vz, esquives, vida, cordura, estado, reanimación 0..1,
+## gesto, su rumbo].
 static func read_player(s: StreamPeerBuffer) -> Array:
 	var i := s.get_u8()
 	return [i, [s.get_16() / POS_K, s.get_16() / POS_K, s.get_u8() / 256.0 * TAU, s.get_16() / POS_K, s.get_16() / POS_K,
-		s.get_u8(), s.get_u16() / STAT_K, s.get_u16() / STAT_K, s.get_u8(), s.get_u8() / 255.0]]
+		s.get_u8(), s.get_u16() / STAT_K, s.get_u16() / STAT_K, s.get_u8(), s.get_u8() / 255.0, s.get_u8(), s.get_u8() / 256.0 * TAU]]
 
 ## Enemigo (15 bytes): nid, x, y, z, rumbo, animación, fase, vida (fracción), estado, contacto, más estado.
 static func write_enemy(s: StreamPeerBuffer, nid: int, e: Enemy, anim_id: int) -> void:
@@ -508,7 +512,7 @@ func _apply_player(q: Player, smp: Array) -> void:
 	var w: float = smp[2]
 	var pos := Vector3(lerpf(a[0], b[0], w), 0.0, lerpf(a[1], b[1], w))
 	var vel := Vector3(lerpf(a[3], b[3], w), 0.0, lerpf(a[4], b[4], w))
-	q.net_apply(pos, lerp_angle(a[2], b[2], w), vel, int(b[5]), float(b[6]), float(b[7]), int(b[8]), float(b[9]))
+	q.net_apply(pos, lerp_angle(a[2], b[2], w), vel, int(b[5]), float(b[6]), float(b[7]), int(b[8]), float(b[9]), int(b[10]), float(b[11]))
 
 func _apply_enemy(e: Enemy, smp: Array) -> void:
 	if smp.is_empty(): return
