@@ -1962,6 +1962,15 @@ El autor pidió las 20 propuestas de mejoras gráficas, sin empeorar apreciablem
 - **Herramienta nueva:** `tools/hoja_poses.gd`, un modelo en N fases de una animación, desde la cámara de la partida y de lado (ver `docs/OPCIONES.md`). Hojas en `shots/poses_dyer_<gesto>.png`.
 - **Pruebas:** `tests/test_gestos_ataque.gd` (el gesto de cada arma; correr disparando, tajos que se interrumpen, conjuros y esquivar apuntando sin saltos; el brazo apunta y vuelve; las hordas no graban los gestos). 739 de 739.
 
+### Hito 17.2: frenar (05-11-2026)
+
+- **Lo que ya había (hito 11.1):** la inclinación del contenedor hacia donde acelera, atrás al frenar con un pequeño rebote y hacia dentro en las curvas (`Player._lean_step`). Inclinarse en las curvas ya estaba hecho; faltaba la frenada.
+- **Frenada** (`anim_humano.brake`, 0,5 s; `Player._brake_step`): tras correr al menos 0,35 s a más del 75 % de su velocidad, pararse en seco planta el talón izquierdo delante con la pierna estirada, adelanta la rodilla derecha con el pie bajo la cadera, echa el tronco atrás (la cabeza mira al frente) y abre los brazos; el modelo baja 13 cm para que los pies no floten, y se recompone. Levanta un poco de nieve, barro o polvo delante (`VoxelFx.puff` con `Ambient.dust_tint()`, como el esquive) o, en el agua, una onda. Si echa a andar, se le pasa.
+- **Darse la vuelta a la carrera** (más de ~110°): solo el tronco y los brazos, a 0,6; las piernas siguen andando.
+- Como mucho una cada 0,8 s; no al esquivar ni abatido. Vale para los jugadores de otros PC (sale de `motor.velocity`, que pone la red). Las hordas no la graban (`HORDE_SKIP`).
+- **Bot nuevo:** `bot=stop` corre y se para por turnos. Para capturar momentos concretos, `--fixed-fps 30`: sin él, las capturas cuentan el primer fotograma tras la carga (largo) y van por delante del bot.
+- **Pruebas:** frena tras correr (con piernas, el cuerpo baja) y un paso corto no frena (`test_gestos_ataque.gd`). 741 de 741. *Ojo:* `test_el_idolo_no_se_mueve_y_ampara_a_los_cercanos` (`test_new_enemies.gd`) falló una vez en la suite entera (el ídolo acabó a 7 m) y pasa suelto y en la repetición: es intermitente, sin relación con los jugadores; queda por averiguar.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

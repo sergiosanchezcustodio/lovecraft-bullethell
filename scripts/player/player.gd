@@ -702,9 +702,67 @@ func _animate(delta: float) -> void:
 		elif _action == "":
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
+	_brake_step(delta)
 	_hold_step(delta)
 	_aim_step(delta)
 	_mind_step(delta)
+
+# ---------------------------------------------------------------- frenada (hito 17.2)
+## Tras correr un rato (BRAKE_RUN s a más del 75 % de su velocidad), pararse en seco planta los
+## pies (anim "brake", piernas incluidas) y levanta un poco de nieve, barro o agua; darse la vuelta
+## de golpe a la carrera, solo el tronco y los brazos (las piernas siguen andando). La
+## inclinación del 11.1 (`_lean_step`) ya echa el cuerpo atrás. Vale para los de otros PC: sale
+## de motor.velocity, que en ellos pone la red.
+const BRAKE_RUN := 0.35
+const BRAKE_GAP := 0.8                         ## s entre una frenada y la siguiente
+const BRAKE_PARTS: Array[String] = ["leg_l", "leg_r", "shin_l", "shin_r", "torso", "head",
+	"arm_l", "arm_r", "fore_l", "fore_r"]
+var _run_t := 0.0
+var _run_dir := Vector3.ZERO
+var _brake_t := -1.0                           ## s desde que empezó la frenada (-1: ninguna)
+var _brake_full := false                       ## parada (piernas) o vuelta (solo tronco y brazos)
+var _brake_cd := 0.0
+
+func _brake_step(delta: float) -> void:
+	var v := motor.velocity
+	v.y = 0.0
+	var speed := v.length()
+	var ms := maxf(data.move_speed, 0.1)
+	_brake_cd -= delta
+	var dir := v / speed if speed > 0.01 else Vector3.ZERO
+	if _action == "" and _brake_cd <= 0.0 and _run_t >= BRAKE_RUN and not is_downed():
+		if speed < 0.2 * ms: _start_brake(true)
+		elif speed > 0.6 * ms and dir.dot(_run_dir) < -0.3: _start_brake(false)
+	if speed > 0.75 * ms and _action == "":
+		_run_t += delta
+		_run_dir = _run_dir.lerp(dir, 1.0 - exp(-10.0 * delta)).normalized() if _run_dir != Vector3.ZERO else dir
+	else:
+		_run_t = 0.0
+		_run_dir = Vector3.ZERO
+	if _brake_t < 0.0: return
+	_brake_t += delta
+	var u := _brake_t / Anims.duration(data.model, "brake")
+	if u >= 1.0 or _action != "":
+		_brake_t = -1.0
+		return
+	if _brake_full:
+		var w := 1.0 - clampf(speed / ms * 1.5, 0.0, 1.0)              # echa a andar: se le pasa
+		var drop := float(Anims.script_for(data.model).get("BRAKE_DROP"))
+		Anims.overlay(data.model, "brake", model, u, w, BRAKE_PARTS)
+		model.position.y -= drop * w * (1.0 - Anims.ease((u - 0.35) / 0.65)) * Anims.ease(u / 0.15)
+	else:
+		Anims.overlay(data.model, "brake", model, u, 0.6, UPPER_BODY)
+
+func _start_brake(full: bool) -> void:
+	if not Anims.has_anim(data.model, "brake"): return
+	_brake_t = 0.0
+	_brake_full = full
+	_brake_cd = BRAKE_GAP
+	_run_t = 0.0
+	if world == null or not visual.visible: return
+	var ahead := global_position + _run_dir * 0.35
+	if _wade > 0.5: Ripples.add(world.fx, ahead, 1.4, 0.7)
+	else: VoxelFx.puff(world.fx, ahead + Vector3(0, 0.08, 0), "ring_dust", 0.35, Ambient.dust_tint(), 0.9)
 
 # ---------------------------------------------------------------- gestos al atacar (hito 17.1)
 ## Los gestos, por número (en red, `gesture_seq`).

@@ -7,14 +7,14 @@ extends RefCounted
 ## CharacterData.dodge_anim; la animación puede durar más que el impulso del esquive.
 const ARM_LAG := 0.32                         ## retraso de los brazos respecto a las piernas (rad del ciclo)
 const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive": 0.5,
-	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6,
+	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6, "brake": 0.5,
 	"fidget_look": 2.6, "fidget_stretch": 2.8, "fidget_check": 2.4, "fidget_shift": 1.8,
 	"down": 0.9, "down_wait": 3.0, "get_up": 0.75}
 ## Gestos de reposo (28-10-2026): Player los pone de vez en cuando si el personaje lleva un rato
 ## quieto. Empiezan y acaban en la pose de reposo, y se funden al entrar y al salir.
 const FIDGETS := ["fidget_look", "fidget_stretch", "fidget_check", "fidget_shift"]
 ## Gestos al atacar de los investigadores (hito 17.1): las hordas (HordeMesh) no los graban.
-const HORDE_SKIP := ["cast", "swing", "thrust", "slam"]
+const HORDE_SKIP := ["cast", "swing", "thrust", "slam", "brake"]
 
 ## Piezas opcionales: antebrazos y espinillas (codos y rodillas), bufanda y coleta. Los
 ## modelos partidos con tools/humano.py split_limbs las tienen; los demás, no, y las
@@ -340,6 +340,24 @@ static func slam(m: Node3D, t: float) -> void:
 	bend(m, "fore_l", -0.5 * up * (1.0 - down) * rest)
 	bend(m, "fore_r", -0.5 * up * (1.0 - down) * rest)
 	Anims.part(m, "torso").rotation.x = (-0.22 * up * (1.0 - down) + 0.38 * down) * rest
+
+## Frenada (hito 17.2): al pararse en seco tras correr, planta el pie izquierdo delante con la
+## pierna estirada, dobla la derecha, echa el cuerpo atrás y abre los brazos para no irse de
+## bruces; luego se recompone. Player la pone encima del reposo (BRAKE_PARTS) y baja el modelo
+## lo que suben los pies (BRAKE_DROP), para que no floten.  0-0,15 frena | 0,35-1 se recompone
+const BRAKE_DROP := 0.13
+static func brake(m: Node3D, t: float) -> void:
+	var k := Anims.ease(t / 0.15) * (1.0 - Anims.ease((t - 0.35) / 0.65))
+	Anims.part(m, "leg_l").rotation.x = -0.62 * k                          # el talón, clavado delante
+	bend(m, "shin_l", 0.05 * k)
+	Anims.part(m, "leg_r").rotation.x = -0.28 * k                          # rodilla adelante, pie bajo la cadera
+	bend(m, "shin_r", 0.95 * k)
+	Anims.part(m, "torso").rotation.x = -0.34 * k
+	Anims.part(m, "head").rotation.x = 0.22 * k                            # la vista, al frente
+	Anims.part(m, "arm_l").rotation = Vector3(-0.75 * k, 0.0, -0.55 * k)
+	Anims.part(m, "arm_r").rotation = Vector3(-0.6 * k, 0.0, 0.6 * k)
+	bend(m, "fore_l", -0.4 * k)
+	bend(m, "fore_r", -0.4 * k)
 
 ## Preparación (hito 12.5; cultistas, sacerdotes, Barnabas): echa la espalda atrás y alza los
 ## brazos abiertos por encima de la cabeza, con las manos temblando; al soltar, los baja hacia

@@ -92,3 +92,40 @@ func test_las_hordas_no_graban_los_gestos_del_jugador() -> void:
 		assert_false(h.anim_rows.has(g), g)
 	assert_true(h.anim_rows.has("walk"))
 	assert_true(h.anim_rows.has("throw"), "throw sí: lo usan los enemigos que lanzan")
+
+## Frenada (hito 17.2): tras correr, pararse en seco planta los pies y baja el cuerpo; un paso
+## corto no frena.
+class StopInput extends PlayerInput:
+	var t := 0.0
+	var run_for := 1.0
+	func update(delta: float) -> void:
+		t += delta
+		super.update(delta)
+	func _read_move(_d: float) -> Vector2:
+		return Vector2(1, 0) if t < run_for else Vector2.ZERO
+
+func _run_and_stop(run_for: float) -> Player:
+	var world := CombatWorld.new()
+	add_child_autofree(world)
+	var inp := StopInput.new()
+	inp.run_for = run_for
+	var p := Player.new().setup(load("res://data/characters/dyer.tres"), inp, Color.YELLOW)
+	p.world = world
+	world.add_child(p)
+	world.add_player(p)
+	var t := 0.0
+	while t < run_for + 0.12:
+		p._physics_process(1.0 / 60.0)
+		p._process(1.0 / 60.0)
+		t += 1.0 / 60.0
+	return p
+
+func test_frena_al_pararse_tras_correr() -> void:
+	var p := _run_and_stop(1.0)
+	assert_gte(p._brake_t, 0.0, "frena")
+	assert_true(p._brake_full, "parada: con las piernas")
+	assert_lt(p.model.position.y, -0.03, "y baja el cuerpo para no flotar")
+
+func test_un_paso_corto_no_frena() -> void:
+	var p := _run_and_stop(0.2)
+	assert_lt(p._brake_t, 0.0)

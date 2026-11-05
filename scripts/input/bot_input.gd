@@ -2,7 +2,8 @@ class_name BotInput
 extends PlayerInput
 ## Jugador automático con guion, para capturas y pruebas de carga reproducibles.
 ## Patrones: "idle" (quieto), "circle" (círculos), "zigzag" (ida y vuelta en diagonal),
-## y en línea recta para medir: "right", "up" y "diag" (arriba a la derecha).
+## y en línea recta para medir: "right", "up" y "diag" (arriba a la derecha); "stop" corre a la
+## derecha media vuelta y se para la otra media (frenada, hito 17.2).
 ## "follow": jugador de compañía en el cooperativo (hito 2.9): va hacia `leader` si se aleja
 ## y, cerca, da vueltas a su alrededor a su aire (necesita `body` y `leader`).
 ## Esquiva cada `dodge_every` segundos (0 = nunca).
@@ -32,6 +33,7 @@ func _read_move(_delta: float) -> Vector2:
 			return Vector2(1, 1).normalized() * (1.0 if fmod(_t, period) < period * 0.5 else -1.0)
 		"follow": return _follow()
 		"right": return Vector2(1, 0)
+		"stop": return Vector2(1, 0) if fmod(_t, period) < period * 0.5 else Vector2.ZERO   # corre y se para (17.2)
 		"up": return Vector2(0, 1)
 		"diag": return Vector2(1, 1).normalized()
 	return Vector2.ZERO

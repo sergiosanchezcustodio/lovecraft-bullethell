@@ -29,7 +29,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
 - **Capturas:** van a `shots/`, que Godot ignora (`.gdignore`) y git también. Caen en la raíz; `python tools/ordenar_shots.py` las reparte en `partida/` y `revision/` por fecha, `modelos/` por grupo, `menus/`, `videos/` y `referencias/` (y corrige las rutas de CLAUDE.md y docs/). Detalle en `shots/LEEME.md`. Añade `--rendering-method gl_compatibility` a cualquier comando para usar el renderizador de reserva.
 - **Argumentos:** las escenas leen lo que va detrás de `--` con `LaunchArgs` (`scripts/core/launch_args.gd`): posicionales, `clave=valor` y banderas `--clave`.
 - **Opciones de la partida** (`scripts/core/game.gd`):
-  - `bot=circle|zigzag|idle` y `dodge_every=` (s): jugador automático.
+  - `bot=circle|zigzag|idle` y `dodge_every=` (s): jugador automático. `bot=stop` corre a la derecha y se para, por turnos (la frenada, hito 17.2); `bot=right`, `up` y `diag`, en línea recta.
   - `shots=` y `tag=`: capturas.
   - `cam=`: altura visible en m (por defecto 15).
   - `demo=N`: criaturas de muestra quietas.
