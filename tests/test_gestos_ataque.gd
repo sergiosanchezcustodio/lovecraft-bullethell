@@ -455,3 +455,62 @@ func test_decorado_que_reacciona() -> void:
 	assert_almost_eq(h.position, Vector3.ZERO, Vector3.ONE * 0.001, "sobre su base")
 	Gusts.current = keep
 	a.free()
+
+## Sucesos lejanos (hito 17.18): uno en cada arena; lo que sube del agua sube, se queda y se hunde;
+## la silueta solo se ve con el relámpago; las esculturas se giran cuando no se las mira.
+func test_sucesos_lejanos() -> void:
+	var arenas: Dictionary = Ambient.config().arenas
+	for ar in ["campamento", "lake", "paso", "ciudad", "tuneles", "carretera", "calles", "tejados", "pantano", "arrecife", "ritual", "muelle", "tormenta", "rlyeh"]:
+		assert_true((arenas[ar] as Dictionary).has("distant"), "suceso lejano en " + ar)
+	assert_true(Ambient.model_cfg("prv_escultura_1").get("turn", false), "las esculturas del estudio se giran")
+	var cam := Camera3D.new()
+	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	cam.size = 15.0
+	cam.rotation_degrees = Vector3(-30, 45, 0)
+	cam.position = cam.basis.z * 30.0
+	add_child_autofree(cam)
+	cam.make_current()
+	var fake := Node3D.new()
+	add_child_autofree(fake)
+	var statue := Node3D.new()
+	statue.position = Vector3(40, 0, 40)             # fuera de la pantalla
+	add_child_autofree(statue)
+	var de := DistantEvents.new().setup([
+		{"kind": "rise", "model": "lejano_tentaculo", "spots": [[0, 0]], "y": 0.0, "depth": 8, "dur": 4, "every": [100, 100]},
+		{"kind": "flash", "model": "lejano_tentaculo", "spots": [[0, 0]], "chance": 1.0}], cam, fake, [statue])
+	add_child_autofree(de)
+	var rise: Dictionary = de._ev[0]
+	assert_true(de._try_start(rise), "se ve: empieza")
+	var h: Node3D = rise.node
+	var low := h.position.y
+	for i in 120: de._process(1.0 / 60.0)            # a los 2 s, arriba
+	assert_gt(h.position.y, low + 7.0, "ha subido")
+	for i in 150: de._process(1.0 / 60.0)
+	assert_false(h.visible, "y se ha hundido")
+	assert_gt(float(rise.wait), 50.0, "hasta el siguiente")
+	var fl: Dictionary = de._ev[1]
+	assert_true(de._try_start(fl))
+	assert_false((fl.node as Node3D).visible, "sin relámpago no se ve")
+	de._flash_step(fl, 0.8)
+	assert_true((fl.node as Node3D).visible, "con el relámpago, sí")
+	# la escultura, sin jugadores cerca, no se gira; con uno a 5 m y sin mirarla, se gira hacia él
+	var p := Node3D.new()
+	p.position = Vector3(40, 0, 45)
+	add_child_autofree(p)
+	fake.set_meta("x", 0)
+	var g := GameStub.new()
+	g.players = [p]
+	add_child_autofree(g)
+	de.game = g
+	de._turn_step()
+	assert_almost_eq(statue.rotation.y, 0.0, 0.01, "mira hacia +Z, donde está él")
+	p.position = Vector3(45, 0, 40)
+	de._turn_step()
+	assert_almost_eq(statue.rotation.y, 0.0, 0.01, "no se vuelve a girar hasta que se la vea")
+	de._turners[0].seen = true
+	de._turn_step()
+	assert_almost_eq(statue.rotation.y, PI / 2.0, 0.01, "y ahora mira a +X")
+
+class GameStub extends Node:
+	var players: Array = []
+	var weather = null

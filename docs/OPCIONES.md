@@ -102,5 +102,6 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `card=true`: con `shots=`, enseña también el rótulo del nivel al empezar (`LevelCard`; sin él, las capturas no lo llevan).
   - `mando=true`: en las pruebas lanzadas desde Claude Code, deja usar los mandos (sin él, la partida no les hace caso). `ver=true`: deja su ventana a la vista, centrada (sin él, va fuera de las pantallas).
   - `blast=x,z,t;…` y `crate=x,z,t;…`: explosiones ahí a esos s y rompibles que se rompen a esos s (capturas del hito 12.11).
+  - `distant_soon=true`: el primer suceso lejano de la arena sale en cuanto se vea (hito 17.18, capturas).
   - `variety=false`: todos los enemigos de un tipo iguales en tamaño, ritmo y paso (hito 17.12).
   - `rise=false`: los enemigos aparecen creciendo, como antes. `rise_demo=pinguino,pesadilla,…` y `rise_at=t`: hacen aparecer esos enemigos alrededor del J1 a los t s (capturas de la aparición).

@@ -162,6 +162,7 @@ static func dress(holder: Node3D, m: Node3D, model: String, in_sea: bool, wind: 
 	if c.has("bob") and in_sea: out["bob"] = float(c.bob)
 	if c.has("wobble") and not in_sea: out["wobble"] = float(c.wobble)   # se tambalea con las explosiones (17.17)
 	if c.has("part"): out["part"] = true
+	if c.has("turn"): out["turn"] = true                              # se gira cuando no se la mira (17.18)
 	if c.has("swing") and (m.get_meta("part_nodes") as Dictionary).has(String(c.swing.get("part", ""))): out["swing"] = c.swing
 	if c.has("glow"): out["glow"] = c
 	return out
@@ -379,6 +380,11 @@ func _ready() -> void:
 		if it.has("sound"): _sounds.append(it.sound)
 		for lp: Vector3 in it.get("ripples", []): _ripplers.append([h.to_global(lp), 0.0])
 	if cfg.has("vents") and bool(Quality.value("vents", true)): _vents(cfg.vents)   # 17.14
+	var turners: Array = []
+	for it: Dictionary in arena.get_meta("ambient", []):
+		if it.has("turn"): turners.append(it.holder)
+	if cfg.has("distant") or not turners.is_empty():                  # sucesos lejanos (17.18)
+		add_child(DistantEvents.new().setup(cfg.get("distant", []), camera, get_parent(), turners))
 	for n in ["Ground", "Sea"]:
 		var mi := arena.get_node_or_null(n) as MeshInstance3D
 		if mi != null and mi.material_override is ShaderMaterial:

@@ -2158,6 +2158,34 @@ Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, mat
 - **Coste:** un bucle de cuatro jugadores en los vértices de los juncos; el tambaleo, solo tras una explosión.
 - **Pruebas:** un barril se tambalea hacia el lado contrario a la explosión y vuelve a quedarse quieto sobre su base. 760 de 760.
 
+### Hito 17.18: sucesos lejanos (05-11-2026)
+
+- `DistantEvents` (`scripts/level/distant_events.gd`), con `distant` en cada arena de `data/ambient.json`. Lo monta `Ambient`, que le pasa también las piezas con `turn`.
+- Cada suceso solo empieza si su sitio está en pantalla; si no, lo vuelve a probar a los 1,5 s. Entre uno y otro pasan `every` segundos. Solo visual, y cada PC el suyo.
+- **Tipos y arenas:**
+
+  | Tipo | Qué pasa | Arenas |
+  |---|---|---|
+  | `rise` | Sube del agua, se mece y se hunde | El tentáculo (`lejano_tentaculo`, nuevo en `tools/gen_sucesos_lejanos.py`, a 16 voxels/m y hueco) en el arrecife, el ritual y R'lyeh; Dagón junto al arrecife del Diablo, en el mar del norte del muelle; un shoggoth en el mar de los túneles |
+  | `flash` | Silueta negra que solo se ve mientras dura el relámpago (`chance` de cada rayo) | Cthulhu en el mar de la tormenta |
+  | `cross` | Cruza la pantalla por arriba, como una silueta oscura en la bruma (`far`) | Un antiguo alado en el campamento, el lago y el paso; el byakhee en los tejados; un shoggoth entre las ruinas de la ciudad |
+  | `lights` | Faroles que recorren un camino más allá del borde | Procesiones en la carretera y el pantano |
+  | `lights` con `signal` | Faroles que hacen señales desde el agua | Las luces del arrecife del Diablo, en las calles |
+  | `turn` | Mientras no se la mira, se gira hacia el jugador más cercano (a menos de 14 m); cuando la vuelves a ver, ya te está mirando | Las esculturas del estudio |
+
+- **Lo aprendido con la cámara:** con la cámara isométrica, el mar del sur y del este queda delante, entre la cámara y la partida.
+  - Lo que sube de ahí va con `aside`: solo a un lado de la pantalla, lejos del centro, donde está el jugador, para no taparlo.
+  - Lo que vuela no puede ir «alto y lejos»: con cámara ortográfica se sale por arriba de la pantalla. Cruza por la parte de arriba, como una silueta.
+- `distant_soon=true` hace que el primer suceso salga en cuanto se vea (capturas).
+- **Coste:** los modelos se cargan al montar la arena y, mientras no pasa nada, están ocultos. Cuando pasa algo, se mueve un solo nodo.
+- **Pruebas:**
+  - suceso en cada arena;
+  - lo que sube empieza hundido, sube y se hunde;
+  - la silueta solo se ve con relámpago;
+  - la escultura se gira hacia el jugador cuando no se la ve, y no otra vez hasta que se la vuelve a ver.
+
+  761 de 761.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
