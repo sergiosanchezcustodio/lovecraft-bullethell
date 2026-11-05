@@ -46,20 +46,28 @@ func _window_mode(la: LaunchArgs, first: String) -> void:
 	Settings.dev_window = ((dev or hidden) and not la.get_bool("fullscreen")) or la.get_bool("window")
 	Settings.force_fullscreen = la.get_bool("fullscreen")
 	Settings.apply_video()
-	if hidden and Settings.dev_window: _hide_window(la.get_bool("ver"))
+	if hidden and Settings.dev_window: _hide_window(la.get_bool("ver"), _res(la))
+	elif Settings.dev_window and _res(la) != Vector2i.ZERO: DisplayServer.window_set_size(_res(la))
 	# y a 30 fotogramas por segundo, para no quitarle la tarjeta gráfica a su juego (las capturas
 	# van por tiempo de juego); sin tope al medir rendimiento o suavidad, al grabar o con ver=true
 	if hidden and not (la.has("perf") or la.has("jitter") or first == "bench" or la.get_bool("ver") 			or Engine.get_write_movie_path() != ""):
 		Engine.max_fps = 30
 	Settings.apply_ui()
 
+## `res=1280x800`: la ventana de pruebas a ese tamaño (revisar la interfaz en otras proporciones).
+static func _res(la: LaunchArgs) -> Vector2i:
+	var p := la.get_str("res").split("x")
+	if p.size() != 2 or not p[0].is_valid_int() or not p[1].is_valid_int(): return Vector2i.ZERO
+	return Vector2i(int(p[0]), int(p[1]))
+
 ## Pruebas de Claude Code: el lanzador abre la ventana de 3×3 px y sin bordes (Godot no deja
 ## abrirla fuera de la pantalla); aquí recupera su tamaño y se va a la derecha de todas las
 ## pantallas, donde se dibuja y captura igual sin tapar lo que tenga delante el autor. ver=true
 ## la deja a la vista, con sus bordes (antes de darle el tamaño, o los bordes lo encogen).
-func _hide_window(in_view: bool) -> void:
+func _hide_window(in_view: bool, res := Vector2i.ZERO) -> void:
 	var size := Vector2i(ProjectSettings.get_setting("display/window/size/viewport_width"),
 		ProjectSettings.get_setting("display/window/size/viewport_height"))
+	if res != Vector2i.ZERO: size = res
 	if in_view: DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
 	DisplayServer.window_set_size(size)
 	var right := 0

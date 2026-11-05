@@ -122,3 +122,27 @@ func test_estadistica_entera() -> void:
 		var plain := RegEx.create_from_string(r"\[[^\]]*\]").sub(p, "", true)
 		assert_false(plain.contains(" "), "sin espacios que rompan dentro: " + plain)
 	assert_string_contains(s, "/" + char(0x2060) + "s")
+
+## Una ventana que no cabe en la pantalla (interfaz Grande) se encoge alrededor del centro; una
+## que cabe, no cambia.
+func test_ventana_que_no_cabe() -> void:
+	var layer := CanvasLayer.new()
+	add_child_autofree(layer)
+	var host := Control.new()
+	host.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	layer.add_child(host)
+	var w: Array = MenuKit.window(host, MenuKit.INK, 400)
+	var root: Control = w[0]
+	var center: CenterContainer = root.get_child(1)
+	var tall := Control.new()
+	tall.custom_minimum_size = Vector2(300, 200)
+	(w[1] as VBoxContainer).add_child(tall)
+	await wait_frames(3)
+	assert_eq(center.scale, Vector2.ONE, "cabe: sin encoger")
+	var vs := get_viewport().get_visible_rect().size
+	tall.custom_minimum_size.y = vs.y * 1.5
+	await wait_frames(3)
+	assert_lt(center.scale.x, 1.0, "no cabe: se encoge")
+	var r := (center.get_child(0) as Control).get_global_rect()
+	assert_true(Rect2(Vector2.ZERO, vs).grow(1.0).encloses(r), "y queda dentro: %s" % r)
+	assert_almost_eq(r.get_center().x, vs.x * 0.5, 2.0, "centrada")

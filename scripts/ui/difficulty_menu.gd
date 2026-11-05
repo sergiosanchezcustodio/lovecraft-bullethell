@@ -58,6 +58,7 @@ func _ready() -> void:
 	box.add_child(hint)
 	MenuKit.dress(panel, MenuKit.BRASS, Vector2(36, 26), 120.0)
 	panel.resized.connect(func() -> void: panel.position = (get_viewport().get_visible_rect().size - panel.size) * 0.5)
+	MenuKit.fit_screen(panel)                         # con la interfaz Grande no cabría
 	if OS.get_cmdline_user_args().has("dif_hist=true"): _show_history()
 	else: _general.grab_focus.call_deferred()
 

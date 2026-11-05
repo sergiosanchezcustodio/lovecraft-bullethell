@@ -2283,6 +2283,24 @@ El autor vio ventanas con el contenido algo descentrado y textos que invadían e
 - **Revisado y bien:** huecos, borrar, menú, Jugar, online, pestañas de configuración y nube, tienda (también el vestuario y sus subpestañas), los once tomos de la biblioteca, sala de trofeos, selección (mapa, desafíos y locura), pausa, depuración, dificultad, ficha, mapa del nivel, repetición, pesca y tabla de daño.
 - **Pruebas:** fila desplazada, hueco de la barra con y sin barra, el rótulo se quita y una estadística entera. 769 de 769. Lecciones en `docs/LECCIONES.md` («Ventanas centradas»).
 
+### Otros tamaños de pantalla y ventanas que faltaban en el recorrido (05-11-2026)
+
+Las tres mejoras propuestas tras «Ventanas centradas».
+
+- **Jugar, debajo del logo:**
+  - las ventanas Jugar y Jugar online tapaban «Surviving» y «Cthulhu». `MainMenu.below_logo` baja su centrador (no el velo, que sigue tapándolo todo): Jugar se centra en lo que queda bajo los 560 px de arriba y Jugar online, más alta, bajo los 470;
+  - si no cabe ahí (con la interfaz Grande), vuelve al centro de la pantalla.
+- **Más ventanas en el recorrido** (`tools/recorrido_ui.py`, ahora 56):
+  - subida de nivel, en solitario y con un bot (`levelup_at=t`, nuevo), y el buhonero;
+  - pactos, partida del día, noche eterna y elección de la expedición (`expedition_open=true`, nuevo).
+  - Todas bien salvo la mercancía del buhonero: «Remedio» y «Baratija» casi se tocaban. Los rótulos de las mercancías bajan de 52 a 42.
+- **Otros tamaños:** `res=1280x800` (nuevo) abre la ventana de pruebas a ese tamaño, y `--con "<opciones>" --sufijo <nombre>` repite el recorrido con ellas. Se pasaron tres:
+  - **1280×800 (16:10):** sin avisos.
+  - **2560×1080 (21:9):** solo la sala de trofeos, por textos de la biblioteca que seguía «visible» detrás. Ahora se esconde lo de detrás mientras la sala está abierta.
+  - **Interfaz Grande (×1,3, 1476×830 unidades):** se salían de la pantalla 20 ventanas: online, logros, tienda, tomo de logros, mapa de selección, desafíos, locura, pactos, noche eterna, depuración, dificultad, subida de nivel y repetición de la caída. `MenuKit.fit_screen` hace que su contenedor crezca por igual hacia los dos lados y lo encoge alrededor de su centro si no cabe en su sitio (el de sus anclas: la tienda va en el 53 % derecho), sin agrandarlo nunca. Una ventana de 1080 de alto queda así a ×1,0, como con la interfaz Normal. Está en `MenuKit.window` (todas las ventanas) y en depuración, dificultad, subida de nivel y repetición.
+- **Revisión:** `ui_check` avisa también de las ventanas que se salen de la pantalla, con su posición, si sigue así en dos revisiones seguidas (la tienda cambia de tamaño al abrirse). Recorrido completo después, con la interfaz Normal y con la Grande: ninguno de los 56 da aviso.
+- **Pruebas:** una ventana que no cabe se encoge, queda dentro y centrada; una que cabe no cambia. 770 de 770.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

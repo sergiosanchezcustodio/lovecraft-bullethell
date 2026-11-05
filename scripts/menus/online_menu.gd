@@ -26,6 +26,7 @@ var _leaving := false
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var w: Array = MenuKit.window(self, MenuKit.INK, 720)
+	if get_parent() is MainMenu: MainMenu.below_logo(w[0], 470.0)   # más alta: tapa solo el pie del logo
 	_box = w[1]
 	Net.failed.connect(_on_failed)
 	Net.closed.connect(_on_closed)

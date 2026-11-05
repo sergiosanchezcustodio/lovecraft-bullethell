@@ -79,6 +79,8 @@ func _ready() -> void:
 			_info_text.text = "Una tirada por una parte con un mapa de caminos que se bifurcan: combates, élites, el buhonero, curiosidades y descansos, y el jefe al final. Lo que ganas solo vale en esa expedición. Se abre la de cada parte al superarla. Sin red.")
 		xb.pressed.connect(func() -> void: _expedition(xb, exp_open if not dev else [0, 1, 2]))
 		extra.add_child(xb)
+		if LaunchArgs.from_cmdline().get_bool("expedition_open"):   # capturas (recorrido de las ventanas)
+			_expedition.call_deferred(xb, exp_open if not dev else [0, 1, 2])
 	if (BossRush.unlocked(Saves.current) or dev) and not Demo.on():   # desfile de jefes (hito 16.22): al vencer a Cthulhu
 		var rb := MenuKit.button("Desfile de jefes" + ("" if BossRush.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
 		rb.custom_minimum_size = Vector2(460, 58)

@@ -67,6 +67,27 @@ func _refresh_money() -> void:
 		_money_lbl.text = "Partida %d  ·  %s $" % [Saves.slot + 1, MenuKit.money(Saves.current.money)]
 
 ## Abre una ventana encima; al cerrarse, el foco vuelve al botón que la abrió.
+const LOGO_CLEAR := 560.0                       ## px de arriba que ocupa el logo (a 1080 de alto)
+
+## Centra la ventana `root` (de MenuKit.window) en lo que queda bajo el logo, sin taparlo: centrada
+## en la columna entera caía encima de «Surviving» (05-11-2026). `top`, en px a 1080 de alto. Si no
+## cabe ahí (interfaz Grande), vuelve al centro de la pantalla.
+static func below_logo(root: Control, top: float) -> void:
+	for c in root.get_children():                   # el centrador; el velo sigue tapándolo todo
+		if c is CenterContainer:
+			var cc := c as Control
+			var place := func() -> void:
+				if not cc.is_inside_tree(): return
+				var h := cc.get_viewport().get_visible_rect().size.y
+				var a := top / 1080.0
+				if cc.get_combined_minimum_size().y > h * (1.0 - a) - 16.0: a = 0.0
+				if not is_equal_approx(cc.anchor_top, a):
+					cc.anchor_top = a
+					cc.offset_top = 0.0
+			cc.minimum_size_changed.connect(place)
+			cc.tree_entered.connect(place)
+			if cc.is_inside_tree(): place.call()
+
 func _push(popup: Control, from: int) -> void:
 	_popup = popup
 	add_child(popup)
@@ -82,6 +103,7 @@ func _open_play() -> void:
 	var p := Control.new()
 	p.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var w: Array = MenuKit.window(p, MenuKit.INK, 560)
+	below_logo(w[0], LOGO_CLEAR)
 	var box: VBoxContainer = w[1]
 	MenuKit.heading(box, "Jugar", 46)
 	var local := MenuKit.button("Jugar en local", MenuKit.INK, 30)

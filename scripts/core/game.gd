@@ -629,6 +629,9 @@ func _ready() -> void:
 		get_tree().create_timer(pa[0], false).timeout.connect(func() -> void:
 			toggle_pause()
 			get_tree().create_timer(pa[1] if pa.size() > 1 else 3.0, true).timeout.connect(toggle_pause))
+	if args.has("levelup_at"):                     # pruebas: el J1 sube un nivel a los t s (la ventana de subida)
+		get_tree().create_timer(args.get_float("levelup_at"), false).timeout.connect(func() -> void:
+			if player != null and player.progress != null: player.progress.add_xp(player.progress.xp_missing() + 0.01))
 	if args.has("autopause_at"):                   # pruebas: como perder el foco a los t s (hito 16.23)
 		get_tree().create_timer(args.get_float("autopause_at"), false).timeout.connect(_auto_pause.bind("prueba"))
 	if not Devices.joy_disconnected.is_connected(_on_pad_lost): Devices.joy_disconnected.connect(_on_pad_lost)

@@ -18,6 +18,7 @@ const WIDE := 0.6               ## parte del ancho de la ventana a partir de la 
 
 var _seen := {}
 var _t := 0.0
+var _off_before := {}                       ## ventanas fuera de la pantalla en la revisión anterior
 var _corner_img: Image
 
 func _ready() -> void:
@@ -37,8 +38,21 @@ func scan() -> Array:
 	var frames: Array = []
 	_collect(get_tree().root, labels, frames)
 	var out: Array = []
+	var screen := get_viewport().get_visible_rect()
+	var off := {}
 	for f: Array in frames:
-		if f[1] == "marco": out.append(_centering(f[0]))
+		if f[1] != "marco": continue
+		out.append(_centering(f[0]))
+		var r: Rect2 = (f[0] as Control).get_global_rect()
+		if not screen.grow(1.0).encloses(r):           # no cabe en la pantalla (interfaz grande, 16:10…)
+			var key := "pantalla|%s" % (f[0] as Control).get_path()
+			off[key] = true
+			if _off_before.has(key) and not _seen.has(key):   # en dos revisiones seguidas: no a mitad de colocarse
+				_seen[key] = true
+				var line := "UICHK %s se sale de la pantalla (%.0f×%.0f en %.0f, %.0f; la pantalla, %.0f×%.0f)" % [_short(f[0]), r.size.x, r.size.y, r.position.x, r.position.y, screen.size.x, screen.size.y]
+				print(line)
+				out.append(line)
+	_off_before = off
 	for l: Control in labels:
 		var box := _text_box(l)
 		if box.size.x <= 1.0 or box.size.y <= 1.0: continue

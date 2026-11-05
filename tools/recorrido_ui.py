@@ -26,6 +26,10 @@ RUNS = [
     ('seleccion_mapa', 'select saves=demo_saves slot=2 map=true shots=3'),
     ('seleccion_desafios', 'select saves=demo_saves slot=2 map=true challenge_open=true shots=3.5'),
     ('seleccion_locura', 'select saves=demo_saves slot=2 map=true madness_open=true shots=3.5'),
+    ('seleccion_pactos', 'select saves=demo_saves slot=2 map=true pact_open=true shots=3.5'),
+    ('seleccion_dia', 'select saves=demo_saves slot=2 map=true daily_open=true shots=3.5'),
+    ('seleccion_noche', 'select saves=demo_saves slot=2 map=true endless_open=true shots=3.5'),
+    ('seleccion_expedicion', 'select saves=demo_saves slot=2 map=true expedition_open=true shots=3.5'),
     ('pausa', G + ' pause_at=2.5,30 shots=4'),
     ('pausa_rotulo', G + ' card=true pause_at=1.6,30 shots=2.6'),
     ('depuracion', G + ' debug_menu=2.5 shots=4'),
@@ -33,22 +37,33 @@ RUNS = [
     ('dano', 'level=p2_n2 character=olmstead god=true spawn_rate=10 bot=circle dmg_table=9 shots=10.5'),   # con daño hecho
     ('ficha', G + ' sheet_at=2.5 shots=4'),
     ('mapa', G + ' map_at=2.5 shots=4'),
-    ('subida', G + ' bot=circle xp=400 shots=4,6'),
+    ('subida', G + ' levelup_at=2.5 shots=4'),
+    ('subida_coop', G + ' bots=1 levelup_at=2.5 shots=4'),
+    ('buhonero', G + ' peddler=true peddler_at=1 objective_near=true purse=300 shots=4'),
     ('evolucion', G + ' evolve_at=2.5 weapons=thompson wlevel=5 items=oro_obed shots=4'),
     ('final', G + ' down_at=2.5 halt_shots=true quit_on_end=true'),
     ('repeticion', G + ' down_at=2.5 halt_shots=true quit_on_end=true replay_open=true'),
     ('expedicion', 'scenes/expedition_map.tscn -- exp_part=0 exp_seed=7 shots=3'),
     ('pesca', 'scenes/fishing.tscn -- pj=dyer fish_auto=true fish_force=arenque card_shot=true tag=uichk'),
 ]
-filt = sys.argv[1].split(',') if len(sys.argv) > 1 else []
+# --con "res=1280x800 cfg_ui_scale=3" --sufijo deck: las mismas ventanas con esas opciones,
+# en shots/ui_recorrido_<sufijo>/
+args = sys.argv[1:]
+EXTRA, SUF = '', ''
+if '--con' in args: i = args.index('--con'); EXTRA = ' ' + args[i + 1]; del args[i:i + 2]
+if '--sufijo' in args: i = args.index('--sufijo'); SUF = args[i + 1]; del args[i:i + 2]
+if SUF:
+    OUT = OUT + '_' + SUF
+    os.makedirs(OUT, exist_ok=True)
+filt = args[0].split(',') if args else []
 report = open(OUT + '/informe.txt', 'w' if not filt else 'a', encoding='utf-8')
 for tag, a in RUNS:
     if filt and tag not in filt: continue
     if a.startswith('scenes/'):
         scene, rest = a.split(' -- ', 1)
-        cmd = 'godot --path . %s -- %s ui_check=true mute=true' % (scene, rest)
+        cmd = 'godot --path . %s -- %s ui_check=true mute=true%s' % (scene, rest, EXTRA)
     else:
-        cmd = 'godot --path . -- %s tag=uichk ui_check=true mute=true' % a
+        cmd = 'godot --path . -- %s tag=uichk ui_check=true mute=true%s' % (a, EXTRA)
     t0 = time.time()
     for f in glob.glob(ROOT + '/shots/*uichk*'): os.remove(f)
     try:

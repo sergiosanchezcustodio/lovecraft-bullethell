@@ -206,6 +206,7 @@ class Picker extends PanelContainer:
 			anchor_left = 0.3; anchor_right = 0.7; anchor_top = 0.16; anchor_bottom = 0.84
 			if evolution and options.size() <= 2:          # dos ramas: ventana más baja (16.8)
 				anchor_top = 0.27; anchor_bottom = 0.73
+			MenuKit.fit_screen(self, 16.0, true)           # crece por igual arriba y abajo (interfaz Grande)
 		else:
 			var qx := p.index % 2
 			var qy := p.index / 2

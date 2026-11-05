@@ -267,12 +267,39 @@ static func window(parent: Node, accent: Color = INK, min_width: float = 0.0) ->
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size.x = min_width
 	center.add_child(panel)
+	fit_screen(center)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 18)
 	panel.add_child(box)
 	dress(panel, brass_for(accent))
 	appear(panel)
 	return [root, box]
+
+## Encoge `c` alrededor del centro de la pantalla cuando lo que tiene dentro (su tamaño mínimo) no
+## cabe en ella con `margin` px a cada lado (6: a 1080 de alto no encoge el mapa, de 1065), y nunca lo agranda. Con la interfaz Grande (×1,3), la
+## pantalla mide 1476×830 y las ventanas altas se salían por abajo (05-11-2026). Una ventana de
+## 1080 de alto queda así como con la interfaz Normal. `c` crece hacia los dos lados, para que su
+## centro siga en el de su sitio. El sitio es el que le dan sus anclas (la tienda, el 53 % derecho),
+## o la pantalla entera si no las abre o con `whole` (las de la subida de nivel son orientativas).
+static func fit_screen(c: Control, margin := 6.0, whole := false) -> void:
+	c.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	c.grow_vertical = Control.GROW_DIRECTION_BOTH
+	var fit := func() -> void:
+		if not is_instance_valid(c) or not c.is_inside_tree(): return
+		var vs := c.get_viewport().get_visible_rect().size
+		var span := Vector2(c.anchor_right - c.anchor_left, c.anchor_bottom - c.anchor_top) * c.get_parent_area_size()
+		if not whole:
+			if span.x >= 1.0: vs.x = span.x
+			if span.y >= 1.0: vs.y = span.y
+		var need := c.get_combined_minimum_size().max(Vector2.ONE)
+		var s := minf(1.0, minf((vs.x - margin * 2.0) / need.x, (vs.y - margin * 2.0) / need.y))
+		c.pivot_offset = c.size * 0.5
+		c.scale = Vector2(s, s)
+	c.resized.connect(fit)
+	c.minimum_size_changed.connect(fit)
+	c.tree_entered.connect(func() -> void:
+		if not c.get_viewport().size_changed.is_connected(fit): c.get_viewport().size_changed.connect(fit))
+	if c.is_inside_tree(): c.get_viewport().size_changed.connect(fit)
 
 ## Hueco para la barra de desplazamiento de `scroll`, a la derecha de su contenido (`margin`), solo
 ## mientras la barra se ve, y entonces otro igual (el hueco más la barra) a la izquierda: las filas

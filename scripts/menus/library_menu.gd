@@ -183,9 +183,16 @@ func _open_tome(i: int) -> void:
 	var tome: Dictionary = Library.TOMES[i]
 	if tome.id == "achievements" or tome.id == "trophies":
 		_sub = AchievementsMenu.new() if tome.id == "achievements" else _trophy_room()
+		var hidden: Array[CanvasItem] = []
+		if tome.id == "trophies":                     # la sala tapa la pantalla entera: lo de detrás, fuera
+			for k in get_children():
+				if k is CanvasItem and (k as CanvasItem).visible:
+					(k as CanvasItem).visible = false
+					hidden.append(k)
 		add_child(_sub)
 		MenuKit.trap_focus(_sub)
 		_sub.tree_exited.connect(func() -> void:
+			for k in hidden: if is_instance_valid(k): k.visible = true
 			_sub = null
 			if is_inside_tree(): _rows[i].grab_focus.call_deferred())
 		return

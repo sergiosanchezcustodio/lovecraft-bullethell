@@ -265,9 +265,9 @@ func _stand() -> void:
 		ring.position = _stalls[i] + Vector3(0, 0.05, 0)
 		_stall_rings.append(ring)
 		var l := Label3D.new()
-		l.font_size = 52
+		l.font_size = 42                            # con 52, «Remedio» y «Baratija» casi se tocaban (05-11-2026)
 		l.pixel_size = 0.0075
-		l.outline_size = 16
+		l.outline_size = 14
 		l.outline_modulate = Color(0.05, 0.03, 0.02, 0.95)
 		l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		l.no_depth_test = true
