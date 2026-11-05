@@ -514,6 +514,7 @@ func _chain(w: Weapon, target_pos: Vector3) -> bool:
 		done[cur.get_instance_id()] = true
 		points.append(cur.global_position)
 		var d := Damage.new(dmg(w) * k, 0.0)
+		d.how = &"shock"                                 # el rayo (17.9)
 		d.bonus = player.data.bonus_tags
 		cur.take_damage(d)
 		if cur.has_method("stun") and cur.is_alive(): cur.stun(w.stat("stun"))

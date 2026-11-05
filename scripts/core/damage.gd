@@ -18,6 +18,9 @@ var bonus := {}
 var tag := &""
 var dir := Vector3.ZERO          ## hacia dónde va el golpe (las balas; si no, `knockback`): escudo del guardián (16.17)
 var dot := false                 ## daño continuo (quemadura…): no dispara los objetos al impactar
+## Cómo mata (hito 17.9): &"burn" (fuego: se quema hasta la ceniza), &"blast" (explosión: sale en
+## trozos), &"shock" (rayo: tiembla y humea) o nada (la muerte de su familia).
+var how := &""
 ## Contra los jugadores (informe al caer, hito 13.1): por dónde llega ("bala", "contacto", "golpe",
 ## "zona", "peligro"…; vacío: "golpe" si lo da un enemigo) y quién, cuando `source` no está (las
 ## balas enemigas guardan el id del enemigo en `tag`).
@@ -38,6 +41,7 @@ func kind() -> Kind:
 func scaled(k: float) -> Damage:
 	var d := Damage.new(physical * k, mental * k)
 	d.knockback = knockback * k
+	d.how = how
 	d.source = source
 	d.bonus = bonus
 	d.tag = tag

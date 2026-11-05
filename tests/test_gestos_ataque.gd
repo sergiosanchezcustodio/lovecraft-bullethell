@@ -233,3 +233,28 @@ func test_gestos_de_reposo_del_shoggoth_y_la_serpiente() -> void:
 	assert_gt(Anims.part(s, "bud").position.x, 0.3, "el brote, fuera")
 	Anims.pose("shoggoth", "fidget_split", s, 1.0)
 	assert_almost_eq(Anims.part(s, "bud").position.x, 0.0, 0.01, "y otra vez dentro")
+
+## Muertes según el daño (hito 17.9): el golpe que mata dice cómo; la explosión lanza las piezas,
+## el fuego ennegrece y el rayo hace temblar antes de caer.
+func test_muere_segun_el_dano() -> void:
+	var world := CombatWorld.new()
+	add_child_autofree(world)
+	var e := Enemy.new().setup(load("res://data/enemies/cultista.tres"), world, null)
+	world.add_child(e)
+	var d := Damage.new(1e6, 0.0)
+	d.how = &"burn"
+	e.take_damage(d)
+	assert_eq(e.killed_how, &"burn")
+	assert_eq(d.scaled(0.5).how, &"burn", "scaled lo conserva")
+	assert_eq(Crumble.delay_for("cultista", &"burn"), Crumble.CHAR_TIME)
+	assert_gt(Crumble.delay_for("cultista", &"shock"), Crumble.delay_for("cultista"))
+	var fx := Node3D.new()
+	add_child_autofree(fx)
+	var m := VoxelBuilder.load_model("res://models/cultista.json")
+	fx.add_child(m)
+	var head := Anims.part(m, "head")
+	var y0 := head.global_position.y
+	assert_true(Crumble.start(fx, m, Color.ORANGE, false, "", &"blast"))
+	var c: Crumble = fx.get_child(fx.get_child_count() - 1)
+	for i in 12: c._process(1.0 / 60.0)
+	assert_gt(head.global_position.y, y0 + 0.3, "la cabeza sale volando")

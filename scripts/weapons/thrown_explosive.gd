@@ -151,6 +151,7 @@ func _explode() -> void:
 		var d := end.distance_to(Vector3(e.global_position.x, 0, e.global_position.z))
 		var k := lerpf(1.0, 0.5, clampf(d / radius, 0.0, 1.0))
 		var dmg := Damage.new(damage * k, 0.0)
+		dmg.how = &"blast"                               # 17.9
 		dmg.knockback = (e.global_position - end).normalized() * 1.5
 		dmg.bonus = bonus
 		e.take_damage(dmg)

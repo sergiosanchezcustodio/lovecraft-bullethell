@@ -533,7 +533,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 17.9 | **Muertes según el daño:** el fuego los quema hasta la ceniza, las explosiones los lanzan en trozos y el rayo los deja temblando y humeando. Si no, la de su familia | Pendiente |
+| 17.9 | **Muertes según el daño:** el fuego los quema hasta la ceniza, las explosiones los lanzan en trozos y el rayo los deja temblando y humeando. Si no, la de su familia | **Hecho (05-11-2026), pendiente de tu revisión:** se queman en pie hasta la ceniza, revientan en piezas que vuelan o tiemblan humeando y caen (`Damage.how`, `Crumble`) |
 | 17.10 | **Golpe según la dirección:** se echan hacia atrás en la dirección del impacto | Pendiente |
 | 17.11 | **Entradas por familia:** los profundos trepan desde el agua y se sacuden, los cultistas salen de la niebla | Pendiente |
 | 17.12 | **Hordas menos clónicas:** pequeñas diferencias de ritmo, tamaño y paso entre enemigos del mismo tipo | Pendiente |

@@ -2038,6 +2038,23 @@ Sobre las reacciones del 12.9 (esconderse de un jefe, celebrar la subida, gemir 
 - Captura: `godot --path . --fixed-fps 30 -- nolevel=true bot=idle dodge_every=9999 pet=perro shots=24` (el bot `idle` esquiva cada 2,5 s si no se le quita).
 - **Pruebas:** da casi una vuelta al subir de nivel; con la cordura baja, `afraid`; quieto 20 s, `sleep`, y un enemigo a 4 m lo despierta; se pega al caído; cada familia tiene `sleep`. 750 de 750.
 
+### Hito 17.9: muertes según el daño (05-11-2026)
+
+- `Damage.how` dice cómo mata el golpe y el enemigo lo guarda al morir (`Enemy.killed_how`). Lo ponen:
+  - `burn`: el lanzallamas (no el helado de Ithaqua), las zonas de fuego y las bolas de fuego (Cthugha, Fomalhaut).
+  - `blast`: la explosión de los lanzados (`ThrownExplosive._explode`).
+  - `shock`: el rayo encadenado (`_chain`, la bobina de Tesla).
+  - Las balas y el resto, nada: la muerte de su familia (12.7), como antes.
+- `Crumble` las hace:
+  - **Fuego:** se queda en pie y en 0,4 s se ennegrece (`char_k` en `crumble.gdshader`: carbón con un 18 % de brasas que laten) y luego se deshace en ceniza, 1,6 veces más despacio y con borde de brasa. Los trozos de `DeathBurst` salen de ceniza y carbón (`ashen`) y echa humo. No cae ni deja charco.
+  - **Explosión:** cada pieza de primer nivel sale hacia fuera y arriba girando, rebota algo en el suelo y a los 0,3 s se deshace en el aire. Los trozos saltan ya.
+  - **Rayo:** tiembla en pie 0,45 s, cada pieza vibrando, echando humo; luego cae a la manera de su familia, medio quemado y con borde azul.
+- Los jefes (`unique`) y los etéreos mueren a su manera siempre. En calidad Baja (sin el material de deshacerse) el fuego no se ve. En los otros PC, la de su familia: cómo murió no viaja en la foto.
+- De paso, el material de deshacerse ya no pinta el borde de brasa con el modelo entero (`cut` 0): antes no se notaba porque empezaba a deshacerse enseguida.
+- Hoja de poses: `anim=die_burn`, `die_blast`, `die_shock` o `die` (`dur=` y `bg=0.45`, fondo claro, para ver lo oscuro). Cada columna avanza su `Crumble` a mano con `process_mode` desactivado: `set_process(false)` lo deshace `_ready`.
+- **Coste:** el de deshacerse de siempre (un parámetro por malla y fotograma, unos fotogramas más).
+- **Pruebas:** el golpe que mata deja `killed_how`; `scaled` lo conserva; retrasos de los trozos; la explosión lanza la cabeza. 751 de 751.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

@@ -9,7 +9,8 @@ extends SceneTree
 ##   anim=    animación de su script (Anims). Los gestos de un golpe se ponen encima de `base`
 ##            como en la partida (solo brazos y torso: over=true). Especiales: aim1 y aim2 (apuntar
 ##            con una o dos manos; las columnas van del culatazo a reposo), aim_look (apunta a los lados),
-##            wade y mud (andar vadeando o por el barro, hito 17.6), slip (frenada en la nieve).
+##            wade y mud (andar vadeando o por el barro, hito 17.6), slip (frenada en la nieve), die, die_burn, die_blast y die_shock
+##            (muertes según el daño, hito 17.9; `dur=` s que cubren las columnas, 1,4).
 ##   base=    animación de debajo (idle por defecto; walk, para verlo andando)
 ##   over=    true: como gesto encima de la base (Player.UPPER_BODY); false: pose entera
 ##   n=       columnas (6)
@@ -42,7 +43,8 @@ func _init() -> void:
 	var env := WorldEnvironment.new()
 	env.environment = Environment.new()
 	env.environment.background_mode = Environment.BG_COLOR
-	env.environment.background_color = Color(0.18, 0.19, 0.22)
+	var bg := float(_opts.get("bg", "0.18"))                 # bg=0.5: fondo claro (lo oscuro se ve)
+	env.environment.background_color = Color(bg, bg * 1.05, bg * 1.2)
 	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.environment.ambient_light_color = Color(0.55, 0.57, 0.62)
 	world.add_child(env)
@@ -94,6 +96,16 @@ func _pose(model_name: String, m: Node3D, anim: String, base: String, t: float, 
 		var kick := exp(-float(i) / float(n) * 4.0) if anim != "aim_look" else 0.0
 		var look := lerpf(-1.2, 1.2, i / float(maxi(n - 1, 1))) if anim == "aim_look" else 0.0
 		s.call("aim", m, 1.0 if anim == "aim2" else 0.0, look, kick, 1.0)
+		return
+	if anim.begins_with("die"):                     # muertes (hito 17.9): die, die_burn, die_blast, die_shock
+		var how := StringName(anim.substr(4)) if anim.length() > 4 else &""
+		Anims.pose(model_name, "idle", m, 0.25)
+		var parent := m.get_parent()
+		var fall := model_name if Anims.death_time(model_name) > 0.0 else ""
+		Crumble.start(parent, m, Color(1.0, 0.5, 0.2), false, fall, how)
+		var c: Crumble = parent.get_child(parent.get_child_count() - 1)
+		c.process_mode = Node.PROCESS_MODE_DISABLED   # solo avanza lo que se le pide (set_process lo deshace _ready)
+		for k in int(t * 0.97 * float(_opts.get("dur", "1.4")) * 60.0): c._process(1.0 / 60.0)
 		return
 	if anim == "slip":                              # frenada resbalando en la nieve (hito 17.6)
 		Anims.pose(model_name, "idle", m, 0.25)

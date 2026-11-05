@@ -23,6 +23,10 @@ var _pool: MeshInstance3D
 var _burst_done := false
 var _cols: Array = FALLBACK
 
+## Quemado (hito 17.9): los trozos, de ceniza y carbón.
+func ashen() -> void:
+	_cols = [Color(0.16, 0.15, 0.14), Color(0.32, 0.3, 0.28), Color(0.52, 0.5, 0.47), Color(0.08, 0.07, 0.07)]
+
 func setup(p_model: String, p_radius: float, model_root: Node3D = null, p_big := false) -> void:
 	model = p_model
 	radius = p_radius

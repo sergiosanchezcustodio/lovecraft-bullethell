@@ -76,6 +76,7 @@ func _physics_process(delta: float) -> void:
 		if _done.has(id) or not e.is_alive(): continue
 		_done[id] = true
 		var d := Damage.new(damage, 0.0)
+		d.how = &"burn"                                  # 17.9
 		d.knockback = dir * 1.2
 		d.bonus = bonus
 		e.take_damage(d)

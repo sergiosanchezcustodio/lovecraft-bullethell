@@ -13,6 +13,7 @@ instance uniform float base_y = 0.0;              // pies, en el mundo
 instance uniform float glow = 0.0;                // capa que brillaba (ojos, bioluminiscencia)
 instance uniform vec4 ember : source_color = vec4(1.0, 0.5, 0.18, 1.0);
 instance uniform float roughness_v = 0.6;
+instance uniform float char_k = 0.0;              // quemado (hito 17.9): negro de carbón con brasas
 
 varying vec3 lp;
 varying float wy;
@@ -37,8 +38,10 @@ void fragment() {
 	float key = h * 0.6 + (1.0 - up) * 0.4;       // arriba, antes
 	if (key < cut) discard;
 	float edge = 1.0 - smoothstep(0.0, 0.09, key - cut);
-	ALBEDO = mix(COLOR.rgb, ember.rgb, edge * 0.6);
-	EMISSION = ember.rgb * edge * step(0.001, cut) * 2.5 + COLOR.rgb * glow;
+	vec3 base = mix(COLOR.rgb, vec3(0.085, 0.07, 0.06), char_k * 0.9);
+	ALBEDO = mix(base, ember.rgb, edge * 0.6 * step(0.001, cut));   // entero (cut 0), sin borde
+	float coal = step(0.82, h) * char_k * (0.55 + 0.45 * sin(TIME * 7.0 + h * 40.0));   // brasas que laten
+	EMISSION = ember.rgb * (edge * step(0.001, cut) * 2.5 + coal * 1.6) + COLOR.rgb * glow * (1.0 - char_k);
 	ROUGHNESS = roughness_v;
 	SPECULAR = 0.3;
 }

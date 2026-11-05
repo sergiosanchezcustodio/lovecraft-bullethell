@@ -67,6 +67,7 @@ var drum_t := 0.0
 var _drum_next := 0.0
 var _revived := false
 var killed_by: StringName = &""               ## etiqueta del golpe que lo abatió («J1:webly»; bestiario, hito 15.4)
+var killed_how := &""                         ## cómo lo mató el último golpe (Damage.how, hito 17.9)
 var _down_t := 0.0
 var _getup_t := 0.0
 var anchored := false                       ## no se mueve ni lo empujan (Dagon, en la orilla)
@@ -532,6 +533,7 @@ func take_damage(d: Damage) -> void:
 	if not d.dot: world.player_hit(d.tag, self)    # objetos al impactar (hito 8.7)
 	if health <= 0.0:
 		killed_by = d.tag
+		killed_how = d.how
 		world.record_kill(d.tag, global_position)
 	_hit_flash()
 	_knock += Vector3(d.knockback.x, 0, d.knockback.z) * (2.5 if not data.elite else 0.6)
@@ -696,13 +698,15 @@ func _death_fx() -> void:
 	var fall := model_name if data.death != &"crumble" and not data.ethereal and Anims.death_time(model_name) > 0.0 else ""
 	var light: Color = DeathBurst.palette_of(model_name, model)[0]
 	for c: Color in DeathBurst.palette_of(model_name, model): if c.get_luminance() > light.get_luminance(): light = c
+	var how := killed_how if not data.unique and not data.ethereal else &""   # los jefes, a su manera (17.9)
 	var fx := DeathBurst.new()
 	fx.setup(model_name, data.body_radius, model, data.elite or data.unique)
-	fx.puddle = Anims.death_kind(fall) in ["puddle", "melt"] and _wade <= 0.5
+	fx.puddle = Anims.death_kind(fall) in ["puddle", "melt"] and _wade <= 0.5 and how != &"burn" and how != &"blast"
 	fx.position = global_position
+	if how == &"burn": fx.ashen()
 	# el modelo se queda y se deshace en cubos (hito 11.1); la brasa, de su color más claro
-	if Crumble.start(world.fx, model, light.lerp(Color(1.0, 0.45, 0.15), 0.55), data.elite or data.unique, fall):
-		fx.delay = Crumble.delay_for(fall)
+	if Crumble.start(world.fx, model, light.lerp(Color(1.0, 0.45, 0.15), 0.55), data.elite or data.unique, fall, how):
+		fx.delay = Crumble.delay_for(fall, how)
 	world.fx.add_child(fx)
 	if _wade > 0.5:                                   # cae al agua: ondas grandes (hito 11.4)
 		Ripples.add(world.fx, global_position, 1.4 + data.body_radius * 2.0, 0.8, 1.6)

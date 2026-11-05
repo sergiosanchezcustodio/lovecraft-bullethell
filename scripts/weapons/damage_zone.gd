@@ -90,6 +90,7 @@ func _physics_process(delta: float) -> void:
 	for e in world.enemies_in_circle(global_position, radius):
 		var d := Damage.new(dps * TICK, 0.0)
 		d.bonus = bonus
+		if kind == WeaponData.Zone.FIRE: d.how = &"burn"   # 17.9
 		e.take_damage(d)
 		if vulnerable > 0.0 and e.has_method("make_vulnerable") and e.is_alive(): e.make_vulnerable(vulnerable)
 		if slow_k < 1.0 and e.has_method("slow") and e.is_alive(): e.slow(TICK + 0.25, slow_k)

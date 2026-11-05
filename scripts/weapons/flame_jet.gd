@@ -85,6 +85,7 @@ func _physics_process(delta: float) -> void:
 			if absf(Vector2(dir.x, dir.z).angle_to(Vector2(rel.x, rel.z))) > half_angle + 0.12: continue
 			var d := Damage.new(dps * 0.15, 0.0)
 			d.bonus = bonus
+			if not frost: d.how = &"burn"                 # 17.9
 			e.take_damage(d)
 			if frost and e.is_alive():
 				e.slow(0.4, 0.45)
