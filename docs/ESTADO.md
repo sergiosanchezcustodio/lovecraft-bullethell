@@ -1971,6 +1971,12 @@ El autor pidió las 20 propuestas de mejoras gráficas, sin empeorar apreciablem
 - **Bot nuevo:** `bot=stop` corre y se para por turnos. Para capturar momentos concretos, `--fixed-fps 30`: sin él, las capturas cuentan el primer fotograma tras la carga (largo) y van por delante del bot.
 - **Pruebas:** frena tras correr (con piernas, el cuerpo baja) y un paso corto no frena (`test_gestos_ataque.gd`). 741 de 741. *Ojo:* `test_el_idolo_no_se_mueve_y_ampara_a_los_cercanos` (`test_new_enemies.gd`) falló una vez en la suite entera (el ídolo acabó a 7 m) y pasa suelto y en la repetición: es intermitente, sin relación con los jugadores; queda por averiguar.
 
+### Hito 17.3: mirar al peligro (05-11-2026)
+
+- La cabeza (80 %) y un poco el tronco (18 %) se vuelven hacia el peligro (`Player._look_step`): un jefe (`unique`) a menos de 16 m o, si no hay, el enemigo más cercano a menos de 7 m (`CombatWorld.nearest_enemy`). Se busca cada 0,12 s y el giro se suaviza; por detrás no pasa de 1,1 rad (mira por encima del hombro). No al esquivar ni abatido; mientras apunta (17.1) manda el apuntado, que ya gira la cabeza hacia el disparo. Vale para los jugadores de otros PC (los enemigos que ve ese PC).
+- Coste: una búsqueda en la rejilla cada 0,12 s y un recorrido de la lista de enemigos buscando jefes, por jugador.
+- **Pruebas:** la cabeza se vuelve hacia un enemigo cercano y vuelve al frente cuando ya no está (`test_gestos_ataque.gd`). 742 de 742.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

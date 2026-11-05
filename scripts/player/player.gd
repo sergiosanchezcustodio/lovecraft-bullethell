@@ -705,7 +705,49 @@ func _animate(delta: float) -> void:
 	_brake_step(delta)
 	_hold_step(delta)
 	_aim_step(delta)
+	_look_step(delta)
 	_mind_step(delta)
+
+# ---------------------------------------------------------------- mirar al peligro (hito 17.3)
+## La cabeza (y un poco el tronco) se vuelve hacia el peligro: un jefe a menos de LOOK_BOSS m o,
+## si no, el enemigo más cercano a menos de LOOK_NEAR. Se busca cada LOOK_SCAN s y el giro se
+## suaviza; por detrás no pasa de LOOK_MAX (mira por encima del hombro). Mientras apunta, manda el
+## apuntado (17.1), que ya gira la cabeza hacia el disparo.
+const LOOK_NEAR := 7.0
+const LOOK_BOSS := 16.0
+const LOOK_MAX := 1.1
+const LOOK_SCAN := 0.12
+var _look_yaw := 0.0
+var _look_target: Node3D
+var _look_scan := 0.0
+
+func _look_step(delta: float) -> void:
+	_look_scan -= delta
+	if _look_scan <= 0.0:
+		_look_scan = LOOK_SCAN
+		_look_target = _danger()
+	var want := 0.0
+	if _look_target != null and is_instance_valid(_look_target) and _look_target.is_alive() 			and _action == "" and not is_downed():
+		var to := _look_target.global_position - global_position
+		want = clampf(wrapf(atan2(to.x, to.z) - visual.rotation.y, -PI, PI), -LOOK_MAX, LOOK_MAX)
+	_look_yaw = lerpf(_look_yaw, want, 1.0 - exp(-7.0 * delta))
+	var w := 1.0 - Anims.ease(_aim_w)
+	if absf(_look_yaw) < 0.002 or w <= 0.0: return
+	Anims.part(model, "head").rotation.y += _look_yaw * 0.8 * w
+	Anims.part(model, "torso").rotation.y += _look_yaw * 0.18 * w
+
+## A quién mirar: el jefe más cercano a tiro o, si no hay, el enemigo más cercano (o null).
+func _danger() -> Node3D:
+	if world == null: return null
+	var best: Node3D = null
+	var bd := LOOK_BOSS * LOOK_BOSS
+	for e in world.enemies:
+		if not is_instance_valid(e) or not e.data.unique or not e.is_alive(): continue
+		var d := e.global_position.distance_squared_to(global_position)
+		if d < bd:
+			bd = d
+			best = e
+	return best if best != null else world.nearest_enemy(global_position, LOOK_NEAR)
 
 # ---------------------------------------------------------------- frenada (hito 17.2)
 ## Tras correr un rato (BRAKE_RUN s a más del 75 % de su velocidad), pararse en seco planta los

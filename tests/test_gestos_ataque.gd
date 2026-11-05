@@ -129,3 +129,25 @@ func test_frena_al_pararse_tras_correr() -> void:
 func test_un_paso_corto_no_frena() -> void:
 	var p := _run_and_stop(0.2)
 	assert_lt(p._brake_t, 0.0)
+
+## Mirar al peligro (hito 17.3): la cabeza se vuelve hacia el enemigo cercano y vuelve al frente
+## cuando ya no está.
+func test_mira_al_enemigo_cercano() -> void:
+	var world := CombatWorld.new()
+	add_child_autofree(world)
+	var p := Player.new().setup(load("res://data/characters/dyer.tres"), PlayerInput.new(), Color.YELLOW)
+	p.world = world
+	world.add_child(p)
+	world.add_player(p)
+	var e := Enemy.new().setup(load("res://data/enemies/cultista.tres"), world, null)
+	world.add_child(e)
+	e.global_position = Vector3(4, 0, 0.5)              # a su izquierda (mira hacia +Z)
+	world.add_enemy(e)
+	for i in 4: world._physics_process(1.0 / 60.0)      # la rejilla, al día
+	for i in 60: p._process(1.0 / 60.0)
+	var head := Anims.part(p.model, "head")
+	assert_gt(head.rotation.y, 0.6, "la cabeza se vuelve hacia él")
+	e.queue_free()
+	await get_tree().process_frame
+	for i in 90: p._process(1.0 / 60.0)
+	assert_lt(absf(head.rotation.y), 0.2, "y vuelve al frente")
