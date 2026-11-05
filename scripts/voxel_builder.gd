@@ -18,7 +18,7 @@ const FACES := [
 static var _cache := {}
 ## Caché en disco de las mallas construidas (ver VoxelMeshCache). Sube BUILDER_VERSION
 ## cuando cambie la forma de construir las mallas, para invalidar lo guardado.
-const BUILDER_VERSION := 8
+const BUILDER_VERSION := 9
 const UNDER_SINK := 0.03                         ## voxels que se hunden las caras de lo tapado por otra parte (bit 64)
 const DISK_CACHE_DIR := "user://voxcache"
 static var use_disk_cache := true
@@ -402,6 +402,16 @@ static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vecto
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var comp := _components(voxels) if ids else {}
+	# 17.16: de cada ventana, su esquina de abajo y su ancho en voxels; en UV2, dónde cae cada
+	# vértice dentro de ella (a lo ancho, hacia arriba), para dibujar quien se asoma
+	var lo := {}
+	var hi := {}
+	for item in voxels:
+		if not ids: break
+		var c: int = comp[item[0]]
+		var v: Vector3i = item[0]
+		lo[c] = v if not lo.has(c) else (lo[c] as Vector3i).min(v)
+		hi[c] = v if not hi.has(c) else (hi[c] as Vector3i).max(v)
 	for item in voxels:
 		var p: Vector3i = item[0]
 		var col: Color = item[1]
@@ -409,7 +419,14 @@ static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vecto
 		# bit 64: voxel tapado por el de otra parte en el mismo sitio (el costado bajo el brazo):
 		# sus caras se hunden un poco para que, donde coinciden, se vea la otra (voxlib.under_kept)
 		var sink := Vector3.ZERO
-		if ids: st.set_uv(Vector2(float(comp[p]), 0.0))       # ventana a la que pertenece (window_glow.gdshader)
+		var wide_x := true
+		var w0 := Vector3.ZERO
+		if ids:                                               # ventana a la que pertenece y su ancho (window_glow.gdshader)
+			var c: int = comp[p]
+			var size: Vector3i = (hi[c] as Vector3i) - (lo[c] as Vector3i) + Vector3i.ONE
+			wide_x = size.x >= size.z
+			w0 = Vector3(lo[c])
+			st.set_uv(Vector2(float(c), float(size.x if wide_x else size.z)))
 		for fi in FACES.size():
 			var f: Array = FACES[fi]
 			var n: Vector3i = f[0]
@@ -428,6 +445,9 @@ static func _build(voxels: Array, own: Dictionary, all: Dictionary, pivot: Vecto
 			if shades[0] + shades[2] < shades[1] + shades[3]:
 				idx = [1, 3, 2, 1, 0, 3]   # evita artefactos de AO en diagonal
 			for i in idx:
+				if ids:
+					var lp: Vector3 = Vector3(p) + corners[i] - w0
+					st.set_uv2(Vector2(lp.x if wide_x else lp.z, lp.y))
 				st.set_normal(Vector3(n))
 				st.set_color(col * shades[i])
 				st.add_vertex((Vector3(p) + corners[i] - sink - pivot) * vs)

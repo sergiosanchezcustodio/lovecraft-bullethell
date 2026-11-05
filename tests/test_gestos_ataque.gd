@@ -410,3 +410,22 @@ func test_fuente_con_ondas() -> void:
 	assert_almost_eq(float(m.get_shader_parameter("radius")), 3.22, 0.01)
 	assert_ne(m.get_shader_parameter("center"), Vector2.ZERO, "las ondas salen del chorro, no del centro")
 	mi.free()
+
+## Siluetas en las ventanas (hito 17.16): la capa de las ventanas lleva su ancho en UV.y y en UV2
+## dónde cae cada vértice dentro de la ventana, de 0 a su ancho.
+func test_ventanas_con_ancho_y_sitio() -> void:
+	var m := VoxelBuilder.load_model("res://models/prt_casa.json")
+	add_child_autofree(m)
+	var found := false
+	for mi: MeshInstance3D in m.get_meta("meshes"):
+		if int(mi.get_meta("kind", 0)) != VoxelBuilder.KIND_WINDOW: continue
+		var arr := mi.mesh.surface_get_arrays(0)
+		var uv: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
+		var uv2: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV2]
+		assert_eq(uv2.size(), uv.size(), "UV2 en todos los vértices")
+		for i in range(0, uv.size(), 7):
+			assert_gt(uv[i].y, 0.0, "ancho de la ventana")
+			assert_between(uv2[i].x, 0.0, uv[i].y + 0.01)
+			assert_gte(uv2[i].y, 0.0)
+		found = true
+	assert_true(found, "la casa tiene ventanas que se encienden")

@@ -2132,6 +2132,17 @@ Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, mat
 - **Coste:** un plano y un sombreador sin luces; en todas las calidades.
 - **Pruebas:** la lámina a la altura del agua, con su radio y las ondas desde el chorro. 758 de 758.
 
+### Hito 17.16: siluetas en las ventanas (05-11-2026)
+
+- En las ventanas que se encienden a ratos (voxels con glow 2, `window_glow.gdshader`), de vez en cuando pasa algo si están encendidas. En cada turno de 9 s, un 16 % de las veces:
+  - alguien a contraluz (hombros y cabeza, a voxels) entra por un lado, se queda mirando y se va, por donde vino o por el otro lado;
+  - se corre la cortina hasta media ventana, con sus pliegues, y vuelve.
+- Todo en el sombreador, sin nada en la CPU. Para saber dónde cae cada voxel dentro de su ventana, `VoxelBuilder` da en UV.y el ancho de la ventana y en UV2 su posición (a lo ancho y hacia arriba, en voxels).
+- `BUILDER_VERSION` sube a 9: la primera partida tras el cambio reconstruye las mallas de la caché.
+- Lo de «alguien vigila» (se apagan cuando pasas cerca) sigue igual: las siluetas se ven de lejos.
+- **Coste:** unas operaciones más por vértice y por píxel en la capa de las ventanas.
+- **Pruebas:** la capa de las ventanas de una casa lleva el ancho y el sitio de cada vértice. 759 de 759.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
