@@ -481,6 +481,7 @@ func _ready() -> void:
 	Enemy.wounds = args.get_str("wounds", "true") != "false" and (bool(Quality.value("wounds", true)) or args.has("wounds"))   # en Baja, sin grietas
 	Enemy.wounds_force = args.get_float("wounds", -1.0) if args.get_str("wounds", "").is_valid_float() else -1.0
 	Enemy.rise_enabled = args.get_bool("rise", true)   # hito 11.6
+	Enemy.variety = args.get_bool("variety", true)        # hito 17.12
 	Enemy.flash_hold = args.get_bool("flash_hold", false)
 	Enemy.anim_lod = args.get_bool("anim_lod", true)    # hito 16.2
 	Enemy.tints = args.get_bool("tints", true)   # tráiler (hito 13.16): los jefes, a golpe continuo, se quedaban blancos

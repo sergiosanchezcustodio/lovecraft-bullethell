@@ -536,7 +536,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | 17.9 | **Muertes según el daño:** el fuego los quema hasta la ceniza, las explosiones los lanzan en trozos y el rayo los deja temblando y humeando. Si no, la de su familia | **Hecho (05-11-2026), pendiente de tu revisión:** se queman en pie hasta la ceniza, revientan en piezas que vuelan o tiemblan humeando y caen (`Damage.how`, `Crumble`) |
 | 17.10 | **Golpe según la dirección:** se echan hacia atrás en la dirección del impacto | **Hecho (05-11-2026), pendiente de tu revisión:** ya se inclinaban (11.2); ahora según la fuerza, deslizándose hacia atrás, con latigazo de cabeza y con dirección también sin empuje (de la bala o del jugador) |
 | 17.11 | **Entradas por familia:** los profundos trepan desde el agua y se sacuden, los cultistas salen de la niebla | **Hecho (05-11-2026), pendiente de tu revisión:** los profundos trepan brazo a brazo y se sacuden el agua; los humanos se materializan en un jirón de niebla (herramienta `tools/hoja_entradas.gd`) |
-| 17.12 | **Hordas menos clónicas:** pequeñas diferencias de ritmo, tamaño y paso entre enemigos del mismo tipo | Pendiente |
+| 17.12 | **Hordas menos clónicas:** pequeñas diferencias de ritmo, tamaño y paso entre enemigos del mismo tipo | **Hecho (05-11-2026), pendiente de tu revisión:** tamaño ±6 %, ritmo ±9 %, más o menos echados adelante y algunos se contonean; solo en lo que se ve, también con la horda (`variety=false` para comparar) |
 
 ### Bloque D: objetos del escenario
 

@@ -36,6 +36,13 @@ var velocity := Vector3.ZERO
 var facing := Vector3(0, 0, 1)
 var anim := "walk"
 var anim_t := 0.0                        ## fase de la animación (0..1)
+## Hordas menos clónicas (hito 17.12): cada uno algo distinto, solo en lo que se ve (la vida, la
+## velocidad y el choque no cambian). Van en el contenedor del modelo: valen con la horda.
+var var_size := 1.0                       ## tamaño (±6 %; las élites y los únicos, 1)
+var var_tempo := 1.0                      ## ritmo de la animación (±9 %)
+var var_lean := 0.0                       ## echado adelante (rad, hasta 0,07)
+var var_roll := 0.0                       ## contoneo al andar (rad, hasta 0,06)
+static var variety := true                ## variety=false para comparar
 var anim_hold := false                   ## el comportamiento controla anim_t directamente
 var _knock := Vector3.ZERO
 var _stun := 0.0                            ## s que le quedan aturdido (no se mueve ni ataca)
@@ -237,6 +244,12 @@ func _ready() -> void:
 	_flash_mat = _shared_flash(false)
 	_attack_timer = data.attack_cooldown * randf_range(0.5, 1.0)
 	anim_t = randf()
+	if variety:                                  # 17.12
+		var_tempo = randf_range(0.91, 1.09)
+		if not data.elite and not data.unique:
+			var_size = randf_range(0.94, 1.06)
+			var_lean = randf_range(0.0, 0.07) if not data.ethereal else 0.0
+			var_roll = randf_range(0.0, 0.06) if randf() < 0.6 else 0.0
 	if data.aura_drain > 0.0 and data.aura_radius > 0.0:
 		_aura_mat = _disc(Color(0.45, 0.2, 0.7, 0.18), data.aura_radius)
 	if data.params.has("guard_radius"):            # ídolo vivo (16.18): el corro que protege, también en red
@@ -1028,7 +1041,11 @@ func _process(delta: float) -> void:
 		var a := 0.035 * clampf(data.body_radius, 0.4, 1.5)
 		visual.global_position += Vector3(randf_range(-a, a), 0.0, randf_range(-a, a))
 	visual.rotation = Vector3(0.0, atan2(facing.x, facing.z), 0.0)
-	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale * (ELITE_SIZE if data.elite else 1.0)   # aparece creciendo (al cambiar de forma)
+	visual.scale = Vector3.ONE * clampf(_spawn_t / 0.35, 0.2, 1.0) * model_scale * (ELITE_SIZE if data.elite else 1.0) * var_size   # aparece creciendo (al cambiar de forma)
+	if (var_lean > 0.0 or var_roll > 0.0) and facing.length_squared() > 0.0001:   # su manera de andar (17.12)
+		var fw := Vector3(facing.x, 0.0, facing.z).normalized()
+		var roll := sin(anim_t * TAU) * var_roll if anim == "walk" else 0.0
+		visual.basis = Basis(fw, roll) * Basis(Vector3(fw.z, 0.0, -fw.x), var_lean) * visual.basis
 	_air_step(delta)
 	if _rise != Rise.NONE: _rise_step(delta)
 	if _shake_t >= 0.0: _shake_step(delta)
@@ -1061,7 +1078,7 @@ func _process(delta: float) -> void:
 			for mi: MeshInstance3D in _wound_meshes:
 				if is_instance_valid(mi): mi.set_instance_shader_parameter("hurt", hk)
 	if not anim_hold and _stasis_t <= 0.0 and world.freeze_t <= 0.0:   # congelado: la animación se detiene
-		anim_t = fposmod(anim_t + delta / Anims.duration(model_name, anim), 1.0)
+		anim_t = fposmod(anim_t + delta / Anims.duration(model_name, anim) * var_tempo, 1.0)
 	if _horde_ok and _spawn_t >= 0.35 and _rise_wait <= 0.0 and _rise_mats.is_empty() and visual.visible:
 		_horde_step(delta, wu, wu_own)
 		Prof.stop("enemigos_anim", t0)

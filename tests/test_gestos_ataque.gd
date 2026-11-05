@@ -336,3 +336,27 @@ func test_entradas_por_familia() -> void:
 		if p._shake_t > 0.0: shook = true
 	assert_lt(most, -1.5, "los brazos arriba, agarrándose")
 	assert_true(shook, "y al salir se sacude")
+
+## Hordas menos clónicas (hito 17.12): cada uno con su tamaño, ritmo y manera de andar, en
+## pequeño; las élites, del tamaño de siempre; la vida y la velocidad, iguales.
+func test_hordas_menos_clonicas() -> void:
+	var world := CombatWorld.new()
+	add_child_autofree(world)
+	var sizes := {}
+	var tempos := {}
+	for i in 12:
+		var e := Enemy.new().setup(load("res://data/enemies/cultista.tres"), world, null)
+		world.add_child(e)
+		assert_between(e.var_size, 0.94, 1.06)
+		assert_between(e.var_tempo, 0.91, 1.09)
+		assert_between(e.var_lean, 0.0, 0.07)
+		assert_eq(e.health, e.data.max_health * e.health_scale, "la vida no cambia")
+		sizes[snappedf(e.var_size, 0.01)] = true
+		tempos[snappedf(e.var_tempo, 0.01)] = true
+	assert_gt(sizes.size(), 4, "tamaños distintos")
+	assert_gt(tempos.size(), 4, "ritmos distintos")
+	var d: EnemyData = (load("res://data/enemies/cultista.tres") as EnemyData).duplicate()
+	d.elite = true
+	var el := Enemy.new().setup(d, world, null)
+	world.add_child(el)
+	assert_eq(el.var_size, 1.0, "la élite, de su tamaño")

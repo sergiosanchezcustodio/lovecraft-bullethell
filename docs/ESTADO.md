@@ -2079,6 +2079,19 @@ Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, mat
 - En partida no se llegaba a ver: el director sigue mandando enemigos y la entrada dura medio segundo. Las hojas sí lo enseñan.
 - **Pruebas:** el cultista sale de la niebla, el expedicionario del suelo; el profundo del agua trepa con los brazos arriba y se sacude al salir. 754 de 754.
 
+### Hito 17.12: hordas menos clónicas (05-11-2026)
+
+- Ya variaba la fase de la animación de cada uno (`anim_t` al azar). Ahora, al nacer, cada enemigo saca también:
+  - `var_size`, tamaño ±6 %;
+  - `var_tempo`, ritmo de la animación ±9 %;
+  - `var_lean`, echado adelante hasta 0,07 rad;
+  - `var_roll`, contoneo al andar hasta 0,06 rad (un 60 % de ellos).
+- Solo se ve: la vida, la velocidad, el radio de choque y el ritmo de ataque no cambian. Las élites y los únicos conservan su tamaño y su postura; los etéreos no se inclinan.
+- Va en el contenedor del modelo (`visual`) y en el reloj de la animación, así que vale con la horda (16.3) sin tocar la textura de poses. En los otros PC sale otro reparto: es solo de lo que se dibuja.
+- `variety=false` lo quita para comparar. La hoja de entradas lo enseña en fila: `tools/hoja_entradas.gd -- enemy=cultista rise=none dur=0 variety=true|false`.
+- **Coste:** una multiplicación y, en los que se inclinan, dos giros de base por enemigo y fotograma.
+- **Pruebas:** en 12 cultistas, tamaños y ritmos distintos dentro de su margen y la vida de siempre; la élite, de su tamaño. 755 de 755.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

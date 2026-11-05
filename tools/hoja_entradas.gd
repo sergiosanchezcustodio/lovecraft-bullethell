@@ -9,6 +9,7 @@ extends SceneTree
 ##   rise=    water, fog, ground o air (la que le tocaría si no se dice)
 ##   n=       columnas (8)
 ##   dur=     s que cubren las columnas (1,2: la entrada y la sacudida)
+##   variety= false: todos iguales (hito 17.12); con rise=none dur=0, una fila para comparar
 ##   out=     archivo (shots/entrada_<enemigo>_<rise>.png)
 
 var _frames := 0
@@ -68,6 +69,7 @@ func _spawn() -> void:
 	var n := int(_opts.get("n", "8"))
 	var dur := float(_opts.get("dur", "1.2"))
 	var world := _world
+	Enemy.variety = String(_opts.get("variety", "true")) == "true"
 	var data: EnemyData = load("res://data/enemies/%s.tres" % id)
 	var across := Vector3(1.0, 0.0, -1.0).normalized()
 	for i in n:
@@ -79,6 +81,7 @@ func _spawn() -> void:
 		if rise != "":
 			e.data = data.duplicate()
 			e.data.rise = StringName(rise)
+		e._rise_end()                                     # la que empezó al prepararse
 		e._rise_start()
 		var t := dur * i / float(maxi(n - 1, 1))
 		var steps := int(t * 60.0)
