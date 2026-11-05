@@ -2235,6 +2235,33 @@ Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, mat
 
   Dentro del tope de +0,5 ms. El 1 % peor varía arriba y abajo, como siempre entre ejecuciones.
 
+### Mejoras pequeñas tras la fase 17 (05-11-2026)
+
+- **Sombra de lo que vuela** (`DistantEvents`, sucesos `cross` con `h` > 2: el antiguo alado del campamento, el lago y el paso, y el byakhee de los tejados):
+  - una segunda copia del modelo, que solo da sombra y no se ve, con la misma pose;
+  - la sombra de verdad caía fuera de la pantalla, porque la luna baja la estira hacia el fondo. Como la copia no se ve, va a 2,2 m del suelo y desplazada según la dirección de la luna (`_moon_reach`), para que su sombra cruce el suelo por la línea de los jugadores;
+  - sin sombras (Baja), no cuesta nada.
+- **Sonido lejano por suceso:** `sound` en el `distant` de cada arena (`data/ambient.json`), con `start` (al asomar), `sink` (al empezar a hundirse), `pass` (a mitad del cruce), `end` y `db`. Cada uno suena una vez por suceso, donde pasa:
+
+  | Suceso | Sonido |
+  |---|---|
+  | Tentáculos | ola al asomar, chapoteo al hundirse |
+  | Dagón | rugido lejano y ola |
+  | Shoggoth de los túneles | «tekeli-li» y chapoteo |
+  | Antiguos alados y shoggoth de la ciudad | «tekeli-li» al pasar |
+  | Byakhee | chillido |
+  | Procesiones | cántico |
+  | Señales del arrecife | campana de boya |
+  | Esculturas del estudio | crujido de piedra al girarse |
+
+  `Auto.sfx_at` acepta ahora volumen.
+- **La lluvia borra los rastros** (`GroundTraces`, en las arenas con lluvia: calles, carretera, muelle…):
+  - cada 45 s (`WASH_EVERY`) lo pintado pasa a una segunda textura (`trace_old`) que el sombreador desvanece (`trace_old_k`, de 1 a 0), y la imagen se empieza limpia;
+  - un rastro dura entre 45 y 90 s, todo con operaciones nativas (`update`, `fill`).
+  - Sin lluvia, se quedan todo el nivel, como antes.
+- **Arreglo:** una mancha sin `mode` (la nieve que levanta una explosión) rompía `GroundTraces.from_mark`. Ahora se salta: el quemado de esa explosión ya deja su rastro.
+- **Pruebas:** el sonido del suceso, una vez al asomar y otra al hundirse; la sombra (solo en lo que vuela, la copia solo da sombra y la silueta no da); y el lavado de los rastros. 765 de 765.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

@@ -6,10 +6,14 @@ extends Node
 ## (ground_traces.gdshaderinc). La mancha se desvanece como antes; el rastro se queda el resto del
 ## nivel. El tope es la propia textura: memoria fija, y lo que cae encima tapa lo de debajo hasta
 ## `MAX_A` (lo pone el sombreador). La sube a la GPU como mucho cada `UPLOAD_EVERY` s. `traces` en data/quality.json.
+## Con lluvia, la lluvia los borra poco a poco: cada `WASH_EVERY` s lo pintado pasa a una segunda
+## textura que se desvanece en el sombreador (`trace_old_k`) y se empieza limpia; así un rastro dura
+## de uno a dos lavados, sin tocar la imagen píxel a píxel.
 
 const PX_PER_M := 8.0
 const MAX_A := 0.62                             ## lo más que tapa el suelo
 const UPLOAD_EVERY := 2.0
+const WASH_EVERY := 45.0
 static var current: GroundTraces                ## el de la arena en juego (null: sin rastros)
 
 var img: Image
@@ -19,6 +23,11 @@ var extent := 0.0
 var _dirty := false
 var _t := 0.0
 var stamps := 0                                 ## (pruebas)
+var mat: ShaderMaterial
+var old_tex: ImageTexture                       ## lo pintado antes del último lavado
+var rain := -1                                  ## -1: sin mirar; 0: no llueve; 1: la lluvia lava
+var _wash := 0.0
+var _fade_t := 0.0
 
 ## Rastros para el suelo con material `mat` que cubre `bounds` (m).
 static func make(mat: ShaderMaterial, bounds: Rect2) -> GroundTraces:
@@ -31,7 +40,11 @@ static func make(mat: ShaderMaterial, bounds: Rect2) -> GroundTraces:
 	g.img = Image.create(px, px, false, Image.FORMAT_RGBA8)
 	g.img.fill(Color(0, 0, 0, 0))
 	g.tex = ImageTexture.create_from_image(g.img)
+	g.old_tex = ImageTexture.create_from_image(g.img)
+	g.mat = mat
 	if mat != null:
+		mat.set_shader_parameter("trace_old", g.old_tex)
+		mat.set_shader_parameter("trace_old_k", 0.0)
 		mat.set_shader_parameter("trace_tex", g.tex)
 		mat.set_shader_parameter("trace_origin", g.origin)
 		mat.set_shader_parameter("trace_extent", g.extent)
@@ -91,18 +104,43 @@ static func _brush(rp: int, shape: int, col: Color, a: float) -> Image:
 	return b
 
 func _process(delta: float) -> void:
+	if rain < 0: rain = 1 if _raining() else 0
+	if rain == 1: _wash_step(delta)
 	_t -= delta
 	if _dirty and _t <= 0.0:
 		_t = UPLOAD_EVERY
 		_dirty = false
 		tex.update(img)
 
+## Llueve en la arena (Weather con lluvia, del juego en el que está).
+func _raining() -> bool:
+	var a := get_parent()
+	if a == null or not a.has_method("_weather"): return false
+	var w: Weather = a.call("_weather")
+	return w != null and w.data != null and w.data.precip == WeatherData.Precip.RAIN
+
+func _wash_step(delta: float) -> void:
+	_wash += delta
+	_fade_t -= delta
+	if _wash >= WASH_EVERY:                       # lo de ahora pasa a la capa que se desvanece
+		_wash = 0.0
+		old_tex.update(img)
+		img.fill(Color(0, 0, 0, 0))
+		tex.update(img)
+		_dirty = false
+		_fade_t = 0.0
+	if _fade_t <= 0.0 and mat != null:
+		_fade_t = 0.25
+		mat.set_shader_parameter("trace_old_k", 1.0 - _wash / WASH_EVERY)
+
 ## Lo que deja una mancha de GroundMarks: su color según el tipo (ground_fx.gdshader, `mode`).
 static func from_mark(mark: MeshInstance3D) -> void:
 	if current == null or not is_instance_valid(current) or mark == null: return
 	var m := mark.material_override as ShaderMaterial
 	if m == null: return
-	var mode := int(m.get_shader_parameter("mode"))
+	var mv: Variant = m.get_shader_parameter("mode")
+	if mv == null: return                                                # manchas sin tipo (huellas en la nieve…)
+	var mode := int(mv)
 	var r := mark.global_basis.get_scale().x * 0.9
 	match mode:
 		2:                                                               # quemado de una explosión

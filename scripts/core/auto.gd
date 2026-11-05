@@ -33,9 +33,9 @@ static func sfx(ev: String, vol_db := 0.0) -> void:
 	if s: s.call("play", ev, vol_db)
 
 ## Sfx.play_at(evento, posición)
-static func sfx_at(ev: String, pos: Vector3) -> void:
+static func sfx_at(ev: String, pos: Vector3, vol_db := 0.0) -> void:
 	var s := node("Sfx")
-	if s: s.call("play_at", ev, pos)
+	if s: s.call("play_at", ev, pos, vol_db)
 
 ## Settings.get_value(clave); `default` si no hay configuración (herramientas)
 static func setting(key: String, default: Variant = null) -> Variant:

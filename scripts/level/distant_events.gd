@@ -28,6 +28,8 @@ var _turn_t := 0.0
 var _last_flash := 0.0
 static var soon := false                        ## distant_soon=true: el primero, en cuanto se vea (capturas)
 
+const SHADOW_H := 2.2                           ## a qué altura va la copia que da la sombra de lo que vuela
+
 func setup(list: Array, p_camera: Camera3D, p_game: Node, turners: Array) -> DistantEvents:
 	camera = p_camera
 	game = p_game
@@ -52,6 +54,20 @@ func setup(list: Array, p_camera: Camera3D, p_game: Node, turners: Array) -> Dis
 			add_child(h)
 			e.node = h
 			e.model = m
+			if e.kind == "cross" and float(c.get("h", 0.0)) > 2.0:
+				# lo que vuela deja su sombra: una copia que solo da sombra y no se ve, así que puede ir
+				# baja y por la línea de los jugadores (la de verdad caería fuera de la pantalla)
+				var sh := Node3D.new()
+				sh.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+				sh.visible = false
+				var sm := VoxelBuilder.load_model("res://models/%s.json" % String(c.model))
+				for mi: MeshInstance3D in sm.find_children("*", "MeshInstance3D", true, false):
+					mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+				sh.add_child(sm)
+				sh.scale = h.scale
+				add_child(sh)
+				e.shadow = sm
+				e.shadow_node = sh
 		elif e.kind == "lights":
 			var lamps: Array[MeshInstance3D] = []
 			var bm := BoxMesh.new()
@@ -137,10 +153,12 @@ func _flash() -> float:
 	return 0.0
 
 func _done(e: Dictionary) -> void:
+	if e.t >= 0.0: _sound(e, "end")
 	e.t = -1.0
 	var ev: Array = e.cfg.get("every", [60, 120])
 	e.wait = _rng.randf_range(float(ev[0]), float(ev[1]))
 	if e.has("node"): (e.node as Node3D).visible = false
+	if e.has("shadow_node"): (e.shadow_node as Node3D).visible = false
 	for l: MeshInstance3D in e.get("lamps", []): l.visible = false
 
 ## Empieza si su sitio se ve; devuelve si ha empezado.
@@ -197,8 +215,33 @@ func _try_start(e: Dictionary) -> bool:
 			h.visible = true
 			var dir: Vector3 = e.to - e.from
 			h.rotation.y = atan2(dir.x, dir.z)
+			e.back = fwd * float(c.get("back", 12.0)) + _moon_reach()
+			if e.has("shadow_node"): (e.shadow_node as Node3D).visible = true
 	e.t = 0.0
+	e.said = {}
+	_sound(e, "start")
 	return true
+
+## Cuánto se aleja por el suelo la sombra de algo a SHADOW_H m, según la luna: la copia que da la
+## sombra va eso más acá, para que la sombra caiga en la línea de los jugadores.
+func _moon_reach() -> Vector3:
+	if not is_inside_tree(): return Vector3.ZERO
+	for l: DirectionalLight3D in get_tree().root.find_children("*", "DirectionalLight3D", true, false):
+		if not l.shadow_enabled or not l.visible: continue
+		var d := -l.global_basis.z                      # hacia donde va la luz
+		if d.y > -0.15: continue                          # muy rasante: no cabe
+		return Vector3(d.x, 0.0, d.z) * (SHADOW_H / -d.y)
+	return Vector3.ZERO
+
+## Sonido lejano del suceso, donde pasa: `sound` = {start, sink (al empezar a hundirse), pass (a
+## mitad del cruce), end, db}. Cada uno, una vez por suceso.
+func _sound(e: Dictionary, which: String) -> void:
+	var s: Dictionary = e.cfg.get("sound", {})
+	if not s.has(which) or (e.get("said", {}) as Dictionary).has(which): return
+	e.said[which] = true
+	var at: Vector3 = e.get("at", e.get("from", _focus()))
+	if e.kind == "cross": at = (e.node as Node3D).position
+	Auto.sfx_at(String(s[which]), at, float(s.get("db", -6.0)))
 
 func _focus() -> Vector3:
 	var players: Array = game.players if game != null and "players" in game else []
@@ -213,6 +256,7 @@ func _anim(e: Dictionary, default_anim: String) -> void:
 	if a == "" or not Anims.has_anim(mname, a): return
 	var d := Anims.duration(mname, a) * float(c.get("anim_slow", 1.0))
 	Anims.pose(mname, a, e.model, fmod(float(e.t) / d, 1.0))
+	if e.has("shadow"): Anims.pose(mname, a, e.shadow, fmod(float(e.t) / d, 1.0))
 
 ## Sube, se mece y se hunde: un cuarto subiendo, la mitad arriba, un cuarto bajando.
 func _rise_step(e: Dictionary) -> void:
@@ -222,6 +266,7 @@ func _rise_step(e: Dictionary) -> void:
 	if u >= 1.0:
 		_done(e)
 		return
+	if u >= 0.75: _sound(e, "sink")
 	var k := smoothstep(0.0, 0.25, u) * (1.0 - smoothstep(0.75, 1.0, u))
 	var h: Node3D = e.node
 	h.position = e.at + Vector3.UP * (-float(c.get("depth", 8.0)) * (1.0 - k))
@@ -242,8 +287,13 @@ func _cross_step(e: Dictionary) -> void:
 	if u >= 1.0:
 		_done(e)
 		return
+	if u >= 0.4: _sound(e, "pass")
 	var h: Node3D = e.node
 	h.position = (e.from as Vector3).lerp(e.to, u) + Vector3.UP * sin(u * TAU * 1.5) * float(c.get("bob", 0.6))
+	if e.has("shadow_node"):
+		var sh: Node3D = e.shadow_node
+		sh.position = Vector3(h.position.x, SHADOW_H, h.position.z) - (e.back as Vector3)
+		sh.rotation = h.rotation
 	_anim(e, "walk")
 
 func _lights_step(e: Dictionary) -> void:
@@ -309,3 +359,4 @@ func _turn_step() -> void:
 		var to := best.global_position - h.global_position
 		h.rotation.y = atan2(to.x, to.z) + float(s.get("face", 0.0))
 		s.seen = false
+		Auto.sfx_at("creak", h.global_position)                         # piedra que roza, a tu espalda

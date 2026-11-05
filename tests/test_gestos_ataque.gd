@@ -476,10 +476,14 @@ func test_sucesos_lejanos() -> void:
 	statue.position = Vector3(40, 0, 40)             # fuera de la pantalla
 	add_child_autofree(statue)
 	var de := DistantEvents.new().setup([
-		{"kind": "rise", "model": "lejano_tentaculo", "spots": [[0, 0]], "y": 0.0, "depth": 8, "dur": 4, "every": [100, 100]},
+		{"kind": "rise", "model": "lejano_tentaculo", "spots": [[0, 0]], "y": 0.0, "depth": 8, "dur": 4, "every": [100, 100], "sound": {"start": "wave", "sink": "splash"}},
 		{"kind": "flash", "model": "lejano_tentaculo", "spots": [[0, 0]], "chance": 1.0}], cam, fake, [statue])
 	add_child_autofree(de)
 	var rise: Dictionary = de._ev[0]
+	var heard: Array = []
+	var sfx := get_node_or_null("/root/Sfx")
+	var on_played := func(ev: String, _pos) -> void: heard.append(ev)
+	if sfx: sfx.played.connect(on_played)
 	assert_true(de._try_start(rise), "se ve: empieza")
 	var h: Node3D = rise.node
 	var low := h.position.y
@@ -488,6 +492,9 @@ func test_sucesos_lejanos() -> void:
 	for i in 150: de._process(1.0 / 60.0)
 	assert_false(h.visible, "y se ha hundido")
 	assert_gt(float(rise.wait), 50.0, "hasta el siguiente")
+	if sfx:
+		sfx.played.disconnect(on_played)
+		assert_eq(heard, ["wave", "splash"], "suena al asomar y al hundirse, una vez cada uno")
 	var fl: Dictionary = de._ev[1]
 	assert_true(de._try_start(fl))
 	assert_false((fl.node as Node3D).visible, "sin relámpago no se ve")
@@ -560,3 +567,42 @@ func test_rastros_que_se_quedan() -> void:
 	for i in 200: tr.stamp(Vector3(randf_range(-8, 8), 0, randf_range(-8, 8)), 0.8, Color(0.05, 0.05, 0.05), 0.5)
 	assert_lt(Time.get_ticks_usec() - t0, 60000, "doscientos rastros, en menos de 60 ms (pinceles hechos)")
 	assert_eq(tr.img.get_pixel(0, 0).a, 0.0, "y lejos, nada")
+
+## Lo que vuela alto en los sucesos lejanos deja su sombra en el suelo: una copia que solo da
+## sombra, con la misma pose; lo que va por el suelo, no.
+func test_sombra_de_lo_que_vuela() -> void:
+	var cam := Camera3D.new()
+	add_child_autofree(cam)
+	var de := DistantEvents.new().setup([
+		{"kind": "cross", "model": "antiguo_alado", "anim": "fly", "h": 5, "far": true},
+		{"kind": "cross", "model": "antiguo_alado", "h": 0}], cam, null, [])
+	add_child_autofree(de)
+	var fly: Dictionary = de._ev[0]
+	assert_true(fly.has("shadow"), "el que vuela, con sombra")
+	assert_false((de._ev[1] as Dictionary).has("shadow"), "el del suelo, sin")
+	var n := 0
+	for mi: MeshInstance3D in (fly.shadow as Node).find_children("*", "MeshInstance3D", true, false):
+		assert_eq(mi.cast_shadow, GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY)
+		n += 1
+	assert_gt(n, 0)
+	for mi: MeshInstance3D in (fly.model as Node).find_children("*", "MeshInstance3D", true, false):
+		assert_eq(mi.cast_shadow, GeometryInstance3D.SHADOW_CASTING_SETTING_OFF, "la silueta en la bruma no da sombra")
+
+## Con lluvia, los rastros se borran poco a poco: a cada lavado lo pintado pasa a la capa que se
+## desvanece y la imagen queda limpia; sin lluvia, se quedan.
+func test_la_lluvia_borra_los_rastros() -> void:
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://scripts/level/town_ground.gdshader")
+	var tr := GroundTraces.make(mat, Rect2(-10, -10, 20, 20))
+	add_child_autofree(tr)
+	var at := Vector2i(int(12.0 * 8.0), int(13.0 * 8.0))
+	tr.rain = 0
+	tr.stamp(Vector3(2, 0, 3), 0.8, Color(0.3, 0.05, 0.05), 0.5)
+	tr._process(GroundTraces.WASH_EVERY + 1.0)
+	assert_gt(tr.img.get_pixelv(at).a, 0.3, "sin lluvia se queda")
+	tr.rain = 1
+	tr._process(GroundTraces.WASH_EVERY + 0.01)
+	assert_eq(tr.img.get_pixelv(at).a, 0.0, "lavado: la imagen, limpia")
+	assert_almost_eq(float(mat.get_shader_parameter("trace_old_k")), 1.0, 0.02)
+	tr._process(GroundTraces.WASH_EVERY * 0.5)
+	assert_almost_eq(float(mat.get_shader_parameter("trace_old_k")), 0.5, 0.02, "a medio lavado, a la mitad")
