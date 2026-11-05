@@ -20,6 +20,7 @@ uniform float camp_radius = 14.0;
 uniform float relief = 1.0;
 uniform float sparkle = 1.0;                  // destellos de escarcha (en roca oscura se veían como estrellas)
 
+#include "res://scripts/fx/ground_traces.gdshaderinc"
 varying vec3 wpos;
 varying vec3 wnrm;
 
@@ -98,6 +99,8 @@ void fragment() {
 		float tr = step(fbm(pc * 0.35 + 9.0 + warp * 2.0), 0.52 - (d - camp_radius) * 0.04) * step(d, camp_radius + 4.0);
 		col = mix(col, trampled * (0.97 + 0.05 * g), tr * 0.75);
 		col = mix(col, ice_c, ice_m);
+		vec4 trc = trace_at(wpos.xz);                             // rastros del nivel (17.20)
+		col = mix(col, trc.rgb, trc.a);
 		ALBEDO = col * shade;
 		// algún destello de cristal de nieve (muy pocos, pequeños)
 		float spark = step(0.996, hash(c + 91.0)) * (1.0 - ice_m) * (1.0 - tr);

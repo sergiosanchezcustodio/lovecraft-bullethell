@@ -537,3 +537,26 @@ func test_fogonazo_de_los_disparos() -> void:
 	var t := WeaponSystem.Weapon.new(load("res://data/weapons/bengalas.tres"))
 	ws.fired.emit(t)
 	assert_false(l.visible, "lo que se lanza no da fogonazo")
+
+## Rastros que se quedan (hito 17.20): la mancha que pasa a GroundMarks deja su rastro en la
+## textura del suelo, del color del icor, y se queda; lo que cae encima no pasa del tope.
+func test_rastros_que_se_quedan() -> void:
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://scripts/level/town_ground.gdshader")
+	var tr := GroundTraces.make(mat, Rect2(-10, -10, 20, 20))
+	add_child_autofree(tr)
+	assert_eq(GroundTraces.current, tr)
+	assert_eq(mat.get_shader_parameter("trace_extent"), 20.0, "el suelo lo lee")
+	var mark := VoxelFx.ground(6, 0.8)
+	mark.material_override.set_shader_parameter("tint", Color(0.1, 0.4, 0.15))
+	add_child_autofree(mark)
+	mark.global_position = Vector3(2, 0, 3)
+	GroundTraces.from_mark(mark)
+	assert_eq(tr.stamps, 1)
+	var px := tr.img.get_pixel(int((2.0 + 10.0) * 8.0), int((3.0 + 10.0) * 8.0))
+	assert_gt(px.a, 0.3, "hay rastro donde cayó")
+	assert_gt(px.g, px.r, "del color del icor")
+	for i in 12: tr.stamp(Vector3(2, 0, 3), 0.8, Color(0.05, 0.05, 0.05), 0.5)
+	px = tr.img.get_pixel(int((2.0 + 10.0) * 8.0), int((3.0 + 10.0) * 8.0))
+	assert_lte(px.a, GroundTraces.MAX_A + 0.01, "no tapa del todo el suelo")
+	assert_eq(tr.img.get_pixel(0, 0).a, 0.0, "y lejos, nada")

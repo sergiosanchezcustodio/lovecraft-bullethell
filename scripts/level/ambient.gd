@@ -380,6 +380,9 @@ func _ready() -> void:
 		if it.has("sound"): _sounds.append(it.sound)
 		for lp: Vector3 in it.get("ripples", []): _ripplers.append([h.to_global(lp), 0.0])
 	if cfg.has("vents") and bool(Quality.value("vents", true)): _vents(cfg.vents)   # 17.14
+	var gnode := arena.get_node_or_null("Ground") as MeshInstance3D       # rastros del nivel (17.20)
+	if gnode != null and gnode.material_override is ShaderMaterial and bool(Quality.value("traces", true)) and arena.has_meta("obstacles"):
+		add_child(GroundTraces.make(gnode.material_override, (arena.get_meta("obstacles") as ObstacleMap).bounds))
 	var turners: Array = []
 	for it: Dictionary in arena.get_meta("ambient", []):
 		if it.has("turn"): turners.append(it.holder)

@@ -2196,6 +2196,21 @@ Sobre las apariciones del 11.6 (salir del suelo o del agua, bajar del cielo, mat
 - Una por jugador y sin sombras. Solo en Alta y Ultra (`shot_light` en `data/quality.json`).
 - **Pruebas:** en Media no y en Alta sí; las balas la encienden y se apaga sola; lo que se lanza no da fogonazo. 762 de 762.
 
+### Hito 17.20: rastros que se quedan (05-11-2026)
+
+- Las manchas de `GroundMarks` (11.1) se desvanecen a los 14-24 s, y con más de `marks` a la vez, antes.
+- Ahora cada una deja además su rastro, más tenue, en una textura que cubre la arena (`GroundTraces`, `scripts/fx/ground_traces.gd`, a 8 píxeles por metro) y que se queda el resto del nivel:
+  - las salpicaduras de las muertes, del color de su icor;
+  - la ceniza de los quemados;
+  - lo quemado de las explosiones, casi negro.
+- La textura la leen los dos suelos (`snow_ground` y `town_ground`, con `ground_traces.gdshaderinc`), a píxeles de 1/8 m, como el resto. En los charcos se ven menos.
+- Cada rastro es una mancha de borde irregular (ocho lóbulos al azar) con unas gotas alrededor.
+- **El tope es la propia textura:** memoria fija (de 512 a 630 px por lado). Lo que cae encima tapa lo de debajo, sin pasar del 62 % de opacidad: el suelo se sigue viendo.
+- Se sube a la GPU como mucho cada 0,3 s.
+- En 20 s de pelea con `spawn_rate=8` salen unos 60 rastros.
+- Por calidad: `traces` en `data/quality.json`, apagado en Baja.
+- **Pruebas:** la mancha deja su rastro del color del icor; con muchas encima, no pasa del tope; lejos, nada. 763 de 763.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

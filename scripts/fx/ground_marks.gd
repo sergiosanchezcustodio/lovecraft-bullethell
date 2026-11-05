@@ -24,6 +24,7 @@ static func keep(fx_parent: Node, mark: MeshInstance3D, life := LINGER) -> void:
 		fx_parent.add_child(gm)
 		fx_parent.set_meta("ground_marks", gm)
 	mark.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	GroundTraces.from_mark(mark)               # y su rastro, que se queda todo el nivel (17.20)
 	mark.reparent(gm)
 	gm._marks.append([mark, mark.material_override, life, FADE])
 	var extra := gm._marks.size() - limit

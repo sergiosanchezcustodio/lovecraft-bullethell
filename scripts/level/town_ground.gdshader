@@ -59,6 +59,7 @@ uniform float dock = 0.0;
 uniform vec3 dock_hi : source_color = vec3(0.44, 0.38, 0.31);
 uniform vec3 dock_lo : source_color = vec3(0.26, 0.22, 0.18);
 
+#include "res://scripts/fx/ground_traces.gdshaderinc"
 varying vec3 wpos;
 varying vec3 wnrm;
 
@@ -352,6 +353,8 @@ void fragment() {
 			}
 			col = mix(col, max(col * 2.2, vec3(0.36, 0.40, 0.44)), rr * clamp(wetm / 0.45, 0.0, 1.0));   // el aro recoge la luz del cielo
 		}
+		vec4 trc = trace_at(wpos.xz);                             // rastros del nivel (17.20)
+		col = mix(col, trc.rgb, trc.a * (1.0 - 0.6 * wetm));      // en el agua, se ven menos
 		ALBEDO = col * shade;
 		EMISSION = glow + crack_glow * crack * 0.7;
 		if (wetm > 0.3 && lamp_n > 0) {                               // reflejo de las farolas en el charco (16-10-2026)
