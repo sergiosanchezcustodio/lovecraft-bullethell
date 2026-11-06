@@ -146,6 +146,7 @@ func _land() -> void:
 	queue_free()
 
 func _explode() -> void:
+	var t0 := Prof.start()
 	world.bullets.clear_enemy_bullets(end, radius * 0.7)       # protege algo: deshace balas enemigas
 	for e in world.enemies_in_circle(end, radius):
 		var d := end.distance_to(Vector3(e.global_position.x, 0, e.global_position.z))
@@ -162,3 +163,4 @@ func _explode() -> void:
 	Combos.blast(world, end, radius, _wtag)      # sobre gas de otro o sobre el agua (hito 13.7)
 	if is_instance_valid(_ring): _ring.queue_free()
 	queue_free()
+	Prof.stop("explosion", t0)

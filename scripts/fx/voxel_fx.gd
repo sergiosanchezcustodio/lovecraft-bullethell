@@ -86,13 +86,29 @@ static func puff(parent: Node, pos: Vector3, recipe: String, r: float, tint := C
 	e.global_position = pos
 	e.get_tree().create_timer(life).timeout.connect(e.queue_free)
 
+static var _plane2: PlaneMesh
+static var _box1: BoxMesh
+
+## Plano de 2×2 m y caja de 1 m compartidos por los efectos (06-11-2026): una malla nueva en cada
+## mancha o explosión se construía y se subía a la tarjeta, y con varias a la vez era un tirón.
+## El tamaño va en la escala del nodo y el color en su material, que sigue siendo de cada uno.
+static func plane2() -> PlaneMesh:
+	if _plane2 == null:
+		_plane2 = PlaneMesh.new()
+		_plane2.size = Vector2(2, 2)
+	return _plane2
+
+static func box1() -> BoxMesh:
+	if _box1 == null:
+		_box1 = BoxMesh.new()
+		_box1.size = Vector3.ONE
+	return _box1
+
 ## Mancha animada del suelo (`ground_fx.gdshader`): 0 fuego, 1 ácido, 2 quemado.
 static func ground(mode: int, radius: float) -> MeshInstance3D:
 	if _ground_shader == null: _ground_shader = preload("res://scripts/fx/ground_fx.gdshader")
 	var mi := MeshInstance3D.new()
-	var pm := PlaneMesh.new()
-	pm.size = Vector2(2, 2)
-	mi.mesh = pm
+	mi.mesh = plane2()
 	var m := ShaderMaterial.new()
 	m.shader = _ground_shader
 	m.set_shader_parameter("mode", mode)

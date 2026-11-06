@@ -2386,6 +2386,19 @@ Las tres mejoras propuestas tras la anterior.
   - Un solo formato de tiempo en la pantalla final: `Endless.clock` y `FallReport._clock` dan «04:10», como el reloj y «Tiempo:» (los récords salían «4:10»). El diario, que es texto, sigue con «4:10» (`RunArchive.clock`).
 - **Pruebas:** 778 de 778.
 
+### Tirones de las explosiones en tanda (06-11-2026)
+
+Medido con el PC libre (`perf=40 spikes=true max_alive=80 spawn_rate=20 bot=smart god=true`, semilla 7) en los cuatro niveles más cargados. Media y 1 % peor normales (7-9,6 ms y 13,5-16,8 ms), pero de 3 a 10 tirones de más de 25 ms por nivel, con un ritmo fijo: cada 2,25 s en p3_n3 y cada 2,8 s en p3_n2, la cadencia de la granada.
+- **Confirmado por partes:** con `weapons=webly`, 0 tirones; con `weapons=granada`, 11. Sin los efectos de muerte, sin las partículas de la explosión o sin su luz seguía igual.
+- **El registro contaba mal:** cada fila llevaba el proceso y el dibujo de un fotograma y la física del siguiente, así que el tirón (en la física: la granada explota en `_physics_process`) salía como «otro». Ahora `SpikeLog` cierra cada fila en `frame_post_draw` y parte «otro» en tramos; con eso, `explosion` (nuevo en `Prof`) se llevaba 11-18 ms del fotograma: tres granadas de la misma tanda estallan en el mismo paso, a 2,9 ms cada una (unos 22 golpes y 7 muertes, a 0,43 ms por muerte).
+- **Arreglos:**
+  - Las de una tanda caen 0,05 s una detrás de otra (`WeaponSystem.VOLLEY_GAP`): el coste se reparte en varios pasos.
+  - El modelo de un enemigo de la horda que muere entra en el árbol una sola vez, directamente en `Crumble` (antes volvía al enemigo y se cambiaba de padre): de 426 a 320 µs por muerte.
+  - `CurseJump` (la maldición que salta al morir) creaba seis cajas y un material en cada salto: ahora compartidos. La explosión, las manchas del suelo (`VoxelFx.ground`) y los avisos (`Telegraph`) comparten plano y caja (`VoxelFx.plane2`, `box1`), con el tamaño en la escala.
+- **Con la granada sola en p3_n3:** de 11-15 tirones a 1, y el peor de 35-42 ms a 25,5.
+- **Los cuatro niveles con las armas de siempre** (una ejecución): tirones de 7 a 2 (p2_n4), de 7 a 1 (p3_n3), de 3 a 0 (p1_n2) y de 10 a 5 (p3_n2); el peor fotograma, de 34-41 ms a 24-32.
+- **Antes y después, tres veces cada uno y alternados** (la versión de antes en una copia del último commit; `perf=30`, semillas 501-503): tirones de 8,7 a 2,7 por ejecución en p3_n2 y de 8,3 a 2 en p2_n4. La media (8,00 → 8,06 y 8,77 → 8,55 ms) y el 1 % peor (14,72 → 15,06 y 15,42 → 15,43 ms) quedan igual, dentro del ruido. Sigue saliendo algún fotograma suelto de 40-55 ms en las dos versiones, sin ritmo.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

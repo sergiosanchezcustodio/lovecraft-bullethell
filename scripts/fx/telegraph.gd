@@ -36,9 +36,8 @@ func elapsed() -> float:
 
 func _ready() -> void:
 	add_to_group(&"enemy_warnings")                 # el bot (SmartBot) sale de los avisos
-	var pm := PlaneMesh.new()
-	pm.size = Vector2(radius * 2.0, radius * 2.0)
-	mesh = pm
+	mesh = VoxelFx.plane2()                          # compartido; el tamaño, en la escala (06-11-2026)
+	scale = Vector3(radius, 1.0, radius)
 	_mat = ShaderMaterial.new()
 	_mat.shader = preload("res://scripts/fx/telegraph.gdshader")
 	_mat.set_shader_parameter("color", color)

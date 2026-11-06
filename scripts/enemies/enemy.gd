@@ -786,7 +786,9 @@ func puppet_die() -> void:
 
 func _death_fx() -> void:
 	var t0 := Prof.start()
-	if _in_horde: _leave_horde()                     # cae y se deshace con su modelo de nodos
+	# cae y se deshace con su modelo de nodos; de la horda, posado pero aún fuera del árbol: entra
+	# una sola vez, en Crumble (06-11-2026)
+	if _in_horde: _leave_horde(false)
 	_rise_end()
 	# cae a su manera (hito 12.7: de rodillas, derrumbado, derretido, de lado) y luego se deshace;
 	# los trozos saltan cuando empieza a deshacerse
@@ -800,8 +802,10 @@ func _death_fx() -> void:
 	fx.position = global_position
 	if how == &"burn": fx.ashen()
 	# el modelo se queda y se deshace en cubos (hito 11.1); la brasa, de su color más claro
-	if Crumble.start(world.fx, model, light.lerp(Color(1.0, 0.45, 0.15), 0.55), data.elite or data.unique, fall, how):
+	if Crumble.start(world.fx, model, light.lerp(Color(1.0, 0.45, 0.15), 0.55), data.elite or data.unique, fall, how, visual):
 		fx.delay = Crumble.delay_for(fall, how)
+	elif model != null and is_instance_valid(model) and model.get_parent() == null:
+		model.queue_free()                            # no cuelga de nadie: no se iría con el enemigo
 	world.fx.add_child(fx)
 	if _wade > 0.5:                                   # cae al agua: ondas grandes (hito 11.4)
 		Ripples.add(world.fx, global_position, 1.4 + data.body_radius * 2.0, 0.8, 1.6)
@@ -1262,11 +1266,12 @@ func _enter_horde() -> void:
 		for mi: MeshInstance3D in model.get_meta("meshes"): mi.material_overlay = null
 	if model.get_parent() == visual: visual.remove_child(model)
 
-func _leave_horde() -> void:
+## `attach` false: lo posa sin meterlo en el árbol (al morir, lo mete Crumble).
+func _leave_horde(attach := true) -> void:
 	_in_horde = false
 	if is_instance_valid(_hdraw): _hdraw.remove(self, _horde)
 	if model != null and is_instance_valid(model) and model.get_parent() == null:
-		visual.add_child(model)
+		if attach: visual.add_child(model)
 		Anims.pose(model_name, anim, model, anim_t)
 	_pose_acc = 1.0                                   # que se pose en seguida
 

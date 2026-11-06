@@ -47,9 +47,7 @@ func _ready() -> void:
 		add_child(_light)
 	# destello del centro: solo los primeros fotogramas, debajo de la bola de cubos
 	_ball = MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = Vector3.ONE
-	_ball.mesh = bm
+	_ball.mesh = VoxelFx.box1()
 	_ball_mat = StandardMaterial3D.new()
 	_ball_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_ball_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -82,9 +80,7 @@ func _snow_blast() -> void:
 	var w := get_parent().get_parent() as CombatWorld
 	if w != null and w.obstacles != null and w.obstacles.water_at(Vector2(global_position.x, global_position.z)) > 0.3: return
 	var mi := MeshInstance3D.new()
-	var pm := PlaneMesh.new()
-	pm.size = Vector2(2, 2)
-	mi.mesh = pm
+	mi.mesh = VoxelFx.plane2()
 	var m := ShaderMaterial.new()
 	m.shader = preload("res://scripts/fx/snow_blast.gdshader")
 	m.set_shader_parameter("seed", randf() * 100.0)
@@ -98,9 +94,7 @@ func _snow_blast() -> void:
 
 func _flat_disc(c: Color) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
-	var pm := PlaneMesh.new()
-	pm.size = Vector2(2, 2)
-	mi.mesh = pm
+	mi.mesh = VoxelFx.plane2()
 	var m := ShaderMaterial.new()
 	m.shader = preload("res://scripts/fx/telegraph.gdshader")
 	m.set_shader_parameter("color", c)

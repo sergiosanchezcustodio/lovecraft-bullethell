@@ -46,8 +46,11 @@ static func delay_for(model_name: String, how := &"") -> float:
 	return fall + (SHOCK_TIME if how == &"shock" else 0.0)
 
 ## Se lleva `model` (lo saca de su enemigo conservando dónde está) y lo deshace. false si hay
-## demasiados a la vez o el modelo no sirve: el enemigo lo libera como siempre.
-static func start(fx_parent: Node, model: Node3D, ember: Color, big := false, model_name := "", how := &"") -> bool:
+## demasiados a la vez o el modelo no sirve: el enemigo lo libera como siempre. Un modelo fuera
+## del árbol (el de un enemigo de la horda) entra directamente aquí, colocado como si colgara de
+## `frame` (06-11-2026: antes entraba en el enemigo y se cambiaba de padre, dos veces en la escena).
+static func start(fx_parent: Node, model: Node3D, ember: Color, big := false, model_name := "", how := &"",
+		frame: Node3D = null) -> bool:
 	if not falls or Anims.death_time(model_name) <= 0.0: model_name = ""
 	if how == &"burn" and not enabled: how = &""                 # calidad Baja: sin el material, a su manera
 	if how == &"burn" or how == &"blast": model_name = ""         # ni caen: arden en pie o revientan
@@ -73,7 +76,9 @@ static func start(fx_parent: Node, model: Node3D, ember: Color, big := false, mo
 	holder.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	c.add_child(holder)
 	if model.get_parent() is Node3D: holder.global_transform = (model.get_parent() as Node3D).global_transform
-	model.reparent(holder)
+	elif frame != null and frame.is_inside_tree(): holder.global_transform = frame.global_transform
+	if model.get_parent() == null: holder.add_child(model)   # su transformación ya es la de dentro de `frame`
+	else: model.reparent(holder)
 	c._model = model
 	if how == &"blast": c._launch()
 	if c._anim == "" and (enabled or how != &"blast"): c._dress()

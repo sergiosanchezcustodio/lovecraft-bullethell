@@ -217,7 +217,7 @@ func _fire(w: Weapon) -> bool:
 			if k > 0:
 				var a := randf() * TAU
 				jitter = Vector3(cos(a), 0, sin(a)) * maxf(w.stat("aoe_radius"), w.stat("zone_radius")) * randf_range(0.6, 1.1)
-			_throw(w, target_pos + jitter)
+			_throw(w, target_pos + jitter, k)
 	else:
 		var base := Vector3(target_pos.x - origin.x, 0, target_pos.z - origin.z).normalized()
 		# rasgo de Malone: más daño cuanto más cerca está el objetivo
@@ -606,7 +606,11 @@ func _thrust(w: Weapon) -> bool:
 	fired.emit(w)
 	return true
 
-func _throw(w: Weapon, target: Vector3) -> void:
+## Los de una misma tanda caen VOLLEY_GAP s uno detrás de otro (06-11-2026): a la vez, tres
+## granadas que matan a veinte enemigos eran 7 ms en un solo paso de física, un tirón cada 2,25 s.
+const VOLLEY_GAP := 0.05
+
+func _throw(w: Weapon, target: Vector3, k := 0) -> void:
 	var e := ThrownExplosive.new()
 	# corriendo hacia donde lanza, el vuelo se acorta para ir claramente por delante de él
 	var flight := w.stat("flight_time")
@@ -614,7 +618,7 @@ func _throw(w: Weapon, target: Vector3) -> void:
 	var fwd := inherited_speed(to)
 	if fwd > 0.5: flight = clampf(to.length() / (fwd * 1.8), 0.25, flight)
 	e.setup(world, player.global_position + Vector3(0, 1.4, 0), Vector3(target.x, 0, target.z),
-		flight, w.stat("fuse"), w.stat("aoe_radius") * player.data.explosion_radius_mult, dmg(w), player.color)
+		flight + VOLLEY_GAP * k, w.stat("fuse"), w.stat("aoe_radius") * player.data.explosion_radius_mult, dmg(w), player.color)
 	var z := {}
 	if w.data.zone != WeaponData.Zone.NONE:
 		z = {"kind": w.data.zone, "radius": w.stat("zone_radius"), "time": w.stat("zone_time"),

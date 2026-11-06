@@ -11,6 +11,10 @@ var _bits: Array[MeshInstance3D] = []
 
 const LIFE := 0.35
 const N := 6
+## Malla y material de los trozos, compartidos (06-11-2026): crearlos en cada salto (seis cajas
+## y un material) era la mitad de un tirón cuando una granada mataba a varios malditos a la vez.
+static var _mesh: BoxMesh
+static var _mat: StandardMaterial3D
 
 func setup(from: Vector3, to: Vector3) -> CurseJump:
 	_from = from + Vector3(0, 0.8, 0)
@@ -20,16 +24,17 @@ func setup(from: Vector3, to: Vector3) -> CurseJump:
 
 func _ready() -> void:
 	Damage.ctx = _wtag
-	var m := StandardMaterial3D.new()
-	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	m.albedo_color = Color(0.5, 0.15, 0.7, 0.9)
+	if _mesh == null:
+		_mesh = BoxMesh.new()
+		_mesh.size = Vector3.ONE * 0.12
+		_mat = StandardMaterial3D.new()
+		_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		_mat.albedo_color = Color(0.5, 0.15, 0.7, 0.9)
 	for i in N:
 		var mi := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = Vector3.ONE * 0.12
-		mi.mesh = bm
-		mi.material_override = m
+		mi.mesh = _mesh
+		mi.material_override = _mat
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(mi)
 		_bits.append(mi)
