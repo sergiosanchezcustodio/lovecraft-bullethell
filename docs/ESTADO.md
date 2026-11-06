@@ -2352,6 +2352,14 @@ Las tres mejoras propuestas tras la anterior.
 - **Nota:** durante la prueba, la tarjeta gráfica dejó de crear dispositivos un rato: Vulkan sin `VK_KHR_surface`, y Direct3D 12 con `0x887a0005`, el dispositivo perdido. Se recuperó sola. Una ejecución de GUT tuvo un fallo suelto que no se repitió.
 - **Pruebas:** 773 de 773.
 
+### Recorrido completo a los seis tamaños (06-11-2026)
+
+- **Informes:** el recorrido guarda los avisos de cada ventana aparte (`shots/ui_recorrido*/<tag>.txt`) y rehace `informe.txt` con todas. Pasar solo unas ya no borra las demás, y el resumen dice de cuándo es cada recorrido.
+- **Resultado** (`python tools/resumen_recorridos.py`): 56 ventanas a cada tamaño, 336 pasadas, sin errores de script.
+  - Normal, Pequeña, Grande, Muy grande y 2560×1080: sin un aviso.
+  - 1280×800: solo textos que se ven a menos de 10 px, en 6 ventanas. Son la fecha de los logros (en logros y su tomo), los nombres de la revisión de arte (solo de desarrollo), el tipo de cada fila y el pie de la tabla de daño, la ficha y la ayuda del mapa.
+  - Es la escala desde 1080: con 800 de alto todo se ve a dos tercios, y los textos de 14 quedan a 9,3 px (a 1280×720, a 8,7). Queda para que decida el autor (ver «Ideas»).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
