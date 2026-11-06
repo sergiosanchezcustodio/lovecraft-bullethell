@@ -137,6 +137,8 @@ static func record(save: SaveData, character: String, base: String, t: float) ->
 	save.records.endless[key] = roundf(t * 10.0) / 10.0
 	return true
 
+## "04:10", como el reloj de la partida y el «Tiempo:» de la pantalla final (los récords salían
+## «4:10» debajo de «Tiempo: 01:35», 06-11-2026). En los textos (diario), `RunArchive.clock`.
 static func clock(t: float) -> String:
 	var s := int(t)
-	return "%d:%02d" % [s / 60, s % 60]
+	return "%02d:%02d" % [s / 60, s % 60]

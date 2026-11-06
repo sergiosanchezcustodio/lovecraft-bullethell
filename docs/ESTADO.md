@@ -2381,6 +2381,9 @@ Las tres mejoras propuestas tras la anterior.
   - Desfile de jefes: con el primer jefe jugado, la pantalla final decía «Tiempo total: 1:35» encima de «Tiempo: 01:35». Ahora el total solo sale si es distinto, y con el mismo formato.
   - «Acaba con Primigenio menor»: el objetivo pone el artículo a los nombres comunes (`Hud.with_article`); los que ya lo llevan («El viejo Castro») y los propios («Madre Hydra», «Cthulhu, recompuesto») quedan igual.
   - Los rótulos de arriba (nivel, reloj, objetivo, dinero y pactos) apenas se leían sobre la nieve: contorno de 3 px y un halo oscuro suave detrás (`shadow_outline_size` 14). En las noches oscuras casi no se nota.
+- **Las dos ideas ofrecidas al acabar, hechas (el autor las pidió):**
+  - En la gráfica del informe (`FallReport.Graph`), donde vida y cordura van juntas (sin daño, las dos arriba) la violeta tapaba la roja: se apartan `SPLIT` (1,5 px), la vida abajo y la cordura arriba, y se juntan en cuanto difieren un 5 %.
+  - Un solo formato de tiempo en la pantalla final: `Endless.clock` y `FallReport._clock` dan «04:10», como el reloj y «Tiempo:» (los récords salían «4:10»). El diario, que es texto, sigue con «4:10» (`RunArchive.clock`).
 - **Pruebas:** 778 de 778.
 
 ## Ideas propuestas y sin hacer (23-10-2026)

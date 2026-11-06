@@ -69,7 +69,7 @@ static func compose(f: Dictionary, seed_value: int) -> Dictionary:
 	var fill := {"min": str(int(f.get("worst_min", 1))), "criatura": String(f.get("creature", "")),
 		"levanto": String(f.get("reviver", "")), "veces": _times(int(f.get("downs", 0))),
 		"arma": String(f.get("weapon", "")), "bajas": str(int(f.get("kills", 0))),
-		"tiempo": Endless.clock(float(f.get("t", 0.0))), "o": "a" if fem else "o",
+		"tiempo": RunArchive.clock(float(f.get("t", 0.0))), "o": "a" if fem else "o",
 		"desafio": String(f.get("challenge", ""))}
 	var out := PackedStringArray()
 	var open: Dictionary = d.get("open", {})

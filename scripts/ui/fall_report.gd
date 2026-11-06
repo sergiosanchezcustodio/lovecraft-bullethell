@@ -77,8 +77,9 @@ static func build(who: String, color: Color, received_via: Dictionary, falls: Ar
 		"top_hp": top_hp.slice(0, 3), "top_san": top_san.slice(0, 2), "falls": falls,
 		"hist": tail, "alive_avg": float(sum) / maxf(alive.size(), 1.0), "alive_max": peak}
 
+## Como el reloj de la pantalla final («a los 04:10»).
 static func _clock(t: float) -> String:
-	return "%d:%02d" % [int(t) / 60, int(t) % 60]
+	return "%02d:%02d" % [int(t) / 60, int(t) % 60]
 
 ## Las líneas de texto de un informe (las del panel y las del registro).
 static func lines(r: Dictionary) -> PackedStringArray:
@@ -179,6 +180,7 @@ class Graph extends Control:
 	var hist := PackedVector2Array()
 
 	const LEGEND := 20.0                      ## px de la leyenda, debajo
+	const SPLIT := 1.5                        ## px que se apartan las dos líneas cuando coinciden
 
 	func _draw() -> void:
 		var s := Vector2(size.x, size.y - LEGEND)
@@ -197,12 +199,15 @@ class Graph extends Control:
 		var span := "último minuto" if hist.size() >= HIST else "%d s" % hist.size()
 		draw_string(font, Vector2(x0, y), "·  " + span, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1, 1, 1, 0.5))
 		if hist.size() < 2: return
+		# donde vida y cordura van juntas (sin daño, las dos al máximo) la violeta tapaba la roja:
+		# se apartan SPLIT px, la vida abajo y la cordura arriba (06-11-2026)
 		for k in 2:
 			var pts := PackedVector2Array()
 			for i in hist.size():
 				var x := s.x * float(i) / float(hist.size() - 1)
 				var v := hist[i].x if k == 0 else hist[i].y
-				pts.append(Vector2(x, 3.0 + (s.y - 6.0) * (1.0 - clampf(v, 0.0, 1.0))))
+				var o := clampf(1.0 - absf(hist[i].x - hist[i].y) * 20.0, 0.0, 1.0) * SPLIT * (1.0 if k == 0 else -1.0)
+				pts.append(Vector2(x, 4.0 + (s.y - 8.0) * (1.0 - clampf(v, 0.0, 1.0)) + o))
 			draw_polyline(pts, PHYS if k == 0 else MIND, 2.0, true)
 
 ## Al registro de dificultad (texto) y al de partidas (una línea JSON por partida, para el

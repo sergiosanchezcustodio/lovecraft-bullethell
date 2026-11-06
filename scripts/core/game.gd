@@ -1646,7 +1646,7 @@ func _rush_won() -> String:
 	var total := GameSession.rush_time
 	var n := BossRush.number_of(String(level.id))
 	var of := BossRush.stages().size()
-	var tt := "%02d:%02d" % [int(total) / 60, int(total) % 60]   # como «Tiempo:» de la misma ventana
+	var tt := Endless.clock(total)   # como «Tiempo:» de la misma ventana
 	# con el primer jefe jugado, el total es el mismo «Tiempo:» de debajo: no se repite (06-11-2026)
 	_endless_lines = PackedStringArray(["Jefe %d de %d%s" % [n, of, " · Tiempo total: " + tt if total > director.time + 0.5 else ""]])
 	if BossRush.next(String(level.id)) != "": return "Jefe vencido"
