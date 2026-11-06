@@ -2358,7 +2358,7 @@ Las tres mejoras propuestas tras la anterior.
 - **Resultado** (`python tools/resumen_recorridos.py`): 56 ventanas a cada tamaño, 336 pasadas, sin errores de script.
   - Normal, Pequeña, Grande, Muy grande y 2560×1080: sin un aviso.
   - 1280×800: solo textos que se ven a menos de 10 px, en 6 ventanas. Son la fecha de los logros (en logros y su tomo), los nombres de la revisión de arte (solo de desarrollo), el tipo de cada fila y el pie de la tabla de daño, la ficha y la ayuda del mapa.
-  - Es la escala desde 1080: con 800 de alto todo se ve a dos tercios, y los textos de 14 quedan a 9,3 px (a 1280×720, a 8,7). Queda para que decida el autor (ver «Ideas»).
+  - Es la escala desde 1080: con 800 de alto todo se ve a dos tercios, y los textos de 14 quedan a 9,3 px (a 1280×720, a 8,7). El autor decidió dejarlo así (06-11-2026): a menos resolución todo se ve más pequeño, y para eso están las interfaces Grande y Muy grande. No hace falta volver a proponerlo.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 
