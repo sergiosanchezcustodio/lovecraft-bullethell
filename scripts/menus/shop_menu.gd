@@ -97,7 +97,7 @@ func _show_sub(k: int) -> void:
 	_show_tab(_tab)
 
 ## La ventana, a la derecha del tendero (desde el 47 % de la pantalla). Si no cabe ahí entera
-## (interfaz Grande: en 1476 de ancho quedaban 782 para 946), se acerca al centro lo justo, en vez
+## (interfaz Muy grande: en 1476 de ancho quedaban 782 para 946), se acerca al centro lo justo, en vez
 ## de encogerse (05-11-2026).
 const RIGHT_FROM := 0.47
 func _to_right(cc: Control) -> void:

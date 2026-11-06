@@ -158,7 +158,7 @@ func _game() -> void:
 			Saves.save()
 			_show_tab(3))
 	_note("Accesibilidad")
-	var sizes: Array[String] = ["Pequeño", "Normal", "Grande", "Muy grande"]
+	var sizes: Array[String] = ["Pequeño (desde 1080 de alto)", "Normal", "Grande", "Muy grande"]
 	_choice("Tamaño de la interfaz", sizes, int(Settings.get_value("ui_scale")), func(i: int) -> void:
 		Settings.set_value("ui_scale", i)
 		Settings.apply_ui())

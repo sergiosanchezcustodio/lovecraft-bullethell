@@ -214,7 +214,7 @@ class Picker extends PanelContainer:
 			anchor_left = 0.3; anchor_right = 0.7; anchor_top = 0.16; anchor_bottom = 0.84
 			if evolution and options.size() <= 2:          # dos ramas: ventana más baja (16.8)
 				anchor_top = 0.27; anchor_bottom = 0.73
-			MenuKit.fit_screen(self, 16.0, true)           # crece por igual arriba y abajo (interfaz Grande)
+			MenuKit.fit_screen(self, 16.0, true)           # crece por igual arriba y abajo (interfaz Grande o Muy grande)
 			tree_entered.connect(func() -> void:          # en panorámica, no más ancha que a 1920
 				_cap_width()
 				get_viewport().size_changed.connect(_cap_width))
@@ -291,7 +291,7 @@ class Picker extends PanelContainer:
 			var kind_row := HBoxContainer.new()
 			kind_row.add_theme_constant_override("separation", 12)
 			col.add_child(kind_row)
-			var kind := UiKit.label(_kind(o), 13 if solo else 11, _accent(o))
+			var kind := UiKit.label(_kind(o), 15 if solo else 13, _accent(o))   # 13 y 11 hasta el 06-11-2026
 			kind_row.add_child(kind)
 			_kinds.append(kind)
 			var hint_l := UiKit.label("", 13 if solo else 11, EVO_COLOR)   # aviso de evolución (16.15)

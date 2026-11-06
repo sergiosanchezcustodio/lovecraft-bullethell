@@ -261,8 +261,8 @@ class PlayerPanel extends PanelContainer:
 		var j := MenuKit.title("J%d" % (p.index + 1), 20, p.color)
 		j.position = Vector2(0, -4)
 		box.add_child(j)
-		_level_lbl = UiKit.label("Nv. 1", 14, UiKit.GOLD)
-		_level_lbl.position = Vector2(28, -1)
+		_level_lbl = UiKit.label("Nv. 1", 16, UiKit.GOLD)       # 14 hasta el 06-11-2026
+		_level_lbl.position = Vector2(28, -2)
 		box.add_child(_level_lbl)
 		var portrait := TextureRect.new()
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE      # antes que el tamaño: si no, se queda al de la imagen
@@ -354,10 +354,10 @@ class PlayerPanel extends PanelContainer:
 			var n := UiKit.label(name.substr(0, 4), 10, UiKit.TEXT_DIM)
 			n.position = Vector2(1, 8)
 			cell.add_child(n)
-		var lv := UiKit.label(str(level), 14, UiKit.GOLD)
+		var lv := UiKit.label(str(level), 16, UiKit.GOLD)       # 14 hasta el 06-11-2026: lo más pequeño de la interfaz
 		lv.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
 		lv.add_theme_constant_override("outline_size", 4)
-		lv.position = Vector2(CELL.x - 10, CELL.y - 19)
+		lv.position = Vector2(CELL.x - 11, CELL.y - 21)
 		cell.add_child(lv)
 		row.add_child(cell)
 

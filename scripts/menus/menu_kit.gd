@@ -276,7 +276,7 @@ static func window(parent: Node, accent: Color = INK, min_width: float = 0.0) ->
 	return [root, box]
 
 ## Encoge `c` alrededor del centro de la pantalla cuando lo que tiene dentro (su tamaño mínimo) no
-## cabe en ella con `margin` px a cada lado (6: a 1080 de alto no encoge el mapa, de 1065), y nunca lo agranda. Con la interfaz Grande (×1,3), la
+## cabe en ella con `margin` px a cada lado (6: a 1080 de alto no encoge el mapa, de 1065), y nunca lo agranda. Con la interfaz Muy grande (×1,3), la
 ## pantalla mide 1476×830 y las ventanas altas se salían por abajo (05-11-2026). Una ventana de
 ## 1080 de alto queda así como con la interfaz Normal. `c` crece hacia los dos lados, para que su
 ## centro siga en el de su sitio. El sitio es el que le dan sus anclas (la tienda, el 53 % derecho),

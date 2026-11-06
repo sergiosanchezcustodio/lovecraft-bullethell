@@ -71,7 +71,7 @@ const LOGO_CLEAR := 560.0                       ## px de arriba que ocupa el log
 
 ## Centra la ventana `root` (de MenuKit.window) en lo que queda bajo el logo, sin taparlo: centrada
 ## en la columna entera caía encima de «Surviving» (05-11-2026). `top`, en px a 1080 de alto. Si no
-## cabe ahí (interfaz Grande), vuelve al centro de la pantalla.
+## cabe ahí (interfaz Grande o Muy grande), vuelve al centro de la pantalla.
 static func below_logo(root: Control, top: float) -> void:
 	for c in root.get_children():                   # el centrador; el velo sigue tapándolo todo
 		if c is CenterContainer:

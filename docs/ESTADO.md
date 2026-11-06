@@ -2289,7 +2289,7 @@ Las tres mejoras propuestas tras «Ventanas centradas».
 
 - **Jugar, debajo del logo:**
   - las ventanas Jugar y Jugar online tapaban «Surviving» y «Cthulhu». `MainMenu.below_logo` baja su centrador (no el velo, que sigue tapándolo todo): Jugar se centra en lo que queda bajo los 560 px de arriba y Jugar online, más alta, bajo los 470;
-  - si no cabe ahí (con la interfaz Grande), vuelve al centro de la pantalla.
+  - si no cabe ahí (con la interfaz Muy grande), vuelve al centro de la pantalla.
 - **Más ventanas en el recorrido** (`tools/recorrido_ui.py`, ahora 56):
   - subida de nivel, en solitario y con un bot (`levelup_at=t`, nuevo), y el buhonero;
   - pactos, partida del día, noche eterna y elección de la expedición (`expedition_open=true`, nuevo).
@@ -2297,22 +2297,32 @@ Las tres mejoras propuestas tras «Ventanas centradas».
 - **Otros tamaños:** `res=1280x800` (nuevo) abre la ventana de pruebas a ese tamaño, y `--con "<opciones>" --sufijo <nombre>` repite el recorrido con ellas. Se pasaron tres:
   - **1280×800 (16:10):** sin avisos.
   - **2560×1080 (21:9):** solo la sala de trofeos, por textos de la biblioteca que seguía «visible» detrás. Ahora se esconde lo de detrás mientras la sala está abierta.
-  - **Interfaz Grande (×1,3, 1476×830 unidades):** se salían de la pantalla 20 ventanas: online, logros, tienda, tomo de logros, mapa de selección, desafíos, locura, pactos, noche eterna, depuración, dificultad, subida de nivel y repetición de la caída. `MenuKit.fit_screen` hace que su contenedor crezca por igual hacia los dos lados y lo encoge alrededor de su centro si no cabe en su sitio (el de sus anclas: la tienda va en el 53 % derecho), sin agrandarlo nunca. Una ventana de 1080 de alto queda así a ×1,0, como con la interfaz Normal. Está en `MenuKit.window` (todas las ventanas) y en depuración, dificultad, subida de nivel y repetición.
-- **Revisión:** `ui_check` avisa también de las ventanas que se salen de la pantalla, con su posición, si sigue así en dos revisiones seguidas (la tienda cambia de tamaño al abrirse). Recorrido completo después, con la interfaz Normal y con la Grande: ninguno de los 56 da aviso.
+  - **Interfaz Muy grande (×1,3, 1476×830 unidades):** se salían de la pantalla 20 ventanas: online, logros, tienda, tomo de logros, mapa de selección, desafíos, locura, pactos, noche eterna, depuración, dificultad, subida de nivel y repetición de la caída. `MenuKit.fit_screen` hace que su contenedor crezca por igual hacia los dos lados y lo encoge alrededor de su centro si no cabe en su sitio (el de sus anclas: la tienda va en el 53 % derecho), sin agrandarlo nunca. Una ventana de 1080 de alto queda así a ×1,0, como con la interfaz Normal. Está en `MenuKit.window` (todas las ventanas) y en depuración, dificultad, subida de nivel y repetición.
+- **Revisión:** `ui_check` avisa también de las ventanas que se salen de la pantalla, con su posición, si sigue así en dos revisiones seguidas (la tienda cambia de tamaño al abrirse). Recorrido completo después, con la interfaz Normal y con la Muy grande: ninguno de los 56 da aviso.
 - **Pruebas:** una ventana que no cabe se encoge, queda dentro y centrada; una que cabe no cambia. 770 de 770.
 
-### Subida en panorámica, tienda con la interfaz Grande e interfaz Pequeña (06-11-2026)
+### Subida en panorámica, tienda con la interfaz Muy grande e interfaz Pequeña (06-11-2026)
 
 Las tres mejoras propuestas tras la anterior.
 
 - **Subida de nivel en panorámica:** con sus anclas del 40 %, a 2560 de ancho salía de 1024 px, con las filas muy estiradas. Ahora no pasa de 768, su ancho a 1920 (`Picker._cap_width`).
-- **Tienda con la interfaz Grande:** en el 53 % derecho de la pantalla (782 de 1476) no cabía y se encogía (a ×1,03). Ahora se acerca al centro lo justo para caber entera (`ShopMenu._to_right`), algo por encima del tendero. Solo se encoge si ni así cabe de alto (a 830).
+- **Tienda con la interfaz Muy grande:** en el 53 % derecho de la pantalla (782 de 1476) no cabía y se encogía (a ×1,03). Ahora se acerca al centro lo justo para caber entera (`ShopMenu._to_right`), algo por encima del tendero. Solo se encoge si ni así cabe de alto (a 830).
 - **Interfaz Pequeña (×0,85):**
   - `ui_check` avisa de los textos que se ven a menos de 10 px de pantalla (`MIN_PX`, `text_px`: su tamaño por su escala y por la de la interfaz). Con la Normal, lo más pequeño (los «ARMA» y «OBJETO» de la subida) se ve a 13 px.
   - Recorrido completo con la Pequeña y con la Normal: ninguno de los 56 da aviso. Con la Pequeña a 1080, lo más pequeño se ve a 11 px.
   - Ojo: la interfaz escala desde 1080, así que a 1280×720 todo se ve a dos tercios (y con la Pequeña, «ARMA» a unos 7 px).
 - **Nota:** `res=2560x1080` en un monitor de 1920 deja que Windows encoja la ventana, aunque se ve lo mismo (la interfaz mide igual en unidades). El tamaño de los textos se mide en px de la ventana.
 - **Pruebas:** la letra en px de pantalla. 771 de 771.
+
+### La interfaz Pequeña, desde 1080, y los rótulos más pequeños (06-11-2026)
+
+- **Pequeña solo desde 1080 de alto:** la interfaz escala desde 1080, así que por debajo ya se ve más pequeña (a 720, a dos tercios), y con la Pequeña los rótulos más chicos quedaban a unos 7 px.
+  - Ahora, en una ventana de menos de 1080 de alto, la Pequeña se ve como la Normal (`Settings.ui_scale_for`), y se recalcula al cambiar el tamaño de la ventana.
+  - La opción dice «Pequeño (desde 1080 de alto)».
+  - Comprobado: a 1280×720, la configuración con la Pequeña y con la Normal sale igual; a 1080, la Pequeña sigue encogiéndola.
+- **Rótulos más pequeños, dos puntos más:** el tipo de cada opción en la subida de nivel («ARMA NUEVA», «OBJETO»…), de 13 a 15 (de 11 a 13 en los cuadrantes). En el marcador, «Nv. 8» y el nivel de cada arma, de 14 a 16.
+- **Corrección:** lo que en las dos entradas anteriores se llamaba «interfaz Grande (×1,3)» es la Muy grande (la Grande es ×1,15).
+- **Pruebas:** la Pequeña, desde 1080; las demás, igual a cualquier alto. 773 de 773.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

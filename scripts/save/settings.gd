@@ -113,7 +113,18 @@ func apply_all() -> void:
 ## Tamaño de la interfaz (hito 8.3): escala todo lo 2D (menús y HUD) sobre la base 1920x1080.
 func apply_ui() -> void:
 	if not is_inside_tree(): return
-	get_window().content_scale_factor = UI_SCALES[clampi(int(get_value("ui_scale")), 0, UI_SCALES.size() - 1)]
+	var w := get_window()
+	if not w.size_changed.is_connected(apply_ui): w.size_changed.connect(apply_ui)   # al cambiar de tamaño la ventana
+	w.content_scale_factor = ui_scale_for(int(get_value("ui_scale")), w.size.y)
+
+const SMALL_MIN_H := 1080                    ## px de alto desde los que vale la interfaz Pequeña
+
+## La escala de la interfaz `index` en una ventana de `height` px de alto. La interfaz escala desde
+## 1080: por debajo ya se ve más pequeña (a 720, a dos tercios), y la Pequeña dejaba los rótulos
+## más chicos a unos 7 px. Ahí se queda en la Normal (06-11-2026).
+static func ui_scale_for(index: int, height: int) -> float:
+	var s: float = UI_SCALES[clampi(index, 0, UI_SCALES.size() - 1)]
+	return 1.0 if s < 1.0 and height < SMALL_MIN_H else s
 
 # ---------------------------------------------------------------- vídeo
 

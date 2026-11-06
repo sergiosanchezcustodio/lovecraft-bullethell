@@ -30,7 +30,7 @@ func _ready() -> void:
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_theme_constant_override("separation", 14)
 	add_child(box)
-	MenuKit.fit_screen(box)                            # el vídeo es de 1280×720: con la interfaz Grande no cabría
+	MenuKit.fit_screen(box)                            # el vídeo es de 1280×720: con la interfaz Grande o Muy grande no cabría
 	MenuKit.heading(box, "La caída", 44, Color(0.86, 0.22, 0.18))
 	var frame := PanelContainer.new()
 	frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
