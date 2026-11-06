@@ -61,6 +61,7 @@ var _dawn_time := 12.0
 func setup(p_moon: DirectionalLight3D, p_env: Environment, p_director: WaveDirector, p_ambient: Ambient, arena_id: String) -> NightCycle:
 	name = "NightCycle"
 	moon = p_moon
+	if moon != null: moon.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # se gira en _process
 	env = p_env
 	director = p_director
 	ambient = p_ambient

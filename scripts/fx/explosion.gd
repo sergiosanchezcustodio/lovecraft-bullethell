@@ -24,6 +24,11 @@ static var lit := 0
 ## su fogonazo (Player).
 static var recent: Array[Dictionary] = []
 
+## Se anima en _process con la raíz quieta: sin interpolación de la física, que avisaba
+## («Interpolated instance triggered from outside physics process», 06-11-2026).
+func _init() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 func _ready() -> void:
 	Auto.sfx_at("explosion", global_position)
 	Rumble.blast(global_position, radius, String(_wtag).begins_with("J"))   # el mando de los que están cerca (16.30)

@@ -17,6 +17,11 @@ var _model: Node3D
 
 const CLOSE_LIFE := 0.8
 
+## Se anima en _process con la raíz quieta: sin interpolación de la física, que avisaba
+## («Interpolated instance triggered from outside physics process», 06-11-2026).
+func _init() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 func setup(p_world: CombatWorld, pos: Vector3, p_radius: float, p_life: float, p_damage: float, p_hold: float,
 		p_bonus: Dictionary) -> BearTrap:
 	world = p_world; radius = p_radius; life = p_life; damage = p_damage; hold = p_hold; bonus = p_bonus

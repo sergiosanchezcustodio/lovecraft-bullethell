@@ -74,6 +74,11 @@ const HOLD := 0.7                               ## s encima para comprar
 const FACE := PI / 4                            ## de frente a la cámara
 const PEDDLER_CFG := "res://data/objectives.json"
 
+## Se anima en _process con la raíz quieta: sin interpolación de la física, que avisaba
+## («Interpolated instance triggered from outside physics process», 06-11-2026).
+func _init() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 func setup(p_kind: String, p_world: CombatWorld, p_director: WaveDirector, p_a: Vector3, p_b: Vector3) -> Objective:
 	kind = p_kind
 	world = p_world

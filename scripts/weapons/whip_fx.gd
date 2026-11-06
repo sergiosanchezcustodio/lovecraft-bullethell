@@ -13,6 +13,11 @@ var _bits: Array[MeshInstance3D] = []
 const LIFE := 0.24
 const SEGMENTS := 14
 
+## Se anima en _process con la raíz quieta: sin interpolación de la física, que avisaba
+## («Interpolated instance triggered from outside physics process», 06-11-2026).
+func _init() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 func setup(origin: Vector3, p_dir: Vector3, p_length: float, spread_deg: float) -> WhipFx:
 	position = Vector3(origin.x, 0.9, origin.z)
 	dir = Vector3(p_dir.x, 0, p_dir.z).normalized()

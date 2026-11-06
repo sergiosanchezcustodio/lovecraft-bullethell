@@ -3377,7 +3377,9 @@ func _changes_ready() -> void:
 		if obstacles != null and obstacles.load_tide(String(c.tide.file)) and _ground_mat != null:
 			_ground_mat.set_shader_parameter("tide_tex", obstacles.tide_texture())
 		var sea := arena.get_node_or_null("Sea") as Node3D
-		if sea != null: _sea_base = sea.position.y
+		if sea != null:
+			_sea_base = sea.position.y
+			sea.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # la marea lo mueve en _process
 		if c.tide.has("surf") and not sfx_muted():
 			_surf = _loop_player(String(c.tide.surf), false) as AudioStreamPlayer
 			if _surf != null:

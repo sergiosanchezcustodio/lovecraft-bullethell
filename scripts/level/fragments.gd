@@ -21,6 +21,11 @@ var _light: OmniLight3D
 var _beam: MeshInstance3D
 var _taken := false
 
+## Se anima en _process con la raíz quieta: sin interpolación de la física, que avisaba
+## («Interpolated instance triggered from outside physics process», 06-11-2026).
+func _init() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 static func data() -> Dictionary:
 	if _data.is_empty():
 		var d = JSON.parse_string(FileAccess.get_file_as_string(DATA))

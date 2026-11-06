@@ -28,6 +28,11 @@ const IRON := Color(0.16, 0.16, 0.17)
 const BRASS := Color(0.78, 0.62, 0.30)
 const SEAL := Color(0.62, 0.30, 0.95)
 
+## Se anima en _process con la raíz quieta: sin interpolación de la física, que avisaba
+## («Interpolated instance triggered from outside physics process», 06-11-2026).
+func _init() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 func setup(p_world: CombatWorld, pos: Vector3, p_money: int, p_heal: float) -> ArcaneChest:
 	world = p_world
 	money = p_money

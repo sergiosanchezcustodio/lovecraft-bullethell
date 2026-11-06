@@ -9,6 +9,11 @@ var _mat: StandardMaterial3D
 
 const ROPE := Color(0.72, 0.64, 0.44)
 
+## Se anima en _process con la raíz quieta: sin interpolación de la física, que avisaba
+## («Interpolated instance triggered from outside physics process», 06-11-2026).
+func _init() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 func setup(pos: Vector3, radius: float, life: float) -> NetFx:
 	position = Vector3(pos.x, 0.06, pos.z)
 	_life = life

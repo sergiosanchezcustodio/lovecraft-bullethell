@@ -43,7 +43,9 @@ static func palette_of(p_model: String, root: Node3D) -> Array:
 	for mi: MeshInstance3D in root.get_meta("meshes"):
 		if mi.mesh == null: continue
 		for si in mi.mesh.get_surface_count():
-			var cols = mi.mesh.surface_get_arrays(si)[Mesh.ARRAY_COLOR]
+			var arrays := mi.mesh.surface_get_arrays(si)
+			if arrays.size() <= Mesh.ARRAY_COLOR: continue   # sin datos (la tarjeta perdió el dispositivo, 06-11-2026)
+			var cols = arrays[Mesh.ARRAY_COLOR]
 			if cols == null: continue
 			var step := maxi(1, cols.size() / 600)
 			for i in range(0, cols.size(), step * 4):        # 4 vértices por cara

@@ -68,6 +68,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	Damage.ctx = _wtag
+	_spin.rotation.y += 22.0 * delta                # en la física, con la raíz: así se interpola (06-11-2026)
 	_t += delta
 	if not is_instance_valid(player) or _t > MAX_LIFE:
 		queue_free()
@@ -121,7 +122,3 @@ func _key() -> void:
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		_spin.add_child(mi)
 	add_child(VoxelFx.emitter("streak", 0.35, false, false, Color(0.65, 0.78, 1.0)))
-
-func _process(delta: float) -> void:
-	Damage.ctx = _wtag
-	_spin.rotation.y += 22.0 * delta

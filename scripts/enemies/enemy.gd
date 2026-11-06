@@ -187,6 +187,16 @@ var _vy := 0.0                              ## velocidad vertical dibujada (m/s)
 var _land := 0.0                            ## fuerza del último aterrizaje (0 sin él)
 var _land_t := LAND_TIME
 
+
+## Gira la dirección `from` hacia `to` en el plano, la parte `w` del ángulo (0..1). Antes con
+## `Vector3.slerp`, que con dos direcciones casi iguales saca un eje de giro mal normalizado en
+## coma flotante («The axis … must be normalized», 06-11-2026). Las dos se miran en horizontal.
+static func turn_flat(from: Vector3, to: Vector3, w: float) -> Vector3:
+	if Vector2(to.x, to.z).length_squared() < 1e-8: return from
+	if Vector2(from.x, from.z).length_squared() < 1e-8: return Vector3(to.x, 0.0, to.z).normalized()
+	var a := lerp_angle(atan2(from.x, from.z), atan2(to.x, to.z), clampf(w, 0.0, 1.0))
+	return Vector3(sin(a), 0.0, cos(a))
+
 func setup(p_data: EnemyData, p_world: CombatWorld, p_obstacles: ObstacleMap) -> Enemy:
 	data = p_data
 	world = p_world
@@ -994,7 +1004,7 @@ func _physics_process(delta: float) -> void:
 		elif obstacles != null: np = obstacles.push_out(np, data.body_radius)
 		position = Vector3(np.x, position.y, np.y)
 	if velocity.length() > 0.1:
-		facing = facing.slerp(velocity.normalized(), 1.0 - exp(-float(data.params.get("turn", 10.0)) * delta)).normalized()   # turn: el guardián gira despacio (16.17)
+		facing = turn_flat(facing, velocity, 1.0 - exp(-float(data.params.get("turn", 10.0)) * delta))   # turn: el guardián gira despacio (16.17)
 	if guard_ring != null: guard_ring.rotation.y += 0.05
 	if traits != 0: EliteTraits.step(self, delta)
 	# Contacto con los jugadores
@@ -1030,7 +1040,7 @@ func _process(delta: float) -> void:
 	if trait_icon != null:                            # icono de los rasgos sobre la cabeza (16.20)
 		trait_icon.visible = visual.visible
 		if _top_h < 0.0: _number_height()
-		trait_icon.position.y = ((_top_h if _top_h > 0.0 else 1.2) * ELITE_SIZE + 0.35) * model_scale + 0.1 * sin(_spawn_t * 2.5)
+		trait_icon.global_position = visual.global_position + Vector3(0.0, ((_top_h if _top_h > 0.0 else 1.2) * ELITE_SIZE + 0.35) * model_scale + 0.1 * sin(_spawn_t * 2.5), 0.0)
 	if _wade > 0.5:                                   # ondas al vadear, cada tanto recorrido (hito 11.4)
 		if _ripple_from == Vector3.INF or visual.global_position.distance_to(_ripple_from) >= 0.6 + data.body_radius:
 			_ripple_from = visual.global_position

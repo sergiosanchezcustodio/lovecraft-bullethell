@@ -28,6 +28,11 @@ const SHARD_EVERY := 0.4
 const SHARD_LIFE := 0.7
 const FADE := 0.6
 
+## Se anima en _process con la raíz quieta: sin interpolación de la física, que avisaba
+## («Interpolated instance triggered from outside physics process», 06-11-2026).
+func _init() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 func setup(p_world: CombatWorld, origin: Vector3, p_dir: Vector3, p_length: float, p_speed: float,
 		p_half_width: float, p_damage: float, p_stun: float, p_bonus: Dictionary) -> Fissure:
 	world = p_world; dir = Vector3(p_dir.x, 0, p_dir.z).normalized(); length = p_length; speed = p_speed

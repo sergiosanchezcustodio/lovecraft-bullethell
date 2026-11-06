@@ -73,7 +73,10 @@ static func apply(e: Enemy, t: int) -> void:
 	s.render_priority = 10
 	s.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	s.position.y = 1.6 * e.model_scale
+	s.top_level = true                                # sigue al dibujo (Enemy._process), no al paso de física
+	s.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	e.add_child(s)
+	s.global_position = e.global_position + Vector3(0.0, 1.6 * e.model_scale, 0.0)
 	e.trait_icon = s
 
 ## Cada paso de física (anfitrión y marionetas).

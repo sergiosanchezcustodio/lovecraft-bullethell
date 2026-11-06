@@ -13,6 +13,11 @@ var _mat_glow: StandardMaterial3D
 var _light: OmniLight3D
 var _motes: GPUParticles3D
 
+## Se anima en _process con la raíz quieta: sin interpolación de la física, que avisaba
+## («Interpolated instance triggered from outside physics process», 06-11-2026).
+func _init() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 ## `core` y `glow` cambian los colores (rayo del Mini-Mi-Go); por defecto, los del Trapezoedro.
 func setup(origin: Vector3, dir: Vector3, length: float, half_width: float, life: float,
 		core := Color(1.0, 0.72, 0.40, 0.95), glow := Color(0.95, 0.30, 0.18, 0.45)) -> void:

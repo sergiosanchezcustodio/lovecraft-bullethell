@@ -21,6 +21,11 @@ const HOLD := 0.45
 const SINK := 0.3
 const BITS := 9
 
+## Se anima en _process con la raíz quieta: sin interpolación de la física, que avisaba
+## («Interpolated instance triggered from outside physics process», 06-11-2026).
+func _init() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 func setup(p_world: CombatWorld, pos: Vector3, p_radius: float, p_damage: float, p_stun: float,
 		p_bonus: Dictionary) -> TentacleSpike:
 	world = p_world; radius = p_radius; damage = p_damage; stun = p_stun; bonus = p_bonus

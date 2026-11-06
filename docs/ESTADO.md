@@ -2360,6 +2360,24 @@ Las tres mejoras propuestas tras la anterior.
   - 1280×800: solo textos que se ven a menos de 10 px, en 6 ventanas. Son la fecha de los logros (en logros y su tomo), los nombres de la revisión de arte (solo de desarrollo), el tipo de cada fila y el pie de la tabla de daño, la ficha y la ayuda del mapa.
   - Es la escala desde 1080: con 800 de alto todo se ve a dos tercios, y los textos de 14 quedan a 9,3 px (a 1280×720, a 8,7). El autor decidió dejarlo así (06-11-2026): a menos resolución todo se ve más pequeño, y para eso están las interfaces Grande y Muy grande. No hace falta volver a proponerlo.
 
+### Caza de errores en partida (06-11-2026)
+
+- **Herramienta:** `python tools/caza_errores.py [tag,tag…] [--par 2] [--t 110]`. Juega con el bot (`bot=smart god=true timescale=2`) los 15 niveles con el final adelantado, tres noches eternas, tres desfiles de jefes, tres desafíos y dos cooperativos con cuatro jugadores. Junta los errores y avisos de la consola sin repetir, con dónde salieron, en `shots/caza_errores/informe.txt`, y la última captura de cada una. Unos 15 minutos con `--par 2`.
+- **Primera pasada:** 54 mensajes distintos en 26 partidas, ningún error de script.
+  - **«The axis … must be normalized»** (`Basis.set_axis_angle`): el giro de los enemigos y las mascotas hacia donde van usaba `Vector3.slerp`, que con dos direcciones casi iguales saca un eje vertical que no llega a 1 en coma flotante. Ahora `Enemy.turn_flat` gira el ángulo en el plano (`lerp_angle`), y las mascotas lo usan también (`tests/test_turn_flat.gd`).
+  - **«Interpolated instance triggered from outside physics process»**, lo que se mueve en `_process` sin quitarle la interpolación (regla de `scripts/CLAUDE.md`):
+    - la luna del ciclo de la noche y el mar que sube con la marea, ahora sin interpolación;
+    - el giro del bumerán, las llamas de la bola de fuego y las esferas del vórtice, que se movían en `_process` dentro de un cuerpo que va en la física, ahora en `_physics_process`: se interpolan con él y no giran más deprisa con más fotogramas;
+    - los efectos con la raíz quieta y las piezas animadas en `_process` (rayo, explosión, red, látigo, baúl arcano, fragmentos, objetivos, cepo, fisura, tentáculo, torreta), sin interpolación en la raíz (`_init`);
+    - el icono de los rasgos de élite (16.20) colgaba del cuerpo y subía y bajaba en `_process`: ahora va por encima (`top_level`), sin interpolación, en la posición dibujada del enemigo. Antes temblaba con él.
+  - **La tarjeta perdió el dispositivo** a mitad de una prueba anterior y `DeathBurst.palette_of` fallaba al leer una malla sin colores: ahora la salta.
+- **Lo que queda (inofensivo):**
+  - «Non-interpolated instance triggered from physics process»: nodos ya sin interpolación que se colocan una vez en un paso de física (manchas del suelo, quemaduras, la pose del enemigo al morir o al salir de la horda). Godot los da por posiblemente inofensivos y no se ven.
+  - «ObjectDB instances leaked at exit» en alguna partida: una espera (`await`) pendiente cuando la prueba cierra el juego a mitad. Solo al cerrar.
+  - Una vez en cooperativo, el farol del jugador recolocado fuera de la física.
+- **Segunda pasada** (los ocho que daban avisos): solo quedan esos tres.
+- **Pruebas:** 776 de 776.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

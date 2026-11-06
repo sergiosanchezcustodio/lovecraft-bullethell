@@ -63,6 +63,14 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	Damage.ctx = _wtag
 	_t += delta
+	var k := clampf(minf(_t / FADE, (life + FADE - _t) / FADE), 0.0, 1.0)   # las esferas, en la física con el
+	for i in _spheres.size():                       # vórtice (su reloj ya iba por pasos): se interpolan (06-11-2026)
+		var a := _t * (2.0 + 0.4 * i) + TAU * i / _spheres.size()
+		var r := 0.45 + 0.25 * sin(_t * 3.0 + i)
+		_spheres[i].position = Vector3(cos(a) * r, 1.0 + 0.35 * sin(a * 1.3 + i), sin(a) * r)
+		_spheres[i].scale = Vector3.ONE * maxf(k, 0.001) * (0.8 + 0.3 * sin(_t * 5.0 + i * 2.0))   # escala 0: "det == 0" al girar
+		_spheres[i].visible = k > 0.0
+		_spheres[i].rotation = Vector3(_t * 2.0 + i, _t * 1.3, i * 0.7)
 	if _t >= life + FADE:
 		queue_free()
 		return
@@ -85,11 +93,4 @@ func _process(_delta: float) -> void:
 	var k := clampf(minf(_t / FADE, (life + FADE - _t) / FADE), 0.0, 1.0)
 	_disc_mat.set_shader_parameter("fade", k)
 	if _t >= life: _motes.emitting = false
-	for i in _spheres.size():
-		var a := _t * (2.0 + 0.4 * i) + TAU * i / _spheres.size()
-		var r := 0.45 + 0.25 * sin(_t * 3.0 + i)
-		_spheres[i].position = Vector3(cos(a) * r, 1.0 + 0.35 * sin(a * 1.3 + i), sin(a) * r)
-		_spheres[i].scale = Vector3.ONE * maxf(k, 0.001) * (0.8 + 0.3 * sin(_t * 5.0 + i * 2.0))   # escala 0: "det == 0" al girar
-		_spheres[i].visible = k > 0.0
-		_spheres[i].rotation = Vector3(_t * 2.0 + i, _t * 1.3, i * 0.7)
 	_light.light_energy = 1.5 * k

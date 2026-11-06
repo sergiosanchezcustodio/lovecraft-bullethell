@@ -213,12 +213,12 @@ func _physics_process(delta: float) -> void:
 	if mood == &"mourn" and _velocity.length() < 0.4:   # 17.8: lo mira, pegado a él
 		var o := owner_player.global_position - global_position
 		o.y = 0.0
-		if o.length() > 0.01: facing = facing.slerp(o.normalized(), 1.0 - exp(-6.0 * delta)).normalized()
+		if o.length() > 0.01: facing = Enemy.turn_flat(facing, o, 1.0 - exp(-6.0 * delta))
 	elif (mood == &"sniff" or mood == &"hiss") and is_instance_valid(_buddy) and _velocity.length() < 0.4:
 		var b := _buddy.global_position - global_position
 		b.y = 0.0
-		if b.length() > 0.01: facing = facing.slerp(b.normalized(), 1.0 - exp(-8.0 * delta)).normalized()
-	elif _velocity.length() > 0.2: facing = facing.slerp(_velocity.normalized(), 1.0 - exp(-12.0 * delta)).normalized()
+		if b.length() > 0.01: facing = Enemy.turn_flat(facing, b, 1.0 - exp(-8.0 * delta))
+	elif _velocity.length() > 0.2: facing = Enemy.turn_flat(facing, _velocity, 1.0 - exp(-12.0 * delta))
 	elif target != null and is_instance_valid(target):
 		var f := target.global_position - global_position
 		f.y = 0.0

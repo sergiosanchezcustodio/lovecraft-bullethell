@@ -60,6 +60,10 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	Damage.ctx = _wtag
+	var k := 0                                      # las llamas giran en la física, con la bola: se interpolan
+	for c in _core.get_children():                  # y no van más deprisa con más fotogramas (06-11-2026)
+		c.rotation += Vector3(0.21, 0.33, 0.17) * (1.0 + k * 0.6) * (1 if k % 2 == 0 else -1)
+		k += 1
 	var step := speed * delta
 	global_position += dir * step
 	_run += step
@@ -85,8 +89,4 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 
 func _process(_delta: float) -> void:
-	var k := 0
-	for c in _core.get_children():
-		c.rotation += Vector3(0.21, 0.33, 0.17) * (1.0 + k * 0.6) * (1 if k % 2 == 0 else -1)
-		k += 1
 	_light.light_energy = 1.8 + 0.5 * sin(Time.get_ticks_msec() * 0.03)

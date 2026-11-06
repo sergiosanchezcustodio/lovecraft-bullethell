@@ -26,6 +26,11 @@ const METAL := Color(0.2, 0.21, 0.2)
 const DARK := Color(0.12, 0.12, 0.12)
 const WOOD := Color(0.42, 0.28, 0.16)
 
+## Se anima en _process con la raíz quieta: sin interpolación de la física, que avisaba
+## («Interpolated instance triggered from outside physics process», 06-11-2026).
+func _init() -> void:
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 func setup(p_world: CombatWorld, pos: Vector3, p_life: float, p_interval: float, p_damage: float,
 		p_reach: float, p_speed: float, p_bonus_set: int) -> Turret:
 	world = p_world; life = p_life; interval = maxf(p_interval, 0.05); damage = p_damage; reach = p_reach
