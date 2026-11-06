@@ -146,3 +146,14 @@ func test_ventana_que_no_cabe() -> void:
 	var r := (center.get_child(0) as Control).get_global_rect()
 	assert_true(Rect2(Vector2.ZERO, vs).grow(1.0).encloses(r), "y queda dentro: %s" % r)
 	assert_almost_eq(r.get_center().x, vs.x * 0.5, 2.0, "centrada")
+
+## La letra en px de pantalla: la de la interfaz por su escala (la Pequeña, 0,85) y la del dibujo.
+func test_letra_en_pantalla() -> void:
+	var layer := CanvasLayer.new()
+	add_child_autofree(layer)
+	var l := UiKit.label("Arriba/abajo: elegir", 14)
+	layer.add_child(l)
+	await wait_frames(1)
+	assert_almost_eq(Check.text_px(l, 0.85), 11.9, 0.01, "14 con la Pequeña: 11,9")
+	l.scale = Vector2(2, 2)
+	assert_almost_eq(Check.text_px(l, 1.0), 28.0, 0.01)

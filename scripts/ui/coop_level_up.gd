@@ -162,6 +162,7 @@ func _choose(pk: Picker, i: int) -> void:
 ## Elección de un jugador: tarjetas con la imagen del arma u objeto.
 class Picker extends PanelContainer:
 	signal clicked(i: int)
+	const MAX_W := 768.0                               ## px: su ancho a 1920 (el 40 % de la pantalla)
 	var player: Player
 	var options: Array[PlayerProgress.Option] = []
 	var cursor := 0
@@ -194,6 +195,13 @@ class Picker extends PanelContainer:
 	var _on_style: StyleBox       ## tarjeta marcada (luz de vela) y las demás
 	var _off_style: StyleBox
 
+	## Con sus anclas del 40 %, a 2560 de ancho (21:9) salía de 1024 px, con las filas muy estiradas.
+	func _cap_width() -> void:
+		if not is_inside_tree(): return
+		var extra := maxf(0.0, (anchor_right - anchor_left) * get_viewport().get_visible_rect().size.x - MAX_W) * 0.5
+		offset_left = extra
+		offset_right = -extra
+
 	func _init(p: Player, p_options: Array[PlayerProgress.Option], title: String, solo := false,
 			attr := "", p_filler: Array[Dictionary] = [], p_accent := Color.TRANSPARENT, p_evolution := false) -> void:
 		player = p
@@ -207,6 +215,9 @@ class Picker extends PanelContainer:
 			if evolution and options.size() <= 2:          # dos ramas: ventana más baja (16.8)
 				anchor_top = 0.27; anchor_bottom = 0.73
 			MenuKit.fit_screen(self, 16.0, true)           # crece por igual arriba y abajo (interfaz Grande)
+			tree_entered.connect(func() -> void:          # en panorámica, no más ancha que a 1920
+				_cap_width()
+				get_viewport().size_changed.connect(_cap_width))
 		else:
 			var qx := p.index % 2
 			var qy := p.index / 2

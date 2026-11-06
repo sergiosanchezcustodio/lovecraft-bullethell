@@ -35,7 +35,7 @@ func _ready() -> void:
 	var box: VBoxContainer = w[1]
 	var win_root: Control = w[0]
 	(win_root.get_child(0) as ColorRect).color = Color(0, 0, 0.02, 0.12)   # sin oscurecer la escena
-	(win_root.get_child(1) as Control).anchor_left = 0.47                  # la ventana, a la derecha
+	_to_right(win_root.get_child(1) as Control)                            # la ventana, a la derecha
 	MenuKit.heading(box, "Tienda", 48)
 	_money = UiKit.label("", 24, UiKit.GOLD)
 	_money.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -95,6 +95,23 @@ func _show_sub(k: int) -> void:
 	_sub = k
 	_focus_id = ""
 	_show_tab(_tab)
+
+## La ventana, a la derecha del tendero (desde el 47 % de la pantalla). Si no cabe ahí entera
+## (interfaz Grande: en 1476 de ancho quedaban 782 para 946), se acerca al centro lo justo, en vez
+## de encogerse (05-11-2026).
+const RIGHT_FROM := 0.47
+func _to_right(cc: Control) -> void:
+	var place := func() -> void:
+		if not cc.is_inside_tree(): return
+		var vw := cc.get_viewport().get_visible_rect().size.x
+		var a := clampf(1.0 - (cc.get_combined_minimum_size().x + 24.0) / vw, 0.0, RIGHT_FROM)
+		if not is_equal_approx(cc.anchor_left, a):
+			cc.anchor_left = a
+			cc.offset_left = 0.0
+	cc.anchor_left = RIGHT_FROM
+	cc.minimum_size_changed.connect(place)
+	cc.tree_entered.connect(place)
+	if cc.is_inside_tree(): place.call()
 
 func _show_tab(i: int) -> void:
 	_tab = i

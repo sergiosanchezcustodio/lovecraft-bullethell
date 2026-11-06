@@ -15,6 +15,7 @@ const OFF_X := 22.0             ## px de diferencia entre el hueco izquierdo y e
 const OFF_Y := 40.0             ## y entre el de arriba y el de abajo (los títulos y botones lo igualan casi siempre)
 const EDGE := 6.0               ## px de diferencia entre los huecos de una fila ancha a cada lado del marco
 const WIDE := 0.6               ## parte del ancho de la ventana a partir de la cual una fila es «ancha»
+const MIN_PX := 10.0            ## px de pantalla por debajo de los que un texto cuesta de leer (con la Normal, lo más pequeño anda por 11)
 
 var _seen := {}
 var _t := 0.0
@@ -53,6 +54,17 @@ func scan() -> Array:
 				print(line)
 				out.append(line)
 	_off_before = off
+	if DisplayServer.get_name() != "headless":
+		var k := float(get_window().size.y) / maxf(screen.size.y, 1.0)   # unidades de la interfaz -> px de pantalla
+		for l: Control in labels:
+			var px := text_px(l, k)
+			if px >= MIN_PX: continue
+			var key := "letra|%s" % _text_of(l)
+			if _seen.has(key): continue
+			_seen[key] = true
+			var line := "UICHK «%s» se lee a %.1f px de pantalla" % [_text_of(l).left(60), px]
+			print(line)
+			out.append(line)
 	for l: Control in labels:
 		var box := _text_box(l)
 		if box.size.x <= 1.0 or box.size.y <= 1.0: continue
@@ -153,6 +165,11 @@ static func _text_of(c: Control) -> String:
 	return t.strip_edges()
 
 ## Caja aproximada de la tinta del texto, en coordenadas globales.
+## Alto de la letra de `c` en px de pantalla: su tamaño, por la escala con la que se dibuja y por
+## `k` (px de pantalla por unidad de la interfaz: 0,85 con la interfaz Pequeña a 1080).
+static func text_px(c: Control, k: float) -> float:
+	return float(c.get_theme_font_size("font_size")) * absf(c.get_global_transform_with_canvas().get_scale().y) * k
+
 static func _text_box(c: Control) -> Rect2:
 	var font: Font = c.get_theme_font("font")
 	var fs: int = c.get_theme_font_size("font_size")

@@ -2301,6 +2301,19 @@ Las tres mejoras propuestas tras «Ventanas centradas».
 - **Revisión:** `ui_check` avisa también de las ventanas que se salen de la pantalla, con su posición, si sigue así en dos revisiones seguidas (la tienda cambia de tamaño al abrirse). Recorrido completo después, con la interfaz Normal y con la Grande: ninguno de los 56 da aviso.
 - **Pruebas:** una ventana que no cabe se encoge, queda dentro y centrada; una que cabe no cambia. 770 de 770.
 
+### Subida en panorámica, tienda con la interfaz Grande e interfaz Pequeña (06-11-2026)
+
+Las tres mejoras propuestas tras la anterior.
+
+- **Subida de nivel en panorámica:** con sus anclas del 40 %, a 2560 de ancho salía de 1024 px, con las filas muy estiradas. Ahora no pasa de 768, su ancho a 1920 (`Picker._cap_width`).
+- **Tienda con la interfaz Grande:** en el 53 % derecho de la pantalla (782 de 1476) no cabía y se encogía (a ×1,03). Ahora se acerca al centro lo justo para caber entera (`ShopMenu._to_right`), algo por encima del tendero. Solo se encoge si ni así cabe de alto (a 830).
+- **Interfaz Pequeña (×0,85):**
+  - `ui_check` avisa de los textos que se ven a menos de 10 px de pantalla (`MIN_PX`, `text_px`: su tamaño por su escala y por la de la interfaz). Con la Normal, lo más pequeño (los «ARMA» y «OBJETO» de la subida) se ve a 13 px.
+  - Recorrido completo con la Pequeña y con la Normal: ninguno de los 56 da aviso. Con la Pequeña a 1080, lo más pequeño se ve a 11 px.
+  - Ojo: la interfaz escala desde 1080, así que a 1280×720 todo se ve a dos tercios (y con la Pequeña, «ARMA» a unos 7 px).
+- **Nota:** `res=2560x1080` en un monitor de 1920 deja que Windows encoja la ventana, aunque se ve lo mismo (la interfaz mide igual en unidades). El tamaño de los textos se mide en px de la ventana.
+- **Pruebas:** la letra en px de pantalla. 771 de 771.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:
