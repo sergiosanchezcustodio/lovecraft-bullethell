@@ -32,7 +32,18 @@ def main():
     runs, when = {}, {}
     for d in glob.glob(ROOT + '/shots/ui_recorrido*/'):
         suf = os.path.basename(d.rstrip('/\\'))[len('ui_recorrido'):].lstrip('_')
-        if os.path.exists(d + 'informe.txt'):
+        # el <ventana>.txt de cada una (recorrido_ui.py), en el orden de informe.txt; si no los hay, informe.txt
+        order = list(read(d + 'informe.txt')) if os.path.exists(d + 'informe.txt') else []
+        ones = {os.path.basename(f)[:-4]: f for f in glob.glob(d + '*.txt') if os.path.basename(f) != 'informe.txt'}
+        if ones:
+            runs[suf], dates = {}, []
+            for w in order + sorted(w for w in ones if w not in order):
+                if w not in ones: continue
+                runs[suf].update(read(ones[w]))
+                dates.append(os.path.getmtime(ones[w]))
+            fmt = lambda t: time.strftime('%d-%m %H:%M', time.localtime(t))
+            when[suf] = fmt(min(dates)) + ('' if fmt(min(dates)) == fmt(max(dates)) else ' a ' + fmt(max(dates)))
+        elif order:
             runs[suf] = read(d + 'informe.txt')
             when[suf] = time.strftime('%d-%m %H:%M', time.localtime(os.path.getmtime(d + 'informe.txt')))
     if not runs:
@@ -61,7 +72,7 @@ def main():
         cells = [cell(s, w) for s in cols]
         if any(c not in '·–' for c in cells): bad += 1
         lines.append(w.ljust(width) + ''.join(c.center(n) for c, n in zip(cells, cw)))
-    lines += ['', 'Ventanas con algo: %d de %d.' % (bad, len(wins)), 'Cada recorrido (ventanas pasadas, último informe):']
+    lines += ['', 'Ventanas con algo: %d de %d.' % (bad, len(wins)), 'Cada recorrido (ventanas pasadas, de cuándo):']
     lines += ['  %-11s %2d  %s' % (NAMES.get(s, s), len(runs[s]), when[s]) for s in cols]
     if '--detalle' in sys.argv:
         for s in cols:

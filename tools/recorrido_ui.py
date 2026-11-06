@@ -1,7 +1,7 @@
 # Recorrido de las ventanas con ui_check=true (05-11-2026): una ejecución por ventana (portada,
 # selección, partida, expedición y pesca), con su captura y los avisos «UICHK» de cada una.
 # Uso, desde la raíz:  python tools/recorrido_ui.py [tag,tag,...]
-#   -> shots/ui_recorrido/<tag>.png e informe.txt (los avisos, por ventana). Unos 25 minutos entero.
+#   -> shots/ui_recorrido/<tag>.png y <tag>.txt (sus avisos), e informe.txt con todas. Unos 25 minutos entero.
 # Necesita la partida de prueba demo_saves (godot --path . -- test_save=N saves=demo_saves).
 import subprocess, sys, os, glob, shutil, time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace(os.sep, '/')
@@ -56,7 +56,18 @@ if SUF:
     OUT = OUT + '_' + SUF
     os.makedirs(OUT, exist_ok=True)
 filt = args[0].split(',') if args else []
-report = open(OUT + '/informe.txt', 'w' if not filt else 'a', encoding='utf-8')
+
+
+def rebuild():
+    """informe.txt, rehecho con el <tag>.txt de cada ventana (06-11-2026): pasar solo unas
+    ventanas no borra lo de las demás, y un informe borrado a mano se vuelve a formar."""
+    tags = [t for t, _ in RUNS] + sorted(os.path.basename(f)[:-4] for f in glob.glob(OUT + '/*.txt')
+                                         if os.path.basename(f) != 'informe.txt' and os.path.basename(f)[:-4] not in dict(RUNS))
+    with open(OUT + '/informe.txt', 'w', encoding='utf-8') as rep:
+        for t in tags:
+            if os.path.exists('%s/%s.txt' % (OUT, t)): rep.write(open('%s/%s.txt' % (OUT, t), encoding='utf-8').read())
+
+
 for tag, a in RUNS:
     if filt and tag not in filt: continue
     if a.startswith('scenes/'):
@@ -75,7 +86,8 @@ for tag, a in RUNS:
     shots = sorted(f for f in glob.glob(ROOT + '/shots/*.png') if os.path.getmtime(f) >= t0)
     for k, f in enumerate(shots):
         shutil.copy(f, '%s/%s%s.png' % (OUT, tag, '' if k == 0 else '_%d' % k))
-    report.write('== %s (%d s, %d capturas)\n' % (tag, time.time() - t0, len(shots)))
-    for l in lines: report.write('   ' + l.strip() + '\n')
-    report.flush()
+    with open('%s/%s.txt' % (OUT, tag), 'w', encoding='utf-8') as one:
+        one.write('== %s (%d s, %d capturas)\n' % (tag, time.time() - t0, len(shots)))
+        for l in lines: one.write('   ' + l.strip() + '\n')
+    rebuild()
     print(tag, len(lines), len(shots), flush=True)
