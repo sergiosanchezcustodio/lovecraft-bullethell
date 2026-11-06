@@ -49,8 +49,10 @@ func _process(delta: float) -> void:
 		elif inp.just_pressed(InputBindings.MAP): toggle(p, &"map")
 		elif inp.just_pressed(InputBindings.BACK) and _open.has(p): close(p)
 		elif _open.get(p) is Sheet:
-			if inp.just_pressed(InputBindings.PAGE_NEXT): (_open[p] as Sheet).turn(1)
-			elif inp.just_pressed(InputBindings.PAGE_PREV): (_open[p] as Sheet).turn(-1)
+			var sh := _open[p] as Sheet
+			if inp.just_pressed(InputBindings.PAGE_NEXT): sh.turn(1)
+			elif inp.just_pressed(InputBindings.PAGE_PREV): sh.turn(-1)
+			if _paused_by_me: sh.nav(CoopLevelUp.nav_dir(inp))   # en solitario: arriba/abajo, una fila entera
 
 ## Abre o cierra la ficha o el mapa de un jugador (si tenía abierto el otro, lo cambia).
 func toggle(p: Player, kind: StringName) -> void:
@@ -123,6 +125,11 @@ class Sheet extends Control:
 	var _dyn: Array[Callable] = []               ## refrescos de los valores
 	var _icons := {}
 	var _cols: Array[VBoxContainer] = []
+	var _rows: Array[Array] = []                 ## [recuadro, descripción] de cada arma y objeto
+	var _row := -1                               ## la que se lee entera (06-11-2026)
+	var _last_dir := 0
+	var _cycle := 0.0                            ## cooperativo: la fila entera cambia sola
+	const CYCLE := 4.0
 
 	const DESIGN := Vector2(1560, 860)
 	const ICONS := "res://resources/PantallasMenus/iconos/ficha_%s.png"
@@ -173,7 +180,7 @@ class Sheet extends Control:
 			v.add_theme_constant_override("separation", 6)
 			frame.add_child(v)
 			_cols.append(v)
-		var hint := UiKit.label(("LB/RB o Q/E: página  ·  " if paged else "") + "Select, B o Esc: cerrar", 14, UiKit.TEXT_DIM)
+		var hint := UiKit.label(("LB/RB o Q/E: página  ·  " if paged else "Arriba/abajo: leer entero un arma u objeto  ·  ") + "Select, B o Esc: cerrar", 14, UiKit.TEXT_DIM)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		hint.size = Vector2(design.x, 24)
 		hint.position = Vector2(0, design.y - 44)
@@ -185,6 +192,7 @@ class Sheet extends Control:
 		_combat(_cols[2])
 		_refresh()
 		_show_page()
+		_pick(0)
 		resized.connect(_fit)
 		_fit.call_deferred()
 
@@ -210,6 +218,33 @@ class Sheet extends Control:
 		if _t >= 1.0:
 			_t = 0.0
 			_refresh()
+		if paged and _rows.size() > 1:
+			_cycle += delta
+			if _cycle >= CYCLE:
+				_cycle = 0.0
+				_pick(wrapi(_row + 1, 0, _rows.size()))
+
+	## Arriba/abajo (`dir`, de CoopLevelUp.nav_dir): la fila de al lado, una vez por pulsación.
+	func nav(dir: int) -> void:
+		if dir != 0 and _last_dir == 0 and not _rows.is_empty():
+			_pick(wrapi(_row + dir, 0, _rows.size()))
+		_last_dir = dir
+
+	## La fila `i` se marca y enseña su descripción entera; las demás, en una línea con «…».
+	func _pick(i: int) -> void:
+		if _rows.is_empty(): return
+		_row = i
+		for k in _rows.size():
+			var on := k == i
+			var box: PanelContainer = _rows[k][0]
+			var d: Label = _rows[k][1]
+			box.add_theme_stylebox_override("panel", _row_on if on else _row_off)
+			d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if on else TextServer.AUTOWRAP_OFF
+			d.clip_text = not on
+			d.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if on else TextServer.OVERRUN_TRIM_ELLIPSIS
+
+	var _row_on: StyleBox
+	var _row_off: StyleBox
 
 	func _refresh() -> void:
 		for c in _dyn: c.call()
@@ -298,7 +333,19 @@ class Sheet extends Control:
 			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			v.add_child(l)
 		card.add_child(v)
-		col.add_child(card)
+		if _row_on == null:
+			_row_on = MenuKit.box(Color(0.12, 0.085, 0.05, 0.7), Color(MenuKit.BRASS, 0.7), 1)
+			_row_off = MenuKit.box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 1)
+			for sb: StyleBoxFlat in [_row_on, _row_off]:
+				sb.content_margin_left = 8; sb.content_margin_right = 8
+				sb.content_margin_top = 4; sb.content_margin_bottom = 4
+		var box := PanelContainer.new()              # marco de la fila marcada
+		box.add_theme_stylebox_override("panel", _row_off)
+		box.add_child(card)
+		var at := _rows.size()
+		box.mouse_entered.connect(func() -> void: _pick(at))
+		_rows.append([box, d])
+		col.add_child(box)
 		return [name, num]
 
 	# ------------------------------------------------------------ 1. personaje

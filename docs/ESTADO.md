@@ -2341,6 +2341,17 @@ Las tres mejoras propuestas tras la anterior.
   - «Salir» la pisaba con la fila de desarrollo «Revisión de arte». La columna sube lo justo si no cabe sobre ella. Con la Muy grande y esa fila, «Jugar» roza el pie del logo; sin ella (en lo que se reparte), no se mueve.
 - **Pruebas:** 773 de 773.
 
+### La ficha, entera al marcar, y el resumen de los recorridos (06-11-2026)
+
+- **Ficha:** cada arma y objeto iba en una línea con «…». Ahora la fila marcada lleva un recuadro y su descripción entera (`Sheet._pick`).
+  - En solitario, la ficha pausa la partida y se cambia de fila con arriba y abajo (`Sheet.nav`, con `CoopLevelUp.nav_dir`; una vez por pulsación) o pasando el ratón por encima.
+  - En cooperativo la partida sigue y el stick mueve al personaje, así que la fila entera cambia sola cada 4 s.
+  - La ayuda de abajo lo dice («Arriba/abajo: leer entero un arma u objeto»).
+  - Pruebas: `sheet_at=2.5 sheet_row=N` abre la ficha con la fila N marcada. Comprobado con cuatro armas (`weapons=webly,arpon,cilindro_migo`): el arpón, marcado, ocupa dos líneas y todo cabe.
+- **Resumen de los recorridos:** `python tools/resumen_recorridos.py [--detalle]` junta los `informe.txt` de `shots/ui_recorrido*/` en una tabla. Lleva una fila por ventana y una columna por tamaño (normal, pequeña, grande, muy grande, 1280×800, 2560×1080), con los avisos de cada una (· ninguno, E errores, – sin pasar, ? sin captura). Al pie, cuántas ventanas tiene cada recorrido y la fecha de su último informe; con `--detalle`, los avisos. Se guarda en `shots/ui_recorrido_resumen.txt`.
+- **Nota:** durante la prueba, la tarjeta gráfica dejó de crear dispositivos un rato: Vulkan sin `VK_KHR_surface`, y Direct3D 12 con `0x887a0005`, el dispositivo perdido. Se recuperó sola. Una ejecución de GUT tuvo un fallo suelto que no se repitió.
+- **Pruebas:** 773 de 773.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

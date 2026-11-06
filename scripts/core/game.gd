@@ -609,7 +609,10 @@ func _ready() -> void:
 		get_tree().create_timer(args.get_float("quit_at"), false).timeout.connect(_quit)
 	for kind: StringName in [&"sheet", &"map"]:      # pruebas: la ficha o el mapa del J1 a los t s
 		if args.has(kind + "_at"):
-			get_tree().create_timer(args.get_float(kind + "_at"), false).timeout.connect(func() -> void: menus.toggle(player, kind))
+			get_tree().create_timer(args.get_float(kind + "_at"), false).timeout.connect(func() -> void:
+				menus.toggle(player, kind)
+				var sh = menus.get("_open").get(player)
+				if args.has("sheet_row") and sh is PlayerMenus.Sheet: (sh as PlayerMenus.Sheet)._pick.call_deferred(args.get_int("sheet_row")))   # la fila N, entera
 	if args.has("demo_kill"):                      # pruebas: todos los enemigos mueren a los t s
 		get_tree().create_timer(args.get_float("demo_kill"), false).timeout.connect(func() -> void:
 			for e in world.enemies.duplicate():
