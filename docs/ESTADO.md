@@ -2376,7 +2376,12 @@ Las tres mejoras propuestas tras la anterior.
   - «ObjectDB instances leaked at exit» en alguna partida: una espera (`await`) pendiente cuando la prueba cierra el juego a mitad. Solo al cerrar.
   - Una vez en cooperativo, el farol del jugador recolocado fuera de la física.
 - **Segunda pasada** (los ocho que daban avisos): solo quedan esos tres.
-- **Pruebas:** 776 de 776.
+- **Detalles vistos en las capturas de la caza:**
+  - Las cifras de daño a partir de diez millones van en millones (`DamageNumbers.short`): el modo dios, que mata con mil millones, llenaba la pantalla de «1000000k».
+  - Desfile de jefes: con el primer jefe jugado, la pantalla final decía «Tiempo total: 1:35» encima de «Tiempo: 01:35». Ahora el total solo sale si es distinto, y con el mismo formato.
+  - «Acaba con Primigenio menor»: el objetivo pone el artículo a los nombres comunes (`Hud.with_article`); los que ya lo llevan («El viejo Castro») y los propios («Madre Hydra», «Cthulhu, recompuesto») quedan igual.
+  - Los rótulos de arriba (nivel, reloj, objetivo, dinero y pactos) apenas se leían sobre la nieve: contorno de 3 px y un halo oscuro suave detrás (`shadow_outline_size` 14). En las noches oscuras casi no se nota.
+- **Pruebas:** 778 de 778.
 
 ## Ideas propuestas y sin hacer (23-10-2026)
 

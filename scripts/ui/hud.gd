@@ -26,6 +26,19 @@ var net_info := Callable()                   ## (Player) -> [PC, ping en ms (-1:
 var player: Player:
 	get: return players[0] if not players.is_empty() else null
 
+
+## Femeninos de los nombres comunes de las criaturas (los demás, «el»).
+const FEM_NOUNS := ["Emanación", "Híbrida", "Hija", "Pesadilla", "Vecina", "Cosa"]
+## Nombres propios: sin artículo.
+const PROPER := ["Cthulhu", "Madre", "Padre", "Barnabas", "Gedney", "Pth'thya-l'yi"]
+
+## «Acaba con el Primigenio menor»: el artículo que falta a los nombres comunes; los que ya lo
+## llevan («El viejo Castro») y los propios («Madre Hydra») quedan igual (06-11-2026).
+static func with_article(n: String) -> String:
+	var first := n.get_slice(" ", 0).trim_suffix(",")
+	if first in ["El", "La", "Los", "Las"] or first in PROPER: return n
+	return ("la " if first in FEM_NOUNS else "el ") + n
+
 func setup(p_players: Array[Player], p_director: WaveDirector) -> Hud:
 	players = p_players
 	director = p_director
@@ -77,6 +90,11 @@ func _ready() -> void:
 	top.add_child(pacts)
 	for l: Label in [title, _time_lbl, _objective_lbl, _money_lbl, pacts]:    # Garamond, como los menús (27-10-2026)
 		l.add_theme_font_override("font", MenuKit.body_font(true))
+		l.add_theme_constant_override("outline_size", 3)
+		l.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.02, 0.55))   # halo oscuro: se lee
+		l.add_theme_constant_override("shadow_outline_size", 14)                       # sobre la nieve (06-11-2026)
+		l.add_theme_constant_override("shadow_offset_x", 0)
+		l.add_theme_constant_override("shadow_offset_y", 1)
 	title.add_theme_font_size_override("font_size", 20)          # la x de Garamond es más baja: un poco más grandes
 	_time_lbl.add_theme_font_size_override("font_size", 36)
 	_objective_lbl.add_theme_font_size_override("font_size", 21)
@@ -103,10 +121,10 @@ func _process_step(_delta: float) -> void:
 			var s := int(ceil(director.survive_left()))
 			_objective_lbl.text = "Resiste a %s · %d:%02d" % [director.level.final_name, s / 60, s % 60]
 		elif not director.mid_alive.is_empty():
-			_objective_lbl.text = "Acaba con %s" % director.mid_alive[0].data.display_name
+			_objective_lbl.text = "Acaba con %s" % with_article(director.mid_alive[0].data.display_name)
 		elif director.time >= director.level.final_time and director.level.final_enemy != null:
 			var f := director.final_target()
-			_objective_lbl.text = "Acaba con %s" % (f.data.display_name if f != null else director.level.final_enemy.display_name)
+			_objective_lbl.text = "Acaba con %s" % with_article(f.data.display_name if f != null else director.level.final_enemy.display_name)
 		elif director.level.endless:
 			var nxt := director.next_mid_time()
 			var parts := PackedStringArray()

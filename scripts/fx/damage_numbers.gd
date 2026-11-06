@@ -45,6 +45,14 @@ static func add(fx_parent: Node, target: Object, amount: float, at: Vector3, str
 		fx_parent.set_meta("damage_numbers", dn)
 	dn._add(target.get_instance_id() if target != null else 0, amount, at, strong, dot)
 
+
+## La cifra corta: hasta 9.999 entera, luego en miles (12k) y en millones (3M); el modo dios,
+## que mata con mil millones, salía «1000000k» (06-11-2026).
+static func short(v: float) -> String:
+	if v < 10000.0: return str(maxi(roundi(v), 1))
+	if v < 1e7: return "%.0fk" % (v / 1000.0)
+	return "%.0fM" % minf(v / 1e6, 999.0)
+
 func _add(id: int, amount: float, at: Vector3, strong: bool, dot: bool) -> void:
 	var col := STRONG if strong else (DOT if dot else NORMAL)
 	var it: Array = _by_id.get(id, [])
@@ -94,7 +102,7 @@ func _label() -> Label3D:
 func _text(it: Array) -> void:
 	var l: Label3D = it[0]
 	var v: float = it[2]
-	var txt := str(maxi(roundi(v), 1)) if v < 10000.0 else "%.0fk" % (v / 1000.0)
+	var txt := short(v)
 	if l.text != txt: l.text = txt
 	var fs := int(SIZE * (1.35 if it[6] == STRONG else (0.8 if it[6] == DOT else 1.0)))
 	if l.font_size != fs: l.font_size = fs
