@@ -294,7 +294,7 @@ class Picker extends PanelContainer:
 			var kind := UiKit.label(_kind(o), 15 if solo else 13, _accent(o))   # 13 y 11 hasta el 06-11-2026
 			kind_row.add_child(kind)
 			_kinds.append(kind)
-			var hint_l := UiKit.label("", 13 if solo else 11, EVO_COLOR)   # aviso de evolución (16.15)
+			var hint_l := UiKit.label("", 15 if solo else 13, EVO_COLOR)   # aviso de evolución (16.15)
 			hint_l.visible = false
 			kind_row.add_child(hint_l)
 			_hints.append(hint_l)
@@ -313,7 +313,7 @@ class Picker extends PanelContainer:
 			cmp.scroll_active = false
 			cmp.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			cmp.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			cmp.add_theme_font_size_override("normal_font_size", 15 if solo else 11)
+			cmp.add_theme_font_size_override("normal_font_size", 15 if solo else 13)
 			cmp.add_theme_color_override("default_color", UiKit.TEXT_DIM)
 			cmp.visible = false
 			col.add_child(cmp)

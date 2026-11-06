@@ -153,7 +153,7 @@ func _row(icon: Texture2D, name: String, kind: String, bar: float, share: String
 	n.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	n.clip_text = true
 	names.add_child(n)
-	if kind != "": names.add_child(UiKit.label(kind, 13, UiKit.TEXT_DIM))
+	if kind != "": names.add_child(UiKit.label(kind, 14, UiKit.TEXT_DIM))
 	h.add_child(names)
 	var bar_box := Control.new()
 	bar_box.custom_minimum_size = Vector2(BAR_W, 22)

@@ -71,7 +71,7 @@ func _row(a: AchievementData) -> Button:
 	d.custom_minimum_size.x = 560
 	mid.add_child(d)
 	var reward := Achievements.reward_text(a)
-	if reward != "": mid.add_child(UiKit.label("Recompensa: " + reward, 14, UiKit.GOLD if got else Color(UiKit.GOLD, 0.6)))
+	if reward != "": mid.add_child(UiKit.label("Recompensa: " + reward, 15, UiKit.GOLD if got else Color(UiKit.GOLD, 0.6)))
 	var right := VBoxContainer.new()
 	right.alignment = BoxContainer.ALIGNMENT_CENTER
 	right.custom_minimum_size.x = 170

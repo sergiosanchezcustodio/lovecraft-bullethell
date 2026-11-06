@@ -34,7 +34,7 @@ func _init(icon_size: Vector2 = Vector2(32, 32)) -> void:
 	_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_tex.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_tex)
-	_ph = UiKit.label("", 14, UiKit.TEXT)
+	_ph = UiKit.label("", 15, UiKit.TEXT)
 	_ph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_ph.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_ph.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

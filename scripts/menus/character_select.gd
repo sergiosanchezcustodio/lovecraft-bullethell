@@ -597,7 +597,7 @@ class _Frame extends Control:
 		_wbox.position = Vector2(FRAME.x - 112, 20)
 		_wbox.add_theme_stylebox_override("panel", _frame(Color(0, 0, 0, 0.5), Color(MenuKit.BRASS, 0.7), 2))
 		add_child(_wbox)
-		_record = UiKit.label("", 14, UiKit.TEXT_DIM)
+		_record = UiKit.label("", 15, UiKit.TEXT_DIM)
 		_record.position = Vector2(FRAME.x - 120, 222)
 		_record.size = Vector2(108, 48)
 		_record.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -646,7 +646,7 @@ class _Frame extends Control:
 		for k in OutfitData.KEYS.size():
 			var row := VBoxContainer.new()
 			row.add_theme_constant_override("separation", -3)
-			var tag := UiKit.label(OutfitData.SLOT_NAMES[k], 13, UiKit.TEXT_DIM)
+			var tag := UiKit.label(OutfitData.SLOT_NAMES[k], 14, UiKit.TEXT_DIM)
 			tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			row.add_child(tag)
 			var val := MenuKit.title("", 18, UiKit.TEXT)

@@ -216,7 +216,7 @@ static func names_for(cat: String) -> Array[String]:
 	return out
 
 func _line(text: String) -> void:
-	var l := UiKit.label(text, 14, UiKit.TEXT_DIM)
+	var l := UiKit.label(text, 15, UiKit.TEXT_DIM)
 	_list.add_child(l)
 
 func _change(cat: String, lv: int) -> void:

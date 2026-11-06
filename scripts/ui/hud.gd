@@ -296,14 +296,14 @@ class PlayerPanel extends PanelContainer:
 		_net_row.position = Vector2(0, -32 if bottom else SIZE.y + 14)
 		_net_dot = UiKit.label("●", 20, PING_OK)
 		_net_row.add_child(_net_dot)
-		_net_lbl = UiKit.label("", 14, UiKit.TEXT)
+		_net_lbl = UiKit.label("", 15, UiKit.TEXT)
 		for l: Label in [_net_dot, _net_lbl]:                   # se lee también sobre la nieve
 			l.add_theme_constant_override("outline_size", 5)
 		_net_row.add_child(_net_lbl)
 		_net_row.visible = false
 		box.add_child(_net_row)
 		_hud = hud
-		_crisis_lbl = UiKit.label("", 12, UiKit.SANITY)          # superpuesto abajo: no ocupa sitio
+		_crisis_lbl = UiKit.label("", 14, UiKit.SANITY)          # superpuesto abajo: no ocupa sitio
 		_crisis_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		_crisis_lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 		_crisis_lbl.size_flags_vertical = Control.SIZE_SHRINK_END

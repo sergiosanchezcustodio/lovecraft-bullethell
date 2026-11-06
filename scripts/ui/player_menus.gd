@@ -290,10 +290,10 @@ class Sheet extends Control:
 		v.alignment = BoxContainer.ALIGNMENT_CENTER
 		v.add_theme_constant_override("separation", 0)
 		var name := UiKit.label("", 17, UiKit.TEXT)
-		var d := UiKit.label(desc, 13, UiKit.TEXT_DIM)
+		var d := UiKit.label(desc, 14, UiKit.TEXT_DIM)
 		d.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		d.clip_text = true
-		var num := UiKit.label("", 13, UiKit.GOLD)
+		var num := UiKit.label("", 14, UiKit.GOLD)
 		for l in [name, d, num]:
 			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			v.add_child(l)
@@ -335,7 +335,7 @@ class Sheet extends Control:
 		_head(col, "Compañero")
 		var pet: Node = p.get("pet")
 		if pet == null or not is_instance_valid(pet):
-			col.add_child(_label("Sin compañero. Se consiguen en la tienda.", 14, UiKit.TEXT_DIM, true))
+			col.add_child(_label("Sin compañero. Se consiguen en la tienda.", 15, UiKit.TEXT_DIM, true))
 			return
 		var pd: PetData = pet.get("data")
 		var h := HBoxContainer.new()
@@ -346,7 +346,7 @@ class Sheet extends Control:
 		v.alignment = BoxContainer.ALIGNMENT_CENTER
 		v.add_theme_constant_override("separation", 0)
 		v.add_child(UiKit.label(pd.display_name, 18, UiKit.GOLD))
-		var info := UiKit.label("", 13, UiKit.TEXT)
+		var info := UiKit.label("", 14, UiKit.TEXT)
 		info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		v.add_child(info)
 		h.add_child(v)
@@ -385,7 +385,7 @@ class Sheet extends Control:
 					"magic": return _pct(p.damage_mult(WeaponData.Category.MAGIC))
 					"physical": return _pct(p.damage_mult(WeaponData.Category.PHYSICAL))
 				return _pct(p.damage_mult(WeaponData.Category.FIREARM)))
-		var crisis := _label("", 14, UiKit.SANITY)
+		var crisis := _label("", 15, UiKit.SANITY)
 		bottom.add_child(crisis)
 		_dyn.append(func() -> void:
 			var c := p.sanity_state.crises
@@ -417,7 +417,7 @@ class Sheet extends Control:
 		for up in p.progress.upgrade_pool:
 			if int(p.progress.passives.get(up.id, 0)) > 0: owned.append(up)
 		var bottom := _half(col, "Objetos  %d / %d" % [owned.size(), p.progress.item_slots])
-		if owned.is_empty(): bottom.add_child(_label("Aún no llevas ninguno: salen al subir de nivel.", 14, UiKit.TEXT_DIM, true))
+		if owned.is_empty(): bottom.add_child(_label("Aún no llevas ninguno: salen al subir de nivel.", 15, UiKit.TEXT_DIM, true))
 		for up: UpgradeData in owned:
 			var ls := _item_row(bottom, up.icon, Color(up.color, 0.5), up.description)
 			var uu: UpgradeData = up
@@ -455,7 +455,7 @@ class ArenaMap extends PanelContainer:
 		_canvas.clip_contents = true                   # nada se sale del marco
 		_canvas.draw.connect(_draw_map)
 		box.add_child(_canvas)
-		var hint := UiKit.label("Gatillos o + y −: zoom  ·  Cruceta abajo o M, B o Esc: cerrar", 13, UiKit.TEXT_DIM)
+		var hint := UiKit.label("Gatillos o + y −: zoom  ·  Cruceta abajo o M, B o Esc: cerrar", 14, UiKit.TEXT_DIM)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(hint)
 		MenuKit.dress(self, MenuKit.BRASS.lerp(p.color, 0.45), Vector2(26, 26), 90.0)   # dentro del filete fino

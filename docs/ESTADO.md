@@ -2324,6 +2324,23 @@ Las tres mejoras propuestas tras la anterior.
 - **Corrección:** lo que en las dos entradas anteriores se llamaba «interfaz Grande (×1,3)» es la Muy grande (la Grande es ×1,15).
 - **Pruebas:** la Pequeña, desde 1080; las demás, igual a cualquier alto. 773 de 773.
 
+### Los textos de 14 px o menos y la interfaz Grande (06-11-2026)
+
+- **Textos pequeños:** las ayudas de abajo de las ventanas (`MenuKit.hint`) ya iban a 17. Ahora lo más pequeño de la interfaz va a 14:
+  - los de 14 pasan a 15: recompensa de los logros, récord de la selección, ayudas de la dificultad, PC y ping en el marcador, crisis y avisos de la ficha, burbuja de los consejos;
+  - los de 11 a 13 pasan a 14 o 15:
+    - en la ficha, la descripción y las cifras de cada arma y objeto, lo del compañero y la ayuda del mapa;
+    - el aviso de crisis del marcador (era de 12);
+    - en la selección, las casillas del vestuario;
+    - el tipo de cada fila de la tabla de daño;
+    - en la subida de nivel, el aviso de evolución y la comparación en los cuadrantes.
+  - En la ficha, las descripciones largas de las armas ya se cortaban con «…»; ahora, unas letras antes.
+  - Revisadas con la interfaz Normal: ficha, subidas, evolución, tabla de daño, dificultad, selección y logros, sin avisos.
+- **Interfaz Grande (×1,15):** recorrido completo, sin avisos en las 56 ventanas. En las capturas, dos choques en la portada con la ayuda de abajo («A o Intro: elegir · B o Esc: cambiar de partida»):
+  - la ventana Jugar bajaba hasta ella. Ahora se esconde mientras hay una ventana abierta, que trae su propia ayuda;
+  - «Salir» la pisaba con la fila de desarrollo «Revisión de arte». La columna sube lo justo si no cabe sobre ella. Con la Muy grande y esa fila, «Jugar» roza el pie del logo; sin ella (en lo que se reparte), no se mueve.
+- **Pruebas:** 773 de 773.
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

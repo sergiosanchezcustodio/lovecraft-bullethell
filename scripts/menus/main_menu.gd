@@ -29,7 +29,8 @@ func _ready() -> void:
 		_buttons.append(b)
 	col.resized.connect(func() -> void:
 		var vs := get_viewport().get_visible_rect().size
-		col.position = Vector2((vs.x - col.size.x) * 0.5, vs.y * 0.6))
+		# al 60 % del alto, o más arriba si no cabe sobre la ayuda de abajo (interfaz Grande: «Salir» la pisaba)
+		col.position = Vector2((vs.x - col.size.x) * 0.5, minf(vs.y * 0.6, vs.y - 52.0 - col.size.y)))
 	# partida en uso, abajo a la izquierda
 	if Saves.slot >= 0:
 		var l := UiKit.label("", 20, UiKit.TEXT_DIM)
@@ -52,6 +53,7 @@ func _ready() -> void:
 	h.offset_left = -400
 	h.offset_right = 400
 	add_child(h)
+	_hint = h
 	_buttons[0].grab_focus.call_deferred()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -61,6 +63,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		back.emit()
 
 var _money_lbl: Label
+var _hint: Label                          ## ayuda de abajo: se esconde con una ventana abierta, que trae la suya
 
 func _refresh_money() -> void:
 	if _money_lbl != null and Saves.current != null:
@@ -91,9 +94,11 @@ static func below_logo(root: Control, top: float) -> void:
 func _push(popup: Control, from: int) -> void:
 	_popup = popup
 	add_child(popup)
+	if _hint: _hint.visible = false            # con la interfaz Grande, Jugar bajaba hasta ella
 	MenuKit.trap_focus(popup)                  # el mando no se escapa a los botones de detrás
 	popup.tree_exited.connect(func() -> void:
 		_popup = null
+		if _hint: _hint.visible = true
 		_refresh_money()                           # la tienda y los logros cambian el dinero
 		if is_inside_tree(): _buttons[from].grab_focus.call_deferred())
 
