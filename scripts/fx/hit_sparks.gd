@@ -12,7 +12,7 @@ const POOL := 6
 const PER_FRAME := 4
 const GAP := 0.09                       ## s entre chispas en el mismo enemigo
 const KINDS := ["bullet", "cut", "blunt", "fire", "acid", "arcane", "shock"]
-const BURSTS := ["crack", "hammer"]                ## ráfagas sueltas de las armas (`burst`), con su receta de VoxelFx
+const BURSTS := ["crack", "hammer", "snap", "glass"]                ## ráfagas sueltas de las armas (`burst`), con su receta de VoxelFx
 
 static var enabled := true
 static var _inst: HitSparks

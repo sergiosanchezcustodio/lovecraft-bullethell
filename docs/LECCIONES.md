@@ -256,3 +256,7 @@ En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra c
 - Los emisores de las chispas, encendidos bajo el suelo en el calentamiento, compilaban otra vez a mitad de partida. Se calientan en la vista, a los pies del jugador, con la escala del nodo al 1 %.
 - **Una malla con otro formato de vértices es otra pipeline:** el anillo del arco solo tiene posición y UV, sin normales. Calentar su material sobre una caja no basta: hay que dibujarlo sobre la misma malla.
 - **Para encontrar qué compila, se quitan piezas con sus opciones** (`hit_sparks=false`, `trails=false`…) y la misma semilla: «compilaciones a mitad de partida» de SpikeLog dice si se fue.
+
+## Luces puntuales y pipelines (fase 18, 07-11-2026)
+
+- En Forward+, Godot especializa la pipeline según el objeto tenga luces puntuales cerca o no. Un efecto que lleva su propia `OmniLight3D` (la explosión) usa una variante que el calentamiento no dibuja si allí no hay ninguna luz. En `FxShade.prime`, cada receta se dibuja junto a una luz tenue y lejos de ella.

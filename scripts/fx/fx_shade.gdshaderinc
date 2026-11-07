@@ -6,6 +6,8 @@
 // (`scroll` m/s) y chispas sueltas.
 // mode 1 arco: sobre el anillo de `VoxelFx.arc_ring()` (UV.x, la vuelta; UV.y, de dentro afuera),
 // una hoja que barre la vuelta (`age` 0..1, la cabeza casi blanca) con estela que se apaga y vetas.
+// mode 2 fogonazo: sobre un cuadro (`VoxelFx.quad1()`) que mira a la cámara; calor radial en
+// anillos a escalones, borde roto por ruido, y el centro que se encoge con `age` (0..1).
 // Por instancia: `fade` (0..1), `tint` (multiplica), `seed` y `age`.
 #include "res://scripts/fx/fx_common.gdshaderinc"
 
@@ -28,10 +30,31 @@ varying vec3 sz;
 void vertex() {
 	lp = VERTEX;
 	sz = vec3(length(MODEL_MATRIX[0].xyz), length(MODEL_MATRIX[1].xyz), length(MODEL_MATRIX[2].xyz));
+	if (mode == 2) {                               // de cara a la cámara, con su escala
+		MODELVIEW_MATRIX = VIEW_MATRIX * mat4(INV_VIEW_MATRIX[0] * sz.x, INV_VIEW_MATRIX[1] * sz.y,
+			INV_VIEW_MATRIX[2] * sz.z, MODEL_MATRIX[3]);
+		MODELVIEW_NORMAL_MATRIX = mat3(MODELVIEW_MATRIX);
+	}
 }
 
 void fragment() {
-	if (mode == 1) {
+	if (mode == 2) {
+		float n = max(floor(sz.x / cell), 8.0);         // celdas de voxel en el cuadro
+		vec2 c2 = (floor(UV * n) + 0.5) / n;
+		vec2 q = c2 * 2.0 - 1.0;
+		float r = length(q);
+		float ang = atan(q.y, q.x);
+		float edge = 0.78 + 0.22 * fx_noise(vec2(ang * 2.2 + seed, seed * 3.1));
+		float rr = r / edge;
+		if (rr > 1.0) discard;
+		float core = 1.0 - age * 0.65;
+		float h = pow(clamp(1.0 - rr, 0.0, 1.0), 1.3) * (0.75 + 0.45 * fx_noise(floor(UV * n) * 0.5 + seed)) * core
+			+ step(rr, 0.28 * core) * 0.35;
+		h = floor(clamp(h, 0.0, 0.999) * steps + 0.5) / steps;
+		vec4 cf = texture(ramp, vec2(h, 0.5));
+		ALBEDO = cf.rgb * tint.rgb * energy;
+		ALPHA = clamp(cf.a * tint.a * fade, 0.0, 1.0);
+	} else if (mode == 1) {
 		// celdas: a lo largo de la vuelta, de `cell` m en el borde de fuera; a lo ancho, 5
 		float n = max(floor(6.2831853 * sz.x / cell), 24.0);
 		float ua = (floor(UV.x * n) + 0.5) / n;

@@ -53,7 +53,7 @@ func _make_page() -> Node3D:
 		holder.add_child(m)
 		add_child(holder)
 		var bm := BoxMesh.new()                       # cadena: eslabones hasta el personaje
-		bm.size = Vector3.ONE * 0.08
+		bm.size = Vector3(0.05, 0.05, 0.15)           # eslabón alargado (hito 18.9; antes, un cubo)
 		var mat := VoxelFx.std()
 		mat.albedo_color = Color(0.35, 0.36, 0.38)
 		mat.metallic = 0.6
@@ -128,9 +128,13 @@ func _process(delta: float) -> void:
 			pg.global_position = center + Vector3(cos(a) * _radius, 0.7, sin(a) * _radius)
 			pg.rotation = Vector3(0, -a, PI * 0.5)                                         # tumbada, la caña hacia el personaje
 			pg.scale = Vector3.ONE * ks * 1.4
+			var link_dir := Vector3(cos(a) * _radius, -0.2, sin(a) * _radius).normalized()
 			for j in _chain.size():
 				var f := float(j + 1) / (_chain.size() + 1)
-				_chain[j].global_position = center + Vector3(cos(a) * _radius * f, 0.9 - 0.2 * f, sin(a) * _radius * f)
+				var lp := center + Vector3(cos(a) * _radius * f, 0.9 - 0.2 * f, sin(a) * _radius * f)
+				var stretch := _radius / (_chain.size() + 1) * 0.95 / 0.15          # casi tocándose
+				var lb := Basis.looking_at(link_dir, Vector3.UP) * Basis(Vector3(0, 0, 1), PI * 0.5 * (j % 2)) 					* Basis.from_scale(Vector3(1, 1, stretch))
+				_chain[j].global_transform = Transform3D(lb, lp)          # uno plano y otro de canto
 				_chain[j].visible = k > 0.05
 			continue
 		pg.global_position = center + Vector3(cos(a) * _radius, 1.0 + 0.12 * sin(_t * 6.0 + i), sin(a) * _radius)

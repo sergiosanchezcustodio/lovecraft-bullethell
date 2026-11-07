@@ -11,6 +11,8 @@ var _t := 0.0
 var _light: OmniLight3D
 var _ball: MeshInstance3D
 var _ball_mat: StandardMaterial3D
+var _flash_fx := false
+const FLASH := 0.2                          ## s del fogonazo (hito 18.8)
 var _wave: MeshInstance3D
 var _wave_mat: ShaderMaterial
 var _scorch_mat: ShaderMaterial
@@ -58,6 +60,11 @@ func _ready() -> void:
 	_ball.position.y = 0.5
 	_ball.rotation = Vector3(0.6, randf() * TAU, 0.3)
 	add_child(_ball)
+	# hito 18.8: el destello es un fogonazo radial de cara a la cámara, en anillos a escalones (antes,
+	# un cubo blanco que en el mortero se veía como un bloque de 3,5 m)
+	_ball.mesh = VoxelFx.quad1()
+	_flash_fx = FxShade.apply(_ball, "blast")
+	if not _flash_fx: _ball.mesh = VoxelFx.box1()
 	_wave = _flat_disc(Color(1.0, 0.75, 0.45, 0.8))
 	_wave_mat = _wave.material_override
 	var scorch := VoxelFx.ground(2, radius * 0.8)
@@ -121,9 +128,15 @@ func _process(delta: float) -> void:
 		_light.light_energy = 9.0 * maxf(0.0, 1.0 - _t / 0.3)
 		if _t > 0.3: _drop_light()                 # apagada, fuera (antes seguía 4 s con energía 0)
 	var grow := clampf(_t / 0.06, 0.0, 1.0)
-	_ball.scale = Vector3.ONE * radius * lerpf(0.3, 0.9, grow)
-	_ball_mat.albedo_color.a = maxf(0.0, 1.0 - _t / 0.12)
-	_ball.visible = _t < 0.12
+	if _flash_fx:
+		_ball.scale = Vector3.ONE * radius * lerpf(0.9, 1.7, 1.0 - pow(1.0 - clampf(_t / FLASH, 0.0, 1.0), 2.0))
+		_ball.set_instance_shader_parameter("age", clampf(_t / FLASH, 0.0, 1.0))
+		_ball.set_instance_shader_parameter("fade", 1.0 - smoothstep(FLASH * 0.5, FLASH, _t))
+		_ball.visible = _t < FLASH
+	else:
+		_ball.scale = Vector3.ONE * radius * lerpf(0.3, 0.9, grow)
+		_ball_mat.albedo_color.a = maxf(0.0, 1.0 - _t / 0.12)
+		_ball.visible = _t < 0.12
 	var w := clampf(_t / 0.3, 0.0, 1.0)
 	_wave.scale = Vector3.ONE * radius * lerpf(0.3, 1.25, 1.0 - pow(1.0 - w, 2.0))
 	_wave_mat.set_shader_parameter("color", Color(1.0, 0.8, 0.5, 0.85 * (1.0 - w)))

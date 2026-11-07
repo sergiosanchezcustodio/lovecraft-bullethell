@@ -75,14 +75,24 @@ static func prime(parent: Node3D, at: Vector3) -> void:
 	parent.add_child(glow)
 	glow.position = at
 	glow.scale = Vector3.ONE * 0.2
+	# cada receta, dos veces: junto a una luz puntual tenue y lejos de ella. En Forward+, con luces
+	# puntuales cerca la pipeline es otra (la explosión enciende la suya y compilaba a mitad de partida)
+	var light := OmniLight3D.new()
+	light.light_energy = 0.01
+	light.omni_range = 1.0
+	light.shadow_enabled = false
+	parent.add_child(light)
+	light.position = at
 	var shades: Dictionary = (d as Dictionary).get("shades", {})
-	for id in shades:
-		var mi := MeshInstance3D.new()
-		# en la malla con la que se usa: el anillo del arco no lleva normales y pide otra pipeline
-		mi.mesh = VoxelFx.arc_ring() if int((shades[id] as Dictionary).get("mode", 0)) == 1 else VoxelFx.box1()
-		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		parent.add_child(mi)
-		mi.position = at
-		mi.scale = Vector3.ONE * 0.2
-		if apply(mi, String(id)): set_fade(mi, 1.0 / 255.0)
-		else: mi.queue_free()
+	for off in [Vector3.ZERO, Vector3(4, 0, 0)]:
+		for id in shades:
+			var mi := MeshInstance3D.new()
+			# en la malla con la que se usa: el anillo del arco no lleva normales y pide otra pipeline
+			var md := int((shades[id] as Dictionary).get("mode", 0))
+			mi.mesh = VoxelFx.arc_ring() if md == 1 else (VoxelFx.quad1() if md == 2 else VoxelFx.box1())
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			parent.add_child(mi)
+			mi.position = at + off
+			mi.scale = Vector3.ONE * 0.2
+			if apply(mi, String(id)): set_fade(mi, 1.0 / 255.0)
+			else: mi.queue_free()

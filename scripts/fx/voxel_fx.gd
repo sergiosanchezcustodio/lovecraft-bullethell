@@ -98,6 +98,14 @@ static func plane2() -> PlaneMesh:
 		_plane2.size = Vector2(2, 2)
 	return _plane2
 
+static var _quad1: QuadMesh
+## Cuadro de 1×1 (plano XY) compartido: fogonazos que miran a la cámara (hito 18.8).
+static func quad1() -> QuadMesh:
+	if _quad1 == null:
+		_quad1 = QuadMesh.new()
+		_quad1.size = Vector2.ONE
+	return _quad1
+
 static var _arc: ArrayMesh
 ## Anillo del arco de los tajos (hito 18.5): de radio 0,5 a 1 en el plano XZ, con el borde de fuera
 ## algo más alto (la hoja barre inclinada). UV.x, la vuelta (0..1, desde +X hacia +Z); UV.y, de
@@ -567,6 +575,32 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.5]])
 			m.color_ramp = _ramp([[0.0, Color(0.92, 0.95, 1.0, 1.0)], [0.4, Color(0.7, 0.74, 0.8, 0.8)],
 				[1.0, Color(0.5, 0.52, 0.56, 0.0)]])
+		"snap":                   # el cepo se cierra (hito 18.9): chispazo de hierro y polvo bajo
+			p.draw_pass_1 = cube("add")
+			p.amount = 14
+			p.lifetime = 0.35
+			p.explosiveness = 1.0
+			m.spread = 70.0
+			m.direction = Vector3(0, 1, 0)
+			m.initial_velocity_min = 1.5; m.initial_velocity_max = 3.5
+			m.damping_min = 4.0; m.damping_max = 7.0
+			m.gravity = Vector3(0, -9.0, 0)
+			m.scale_min = 0.03; m.scale_max = 0.06
+			m.color_ramp = _ramp([[0.0, Color(1.0, 1.0, 0.9, 1.0)], [0.35, Color(1.0, 0.75, 0.4, 0.9)],
+				[1.0, Color(0.5, 0.3, 0.15, 0.0)]])
+		"glass":                  # cristal que estalla (hito 18.9): esquirlas verdosas que saltan y caen
+			p.draw_pass_1 = cube("add")
+			p.amount = 16
+			p.lifetime = 0.55
+			p.explosiveness = 1.0
+			m.spread = 75.0
+			m.direction = Vector3(0, 1, 0)
+			m.initial_velocity_min = 1.8; m.initial_velocity_max = 3.8
+			m.gravity = Vector3(0, -12.0, 0)
+			m.angular_velocity_min = -400.0; m.angular_velocity_max = 400.0
+			m.scale_min = 0.03; m.scale_max = 0.07
+			m.color_ramp = _ramp([[0.0, Color(0.85, 1.0, 0.9, 0.95)], [0.5, Color(0.45, 0.75, 0.5, 0.7)],
+				[1.0, Color(0.2, 0.4, 0.25, 0.0)]])
 		"hit_bullet":             # impacto de bala (hito 18.3): chispas que rebotan hacia quien dispara
 			p.draw_pass_1 = cube("add")
 			p.amount = 7

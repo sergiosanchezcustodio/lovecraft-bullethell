@@ -61,7 +61,10 @@ func _spring() -> void:
 	var snap := VoxelFx.emitter("zap", 0.8, true, false, Color(0.85, 0.85, 0.8))   # chispas del hierro al cerrarse (11-10-2026)
 	snap.position.y = 0.2
 	add_child(snap)
+	HitSparks.burst("snap", global_position + Vector3(0, 0.12, 0))   # hito 18.9: chispazo de hierro y polvo
 
 func _process(_delta: float) -> void:
-	if sprung: _model.scale = Vector3.ONE * (1.0 - smoothstep(CLOSE_LIFE * 0.6, CLOSE_LIFE, _t))
+	if sprung:
+		var bump := sin(clampf(_t / 0.14, 0.0, 1.0) * PI)                # se cierra de golpe: se aplasta y rebota
+		_model.scale = Vector3(1.0 + 0.22 * bump, 1.0 - 0.3 * bump, 1.0 + 0.22 * bump) 			* (1.0 - smoothstep(CLOSE_LIFE * 0.6, CLOSE_LIFE, _t))
 	elif _t > life - 1.0: visible = fmod(_t, 0.25) < 0.15           # parpadea antes de irse

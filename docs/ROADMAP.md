@@ -589,8 +589,8 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 18.8 | **Explosiones:** destello radial con degradado en lugar del cubo blanco, onda de choque y estela de humo del proyectil en el aire (granada, mortero, dinamita) | Pendiente |
-| 18.9 | **Ancla, arpón, cepos, bisturís, bumerán y molotov:** cadena de eslabones, cuerda, cepos que se cierran con chispa, estelas de giro y la botella que gira y salpica | Pendiente |
+| 18.8 | **Explosiones:** destello radial con degradado en lugar del cubo blanco, onda de choque y estela de humo del proyectil en el aire (granada, mortero, dinamita) | **Hecho (07-11-2026), pendiente de tu revisión:** fogonazo radial de cara a la cámara (`FxShade` modo 2) en lugar del cubo; la onda y la estela de humo ya estaban |
+| 18.9 | **Ancla, arpón, cepos, bisturís, bumerán y molotov:** cadena de eslabones, cuerda, cepos que se cierran con chispa, estelas de giro y la botella que gira y salpica | **Hecho (07-11-2026), pendiente de tu revisión:** eslabones en la cadena del ancla, cepos que se aplastan con chispazo, cristal que estalla; arpón y bisturís son balas (van con el bloque D, en `BulletManager`). Bloque C medido: +0,2-0,3 ms en el peor caso |
 
 ### Bloque D: arcanas y zonas
 

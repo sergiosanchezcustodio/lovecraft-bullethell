@@ -140,6 +140,8 @@ func _land() -> void:
 		world.fx.add_child(NetFx.new().setup(end, radius, net))
 		queue_free()
 		return
+	if look in ["molotov", "frasco", "baba"]:          # hito 18.9: el cristal estalla al caer
+		HitSparks.burst("glass", end + Vector3(0, 0.12, 0))
 	if not zone.is_empty():
 		world.fx.add_child(DamageZone.new().setup(world, int(zone.kind), end, float(zone.radius), float(zone.time),
 			float(zone.dps), float(zone.get("vulnerable", 0.0)), bonus))
