@@ -80,11 +80,20 @@ static func start(parent: Node, level: LevelData, at: Vector3) -> LevelWarmup:
 				k += 1
 	# el baúl arcano (07-11-2026: el primero compilaba sus shaders al aparecer, a mitad de nivel). Sin
 	# `setup` no cuenta como baúl ni se abre: solo se dibuja.
+	# En el suelo, junto al jugador, a su tamaño de salida (1 %, quieto) y con la luz apagada: bajo el
+	# suelo quedaba fuera de las sombras de la luna y le faltaba esa pasada (16,5 ms al salir el primero).
 	if level.chest_every > 0.0:
 		var c := ArcaneChest.new()
 		w.add_child(c)
-		c.position = Vector3((k % 6) * 2.5 - 6.0, 0.0, (k / 6) * 2.5 - 6.0)
-		k += 1
+		c.set_process(false)
+		c._light.light_energy = 0.0
+		c.position = Vector3(-1.5, -DEPTH, 1.5)
+		var lb := ArcaneChest.money_label(30)                 # y lo que sale al abrirlo: el letrero (que se
+		lb.modulate.a = 1.0 / 255.0                           # dibuja encima de todo: casi transparente; con 0, no se dibuja)
+		lb.outline_modulate.a = 1.0 / 255.0
+		w.add_child(lb)
+		lb.position = Vector3(-1.5, 1.2 - DEPTH, 1.5)
+		VoxelFx.puff(w, w.global_position + Vector3(-1.5, 0.5, 1.5), "sparkle", 0.6)   # y los destellos, bajo el suelo
 	# y una sombra del miedo (07-11-2026: la primera, a mitad de nivel, compilaba 6 shaders en 320 ms).
 	# Sobre el suelo, junto al jugador y del todo transparente: invisible, pero se dibuja como en la
 	# partida (bajo el suelo le faltaban 4 de sus pipelines)

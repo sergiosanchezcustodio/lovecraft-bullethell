@@ -170,6 +170,7 @@ func spawn_chest() -> ArcaneChest:
 		if obstacles != null and (not obstacles.bounds.grow(-2.0).has_point(p2) or not _spawnable(p2, 0.7)): continue
 		pos = c
 		break
+	if OS.get_cmdline_user_args().has("chest_here=true"): pos = center   # pruebas: a los pies del jugador, se abre al salir
 	var cash := roundi(rng.randi_range(level.chest_money.x, level.chest_money.y) * Pacts.value("chest_money")
 		* (2.0 if Signs.any(world.players, &"dagon") else 1.0))
 	var chest := ArcaneChest.new().setup(world, pos, cash, 0.0 if Pacts.has("no_heal") else level.chest_heal)

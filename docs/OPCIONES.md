@@ -64,6 +64,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `traits=N` o `traits=vampira,estalla,icor,rapida,escudo`: todas las élites salen con esos rasgos (hito 16.20; `N`, la máscara de `EliteTraits`).
   - `peddler=true`: el buhonero sale en este nivel (a los `peddler_at=` s, 5 por defecto; con bots también); `peddler=false`, nunca. `objective_near=true` lo pone cerca y `peddler_stall=N` deja la mercancía N (0 remedio, 1 baratija, 2 libro) a los pies del J1. `purse=N`: el nivel empieza con N dólares ganados. `log=true` escribe `BUHONERO` y `COMPRA`.
   - `signs=cthugha,yog`: Signos Mayores del J1 para esta ejecución (hito 16.9; `signs=false`, ninguno y sin elegir). Sin hueco elegido no se ofrece ninguno (salen de los logros del hueco).
+  - `chest_every=S` y `chest_here=true`: baúles arcanos cada S s de media y a los pies del jugador, que los abre al salir (07-11-2026: para probar lo que hace el baúl al abrirse; el bot casi nunca va a por ellos).
   - `evolve_at=T`: el J1 abre un baúl arcano a los T s (evoluciona el arma que esté lista; con dos ramas, abre la ventana de elegir; hito 16.8). Junto con `weapons=thompson wlevel=5 items=oro_obed`. `evo_branch=N`: con bot o `autopick`, elige la rama N (0 o 1).
   - `autorestart=N`: en la pantalla final, reintenta sola tras N s.
   - `log=true`: cada 30 s de juego imprime vivos, abatidos, nivel, vida, cordura y balas; si el enemigo final tarda en morir (más de 30 s), cada 10 s su posición, vida y estado (`final=`).

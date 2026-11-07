@@ -133,6 +133,17 @@ func _physics_process(delta: float) -> void:
 			open(p)
 			return
 
+## El «+35 $» que sube al abrirlo (también lo dibuja `LevelWarmup`, para que no compile al abrir el primero).
+static func money_label(amount: int) -> Label3D:
+	var label := Label3D.new()
+	label.text = "+%d $" % amount
+	label.font_size = 64
+	label.outline_size = 12
+	label.modulate = Color(1.0, 0.85, 0.35)
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.no_depth_test = true
+	return label
+
 ## Lo abre un jugador: dólares (los cuenta la partida), vida y cordura para él.
 func open(by: Player) -> void:
 	if is_open: return
@@ -143,13 +154,7 @@ func open(by: Player) -> void:
 	_coins.emitting = true
 	by.play_once("open_chest", true)             # levanta la tapa (hito 17.4)
 	VoxelFx.puff(get_parent(), global_position + Vector3(0, 0.5, 0), "sparkle", 0.6)   # destellos (11-10-2026)
-	var label := Label3D.new()                                                       # "+35 $" que sube
-	label.text = "+%d $" % money
-	label.font_size = 64
-	label.outline_size = 12
-	label.modulate = Color(1.0, 0.85, 0.35)
-	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.no_depth_test = true
+	var label := money_label(money)                                                  # "+35 $" que sube
 	label.position = Vector3(0, 1.2, 0)
 	add_child(label)
 	var tw := create_tween()

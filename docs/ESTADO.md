@@ -2463,3 +2463,12 @@ Ofrecidas tras la dificultad del 1 al 10 (29-10-2026), 22 de todo tipo:
   Con la semilla 13 el bot lleva la fisura: cada raja soltaba sus materiales al acabar y la siguiente compilaba otra vez sus shaders, 3 por uso durante toda la partida. Las que quedan son de muertes y explosiones con algo que aún no había salido.
 - 779 de 779; `tools/hoja_poses.gd` (con `-s`, usa `Anims`) sigue funcionando.
 
+### El baúl arcano, calentado del todo (07-11-2026)
+
+- **Al salir:** el calentamiento lo dibujaba 6 m bajo el suelo, fuera de las sombras de la luna, y al salir el primero compilaba esa pasada (16,5 ms a los 134 s con la semilla 12). Ahora va en el suelo junto al jugador, a su tamaño de salida (1 %, con `set_process(false)`) y con la luz apagada.
+- **Al abrirse:** el letrero «+35 $» (`ArcaneChest.money_label`, que se dibuja encima de todo) y los destellos compilaban otra vez (17-19 ms). El calentamiento dibuja el letrero junto al jugador con transparencia 1/255 (con 0, Godot no lo dibuja y no sirve) y los destellos bajo el suelo.
+- **Opción de prueba `chest_here=true`** (con `chest_every=S`): el baúl sale a los pies del jugador y se abre al momento; el bot casi nunca va a por ellos. Con `chest_every=10 chest_here=true`, semilla 12 y 60 s: 5 baúles abiertos y ninguna compilación del baúl.
+- **Lo que queda** son compilaciones de los primeros 15-20 s del nivel: la primera explosión con su muerte (hasta 23,6 ms), un profundo anciano, los murciélagos del ambiente. Calentar una explosión de verdad arrastra sonido, vibración, decorado que se rompe y hollín: haría falta un modo «solo visual» de `Explosion`. Sin hacer.
+- **El proceso que ocupa un núcleo en este PC** es GIGABYTE Control Center, en concreto su módulo de la tarjeta gráfica (`C:\Program Files\GIGABYTE\Control Center\Lib\GBT_VGA\Service\Dll\GvFvSDKCSharp.exe`, ventiladores, luces y frecuencias), en marcha desde el 02-11 con más de 16 horas de CPU. No lo he tocado.
+- 779 de 779.
+
