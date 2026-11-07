@@ -250,3 +250,9 @@ En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra c
 ## Lo que solo se ve no usa el azar de la partida (fase 18, 07-11-2026)
 
 - Un efecto visual que llama a `randf()` cambia la secuencia del generador global, y con la misma semilla la partida sale distinta: otras mejoras, otros enemigos. Así no se pueden comparar dos configuraciones, y cambia lo que debería repetirse con una semilla (partida del día, archivo, repetición). Los efectos nuevos llevan su propio `RandomNumberGenerator` (`static var _rng`).
+
+## Calentar en la vista también las partículas (fase 18, 07-11-2026)
+
+- Los emisores de las chispas, encendidos bajo el suelo en el calentamiento, compilaban otra vez a mitad de partida. Se calientan en la vista, a los pies del jugador, con la escala del nodo al 1 %.
+- **Una malla con otro formato de vértices es otra pipeline:** el anillo del arco solo tiene posición y UV, sin normales. Calentar su material sobre una caja no basta: hay que dibujarlo sobre la misma malla.
+- **Para encontrar qué compila, se quitan piezas con sus opciones** (`hit_sparks=false`, `trails=false`…) y la misma semilla: «compilaciones a mitad de partida» de SpikeLog dice si se fue.

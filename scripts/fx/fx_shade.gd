@@ -64,9 +64,22 @@ static func prime(parent: Node3D, at: Vector3) -> void:
 	if f == null: return
 	var d: Variant = JSON.parse_string(f.get_as_text())
 	if not d is Dictionary: return
-	for id in (d as Dictionary).get("shades", {}):
+	var glow := MeshInstance3D.new()                  # la raja del martillo: transparente y con brillo (hito 18.6)
+	glow.mesh = VoxelFx.box1()
+	var gm := VoxelFx.std()
+	gm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	gm.emission_enabled = true
+	gm.albedo_color = Color(0, 0, 0, 1.0 / 255.0)
+	glow.material_override = gm
+	glow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(glow)
+	glow.position = at
+	glow.scale = Vector3.ONE * 0.2
+	var shades: Dictionary = (d as Dictionary).get("shades", {})
+	for id in shades:
 		var mi := MeshInstance3D.new()
-		mi.mesh = VoxelFx.box1()
+		# en la malla con la que se usa: el anillo del arco no lleva normales y pide otra pipeline
+		mi.mesh = VoxelFx.arc_ring() if int((shades[id] as Dictionary).get("mode", 0)) == 1 else VoxelFx.box1()
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		parent.add_child(mi)
 		mi.position = at

@@ -24,6 +24,7 @@ var _shards: Array[Dictionary] = []          ## {node, born}
 var _next := 0.0                             ## m donde va la próxima esquirla
 
 var _spray: GPUParticles3D
+var _glow := false
 const SHARD_EVERY := 0.4
 const SHARD_LIFE := 0.7
 const FADE := 0.6
@@ -65,6 +66,11 @@ func _ready() -> void:
 		spray_col = Color(0.62, 0.36, 0.78)
 	_spray = VoxelFx.emitter("spray", 0.4, false, false, spray_col)   # esquirlas en la punta (11-10-2026)
 	add_child(_spray)
+	if look != "dunwich" and FxShade.on():          # hito 18.6: el golpe levanta polvo y la raja brilla de frío
+		_crack_mat.emission_enabled = true
+		_crack_mat.emission = Color(0.45, 0.75, 1.0)
+		_glow = true
+		HitSparks.burst("hammer", global_position + Vector3(0, 0.05, 0))
 
 func tip() -> float:
 	return minf(_t * speed, length)
@@ -95,6 +101,9 @@ func _process(_delta: float) -> void:
 	var reach := tip()
 	_spray.position = dir * reach + Vector3(0, 0.1, 0)
 	_spray.emitting = _t * speed <= length
+	if _glow:                                           # la luz de la raja se apaga a escalones
+		var g := clampf(1.0 - (_t - length / speed) / (SHARD_LIFE + FADE), 0.0, 1.0)
+		_crack_mat.emission_energy_multiplier = floorf(g * 4.0) / 4.0 * 1.6
 	while _next <= reach and _next <= length:           # la raja y sus esquirlas, según avanza
 		var side := randf_range(-0.25, 0.25)
 		var crack := MeshInstance3D.new()

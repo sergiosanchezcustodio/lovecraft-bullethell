@@ -581,9 +581,9 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 18.5 | **Machete:** arco de barrido con degradado y estela, y chispas al golpear | Pendiente |
-| 18.6 | **Daga, estoque y martillo:** puñalada y estocada con estela, y el martillo con onda y cascotes | Pendiente |
-| 18.7 | **Látigo:** una cuerda que se curva y ondula, con restallido en la punta | Pendiente |
+| 18.5 | **Machete:** arco de barrido con degradado y estela, y chispas al golpear | **Hecho (07-11-2026), pendiente de tu revisión:** arco a la altura de la hoja (`FxShade` modo 1) con estela en la punta |
+| 18.6 | **Daga, estoque y martillo:** puñalada y estocada con estela, y el martillo con onda y cascotes | **Hecho (07-11-2026), pendiente de tu revisión:** estela de la hoja en la daga y el estoque; corona de polvo y raja con luz fría en el martillo |
+| 18.7 | **Látigo:** una cuerda que se curva y ondula, con restallido en la punta | **Hecho (07-11-2026), pendiente de tu revisión:** cuerda continua de 22 tramos que se afina, onda, estela en la punta y restallido. Bloque B medido: sin coste apreciable |
 
 ### Bloque C: arrojadizas
 

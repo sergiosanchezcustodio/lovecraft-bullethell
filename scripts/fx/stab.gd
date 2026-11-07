@@ -48,6 +48,11 @@ func _ready() -> void:
 	_trail.material_override = _trail_mat
 	_trail.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(_trail)
+	# estela de la punta (hito 18.6): con su color, en tramos; la caja de antes queda como brillo
+	var tip := Node3D.new()
+	tip.position = Vector3(0, 0, -blade * 0.5)
+	_blade.add_child(tip)
+	FxTrails.attach.call_deferred(tip, "steel", Color(color.r, color.g, color.b).lightened(0.35), 0.9)
 	_process(0.0)
 
 func _process(delta: float) -> void:

@@ -12,6 +12,7 @@ const POOL := 6
 const PER_FRAME := 4
 const GAP := 0.09                       ## s entre chispas en el mismo enemigo
 const KINDS := ["bullet", "cut", "blunt", "fire", "acid", "arcane", "shock"]
+const BURSTS := ["crack", "hammer"]                ## ráfagas sueltas de las armas (`burst`), con su receta de VoxelFx
 
 static var enabled := true
 static var _inst: HitSparks
@@ -32,6 +33,16 @@ static func hit(world: CombatWorld, e: Node3D, d: Damage, radius := 0.4, height 
 	if not is_instance_valid(_inst) or not _inst.is_inside_tree(): return
 	_inst._hit(e, d, radius, height)
 
+## Una ráfaga de la receta `name` (una de `BURSTS`) en `at`, con los emisores reciclados.
+static func burst(name: String, at: Vector3) -> void:
+	if not is_instance_valid(_inst) or not _inst._pools.has(name): return
+	var list: Array = _inst._pools[name]
+	var i: int = _inst._next[name]
+	_inst._next[name] = (i + 1) % list.size()
+	var p: GPUParticles3D = list[i]
+	p.global_transform = Transform3D(Basis(), at)
+	p.restart()
+
 ## Monta los emisores (al empezar el nivel, con el calentamiento).
 static func setup(world: CombatWorld) -> void:
 	if not enabled or world == null: return
@@ -45,10 +56,10 @@ static func setup(world: CombatWorld) -> void:
 
 func _ready() -> void:
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-	for k in KINDS:
+	for k in KINDS + BURSTS:
 		var list: Array[GPUParticles3D] = []
 		for i in POOL:
-			var p := VoxelFx.emitter("hit_" + k, 0.3, true)
+			var p := VoxelFx.emitter(k if k in BURSTS else "hit_" + k, 0.3, true)
 			p.emitting = false
 			p.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 			add_child(p)
@@ -119,10 +130,11 @@ static func _by_delivery(w: WeaponData) -> String:
 			return "arcane"
 	return "bullet"
 
-## Calentamiento (LevelWarmup): una chispa de cada tipo bajo el suelo, en `at`.
+## Calentamiento (LevelWarmup): una chispa de cada tipo en `at`, en la vista y encogida al 1 % (bajo
+## el suelo le faltaban pasadas y compilaba a mitad de partida, como el baúl).
 static func prime(at: Vector3) -> void:
 	if not is_instance_valid(_inst): return
-	for k in KINDS:
+	for k in KINDS + BURSTS:
 		var p: GPUParticles3D = (_inst._pools[k] as Array)[POOL - 1]
-		p.global_position = at
+		p.global_transform = Transform3D(Basis.from_scale(Vector3.ONE * 0.01), at)
 		p.restart()

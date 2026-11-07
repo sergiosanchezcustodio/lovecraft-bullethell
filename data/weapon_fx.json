@@ -1,6 +1,7 @@
 {
   "_doc": "Efectos de las armas (fase 18, D-50). shades: recetas del sombreador de efectos (FxShade, hito 18.2): mode (0 haz), add (aditiva o normal), steps (tramos del calor), scroll (m/s de las ondas), energy (brillo), sparkle (umbral de las chispas: más alto, menos) y colors (rampa del calor, de 0 a 1). trails: recetas de estela (FxTrails, hito 18.1). width: ancho en la cabeza (m); life: s que dura cada tramo; colors: degradado de la cabeza a la cola (#rrggbbaa), en tramos (bands); add: aditiva (brillo) o normal (humo); min_step: m que tiene que moverse para poner un punto nuevo.",
   "shades": {
+    "slash": {"mode": 1, "add": true, "steps": 5, "energy": 1.25, "colors": ["#00000000", "#20305830", "#5070b070", "#a0c4f0b0", "#e0f0ffe0", "#ffffffff"]},
     "lamp": {"mode": 0, "add": true, "steps": 6, "scroll": 5.0, "energy": 1.3, "sparkle": 0.97, "colors": ["#00000000", "#5a200810", "#b0501860", "#f0a040a0", "#ffd890d0", "#fff6e0f0"]}
   },
   "trails": {
@@ -8,6 +9,7 @@
     "steel": {"width": 0.3, "life": 0.2, "bands": 5, "add": true, "colors": ["#e0f0ffc0", "#80b0ffa0", "#3060d060", "#10204000"]},
     "page": {"width": 0.2, "life": 0.3, "bands": 5, "add": true, "colors": ["#ffe080c0", "#ffa83090", "#c0502850", "#40100000"]},
     "migo": {"width": 0.18, "life": 0.35, "bands": 5, "add": true, "colors": ["#ffb0e8d0", "#ff40b0a0", "#a0189060", "#30084000"]},
+    "lash": {"width": 0.16, "life": 0.18, "bands": 4, "add": true, "colors": ["#fff0d0d0", "#e0a86090", "#90502840", "#30100800"]},
     "smoke": {"width": 0.22, "life": 0.55, "bands": 5, "add": false, "min_step": 0.06, "colors": ["#d8d0c890", "#9a928a70", "#605a5440", "#30302c00"]},
     "ember": {"width": 0.14, "life": 0.3, "bands": 4, "add": true, "colors": ["#fff0c0e0", "#ffa040a0", "#c0401850", "#40100000"]},
     "acid": {"width": 0.14, "life": 0.3, "bands": 4, "add": true, "colors": ["#e8ffc0d0", "#90f04090", "#40a02040", "#10300800"]}

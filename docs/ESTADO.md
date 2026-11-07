@@ -2507,3 +2507,12 @@ Pedida por el autor y decidida en D-50: estilo voxel con degradados y la fase co
 
 - **Azar propio:** los efectos nuevos (`HitSparks`, `Casings`, `FxShade`) usan su propio `RandomNumberGenerator`. Con `randf()`, el mismo del juego, la misma semilla daba otra partida según hubiera efectos o no: otras mejoras elegidas, 755 o 1290 llamadas de dibujo. Así no se podía comparar y, además, cambiaban las partidas con semilla.
 - **`comparar.py`, `qset=weapon_fx:0` contra Alta, 3 veces, 30 s:** p1_n2, media de 7,28 a 7,42 ms y 1 % peor de 13,87 a 13,96 ms; p2_n2, de 8,52 a 8,53 ms y de 16,12 a 15,61 ms. Sin compilaciones nuevas a mitad de partida. 782 de 782.
+
+### Bloque B: cuerpo a cuerpo (hitos 18.5 a 18.7, 07-11-2026)
+
+- **18.5, machete** (`Slash`): además del anillo en el suelo, un arco a la altura de la hoja (`VoxelFx.arc_ring()`, un anillo compartido con el borde de fuera algo más alto) con el modo 1 de `FxShade`, receta `slash`. La cabeza es casi blanca, la estela azulada se apaga en tramos y tiene vetas, todo en celdas de voxel. Una estela de acero sigue a la punta de la hoja. Dura 0,3 s (antes, 0,26).
+- **18.6, daga y estoque** (`Stab`): una estela del color de la hoja sigue a la punta. **Martillo** (`Fissure`): al golpear levanta una corona de polvo, nieve y cascotes (`hammer`), y la raja brilla con luz fría que se apaga a escalones. Las pisadas de Dunwich siguen como estaban.
+- **18.7, látigo** (`WhipFx`): 22 tramos en lugar de 14, cada uno estirado hasta el siguiente para que la cuerda sea continua y más fina hacia la punta. Una onda la recorre al barrer, la punta llega tarde y deja estela (`lash`), y al acabar el barrido restalla con un destello y chispas (`crack`).
+- **Ráfagas recicladas:** `HitSparks.burst(nombre, sitio)` reutiliza emisores para las ráfagas de las armas (`crack`, `hammer`), así que no se crean en cada uso.
+- **Calentamiento:** las chispas se calientan en la vista, a los pies del jugador y encogidas al 1 %. Bajo el suelo compilaban dos veces a mitad de partida (18 ms), igual que pasó con el baúl. También se calientan el arco sobre su propio anillo (sin normales: es otra pipeline) y el material transparente con brillo de la raja.
+- **Medido,** machete, látigo, daga y martillo a nivel 6, `qset=weapon_fx:0` contra Alta, 3 veces: p1_n2, de 7,87 a 7,68 ms; p2_n2, de 9,41 a 9,44 ms. Es decir, nada: es ruido. Sin compilaciones a mitad de partida. 782 de 782.
