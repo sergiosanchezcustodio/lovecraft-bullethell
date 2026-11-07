@@ -2545,3 +2545,12 @@ Pedida por el autor y decidida en D-50: estilo voxel con degradados y la fase co
   - El resto, dorado o violeta según la rama.
 - **El gas se ve de noche:** la nube lleva un velo mínimo en toda la mancha, más brillo propio y un filo más claro en el contorno (`ground_fx`, modo 4).
 - **Caso extremo, medido con el PC libre** (sin el programa de descargas): con lente, bobina, fórmula, resonador, signo, gas y bumerán de guerra a nivel 6, la fase 18 costaba +0,43 ms en p1_n2 y +1,0 ms en p2_n2. Casi la mitad eran las chispas de impacto (`hit_sparks=false` lo separa): con tantas armas golpeando había hasta seis emisores encendidos por tipo, más el destello de la evolución. Ahora `HitSparks.POOL` es 4 (antes 6), `PER_FRAME` es 3 (antes 4) y el destello cuenta para el tope. Medido de nuevo en p2_n2, 3 veces: de 9,66 a 9,84 ms (+0,18).
+
+### Propuestas pendientes tras la fase 18 (ofrecidas al autor el 07-11-2026; sin hacer)
+
+- Que el aviso de evolución (16.15) use el color del acento de su rama (`FxAccent`), para que coincida con lo que se ve en la partida.
+- La red de Innsmouth y el trapezoedro se quedaron sin retocar en la fase 18: hilos que se tensan en la red y halo en celdas (`FxShade`) en el trapezoedro. Tampoco se tocaron West ni Shub-Niggurath.
+- Una muestra del destello de cada evolución en el bestiario o en la pausa, junto a su daño (16.27).
+- Sin comprobar en las capturas: el destello de los golpes de las evoluciones (solo lo cubre el test) y el charco del lanzaquímicos con la capa nueva (cayó fuera de plano).
+- Para medir la fase 18: `qset=weapon_fx:0` apaga toda la fase; el caso extremo es `weapons=lente,tesla,formula,resonador,signo,gas,bumeran_guerra wlevel=6` en p2_n2 (9,66 -> 9,84 ms).
+
