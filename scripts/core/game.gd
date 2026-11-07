@@ -216,6 +216,10 @@ func _ready() -> void:
 	world.obstacles = arena.get_meta("obstacles")
 	add_child(world)
 	Combos.attach(world, is_guest())                 # combinaciones en cooperativo (hito 13.7)
+	HitSparks.enabled = args.get_bool("hit_sparks", true)
+	HitSparks.setup(world)                           # impactos según el daño (hito 18.3)
+	Casings.enabled = args.get_bool("casings", true)
+	Casings.setup(world)                             # casquillos (hito 18.4)
 	_lap("mundo")
 	gems = GemManager.new()
 	gems.world = world

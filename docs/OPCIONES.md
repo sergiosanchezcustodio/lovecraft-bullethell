@@ -109,6 +109,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `card=true`: con `shots=`, enseña también el rótulo del nivel al empezar (`LevelCard`; sin él, las capturas no lo llevan).
   - `mando=true`: en las pruebas lanzadas desde Claude Code, deja usar los mandos (sin él, la partida no les hace caso). `ver=true`: deja su ventana a la vista, centrada (sin él, va fuera de las pantallas).
   - `blast=x,z,t;…` y `crate=x,z,t;…`: explosiones ahí a esos s y rompibles que se rompen a esos s (capturas del hito 12.11).
+  - `hit_sparks=false`: sin las chispas de los impactos según el daño (hito 18.3, `HitSparks`). `casings=false`: sin casquillos (hito 18.4, `Casings`). En Baja no salen ninguno de los dos.
   - `trails=false`: sin las estelas de las armas (hito 18.1, `FxTrails`); en Baja no salen (`weapon_fx` 0, `qset=weapon_fx:2` para verlas).
   - `qset=clave:valor,…`: cambia claves sueltas del preajuste de calidad para esta ejecución (`qset=traces:false,vents:false,shot_light:true`), para comparar con `tools/comparar.py`.
   - `distant_soon=true`: el primer suceso lejano de la arena sale en cuanto se vea (hito 17.18, capturas).

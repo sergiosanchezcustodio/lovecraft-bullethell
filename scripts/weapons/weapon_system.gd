@@ -301,6 +301,7 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 		w.muzzle_frame = Engine.get_physics_frames()
 		world.bullets.muzzle(player.global_position + dir * 0.55)
 		player.muzzle_flash(dir)                       # y un destello de luz (hito 11.3)
+		Casings.eject(player.global_position + dir * 0.3 + Vector3(0, 0.85, 0), dir, w.data.bullet_look)   # hito 18.4
 	if w.had_target:
 		var g := w.data.gesture_of()
 		if g == "shot" or g == "shot2": player.gesture(g, dir, 1.0, w.stat("cooldown"))

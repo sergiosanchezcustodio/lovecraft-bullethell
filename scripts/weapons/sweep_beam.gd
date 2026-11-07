@@ -23,6 +23,7 @@ var _light: OmniLight3D
 var _ghost: MeshInstance3D
 var _ghost_mat: StandardMaterial3D
 var _motes: GPUParticles3D
+var _shaded := false
 
 const FADE := 0.25
 
@@ -49,6 +50,7 @@ func _ready() -> void:
 	_ghost.mesh = _beam.mesh
 	_ghost_mat = _mat.duplicate()
 	_ghost.material_override = _ghost_mat
+	_shaded = FxShade.apply(_beam, "lamp") and FxShade.apply(_ghost, "lamp")   # rampa y ondas (hito 18.2)
 	_ghost.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(_ghost)
 	_motes = VoxelFx.emitter("beam_motes", length, false, true, Color(0.9, 0.7, 0.3))
@@ -93,6 +95,9 @@ func _process(_delta: float) -> void:
 	_beam.global_rotation = Vector3(0, -_angle, 0)
 	_beam.scale = Vector3(length, 1, half * 2.0 * (0.85 + 0.15 * sin(_t * 30.0)))
 	_mat.albedo_color = Color(1.0, 0.82, 0.4, 0.55 * k)
+	if _shaded:
+		FxShade.set_fade(_beam, k)
+		FxShade.set_fade(_ghost, 0.45 * k, Color(1.0, 0.6, 0.3))
 	var lag := _angle - deg_to_rad(signf(speed) * 14.0)
 	var gdir := Vector3(cos(lag), 0, sin(lag))
 	_ghost.global_position = o + gdir * length * 0.5 + Vector3(0, 0.88, 0)

@@ -573,9 +573,9 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | Hito | Contenido | Estado |
 |---|---|---|
 | 18.1 | **Estelas:** una cinta que sigue a lo que se mueve (proyectil, hoja, bumerán, páginas), con degradado de color a lo largo, que se estrecha y se apaga; escalonada a píxel grande. Reciclada | **Hecho (07-11-2026), pendiente de tu revisión:** `FxTrails`, dos tiras de triángulos para todas las del nivel; recetas en `data/weapon_fx.json`; en el bumerán, la llave, las páginas, el ancla, los drones y lo que se lanza. En Baja, sin estelas; en Media, más cortas (`weapon_fx`). Sin coste apreciable (9,55 → 9,49 ms) |
-| 18.2 | **Sombreador de efectos:** rampa de color, ruido que se desplaza, bordes escalonados y disolución, para haces, arcos, zonas y círculos en el suelo | Pendiente |
-| 18.3 | **Impactos según el daño:** chispas de cubitos y destello breve, distintos para bala, corte, golpe, fuego, ácido y arcano | Pendiente |
-| 18.4 | **Al disparar:** humo en la boca del cañón y casquillos de cubitos que rebotan en el suelo (con tope) | Pendiente |
+| 18.2 | **Sombreador de efectos:** rampa de color, ruido que se desplaza, bordes escalonados y disolución, para haces, arcos, zonas y círculos en el suelo | **Hecho (07-11-2026), pendiente de tu revisión:** `FxShade`, un material por receta con la rampa en tramos y lo de cada uso por instancia. Modo haz, estrenado en la lámpara de Alhazred; los demás modos llegan con sus armas |
+| 18.3 | **Impactos según el daño:** chispas de cubitos y destello breve, distintos para bala, corte, golpe, fuego, ácido y arcano | **Hecho (07-11-2026), pendiente de tu revisión:** `HitSparks`, siete tipos (y rayo), con emisores reciclados y tope por fotograma y por enemigo |
+| 18.4 | **Al disparar:** humo en la boca del cañón y casquillos de cubitos que rebotan en el suelo (con tope) | **Hecho (07-11-2026), pendiente de tu revisión:** el humo ya estaba; `Casings`, latón, fusil y cartucho rojo, en un MultiMesh con tope de 64. Bloque A medido: +0,14 ms en p1_n2, nada en p2_n2 |
 
 ### Bloque B: cuerpo a cuerpo
 

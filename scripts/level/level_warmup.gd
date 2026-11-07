@@ -101,7 +101,9 @@ static func start(parent: Node, level: LevelData, at: Vector3) -> LevelWarmup:
 		var made := Ambient.make_shade(Ambient.fear_cfg())
 		w.add_child(made[0])
 		(made[0] as Node3D).position = Vector3(1.5, -DEPTH, 1.5)
-	FxTrails.prime(parent.get_tree(), at + Vector3(0, 0.5, 0))        # las estelas de las armas (hito 18.1)
+	FxTrails.prime(parent.get_tree(), at + Vector3(0, 0.5, 0))
+	FxShade.prime(w, Vector3(0, 0.6 - DEPTH, 0))                 # el sombreador de efectos (hito 18.2)
+	HitSparks.prime(w.global_position)                          # las chispas de los impactos (hito 18.3)        # las estelas de las armas (hito 18.1)
 	last_models = list.size()
 	return w
 

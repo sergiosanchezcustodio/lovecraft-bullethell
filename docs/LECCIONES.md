@@ -246,3 +246,7 @@ En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra c
 - **`ImmediateMesh` vértice a vértice es caro desde GDScript:** 15 estelas con seis vértices por punto costaban 0,7 ms de CPU por fotograma (unos 2 µs por punto). Lo que hay que rehacer cada fotograma va en arrays empaquetados y un `add_surface_from_arrays`, con los menos vértices posibles (una tira de triángulos: dos por punto, sin índices), y lo que no cambia (colores, anchos por tramo) se calcula una vez.
 - **Los arrays empaquetados se copian al escribirlos** si están guardados en otro sitio: `var v: PackedVector3Array = lista[0]` y luego `v.append(...)` copia el array entero. Si varias funciones escriben en el mismo, que sea una variable del nodo.
 - **Lo que se puede pintar en el sombreador no va en vértices:** las franjas de los bordes de la estela salen de `UV.y` en el fragmento, no de cuatro vértices más por punto.
+
+## Lo que solo se ve no usa el azar de la partida (fase 18, 07-11-2026)
+
+- Un efecto visual que llama a `randf()` cambia la secuencia del generador global, y con la misma semilla la partida sale distinta: otras mejoras, otros enemigos. Así no se pueden comparar dos configuraciones, y cambia lo que debería repetirse con una semilla (partida del día, archivo, repetición). Los efectos nuevos llevan su propio `RandomNumberGenerator` (`static var _rng`).

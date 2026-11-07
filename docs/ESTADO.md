@@ -2484,3 +2484,26 @@ Pedida por el autor y decidida en D-50: estilo voxel con degradados y la fase co
 - **Calentamiento:** `LevelWarmup` dibuja una de cada mezcla junto al jugador, con transparencia 1/255.
 - **Rendimiento:** la primera versión, con `ImmediateMesh` y seis vértices por punto, costaba 2 ms de media (0,7 ms de CPU solo en calcular 15 estelas). Con la tira y la tabla, la diferencia no se ve. `comparar.py`, p2_n2, 3 veces, con bumerán, Necronomicón, granada y Mi-Go a nivel 6: sin estelas, 9,55 ms y 1 % peor 16,70 ms; con ellas, 9,49 ms y 16,74 ms.
 - **Prueba:** `test_la_estela_sigue_y_se_apaga_cuando_se_va_su_dueno` (`tests/test_hit_fx.gd`). 780 de 780.
+
+### Hito 18.2: sombreador de efectos (07-11-2026)
+
+- **`FxShade`** (`scripts/fx/fx_shade.gd`, `fx_shade.gdshaderinc` con sus variantes `_add` y `_mix`; funciones comunes en `fx_common.gdshaderinc`): sobre una caja o un plano escalado, parte la forma en celdas de voxel del mundo (`cell`), calcula el «calor» de cada celda, lo escalona en `steps` tramos y toma color y opacidad de la rampa de su receta. Un material compartido por receta (`data/weapon_fx.json`, `shades`); el desvanecerse, el tinte y la semilla van por instancia (`instance uniform`, `FxShade.set_fade`), así que no se crean materiales en partida. `LevelWarmup` dibuja una caja con cada receta (`FxShade.prime`).
+- **Modo 0, haz:** brillante en el eje y cerca del origen, con ondas que corren hacia la punta y chispas sueltas. Estrenado en la **lámpara de Alhazred** (`SweepBeam`, receta `lamp`): el haz y su estela, que eran barras amarillas lisas, tienen ahora un centro casi blanco, bordes rojizos y celdas a escalones.
+- Con `weapon_fx` 0 (Baja), cada arma usa su material liso de antes.
+
+### Hito 18.3: impactos según el daño (07-11-2026)
+
+- **`HitSparks`** (`scripts/fx/hit_sparks.gd`): en cada golpe que no es continuo, una chispa breve de cubitos según el tipo de impacto. Bala: chispas que rebotan hacia quien dispara. Corte: un destello de acero y esquirlas de icor. Golpe: polvo y cascotes. Fuego: brasas. Ácido: gotas verdes. Arcano: motas que suben girando. Rayo: chispazos azules. Recetas `hit_*` en `VoxelFx.emitter`.
+- **Tipo de impacto:** por `Damage.how` (fuego, rayo), por ser solo mental (arcano) o por la forma del arma (`WeaponData.delivery`, con caché por etiqueta del arma).
+- **Coste acotado:** seis emisores reciclados por tipo, montados al crear el mundo (`HitSparks.setup`), ninguno creado en partida. Como mucho cuatro chispas por fotograma y una cada 0,09 s por enemigo. En Media, la mitad. `LevelWarmup` enciende una de cada tipo bajo el suelo. `hit_sparks=false` las quita.
+
+### Hito 18.4: casquillos (07-11-2026)
+
+- El fogonazo ya llevaba humo (11-10-2026), así que el hito se queda en los casquillos.
+- **`Casings`** (`scripts/fx/casings.gd`): cada disparo de un arma de fuego suelta un casquillo que salta a la derecha del cañón, gira, rebota dos o tres veces y se queda tumbado antes de encogerse (2,4 s). Latón para las pistolas y los subfusiles, más largo para los fusiles, rojo para los cartuchos de escopeta; los dardos, los arpones y demás no sueltan nada.
+- Todos en un `MultiMesh` con tope de 64 (el más viejo deja sitio). En Media, la mitad y menos tiempo en el suelo. `casings=false` los quita.
+
+### Bloque A medido (07-11-2026)
+
+- **Azar propio:** los efectos nuevos (`HitSparks`, `Casings`, `FxShade`) usan su propio `RandomNumberGenerator`. Con `randf()`, el mismo del juego, la misma semilla daba otra partida según hubiera efectos o no: otras mejoras elegidas, 755 o 1290 llamadas de dibujo. Así no se podía comparar y, además, cambiaban las partidas con semilla.
+- **`comparar.py`, `qset=weapon_fx:0` contra Alta, 3 veces, 30 s:** p1_n2, media de 7,28 a 7,42 ms y 1 % peor de 13,87 a 13,96 ms; p2_n2, de 8,52 a 8,53 ms y de 16,12 a 15,61 ms. Sin compilaciones nuevas a mitad de partida. 782 de 782.

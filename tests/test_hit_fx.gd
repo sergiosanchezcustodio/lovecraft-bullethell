@@ -151,3 +151,26 @@ func test_la_estela_sigue_y_se_apaga_cuando_se_va_su_dueno() -> void:
 	assert_eq(t._trails.size(), 0, "sin dueño y sin cola, se quita")
 	FxTrails._inst = null
 	Quality._over = keep_over
+
+func test_tipo_de_impacto_segun_el_dano() -> void:
+	var d := Damage.new(5.0, 0.0)
+	d.how = &"burn"
+	assert_eq(HitSparks.kind_of(d), "fire", "fuego por cómo mata")
+	var m := Damage.new(0.0, 4.0)
+	assert_eq(HitSparks.kind_of(m), "arcane", "solo mental: arcano")
+	var c := Damage.new(5.0, 0.0)
+	c.tag = &"J1:machete"
+	assert_eq(HitSparks.kind_of(c), "cut", "el machete corta")
+	var b := Damage.new(5.0, 0.0)
+	b.tag = &"J1:webly"
+	assert_eq(HitSparks.kind_of(b), "bullet", "el revólver, bala")
+
+func test_los_casquillos_caen_y_se_quedan_en_el_suelo() -> void:
+	var c := Casings.new()
+	add_child_autofree(c)
+	c._eject(Vector3(0, 0.85, 0), Vector3(1, 0, 0), Casings.LOOKS[""])
+	for k in 120: c._process(1.0 / 60.0)
+	assert_almost_eq(c._pos[0].y, Casings.LOOKS[""][0].x * 0.5, 0.001, "tumbado en el suelo")
+	assert_eq(c._vel[0], Vector3.ZERO, "quieto")
+	for k in 120: c._process(1.0 / 60.0)
+	assert_eq(c.multimesh.visible_instance_count, 1, "uno, ya encogido del todo")

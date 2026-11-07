@@ -513,6 +513,102 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.05; m.scale_max = 0.13
 			m.color_ramp = _ramp([[0.0, Color(0.32, 0.27, 0.22, 1.0)], [0.85, Color(0.2, 0.17, 0.15, 1.0)],
 				[1.0, Color(0.2, 0.17, 0.15, 0.0)]])
+		"hit_bullet":             # impacto de bala (hito 18.3): chispas que rebotan hacia quien dispara
+			p.draw_pass_1 = cube("add")
+			p.amount = 7
+			p.lifetime = 0.28
+			p.explosiveness = 1.0
+			m.direction = Vector3(0, 0.35, 1)
+			m.spread = 38.0
+			m.initial_velocity_min = 3.0; m.initial_velocity_max = 6.5
+			m.damping_min = 6.0; m.damping_max = 10.0
+			m.gravity = Vector3(0, -12.0, 0)
+			m.scale_min = 0.03; m.scale_max = 0.0625
+			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.3]])
+			m.color_ramp = _ramp([[0.0, Color(1.0, 1.0, 0.85, 1.0)], [0.35, Color(1.0, 0.8, 0.35, 1.0)],
+				[0.7, Color(0.9, 0.38, 0.1, 0.8)], [1.0, Color(0.4, 0.1, 0.02, 0.0)]])
+		"hit_cut":                # corte: un destello de acero y esquirlas de icor que caen
+			p.draw_pass_1 = cube("mix")
+			p.amount = 8
+			p.lifetime = 0.42
+			p.explosiveness = 1.0
+			m.direction = Vector3(0, 0.6, 1)
+			m.spread = 60.0
+			m.initial_velocity_min = 1.6; m.initial_velocity_max = 3.6
+			m.damping_min = 2.0; m.damping_max = 4.0
+			m.gravity = Vector3(0, -11.0, 0)
+			m.scale_min = 0.04; m.scale_max = 0.08
+			m.color_ramp = _ramp([[0.0, Color(0.95, 0.98, 1.0, 1.0)], [0.12, Color(0.45, 0.62, 0.22, 1.0)],
+				[0.6, Color(0.24, 0.36, 0.12, 0.95)], [1.0, Color(0.12, 0.18, 0.06, 0.0)]])
+		"hit_blunt":              # golpe: polvo y cascotes que saltan bajos
+			p.draw_pass_1 = cube("mix")
+			p.amount = 8
+			p.lifetime = 0.5
+			p.explosiveness = 1.0
+			m.direction = Vector3(0, 0.5, 1)
+			m.spread = 75.0
+			m.initial_velocity_min = 1.2; m.initial_velocity_max = 3.0
+			m.damping_min = 2.0; m.damping_max = 4.0
+			m.gravity = Vector3(0, -9.0, 0)
+			m.scale_min = 0.05; m.scale_max = 0.11
+			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.6]])
+			m.color_ramp = _ramp([[0.0, Color(0.72, 0.66, 0.56, 0.95)], [0.6, Color(0.5, 0.45, 0.38, 0.7)],
+				[1.0, Color(0.35, 0.32, 0.28, 0.0)]])
+		"hit_fire":               # fuego: brasas que suben y se apagan
+			p.draw_pass_1 = cube("add")
+			p.amount = 6
+			p.lifetime = 0.5
+			p.explosiveness = 0.9
+			m.direction = Vector3(0, 1, 0.4)
+			m.spread = 35.0
+			m.initial_velocity_min = 0.8; m.initial_velocity_max = 2.0
+			m.damping_min = 1.0; m.damping_max = 2.0
+			m.gravity = Vector3(0, 2.5, 0)
+			m.scale_min = 0.04; m.scale_max = 0.08
+			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.2]])
+			m.color_ramp = _ramp([[0.0, Color(1.0, 0.92, 0.6, 1.0)], [0.3, Color(1.0, 0.55, 0.15, 1.0)],
+				[0.75, Color(0.7, 0.18, 0.04, 0.7)], [1.0, Color(0.2, 0.05, 0.02, 0.0)]])
+		"hit_acid":               # ácido: gotas verdes que saltan y caen
+			p.draw_pass_1 = cube("add")
+			p.amount = 7
+			p.lifetime = 0.45
+			p.explosiveness = 1.0
+			m.direction = Vector3(0, 0.8, 0.5)
+			m.spread = 55.0
+			m.initial_velocity_min = 1.4; m.initial_velocity_max = 3.0
+			m.gravity = Vector3(0, -10.0, 0)
+			m.scale_min = 0.035; m.scale_max = 0.07
+			m.color_ramp = _ramp([[0.0, Color(0.85, 1.0, 0.55, 1.0)], [0.4, Color(0.5, 0.9, 0.2, 0.9)],
+				[1.0, Color(0.15, 0.4, 0.05, 0.0)]])
+		"hit_arcane":             # arcano: motas violáceas que suben girando
+			p.draw_pass_1 = cube("add")
+			p.amount = 6
+			p.lifetime = 0.6
+			p.explosiveness = 0.8
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = 0.18
+			m.direction = Vector3(0, 1, 0)
+			m.spread = 30.0
+			m.initial_velocity_min = 0.6; m.initial_velocity_max = 1.4
+			m.gravity = Vector3(0, 1.2, 0)
+			m.tangential_accel_min = 2.0; m.tangential_accel_max = 4.0
+			m.scale_min = 0.035; m.scale_max = 0.07
+			m.scale_curve = _curve([[0.0, 0.4], [0.3, 1.0], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.95, 0.85, 1.0, 1.0)], [0.4, Color(0.65, 0.4, 1.0, 0.9)],
+				[1.0, Color(0.25, 0.1, 0.5, 0.0)]])
+		"hit_shock":              # rayo: chispazos azules rápidos en todas direcciones
+			p.draw_pass_1 = cube("add")
+			p.amount = 8
+			p.lifetime = 0.22
+			p.explosiveness = 1.0
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = 0.15
+			m.spread = 180.0
+			m.initial_velocity_min = 2.5; m.initial_velocity_max = 5.0
+			m.damping_min = 8.0; m.damping_max = 12.0
+			m.scale_min = 0.025; m.scale_max = 0.05
+			m.color_ramp = _ramp([[0.0, Color(1.0, 1.0, 1.0, 1.0)], [0.3, Color(0.6, 0.8, 1.0, 1.0)],
+				[1.0, Color(0.2, 0.35, 1.0, 0.0)]])
 		"sparks":                 # chispas rápidas de la explosión
 			p.draw_pass_1 = cube("add")
 			p.amount = int(clampf(r * 10.0, 14.0, 30.0))

@@ -602,6 +602,7 @@ func take_damage(d: Damage) -> void:
 		killed_how = d.how
 		world.record_kill(d.tag, global_position)
 	_hit_flash()
+	HitSparks.hit(world, self, d, hit_radius * 0.8, 0.6 * model_scale)   # impacto según el daño (hito 18.3)
 	_knock += Vector3(d.knockback.x, 0, d.knockback.z) * (2.5 if not data.elite else 0.6)
 	_hit_pose(d, dealt)
 	var big := data.elite or data.unique
