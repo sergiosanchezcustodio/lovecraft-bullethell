@@ -111,3 +111,21 @@ func test_manchas_con_tope() -> void:
 	gm._process(GroundMarks.LINGER)
 	assert_eq(gm.count(), 0, "y las demás, al acabar su rato")
 	GroundMarks.limit = keep
+
+## VoxelFx.keep (07-11-2026): una copia por shader distinto; los colores no cuentan.
+func test_keep_guarda_una_copia_por_shader() -> void:
+	VoxelFx._kept.clear()
+	var a := StandardMaterial3D.new()
+	a.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var b := StandardMaterial3D.new()
+	b.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	b.albedo_color = Color(0.2, 0.9, 0.1, 0.3)
+	VoxelFx.keep(a)
+	VoxelFx.keep(b)
+	assert_eq(VoxelFx._kept.size(), 1, "mismo shader: una copia")
+	var c := StandardMaterial3D.new()
+	c.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	VoxelFx.keep(c)
+	assert_eq(VoxelFx._kept.size(), 2, "otro shader: otra copia")
+	assert_ne(VoxelFx._kept.values()[0], a, "es una copia, no el material de quien lo usa")
+	VoxelFx._kept.clear()

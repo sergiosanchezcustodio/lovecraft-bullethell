@@ -9,6 +9,9 @@ extends RefCounted
 const LIMIT := 16.7
 const WORST := 12
 const HITCH := 25.0                       ## tirón que se nota: más de 25 ms
+## Tope de filas (07-11-2026): cada una pesa unos 9 KB; una medición colgada llegó a 13 GB. Con
+## 120 000 (unos 20 min a 100 fps, ~1 GB) deja de apuntar y el informe lo dice.
+const MAX_ROWS := 120000
 
 var _vp: RID
 var _prev_prof := {}
@@ -151,6 +154,7 @@ func _close() -> void:
 			var dv := int(_pipe_by[k]) - int(before.get(k, 0))
 			if dv > 0: ptypes[k] = dv
 	var phys := Engine.get_physics_frames()
+	if _rows.size() >= MAX_ROWS: first = true             # lleno: ya no apunta
 	if not first:
 		var otro := maxf(ms - proc_ms - phys_ms, 0.0)
 		_rows.append({
@@ -204,6 +208,7 @@ func report() -> String:
 	var out: PackedStringArray = []
 	out.append("PICOS %d de %d fotogramas pasan de %.1f ms (shaders compilados en total: %d)" % [spikes.size(), _rows.size(), LIMIT,
 		_rows.reduce(func(a: int, r: Dictionary) -> int: return a + int(r.shaders), 0)])
+	if _rows.size() >= MAX_ROWS: out.append("PICOS ojo: tope de %d fotogramas; los de después no se apuntaron" % MAX_ROWS)
 	var worst := 0.0
 	for r in _rows: worst = maxf(worst, float(r.ms))
 	var hitches := _rows.filter(func(r: Dictionary) -> bool: return r.ms > HITCH)

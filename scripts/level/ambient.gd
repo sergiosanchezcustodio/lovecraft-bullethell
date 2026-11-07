@@ -2365,7 +2365,9 @@ func _shade_step(delta: float, fc: Dictionary) -> void:
 		_spawn_shade(Vector3(p.x, 0.0, p.z), fc)
 		return
 
-func _spawn_shade(at: Vector3, fc: Dictionary) -> void:
+## Una sombra: el modelo en negro transparente y dos ojos pálidos. Devuelve [nodo, materiales]
+## (con la transparencia a 0; la anima `_shade_step`). La usa también `LevelWarmup`.
+static func make_shade(fc: Dictionary) -> Array:
 	var b := Node3D.new()
 	var m := VoxelBuilder.load_model("res://models/%s.json" % String(fc.get("model", "cultista")))
 	var mats: Array = []
@@ -2381,18 +2383,26 @@ func _spawn_shade(at: Vector3, fc: Dictionary) -> void:
 	b.add_child(m)
 	for sx in [-1, 1]:                                           # dos ojos pálidos: de noche es lo único que se ve
 		var e := MeshInstance3D.new()
-		var em := BoxMesh.new()
-		em.size = Vector3(0.045, 0.025, 0.02)
 		var eye := StandardMaterial3D.new()
 		eye.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		eye.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		eye.albedo_color = Color(0.85, 0.82, 0.6, 0.0)
-		em.material = eye
-		e.mesh = em
+		e.mesh = VoxelFx.box(Vector3(0.045, 0.025, 0.02))
+		e.material_override = eye
 		e.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		e.position = Vector3(sx * 0.055, float(fc.get("eye_y", 1.56)), 0.17)
 		b.add_child(e)
 		mats.append(eye)
+	# cada sombra se lleva sus materiales al irse a los 3-6 s, y la siguiente compilaba otra vez sus
+	# shaders (3 cada 10-20 s, 07-11-2026): una copia de cada uno, siempre viva
+	VoxelFx.keep(mats[0])
+	VoxelFx.keep(mats[-1])
+	return [b, mats]
+
+func _spawn_shade(at: Vector3, fc: Dictionary) -> void:
+	var made := make_shade(fc)
+	var b: Node3D = made[0]
+	var mats: Array = made[1]
 	add_child(b)
 	b.position = at
 	b.scale = Vector3.ONE * _rng.randf_range(1.0, 1.25)
@@ -2801,6 +2811,7 @@ func _phantom_step(delta: float) -> void:
 			mi.material_override = sm
 			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			mats.append(sm)
+		if not mats.is_empty(): VoxelFx.keep(mats[0])            # que su shader no se libere al irse (07-11-2026)
 		lying.add_child(m)
 		lying.rotation.x = -PI * 0.5
 		holder.add_child(lying)
@@ -3340,6 +3351,7 @@ func _make_ship(p: Vector2, vel: Vector2) -> void:
 		halo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		b.add_child(halo)
 		mats.append([hm, hl[3]])
+	for mt: Array in mats: VoxelFx.keep(mt[0])                                          # que sus shaders no se liberen (07-11-2026)
 	add_child(b)
 	b.position = Vector3(p.x, float(_sea.get("level", 0.0)), p.y)
 	var yaw := atan2(-vel.y, vel.x)                                                     # la proa (+X del barco) hacia donde va

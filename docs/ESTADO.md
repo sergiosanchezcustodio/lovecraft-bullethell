@@ -2437,3 +2437,12 @@ Ofrecidas al cerrar la fase 10 (26-10-2026):
 
 Ofrecidas tras la dificultad del 1 al 10 (29-10-2026), 22 de todo tipo:
 - El autor las quiere todas: son la fase 13 (`docs/ROADMAP.md`, plan propuesto). La idea 3 («usar la dificultad de mi última partida») ya la cumplía `dif_levels`, que se conserva entre sesiones; en el plan pasa a ser un historial de combinaciones con su resultado.
+
+### Shaders que se liberaban y el fotograma de 320 ms (07-11-2026)
+
+- **La causa:** las sombras del miedo (`Ambient._spawn_shade`, cultistas negros y transparentes al borde de la vista) creaban sus materiales y se los llevaban al irse a los 3-6 s. Godot libera el shader de una combinación de `StandardMaterial3D` cuando ya no la usa nadie, así que cada sombra nueva compilaba otra vez los suyos: 3 cada 10-20 s mientras hubiera miedo (la semilla 12 baja la cordura del bot; la 11, casi no), 15-25 ms cada vez, y la primera, en frío, 320-330 ms (6 shaders). Las subidas de nivel del bot no tenían que ver (0,7 ms; las trazas de la investigación no se quedan).
+- **El arreglo:** `VoxelFx.keep(material)` guarda una copia de cada combinación (la clave, `_shader_key`, con banderas, características, modos y texturas: GDScript no da el shader de un material). Lo usan las sombras, las sombras sin dueño (`phantoms`) y los barcos. La sombra sale en `Ambient.make_shade` y `LevelWarmup` dibuja una al empezar.
+- **Con la semilla 12, 100 s:** las compilaciones a mitad de partida, de 11 a 6. Las 9 sombras compilan una sola vez (4 shaders, 12,6 ms, la primera: lo que dibuja el calentamiento bajo el suelo no lleva la misma luz). Sin el fotograma de 320 ms; el peor, 39,8 ms. Captura: la sombra se ve igual.
+- **SpikeLog con tope:** 120 000 filas (`MAX_ROWS`, unos 20 min a 100 fps y 1 GB); después deja de apuntar y el informe lo dice.
+- Prueba: `test_keep_guarda_una_copia_por_shader`. 779 de 779.
+

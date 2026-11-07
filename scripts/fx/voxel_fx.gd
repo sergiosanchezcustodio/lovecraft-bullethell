@@ -104,6 +104,27 @@ static func box1() -> BoxMesh:
 		_box1.size = Vector3.ONE
 	return _box1
 
+## Una copia de cada material que se crea y se suelta una y otra vez (07-11-2026): Godot libera el
+## shader de una combinación de StandardMaterial3D cuando ya no la usa nadie, y la siguiente vez lo
+## compila de nuevo (un tirón cada vez; el primero, en frío, de hasta 320 ms). Con una copia viva,
+## el shader y sus pipelines se quedan. Una por shader: llamarlo con cada material nuevo es barato.
+static var _kept := {}
+
+static func keep(m: BaseMaterial3D) -> void:
+	if m == null: return
+	var k := _shader_key(m)
+	if not _kept.has(k): _kept[k] = m.duplicate()
+
+## Lo que decide qué shader le toca a un BaseMaterial3D (GDScript no da su shader): banderas,
+## características, modos y qué texturas lleva. Los colores y las cifras no cuentan.
+static func _shader_key(m: BaseMaterial3D) -> String:
+	var bits := PackedInt32Array([m.transparency, m.shading_mode, m.blend_mode, m.depth_draw_mode, m.cull_mode,
+		m.diffuse_mode, m.specular_mode, m.billboard_mode, m.texture_filter, m.distance_fade_mode, int(m.proximity_fade_enabled)])
+	for f in BaseMaterial3D.FLAG_MAX: bits.append(int(m.get_flag(f)))
+	for f in BaseMaterial3D.FEATURE_MAX: bits.append(int(m.get_feature(f)))
+	for t in BaseMaterial3D.TEXTURE_MAX: bits.append(int(m.get_texture(t) != null))
+	return ",".join(Array(bits).map(func(v: int) -> String: return str(v)))
+
 static var _boxes := {}
 
 ## Caja de ese tamaño, compartida: para las piezas de tamaño fijo de los efectos (las de tamaño

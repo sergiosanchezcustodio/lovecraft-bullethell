@@ -7,7 +7,7 @@ extends Node3D
 ##    malla de vuelta de la GPU: lento, y antes se hacía con la primera muerte de cada tipo),
 ##  - y lo dibuja unos fotogramas bajo el suelo, delante de la cámara, tal cual, con el destello
 ##    del golpe, con el de los jefes y deshaciéndose: así se compilan sus shaders ahora y no al
-##    aparecer, al recibir el primer golpe o al morir. También el baúl arcano.
+##    aparecer, al recibir el primer golpe o al morir. También el baúl arcano y una sombra del miedo.
 ## `warmup=false` lo quita (para comparar).
 
 const FRAMES := 3                          ## fotogramas que se dibujan antes de quitarlos
@@ -84,6 +84,13 @@ static func start(parent: Node, level: LevelData, at: Vector3) -> LevelWarmup:
 		var c := ArcaneChest.new()
 		w.add_child(c)
 		c.position = Vector3((k % 6) * 2.5 - 6.0, 0.0, (k / 6) * 2.5 - 6.0)
+		k += 1
+	# y una sombra del miedo (07-11-2026: la primera, a mitad de nivel, compilaba 6 shaders en 320 ms)
+	if not Ambient.fear_cfg().is_empty():
+		var made := Ambient.make_shade(Ambient.fear_cfg())
+		for mt: StandardMaterial3D in made[1]: mt.albedo_color.a = 0.5
+		w.add_child(made[0])
+		(made[0] as Node3D).position = Vector3((k % 6) * 2.5 - 6.0, 0.0, (k / 6) * 2.5 - 6.0)
 	last_models = list.size()
 	return w
 
