@@ -177,7 +177,7 @@ func _particles(n: int, lifetime: float) -> GPUParticles3D:
 	return p
 
 func _unshaded(c: Color, billboard: bool) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.vertex_color_use_as_albedo = true

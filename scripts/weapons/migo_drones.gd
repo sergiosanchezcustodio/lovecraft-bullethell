@@ -52,7 +52,7 @@ func _make_orb() -> Node3D:
 	var bm := BoxMesh.new()
 	bm.size = Vector3.ONE * 0.34
 	shell.mesh = bm
-	var sm := StandardMaterial3D.new()
+	var sm := VoxelFx.std()
 	sm.albedo_color = Color(PINK.r * 0.6, PINK.g * 0.5, PINK.b * 0.6, 0.55)
 	sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	sm.roughness = 0.2
@@ -65,7 +65,7 @@ func _make_orb() -> Node3D:
 	var cm := BoxMesh.new()
 	cm.size = Vector3.ONE * 0.16
 	core.mesh = cm
-	var mm := StandardMaterial3D.new()
+	var mm := VoxelFx.std()
 	mm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mm.albedo_color = Color(PINK.r * 0.85, PINK.g * 0.85, PINK.b * 0.85)
 	core.material_override = mm

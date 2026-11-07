@@ -119,10 +119,10 @@ func _step_angles(delta: float) -> void:
 ## La grieta: esquirlas negras y verdes en ángulos que no cuadran, que giran despacio.
 func _angle_mesh(r: float) -> Node3D:
 	var root := Node3D.new()
-	var dark := StandardMaterial3D.new()
+	var dark := VoxelFx.std()
 	dark.albedo_color = Color(0.02, 0.04, 0.03)
 	dark.roughness = 0.2
-	var glow := StandardMaterial3D.new()
+	var glow := VoxelFx.std()
 	glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	glow.albedo_color = Color(0.25, 0.85, 0.45) * 0.8
 	# el pozo en celdas con grietas verdes que no cuadran, y motas que caen hacia dentro (11-10-2026)
@@ -159,7 +159,7 @@ func spawn_wave_at(z: float) -> void:
 	var pm := PlaneMesh.new()
 	pm.size = Vector2(b.size.x, level.wave_width)
 	band.mesh = pm
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.albedo_color = Color(0.3, 0.6, 0.9, 0.25)

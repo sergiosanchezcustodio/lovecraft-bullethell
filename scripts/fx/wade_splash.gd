@@ -38,7 +38,7 @@ static func make() -> GPUParticles3D:
 	p.process_material = pm
 	var box := BoxMesh.new()
 	box.size = Vector3.ONE
-	var bm := StandardMaterial3D.new()
+	var bm := VoxelFx.std()
 	bm.vertex_color_use_as_albedo = true
 	bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED

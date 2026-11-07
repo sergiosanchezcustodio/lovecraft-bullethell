@@ -31,7 +31,7 @@ func _ready() -> void:
 	Damage.ctx = _wtag
 	_blade = MeshInstance3D.new()
 	_blade.mesh = VoxelFx.box(Vector3(0.14, 0.07, blade))      # mallas compartidas (06-11-2026)
-	_mat = StandardMaterial3D.new()
+	_mat = VoxelFx.std()
 	_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_mat.albedo_color = color
@@ -41,7 +41,7 @@ func _ready() -> void:
 	# estela de la hoja (11-10-2026): un trazo aditivo detrás que se estira y se apaga
 	_trail = MeshInstance3D.new()
 	_trail.mesh = VoxelFx.box(Vector3(0.22, 0.03, 1.0))
-	_trail_mat = StandardMaterial3D.new()
+	_trail_mat = VoxelFx.std()
 	_trail_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_trail_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_trail_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD

@@ -43,7 +43,7 @@ func _setup() -> void:
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var bm := BoxMesh.new()
 	bm.size = Vector3(1.0, 0.008, 1.0)
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.vertex_color_use_as_albedo = true

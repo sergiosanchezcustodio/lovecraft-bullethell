@@ -89,7 +89,7 @@ func setup(list: Array, p_camera: Camera3D, p_game: Node, turners: Array) -> Dis
 
 func _silhouette() -> StandardMaterial3D:
 	if _black == null:
-		_black = StandardMaterial3D.new()
+		_black = VoxelFx.std()
 		_black.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		_black.albedo_color = Color(0.01, 0.012, 0.016)
 	return _black
@@ -97,7 +97,7 @@ func _silhouette() -> StandardMaterial3D:
 var _haze_mat: StandardMaterial3D
 func _haze() -> StandardMaterial3D:
 	if _haze_mat == null:
-		_haze_mat = StandardMaterial3D.new()
+		_haze_mat = VoxelFx.std()
 		_haze_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		_haze_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		_haze_mat.albedo_color = Color(0.04, 0.05, 0.08, 0.72)
@@ -106,7 +106,7 @@ func _haze() -> StandardMaterial3D:
 func _lamp(c: Dictionary) -> StandardMaterial3D:
 	if _lamp_mat == null:
 		var col: Array = c.get("color", [1.0, 0.62, 0.25])
-		_lamp_mat = StandardMaterial3D.new()
+		_lamp_mat = VoxelFx.std()
 		_lamp_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		_lamp_mat.albedo_color = Color(col[0], col[1], col[2])
 	return _lamp_mat

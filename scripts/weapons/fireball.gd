@@ -40,7 +40,7 @@ func _ready() -> void:
 	for k in 3:
 		var mi := MeshInstance3D.new()
 		if _mats.size() <= k:                      # materiales y cajas compartidos (06-11-2026)
-			var mat := StandardMaterial3D.new()
+			var mat := VoxelFx.std()
 			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if k == 0 else BaseMaterial3D.TRANSPARENCY_DISABLED
 			mat.albedo_color = [Color(0.8, 0.22, 0.04, 0.55), Color(0.85, 0.5, 0.1), Color(0.9, 0.85, 0.55)][k]

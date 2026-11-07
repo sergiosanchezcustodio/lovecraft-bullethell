@@ -64,7 +64,7 @@ func _bar(w: float, additive: bool) -> MeshInstance3D:
 	var bm := BoxMesh.new()
 	bm.size = Vector3(w, w, 1.0)
 	mi.mesh = bm
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	if additive: m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD

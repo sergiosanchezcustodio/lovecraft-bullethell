@@ -32,7 +32,7 @@ func _ready() -> void:
 	if _bm == null:
 		_bm = BoxMesh.new()
 		_bm.size = Vector3.ONE * 0.11
-		var mat := StandardMaterial3D.new()
+		var mat := VoxelFx.std()
 		mat.albedo_color = Color(0.32, 0.2, 0.12)
 		mat.emission_enabled = true
 		mat.emission = Color(0.9, 0.75, 0.5)

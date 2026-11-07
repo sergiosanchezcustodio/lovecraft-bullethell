@@ -50,7 +50,7 @@ func _bar(size: Vector3, c: Color, additive: bool, k: float) -> MeshInstance3D:
 	mi.mesh = VoxelFx.box1()                        # caja de 1 m compartida (06-11-2026): el tamaño, en la escala
 	mi.scale = size
 	mi.set_meta("size", size)
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	if additive: m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD

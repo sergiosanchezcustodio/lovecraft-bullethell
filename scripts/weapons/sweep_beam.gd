@@ -37,7 +37,7 @@ func setup(p: Player, p_world: CombatWorld, p_length: float, p_half: float, p_sp
 func _ready() -> void:
 	_beam = MeshInstance3D.new()
 	_beam.mesh = VoxelFx.box(Vector3(1, 0.18, 1))   # compartida (06-11-2026)
-	_mat = StandardMaterial3D.new()
+	_mat = VoxelFx.std()
 	_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD

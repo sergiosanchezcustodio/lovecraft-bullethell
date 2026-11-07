@@ -46,7 +46,7 @@ func _ready() -> void:
 			var bm := BoxMesh.new()
 			var w := lerpf(0.42, 0.12, float(i) / BITS)
 			bm.size = Vector3(w, 0.26, w)
-			var m := StandardMaterial3D.new()
+			var m := VoxelFx.std()
 			m.albedo_color = cols[i % 3]
 			m.roughness = 0.4
 			if i == BITS - 1:

@@ -131,7 +131,7 @@ func _ready() -> void:
 	current = self
 	_rubble_n = int(Quality.value("decor_rubble", 40))
 	if _flash_mat == null:
-		_flash_mat = StandardMaterial3D.new()
+		_flash_mat = VoxelFx.std()
 		_flash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		_flash_mat.albedo_color = Color(1, 0.86, 0.66, 0.22)
 		_flash_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -222,7 +222,7 @@ func _rubble(p: Piece) -> void:
 	var ch: Array = _mat(p).get("chunk", [0.06, 0.16])
 	var bm := BoxMesh.new()
 	bm.size = Vector3.ONE
-	var mat := StandardMaterial3D.new()
+	var mat := VoxelFx.std()
 	mat.vertex_color_use_as_albedo = true
 	mat.vertex_color_is_srgb = VoxelBuilder.colors_are_srgb()
 	mat.roughness = 0.95

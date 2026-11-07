@@ -42,10 +42,10 @@ func setup(p_world: CombatWorld, origin: Vector3, p_dir: Vector3, p_length: floa
 
 func _ready() -> void:
 	Damage.ctx = _wtag
-	_crack_mat = StandardMaterial3D.new()
+	_crack_mat = VoxelFx.std()
 	_crack_mat.albedo_color = Color(0.08, 0.1, 0.14)
 	_crack_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_shard_mat = StandardMaterial3D.new()
+	_shard_mat = VoxelFx.std()
 	_shard_mat.albedo_color = Color(0.72, 0.86, 0.95)
 	_shard_mat.roughness = 0.2
 	_shard_mat.metallic = 0.2

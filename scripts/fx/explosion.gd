@@ -48,7 +48,7 @@ func _ready() -> void:
 	# destello del centro: solo los primeros fotogramas, debajo de la bola de cubos
 	_ball = MeshInstance3D.new()
 	_ball.mesh = VoxelFx.box1()
-	_ball_mat = StandardMaterial3D.new()
+	_ball_mat = VoxelFx.std()
 	_ball_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_ball_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_ball_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD

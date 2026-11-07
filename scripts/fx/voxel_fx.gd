@@ -110,6 +110,25 @@ static func box1() -> BoxMesh:
 ## el shader y sus pipelines se quedan. Una por shader: llamarlo con cada material nuevo es barato.
 static var _kept := {}
 
+static var _pending: Array[BaseMaterial3D] = []
+
+## Un StandardMaterial3D nuevo que, al empezar el fotograma siguiente (ya configurado), pasa por
+## `keep`. Úsalo en lo que se crea y se suelta en partida en lugar de `StandardMaterial3D.new()`.
+static func std() -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	if _pending.is_empty():
+		var tree := Engine.get_main_loop() as SceneTree
+		if tree == null: return m
+		tree.process_frame.connect(_flush_pending, CONNECT_ONE_SHOT)
+	_pending.append(m)
+	return m
+
+static func _flush_pending() -> void:
+	var t0 := Prof.start()
+	for m in _pending: keep(m)
+	_pending.clear()
+	Prof.stop("materiales", t0)
+
 static func keep(m: BaseMaterial3D) -> void:
 	if m == null: return
 	var k := _shader_key(m)

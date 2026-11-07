@@ -92,7 +92,7 @@ func _ready() -> void:
 	var m := BoxMesh.new()
 	m.size = Vector3(0.34, 0.015, 0.46)
 	_paper.mesh = m
-	var mat := StandardMaterial3D.new()
+	var mat := VoxelFx.std()
 	mat.albedo_color = Color(0.93, 0.87, 0.72)
 	mat.emission_enabled = true
 	mat.emission = COLOR
@@ -110,7 +110,7 @@ func _ready() -> void:
 	var c := CylinderMesh.new()
 	c.top_radius = 0.18; c.bottom_radius = 0.3; c.height = 6.0
 	_beam.mesh = c
-	var bm := StandardMaterial3D.new()
+	var bm := VoxelFx.std()
 	bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	bm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD

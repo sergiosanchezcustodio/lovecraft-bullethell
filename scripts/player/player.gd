@@ -226,7 +226,7 @@ func _ready() -> void:
 	for mi: MeshInstance3D in model.get_meta("meshes"):
 		mi.material_overlay = _xray
 	if pn.has("glass"):                             # vaho del casco de buzo, con la silueta detrás
-		_fog = StandardMaterial3D.new()
+		_fog = VoxelFx.std()
 		_fog.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		_fog.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		_fog.albedo_color = Color(FOG_TINT, 0.0)
@@ -244,7 +244,7 @@ func _ready() -> void:
 	add_child(_snow)
 	_splash = WadeSplash.make()
 	add_child(_splash)
-	_frozen_mat = StandardMaterial3D.new()          # tinte violeta durante las congelaciones
+	_frozen_mat = VoxelFx.std()          # tinte violeta durante las congelaciones
 	_frozen_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_frozen_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_frozen_mat.albedo_color = Color(UiKit.SANITY * 0.6, 0.45)
@@ -1228,7 +1228,7 @@ func _make_snow_spray() -> GPUParticles3D:
 	p.process_material = pm
 	var box := BoxMesh.new()
 	box.size = Vector3.ONE
-	var bm := StandardMaterial3D.new()
+	var bm := VoxelFx.std()
 	bm.vertex_color_use_as_albedo = true
 	bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -1559,7 +1559,7 @@ func _make_ring() -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	mi.name = "Ring"
 	mi.mesh = st.commit()
-	_ring_mat = StandardMaterial3D.new()
+	_ring_mat = VoxelFx.std()
 	_ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_ring_mat.albedo_color = color
 	_ring_mat.cull_mode = BaseMaterial3D.CULL_DISABLED

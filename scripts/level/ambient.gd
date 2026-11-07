@@ -1331,7 +1331,7 @@ func _ripple_step(delta: float) -> void:
 
 static func _drop_material() -> StandardMaterial3D:
 	if not _mats.has("drop"):
-		var m := StandardMaterial3D.new()
+		var m := VoxelFx.std()
 		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		m.albedo_color = Color(0.5, 0.58, 0.66, 0.75)
@@ -1728,7 +1728,7 @@ static func _hidden_by(p: Vector3, canopies: Array) -> bool:
 func _eye_mat(col: Color) -> StandardMaterial3D:
 	var key := "eye|" + col.to_html()
 	if not _mats.has(key):
-		var m := StandardMaterial3D.new()
+		var m := VoxelFx.std()
 		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		m.albedo_color = col
 		_mats[key] = m
@@ -2246,7 +2246,7 @@ func _gator_step(delta: float) -> void:
 
 func _gator_rise(at: Vector3, c: Dictionary) -> void:
 	var b := Node3D.new()
-	var dark := StandardMaterial3D.new()
+	var dark := VoxelFx.std()
 	dark.albedo_color = Color(0.09, 0.11, 0.07)
 	dark.roughness = 0.35
 	var parts: Array = [[Vector3(0.2, 0.035, 0.6), Vector3(0, 0.0, 0.2)]]   # el morro que apenas asoma
@@ -2372,7 +2372,7 @@ static func make_shade(fc: Dictionary) -> Array:
 	var m := VoxelBuilder.load_model("res://models/%s.json" % String(fc.get("model", "cultista")))
 	var mats: Array = []
 	for mi: MeshInstance3D in m.get_meta("meshes"):
-		var sm := StandardMaterial3D.new()
+		var sm := VoxelFx.std()
 		sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		sm.albedo_color = Color(0.015, 0.012, 0.02, 0.0)
@@ -2383,7 +2383,7 @@ static func make_shade(fc: Dictionary) -> Array:
 	b.add_child(m)
 	for sx in [-1, 1]:                                           # dos ojos pálidos: de noche es lo único que se ve
 		var e := MeshInstance3D.new()
-		var eye := StandardMaterial3D.new()
+		var eye := VoxelFx.std()
 		eye.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		eye.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		eye.albedo_color = Color(0.85, 0.82, 0.6, 0.0)
@@ -2480,7 +2480,7 @@ func _crack_at(at: Vector3) -> void:
 	add_child(root)
 	root.position = at + Vector3(0, 0.01, 0)
 	var segs: Array = []
-	var mat := StandardMaterial3D.new()
+	var mat := VoxelFx.std()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.albedo_color = Color(0.22, 0.34, 0.5, 0.0)
@@ -2556,7 +2556,7 @@ func _gravel_step(delta: float) -> void:
 				var bm := BoxMesh.new()
 				var sz := _rng.randf_range(0.06, 0.14)
 				bm.size = Vector3(sz, sz * 0.8, sz)
-				var mat := StandardMaterial3D.new()
+				var mat := VoxelFx.std()
 				mat.albedo_color = Color(0.36, 0.36, 0.38).darkened(_rng.randf() * 0.3)
 				bm.material = mat
 				st.mesh = bm
@@ -2618,7 +2618,7 @@ func _paper_step(delta: float) -> void:
 		var pp := MeshInstance3D.new()
 		var bm := BoxMesh.new()
 		bm.size = Vector3(0.21, 0.004, 0.28)
-		var mat := StandardMaterial3D.new()
+		var mat := VoxelFx.std()
 		mat.albedo_color = Color(0.86, 0.83, 0.74).darkened(_rng.randf() * 0.25)
 		mat.roughness = 0.95
 		bm.material = mat
@@ -2649,12 +2649,12 @@ func _paper_step(delta: float) -> void:
 var _buoys: Array[Dictionary] = []
 
 func _make_buoys(list: Array) -> void:
-	var red := StandardMaterial3D.new()
+	var red := VoxelFx.std()
 	red.albedo_color = Color(0.55, 0.12, 0.08)
 	red.roughness = 0.6
-	var dark := StandardMaterial3D.new()
+	var dark := VoxelFx.std()
 	dark.albedo_color = Color(0.12, 0.12, 0.12)
-	var brass := StandardMaterial3D.new()
+	var brass := VoxelFx.std()
 	brass.albedo_color = Color(0.55, 0.45, 0.22)
 	brass.metallic = 0.6
 	brass.roughness = 0.4
@@ -2803,7 +2803,7 @@ func _phantom_step(delta: float) -> void:
 		var m := VoxelBuilder.load_model("res://models/%s.json" % String(models[_rng.randi() % models.size()]))
 		var mats: Array = []
 		for mi: MeshInstance3D in m.get_meta("meshes"):
-			var sm := StandardMaterial3D.new()
+			var sm := VoxelFx.std()
 			sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 			sm.albedo_color = Color(0.0, 0.0, 0.0, 0.0)
@@ -3322,7 +3322,7 @@ func _make_ship(p: Vector2, vel: Vector2) -> void:
 		var mi := MeshInstance3D.new()
 		var bm := BoxMesh.new()
 		bm.size = pr[0]
-		var mt := StandardMaterial3D.new()
+		var mt := VoxelFx.std()
 		mt.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		mt.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		var pc: Color = pr[2]
@@ -3337,7 +3337,7 @@ func _make_ship(p: Vector2, vel: Vector2) -> void:
 		var halo := MeshInstance3D.new()                                               # las luces, borrosas en la lluvia
 		var qm := QuadMesh.new()
 		qm.size = Vector2(hl[1], hl[1])
-		var hm := StandardMaterial3D.new()
+		var hm := VoxelFx.std()
 		hm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		hm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		hm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD

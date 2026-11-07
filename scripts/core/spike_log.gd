@@ -12,6 +12,7 @@ const HITCH := 25.0                       ## tirón que se nota: más de 25 ms
 ## Tope de filas (07-11-2026): cada una pesa unos 9 KB; una medición colgada llegó a 13 GB. Con
 ## 120 000 (unos 20 min a 100 fps, ~1 GB) deja de apuntar y el informe lo dice.
 const MAX_ROWS := 120000
+const SETTLE := 10.0                      ## s medidos tras los que una compilación ya es «a mitad de partida»
 
 var _vp: RID
 var _prev_prof := {}
@@ -222,6 +223,14 @@ func report() -> String:
 		keys.sort()
 		out.append("PICOS tirones por medio minuto (s desde el arranque: cuántos): " + "  ".join(keys.map(func(k: int) -> String: return "%d: %d" % [k, per[k]])))
 	var comp := _rows.filter(func(r: Dictionary) -> bool: return int(r.shaders) > 0)
+	# las de a mitad de partida (07-11-2026), que son las que se notan: las de los primeros
+	# `SETTLE` s medidos son del arranque del nivel
+	var t_first: float = _rows[0].t if not _rows.is_empty() else 0.0
+	var late := comp.filter(func(r: Dictionary) -> bool: return float(r.t) > t_first + SETTLE)
+	var late_worst := 0.0
+	for r in late: late_worst = maxf(late_worst, float(r.ms))
+	out.append("PICOS compilaciones a mitad de partida: %d en %d fotogramas  peor: %.1f ms" % [
+		late.reduce(func(a: int, r: Dictionary) -> int: return a + int(r.shaders), 0), late.size(), late_worst])
 	if not comp.is_empty():
 		var cl := "PICOS compilaciones (s desde el arranque: cuántas, ms del fotograma):"
 		for r in comp: cl += "  %.2f: %d, %.1f" % [r.t, r.shaders, r.ms]

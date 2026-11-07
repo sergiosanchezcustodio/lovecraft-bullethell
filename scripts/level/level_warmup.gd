@@ -85,12 +85,13 @@ static func start(parent: Node, level: LevelData, at: Vector3) -> LevelWarmup:
 		w.add_child(c)
 		c.position = Vector3((k % 6) * 2.5 - 6.0, 0.0, (k / 6) * 2.5 - 6.0)
 		k += 1
-	# y una sombra del miedo (07-11-2026: la primera, a mitad de nivel, compilaba 6 shaders en 320 ms)
+	# y una sombra del miedo (07-11-2026: la primera, a mitad de nivel, compilaba 6 shaders en 320 ms).
+	# Sobre el suelo, junto al jugador y del todo transparente: invisible, pero se dibuja como en la
+	# partida (bajo el suelo le faltaban 4 de sus pipelines)
 	if not Ambient.fear_cfg().is_empty():
 		var made := Ambient.make_shade(Ambient.fear_cfg())
-		for mt: StandardMaterial3D in made[1]: mt.albedo_color.a = 0.5
 		w.add_child(made[0])
-		(made[0] as Node3D).position = Vector3((k % 6) * 2.5 - 6.0, 0.0, (k / 6) * 2.5 - 6.0)
+		(made[0] as Node3D).position = Vector3(1.5, -DEPTH, 1.5)
 	last_models = list.size()
 	return w
 

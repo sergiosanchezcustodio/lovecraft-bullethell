@@ -121,7 +121,7 @@ static func _lid_for(mesh: Mesh) -> Material:
 	for i in range(0, cols.size(), step):
 		sum += cols[i]
 		n += 1
-	var lid := StandardMaterial3D.new()
+	var lid := VoxelFx.std()
 	lid.albedo_color = Color(sum.r / n, sum.g / n, sum.b / n) * 0.8 if n > 0 else Color(0.2, 0.2, 0.2)
 	lid.roughness = 0.6
 	_lids[mesh] = lid

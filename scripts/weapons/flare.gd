@@ -25,7 +25,7 @@ static var _spark_pm: ParticleProcessMaterial
 static var _spark_box: BoxMesh
 
 static func _shared() -> void:
-	_core_mat = StandardMaterial3D.new()
+	_core_mat = VoxelFx.std()
 	_core_mat.albedo_color = Color(0.7, 0.12, 0.1)
 	_core_mat.emission_enabled = true
 	_core_mat.emission = Color(1.0, 0.35, 0.2)
@@ -41,7 +41,7 @@ static func _shared() -> void:
 	_spark_pm.color = Color(1.0, 0.7, 0.4)
 	_spark_box = BoxMesh.new()                      # propia: lleva el material de las chispas
 	_spark_box.size = Vector3.ONE
-	var pmat := StandardMaterial3D.new()
+	var pmat := VoxelFx.std()
 	pmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	pmat.vertex_color_use_as_albedo = true
 	_spark_box.material = pmat

@@ -2446,3 +2446,20 @@ Ofrecidas tras la dificultad del 1 al 10 (29-10-2026), 22 de todo tipo:
 - **SpikeLog con tope:** 120 000 filas (`MAX_ROWS`, unos 20 min a 100 fps y 1 GB); después deja de apuntar y el informe lo dice.
 - Prueba: `test_keep_guarda_una_copia_por_shader`. 779 de 779.
 
+### Ningún material de partida suelta su shader (07-11-2026)
+
+- **`VoxelFx.std()`** en lugar de `StandardMaterial3D.new()` en los 42 scripts que crean materiales en partida (efectos, armas, ambiente, decorado que se rompe, peligros, recompensas, jugador, enemigos, mascotas, pesca): crea el material y, al empezar el fotograma siguiente (ya configurado), pasa por `VoxelFx.keep`. Fuera, los que no crean nada a mitad de partida (montaje de la arena, constructor de modelos, calentamiento, vista previa, banco, sala de trofeos). Cuesta 57 µs en los fotogramas en que se crea alguno (`Prof`: `materiales`).
+- **La sombra del calentamiento**, sobre el suelo junto al jugador y del todo transparente: invisible, pero dibujada como en la partida (bajo el suelo le faltaban 4 pipelines). Con la semilla 12 y 100 s, ninguna compilación tras el arranque.
+- **SpikeLog** da las compilaciones a mitad de partida («PICOS compilaciones a mitad de partida: N en M fotogramas  peor: X ms», tras los 10 primeros s medidos, `SETTLE`) y `tools/comparar.py` las promedia («a_mitad»).
+- **Antes y después, 5 minutos, alternados** (la de antes, d3f7f58 con el SpikeLog nuevo; las cuatro, cortadas al superar el nivel):
+
+  | semilla | versión | media | 1 % peor | fotogramas > 16,7 ms | tirones > 25 ms | compilaciones a mitad |
+  |---|---|---|---|---|---|---|
+  | 12 | antes | 11,09 ms | 19,37 ms | 1051 | 39 | 10 en 4 fotogramas |
+  | 12 | ahora | 10,96 ms | 18,83 ms | 856 | 25 | 8 en 3 |
+  | 13 | antes | 10,55 ms | 18,83 ms | 800 | 36 | 427 en 142 |
+  | 13 | ahora | 10,15 ms | 17,17 ms | 469 | 7 | 5 en 3 |
+
+  Con la semilla 13 el bot lleva la fisura: cada raja soltaba sus materiales al acabar y la siguiente compilaba otra vez sus shaders, 3 por uso durante toda la partida. Las que quedan son de muertes y explosiones con algo que aún no había salido.
+- 779 de 779; `tools/hoja_poses.gd` (con `-s`, usa `Anims`) sigue funcionando.
+

@@ -127,7 +127,7 @@ func _ring() -> MeshInstance3D:
 	mi.scale = Vector3(1, 0.08, 1)
 	mi.position.y = 0.03
 	mi.set_meta("ground", true)
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.albedo_color = Color(owner_player.color, 0.8)
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

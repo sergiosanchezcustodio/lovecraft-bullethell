@@ -70,7 +70,7 @@ func _box(size: Vector3, c: Color, parent: Node3D) -> MeshInstance3D:
 	var bm := BoxMesh.new()
 	bm.size = size
 	mi.mesh = bm
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.albedo_color = c
 	m.roughness = 0.6
 	m.metallic = 0.3 if c != WOOD else 0.0

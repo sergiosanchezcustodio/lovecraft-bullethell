@@ -17,7 +17,7 @@ func _init() -> void:
 func setup(pos: Vector3, radius: float, life: float) -> NetFx:
 	position = Vector3(pos.x, 0.06, pos.z)
 	_life = life
-	_mat = StandardMaterial3D.new()
+	_mat = VoxelFx.std()
 	_mat.albedo_color = ROPE
 	_mat.roughness = 0.9
 	_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -29,7 +29,7 @@ func setup(pos: Vector3, radius: float, life: float) -> NetFx:
 		_bar(Vector3(0.05, 0.04, half * 2.0), Vector3(o, 0, 0))
 		_bar(Vector3(half * 2.0, 0.04, 0.05), Vector3(0, 0.02, o))
 	if _lead == null:                                # plomos del borde (material y malla compartidos, 06-11-2026)
-		_lead = StandardMaterial3D.new()
+		_lead = VoxelFx.std()
 		_lead.albedo_color = Color(0.3, 0.3, 0.33)
 	for k in 10:
 		var a := TAU * k / 10.0

@@ -49,7 +49,7 @@ func _ready() -> void:
 		if not _cubes.has(ci):                     # cubos, a juego con el voxel (eran esferas); compartidos (06-11-2026)
 			var sm := BoxMesh.new()
 			sm.size = Vector3.ONE * 0.34
-			var m := StandardMaterial3D.new()
+			var m := VoxelFx.std()
 			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			m.albedo_color = cols[ci] * 0.75
 			sm.material = m

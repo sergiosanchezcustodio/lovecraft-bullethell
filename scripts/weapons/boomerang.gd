@@ -43,10 +43,10 @@ func _ready() -> void:
 		reset_physics_interpolation.call_deferred()
 		return
 	if _wood_mat == null:                            # materiales compartidos (06-11-2026)
-		_wood_mat = StandardMaterial3D.new()
+		_wood_mat = VoxelFx.std()
 		_wood_mat.albedo_color = WOOD
 		_wood_mat.roughness = 0.8
-		_paint_mat = StandardMaterial3D.new()
+		_paint_mat = VoxelFx.std()
 		_paint_mat.albedo_color = PAINT
 	for side in [-1, 1]:
 		var arm := MeshInstance3D.new()
@@ -104,7 +104,7 @@ static var _key_mat: StandardMaterial3D
 
 func _key() -> void:
 	if _key_mat == null:
-		_key_mat = StandardMaterial3D.new()
+		_key_mat = VoxelFx.std()
 		_key_mat.albedo_color = Color(0.82, 0.88, 0.98)
 		_key_mat.metallic = 0.6
 		_key_mat.roughness = 0.3

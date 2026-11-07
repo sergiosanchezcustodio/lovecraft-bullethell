@@ -36,7 +36,7 @@ func _ready() -> void:
 	_model_id = m[0]
 	_model = VoxelBuilder.load_model("res://models/%s.json" % m[0])
 	holder.add_child(_model)
-	_mat = StandardMaterial3D.new()
+	_mat = VoxelFx.std()
 	_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_mat.albedo_color = Color(1, 1, 1, 0.8)
 	_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

@@ -54,7 +54,7 @@ func _box(size: Vector3, c: Color, at: Vector3, parent: Node3D, metal := false, 
 	var key := "%s|%s" % [c.to_html(), metal]
 	var m: StandardMaterial3D = null if own else _mats.get(key)
 	if m == null:
-		m = StandardMaterial3D.new()
+		m = VoxelFx.std()
 		m.albedo_color = c
 		m.roughness = 0.45 if metal else 0.85
 		m.metallic = 0.5 if metal else 0.0
@@ -108,7 +108,7 @@ func _ready() -> void:
 		_coin_pm.angular_velocity_max = 360.0
 		_coin = BoxMesh.new()
 		_coin.size = Vector3(0.09, 0.03, 0.09)
-		var cm := StandardMaterial3D.new()
+		var cm := VoxelFx.std()
 		cm.albedo_color = Color(1.0, 0.8, 0.3)
 		cm.metallic = 0.7
 		cm.roughness = 0.3

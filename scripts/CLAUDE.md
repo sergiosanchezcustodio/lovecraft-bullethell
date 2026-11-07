@@ -32,6 +32,7 @@
     - Las arcanas cuestan cordura (`sanity_cost`, multiplicado por `CharacterData.arcane_cost_mult`).
   - Los patrones enemigos también son datos (`BulletPattern`, en `data/patterns/`): radial o en abanico, ráfagas, giro y aviso previo. `PatternRunner` los ejecuta.
   - Efectos: `Telegraph` (aviso en el suelo) y `Explosion`.
+  - **Materiales y mallas en lo que se crea en partida** (07-11-2026): `VoxelFx.std()` en lugar de `StandardMaterial3D.new()` (guarda una copia de cada combinación para que Godot no libere su shader y lo recompile la vez siguiente), y `VoxelFx.box(size)`, `box1()` o `plane2()` en lugar de mallas nuevas en cada uso.
   - Sensación de impacto (fase 11, `scripts/fx/`): `HitStop` (micro-pausa), `Crumble` (el modelo muerto se deshace), `GroundMarks` (manchas con tope), `DamageNumbers` (cifras recicladas), `Ripples` (ondas en el agua, un MultiMesh) y `Gusts` (ráfagas en los globales `gust_a`/`gust_b` que leen `sway` y `flag_wave`). Los que se crean solos cuelgan de `world.fx` y se guardan en su meta.
   - Para pruebas: `TrainingDummy` (objetivo de práctica) y `TestEmitter` (dispara un patrón).
 - **Enemigos** (`scripts/enemies/`):

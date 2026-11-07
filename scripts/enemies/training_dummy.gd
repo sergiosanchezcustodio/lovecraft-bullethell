@@ -28,7 +28,7 @@ func _ready() -> void:
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # se mueve en _process
 	model = VoxelBuilder.load_model("res://models/%s.json" % kind)
 	add_child(model)
-	_flash_mat = StandardMaterial3D.new()
+	_flash_mat = VoxelFx.std()
 	_flash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_flash_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_flash_mat.albedo_color = Color(1, 1, 1, 0.75)

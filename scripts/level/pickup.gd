@@ -47,7 +47,7 @@ func _ready() -> void:
 	var tm := TorusMesh.new()
 	tm.inner_radius = 0.42; tm.outer_radius = 0.5
 	ring.mesh = tm
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.albedo_color = [Color(1.0, 0.45, 0.35), Color(0.75, 0.45, 1.0), Color(1.0, 0.82, 0.3), Color(1.0, 0.55, 0.15), Color(0.45, 0.8, 1.0)][kind]
 	ring.material_override = m

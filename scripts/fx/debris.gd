@@ -43,7 +43,7 @@ func _setup() -> void:
 	_max = maxi(limit, 1)
 	var bm := BoxMesh.new()
 	bm.size = Vector3.ONE
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.vertex_color_use_as_albedo = true
 	m.vertex_color_is_srgb = VoxelBuilder.colors_are_srgb()
 	m.roughness = 0.9

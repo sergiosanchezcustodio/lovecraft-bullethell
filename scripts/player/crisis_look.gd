@@ -90,7 +90,7 @@ static func _make_face(model: Node3D) -> Node3D:
 	return root
 
 static func _mat(c: Color) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.albedo_color = c
 	return m

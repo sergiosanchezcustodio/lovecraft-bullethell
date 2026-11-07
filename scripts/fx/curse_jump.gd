@@ -27,7 +27,7 @@ func _ready() -> void:
 	if _mesh == null:
 		_mesh = BoxMesh.new()
 		_mesh.size = Vector3.ONE * 0.12
-		_mat = StandardMaterial3D.new()
+		_mat = VoxelFx.std()
 		_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		_mat.albedo_color = Color(0.5, 0.15, 0.7, 0.9)

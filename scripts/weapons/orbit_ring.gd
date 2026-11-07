@@ -54,7 +54,7 @@ func _make_page() -> Node3D:
 		add_child(holder)
 		var bm := BoxMesh.new()                       # cadena: eslabones hasta el personaje
 		bm.size = Vector3.ONE * 0.08
-		var mat := StandardMaterial3D.new()
+		var mat := VoxelFx.std()
 		mat.albedo_color = Color(0.35, 0.36, 0.38)
 		mat.metallic = 0.6
 		mat.roughness = 0.5
@@ -72,7 +72,7 @@ func _make_page() -> Node3D:
 	var bm := BoxMesh.new()
 	bm.size = Vector3(0.26, 0.34, 0.04)
 	mi.mesh = bm
-	var mat := StandardMaterial3D.new()
+	var mat := VoxelFx.std()
 	mat.albedo_color = Color(0.86, 0.78, 0.60)
 	mat.emission_enabled = true
 	mat.emission = Color(0.95, 0.72, 0.35)

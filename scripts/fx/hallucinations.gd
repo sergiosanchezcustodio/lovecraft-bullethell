@@ -108,7 +108,7 @@ func _phantom(q: Player) -> void:
 	var model := VoxelBuilder.load_model("res://models/%s.json" % src.model_name)
 	root.add_child(model)
 	if _players().size() > 1:                         # cooperativo: un leve tinte del que alucina
-		var over := StandardMaterial3D.new()
+		var over := VoxelFx.std()
 		over.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		over.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		over.blend_mode = BaseMaterial3D.BLEND_MODE_ADD

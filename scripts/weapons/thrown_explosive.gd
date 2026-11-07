@@ -72,7 +72,7 @@ func _ready() -> void:
 		if not _pieces.has(k):                       # malla y material compartidos por todos los lanzamientos
 			var box := BoxMesh.new()
 			box.size = piece[0]
-			var mat := StandardMaterial3D.new()
+			var mat := VoxelFx.std()
 			mat.albedo_color = piece[1]
 			mat.roughness = 0.8
 			_pieces[k] = [box, mat]

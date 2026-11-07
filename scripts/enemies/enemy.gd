@@ -639,7 +639,7 @@ static func _shared_flash(big: bool) -> StandardMaterial3D:
 	var full := int(Auto.setting("flashes", 1)) == 1
 	var key := "%s|%s" % [big, full]
 	if not _flash_mats.has(key):
-		var m := StandardMaterial3D.new()
+		var m := VoxelFx.std()
 		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		if big:                                    # jefes y gigantes: suma luz
 			m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
@@ -1277,7 +1277,7 @@ func _leave_horde(attach := true) -> void:
 
 func _status(c: Color) -> StandardMaterial3D:
 	if _status_mat == null:
-		_status_mat = StandardMaterial3D.new()
+		_status_mat = VoxelFx.std()
 		_status_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		_status_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_status_mat.albedo_color = c
@@ -1392,7 +1392,7 @@ func set_guard_ring(on: bool) -> void:
 	var tm := TorusMesh.new()
 	tm.inner_radius = 1.1; tm.outer_radius = 1.3
 	guard_ring.mesh = tm
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.albedo_color = Color(0.85, 0.70, 0.30) * 0.8
 	guard_ring.material_override = m

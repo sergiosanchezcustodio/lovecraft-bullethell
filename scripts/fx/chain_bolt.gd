@@ -21,11 +21,11 @@ func setup(points: Array[Vector3]) -> ChainBolt:
 
 func _ready() -> void:
 	Damage.ctx = _wtag
-	_mat = StandardMaterial3D.new()
+	_mat = VoxelFx.std()
 	_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_mat.albedo_color = Color(0.75, 0.9, 1.0, 1.0)
-	_glow_mat = StandardMaterial3D.new()                 # halo aditivo alrededor del zigzag (11-10-2026)
+	_glow_mat = VoxelFx.std()                 # halo aditivo alrededor del zigzag (11-10-2026)
 	_glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_glow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_glow_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD

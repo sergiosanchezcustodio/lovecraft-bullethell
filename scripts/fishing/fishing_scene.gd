@@ -143,7 +143,7 @@ func _build_fisher() -> void:
 		_bobber.add_child(b)
 	_bobber.visible = false
 	_line_mesh.mesh = _imm
-	var lm := StandardMaterial3D.new()
+	var lm := VoxelFx.std()
 	lm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	lm.albedo_color = Color(0.85, 0.85, 0.80, 0.8)
 	lm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -151,7 +151,7 @@ func _build_fisher() -> void:
 	add_child(_line_mesh)
 
 func _mat(c: Color, glow := 0.0) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.albedo_color = c
 	m.roughness = 0.8
 	if glow > 0.0:
@@ -436,7 +436,7 @@ func _ring(at: Vector3, big: float) -> void:
 	tm.rings = 24
 	tm.ring_segments = 4
 	r.mesh = tm
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.albedo_color = Color(0.80, 0.88, 0.86, 0.35)

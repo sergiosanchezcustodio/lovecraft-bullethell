@@ -39,7 +39,7 @@ func _ready() -> void:
 	add_child(_visual)
 	_model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
 	_visual.add_child(_model)
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.albedo_color = TINT

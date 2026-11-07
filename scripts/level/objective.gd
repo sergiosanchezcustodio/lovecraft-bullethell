@@ -165,7 +165,7 @@ func _ready() -> void:
 		cyl.bottom_radius = 0.5
 		cyl.height = 6.0
 		_beam.mesh = cyl
-		var bm := StandardMaterial3D.new()
+		var bm := VoxelFx.std()
 		bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		bm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
@@ -211,7 +211,7 @@ func _box(size: Vector3, c: Color, at: Vector3, parent: Node3D, glow := false) -
 	var bx := BoxMesh.new()
 	bx.size = size
 	mi.mesh = bx
-	var m := StandardMaterial3D.new()
+	var m := VoxelFx.std()
 	m.albedo_color = c
 	m.roughness = 0.85
 	if glow:
