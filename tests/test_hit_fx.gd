@@ -184,4 +184,8 @@ func test_las_evoluciones_tienen_acento_de_su_rama() -> void:
 	assert_eq(b.get("glint"), "glint_violet", "la segunda rama, violeta")
 	assert_gt(float(a.get("width", 0.0)), 1.0, "estelas más anchas")
 	assert_true(HitSparks.BURSTS.has(a["glint"]) and HitSparks.BURSTS.has(b["glint"]), "ráfagas montadas")
+	assert_eq(FxAccent.of(&"J1:al_azif").get("glint"), "glint_green", "acento propio en by_id")
+	assert_eq(FxAccent.of(&"J1:wendigo").get("glint"), "glint_ice", "acento propio en by_id")
+	for id in ["al_azif", "wendigo", "bateria_morteros", "rey_amarillo"]:
+		assert_true(HitSparks.BURSTS.has(FxAccent.of(StringName("J1:" + id))["glint"]), "destello montado: " + id)
 

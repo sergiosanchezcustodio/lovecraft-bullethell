@@ -2533,3 +2533,15 @@ Pedida por el autor y decidida en D-50: estilo voxel con degradados y la fase co
 - **18.13, arcanas tenues:** las trazadoras de Yith y del fuego fatuo (`bullet.gdshader`, estilos 5 y 4) van en celdas con el calor a escalones; Yith, con anillos que corren hacia la cabeza, y el fatuo, con la cola deshecha en jirones. El azar por bala ya no usa `sin()` con la posición.
 - **18.14, evoluciones** (`FxAccent`, `accents` en `data/weapon_fx.json`): la rama principal tiene acento dorado y la segunda, violeta, y se puede definir uno propio en `by_id`. Sus estelas salen un 30 % más anchas y teñidas, y cada golpe con chispa suelta también el destello de su rama (`glint_gold`, `glint_violet`). Test `test_las_evoluciones_tienen_acento_de_su_rama`.
 - **Medido** con `qset=weapon_fx:0`, que apaga toda la fase 18, contra Alta, 3 veces. En partida normal: p1_n2, de 7,93 a 8,02 ms; p2_n2, de 9,79 a 9,40 ms. En el peor caso (lente, bobina, fórmula, resonador, signo, gas y bumerán de guerra a nivel 6) se pasa de 10,71 a 11,38 ms en p2_n2 (5 veces); las estelas suponen 0,13 ms. Ojo: había un programa de descargas usando un núcleo entero y la base sin efectos varió de 10,2 a 10,7 ms. 783 de 783.
+
+### Retoques tras la fase 18 (07-11-2026)
+
+- **El acento de las evoluciones tiñe también lo de `FxShade`:** halos, arcos, fogonazos y cortinas. `FxShade.apply` guarda el acento del arma (`Damage.ctx`) en la meta `fx_acc` del nodo, y `set_fade` y el nuevo `set_tint` lo multiplican por el tinte del efecto.
+- **Acentos propios** (`by_id` en `data/weapon_fx.json`), 31 evoluciones:
+  - Hielo (`glint_ice`): Wendigo, Ithaqua, la bobina, Wardenclyffe, los rayos de Yith, el martillo y el piolet.
+  - Brasa (`glint_ember`): morteros, Moloch, la lanza térmica, Fomalhaut, la llama del culto, los fuegos artificiales y los cócteles.
+  - Verde (`glint_green`): Al Azif, Shub-Niggurath, los Mi-Go, los reactivos de West y los gases.
+  - Ámbar: el Rey de Amarillo, Carcosa y las lámparas.
+  - El resto, dorado o violeta según la rama.
+- **El gas se ve de noche:** la nube lleva un velo mínimo en toda la mancha, más brillo propio y un filo más claro en el contorno (`ground_fx`, modo 4).
+- **Caso extremo, medido con el PC libre** (sin el programa de descargas): con lente, bobina, fórmula, resonador, signo, gas y bumerán de guerra a nivel 6, la fase 18 costaba +0,43 ms en p1_n2 y +1,0 ms en p2_n2. Casi la mitad eran las chispas de impacto (`hit_sparks=false` lo separa): con tantas armas golpeando había hasta seis emisores encendidos por tipo, más el destello de la evolución. Ahora `HitSparks.POOL` es 4 (antes 6), `PER_FRAME` es 3 (antes 4) y el destello cuenta para el tope. Medido de nuevo en p2_n2, 3 veces: de 9,66 a 9,84 ms (+0,18).

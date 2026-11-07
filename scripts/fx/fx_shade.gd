@@ -50,14 +50,22 @@ static func apply(mi: GeometryInstance3D, id: String) -> bool:
 	if m == null: return false
 	mi.material_override = m
 	mi.set_instance_shader_parameter("seed", _rng.randf() * 100.0)
+	# evoluciones (hito 18.14): el acento de la rama tiñe también halos, arcos y fogonazos
+	var acc := FxAccent.of(Damage.ctx)
+	if not acc.is_empty():
+		mi.set_meta(&"fx_acc", acc["tint"])
+		mi.set_instance_shader_parameter("tint", acc["tint"])
 	return true
 
 static func set_fade(mi: GeometryInstance3D, fade: float, tint := Color.WHITE) -> void:
 	mi.set_instance_shader_parameter("fade", fade)
+	set_tint(mi, tint)
+
+## El tinte de un efecto, con el acento de su evolución si lo tiene.
+static func set_tint(mi: GeometryInstance3D, tint: Color) -> void:
+	if mi.has_meta(&"fx_acc"): tint = tint * (mi.get_meta(&"fx_acc") as Color)
 	mi.set_instance_shader_parameter("tint", tint)
 
-## Calentamiento (LevelWarmup): una caja casi transparente con cada receta, hija de `parent` en
-## `at` (local), para que sus sombreadores se compilen antes de la partida.
 ## La malla con la que se usa cada modo (el anillo y la cortina no llevan normales: otra pipeline).
 static func mesh_for(md: int) -> Mesh:
 	match md:
@@ -66,6 +74,8 @@ static func mesh_for(md: int) -> Mesh:
 		3: return VoxelFx.ring_wall()
 	return VoxelFx.box1()
 
+## Calentamiento (LevelWarmup): una caja casi transparente con cada receta, hija de `parent` en
+## `at` (local), para que sus sombreadores se compilen antes de la partida.
 static func prime(parent: Node3D, at: Vector3) -> void:
 	if not on(): return
 	var f := FileAccess.open("res://data/weapon_fx.json", FileAccess.READ)

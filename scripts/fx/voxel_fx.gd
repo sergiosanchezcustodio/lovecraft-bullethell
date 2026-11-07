@@ -596,8 +596,13 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.5]])
 			m.color_ramp = _ramp([[0.0, Color(0.92, 0.95, 1.0, 1.0)], [0.4, Color(0.7, 0.74, 0.8, 0.8)],
 				[1.0, Color(0.5, 0.52, 0.56, 0.0)]])
-		"glint_gold", "glint_violet":   # destello de las evoluciones (hito 18.14): estrella de cubitos que se abre
-			var gold := recipe == "glint_gold"
+		"glint_gold", "glint_violet", "glint_green", "glint_ice", "glint_ember":
+			# destello de las evoluciones (hito 18.14): estrella de cubitos que se abre
+			var gc: Array = {"glint_gold": [Color(1.0, 0.85, 0.4), Color(0.6, 0.4, 0.1)],
+				"glint_violet": [Color(0.78, 0.6, 1.0), Color(0.35, 0.2, 0.6)],
+				"glint_green": [Color(0.6, 1.0, 0.45), Color(0.15, 0.45, 0.1)],
+				"glint_ice": [Color(0.7, 0.92, 1.0), Color(0.25, 0.45, 0.7)],
+				"glint_ember": [Color(1.0, 0.55, 0.2), Color(0.55, 0.12, 0.04)]}[recipe]
 			p.draw_pass_1 = cube("add")
 			p.amount = 8
 			p.lifetime = 0.3
@@ -608,8 +613,7 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.gravity = Vector3(0, 1.5, 0)
 			m.scale_min = 0.035; m.scale_max = 0.06
 			m.color_ramp = _ramp([[0.0, Color(1, 1, 1, 1)],
-				[0.3, Color(1.0, 0.85, 0.4, 0.95) if gold else Color(0.78, 0.6, 1.0, 0.95)],
-				[1.0, Color(0.6, 0.4, 0.1, 0.0) if gold else Color(0.35, 0.2, 0.6, 0.0)]])
+				[0.3, Color(gc[0], 0.95)], [1.0, Color(gc[1], 0.0)]])
 		"snap":                   # el cepo se cierra (hito 18.9): chispazo de hierro y polvo bajo
 			p.draw_pass_1 = cube("add")
 			p.amount = 14

@@ -202,8 +202,12 @@ void fragment() {
 		den = floor((den + 0.35 * (1.0 - rim)) * 4.0) / 4.0;
 		col = mix(vec3(0.18, 0.2, 0.03), vec3(0.5, 0.56, 0.12), den) * 0.6;
 		col = mix(col, vec3(0.62, 0.68, 0.2) * 0.6, top * 0.5);
-		emi = col * 0.15;
-		a = clamp(den * 0.85, 0.0, 0.8) * (1.0 - rim * 0.7);
+		// más visible de noche (07-11-2026): un velo mínimo en toda la nube, más brillo propio y
+		// un filo algo más claro que marca su contorno
+		float lip = step(edge - 0.07, r);
+		col = mix(col, vec3(0.6, 0.66, 0.2) * 0.7, lip * 0.6);
+		emi = col * 0.32 + vec3(0.25, 0.3, 0.05) * lip * 0.25;
+		a = clamp(max(den * 0.85, 0.28) + lip * 0.2, 0.0, 0.82) * (1.0 - rim * 0.55);
 	} else if (mode == 5) {
 		// polvo de Ibn-Ghazi: tierra sepia a manchas con motas doradas que se encienden
 		float sd = fbm(n * 1.1);

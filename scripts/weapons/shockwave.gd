@@ -43,7 +43,7 @@ func _ready() -> void:
 	_wall.mesh = VoxelFx.ring_wall()
 	_wall.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	if FxShade.apply(_wall, "wall"):
-		_wall.set_instance_shader_parameter("tint", Color(color.r, color.g, color.b).lightened(0.15))
+		FxShade.set_tint(_wall, Color(color.r, color.g, color.b).lightened(0.15))
 		add_child(_wall)
 	else:
 		_wall.free()
