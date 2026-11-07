@@ -98,6 +98,11 @@ func _ready() -> void:
 		trail.position = Vector3(0, 0.05, 0.12)
 		add_child(trail)
 		_trail = trail
+	match look:                                      # estela en el aire (hito 18.1)
+		"dinamita", "granada": FxTrails.attach.call_deferred(self, "smoke")
+		"bengala": FxTrails.attach.call_deferred(self, "ember", Color(1.0, 0.6, 0.6))
+		"molotov": FxTrails.attach.call_deferred(self, "ember")
+		"frasco", "baba": FxTrails.attach.call_deferred(self, "acid", Color(tint.r, tint.g, tint.b).lightened(0.3))
 
 func _physics_process(delta: float) -> void:
 	Damage.ctx = _wtag

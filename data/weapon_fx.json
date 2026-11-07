@@ -1,0 +1,12 @@
+{
+  "_doc": "Efectos de las armas (fase 18, D-50). trails: recetas de estela (FxTrails, hito 18.1). width: ancho en la cabeza (m); life: s que dura cada tramo; colors: degradado de la cabeza a la cola (#rrggbbaa), en tramos (bands); add: aditiva (brillo) o normal (humo); min_step: m que tiene que moverse para poner un punto nuevo.",
+  "trails": {
+    "spin": {"width": 0.34, "life": 0.22, "bands": 5, "add": true, "colors": ["#ffd890c0", "#f09040a0", "#a0401860", "#40100000"]},
+    "steel": {"width": 0.3, "life": 0.2, "bands": 5, "add": true, "colors": ["#e0f0ffc0", "#80b0ffa0", "#3060d060", "#10204000"]},
+    "page": {"width": 0.2, "life": 0.3, "bands": 5, "add": true, "colors": ["#ffe080c0", "#ffa83090", "#c0502850", "#40100000"]},
+    "migo": {"width": 0.18, "life": 0.35, "bands": 5, "add": true, "colors": ["#ffb0e8d0", "#ff40b0a0", "#a0189060", "#30084000"]},
+    "smoke": {"width": 0.22, "life": 0.55, "bands": 5, "add": false, "min_step": 0.06, "colors": ["#d8d0c890", "#9a928a70", "#605a5440", "#30302c00"]},
+    "ember": {"width": 0.14, "life": 0.3, "bands": 4, "add": true, "colors": ["#fff0c0e0", "#ffa040a0", "#c0401850", "#40100000"]},
+    "acid": {"width": 0.14, "life": 0.3, "bands": 4, "add": true, "colors": ["#e8ffc0d0", "#90f04090", "#40a02040", "#10300800"]}
+  }
+}

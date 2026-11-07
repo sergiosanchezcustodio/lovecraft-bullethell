@@ -555,3 +555,55 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | 17.18 | **Sucesos lejanos,** uno por arena: un tentáculo que asoma en el horizonte del arrecife, una silueta inmensa iluminada por un relámpago en la tormenta, las estatuas del estudio que giran la cabeza cuando no las miras… | **Hecho (05-11-2026), pendiente de tu revisión:** un suceso en cada arena (`DistantEvents`): tentáculos, Dagón, Cthulhu con el relámpago, antiguos alados y el byakhee que cruzan, procesiones y señales de faroles, y las esculturas del estudio que se giran cuando no las miras |
 | 17.19 | **Luz de los disparos y las explosiones** sobre paredes y suelo, en Alta y Ultra | **Hecho (05-11-2026), pendiente de tu revisión:** las explosiones ya la tenían; ahora cada disparo de balas da un fogonazo que alumbra el suelo y las paredes; solo en Ultra, porque en Alta costaba unos 0,3 ms |
 | 17.20 | **Rastros que se quedan:** icor, ceniza y quemaduras en el suelo el resto del nivel, con tope | **Hecho (05-11-2026), pendiente de tu revisión:** cada mancha deja su rastro en una textura del suelo de la arena, que se queda todo el nivel; el tope es la propia textura (apagado en Baja) |
+
+## Fase 18: efectos de las armas
+
+**Pedida por el autor (07-11-2026):** «quiero mejorar las animaciones de las armas, que sean de más calidad, con más detalles, animaciones más fluidas, usar más degradados y texturas, añadir partículas, estelas etc». Elegido por el autor (D-50): estilo **voxel con degradados** (degradados y texturas escalonados a píxel grande, partículas de cubitos) y la **fase completa por bloques**, con capturas de cada bloque.
+
+**Punto de partida** (capturas de las 52 armas de base en acción, 07-11-2026): el cuerpo a cuerpo apenas se ve (machete, daga y estoque, un trazo o un soplo; el látigo, una fila de bolitas); haces, zonas y signos son planos y de un color (lámpara, gas, polvo, fórmula, signo, resonador, red); la cadena del ancla son puntos, los cepos no se cierran, bumerán y bisturís no dejan estela, y el destello de las explosiones es un cubo blanco (en el mortero, de unos 3,5 m). Las armas de fuego tienen trazadora y fogonazo, pero ni humo, ni casquillos, ni impacto. Están bien la explosión (sin el destello), el fuego, la escarcha, el rayo de la lente y el vórtice.
+
+**Reglas de la fase** (las de la fase 17):
+- Cada bloque se mide antes y después en Alta (`python tools/comparar.py`, varias veces); toda la fase junta no debe subir la media más de 0,5 ms ni el 1 % peor de forma apreciable.
+- Lo que cuesta va por calidad (`data/quality.json`), se quita o se rebaja en Baja y Media y tiene su opción `=false` para comparar.
+- Nada crea mallas ni materiales en cada uso: mallas compartidas (`VoxelFx.box`, `box1`, `plane2`), materiales con `VoxelFx.std()` o compartidos, nodos reciclados; y lo nuevo se calienta al empezar el nivel (`LevelWarmup`) si compila algo.
+- Estilo: degradados en tramos (no lisos), bordes a píxel grande, partículas de cubitos.
+
+### Bloque A: base común
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 18.1 | **Estelas:** una cinta que sigue a lo que se mueve (proyectil, hoja, bumerán, páginas), con degradado de color a lo largo, que se estrecha y se apaga; escalonada a píxel grande. Reciclada | **Hecho (07-11-2026), pendiente de tu revisión:** `FxTrails`, dos tiras de triángulos para todas las del nivel; recetas en `data/weapon_fx.json`; en el bumerán, la llave, las páginas, el ancla, los drones y lo que se lanza. En Baja, sin estelas; en Media, más cortas (`weapon_fx`). Sin coste apreciable (9,55 → 9,49 ms) |
+| 18.2 | **Sombreador de efectos:** rampa de color, ruido que se desplaza, bordes escalonados y disolución, para haces, arcos, zonas y círculos en el suelo | Pendiente |
+| 18.3 | **Impactos según el daño:** chispas de cubitos y destello breve, distintos para bala, corte, golpe, fuego, ácido y arcano | Pendiente |
+| 18.4 | **Al disparar:** humo en la boca del cañón y casquillos de cubitos que rebotan en el suelo (con tope) | Pendiente |
+
+### Bloque B: cuerpo a cuerpo
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 18.5 | **Machete:** arco de barrido con degradado y estela, y chispas al golpear | Pendiente |
+| 18.6 | **Daga, estoque y martillo:** puñalada y estocada con estela, y el martillo con onda y cascotes | Pendiente |
+| 18.7 | **Látigo:** una cuerda que se curva y ondula, con restallido en la punta | Pendiente |
+
+### Bloque C: arrojadizas
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 18.8 | **Explosiones:** destello radial con degradado en lugar del cubo blanco, onda de choque y estela de humo del proyectil en el aire (granada, mortero, dinamita) | Pendiente |
+| 18.9 | **Ancla, arpón, cepos, bisturís, bumerán y molotov:** cadena de eslabones, cuerda, cepos que se cierran con chispa, estelas de giro y la botella que gira y salpica | Pendiente |
+
+### Bloque D: arcanas y zonas
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 18.10 | **Zonas en el suelo:** gas, polvo, fuego y ácido en capas que se mueven, con el sombreador del 18.2 | Pendiente |
+| 18.11 | **Signos y ondas:** fórmula, signo, resonador y red, con runas que brillan y chispas que suben | Pendiente |
+| 18.12 | **Haces y rayos:** la lámpara con caída de luz y motas; lente, trapezoedro y la bobina, con ramas que parpadean | Pendiente |
+| 18.13 | **Lo arcano que apenas se ve:** Yith, la llave de los sueños, West, los Mi-Go, Shub-Niggurath y las pisadas de Dunwich | Pendiente |
+
+### Bloque E: evoluciones
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 18.14 | **Un acento propio por evolución:** color, partículas o estela que la distinguen de su arma de base, en datos | Pendiente |
+

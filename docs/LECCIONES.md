@@ -240,3 +240,9 @@ En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra c
 - **La interfaz Muy grande (×1,3) deja una pantalla de 1476×830 unidades.** Las ventanas pensadas para 1080 de alto se salían por abajo (un `CenterContainer` a pantalla completa crece hacia abajo cuando su contenido no cabe). `MenuKit.fit_screen(c)` hace que crezca por igual hacia los dos lados y lo encoge alrededor de su centro si no cabe. Mide contra el sitio que le dan sus anclas (la tienda va en el 53 % derecho) y nunca lo agranda.
 - **No escales un control que está dentro de un contenedor:** el contenedor le devuelve la escala a 1 cada vez que lo coloca. Escala el contenedor de fuera (en `MenuKit.window`, el `CenterContainer`, no el panel, que además ya escala `appear` al entrar).
 - **Lo que se abre encima de la partida no tapa lo que va en una capa más alta.** El rótulo del nivel (capa 90) tapaba el título de «Has caído» si se caía en los primeros segundos. `LevelCard.dismiss()` lo quita al abrir la pausa o la pantalla final.
+
+## Mallas que se rehacen cada fotograma (hito 18.1, 07-11-2026)
+
+- **`ImmediateMesh` vértice a vértice es caro desde GDScript:** 15 estelas con seis vértices por punto costaban 0,7 ms de CPU por fotograma (unos 2 µs por punto). Lo que hay que rehacer cada fotograma va en arrays empaquetados y un `add_surface_from_arrays`, con los menos vértices posibles (una tira de triángulos: dos por punto, sin índices), y lo que no cambia (colores, anchos por tramo) se calcula una vez.
+- **Los arrays empaquetados se copian al escribirlos** si están guardados en otro sitio: `var v: PackedVector3Array = lista[0]` y luego `v.append(...)` copia el array entero. Si varias funciones escriben en el mismo, que sea una variable del nodo.
+- **Lo que se puede pintar en el sombreador no va en vértices:** las franjas de los bordes de la estela salen de `UV.y` en el fragmento, no de cuatro vértices más por punto.

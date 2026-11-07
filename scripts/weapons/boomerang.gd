@@ -61,7 +61,15 @@ func _ready() -> void:
 		band.position = Vector3(0, 0, 0.12)
 		arm.add_child(band)
 	add_child(VoxelFx.emitter("streak", 0.35, false, false, Color(0.75, 0.6, 0.4)))   # rastro al girar (11-10-2026)
+	_tip_trail("spin")
 	reset_physics_interpolation.call_deferred()
+
+## Estela de la punta de un brazo (hito 18.1): al girar dibuja una espiral.
+func _tip_trail(recipe: String) -> void:
+	var tip := Node3D.new()
+	tip.position = Vector3(0.22, 0, 0.3)
+	_spin.add_child(tip)
+	FxTrails.attach.call_deferred(tip, recipe)
 
 func _physics_process(delta: float) -> void:
 	Damage.ctx = _wtag
@@ -123,3 +131,4 @@ func _key() -> void:
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		_spin.add_child(mi)
 	add_child(VoxelFx.emitter("streak", 0.35, false, false, Color(0.65, 0.78, 1.0)))
+	_tip_trail("steel")

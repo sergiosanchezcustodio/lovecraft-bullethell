@@ -2472,3 +2472,15 @@ Ofrecidas tras la dificultad del 1 al 10 (29-10-2026), 22 de todo tipo:
 - **El proceso que ocupa un núcleo en este PC** es GIGABYTE Control Center, en concreto su módulo de la tarjeta gráfica (`C:\Program Files\GIGABYTE\Control Center\Lib\GBT_VGA\Service\Dll\GvFvSDKCSharp.exe`, ventiladores, luces y frecuencias), en marcha desde el 02-11 con más de 16 horas de CPU. No lo he tocado.
 - 779 de 779.
 
+## Fase 18: efectos de las armas (07-11-2026)
+
+Pedida por el autor y decidida en D-50: estilo voxel con degradados y la fase completa por bloques (`docs/ROADMAP.md`). Punto de partida: capturas de las 52 armas de base en acción (lo que se ve flojo está en la introducción de la fase en el ROADMAP).
+
+### Hito 18.1: estelas (07-11-2026)
+
+- **`FxTrails`** (`scripts/fx/fx_trails.gd`): una cinta que sigue a un nodo (`FxTrails.attach(nodo, receta, tinte, ancho)`). Todas las del nivel van en dos tiras de triángulos que se rehacen cada fotograma (aditivas y de humo): dos llamadas de dibujo y ningún nodo por estela. Dos vértices por punto; el color y el ancho de cada punto van a escalones según su edad (`bands`), con una tabla calculada al crear la estela, y el ancho a saltos de dos voxels. A lo ancho, el sombreador (`fx_trail.gdshaderinc`, `fx_trail_add` y `fx_trail_mix`) pinta los bordes más tenues que el centro. Si el nodo se esconde (páginas y drones entre usos), la estela espera; si se libera, la cola se apaga y se quita. Topes: 18 puntos por estela, 900 en total.
+- **Recetas** en `data/weapon_fx.json` (`trails`): `spin` (bumerán), `steel` (llave de los sueños y ancla), `page` (páginas del Necronomicón), `migo` (drones), `smoke` (dinamita y granada), `ember` (molotov y bengala) y `acid` (frasco y baba).
+- **Por calidad:** clave `weapon_fx` en `data/quality.json` (Baja 0, sin estelas; Media 1, un 40 % más cortas; Alta y Ultra 2). `trails=false` las quita para comparar.
+- **Calentamiento:** `LevelWarmup` dibuja una de cada mezcla junto al jugador, con transparencia 1/255.
+- **Rendimiento:** la primera versión, con `ImmediateMesh` y seis vértices por punto, costaba 2 ms de media (0,7 ms de CPU solo en calcular 15 estelas). Con la tira y la tabla, la diferencia no se ve. `comparar.py`, p2_n2, 3 veces, con bumerán, Necronomicón, granada y Mi-Go a nivel 6: sin estelas, 9,55 ms y 1 % peor 16,70 ms; con ellas, 9,49 ms y 16,74 ms.
+- **Prueba:** `test_la_estela_sigue_y_se_apaga_cuando_se_va_su_dueno` (`tests/test_hit_fx.gd`). 780 de 780.

@@ -129,3 +129,25 @@ func test_keep_guarda_una_copia_por_shader() -> void:
 	assert_eq(VoxelFx._kept.size(), 2, "otro shader: otra copia")
 	assert_ne(VoxelFx._kept.values()[0], a, "es una copia, no el material de quien lo usa")
 	VoxelFx._kept.clear()
+
+func test_la_estela_sigue_y_se_apaga_cuando_se_va_su_dueno() -> void:
+	var t := FxTrails.new()
+	add_child_autofree(t)
+	FxTrails._inst = t
+	var keep_over = Quality._over
+	Quality._over = {"weapon_fx": 2}               # este PC puede estar en Baja, sin estelas
+	var n := Node3D.new()
+	add_child(n)
+	FxTrails.attach(n, "spin")
+	assert_eq(t._trails.size(), 1, "una estela por lo que sigue")
+	for k in 4:
+		n.global_position = Vector3(k * 0.3, 0, 0)
+		t._process(0.016)
+	assert_gt((t._trails[0].pts as PackedVector3Array).size(), 1, "va poniendo puntos al moverse")
+	n.free()
+	t._trails[0].life = -1.0                       # que la cola se apague ya
+	t._process(0.016)
+	t._process(0.016)
+	assert_eq(t._trails.size(), 0, "sin dueño y sin cola, se quita")
+	FxTrails._inst = null
+	Quality._over = keep_over

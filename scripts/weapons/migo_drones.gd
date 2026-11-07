@@ -78,6 +78,7 @@ func _make_orb() -> Node3D:
 	orb.add_child(light)
 	orb.add_child(VoxelFx.emitter("streak", 0.15, false, false, Color(PINK.r, PINK.g, PINK.b) * 0.8))   # estela (11-10-2026)
 	add_child(orb)
+	FxTrails.attach.call_deferred(orb, "migo")                # estela (hito 18.1)
 	return orb
 
 func _orb_pos(i: int, center: Vector3) -> Vector3:

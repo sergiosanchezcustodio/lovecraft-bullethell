@@ -478,6 +478,7 @@ func _ready() -> void:
 	Quality.apply_game(env, moon)                        # calidad gráfica (hito 11.5); las opciones de abajo mandan
 	Crumble.enabled = args.get_bool("crumble", Crumble.enabled)
 	Crumble.falls = args.get_bool("falls", true)
+	FxTrails.enabled = args.get_bool("trails", true)   # estelas de las armas (hito 18.1): trails=false para comparar
 	Enemy.wounds = args.get_str("wounds", "true") != "false" and (bool(Quality.value("wounds", true)) or args.has("wounds"))   # en Baja, sin grietas
 	Enemy.wounds_force = args.get_float("wounds", -1.0) if args.get_str("wounds", "").is_valid_float() else -1.0
 	Enemy.rise_enabled = args.get_bool("rise", true)   # hito 11.6
