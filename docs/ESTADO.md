@@ -2399,6 +2399,28 @@ Medido con el PC libre (`perf=40 spikes=true max_alive=80 spawn_rate=20 bot=smar
 - **Los cuatro niveles con las armas de siempre** (una ejecución): tirones de 7 a 2 (p2_n4), de 7 a 1 (p3_n3), de 3 a 0 (p1_n2) y de 10 a 5 (p3_n2); el peor fotograma, de 34-41 ms a 24-32.
 - **Antes y después, tres veces cada uno y alternados** (la versión de antes en una copia del último commit; `perf=30`, semillas 501-503): tirones de 8,7 a 2,7 por ejecución en p3_n2 y de 8,3 a 2 en p2_n4. La media (8,00 → 8,06 y 8,77 → 8,55 ms) y el 1 % peor (14,72 → 15,06 y 15,42 → 15,43 ms) quedan igual, dentro del ruido. Sigue saliendo algún fotograma suelto de 40-55 ms en las dos versiones, sin ritmo.
 
+### Mallas compartidas en los efectos y medición larga (07-11-2026)
+
+- **Efectos que creaban mallas o materiales en cada uso**, ahora compartidos (`VoxelFx.box(size)` por tamaño, o `box1` con el tamaño en la escala cuando varía): puñalada (`Stab`), rayo en cadena (`ChainBolt`, que rehace el zigzag cada 0,07 s y creaba dos cajas por tramo cada vez), haz (`Beam`, la escala animada se multiplica por el tamaño guardado), red (`NetFx`), fisura (`Fissure`, esquirlas de tamaño al azar en la escala), barrido (`SweepBeam`), bumerán y llave de Carter, bengala (núcleo y chispas), látigo, tentáculo, vórtice y bola de fuego. Los materiales que se animan (transparencia, brillo) siguen siendo de cada uno. Capturas antes y después (`fx_demo=…`, con `git stash`): iguales.
+- **Medición de 5 minutos** (`level=p2_n4 perf=300 spikes=true`, semilla 11, PC libre): media 11,3 ms, 1 % peor 19,5 ms, 30 tirones, el peor de 44,7 ms. (Una primera medición no valió: las pruebas se solaparon con ella y la física entró en espiral, ocho pasos por fotograma y fotogramas de 160 ms.) Lo que quedaba:
+  - **El evento final:** el jefe y toda su oleada (`final_wave`, 25) en el mismo paso: 400 nodos nuevos, 45 ms. Ahora la oleada sale de 3 en 3 por paso (`WaveDirector.FINAL_PER_STEP`), fuera de cámara; el jefe, igual.
+  - **Las gemas:** cada gema preguntaba en cada paso por la posición y el radio de cada jugador, también las quietas en el suelo, que a media partida son cientos (de 0,9 ms por fotograma a 2-7 en los picos). Ahora los jugadores se leen una vez por paso, las distancias van al cuadrado y la gema quieta que nadie alcanza se salta el resto (quedaba igual).
+  - **El primer baúl arcano** compilaba 4 shaders al aparecer: `LevelWarmup` lo dibuja unos fotogramas al empezar (sin `setup`, no cuenta como baúl ni se abre), y sus piezas comparten malla y material (el sello, que late, no).
+  - **Las explosiones** que quedan, sueltas, son de 4-6 ms a esas alturas (más enemigos juntos): no se tocan.
+- **Prueba intermitente:** `test_el_idolo_no_se_mueve_y_ampara_a_los_cercanos` falló una vez en la batería entera (el ídolo acabó a 7 m en vez de volver a su sitio) y pasó sola, con su archivo y en la batería repetida. Depende de algo que deja otra prueba; sin averiguar.
+- **La medición larga no se cerraba si el nivel acababa antes.** Con la oleada final repartida, el jefe de p2_n4 murió a los 275 s: la pantalla final pausa el árbol, `_perf` no volvía a correr y SpikeLog seguía apuntando fotogramas (13 GB en 4 horas, hasta que el sistema se quedó sin memoria y cortó la tarea). Ahora el nivel superado o la caída dan el informe de lo medido y salen (`Game._perf_report`, «RENDIMIENTO cortada a los … s»), y SpikeLog cuenta los tirones por medio minuto (los 12 peores no decían si iban juntos).
+- **Antes y después, 5 minutos, alternados** (la versión de antes en una copia del último commit con esos dos arreglos de medición; las cuatro, cortadas al superar el nivel, a los 247-271 s):
+
+  | semilla | versión | media | 1 % peor | fotogramas > 16,7 ms | tirones > 25 ms | gemas |
+  |---|---|---|---|---|---|---|
+  | 11 | antes | 10,50 ms | 18,02 ms | 702 | 46 | 0,61 ms |
+  | 11 | ahora | 9,94 ms | 17,19 ms | 395 | 5 | 0,17 ms |
+  | 12 | antes | 11,40 ms | 19,47 ms | 1241 | 26 | 0,82 ms |
+  | 12 | ahora | 10,83 ms | 18,10 ms | 546 | 10 | 0,19 ms |
+
+  Antes, los tirones se amontonaban a partir del minuto 3 (7-9 por medio minuto: las gemas del suelo y el evento final); ahora, sueltos. Una medición anterior de la versión nueva con la semilla 11 dio 58 tirones, 9 de ellos en el último medio minuto: no se repitió, y las mediciones largas siguen variando mucho.
+- **Sin resolver, en las dos versiones:** con la semilla 12, un fotograma de 320-330 ms hacia el segundo 63 desde el arranque, casi todo proceso, con 6 shaders nuevos y unos cultistas apareciendo. Coincide con una subida de nivel del bot (le ofrecen diario de Wilbur, salterio y escamas, que solo cambian cifras): falta saber qué se carga ahí. Con esa semilla, además, 3 shaders nuevos cada 10-20 s durante toda la partida (con la 11, casi ninguno).
+
 ## Ideas propuestas y sin hacer (23-10-2026)
 
 Ofrecidas al autor al cerrar las mejoras de la prueba online; las pidió subir a GitHub sin hacerlas. Ofrécelas de nuevo si vuelve a ese tema:

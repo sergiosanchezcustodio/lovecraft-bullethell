@@ -59,20 +59,20 @@ func _rebuild() -> void:
 func _seg(a: Vector3, b: Vector3) -> void:
 	var len := a.distance_to(b)
 	if len < 0.01: return
+	# caja de 1 m compartida con el tamaño en la escala (06-11-2026): el zigzag se rehace cada
+	# 0,07 s y antes creaba dos mallas por tramo cada vez
 	var mi := MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = Vector3(0.07, 0.07, len)
-	mi.mesh = bm
+	mi.mesh = VoxelFx.box1()
 	mi.material_override = _mat
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
 	mi.global_position = (a + b) * 0.5
 	mi.look_at(b, Vector3.UP if absf((b - a).normalized().y) < 0.99 else Vector3.RIGHT)
+	mi.scale = Vector3(0.07, 0.07, len)
 	_segs.append(mi)
 	var halo := MeshInstance3D.new()
-	var hb := BoxMesh.new()
-	hb.size = Vector3(0.22, 0.22, len)
-	halo.mesh = hb
+	halo.mesh = VoxelFx.box1()
+	halo.scale = Vector3(0.22 / 0.07, 0.22 / 0.07, 1.0)          # dentro del tramo, que ya lleva su escala
 	halo.material_override = _glow_mat
 	halo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mi.add_child(halo)

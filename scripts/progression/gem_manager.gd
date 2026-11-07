@@ -18,6 +18,7 @@ const GLINT := Color(1.6, 1.6, 1.6)
 const TIER_COLORS: Array[Color] = [Color(1.0, 0.78, 0.22), Color(0.35, 0.92, 0.35), Color(0.30, 0.62, 1.0),
 	Color(1.0, 0.24, 0.20), Color(0.72, 0.32, 1.0)]
 const STRIDE := 16
+const HOMING_REACH2 := 99.0 * 99.0                ## la que ya vuela sigue a quien esté a menos de 99 m
 
 ## En red (hito 9.3b): cada gema lleva un id. El anfitrión avisa de cada puñado que suelta
 ## (`dropped`, con la semilla de sus saltos: el invitado las suelta iguales) y de cada gema que
@@ -158,20 +159,34 @@ func attract(pos: Vector3, r: float) -> int:
 
 func _physics_process(delta: float) -> void:
 	var t0 := Prof.start()
+	# los jugadores en pie, una vez por paso y no por gema, y las distancias al cuadrado
+	# (07-11-2026: a media partida, cientos de gemas quietas preguntaban a cada jugador)
+	var pls: Array[Player] = []
+	var pl_xz := PackedVector2Array()
+	var pl_r2 := PackedFloat32Array()
+	for pl in world.players:
+		if pl.health <= 0.0: continue
+		pls.append(pl)
+		pl_xz.append(Vector2(pl.global_position.x, pl.global_position.z))
+		pl_r2.append(pl.data.pickup_radius * pl.data.pickup_radius)
 	var i := 0
 	while i < count:
 		_age[i] += delta
 		_prev[i] = _pos[i]
 		var p := _pos[i]
+		var homing := _homing[i] != 0
 		var target: Player = null
-		var best := INF
-		for pl in world.players:
-			if pl.health <= 0.0: continue
-			var d := Vector2(pl.global_position.x - p.x, pl.global_position.z - p.z).length()
-			var reach := pl.data.pickup_radius if _homing[i] == 0 else 99.0
-			if d < reach and d < best and _age[i] > 0.35:
-				best = d
-				target = pl
+		if _age[i] > 0.35:
+			var best := INF
+			var q := Vector2(p.x, p.z)
+			for k in pls.size():
+				var d2 := pl_xz[k].distance_squared_to(q)
+				if d2 < (HOMING_REACH2 if homing else pl_r2[k]) and d2 < best:
+					best = d2
+					target = pls[k]
+		if target == null and not homing and _vel[i] == Vector3.ZERO:
+			i += 1                                      # quieta en el suelo y nadie a su alcance: sigue igual
+			continue
 		if target != null:
 			_homing[i] = 1
 			var to := target.global_position + Vector3(0, 0.8, 0) - p

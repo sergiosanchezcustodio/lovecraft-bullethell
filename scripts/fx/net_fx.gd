@@ -28,24 +28,24 @@ func setup(pos: Vector3, radius: float, life: float) -> NetFx:
 		if half < 0.1: continue
 		_bar(Vector3(0.05, 0.04, half * 2.0), Vector3(o, 0, 0))
 		_bar(Vector3(half * 2.0, 0.04, 0.05), Vector3(0, 0.02, o))
-	var lead := StandardMaterial3D.new()             # plomos del borde
-	lead.albedo_color = Color(0.3, 0.3, 0.33)
+	if _lead == null:                                # plomos del borde (material y malla compartidos, 06-11-2026)
+		_lead = StandardMaterial3D.new()
+		_lead.albedo_color = Color(0.3, 0.3, 0.33)
 	for k in 10:
 		var a := TAU * k / 10.0
 		var mi := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = Vector3.ONE * 0.12
-		mi.mesh = bm
-		mi.material_override = lead
+		mi.mesh = VoxelFx.box(Vector3.ONE * 0.12)
+		mi.material_override = _lead
 		mi.position = Vector3(cos(a) * radius, 0.04, sin(a) * radius)
 		add_child(mi)
 	return self
 
+static var _lead: StandardMaterial3D
+
 func _bar(size: Vector3, at: Vector3) -> void:
 	var mi := MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = size
-	mi.mesh = bm
+	mi.mesh = VoxelFx.box1()                         # caja de 1 m: el tamaño, en la escala
+	mi.scale = size
 	mi.material_override = _mat
 	mi.position = at
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

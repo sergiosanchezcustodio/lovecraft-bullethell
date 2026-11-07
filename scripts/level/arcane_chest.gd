@@ -42,15 +42,23 @@ func setup(p_world: CombatWorld, pos: Vector3, p_money: int, p_heal: float) -> A
 	add_to_group(&"chests")
 	return self
 
-func _box(size: Vector3, c: Color, at: Vector3, parent: Node3D, metal := false) -> MeshInstance3D:
+## Materiales de las piezas, compartidos por color (07-11-2026: antes, uno por pieza y baúl);
+## `own` para el que se anima (el sello).
+static var _mats := {}
+static var _coin_pm: ParticleProcessMaterial
+static var _coin: BoxMesh
+
+func _box(size: Vector3, c: Color, at: Vector3, parent: Node3D, metal := false, own := false) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = size
-	mi.mesh = bm
-	var m := StandardMaterial3D.new()
-	m.albedo_color = c
-	m.roughness = 0.45 if metal else 0.85
-	m.metallic = 0.5 if metal else 0.0
+	mi.mesh = VoxelFx.box(size)
+	var key := "%s|%s" % [c.to_html(), metal]
+	var m: StandardMaterial3D = null if own else _mats.get(key)
+	if m == null:
+		m = StandardMaterial3D.new()
+		m.albedo_color = c
+		m.roughness = 0.45 if metal else 0.85
+		m.metallic = 0.5 if metal else 0.0
+		if not own: _mats[key] = m
 	mi.material_override = m
 	mi.position = at
 	parent.add_child(mi)
@@ -73,7 +81,7 @@ func _ready() -> void:
 		for z in [-0.25, 0.25]:
 			_box(Vector3(0.05, 0.09, 0.05), BRASS, Vector3(x, 0.36, z), self, true)
 	_box(Vector3(0.12, 0.12, 0.03), BRASS, Vector3(0, 0.33, 0.26), self, true)           # cerradura
-	var seal := _box(Vector3(0.22, 0.02, 0.22), SEAL, Vector3(0, 0.2, 0.25), _lid)       # sello encima (se ve desde arriba)
+	var seal := _box(Vector3(0.22, 0.02, 0.22), SEAL, Vector3(0, 0.2, 0.25), _lid, false, true)   # sello encima (se ve desde arriba)
 	_seal_mat = seal.material_override
 	_seal_mat.emission_enabled = true
 	_seal_mat.emission = SEAL
@@ -89,25 +97,26 @@ func _ready() -> void:
 	_coins.lifetime = 0.9
 	_coins.explosiveness = 0.9
 	_coins.position = Vector3(0, 0.45, 0)
-	var pm := ParticleProcessMaterial.new()
-	pm.direction = Vector3.UP
-	pm.spread = 35.0
-	pm.initial_velocity_min = 2.5
-	pm.initial_velocity_max = 4.5
-	pm.gravity = Vector3(0, -9.0, 0)
-	pm.angular_velocity_min = -360.0
-	pm.angular_velocity_max = 360.0
-	_coins.process_material = pm
-	var coin := BoxMesh.new()
-	coin.size = Vector3(0.09, 0.03, 0.09)
-	var cm := StandardMaterial3D.new()
-	cm.albedo_color = Color(1.0, 0.8, 0.3)
-	cm.metallic = 0.7
-	cm.roughness = 0.3
-	cm.emission_enabled = true
-	cm.emission = Color(0.6, 0.45, 0.1)
-	coin.material = cm
-	_coins.draw_pass_1 = coin
+	if _coin_pm == null:                                                            # monedas compartidas
+		_coin_pm = ParticleProcessMaterial.new()
+		_coin_pm.direction = Vector3.UP
+		_coin_pm.spread = 35.0
+		_coin_pm.initial_velocity_min = 2.5
+		_coin_pm.initial_velocity_max = 4.5
+		_coin_pm.gravity = Vector3(0, -9.0, 0)
+		_coin_pm.angular_velocity_min = -360.0
+		_coin_pm.angular_velocity_max = 360.0
+		_coin = BoxMesh.new()
+		_coin.size = Vector3(0.09, 0.03, 0.09)
+		var cm := StandardMaterial3D.new()
+		cm.albedo_color = Color(1.0, 0.8, 0.3)
+		cm.metallic = 0.7
+		cm.roughness = 0.3
+		cm.emission_enabled = true
+		cm.emission = Color(0.6, 0.45, 0.1)
+		_coin.material = cm
+	_coins.process_material = _coin_pm
+	_coins.draw_pass_1 = _coin
 	add_child(_coins)
 	scale = Vector3.ONE * 0.01
 

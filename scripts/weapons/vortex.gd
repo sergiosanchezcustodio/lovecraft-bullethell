@@ -24,6 +24,8 @@ var _motes: GPUParticles3D
 const FADE := 0.4
 const SPHERES := 7
 
+static var _cubes := {}                      ## color -> cubo con su material
+
 func setup(p_world: CombatWorld, origin: Vector3, p_goal: Vector3, p_speed: float, p_radius: float, p_damage: float,
 		p_interval: float, p_pull: float, p_life: float, p_bonus: Dictionary) -> Vortex:
 	world = p_world; goal = Vector3(p_goal.x, 0, p_goal.z); speed = p_speed; radius = p_radius
@@ -43,13 +45,16 @@ func _ready() -> void:
 	var cols := [Color(0.95, 0.75, 0.25), Color(0.55, 0.35, 0.95), Color(0.3, 0.85, 0.85)]
 	for i in SPHERES:                             # las esferas de Yog-Sothoth, que se entrecruzan
 		var mi := MeshInstance3D.new()
-		var sm := BoxMesh.new()                    # cubos, a juego con el voxel (eran esferas)
-		sm.size = Vector3.ONE * 0.34
-		var m := StandardMaterial3D.new()
-		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		m.albedo_color = cols[i % cols.size()] * 0.75
-		sm.material = m
-		mi.mesh = sm
+		var ci := i % cols.size()
+		if not _cubes.has(ci):                     # cubos, a juego con el voxel (eran esferas); compartidos (06-11-2026)
+			var sm := BoxMesh.new()
+			sm.size = Vector3.ONE * 0.34
+			var m := StandardMaterial3D.new()
+			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			m.albedo_color = cols[ci] * 0.75
+			sm.material = m
+			_cubes[ci] = sm
+		mi.mesh = _cubes[ci]
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(mi)
 		_spheres.append(mi)

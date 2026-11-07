@@ -42,25 +42,22 @@ func _ready() -> void:
 		_key()
 		reset_physics_interpolation.call_deferred()
 		return
+	if _wood_mat == null:                            # materiales compartidos (06-11-2026)
+		_wood_mat = StandardMaterial3D.new()
+		_wood_mat.albedo_color = WOOD
+		_wood_mat.roughness = 0.8
+		_paint_mat = StandardMaterial3D.new()
+		_paint_mat.albedo_color = PAINT
 	for side in [-1, 1]:
 		var arm := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = Vector3(0.1, 0.05, 0.42)
-		arm.mesh = bm
-		var m := StandardMaterial3D.new()
-		m.albedo_color = WOOD
-		m.roughness = 0.8
-		arm.material_override = m
+		arm.mesh = VoxelFx.box(Vector3(0.1, 0.05, 0.42))
+		arm.material_override = _wood_mat
 		arm.rotation.y = side * 0.55
 		arm.position = Vector3(side * 0.1, 0, 0.1)
 		_spin.add_child(arm)
 		var band := MeshInstance3D.new()             # franja pintada en cada brazo
-		var bb := BoxMesh.new()
-		bb.size = Vector3(0.11, 0.06, 0.07)
-		band.mesh = bb
-		var pm := StandardMaterial3D.new()
-		pm.albedo_color = PAINT
-		band.material_override = pm
+		band.mesh = VoxelFx.box(Vector3(0.11, 0.06, 0.07))
+		band.material_override = _paint_mat
 		band.position = Vector3(0, 0, 0.12)
 		arm.add_child(band)
 	add_child(VoxelFx.emitter("streak", 0.35, false, false, Color(0.75, 0.6, 0.4)))   # rastro al girar (11-10-2026)
@@ -101,22 +98,26 @@ func _physics_process(delta: float) -> void:
 		hits += 1
 
 ## La llave de plata de Randolph Carter: ojo, caña y paletón de plata que brilla, girando.
+static var _wood_mat: StandardMaterial3D
+static var _paint_mat: StandardMaterial3D
+static var _key_mat: StandardMaterial3D
+
 func _key() -> void:
-	var m := StandardMaterial3D.new()
-	m.albedo_color = Color(0.82, 0.88, 0.98)
-	m.metallic = 0.6
-	m.roughness = 0.3
-	m.emission_enabled = true
-	m.emission = Color(0.55, 0.70, 1.0)
-	m.emission_energy_multiplier = 1.4
+	if _key_mat == null:
+		_key_mat = StandardMaterial3D.new()
+		_key_mat.albedo_color = Color(0.82, 0.88, 0.98)
+		_key_mat.metallic = 0.6
+		_key_mat.roughness = 0.3
+		_key_mat.emission_enabled = true
+		_key_mat.emission = Color(0.55, 0.70, 1.0)
+		_key_mat.emission_energy_multiplier = 1.4
+	var m := _key_mat
 	for b: Array in [[Vector3(0.05, 0.04, 0.18), Vector3(0, 0, 0.12)], [Vector3(0.05, 0.04, 0.18), Vector3(0, 0, -0.04)],   # el ojo
 			[Vector3(0.16, 0.04, 0.05), Vector3(-0.07, 0, 0.04)], [Vector3(0.16, 0.04, 0.05), Vector3(0.07, 0, 0.04)],
 			[Vector3(0.05, 0.04, 0.34), Vector3(0, 0, -0.27)],                                                         # la caña
 			[Vector3(0.10, 0.04, 0.05), Vector3(0.06, 0, -0.38)], [Vector3(0.07, 0.04, 0.05), Vector3(0.05, 0, -0.30)]]:   # el paletón
 		var mi := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = b[0]
-		mi.mesh = bm
+		mi.mesh = VoxelFx.box(b[0])
 		mi.position = b[1] + Vector3(0, 0, 0.12)
 		mi.material_override = m
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

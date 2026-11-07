@@ -13,6 +13,7 @@ var _t := 0.0
 var _struck := false
 var _warn: Telegraph
 var _bits: Array[MeshInstance3D] = []
+static var _meshes: Array[BoxMesh] = []
 var _hole_mat: ShaderMaterial
 
 const WARN := 0.35
@@ -41,18 +42,20 @@ func _ready() -> void:
 	var cols := [Color(0.12, 0.16, 0.1), Color(0.2, 0.28, 0.14), Color(0.35, 0.18, 0.3)]
 	for i in BITS:
 		var mi := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		var w := lerpf(0.42, 0.12, float(i) / BITS)
-		bm.size = Vector3(w, 0.26, w)
-		var m := StandardMaterial3D.new()
-		m.albedo_color = cols[i % 3]
-		m.roughness = 0.4
-		if i == BITS - 1:
-			m.emission_enabled = true
-			m.emission = Color(0.6, 1.0, 0.4)
-			m.emission_energy_multiplier = 0.8
-		bm.material = m
-		mi.mesh = bm
+		if _meshes.size() <= i:                      # una por trozo, compartidas (06-11-2026)
+			var bm := BoxMesh.new()
+			var w := lerpf(0.42, 0.12, float(i) / BITS)
+			bm.size = Vector3(w, 0.26, w)
+			var m := StandardMaterial3D.new()
+			m.albedo_color = cols[i % 3]
+			m.roughness = 0.4
+			if i == BITS - 1:
+				m.emission_enabled = true
+				m.emission = Color(0.6, 1.0, 0.4)
+				m.emission_energy_multiplier = 0.8
+			bm.material = m
+			_meshes.append(bm)
+		mi.mesh = _meshes[i]
 		mi.visible = false
 		add_child(mi)
 		_bits.append(mi)

@@ -98,9 +98,7 @@ func _process(_delta: float) -> void:
 	while _next <= reach and _next <= length:           # la raja y sus esquirlas, según avanza
 		var side := randf_range(-0.25, 0.25)
 		var crack := MeshInstance3D.new()
-		var cb := BoxMesh.new()
-		cb.size = Vector3(0.14, 0.03, SHARD_EVERY * 1.1)
-		crack.mesh = cb
+		crack.mesh = VoxelFx.box(Vector3(0.14, 0.03, SHARD_EVERY * 1.1))   # mallas compartidas (06-11-2026)
 		crack.material_override = _crack_mat
 		crack.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(crack)
@@ -108,10 +106,9 @@ func _process(_delta: float) -> void:
 		crack.rotation.y = atan2(dir.x, dir.z) + randf_range(-0.3, 0.3)
 		for k in 2:
 			var shard := MeshInstance3D.new()
-			var sb := BoxMesh.new()
 			var h := randf_range(0.3, 0.6)
-			sb.size = Vector3(randf_range(0.12, 0.2), h, randf_range(0.12, 0.2))
-			shard.mesh = sb
+			shard.mesh = VoxelFx.box1()
+			shard.scale = Vector3(randf_range(0.12, 0.2), h, randf_range(0.12, 0.2))
 			shard.material_override = _shard_mat
 			add_child(shard)
 			shard.position = dir * _next + dir.cross(Vector3.UP) * randf_range(-half_width, half_width) * 0.8

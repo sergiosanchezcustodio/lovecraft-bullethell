@@ -47,9 +47,9 @@ func setup(origin: Vector3, dir: Vector3, length: float, half_width: float, life
 
 func _bar(size: Vector3, c: Color, additive: bool, k: float) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = size
-	mi.mesh = bm
+	mi.mesh = VoxelFx.box1()                        # caja de 1 m compartida (06-11-2026): el tamaño, en la escala
+	mi.scale = size
+	mi.set_meta("size", size)
 	var m := StandardMaterial3D.new()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -71,8 +71,8 @@ func _process(delta: float) -> void:
 		return
 	var u := clampf(_t / _life, 0.0, 1.0)
 	var k := 1.0 - u * u
-	_core.scale = Vector3(k, k, 1.0)
-	_glow.scale = Vector3(0.6 + 0.6 * u, 0.6 + 0.6 * u, 1.0)
+	_core.scale = _core.get_meta("size") * Vector3(k, k, 1.0)
+	_glow.scale = _glow.get_meta("size") * Vector3(0.6 + 0.6 * u, 0.6 + 0.6 * u, 1.0)
 	_mat_glow.albedo_color.a = 0.45 * k
 	_mat_core.albedo_color.a = 0.95 * k
 	_light.light_energy = 2.0 * k

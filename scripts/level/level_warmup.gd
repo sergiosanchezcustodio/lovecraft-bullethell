@@ -7,7 +7,7 @@ extends Node3D
 ##    malla de vuelta de la GPU: lento, y antes se hacía con la primera muerte de cada tipo),
 ##  - y lo dibuja unos fotogramas bajo el suelo, delante de la cámara, tal cual, con el destello
 ##    del golpe, con el de los jefes y deshaciéndose: así se compilan sus shaders ahora y no al
-##    aparecer, al recibir el primer golpe o al morir.
+##    aparecer, al recibir el primer golpe o al morir. También el baúl arcano.
 ## `warmup=false` lo quita (para comparar).
 
 const FRAMES := 3                          ## fotogramas que se dibujan antes de quitarlos
@@ -78,6 +78,12 @@ static func start(parent: Node, level: LevelData, at: Vector3) -> LevelWarmup:
 				mmi.multimesh.buffer = PackedFloat32Array([1, 0, 0, x, 0, 1, 0, 0, 0, 0, 1, z, 0, 0, 0, 0])
 				w.add_child(mmi)
 				k += 1
+	# el baúl arcano (07-11-2026: el primero compilaba sus shaders al aparecer, a mitad de nivel). Sin
+	# `setup` no cuenta como baúl ni se abre: solo se dibuja.
+	if level.chest_every > 0.0:
+		var c := ArcaneChest.new()
+		w.add_child(c)
+		c.position = Vector3((k % 6) * 2.5 - 6.0, 0.0, (k / 6) * 2.5 - 6.0)
 	last_models = list.size()
 	return w
 

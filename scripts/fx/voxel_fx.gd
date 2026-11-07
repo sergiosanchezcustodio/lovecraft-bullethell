@@ -104,6 +104,18 @@ static func box1() -> BoxMesh:
 		_box1.size = Vector3.ONE
 	return _box1
 
+static var _boxes := {}
+
+## Caja de ese tamaño, compartida: para las piezas de tamaño fijo de los efectos (las de tamaño
+## variable, `box1` con el tamaño en la escala).
+static func box(size: Vector3) -> BoxMesh:
+	var k := size.snapped(Vector3.ONE * 0.001)
+	if not _boxes.has(k):
+		var b := BoxMesh.new()
+		b.size = k
+		_boxes[k] = b
+	return _boxes[k]
+
 ## Mancha animada del suelo (`ground_fx.gdshader`): 0 fuego, 1 ácido, 2 quemado.
 static func ground(mode: int, radius: float) -> MeshInstance3D:
 	if _ground_shader == null: _ground_shader = preload("res://scripts/fx/ground_fx.gdshader")

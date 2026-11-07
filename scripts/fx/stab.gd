@@ -30,9 +30,7 @@ func setup(from: Vector3, to: Vector3) -> Stab:
 func _ready() -> void:
 	Damage.ctx = _wtag
 	_blade = MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = Vector3(0.14, 0.07, blade)
-	_blade.mesh = bm
+	_blade.mesh = VoxelFx.box(Vector3(0.14, 0.07, blade))      # mallas compartidas (06-11-2026)
 	_mat = StandardMaterial3D.new()
 	_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -42,9 +40,7 @@ func _ready() -> void:
 	add_child(_blade)
 	# estela de la hoja (11-10-2026): un trazo aditivo detrás que se estira y se apaga
 	_trail = MeshInstance3D.new()
-	var tb := BoxMesh.new()
-	tb.size = Vector3(0.22, 0.03, 1.0)
-	_trail.mesh = tb
+	_trail.mesh = VoxelFx.box(Vector3(0.22, 0.03, 1.0))
 	_trail_mat = StandardMaterial3D.new()
 	_trail_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_trail_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

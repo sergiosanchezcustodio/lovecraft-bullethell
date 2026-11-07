@@ -34,7 +34,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `cam=`: altura visible en m (por defecto 15).
   - `demo=N`: criaturas de muestra quietas.
   - `pos=x,z`: posición inicial del jugador.
-  - `perf=N`: mide el rendimiento N segundos.
+  - `perf=N`: mide el rendimiento N segundos. Si antes se supera el nivel o se cae, da el informe de lo medido («RENDIMIENTO cortada a los … s») y sale (07-11-2026: antes se quedaba parada en la pantalla final).
   - `fogvol=false`: quita los halos de niebla.
   - `--debug`: imprime la posición del jugador.
   - `dodge=deslizar|rodar|plancha|salto|destello`: estilo de esquive (F1 los recorre en partida).

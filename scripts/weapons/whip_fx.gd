@@ -25,15 +25,20 @@ func setup(origin: Vector3, p_dir: Vector3, p_length: float, spread_deg: float) 
 	half = deg_to_rad(spread_deg) * 0.5
 	return self
 
+## Malla de los trozos del látigo, con su material, compartida (06-11-2026: antes, nueva en cada latigazo).
+static var _bm: BoxMesh
+
 func _ready() -> void:
-	var bm := BoxMesh.new()
-	bm.size = Vector3.ONE * 0.11
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.32, 0.2, 0.12)
-	mat.emission_enabled = true
-	mat.emission = Color(0.9, 0.75, 0.5)
-	mat.emission_energy_multiplier = 0.25
-	bm.material = mat
+	if _bm == null:
+		_bm = BoxMesh.new()
+		_bm.size = Vector3.ONE * 0.11
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = Color(0.32, 0.2, 0.12)
+		mat.emission_enabled = true
+		mat.emission = Color(0.9, 0.75, 0.5)
+		mat.emission_energy_multiplier = 0.25
+		_bm.material = mat
+	var bm := _bm
 	for i in SEGMENTS:
 		var mi := MeshInstance3D.new()
 		mi.mesh = bm

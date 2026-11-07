@@ -206,7 +206,16 @@ func report() -> String:
 		_rows.reduce(func(a: int, r: Dictionary) -> int: return a + int(r.shaders), 0)])
 	var worst := 0.0
 	for r in _rows: worst = maxf(worst, float(r.ms))
-	out.append("PICOS tirones (más de %.0f ms): %d  peor: %.1f ms" % [HITCH, _rows.filter(func(r: Dictionary) -> bool: return r.ms > HITCH).size(), worst])
+	var hitches := _rows.filter(func(r: Dictionary) -> bool: return r.ms > HITCH)
+	out.append("PICOS tirones (más de %.0f ms): %d  peor: %.1f ms" % [HITCH, hitches.size(), worst])
+	if not hitches.is_empty():                   # cuándo caen (07-11-2026: los peores no dicen si van juntos)
+		var per := {}
+		for r in hitches:
+			var k := int(float(r.t) / 30.0) * 30
+			per[k] = int(per.get(k, 0)) + 1
+		var keys := per.keys()
+		keys.sort()
+		out.append("PICOS tirones por medio minuto (s desde el arranque: cuántos): " + "  ".join(keys.map(func(k: int) -> String: return "%d: %d" % [k, per[k]])))
 	var comp := _rows.filter(func(r: Dictionary) -> bool: return int(r.shaders) > 0)
 	if not comp.is_empty():
 		var cl := "PICOS compilaciones (s desde el arranque: cuántas, ms del fotograma):"

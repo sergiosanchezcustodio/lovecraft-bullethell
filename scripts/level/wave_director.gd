@@ -36,6 +36,10 @@ var pool_override: Array[EnemyData] = []   ## no vacío: solo aparecen estos, co
 var _acc := 0.0
 var _final: Enemy
 var _final_done := false
+## La oleada del evento final sale FINAL_PER_STEP por paso de física (07-11-2026): los 25 a la
+## vez, con el jefe, eran 400 nodos nuevos y un tirón de 45 ms. Fuera de cámara no se nota.
+const FINAL_PER_STEP := 3
+var _final_left := 0
 var _mid_done := 0                          ## eventos intermedios ya lanzados
 var mid_alive: Array[Enemy] = []            ## minijefes intermedios vivos (HUD)
 var completed := false
@@ -70,10 +74,10 @@ func _physics_process(delta: float) -> void:
 	elif not _final_done and level.final_enemy != null and time >= level.final_time:
 		_final_done = true
 		_final = spawn(level.final_enemy, spawn_point(level.final_enemy.body_radius))
-		for i in level.final_wave:
-			var d := pick()
-			if d != null: spawn(d, spawn_point(d.body_radius))
+		_final_left = level.final_wave
+		_final_wave_step()
 		final_event.emit(_final)
+	elif _final_left > 0: _final_wave_step()
 	var scale := level.final_spawn_scale if _final_done else 1.0
 	if _boss_on: scale *= BOSS_SPAWN_SCALE         # con el jefe en pantalla, las oleadas casi paran
 	_acc += level.rate_at(time) * scale * LevelData.coop(level.coop_spawn, players) * _idol() * Difficulty.rate(time) * Challenge.value("spawn_rate") * delta
@@ -86,6 +90,12 @@ func _physics_process(delta: float) -> void:
 		if d == null: break
 		if d.emerge and _emerge(d): continue
 		spawn(d, spawn_point(d.body_radius))
+
+func _final_wave_step() -> void:
+	for i in mini(_final_left, FINAL_PER_STEP):
+		var d := pick()
+		if d != null: spawn(d, spawn_point(d.body_radius))
+	_final_left = maxi(_final_left - FINAL_PER_STEP, 0)
 
 ## Evento de supervivencia (hito 6.3): de final_time a final_time + final_survive llega la
 ## horda a su ritmo; al acabar, nivel superado. Devuelve true mientras dura (sustituye a las

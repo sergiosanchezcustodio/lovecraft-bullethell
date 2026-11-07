@@ -36,9 +36,7 @@ func setup(p: Player, p_world: CombatWorld, p_length: float, p_half: float, p_sp
 
 func _ready() -> void:
 	_beam = MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = Vector3(1, 0.18, 1)
-	_beam.mesh = bm
+	_beam.mesh = VoxelFx.box(Vector3(1, 0.18, 1))   # compartida (06-11-2026)
 	_mat = StandardMaterial3D.new()
 	_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -48,7 +46,7 @@ func _ready() -> void:
 	add_child(_beam)
 	# estela: el mismo haz algo atrás en el giro y más tenue; y motas doradas (11-10-2026)
 	_ghost = MeshInstance3D.new()
-	_ghost.mesh = bm
+	_ghost.mesh = _beam.mesh
 	_ghost_mat = _mat.duplicate()
 	_ghost.material_override = _ghost_mat
 	_ghost.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

@@ -1441,6 +1441,7 @@ var _replay_frames: Array[Image] = []
 func _game_over() -> void:
 	if _ended: return
 	_ended = true
+	if args.has("perf"): _perf_report("caída")
 	if is_net_host(): net_game.send_lost()
 	if args.get_bool("log") and director != null:
 		print("FIN DERROTA %s t=%d abatidos=%d nivel_j1=%d" % [level.id, int(director.time), director.killed_total, player.progress.level])
@@ -1571,6 +1572,7 @@ func _endless_record() -> void:
 func _on_level_completed() -> void:
 	if _ended: return
 	_ended = true
+	if args.has("perf"): _perf_report("nivel superado")   # con el juego en pausa ya no se mediría
 	Rumble.all(0.5, 1.0, 0.9, "nivel superado")      # el jefe cae (16.30)
 	for q in players:                                # pose de victoria (hito 17.5)
 		if q.health > 0.0 and not q.is_downed(): q.play_once(q.data.victory if q.data.victory != "" else "win_fist", true)
@@ -2248,6 +2250,14 @@ func _perf(delta: float) -> void:
 	_peak_enemies = maxi(_peak_enemies, world.enemies.size())
 	_peak_bullets = maxi(_peak_bullets, world.bullets.count)
 	if _t < 2.0 + args.get_float("perf", 10.0): return
+	_perf_report()
+
+## El informe de `perf=` y salir. `why`: la partida acabó antes (07-11-2026: al superar el nivel
+## la pantalla final pausaba el juego, `_perf` no volvía a correr y la medición no se cerraba nunca;
+## SpikeLog seguía apuntando fotogramas y llegó a 13 GB en 4 horas).
+func _perf_report(why := "") -> void:
+	if _frames.is_empty(): return
+	if why != "": print("RENDIMIENTO cortada a los %.0f s de los %.0f: %s" % [_t - 2.0, args.get_float("perf", 10.0), why])
 	_frames.sort()
 	var avg := 0.0
 	for f in _frames: avg += f

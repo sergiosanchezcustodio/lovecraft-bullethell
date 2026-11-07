@@ -23,6 +23,8 @@ var _parts: GPUParticles3D
 
 const DROP_EVERY := 1.4
 
+static var _mats: Array[StandardMaterial3D] = []
+
 func setup(p_world: CombatWorld, origin: Vector3, p_dir: Vector3, p_speed: float, p_length: float, p_radius: float,
 		p_damage: float, z_r: float, z_t: float, z_dps: float, p_bonus: Dictionary) -> Fireball:
 	world = p_world; dir = Vector3(p_dir.x, 0, p_dir.z).normalized(); speed = p_speed; length = p_length
@@ -37,14 +39,14 @@ func _ready() -> void:
 	add_child(_core)
 	for k in 3:
 		var mi := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = Vector3.ONE * radius * [1.15, 0.85, 0.5][k]
-		var mat := StandardMaterial3D.new()
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if k == 0 else BaseMaterial3D.TRANSPARENCY_DISABLED
-		mat.albedo_color = [Color(0.8, 0.22, 0.04, 0.55), Color(0.85, 0.5, 0.1), Color(0.9, 0.85, 0.55)][k]
-		bm.material = mat
-		mi.mesh = bm
+		if _mats.size() <= k:                      # materiales y cajas compartidos (06-11-2026)
+			var mat := StandardMaterial3D.new()
+			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if k == 0 else BaseMaterial3D.TRANSPARENCY_DISABLED
+			mat.albedo_color = [Color(0.8, 0.22, 0.04, 0.55), Color(0.85, 0.5, 0.1), Color(0.9, 0.85, 0.55)][k]
+			_mats.append(mat)
+		mi.mesh = VoxelFx.box(Vector3.ONE * radius * [1.15, 0.85, 0.5][k])
+		mi.material_override = _mats[k]
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		mi.rotation = Vector3(randf(), randf(), randf()) * TAU
 		_core.add_child(mi)
