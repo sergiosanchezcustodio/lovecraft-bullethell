@@ -596,14 +596,14 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 18.10 | **Zonas en el suelo:** gas, polvo, fuego y ácido en capas que se mueven, con el sombreador del 18.2 | Pendiente |
-| 18.11 | **Signos y ondas:** fórmula, signo, resonador y red, con runas que brillan y chispas que suben | Pendiente |
-| 18.12 | **Haces y rayos:** la lámpara con caída de luz y motas; lente, trapezoedro y la bobina, con ramas que parpadean | Pendiente |
-| 18.13 | **Lo arcano que apenas se ve:** Yith, la llave de los sueños, West, los Mi-Go, Shub-Niggurath y las pisadas de Dunwich | Pendiente |
+| 18.10 | **Zonas en el suelo:** gas, polvo, fuego y ácido en capas que se mueven, con el sombreador del 18.2 | **Hecho (07-11-2026), pendiente de tu revisión:** segunda capa que se mueve en `ground_fx` (lenguas de fuego, película del ácido, gas que se cruza, vetas del polvo; solo en Alta) y la mancha se abre con un rebote |
+| 18.11 | **Signos y ondas:** fórmula, signo, resonador y red, con runas que brillan y chispas que suben | **Hecho (07-11-2026), pendiente de tu revisión:** cortina de luz en celdas que sube con la onda de la fórmula y el resonador y del borde del signo (`FxShade` modo 3, `VoxelFx.ring_wall`); la red es un lanzado y no se ha tocado |
+| 18.12 | **Haces y rayos:** la lámpara con caída de luz y motas; lente, trapezoedro y la bobina, con ramas que parpadean | **Hecho (07-11-2026), pendiente de tu revisión:** halos con ondas en celdas en la lente (`ether`) y la bobina (`bolt`), y ramas en el zigzag; el trapezoedro, sin cambios |
+| 18.13 | **Lo arcano que apenas se ve:** Yith, la llave de los sueños, West, los Mi-Go, Shub-Niggurath y las pisadas de Dunwich | **Hecho (07-11-2026), pendiente de tu revisión:** trazadoras de Yith y del fuego fatuo en celdas a escalones (anillos que corren; llama que se deshace). La llave y los Mi-Go ya tenían estela (18.1) y las pisadas la grieta (18.6); West y Shub, sin cambios |
 
 ### Bloque E: evoluciones
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 18.14 | **Un acento propio por evolución:** color, partículas o estela que la distinguen de su arma de base, en datos | Pendiente |
+| 18.14 | **Un acento propio por evolución:** color, partículas o estela que la distinguen de su arma de base, en datos | **Hecho (07-11-2026), pendiente de tu revisión:** `FxAccent` y `accents` en `data/weapon_fx.json`: por rama (dorado y violeta) o por evolución (`by_id`); estelas más anchas y teñidas y un destello en cada golpe |
 

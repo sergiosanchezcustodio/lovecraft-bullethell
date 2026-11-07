@@ -18,6 +18,7 @@ var slowed := 0                              ## balas frenadas (tests)
 var _t := 0.0
 var _tick := 0.0
 var _mat: ShaderMaterial
+var _wall: MeshInstance3D
 var _motes: GPUParticles3D
 var _light: OmniLight3D
 
@@ -41,6 +42,15 @@ func _ready() -> void:
 	_mat = g.material_override
 	_mat.set_shader_parameter("tint", COLOR * 0.75)
 	add_child(g)
+	_wall = MeshInstance3D.new()                 # cortina que sube del borde al aparecer (hito 18.11)
+	_wall.mesh = VoxelFx.ring_wall()
+	_wall.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if FxShade.apply(_wall, "wall"):
+		_wall.set_instance_shader_parameter("tint", COLOR.lightened(0.35))
+		add_child(_wall)
+	else:
+		_wall.free()
+		_wall = null
 	_motes = VoxelFx.emitter("motes", radius, false, false, Color(0.75, 0.5, 1.0))
 	add_child(_motes)
 	_light = OmniLight3D.new()
@@ -74,3 +84,8 @@ func _process(_delta: float) -> void:
 	_mat.set_shader_parameter("fade", 1.0 - smoothstep(life, life + FADE, _t))
 	if _t >= life: _motes.emitting = false
 	_light.light_energy = 0.9 * k
+	if _wall:
+		var w := clampf(_t / 0.6, 0.0, 1.0)
+		_wall.visible = w < 1.0
+		_wall.scale = Vector3(radius * 0.98, 1.1 * (1.0 - pow(1.0 - w, 2.0)) + 0.05, radius * 0.98)
+		_wall.set_instance_shader_parameter("fade", 1.0 - smoothstep(0.3, 1.0, w))

@@ -32,6 +32,7 @@ func setup(p_world: CombatWorld, p_kind: int, pos: Vector3, p_radius: float, p_l
 	return self
 
 var _ground_mat: ShaderMaterial               ## mancha animada (ground_fx)
+var _ground: MeshInstance3D
 var _extra: Array[GPUParticles3D] = []
 
 func _ready() -> void:
@@ -57,6 +58,9 @@ func _ready_voxel() -> void:
 	var g := VoxelFx.ground(mode, radius)
 	add_child(g)
 	_ground_mat = g.material_override
+	_ground = g
+	if int(Quality.value("weapon_fx", 2)) >= 2 and not lite:   # hito 18.10: la segunda capa, solo en Alta
+		_ground_mat.set_shader_parameter("layers", 1.0)
 	var fx := Node3D.new()
 	fx.position.y = 0.08
 	add_child(fx)
@@ -100,4 +104,8 @@ func _process(_delta: float) -> void:
 	Damage.ctx = _wtag
 	var fade := 1.0 - smoothstep(life, life + FADE, _t)
 	_ground_mat.set_shader_parameter("fade", fade * smoothstep(0.0, 0.15, _t))
+	if _ground.scale.x != radius or _t < 0.3:      # se abre al caer, con un rebote (hito 18.10)
+		var k := clampf(_t / 0.3, 0.0, 1.0)
+		var s := 1.0 + 0.08 * sin(k * PI) - 0.45 * pow(1.0 - k, 3.0)
+		_ground.scale = Vector3(radius * s, 1.0, radius * s)
 	if _light: _light.light_energy = (1.1 + 0.5 * sin(_t * 23.0) * sin(_t * 7.0)) * fade

@@ -12,7 +12,7 @@ const POOL := 6
 const PER_FRAME := 4
 const GAP := 0.09                       ## s entre chispas en el mismo enemigo
 const KINDS := ["bullet", "cut", "blunt", "fire", "acid", "arcane", "shock"]
-const BURSTS := ["crack", "hammer", "snap", "glass"]                ## ráfagas sueltas de las armas (`burst`), con su receta de VoxelFx
+const BURSTS := ["crack", "hammer", "snap", "glass", "glint_gold", "glint_violet"]                ## ráfagas sueltas de las armas (`burst`), con su receta de VoxelFx
 
 static var enabled := true
 static var _inst: HitSparks
@@ -48,6 +48,7 @@ static func setup(world: CombatWorld) -> void:
 	if not enabled or world == null: return
 	var lv := int(Quality.value("weapon_fx", 2))
 	if lv <= 0: return
+	FxAccent.build()
 	var h := HitSparks.new()
 	h.name = "HitSparks"
 	h._every = 2 if lv == 1 else 1
@@ -96,6 +97,8 @@ func _hit(e: Node3D, d: Damage, radius: float, height: float) -> void:
 	var x := up.cross(z).normalized()
 	p.global_transform = Transform3D(Basis(x, up, z), at)   # el eje z del emisor, hacia quien golpea
 	p.restart()
+	var acc := FxAccent.of(d.tag)                     # evoluciones (hito 18.14): destello de su rama
+	if not acc.is_empty() and _pools.has(acc["glint"]): burst(acc["glint"], at)
 
 ## Tipo de impacto del golpe: por cómo mata, si es solo mental, o por la forma del arma.
 static func kind_of(d: Damage) -> String:

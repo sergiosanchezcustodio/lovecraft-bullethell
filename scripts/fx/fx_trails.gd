@@ -39,6 +39,10 @@ static func attach(target: Node3D, recipe: String, tint := Color.WHITE, width :=
 	if r.is_empty(): return
 	var t := of(target.get_tree())
 	if t == null: return
+	var acc := FxAccent.of(Damage.ctx)                 # evoluciones (hito 18.14): más anchas y teñidas
+	if not acc.is_empty():
+		tint = tint * (acc["tint"] as Color)
+		width *= float(acc["width"])
 	t._trails.append(_new_trail(weakref(target), r, tint, float(r.get("width", 0.2)) * width,
 		float(r.get("life", 0.25)) * (0.6 if lv == 1 else 1.0)))
 

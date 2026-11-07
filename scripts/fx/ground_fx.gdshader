@@ -22,10 +22,14 @@ uniform float seed = 0.0;
 uniform float cell = 0.0625;
 uniform float wave_r = 0.0;
 uniform vec3 tint : source_color = vec3(1.0, 0.84, 0.46);
+uniform float layers = 0.0;                  // hito 18.10: segunda capa que se mueve (1 con weapon_fx)
+
+#include "res://scripts/fx/fx_common.gdshaderinc"
 
 varying vec3 wpos;
 
-float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+// sin senos (07-11-2026): con las coordenadas del mundo, fract(sin(x) * 43758) dejaba hileras
+float hash(vec2 p) { return fx_hash(p); }
 vec2 grad(vec2 i) { float a = hash(i) * 6.2831853; return vec2(cos(a), sin(a)); }
 float gnoise(vec2 p) {
 	vec2 i = floor(p), f = fract(p);
@@ -140,6 +144,11 @@ void fragment() {
 		// fuego: lecho de brasas; el calor corre hacia fuera y late por celdas
 		float heat = fbm(n * 0.9 + vec2(t * 0.35, -t * 0.6)) + 0.12 * sin(t * 6.0 + fbm(n * 0.5) * 12.0) + 0.04 * g;
 		heat = heat * (1.0 - rim * 0.7) - 0.05;
+		if (layers > 0.0) {                                 // lenguas que corren hacia fuera, a otra velocidad
+			float ang0 = atan(q.y, q.x);
+			float tongue = gnoise(vec2(ang0 * 2.5 + seed, r * 3.0 - t * 1.6));
+			heat += step(0.72, tongue) * 0.22 * (1.0 - rim) * layers;
+		}
 		heat = floor(heat * 6.0) / 6.0;                     // escalones, como los voxels
 		vec3 coal = vec3(0.10, 0.04, 0.03);
 		vec3 red = vec3(0.85, 0.18, 0.04);
@@ -174,19 +183,36 @@ void fragment() {
 		float pop = step(0.85, ph) * step(br, 3.2) * step(2.2, br);
 		float bub = clamp(ring + fill + pop, 0.0, 1.0) * on * (1.0 - rim);
 		col = mix(col, vec3(0.6, 0.9, 0.2) * 0.6, bub);
+		if (layers > 0.0) {                                 // película que gira despacio encima
+			float ang1 = atan(q.y, q.x) + t * 0.25;
+			float film = step(0.8, gnoise(vec2(ang1 * 3.0, r * 6.0) + seed)) * (1.0 - rim) * layers;
+			col = mix(col, vec3(0.55, 0.85, 0.15) * 0.5, film * 0.45);
+			emi += vec3(0.3, 0.6, 0.05) * film * 0.25;
+		}
 		emi = lime * (max(vein, fringe) * 0.3 + bub * 0.9) + col * 0.2;
 		a = mix(0.95, 0.85, rim);
 	} else if (mode == 4) {
 		// gas de cloro: capas turbias amarillo verdosas que derivan, más densas en el centro
 		float den = fbm(n * 0.6 + vec2(t * 0.3, t * 0.12));
+		float top = 0.0;
+		if (layers > 0.0) {                                 // capa de encima, más fina y en otra dirección
+			top = step(0.62, fbm(n * 1.1 + vec2(-t * 0.5, t * 0.35) + 9.0)) * layers;
+			den += top * 0.25;
+		}
 		den = floor((den + 0.35 * (1.0 - rim)) * 4.0) / 4.0;
 		col = mix(vec3(0.18, 0.2, 0.03), vec3(0.5, 0.56, 0.12), den) * 0.6;
+		col = mix(col, vec3(0.62, 0.68, 0.2) * 0.6, top * 0.5);
 		emi = col * 0.15;
 		a = clamp(den * 0.85, 0.0, 0.8) * (1.0 - rim * 0.7);
 	} else if (mode == 5) {
 		// polvo de Ibn-Ghazi: tierra sepia a manchas con motas doradas que se encienden
 		float sd = fbm(n * 1.1);
 		col = mix(vec3(0.22, 0.13, 0.04), vec3(0.45, 0.3, 0.1), floor(sd * 4.0) / 4.0);
+		if (layers > 0.0) {                                 // vetas de arena que corren en espiral
+			float ang2 = atan(q.y, q.x);
+			float vein2 = fract((ang2 * 3.0 + r * 9.0 - t * 1.2) / 6.2831853 * 2.0);
+			col = mix(col, vec3(0.6, 0.42, 0.16), step(vein2, 0.12) * (1.0 - rim) * 0.6 * layers);
+		}
 		float mote = step(0.93, hash(c + floor(t * 3.0 + g * 5.0)));
 		col = mix(col, vec3(1.0, 0.82, 0.4) * 0.7, mote * (1.0 - rim));
 		emi = vec3(1.0, 0.8, 0.35) * mote * (1.0 - rim) * 0.8;

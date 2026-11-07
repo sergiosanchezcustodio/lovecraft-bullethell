@@ -260,3 +260,8 @@ En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra c
 ## Luces puntuales y pipelines (fase 18, 07-11-2026)
 
 - En Forward+, Godot especializa la pipeline según el objeto tenga luces puntuales cerca o no. Un efecto que lleva su propia `OmniLight3D` (la explosión) usa una variante que el calentamiento no dibuja si allí no hay ninguna luz. En `FxShade.prime`, cada receta se dibuja junto a una luz tenue y lejos de ella.
+
+## Nodos que se rehacen cada pocos fotogramas (fase 18, 07-11-2026)
+
+- Un efecto que se redibuja varias veces por segundo (el zigzag de la bobina) debe reciclar sus `MeshInstance3D` en lugar de liberarlos y crearlos. Con uniformes por instancia (`FxShade`), cada nodo nuevo reserva su hueco en el búfer de instancias.
+- `qset=weapon_fx:0` apaga toda la fase 18, no solo el bloque que se prueba: al comparar, la diferencia es la de la fase entera con esas armas.

@@ -27,6 +27,8 @@ uniform vec3 yith_color : source_color = vec3(0.3, 0.95, 0.95);
 uniform vec3 outline_color : source_color = vec3(0.05, 0.02, 0.04);
 uniform float exposure_comp = 0.55;
 
+#include "res://scripts/fx/fx_common.gdshaderinc"
+
 varying flat float v_style;
 varying float v_phase;
 varying float v_age;
@@ -38,7 +40,7 @@ void vertex() {
 	v_style = INSTANCE_CUSTOM.x;
 	v_phase = INSTANCE_CUSTOM.y;
 	v_age = INSTANCE_CUSTOM.z;
-	v_seed = fract(sin(dot(MODEL_MATRIX[3].xz, vec2(12.9898, 78.233))) * 43758.5453);
+	v_seed = fx_hash(floor(MODEL_MATRIX[3].xz * 37.0));   // sin senos: con la posición del mundo dejaba hileras
 	// Cuadrado en el plano de la vista, centrado en la bala. Se calcula POSITION en todos
 	// los casos: si una rama lo escribe y otra no, Godot deja la otra sin posición.
 	vec3 center = (VIEW_MATRIX * vec4(MODEL_MATRIX[3].xyz, 1.0)).xyz;
@@ -160,6 +162,21 @@ void fragment() {
 		alpha = max(core, halo);
 		col = mix(player_color * exposure_comp * 1.3, vec3(1.0, 0.97, 0.88), smoothstep(0.7, 0.98, along) * (1.0 - across));
 		col = mix(player_color * exposure_comp * 0.9, col, core);
+	} else if (style == 5 || style == 4) {
+		// Yith y fuego fatuo (hito 18.13): en celdas, el calor a escalones; en Yith, anillos que
+		// corren hacia la cabeza; en el fatuo, una llama que tiembla y se rompe en la cola
+		vec2 cl = floor(vec2(along * 12.0, UV.y * 5.0));
+		float ac = abs((cl.y + 0.5) / 5.0 * 2.0 - 1.0);
+		float al = (cl.x + 0.5) / 12.0;
+		float nz = fx_noise(cl * vec2(0.7, 1.3) + vec2(-TIME * 9.0, v_seed * 40.0));
+		float h = pow(al, 1.1) * (1.0 - ac * ac) * (0.65 + 0.5 * nz);
+		if (style == 5) h += step(0.75, fract(al * 3.0 - TIME * 5.0 + v_seed)) * 0.25 * (1.0 - ac);
+		else h *= step(0.35 - 0.25 * al, nz);             // la cola se deshace en jirones
+		h = floor(clamp(h, 0.0, 0.999) * 5.0 + 0.5) / 5.0;
+		vec3 pc = style == 4 ? wisp_color : yith_color;
+		alpha = smoothstep(0.05, 0.25, h) * 0.95;
+		col = mix(pc * exposure_comp * 0.7, pc * exposure_comp * 1.5, smoothstep(0.2, 0.6, h));
+		col = mix(col, vec3(1.0, 0.98, 0.9), smoothstep(0.7, 1.0, h));
 	} else if (style >= 4) {
 		// cabeza brillante delante (UV.x alto) y estela que se desvanece detrás
 		alpha = smoothstep(1.0, 0.35, across) * smoothstep(0.0, 0.75, along) * 0.8;

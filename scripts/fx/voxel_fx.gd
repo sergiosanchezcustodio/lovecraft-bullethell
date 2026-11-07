@@ -107,6 +107,7 @@ static func quad1() -> QuadMesh:
 	return _quad1
 
 static var _arc: ArrayMesh
+static var _wall: ArrayMesh
 ## Anillo del arco de los tajos (hito 18.5): de radio 0,5 a 1 en el plano XZ, con el borde de fuera
 ## algo más alto (la hoja barre inclinada). UV.x, la vuelta (0..1, desde +X hacia +Z); UV.y, de
 ## dentro afuera. Compartido: el radio va en la escala del nodo.
@@ -127,6 +128,26 @@ static func arc_ring() -> ArrayMesh:
 	_arc = ArrayMesh.new()
 	_arc.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLE_STRIP, arr)
 	return _arc
+
+## Cilindro abierto de radio 1 y 1 m de alto, solo con UV (x, la vuelta; y, de abajo arriba): la
+## cortina de luz de las ondas y los signos (FxShade modo 3, hito 18.11).
+static func ring_wall() -> ArrayMesh:
+	if _wall != null: return _wall
+	var n := 64
+	var vs := PackedVector3Array()
+	var uv := PackedVector2Array()
+	for i in n + 1:
+		var a := TAU * i / n
+		var d := Vector3(cos(a), 0, sin(a))
+		vs.append(d); uv.append(Vector2(float(i) / n, 0.0))
+		vs.append(d + Vector3(0, 1, 0)); uv.append(Vector2(float(i) / n, 1.0))
+	var arr := []
+	arr.resize(Mesh.ARRAY_MAX)
+	arr[Mesh.ARRAY_VERTEX] = vs
+	arr[Mesh.ARRAY_TEX_UV] = uv
+	_wall = ArrayMesh.new()
+	_wall.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLE_STRIP, arr)
+	return _wall
 
 static func box1() -> BoxMesh:
 	if _box1 == null:
@@ -575,6 +596,20 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_curve = _curve([[0.0, 1.0], [1.0, 0.5]])
 			m.color_ramp = _ramp([[0.0, Color(0.92, 0.95, 1.0, 1.0)], [0.4, Color(0.7, 0.74, 0.8, 0.8)],
 				[1.0, Color(0.5, 0.52, 0.56, 0.0)]])
+		"glint_gold", "glint_violet":   # destello de las evoluciones (hito 18.14): estrella de cubitos que se abre
+			var gold := recipe == "glint_gold"
+			p.draw_pass_1 = cube("add")
+			p.amount = 8
+			p.lifetime = 0.3
+			p.explosiveness = 1.0
+			m.spread = 180.0
+			m.initial_velocity_min = 1.2; m.initial_velocity_max = 2.4
+			m.damping_min = 5.0; m.damping_max = 8.0
+			m.gravity = Vector3(0, 1.5, 0)
+			m.scale_min = 0.035; m.scale_max = 0.06
+			m.color_ramp = _ramp([[0.0, Color(1, 1, 1, 1)],
+				[0.3, Color(1.0, 0.85, 0.4, 0.95) if gold else Color(0.78, 0.6, 1.0, 0.95)],
+				[1.0, Color(0.6, 0.4, 0.1, 0.0) if gold else Color(0.35, 0.2, 0.6, 0.0)]])
 		"snap":                   # el cepo se cierra (hito 18.9): chispazo de hierro y polvo bajo
 			p.draw_pass_1 = cube("add")
 			p.amount = 14

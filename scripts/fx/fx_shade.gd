@@ -31,7 +31,7 @@ static func material(id: String) -> ShaderMaterial:
 	tex.gradient = g
 	tex.width = 64
 	m.set_shader_parameter("ramp", tex)
-	for k in ["mode", "cell", "steps", "scroll", "energy", "sparkle"]:
+	for k in ["mode", "cell", "steps", "scroll", "energy", "sparkle", "axis_z", "falloff", "tail"]:
 		if r.has(k): m.set_shader_parameter(k, r[k])
 	_mats[id] = m
 	return m
@@ -58,6 +58,14 @@ static func set_fade(mi: GeometryInstance3D, fade: float, tint := Color.WHITE) -
 
 ## Calentamiento (LevelWarmup): una caja casi transparente con cada receta, hija de `parent` en
 ## `at` (local), para que sus sombreadores se compilen antes de la partida.
+## La malla con la que se usa cada modo (el anillo y la cortina no llevan normales: otra pipeline).
+static func mesh_for(md: int) -> Mesh:
+	match md:
+		1: return VoxelFx.arc_ring()
+		2: return VoxelFx.quad1()
+		3: return VoxelFx.ring_wall()
+	return VoxelFx.box1()
+
 static func prime(parent: Node3D, at: Vector3) -> void:
 	if not on(): return
 	var f := FileAccess.open("res://data/weapon_fx.json", FileAccess.READ)
@@ -89,7 +97,7 @@ static func prime(parent: Node3D, at: Vector3) -> void:
 			var mi := MeshInstance3D.new()
 			# en la malla con la que se usa: el anillo del arco no lleva normales y pide otra pipeline
 			var md := int((shades[id] as Dictionary).get("mode", 0))
-			mi.mesh = VoxelFx.arc_ring() if md == 1 else (VoxelFx.quad1() if md == 2 else VoxelFx.box1())
+			mi.mesh = mesh_for(md)
 			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			parent.add_child(mi)
 			mi.position = at + off

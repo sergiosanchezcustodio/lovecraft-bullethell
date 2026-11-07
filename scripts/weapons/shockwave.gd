@@ -16,6 +16,7 @@ var _t := 0.0
 var _hit := {}                               ## ids ya alcanzados
 var _mat: ShaderMaterial
 var _disc: MeshInstance3D
+var _wall: MeshInstance3D                    ## cortina de luz que sube con la onda (hito 18.11)
 var clears := false                          ## Resonador: deshace las balas enemigas que alcanza
 var color := COLOR
 var cleared := 0                             ## balas deshechas (tests)
@@ -38,6 +39,15 @@ func _ready() -> void:
 	add_child(_disc)
 	_mat = _disc.material_override
 	_mat.set_shader_parameter("tint", Color(color.r, color.g, color.b))
+	_wall = MeshInstance3D.new()
+	_wall.mesh = VoxelFx.ring_wall()
+	_wall.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if FxShade.apply(_wall, "wall"):
+		_wall.set_instance_shader_parameter("tint", Color(color.r, color.g, color.b).lightened(0.15))
+		add_child(_wall)
+	else:
+		_wall.free()
+		_wall = null
 	var dust := VoxelFx.emitter("ring_dust", _radius, true)
 	dust.position.y = 0.1
 	add_child(dust)
@@ -72,4 +82,9 @@ func _process(_delta: float) -> void:
 	_mat.set_shader_parameter("wave_r", maxf(current_radius(), 0.3) / _radius)
 	var fade := 1.0 - smoothstep(_grow, _grow + FADE, _t)
 	_mat.set_shader_parameter("fade", fade)
+	if _wall:
+		var u := clampf(_t / _grow, 0.0, 1.0)
+		var r := maxf(current_radius(), 0.3)
+		_wall.scale = Vector3(r, lerpf(0.9, 0.35, u), r)             # alta al salir, baja al abrirse
+		_wall.set_instance_shader_parameter("fade", fade * (1.0 - 0.6 * u))
 	if _t > _grow + FADE + 0.6: queue_free()               # deja acabar el polvo

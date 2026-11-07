@@ -174,3 +174,14 @@ func test_los_casquillos_caen_y_se_quedan_en_el_suelo() -> void:
 	assert_eq(c._vel[0], Vector3.ZERO, "quieto")
 	for k in 120: c._process(1.0 / 60.0)
 	assert_eq(c.multimesh.visible_instance_count, 1, "uno, ya encogido del todo")
+
+func test_las_evoluciones_tienen_acento_de_su_rama() -> void:
+	FxAccent.build()
+	assert_true(FxAccent.of(&"J1:bumeran").is_empty(), "el arma de base no lleva acento")
+	var a := FxAccent.of(&"J1:bumeran_hueso")
+	var b := FxAccent.of(&"J2:bumeran_guerra")
+	assert_eq(a.get("glint"), "glint_gold", "la rama principal, dorada")
+	assert_eq(b.get("glint"), "glint_violet", "la segunda rama, violeta")
+	assert_gt(float(a.get("width", 0.0)), 1.0, "estelas más anchas")
+	assert_true(HitSparks.BURSTS.has(a["glint"]) and HitSparks.BURSTS.has(b["glint"]), "ráfagas montadas")
+

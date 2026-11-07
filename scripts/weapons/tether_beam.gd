@@ -24,6 +24,7 @@ var _core: MeshInstance3D
 var _glow: MeshInstance3D
 var _mat_core: StandardMaterial3D
 var _mat_glow: StandardMaterial3D
+var _shaded := false
 var _light: OmniLight3D
 var _sparks: GPUParticles3D                  ## chispas donde muerde el rayo (11-10-2026)
 var _motes: GPUParticles3D
@@ -46,6 +47,7 @@ func _ready() -> void:
 	_mat_core = _core.material_override
 	_glow = _bar(0.2, true)
 	_mat_glow = _glow.material_override
+	_shaded = FxShade.apply(_glow, "ether")                       # hito 18.12: ondas que corren por el rayo
 	_light = OmniLight3D.new()
 	_light.light_color = COLD
 	_light.omni_range = 2.5
@@ -115,6 +117,9 @@ func _process(_delta: float) -> void:
 	var c := COLD.lerp(HOT, u)
 	_mat_core.albedo_color = Color(c.r * 0.9, c.g * 0.9, c.b * 0.9, 0.95 * fade)
 	_mat_glow.albedo_color = Color(c.r * 0.35, c.g * 0.5, c.b * 0.7, 0.5 * fade)
+	if _shaded:
+		_glow.scale = Vector3((1.0 + u * 2.0) * flick, (1.0 + u * 2.0) * flick, len)
+		FxShade.set_fade(_glow, fade, c.lightened(0.3))
 	_light.position = Vector3(0, 0, -len * 0.5)                     # en el extremo del enemigo (look_at mira por -Z)
 	_light.light_color = c
 	_light.light_energy = (0.8 + u * 1.4) * fade
