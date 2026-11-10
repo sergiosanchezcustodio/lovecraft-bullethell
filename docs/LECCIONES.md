@@ -266,3 +266,8 @@ En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra c
 - Un efecto que se redibuja varias veces por segundo (el zigzag de la bobina) debe reciclar sus `MeshInstance3D` en lugar de liberarlos y crearlos. Con uniformes por instancia (`FxShade`), cada nodo nuevo reserva su hueco en el búfer de instancias.
 - `qset=weapon_fx:0` apaga toda la fase 18, no solo el bloque que se prueba: al comparar, la diferencia es la de la fase entera con esas armas.
 - Cada `GPUParticles3D` encendido es otro proceso de partículas y otra llamada de dibujo, aunque sea pequeño. Las chispas recicladas necesitan un tope de emisores vivos (reserva por tipo y golpes por fotograma), no solo de ráfagas: con siete armas a la vez, seis por tipo costaban 0,5 ms.
+
+## Nombres reservados en los sombreadores (10-11-2026)
+
+- `flat` (como `smooth` y `noperspective`) es un calificador de interpolación de GLSL: un `uniform bool flat` da «Expected an identifier or '['» y el sombreador entero no compila. El modo haz de `FxShade` usa `across`.
+- Un haz en una caja vista desde arriba: si la distancia al eje se mide en las dos direcciones del corte (`max(|x|, |y|)`), en todas las caras sale «borde» y el centro no se ve nunca. Para lo que se ve desde la cámara, mide solo a lo ancho.
