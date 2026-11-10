@@ -492,9 +492,15 @@ class Picker extends PanelContainer:
 		match o.kind:
 			PlayerProgress.Option.Kind.NEW_WEAPON: return UiKit.GOLD
 			PlayerProgress.Option.Kind.WEAPON_LEVEL: return Color(1.0, 0.55, 0.25)
-			PlayerProgress.Option.Kind.EVOLUTION: return EVO_COLOR
+			PlayerProgress.Option.Kind.EVOLUTION: return branch_color(o.weapon)
 			PlayerProgress.Option.Kind.SIGN: return SIGN_COLOR
 		return o.upgrade.color
+
+	## Color de una rama de evolución (16.8): el de su acento en la partida (FxAccent, 18.14),
+	## avivado para que se lea como texto; sin acento, el verde de siempre.
+	static func branch_color(w: WeaponData) -> Color:
+		var c := FxAccent.ui_color(w.id) if w != null else Color.TRANSPARENT
+		return c if c.a > 0.0 else EVO_COLOR
 
 	static func _kind(o: PlayerProgress.Option) -> String:
 		match o.kind:

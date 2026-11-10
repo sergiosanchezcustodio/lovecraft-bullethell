@@ -27,6 +27,7 @@ instance uniform float age = 0.0;
 uniform float tail = 2.6;                        // arco: largo de la estela (rad)
 uniform bool axis_z = false;                     // haz: a lo largo de -Z (barras con look_at; el origen en +Z)
 uniform float falloff = 0.6;                     // haz: cuánto se apaga hacia la punta
+uniform bool across = false;                        // haz: del eje al borde solo a lo ancho (se ve desde arriba; trapezoedro, 10-11-2026)
 
 varying vec3 lp;
 varying vec3 sz;
@@ -96,7 +97,8 @@ void fragment() {
 	vec3 cm = (c + 0.5) * cell;
 	float al = axis_z ? (sz.z - cm.z) : cm.x;        // metros desde el origen
 	float u = clamp(al / (axis_z ? sz.z : sz.x), 0.0, 1.0);   // a lo largo
-	float v = axis_z ? max(abs(cm.x / sz.x * 2.0 - 1.0), abs(cm.y / sz.y * 2.0 - 1.0))
+	float v = across ? abs((axis_z ? cm.x / sz.x : cm.z / sz.z) * 2.0 - 1.0)
+		: axis_z ? max(abs(cm.x / sz.x * 2.0 - 1.0), abs(cm.y / sz.y * 2.0 - 1.0))
 		: abs(cm.z / sz.z * 2.0 - 1.0);
 	v = clamp(v, 0.0, 1.0);                          // del eje (0) al borde (1)
 	float cr = axis_z ? cm.x + cm.y : cm.z;

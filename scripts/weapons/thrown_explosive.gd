@@ -103,6 +103,7 @@ func _ready() -> void:
 		"bengala": FxTrails.attach.call_deferred(self, "ember", Color(1.0, 0.6, 0.6))
 		"molotov": FxTrails.attach.call_deferred(self, "ember")
 		"frasco", "baba": FxTrails.attach.call_deferred(self, "acid", Color(tint.r, tint.g, tint.b).lightened(0.3))
+		"red": FxTrails.attach.call_deferred(self, "lash", Color(0.9, 0.85, 0.7))   # la red, al vuelo (10-11-2026)
 
 func _physics_process(delta: float) -> void:
 	Damage.ctx = _wtag

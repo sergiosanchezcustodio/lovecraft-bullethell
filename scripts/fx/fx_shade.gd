@@ -31,7 +31,7 @@ static func material(id: String) -> ShaderMaterial:
 	tex.gradient = g
 	tex.width = 64
 	m.set_shader_parameter("ramp", tex)
-	for k in ["mode", "cell", "steps", "scroll", "energy", "sparkle", "axis_z", "falloff", "tail"]:
+	for k in ["mode", "cell", "steps", "scroll", "energy", "sparkle", "axis_z", "falloff", "across", "tail"]:
 		if r.has(k): m.set_shader_parameter(k, r[k])
 	_mats[id] = m
 	return m

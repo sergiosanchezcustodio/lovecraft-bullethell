@@ -2546,7 +2546,7 @@ Pedida por el autor y decidida en D-50: estilo voxel con degradados y la fase co
 - **El gas se ve de noche:** la nube lleva un velo mínimo en toda la mancha, más brillo propio y un filo más claro en el contorno (`ground_fx`, modo 4).
 - **Caso extremo, medido con el PC libre** (sin el programa de descargas): con lente, bobina, fórmula, resonador, signo, gas y bumerán de guerra a nivel 6, la fase 18 costaba +0,43 ms en p1_n2 y +1,0 ms en p2_n2. Casi la mitad eran las chispas de impacto (`hit_sparks=false` lo separa): con tantas armas golpeando había hasta seis emisores encendidos por tipo, más el destello de la evolución. Ahora `HitSparks.POOL` es 4 (antes 6), `PER_FRAME` es 3 (antes 4) y el destello cuenta para el tope. Medido de nuevo en p2_n2, 3 veces: de 9,66 a 9,84 ms (+0,18).
 
-### Propuestas pendientes tras la fase 18 (ofrecidas al autor el 07-11-2026; sin hacer)
+### Propuestas pendientes tras la fase 18 (ofrecidas al autor el 07-11-2026; hechas el 10-11-2026, abajo)
 
 - Que el aviso de evolución (16.15) use el color del acento de su rama (`FxAccent`), para que coincida con lo que se ve en la partida.
 - La red de Innsmouth y el trapezoedro se quedaron sin retocar en la fase 18: hilos que se tensan en la red y halo en celdas (`FxShade`) en el trapezoedro. Tampoco se tocaron West ni Shub-Niggurath.
@@ -2554,3 +2554,15 @@ Pedida por el autor y decidida en D-50: estilo voxel con degradados y la fase co
 - Sin comprobar en las capturas: el destello de los golpes de las evoluciones (solo lo cubre el test) y el charco del lanzaquímicos con la capa nueva (cayó fuera de plano).
 - Para medir la fase 18: `qset=weapon_fx:0` apaga toda la fase; el caso extremo es `weapons=lente,tesla,formula,resonador,signo,gas,bumeran_guerra wlevel=6` en p2_n2 (9,66 -> 9,84 ms).
 
+### Retoques tras la fase 18 (10-11-2026, pedidos por el autor: «haz todo»)
+
+- **Cartas de rama con el color de su acento** (16.8 y 16.15): en la ventana de elegir evolución, el «EVOLUCIÓN» y el marco de cada carta llevan el color de su rama en la partida (`FxAccent.ui_color`, el tinte del acento avivado para leerse sobre fondo oscuro): dorado la principal, violeta la segunda, o el propio de `by_id` (hielo, brasa, verde, ámbar). Sin acento, el verde de siempre. Captura `shots/game_evo_acento_004.0s.png` (`weapons=thompson wlevel=5 items=oro_obed evolve_at=3`).
+- **Red** (`NetFx`, red de pesca, de Innsmouth y redes de arrastre): cae desde 0,9 m abriéndose y ondulando; los plomos llegan un poco después y rebotan; mientras sujeta, se tensa a tirones (las cuerdas se afinan, se aclaran y la red se encoge un 5 %) y al soltar se afloja y se hunde. En el aire lleva una estela de cuerda (`lash`).
+- **Trapezoedro** (`Beam`): el halo va con el sombreador de efectos (receta `trapezo`: borde al rojo, celdas que corren y chispas), plano para que se vea desde la cámara, y el núcleo es más fino. Solo el rayo del Trapezoedro: el del Mini-Mi-Go y los demás siguen lisos. El modo haz de `FxShade` tiene una opción nueva, `across` (del eje al borde solo a lo ancho): con la caja vista desde arriba, la distancia de siempre daba «borde» en todas las caras y el halo no se veía. Ojo: `flat` es palabra reservada en GLSL.
+- **Tentáculos de Shub:** al brotar, una cortina verde sube del agujero (`FxShade` `wall`) y la punta deja una estela violácea.
+- **West** (`Reanimated`): se levanta con un chispazo verde (`glint_green`) y una cortina que sube a su alrededor, el verde late a tirones como una corriente galvánica (entre el 45 y el 100 % del tinte de antes, que tapaba el modelo) y se deshace con otro chispazo.
+- **Tabla de daño** (16.27): las evoluciones llevan el color de su rama en la barra y en «Evolución…», y un destello de cuadros que late en la esquina de su imagen (`DamageTable.Glint`). Capturas `shots/game_f18c_tabla_021.0s.png` y `game_f18c_tabla2_019.0s.png`.
+- **Comprobado en capturas lo que faltaba:** el destello dorado de los golpes de una evolución (`shots/game_f18c_evo_017.5s.png`, Thompson de Chicago) y el charco del lanzaquímicos con la capa nueva (`game_f18c_evo_*`). La cortina del reanimado de West no salió en ninguna captura (dura 0,45 s); la cubre `test_arsenal3`.
+- Capturas de la red, el trapezoedro, Shub y West: `shots/game_f18r_*`, `game_f18_trap5_003.9s.png`, `game_f18b_shub_*` y `game_f18c_west_*`. Las criaturas de `demo=` no son objetivos: para ver un arma golpeando, captura pasados unos 14 s.
+- Sin medir el rendimiento: son pocos nodos y solo al disparar.
+- Tests: 783 de 783 (`test_hit_fx`, «vuelve solo», falla a veces en la suite completa por tiempos y pasa solo).

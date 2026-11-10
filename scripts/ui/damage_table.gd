@@ -92,7 +92,8 @@ func _source(p: Player, id: String) -> Array:
 		if p.weapons != null:
 			for x: WeaponSystem.Weapon in p.weapons.weapons:
 				if x.data.id == w.id: lv = "  ·  Nv %d" % x.level
-		return [w.display_name + lv, w.get_icon(), ("Evolución" if w.evolved else "Arma") + " " + ["física", "de fuego", "mágica"][int(w.category)]]
+		return [w.display_name + lv, w.get_icon(), ("Evolución" if w.evolved else "Arma") + " " + ["física", "de fuego", "mágica"][int(w.category)],
+			FxAccent.ui_color(w.id)]
 	var up := "res://data/upgrades/%s.tres" % id
 	if ResourceLoader.exists(up):
 		var u: UpgradeData = load(up)
@@ -120,7 +121,8 @@ func _build() -> void:
 	for r: Dictionary in shown:
 		var src := _source(p, String(r.id))
 		_box.add_child(_row(src[1], src[0], src[2], float(r.damage) / maxf(top, 1.0), "%d %%" % roundi(float(r.share) * 100.0),
-			MenuKit.money(roundi(r.damage)), RunArchive.decimal(float(r.dps)), str(int(r.kills))))
+			MenuKit.money(roundi(r.damage)), RunArchive.decimal(float(r.dps)), str(int(r.kills)), false,
+			src[3] if src.size() > 3 else Color.TRANSPARENT))
 	if rows.size() > ROWS:
 		var rest := rows.slice(ROWS)
 		var d := 0.0; var k := 0; var sh := 0.0
@@ -136,7 +138,10 @@ func _build() -> void:
 		RunArchive.decimal(total / maxf(w.clock, 1.0)), str(kills), true))
 
 ## Una fila: imagen, nombre (y debajo, qué es), barra de la parte del total y cuatro cifras.
-func _row(icon: Texture2D, name: String, kind: String, bar: float, share: String, dmg: String, dps: String, kills: String, head := false) -> Control:
+## `accent` (evoluciones, 10-11-2026): el color de su rama en la partida (FxAccent), en la barra, en
+## «Evolución» y en un destello junto a la imagen.
+func _row(icon: Texture2D, name: String, kind: String, bar: float, share: String, dmg: String, dps: String, kills: String, head := false,
+		accent := Color.TRANSPARENT) -> Control:
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 14)
 	var img := TextureRect.new()
@@ -145,6 +150,10 @@ func _row(icon: Texture2D, name: String, kind: String, bar: float, share: String
 	img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	h.add_child(img)
+	if accent.a > 0.0:
+		var g := Glint.new()
+		g.color = accent
+		img.add_child(g)
 	var names := VBoxContainer.new()
 	names.custom_minimum_size = Vector2(NAME_W, 0)
 	names.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -153,7 +162,7 @@ func _row(icon: Texture2D, name: String, kind: String, bar: float, share: String
 	n.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	n.clip_text = true
 	names.add_child(n)
-	if kind != "": names.add_child(UiKit.label(kind, 14, UiKit.TEXT_DIM))
+	if kind != "": names.add_child(UiKit.label(kind, 14, accent if accent.a > 0.0 else UiKit.TEXT_DIM))
 	h.add_child(names)
 	var bar_box := Control.new()
 	bar_box.custom_minimum_size = Vector2(BAR_W, 22)
@@ -165,7 +174,7 @@ func _row(icon: Texture2D, name: String, kind: String, bar: float, share: String
 		bg.position = Vector2(0, 4)
 		bar_box.add_child(bg)
 		var fg := ColorRect.new()
-		fg.color = Color(UiKit.GOLD, 0.75)
+		fg.color = Color(accent if accent.a > 0.0 else UiKit.GOLD, 0.75)
 		fg.size = Vector2(maxf(BAR_W * clampf(bar, 0.0, 1.0), 2.0), 14)
 		fg.position = Vector2(0, 4)
 		bar_box.add_child(fg)
@@ -176,3 +185,31 @@ func _row(icon: Texture2D, name: String, kind: String, bar: float, share: String
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		h.add_child(l)
 	return h
+
+## Destello de una evolución (10-11-2026): una estrella de cuadros, como las chispas de sus golpes
+## (HitSparks, `glint_*`), que late en la esquina de su imagen.
+class Glint extends Control:
+	var color := Color.WHITE
+	var _t := randf() * 3.0
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		position = Vector2(30, -4)
+		size = Vector2(20, 20)
+
+	func _process(delta: float) -> void:
+		_t += delta
+		queue_redraw()
+
+	func _draw() -> void:
+		var k := 0.5 + 0.5 * sin(_t * 3.2)
+		var c := Vector2(10, 10)
+		var s := 2.0 + 1.0 * k
+		var reach := int(2 + roundi(2.0 * k))
+		draw_rect(Rect2(c - Vector2(s, s), Vector2(s, s) * 2.0), Color(1, 1, 1, 0.9))
+		for i in range(1, reach + 1):
+			var a := 1.0 - float(i) / (reach + 1)
+			var col := Color(color, a)
+			var q := Vector2(s, s) * 0.8
+			for d: Vector2 in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
+				draw_rect(Rect2(c + d * (s * 1.6 * i) - q * 0.5, q), col)

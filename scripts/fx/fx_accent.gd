@@ -44,6 +44,14 @@ static func build() -> void:
 			if evo == "" or _by_wid.has(evo): continue
 			_by_wid[evo] = _parse(by_id.get(evo, acc.get(k, {})))
 
+## Color del acento para la interfaz (cartas de rama, tabla de daño): el tinte avivado para que
+## se lea sobre fondo oscuro; transparente si `wid` no es una evolución con acento.
+static func ui_color(wid: StringName) -> Color:
+	var a := of(wid)
+	if a.is_empty(): return Color.TRANSPARENT
+	var c: Color = a.tint
+	return Color.from_hsv(c.h, clampf(c.s * 1.9, 0.0, 0.75), 1.0)
+
 static func _parse(a: Dictionary) -> Dictionary:
 	if a.is_empty(): return {}
 	return {"tint": Color.html(String(a.get("tint", "#ffffff"))), "width": float(a.get("width", 1.0)),

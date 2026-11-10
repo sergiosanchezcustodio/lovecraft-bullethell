@@ -15,6 +15,7 @@ var _warn: Telegraph
 var _bits: Array[MeshInstance3D] = []
 static var _meshes: Array[BoxMesh] = []
 var _hole_mat: ShaderMaterial
+var _wall: MeshInstance3D                    ## cortina verde que sube del agujero al brotar (fase 18, 10-11-2026)
 
 const WARN := 0.35
 const RISE := 0.12
@@ -73,6 +74,19 @@ func _physics_process(delta: float) -> void:
 		hole.material_override.set_shader_parameter("age", 0.6)
 		add_child(hole)
 		_hole_mat = hole.material_override
+		if FxShade.on():                           # fase 18 (10-11-2026): cortina verde y estela en la punta
+			_wall = MeshInstance3D.new()
+			_wall.mesh = VoxelFx.ring_wall()
+			_wall.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			Damage.ctx = _wtag
+			if FxShade.apply(_wall, "wall"):
+				FxShade.set_tint(_wall, Color(0.55, 1.0, 0.4))
+				add_child(_wall)
+			else:
+				_wall.free()
+				_wall = null
+			_bits[BITS - 1].visible = true
+			FxTrails.attach(_bits[BITS - 1], "acid", Color(0.75, 0.6, 1.0))
 		Damage.ctx = _wtag
 		for e in world.enemies_in_circle(global_position, radius):
 			var d := Damage.new(damage, 0.0)
@@ -92,3 +106,8 @@ func _process(_delta: float) -> void:
 		_bits[i].visible = h > 0.02
 		_bits[i].position = Vector3(sway, k * 2.2 * h + 0.13, sway * 0.6)
 		_bits[i].rotation.y = u * 4.0 + k
+	if _wall:
+		var w := clampf(u / 0.4, 0.0, 1.0)
+		_wall.visible = w < 1.0
+		_wall.scale = Vector3(radius * 0.85, 0.9 * (1.0 - pow(1.0 - w, 2.0)) + 0.05, radius * 0.85)
+		_wall.set_instance_shader_parameter("fade", 0.8 * (1.0 - smoothstep(0.25, 1.0, w)))

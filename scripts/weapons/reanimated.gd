@@ -17,6 +17,9 @@ var _facing := Vector3.FORWARD
 var _visual: Node3D
 var _model: Node3D
 var _anim_t := 0.0
+var _overlay: StandardMaterial3D
+var _wall: MeshInstance3D                    ## cortina verde al levantarse (fase 18, 10-11-2026)
+var _ended := false
 
 const SPEED := 3.4
 const TICK := 0.4
@@ -44,6 +47,19 @@ func _ready() -> void:
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.albedo_color = TINT
 	for mi: MeshInstance3D in _model.get_meta("meshes"): mi.material_overlay = m
+	_overlay = m
+	# fase 18 (10-11-2026): se levanta con una descarga verde, una cortina que sube y chispas
+	if FxShade.on():
+		HitSparks.burst("glint_green", global_position + Vector3(0, 0.6, 0))
+		_wall = MeshInstance3D.new()
+		_wall.mesh = VoxelFx.ring_wall()
+		_wall.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		if FxShade.apply(_wall, "wall"):
+			FxShade.set_tint(_wall, Color(0.5, 1.0, 0.45))
+			_visual.add_child(_wall)
+		else:
+			_wall.free()
+			_wall = null
 
 func _physics_process(delta: float) -> void:
 	Damage.ctx = _wtag
@@ -74,5 +90,17 @@ func _process(delta: float) -> void:
 	var sink := smoothstep(life, life + FADE, _t)                       # se desmorona hundiéndose
 	_visual.global_position.y -= sink * 0.8
 	_visual.scale = Vector3.ONE * clampf(_t / 0.3, 0.3, 1.0) * (1.0 - sink * 0.4)
+	# el suero chisporrotea: el verde late a tirones, como una corriente galvánica
+	var jolt := 0.5 + 0.5 * sin(_t * 23.0) * sin(_t * 7.0)
+	_overlay.albedo_color.a = TINT.a * (0.45 + 0.55 * jolt) * (1.0 - sink)
+	if _wall:
+		var w := clampf(_t / 0.45, 0.0, 1.0)
+		_wall.visible = w < 1.0
+		var r := data.body_radius + 0.35
+		_wall.scale = Vector3(r, 1.4 * (1.0 - pow(1.0 - w, 2.0)) + 0.05, r)
+		_wall.set_instance_shader_parameter("fade", 0.8 * (1.0 - smoothstep(0.3, 1.0, w)))
+	if not _ended and _t >= life:                                       # se deshace con un último chispazo
+		_ended = true
+		if FxShade.on(): HitSparks.burst("glint_green", _visual.global_position + Vector3(0, 0.5, 0))
 	_anim_t = fposmod(_anim_t + delta / Anims.duration(data.model, "walk"), 1.0)
 	Anims.pose(data.model, "walk", _model, _anim_t)

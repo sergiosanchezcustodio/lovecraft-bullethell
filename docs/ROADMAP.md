@@ -32,7 +32,8 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 14 | Vestuario ampliado y tienda de ropa | **Hecha** (30-10-2026), pendiente de revisión del autor | Ninguna |
 | 15 | Repetición de la caída, modo desafío, enemigos nuevos y bestiario vivo | **Hecha** (30-10-2026; mejoras el 02-11-2026), pendiente de tu revisión | Ninguna |
 | 16 | Rendimiento, jugabilidad del género, enemigos, modos, menús y gráficos | **Hecha** (03-11-2026) en el alcance elegido (D-46), pendiente de tu revisión: bloques A (16.4 fuera; 16.1 al borde: 1 % peor de 14-17,5 ms en Alta frente al límite de 16,7), B (16.8, 16.9, 16.12, 16.14 y 16.15), C, D, E y F; G no elegido. Por revisar las propuestas D-47, D-48 y D-49 | Ninguna (D-46, resuelta) |
-| 17 | Animación y vida de los escenarios | **En curso** (05-11-2026): 20 hitos en cinco bloques (investigadores, compañeros, enemigos, objetos del escenario y escenarios), sin empeorar apreciablemente el rendimiento | Ninguna |
+| 17 | Animación y vida de los escenarios | **Hecha** (05-11-2026), pendiente de tu revisión: los 20 hitos de los cinco bloques (investigadores, compañeros, enemigos, objetos del escenario y escenarios), sin empeorar apreciablemente el rendimiento | Ninguna |
+| 18 | Efectos de las armas | **Hecha** (07-11-2026; retoques el 10-11-2026), pendiente de tu revisión: los 14 hitos de los cinco bloques, estilo voxel con degradados; calidad `weapon_fx` | Ninguna (D-50, resuelta) |
 
 ---
 
