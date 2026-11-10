@@ -125,7 +125,7 @@ func _process(delta: float) -> void:
 	Damage.ctx = _wtag
 	_t += delta
 	if _light != null:
-		_light.light_energy = 9.0 * maxf(0.0, 1.0 - _t / 0.3)
+		_light.light_energy = 9.0 * Flashes.k() * maxf(0.0, 1.0 - _t / 0.3)   # destellos reducidos (19.4)
 		if _t > 0.3: _drop_light()                 # apagada, fuera (antes seguía 4 s con energía 0)
 	var grow := clampf(_t / 0.06, 0.0, 1.0)
 	if _flash_fx:

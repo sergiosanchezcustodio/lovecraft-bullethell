@@ -34,6 +34,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 16 | Rendimiento, jugabilidad del género, enemigos, modos, menús y gráficos | **Hecha** (03-11-2026) en el alcance elegido (D-46), pendiente de tu revisión: bloques A (16.4 fuera; 16.1 al borde: 1 % peor de 14-17,5 ms en Alta frente al límite de 16,7), B (16.8, 16.9, 16.12, 16.14 y 16.15), C, D, E y F; G no elegido. Por revisar las propuestas D-47, D-48 y D-49 | Ninguna (D-46, resuelta) |
 | 17 | Animación y vida de los escenarios | **Hecha** (05-11-2026), pendiente de tu revisión: los 20 hitos de los cinco bloques (investigadores, compañeros, enemigos, objetos del escenario y escenarios), sin empeorar apreciablemente el rendimiento | Ninguna |
 | 18 | Efectos de las armas | **Hecha** (07-11-2026; retoques el 10-11-2026), pendiente de tu revisión: los 14 hitos de los cinco bloques, estilo voxel con degradados; calidad `weapon_fx` | Ninguna (D-50, resuelta) |
+| 19 | Rendimiento, accesibilidad de los efectos y distribución | **En curso** (10-11-2026): bloque A (rendimiento tras las fases 17 y 18); B y C propuestos | Ninguna |
 
 ---
 
@@ -608,3 +609,33 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 |---|---|---|
 | 18.14 | **Un acento propio por evolución:** color, partículas o estela que la distinguen de su arma de base, en datos | **Hecho (07-11-2026), pendiente de tu revisión:** `FxAccent` y `accents` en `data/weapon_fx.json`: por rama (dorado y violeta) o por evolución (`by_id`); estelas más anchas y teñidas y un destello en cada golpe |
 
+
+## Fase 19: rendimiento, accesibilidad de los efectos y distribución
+
+**Propuesta el 10-11-2026** tras cerrar los retoques de la fase 18. El autor deja elegir por dónde empezar («empieza por el que mejor consideres tú»): se empieza por el bloque A. Los bloques B y C quedan propuestos; el D (16.7, 16.10, 16.11 y 16.13, de la reserva de la fase 16) sigue sin elegir.
+
+**Criterio de aceptación de la fase:** en Alta, el 1 % peor de los niveles pesados (p2_n2 y p3_n2), con 1 y con 4 jugadores, por debajo de 16,7 ms en el PC del autor y libre, medido 3 veces; ningún efecto nuevo sin su versión reducida en Baja; «Destellos reducidos» atenúa todo lo que destella.
+
+### Bloque A: rendimiento tras las fases 17 y 18
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 19.1 | **Medir el acumulado:** antes de la fase 17 (commit ca5b6cf, en un worktree) frente a ahora, alternando las dos copias, en p2_n2 y p3_n2, con 1 y con 4 jugadores | Hecho (10-11-2026): 1 jugador, igual (+0,2 ms); 4 jugadores, +1,25 ms de media y +1,7 ms en el 1 % peor. Ver `docs/ESTADO.md` |
+| 19.2 | **Recortar lo que más cuesta:** reparto por sistema (`prof=true`) y picos (`spikes=true`) donde haya subido; arreglar lo que se pueda sin cambiar cómo se ve | Pendiente |
+| 19.3 | **Bajar por calidad lo que no se pueda recortar:** en Media o Baja, con su opción `=false` para comparar | Pendiente |
+
+### Bloque B: accesibilidad de los efectos (propuesto)
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 19.4 | **«Destellos reducidos» en la fase 18:** fogonazos radiales, chispas y destellos de las evoluciones, cortinas, restallidos y fogonazo de los disparos (17.19) atenuados como el destello de los enemigos y los relámpagos (`Settings` `flashes`) | Hecho en código y test (10-11-2026; `Flashes`); falta comprobarlo en captura |
+| 19.5 | **Alto contraste con los efectos nuevos:** que estelas y acentos no se confundan con las balas enemigas en la paleta de daltonismo (`bullet_palette`) | Propuesto |
+| 19.6 | **Menos efectos de las armas por jugador:** en cooperativo, cada uno puede bajar los suyos (estelas, chispas) para leer mejor la pantalla | Propuesto |
+
+### Bloque C: distribución (propuesto; 16.36-16.38, no elegidos en la fase 16)
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 19.7 | **Steam Deck y portátiles:** preajuste «Portátil» (800p, 30-40 fps estables) y la interfaz revisada a 1280×800 | Propuesto |
+| 19.8 | **Linux:** build y prueba en GitHub Actions | Propuesto |
+| 19.9 | **Informe de errores:** si el juego se cerró mal, al volver ofrece guardar un archivo con el registro y la configuración | Propuesto |

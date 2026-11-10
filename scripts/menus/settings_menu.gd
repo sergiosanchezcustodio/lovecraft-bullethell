@@ -168,7 +168,8 @@ func _game() -> void:
 	_note("Alto contraste: físicas en amarillo y blanco, mentales en cian. Se distinguen también por la forma: bola maciza o anillo.")
 	var fl: Array[String] = ["Reducidos", "Normales"]
 	_choice("Destellos (golpes y rayos)", fl, int(Settings.get_value("flashes")), func(i: int) -> void:
-		Settings.set_value("flashes", i))
+		Settings.set_value("flashes", i)
+		Flashes.refresh())
 	var sh: Array[String] = ["Sin temblor", "25 %", "50 %", "75 %", "100 %"]
 	_choice("Temblor de la cámara", sh, int(round(float(Settings.get_value("shake")) * 4.0)), func(i: int) -> void:
 		Settings.set_value("shake", i / 4.0))

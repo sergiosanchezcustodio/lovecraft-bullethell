@@ -2566,3 +2566,23 @@ Pedida por el autor y decidida en D-50: estilo voxel con degradados y la fase co
 - Capturas de la red, el trapezoedro, Shub y West: `shots/game_f18r_*`, `game_f18_trap5_003.9s.png`, `game_f18b_shub_*` y `game_f18c_west_*`. Las criaturas de `demo=` no son objetivos: para ver un arma golpeando, captura pasados unos 14 s.
 - Sin medir el rendimiento: son pocos nodos y solo al disparar.
 - Tests: 783 de 783 (`test_hit_fx`, «vuelve solo», falla a veces en la suite completa por tiempos y pasa solo).
+
+## Fase 19: rendimiento, accesibilidad de los efectos y distribución (10-11-2026)
+
+### 19.1: coste acumulado de las fases 17 y 18
+
+Copia de antes de la fase 17 (commit ca5b6cf, en un worktree) frente a la actual, alternadas, 3 vueltas, `tools/comparar.py` en p2_n2 y p3_n2. Media de las 3 vueltas, en ms (media / 1 % peor / picos por 1000):
+
+| Caso | Antes | Ahora |
+|---|---|---|
+| 1 jugador, p2_n2 | 8,53 / 16,37 / 10 | 8,58 / 16,05 / 8 |
+| 1 jugador, p3_n2 | 8,89 / 15,94 / 8 | 9,21 / 17,33 / 11 |
+| 4 jugadores (`bots=3`), p2_n2 | 12,14 / 21,54 / 100 | 13,40 / 23,21 / 148 |
+| 4 jugadores (`bots=3`), p3_n2 | 13,06 / 22,25 / 142 | 14,30 / 23,87 / 204 |
+
+Con 1 jugador apenas cuesta; con 4, un 10 % más de media y la mitad más de picos (los efectos de las armas se multiplican por jugador). Con 4 jugadores el 1 % peor ya pasaba de 16,7 ms antes de la fase 17: el criterio de aceptación de la fase está por revisar con el autor (propuesta: con 4 jugadores, volver a lo de antes de la fase 17). No se miró antes si el PC estaba libre; las dos copias se midieron intercaladas y las vueltas son coherentes. Lección: al crear un `class_name` hay que pasar `--import` **antes** de medir, o la copia no compila y Godot se queda esperando sin dar error (se perdieron dos horas).
+
+### 19.4: «Destellos reducidos» también en los efectos nuevos
+
+`scripts/fx/flashes.gd` (`Flashes.k()`, `reduced()`, `refresh()`): con `flashes` = 0, el sombreador de efectos (`FxShade`) baja la energía al `DIM` (0,35) en los fogonazos radiales y lo que brilla mucho (energía ≥ 1,4) y a medias en el resto; `HitSparks` no lanza los destellos (`glint_*`) ni el restallido (`crack`); `MuzzleLight` y la luz de `Explosion` se multiplican por `k()`. Se aplica al empezar el nivel (`HitSparks.setup`) y al cambiar la opción en el menú. Test: `tests/test_flashes.gd`. 784 de 784. Falta comprobarlo en una captura.
+

@@ -38,6 +38,7 @@ static func hit(world: CombatWorld, e: Node3D, d: Damage, radius := 0.4, height 
 ## Una ráfaga de la receta `name` (una de `BURSTS`) en `at`, con los emisores reciclados.
 static func burst(name: String, at: Vector3) -> void:
 	if not is_instance_valid(_inst) or not _inst._pools.has(name): return
+	if Flashes.reduced() and (name == "crack" or name.begins_with("glint_")): return   # destellos reducidos (19.4)
 	var list: Array = _inst._pools[name]
 	var i: int = _inst._next[name]
 	_inst._next[name] = (i + 1) % list.size()
@@ -51,6 +52,7 @@ static func setup(world: CombatWorld) -> void:
 	var lv := int(Quality.value("weapon_fx", 2))
 	if lv <= 0: return
 	FxAccent.build()
+	Flashes.refresh()
 	var h := HitSparks.new()
 	h.name = "HitSparks"
 	h._every = 2 if lv == 1 else 1

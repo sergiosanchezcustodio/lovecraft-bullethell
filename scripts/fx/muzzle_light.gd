@@ -35,5 +35,5 @@ func _on_fired(w: WeaponSystem.Weapon) -> void:
 func _process(delta: float) -> void:
 	if not visible: return
 	_k = maxf(_k - FADE * delta * _k - delta * 2.0, 0.0)
-	light_energy = PEAK * _k * (0.85 + 0.3 * randf())
+	light_energy = PEAK * Flashes.k() * _k * (0.85 + 0.3 * randf())   # destellos reducidos (19.4)
 	if _k <= 0.0: visible = false

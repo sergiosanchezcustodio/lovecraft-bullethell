@@ -34,7 +34,18 @@ static func material(id: String) -> ShaderMaterial:
 	for k in ["mode", "cell", "steps", "scroll", "energy", "sparkle", "axis_z", "falloff", "across", "tail"]:
 		if r.has(k): m.set_shader_parameter(k, r[k])
 	_mats[id] = m
+	_flash(m, r)
 	return m
+
+## Destellos reducidos (19.4): el fogonazo radial y el rayo, al `Flashes.DIM`; el resto, a medias.
+static func _flash(m: ShaderMaterial, r: Dictionary) -> void:
+	var dim := Flashes.k()
+	if dim < 1.0 and not (int(r.get("mode", 0)) == 2 or float(r.get("energy", 1.0)) >= 1.4): dim = lerpf(1.0, dim, 0.5)
+	m.set_shader_parameter("energy", float(r.get("energy", 1.0)) * dim)
+
+## Vuelve a aplicar la opción de destellos a los materiales ya creados (Flashes.refresh).
+static func reflash() -> void:
+	for id in _mats: _flash(_mats[id], recipe_of(String(id)))
 
 static func recipe_of(id: String) -> Dictionary:
 	var f := FileAccess.open("res://data/weapon_fx.json", FileAccess.READ)
