@@ -361,6 +361,7 @@ func _ready() -> void:
 	_make_announcer()
 	if not args.get_bool("nolevel"):
 		var level_id := LevelPreload.level_id(args)
+		CrashReport.note(level_id)                    # hito 19.9: dónde iba si se cierra de golpe
 		if Daily.is_daily(level_id):                  # partida del día (hito 13.9)
 			level = Daily.make_level(level_id)
 			add_child(Endless.new().setup(level))

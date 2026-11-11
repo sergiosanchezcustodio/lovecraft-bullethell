@@ -2617,3 +2617,15 @@ El autor eligió una opción para todos, no por jugador: en local todos ven la m
 - **Listas:** 1280×800 en las resoluciones, en el hueco 1. La configuración pasa a la versión 2 y corre los índices guardados antes para que sigan siendo las mismas. Límites de 30 y 40 fps (se guardan por valor, no por índice).
 - **Interfaz:** ya se revisó a 1280×800 el 06-11-2026 (solo textos de menos de 10 px en 6 ventanas; el autor lo deja así, para eso está la Grande). La pestaña de vídeo, comprobada con la Grande: `shots/ui_recorrido_deck/config_0.png`.
 - **Falta:** probarlo en una Deck de verdad (rendimiento de la Baja a 800p y si 40 fps se sostienen). Tests: `tests/test_handheld.gd`.
+
+### 19.8: Linux (11-11-2026)
+
+- **Perfiles:** `Linux` y `Linux Demo` en `export_presets.cfg` (x86_64, el .pck dentro, `builds/linux/LovecraftLibrary.x86_64`). `tools/exportar.sh` las hace si está la plantilla de Linux; en este PC no está, así que esa build sale de GitHub Actions.
+- **GitHub Actions** (`build.yml`): baja también `linux_release.x86_64`, exporta las dos y las deja en zip (`-linux.zip`, `-demo-linux.zip`) junto a las de Windows y macOS. **Prueba de la build:** el ejecutable de Linux arranca sin pantalla (`--headless --fixed-fps 60 --quit-after 3600`), primero en la portada y después un minuto en p1_n2 con el bot; la demo, 20 s. Un `SCRIPT ERROR` para la ejecución. En local, la misma orden con el Godot del editor juega p1_n2 sin errores (`RENDIMIENTO fotogramas=600…`).
+- **Falta:** probarla en un Linux con pantalla y Vulkan (sin pantalla no se dibuja nada).
+
+### 19.9: informe de errores (11-11-2026)
+
+- **Cómo sabe que se cerró mal:** `CrashReport` (`scripts/core/crash_report.gd`). Al arrancar de verdad (sin opciones de prueba, o con `crash_report=true`), `main.gd` deja la marca `user://running.json` (versión, hora y dónde va; la partida apunta el nivel con `CrashReport.note`). Un nodo en la raíz la borra en `_exit_tree`, que llega también con `get_tree().quit()`. Si al volver sigue ahí, la vez anterior se cerró de golpe. Las ejecuciones de prueba no la arman, porque se cortan a menudo.
+- **Lo que ofrece:** al abrir el menú principal, una vez, «La última vez el juego se cerró de golpe. ¿Guardar en Documentos un informe…?». «Guardar» deja `LovecraftLibrary_informe_<fecha>.zip` con `registro.log` (el registro de Godot de aquella vez: al arrancar lo rota a `user://logs/godot<fecha>.log`), `configuracion.json` y `equipo.txt` (versión, sistema, procesador, memoria, tarjeta y su API, pantalla, idioma, dónde iba). Después, «Abrir la carpeta». Nada sale del PC.
+- **Comprobado:** la marca aparece al arrancar y se borra al salir bien; la pregunta, en captura (`crash_demo=true`, `shots/titulo_informe_023.0s.png`). Tests: `tests/test_crash_report.gd`.

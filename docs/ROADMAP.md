@@ -632,10 +632,10 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | 19.5 | **Alto contraste con los efectos nuevos:** que estelas y acentos no se confundan con las balas enemigas en la paleta de daltonismo (`bullet_palette`) | Hecho (11-11-2026): con alto contraste, los efectos y las balas de los jugadores hacia el gris y más tenues, sin los destellos de las evoluciones |
 | 19.6 | **Menos efectos de las armas por jugador:** en cooperativo, cada uno puede bajar los suyos (estelas, chispas) para leer mejor la pantalla | Hecho (11-11-2026), como opción para todos (elegida por el autor): «Efectos de las armas» (Mínimos, Rebajados, Enteros) en Vídeo, tope sobre `weapon_fx` de la calidad |
 
-### Bloque C: distribución (propuesto; 16.36-16.38, no elegidos en la fase 16)
+### Bloque C: distribución (elegido por el autor el 11-11-2026; 16.36-16.38, no elegidos en la fase 16)
 
 | Hito | Contenido | Estado |
 |---|---|---|
 | 19.7 | **Steam Deck y portátiles:** preajuste «Portátil» (800p, 30-40 fps estables) y la interfaz revisada a 1280×800 | Hecho (11-11-2026): «Ajustes para Steam Deck y portátiles» en Vídeo (`Settings.HANDHELD`), solos la primera vez en una Deck; 1280×800 y límites de 30 y 40 fps. Falta probarlo en una Deck de verdad |
-| 19.8 | **Linux:** build y prueba en GitHub Actions | Propuesto |
-| 19.9 | **Informe de errores:** si el juego se cerró mal, al volver ofrece guardar un archivo con el registro y la configuración | Propuesto |
+| 19.8 | **Linux:** build y prueba en GitHub Actions | Hecho (11-11-2026): perfiles Linux y Linux Demo; en Actions se exportan y se prueban sin pantalla (portada y un minuto de partida con el bot). Falta probarla en un Linux con pantalla |
+| 19.9 | **Informe de errores:** si el juego se cerró mal, al volver ofrece guardar un archivo con el registro y la configuración | Hecho (11-11-2026): `CrashReport`, marca `user://running.json`; en el menú principal, un .zip en Documentos con el registro anterior, la configuración y el equipo |

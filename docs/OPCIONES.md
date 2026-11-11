@@ -84,6 +84,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `python tools/caza_errores.py [tag,tag…] [--par 2] [--t 110]`: juega con el bot los 15 niveles (final adelantado), tres noches eternas, tres desfiles, tres desafíos y dos cooperativos, y junta los errores y avisos de la consola sin repetir, con dónde salieron, en `shots/caza_errores/informe.txt` (y la última captura de cada partida). Unos 15 minutos.
   - `sheet_row=N` (con `sheet_at=`): la ficha se abre con el arma u objeto N marcado y entero.
   - `res=1280x800`: la ventana de pruebas a ese tamaño (la interfaz escala desde 1920×1080: con 16:10 la pantalla mide 1920×1200 unidades y con 21:9, 2560×1080).
+  - `crash_report=true`: arma el informe de errores (hito 19.9) en una ejecución de prueba; sin opciones, siempre. `crash_demo=true`: hace como si la vez anterior se hubiera cerrado de golpe, para ver la pregunta del menú principal (`title … open=menu crash_demo=true`).
   - `levelup_at=t`: el J1 sube un nivel a los t s (la ventana de subida). `expedition_open=true` (con `select … map=true`): abre la elección de la expedición, como `endless_open`, `daily_open`, `pact_open` y `challenge_open`.
   - `level=desfile:N`: el desfile de jefes desde el jefe N (hito 16.22; con 22 subidas al empezar). Con `autonext=true` pasa solo al siguiente.
   - `level=expedicion:<tipo>:<nivel>:<fila>`: un nodo suelto de la expedición (hito 16.21; tipos `combate`, `elite`, `buhonero` y `jefe`; p. ej. `expedicion:buhonero:p2_n2:3`). Sin expedición en curso, sin bolsa ni subidas.

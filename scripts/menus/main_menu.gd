@@ -40,6 +40,7 @@ func _ready() -> void:
 		l.offset_left = 24
 		l.offset_top = -44
 		add_child(l)
+	_offer_crash_report.call_deferred()
 	var ver := UiKit.label(Demo.version_text(), 18, UiKit.TEXT_DIM)
 	ver.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)   # la versión: en red, la misma en todos los PC
 	ver.offset_left = -140
@@ -163,6 +164,21 @@ func _open_settings() -> void:
 func open_settings_tab(tab: int) -> void:
 	_open_settings()
 	(_popup as SettingsMenu)._show_tab.call_deferred(tab)
+
+## Hito 19.9: la vez anterior el juego se cerró de golpe. Una vez por arranque.
+func _offer_crash_report() -> void:
+	if not CrashReport.pending() or _popup != null: return
+	CrashReport.dismiss()
+	var c := MenuKit.Confirm.new("La última vez el juego se cerró de golpe. ¿Guardar en Documentos un informe con el registro y la configuración? Así puedes enviárselo al autor; no sale nada del PC si no lo envías tú.", "Guardar", "No, gracias", UiKit.GOLD)
+	c.answered.connect(func(yes: bool) -> void:
+		if not yes: return
+		var path := CrashReport.save()
+		var text := ("Guardado en %s" % path) if path != "" else "No se ha podido guardar el informe."
+		var done := MenuKit.Confirm.new(text, "Abrir la carpeta", "Cerrar", UiKit.GOLD)
+		done.answered.connect(func(open: bool) -> void:
+			if open and path != "": OS.shell_show_in_file_manager(path))
+		_push.call_deferred(done, 0))
+	_push(c, 0)
 
 func _ask_quit() -> void:
 	var c := MenuKit.Confirm.new("¿Salir del juego?", "Salir")

@@ -26,6 +26,8 @@ func _ready() -> void:
 		add_child(preload("res://scripts/cloud/cloud_check.gd").new())
 		return
 	_window_mode(la, first)
+	# hito 19.9: marca de «en marcha» solo en el arranque de verdad (las pruebas se cortan a menudo)
+	CrashReport.start(get_tree(), OS.get_cmdline_user_args().is_empty() or la.get_bool("crash_report"), la.get_bool("crash_demo"))
 	# Sin argumentos se abre la pantalla de título; con opciones de partida, la partida
 	var scene := "res://scenes/game.tscn"
 	if OS.get_cmdline_user_args().is_empty():           # arranque normal: ficha e intro (según la configuración) y portada
