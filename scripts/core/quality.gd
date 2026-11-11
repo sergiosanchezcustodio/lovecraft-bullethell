@@ -29,7 +29,9 @@ static func current() -> Dictionary:
 static func value(key: String, default: Variant) -> Variant:
 	var o := overrides()
 	if o.has(key): return o[key]
-	return current().get(key, default)
+	var v: Variant = current().get(key, default)
+	if key == "weapon_fx": v = mini(int(v), clampi(int(Auto.setting("weapon_fx", 2)), 0, 2))   # hito 19.6
+	return v
 
 ## `qset=clave:valor,clave:valor` al lanzar (17.20): cambia claves sueltas del preajuste para comparar
 ## (`qset=traces:false,vents:false`). Los valores se leen como en el JSON.

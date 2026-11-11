@@ -93,6 +93,10 @@ func _video() -> void:
 		Settings.set_value("quality", i)
 		Settings.apply_video())
 	_note("Suavizado, sombras, oclusión ambiental (Ultra), niebla de los faroles, enemigos que se desmoronan y manchas. Lo de la partida cambia al empezar el siguiente nivel.")
+	var wfx: Array[String] = ["Mínimos", "Rebajados", "Enteros"]
+	_choice("Efectos de las armas", wfx, int(Settings.get_value("weapon_fx")), func(i: int) -> void:
+		Settings.set_value("weapon_fx", i))
+	_note("Estelas, chispas, casquillos y acentos de las evoluciones. Con tres o cuatro jugadores, «Rebajados» o «Mínimos» dejan leer mejor la pantalla y van más fluidos. Nunca pasan de lo que permite la calidad gráfica.")
 	_choice("Resolución del 3D (rendimiento)", OptionRow.fmt(Settings.SCALES_3D, "%d %%", 100.0),
 		OptionRow.idx(Settings.SCALES_3D, float(Settings.get_value("scale_3d")), 3), func(i: int) -> void:
 			Settings.set_value("scale_3d", Settings.SCALES_3D[i])

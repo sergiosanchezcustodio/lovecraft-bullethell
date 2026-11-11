@@ -630,7 +630,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 |---|---|---|
 | 19.4 | **«Destellos reducidos» en la fase 18:** fogonazos radiales, chispas y destellos de las evoluciones, cortinas, restallidos y fogonazo de los disparos (17.19) atenuados como el destello de los enemigos y los relámpagos (`Settings` `flashes`) | Hecho (10 y 11-11-2026; `Flashes`), comprobado en captura |
 | 19.5 | **Alto contraste con los efectos nuevos:** que estelas y acentos no se confundan con las balas enemigas en la paleta de daltonismo (`bullet_palette`) | Hecho (11-11-2026): con alto contraste, los efectos y las balas de los jugadores hacia el gris y más tenues, sin los destellos de las evoluciones |
-| 19.6 | **Menos efectos de las armas por jugador:** en cooperativo, cada uno puede bajar los suyos (estelas, chispas) para leer mejor la pantalla | Propuesto |
+| 19.6 | **Menos efectos de las armas por jugador:** en cooperativo, cada uno puede bajar los suyos (estelas, chispas) para leer mejor la pantalla | Hecho (11-11-2026), como opción para todos (elegida por el autor): «Efectos de las armas» (Mínimos, Rebajados, Enteros) en Vídeo, tope sobre `weapon_fx` de la calidad |
 
 ### Bloque C: distribución (propuesto; 16.36-16.38, no elegidos en la fase 16)
 

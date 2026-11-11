@@ -2605,3 +2605,7 @@ Con «Colores de las balas: Alto contraste» (`bullet_palette` 1) las balas enem
 - La nota del menú lo dice («Los efectos de tus armas, más grises y tenues»); revisada con `tools/recorrido_ui.py config_3`, sin avisos.
 - Test en `tests/test_flashes.gd`. Capturas: `shots/game_f19_contraste3_017.5s.png` (frente a `game_f19_normal_017.5s.png`) y `game_f19_contraste_p2_032.0s.png` (p2_n2, con los anillos cian de las balas mentales junto a las trazadoras grises). 785 de 785.
 
+
+### 19.6: «Efectos de las armas» para todos (11-11-2026)
+
+El autor eligió una opción para todos, no por jugador: en local todos ven la misma pantalla. En Configuración → Vídeo, «Efectos de las armas» (Mínimos, Rebajados, Enteros; `Settings` `weapon_fx`, 2 por defecto). Pone un tope a la clave `weapon_fx` de la calidad dentro de `Quality.value`, así que vale para todo lo que ya la leía (estelas, chispas, casquillos, sombreador de efectos, acentos, segunda capa de las zonas) y nunca sube por encima del preajuste. `qset=weapon_fx:N` sigue mandando al comparar; `cfg_weapon_fx=N` la fija para una ejecución. Con 4 jugadores, «Mínimos» ahorra ~1 ms de media (mediciones de 19.2). Test: `tests/test_weapon_fx_setting.gd`. Captura: `shots/ui_recorrido/config_0.png`.

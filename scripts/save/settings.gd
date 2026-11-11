@@ -35,6 +35,7 @@ var defaults := {
 	"shake": 1.0,                           ## temblor de cámara (0..1)
 	"damage_numbers": 2,                    ## cifras de daño: 0 no, 1 solo los golpes fuertes, 2 todas (hito 11.2)
 	"quality": 2,                           ## calidad gráfica: 0 baja, 1 media, 2 alta, 3 ultra (Quality, hito 11.5)
+	"weapon_fx": 2,                         ## efectos de las armas: 0 mínimos, 1 rebajados, 2 enteros; tope sobre la calidad (hito 19.6)
 	"dif_levels": {},                       ## dificultad (D-42, temporal): característica -> 1..10; sin ella, 3 (Difficulty)
 	"hallucinations": true,                 ## alucinaciones con poca cordura (hito 13.4, Hallucinations)
 	"tips": true,                           ## consejos de la primera partida (hito 13.3, Tips)
