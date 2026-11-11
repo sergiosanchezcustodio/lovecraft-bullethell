@@ -26,6 +26,10 @@ uniform vec3 wisp_color : source_color = vec3(0.55, 1.0, 0.6);
 uniform vec3 yith_color : source_color = vec3(0.3, 0.95, 0.95);
 uniform vec3 outline_color : source_color = vec3(0.05, 0.02, 0.04);
 uniform float exposure_comp = 0.55;
+// alto contraste (19.5): las balas de los jugadores, hacia el gris y más tenues (el amarillo y el
+// cian intensos quedan para las enemigas). 0 y 1 sin él.
+uniform float player_grey = 0.0;
+uniform float player_soft = 1.0;
 
 #include "res://scripts/fx/fx_common.gdshaderinc"
 
@@ -199,6 +203,10 @@ void fragment() {
 		alpha = max(max(ring, edge * 0.9), solid);
 		col = r < 0.3 ? core_color * 0.85 : (r < 0.52 ? physical_color * exposure_comp : outline_color);
 		col = mix(col, mental_color * exposure_comp, ring * (1.0 - solid));
+	}
+	if (style == 0 || style >= 4) {
+		col = mix(col, vec3(dot(col, vec3(0.299, 0.587, 0.114))), player_grey) * player_soft;
+		alpha *= player_soft;
 	}
 	if (alpha < 0.01) discard;
 	ALBEDO = col;

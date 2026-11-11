@@ -124,6 +124,9 @@ func _ready() -> void:
 	mmi.multimesh = _mm
 	var mat := ShaderMaterial.new()
 	mat.shader = preload("res://scripts/bullets/bullet.gdshader")
+	if Flashes.contrast():   # alto contraste (19.5): las trazadoras, hacia el gris (el amarillo y el cian, solo las enemigas)
+		mat.set_shader_parameter("player_grey", Flashes.GREY)
+		mat.set_shader_parameter("player_soft", Flashes.SOFT)
 	mmi.material_override = mat
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mmi.custom_aabb = AABB(Vector3(-200, -10, -200), Vector3(400, 20, 400))   # nunca se descarta por visibilidad

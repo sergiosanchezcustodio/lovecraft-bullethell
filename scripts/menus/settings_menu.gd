@@ -164,8 +164,9 @@ func _game() -> void:
 		Settings.apply_ui())
 	var pal: Array[String] = ["Normales", "Alto contraste"]
 	_choice("Colores de las balas", pal, int(Settings.get_value("bullet_palette")), func(i: int) -> void:
-		Settings.set_value("bullet_palette", i))
-	_note("Alto contraste: físicas en amarillo y blanco, mentales en cian. Se distinguen también por la forma: bola maciza o anillo.")
+		Settings.set_value("bullet_palette", i)
+		Flashes.refresh())
+	_note("Alto contraste: físicas en amarillo y blanco, mentales en cian. Se distinguen también por la forma: bola maciza o anillo. Los efectos de tus armas, más grises y tenues.")
 	var fl: Array[String] = ["Reducidos", "Normales"]
 	_choice("Destellos (golpes y rayos)", fl, int(Settings.get_value("flashes")), func(i: int) -> void:
 		Settings.set_value("flashes", i)

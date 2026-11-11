@@ -20,30 +20,36 @@ static func material(id: String) -> ShaderMaterial:
 	if r.is_empty(): return null
 	var m := ShaderMaterial.new()
 	m.shader = load("res://scripts/fx/fx_shade_add.gdshader" if bool(r.get("add", true)) else "res://scripts/fx/fx_shade_mix.gdshader")
-	var g := Gradient.new()
-	var cols: Array = r.get("colors", ["#00000000", "#ffffffff"])
-	var offs := PackedFloat32Array()
-	var cs := PackedColorArray()
-	for i in cols.size():
-		offs.append(float(i) / maxf(cols.size() - 1, 1))
-		cs.append(Color.html(String(cols[i])))
-	g.offsets = offs
-	g.colors = cs
-	var tex := GradientTexture1D.new()
-	tex.gradient = g
-	tex.width = 64
-	m.set_shader_parameter("ramp", tex)
 	for k in ["mode", "cell", "steps", "scroll", "energy", "sparkle", "axis_z", "falloff", "across", "tail"]:
 		if r.has(k): m.set_shader_parameter(k, r[k])
 	_mats[id] = m
 	_flash(m, r)
 	return m
 
+## La rampa de color de la receta (con alto contraste, hacia el gris: Flashes.color, 19.5).
+static func _ramp(m: ShaderMaterial, r: Dictionary) -> void:
+	var g := Gradient.new()
+	var cols: Array = r.get("colors", ["#00000000", "#ffffffff"])
+	var offs := PackedFloat32Array()
+	var cs := PackedColorArray()
+	for i in cols.size():
+		offs.append(float(i) / maxf(cols.size() - 1, 1))
+		cs.append(Flashes.color(Color.html(String(cols[i]))))
+	g.offsets = offs
+	g.colors = cs
+	var tex := GradientTexture1D.new()
+	tex.gradient = g
+	tex.width = 64
+	m.set_shader_parameter("ramp", tex)
+
 ## Destellos reducidos (19.4): el fogonazo radial y el rayo, al `Flashes.DIM`; el resto, a medias.
+## Con alto contraste (19.5), además, la rampa hacia el gris y menos brillo.
 static func _flash(m: ShaderMaterial, r: Dictionary) -> void:
 	var dim := Flashes.k()
 	if dim < 1.0 and not (int(r.get("mode", 0)) == 2 or float(r.get("energy", 1.0)) >= 1.4): dim = lerpf(1.0, dim, 0.5)
+	if Flashes.contrast(): dim *= Flashes.SOFT
 	m.set_shader_parameter("energy", float(r.get("energy", 1.0)) * dim)
+	_ramp(m, r)
 
 ## Vuelve a aplicar la opción de destellos a los materiales ya creados (Flashes.refresh).
 static func reflash() -> void:
@@ -77,7 +83,7 @@ static func set_fade(mi: GeometryInstance3D, fade: float, tint := Color.WHITE) -
 ## El tinte de un efecto, con el acento de su evolución si lo tiene.
 static func set_tint(mi: GeometryInstance3D, tint: Color) -> void:
 	if mi.has_meta(&"fx_acc"): tint = tint * (mi.get_meta(&"fx_acc") as Color)
-	mi.set_instance_shader_parameter("tint", tint)
+	mi.set_instance_shader_parameter("tint", Flashes.grey(tint))   # alto contraste (19.5): sin el dorado
 
 ## La malla con la que se usa cada modo (el anillo y la cortina no llevan normales: otra pipeline).
 static func mesh_for(md: int) -> Mesh:

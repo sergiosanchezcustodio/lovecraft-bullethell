@@ -624,12 +624,12 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | 19.2 | **Recortar lo que más cuesta:** reparto por sistema (`prof=true`) y picos (`spikes=true`) donde haya subido; arreglar lo que se pueda sin cambiar cómo se ve | En curso (11-11-2026): tope de chispas encendidas (`HitSparks.max_live`), −1,2 a −2,2 ms en el 1 % peor con 4 jugadores; el resto del coste está repartido (ver `docs/ESTADO.md`) |
 | 19.3 | **Bajar por calidad lo que no se pueda recortar:** en Media o Baja, con su opción `=false` para comparar | Pendiente |
 
-### Bloque B: accesibilidad de los efectos (propuesto)
+### Bloque B: accesibilidad de los efectos (elegido por el autor el 11-11-2026: «continúa con otros temas»)
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 19.4 | **«Destellos reducidos» en la fase 18:** fogonazos radiales, chispas y destellos de las evoluciones, cortinas, restallidos y fogonazo de los disparos (17.19) atenuados como el destello de los enemigos y los relámpagos (`Settings` `flashes`) | Hecho en código y test (10-11-2026; `Flashes`); falta comprobarlo en captura |
-| 19.5 | **Alto contraste con los efectos nuevos:** que estelas y acentos no se confundan con las balas enemigas en la paleta de daltonismo (`bullet_palette`) | Propuesto |
+| 19.4 | **«Destellos reducidos» en la fase 18:** fogonazos radiales, chispas y destellos de las evoluciones, cortinas, restallidos y fogonazo de los disparos (17.19) atenuados como el destello de los enemigos y los relámpagos (`Settings` `flashes`) | Hecho (10 y 11-11-2026; `Flashes`), comprobado en captura |
+| 19.5 | **Alto contraste con los efectos nuevos:** que estelas y acentos no se confundan con las balas enemigas en la paleta de daltonismo (`bullet_palette`) | Hecho (11-11-2026): con alto contraste, los efectos y las balas de los jugadores hacia el gris y más tenues, sin los destellos de las evoluciones |
 | 19.6 | **Menos efectos de las armas por jugador:** en cooperativo, cada uno puede bajar los suyos (estelas, chispas) para leer mejor la pantalla | Propuesto |
 
 ### Bloque C: distribución (propuesto; 16.36-16.38, no elegidos en la fase 16)

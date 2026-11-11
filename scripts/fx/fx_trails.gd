@@ -53,7 +53,7 @@ static func _new_trail(node: Variant, r: Dictionary, tint: Color, w0: float, lif
 	var hws := PackedFloat32Array()
 	for b in bands + 1:
 		var f := minf(float(b) / bands, 1.0)
-		cols.append(_sample(r._ramp, f) * tint)
+		cols.append(Flashes.color(_sample(r._ramp, f) * tint))   # alto contraste (19.5): hacia el gris
 		hws.append(maxf(snappedf(w0 * (1.0 - f * 0.85), STEP), STEP) * 0.5)
 	var st := float(r.get("min_step", MIN_STEP))
 	return {"node": node, "life": life, "add": bool(r.get("add", true)), "cols": cols, "hws": hws,

@@ -2584,7 +2584,7 @@ Con 1 jugador apenas cuesta; con 4, un 10 % más de media y la mitad más de pic
 
 ### 19.4: «Destellos reducidos» también en los efectos nuevos
 
-`scripts/fx/flashes.gd` (`Flashes.k()`, `reduced()`, `refresh()`): con `flashes` = 0, el sombreador de efectos (`FxShade`) baja la energía al `DIM` (0,35) en los fogonazos radiales y lo que brilla mucho (energía ≥ 1,4) y a medias en el resto; `HitSparks` no lanza los destellos (`glint_*`) ni el restallido (`crack`); `MuzzleLight` y la luz de `Explosion` se multiplican por `k()`. Se aplica al empezar el nivel (`HitSparks.setup`) y al cambiar la opción en el menú. Test: `tests/test_flashes.gd`. 784 de 784. Falta comprobarlo en una captura.
+`scripts/fx/flashes.gd` (`Flashes.k()`, `reduced()`, `refresh()`): con `flashes` = 0, el sombreador de efectos (`FxShade`) baja la energía al `DIM` (0,35) en los fogonazos radiales y lo que brilla mucho (energía ≥ 1,4) y a medias en el resto; `HitSparks` no lanza los destellos (`glint_*`) ni el restallido (`crack`); `MuzzleLight` y la luz de `Explosion` se multiplican por `k()`. Se aplica al empezar el nivel (`HitSparks.setup`) y al cambiar la opción en el menú. Test: `tests/test_flashes.gd`. 784 de 784. Comprobado en captura el 11-11-2026 (`shots/game_f19_reducidos_*` frente a `game_f19_normal_*`).
 
 ### 19.2: dónde está el coste con 4 jugadores (11-11-2026)
 
@@ -2594,4 +2594,14 @@ Todo con `bots=3`, `tools/comparar.py`, p2_n2 y p3_n2. El PC no estaba del todo 
 - `qset=weapon_fx:0` (efectos de armas al mínimo): −0,8 a −1,4 ms. `qset=traces:false,vents:false` (fase 17): −0,3 a −0,9. `variety=false`, `trails=false`, `casings=false` y `fx_shade=false` (nuevo): nada que se distinga del ruido. `hit_sparks=false`: −0,5 en los dos niveles. `qset=weapon_fx:1` (Media): nada.
 - **Hecho:** tope de chispas encendidas a la vez (`HitSparks.max_live` = 16 en los últimos 0,3 s; `sparks_live=N` para comparar, 999 como antes). Con 4 jugadores el tope por fotograma se llenaba siempre y había unos 60 emisores encendidos. 3 vueltas: 4 jugadores, 1 % peor −1,2 (p2_n2) y −2,2 ms (p3_n2), tirones de más de 25 ms de 28 a 14 en p3_n2; 1 jugador, igual o algo mejor.
 - El resto del coste de los efectos de armas no está en un sistema: es la suma de muchos pequeños (estelas, casquillos, segunda capa de las zonas, acentos), cada uno por debajo del ruido.
+
+### 19.5: alto contraste con los efectos nuevos (11-11-2026)
+
+Con «Colores de las balas: Alto contraste» (`bullet_palette` 1) las balas enemigas van en amarillo y blanco (físicas) y cian (mentales), los colores de varios efectos de las armas de los jugadores. Ahora, con él, lo de los jugadores se aparta: `Flashes.contrast()`, `Flashes.color()` (hacia el gris un `GREY` = 0,6 y apagado a `SOFT` = 0,7) y `Flashes.grey()` (solo hacia el gris, para los tintes).
+- `FxShade`: la rampa de cada receta pasa por `Flashes.color` y la energía, ×`SOFT`; el tinte del acento de las evoluciones, por `Flashes.grey` (sin el dorado). Se rehace al cambiar la opción (`Flashes.refresh` → `FxShade.reflash`, que ahora rehace también la rampa: `_ramp`).
+- `FxTrails`: los colores de cada estela, por `Flashes.color`.
+- `HitSparks`: sin los destellos de las evoluciones (`glint_*`; `Flashes.skip_glint`, que junta esto con los destellos reducidos).
+- Balas de los jugadores (`bullet.gdshader`): paso común al final para los estilos del jugador (0 y 4 en adelante; muchos llevan el color escrito en el sombreador), `player_grey` y `player_soft`, que pone `BulletManager` con alto contraste. Las trazadoras de la Thompson pasan de amarillas a un beige grisáceo y tenue.
+- La nota del menú lo dice («Los efectos de tus armas, más grises y tenues»); revisada con `tools/recorrido_ui.py config_3`, sin avisos.
+- Test en `tests/test_flashes.gd`. Capturas: `shots/game_f19_contraste3_017.5s.png` (frente a `game_f19_normal_017.5s.png`) y `game_f19_contraste_p2_032.0s.png` (p2_n2, con los anillos cian de las balas mentales junto a las trazadoras grises). 785 de 785.
 
