@@ -8,8 +8,10 @@ class_name FxShade
 static var _mats := {}
 static var _rng := RandomNumberGenerator.new()   ## propio: lo que se ve no cambia el azar de la partida
 
+static var enabled := true                       ## `fx_shade=false` para comparar (19.2)
+
 static func on() -> bool:
-	return int(Quality.value("weapon_fx", 2)) > 0
+	return enabled and int(Quality.value("weapon_fx", 2)) > 0
 
 ## El material de la receta `id` (null si no existe).
 static func material(id: String) -> ShaderMaterial:

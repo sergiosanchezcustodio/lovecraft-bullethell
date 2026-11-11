@@ -2586,3 +2586,12 @@ Con 1 jugador apenas cuesta; con 4, un 10 % más de media y la mitad más de pic
 
 `scripts/fx/flashes.gd` (`Flashes.k()`, `reduced()`, `refresh()`): con `flashes` = 0, el sombreador de efectos (`FxShade`) baja la energía al `DIM` (0,35) en los fogonazos radiales y lo que brilla mucho (energía ≥ 1,4) y a medias en el resto; `HitSparks` no lanza los destellos (`glint_*`) ni el restallido (`crack`); `MuzzleLight` y la luz de `Explosion` se multiplican por `k()`. Se aplica al empezar el nivel (`HitSparks.setup`) y al cambiar la opción en el menú. Test: `tests/test_flashes.gd`. 784 de 784. Falta comprobarlo en una captura.
 
+### 19.2: dónde está el coste con 4 jugadores (11-11-2026)
+
+Todo con `bots=3`, `tools/comparar.py`, p2_n2 y p3_n2. El PC no estaba del todo libre (Edge, Spotify, Enlace Móvil): las cifras salen 0,5-1,5 ms más altas que el 10-11 y de una tanda a otra varían ±0,5 ms; dentro de cada tanda las configuraciones van intercaladas.
+
+- Perfil (`prof=true`): lo de GDScript apenas sube (animación de los jugadores 147 → 193 µs por llamada por los gestos de la fase 17; balas 293 → 376 µs; estelas y casquillos, 0,1 ms). Lo que crece es el dibujo: 1578 → 1782 llamadas y 11,8 → 13,6 millones de primitivas.
+- `qset=weapon_fx:0` (efectos de armas al mínimo): −0,8 a −1,4 ms. `qset=traces:false,vents:false` (fase 17): −0,3 a −0,9. `variety=false`, `trails=false`, `casings=false` y `fx_shade=false` (nuevo): nada que se distinga del ruido. `hit_sparks=false`: −0,5 en los dos niveles. `qset=weapon_fx:1` (Media): nada.
+- **Hecho:** tope de chispas encendidas a la vez (`HitSparks.max_live` = 16 en los últimos 0,3 s; `sparks_live=N` para comparar, 999 como antes). Con 4 jugadores el tope por fotograma se llenaba siempre y había unos 60 emisores encendidos. 3 vueltas: 4 jugadores, 1 % peor −1,2 (p2_n2) y −2,2 ms (p3_n2), tirones de más de 25 ms de 28 a 14 en p3_n2; 1 jugador, igual o algo mejor.
+- El resto del coste de los efectos de armas no está en un sistema: es la suma de muchos pequeños (estelas, casquillos, segunda capa de las zonas, acentos), cada uno por debajo del ruido.
+

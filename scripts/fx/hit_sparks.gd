@@ -13,6 +13,12 @@ extends Node3D
 const POOL := 4
 const PER_FRAME := 3
 const GAP := 0.09                       ## s entre chispas en el mismo enemigo
+## Tope de chispas encendidas a la vez (19.2, 11-11-2026): lo que cuesta es cada emisor encendido, no
+## cada golpe. Con 4 jugadores el tope por fotograma se llenaba siempre y había unos 60 a la vez
+## (0,5 ms); con 1 jugador casi nunca llega. Cuenta las que empezaron en los últimos `LIVE_S` s.
+## `sparks_live=N` para comparar (999, como antes).
+const LIVE_S := 0.3
+static var max_live := 16
 const KINDS := ["bullet", "cut", "blunt", "fire", "acid", "arcane", "shock"]
 const BURSTS := ["crack", "hammer", "snap", "glass", "glint_gold", "glint_violet", "glint_green", "glint_ice", "glint_ember"]                ## ráfagas sueltas de las armas (`burst`), con su receta de VoxelFx
 
@@ -28,6 +34,7 @@ var _used := 0
 var _last := {}
 var _every := 1
 var _count := 0
+var _recent := PackedFloat64Array()     ## cuándo empezó cada chispa encendida
 
 ## Chispa del golpe `d` a `e` (lo llama Enemy al recibir daño que no es continuo).
 static func hit(world: CombatWorld, e: Node3D, d: Damage, radius := 0.4, height := 0.6) -> void:
@@ -39,6 +46,7 @@ static func hit(world: CombatWorld, e: Node3D, d: Damage, radius := 0.4, height 
 static func burst(name: String, at: Vector3) -> void:
 	if not is_instance_valid(_inst) or not _inst._pools.has(name): return
 	if Flashes.reduced() and (name == "crack" or name.begins_with("glint_")): return   # destellos reducidos (19.4)
+	if not _inst._room(): return
 	var list: Array = _inst._pools[name]
 	var i: int = _inst._next[name]
 	_inst._next[name] = (i + 1) % list.size()
@@ -85,6 +93,7 @@ func _hit(e: Node3D, d: Damage, radius: float, height: float) -> void:
 	if now - float(_last.get(id, -9.0)) < GAP: return
 	_last[id] = now
 	if _last.size() > 400: _last.clear()
+	if not _room(): return
 	_used += 1
 	var k := kind_of(d)
 	var list: Array = _pools[k]
@@ -105,6 +114,16 @@ func _hit(e: Node3D, d: Damage, radius: float, height: float) -> void:
 	if not acc.is_empty() and _pools.has(acc["glint"]) and _used < PER_FRAME:   # cuenta para el tope
 		_used += 1
 		burst(acc["glint"], at)
+
+## Hay sitio para otra chispa (tope `max_live` en los últimos `LIVE_S` s); si lo hay, la apunta.
+func _room() -> bool:
+	var now := Time.get_ticks_msec() / 1000.0
+	var keep := 0
+	while keep < _recent.size() and now - _recent[keep] > LIVE_S: keep += 1
+	if keep > 0: _recent = _recent.slice(keep)
+	if _recent.size() >= max_live: return false
+	_recent.append(now)
+	return true
 
 ## Tipo de impacto del golpe: por cómo mata, si es solo mental, o por la forma del arma.
 static func kind_of(d: Damage) -> String:

@@ -217,6 +217,8 @@ func _ready() -> void:
 	add_child(world)
 	Combos.attach(world, is_guest())                 # combinaciones en cooperativo (hito 13.7)
 	HitSparks.enabled = args.get_bool("hit_sparks", true)
+	HitSparks.max_live = args.get_int("sparks_live", 16)   # tope de chispas encendidas (19.2)
+	FxShade.enabled = args.get_bool("fx_shade", true)      # sombreador de efectos (18.2): false para comparar
 	HitSparks.setup(world)                           # impactos según el daño (hito 18.3)
 	Casings.enabled = args.get_bool("casings", true)
 	Casings.setup(world)                             # casquillos (hito 18.4)

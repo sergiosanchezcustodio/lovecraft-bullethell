@@ -614,14 +614,14 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 
 **Propuesta el 10-11-2026** tras cerrar los retoques de la fase 18. El autor deja elegir por dónde empezar («empieza por el que mejor consideres tú»): se empieza por el bloque A. Los bloques B y C quedan propuestos; el D (16.7, 16.10, 16.11 y 16.13, de la reserva de la fase 16) sigue sin elegir.
 
-**Criterio de aceptación de la fase:** en Alta, el 1 % peor de los niveles pesados (p2_n2 y p3_n2), con 1 y con 4 jugadores, por debajo de 16,7 ms en el PC del autor y libre, medido 3 veces; ningún efecto nuevo sin su versión reducida en Baja; «Destellos reducidos» atenúa todo lo que destella.
+**Criterio de aceptación de la fase** (cambiado por el autor el 11-11-2026: con 4 jugadores el 1 % peor ya pasaba de 21 ms antes de la fase 17): en Alta, en los niveles pesados (p2_n2 y p3_n2), en el PC del autor y libre, medido 3 veces: con 1 jugador, el 1 % peor por debajo de 16,7 ms; con 4 jugadores, volver a lo de antes de la fase 17 (media de unos 12,1-13,1 ms y 1 % peor de unos 21,5-22,3 ms, `docs/ESTADO.md`, 19.1); ningún efecto nuevo sin su versión reducida en Baja; «Destellos reducidos» atenúa todo lo que destella.
 
 ### Bloque A: rendimiento tras las fases 17 y 18
 
 | Hito | Contenido | Estado |
 |---|---|---|
 | 19.1 | **Medir el acumulado:** antes de la fase 17 (commit ca5b6cf, en un worktree) frente a ahora, alternando las dos copias, en p2_n2 y p3_n2, con 1 y con 4 jugadores | Hecho (10-11-2026): 1 jugador, igual (+0,2 ms); 4 jugadores, +1,25 ms de media y +1,7 ms en el 1 % peor. Ver `docs/ESTADO.md` |
-| 19.2 | **Recortar lo que más cuesta:** reparto por sistema (`prof=true`) y picos (`spikes=true`) donde haya subido; arreglar lo que se pueda sin cambiar cómo se ve | Pendiente |
+| 19.2 | **Recortar lo que más cuesta:** reparto por sistema (`prof=true`) y picos (`spikes=true`) donde haya subido; arreglar lo que se pueda sin cambiar cómo se ve | En curso (11-11-2026): tope de chispas encendidas (`HitSparks.max_live`), −1,2 a −2,2 ms en el 1 % peor con 4 jugadores; el resto del coste está repartido (ver `docs/ESTADO.md`) |
 | 19.3 | **Bajar por calidad lo que no se pueda recortar:** en Media o Baja, con su opción `=false` para comparar | Pendiente |
 
 ### Bloque B: accesibilidad de los efectos (propuesto)
