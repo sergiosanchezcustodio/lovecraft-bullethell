@@ -1,9 +1,10 @@
-# Builds de Windows y macOS (hito 13.15), también de la demo de la parte 1 (hito 13.17). Se lanza al subir una etiqueta de versión (v0.9.1,
+# Builds de Windows, macOS y Linux (hitos 13.15 y 19.8), también de la demo de la parte 1 (hito 13.17). Se lanza al subir una etiqueta de versión (v0.9.1,
 # con tools/publicar.sh) o a mano desde la pestaña Actions de GitHub («Run workflow»).
 # Pasa los tests y la revisión de los costados, comprime los modelos y exporta con los perfiles
 # de export_presets.cfg, como tools/exportar.sh. Con etiqueta, deja los dos zip en una Release en
 # borrador (para revisarla y publicarla a mano); a mano, solo en la ejecución (Artifacts).
-# Sin firma de macOS (firma ad hoc del propio Godot, como en local).
+# Sin firma de macOS (firma ad hoc del propio Godot, como en local). La de Linux se prueba aquí mismo:
+# arranca sin pantalla y juega un minuto con el bot; un error de script la para.
 name: Builds
 
 on:
@@ -47,9 +48,9 @@ jobs:
           path: |
             /home/runner/godot
             /home/runner/.local/share/godot/export_templates
-          key: godot-${{ env.GODOT_VERSION }}-win-mac-rcedit
+          key: godot-${{ env.GODOT_VERSION }}-win-mac-linux-rcedit
 
-      - name: Descargar Godot y las plantillas de Windows y macOS
+      - name: Descargar Godot y las plantillas de Windows, macOS y Linux
         if: steps.godot-cache.outputs.cache-hit != 'true'
         run: |
           base=https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable
@@ -63,7 +64,7 @@ jobs:
           curl -sSL -o templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
           # solo las que se usan: el paquete entero ocupa más de 1 GB
           unzip -q -j -o templates.tpz templates/version.txt templates/windows_release_x86_64.exe \
-            templates/windows_release_x86_64_console.exe templates/macos.zip -d "$tpl"
+            templates/windows_release_x86_64_console.exe templates/macos.zip templates/linux_release.x86_64 -d "$tpl"
           rm godot.zip templates.tpz
           ls -la "$tpl"
           # rcedit pone el icono y los datos del .exe (application/modify_resources); en Linux, con wine
@@ -123,6 +124,11 @@ jobs:
             exit 1
           fi
           "$GODOT" --headless --path . --export-release "macOS Demo" builds/demo/macos/LovecraftLibraryDemo.zip
+          mkdir -p builds/linux builds/demo/linux
+          "$GODOT" --headless --path . --export-release "Linux" builds/linux/LovecraftLibrary.x86_64
+          "$GODOT" --headless --path . --export-release "Linux Demo" builds/demo/linux/LovecraftLibraryDemo.x86_64
+          test -s builds/linux/LovecraftLibrary.x86_64
+          test -s builds/demo/linux/LovecraftLibraryDemo.x86_64
           test -s builds/windows/LovecraftLibrary.exe
           test -s builds/macos/LovecraftLibrary.zip
           test -s builds/demo/windows/LovecraftLibraryDemo.exe
@@ -133,7 +139,28 @@ jobs:
           cp builds/macos/LovecraftLibrary.zip "dist/LovecraftLibrary-${v}-macos.zip"
           (cd builds/demo/windows && zip -q -9 "../../../dist/LovecraftLibrary-${v}-demo-windows.zip" LovecraftLibraryDemo.exe)
           cp builds/demo/macos/LovecraftLibraryDemo.zip "dist/LovecraftLibrary-${v}-demo-macos.zip"
+          chmod +x builds/linux/LovecraftLibrary.x86_64 builds/demo/linux/LovecraftLibraryDemo.x86_64
+          (cd builds/linux && zip -q -9 "../../dist/LovecraftLibrary-${v}-linux.zip" LovecraftLibrary.x86_64)
+          (cd builds/demo/linux && zip -q -9 "../../../dist/LovecraftLibrary-${v}-demo-linux.zip" LovecraftLibraryDemo.x86_64)
           ls -la dist
+
+      # Hito 19.8: la build de Linux, de verdad. Sin pantalla (--headless) y a 60 pasos por segundo fijos:
+      # la portada y después un minuto de partida con el bot, en el nivel más pesado de la parte 1.
+      - name: Probar la build de Linux
+        run: |
+          for run in "" "level=p1_n2 bot=smart god=true autopick=true perf=20"; do
+            echo "== ${run:-portada}"
+            timeout 600 builds/linux/LovecraftLibrary.x86_64 --headless --fixed-fps 60 --quit-after 3600 -- mute=true $run > smoke.log 2>&1 || echo "salida $?"
+            grep -E "ERROR|WARNING|RENDIMIENTO|INICIO" smoke.log | sort | uniq -c | sort -rn | head -20 || true
+            if grep -q "SCRIPT ERROR" smoke.log; then
+              grep -A4 "SCRIPT ERROR" smoke.log | head -60
+              echo "::error::La build de Linux da errores de script (${run:-portada})"
+              exit 1
+            fi
+          done
+          timeout 300 builds/demo/linux/LovecraftLibraryDemo.x86_64 --headless --fixed-fps 60 --quit-after 1200 -- mute=true > smoke_demo.log 2>&1 || true
+          if grep -q "SCRIPT ERROR" smoke_demo.log; then grep -A4 "SCRIPT ERROR" smoke_demo.log | head -40; echo "::error::La demo de Linux da errores de script"; exit 1; fi
+          echo "La build de Linux arranca y juega sin errores de script"
 
       - name: Guardar las builds en la ejecución
         uses: actions/upload-artifact@v4
@@ -150,6 +177,7 @@ jobs:
         run: |
           cat > notas.md <<'EOF'
           **Windows:** descomprime y abre `LovecraftLibrary.exe`.
+          **Linux:** descomprime y abre `LovecraftLibrary.x86_64` (si no arranca, `chmod +x` primero). Necesita Vulkan.
           **macOS:** descomprime; la primera vez, clic derecho sobre la aplicación y «Abrir» (no está firmada con un certificado de Apple).
           **Demo** (`-demo-`): la parte 1 entera, cuatro investigadores y cooperativo local.
           En red, todos los PC tienen que llevar la misma versión.

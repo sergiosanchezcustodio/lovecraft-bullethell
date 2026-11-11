@@ -1,5 +1,5 @@
 #!/bin/sh
-# Builds de Windows y macOS (hito 8.5) y de la demo de la parte 1 (hito 13.17, en builds/demo/).
+# Builds de Windows, macOS y Linux (hitos 8.5 y 19.8) y de la demo de la parte 1 (hito 13.17, en builds/demo/).
 # Comprime los modelos (models/*.json.z: la build no lleva los .json) y exporta con los perfiles
 # de export_presets.cfg.
 # Uso (Git Bash, desde la raíz): sh tools/exportar.sh [versión]
@@ -38,4 +38,12 @@ godot --headless --path . --export-release "Windows Desktop" builds/windows/Love
 godot --headless --path . --export-release "macOS" builds/macos/LovecraftLibrary.zip
 godot --headless --path . --export-release "Windows Demo" builds/demo/windows/LovecraftLibraryDemo.exe
 godot --headless --path . --export-release "macOS Demo" builds/demo/macos/LovecraftLibraryDemo.zip
+# Linux (hito 19.8), si está su plantilla (en GitHub Actions se hace siempre y se prueba)
+if ls "$APPDATA/Godot/export_templates/"*/linux_release.x86_64 >/dev/null 2>&1; then
+	mkdir -p builds/linux builds/demo/linux
+	godot --headless --path . --export-release "Linux" builds/linux/LovecraftLibrary.x86_64
+	godot --headless --path . --export-release "Linux Demo" builds/demo/linux/LovecraftLibraryDemo.x86_64
+else
+	echo "Sin la plantilla de Linux: esa build, solo en GitHub Actions"
+fi
 ls -la builds/windows builds/macos builds/demo/windows builds/demo/macos
