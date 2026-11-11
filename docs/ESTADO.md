@@ -2609,3 +2609,11 @@ Con «Colores de las balas: Alto contraste» (`bullet_palette` 1) las balas enem
 ### 19.6: «Efectos de las armas» para todos (11-11-2026)
 
 El autor eligió una opción para todos, no por jugador: en local todos ven la misma pantalla. En Configuración → Vídeo, «Efectos de las armas» (Mínimos, Rebajados, Enteros; `Settings` `weapon_fx`, 2 por defecto). Pone un tope a la clave `weapon_fx` de la calidad dentro de `Quality.value`, así que vale para todo lo que ya la leía (estelas, chispas, casquillos, sombreador de efectos, acentos, segunda capa de las zonas) y nunca sube por encima del preajuste. `qset=weapon_fx:N` sigue mandando al comparar; `cfg_weapon_fx=N` la fija para una ejecución. Con 4 jugadores, «Mínimos» ahorra ~1 ms de media (mediciones de 19.2). Test: `tests/test_weapon_fx_setting.gd`. Captura: `shots/ui_recorrido/config_0.png`.
+
+### 19.7: Steam Deck y portátiles (11-11-2026)
+
+- **Preajuste:** «Ajustes para Steam Deck y portátiles» en Configuración → Vídeo (`Settings.HANDHELD`, `apply_handheld`): pantalla completa, 1280×800, sincronía vertical, 40 fps, calidad Baja, efectos de las armas Mínimos, 3D al 100 % e interfaz Grande. Lo demás no se toca.
+- **Detección:** la primera vez que arranca (sin `settings.json`), si Steam ha puesto `SteamDeck=1` o la pantalla mide 1280×800, se pone solo (`Settings.is_handheld`).
+- **Listas:** 1280×800 en las resoluciones, en el hueco 1. La configuración pasa a la versión 2 y corre los índices guardados antes para que sigan siendo las mismas. Límites de 30 y 40 fps (se guardan por valor, no por índice).
+- **Interfaz:** ya se revisó a 1280×800 el 06-11-2026 (solo textos de menos de 10 px en 6 ventanas; el autor lo deja así, para eso está la Grande). La pestaña de vídeo, comprobada con la Grande: `shots/ui_recorrido_deck/config_0.png`.
+- **Falta:** probarlo en una Deck de verdad (rendimiento de la Baja a 800p y si 40 fps se sostienen). Tests: `tests/test_handheld.gd`.

@@ -97,6 +97,10 @@ func _video() -> void:
 	_choice("Efectos de las armas", wfx, int(Settings.get_value("weapon_fx")), func(i: int) -> void:
 		Settings.set_value("weapon_fx", i))
 	_note("Estelas, chispas, casquillos y acentos de las evoluciones. Con tres o cuatro jugadores, «Rebajados» o «Mínimos» dejan leer mejor la pantalla y van más fluidos. Nunca pasan de lo que permite la calidad gráfica.")
+	_action("Ajustes para Steam Deck y portátiles", func() -> void:
+		Settings.apply_handheld()
+		_show_tab(0))
+	_note("Pantalla completa, 40 fps con sincronía, calidad Baja e interfaz Grande. En una Steam Deck se ponen solos la primera vez.")
 	_choice("Resolución del 3D (rendimiento)", OptionRow.fmt(Settings.SCALES_3D, "%d %%", 100.0),
 		OptionRow.idx(Settings.SCALES_3D, float(Settings.get_value("scale_3d")), 3), func(i: int) -> void:
 			Settings.set_value("scale_3d", Settings.SCALES_3D[i])

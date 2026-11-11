@@ -3,11 +3,11 @@ extends Node
 ## vídeo, audio, controles y juego. Se guarda en `user://settings.json` (con versión) y se
 ## aplica al arrancar y cada vez que se cambia algo en el menú de configuración.
 
-const VERSION := 1
+const VERSION := 2                         ## 2: 1280×800 en RESOLUTIONS (hito 19.7)
 const PATH := "user://settings.json"
 
-const RESOLUTIONS: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1600, 900), Vector2i(1920, 1080), Vector2i(2560, 1440), Vector2i(3840, 2160)]
-const FPS_LIMITS: Array[int] = [0, 60, 120, 144, 240]          ## 0 = sin límite
+const RESOLUTIONS: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1280, 800), Vector2i(1600, 900), Vector2i(1920, 1080), Vector2i(2560, 1440), Vector2i(3840, 2160)]
+const FPS_LIMITS: Array[int] = [0, 30, 40, 60, 120, 144, 240]          ## 0 = sin límite
 const SCALES_3D: Array[float] = [0.5, 0.67, 0.75, 1.0]
 ## Brillo (17-10-2026): gamma que multiplica la de cada arena (Atmosphere.set_lift); índice 3 = 1
 const GAME_SPEEDS: Array[float] = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3]   ## hito 16.23
@@ -61,7 +61,11 @@ var _overrides := {}                        ## `cfg_<clave>=valor` al lanzar: so
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_make_buses()
+	var first := not FileAccess.file_exists(path)
 	load_file()
+	if first and is_handheld():                 # hito 19.7: la primera vez en una Steam Deck
+		apply_handheld_values()
+		save_file()
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("cfg_") and "=" in a:
 			var kv := a.substr(4).split("=", true, 1)
@@ -87,6 +91,8 @@ func load_file() -> void:
 	if parsed is not Dictionary: return
 	for k in parsed:
 		if k != "version" and defaults.has(k): values[k] = parsed[k]
+	if int(parsed.get("version", 1)) < 2 and int(values.get("resolution", 2)) >= 1:
+		values["resolution"] = int(values["resolution"]) + 1     # se metió 1280×800 en el hueco 1
 	if parsed.has("difficulty") and not parsed.has("dif_levels"):   # la de tres (hasta el 29-10-2026): 1, 3 o 6
 		var lv: int = [1, 3, 6][clampi(int(parsed.difficulty), 0, 2)]      # (Pesadilla, el 6 desde el reparto del 13.2)
 		var d := {}
@@ -128,6 +134,26 @@ static func ui_scale_for(index: int, height: int) -> float:
 	return 1.0 if s < 1.0 and height < SMALL_MIN_H else s
 
 # ---------------------------------------------------------------- vídeo
+
+## Preajuste «Portátil» (hito 19.7): Steam Deck y portátiles flojos. Pantalla de 800 de alto, 40 fps
+## con sincronía (la Deck va a 40 Hz o a 60), calidad Baja e interfaz Grande para su pantalla de 7".
+const HANDHELD := {"fullscreen": true, "resolution": 1, "vsync": true, "fps_limit": 40, "scale_3d": 1.0,
+	"quality": 0, "weapon_fx": 0, "ui_scale": 2}
+
+## ¿Una Steam Deck? Steam pone `SteamDeck=1` al lanzar en ella; también vale una pantalla de 1280×800.
+static func is_handheld() -> bool:
+	if OS.get_environment("SteamDeck") == "1": return true
+	if DisplayServer.get_name() == "headless": return false
+	return DisplayServer.screen_get_size() == Vector2i(1280, 800)
+
+func apply_handheld_values() -> void:
+	for k in HANDHELD: values[k] = HANDHELD[k]
+
+## Desde la configuración: pone el preajuste, lo guarda y lo aplica.
+func apply_handheld() -> void:
+	apply_handheld_values()
+	save_file()
+	apply_all()
 
 func apply_video() -> void:
 	if DisplayServer.get_name() == "headless": return

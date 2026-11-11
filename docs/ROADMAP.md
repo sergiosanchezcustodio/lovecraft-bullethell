@@ -636,6 +636,6 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 19.7 | **Steam Deck y portátiles:** preajuste «Portátil» (800p, 30-40 fps estables) y la interfaz revisada a 1280×800 | Propuesto |
+| 19.7 | **Steam Deck y portátiles:** preajuste «Portátil» (800p, 30-40 fps estables) y la interfaz revisada a 1280×800 | Hecho (11-11-2026): «Ajustes para Steam Deck y portátiles» en Vídeo (`Settings.HANDHELD`), solos la primera vez en una Deck; 1280×800 y límites de 30 y 40 fps. Falta probarlo en una Deck de verdad |
 | 19.8 | **Linux:** build y prueba en GitHub Actions | Propuesto |
 | 19.9 | **Informe de errores:** si el juego se cerró mal, al volver ofrece guardar un archivo con el registro y la configuración | Propuesto |
