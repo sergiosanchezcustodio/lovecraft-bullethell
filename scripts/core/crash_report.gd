@@ -4,7 +4,7 @@ extends Node
 ## (`MARK`) que se borra al salir bien (`_exit_tree`, que también llega con `get_tree().quit()`).
 ## Si al volver la marca sigue ahí, el juego se cerró de golpe: el menú principal ofrece guardar en
 ## Documentos un .zip con el registro de aquella vez (Godot lo rota a `user://logs/godot<fecha>.log`
-## al arrancar), la configuración y los datos del equipo. Nada sale del PC: el jugador lo envía si quiere.
+## al arrancar), los de red de esa vez (`NetLog`), la configuración y los datos del equipo. Nada sale del PC: el jugador lo envía si quiere.
 ## `crash_report=true` arma la marca en una ejecución de prueba; `crash_demo=true` hace como si la
 ## anterior se hubiera cerrado mal (capturas).
 
@@ -23,7 +23,8 @@ static func start(tree: SceneTree, real: bool, demo := false) -> void:
 	if demo and _pending.is_empty(): _pending = {"version": Demo.version_text(), "started": "demo", "where": "p2_n2"}
 	if not real: return
 	_armed = true
-	_write({"version": Demo.version_text(), "started": Time.get_datetime_string_from_system(), "where": "portada"})
+	_write({"version": Demo.version_text(), "started": Time.get_datetime_string_from_system(), "where": "portada",
+		"t": int(Time.get_unix_time_from_system())})
 	tree.root.add_child.call_deferred(CrashReport.new())
 
 static func pending() -> bool:
@@ -60,6 +61,18 @@ static func previous_log(dir := LOGS) -> String:
 			best = dir.path_join(f)
 	return best
 
+## Los registros de red (`NetLog`) de la vez que se cerró: los escritos desde que arrancó (`t` de la
+## marca). Sin esa hora (marca de antes), ninguno.
+static func net_logs(dir := NetLog.DIR) -> Array[String]:
+	var out: Array[String] = []
+	var t := int(_pending.get("t", 0))
+	if t <= 0 or not DirAccess.dir_exists_absolute(dir): return out
+	for f in DirAccess.get_files_at(dir):
+		if f.begins_with("red_") and f.ends_with(".log") and FileAccess.get_modified_time(dir.path_join(f)) >= t - 2:
+			out.append(dir.path_join(f))
+	out.sort()
+	return out
+
 ## Datos del equipo y de la partida, en texto.
 static func info_text() -> String:
 	var lines: Array[String] = [
@@ -89,6 +102,7 @@ static func save(dir := "") -> String:
 	var files := {"equipo.txt": info_text().to_utf8_buffer()}
 	var prev := previous_log()
 	if prev != "": files["registro.log"] = FileAccess.get_file_as_bytes(prev)
+	for n in net_logs(): files["red/" + n.get_file()] = FileAccess.get_file_as_bytes(n)   # partidas en red
 	if FileAccess.file_exists(Settings.PATH): files["configuracion.json"] = FileAccess.get_file_as_bytes(Settings.PATH)
 	for name: String in files:
 		zip.start_file(name)

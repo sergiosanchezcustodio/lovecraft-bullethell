@@ -42,3 +42,15 @@ func test_guarda_un_zip_con_el_equipo() -> void:
 	assert_true("equipo.txt" in z.get_files())
 	assert_true("Sistema:" in z.read_file("equipo.txt").get_string_from_utf8())
 	z.close()
+
+func test_lleva_los_registros_de_red_de_aquella_vez() -> void:
+	var f := FileAccess.open(DIR.path_join("red_2026-11-11_10-00-00.log"), FileAccess.WRITE)
+	f.store_string("Anfitrión")
+	f.close()
+	FileAccess.open(DIR.path_join("otra_cosa.txt"), FileAccess.WRITE).store_string("x")
+	CrashReport._pending = {"t": int(Time.get_unix_time_from_system()) - 60}
+	assert_eq(CrashReport.net_logs(DIR).size(), 1, "el de esa sesión, solo los red_*.log")
+	CrashReport._pending = {"t": int(Time.get_unix_time_from_system()) + 3600}
+	assert_eq(CrashReport.net_logs(DIR).size(), 0, "los de antes de arrancar, no")
+	CrashReport._pending = {"version": "?"}
+	assert_eq(CrashReport.net_logs(DIR).size(), 0, "sin hora en la marca, ninguno")
