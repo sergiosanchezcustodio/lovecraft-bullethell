@@ -2629,3 +2629,18 @@ El autor eligió una opción para todos, no por jugador: en local todos ven la m
 - **Cómo sabe que se cerró mal:** `CrashReport` (`scripts/core/crash_report.gd`). Al arrancar de verdad (sin opciones de prueba, o con `crash_report=true`), `main.gd` deja la marca `user://running.json` (versión, hora y dónde va; la partida apunta el nivel con `CrashReport.note`). Un nodo en la raíz la borra en `_exit_tree`, que llega también con `get_tree().quit()`. Si al volver sigue ahí, la vez anterior se cerró de golpe. Las ejecuciones de prueba no la arman, porque se cortan a menudo.
 - **Lo que ofrece:** al abrir el menú principal, una vez, «La última vez el juego se cerró de golpe. ¿Guardar en Documentos un informe…?». «Guardar» deja `LovecraftLibrary_informe_<fecha>.zip` con `registro.log` (el registro de Godot de aquella vez: al arrancar lo rota a `user://logs/godot<fecha>.log`), `red/red_<fecha>.log` (los registros de red de esa vez, `NetLog`: los escritos desde que arrancó, por la hora `t` de la marca; añadido el 12-11-2026 a petición del autor), `configuracion.json` y `equipo.txt` (versión, sistema, procesador, memoria, tarjeta y su API, pantalla, idioma, dónde iba). Después, «Abrir la carpeta». Nada sale del PC.
 - **Comprobado:** la marca aparece al arrancar y se borra al salir bien; la pregunta, en captura (`crash_demo=true`, `shots/titulo_informe_023.0s.png`). Tests: `tests/test_crash_report.gd`.
+
+### 19.2: medición con el PC libre (12-11-2026)
+
+PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf) frente a la actual (4722151), alternadas, 3 vueltas, Alta, `bot=smart max_alive=80 spawn_rate=20 perf=20`. Media / 1 % peor en ms (las tres vueltas del 1 % peor entre paréntesis):
+
+| Caso | Antes | Ahora | Diferencia |
+|---|---|---|---|
+| 1 jugador, p2_n2 | 8,09 / 14,66 (14,4-15,2-14,4) | 8,81 / 16,27 (16,3-15,8-16,7) | +0,7 / +1,6 |
+| 1 jugador, p3_n2 | 8,54 / 16,07 (16,2-16,3-15,7) | 9,01 / 17,11 (15,6-18,6-17,2) | +0,5 / +1,0 |
+| 4 jugadores, p2_n2 | 12,93 / 24,44 (26,6-22,3-24,4) | 14,09 / 24,59 (21,8-25,2-26,8) | +1,2 / +0,2 |
+| 4 jugadores, p3_n2 | 13,78 / 23,15 (22,1-24,1-23,3) | 15,28 / 25,31 (23,7-26,7-25,5) | +1,5 / +2,2 |
+
+- **Criterio:** no se cumple del todo. Con 1 jugador, p2_n2 queda por debajo de 16,7 ms y p3_n2 lo pasa (17,1; antes, 16,1). Con 4 jugadores la media sigue 1,2-1,5 ms por encima de antes; el 1 % peor, igual en p2_n2 y +2,2 en p3_n2.
+- Con 4 jugadores, «antes» sale peor que el 10-11 (12,9-13,8 frente a 12,1-13,1): cifras de distintos días no se comparan, solo las intercaladas.
+- El tope de chispas no ha cerrado la diferencia: lo que queda es la suma de los efectos de las armas (19.2, más arriba). Pasa al 19.3.
