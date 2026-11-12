@@ -2660,3 +2660,4 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 | 1 jugador, Automático (Enteros) | 8,14 / 15,47 | 9,00 / 16,79 |
 
 - **Conclusión:** el «Rebajados» nuevo casi no ahorra (0 en p2_n2, −0,4 ms en p3_n2): lo que cuesta no son las chispas ni los casquillos sino lo que se queda en 1 (estelas, sombreador de efectos, arcos, cortinas…), repartido. «Mínimos» sí vuelve a lo de antes de la fase 17. Capturas con 4 jugadores: `shots/game_f19_wfx2_020.0s.png` (Enteros) y `game_f19_wfx0_020.0s.png` (Mínimos): con Mínimos siguen las trazadoras, el chorro, las zonas (una capa) y los números; faltan estelas, chispas, casquillos y el brillo de los efectos.
+- **Decisión (12-11-2026, opción recomendada):** «Automático» pasa a **mínimos con 3 o 4 jugadores** (enteros con 1 o 2), lo único que cumple el criterio de la fase 19 con 4 jugadores. «Rebajados» se queda como opción a mano (y en Media). La nota del menú lo explica.

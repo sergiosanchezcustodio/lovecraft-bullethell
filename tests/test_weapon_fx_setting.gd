@@ -18,13 +18,17 @@ func test_la_opcion_baja_los_efectos_sin_pasar_de_la_calidad() -> void:
 	assert_eq(int(Quality.value("weapon_fx", 2)), 0, "en Baja no sube aunque se pidan enteros")
 	assert_eq(int(Quality.value("traces", true) == true), 0, "lo demás de la calidad, igual")
 
-func test_automatico_rebaja_con_tres_o_cuatro_jugadores() -> void:
+func test_automatico_minimos_con_tres_o_cuatro_jugadores() -> void:
 	Settings._overrides["quality"] = 2
 	Settings._overrides["weapon_fx"] = Quality.WFX_AUTO
 	Quality.players = 2
 	assert_eq(int(Quality.value("weapon_fx", 2)), 2, "dos jugadores: enteros")
 	Quality.players = 3
-	assert_eq(int(Quality.value("weapon_fx", 2)), 1, "tres: rebajados")
+	assert_eq(int(Quality.value("weapon_fx", 2)), 0, "tres: mínimos")
+	Settings._overrides["quality"] = 1
+	Quality.players = 2
+	assert_eq(int(Quality.value("weapon_fx", 2)), 1, "dos en Media: lo de Media")
+	Quality.players = 4
 	Settings._overrides["quality"] = 0
 	assert_eq(int(Quality.value("weapon_fx", 2)), 0, "en Baja, lo de Baja")
 	Quality.players = 1
