@@ -3,7 +3,7 @@ extends Node
 ## vídeo, audio, controles y juego. Se guarda en `user://settings.json` (con versión) y se
 ## aplica al arrancar y cada vez que se cambia algo en el menú de configuración.
 
-const VERSION := 2                         ## 2: 1280×800 en RESOLUTIONS (hito 19.7)
+const VERSION := 3                         ## 2: 1280×800 en RESOLUTIONS (hito 19.7); 3: efectos de las armas en Automático (19.3)
 const PATH := "user://settings.json"
 
 const RESOLUTIONS: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1280, 800), Vector2i(1600, 900), Vector2i(1920, 1080), Vector2i(2560, 1440), Vector2i(3840, 2160)]
@@ -35,7 +35,7 @@ var defaults := {
 	"shake": 1.0,                           ## temblor de cámara (0..1)
 	"damage_numbers": 2,                    ## cifras de daño: 0 no, 1 solo los golpes fuertes, 2 todas (hito 11.2)
 	"quality": 2,                           ## calidad gráfica: 0 baja, 1 media, 2 alta, 3 ultra (Quality, hito 11.5)
-	"weapon_fx": 2,                         ## efectos de las armas: 0 mínimos, 1 rebajados, 2 enteros; tope sobre la calidad (hito 19.6)
+	"weapon_fx": 3,                         ## efectos de las armas: 0 mínimos, 1 rebajados, 2 enteros, 3 automático (rebajados con 3-4 jugadores); tope sobre la calidad (19.6, 19.3)
 	"dif_levels": {},                       ## dificultad (D-42, temporal): característica -> 1..10; sin ella, 3 (Difficulty)
 	"hallucinations": true,                 ## alucinaciones con poca cordura (hito 13.4, Hallucinations)
 	"tips": true,                           ## consejos de la primera partida (hito 13.3, Tips)
@@ -93,6 +93,8 @@ func load_file() -> void:
 		if k != "version" and defaults.has(k): values[k] = parsed[k]
 	if int(parsed.get("version", 1)) < 2 and int(values.get("resolution", 2)) >= 1:
 		values["resolution"] = int(values["resolution"]) + 1     # se metió 1280×800 en el hueco 1
+	if int(parsed.get("version", 1)) < 3 and int(values.get("weapon_fx", 3)) == 2:
+		values["weapon_fx"] = 3                               # el Enteros de fábrica de un día pasa a Automático
 	if parsed.has("difficulty") and not parsed.has("dif_levels"):   # la de tres (hasta el 29-10-2026): 1, 3 o 6
 		var lv: int = [1, 3, 6][clampi(int(parsed.difficulty), 0, 2)]      # (Pesadilla, el 6 desde el reparto del 13.2)
 		var d := {}

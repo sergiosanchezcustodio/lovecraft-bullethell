@@ -5,8 +5,8 @@ extends Node3D
 ## de icor y un destello de acero), golpe (polvo y cascotes), fuego (brasas), ácido (gotas verdes),
 ## arcano (motas que suben) y rayo (chispazos azules). Los emisores se reciclan (`POOL` por tipo,
 ## montados al empezar el nivel): ninguno se crea en partida. Tope de golpes con chispa por
-## fotograma (`PER_FRAME`) y por enemigo (`GAP`). Con `weapon_fx` 0 (Baja), nada; en 1 (Media), la
-## mitad. `hit_sparks=false` para comparar.
+## fotograma (`PER_FRAME`) y por enemigo (`GAP`). Con `weapon_fx` 0 (Baja), nada; en 1 (Media o «Rebajados»),
+## una de cada tres, la mitad de encendidas y sin los destellos de las evoluciones (19.3). `hit_sparks=false` para comparar.
 
 ## 4 y 3 (07-11-2026; antes 6 y 4): con siete armas a la vez costaban 0,5 ms (cada emisor encendido
 ## es otro proceso de partículas y otra llamada de dibujo)
@@ -33,6 +33,8 @@ var _frame := -1
 var _used := 0
 var _last := {}
 var _every := 1
+var _lite := false
+var _max := -1                               ## tope de encendidas de este nivel (-1: `max_live`)
 var _count := 0
 var _recent := PackedFloat64Array()     ## cuándo empezó cada chispa encendida
 
@@ -46,6 +48,7 @@ static func hit(world: CombatWorld, e: Node3D, d: Damage, radius := 0.4, height 
 static func burst(name: String, at: Vector3) -> void:
 	if not is_instance_valid(_inst) or not _inst._pools.has(name): return
 	if Flashes.skip_glint(name): return            # destellos reducidos (19.4) y alto contraste (19.5)
+	if _inst._lite and name.begins_with("glint_"): return   # Rebajados (19.3): sin destellos de las evoluciones
 	if not _inst._room(): return
 	var list: Array = _inst._pools[name]
 	var i: int = _inst._next[name]
@@ -63,7 +66,9 @@ static func setup(world: CombatWorld) -> void:
 	Flashes.refresh()
 	var h := HitSparks.new()
 	h.name = "HitSparks"
-	h._every = 2 if lv == 1 else 1
+	h._every = 3 if lv == 1 else 1                 # Rebajados (19.3): una de cada tres, y menos encendidas
+	h._lite = lv == 1
+	if lv == 1: h._max = maxi(1, max_live / 2)
 	world.fx.add_child(h)
 	_inst = h
 
@@ -121,7 +126,7 @@ func _room() -> bool:
 	var keep := 0
 	while keep < _recent.size() and now - _recent[keep] > LIVE_S: keep += 1
 	if keep > 0: _recent = _recent.slice(keep)
-	if _recent.size() >= max_live: return false
+	if _recent.size() >= (_max if _max > 0 else max_live): return false
 	_recent.append(now)
 	return true
 

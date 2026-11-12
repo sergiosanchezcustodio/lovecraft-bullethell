@@ -93,10 +93,10 @@ func _video() -> void:
 		Settings.set_value("quality", i)
 		Settings.apply_video())
 	_note("Suavizado, sombras, oclusión ambiental (Ultra), niebla de los faroles, enemigos que se desmoronan y manchas. Lo de la partida cambia al empezar el siguiente nivel.")
-	var wfx: Array[String] = ["Mínimos", "Rebajados", "Enteros"]
+	var wfx: Array[String] = ["Mínimos", "Rebajados", "Enteros", "Automático"]
 	_choice("Efectos de las armas", wfx, int(Settings.get_value("weapon_fx")), func(i: int) -> void:
 		Settings.set_value("weapon_fx", i))
-	_note("Estelas, chispas, casquillos y acentos de las evoluciones. Con tres o cuatro jugadores, «Rebajados» o «Mínimos» dejan leer mejor la pantalla y van más fluidos. Nunca pasan de lo que permite la calidad gráfica.")
+	_note("Estelas, chispas, casquillos y acentos de las evoluciones. «Automático»: enteros con uno o dos jugadores y rebajados con tres o cuatro, para leer mejor la pantalla y que vaya más fluido. Nunca pasan de lo que permite la calidad gráfica.")
 	_action("Ajustes para Steam Deck y portátiles", func() -> void:
 		Settings.apply_handheld()
 		_show_tab(0))

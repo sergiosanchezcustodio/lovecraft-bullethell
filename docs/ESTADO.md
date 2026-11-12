@@ -2644,3 +2644,19 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Criterio:** no se cumple del todo. Con 1 jugador, p2_n2 queda por debajo de 16,7 ms y p3_n2 lo pasa (17,1; antes, 16,1). Con 4 jugadores la media sigue 1,2-1,5 ms por encima de antes; el 1 % peor, igual en p2_n2 y +2,2 en p3_n2.
 - Con 4 jugadores, «antes» sale peor que el 10-11 (12,9-13,8 frente a 12,1-13,1): cifras de distintos días no se comparan, solo las intercaladas.
 - El tope de chispas no ha cerrado la diferencia: lo que queda es la suma de los efectos de las armas (19.2, más arriba). Pasa al 19.3.
+
+### 19.3: «Automático» en los efectos de las armas (12-11-2026, elegido por el autor)
+
+- **Opción:** «Efectos de las armas» tiene un cuarto valor, «Automático» (`weapon_fx` 3, el de fábrica): enteros con 1 o 2 jugadores y rebajados con 3 o 4. `Quality.players` lo pone Game antes de montar los efectos (los de la selección más `bots=`); `Quality.weapon_fx_cap()`. La configuración pasa a la versión 3: el «Enteros» de fábrica guardado el día anterior pasa a «Automático».
+- **«Rebajados» (`weapon_fx` 1, también Media) más recortado:** sin casquillos (antes, la mitad), una de cada tres chispas (antes, la mitad), la mitad de chispas encendidas a la vez y sin los destellos de las evoluciones. Estelas más cortas, como antes.
+- **Medición** (PC libre, alternadas, 3 vueltas, Alta), media / 1 % peor en ms:
+
+| Caso | p2_n2 | p3_n2 |
+|---|---|---|
+| 4 jugadores, antes de la fase 17 | 12,51 / 21,69 | 14,02 / 23,69 |
+| 4 jugadores, Enteros | 13,59 / 23,30 | 15,13 / 24,71 |
+| 4 jugadores, Automático (Rebajados nuevo) | 13,61 / 23,29 | 14,71 / 23,91 |
+| 4 jugadores, Mínimos | 12,89 / 22,11 | 14,02 / 23,42 |
+| 1 jugador, Automático (Enteros) | 8,14 / 15,47 | 9,00 / 16,79 |
+
+- **Conclusión:** el «Rebajados» nuevo casi no ahorra (0 en p2_n2, −0,4 ms en p3_n2): lo que cuesta no son las chispas ni los casquillos sino lo que se queda en 1 (estelas, sombreador de efectos, arcos, cortinas…), repartido. «Mínimos» sí vuelve a lo de antes de la fase 17. Capturas con 4 jugadores: `shots/game_f19_wfx2_020.0s.png` (Enteros) y `game_f19_wfx0_020.0s.png` (Mínimos): con Mínimos siguen las trazadoras, el chorro, las zonas (una capa) y los números; faltan estelas, chispas, casquillos y el brillo de los efectos.

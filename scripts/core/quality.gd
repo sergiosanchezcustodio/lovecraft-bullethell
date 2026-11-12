@@ -26,11 +26,22 @@ static func current() -> Dictionary:
 	if all.is_empty(): return {}
 	return all[clampi(int(Auto.setting("quality", DEFAULT)), 0, all.size() - 1)]
 
+## Jugadores de la partida que se monta (lo pone Game antes de los efectos): «Automático» en los
+## efectos de las armas (hito 19.3) los rebaja con 3 o 4.
+static var players := 1
+const WFX_AUTO := 3
+
+## Tope de `weapon_fx` según la opción «Efectos de las armas» (0..2, o 3 automático).
+static func weapon_fx_cap() -> int:
+	var s := clampi(int(Auto.setting("weapon_fx", WFX_AUTO)), 0, WFX_AUTO)
+	if s == WFX_AUTO: return 1 if players >= 3 else 2
+	return s
+
 static func value(key: String, default: Variant) -> Variant:
 	var o := overrides()
 	if o.has(key): return o[key]
 	var v: Variant = current().get(key, default)
-	if key == "weapon_fx": v = mini(int(v), clampi(int(Auto.setting("weapon_fx", 2)), 0, 2))   # hito 19.6
+	if key == "weapon_fx": v = mini(int(v), weapon_fx_cap())   # hitos 19.6 y 19.3
 	return v
 
 ## `qset=clave:valor,clave:valor` al lanzar (17.20): cambia claves sueltas del preajuste para comparar

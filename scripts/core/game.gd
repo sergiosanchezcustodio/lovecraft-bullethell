@@ -216,6 +216,8 @@ func _ready() -> void:
 	world.obstacles = arena.get_meta("obstacles")
 	add_child(world)
 	Combos.attach(world, is_guest())                 # combinaciones en cooperativo (hito 13.7)
+	# cuántos van a jugar, antes de montar los efectos («Automático» en los de las armas, hito 19.3)
+	Quality.players = clampi((GameSession.seats.size() if GameSession.is_set() else 1) + args.get_int("bots", 0), 1, 4)
 	HitSparks.enabled = args.get_bool("hit_sparks", true)
 	HitSparks.max_live = args.get_int("sparks_live", 16)   # tope de chispas encendidas (19.2)
 	FxShade.enabled = args.get_bool("fx_shade", true)      # sombreador de efectos (18.2): false para comparar

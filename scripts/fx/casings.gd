@@ -4,8 +4,8 @@ extends MultiMeshInstance3D
 ## salta a la derecha del cañón, gira, rebota en el suelo y se queda un momento antes de encogerse.
 ## Latón para las pistolas y los fusiles (más largo), rojo para los cartuchos de las escopetas;
 ## los dardos, arpones y demás no sueltan nada. Todos en un MultiMesh (una llamada de dibujo), con
-## tope (`MAX`: el más viejo deja sitio). Con `weapon_fx` 0 (Baja), nada; en 1 (Media), la mitad
-## de los casquillos y menos tiempo en el suelo. `casings=false` para comparar.
+## tope (`MAX`: el más viejo deja sitio). Con `weapon_fx` 0 o 1 (Baja, Media o «Rebajados»), nada
+## (hasta el 12-11-2026, en 1 la mitad: no ahorraba nada que se notara, hito 19.3). `casings=false` para comparar.
 
 const MAX := 64
 const LIFE := 2.4
@@ -44,12 +44,9 @@ static func eject(at: Vector3, dir: Vector3, look: String) -> void:
 static func setup(world: CombatWorld) -> void:
 	if not enabled or world == null: return
 	var lv := int(Quality.value("weapon_fx", 2))
-	if lv <= 0: return
+	if lv <= 1: return                           # Rebajados (19.3): sin casquillos
 	var c := Casings.new()
 	c.name = "Casings"
-	if lv == 1:
-		c._every = 2
-		c._life = LIFE * 0.6
 	world.fx.add_child(c)
 	_inst = c
 
