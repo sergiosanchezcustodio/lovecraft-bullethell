@@ -11,6 +11,7 @@ La tabla de qué suena en cada evento está en data/sfx.json.
 Uso: python tools/gen_sfx.py <carpeta con los packs de Kenney descomprimidos>
      python tools/gen_sfx.py --ambiente   (solo los del ambiente de los escenarios)
      python tools/gen_sfx.py --buzo       (solo la respiración del casco de buzo y la linterna que falla)
+     python tools/gen_sfx.py --sueno      (solo el sueño de Kuranes)
 """
 import os, sys, shutil, wave, glob
 import numpy as np
@@ -853,6 +854,58 @@ def menus():
         save('stamp_%d' % k, thump + knock + crush + table)
 
 
+def sueno():
+    """El sueño de Kuranes (hito 20.22): al abrirse, campanillas de celesta en pentatónica que suben
+    (parciales 1, 2, 3 y 4 que caen a distinto ritmo, con un brillo de metal al golpe) sobre una nube
+    de senos desafinados que entra despacio, y un eco largo. Al dormirse uno en Ooth-Nargai, dos
+    notas que bajan, más graves, y un soplo de respiración."""
+    r = np.random.default_rng(2022)
+
+    def celesta(f, d, amp=1.0):
+        tt = t(d)
+        x = np.zeros(len(tt))
+        for ratio, a, dec in ((1.0, 1.0, 0.9), (2.0, 0.35, 0.45), (3.0, 0.12, 0.25), (4.02, 0.08, 0.12)):
+            x += a * np.sin(2 * np.pi * f * ratio * tt) * np.exp(-tt / dec)
+        x *= np.minimum(tt / 0.003, 1)
+        x += hp(r.standard_normal(len(tt)), 4000) * np.exp(-tt / 0.006) * 0.15
+        return x * amp
+
+    def reverb(x, size=1.8, dec=0.6, mix=0.55):
+        ir = lp(r.standard_normal(int(size * SR)), 5000) * np.exp(-t(size) / dec)
+        wet = signal.fftconvolve(x, ir)[:len(x)]
+        wet *= np.std(x) / (np.std(wet) + 1e-9)
+        y = x * (1 - mix * 0.5) + wet * mix
+        n = int(0.35 * SR)
+        y[-n:] *= np.linspace(1, 0, n) ** 2                                # que la cola no se corte
+        return y
+
+    scale = (587.3, 659.3, 740.0, 880.0, 987.8, 1174.7, 1318.5)       # re mayor pentatónica, alta
+    for k in range(2):
+        d = 1.9
+        x = np.zeros(int(d * SR))
+        notes = (0, 2, 3, 5, 6) if k == 0 else (1, 3, 4, 5, 6)
+        for j, n in enumerate(notes):
+            i = int((0.02 + j * r.uniform(0.07, 0.09)) * SR)
+            c = celesta(scale[n] * (1 + r.uniform(-0.002, 0.002)), d - i / SR, 0.9 - j * 0.08)
+            x[i:i + len(c)] += c
+        tt = t(d)                                                        # la nube de debajo
+        pad_env = np.clip(tt / 0.35, 0, 1) * np.exp(-np.maximum(tt - 0.35, 0) / 0.55)
+        for f, a in ((293.7, 0.25), (440.0, 0.18), (587.3, 0.10)):
+            x += a * pad_env * (np.sin(2 * np.pi * f * tt) + np.sin(2 * np.pi * f * 1.004 * tt + 1.0)) * 0.5
+        x += bp(r.standard_normal(len(tt)), 2500, 8000) * pad_env * 0.03  # aire
+        save('dream_%d' % k, reverb(x))
+    d = 1.1                                                              # se duerme: dos notas que bajan
+    x = np.zeros(int(d * SR))
+    for j, f in enumerate((659.3, 493.9)):
+        i = int(j * 0.16 * SR)
+        c = celesta(f, d - i / SR, 0.8 - 0.2 * j)
+        x[i:i + len(c)] += c
+    tt = t(d)
+    sigh = np.clip(tt / 0.15, 0, 1) * np.exp(-np.maximum(tt - 0.15, 0) / 0.2)
+    x += lp(bp(r.standard_normal(len(tt)), 300, 1800), 1200) * sigh * 0.25
+    save('dream_sleep_0', reverb(x, 1.4, 0.45, 0.45))
+
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
@@ -865,6 +918,8 @@ if __name__ == '__main__':
         menus()
     elif '--vela' in sys.argv:                                 # solo la vela que se apaga (hito 20.3)
         vela()
+    elif '--sueno' in sys.argv:                                # solo el sueño de Kuranes (hito 20.22)
+        sueno()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)
@@ -876,5 +931,6 @@ if __name__ == '__main__':
         ambiente()
         vela()
         menus()
+        sueno()
         if len(sys.argv) > 1: copy_kenney(sys.argv[1])
     print('listo en', OUT)

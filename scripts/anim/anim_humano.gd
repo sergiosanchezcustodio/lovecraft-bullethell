@@ -8,7 +8,7 @@ extends RefCounted
 const ARM_LAG := 0.32                         ## retraso de los brazos respecto a las piernas (rad del ciclo)
 const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive": 0.5,
 	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6, "brake": 0.5, "cheer": 0.9, "marvel": 1.1, "open_chest": 0.9,
-	"win_fist": 1.6, "win_salute": 1.6, "win_hat": 1.6, "win_ward": 1.6, "win_bow": 1.6,
+	"win_fist": 1.6, "win_salute": 1.6, "win_hat": 1.6, "win_ward": 1.6, "win_bow": 1.6, "win_court": 1.8,
 	"fidget_look": 2.6, "fidget_stretch": 2.8, "fidget_check": 2.4, "fidget_shift": 1.8,
 	"down": 0.9, "down_wait": 3.0, "get_up": 0.75}
 ## Gestos de reposo (28-10-2026): Player los pone de vez en cuando si el personaje lleva un rato
@@ -16,7 +16,7 @@ const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive":
 const FIDGETS := ["fidget_look", "fidget_stretch", "fidget_check", "fidget_shift"]
 ## Gestos al atacar de los investigadores (hito 17.1): las hordas (HordeMesh) no los graban.
 const HORDE_SKIP := ["cast", "swing", "thrust", "slam", "brake", "cheer", "marvel", "open_chest",
-	"win_fist", "win_salute", "win_hat", "win_ward", "win_bow"]
+	"win_fist", "win_salute", "win_hat", "win_ward", "win_bow", "win_court"]
 
 ## Piezas opcionales: antebrazos y espinillas (codos y rodillas), bufanda y coleta. Los
 ## modelos partidos con tools/humano.py split_limbs las tienen; los demás, no, y las
@@ -477,6 +477,22 @@ static func win_bow(m: Node3D, t: float) -> void:
 	bend(m, "fore_r", -1.55 * k)
 	Anims.part(m, "arm_l").rotation = Vector3(0.15 * k, 0.0, -0.85 * k)
 	bend(m, "fore_l", -0.2 * k)
+
+## Reverencia de corte (Kuranes, rey de Celephaïs; hito 20.22): la mano derecha sube a la frente,
+## al aro, y baja en un floreo amplio hacia fuera y abajo con la palma abierta; la izquierda, a la
+## espalda; el tronco se inclina un poco al final del floreo (poco: la cabeza no cuelga del tronco).
+##   0-0,3 sube a la frente | 0,3-0,62 floreo y reverencia | se mantiene | 0,8-1 vuelve
+static func win_court(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.2, 0.8)
+	var up := Anims.ease(t / 0.28)                                          # a la frente, como el saludo
+	var sweep := Anims.ease((t - 0.3) / 0.32)
+	var curl := sin(sweep * PI) * 0.4                                       # el floreo: sube un poco antes de bajar
+	Anims.part(m, "arm_r").rotation = Vector3((lerpf(-1.45 * up, -0.55, sweep) - curl) * k,
+		lerpf(-0.35 * up, 0.0, sweep) * k, lerpf(0.8 * up, 0.95, sweep) * k)
+	bend(m, "fore_r", lerpf(-2.15 * up, -0.25, sweep) * k)
+	Anims.part(m, "arm_l").rotation = Vector3(0.5 * k, 0.0, 0.18 * k)      # a la espalda (casi estirado: si se
+	bend(m, "fore_l", -0.35 * k)                                            #  dobla, la mano vuelve delante)
+	Anims.part(m, "torso").rotation = Vector3(0.15 * sweep * k, 0.1 * sweep * k, 0.0)
 
 ## Frenada (hito 17.2): al pararse en seco tras correr, planta el pie izquierdo delante con la
 ## pierna estirada, dobla la derecha, echa el cuerpo atrás y abre los brazos para no irse de

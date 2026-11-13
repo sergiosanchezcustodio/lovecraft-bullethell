@@ -3,6 +3,7 @@
 //   0,0 núcleo interior (7 cubos)   0,5 capa exterior del núcleo (12)   1,0 anillo (14)
 // COLOR.r es un matiz propio de cada cubo (0..1) para variar el tono.
 // INSTANCE_CUSTOM: x = estilo (1 físico, 2 mental, 3 mixto), y = fase, z = edad, w = radio visual.
+//   Las frenadas por un sueño de Kuranes (hito 20.22) llevan 16 sumado al estilo: se tiñen de pastel.
 // Cada estilo enseña unos grupos y esconde los demás (colapsándolos en el centro):
 //   físico: núcleo entero (bola maciza)   mental: anillo y núcleo interior   mixto: todo.
 
@@ -11,12 +12,14 @@ varying float v_group;
 varying float v_shade;
 
 float group_of(vec4 c) { return c.g < 0.25 ? 0.0 : (c.g < 0.75 ? 1.0 : 2.0); }
+int style_of(float x) { return int(x + 0.5) % 16; }
+bool dreamy(float x) { return x > 15.5; }
 
 // Devuelve la posición del vértice en el espacio del modelo (sin escala de instancia).
 // (Los varyings no se pueden asignar en una función: los pone vertex().)
 vec3 bullet_vertex(vec3 v, vec4 c, vec4 custom, float time) {
 	float group = group_of(c);
-	int style = int(custom.x + 0.5);
+	int style = style_of(custom.x);
 	float phase = custom.y;
 	bool show = true;
 	if (style == 1 && group > 1.5) show = false;           // físico: sin anillo

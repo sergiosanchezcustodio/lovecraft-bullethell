@@ -1593,6 +1593,7 @@ func _on_dodge() -> void:
 		world.fx.add_child(DreamZone.new().setup(world, from, data.dodge_style.dream, DODGE_DREAM_T, 0.0, 0.5,
 			DODGE_DREAM_SLOW, 0.6, 0.0, {}))
 		VoxelFx.puff(world.fx, global_position, "dream", 0.5, Color.WHITE, 0.8)
+		Auto.sfx_at("dream", from, -7.0)
 		_frame_out = false
 	if data.dodge_style != null and data.dodge_style.reveal > 0.0 and world != null:   # se asoma al más allá (20.20)
 		VoxelFx.puff(world.fx, global_position, "beyond", 0.7, Color.WHITE, 0.8)

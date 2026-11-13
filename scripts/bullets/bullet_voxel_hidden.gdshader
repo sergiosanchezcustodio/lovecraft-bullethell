@@ -8,6 +8,7 @@ render_mode unshaded, depth_test_disabled, depth_draw_never, cull_back, shadows_
 
 uniform vec3 phys_color : source_color = vec3(0.62, 0.26, 0.12);
 uniform vec3 ment_color : source_color = vec3(0.44, 0.28, 0.62);
+uniform vec3 dream_color : source_color = vec3(0.78, 0.78, 0.94);   // frenada en un sueño (20.22)
 uniform sampler2D depth_tex : hint_depth_texture, filter_nearest;
 
 void vertex() {
@@ -22,6 +23,7 @@ void fragment() {
 	vec4 view = INV_PROJECTION_MATRIX * vec4(SCREEN_UV * 2.0 - 1.0, depth, 1.0);
 	float scene_dist = -view.z / view.w;
 	if (scene_dist > -VERTEX.z - 0.3) discard;               // no está tapada
-	ALBEDO = (v_group > 1.5 || int(v_style + 0.5) == 2) ? ment_color : phys_color;
+	ALBEDO = (v_group > 1.5 || style_of(v_style) == 2) ? ment_color : phys_color;
+	if (dreamy(v_style)) ALBEDO = mix(ALBEDO, dream_color, 0.45);
 	ALPHA = 0.8;
 }

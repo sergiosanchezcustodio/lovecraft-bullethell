@@ -164,3 +164,27 @@ func test_la_adormidera_frena_mas() -> void:
 	var w: WeaponData = load("res://data/weapons/ensueno_celephais.tres")
 	assert_almost_eq(WeaponSystem.with_items(w, "slow_factor", 0.45, cd), 0.39, 0.0001)
 	assert_eq(WeaponSystem.with_items(w, "slow_factor", 1.0, cd), 1.0, "lo que no frena, nada")
+
+func test_las_balas_que_frena_se_ven_en_pastel() -> void:
+	# las del sueño se marcan SLOW_DREAM (el dibujo suma 16 al estilo, bullet_voxel.gdshaderinc);
+	# las del Signo Arcano siguen con su color
+	var z := _zone(Vector3.ZERO)
+	world.bullets.spawn(BulletManager.Team.ENEMY, BulletManager.Style.PHYSICAL, Vector3(1, 0.8, 0), Vector3(4, 0, 0),
+		0.2, 0.2, Damage.new(5.0, 0.0), 3.0, 0, 0.0, -1)
+	world.bullets.spawn(BulletManager.Team.ENEMY, BulletManager.Style.MENTAL, Vector3(20, 0.8, 0), Vector3(4, 0, 0),
+		0.2, 0.2, Damage.new(0.0, 5.0), 3.0, 0, 0.0, -1)
+	_run(z, 0.05)
+	assert_eq(world.bullets._slowed[0], BulletManager.SLOW_DREAM)
+	assert_eq(world.bullets.slow_enemy_bullets(Vector3(20, 0, 0), 2.0, 0.5), 1)
+	assert_eq(world.bullets._slowed[1], BulletManager.SLOW_SIGN)
+	assert_eq(world.bullets.slow_enemy_bullets(Vector3(1, 0, 0), 3.0, 0.5), 0, "cada bala se frena una vez")
+
+func test_suena_a_sueño_y_hace_su_reverencia() -> void:
+	var defs: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/sfx.json"))
+	for ev in ["dream", "dream_sleep"]:
+		var d: Dictionary = (defs["eventos"] as Dictionary).get(ev, {})
+		assert_false(d.is_empty(), ev)
+		for f in d.get("files", []): assert_true(ResourceLoader.exists("res://resources/sfx/" + f), f)
+	var c: CharacterData = load("res://data/characters/kuranes.tres")
+	assert_eq(c.victory, "win_court")
+	assert_true(Anims.has_anim(c.model, "win_court"))

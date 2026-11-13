@@ -7,7 +7,7 @@
 script = ExtResource("1")
 id = &"kuranes"
 display_name = "Kuranes"
-victory = "win_hat"
+victory = "win_court"
 model = "kuranes"
 role = "Soñador de Londres, rey de Celephaïs"
 passive_text = "Medio dormido: recupera 0,4 de cordura por segundo, también entre los horrores."

@@ -387,7 +387,7 @@ func _dream(w: Weapon, target_pos: Vector3) -> bool:
 		z.follow = player
 		_dreams[w] = z
 	world.fx.add_child(z)
-	Auto.sfx_at("chant", z.global_position)
+	Auto.sfx_at("dream", z.global_position)          # campanillas de celesta (gen_sfx.py --sueno)
 	fired.emit(w)
 	return true
 

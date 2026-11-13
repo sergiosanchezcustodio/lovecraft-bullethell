@@ -2922,4 +2922,20 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
   - Serannian va con él y no se amontona.
   - El esquive deja un sueño que frena y no daña.
   - La adormidera solo frena más a lo que ya frenaba.
+- **Mejoras del mismo día** (pedidas por el autor: «adelante con las ideas»):
+  - **Sonido propio** (`python tools/gen_sfx.py --sueno`):
+    - `dream_0` y `dream_1`: campanillas de celesta en re mayor pentatónica que suben, sobre una nube de senos desafinados que entra despacio, con eco largo y la cola fundida. Suena al abrirse el sueño y, más bajo (−7 dB), en el esquive.
+    - `dream_sleep_0`: dos notas que bajan y un soplo, al dormirse uno en Ooth-Nargai.
+    - Sustituyen al cántico.
+  - **Balas frenadas en pastel:**
+    - `BulletManager.slow_enemy_bullets` apunta quién frenó cada bala: `SLOW_SIGN`, el Signo Arcano, o `SLOW_DREAM`.
+    - Las del sueño llevan 16 sumado al estilo en el dato de la instancia. `bullet_voxel.gdshaderinc` lo separa con `style_of` y `dreamy`.
+    - Se tiñen de celeste y rosa cubo a cubo (`dream_a`, `dream_b`) con algo más de brillo, sin perder la forma de su tipo. La silueta tapada se aclara un poco.
+    - Siguen así al salir del sueño, porque siguen frenadas.
+  - **Reverencia de corte** (`anim_humano.win_court`, 1,8 s), la pose de victoria de Kuranes:
+    - La mano derecha sube al aro de la frente, como en el saludo, y baja en un floreo hacia fuera con la palma abierta.
+    - La izquierda va a la espalda casi estirada: si el codo se dobla, la mano vuelve delante.
+    - El tronco se inclina un poco.
+    - Revisada con `tools/hoja_poses.gd -- model=kuranes anim=win_court n=7`. Ya son seis poses de victoria (`test_gestos_ataque`).
+  - **Tests** en `test_kuranes`: las balas del sueño se marcan `SLOW_DREAM` y las del Signo, no; cada bala se frena una vez; existen los sonidos y la pose.
 

@@ -182,7 +182,7 @@ func test_cada_investigador_tiene_su_pose_de_victoria() -> void:
 		assert_ne(c.victory, "", f)
 		assert_true(Anims.has_anim(c.model, c.victory), "%s: %s" % [f, c.victory])
 		seen[c.victory] = true
-	assert_eq(seen.size(), 5, "las cinco poses se usan")
+	assert_eq(seen.size(), 6, "las seis poses se usan (la de corte, de Kuranes: 20.22)")
 
 ## Según el suelo (hito 17.6): vadeando, las manos van más altas; en el barro, el tronco más
 ## adelante y las rodillas más dobladas.

@@ -18,6 +18,8 @@ uniform vec3 ment_light : source_color = vec3(0.52, 0.40, 0.70);  // lila
 uniform vec3 ment_mid : source_color = vec3(0.34, 0.17, 0.52);    // morado
 uniform vec3 ment_dark : source_color = vec3(0.19, 0.07, 0.29);   // violeta oscuro
 uniform float glow = 0.22;                                        // brillo propio (fracción del color)
+uniform vec3 dream_a : source_color = vec3(0.62, 0.84, 0.98);     // frenada en un sueño (20.22): celeste
+uniform vec3 dream_b : source_color = vec3(0.98, 0.70, 0.86);     //   y rosa, cubo a cubo
 
 void vertex() {
 	v_style = INSTANCE_CUSTOM.x;
@@ -27,7 +29,7 @@ void vertex() {
 }
 
 void fragment() {
-	int style = int(v_style + 0.5);
+	int style = style_of(v_style);
 	vec3 c;
 	if (v_group > 1.5) {
 		c = mix(ment_mid, ment_light, v_shade);                    // anillo
@@ -38,8 +40,13 @@ void fragment() {
 	} else {
 		c = mix(phys_edge, phys_mid, v_shade);                     // capa exterior
 	}
+	float g = glow;
+	if (dreamy(v_style)) {                                         // sigue leyéndose su tipo debajo
+		c = mix(c, mix(dream_a, dream_b, 0.5 + 0.5 * sin(TIME * 1.6 + v_shade * 6.3)), 0.55);
+		g = glow * 1.4;
+	}
 	ALBEDO = c;
 	ROUGHNESS = 0.7;
 	SPECULAR = 0.3;
-	EMISSION = c * glow;
+	EMISSION = c * g;
 }

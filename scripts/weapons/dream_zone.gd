@@ -80,7 +80,8 @@ func _physics_process(delta: float) -> void:
 	if _t >= life:
 		if _t >= life + FADE: queue_free()
 		return
-	if bullet_slow < 1.0: slowed += world.bullets.slow_enemy_bullets(global_position, radius, bullet_slow)
+	if bullet_slow < 1.0:
+		slowed += world.bullets.slow_enemy_bullets(global_position, radius, bullet_slow, BulletManager.SLOW_DREAM)
 	if rest > 0.0:                               # los soñadores descansan
 		for p in world.players:
 			if p.remote or p.health <= 0.0: continue
@@ -102,6 +103,7 @@ func _physics_process(delta: float) -> void:
 			e.stun(sleep)
 			if e.has_method("dream"): e.dream(sleep)
 			VoxelFx.puff(world.fx, e.global_position + Vector3(0, 1.0, 0), "dream_z", 0.3, Color.WHITE, 1.4)
+			Auto.sfx_at("dream_sleep", e.global_position)
 		if damage > 0.0:
 			var d := Damage.new(damage, 0.0)
 			d.bonus = bonus

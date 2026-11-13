@@ -910,6 +910,8 @@
 			]
 		},
 		"candle_out": {"db": -12, "pitch": [0.95, 1.05], "voices": 1, "gap": 0.3, "files": ["candle_out.wav"]},
+		"dream": {"db": -13, "pitch": [0.97, 1.03], "voices": 2, "gap": 0.5, "files": ["dream_0.wav", "dream_1.wav"]},
+		"dream_sleep": {"db": -17, "pitch": [0.92, 1.08], "voices": 2, "gap": 0.3, "files": ["dream_sleep_0.wav"]},
 		"torch_crackle": {
 			"db": -22,
 			"pitch": [

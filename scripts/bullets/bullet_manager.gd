@@ -84,7 +84,9 @@ var _home := PackedFloat32Array()            ## giro máximo hacia el enemigo m�
                                              ## negativo: cada -_home s, un ángulo recto, Gilman: _angle_step)
 var _effect := PackedByteArray()             ## Effect al impactar
 var _effect_val := PackedFloat32Array()
-var _slowed := PackedByteArray()             ## 1 si ya la frenó un Signo Arcano (solo una vez)
+var _slowed := PackedByteArray()             ## quién la frenó (solo una vez): SLOW_SIGN o SLOW_DREAM
+const SLOW_SIGN := 1                         ## un Signo Arcano
+const SLOW_DREAM := 2                        ## un sueño de Kuranes (hito 20.22): se dibuja en pastel
 const OVER_WALLS := -2                       ## _owner de las balas enemigas que no para el decorado
 var _owner := PackedInt32Array()             ## índice del jugador que la disparó (-1: nadie)
 ## Rasgos de daño de quien dispara (Damage.bonus), registrados una vez por jugador.
@@ -214,16 +216,16 @@ func register_bonus(bonus: Dictionary) -> int:
 func clear() -> void:
 	count = 0
 
-## Signo Arcano: las balas enemigas dentro del círculo pasan a ir a `factor` de su
-## velocidad (cada bala, una sola vez). Devuelve cuántas ha frenado.
-func slow_enemy_bullets(center: Vector3, r: float, factor: float) -> int:
+## Signo Arcano y sueños de Kuranes: las balas enemigas dentro del círculo pasan a ir a `factor`
+## de su velocidad (cada bala, una sola vez); `by` dice quién, para dibujarlas. Devuelve cuántas.
+func slow_enemy_bullets(center: Vector3, r: float, factor: float, by := SLOW_SIGN) -> int:
 	var c := Vector2(center.x, center.z)
 	var n := 0
 	for i in count:
-		if _team[i] != Team.ENEMY or _slowed[i] == 1: continue
+		if _team[i] != Team.ENEMY or _slowed[i] != 0: continue
 		if Vector2(_pos[i].x, _pos[i].z).distance_squared_to(c) > r * r: continue
 		_vel[i] *= factor
-		_slowed[i] = 1
+		_slowed[i] = by
 		n += 1
 	return n
 
@@ -554,7 +556,8 @@ func _process(_delta: float) -> void:
 			_buffer_enemy[o] = s; _buffer_enemy[o + 1] = 0.0; _buffer_enemy[o + 2] = 0.0; _buffer_enemy[o + 3] = p.x
 			_buffer_enemy[o + 4] = 0.0; _buffer_enemy[o + 5] = s; _buffer_enemy[o + 6] = 0.0; _buffer_enemy[o + 7] = p.y
 			_buffer_enemy[o + 8] = 0.0; _buffer_enemy[o + 9] = 0.0; _buffer_enemy[o + 10] = s; _buffer_enemy[o + 11] = p.z
-			_buffer_enemy[o + 12] = float(_style[i]); _buffer_enemy[o + 13] = float(i % 17) * 0.37
+			_buffer_enemy[o + 12] = float(_style[i]) + (16.0 if _slowed[i] == SLOW_DREAM else 0.0)   # (pastel: shaderinc)
+			_buffer_enemy[o + 13] = float(i % 17) * 0.37
 			_buffer_enemy[o + 14] = _age[i]; _buffer_enemy[o + 15] = s
 			ne += 1
 	# destellos de impacto, detrás de las balas en el mismo buffer
