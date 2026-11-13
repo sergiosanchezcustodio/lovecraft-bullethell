@@ -102,6 +102,20 @@ class PauseMenu extends CanvasLayer:
 	var _ping_lbl: Label
 	var _ping_t := 0.0
 
+	## La partida, desenfocada debajo del velo (hito 20.10; `pause_blur` de la calidad, no en Baja).
+	func _blur(root: Control) -> void:
+		var r := ColorRect.new()
+		r.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var m := ShaderMaterial.new()
+		m.shader = preload("res://scripts/ui/pause_blur.gdshader")
+		m.set_shader_parameter("amount", 0.0)          # sin darle valor, el tween no encuentra la propiedad
+		r.material = m
+		root.add_child(r)
+		root.move_child(r, 0)
+		var tw := r.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		tw.tween_property(m, "shader_parameter/amount", 1.0, 0.25).set_trans(Tween.TRANS_SINE)
+
 	func _init(p_guest := false) -> void:
 		guest = p_guest
 		layer = 30
@@ -111,6 +125,7 @@ class PauseMenu extends CanvasLayer:
 		var w: Array = MenuKit.window(self, MenuKit.INK, 440)
 		var dim: Control = w[0]
 		var box: VBoxContainer = w[1]
+		if bool(Quality.value("pause_blur", true)): _blur(dim)
 		var ver := UiKit.label(Demo.version_text(), 18, UiKit.TEXT_DIM)
 		ver.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)   # a mano al apuntar un fallo
 		ver.offset_left = -140

@@ -2717,3 +2717,8 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Tests:** `tests/test_title_progress.gd`.
 - **Pendiente de la propuesta:** «más libros y objetos de los jefes vencidos» necesita arte nuevo pintado sobre la ilustración; queda para cuando el autor quiera encargarlo (ComfyUI).
 
+### 20.10: desenfoque en la pausa (13-11-2026)
+
+- **Qué:** al abrir la pausa, la partida se desenfoca detrás del velo en 0,25 s (`pause_blur.gdshader`: la pantalla de debajo leída de sus mipmaps, `lod` 1,9, dos lecturas mezcladas, algo oscurecida y fría). Se adivinan las formas (fuente, faroles), no los detalles. Calidad: `pause_blur` en `data/quality.json` (Baja no; Media, Alta y Ultra sí). Solo la pausa: la subida de nivel y la pantalla final siguen viendo la partida tal cual (hay que ver lo que pasa).
+- **Captura:** `pause_at=6,3 halt_shots=true` ahora también captura la pausa (antes solo las paradas en red): `level=p2_n2 bot=smart god=true cfg_quality=2 pause_at=6,3 halt_shots=true tag=_pausa quit_after=12` → `shots/game__pausa_parada1.png`.
+

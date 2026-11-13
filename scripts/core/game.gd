@@ -642,6 +642,7 @@ func _ready() -> void:
 		var pa := args.get_floats("pause_at")
 		get_tree().create_timer(pa[0], false).timeout.connect(func() -> void:
 			toggle_pause()
+			if args.get_bool("halt_shots"): _halt_shot()     # la pausa, capturada (hito 20.10)
 			get_tree().create_timer(pa[1] if pa.size() > 1 else 3.0, true).timeout.connect(toggle_pause))
 	if args.has("levelup_at"):                     # pruebas: el J1 sube un nivel a los t s (la ventana de subida)
 		get_tree().create_timer(args.get_float("levelup_at"), false).timeout.connect(func() -> void:

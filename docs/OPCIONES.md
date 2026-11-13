@@ -60,6 +60,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `autopick=true`: elige sola la primera mejora (para bots y capturas).
   - `xp=`, `hp=` y `san=`: experiencia, vida y cordura iniciales.
   - `madness=N`: grado de locura (16.14, de 0 a 5) para los niveles de la campaña; en el mapa, `madness_open=true` pone el foco en el selector (sale aunque no se haya vencido a Cthulhu, en desarrollo).
+  - `pause_at=t,dur` con `halt_shots=true`: captura la pausa (hito 20.10, con el desenfoque).
   - `autopause_at=T`: simula perder el foco a los T s (pausa automática, hito 16.23). `cfg_game_speed=0.8`: velocidad del juego de esta ejecución.
   - `traits=N` o `traits=vampira,estalla,icor,rapida,escudo`: todas las élites salen con esos rasgos (hito 16.20; `N`, la máscara de `EliteTraits`).
   - `peddler=true`: el buhonero sale en este nivel (a los `peddler_at=` s, 5 por defecto; con bots también); `peddler=false`, nunca. `objective_near=true` lo pone cerca y `peddler_stall=N` deja la mercancía N (0 remedio, 1 baratija, 2 libro) a los pies del J1. `purse=N`: el nivel empieza con N dólares ganados. `log=true` escribe `BUHONERO` y `COMPRA`.
