@@ -16,6 +16,15 @@ const LAMP_UV := Vector2(255.0 / 1672.0, 470.0 / 941.0)   ## quinqué, en la ilu
 var _art: TextureRect
 var _dust: GPUParticles2D
 
+## Paralaje (hito 20.8): la ilustración se mueve un poco al contrario que el ratón o el stick
+## derecho de cualquier mando, y el polvo, que flota delante, el doble. Ampliada lo justo para que
+## no asomen los bordes. Se escala con «Temblor de cámara» (a 0, quieta).
+const PARALLAX_PX := 14.0
+const PARALLAX_ZOOM := 1.03                     ## a 1080 de alto deja 16 px por lado (> PARALLAX_PX)
+const PARALLAX_EASE := 4.0                       ## 1/s: lo que tarda en seguir
+var _look := Vector2.ZERO                        ## -1..1, hacia dónde se mira
+var _dust_base := Vector2.ZERO
+
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -35,6 +44,23 @@ func _ready() -> void:
 	add_child(_dust)
 	resized.connect(_place_dust)
 	_place_dust.call_deferred()
+	resized.connect(func() -> void: _art.pivot_offset = size * 0.5)
+	_art.scale = Vector2.ONE * PARALLAX_ZOOM
+
+func _process(delta: float) -> void:
+	var want := Vector2.ZERO
+	var stick := Vector2.ZERO
+	for d in ([] if JoypadInput.disabled() else Input.get_connected_joypads()):   # pruebas: sin mandos
+		var v := Vector2(Input.get_joy_axis(d, JOY_AXIS_RIGHT_X), Input.get_joy_axis(d, JOY_AXIS_RIGHT_Y))
+		if v.length() > stick.length(): stick = v
+	if stick.length() > 0.2: want = stick.limit_length(1.0)
+	elif size.x > 0.0 and get_viewport().get_visible_rect().has_point(get_viewport().get_mouse_position()):
+		want = ((get_viewport().get_mouse_position() - size * 0.5) / (size * 0.5)).clamp(-Vector2.ONE, Vector2.ONE)
+	_look = _look.lerp(want, 1.0 - exp(-PARALLAX_EASE * delta))
+	var k := clampf(float(Auto.setting("shake", 1.0)), 0.0, 1.0)
+	var shift := -_look * PARALLAX_PX * k
+	_art.position = shift
+	_dust.position = _dust_base + shift * 2.0
 
 ## Motas de polvo que flotan despacio en la luz del quinqué.
 func _make_dust() -> GPUParticles2D:
@@ -74,7 +100,8 @@ func _place_dust() -> void:
 	var k := maxf(size.x / tex_size.x, size.y / tex_size.y)
 	var shown := tex_size * k
 	var origin := (size - shown) * 0.5
-	_dust.position = origin + LAMP_UV * shown + Vector2(60, -40) * k
+	_dust_base = origin + LAMP_UV * shown + Vector2(60, -40) * k
+	_dust.position = _dust_base
 	_dust.scale = Vector2.ONE * k
 
 ## El diorama en voxel del hito 2.13d (sin usar): la tienda y el anciano en un mundo 3D propio.

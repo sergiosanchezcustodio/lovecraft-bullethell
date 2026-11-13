@@ -2703,3 +2703,8 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Qué:** en la tienda, el personaje o el compañero marcado deja la imagen fija: su modelo hace su reposo en bucle; los retratos (personajes, `icon_mode` "head") miran despacio a un lado y a otro (±0,32 rad, 7 s la vuelta) y los compañeros enteros giran como en el bestiario. Uno solo a la vez (`ShopMenu._go_live`/`_stop_live`); al quitarle el foco vuelve la imagen de siempre. `ModelIcon.make_live(…, mode)` admite ahora "head" (`Spin.sway`). El vestuario y los potenciadores, como antes.
 - **Captura:** `title saves=demo_saves open=menu_tienda tab=1 shots=10,12.5 tag=_viva` (el retrato de Legrasse cambia de una a otra).
 
+### 20.8: paralaje en la tienda (13-11-2026)
+
+- **Qué:** la ilustración del tendero (`ShopBackdrop`) se mueve hasta 14 px al contrario que el ratón o el stick derecho de cualquier mando (el que más se incline; con el stick quieto, el ratón), con un seguimiento suave (`PARALLAX_EASE`, 4/s); el polvo del quinqué, que flota delante, el doble. La ilustración va ampliada un 3 % para que no asomen los bordes (16 px de margen a 1080 de alto). Se escala con «Temblor de cámara»: a 0, quieta. En las pruebas de Claude Code no lee los mandos (`JoypadInput.disabled`).
+- **Captura:** `title saves=demo_saves open=menu_tienda tab=1 shots=10 tag=_paralaje`.
+
