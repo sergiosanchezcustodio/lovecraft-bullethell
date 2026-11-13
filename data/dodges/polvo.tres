@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DodgeStyle" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/dodge_style.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"polvo"
+display_name = "Polvo"
+anim = "flash"
+speed = 22.0
+duration = 0.16
+iframes = 0.28
+cooldown = 1.25
+snow_spray = false
+dust = true
+hidden_from = 0.12
+hidden_to = 0.7

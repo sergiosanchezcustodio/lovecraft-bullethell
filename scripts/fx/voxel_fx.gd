@@ -564,6 +564,41 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.05; m.scale_max = 0.13
 			m.color_ramp = _ramp([[0.0, Color(0.32, 0.27, 0.22, 1.0)], [0.85, Color(0.2, 0.17, 0.15, 1.0)],
 				[1.0, Color(0.2, 0.17, 0.15, 0.0)]])
+		"salts_fall":             # se deshace en sales (hito 20.18): una columna de polvo azulado que cae
+			p.draw_pass_1 = cube("mix")
+			p.amount = int(clampf(r * 100.0, 30.0, 70.0))
+			p.lifetime = 0.9
+			p.explosiveness = 0.95
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+			m.emission_box_extents = Vector3(r * 0.5, 0.75, r * 0.5)
+			m.emission_shape_offset = Vector3(0, 0.85, 0)          # la figura entera, del suelo a la cabeza
+			m.spread = 180.0
+			m.initial_velocity_min = 0.1; m.initial_velocity_max = 0.5
+			m.damping_min = 0.5; m.damping_max = 1.0
+			m.gravity = Vector3(0, -1.8, 0)
+			m.scale_min = 0.05; m.scale_max = 0.1
+			m.scale_curve = _curve([[0.0, 1.0], [0.7, 0.8], [1.0, 0.2]])
+			m.color_ramp = _ramp([[0.0, Color(0.62, 0.7, 0.92, 1.0)], [0.5, Color(0.42, 0.5, 0.72, 0.9)],
+				[1.0, Color(0.3, 0.36, 0.52, 0.0)]])
+		"salts_rise":             # se recompone (hito 20.18): las sales suben del suelo en remolino
+			p.draw_pass_1 = cube("mix")
+			p.amount = int(clampf(r * 50.0, 20.0, 64.0))
+			p.lifetime = 0.6
+			p.explosiveness = 0.85
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
+			m.emission_ring_axis = Vector3.UP
+			m.emission_ring_radius = r
+			m.emission_ring_inner_radius = r * 0.3
+			m.emission_ring_height = 0.05
+			m.direction = Vector3(0, 1, 0)
+			m.spread = 18.0
+			m.initial_velocity_min = 1.6; m.initial_velocity_max = 3.0
+			m.damping_min = 2.0; m.damping_max = 3.5
+			m.gravity = Vector3(0, -1.0, 0)
+			m.scale_min = 0.05; m.scale_max = 0.095
+			m.scale_curve = _curve([[0.0, 0.4], [0.3, 1.0], [1.0, 0.3]])
+			m.color_ramp = _ramp([[0.0, Color(0.35, 0.42, 0.6, 0.0)], [0.2, Color(0.6, 0.68, 0.92, 0.95)],
+				[1.0, Color(0.42, 0.52, 0.8, 0.0)]])
 		"crack":                  # restallido del látigo (hito 18.7): destello blanco y chispas en todas direcciones
 			p.draw_pass_1 = cube("add")
 			p.amount = 12

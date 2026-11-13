@@ -52,10 +52,15 @@ enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND, STRONGEST, FRONT_BACK }
 ## al romperse lo tocado o acabarse, revienta (2 × `damage` alrededor) y suelta un necrófago que
 ## golpea `damage` cada hit_interval durante `ally_time` s (Lienzos de Pickman); con split_count,
 ## suelta 1 + split_count necrófagos.
+## SALTS: esparce las sales donde más enemigos han caído en los últimos segundos (CombatWorld.remains;
+## sin restos cerca, sobre el grupo más denso): tras un instante, la fórmula daña 3 × `damage` a los de
+## aoe_radius y levanta como aliados a `count` de los caídos allí, que golpean `damage` cada
+## hit_interval durante `ally_time` s; con ally_blast, al deshacerse revientan (ally_blast × damage; Sales esenciales de
+## Ward, `SaltCircle`).
 ## SWEEP: rayo de `range` m que gira alrededor del personaje a projectile_speed grados por
 ## segundo durante `duration` s; daña cada hit_interval a cada enemigo (Lámpara de Alhazred).
 enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE, FLAME, SIGIL, PULSE, TETHER, CLOUD, DRONE, STAB,
-	CHAIN, TURRET, BOOMERANG, FISSURE, THRUST, WHIP, TRAP, FIREBALL, VORTEX, SPIKES, MADDEN, SWEEP, CANVAS }
+	CHAIN, TURRET, BOOMERANG, FISSURE, THRUST, WHIP, TRAP, FIREBALL, VORTEX, SPIKES, MADDEN, SWEEP, CANVAS, SALTS }
 ## Zona que deja en el suelo (lanzados, lanzallamas, nube): ninguna, fuego, ácido o polvo
 ## (ralentiza y debilita).
 ## GAS: nube tóxica que deriva (`drift` m/s) hacia donde se lanzó (Gas de cloro).
@@ -124,6 +129,7 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var crit_chance := 0.0               ## probabilidad de crítico (Springfield)
 @export var crit_mult := 1.0                 ## daño del crítico
 @export var ally_time := 0.0                 ## s que se levanta como aliado el que muere inyectado (West)
+@export var ally_blast := 0.0                ## al deshacerse, cada aliado daña ally_blast × damage en 1,8 m (Cola del Dragón, hito 20.18)
 @export var root := 0.0                      ## s que deja inmóviles a los de la red (las élites solo se frenan)
 @export_group("Arsenal III")
 @export var volleys := 1.0                   ## disparos seguidos por uso (Recortada: 2)

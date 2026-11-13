@@ -168,6 +168,7 @@ func _fire(w: Weapon) -> bool:
 		WeaponData.Targeting.DENSEST:
 			var t := world.densest_enemy(origin, rng, maxf(w.stat("aoe_radius"), 1.0))
 			target_pos = t.global_position if t != null else ahead
+			w.had_target = t != null or w.data.delivery != WeaponData.Delivery.SALTS   # las sales esperan
 		WeaponData.Targeting.MOVE_DIR:
 			target_pos = origin + player.motor.facing * rng
 		WeaponData.Targeting.AROUND:
@@ -203,6 +204,7 @@ func _fire(w: Weapon) -> bool:
 		WeaponData.Delivery.CHAIN: return _chain(w, target_pos)
 		WeaponData.Delivery.TURRET: return _turret(w)
 		WeaponData.Delivery.CANVAS: return _canvas(w, target_pos)
+		WeaponData.Delivery.SALTS: return _salts(w, target_pos)
 		WeaponData.Delivery.BOOMERANG: return _boomerang(w, target_pos)
 		WeaponData.Delivery.FISSURE: return _fissure(w, target_pos)
 		WeaponData.Delivery.THRUST: return _thrust(w)
@@ -566,7 +568,25 @@ func _canvas(w: Weapon, target_pos: Vector3) -> bool:
 		var c := Canvas.new().setup(world, at, -dir, w.stat("duration"), w.stat("aoe_radius"), dmg(w),
 			w.stat("ally_time"), w.stat("hit_interval"), w.stat("vulnerable"), player.data.bonus_tags)
 		c.ghouls = 1 + int(w.stat("split_count"))
+		c.power = player.data.ally_dmg_mult
 		world.fx.add_child(c)
+	fired.emit(w)
+	return true
+
+## Sales esenciales (hito 20.18): donde más han caído a su alcance o, sin restos, sobre el grupo más
+## denso. Sin ninguno de los dos (nadie cerca), no gasta la cordura: espera.
+func _salts(w: Weapon, target_pos: Vector3) -> bool:
+	var origin := player.global_position
+	var r := w.stat("aoe_radius")
+	var at := world.remains_spot(origin, w.stat("range"), r)
+	if at == Vector3.INF:
+		if not w.had_target: return false
+		at = target_pos
+	var s := SaltCircle.new().setup(world, Vector3(at.x, 0.0, at.z), r, dmg(w), int(w.stat("count")),
+		w.stat("ally_time"), w.stat("hit_interval"), w.stat("ally_blast") * dmg(w), player.data.bonus_tags)
+	s.power = player.data.ally_dmg_mult
+	world.fx.add_child(s)
+	_pay_sanity(w)
 	fired.emit(w)
 	return true
 

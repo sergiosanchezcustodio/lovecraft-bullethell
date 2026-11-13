@@ -46,6 +46,7 @@ Nota: `gen_variantes.py` también escribe un `acechador.json` genérico que sobr
 | **Randolph Carter** (secreto) | Hito 16.25 (`gen_secretos.py`) | Soñador de Boston: abrigo largo azul noche, chaleco gris, corbatín, sienes canosas, párpados pesados y la llave de plata que brilla en el pecho. |
 | **Wilbur Whateley** (secreto) | Hito 16.25 (`gen_secretos.py`) | Enorme y encorvado, abrigo corto pardo remendado, cara de cabra sin barbilla, orejas caídas, pelo negro rizado; puntas de tentáculo con ventosas bajo el abrigo y por las botas. |
 | **Richard Upton Pickman** | Hito 20.17 (`gen_tienda20.py pickman`) | Pintor de Boston, delgado: pelo muy oscuro largo y revuelto, ojeras, blusón de lino crudo con canesú y manchurrones de óleo grandes, lazo negro de artista, pincel en el bolsillo, pantalón carbón. Lienzos (`lienzo.json`, caballete con un cuadro), esquive por un cuadro. |
+| **Charles Dexter Ward** | Hito 20.18 (`gen_tienda20.py ward`) | Anticuario de Providence con la ropa de Curwen, de otro siglo: levita verde botella de faldones con botones de latón y vueltas anchas, chaleco largo de ante, chorrera de encaje blanco, calzón pardo con medias blancas y zapatos de hebilla de plata, pelo castaño recogido en coleta con lazo negro, una ceja más alta y media sonrisa. Un frasquito de sales azuladas que brilla en el costado. |
 
 ### Bestiario actual
 

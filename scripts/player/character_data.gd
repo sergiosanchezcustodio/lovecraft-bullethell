@@ -30,6 +30,7 @@ extends Resource
 @export var close_bonus := 0.0               ## daño extra a quemarropa: +close_bonus junto al enemigo, 0 al alcance máximo (Malone)
 @export var explosion_radius_mult := 1.0     ## radio de las explosiones de sus lanzados (Dyer: 1,25)
 @export var melee_mult := 1.0              ## daño de las armas cuerpo a cuerpo (Johansen: 1,25)
+@export var low_sanity_bonus := 0.0          ## daño extra cuanto menos cordura le queda: +low_sanity_bonus a cero (Ward: 0,4; hito 20.18)
 ## Investigador secreto (hito 16.25): no se compra, se abre con una condición (Secrets):
 ## "fragmentos" (todas las páginas sueltas) o "desafios" (los 15 desafíos). "" = no lo es.
 @export var secret := ""
@@ -76,6 +77,7 @@ extends Resource
 @export var weapon_cooldown_mult := 1.0      ## recarga de todas las armas (Reloj de Tillinghast)
 @export var duration_mult := 1.0             ## duración de zonas, órbitas, rayos y torretas (Clepsidra de Yith)
 @export var ally_mult := 1.0                 ## lo que duran los aliados que levantan las armas (Fotografía del modelo, hito 20.17)
+@export var ally_dmg_mult := 1.0             ## daño de esos aliados (Frasco de los Custodes, hito 20.18)
 @export var pierce_add := 0.0                ## enemigos más que atraviesan las balas (Piedra de afilar)
 @export var crit_chance := 0.0               ## probabilidad de crítico de todas las armas (Ojo de Pickman)
 @export var crit_bonus := 0.0                ## suma al daño del crítico, que de base es ×1,5 (Collar de colmillos)

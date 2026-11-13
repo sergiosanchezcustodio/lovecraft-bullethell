@@ -363,7 +363,7 @@ func _collide_player_bullet(i: int) -> bool:
 		if _bonus[i] >= 0: d.bonus = bonus_sets[_bonus[i]]
 		t.take_damage(d)
 		if _effect[i] == Effect.STASIS and t.is_alive() and t.has_method("stasis"): t.stasis(_effect_val[i])
-		elif _effect[i] == Effect.INJECT and t.has_method("inject"): t.inject(_effect_val[i], d.bonus)
+		elif _effect[i] == Effect.INJECT and t.has_method("inject"): t.inject(_effect_val[i], d.bonus, _ally_power(d.tag))
 		elif _effect[i] == Effect.ROOT and t.is_alive() and t.has_method("root"): t.root(_effect_val[i])   # ballesta
 		_last_hit[i] = t.get_instance_id()
 		if _effect[i] == Effect.BOUNCE and _effect_val[i] >= 1.0 and _bounce(i, t): return false   # BAR
@@ -561,3 +561,8 @@ func _process(_delta: float) -> void:
 	RenderingServer.multimesh_set_buffer(_mm_enemy.get_rid(), _buffer_enemy)
 	_mm_enemy.visible_instance_count = ne
 	Prof.stop("balas_buffer", t0)
+
+## Daño de los aliados del que dispara (Frasco de los Custodes, hito 20.18).
+func _ally_power(tag: StringName) -> float:
+	var p := world.player_of(tag) if world != null else null
+	return p.data.ally_dmg_mult if p != null else 1.0

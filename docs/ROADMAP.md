@@ -687,7 +687,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | Hito | Contenido | Estado |
 |---|---|---|
 | 20.17 | **Richard Upton Pickman** (*El modelo de Pickman*): lienzos que atraen a los enemigos y, al romperse, sueltan un necrófago aliado un rato; esquive: entra en un cuadro y sale por otro | Hecho (13-11-2026): `Canvas`, `necrofago`, esquive `cuadro`, `foto_modelo` (`ally_mult`) y dos ramas. Ver `docs/ESTADO.md` |
-| 20.18 | **Charles Dexter Ward** (*El caso de Charles Dexter Ward*): las sales esenciales levantan como aliados unos segundos a algunos enemigos caídos; poca vida, cuesta cordura | Pendiente |
+| 20.18 | **Charles Dexter Ward** (*El caso de Charles Dexter Ward*): las sales esenciales levantan como aliados unos segundos a algunos enemigos caídos; poca vida, cuesta cordura | Hecho (13-11-2026): restos de los caídos (`CombatWorld.remains`), `SaltCircle`, esquive `polvo`, `frasco_custodes` (`ally_dmg_mult`), rasgo `low_sanity_bonus` y dos ramas. Ver `docs/ESTADO.md` |
 | 20.19 | **Walter Gilman** (*Los sueños en la casa de la bruja*): esquive por un ángulo imposible que atraviesa enemigos y decorado; armas de trayectoria rara | Pendiente |
 | 20.20 | **Crawford Tillinghast** (*Desde el más allá*): el resonador muestra lo oculto y le hace más daño; usarlo mucho baja la cordura del grupo | Pendiente |
 | 20.21 | **Edward Derby y Asenath Waite** (*El ser en el umbral*): dos cuerpos que se cambian en cada esquive, uno de cuerpo a cuerpo y otro arcano | Pendiente |

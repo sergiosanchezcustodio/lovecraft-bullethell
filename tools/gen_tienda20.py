@@ -227,7 +227,98 @@ def lienzo():
     print('lienzo', n, 'voxels')
 
 
-WHO = {'pickman': pickman, 'necrofago': necrofago, 'lienzo': lienzo}
+def ward():
+    SKIN = (0.87, 0.78, 0.70); SKIN_SH = (0.77, 0.67, 0.60); EAR_IN = (0.64, 0.50, 0.43)
+    COAT = (0.16, 0.28, 0.20); COAT_SH = (0.11, 0.19, 0.14); COAT_LT = (0.23, 0.37, 0.27)
+    VEST = (0.70, 0.57, 0.34); VEST_SH = (0.58, 0.46, 0.26)
+    JABOT = (0.92, 0.90, 0.84); JABOT_SH = (0.78, 0.76, 0.70)
+    BREECH = (0.20, 0.15, 0.12); STOCK = (0.84, 0.82, 0.76); SHOE = (0.08, 0.07, 0.07)
+    BRASS = (0.78, 0.62, 0.28); SILVER = (0.78, 0.80, 0.84)
+    HAIR = (0.36, 0.24, 0.15); HAIR_SH = (0.28, 0.18, 0.11); RIBBON = (0.06, 0.06, 0.07)
+    BROW = (0.30, 0.20, 0.13); IRIS = (0.42, 0.48, 0.44); HOLLOW = (0.74, 0.64, 0.58)
+    MOUTH = (0.66, 0.47, 0.44)
+    GLASS = (0.50, 0.58, 0.64); SALT = (0.58, 0.68, 0.90); CORK = (0.50, 0.36, 0.22)
+    B = -1
+    M = cu.new(1928)
+    top = cu.shoes(M, SHOE, SOLE)
+    for (x, y, z), v in M.V.items():                                         # hebillas de plata en el empeine
+        if v[1] == SHOE and y == top - 1 and z >= 4 and abs(abs(x + 0.5) - 5) <= 1.0: v[1] = SILVER
+    cu.legs(M, STOCK, bottom=top, thigh=BREECH)                              # medias blancas y calzón
+    for (x, y, z), v in M.V.items():                                         # el calzón baja hasta la rodilla
+        if v[1] == STOCK and y >= 25: v[1] = BREECH
+    cu.torso(M, COAT, b=B, bottom=16)
+    cu.skirt(M, COAT, 22, top=38, b=B, flare=3, depth=12)                    # levita de faldones, a la rodilla
+    cu.opening(M, 22, 61, 7, 14, COAT_SH)                                    # abierta: el borde, más oscuro
+    cu.opening(M, 33, 61, 9, 12, VEST)                                       # chaleco largo de ante
+    for y in range(33, 61):
+        cu.front(M, -1, y, VEST_SH) if y % 4 == 1 else None                  # botones del chaleco
+    for y in (30, 34, 38, 42, 46, 50, 54):                                   # botones de latón de la levita
+        cu.front(M, -7, y, BRASS); cu.front(M, 6, y, BRASS)
+    for (x0, y) in ((-9, 34), (4, 34)):                                      # carteras de los bolsillos
+        for x in range(x0, x0 + 5): cu.front(M, x, y, COAT_LT); cu.front(M, x, y - 1, COAT_SH)
+    # la chorrera: encaje blanco en volantes que cae del cuello sobre el chaleco (algo de relieve)
+    jab = ['..jjjj..',     # 61
+           '.jJjjJj.',     # 60
+           '.jjJJjj.',     # 59
+           '..jjjj..',     # 58
+           '.jJjjJj.',     # 57
+           '..jJJj..',     # 56
+           '..jjjj..',     # 55
+           '...JJ...',     # 54
+           '...jj...']     # 53
+    for i, row in enumerate(jab):
+        for j, ch in enumerate(row):
+            if ch != '.': cu.front(M, j - 4, 61 - i, JABOT if ch == 'j' else JABOT_SH, dz=1)
+    slab(M, T, COAT, 60, 64, 0, -1.5, 13, 12, 9, 8, ch=1)                    # cuello alto de la levita, detrás
+    # el frasco de las sales, colgado del cinto a su derecha: cristal, polvo azulado y corcho
+    for y in range(36, 42):
+        for x in (-11, -10):
+            cu.front(M, x, y, GLASS if y in (36, 41) else SALT, dz=1)
+    cu.front(M, -11, 42, CORK, dz=1); cu.front(M, -10, 42, CORK, dz=1)
+    for (x, y, z), v in list(M.V.items()):
+        if v[1] == SALT: M.V[(x, y, z)] = [v[0], SALT, 1]
+    cu.neck(M, SKIN)
+    cu.arms(M, COAT, SKIN, b=B, cuff=COAT_LT, cuff_wide=True)                # vueltas anchas en las mangas
+    cu.head(M, SKIN, SKIN_SH, nose=False, r=3, rb=3)
+    cu.face_art(M, 77, [                   # en relieve
+        '..........bbbb..',                # 77: la ceja izquierda, más alta (una mirada que no es suya)
+        '..bbbb..........',                # 76: la otra, recta
+        '................',
+        '.......nn.......',                # 74: nariz recta y fina
+        '.......nn.......',
+        '.......nn.......',
+        '.......sn.......',                # 71
+    ], {'b': BROW, 'n': SKIN, 's': SKIN_SH}, dz=1)
+    cu.face_art(M, 74, [                   # pintado: ojos grises y fríos, mejillas hundidas, media sonrisa
+        '..wpiw....wipw..',                # 74
+        '..wppw....wppw..',                # 73
+        '................',
+        '.h............h.',                # 71: mejillas hundidas
+        '.h............h.',
+        '...........m....',                # 69: la comisura que sube: media sonrisa
+        '......mmmmm.....',                # 68
+    ], {'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'h': HOLLOW, 'm': MOUTH})
+    cu.ear_holes(M, EAR_IN)
+    # pelo peinado hacia atrás y recogido en una coleta corta con lazo negro, a la antigua
+    cu.hair_back(M, SKIN, HAIR, top=200, bottom=68, neck=False)
+    for (x, y, z), v in M.V.items():
+        if v[0] == H and v[1] == SKIN and y >= 78: v[1] = HAIR
+    cu.sideburns(M, HAIR, 73, 79)
+    cu.hair_over_ears(M, SKIN, HAIR, 76, 79)
+    slab(M, H, RIBBON, 66, 69, -0.5, -8.5, 4, 4, 2, 2, ch=0)                 # el lazo
+    slab(M, H, HAIR, 58, 66, -0.5, -8.5, 3, 2, 2, 2, ch=0)                   # la coleta
+    for (x, z) in {(k[0], k[2]) for k in M.V if k[1] >= 79}:                 # marcas del peine, hacia atrás
+        y = M.top(x, z)
+        if y is not None and y >= 80 and x % 3 == 0 and M.V[(x, y, z)][1] == HAIR: M.V[(x, y, z)][1] = HAIR_SH
+    cu.seams(M, (COAT,))
+    cu.finish(M, 'ward', {COAT: 'lana', COAT_SH: 'lana', COAT_LT: 'lana', VEST: 'lana', VEST_SH: 'lana',
+                          BREECH: 'lana', STOCK: 'punto', SHOE: 'cuero', SOLE: 'cuero', HAIR: 'pelo',
+                          HAIR_SH: 'pelo', SKIN: 'piel', SKIN_SH: 'piel', JABOT: 'lona', JABOT_SH: 'lona'},
+              flat=(BRASS, SILVER, RIBBON, BROW, IRIS, HOLLOW, MOUTH, EAR_IN, GLASS, SALT, CORK),
+              b=B, skirt=True)
+
+
+WHO = {'pickman': pickman, 'necrofago': necrofago, 'lienzo': lienzo, 'ward': ward}
 
 if __name__ == '__main__':
     for name in (sys.argv[1:] or list(WHO)):

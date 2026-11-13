@@ -16,6 +16,7 @@ var ally_life := 5.0
 var ally_tick := 0.4
 var vulnerable := 1.0
 var ghouls := 1                            ## necrófagos que suelta (El modelo del natural: tres)
+var power := 1.0                           ## daño de los aliados (Frasco de los Custodes, hito 20.18)
 var bonus := {}
 var hits := 0                              ## golpes recibidos (tests)
 var broken := false
@@ -104,7 +105,7 @@ func _break() -> void:
 		var off := Vector3.ZERO if ghouls == 1 else Vector3(0.7, 0, 0).rotated(Vector3.UP, TAU * k / ghouls)
 		var g := Reanimated.new().setup(world, ghoul_data(), global_position + off, -_face, ally_life, bonus)
 		g.look = "pickman"
-		g.dps = damage / ally_tick
+		g.dps = damage / ally_tick * power
 		g.tick = ally_tick
 		world.fx.add_child(g)
 	var tw := create_tween()

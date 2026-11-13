@@ -71,7 +71,7 @@ const ITEM_STATS: Array[String] = ["proj_count_add", "range_mult", "proj_speed_m
 	"chest_mult", "pickup_heal_mult", "pet_mult", "hit_iframes", "arcane_cost_mult", "thorns", "nodens_level",
 	"ankh", "dodge_charges", "decoy_time", "dodge_blast", "dodge_fury", "rerolls", "kill_blast", "hit_slow",
 	"hit_burn", "low_hp_bonus", "idol_mult", "arcane_cooldown_mult", "calm_aura",   # (estos dos, 16.25)
-	"ally_mult"]                                                                     # (20.17)
+	"ally_mult", "ally_dmg_mult"]                                                                     # (20.17)
 ## Objetos con mecánica (hito 8.7)
 const LOW_HP := 0.3              ## por debajo de esta parte de la vida cuenta el Diente de shoggoth
 const FURY_TIME := 2.0           ## s de daño extra tras esquivar (Elixir de Curwen)
@@ -625,6 +625,9 @@ func _process_step(delta: float) -> void:
 		if style.frames and not _frame_out and u >= style.hidden_to and world != null:   # y el cuadro por el que sale
 			_frame_out = true
 			world.fx.add_child(PictureFrame.new().setup(global_position))
+		if style.dust and not _frame_out and u >= style.hidden_to - 0.12 and world != null:   # y se recompone
+			_frame_out = true
+			VoxelFx.puff(world.fx, global_position, "salts_rise", 0.45, Color.WHITE, 1.0)
 		if style.afterimages and u >= 0.1 and u < style.hidden_to:       # estela breve y tenue
 			_ghost_t -= delta
 			if _ghost_t <= 0.0 and world != null:
@@ -635,7 +638,7 @@ func _process_step(delta: float) -> void:
 ## muelle poco amortiguado) y hacia dentro en las curvas. La aceleración sale de la posición
 ## dibujada (la diferencia entre su velocidad, apenas suavizada, y la misma muy suavizada), así
 ## que vale también para los jugadores de otros PC. En el contenedor, como el giro.
-var _frame_out := true                         ## ya salió por el segundo cuadro (esquive de Pickman)
+var _frame_out := true                         ## ya salió por el segundo cuadro (Pickman) o se recompuso (Ward)
 const LEAN_K := 0.045                          ## rad por m/s de diferencia
 const LEAN_MAX := 0.2
 var _lean := Vector2.ZERO                      ## x: adelante; y: de lado (rotation.z)
@@ -1319,6 +1322,8 @@ func damage_mult(category: int) -> float:
 	var k := float(shop.get("damage", 1.0)) * data.damage_mult   # Puntería (tienda) y objetos
 	if _fury_t > 0.0: k *= 1.0 + data.dodge_fury                  # Elixir de Curwen
 	if data.low_hp_bonus > 0.0 and health < data.max_health * LOW_HP: k *= 1.0 + data.low_hp_bonus   # Diente de shoggoth
+	if data.low_sanity_bonus > 0.0:                                 # Ward (20.18): la sombra de Curwen
+		k *= 1.0 + data.low_sanity_bonus * clampf(1.0 - sanity / maxf(data.max_sanity, 1.0), 0.0, 1.0)
 	match category:
 		WeaponData.Category.PHYSICAL: return Attributes.mult(attrs, "physical") * data.physical_mult * k
 		WeaponData.Category.MAGIC: return Attributes.mult(attrs, "magic") * data.magic_mult * k
@@ -1469,6 +1474,9 @@ func _on_dodge() -> void:
 	var from := global_position - motor.dodge_dir * 0.3
 	if data.dodge_style != null and data.dodge_style.frames and world != null:   # el cuadro por el que entra (20.17)
 		world.fx.add_child(PictureFrame.new().setup(global_position))
+		_frame_out = false
+	if data.dodge_style != null and data.dodge_style.dust and world != null:   # se deshace en sales (20.18)
+		VoxelFx.puff(world.fx, global_position, "salts_fall", 0.45, Color.WHITE, 1.2)
 		_frame_out = false
 	if world != null: VoxelFx.puff(world.fx, from + Vector3(0, 0.1, 0), "ring_dust", 0.5, Color(0.8, 0.8, 0.85), 1.0)
 	if data.decoy_time > 0.0 and world != null:              # Capa del Hombre Negro

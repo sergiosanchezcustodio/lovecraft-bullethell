@@ -14,6 +14,12 @@ var stats := {}
 ## que la pausa no cuenta) y segundo en que cada etiqueta hizo daño por primera vez.
 var clock := 0.0
 var since := {}
+## Restos de los caídos (hito 20.18): las Sales esenciales de Ward levantan a los que cayeron hace
+## poco. [EnemyData, Vector3, clock] de los últimos REMAINS_LIFE s, como mucho REMAINS_MAX (se
+## olvidan los más viejos). Sin los únicos ni los grandes (Enemy._leave_remains).
+var remains: Array = []
+const REMAINS_MAX := 60
+const REMAINS_LIFE := 12.0
 var breakables: Array[Node3D] = []           ## objetos rompibles: se golpean, no se apuntan
 var flow: FlowField                          ## mapa de flujo hacia los jugadores (rodear el decorado)
 var freeze_t := 0.0                          ## s de tiempo congelado (recompensa): enemigos y sus balas quietos
@@ -221,6 +227,42 @@ func strongest_enemy(pos: Vector3, max_r: float) -> Node3D:
 			best_score = score
 			best = e
 	return best
+
+func add_remains(d: EnemyData, pos: Vector3) -> void:
+	remains.append([d, Vector3(pos.x, 0.0, pos.z), clock])
+	if remains.size() > REMAINS_MAX: remains.pop_front()
+
+func _prune_remains() -> void:
+	while not remains.is_empty() and clock - float(remains[0][2]) > REMAINS_LIFE: remains.pop_front()
+
+## El resto, a menos de max_r de pos, con más restos a menos de r (INF si no hay ninguno).
+func remains_spot(pos: Vector3, max_r: float, r: float) -> Vector3:
+	_prune_remains()
+	var at := Vector3(pos.x, 0.0, pos.z)
+	var best := Vector3.INF
+	var best_n := 0
+	for a: Array in remains:
+		var p: Vector3 = a[1]
+		if p.distance_squared_to(at) > max_r * max_r: continue
+		var n := 0
+		for b: Array in remains:
+			if (b[1] as Vector3).distance_squared_to(p) <= r * r: n += 1
+		if n > best_n:
+			best_n = n
+			best = p
+	return best
+
+## Saca y devuelve hasta n restos a menos de r de pos, los más recientes primero.
+func take_remains(pos: Vector3, r: float, n: int) -> Array:
+	_prune_remains()
+	var at := Vector3(pos.x, 0.0, pos.z)
+	var out: Array = []
+	for i in range(remains.size() - 1, -1, -1):
+		if out.size() >= n: break
+		if (remains[i][1] as Vector3).distance_squared_to(at) <= r * r:
+			out.append(remains[i])
+			remains.remove_at(i)
+	return out
 
 ## Objetivos vivos que tocan un círculo (para explosiones y áreas).
 func record_damage(tag: StringName, amount: float) -> void:

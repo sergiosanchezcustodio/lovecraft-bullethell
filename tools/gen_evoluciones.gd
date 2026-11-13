@@ -4,7 +4,9 @@ extends SceneTree
 ## "x*" multiplica, "x+" suma, "x=" fija) y escala el daño (damage, zone_dps, curse_dps) para
 ## que rinda EVO_DPS veces el nivel 5 según DamageRules. Escribe data/weapons/<evo>.tres, enlaza
 ## el arma base (evolves_with, evolution) y deja la nota de la Biblioteca.
-##   godot --headless --path . -s tools/gen_evoluciones.gd
+##   godot --headless --path . -s tools/gen_evoluciones.gd [-- solo=lienzos,sales_esenciales]
+## Con `solo=`, solo las de esas armas base (sin él las rehace todas, y reescribe los cien ficheros
+## aunque no cambie nada más que el orden de los campos).
 
 const EVO_DPS := 1.4
 const DAMAGE_KEYS := ["damage", "zone_dps", "curse_dps"]
@@ -100,6 +102,9 @@ const EVO := {
 	"llave_suenos": ["llave_kadath", "Llave de la ignota Kadath", "mapa_sueno", "Cuatro llaves que adormecen el doble y llegan más lejos.",
 		{"count+": 1, "stun*": 1.6, "range*": 1.2},
 		"La llave que abrió a Carter el camino hasta la cima de Kadath, donde los dioses de la Tierra bailan en su castillo de ónice. Del otro lado de cada golpe, alguien sueña."],
+	"sales_esenciales": ["cabeza_dragon", "Cabeza del Dragón", "frasco_custodes", "Y'ai 'ng'ngah, Yog-Sothoth: levanta a cuatro a la vez en un círculo más ancho, y duran más.",
+		{"count+": 2, "ally_time*": 1.3, "aoe_radius*": 1.2},
+		"La fórmula que Curwen copió en la granja de Pawtuxet: se dice con las sales delante, y lo que fue se levanta de ellas. Conviene saberse también la otra."],
 	"lienzos": ["galeria_pickman", "Galería de North End", "foto_modelo", "Tres lienzos a la vez, que atraen desde más lejos y sueltan necrófagos que cazan más tiempo.",
 		{"count+": 1, "ally_time*": 1.5, "aoe_radius*": 1.15},
 		"Los cuadros del sótano de North End, los que Pickman no enseñaba en el Club. Cada uno es una puerta, y lo que hay detrás tiene hambre."],
@@ -266,6 +271,9 @@ const EVO_B := {
 	"llave_suenos": ["llave_ulthar", "Llaves de Ulthar", "Seis llaves más rápidas, en abanico, que adormecen menos.",
 		{"count+": 3, "spread_deg+": 50.0, "projectile_speed*": 1.3, "stun*": 0.6},
 		"En Ulthar ningún hombre puede matar a un gato. Los gatos de Ulthar, a cambio, guardan las llaves de los que sueñan bien."],
+	"sales_esenciales": ["cola_dragon", "Cola del Dragón", "Ogthrod ai'f geb'l-ee'h: los levantados vuelven a ser polvo de golpe y revientan al deshacerse.",
+		{"ally_blast=": 3.0, "cooldown*": 0.85},
+		"Willett la recitó delante de lo que parecía Charles Ward. Del doctor Allen, de Joseph Curwen, solo quedó en el suelo un poco de polvo gris azulado."],
 	"lienzos": ["modelo_natural", "El modelo del natural", "Un solo cuadro enorme que atrae desde muy lejos y suelta tres necrófagos.",
 		{"count=": 1, "split_count=": 2, "aoe_radius*": 1.6, "duration*": 1.3},
 		"Pickman no pintaba de memoria. La fotografía clavada en el lienzo lo demostraba: el modelo posaba para él, y vuelve cuando lo llaman."],
@@ -330,13 +338,20 @@ const EVO_B := {
 
 func _init() -> void:
 	var notes := {}
+	# `-- solo=lienzos,sales_esenciales` rehace solo las de esas armas (13-11-2026: rehacerlas todas
+	# reescribía los cien ficheros cambiando solo el orden de los campos)
+	var only: Array = []
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("solo="): only = a.substr(5).split(",", false)
 	for base_id: String in EVO:
+		if not only.is_empty() and not base_id in only: continue
 		var e: Array = EVO[base_id]
 		_make(base_id, e[0], e[1], e[3], e[4], e[2])
 		_link(base_id, "evolves_with", e[2])
 		_link(base_id, "evolution", e[0])
 		notes[e[0]] = e[5]
 	for base_id: String in EVO_B:                        # hito 16.8
+		if not only.is_empty() and not base_id in only: continue
 		var e: Array = EVO_B[base_id]
 		var base: WeaponData = load("res://data/weapons/%s.tres" % base_id)
 		_make(base_id, e[0], e[1], e[2], e[3], String(base.evolves_with))

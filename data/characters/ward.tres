@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/polvo.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"ward"
+display_name = "Charles Dexter Ward"
+victory = "win_ward"
+model = "ward"
+role = "Anticuario de Providence"
+passive_text = "La sombra de Curwen: hasta un 40 % más de daño cuanto menos cordura le queda."
+story = "El caso de Charles Dexter Ward"
+price = 7500
+order = 17
+max_health = 80.0
+max_sanity = 120.0
+move_speed = 4.6
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"sales_esenciales"])
+low_sanity_bonus = 0.4
+attr_bonus = {"CUL": 8, "POD": 7, "INT": 5}
+in_shop = true

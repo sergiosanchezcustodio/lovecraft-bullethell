@@ -223,7 +223,10 @@
 		"huellas_gemelo": "Lavinia tuvo gemelos. Uno se parecía más al padre.",
 		"galeria_pickman": "Los cuadros del sótano de North End, los que Pickman no enseñaba en el Club. Cada uno es una puerta, y lo que hay detrás tiene hambre.",
 		"modelo_natural": "Pickman no pintaba de memoria. La fotografía clavada en el lienzo lo demostraba: el modelo posaba para él, y vuelve cuando lo llaman.",
-		"lienzos": "Óleos a medio acabar en un caballete plegable: túneles, sótanos y algo que asoma. Los enemigos no pueden dejar de mirarlos, y cuando por fin rompen la tela, lo pintado sale."
+		"lienzos": "Óleos a medio acabar en un caballete plegable: túneles, sótanos y algo que asoma. Los enemigos no pueden dejar de mirarlos, y cuando por fin rompen la tela, lo pintado sale.",
+		"cabeza_dragon": "La fórmula que Curwen copió en la granja de Pawtuxet: se dice con las sales delante, y lo que fue se levanta de ellas. Conviene saberse también la otra.",
+		"cola_dragon": "Willett la recitó delante de lo que parecía Charles Ward. Del doctor Allen, de Joseph Curwen, solo quedó en el suelo un poco de polvo gris azulado.",
+		"sales_esenciales": "Polvo gris azulado guardado en frascos de plomo con etiquetas a la antigua: Custodes, Materia. Son los restos de alguien. Con la fórmula adecuada, ese alguien vuelve, aunque no siempre entero."
 	},
 	"items": {
 		"diario_wilbur": "Un cuaderno cifrado en un alfabeto que Armitage tardó semanas en romper. Lo que dice no se puede leer de un tirón, pero quien lo lleva encima deja de temblar.",
@@ -306,7 +309,8 @@
 		"diario_expedicion": "Notas de cada jornada, mapas y lo aprendido. Quien lo relee por la noche amanece sabiendo un poco más.",
 		"pacto": "Un contrato firmado en el bosque, con sello de cera roja. Lo que piden a cambio crece con lo que dan. Se puede quemar; también reescribir.",
 		"linterna": "Una lámpara de queroseno de las buenas. Mientras su luz alcanza, lo que acecha en la oscuridad pesa un poco menos.",
-		"foto_modelo": "Una fotografía arrugada que estaba clavada en el lienzo de Pickman, la que usaba de modelo. No es un decorado ni un disfraz. El que la mira ya no vuelve a bajar a un sótano."
+		"foto_modelo": "Una fotografía arrugada que estaba clavada en el lienzo de Pickman, la que usaba de modelo. No es un decorado ni un disfraz. El que la mira ya no vuelve a bajar a un sótano.",
+		"frasco_custodes": "Un frasco de gres con la etiqueta «Custodes». Lo que hay dentro no es para levantar a cualquiera: son los guardianes, y obedecen al que los llamó."
 	},
 	"places": {
 		"p1_n1": "Costa del mar de Ross, Antártida, 1930. La expedición de la Universidad de Miskatonic monta aquí su campamento: tiendas, una cabaña de troncos, un iglú y los faroles. Al norte, la Barrera de hielo; al sur, el mar. Algo vino de las cavernas de abajo.",
@@ -341,7 +345,8 @@
 		"malone": "Contrabandista de alcohol en Red Hook, Brooklyn. Los clientes de los sótanos de la calle Parker no bebían ginebra.",
 		"armitage": "Henry Armitage, bibliotecario jefe de la Universidad de Miskatonic. Fue él quien guardó el Necronomicón bajo llave y quien subió a la colina de Dunwich con el polvo de Ibn-Ghazi para hacer visible lo que no se veía. Viejo, pero el más sabio de todos.",
 		"west": "Herbert West, médico de Arkham, menudo, rubio y pálido detrás de sus gafas. Lleva años buscando el reactivo que devuelva la vida a los muertos. Sus resultados no siempre son los que esperaba, pero a sus compañeros los pone en pie como nadie.",
-		"pickman": "Richard Upton Pickman, de una vieja familia de Salem, pintor. Lo echaron del Club de Arte de Boston por sus cuadros de cosas que salen de los túneles a comer. Tenía un estudio secreto en el North End, junto a un pozo de ladrillo, y nadie sabe de dónde sacaba los modelos. Desapareció. Sus cuadros, no."
+		"pickman": "Richard Upton Pickman, de una vieja familia de Salem, pintor. Lo echaron del Club de Arte de Boston por sus cuadros de cosas que salen de los túneles a comer. Tenía un estudio secreto en el North End, junto a un pozo de ladrillo, y nadie sabe de dónde sacaba los modelos. Desapareció. Sus cuadros, no.",
+		"ward": "Charles Dexter Ward, de Providence, anticuario. Se obsesionó con un antepasado, Joseph Curwen, que había muerto en 1771 y que no estaba del todo muerto. Encontró sus papeles, sus fórmulas y su tumba. Lo encerraron en un sanatorio, y el doctor Willett notó que su paciente ya no tenía el lunar de la cadera."
 	},
 	"pets": {
 		"perro": "Uno de los perros de trineo del campamento de Lake. El único que volvió. Desde entonces gruñe a la nieve.",

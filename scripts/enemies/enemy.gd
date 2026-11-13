@@ -95,6 +95,7 @@ var _root_t := 0.0                          ## s inmóvil (red de pesca); puede 
 var _inject_t := 0.0                        ## s con el suero de West dentro
 var _ally_time := 0.0                       ## s que se levanta como aliado si muere inyectado
 var _inject_bonus := {}
+var _inject_power := 1.0                    ## daño de su aliado (Frasco de los Custodes, hito 20.18)
 const INJECT_TIME := 4.0
 # Compañeros (hito 2.15, D-36)
 var _poison_t := 0.0                        ## s envenenado (serpiente de Yig): daño continuo
@@ -493,10 +494,11 @@ func is_rooted() -> bool:
 	return _root_t > 0.0
 
 ## Suero de Herbert West: si muere en los próximos segundos, se levanta `ally_time` s como aliado.
-func inject(ally_time: float, bonus: Dictionary = {}) -> void:
+func inject(ally_time: float, bonus: Dictionary = {}, power := 1.0) -> void:
 	_inject_t = INJECT_TIME
 	_ally_time = ally_time
 	_inject_bonus = bonus
+	_inject_power = power
 
 func is_injected() -> bool:
 	return _inject_t > 0.0
@@ -774,7 +776,10 @@ func _die() -> void:
 	Auto.sfx_at("die", global_position)
 	if _curse_t > 0.0 and int(_curse.get("spread", 0)) > 0: _spread_curse()
 	if _inject_t > 0.0 and _ally_time > 0.0:            # se levanta como aliado
-		world.fx.add_child(Reanimated.new().setup(world, data, global_position, facing, _ally_time, _inject_bonus))
+		var r := Reanimated.new().setup(world, data, global_position, facing, _ally_time, _inject_bonus)
+		r.dps *= _inject_power
+		world.fx.add_child(r)
+	_leave_remains()
 	if traits != 0: EliteTraits.on_death(self)
 	_death_fx()
 
@@ -783,7 +788,12 @@ func puppet_die() -> void:
 	if is_queued_for_deletion(): return
 	health = 0.0
 	Auto.sfx_at("die", global_position)
+	_leave_remains()
 	_death_fx()
+
+## Sus restos, para las Sales esenciales de Ward (hito 20.18). Los únicos y los grandes, no.
+func _leave_remains() -> void:
+	if world != null and not data.unique and data.model_scale <= 1.5: world.add_remains(data, global_position)
 
 func _death_fx() -> void:
 	var t0 := Prof.start()
