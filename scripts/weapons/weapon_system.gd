@@ -457,6 +457,8 @@ func _beam(w: Weapon, target_pos: Vector3) -> bool:
 	var length := w.stat("range")
 	var half := w.stat("projectile_radius")
 	var mid := origin + dir * length * 0.5
+	# antes del daño: la pesadilla (21.6) da a los que sueñan antes de que el rayo los mate
+	Combos.beam(world, origin, dir, length, half, dmg(w), tag_of(w))   # a través del signo de otro (hito 13.7)
 	for t in world.enemies_in_circle(mid, length * 0.5 + half):
 		var rel := Vector2(t.global_position.x - origin.x, t.global_position.z - origin.z)
 		var along := rel.dot(Vector2(dir.x, dir.z))
@@ -471,7 +473,6 @@ func _beam(w: Weapon, target_pos: Vector3) -> bool:
 	var fx := Beam.new()
 	fx.setup(origin + Vector3(0, 1.0, 0), dir, length, half, w.stat("duration"))
 	world.fx.add_child(fx)
-	Combos.beam(world, origin, dir, length, half, dmg(w), tag_of(w))   # a través del signo de otro (hito 13.7)
 	fired.emit(w)
 	return true
 
@@ -493,6 +494,7 @@ func _slash(w: Weapon, k := 1.0) -> bool:
 	fx.radius = r
 	fx.position = Vector3(origin.x, 0.0, origin.z)
 	world.fx.add_child(fx)
+	Combos.slash(world, origin, r, tag_of(w))              # sobre un lienzo (hito 21.6)
 	fired.emit(w)
 	return true
 

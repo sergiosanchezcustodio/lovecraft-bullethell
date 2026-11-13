@@ -3095,3 +3095,38 @@ Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden:
   - Los `mods` van en una copia.
   - El truco va en el progreso y pasa de nivel.
   - Rayo en cadena, ronroneo, aullido, vigilia y leche de cabra.
+
+### 21.6: combinaciones con tus propias armas, y seis nuevas (13-11-2026)
+
+- **Con tus propias armas:** las combinaciones del 13.7 saltan también entre armas distintas de un mismo jugador, en solitario o en cooperativo. Una misma arma no se combina consigo misma (`combos_solo=true` lo deja, como antes). Lo que deja una combinación (el gas de la nube, las esquirlas) no vuelve a combinarse (`Combos._pair_t`, `weapon_of`).
+- **Su fila en la tabla de daño:** el daño de las combinaciones va a «J<n>:combo», de quien la provoca. Sale como «Combinaciones» en la tabla de la pausa y en el archivo de expediciones (`RunArchive.source_name`). Antes iba a «combo» y no salía en ninguna. Lo que hace un lienzo abierto por una combinación sigue siendo del lienzo y de sus necrófagos.
+- **Las seis nuevas** (`data/combos.json`), con su rótulo la primera vez:
+
+| Combinación | Qué la provoca | Qué pasa |
+|---|---|---|
+| Pesadilla | Un rayo (el trapezoedro) o la electricidad sobre un sueño de Kuranes, con alguien dentro | Los de dentro reciben el doble del daño del rayo y despiertan (`Enemy.wake`). Una vez por sueño; el sueño sigue. Estallido violeta y cristal |
+| Ceniza azul | La fórmula de las sales de Ward sobre un lienzo de Pickman | El cuadro se abre y sus necrófagos salen de ceniza azul (`look` «ward»), con un 40 % más de fuerza y un 60 % más de vida |
+| Lienzo rasgado | Un tajo (machete, el de Edward Derby) sobre un lienzo | Se rasga y el necrófago sale con el doble de fuerza |
+| Óleo ardiente | Fuego sobre un lienzo | Arde: el lienzo se abre y deja un charco de fuego grande (2,4 m, 18 por segundo, 4 s) |
+| Esquirlas angulares | Un ángulo de Gilman que entra en un signo | Se abre en seis esquirlas violetas que también doblan esquinas. Solo los que entran desde fuera: el signo se traza bajo el personaje y los ángulos salen de dentro |
+| Visión del más allá | La onda de la Máquina de Tillinghast sobre un sueño, con alguien dentro | Todos los de dentro se duermen 2 s y el sueño dura 2 s más |
+
+- **Cómo:**
+  - Ganchos nuevos en `Combos`: `slash` (desde `WeaponSystem._slash`), `salts` (desde `SaltCircle._formula`) y `wave(…, beyond)`. La onda de la Máquina se reconoce por `reveal_t`.
+  - Grupos `combo_canvases` y `combo_dreams`.
+  - Los ángulos: `BulletManager.angle_hook`, una llamada por ángulo y paso, pero solo mientras hay signos (`Combos._physics_process` la pone y la quita): sin signos no cuesta nada. Recibe la posición de antes y la de ahora.
+  - El rayo avisa a las combinaciones antes de hacer su daño: si no, mataba a los que soñaban antes de la pesadilla.
+  - En red las decide el anfitrión y los invitados repiten lo que se ve (`replay`).
+- **Comprobado en partida** con `log=true` y la opción nueva `combo_shots=true`, que captura las dos primeras de cada una en `shots/combo_<id>_<n>.png`.
+  - Kuranes con el trapezoedro (pesadilla).
+  - Pickman con las sales, el molotov y el machete (ceniza azul, óleo ardiente y lienzo rasgado).
+  - Gilman con el signo (esquirlas): eran 16 en 40 s mientras contaban las que salían de dentro; ahora, 2.
+  - Tillinghast con el ensueño (visión).
+  - La fila «Combinaciones» en la tabla de daño.
+- **Tests** (`tests/test_combos.gd`, de 9 a 19):
+  - Las armas de un mismo jugador se combinan y una misma arma no se combina consigo.
+  - Lo que deja una combinación no se vuelve a combinar.
+  - El daño va a «J<n>:combo».
+  - Las seis nuevas.
+  - Un sueño vacío no se combina.
+  - La esquirla que sale de dentro de un signo no se abre.

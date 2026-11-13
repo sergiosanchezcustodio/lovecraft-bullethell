@@ -478,6 +478,11 @@ func reveal(seconds: float, bonus: float, chain := 0.0) -> void:
 func dream(seconds: float) -> void:
 	_dream_t = maxf(_dream_t, seconds)
 
+## Despierta de golpe (Combos, pesadilla, 21.6): deja de soñar y, si dormía, de estar quieto.
+func wake() -> void:
+	if _dream_t > 0.0: _stun = 0.0
+	_dream_t = 0.0
+
 func is_dreaming() -> bool:
 	return _dream_t > 0.0
 

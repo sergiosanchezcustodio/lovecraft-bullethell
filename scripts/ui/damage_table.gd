@@ -85,6 +85,7 @@ func _source(p: Player, id: String) -> Array:
 		var pd: PetData = (p.pet as Pet).data
 		if not _icons.has(pd.model): _icons[pd.model] = ModelIcon.make(self, pd.model, "full", 96, 0.0) if pd.model != "" else null
 		return [pd.display_name, _icons[pd.model], "Compañero"]
+	if id == "combo": return ["Combinaciones", null, "Lo que hacen tus armas juntas, o con las de otros"]   # (hito 21.6)
 	var wp := "res://data/weapons/%s.tres" % id
 	if ResourceLoader.exists(wp):
 		var w: WeaponData = load(wp)

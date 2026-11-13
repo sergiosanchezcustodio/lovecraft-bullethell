@@ -50,6 +50,7 @@ func ending() -> bool:
 
 func _ready() -> void:
 	Damage.ctx = _wtag
+	add_to_group(&"combo_dreams")                     # rayos y la Máquina (Combos, hito 21.6)
 	var g := VoxelFx.ground(12, radius)
 	g.position.y = 0.05
 	_mat = g.material_override

@@ -62,6 +62,9 @@ var count := 0
 ## En red (hito 9.3b), anfitrión: se llama con cada bala enemiga nueva (pos, vel, radio, tamaño,
 ## daño físico, mental, vida, estilo, atraviesa el decorado) para mandarla a los invitados.
 var on_enemy_spawn := Callable()
+## Ángulos de Gilman que entran en un signo (Combos, hito 21.6): (antes, ahora, etiqueta, daño, giro) -> true
+## si la bala se abre (se acaba aquí). Solo mientras hay signos: si no, vacío y sin coste.
+var angle_hook := Callable()
 var _bursting := false                       ## las chispas de una que se abre no se mandan: cada PC la abre
 
 var _pos := PackedVector3Array()
@@ -309,8 +312,12 @@ func _physics_process(delta: float) -> void:
 		var dead := _age[i] >= _life[i] or not b.has_point(p2) or (obs != null and _owner[i] != OVER_WALLS and _home[i] >= 0.0 and obs.stops_bullet(p2))
 		if not dead and world != null:
 			dead = _collide_player_bullet(i) if _team[i] == Team.PLAYER else _collide_enemy_bullet(i)
+		var opened := false
+		if not dead and _home[i] < 0.0 and angle_hook.is_valid() and _team[i] == Team.PLAYER:
+			opened = angle_hook.call(_prev[i], _pos[i], _tag[i], _phys[i], _home[i])
+			dead = opened
 		if dead:
-			if _split[i] > 0: _burst(i)
+			if _split[i] > 0 and not opened: _burst(i)
 			_remove(i)          # la última ocupa su hueco: no avanzar i
 		else:
 			i += 1

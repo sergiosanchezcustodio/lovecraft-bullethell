@@ -58,6 +58,7 @@ func _physics_process(delta: float) -> void:
 ## La fórmula: daña a los del círculo y levanta a los caídos que quedan en él.
 func _formula() -> void:
 	done = true
+	Combos.salts(self)                                 # sobre un lienzo: ceniza azul (hito 21.6)
 	for e in world.enemies_in_circle(global_position, radius):
 		var d := Damage.new(damage * FORMULA, 0.0)
 		d.bonus = bonus

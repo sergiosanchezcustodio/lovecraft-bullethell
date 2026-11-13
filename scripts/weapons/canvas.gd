@@ -59,6 +59,7 @@ static func ghoul_data() -> EnemyData:
 
 func _ready() -> void:
 	Damage.ctx = _wtag
+	add_to_group(&"combo_canvases")                   # sales, tajos y fuego (Combos, hito 21.6)
 	_visual = Node3D.new()
 	add_child(_visual)
 	_model = VoxelBuilder.load_model("res://models/lienzo.json")
@@ -104,7 +105,7 @@ func _break() -> void:
 	for k in ghouls:
 		var off := Vector3.ZERO if ghouls == 1 else Vector3(0.7, 0, 0).rotated(Vector3.UP, TAU * k / ghouls)
 		var g := Reanimated.new().setup(world, ghoul_data(), global_position + off, -_face, ally_life, bonus)
-		g.look = "pickman"
+		g.look = "ward" if has_meta("ash") else "pickman"   # ceniza azul (Combos, hito 21.6)
 		g.dps = damage / ally_tick * power
 		g.tick = ally_tick
 		world.fx.add_child(g)
