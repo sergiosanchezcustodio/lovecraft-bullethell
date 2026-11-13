@@ -625,8 +625,105 @@ def asenath():
               flat=(GOLD, GOLD_SH, STOCKING, BROW, LASH, IRIS, LIP, CHEEK), ax=AX, skirt=True)
 
 
+def kuranes():
+    """Kuranes, el soñador de Londres que reina en Celephaïs: mayor, de pelo y barba corta grises,
+    ojos azules soñadores de párpado caído; batín de terciopelo granate con solapas acolchadas,
+    alamares y cordón de oro con borlas, pañuelo azul al cuello con alfiler, pantalón gris y
+    zapatillas. En la frente, el aro de oro fino del rey de Celephaïs con una piedra celeste."""
+    SKIN = (0.88, 0.78, 0.70); SKIN_SH = (0.78, 0.67, 0.60); EAR_IN = (0.66, 0.52, 0.46)
+    GOWN = (0.42, 0.12, 0.16); GOWN_SH = (0.31, 0.08, 0.11); GOWN_LT = (0.52, 0.18, 0.22)
+    LAPEL = (0.22, 0.06, 0.09); LAPEL_LT = (0.30, 0.10, 0.13)
+    GOLD = (0.86, 0.70, 0.30); GOLD_SH = (0.66, 0.50, 0.20); GEM = (0.30, 0.72, 0.95)
+    SHIRT = (0.92, 0.91, 0.87); CRAVAT = (0.16, 0.25, 0.48); CRAVAT_SH = (0.11, 0.18, 0.36)
+    TROU = (0.36, 0.36, 0.38); TROU_SH = (0.30, 0.30, 0.32); SLIPPER = (0.22, 0.10, 0.10)
+    HAIR = (0.56, 0.58, 0.63); HAIR_SH = (0.46, 0.48, 0.53); BEARD = (0.52, 0.53, 0.57)
+    BROW = (0.44, 0.45, 0.49); IRIS = (0.42, 0.58, 0.74); LID = (0.74, 0.62, 0.56); MOUTH = (0.56, 0.38, 0.36)
+    M = cu.new(1922)
+    top = cu.shoes(M, SLIPPER, SOLE)
+    cu.legs(M, TROU, bottom=top)
+    for (x, y, z), v in M.V.items():                                         # la raya del pantalón
+        if v[1] == TROU and z > 0 and x in (-5, 4): v[1] = TROU_SH
+    cu.torso(M, GOWN, bottom=18)
+    cu.skirt(M, GOWN, 24, top=38, flare=2, depth=12)                         # batín hasta medio muslo
+    cu.opening(M, 24, 40, 5, 6, GOWN_SH)                                     # cruzado: la línea del cruce
+    cu.opening(M, 40, 61, 4, 12, LAPEL)                                      # solapas acolchadas, en pico
+    cu.opening(M, 46, 61, 2, 8, SHIRT)
+    for (x, y, z), v in M.V.items():                                         # el acolchado: rombos más claros
+        if v[0] == T and v[1] == LAPEL and (x + y) % 3 == 0 and (x - y) % 3 == 0: v[1] = LAPEL_LT
+    for y in range(52, 61):                                                  # el pañuelo azul, metido en la camisa
+        w = 2 if y >= 57 else 1
+        for x in range(-w, w): cu.front(M, x, y, CRAVAT if (x + y) % 4 else CRAVAT_SH, dz=1)
+    cu.front(M, -1, 56, GOLD, dz=1)                                          # el alfiler
+    for y in (43, 47):                                                       # alamares de cordón de oro
+        for x in range(-5, 5): cu.front(M, x, y, GOLD if x not in (-5, 4) else GOLD_SH, dz=1)
+    cu.belt(M, GOLD, y=39, b=0, h=1)                                         # el cordón del batín
+    for (x, y, z), v in M.V.items():
+        if v[1] == GOLD and y == 39 and (x + z) % 2: v[1] = GOLD_SH
+    for y in range(31, 39):                                                  # y sus borlas, colgando a un lado
+        for x in (4, 6):
+            if y >= 33 or x == 4: cu.front(M, x + (1 if y < 34 and x == 4 else 0), y, GOLD if y > 32 else GOLD_SH, dz=1)
+    for (x, y, z), v in M.V.items():                                         # el bajo y los bolsillos, más claros
+        if v[0] == T and v[1] == GOWN and 24 <= y <= 25: v[1] = GOWN_LT
+    for x0 in (-9, 4):
+        for x in range(x0, x0 + 5): cu.front(M, x, 32, LAPEL)
+    cu.neck(M, SKIN)
+    cu.arms(M, GOWN, SKIN, cuff=LAPEL, cuff_wide=True)                       # vueltas acolchadas
+    cu.head(M, SKIN, SKIN_SH, nose=False, r=4, rb=3)
+    cu.face_art(M, 77, [                   # en relieve
+        '..bbb......bbb..',                # 77: cejas grises, suaves y algo altas (mira lejos)
+        '................',
+        '................',
+        '.......nn.......',                # 74: nariz
+        '.......nn.......',
+        '.......nn.......',
+        '......snns......',                # 71
+        '................',
+        '....tttttttt....',                # 69: bigote gris
+    ], {'b': BROW, 'n': SKIN, 's': SKIN_SH, 't': BEARD}, dz=1)
+    cu.face_art(M, 75, [                   # pintado: ojos soñadores de párpado caído
+        '..LLLL....LLLL..',                # 75: el párpado, bajo
+        '..wiiw....wiiw..',                # 74
+        '..wpiw....wipw..',                # 73
+        '................',
+        '................',
+        '................',
+        '................',
+        '......mmmm......',                # 68: la boca, tranquila
+    ], {'L': LID, 'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'm': MOUTH})
+    cu.face_art(M, 68, [                   # barba corta y recortada, en relieve
+        '..dd........dd..',                # 68
+        '..dddd....dddd..',                # 67
+        '...dddddddddd...',                # 66
+        '....dddddddd....',                # 65
+        '.....dddddd.....',                # 64
+    ], {'d': BEARD}, dz=1)
+    cu.ear_holes(M, EAR_IN)
+    # pelo gris peinado hacia atrás, con entradas
+    cu.hair_back(M, SKIN, HAIR, top=200, bottom=68, neck=True)
+    for (x, y, z), v in M.V.items():
+        if v[0] == H and v[1] == SKIN and (y >= 81 or (y >= 79 and abs(x + 0.5) >= 4)): v[1] = HAIR
+    cu.sideburns(M, HAIR, 70, 78)
+    cu.hair_over_ears(M, SKIN, HAIR, 75, 78)
+    for (x, z) in {(k[0], k[2]) for k in M.V if k[1] >= 79}:                 # las marcas del peine
+        y = M.top(x, z)
+        if y is not None and y >= 80 and x % 3 == 0 and M.V[(x, y, z)][1] == HAIR: M.V[(x, y, z)][1] = HAIR_SH
+    # el aro de oro del rey de Celephaïs, fino, con una piedra celeste en la frente
+    for (x, y, z), v in list(M.V.items()):
+        if v[0] != H or y != 79: continue
+        out = [(x + dx, y, z + dz) for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)) if (x + dx, y, z + dz) not in M.V]
+        if out: v[1] = GOLD if (x + z) % 4 else GOLD_SH
+    for (x, y) in ((-1, 79), (0, 79)): cu.front(M, x, y, GEM, dz=1)
+    for (x, y, z), v in list(M.V.items()):
+        if v[1] == GEM: M.V[(x, y, z)] = [v[0], GEM, 1]
+    cu.seams(M, (GOWN,))
+    cu.finish(M, 'kuranes', {GOWN: 'lana', GOWN_SH: 'lana', GOWN_LT: 'lana', LAPEL: 'lana', LAPEL_LT: 'lana',
+                             SHIRT: 'lona', TROU: 'lana', TROU_SH: 'lana', SLIPPER: 'cuero', SOLE: 'cuero',
+                             HAIR: 'pelo', HAIR_SH: 'pelo', BEARD: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
+              flat=(GOLD, GOLD_SH, GEM, CRAVAT, CRAVAT_SH, BROW, IRIS, LID, MOUTH, EAR_IN), skirt=True)
+
+
 WHO = {'pickman': pickman, 'necrofago': necrofago, 'lienzo': lienzo, 'ward': ward, 'gilman': gilman,
-       'tillinghast': tillinghast, 'derby': derby, 'asenath': asenath}
+       'tillinghast': tillinghast, 'derby': derby, 'asenath': asenath, 'kuranes': kuranes}
 
 if __name__ == '__main__':
     for name in (sys.argv[1:] or list(WHO)):

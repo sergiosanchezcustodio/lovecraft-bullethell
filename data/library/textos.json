@@ -233,9 +233,12 @@
 		"maquina_mas_alla": "Tubos de vidrio, latón y un zumbido que se nota en los dientes. Al encenderla todo se tiñe de violeta y aparece lo que siempre ha estado ahí. Lo que ha estado ahí también nos ve.",
 		"lo_que_nos_rodea": "«¿Quieres saber lo que nos rodea? Los has visto: flotan a través de ti y de mí, por el aire que respiramos.» Tillinghast no tuvo que encenderla más.",
 		"medusas_mas_alla": "Cosas como medusas, pálidas y gelatinosas, que se comen unas a otras sin hacer ruido. Los criados de Tillinghast no se fueron: se los comieron.",
+		"ensueno_celephais": "Celephaïs, en el valle de Ooth-Nargai: minaretes que brillan, galeras en el puerto y un cielo que no termina en el mar. Kuranes la soñó de niño y la volvió a encontrar de viejo, y ahora la lleva consigo a donde haga falta dormir un poco.",
 		"el_umbral": "Edward Derby se casó con Asenath Waite, de Innsmouth, y desde entonces no siempre es él quien mira por sus ojos. Cuando es él, golpea con torpeza de poeta asustado; cuando es ella, mira, y lo que mira se marchita.",
 		"lo_que_llamo": "Tres golpes, y luego dos: la llamada de Edward. Daniel Upton abrió, y lo que esperaba en el umbral estaba deshecho; aun así había vuelto andando desde la casa de Crowninshield.",
-		"ojos_de_ephraim": "Ephraim Waite no murió en Innsmouth: se quedó con el cuerpo de su hija y, cuando se le quedó pequeño, quiso el de Edward. Los ojos son lo único que no cambia de un cuerpo a otro."
+		"ojos_de_ephraim": "Ephraim Waite no murió en Innsmouth: se quedó con el cuerpo de su hija y, cuando se le quedó pequeño, quiso el de Edward. Los ojos son lo único que no cambia de un cuerpo a otro.",
+		"ooth_nargai": "En el valle de Ooth-Nargai, más allá de las colinas Tanarias, el tiempo no existe: Kuranes volvió después de cuarenta años y el mismo esclavo le esperaba en la misma puerta, sin una cana.",
+		"serannian": "Serannian, la ciudad de mármol rosa sobre las nubes, donde el mar etéreo se junta con el cielo. Las galeras de Celephaïs zarpan hacia ella y no se ve dónde termina el agua."
 	},
 	"items": {
 		"diario_wilbur": "Un cuaderno cifrado en un alfabeto que Armitage tardó semanas en romper. Lo que dice no se puede leer de un tirón, pero quien lo lleva encima deja de temblar.",
@@ -322,6 +325,7 @@
 		"frasco_custodes": "Un frasco de gres con la etiqueta «Custodes». Lo que hay dentro no es para levantar a cualquiera: son los guardianes, y obedecen al que los llamó.",
 		"estatuilla_balaustrada": "Una figurilla de metal con forma de barril estriado y cinco brazos en estrella. Gilman la arrancó en sueños de la balaustrada de una terraza bajo tres soles. Por la mañana estaba en su cama.",
 		"valvula_maquina": "Una válvula de repuesto de la máquina de Tillinghast, aún tibia. Brilla con un violeta que no debería verse: el que está más allá del violeta.",
+		"adormidera": "Flores de adormidera de los campos de Ooth-Nargai, que no se marchitan. Basta su olor para que el paso se haga lento y pesado, como el de los sueños en que se corre sin avanzar.",
 		"aldaba_derby": "La aldaba de hierro de la casa de Edward en Arkham. Tres golpes y luego dos era la llamada de Edward cuando era Edward; los demás llamaban de otra forma, y nadie les abría."
 	},
 	"places": {
@@ -361,6 +365,7 @@
 		"ward": "Charles Dexter Ward, de Providence, anticuario. Se obsesionó con un antepasado, Joseph Curwen, que había muerto en 1771 y que no estaba del todo muerto. Encontró sus papeles, sus fórmulas y su tumba. Lo encerraron en un sanatorio, y el doctor Willett notó que su paciente ya no tenía el lunar de la cadera.",
 		"gilman": "Walter Gilman, de Haverhill, estudiante de matemáticas en Miskatonic. Alquiló la buhardilla de la casa de la bruja, en Arkham, porque sus ángulos no eran normales. Soñaba con una vieja y con una rata con cara de hombre que le mordisqueaba los tobillos, y despertaba con barro en los pies.",
 		"tillinghast": "Crawford Tillinghast, físico y filósofo de Providence. Construyó una máquina que despierta los sentidos dormidos y muestra lo que nos rodea sin que lo veamos. Después de diez semanas encerrado con ella estaba flaco, sucio y sin criados, y sonreía de un modo que no gustaba.",
+		"kuranes": "En Londres era un hombre sin dinero ni amigos que soñaba despierto; en sueños se llamaba Kuranes y era rey de Celephaïs. Dejó de distinguir una cosa de la otra. Un día la marea dejó un vagabundo ahogado en las rocas de Innsmouth, y en Celephaïs Kuranes sigue reinando.",
 		"derby": "Edward Pickman Derby, poeta precoz de Arkham, blando, rubio y algo grueso, que nunca se separó de sus padres. Se casó con Asenath Waite, la hija del viejo Ephraim de Innsmouth, de ojos saltones y mirada fija. Desde entonces a veces es él, y a veces, en su mismo cuerpo, es otra persona."
 	},
 	"pets": {

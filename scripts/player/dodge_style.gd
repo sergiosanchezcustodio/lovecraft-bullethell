@@ -23,6 +23,9 @@ extends Resource
 @export var reveal := 0.0
 ## Cambia de cuerpo (Derby y Asenath, hito 20.21; CharacterData.alt_model), escondido en el destello.
 @export var swap := false
+## Se duerme y despierta en otro sitio (Kuranes, hito 20.22): deja donde estaba un sueño de este
+## radio que frena a los enemigos DODGE_DREAM_T s. 0: nada.
+@export var dream := 0.0
 ## Tramo de la animación (0..1) en que el modelo no se ve (el destello "desaparece").
 @export var hidden_from := -1.0
 @export var hidden_to := -1.0

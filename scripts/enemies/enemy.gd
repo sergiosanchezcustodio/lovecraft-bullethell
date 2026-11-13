@@ -52,6 +52,7 @@ var _reveal_t := 0.0                         ## s revelado (Máquina del más al
 var _reveal_k := 0.0
 var _reveal_chain := 0.0                     ## daño con que revienta si muere revelado (Medusas del más allá)
 var _reveal_tag := &""
+var _dream_t := 0.0                         ## s que sigue soñando (zonas de Kuranes, 20.22)
 const REVEAL_BURST_R := 2.0
 var _lure_t := 0.0                          ## s que le atrae una bengala
 var _lure_pos := Vector3.ZERO
@@ -472,6 +473,13 @@ func reveal(seconds: float, bonus: float, chain := 0.0) -> void:
 	_reveal_chain = maxf(_reveal_chain, chain)
 	_reveal_tag = Damage.ctx
 	if buried and behavior != null: behavior.reveal(self)
+
+## Sueña `seconds` (zona de sueño de Kuranes, 20.22): solo el tinte; el freno lo pone la zona.
+func dream(seconds: float) -> void:
+	_dream_t = maxf(_dream_t, seconds)
+
+func is_dreaming() -> bool:
+	return _dream_t > 0.0
 
 func is_revealed() -> bool:
 	return _reveal_t > 0.0
@@ -1024,6 +1032,7 @@ func _physics_process(delta: float) -> void:
 	if _root_t > 0.0: velocity = Vector3.ZERO
 	if _vulnerable > 0.0: _vulnerable -= delta
 	if _reveal_t > 0.0: _reveal_t -= delta
+	if _dream_t > 0.0: _dream_t -= delta
 	if _lure_t > 0.0:                          # bengala: va hacia la luz en lugar del jugador
 		_lure_t -= delta
 		var to := Vector3(_lure_pos.x - position.x, 0, _lure_pos.z - position.z)
@@ -1290,6 +1299,7 @@ func _status_color() -> Color:
 	if _confuse_t > 0.0: return Color(0.95, 0.75, 0.95, 0.22 + 0.1 * sin(_spawn_t * 11.0))
 	if _inject_t > 0.0: return Color(0.8, 0.95, 0.25, 0.14 + 0.06 * sin(_spawn_t * 12.0))   # suero: tenue (el aliado, verde intenso)
 	if _reveal_t > 0.0: return Color(0.72, 0.64, 1.0, 0.2 + 0.08 * sin(_spawn_t * 4.0))     # revelado: luz violeta pálida (20.20)
+	if _dream_t > 0.0: return Color(0.62, 0.84, 0.95, 0.2 + 0.08 * sin(_spawn_t * 2.5)).lerp(Color(0.95, 0.68, 0.84, 0.24), 0.5 + 0.5 * sin(_spawn_t * 1.3))   # soñando (20.22)
 	return Color(0, 0, 0, 0)
 
 ## Con la horda (hito 16.3): la fila de la pose (el golpe y la preparación del ataque, si la
@@ -1372,6 +1382,7 @@ func net_flags2() -> int:
 	if small: f |= 8
 	if buried: f |= 16
 	if _reveal_t > 0.0: f |= 32
+	if _dream_t > 0.0: f |= 64
 	return f
 
 func net_apply_flags2(f: int) -> void:
@@ -1381,6 +1392,7 @@ func net_apply_flags2(f: int) -> void:
 	if (f & 8) != 0 and not small: set_small()
 	buried = (f & 16) != 0
 	_reveal_t = 1.0 if (f & 32) != 0 else 0.0
+	_dream_t = 1.0 if (f & 64) != 0 else 0.0
 
 ## Escudo de icor (grados de locura, 16.14): una burbuja verdinegra que para `n` golpes.
 const WARD_COLOR := Color(0.45, 0.95, 0.55)

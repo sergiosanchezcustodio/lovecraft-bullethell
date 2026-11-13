@@ -23,6 +23,7 @@ const STATS := {
 	"proj_size_mult": ["Tamaño de las balas", "mult", "", false],
 	"reveal_add": ["Daño a los revelados", "pct", "", false],
 	"fresh_mult": ["Daño a los ilesos", "mult", "", false],
+	"slow_add": ["Freno de los enemigos", "pct", "", false],
 	"proj_speed_mult": ["Velocidad de los proyectiles", "mult", "", false],
 	"weapon_cooldown_mult": ["Recarga de las armas", "mult", "", true],
 	"arcane_cooldown_mult": ["Recarga de las mágicas", "mult", "", true],

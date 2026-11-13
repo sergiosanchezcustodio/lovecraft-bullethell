@@ -564,6 +564,39 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.05; m.scale_max = 0.13
 			m.color_ramp = _ramp([[0.0, Color(0.32, 0.27, 0.22, 1.0)], [0.85, Color(0.2, 0.17, 0.15, 1.0)],
 				[1.0, Color(0.2, 0.17, 0.15, 0.0)]])
+		"dream":                  # Kuranes (hito 20.22): cubitos de colores pastel que flotan despacio y titilan
+			p.draw_pass_1 = cube("add")
+			p.amount = int(clampf(r * 9.0, 10.0, 30.0))
+			p.lifetime = 2.2
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = maxf(r, 0.3) * 0.85
+			m.spread = 60.0
+			m.initial_velocity_min = 0.1; m.initial_velocity_max = 0.45
+			m.gravity = Vector3(0, 0.18, 0)
+			m.damping_min = 0.2; m.damping_max = 0.5
+			m.angular_velocity_min = -60.0; m.angular_velocity_max = 60.0
+			m.scale_min = 0.04; m.scale_max = 0.09
+			m.scale_curve = _curve([[0.0, 0.3], [0.25, 1.0], [0.7, 0.8], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.6, 0.85, 1.0, 0.0)], [0.2, Color(0.6, 0.85, 1.0, 0.9)],
+				[0.5, Color(0.98, 0.7, 0.86, 0.85)], [0.8, Color(1.0, 0.88, 0.55, 0.7)], [1.0, Color(1.0, 0.88, 0.55, 0.0)]])
+		"dream_z":                # el que se duerme (Ooth-Nargai, 20.22): cubitos claros que suben en zigzag
+			p.draw_pass_1 = cube("add")
+			p.amount = 6
+			p.lifetime = 1.2
+			p.explosiveness = 0.3
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = 0.1
+			m.direction = Vector3(0.5, 1.0, 0.0)
+			m.spread = 15.0
+			m.initial_velocity_min = 0.5; m.initial_velocity_max = 0.7
+			m.gravity = Vector3(0, 0.2, 0)
+			m.turbulence_enabled = true
+			m.turbulence_noise_strength = 1.5
+			m.turbulence_noise_scale = 1.2
+			m.scale_min = 0.07; m.scale_max = 0.12
+			m.scale_curve = _curve([[0.0, 0.5], [0.4, 1.0], [1.0, 0.6]])
+			m.color_ramp = _ramp([[0.0, Color(0.85, 0.92, 1.0, 0.0)], [0.15, Color(0.85, 0.92, 1.0, 0.95)],
+				[1.0, Color(0.95, 0.75, 0.9, 0.0)]])
 		"soul":                   # Derby y Asenath (hito 20.21): el alma que entra en el otro cuerpo, humo verdoso
 			p.draw_pass_1 = cube("add")
 			p.amount = 18

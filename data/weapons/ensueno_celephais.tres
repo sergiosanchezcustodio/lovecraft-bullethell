@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ensueno_celephais"
+display_name = "Ensueño de Celephaïs"
+description = "Un trozo del cielo de Celephaïs donde más enemigos hay: dentro sueñan y van cada vez más despacio, sus balas se frenan y los investigadores recuperan cordura."
+category = 2
+delivery = 29
+targeting = 1
+cooldown = 3.2
+range = 8.0
+damage = 3.9
+hit_interval = 0.5
+zone_radius = 2.6
+zone_time = 4.0
+slow_factor = 0.45
+bullet_slow = 0.6
+dream_rest = 0.8
+sanity_cost = 1.5
+evolves_with = &"adormidera"
+evolution = &"ooth_nargai"
+evolution_alt = &"serannian"
+max_level = 5
+level_mods = Array[Dictionary]([{"damage*": 1.3}, {"zone_radius*": 1.15}, {"slow_factor*": 0.85}, {"damage*": 1.25, "zone_time*": 1.2}])
+level_text = Array[String](["+30 % de daño", "Sueño un 15 % más amplio", "Los de dentro, aún más lentos", "+25 % de daño y sueña más tiempo"])

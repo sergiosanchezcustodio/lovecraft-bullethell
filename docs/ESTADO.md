@@ -2872,3 +2872,53 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
   - La aldaba solo suma al primer golpe.
   - En red, el otro PC ve el cambio.
 
+### 20.22: Kuranes (13-11-2026)
+
+*Pendiente de revisión del autor.*
+
+- **Quién:** el soñador de Londres de *Celephaïs*, rey de la ciudad en sueños, en la tienda por 9.500 $ (`data/characters/kuranes.tres`, orden 21). Rasgo, medio dormido: recupera 0,4 de cordura por segundo, también entre los horrores (`sanity_regen`, la estadística de la Pipa de espuma; entra en la lista de rasgos de `test_characters`). Vida 85, cordura 110, velocidad 4,4; POD, INT y CUL. Victoria, `win_hat`.
+- **Arte** (`tools/gen_tienda20.py kuranes`, revisado de frente, de lado y de espaldas):
+  - Mayor, de pelo gris peinado hacia atrás con entradas, barba corta recortada y bigote grises en relieve, ojos azules soñadores de párpado caído.
+  - Batín de terciopelo granate hasta medio muslo, con solapas acolchadas en rombos, dos alamares y cordón de oro con borlas. Pañuelo azul al cuello con alfiler, pantalón gris y zapatillas.
+  - En la frente, el aro de oro fino del rey de Celephaïs, con una piedra celeste que brilla.
+  - El primer gris del pelo y la barba era tan claro que con la luz cálida salía del color de la piel (de espaldas parecía calvo): oscurecido y con un tono frío.
+  - Cara para el parpadeo y vestuario (83 prendas).
+- **Zona de sueño** (`DreamZone`, `scripts/weapons/dream_zone.gd`): un trozo del cielo de Celephaïs en el suelo.
+  - Los enemigos de dentro van cada vez más despacio: del paso normal al freno entero (`slow_factor`) en `DROWSE` (1,2 s). Las élites, la mitad, como con cualquier freno.
+  - Las balas enemigas que entran se frenan (`bullet_slow`, 0,6) y se amontonan.
+  - Los investigadores de dentro recuperan `dream_rest` de cordura por segundo (los del mismo PC).
+  - Daña poco, a tics de `hit_interval`.
+  - Los que sueñan llevan un tinte pastel que pasa del celeste al rosa (`Enemy.dream`, `is_dreaming`; en red, `net_flags2` 64).
+  - Se ve como un suelo de nubes pastel que giran sobre un cielo de noche, con estrellas doradas que titilan y un borde claro, que se abre desde el centro (`ground_fx`, modo 12). Lleva la cortina que sube del borde al aparecer y cubitos de colores que flotan (receta `dream`, en el calentamiento).
+- **Arma, Ensueño de Celephaïs** (`ensueno_celephais`, mágica, entrega nueva `DREAM`):
+  - Pone una zona de 2,6 m y 4 s donde hay más enemigos, y espera a que los haya.
+  - Cuesta 1,5 de cordura, que en buena parte devuelve si se queda dentro (0,8 por segundo).
+  - Niveles: daño, sueño más amplio, aún más lentos, y daño con más tiempo.
+  - Campos nuevos `dream_rest`, `dream_sleep` y `dream_follow`.
+  - Reglas de daño: tics mientras dura (`zone_time / hit_interval`), control, área. *Serannian* cuenta una zona a la vez (`cycle`). Daño 3,9 por tic tras las reglas.
+  - **Objeto, Adormidera de Ooth-Nargai** (`adormidera`): estadística nueva `slow_add`. Los que frenan tus armas van un 6 % más lentos por nivel; resta a `slow_factor` solo donde hay freno, también en el polvo de Ibn-Ghazi. En la comparación, «Freno de los enemigos».
+  - **Ramas:**
+    - *Valle de Ooth-Nargai* (`ooth_nargai`): los que llevan 1,5 s dentro se duermen 2 s, una vez cada uno (`dream_sleep`, cubitos claros que suben en zigzag, receta `dream_z`). Sueños un 30 % más amplios.
+    - *Serannian* (`serannian`): un solo sueño, más amplio y largo, que va con Kuranes y sale otro cuando se apaga (`dream_follow`, `WeaponSystem._dreams`). Dentro se descansa un 50 % más.
+    - Las dos, a 1,4 veces el nivel 5.
+  - Iconos con ComfyUI en local (semillas 1001, 1001, 1000 y 1002; sin letreros). Textos de la Biblioteca.
+- **Esquive, Sueño** (`data/dodges/sueno.tres`, `DodgeStyle.dream`): un destello con estela pastel. Donde estaba deja un sueño de 2 m que frena a los enemigos 2 s sin dañar (`Player.DODGE_DREAM_T` y `DODGE_DREAM_SLOW`).
+- **Arreglado de paso:** `Breakable.inject` no aceptaba el tercer argumento del suero de West (la fuerza del aliado, que llegó con el 20.18). Una bala de suero que daba en un barril soltaba un error. Lo vigila `test_breakables.test_aguanta_los_estados_de_los_enemigos`.
+- **Capturas:**
+  - `level=p2_n2 character=kuranes weapons=ensueno_celephais autopick=false bot=smart` (el sueño, los enemigos teñidos y las balas que se amontonan al frenarse), y lo mismo con `weapons=ooth_nargai` y `weapons=serannian`.
+  - `bot=circle dodge_every=0.6` (el sueño que deja el esquive).
+  - `title … open=menu_tienda tab=1 shop_focus=kuranes`.
+  - Partida de 70 s con el bot (`bot=smart`, capturas hasta los 69 s) sin errores.
+- **Tests:** `tests/test_kuranes.gd`. 869 de 869. Comprueba:
+  - Está en la tienda con su arma y sus ramas.
+  - Dentro van cada vez más despacio y sueñan; el de fuera, no.
+  - Frena las balas enemigas que entran.
+  - Los investigadores de dentro descansan y los de fuera no.
+  - La zona se apaga y se va.
+  - Sin enemigos no sueña ni cuesta cordura.
+  - El arma pone el sueño donde están los enemigos.
+  - Ooth-Nargai duerme una vez a los que se quedan.
+  - Serannian va con él y no se amontona.
+  - El esquive deja un sueño que frena y no daña.
+  - La adormidera solo frena más a lo que ya frenaba.
+

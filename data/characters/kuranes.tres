@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/sueno.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"kuranes"
+display_name = "Kuranes"
+victory = "win_hat"
+model = "kuranes"
+role = "Soñador de Londres, rey de Celephaïs"
+passive_text = "Medio dormido: recupera 0,4 de cordura por segundo, también entre los horrores."
+story = "Celephaïs"
+price = 9500
+order = 21
+max_health = 85.0
+max_sanity = 110.0
+move_speed = 4.4
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"ensueno_celephais"])
+sanity_regen = 0.4
+attr_bonus = {"POD": 9, "INT": 5, "CUL": 6}
+in_shop = true

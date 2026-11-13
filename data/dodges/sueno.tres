@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="DodgeStyle" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/dodge_style.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sueno"
+display_name = "Sueño"
+anim = "flash"
+speed = 20.0
+duration = 0.17
+iframes = 0.3
+cooldown = 1.4
+snow_spray = false
+afterimages = true
+hidden_from = 0.1
+hidden_to = 0.64
+dream = 2.0

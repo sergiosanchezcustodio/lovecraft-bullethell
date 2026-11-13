@@ -43,3 +43,12 @@ func test_al_pisarla_se_recoge() -> void:
 	k._physics_process(0.016)
 	assert_gt(p.health, 10.0, "la comida cura")
 	assert_true(k.is_queued_for_deletion())
+
+func test_aguanta_los_estados_de_los_enemigos() -> void:
+	# las balas y zonas los llaman también sobre lo rompible (el suero, con la fuerza del aliado: 20.18)
+	var b := Breakable.new().setup(world, Vector3(1, 0, 0))
+	world.fx.add_child(b)
+	b.inject(3.0, {}, 1.0)
+	b.poison(2.0, 1.0, {})
+	b.curse(2.0, 1.0, 1, {})
+	assert_true(b.is_alive())

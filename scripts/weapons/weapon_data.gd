@@ -60,7 +60,7 @@ enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND, STRONGEST, FRONT_BACK }
 ## SWEEP: rayo de `range` m que gira alrededor del personaje a projectile_speed grados por
 ## segundo durante `duration` s; daña cada hit_interval a cada enemigo (Lámpara de Alhazred).
 enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE, FLAME, SIGIL, PULSE, TETHER, CLOUD, DRONE, STAB,
-	CHAIN, TURRET, BOOMERANG, FISSURE, THRUST, WHIP, TRAP, FIREBALL, VORTEX, SPIKES, MADDEN, SWEEP, CANVAS, SALTS, BEYOND, THRESHOLD }
+	CHAIN, TURRET, BOOMERANG, FISSURE, THRUST, WHIP, TRAP, FIREBALL, VORTEX, SPIKES, MADDEN, SWEEP, CANVAS, SALTS, BEYOND, THRESHOLD, DREAM }
 ## Zona que deja en el suelo (lanzados, lanzallamas, nube): ninguna, fuego, ácido o polvo
 ## (ralentiza y debilita).
 ## GAS: nube tóxica que deriva (`drift` m/s) hacia donde se lanzó (Gas de cloro).
@@ -144,6 +144,14 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 ## (mágicas, cuestan cordura). Con swap_blast, cada cambio de cuerpo suelta una onda de
 ## swap_blast × damage en aoe_radius × 1,5 (Lo que llamó a la puerta).
 @export var swap_blast := 0.0
+## Ensueño de Celephaïs (entrega DREAM, hito 20.22, DreamZone): zonas de sueño de zone_radius y
+## zone_time donde los enemigos van cada vez más despacio (hasta slow_factor) y sus balas a
+## bullet_slow; daño `damage` cada hit_interval. dream_rest: cordura por segundo para los
+## jugadores de dentro. dream_sleep: s que duermen los que se quedan dentro (Ooth-Nargai).
+## dream_follow: una sola, que va con el jugador (Serannian).
+@export var dream_rest := 0.0
+@export var dream_sleep := 0.0
+@export var dream_follow := 0.0
 @export var root := 0.0                      ## s que deja inmóviles a los de la red (las élites solo se frenan)
 @export_group("Arsenal III")
 @export var volleys := 1.0                   ## disparos seguidos por uso (Recortada: 2)

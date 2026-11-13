@@ -42,6 +42,8 @@ static func with_items(d: WeaponData, n: String, v: float, c: CharacterData) -> 
 		"knockback": v *= c.knockback_mult
 		"reveal_bonus":
 			if v > 0.0: v += c.reveal_add                       # Válvula de la máquina (20.20)
+		"slow_factor":
+			if v < 1.0: v = maxf(0.1, v - c.slow_add)            # Adormidera (20.22): frenan más
 		"projectile_radius", "projectile_size":
 			if d.delivery == D.BULLET: v *= c.proj_size_mult      # Estatuilla de la balaustrada (20.19)
 	return v
@@ -57,6 +59,7 @@ var _tethers := {}                           ## Weapon -> TetherBeam activo (Len
 var _traps := {}                             ## Weapon -> cepos puestos (Cepos)
 var _angle_side := 1.0                       ## a qué lado sale el siguiente ángulo de Gilman
 var _heat := {}                              ## Weapon -> calor de la Máquina del más allá (1 a BEYOND_HEAT_MAX)
+var _dreams := {}                            ## Weapon -> DreamZone que va con él (Serannian)
 var _heat_at := {}                           ## Weapon -> world.clock del último pulso
 const BEYOND_HEAT_MAX := 3.0                 ## la cordura que quita llega a triplicarse
 const BEYOND_COOL := 0.25                    ## calor que pierde por segundo parada
@@ -180,7 +183,7 @@ func _fire(w: Weapon) -> bool:
 		WeaponData.Targeting.DENSEST:
 			var t := world.densest_enemy(origin, rng, maxf(w.stat("aoe_radius"), 1.0))
 			target_pos = t.global_position if t != null else ahead
-			w.had_target = t != null or w.data.delivery != WeaponData.Delivery.SALTS   # las sales esperan
+			w.had_target = t != null or not w.data.delivery in [WeaponData.Delivery.SALTS, WeaponData.Delivery.DREAM]   # las sales y el sueño esperan
 		WeaponData.Targeting.MOVE_DIR:
 			target_pos = origin + player.motor.facing * rng
 		WeaponData.Targeting.AROUND:
@@ -222,6 +225,7 @@ func _fire(w: Weapon) -> bool:
 		WeaponData.Delivery.CANVAS: return _canvas(w, target_pos)
 		WeaponData.Delivery.SALTS: return _salts(w, target_pos)
 		WeaponData.Delivery.BEYOND: return _beyond(w)
+		WeaponData.Delivery.DREAM: return _dream(w, target_pos)
 		WeaponData.Delivery.BOOMERANG: return _boomerang(w, target_pos)
 		WeaponData.Delivery.FISSURE: return _fissure(w, target_pos)
 		WeaponData.Delivery.THRUST: return _thrust(w)
@@ -364,6 +368,28 @@ func dmg(w: Weapon, crit := true) -> float:
 	var cat := w.data.category
 	if swap: cat = WeaponData.Category.PHYSICAL if player.form == 0 else WeaponData.Category.MAGIC
 	return w.stat("damage") * player.damage_mult(cat) * k
+
+## Ensueño de Celephaïs (Kuranes, hito 20.22): una zona de sueño donde hay más enemigos (espera a
+## que los haya). Con dream_follow (Serannian), una sola alrededor de él, que viaja con él y sale
+## otra cuando se apaga.
+func _dream(w: Weapon, target_pos: Vector3) -> bool:
+	var follow := w.stat("dream_follow") > 0.0
+	if follow:
+		var cur := _dreams.get(w) as DreamZone
+		if cur != null and is_instance_valid(cur) and not cur.ending(): return false
+	elif not w.had_target: return false
+	_pay_sanity(w)
+	var z := DreamZone.new().setup(world, player.global_position if follow else target_pos, w.stat("zone_radius"),
+		w.stat("zone_time"), dmg(w), w.stat("hit_interval"), w.stat("slow_factor"), w.stat("bullet_slow"),
+		w.stat("dream_rest"), player.data.bonus_tags)
+	z.sleep = w.stat("dream_sleep")
+	if follow:
+		z.follow = player
+		_dreams[w] = z
+	world.fx.add_child(z)
+	Auto.sfx_at("chant", z.global_position)
+	fired.emit(w)
+	return true
 
 ## Cambio de cuerpo (Derby y Asenath, hito 20.21): las armas con swap_blast sueltan su onda (Lo
 ## que llamó a la puerta: verde podrido, empuja y no aturde).

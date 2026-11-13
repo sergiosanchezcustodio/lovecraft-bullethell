@@ -80,6 +80,7 @@ extends Resource
 @export var ally_dmg_mult := 1.0             ## daño de esos aliados (Frasco de los Custodes, hito 20.18)
 @export var proj_size_mult := 1.0            ## tamaño de las balas, el de choque y el que se ve (Estatuilla de la balaustrada, hito 20.19)
 @export var reveal_add := 0.0                ## más daño a los revelados (Válvula de la máquina, hito 20.20)
+@export var slow_add := 0.0                  ## los que frenan sus armas, más lentos (Adormidera, hito 20.22)
 @export var fresh_mult := 1.0                ## daño a los enemigos ilesos (Aldaba de los Derby, hito 20.21)
 ## Segundo cuerpo (Derby y Asenath, hito 20.21): el modelo al que cambia con un esquive `swap`
 ## (y sus armas THRESHOLD, a la otra forma). Vacío: uno solo.

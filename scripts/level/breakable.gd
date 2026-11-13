@@ -86,4 +86,4 @@ func root(_s: float) -> void: pass
 func confuse(_s: float) -> void: pass
 func poison(_a = null, _b = null, _c = null) -> void: pass
 func stasis(_s: float) -> void: pass
-func inject(_a = null, _b = null) -> void: pass
+func inject(_a = null, _b = null, _c = null) -> void: pass   # (el suero lleva también la fuerza del aliado, 20.18)

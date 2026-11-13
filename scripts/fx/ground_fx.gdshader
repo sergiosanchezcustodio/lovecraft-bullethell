@@ -13,7 +13,9 @@ render_mode unshaded, cull_disabled, depth_draw_never, shadows_disabled;
 // (`age` = avance del giro, 0..1); 9 vórtice: brazos en espiral que giran hacia dentro,
 // iridiscentes, con el centro oscuro; 10 limo: charco espeso del color `tint` con brillos
 // húmedos y burbujas lentas que revientan; 11 Ángulos: pozo negro en celdas con grietas
-// rectas en ángulos que no cuadran y luz verde que late en ellas.
+// rectas en ángulos que no cuadran y luz verde que late en ellas; 12 sueño (Kuranes, hito
+// 20.22): nubes de colores pastel que giran despacio sobre un cielo de noche, estrellas doradas
+// que titilan y un borde claro; se abre desde el centro con `age`.
 
 uniform int mode = 0;
 uniform float fade = 1.0;
@@ -126,6 +128,28 @@ void fragment() {
 		ALBEDO = mix(c9 * 0.35, vec3(0.02, 0.0, 0.04), core);
 		EMISSION = c9 * arm * (1.0 - r) * 0.9;
 		ALPHA = (arm * (1.0 - r * 0.6) * 0.85 + core * 0.9 + 0.12 * (1.0 - r)) * fade;
+	} else if (mode == 12) {
+		float open12 = clamp(age * 3.0, 0.0, 1.0);
+		float wob = 0.92 + 0.08 * fbm(n * 0.9 + TIME * 0.2);
+		if (r > wob * open12) discard;
+		float ang = atan(q.y, q.x) + TIME * 0.12;
+		vec2 sw = vec2(cos(ang), sin(ang)) * r * 3.2 + seed;
+		float cloud = fbm(sw + vec2(TIME * 0.15, -TIME * 0.1));
+		cloud = floor(cloud * 5.0) / 5.0;                       // escalones, como los voxels
+		vec3 night = vec3(0.05, 0.07, 0.16);
+		vec3 teal = vec3(0.35, 0.72, 0.82);
+		vec3 rose = vec3(0.88, 0.58, 0.76);
+		vec3 c12 = mix(night, teal, smoothstep(0.35, 0.65, cloud));
+		c12 = mix(c12, rose, smoothstep(0.65, 0.95, cloud) * (0.5 + 0.5 * sin(ang * 2.0 + TIME * 0.4)));
+		float tw = hash(c + floor(TIME * 1.5 + hash(c) * 3.0));
+		float star = step(0.975, hash(c * 1.7 + seed)) * step(0.4, tw);
+		float rim12 = step(wob * open12 - 0.07, r);
+		c12 = mix(c12, vec3(1.0, 0.86, 0.5), star);
+		c12 = mix(c12, vec3(0.8, 0.9, 1.0), rim12 * 0.7);
+		ALBEDO = c12 * 0.55;
+		EMISSION = c12 * (0.35 + 0.25 * cloud) + vec3(1.0, 0.85, 0.5) * star * 0.9 + vec3(0.6, 0.75, 1.0) * rim12 * 0.4;
+		ALPHA = (mix(0.5, 0.82, smoothstep(0.3, 0.8, cloud)) * (1.0 - r * 0.35) + star + rim12 * 0.4) * fade;
+		ALPHA = clamp(ALPHA, 0.0, 0.95);
 	} else {
 	float edge = 0.78 + 0.22 * fbm(n * 0.9);
 	if (mode == 6) {                                   // salpicadura: núcleo más pequeño y gotas sueltas
