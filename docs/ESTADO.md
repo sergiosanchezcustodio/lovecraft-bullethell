@@ -3048,3 +3048,50 @@ Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden:
   - No empieza con el evento final ya fuera.
   - Las estrellas caen.
 
+
+### 21.5: compañeros que crecen (13-11-2026)
+
+- **Qué:** cuando su investigador llega al nivel 5, el compañero elige entre dos trucos. Salen dos cartas en la ventana de la subida, como las ramas de las armas: no gastan la subida, que viene justo después. El título es «Truco · Gato de Ulthar», las cartas son ámbar (`TRICK_COLOR`) y llevan el retrato del compañero. Al elegir, el aviso dice «Gato de Ulthar aprende Ronroneo: …» y sobre el compañero sale el nombre del truco con una columna de luz.
+- **Los 32 trucos** (`data/pet_tricks.json`, dos por compañero):
+
+| Compañero | Uno | Otro |
+|---|---|---|
+| Perro | Arrastre (empuja cuatro veces más) | Aullido (cada 7 s, con enemigos a 4,5 m de su dueño: onda azulada que empuja y los confunde 2,5 s) |
+| Gato | Dos zarpas (cada zarpazo araña también al más cercano) | Ronroneo (cada tres zarpazos duerme 3 s al que araña; «Zzz») |
+| Sapo | Baba corrosiva (+50 % de daño) | Buen escupidor (escupe casi el doble de a menudo y más lejos) |
+| Búho | Sabiduría (+50 % de la experiencia que daba) | Vigilia (0,5 de cordura por segundo) |
+| Rata | Botín (+60 % de dólares) | Olfato (escarba el doble de a menudo) |
+| Shoggoth | Glotón (traga el doble de balas) | Calor de shoggoth (0,4 % de la vida por segundo) |
+| Byakhee | Picado doble (también al más cercano) | Alarido (su picado aturde 1 s) |
+| Cuervo | Urraca (a veces roba 3 $ al que pica) | Picotazo (vulnerables 3 s) |
+| Polilla | Polvo denso (+40 % de área) | Polvo de Leng (confusión un 70 % más larga) |
+| Gaviota | Pescado fresco (+40 % de curación) | Ida y vuelta (más a menudo) |
+| Mi-go | Rayo en cadena (salta al más cercano) | Descarga (aturde 0,6 s) |
+| Araña de Tíndalos | Ángulos agudos (salta más deprisa) | Mordisco del tiempo (a la mitad de rapidez 3 s) |
+| Yig | Veneno lento (+80 % de duración) | Mirada fija (cada tres mordiscos, quieto 2 s) |
+| Cabra | Cornada (empuja el doble y aturde 0,6 s) | Leche de cabra (cada embestida cura el 1 % de la vida) |
+| Pez | Resbaladizo (embiste más a menudo) | Escamas afiladas (vulnerables 3 s) |
+| Dhole | Túneles anchos (+40 % de área) | Temblor (aturde 0,8 s) |
+
+- **Cómo:**
+  - `PetTricks` (en `scripts/pets/`) lee los datos. Un truco tiene `mods` (`"campo*"` multiplica y `"campo+"` suma sobre una copia de su `PetData`) o un `efecto`: `twin`, `sleep`, `howl`, `sanity`, `regen`, `gold`, `vulnerable`, `slow` o `heal`.
+  - `Pet.learn(id)` aplica el truco. `Pet.on_hit` se llama tras cada golpe (`Pet.strike` y los mordiscos y zarpazos de `PetHunt`). Un zarpazo que da a varios cuenta como un solo golpe. `_trick_step` lleva lo que va solo: el aullido, la cordura y la vida.
+  - `PetHunt` ahora usa el empuje y el aturdimiento de los datos: sin truco, igual que antes.
+  - En el progreso del jugador: `PlayerProgress.Option.Kind.TRICK` (clave `t:<id>`), `pet_id` (lo pone `Pet.setup`), `pet_trick` y `trick_options()`, que van antes que los Signos Mayores en `next_options` y en `has_special`.
+  - El truco pasa de un nivel a otro (`GameSession.snapshot`/`restore`). En red viaja con el progreso (`apply_progress`): cada PC ve el progreso y el compañero aprende el truco al verlo. `PROTOCOL` 21.
+- **Arreglado de paso: `ModelIcon.make` salía vacío con algunos modelos en partida.** Con `UPDATE_ONCE`, un material que aún no se había dibujado en una vista así compila su pipeline en segundo plano y ese único fotograma salía en blanco: el gato, la cabra y el dhole (el perro y el sapo, no). Ahora la vista se dibuja 0,4 s (`ModelIcon._Settle`, que sigue con la partida en pausa) y luego una vez más y se para.
+- **Opciones de prueba:**
+  - `levelup_to=N` con `levelup_at=t`: sube al nivel N, p. ej. 5, para ver la ventana del truco.
+  - `trick=<id>` con `pet=<compañero>`: empieza con ese truco.
+  - `icon_dump=true`: guarda el retrato del compañero en `user://icono_<modelo>.png`.
+- **Comprobado en partida:**
+  - La ventana con el retrato del gato y, después del truco, la subida normal del nivel 5.
+  - La onda del aullido.
+  - El registro `TRUCO gato dos_zarpas`.
+- **Tests** (`tests/test_pet_tricks.gd`, 10):
+  - Dos trucos bien hechos por compañero.
+  - Al nivel 5 se ofrecen sin gastar la subida, y la clave vuelve a dar la carta.
+  - Sin compañero no hay trucos.
+  - Los `mods` van en una copia.
+  - El truco va en el progreso y pasa de nivel.
+  - Rayo en cadena, ronroneo, aullido, vigilia y leche de cabra.

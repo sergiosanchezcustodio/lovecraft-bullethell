@@ -45,12 +45,14 @@ func step(delta: float) -> void:
 
 func _hit(e: Node3D) -> void:
 	var d := Damage.new(damage(), 0.0)
-	d.knockback = pet.facing * 0.8
+	d.knockback = pet.facing * pet.data.knockback          # (0,8 de siempre; el arrastre del perro, más: 21.5)
 	d.bonus = pet.owner_player.data.bonus_tags
 	e.take_damage(d)
+	if pet.data.stun > 0.0 and e.is_alive() and e.has_method("stun"): e.stun(pet.data.stun)   # (trucos, 21.5)
 	if pet.data.kind == PetData.Kind.POISON and e.is_alive() and e.has_method("poison"):
 		e.poison(pet.data.effect_time, pet.data.attack_at(pet.level()), d.bonus)
 	pet.hits += 1
+	pet.on_hit(e)                                          # su truco (21.5)
 
 ## Zarpazo: a todos los que están delante del gato, con un arañazo en el aire.
 func _claw() -> void:

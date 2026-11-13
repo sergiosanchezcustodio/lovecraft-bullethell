@@ -148,6 +148,7 @@ Sacadas de `CLAUDE.md` el 17-10-2026. Léelas antes de tocar generadores de mode
 ## Leer una imagen dibujada por la tarjeta (29-10-2026, charcos del hito 12.12)
 
 - Un `SubViewport` para leer una imagen una vez (el mapa de charcos del hito 12.12): con `UPDATE_ONCE` y la cámara sin `make_current()` no dibujaba nada y `get_image()` daba el gris de fondo; con `UPDATE_ALWAYS` y `cam.make_current()` ya dentro del árbol, sí (y se libera después de leer). Leer la imagen de la tarjeta para el juego un fotograma: unos 60 ms, casi igual a 624 que a 1248 px de lado.
+- **Un `SubViewport` con `UPDATE_ONCE` puede salir vacío** si alguno de sus materiales no se había dibujado aún en una vista así: el pipeline se compila en segundo plano y el único fotograma se pierde (13-11-2026: en partida, los retratos del gato, la cabra y el dhole; el perro y el sapo, sí). Dibújala unos fotogramas con `UPDATE_ALWAYS` (0,4 s, desde un nodo con `PROCESS_MODE_ALWAYS` si la partida está en pausa) y luego `UPDATE_ONCE`, como `ModelIcon._Settle`. Para saber si sale, `get_image().getextrema()` del alfa.
 - En las ventanas de prueba el viewport mide 2258 × 1270, no 1920 × 1080: lo que da `unproject_position` hay que escalarlo para buscarlo en la captura.
 
 ## Animar un modelo que se pinta en 2D (28-10-2026, cuervo de la portada)

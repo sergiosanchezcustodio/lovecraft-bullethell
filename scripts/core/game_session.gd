@@ -72,7 +72,8 @@ static func snapshot(q: Player) -> Dictionary:
 	for w in q.weapons.weapons: ws.append([String(w.data.id), w.level])
 	return {"level": q.progress.level, "xp": q.progress.xp, "attrs": q.attrs.duplicate(),
 		"attrs_level1": q.attrs_level1.duplicate(), "passives": q.progress.passives.duplicate(), "weapons": ws,
-		"signs": Array(q.progress.signs).map(func(s: StringName) -> String: return String(s))}
+		"signs": Array(q.progress.signs).map(func(s: StringName) -> String: return String(s)),
+		"trick": q.progress.pet_trick}                  # el truco de su compañero (21.5)
 
 ## Devuelve a un jugador el progreso guardado (armas, objetos, nivel y atributos).
 static func restore(q: Player, d: Dictionary) -> void:
@@ -83,6 +84,7 @@ static func restore(q: Player, d: Dictionary) -> void:
 	q.progress.signs.clear()                          # Signos Mayores (16.9)
 	if d.get("signs") is Array:
 		for s: Variant in d.signs: q.progress.signs.append(StringName(String(s)))
+	q.progress.pet_trick = String(d.get("trick", ""))     # (21.5)
 	q.attrs = (d.attrs as Dictionary).duplicate()
 	q.attrs_level1 = (d.attrs_level1 as Dictionary).duplicate()
 	for w in q.weapons.weapons.duplicate(): q.weapons.remove_weapon(w.data.id)

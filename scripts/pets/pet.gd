@@ -10,6 +10,15 @@ var owner_player: Player
 var world: CombatWorld
 var game: Node                               ## la partida (dólares, director); puede faltar en tests
 var behavior: PetBehavior
+## Truco aprendido (hito 21.5, PetTricks): {} sin él. Lo elige su jugador al nivel PetTricks.level()
+## y va en su progreso (`PlayerProgress.pet_trick`); aquí se aprende al verlo (también en red).
+var trick := {}
+var _trick := ""
+var _base_data: PetData
+var _trick_t := 0.0
+var _trick_hits := 0
+var _in_twin := false
+var _hit_frame := -1
 var hits := 0                                ## ataques o balas comidas (tests)
 var found_money := 0                         ## dólares encontrados (rata)
 var facing := Vector3.FORWARD
@@ -73,7 +82,9 @@ const LEASH := 8.0                           ## más lejos del jugador que esto,
 
 func setup(p_data: PetData, p_owner: Player, p_world: CombatWorld, p_game: Node = null) -> Pet:
 	data = p_data
+	_base_data = p_data
 	owner_player = p_owner
+	if p_owner.progress != null: p_owner.progress.pet_id = String(p_data.id)   # trucos (21.5)
 	world = p_world
 	game = p_game
 	name = "Pet_%s" % data.id
@@ -155,6 +166,114 @@ func strike(e: Node3D, dmg := -1.0) -> void:
 	e.take_damage(d)
 	if data.stun > 0.0 and e.is_alive() and e.has_method("stun"): e.stun(data.stun)
 	hits += 1
+	on_hit(e)
+
+# ---------------------------------------------------------------- trucos (hito 21.5)
+
+## Aprende el truco `id` (o lo olvida con ""): sus datos son una copia con los `mods`.
+func learn(id: String) -> void:
+	_trick = id
+	trick = PetTricks.find(String(_base_data.id), id) if id != "" else {}
+	data = _base_data
+	_trick_hits = 0
+	_trick_t = float(trick.get("cada", 0.0))
+	if trick.is_empty(): return
+	data = _base_data.duplicate()
+	PetTricks.apply_mods(data, trick.get("mods", {}))
+	if is_inside_tree():
+		popup("¡%s!" % String(trick.get("nombre", "")), Color(1.0, 0.86, 0.5))
+		if world != null: VoxelFx.puff(world.fx, global_position, "rise", 0.5, Color(1.0, 0.86, 0.5), 1.0)
+
+## Tras cada golpe del compañero (Pet.strike y los mordiscos de PetHunt): lo que añade su truco.
+func on_hit(e: Node3D) -> void:
+	if trick.is_empty() or e == null or not is_instance_valid(e): return
+	var f := Engine.get_physics_frames()             # un zarpazo a varios cuenta como un golpe
+	var first := f != _hit_frame
+	_hit_frame = f
+	if first: _trick_hits += 1
+	match String(trick.get("efecto", "")):
+		"twin":                                     # da también al más cercano
+			if _in_twin or not first or world == null: return
+			var best: Node3D = null
+			var bd := float(trick.get("radio", 2.5))
+			for o in world.enemies_in_circle(e.global_position, bd):
+				if o == e or not o.is_alive(): continue
+				var dd := o.global_position.distance_to(e.global_position)
+				if dd < bd:
+					bd = dd
+					best = o
+			if best != null:
+				_in_twin = true
+				strike(best)
+				_in_twin = false
+		"sleep":                                    # cada pocos golpes, se duerme
+			if not first or _trick_hits % maxi(int(trick.get("cada", 3)), 1) != 0 or not e.is_alive(): return
+			var t := float(trick.get("tiempo", 2.0))
+			if e.has_method("stun"): e.stun(t)
+			if e.has_method("dream"): e.dream(t)
+			_float_text(e.global_position + Vector3(0, 1.4, 0), "Zzz", Color(0.8, 0.85, 1.0))
+		"gold":
+			if not first or randf() >= float(trick.get("prob", 0.3)): return
+			var n := int(trick.get("dolares", 3))
+			if game != null and game.has_method("earn"): game.earn(n)
+			found_money += n
+			popup("+%d $" % n, Color(1.0, 0.85, 0.35))
+		"vulnerable":
+			if e.is_alive() and e.has_method("make_vulnerable"): e.make_vulnerable(float(trick.get("tiempo", 3.0)))
+		"slow":
+			if e.is_alive() and e.has_method("slow"): e.slow(float(trick.get("tiempo", 3.0)), float(trick.get("factor", 0.5)))
+		"heal":
+			if first and not owner_player.remote and owner_player.health > 0.0:
+				owner_player.health = minf(owner_player.data.max_health, owner_player.health + owner_player.data.max_health * float(trick.get("parte", 0.01)))
+
+## Lo que hace el truco cada poco: el aullido, la cordura y la vida.
+func _trick_step(delta: float) -> void:
+	if trick.is_empty(): return
+	var q := owner_player
+	match String(trick.get("efecto", "")):
+		"sanity":
+			if not q.remote and q.health > 0.0: q.sanity = minf(q.data.max_sanity, q.sanity + float(trick.get("por_s", 0.5)) * delta)
+		"regen":
+			if not q.remote and q.health > 0.0: q.health = minf(q.data.max_health, q.health + q.data.max_health * float(trick.get("por_s", 0.004)) * delta)
+		"howl":
+			_trick_t -= delta
+			if _trick_t > 0.0 or world == null: return
+			var r := float(trick.get("radio", 4.5))
+			var near := world.enemies_in_circle(q.global_position, r)
+			if near.is_empty():
+				_trick_t = 0.5                           # vuelve a mirar dentro de poco
+				return
+			_trick_t = float(trick.get("cada", 7.0))
+			act()
+			popup("¡Auuu!", Color(0.85, 0.9, 1.0))
+			Auto.sfx_at("howl", global_position)
+			var wave := Shockwave.new().setup(q, world, r, 0.35, 0.0, 3.0, 0.0, {})
+			wave.color = Color(0.75, 0.85, 1.0, 0.7)
+			world.fx.add_child(wave)
+			for e in near:
+				if e.is_alive() and e.has_method("confuse"): e.confuse(float(trick.get("tiempo", 2.5)))
+
+## Lo que cambia su empuje con el truco (1 sin él): para los que no empujan con `data.knockback`.
+func knock_k() -> float:
+	return data.knockback / maxf(_base_data.knockback, 0.01) if _base_data != null else 1.0
+
+func _float_text(at: Vector3, text: String, color: Color) -> void:
+	if world == null: return
+	var l := Label3D.new()
+	l.text = text
+	l.modulate = color
+	l.outline_modulate = Color(0, 0, 0, 0.8)
+	l.font_size = 40
+	l.outline_size = 10
+	l.pixel_size = 0.006
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.no_depth_test = true
+	world.fx.add_child(l)
+	l.global_position = at
+	var tw := l.create_tween()
+	tw.tween_property(l, "position:y", l.position.y + 0.7, 1.4)
+	tw.parallel().tween_property(l, "modulate:a", 0.0, 1.4).set_delay(0.6)
+	tw.tween_callback(l.queue_free)
 
 ## Aparece de golpe en otro sitio (araña de Tíndalos, dhole).
 func teleport(pos: Vector3) -> void:
@@ -183,6 +302,8 @@ func popup(text: String, color: Color) -> void:
 func _physics_process(delta: float) -> void:
 	if owner_player != null: Damage.ctx = StringName("J%d:mascota" % (owner_player.index + 1))
 	if not is_instance_valid(owner_player): return
+	if owner_player.progress != null and owner_player.progress.pet_trick != _trick: learn(owner_player.progress.pet_trick)
+	_trick_step(delta)
 	cooldown -= delta
 	target = null
 	var home := owner_player.global_position

@@ -9,12 +9,15 @@ signal leveled_up(new_level: int)
 class Option:
 	## EVOLUTION (hito 16.8): una de las dos ramas de un arma al abrir el baúl; `weapon` es la
 	## evolución y `from`, el arma que lleva. SIGN (hito 16.9): un Signo Mayor (`sign`, de Signs).
-	enum Kind { NEW_WEAPON, WEAPON_LEVEL, PASSIVE, EVOLUTION, SIGN }
+	## TRICK (hito 21.5): uno de los dos trucos de su compañero (`trick`, de PetTricks).
+	enum Kind { NEW_WEAPON, WEAPON_LEVEL, PASSIVE, EVOLUTION, SIGN, TRICK }
 	var kind: Kind
 	var weapon: WeaponData
 	var upgrade: UpgradeData
 	var from: WeaponData
 	var sign := {}
+	var trick := {}
+	var icon: Texture2D                ## icono propio de la carta (el compañero, en los trucos)
 	var to_level := 1
 	## Aviso de evolución en la carta (hito 16.15): "" si no completa ni prepara ninguna.
 	var evo_hint := ""
@@ -24,11 +27,13 @@ class Option:
 			Kind.NEW_WEAPON, Kind.EVOLUTION: return weapon.display_name
 			Kind.WEAPON_LEVEL: return "%s  %d" % [weapon.display_name, to_level]
 			Kind.SIGN: return String(sign.get("name", ""))
+			Kind.TRICK: return String(trick.get("nombre", ""))
 		return "%s  %d" % [upgrade.display_name, to_level]
 	func text() -> String:
 		match kind:
 			Kind.NEW_WEAPON, Kind.EVOLUTION: return weapon.description if weapon.description != "" else "Arma nueva"
 			Kind.SIGN: return String(sign.get("text", ""))
+			Kind.TRICK: return String(trick.get("texto", ""))
 			Kind.WEAPON_LEVEL: return weapon.level_text[to_level - 2] if to_level - 2 < weapon.level_text.size() else "Mejora"
 		return upgrade.description
 
@@ -51,6 +56,9 @@ var evolving: Array[StringName] = []
 var signs: Array[StringName] = []
 var signs_pending := 0
 var sign_save: SaveData
+## Compañero (hito 21.5): su id (lo pone Pet.setup) y el truco que ha aprendido ("" aún ninguno).
+var pet_id := ""
+var pet_trick := ""
 ## Cooperativo: la experiencia es común (D-07). Referencia débil: el equipo ya guarda a sus
 ## miembros y, con dos fuertes, ninguno de los dos se liberaba nunca (ni al reiniciar).
 var team: TeamXp:
@@ -165,14 +173,28 @@ func roll_options(weapons: WeaponSystem, rng: RandomNumberGenerator, n: int = -1
 func next_options(weapons: WeaponSystem, rng: RandomNumberGenerator, n: int = -1) -> Array[Option]:
 	var evo := evolution_options(weapons)
 	if not evo.is_empty(): return evo
+	var tr := trick_options()
+	if not tr.is_empty(): return tr
 	var sg := sign_options(rng)
 	return sg if not sg.is_empty() else roll_options(weapons, rng, n)
 
 ## ¿Tiene algo que elegir que no sea una subida? (Rama de evolución o Signo Mayor.)
 func has_special(weapons: WeaponSystem) -> bool:
 	if not evolution_options(weapons).is_empty(): return true
+	if not trick_options().is_empty(): return true
 	if signs_pending > 0 and Signs.roll(sign_save, signs, RandomNumberGenerator.new()).is_empty(): signs_pending = 0
 	return signs_pending > 0
+
+## Los dos trucos de su compañero (hito 21.5), si ya tiene el nivel y aún no ha aprendido ninguno.
+func trick_options() -> Array[Option]:
+	var out: Array[Option] = []
+	if pet_id == "" or pet_trick != "" or level < PetTricks.level(): return out
+	for t: Dictionary in PetTricks.for_pet(pet_id):
+		var o := Option.new()
+		o.kind = Option.Kind.TRICK
+		o.trick = t
+		out.append(o)
+	return out
 
 ## Signos Mayores que se le ofrecen (hito 16.9): hasta tres de los abiertos que no lleva. Sin
 ## ninguno abierto, no queda nada por elegir.
@@ -238,6 +260,7 @@ const OWNED_WEIGHT := 8.0
 static func key_of(o: Option) -> String:
 	if o.kind == Option.Kind.EVOLUTION: return "e:" + String(o.weapon.id)
 	if o.kind == Option.Kind.SIGN: return "s:" + String(o.sign.get("id", ""))
+	if o.kind == Option.Kind.TRICK: return "t:" + String(o.trick.get("id", ""))
 	return ("u:" + String(o.upgrade.id)) if o.kind == Option.Kind.PASSIVE else ("w:" + String(o.weapon.id))
 
 ## La opción que corresponde a una clave de `key_of` con lo que lleva ahora el jugador (en red,
@@ -247,6 +270,10 @@ func option_for(key: String, weapons: WeaponSystem) -> Option:
 	if key.begins_with("e:"):                      # rama de la evolución pendiente (hito 16.8)
 		for e in evolution_options(weapons):
 			if e.weapon.id == id: return e
+		return null
+	if key.begins_with("t:"):                      # truco del compañero (21.5)
+		for t in trick_options():
+			if String(t.trick.get("id", "")) == String(id): return t
 		return null
 	if key.begins_with("s:"):                      # Signo Mayor (16.9): lo ha elegido en su PC, con sus logros
 		var sg := Signs.find(String(id))
@@ -298,6 +325,10 @@ func choose(o: Option, p: Player) -> void:
 		var w := p.weapons.get_weapon(o.from.id)
 		if w != null: p.weapons.evolve(w, o.weapon.id)
 		evolving.erase(o.from.id)
+		return
+	if o.kind == Option.Kind.TRICK:                # tampoco: lo aprende su compañero (hito 21.5)
+		pet_trick = String(o.trick.get("id", ""))
+		if p != null and p.pet != null and is_instance_valid(p.pet): p.pet.learn(pet_trick)
 		return
 	if o.kind == Option.Kind.SIGN:                 # tampoco (hito 16.9)
 		var id := StringName(String(o.sign.get("id", "")))

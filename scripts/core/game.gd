@@ -275,6 +275,7 @@ func _ready() -> void:
 			player = q
 			break
 	if args.has("pet"): _spawn_pet(args.get_str("pet"), player)   # probar un compañero
+	if args.has("trick") and player.progress != null: player.progress.pet_trick = args.get_str("trick")   # pruebas: con su truco (21.5)
 	if args.has("pets"):                            # pets=gato,perro: uno por jugador, en orden (hito 12.9)
 		var ids := args.get_str("pets").split(",")
 		for i in mini(ids.size(), players.size()): _spawn_pet(ids[i], players[i])
@@ -652,7 +653,9 @@ func _ready() -> void:
 			get_tree().create_timer(pa[1] if pa.size() > 1 else 3.0, true).timeout.connect(toggle_pause))
 	if args.has("levelup_at"):                     # pruebas: el J1 sube un nivel a los t s (la ventana de subida)
 		get_tree().create_timer(args.get_float("levelup_at"), false).timeout.connect(func() -> void:
-			if player != null and player.progress != null: player.progress.add_xp(player.progress.xp_missing() + 0.01))
+			if player == null or player.progress == null: return
+			if args.has("levelup_to"): player.progress.level = maxi(args.get_int("levelup_to") - 1, 1)   # p. ej. 5: el truco del compañero (21.5)
+			player.progress.add_xp(player.progress.xp_missing() + 0.01))
 	if args.has("autopause_at"):                   # pruebas: como perder el foco a los t s (hito 16.23)
 		get_tree().create_timer(args.get_float("autopause_at"), false).timeout.connect(_auto_pause.bind("prueba"))
 	if not Devices.joy_disconnected.is_connected(_on_pad_lost): Devices.joy_disconnected.connect(_on_pad_lost)
@@ -923,7 +926,8 @@ func _open_level_up() -> void:
 		_open_level_up.call_deferred()
 		return
 	var evo := options[0].kind == PlayerProgress.Option.Kind.EVOLUTION
-	var sign := options[0].kind == PlayerProgress.Option.Kind.SIGN
+	var sign := options[0].kind in [PlayerProgress.Option.Kind.SIGN, PlayerProgress.Option.Kind.TRICK]   # (los trucos, 21.5, igual)
+	var trick := options[0].kind == PlayerProgress.Option.Kind.TRICK
 	var coop := players.size() > 1
 	if args.get_bool("autopick") or _is_bot(q):
 		var pick: PlayerProgress.Option = options[0] if not _is_bot(q) else options[q.up_rng.randi() % options.size()]
@@ -943,13 +947,14 @@ func _open_level_up() -> void:
 	var title := "Nivel %d" % (q.progress.level - q.progress.pending + 1)
 	if evo: title = "Evolución · %s" % options[0].from.display_name
 	if sign: title = "Signo Mayor"
+	if trick: title = "Truco · %s" % (q.pet.data.display_name if q.pet != null else "compañero")
 	if net_game != null: title = "Turno de J%d · %s (%s) · %s" % [q.index + 1, q.data.display_name, _pc_name(_peer_of(q)), title]
 	elif coop: title = "Turno de J%d · %s · %s" % [q.index + 1, q.data.display_name, title]
 	var attr := "" if q.progress.attr_gains.is_empty() or evo or sign else String(q.progress.attr_gains[0])  # D-27: lo enseña el rodillo
 	if net_game != null:                          # en red, la partida se para en todos los PC
 		var h := {"k": "lvup", "peer": _peer_of(q), "i": q.index, "title": title, "attr": attr}
 		if evo: h["evo"] = String(options[0].from.id)
-		if sign: h["sign"] = true
+		if sign and not trick: h["sign"] = true
 		net_game.halt_all(h)
 		if q.remote: return                        # elige en su PC (llega con net_picked)
 	# la misma ventana en solitario y en cooperativo, centrada (antes, Menus.LevelUpMenu: fila de
@@ -969,8 +974,11 @@ func _open_level_up() -> void:
 ## La ventana de subida de un jugador (CoopLevelUp centrada, con su color en cooperativo).
 func _level_up_window(q: Player, options: Array[PlayerProgress.Option], title: String, attr: String, pick: Callable) -> CoopLevelUp:
 	var entry := {"player": q, "options": options, "title": title, "attr": attr}
-	if not options.is_empty() and options[0].kind in [PlayerProgress.Option.Kind.EVOLUTION, PlayerProgress.Option.Kind.SIGN]:
-		entry["evolution"] = true                    # ramas o signos: sin rodillos ni descartes (16.8, 16.9)
+	if not options.is_empty() and options[0].kind in [PlayerProgress.Option.Kind.EVOLUTION, PlayerProgress.Option.Kind.SIGN, PlayerProgress.Option.Kind.TRICK]:
+		entry["evolution"] = true                    # ramas, signos o trucos: sin rodillos ni descartes (16.8, 16.9, 21.5)
+	for o in options:                                # los trucos llevan el retrato del compañero (21.5)
+		if o.kind == PlayerProgress.Option.Kind.TRICK and o.icon == null and q.pet != null and q.pet.data.model != "":
+			o.icon = _pet_icon(q.pet.data.model)
 	if players.size() > 1:
 		entry["accent"] = q.color
 		entry["speed"] = LEVEL_UP_COOP_SPEED            # más pausas que en solitario: rodillos más cortos
@@ -978,6 +986,21 @@ func _level_up_window(q: Player, options: Array[PlayerProgress.Option], title: S
 	var after := args.get_float("pick_after", -1.0)   # pruebas: elige sola la opción marcada a los N s
 	if after >= 0.0: menu.auto_pick_after = after
 	return menu
+
+## Retrato de un compañero para las cartas de sus trucos (21.5): uno por modelo, en un nodo que
+## sigue con la partida en pausa (la ventana la para antes de abrirse).
+var _pet_icons := {}
+func _pet_icon(model: String) -> Texture2D:
+	if not _pet_icons.has(model):
+		var host := Node.new()
+		host.name = "PetIcon_%s" % model
+		host.process_mode = Node.PROCESS_MODE_ALWAYS
+		add_child(host)
+		_pet_icons[model] = ModelIcon.make(host, model, "full", 128, 0.0)
+		if args.get_bool("icon_dump"):               # pruebas: guarda el retrato
+			var tx: Texture2D = _pet_icons[model]
+			get_tree().create_timer(0.8, true, false, true).timeout.connect(func() -> void: tx.get_image().save_png("user://icono_%s.png" % model))
+	return _pet_icons[model]
 
 static func _pick_text(q: Player, o: PlayerProgress.Option) -> String:
 	return "J%d · %s: %s" % [q.index + 1, q.data.display_name, o.title()]
@@ -989,6 +1012,10 @@ func _choose_option(q: Player, o: PlayerProgress.Option) -> String:
 		if args.get_bool("log"): print("SIGNO %s" % o.sign.get("id", ""))
 		var st := "%s: %s" % [o.title(), o.text()]
 		return "J%d · %s" % [q.index + 1, st] if players.size() > 1 else st
+	if o.kind == PlayerProgress.Option.Kind.TRICK:   # (21.5)
+		if args.get_bool("log"): print("TRUCO %s %s" % [q.progress.pet_id, o.trick.get("id", "")])
+		var tt := "%s aprende %s: %s" % [q.pet.data.display_name if q.pet != null else "Tu compañero", o.title(), o.text()]
+		return "J%d · %s" % [q.index + 1, tt] if players.size() > 1 else tt
 	if o.kind != PlayerProgress.Option.Kind.EVOLUTION: return _pick_text(q, o)
 	if args.get_bool("log"): print("EVOLUCION %s" % o.weapon.id)
 	var text := "¡Evolución! %s → %s" % [o.from.display_name, o.weapon.display_name]

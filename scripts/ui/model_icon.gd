@@ -51,7 +51,27 @@ static func make(host: Node, model_name: String, mode: String = "full", px: int 
 	if not worn.is_empty(): OutfitData.apply(m, model_name, worn)
 	OutfitData.pose_hold(m, hold, 1.0)
 	_stage(vp, m, mode, fixed)
+	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	vp.add_child(_Settle.new(vp))
 	return vp.get_texture()
+
+## Dibuja la vista unos fotogramas y luego la para (13-11-2026). Con UPDATE_ONCE, un material que
+## aún no se había dibujado en una vista así compila su pipeline en segundo plano y ese primer y
+## único fotograma salía vacío: en partida, el gato, la cabra y el dhole (los trucos, 21.5).
+class _Settle extends Node:
+	const SETTLE_MS := 400
+	var vp: SubViewport
+	var _until := 0
+	func _init(p_vp: SubViewport) -> void:
+		vp = p_vp
+		name = "Settle"
+		process_mode = Node.PROCESS_MODE_ALWAYS
+	func _ready() -> void:
+		_until = Time.get_ticks_msec() + SETTLE_MS
+	func _process(_delta: float) -> void:
+		if Time.get_ticks_msec() < _until: return
+		vp.render_target_update_mode = SubViewport.UPDATE_ONCE   # uno más, ya compilado, y se queda
+		queue_free()
 
 ## Modelo vivo (hito 15.4, bestiario): como `make` con "full", pero se dibuja en cada fotograma,
 ## gira despacio y hace su animación de reposo (o de andar). Devuelve el SubViewport (su textura

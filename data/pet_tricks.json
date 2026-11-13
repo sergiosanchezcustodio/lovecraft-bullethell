@@ -1,0 +1,70 @@
+{
+	"_doc": "Trucos de los compañeros (hito 21.5, PetTricks). Cuando su jugador llega al nivel 'nivel', el compañero elige entre sus dos trucos (dos cartas en la ventana de la subida, como las ramas de las armas; no gasta la subida). 'mods' cambia sus datos (PetData): 'campo*' multiplica y 'campo+' suma. 'efecto': twin (cada golpe da también al enemigo más cercano a 'radio' m), sleep (cada 'cada' golpes, duerme 'tiempo' s al que golpea), howl (cada 'cada' s, si hay enemigos a 'radio' m de su jugador, los empuja y los confunde 'tiempo' s), sanity (devuelve 'por_s' de cordura por segundo a su jugador), regen (cura 'por_s' de la vida máxima por segundo), gold (con 'prob', roba 'dolares' al golpear), vulnerable (los que golpea, vulnerables 'tiempo' s), slow (más lentos 'tiempo' s, a 'factor') y heal (cada golpe cura 'parte' de la vida máxima).",
+	"nivel": 5,
+	"trucos": {
+		"perro": [
+			{"id": "arrastre", "nombre": "Arrastre", "texto": "Agarra a su presa y la arrastra lejos de ti", "mods": {"knockback*": 4.0}},
+			{"id": "aullido", "nombre": "Aullido", "texto": "Cada 7 s aúlla: los enemigos de alrededor huyen confundidos", "efecto": "howl", "cada": 7.0, "radio": 4.5, "tiempo": 2.5}
+		],
+		"gato": [
+			{"id": "dos_zarpas", "nombre": "Dos zarpas", "texto": "Cada zarpazo araña también al enemigo más cercano", "efecto": "twin", "radio": 2.5},
+			{"id": "ronroneo", "nombre": "Ronroneo", "texto": "Cada tres zarpazos, duerme 3 s al que araña", "efecto": "sleep", "cada": 3, "tiempo": 3.0}
+		],
+		"sapo": [
+			{"id": "baba_corrosiva", "nombre": "Baba corrosiva", "texto": "Sus charcos hacen un 50 % más de daño", "mods": {"attack_damage*": 1.5, "attack_per_level*": 1.5}},
+			{"id": "buen_escupidor", "nombre": "Buen escupidor", "texto": "Escupe casi el doble de a menudo, y más lejos", "mods": {"attack_every*": 0.55, "attack_range*": 1.3}}
+		],
+		"buho": [
+			{"id": "sabiduria", "nombre": "Sabiduría", "texto": "Te da un 50 % más de experiencia de la que daba", "mods": {"bonus*": 1.5, "bonus_per_level*": 1.5, "bonus_max*": 1.5}},
+			{"id": "vigilia", "nombre": "Vigilia", "texto": "Vela tu sueño: te devuelve 0,5 de cordura por segundo", "efecto": "sanity", "por_s": 0.5}
+		],
+		"rata": [
+			{"id": "botin", "nombre": "Botín", "texto": "Encuentra un 60 % más de dólares", "mods": {"attack_damage*": 1.6, "attack_per_level*": 1.6}},
+			{"id": "olfato", "nombre": "Olfato", "texto": "Escarba el doble de a menudo", "mods": {"attack_every*": 0.5}}
+		],
+		"shoggoth": [
+			{"id": "gloton", "nombre": "Glotón", "texto": "Se traga el doble de balas", "mods": {"bonus*": 2.0, "bonus_per_level*": 2.0, "bonus_max*": 2.0}},
+			{"id": "calor", "nombre": "Calor de shoggoth", "texto": "Pegado a ti, te cura el 0,4 % de la vida por segundo", "efecto": "regen", "por_s": 0.004}
+		],
+		"byakhee": [
+			{"id": "picado_doble", "nombre": "Picado doble", "texto": "Cada picado golpea también al enemigo más cercano", "efecto": "twin", "radio": 3.0},
+			{"id": "alarido", "nombre": "Alarido", "texto": "Su picado aturde 1 s a los que golpea", "mods": {"stun+": 1.0}}
+		],
+		"cuervo": [
+			{"id": "urraca", "nombre": "Urraca", "texto": "A veces roba unos dólares al que pica", "efecto": "gold", "prob": 0.3, "dolares": 3},
+			{"id": "picotazo", "nombre": "Picotazo", "texto": "Los que pica reciben un 25 % más de daño durante 3 s", "efecto": "vulnerable", "tiempo": 3.0}
+		],
+		"polilla": [
+			{"id": "polvo_denso", "nombre": "Polvo denso", "texto": "Su polvo cubre un 40 % más", "mods": {"radius*": 1.4}},
+			{"id": "polvo_largo", "nombre": "Polvo de Leng", "texto": "La confusión dura un 70 % más", "mods": {"effect_time*": 1.7}}
+		],
+		"gaviota": [
+			{"id": "pescado", "nombre": "Pescado fresco", "texto": "Su pescado cura un 40 % más", "mods": {"bonus*": 1.4, "bonus_per_level*": 1.4, "bonus_max*": 1.4}},
+			{"id": "ida_vuelta", "nombre": "Ida y vuelta", "texto": "Trae pescado más a menudo", "mods": {"attack_every*": 0.65}}
+		],
+		"migo": [
+			{"id": "cadena", "nombre": "Rayo en cadena", "texto": "Su rayo salta también al enemigo más cercano", "efecto": "twin", "radio": 3.0},
+			{"id": "descarga", "nombre": "Descarga", "texto": "Su rayo aturde 0,6 s", "mods": {"stun+": 0.6}}
+		],
+		"tindalos": [
+			{"id": "angulos", "nombre": "Ángulos agudos", "texto": "Salta de un enemigo a otro más deprisa", "mods": {"attack_every*": 0.65}},
+			{"id": "mordisco_tiempo", "nombre": "Mordisco del tiempo", "texto": "Los que muerde van a la mitad durante 3 s", "efecto": "slow", "tiempo": 3.0, "factor": 0.5}
+		],
+		"yig": [
+			{"id": "veneno_lento", "nombre": "Veneno lento", "texto": "El veneno dura un 80 % más", "mods": {"effect_time*": 1.8}},
+			{"id": "mirada", "nombre": "Mirada fija", "texto": "Cada tres mordiscos, deja quieto 2 s al que mira", "efecto": "sleep", "cada": 3, "tiempo": 2.0}
+		],
+		"cabra": [
+			{"id": "cornada", "nombre": "Cornada", "texto": "Embiste más fuerte: empuja el doble y aturde", "mods": {"knockback*": 2.0, "stun+": 0.6}},
+			{"id": "leche", "nombre": "Leche de cabra", "texto": "Cada embestida te cura el 1 % de la vida", "efecto": "heal", "parte": 0.01}
+		],
+		"pez": [
+			{"id": "resbaladizo", "nombre": "Resbaladizo", "texto": "Toma carrerilla más a menudo", "mods": {"attack_every*": 0.65}},
+			{"id": "escamas", "nombre": "Escamas afiladas", "texto": "Los que embiste reciben un 25 % más de daño durante 3 s", "efecto": "vulnerable", "tiempo": 3.0}
+		],
+		"dhole": [
+			{"id": "tuneles", "nombre": "Túneles anchos", "texto": "Sale con más fuerza: golpea en un 40 % más de área", "mods": {"radius*": 1.4}},
+			{"id": "temblor", "nombre": "Temblor", "texto": "Los que golpea se quedan aturdidos 0,8 s", "mods": {"stun+": 0.8}}
+		]
+	}
+}

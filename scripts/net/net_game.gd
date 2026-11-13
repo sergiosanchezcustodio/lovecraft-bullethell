@@ -864,6 +864,7 @@ static func apply_progress(q: Player, d: Dictionary) -> bool:
 	if d.get("signs") is Array:                      # Signos Mayores (16.9)
 		q.progress.signs.clear()
 		for s: Variant in d.signs: q.progress.signs.append(StringName(String(s)))
+	if d.has("trick"): q.progress.pet_trick = String(d.trick)   # el truco del compañero (21.5)
 	if d.get("attrs") is Dictionary: q.attrs = (d.attrs as Dictionary).duplicate()
 	if d.get("attrs_level1") is Dictionary: q.attrs_level1 = (d.attrs_level1 as Dictionary).duplicate()
 	if d.get("weapons") is Array:
