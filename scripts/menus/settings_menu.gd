@@ -115,6 +115,7 @@ func _video() -> void:
 		pattern.queue_redraw())
 	_list.add_child(pattern)
 	_note("Ajusta hasta que el ojo de la izquierda apenas se vea y el de la derecha se vea bien.")
+	_reset_tab("video", "el vídeo", 0)
 
 func _audio() -> void:
 	for pair in [["Volumen general", "vol_master"], ["Música", "vol_music"], ["Efectos", "vol_sfx"],
@@ -131,6 +132,7 @@ func _audio() -> void:
 	_toggle("Avisos de lo que llega de fuera de la pantalla", Settings.get_value("offscreen_cues"), func(on: bool) -> void:
 		Settings.set_value("offscreen_cues", on))
 	_note("Las élites y los ataques fuertes que no se ven suenan por su lado y se marcan en el borde.")
+	_reset_tab("audio", "el audio", 1)
 
 func _controls() -> void:
 	_header("Teclado")
@@ -204,6 +206,7 @@ func _game() -> void:
 	_toggle("Mostrar FPS", Settings.get_value("show_fps"), func(on: bool) -> void:
 		Settings.set_value("show_fps", on)
 		Settings.apply_video())
+	_reset_tab("game", "lo de esta pestaña (juego y accesibilidad)", 3)
 	_action("Restablecer toda la configuración", func() -> void:
 		var c := MenuKit.Confirm.new("¿Restablecer toda la configuración (vídeo, audio, controles y juego)?", "Restablecer")
 		add_child(c)
@@ -319,6 +322,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		queue_free()
 
 # ---------------------------------------------------------------- filas
+
+## «Restablecer esta pestaña» (hito 20.15): solo sus valores (`Settings.GROUPS`), con confirmación.
+func _reset_tab(group: String, what: String, tab: int) -> void:
+	_action("Restablecer esta pestaña", func() -> void:
+		var c := MenuKit.Confirm.new("¿Volver a dejar %s como de fábrica?" % what, "Restablecer")
+		add_child(c)
+		c.answered.connect(func(yes: bool) -> void:
+			if yes: Settings.reset_group(group)
+			_show_tab(tab)))
 
 func _header(text: String) -> void:
 	if _list.get_child_count() > 0:

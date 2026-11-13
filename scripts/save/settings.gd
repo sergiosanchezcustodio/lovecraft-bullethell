@@ -112,6 +112,22 @@ func reset_all() -> void:
 	save_file()
 	apply_all()
 
+## Lo que guarda cada pestaña de la configuración (hito 20.15: restablecer solo esa pestaña). Los
+## controles van aparte (`reset_controls`); la nube no tiene valores aquí.
+const GROUPS := {
+	"video": ["fullscreen", "resolution", "vsync", "fps_limit", "quality", "weapon_fx", "scale_3d", "brightness"],
+	"audio": ["vol_master", "vol_music", "vol_sfx", "vol_weapons", "vol_ambient", "music_layers", "offscreen_cues"],
+	"game": ["distortion", "hallucinations", "weather", "madness", "tips", "ui_scale", "bullet_palette", "flashes",
+		"shake", "damage_numbers", "game_speed", "auto_pause", "intro", "vibration", "show_fps"],
+}
+
+## Vuelve a los de fábrica solo los valores de `group` (una clave de GROUPS) y los aplica.
+func reset_group(group: String) -> void:
+	for k: String in GROUPS.get(group, []):
+		values[k] = defaults[k] if not (defaults[k] is Dictionary or defaults[k] is Array) else defaults[k].duplicate(true)
+	save_file()
+	apply_all()
+
 const UI_SCALES := [0.85, 1.0, 1.15, 1.3]
 
 func apply_all() -> void:

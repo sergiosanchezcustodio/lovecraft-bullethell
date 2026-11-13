@@ -2727,3 +2727,8 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Qué:** en la portada, unas 46 motas doradas suben despacio y se mecen en la luz de la vela del escritorio (`TitleScreen._make_candle_dust`, `CANDLE_DUST_AT`): nacen y mueren con un fundido, con mezcla aditiva (donde no hay luz no se ven). Se suman a la ceniza gris que cae por toda la sala. La tienda ya tenía su polvo en la luz del quinqué (2.13d), que ahora se mueve con el paralaje (20.8). `off=polvo` las quita.
 - **Captura:** `title off=titulo,aviso,niebla_titulo shots=6 tag=_polvo` → `shots/titulo__polvo_006.0s.png`.
 
+### 20.15: restablecer solo una pestaña (13-11-2026)
+
+- **Qué:** Vídeo, Audio y Juego terminan con «Restablecer esta pestaña» (con confirmación): vuelven a los de fábrica solo sus valores (`Settings.GROUPS` y `Settings.reset_group`) y se aplican. Controles ya tenía el suyo («Restablecer los controles de fábrica») y Juego sigue con «Restablecer toda la configuración».
+- **Tests:** `test_settings.gd`: restablecer el audio no toca el vídeo ni el juego; toda clave de fábrica está en una pestaña (salvo controles, intro vista y dificultad), para que una opción nueva no se quede fuera.
+

@@ -45,3 +45,26 @@ func test_restablecer_los_controles() -> void:
 	settings.set_key(InputBindings.DODGE, KEY_J)
 	settings.reset_controls()
 	assert_eq(settings.key_for(InputBindings.DODGE), KEY_SPACE)
+
+## Hito 20.15: restablecer una pestaña deja las demás como estaban.
+func test_restablecer_una_pestana() -> void:
+	settings.set_value("vol_music", 0.2)
+	settings.set_value("quality", 0)
+	settings.set_value("shake", 0.25)
+	settings.reset_group("audio")
+	assert_almost_eq(float(settings.get_value("vol_music")), float(settings.defaults["vol_music"]), 0.001, "el audio, de fábrica")
+	assert_eq(int(settings.get_value("quality")), 0, "el vídeo, como estaba")
+	assert_almost_eq(float(settings.get_value("shake")), 0.25, 0.001, "el juego, como estaba")
+	settings.reset_group("video")
+	assert_eq(int(settings.get_value("quality")), int(settings.defaults["quality"]))
+
+## Toda clave de fábrica está en una pestaña (o es de los controles, la intro o la dificultad).
+func test_cada_clave_tiene_su_pestana() -> void:
+	var grouped := {}
+	for g: String in settings.GROUPS:
+		for k: String in settings.GROUPS[g]:
+			assert_true(settings.defaults.has(k), "%s existe" % k)
+			grouped[k] = true
+	for k: String in settings.defaults:
+		if k in ["keys", "joy", "controls_rev", "controls_base", "intro_seen", "dif_levels"]: continue
+		assert_true(grouped.has(k), "%s está en alguna pestaña" % k)
