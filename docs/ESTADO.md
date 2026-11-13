@@ -2698,3 +2698,8 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 
 - **Qué:** moverse por los botones (`ui_move`) suena a una pluma que rasguea el papel (`quill_0..2.wav`: dos trazos cortos de ruido agudo con el salto de la punta en las fibras) y confirmar (`ui_accept`) a un sello que cae sobre la mesa (`stamp_0..1.wav`: golpe sordo de madera, papel aplastado y un eco corto). Sustituyen a los clics de Kenney (`ui_move_*.ogg`, `ui_accept_0.ogg`, que siguen en la carpeta). Volver (`ui_back`) y abrir una ventana (la página, `menu_open`) no cambian. Sintetizados en `tools/gen_sfx.py` (`--menus`); en `data/sfx.json`, `ui_move` a −18 dB con tono 0,94-1,08 y `ui_accept` a −8 dB con 0,96-1,04 (sonoridad media parecida a los de antes, medida con `ffmpeg volumedetect`). Sin oírlos aún: pendiente de la revisión del autor.
 
+### 20.7: personajes y compañeros vivos en la tienda (13-11-2026)
+
+- **Qué:** en la tienda, el personaje o el compañero marcado deja la imagen fija: su modelo hace su reposo en bucle; los retratos (personajes, `icon_mode` "head") miran despacio a un lado y a otro (±0,32 rad, 7 s la vuelta) y los compañeros enteros giran como en el bestiario. Uno solo a la vez (`ShopMenu._go_live`/`_stop_live`); al quitarle el foco vuelve la imagen de siempre. `ModelIcon.make_live(…, mode)` admite ahora "head" (`Spin.sway`). El vestuario y los potenciadores, como antes.
+- **Captura:** `title saves=demo_saves open=menu_tienda tab=1 shots=10,12.5 tag=_viva` (el retrato de Legrasse cambia de una a otra).
+

@@ -204,6 +204,9 @@ func _row(e: Shop.Entry) -> Button:
 	pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.add_child(pic)                                          # comprado: lo dice la etiqueta, la imagen no se atenúa
+	if e.icon == null and e.icon_model != "" and e.outfit == null:   # personajes y compañeros: vivos al marcarlos (20.7)
+		b.focus_entered.connect(func() -> void: _go_live(pic, e))
+		b.focus_exited.connect(func() -> void: _stop_live(pic, e))
 	h.add_theme_constant_override("separation", 14)
 	var col := VBoxContainer.new()
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -335,6 +338,27 @@ func _try_buy_set(s: Dictionary) -> void:
 			Saves.save()
 			_say("Comprado: %s." % String(s.name))
 		_show_tab(_tab))
+
+## El artículo marcado, vivo (hito 20.7): su modelo respira con su reposo y mira a los lados (un
+## retrato) o da la vuelta despacio (un compañero entero). Uno solo a la vez; al salir, la imagen fija.
+var _live: SubViewport
+var _live_pic: TextureRect
+func _go_live(pic: TextureRect, e: Shop.Entry) -> void:
+	_drop_live()
+	_live = ModelIcon.make_live(e.icon_model, 160, 0.0, e.icon_mode)
+	add_child(_live)
+	_live_pic = pic
+	pic.texture = _live.get_texture()
+
+func _stop_live(pic: TextureRect, e: Shop.Entry) -> void:
+	if pic != _live_pic: return
+	_drop_live()
+	if is_instance_valid(pic): pic.texture = _icon(e)
+
+func _drop_live() -> void:
+	if _live != null and is_instance_valid(_live): _live.queue_free()
+	_live = null
+	_live_pic = null
 
 ## Imagen de un artículo: la dibujada o, si no hay, su modelo renderizado (una vez).
 var _icons := {}

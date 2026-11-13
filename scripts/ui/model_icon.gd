@@ -55,8 +55,9 @@ static func make(host: Node, model_name: String, mode: String = "full", px: int 
 
 ## Modelo vivo (hito 15.4, bestiario): como `make` con "full", pero se dibuja en cada fotograma,
 ## gira despacio y hace su animación de reposo (o de andar). Devuelve el SubViewport (su textura
-## es la imagen); hay que colgarlo de algo que se libere con la página.
-static func make_live(model_name: String, px: int = 128, fixed := 0.0) -> SubViewport:
+## es la imagen); hay que colgarlo de algo que se libere con la página. Con `mode` "head" (el
+## retrato de la tienda, hito 20.7) no da la vuelta: respira con su reposo y mira a un lado y a otro.
+static func make_live(model_name: String, px: int = 128, fixed := 0.0, mode := "full") -> SubViewport:
 	var vp := SubViewport.new()
 	vp.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	vp.size = Vector2i(px, px)
@@ -68,8 +69,9 @@ static func make_live(model_name: String, px: int = 128, fixed := 0.0) -> SubVie
 	turn.name = "Turn"
 	vp.add_child(turn)
 	turn.add_child(m)
-	_stage(vp, m, "full", fixed)
+	_stage(vp, m, mode, fixed)
 	var spin := Spin.new()
+	spin.sway = mode == "head"
 	spin.model_name = model_name
 	spin.model = m
 	spin.turn = turn
@@ -79,6 +81,9 @@ static func make_live(model_name: String, px: int = 128, fixed := 0.0) -> SubVie
 ## Gira el modelo y le pone su animación de reposo (o de andar, si no tiene).
 class Spin extends Node:
 	const SPEED := 0.6                             ## rad/s
+	const SWAY := 0.32                             ## rad a cada lado, con `sway`
+	const SWAY_PERIOD := 7.0                       ## s de un lado al otro y vuelta
+	var sway := false
 	var model_name := ""
 	var model: Node3D
 	var turn: Node3D
@@ -86,9 +91,12 @@ class Spin extends Node:
 	var _anim := ""
 	func _ready() -> void:
 		_anim = "idle" if Anims.has_anim(model_name, "idle") else ("walk" if Anims.has_anim(model_name, "walk") else "")
-		turn.rotation.y = -0.6
+		turn.rotation.y = 0.0 if sway else -0.6
+	var _clock := 0.0
 	func _process(delta: float) -> void:
-		turn.rotation.y += SPEED * delta
+		_clock += delta
+		if sway: turn.rotation.y = SWAY * sin(TAU * _clock / SWAY_PERIOD)
+		else: turn.rotation.y += SPEED * delta
 		if _anim == "": return
 		_t = fposmod(_t + delta / Anims.duration(model_name, _anim), 1.0)
 		Anims.pose(model_name, _anim, model, _t)
