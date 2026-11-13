@@ -27,7 +27,7 @@ var defaults := {
 	"fullscreen": true, "resolution": 2, "vsync": true, "fps_limit": 0, "scale_3d": 1.0,
 	"brightness": 3,                        ## índice en BRIGHTNESS
 	"vol_master": 1.0, "vol_music": 0.8, "vol_sfx": 0.9, "vol_weapons": 0.7, "vol_ambient": 0.8,
-	"distortion": 1.0, "vibration": 1.0, "show_fps": false,
+	"distortion": 1.0, "vibration": 1.0, "show_fps": 0,   ## show_fps: 0 no, 1 FPS, 2 detallado (hito 20.16; antes, sí/no)
 	"weather": 2,                           ## clima: 0 apagado, 1 reducido, 2 completo
 	"ui_scale": 1,                          ## accesibilidad (hito 8.3): tamaño de la interfaz (UI_SCALES)
 	"bullet_palette": 0,                    ## 0 normal, 1 alto contraste (daltonismo)
@@ -312,7 +312,7 @@ static func key_name(k: int) -> String:
 # ---------------------------------------------------------------- juego
 
 func _update_fps_label() -> void:
-	var on: bool = get_value("show_fps")
+	var on := fps_mode() > 0
 	if on and _fps_label == null:
 		var layer := CanvasLayer.new()
 		layer.layer = 100
@@ -324,5 +324,38 @@ func _update_fps_label() -> void:
 		layer.add_child(_fps_label)
 	if _fps_label: _fps_label.visible = on
 
+## 0 sin contador, 1 FPS, 2 detallado (el «Sí» de antes es 1).
+func fps_mode() -> int:
+	return clampi(int(get_value("show_fps")), 0, 2)
+
+## Rendimiento detallado (hito 20.16): FPS, media y 1 % peor de los últimos `PERF_FRAMES`
+## fotogramas, medidos con el reloj real (el `delta` de `_process` va con la velocidad del juego).
+const PERF_FRAMES := 300
+var _frame_us := PackedInt64Array()
+var _last_us := 0
+var _perf_left := 0.0
+
 func _process(_delta: float) -> void:
-	if _fps_label and _fps_label.visible: _fps_label.text = "%d FPS" % Engine.get_frames_per_second()
+	if not (_fps_label and _fps_label.visible): return
+	var now := Time.get_ticks_usec()
+	if _last_us > 0: _frame_us.append(now - _last_us)
+	_last_us = now
+	if _frame_us.size() > PERF_FRAMES: _frame_us = _frame_us.slice(_frame_us.size() - PERF_FRAMES)
+	if fps_mode() == 1:
+		_fps_label.text = "%d FPS" % Engine.get_frames_per_second()
+		return
+	_perf_left -= _delta / maxf(Engine.time_scale, 0.01)
+	if _perf_left > 0.0: return
+	_perf_left = 0.25                                  # cuatro veces por segundo, para que se lea
+	_fps_label.text = perf_text(_frame_us, Engine.get_frames_per_second())
+
+## «60 FPS · media 16,7 ms · 1 % peor 18,2 ms» de unos tiempos de fotograma en µs.
+static func perf_text(frames_us: PackedInt64Array, fps: float) -> String:
+	if frames_us.is_empty(): return "%d FPS" % fps
+	var sorted := frames_us.duplicate()
+	sorted.sort()
+	var total := 0
+	for f in sorted: total += f
+	var mean := total / 1000.0 / sorted.size()
+	var worst := sorted[mini(int(sorted.size() * 0.99), sorted.size() - 1)] / 1000.0   # como `perf=` (Game._perf_report)
+	return ("%d FPS  ·  media %.1f ms  ·  1 %% peor %.1f ms" % [fps, mean, worst]).replace(".", ",")

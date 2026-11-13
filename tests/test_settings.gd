@@ -68,3 +68,15 @@ func test_cada_clave_tiene_su_pestana() -> void:
 	for k: String in settings.defaults:
 		if k in ["keys", "joy", "controls_rev", "controls_base", "intro_seen", "dif_levels"]: continue
 		assert_true(grouped.has(k), "%s está en alguna pestaña" % k)
+
+## Hito 20.16: el contador detallado y el «Sí» de antes.
+func test_rendimiento_detallado() -> void:
+	var f := PackedInt64Array()
+	for i in 99: f.append(16000)
+	f.append(40000)
+	var t: String = settings.perf_text(f, 60)
+	assert_string_contains(t, "60 FPS")
+	assert_string_contains(t, "media 16,2 ms")
+	assert_string_contains(t, "1 % peor 40,0 ms")
+	settings.set_value("show_fps", true)
+	assert_eq(settings.fps_mode(), 1, "el «Sí» de antes es el contador de siempre")

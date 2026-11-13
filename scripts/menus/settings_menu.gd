@@ -203,9 +203,11 @@ func _game() -> void:
 		Settings.set_value("vibration", Rumble.LEVELS[i])
 		if i > 0 and Devices.last_device >= 0: Input.start_joy_vibration(Devices.last_device, 0.3 * Rumble.LEVELS[i], 0.5 * Rumble.LEVELS[i], 0.2))   # para notarla (16.30)
 	_note("Al recibir golpes, con las explosiones cercanas, los jefes, las subidas de nivel y las crisis de cordura.")
-	_toggle("Mostrar FPS", Settings.get_value("show_fps"), func(on: bool) -> void:
-		Settings.set_value("show_fps", on)
+	var fpsm: Array[String] = ["No", "FPS", "Detallado"]
+	_choice("Mostrar FPS", fpsm, Settings.fps_mode(), func(i: int) -> void:
+		Settings.set_value("show_fps", i)
 		Settings.apply_video())
+	_note("Detallado: también lo que tarda cada fotograma, de media y en el 1 % peor (los tirones), de los últimos 300.")
 	_reset_tab("game", "lo de esta pestaña (juego y accesibilidad)", 3)
 	_action("Restablecer toda la configuración", func() -> void:
 		var c := MenuKit.Confirm.new("¿Restablecer toda la configuración (vídeo, audio, controles y juego)?", "Restablecer")

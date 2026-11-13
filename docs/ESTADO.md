@@ -2732,3 +2732,9 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Qué:** Vídeo, Audio y Juego terminan con «Restablecer esta pestaña» (con confirmación): vuelven a los de fábrica solo sus valores (`Settings.GROUPS` y `Settings.reset_group`) y se aplican. Controles ya tenía el suyo («Restablecer los controles de fábrica») y Juego sigue con «Restablecer toda la configuración».
 - **Tests:** `test_settings.gd`: restablecer el audio no toca el vídeo ni el juego; toda clave de fábrica está en una pestaña (salvo controles, intro vista y dificultad), para que una opción nueva no se quede fuera.
 
+### 20.16: rendimiento detallado (13-11-2026)
+
+- **Qué:** «Mostrar FPS» (Juego) pasa de sí/no a No, FPS y Detallado. Detallado, abajo a la izquierda: «60 FPS · media 16,7 ms · 1 % peor 18,2 ms» de los últimos 300 fotogramas (`Settings.PERF_FRAMES`), cuatro veces por segundo, medidos con el reloj real (el `delta` va con la velocidad del juego) y con el mismo 1 % peor que `perf=` (`Settings.perf_text`). `show_fps` es ahora 0, 1 o 2; el `true` guardado de antes vale 1 (`Settings.fps_mode`), sin cambiar la versión de la configuración.
+- **Captura:** `level=p1_n2 bot=smart god=true cfg_show_fps=2 shots=6 tag=_perfdet` (en la ventana oculta de las pruebas, a 30 fps y con los tirones de la carga).
+- **Tests:** `test_settings.gd` (el texto y el «Sí» de antes).
+
