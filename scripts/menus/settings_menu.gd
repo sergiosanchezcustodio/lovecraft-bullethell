@@ -70,6 +70,10 @@ func _show_tab(i: int) -> void:
 		2: _controls()
 		3: _game()
 		4: _cloud()
+	var row := LaunchArgs.from_cmdline().get_int("focus_row", -1)      # capturas: focus_row=N elige la fila N
+	if row >= 0:
+		var rows := _list.get_children().filter(func(c: Node) -> bool: return c is OptionRow)
+		if row < rows.size(): _first = rows[row]
 	if _first: _first.grab_focus.call_deferred()
 
 # ---------------------------------------------------------------- pestañas
@@ -95,13 +99,17 @@ func _video() -> void:
 	_choice("Límite de FPS", fps, OptionRow.idx(Settings.FPS_LIMITS, int(Settings.get_value("fps_limit")), 0), func(i: int) -> void:
 		Settings.set_value("fps_limit", Settings.FPS_LIMITS[i])
 		Settings.apply_video())
+	var preview := VideoPreview.new()              # (hito 20.12), encima: al bajar a la calidad, se ve
+	_list.add_child(preview)
 	_choice("Calidad gráfica", Quality.names(), int(Settings.get_value("quality")), func(i: int) -> void:
 		Settings.set_value("quality", i)
-		Settings.apply_video())
+		Settings.apply_video()
+		preview.refresh())
 	_note("Suavizado, sombras, oclusión ambiental (Ultra), niebla de los faroles, enemigos que se desmoronan y manchas. Lo de la partida cambia al empezar el siguiente nivel.")
 	var wfx: Array[String] = ["Mínimos", "Rebajados", "Enteros", "Automático"]
 	_choice("Efectos de las armas", wfx, int(Settings.get_value("weapon_fx")), func(i: int) -> void:
-		Settings.set_value("weapon_fx", i))
+		Settings.set_value("weapon_fx", i)
+		preview.refresh())
 	_note("Estelas, chispas, casquillos y acentos de las evoluciones. «Automático»: enteros con uno o dos jugadores y mínimos con tres o cuatro, para leer mejor la pantalla y que vaya más fluido. Nunca pasan de lo que permite la calidad gráfica.")
 	_action("Ajustes para Steam Deck y portátiles", func() -> void:
 		Settings.apply_handheld()
@@ -116,7 +124,8 @@ func _video() -> void:
 	var pattern := BrightnessPattern.new()
 	_choice("Brillo", steps, int(Settings.get_value("brightness")), func(i: int) -> void:
 		Settings.set_value("brightness", i)
-		pattern.queue_redraw())
+		pattern.queue_redraw()
+		preview.refresh())
 	_list.add_child(pattern)
 	_note("Ajusta hasta que el ojo de la izquierda apenas se vea y el de la derecha se vea bien.")
 	_reset_tab("video", "el vídeo", 0)
@@ -161,8 +170,11 @@ func _game() -> void:
 		Settings.set_value("hallucinations", on))
 	_note("Por debajo del 30 % de cordura ves criaturas y gemas que no están y tu panel miente un momento. No hacen daño.")
 	var wx: Array[String] = ["Apagado", "Reducido", "Completo"]
+	var wpre := VideoPreview.new("weather")         # (hito 20.12), encima de su fila
+	_list.add_child(wpre)
 	_choice("Clima (nieve, lluvia, niebla…)", wx, int(Settings.get_value("weather")), func(i: int) -> void:
-		Settings.set_value("weather", i))
+		Settings.set_value("weather", i)
+		wpre.refresh())
 	# La dificultad está en la pausa, del 1 al 10 por características, mientras el autor la calibra (D-42)
 	_toggle("Locura acumulada (cada crisis baja la cordura máxima)", Settings.get_value("madness"), func(on: bool) -> void:
 		Settings.set_value("madness", on))

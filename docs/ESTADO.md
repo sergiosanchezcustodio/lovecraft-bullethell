@@ -2750,3 +2750,11 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Captura:** `title saves=demo_saves open=menu_config tab=0 shots=10 tag=_perfil`.
 - **Tests:** `test_settings.gd` (cada perfil recuerda lo suyo, el audio no va en el perfil, se guarda; el botón de la Deck no pierde el de sobremesa).
 
+### 20.12: vista previa en Vídeo (13-11-2026)
+
+- **Qué:** encima de «Calidad gráfica» (pestaña Vídeo), una miniatura de la partida (`VideoPreview`, `scripts/ui/video_preview.gd`) que cambia al tocar la calidad, los efectos de las armas y el brillo; y encima de «Clima» (pestaña Juego), otra que cambia con el clima. Va encima de su fila porque la lista solo se desplaza hasta enseñar la fila elegida: debajo no se veía al cambiarla. Pie: «Vista previa · Alta · efectos enteros».
+- **Cómo:** son capturas de verdad (`resources/vista_previa/`, 11 jpg de 480×270, 592 KB), una por combinación que se distingue: la calidad pone tope a los efectos (Baja, mínimos; Media, rebajados), así que son 9 (`vp_q<calidad>_w<efectos>`), más el clima apagado y reducido con la calidad Alta (`vp_clima0`, `vp_clima1`; el completo es `vp_q2_w2`). `VideoPreview.effective_fx` elige como `Quality.value("weapon_fx")` con un jugador («Automático» = enteros). El brillo se aplica encima con la misma curva que la partida y el patrón (`video_preview.gdshader`). Al cambiar, un fundido de 0,18 s.
+- **Las miniaturas:** `python tools/gen_vista_previa.py` (11 capturas de ~30 s): el muelle de la plaza de Innsmouth (p2_n2) con cuatro investigadores, `seed=500`, `bot=idle` (el J1 quieto y los otros lo siguen: con `bot=smart` cada captura salía en otro sitio de la plaza), `hud=false`, a los 20 s. Se ven el halo del farol desde Media y su reflejo en el agua desde Alta; la lluvia de ese nivel es ligera y entre clima reducido y completo hay poca diferencia.
+- **Capturas:** `title saves=demo_saves open=menu_config tab=0 focus_row=5 shots=10 tag=_vista` y `tab=3 focus_row=2 cfg_weather=1 tag=_vistaclima`. `focus_row=N` (nuevo): la configuración abre con la fila N elegida.
+- **Tests:** `tests/test_video_preview.gd` (el tope de los efectos por calidad, que hay miniatura para cada combinación y que cambia con la calidad y el brillo).
+
