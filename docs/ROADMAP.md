@@ -35,6 +35,8 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 17 | Animación y vida de los escenarios | **Hecha** (05-11-2026), pendiente de tu revisión: los 20 hitos de los cinco bloques (investigadores, compañeros, enemigos, objetos del escenario y escenarios), sin empeorar apreciablemente el rendimiento | Ninguna |
 | 18 | Efectos de las armas | **Hecha** (07-11-2026; retoques el 10-11-2026), pendiente de tu revisión: los 14 hitos de los cinco bloques, estilo voxel con degradados; calidad `weapon_fx` | Ninguna (D-50, resuelta) |
 | 19 | Rendimiento, accesibilidad de los efectos y distribución | **En curso** (10-11-2026): bloque A (rendimiento tras las fases 17 y 18); B y C propuestos | Ninguna |
+| 20 | Menús, transiciones, configuración y personajes nuevos | **Hecha** (13-11-2026), pendiente de tu revisión: los 22 hitos (el 20.9, en parte: los libros y los objetos de los jefes de la portada necesitan arte nuevo) | Ninguna |
+| 21 | Sonido y victorias de la fase 20, jugabilidad, contenido nuevo, gráficos y menús | **Propuesta** (13-11-2026), sin aprobar: elige bloques o hitos | D-51 (vínculos), D-52 (qué contenido nuevo) |
 
 ---
 
@@ -692,3 +694,66 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | 20.20 | **Crawford Tillinghast** (*Desde el más allá*): el resonador muestra lo oculto y le hace más daño; usarlo mucho baja la cordura del grupo | Hecho (13-11-2026): la Máquina del más allá (entrega `BEYOND`) revela (`Enemy.reveal`: más daño, saca al excavador y al sonámbulo) y se calienta (quita más cordura al grupo cercano), esquive `mas_alla` que revela, `valvula_maquina` (`reveal_add`), rasgo `range_mult` y dos ramas. Ver `docs/ESTADO.md` |
 | 20.21 | **Edward Derby y Asenath Waite** (*El ser en el umbral*): dos cuerpos que se cambian en cada esquive, uno de cuerpo a cuerpo y otro arcano | Hecho (13-11-2026): un personaje con dos modelos (`alt_model`), esquive `umbral` que cambia de cuerpo (`Player.swap_form`, también en red), El umbral (entrega `THRESHOLD`: tajo de Edward o miradas de Asenath), `aldaba_derby` (`fresh_mult`), rasgo `swap_restore` y dos ramas. Ver `docs/ESTADO.md` |
 | 20.22 | **Kuranes** (*Celephaïs*): zonas de sueño donde los enemigos van más lentos | Hecho (13-11-2026): `DreamZone` (entrega `DREAM`): los de dentro van cada vez más despacio, sus balas se frenan y los investigadores recuperan cordura; esquive `sueno` que deja un sueño, `adormidera` (`slow_add`), rasgo `sanity_regen` y dos ramas (se duermen; el sueño va con él). Ver `docs/ESTADO.md` |
+
+## Fase 21: propuesta (13-11-2026)
+
+**Propuesta el 13-11-2026**, al cerrar la fase 20, a petición del autor («plan de fase 21»). **Sin aprobar:** elige bloques enteros o hitos sueltos. Nada se empieza hasta que lo apruebes. Orden recomendado: A (corto, remata la fase 20), luego B y, del contenido, C o D (no los dos a la vez: D es más corto).
+
+**Criterio de aceptación de la fase** (para lo que se elija):
+- Todo comprobado en captura y con el bot sin errores, y nada empeora el rendimiento apreciablemente en Alta.
+- Lo jugable va por datos (`data/…json` o `.tres`) y con tests.
+- El arte nuevo de humanos, a bloques limpios (regla de los humanos); el pintado, con ComfyUI en local. Replicate, solo con tu permiso y el coste.
+
+### Bloque A: sonido y victorias de los personajes de la fase 20
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 21.1 | **Sonido propio de las armas de la fase 20**, como el de Kuranes. Ahora usan los de siempre (página, cántico, golpe). **Pickman:** el pincel y el lienzo que se rasga. **Ward:** las sales que chisporrotean y la fórmula susurrada. **Gilman:** un zumbido que se quiebra al doblar cada ángulo. **Tillinghast:** la máquina, que sube de tono al calentarse. **Derby:** al cambiar de cuerpo, la llamada a la puerta (tres golpes y luego dos) | Propuesto |
+| 21.2 | **Pose de victoria propia para los cinco.** **Pickman** se aparta para mirar el cuadro. **Ward** alza el frasco. **Gilman** traza un ángulo en el aire. **Tillinghast** ajusta la máquina. **Derby y Asenath**, una distinta según el cuerpo | Propuesto |
+
+### Bloque B: jugabilidad
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 21.3 | **Vínculos entre investigadores** en cooperativo (D-51: cuáles y cuánto dan). Dos que se conocen en los relatos, jugando juntos, tienen una frase al empezar, un gesto compartido al subir de nivel y una pequeña ventaja mientras están cerca. Por ejemplo:<br>- **Carter y Kuranes**, soñadores: los sueños de Kuranes también curan a Carter.<br>- **Carter y Pickman**, que en las Tierras del Sueño es un necrófago: el necrófago de los lienzos dura más.<br>- **Legrasse y Johansen**, los dos vieron el culto de Cthulhu: más daño a los cultistas.<br>- **West y Whipple**, médicos: curan algo más al levantar a un caído.<br>Por datos (`data/bonds.json`). En la selección se ve el vínculo cuando los dos están elegidos | Propuesto |
+| 21.4 | **Sucesos de la noche:** una o dos veces por nivel, con aviso y 30 s de duración, algo cambia las reglas. Por datos (`data/night_events.json`), uno por arena como mínimo. Por ejemplo:<br>- **Luna de sangre:** más élites y doble de oro.<br>- **Niebla espesa:** se ve menos y das más experiencia.<br>- **Marea:** el agua sube en Innsmouth.<br>- **Lluvia de estrellas:** caen gemas.<br>- **Silencio:** 10 s sin enemigos y luego llega una horda | Propuesto |
+| 21.5 | **Compañeros que crecen:** suben de nivel con su dueño y, al 5, eligen entre dos trucos, como las ramas de las armas. Por ejemplo, el gato de Ulthar araña a dos a la vez o duerme a uno; el perro de Lake arrastra a un enemigo o aúlla y espanta a los de alrededor | Propuesto |
+| 21.6 | **Combinaciones con tus propias armas, y combinaciones nuevas.** Las combinaciones del 13.7 (fuego sobre ácido, rayo por una zona arcana…) solo saltan entre jugadores distintos: que salten también entre las armas de un mismo jugador, como en solitario. Además, unas seis nuevas con las entregas de la fase 20. Por ejemplo:<br>- **Pesadilla:** el rayo sobre un sueño de Kuranes despierta a los dormidos con el doble de daño.<br>- **Las sales sobre un lienzo de Pickman:** el necrófago sale de ceniza azul y dura más.<br>- **Un ángulo de Gilman que cruza una zona arcana** se abre en esquirlas.<br>Con su rótulo la primera vez y su fila en la tabla de daño | Propuesto |
+| 21.7 | **Revelaciones:** quien sale de una crisis de locura (cordura a cero) elige entre dos revelaciones, poderes raros que duran lo que queda del nivel, como «ves a través de las paredes» o «tus balas atraviesan a los ocultos». Vuelve la caída de la cordura algo que también se busca, con su riesgo. Por datos, con su sonido y su gesto | Propuesto |
+
+### Bloque C: Las Tierras del Sueño (una parte 4; D-52, frente al bloque D)
+
+*La búsqueda onírica de la desconocida Kadath*. Encaja con Carter, Kuranes y el gato de Ulthar, que ya están en el juego. Es el bloque más largo, del tamaño de las fases 4, 6 o 7.
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 21.8 | **Diseño en el GDD:** niveles, criaturas, jefe, relatos y frases de Carter y Kuranes en esta parte. Se aprueba antes de hacer nada | Propuesto |
+| 21.9 | **Arenas:** Ulthar y el bosque encantado; el puerto de Dylath-Leen y la galera negra; la meseta de Leng; el mundo inferior de los gugs; Kadath en el yermo frío | Propuesto |
+| 21.10 | **Criaturas:**<br>- Zoogs: pequeños y en enjambre.<br>- Bestias lunares y hombres de Leng.<br>- Gugs: enormes y lentos.<br>- Ghasts: saltan y odian la luz del farol.<br>- Descarnados nocturnos: te agarran y te llevan por el aire | Propuesto |
+| 21.11 | **Jefe:** Nyarlathotep, el Caos reptante, que cambia de forma a lo largo del combate (el faraón negro, el ser sin rostro) | Propuesto |
+| 21.12 | **Lo que la rodea:** relatos, mapa, Biblioteca, bestiario, trofeos y desafíos de la parte | Propuesto |
+
+### Bloque D: noches sueltas (D-52, frente al bloque C)
+
+Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con su arena, dos criaturas, un jefe y su relato.
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 21.13 | ***El color que cayó del cielo*:** la granja de los Gardner. El color se extiende por el suelo y lo que toca se vuelve gris y quebradizo, también los enemigos. Jefe: el color que sube del pozo | Propuesto |
+| 21.14 | ***El horror de Dunwich*:** Sentinel Hill. El hermano de Wilbur es invisible: solo se ven sus huellas, y el polvo de Armitage lo descubre. Los chotacabras se llevan a los caídos | Propuesto |
+| 21.15 | ***La sombra fuera del tiempo*:** la ciudad de los Yith. Los pólipos voladores son invisibles y se anuncian con silbidos y viento | Propuesto |
+
+### Bloque E: gráficos
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 21.16 | **Retratos pintados de los investigadores** (ComfyUI en local), con el estilo de la portada, para la selección y la tienda. El modelo voxel sigue en la partida | Propuesto |
+| 21.17 | **Final ilustrado de cada parte:** al vencer al jefe, una ilustración con el cierre del relato antes de la pantalla de victoria | Propuesto |
+| 21.18 | **El mapa de niveles, más vivo:** el camino se dibuja con tinta al abrirse un nivel y cada nivel superado deja su sello de lacre | Propuesto |
+
+### Bloque F: menús
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 21.19 | **Manual del investigador** en la Biblioteca: páginas con animaciones cortas para quien empieza (cordura y crisis, evoluciones, esquives, élites, objetivos). Complementa el primer nivel guiado y los consejos en la partida (13.3) | Propuesto |
+| 21.20 | **Estadísticas de la cuenta** en una página de la Biblioteca, con gráficas en tinta: junta lo que ya se apunta en sitios distintos (tiempo jugado de cada hueco, bajas por criatura del bestiario, récords, archivo de expediciones) y lo que no (daño y bajas por arma de todas las partidas, investigador favorito, minutos en crisis) | Propuesto |
