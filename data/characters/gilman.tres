@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/angulo.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"gilman"
+display_name = "Walter Gilman"
+victory = "win_salute"
+model = "gilman"
+role = "Estudiante de matemáticas de Miskatonic"
+passive_text = "Entre los ángulos: las balas le alcanzan menos (su blanco es un 30 % más pequeño)."
+story = "Los sueños en la casa de la bruja"
+price = 8000
+order = 18
+max_health = 90.0
+max_sanity = 100.0
+move_speed = 4.7
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"angulos_imposibles"])
+hurt_radius = 0.175
+attr_bonus = {"INT": 9, "CUL": 6, "DES": 5}
+in_shop = true

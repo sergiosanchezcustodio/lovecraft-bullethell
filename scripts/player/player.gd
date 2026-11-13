@@ -71,7 +71,7 @@ const ITEM_STATS: Array[String] = ["proj_count_add", "range_mult", "proj_speed_m
 	"chest_mult", "pickup_heal_mult", "pet_mult", "hit_iframes", "arcane_cost_mult", "thorns", "nodens_level",
 	"ankh", "dodge_charges", "decoy_time", "dodge_blast", "dodge_fury", "rerolls", "kill_blast", "hit_slow",
 	"hit_burn", "low_hp_bonus", "idol_mult", "arcane_cooldown_mult", "calm_aura",   # (estos dos, 16.25)
-	"ally_mult", "ally_dmg_mult"]                                                                     # (20.17)
+	"ally_mult", "ally_dmg_mult", "proj_size_mult"]                                                                     # (20.17)
 ## Objetos con mecánica (hito 8.7)
 const LOW_HP := 0.3              ## por debajo de esta parte de la vida cuenta el Diente de shoggoth
 const FURY_TIME := 2.0           ## s de daño extra tras esquivar (Elixir de Curwen)
@@ -328,9 +328,11 @@ func _physics_process_step(delta: float) -> void:
 	push = Vector3.ZERO
 	if ss.is_kind(&"huida"): velocity *= rules.flee_speed
 	elif ss.is_kind(&"vagar"): velocity *= rules.wander_speed
-	move_and_slide()
+	var phasing := motor.is_dodging() and data.dodge_style != null and data.dodge_style.phase
+	if phasing: _phase_move(delta)                    # Gilman (20.19): el ángulo atraviesa el decorado
+	else: move_and_slide()
 	position.y = 0.0
-	if world != null and world.obstacles != null and world.obstacles.has_mask():   # límites y decorado dibujados
+	if not phasing and world != null and world.obstacles != null and world.obstacles.has_mask():   # límites y decorado dibujados
 		var p2 := world.obstacles.push_out(Vector2(position.x, position.z), data.hurt_radius + 0.05)
 		position.x = p2.x; position.z = p2.y
 	if leash.is_valid(): global_position = leash.call(global_position)
@@ -617,6 +619,7 @@ func _process_step(delta: float) -> void:
 	_ripple_step()
 	var style := data.dodge_style
 	_snow.emitting = _action != "" and (style == null or style.snow_spray)
+	if style != null and style.phase: visual.scale = Vector3.ONE        # el plegado (20.19) la cambia abajo
 	# Destello: el modelo desaparece en su tramo y deja una estela de imágenes fantasma
 	if _action != "" and style != null:
 		var u := _action_t / Anims.duration(data.model, _action)
@@ -625,6 +628,13 @@ func _process_step(delta: float) -> void:
 		if style.frames and not _frame_out and u >= style.hidden_to and world != null:   # y el cuadro por el que sale
 			_frame_out = true
 			world.fx.add_child(PictureFrame.new().setup(global_position))
+		if style.phase:                                                   # se pliega de lado y se despliega
+			var fold := sin(PI * clampf(u / 0.85, 0.0, 1.0))
+			visual.rotation.z += fold * 1.25
+			visual.scale = Vector3(1.0 - 0.8 * fold, 1.0 + 0.12 * fold, 1.0)
+			if not _frame_out and u >= 0.85 and world != null:
+				_frame_out = true
+				VoxelFx.puff(world.fx, global_position, "fold", 0.5, Color.WHITE, 1.0)
 		if style.dust and not _frame_out and u >= style.hidden_to - 0.12 and world != null:   # y se recompone
 			_frame_out = true
 			VoxelFx.puff(world.fx, global_position, "salts_rise", 0.45, Color.WHITE, 1.0)
@@ -632,7 +642,8 @@ func _process_step(delta: float) -> void:
 			_ghost_t -= delta
 			if _ghost_t <= 0.0 and world != null:
 				_ghost_t = 0.05
-				world.fx.add_child(Afterimage.new().setup(model, color.lerp(Color(0.85, 0.95, 1.0), 0.6), 0.28))
+				var tint := Color(0.7, 0.45, 1.0) if style.phase else color.lerp(Color(0.85, 0.95, 1.0), 0.6)
+				world.fx.add_child(Afterimage.new().setup(model, tint, 0.28))
 
 ## Inclinación (hito 11.1): hacia donde acelera, atrás al frenar (con un pequeño rebote: un
 ## muelle poco amortiguado) y hacia dentro en las curvas. La aceleración sale de la posición
@@ -1469,11 +1480,24 @@ func _item_hit(e: Node3D, dmg: float, item: String) -> void:
 	e.take_damage(d)
 	Damage.ctx = prev
 
+## Esquive por un ángulo (Gilman, hito 20.19): sin chocar con el decorado ni con los cuerpos
+## físicos, solo dentro de los límites de la arena. Al acabar, el push_out de siempre lo saca de
+## lo que tenga encima.
+func _phase_move(delta: float) -> void:
+	position += Vector3(velocity.x, 0.0, velocity.z) * delta
+	var b := world.obstacles.bounds if world != null and world.obstacles != null else Rect2(-40, -40, 80, 80)
+	b = b.grow(-data.collision_radius)
+	position.x = clampf(position.x, b.position.x, b.end.x)
+	position.z = clampf(position.z, b.position.y, b.end.y)
+
 ## Al empezar un esquive: señuelo, petardos y furia.
 func _on_dodge() -> void:
 	var from := global_position - motor.dodge_dir * 0.3
 	if data.dodge_style != null and data.dodge_style.frames and world != null:   # el cuadro por el que entra (20.17)
 		world.fx.add_child(PictureFrame.new().setup(global_position))
+		_frame_out = false
+	if data.dodge_style != null and data.dodge_style.phase and world != null:  # se pliega en un ángulo (20.19)
+		VoxelFx.puff(world.fx, global_position, "fold", 0.5, Color.WHITE, 1.0)
 		_frame_out = false
 	if data.dodge_style != null and data.dodge_style.dust and world != null:   # se deshace en sales (20.18)
 		VoxelFx.puff(world.fx, global_position, "salts_fall", 0.45, Color.WHITE, 1.2)

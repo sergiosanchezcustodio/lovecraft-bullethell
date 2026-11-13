@@ -40,6 +40,8 @@ static func with_items(d: WeaponData, n: String, v: float, c: CharacterData) -> 
 		"crit_chance": v += c.crit_chance
 		"crit_mult": v = (v if v > 1.0 else BASE_CRIT) + c.crit_bonus
 		"knockback": v *= c.knockback_mult
+		"projectile_radius", "projectile_size":
+			if d.delivery == D.BULLET: v *= c.proj_size_mult      # Estatuilla de la balaustrada (20.19)
 	return v
 
 var player: Player
@@ -51,6 +53,7 @@ var _rings := {}                             ## Weapon -> OrbitRing (páginas de
 var _drones := {}                            ## Weapon -> MiGoDrones (orbes Mi-Go)
 var _tethers := {}                           ## Weapon -> TetherBeam activo (Lente del Éter)
 var _traps := {}                             ## Weapon -> cepos puestos (Cepos)
+var _angle_side := 1.0                       ## a qué lado sale el siguiente ángulo de Gilman
 
 func setup(p_player: Player, p_world: CombatWorld) -> WeaponSystem:
 	player = p_player
@@ -269,6 +272,10 @@ func inherited_speed(dir: Vector3) -> float:
 	return clampf(Vector3(v.x, 0, v.z).dot(d), 0.0, player.data.move_speed)
 
 func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
+	var turn := w.stat("angle_turn")
+	if turn > 0.0:                                     # Gilman (20.19): salen a 45° y doblan la esquina
+		_angle_side = -_angle_side
+		dir = dir.rotated(Vector3.UP, PI * 0.25 * _angle_side)
 	var speed := w.stat("projectile_speed") + inherited_speed(dir)
 	var life := w.stat("range") / speed * 1.15                        # mismo alcance: solo sale más rápido
 	if _bonus_set < 0 and not player.data.bonus_tags.is_empty():
@@ -296,6 +303,7 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 		effect_val = player.rules.paranoia_mental
 	if w.data.bullet_look != "": style = BulletManager.LOOK_STYLE.get(w.data.bullet_look, style)
 	if w.stat("homing") > 0.0: style = BulletManager.Style.WISP
+	if turn > 0.0: style = BulletManager.Style.ANGLE
 	if w.stat("stasis") > 0.0:
 		style = BulletManager.Style.YITH
 		effect = BulletManager.Effect.STASIS
@@ -312,7 +320,7 @@ func _spawn_bullet(w: Weapon, dir: Vector3, dmg_k: float = 1.0) -> void:
 	world.bullets.spawn(BulletManager.Team.PLAYER, style,
 		player.global_position + dir * 0.4, dir * speed, w.stat("projectile_radius"),
 		size, Damage.new(dmg(w, false) * dmg_k, 0.0), life, pierce,
-		w.stat("knockback"), _bonus_set, int(w.stat("split_count")), w.stat("homing"), effect, effect_val, player.index)
+		w.stat("knockback"), _bonus_set, int(w.stat("split_count")), -turn if turn > 0.0 else w.stat("homing"), effect, effect_val, player.index)
 
 ## ¿En crisis de paranoia? (solo en cooperativo: en solitario no sale.)
 func paranoid() -> bool:

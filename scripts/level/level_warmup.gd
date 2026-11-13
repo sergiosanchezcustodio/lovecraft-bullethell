@@ -103,6 +103,7 @@ static func start(parent: Node, level: LevelData, at: Vector3) -> LevelWarmup:
 		(made[0] as Node3D).position = Vector3(1.5, -DEPTH, 1.5)
 	VoxelFx.puff(w, w.global_position + Vector3(1.5, 0.5, -1.5), "salts_fall", 0.45)   # el polvo de Ward (20.18)
 	VoxelFx.puff(w, w.global_position + Vector3(1.5, 0.5, -1.5), "salts_rise", 0.45)
+	VoxelFx.puff(w, w.global_position + Vector3(1.5, 0.5, -1.5), "fold", 0.5)        # el ángulo de Gilman (20.19)
 	FxTrails.prime(parent.get_tree(), at + Vector3(0, 0.5, 0))
 	FxShade.prime(w, Vector3(0, 0.6 - DEPTH, 0))                 # el sombreador de efectos (hito 18.2)
 	HitSparks.prime(at + Vector3(0, 0.5, 0))                     # las chispas de los impactos (hito 18.3)        # las estelas de las armas (hito 18.1)

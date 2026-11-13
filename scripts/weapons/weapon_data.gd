@@ -117,6 +117,9 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var arc_height := 2.2                ## altura del arco de los lanzados
 @export var look := "dinamita"               ## aspecto del lanzado: dinamita, granada, molotov, frasco, bengala
 @export var homing := 0.0                    ## giro máximo hacia el enemigo más cercano (rad/s; fuegos fatuos)
+## Ángulos de Gilman (hito 20.19): cada angle_turn s la bala gira en ángulo recto (o sigue recta)
+## hacia el enemigo más cercano, y no la para el decorado. Salen a 45° del objetivo.
+@export var angle_turn := 0.0
 @export var stasis := 0.0                    ## s de estasis al impactar (Rayo de Yith)
 @export var bullet_slow := 0.5               ## velocidad de las balas enemigas dentro del signo
 @export var slow_factor := 1.0               ## velocidad de los enemigos dentro de la zona (polvo)

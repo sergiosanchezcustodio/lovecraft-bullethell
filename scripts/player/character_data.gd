@@ -78,6 +78,7 @@ extends Resource
 @export var duration_mult := 1.0             ## duración de zonas, órbitas, rayos y torretas (Clepsidra de Yith)
 @export var ally_mult := 1.0                 ## lo que duran los aliados que levantan las armas (Fotografía del modelo, hito 20.17)
 @export var ally_dmg_mult := 1.0             ## daño de esos aliados (Frasco de los Custodes, hito 20.18)
+@export var proj_size_mult := 1.0            ## tamaño de las balas, el de choque y el que se ve (Estatuilla de la balaustrada, hito 20.19)
 @export var pierce_add := 0.0                ## enemigos más que atraviesan las balas (Piedra de afilar)
 @export var crit_chance := 0.0               ## probabilidad de crítico de todas las armas (Ojo de Pickman)
 @export var crit_bonus := 0.0                ## suma al daño del crítico, que de base es ×1,5 (Collar de colmillos)

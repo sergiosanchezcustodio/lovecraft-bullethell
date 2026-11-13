@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"angulos_imposibles"
+display_name = "Ángulos imposibles"
+description = "Lanza ángulos que salen torcidos y doblan esquinas en ángulo recto hasta dar con el enemigo. Atraviesan paredes, árboles y a varios enemigos."
+bullet_look = "angle"
+category = 2
+delivery = 0
+targeting = 0
+cooldown = 0.9
+range = 10.0
+damage = 4.3
+count = 2.0
+projectile_speed = 10.0
+projectile_radius = 0.2
+projectile_size = 0.3
+pierce = 2.0
+knockback = 0.3
+angle_turn = 0.2
+evolves_with = &"estatuilla_balaustrada"
+evolution = &"geometria_bruja"
+evolution_alt = &"trono_azathoth"
+max_level = 5
+level_mods = Array[Dictionary]([{"damage*": 1.25}, {"count+": 1.0}, {"pierce+": 2.0}, {"damage*": 1.2, "count+": 1.0}])
+level_text = Array[String](["+25 % de daño", "Un ángulo más", "Atraviesan a dos más", "+20 % de daño y un ángulo más"])

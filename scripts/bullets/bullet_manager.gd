@@ -16,10 +16,10 @@ const HIGH_CONTRAST := {"phys_core": Color(1.0, 1.0, 0.85), "phys_mid": Color(1.
 enum Team { PLAYER, ENEMY }
 ## Estilo visual (lenguaje de daños, GDD 4.4): lo lee el shader por instancia.
 ## WISP y YITH son trazadoras del jugador de otro color (Báculo del Farolero, Rayo de Yith).
-enum Style { PLAYER, PHYSICAL, MENTAL, MIXED, WISP, YITH, PELLET, RIFLE, SMG, BLADE, SPARK, HARPOON, DART, IMPACT }
+enum Style { PLAYER, PHYSICAL, MENTAL, MIXED, WISP, YITH, PELLET, RIFLE, SMG, BLADE, SPARK, HARPOON, DART, IMPACT, ANGLE }
 ## Aspecto de bala de cada `WeaponData.bullet_look`.
 const LOOK_STYLE := {"pellet": Style.PELLET, "rifle": Style.RIFLE, "smg": Style.SMG, "blade": Style.BLADE,
-	"spark": Style.SPARK, "harpoon": Style.HARPOON, "dart": Style.DART}
+	"spark": Style.SPARK, "harpoon": Style.HARPOON, "dart": Style.DART, "angle": Style.ANGLE}
 ## Destellos de impacto: un depósito fijo que se dibuja en el mismo MultiMesh que las balas del
 ## jugador (cero llamadas de dibujo extra). Cada uno vive IMPACT_LIFE s.
 ## Choque entre balas (04-10-2026): las del jugador anulan las enemigas que tocan. Rejilla plana
@@ -80,7 +80,8 @@ var _push := PackedFloat32Array()            ## empuje del impacto (multiplicado
 var _bonus := PackedInt32Array()             ## índice en bonus_sets (-1 = sin rasgo)
 var _split := PackedInt32Array()
 var _tag: Array[StringName] = []          ## arma de cada bala (estadísticas de la ficha)             ## al morir se divide en tantos proyectiles (fuegos artificiales)
-var _home := PackedFloat32Array()            ## giro máximo hacia el enemigo más cercano (rad/s; 0 = recta)
+var _home := PackedFloat32Array()            ## giro máximo hacia el enemigo más cercano (rad/s; 0 = recta;
+                                             ## negativo: cada -_home s, un ángulo recto, Gilman: _angle_step)
 var _effect := PackedByteArray()             ## Effect al impactar
 var _effect_val := PackedFloat32Array()
 var _slowed := PackedByteArray()             ## 1 si ya la frenó un Signo Arcano (solo una vez)
@@ -298,11 +299,12 @@ func _physics_process(delta: float) -> void:
 			i += 1
 			continue
 		if _home[i] > 0.0 and world != null: _steer(i, delta)
+		elif _home[i] < 0.0 and world != null: _angle_step(i, delta)
 		_pos[i] += _vel[i] * delta
 		_age[i] += delta
 		var p2 := Vector2(_pos[i].x, _pos[i].z)
 		# se paran contra el decorado (cabañas, iglús, acantilados…), las del jugador y las enemigas
-		var dead := _age[i] >= _life[i] or not b.has_point(p2) or (obs != null and _owner[i] != OVER_WALLS and obs.stops_bullet(p2))
+		var dead := _age[i] >= _life[i] or not b.has_point(p2) or (obs != null and _owner[i] != OVER_WALLS and _home[i] >= 0.0 and obs.stops_bullet(p2))
 		if not dead and world != null:
 			dead = _collide_player_bullet(i) if _team[i] == Team.PLAYER else _collide_enemy_bullet(i)
 		if dead:
@@ -325,6 +327,24 @@ func _steer(i: int, delta: float) -> void:
 		a += clampf(wrapf(want - a, -PI, PI), -_home[i] * delta, _home[i] * delta)
 	a += sin(_age[i] * 11.0 + float(i)) * 2.2 * delta               # vaivén
 	_vel[i] = Vector3(cos(a) * spd, 0.0, sin(a) * spd)
+
+## Ángulos de Gilman (hito 20.19): a cada -_home s, gira 90° a un lado o al otro, o sigue recta,
+## según lo que la acerque más al enemigo más cercano. El camino sale a escalones.
+func _angle_step(i: int, delta: float) -> void:
+	var every := -_home[i]
+	if int(_age[i] / every) == int((_age[i] - delta) / every): return
+	var t := world.nearest_enemy(_pos[i], 9.0)
+	if t == null: return
+	var to := Vector2(t.global_position.x - _pos[i].x, t.global_position.z - _pos[i].z).normalized()
+	var v := Vector2(_vel[i].x, _vel[i].z)
+	var best := v
+	var best_d := v.normalized().dot(to) + 0.05                    # seguir recta, si da igual
+	for c: Vector2 in [v.orthogonal(), -v.orthogonal()]:
+		var d := c.normalized().dot(to)
+		if d > best_d:
+			best = c
+			best_d = d
+	_vel[i] = Vector3(best.x, 0.0, best.y)
 
 func _collide_enemy_bullet(i: int) -> bool:
 	var p := Vector2(_pos[i].x, _pos[i].z)
@@ -417,7 +437,7 @@ func _burst(i: int) -> void:
 	for k in n:
 		var a := a0 + TAU * k / n
 		spawn(_team[i], _style[i], _pos[i], Vector3(cos(a), 0, sin(a)) * spd, _radius[i] * 0.8, _size[i] * 0.7,
-			d, 0.45, 0, _push[i] * 0.5, _bonus[i], 0)
+			d, 0.45, 0, _push[i] * 0.5, _bonus[i], 0, minf(_home[i], 0.0))   # las esquirlas de Gilman también giran
 	_bursting = false
 
 func _clash_key(p: Vector3) -> int:

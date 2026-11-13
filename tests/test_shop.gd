@@ -13,7 +13,7 @@ func _entry(id: String) -> Shop.Entry:
 
 func test_el_catalogo_tiene_las_cuatro_secciones() -> void:
 	assert_eq(Shop.in_section(ShopItem.Section.POWERUP).size(), 17, "diecisiete potenciadores (cuatro más en el hito 5.4 y ocho el 17-10-2026)")
-	assert_eq(Shop.in_section(ShopItem.Section.CHARACTER).size(), 11, "los nueve que no son de inicio (Armitage y West, hito 5.5), Pickman (20.17) y Ward (20.18)")
+	assert_eq(Shop.in_section(ShopItem.Section.CHARACTER).size(), 12, "los nueve que no son de inicio (Armitage y West, hito 5.5), Pickman, Ward y Gilman (20.17-20.19)")
 	assert_eq(Shop.in_section(ShopItem.Section.PET).size(), DebugOptions.list_resources("res://data/pets").size(), "todos los compañeros")
 	assert_eq(Shop.in_section(ShopItem.Section.UPGRADE).size(), 11, "quinta y sexta funda, quinto y sexto bolsillo y siete mejoras del 17-10-2026")
 	for e in Shop.catalog():
@@ -29,7 +29,7 @@ func test_la_tienda_entera_lleva_unas_veinte_horas() -> void:
 				outfits += p
 				garments += 1
 			else: total += p
-	assert_between(total, 180000, 260000, "a unos 5.500 $ por hora: de 33 a 47 h entre tienda y compañeros (D-36; el 5.4 y el 17-10-2026 la amplían)")
+	assert_between(total, 180000, 310000, "a unos 5.500 $ por hora: de 33 a 56 h entre tienda y compañeros (D-36; el 5.4, el 17-10-2026 y los seis personajes de la fase 20 la amplían)")
 	# el vestuario es una colección aparte que no hace falta completar (D-34, ampliado en la fase 14):
 	# se vigila el precio medio de una prenda, de 10 a 30 minutos de partida
 	assert_between(outfits / garments, 900, 2800, "precio medio de una prenda (D-34)")

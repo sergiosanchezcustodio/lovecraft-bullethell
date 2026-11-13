@@ -53,9 +53,9 @@ void vertex() {
 	if (st == 13) {
 		s = length(MODEL_MATRIX[0].xyz) * (v_phase > 99.5 ? 2.0 : 1.5);   // cuadro fijo; el fogonazo, mayor
 		off = VERTEX.xy * s;
-	} else if (st == 9 || st == 10) {
-		// hoja y chispa: cuadrado que gira (la hoja, rápido)
-		float a = TIME * (st == 9 ? 22.0 : 6.0) + v_phase * 3.0;
+	} else if (st == 9 || st == 10 || st == 14) {
+		// hoja, chispa y ángulo de Gilman: cuadrado que gira (la hoja, rápido)
+		float a = TIME * (st == 9 ? 22.0 : (st == 14 ? 8.0 : 6.0)) + v_phase * 3.0;
 		vec2 dir = vec2(cos(a), sin(a));
 		off = dir * VERTEX.x * s * 1.3 + vec2(-dir.y, dir.x) * VERTEX.y * s * 1.3;
 	} else if (st == 0 || st >= 4) {
@@ -159,6 +159,15 @@ void fragment() {
 		float needle = smoothstep(0.25, 0.0, across) * step(0.75, along);
 		alpha = max(body * 0.95, needle);
 		col = needle > body ? vec3(0.9, 0.95, 0.9) : vec3(0.35, 1.0, 0.4) * exposure_comp * 1.5;
+	} else if (style == 14) {
+		// ángulo de Gilman (hito 20.19): un cuadrado violeta hueco con otro girado dentro y el centro claro
+		float sq = max(abs(p.x), abs(p.y));
+		float dm = abs(p.x) + abs(p.y);
+		float outer = smoothstep(0.6, 0.68, sq) * smoothstep(0.94, 0.86, sq);
+		float inner = smoothstep(0.42, 0.5, dm) * smoothstep(0.72, 0.64, dm);
+		float core = smoothstep(0.26, 0.08, r);
+		alpha = max(max(outer, inner * 0.85), core);
+		col = mix(vec3(0.5, 0.26, 1.0) * exposure_comp * 1.1, vec3(0.92, 0.84, 1.0), max(core, inner * 0.2));
 	} else if (style == 0) {
 		// trazadora pesada: cabeza blanca, cuerpo dorado y halo suave alrededor
 		float core = smoothstep(0.55, 0.15, across) * smoothstep(0.0, 0.8, along);

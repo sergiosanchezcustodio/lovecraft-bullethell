@@ -564,6 +564,22 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.05; m.scale_max = 0.13
 			m.color_ramp = _ramp([[0.0, Color(0.32, 0.27, 0.22, 1.0)], [0.85, Color(0.2, 0.17, 0.15, 1.0)],
 				[1.0, Color(0.2, 0.17, 0.15, 0.0)]])
+		"fold":                   # el ángulo de Gilman (hito 20.19): esquirlas violetas que giran y se cierran
+			p.draw_pass_1 = cube("add")
+			p.amount = 16
+			p.lifetime = 0.45
+			p.explosiveness = 1.0
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+			m.emission_box_extents = Vector3(r * 0.4, 0.7, r * 0.4)
+			m.emission_shape_offset = Vector3(0, 0.85, 0)
+			m.spread = 180.0
+			m.initial_velocity_min = 1.0; m.initial_velocity_max = 2.4
+			m.damping_min = 4.0; m.damping_max = 7.0
+			m.angular_velocity_min = -500.0; m.angular_velocity_max = 500.0
+			m.scale_min = 0.05; m.scale_max = 0.11
+			m.scale_curve = _curve([[0.0, 1.0], [0.6, 0.7], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.95, 0.9, 1.0, 1.0)], [0.3, Color(0.65, 0.4, 1.0, 0.95)],
+				[1.0, Color(0.3, 0.12, 0.6, 0.0)]])
 		"salts_fall":             # se deshace en sales (hito 20.18): una columna de polvo azulado que cae
 			p.draw_pass_1 = cube("mix")
 			p.amount = int(clampf(r * 100.0, 30.0, 70.0))

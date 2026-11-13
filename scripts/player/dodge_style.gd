@@ -16,6 +16,9 @@ extends Resource
 @export var afterimages := false             ## deja una estela de imágenes fantasma
 @export var frames := false                  ## entra en un cuadro y sale por otro (Pickman, hito 20.17)
 @export var dust := false                    ## se deshace en sales y se recompone al salir (Ward, hito 20.18)
+## Por un ángulo imposible (Gilman, hito 20.19): durante el impulso atraviesa el decorado (no los
+## límites de la arena) y el modelo se pliega de lado; al acabar, se recoloca fuera de lo que tenga encima.
+@export var phase := false
 ## Tramo de la animación (0..1) en que el modelo no se ve (el destello "desaparece").
 @export var hidden_from := -1.0
 @export var hidden_to := -1.0
