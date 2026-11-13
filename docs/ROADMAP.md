@@ -668,7 +668,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 20.9 | **Portada viva según el progreso:** más libros, objetos de los jefes vencidos y otro cielo según lo jugado | Pendiente |
+| 20.9 | **Portada viva según el progreso:** más libros, objetos de los jefes vencidos y otro cielo según lo jugado | Hecho en parte (13-11-2026): velas y cielo según el progreso (`TitleProgress`); los libros y los objetos de los jefes necesitan arte nuevo. Ver `docs/ESTADO.md` |
 | 20.10 | **Desenfoque en la pausa:** la partida, desenfocada detrás del panel (apagado en Baja) | Pendiente |
 | 20.11 | **Polvo en la luz de los menús:** motas que flotan en el haz de la vela | Pendiente |
 

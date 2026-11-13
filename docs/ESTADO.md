@@ -2708,3 +2708,12 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Qué:** la ilustración del tendero (`ShopBackdrop`) se mueve hasta 14 px al contrario que el ratón o el stick derecho de cualquier mando (el que más se incline; con el stick quieto, el ratón), con un seguimiento suave (`PARALLAX_EASE`, 4/s); el polvo del quinqué, que flota delante, el doble. La ilustración va ampliada un 3 % para que no asomen los bordes (16 px de margen a 1080 de alto). Se escala con «Temblor de cámara»: a 0, quieta. En las pruebas de Claude Code no lee los mandos (`JoypadInput.disabled`).
 - **Captura:** `title saves=demo_saves open=menu_tienda tab=1 shots=10 tag=_paralaje`.
 
+### 20.9: la portada según lo jugado (13-11-2026)
+
+- **Qué:** con la partida más avanzada de los tres huecos (o la que está en uso; `TitleProgress.best_won`), la Biblioteca de la portada cambia:
+  - **Velas:** sin nada superado, el 45 % encendidas (`LIT_MIN`); con toda la campaña, todas. Cada vela se enciende según su número (su G en `mascara_velas.png`, leído sin filtrar con `texelFetch` para no mezclar dos velas; un hash lo reparte); apagada, la llama pintada se oscurece y su luz baja (`background.gdshader`, `lit`). La vela grande del escritorio (G = 130, `keep_lit_g`) siempre está encendida: apagada quedaba una silueta negra en primer plano.
+  - **Cielo del ventanal** según la parte a la que se ha llegado (`TitleProgress.part`: la más lejana con algo superado, la siguiente si esa está entera): las montañas, el azul de siempre; Innsmouth, verde de mar; R'lyeh, verde enfermizo; la campaña terminada, una luna de sangre con los ojos más rojos. La luna y las nubes cambian en `window_sky.gdshader` y el cielo pintado se tiñe en `background.gdshader` (`sky_tint`, con `mascara_zonas.png`): la capa del cielo solo suma luz y por sí sola apenas se notaba.
+- **Capturas:** `title progress=0..1 sky_part=0..3 off=titulo,aviso,ceniza,niebla_titulo shots=6 tag=…` → `shots/portada_progreso.png` (sin nada y con todo) y `shots/titulo__sky1..3_006.0s.png`.
+- **Tests:** `tests/test_title_progress.gd`.
+- **Pendiente de la propuesta:** «más libros y objetos de los jefes vencidos» necesita arte nuevo pintado sobre la ilustración; queda para cuando el autor quiera encargarlo (ComfyUI).
+

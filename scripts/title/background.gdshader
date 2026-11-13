@@ -19,6 +19,11 @@ uniform float lantern_breath = 0.06;         // variación de brillo del cristal
 uniform float lantern_halo = 0.10;           // intensidad del halo
 uniform float lantern_period = 5.0;          // s de una respiración
 uniform vec3 lantern_color : source_color = vec3(1.0, 0.62, 0.28);
+uniform sampler2D zonas : filter_linear;     // R cielo claro, B cristal del ventanal (para teñirlo, 20.9)
+uniform vec3 sky_tint : source_color = vec3(1.0);   // color del cielo según la parte (blanco: el pintado)
+uniform float sky_tint_strength = 0.0;
+uniform float keep_lit_g = 130.0;           // la vela grande del escritorio (su G en la máscara): siempre encendida
+uniform float lit = 1.0;                     // parte de las velas encendidas (hito 20.9: crece con el progreso)
 uniform float gust = 0.0;                    // ráfaga de aire (TitleGust, 0..1): todas las velas se tumban y tiemblan a la vez
 
 // Parpadeo de vela en [-1, 1]: casi estable, con oscilaciones rápidas pequeñas y, de vez
@@ -47,6 +52,15 @@ void fragment() {
 		float f = flicker(v.g, t);
 		c.rgb *= 1.0 + f * (1.0 + 2.5 * gust) * (flicker_strength * v.r + spill_strength * l.b);
 		c.rgb *= 1.0 - gust * (0.22 * v.r + 0.12 * l.b);       // la llama se achica y su luz baja
+		// apagadas (20.9): cada vela, por su fase (sin filtrar, para no mezclar dos velas), se
+		// enciende si su número cae por debajo de `lit`; apagada, la llama es mecha y su luz se va
+		float g = texelFetch(velas, ivec2(UV * vec2(textureSize(velas, 0))), 0).g;
+		float id = fract(g * 255.0 * 0.6180339 + 0.137);
+		if (lit < 0.999 && id > lit && v.g > 0.0 && abs(g * 255.0 - keep_lit_g) > 0.5) {
+			float luma = dot(c.rgb, vec3(0.3, 0.55, 0.15));
+			c.rgb = mix(c.rgb, vec3(0.04, 0.035, 0.03) + luma * 0.05, smoothstep(0.015, 0.3, v.r) * 0.95);
+			c.rgb *= 1.0 - 0.6 * l.b;
+		}
 	}
 	if (lanterns_enabled) {
 		// fase suave según la posición: cada farolillo respira a su ritmo, sin saltos en el halo
@@ -54,6 +68,12 @@ void fragment() {
 		float slow = 0.5 + 0.5 * lp;
 		c.rgb *= 1.0 + lantern_breath * lp * l.r;
 		c.rgb += lantern_color * l.g * l.g * lantern_halo * mix(0.55, 1.0, slow);
+	}
+	if (sky_tint_strength > 0.0) {                 // el cielo del ventanal, con el color de la parte
+		vec4 z = texture(zonas, UV);
+		float k = sky_tint_strength * max(z.r, z.b * 0.6);
+		float luma = dot(c.rgb, vec3(0.3, 0.55, 0.15));
+		c.rgb = mix(c.rgb, luma * sky_tint * 1.6, k);
 	}
 	COLOR = c;
 }

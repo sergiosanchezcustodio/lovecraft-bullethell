@@ -155,6 +155,7 @@ func _build_stage() -> void:
 	bg_mat.shader = preload("res://scripts/title/background.gdshader")
 	bg_mat.set_shader_parameter("velas", load(VELAS))
 	bg_mat.set_shader_parameter("luces", luces)
+	bg_mat.set_shader_parameter("zonas", zonas)                   # el cielo, para teñirlo (20.9)
 	bg.material = bg_mat
 	stage.add_child(bg)
 	# lo que va bajo la niebla del suelo: gotas y papel del escritorio
@@ -312,6 +313,20 @@ func _push_params() -> void:
 			"eyes_enabled", "eye_left", "eye_right", "eyes_color",
 			"clouds_enabled", "clouds_strength", "clouds_speed", "clouds_block", "clouds_color"]:
 		sky_mat.set_shader_parameter(n, cfg.get(n))
+	_push_progress()
+
+## Velas y cielo según lo jugado (hito 20.9, `TitleProgress`).
+const SKY_TINT := 0.55
+func _push_progress() -> void:
+	var won := TitleProgress.best_won()
+	var lit := args.get_float("progress", -1.0)
+	lit = TitleProgress.lit(won) if lit < 0.0 else lerpf(TitleProgress.LIT_MIN, 1.0, lit)
+	bg_mat.set_shader_parameter("lit", lit)
+	var part := args.get_int("sky_part", TitleProgress.part(won))
+	var sky: Dictionary = TitleProgress.SKIES[clampi(part, 0, TitleProgress.SKIES.size() - 1)]
+	bg_mat.set_shader_parameter("sky_tint_strength", float(sky.get("sky_k", SKY_TINT)) if sky.has("sky_tint") else 0.0)
+	for k: String in sky:
+		if k != "sky_k": (bg_mat if k == "sky_tint" else sky_mat).set_shader_parameter(k, sky[k])
 
 ## Escenario y título cubren la pantalla conservando la proporción (se recorta lo que sobre).
 func _layout() -> void:
