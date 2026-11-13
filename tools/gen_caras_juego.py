@@ -14,7 +14,8 @@ EYE_X = (-6, -5, -4, -3, 2, 3, 4, 5)
 # Caras con otros ojos (hito 16.25): columnas de los ojos y fila de abajo (el párpado cerrado va
 # en esa y la de encima). Carter, con los ojos a medio cerrar (una fila y el párpado caído encima);
 # Wilbur, ojos pequeños de 2×2 muy juntos, con el blanco amarillento.
-ODD_EYES = {'carter': (EYE_X, 73), 'whateley': ((-4, -3, 2, 3), 73)}
+# Asenath (hito 20.21), ojos saltones de 4×4 en relieve: el párpado cerrado tapa las cuatro filas.
+ODD_EYES = {'carter': (EYE_X, 73), 'whateley': ((-4, -3, 2, 3), 73), 'asenath': (EYE_X, 72, 4)}
 
 
 def _reddish(c):
@@ -31,11 +32,13 @@ def face(path):
     rows = [y for y in range(68, 78) if all(white(x, y) for x in (-6, -3, 2, 5))]   # bordes blancos de los dos ojos
     name = os.path.basename(path)[:-5]
     xs = EYE_X
+    n = 2                                                 # filas de cada ojo
     if name in ODD_EYES:                                  # ojos que no son de 4×2 con blanco (16.25)
-        xs, y0 = ODD_EYES[name]
+        xs, y0, *rest = ODD_EYES[name]
+        if rest: n = rest[0]
     elif len(rows) != 2 or rows[1] != rows[0] + 1: return None
     else: y0 = rows[0]
-    eyes = [[x, y, front[(x, y)][0]] for x in xs for y in (y0, y0 + 1)]
+    eyes = [[x, y, front[(x, y)][0]] for x in xs for y in range(y0, y0 + n)]
     # párpado del color de la piel: la piel tiene textura (cada voxel con su tono) y lo pintado
     # (cejas, pestañas, gafas, mejillas) es de un color plano, que se repite
     near = [tuple(front[(x, y)][1]) for x in range(-8, 8) for y in range(y0 - 3, y0 + 4)
@@ -69,8 +72,9 @@ def face(path):
 
 out = {}
 for tres in sorted(glob.glob('data/characters/*.tres')):
-    model = next(l.split('"')[1] for l in open(tres, encoding='utf-8') if l.startswith('model = '))
-    for path in [p for p in glob.glob('models/%s*.json' % model) if os.path.basename(p)[len(model):] in ('.json', '_v1.json')]:
+    lines = open(tres, encoding='utf-8').readlines()
+    for model in [l.split('"')[1] for l in lines if l.startswith('model = ') or l.startswith('alt_model = ')]:   # (y el otro cuerpo, 20.21)
+      for path in [p for p in glob.glob('models/%s*.json' % model) if os.path.basename(p)[len(model):] in ('.json', '_v1.json')]:
         name = os.path.basename(path)[:-5]
         f = face(path)
         print('%-12s %s' % (name, 'ojos en %d-%d, párpado %s' % (f['eyes'][0][1], f['eyes'][1][1], f['lid']) if f else 'sin cara dibujada: no parpadea'))

@@ -564,6 +564,27 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.05; m.scale_max = 0.13
 			m.color_ramp = _ramp([[0.0, Color(0.32, 0.27, 0.22, 1.0)], [0.85, Color(0.2, 0.17, 0.15, 1.0)],
 				[1.0, Color(0.2, 0.17, 0.15, 0.0)]])
+		"soul":                   # Derby y Asenath (hito 20.21): el alma que entra en el otro cuerpo, humo verdoso
+			p.draw_pass_1 = cube("add")
+			p.amount = 18
+			p.lifetime = 0.7
+			p.explosiveness = 0.9
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
+			m.emission_ring_axis = Vector3.UP
+			m.emission_ring_radius = maxf(r, 0.3)
+			m.emission_ring_inner_radius = maxf(r, 0.3) * 0.7
+			m.emission_ring_height = 1.2
+			m.emission_shape_offset = Vector3(0, 0.8, 0)
+			m.direction = Vector3.UP
+			m.spread = 25.0
+			m.initial_velocity_min = 0.6; m.initial_velocity_max = 1.4
+			m.radial_velocity_min = -1.6; m.radial_velocity_max = -0.9
+			m.damping_min = 1.0; m.damping_max = 2.0
+			m.angular_velocity_min = -200.0; m.angular_velocity_max = 200.0
+			m.scale_min = 0.06; m.scale_max = 0.13
+			m.scale_curve = _curve([[0.0, 0.4], [0.3, 1.0], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.8, 0.95, 0.75, 0.0)], [0.15, Color(0.55, 0.78, 0.5, 0.8)],
+				[0.6, Color(0.3, 0.42, 0.3, 0.55)], [1.0, Color(0.12, 0.16, 0.12, 0.0)]])
 		"beyond":                 # la Máquina del más allá (hito 20.20): seres translúcidos que flotan un momento
 			p.draw_pass_1 = cube("add")
 			p.amount = 12

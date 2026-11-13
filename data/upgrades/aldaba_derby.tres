@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/upgrade_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://resources/items/icons/aldaba_derby.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"aldaba_derby"
+display_name = "Aldaba de la casa Derby"
+description = "Tres golpes y luego dos: el primer daño a un enemigo ileso es un 12 % mayor"
+stat = "fresh_mult"
+multiply = 1.12
+add = 0.0
+max_level = 5
+color = Color(0.5, 0.72, 0.42, 1)
+icon = ExtResource("2")
+group = "ataque"

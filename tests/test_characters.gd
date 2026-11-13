@@ -205,7 +205,7 @@ func test_un_solo_rasgo_por_personaje() -> void:
 	var fields := ["resist_tags", "bonus_tags", "knockback_immune", "dodge_length", "arcane_cost_mult", "xp_mult",
 		"heal_on_level", "revive_speed", "calm_aura", "physical_resist", "dodge_cooldown_mult", "close_bonus",
 		"explosion_radius_mult", "melee_mult", "luck", "pickup_radius", "arcane_cooldown_mult", "team_heal_on_level",
-		"crisis_mult", "mental_mult", "low_sanity_bonus", "hurt_radius", "range_mult"]   # (crisis y mental, de los secretos: 16.25; Ward, 20.18; Gilman, 20.19; Tillinghast, 20.20)
+		"crisis_mult", "mental_mult", "low_sanity_bonus", "hurt_radius", "range_mult", "swap_restore"]   # (crisis y mental, de los secretos: 16.25; Ward, 20.18; Gilman, 20.19; Tillinghast, 20.20; Derby, 20.21)
 	for r in DebugOptions.list_resources("res://data/characters"):
 		var c := r as CharacterData
 		var n := 0

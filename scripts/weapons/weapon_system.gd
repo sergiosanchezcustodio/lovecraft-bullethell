@@ -198,6 +198,10 @@ func _fire(w: Weapon) -> bool:
 	var n := int(w.stat("count"))
 	if w.data.delivery == WeaponData.Delivery.MELEE:
 		return _slash(w)
+	if w.data.delivery == WeaponData.Delivery.THRESHOLD:   # Derby y Asenath (20.21): según el cuerpo
+		if player.form == 0: return _slash(w, DamageRules.THRESHOLD_MELEE)   # Edward golpea fuerte, de cerca
+		if not w.had_target: return false              # Asenath espera a tener a quién mirar
+		# las miradas, por el camino de las balas de abajo (con su coste de cordura)
 	if w.data.delivery == WeaponData.Delivery.ORBIT:
 		return _orbit(w)
 	if w.data.delivery == WeaponData.Delivery.BEAM:
@@ -352,11 +356,29 @@ func _nearest_mate(max_r: float) -> Player:
 ## Con `crit`, las armas que no son de balas tiran el crítico de los objetos para todo el
 ## disparo (las balas lo tiran cada una al salir).
 func dmg(w: Weapon, crit := true) -> float:
-	var melee := w.data.delivery in [WeaponData.Delivery.MELEE, WeaponData.Delivery.THRUST]
+	var swap := w.data.delivery == WeaponData.Delivery.THRESHOLD   # El umbral (20.21): según el cuerpo
+	var melee := w.data.delivery in [WeaponData.Delivery.MELEE, WeaponData.Delivery.THRUST] or (swap and player.form == 0)
 	var k := player.data.melee_mult if melee else 1.0   # rasgo de Johansen
 	if crit and w.data.delivery != WeaponData.Delivery.BULLET and player.data.crit_chance > 0.0 			and randf() < w.stat("crit_chance"):
 		k *= w.stat("crit_mult")
-	return w.stat("damage") * player.damage_mult(w.data.category) * k
+	var cat := w.data.category
+	if swap: cat = WeaponData.Category.PHYSICAL if player.form == 0 else WeaponData.Category.MAGIC
+	return w.stat("damage") * player.damage_mult(cat) * k
+
+## Cambio de cuerpo (Derby y Asenath, hito 20.21): las armas con swap_blast sueltan su onda (Lo
+## que llamó a la puerta: verde podrido, empuja y no aturde).
+func on_swap() -> void:
+	for w in weapons:
+		var b := w.stat("swap_blast")
+		if b <= 0.0: continue
+		Damage.ctx = tag_of(w)
+		var wave := Shockwave.new().setup(player, world, w.stat("aoe_radius") * 1.5, 0.35, dmg(w) * b,
+			w.stat("knockback") * 2.0, 0.0, player.data.bonus_tags)
+		wave.color = SWAP_COLOR
+		world.fx.add_child(wave)
+		Auto.sfx_at("slam", player.global_position)
+
+const SWAP_COLOR := Color(0.58, 0.74, 0.32, 0.95)
 
 ## Coste de cordura de las armas arcanas (GDD 5.2), con el rasgo del personaje.
 func _pay_sanity(w: Weapon) -> void:
@@ -418,14 +440,14 @@ func _beam(w: Weapon, target_pos: Vector3) -> bool:
 
 ## Tajo circular (machete): daña y empuja hacia fuera a todo lo que haya en el radio.
 ## Solo golpea si hay alguien dentro: sin enemigos cerca, espera.
-func _slash(w: Weapon) -> bool:
+func _slash(w: Weapon, k := 1.0) -> bool:
 	var origin := player.global_position
 	var r := w.stat("aoe_radius")
 	var targets := world.enemies_in_circle(origin, r)
 	world.bullets.clear_enemy_bullets(origin, r * 0.8)          # el tajo también corta balas
 	if targets.is_empty(): return false
 	for t in targets:
-		var d := Damage.new(dmg(w), 0.0)
+		var d := Damage.new(dmg(w) * k, 0.0)
 		var away := t.global_position - origin
 		d.knockback = Vector3(away.x, 0, away.z).normalized() * w.stat("knockback")
 		d.bonus = player.data.bonus_tags

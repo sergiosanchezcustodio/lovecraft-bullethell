@@ -486,8 +486,147 @@ def tillinghast():
               flat=(BUTTON, BROW, IRIS, SOCKET, HOLLOW, MOUTH, STUBBLE, EAR_IN, TUBE, TUBE_CORE, BRASS), b=B)
 
 
+def derby():
+    """Edward Pickman Derby, el poeta de Arkham: rubio, de cara redonda de niño, algo grueso, con un
+    bigotillo; traje claro de buen paño con pajarita verde y pañuelo en el bolsillo. El cuerpo que
+    Asenath (Ephraim) quería."""
+    SKIN = (0.92, 0.78, 0.68); SKIN_SH = (0.82, 0.67, 0.58); EAR_IN = (0.70, 0.54, 0.46); CHEEK = (0.90, 0.66, 0.60)
+    SUIT = (0.66, 0.61, 0.50); SUIT_SH = (0.55, 0.50, 0.40); SUIT_LT = (0.72, 0.67, 0.56)
+    SHIRT = (0.92, 0.91, 0.87); BOW = (0.14, 0.34, 0.24); BOW_SH = (0.09, 0.24, 0.17)
+    SHOE = (0.36, 0.20, 0.11); BUTTON = (0.36, 0.26, 0.16)
+    HAIR = (0.80, 0.64, 0.34); HAIR_SH = (0.70, 0.54, 0.26); BROW = (0.66, 0.50, 0.26)
+    IRIS = (0.36, 0.52, 0.70); MOUTH = (0.70, 0.46, 0.42); MOUSTACHE = (0.72, 0.56, 0.28)
+    B = 1                                                                    # algo grueso
+    M = cu.new(1933)
+    top = cu.shoes(M, SHOE, SOLE)
+    cu.legs(M, SUIT, bottom=top)
+    for (x, y, z), v in M.V.items():                                         # la raya del pantalón
+        if v[1] == SUIT and z > 0 and x in (-5, 4): v[1] = SUIT_SH
+    cu.torso(M, SHIRT, b=B, bottom=34)
+    # la chaqueta, cruzada a la cintura: la camisa asoma en pico desde el pecho
+    for (x, y, z), v in M.V.items():
+        if v[0] != T or v[1] != SHIRT: continue
+        open_w = (y - 46) / 3.0                                              # el pico se abre hacia arriba
+        if not (z > 0 and y >= 47 and abs(x + 0.5) <= open_w): v[1] = SUIT
+    for y in range(47, 61):                                                  # solapas
+        w = int((y - 46) / 3.0) + 1
+        cu.front(M, -w - 1, y, SUIT_SH, dz=1); cu.front(M, w, y, SUIT_SH, dz=1)
+    for y in (41, 45): cu.front(M, -1, y, BUTTON, dz=1)
+    for (x, y, z), v in M.V.items():                                         # el bajo de la chaqueta, más claro
+        if v[0] == T and v[1] == SUIT and 34 <= y <= 35: v[1] = SUIT_LT
+    for x in range(3, 7): cu.front(M, x, 53, SUIT_SH)                        # bolsillo del pecho, con pañuelo
+    for x in (4, 5): cu.front(M, x, 54, SHIRT, dz=1)
+    for (x, y) in ((-3, 59), (-2, 59), (1, 59), (2, 59), (-3, 58), (2, 58)): cu.front(M, x, y, BOW, dz=1)   # pajarita
+    for (x, y) in ((-1, 58), (0, 58), (-1, 59), (0, 59)): cu.front(M, x, y, BOW_SH, dz=1)
+    cu.neck(M, SKIN)
+    cu.arms(M, SUIT, SKIN, b=B, cuff=SHIRT, cuff_wide=False)
+    cu.head(M, SKIN, SKIN_SH, nose=False, r=4, rb=4)                         # cara redonda
+    cu.face_art(M, 76, [                   # en relieve
+        '...bbb....bbb...',                # 76: cejas rubias, suaves
+        '................',
+        '.......nn.......',
+        '.......nn.......',
+        '......snns......',                # 72
+    ], {'b': BROW, 'n': SKIN, 's': SKIN_SH}, dz=1)
+    cu.face_art(M, 74, [                   # pintado: ojos azules y blandos, mejillas sonrosadas
+        '..wppw....wppw..',                # 74
+        '..wiiw....wiiw..',                # 73
+        '................',
+        '.cc..........cc.',                # 71
+        '................',
+        '.....tttttt.....',                # 69: bigotillo rubio
+        '.......mm.......',                # 68
+    ], {'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'c': CHEEK, 't': MOUSTACHE, 'm': MOUTH})
+    cu.ear_holes(M, EAR_IN)
+    # pelo rubio peinado con raya a un lado, corto en la nuca
+    cu.hair_back(M, SKIN, HAIR, top=200, bottom=68, neck=True)
+    for (x, y, z), v in M.V.items():
+        if v[0] == H and v[1] == SKIN and y >= 78: v[1] = HAIR
+    cu.sideburns(M, HAIR, 73, 78)
+    cu.hair_over_ears(M, SKIN, HAIR, 75, 78)
+    for x in range(-6, 1): cu.front(M, x, 77, HAIR)                         # el tupé, hacia un lado
+    for (x, y, z), v in M.V.items():
+        if v[0] == H and v[1] == HAIR and x == 3 and y >= 80 and z > -3: v[1] = HAIR_SH   # la raya
+    cu.seams(M, (SUIT,))
+    cu.finish(M, 'derby', {SUIT: 'lana', SUIT_SH: 'lana', SUIT_LT: 'lana', SHIRT: 'lona', SHOE: 'cuero',
+                           SOLE: 'cuero', HAIR: 'pelo', HAIR_SH: 'pelo', SKIN: 'piel',
+                           SKIN_SH: 'piel'},
+              flat=(BOW, BOW_SH, BUTTON, BROW, IRIS, MOUTH, MOUSTACHE, CHEEK, EAR_IN), b=B)
+
+
+def asenath():
+    """Asenath Waite, de Innsmouth: menuda y morena, pálida, con los ojos saltones de los Waite;
+    pelo negro con raya en medio y moño bajo, vestido verde muy oscuro de talle bajo con un cinturón
+    de cadena de oro y un colgante de oro de Innsmouth que brilla apenas."""
+    SKIN = (0.85, 0.79, 0.72); SKIN_SH = (0.74, 0.68, 0.62); CHEEK = (0.80, 0.66, 0.62)
+    DRESS = (0.10, 0.20, 0.17); DRESS_SH = (0.07, 0.14, 0.12); DRESS_LT = (0.15, 0.28, 0.24)
+    COLLAR = (0.80, 0.78, 0.70); GOLD = (0.80, 0.64, 0.26); GOLD_SH = (0.62, 0.48, 0.18)
+    STOCKING = (0.20, 0.18, 0.18); SHOE = (0.08, 0.08, 0.08)
+    HAIR = (0.06, 0.06, 0.07); HAIR_SH = (0.16, 0.15, 0.16)
+    BROW = (0.10, 0.09, 0.09); LASH = (0.08, 0.07, 0.07); IRIS = (0.30, 0.46, 0.34)
+    LIP = (0.44, 0.18, 0.22)
+    AX = cu.ARM_X_F
+    M = cu.new(1934)
+    top = cu.shoes_f(M, SHOE, SOLE)
+    cu.legs_f(M, STOCKING, bottom=top)
+    cu.torso_f(M, DRESS, bottom=36)
+    cu.skirt(M, DRESS, 12, top=42, b=-3, flare=3, depth=12.5)               # hasta media pantorrilla
+    for y in range(13, 42, 4):                                              # pliegues
+        for x in (-7, -2, 3, 8): cu.front(M, x, y, DRESS_SH)
+    for (x, y, z), v in M.V.items():                                         # el bajo, ribeteado
+        if v[0] == T and 12 <= y <= 13 and v[1] in (DRESS, DRESS_SH): v[1] = DRESS_LT
+    cu.belt(M, GOLD, y=38, b=-3, h=1)                                        # cinturón de cadena de oro, a la cadera
+    for (x, y, z), v in M.V.items():
+        if v[1] == GOLD and y == 38 and (x + z) % 2: v[1] = GOLD_SH
+    for x in range(-4, 4):                                                   # cuello de encaje, en pico
+        cu.front(M, x, 59, COLLAR)
+    for x in range(-3, 3): cu.front(M, x, 58, COLLAR)
+    for x in (-2, 1): cu.front(M, x, 57, COLLAR)
+    for y in range(52, 57): cu.front(M, -1, y, GOLD_SH); cu.front(M, 0, y, GOLD_SH)   # cadena del colgante
+    for (x, y) in ((-2, 50), (-1, 50), (0, 50), (1, 50), (-2, 51), (1, 51), (-1, 52), (0, 52), (-2, 49), (1, 49), (-1, 48), (0, 48)):
+        cu.front(M, x, y, GOLD, dz=1)                                        # el colgante de Innsmouth
+    for (x, y) in ((-1, 50), (0, 50), (-1, 51), (0, 51), (-1, 49), (0, 49)):
+        cu.front(M, x, y, IRIS, dz=1)                                        # la piedra, verdosa
+    for (x, y, z), v in M.V.items():
+        if v[1] == IRIS and v[0] == T: M.V[(x, y, z)] = [v[0], v[1], 1]
+    cu.neck(M, SKIN)
+    cu.arms(M, DRESS, SKIN, ax=AX, slim=True, cuff=COLLAR, cuff_wide=False)
+    cu.head(M, SKIN, SKIN_SH, ears=False, fem=True, nose=False)
+    cu.face_art(M, 77, [                   # en relieve: los ojos saltones de los Waite asoman de la cara
+        '................',
+        '..bbbb....bbbb..',                # 76: el párpado de arriba, oscuro, pegado al ojo
+        '..wwww....wwww..',                # 75: ojos grandes con el blanco alrededor: mirada fija
+        '..wpiw....wipw..',                # 74
+        '..wiiw....wiiw..',                # 73
+        '..wwww....wwww..',                # 72
+        '.......nn.......',                # 71: nariz pequeña
+    ], {'b': BROW, 'w': cu.EYE_W, 'p': cu.EYE, 'i': IRIS, 'n': SKIN}, dz=1)
+    cu.face_art(M, 76, [                   # pintado
+        '.L............L.',                # 76: el rabillo, hacia fuera
+        '................',
+        '................',
+        '................',
+        '................',
+        '................',
+        '.c............c.',                # 70
+        '................',
+        '......rrrr......',                # 68: labios finos, oscuros
+    ], {'L': LASH, 'c': CHEEK, 'r': LIP})
+    # pelo negro con raya en medio, liso y pegado, recogido en un moño bajo en la nuca
+    cu.bob(M, HAIR, bottom=70, top=82, fringe=78, side_z=3)
+    cu.hair_back(M, SKIN, HAIR, top=82, zmax=2)
+    for (x, y, z), v in M.V.items():
+        if v[0] == H and v[1] == HAIR and x == 0 and y >= 81 and z > -2: v[1] = HAIR_SH   # la raya
+    slab(M, H, HAIR, 66, 73, 0, -9.5, 8, 8, 5, 5, ch=2)                     # el moño
+    slab(M, H, HAIR_SH, 69, 70, 0, -9.5, 8.5, 8.5, 5.5, 5.5, ch=2)
+    cu.seams(M, (DRESS,))
+    cu.finish(M, 'asenath', {DRESS: 'lana', DRESS_SH: 'lana', DRESS_LT: 'lana', COLLAR: 'lona', SHOE: 'cuero',
+                             SOLE: 'cuero', HAIR: 'pelo', HAIR_SH: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
+              flat=(GOLD, GOLD_SH, STOCKING, BROW, LASH, IRIS, LIP, CHEEK), ax=AX, skirt=True)
+
+
 WHO = {'pickman': pickman, 'necrofago': necrofago, 'lienzo': lienzo, 'ward': ward, 'gilman': gilman,
-       'tillinghast': tillinghast}
+       'tillinghast': tillinghast, 'derby': derby, 'asenath': asenath}
 
 if __name__ == '__main__':
     for name in (sys.argv[1:] or list(WHO)):

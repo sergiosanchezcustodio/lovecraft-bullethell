@@ -21,6 +21,7 @@ var visual: Node3D
 var runner: PatternRunner
 var hit_radius := 0.5
 var health := 1.0
+var _touched := false                    ## ya ha recibido daño (Aldaba de los Derby, hito 20.21)
 var health_scale := 1.0                  ## multiplicador de vida (cooperativo): vida máxima = data.max_health × esto
 var shield_t := 0.0
 var ward := 0                              ## escudo de icor: golpes que para (grados de locura, 16.14)
@@ -607,6 +608,7 @@ func take_damage(d: Damage) -> void:
 	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
 	if idol_t > 0.0: k *= IDOL_GUARD           # al amparo del ídolo vivo (16.18)
 	if _reveal_t > 0.0: k *= 1.0 + _reveal_k   # revelado por la máquina (20.20)
+	if not _touched: k *= float(d.bonus.get(Player.FRESH_TAG, 1.0))   # ileso hasta ahora (Aldaba, 20.21)
 	for tag in data.tags: k *= float(d.bonus.get(tag, 1.0))    # rasgos contra este tipo de enemigo
 	if data.elite or data.unique: k *= float(d.bonus.get(Player.ELITE_TAG, 1.0))   # Medallón del cazador
 	if _stun > 0.0 or _root_t > 0.0: k *= float(d.bonus.get(Player.HELD_TAG, 1.0))   # Signo de Tsathoggua (16.9)
@@ -616,6 +618,7 @@ func take_damage(d: Damage) -> void:
 		return
 	var dealt := minf(d.physical * k, maxf(health, 0.0))
 	health -= d.physical * k
+	_touched = true
 	if health <= 0.0 and data.revive > 0.0 and not _revived:   # expedicionario: cae, pero aún no está muerto
 		_fall_down(d)
 		return

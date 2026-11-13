@@ -2822,3 +2822,53 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Capturas:** `level=p2_n2 character=tillinghast weapons=maquina_mas_alla autopick=false bot=smart` con capturas cada 0,2 s (el pulso y las visiones; al principio los mata de un golpe y caen deshechos en cubos azulados, del tinte de revelado), `weapons=medusas_mas_alla` (el anillo caliente, rosa, y los picotazos), `bot=circle dodge_every=0.6` y `title … open=menu_tienda tab=1 shop_focus=tillinghast`. Partida de 70 s con el bot sin errores.
 - **Tests:** `tests/test_tillinghast.gd` (en la tienda con su arma y sus ramas; lo revelado recibe más daño y se queda con el mayor; la onda revela lo que alcanza y no lo de lejos; sin enemigos no vibra ni cuesta; saca al excavador enterrado y le llega la onda; saca al sonámbulo donde se desvaneció; el calor dobla la cordura del segundo pulso, también al compañero cercano y no al lejano, y se enfría; las medusas revientan y revelan sin encadenarse; el esquive revela; la válvula suma solo a lo que revela). 847 de 847.
 
+### 20.21: Edward Derby y Asenath Waite (13-11-2026)
+
+*Pendiente de revisión del autor.*
+
+- **Quién:** el poeta de *El ser en el umbral* y su mujer, de Innsmouth, en la tienda como un solo personaje por 9.000 $ (`data/characters/derby.tres`, orden 20). Cada esquive cambia de cuerpo: Edward golpea de cerca y Asenath mira de lejos. Rasgo, dos almas: cada cambio le devuelve 3 de vida y 3 de cordura (`swap_restore`, en la lista de rasgos de `test_characters`). Vida 95, cordura 80, velocidad 4,6; FUE, POD y CUL. Victoria, `win_hat`.
+- **Arte** (`tools/gen_tienda20.py derby` y `asenath`, revisados de frente, de lado y de espaldas):
+  - **Edward:** rubio, de cara redonda y algo grueso (`b=1`), con bigotillo, ojos azules blandos y mejillas sonrosadas. Traje claro de buen paño con solapas, pajarita verde y pañuelo en el bolsillo. El primer traje salía mostaza: aclarado. Los zapatos de dos colores no se veían a tamaño de juego: quitados.
+  - **Asenath:** cuerpo de mujer (como Blake), pálida, con los ojos saltones de los Waite *en relieve* (4×4, con el blanco alrededor e iris verde) y el párpado oscuro encima, mirada fija y labios finos oscuros. Pelo negro con raya en medio y moño bajo. Vestido verde muy oscuro de talle bajo, cuello de encaje, cinturón de cadena de oro y colgante de oro de Innsmouth con piedra verdosa que brilla. Primero llevaba los ojos pintados y los párpados en relieve, y con la piel tan pálida no se leían (salía adormilada): rehechos en relieve, con la piel un poco menos blanca.
+  - **Caras:** `gen_caras_juego.py` lee también `alt_model` de cada personaje. Asenath va en `ODD_EYES` con sus cuatro filas (`(EYE_X, 72, 4)`: el párpado cerrado las tapa todas).
+  - **Vestuario:** 83 prendas cada uno (`gen_vestuario.py`). Los dos se visten con lo mismo que lleve Derby.
+- **Cambio de cuerpo** (`Player.swap_form`, `_swap_model`, `_make_body`; `CharacterData.alt_model`, `DodgeStyle.swap`):
+  - La forma (`Player.form`: 0 Edward, 1 Asenath) cambia al empezar el esquive, y con ella el arma.
+  - El modelo cambia escondido en el destello: `_swap_pending`, en cuanto la animación pasa de `hidden_from`.
+  - El segundo cuerpo se construye la primera vez, con su vestuario, su cara para el parpadeo, su silueta tras el decorado y su aura de crisis. Después se guarda en `Player._bodies` y se reutiliza.
+  - Al quitar al jugador se libera también el cuerpo que está fuera de la escena (`_notification`). Si no, cada partida dejaba sus mallas sin liberar.
+  - Las animaciones van por el modelo en uso (`Player.model_name` en lugar de `data.model`).
+  - Las piezas animadas del vestuario se buscan otra vez en cada cambio (`_grab_parts` y `_grab_glass`): linterna, burbujas, humo y vaho del casco.
+  - Humo de alma verdoso al cambiar (receta `soul`, en el calentamiento) y estela verde en el destello.
+  - En red viaja como `Player.NET_FORM` (64) en `net_flags`, y el otro PC cambia el modelo en `net_apply`.
+  - El retrato del panel sigue siendo el de Edward.
+- **Arma, El umbral** (`el_umbral`, entrega nueva `THRESHOLD`):
+  - **Edward:** un tajo alrededor (el del machete, `_slash`) de 2,3 m con `DamageRules.THRESHOLD_MELEE` (1,6) veces el daño. Es físico y cuerpo a cuerpo, así que le cuentan `melee_mult` y el daño físico del personaje.
+  - **Asenath:** dos miradas verdes que buscan al enemigo (balas con `homing`, estilo fuego fatuo). Son mágicas, cuestan 0,6 de cordura y solo salen si hay a quién mirar.
+  - `WeaponSystem.dmg` elige la categoría y el cuerpo a cuerpo según la forma.
+  - Reglas de daño: la media de los dos cuerpos, `(THRESHOLD_MELEE + count) / 2`, más `THRESHOLD_SWAPS` cambios por uso si suelta onda. Va en `AREA` y `NO_PROJECTILE`. Daño 7 (+7 %, dentro de la tolerancia).
+  - Niveles: daño, una mirada más, golpe más amplio, y daño con cadencia.
+  - **Objeto, Aldaba de la casa Derby** (`aldaba_derby`): estadística nueva `fresh_mult`, ×1,12 por nivel al primer daño a un enemigo ileso (etiqueta `Player.FRESH_TAG`). `Enemy._touched` se marca con el primer daño que resta vida. En la comparación, «Daño a los ilesos».
+  - **Ramas:**
+    - *Lo que llamó a la puerta* (`lo_que_llamo`): cada cambio de cuerpo suelta una onda verde podrida de `swap_blast` (2,5) veces el daño en 1,5 × `aoe_radius`, que aparta y no aturde (`WeaponSystem.on_swap`, `SWAP_COLOR`). El golpe de Edward es un 25 % más amplio.
+    - *Los ojos de Ephraim* (`ojos_de_ephraim`): cinco miradas de Asenath, que llegan más lejos y buscan con más ganas.
+    - Las dos, a 1,4 veces el nivel 5.
+  - Iconos con ComfyUI en local (semillas 1000, 1001, 1002 y 1001; sin letreros). Textos de la Biblioteca.
+- **Esquive, Cambio de cuerpo** (`data/dodges/umbral.tres`): un destello con estela verde en el que desaparece y sale con el otro cuerpo.
+- **Capturas:**
+  - `level=p2_n2 character=derby weapons=el_umbral autopick=false bot=circle dodge_every=0.6` (el cambio y las miradas) y `weapons=lo_que_llamo` (la onda).
+  - `title … open=menu_tienda tab=1 shop_focus=derby`.
+  - Partida de 70 s con el bot (`bot=smart`, con capturas hasta los 69 s) sin errores.
+  - Ojo: `quit_after=` no es una opción del juego. La partida de prueba sale tras la última captura; sin `shots=` no se cierra sola.
+  - Las estelas naranjas largas que salen al girar el bot en `p2_n2` hacia los 5 s también salen con Tillinghast: no son de Derby.
+- **Tests:** `tests/test_derby.gd`. 857 de 857. Comprueba:
+  - Está en la tienda con sus dos cuerpos y sus ramas.
+  - El esquive cambia de cuerpo y vuelve, con los mismos modelos.
+  - Edward golpea de cerca, sin balas ni coste de cordura.
+  - Asenath mira de lejos, le cuesta cordura y espera a tener a quién mirar.
+  - El daño es físico y cuerpo a cuerpo con Edward, y mágico con Asenath.
+  - Cada cambio devuelve vida y cordura sin pasarse del máximo.
+  - Lo que llamó suelta la onda al cambiar (sin la rama, no).
+  - La aldaba solo suma al primer golpe.
+  - En red, el otro PC ve el cambio.
+

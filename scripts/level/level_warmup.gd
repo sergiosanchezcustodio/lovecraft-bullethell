@@ -105,6 +105,7 @@ static func start(parent: Node, level: LevelData, at: Vector3) -> LevelWarmup:
 	VoxelFx.puff(w, w.global_position + Vector3(1.5, 0.5, -1.5), "salts_rise", 0.45)
 	VoxelFx.puff(w, w.global_position + Vector3(1.5, 0.5, -1.5), "fold", 0.5)        # el ángulo de Gilman (20.19)
 	VoxelFx.puff(w, w.global_position + Vector3(1.5, 0.5, -1.5), "beyond", 0.7)      # la máquina de Tillinghast (20.20)
+	VoxelFx.puff(w, w.global_position + Vector3(1.5, 0.5, -1.5), "soul", 0.6)        # el cambio de cuerpo de Derby (20.21)
 	FxTrails.prime(parent.get_tree(), at + Vector3(0, 0.5, 0))
 	FxShade.prime(w, Vector3(0, 0.6 - DEPTH, 0))                 # el sombreador de efectos (hito 18.2)
 	HitSparks.prime(at + Vector3(0, 0.5, 0))                     # las chispas de los impactos (hito 18.3)        # las estelas de las armas (hito 18.1)

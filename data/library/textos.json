@@ -232,7 +232,10 @@
 		"trono_azathoth": "Más allá de los ángulos está el caos del centro, donde el sultán de los demonios se revuelve entre flautas. Gilman soñó que lo llevaban hasta allí a firmar en un libro.",
 		"maquina_mas_alla": "Tubos de vidrio, latón y un zumbido que se nota en los dientes. Al encenderla todo se tiñe de violeta y aparece lo que siempre ha estado ahí. Lo que ha estado ahí también nos ve.",
 		"lo_que_nos_rodea": "«¿Quieres saber lo que nos rodea? Los has visto: flotan a través de ti y de mí, por el aire que respiramos.» Tillinghast no tuvo que encenderla más.",
-		"medusas_mas_alla": "Cosas como medusas, pálidas y gelatinosas, que se comen unas a otras sin hacer ruido. Los criados de Tillinghast no se fueron: se los comieron."
+		"medusas_mas_alla": "Cosas como medusas, pálidas y gelatinosas, que se comen unas a otras sin hacer ruido. Los criados de Tillinghast no se fueron: se los comieron.",
+		"el_umbral": "Edward Derby se casó con Asenath Waite, de Innsmouth, y desde entonces no siempre es él quien mira por sus ojos. Cuando es él, golpea con torpeza de poeta asustado; cuando es ella, mira, y lo que mira se marchita.",
+		"lo_que_llamo": "Tres golpes, y luego dos: la llamada de Edward. Daniel Upton abrió, y lo que esperaba en el umbral estaba deshecho; aun así había vuelto andando desde la casa de Crowninshield.",
+		"ojos_de_ephraim": "Ephraim Waite no murió en Innsmouth: se quedó con el cuerpo de su hija y, cuando se le quedó pequeño, quiso el de Edward. Los ojos son lo único que no cambia de un cuerpo a otro."
 	},
 	"items": {
 		"diario_wilbur": "Un cuaderno cifrado en un alfabeto que Armitage tardó semanas en romper. Lo que dice no se puede leer de un tirón, pero quien lo lleva encima deja de temblar.",
@@ -318,7 +321,8 @@
 		"foto_modelo": "Una fotografía arrugada que estaba clavada en el lienzo de Pickman, la que usaba de modelo. No es un decorado ni un disfraz. El que la mira ya no vuelve a bajar a un sótano.",
 		"frasco_custodes": "Un frasco de gres con la etiqueta «Custodes». Lo que hay dentro no es para levantar a cualquiera: son los guardianes, y obedecen al que los llamó.",
 		"estatuilla_balaustrada": "Una figurilla de metal con forma de barril estriado y cinco brazos en estrella. Gilman la arrancó en sueños de la balaustrada de una terraza bajo tres soles. Por la mañana estaba en su cama.",
-		"valvula_maquina": "Una válvula de repuesto de la máquina de Tillinghast, aún tibia. Brilla con un violeta que no debería verse: el que está más allá del violeta."
+		"valvula_maquina": "Una válvula de repuesto de la máquina de Tillinghast, aún tibia. Brilla con un violeta que no debería verse: el que está más allá del violeta.",
+		"aldaba_derby": "La aldaba de hierro de la casa de Edward en Arkham. Tres golpes y luego dos era la llamada de Edward cuando era Edward; los demás llamaban de otra forma, y nadie les abría."
 	},
 	"places": {
 		"p1_n1": "Costa del mar de Ross, Antártida, 1930. La expedición de la Universidad de Miskatonic monta aquí su campamento: tiendas, una cabaña de troncos, un iglú y los faroles. Al norte, la Barrera de hielo; al sur, el mar. Algo vino de las cavernas de abajo.",
@@ -356,7 +360,8 @@
 		"pickman": "Richard Upton Pickman, de una vieja familia de Salem, pintor. Lo echaron del Club de Arte de Boston por sus cuadros de cosas que salen de los túneles a comer. Tenía un estudio secreto en el North End, junto a un pozo de ladrillo, y nadie sabe de dónde sacaba los modelos. Desapareció. Sus cuadros, no.",
 		"ward": "Charles Dexter Ward, de Providence, anticuario. Se obsesionó con un antepasado, Joseph Curwen, que había muerto en 1771 y que no estaba del todo muerto. Encontró sus papeles, sus fórmulas y su tumba. Lo encerraron en un sanatorio, y el doctor Willett notó que su paciente ya no tenía el lunar de la cadera.",
 		"gilman": "Walter Gilman, de Haverhill, estudiante de matemáticas en Miskatonic. Alquiló la buhardilla de la casa de la bruja, en Arkham, porque sus ángulos no eran normales. Soñaba con una vieja y con una rata con cara de hombre que le mordisqueaba los tobillos, y despertaba con barro en los pies.",
-		"tillinghast": "Crawford Tillinghast, físico y filósofo de Providence. Construyó una máquina que despierta los sentidos dormidos y muestra lo que nos rodea sin que lo veamos. Después de diez semanas encerrado con ella estaba flaco, sucio y sin criados, y sonreía de un modo que no gustaba."
+		"tillinghast": "Crawford Tillinghast, físico y filósofo de Providence. Construyó una máquina que despierta los sentidos dormidos y muestra lo que nos rodea sin que lo veamos. Después de diez semanas encerrado con ella estaba flaco, sucio y sin criados, y sonreía de un modo que no gustaba.",
+		"derby": "Edward Pickman Derby, poeta precoz de Arkham, blando, rubio y algo grueso, que nunca se separó de sus padres. Se casó con Asenath Waite, la hija del viejo Ephraim de Innsmouth, de ojos saltones y mirada fija. Desde entonces a veces es él, y a veces, en su mismo cuerpo, es otra persona."
 	},
 	"pets": {
 		"perro": "Uno de los perros de trineo del campamento de Lake. El único que volvió. Desde entonces gruñe a la nieve.",

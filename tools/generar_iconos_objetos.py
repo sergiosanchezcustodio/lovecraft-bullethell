@@ -82,6 +82,7 @@ ITEMS = {
     'laudano': "a small brown glass laudanum bottle with a cork and a paper label",
     'mapa_sueno': "a rolled-out old parchment map of a fantasy dreamland with a strange mountain at its edge, glowing faintly blue",
     'valvula_maquina': "a single antique glass vacuum tube valve with a brass base and filaments glowing ultraviolet violet inside",
+    'aldaba_derby': "an antique black iron door knocker shaped like a ring held by a lion head, mounted on a dark green painted wooden door, faint green glow",
     'estatuilla_balaustrada': "a small spiky dull bronze figurine shaped like a ridged barrel with five thin radiating star-shaped arms on top, an alien statuette broken off a balustrade",
     'frasco_custodes': "an old corked grey stoneware jar with a faded paper label reading Custodes, a thin crack in its side leaking faint pale blue light",
     'foto_modelo': "an old crumpled sepia photograph curling at the edges, showing a hideous hunched grey ghoul monster with a canine snout, long claws and glowing eyes, pinned with a rusty nail",

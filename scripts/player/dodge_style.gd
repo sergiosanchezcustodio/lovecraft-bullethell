@@ -21,6 +21,8 @@ extends Resource
 @export var phase := false
 ## Se asoma al más allá (Tillinghast, hito 20.20): revela a los de `reveal` m de donde sale.
 @export var reveal := 0.0
+## Cambia de cuerpo (Derby y Asenath, hito 20.21; CharacterData.alt_model), escondido en el destello.
+@export var swap := false
 ## Tramo de la animación (0..1) en que el modelo no se ve (el destello "desaparece").
 @export var hidden_from := -1.0
 @export var hidden_to := -1.0

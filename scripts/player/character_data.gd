@@ -80,6 +80,11 @@ extends Resource
 @export var ally_dmg_mult := 1.0             ## daño de esos aliados (Frasco de los Custodes, hito 20.18)
 @export var proj_size_mult := 1.0            ## tamaño de las balas, el de choque y el que se ve (Estatuilla de la balaustrada, hito 20.19)
 @export var reveal_add := 0.0                ## más daño a los revelados (Válvula de la máquina, hito 20.20)
+@export var fresh_mult := 1.0                ## daño a los enemigos ilesos (Aldaba de los Derby, hito 20.21)
+## Segundo cuerpo (Derby y Asenath, hito 20.21): el modelo al que cambia con un esquive `swap`
+## (y sus armas THRESHOLD, a la otra forma). Vacío: uno solo.
+@export var alt_model := ""
+@export var swap_restore := 0.0              ## vida y cordura que recupera al cambiar de cuerpo (rasgo de Derby)
 @export var pierce_add := 0.0                ## enemigos más que atraviesan las balas (Piedra de afilar)
 @export var crit_chance := 0.0               ## probabilidad de crítico de todas las armas (Ojo de Pickman)
 @export var crit_bonus := 0.0                ## suma al daño del crítico, que de base es ×1,5 (Collar de colmillos)

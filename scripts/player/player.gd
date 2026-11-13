@@ -52,6 +52,12 @@ var pet: Node                    ## su compañero (Pet), si lleva
 var pet_xp_mult := 1.0          ## experiencia extra por gema (búho de los sueños)
 var visual: Node3D          ## contenedor que gira hacia donde mira; dentro, el modelo voxel
 var model: Node3D
+## Cuerpo en uso (Derby y Asenath, hito 20.21): 0 el de `data.model`, 1 el de `data.alt_model`.
+var form := 0
+var model_name := ""                         ## el modelo en uso (anims, cara)
+signal body_swapped
+var _bodies: Array[Dictionary] = []          ## [{model, face, crisis, name}] de los dos cuerpos
+var _swap_pending := false                   ## el modelo cambia escondido en el destello
 var _crisis_look: CrisisLook
 var _face: FaceLook              ## parpadeo y mueca de dolor
 var health := 0.0
@@ -63,6 +69,7 @@ const CALM_RADIUS := 4.0
 const ARMOR_FLOOR := 0.2         ## parte del golpe físico que siempre pasa la armadura
 const ELITE_TAG := "elite"       ## rasgo de daño contra élites y seres únicos (Enemy.take_damage)
 const HELD_TAG := "held"         ## contra aturdidos o inmovilizados (Signo de Tsathoggua, 16.9)
+const FRESH_TAG := "fresh"       ## contra los enemigos ilesos (Aldaba de los Derby, 20.21)
 ## Estadísticas de los objetos (D-38) que rebuild_stats rehace desde la base del personaje.
 const ITEM_STATS: Array[String] = ["proj_count_add", "range_mult", "proj_speed_mult", "area_mult",
 	"weapon_cooldown_mult", "duration_mult", "pierce_add", "crit_chance", "crit_bonus", "damage_mult",
@@ -71,7 +78,7 @@ const ITEM_STATS: Array[String] = ["proj_count_add", "range_mult", "proj_speed_m
 	"chest_mult", "pickup_heal_mult", "pet_mult", "hit_iframes", "arcane_cost_mult", "thorns", "nodens_level",
 	"ankh", "dodge_charges", "decoy_time", "dodge_blast", "dodge_fury", "rerolls", "kill_blast", "hit_slow",
 	"hit_burn", "low_hp_bonus", "idol_mult", "arcane_cooldown_mult", "calm_aura",   # (estos dos, 16.25)
-	"ally_mult", "ally_dmg_mult", "proj_size_mult", "reveal_add"]                                                                     # (20.17)
+	"ally_mult", "ally_dmg_mult", "proj_size_mult", "reveal_add", "fresh_mult"]                                                                     # (20.17)
 ## Objetos con mecánica (hito 8.7)
 const LOW_HP := 0.3              ## por debajo de esta parte de la vida cuenta el Diente de shoggoth
 const FURY_TIME := 2.0           ## s de daño extra tras esquivar (Elixir de Curwen)
@@ -202,20 +209,15 @@ func _ready() -> void:
 	visual.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	visual.top_level = true
 	add_child(visual)
+	model_name = data.model
 	model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
 	var worn := OutfitData.worn_for(String(data.id))
 	OutfitData.apply(model, data.model, worn)        # vestuario (D-34)
 	_hold = OutfitData.hold_of(worn)                 # paraguas, linterna (fase 14)
 	outfit_set = OutfitSets.worn_name(worn)          # conjunto entero puesto (14.8)
 	outfit_worn = worn
-	var pn: Dictionary = model.get_meta("part_nodes")
-	if pn.has("fore_r"): _beam = (pn["fore_r"] as Node3D).get_node_or_null("Beam") as SpotLight3D
-	if pn.has("head"):
-		_bubbles = (pn["head"] as Node3D).get_node_or_null("bubbles") as GPUParticles3D
-		for c in (pn["head"] as Node3D).get_children():
-			if c is GPUParticles3D and String(c.name).begins_with("smoke"): _smokes.append(c)
+	_grab_parts(model)
 	if String(worn.get("head", "")) == "casco_buzo": _breath_in = randf_range(2.0, BREATH_EVERY.y)
-	if pn.has("fore_r"): _sparks = (pn["fore_r"] as Node3D).get_node_or_null("torch_sparks") as GPUParticles3D
 	_face = FaceLook.new().setup(model, VoxelBuilder.variant_path("res://models/%s.json" % data.model))
 	add_child(_face)
 	_set_vis_layer(model)
@@ -226,16 +228,7 @@ func _ready() -> void:
 	_xray.set_shader_parameter("color", Color(color, 0.6))
 	for mi: MeshInstance3D in model.get_meta("meshes"):
 		mi.material_overlay = _xray
-	if pn.has("glass"):                             # vaho del casco de buzo, con la silueta detrás
-		_fog = VoxelFx.std()
-		_fog.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		_fog.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		_fog.albedo_color = Color(FOG_TINT, 0.0)
-		_fog.next_pass = _xray
-		for c in (pn["glass"] as Node3D).get_children():
-			if c is MeshInstance3D:
-				_glass_meshes.append(c)
-				(c as MeshInstance3D).material_overlay = _fog
+	_grab_glass(model)
 	_dirt_dress()
 	_ring = _make_ring()
 	add_child(_ring)
@@ -271,6 +264,34 @@ func _ready() -> void:
 	fill.light_cull_mask = VIS_PLAYER
 	add_child(fill)
 	reset_physics_interpolation.call_deferred()      # no interpolar desde el origen al aparecer
+
+## Las piezas del vestuario que el jugador anima (linterna, burbujas y vaho del casco, humo de la
+## pipa, chispas de la antorcha). Se buscan otra vez al cambiar de cuerpo (Derby, hito 20.21).
+func _grab_parts(m: Node3D) -> void:
+	var pn: Dictionary = m.get_meta("part_nodes")
+	_beam = null; _bubbles = null; _sparks = null
+	_smokes.clear()
+	if pn.has("fore_r"): _beam = (pn["fore_r"] as Node3D).get_node_or_null("Beam") as SpotLight3D
+	if pn.has("head"):
+		_bubbles = (pn["head"] as Node3D).get_node_or_null("bubbles") as GPUParticles3D
+		for c in (pn["head"] as Node3D).get_children():
+			if c is GPUParticles3D and String(c.name).begins_with("smoke"): _smokes.append(c)
+	if pn.has("fore_r"): _sparks = (pn["fore_r"] as Node3D).get_node_or_null("torch_sparks") as GPUParticles3D
+
+func _grab_glass(m: Node3D) -> void:
+	var pn: Dictionary = m.get_meta("part_nodes")
+	_glass_meshes.clear()
+	if not pn.has("glass"): return                 # vaho del casco de buzo, con la silueta detrás
+	if _fog == null:
+		_fog = VoxelFx.std()
+		_fog.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_fog.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		_fog.albedo_color = Color(FOG_TINT, 0.0)
+		_fog.next_pass = _xray
+	for c in (pn["glass"] as Node3D).get_children():
+		if c is MeshInstance3D:
+			_glass_meshes.append(c)
+			(c as MeshInstance3D).material_overlay = _fog
 
 ## Pasa el modelo (con su vestuario) a la capa de los jugadores.
 static func _set_vis_layer(node: Node) -> void:
@@ -523,13 +544,13 @@ func _downed_visual(delta: float) -> void:
 	var here := get_global_transform_interpolated().origin
 	Anims.reset(model)
 	_down_t += delta
-	if Anims.has_anim(data.model, "down"):
-		var fall := Anims.duration(data.model, "down")
+	if Anims.has_anim(model_name, "down"):
+		var fall := Anims.duration(model_name, "down")
 		if _down_t < fall:
-			Anims.pose(data.model, "down", model, _down_t / fall)
+			Anims.pose(model_name, "down", model, _down_t / fall)
 		else:
 			var r := _reach()
-			Anims.script_for(data.model).call("down_wait", model, fmod(_down_t - fall, 3.0) / 3.0, r.x, r.y)
+			Anims.script_for(model_name).call("down_wait", model, fmod(_down_t - fall, 3.0) / 3.0, r.x, r.y)
 		if not _down_snap.is_empty(): Anims.blend_from(model, _down_snap, Anims.ease(_down_t / 0.15))
 	else:
 		model.rotation.x = PI * 0.47                  # de bruces, hacia donde miraba
@@ -618,11 +639,14 @@ func _process_step(delta: float) -> void:
 	_splash.emitting = _wade > 0.5 and motor.velocity.length() > 0.3
 	_ripple_step()
 	var style := data.dodge_style
+	if _swap_pending and (_action == "" or style == null or style.hidden_from < 0.0 \
+			or _action_t / Anims.duration(model_name, _action) >= style.hidden_from):
+		_swap_model()                                                  # escondido en el destello (20.21)
 	_snow.emitting = _action != "" and (style == null or style.snow_spray)
 	if style != null and style.phase: visual.scale = Vector3.ONE        # el plegado (20.19) la cambia abajo
 	# Destello: el modelo desaparece en su tramo y deja una estela de imágenes fantasma
 	if _action != "" and style != null:
-		var u := _action_t / Anims.duration(data.model, _action)
+		var u := _action_t / Anims.duration(model_name, _action)
 		if u >= style.hidden_from and u < style.hidden_to:
 			visual.visible = false
 		if style.frames and not _frame_out and u >= style.hidden_to and world != null:   # y el cuadro por el que sale
@@ -646,6 +670,7 @@ func _process_step(delta: float) -> void:
 			if _ghost_t <= 0.0 and world != null:
 				_ghost_t = 0.05
 				var tint := Color(0.7, 0.45, 1.0) if style.phase or style.reveal > 0.0 else color.lerp(Color(0.85, 0.95, 1.0), 0.6)
+				if style.swap: tint = Color(0.55, 0.8, 0.5)                  # el alma que pasa al otro cuerpo (20.21)
 				world.fx.add_child(Afterimage.new().setup(model, tint, 0.28))
 
 ## Inclinación (hito 11.1): hacia donde acelera, atrás al frenar (con un pequeño rebote: un
@@ -690,7 +715,7 @@ func _animate(delta: float) -> void:
 		# reloj propio a ritmo de fotograma: motor.dodge_time avanza en pasos de física
 		# (60 Hz) y en monitores más rápidos la pose iría a saltos
 		_action_t += delta
-		if _action_t >= Anims.duration(data.model, _action): _action = ""
+		if _action_t >= Anims.duration(model_name, _action): _action = ""
 	var anim := "idle"
 	if _action != "": anim = _action
 	elif motor.velocity.length() > 0.1: anim = "walk"
@@ -705,7 +730,7 @@ func _animate(delta: float) -> void:
 		if anim != "walk": _anim_t = 0.0
 	var t: float
 	if _action != "":
-		t = _action_t / Anims.duration(data.model, _action)
+		t = _action_t / Anims.duration(model_name, _action)
 	elif _fidget != "":
 		t = _fidget_t / Anims.duration(data.model, _fidget)
 	elif anim == "walk":
@@ -785,7 +810,7 @@ func _terrain_step(anim: String, t: float, delta: float) -> void:
 	var mud_want := 1.0 if Ambient.ground == "mud" and _wade < 0.5 else 0.0
 	_mud_w = move_toward(_mud_w, mud_want, delta * 3.0)
 	if anim != "walk": return
-	var s := Anims.script_for(data.model)
+	var s := Anims.script_for(model_name)
 	if s == null or not s.has_method("terrain"): return
 	var k := clampf(motor.velocity.length() / maxf(data.move_speed, 0.1), 0.0, 1.0)   # parado, nada
 	s.call("terrain", model, t, _wade * k, _mud_w * k)
@@ -830,13 +855,13 @@ func _brake_step(delta: float) -> void:
 		return
 	if _brake_full:
 		var w := 1.0 - clampf(speed / ms * 1.5, 0.0, 1.0)              # echa a andar: se le pasa
-		var drop := float(Anims.script_for(data.model).get("BRAKE_DROP"))
+		var drop := float(Anims.script_for(model_name).get("BRAKE_DROP"))
 		Anims.overlay(data.model, "brake", model, u, w, BRAKE_PARTS)
 		model.position.y -= drop * w * (1.0 - Anims.ease((u - 0.35) / 0.65)) * Anims.ease(u / 0.15)
 		if Ambient.ground == "snow" and _wade < 0.5:                   # en la nieve, resbala (17.6)
 			_slip_t += delta
 			var sk := Anims.ease(u / 0.1) * (1.0 - Anims.ease((u - 0.3) / 0.5))
-			var sc := Anims.script_for(data.model)
+			var sc := Anims.script_for(model_name)
 			if sc != null and sc.has_method("slip"): sc.call("slip", model, sk * w, _slip_t)
 	else:
 		Anims.overlay(data.model, "brake", model, u, 0.6, UPPER_BODY)
@@ -898,7 +923,7 @@ func _aim_step(delta: float) -> void:
 	_aim_two = move_toward(_aim_two, _aim_want_two, delta * 5.0)
 	_kick *= exp(-delta * 14.0)
 	if _aim_w <= 0.0: return
-	var s := Anims.script_for(data.model)
+	var s := Anims.script_for(model_name)
 	if s == null or not s.has_method("aim"): return
 	var look := clampf(wrapf(_aim_yaw - visual.rotation.y, -PI, PI), -1.2, 1.2)
 	s.call("aim", model, _aim_two, look, _kick, Anims.ease(_aim_w))
@@ -1099,7 +1124,7 @@ func reseed(s: int) -> void:
 ## a cero (la crisis), las manos a la cabeza. Con la cordura que ve este PC, así que vale para
 ## los jugadores de otros PC. No durante el esquive.
 func _mind_step(delta: float) -> void:
-	var s := Anims.script_for(data.model)
+	var s := Anims.script_for(model_name)
 	if s == null or not s.has_method("unease"): return
 	_mind_t += delta
 	_crisis_w = move_toward(_crisis_w, 1.0 if sanity <= 0.01 and _action == "" else 0.0, delta * 4.0)
@@ -1307,6 +1332,7 @@ func rebuild_stats() -> void:
 	var tags := base.bonus_tags.duplicate()                  # Medallón del cazador: contra élites y únicos
 	if data.elite_mult != 1.0: tags[ELITE_TAG] = data.elite_mult
 	if has_sign(&"tsathoggua"): tags[HELD_TAG] = Signs.value("tsathoggua")   # aturdidos o inmovilizados (16.9)
+	if data.fresh_mult != 1.0: tags[FRESH_TAG] = data.fresh_mult
 	if tags != data.bonus_tags:
 		data.bonus_tags = tags
 		if weapons: weapons.bonus_changed()
@@ -1483,6 +1509,57 @@ func _item_hit(e: Node3D, dmg: float, item: String) -> void:
 	e.take_damage(d)
 	Damage.ctx = prev
 
+## Cambia de cuerpo (Derby y Asenath, hito 20.21): la forma (y con ella las armas THRESHOLD) al
+## momento; el modelo, escondido en el destello (_swap_model). Recupera swap_restore de vida y cordura.
+func swap_form() -> void:
+	form = 1 - form
+	_swap_pending = true
+	if data.swap_restore > 0.0:
+		health = minf(data.max_health, health + data.swap_restore)
+		sanity = minf(data.max_sanity, sanity + data.swap_restore)
+	if world != null: VoxelFx.puff(world.fx, global_position, "soul", 0.6, Color.WHITE, 1.0)
+	if weapons != null: weapons.on_swap()
+
+## Pone el modelo del cuerpo `form`. El otro se construye la primera vez (con su vestuario, su
+## cara, su silueta tras el decorado y su aura de crisis) y se guarda.
+func _swap_model() -> void:
+	_swap_pending = false
+	if _bodies.is_empty(): _bodies.append({"model": model, "face": _face, "crisis": _crisis_look, "name": data.model})
+	if _bodies.size() < 2: _bodies.append(_make_body(data.alt_model))
+	var b: Dictionary = _bodies[form]
+	if b.model == model: return
+	if model.get_parent() == visual: visual.remove_child(model)
+	model = b.model
+	_face = b.face
+	_crisis_look = b.crisis
+	model_name = b.name
+	visual.add_child(model)
+	Anims.reset(model)
+	_blend_snap = []
+	_grab_parts(model)
+	_grab_glass(model)
+	_dirt_dress()
+	if world != null: VoxelFx.puff(world.fx, global_position, "soul", 0.45, Color.WHITE, 0.7)
+	body_swapped.emit()
+
+## El cuerpo guardado fuera de la escena no lo libera nadie más.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE:
+		for b in _bodies:
+			var m: Node3D = b.model
+			if is_instance_valid(m) and m.get_parent() == null: m.free()
+
+func _make_body(name: String) -> Dictionary:
+	var m := VoxelBuilder.load_model("res://models/%s.json" % name)
+	OutfitData.apply(m, name, outfit_worn)
+	var face := FaceLook.new().setup(m, VoxelBuilder.variant_path("res://models/%s.json" % name))
+	add_child(face)
+	_set_vis_layer(m)
+	for mi: MeshInstance3D in m.get_meta("meshes"): mi.material_overlay = _xray
+	var crisis := CrisisLook.new().setup(m)
+	add_child(crisis)
+	return {"model": m, "face": face, "crisis": crisis, "name": name}
+
 const DODGE_REVEAL_T := 2.5                   ## esquive de Tillinghast (20.20): s revelados
 const DODGE_REVEAL_K := 0.2                   ## y cuánto más daño reciben
 
@@ -1505,6 +1582,7 @@ func _on_dodge() -> void:
 	if data.dodge_style != null and data.dodge_style.phase and world != null:  # se pliega en un ángulo (20.19)
 		VoxelFx.puff(world.fx, global_position, "fold", 0.5, Color.WHITE, 1.0)
 		_frame_out = false
+	if data.dodge_style != null and data.dodge_style.swap and data.alt_model != "": swap_form()   # el otro cuerpo (20.21)
 	if data.dodge_style != null and data.dodge_style.reveal > 0.0 and world != null:   # se asoma al más allá (20.20)
 		VoxelFx.puff(world.fx, global_position, "beyond", 0.7, Color.WHITE, 0.8)
 		for e in world.enemies_in_circle(global_position, data.dodge_style.reveal):
@@ -1626,6 +1704,7 @@ const NET_TREMBLING := 4
 const NET_HURT := 8                  ## parpadea tras un golpe
 const NET_ELIMINATED := 16
 const NET_INVULN := 32               ## esquivando o recién golpeado: las balas lo atraviesan
+const NET_FORM := 64                 ## con el otro cuerpo (Derby y Asenath, 20.21)
 
 ## Lo que los demás PC no pueden calcular de este jugador (crisis, parálisis, golpe reciente).
 func net_flags() -> int:
@@ -1637,6 +1716,7 @@ func net_flags() -> int:
 	if _hurt_time >= 0.0 and _hurt_time < data.hit_iframes: f |= NET_HURT
 	if is_eliminated: f |= NET_ELIMINATED
 	if god or is_invulnerable(): f |= NET_INVULN
+	if form == 1: f |= NET_FORM
 	return f
 
 ## Jugador de otro PC: ¿para aquí las balas enemigas? (en pie y sin invulnerabilidad; el daño
@@ -1666,6 +1746,10 @@ func net_apply(pos: Vector3, yaw: float, vel: Vector3, dodges: int, hp: float, s
 	health = hp
 	sanity = san
 	_net_flags = flags
+	var f := 1 if (flags & NET_FORM) != 0 else 0
+	if data.alt_model != "" and f != form:            # ha cambiado de cuerpo en su PC (20.21)
+		form = f
+		_swap_pending = true
 	sanity_state.in_crisis = (flags & NET_CRISIS) != 0
 	if flags & NET_HURT:
 		if _hurt_time < 0.0 or _hurt_time >= data.hit_iframes:
