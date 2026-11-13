@@ -699,9 +699,12 @@ def kuranes():
     ], {'d': BEARD}, dz=1)
     cu.ear_holes(M, EAR_IN)
     # pelo gris peinado hacia atrás, con entradas
-    cu.hair_back(M, SKIN, HAIR, top=200, bottom=68, neck=True)
+    cu.hair_back(M, SKIN, HAIR, top=200, bottom=65, neck=True)
     for (x, y, z), v in M.V.items():
-        if v[0] == H and v[1] == SKIN and (y >= 81 or (y >= 79 and abs(x + 0.5) >= 4)): v[1] = HAIR
+        # (la cabeza acaba en la fila 80: arriba, pelo salvo las entradas de delante, y en las
+        #  esquinas redondeadas sobre las orejas; con y >= 81 la coronilla salía calva)
+        if v[0] == H and v[1] == SKIN and ((y >= 80 and not (z >= 5 and abs(x + 0.5) >= 2.5))
+                                           or (y >= 77 and abs(x + 0.5) >= 4 and z <= 4)): v[1] = HAIR
     cu.sideburns(M, HAIR, 70, 78)
     cu.hair_over_ears(M, SKIN, HAIR, 75, 78)
     for (x, z) in {(k[0], k[2]) for k in M.V if k[1] >= 79}:                 # las marcas del peine

@@ -2882,6 +2882,7 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
   - Batín de terciopelo granate hasta medio muslo, con solapas acolchadas en rombos, dos alamares y cordón de oro con borlas. Pañuelo azul al cuello con alfiler, pantalón gris y zapatillas.
   - En la frente, el aro de oro fino del rey de Celephaïs, con una piedra celeste que brilla.
   - El primer gris del pelo y la barba era tan claro que con la luz cálida salía del color de la piel (de espaldas parecía calvo): oscurecido y con un tono frío.
+  - Al montar la hoja resumen se vio que seguía saliendo calvo por arriba: la cabeza acaba en la fila 80 y el pelo de arriba empezaba en la 81. Ahora la coronilla es de pelo salvo las entradas de delante, las esquinas redondeadas sobre las orejas también, y la nuca baja hasta la fila 65 (antes, 68: de espaldas quedaba una franja de piel).
   - Cara para el parpadeo y vestuario (83 prendas).
 - **Zona de sueño** (`DreamZone`, `scripts/weapons/dream_zone.gd`): un trozo del cielo de Celephaïs en el suelo.
   - Los enemigos de dentro van cada vez más despacio: del paso normal al freno entero (`slow_factor`) en `DROWSE` (1,2 s). Las élites, la mitad, como con cualquier freno.
