@@ -218,13 +218,56 @@ static func divider(width: float = 380.0) -> TextureRect:
 
 ## Título de ventana con su separador debajo, pegado a él.
 static func heading(parent: Container, text: String, size: int = 44, color: Color = INK) -> Label:
+	var crumb: Label = null
+	if page_turn:                                 # la ruta, encima (hito 20.5); en la partida, no
+		crumb = UiKit.label("", 17, UiKit.TEXT_DIM)
+		crumb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		crumb.visible = false
+		parent.add_child(crumb)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", -int(size * 0.18))
 	parent.add_child(v)
 	var t := title(text, size, color)
 	v.add_child(t)
 	v.add_child(divider(clampf(size * 7.0, 240.0, 380.0)))
+	if crumb != null:
+		var path: Array[String] = []
+		var alive: Array = []
+		for e: Array in _trail:
+			var l: Variant = e[0]
+			if is_instance_valid(l) and (l as Node).is_inside_tree() and not (l as Node).is_queued_for_deletion():
+				alive.append(e)
+				path.append(String(e[1]))
+		alive.append([t, text])
+		_trail = alive
+		t.set_meta(&"crumb", [crumb, path, text])
+		_crumb_text(t, "")
 	return t
+
+## Ruta de los menús (hito 20.5): «Jugar › La noche eterna», «Tienda › Personajes». Cada título
+## de ventana abierto fuera de la partida se apunta en `_trail`; el de una ventana nueva lleva
+## encima los de las que siguen abiertas debajo y, con `crumb_tail`, la pestaña en la que está.
+## Sola y sin pestaña, no se ve.
+const CRUMB_SEP := "  ›  "
+static var _trail: Array = []
+
+## La pestaña (o lo que se esté viendo dentro) tras el título `heading_label` de `heading`.
+static func crumb_tail(heading_label: Label, tail: String) -> void:
+	if heading_label != null and heading_label.has_meta(&"crumb"): _crumb_text(heading_label, tail)
+
+static func crumb_of(heading_label: Label) -> String:
+	if heading_label == null or not heading_label.has_meta(&"crumb"): return ""
+	return (heading_label.get_meta(&"crumb")[0] as Label).text
+
+static func _crumb_text(t: Label, tail: String) -> void:
+	var m: Array = t.get_meta(&"crumb")
+	var parts: Array[String] = []
+	parts.append_array(m[1])
+	parts.append(String(m[2]))
+	if tail != "": parts.append(tail)
+	var l: Label = m[0]
+	l.text = CRUMB_SEP.join(parts) if parts.size() > 1 else ""
+	l.visible = parts.size() > 1
 
 ## Estilo de una fila de opciones (OptionRow) o de una pestaña: sombría, con un filete abajo; con
 ## el foco, la luz de vela de los botones.

@@ -10,6 +10,7 @@ signal closed
 const TABS := ["Vídeo", "Audio", "Controles", "Juego", "Nube"]
 
 var _tab := 0
+var _head: Label                         ## el título, para la ruta (hito 20.5)
 var _tabs: Array[Button] = []
 var _list: VBoxContainer
 var _first: Control
@@ -21,7 +22,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var w: Array = MenuKit.window(self, MenuKit.INK, 900)
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "Configuración", 48)
+	_head = MenuKit.heading(box, "Configuración", 48)
 	var tabs := HBoxContainer.new()
 	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
 	tabs.add_theme_constant_override("separation", 12)
@@ -53,6 +54,7 @@ func _ready() -> void:
 func _show_tab(i: int) -> void:
 	_capture = {}
 	_tab = i
+	MenuKit.crumb_tail(_head, TABS[i])
 	for k in _tabs.size():
 		_tabs[k].add_theme_color_override("font_color", MenuKit.INK if k == i else UiKit.TEXT_DIM)
 		_tabs[k].add_theme_stylebox_override("normal", MenuKit.box(Color(0.16, 0.1, 0.05, 0.9) if k == i else Color(0.04, 0.03, 0.025, 0.6),

@@ -12,6 +12,7 @@ signal closed
 
 var save: SaveData
 var _tab := 0
+var _head: Label                                ## el título, para la ruta (hito 20.5)
 var _tabs: Array[Button] = []
 var _list: VBoxContainer
 var _money: Label
@@ -36,7 +37,7 @@ func _ready() -> void:
 	var win_root: Control = w[0]
 	(win_root.get_child(0) as ColorRect).color = Color(0, 0, 0.02, 0.12)   # sin oscurecer la escena
 	_to_right(win_root.get_child(1) as Control)                            # la ventana, a la derecha
-	MenuKit.heading(box, "Tienda", 48)
+	_head = MenuKit.heading(box, "Tienda", 48)
 	_money = UiKit.label("", 24, UiKit.GOLD)
 	_money.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_money)
@@ -115,6 +116,7 @@ func _to_right(cc: Control) -> void:
 
 func _show_tab(i: int) -> void:
 	_tab = i
+	MenuKit.crumb_tail(_head, Shop.SECTIONS[i])
 	for k in _tabs.size():
 		_tabs[k].add_theme_color_override("font_color", UiKit.GOLD if k == i else UiKit.TEXT_DIM)
 		_tabs[k].add_theme_stylebox_override("normal", MenuKit.box(Color(0.16, 0.1, 0.05, 0.9) if k == i else Color(0.04, 0.03, 0.025, 0.6),
