@@ -81,6 +81,7 @@ ITEMS = {
     'escapulario': "a cloth scapular with two small embroidered patches joined by cords",
     'laudano': "a small brown glass laudanum bottle with a cork and a paper label",
     'mapa_sueno': "a rolled-out old parchment map of a fantasy dreamland with a strange mountain at its edge, glowing faintly blue",
+    'foto_modelo': "an old crumpled sepia photograph curling at the edges, showing a hideous hunched grey ghoul monster with a canine snout, long claws and glowing eyes, pinned with a rusty nail",
     'diario_wilbur': "a battered small leather notebook tied with string, its open pages covered in strange cipher script",
     'escamas': "a vest made of overlapping blue-green fish scales, iridescent",
     'nodens': "a large grey seashell shield with pale blue glowing edges",

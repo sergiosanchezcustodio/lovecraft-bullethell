@@ -90,6 +90,7 @@ func _ready() -> void:
 	var la := LaunchArgs.from_cmdline()                        # capturas: shop_sub=3 shop_char=2
 	_sub = la.get_int("shop_sub", 0)
 	for n in la.get_int("shop_char", 0): _fitting.next_character()
+	_focus_id = la.get_str("shop_focus", "")                 # capturas: shop_focus=pickman elige su fila
 	_show_tab(0)
 
 func _show_sub(k: int) -> void:

@@ -75,6 +75,7 @@ extends Resource
 @export var area_mult := 1.0                 ## radios de explosiones, zonas, ondas y tajos (Mapa de Leng)
 @export var weapon_cooldown_mult := 1.0      ## recarga de todas las armas (Reloj de Tillinghast)
 @export var duration_mult := 1.0             ## duración de zonas, órbitas, rayos y torretas (Clepsidra de Yith)
+@export var ally_mult := 1.0                 ## lo que duran los aliados que levantan las armas (Fotografía del modelo, hito 20.17)
 @export var pierce_add := 0.0                ## enemigos más que atraviesan las balas (Piedra de afilar)
 @export var crit_chance := 0.0               ## probabilidad de crítico de todas las armas (Ojo de Pickman)
 @export var crit_bonus := 0.0                ## suma al daño del crítico, que de base es ×1,5 (Collar de colmillos)

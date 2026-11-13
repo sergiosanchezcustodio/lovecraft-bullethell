@@ -18,10 +18,10 @@ const TOLERANCE := 0.15
 const D := WeaponData.Delivery
 ## Entregas que no son proyectiles: el rasgo "uno o varios proyectiles" no se aplica.
 const NO_PROJECTILE := [D.MELEE, D.WAVE, D.PULSE, D.SIGIL, D.FLAME, D.CLOUD, D.TETHER, D.STAB,
-	D.THRUST, D.FISSURE, D.BEAM, D.CHAIN, D.TURRET, D.WHIP, D.TRAP, D.VORTEX, D.SPIKES, D.MADDEN, D.SWEEP]
+	D.THRUST, D.FISSURE, D.BEAM, D.CHAIN, D.TURRET, D.WHIP, D.TRAP, D.VORTEX, D.SPIKES, D.MADDEN, D.SWEEP, D.CANVAS]
 ## Entregas que dañan una zona o una línea (o atraviesan).
 const AREA := [D.MELEE, D.ORBIT, D.WAVE, D.PULSE, D.SIGIL, D.FLAME, D.CLOUD, D.CHAIN, D.FISSURE,
-	D.BEAM, D.THRUST, D.WHIP, D.FIREBALL, D.VORTEX, D.SPIKES, D.SWEEP]
+	D.BEAM, D.THRUST, D.WHIP, D.FIREBALL, D.VORTEX, D.SPIKES, D.SWEEP, D.CANVAS]
 ## Entregas centradas en el personaje: su alcance es aoe_radius.
 const SELF := [D.MELEE, D.ORBIT, D.WAVE, D.PULSE, D.SIGIL, D.SWEEP]
 
@@ -87,6 +87,7 @@ static func _hit_per_use(w: WeaponData) -> float:
 		D.SWEEP: return w.damage * maxf(w.duration * w.projectile_speed / 360.0, 1.0) * maxf(w.count, 1.0)   # una vez por vuelta y haz
 		D.MADDEN: return w.damage * w.duration                   # lo que hacen los enloquecidos
 		D.SPIKES, D.TRAP: return w.damage                        # cada uno, a un enemigo distinto
+		D.CANVAS: return w.damage * w.count * (2.0 + (1.0 + w.split_count) * w.ally_time / maxf(w.hit_interval, 0.05))   # salpicón y necrófagos
 	if w.delivery == D.BULLET: return w.damage * w.count * w.volleys
 	return w.damage * w.count
 

@@ -11,6 +11,10 @@ var life := 6.0
 var dps := 12.0
 var bonus := {}
 var hits := 0                                ## golpes dados (tests)
+## Aspecto (hito 20.17): "west", el suero verde que chisporrotea; "pickman", el necrófago que sale de
+## un lienzo (sin tinte, con un salpicón oscuro al salir y al irse). `tick`: s entre golpes.
+var look := "west"
+var tick := TICK
 var _t := 0.0
 var _tick := 0.0
 var _facing := Vector3.FORWARD
@@ -42,6 +46,9 @@ func _ready() -> void:
 	add_child(_visual)
 	_model = VoxelBuilder.load_model("res://models/%s.json" % data.model)
 	_visual.add_child(_model)
+	if look == "pickman":                                               # el necrófago: sale del cuadro
+		if FxShade.on(): HitSparks.burst("glint_ember", global_position + Vector3(0, 0.6, 0))
+		return
 	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -75,9 +82,9 @@ func _physics_process(delta: float) -> void:
 			position += _facing * SPEED * delta
 	_tick -= delta
 	if _tick > 0.0: return
-	_tick = TICK
+	_tick = tick
 	for e in world.enemies_in_circle(global_position, data.body_radius + 0.35):
-		var d := Damage.new(dps * TICK, 0.0)
+		var d := Damage.new(dps * tick, 0.0)
 		d.knockback = _facing * 0.6
 		d.bonus = bonus
 		e.take_damage(d)
@@ -92,7 +99,7 @@ func _process(delta: float) -> void:
 	_visual.scale = Vector3.ONE * clampf(_t / 0.3, 0.3, 1.0) * (1.0 - sink * 0.4)
 	# el suero chisporrotea: el verde late a tirones, como una corriente galvánica
 	var jolt := 0.5 + 0.5 * sin(_t * 23.0) * sin(_t * 7.0)
-	_overlay.albedo_color.a = TINT.a * (0.45 + 0.55 * jolt) * (1.0 - sink)
+	if _overlay: _overlay.albedo_color.a = TINT.a * (0.45 + 0.55 * jolt) * (1.0 - sink)
 	if _wall:
 		var w := clampf(_t / 0.45, 0.0, 1.0)
 		_wall.visible = w < 1.0
@@ -101,6 +108,6 @@ func _process(delta: float) -> void:
 		_wall.set_instance_shader_parameter("fade", 0.8 * (1.0 - smoothstep(0.3, 1.0, w)))
 	if not _ended and _t >= life:                                       # se deshace con un último chispazo
 		_ended = true
-		if FxShade.on(): HitSparks.burst("glint_green", _visual.global_position + Vector3(0, 0.5, 0))
+		if FxShade.on(): HitSparks.burst("glint_ember" if look == "pickman" else "glint_green", _visual.global_position + Vector3(0, 0.5, 0))
 	_anim_t = fposmod(_anim_t + delta / Anims.duration(data.model, "walk"), 1.0)
 	Anims.pose(data.model, "walk", _model, _anim_t)

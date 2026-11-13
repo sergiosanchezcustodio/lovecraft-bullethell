@@ -34,6 +34,7 @@ static func with_items(d: WeaponData, n: String, v: float, c: CharacterData) -> 
 		"aoe_radius", "zone_radius": v *= c.area_mult
 		"cooldown": v *= c.weapon_cooldown_mult
 		"duration", "zone_time": v *= c.duration_mult
+		"ally_time": v *= c.ally_mult                         # necrófagos, reanimados (20.17)
 		"pierce":
 			if d.delivery == D.BULLET: v += c.pierce_add
 		"crit_chance": v += c.crit_chance
@@ -201,6 +202,7 @@ func _fire(w: Weapon) -> bool:
 		WeaponData.Delivery.STAB: return _stab(w)
 		WeaponData.Delivery.CHAIN: return _chain(w, target_pos)
 		WeaponData.Delivery.TURRET: return _turret(w)
+		WeaponData.Delivery.CANVAS: return _canvas(w, target_pos)
 		WeaponData.Delivery.BOOMERANG: return _boomerang(w, target_pos)
 		WeaponData.Delivery.FISSURE: return _fissure(w, target_pos)
 		WeaponData.Delivery.THRUST: return _thrust(w)
@@ -542,6 +544,29 @@ func _turret(w: Weapon) -> bool:
 	var t := Turret.new().setup(world, player.global_position + player.motor.facing * 0.8, w.stat("duration"),
 		w.stat("hit_interval"), dmg(w), w.stat("range"), w.stat("projectile_speed"), _bonus_set)
 	world.fx.add_child(t)
+	fired.emit(w)
+	return true
+
+## Lienzos de Pickman (hito 20.17): `count` caballetes hacia el grupo más denso a menos de `range`
+## (sin enemigos, delante), abiertos en abanico, mirando a Pickman.
+func _canvas(w: Weapon, target_pos: Vector3) -> bool:
+	var origin := player.global_position
+	var to := target_pos - origin
+	to.y = 0.0
+	var dist := clampf(to.length(), 1.5, w.stat("range"))
+	var base := to.normalized() if to.length() > 0.01 else Vector3.FORWARD
+	var n := int(w.stat("count"))
+	for k in n:
+		var off := 0.0 if n == 1 else lerpf(-0.6, 0.6, k / float(n - 1))
+		var dir := base.rotated(Vector3.UP, off)
+		var at := origin + dir * dist
+		if world.obstacles != null:                     # fuera del decorado
+			var q := world.obstacles.push_out(Vector2(at.x, at.z), 0.5)
+			at = Vector3(q.x, 0.0, q.y)
+		var c := Canvas.new().setup(world, at, -dir, w.stat("duration"), w.stat("aoe_radius"), dmg(w),
+			w.stat("ally_time"), w.stat("hit_interval"), w.stat("vulnerable"), player.data.bonus_tags)
+		c.ghouls = 1 + int(w.stat("split_count"))
+		world.fx.add_child(c)
 	fired.emit(w)
 	return true
 

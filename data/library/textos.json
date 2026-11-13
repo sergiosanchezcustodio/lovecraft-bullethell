@@ -220,7 +220,10 @@
 		"llave_kadath": "La llave que abrió a Carter el camino hasta la cima de Kadath, donde los dioses de la Tierra bailan en su castillo de ónice. Del otro lado de cada golpe, alguien sueña.",
 		"huellas_sentinel": "Ya no son las pisadas de algo que pasa: es la cosa entera, que baja de la colina de Sentinel hacia el pueblo. Wilbur la llama hermano.",
 		"llave_ulthar": "En Ulthar ningún hombre puede matar a un gato. Los gatos de Ulthar, a cambio, guardan las llaves de los que sueñan bien.",
-		"huellas_gemelo": "Lavinia tuvo gemelos. Uno se parecía más al padre."
+		"huellas_gemelo": "Lavinia tuvo gemelos. Uno se parecía más al padre.",
+		"galeria_pickman": "Los cuadros del sótano de North End, los que Pickman no enseñaba en el Club. Cada uno es una puerta, y lo que hay detrás tiene hambre.",
+		"modelo_natural": "Pickman no pintaba de memoria. La fotografía clavada en el lienzo lo demostraba: el modelo posaba para él, y vuelve cuando lo llaman.",
+		"lienzos": "Óleos a medio acabar en un caballete plegable: túneles, sótanos y algo que asoma. Los enemigos no pueden dejar de mirarlos, y cuando por fin rompen la tela, lo pintado sale."
 	},
 	"items": {
 		"diario_wilbur": "Un cuaderno cifrado en un alfabeto que Armitage tardó semanas en romper. Lo que dice no se puede leer de un tirón, pero quien lo lleva encima deja de temblar.",
@@ -302,7 +305,8 @@
 		"medalla": "La medalla del patrón de los viajeros. Se dice que ha devuelto a más de uno del borde mismo.",
 		"diario_expedicion": "Notas de cada jornada, mapas y lo aprendido. Quien lo relee por la noche amanece sabiendo un poco más.",
 		"pacto": "Un contrato firmado en el bosque, con sello de cera roja. Lo que piden a cambio crece con lo que dan. Se puede quemar; también reescribir.",
-		"linterna": "Una lámpara de queroseno de las buenas. Mientras su luz alcanza, lo que acecha en la oscuridad pesa un poco menos."
+		"linterna": "Una lámpara de queroseno de las buenas. Mientras su luz alcanza, lo que acecha en la oscuridad pesa un poco menos.",
+		"foto_modelo": "Una fotografía arrugada que estaba clavada en el lienzo de Pickman, la que usaba de modelo. No es un decorado ni un disfraz. El que la mira ya no vuelve a bajar a un sótano."
 	},
 	"places": {
 		"p1_n1": "Costa del mar de Ross, Antártida, 1930. La expedición de la Universidad de Miskatonic monta aquí su campamento: tiendas, una cabaña de troncos, un iglú y los faroles. Al norte, la Barrera de hielo; al sur, el mar. Algo vino de las cavernas de abajo.",
@@ -336,7 +340,8 @@
 		"elwood": "Sargento veterano de la Gran Guerra. Después de Verdún creía haberlo visto todo.",
 		"malone": "Contrabandista de alcohol en Red Hook, Brooklyn. Los clientes de los sótanos de la calle Parker no bebían ginebra.",
 		"armitage": "Henry Armitage, bibliotecario jefe de la Universidad de Miskatonic. Fue él quien guardó el Necronomicón bajo llave y quien subió a la colina de Dunwich con el polvo de Ibn-Ghazi para hacer visible lo que no se veía. Viejo, pero el más sabio de todos.",
-		"west": "Herbert West, médico de Arkham, menudo, rubio y pálido detrás de sus gafas. Lleva años buscando el reactivo que devuelva la vida a los muertos. Sus resultados no siempre son los que esperaba, pero a sus compañeros los pone en pie como nadie."
+		"west": "Herbert West, médico de Arkham, menudo, rubio y pálido detrás de sus gafas. Lleva años buscando el reactivo que devuelva la vida a los muertos. Sus resultados no siempre son los que esperaba, pero a sus compañeros los pone en pie como nadie.",
+		"pickman": "Richard Upton Pickman, de una vieja familia de Salem, pintor. Lo echaron del Club de Arte de Boston por sus cuadros de cosas que salen de los túneles a comer. Tenía un estudio secreto en el North End, junto a un pozo de ladrillo, y nadie sabe de dónde sacaba los modelos. Desapareció. Sus cuadros, no."
 	},
 	"pets": {
 		"perro": "Uno de los perros de trineo del campamento de Lake. El único que volvió. Desde entonces gruñe a la nieve.",

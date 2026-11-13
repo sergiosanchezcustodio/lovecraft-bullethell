@@ -8,6 +8,8 @@ extends SceneTree
 
 const EVO_DPS := 1.4
 const DAMAGE_KEYS := ["damage", "zone_dps", "curse_dps"]
+## Lo que no sale del arma base ni de los cambios: si la evolución ya existe, se conserva.
+const KEEP := ["gesture", "bullet_look", "sfx", "look", "orbit_look"]
 
 # arma base: [id evolución, nombre, objeto, descripción, cambios, nota de la Biblioteca]
 const EVO := {
@@ -98,6 +100,9 @@ const EVO := {
 	"llave_suenos": ["llave_kadath", "Llave de la ignota Kadath", "mapa_sueno", "Cuatro llaves que adormecen el doble y llegan más lejos.",
 		{"count+": 1, "stun*": 1.6, "range*": 1.2},
 		"La llave que abrió a Carter el camino hasta la cima de Kadath, donde los dioses de la Tierra bailan en su castillo de ónice. Del otro lado de cada golpe, alguien sueña."],
+	"lienzos": ["galeria_pickman", "Galería de North End", "foto_modelo", "Tres lienzos a la vez, que atraen desde más lejos y sueltan necrófagos que cazan más tiempo.",
+		{"count+": 1, "ally_time*": 1.5, "aoe_radius*": 1.15},
+		"Los cuadros del sótano de North End, los que Pickman no enseñaba en el Club. Cada uno es una puerta, y lo que hay detrás tiene hambre."],
 	"huellas_dunwich": ["huellas_sentinel", "Lo que bajó de Sentinel Hill", "diario_wilbur", "Pisadas el doble de anchas que aplastan más y aturden más tiempo.",
 		{"aoe_radius*": 1.7, "stun+": 0.4},
 		"Ya no son las pisadas de algo que pasa: es la cosa entera, que baja de la colina de Sentinel hacia el pueblo. Wilbur la llama hermano."],
@@ -261,6 +266,9 @@ const EVO_B := {
 	"llave_suenos": ["llave_ulthar", "Llaves de Ulthar", "Seis llaves más rápidas, en abanico, que adormecen menos.",
 		{"count+": 3, "spread_deg+": 50.0, "projectile_speed*": 1.3, "stun*": 0.6},
 		"En Ulthar ningún hombre puede matar a un gato. Los gatos de Ulthar, a cambio, guardan las llaves de los que sueñan bien."],
+	"lienzos": ["modelo_natural", "El modelo del natural", "Un solo cuadro enorme que atrae desde muy lejos y suelta tres necrófagos.",
+		{"count=": 1, "split_count=": 2, "aoe_radius*": 1.6, "duration*": 1.3},
+		"Pickman no pintaba de memoria. La fotografía clavada en el lienzo lo demostraba: el modelo posaba para él, y vuelve cuando lo llaman."],
 	"huellas_dunwich": ["huellas_gemelo", "El gemelo de Wilbur", "Tres hileras de pisadas a la vez, más largas.",
 		{"count+": 2, "spread_deg+": 50.0, "range*": 1.3},
 		"Lavinia tuvo gemelos. Uno se parecía más al padre."],
@@ -347,6 +355,10 @@ func _make(base_id: String, evo_id: String, display: String, desc: String, mods:
 	evo.level_mods = []; evo.level_text = []
 	evo.evolves_with = &""; evo.evolution = &""; evo.evolution_alt = &""
 	evo.icon = null
+	var path := "res://data/weapons/%s.tres" % evo_id
+	if ResourceLoader.exists(path):                  # lo retocado a mano en la evolución se queda (13-11-2026:
+		var old: WeaponData = load(path)             # al rehacerlas, la Carabina Mauser perdía su gesto)
+		for k in KEEP: evo.set(k, old.get(k))
 	for k: String in mods:
 		var stat := k.left(-1)
 		var v: float = float(mods[k])

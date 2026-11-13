@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/dodges/cuadro.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"pickman"
+display_name = "Richard Upton Pickman"
+victory = "win_bow"
+model = "pickman"
+role = "Pintor de Boston"
+passive_text = "Ha pintado cosas peores: pierde un 30 % menos de cordura."
+story = "El modelo de Pickman"
+price = 7000
+order = 16
+max_health = 95.0
+max_sanity = 110.0
+move_speed = 4.5
+dodge_style = ExtResource("2")
+starting_weapons = Array[StringName]([&"lienzos"])
+mental_mult = 0.7
+attr_bonus = {"DES": 8, "CUL": 7, "POD": 5}
+in_shop = true

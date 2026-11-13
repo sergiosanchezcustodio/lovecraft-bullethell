@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DodgeStyle" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/dodge_style.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cuadro"
+display_name = "Cuadro"
+anim = "flash"
+speed = 24.0
+duration = 0.15
+iframes = 0.26
+cooldown = 1.2
+snow_spray = false
+frames = true
+hidden_from = 0.18
+hidden_to = 0.66

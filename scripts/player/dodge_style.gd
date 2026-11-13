@@ -14,6 +14,7 @@ extends Resource
 @export var cooldown := 1.2                  ## s desde que empieza hasta poder repetir
 @export var snow_spray := true               ## levanta nieve mientras dura la animación
 @export var afterimages := false             ## deja una estela de imágenes fantasma
+@export var frames := false                  ## entra en un cuadro y sale por otro (Pickman, hito 20.17)
 ## Tramo de la animación (0..1) en que el modelo no se ve (el destello "desaparece").
 @export var hidden_from := -1.0
 @export var hidden_to := -1.0

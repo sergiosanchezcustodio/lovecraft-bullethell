@@ -19,7 +19,7 @@ const STATS := {
 	"physical_mult": ["Daño físico", "mult", "", false], "firearm_mult": ["Daño balístico", "mult", "", false],
 	"magic_mult": ["Daño mágico", "mult", "", false], "elite_mult": ["Daño a élites", "mult", "", false],
 	"knockback_mult": ["Empuje", "mult", "", false], "range_mult": ["Alcance", "mult", "", false],
-	"area_mult": ["Área", "mult", "", false], "duration_mult": ["Duración", "mult", "", false],
+	"area_mult": ["Área", "mult", "", false], "duration_mult": ["Duración", "mult", "", false], "ally_mult": ["Duración de los aliados", "mult", "", false],
 	"proj_speed_mult": ["Velocidad de los proyectiles", "mult", "", false],
 	"weapon_cooldown_mult": ["Recarga de las armas", "mult", "", true],
 	"arcane_cooldown_mult": ["Recarga de las mágicas", "mult", "", true],

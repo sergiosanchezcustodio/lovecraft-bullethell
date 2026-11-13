@@ -46,10 +46,16 @@ enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND, STRONGEST, FRONT_BACK }
 ## dañan en aoe_radius y aturden `stun` s (Tentáculos de Shub).
 ## MADDEN: enloquece a `count` enemigos a menos de `range` durante `duration` s: atacan a los
 ## suyos con `damage` por segundo y no disparan ni tocan a los jugadores (Signo Amarillo).
+## Fase 20 (personajes nuevos de la tienda):
+## CANVAS: planta `count` lienzos (`Canvas`) hacia el grupo más denso, a menos de `range`; cada uno
+## dura `duration` s, atrae (`lure`) a los de aoe_radius y los deja vulnerables (`vulnerable` s);
+## al romperse lo tocado o acabarse, revienta (2 × `damage` alrededor) y suelta un necrófago que
+## golpea `damage` cada hit_interval durante `ally_time` s (Lienzos de Pickman); con split_count,
+## suelta 1 + split_count necrófagos.
 ## SWEEP: rayo de `range` m que gira alrededor del personaje a projectile_speed grados por
 ## segundo durante `duration` s; daña cada hit_interval a cada enemigo (Lámpara de Alhazred).
 enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE, FLAME, SIGIL, PULSE, TETHER, CLOUD, DRONE, STAB,
-	CHAIN, TURRET, BOOMERANG, FISSURE, THRUST, WHIP, TRAP, FIREBALL, VORTEX, SPIKES, MADDEN, SWEEP }
+	CHAIN, TURRET, BOOMERANG, FISSURE, THRUST, WHIP, TRAP, FIREBALL, VORTEX, SPIKES, MADDEN, SWEEP, CANVAS }
 ## Zona que deja en el suelo (lanzados, lanzallamas, nube): ninguna, fuego, ácido o polvo
 ## (ralentiza y debilita).
 ## GAS: nube tóxica que deriva (`drift` m/s) hacia donde se lanzó (Gas de cloro).
