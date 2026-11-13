@@ -140,5 +140,15 @@ func test_al_subir_se_saludan() -> void:
 	var k := _player("kuranes", Vector3(2, 0, 0))
 	var bonds := _bonds([c, k])
 	assert_eq(bonds.friends_near(c), [k] as Array[Player])
-	c.look_at_friend(k, 1.0)
-	assert_eq(c._friend, k)
+	assert_true(Bonds.greet(bonds, c), "se saludan")
+	assert_eq(c._override, "bond_wave")
+	assert_eq(k._override, "bond_wave")
+	assert_eq(c._friend, k, "y se miran")
+	assert_eq(k._friend, c)
+
+## En solitario no hay Bonds (Game.bonds es null): sube con el puño de siempre (fallaba el tipo).
+func test_en_solitario_no_hay_saludo() -> void:
+	var c := _player("carter", Vector3.ZERO)
+	assert_false(Bonds.greet(null, c))
+	var d := _player("dyer", Vector3(1, 0, 0))
+	assert_false(Bonds.greet(_bonds([c, d]), c), "sin vínculo entre ellos, tampoco")

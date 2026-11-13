@@ -445,6 +445,9 @@ func _ready() -> void:
 		var night_id := arena.get_meta("arena_id", "") as String
 		if NightCycle.amount(night_id) > 0.0 and args.get_str("night", "") != "false":   # la noche avanza (16.33)
 			add_child(NightCycle.new().setup(_moon, _env, director, _ambient, night_id))
+		if args.get_str("night_events", "") != "false" and not BossRush.is_rush(String(level.id)) and not Challenge.active():
+			night_events = NightEvents.new().setup(self, director, world, _moon, _env, night_id, not is_guest())   # sucesos (21.4)
+			add_child(night_events)
 		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
 		# rompibles y peligros del escenario: en red, solo en el anfitrión (llegan a los invitados en el 9.3c)
 		if not args.get_bool("nobreakables") and not args.get_bool("no_spawn") and not is_guest(): add_child(BreakableSpawner.new().setup(world, arena.get_meta("size")))
@@ -764,15 +767,7 @@ func level_fx(q: Player) -> void:
 		wave.color = Color(0.6, 0.85, 1.0, 0.9)
 		world.fx.add_child(wave)
 	VoxelFx.puff(q, q.global_position, "rise", 0.6, Color.WHITE, 1.4)      # columna de luz (11-10-2026)
-	var friends: Array[Player] = bonds.friends_near(q) if bonds != null else []
-	if friends.is_empty(): q.play_once("cheer", true)                      # alza el puño (hito 17.4)
-	else:                                                                  # con su vínculo cerca, se saludan (21.3)
-		q.play_once("bond_wave", true)
-		for o in friends:
-			o.play_once("bond_wave", true)
-			q.look_at_friend(o, 1.4)
-			o.look_at_friend(q, 1.4)
-			bonds.ribbon(q, o)
+	if not Bonds.greet(bonds, q): q.play_once("cheer", true)              # alza el puño (17.4) o se saludan (21.3)
 	if not q.remote and not Pacts.has("no_heal"): q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
 	if q.data.team_heal_on_level > 0.0:                   # rasgo de West: cura a los compañeros cercanos
 		for o in players:
@@ -813,7 +808,7 @@ func net_enemy_died(e: Enemy) -> void:
 
 ## Dólares (D-31): se suman al hueco en el momento, así que se conservan aunque se caiga.
 func earn(amount: int) -> void:
-	var n := int(round(amount * money_mult * (director.team_item("money_mult") if director else 1.0) * Pacts.value("money")))   # Oro de Obed; pactos (hito 13.6)
+	var n := int(round(amount * money_mult * (director.team_item("money_mult") if director else 1.0) * Pacts.value("money") * NightEvents.value("money")))   # Oro de Obed; pactos (hito 13.6); sucesos (21.4)
 	if n <= 0: return
 	run_money += n
 	if Saves.current != null and not _expedition():   # en la expedición, a su bolsa (16.21)
@@ -1551,6 +1546,7 @@ func _diary(result: String) -> Array:
 ## subidas de ventaja de los niveles avanzados (`_apply_carry`), el director y los peligros al crearlos.
 var run_seed := 0
 var bonds: Bonds                                  ## vínculos entre los investigadores (hito 21.3)
+var night_events: NightEvents                    ## sucesos de la noche (hito 21.4)
 func _seed_players() -> void:
 	if level.daily != "": run_seed = Daily.seed_of(level.daily)
 	else:

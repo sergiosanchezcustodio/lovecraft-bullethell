@@ -229,9 +229,9 @@ func pick() -> EnemyData:
 	var cands: Array[EnemyData] = []
 	var weights: Array[float] = []
 	for d in level.pool:
-		if d.tier >= 4 and elites >= Difficulty.elites(roundi(level.elite_cap * Pacts.value("elites"))): continue   # Frenesí (16.14)
+		if d.tier >= 4 and elites >= Difficulty.elites(roundi(level.elite_cap * Pacts.value("elites") * NightEvents.value("elites"))): continue   # Frenesí (16.14); luna de sangre (21.4)
 		if d.unique: continue                       # seres únicos (D-04): solo como evento
-		var w := LevelData.weight(d.tier, level.number) * d.spawn_weight
+		var w := LevelData.weight(d.tier, level.number) * d.spawn_weight * NightEvents.weight_of(d)   # sucesos (21.4)
 		if w <= 0.0: continue
 		cands.append(d)
 		weights.append(w)

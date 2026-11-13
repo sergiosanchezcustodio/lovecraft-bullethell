@@ -1364,7 +1364,7 @@ func rebuild_stats() -> void:
 	if has_sign(&"nyarlathotep"): v["crit_chance"] += Signs.value("nyarlathotep")   # hito 16.9
 	for up in progress.upgrade_pool if progress else []:
 		up.apply_levels(v, base, int(progress.passives.get(up.id, 0)))
-	v["move_speed"] *= debug_speed
+	v["move_speed"] *= debug_speed * NightEvents.value("player_speed")   # la ventisca (21.4)
 	for k: String in bond:                                   # vínculos (hito 21.3): con el otro cerca
 		if k.begins_with("stat:") and v.has(k.substr(5)): v[k.substr(5)] *= float(bond[k])
 	for k in v: data.set(k, v[k])

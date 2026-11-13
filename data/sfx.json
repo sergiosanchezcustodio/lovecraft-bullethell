@@ -924,6 +924,9 @@
 		"knock_2": {"db": -12, "pitch": [0.96, 1.04], "voices": 1, "gap": 0.3, "files": ["knock_2.wav"]},
 		"gaze": {"db": -18, "pitch": [0.95, 1.05], "voices": 2, "gap": 0.2, "group": "armas", "files": ["gaze_0.wav", "gaze_1.wav"]},
 		"dream_sleep": {"db": -17, "pitch": [0.92, 1.08], "voices": 2, "gap": 0.3, "files": ["dream_sleep_0.wav"]},
+		"omen": {"db": -9, "pitch": [0.97, 1.0], "voices": 1, "gap": 2.0, "bus": "Ambiente", "files": ["omen.wav"]},
+		"wind_gust": {"db": -13, "pitch": [0.92, 1.06], "voices": 2, "gap": 1.0, "bus": "Ambiente", "files": ["wind_gust_0.wav", "wind_gust_1.wav"]},
+		"star_fall": {"db": -23, "pitch": [0.9, 1.12], "voices": 3, "gap": 0.08, "files": ["star_fall_0.wav", "star_fall_1.wav", "star_fall_2.wav"]},
 		"torch_crackle": {
 			"db": -22,
 			"pitch": [

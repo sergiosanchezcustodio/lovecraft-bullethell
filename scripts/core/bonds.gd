@@ -103,6 +103,20 @@ func friends_near(q: Player) -> Array[Player]:
 		elif p.b == q: out.append(p.a)
 	return out
 
+## Al subir de nivel (Game.level_fx): si `q` tiene a alguien de su vínculo cerca, los dos se saludan,
+## se miran y un lazo va de uno a otro (true). Sin vínculos (o sin `bonds`, en solitario), false.
+static func greet(bonds: Bonds, q: Player) -> bool:
+	if bonds == null: return false
+	var friends := bonds.friends_near(q)
+	if friends.is_empty(): return false
+	q.play_once("bond_wave", true)
+	for o in friends:
+		o.play_once("bond_wave", true)
+		q.look_at_friend(o, 1.4)
+		o.look_at_friend(q, 1.4)
+		bonds.ribbon(q, o)
+	return true
+
 func _physics_process(delta: float) -> void:
 	step(delta)
 

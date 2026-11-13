@@ -3011,4 +3011,40 @@ Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden:
   - Los médicos levantan con más vida.
   - El diálogo, solo al empezar la parte.
   - El saludo existe.
+- **Arreglado** después del commit: en solitario (sin `Game.bonds`), cada subida de nivel daba un error de tipo (`Array` en un `Array[Player]`) y no hacía el puño. El saludo va ahora en `Bonds.greet`, con un test en solitario.
+
+### 21.4: sucesos de la noche (13-11-2026)
+
+*Pendiente de la revisión del autor.*
+
+- **Qué:** una o dos veces por nivel (la mitad de las veces, dos), con aviso, algo cambia las reglas un rato. La primera llega entre el 22 % y el 36 % del tiempo hasta el evento final, y la segunda, entre el 55 % y el 68 %. No empiezan con el evento final ya fuera. Con la semilla de la partida (`plan`), así que el archivo de expediciones repite los mismos.
+- **Al empezar**, el augurio (`omen`, una campana muy grave y lejana tras un soplo que crece; `gen_sfx.py --sucesos`), el sonido del suceso y el aviso «Luna de sangre · Más élites, y el doble de dólares». **Al acabar**, su frase («La luna vuelve a palidecer»). La luz cambia y vuelve en 2,5 s.
+- **Los seis** (`data/night_events.json`):
+
+| Suceso | Dónde | Qué cambia | Cómo se ve |
+|---|---|---|---|
+| Luna de sangre | Todas menos el estudio y los túneles | Élites tres veces más a menudo y el doble a la vez; el doble de dólares | Luna y ambiente rojos; aullidos lejanos |
+| Niebla espesa | Todas menos el estudio | Las gemas valen un 50 % más | Niebla que se suma a la del clima; la sirena de niebla |
+| Lluvia de estrellas | Todas menos el estudio, los túneles y la tormenta | Cada 0,45 s cae una estrella a 2-8 m de un investigador y deja gemas | Una raya de luz que cae en diagonal, un destello al tocar el suelo y un chispazo (`star_fall`) |
+| Silencio | Todas | 10 s sin que aparezca nadie y luego una horda de 16 por jugador | Se apaga una vela; «¡Una horda!» y el rugido |
+| Marea viva | Pantano, arrecife, ritual, muelle, tormenta y R'lyeh | Marinos cuatro veces más a menudo y un 20 % más rápidos; el doble de dólares | Ambiente verdemar y algo de niebla; la ola |
+| Ventisca | Campamento, lago y paso | Enemigos al 75 % de rapidez e investigadores al 88 % | El clima pasa a la ventisca mientras dura; una ráfaga (`wind_gust`) |
+
+- **Cómo:** `NightEvents` (en `scripts/level/`) y sus reglas en vivo, como los pactos:
+  - `value(clave)` multiplica el dinero (`Game.earn`), la experiencia (gemas), las élites a la vez (`WaveDirector.pick`) y la rapidez de los investigadores (`rebuild_stats`, que se rehace al empezar y al acabar).
+  - `weight_of(enemigo)` cambia el peso al aparecer y `speed_of(enemigo)`, la rapidez de los enemigos.
+  - La luz va después del ciclo de la noche y del clima (`process_priority`). Si alguien reescribe el color de la luna, el del ambiente o la niebla, toma lo nuevo como base; si no, guarda la suya. Así no se acumula y vuelve a lo que había.
+  - La ventisca cambia el clima con `Game.set_weather` y al acabar pone el de antes.
+  - No sale en el desfile de jefes ni en los desafíos.
+- **En red:** lo decide el anfitrión. A los invitados les llega como suceso de la red (`{"k": "night", "text": id}`; «» acaba), y allí se ve, se oye y frena a sus investigadores. `PROTOCOL` 20.
+- **Comprobado** en partida con `night_event=<id> night_at=3` (luna en las calles, niebla, ventisca y estrellas en el campamento, marea en el pantano, silencio en el lago) y en niveles enteros sin forzar, con `timescale=4`: semilla 3 en el muelle, marea a los 76 s y luna a los 152 s; semilla 11, estrellas a los 72 s; el lago, ventisca a los 54 s. Sin errores.
+- **Tests** (`tests/test_night_events.gd`, 9):
+  - Los datos y sus sonidos.
+  - Cada arena de los 15 niveles tiene al menos uno.
+  - Uno o dos por nivel, distintos y en su momento, y la misma semilla da los mismos.
+  - Las reglas duran lo que el suceso.
+  - La marea y la ventisca cambian la rapidez, y la ventisca frena a los investigadores.
+  - El silencio y luego la horda.
+  - No empieza con el evento final ya fuera.
+  - Las estrellas caen.
 

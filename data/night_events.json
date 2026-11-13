@@ -1,0 +1,51 @@
+{
+	"_doc": "Sucesos de la noche (hito 21.4, NightEvents). Una o dos veces por nivel (la primera entre 'primero' del tiempo hasta el evento final, la segunda entre 'segundo'), con aviso, un suceso cambia las reglas durante 'duracion' s. 'arenas': en cuáles puede salir ('todas', o la lista); 'excluir': en cuáles no. Al empezar suena el augurio ('omen') y luego 'sonido'. 'efectos' multiplica lo que se lee en vivo (NightEvents.value): elite_weight (peso de las élites al aparecer), elites (cuántas a la vez), money (dólares), xp (experiencia de las gemas), enemy_speed, marine_weight y marine_speed (las criaturas marinas), player_speed. 'visual': moon y moon_mix (color de la luna), ambient y ambient_mix (del ambiente), fog (niebla que se suma), weather (el clima mientras dura). 'lluvia': caen gemas del cielo cada 'cada' s, de 'valor', a 'radio' m de un investigador. 'silencio': s sin que aparezca nadie y luego una horda de 'horda' enemigos (por jugador, como las oleadas). night_events=false los quita; night_event=<id> lanza ese a los night_at= s (5 por defecto).",
+	"primero": [0.22, 0.36],
+	"segundo": [0.55, 0.68],
+	"dos": 0.5,
+	"sucesos": [
+		{
+			"id": "luna_sangre", "nombre": "Luna de sangre", "texto": "Más élites, y el doble de dólares",
+			"fin": "La luna vuelve a palidecer", "sonido": "howl",
+			"duracion": 30.0, "arenas": "todas", "excluir": ["estudio", "tuneles"],
+			"efectos": {"elite_weight": 3.0, "elites": 2.0, "money": 2.0},
+			"visual": {"moon": [1.0, 0.28, 0.2], "moon_mix": 0.7, "ambient": [0.62, 0.18, 0.16], "ambient_mix": 0.35}
+		},
+		{
+			"id": "niebla", "nombre": "Niebla espesa", "texto": "Se ve menos, y las gemas valen un 50 % más",
+			"fin": "La niebla se levanta", "sonido": "ship_horn",
+			"duracion": 30.0, "arenas": "todas", "excluir": ["estudio"],
+			"efectos": {"xp": 1.5},
+			"visual": {"fog": 0.022, "ambient": [0.55, 0.6, 0.62], "ambient_mix": 0.2}
+		},
+		{
+			"id": "estrellas", "nombre": "Lluvia de estrellas", "texto": "Caen gemas del cielo",
+			"fin": "Las estrellas se aquietan", "sonido": "",
+			"duracion": 30.0, "arenas": "todas", "excluir": ["estudio", "tuneles", "tormenta"],
+			"efectos": {},
+			"lluvia": {"cada": 0.45, "valor": 4.0, "radio": 8.0},
+			"visual": {"moon": [0.75, 0.85, 1.0], "moon_mix": 0.3}
+		},
+		{
+			"id": "silencio", "nombre": "Silencio", "texto": "Nadie se acerca… por ahora",
+			"fin": "", "sonido": "candle_out",
+			"duracion": 16.0, "arenas": "todas",
+			"efectos": {},
+			"silencio": {"tiempo": 10.0, "horda": 16, "texto": "¡Una horda!", "sonido": "roar"}
+		},
+		{
+			"id": "marea", "nombre": "Marea viva", "texto": "Los profundos salen del agua, y pagan el doble",
+			"fin": "La marea baja", "sonido": "wave",
+			"duracion": 30.0, "arenas": ["pantano", "arrecife", "ritual", "muelle", "tormenta", "rlyeh"],
+			"efectos": {"marine_weight": 4.0, "marine_speed": 1.2, "money": 2.0},
+			"visual": {"ambient": [0.2, 0.55, 0.5], "ambient_mix": 0.3, "fog": 0.006}
+		},
+		{
+			"id": "ventisca", "nombre": "Ventisca", "texto": "Todos van más despacio, ellos más que tú",
+			"fin": "Amaina el viento", "sonido": "wind_gust",
+			"duracion": 30.0, "arenas": ["campamento", "lake", "paso"],
+			"efectos": {"enemy_speed": 0.75, "player_speed": 0.88},
+			"visual": {"weather": "res://data/weather/ventisca.tres", "ambient": [0.7, 0.8, 0.95], "ambient_mix": 0.2}
+		}
+	]
+}

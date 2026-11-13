@@ -554,7 +554,7 @@ func _event(d: Dictionary) -> void:
 	_say_event(d)
 	net.send(0, EVENT, d)
 
-const EVENT_TEXT := {"won": "nivel superado", "lost": "derrota", "final": "aparece el enemigo final", "boss": "jefe", "mid": "enemigo especial"}
+const EVENT_TEXT := {"night": "suceso de la noche", "won": "nivel superado", "lost": "derrota", "final": "aparece el enemigo final", "boss": "jefe", "mid": "enemigo especial"}
 
 ## Los sucesos que cambian el nivel, con el reloj y las bajas (para comparar los registros de cada PC).
 func _say_event(d: Dictionary) -> void:
@@ -782,6 +782,9 @@ func _on_event(d: Dictionary) -> void:
 			if game.has_method("announce"): game.announce(String(d.get("text", "")), 1.6)
 		"decor":                                   # una pieza del decorado se rompe (hito 16.34)
 			if DecorBreak.current != null: DecorBreak.current.crumble(int(d.get("i", -1)))
+		"night":                                   # un suceso de la noche empieza ("" acaba; hito 21.4)
+			var ne: Variant = game.get("night_events")
+			if ne is NightEvents: (ne as NightEvents).remote(String(d.get("text", "")))
 
 # ---------------------------------------------------------------- combate (hito 9.3b)
 

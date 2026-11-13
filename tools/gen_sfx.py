@@ -13,6 +13,7 @@ Uso: python tools/gen_sfx.py <carpeta con los packs de Kenney descomprimidos>
      python tools/gen_sfx.py --buzo       (solo la respiración del casco de buzo y la linterna que falla)
      python tools/gen_sfx.py --sueno      (solo el sueño de Kuranes)
      python tools/gen_sfx.py --fase20     (solo los de Pickman, Ward, Gilman, Tillinghast y Derby)
+     python tools/gen_sfx.py --sucesos    (solo los de los sucesos de la noche: augurio, ventisca y estrellas)
 """
 import os, sys, shutil, wave, glob
 import numpy as np
@@ -1042,6 +1043,57 @@ def fase20():
         save('gaze_%d' % k, room(x, 0.9, 0.3, 0.45))
 
 
+def sucesos():
+    """Sucesos de la noche (hito 21.4). El augurio que abre cada suceso: una campana muy grave y
+    lejana (parciales inarmónicos que se apagan despacio) sobre un soplo que crece al revés y se
+    corta. La ventisca: una ráfaga de ruido filtrado que sube y baja con el filtro moviéndose. La
+    estrella que cae: tres destellos agudos que bajan de tono, con un brillo de ruido fino."""
+    r = np.random.default_rng(2104)
+
+    def tail(x, sec=0.3):
+        n = min(len(x) // 3, int(sec * SR))
+        x[-n:] *= np.linspace(1, 0, n) ** 2
+        return x
+
+    d = 4.2                                                             # el augurio
+    tt = t(d)
+    x = np.zeros(len(tt))
+    for ratio, amp, dec in ((1.0, 1.0, 1.6), (2.02, 0.45, 1.1), (2.76, 0.3, 0.8), (4.07, 0.18, 0.5), (0.5, 0.35, 2.2)):
+        f = 73.4 * ratio
+        x += np.sin(2 * np.pi * f * tt + r.uniform(0, 6)) * amp * np.exp(-tt / dec) * np.minimum(tt / 0.01, 1.0)
+    sw = np.clip(tt / 1.2, 0, 1) ** 3 * (tt < 1.2)                       # soplo al revés antes del golpe
+    swell = lp(r.standard_normal(len(tt)), 700) * sw * 0.5
+    bell = np.concatenate([np.zeros(int(1.2 * SR)), x])[:len(tt)]
+    ir = lp(r.standard_normal(int(2.5 * SR)), 2500) * np.exp(-t(2.5) / 0.9)
+    wet = signal.fftconvolve(bell, ir)[:len(bell)]
+    wet *= np.std(bell) / (np.std(wet) + 1e-9)
+    save('omen', tail(swell + bell * 0.7 + wet * 0.5, 0.8))
+
+    for k in range(2):                                                  # la ventisca
+        d = 2.8
+        tt = t(d)
+        n = r.standard_normal(len(tt))
+        y = np.zeros(len(tt))
+        seg = int(0.05 * SR)
+        for i in range(0, len(tt), seg):                                 # el filtro sube y baja con la ráfaga
+            c = 350 + 900 * np.sin(np.pi * min(i / len(tt), 1.0)) * (0.8 + 0.2 * k)
+            y[i:i + seg] = bp(n[max(0, i - 2048):i + seg], c * 0.7, c * 1.4)[-len(y[i:i + seg]):]
+        envw = np.sin(np.pi * np.clip(tt / d, 0, 1)) ** 1.5 * (1 + 0.25 * np.sin(2 * np.pi * 1.3 * tt + k))
+        save('wind_gust_%d' % k, tail(y * envw, 0.4))
+
+    for k in range(3):                                                  # la estrella que cae
+        d = 0.7
+        tt = t(d)
+        x = np.zeros(len(tt))
+        for j, f0 in enumerate((2600, 3300, 4100)):
+            st = int((0.04 * j + 0.01 * k) * SR)
+            f = f0 * (1.0 + 0.12 * k) * np.exp(-tt[:len(tt) - st] * 1.8)
+            ph = 2 * np.pi * np.cumsum(f) / SR
+            x[st:] += np.sin(ph) * np.exp(-tt[:len(tt) - st] / 0.18) * (0.6 - 0.15 * j)
+        x += hp(r.standard_normal(len(tt)), 6000) * np.exp(-tt / 0.08) * 0.08
+        save('star_fall_%d' % k, tail(x, 0.15))
+
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
@@ -1058,6 +1110,8 @@ if __name__ == '__main__':
         sueno()
     elif '--fase20' in sys.argv:                               # solo los de los personajes de la fase 20 (hito 21.1)
         fase20()
+    elif '--sucesos' in sys.argv:                              # solo los de los sucesos de la noche (hito 21.4)
+        sucesos()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)
@@ -1071,5 +1125,6 @@ if __name__ == '__main__':
         menus()
         sueno()
         fase20()
+        sucesos()
         if len(sys.argv) > 1: copy_kenney(sys.argv[1])
     print('listo en', OUT)
