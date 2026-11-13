@@ -7,7 +7,7 @@ extends RefCounted
 ## CharacterData.dodge_anim; la animación puede durar más que el impulso del esquive.
 const ARM_LAG := 0.32                         ## retraso de los brazos respecto a las piernas (rad del ciclo)
 const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive": 0.5,
-	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6, "brake": 0.5, "cheer": 0.9, "marvel": 1.1, "open_chest": 0.9,
+	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6, "brake": 0.5, "cheer": 0.9, "bond_wave": 1.2, "marvel": 1.1, "open_chest": 0.9,
 	"win_fist": 1.6, "win_salute": 1.6, "win_hat": 1.6, "win_ward": 1.6, "win_bow": 1.6, "win_court": 1.8,
 	"win_paint": 1.8, "win_flask": 1.6, "win_angle": 1.7, "win_tune": 1.7, "win_poet": 1.7, "win_clasp": 1.6,
 	"fidget_look": 2.6, "fidget_stretch": 2.8, "fidget_check": 2.4, "fidget_shift": 1.8,
@@ -16,7 +16,7 @@ const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive":
 ## quieto. Empiezan y acaban en la pose de reposo, y se funden al entrar y al salir.
 const FIDGETS := ["fidget_look", "fidget_stretch", "fidget_check", "fidget_shift"]
 ## Gestos al atacar de los investigadores (hito 17.1): las hordas (HordeMesh) no los graban.
-const HORDE_SKIP := ["cast", "swing", "thrust", "slam", "brake", "cheer", "marvel", "open_chest",
+const HORDE_SKIP := ["cast", "swing", "thrust", "slam", "brake", "cheer", "bond_wave", "marvel", "open_chest",
 	"win_fist", "win_salute", "win_hat", "win_ward", "win_bow", "win_court",
 	"win_paint", "win_flask", "win_angle", "win_tune", "win_poet", "win_clasp"]
 
@@ -399,6 +399,17 @@ static func cheer(m: Node3D, t: float) -> void:
 	Anims.part(m, "arm_l").rotation.x = -0.45 * up
 	bend(m, "fore_l", -1.0 * up)
 	Anims.part(m, "torso").rotation.x = -0.12 * up                           # saca pecho
+
+## Saludo entre dos con vínculo al subir de nivel (hito 21.3): la mano derecha alzada y abierta,
+## que se agita dos veces, y la izquierda al pecho; la cabeza mira al otro (Player.look_at_friend).
+static func bond_wave(m: Node3D, t: float) -> void:
+	var up := Anims.ease(t / 0.22) * (1.0 - Anims.ease((t - 0.78) / 0.22))
+	var wave := sin(clampf((t - 0.22) / 0.5, 0.0, 1.0) * TAU * 2.0) * 0.22
+	Anims.part(m, "arm_r").rotation = Vector3(-2.25 * up, 0.0, (0.3 + wave) * up)
+	bend(m, "fore_r", -0.45 * up)
+	Anims.part(m, "arm_l").rotation = Vector3(-0.6 * up, 0.4 * up, 0.0)
+	bend(m, "fore_l", -1.45 * up)
+	Anims.part(m, "torso").rotation.x = -0.06 * up
 
 ## Evoluciona un arma: junta las manos delante como si sostuviera algo que brilla, lo mira y lo
 ## alza por encima de la cabeza.

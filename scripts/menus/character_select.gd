@@ -53,6 +53,15 @@ var net_select: NetSelect                    ## en red; null en local
 const LATE_WAIT := "De vuelta: entrarás al empezar el siguiente nivel"
 var _me := SelectState.LOCAL                 ## PC de los jugadores de esta pantalla
 var _stage: Control
+var _title: Label
+## Vínculos entre los elegidos (hito 21.3, Bonds): en la fila del título, que se aparta; si hay
+## varios, se turnan cada BOND_CYCLE s.
+const BOND_CYCLE := 4.5
+var _bond_head: Label
+var _bond_text: Label
+var _bond_list: Array = []
+var _bond_i := 0
+var _bond_t := 0.0
 var _modal: Control                          ## confirmación de salir de la sala
 var _wait: PanelContainer                    ## aviso en el centro (conectando, eligiendo nivel)
 var _wait_label: Label
@@ -138,6 +147,17 @@ func _build() -> void:
 	t.size = Vector2(DESIGN.x, 70)
 	t.position = Vector2(0, 18)
 	stage.add_child(t)
+	_title = t
+	_bond_head = MenuKit.title("", 34, UiKit.GOLD)
+	_bond_head.size = Vector2(DESIGN.x, 46)
+	_bond_head.position = Vector2(0, 10)
+	_bond_text = UiKit.label("", 20, UiKit.TEXT)
+	_bond_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_bond_text.size = Vector2(DESIGN.x, 28)
+	_bond_text.position = Vector2(0, 57)
+	for l: Label in [_bond_head, _bond_text]:
+		l.modulate.a = 0.0
+		stage.add_child(l)
 	if Saves.current:
 		var m := UiKit.label("Dinero  %s $" % MenuKit.money(Saves.current.money), 22, UiKit.GOLD)
 		m.position = Vector2(DESIGN.x - 260, 22)
@@ -162,8 +182,49 @@ func _build() -> void:
 
 func _refresh() -> void:
 	for f in _frames: f.refresh()
+	_refresh_bonds()
 	if state.all_ready() and _map == null and not _leaving and (net_select == null or net_select.is_host()):
 		_open_map.call_deferred()
+
+## Los vínculos entre los personajes que hay ahora en los marcos (los secretos cerrados, no).
+func _refresh_bonds() -> void:
+	if _bond_head == null: return
+	var ids := []
+	for i in state.seats.size():
+		var seat: SelectState.Seat = state.seats[i]
+		if seat == null: continue
+		var c: CharacterData = state.characters[seat.character]
+		if state.is_locked(seat.character, i) and c.secret != "": continue
+		ids.append(String(c.id))
+	var found := Bonds.between(ids)
+	if found == _bond_list: return
+	_bond_list = found
+	_bond_i = 0
+	_bond_t = 0.0
+	_show_bond()
+
+## Funde el título con el vínculo que toca (o vuelve al título si no hay ninguno).
+func _show_bond() -> void:
+	var on := not _bond_list.is_empty()
+	var tw := create_tween()
+	tw.tween_property(_bond_head, "modulate:a", 0.0, 0.18)
+	tw.parallel().tween_property(_bond_text, "modulate:a", 0.0, 0.18)
+	tw.parallel().tween_property(_title, "modulate:a", 0.0 if on else 1.0, 0.3)
+	if not on: return
+	var b: Dictionary = _bond_list[_bond_i % _bond_list.size()]
+	tw.tween_callback(func() -> void:
+		_bond_head.text = "Vínculo · %s: %s" % [String(b.get("titulo", "")), String(b.get("pareja", ""))]
+		_bond_text.text = String(b.get("texto", "")))
+	tw.tween_property(_bond_head, "modulate:a", 1.0, 0.3)
+	if net_select == null: tw.parallel().tween_property(_bond_text, "modulate:a", 1.0, 0.3)   # en red, ahí va la sala
+
+func _process(delta: float) -> void:
+	if _bond_list.size() < 2: return
+	_bond_t += delta
+	if _bond_t < BOND_CYCLE: return
+	_bond_t = 0.0
+	_bond_i += 1
+	_show_bond()
 
 # ---------------------------------------------------------------- entrada por dispositivo
 

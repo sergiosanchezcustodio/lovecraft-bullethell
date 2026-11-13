@@ -2973,3 +2973,42 @@ Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden:
 - **En partida:** `godot --path . --fixed-fps 30 -- character=gilman level=p1_n1 final_at=2 boss_intro=false demo_kill=4 bot=idle god=true shots=4.5,4.8` (el jefe cae a los 4 s y sale «Nivel superado»).
 - **Tests:** en `test_gestos_ataque` se usan las once poses, y Edward y Asenath celebran cada uno a su manera (Kuranes, sin segundo cuerpo, la suya).
 
+### 21.3: vínculos entre investigadores (13-11-2026)
+
+*Pendiente de la revisión del autor (D-51, con la recomendación).*
+
+- **Qué:** dos investigadores que se conocen en los relatos, jugando juntos en cooperativo:
+  - **Al empezar una parte** (sin progreso del nivel anterior, `GameSession.carry` vacío), se dicen su diálogo: un bocadillo sobre la cabeza de cada uno que lo sigue (`Label3D` con la letra del texto, «comillas»), a los 2,5 s, y la respuesta a los 3,2 s. Con varios vínculos, uno tras otro.
+  - **Al subir de nivel** con el otro a menos de 7 m, los dos se saludan (`bond_wave`: la mano alzada que se agita dos veces y la otra al pecho, en lugar del puño de `cheer`) y se miran (`Player.look_at_friend`, que manda sobre mirar al peligro). Un lazo de cubitos dorados en arco va de uno a otro (`Bonds.ribbon`), también al juntarse después de estar separados (como mucho cada 8 s).
+  - **Mientras están cerca** (7 m; se separan a 8, para que no parpadee en el borde), tienen una ventaja pequeña.
+- **Datos:** `data/bonds.json`. Cada vínculo lleva la pareja, el título, el texto de la selección, el diálogo (frase y respuesta) y sus efectos, para los dos o para uno:
+  - `stat`: multiplica una estadística en `Player.rebuild_stats`, así que no se acumula al rehacerlas.
+  - `tag`: multiplica el daño contra una etiqueta (`bonus_tags`).
+  - `dream_heal`: cura esa parte de la vida por segundo en los sueños (`DreamZone`).
+  - `revive_heal`: suma esa parte de la vida al que levanta (`Player.revive`, con `_reviver_node`).
+- **Las ocho parejas:**
+
+| Vínculo | Pareja | Ventaja |
+|---|---|---|
+| Los soñadores | Carter y Kuranes | En los sueños de Kuranes, Carter recupera el 1,5 % de la vida por segundo |
+| Las criptas de Zin | Carter y Pickman | Los necrófagos de Pickman duran un 30 % más (`ally_mult`) |
+| El culto de Cthulhu | Legrasse y Johansen | Los dos, un 10 % más de daño a los humanos |
+| Los médicos | West y Whipple | El que levanta a un caído le devuelve un 15 % más de vida |
+| La casa de la bruja | Elwood y Gilman | Sus crisis duran un 25 % menos (`crisis_mult`) |
+| El crucifijo | Iwanicki y Gilman | Gilman pierde un 15 % menos de cordura (`mental_mult`) |
+| El desierto de Australia | Dyer y Peaslee | Los dos, un 10 % más de experiencia |
+| El Necronomicón | Armitage y Whateley | Sus armas arcanas se recargan un 10 % antes |
+
+- **Selección:** cuando dos marcos tienen a una pareja (aunque no la hayan confirmado; los secretos cerrados no se descubren), la fila del título se funde con «Vínculo · El culto de Cthulhu: Legrasse y Johansen» y su texto debajo. Con varios, se turnan cada 4,5 s. En red solo sale la primera línea, porque debajo va la sala.
+- **En red:** `Bonds` corre igual en todos los PC. Cada ventaja actúa donde se decide lo suyo: la vida, en el PC de cada jugador; la experiencia, en el anfitrión.
+- **Comprobado** en partida con `character=carter bots=1 bot_chars=kuranes bot=smart` (los dos bocadillos) y `levelup_at=8 autopick=true bot=idle bond_talk=false` (el saludo y el lazo). Si el que sube está disparando, el apuntado le tapa el brazo del saludo, como el puño del 17.4.
+- **Tests** (`tests/test_bonds.gd`, 9):
+  - Los datos: personajes que existen, diálogo de los dos y ventajas pequeñas.
+  - Quién tiene vínculo con quién.
+  - Cerca tienen la ventaja y lejos la pierden, con margen en el borde.
+  - Las estadísticas no se acumulan al rehacerlas, y cada ventaja va solo a quien le toca.
+  - Los sueños curan a Carter y no a Kuranes.
+  - Los médicos levantan con más vida.
+  - El diálogo, solo al empezar la parte.
+  - El saludo existe.
+

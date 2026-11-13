@@ -86,7 +86,10 @@ func _physics_process(delta: float) -> void:
 		for p in world.players:
 			if p.remote or p.health <= 0.0: continue
 			var dp := Vector2(p.global_position.x - global_position.x, p.global_position.z - global_position.z)
-			if dp.length() <= radius: p.sanity = minf(p.data.max_sanity, p.sanity + rest * delta)
+			if dp.length() <= radius:
+				p.sanity = minf(p.data.max_sanity, p.sanity + rest * delta)
+				var heal := float(p.bond.get("dream_heal", 0.0))   # los soñadores (vínculo, 21.3): Carter
+				if heal > 0.0: p.health = minf(p.data.max_health, p.health + p.data.max_health * heal * delta)
 	_tick -= delta
 	if _tick > 0.0: return
 	_tick = interval

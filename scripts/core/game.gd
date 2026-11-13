@@ -279,6 +279,9 @@ func _ready() -> void:
 		var ids := args.get_str("pets").split(",")
 		for i in mini(ids.size(), players.size()): _spawn_pet(ids[i], players[i])
 	_lap("compañeros")
+	if players.size() > 1:                            # vínculos (hito 21.3): su diálogo al empezar la parte
+		bonds = Bonds.new().setup(world, players, GameSession.carry.is_empty() and args.get_str("bond_talk", "") != "false")
+		add_child(bonds)
 	var bonus := Shop.bonuses(Saves.current)          # lo comprado en la tienda (D-31)
 	if args.has("shop"):                              # pruebas: N niveles en cada potenciador, sin tocar la partida
 		var n := args.get_int("shop")
@@ -761,7 +764,15 @@ func level_fx(q: Player) -> void:
 		wave.color = Color(0.6, 0.85, 1.0, 0.9)
 		world.fx.add_child(wave)
 	VoxelFx.puff(q, q.global_position, "rise", 0.6, Color.WHITE, 1.4)      # columna de luz (11-10-2026)
-	q.play_once("cheer", true)                                             # alza el puño (hito 17.4)
+	var friends: Array[Player] = bonds.friends_near(q) if bonds != null else []
+	if friends.is_empty(): q.play_once("cheer", true)                      # alza el puño (hito 17.4)
+	else:                                                                  # con su vínculo cerca, se saludan (21.3)
+		q.play_once("bond_wave", true)
+		for o in friends:
+			o.play_once("bond_wave", true)
+			q.look_at_friend(o, 1.4)
+			o.look_at_friend(q, 1.4)
+			bonds.ribbon(q, o)
 	if not q.remote and not Pacts.has("no_heal"): q.health = minf(q.health + q.data.max_health * q.data.heal_on_level, q.data.max_health)   # Whipple
 	if q.data.team_heal_on_level > 0.0:                   # rasgo de West: cura a los compañeros cercanos
 		for o in players:
@@ -1539,6 +1550,7 @@ func _diary(result: String) -> Array:
 ## partida en el archivo. Va en dos tiempos: los jugadores y el azar de la partida antes de las
 ## subidas de ventaja de los niveles avanzados (`_apply_carry`), el director y los peligros al crearlos.
 var run_seed := 0
+var bonds: Bonds                                  ## vínculos entre los investigadores (hito 21.3)
 func _seed_players() -> void:
 	if level.daily != "": run_seed = Daily.seed_of(level.daily)
 	else:

@@ -1,0 +1,70 @@
+{
+	"_comentario": "Vínculos entre investigadores (hito 21.3, D-51). Dos que se conocen en los relatos, jugando juntos: se dicen su diálogo al empezar una parte, se saludan al subir de nivel y, mientras están a menos de 'radio' m, tienen una ventaja pequeña (en torno a un 10 %). Efectos: 'stat' multiplica una estadística del personaje (CharacterData; las de Player.rebuild_stats), 'tag' el daño contra los enemigos con esa etiqueta, 'dream_heal' cura esa parte de la vida por segundo dentro de los sueños de Kuranes y 'revive_heal' suma esa parte de la vida al levantar a un caído. 'quien': 'ambos' o el id de uno de los dos.",
+	"radio": 7.0,
+	"vinculos": [
+		{
+			"id": "sonadores", "a": "carter", "b": "kuranes",
+			"titulo": "Los soñadores", "pareja": "Carter y Kuranes",
+			"texto": "Mientras están cerca, los sueños de Kuranes también le curan la vida a Carter.",
+			"dialogo": [["carter", "Kuranes. Te hacía en tu trono de Celephaïs."],
+				["kuranes", "Hasta un rey sueña con volver a casa, Carter."]],
+			"efectos": [{"quien": "carter", "tipo": "dream_heal", "valor": 0.015}]
+		},
+		{
+			"id": "zin", "a": "carter", "b": "pickman",
+			"titulo": "Las criptas de Zin", "pareja": "Carter y Pickman",
+			"texto": "Mientras están cerca, los necrófagos de Pickman duran un 30 % más.",
+			"dialogo": [["pickman", "Mis necrófagos te guardan las espaldas, Carter."],
+				["carter", "Ya me sacaron una vez de las criptas de Zin."]],
+			"efectos": [{"quien": "pickman", "tipo": "stat", "stat": "ally_mult", "valor": 1.3}]
+		},
+		{
+			"id": "culto", "a": "legrasse", "b": "johansen",
+			"titulo": "El culto de Cthulhu", "pareja": "Legrasse y Johansen",
+			"texto": "Mientras están cerca, los dos hacen un 10 % más de daño a los humanos: cultistas e híbridos.",
+			"dialogo": [["legrasse", "Los vi bailar en el pantano, alrededor del monolito."],
+				["johansen", "Yo vi la ciudad de la que salió su dios."]],
+			"efectos": [{"quien": "ambos", "tipo": "tag", "tag": "humana", "valor": 1.1}]
+		},
+		{
+			"id": "medicos", "a": "west", "b": "whipple",
+			"titulo": "Los médicos", "pareja": "West y Whipple",
+			"texto": "Mientras están cerca, el que levanta a un caído le devuelve un 15 % más de vida.",
+			"dialogo": [["west", "Doctora, ¿nunca ha querido devolverle la vida a un paciente?"],
+				["whipple", "Yo curo a los vivos, West. A los muertos déjelos en paz."]],
+			"efectos": [{"quien": "ambos", "tipo": "revive_heal", "valor": 0.15}]
+		},
+		{
+			"id": "pension", "a": "elwood", "b": "gilman",
+			"titulo": "La casa de la bruja", "pareja": "Elwood y Gilman",
+			"texto": "Mientras están cerca, sus crisis de locura duran un 25 % menos.",
+			"dialogo": [["elwood", "Walter, anoche volviste a andar dormido."],
+				["gilman", "Frank, las esquinas de mi cuarto no son rectas."]],
+			"efectos": [{"quien": "ambos", "tipo": "stat", "stat": "crisis_mult", "valor": 0.75}]
+		},
+		{
+			"id": "crucifijo", "a": "iwanicki", "b": "gilman",
+			"titulo": "El crucifijo", "pareja": "Iwanicki y Gilman",
+			"texto": "Mientras están cerca, Gilman pierde un 15 % menos de cordura.",
+			"dialogo": [["iwanicki", "Lleva siempre el crucifijo, hijo. Y no duermas en esa buhardilla."],
+				["gilman", "Padre, lo que me visita no entra por la puerta."]],
+			"efectos": [{"quien": "gilman", "tipo": "stat", "stat": "mental_mult", "valor": 0.85}]
+		},
+		{
+			"id": "australia", "a": "dyer", "b": "peaslee",
+			"titulo": "El desierto de Australia", "pareja": "Dyer y Peaslee",
+			"texto": "Mientras están cerca, los dos ganan un 10 % más de experiencia.",
+			"dialogo": [["dyer", "Acompañé a tu tío al desierto de Australia, Amelia."],
+				["peaslee", "Y ninguno de los dos quiso contar lo que vio allí abajo."]],
+			"efectos": [{"quien": "ambos", "tipo": "stat", "stat": "xp_mult", "valor": 1.1}]
+		},
+		{
+			"id": "necronomicon", "a": "armitage", "b": "whateley",
+			"titulo": "El Necronomicón", "pareja": "Armitage y Whateley",
+			"texto": "Mientras están cerca, sus armas arcanas se recargan un 10 % antes.",
+			"dialogo": [["armitage", "Ese libro no sale de la biblioteca, Whateley."],
+				["whateley", "Mi abuelo me enseñó a leerlo, profesor."]],
+			"efectos": [{"quien": "ambos", "tipo": "stat", "stat": "arcane_cooldown_mult", "valor": 0.9}]
+		}
+	]
+}

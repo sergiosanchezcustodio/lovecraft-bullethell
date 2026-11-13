@@ -473,6 +473,11 @@ var hurt_min := {}
 var downs := 0
 var last_reviver := ""
 var _reviver := ""
+var _reviver_node: Player                     ## quién lo levanta (los médicos, vínculo del 21.3)
+## Ventajas de los vínculos con alguien cerca (hito 21.3, Bonds): "stat:<estadística>" y
+## "tag:<etiqueta>" multiplican (rebuild_stats); "dream_heal" cura esa parte de la vida por segundo
+## en los sueños (DreamZone) y "revive_heal" suma esa parte de la vida al que levanta.
+var bond := {}
 static var bench_immortal := OS.get_cmdline_user_args().has("immortal=true")
 func recv_add(src: String, ph: float, me: float, via := &"otro") -> void:
 	if not received.has(src): received[src] = [0.0, 0.0]
@@ -512,7 +517,9 @@ func _downed_step(delta: float) -> void:
 		for q in world.players:
 			if q == self or q.health <= 0.0: continue
 			if q.global_position.distance_to(global_position) <= rules.revive_radius:
-				if q.data.revive_speed >= speed: _reviver = q.data.display_name
+				if q.data.revive_speed >= speed:
+					_reviver = q.data.display_name
+					_reviver_node = q
 				speed = maxf(speed, q.data.revive_speed)
 	if speed > 0.0: revive_progress += delta * speed
 	else: revive_progress = maxf(0.0, revive_progress - delta * 0.5)
@@ -525,7 +532,10 @@ func _downed_step(delta: float) -> void:
 
 ## Vuelve a la lucha con parte de la vida y un momento de invulnerabilidad.
 func revive() -> void:
-	health = data.max_health * rules.revive_health
+	var extra := 0.0                                  # los médicos (vínculo, 21.3)
+	if _reviver_node != null and is_instance_valid(_reviver_node): extra = float(_reviver_node.bond.get("revive_heal", 0.0))
+	health = data.max_health * minf(rules.revive_health + extra, 1.0)
+	_reviver_node = null
 	down_left = -1.0
 	revive_progress = 0.0
 	motor.locked = false
@@ -782,10 +792,21 @@ const LOOK_SCAN := 0.12
 var _look_yaw := 0.0
 var _look_target: Node3D
 var _look_scan := 0.0
+var _friend: Node3D                            ## a quién mira al saludarse (vínculos, 21.3)
+var _friend_t := 0.0
+
+## Vuelve la cabeza hacia `who` durante `seconds` s (el saludo de los vínculos), por encima del peligro.
+func look_at_friend(who: Node3D, seconds: float) -> void:
+	_friend = who
+	_friend_t = seconds
 
 func _look_step(delta: float) -> void:
 	var want := 0.0
-	if _look_target != null and is_instance_valid(_look_target) and _look_target.is_alive() 			and _action == "" and not is_downed():
+	_friend_t -= delta
+	if _friend_t > 0.0 and is_instance_valid(_friend) and _action == "" and not is_downed():
+		var tf := _friend.global_position - global_position
+		want = clampf(wrapf(atan2(tf.x, tf.z) - visual.rotation.y, -PI, PI), -LOOK_MAX, LOOK_MAX)
+	elif _look_target != null and is_instance_valid(_look_target) and _look_target.is_alive() 			and _action == "" and not is_downed():
 		var to := _look_target.global_position - global_position
 		want = clampf(wrapf(atan2(to.x, to.z) - visual.rotation.y, -PI, PI), -LOOK_MAX, LOOK_MAX)
 	_look_yaw = lerpf(_look_yaw, want, 1.0 - exp(-7.0 * delta))
@@ -1303,6 +1324,12 @@ func apply_dodge_style(style: DodgeStyle) -> void:
 ## pueden subir y bajar sin acumular errores): la base del personaje, por los multiplicadores
 ## de sus atributos (Attributes), el estilo de esquive y, encima, las mejoras pasivas.
 ## La vida y la cordura ganadas se rellenan; si bajan, no pasan del nuevo máximo.
+## Pone las ventajas de sus vínculos (Bonds, al juntarse o separarse) y rehace las estadísticas.
+func set_bond(effects: Dictionary) -> void:
+	if effects == bond: return
+	bond = effects
+	rebuild_stats()
+
 func rebuild_stats() -> void:
 	var base: CharacterData = load(data.resource_path) if data.resource_path != "" else null
 	if base == null: base = load("res://data/characters/%s.tres" % data.id)
@@ -1338,11 +1365,17 @@ func rebuild_stats() -> void:
 	for up in progress.upgrade_pool if progress else []:
 		up.apply_levels(v, base, int(progress.passives.get(up.id, 0)))
 	v["move_speed"] *= debug_speed
+	for k: String in bond:                                   # vínculos (hito 21.3): con el otro cerca
+		if k.begins_with("stat:") and v.has(k.substr(5)): v[k.substr(5)] *= float(bond[k])
 	for k in v: data.set(k, v[k])
 	var tags := base.bonus_tags.duplicate()                  # Medallón del cazador: contra élites y únicos
 	if data.elite_mult != 1.0: tags[ELITE_TAG] = data.elite_mult
 	if has_sign(&"tsathoggua"): tags[HELD_TAG] = Signs.value("tsathoggua")   # aturdidos o inmovilizados (16.9)
 	if data.fresh_mult != 1.0: tags[FRESH_TAG] = data.fresh_mult
+	for k: String in bond:                                   # vínculos (21.3): contra esa etiqueta
+		if k.begins_with("tag:"):
+			var tag := StringName(k.substr(4))
+			tags[tag] = float(tags.get(tag, 1.0)) * float(bond[k])
 	if tags != data.bonus_tags:
 		data.bonus_tags = tags
 		if weapons: weapons.bonus_changed()
