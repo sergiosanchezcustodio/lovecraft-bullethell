@@ -622,7 +622,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 |---|---|---|
 | 19.1 | **Medir el acumulado:** antes de la fase 17 (commit ca5b6cf, en un worktree) frente a ahora, alternando las dos copias, en p2_n2 y p3_n2, con 1 y con 4 jugadores | Hecho (10-11-2026): 1 jugador, igual (+0,2 ms); 4 jugadores, +1,25 ms de media y +1,7 ms en el 1 % peor. Ver `docs/ESTADO.md` |
 | 19.2 | **Recortar lo que más cuesta:** reparto por sistema (`prof=true`) y picos (`spikes=true`) donde haya subido; arreglar lo que se pueda sin cambiar cómo se ve | En curso (11-11-2026): tope de chispas encendidas (`HitSparks.max_live`), −1,2 a −2,2 ms en el 1 % peor con 4 jugadores; el resto del coste está repartido (ver `docs/ESTADO.md`) |
-| 19.3 | **Bajar por calidad lo que no se pueda recortar:** en Media o Baja, con su opción `=false` para comparar | Pendiente |
+| 19.3 | **Bajar por calidad lo que no se pueda recortar:** en Media o Baja, con su opción `=false` para comparar | Hecho (12-11-2026): «Automático» en Efectos de las armas (de fábrica): enteros con 1 o 2 jugadores, mínimos con 3 o 4 (lo único que vuelve a lo de antes de la fase 17). Ver `docs/ESTADO.md` |
 
 ### Bloque B: accesibilidad de los efectos (elegido por el autor el 11-11-2026: «continúa con otros temas»)
 
@@ -639,3 +639,56 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | 19.7 | **Steam Deck y portátiles:** preajuste «Portátil» (800p, 30-40 fps estables) y la interfaz revisada a 1280×800 | Hecho (11-11-2026): «Ajustes para Steam Deck y portátiles» en Vídeo (`Settings.HANDHELD`), solos la primera vez en una Deck; 1280×800 y límites de 30 y 40 fps. Falta probarlo en una Deck de verdad |
 | 19.8 | **Linux:** build y prueba en GitHub Actions | Hecho (11-11-2026): perfiles Linux y Linux Demo; en Actions se exportan y se prueban sin pantalla (portada y un minuto de partida con el bot). Falta probarla en un Linux con pantalla |
 | 19.9 | **Informe de errores:** si el juego se cerró mal, al volver ofrece guardar un archivo con el registro y la configuración | Hecho (11-11-2026): `CrashReport`, marca `user://running.json`; en el menú principal, un .zip en Documentos con el registro anterior, la configuración y el equipo |
+
+## Fase 20: menús, transiciones, configuración y personajes nuevos
+
+**Propuesta el 12-11-2026** a petición del autor («dame más sugerencias: menús, transiciones, algo gráfico, configuración, personajes nuevos para la tienda») y aprobada entera el 13-11-2026 («haz un plan para todo y comienza»). Se empieza por el bloque A.
+
+**Criterio de aceptación de la fase:** ninguna transición pasa de 0,7 s ni bloquea la entrada (cualquier botón la acaba); con «Destellos reducidos», nada de lo nuevo destella; lo nuevo de los menús no se nota en la partida (lo que va dentro, como el desenfoque de la pausa, se apaga en Baja); cada personaje nuevo con su modelo a bloques (regla de los humanos), su cara, su vestuario, sus armas, su esquive, su precio en la tienda, sus tests y una partida con el bot sin errores; todo comprobado en captura.
+
+### Bloque A: transiciones
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 20.1 | **Mancha de tinta:** al entrar en la partida y al salir de ella (`LevelCard`), la tinta se extiende por la pantalla desde el centro y se retira por los bordes, en lugar del fundido a negro | Pendiente |
+| 20.2 | **Pasar página entre los menús de la portada:** al abrir la tienda, el bestiario, la configuración… la ventana entra como una hoja que gira sobre el lomo (como el libro de la selección, 12.14) | Pendiente |
+| 20.3 | **La vela se apaga:** al salir del juego o volver a la portada desde la partida, la luz se recoge en una llama que se apaga | Pendiente |
+| 20.4 | **Página quemada:** la pantalla final al caer entra con los bordes ardiendo | Pendiente |
+
+### Bloque B: menús
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 20.5 | **Ruta arriba:** «Biblioteca › Tienda › Personajes» en los menús de varios niveles | Pendiente |
+| 20.6 | **Sonido de los menús:** pluma al moverse por los botones y sello al confirmar | Pendiente |
+| 20.7 | **Personajes de la tienda que respiran:** el modelo en reposo, en bucle lento, en lugar de quieto | Pendiente |
+| 20.8 | **Paralaje en las ilustraciones de la tienda:** se mueven un poco con el cursor o el stick | Pendiente |
+
+### Bloque C: gráfico
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 20.9 | **Portada viva según el progreso:** más libros, objetos de los jefes vencidos y otro cielo según lo jugado | Pendiente |
+| 20.10 | **Desenfoque en la pausa:** la partida, desenfocada detrás del panel (apagado en Baja) | Pendiente |
+| 20.11 | **Polvo en la luz de los menús:** motas que flotan en el haz de la vela | Pendiente |
+
+### Bloque D: configuración
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 20.12 | **Vista previa en Vídeo:** una miniatura de la partida que cambia al tocar calidad, efectos, brillo o clima | Pendiente |
+| 20.13 | **Tamaño y contraste del texto de los relatos y el diario,** aparte de la escala de la interfaz | Pendiente |
+| 20.14 | **Perfiles de ajustes:** dos configuraciones guardadas («sobremesa» y «portátil») que se cambian con un botón | Pendiente |
+| 20.15 | **Restablecer solo esta pestaña** | Pendiente |
+| 20.16 | **Rendimiento detallado:** además de los FPS, ms de media y 1 % peor | Pendiente |
+
+### Bloque E: personajes nuevos para la tienda
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 20.17 | **Richard Upton Pickman** (*El modelo de Pickman*): lienzos que atraen a los enemigos y, al romperse, sueltan un necrófago aliado un rato; esquive: entra en un cuadro y sale por otro | Pendiente |
+| 20.18 | **Charles Dexter Ward** (*El caso de Charles Dexter Ward*): las sales esenciales levantan como aliados unos segundos a algunos enemigos caídos; poca vida, cuesta cordura | Pendiente |
+| 20.19 | **Walter Gilman** (*Los sueños en la casa de la bruja*): esquive por un ángulo imposible que atraviesa enemigos y decorado; armas de trayectoria rara | Pendiente |
+| 20.20 | **Crawford Tillinghast** (*Desde el más allá*): el resonador muestra lo oculto y le hace más daño; usarlo mucho baja la cordura del grupo | Pendiente |
+| 20.21 | **Edward Derby y Asenath Waite** (*El ser en el umbral*): dos cuerpos que se cambian en cada esquive, uno de cuerpo a cuerpo y otro arcano | Pendiente |
+| 20.22 | **Kuranes** (*Celephaïs*): zonas de sueño donde los enemigos van más lentos | Pendiente |

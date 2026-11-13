@@ -2661,3 +2661,12 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 
 - **Conclusión:** el «Rebajados» nuevo casi no ahorra (0 en p2_n2, −0,4 ms en p3_n2): lo que cuesta no son las chispas ni los casquillos sino lo que se queda en 1 (estelas, sombreador de efectos, arcos, cortinas…), repartido. «Mínimos» sí vuelve a lo de antes de la fase 17. Capturas con 4 jugadores: `shots/game_f19_wfx2_020.0s.png` (Enteros) y `game_f19_wfx0_020.0s.png` (Mínimos): con Mínimos siguen las trazadoras, el chorro, las zonas (una capa) y los números; faltan estelas, chispas, casquillos y el brillo de los efectos.
 - **Decisión (12-11-2026, opción recomendada):** «Automático» pasa a **mínimos con 3 o 4 jugadores** (enteros con 1 o 2), lo único que cumple el criterio de la fase 19 con 4 jugadores. «Rebajados» se queda como opción a mano (y en Media). La nota del menú lo explica.
+
+## Fase 20: menús, transiciones, configuración y personajes nuevos
+
+### 20.1: mancha de tinta (13-11-2026)
+
+- **Qué:** las entradas y salidas de la partida (`LevelCard.enter` y `LevelCard.leave`: al empezar un nivel, al pasar al relato, a la pesca o a la portada) ya no funden a negro: una mancha de tinta (`scripts/ui/ink_wipe.gdshader`) se extiende desde el centro con el borde deshilachado del papel, hilos que se adelantan por las fibras, unos goterones que se le unen y un velo azulado por delante; al entrar se abre un claro desde el centro y la tinta se retira hacia los bordes con un filo azul. Cada vez sale una mancha distinta (`seed`). Al terminar es el mismo negro de siempre (`LevelCard.BLACK`), así que el relato sigue empezando en negro sin corte.
+- **Tiempos:** la salida, 0,45 s como antes (cuadrática, rápida al principio como la tinta que cae); la entrada pasa de 1,0 a 0,7 s (criterio de la fase).
+- **Hoja de prueba:** `godot --path . -s tools/probar_tinta.gd -- [fondo=…] [semilla=N]` → `shots/tinta_hoja.png` (arriba la salida, abajo la entrada, a 15-92 %). En partida, `card=true` con `shots=` (las capturas quitan el rótulo y su entrada si no): `shots/game_tinta_entra_000.3s.png`.
+

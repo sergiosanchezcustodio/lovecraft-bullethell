@@ -4,12 +4,15 @@ extends CanvasLayer
 ## («Parte 1 · Nivel 2» y su nombre, con el separador de los menús) que se desvanece, y al
 ## pasar al relato o al siguiente nivel la pantalla funde a negro antes de cambiar de escena.
 ## El relato ya empieza en negro, así que de nivel a relato y de relato a nivel no hay cortes.
+## Hito 20.1: el negro es una mancha de tinta (`ink_wipe.gdshader`) que se extiende al salir y se
+## retira hacia los bordes al entrar.
 
-const FADE_IN := 1.0            ## s de negro a la partida
+const FADE_IN := 0.7            ## s de negro a la partida (la tinta se retira)
 const CARD_AT := 0.45           ## s hasta que aparece el rótulo
 const CARD_HOLD := 2.6          ## s que se queda entero
 const FADE_OUT := 0.45          ## s de la partida a negro al salir
 const BLACK := Color(0.01, 0.01, 0.015)
+const INK := preload("res://scripts/ui/ink_wipe.gdshader")
 
 ## Rótulo y salida de negro al empezar un nivel. `id`: el de data/campaign.json (sin él, solo
 ## el nombre).
@@ -18,12 +21,12 @@ static func enter(parent: Node, id: String, level_name: String) -> LevelCard:
 	c.layer = 90
 	c.process_mode = Node.PROCESS_MODE_ALWAYS          # también mientras la red espera a todos
 	parent.add_child(c)
-	var black := _black(c, 1.0)
+	var black := _ink(c, 1.0, true)
 	var card := c._card(id, level_name)
 	card.modulate.a = 0.0
 	var tw := c.create_tween().set_parallel(true)
 	tw.set_meta(&"card", c)
-	tw.tween_property(black, "color:a", 0.0, FADE_IN).set_trans(Tween.TRANS_SINE).set_delay(0.1)
+	tw.tween_property(black.material, "shader_parameter/amount", 0.0, FADE_IN).set_trans(Tween.TRANS_SINE) 		.set_ease(Tween.EASE_IN_OUT).set_delay(0.1)
 	tw.tween_property(card, "modulate:a", 1.0, 0.6).set_delay(CARD_AT)
 	for side in ["offset_top", "offset_bottom"]:          # sube un poco al aparecer
 		tw.tween_property(card, side, 0.0, 0.9).from(16.0).set_trans(Tween.TRANS_CUBIC) \
@@ -49,10 +52,24 @@ static func leave(parent: Node, then: Callable, secs := FADE_OUT) -> void:
 	c.layer = 128
 	c.process_mode = Node.PROCESS_MODE_ALWAYS
 	parent.add_child(c)
-	var black := _black(c, 0.0)
+	var black := _ink(c, 0.0, false)
 	var tw := c.create_tween()
-	tw.tween_property(black, "color:a", 1.0, secs).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(black.material, "shader_parameter/amount", 1.0, secs).set_trans(Tween.TRANS_QUAD) 		.set_ease(Tween.EASE_OUT)
 	tw.tween_callback(then)
+
+## La tinta a pantalla completa, con una mancha distinta cada vez. `reveal`: se abre desde el centro.
+static func _ink(c: CanvasLayer, amount: float, reveal: bool) -> ColorRect:
+	var r := _black(c, 1.0)
+	var m := ShaderMaterial.new()
+	m.shader = INK
+	m.set_shader_parameter("amount", amount)
+	m.set_shader_parameter("reveal", reveal)
+	m.set_shader_parameter("seed", randf() * 50.0)
+	m.set_shader_parameter("ink", Color(BLACK, 1.0))
+	var view := c.get_viewport().get_visible_rect().size if c.is_inside_tree() else Vector2(1920, 1080)
+	m.set_shader_parameter("aspect", Vector2(view.x / maxf(view.y, 1.0), 1.0))
+	r.material = m
+	return r
 
 static func _black(c: CanvasLayer, a: float) -> ColorRect:
 	var r := ColorRect.new()
