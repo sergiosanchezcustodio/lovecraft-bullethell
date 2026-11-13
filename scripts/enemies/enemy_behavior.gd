@@ -99,6 +99,11 @@ func contact_damage(e: Enemy) -> Damage:
 func puppet_step(_e: Enemy, _delta: float) -> void:
 	pass
 
+## La Máquina del más allá revela a un enemigo oculto (`Enemy.buried`; hito 20.20): los que se
+## esconden salen aquí.
+func reveal(_e: Enemy) -> void:
+	pass
+
 func touches(_e: Enemy) -> bool:
 	return true
 

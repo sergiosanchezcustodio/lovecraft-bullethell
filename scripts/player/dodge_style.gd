@@ -19,6 +19,8 @@ extends Resource
 ## Por un ángulo imposible (Gilman, hito 20.19): durante el impulso atraviesa el decorado (no los
 ## límites de la arena) y el modelo se pliega de lado; al acabar, se recoloca fuera de lo que tenga encima.
 @export var phase := false
+## Se asoma al más allá (Tillinghast, hito 20.20): revela a los de `reveal` m de donde sale.
+@export var reveal := 0.0
 ## Tramo de la animación (0..1) en que el modelo no se ve (el destello "desaparece").
 @export var hidden_from := -1.0
 @export var hidden_to := -1.0

@@ -47,6 +47,11 @@ var anim_hold := false                   ## el comportamiento controla anim_t di
 var _knock := Vector3.ZERO
 var _stun := 0.0                            ## s que le quedan aturdido (no se mueve ni ataca)
 var _vulnerable := 0.0                      ## s que recibe +25 % de daño (ácido)
+var _reveal_t := 0.0                         ## s revelado (Máquina del más allá, 20.20): recibe +_reveal_k de daño
+var _reveal_k := 0.0
+var _reveal_chain := 0.0                     ## daño con que revienta si muere revelado (Medusas del más allá)
+var _reveal_tag := &""
+const REVEAL_BURST_R := 2.0
 var _lure_t := 0.0                          ## s que le atrae una bengala
 var _lure_pos := Vector3.ZERO
 const VULNERABLE_MULT := 1.25
@@ -454,6 +459,22 @@ func lure(pos: Vector3, seconds: float) -> void:
 func is_vulnerable() -> bool:
 	return _vulnerable > 0.0
 
+## Revelado durante `seconds` (Máquina del más allá, hito 20.20): recibe `bonus` más de daño de
+## todo y, si estaba oculto (enterrado o desvanecido), sale (EnemyBehavior.reveal). Con `chain`,
+## si muere así revienta (_reveal_burst).
+func reveal(seconds: float, bonus: float, chain := 0.0) -> void:
+	if _reveal_t <= 0.0:
+		_reveal_k = 0.0
+		_reveal_chain = 0.0
+	_reveal_t = maxf(_reveal_t, seconds)
+	_reveal_k = maxf(_reveal_k, bonus)
+	_reveal_chain = maxf(_reveal_chain, chain)
+	_reveal_tag = Damage.ctx
+	if buried and behavior != null: behavior.reveal(self)
+
+func is_revealed() -> bool:
+	return _reveal_t > 0.0
+
 ## Más lento durante `seconds`: la velocidad pasa a `factor` (las élites, la mitad de efecto).
 func slow(seconds: float, factor: float) -> void:
 	_slow_t = maxf(_slow_t, seconds)
@@ -585,6 +606,7 @@ func take_damage(d: Damage) -> void:
 	Auto.sfx_at("hit", global_position)
 	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
 	if idol_t > 0.0: k *= IDOL_GUARD           # al amparo del ídolo vivo (16.18)
+	if _reveal_t > 0.0: k *= 1.0 + _reveal_k   # revelado por la máquina (20.20)
 	for tag in data.tags: k *= float(d.bonus.get(tag, 1.0))    # rasgos contra este tipo de enemigo
 	if data.elite or data.unique: k *= float(d.bonus.get(Player.ELITE_TAG, 1.0))   # Medallón del cazador
 	if _stun > 0.0 or _root_t > 0.0: k *= float(d.bonus.get(Player.HELD_TAG, 1.0))   # Signo de Tsathoggua (16.9)
@@ -775,6 +797,7 @@ func _number(amount: float, strong: bool, dot: bool) -> void:
 func _die() -> void:
 	Auto.sfx_at("die", global_position)
 	if _curse_t > 0.0 and int(_curse.get("spread", 0)) > 0: _spread_curse()
+	if _reveal_t > 0.0 and _reveal_chain > 0.0: _reveal_burst()
 	if _inject_t > 0.0 and _ally_time > 0.0:            # se levanta como aliado
 		var r := Reanimated.new().setup(world, data, global_position, facing, _ally_time, _inject_bonus)
 		r.dps *= _inject_power
@@ -826,6 +849,22 @@ func _death_fx() -> void:
 	Prof.stop("muerte", t0)
 
 ## La maldición salta a los más cercanos que aún no la llevan.
+## Medusas del más allá (hito 20.20): el revelado que muere revienta en un picotazo violeta que
+## daña y revela a los de REVEAL_BURST_R. Los que solo revela él no revientan a su vez (los que ya
+## había revelado la máquina, sí): la cadena se acaba.
+func _reveal_burst() -> void:
+	var chain := _reveal_chain
+	_reveal_chain = 0.0
+	var prev := Damage.ctx
+	Damage.ctx = _reveal_tag
+	for e in world.enemies_in_circle(global_position, REVEAL_BURST_R):
+		if e == self or not e.has_method("reveal") or not e.is_alive(): continue
+		e.reveal(maxf(_reveal_t, 1.5), _reveal_k)
+		e.take_damage(Damage.new(chain, 0.0))
+	Damage.ctx = prev
+	VoxelFx.puff(world.fx, global_position, "beyond", REVEAL_BURST_R * 0.5, Color.WHITE, 0.6)
+	if FxShade.on(): HitSparks.burst("glint_violet", global_position + Vector3(0, 0.4, 0))
+
 func _spread_curse() -> void:
 	var near := world.enemies_in_circle(global_position, CURSE_JUMP)
 	near.sort_custom(func(a: Node3D, b: Node3D) -> bool:
@@ -981,6 +1020,7 @@ func _physics_process(delta: float) -> void:
 	_wade = move_toward(_wade, 1.0 if wet else 0.0, WadeSplash.EASE * delta)
 	if _root_t > 0.0: velocity = Vector3.ZERO
 	if _vulnerable > 0.0: _vulnerable -= delta
+	if _reveal_t > 0.0: _reveal_t -= delta
 	if _lure_t > 0.0:                          # bengala: va hacia la luz en lugar del jugador
 		_lure_t -= delta
 		var to := Vector3(_lure_pos.x - position.x, 0, _lure_pos.z - position.z)
@@ -1246,6 +1286,7 @@ func _status_color() -> Color:
 	if _madden_t > 0.0: return Color(1.0, 0.85, 0.15, 0.3 + 0.12 * sin(_spawn_t * 10.0))
 	if _confuse_t > 0.0: return Color(0.95, 0.75, 0.95, 0.22 + 0.1 * sin(_spawn_t * 11.0))
 	if _inject_t > 0.0: return Color(0.8, 0.95, 0.25, 0.14 + 0.06 * sin(_spawn_t * 12.0))   # suero: tenue (el aliado, verde intenso)
+	if _reveal_t > 0.0: return Color(0.72, 0.64, 1.0, 0.2 + 0.08 * sin(_spawn_t * 4.0))     # revelado: luz violeta pálida (20.20)
 	return Color(0, 0, 0, 0)
 
 ## Con la horda (hito 16.3): la fila de la pose (el golpe y la preparación del ataque, si la
@@ -1327,6 +1368,7 @@ func net_flags2() -> int:
 	if ward > 0: f |= 4
 	if small: f |= 8
 	if buried: f |= 16
+	if _reveal_t > 0.0: f |= 32
 	return f
 
 func net_apply_flags2(f: int) -> void:
@@ -1335,6 +1377,7 @@ func net_apply_flags2(f: int) -> void:
 	if ((f & 4) != 0) != (ward > 0): set_ward(1 if (f & 4) != 0 else 0)
 	if (f & 8) != 0 and not small: set_small()
 	buried = (f & 16) != 0
+	_reveal_t = 1.0 if (f & 32) != 0 else 0.0
 
 ## Escudo de icor (grados de locura, 16.14): una burbuja verdinegra que para `n` golpes.
 const WARD_COLOR := Color(0.45, 0.95, 0.55)

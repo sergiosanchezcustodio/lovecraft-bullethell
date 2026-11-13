@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"maquina_mas_alla"
+display_name = "Máquina del más allá"
+description = "Una onda violeta que revela lo que nos rodea: los alcanzados reciben un 30 % más de daño de todo durante unos segundos, y los ocultos salen. Cada pulso seguido calienta la máquina y quita más cordura a todo el grupo cercano."
+category = 2
+delivery = 27
+targeting = 3
+cooldown = 2.4
+range = 5.0
+damage = 30.2
+count = 1.0
+aoe_radius = 5.0
+knockback = 0.25
+sanity_cost = 1.0
+reveal_time = 3.5
+reveal_bonus = 0.3
+evolves_with = &"valvula_maquina"
+evolution = &"lo_que_nos_rodea"
+evolution_alt = &"medusas_mas_alla"
+max_level = 5
+level_mods = Array[Dictionary]([{"damage*": 1.3}, {"aoe_radius*": 1.15}, {"reveal_bonus+": 0.1}, {"damage*": 1.25, "cooldown*": 0.9}])
+level_text = Array[String](["+30 % de daño", "Onda un 15 % más amplia", "Los revelados reciben un 10 % más", "+25 % de daño y vibra más a menudo"])

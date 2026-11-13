@@ -57,5 +57,12 @@ func _appear(e: Enemy) -> void:
 	e.world.ground_hit(_to, 0.9, MIST)
 	e.world.sfx("rise_fog", _to)
 
+## La Máquina del más allá lo saca de la bruma (hito 20.20): reaparece donde se desvaneció.
+func reveal(e: Enemy) -> void:
+	if _away <= 0.0: return
+	_away = 0.0
+	_to = Vector3(e.global_position.x, 0.0, e.global_position.z)
+	_appear(e)
+
 func touches(e: Enemy) -> bool:
 	return not e.buried

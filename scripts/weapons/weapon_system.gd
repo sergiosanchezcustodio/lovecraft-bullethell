@@ -40,6 +40,8 @@ static func with_items(d: WeaponData, n: String, v: float, c: CharacterData) -> 
 		"crit_chance": v += c.crit_chance
 		"crit_mult": v = (v if v > 1.0 else BASE_CRIT) + c.crit_bonus
 		"knockback": v *= c.knockback_mult
+		"reveal_bonus":
+			if v > 0.0: v += c.reveal_add                       # Válvula de la máquina (20.20)
 		"projectile_radius", "projectile_size":
 			if d.delivery == D.BULLET: v *= c.proj_size_mult      # Estatuilla de la balaustrada (20.19)
 	return v
@@ -54,6 +56,13 @@ var _drones := {}                            ## Weapon -> MiGoDrones (orbes Mi-G
 var _tethers := {}                           ## Weapon -> TetherBeam activo (Lente del Éter)
 var _traps := {}                             ## Weapon -> cepos puestos (Cepos)
 var _angle_side := 1.0                       ## a qué lado sale el siguiente ángulo de Gilman
+var _heat := {}                              ## Weapon -> calor de la Máquina del más allá (1 a BEYOND_HEAT_MAX)
+var _heat_at := {}                           ## Weapon -> world.clock del último pulso
+const BEYOND_HEAT_MAX := 3.0                 ## la cordura que quita llega a triplicarse
+const BEYOND_COOL := 0.25                    ## calor que pierde por segundo parada
+const BEYOND_GROUP := 9.0                    ## m: a quién del grupo le quita cordura
+const BEYOND_COLOR := Color(0.62, 0.45, 1.0, 0.95)
+const BEYOND_HOT := Color(0.95, 0.35, 0.7, 0.95)   ## caliente: violeta enfermizo
 
 func setup(p_player: Player, p_world: CombatWorld) -> WeaponSystem:
 	player = p_player
@@ -208,6 +217,7 @@ func _fire(w: Weapon) -> bool:
 		WeaponData.Delivery.TURRET: return _turret(w)
 		WeaponData.Delivery.CANVAS: return _canvas(w, target_pos)
 		WeaponData.Delivery.SALTS: return _salts(w, target_pos)
+		WeaponData.Delivery.BEYOND: return _beyond(w)
 		WeaponData.Delivery.BOOMERANG: return _boomerang(w, target_pos)
 		WeaponData.Delivery.FISSURE: return _fissure(w, target_pos)
 		WeaponData.Delivery.THRUST: return _thrust(w)
@@ -580,6 +590,44 @@ func _canvas(w: Weapon, target_pos: Vector3) -> bool:
 		world.fx.add_child(c)
 	fired.emit(w)
 	return true
+
+## Máquina del más allá de Tillinghast (hito 20.20): una onda violeta que revela a los de
+## aoe_radius (más daño mientras dura; saca a los enterrados y a los desvanecidos). Solo vibra con
+## enemigos cerca, también ocultos. Cada pulso seguido la calienta (se enfría BEYOND_COOL por s) y
+## la cordura que quita, sanity_cost × calor, la pierden todos los del grupo a BEYOND_GROUP m (los
+## jugadores de este PC: los de otro PC llevan su cordura allí).
+func _beyond(w: Weapon) -> bool:
+	var origin := player.global_position
+	var r := w.stat("aoe_radius")
+	if world.enemies_in_circle(origin, r).is_empty() and not _hidden_near(origin, r): return false
+	var since := world.clock - float(_heat_at.get(w, world.clock))
+	var h := minf(maxf(float(_heat.get(w, 0.0)) - since * BEYOND_COOL, 0.0) + 1.0, BEYOND_HEAT_MAX)
+	_heat[w] = h
+	_heat_at[w] = world.clock
+	var cost := w.stat("sanity_cost") * h
+	for p: Player in world.players:
+		if p.remote or p.is_downed() or p.global_position.distance_to(origin) > BEYOND_GROUP: continue
+		p.sanity = maxf(0.0, p.sanity - cost * p.data.arcane_cost_mult)
+	var wave := Shockwave.new().setup(player, world, r, 0.45, dmg(w), w.stat("knockback"), 0.0, player.data.bonus_tags)
+	wave.reveal_t = w.stat("reveal_time")
+	wave.reveal_k = w.stat("reveal_bonus")
+	wave.reveal_chain = w.stat("reveal_chain") * dmg(w, false)
+	wave.color = BEYOND_COLOR.lerp(BEYOND_HOT, (h - 1.0) / (BEYOND_HEAT_MAX - 1.0))
+	world.fx.add_child(wave)
+	VoxelFx.puff(world.fx, origin, "beyond", r * 0.6, Color.WHITE, 1.0)   # lo que se ve al encenderla
+	Auto.sfx_at("magic", origin)
+	fired.emit(w)
+	return true
+
+## Calor actual de la Máquina del más allá (tests).
+func heat_of(w: Weapon) -> float:
+	return float(_heat.get(w, 0.0))
+
+func _hidden_near(origin: Vector3, r: float) -> bool:
+	for e in world.enemies:
+		if e is Enemy and (e as Enemy).buried and Vector2(e.global_position.x - origin.x, e.global_position.z - origin.z).length() <= r:
+			return true
+	return false
 
 ## Sales esenciales (hito 20.18): donde más han caído a su alcance o, sin restos, sobre el grupo más
 ## denso. Sin ninguno de los dos (nadie cerca), no gasta la cordura: espera.

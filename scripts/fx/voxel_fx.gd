@@ -564,6 +564,30 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_min = 0.05; m.scale_max = 0.13
 			m.color_ramp = _ramp([[0.0, Color(0.32, 0.27, 0.22, 1.0)], [0.85, Color(0.2, 0.17, 0.15, 1.0)],
 				[1.0, Color(0.2, 0.17, 0.15, 0.0)]])
+		"beyond":                 # la Máquina del más allá (hito 20.20): seres translúcidos que flotan un momento
+			p.draw_pass_1 = cube("add")
+			p.amount = 12
+			p.lifetime = 1.5
+			p.explosiveness = 0.85
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
+			m.emission_ring_axis = Vector3.UP
+			m.emission_ring_radius = maxf(r, 0.3)
+			m.emission_ring_inner_radius = maxf(r, 0.3) * 0.3
+			m.emission_ring_height = 0.6
+			m.emission_shape_offset = Vector3(0, 0.9, 0)
+			m.direction = Vector3.UP
+			m.spread = 35.0
+			m.gravity = Vector3(0, 0.35, 0)
+			m.initial_velocity_min = 0.15; m.initial_velocity_max = 0.5
+			m.damping_min = 0.3; m.damping_max = 0.8
+			m.angular_velocity_min = -60.0; m.angular_velocity_max = 60.0
+			m.turbulence_enabled = true
+			m.turbulence_noise_strength = 0.6
+			m.turbulence_noise_scale = 2.0
+			m.scale_min = 0.12; m.scale_max = 0.26
+			m.scale_curve = _curve([[0.0, 0.2], [0.25, 1.0], [0.7, 0.85], [1.0, 0.0]])
+			m.color_ramp = _ramp([[0.0, Color(0.85, 0.8, 1.0, 0.0)], [0.2, Color(0.66, 0.5, 1.0, 0.55)],
+				[0.6, Color(0.42, 0.7, 0.95, 0.4)], [1.0, Color(0.3, 0.2, 0.6, 0.0)]])
 		"fold":                   # el ángulo de Gilman (hito 20.19): esquirlas violetas que giran y se cierran
 			p.draw_pass_1 = cube("add")
 			p.amount = 16

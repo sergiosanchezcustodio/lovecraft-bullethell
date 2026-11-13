@@ -101,6 +101,11 @@ func _enter(s: State) -> void:
 	state = s
 	_t = 0.0
 
+## La Máquina del más allá lo saca (hito 20.20): bajo tierra o a punto de salir, sale aturdido
+## donde está, sin el golpe de la salida.
+func reveal(e: Enemy) -> void:
+	if e.buried and state in [State.UNDER, State.WARN]: _surface(e)
+
 func touches(e: Enemy) -> bool:
 	return not e.buried and state != State.DIG
 

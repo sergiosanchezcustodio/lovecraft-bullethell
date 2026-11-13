@@ -60,7 +60,7 @@ enum Targeting { NEAREST, DENSEST, MOVE_DIR, AROUND, STRONGEST, FRONT_BACK }
 ## SWEEP: rayo de `range` m que gira alrededor del personaje a projectile_speed grados por
 ## segundo durante `duration` s; daña cada hit_interval a cada enemigo (Lámpara de Alhazred).
 enum Delivery { BULLET, THROWN, MELEE, ORBIT, BEAM, WAVE, FLAME, SIGIL, PULSE, TETHER, CLOUD, DRONE, STAB,
-	CHAIN, TURRET, BOOMERANG, FISSURE, THRUST, WHIP, TRAP, FIREBALL, VORTEX, SPIKES, MADDEN, SWEEP, CANVAS, SALTS }
+	CHAIN, TURRET, BOOMERANG, FISSURE, THRUST, WHIP, TRAP, FIREBALL, VORTEX, SPIKES, MADDEN, SWEEP, CANVAS, SALTS, BEYOND }
 ## Zona que deja en el suelo (lanzados, lanzallamas, nube): ninguna, fuego, ácido o polvo
 ## (ralentiza y debilita).
 ## GAS: nube tóxica que deriva (`drift` m/s) hacia donde se lanzó (Gas de cloro).
@@ -133,6 +133,12 @@ enum Category { PHYSICAL, FIREARM, MAGIC }
 @export var crit_mult := 1.0                 ## daño del crítico
 @export var ally_time := 0.0                 ## s que se levanta como aliado el que muere inyectado (West)
 @export var ally_blast := 0.0                ## al deshacerse, cada aliado daña ally_blast × damage en 1,8 m (Cola del Dragón, hito 20.18)
+## Máquina del más allá (entrega BEYOND, hito 20.20): los que alcanza quedan revelados reveal_time s
+## y reciben reveal_bonus más de daño de todo (los ocultos salen); con reveal_chain, al morir
+## revelados revientan con reveal_chain × damage en 2 m (Medusas del más allá).
+@export var reveal_time := 0.0
+@export var reveal_bonus := 0.0
+@export var reveal_chain := 0.0
 @export var root := 0.0                      ## s que deja inmóviles a los de la red (las élites solo se frenan)
 @export_group("Arsenal III")
 @export var volleys := 1.0                   ## disparos seguidos por uso (Recortada: 2)

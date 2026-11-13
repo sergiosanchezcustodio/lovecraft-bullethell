@@ -71,7 +71,7 @@ const ITEM_STATS: Array[String] = ["proj_count_add", "range_mult", "proj_speed_m
 	"chest_mult", "pickup_heal_mult", "pet_mult", "hit_iframes", "arcane_cost_mult", "thorns", "nodens_level",
 	"ankh", "dodge_charges", "decoy_time", "dodge_blast", "dodge_fury", "rerolls", "kill_blast", "hit_slow",
 	"hit_burn", "low_hp_bonus", "idol_mult", "arcane_cooldown_mult", "calm_aura",   # (estos dos, 16.25)
-	"ally_mult", "ally_dmg_mult", "proj_size_mult"]                                                                     # (20.17)
+	"ally_mult", "ally_dmg_mult", "proj_size_mult", "reveal_add"]                                                                     # (20.17)
 ## Objetos con mecánica (hito 8.7)
 const LOW_HP := 0.3              ## por debajo de esta parte de la vida cuenta el Diente de shoggoth
 const FURY_TIME := 2.0           ## s de daño extra tras esquivar (Elixir de Curwen)
@@ -635,6 +635,9 @@ func _process_step(delta: float) -> void:
 			if not _frame_out and u >= 0.85 and world != null:
 				_frame_out = true
 				VoxelFx.puff(world.fx, global_position, "fold", 0.5, Color.WHITE, 1.0)
+		if style.reveal > 0.0 and not _frame_out and u >= style.hidden_to - 0.12 and world != null:   # y vuelve
+			_frame_out = true
+			VoxelFx.puff(world.fx, global_position, "beyond", 0.5, Color.WHITE, 0.6)
 		if style.dust and not _frame_out and u >= style.hidden_to - 0.12 and world != null:   # y se recompone
 			_frame_out = true
 			VoxelFx.puff(world.fx, global_position, "salts_rise", 0.45, Color.WHITE, 1.0)
@@ -642,7 +645,7 @@ func _process_step(delta: float) -> void:
 			_ghost_t -= delta
 			if _ghost_t <= 0.0 and world != null:
 				_ghost_t = 0.05
-				var tint := Color(0.7, 0.45, 1.0) if style.phase else color.lerp(Color(0.85, 0.95, 1.0), 0.6)
+				var tint := Color(0.7, 0.45, 1.0) if style.phase or style.reveal > 0.0 else color.lerp(Color(0.85, 0.95, 1.0), 0.6)
 				world.fx.add_child(Afterimage.new().setup(model, tint, 0.28))
 
 ## Inclinación (hito 11.1): hacia donde acelera, atrás al frenar (con un pequeño rebote: un
@@ -1480,6 +1483,9 @@ func _item_hit(e: Node3D, dmg: float, item: String) -> void:
 	e.take_damage(d)
 	Damage.ctx = prev
 
+const DODGE_REVEAL_T := 2.5                   ## esquive de Tillinghast (20.20): s revelados
+const DODGE_REVEAL_K := 0.2                   ## y cuánto más daño reciben
+
 ## Esquive por un ángulo (Gilman, hito 20.19): sin chocar con el decorado ni con los cuerpos
 ## físicos, solo dentro de los límites de la arena. Al acabar, el push_out de siempre lo saca de
 ## lo que tenga encima.
@@ -1498,6 +1504,11 @@ func _on_dodge() -> void:
 		_frame_out = false
 	if data.dodge_style != null and data.dodge_style.phase and world != null:  # se pliega en un ángulo (20.19)
 		VoxelFx.puff(world.fx, global_position, "fold", 0.5, Color.WHITE, 1.0)
+		_frame_out = false
+	if data.dodge_style != null and data.dodge_style.reveal > 0.0 and world != null:   # se asoma al más allá (20.20)
+		VoxelFx.puff(world.fx, global_position, "beyond", 0.7, Color.WHITE, 0.8)
+		for e in world.enemies_in_circle(global_position, data.dodge_style.reveal):
+			if e.has_method("reveal"): e.reveal(DODGE_REVEAL_T, DODGE_REVEAL_K)
 		_frame_out = false
 	if data.dodge_style != null and data.dodge_style.dust and world != null:   # se deshace en sales (20.18)
 		VoxelFx.puff(world.fx, global_position, "salts_fall", 0.45, Color.WHITE, 1.2)

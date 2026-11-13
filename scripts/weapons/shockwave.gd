@@ -20,6 +20,9 @@ var _wall: MeshInstance3D                    ## cortina de luz que sube con la o
 var clears := false                          ## Resonador: deshace las balas enemigas que alcanza
 var color := COLOR
 var cleared := 0                             ## balas deshechas (tests)
+var reveal_t := 0.0                          ## Máquina del más allá (20.20): s que quedan revelados
+var reveal_k := 0.0                          ## y cuánto más daño reciben
+var reveal_chain := 0.0                      ## daño con que revientan al morir así (Medusas del más allá)
 
 const FADE := 0.25
 const COLOR := Color(1.0, 0.84, 0.46, 0.95)        # dorado: un blanco pálido se perdía sobre la nieve
@@ -66,6 +69,7 @@ func _physics_process(delta: float) -> void:
 	var r := current_radius()
 	if Engine.get_physics_frames() % 3 == 0: world.bullets.clear_enemy_bullets(global_position, r * 0.6)   # la onda aparta balas
 	if clears: cleared += world.bullets.clear_enemy_bullets(global_position, r)
+	if reveal_t > 0.0: _reveal_hidden(r)
 	for e in world.enemies_in_circle(global_position, r):
 		var id := e.get_instance_id()
 		if _hit.has(id): continue
@@ -74,8 +78,17 @@ func _physics_process(delta: float) -> void:
 		var away := e.global_position - global_position
 		d.knockback = Vector3(away.x, 0, away.z).normalized() * _push
 		d.bonus = _bonus
+		if reveal_t > 0.0 and e.has_method("reveal"): e.reveal(reveal_t, reveal_k, reveal_chain)
 		e.take_damage(d)
-		if e.has_method("stun") and e.is_alive(): e.stun(_stun)
+		if _stun > 0.0 and e.has_method("stun") and e.is_alive(): e.stun(_stun)
+
+## Los enterrados y los desvanecidos no están en la rejilla: la onda los busca y los saca (salen
+## con Enemy.reveal); el golpe les llega en el paso siguiente, ya en la rejilla.
+func _reveal_hidden(r: float) -> void:
+	for e in world.enemies:
+		if not e is Enemy or not (e as Enemy).buried: continue
+		if Vector2(e.global_position.x - global_position.x, e.global_position.z - global_position.z).length() > r: continue
+		(e as Enemy).reveal(reveal_t, reveal_k, reveal_chain)
 
 func _process(_delta: float) -> void:
 	Damage.ctx = _wtag

@@ -21,6 +21,7 @@ const STATS := {
 	"knockback_mult": ["Empuje", "mult", "", false], "range_mult": ["Alcance", "mult", "", false],
 	"area_mult": ["Área", "mult", "", false], "duration_mult": ["Duración", "mult", "", false], "ally_mult": ["Duración de los aliados", "mult", "", false], "ally_dmg_mult": ["Daño de los aliados", "mult", "", false],
 	"proj_size_mult": ["Tamaño de las balas", "mult", "", false],
+	"reveal_add": ["Daño a los revelados", "pct", "", false],
 	"proj_speed_mult": ["Velocidad de los proyectiles", "mult", "", false],
 	"weapon_cooldown_mult": ["Recarga de las armas", "mult", "", true],
 	"arcane_cooldown_mult": ["Recarga de las mágicas", "mult", "", true],

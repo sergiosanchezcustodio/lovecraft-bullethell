@@ -400,7 +400,94 @@ def gilman():
               flat=(TIE, TIE_SH, BUTTON, BROW, IRIS, BAGS, MOUTH, EAR_IN, PENCIL, ERASER, LEAD), b=B)
 
 
-WHO = {'pickman': pickman, 'necrofago': necrofago, 'lienzo': lienzo, 'ward': ward, 'gilman': gilman}
+def tillinghast():
+    SKIN = (0.80, 0.74, 0.62); SKIN_SH = (0.69, 0.63, 0.53); EAR_IN = (0.58, 0.48, 0.40)   # cetrina
+    SHIRT = (0.86, 0.86, 0.82); SHIRT_SH = (0.72, 0.72, 0.68); STAIN = (0.70, 0.66, 0.54)
+    BRACE = (0.22, 0.17, 0.14); BUTTON = (0.66, 0.56, 0.32)
+    TROU = (0.25, 0.25, 0.27); TROU_SH = (0.20, 0.20, 0.22); SHOE = (0.14, 0.11, 0.09)
+    HAIR = (0.21, 0.18, 0.16); HAIR_SH = (0.16, 0.14, 0.12); GREY = (0.64, 0.65, 0.68)
+    STUBBLE = (0.56, 0.51, 0.43); BROW = (0.17, 0.14, 0.12); IRIS = (0.34, 0.28, 0.24)
+    SOCKET = (0.56, 0.46, 0.46); HOLLOW = (0.70, 0.63, 0.53); MOUTH = (0.50, 0.36, 0.34)
+    TUBE = (0.72, 0.52, 1.0); TUBE_CORE = (0.94, 0.86, 1.0); BRASS = (0.70, 0.56, 0.26)
+    B = -2                                                                   # flaco: diez semanas sin comer
+    M = cu.new(1920)
+    top = cu.shoes(M, SHOE, SOLE)
+    cu.legs(M, TROU, bottom=top)
+    for (x, y, z), v in M.V.items():                                         # raya del pantalón, arrugado
+        if v[1] == TROU and z > 0 and x in (-4, 3): v[1] = TROU_SH
+    cu.torso(M, SHIRT, b=B)
+    for (x, y, z), v in M.V.items():                                         # pantalón alto, hasta la cintura
+        if v[0] == T and y < 42: v[1] = TROU
+    # tirantes: dos tiras oscuras delante y detrás, con sus botones en la cintura
+    for y in range(42, 61):
+        for x in (-5, 4):
+            cu.front(M, x, y, BRACE); cu.back(M, x, y, BRACE)
+    for x in (-5, 4): cu.front(M, x, 41, BUTTON)
+    # camisa sucia y abierta, sin cuello postizo ni corbata: el pecho asoma en pico
+    for (x, y) in ((-1, 60), (0, 60), (-1, 59), (0, 59), (-1, 58), (0, 58), (-2, 60), (1, 60)):
+        cu.front(M, x, y, SKIN_SH if y == 58 else SKIN)
+    for x in (-3, 2): cu.front(M, x, 61, SHIRT_SH, dz=1)                     # las puntas del cuello, caídas
+    for y in range(43, 58, 3): cu.front(M, -1, y, SHIRT_SH)                   # la tapeta, mal abrochada
+    for (x, y, z), v in M.V.items():                                         # manchas (grasa, aceite de la máquina)
+        if v[1] == SHIRT and M.noise(x, y, z, 1.6) > 0.84: v[1] = STAIN
+    # bolsillo con una válvula de la máquina, que brilla violeta
+    for x in range(1, 4):
+        for y in range(50, 54): cu.front(M, x, y, SHIRT_SH)
+    for y in range(53, 57):
+        cu.front(M, 2, y, BRASS if y == 53 else (TUBE_CORE if y == 55 else TUBE), dz=1)
+    for (x, y, z), v in M.V.items():
+        if v[1] in (TUBE, TUBE_CORE): M.V[(x, y, z)] = [v[0], v[1], 1]
+    cu.neck(M, SKIN)
+    cu.arms(M, SHIRT, SKIN, b=B, fore=SKIN)                                  # remangado hasta el codo
+    for (x, y, z), v in M.V.items():                                         # la manga enrollada
+        if v[0].startswith('arm') and 46 <= y <= 47: v[1] = SHIRT_SH
+    cu.head(M, SKIN, SKIN_SH, nose=False, r=3, rb=3)
+    cu.face_art(M, 76, [                   # en relieve
+        '..bbb......bbb..',                # 76: cejas finas, altas (los ojos, muy abiertos)
+        '................',
+        '.......nn.......',
+        '.......nn.......',
+        '.......nn.......',
+        '......snns......',                # 71
+    ], {'b': BROW, 'n': SKIN, 's': SKIN_SH}, dz=1)
+    cu.face_art(M, 75, [                   # pintado: ojos muy abiertos y hundidos, mejillas chupadas, sonrisa rara
+        '................',                # 75
+        '..wwpw....wpww..',                # 74: el blanco alrededor (mira demasiado)
+        '..wwpw....wpww..',                # 73
+        '..kkkk....kkkk..',                # 72: ojeras hundidas
+        '.h.kk......kk.h.',                # 71: y pómulos marcados
+        '.h............h.',
+        '................',
+        '.....m....m.....',                # 68: una sonrisa que no gusta
+        '......mmmm......',                # 67
+    ], {'w': cu.EYE_W, 'p': cu.EYE, 'k': SOCKET, 'h': HOLLOW, 'm': MOUTH})
+    for x in range(-6, 6):                                                   # barba de días, pintada
+        for y in range(63, 67):
+            if (x + y) % 2 and not (y == 66 and -3 <= x <= 2): cu.paint_face(M, x, y, STUBBLE)
+    cu.ear_holes(M, EAR_IN)
+    # pelo oscuro, largo de no cortárselo y despeinado, con canas en las sienes
+    cu.hair_back(M, SKIN, HAIR, top=200, bottom=65, neck=True)
+    for (x, y, z), v in M.V.items():
+        if v[0] == H and v[1] == SKIN and y >= 78: v[1] = HAIR
+    cu.sideburns(M, HAIR, 73, 78)
+    cu.hair_over_ears(M, SKIN, HAIR, 75, 78)
+    for (x, y) in ((-6, 77), (-5, 77), (-1, 77), (0, 77), (4, 77), (5, 77)): cu.front(M, x, y, HAIR)   # mechones caídos
+    for (x, z) in ((-4, 2), (-1, -1), (2, 1), (4, -3), (-3, -4), (1, -5)):   # de punta
+        y = M.top(x, z)
+        if y is not None: M.put(x, y + 1, z, H, HAIR)
+    for (x, y, z), v in M.V.items():
+        if v[0] != H or v[1] != HAIR: continue
+        if abs(x + 0.5) >= 6.5 and 74 <= y <= 79 and z >= 1 and (y + z) % 3 == 0: v[1] = GREY   # canas en las sienes
+        elif M.noise(x * 1.3, y * 0.7, z * 1.3, 1.6) > 0.66: v[1] = HAIR_SH
+    cu.seams(M, (SHIRT,))
+    cu.finish(M, 'tillinghast', {SHIRT: 'lona', SHIRT_SH: 'lona', STAIN: 'lona', TROU: 'lana', TROU_SH: 'lana',
+                                 SHOE: 'cuero', SOLE: 'cuero', BRACE: 'cuero', HAIR: 'pelo', HAIR_SH: 'pelo',
+                                 GREY: 'pelo', SKIN: 'piel', SKIN_SH: 'piel'},
+              flat=(BUTTON, BROW, IRIS, SOCKET, HOLLOW, MOUTH, STUBBLE, EAR_IN, TUBE, TUBE_CORE, BRASS), b=B)
+
+
+WHO = {'pickman': pickman, 'necrofago': necrofago, 'lienzo': lienzo, 'ward': ward, 'gilman': gilman,
+       'tillinghast': tillinghast}
 
 if __name__ == '__main__':
     for name in (sys.argv[1:] or list(WHO)):

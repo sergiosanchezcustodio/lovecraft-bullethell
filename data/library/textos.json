@@ -229,7 +229,10 @@
 		"sales_esenciales": "Polvo gris azulado guardado en frascos de plomo con etiquetas a la antigua: Custodes, Materia. Son los restos de alguien. Con la fórmula adecuada, ese alguien vuelve, aunque no siempre entero.",
 		"angulos_imposibles": "Una figura dibujada con tiza que no debería cerrarse y se cierra. Lo que se lanza por ella no va en línea recta: dobla esquinas que no están, y las paredes no le importan.",
 		"geometria_bruja": "Keziah Mason se escapó de la cárcel de Salem en 1692 por unas líneas que dibujó en la pared. Gilman encontró las mismas en el techo de su buhardilla, y no estaban mal trazadas.",
-		"trono_azathoth": "Más allá de los ángulos está el caos del centro, donde el sultán de los demonios se revuelve entre flautas. Gilman soñó que lo llevaban hasta allí a firmar en un libro."
+		"trono_azathoth": "Más allá de los ángulos está el caos del centro, donde el sultán de los demonios se revuelve entre flautas. Gilman soñó que lo llevaban hasta allí a firmar en un libro.",
+		"maquina_mas_alla": "Tubos de vidrio, latón y un zumbido que se nota en los dientes. Al encenderla todo se tiñe de violeta y aparece lo que siempre ha estado ahí. Lo que ha estado ahí también nos ve.",
+		"lo_que_nos_rodea": "«¿Quieres saber lo que nos rodea? Los has visto: flotan a través de ti y de mí, por el aire que respiramos.» Tillinghast no tuvo que encenderla más.",
+		"medusas_mas_alla": "Cosas como medusas, pálidas y gelatinosas, que se comen unas a otras sin hacer ruido. Los criados de Tillinghast no se fueron: se los comieron."
 	},
 	"items": {
 		"diario_wilbur": "Un cuaderno cifrado en un alfabeto que Armitage tardó semanas en romper. Lo que dice no se puede leer de un tirón, pero quien lo lleva encima deja de temblar.",
@@ -314,7 +317,8 @@
 		"linterna": "Una lámpara de queroseno de las buenas. Mientras su luz alcanza, lo que acecha en la oscuridad pesa un poco menos.",
 		"foto_modelo": "Una fotografía arrugada que estaba clavada en el lienzo de Pickman, la que usaba de modelo. No es un decorado ni un disfraz. El que la mira ya no vuelve a bajar a un sótano.",
 		"frasco_custodes": "Un frasco de gres con la etiqueta «Custodes». Lo que hay dentro no es para levantar a cualquiera: son los guardianes, y obedecen al que los llamó.",
-		"estatuilla_balaustrada": "Una figurilla de metal con forma de barril estriado y cinco brazos en estrella. Gilman la arrancó en sueños de la balaustrada de una terraza bajo tres soles. Por la mañana estaba en su cama."
+		"estatuilla_balaustrada": "Una figurilla de metal con forma de barril estriado y cinco brazos en estrella. Gilman la arrancó en sueños de la balaustrada de una terraza bajo tres soles. Por la mañana estaba en su cama.",
+		"valvula_maquina": "Una válvula de repuesto de la máquina de Tillinghast, aún tibia. Brilla con un violeta que no debería verse: el que está más allá del violeta."
 	},
 	"places": {
 		"p1_n1": "Costa del mar de Ross, Antártida, 1930. La expedición de la Universidad de Miskatonic monta aquí su campamento: tiendas, una cabaña de troncos, un iglú y los faroles. Al norte, la Barrera de hielo; al sur, el mar. Algo vino de las cavernas de abajo.",
@@ -351,7 +355,8 @@
 		"west": "Herbert West, médico de Arkham, menudo, rubio y pálido detrás de sus gafas. Lleva años buscando el reactivo que devuelva la vida a los muertos. Sus resultados no siempre son los que esperaba, pero a sus compañeros los pone en pie como nadie.",
 		"pickman": "Richard Upton Pickman, de una vieja familia de Salem, pintor. Lo echaron del Club de Arte de Boston por sus cuadros de cosas que salen de los túneles a comer. Tenía un estudio secreto en el North End, junto a un pozo de ladrillo, y nadie sabe de dónde sacaba los modelos. Desapareció. Sus cuadros, no.",
 		"ward": "Charles Dexter Ward, de Providence, anticuario. Se obsesionó con un antepasado, Joseph Curwen, que había muerto en 1771 y que no estaba del todo muerto. Encontró sus papeles, sus fórmulas y su tumba. Lo encerraron en un sanatorio, y el doctor Willett notó que su paciente ya no tenía el lunar de la cadera.",
-		"gilman": "Walter Gilman, de Haverhill, estudiante de matemáticas en Miskatonic. Alquiló la buhardilla de la casa de la bruja, en Arkham, porque sus ángulos no eran normales. Soñaba con una vieja y con una rata con cara de hombre que le mordisqueaba los tobillos, y despertaba con barro en los pies."
+		"gilman": "Walter Gilman, de Haverhill, estudiante de matemáticas en Miskatonic. Alquiló la buhardilla de la casa de la bruja, en Arkham, porque sus ángulos no eran normales. Soñaba con una vieja y con una rata con cara de hombre que le mordisqueaba los tobillos, y despertaba con barro en los pies.",
+		"tillinghast": "Crawford Tillinghast, físico y filósofo de Providence. Construyó una máquina que despierta los sentidos dormidos y muestra lo que nos rodea sin que lo veamos. Después de diez semanas encerrado con ella estaba flaco, sucio y sin criados, y sonreía de un modo que no gustaba."
 	},
 	"pets": {
 		"perro": "Uno de los perros de trineo del campamento de Lake. El único que volvió. Desde entonces gruñe a la nieve.",
