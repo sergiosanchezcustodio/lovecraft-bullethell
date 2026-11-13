@@ -387,21 +387,41 @@ static func retint(panel: Control, brass: Color, alpha := 0.97) -> void:
 static func _corner_tint(brass: Color) -> Color:
 	return Color(clampf(brass.r / BRASS.r, 0, 1.6), clampf(brass.g / BRASS.g, 0, 1.6), clampf(brass.b / BRASS.b, 0, 1.6))
 
-## Entrada de una ventana: un fundido y un pequeño acercamiento.
+## Entrada de una ventana. Fuera de la partida (hito 20.2) entra como una hoja que gira sobre el
+## lomo, a su izquierda: de canto y en sombra a plana y con luz, en `PAGE_TIME`. En la partida
+## (`page_turn` = false, lo pone Game) se queda el fundido con un pequeño acercamiento, más rápido.
+const PAGE_TIME := 0.3
+static var page_turn := true
+
 static func appear(panel: Control) -> void:
 	panel.modulate.a = 0.0
-	panel.resized.connect(func() -> void: panel.pivot_offset = panel.size * 0.5)
+	var page := page_turn
+	panel.resized.connect(func() -> void:
+		panel.pivot_offset = Vector2(0.0, panel.size.y * 0.5) if page else panel.size * 0.5)
 	var start := func() -> void:
 		if not is_instance_valid(panel) or not panel.is_inside_tree(): return   # se cerró antes de empezar
-		panel.scale = Vector2(0.975, 0.975)
 		var tw := panel.create_tween().set_parallel().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		if page:
+			panel.pivot_offset = Vector2(0.0, panel.size.y * 0.5)
+			_page_angle(1.0, panel)
+			tw.tween_method(MenuKit._page_angle.bind(panel), 1.0, 0.0, PAGE_TIME)
+			return
+		panel.scale = Vector2(0.975, 0.975)
 		tw.tween_property(panel, "modulate:a", 1.0, 0.18)
 		tw.tween_property(panel, "scale", Vector2.ONE, 0.22)
 	if panel.is_inside_tree(): start.call_deferred()       # se abrió con el menú ya en escena
 	else: panel.ready.connect(start, CONNECT_ONE_SHOT)
 	Auto.sfx("menu_open")                                   # una página al abrirse
 	panel.tree_exiting.connect(func() -> void: _closed(panel))
+
+## La hoja a `u` de su giro (1: de canto, recién levantada; 0: plana). El borde libre se acerca a
+## la vista al levantarse (algo más alta) y la cara queda en sombra hasta posarse.
+static func _page_angle(u: float, panel: Control) -> void:
+	var a := u * deg_to_rad(84.0)
+	panel.scale = Vector2(maxf(cos(a), 0.02), 1.0 + 0.04 * sin(a))
+	var lit := lerpf(1.0, 0.45, u * u)
+	panel.modulate = Color(lit, lit * (1.0 - 0.03 * u), lit * (1.0 - 0.08 * u), clampf((1.0 - u) * 4.0, 0.0, 1.0))
 
 ## Sonido al cerrarse una ventana, solo si se cierra para volver (B, Esc, «Cancelar»…): no si se
 ## acaba de aceptar algo (ya sonó) ni si se va toda la escena (al empezar la partida o salir).

@@ -651,7 +651,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | Hito | Contenido | Estado |
 |---|---|---|
 | 20.1 | **Mancha de tinta:** al entrar en la partida y al salir de ella (`LevelCard`), la tinta se extiende por la pantalla desde el centro y se retira por los bordes, en lugar del fundido a negro | Hecho (13-11-2026): `ink_wipe.gdshader`; entrada de 1,0 a 0,7 s. Ver `docs/ESTADO.md` |
-| 20.2 | **Pasar página entre los menús de la portada:** al abrir la tienda, el bestiario, la configuración… la ventana entra como una hoja que gira sobre el lomo (como el libro de la selección, 12.14) | Pendiente |
+| 20.2 | **Pasar página entre los menús de la portada:** al abrir la tienda, el bestiario, la configuración… la ventana entra como una hoja que gira sobre el lomo (como el libro de la selección, 12.14) | Hecho (13-11-2026): `MenuKit.appear` (0,3 s); en la partida, la entrada corta de antes. Ver `docs/ESTADO.md` |
 | 20.3 | **La vela se apaga:** al salir del juego o volver a la portada desde la partida, la luz se recoge en una llama que se apaga | Pendiente |
 | 20.4 | **Página quemada:** la pantalla final al caer entra con los bordes ardiendo | Pendiente |
 

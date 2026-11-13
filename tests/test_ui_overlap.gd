@@ -126,6 +126,7 @@ func test_estadistica_entera() -> void:
 ## Una ventana que no cabe en la pantalla (interfaz Grande) se encoge alrededor del centro; una
 ## que cabe, no cambia.
 func test_ventana_que_no_cabe() -> void:
+	MenuKit.page_turn = false                     # mide la ventana: sin el giro de la página (20.2)
 	var layer := CanvasLayer.new()
 	add_child_autofree(layer)
 	var host := Control.new()
@@ -146,6 +147,7 @@ func test_ventana_que_no_cabe() -> void:
 	var r := (center.get_child(0) as Control).get_global_rect()
 	assert_true(Rect2(Vector2.ZERO, vs).grow(1.0).encloses(r), "y queda dentro: %s" % r)
 	assert_almost_eq(r.get_center().x, vs.x * 0.5, 2.0, "centrada")
+	MenuKit.page_turn = true
 
 ## La letra en px de pantalla: la de la interfaz por su escala (la Pequeña, 0,85) y la del dibujo.
 func test_letra_en_pantalla() -> void:

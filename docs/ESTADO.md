@@ -2670,3 +2670,10 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Tiempos:** la salida, 0,45 s como antes (cuadrática, rápida al principio como la tinta que cae); la entrada pasa de 1,0 a 0,7 s (criterio de la fase).
 - **Hoja de prueba:** `godot --path . -s tools/probar_tinta.gd -- [fondo=…] [semilla=N]` → `shots/tinta_hoja.png` (arriba la salida, abajo la entrada, a 15-92 %). En partida, `card=true` con `shots=` (las capturas quitan el rótulo y su entrada si no): `shots/game_tinta_entra_000.3s.png`.
 
+### 20.2: las ventanas entran como una página (13-11-2026)
+
+- **Qué:** fuera de la partida, todas las ventanas de `MenuKit.window`/`appear` (configuración, tienda, logros, mapas, huecos, online…) entran como una hoja que gira sobre el lomo, a su izquierda: de canto (84°) y en sombra a plana y con luz, en `MenuKit.PAGE_TIME` (0,3 s, cúbica); el borde libre crece un poco al levantarse, como si se acercara a la vista (`MenuKit._page_angle`). Suena la página de siempre (`menu_open`). La transición del libro hacia la selección (12.14) no cambia.
+- **En la partida** (pausa, subidas de nivel, ventanas de la red, la pesca si se entra desde un nivel) se queda la entrada corta de antes: `MenuKit.page_turn` la pone a false `Game._ready` y a true `Game._exit_tree`.
+- **Hoja:** `godot --path . -s tools/probar_pagina.gd` → `shots/pagina_hoja.png` (la ventana a 85, 65, 45, 25 y 0 % del giro). Las capturas de la portada (`shots=`) van de 0,1 en 0,1 s y no cazan los 0,3 s del giro.
+- **Tests:** `tests/test_menu_page.gd` (empieza girada sobre el borde izquierdo y acaba plana y con su color; en la partida, sin girar); `test_ventana_que_no_cabe` mide sin el giro.
+

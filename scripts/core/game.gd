@@ -148,6 +148,7 @@ func set_weather(wd: WeatherData) -> void:
 	add_child(weather)
 
 func _ready() -> void:
+	MenuKit.page_turn = false                          # en la partida, las ventanas entran deprisa (hito 20.2)
 	var t_start := Time.get_ticks_msec()
 	_lap_t = Time.get_ticks_usec()
 	args = LaunchArgs.from_cmdline()
@@ -1290,6 +1291,7 @@ func _over_pause(m: CanvasLayer, button: String) -> void:
 ## hueco elegido (partida lanzada directamente), sale del juego.
 ## Al irse la partida (menú, reintentar, siguiente nivel): que no quede el juego parado.
 func _exit_tree() -> void:
+	MenuKit.page_turn = true
 	HitStop.stop()
 	ModelPool.clear()                                  # la reserva de modelos no está en el árbol (hito 16.1)
 	Music.set_intensity(0.0, 0.0)                    # sin la partida, las capas se apagan
