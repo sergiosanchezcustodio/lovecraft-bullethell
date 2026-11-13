@@ -1595,7 +1595,7 @@ func _on_level_completed() -> void:
 	if args.has("perf"): _perf_report("nivel superado")   # con el juego en pausa ya no se mediría
 	Rumble.all(0.5, 1.0, 0.9, "nivel superado")      # el jefe cae (16.30)
 	for q in players:                                # pose de victoria (hito 17.5)
-		if q.health > 0.0 and not q.is_downed(): q.play_once(q.data.victory if q.data.victory != "" else "win_fist", true)
+		if q.health > 0.0 and not q.is_downed(): q.play_once(q.victory_anim(), true)
 	earn(level.money_bonus)                          # bono por superar el nivel
 	if not _someone_fell: Achievements.add(Saves.current, "flawless")
 	if args.get_bool("log"): print("NIVEL SUPERADO %s t=%d s  abatidos=%d  dólares=%d  nivel_j1=%d  vida_min=%d" % [level.id, director.time, kills, run_money, player.progress.level, roundi(maxf(player.min_hp, 0.0) * 100)])

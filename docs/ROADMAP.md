@@ -36,7 +36,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 18 | Efectos de las armas | **Hecha** (07-11-2026; retoques el 10-11-2026), pendiente de tu revisión: los 14 hitos de los cinco bloques, estilo voxel con degradados; calidad `weapon_fx` | Ninguna (D-50, resuelta) |
 | 19 | Rendimiento, accesibilidad de los efectos y distribución | **En curso** (10-11-2026): bloque A (rendimiento tras las fases 17 y 18); B y C propuestos | Ninguna |
 | 20 | Menús, transiciones, configuración y personajes nuevos | **Hecha** (13-11-2026), pendiente de tu revisión: los 22 hitos (el 20.9, en parte: los libros y los objetos de los jefes de la portada necesitan arte nuevo) | Ninguna |
-| 21 | Sonido y victorias de la fase 20, jugabilidad, contenido nuevo, gráficos y menús | **En curso** (13-11-2026; aprobada entera): bloque A | Ninguna (D-51 y D-52, resueltas) |
+| 21 | Sonido y victorias de la fase 20, jugabilidad, contenido nuevo, gráficos y menús | **En curso** (13-11-2026; aprobada entera): bloque A hecho (21.1 y 21.2), pendiente de revisión; sigue el B | Ninguna (D-51 y D-52, resueltas) |
 
 ---
 
@@ -709,7 +709,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | Hito | Contenido | Estado |
 |---|---|---|
 | 21.1 | **Sonido propio de las armas de la fase 20**, como el de Kuranes. Ahora usan los de siempre (página, cántico, golpe). **Pickman:** el pincel y el lienzo que se rasga. **Ward:** las sales que chisporrotean y la fórmula susurrada. **Gilman:** un zumbido que se quiebra al doblar cada ángulo. **Tillinghast:** la máquina, que sube de tono al calentarse. **Derby:** al cambiar de cuerpo, la llamada a la puerta (tres golpes y luego dos) | Hecho (13-11-2026), falta que lo escuches: `gen_sfx.py --fase20`, doce sonidos; las entregas de la fase 20 ya no suenan dos veces. Ver `docs/ESTADO.md` |
-| 21.2 | **Pose de victoria propia para los cinco.** **Pickman** se aparta para mirar el cuadro. **Ward** alza el frasco. **Gilman** traza un ángulo en el aire. **Tillinghast** ajusta la máquina. **Derby y Asenath**, una distinta según el cuerpo | Propuesto |
+| 21.2 | **Pose de victoria propia para los cinco.** **Pickman** se aparta para mirar el cuadro. **Ward** alza el frasco. **Gilman** traza un ángulo en el aire. **Tillinghast** ajusta la máquina. **Derby y Asenath**, una distinta según el cuerpo | Hecho (13-11-2026), falta que lo veas: seis poses (Edward y Asenath, una cada uno, `victory_alt`); Gilman deja el ángulo dibujado en el aire. Ver `docs/ESTADO.md` |
 
 ### Bloque B: jugabilidad
 

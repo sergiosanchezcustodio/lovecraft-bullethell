@@ -7,7 +7,7 @@
 script = ExtResource("1")
 id = &"pickman"
 display_name = "Richard Upton Pickman"
-victory = "win_bow"
+victory = "win_paint"
 model = "pickman"
 role = "Pintor de Boston"
 passive_text = "Ha pintado cosas peores: pierde un 30 % menos de cordura."

@@ -54,8 +54,11 @@ extends Resource
 ## Animación del esquive (la fija su estilo; ver DodgeStyle).
 @export var dodge_anim := "slide"
 ## Pose de victoria al superar un nivel (hito 17.5): "win_fist", "win_salute", "win_hat",
-## "win_ward", "win_bow" o "win_court" (anim_humano; la de corte, de Kuranes). Vacío: win_fist.
+## "win_ward", "win_bow", "win_court" (Kuranes), "win_paint" (Pickman), "win_flask" (Ward),
+## "win_angle" (Gilman), "win_tune" (Tillinghast) o "win_poet" (Edward Derby) (anim_humano). Vacío: win_fist.
 @export var victory := ""
+## La del segundo cuerpo (alt_model), si la tiene: "win_clasp", Asenath (hito 21.2).
+@export var victory_alt := ""
 ## Estilo de esquive del personaje (data/dodges/). Si está, sus valores sustituyen a los
 ## de arriba al crear el jugador.
 @export var dodge_style: DodgeStyle

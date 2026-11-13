@@ -7,7 +7,7 @@
 script = ExtResource("1")
 id = &"tillinghast"
 display_name = "Crawford Tillinghast"
-victory = "win_hat"
+victory = "win_tune"
 model = "tillinghast"
 role = "Físico y filósofo de Providence"
 passive_text = "Ve más allá: sus armas llegan un 15 % más lejos."

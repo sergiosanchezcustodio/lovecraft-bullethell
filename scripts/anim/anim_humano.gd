@@ -9,6 +9,7 @@ const ARM_LAG := 0.32                         ## retraso de los brazos respecto 
 const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive": 0.5,
 	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6, "brake": 0.5, "cheer": 0.9, "marvel": 1.1, "open_chest": 0.9,
 	"win_fist": 1.6, "win_salute": 1.6, "win_hat": 1.6, "win_ward": 1.6, "win_bow": 1.6, "win_court": 1.8,
+	"win_paint": 1.8, "win_flask": 1.6, "win_angle": 1.7, "win_tune": 1.7, "win_poet": 1.7, "win_clasp": 1.6,
 	"fidget_look": 2.6, "fidget_stretch": 2.8, "fidget_check": 2.4, "fidget_shift": 1.8,
 	"down": 0.9, "down_wait": 3.0, "get_up": 0.75}
 ## Gestos de reposo (28-10-2026): Player los pone de vez en cuando si el personaje lleva un rato
@@ -16,7 +17,8 @@ const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive":
 const FIDGETS := ["fidget_look", "fidget_stretch", "fidget_check", "fidget_shift"]
 ## Gestos al atacar de los investigadores (hito 17.1): las hordas (HordeMesh) no los graban.
 const HORDE_SKIP := ["cast", "swing", "thrust", "slam", "brake", "cheer", "marvel", "open_chest",
-	"win_fist", "win_salute", "win_hat", "win_ward", "win_bow", "win_court"]
+	"win_fist", "win_salute", "win_hat", "win_ward", "win_bow", "win_court",
+	"win_paint", "win_flask", "win_angle", "win_tune", "win_poet", "win_clasp"]
 
 ## Piezas opcionales: antebrazos y espinillas (codos y rodillas), bufanda y coleta. Los
 ## modelos partidos con tools/humano.py split_limbs las tienen; los demás, no, y las
@@ -493,6 +495,74 @@ static func win_court(m: Node3D, t: float) -> void:
 	Anims.part(m, "arm_l").rotation = Vector3(0.5 * k, 0.0, 0.18 * k)      # a la espalda (casi estirado: si se
 	bend(m, "fore_l", -0.35 * k)                                            #  dobla, la mano vuelve delante)
 	Anims.part(m, "torso").rotation = Vector3(0.15 * sweep * k, 0.1 * sweep * k, 0.0)
+
+## Pickman (hito 21.2): se echa atrás para mirar el cuadro; el brazo derecho estirado, a la altura
+## de los ojos, mide con el pulgar (sube y baja un poco), y la mano izquierda al mentón.
+static func win_paint(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.22, 0.8)
+	var measure := sin(clampf((t - 0.25) / 0.5, 0.0, 1.0) * TAU) * 0.08
+	Anims.part(m, "arm_r").rotation = Vector3((-1.55 + measure) * k, 0.0, 0.08 * k)
+	bend(m, "fore_r", -0.08 * k)
+	Anims.part(m, "arm_l").rotation = Vector3(-0.55 * k, 0.35 * k, 0.0)
+	bend(m, "fore_l", -2.15 * k)
+	Anims.part(m, "torso").rotation = Vector3(-0.1 * k, -0.08 * k, 0.0)
+
+## Ward (hito 21.2): alza el frasco de las sales por encima de la cabeza y lo agita; la otra mano,
+## al pecho.
+static func win_flask(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.2, 0.78)
+	var shake := sin(t * 34.0) * 0.06 * Anims.ease((t - 0.25) / 0.1) * k
+	Anims.part(m, "arm_r").rotation = Vector3(-2.65 * k, 0.0, (0.12 + shake) * k)
+	bend(m, "fore_r", -0.25 * k)
+	Anims.part(m, "arm_l").rotation = Vector3(-0.75 * k, 0.45 * k, 0.0)    # (el izquierdo, giro al revés)
+	bend(m, "fore_l", -1.5 * k)
+	Anims.part(m, "torso").rotation.x = -0.08 * k
+
+## Gilman (hito 21.2): traza un ángulo recto en el aire con la mano derecha: de delante del pecho
+## hacia fuera, en horizontal, y luego hacia abajo, en vertical.
+##   0-0,15 sube | 0,15-0,45 tramo horizontal | 0,45-0,68 tramo vertical | se mantiene | vuelve
+static func win_angle(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.15, 0.82)
+	var across := Anims.ease((t - 0.15) / 0.3)
+	var down := Anims.ease((t - 0.45) / 0.23)
+	Anims.part(m, "arm_r").rotation = Vector3(lerpf(-1.6, -0.4, down) * k, 0.0, lerpf(-0.5, 1.05, across) * k)
+	bend(m, "fore_r", -0.15 * k)
+	Anims.part(m, "arm_l").rotation = Vector3(0.05 * k, 0.0, 0.06 * k)
+	bend(m, "fore_l", -0.2 * k)
+	Anims.part(m, "torso").rotation = Vector3(0.0, lerpf(0.12, -0.1, across) * k, 0.0)   # sigue a la mano
+
+## Tillinghast (hito 21.2): las dos manos delante, a la altura del pecho, ajustando la máquina; los
+## antebrazos se mueven a destiempo (gira diales) y el tronco se inclina para mirar de cerca.
+static func win_tune(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.2, 0.8)
+	var a := sin(t * 18.0) * 0.12 * k
+	var b := sin(t * 18.0 + 2.1) * 0.12 * k
+	Anims.part(m, "arm_r").rotation = Vector3(-1.05 * k, -0.25 * k, 0.12 * k + a * 0.5)
+	bend(m, "fore_r", -0.95 * k + a)
+	Anims.part(m, "arm_l").rotation = Vector3(-1.05 * k, 0.25 * k, -0.12 * k + b * 0.5)
+	bend(m, "fore_l", -0.95 * k + b)
+	Anims.part(m, "torso").rotation.x = 0.14 * k
+
+## Edward Derby (hito 21.2): declama, el poeta: la mano derecha al pecho y la izquierda alzada y
+## abierta hacia fuera.
+static func win_poet(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.22, 0.8)
+	var lift := Anims.ease((t - 0.2) / 0.3)
+	Anims.part(m, "arm_l").rotation = Vector3(lerpf(-1.2, -2.1, lift) * k, 0.0, -0.75 * k)
+	bend(m, "fore_l", -0.3 * k)
+	Anims.part(m, "arm_r").rotation = Vector3(-0.8 * k, -0.5 * k, 0.0)
+	bend(m, "fore_r", -1.55 * k)
+	Anims.part(m, "torso").rotation.x = -0.12 * k
+
+## Asenath Waite (hito 21.2): las manos juntas delante, a la cintura, y el tronco erguido y algo
+## echado atrás: mira por encima.
+static func win_clasp(m: Node3D, t: float) -> void:
+	var k := _held(t, 0.25, 0.8)
+	Anims.part(m, "arm_r").rotation = Vector3(-0.45 * k, 0.0, -0.42 * k)
+	bend(m, "fore_r", -1.05 * k)
+	Anims.part(m, "arm_l").rotation = Vector3(-0.45 * k, 0.0, 0.42 * k)
+	bend(m, "fore_l", -1.05 * k)
+	Anims.part(m, "torso").rotation.x = -0.12 * k
 
 ## Frenada (hito 17.2): al pararse en seco tras correr, planta el pie izquierdo delante con la
 ## pierna estirada, dobla la derecha, echa el cuerpo atrás y abre los brazos para no irse de

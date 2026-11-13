@@ -118,6 +118,7 @@ var _fidget_at := 6.0            ## s quieto hasta el siguiente gesto (al azar e
 const FIDGET_GAP := Vector2(5.0, 10.0)
 var _override := ""              ## gesto del tren superior (lanzar) que se suma a la animación
 var _override_t := 0.0
+var _trail_t := 0.0                          ## la estela de la mano en la victoria de Gilman (21.2)
 var _action := ""                ## animación de acción en curso (el esquive) y su tiempo
 var _action_t := 0.0
 var _ghost_t := 0.0
@@ -758,6 +759,11 @@ func _animate(delta: float) -> void:
 		elif _action == "":
 			var w := smoothstep(0.0, 0.2, _override_t) * (1.0 - smoothstep(0.7, 1.0, _override_t))
 			Anims.overlay(data.model, _override, model, _override_t, w, UPPER_BODY)
+			if _override == "win_angle" and world != null and _override_t > 0.15 and _override_t < 0.7:
+				_trail_t -= delta                      # Gilman deja el ángulo dibujado en el aire (21.2)
+				if _trail_t <= 0.0 and (model.get_meta("part_nodes") as Dictionary).has("fore_r"):
+					_trail_t = 0.035
+					_angle_mark(Anims.part(model, "fore_r").global_transform * Vector3(0, -0.3, 0))
 	_brake_step(delta)
 	_hold_step(delta)
 	_aim_step(delta)
@@ -1524,6 +1530,30 @@ func swap_form() -> void:
 	if world != null: VoxelFx.puff(world.fx, global_position, "soul", 0.6, Color.WHITE, 1.0)
 	Auto.sfx_at("knock_3" if form == 1 else "knock_2", global_position)   # tres golpes y luego dos (21.1)
 	if weapons != null: weapons.on_swap()
+
+## Un cubito violeta quieto donde pasa la mano de Gilman al trazar su ángulo (21.2): brilla, se
+## encoge y se apaga en 0,9 s (las esquirlas de «fold» subían y tapaban el trazo).
+func _angle_mark(at: Vector3) -> void:
+	var c := MeshInstance3D.new()
+	c.mesh = VoxelFx.box1()
+	c.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var mat := VoxelFx.std()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color = Color(0.78, 0.6, 1.0, 0.95)
+	c.material_override = mat
+	world.fx.add_child(c)
+	c.global_position = at
+	c.scale = Vector3.ONE * 0.07
+	var tw := c.create_tween()
+	tw.tween_property(c, "scale", Vector3.ONE * 0.02, 0.9).set_delay(0.25)
+	tw.parallel().tween_property(mat, "albedo_color:a", 0.0, 0.9).set_delay(0.25)
+	tw.tween_callback(c.queue_free)
+
+## Pose de victoria (hito 17.5): la del personaje o, en su segundo cuerpo, la de ese (21.2).
+func victory_anim() -> String:
+	if form == 1 and data.victory_alt != "": return data.victory_alt
+	return data.victory if data.victory != "" else "win_fist"
 
 ## Pone el modelo del cuerpo `form`. El otro se construye la primera vez (con su vestuario, su
 ## cara, su silueta tras el decorado y su aura de crisis) y se guarda.

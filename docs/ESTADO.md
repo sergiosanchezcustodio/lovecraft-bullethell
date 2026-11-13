@@ -2957,3 +2957,19 @@ Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden:
 - **Comprobado en partida** sin sonar en los altavoces: `--audio-driver Dummy … log=true` cuenta lo que suena (`SONIDOS {…}` al salir). En 20-25 s con cada uno: Derby, 6 tajos, 6 miradas y 7 y 6 llamadas; Pickman, 5 pinceles y 4 lienzos rasgados; Ward, 5 fórmulas y 5 sales; Gilman, 28 zumbidos y 52 chasquidos; Tillinghast, 3, 2 y 2 según el calor.
 - **Tests:** `tests/test_sonidos_fase20.gd`: los eventos y sus archivos existen; las entregas de la fase 20 no suenan dos veces; la máquina, según el calor; Derby llama tres veces y Asenath dos.
 
+### 21.2: pose de victoria propia para los personajes de la fase 20 (13-11-2026)
+
+*Pendiente de que el autor la vea en partida.*
+
+- **Seis poses nuevas** en `anim_humano` (brazos y tronco, como las del 17.5; el `CharacterData.victory` de cada uno):
+  - `win_paint`, **Pickman**: se echa atrás para mirar el cuadro, con el brazo derecho estirado a la altura de los ojos midiendo con el pulgar (sube y baja un poco) y la mano izquierda al mentón.
+  - `win_flask`, **Ward**: alza el frasco de las sales por encima de la cabeza y lo agita; la otra mano, al pecho.
+  - `win_angle`, **Gilman**: traza un ángulo recto en el aire, primero un tramo horizontal hacia fuera y luego uno vertical hacia abajo; el tronco sigue a la mano. Va dejando cubitos violetas quietos donde pasa la mano, que brillan y se apagan en 0,9 s (`Player._angle_mark`). Las esquirlas de «fold» subían y tapaban el trazo.
+  - `win_tune`, **Tillinghast**: las dos manos delante del pecho, ajustando la máquina; los antebrazos se mueven a destiempo, como quien gira diales, y se inclina para mirar de cerca.
+  - `win_poet`, **Edward Derby**: declama, con la mano derecha al pecho y la izquierda alzada y abierta.
+  - `win_clasp`, **Asenath**: las manos juntas a la cintura y el tronco erguido y algo atrás; mira por encima.
+- **Según el cuerpo:** `CharacterData.victory_alt` es la del segundo cuerpo (`alt_model`). `Player.victory_anim()` la elige según `form` y `Game._on_level_completed` la usa para todos.
+- **Revisado** con `tools/hoja_poses.gd` de frente y de lado. Ward llevaba la mano izquierda hacia fuera y no al pecho (el giro del brazo izquierdo va al revés). El tramo vertical de Gilman casi no se veía. Las manos de Asenath quedaban separadas.
+- **En partida:** `godot --path . --fixed-fps 30 -- character=gilman level=p1_n1 final_at=2 boss_intro=false demo_kill=4 bot=idle god=true shots=4.5,4.8` (el jefe cae a los 4 s y sale «Nivel superado»).
+- **Tests:** en `test_gestos_ataque` se usan las once poses, y Edward y Asenath celebran cada uno a su manera (Kuranes, sin segundo cuerpo, la suya).
+

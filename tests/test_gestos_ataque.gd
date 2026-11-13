@@ -182,7 +182,7 @@ func test_cada_investigador_tiene_su_pose_de_victoria() -> void:
 		assert_ne(c.victory, "", f)
 		assert_true(Anims.has_anim(c.model, c.victory), "%s: %s" % [f, c.victory])
 		seen[c.victory] = true
-	assert_eq(seen.size(), 6, "las seis poses se usan (la de corte, de Kuranes: 20.22)")
+	assert_eq(seen.size(), 11, "las once poses se usan (la de corte, de Kuranes: 20.22; las de la fase 20, 21.2)")
 
 ## Según el suelo (hito 17.6): vadeando, las manos van más altas; en el barro, el tronco más
 ## adelante y las rodillas más dobladas.
@@ -606,3 +606,16 @@ func test_la_lluvia_borra_los_rastros() -> void:
 	assert_almost_eq(float(mat.get_shader_parameter("trace_old_k")), 1.0, 0.02)
 	tr._process(GroundTraces.WASH_EVERY * 0.5)
 	assert_almost_eq(float(mat.get_shader_parameter("trace_old_k")), 0.5, 0.02, "a medio lavado, a la mitad")
+
+## Hito 21.2: Edward y Asenath celebran cada uno a su manera (victory_alt, la del segundo cuerpo).
+func test_derby_y_asenath_celebran_cada_uno_a_su_manera() -> void:
+	var c: CharacterData = load("res://data/characters/derby.tres")
+	assert_eq(c.victory_alt, "win_clasp")
+	assert_true(Anims.has_anim(c.alt_model, c.victory_alt))
+	var p: Player = autofree(Player.new().setup(c, BotInput.new("idle"), Color.YELLOW))
+	assert_eq(p.victory_anim(), "win_poet", "Edward declama")
+	p.form = 1
+	assert_eq(p.victory_anim(), "win_clasp", "Asenath, las manos juntas")
+	var k: Player = autofree(Player.new().setup(load("res://data/characters/kuranes.tres"), BotInput.new("idle"), Color.YELLOW))
+	k.form = 1
+	assert_eq(k.victory_anim(), "win_court", "sin segundo cuerpo, la suya")

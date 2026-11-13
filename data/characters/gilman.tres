@@ -7,7 +7,7 @@
 script = ExtResource("1")
 id = &"gilman"
 display_name = "Walter Gilman"
-victory = "win_salute"
+victory = "win_angle"
 model = "gilman"
 role = "Estudiante de matemáticas de Miskatonic"
 passive_text = "Entre los ángulos: las balas le alcanzan menos (su blanco es un 30 % más pequeño)."

@@ -7,7 +7,7 @@
 script = ExtResource("1")
 id = &"ward"
 display_name = "Charles Dexter Ward"
-victory = "win_ward"
+victory = "win_flask"
 model = "ward"
 role = "Anticuario de Providence"
 passive_text = "La sombra de Curwen: hasta un 40 % más de daño cuanto menos cordura le queda."

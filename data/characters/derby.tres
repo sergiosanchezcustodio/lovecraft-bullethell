@@ -7,7 +7,8 @@
 script = ExtResource("1")
 id = &"derby"
 display_name = "Edward Derby"
-victory = "win_hat"
+victory = "win_poet"
+victory_alt = "win_clasp"
 model = "derby"
 alt_model = "asenath"
 role = "Poeta de Arkham (y Asenath Waite)"
