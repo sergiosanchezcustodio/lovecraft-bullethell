@@ -2683,3 +2683,8 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Sonido:** `candle_out` (soplo, chasquidos de la mecha y siseo del humo), sintetizado en `tools/gen_sfx.py` (`--vela`), en `data/sfx.json`.
 - **Hoja:** `godot --path . -s tools/probar_vela.gd -- [fondo=…]` → `shots/vela_hoja.png` (a 20, 45, 60, 70, 78, 86, 94 y 100 %).
 
+### 20.4: página quemada al caer (13-11-2026)
+
+- **Qué:** la pantalla final de una caída (`Menus.EndScreen.burn`, lo pone `Game._end_screen` con `result == "caida"`) quema los bordes de la pantalla hacia dentro en 0,7 s (cúbica, rápida al principio): carbón con vetas en el borde, un frente de brasa irregular (hasta un 8,5 % del alto, `reach`) y el papel tostado por delante; luego se queda quieto y las brasas se apagan a rojo oscuro en unos segundos. Va entre el velo y la ventana (`burn_edges.gdshader`), así que no tapa el texto. Suena el chisporroteo (`torch_crackle`). Con «Destellos reducidos», las brasas no respiran (`pulse` = 0). Al superar un nivel, como antes.
+- **Captura:** `level=p2_n2 bot=still hp=1 halt_shots=true quit_on_end=true replay=false tag=_quemada` → `shots/game__quemada_parada1.png`. (El escalón horizontal que se ve a veces en estas capturas es de la lectura de la ventana oculta, no del fuego: también salta el suelo de debajo.)
+

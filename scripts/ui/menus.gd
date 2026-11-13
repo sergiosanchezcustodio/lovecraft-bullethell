@@ -195,6 +195,33 @@ class EndScreen extends CanvasLayer:
 	var replay: Array[Image] = []               ## los últimos segundos antes de caer (hito 15.1, `DeathReplay`)
 	var epilogue := false                       ## al vencer el final de la campaña: «Epílogo», el primero (13.11)
 	signal epilogue_open
+	var burn := false                           ## al caer: los bordes arden (hito 20.4, `burn_edges.gdshader`)
+	var _burn_mat: ShaderMaterial
+	var _burn_t := 0.0
+	const BURN_TIME := 0.7
+
+	## Los bordes que arden, entre el velo y la ventana: no tapan el texto.
+	func _add_burn(root: Control) -> void:
+		var r := ColorRect.new()
+		r.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_burn_mat = ShaderMaterial.new()
+		_burn_mat.shader = preload("res://scripts/ui/burn_edges.gdshader")
+		var view := get_viewport().get_visible_rect().size
+		_burn_mat.set_shader_parameter("aspect", Vector2(view.x / maxf(view.y, 1.0), 1.0))
+		_burn_mat.set_shader_parameter("seed", randf() * 40.0)
+		_burn_mat.set_shader_parameter("pulse", 1.0 if int(Auto.setting("flashes", 1)) == 1 else 0.0)
+		r.material = _burn_mat
+		root.add_child(r)
+		root.move_child(r, 1)
+		Auto.sfx("torch_crackle")
+
+	func _process(delta: float) -> void:
+		if _burn_mat == null: return
+		_burn_t += delta
+		var u := clampf(_burn_t / BURN_TIME, 0.0, 1.0)
+		_burn_mat.set_shader_parameter("t", 1.0 - pow(1.0 - u, 3.0))
+		_burn_mat.set_shader_parameter("time_s", _burn_t)
 
 	func _init(p_title: String, p_lines: PackedStringArray, p_accent: Color) -> void:
 		title = p_title
@@ -210,6 +237,7 @@ class EndScreen extends CanvasLayer:
 		box.add_theme_constant_override("separation", 12)
 		root.modulate.a = 0.0                          # entra despacio: la partida se ve terminar
 		create_tween().tween_property(root, "modulate:a", 1.0, 0.9)
+		if burn: _add_burn(root)
 		MenuKit.heading(box, title, 56, accent)
 		if report != null:                             # con informe: el resumen y los botones a la
 			var cols := HBoxContainer.new()            # izquierda, el informe a la derecha

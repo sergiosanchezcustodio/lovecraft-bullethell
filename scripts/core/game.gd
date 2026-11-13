@@ -1716,6 +1716,7 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 	s.diary = _diary(result)
 	_archive(result)
 	if result == "caida" and _replay_frames.size() >= int(DeathReplay.FPS): s.replay = _replay_frames
+	s.burn = result == "caida"                         # la página arde al caer (hito 20.4)
 	s.epilogue = result == "superado" and next_id == "" and level != null and String(level.id) == Demo.last_level()
 	s.epilogue_open.connect(_epilogue)
 	if not s.diary.is_empty(): Saves.save()                # el diario, ya en el hueco
