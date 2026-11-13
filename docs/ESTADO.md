@@ -2694,3 +2694,7 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Captura:** `title saves=demo_saves open=menu_tienda tab=1 shots=10 tag=_ruta` → `shots/titulo__ruta_010.0s.png`.
 - **Tests:** `tests/test_menu_crumbs.gd`.
 
+### 20.6: la pluma y el sello (13-11-2026)
+
+- **Qué:** moverse por los botones (`ui_move`) suena a una pluma que rasguea el papel (`quill_0..2.wav`: dos trazos cortos de ruido agudo con el salto de la punta en las fibras) y confirmar (`ui_accept`) a un sello que cae sobre la mesa (`stamp_0..1.wav`: golpe sordo de madera, papel aplastado y un eco corto). Sustituyen a los clics de Kenney (`ui_move_*.ogg`, `ui_accept_0.ogg`, que siguen en la carpeta). Volver (`ui_back`) y abrir una ventana (la página, `menu_open`) no cambian. Sintetizados en `tools/gen_sfx.py` (`--menus`); en `data/sfx.json`, `ui_move` a −18 dB con tono 0,94-1,08 y `ui_accept` a −8 dB con 0,96-1,04 (sonoridad media parecida a los de antes, medida con `ffmpeg volumedetect`). Sin oírlos aún: pendiente de la revisión del autor.
+

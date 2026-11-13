@@ -823,6 +823,36 @@ def vela():
     save('candle_out', x)
 
 
+def menus():
+    """Los menús (hito 20.6): la pluma al moverse por los botones (un rasgueo corto de punta sobre
+    papel: ruido agudo filtrado en dos trazos, con su chirrido fino) y el sello al confirmar (golpe
+    sordo de madera, el papel que se aplasta y un eco corto de la mesa)."""
+    r = np.random.default_rng(2006)
+    for k in range(3):                                                    # la pluma
+        d = 0.11
+        tt = t(d)
+        x = np.zeros(len(tt))
+        starts = [0.0, r.uniform(0.035, 0.05)]
+        for j, s0 in enumerate(starts):
+            ln = r.uniform(0.03, 0.045) if j == 0 else r.uniform(0.025, 0.04)
+            m = (tt >= s0) & (tt < s0 + ln)
+            u = (tt[m] - s0) / ln
+            e = np.sin(np.pi * u) ** 1.5 * (1.0 if j == 0 else 0.6)
+            grain = bp(r.standard_normal(len(tt)), 2500 + 400 * k, 7000)[m]
+            rasp = 1.0 + 0.6 * np.sign(np.sin(2 * np.pi * r.uniform(180, 260) * tt[m]))   # la punta que salta en las fibras
+            x[m] += grain * e * rasp
+        save('quill_%d' % k, x)
+    for k in range(2):                                                    # el sello
+        d = 0.32
+        tt = t(d)
+        f0 = 95 + 15 * k
+        thump = np.sin(2 * np.pi * f0 * tt * (1 - 0.3 * tt)) * np.exp(-tt / 0.045)
+        knock = bp(r.standard_normal(len(tt)), 300, 1400) * np.exp(-tt / 0.02) * 0.7
+        crush = bp(r.standard_normal(len(tt)), 1500, 5000) * np.exp(-np.maximum(tt - 0.004, 0) / 0.03) * 0.25
+        table = np.sin(2 * np.pi * 210 * tt) * np.exp(-tt / 0.09) * 0.15
+        save('stamp_%d' % k, thump + knock + crush + table)
+
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
@@ -831,6 +861,8 @@ if __name__ == '__main__':
     elif '--buzo' in sys.argv:                                 # vestuario (fase 14): la respiración del casco de
         respiracion_buzo()                                     # buzo y el chisporroteo de la linterna
         chispas_linterna()
+    elif '--menus' in sys.argv:                                # solo la pluma y el sello de los menús (hito 20.6)
+        menus()
     elif '--vela' in sys.argv:                                 # solo la vela que se apaga (hito 20.3)
         vela()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
@@ -843,5 +875,6 @@ if __name__ == '__main__':
         synth()
         ambiente()
         vela()
+        menus()
         if len(sys.argv) > 1: copy_kenney(sys.argv[1])
     print('listo en', OUT)

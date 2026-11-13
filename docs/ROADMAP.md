@@ -660,7 +660,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 | Hito | Contenido | Estado |
 |---|---|---|
 | 20.5 | **Ruta arriba:** «Biblioteca › Tienda › Personajes» en los menús de varios niveles | Hecho (13-11-2026): `MenuKit.heading` y `crumb_tail` (tienda y configuración). Ver `docs/ESTADO.md` |
-| 20.6 | **Sonido de los menús:** pluma al moverse por los botones y sello al confirmar | Pendiente |
+| 20.6 | **Sonido de los menús:** pluma al moverse por los botones y sello al confirmar | Hecho (13-11-2026): `quill_*.wav` y `stamp_*.wav` (gen_sfx.py --menus); falta que el autor los oiga. Ver `docs/ESTADO.md` |
 | 20.7 | **Personajes de la tienda que respiran:** el modelo en reposo, en bucle lento, en lugar de quieto | Pendiente |
 | 20.8 | **Paralaje en las ilustraciones de la tienda:** se mueven un poco con el cursor o el stick | Pendiente |
 

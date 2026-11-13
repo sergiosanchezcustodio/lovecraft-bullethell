@@ -362,28 +362,30 @@
 			]
 		},
 		"ui_move": {
-			"db": -16,
+			"db": -18,
 			"pitch": [
-				1.0,
-				1.05
+				0.94,
+				1.08
 			],
 			"voices": 1,
 			"gap": 0.04,
 			"files": [
-				"ui_move_0.ogg",
-				"ui_move_1.ogg"
+				"quill_0.wav",
+				"quill_1.wav",
+				"quill_2.wav"
 			]
 		},
 		"ui_accept": {
-			"db": -10,
+			"db": -8,
 			"pitch": [
-				1.0,
-				1.0
+				0.96,
+				1.04
 			],
 			"voices": 1,
 			"gap": 0.08,
 			"files": [
-				"ui_accept_0.ogg"
+				"stamp_0.wav",
+				"stamp_1.wav"
 			]
 		},
 		"ui_back": {
