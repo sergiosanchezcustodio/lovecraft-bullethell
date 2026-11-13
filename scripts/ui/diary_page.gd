@@ -7,6 +7,9 @@ extends Control
 const PAPER := Color(0.86, 0.79, 0.64)
 const INK := Color(0.2, 0.13, 0.08)
 const INK_DIM := Color(0.42, 0.34, 0.25)
+const PAPER_HC := Color(0.95, 0.91, 0.8)          ## con más contraste (Reading, hito 20.13)
+const INK_HC := Color(0.07, 0.04, 0.02)
+const INK_DIM_HC := Color(0.25, 0.18, 0.11)
 
 var entries: Array = []
 var _k := 0
@@ -18,6 +21,10 @@ func _init(p_entries: Array) -> void:
 	entries = p_entries
 
 func _ready() -> void:
+	var hc := Reading.contrast()
+	var paper_c := PAPER_HC if hc else PAPER
+	var ink := INK_HC if hc else INK
+	var ink_dim := INK_DIM_HC if hc else INK_DIM
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	theme = MenuKit.theme()                          # EB Garamond, como los relatos
 	var veil := ColorRect.new()
@@ -28,8 +35,8 @@ func _ready() -> void:
 	cc.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(cc)
 	var paper := PanelContainer.new()
-	paper.custom_minimum_size = Vector2(820, 0)
-	paper.add_theme_stylebox_override("panel", UiKit.panel(PAPER, Color(0.45, 0.3, 0.15), 3))
+	paper.custom_minimum_size = Vector2(820 if Reading.k() < 1.3 else 980, 0)
+	paper.add_theme_stylebox_override("panel", UiKit.panel(paper_c, Color(0.45, 0.3, 0.15), 3))
 	cc.add_child(paper)
 	var m := MarginContainer.new()
 	for side in ["left", "right"]: m.add_theme_constant_override("margin_" + side, 56)
@@ -38,23 +45,23 @@ func _ready() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 14)
 	m.add_child(box)
-	_who = UiKit.label("", 20, INK_DIM, false)
+	_who = UiKit.label("", Reading.px(20), ink_dim, false)
 	_who.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_who)
-	_title = UiKit.label("", 30, INK, false)
+	_title = UiKit.label("", Reading.px(30), ink, false)
 	_title.add_theme_font_override("font", MenuKit.font())
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_title)
 	var rule := ColorRect.new()
-	rule.color = Color(INK, 0.35)
+	rule.color = Color(ink, 0.35)
 	rule.custom_minimum_size = Vector2(0, 2)
 	box.add_child(rule)
-	_text = UiKit.label("", 24, INK, false)
+	_text = UiKit.label("", Reading.px(24), ink, false)
 	_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_text.custom_minimum_size.x = 700
+	_text.custom_minimum_size.x = 700 if Reading.k() < 1.3 else 860
 	box.add_child(_text)
-	var hint := UiKit.label(("Izquierda/derecha: otro investigador  ·  " if entries.size() > 1 else "") + "A, B o Esc: cerrar", 16, INK_DIM, false)
+	var hint := UiKit.label(("Izquierda/derecha: otro investigador  ·  " if entries.size() > 1 else "") + "A, B o Esc: cerrar", 16, ink_dim, false)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(hint)
 	_show()

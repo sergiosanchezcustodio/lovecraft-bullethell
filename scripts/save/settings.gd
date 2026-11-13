@@ -30,6 +30,8 @@ var defaults := {
 	"distortion": 1.0, "vibration": 1.0, "show_fps": 0,   ## show_fps: 0 no, 1 FPS, 2 detallado (hito 20.16; antes, sí/no)
 	"weather": 2,                           ## clima: 0 apagado, 1 reducido, 2 completo
 	"ui_scale": 1,                          ## accesibilidad (hito 8.3): tamaño de la interfaz (UI_SCALES)
+	"reading_size": 0,                      ## texto de los relatos y el diario: Reading.SIZES (hito 20.13)
+	"reading_contrast": false,              ## y con más contraste
 	"bullet_palette": 0,                    ## 0 normal, 1 alto contraste (daltonismo)
 	"flashes": 1,                           ## destellos (golpes, rayos): 0 reducidos, 1 normales
 	"shake": 1.0,                           ## temblor de cámara (0..1)
@@ -117,7 +119,7 @@ func reset_all() -> void:
 const GROUPS := {
 	"video": ["fullscreen", "resolution", "vsync", "fps_limit", "quality", "weapon_fx", "scale_3d", "brightness"],
 	"audio": ["vol_master", "vol_music", "vol_sfx", "vol_weapons", "vol_ambient", "music_layers", "offscreen_cues"],
-	"game": ["distortion", "hallucinations", "weather", "madness", "tips", "ui_scale", "bullet_palette", "flashes",
+	"game": ["distortion", "hallucinations", "weather", "madness", "tips", "ui_scale", "reading_size", "reading_contrast", "bullet_palette", "flashes",
 		"shake", "damage_numbers", "game_speed", "auto_pause", "intro", "vibration", "show_fps"],
 }
 

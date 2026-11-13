@@ -174,6 +174,11 @@ func _game() -> void:
 	_choice("Tamaño de la interfaz", sizes, int(Settings.get_value("ui_scale")), func(i: int) -> void:
 		Settings.set_value("ui_scale", i)
 		Settings.apply_ui())
+	_choice("Texto de los relatos y el diario", Reading.NAMES, int(Settings.get_value("reading_size")), func(i: int) -> void:
+		Settings.set_value("reading_size", i))
+	_toggle("Más contraste en los relatos y el diario", Settings.get_value("reading_contrast"), func(on: bool) -> void:
+		Settings.set_value("reading_contrast", on))
+	_note("Aparte del tamaño de la interfaz, que se suma encima.")
 	var pal: Array[String] = ["Normales", "Alto contraste"]
 	_choice("Colores de las balas", pal, int(Settings.get_value("bullet_palette")), func(i: int) -> void:
 		Settings.set_value("bullet_palette", i)

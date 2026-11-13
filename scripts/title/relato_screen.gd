@@ -71,7 +71,7 @@ func _ready() -> void:
 		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 		bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		bg.modulate = Color(0.2, 0.2, 0.23)
+		bg.modulate = Color(0.12, 0.12, 0.14) if Reading.contrast() else Color(0.2, 0.2, 0.23)   # más contraste: el mapa, más oscuro (20.13)
 		if _sky != null:                                  # asoma bajo el cielo (16.35)
 			var mm := ShaderMaterial.new()
 			mm.shader = preload("res://scripts/title/relato_map.gdshader")
@@ -81,7 +81,7 @@ func _ready() -> void:
 	c.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(c)
 	var box := VBoxContainer.new()
-	box.custom_minimum_size = Vector2(1150, 0)
+	box.custom_minimum_size = Vector2(1150 if Reading.k() < 1.3 else 1300, 0)   # con letra muy grande, algo más ancho
 	box.add_theme_constant_override("separation", 22)
 	c.add_child(box)
 	var info := {}
@@ -101,7 +101,7 @@ func _ready() -> void:
 	sep.modulate = Color(MenuKit.INK, 0.4)
 	box.add_child(sep)
 	for s in (d as Dictionary)[id]:
-		var l := UiKit.label(String(s).format(fill), 28, Color(0.90, 0.86, 0.78))
+		var l := UiKit.label(String(s).format(fill), Reading.px(28), Color(1.0, 0.97, 0.9) if Reading.contrast() else Color(0.90, 0.86, 0.78))   # (20.13)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.modulate.a = 0.0

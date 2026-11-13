@@ -2738,3 +2738,9 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Captura:** `level=p1_n2 bot=smart god=true cfg_show_fps=2 shots=6 tag=_perfdet` (en la ventana oculta de las pruebas, a 30 fps y con los tirones de la carga).
 - **Tests:** `test_settings.gd` (el texto y el «Sí» de antes).
 
+### 20.13: texto de los relatos y el diario (13-11-2026)
+
+- **Qué:** en Juego › Accesibilidad, «Texto de los relatos y el diario» (Normal, Grande ×1,18, Muy grande ×1,35) y «Más contraste en los relatos y el diario» (`reading_size`, `reading_contrast`; `Reading` en `scripts/ui/reading.gd`). Se multiplica encima del tamaño de la interfaz. En el relato entre niveles (`RelatoScreen`) las frases crecen (con Muy grande la columna pasa de 1150 a 1300 px) y, con contraste, la letra va casi blanca y el mapa de fondo más oscuro; en la página del diario (`DiaryPage`) crecen el nombre, el título y la entrada (papel de 820 a 980 px con Muy grande) y, con contraste, la tinta es casi negra sobre un papel más claro. Las páginas de la Biblioteca no cambian: son de tamaño fijo y el texto se saldría.
+- **Captura:** `relato level=p3_n2 preload=false cfg_reading_size=2 cfg_reading_contrast=true shots=9 tag=_lectura2` (por `main.gd`: abriendo `scenes/relato.tscn` directamente la ventana oculta se queda en 64 px) → `shots/lectura_relato.png` (normal y muy grande con contraste).
+- **Tests:** `tests/test_reading.gd`; las dos claves están en la pestaña Juego (`Settings.GROUPS`).
+
