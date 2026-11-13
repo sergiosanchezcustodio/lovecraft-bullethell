@@ -2939,3 +2939,21 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
     - Revisada con `tools/hoja_poses.gd -- model=kuranes anim=win_court n=7`. Ya son seis poses de victoria (`test_gestos_ataque`).
   - **Tests** en `test_kuranes`: las balas del sueño se marcan `SLOW_DREAM` y las del Signo, no; cada bala se frena una vez; existen los sonidos y la pose.
 
+## Fase 21 (13-11-2026)
+
+Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden: A, B, D, C, E, F. D-51 y D-52, con la recomendación (GDD).
+
+### 21.1: sonido propio de las armas de la fase 20 (13-11-2026)
+
+*Pendiente de que el autor lo escuche.*
+
+- **Qué:** sintetizados con `python tools/gen_sfx.py --fase20`, como los del sueño de Kuranes. Hasta ahora sonaban con los de siempre (el genérico «magic» al disparar, y además página, cántico o golpe).
+  - **Pickman:** `brush`, tres pasadas de pincel al plantar el lienzo. `canvas_tear`, hilos que saltan cada vez más deprisa y el marco que cae, al romperse; el gruñido del necrófago sigue.
+  - **Ward:** `formula`, sílabas susurradas con sus formantes y eco, al abrir el círculo. `salts`, chisporroteo de cristales y un soplo grave, al levantar a los caídos.
+  - **Gilman:** `angle_hum`, al disparar, un zumbido que salta de tono en cada esquina. `angle_snap`, en cada giro de una bala, un chasquido de cristal corto y bajo (−24 dB, separados 0,09 s).
+  - **Tillinghast:** la máquina zumba más agudo y con más chispas cuanto más caliente (`beyond_cool`, `beyond_warm` y `beyond_hot`; `WeaponSystem.beyond_sound`).
+  - **Derby y Asenath:** al cambiar de cuerpo, tres golpes en la puerta al pasar a Asenath y dos al volver a Edward (`knock_3`, `knock_2`). Las miradas de Asenath suenan como un tono vidrioso que bate (`gaze`); el tajo de Edward, `swing` (`WeaponSystem._fire_sound`, según `Player.form`).
+  - **Sin repeticiones:** las entregas que suenan en su sitio con lo suyo (lienzo, sales, máquina y sueño) no suenan además al disparar: `sound_of` da «» para ellas. El sueño de Kuranes sonaba dos veces («magic» y sus campanillas).
+- **Comprobado en partida** sin sonar en los altavoces: `--audio-driver Dummy … log=true` cuenta lo que suena (`SONIDOS {…}` al salir). En 20-25 s con cada uno: Derby, 6 tajos, 6 miradas y 7 y 6 llamadas; Pickman, 5 pinceles y 4 lienzos rasgados; Ward, 5 fórmulas y 5 sales; Gilman, 28 zumbidos y 52 chasquidos; Tillinghast, 3, 2 y 2 según el calor.
+- **Tests:** `tests/test_sonidos_fase20.gd`: los eventos y sus archivos existen; las entregas de la fase 20 no suenan dos veces; la máquina, según el calor; Derby llama tres veces y Asenath dos.
+

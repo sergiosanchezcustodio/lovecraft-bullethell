@@ -1522,6 +1522,7 @@ func swap_form() -> void:
 		health = minf(data.max_health, health + data.swap_restore)
 		sanity = minf(data.max_sanity, sanity + data.swap_restore)
 	if world != null: VoxelFx.puff(world.fx, global_position, "soul", 0.6, Color.WHITE, 1.0)
+	Auto.sfx_at("knock_3" if form == 1 else "knock_2", global_position)   # tres golpes y luego dos (21.1)
 	if weapons != null: weapons.on_swap()
 
 ## Pone el modelo del cuerpo `form`. El otro se construye la primera vez (con su vestuario, su

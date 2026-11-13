@@ -347,6 +347,7 @@ func _angle_step(i: int, delta: float) -> void:
 			best = c
 			best_d = d
 	_vel[i] = Vector3(best.x, 0.0, best.y)
+	if best != v: Auto.sfx_at("angle_snap", _pos[i])   # el chasquido de cada esquina (hito 21.1; separados en la tabla)
 
 func _collide_enemy_bullet(i: int) -> bool:
 	var p := Vector2(_pos[i].x, _pos[i].z)

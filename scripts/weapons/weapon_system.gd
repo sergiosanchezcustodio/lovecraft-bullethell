@@ -143,7 +143,7 @@ func _physics_process_step(delta: float) -> void:
 		Damage.ctx = tag_of(w)                   # lo que cree este disparo daña en nombre de esta arma
 		if not _fire(w): continue                # el machete espera a tener a alguien cerca
 		_gesture(w)
-		Auto.sfx_at(sound_of(w.data), player.global_position)      # en cooperativo, del lado de quien dispara
+		Auto.sfx_at(_fire_sound(w), player.global_position)      # en cooperativo, del lado de quien dispara
 		w.timer = w.stat("cooldown")
 		if w.data.spinup > 1.0:                  # Nagant: cuanto más dispara seguido, más rápido
 			var step := w.stat("cooldown") / maxf(w.data.spinup_time, 0.1)
@@ -152,10 +152,21 @@ func _physics_process_step(delta: float) -> void:
 		if w.data.category == WeaponData.Category.MAGIC: w.timer *= player.data.arcane_cooldown_mult   # rasgo de Armitage
 
 ## Sonido al disparar (hito 8.1): el del arma o, si no tiene, según su categoría y entrega.
+## El umbral (Derby y Asenath) suena según el cuerpo: el tajo de Edward o las miradas de Asenath.
+func _fire_sound(w: Weapon) -> String:
+	if w.data.delivery == WeaponData.Delivery.THRESHOLD and w.data.sfx == "" and player.form == 1: return "gaze"
+	return sound_of(w.data)
+
 static func sound_of(d: WeaponData) -> String:
 	if d.sfx != "": return d.sfx
+	if d.bullet_look == "angle": return "angle_hum"            # Gilman (hito 21.1): se quiebra en ángulos
 	match d.delivery:
 		WeaponData.Delivery.THROWN: return ""                    # suena al explotar
+		# las de la fase 20 suenan en su sitio con lo suyo (hito 21.1): el lienzo (pincel), las sales
+		# (la fórmula), la máquina (según el calor) y el sueño (campanillas)
+		WeaponData.Delivery.CANVAS, WeaponData.Delivery.SALTS, WeaponData.Delivery.BEYOND, WeaponData.Delivery.DREAM:
+			return ""
+		WeaponData.Delivery.THRESHOLD: return "swing"            # (el de Asenath, _fire_sound)
 		WeaponData.Delivery.FLAME: return "fire"
 		WeaponData.Delivery.BEAM, WeaponData.Delivery.TETHER: return "beam"
 		WeaponData.Delivery.MELEE, WeaponData.Delivery.STAB: return "swing"
@@ -663,9 +674,15 @@ func _beyond(w: Weapon) -> bool:
 	wave.color = BEYOND_COLOR.lerp(BEYOND_HOT, (h - 1.0) / (BEYOND_HEAT_MAX - 1.0))
 	world.fx.add_child(wave)
 	VoxelFx.puff(world.fx, origin, "beyond", r * 0.6, Color.WHITE, 1.0)   # lo que se ve al encenderla
-	Auto.sfx_at("magic", origin)
+	Auto.sfx_at(beyond_sound(h), origin)
 	fired.emit(w)
 	return true
+
+## Zumbido de la máquina según el calor (hito 21.1): fría, templada o caliente (más aguda y con
+## más chispas).
+static func beyond_sound(heat: float) -> String:
+	var k := (heat - 1.0) / (BEYOND_HEAT_MAX - 1.0)
+	return "beyond_cool" if k < 0.34 else ("beyond_warm" if k < 0.67 else "beyond_hot")
 
 ## Calor actual de la Máquina del más allá (tests).
 func heat_of(w: Weapon) -> float:

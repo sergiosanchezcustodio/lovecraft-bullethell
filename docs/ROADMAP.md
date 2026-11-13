@@ -36,7 +36,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 18 | Efectos de las armas | **Hecha** (07-11-2026; retoques el 10-11-2026), pendiente de tu revisión: los 14 hitos de los cinco bloques, estilo voxel con degradados; calidad `weapon_fx` | Ninguna (D-50, resuelta) |
 | 19 | Rendimiento, accesibilidad de los efectos y distribución | **En curso** (10-11-2026): bloque A (rendimiento tras las fases 17 y 18); B y C propuestos | Ninguna |
 | 20 | Menús, transiciones, configuración y personajes nuevos | **Hecha** (13-11-2026), pendiente de tu revisión: los 22 hitos (el 20.9, en parte: los libros y los objetos de los jefes de la portada necesitan arte nuevo) | Ninguna |
-| 21 | Sonido y victorias de la fase 20, jugabilidad, contenido nuevo, gráficos y menús | **Propuesta** (13-11-2026), sin aprobar: elige bloques o hitos | D-51 (vínculos), D-52 (qué contenido nuevo) |
+| 21 | Sonido y victorias de la fase 20, jugabilidad, contenido nuevo, gráficos y menús | **En curso** (13-11-2026; aprobada entera): bloque A | Ninguna (D-51 y D-52, resueltas) |
 
 ---
 
@@ -697,7 +697,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 
 ## Fase 21: propuesta (13-11-2026)
 
-**Propuesta el 13-11-2026**, al cerrar la fase 20, a petición del autor («plan de fase 21»). **Sin aprobar:** elige bloques enteros o hitos sueltos. Nada se empieza hasta que lo apruebes. Orden recomendado: A (corto, remata la fase 20), luego B y, del contenido, C o D (no los dos a la vez: D es más corto).
+**Propuesta el 13-11-2026**, al cerrar la fase 20, a petición del autor («plan de fase 21»), y **aprobada entera** el mismo día («me gusta todo, organízate y comienza»). Orden: A (corto, remata la fase 20), B, D (las noches sueltas, más cortas), C (la parte 4), E y F. D-51 y D-52, resueltas con la recomendación (GDD, sección 12).
 
 **Criterio de aceptación de la fase** (para lo que se elija):
 - Todo comprobado en captura y con el bot sin errores, y nada empeora el rendimiento apreciablemente en Alta.
@@ -708,7 +708,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 21.1 | **Sonido propio de las armas de la fase 20**, como el de Kuranes. Ahora usan los de siempre (página, cántico, golpe). **Pickman:** el pincel y el lienzo que se rasga. **Ward:** las sales que chisporrotean y la fórmula susurrada. **Gilman:** un zumbido que se quiebra al doblar cada ángulo. **Tillinghast:** la máquina, que sube de tono al calentarse. **Derby:** al cambiar de cuerpo, la llamada a la puerta (tres golpes y luego dos) | Propuesto |
+| 21.1 | **Sonido propio de las armas de la fase 20**, como el de Kuranes. Ahora usan los de siempre (página, cántico, golpe). **Pickman:** el pincel y el lienzo que se rasga. **Ward:** las sales que chisporrotean y la fórmula susurrada. **Gilman:** un zumbido que se quiebra al doblar cada ángulo. **Tillinghast:** la máquina, que sube de tono al calentarse. **Derby:** al cambiar de cuerpo, la llamada a la puerta (tres golpes y luego dos) | Hecho (13-11-2026), falta que lo escuches: `gen_sfx.py --fase20`, doce sonidos; las entregas de la fase 20 ya no suenan dos veces. Ver `docs/ESTADO.md` |
 | 21.2 | **Pose de victoria propia para los cinco.** **Pickman** se aparta para mirar el cuadro. **Ward** alza el frasco. **Gilman** traza un ángulo en el aire. **Tillinghast** ajusta la máquina. **Derby y Asenath**, una distinta según el cuerpo | Propuesto |
 
 ### Bloque B: jugabilidad

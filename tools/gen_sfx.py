@@ -12,6 +12,7 @@ Uso: python tools/gen_sfx.py <carpeta con los packs de Kenney descomprimidos>
      python tools/gen_sfx.py --ambiente   (solo los del ambiente de los escenarios)
      python tools/gen_sfx.py --buzo       (solo la respiración del casco de buzo y la linterna que falla)
      python tools/gen_sfx.py --sueno      (solo el sueño de Kuranes)
+     python tools/gen_sfx.py --fase20     (solo los de Pickman, Ward, Gilman, Tillinghast y Derby)
 """
 import os, sys, shutil, wave, glob
 import numpy as np
@@ -906,6 +907,141 @@ def sueno():
     save('dream_sleep_0', reverb(x, 1.4, 0.45, 0.45))
 
 
+def fase20():
+    """Los personajes de la fase 20 (hito 21.1). Pickman: el pincel (tres pasadas de cerda) y el
+    lienzo que se rasga. Ward: la fórmula susurrada (sílabas con sus formantes) y las sales que
+    chisporrotean al levantar a los caídos. Gilman: el zumbido que se quiebra en ángulos rectos al
+    disparar y el chasquido de cristal de cada giro. Tillinghast: la máquina, que zumba más agudo y
+    chisporrotea más cuanto más caliente (fría, templada y caliente). Derby: la llamada a la puerta
+    (tres golpes al pasar a Asenath, dos al volver) y las miradas de Asenath, un tono vidrioso que bate."""
+    r = np.random.default_rng(2021)
+
+    def room(x, size=0.8, dec=0.25, mix=0.35):
+        ir = lp(r.standard_normal(int(size * SR)), 4000) * np.exp(-t(size) / dec)
+        wet = signal.fftconvolve(x, ir)[:len(x)]
+        wet *= np.std(x) / (np.std(wet) + 1e-9)
+        y = x * (1 - mix * 0.5) + wet * mix
+        n = min(len(y) // 3, int(0.15 * SR))
+        y[-n:] *= np.linspace(1, 0, n) ** 2
+        return y
+
+    def crackle(n, rate_env, pole=0.5):
+        clicks = r.random(n) < rate_env / SR
+        return signal.lfilter([1], [1, -pole], np.where(clicks, r.uniform(0.3, 1.0, n), 0.0))
+
+    for k in range(2):                                                   # el pincel
+        d = 0.42
+        tt = t(d)
+        x = np.zeros(len(tt))
+        for j, (s0, ln) in enumerate(((0.0, 0.12), (0.14, 0.1), (0.27, 0.13))):
+            m = (tt >= s0) & (tt < s0 + ln)
+            u = (tt[m] - s0) / ln
+            e = np.sin(np.pi * u) ** 1.2 * (1.0, 0.75, 0.9)[j]
+            bristle = bp(r.standard_normal(len(tt)), 1200 + 300 * k, 5500)[m]
+            rasp = 1.0 + 0.35 * np.sin(2 * np.pi * r.uniform(55, 80) * tt[m])
+            x[m] += bristle * e * rasp
+        save('brush_%d' % k, room(lp(x, 6000), 0.4, 0.08, 0.2))
+
+    d = 0.6                                                              # el lienzo que se rasga
+    tt = t(d)
+    x = crackle(len(tt), np.linspace(40, 260, len(tt)), 0.6) * np.clip((0.5 - tt) / 0.1, 0, 1)
+    x = bp(x, 900, 7000)
+    x += bp(r.standard_normal(len(tt)), 600, 3000) * np.exp(-np.abs(tt - 0.32) / 0.12) * 0.5
+    x += np.sin(2 * np.pi * 85 * tt) * np.exp(-np.maximum(tt - 0.42, 0) / 0.05) * (tt > 0.42) * 0.6   # el marco
+    save('canvas_tear_0', room(x, 0.5, 0.1, 0.25))
+
+    vowels = {'a': (800, 1200), 'e': (500, 1900), 'i': (320, 2400), 'o': (500, 900), 'u': (350, 750)}
+    for k, word in enumerate(('aiaoe', 'ouaia')):                       # la fórmula, susurrada
+        syl = 0.15
+        d = syl * len(word) + 0.45
+        tt = t(d)
+        x = np.zeros(len(tt))
+        for j, v in enumerate(word):
+            s0 = 0.03 + j * syl * r.uniform(0.92, 1.08)
+            ln = syl * (1.6 if j == len(word) - 1 else 0.95)
+            m = (tt >= s0) & (tt < s0 + ln)
+            u = (tt[m] - s0) / ln
+            e = np.clip(u / 0.15, 0, 1) * np.clip((1 - u) / 0.5, 0, 1) * (0.7 + 0.3 * (j % 2))
+            f1, f2 = vowels[v]
+            n0 = r.standard_normal(len(tt))
+            voice = bp(n0, f1 * 0.85, f1 * 1.15) + 0.7 * bp(n0, f2 * 0.9, f2 * 1.1)
+            x[m] += voice[m] * e
+            cons = int(0.025 * SR)
+            i0 = int(s0 * SR)                                            # la consonante: un siseo corto
+            x[i0:i0 + cons] += hp(r.standard_normal(cons), 3500) * np.linspace(1, 0, cons) * 0.5
+        save('formula_%d' % k, room(x, 1.2, 0.35, 0.45))
+
+    for k in range(2):                                                   # las sales
+        d = 0.9
+        tt = t(d)
+        env = np.clip(tt / 0.05, 0, 1) * np.exp(-np.maximum(tt - 0.05, 0) / 0.3)
+        x = hp(crackle(len(tt), 900 * env, 0.3), 2500)
+        x += hp(r.standard_normal(len(tt)), 6000) * env * 0.08          # el siseo
+        x += lp(r.standard_normal(len(tt)), 260) * np.exp(-tt / 0.12) * 0.9   # la ceniza que sube: un soplo grave
+        save('salts_%d' % k, room(x, 0.7, 0.2, 0.3))
+
+    for k in range(2):                                                   # Gilman: el zumbido que se quiebra
+        d = 0.5
+        tt = t(d)
+        steps = (0.12, 0.24, 0.36)
+        f = np.full(len(tt), 150.0 + 20 * k)
+        for j, s0 in enumerate(steps):
+            f[tt >= s0] *= (1.26, 0.84, 1.33)[j]                         # saltos de tono en cada esquina
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        x = sum(np.sin(ph * h) / h for h in range(1, 7))                 # algo de diente de sierra
+        x = bp(x, 120, 2400) * np.clip(tt / 0.02, 0, 1) * np.exp(-tt / 0.3) * np.clip((d - tt) / 0.12, 0, 1)
+        for s0 in steps:
+            i0 = int(s0 * SR)
+            m = int(0.01 * SR)
+            x[i0:i0 + m] += hp(r.standard_normal(m), 3000) * np.linspace(1, 0, m) * 0.6
+        save('angle_hum_%d' % k, x)
+    for k in range(3):                                                   # el chasquido de cada giro
+        d = 0.1
+        tt = t(d)
+        f0 = 2400 + 350 * k
+        x = np.sin(2 * np.pi * f0 * tt * (1 - 0.8 * tt)) * np.exp(-tt / 0.018)
+        x += np.sin(2 * np.pi * f0 * 1.51 * tt) * np.exp(-tt / 0.01) * 0.4
+        x += hp(r.standard_normal(len(tt)), 5000) * np.exp(-tt / 0.003) * 0.3
+        save('angle_snap_%d' % k, x)
+
+    for k, (name, whine, rate) in enumerate((('cool', 520, 120), ('warm', 780, 400), ('hot', 1150, 1100))):
+        d = 0.95                                                         # Tillinghast: la máquina
+        tt = t(d)
+        env = np.clip(tt / 0.06, 0, 1) * np.exp(-np.maximum(tt - 0.25, 0) / 0.3)
+        hum = sum(np.sign(np.sin(2 * np.pi * 120 * h * tt)) / h ** 1.6 for h in (1, 2, 3))
+        x = lp(hum, 1600) * env * 0.6
+        wf = whine * (1 + 0.25 * np.clip(tt / 0.3, 0, 1)) * (1 + 0.01 * np.sin(2 * np.pi * 7 * tt))
+        x += np.sin(2 * np.pi * np.cumsum(wf) / SR) * env * (0.25 + 0.1 * k)
+        x += hp(crackle(len(tt), rate * env), 2000) * (0.5 + 0.2 * k)
+        save('beyond_%s' % name, room(x, 0.5, 0.15, 0.25))
+
+    def knocks(n):                                                       # Derby: la llamada a la puerta
+        gap = 0.17
+        d = gap * n + 0.5
+        tt = t(d)
+        x = np.zeros(len(tt))
+        for j in range(n):
+            i0 = int((0.02 + j * gap * r.uniform(0.95, 1.05)) * SR)
+            u = t(0.25)
+            hit = np.sin(2 * np.pi * r.uniform(120, 145) * u) * np.exp(-u / 0.035)
+            hit += bp(r.standard_normal(len(u)), 250, 1100) * np.exp(-u / 0.012) * 0.8
+            hit += np.sin(2 * np.pi * 410 * u) * np.exp(-u / 0.05) * 0.2   # la madera de la puerta
+            x[i0:i0 + len(u)] += hit[:len(x) - i0] * (1.0 if j < n - 1 else 1.1)
+        return room(x, 0.9, 0.22, 0.4)
+    save('knock_3', knocks(3))
+    save('knock_2', knocks(2))
+    for k in range(2):                                                   # las miradas de Asenath
+        d = 0.6
+        tt = t(d)
+        env = np.clip(tt / 0.08, 0, 1) * np.exp(-np.maximum(tt - 0.1, 0) / 0.22)
+        f0 = 1180 + 90 * k
+        vib = 1 + 0.004 * np.sin(2 * np.pi * 5.5 * tt)
+        x = (np.sin(2 * np.pi * np.cumsum(f0 * vib) / SR) + np.sin(2 * np.pi * np.cumsum((f0 + 13) * vib) / SR)) * env
+        x += np.sin(2 * np.pi * f0 * 0.5 * tt) * env * 0.3
+        x += bp(r.standard_normal(len(tt)), 1500, 5000) * env * 0.06
+        save('gaze_%d' % k, room(x, 0.9, 0.3, 0.45))
+
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
@@ -920,6 +1056,8 @@ if __name__ == '__main__':
         vela()
     elif '--sueno' in sys.argv:                                # solo el sueño de Kuranes (hito 20.22)
         sueno()
+    elif '--fase20' in sys.argv:                               # solo los de los personajes de la fase 20 (hito 21.1)
+        fase20()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)
@@ -932,5 +1070,6 @@ if __name__ == '__main__':
         vela()
         menus()
         sueno()
+        fase20()
         if len(sys.argv) > 1: copy_kenney(sys.argv[1])
     print('listo en', OUT)

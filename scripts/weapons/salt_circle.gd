@@ -37,7 +37,7 @@ func _ready() -> void:
 	Damage.ctx = _wtag
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	VoxelFx.puff(world.fx, global_position, "salts_rise", radius * 0.8, Color.WHITE, 1.2)
-	Auto.sfx_at("chant", global_position)
+	Auto.sfx_at("formula", global_position)           # la fórmula, susurrada (hito 21.1)
 	if FxShade.on():                                   # la cortina de la fórmula, azul y baja
 		_wall = MeshInstance3D.new()
 		_wall.mesh = VoxelFx.ring_wall()
@@ -76,7 +76,7 @@ func _formula() -> void:
 		g.blast = blast * power
 		world.fx.add_child(g)
 		risen += 1
-	Auto.sfx_at("magic", global_position)
+	Auto.sfx_at("salts", global_position)             # las sales que chisporrotean (hito 21.1)
 	if FxShade.on(): HitSparks.burst("glint_ice", global_position + Vector3(0, 0.4, 0))
 
 func _process(_delta: float) -> void:

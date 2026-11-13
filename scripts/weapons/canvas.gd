@@ -66,7 +66,7 @@ func _ready() -> void:
 	_cloth = _model.find_child("canvas", true, false) as Node3D
 	_big = 1.5 if ghouls > 1 else 1.0               # El modelo del natural: un cuadro enorme
 	_visual.scale = Vector3(_big, 0.05, _big)
-	Auto.sfx_at("page", global_position)
+	Auto.sfx_at("brush", global_position)             # el pincel (hito 21.1)
 
 func _physics_process(delta: float) -> void:
 	Damage.ctx = _wtag
@@ -99,7 +99,7 @@ func _break() -> void:
 		e.take_damage(d)
 	world.splash(global_position, 1.1, Color(0.55, 0.1, 0.08))
 	if FxShade.on(): HitSparks.burst("glint_ember", at)
-	Auto.sfx_at("rise_wood", global_position)
+	Auto.sfx_at("canvas_tear", global_position)       # el lienzo que se rasga (hito 21.1)
 	Auto.sfx_at("growl", global_position)
 	for k in ghouls:
 		var off := Vector3.ZERO if ghouls == 1 else Vector3(0.7, 0, 0).rotated(Vector3.UP, TAU * k / ghouls)
