@@ -32,6 +32,8 @@ var defaults := {
 	"ui_scale": 1,                          ## accesibilidad (hito 8.3): tamaño de la interfaz (UI_SCALES)
 	"reading_size": 0,                      ## texto de los relatos y el diario: Reading.SIZES (hito 20.13)
 	"reading_contrast": false,              ## y con más contraste
+	"profile": 0,                           ## perfil de ajustes en uso: PROFILES (hito 20.14)
+	"profiles": {},                         ## lo guardado de cada perfil: "0"/"1" -> {clave: valor} (profile_keys)
 	"bullet_palette": 0,                    ## 0 normal, 1 alto contraste (daltonismo)
 	"flashes": 1,                           ## destellos (golpes, rayos): 0 reducidos, 1 normales
 	"shake": 1.0,                           ## temblor de cámara (0..1)
@@ -67,6 +69,7 @@ func _ready() -> void:
 	load_file()
 	if first and is_handheld():                 # hito 19.7: la primera vez en una Steam Deck
 		apply_handheld_values()
+		values["profile"] = PROFILE_HANDHELD      # y ya en su perfil (20.14)
 		save_file()
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("cfg_") and "=" in a:
@@ -169,8 +172,40 @@ static func is_handheld() -> bool:
 func apply_handheld_values() -> void:
 	for k in HANDHELD: values[k] = HANDHELD[k]
 
-## Desde la configuración: pone el preajuste, lo guarda y lo aplica.
+## Perfiles de ajustes (hito 20.14): dos juegos de lo de la pestaña Vídeo más el tamaño de la
+## interfaz, «Sobremesa» y «Portátil», que se cambian con una opción. Al cambiar, lo de ahora se
+## guarda en el perfil que se deja y se pone lo del otro; el portátil empieza con `HANDHELD` y el
+## de sobremesa, con lo de fábrica.
+const PROFILES: Array[String] = ["Sobremesa", "Portátil"]
+const PROFILE_HANDHELD := 1
+
+static func profile_keys() -> Array:
+	return (GROUPS["video"] as Array) + ["ui_scale"]
+
+func switch_profile(i: int) -> void:
+	i = clampi(i, 0, PROFILES.size() - 1)
+	var cur := int(values.get("profile", 0))
+	if i == cur: return
+	var store: Dictionary = (values.get("profiles", {}) as Dictionary).duplicate(true)
+	var snap := {}
+	for k: String in profile_keys(): snap[k] = values[k]
+	store[str(cur)] = snap
+	var target: Dictionary = store.get(str(i), {})
+	if target.is_empty():
+		target = HANDHELD if i == PROFILE_HANDHELD else {}
+		if i != PROFILE_HANDHELD:
+			for k: String in profile_keys(): target[k] = defaults[k]
+	for k: String in profile_keys():
+		if target.has(k): values[k] = target[k]
+	values["profile"] = i
+	values["profiles"] = store
+	save_file()
+	apply_all()
+
+## Desde la configuración: pasa al perfil Portátil (guardando el de sobremesa, 20.14), le pone el
+## preajuste, lo guarda y lo aplica.
 func apply_handheld() -> void:
+	switch_profile(PROFILE_HANDHELD)
 	apply_handheld_values()
 	save_file()
 	apply_all()

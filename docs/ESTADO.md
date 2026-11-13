@@ -2744,3 +2744,9 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Captura:** `relato level=p3_n2 preload=false cfg_reading_size=2 cfg_reading_contrast=true shots=9 tag=_lectura2` (por `main.gd`: abriendo `scenes/relato.tscn` directamente la ventana oculta se queda en 64 px) → `shots/lectura_relato.png` (normal y muy grande con contraste).
 - **Tests:** `tests/test_reading.gd`; las dos claves están en la pestaña Juego (`Settings.GROUPS`).
 
+### 20.14: perfiles de ajustes (13-11-2026)
+
+- **Qué:** arriba de la pestaña Vídeo, «Perfil de ajustes»: Sobremesa o Portátil (`Settings.PROFILES`). Cada perfil guarda lo de la pestaña Vídeo más el tamaño de la interfaz (`Settings.profile_keys`). Al cambiar (`Settings.switch_profile`), lo de ahora se guarda en el perfil que se deja (`profiles`, en la configuración) y se pone lo del otro; el Portátil empieza con el preajuste de la Steam Deck (`HANDHELD`) y el de Sobremesa con lo de fábrica. El audio, los controles y el juego son comunes. «Ajustes para Steam Deck y portátiles» pasa antes al perfil Portátil (sin perder el de sobremesa) y en una Deck, la primera vez, se arranca ya en él.
+- **Captura:** `title saves=demo_saves open=menu_config tab=0 shots=10 tag=_perfil`.
+- **Tests:** `test_settings.gd` (cada perfil recuerda lo suyo, el audio no va en el perfil, se guarda; el botón de la Deck no pierde el de sobremesa).
+

@@ -678,7 +678,7 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 |---|---|---|
 | 20.12 | **Vista previa en Vídeo:** una miniatura de la partida que cambia al tocar calidad, efectos, brillo o clima | Pendiente |
 | 20.13 | **Tamaño y contraste del texto de los relatos y el diario,** aparte de la escala de la interfaz | Hecho (13-11-2026): `Reading` (relato entre niveles y página del diario). Ver `docs/ESTADO.md` |
-| 20.14 | **Perfiles de ajustes:** dos configuraciones guardadas («sobremesa» y «portátil») que se cambian con un botón | Pendiente |
+| 20.14 | **Perfiles de ajustes:** dos configuraciones guardadas («sobremesa» y «portátil») que se cambian con un botón | Hecho (13-11-2026): «Perfil de ajustes» en Vídeo (`Settings.switch_profile`). Ver `docs/ESTADO.md` |
 | 20.15 | **Restablecer solo esta pestaña** | Hecho (13-11-2026): `Settings.reset_group` en Vídeo, Audio y Juego. Ver `docs/ESTADO.md` |
 | 20.16 | **Rendimiento detallado:** además de los FPS, ms de media y 1 % peor | Hecho (13-11-2026): «Mostrar FPS» No, FPS, Detallado (`Settings.perf_text`). Ver `docs/ESTADO.md` |
 

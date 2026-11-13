@@ -75,6 +75,10 @@ func _show_tab(i: int) -> void:
 # ---------------------------------------------------------------- pestañas
 
 func _video() -> void:
+	_choice("Perfil de ajustes", Settings.PROFILES, int(Settings.get_value("profile")), func(i: int) -> void:
+		Settings.switch_profile(i)
+		_show_tab.call_deferred(0))
+	_note("Cada perfil guarda lo de esta pestaña y el tamaño de la interfaz: cámbialo al pasar de la tele o el monitor a un portátil o a la Steam Deck.")
 	_toggle("Pantalla completa", Settings.get_value("fullscreen"), func(on: bool) -> void:
 		Settings.set_value("fullscreen", on)
 		Settings.apply_video())
@@ -102,7 +106,7 @@ func _video() -> void:
 	_action("Ajustes para Steam Deck y portátiles", func() -> void:
 		Settings.apply_handheld()
 		_show_tab(0))
-	_note("Pantalla completa, 40 fps con sincronía, calidad Baja e interfaz Grande. En una Steam Deck se ponen solos la primera vez.")
+	_note("Pasa al perfil Portátil y le pone pantalla completa, 40 fps con sincronía, calidad Baja e interfaz Grande. En una Steam Deck se ponen solos la primera vez.")
 	_choice("Resolución del 3D (rendimiento)", OptionRow.fmt(Settings.SCALES_3D, "%d %%", 100.0),
 		OptionRow.idx(Settings.SCALES_3D, float(Settings.get_value("scale_3d")), 3), func(i: int) -> void:
 			Settings.set_value("scale_3d", Settings.SCALES_3D[i])

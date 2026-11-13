@@ -66,7 +66,7 @@ func test_cada_clave_tiene_su_pestana() -> void:
 			assert_true(settings.defaults.has(k), "%s existe" % k)
 			grouped[k] = true
 	for k: String in settings.defaults:
-		if k in ["keys", "joy", "controls_rev", "controls_base", "intro_seen", "dif_levels"]: continue
+		if k in ["keys", "joy", "controls_rev", "controls_base", "intro_seen", "dif_levels", "profile", "profiles"]: continue
 		assert_true(grouped.has(k), "%s está en alguna pestaña" % k)
 
 ## Hito 20.16: el contador detallado y el «Sí» de antes.
@@ -80,3 +80,31 @@ func test_rendimiento_detallado() -> void:
 	assert_string_contains(t, "1 % peor 40,0 ms")
 	settings.set_value("show_fps", true)
 	assert_eq(settings.fps_mode(), 1, "el «Sí» de antes es el contador de siempre")
+
+## Hito 20.14: dos perfiles; cada uno recuerda lo suyo.
+func test_perfiles() -> void:
+	settings.set_value("quality", 3)
+	settings.set_value("ui_scale", 1)
+	settings.switch_profile(1)
+	assert_eq(int(settings.get_value("profile")), 1)
+	assert_eq(int(settings.get_value("quality")), int(settings.HANDHELD["quality"]), "el portátil empieza con el preajuste")
+	assert_eq(int(settings.get_value("ui_scale")), int(settings.HANDHELD["ui_scale"]))
+	settings.set_value("quality", 1)
+	settings.set_value("vol_music", 0.4)
+	settings.switch_profile(0)
+	assert_eq(int(settings.get_value("quality")), 3, "el de sobremesa, como se dejó")
+	assert_eq(int(settings.get_value("ui_scale")), 1)
+	assert_almost_eq(float(settings.get_value("vol_music")), 0.4, 0.001, "el audio no va en el perfil")
+	settings.switch_profile(1)
+	assert_eq(int(settings.get_value("quality")), 1, "el portátil, como se dejó")
+	settings.load_file()
+	assert_eq(int(settings.get_value("profile")), 1, "se guarda")
+
+## El botón de la Steam Deck pasa al perfil Portátil sin perder el de sobremesa.
+func test_ajustes_de_portatil_guardan_el_de_sobremesa() -> void:
+	settings.set_value("quality", 3)
+	settings.apply_handheld()
+	assert_eq(int(settings.get_value("profile")), settings.PROFILE_HANDHELD)
+	assert_eq(int(settings.get_value("quality")), int(settings.HANDHELD["quality"]))
+	settings.switch_profile(0)
+	assert_eq(int(settings.get_value("quality")), 3)
