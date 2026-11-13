@@ -6,7 +6,7 @@ extends Control
 ## Cada efecto se configura o se quita por separado en data/title/portada.tres
 ## (TitleScreenConfig). Para probar, detrás de `--`:
 ##   off=velas,farolillos,niebla,luna,relampago,ojos,acercamiento,ceniza,titulo,halo,
-##       niebla_titulo,aviso,musica,cuervo,polillas,rafaga,paginas,gotas
+##       niebla_titulo,aviso,musica,cuervo,polillas,rafaga,paginas,gotas,polvo
 ##   raven=s             el cuervo (quitado de momento) llega en ese segundo (raven=-1: ya posado)
 ##   gust=s              la primera ráfaga en ese segundo
 ##   drips_every=s       una gota cada tantos segundos
@@ -17,6 +17,7 @@ extends Control
 ##                       open=slots_borrar, además la confirmación de borrado; open=menu (menú
 ##                       principal), open=menu_jugar, open=menu_config tab=0..4, open=menu_tienda tab=0..3, open=menu_logros,
 ##                       open=menu_biblioteca tome=N cursor=N
+##   progress=0..1 sky_part=0..3   velas y cielo como con ese progreso (hito 20.9)
 ##                       open=menu_revision (revisión de arte, temporal), open=menu_online,
 ##                       open=menu_libro (Jugar en local: el libro que se abre hacia la selección)
 ##                       (con net_host=true o net_join=<código|IP>: abre la sala o se une)
@@ -119,7 +120,7 @@ func _ready() -> void:
 		var tag := ("_" + args.get_str("tag")) if args.has("tag") else ""
 		add_child(ShotTaker.new(args.get_floats("shots"), "res://shots/titulo%s" % tag))
 
-## off=niebla,motas… apaga esos efectos (para compararlos sin tocar la configuración).
+## off=niebla,polvo… apaga esos efectos (para compararlos sin tocar la configuración).
 func _apply_off(list: String) -> void:
 	var names := {"velas": "candles_enabled", "farolillos": "lanterns_enabled", "niebla": "fog_enabled",
 		"luna": "moon_enabled", "relampago": "lightning_enabled", "ojos": "eyes_enabled",
@@ -190,6 +191,8 @@ func _build_stage() -> void:
 		moths = TitleMoths.new(cfg.moths_count)
 		stage.add_child(moths)
 		if gust: gust.moths = moths
+	if not "polvo" in args.get_str("off").split(",", false):   # motas en la luz de la vela (hito 20.11)
+		stage.add_child(_make_candle_dust())
 	if cfg.raven_enabled or args.has("raven"):      # quitado de momento: raven=s lo trae para probarlo
 		raven = TitleRaven.new(args.get_float("raven", cfg.raven_first))
 		stage.add_child(raven)
@@ -199,6 +202,45 @@ func _build_stage() -> void:
 	ash.append(_make_ash(cfg.ash_mid_amount, 1.5, Vector2(0.2, 0.42), cfg.ash_alpha * 0.85, 0.7))
 	ash.append(_make_ash(cfg.ash_near_amount, 2.3, Vector2(0.5, 1.3), cfg.ash_alpha * 0.6, 0.35))
 	_push_params()
+
+## Motas de polvo doradas que suben despacio y se mecen en la luz de la vela del escritorio
+## (hito 20.11): nacen y mueren con un fundido dentro del halo, más brillantes cerca de la llama.
+## Se suman a la luz (mezcla aditiva), así que donde no hay luz no se ven. `off=polvo` las quita.
+const CANDLE_DUST_AT := Vector2(229, 650)         ## sobre la llama, en la ilustración (1920×1080)
+func _make_candle_dust() -> GPUParticles2D:
+	var p := GPUParticles2D.new()
+	p.amount = 46
+	p.lifetime = 7.0
+	p.preprocess = 7.0
+	p.position = CANDLE_DUST_AT
+	var m := ParticleProcessMaterial.new()
+	m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+	m.emission_sphere_radius = 120.0
+	m.direction = Vector3(0.15, -1, 0)
+	m.spread = 50.0
+	m.initial_velocity_min = 2.0
+	m.initial_velocity_max = 7.0
+	m.gravity = Vector3(0, -1.2, 0)                 # el aire caliente las sube
+	m.turbulence_enabled = true
+	m.turbulence_noise_scale = 2.5
+	m.turbulence_influence_min = 0.006
+	m.turbulence_influence_max = 0.012
+	m.scale_min = 0.8
+	m.scale_max = 2.2
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.25, 0.75, 1.0])
+	g.colors = PackedColorArray([Color(1, 0.78, 0.45, 0), Color(1, 0.78, 0.45, 0.6), Color(1, 0.7, 0.4, 0.45), Color(1, 0.7, 0.4, 0)])
+	var gt := GradientTexture1D.new()
+	gt.gradient = g
+	m.color_ramp = gt
+	p.process_material = m
+	var img := Image.create(2, 2, false, Image.FORMAT_RGBA8)   # mota de 2 × 2 px, como en la tienda
+	img.fill(Color.WHITE)
+	p.texture = ImageTexture.create_from_image(img)
+	var cm := CanvasItemMaterial.new()
+	cm.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	p.material = cm
+	return p
 
 ## Ceniza que cae despacio por toda la sala, meciéndose. Los copos nacen repartidos por toda
 ## la sala y aparecen y se apagan con un fundido (no dependemos de `preprocess`, que no llegaba

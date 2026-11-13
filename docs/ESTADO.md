@@ -2722,3 +2722,8 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Qué:** al abrir la pausa, la partida se desenfoca detrás del velo en 0,25 s (`pause_blur.gdshader`: la pantalla de debajo leída de sus mipmaps, `lod` 1,9, dos lecturas mezcladas, algo oscurecida y fría). Se adivinan las formas (fuente, faroles), no los detalles. Calidad: `pause_blur` en `data/quality.json` (Baja no; Media, Alta y Ultra sí). Solo la pausa: la subida de nivel y la pantalla final siguen viendo la partida tal cual (hay que ver lo que pasa).
 - **Captura:** `pause_at=6,3 halt_shots=true` ahora también captura la pausa (antes solo las paradas en red): `level=p2_n2 bot=smart god=true cfg_quality=2 pause_at=6,3 halt_shots=true tag=_pausa quit_after=12` → `shots/game__pausa_parada1.png`.
 
+### 20.11: polvo en la luz de la vela (13-11-2026)
+
+- **Qué:** en la portada, unas 46 motas doradas suben despacio y se mecen en la luz de la vela del escritorio (`TitleScreen._make_candle_dust`, `CANDLE_DUST_AT`): nacen y mueren con un fundido, con mezcla aditiva (donde no hay luz no se ven). Se suman a la ceniza gris que cae por toda la sala. La tienda ya tenía su polvo en la luz del quinqué (2.13d), que ahora se mueve con el paralaje (20.8). `off=polvo` las quita.
+- **Captura:** `title off=titulo,aviso,niebla_titulo shots=6 tag=_polvo` → `shots/titulo__polvo_006.0s.png`.
+
