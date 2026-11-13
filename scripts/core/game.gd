@@ -1337,7 +1337,11 @@ func _epilogue() -> void:
 	if net_game != null: Net.close()                     # la campaña ha terminado: se deja la sala
 	get_tree().change_scene_to_file("res://scenes/relato.tscn")
 
+var _quitting := false                            ## la vela ya se está apagando (hito 20.3)
+
 func _quit() -> void:
+	if _quitting: return
+	_quitting = true
 	if level != null and Expedition.is_expedition(String(level.id)): GameSession.expedition = {}   # se abandona (16.21)
 	Saves.save()
 	get_tree().paused = false
@@ -1348,11 +1352,14 @@ func _quit() -> void:
 		TitleScreen.reopen_online = true
 		get_tree().change_scene_to_file("res://scenes/title.tscn")
 		return
-	if Saves.slot < 0:
-		get_tree().quit()
-		return
-	TitleScreen.skip_to_menu = true
-	get_tree().change_scene_to_file("res://scenes/title.tscn")
+	get_tree().paused = true                          # quieta mientras se apaga la vela (hito 20.3)
+	CandleOut.play(self, func() -> void:
+		get_tree().paused = false
+		if Saves.slot < 0:
+			get_tree().quit()
+			return
+		TitleScreen.skip_to_menu = true
+		get_tree().change_scene_to_file("res://scenes/title.tscn"))
 
 func _summary() -> PackedStringArray:
 	var t := int(director.time) if director != null else 0

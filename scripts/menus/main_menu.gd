@@ -185,7 +185,7 @@ func _ask_quit() -> void:
 	c.answered.connect(func(yes: bool) -> void:
 		if yes:
 			Saves.save()
-			get_tree().quit())
+			CandleOut.play(self, get_tree().quit))           # la vela se apaga (hito 20.3)
 	_push(c, _buttons.size() - 1)
 
 ## Las ventanas sencillas se cierran con B / Esc.

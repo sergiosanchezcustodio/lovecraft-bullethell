@@ -806,6 +806,23 @@ def copy_kenney(src):
     print('kenney:', sum(len(v) for v in KENNEY.values()), 'archivos')
 
 
+def vela():
+    """La vela que se apaga (hito 20.3): un soplo corto (ruido grave filtrado que sube y cae), el
+    chisporroteo de la mecha al morir y un siseo fino del humo que se va."""
+    r = np.random.default_rng(2003)
+    d = 0.75
+    tt = t(d)
+    puff_env = np.clip(tt / 0.04, 0, 1) * np.exp(-np.maximum(tt - 0.04, 0) / 0.09)
+    x = lp(r.standard_normal(len(tt)), 700, 3) * puff_env * 1.0            # el soplo
+    x += bp(r.standard_normal(len(tt)), 900, 2600) * puff_env * 0.25
+    for s in np.sort(r.uniform(0.08, 0.22, 4)):                              # la mecha: chasquidos secos
+        i = int(s * SR); m = int(r.uniform(0.003, 0.008) * SR)
+        x[i:i + m] += hp(r.standard_normal(m), 2000) * np.exp(-np.arange(m) / (0.0015 * SR)) * r.uniform(0.15, 0.35)
+    hiss_env = np.clip((tt - 0.12) / 0.08, 0, 1) * np.exp(-np.maximum(tt - 0.2, 0) / 0.2)
+    x += hp(r.standard_normal(len(tt)), 5000) * hiss_env * 0.06                # el humo
+    save('candle_out', x)
+
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
@@ -814,6 +831,8 @@ if __name__ == '__main__':
     elif '--buzo' in sys.argv:                                 # vestuario (fase 14): la respiración del casco de
         respiracion_buzo()                                     # buzo y el chisporroteo de la linterna
         chispas_linterna()
+    elif '--vela' in sys.argv:                                 # solo la vela que se apaga (hito 20.3)
+        vela()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)
@@ -823,5 +842,6 @@ if __name__ == '__main__':
     else:
         synth()
         ambiente()
+        vela()
         if len(sys.argv) > 1: copy_kenney(sys.argv[1])
     print('listo en', OUT)

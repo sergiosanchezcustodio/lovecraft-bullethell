@@ -907,6 +907,7 @@
 				"diver_breath.wav"
 			]
 		},
+		"candle_out": {"db": -12, "pitch": [0.95, 1.05], "voices": 1, "gap": 0.3, "files": ["candle_out.wav"]},
 		"torch_crackle": {
 			"db": -22,
 			"pitch": [

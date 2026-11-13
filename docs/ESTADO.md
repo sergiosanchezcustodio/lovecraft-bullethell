@@ -2677,3 +2677,9 @@ PC libre (nada por encima del 1 % de CPU). Copia de antes de la fase 17 (ca5b6cf
 - **Hoja:** `godot --path . -s tools/probar_pagina.gd` → `shots/pagina_hoja.png` (la ventana a 85, 65, 45, 25 y 0 % del giro). Las capturas de la portada (`shots=`) van de 0,1 en 0,1 s y no cazan los 0,3 s del giro.
 - **Tests:** `tests/test_menu_page.gd` (empieza girada sobre el borde izquierdo y acaba plana y con su color; en la partida, sin girar); `test_ventana_que_no_cabe` mide sin el giro.
 
+### 20.3: la vela se apaga (13-11-2026)
+
+- **Qué:** al salir del juego (menú principal, «Salir») y al volver de la partida al menú principal o salir desde ella (`Game._quit`: pausa, pantalla final, `quit_at=`), la oscuridad se cierra hacia una llama en el centro, que tiembla, se encoge y se apaga dejando un hilo de humo que sube con su vaivén; después, la escena o la salida. `CandleOut` (`scripts/ui/candle_out.gd`, sombreador `candle_out.gdshader`), 0,7 s; cualquier botón lo acaba. La partida se queda en pausa mientras tanto (`_quitting` evita una segunda llamada). En red se sale como antes, sin vela (hay que cerrar la sala ya).
+- **Sonido:** `candle_out` (soplo, chasquidos de la mecha y siseo del humo), sintetizado en `tools/gen_sfx.py` (`--vela`), en `data/sfx.json`.
+- **Hoja:** `godot --path . -s tools/probar_vela.gd -- [fondo=…]` → `shots/vela_hoja.png` (a 20, 45, 60, 70, 78, 86, 94 y 100 %).
+
