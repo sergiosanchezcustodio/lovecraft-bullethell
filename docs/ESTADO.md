@@ -3260,3 +3260,47 @@ Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden:
   - **Miniatura del mapa** en la ventana de las noches sueltas: junto a la presentación, con marco de latón y oscurecida si la noche está cerrada (`NightsMenu._show_map`).
   - **Logro «Sin tocar el color»** (`data/achievements/31_sin_tocar_el_color.tres`, 400 $, icono del jefe): superar la noche sin que nadie de este PC pise el color (`ColorBlight.touched`; los bots no cuentan). Estadística `color_untouched`.
   - Tests: 12 en `test_nights.gd` (pisar el color quita el logro salvo a los bots; el logro y el consejo).
+
+### 21.14: *El horror de Dunwich* (14-11-2026)
+
+- **Sentinel Hill** (`tools/gen_arena_dunwich.py`, `data/arenas/dunwich.json`): 64 × 64 m de hierba oscura y barro, con el camino que baja de la granja.
+  - En el centro, un poco al norte, el círculo de diez menhires (radio 8,5 m, con un hueco al sur para entrar) y la mesa del altar, con dos hogueras.
+  - Al noroeste, la granja de los Whateley (`inn_casa_2` y un granero a ¾), de donde sale el jefe; tres árboles partidos marcan el rastro que deja al bajar.
+  - Bosque de abetos y robles al norte y al oeste, muros de piedra seca al sur y al este (con huecos), rocas y matas sueltas.
+  - Tormenta (`data/weather/tormenta_dunwich.tres`): lluvia 0,3, niebla 0,25, nubes 0,5 y un rayo cada 14 s de media.
+  - Luz de luna fría con `gamma` 1,65: mediana de brillo de 0,15-0,20 en las capturas de partida (con 1,45 daba 0,10-0,17).
+  - Ambiente propio en `data/ambient.json` (`dunwich`): pisa en barro, murciélagos y pájaros que salen de los árboles con los ruidos fuertes. La granja del 21.13 no tenía entrada y pisaba «en la nieve»: ahora la tiene (`granja`, barro y cuervos).
+- **Decorado nuevo** (`tools/gen_atrezo_dunwich.py`, `models/dun_*.json`, 11 modelos): dos abetos de pisos, un roble de copa ancha, tres menhires con liquen y musgo al pie, el altar (losa sobre dos piedras, con mancha, cabos de vela y ceniza), una roca, un árbol partido (tocón astillado y tronco caído), una mata (se rompe: `decor_break.json`, madera) y el pulverizador de latón con cardenillo, bomba y manguera.
+- **Lo que no se ve** (`Unseen`, `scripts/level/unseen.gd`; datos en `LevelData.powder_*`):
+  - **Huellas:** cada enemigo con `unseen` que no se ve deja un hoyo redondo cada `print_step` m, a un lado y a otro (`unseen_print.gdshader`: a bloques de 1/8 m, hoyo oscuro y reborde roto de barro, con luz como el suelo). Cada paso suena (`horror_step`), levanta polvo, hace temblar la cámara cerca y rompe lo que pisa (`DecorBreak.blast`, en el anfitrión). Hasta 64 a la vez, 14 s cada una. Las hace cada PC con lo que ve, también con las marionetas del invitado. Lo oculto (`Enemy.buried`) ya no deja las huellas corrientes de `Ambient`.
+  - **El polvo de Ibn Ghazi:** pulverizadores que aparecen a 4-9 m de un jugador al azar cada 18 s (cada 10 s con el jefe suelto), hasta 2 a la vez, y duran 30 s. Quien pasa por encima lo suelta: una nube de 8 m que descubre 6 s lo que no es de este mundo (`Enemy.reveal`, +25 % de daño; las devotas, que son humanas, no) y sale el rótulo «El polvo de Ibn Ghazi». Armitage, que lo prepara en el relato, lo suelta más lejos y le dura más (×1,5). Sonido `powder_spray`. Los bots van a por ellos (grupo `pickups`).
+  - **Los chotacabras se llevan a los caídos:** cada uno a menos de 2,2 m de un caído hace que su tiempo corra un 60 % más deprisa (`Player.down_haste`, hasta el triple). Si se le acaba con ellos alrededor, «Los chotacabras se llevan su alma» y una luz que sube.
+  - En red, los pulverizadores, quién los recoge y el rayo del final los decide el anfitrión (suceso «powder»: `add`, `use`, `bolt`); las huellas y lo de los caídos, cada PC con sus jugadores. Sin probar aún con dos ventanas.
+- **Las criaturas** (`tools/gen_noche_dunwich.py`):
+  - **Chotacabras** (escalón 1, `anim_volador`): pardo y gris con el collar y las puntas de la cola blancos y los ojos rojizos. `FlockBehavior` (`scripts/enemies/flock_behavior.gd`): vuela a 1,5 m, ronda a su presa a 3,5-5,5 m y cada 3,5-6 s se para en el aire 0,4 s (el aviso) y se lanza en picado; solo toca en picado y, al tocar, remonta. Huele la muerte: va a por el caído más cercano y, si no lo hay, a por quien tenga menos de un tercio de la vida, algo más deprisa. Alrededor de un caído da vueltas muy cerca y canta más a menudo (`whippoorwill`).
+  - **Devota de las colinas** (escalón 2, humana a bloques): albina como Lavinia, con el pelo blanco revuelto y los ojos rojos, chal oscuro cruzado, vestido pardo remendado y roto, descalza y con un amuleto de piedra. Persigue y murmura (`devota_susurro`: cinco en abanico, mentales).
+  - **El hermano de Wilbur** (jefe, `anim_fragmento`, escala 2,6, 1300 de vida): como lo vio Curtis Whateley con el catalejo. Un huevo de cuerdas con anillos azulados y morados, ocho patas como toneles, dieciséis ojos saltones, cinco trompas a cada lado con la boca oscura y, arriba, media cara de Whateley con el pelo blanco, la otra mitad fundida con las cuerdas. Su aura quita cordura.
+- **El jefe** (`HorrorBehavior`, `scripts/enemies/horror_behavior.gd`):
+  - A los 4 minutos sale de la granja (`from`) rompiendo lo que tiene delante y va a por el jugador más cercano.
+  - No se ve: oculto (`buried`, fuera de la rejilla, no se le apunta ni se le da) y con el modelo escondido. Lo delatan sus huellas, lo que rompe, sus avisos y las balas que salen de donde está. Pisa aunque no se vea.
+  - Lo descubre lo que revela: el polvo, la Máquina del más allá de Tillinghast y las ondas que sacan a los ocultos. Mientras dura se ve, se le puede dar y va a un 60 % de su paso (`reveal_slow`).
+  - Ataques: pisotón con aviso bajo el jugador si lo tiene a menos de 5 m (cada 3,5 s, 20 de daño en 3 m, deja su huella) y las bocas cada 5 s (`horror_bocas`: anillos de 20 que giran, con huecos). Los movimientos de los grandes (salto y erupción) también.
+  - Por debajo de la mitad, «¡Ayuda! ¡Ayuda!…» y tres chotacabras cada 9 s; por debajo del 20 %, el conjuro y todo más deprisa.
+  - Al morir, un rayo cae sobre él (`Weather.strike_now`, el destello del clima, y un rayo de tramos) y grita «¡Padre! ¡Padre! ¡Yog-Sothoth!».
+- **El relato:** cuatro frases (las hogueras del viejo Whateley, la muerte de Wilbur en la biblioteca, lo que baja de la granja sin verse y el polvo de Armitage), con el cielo de tormenta. Textos del bestiario y del lugar.
+- **Música:** la de `p1_n2`, y la del jefe, `jefe_heavy_battle`. Se abre al superar `p2_n5`.
+- **Sonidos** (`gen_sfx.py --dunwich`):
+  - `whippoorwill`, dos variantes: «whip-poor-WILL», tres notas silbadas con la última que sube de golpe y eco de monte.
+  - `horror_step`, dos variantes: un golpe hondo que baja, barro que chapotea y astillas.
+  - `powder_spray`: el clac de la bomba y un soplido de polvo.
+  - `horror_cry`: un mugido enorme que baja, con bocas que chillan encima.
+- **Consejos** (`data/tutorial.json`): el primer pulverizador («pásale por encima…», disparo `powder`) y lo invisible ya suelto («No se ve, pero está: sigue sus huellas…», disparo `unseen`).
+- **Equilibrio** (`simular.py noche_dunwich --n 2 --ts 2`, dificultad 3): al principio el bot caía a los 56 y 158 s, casi todo por los chotacabras (picados sin aviso). Con el aviso, un golpe por picado, picados cada 3,5-6 s y algo menos de vida, velocidad y daño (12, 3,2 y 5), caía a los 194 y 394 s, sin poder dar al jefe. Con el bot yendo a por los pulverizadores, 1 de 2 superadas (342 s, vida mínima 42 %). La noche del color, medida igual como referencia: 1 de 2 (258 s).
+- **Comprobado en partida** (Dyer con bot, `cfg_quality=2`):
+  - Las huellas del jefe sin verse, los pisotones con aviso y las bocas disparando desde la nada.
+  - El polvo lo descubre (tinte de lo revelado) y, al caer, el rayo y el grito.
+  - Con `bots=1 down_at=6`, los chotacabras rodean al caído hasta que el J2 lo reanima.
+  - Los dos consejos, el relato con su cielo y la ventana de las noches con la nueva y su mapa (`nights_row=1`).
+- **Opciones nuevas:** `powder_here=T` (un pulverizador junto al J1 cada T s) y `nights_row=N` (la ventana de las noches con la noche N marcada).
+- **Tests** (`tests/test_dunwich.gd`, 14; 953 de 953 en total): la noche y su nivel; el polvo descubre lo de otro mundo (no a las devotas) y da más daño; Armitage lo suelta más lejos; los pulverizadores aparecen cerca y se acaban; en el invitado llegan del anfitrión (también el rayo); lo que no se ve deja huellas y lo que se ve no; tope de las huellas; los chotacabras apuran a los caídos y se llevan su alma; a quién van; vuelan; el jefe sale de la granja sin verse, se descubre y va más despacio; sus fases; el rayo al morir; el rayo a demanda del clima.
+- **Capturas:** `shots/game_dunf_009.0s.png` a `_030.0s.png` (el jefe con el polvo, `powder_here=6 final_at=4`) y `shots/seleccion_noches21_002.5s.png` (la ventana).

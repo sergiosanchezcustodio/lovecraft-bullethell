@@ -1191,6 +1191,80 @@ def color():
     save('color_rise', tail(dry * 0.7 + wet * 0.5, 1.0))
 
 
+def dunwich():
+    """El horror de Dunwich (hito 21.14). El chotacabras: «whip-poor-WILL», tres notas silbadas (la
+    última sube de golpe), con algo de eco de monte; dos variantes. El paso de lo que no se ve: un golpe
+    hondo que baja, barro que chapotea y astillas. El pulverizador: el clac de la bomba y un soplido de
+    polvo. El grito del hermano de Wilbur: un mugido enorme que baja, con bocas que chillan encima."""
+    r = np.random.default_rng(2114)
+
+    def tail(x, sec=0.3):
+        n = min(len(x) // 3, int(sec * SR))
+        x[-n:] *= np.linspace(1, 0, n) ** 2
+        return x
+
+    def verb(dry, sec=1.6, decay=0.6, k=0.45, cut=2500):
+        ir = lp(r.standard_normal(int(sec * SR)), cut) * np.exp(-t(sec) / decay)
+        wet = signal.fftconvolve(dry, ir)[:len(dry)]
+        wet *= np.std(dry) / (np.std(wet) + 1e-9)
+        return dry + wet * k
+
+    def whistle(f, amp):
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        return (np.sin(ph) + 0.18 * np.sin(2 * ph)) * amp
+
+    for k in range(2):
+        d = 1.5
+        tt = t(d)
+        x = np.zeros(len(tt))
+        sc = 1.0 + 0.06 * k
+        # (inicio, duración, frecuencia de partida, de llegada, volumen)
+        for t0, dur, f0, f1, a in ((0.05, 0.12, 1500, 2300, 0.8), (0.24, 0.1, 1350, 1250, 0.55), (0.42, 0.26, 1150, 2900, 1.0)):
+            m = (tt >= t0) & (tt < t0 + dur)
+            u = (tt[m] - t0) / dur
+            f = np.full(len(tt), 1.0)
+            f[m] = (f0 + (f1 - f0) * u ** 1.6) * sc
+            e = np.zeros(len(tt))
+            e[m] = np.sin(np.pi * u) ** 0.6
+            x += whistle(f, a) * e
+        save('whippoorwill_%d' % k, tail(verb(x, 1.4, 0.45, 0.35, 4000), 0.4))
+
+    for k in range(2):
+        d = 1.0
+        tt = t(d)
+        boom = np.sin(2 * np.pi * np.cumsum(52 * (1 - 0.45 * np.clip(tt / 0.4, 0, 1)) * (1 + 0.08 * k)) / SR)
+        boom *= np.minimum(tt / 0.006, 1) * np.exp(-tt / 0.28) * 1.4
+        thud = lp(noise(d), 180, 4) * np.minimum(tt / 0.003, 1) * np.exp(-tt / 0.12) * 2.0
+        squelch = bp(r.standard_normal(len(tt)), 300, 1400) * np.exp(-np.maximum(tt - 0.06, 0) / 0.09) * (tt > 0.05) * 0.45
+        crack = (r.random(len(tt)) < 0.003 * np.exp(-tt / 0.2)) * r.uniform(-1, 1, len(tt))
+        x = boom + thud + squelch + hp(crack, 2500) * 0.8
+        save('horror_step_%d' % k, tail(x, 0.3))
+
+    d = 1.1
+    tt = t(d)
+    clank = bp(r.standard_normal(len(tt)), 1800, 5200) * np.exp(-tt / 0.02) * 0.9
+    clank += np.sin(2 * np.pi * 2300 * tt) * np.exp(-tt / 0.06) * 0.3
+    hiss = bp(r.standard_normal(len(tt)), 1500, 7500) * np.clip((tt - 0.05) / 0.05, 0, 1) * np.exp(-np.maximum(tt - 0.15, 0) / 0.3)
+    puff = lp(r.standard_normal(len(tt)), 600) * np.clip((tt - 0.05) / 0.04, 0, 1) * np.exp(-np.maximum(tt - 0.1, 0) / 0.2) * 1.2
+    save('powder_spray', tail(clank + hiss * 0.7 + puff, 0.3))
+
+    d = 2.6
+    tt = t(d)
+    f = 78 * (1 - 0.4 * np.clip(tt / 2.2, 0, 1)) * (1 + 0.03 * np.sin(2 * np.pi * 4.5 * tt))
+    moan = np.zeros(len(tt))
+    for h, a in ((1, 1.0), (2, 0.6), (3, 0.45), (4, 0.3), (5, 0.2), (7, 0.12)):
+        moan += np.sin(2 * np.pi * np.cumsum(f * h) / SR) * a
+    moan *= 1 + 0.5 * lp(r.standard_normal(len(tt)), 30)
+    moan = bp(moan, 60, 1600) * np.minimum(tt / 0.25, 1) * np.exp(-np.maximum(tt - 1.6, 0) / 0.4)
+    squeal = np.zeros(len(tt))
+    for f0, t0 in ((620, 0.2), (810, 0.45), (540, 0.7)):
+        u = np.clip(tt - t0, 0, None)
+        ff = f0 * (1 + 0.25 * np.sin(2 * np.pi * 6.5 * tt + f0)) * (1 - 0.3 * np.clip(u / 1.5, 0, 1))
+        squeal += np.sin(2 * np.pi * np.cumsum(ff) / SR) * (tt > t0) * np.minimum(u / 0.15, 1) * np.exp(-u / 0.8) * 0.22
+    x = verb(moan + squeal, 2.2, 0.8, 0.5, 1800)
+    save('horror_cry', tail(x, 0.8))
+
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
@@ -1213,6 +1287,8 @@ if __name__ == '__main__':
         revelaciones()
     elif '--color' in sys.argv:                                # solo los del color que cayó del cielo (hito 21.13)
         color()
+    elif '--dunwich' in sys.argv:                              # solo los de Dunwich (hito 21.14)
+        dunwich()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)

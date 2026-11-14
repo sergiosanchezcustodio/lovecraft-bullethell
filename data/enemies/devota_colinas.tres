@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/devota_susurro.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"devota_colinas"
+display_name = "Devota de las colinas"
+model = "devota_colinas"
+tier = 2
+spawn_weight = 0.9
+elite = false
+tags = Array[StringName]([&"humana"])
+max_health = 36.0
+hit_radius = 0.4
+body_radius = 0.4
+move_speed = 1.9
+xp = 2.0
+money = 3
+contact_physical = 4.0
+contact_mental = 4.0
+movement = &"chase"
+attack = ExtResource("2")
+attack_cooldown = 4.0
+attack_range = 8.5
+attack_anim = "cast"

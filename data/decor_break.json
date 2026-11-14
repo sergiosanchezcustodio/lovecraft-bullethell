@@ -20,6 +20,7 @@
 		"prv_muro_bajo": "stone", "prv_escultura_1": "stone", "prv_escultura_2": "stone", "prv_sacos": "wood", "prv_caballete": "wood", "prv_mesa": "wood",
 		"alr_fardos": "wood", "alr_rollo": "wood",
 		"lui_poste": "wood", "lui_piragua": "wood",
-		"rly_bloque": "heavy", "rly_monolito": "heavy", "rly_muro": "stone"
+		"rly_bloque": "heavy", "rly_monolito": "heavy", "rly_muro": "stone",
+		"dun_arbusto": "wood"
 	}
 }

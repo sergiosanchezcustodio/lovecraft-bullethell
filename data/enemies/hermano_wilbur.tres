@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/horror_bocas.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/chotacabras.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = &"hermano_wilbur"
+display_name = "El hermano de Wilbur"
+model = "hermano_wilbur"
+model_scale = 2.6
+unique = true
+tier = 5
+spawn_weight = 1.0
+elite = true
+max_health = 1300.0
+hit_radius = 1.9
+body_radius = 1.7
+move_speed = 2.0
+xp = 60.0
+money = 150
+contact_physical = 16.0
+contact_mental = 4.0
+aura_radius = 4.5
+aura_drain = 1.5
+movement = &"horror"
+params = {"death_text": "¡Padre! ¡Padre! ¡Yog-Sothoth!", "from": Vector2(-21, -29.5), "minion": ExtResource("3"), "minion_count": 3, "minion_every": 9.0, "mouth_every": 5.0, "phase_text_2": "¡Ayuda! ¡Ayuda!…", "phase_text_3": "Ygnaiih… thflthkh'ngha… ¡Yog-Sothoth!", "print_side": 1.1, "print_size": 0.62, "print_step": 1.6, "reveal_slow": 0.6, "stomp_damage": 20.0, "stomp_every": 3.5, "stomp_radius": 3.0, "stomp_range": 5.0, "unseen": true}
+attack = ExtResource("2")
+attack_cooldown = 99.0
+attack_range = 0.0
+attack_anim = "burst"

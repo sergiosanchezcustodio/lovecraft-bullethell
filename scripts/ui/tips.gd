@@ -3,7 +3,8 @@ extends CanvasLayer
 ## Consejos de la primera partida y leyenda de los avisos (hito 13.3, fase 13). Un cartel abajo,
 ## en el centro, cuando pasa algo por primera vez (moverse, esquivar, la primera gema, la primera
 ## subida, la cordura baja, el primer baúl, la primera élite, el enemigo final, un compañero
-## caído, la pausa, la ficha, la primera vez en el color de la noche suelta del 21.13); y, junto al primer aviso en el suelo de cada tipo (golpe, cordura,
+## caído, la pausa, la ficha, la primera vez en el color de la noche suelta del 21.13, el polvo de
+## Ibn Ghazi y lo que no se ve del 21.14); y, junto al primer aviso en el suelo de cada tipo (golpe, cordura,
 ## los dos, algo que va a salir, grieta), una etiqueta corta. Cada uno, una vez por hueco
 ## (`SaveData.seen["tips"]`). Textos en `data/tutorial.json`. Configuración > Juego > «Consejos»
 ## los quita y «Volver a ver los consejos» los repone. Sin hueco o con bots, no sale nada; para
@@ -145,6 +146,10 @@ func _happened(t: Dictionary) -> bool:
 		"blight":                                            # el color de la granja (21.13)
 			for q: Player in players:
 				if not q.remote and q.blight_t > 0.0: return true
+		"powder":                                            # Sentinel Hill (21.14): el primer pulverizador
+			return Unseen.current != null and not Unseen.current.sprayers.is_empty()
+		"unseen":                                            # lo que no se ve, ya suelto
+			return Unseen.current != null and Unseen.current.unseen_alive()
 	return false
 
 func _show(id: String) -> void:

@@ -1,7 +1,7 @@
 {
 	"_doc": "Cielos de los relatos (hito 16.35, RelatoScreen, scripts/title/relato_sky.gdshader). parts: el de cada parte; levels: los niveles que llevan otro. skies: los parámetros de cada cielo (mode 0 luna y nubes, 1 aurora, 2 tormenta, 3 R'lyeh; colores top, horizon, cloud_dark, cloud_lit, moon, glow_a y glow_b; cover, cuánto tapan las nubes, de 0,3 a 0,7; moon_pos, dónde está la luna, en fracción de la pantalla). sky=luna|aurora|tormenta|rlyeh en el relato lo cambia para probar.",
 	"parts": {"p1": "aurora", "p2": "luna", "p3": "luna"},
-	"levels": {"p1_n5": "luna_baja", "p2_n2": "tormenta", "p2_n5": "luna_verde", "p3_n4": "tormenta", "p3_n5": "rlyeh", "noche_color": "el_color", "epilogo": "luna", "epilogo_locura": "rlyeh"},
+	"levels": {"p1_n5": "luna_baja", "p2_n2": "tormenta", "p2_n5": "luna_verde", "p3_n4": "tormenta", "p3_n5": "rlyeh", "noche_color": "el_color", "noche_dunwich": "tormenta", "epilogo": "luna", "epilogo_locura": "rlyeh"},
 	"skies": {
 		"luna": {"mode": 0, "top": [0.02, 0.03, 0.07], "horizon": [0.1, 0.11, 0.17], "cloud_dark": [0.05, 0.06, 0.09], "cloud_lit": [0.3, 0.32, 0.4], "moon": [0.92, 0.9, 0.8], "cover": 0.54, "moon_pos": [0.76, 0.14]},
 		"luna_baja": {"mode": 0, "top": [0.01, 0.02, 0.04], "horizon": [0.05, 0.08, 0.11], "cloud_dark": [0.03, 0.05, 0.07], "cloud_lit": [0.22, 0.28, 0.34], "moon": [0.75, 0.85, 0.9], "cover": 0.5, "moon_pos": [0.18, 0.2]},

@@ -96,6 +96,12 @@
 		"Las manzanas crecieron grandes y amargas, las vacas se volvieron grises y se deshacían al tocarlas. La familia, una a una, también.",
 		"Esta noche el pozo brilla. Y un color que nadie sabe nombrar se extiende por los campos."
 	],
+	"noche_dunwich": [
+		"En Dunwich no se habla de los Whateley. El viejo encendía hogueras en Sentinel Hill la víspera de mayo y por Todos los Santos, y algo le contestaba desde debajo de la tierra.",
+		"Wilbur murió en la biblioteca de la Universidad de Miskatonic, despedazado por un perro guardián, y lo que quedó de él no era de este mundo.",
+		"Pero en la granja había otra cosa. Más grande. Ha reventado la casa y baja por el monte partiendo los árboles, y no se le ve: solo las huellas, grandes como toneles.",
+		"El doctor Armitage ha traído el polvo de Ibn Ghazi y las palabras del libro. Los chotacabras cantan en la colina, esperando un alma."
+	],
 	"epilogo": [
 		"La isla volvió a hundirse antes del amanecer, y el mar cerró la herida como si nunca hubiera existido.",
 		"{nombre} regresó a Arkham en otoño. La Universidad de Miskatonic archivó su informe en una sección que no figura en ningún catálogo.",

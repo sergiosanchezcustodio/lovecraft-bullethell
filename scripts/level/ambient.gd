@@ -1100,7 +1100,7 @@ func _enemy_prints(delta: float) -> void:
 		if n >= 48: break
 		if not is_instance_valid(e) or not e.is_alive() or e.get("data") == null: continue
 		var d = e.data
-		if d.ethereal or d.movement == &"dive" or e.global_position.y > 0.15 or e.rising(): continue
+		if d.ethereal or d.movement == &"dive" or e.global_position.y > 0.15 or e.rising() or e.get("buried") == true: continue   # lo oculto, sin huellas (lo que no se ve de 21.14 deja las suyas)
 		n += 1
 		var id: int = e.get_instance_id()
 		var pos: Vector3 = e.global_position

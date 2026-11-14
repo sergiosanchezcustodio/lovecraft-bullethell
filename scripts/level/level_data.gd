@@ -77,6 +77,16 @@ func is_survival() -> bool:
 @export var blight_life := 40.0                ## s que dura cada una
 @export var blight_sanity := 2.0               ## cordura por segundo que quita a los de dentro
 @export var blight_enemy := 0.5                ## daño de más que reciben los enemigos agrisados
+@export_group("Lo que no se ve (hito 21.14)")
+## El polvo de Ibn Ghazi (Unseen): pulverizadores que aparecen cerca de los jugadores; quien pasa por
+## encima lo suelta y lo que no es de este mundo que hay en la nube se descubre. 0 en powder_every:
+## ninguno. Las huellas de los invisibles (`unseen`) y lo de los chotacabras van aparte.
+@export var powder_every := 0.0                ## s medios entre pulverizadores
+@export var powder_final_every := 0.0          ## lo mismo con lo invisible suelto (0: como powder_every)
+@export var powder_max := 2                    ## pulverizadores a la vez
+@export var powder_life := 30.0                ## s que dura cada uno si nadie lo recoge
+@export var powder_reveal := 7.0               ## s que dura lo que descubre
+@export var powder_radius := 8.0               ## m de la nube
 @export_group("Dinero (D-31)")
 @export var money_bonus := 100                 ## dólares al superar el nivel
 @export var chest_every := 90.0                ## s medios entre baúles arcanos (0: ninguno)

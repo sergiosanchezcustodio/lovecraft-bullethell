@@ -455,6 +455,13 @@ func _lightning(delta: float) -> void:
 	if env: env.ambient_light_energy = _base_ambient + k * FLASH_AMBIENT
 	for m in _mist: m.set_shader_parameter("flash", k)
 
+## Un rayo ahora (el final del hermano de Wilbur, hito 21.14): el destello, si este clima tiene rayos.
+func strike_now() -> void:
+	if data == null or data.lightning_every <= 0.0: return
+	_bolt_t = 0.0
+	lightning_count += 1
+	_next_bolt = data.lightning_every * _rng.randf_range(0.5, 1.5)
+
 ## Trueno (sin lugar: suena en el centro). Sfx se busca al usarlo (ver Ambient.autoload).
 func _thunder() -> void:
 	var sfx := Ambient.autoload("Sfx")

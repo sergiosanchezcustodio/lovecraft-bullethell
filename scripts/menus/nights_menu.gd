@@ -28,6 +28,8 @@ func _ready() -> void:
 	var dev := OS.is_debug_build()
 	var first: Button = null
 	var prev: Button = null
+	var want := LaunchArgs.from_cmdline().get_int("nights_row", 0)   # capturas: la noche N marcada
+	var row_i := 0
 	for n: Dictionary in Nights.all():
 		var id := String(n.id)
 		var open := Nights.unlocked(Saves.current, id)
@@ -51,7 +53,8 @@ func _ready() -> void:
 			b.focus_neighbor_top = b.get_path_to(prev)
 			prev.focus_neighbor_bottom = prev.get_path_to(b)
 		prev = b
-		if first == null and not b.disabled: first = b
+		if not b.disabled and (first == null or row_i == want): first = b
+		row_i += 1
 	var row := HBoxContainer.new()                 # la miniatura del mapa y, a su lado, la presentación
 	row.add_theme_constant_override("separation", 26)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER

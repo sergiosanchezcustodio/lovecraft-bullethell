@@ -1,0 +1,1288 @@
+{
+ "name": "Sentinel Hill",
+ "spawn": [
+  0.0,
+  9.0
+ ],
+ "farm": [
+  -21.0,
+  -29.5
+ ],
+ "ground": {
+  "seed": 41,
+  "tile": 0.5,
+  "margin_back": 14.0,
+  "margin_front": 18.0,
+  "camp_radius": 0.0,
+  "kind": "mud",
+  "wet": 0.0,
+  "road": [
+   -21.0,
+   -28.0,
+   0.45,
+   0.89,
+   2.2
+  ],
+  "colors": {
+   "base_hi": [
+    0.25,
+    0.28,
+    0.18
+   ],
+   "base_lo": [
+    0.13,
+    0.15,
+    0.1
+   ],
+   "moss": [
+    0.19,
+    0.25,
+    0.12
+   ],
+   "puddle": [
+    0.08,
+    0.09,
+    0.08
+   ]
+  }
+ },
+ "light": {
+  "sun_rot": [
+   -38,
+   40
+  ],
+  "sun_color": [
+   0.62,
+   0.68,
+   0.84
+  ],
+  "sun_energy": 0.42,
+  "exposure": 1.25,
+  "ambient_color": [
+   0.4,
+   0.44,
+   0.5
+  ],
+  "ambient_energy": 0.45,
+  "background": [
+   0.06,
+   0.07,
+   0.09
+  ],
+  "fog_color": [
+   0.2,
+   0.22,
+   0.26
+  ],
+  "fog_density": 0.0,
+  "gamma": 1.65
+ },
+ "lamp": {
+  "color": [
+   1.0,
+   0.62,
+   0.32
+  ],
+  "energy": 2.6,
+  "range": 9.0
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_bloques_hielo_2": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_bloques_hielo_3": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_roca_nevada": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.4
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "inn_casa_2": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "granja_granero": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "granja_muro": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "dun_abeto_1": {
+   "type": "cylinder",
+   "radius": 1.1
+  },
+  "dun_abeto_2": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "dun_roble": {
+   "type": "cylinder",
+   "radius": 0.45
+  },
+  "dun_menhir_1": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "dun_menhir_2": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "dun_menhir_3": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "dun_altar": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "dun_roca": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "dun_arbol_partido": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "dun_arbusto": {
+   "type": "cylinder",
+   "radius": 0.55
+  },
+  "lui_hoguera": {
+   "type": "cylinder",
+   "radius": 0.55
+  }
+ },
+ "size": [
+  64.0,
+  64.0
+ ],
+ "props": [
+  {
+   "model": "dun_altar",
+   "pos": [
+    0.0,
+    -4.0
+   ],
+   "rot": 8,
+   "scale": 1.0
+  },
+  {
+   "model": "dun_menhir_1",
+   "pos": [
+    2.39,
+    -12.16
+   ],
+   "rot": 154.8,
+   "scale": 1.13
+  },
+  {
+   "model": "dun_menhir_2",
+   "pos": [
+    6.42,
+    -9.57
+   ],
+   "rot": 133.7,
+   "scale": 0.97
+  },
+  {
+   "model": "dun_menhir_1",
+   "pos": [
+    7.73,
+    -0.47
+   ],
+   "rot": 71.9,
+   "scale": 1.13
+  },
+  {
+   "model": "dun_menhir_2",
+   "pos": [
+    4.6,
+    3.15
+   ],
+   "rot": 42.3,
+   "scale": 0.98
+  },
+  {
+   "model": "dun_menhir_3",
+   "pos": [
+    0.0,
+    4.5
+   ],
+   "rot": 3.0,
+   "scale": 1.0
+  },
+  {
+   "model": "dun_menhir_1",
+   "pos": [
+    -4.6,
+    3.15
+   ],
+   "rot": -37.6,
+   "scale": 1.14
+  },
+  {
+   "model": "dun_menhir_2",
+   "pos": [
+    -7.73,
+    -0.47
+   ],
+   "rot": -72.6,
+   "scale": 1.05
+  },
+  {
+   "model": "dun_menhir_3",
+   "pos": [
+    -8.41,
+    -5.21
+   ],
+   "rot": -96.4,
+   "scale": 1.11
+  },
+  {
+   "model": "dun_menhir_1",
+   "pos": [
+    -6.42,
+    -9.57
+   ],
+   "rot": -132.2,
+   "scale": 1.1
+  },
+  {
+   "model": "dun_menhir_2",
+   "pos": [
+    -2.39,
+    -12.16
+   ],
+   "rot": -168.7,
+   "scale": 1.06
+  },
+  {
+   "model": "lui_hoguera",
+   "pos": [
+    -4.6,
+    -1.8
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "lui_hoguera",
+   "pos": [
+    4.4,
+    -6.6
+   ],
+   "rot": 0,
+   "scale": 0.9
+  },
+  {
+   "model": "inn_casa_2",
+   "pos": [
+    -21.0,
+    -34.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_granero",
+   "pos": [
+    -5.0,
+    -36.5
+   ],
+   "rot": 0,
+   "scale": 0.75
+  },
+  {
+   "model": "dun_arbol_partido",
+   "pos": [
+    -21.0,
+    -24.8
+   ],
+   "rot": 338.3,
+   "scale": 0.95
+  },
+  {
+   "model": "dun_arbol_partido",
+   "pos": [
+    -11.5,
+    -20.73
+   ],
+   "rot": 294.3,
+   "scale": 1.08
+  },
+  {
+   "model": "dun_arbol_partido",
+   "pos": [
+    -14.1,
+    -16.29
+   ],
+   "rot": 92.8,
+   "scale": 1.03
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -13.11,
+    -30.2
+   ],
+   "rot": 268.7,
+   "scale": 1.07
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    -9.11,
+    -25.72
+   ],
+   "rot": 171.5,
+   "scale": 1.03
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    -6.09,
+    -26.12
+   ],
+   "rot": 108.9,
+   "scale": 0.9
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    -2.5,
+    -25.42
+   ],
+   "rot": 296.2,
+   "scale": 1.02
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    0.6,
+    -29.29
+   ],
+   "rot": 223.2,
+   "scale": 1.05
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    1.26,
+    -25.45
+   ],
+   "rot": 212.8,
+   "scale": 1.05
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    3.76,
+    -28.57
+   ],
+   "rot": 92.6,
+   "scale": 1.07
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    6.5,
+    -25.91
+   ],
+   "rot": 20.1,
+   "scale": 1.0
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    8.36,
+    -28.8
+   ],
+   "rot": 352.1,
+   "scale": 1.05
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    10.26,
+    -25.01
+   ],
+   "rot": 170.5,
+   "scale": 0.9
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    12.32,
+    -28.8
+   ],
+   "rot": 159.7,
+   "scale": 1.14
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    14.84,
+    -25.35
+   ],
+   "rot": 161.1,
+   "scale": 1.01
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    16.76,
+    -29.16
+   ],
+   "rot": 156.1,
+   "scale": 1.02
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    16.89,
+    -25.26
+   ],
+   "rot": 185.5,
+   "scale": 0.94
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    19.37,
+    -30.37
+   ],
+   "rot": 185.6,
+   "scale": 1.11
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    22.42,
+    -26.37
+   ],
+   "rot": 218.4,
+   "scale": 1.0
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    23.44,
+    -29.01
+   ],
+   "rot": 212.7,
+   "scale": 1.02
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    26.98,
+    -25.77
+   ],
+   "rot": 264.0,
+   "scale": 0.98
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    27.38,
+    -29.29
+   ],
+   "rot": 218.8,
+   "scale": 1.1
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    29.12,
+    -25.57
+   ],
+   "rot": 100.5,
+   "scale": 1.12
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    31.2,
+    -29.26
+   ],
+   "rot": 244.4,
+   "scale": 1.08
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    34.82,
+    -25.8
+   ],
+   "rot": 15.3,
+   "scale": 1.02
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -28.92,
+    -19.82
+   ],
+   "rot": 265.4,
+   "scale": 0.91
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    -29.48,
+    -16.22
+   ],
+   "rot": 269.8,
+   "scale": 0.99
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    -29.72,
+    -12.59
+   ],
+   "rot": 251.0,
+   "scale": 1.07
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -25.47,
+    -9.44
+   ],
+   "rot": 314.1,
+   "scale": 1.09
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -29.97,
+    -7.2
+   ],
+   "rot": 341.4,
+   "scale": 1.07
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -29.53,
+    -3.07
+   ],
+   "rot": 172.4,
+   "scale": 0.95
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -25.7,
+    -2.62
+   ],
+   "rot": 259.9,
+   "scale": 1.04
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    -28.89,
+    -0.49
+   ],
+   "rot": 31.5,
+   "scale": 1.15
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -28.85,
+    4.96
+   ],
+   "rot": 225.0,
+   "scale": 1.09
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -25.65,
+    5.54
+   ],
+   "rot": 301.6,
+   "scale": 0.95
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -30.22,
+    7.75
+   ],
+   "rot": 27.6,
+   "scale": 1.0
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    -30.48,
+    12.98
+   ],
+   "rot": 355.3,
+   "scale": 1.02
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    -30.47,
+    15.59
+   ],
+   "rot": 27.9,
+   "scale": 1.08
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -25.43,
+    18.69
+   ],
+   "rot": 228.4,
+   "scale": 1.01
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    -30.18,
+    20.72
+   ],
+   "rot": 175.0,
+   "scale": 0.94
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    -26.1,
+    22.0
+   ],
+   "rot": 293.1,
+   "scale": 0.9
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    -29.44,
+    23.34
+   ],
+   "rot": 99.2,
+   "scale": 1.11
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    -25.49,
+    25.31
+   ],
+   "rot": 251.6,
+   "scale": 0.98
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -28.77,
+    27.75
+   ],
+   "rot": 237.1,
+   "scale": 1.02
+  },
+  {
+   "model": "dun_abeto_1",
+   "pos": [
+    -29.62,
+    31.15
+   ],
+   "rot": 213.9,
+   "scale": 0.98
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    -25.14,
+    33.03
+   ],
+   "rot": 183.8,
+   "scale": 1.06
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -21.5,
+    32.58
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -18.5,
+    32.65
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -15.5,
+    32.45
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -12.5,
+    32.57
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -9.5,
+    32.66
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -6.5,
+    32.47
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -3.5,
+    32.53
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    5.5,
+    32.7
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    8.5,
+    32.65
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    11.5,
+    32.68
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    17.5,
+    32.46
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    20.5,
+    32.49
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    23.5,
+    32.72
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    26.5,
+    32.64
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    29.5,
+    32.67
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.59,
+    -20.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.6,
+    -17.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.62,
+    -14.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.73,
+    -11.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.51,
+    -8.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.46,
+    -5.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.56,
+    -2.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.56,
+    0.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.64,
+    3.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.45,
+    12.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.68,
+    15.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.71,
+    18.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.57,
+    21.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.5,
+    24.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.57,
+    27.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.57,
+    30.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "dun_roca",
+   "pos": [
+    14.0,
+    12.0
+   ],
+   "rot": 194.8,
+   "scale": 0.99
+  },
+  {
+   "model": "dun_roca",
+   "pos": [
+    -14.0,
+    16.0
+   ],
+   "rot": 78.7,
+   "scale": 0.91
+  },
+  {
+   "model": "dun_roca",
+   "pos": [
+    22.0,
+    -12.0
+   ],
+   "rot": 175.8,
+   "scale": 1.04
+  },
+  {
+   "model": "dun_roca",
+   "pos": [
+    -18.0,
+    -6.0
+   ],
+   "rot": 6.5,
+   "scale": 1.05
+  },
+  {
+   "model": "dun_roca",
+   "pos": [
+    8.0,
+    24.0
+   ],
+   "rot": 138.5,
+   "scale": 0.86
+  },
+  {
+   "model": "dun_roca",
+   "pos": [
+    25.0,
+    22.0
+   ],
+   "rot": 11.8,
+   "scale": 1.09
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    -12.75,
+    6.43
+   ],
+   "rot": 164.9,
+   "scale": 0.94
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    -17.12,
+    22.29
+   ],
+   "rot": 142.6,
+   "scale": 1.09
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    24.04,
+    3.0
+   ],
+   "rot": 258.5,
+   "scale": 0.8
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    -28.67,
+    -24.42
+   ],
+   "rot": 178.4,
+   "scale": 1.11
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    -10.7,
+    27.77
+   ],
+   "rot": 184.4,
+   "scale": 0.86
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    20.68,
+    -22.86
+   ],
+   "rot": 339.5,
+   "scale": 0.93
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    22.74,
+    -9.31
+   ],
+   "rot": 124.6,
+   "scale": 0.81
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    7.45,
+    -17.29
+   ],
+   "rot": 314.2,
+   "scale": 0.96
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    24.66,
+    -17.72
+   ],
+   "rot": 315.8,
+   "scale": 1.08
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    16.79,
+    -6.67
+   ],
+   "rot": 50.0,
+   "scale": 0.94
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    -13.95,
+    28.95
+   ],
+   "rot": 10.0,
+   "scale": 0.83
+  },
+  {
+   "model": "dun_arbusto",
+   "pos": [
+    -7.43,
+    20.81
+   ],
+   "rot": 318.3,
+   "scale": 0.95
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    -4.64,
+    -17.44
+   ],
+   "rot": 0.0,
+   "scale": 1.01
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    17.16,
+    -13.0
+   ],
+   "rot": 310.5,
+   "scale": 0.95
+  },
+  {
+   "model": "dun_roble",
+   "pos": [
+    2.27,
+    24.56
+   ],
+   "rot": 100.2,
+   "scale": 0.95
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    -20.55,
+    8.61
+   ],
+   "rot": 338.6,
+   "scale": 0.9
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    26.69,
+    -21.77
+   ],
+   "rot": 349.1,
+   "scale": 0.96
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    19.34,
+    -17.21
+   ],
+   "rot": 346.5,
+   "scale": 0.97
+  },
+  {
+   "model": "dun_abeto_2",
+   "pos": [
+    -20.7,
+    -9.67
+   ],
+   "rot": 16.8,
+   "scale": 1.04
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/dunwich_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125
+ }
+}

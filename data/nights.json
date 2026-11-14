@@ -8,6 +8,14 @@
 			"criaturas": "Reses grises · Granjeros consumidos · El color que sube del pozo",
 			"texto": "Un meteorito cayó junto al pozo de Nahum Gardner. Desde entonces, un color que no tiene nombre se extiende por la tierra, y lo que toca se vuelve gris y quebradizo. También tú. También ellos.",
 			"abre": "p1_n5"
+		},
+		{
+			"id": "noche_dunwich",
+			"titulo": "El horror de Dunwich",
+			"lugar": "Sentinel Hill, sobre Dunwich",
+			"criaturas": "Chotacabras · Devotas de las colinas · El hermano de Wilbur",
+			"texto": "Wilbur Whateley ha muerto, pero lo que criaba en la granja se ha soltado. Es enorme y no se ve: solo sus huellas, y los árboles que parte al pasar. Los chotacabras cantan esperando un alma. El polvo de Ibn Ghazi lo descubre unos segundos.",
+			"abre": "p2_n5"
 		}
 	]
 }

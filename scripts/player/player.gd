@@ -99,6 +99,7 @@ var second_lives_used := 0       ## Medalla de San Cristóbal gastadas en este n
 var banishes_used := 0           ## descartes de las Cartas del tarot en este nivel
 var _nodens_t := 0.0             ## s cargando el Escudo de Nodens
 var blight_t := 0.0              ## s que sigue gris y quebradizo (ColorBlight, 21.13)
+var down_haste := 0.0            ## caído con chotacabras alrededor (Unseen, 21.14): su tiempo corre un tanto más deprisa
 var _nodens_fx: MeshInstance3D
 var _ankh_used := false
 var _fury_t := 0.0
@@ -514,7 +515,7 @@ func drain_sanity(amount: float, src := "", via := &"aura") -> void:
 ## aparta, lo avanzado se va perdiendo despacio).
 func _downed_step(delta: float) -> void:
 	if not revivable or is_eliminated or down_left < 0.0: return
-	down_left -= delta
+	down_left -= delta * (1.0 + down_haste)
 	var speed := 0.0
 	if world != null:
 		for q in world.players:

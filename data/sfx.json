@@ -931,6 +931,10 @@
 		"gaze_pulse": {"db": -22, "pitch": [0.9, 1.1], "voices": 2, "gap": 0.4, "group": "armas", "files": ["gaze_pulse_0.wav", "gaze_pulse_1.wav"]},
 		"blight": {"db": -16, "pitch": [0.9, 1.12], "voices": 2, "gap": 0.6, "files": ["blight_0.wav", "blight_1.wav"]},
 		"color_rise": {"db": -6, "pitch": [0.97, 1.03], "voices": 1, "gap": 1.0, "files": ["color_rise.wav"]},
+		"whippoorwill": {"db": -14, "pitch": [0.94, 1.06], "voices": 2, "gap": 0.7, "files": ["whippoorwill_0.wav", "whippoorwill_1.wav"]},
+		"horror_step": {"db": -5, "pitch": [0.9, 1.08], "voices": 2, "gap": 0.25, "files": ["horror_step_0.wav", "horror_step_1.wav"]},
+		"powder_spray": {"db": -8, "pitch": [0.95, 1.05], "voices": 2, "gap": 0.3, "files": ["powder_spray.wav"]},
+		"horror_cry": {"db": -4, "pitch": [0.95, 1.03], "voices": 1, "gap": 1.5, "files": ["horror_cry.wav"]},
 		"torch_crackle": {
 			"db": -22,
 			"pitch": [

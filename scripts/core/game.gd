@@ -457,6 +457,10 @@ func _ready() -> void:
 		if level.blight_every > 0.0 or _level_blights():   # el color que cayó del cielo (21.13)
 			blight = ColorBlight.new().setup(world, level, not is_guest(), self)
 			add_child(blight)
+		if level.powder_every > 0.0 or _level_unseen():     # lo que no se ve (21.14)
+			unseen = Unseen.new().setup(world, level, not is_guest(), self)
+			add_child(unseen)
+			if args.has("powder_here"): _powder_here.call_deferred(args.get_float("powder_here", 1.0))
 		director.enemy_spawned.connect(func(e: Enemy) -> void:
 			e.died.connect(_on_enemy_died)
 			if blight != null and not is_guest() and float(e.data.param("blight_on_death", 0.0)) > 0.0: e.died.connect(blight.on_enemy_died))
@@ -1621,6 +1625,21 @@ var night_events: NightEvents                    ## sucesos de la noche (hito 21
 var blight: ColorBlight                          ## el color que cayó del cielo (hito 21.13)
 
 ## ¿Algún enemigo del nivel deja el color o lo siembra? (entonces hacen falta las manchas)
+var unseen: Unseen                               ## lo que no se ve: huellas, el polvo y los chotacabras (21.14)
+func _level_unseen() -> bool:
+	for ed: EnemyData in level.pool + level.final_pool + level.mid_enemies + ([level.final_enemy] if level.final_enemy else []):
+		if bool(ed.param("unseen", false)) or bool(ed.param("soul_eater", false)): return true
+	return false
+
+## powder_here=T (pruebas y capturas): un pulverizador a los pies del J1 cada T s.
+func _powder_here(every: float) -> void:
+	while is_inside_tree() and unseen != null and not _ended:
+		if not unseen.sprayers.is_empty() or player.health <= 0.0:
+			await get_tree().create_timer(0.5, false).timeout
+			continue
+		unseen.spawn_at(Vector2(player.global_position.x + 1.5, player.global_position.z))
+		await get_tree().create_timer(maxf(every, 0.5), false).timeout
+
 func _level_blights() -> bool:
 	for ed: EnemyData in level.pool + level.final_pool + level.mid_enemies + ([level.final_enemy] if level.final_enemy else []):
 		if float(ed.param("blight_on_death", 0.0)) > 0.0 or bool(ed.param("seeds_color", false)): return true
