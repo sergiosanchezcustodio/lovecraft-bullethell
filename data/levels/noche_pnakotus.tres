@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/poseido_yith.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/polipo_volador.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/polipo_antiguo.tres" id="4"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+[ext_resource type="Resource" path="res://data/weather/viento_desierto.tres" id="weather"]
+
+[resource]
+script = ExtResource("1")
+weather = ExtResource("weather")
+id = &"noche_pnakotus"
+display_name = "Las ruinas de Pnakotus"
+part = 3
+number = 5
+arena = "res://data/arenas/pnakotus.json"
+health_mult = 1.0
+duration = 300.0
+music = "res://resources/Music/cc0/p3_n1_dungeon_deep.ogg"
+boss_music = "res://resources/Music/cc0/jefe_bio_hazard.ogg"
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3")])
+spawn_rate = Array[Vector2]([Vector2(0, 0.4), Vector2(45, 0.65), Vector2(90, 0.95), Vector2(150, 1.4), Vector2(210, 1.9), Vector2(300, 2.3)])
+max_alive = 75
+elite_cap = 1
+final_time = 240.0
+final_enemy = ExtResource("4")
+final_wave = 14
+final_spawn_scale = 0.35
+final_text = "La gran trampilla del archivo se abre. Sube un silbido…"
+trap_every = 16.0
+trap_final_every = 12.0
+trap_max = 3
+trap_warn = 3.0
+trap_seal = 2.5
+trap_wind = 3.0
+trap_wind_radius = 6.0
+trap_spawn_every = 4.0
+trap_spawn_cap = 4
+trap_enemy = ExtResource("3")
+money_bonus = 150

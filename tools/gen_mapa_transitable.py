@@ -120,7 +120,9 @@ def build(name):
     X, Z = np.meshgrid(cx, cx)
     floor |= (X <= half[0] + front) & (Z <= half[1] + front) & (X >= -half[0] - back) & (Z >= -half[1] - back)
     pieces = []
+    walkable = set(data.get('walkable', []))           # piezas a ras de suelo que se pisan (las trampillas de Pnakotus)
     for p in data['props']:
+        if p['model'] in walkable: continue
         y = sea_y - 0.15 if ('sea' in data and (p['pos'][0] > half[0] or p['pos'][1] > half[1])) else 0.0
         if 'y' in p: y = p['y']
         s = float(p['scale'])

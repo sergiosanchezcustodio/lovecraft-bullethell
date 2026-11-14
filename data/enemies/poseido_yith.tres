@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/yith_rayo.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"poseido_yith"
+display_name = "Poseído de la Gran Raza"
+model = "poseido_yith"
+tier = 1
+spawn_weight = 1.1
+elite = false
+tags = Array[StringName]([&"humana"])
+max_health = 20.0
+hit_radius = 0.4
+body_radius = 0.4
+move_speed = 1.8
+xp = 1.4
+money = 2
+contact_physical = 4.0
+contact_mental = 3.0
+movement = &"keep"
+params = {"keep": 6.5, "strafe": 0.4}
+attack = ExtResource("2")
+attack_cooldown = 4.2
+attack_range = 8.5
+attack_anim = "cast"

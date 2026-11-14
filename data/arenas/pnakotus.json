@@ -1,0 +1,1451 @@
+{
+ "name": "Las ruinas de Pnakotus",
+ "spawn": [
+  0.0,
+  20.0
+ ],
+ "great_door": [
+  0.0,
+  -7.0
+ ],
+ "trapdoors": [
+  [
+   -15.0,
+   -15.0
+  ],
+  [
+   15.0,
+   -16.0
+  ],
+  [
+   -21.0,
+   4.0
+  ],
+  [
+   20.0,
+   2.0
+  ],
+  [
+   -11.0,
+   17.0
+  ],
+  [
+   13.0,
+   15.0
+  ]
+ ],
+ "walkable": [
+  "pna_trampilla"
+ ],
+ "ground": {
+  "seed": 47,
+  "tile": 0.5,
+  "margin_back": 14.0,
+  "margin_front": 18.0,
+  "camp_radius": 0.0,
+  "kind": "mud",
+  "wet": 0.0,
+  "colors": {
+   "base_hi": [
+    0.5,
+    0.37,
+    0.25
+   ],
+   "base_lo": [
+    0.38,
+    0.27,
+    0.18
+   ],
+   "moss": [
+    0.4,
+    0.36,
+    0.22
+   ],
+   "puddle": [
+    0.32,
+    0.23,
+    0.16
+   ]
+  }
+ },
+ "light": {
+  "sun_rot": [
+   -50,
+   30
+  ],
+  "sun_color": [
+   0.7,
+   0.76,
+   0.92
+  ],
+  "sun_energy": 0.45,
+  "exposure": 1.15,
+  "ambient_color": [
+   0.42,
+   0.46,
+   0.58
+  ],
+  "ambient_energy": 0.42,
+  "background": [
+   0.05,
+   0.06,
+   0.1
+  ],
+  "fog_color": [
+   0.3,
+   0.27,
+   0.26
+  ],
+  "fog_density": 0.0,
+  "gamma": 1.3
+ },
+ "lamp": {
+  "color": [
+   1.0,
+   0.64,
+   0.34
+  ],
+  "energy": 2.6,
+  "range": 9.0
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_bloques_hielo_2": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_bloques_hielo_3": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.25
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_roca_nevada": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.4
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "pna_bloque_1": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "pna_bloque_2": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "pna_bloque_3": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "pna_muro": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "pna_torre": {
+   "type": "cylinder",
+   "radius": 2.1
+  },
+  "pna_duna_1": {
+   "type": "box",
+   "shrink": 0.7
+  },
+  "pna_duna_2": {
+   "type": "box",
+   "shrink": 0.7
+  },
+  "pna_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "pna_matorral": {
+   "type": "cylinder",
+   "radius": 0.35
+  },
+  "pna_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "lui_hoguera": {
+   "type": "cylinder",
+   "radius": 0.55
+  }
+ },
+ "size": [
+  64.0,
+  64.0
+ ],
+ "props": [
+  {
+   "model": "pna_trampilla",
+   "pos": [
+    0.0,
+    -7.0
+   ],
+   "rot": 0,
+   "scale": 2.0
+  },
+  {
+   "model": "pna_bloque_2",
+   "pos": [
+    -6.11,
+    -9.22
+   ],
+   "rot": -120.5,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_bloque_1",
+   "pos": [
+    -2.05,
+    -12.64
+   ],
+   "rot": -174.1,
+   "scale": 0.98
+  },
+  {
+   "model": "pna_bloque_3",
+   "pos": [
+    3.1,
+    -12.37
+   ],
+   "rot": -207.0,
+   "scale": 1.06
+  },
+  {
+   "model": "pna_bloque_1",
+   "pos": [
+    6.16,
+    -9.87
+   ],
+   "rot": -253.6,
+   "scale": 1.03
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -8.5,
+    -10.5
+   ],
+   "rot": 70,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    8.5,
+    -9.5
+   ],
+   "rot": -75,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_trampilla",
+   "pos": [
+    -15.0,
+    -15.0
+   ],
+   "rot": 53.3,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_bloque_1",
+   "pos": [
+    -11.61,
+    -15.29
+   ],
+   "rot": 62.5,
+   "scale": 0.71
+  },
+  {
+   "model": "pna_trampilla",
+   "pos": [
+    15.0,
+    -16.0
+   ],
+   "rot": 241.5,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_bloque_2",
+   "pos": [
+    11.82,
+    -17.21
+   ],
+   "rot": 69.2,
+   "scale": 0.75
+  },
+  {
+   "model": "pna_trampilla",
+   "pos": [
+    -21.0,
+    4.0
+   ],
+   "rot": 348.5,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_bloque_3",
+   "pos": [
+    -24.15,
+    5.29
+   ],
+   "rot": 155.7,
+   "scale": 0.73
+  },
+  {
+   "model": "pna_trampilla",
+   "pos": [
+    20.0,
+    2.0
+   ],
+   "rot": 303.9,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_bloque_1",
+   "pos": [
+    22.86,
+    3.84
+   ],
+   "rot": 267.5,
+   "scale": 0.77
+  },
+  {
+   "model": "pna_trampilla",
+   "pos": [
+    -11.0,
+    17.0
+   ],
+   "rot": 168.2,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_bloque_2",
+   "pos": [
+    -13.5,
+    19.31
+   ],
+   "rot": 268.2,
+   "scale": 0.73
+  },
+  {
+   "model": "pna_trampilla",
+   "pos": [
+    13.0,
+    15.0
+   ],
+   "rot": 66.5,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_bloque_3",
+   "pos": [
+    12.22,
+    11.69
+   ],
+   "rot": 135.2,
+   "scale": 0.71
+  },
+  {
+   "model": "pna_torre",
+   "pos": [
+    -9.0,
+    -27.0
+   ],
+   "rot": 10,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_torre",
+   "pos": [
+    15.0,
+    -26.5
+   ],
+   "rot": 40,
+   "scale": 0.9
+  },
+  {
+   "model": "pna_torre",
+   "pos": [
+    -27.0,
+    -9.0
+   ],
+   "rot": 80,
+   "scale": 0.85
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -22.0,
+    -28.5
+   ],
+   "rot": 0,
+   "scale": 1.02
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    2.5,
+    -29.0
+   ],
+   "rot": 0,
+   "scale": 1.08
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    27.0,
+    -26.0
+   ],
+   "rot": 10,
+   "scale": 1.03
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -28.5,
+    -21.0
+   ],
+   "rot": 90,
+   "scale": 1.02
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -28.5,
+    14.0
+   ],
+   "rot": 90,
+   "scale": 1.03
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -28.5,
+    26.0
+   ],
+   "rot": 85,
+   "scale": 1.03
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -29.57,
+    -32.95
+   ],
+   "rot": 2.6,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -22.3,
+    -33.19
+   ],
+   "rot": 1.8,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -14.72,
+    -32.78
+   ],
+   "rot": 2.0,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    2.14,
+    -32.8
+   ],
+   "rot": -5.3,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    9.61,
+    -33.19
+   ],
+   "rot": 0.6,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    26.21,
+    -32.83
+   ],
+   "rot": -1.5,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -32.97,
+    -25.33
+   ],
+   "rot": 85.4,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -32.66,
+    -18.46
+   ],
+   "rot": 88.9,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -32.44,
+    -1.95
+   ],
+   "rot": 92.0,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -32.86,
+    5.54
+   ],
+   "rot": 85.3,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -32.97,
+    13.45
+   ],
+   "rot": 89.3,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_muro",
+   "pos": [
+    -32.52,
+    22.42
+   ],
+   "rot": 91.8,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -34,
+    -38.0
+   ],
+   "rot": -1.2,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -24,
+    -38.0
+   ],
+   "rot": 5.6,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -14,
+    -38.0
+   ],
+   "rot": -3.1,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -4,
+    -38.0
+   ],
+   "rot": 5.1,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    6,
+    -38.0
+   ],
+   "rot": 4.5,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    16,
+    -38.0
+   ],
+   "rot": -3.6,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    26,
+    -38.0
+   ],
+   "rot": 5.2,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -38.0,
+    -30
+   ],
+   "rot": 88.9,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -38.0,
+    -20
+   ],
+   "rot": 85.6,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -38.0,
+    -10
+   ],
+   "rot": 90.8,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -38.0,
+    0
+   ],
+   "rot": 92.6,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -38.0,
+    10
+   ],
+   "rot": 88.3,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -38.0,
+    20
+   ],
+   "rot": 87.1,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -38.0,
+    30
+   ],
+   "rot": 89.5,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_2",
+   "pos": [
+    -35.0,
+    -35.0
+   ],
+   "rot": 45,
+   "scale": 1.3
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -26.75,
+    34.5
+   ],
+   "rot": -5.2,
+   "scale": 1.06
+  },
+  {
+   "model": "pna_duna_2",
+   "pos": [
+    -17.38,
+    34.5
+   ],
+   "rot": 5.7,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    -7.87,
+    34.5
+   ],
+   "rot": -1.5,
+   "scale": 1.14
+  },
+  {
+   "model": "pna_duna_2",
+   "pos": [
+    2.09,
+    34.5
+   ],
+   "rot": 2.5,
+   "scale": 0.99
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    9.84,
+    34.5
+   ],
+   "rot": -0.0,
+   "scale": 1.03
+  },
+  {
+   "model": "pna_duna_2",
+   "pos": [
+    20.29,
+    34.5
+   ],
+   "rot": 5.2,
+   "scale": 1.17
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    27.11,
+    34.5
+   ],
+   "rot": 3.0,
+   "scale": 0.97
+  },
+  {
+   "model": "pna_duna_2",
+   "pos": [
+    34.5,
+    -24.29
+   ],
+   "rot": 89.3,
+   "scale": 0.97
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    34.5,
+    -14.1
+   ],
+   "rot": 86.7,
+   "scale": 1.2
+  },
+  {
+   "model": "pna_duna_2",
+   "pos": [
+    34.5,
+    -6.83
+   ],
+   "rot": 89.1,
+   "scale": 1.13
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    34.5,
+    4.35
+   ],
+   "rot": 93.5,
+   "scale": 0.98
+  },
+  {
+   "model": "pna_duna_2",
+   "pos": [
+    34.5,
+    11.1
+   ],
+   "rot": 97.7,
+   "scale": 1.06
+  },
+  {
+   "model": "pna_duna_1",
+   "pos": [
+    34.5,
+    22.1
+   ],
+   "rot": 88.0,
+   "scale": 1.04
+  },
+  {
+   "model": "pna_tienda",
+   "pos": [
+    3.5,
+    25.5
+   ],
+   "rot": -20,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_tienda",
+   "pos": [
+    9.5,
+    26.5
+   ],
+   "rot": 15,
+   "scale": 1.0
+  },
+  {
+   "model": "lui_hoguera",
+   "pos": [
+    6.0,
+    22.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    11.5,
+    23.0
+   ],
+   "rot": 30,
+   "scale": 1.0
+  },
+  {
+   "model": "atrezo_caja",
+   "pos": [
+    12.3,
+    23.8
+   ],
+   "rot": 5,
+   "scale": 0.85
+  },
+  {
+   "model": "atrezo_farol",
+   "pos": [
+    1.5,
+    23.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_bloque_1",
+   "pos": [
+    -6.0,
+    6.0
+   ],
+   "rot": 166.2,
+   "scale": 0.96
+  },
+  {
+   "model": "pna_bloque_3",
+   "pos": [
+    7.0,
+    4.0
+   ],
+   "rot": 89.6,
+   "scale": 0.97
+  },
+  {
+   "model": "pna_bloque_2",
+   "pos": [
+    24.0,
+    -8.0
+   ],
+   "rot": 307.4,
+   "scale": 0.98
+  },
+  {
+   "model": "pna_bloque_1",
+   "pos": [
+    -24.0,
+    -18.0
+   ],
+   "rot": 297.4,
+   "scale": 0.94
+  },
+  {
+   "model": "pna_bloque_3",
+   "pos": [
+    25.0,
+    22.0
+   ],
+   "rot": 283.4,
+   "scale": 0.77
+  },
+  {
+   "model": "pna_bloque_3",
+   "pos": [
+    -18.0,
+    26.0
+   ],
+   "rot": 6.6,
+   "scale": 0.85
+  },
+  {
+   "model": "pna_bloque_3",
+   "pos": [
+    0.0,
+    14.0
+   ],
+   "rot": 342.0,
+   "scale": 0.81
+  },
+  {
+   "model": "pna_roca",
+   "pos": [
+    -14.0,
+    26.0
+   ],
+   "rot": 247.2,
+   "scale": 1.02
+  },
+  {
+   "model": "pna_roca",
+   "pos": [
+    20.0,
+    26.0
+   ],
+   "rot": 127.3,
+   "scale": 0.96
+  },
+  {
+   "model": "pna_roca",
+   "pos": [
+    26.0,
+    12.0
+   ],
+   "rot": 329.1,
+   "scale": 1.12
+  },
+  {
+   "model": "pna_roca",
+   "pos": [
+    -24.0,
+    -2.0
+   ],
+   "rot": 75.7,
+   "scale": 0.93
+  },
+  {
+   "model": "pna_roca",
+   "pos": [
+    10.0,
+    -22.0
+   ],
+   "rot": 350.6,
+   "scale": 0.89
+  },
+  {
+   "model": "pna_bloque_1",
+   "pos": [
+    -3.35,
+    -19.6
+   ],
+   "rot": 321.8,
+   "scale": 0.74
+  },
+  {
+   "model": "pna_bloque_1",
+   "pos": [
+    23.05,
+    -17.78
+   ],
+   "rot": 340.7,
+   "scale": 0.62
+  },
+  {
+   "model": "pna_bloque_1",
+   "pos": [
+    -18.15,
+    -22.86
+   ],
+   "rot": 154.3,
+   "scale": 0.84
+  },
+  {
+   "model": "pna_bloque_1",
+   "pos": [
+    -21.79,
+    16.43
+   ],
+   "rot": 227.0,
+   "scale": 0.94
+  },
+  {
+   "model": "pna_roca",
+   "pos": [
+    -8.09,
+    24.24
+   ],
+   "rot": 100.6,
+   "scale": 0.9
+  },
+  {
+   "model": "pna_roca",
+   "pos": [
+    26.37,
+    0.31
+   ],
+   "rot": 209.4,
+   "scale": 0.9
+  },
+  {
+   "model": "pna_roca",
+   "pos": [
+    -17.39,
+    17.58
+   ],
+   "rot": 21.6,
+   "scale": 0.95
+  },
+  {
+   "model": "pna_roca",
+   "pos": [
+    -20.92,
+    -4.72
+   ],
+   "rot": 152.6,
+   "scale": 0.92
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    1.24,
+    -22.66
+   ],
+   "rot": 270.6,
+   "scale": 0.92
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    1.79,
+    10.23
+   ],
+   "rot": 264.0,
+   "scale": 0.97
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -12.93,
+    2.99
+   ],
+   "rot": 229.0,
+   "scale": 1.14
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -16.4,
+    11.11
+   ],
+   "rot": 70.5,
+   "scale": 0.95
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -9.63,
+    7.78
+   ],
+   "rot": 352.8,
+   "scale": 0.95
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    6.69,
+    0.14
+   ],
+   "rot": 68.6,
+   "scale": 1.19
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    21.13,
+    -20.54
+   ],
+   "rot": 83.3,
+   "scale": 1.29
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    14.6,
+    6.22
+   ],
+   "rot": 209.6,
+   "scale": 1.13
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    21.85,
+    12.87
+   ],
+   "rot": 261.4,
+   "scale": 1.24
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    16.01,
+    11.35
+   ],
+   "rot": 218.9,
+   "scale": 1.06
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    15.02,
+    -11.04
+   ],
+   "rot": 51.9,
+   "scale": 0.88
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -20.45,
+    -17.87
+   ],
+   "rot": 89.5,
+   "scale": 0.91
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    25.47,
+    18.62
+   ],
+   "rot": 168.3,
+   "scale": 0.91
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    0.48,
+    28.33
+   ],
+   "rot": 82.1,
+   "scale": 0.9
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    17.72,
+    -14.71
+   ],
+   "rot": 48.7,
+   "scale": 0.94
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -4.69,
+    -17.22
+   ],
+   "rot": 96.7,
+   "scale": 0.85
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    8.28,
+    11.63
+   ],
+   "rot": 60.3,
+   "scale": 1.07
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    14.08,
+    -22.37
+   ],
+   "rot": 3.6,
+   "scale": 1.07
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -23.04,
+    8.51
+   ],
+   "rot": 172.1,
+   "scale": 0.85
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    16.42,
+    14.38
+   ],
+   "rot": 234.2,
+   "scale": 0.91
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -10.19,
+    -21.27
+   ],
+   "rot": 301.2,
+   "scale": 1.02
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    5.62,
+    7.55
+   ],
+   "rot": 67.6,
+   "scale": 1.28
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -17.5,
+    14.99
+   ],
+   "rot": 28.1,
+   "scale": 0.8
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    26.53,
+    25.84
+   ],
+   "rot": 234.0,
+   "scale": 1.05
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    28.54,
+    8.28
+   ],
+   "rot": 78.3,
+   "scale": 1.19
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    21.11,
+    8.89
+   ],
+   "rot": 137.8,
+   "scale": 1.01
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    21.31,
+    28.78
+   ],
+   "rot": 173.4,
+   "scale": 1.15
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -18.32,
+    21.4
+   ],
+   "rot": 107.6,
+   "scale": 1.28
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -24.1,
+    19.71
+   ],
+   "rot": 111.7,
+   "scale": 1.26
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    10.06,
+    7.9
+   ],
+   "rot": 190.1,
+   "scale": 1.25
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    23.27,
+    -1.45
+   ],
+   "rot": 198.3,
+   "scale": 1.14
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    15.65,
+    -7.54
+   ],
+   "rot": 103.3,
+   "scale": 0.94
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -18.72,
+    -14.74
+   ],
+   "rot": 109.6,
+   "scale": 1.0
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    20.3,
+    -0.55
+   ],
+   "rot": 57.1,
+   "scale": 0.91
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -4.6,
+    23.11
+   ],
+   "rot": 114.0,
+   "scale": 0.9
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    1.86,
+    -16.68
+   ],
+   "rot": 26.2,
+   "scale": 0.92
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    18.57,
+    -6.61
+   ],
+   "rot": 151.9,
+   "scale": 1.02
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    -16.38,
+    -18.64
+   ],
+   "rot": 346.2,
+   "scale": 1.14
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    16.21,
+    19.49
+   ],
+   "rot": 255.1,
+   "scale": 1.13
+  },
+  {
+   "model": "pna_matorral",
+   "pos": [
+    19.18,
+    -8.82
+   ],
+   "rot": 201.4,
+   "scale": 0.81
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/pnakotus_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125
+ }
+}

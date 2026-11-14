@@ -1,7 +1,7 @@
 {
 	"_doc": "Cielos de los relatos (hito 16.35, RelatoScreen, scripts/title/relato_sky.gdshader). parts: el de cada parte; levels: los niveles que llevan otro. skies: los parámetros de cada cielo (mode 0 luna y nubes, 1 aurora, 2 tormenta, 3 R'lyeh; colores top, horizon, cloud_dark, cloud_lit, moon, glow_a y glow_b; cover, cuánto tapan las nubes, de 0,3 a 0,7; moon_pos, dónde está la luna, en fracción de la pantalla). sky=luna|aurora|tormenta|rlyeh en el relato lo cambia para probar.",
 	"parts": {"p1": "aurora", "p2": "luna", "p3": "luna"},
-	"levels": {"p1_n5": "luna_baja", "p2_n2": "tormenta", "p2_n5": "luna_verde", "p3_n4": "tormenta", "p3_n5": "rlyeh", "noche_color": "el_color", "noche_dunwich": "tormenta", "epilogo": "luna", "epilogo_locura": "rlyeh"},
+	"levels": {"p1_n5": "luna_baja", "p2_n2": "tormenta", "p2_n5": "luna_verde", "p3_n4": "tormenta", "p3_n5": "rlyeh", "noche_color": "el_color", "noche_dunwich": "tormenta", "noche_pnakotus": "desierto", "epilogo": "luna", "epilogo_locura": "rlyeh"},
 	"skies": {
 		"luna": {"mode": 0, "top": [0.02, 0.03, 0.07], "horizon": [0.1, 0.11, 0.17], "cloud_dark": [0.05, 0.06, 0.09], "cloud_lit": [0.3, 0.32, 0.4], "moon": [0.92, 0.9, 0.8], "cover": 0.54, "moon_pos": [0.76, 0.14]},
 		"luna_baja": {"mode": 0, "top": [0.01, 0.02, 0.04], "horizon": [0.05, 0.08, 0.11], "cloud_dark": [0.03, 0.05, 0.07], "cloud_lit": [0.22, 0.28, 0.34], "moon": [0.75, 0.85, 0.9], "cover": 0.5, "moon_pos": [0.18, 0.2]},
@@ -9,6 +9,6 @@
 		"aurora": {"mode": 1, "top": [0.01, 0.02, 0.06], "horizon": [0.07, 0.1, 0.16], "cloud_dark": [0.06, 0.07, 0.1], "cloud_lit": [0.3, 0.34, 0.42], "moon": [0.9, 0.92, 0.95], "glow_a": [0.15, 0.95, 0.55], "glow_b": [0.5, 0.25, 0.8], "cover": 0.66, "moon_pos": [0.86, 0.1]},
 		"el_color": {"mode": 1, "top": [0.02, 0.02, 0.05], "horizon": [0.09, 0.08, 0.14], "cloud_dark": [0.06, 0.06, 0.09], "cloud_lit": [0.32, 0.3, 0.4], "moon": [0.9, 0.9, 0.95], "glow_a": [0.95, 0.42, 0.88], "glow_b": [0.58, 1.0, 0.86], "cover": 0.6, "moon_pos": [0.2, 0.12]},
 		"tormenta": {"mode": 2, "top": [0.02, 0.025, 0.035], "horizon": [0.07, 0.08, 0.1], "cloud_dark": [0.03, 0.035, 0.045], "cloud_lit": [0.16, 0.18, 0.22], "cover": 0.42},
-		"rlyeh": {"mode": 3, "top": [0.01, 0.04, 0.03], "horizon": [0.08, 0.16, 0.1], "cloud_dark": [0.03, 0.07, 0.05], "cloud_lit": [0.2, 0.36, 0.26], "moon": [0.75, 0.9, 0.6], "cover": 0.5, "moon_pos": [0.66, 0.17]}
+		"desierto": {"mode": 0, "top": [0.015, 0.02, 0.06], "horizon": [0.16, 0.10, 0.08], "cloud_dark": [0.06, 0.05, 0.06], "cloud_lit": [0.34, 0.28, 0.26], "moon": [0.95, 0.92, 0.84], "cover": 0.3, "moon_pos": [0.7, 0.16]}, "rlyeh": {"mode": 3, "top": [0.01, 0.04, 0.03], "horizon": [0.08, 0.16, 0.1], "cloud_dark": [0.03, 0.07, 0.05], "cloud_lit": [0.2, 0.36, 0.26], "moon": [0.75, 0.9, 0.6], "cover": 0.5, "moon_pos": [0.66, 0.17]}
 	}
 }

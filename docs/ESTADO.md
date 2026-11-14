@@ -3315,3 +3315,46 @@ Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden:
 - `powder_here=T` suelta el pulverizador a los pies del J1.
 - **Tests:** 5 más en `tests/test_dunwich.gd` (19): el jefe revelado sin tinte y los demás con él, se ve al caer en el invitado, el logro, los consejos urgentes y el aura a su radio; 958 de 958.
 - **Capturas:** `shots/game_dun_mejoras_010.0s.png` y `_012.0s.png` (el jefe revelado con su color, bajo la lluvia).
+
+### 21.15: *La sombra fuera del tiempo* (14-11-2026)
+
+- **Las ruinas de Pnakotus** (`tools/gen_arena_pnakotus.py`, `data/arenas/pnakotus.json`, 134 piezas): 64 × 64 m de arena rojiza del Gran Desierto Arenoso (suelo `mud` con los colores del desierto).
+  - Un poco al norte del centro, la gran trampilla del archivo (a escala 2), entre bloques caídos y dos tramos de muro: de ahí sube el jefe.
+  - Seis trampillas pequeñas alrededor (`trapdoors` en el JSON), cada una con un bloque cerca. Tres torres sin ventanas (dos al norte, una al oeste), muros de la ciudad medio enterrados al norte y al oeste con dunas detrás, y dunas al sur y al este.
+  - Al sur, el campamento de la expedición de 1935 (tiendas, cajas, farol y hoguera), donde se empieza.
+  - Viento del desierto (`data/weather/viento_desierto.tres`): viento 4, rachas, polvo rojizo a ras de suelo y algo de niebla.
+  - Luna fría con `gamma` 1,3: mediana de brillo de 0,176 (con 1,05 daba 0,118).
+  - **Piezas que se pisan:** nueva clave `"walkable"` en el JSON de la arena (lista de modelos) que `gen_mapa_transitable.py` no marca como obstáculo. El marco de la trampilla sobresale más de 0,15 m y el mapa la daba por bloqueada y rellena: nadie podía ponerse en medio a sellarla (las pruebas de `PolypWinds` no montan la arena y no lo veían; ahora hay una que lee el mapa).
+- **Decorado nuevo** (`tools/gen_atrezo_pnakotus.py`, `models/pna_*.json`, 12 modelos): tres bloques convexos de basalto con jeroglíficos curvos, un tramo de muro, la torre sin ventanas (72.000 voxels), la trampilla (marco con la boca negra) y su tapa (aparte: se desliza al abrirse), dos dunas con la cresta afilada, una mata de spinifex (se rompe: madera), una roca y una tienda de lona sin nieve.
+- **Las trampillas y el viento** (`PolypWinds`, `scripts/level/polyp_winds.gd`; datos en `LevelData.trap_*`):
+  - Cada 16 s (12 con el jefe suelto), una trampilla cerrada al azar silba 3 s (tiembla la tapa, sale arena, `trap_rumble`) y se abre: la tapa se aparta, sopla (`trap_open`, `trap_wind`, `Gusts`) y suelta un pólipo cada 4 s, hasta 4. Como mucho 3 abiertas a la vez.
+  - **Sellarlas:** de pie en medio (a menos de 1,7 m) 2,5 s, también mientras silban; Peaslee, que las vio en sueños, va 1,6 veces más deprisa, y varios a la vez suman. Si se sale, lo hecho se pierde despacio. Al sellarla, «Trampilla sellada», la tapa vuelve y caen 3 gemas. Un anillo dorado marca las que silban o están abiertas y un disco crece con lo sellado. Los bots van a ellas (grupo `pickups`).
+  - **El viento** aparta a quien está cerca de una abierta (3 m/s a 6 m; la grande, ×1,5 de radio y ×1,4 de fuerza), con calma en el centro para poder sellarla. Los pólipos empujan de lado a quien tienen cerca (su remolino) y el jefe tira de todos al tomar aliento.
+  - **Los pólipos casi no se ven:** cada PC les pone un alfa según lo cerca que estén de sus jugadores (del 6 % a 2,6-7 m hasta el 72 %), y se ven al recibir un golpe (1,1 s) o con lo que revela. Los delata el remolino de arena (granos en un MultiMesh, más gordos y rápidos antes de embestir) y su silbido.
+  - En red, el anfitrión decide qué silba, se abre o se sella y el aliento (suceso `trap`: `warn`, `open`, `seal`, `great`, `pull`); el viento y el alfa, cada PC con sus jugadores. Sin probar aún con dos ventanas.
+- **Las criaturas** (`tools/gen_noche_pnakotus.py`):
+  - **Pólipo volador** (escalón 2, `anim_fragmento`, etéreo: atraviesa el decorado): carne pálida a lóbulos con bocas oscuras de reborde, una corona de tubos, tentáculos finos con ventosas y dos largos a los lados. `PolypBehavior` (`scripts/enemies/polyp_behavior.gd`): flota a 0,9 m meciéndose, silba cada 4-8 s y, a menos de 7 m, avisa 0,6 s (se para y silba fuerte, `polyp_rush`) y embiste 0,7 s a 2,6 veces su paso. Solo toca embistiendo, un golpe por embestida.
+  - **Poseído de la Gran Raza** (escalón 1, humano a bloques): un hombre de la expedición con salacot, camisa caqui con bolsillos, polainas, ojos de un amarillo pálido que brillan y en la mano el aparato cónico de los Yith con anillos de luz. Se queda a 6,5 m y dispara rayos (`yith_rayo`: tres en abanico).
+  - **El pólipo antiguo** (jefe, escala 2,3, 2200 de vida, aura que quita cordura): el pólipo con 14 bocas, una corona de 11 tubos, 16 tentáculos y las venas que brillan.
+- **El jefe** (`PolypBossBehavior`, `scripts/enemies/polyp_boss_behavior.gd`):
+  - Sube por la gran trampilla, que se abre y sopla mientras vive (2,5 s sin cuerpo al subir).
+  - Con cuerpo: vendaval cada 4 s (`polipo_vendaval`: anillos de 18 que giran) y, cada 9 s, «Toma aliento…»: 1 s de aviso y 2,5 s tirando de todos hacia él.
+  - **A ratos se deshace en el viento** (cada 8 s, 5 s): oculto (`buried`, no se le apunta ni se le da), solo se ve su remolino, enorme, y va más deprisa. Al volver avisa en el suelo 1 s y sale con un golpe (16 de daño en 3,5 m). Lo que revela (la Máquina de Tillinghast, las ondas que sacan a los ocultos) lo obliga a tener cuerpo.
+  - Por debajo de la mitad, «Se abren todas las trampillas» (silban todas a la vez); por debajo del 20 %, «El viento aúlla en los pasadizos de abajo».
+  - Al morir se cierra la gran trampilla: «El silbido se apaga bajo la arena…».
+- **El relato:** cuatro frases (Peaslee de 1908 a 1913, la expedición de 1935, los pólipos tras las trampillas, y esta noche el viento que sopla desde abajo), con un cielo nuevo, `desierto`. Textos del bestiario y del lugar.
+- **Música:** la de `p3_n1` (`dungeon_deep`) y, la del jefe, `jefe_bio_hazard`. Se abre al superar `p3_n5`.
+- **Sonidos** (`gen_sfx.py --pnakotus`):
+  - El pólipo: `polyp_whistle` (dos variantes, un silbido de tubo hueco y quebrado) y `polyp_rush` (uno que sube de golpe).
+  - Las trampillas: `trap_rumble`, `trap_open` (la losa que roza y un soplido), `trap_wind` y `trap_seal` (el golpe sordo).
+  - El jefe: `polyp_cry` (silbidos que se cruzan sobre un rumor), `polyp_breath` (aire que entra) y `polyp_vanish`.
+  - **El suelo de arena:** `step_sand` (cuatro variantes, un roce blando), huellas propias (`Footprints.KINDS["sand"]`, más claras y que se borran antes) y el polvo al pisar (`Ambient`, «sand»). Ambiente `pnakotus` en `data/ambient.json`: pisa en arena, murciélagos y viento.
+- **Consejos urgentes** (`data/tutorial.json`): la primera trampilla que silba («Ponte en medio del círculo dorado hasta sellarla…», disparo `trapdoor`) y un pólipo cerca («escucha su silbido y busca su remolino de arena…», disparo `polyp`).
+- **Equilibrio** (`simular.py noche_pnakotus --ts 2`, dificultad 3):
+  - Al principio, 0 de 4 (caídas a los 131-249 s, casi todo por los rayos del poseído, a 7 m/s y en dos ráfagas, que el bot no esquivaba).
+  - Con los rayos a 4,6 m/s, en una ráfaga y 4 de daño físico, el poseído cada 4,2 s y algo menos frecuente (peso 1,1; el pólipo, 0,9): 4 de 4, pero el jefe caía en 12-41 s.
+  - Con el jefe a 2200 de vida (de 1400) y 5 s sin cuerpo (de 4): 2 de 2, el jefe en unos 50 s, vida mínima del 53-58 %.
+- **Comprobado en partida** (`cfg_quality=2`): las trampillas silban, se abren con la tapa a un lado y sueltan pólipos; el viento aparta; Peaslee sella una en medio (el disco, el rótulo y las gemas); los pólipos casi transparentes con su remolino; el jefe sube por la gran trampilla, se deshace, vuelve y dispara su vendaval; el relato con su cielo y la ventana de las noches con la nueva y su mapa (`nights_row=2`).
+- **Opción nueva:** `trap_here=T` (cada T s silba la trampilla cerrada más cercana al J1).
+- **Tests** (`tests/test_pnakotus.gd`, 17; 975 de 975 en total): la noche y su nivel; las trampillas de la arena y que se pisan; silba, se abre y sopla con calma en el centro; se sella de pie en medio y se pierde despacio al salir; Peaslee antes; sellarla mientras silba; al azar y con tope; en el invitado llegan del anfitrión; el aliento; el pólipo casi no se ve salvo de cerca o al darle; el remolino lo delata (y al poseído no); avisa y embiste; el jefe sube por la gran trampilla y se deshace, lo revelado lo obliga a tener cuerpo; vuelve con un golpe; sus fases y al morir; los consejos y el suelo de arena.
+- **Capturas:** `shots/game_pna_sello_001.9s.png` a `_002.7s.png` (Peaslee sella una trampilla), `shots/game_pna_jefe_006.0s.png` a `_019.0s.png` (el jefe), `shots/pna_07.0s.png` (el relato) y `shots/seleccion_noches2115_002.5s.png` (la ventana).

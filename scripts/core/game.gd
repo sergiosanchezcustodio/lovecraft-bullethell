@@ -461,6 +461,10 @@ func _ready() -> void:
 			unseen = Unseen.new().setup(world, level, not is_guest(), self)
 			add_child(unseen)
 			if args.has("powder_here"): _powder_here.call_deferred(args.get_float("powder_here", 1.0))
+		if level.trap_every > 0.0 or _level_polyps():       # las trampillas de la Gran Raza (21.15)
+			polyps = PolypWinds.new().setup(world, level, not is_guest(), self)
+			add_child(polyps)
+			if args.has("trap_here"): _trap_here.call_deferred(args.get_float("trap_here", 1.0))
 		director.enemy_spawned.connect(func(e: Enemy) -> void:
 			e.died.connect(_on_enemy_died)
 			if blight != null and not is_guest() and float(e.data.param("blight_on_death", 0.0)) > 0.0: e.died.connect(blight.on_enemy_died))
@@ -1639,6 +1643,27 @@ func _powder_here(every: float) -> void:
 			continue
 		unseen.spawn_at(Vector2(player.global_position.x, player.global_position.z))
 		await get_tree().create_timer(maxf(every, 0.5), false).timeout
+
+var polyps: PolypWinds                           ## las trampillas de la Gran Raza y los pólipos (21.15)
+func _level_polyps() -> bool:
+	for ed: EnemyData in level.pool + level.final_pool + level.mid_enemies + ([level.final_enemy] if level.final_enemy else []):
+		if bool(ed.param("polyp", false)): return true
+	return false
+
+## trap_here=T (pruebas y capturas): cada T s silba la trampilla cerrada más cercana al J1.
+func _trap_here(every: float) -> void:
+	while is_inside_tree() and polyps != null and not _ended:
+		await get_tree().create_timer(maxf(every, 0.5), false).timeout
+		if polyps == null or player.health <= 0.0: continue
+		var best := -1
+		var bd := INF
+		for d in polyps.doors:
+			if d.state != PolypWinds.State.CLOSED: continue
+			var dd: float = Vector2(player.global_position.x, player.global_position.z).distance_to(d.pos)
+			if dd < bd:
+				bd = dd
+				best = int(d.i)
+		if best >= 0: polyps.warn_door(best)
 
 func _level_blights() -> bool:
 	for ed: EnemyData in level.pool + level.final_pool + level.mid_enemies + ([level.final_enemy] if level.final_enemy else []):

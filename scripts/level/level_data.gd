@@ -87,6 +87,20 @@ func is_survival() -> bool:
 @export var powder_life := 30.0                ## s que dura cada uno si nadie lo recoge
 @export var powder_reveal := 7.0               ## s que dura lo que descubre
 @export var powder_radius := 8.0               ## m de la nube
+@export_group("Las trampillas de la Gran Raza (hito 21.15)")
+## Trampillas de la arena (`trapdoors` en su JSON; PolypWinds): cada `trap_every` s una silba
+## `trap_warn` s y se abre; sopla un viento que aparta y suelta un `trap_enemy` cada `trap_spawn_every` s
+## hasta que alguien la sella, de pie en medio `trap_seal` s. 0 en trap_every: ninguna.
+@export var trap_every := 0.0                  ## s medios entre trampillas que se abren
+@export var trap_final_every := 0.0            ## lo mismo con el jefe suelto (0: como trap_every)
+@export var trap_max := 3                      ## abiertas a la vez
+@export var trap_warn := 3.0                   ## s que silba antes de abrirse
+@export var trap_seal := 2.5                   ## s de pie en medio para sellarla
+@export var trap_wind := 3.0                   ## m/s del viento que aparta, en lo más fuerte
+@export var trap_wind_radius := 6.0            ## m hasta donde llega
+@export var trap_spawn_every := 4.0            ## s entre pólipos que salen de una abierta
+@export var trap_spawn_cap := 4                ## pólipos que suelta cada vez que se abre, como mucho
+@export var trap_enemy: EnemyData              ## lo que sale
 @export_group("Dinero (D-31)")
 @export var money_bonus := 100                 ## dólares al superar el nivel
 @export var chest_every := 90.0                ## s medios entre baúles arcanos (0: ninguno)

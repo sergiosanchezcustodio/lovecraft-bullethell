@@ -151,6 +151,10 @@ func _happened(t: Dictionary) -> bool:
 				if not q.remote and q.blight_t > 0.0: return true
 		"powder":                                            # Sentinel Hill (21.14): el primer pulverizador
 			return Unseen.current != null and not Unseen.current.sprayers.is_empty()
+		"trapdoor":                                          # Pnakotus (21.15): la primera trampilla que silba
+			return PolypWinds.current != null and PolypWinds.current.open_count() > 0
+		"polyp":                                             # un pólipo cerca
+			return PolypWinds.current != null and PolypWinds.current.polyp_near(9.0)
 		"unseen":                                            # lo que no se ve, ya suelto
 			return Unseen.current != null and Unseen.current.unseen_alive()
 	return false

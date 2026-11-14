@@ -119,6 +119,9 @@
 		"west": "anim_humano",
 		"expedicionario": "anim_humano",
 		"tamborilero": "anim_humano",
-		"nadador": "anim_profundo"
+		"nadador": "anim_profundo",
+		"polipo_volador": "anim_fragmento",
+		"polipo_antiguo": "anim_fragmento",
+		"poseido_yith": "anim_humano"
 	}
 }

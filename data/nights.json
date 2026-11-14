@@ -16,6 +16,14 @@
 			"criaturas": "Chotacabras · Devotas de las colinas · El hermano de Wilbur",
 			"texto": "Wilbur Whateley ha muerto, pero lo que criaba en la granja se ha soltado. Es enorme y no se ve: solo sus huellas, y los árboles que parte al pasar. Los chotacabras cantan esperando un alma. El polvo de Ibn Ghazi lo descubre unos segundos.",
 			"abre": "p2_n5"
+		},
+		{
+			"id": "noche_pnakotus",
+			"titulo": "La sombra fuera del tiempo",
+			"lugar": "Las ruinas de Pnakotus, en el Gran Desierto Arenoso (Australia, 1935)",
+			"criaturas": "Poseídos de la Gran Raza · Pólipos voladores · El pólipo antiguo",
+			"texto": "Bajo la arena hay una ciudad más vieja que el hombre. La Gran Raza encerró allí, tras trampillas selladas, a unos seres a medias materiales que no se ven: solo se oyen sus silbidos y se siente su viento. Las trampillas se están abriendo. Séllalas, de pie en medio, antes de que salgan todos.",
+			"abre": "p3_n5"
 		}
 	]
 }

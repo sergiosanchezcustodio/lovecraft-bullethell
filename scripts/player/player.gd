@@ -842,7 +842,7 @@ var _mud_w := 0.0
 var _slip_t := 0.0
 
 func _terrain_step(anim: String, t: float, delta: float) -> void:
-	var mud_want := 1.0 if Ambient.ground == "mud" and _wade < 0.5 else 0.0
+	var mud_want := 1.0 if (Ambient.ground == "mud" or Ambient.ground == "sand") and _wade < 0.5 else 0.0
 	_mud_w = move_toward(_mud_w, mud_want, delta * 3.0)
 	if anim != "walk": return
 	var s := Anims.script_for(model_name)

@@ -935,6 +935,17 @@
 		"horror_step": {"db": -5, "pitch": [0.9, 1.08], "voices": 2, "gap": 0.25, "files": ["horror_step_0.wav", "horror_step_1.wav"]},
 		"powder_spray": {"db": -8, "pitch": [0.95, 1.05], "voices": 2, "gap": 0.3, "files": ["powder_spray.wav"]},
 		"horror_cry": {"db": -4, "pitch": [0.95, 1.03], "voices": 1, "gap": 1.5, "files": ["horror_cry.wav"]},
+		"polyp_whistle": {"db": -16, "pitch": [0.9, 1.12], "voices": 3, "gap": 0.4, "files": ["polyp_whistle_0.wav", "polyp_whistle_1.wav"]},
+		"polyp_rush": {"db": -11, "pitch": [0.94, 1.08], "voices": 3, "gap": 0.2, "files": ["polyp_rush.wav"]},
+		"trap_rumble": {"db": -10, "pitch": [0.92, 1.06], "voices": 2, "gap": 0.5, "files": ["trap_rumble.wav"]},
+		"trap_open": {"db": -7, "pitch": [0.95, 1.05], "voices": 2, "gap": 0.4, "files": ["trap_open.wav"]},
+		"trap_wind": {"db": -17, "pitch": [0.9, 1.1], "voices": 3, "gap": 0.6, "files": ["trap_wind.wav"]},
+		"trap_seal": {"db": -6, "pitch": [0.95, 1.05], "voices": 2, "gap": 0.3, "files": ["trap_seal.wav"]},
+		"polyp_cry": {"db": -5, "pitch": [0.95, 1.03], "voices": 1, "gap": 1.5, "files": ["polyp_cry.wav"]},
+		"polyp_breath": {"db": -7, "pitch": [0.97, 1.03], "voices": 1, "gap": 2.0, "files": ["polyp_breath.wav"]},
+		"polyp_vanish": {"db": -8, "pitch": [0.95, 1.05], "voices": 1, "gap": 1.0, "files": ["polyp_vanish.wav"]},
+		"rise_sand": {"db": -15, "pitch": [0.55, 0.72], "voices": 2, "gap": 0.2, "files": ["step_mud_0.wav", "step_mud_1.wav", "step_mud_2.wav", "step_mud_3.wav"]},
+		"step_sand": {"db": -28, "pitch": [0.9, 1.12], "voices": 3, "gap": 0.05, "files": ["step_sand_0.wav", "step_sand_1.wav", "step_sand_2.wav", "step_sand_3.wav"]},
 		"torch_crackle": {
 			"db": -22,
 			"pitch": [

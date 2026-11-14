@@ -1265,6 +1265,111 @@ def dunwich():
     save('horror_cry', tail(x, 0.8))
 
 
+def pnakotus():
+    """La sombra fuera del tiempo (hito 21.15). El pólipo: un silbido hueco y quebrado, como el viento por
+    un tubo, que sube y baja con aire alrededor (dos variantes); antes de embestir, uno que sube de golpe.
+    La trampilla: el rumor de la piedra que tiembla, el roce de la losa al abrirse con un soplido que sale,
+    el viento que sopla por ella (rachas), y el golpe sordo al sellarla. El jefe: un aullido enorme de
+    silbidos que se cruzan, el aliento (aire que entra, cada vez más fuerte) y el viento que se lo lleva
+    al deshacerse. El paso en la arena: un roce blando."""
+    r = np.random.default_rng(2115)
+
+    def tail(x, sec=0.3):
+        n = min(len(x) // 3, int(sec * SR))
+        x[-n:] *= np.linspace(1, 0, n) ** 2
+        return x
+
+    def verb(dry, sec=1.4, decay=0.5, k=0.4, cut=3000):
+        ir = lp(r.standard_normal(int(sec * SR)), cut) * np.exp(-t(sec) / decay)
+        wet = signal.fftconvolve(dry, ir)[:len(dry)]
+        wet *= np.std(dry) / (np.std(wet) + 1e-9)
+        return dry + wet * k
+
+    def piped(f, amp, breath=0.5):
+        """Silbido de tubo: una nota con su octava rota y aire filtrado alrededor de la nota."""
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        tone = np.sin(ph) + 0.3 * np.sin(1.5 * ph + 0.4 * np.sin(ph * 0.25)) + 0.12 * np.sin(2 * ph)
+        air = r.standard_normal(len(f))
+        out = np.zeros(len(f)); step = 1024
+        for a0 in range(0, len(f), step):
+            b, aa = signal.iirpeak(min(max(f[a0], 200), 9000) / (SR / 2), 9)
+            out[a0:a0 + step] = signal.lfilter(b, aa, air[a0:a0 + step])
+        out *= np.std(tone) / (np.std(out) + 1e-9)
+        return (tone * (1 - breath) + out * breath) * amp
+
+    for k in range(2):
+        d = 1.6
+        tt = t(d)
+        f = (620 + 140 * k) * (1 + 0.35 * np.sin(2 * np.pi * (0.7 + 0.2 * k) * tt + k) + 0.08 * np.sin(2 * np.pi * 7 * tt))
+        x = piped(f, 0.8, 0.55) * np.sin(np.pi * np.clip(tt / d, 0, 1)) ** 0.7
+        x *= 1 + 0.4 * lp(r.standard_normal(len(tt)), 6)                          # quebrado
+        save('polyp_whistle_%d' % k, tail(verb(x, 1.2, 0.45, 0.35), 0.3))
+
+    d = 0.9
+    tt = t(d)
+    f = 480 * (1 + 2.2 * np.clip(tt / 0.6, 0, 1) ** 1.5)
+    x = piped(f, 1.0, 0.45) * np.minimum(tt / 0.05, 1) * np.exp(-np.maximum(tt - 0.6, 0) / 0.12)
+    gust = bp(r.standard_normal(len(tt)), 300, 2500) * np.clip(tt / 0.6, 0, 1) ** 2 * 0.5
+    save('polyp_rush', tail(x + gust, 0.15))
+
+    d = 1.6
+    tt = t(d)
+    rumble = lp(r.standard_normal(len(tt)), 120, 4) * (1 + 0.6 * np.sin(2 * np.pi * 9 * tt)) * 2.0
+    grit = bp(r.standard_normal(len(tt)), 1500, 6000) * (r.random(len(tt)) < 0.02) * 0.6
+    x = (rumble + grit) * np.minimum(tt / 0.2, 1) * np.exp(-np.maximum(tt - 1.1, 0) / 0.25)
+    save('trap_rumble', tail(x, 0.25))
+
+    d = 1.4
+    tt = t(d)
+    scrape = bp(r.standard_normal(len(tt)), 250, 1800) * (1 + 0.8 * np.sin(2 * np.pi * 23 * tt)) * np.exp(-tt / 0.35) * 0.9
+    thump = np.sin(2 * np.pi * 70 * tt) * np.exp(-tt / 0.12) * 0.8
+    whoosh = bp(r.standard_normal(len(tt)), 400, 4000) * np.clip((tt - 0.15) / 0.2, 0, 1) * np.exp(-np.maximum(tt - 0.4, 0) / 0.4)
+    save('trap_open', tail(verb(scrape + thump + whoosh * 0.9, 1.0, 0.35, 0.3), 0.3))
+
+    d = 2.4
+    tt = t(d)
+    env = np.sin(np.pi * np.clip(tt / d, 0, 1)) ** 1.2 * (1 + 0.5 * lp(r.standard_normal(len(tt)), 3))
+    howl = piped(380 * (1 + 0.25 * np.sin(2 * np.pi * 0.5 * tt)), 0.35, 0.8)
+    x = (bp(r.standard_normal(len(tt)), 200, 1800) * 0.9 + howl) * env
+    save('trap_wind', tail(x, 0.4))
+
+    d = 0.9
+    tt = t(d)
+    thud = lp(r.standard_normal(len(tt)), 200, 4) * np.minimum(tt / 0.003, 1) * np.exp(-tt / 0.1) * 2.4
+    boom = np.sin(2 * np.pi * np.cumsum(65 * (1 - 0.3 * np.clip(tt / 0.3, 0, 1))) / SR) * np.exp(-tt / 0.22) * 1.1
+    grit = bp(r.standard_normal(len(tt)), 2000, 7000) * np.exp(-tt / 0.05) * 0.3
+    save('trap_seal', tail(verb(thud + boom + grit, 0.9, 0.3, 0.25, 1500), 0.25))
+
+    d = 2.8
+    tt = t(d)
+    x = np.zeros(len(tt))
+    for f0, ph, a in ((300, 0.0, 1.0), (455, 1.3, 0.7), (610, 2.1, 0.55), (820, 0.7, 0.4)):
+        f = f0 * (1 + 0.3 * np.sin(2 * np.pi * 0.45 * tt + ph) + 0.05 * np.sin(2 * np.pi * 6 * tt + ph))
+        x += piped(f, a, 0.5)
+    x *= np.minimum(tt / 0.3, 1) * np.exp(-np.maximum(tt - 2.0, 0) / 0.35)
+    low = lp(r.standard_normal(len(tt)), 160, 4) * np.minimum(tt / 0.3, 1) * np.exp(-np.maximum(tt - 1.8, 0) / 0.4) * 1.6
+    save('polyp_cry', tail(verb(x * 0.6 + low, 2.0, 0.8, 0.5, 2500), 0.6))
+
+    d = 3.4
+    tt = t(d)
+    inhale = bp(r.standard_normal(len(tt)), 250, 3500) * np.clip(tt / 1.0, 0, 1) ** 2 * np.exp(-np.maximum(tt - 3.0, 0) / 0.2)
+    pitch = piped(220 * (1 + 0.8 * np.clip(tt / 1.0, 0, 1)), 0.4, 0.7) * np.clip(tt / 1.0, 0, 1) * np.exp(-np.maximum(tt - 3.0, 0) / 0.2)
+    save('polyp_breath', tail(verb(inhale + pitch, 1.5, 0.5, 0.35), 0.3))
+
+    d = 1.6
+    tt = t(d)
+    f = 900 * (1 - 0.7 * np.clip(tt / 1.2, 0, 1))
+    x = piped(f, 0.7, 0.75) * np.exp(-tt / 0.6) + bp(r.standard_normal(len(tt)), 300, 3000) * np.exp(-tt / 0.5) * 0.6
+    save('polyp_vanish', tail(verb(x, 1.2, 0.5, 0.4), 0.3))
+
+    for i in range(4):
+        d = 0.22
+        tt = t(d)
+        sh = bp(r.standard_normal(len(tt)), 900 + 150 * i, 5000) * np.exp(-((tt - 0.04) / 0.035) ** 2) * 0.5
+        thump = lp(r.standard_normal(len(tt)), 300) * np.exp(-tt / 0.03) * 0.7
+        save('step_sand_%d' % i, sh + thump)
+
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
@@ -1289,6 +1394,8 @@ if __name__ == '__main__':
         color()
     elif '--dunwich' in sys.argv:                              # solo los de Dunwich (hito 21.14)
         dunwich()
+    elif '--pnakotus' in sys.argv:                             # solo los de Pnakotus (hito 21.15)
+        pnakotus()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)

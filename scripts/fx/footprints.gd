@@ -11,6 +11,7 @@ const FADE := 3.0                              ## s del final en los que se desv
 const KINDS := {
 	"snow": [Color(0.42, 0.48, 0.58), 0.45, 10.0],
 	"mud": [Color(0.05, 0.04, 0.03), 0.62, 14.0],
+	"sand": [Color(0.20, 0.13, 0.08), 0.42, 9.0],     # arena del desierto (21.15): el viento las borra antes
 	"wet": [Color(0.03, 0.035, 0.05), 0.5, 4.0],
 }
 

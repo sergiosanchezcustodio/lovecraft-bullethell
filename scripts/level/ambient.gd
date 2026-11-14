@@ -33,6 +33,7 @@ static func dust_tint() -> Color:
 	match ground:
 		"snow": return Color(0.82, 0.87, 0.95)
 		"mud": return Color(0.32, 0.29, 0.22)
+		"sand": return Color(0.62, 0.48, 0.33)
 		"wood": return Color(0.45, 0.38, 0.3)
 	return Color(0.6, 0.58, 0.55)
 static var _mats := {}                          ## material compartido por modelo y capa
@@ -1062,13 +1063,13 @@ var _walkers := {}                              ## id de enemigo -> [nodo, donde
 var _walk_t := 0.0
 var _enemy_prints_on := true
 
-## Qué huella deja quien pisa `kind` ("snow", "mud", "stone", "wood" o "water"): [clase, fuerza] o [].
+## Qué huella deja quien pisa `kind` ("snow", "mud", "sand", "stone", "wood" o "water"): [clase, fuerza] o [].
 func _print_kind(kind: String, id: int) -> Array:
 	if kind == "water":
 		_wet[id] = _print_clock
 		return []
 	if not cfg.get("footprints", true): return []
-	if kind == "snow" or kind == "mud": return [kind, 1.0]
+	if kind == "snow" or kind == "mud" or kind == "sand": return [kind, 1.0]
 	var dry := _print_clock - float(_wet.get(id, -99.0))
 	if dry < WET_TIME: return ["wet", 1.0 - dry / WET_TIME]
 	return []

@@ -21,6 +21,7 @@
 		"alr_fardos": "wood", "alr_rollo": "wood",
 		"lui_poste": "wood", "lui_piragua": "wood",
 		"rly_bloque": "heavy", "rly_monolito": "heavy", "rly_muro": "stone",
-		"dun_arbusto": "wood"
+		"dun_arbusto": "wood",
+		"pna_matorral": "wood"
 	}
 }
