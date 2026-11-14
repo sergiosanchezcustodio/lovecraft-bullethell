@@ -3255,3 +3255,8 @@ Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden:
   - Las reses dejan mancha.
   - En el invitado.
   - El jefe sube del pozo, siembra y cambia de fase.
+- **Mejoras del 14-11-2026** (pedidas por el autor):
+  - **Consejo del color:** la primera vez que alguien de este PC pisa el color sale el consejo «Estás en el color: te vuelve gris y quebradizo…» (`data/tutorial.json`, disparo `blight` en `Tips`). Una vez por hueco, como los demás; con `tips=true` sale en las capturas.
+  - **Miniatura del mapa** en la ventana de las noches sueltas: junto a la presentación, con marco de latón y oscurecida si la noche está cerrada (`NightsMenu._show_map`).
+  - **Logro «Sin tocar el color»** (`data/achievements/31_sin_tocar_el_color.tres`, 400 $, icono del jefe): superar la noche sin que nadie de este PC pise el color (`ColorBlight.touched`; los bots no cuentan). Estadística `color_untouched`.
+  - Tests: 12 en `test_nights.gd` (pisar el color quita el logro salvo a los bots; el logro y el consejo).

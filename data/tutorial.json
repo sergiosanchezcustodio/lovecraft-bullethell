@@ -10,6 +10,7 @@
 		{"id": "elite", "when": "elite", "text": "Una élite: más grande, más dura y con su marca a los pies. Suelta mejor botín."},
 		{"id": "down", "when": "down", "text": "Un compañero ha caído: quédate a su lado para levantarlo antes de que se le acabe el tiempo."},
 		{"id": "final", "when": "final", "text": "El enemigo final del nivel: acaba con él para superarlo."},
+		{"id": "color", "when": "blight", "text": "Estás en el color: te vuelve gris y quebradizo. Pierdes cordura y los golpes te hacen más daño. A los enemigos les pasa lo mismo: llévalos a él y sal tú."},
 		{"id": "pause", "when": "pause", "at": 40.0, "text": "Start o Esc pausa la partida."},
 		{"id": "sheet", "when": "sheet", "at": 75.0, "text": "Select o Tab abre la ficha del investigador; la cruceta abajo o M, el mapa del nivel."}
 	],

@@ -1710,6 +1710,7 @@ func _on_level_completed() -> void:
 	elif Nights.is_night(String(level.id)):          # noche suelta (fase 21, bloque D): aparte de la campaña
 		won_title = "Noche superada"
 		if not is_guest(): Nights.record_win(Saves.current, String(level.id))
+		if blight != null and not blight.touched: Achievements.add(Saves.current, "color_untouched")   # «Sin tocar el color»
 	elif Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))
 	if not rush:

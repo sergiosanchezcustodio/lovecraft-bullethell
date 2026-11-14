@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sin_tocar_el_color"
+display_name = "Sin tocar el color"
+description = "Supera la noche suelta «El color que cayó del cielo» sin pisar el color ni una vez."
+order = 31
+stat = "color_untouched"
+target = 1
+reward_money = 400
+icon_model = "color_pozo"
+icon_mode = "full"

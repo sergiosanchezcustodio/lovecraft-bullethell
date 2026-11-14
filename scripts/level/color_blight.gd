@@ -31,6 +31,7 @@ var _fx_t := 0.0
 var _rng := RandomNumberGenerator.new()
 var _mm: MultiMeshInstance3D
 var _flakes := {}                      ## jugador -> s hasta el próximo copo gris
+var touched := false                   ## alguien de este PC (no un bot) ha pisado el color: sin el logro «Sin tocar el color»
 
 func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node = null) -> ColorBlight:
 	name = "ColorBlight"
@@ -95,6 +96,7 @@ func _physics_process(delta: float) -> void:
 		if q.remote or q.health <= 0.0: continue
 		if inside(q.global_position):
 			q.blight_t = IN_HOLD
+			if not (q.input is BotInput): touched = true
 			var drain := (level.blight_sanity if level != null else 2.0) * TICK * q.mental_resist * q.data.mental_mult
 			if drain > 0.0 and not q.sanity_state.in_crisis:
 				q.sanity = maxf(0.0, q.sanity - drain)

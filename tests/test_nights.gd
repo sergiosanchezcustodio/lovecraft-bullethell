@@ -194,3 +194,31 @@ func test_el_color_sube_del_pozo_y_siembra() -> void:
 	assert_eq(b.phase_for(boss), 2)
 	boss.health = boss.data.max_health * 0.2
 	assert_eq(b.phase_for(boss), 3)
+
+# ------------------------------------------------------------------ mejoras (consejo, logro)
+
+func test_pisar_el_color_quita_el_logro_salvo_a_los_bots() -> void:
+	var cb := _blight()
+	var bot := _player()
+	cb.seed_at(Vector2.ZERO, 3.0)
+	cb.patches[0].age = 20.0
+	_step(cb, 0.3)
+	assert_gt(bot.blight_t, 0.0)
+	assert_false(cb.touched, "un bot no cuenta")
+	var me := Player.new().setup(load("res://data/characters/legrasse.tres"), KeyboardInput.new(), Color.RED)
+	me.world = world
+	world.add_child(me)
+	world.add_player(me)
+	_step(cb, 0.3)
+	assert_true(cb.touched, "quien juega en este PC, sí")
+
+func test_el_logro_sin_tocar_el_color() -> void:
+	var a: AchievementData = load("res://data/achievements/31_sin_tocar_el_color.tres")
+	assert_eq(a.stat, "color_untouched")
+	assert_eq(a.icon_model, "color_pozo")
+	var s := SaveData.new()
+	assert_eq(Achievements.value(s, a), 0)
+	Achievements.add(s, "color_untouched")
+	assert_true(Achievements.check(s).has(a))
+	var tips: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/tutorial.json"))
+	assert_true((tips.tips as Array).any(func(t: Dictionary) -> bool: return String(t.when) == "blight"), "consejo al pisarlo")

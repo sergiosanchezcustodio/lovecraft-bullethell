@@ -9,7 +9,8 @@ extends Resource
 @export_multiline var description := ""
 @export var order := 0
 ## Estadística que mira (ver Achievements.value): kills, runs, levels_won, elites, chests,
-## crises, revives, coop_runs, best_level, best_time, money, characters, maxed_weapons, flawless.
+## crises, revives, coop_runs, best_level, best_time, money, characters, maxed_weapons, flawless,
+## color_untouched (la noche del color sin pisarlo, 21.13)…
 @export var stat := "kills"
 @export var target := 100
 @export_group("Recompensa")
