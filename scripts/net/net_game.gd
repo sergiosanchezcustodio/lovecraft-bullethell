@@ -851,6 +851,7 @@ func _release_bullets(render_t: float) -> void:
 static func progress_of(q: Player) -> Dictionary:
 	var d := GameSession.snapshot(q)
 	d["shop"] = q.shop.duplicate()
+	d["rev"] = q.progress.revelations.duplicate()    # revelaciones (21.7): solo en este nivel, no en la foto
 	return d
 
 ## Aplica el progreso que manda el anfitrión (sin tocar vida ni cordura, salvo lo que suba el
@@ -865,6 +866,7 @@ static func apply_progress(q: Player, d: Dictionary) -> bool:
 		q.progress.signs.clear()
 		for s: Variant in d.signs: q.progress.signs.append(StringName(String(s)))
 	if d.has("trick"): q.progress.pet_trick = String(d.trick)   # el truco del compañero (21.5)
+	if d.get("rev") is Array: q.progress.revelations.assign((d.rev as Array).map(func(x: Variant) -> String: return String(x)))   # (21.7)
 	if d.get("attrs") is Dictionary: q.attrs = (d.attrs as Dictionary).duplicate()
 	if d.get("attrs_level1") is Dictionary: q.attrs_level1 = (d.attrs_level1 as Dictionary).duplicate()
 	if d.get("weapons") is Array:

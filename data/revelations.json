@@ -1,0 +1,14 @@
+{
+	"_doc": "Revelaciones (hito 21.7, Revelations): quien sale de una crisis de locura elige entre dos, al azar entre las que aún no tiene; duran lo que queda del nivel. 'stats': estadísticas del personaje ('campo*' multiplica y 'campo+' suma, en Player.rebuild_stats). 'efecto': eyes (ve brillar los ojos de los enemigos a 'radio' m, también a través del decorado, y su farol alumbra 'farol' veces más lejos), walls (sus balas atraviesan el decorado), reveal (cada s, los enemigos a 'radio' m quedan revelados con 'bonus' de daño de más y los enterrados salen) o aura (los enemigos a 'radio' m pierden 'dps' de vida por segundo). 'color': el del iris de su icono (tools/gen_revelaciones.py) y el del destello.",
+	"revelaciones": [
+		{"id": "ojos_muros", "nombre": "Ojos en la oscuridad", "texto": "Tu farol alumbra el doble de lejos y ves brillar los ojos de los que te rodean, también tras el decorado", "efecto": "eyes", "radio": 14.0, "farol": 2.0, "color": [1.0, 0.32, 0.25]},
+		{"id": "sin_muros", "nombre": "Nada los detiene", "texto": "Tus balas atraviesan el decorado", "efecto": "walls", "color": [0.55, 0.8, 1.0]},
+		{"id": "lo_oculto", "nombre": "Lo oculto, al descubierto", "texto": "Los enemigos a 7 m quedan revelados (un 25 % más de daño) y los enterrados salen", "efecto": "reveal", "radio": 7.0, "bonus": 0.25, "color": [0.72, 0.45, 1.0]},
+		{"id": "lenguas_muertas", "nombre": "Lenguas muertas", "texto": "Tus armas arcanas no cuestan cordura", "stats": {"arcane_cost_mult*": 0.0}, "color": [0.45, 1.0, 0.55]},
+		{"id": "conocimiento", "nombre": "Conocimiento prohibido", "texto": "Haces un 30 % más de daño, pero el daño mental te hace un 30 % más", "stats": {"damage_mult*": 1.3, "mental_mult*": 1.3}, "color": [1.0, 0.78, 0.25]},
+		{"id": "reloj_roto", "nombre": "El reloj roto", "texto": "Tus armas se recargan un 20 % antes", "stats": {"weapon_cooldown_mult*": 0.8}, "color": [0.92, 0.92, 0.98]},
+		{"id": "entre_angulos", "nombre": "Entre los ángulos", "texto": "Esquivas un 35 % más a menudo", "stats": {"dodge_cooldown*": 0.65}, "color": [0.35, 1.0, 0.92]},
+		{"id": "mirada", "nombre": "La mirada que hiere", "texto": "Los enemigos a 3 m de ti pierden 10 de vida por segundo", "efecto": "aura", "radio": 3.0, "dps": 10.0, "color": [1.0, 0.42, 0.72]},
+		{"id": "calma", "nombre": "La calma del abismo", "texto": "Las próximas crisis duran la mitad y recuperas cordura un 50 % más deprisa", "stats": {"crisis_mult*": 0.5, "sanity_regen+": 0.5}, "color": [0.4, 0.6, 1.0]}
+	]
+}

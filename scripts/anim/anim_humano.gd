@@ -7,7 +7,7 @@ extends RefCounted
 ## CharacterData.dodge_anim; la animación puede durar más que el impulso del esquive.
 const ARM_LAG := 0.32                         ## retraso de los brazos respecto a las piernas (rad del ciclo)
 const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive": 0.5,
-	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6, "brake": 0.5, "cheer": 0.9, "bond_wave": 1.2, "marvel": 1.1, "open_chest": 0.9,
+	"jump": 0.45, "flash": 0.3, "throw": 0.55, "cast": 0.5, "swing": 0.45, "thrust": 0.4, "slam": 0.6, "brake": 0.5, "cheer": 0.9, "bond_wave": 1.2, "marvel": 1.1, "open_chest": 0.9, "revelation": 1.6,
 	"win_fist": 1.6, "win_salute": 1.6, "win_hat": 1.6, "win_ward": 1.6, "win_bow": 1.6, "win_court": 1.8,
 	"win_paint": 1.8, "win_flask": 1.6, "win_angle": 1.7, "win_tune": 1.7, "win_poet": 1.7, "win_clasp": 1.6,
 	"fidget_look": 2.6, "fidget_stretch": 2.8, "fidget_check": 2.4, "fidget_shift": 1.8,
@@ -16,7 +16,7 @@ const DURATION := {"idle": 2.0, "walk": 0.5, "slide": 0.5, "roll": 0.42, "dive":
 ## quieto. Empiezan y acaban en la pose de reposo, y se funden al entrar y al salir.
 const FIDGETS := ["fidget_look", "fidget_stretch", "fidget_check", "fidget_shift"]
 ## Gestos al atacar de los investigadores (hito 17.1): las hordas (HordeMesh) no los graban.
-const HORDE_SKIP := ["cast", "swing", "thrust", "slam", "brake", "cheer", "bond_wave", "marvel", "open_chest",
+const HORDE_SKIP := ["cast", "swing", "thrust", "slam", "brake", "cheer", "bond_wave", "marvel", "open_chest", "revelation",
 	"win_fist", "win_salute", "win_hat", "win_ward", "win_bow", "win_court",
 	"win_paint", "win_flask", "win_angle", "win_tune", "win_poet", "win_clasp"]
 
@@ -423,6 +423,22 @@ static func marvel(m: Node3D, t: float) -> void:
 	bend(m, "fore_l", (-0.9 * a * (1.0 - r) - 0.3) * out)
 	bend(m, "fore_r", (-0.9 * a * (1.0 - r) - 0.3) * out)
 	Anims.part(m, "torso").rotation.x = (0.14 * a * (1.0 - r) - 0.14 * r) * out
+
+## Revelación (hito 21.7): al elegirla, se lleva las manos a las sienes, echa la cabeza atrás y
+## abre despacio los brazos, como quien ve de pronto lo que hay detrás de todo.
+static func revelation(m: Node3D, t: float) -> void:
+	var a := Anims.ease(t / 0.22)                       # las manos a las sienes
+	var o := Anims.ease((t - 0.42) / 0.3)               # abre los brazos
+	var out := 1.0 - Anims.ease((t - 0.82) / 0.18)
+	var shake := sin(t * 70.0) * 0.04 * a * (1.0 - o)   # le tiemblan las manos
+	var x := lerpf(-1.45 * a, -0.35, o) * out           # (el giro en Z va antes que el de X:
+	var z := lerpf(0.85 * a, 2.2, o) * out              # z abre el brazo a un lado, x lo adelanta)
+	Anims.part(m, "arm_l").rotation = Vector3(x + shake, 0.0, -z)
+	Anims.part(m, "arm_r").rotation = Vector3(x - shake, 0.0, z)
+	bend(m, "fore_l", lerpf(-2.15 * a, -0.15, o) * out)
+	bend(m, "fore_r", lerpf(-2.15 * a, -0.15, o) * out)
+	Anims.part(m, "torso").rotation.x = (0.12 * a * (1.0 - o) - 0.18 * o) * out
+	Anims.part(m, "head").rotation.x = (0.22 * a * (1.0 - o) - 0.5 * o) * out
 
 ## Abre un baúl: se inclina, mete las manos bajo la tapa y la levanta de un tirón.
 static func open_chest(m: Node3D, t: float) -> void:

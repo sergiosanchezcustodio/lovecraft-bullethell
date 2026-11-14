@@ -65,6 +65,9 @@ var on_enemy_spawn := Callable()
 ## Ángulos de Gilman que entran en un signo (Combos, hito 21.6): (antes, ahora, etiqueta, daño, giro) -> true
 ## si la bala se abre (se acaba aquí). Solo mientras hay signos: si no, vacío y sin coste.
 var angle_hook := Callable()
+## Jugadores (bit 1 << índice) cuyas balas atraviesan el decorado: revelación «Nada los detiene»
+## (hito 21.7; la pone Revelations en cada paso de física).
+var walls_free := 0
 var _bursting := false                       ## las chispas de una que se abre no se mandan: cada PC la abre
 
 var _pos := PackedVector3Array()
@@ -309,7 +312,9 @@ func _physics_process(delta: float) -> void:
 		_age[i] += delta
 		var p2 := Vector2(_pos[i].x, _pos[i].z)
 		# se paran contra el decorado (cabañas, iglús, acantilados…), las del jugador y las enemigas
-		var dead := _age[i] >= _life[i] or not b.has_point(p2) or (obs != null and _owner[i] != OVER_WALLS and _home[i] >= 0.0 and obs.stops_bullet(p2))
+		var dead := _age[i] >= _life[i] or not b.has_point(p2) or (obs != null and _owner[i] != OVER_WALLS and _home[i] >= 0.0
+			and not (walls_free != 0 and _team[i] == Team.PLAYER and _owner[i] >= 0 and ((walls_free >> _owner[i]) & 1) == 1)
+			and obs.stops_bullet(p2))
 		if not dead and world != null:
 			dead = _collide_player_bullet(i) if _team[i] == Team.PLAYER else _collide_enemy_bullet(i)
 		var opened := false

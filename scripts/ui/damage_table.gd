@@ -86,6 +86,10 @@ func _source(p: Player, id: String) -> Array:
 		if not _icons.has(pd.model): _icons[pd.model] = ModelIcon.make(self, pd.model, "full", 96, 0.0) if pd.model != "" else null
 		return [pd.display_name, _icons[pd.model], "Compañero"]
 	if id == "combo": return ["Combinaciones", null, "Lo que hacen tus armas juntas, o con las de otros"]   # (hito 21.6)
+	if id == "revelacion":                           # «La mirada que hiere» (21.7)
+		var ids: Array = p.progress.revelations if p.progress != null else []
+		var rid := "mirada" if ids.is_empty() else String(Revelations.with_effect(ids, "aura").get("id", "mirada"))
+		return ["Revelaciones", Revelations.icon(rid), "Lo que te enseñó la locura"]
 	var wp := "res://data/weapons/%s.tres" % id
 	if ResourceLoader.exists(wp):
 		var w: WeaponData = load(wp)

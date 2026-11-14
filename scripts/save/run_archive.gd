@@ -95,6 +95,7 @@ static func source_name(id: String, pet := "") -> String:
 		var pp := "res://data/pets/%s.tres" % pet
 		return (load(pp) as PetData).display_name if pet != "" and ResourceLoader.exists(pp) else "Compañero"
 	if id == "combo": return "Combinaciones"           # (hito 21.6)
+	if id == "revelacion": return "Revelaciones"       # (hito 21.7)
 	for dir in ["weapons", "upgrades"]:
 		var p := "res://data/%s/%s.tres" % [dir, id]
 		if ResourceLoader.exists(p): return String(load(p).get("display_name"))

@@ -217,6 +217,8 @@ func _ready() -> void:
 	world.obstacles = arena.get_meta("obstacles")
 	add_child(world)
 	Combos.attach(world, is_guest())                 # combinaciones en cooperativo (hito 13.7)
+	revelations = Revelations.new().setup(world, not is_guest())   # revelaciones tras las crisis (21.7)
+	add_child(revelations)
 	# cuántos van a jugar, antes de montar los efectos («Automático» en los de las armas, hito 19.3)
 	Quality.players = clampi((GameSession.seats.size() if GameSession.is_set() else 1) + args.get_int("bots", 0), 1, 4)
 	HitSparks.enabled = args.get_bool("hit_sparks", true)
@@ -276,6 +278,9 @@ func _ready() -> void:
 			break
 	if args.has("pet"): _spawn_pet(args.get_str("pet"), player)   # probar un compañero
 	if args.has("trick") and player.progress != null: player.progress.pet_trick = args.get_str("trick")   # pruebas: con su truco (21.5)
+	if args.has("revelation") and player.progress != null:   # pruebas: con esas revelaciones (21.7)
+		for id in args.get_str("revelation").split(",", false): player.progress.revelations.append(id)
+		player.rebuild_stats()
 	if args.has("pets"):                            # pets=gato,perro: uno por jugador, en orden (hito 12.9)
 		var ids := args.get_str("pets").split(",")
 		for i in mini(ids.size(), players.size()): _spawn_pet(ids[i], players[i])
@@ -563,6 +568,13 @@ func _ready() -> void:
 	if players.size() > 1: Achievements.add(Saves.current, "coop_runs")
 	if args.get_int("demo") > 0: _demo_crowd(args.get_int("demo"))
 	if args.get_int("dummies") > 0: _dummies(args.get_int("dummies"))
+	if args.has("foes"):                             # pruebas: foes=pinguino,x,z;… enemigos quietos y casi inmortales ahí (21.7)
+		for f in args.get_str("foes").split(";", false):
+			var v := f.split(",")
+			var fd: EnemyData = (load("res://data/enemies/%s.tres" % v[0]) as EnemyData).duplicate()
+			fd.max_health = 1.0e6
+			fd.move_speed = 0.0
+			director.spawn(fd, Vector3(float(v[1]), 0.0, float(v[2])))
 	if args.get_bool("emitters"): _emitters()
 	if args.has("fx_demo"): _fx_demo(args.get_str("fx_demo"))
 	if args.has("blast"):                            # pruebas: blast=x,z,t;x,z,t explosiones ahí a esos s (hito 12.11)
@@ -926,8 +938,9 @@ func _open_level_up() -> void:
 		_open_level_up.call_deferred()
 		return
 	var evo := options[0].kind == PlayerProgress.Option.Kind.EVOLUTION
-	var sign := options[0].kind in [PlayerProgress.Option.Kind.SIGN, PlayerProgress.Option.Kind.TRICK]   # (los trucos, 21.5, igual)
+	var sign := options[0].kind in [PlayerProgress.Option.Kind.SIGN, PlayerProgress.Option.Kind.TRICK, PlayerProgress.Option.Kind.REVELATION]   # (los trucos, 21.5, y las revelaciones, 21.7, igual)
 	var trick := options[0].kind == PlayerProgress.Option.Kind.TRICK
+	var rev := options[0].kind == PlayerProgress.Option.Kind.REVELATION
 	var coop := players.size() > 1
 	if args.get_bool("autopick") or _is_bot(q):
 		var pick: PlayerProgress.Option = options[0] if not _is_bot(q) else options[q.up_rng.randi() % options.size()]
@@ -948,13 +961,15 @@ func _open_level_up() -> void:
 	if evo: title = "Evolución · %s" % options[0].from.display_name
 	if sign: title = "Signo Mayor"
 	if trick: title = "Truco · %s" % (q.pet.data.display_name if q.pet != null else "compañero")
+	if rev: title = "Revelación"
 	if net_game != null: title = "Turno de J%d · %s (%s) · %s" % [q.index + 1, q.data.display_name, _pc_name(_peer_of(q)), title]
 	elif coop: title = "Turno de J%d · %s · %s" % [q.index + 1, q.data.display_name, title]
 	var attr := "" if q.progress.attr_gains.is_empty() or evo or sign else String(q.progress.attr_gains[0])  # D-27: lo enseña el rodillo
 	if net_game != null:                          # en red, la partida se para en todos los PC
 		var h := {"k": "lvup", "peer": _peer_of(q), "i": q.index, "title": title, "attr": attr}
 		if evo: h["evo"] = String(options[0].from.id)
-		if sign and not trick: h["sign"] = true
+		if options[0].kind == PlayerProgress.Option.Kind.SIGN: h["sign"] = true
+		if rev: h["rev"] = true                    # (21.7) las sortea su PC, como los Signos
 		net_game.halt_all(h)
 		if q.remote: return                        # elige en su PC (llega con net_picked)
 	# la misma ventana en solitario y en cooperativo, centrada (antes, Menus.LevelUpMenu: fila de
@@ -974,8 +989,8 @@ func _open_level_up() -> void:
 ## La ventana de subida de un jugador (CoopLevelUp centrada, con su color en cooperativo).
 func _level_up_window(q: Player, options: Array[PlayerProgress.Option], title: String, attr: String, pick: Callable) -> CoopLevelUp:
 	var entry := {"player": q, "options": options, "title": title, "attr": attr}
-	if not options.is_empty() and options[0].kind in [PlayerProgress.Option.Kind.EVOLUTION, PlayerProgress.Option.Kind.SIGN, PlayerProgress.Option.Kind.TRICK]:
-		entry["evolution"] = true                    # ramas, signos o trucos: sin rodillos ni descartes (16.8, 16.9, 21.5)
+	if not options.is_empty() and options[0].kind in [PlayerProgress.Option.Kind.EVOLUTION, PlayerProgress.Option.Kind.SIGN, PlayerProgress.Option.Kind.TRICK, PlayerProgress.Option.Kind.REVELATION]:
+		entry["evolution"] = true                    # ramas, signos, trucos o revelaciones: sin rodillos ni descartes (16.8, 16.9, 21.5, 21.7)
 	for o in options:                                # los trucos llevan el retrato del compañero (21.5)
 		if o.kind == PlayerProgress.Option.Kind.TRICK and o.icon == null and q.pet != null and q.pet.data.model != "":
 			o.icon = _pet_icon(q.pet.data.model)
@@ -1002,6 +1017,21 @@ func _pet_icon(model: String) -> Texture2D:
 			get_tree().create_timer(0.8, true, false, true).timeout.connect(func() -> void: tx.get_image().save_png("user://icono_%s.png" % model))
 	return _pet_icons[model]
 
+## Revelaciones (hito 21.7): quien sale de una crisis elige una. Sin red o en el anfitrión, que
+## lleva las subidas; los jugadores de otro PC traen su crisis en sus banderas (NET_CRISIS).
+## `revelations=false`, sin ellas.
+var _in_crisis := {}
+var _crisis_forced := false
+func _watch_crises() -> void:
+	if args.get_str("revelations", "") == "false": return
+	for q in players:
+		var now := q.sanity_state != null and q.sanity_state.in_crisis
+		if bool(_in_crisis.get(q.index, false)) and not now and q.health > 0.0 and q.progress != null:
+			q.progress.revelations_pending += 1
+			if args.get_bool("log"): print("REVELACION pendiente J%d t=%.1f" % [q.index + 1, director.time if director else 0.0])
+			_open_level_up.call_deferred()
+		_in_crisis[q.index] = now
+
 static func _pick_text(q: Player, o: PlayerProgress.Option) -> String:
 	return "J%d · %s: %s" % [q.index + 1, q.data.display_name, o.title()]
 
@@ -1012,6 +1042,10 @@ func _choose_option(q: Player, o: PlayerProgress.Option) -> String:
 		if args.get_bool("log"): print("SIGNO %s" % o.sign.get("id", ""))
 		var st := "%s: %s" % [o.title(), o.text()]
 		return "J%d · %s" % [q.index + 1, st] if players.size() > 1 else st
+	if o.kind == PlayerProgress.Option.Kind.REVELATION:   # (21.7)
+		if args.get_bool("log"): print("REVELACION %s" % o.revelation.get("id", ""))
+		var rt := "Revelación · %s: %s" % [o.title(), o.text()]
+		return "J%d · %s" % [q.index + 1, rt] if players.size() > 1 else rt
 	if o.kind == PlayerProgress.Option.Kind.TRICK:   # (21.5)
 		if args.get_bool("log"): print("TRUCO %s %s" % [q.progress.pet_id, o.trick.get("id", "")])
 		var tt := "%s aprende %s: %s" % [q.pet.data.display_name if q.pet != null else "Tu compañero", o.title(), o.text()]
@@ -1167,14 +1201,18 @@ func _open_net_level_up(q: Player, d: Dictionary) -> void:
 	q.progress.evolving.clear()                   # la rama pendiente la dice el anfitrión (16.8)
 	if d.has("evo"): q.progress.evolving.append(StringName(String(d.evo)))
 	q.progress.signs_pending = 1 if d.has("sign") else 0    # Signo Mayor (16.9), con los logros de este PC
+	q.progress.revelations_pending = 1 if d.has("rev") else 0   # revelación (21.7), sorteada aquí
 	var options := q.progress.next_options(q.weapons, q.up_rng)
 	q.progress.evolving.clear()
-	if options.is_empty() and d.has("sign"):           # ninguno abierto aquí: que siga
+	if options.is_empty() and (d.has("sign") or d.has("rev")):   # ninguno abierto aquí (o ya las tiene todas): que siga
 		var none := PlayerProgress.Option.new()
-		none.kind = PlayerProgress.Option.Kind.SIGN
+		none.kind = PlayerProgress.Option.Kind.REVELATION if d.has("rev") else PlayerProgress.Option.Kind.SIGN
 		net_game.send_pick(q, none)
+		q.progress.signs_pending = 0
+		q.progress.revelations_pending = 0
 		return
 	q.progress.signs_pending = 0
+	q.progress.revelations_pending = 0
 	if options.is_empty(): return
 	var menu := _level_up_window(q, options, String(d.get("title", "")), String(d.get("attr", "")),
 		func(pq: Player, o: PlayerProgress.Option) -> void: net_game.send_pick(pq, o))
@@ -1190,8 +1228,9 @@ func net_picked(i: int, d: Dictionary) -> void:
 	q.rerolls_used = int(d.get("rerolls", q.rerolls_used))
 	q.banishes_used = int(d.get("banishes", q.banishes_used))
 	var o := q.progress.option_for(String(d.get("key", "")), q.weapons)
-	if o == null and String(d.get("key", "")) == "s:":  # sin Signos abiertos en su PC (16.9)
-		q.progress.signs_pending = 0
+	if o == null and String(d.get("key", "")) in ["s:", "r:"]:  # sin Signos abiertos en su PC (16.9) o sin revelaciones (21.7)
+		if String(d.get("key", "")) == "s:": q.progress.signs_pending = 0
+		else: q.progress.revelations_pending = 0
 		_menu_open = false
 		net_game.resume_all("")
 		_open_level_up.call_deferred()
@@ -1574,6 +1613,7 @@ func _diary(result: String) -> Array:
 var run_seed := 0
 var bonds: Bonds                                  ## vínculos entre los investigadores (hito 21.3)
 var night_events: NightEvents                    ## sucesos de la noche (hito 21.4)
+var revelations: Revelations                    ## revelaciones al salir de una crisis (hito 21.7)
 func _seed_players() -> void:
 	if level.daily != "": run_seed = Daily.seed_of(level.daily)
 	else:
@@ -2217,6 +2257,10 @@ func _process_step(delta: float) -> void:
 	if _ach_t >= 1.0 and not _ended:
 		_ach_t = 0.0
 		_check_achievements()
+	if not _ended and not is_guest(): _watch_crises()
+	if args.has("crisis_at") and not _crisis_forced and director != null and director.time >= args.get_float("crisis_at"):
+		_crisis_forced = true                          # pruebas: la cordura del J1 a cero a los N s (21.7)
+		player.sanity = 0.0
 	if players.size() > 1:                           # la cámara encuadra a los que siguen en pie
 		var alive: Array[Node3D] = []
 		for q in players:

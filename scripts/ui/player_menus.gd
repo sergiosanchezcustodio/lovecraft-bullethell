@@ -369,6 +369,13 @@ class Sheet extends Control:
 			var names := Array(p.progress.signs).map(func(id: StringName) -> String: return String(Signs.find(String(id)).get("name", id)))
 			sg.visible = not names.is_empty()
 			sg.text = " · ".join(PackedStringArray(names)))
+		var rv := _label("", 15, CoopLevelUp.REVELATION_COLOR, true)   # revelaciones de este nivel (21.7)
+		rv.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		col.add_child(rv)
+		_dyn.append(func() -> void:
+			var names := Array(p.progress.revelations).map(func(id: String) -> String: return String(Revelations.find(id).get("nombre", id)))
+			rv.visible = not names.is_empty()
+			rv.text = "Revelaciones: " + " · ".join(PackedStringArray(names)))
 		if p.outfit_set != "":                   # conjunto del vestuario entero (14.8)
 			var won := OutfitSets.levels_with(Saves.current, p.outfit_worn)
 			var t := "Conjunto: " + p.outfit_set

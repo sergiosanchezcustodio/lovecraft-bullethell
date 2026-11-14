@@ -3130,3 +3130,51 @@ Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden:
   - Las seis nuevas.
   - Un sueño vacío no se combina.
   - La esquirla que sale de dentro de un signo no se abre.
+
+### 21.7: revelaciones (13 y 14-11-2026)
+
+- **Qué:** quien sale de una crisis de locura elige entre dos revelaciones, al azar entre las que aún no tiene. Le duran lo que queda del nivel: no pasan al siguiente ni al reintentar (`GameSession.snapshot` no las guarda). Como las ramas, los Signos y los trucos, no gastan la subida de nivel. La caída de la cordura pasa a ser algo que también se busca.
+- **La ventana:** título «Revelación», cartas lilas (`CoopLevelUp.REVELATION_COLOR`), la etiqueta «REVELACIÓN» del color de cada una y su icono. Al elegir, el aviso dice «Revelación · <nombre>: <texto>».
+- **Al llegar** (en cualquier PC, también por la red): un anillo y chispas de su color, un ojo que se abre sobre la cabeza y sube (enganchado a su `Visual`, así que lo sigue), el sonido `revelation` y el gesto `revelation` de `anim_humano` (manos a las sienes, cabeza atrás y brazos abiertos; las hordas no lo graban).
+- **Las nueve** (`data/revelations.json`):
+
+| Revelación | Qué hace |
+|---|---|
+| Ojos en la oscuridad | El farol alumbra el doble de lejos y brillan los ojos de los enemigos a 14 m, también a través del decorado |
+| Nada los detiene | Sus balas atraviesan el decorado (`BulletManager.walls_free`) |
+| Lo oculto, al descubierto | Los enemigos a 7 m quedan revelados (un 25 % más de daño) y los enterrados salen |
+| Lenguas muertas | Las armas arcanas no cuestan cordura |
+| Conocimiento prohibido | Un 30 % más de daño, pero el daño mental le hace un 30 % más |
+| El reloj roto | Las armas se recargan un 20 % antes |
+| Entre los ángulos | Esquiva un 35 % más a menudo |
+| La mirada que hiere | Los enemigos a 3 m pierden 10 de vida por segundo, con un anillo rosado y un latido (`gaze_pulse`) |
+| La calma del abismo | Las crisis siguientes duran la mitad y recupera cordura un 50 % más deprisa |
+
+- **Ojos en la oscuridad sustituye a «Ojos tras los muros»**, que solo pintaba los ojos de los enemigos tapados. Con esta cámara, el decorado alto de las arenas está en los bordes (las casas de las calles) y el bajo (tiendas, iglú, pilotes) casi nunca tapa una cabeza entera: se notaba muy poco. Ahora los ojos salen en todos los de alrededor, por encima de todo, y el sombreador no lee la profundidad. Van en la cara, más juntos de perfil y apagados de espaldas (`Enemy.facing`), y escalan con el enemigo.
+- **Cómo:**
+  - `Revelations` (`scripts/core/revelations.gd`, un nodo por partida): datos, sorteo (`roll`), estadísticas (`apply_stats`, desde `Player.rebuild_stats`: «campo*» multiplica y «campo+» suma) y efectos. «reveal» y «aura», cada 0,5 s, solo donde se manda en los enemigos (sin red o en el anfitrión). Los ojos, en `_process` y solo para los jugadores de ese PC: un MultiMesh de hasta 160 con `revelation_eyes.gdshader`.
+  - La altura de los ojos se mide una vez por modelo desde sus mallas (`Revelations.eye_height`). `HordeMesh.height` sale 0,8 m para todas las hordas y no vale: es un fallo que ya estaba (las cifras de daño de las hordas salen bajas).
+  - `PlayerProgress`: `Option.Kind.REVELATION` (clave «r:<id>»), `revelations` y `revelations_pending`. En `next_options` va justo después de la rama de evolución.
+  - `Game._watch_crises`: cuando un jugador pasa de estar en crisis a no estarlo, una revelación pendiente y la ventana. En el anfitrión también los jugadores de otro PC, por su bandera `NET_CRISIS`.
+  - En red, como los Signos: el anfitrión para la partida con `h["rev"]`, el PC del jugador sortea las dos y manda la elegida («r:» si ya las tiene todas). Las revelaciones viajan en `NetGame.progress_of` (`rev`). PROTOCOL 22.
+  - Su daño va a «J<n>:revelacion»: fila «Revelaciones» en la tabla de daño (con el icono de la mirada) y en el archivo. En la ficha de la pausa, una línea con las que lleva.
+- **Arte y sonido:**
+  - `tools/gen_revelaciones.py`: un medallón de piedra con runas, fondo estrellado y un ojo de pupila de rendija, a bloques y alineado con la rejilla; el iris, del color de cada una (`models/revelacion_<id>.json`).
+  - `tools/render_revelaciones.gd` los pasa a `resources/revelations/<id>.png` (256 px), como los Signos: en partida no hay vistas.
+  - `gen_sfx.py --revelaciones`: `revelation` (susurro que sube, coro que se abre en un acorde y brillo de cristal) y `gaze_pulse` (pulso grave).
+- **Comprobado en partida:**
+  - La ventana, el destello y el gesto (Gilman, `crisis_at=3`).
+  - Los ojos en la noche de Innsmouth (`p2_n1`).
+  - El aura, Lo oculto y la fila en la tabla de daño.
+- **Opciones de prueba nuevas:** `crisis_at=t` (la cordura del J1 a cero), `revelation=a,b` (empieza con esas), `revelations=false` y `foes=pinguino,x,z;…` (enemigos quietos y casi inmortales en esos sitios).
+- **Tests** (`tests/test_revelations.gd`, 12):
+  - Los datos y sus iconos.
+  - El sorteo.
+  - No gasta la subida.
+  - `option_for` con lo que llega por la red.
+  - Las estadísticas se ponen y se quitan.
+  - No pasan de nivel pero viajan en el progreso.
+  - Las balas atraviesan el decorado.
+  - Lo oculto y el aura, con su fila; en el invitado no hacen nada.
+  - El gesto.
+  - Los ojos (dos por enemigo cercano).

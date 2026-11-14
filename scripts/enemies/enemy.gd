@@ -803,6 +803,11 @@ func _number_height() -> void:
 			if is_instance_valid(mi) and mi.mesh != null:
 				_top_h = maxf(_top_h, (inv * mi.global_transform * mi.get_aabb()).end.y)
 
+## Altura del modelo ya escalado (m): donde van sus ojos en «Ojos tras los muros» (21.7).
+func top_height() -> float:
+	_number_height()
+	return (_top_h if _top_h > 0.0 else 1.2) * model_scale
+
 ## Cifra de daño encima del modelo (DamageNumbers).
 func _number(amount: float, strong: bool, dot: bool) -> void:
 	if not DamageNumbers.enabled or world == null: return

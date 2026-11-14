@@ -48,6 +48,7 @@ const HINT := "Arriba y abajo para elegir · A o Intro para confirmar"
 const EVO_COLOR := Color(0.55, 0.95, 0.62)   ## evoluciones: el verde de lo que no es de este mundo (16.8, 16.15)
 const SIGN_COLOR := Color(0.7, 0.6, 1.0)     ## Signos Mayores: violeta (16.9)
 const TRICK_COLOR := Color(1.0, 0.76, 0.42)   ## trucos de los compañeros: ámbar (21.5)
+const REVELATION_COLOR := Revelations.COLOR   ## revelaciones: lila (21.7)
 
 ## Lo que pasa por los rodillos mientras giran: {icon, title, kind, accent}.
 static var _filler: Array[Dictionary] = []
@@ -232,6 +233,7 @@ class Picker extends PanelContainer:
 			match options[0].kind:
 				PlayerProgress.Option.Kind.SIGN: accent = SIGN_COLOR
 				PlayerProgress.Option.Kind.TRICK: accent = TRICK_COLOR
+				PlayerProgress.Option.Kind.REVELATION: accent = REVELATION_COLOR
 				_: accent = EVO_COLOR
 		var metal := MenuKit.BRASS if p_accent.a <= 0.0 and solo else MenuKit.BRASS.lerp(accent, 0.5)
 		theme = MenuKit.theme()
@@ -500,6 +502,7 @@ class Picker extends PanelContainer:
 			PlayerProgress.Option.Kind.EVOLUTION: return branch_color(o.weapon)
 			PlayerProgress.Option.Kind.SIGN: return SIGN_COLOR
 			PlayerProgress.Option.Kind.TRICK: return TRICK_COLOR
+			PlayerProgress.Option.Kind.REVELATION: return Revelations.color_of(String(o.revelation.get("id", ""))).lerp(Color.WHITE, 0.25)
 		return o.upgrade.color
 
 	## Color de una rama de evolución (16.8): el de su acento en la partida (FxAccent, 18.14),
@@ -515,6 +518,7 @@ class Picker extends PanelContainer:
 			PlayerProgress.Option.Kind.EVOLUTION: return "EVOLUCIÓN"
 			PlayerProgress.Option.Kind.SIGN: return "SIGNO MAYOR"
 			PlayerProgress.Option.Kind.TRICK: return "TRUCO"
+			PlayerProgress.Option.Kind.REVELATION: return "REVELACIÓN"
 		return "OBJETO"
 
 	func move(step: int) -> void:

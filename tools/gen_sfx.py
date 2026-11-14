@@ -1094,6 +1094,58 @@ def sucesos():
         save('star_fall_%d' % k, tail(x, 0.15))
 
 
+def revelaciones():
+    """Revelaciones (hito 21.7). La revelación: un susurro que sube (ruido filtrado con un filtro que
+    abre y sílabas de amplitud), un coro grave que se abre en un acorde inarmónico con vibrato lento
+    y, en lo alto, un brillo de cristal que se queda vibrando; todo con una cola larga. El latido del
+    aura de «La mirada que hiere»: un pulso grave y corto, como un ojo que parpadea."""
+    r = np.random.default_rng(2107)
+
+    def tail(x, sec=0.3):
+        n = min(len(x) // 3, int(sec * SR))
+        x[-n:] *= np.linspace(1, 0, n) ** 2
+        return x
+
+    d = 3.2
+    tt = t(d)
+    n = r.standard_normal(len(tt))                                       # el susurro
+    wh = np.zeros(len(tt))
+    seg = int(0.04 * SR)
+    for i in range(0, len(tt), seg):
+        c = 600 + 2600 * min(i / (1.1 * SR), 1.0)
+        wh[i:i + seg] = bp(n[max(0, i - 2048):i + seg], c * 0.6, c * 1.5)[-len(wh[i:i + seg]):]
+    syl = 0.55 + 0.45 * np.abs(np.sin(2 * np.pi * 3.1 * tt + np.sin(2 * np.pi * 0.7 * tt)))
+    wh *= syl * np.clip(tt / 1.0, 0, 1) ** 2 * np.exp(-np.maximum(tt - 1.1, 0) / 0.35)
+    ch = np.zeros(len(tt))                                               # el coro
+    open_t = 0.95
+    for ratio, amp in ((1.0, 1.0), (1.498, 0.7), (2.0, 0.5), (2.38, 0.45), (3.01, 0.25)):
+        for det in (-0.004, 0.0, 0.005):
+            f = 110.0 * ratio * (1 + det) * (1 + 0.006 * np.sin(2 * np.pi * 4.8 * tt + r.uniform(0, 6)))
+            ph = 2 * np.pi * np.cumsum(f) / SR
+            ch += np.sin(ph) * amp / 3
+    swell = np.clip((tt - 0.3) / (open_t - 0.3), 0, 1) ** 1.5 * np.exp(-np.maximum(tt - open_t, 0) / 1.1)
+    ch = lp(ch * swell, 1800)
+    gl = np.zeros(len(tt))                                               # el brillo de cristal
+    st = int(open_t * SR)
+    tg = tt[:len(tt) - st]
+    for f0, a in ((2093.0, 1.0), (3136.0, 0.6), (4699.0, 0.35)):
+        gl[st:] += np.sin(2 * np.pi * f0 * tg * (1 + 0.003 * np.sin(2 * np.pi * 6 * tg))) * a * np.exp(-tg / 0.9) * np.minimum(tg / 0.004, 1)
+    ir = lp(r.standard_normal(int(2.2 * SR)), 3000) * np.exp(-t(2.2) / 0.8)
+    dry = wh * 0.55 + ch + gl * 0.32
+    wet = signal.fftconvolve(dry, ir)[:len(dry)]
+    wet *= np.std(dry) / (np.std(wet) + 1e-9)
+    save('revelation', tail(dry * 0.75 + wet * 0.45, 0.8))
+
+    for k in range(2):                                                   # el pulso del aura
+        d = 0.45
+        tt = t(d)
+        f = 70.0 * (1 + 0.08 * k) * np.exp(-tt * 2.0)
+        x = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tt / 0.12) * np.minimum(tt / 0.01, 1)
+        x += lp(r.standard_normal(len(tt)), 900) * np.exp(-tt / 0.05) * 0.25
+        x += np.sin(2 * np.pi * 880 * (1 + 0.1 * k) * tt) * np.exp(-tt / 0.08) * 0.08
+        save('gaze_pulse_%d' % k, tail(x, 0.1))
+
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
@@ -1112,6 +1164,8 @@ if __name__ == '__main__':
         fase20()
     elif '--sucesos' in sys.argv:                              # solo los de los sucesos de la noche (hito 21.4)
         sucesos()
+    elif '--revelaciones' in sys.argv:                         # solo los de las revelaciones (hito 21.7)
+        revelaciones()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)
@@ -1126,5 +1180,6 @@ if __name__ == '__main__':
         sueno()
         fase20()
         sucesos()
+        revelaciones()
         if len(sys.argv) > 1: copy_kenney(sys.argv[1])
     print('listo en', OUT)

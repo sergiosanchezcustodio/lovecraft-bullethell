@@ -1367,6 +1367,7 @@ func rebuild_stats() -> void:
 	v["move_speed"] *= debug_speed * NightEvents.value("player_speed")   # la ventisca (21.4)
 	for k: String in bond:                                   # vínculos (hito 21.3): con el otro cerca
 		if k.begins_with("stat:") and v.has(k.substr(5)): v[k.substr(5)] *= float(bond[k])
+	if progress != null and not progress.revelations.is_empty(): Revelations.apply_stats(v, progress.revelations)   # (21.7)
 	for k in v: data.set(k, v[k])
 	var tags := base.bonus_tags.duplicate()                  # Medallón del cazador: contra élites y únicos
 	if data.elite_mult != 1.0: tags[ELITE_TAG] = data.elite_mult
@@ -1382,7 +1383,7 @@ func rebuild_stats() -> void:
 	if sanity_state: sanity_state.duration_mult = data.crisis_mult
 	if motor: motor.data = data
 	var lamp := get_node_or_null("CarryLight") as OmniLight3D      # Linterna de queroseno (tienda)
-	if lamp != null: lamp.omni_range = 4.5 * (LANTERN_RANGE if float(shop.get("lantern", 0.0)) > 0.0 else 1.0) * Pacts.value("lamp")   # La noche más cerrada (hito 13.6)
+	if lamp != null: lamp.omni_range = 4.5 * (LANTERN_RANGE if float(shop.get("lantern", 0.0)) > 0.0 else 1.0) * Pacts.value("lamp") 			* (float(Revelations.with_effect(progress.revelations, "eyes").get("farol", 1.0)) if progress != null else 1.0)   # La noche más cerrada (hito 13.6); Ojos en la oscuridad (21.7)
 	# derribado o eliminado (la experiencia es común: sube igual), no: se levantaba sin que lo reanimaran
 	if health > 0.0: health = minf(health + maxf(data.max_health - old_health, 0.0), data.max_health)
 	sanity = minf(sanity + maxf(data.max_sanity - old_sanity, 0.0), data.max_sanity)
