@@ -86,6 +86,7 @@ A.write({
     "name": "El bosque encantado",
     "spawn": [1.5, 22.0],
     "slab": [SLAB[0], SLAB[1]],
+    "cats_from": [4.5, -HALF + 1.0],              # los gatos bajan de Ulthar por la puerta del camino
     "walkable": ["sue_losa"],
     "ground": {"seed": 53, "tile": 0.5, "margin_back": 14.0, "margin_front": 18.0, "camp_radius": 0.0,
                "kind": "mud", "wet": 0.0, "road": [4.5, -34.0, 0.0, 1.0, 2.0],

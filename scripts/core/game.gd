@@ -465,6 +465,9 @@ func _ready() -> void:
 			polyps = PolypWinds.new().setup(world, level, not is_guest(), self)
 			add_child(polyps)
 			if args.has("trap_here"): _trap_here.call_deferred(args.get_float("trap_here", 1.0))
+		if level.cats_every > 0.0 or level.mushroom_sanity > 0.0:   # las Tierras del Sueño (21.10)
+			dream = DreamLands.new().setup(world, level, not is_guest(), self)
+			add_child(dream)
 		director.enemy_spawned.connect(func(e: Enemy) -> void:
 			e.died.connect(_on_enemy_died)
 			if blight != null and not is_guest() and float(e.data.param("blight_on_death", 0.0)) > 0.0: e.died.connect(blight.on_enemy_died))
@@ -1645,6 +1648,7 @@ func _powder_here(every: float) -> void:
 		await get_tree().create_timer(maxf(every, 0.5), false).timeout
 
 var polyps: PolypWinds                           ## las trampillas de la Gran Raza y los pólipos (21.15)
+var dream: DreamLands                            ## lo propio de cada nivel de la parte 4 (21.10)
 func _level_polyps() -> bool:
 	for ed: EnemyData in level.pool + level.final_pool + level.mid_enemies + ([level.final_enemy] if level.final_enemy else []):
 		if bool(ed.param("polyp", false)): return true

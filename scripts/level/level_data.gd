@@ -101,6 +101,14 @@ func is_survival() -> bool:
 @export var trap_spawn_every := 4.0            ## s entre pólipos que salen de una abierta
 @export var trap_spawn_cap := 4                ## pólipos que suelta cada vez que se abre, como mucho
 @export var trap_enemy: EnemyData              ## lo que sale
+@export_group("Las Tierras del Sueño (hito 21.10)")
+## Lo propio de cada nivel de la parte 4 (DreamLands). Nivel 1: los gatos de Ulthar bajan del pueblo a
+## barrer a los zoogs y los hongos devuelven cordura.
+@export var cats_every := 0.0                  ## s medios entre manadas (0: sin gatos); con el gato de compañero, ×0,7
+@export var cats_count := 5                    ## gatos de cada manada
+@export var cats_life := 10.0                  ## s que cazan antes de volver al pueblo
+@export var mushroom_sanity := 0.0             ## cordura por segundo junto a los hongos que brillan (0: nada)
+@export var mushroom_radius := 1.9             ## m alrededor de cada corro
 @export_group("Dinero (D-31)")
 @export var money_bonus := 100                 ## dólares al superar el nivel
 @export var chest_every := 90.0                ## s medios entre baúles arcanos (0: ninguno)

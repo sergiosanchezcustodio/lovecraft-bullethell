@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"zoog_copas"
+display_name = "Zoog de las copas"
+model = "zoog_copas"
+model_scale = 1.3
+tier = 1
+spawn_weight = 0.55
+elite = false
+tags = Array[StringName]([&"zoog"])
+max_health = 16.0
+hit_radius = 0.35
+body_radius = 0.3
+move_speed = 2.7
+xp = 1.4
+money = 1
+contact_physical = 4.0
+contact_mental = 1.0
+movement = &"zoog"
+params = {"bold_mult": 1.4, "drop": true, "drop_damage": 9.0, "drop_radius": 1.2, "pack_min": 3, "pack_r": 4.5, "shy": 6.5, "warn": 1.0}
+attack_anim = ""

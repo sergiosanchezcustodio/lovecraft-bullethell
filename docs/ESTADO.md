@@ -3392,3 +3392,17 @@ El diseño (21.8) está en `docs/GDD.md` (sección 2.5, D-53): cuarta parte de l
   - Ambiente de las cinco arenas en `data/ambient.json`: pisadas, viento, murciélagos (gaviotas en Dylath-Leen), luciérnagas y motas en el bosque, sin sombras de nubes bajo tierra en Zin, y aliento y huellas en Kadath.
   - Capturas: `shots/game_leng4_004.0s.png`, `shots/game_zin4_004.0s.png` y `shots/game_kad4_004.0s.png`.
   - `test_hit_fx` (la micro-pausa, con tiempo real) falla hoy también sin estos cambios: es el ritmo del PC, no el código.
+
+### 21.10: las criaturas y lo propio de cada nivel (14-11-2026, en curso)
+
+Por tramos: nivel 1; nivel 2; nivel 3; niveles 4 y 5. Lo de cada nivel vive en `DreamLands` (`scripts/level/dream_lands.gd`; datos en `LevelData`, grupo «Las Tierras del Sueño»; en red, suceso `dream`). Modelos en `tools/gen_criaturas_sueno.py`; pruebas en `tests/test_sueno.gd`.
+
+- **Nivel 1, el bosque encantado** (`p4_n1`, vida ×1,3):
+  - **Zoogs** (escalón 1, `anim_cuadrupedo`, escala 1,3): pequeños, pardos, de pelo a mechones, con un manojo de tentáculos rosados en el hocico, ojos amarillos que brillan y cola pelada. `ZoogBehavior` (`scripts/enemies/zoog_behavior.gd`): cuentan los zoogs (etiqueta `zoog`) a 4,5 m; con menos de 3 no se atreven (rondan a 6,5 m y huyen si te acercas; al que le das estando solo, huye 1,4 s); con 3 o más atacan a saltos a 1,4 veces su paso.
+  - **Zoogs de las copas** (escalón 1, pelo verdoso de musgo y garras claras): aparecen escondidos arriba (`buried`), marcan tu sitio 1 s (aviso verde, `brush`) y caen encima (9 de daño en 1,2 m); después, zoogs normales. Lo que revela los hace caer sin golpe.
+  - **El anciano del consejo de los zoogs** (jefe del nivel, único, escala 3, 480 de vida): gris, con los tentáculos largos y blancos, barba y una ristra de setas que brillan al cuello. `keep` a 6,5 m, esporas (`zoog_esporas`: abanico de 7, dos ráfagas, sobre todo mental) y llama a 4 zoogs cada 9 s («El anciano chilla: el consejo de los zoogs acude»).
+  - **Los gatos de Ulthar** (`cats_every` 55 s; ×0,7 si alguien lleva al gato de compañero): bajan 5 gatos (el modelo del compañero) por la puerta del camino (`cats_from` en `bosque.json`), «Bajan los gatos de Ulthar…», y corren a por el zoog más cercano: el que alcanzan, cae; al anciano solo le arañan (25 cada segundo). A los 10 s vuelven al pueblo. En el invitado los manda el anfitrión, que es el único que hace daño.
+  - **Los hongos que brillan** (`sue_hongos`): 4 de cordura por segundo a 1,9 m.
+  - Con la pesadilla en las oleadas, como criatura del sueño.
+- **Tests** (`tests/test_sueno.gd`, 11): el nivel; un zoog solo no se atreve y en grupo atacan; el de las copas cae con aviso y lo que revela lo hace caer; los gatos bajan y cazan, al anciano solo le arañan, vuelven al pueblo, llegan antes con el gato de compañero y en el invitado llegan del anfitrión; los hongos devuelven cordura.
+- **Capturas:** `shots/hoja_zoogs.png`, `shots/game_p41_045.0s.png` (los gatos), `shots/game_p41_070.0s.png` (zoogs que no se atreven), `shots/game_p41j_012.0s.png` (el anciano llama al consejo).
