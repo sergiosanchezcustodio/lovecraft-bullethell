@@ -36,7 +36,7 @@ Fases del proyecto, criterios de aceptación y estado. El diseño está en [`GDD
 | 18 | Efectos de las armas | **Hecha** (07-11-2026; retoques el 10-11-2026), pendiente de tu revisión: los 14 hitos de los cinco bloques, estilo voxel con degradados; calidad `weapon_fx` | Ninguna (D-50, resuelta) |
 | 19 | Rendimiento, accesibilidad de los efectos y distribución | **En curso** (10-11-2026): bloque A (rendimiento tras las fases 17 y 18); B y C propuestos | Ninguna |
 | 20 | Menús, transiciones, configuración y personajes nuevos | **Hecha** (13-11-2026), pendiente de tu revisión: los 22 hitos (el 20.9, en parte: los libros y los objetos de los jefes de la portada necesitan arte nuevo) | Ninguna |
-| 21 | Sonido y victorias de la fase 20, jugabilidad, contenido nuevo, gráficos y menús | **En curso** (13-11-2026; aprobada entera): bloque A hecho (21.1 y 21.2) y del B el 21.3, el 21.4, el 21.5, el 21.6 y el 21.7, pendientes de revisión | Ninguna (D-51 y D-52, resueltas) |
+| 21 | Sonido y victorias de la fase 20, jugabilidad, contenido nuevo, gráficos y menús | **En curso** (13-11-2026; aprobada entera): bloque A hecho (21.1 y 21.2) bloque B hecho (21.3 a 21.7) y del D el 21.13, pendientes de revisión | Ninguna (D-51 y D-52, resueltas) |
 
 ---
 
@@ -739,7 +739,7 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 21.13 | ***El color que cayó del cielo*:** la granja de los Gardner. El color se extiende por el suelo y lo que toca se vuelve gris y quebradizo, también los enemigos. Jefe: el color que sube del pozo | Propuesto |
+| 21.13 | ***El color que cayó del cielo*:** la granja de los Gardner. El color se extiende por el suelo y lo que toca se vuelve gris y quebradizo, también los enemigos. Jefe: el color que sube del pozo | Hecho (14-11-2026), pendiente de revisión: el formato de las noches sueltas (`Nights`, `data/nights.json`, «Noches sueltas» en el mapa) y la granja, con el color en el suelo (`ColorBlight`), la res gris, el granjero consumido y el color que sube del pozo (`ColorBehavior`) |
 | 21.14 | ***El horror de Dunwich*:** Sentinel Hill. El hermano de Wilbur es invisible: solo se ven sus huellas, y el polvo de Armitage lo descubre. Los chotacabras se llevan a los caídos | Propuesto |
 | 21.15 | ***La sombra fuera del tiempo*:** la ciudad de los Yith. Los pólipos voladores son invisibles y se anuncian con silbidos y viento | Propuesto |
 

@@ -67,6 +67,16 @@ func is_survival() -> bool:
 @export var mid_enemies: Array[EnemyData] = []
 @export var mid_times: Array[float] = []
 @export var mid_texts: Array[String] = []
+@export_group("El color (hito 21.13)")
+## Manchas del color que cayó del cielo (ColorBlight): 0 en blight_every, sin ellas (salvo las que
+## dejan los enemigos o el jefe). Quien está dentro se vuelve gris y quebradizo.
+@export var blight_every := 0.0                ## s medios entre manchas nuevas
+@export var blight_max := 10                   ## manchas a la vez (las del suelo; las demás, aparte)
+@export var blight_radius := Vector2(2.0, 4.0) ## radio final (m), al azar entre los dos
+@export var blight_grow := 0.4                 ## m/s que crece
+@export var blight_life := 40.0                ## s que dura cada una
+@export var blight_sanity := 2.0               ## cordura por segundo que quita a los de dentro
+@export var blight_enemy := 0.5                ## daño de más que reciben los enemigos agrisados
 @export_group("Dinero (D-31)")
 @export var money_bonus := 100                 ## dólares al superar el nivel
 @export var chest_every := 90.0                ## s medios entre baúles arcanos (0: ninguno)

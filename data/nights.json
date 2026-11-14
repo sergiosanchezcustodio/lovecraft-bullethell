@@ -1,0 +1,13 @@
+{
+	"_doc": "Noches sueltas (fase 21, bloque D; Nights). Niveles aparte de la campaña, cada uno con su escenario, dos criaturas, un jefe y su relato; se eligen desde el mapa de niveles («Noches sueltas»). id: el del nivel (data/levels/<id>.tres) y del relato (data/library/relatos.json); abre: el nivel de la campaña que hay que superar para abrirla; titulo, lugar y criaturas, para la ventana y el relato; texto, la presentación.",
+	"noches": [
+		{
+			"id": "noche_color",
+			"titulo": "El color que cayó del cielo",
+			"lugar": "La granja de los Gardner, al oeste de Arkham",
+			"criaturas": "Reses grises · Granjeros consumidos · El color que sube del pozo",
+			"texto": "Un meteorito cayó junto al pozo de Nahum Gardner. Desde entonces, un color que no tiene nombre se extiende por la tierra, y lo que toca se vuelve gris y quebradizo. También tú. También ellos.",
+			"abre": "p1_n5"
+		}
+	]
+}

@@ -38,6 +38,12 @@ func kind() -> Kind:
 	if mental > 0.0: return Kind.MENTAL
 	return Kind.PHYSICAL
 
+## Copia con solo la parte física multiplicada por `k` (quebradizo, 21.13).
+func scaled_physical(k: float) -> Damage:
+	var d := scaled(1.0)
+	d.physical = physical * k
+	return d
+
 func scaled(k: float) -> Damage:
 	var d := Damage.new(physical * k, mental * k)
 	d.knockback = knockback * k

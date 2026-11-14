@@ -1,0 +1,1288 @@
+{
+ "name": "La granja de los Gardner",
+ "well": [
+  0.0,
+  -9.0
+ ],
+ "ground": {
+  "seed": 33,
+  "tile": 0.5,
+  "margin_back": 14.0,
+  "margin_front": 18.0,
+  "camp_radius": 0.0,
+  "kind": "mud",
+  "wet": 0.12,
+  "road": [
+   -1.5,
+   0.0,
+   0.12,
+   1.0,
+   3.2
+  ],
+  "colors": {
+   "base_hi": [
+    0.38,
+    0.37,
+    0.33
+   ],
+   "base_lo": [
+    0.23,
+    0.225,
+    0.2
+   ],
+   "moss": [
+    0.3,
+    0.3,
+    0.27
+   ],
+   "puddle": [
+    0.1,
+    0.1,
+    0.11
+   ]
+  }
+ },
+ "light": {
+  "sun_rot": [
+   -36,
+   35
+  ],
+  "sun_color": [
+   0.66,
+   0.72,
+   0.86
+  ],
+  "sun_energy": 0.44,
+  "exposure": 1.25,
+  "ambient_color": [
+   0.42,
+   0.44,
+   0.52
+  ],
+  "ambient_energy": 0.46,
+  "background": [
+   0.08,
+   0.09,
+   0.12
+  ],
+  "fog_color": [
+   0.24,
+   0.24,
+   0.3
+  ],
+  "fog_density": 0.0,
+  "gamma": 1.45
+ },
+ "lamp": {
+  "color": [
+   1.0,
+   0.74,
+   0.44
+  ],
+  "energy": 2.2,
+  "range": 8.0
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_bloques_hielo_2": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_bloques_hielo_3": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_roca_nevada": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.4
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "inn_casa": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "inn_casa_2": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "granja_granero": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "granja_pozo": {
+   "type": "cylinder",
+   "radius": 0.85
+  },
+  "granja_manzano_1": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "granja_manzano_2": {
+   "type": "cylinder",
+   "radius": 0.28
+  },
+  "granja_cerca": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "granja_muro": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "granja_heno": {
+   "type": "cylinder",
+   "radius": 0.85
+  },
+  "granja_abrevadero": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "inn_barril": {
+   "type": "cylinder",
+   "radius": 0.35
+  },
+  "inn_carretilla": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "pan_tocon": {
+   "type": "cylinder",
+   "radius": 0.4
+  },
+  "granja_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  }
+ },
+ "size": [
+  64.0,
+  64.0
+ ],
+ "spawn": [
+  0.0,
+  0.0
+ ],
+ "props": [
+  {
+   "model": "inn_casa",
+   "pos": [
+    -17.0,
+    -35.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_granero",
+   "pos": [
+    9.0,
+    -35.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_casa_2",
+   "pos": [
+    -36.0,
+    -34.0
+   ],
+   "rot": 90,
+   "scale": 0.95
+  },
+  {
+   "model": "granja_granero",
+   "pos": [
+    30.0,
+    -37.5
+   ],
+   "rot": 90,
+   "scale": 0.85
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -10.0,
+    -31.2
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -7.0,
+    -31.2
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -4.0,
+    -31.2
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -1.0,
+    -31.2
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    16.5,
+    -31.2
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    19.5,
+    -31.2
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    22.5,
+    -31.2
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    25.5,
+    -31.2
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_manzano_1",
+   "pos": [
+    -1.5,
+    -33.0
+   ],
+   "rot": 157.7,
+   "scale": 1.1
+  },
+  {
+   "model": "granja_manzano_1",
+   "pos": [
+    18.0,
+    -33.0
+   ],
+   "rot": 334.7,
+   "scale": 1.1
+  },
+  {
+   "model": "granja_cerca",
+   "pos": [
+    2.0,
+    -22.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_cerca",
+   "pos": [
+    8.0,
+    -22.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_cerca",
+   "pos": [
+    17.5,
+    -22.5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_cerca",
+   "pos": [
+    20.5,
+    -25.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_abrevadero",
+   "pos": [
+    12.5,
+    -25.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_heno",
+   "pos": [
+    21.0,
+    -18.0
+   ],
+   "rot": 242.2,
+   "scale": 1.1
+  },
+  {
+   "model": "granja_heno",
+   "pos": [
+    25.5,
+    -14.5
+   ],
+   "rot": 12.2,
+   "scale": 0.9
+  },
+  {
+   "model": "inn_carretilla",
+   "pos": [
+    -9.0,
+    -21.5
+   ],
+   "rot": 30,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_farol",
+   "pos": [
+    -12.5,
+    -26.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_farol",
+   "pos": [
+    4.0,
+    -27.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_farol",
+   "pos": [
+    2.6,
+    -6.4
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_pozo",
+   "pos": [
+    0.0,
+    -9.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    -27.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    -24.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    -21.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    -18.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    -15.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    -12.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    -9.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    -6.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    -3.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    -0.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    2.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    5.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    8.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    11.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    14.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    17.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    20.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    23.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    26.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    29.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -32.6,
+    32.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_manzano_1",
+   "pos": [
+    -27.13,
+    -21.92
+   ],
+   "rot": 53.5,
+   "scale": 1.07
+  },
+  {
+   "model": "granja_manzano_2",
+   "pos": [
+    -21.58,
+    -22.44
+   ],
+   "rot": 171.9,
+   "scale": 0.98
+  },
+  {
+   "model": "granja_manzano_2",
+   "pos": [
+    -26.28,
+    -16.05
+   ],
+   "rot": 167.7,
+   "scale": 0.99
+  },
+  {
+   "model": "granja_manzano_2",
+   "pos": [
+    -20.27,
+    -10.36
+   ],
+   "rot": 332.1,
+   "scale": 0.92
+  },
+  {
+   "model": "granja_manzano_2",
+   "pos": [
+    -27.25,
+    -4.45
+   ],
+   "rot": 132.8,
+   "scale": 1.04
+  },
+  {
+   "model": "granja_manzano_1",
+   "pos": [
+    -20.49,
+    -3.66
+   ],
+   "rot": 262.0,
+   "scale": 1.02
+  },
+  {
+   "model": "granja_manzano_1",
+   "pos": [
+    -26.74,
+    2.15
+   ],
+   "rot": 158.9,
+   "scale": 1.04
+  },
+  {
+   "model": "granja_manzano_1",
+   "pos": [
+    -20.4,
+    8.79
+   ],
+   "rot": 317.4,
+   "scale": 1.11
+  },
+  {
+   "model": "granja_manzano_1",
+   "pos": [
+    -26.95,
+    13.25
+   ],
+   "rot": 47.8,
+   "scale": 1.04
+  },
+  {
+   "model": "granja_manzano_2",
+   "pos": [
+    -20.57,
+    13.27
+   ],
+   "rot": 32.0,
+   "scale": 1.09
+  },
+  {
+   "model": "granja_manzano_2",
+   "pos": [
+    -27.72,
+    20.08
+   ],
+   "rot": 159.4,
+   "scale": 1.11
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -30.5,
+    32.69
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -27.5,
+    32.73
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -24.5,
+    32.45
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -21.5,
+    32.58
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -18.5,
+    32.68
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -15.5,
+    32.54
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -12.5,
+    32.7
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -9.5,
+    32.53
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -6.5,
+    32.68
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -3.5,
+    32.66
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    -0.5,
+    32.61
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    2.5,
+    32.73
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    5.5,
+    32.58
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    8.5,
+    32.64
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    11.5,
+    32.55
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    14.5,
+    32.66
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    17.5,
+    32.74
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    20.5,
+    32.62
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    23.5,
+    32.65
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    26.5,
+    32.46
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    29.5,
+    32.65
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.56,
+    -30.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.59,
+    -27.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.74,
+    -24.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.7,
+    -21.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.53,
+    -18.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.55,
+    -15.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.71,
+    -12.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.55,
+    -9.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.62,
+    -6.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.66,
+    -3.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.48,
+    -0.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.53,
+    2.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.5,
+    11.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.71,
+    14.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.75,
+    17.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.68,
+    20.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.46,
+    23.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.65,
+    26.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_muro",
+   "pos": [
+    32.7,
+    29.5
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_manzano_2",
+   "pos": [
+    -12.0,
+    29.0
+   ],
+   "rot": 220.8,
+   "scale": 1.1
+  },
+  {
+   "model": "granja_manzano_1",
+   "pos": [
+    14.0,
+    29.5
+   ],
+   "rot": 223.9,
+   "scale": 1.06
+  },
+  {
+   "model": "granja_manzano_1",
+   "pos": [
+    29.5,
+    20.0
+   ],
+   "rot": 129.0,
+   "scale": 1.04
+  },
+  {
+   "model": "granja_manzano_1",
+   "pos": [
+    29.0,
+    -4.0
+   ],
+   "rot": 61.5,
+   "scale": 1.19
+  },
+  {
+   "model": "granja_manzano_1",
+   "pos": [
+    28.5,
+    30.0
+   ],
+   "rot": 125.6,
+   "scale": 1.09
+  },
+  {
+   "model": "granja_heno",
+   "pos": [
+    14.0,
+    10.0
+   ],
+   "rot": 35.2,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_heno",
+   "pos": [
+    -11.0,
+    14.0
+   ],
+   "rot": 173.8,
+   "scale": 1.15
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    -6.0,
+    -18.5
+   ],
+   "rot": 70.7,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    -5.0,
+    -19.5
+   ],
+   "rot": 121.2,
+   "scale": 1.0
+  },
+  {
+   "model": "inn_barril",
+   "pos": [
+    16.5,
+    -20.0
+   ],
+   "rot": 135.1,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_cerca",
+   "pos": [
+    6.0,
+    19.0
+   ],
+   "rot": -20,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_cerca",
+   "pos": [
+    -18.0,
+    5.0
+   ],
+   "rot": 75,
+   "scale": 1.0
+  },
+  {
+   "model": "granja_manzano_2",
+   "pos": [
+    20.03,
+    26.6
+   ],
+   "rot": 287.4,
+   "scale": 1.04
+  },
+  {
+   "model": "granja_manzano_2",
+   "pos": [
+    23.91,
+    12.27
+   ],
+   "rot": 43.9,
+   "scale": 0.98
+  },
+  {
+   "model": "granja_manzano_2",
+   "pos": [
+    -14.71,
+    13.32
+   ],
+   "rot": 201.1,
+   "scale": 1.01
+  },
+  {
+   "model": "granja_manzano_2",
+   "pos": [
+    -13.47,
+    20.69
+   ],
+   "rot": 203.9,
+   "scale": 1.02
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -24.0,
+    2.5
+   ],
+   "rot": 20,
+   "scale": 0.9
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    -15.0,
+    -12.0
+   ],
+   "rot": 70,
+   "scale": 0.9
+  },
+  {
+   "model": "pan_tocon",
+   "pos": [
+    20.0,
+    25.0
+   ],
+   "rot": 140,
+   "scale": 0.9
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/granja_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125
+ }
+}

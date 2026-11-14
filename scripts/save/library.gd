@@ -126,6 +126,12 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 					return t.left(1).to_upper() + t.substr(1))))
 				out.append(_e(String(ep[0]), String(ep[1]), _seen(save, "epilogues", StringName(ep[0])), txt, "", "", null,
 					["Tras vencer a Cthulhu" + (" con menos de un cuarto de la cordura" if ep[0] == "epilogo_locura" else "")], "Epílogos"))
+			for n: Dictionary in Nights.all():              # el relato de cada noche suelta, al jugarla
+				var lines: Array = (rel as Dictionary).get(String(n.id), []) if rel is Dictionary else []
+				out.append(_e(String(n.id), String(n.titulo), _seen(save, "places", StringName(n.id)) or Nights.wins(save, String(n.id)) > 0,
+					"
+
+".join(PackedStringArray(lines)), "", "", null, [String(n.lugar)], "Noches sueltas"))
 		"archive":                                     # archivo de expediciones (hito 16.26)
 			var runs := RunArchive.runs(save)
 			for i in runs.size():
@@ -227,6 +233,13 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				out.append(_e(id, String(l.name), known, text("places", id), "", "", map,
 					["Parte %d · %s (%s) · Nivel %d" % [int(l.part) + 1, p.title, p.place, int(l.number)],
 					"Criaturas: " + String(l.get("creatures", ""))], String(p.title)))
+			for n: Dictionary in Nights.all():              # noches sueltas (fase 21, bloque D)
+				var id := String(n.id)
+				var map_path := "res://resources/maps/%s.png" % id
+				var map: Texture2D = load(map_path) if ResourceLoader.exists(map_path) else null
+				out.append(_e(id, String(n.lugar).get_slice(",", 0), _seen(save, "places", id) or Nights.wins(save, id) > 0,
+					text("places", id), "", "", map, ["Noche suelta · " + String(n.titulo), "Criaturas: " + String(n.criaturas)],
+					"Noches sueltas"))
 		"people":
 			var chars := _list("res://data/characters")
 			chars.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return a.order < b.order)

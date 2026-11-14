@@ -59,6 +59,8 @@ func _ready() -> void:
 	add_child(top)
 	var lvl_name := "Parte %d · Nivel %d" % [director.level.part, director.level.number] if director != null else "Campo de pruebas"
 	if Madness.grade() > 0: lvl_name += " · Grado %s" % String(Madness.info(Madness.grade()).get("roman", ""))   # 16.14
+	if director != null and Nights.is_night(String(director.level.id)):   # noche suelta (fase 21, bloque D)
+		lvl_name = Nights.label(String(director.level.id))
 	if director != null and Challenge.is_challenge(String(director.level.id)):   # desafío (15.2)
 		lvl_name = "Desafío · %s" % String(Challenge.find(String(director.level.id)).get("name", ""))
 	if director != null and Expedition.is_expedition(String(director.level.id)):   # expedición (16.21)

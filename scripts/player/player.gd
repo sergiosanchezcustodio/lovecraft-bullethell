@@ -67,6 +67,7 @@ var world: CombatWorld
 var progress: PlayerProgress
 const CALM_RADIUS := 4.0
 const ARMOR_FLOOR := 0.2         ## parte del golpe físico que siempre pasa la armadura
+const BLIGHT_HURT := 0.3         ## gris y quebradizo (el color, 21.13): los golpes físicos, un 30 % más
 const ELITE_TAG := "elite"       ## rasgo de daño contra élites y seres únicos (Enemy.take_damage)
 const HELD_TAG := "held"         ## contra aturdidos o inmovilizados (Signo de Tsathoggua, 16.9)
 const FRESH_TAG := "fresh"       ## contra los enemigos ilesos (Aldaba de los Derby, 20.21)
@@ -97,6 +98,7 @@ const SECOND_LIFE_HEALTH := 0.5  ## vida con la que te levanta la Medalla de San
 var second_lives_used := 0       ## Medalla de San Cristóbal gastadas en este nivel
 var banishes_used := 0           ## descartes de las Cartas del tarot en este nivel
 var _nodens_t := 0.0             ## s cargando el Escudo de Nodens
+var blight_t := 0.0              ## s que sigue gris y quebradizo (ColorBlight, 21.13)
 var _nodens_fx: MeshInstance3D
 var _ankh_used := false
 var _fury_t := 0.0
@@ -305,6 +307,7 @@ func _physics_process(delta: float) -> void:
 	var rs := Vector3.ONE * (1.0 + 0.22 * _gem_pulse)
 	if _ring != null and _ring.scale != rs: _ring.scale = rs
 	var t0 := Prof.start()
+	if blight_t > 0.0: blight_t -= delta
 	_look_scan -= delta                          # a quién mirar (17.3): en la física, con la rejilla al día
 	if _look_scan <= 0.0:
 		_look_scan = LOOK_SCAN
@@ -1447,6 +1450,7 @@ func take_damage(d: Damage) -> void:
 		r.knockback = d.knockback; r.source = d.source; r.bonus = d.bonus
 		r.via = d.via; r.who = d.who
 		d = r
+	if blight_t > 0.0 and d.physical > 0.0: d = d.scaled_physical(1.0 + BLIGHT_HURT)   # quebradizo (21.13)
 	health = maxf(0.0, health - d.physical)
 	if bench_immortal: health = maxf(health, 1.0)        # banco de objetos: recibe el daño pero no cae
 	var src := "otro"

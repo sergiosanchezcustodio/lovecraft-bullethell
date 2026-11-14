@@ -91,6 +91,9 @@ func _ready() -> void:
 	if id == Demo.END_RELATO:                            # la demo (13.17): lo que viene después
 		box.add_child(MenuKit.title("Fin de la demo", 26, Color(0.75, 0.68, 0.52)))
 		box.add_child(MenuKit.title("Continúa en el juego completo", 46))
+	elif Nights.is_night(id):                            # noche suelta (fase 21, bloque D)
+		box.add_child(MenuKit.title("Noche suelta · " + String(Nights.find(id).get("lugar", "")), 26, Color(0.75, 0.68, 0.52)))
+		box.add_child(MenuKit.title(String(Nights.find(id).get("titulo", "")), 46))
 	elif id.begins_with("epilogo"):
 		box.add_child(MenuKit.title("Epílogo", 26, Color(0.75, 0.68, 0.52)))
 		box.add_child(MenuKit.title("El que no volvió del todo" if id == "epilogo_locura" else "Lo que vino después", 46))

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"granjero_coagulo"
+shape = 1
+count = 3
+spread_deg = 28.0
+speed = 3.8
+radius = 0.13
+size = 0.22
+damage_physical = 5.0
+damage_mental = 3.0
+lifetime = 4.0
+bursts = 1
+burst_interval = 0.15
+aimed = true

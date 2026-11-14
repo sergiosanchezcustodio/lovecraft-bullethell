@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"res_gris"
+display_name = "Res gris"
+model = "res_gris"
+tier = 1
+spawn_weight = 1.0
+elite = false
+max_health = 30.0
+hit_radius = 0.55
+body_radius = 0.55
+move_speed = 2.2
+xp = 1.5
+money = 1
+contact_physical = 8.0
+contact_mental = 1.0
+movement = &"charge"
+params = {"anim_charge": "run", "anim_move": "walk", "anim_rest": "idle", "anim_windup": "bite", "blight_on_death": 1.6, "charge_cooldown": 4.0, "charge_mult": 1.5, "charge_range": 7.0, "charge_speed": 9.0, "charge_time": 0.6, "rest": 1.0, "windup": 0.75}
+attack_anim = ""

@@ -1146,6 +1146,51 @@ def revelaciones():
         save('gaze_pulse_%d' % k, tail(x, 0.1))
 
 
+def color():
+    """El color que cayó del cielo (hito 21.13). La mancha que nace: un zumbido de cristal que sube
+    y se tuerce (dos senos casi iguales que baten, con un glissando lento), con un chisporroteo fino
+    encima; dos variantes. El color que sube del pozo: un rumor grave que crece desde abajo, un acorde
+    que no acaba de afinar y el mismo cristal arriba, con cola larga."""
+    r = np.random.default_rng(2113)
+
+    def tail(x, sec=0.3):
+        n = min(len(x) // 3, int(sec * SR))
+        x[-n:] *= np.linspace(1, 0, n) ** 2
+        return x
+
+    for k in range(2):
+        d = 1.3
+        tt = t(d)
+        f0 = 900.0 * (1 + 0.12 * k)
+        f = f0 * (1 + 0.35 * np.clip(tt / 1.0, 0, 1) ** 1.5) * (1 + 0.01 * np.sin(2 * np.pi * 5.5 * tt))
+        x = np.sin(2 * np.pi * np.cumsum(f) / SR) + np.sin(2 * np.pi * np.cumsum(f * 1.013) / SR) * 0.8
+        x += np.sin(2 * np.pi * np.cumsum(f * 1.5) / SR) * 0.25
+        env = np.minimum(tt / 0.25, 1) ** 2 * np.exp(-np.maximum(tt - 0.5, 0) / 0.35)
+        crackle = (r.random(len(tt)) < 0.004) * r.uniform(-1, 1, len(tt))
+        x = x * env * 0.35 + hp(crackle, 3000) * env * 0.6
+        save('blight_%d' % k, tail(x, 0.25))
+
+    d = 3.6
+    tt = t(d)
+    rum = lp(r.standard_normal(len(tt)), 160) * np.clip(tt / 2.0, 0, 1) ** 2 * 2.5
+    ch = np.zeros(len(tt))
+    for ratio, amp in ((1.0, 1.0), (1.41, 0.7), (1.89, 0.55), (2.52, 0.4)):
+        for det in (-0.006, 0.0, 0.007):
+            f = 55.0 * ratio * (1 + det) * (1 + 0.25 * np.clip(tt / 3.0, 0, 1))
+            ch += np.sin(2 * np.pi * np.cumsum(f) / SR) * amp / 3
+    ch *= np.clip(tt / 1.6, 0, 1) ** 1.5
+    gl = np.zeros(len(tt))
+    for f0, a in ((1760.0, 1.0), (2637.0, 0.6), (3951.0, 0.3)):
+        f = f0 * (1 + 0.02 * np.sin(2 * np.pi * 0.7 * tt))
+        gl += np.sin(2 * np.pi * np.cumsum(f) / SR) * a
+    gl *= np.clip((tt - 1.0) / 1.5, 0, 1) * 0.25
+    dry = rum + lp(ch, 1400) + gl
+    ir = lp(r.standard_normal(int(2.5 * SR)), 2500) * np.exp(-t(2.5) / 0.9)
+    wet = signal.fftconvolve(dry, ir)[:len(dry)]
+    wet *= np.std(dry) / (np.std(wet) + 1e-9)
+    save('color_rise', tail(dry * 0.7 + wet * 0.5, 1.0))
+
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     if '--latido' in sys.argv:                               # solo el latido de R'lyeh y la sirena (hito 12.12)
@@ -1166,6 +1211,8 @@ if __name__ == '__main__':
         sucesos()
     elif '--revelaciones' in sys.argv:                         # solo los de las revelaciones (hito 21.7)
         revelaciones()
+    elif '--color' in sys.argv:                                # solo los del color que cayó del cielo (hito 21.13)
+        color()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)
@@ -1181,5 +1228,6 @@ if __name__ == '__main__':
         fase20()
         sucesos()
         revelaciones()
+        color()
         if len(sys.argv) > 1: copy_kenney(sys.argv[1])
     print('listo en', OUT)

@@ -782,6 +782,9 @@ func _on_event(d: Dictionary) -> void:
 			if game.has_method("announce"): game.announce(String(d.get("text", "")), 1.6)
 		"decor":                                   # una pieza del decorado se rompe (hito 16.34)
 			if DecorBreak.current != null: DecorBreak.current.crumble(int(d.get("i", -1)))
+		"blight":                                  # una mancha del color (hito 21.13)
+			var cb: Variant = game.get("blight")
+			if cb is ColorBlight: (cb as ColorBlight).remote(d)
 		"night":                                   # un suceso de la noche empieza ("" acaba; hito 21.4)
 			var ne: Variant = game.get("night_events")
 			if ne is NightEvents: (ne as NightEvents).remote(String(d.get("text", "")))
@@ -1130,6 +1133,7 @@ func _on_roster() -> void:
 ## Anfitrión: a quien espera para volver, en qué nivel va la partida y el objetivo del HUD.
 func _send_late() -> void:
 	var where := "Parte %d · Nivel %d" % [game.level.part, game.level.number] if game.level != null else ""
+	if game.level != null and Nights.is_night(String(game.level.id)): where = Nights.label(String(game.level.id))
 	var goal: String = game.hud.objective_text() if game.hud != null else ""
 	for id in GameSession.returning:
 		if net.peers.has(id): net.send(id, NetSelect.LATE, [where, goal])

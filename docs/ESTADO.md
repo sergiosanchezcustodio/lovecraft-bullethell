@@ -3178,3 +3178,80 @@ Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden:
   - Lo oculto y el aura, con su fila; en el invitado no hacen nada.
   - El gesto.
   - Los ojos (dos por enemigo cercano).
+
+### Bloque D: el formato de las noches sueltas (14-11-2026)
+
+- **Qué:** niveles aparte de la campaña (`data/nights.json`, `Nights`), cada uno con su escenario, dos criaturas, un jefe y su relato. El nivel es un `data/levels/<id>.tres` corriente, con su relato en `data/library/relatos.json` con el mismo id.
+- **Dónde se eligen:** botón «Noches sueltas» en el mapa de niveles, junto a los demás modos (caben los seis en la fila). Abre `NightsMenu`, con una carta por noche: título, lugar, ✓ si ya se ha superado y, abajo, la presentación y las criaturas. Para capturas, `nights_open=true` (selección con `map=true`).
+- **Cuándo se abren:** cada una, al superar un nivel de la campaña (`abre`; la del color, el último de la parte 1). En desarrollo, todas.
+- **Cómo se juegan:**
+  - Se empieza de cero, como el primer nivel de una parte (`GameSession.carry.clear()`), con los pactos que elijas.
+  - Al superarla, «Noche superada» y sin siguiente.
+  - Las victorias van en `SaveData.records["nights"]` ({id: veces}), no en `levels_won`.
+  - El HUD, la tarjeta de la partida y lo que ve en la red quien vuelve dicen «Noche suelta · <título>» (`Nights.label`). En el relato: «Noche suelta · <lugar>» y el título.
+- **Biblioteca:**
+  - En «Lugares», su mapa (sección «Noches sueltas»).
+  - En «Relatos», su relato al jugarla (`test_fragments` cuenta ahora también las noches).
+  - Sus criaturas entran solas en el bestiario, con sus textos en `data/library/textos.json`.
+
+### 21.13: *El color que cayó del cielo* (14-11-2026)
+
+- **La granja de los Gardner** (`tools/gen_arena_granja.py`, `data/arenas/granja.json`): 64 × 64 m de tierra gris con el camino de la granja.
+  - Al norte, la casa de los Gardner (`inn_casa`, la de tablas de Nueva Inglaterra), la casa vieja, el granero y el cobertizo, con muro y manzanos entre ellos.
+  - Delante del granero, la cerca del corral, el abrevadero y los almiares.
+  - Al oeste, el huerto de manzanos muertos en hileras, y algún tocón. Muros de piedra seca cierran los cuatro lados, con huecos.
+  - En el centro, un poco al norte, el pozo, de donde sube el jefe.
+  - Tres faroles y una lluvia fina de ceniza gris (`data/weather/ceniza_gris.tres`).
+  - Luz de luna fría con `gamma` 1,45: mediana de brillo de 0,19 en las capturas de partida (con 1,0 daba 0,145).
+- **Decorado nuevo** (`tools/gen_atrezo_granja.py`, `models/granja_*.json`), todo gris y quebradizo salvo el color:
+  - Granero de tablas verticales, rojo que se vuelve gris desde abajo, con el portón de dos hojas en aspa y la puerta del pajar (16/m, hueco).
+  - Pozo con brocal de piedra, tejadillo, torno, cuerda y cubo; dentro, el color que brilla.
+  - Dos manzanos muertos, sin hojas, con frutos que brillan.
+  - Cerca de troncos (con un tramo caído) y muro de piedra seca, de hiladas y piedras de tamaño desigual.
+  - Almiar gris, abrevadero con un brillo y un farol de poste sin la nieve del campamento.
+  - Mapa de la Biblioteca y del relato: `resources/maps/noche_color.png` (`tools/render_mapa.gd -- noche_color`).
+- **El color** (`ColorBlight`, `scripts/level/color_blight.gd` y `color_blight.gdshader`; datos en `LevelData.blight_*`):
+  - Las manchas nacen pequeñas cerca de un jugador (cada 9 s de media, hasta 8 a la vez), crecen hasta 2-3,8 m de radio, duran 38 s y se apagan.
+  - Quien está dentro queda gris y quebradizo hasta 0,6 s después de salir:
+    - El jugador pierde 2,5 de cordura por segundo y los golpes físicos le hacen un 30 % más (`Player.blight_t`, `BLIGHT_HURT`). Suelta copos de ceniza.
+    - Los enemigos se tiñen de gris y reciben un 50 % más de daño (`Enemy.blight`, `is_blighted`). Lo que nace del color (`of_color`), no.
+    - Llevarlos al color es una baza; pisarlo, un riesgo.
+  - Las reses y los granjeros dejan su mancha al morir (`blight_on_death`, radio), y el jefe siembra las suyas.
+  - Se dibujan con un MultiMesh de hasta 48 discos y un sombreador a bloques de 1/8 m: el color cambia sin parar entre un rosa violáceo, un lila y un verde de cristal, y el borde es de ceniza gris. Chispas que suben.
+  - Sonido `blight` al nacer una mancha cerca de un jugador de ese PC.
+  - En red, las manchas las decide el anfitrión y llegan como suceso «blight» (posición, radio, vida y semilla). Cada PC aplica el color a sus jugadores, y a los enemigos solo el anfitrión. Sin probar aún con dos ventanas.
+- **Las criaturas** (`tools/gen_noche_color.py`):
+  - **Res gris** (escalón 1, `anim_cuadrupedo`): la vaca de los Gardner, gris de ceniza con manchas más oscuras, agrietada y desconchada, con el color en las grietas y los ojos. Se acerca andando y embiste corriendo (`charge`). `ChargeBehavior` acepta ahora `anim_charge`.
+  - **Granjero consumido** (escalón 2, humano a bloques): como Nahum Gardner al final.
+    - Peto vaquero desvaído con tirantes y hebillas, camisa de franela a cuadros que era roja y sombrero de paja roto.
+    - Piel gris cuarteada, barba de días, y los ojos y las grietas del color.
+    - Persigue y arroja coágulos (`granjero_coagulo`, tres en abanico).
+  - **El color que sube del pozo** (jefe, `anim_fragmento`, escala 2,6): una columna que se retuerce en dos espirales de bloques del color alrededor de un núcleo claro, con bloques sueltos y dos jirones. Todo brilla, así que lleva los colores más oscuros: si no, se veía blanco. Su aura quita cordura.
+- **El jefe** (`ColorBehavior`, `scripts/enemies/color_behavior.gd`):
+  - A los 4 minutos sube del pozo (`from`), sin que le hagan daño mientras sale, y flota rondando a 6,5 m del jugador.
+  - Fases según su vida:
+    - Por encima del 60 %: espiral (`color_espiral`) cada 6 s y una mancha bajo los pies de un jugador cada 6 s.
+    - Entre el 60 y el 25 %: además, anillos con huecos (`color_anillo`) y dos reses grises cada 10 s. Todo más deprisa.
+    - Por debajo del 25 %: se acerca y lo suelta todo aún más deprisa.
+  - Al morir, el color sube al cielo en una columna de luz, como en el relato de Ammi.
+  - Sonido `color_rise` al salir, al cambiar de fase y al irse.
+- **El relato:** cuatro frases desde la mirada de Ammi Pierce (el meteorito, las manzanas y las vacas grises, el pozo que brilla), con un cielo propio (`el_color` en `data/relato_skies.json`). Textos del bestiario y del lugar.
+- **Música:** la de `p2_n3`, y la del jefe, `jefe_a_dispirited_epic`.
+- **Sonidos** (`gen_sfx.py --color`):
+  - `blight`, dos variantes: un zumbido de cristal que sube y bate, con chisporroteo.
+  - `color_rise`: un rumor grave, un acorde que no afina y el cristal arriba.
+- **Comprobado en partida** (Dyer con bot, `cfg_quality=2`):
+  - Las manchas, los enemigos grises dentro y el rótulo del HUD.
+  - El jefe que sube del pozo (`final_at=15`), sus espirales, las manchas que siembra y su aura.
+  - Con `weapons=thompson,granada wlevel=8 final_at=12 seed=77`, cae a los 32 s: columna de luz y «Noche superada».
+  - El mapa entero, la ventana de las noches y el botón del mapa.
+- **Tests** (`tests/test_nights.gd`, 10; 937 de 937 en total):
+  - Datos de cada noche (nivel, relato, arena, mapa y textos).
+  - Se abren y cuentan.
+  - Su lugar y su relato salen en la Biblioteca.
+  - La mancha crece y se apaga.
+  - Enemigos grises y quebradizos; el jugador pierde cordura y recibe más.
+  - Lo del color no se agrisa.
+  - Las reses dejan mancha.
+  - En el invitado.
+  - El jefe sube del pozo, siembra y cambia de fase.

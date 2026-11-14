@@ -53,6 +53,8 @@ var _reveal_k := 0.0
 var _reveal_chain := 0.0                     ## daño con que revienta si muere revelado (Medusas del más allá)
 var _reveal_tag := &""
 var _dream_t := 0.0                         ## s que sigue soñando (zonas de Kuranes, 20.22)
+var _blight_t := 0.0                        ## s que sigue gris y quebradizo (el color, 21.13)
+var _blight_k := 0.0                        ## daño de más que recibe mientras tanto
 const REVEAL_BURST_R := 2.0
 var _lure_t := 0.0                          ## s que le atrae una bengala
 var _lure_pos := Vector3.ZERO
@@ -478,6 +480,16 @@ func reveal(seconds: float, bonus: float, chain := 0.0) -> void:
 func dream(seconds: float) -> void:
 	_dream_t = maxf(_dream_t, seconds)
 
+## Gris y quebradizo durante `seconds` (el color que cayó del cielo, 21.13): recibe `bonus` más de
+## daño de todo. Los que nacen del color (`data.param("of_color")`) no se agrisan.
+func blight(seconds: float, bonus: float) -> void:
+	if bool(data.param("of_color", false)): return
+	_blight_t = maxf(_blight_t, seconds)
+	_blight_k = maxf(_blight_k, bonus)
+
+func is_blighted() -> bool:
+	return _blight_t > 0.0
+
 ## Despierta de golpe (Combos, pesadilla, 21.6): deja de soñar y, si dormía, de estar quieto.
 func wake() -> void:
 	if _dream_t > 0.0: _stun = 0.0
@@ -621,6 +633,7 @@ func take_damage(d: Damage) -> void:
 	var k := VULNERABLE_MULT if _vulnerable > 0.0 else 1.0
 	if idol_t > 0.0: k *= IDOL_GUARD           # al amparo del ídolo vivo (16.18)
 	if _reveal_t > 0.0: k *= 1.0 + _reveal_k   # revelado por la máquina (20.20)
+	if _blight_t > 0.0: k *= 1.0 + _blight_k   # gris y quebradizo (el color, 21.13)
 	if not _touched: k *= float(d.bonus.get(Player.FRESH_TAG, 1.0))   # ileso hasta ahora (Aldaba, 20.21)
 	for tag in data.tags: k *= float(d.bonus.get(tag, 1.0))    # rasgos contra este tipo de enemigo
 	if data.elite or data.unique: k *= float(d.bonus.get(Player.ELITE_TAG, 1.0))   # Medallón del cazador
@@ -1043,6 +1056,7 @@ func _physics_process(delta: float) -> void:
 	if _vulnerable > 0.0: _vulnerable -= delta
 	if _reveal_t > 0.0: _reveal_t -= delta
 	if _dream_t > 0.0: _dream_t -= delta
+	if _blight_t > 0.0: _blight_t -= delta
 	if _lure_t > 0.0:                          # bengala: va hacia la luz en lugar del jugador
 		_lure_t -= delta
 		var to := Vector3(_lure_pos.x - position.x, 0, _lure_pos.z - position.z)
@@ -1309,6 +1323,7 @@ func _status_color() -> Color:
 	if _confuse_t > 0.0: return Color(0.95, 0.75, 0.95, 0.22 + 0.1 * sin(_spawn_t * 11.0))
 	if _inject_t > 0.0: return Color(0.8, 0.95, 0.25, 0.14 + 0.06 * sin(_spawn_t * 12.0))   # suero: tenue (el aliado, verde intenso)
 	if _reveal_t > 0.0: return Color(0.72, 0.64, 1.0, 0.2 + 0.08 * sin(_spawn_t * 4.0))     # revelado: luz violeta pálida (20.20)
+	if _blight_t > 0.0: return Color(0.55, 0.55, 0.53, 0.55 + 0.06 * sin(_spawn_t * 3.0))   # gris de ceniza (21.13)
 	if _dream_t > 0.0: return Color(0.62, 0.84, 0.95, 0.2 + 0.08 * sin(_spawn_t * 2.5)).lerp(Color(0.95, 0.68, 0.84, 0.24), 0.5 + 0.5 * sin(_spawn_t * 1.3))   # soñando (20.22)
 	return Color(0, 0, 0, 0)
 

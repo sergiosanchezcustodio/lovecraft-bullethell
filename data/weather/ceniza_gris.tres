@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="WeatherData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/weather_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ceniza_gris"
+display_name = "Ceniza gris de la granja"
+wind_dir = Vector2(0.3, 1)
+wind = 0.25
+gusts = 0.15
+precip = 2
+precip_amount = 0.12
+fall_speed = 0.45
+flake_size = 0.05
+precip_color = Color(0.4, 0.39, 0.38, 0.7)
+drift = 0.1
+drift_color = Color(0.45, 0.44, 0.44, 0.3)
+mist = 0.18
+mist_color = Color(0.46, 0.42, 0.52, 1.0)
+clouds = 0.15

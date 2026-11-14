@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/granjero_coagulo.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"granjero_gris"
+display_name = "Granjero consumido"
+model = "granjero_gris"
+tier = 2
+spawn_weight = 1.1
+elite = false
+tags = Array[StringName]([&"humana"])
+max_health = 40.0
+hit_radius = 0.42
+body_radius = 0.42
+move_speed = 1.8
+xp = 2.0
+money = 3
+contact_physical = 6.0
+contact_mental = 2.5
+movement = &"chase"
+params = {"blight_on_death": 1.2}
+attack = ExtResource("2")
+attack_cooldown = 4.5
+attack_range = 8.0
+attack_anim = "throw"

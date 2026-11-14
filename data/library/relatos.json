@@ -90,6 +90,12 @@
 		"Al fondo, una puerta colosal, entreabierta, con un resplandor verde en la rendija.",
 		"Los que yacen con Él empiezan a despertar. La puerta se abre del todo. Él sale."
 	],
+	"noche_color": [
+		"Al oeste de Arkham, donde van a hacer el pantano nuevo, el viejo Ammi Pierce aún no se acerca de noche.",
+		"Allí cayó una piedra del cielo, junto al pozo de Nahum Gardner. Se encogió, se fundió, y lo que traía dentro se metió en la tierra.",
+		"Las manzanas crecieron grandes y amargas, las vacas se volvieron grises y se deshacían al tocarlas. La familia, una a una, también.",
+		"Esta noche el pozo brilla. Y un color que nadie sabe nombrar se extiende por los campos."
+	],
 	"epilogo": [
 		"La isla volvió a hundirse antes del amanecer, y el mar cerró la herida como si nunca hubiera existido.",
 		"{nombre} regresó a Arkham en otoño. La Universidad de Miskatonic archivó su informe en una sección que no figura en ningún catálogo.",

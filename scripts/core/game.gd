@@ -454,7 +454,12 @@ func _ready() -> void:
 		if args.get_str("night_events", "") != "false" and not BossRush.is_rush(String(level.id)) and not Challenge.active():
 			night_events = NightEvents.new().setup(self, director, world, _moon, _env, night_id, not is_guest())   # sucesos (21.4)
 			add_child(night_events)
-		director.enemy_spawned.connect(func(e: Enemy) -> void: e.died.connect(_on_enemy_died))
+		if level.blight_every > 0.0 or _level_blights():   # el color que cayó del cielo (21.13)
+			blight = ColorBlight.new().setup(world, level, not is_guest(), self)
+			add_child(blight)
+		director.enemy_spawned.connect(func(e: Enemy) -> void:
+			e.died.connect(_on_enemy_died)
+			if blight != null and not is_guest() and float(e.data.param("blight_on_death", 0.0)) > 0.0: e.died.connect(blight.on_enemy_died))
 		# rompibles y peligros del escenario: en red, solo en el anfitrión (llegan a los invitados en el 9.3c)
 		if not args.get_bool("nobreakables") and not args.get_bool("no_spawn") and not is_guest(): add_child(BreakableSpawner.new().setup(world, arena.get_meta("size")))
 		if args.get_bool("pickup_test"):               # las cinco recompensas en fila delante del J1
@@ -1613,6 +1618,13 @@ func _diary(result: String) -> Array:
 var run_seed := 0
 var bonds: Bonds                                  ## vínculos entre los investigadores (hito 21.3)
 var night_events: NightEvents                    ## sucesos de la noche (hito 21.4)
+var blight: ColorBlight                          ## el color que cayó del cielo (hito 21.13)
+
+## ¿Algún enemigo del nivel deja el color o lo siembra? (entonces hacen falta las manchas)
+func _level_blights() -> bool:
+	for ed: EnemyData in level.pool + level.final_pool + level.mid_enemies + ([level.final_enemy] if level.final_enemy else []):
+		if float(ed.param("blight_on_death", 0.0)) > 0.0 or bool(ed.param("seeds_color", false)): return true
+	return false
 var revelations: Revelations                    ## revelaciones al salir de una crisis (hito 21.7)
 func _seed_players() -> void:
 	if level.daily != "": run_seed = Daily.seed_of(level.daily)
@@ -1695,6 +1707,9 @@ func _on_level_completed() -> void:
 		elif Saves.current != null:
 			_endless_lines = PackedStringArray(["Tiempo: %s  ·  Récord: %s" % [Endless.clock(t), Endless.clock(prev)]])
 		Achievements.record(Saves.current, "challenges_won", Challenge.won_count(Saves.current))
+	elif Nights.is_night(String(level.id)):          # noche suelta (fase 21, bloque D): aparte de la campaña
+		won_title = "Noche superada"
+		if not is_guest(): Nights.record_win(Saves.current, String(level.id))
 	elif Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))
 	if not rush:

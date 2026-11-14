@@ -17,6 +17,7 @@ var _first: Button
 var _endless_btn: Button
 var _daily_btn: Button
 var _challenge_btn: Button
+var _nights_btn: Button
 var _madness_row: OptionRow
 
 func _ready() -> void:
@@ -102,6 +103,15 @@ func _ready() -> void:
 		cb.pressed.connect(func() -> void: _challenges(cb))
 		extra.add_child(cb)
 		_challenge_btn = cb
+	if (Nights.any_unlocked(Saves.current) or dev) and not Demo.on():   # noches sueltas (fase 21, bloque D)
+		var nb := MenuKit.button("Noches sueltas" + ("" if Nights.any_unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
+		nb.custom_minimum_size = Vector2(460, 58)
+		nb.focus_entered.connect(func() -> void:
+			_info_title.text = "Noches sueltas"
+			_info_text.text = "Relatos aparte de la campaña, en una sola noche: un escenario, dos criaturas y su horror. Se abre cada una al superar una parte. Superadas: %d de %d." % [Nights.won_count(Saves.current), Nights.all().size()])
+		nb.pressed.connect(func() -> void: _nights(nb))
+		extra.add_child(nb)
+		_nights_btn = nb
 	if extra.get_child_count() > 4:                  # cinco modos (16.21, 16.22): más estrechos, que quepan
 		extra.add_theme_constant_override("separation", 14)
 		for b: Button in extra.get_children():
@@ -138,6 +148,7 @@ func _ready() -> void:
 	if la.get_bool("pact_open") and _first: _pick.call_deferred(Campaign.first_of(0), _first)
 	if la.get_bool("endless_open") and _endless_btn: _endless.call_deferred(_endless_btn)   # capturas
 	if la.get_bool("daily_open") and _daily_btn: _daily.call_deferred(_daily_btn)
+	if la.get_bool("nights_open") and _nights_btn: _nights.call_deferred(_nights_btn)   # capturas
 	if la.get_bool("challenge_open") and _challenge_btn: _challenges.call_deferred(_challenge_btn)
 	if la.get_bool("madness_open") and _madness_row: _madness_row.grab_focus.call_deferred()   # capturas
 	if la.has("madness") and _madness_row:
@@ -268,6 +279,19 @@ func _challenges(from: Button) -> void:
 		visible = true
 		Pacts.set_active([])
 		chosen.emit(id))
+	m.closed.connect(func() -> void:
+		visible = true
+		from.grab_focus.call_deferred())
+	get_parent().add_child(m)
+
+## Noches sueltas: se empiezan de cero, con los pactos que elijas.
+func _nights(from: Button) -> void:
+	var m := NightsMenu.new()
+	visible = false
+	m.picked.connect(func(id: String) -> void:
+		visible = true
+		GameSession.carry.clear()
+		_pick(id, from))
 	m.closed.connect(func() -> void:
 		visible = true
 		from.grab_focus.call_deferred())

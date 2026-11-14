@@ -929,6 +929,8 @@
 		"star_fall": {"db": -23, "pitch": [0.9, 1.12], "voices": 3, "gap": 0.08, "files": ["star_fall_0.wav", "star_fall_1.wav", "star_fall_2.wav"]},
 		"revelation": {"db": -8, "pitch": [0.97, 1.03], "voices": 1, "gap": 1.0, "files": ["revelation.wav"]},
 		"gaze_pulse": {"db": -22, "pitch": [0.9, 1.1], "voices": 2, "gap": 0.4, "group": "armas", "files": ["gaze_pulse_0.wav", "gaze_pulse_1.wav"]},
+		"blight": {"db": -16, "pitch": [0.9, 1.12], "voices": 2, "gap": 0.6, "files": ["blight_0.wav", "blight_1.wav"]},
+		"color_rise": {"db": -6, "pitch": [0.97, 1.03], "voices": 1, "gap": 1.0, "files": ["color_rise.wav"]},
 		"torch_crackle": {
 			"db": -22,
 			"pitch": [
