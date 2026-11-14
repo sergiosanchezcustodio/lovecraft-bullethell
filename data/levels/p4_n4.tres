@@ -1,7 +1,9 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
-[ext_resource type="Resource" path="res://data/enemies/pesadilla.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/ghast.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/gug.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/gug_koth.tres" id="4"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
 
 [resource]
@@ -11,14 +13,23 @@ display_name = "Las bóvedas de Zin y la torre de los gugs"
 part = 4
 number = 4
 arena = "res://data/arenas/zin.json"
-health_mult = 1.0
+health_mult = 1.75
 duration = 300.0
 music = "res://resources/Music/cc0/p3_n1_dungeon_deep.ogg"
-pool = Array[ExtResource("5")]([ExtResource("2")])
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3")])
 spawn_rate = Array[Vector2]([Vector2(0, 0.3), Vector2(45, 0.5), Vector2(90, 0.82), Vector2(150, 1.35), Vector2(210, 1.85), Vector2(300, 2.35)])
-max_alive = 75
-elite_cap = 1
+max_alive = 70
+elite_cap = 2
 final_time = 240.0
-final_wave = 14
+final_enemy = ExtResource("4")
+final_wave = 12
 final_spawn_scale = 0.3
+final_text = "Retumban las bóvedas: baja de la torre de Koth el gran gug, y los ghasts se apartan a su paso…"
+glow_models = Array[String](["sue_hongos_zin"])
+glow_radius = 2.4
+ghouls_every = 50.0
+ghouls_count = 3
+ghouls_pickman = 2
+ghouls_life = 12.0
+ghouls_dps = 30.0
 coop_spawn = Array[float]([1.0, 1.15, 1.3, 1.45])

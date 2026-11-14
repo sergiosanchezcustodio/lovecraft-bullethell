@@ -24,6 +24,10 @@ Nivel 3, la meseta de Leng:
   sacerdote_leng      el sumo sacerdote que no debe describirse (anim_humano): seda amarilla; la máscara es
                       la parte `hat`, que se oculta al quitársela
   telarana            la red que tienden en el suelo (32/m, plana)
+Nivel 4, las bóvedas de Zin:
+  ghast               salta como un canguro (anim_sapo), pálido y leproso, cara humana sin nariz ni frente
+  gug                 gigante peludo y negro con la boca vertical y cuatro brazos (anim_profundo)
+  gug_koth            el gran gug de la torre de Koth (jefe del nivel 4, escalado)
 
 Escribe models/<nombre>.json. Uso: python tools/gen_criaturas_sueno.py [nombres…]
 """
@@ -437,11 +441,122 @@ def telarana():
     print('telarana', n, 'voxels')
 
 
+# ---------------- nivel 4: las bóvedas de Zin ----------------
+
+def _ghast(name, seed, skin, skin_d, sore, eye, glow=False):
+    """Ghast (anim_sapo: body, head, leg_fl, leg_fr, leg_bl, leg_br; mira hacia +Z): salta como un canguro
+    sobre las patas de atrás, largas y dobladas, con los pies largos y la cola gruesa de apoyo; brazos
+    cortos con garras, recogidos delante. Piel desnuda gris blancuzca y leprosa. La cara es «curiosamente
+    humana» pero sin nariz ni frente: el cráneo se va hacia atrás desde las cejas, ojillos rojos y una boca
+    ancha con dientes."""
+    M = cu.new(seed)
+    for part, s in (('leg_bl', -1), ('leg_br', 1)):                                # patas de canguro
+        slab(M, part, skin, 14, 30, 7 * s, -4, 7, 10, 9, 13, ch=3)                 # el muslo, grueso
+        slab(M, part, skin_d, 3, 15, 7 * s, -9, 5, 6, 6, 7, ch=2, zoff0=-1, zoff1=4)  # la caña, hacia atrás
+        slab(M, part, skin_d, 0, 3, 7 * s, -2, 6, 6, 22, 20, ch=1)                 # el pie, largo
+        for dx in (-2, 0, 2): M.put(7 * s + dx, 0, 9, part, (0.16, 0.12, 0.10))
+    slab(M, B, skin, 24, 48, 0, -3, 15, 12, 15, 11, ch=4, zoff0=-2, zoff1=7)       # el cuerpo, inclinado
+    for k in range(28):                                                            # la cola, de apoyo
+        z = -9 - k
+        y = 26 - k * 0.85
+        r = 4.5 - k * 0.13
+        for dx in range(-int(r), int(r) + 1):
+            for dy in range(-int(r), int(r) + 1):
+                if dx * dx + dy * dy <= r * r and y + dy >= 0: M.put(dx, int(y + dy), z, B, skin_d)
+    for part, s in (('leg_fl', -1), ('leg_fr', 1)):                                # bracitos con garras
+        slab(M, part, skin, 36, 45, 7 * s, 6, 4, 5, 4, 5, ch=1, zoff0=4, zoff1=0)
+        for dx in (-1, 0, 1):
+            for k in range(3): M.put(7 * s + dx, 35 - k, 11 + k, part, (0.18, 0.14, 0.12))
+    rslab(M, H, skin, 46, 58, 0, 7, 14, 14, r=4, rt=2, rb=3)                       # la cabeza
+    for (x, y, z), v in list(M.V.items()):                                         # sin frente: el cráneo
+        if v[0] == H and y > 52 and z > 7 + (58 - y) * 1.1: del M.V[(x, y, z)]     # se va hacia atrás
+    for (x, y, z), v in M.V.items():
+        if v[1] not in (skin, skin_d): continue
+        n = M.noise(x, y, z, 4.0)
+        if n > 0.8: v[1] = sore                                                    # llagas
+        elif n > 0.7: v[1] = lerp(v[1], sore, 0.35)
+        elif y < 30 and v[0] == B: v[1] = lerp(skin, (1, 1, 1), 0.12)              # el vientre, más claro
+    for s in (-1, 1):                                                              # los ojillos, bajo las cejas
+        for x in ((2, 3) if s > 0 else (-4, -3)):
+            z = M.front(x, 53)
+            if z is not None:
+                M.V[(x, 53, z)] = [H, eye, 1 if glow or x in (2, -3) else 0]
+                M.put(x, 54, z, H, skin_d)
+    for x in range(-4, 4):                                                         # la boca ancha, con dientes
+        for y in (48, 49):
+            z = M.front(x, y)
+            if z is None: continue
+            c = (0.18, 0.05, 0.06) if y == 48 else ((0.88, 0.84, 0.70) if x % 2 == 0 else (0.18, 0.05, 0.06))
+            M.V[(x, y, z)] = [H, c, 0]
+    piv = {'body': [0, 24, -3], 'head': [0, 47, 6],
+           'leg_fl': [-7, 44, 5], 'leg_fr': [7, 44, 5], 'leg_bl': [-7, 28, -4], 'leg_br': [7, 28, -4]}
+    n = M.export('models/%s.json' % name, piv, jitter=0.0, pivots_in_voxels=True, roughness=0.55, specular=0.4)
+    print(name, n, 'voxels')
+
+
+def ghast():
+    _ghast('ghast', 2300, (0.56, 0.56, 0.52), (0.44, 0.44, 0.41), (0.50, 0.40, 0.36), (0.95, 0.22, 0.12))
+
+
+def _gug(name, seed, fur, fur_d, bone, eye, mouth, scars=None, glow_eyes=False):
+    """Gug (anim_profundo; humano con cu, encorvado): un gigante peludo y negro con la boca vertical, que le
+    parte la cabeza de la coronilla a la barbilla, los ojos en la punta de dos protuberancias de hueso a
+    los lados, y cuatro brazos (el segundo par, debajo del primero, se mueve con él) con zarpas enormes."""
+    M = cu.new(seed)
+    slab(M, 'shin_l', fur_d, 0, 4, -6, 2, 10, 10, 13, 12, ch=2)                    # pies anchos
+    slab(M, 'shin_r', fur_d, 0, 4, 6, 2, 10, 10, 13, 12, ch=2)
+    cu.legs(M, fur, bottom=4)
+    cu.torso(M, fur, b=4)
+    cu.neck(M, fur)
+    cu.arms(M, fur, fur_d, b=4, mitten=True)
+    arms_ = ('arm_l', 'arm_r', 'fore_l', 'fore_r')
+    for (x, y, z), v in list(M.V.items()):                                         # el segundo par de brazos
+        if v[0] in arms_ and y >= 33:
+            s = 1 if x > 0 else -1
+            M.put(x + s * 6, y - 9, z - 2, v[0], fur_d if y < 40 else fur, over=False)
+    for (x, y, z), v in M.V.items():                                               # zarpas
+        if v[0] in ('fore_l', 'fore_r') and y <= 26: v[1] = bone
+    cu.head(M, fur, fur_d, ears=False, nose=False, w=17.0, d=16.0)
+    for y in range(64, 82):                                                        # la boca vertical
+        for x in (-1, 0):
+            z = M.front(x, y)
+            if z is None: continue
+            M.V[(x, y, z)] = [H, mouth, 0]
+        for x in (-2, 1):
+            z = M.front(x, y)
+            if z is not None and y % 2 == 0: M.V[(x, y, z)] = [H, bone, 0]          # los dientes, a los lados
+    for s in (-1, 1):                                                              # los ojos, en sus protuberancias
+        for k in range(4):
+            x = (9 + k) * s - (1 if s < 0 else 0)
+            M.put(x, 75, 3, H, bone); M.put(x, 76, 3, H, bone)
+        x = 13 * s - (1 if s < 0 else 0)
+        for dy in (75, 76):
+            for dz in (3, 4): M.put(x, dy, dz, H, eye, 1 if glow_eyes else 0)
+    for (x, y, z), v in M.V.items():                                               # pelo a mechones
+        if v[1] == fur and M.noise(x, y, z, 2.5) > 0.6: v[1] = fur_d
+        if scars and v[0] == T and (x + 2 * y) % 17 == 0 and M.hsh(x, y, 1) < 0.5: v[1] = scars
+    piv = cu.hunch(M, k=0.35, head_drop=4)
+    cu.finish(M, name, {fur: 'piel', fur_d: 'piel'}, flat=(bone, eye, mouth) + ((scars,) if scars else ()),
+              b=4, extra_pivots=piv, roughness=0.85, specular=0.2)
+
+
+def gug():
+    _gug('gug', 2310, (0.22, 0.20, 0.19), (0.13, 0.12, 0.12), (0.62, 0.58, 0.48), (0.95, 0.82, 0.40),
+         (0.42, 0.06, 0.08))
+
+
+def gug_koth():
+    """El gran gug de la torre de Koth (jefe del nivel 4, escalado): canoso de viejo, con cicatrices pálidas y
+    los ojos encendidos."""
+    _gug('gug_koth', 2311, (0.30, 0.28, 0.27), (0.17, 0.16, 0.16), (0.72, 0.68, 0.58), (1.0, 0.55, 0.20),
+         (0.55, 0.08, 0.10), scars=(0.55, 0.50, 0.46), glow_eyes=True)
+
+
 ALL = {'zoog': zoog, 'zoog_copas': zoog_copas, 'zoog_anciano': zoog_anciano,
        'mercader_leng': mercader_leng, 'remero_lunar': remero_lunar, 'bestia_lunar_mayor': bestia_lunar_mayor,
        'escotilla': escotilla,
        'shantak': shantak, 'arana_leng': arana_leng, 'arana_madre': arana_madre, 'sacerdote_leng': sacerdote_leng,
-       'telarana': telarana}
+       'telarana': telarana, 'ghast': ghast, 'gug': gug, 'gug_koth': gug_koth}
 
 if __name__ == '__main__':
     for n in (sys.argv[1:] or ALL):

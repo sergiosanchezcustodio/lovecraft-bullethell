@@ -14,6 +14,10 @@ extends Node
 ##   Leng) sueltan a veces uno al caer (`Pickup.Kind.RUBY`: el doble de dólares, pero quita cordura).
 ## - Nivel 3, la meseta de Leng: **el viento de Leng** sopla a rachas (`gust_every`): avisa, y durante
 ##   `gust_time` s empuja a todos hacia un lado (al azar) a `gust_push` m/s, con más fuerza a mitad.
+## - Nivel 4, las bóvedas de Zin: **la oscuridad**. Los ghasts no pisan la luz (`GhastBehavior`): la de los
+##   faroles de los jugadores y la de los hongos que brillan (`glow_models`, en `glows`). **Los necrófagos de
+##   Pickman** suben de la cripta (`crypt` en el JSON) cada `ghouls_every` s y cazan un rato (`Reanimated`,
+##   como los de los lienzos); si juega Pickman, suben más.
 ## En red, la manada la decide el anfitrión (suceso "dream"); los gatos cazan en todos los PC, pero solo
 ## el anfitrión hace daño (los enemigos son suyos).
 
@@ -50,6 +54,11 @@ var gusts := 0                         ## rachas (tests)
 var gust_dir := Vector3.ZERO           ## hacia dónde empuja la racha en curso
 var _gust_next := 0.0
 var _gust_t := -1.0                    ## s desde que empezó el aviso de la racha en curso (-1: ninguna)
+var glows: Array[Vector2] = []          ## hongos que brillan: luz que los ghasts no pisan
+var crypt_at := Vector3.INF
+var ghouls: Array = []                 ## sin tipo: los que acaban quedan liberados
+var risings := 0                       ## subidas de necrófagos (tests)
+var _ghoul_next := 0.0
 var _rng := RandomNumberGenerator.new()
 
 func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node = null) -> DreamLands:
@@ -66,6 +75,10 @@ func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node 
 	cats_from = Vector3(float(cf[0]), 0.0, float(cf[1])) if cf.size() == 2 else Vector3(0, 0, -half + 1.0)
 	for p: Dictionary in layout.get("props", []):
 		if String(p.model) in MUSHROOMS: mushrooms.append(Vector2(float(p.pos[0]), float(p.pos[1])))
+		if level != null and String(p.model) in level.glow_models: glows.append(Vector2(float(p.pos[0]), float(p.pos[1])))
+	var cr: Array = layout.get("crypt", [])
+	if cr.size() >= 2: crypt_at = Vector3(float(cr[0]), 0.0, float(cr[1]))
+	_ghoul_next = level.ghouls_every * 0.5 if level != null else 0.0
 	_next = cats_every() * 0.6
 	var g: Array = layout.get("galley", [])
 	if g.size() >= 2: galley_at = Vector3(float(g[0]), 0.0, float(g[1]))
@@ -101,6 +114,7 @@ func _physics_process(delta: float) -> void:
 	_mushroom_step(delta)
 	if host: _galley_step(delta)
 	_gust_step(delta)
+	if host: _ghoul_step(delta)
 
 # ------------------------------------------------------------------ los gatos de Ulthar
 
@@ -296,6 +310,48 @@ func gust(a: float) -> void:
 	Auto.sfx_at("trap_wind", at)
 	if host: _net({"a": "gust", "r": a})
 
+# ------------------------------------------------------------------ la oscuridad y los necrófagos
+
+func glow_radius() -> float:
+	return level.glow_radius if level != null else 2.4
+
+## ¿Juega Pickman? (suben más necrófagos)
+func pickman_plays() -> bool:
+	for q in world.players:
+		if q.data != null and String(q.data.id) == "pickman": return true
+	return false
+
+func _ghoul_step(delta: float) -> void:
+	if level.ghouls_every <= 0.0 or crypt_at == Vector3.INF: return
+	_ghoul_next -= delta
+	if _ghoul_next > 0.0: return
+	_ghoul_next = level.ghouls_every * _rng.randf_range(0.85, 1.15)
+	rise_ghouls(_rng.randi())
+
+## Suben los necrófagos de la cripta (en el invitado, cuando lo dice el anfitrión: allí no hacen daño,
+## que los enemigos son del anfitrión).
+func rise_ghouls(seed_v: int) -> void:
+	risings += 1
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_v
+	var n := level.ghouls_count + (level.ghouls_pickman if pickman_plays() else 0)
+	for i in n:
+		var a := TAU * i / n + rng.randf() * 0.5
+		var at := crypt_at + Vector3(cos(a), 0.0, sin(a)) * rng.randf_range(0.6, 1.4)
+		var g := Reanimated.new().setup(world, Canvas.ghoul_data(), at, Vector3(cos(a), 0, sin(a)),
+			level.ghouls_life * rng.randf_range(0.9, 1.1), {})
+		g.look = "pickman"
+		g.tick = 0.4
+		g.dps = level.ghouls_dps if host else 0.0
+		world.fx.add_child(g)
+		ghouls.append(g)
+	ghouls = ghouls.filter(func(g: Variant) -> bool: return is_instance_valid(g))
+	var txt := "Suben los necrófagos de las criptas: Pickman les ha hablado de ti" if pickman_plays() 		else "Suben los necrófagos de las criptas a echar una mano"
+	if game != null and game.has_method("announce"): game.announce(txt, 2.5)
+	world.sfx("growl", crypt_at)
+	world.sfx("rise_stone", crypt_at)
+	if host: _net({"a": "ghouls", "s": seed_v})
+
 # ------------------------------------------------------------------ los rubíes
 
 ## Vigila a un enemigo que acaba de aparecer: si es de los que llevan rubíes, puede soltar uno al caer.
@@ -318,6 +374,7 @@ func remote(d: Dictionary) -> void:
 		"cats": release_cats(int(d.get("s", 0)))
 		"galley": _say_galley()
 		"gust": gust(float(d.get("r", 0.0)))
+		"ghouls": rise_ghouls(int(d.get("s", 0)))
 		"hatch":
 			hatch_broken = true
 			_say_hatch()

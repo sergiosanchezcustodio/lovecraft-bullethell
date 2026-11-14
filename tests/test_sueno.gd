@@ -365,3 +365,110 @@ func test_el_viento_de_leng_empuja() -> void:
 	dl2.remote({"a": "gust", "r": PI})
 	assert_eq(dl2.gusts, 1, "en el invitado, la del anfitrión")
 	assert_almost_eq(dl2.gust_dir.x, -1.0, 0.001)
+
+# ------------------------------------------------------------------ nivel 4: las bóvedas de Zin
+
+func test_el_nivel_de_zin() -> void:
+	var lv: LevelData = load("res://data/levels/p4_n4.tres")
+	var ids := lv.pool.map(func(d: EnemyData) -> String: return String(d.id))
+	assert_true(ids.has("ghast") and ids.has("gug"))
+	assert_true((load("res://data/enemies/gug.tres") as EnemyData).elite, "el gug es élite")
+	assert_eq(String(lv.final_enemy.id), "gug_koth")
+	assert_true(lv.final_enemy.unique)
+	for d: EnemyData in lv.pool + [lv.final_enemy]:
+		assert_true(Anims.script_for(d.model) != null, "%s se anima" % d.model)
+	var dl := _dream("p4_n4")
+	assert_false(dl.glows.is_empty(), "los hongos de Zin dan luz")
+	assert_ne(dl.crypt_at, Vector3.INF, "la cripta de los necrófagos")
+
+func _ghast(at: Vector3) -> Enemy:
+	var e := _enemy("ghast", at, false)
+	e.data.max_health = 1000.0
+	e.health = 1000.0
+	(e.behavior as GhastBehavior)._cd = 999.0
+	return e
+
+func test_el_ghast_no_entra_en_la_luz() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var e := _ghast(Vector3(2.0, 0, 0))
+	var b := e.behavior as GhastBehavior
+	assert_ne(GhastBehavior.light_at(world, e.global_position, 0.65), Vector3.INF, "dentro del farol")
+	var v := Vector3.ZERO
+	for k in 20: v = b.update(e, p, DT)
+	assert_gt(b.burned, 0.0, "la luz lo quema")
+	assert_lt(e.health, 1000.0)
+	assert_eq(b.state, GhastBehavior.State.FLEE)
+	assert_gt(v.x, 0.0, "huye de la luz")
+
+func test_a_oscuras_no_se_quema_y_se_acerca() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var e := _ghast(Vector3(9.0, 0, 0))
+	var b := e.behavior as GhastBehavior
+	var v := Vector3.ZERO
+	for k in 20: v = b.update(e, p, DT)
+	assert_eq(b.burned, 0.0)
+	assert_lt(v.x, 0.0, "va hacia el jugador")
+	assert_eq(b.state, GhastBehavior.State.PROWL)
+
+func test_el_ghast_salta_con_aviso() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var e := _ghast(Vector3(5.0, 0, 0))
+	var b := e.behavior as GhastBehavior
+	b._cd = 0.0
+	b.update(e, p, DT)
+	assert_eq(b.state, GhastBehavior.State.AIM, "marca dónde va a caer")
+	assert_false(b.touches(e))
+	var hp := p.health
+	for k in int((float(e.data.param("leap_warn", 0.55)) + float(e.data.param("leap_time", 0.45))) / DT) + 3:
+		b.update(e, p, DT)
+	assert_lt(p.health, hp, "le cae encima")
+	assert_eq(b.state, GhastBehavior.State.FLEE, "y sale huyendo")
+	for k in 10: b.update(e, p, DT)
+	assert_gt(b.burned, 0.0, "ha caído en la luz: se quema")
+
+func test_un_farol_mayor_da_mas_luz() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var at := Vector3(4.0, 0, 0)
+	assert_eq(GhastBehavior.light_at(world, at, 0.65), Vector3.INF)
+	(p.get_node("CarryLight") as OmniLight3D).omni_range = 9.0
+	assert_ne(GhastBehavior.light_at(world, at, 0.65), Vector3.INF, "la linterna de la tienda la agranda")
+
+func test_los_hongos_dan_luz() -> void:
+	var dl := _dream("p4_n4")
+	var g: Vector2 = dl.glows[0]
+	assert_ne(GhastBehavior.light_at(world, Vector3(g.x, 0, g.y + 1.0), 0.65), Vector3.INF)
+	assert_eq(GhastBehavior.light_at(world, Vector3(g.x, 0, g.y + dl.glow_radius() + 0.5), 0.65), Vector3.INF)
+
+func test_el_gug_si_entra_en_la_luz() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var e := _enemy("gug", Vector3(3.5, 0, 0), false)
+	assert_false(e.behavior is GhastBehavior)
+	world.rebuild_grid()
+	var v := e.behavior.update(e, p, DT)
+	assert_lt(v.x, 0.0, "va a por él aunque esté en la luz")
+
+func test_suben_los_necrofagos() -> void:
+	_player("dyer", Vector3.ZERO)
+	var dl := _dream("p4_n4")
+	dl._ghoul_next = 0.0
+	dl._physics_process(DT)
+	assert_eq(dl.risings, 1)
+	assert_eq(dl.ghouls.size(), dl.level.ghouls_count)
+	assert_gt((dl.ghouls[0] as Reanimated).dps, 0.0)
+	assert_lt((dl.ghouls[0] as Reanimated).global_position.distance_to(dl.crypt_at), 2.0, "de la cripta")
+
+func test_con_pickman_suben_mas() -> void:
+	_player("pickman", Vector3.ZERO)
+	var dl := _dream("p4_n4")
+	dl.rise_ghouls(7)
+	assert_eq(dl.ghouls.size(), dl.level.ghouls_count + dl.level.ghouls_pickman)
+
+func test_en_el_invitado_los_necrofagos_no_hacen_dano() -> void:
+	_player("dyer", Vector3.ZERO)
+	var dl := _dream("p4_n4", false)
+	dl._ghoul_next = 0.0
+	dl._physics_process(DT)
+	assert_eq(dl.risings, 0, "los decide el anfitrión")
+	dl.remote({"a": "ghouls", "s": 3})
+	assert_eq(dl.risings, 1)
+	assert_eq((dl.ghouls[0] as Reanimated).dps, 0.0)

@@ -125,6 +125,17 @@ func is_survival() -> bool:
 @export var gust_warn := 1.5
 @export var gust_time := 4.0
 @export var gust_push := 3.0
+## Nivel 4: la oscuridad. Los ghasts (GhastBehavior) no entran en la luz de los faroles ni en la de los
+## hongos que brillan (`glow_models`, a `glow_radius` m). Cada `ghouls_every` s suben de la cripta (`crypt` en
+## el JSON de la arena) `ghouls_count` necrófagos de Pickman (`ghouls_pickman` más si juega Pickman), que
+## cazan `ghouls_life` s haciendo `ghouls_dps` de daño.
+@export var glow_models: Array[String] = []
+@export var glow_radius := 2.4
+@export var ghouls_every := 0.0                ## s medios entre subidas (0: sin necrófagos)
+@export var ghouls_count := 3
+@export var ghouls_pickman := 2
+@export var ghouls_life := 12.0
+@export var ghouls_dps := 30.0
 @export_group("Dinero (D-31)")
 @export var money_bonus := 100                 ## dólares al superar el nivel
 @export var chest_every := 90.0                ## s medios entre baúles arcanos (0: ninguno)

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rocas_koth"
+shape = 1
+count = 7
+spread_deg = 70.0
+speed = 4.2
+radius = 0.2
+size = 0.32
+damage_physical = 8.0
+damage_mental = 1.0
+lifetime = 5.0
+bursts = 2
+burst_interval = 0.5
+aimed = true
+telegraph_time = 0.45
+telegraph_radius = 2.2
