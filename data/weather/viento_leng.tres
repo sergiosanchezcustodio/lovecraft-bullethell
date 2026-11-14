@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WeatherData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/weather_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"viento_leng"
+display_name = "Viento de Leng"
+wind_dir = Vector2(1, 0.45)
+wind = 4.5
+gusts = 0.9
+gust_period = 6.0
+precip = 0
+precip_amount = 0.0
+drift = 0.3
+drift_color = Color(0.56, 0.52, 0.60, 0.22)
+mist = 0.1
+mist_color = Color(0.40, 0.37, 0.48, 1.0)
+clouds = 0.18
+lightning_every = 0.0

@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/enemies/pesadilla.tres" id="2"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+[ext_resource type="Resource" path="res://data/weather/viento_leng.tres" id="weather"]
 
 [resource]
 script = ExtResource("1")
+weather = ExtResource("weather")
 id = &"p4_n3"
 display_name = "La meseta de Leng y el monasterio sin ventanas"
 part = 4

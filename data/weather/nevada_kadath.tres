@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeatherData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/weather_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"nevada_kadath"
+display_name = "Nevada de Kadath"
+wind_dir = Vector2(0.8, 0.5)
+wind = 1.0
+gusts = 0.5
+gust_period = 8.0
+precip = 1
+precip_amount = 0.3
+fall_speed = 0.9
+flake_size = 0.045
+precip_color = Color(0.86, 0.86, 1.0, 0.8)
+drift = 0.15
+drift_color = Color(0.80, 0.82, 0.95, 0.25)
+mist = 0.12
+mist_color = Color(0.36, 0.34, 0.52, 1.0)
+clouds = 0.1
+lightning_every = 0.0

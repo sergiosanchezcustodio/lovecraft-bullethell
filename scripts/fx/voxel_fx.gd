@@ -308,6 +308,25 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 			m.scale_curve = _curve([[0.0, 0.35], [0.4, 0.8], [1.0, 1.6]])
 			m.color_ramp = _ramp([[0.0, Color(0.16, 0.15, 0.15, 0.0)], [0.08, Color(0.17, 0.16, 0.16, 0.75)],
 				[0.5, Color(0.22, 0.22, 0.23, 0.45)], [1.0, Color(0.28, 0.29, 0.30, 0.0)]])
+		"campfire_smoke":         # humo de hoguera (21.9, mejoras): columna que sube recta y se abre arriba, poca deriva
+			p.draw_pass_1 = cube("mix")
+			p.amount = int(clampf(r * 40.0, 12.0, 28.0))
+			p.lifetime = 5.0
+			p.preprocess = 5.0
+			p.visibility_aabb = AABB(Vector3(-3, -1, -3), Vector3(6, 10, 6))
+			m.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			m.emission_sphere_radius = r * 0.35
+			m.direction = Vector3(0, 1, 0)
+			m.spread = 6.0
+			m.initial_velocity_min = 1.1; m.initial_velocity_max = 1.5
+			m.gravity = Vector3(0.06, 0.08, -0.03)
+			m.damping_min = 0.12; m.damping_max = 0.2
+			m.angle_min = -40.0; m.angle_max = 40.0
+			m.angular_velocity_min = -10.0; m.angular_velocity_max = 10.0
+			m.scale_min = r * 0.45; m.scale_max = r * 0.7
+			m.scale_curve = _curve([[0.0, 0.3], [0.5, 0.8], [1.0, 1.5]])
+			m.color_ramp = _ramp([[0.0, Color(0.16, 0.15, 0.15, 0.0)], [0.1, Color(0.18, 0.17, 0.17, 0.6)],
+				[0.55, Color(0.23, 0.23, 0.24, 0.32)], [1.0, Color(0.28, 0.29, 0.30, 0.0)]])
 		"steam":                  # vapor de alcantarilla (hito 17.14): bocanadas blancas que suben deprisa y se deshacen
 			p.draw_pass_1 = cube("mix")
 			p.amount = int(clampf(r * 30.0, 8.0, 18.0))

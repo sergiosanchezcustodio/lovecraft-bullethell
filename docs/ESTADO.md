@@ -3385,3 +3385,10 @@ El diseño (21.8) está en `docs/GDD.md` (sección 2.5, D-53): cuarta parte de l
 - **Niveles provisionales** `data/levels/p4_n1.tres` a `p4_n5.tres` (con la pesadilla de enemigo y la música de otras partes) para jugar las arenas con `level=p4_nN`; los enemigos, las mecánicas, la música y el relato llegan en 21.10-21.12. Mapas en `resources/maps/p4_n1.png` a `p4_n5.png`.
 - **Tests** (`tests/test_arenas_sueno.gd`, 5; 980 de 980): cada nivel con su arena y su mapa, los modelos existen, las luces propias son de modelos con `light`, los puntos de las mecánicas se pisan y la meseta toma el color de la arena.
 - **Capturas:** `shots/game_bosque4_003.0s.png`, `shots/game_dylath2_003.0s.png`, `shots/game_leng2_002.0s.png` y `_leng3_`, `shots/game_zin2_002.0s.png` y `_zin3_`, `shots/game_kad2_002.0s.png`; hojas de modelos `shots/hoja_leng.png`, `shots/hoja_zin.png` y `shots/hoja_kadath.png`.
+- **Mejoras (14-11-2026, encargo del autor):**
+  - Clima: viento de Leng (`data/weather/viento_leng.tres`: viento 4,5 con rachas y polvo gris violáceo a ras de suelo) y nevada de Kadath (`nevada_kadath.tres`: copos lentos y escasos, bruma violeta).
+  - Las hogueras (`lui_hoguera`, en todas las arenas) echan el humo en columna recta que se abre arriba (receta nueva `campfire_smoke` en `VoxelFx`; antes, `chimney`, que se tumbaba).
+  - Los hongos de Zin y las setas del bosque laten (`glow: pulse`) y tienen polillas.
+  - Ambiente de las cinco arenas en `data/ambient.json`: pisadas, viento, murciélagos (gaviotas en Dylath-Leen), luciérnagas y motas en el bosque, sin sombras de nubes bajo tierra en Zin, y aliento y huellas en Kadath.
+  - Capturas: `shots/game_leng4_004.0s.png`, `shots/game_zin4_004.0s.png` y `shots/game_kad4_004.0s.png`.
+  - `test_hit_fx` (la micro-pausa, con tiempo real) falla hoy también sin estos cambios: es el ritmo del PC, no el código.
