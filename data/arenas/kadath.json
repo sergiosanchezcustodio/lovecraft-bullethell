@@ -1,0 +1,1371 @@
+{
+ "name": "La cima de Kadath",
+ "spawn": [
+  0.0,
+  24.0
+ ],
+ "gate": [
+  0.0,
+  -30.5
+ ],
+ "ground": {
+  "seed": 79,
+  "tile": 0.5,
+  "margin_back": 14.0,
+  "margin_front": 18.0,
+  "camp_radius": 0.0,
+  "colors": {
+   "snow_lo": [
+    0.4,
+    0.42,
+    0.52
+   ],
+   "snow_hi": [
+    0.6,
+    0.63,
+    0.74
+   ],
+   "ice": [
+    0.16,
+    0.14,
+    0.22
+   ],
+   "ice_vein": [
+    0.3,
+    0.26,
+    0.4
+   ],
+   "trampled": [
+    0.44,
+    0.46,
+    0.56
+   ]
+  }
+ },
+ "barrier": {
+  "models": [
+   "sue_muro_onice_1",
+   "sue_muro_onice_2",
+   "sue_muro_onice_3"
+  ],
+  "sides": [
+   "north",
+   "west"
+  ],
+  "line": 36.5,
+  "spacing": 7.4,
+  "from": -44.0,
+  "to": 48.0,
+  "y": -0.5,
+  "plateau": 9.0,
+  "plateau_color": [
+   0.1,
+   0.09,
+   0.13
+  ],
+  "placements": [
+   [
+    -44.0,
+    -0.5,
+    -36.33268784185054,
+    0.0,
+    0.9055023661489867,
+    "sue_muro_onice_1"
+   ],
+   [
+    -36.779976545304706,
+    -0.5,
+    -36.832147114221414,
+    0.0,
+    1.0620236671160828,
+    "sue_muro_onice_2"
+   ],
+   [
+    -29.238616955366375,
+    -0.5,
+    -36.029384518754185,
+    0.0,
+    0.9191265431784715,
+    "sue_muro_onice_3"
+   ],
+   [
+    -21.901079499618156,
+    -0.5,
+    -37.064243336674316,
+    0.0,
+    0.9481003544567927,
+    "sue_muro_onice_1"
+   ],
+   [
+    -14.496795269135465,
+    -0.5,
+    -37.068156836379366,
+    0.0,
+    0.9437442831510627,
+    "sue_muro_onice_2"
+   ],
+   [
+    -6.976887718911846,
+    -0.5,
+    -36.44607022327614,
+    0.0,
+    0.9484969368489533,
+    "sue_muro_onice_3"
+   ],
+   [
+    0.4945248281888812,
+    -0.5,
+    -36.12868345198661,
+    0.0,
+    0.9014297271291735,
+    "sue_muro_onice_1"
+   ],
+   [
+    8.139180229655128,
+    -0.5,
+    -36.262232726014126,
+    0.0,
+    0.9748551136339583,
+    "sue_muro_onice_2"
+   ],
+   [
+    15.263563829504553,
+    -0.5,
+    -35.95134431335186,
+    0.0,
+    0.9740507999247779,
+    "sue_muro_onice_3"
+   ],
+   [
+    22.337760504208674,
+    -0.5,
+    -36.983940347799845,
+    0.0,
+    1.0864487605964412,
+    "sue_muro_onice_1"
+   ],
+   [
+    29.820741329302187,
+    -0.5,
+    -36.131446072070744,
+    0.0,
+    1.06054099307264,
+    "sue_muro_onice_2"
+   ],
+   [
+    37.24972380246595,
+    -0.5,
+    -35.93226108322475,
+    0.0,
+    0.9832775629858378,
+    "sue_muro_onice_3"
+   ],
+   [
+    44.69135630748453,
+    -0.5,
+    -36.104714402896406,
+    0.0,
+    1.0360743455201342,
+    "sue_muro_onice_1"
+   ],
+   [
+    -36.407177425691884,
+    -0.5,
+    -44.0,
+    90.0,
+    1.0550058039672832,
+    "sue_muro_onice_1"
+   ],
+   [
+    -36.82652206921814,
+    -0.5,
+    -36.96334049307547,
+    90.0,
+    0.9636653519924636,
+    "sue_muro_onice_2"
+   ],
+   [
+    -36.82065093636676,
+    -0.5,
+    -29.89950691153657,
+    90.0,
+    0.9222203144701404,
+    "sue_muro_onice_3"
+   ],
+   [
+    -36.33717866688272,
+    -0.5,
+    -22.677128029048497,
+    90.0,
+    0.9802630793734186,
+    "sue_muro_onice_1"
+   ],
+   [
+    -36.848591563074216,
+    -0.5,
+    -15.380983255354991,
+    90.0,
+    0.958735120850805,
+    "sue_muro_onice_2"
+   ],
+   [
+    -36.322357537704086,
+    -0.5,
+    -7.6316595851849955,
+    90.0,
+    1.0340088212467375,
+    "sue_muro_onice_3"
+   ],
+   [
+    -36.22504784245958,
+    -0.5,
+    -0.49474866662651795,
+    90.0,
+    0.9359485486276243,
+    "sue_muro_onice_1"
+   ],
+   [
+    -35.912571979236084,
+    -0.5,
+    6.8088156867796,
+    90.0,
+    1.0407999471679006,
+    "sue_muro_onice_2"
+   ],
+   [
+    -36.27846289881215,
+    -0.5,
+    14.254375481799318,
+    90.0,
+    1.0854274224417582,
+    "sue_muro_onice_3"
+   ],
+   [
+    -36.82514231364308,
+    -0.5,
+    21.875175411036317,
+    90.0,
+    0.9070620536588884,
+    "sue_muro_onice_1"
+   ],
+   [
+    -36.77871094882916,
+    -0.5,
+    29.12753784948358,
+    90.0,
+    0.9464162255889919,
+    "sue_muro_onice_2"
+   ],
+   [
+    -36.048358848232795,
+    -0.5,
+    36.88186562095162,
+    90.0,
+    0.9692291337756652,
+    "sue_muro_onice_3"
+   ],
+   [
+    -36.6252417187272,
+    -0.5,
+    44.40621655318753,
+    90.0,
+    1.1012004697429196,
+    "sue_muro_onice_1"
+   ]
+  ]
+ },
+ "light": {
+  "sun_rot": [
+   -40,
+   25
+  ],
+  "sun_color": [
+   0.62,
+   0.62,
+   0.9
+  ],
+  "sun_energy": 0.4,
+  "exposure": 1.0,
+  "ambient_color": [
+   0.4,
+   0.4,
+   0.6
+  ],
+  "ambient_energy": 0.4,
+  "background": [
+   0.03,
+   0.03,
+   0.07
+  ],
+  "fog_color": [
+   0.2,
+   0.2,
+   0.32
+  ],
+  "fog_density": 0.0
+ },
+ "lamp": {
+  "color": [
+   1.0,
+   0.56,
+   0.26
+  ],
+  "energy": 2.8,
+  "range": 8.5,
+  "fog": 0.25
+ },
+ "lamps": {
+  "sue_puerta_kadath": {
+   "color": [
+    1.0,
+    0.82,
+    0.44
+   ],
+   "energy": 4.0,
+   "range": 13.0,
+   "fog": 0.35,
+   "fog_tint": true
+  }
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_bloques_hielo_2": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_bloques_hielo_3": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_roca_nevada": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.4
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "sue_puerta_kadath": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "sue_pilar_1": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "sue_pilar_2": {
+   "type": "cylinder",
+   "radius": 0.7
+  },
+  "sue_brasero": {
+   "type": "cylinder",
+   "radius": 0.45
+  },
+  "sue_escombro_1": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "sue_escombro_2": {
+   "type": "box",
+   "shrink": 0.8
+  }
+ },
+ "size": [
+  64.0,
+  64.0
+ ],
+ "props": [
+  {
+   "model": "sue_puerta_kadath",
+   "pos": [
+    0.0,
+    -35.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    -8.0,
+    -22
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    8.0,
+    -22
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_brasero",
+   "pos": [
+    -4.5,
+    -17.5
+   ],
+   "rot": 278.5,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_brasero",
+   "pos": [
+    4.5,
+    -17.5
+   ],
+   "rot": 321.6,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    -8.0,
+    -13
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    8.0,
+    -13
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    -8.0,
+    -4
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_2",
+   "pos": [
+    8.0,
+    -4
+   ],
+   "rot": 90,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_brasero",
+   "pos": [
+    -4.5,
+    0.5
+   ],
+   "rot": 75.1,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_brasero",
+   "pos": [
+    4.5,
+    0.5
+   ],
+   "rot": 234.4,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_2",
+   "pos": [
+    -8.0,
+    5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    8.0,
+    5
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    -8.0,
+    14
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    8.0,
+    14
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_brasero",
+   "pos": [
+    -4.5,
+    18.5
+   ],
+   "rot": 220.7,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_brasero",
+   "pos": [
+    4.5,
+    18.5
+   ],
+   "rot": 311.5,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    -8.0,
+    23
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    8.0,
+    23
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_2",
+   "pos": [
+    -19.21,
+    -18.76
+   ],
+   "rot": 154.9,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    -24.44,
+    -4.13
+   ],
+   "rot": 344.2,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_2",
+   "pos": [
+    -18.99,
+    9.72
+   ],
+   "rot": 148.7,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_2",
+   "pos": [
+    -21.53,
+    21.65
+   ],
+   "rot": 51.5,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_2",
+   "pos": [
+    17.34,
+    -20.51
+   ],
+   "rot": 340.9,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_1",
+   "pos": [
+    22.36,
+    -6.13
+   ],
+   "rot": 38.1,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_2",
+   "pos": [
+    20.01,
+    8.79
+   ],
+   "rot": 105.5,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_pilar_2",
+   "pos": [
+    24.01,
+    20.86
+   ],
+   "rot": 342.4,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_brasero",
+   "pos": [
+    -14.0,
+    -26.0
+   ],
+   "rot": 194.1,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_brasero",
+   "pos": [
+    14.0,
+    -26.0
+   ],
+   "rot": 108.2,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_brasero",
+   "pos": [
+    -26.0,
+    14.0
+   ],
+   "rot": 229.4,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_brasero",
+   "pos": [
+    26.0,
+    -14.0
+   ],
+   "rot": 212.1,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    -1.6,
+    24.96
+   ],
+   "rot": 65.6,
+   "scale": 0.76
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    18.81,
+    -14.31
+   ],
+   "rot": 50.5,
+   "scale": 0.71
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    10.17,
+    -0.47
+   ],
+   "rot": 107.9,
+   "scale": 0.76
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    -0.76,
+    22.12
+   ],
+   "rot": 233.2,
+   "scale": 0.99
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    12.0,
+    -3.66
+   ],
+   "rot": 55.2,
+   "scale": 0.86
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    -26.7,
+    -12.65
+   ],
+   "rot": 313.0,
+   "scale": 0.88
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -17.08,
+    -12.59
+   ],
+   "rot": 302.3,
+   "scale": 0.85
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    26.08,
+    -8.79
+   ],
+   "rot": 196.6,
+   "scale": 0.74
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    13.48,
+    -23.46
+   ],
+   "rot": 96.9,
+   "scale": 0.91
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    1.22,
+    14.61
+   ],
+   "rot": 239.3,
+   "scale": 0.95
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -9.36,
+    9.83
+   ],
+   "rot": 339.6,
+   "scale": 0.72
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -23.13,
+    15.44
+   ],
+   "rot": 238.4,
+   "scale": 0.98
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -44.0,
+    33.21
+   ],
+   "rot": 300.3,
+   "scale": 1.1
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    33.17,
+    -44.0
+   ],
+   "rot": 322.4,
+   "scale": 1.17
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -41.4,
+    32.87
+   ],
+   "rot": 197.2,
+   "scale": 1.06
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    33.74,
+    -41.4
+   ],
+   "rot": 60.7,
+   "scale": 1.24
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    -38.8,
+    33.18
+   ],
+   "rot": 325.8,
+   "scale": 1.23
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    32.95,
+    -38.8
+   ],
+   "rot": 256.6,
+   "scale": 1.29
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -36.2,
+    33.45
+   ],
+   "rot": 19.8,
+   "scale": 1.28
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    33.74,
+    -36.2
+   ],
+   "rot": 140.7,
+   "scale": 1.03
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    -33.6,
+    32.68
+   ],
+   "rot": 295.4,
+   "scale": 1.21
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    33.64,
+    -33.6
+   ],
+   "rot": 153.3,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -31.0,
+    33.18
+   ],
+   "rot": 312.8,
+   "scale": 1.1
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    33.74,
+    -31.0
+   ],
+   "rot": 195.1,
+   "scale": 1.12
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -28.4,
+    33.69
+   ],
+   "rot": 213.3,
+   "scale": 1.26
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    32.78,
+    -28.4
+   ],
+   "rot": 140.5,
+   "scale": 1.2
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -25.8,
+    33.43
+   ],
+   "rot": 51.2,
+   "scale": 1.03
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    32.92,
+    -25.8
+   ],
+   "rot": 35.7,
+   "scale": 1.05
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -23.2,
+    32.63
+   ],
+   "rot": 150.8,
+   "scale": 1.13
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    33.21,
+    -23.2
+   ],
+   "rot": 116.9,
+   "scale": 1.18
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -20.6,
+    33.44
+   ],
+   "rot": 255.8,
+   "scale": 1.1
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    32.89,
+    -20.6
+   ],
+   "rot": 298.3,
+   "scale": 1.02
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    -18.0,
+    32.99
+   ],
+   "rot": 269.0,
+   "scale": 1.26
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    32.75,
+    -18.0
+   ],
+   "rot": 271.8,
+   "scale": 1.08
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    -15.4,
+    33.11
+   ],
+   "rot": 182.6,
+   "scale": 1.1
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    32.73,
+    -15.4
+   ],
+   "rot": 187.1,
+   "scale": 1.19
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    -12.8,
+    33.75
+   ],
+   "rot": 66.3,
+   "scale": 1.13
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    33.73,
+    -12.8
+   ],
+   "rot": 304.3,
+   "scale": 1.12
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -10.2,
+    33.56
+   ],
+   "rot": 329.6,
+   "scale": 1.12
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    33.72,
+    -10.2
+   ],
+   "rot": 141.6,
+   "scale": 1.06
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    -7.6,
+    32.92
+   ],
+   "rot": 315.5,
+   "scale": 1.27
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    33.54,
+    -7.6
+   ],
+   "rot": 6.6,
+   "scale": 1.07
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -5.0,
+    33.1
+   ],
+   "rot": 56.9,
+   "scale": 1.09
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    33.36,
+    -5.0
+   ],
+   "rot": 126.6,
+   "scale": 1.07
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    -2.4,
+    33.01
+   ],
+   "rot": 198.1,
+   "scale": 1.09
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    33.71,
+    -2.4
+   ],
+   "rot": 160.9,
+   "scale": 1.25
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    0.2,
+    33.65
+   ],
+   "rot": 264.9,
+   "scale": 1.12
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    32.77,
+    0.2
+   ],
+   "rot": 84.4,
+   "scale": 1.23
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    2.8,
+    33.45
+   ],
+   "rot": 35.3,
+   "scale": 1.28
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    33.26,
+    2.8
+   ],
+   "rot": 23.0,
+   "scale": 1.27
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    5.4,
+    32.89
+   ],
+   "rot": 102.8,
+   "scale": 1.14
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    32.7,
+    5.4
+   ],
+   "rot": 293.3,
+   "scale": 1.02
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    8.0,
+    32.83
+   ],
+   "rot": 29.6,
+   "scale": 1.18
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    33.13,
+    8.0
+   ],
+   "rot": 135.7,
+   "scale": 1.27
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    10.6,
+    32.73
+   ],
+   "rot": 112.6,
+   "scale": 1.26
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    33.52,
+    10.6
+   ],
+   "rot": 158.8,
+   "scale": 1.01
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    13.2,
+    33.23
+   ],
+   "rot": 31.8,
+   "scale": 1.22
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    33.51,
+    13.2
+   ],
+   "rot": 63.2,
+   "scale": 1.11
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    15.8,
+    33.24
+   ],
+   "rot": 206.4,
+   "scale": 1.23
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    33.43,
+    15.8
+   ],
+   "rot": 44.0,
+   "scale": 1.08
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    18.4,
+    32.67
+   ],
+   "rot": 29.9,
+   "scale": 1.11
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    32.91,
+    18.4
+   ],
+   "rot": 210.3,
+   "scale": 1.07
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    21.0,
+    32.65
+   ],
+   "rot": 265.3,
+   "scale": 1.06
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    33.46,
+    21.0
+   ],
+   "rot": 66.5,
+   "scale": 1.22
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    23.6,
+    33.26
+   ],
+   "rot": 276.4,
+   "scale": 1.05
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    32.6,
+    23.6
+   ],
+   "rot": 127.5,
+   "scale": 1.28
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    26.2,
+    33.8
+   ],
+   "rot": 179.4,
+   "scale": 1.01
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    33.1,
+    26.2
+   ],
+   "rot": 344.1,
+   "scale": 1.25
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    28.8,
+    33.04
+   ],
+   "rot": 300.5,
+   "scale": 1.29
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    32.67,
+    28.8
+   ],
+   "rot": 302.6,
+   "scale": 1.07
+  },
+  {
+   "model": "sue_escombro_2",
+   "pos": [
+    31.4,
+    33.47
+   ],
+   "rot": 13.5,
+   "scale": 1.04
+  },
+  {
+   "model": "sue_escombro_1",
+   "pos": [
+    32.84,
+    31.4
+   ],
+   "rot": 179.2,
+   "scale": 1.18
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/kadath_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125
+ }
+}

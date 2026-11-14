@@ -71,7 +71,7 @@ static func build(path: String, fog_volumes: bool = false) -> Node3D:
 		var in_water: bool = not in_sea and obstacles.has_water() and obstacles.water_at(Vector2(p.pos[0], p.pos[1])) > 0.3
 		var amb := Ambient.dress(holder, m, p.model, in_sea or in_water, wind)
 		if (m.get_meta("pivots") as Dictionary).has("light"):
-			var lamp := _lamp(holder, m, data.lamp, fog_volumes)
+			var lamp := _lamp(holder, m, (data.get("lamps", {}) as Dictionary).get(p.model, data.lamp), fog_volumes)   # 21.9: luz por modelo
 			lights.append(lamp)
 			if not amb.is_empty(): amb["light"] = lamp
 		if not amb.is_empty():
@@ -222,7 +222,7 @@ static func _sea(data: Dictionary, size: Vector2) -> MeshInstance3D:
 ## y solapados, y una meseta nevada detrás que llega hasta donde alcanza la cámara.
 ## data: {"models": [...], "sides": ["north", "west"], "line": m desde el centro hasta el
 ## frente, "spacing": m entre tramos, "from"/"to": m a lo largo, "y": altura de la base,
-## "plateau": altura de la meseta}.
+## "plateau": altura de la meseta, "plateau_color": su color, nieve si no se da}.
 static func _barrier(b: Dictionary, size: Vector2) -> Node3D:
 	var root := Node3D.new()
 	root.name = "Barrier"
@@ -264,6 +264,7 @@ static func _barrier(b: Dictionary, size: Vector2) -> Node3D:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var h: float = b.plateau
+	var pc: Array = b.get("plateau_color", [0.84, 0.88, 0.93])          # nieve, salvo que la arena diga otra cosa
 	var far := 90.0
 	var back := line + 3.0                                            # empieza bajo la cumbre
 	for r in [Rect2(-far, -far, 2.0 * far, far - back), Rect2(-far, -back, far - back, far + back)]:
@@ -271,7 +272,7 @@ static func _barrier(b: Dictionary, size: Vector2) -> Node3D:
 			Vector3(r.end.x, h, r.end.y), Vector3(r.end.x, h, r.position.y)]
 		for i in [0, 1, 2, 0, 2, 3]:
 			st.set_normal(Vector3.UP)
-			st.set_color(Color(0.84, 0.88, 0.93))
+			st.set_color(Color(float(pc[0]), float(pc[1]), float(pc[2])))
 			st.add_vertex(q[i])
 	var plateau := MeshInstance3D.new()
 	plateau.name = "Plateau"
@@ -333,7 +334,8 @@ static func _smoke(holder: Node3D, m: Node3D, key: String) -> void:
 	e.position = Vector3(pv[0], pv[1], pv[2]) * float(m.get_meta("voxel_size"))
 	holder.add_child(e)
 
-## Luz cálida del farol en el punto "light" del modelo.
+## Luz cálida del farol en el punto "light" del modelo. La de la arena ("lamp") o, si la hay, la del
+## modelo ("lamps": {modelo: {color, energy, range, fog}}, hito 21.9: los hongos del bosque encantado).
 static func _lamp(holder: Node3D, m: Node3D, def: Dictionary, fog_volume: bool) -> OmniLight3D:
 	var pv: Array = m.get_meta("pivots")["light"]
 	var local := Vector3(pv[0], pv[1], pv[2]) * float(m.get_meta("voxel_size"))
@@ -352,7 +354,7 @@ static func _lamp(holder: Node3D, m: Node3D, def: Dictionary, fog_volume: bool) 
 		fv.position = local
 		var fm := FogMaterial.new()
 		fm.density = float(def.get("fog", 0.35))          # lamp.fog: halo más tenue (corales del arrecife)
-		fm.albedo = Color(1.0, 0.85, 0.7)
+		fm.albedo = Color(1.0, 0.85, 0.7) if not def.has("fog_tint") else Color(def.color[0], def.color[1], def.color[2])
 		fm.height_falloff = 0.0
 		fm.edge_fade = 0.9
 		fv.material = fm

@@ -1,0 +1,1641 @@
+{
+ "name": "Las b\u00f3vedas de Zin",
+ "spawn": [
+  0.0,
+  22.0
+ ],
+ "crypt": [
+  13.0,
+  -4.0
+ ],
+ "koth": [
+  -29.3,
+  -29.3
+ ],
+ "walkable": [
+  "sue_hongos_zin"
+ ],
+ "ground": {
+  "seed": 71,
+  "tile": 0.5,
+  "margin_back": 14.0,
+  "margin_front": 18.0,
+  "camp_radius": 0.0,
+  "kind": "mud",
+  "wet": 0.2,
+  "colors": {
+   "base_hi": [
+    0.3,
+    0.29,
+    0.28
+   ],
+   "base_lo": [
+    0.2,
+    0.19,
+    0.19
+   ],
+   "moss": [
+    0.36,
+    0.35,
+    0.32
+   ],
+   "puddle": [
+    0.1,
+    0.1,
+    0.11
+   ]
+  }
+ },
+ "barrier": {
+  "models": [
+   "sue_muro_zin_1",
+   "sue_muro_zin_2",
+   "sue_muro_zin_3"
+  ],
+  "sides": [
+   "north",
+   "west"
+  ],
+  "line": 35.5,
+  "spacing": 7.6,
+  "from": -44.0,
+  "to": 48.0,
+  "y": -0.5,
+  "plateau": 6.5,
+  "plateau_color": [
+   0.1,
+   0.1,
+   0.1
+  ],
+  "placements": [
+   [
+    -44.0,
+    -0.5,
+    -35.33268784185054,
+    0.0,
+    0.9055023661489867,
+    "sue_muro_zin_1"
+   ],
+   [
+    -36.5799765453047,
+    -0.5,
+    -35.832147114221414,
+    0.0,
+    1.0620236671160828,
+    "sue_muro_zin_2"
+   ],
+   [
+    -28.838616955366376,
+    -0.5,
+    -35.029384518754185,
+    0.0,
+    0.9191265431784715,
+    "sue_muro_zin_3"
+   ],
+   [
+    -21.30107949961816,
+    -0.5,
+    -36.064243336674316,
+    0.0,
+    0.9481003544567927,
+    "sue_muro_zin_1"
+   ],
+   [
+    -13.696795269135471,
+    -0.5,
+    -36.068156836379366,
+    0.0,
+    0.9437442831510627,
+    "sue_muro_zin_2"
+   ],
+   [
+    -5.976887718911853,
+    -0.5,
+    -35.44607022327614,
+    0.0,
+    0.9484969368489533,
+    "sue_muro_zin_3"
+   ],
+   [
+    1.6945248281888734,
+    -0.5,
+    -35.12868345198661,
+    0.0,
+    0.9014297271291735,
+    "sue_muro_zin_1"
+   ],
+   [
+    9.53918022965512,
+    -0.5,
+    -35.262232726014126,
+    0.0,
+    0.9748551136339583,
+    "sue_muro_zin_2"
+   ],
+   [
+    16.863563829504542,
+    -0.5,
+    -34.95134431335186,
+    0.0,
+    0.9740507999247779,
+    "sue_muro_zin_3"
+   ],
+   [
+    24.13776050420866,
+    -0.5,
+    -35.983940347799845,
+    0.0,
+    1.0864487605964412,
+    "sue_muro_zin_1"
+   ],
+   [
+    31.820741329302173,
+    -0.5,
+    -35.131446072070744,
+    0.0,
+    1.06054099307264,
+    "sue_muro_zin_2"
+   ],
+   [
+    39.44972380246593,
+    -0.5,
+    -34.93226108322475,
+    0.0,
+    0.9832775629858378,
+    "sue_muro_zin_3"
+   ],
+   [
+    47.09135630748452,
+    -0.5,
+    -35.104714402896406,
+    0.0,
+    1.0360743455201342,
+    "sue_muro_zin_1"
+   ],
+   [
+    -35.407177425691884,
+    -0.5,
+    -44.0,
+    90.0,
+    1.0550058039672832,
+    "sue_muro_zin_1"
+   ],
+   [
+    -35.82652206921814,
+    -0.5,
+    -36.76334049307547,
+    90.0,
+    0.9636653519924636,
+    "sue_muro_zin_2"
+   ],
+   [
+    -35.82065093636676,
+    -0.5,
+    -29.499506911536567,
+    90.0,
+    0.9222203144701404,
+    "sue_muro_zin_3"
+   ],
+   [
+    -35.33717866688272,
+    -0.5,
+    -22.077128029048495,
+    90.0,
+    0.9802630793734186,
+    "sue_muro_zin_1"
+   ],
+   [
+    -35.848591563074216,
+    -0.5,
+    -14.58098325535499,
+    90.0,
+    0.958735120850805,
+    "sue_muro_zin_2"
+   ],
+   [
+    -35.322357537704086,
+    -0.5,
+    -6.6316595851849955,
+    90.0,
+    1.0340088212467375,
+    "sue_muro_zin_3"
+   ],
+   [
+    -35.22504784245958,
+    -0.5,
+    0.7052513333734813,
+    90.0,
+    0.9359485486276243,
+    "sue_muro_zin_1"
+   ],
+   [
+    -34.912571979236084,
+    -0.5,
+    8.208815686779598,
+    90.0,
+    1.0407999471679006,
+    "sue_muro_zin_2"
+   ],
+   [
+    -35.27846289881215,
+    -0.5,
+    15.854375481799314,
+    90.0,
+    1.0854274224417582,
+    "sue_muro_zin_3"
+   ],
+   [
+    -35.82514231364308,
+    -0.5,
+    23.67517541103631,
+    90.0,
+    0.9070620536588884,
+    "sue_muro_zin_1"
+   ],
+   [
+    -35.77871094882916,
+    -0.5,
+    31.127537849483573,
+    90.0,
+    0.9464162255889919,
+    "sue_muro_zin_2"
+   ],
+   [
+    -35.048358848232795,
+    -0.5,
+    39.08186562095162,
+    90.0,
+    0.9692291337756652,
+    "sue_muro_zin_3"
+   ],
+   [
+    -35.6252417187272,
+    -0.5,
+    46.806216553187525,
+    90.0,
+    1.1012004697429196,
+    "sue_muro_zin_1"
+   ]
+  ]
+ },
+ "light": {
+  "sun_rot": [
+   -62,
+   20
+  ],
+  "sun_color": [
+   0.56,
+   0.58,
+   0.7
+  ],
+  "sun_energy": 0.32,
+  "exposure": 1.3,
+  "ambient_color": [
+   0.4,
+   0.38,
+   0.48
+  ],
+  "ambient_energy": 0.42,
+  "background": [
+   0.02,
+   0.02,
+   0.03
+  ],
+  "fog_color": [
+   0.1,
+   0.09,
+   0.13
+  ],
+  "fog_density": 0.0,
+  "gamma": 2.25
+ },
+ "lamp": {
+  "color": [
+   0.72,
+   0.52,
+   1.0
+  ],
+  "energy": 2.4,
+  "range": 7.5,
+  "fog": 0.2,
+  "fog_tint": true
+ },
+ "colliders": {
+  "atrezo_tienda": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_iglu": {
+   "type": "cylinder",
+   "radius": 1.75
+  },
+  "atrezo_cabana": {
+   "type": "box",
+   "shrink": 0.82
+  },
+  "atrezo_bloques_hielo": {
+   "type": "box",
+   "shrink": 0.9
+  },
+  "atrezo_bloques_hielo_2": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_bloques_hielo_3": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_caja": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "atrezo_bidon": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_farol": {
+   "type": "cylinder",
+   "radius": 0.15
+  },
+  "atrezo_roca": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "atrezo_roca_nevada": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "atrezo_trineo": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "atrezo_tripode": {
+   "type": "cylinder",
+   "radius": 0.3
+  },
+  "atrezo_bandera": {
+   "type": "cylinder",
+   "radius": 0.4
+  },
+  "monticulo_1": {
+   "type": "cylinder",
+   "radius": 1.4
+  },
+  "monticulo_2": {
+   "type": "cylinder",
+   "radius": 1.9
+  },
+  "monticulo_3": {
+   "type": "cylinder",
+   "radius": 0.95
+  },
+  "atrezo_hielo": {
+   "type": "box",
+   "shrink": 0.75
+  },
+  "sue_torre_koth": {
+   "type": "cylinder",
+   "radius": 5.6
+  },
+  "sue_lapida_1": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "sue_lapida_2": {
+   "type": "box",
+   "shrink": 0.85
+  },
+  "sue_cripta": {
+   "type": "box",
+   "shrink": 0.95
+  },
+  "sue_bloque_1": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "sue_bloque_2": {
+   "type": "box",
+   "shrink": 0.8
+  },
+  "sue_huesos": {
+   "type": "cylinder",
+   "radius": 0.4
+  }
+ },
+ "no_shadow": [
+  "sue_hongos_zin"
+ ],
+ "size": [
+  64.0,
+  64.0
+ ],
+ "props": [
+  {
+   "model": "sue_torre_koth",
+   "pos": [
+    -35.5,
+    -35.5
+   ],
+   "rot": 45,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_cripta",
+   "pos": [
+    13.0,
+    -4.0
+   ],
+   "rot": 0,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_huesos",
+   "pos": [
+    16.1,
+    -2.16
+   ],
+   "rot": 224.5,
+   "scale": 0.51
+  },
+  {
+   "model": "sue_huesos",
+   "pos": [
+    12.17,
+    -0.5
+   ],
+   "rot": 205.7,
+   "scale": 0.66
+  },
+  {
+   "model": "sue_huesos",
+   "pos": [
+    9.99,
+    -5.98
+   ],
+   "rot": 88.2,
+   "scale": 0.51
+  },
+  {
+   "model": "sue_huesos",
+   "pos": [
+    14.6,
+    -7.22
+   ],
+   "rot": 285.9,
+   "scale": 0.68
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -25.52,
+    -22.0
+   ],
+   "rot": 93.1,
+   "scale": 1.1
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -24.65,
+    -17.42
+   ],
+   "rot": 99.2,
+   "scale": 0.92
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -25.72,
+    -12.79
+   ],
+   "rot": 82.2,
+   "scale": 0.9
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -24.58,
+    -7.64
+   ],
+   "rot": 98.7,
+   "scale": 1.06
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -24.29,
+    1.17
+   ],
+   "rot": 85.2,
+   "scale": 1.11
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -24.3,
+    5.59
+   ],
+   "rot": 82.6,
+   "scale": 1.11
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -25.06,
+    9.33
+   ],
+   "rot": 93.8,
+   "scale": 1.07
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -24.63,
+    13.18
+   ],
+   "rot": 88.7,
+   "scale": 0.92
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -25.18,
+    17.39
+   ],
+   "rot": 89.6,
+   "scale": 0.95
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -25.73,
+    21.65
+   ],
+   "rot": 77.0,
+   "scale": 1.07
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -20.2,
+    -20.5
+   ],
+   "rot": 77.6,
+   "scale": 1.08
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -18.91,
+    -16.86
+   ],
+   "rot": 87.7,
+   "scale": 1.15
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -19.07,
+    -12.18
+   ],
+   "rot": 83.1,
+   "scale": 1.15
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -19.14,
+    -8.21
+   ],
+   "rot": 95.6,
+   "scale": 1.09
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -18.91,
+    0.65
+   ],
+   "rot": 96.6,
+   "scale": 0.9
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -19.3,
+    5.8
+   ],
+   "rot": 80.6,
+   "scale": 0.99
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -19.33,
+    10.45
+   ],
+   "rot": 79.1,
+   "scale": 0.98
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -20.08,
+    15.59
+   ],
+   "rot": 76.3,
+   "scale": 1.11
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -19.93,
+    20.39
+   ],
+   "rot": 96.4,
+   "scale": 0.88
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -13.76,
+    -19.0
+   ],
+   "rot": 100.3,
+   "scale": 1.14
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -13.81,
+    -15.35
+   ],
+   "rot": 85.7,
+   "scale": 1.04
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -13.42,
+    -11.38
+   ],
+   "rot": 101.8,
+   "scale": 0.87
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -13.77,
+    -2.89
+   ],
+   "rot": 77.4,
+   "scale": 0.96
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -14.2,
+    0.93
+   ],
+   "rot": 85.4,
+   "scale": 1.06
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -14.07,
+    4.58
+   ],
+   "rot": 89.3,
+   "scale": 1.08
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -14.65,
+    8.7
+   ],
+   "rot": 91.0,
+   "scale": 1.1
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -13.23,
+    12.72
+   ],
+   "rot": 89.1,
+   "scale": 0.95
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -14.1,
+    16.36
+   ],
+   "rot": 77.8,
+   "scale": 1.06
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -14.79,
+    21.18
+   ],
+   "rot": 77.8,
+   "scale": 0.95
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    -4.0,
+    -20.0
+   ],
+   "rot": 276.4,
+   "scale": 1.02
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    6.0,
+    -24.0
+   ],
+   "rot": 220.2,
+   "scale": 0.92
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    22.0,
+    -20.0
+   ],
+   "rot": 249.2,
+   "scale": 0.96
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    -6.0,
+    12.0
+   ],
+   "rot": 150.6,
+   "scale": 0.86
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    4.0,
+    22.0
+   ],
+   "rot": 350.2,
+   "scale": 0.83
+  },
+  {
+   "model": "sue_lapida_2",
+   "pos": [
+    24.0,
+    14.0
+   ],
+   "rot": 54.6,
+   "scale": 0.9
+  },
+  {
+   "model": "sue_lapida_1",
+   "pos": [
+    26.0,
+    0.0
+   ],
+   "rot": 311.5,
+   "scale": 0.95
+  },
+  {
+   "model": "sue_huesos",
+   "pos": [
+    -6.79,
+    14.28
+   ],
+   "rot": 162.6,
+   "scale": 0.59
+  },
+  {
+   "model": "sue_huesos",
+   "pos": [
+    6.65,
+    -5.32
+   ],
+   "rot": 8.4,
+   "scale": 0.61
+  },
+  {
+   "model": "sue_huesos",
+   "pos": [
+    -18.25,
+    19.12
+   ],
+   "rot": 299.2,
+   "scale": 0.46
+  },
+  {
+   "model": "sue_huesos",
+   "pos": [
+    -27.49,
+    23.99
+   ],
+   "rot": 244.8,
+   "scale": 0.55
+  },
+  {
+   "model": "sue_huesos",
+   "pos": [
+    15.81,
+    -27.61
+   ],
+   "rot": 313.9,
+   "scale": 0.48
+  },
+  {
+   "model": "sue_huesos",
+   "pos": [
+    -6.05,
+    -6.41
+   ],
+   "rot": 330.4,
+   "scale": 0.5
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    11.15,
+    -13.23
+   ],
+   "rot": 97.6,
+   "scale": 1.04
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    14.03,
+    -24.53
+   ],
+   "rot": 174.5,
+   "scale": 0.97
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    28.0,
+    17.35
+   ],
+   "rot": 271.3,
+   "scale": 1.02
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -9.97,
+    -16.0
+   ],
+   "rot": 96.4,
+   "scale": 0.92
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    23.76,
+    -12.09
+   ],
+   "rot": 250.1,
+   "scale": 0.84
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    -8.0,
+    -10.0
+   ],
+   "rot": 290.7,
+   "scale": 0.9
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    2.0,
+    8.0
+   ],
+   "rot": 221.3,
+   "scale": 0.98
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    20.0,
+    -14.0
+   ],
+   "rot": 348.0,
+   "scale": 1.28
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    -20.0,
+    16.0
+   ],
+   "rot": 100.9,
+   "scale": 0.99
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    -18.0,
+    -12.0
+   ],
+   "rot": 102.1,
+   "scale": 1.06
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    10.0,
+    20.0
+   ],
+   "rot": 278.2,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    24.0,
+    6.0
+   ],
+   "rot": 201.4,
+   "scale": 0.91
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    -4.0,
+    26.0
+   ],
+   "rot": 300.8,
+   "scale": 1.12
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    0.0,
+    -26.0
+   ],
+   "rot": 103.4,
+   "scale": 1.09
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    -10.0,
+    2.0
+   ],
+   "rot": 67.7,
+   "scale": 1.28
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    19.74,
+    -6.79
+   ],
+   "rot": 145.0,
+   "scale": 0.74
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    -18.53,
+    23.89
+   ],
+   "rot": 353.7,
+   "scale": 0.79
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    -6.56,
+    -16.42
+   ],
+   "rot": 235.2,
+   "scale": 0.77
+  },
+  {
+   "model": "sue_hongos_zin",
+   "pos": [
+    22.26,
+    1.16
+   ],
+   "rot": 156.2,
+   "scale": 0.63
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -44.0,
+    32.88
+   ],
+   "rot": 292.1,
+   "scale": 1.07
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    33.31,
+    -44.0
+   ],
+   "rot": 278.5,
+   "scale": 1.02
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -41.6,
+    33.25
+   ],
+   "rot": 184.2,
+   "scale": 1.05
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    33.18,
+    -41.6
+   ],
+   "rot": 217.3,
+   "scale": 1.16
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    -39.2,
+    32.98
+   ],
+   "rot": 144.2,
+   "scale": 0.99
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    32.82,
+    -39.2
+   ],
+   "rot": 289.0,
+   "scale": 1.18
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    -36.8,
+    32.99
+   ],
+   "rot": 231.9,
+   "scale": 1.14
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    32.93,
+    -36.8
+   ],
+   "rot": 36.7,
+   "scale": 1.15
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -34.4,
+    32.88
+   ],
+   "rot": 203.2,
+   "scale": 0.98
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    32.97,
+    -34.4
+   ],
+   "rot": 288.7,
+   "scale": 1.09
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    -32.0,
+    33.41
+   ],
+   "rot": 145.3,
+   "scale": 0.94
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    33.03,
+    -32.0
+   ],
+   "rot": 214.0,
+   "scale": 1.02
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    -29.6,
+    33.12
+   ],
+   "rot": 272.8,
+   "scale": 1.01
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    33.73,
+    -29.6
+   ],
+   "rot": 19.4,
+   "scale": 1.07
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    -27.2,
+    32.86
+   ],
+   "rot": 333.0,
+   "scale": 1.06
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    33.59,
+    -27.2
+   ],
+   "rot": 256.4,
+   "scale": 0.99
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -24.8,
+    33.14
+   ],
+   "rot": 252.9,
+   "scale": 1.18
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    32.96,
+    -24.8
+   ],
+   "rot": 254.4,
+   "scale": 0.99
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -22.4,
+    33.63
+   ],
+   "rot": 256.0,
+   "scale": 1.14
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    33.59,
+    -22.4
+   ],
+   "rot": 332.0,
+   "scale": 1.1
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -20.0,
+    32.81
+   ],
+   "rot": 125.5,
+   "scale": 0.91
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    33.63,
+    -20.0
+   ],
+   "rot": 161.6,
+   "scale": 0.93
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -17.6,
+    33.35
+   ],
+   "rot": 294.4,
+   "scale": 0.99
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    33.0,
+    -17.6
+   ],
+   "rot": 295.9,
+   "scale": 1.11
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    -15.2,
+    33.06
+   ],
+   "rot": 3.7,
+   "scale": 1.02
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    32.79,
+    -15.2
+   ],
+   "rot": 231.9,
+   "scale": 0.99
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -12.8,
+    33.2
+   ],
+   "rot": 28.3,
+   "scale": 1.07
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    33.57,
+    -12.8
+   ],
+   "rot": 247.9,
+   "scale": 0.97
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    -10.4,
+    33.73
+   ],
+   "rot": 220.1,
+   "scale": 0.92
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    33.17,
+    -10.4
+   ],
+   "rot": 96.5,
+   "scale": 0.97
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -8.0,
+    33.08
+   ],
+   "rot": 203.4,
+   "scale": 1.15
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    32.73,
+    -8.0
+   ],
+   "rot": 358.8,
+   "scale": 1.07
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -5.6,
+    33.44
+   ],
+   "rot": 358.4,
+   "scale": 1.01
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    32.82,
+    -5.6
+   ],
+   "rot": 296.0,
+   "scale": 1.18
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -3.2,
+    33.4
+   ],
+   "rot": 321.0,
+   "scale": 1.05
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    32.72,
+    -3.2
+   ],
+   "rot": 225.4,
+   "scale": 0.92
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    -0.8,
+    33.61
+   ],
+   "rot": 289.3,
+   "scale": 0.93
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    33.79,
+    -0.8
+   ],
+   "rot": 294.6,
+   "scale": 1.16
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    1.6,
+    33.27
+   ],
+   "rot": 9.9,
+   "scale": 1.15
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    33.46,
+    1.6
+   ],
+   "rot": 85.0,
+   "scale": 1.1
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    4.0,
+    33.06
+   ],
+   "rot": 249.5,
+   "scale": 1.08
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    32.96,
+    4.0
+   ],
+   "rot": 190.2,
+   "scale": 1.09
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    6.4,
+    32.88
+   ],
+   "rot": 238.9,
+   "scale": 0.95
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    33.11,
+    6.4
+   ],
+   "rot": 175.4,
+   "scale": 1.06
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    8.8,
+    32.88
+   ],
+   "rot": 81.9,
+   "scale": 0.95
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    33.17,
+    8.8
+   ],
+   "rot": 44.6,
+   "scale": 0.91
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    11.2,
+    33.6
+   ],
+   "rot": 177.6,
+   "scale": 1.17
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    33.48,
+    11.2
+   ],
+   "rot": 278.0,
+   "scale": 1.05
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    13.6,
+    32.82
+   ],
+   "rot": 49.1,
+   "scale": 1.13
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    33.43,
+    13.6
+   ],
+   "rot": 357.3,
+   "scale": 1.0
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    16.0,
+    33.35
+   ],
+   "rot": 334.2,
+   "scale": 0.99
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    33.1,
+    16.0
+   ],
+   "rot": 158.1,
+   "scale": 0.96
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    18.4,
+    33.02
+   ],
+   "rot": 254.5,
+   "scale": 1.12
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    33.0,
+    18.4
+   ],
+   "rot": 155.9,
+   "scale": 0.96
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    20.8,
+    33.0
+   ],
+   "rot": 89.8,
+   "scale": 1.15
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    33.03,
+    20.8
+   ],
+   "rot": 233.5,
+   "scale": 1.04
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    23.2,
+    33.31
+   ],
+   "rot": 276.6,
+   "scale": 0.93
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    32.98,
+    23.2
+   ],
+   "rot": 71.0,
+   "scale": 1.08
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    25.6,
+    32.89
+   ],
+   "rot": 50.3,
+   "scale": 1.01
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    33.16,
+    25.6
+   ],
+   "rot": 338.9,
+   "scale": 1.11
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    28.0,
+    32.69
+   ],
+   "rot": 121.2,
+   "scale": 1.07
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    32.65,
+    28.0
+   ],
+   "rot": 308.5,
+   "scale": 0.9
+  },
+  {
+   "model": "sue_bloque_2",
+   "pos": [
+    30.4,
+    32.67
+   ],
+   "rot": 310.5,
+   "scale": 1.15
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    33.03,
+    30.4
+   ],
+   "rot": 78.3,
+   "scale": 1.02
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    32.8,
+    32.84
+   ],
+   "rot": 0.4,
+   "scale": 1.16
+  },
+  {
+   "model": "sue_bloque_1",
+   "pos": [
+    33.36,
+    32.8
+   ],
+   "rot": 297.1,
+   "scale": 1.1
+  }
+ ],
+ "mask": {
+  "file": "res://data/arenas/zin_mapa.bin",
+  "size": 400,
+  "cell": 0.25,
+  "origin": [
+   -50.0,
+   -50.0
+  ],
+  "dist_step": 0.03125
+ }
+}
