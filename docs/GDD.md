@@ -28,8 +28,8 @@ Bullet hell isométrico con disparo automático, para 1–4 jugadores en coopera
 
 ## 2. Estructura
 
-- **15 niveles:** 3 partes × 5 niveles, con un jefe al final de cada parte. Cada parte se ambienta en un relato y cada nivel es un escenario distinto de ese relato.
-- **Modos de partida:** *Campaña* (las 3 partes seguidas) y *Por partes* (una sola parte de 5 niveles). En ambos, la progresión del personaje empieza de cero.
+- **20 niveles:** 4 partes × 5 niveles, con un jefe al final de cada parte (la cuarta, *Las Tierras del Sueño*, desde el 14-11-2026, D-53; antes eran 3 partes y 15 niveles). Cada parte se ambienta en un relato y cada nivel es un escenario distinto de ese relato.
+- **Modos de partida:** *Campaña* (las 4 partes seguidas) y *Por partes* (una sola parte de 5 niveles). En ambos, la progresión del personaje empieza de cero.
 - **Objetivo y duración de un nivel (D-02):** supervivencia por oleadas de 8–10 minutos. Los niveles 1 a 4 de cada parte terminan con un evento final sin jefe, por ejemplo una última oleada con las élites del nivel. Solo el nivel 5 termina con el jefe de la parte. El tipo de objetivo y la duración son datos del nivel, para poder variar niveles concretos. Campaña de unas 2–2,5 horas sin contar reintentos.
 - **Escenarios (D-03):** arena finita de unas 3×3 pantallas (con el zoom normal de un jugador), cerrada por el propio decorado: acantilados, agua, muros. Tiene puntos de interés, como fuentes de luz que recuperan cordura y obstáculos que sirven de cobertura o de trampa. Los enemigos aparecen fuera de cámara. El tamaño es un dato del nivel.
 - **Época:** años 20 y 30, sin fechas exactas en pantalla. Las partes siguen el orden fijado aunque los relatos originales ocurran en otro orden.
@@ -83,6 +83,46 @@ El rastro del culto a Cthulhu lleva de Providence a los pantanos de Luisiana y a
 | **Jefe** | | **Cthulhu** (C) |
 
 El relato apenas describe criaturas aparte de Cthulhu. *Decidido (08-10-2026):* los Ángulos devoradores (la geometría imposible que engulle a un marinero) son un **peligro del escenario**: zonas que se abren en el suelo con aviso, atraen hacia su centro y engullen (mucho daño y cordura) a quien se queda dentro, y se cierran solas; no se matan. **Cthulhu** se combate como Dagon: colosal, solo la parte visible, asomando por la puerta de R'lyeh, anclado y con fases; al "morir" se deshace en una nube verde y se recompone una vez, más furioso, como en el relato.
+
+### 2.5 Parte 4: *La búsqueda onírica de la desconocida Kadath* (las Tierras del Sueño) (hito 21.8, D-53)
+
+*Aprobada el 14-11-2026 (D-53): entra en la campaña como cuarta parte, con lo propio de cada nivel, el jefe intermedio y algo más de color.* Randolph Carter sueña tres veces con una ciudad del crepúsculo y los dioses de la tierra le niegan el paso. Baja los setenta escalones hasta la caverna de la llama y los setecientos hasta la Puerta del Sueño Profundo. Después cruza el bosque encantado, Ulthar y Dylath-Leen, cae en manos de los mercaderes de Leng, pasa por el mundo inferior y llega a Kadath, en el yermo frío, donde le espera Nyarlathotep. El tono cambia: es un sueño, más extraño que oscuro, pero sigue siendo de noche (luna, luz cálida puntual), con colores algo más saturados que en las partes 1 a 3.
+
+**Regla de la parte:** no hay humanos de la vigilia. Los enemigos son criaturas del sueño y los hombres de Leng, que no son del todo hombres. Los gatos y los necrófagos son aliados, como en el relato: aparecen como sucesos del nivel y no se matan.
+
+| Nivel | Escenario | Criaturas nuevas | Lo propio del nivel |
+|---|---|---|---|
+| 1 | El bosque encantado y las afueras de Ulthar: robles enormes con hongos que brillan y, al fondo, los tejados del pueblo | **Zoogs** (C, escalón 1): pequeños, pardos y furtivos, en enjambre; huyen si los pillas solos y atacan en grupo · **Zoogs de las copas** (V, 1): bajan de los robles sobre el jugador con aviso | **Los gatos de Ulthar** (C): cada cierto tiempo baja del pueblo una manada que barre a los zoogs de una zona; los hongos devuelven algo de cordura |
+| 2 | El puerto de Dylath-Leen y la galera negra atracada en el muelle de basalto | **Mercaderes de Leng** (C, 2): con turbante sobre los cuernos y sonrisa ancha; disparan y huyen · **Remeros lunares** (C, 2): las bestias lunares, grises y sin ojos, con tentáculos rosados en el hocico, que bajan de la galera | **La galera negra:** atraca a ratos y suelta un desembarco; su escotilla se puede reventar a golpes para que deje de soltar remeros. Los rubíes de los mercaderes: valen el doble de dólares pero quitan cordura al recogerlos |
+| 3 | La meseta de Leng: piedra gris, hogueras lejanas y el monasterio sin ventanas | **Shantaks** (C, 3): aves enormes de escamas con cabeza de caballo, que vuelan en círculos y caen en picado · **Arañas púrpura de Leng** (M, 3): tejen redes en el suelo que atrapan al que las pisa | **Jefe intermedio: el sumo sacerdote que no debe describirse** (C), con su máscara de seda amarilla: aparece hacia la mitad del nivel, flautas y tambores, y cuando se le ve la cara, quita cordura. El viento de Leng aparta, como el de Pnakotus |
+| 4 | El mundo inferior: las criptas de Zin y la torre de los gugs, a oscuras | **Gugs** (C, 4, élite): enormes, lentos, con la boca vertical y cuatro brazos; aplastan con aviso · **Ghasts** (C, 4): saltan como canguros en grupo y odian la luz, así que el farol los quema y huyen de él | **La oscuridad:** el farol del jugador importa, porque los ghasts no entran en su luz y los gugs sí. **Los necrófagos de Pickman** (C) suben de las criptas a echar una mano; si juega Pickman, son más |
+| 5 | El yermo frío y Kadath: las escaleras de ónice del castillo de los dioses, bajo un cielo con auroras | **Descarnados nocturnos** (C, 5, élite): negros, gomosos, sin cara, con cuernos y cola de púa; te agarran y te llevan por el aire unos metros (con aviso, y un compañero puede soltarte golpeándolos) · **Larvas de los Otros Dioses** (M, 5): masas ciegas que flotan al son de las flautas y dejan cordura por los suelos | **Las flautas de los Otros Dioses:** a ratos suena la música; mientras dura, los enemigos van más deprisa y la cordura baja. Con un compañero cerca baja menos |
+| **Jefe** | | **Nyarlathotep, el Caos reptante** (C) | Tres formas, una por fase (ver abajo) |
+
+**Nyarlathotep** (jefe de la parte, en el gran salón de Kadath). Cambia de forma a lo largo del combate:
+1. **El faraón negro:** alto y delgado, joven, con el rostro de un faraón antiguo, la túnica de colores y una corona que brilla. Habla con voz suave (sus frases salen en pantalla), lanza abanicos de balas lentos y hace salir sombras de los escalones.
+2. **El enjambre:** se deshace en una nube de formas (manos, alas, ojos) que recorren la arena y se recomponen donde está el jugador más alejado; mientras tanto solo se le puede dar a la forma central.
+3. **El ser sin rostro:** una figura enorme, negra, con alas y una cabeza sin cara, que llena la mitad del salón. Ataca con anillos y llamas negras, y la cordura baja todo el rato.
+
+Al caer, el final del relato: un shantak se lleva a Carter hacia Azathoth, Carter recuerda su ciudad del crepúsculo, que era Boston, y se despierta en su cama. Es el epílogo de la parte: un texto como el de Cthulhu, con un cielo de amanecer.
+
+**Escalada:** shoggoth primigenio < Padre Dagon < Cthulhu < Nyarlathotep. Nyarlathotep es un dios exterior y queda por encima de Cthulhu, así que solo puede ir después de la parte 3.
+
+**Relatos:** cuatro o cinco frases por nivel, como en las partes 1 a 3: los escalones de la caverna y los sacerdotes Nasht y Kaman-Thah; el bosque y el consejo de los zoogs; la galera y el vino de los mercaderes; Leng y el monasterio; las criptas y los necrófagos (el «amigo de Boston», Pickman); los descarnados y el yermo frío. Los cuenta un narrador, en pasado, como siempre.
+
+**Carter y Kuranes en esta parte:**
+- **Si juega Carter**, los relatos tienen una frase suya en primera persona al final de cada nivel (es su sueño) y su vínculo con Kuranes (D-51) se dice en el nivel 2.
+- **Kuranes** aparece en el relato del nivel 2 (Carter le visita en Celephaïs, que le aconseja no buscar Kadath). Si juega Kuranes, tiene una frase al empezar cada nivel.
+- **Pickman**, en el nivel 4 (los necrófagos son sus amigos). **El gato de Ulthar**, en el nivel 1: si lo llevas de compañero, la manada llega antes.
+- Fuera de esto, sin cambios: cualquiera puede jugar la parte.
+
+**Lo que la rodea (hito 21.12):** cinco relatos, el mapa de la parte (una página más en `LevelMap`), Biblioteca (lugares y bestiario, con el modelo vivo), trofeos de la parte (los del jefe y los dos jefes intermedios, si se aceptan) y cinco desafíos nuevos. Música: pistas de las ya disponibles, elegidas por nivel (falta elegirlas).
+
+**Preguntas para el autor (D-53, respondidas el 14-11-2026: las cuatro, como se recomendaba):**
+1. **¿Entra en la Campaña?** Recomendado: sí, como cuarta parte (unas 3 h en total), y también jugable sola en *Por partes*. Se abre al superar la parte 3. Alternativa: solo *Por partes*, sin tocar la campaña de tres.
+2. **Lo propio de cada nivel** (la columna de la derecha): ¿todo, o se queda solo con las criaturas y las arenas?
+3. **El jefe intermedio** del nivel 3 (el sumo sacerdote): ¿sí? Las partes 1 a 3 tienen uno.
+4. **¿Más color** que en las otras partes (los hongos, los tejados de Ulthar, las auroras de Kadath), sin perder la noche?
 
 ---
 
@@ -661,6 +701,7 @@ D-01 a D-13 proceden de la especificación. D-14 a D-19 salen de las incoherenci
 
 - **D-51 — Vínculos entre investigadores (hito 21.3, fase 21, 13-11-2026).** *Resuelta con la recomendación* (el autor: «me gusta todo, organízate»), pendiente de su revisión: solo parejas que se conocen en los relatos (Carter y Kuranes, Carter y Pickman, Legrasse y Johansen, West y Whipple, y las que el autor añada), con una ventaja pequeña mientras están cerca (en torno a un 10 %) para que no obligue a elegir pareja. Bloqueaba el 21.3. *Hecho* (13-11-2026): ocho parejas en `data/bonds.json`. A las cuatro de la propuesta se suman otras cuatro de los relatos: Elwood y Gilman, e Iwanicki y Gilman (*Los sueños en la casa de la bruja*), Dyer y Peaslee (Dyer acompañó al tío de Amelia a Australia, *La sombra fuera del tiempo*) y Armitage y Whateley (el Necronomicón de *El horror de Dunwich*). Quitar o añadir una es tocar ese archivo.
 - **D-52 — Qué contenido nuevo (fase 21, 13-11-2026).** *Resuelta:* las dos (el autor: «me gusta todo»), en este orden: primero las noches sueltas (D), luego la parte 4 (C). Las opciones eran una parte 4 entera, *Las Tierras del Sueño* (bloque C: cinco niveles, cinco criaturas y Nyarlathotep, del tamaño de las fases 4, 6 o 7), o tres noches sueltas desde la Biblioteca (bloque D: *El color que cayó del cielo*, *El horror de Dunwich* y *La sombra fuera del tiempo*, un nivel con dos criaturas y un jefe cada una). D va primero porque es más corto y prueba el formato de nivel suelto.
+- **D-53 — La parte 4, *Las Tierras del Sueño* (hito 21.8, fase 21, 14-11-2026).** *Resuelta por el autor (las cuatro, como se recomendaba):* diseño en la sección 2.5 (cinco niveles, diez criaturas, el sumo sacerdote de jefe intermedio y Nyarlathotep con tres formas). Entra en la campaña como cuarta parte (se abre al superar la parte 3 y también va en *Por partes*), con lo propio de cada nivel y algo más de color que las partes 1 a 3, sin dejar la noche. Bloqueaba los hitos 21.9 a 21.12.
 
 ---
 
