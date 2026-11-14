@@ -268,3 +268,57 @@ func test_el_rayo_a_demanda_del_clima() -> void:
 	w.data = WeatherData.new()                        # sin rayos en este clima: nada
 	w.strike_now()
 	assert_eq(w.lightning_count, n + 1)
+
+# ------------------------------------------------------------------ mejoras (tinte, red, logro, consejos)
+
+func test_el_jefe_revelado_no_lleva_tinte() -> void:
+	var boss := _enemy("hermano_wilbur", Vector3.ZERO)
+	var bird := _enemy("chotacabras", Vector3(5, 0, 0))
+	boss.reveal(3.0, 0.25)
+	bird.reveal(3.0, 0.25)
+	assert_eq(boss._status_color().a, 0.0, "reveal_tint 0: verlo ya dice que está revelado, y el tinte lo dejaba lila")
+	assert_gt(bird._status_color().a, 0.0, "los demás, con su luz violeta")
+
+func test_en_el_invitado_se_ve_al_caer() -> void:
+	var boss := _enemy("hermano_wilbur", Vector3.ZERO)
+	HorrorBehavior.set_hidden(boss, true)
+	boss.puppet_die()
+	assert_true(boss.visual.visible)
+	assert_false(boss.buried)
+
+func test_el_logro_ningun_alma_para_los_chotacabras() -> void:
+	var a: AchievementData = load("res://data/achievements/32_ningun_alma.tres")
+	assert_eq(a.stat, "dunwich_untouched")
+	assert_lt(a.reward_money, 500, "no es de los grandes")
+	var un := _unseen()
+	var p := _player("dyer", Vector3(0, 0, 0))
+	p.input = KeyboardInput.new()                     # una persona, no un bot
+	var bird := _enemy("chotacabras", Vector3(9, 0, 0))
+	_step(un, 0.3)
+	assert_true(un.birds_untouched())
+	var d := Damage.new(5.0, 0.0)
+	d.source = bird
+	p.take_damage(d)
+	assert_false(un.birds_untouched(), "un picotazo y se acabó")
+	var s := SaveData.new()
+	Achievements.add(s, "dunwich_untouched")
+	assert_true(Achievements.check(s).has(a))
+
+func test_los_consejos_de_la_noche_pasan_delante() -> void:
+	var tips: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/tutorial.json"))
+	var urgent := {}
+	for t: Dictionary in tips.tips: urgent[String(t.id)] = bool(t.get("urgent", false))
+	for id in ["polvo", "invisible", "color"]: assert_true(urgent.get(id, false), id)
+	assert_false(urgent.get("move", true), "los generales, en su orden")
+
+func test_el_aura_de_un_jefe_grande_mide_su_radio() -> void:
+	var boss := _enemy("hermano_wilbur", Vector3.ZERO)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var disc: MeshInstance3D = null
+	for c in boss.visual.get_children():
+		if c is MeshInstance3D and c.mesh is PlaneMesh: disc = c
+	assert_not_null(disc, "el disco del aura")
+	if disc == null: return
+	var full := boss.model_scale * (Enemy.ELITE_SIZE if boss.data.elite else 1.0) * boss.var_size
+	assert_almost_eq(disc.scale.x * full, boss.data.aura_radius, 0.01, "en el mundo, lo que dice aura_radius (antes, por model_scale)")

@@ -845,6 +845,9 @@ func puppet_die() -> void:
 	if is_queued_for_deletion(): return
 	health = 0.0
 	Auto.sfx_at("die", global_position)
+	if bool(data.param("unseen", false)) and visual != null:   # lo que no se ve (21.14) se ve al caer, como en el anfitrión
+		buried = false
+		visual.visible = true
 	_leave_remains()
 	_death_fx()
 
@@ -1306,8 +1309,11 @@ func _disc(c: Color, radius: float) -> ShaderMaterial:
 	mat.set_shader_parameter("soft", true)
 	mat.set_shader_parameter("color", c)
 	mi.material_override = mat
-	mi.scale = Vector3.ONE * radius
-	mi.position.y = 0.05
+	# cuelga del modelo, que va a model_scale (y más si es élite): sin descontarlo, el aura de un jefe
+	# grande se dibujaba hasta el triple de su radio de verdad (21.14)
+	var base := model_scale * (ELITE_SIZE if data.elite else 1.0) * var_size
+	mi.scale = Vector3.ONE * radius / maxf(base, 0.01)
+	mi.position.y = 0.05 / maxf(base, 0.01)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	visual.add_child(mi)
 	return mat
@@ -1322,7 +1328,7 @@ func _status_color() -> Color:
 	if _madden_t > 0.0: return Color(1.0, 0.85, 0.15, 0.3 + 0.12 * sin(_spawn_t * 10.0))
 	if _confuse_t > 0.0: return Color(0.95, 0.75, 0.95, 0.22 + 0.1 * sin(_spawn_t * 11.0))
 	if _inject_t > 0.0: return Color(0.8, 0.95, 0.25, 0.14 + 0.06 * sin(_spawn_t * 12.0))   # suero: tenue (el aliado, verde intenso)
-	if _reveal_t > 0.0: return Color(0.72, 0.64, 1.0, 0.2 + 0.08 * sin(_spawn_t * 4.0))     # revelado: luz violeta pálida (20.20)
+	if _reveal_t > 0.0: return Color(0.72, 0.64, 1.0, (0.2 + 0.08 * sin(_spawn_t * 4.0)) * float(data.param("reveal_tint", 1.0)))     # revelado: luz violeta pálida (20.20; `reveal_tint` la templa)
 	if _blight_t > 0.0: return Color(0.55, 0.55, 0.53, 0.55 + 0.06 * sin(_spawn_t * 3.0))   # gris de ceniza (21.13)
 	if _dream_t > 0.0: return Color(0.62, 0.84, 0.95, 0.2 + 0.08 * sin(_spawn_t * 2.5)).lerp(Color(0.95, 0.68, 0.84, 0.24), 0.5 + 0.5 * sin(_spawn_t * 1.3))   # soñando (20.22)
 	return Color(0, 0, 0, 0)

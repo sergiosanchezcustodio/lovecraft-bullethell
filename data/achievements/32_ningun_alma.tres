@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ningun_alma"
+display_name = "Ningún alma para los chotacabras"
+description = "Supera la noche suelta «El horror de Dunwich» sin que te toque un chotacabras."
+order = 32
+stat = "dunwich_untouched"
+target = 1
+reward_money = 400
+icon_model = "chotacabras"
+icon_mode = "full"

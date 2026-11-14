@@ -1631,13 +1631,13 @@ func _level_unseen() -> bool:
 		if bool(ed.param("unseen", false)) or bool(ed.param("soul_eater", false)): return true
 	return false
 
-## powder_here=T (pruebas y capturas): un pulverizador a los pies del J1 cada T s.
+## powder_here=T (pruebas y capturas): un pulverizador a los pies del J1 cada T s (lo suelta al momento).
 func _powder_here(every: float) -> void:
 	while is_inside_tree() and unseen != null and not _ended:
 		if not unseen.sprayers.is_empty() or player.health <= 0.0:
 			await get_tree().create_timer(0.5, false).timeout
 			continue
-		unseen.spawn_at(Vector2(player.global_position.x + 1.5, player.global_position.z))
+		unseen.spawn_at(Vector2(player.global_position.x, player.global_position.z))
 		await get_tree().create_timer(maxf(every, 0.5), false).timeout
 
 func _level_blights() -> bool:
@@ -1730,6 +1730,7 @@ func _on_level_completed() -> void:
 		won_title = "Noche superada"
 		if not is_guest(): Nights.record_win(Saves.current, String(level.id))
 		if blight != null and not blight.touched: Achievements.add(Saves.current, "color_untouched")   # «Sin tocar el color»
+		if unseen != null and unseen.birds_untouched(): Achievements.add(Saves.current, "dunwich_untouched")   # «Ningún alma para los chotacabras»
 	elif Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))
 	if not rush:

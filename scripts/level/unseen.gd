@@ -241,10 +241,24 @@ func _net(d: Dictionary) -> void:
 
 # ------------------------------------------------------------------ los chotacabras y los caídos
 
+## ¿Ningún chotacabras ha tocado a nadie de este PC? (los bots no cuentan): el logro «Ningún alma
+## para los chotacabras».
+func birds_untouched() -> bool:
+	for q in world.players:
+		if q.remote or q.input is BotInput: continue
+		for src: String in q.received.keys():
+			var ed: EnemyData = _soul_eaters.get(src)
+			if ed != null: return false
+	return true
+
+var _soul_eaters := {}                 ## id -> EnemyData de los que se llevan almas (los que han salido)
+
 func _souls() -> void:
 	var eaters: Array[Node3D] = []
 	for e in world.enemies:
-		if e is Enemy and is_instance_valid(e) and e.is_alive() and bool((e as Enemy).data.param("soul_eater", false)): eaters.append(e)
+		if e is Enemy and is_instance_valid(e) and e.is_alive() and bool((e as Enemy).data.param("soul_eater", false)):
+			eaters.append(e)
+			_soul_eaters[String((e as Enemy).data.id)] = (e as Enemy).data
 	for q in world.players:
 		var was: bool = _downed.get(q, false)
 		var down := q.is_downed()

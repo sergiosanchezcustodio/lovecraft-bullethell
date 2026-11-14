@@ -3304,3 +3304,14 @@ Aprobada entera por el autor («me gusta todo, organízate y comienza»). Orden:
 - **Opciones nuevas:** `powder_here=T` (un pulverizador junto al J1 cada T s) y `nights_row=N` (la ventana de las noches con la noche N marcada).
 - **Tests** (`tests/test_dunwich.gd`, 14; 953 de 953 en total): la noche y su nivel; el polvo descubre lo de otro mundo (no a las devotas) y da más daño; Armitage lo suelta más lejos; los pulverizadores aparecen cerca y se acaban; en el invitado llegan del anfitrión (también el rayo); lo que no se ve deja huellas y lo que se ve no; tope de las huellas; los chotacabras apuran a los caídos y se llevan su alma; a quién van; vuelan; el jefe sale de la granja sin verse, se descubre y va más despacio; sus fases; el rayo al morir; el rayo a demanda del clima.
 - **Capturas:** `shots/game_dunf_009.0s.png` a `_030.0s.png` (el jefe con el polvo, `powder_here=6 final_at=4`) y `shots/seleccion_noches21_002.5s.png` (la ventana).
+
+#### Mejoras del 14-11-2026 (21.14)
+
+- **El jefe revelado, con sus colores:** el tinte violeta de lo revelado (`Enemy._status_color`, sin sombreado) dejaba al hermano de Wilbur lila y plano, porque es oscuro y enorme y la noche de Dunwich se aclara con `gamma`. Nuevo parámetro `reveal_tint` (multiplica el alfa de ese tinte; por defecto 1): el jefe lleva 0, que lo quita del todo, porque verlo ya dice que está revelado. Su material pasa también a mate (`roughness=0.85, specular=0.25` en `gen_noche_dunwich.py`).
+- **El aura de los jefes grandes, a su radio:** el disco del aura (y el corro del ídolo vivo) cuelga del modelo, que va a `model_scale` × 1,1 si es élite × `var_size`, y no lo descontaba: en todos los jefes escalados se dibujaba más grande que el radio de verdad del drenaje (el shoggoth primigenio, unas cuatro veces). `Enemy._disc` lo descuenta ahora. **Es un fallo de antes que cambia el aspecto de 20 jefes:** el disco es ahora lo que de verdad drena.
+- **En el invitado se ve al caer:** `Enemy.puppet_die` muestra lo que no se ve antes de deshacerlo, como en el anfitrión.
+- **Logro 32, «Ningún alma para los chotacabras»** (400 $): superar la noche de Dunwich sin que te toque un chotacabras (`Unseen.birds_untouched`, por `Player.received`; los bots y los de otros PC no cuentan; estadística `dunwich_untouched`).
+- **Consejos urgentes:** `"urgent": true` en `data/tutorial.json` (polvo, invisible y color) los pone al frente de la cola de `Tips`, para que no lleguen después del de moverse.
+- `powder_here=T` suelta el pulverizador a los pies del J1.
+- **Tests:** 5 más en `tests/test_dunwich.gd` (19): el jefe revelado sin tinte y los demás con él, se ve al caer en el invitado, el logro, los consejos urgentes y el aura a su radio; 958 de 958.
+- **Capturas:** `shots/game_dun_mejoras_010.0s.png` y `_012.0s.png` (el jefe revelado con su color, bajo la lluvia).

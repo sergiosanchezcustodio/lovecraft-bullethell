@@ -7,7 +7,8 @@ extends CanvasLayer
 ## Ibn Ghazi y lo que no se ve del 21.14); y, junto al primer aviso en el suelo de cada tipo (golpe, cordura,
 ## los dos, algo que va a salir, grieta), una etiqueta corta. Cada uno, una vez por hueco
 ## (`SaveData.seen["tips"]`). Textos en `data/tutorial.json`. Configuración > Juego > «Consejos»
-## los quita y «Volver a ver los consejos» los repone. Sin hueco o con bots, no sale nada; para
+## los quita y «Volver a ver los consejos» los repone. Los que llevan `"urgent": true` (lo propio de
+## cada noche suelta) pasan delante de los que esperan en la cola. Sin hueco o con bots, no sale nada; para
 ## capturas, `tips=true` los saca igual (lo visto, solo en memoria).
 
 const DATA := "res://data/tutorial.json"
@@ -114,7 +115,9 @@ func _process(delta: float) -> void:
 	for t: Dictionary in _tips:
 		var id := String(t.id)
 		if seen(id) or _queue.has(id): continue
-		if _happened(t): _queue.append(id)
+		if not _happened(t): continue
+		if bool(t.get("urgent", false)): _queue.push_front(id)   # los de la noche, antes que los generales
+		else: _queue.append(id)
 	if not _queue.is_empty(): _show(_queue.pop_front())
 
 ## Lo que dispara cada consejo.

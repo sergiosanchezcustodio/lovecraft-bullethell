@@ -269,7 +269,7 @@ def hermano_wilbur():
     for x in range(-1, 7): face(x, TOP - 2, MOUTH)                                  # media boca, sin barbilla
     for x in range(0, 6): face(x, TOP - 3, (0.20, 0.08, 0.08))
     piv = {'body': [0, 0, 0], 'top': [FX, TOP, FZ - 4], 'pod_l': [-20, CY, 0], 'pod_r': [20, CY, 0]}
-    n = M.export('models/hermano_wilbur.json', piv, jitter=0.0, pivots_in_voxels=True, roughness=0.45, specular=0.5)
+    n = M.export('models/hermano_wilbur.json', piv, jitter=0.0, pivots_in_voxels=True, roughness=0.85, specular=0.25)
     print('hermano_wilbur', n, 'voxels')
 
 
