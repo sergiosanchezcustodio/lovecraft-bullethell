@@ -1,7 +1,7 @@
 """Recompensas de los objetos rompibles (04-10-2026), a 32 voxels/m, pequeñas y reconocibles:
 comida (lata de conservas y pan), poción de cordura (frasco violeta que brilla), dinero
 (bolsa con monedas), lanzallamas (bidón rojo con la llama pintada) y congelación del tiempo
-(reloj de arena azul que brilla). Escribe models/recompensa_<id>.json.
+(reloj de arena azul que brilla) y el rubí de Leng (21.10). Escribe models/recompensa_<id>.json.
 Uso: python tools/gen_recompensas.py
 """
 import sys, os, math
@@ -69,8 +69,26 @@ def reloj():
     return M
 
 
+def rubi():
+    """Rubí de los mercaderes de Leng (hito 21.10): una gema tallada, roja y con luz dentro, en un engaste
+    de oro."""
+    M = Model(S=2, seed=87)
+    for y in range(0, 15):                                                    # dos pirámides de base octogonal
+        r = (y / 6.0) * 5.0 if y < 6 else 5.0 - (y - 6) * 0.62
+        for x in range(-6, 6):
+            for z in range(-6, 6):
+                px, pz = abs(x + 0.5), abs(z + 0.5)
+                if max(px, pz) <= r and px + pz <= r * 1.35:
+                    face = (x + y + z) % 3
+                    col = (0.95, 0.12, 0.20) if face == 0 else ((0.75, 0.05, 0.12) if face == 1 else (1.0, 0.40, 0.45))
+                    rim = y in (5, 6) and (max(px, pz) > r - 1.2 or px + pz > r * 1.35 - 1.2)
+                    if rim: col = (1.0, 0.78, 0.25)                           # el engaste, en el filo
+                    M.put(x, y + 2, z, P, col, glow=1 if 4 <= y <= 9 and max(px, pz) < r - 1.5 and not rim else 0)
+    return M
+
+
 for name, fn in (('comida', comida), ('pocion', pocion), ('dinero', dinero), ('lanzallamas', lanzallamas),
-                 ('reloj', reloj)):
+                 ('reloj', reloj), ('rubi', rubi)):
     M = fn()
     for k in [k for k in M.V if k[1] < 0]: del M.V[k]
     n = M.export('models/recompensa_%s.json' % name, {P: [0, 0, 0]}, jitter=0.01, pivots_in_voxels=True,

@@ -81,7 +81,8 @@ COLL.update({
 A.write({
     "name": "El puerto de Dylath-Leen",
     "spawn": [0.0, 20.0],
-    "galley": [GALLEY[0] + 4.2, -HALF + 1.5],
+    "galley": [GALLEY[0] + 4.2, -HALF + 1.5],                 # el pie de la pasarela: de ahí bajan los remeros
+    "hatch": [GALLEY[0] - 40 / 16, GALLEY[1], SEA - 0.35 + 38 / 16],   # la escotilla de la bodega (x, z, y)
     "walkable": ["sue_galera"],
     "ground": {"seed": 61, "tile": 0.5, "margin_back": 14.0, "margin_north": 0.0, "walk_back": 0.0, "camp_radius": 0.0,
                "edge_color": [0.10, 0.10, 0.12],

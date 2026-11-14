@@ -9,7 +9,7 @@ func _all(dir: String) -> Array:
 func test_cada_enemigo_tiene_modelo_animaciones_y_comportamiento() -> void:
 	for e: EnemyData in _all("res://data/enemies"):
 		assert_true(FileAccess.file_exists("res://models/%s.json" % e.model), "%s: falta models/%s.json" % [e.id, e.model])
-		assert_not_null(Anims.script_for(e.model), "%s: falta en data/anim_sets.json" % e.id)
+		if not e.tags.has(&"objeto"): assert_not_null(Anims.script_for(e.model), "%s: falta en data/anim_sets.json" % e.id)
 		if e.movement != &"chase":
 			assert_true(ResourceLoader.exists(EnemyBehavior.DIR % e.movement), "%s: falta el comportamiento %s" % [e.id, e.movement])
 		if e.attack != null: assert_gt(e.attack_cooldown, 0.0, "%s: ataque sin recarga" % e.id)

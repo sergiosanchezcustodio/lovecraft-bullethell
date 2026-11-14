@@ -7,6 +7,11 @@ extends Node
 ##   arena; si no, el centro del borde norte) que corre a por los zoogs: el que alcanzan, cae (al anciano
 ##   solo le arañan). A los `cats_life` s vuelven al pueblo. **Los hongos que brillan** (`sue_hongos`)
 ##   devuelven `mushroom_sanity` de cordura por segundo a quien está a `mushroom_radius` m.
+## - Nivel 2, el puerto de Dylath-Leen: **la galera negra** atraca cada `galley_every` s: avisa en el pie
+##   de la pasarela (`galley` en el JSON) y bajan `galley_count` remeros lunares, uno tras otro. Su
+##   **escotilla** (`hatch_enemy`, en `hatch`: x, z, y) es un objetivo quieto: al reventarla, la galera deja
+##   de desembarcar y suelta experiencia en la pasarela. **Los rubíes**: los de `ruby_tag` (mercaderes de
+##   Leng) sueltan a veces uno al caer (`Pickup.Kind.RUBY`: el doble de dólares, pero quita cordura).
 ## En red, la manada la decide el anfitrión (suceso "dream"); los gatos cazan en todos los PC, pero solo
 ## el anfitrión hace daño (los enemigos son suyos).
 
@@ -30,6 +35,15 @@ var caught := 0                        ## zoogs que han atrapado (tests)
 var cats_from := Vector3.INF
 var mushrooms: Array[Vector2] = []
 var _next := 0.0
+var galley_at := Vector3.INF           ## el pie de la pasarela
+var hatch_at := Vector3.INF
+var hatch: Enemy
+var hatch_broken := false
+var landings := 0                      ## desembarcos (tests)
+var rubies := 0                        ## rubíes soltados (tests)
+var spawner: Callable                  ## pruebas: en lugar del director, spawner.call(d, pos) -> Enemy
+var _galley_next := 0.0
+var _queue: Array[float] = []          ## s hasta cada remero del desembarco en curso
 var _rng := RandomNumberGenerator.new()
 
 func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node = null) -> DreamLands:
@@ -47,6 +61,14 @@ func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node 
 	for p: Dictionary in layout.get("props", []):
 		if String(p.model) in MUSHROOMS: mushrooms.append(Vector2(float(p.pos[0]), float(p.pos[1])))
 	_next = cats_every() * 0.6
+	var g: Array = layout.get("galley", [])
+	if g.size() >= 2: galley_at = Vector3(float(g[0]), 0.0, float(g[1]))
+	var h: Array = layout.get("hatch", [])
+	if h.size() >= 2: hatch_at = Vector3(float(h[0]), float(h[2]) if h.size() > 2 else 0.0, float(h[1]))
+	_galley_next = level.galley_every * 0.5 if level != null else 0.0
+	var dir: Variant = game.get("director") if game != null else null
+	if host and dir is WaveDirector and level != null and level.ruby_chance > 0.0:
+		(dir as WaveDirector).enemy_spawned.connect(watch_ruby)
 	return self
 
 func _exit_tree() -> void:
@@ -70,6 +92,7 @@ func _physics_process(delta: float) -> void:
 			release_cats(_rng.randi())
 	_cats_step(delta)
 	_mushroom_step(delta)
+	if host: _galley_step(delta)
 
 # ------------------------------------------------------------------ los gatos de Ulthar
 
@@ -170,11 +193,92 @@ func near_mushroom(at: Vector3) -> bool:
 		if p.distance_to(m) <= level.mushroom_radius: return true
 	return false
 
+# ------------------------------------------------------------------ la galera negra
+
+func _galley_step(delta: float) -> void:
+	if level.galley_every <= 0.0 or galley_at == Vector3.INF: return
+	if hatch == null and not hatch_broken and level.hatch_enemy != null and hatch_at != Vector3.INF:
+		place_hatch()
+	for i in range(_queue.size() - 1, -1, -1):
+		_queue[i] -= delta
+		if _queue[i] > 0.0: continue
+		_queue.remove_at(i)
+		var off := Vector3(_rng.randf_range(-1.2, 1.2), 0.0, _rng.randf_range(0.0, 1.5))
+		_spawn(level.galley_enemy, galley_at + off)
+	if hatch_broken: return
+	_galley_next -= delta
+	if _galley_next <= 0.0:
+		_galley_next = level.galley_every * _rng.randf_range(0.85, 1.15)
+		land()
+
+## Atraca y desembarca (en el anfitrión): el aviso en la pasarela y los remeros, uno tras otro.
+func land() -> void:
+	landings += 1
+	var tg := Telegraph.enemy(2.4, level.galley_warn, Color(0.55, 1.0, 0.5, 0.8))
+	tg.position = galley_at
+	world.fx.add_child(tg)
+	for i in level.galley_count: _queue.append(level.galley_warn + i * 0.55)
+	_say_galley()
+	_net({"a": "galley"})
+
+func _say_galley() -> void:
+	if game != null and game.has_method("announce"): game.announce("Atraca la galera negra: bajan los remeros lunares", 2.5)
+	world.sfx("slam", galley_at)
+
+## La escotilla, en su sitio de la cubierta.
+func place_hatch() -> void:
+	hatch = _spawn(level.hatch_enemy, hatch_at)
+	if hatch == null: return
+	hatch.position = hatch_at
+	hatch.reset_physics_interpolation()
+	hatch.died.connect(_on_hatch_died)
+
+func _on_hatch_died(_e: Enemy) -> void:
+	if hatch_broken: return
+	hatch_broken = true
+	_queue.clear()
+	var gm: Variant = game.get("gems") if game != null else null
+	if gm != null and gm.has_method("drop"):
+		for i in 6: gm.drop(galley_at + Vector3(_rng.randf_range(-1.5, 1.5), 0, _rng.randf_range(0.0, 2.0)), 3.0, 2)
+	_say_hatch()
+	_net({"a": "hatch"})
+
+func _say_hatch() -> void:
+	if game != null and game.has_method("announce"): game.announce("Revienta la escotilla: la galera ya no desembarca", 2.5)
+	world.sfx("slam", hatch_at)
+	world.ground_hit(Vector3(hatch_at.x, 0.0, hatch_at.z), 1.6, Color(0.45, 1.0, 0.45))
+
+func _spawn(d: EnemyData, pos: Vector3) -> Enemy:
+	if d == null: return null
+	if spawner.is_valid(): return spawner.call(d, pos)
+	var dir: Variant = game.get("director") if game != null else null
+	if dir is WaveDirector: return (dir as WaveDirector).spawn(d, pos)
+	return null
+
+# ------------------------------------------------------------------ los rubíes
+
+## Vigila a un enemigo que acaba de aparecer: si es de los que llevan rubíes, puede soltar uno al caer.
+func watch_ruby(e: Enemy) -> void:
+	if level.ruby_chance > 0.0 and e.data.tags.has(level.ruby_tag): e.died.connect(_on_ruby_died)
+
+func _on_ruby_died(e: Enemy) -> void:
+	if _rng.randf() < level.ruby_chance: drop_ruby(e.global_position)
+
+func drop_ruby(at: Vector3) -> Pickup:
+	var p := Pickup.new().setup(world, at, Pickup.Kind.RUBY)
+	world.fx.add_child(p)
+	rubies += 1
+	return p
+
 # ------------------------------------------------------------------ red
 
 func remote(d: Dictionary) -> void:
 	match String(d.get("a", "")):
 		"cats": release_cats(int(d.get("s", 0)))
+		"galley": _say_galley()
+		"hatch":
+			hatch_broken = true
+			_say_hatch()
 
 func _net(d: Dictionary) -> void:
 	var net: Variant = game.get("net_game") if game != null else null

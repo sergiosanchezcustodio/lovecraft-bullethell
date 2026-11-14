@@ -181,6 +181,7 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 		"enemies":
 			for e: EnemyData in _list("res://data/enemies"):
 				if String(e.id).ends_with(MUELLE): continue    # variantes del muelle: la misma criatura (15.4)
+				if e.tags.has(&"objeto"): continue            # objetivos que no son criaturas (la escotilla de la galera, 21.10)
 				var facts := ["Escalón %d%s" % [e.tier, " · élite" if e.elite else ""], "Vida %d" % int(e.max_health),
 					"Velocidad %.1f m/s" % e.move_speed]
 				if e.aura_drain > 0.0: facts.append("Aura: −%.1f de cordura por segundo" % e.aura_drain)

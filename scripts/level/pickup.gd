@@ -3,15 +3,19 @@ extends Node3D
 ## Recompensa de un objeto rompible (04-10-2026). Flota y gira; la recoge el primer jugador que
 ## la pisa. FOOD cura vida, POTION cordura, MONEY da dólares, FLAMER pone 5 s un lanzallamas
 ## potente al jugador y FREEZE congela el tiempo 5 s (enemigos y sus balas quietos y sin atacar).
+## RUBY (hito 21.10, los rubíes de los mercaderes de Leng): el doble de dólares que MONEY, pero quita
+## RUBY_SANITY de cordura a quien lo coge. No sale de los rompibles (roll), solo de los mercaderes.
 ## Si nadie la recoge en LIFE s, desaparece.
 
-enum Kind { FOOD, POTION, MONEY, FLAMER, FREEZE }
-const MODELS := ["recompensa_comida", "recompensa_pocion", "recompensa_dinero", "recompensa_lanzallamas", "recompensa_reloj"]
-const NAMES := ["Comida: +30 % de vida", "Poción: +30 % de cordura", "Dólares", "¡Lanzallamas!", "¡Tiempo congelado!"]
+enum Kind { FOOD, POTION, MONEY, FLAMER, FREEZE, RUBY }
+const MODELS := ["recompensa_comida", "recompensa_pocion", "recompensa_dinero", "recompensa_lanzallamas", "recompensa_reloj", "recompensa_rubi"]
+const NAMES := ["Comida: +30 % de vida", "Poción: +30 % de cordura", "Dólares", "¡Lanzallamas!", "¡Tiempo congelado!", "Rubí de Leng: dólares… y un escalofrío"]
 ## Probabilidades: lo útil a menudo, los poderes de vez en cuando.
 const WEIGHTS := [0.3, 0.25, 0.25, 0.1, 0.1]
 const LIFE := 25.0
 const POWER_TIME := 5.0
+const RUBY_SANITY := 9.0
+const MONEY_RANGE := Vector2i(15, 40)
 
 ## En red (hito 9.3c): en el anfitrión, al recogerla (`money`: los dólares que da); en el
 ## invitado (`mirror`) no se recoge sola, la quita NetGame.
@@ -49,7 +53,7 @@ func _ready() -> void:
 	ring.mesh = tm
 	var m := VoxelFx.std()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	m.albedo_color = [Color(1.0, 0.45, 0.35), Color(0.75, 0.45, 1.0), Color(1.0, 0.82, 0.3), Color(1.0, 0.55, 0.15), Color(0.45, 0.8, 1.0)][kind]
+	m.albedo_color = [Color(1.0, 0.45, 0.35), Color(0.75, 0.45, 1.0), Color(1.0, 0.82, 0.3), Color(1.0, 0.55, 0.15), Color(0.45, 0.8, 1.0), Color(1.0, 0.15, 0.25)][kind]
 	ring.material_override = m
 	ring.position.y = 0.04
 	ring.scale = Vector3(1, 0.2, 1)
@@ -70,10 +74,17 @@ func _physics_process(_delta: float) -> void:
 		var off := p.global_position - global_position
 		off.y = 0.0
 		if off.length() < 0.9:
-			var n := randi_range(15, 40) if kind == Kind.MONEY else 0
+			var n := money_roll(kind)
 			take(p, n)
 			picked.emit(self, p, n)
 			return
+
+## Dólares que da al cogerla (el rubí, el doble).
+static func money_roll(k: Kind) -> int:
+	match k:
+		Kind.MONEY: return randi_range(MONEY_RANGE.x, MONEY_RANGE.y)
+		Kind.RUBY: return randi_range(MONEY_RANGE.x * 2, MONEY_RANGE.y * 2)
+	return 0
 
 ## La recoge `p` (en cualquier PC): destellos, efecto y fuera. La vida y la cordura solo las
 ## cambia el PC del jugador; los dólares, todos (cada uno en su partida).
@@ -93,6 +104,9 @@ func _give(p: Player, money: int) -> void:
 			if game != null and game.has_method("earn"): game.earn(money)
 		Kind.FLAMER: give_flamer(p)
 		Kind.FREEZE: world.freeze_time(POWER_TIME)
+		Kind.RUBY:
+			if game != null and game.has_method("earn"): game.earn(money)
+			p.drain_sanity(RUBY_SANITY, "Rubí de Leng", &"peligro")           # en su PC (remote no hace nada)
 	if game != null and game.has_method("announce"): game.announce(NAMES[kind], 1.5)
 	if OS.get_cmdline_user_args().has("log=true"): print("RECOGIDA %s" % Kind.keys()[kind])
 

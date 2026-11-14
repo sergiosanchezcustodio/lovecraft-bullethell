@@ -350,7 +350,7 @@ func spawn(d: EnemyData, pos: Vector3) -> Enemy:
 	e.position = pos
 	e.died.connect(_on_died)
 	enemies_root.add_child(e)
-	if not mirror and not boss and not d.elite and Madness.chance("ward") > 0.0 and rng.randf() < Madness.chance("ward"):
+	if not mirror and not boss and not d.elite and not d.tags.has(&"objeto") and Madness.chance("ward") > 0.0 and rng.randf() < Madness.chance("ward"):
 		e.set_ward(1)                                                    # escudo de icor (grados de locura, 16.14)
 	if not mirror and not boss and d.elite: EliteTraits.apply(e, EliteTraits.roll(rng))   # rasgos de élite (16.20)
 	alive.append(e)
@@ -364,7 +364,7 @@ func _on_died(e: Enemy) -> void:
 	killed_total += 1
 	if not mirror and e.data.tier >= 4 and not e.data.unique and e != _final and Pacts.has("split_elites"):
 		_split(e)
-	elif not mirror and e.data.tier < 4 and not e.data.unique and not e.small and e != _final \
+	elif not mirror and e.data.tier < 4 and not e.data.unique and not e.small and e != _final and not e.data.tags.has(&"objeto") \
 			and Madness.chance("split") > 0.0 and rng.randf() < Madness.chance("split"):
 		_split_small(e)
 	if e == _final and not completed:

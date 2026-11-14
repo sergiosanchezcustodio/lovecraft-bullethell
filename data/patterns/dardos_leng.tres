@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"dardos_leng"
+shape = 1
+count = 3
+spread_deg = 22.0
+speed = 7.5
+radius = 0.1
+size = 0.14
+damage_physical = 5.0
+damage_mental = 1.0
+lifetime = 2.2
+bursts = 1
+aimed = true

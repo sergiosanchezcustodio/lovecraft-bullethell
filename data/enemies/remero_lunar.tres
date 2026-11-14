@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"remero_lunar"
+display_name = "Remero lunar"
+model = "remero_lunar"
+model_scale = 1.25
+tier = 2
+spawn_weight = 0.7
+elite = false
+tags = Array[StringName]([&"lunar"])
+max_health = 46.0
+hit_radius = 0.6
+body_radius = 0.55
+move_speed = 2.1
+xp = 2.5
+money = 2
+contact_physical = 9.0
+contact_mental = 2.0
+movement = &"chase"
+soft = true

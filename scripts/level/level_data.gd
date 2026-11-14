@@ -109,6 +109,16 @@ func is_survival() -> bool:
 @export var cats_life := 10.0                  ## s que cazan antes de volver al pueblo
 @export var mushroom_sanity := 0.0             ## cordura por segundo junto a los hongos que brillan (0: nada)
 @export var mushroom_radius := 1.9             ## m alrededor de cada corro
+## Nivel 2: la galera negra atraca cada `galley_every` s y desembarca `galley_count` `galley_enemy` por
+## la pasarela (`galley` en el JSON de la arena), hasta que revientan su escotilla (`hatch_enemy`, en
+## `hatch`). Los de `ruby_tag` sueltan a veces un rubí: dólares de más, pero quita cordura.
+@export var galley_every := 0.0                ## s medios entre desembarcos (0: sin galera)
+@export var galley_count := 5                  ## remeros de cada desembarco
+@export var galley_warn := 3.0                 ## s de aviso antes de que bajen
+@export var galley_enemy: EnemyData
+@export var hatch_enemy: EnemyData             ## la escotilla (vacío: la galera no para)
+@export var ruby_chance := 0.0                 ## probabilidad de que un mercader suelte un rubí
+@export var ruby_tag := &"leng"
 @export_group("Dinero (D-31)")
 @export var money_bonus := 100                 ## dólares al superar el nivel
 @export var chest_every := 90.0                ## s medios entre baúles arcanos (0: ninguno)

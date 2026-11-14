@@ -465,9 +465,11 @@ func _ready() -> void:
 			polyps = PolypWinds.new().setup(world, level, not is_guest(), self)
 			add_child(polyps)
 			if args.has("trap_here"): _trap_here.call_deferred(args.get_float("trap_here", 1.0))
-		if level.cats_every > 0.0 or level.mushroom_sanity > 0.0:   # las Tierras del Sueño (21.10)
+		if level.cats_every > 0.0 or level.mushroom_sanity > 0.0 or level.galley_every > 0.0 or level.ruby_chance > 0.0:   # las Tierras del Sueño (21.10)
 			dream = DreamLands.new().setup(world, level, not is_guest(), self)
 			add_child(dream)
+			if args.has("galley_here"): dream._galley_next = args.get_float("galley_here", 2.0)   # pruebas: atraca a los t s
+			if args.has("cats_here"): dream._next = args.get_float("cats_here", 2.0)
 		director.enemy_spawned.connect(func(e: Enemy) -> void:
 			e.died.connect(_on_enemy_died)
 			if blight != null and not is_guest() and float(e.data.param("blight_on_death", 0.0)) > 0.0: e.died.connect(blight.on_enemy_died))

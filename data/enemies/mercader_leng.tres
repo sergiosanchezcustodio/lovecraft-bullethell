@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/dardos_leng.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"mercader_leng"
+display_name = "Mercader de Leng"
+model = "mercader_leng"
+tier = 2
+spawn_weight = 1.0
+elite = false
+tags = Array[StringName]([&"leng", &"humana"])
+max_health = 30.0
+hit_radius = 0.45
+body_radius = 0.45
+move_speed = 2.5
+xp = 2.0
+money = 3
+contact_physical = 5.0
+contact_mental = 1.0
+movement = &"keep"
+params = {"keep": 7.5, "strafe": 0.6}
+attack = ExtResource("2")
+attack_cooldown = 3.0
+attack_range = 9.5
+attack_anim = ""

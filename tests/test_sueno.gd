@@ -162,3 +162,106 @@ func test_los_hongos_devuelven_cordura() -> void:
 	_step(dl, 1.0)
 	assert_almost_eq(p.sanity, 10.0 + dl.level.mushroom_sanity, 0.3)
 	assert_almost_eq(far.sanity, 10.0, 0.01, "lejos, nada")
+
+# ------------------------------------------------------------------ nivel 2: la galera negra
+
+func test_el_nivel_del_puerto() -> void:
+	var lv: LevelData = load("res://data/levels/p4_n2.tres")
+	var ids := lv.pool.map(func(d: EnemyData) -> String: return String(d.id))
+	assert_true(ids.has("mercader_leng") and ids.has("remero_lunar"))
+	assert_eq(String(lv.final_enemy.id), "bestia_lunar_mayor")
+	assert_true(lv.final_enemy.unique)
+	assert_gt(lv.galley_every, 0.0)
+	assert_eq(String(lv.galley_enemy.id), "remero_lunar")
+	assert_eq(String(lv.hatch_enemy.id), "escotilla")
+	assert_gt(lv.ruby_chance, 0.0)
+	for d: EnemyData in lv.pool + [lv.final_enemy]:
+		assert_true(Anims.script_for(d.model) != null, "%s se anima" % d.model)
+	for m in ["escotilla", "recompensa_rubi"]:
+		assert_true(FileAccess.file_exists("res://models/%s.json" % m), m)
+
+func _puerto() -> Array:
+	var made: Array[Enemy] = []
+	var dl := _dream("p4_n2")
+	dl.spawner = func(d: EnemyData, pos: Vector3) -> Enemy:
+		var e := _enemy(String(d.id), pos, false)
+		made.append(e)
+		return e
+	return [dl, made]
+
+func test_la_galera_desembarca_remeros() -> void:
+	_player("dyer", Vector3(0, 0, 0))
+	var r := _puerto()
+	var dl: DreamLands = r[0]
+	var made: Array[Enemy] = r[1]
+	assert_eq(dl.galley_at, Vector3(2.2, 0, -30.5), "el pie de la pasarela")
+	dl._galley_next = 0.0
+	_step(dl, 0.1)
+	assert_eq(dl.landings, 1)
+	assert_true(dl.hatch != null, "la escotilla, en la cubierta")
+	assert_almost_eq(dl.hatch.position.y, 0.825, 0.01)
+	assert_eq(made.size(), 1, "aún no ha bajado nadie: el aviso")
+	_step(dl, dl.level.galley_warn + dl.level.galley_count * 0.55 + 0.2)
+	var rowers := made.filter(func(e: Enemy) -> bool: return String(e.data.id) == "remero_lunar")
+	assert_eq(rowers.size(), dl.level.galley_count)
+	for e: Enemy in rowers:
+		assert_lt(e.position.distance_to(dl.galley_at), 2.5, "bajan por la pasarela")
+
+func test_reventar_la_escotilla_para_la_galera() -> void:
+	_player("dyer", Vector3(0, 0, 0))
+	var r := _puerto()
+	var dl: DreamLands = r[0]
+	var made: Array[Enemy] = r[1]
+	dl._galley_next = 0.0
+	_step(dl, 0.1)
+	assert_eq(dl.landings, 1)
+	dl.hatch.take_damage(Damage.new(99999.0, 0.0))
+	assert_true(dl.hatch_broken)
+	var n := made.size()
+	dl._galley_next = 0.0
+	_step(dl, 6.0)
+	assert_eq(dl.landings, 1, "ya no atraca")
+	assert_eq(made.size(), n, "y no baja nadie más (tampoco los que esperaban)")
+
+func test_la_escotilla_no_se_mueve_ni_toca() -> void:
+	var p := _player("dyer", Vector3(-4.5, 0, -33.5))
+	var r := _puerto()
+	var dl: DreamLands = r[0]
+	dl.place_hatch()
+	var h := dl.hatch
+	var hit := Damage.new(5.0, 0.0)
+	hit.knockback = Vector3(0, 0, -30)
+	h.take_damage(hit)
+	await wait_physics_frames(20)
+	assert_almost_eq(h.position.x, dl.hatch_at.x, 0.001)
+	assert_almost_eq(h.position.z, dl.hatch_at.z, 0.001, "anclada: ni el empujón ni el borde la mueven")
+	assert_false(h.behavior.touches(h))
+	assert_false(h.behavior.can_shoot(h))
+	assert_eq(p.health, p.data.max_health)
+
+func test_los_mercaderes_sueltan_rubies() -> void:
+	var dl := _dream("p4_n2")
+	dl.level = dl.level.duplicate()
+	dl.level.ruby_chance = 1.0
+	var m := _enemy("mercader_leng", Vector3(3, 0, 3), false)
+	var z := _enemy("remero_lunar", Vector3(-3, 0, 3), false)
+	dl.watch_ruby(m)
+	dl.watch_ruby(z)
+	m.take_damage(Damage.new(99999.0, 0.0))
+	z.take_damage(Damage.new(99999.0, 0.0))
+	assert_eq(dl.rubies, 1, "solo el mercader")
+	var found := world.fx.get_children().filter(func(n: Node) -> bool: return n is Pickup and (n as Pickup).kind == Pickup.Kind.RUBY)
+	assert_eq(found.size(), 1)
+
+func test_el_rubi_vale_el_doble_y_quita_cordura() -> void:
+	for i in 20:
+		var n := Pickup.money_roll(Pickup.Kind.RUBY)
+		assert_true(n >= Pickup.MONEY_RANGE.x * 2 and n <= Pickup.MONEY_RANGE.y * 2)
+	assert_eq(Pickup.money_roll(Pickup.Kind.FOOD), 0)
+	var p := _player("dyer", Vector3.ZERO)
+	var s := p.sanity
+	var rb := Pickup.new().setup(world, Vector3.ZERO, Pickup.Kind.RUBY)
+	world.fx.add_child(rb)
+	rb.take(p, 60)
+	assert_lt(p.sanity, s, "un escalofrío")
+	for k in 6: assert_ne(Pickup.roll(), Pickup.Kind.RUBY, "no sale de los rompibles")
