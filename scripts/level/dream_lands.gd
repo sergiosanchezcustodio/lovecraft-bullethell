@@ -12,6 +12,8 @@ extends Node
 ##   **escotilla** (`hatch_enemy`, en `hatch`: x, z, y) es un objetivo quieto: al reventarla, la galera deja
 ##   de desembarcar y suelta experiencia en la pasarela. **Los rubíes**: los de `ruby_tag` (mercaderes de
 ##   Leng) sueltan a veces uno al caer (`Pickup.Kind.RUBY`: el doble de dólares, pero quita cordura).
+## - Nivel 3, la meseta de Leng: **el viento de Leng** sopla a rachas (`gust_every`): avisa, y durante
+##   `gust_time` s empuja a todos hacia un lado (al azar) a `gust_push` m/s, con más fuerza a mitad.
 ## En red, la manada la decide el anfitrión (suceso "dream"); los gatos cazan en todos los PC, pero solo
 ## el anfitrión hace daño (los enemigos son suyos).
 
@@ -44,6 +46,10 @@ var rubies := 0                        ## rubíes soltados (tests)
 var spawner: Callable                  ## pruebas: en lugar del director, spawner.call(d, pos) -> Enemy
 var _galley_next := 0.0
 var _queue: Array[float] = []          ## s hasta cada remero del desembarco en curso
+var gusts := 0                         ## rachas (tests)
+var gust_dir := Vector3.ZERO           ## hacia dónde empuja la racha en curso
+var _gust_next := 0.0
+var _gust_t := -1.0                    ## s desde que empezó el aviso de la racha en curso (-1: ninguna)
 var _rng := RandomNumberGenerator.new()
 
 func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node = null) -> DreamLands:
@@ -66,6 +72,7 @@ func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node 
 	var h: Array = layout.get("hatch", [])
 	if h.size() >= 2: hatch_at = Vector3(float(h[0]), float(h[2]) if h.size() > 2 else 0.0, float(h[1]))
 	_galley_next = level.galley_every * 0.5 if level != null else 0.0
+	_gust_next = level.gust_every * 0.6 if level != null else 0.0
 	var dir: Variant = game.get("director") if game != null else null
 	if host and dir is WaveDirector and level != null and level.ruby_chance > 0.0:
 		(dir as WaveDirector).enemy_spawned.connect(watch_ruby)
@@ -93,6 +100,7 @@ func _physics_process(delta: float) -> void:
 	_cats_step(delta)
 	_mushroom_step(delta)
 	if host: _galley_step(delta)
+	_gust_step(delta)
 
 # ------------------------------------------------------------------ los gatos de Ulthar
 
@@ -255,6 +263,39 @@ func _spawn(d: EnemyData, pos: Vector3) -> Enemy:
 	if dir is WaveDirector: return (dir as WaveDirector).spawn(d, pos)
 	return null
 
+# ------------------------------------------------------------------ el viento de Leng
+
+func _gust_step(delta: float) -> void:
+	if level.gust_every <= 0.0: return
+	if host and _gust_t < 0.0:
+		_gust_next -= delta
+		if _gust_next <= 0.0:
+			_gust_next = level.gust_every * _rng.randf_range(0.85, 1.15)
+			gust(_rng.randf() * TAU)
+	if _gust_t < 0.0: return
+	_gust_t += delta
+	var t := _gust_t - level.gust_warn
+	if t >= level.gust_time:
+		_gust_t = -1.0
+		return
+	if t < 0.0: return
+	var k := sin(clampf(t / level.gust_time, 0.0, 1.0) * PI)
+	for q in world.players:
+		if q.remote or q.health <= 0.0: continue
+		q.push += gust_dir * level.gust_push * k
+	if fmod(t, 0.5) < delta:
+		for q in world.players: Gusts.push(world.fx, q.global_position - gust_dir * 4.0, 0.5 * k, 9.0)
+
+## Empieza una racha hacia el ángulo `a` (en el invitado, cuando lo dice el anfitrión).
+func gust(a: float) -> void:
+	gusts += 1
+	gust_dir = Vector3(cos(a), 0.0, sin(a))
+	_gust_t = 0.0
+	if game != null and game.has_method("announce"): game.announce("Se levanta el viento de Leng…", 2.0)
+	var at := world.players[0].global_position if not world.players.is_empty() else Vector3.ZERO
+	Auto.sfx_at("trap_wind", at)
+	if host: _net({"a": "gust", "r": a})
+
 # ------------------------------------------------------------------ los rubíes
 
 ## Vigila a un enemigo que acaba de aparecer: si es de los que llevan rubíes, puede soltar uno al caer.
@@ -276,6 +317,7 @@ func remote(d: Dictionary) -> void:
 	match String(d.get("a", "")):
 		"cats": release_cats(int(d.get("s", 0)))
 		"galley": _say_galley()
+		"gust": gust(float(d.get("r", 0.0)))
 		"hatch":
 			hatch_broken = true
 			_say_hatch()

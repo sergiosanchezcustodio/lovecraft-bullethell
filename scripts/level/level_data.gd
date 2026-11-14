@@ -119,6 +119,12 @@ func is_survival() -> bool:
 @export var hatch_enemy: EnemyData             ## la escotilla (vacío: la galera no para)
 @export var ruby_chance := 0.0                 ## probabilidad de que un mercader suelte un rubí
 @export var ruby_tag := &"leng"
+## Nivel 3: las rachas del viento de Leng. Cada `gust_every` s, tras `gust_warn` s de aviso, sopla `gust_time`
+## s desde un lado al azar y empuja a los jugadores a `gust_push` m/s en lo más fuerte.
+@export var gust_every := 0.0                  ## s medios entre rachas (0: ninguna)
+@export var gust_warn := 1.5
+@export var gust_time := 4.0
+@export var gust_push := 3.0
 @export_group("Dinero (D-31)")
 @export var money_bonus := 100                 ## dólares al superar el nivel
 @export var chest_every := 90.0                ## s medios entre baúles arcanos (0: ninguno)

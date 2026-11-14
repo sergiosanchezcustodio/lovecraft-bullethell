@@ -350,6 +350,9 @@ func _physics_process_step(delta: float) -> void:
 	velocity = motor.step(delta, move, dodge)
 	if in_water() and not motor.is_dodging(): velocity *= WadeSplash.SLOW   # agua somera: frena
 	if carry_slow != 1.0 and not motor.is_dodging(): velocity *= carry_slow  # lleva la reliquia (13.5)
+	if snare > 0.0:                                   # en una red (21.10): quieto hasta que se suelta o esquiva
+		snare = 0.0 if motor.is_dodging() else snare - delta
+		if snare > 0.0: velocity = Vector3.ZERO
 	velocity += push
 	push = Vector3.ZERO
 	if ss.is_kind(&"huida"): velocity *= rules.flee_speed
@@ -469,6 +472,7 @@ var last_hit := {}
 var hud_lie := Vector2(-1, -1)
 ## Objetivo de la reliquia (hito 13.5, `Objective`): quien la lleva anda más despacio.
 var carry_slow := 1.0
+var snare := 0.0                       ## s que sigue atrapado en una red de las arañas de Leng (SpiderWeb, 21.10): no anda; esquivar lo suelta
 var _hp_seen := 0.0                     ## vida del paso anterior (pacto Sin consuelo)
 ## Diario (hito 13.10, `Diary`): vida y cordura perdidas por minuto del nivel, veces que ha
 ## caído y quién lo levantó la última vez. `clock` es el reloj del nivel (lo pone game.gd).

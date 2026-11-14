@@ -1,7 +1,11 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
-[ext_resource type="Resource" path="res://data/enemies/pesadilla.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/mercader_leng.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/shantak.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/arana_leng.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/sacerdote_leng.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/arana_madre.tres" id="7"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
 [ext_resource type="Resource" path="res://data/weather/viento_leng.tres" id="weather"]
 
@@ -13,14 +17,23 @@ display_name = "La meseta de Leng y el monasterio sin ventanas"
 part = 4
 number = 3
 arena = "res://data/arenas/leng.json"
-health_mult = 1.0
+health_mult = 1.6
 duration = 300.0
 music = "res://resources/Music/cc0/p1_n2_wastelands.ogg"
-pool = Array[ExtResource("5")]([ExtResource("2")])
+pool = Array[ExtResource("5")]([ExtResource("3"), ExtResource("4"), ExtResource("2")])
 spawn_rate = Array[Vector2]([Vector2(0, 0.3), Vector2(45, 0.5), Vector2(90, 0.82), Vector2(150, 1.35), Vector2(210, 1.85), Vector2(300, 2.35)])
 max_alive = 75
 elite_cap = 1
 final_time = 240.0
+final_enemy = ExtResource("7")
 final_wave = 14
 final_spawn_scale = 0.3
+final_text = "Algo se descuelga de las grietas del monasterio, enorme y púrpura, y tiende sus redes por la meseta…"
+mid_enemies = Array[ExtResource("5")]([ExtResource("6")])
+mid_times = Array[float]([130.0])
+mid_texts = Array[String](["Suenan flautas y tambores: sale del monasterio el sumo sacerdote de la máscara amarilla"])
+gust_every = 24.0
+gust_warn = 1.5
+gust_time = 4.0
+gust_push = 3.0
 coop_spawn = Array[float]([1.0, 1.15, 1.3, 1.45])

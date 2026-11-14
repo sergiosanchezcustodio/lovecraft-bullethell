@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"shantak"
+display_name = "Shantak"
+model = "shantak"
+model_scale = 1.2
+tier = 3
+spawn_weight = 0.8
+elite = false
+tags = Array[StringName]([&"leng"])
+max_health = 58.0
+hit_radius = 0.8
+body_radius = 0.6
+move_speed = 3.6
+xp = 3.5
+money = 4
+contact_physical = 11.0
+contact_mental = 2.0
+movement = &"dive"
+params = {"dive_cooldown": 4.0, "dive_damage": 15.0, "dive_radius": 1.6, "dive_range": 10.0, "dive_time": 0.45, "height": 3.2, "orbit": 6.0, "telegraph": 0.85}

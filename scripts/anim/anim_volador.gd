@@ -3,7 +3,7 @@ extends RefCounted
 ## wing_r. El modelo mira hacia +Z; la altura de vuelo la pone Pet. Siempre en el aire: en
 ## reposo aletea despacio y planea; al moverse aletea más y se inclina hacia delante.
 
-const DURATION := {"idle": 0.9, "walk": 0.45, "run": 0.32, "bite": 0.5,
+const DURATION := {"idle": 0.9, "walk": 0.45, "run": 0.32, "bite": 0.5, "fly": 0.7, "dive": 0.5,
 	"fidget_preen": 2.7, "fidget_roll": 1.8}
 ## Gestos de reposo (28-10-2026): se acicala bajo un ala o da una voltereta en el aire.
 const FIDGETS := ["fidget_preen", "fidget_roll"]
@@ -28,6 +28,17 @@ static func walk(m: Node3D, t: float) -> void:
 
 static func run(m: Node3D, t: float) -> void:
 	_flap(m, t, 1.0, 0.35)
+
+## Vuela (enemigos que vuelan en círculo, como el shantak; DiveBehavior): aleteo ancho y lento.
+static func fly(m: Node3D, t: float) -> void:
+	_flap(m, t, 0.7, 0.1)
+
+## En picado: las alas plegadas hacia atrás y la cabeza por delante.
+static func dive(m: Node3D, t: float) -> void:
+	_p(m, "wing_l").rotation = Vector3(0.0, 0.5, -0.15)
+	_p(m, "wing_r").rotation = Vector3(0.0, -0.5, 0.15)
+	_p(m, "head").rotation.x = 0.25 + 0.05 * sin(t * TAU * 3.0)
+	m.rotation.x = 0.45
 
 ## Ulula: abre las alas, ahueca el pecho y cabecea.
 static func bite(m: Node3D, t: float) -> void:

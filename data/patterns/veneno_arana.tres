@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"veneno_arana"
+shape = 0
+count = 18
+speed = 3.4
+radius = 0.13
+size = 0.22
+damage_physical = 4.0
+damage_mental = 6.0
+lifetime = 5.5
+bursts = 2
+burst_interval = 0.5
+aimed = true
+gap_count = 2
+gap_width = 3
+telegraph_time = 0.5
+telegraph_radius = 2.0

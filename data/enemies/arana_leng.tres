@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"arana_leng"
+display_name = "Araña púrpura de Leng"
+model = "arana_leng"
+model_scale = 1.1
+tier = 3
+spawn_weight = 0.9
+elite = false
+tags = Array[StringName]([&"leng"])
+max_health = 52.0
+hit_radius = 0.6
+body_radius = 0.6
+move_speed = 2.8
+xp = 3.0
+money = 3
+contact_physical = 4.0
+contact_mental = 8.0
+movement = &"web"
+path = &"zigzag"
+params = {"keep": 0.8, "strafe": 0.3, "web_count": 1, "web_every": 4.5, "web_hold": 1.6, "web_max": 3, "web_radius": 1.0, "web_range": 8.0, "web_warn": 0.6}

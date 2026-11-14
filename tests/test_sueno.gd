@@ -265,3 +265,103 @@ func test_el_rubi_vale_el_doble_y_quita_cordura() -> void:
 	rb.take(p, 60)
 	assert_lt(p.sanity, s, "un escalofrío")
 	for k in 6: assert_ne(Pickup.roll(), Pickup.Kind.RUBY, "no sale de los rompibles")
+
+# ------------------------------------------------------------------ nivel 3: la meseta de Leng
+
+func test_el_nivel_de_leng() -> void:
+	var lv: LevelData = load("res://data/levels/p4_n3.tres")
+	var ids := lv.pool.map(func(d: EnemyData) -> String: return String(d.id))
+	assert_true(ids.has("shantak") and ids.has("arana_leng"))
+	assert_eq(String(lv.final_enemy.id), "arana_madre")
+	assert_true(lv.final_enemy.unique)
+	assert_eq(lv.mid_enemies.size(), 1)
+	assert_eq(String(lv.mid_enemies[0].id), "sacerdote_leng")
+	assert_gt(lv.gust_every, 0.0)
+	for d: EnemyData in lv.pool + [lv.final_enemy, lv.mid_enemies[0]]:
+		assert_true(Anims.script_for(d.model) != null, "%s se anima" % d.model)
+		for a in ["idle", "walk"]: assert_true(Anims.has_anim(d.model, a), "%s: %s" % [d.model, a])
+	assert_true(Anims.has_anim("shantak", "fly") and Anims.has_anim("shantak", "dive"), "vuela y cae en picado")
+
+func test_la_arana_tira_una_red_y_atrapa() -> void:
+	var p := _player("dyer", Vector3(4, 0, 0))
+	var e := _enemy("arana_leng", Vector3(0, 0, 0), false)
+	var b := e.behavior as WebBehavior
+	b._web = 0.0
+	world.rebuild_grid()
+	b.update(e, p, DT)
+	assert_eq(b._pending.size(), 1, "la lanza, con aviso")
+	for k in int(0.7 / DT): b.update(e, p, DT)
+	var webs := world.fx.get_children().filter(func(n: Node) -> bool: return n is SpiderWeb)
+	assert_eq(webs.size(), 1, "cae al suelo")
+	var w: SpiderWeb = webs[0]
+	assert_lt(Vector2(w.position.x, w.position.z).distance_to(Vector2(4, 0)), 1.0, "donde estaba el jugador")
+	p.position = w.position
+	for k in int(0.6 / DT): w._physics_process(DT)
+	assert_gt(p.snare, 0.0, "atrapado")
+	assert_eq(w.caught, p)
+
+func test_atrapado_no_anda_y_esquivar_lo_suelta() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	p.snare = 1.0
+	(p.input as BotInput).pattern = "right"
+	await wait_physics_frames(10)
+	assert_almost_eq(p.position.x, 0.0, 0.01, "pegado al suelo")
+	p.snare = 0.0
+	await wait_physics_frames(10)
+	assert_gt(p.position.x, 0.05, "suelto, anda")
+
+func test_la_red_no_atrapa_al_que_esquiva_ni_al_de_otro_pc() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var w := SpiderWeb.new().setup(world, Vector3.ZERO)
+	world.fx.add_child(w)
+	p.remote = true
+	for k in int(0.7 / DT): w._physics_process(DT)
+	assert_eq(p.snare, 0.0, "el de otro PC, en su PC")
+	assert_null(w.caught)
+
+func test_el_sacerdote_se_quita_la_mascara() -> void:
+	var p := _player("dyer", Vector3(0, 0, 5))
+	var e := _enemy("sacerdote_leng", Vector3.ZERO, true)
+	var b := e.behavior as MaskBehavior
+	b._ut = 0.0
+	b.update(e, p, DT)
+	assert_eq(b.state, MaskBehavior.State.WARN, "avisa")
+	for k in int((float(e.data.param("unmask_warn", 1.2)) + 0.1) / DT): b.update(e, p, DT)
+	assert_eq(b.state, MaskBehavior.State.BARE)
+	assert_eq(e.anim, "unmask", "viaja en la foto")
+	var hat: Node3D = (e.model.get_meta("part_nodes") as Dictionary).get("hat")
+	assert_false(hat.visible, "sin la máscara")
+	assert_false(b.can_shoot(e))
+	for k in int(float(e.data.param("unmask_time", 3.0)) / DT) + 2: b.update(e, p, DT)
+	assert_eq(b.state, MaskBehavior.State.MASKED)
+	assert_true(hat.visible)
+
+func test_mirarle_la_cara_quita_cordura() -> void:
+	var p := _player("dyer", Vector3(0, 0, 5))
+	var away := _player("dyer", Vector3(5, 0, 0))
+	var e := _enemy("sacerdote_leng", Vector3.ZERO, true)
+	p.visual.rotation.y = PI                     # de cara a él (mira hacia -Z)
+	away.visual.rotation.y = PI * 0.5            # de espaldas (mira hacia +X)
+	assert_true(MaskBehavior.gazing(p, e.global_position, 13.0, 0.3))
+	assert_false(MaskBehavior.gazing(away, e.global_position, 13.0, 0.3))
+	var b := e.behavior as MaskBehavior
+	b.state = MaskBehavior.State.BARE
+	var s1 := p.sanity
+	var s2 := away.sanity
+	b._gaze(e, 1.0)
+	assert_lt(p.sanity, s1, "le ha visto la cara")
+	assert_eq(away.sanity, s2, "de espaldas, nada")
+
+func test_el_viento_de_leng_empuja() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var dl := _dream("p4_n3")
+	dl._gust_next = 999.0
+	dl.gust(0.0)
+	assert_eq(dl.gusts, 1)
+	assert_almost_eq(dl.gust_dir.x, 1.0, 0.001)
+	for k in int((dl.level.gust_warn + dl.level.gust_time * 0.5) / DT): dl._physics_process(DT)
+	assert_gt(p.push.x, 0.5, "a mitad de la racha, empuja hacia +X")
+	var dl2 := _dream("p4_n3", false)
+	dl2.remote({"a": "gust", "r": PI})
+	assert_eq(dl2.gusts, 1, "en el invitado, la del anfitrión")
+	assert_almost_eq(dl2.gust_dir.x, -1.0, 0.001)
