@@ -472,3 +472,126 @@ func test_en_el_invitado_los_necrofagos_no_hacen_dano() -> void:
 	dl.remote({"a": "ghouls", "s": 3})
 	assert_eq(dl.risings, 1)
 	assert_eq((dl.ghouls[0] as Reanimated).dps, 0.0)
+
+# ------------------------------------------------------------------ nivel 5: la cima de Kadath
+
+func test_el_nivel_de_kadath() -> void:
+	var lv: LevelData = load("res://data/levels/p4_n5.tres")
+	var ids := lv.pool.map(func(d: EnemyData) -> String: return String(d.id))
+	assert_true(ids.has("descarnado") and ids.has("larva_otros"))
+	assert_true((load("res://data/enemies/descarnado.tres") as EnemyData).elite, "el descarnado es élite")
+	assert_gt(lv.flute_every, 0.0)
+	for d: EnemyData in lv.pool:
+		assert_true(Anims.script_for(d.model) != null, "%s se anima" % d.model)
+
+func _gaunt(at: Vector3) -> Enemy:
+	var e := _enemy("descarnado", at, false)
+	e.data.max_health = 1000.0
+	e.health = 1000.0
+	return e
+
+func _aim_and_swoop(e: Enemy, p: Player) -> GauntBehavior:
+	var b := e.behavior as GauntBehavior
+	b._cd = 0.0
+	b.update(e, p, DT)
+	assert_eq(b.state, GauntBehavior.State.AIM, "marca dónde va a bajar")
+	return b
+
+func test_el_descarnado_agarra_y_se_lo_lleva() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var e := _gaunt(Vector3(4, 0, 0))
+	assert_false(e.behavior.touches(e), "vuela: no toca")
+	var b := _aim_and_swoop(e, p)
+	for k in int((float(e.data.param("grab_warn", 0.9)) + GauntBehavior.SWOOP_TIME) / DT) + 3: b.update(e, p, DT)
+	assert_eq(b.state, GauntBehavior.State.CARRY, "lo ha agarrado")
+	assert_eq(b.victim, p)
+	var s0 := p.sanity
+	for k in 60: b.update(e, p, DT)
+	assert_gt(p.carried, 0.0, "va colgado")
+	assert_gt(p.lift, 0.5, "por el aire")
+	assert_gt(p.global_position.length(), 1.5, "se lo lleva")
+	assert_lt(p.sanity, s0)
+	var hp := p.health
+	for k in int((float(e.data.param("carry_time", 2.2)) - 1.0) / DT) + 2: b.update(e, p, DT)
+	assert_eq(b.state, GauntBehavior.State.RISE, "lo deja caer y sube")
+	assert_eq(p.carried, 0.0)
+	assert_lt(p.health, hp, "la caída duele")
+	assert_eq(b.drops, 1)
+
+func test_si_te_apartas_no_te_agarra() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var e := _gaunt(Vector3(4, 0, 0))
+	var b := _aim_and_swoop(e, p)
+	p.position = Vector3(4, 0, 4)
+	for k in int((float(e.data.param("grab_warn", 0.9)) + GauntBehavior.SWOOP_TIME) / DT) + 3: b.update(e, p, DT)
+	assert_null(b.victim)
+	assert_ne(b.state, GauntBehavior.State.CARRY)
+
+func test_golpearlo_lo_suelta() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var e := _gaunt(Vector3(4, 0, 0))
+	var b := _aim_and_swoop(e, p)
+	for k in int((float(e.data.param("grab_warn", 0.9)) + GauntBehavior.SWOOP_TIME) / DT) + 3: b.update(e, p, DT)
+	assert_eq(b.state, GauntBehavior.State.CARRY)
+	e.take_damage(Damage.new(e.health * 0.3, 0.0))
+	b.update(e, p, DT)
+	assert_true(b.freed, "con un buen golpe, lo suelta")
+	assert_eq(p.carried, 0.0)
+	assert_eq(b.drops, 0)
+
+func test_en_el_invitado_se_lleva_al_de_su_pc() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var e := _gaunt(Vector3(0.5, 0, 0))
+	var b := e.behavior as GauntBehavior
+	e.position = Vector3(0.5, 2.4, 0)
+	e.anim = "carry"
+	b.puppet_step(e, DT)
+	assert_eq(b.victim, p)
+	assert_gt(p.carried, 0.0)
+	assert_almost_eq(p.global_position.x, 0.5, 0.01, "colgado debajo")
+	var hp := p.health
+	e.anim = "fly"
+	b.puppet_step(e, DT)
+	assert_eq(p.carried, 0.0, "lo suelta")
+	assert_lt(p.health, hp)
+
+func test_las_flautas_aceleran_y_quitan_cordura() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	var dl := _dream("p4_n5")
+	dl._flute_next = 999.0
+	assert_eq(DreamLands.haste(), 1.0)
+	dl.play_flutes()
+	assert_eq(dl.flutes, 1)
+	var s0 := p.sanity
+	for k in int((dl.level.flute_warn + 1.0) / DT): dl._physics_process(DT)
+	assert_true(dl.fluting())
+	assert_almost_eq(DreamLands.haste(), dl.level.flute_haste, 0.001, "los enemigos corren más")
+	assert_almost_eq(s0 - p.sanity, dl.level.flute_sanity, 0.2, "y la cordura baja")
+	for k in int(dl.level.flute_time / DT) + 2: dl._physics_process(DT)
+	assert_false(dl.fluting(), "callan")
+	assert_eq(DreamLands.haste(), 1.0)
+
+func test_con_un_companero_cerca_baja_menos() -> void:
+	var p := _player("dyer", Vector3.ZERO)
+	_player("peaslee", Vector3(2, 0, 0))
+	var dl := _dream("p4_n5")
+	dl._flute_next = 999.0
+	dl.play_flutes()
+	for k in int(dl.level.flute_warn / DT) + 1: dl._physics_process(DT)
+	var s0 := p.sanity
+	for k in 60: dl._physics_process(DT)
+	assert_true(dl.company(p))
+	assert_almost_eq(s0 - p.sanity, dl.level.flute_sanity * 0.5, 0.15)
+	var dl2 := _dream("p4_n5", false)
+	dl2.remote({"a": "flutes"})
+	assert_eq(dl2.flutes, 1, "en el invitado, las del anfitrión")
+
+func test_la_larva_deja_charcos_que_quitan_cordura() -> void:
+	var p := _player("dyer", Vector3(6, 0, 0))
+	var e := _enemy("larva_otros", Vector3.ZERO, false)
+	for k in int(float(e.data.param("drop_every", 2.2)) / DT) + 2: e.behavior.update(e, p, DT)
+	var zones := world.fx.get_children().filter(func(n: Node) -> bool: return n is EnemyZone)
+	assert_false(zones.is_empty(), "deja un charco")
+	var z: EnemyZone = zones[0]
+	assert_eq(z.dps, 0.0, "no hace daño a la vida")
+	assert_gt(z.mental_dps, 0.0, "pero sí a la cordura")

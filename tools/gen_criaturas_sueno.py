@@ -28,6 +28,9 @@ Nivel 4, las bóvedas de Zin:
   ghast               salta como un canguro (anim_sapo), pálido y leproso, cara humana sin nariz ni frente
   gug                 gigante peludo y negro con la boca vertical y cuatro brazos (anim_profundo)
   gug_koth            el gran gug de la torre de Koth (jefe del nivel 4, escalado)
+Nivel 5, el yermo frío y Kadath:
+  descarnado          descarnado nocturno (anim_volador, 32/m): negro, gomoso, sin cara, cuernos y cola de púa
+  larva_otros         larva de los Otros Dioses (anim_blob): masa ciega y flotante que gotea
 
 Escribe models/<nombre>.json. Uso: python tools/gen_criaturas_sueno.py [nombres…]
 """
@@ -552,11 +555,110 @@ def gug_koth():
          (0.55, 0.08, 0.10), scars=(0.55, 0.50, 0.46), glow_eyes=True)
 
 
+# ---------------- nivel 5: el yermo frío y Kadath ----------------
+
+def descarnado():
+    """Descarnado nocturno (anim_volador: body, head, wing_l, wing_r; 32/m; mira hacia +Z): flaco y de forma
+    de hombre, negro y gomoso como piel de ballena, sin cara ninguna; dos cuernos que se curvan hacia dentro,
+    alas de murciélago y una cola con púa. Vuela tendido, con los brazos por delante para agarrar y las
+    piernas detrás."""
+    M = Model(S=2, seed=2320)
+    BK = (0.07, 0.07, 0.08); BK_L = (0.15, 0.15, 0.18); BK_D = (0.04, 0.04, 0.05)
+    HORN = (0.20, 0.18, 0.17); MEMB = (0.10, 0.09, 0.11); CLAW = (0.30, 0.28, 0.27)
+    rslab(M, B, BK, 3, 12, 0, 0, 12, 24, r=4, rt=4, rb=3)                         # el tronco, tendido
+    rslab(M, B, BK, 4, 11, 0, -13, 9, 8, r=3, rt=3, rb=2)                         # la cadera
+    for s in (-1, 1):                                                             # piernas flacas, detrás
+        x = 3 * s - (1 if s < 0 else 0)
+        for z in range(-16, -36, -1):
+            w = 2 if z > -28 else 1
+            for dx in range(w):
+                for y in (6, 7):
+                    M.put(x + dx * s, y - (1 if z < -30 else 0), z, B, BK)
+        for dz in (0, 1): M.put(x, 5, -36 - dz, B, CLAW)
+        for z in range(8, 22):                                                    # brazos, por delante
+            y = 4 - (z - 8) // 5
+            for dx in (0, s):
+                M.put(5 * s - (1 if s < 0 else 0) + dx, y, z, B, BK)
+                M.put(5 * s - (1 if s < 0 else 0) + dx, y + 1, z, B, BK)
+        for k in range(3):                                                        # zarpas abiertas
+            for dx in (-1, 0, 1): M.put(5 * s - (1 if s < 0 else 0) + dx, 1 - k // 2, 22 + k, B, CLAW)
+    for k in range(30):                                                           # la cola, que acaba en púa
+        z = -16 - k
+        y = 8 - k * 0.12 + 3 * math.sin(k / 29 * math.pi * 1.5)
+        M.put(0, int(y), z, B, BK_D)
+        if k < 10: M.put(-1, int(y), z, B, BK_D)
+    yt = int(8 - 29 * 0.12 + 3 * math.sin(math.pi * 1.5))
+    for i in range(5):                                                            # la púa, de flecha
+        for dx in range(-(4 - i) // 2, (4 - i) // 2 + 1): M.put(dx, yt, -46 - i, B, HORN)
+    rslab(M, H, BK, 7, 17, 0, 17, 10, 11, r=4, rt=4, rb=3)                        # la cabeza, lisa: sin cara
+    for s in (-1, 1):                                                             # los cuernos, hacia dentro
+        for k in range(10):
+            a = k / 9
+            x = s * (4 - 2.5 * a) - (1 if s < 0 else 0)
+            M.put(int(round(x)), 16 + int(a * 7), 15 - int(a * 4), H, HORN)
+            if k < 5: M.put(int(round(x)) + s, 16 + int(a * 7), 15 - int(a * 4), H, HORN)
+    for (x, y, z), v in M.V.items():                                              # brillo gomoso
+        if v[1] == BK and M.noise(x, y, z, 3.0) > 0.66: v[1] = BK_L
+    for part, s in (('wing_l', -1), ('wing_r', 1)):                              # alas de murciélago
+        span = 40
+        for i in range(span):
+            t = i / (span - 1)
+            z0 = int(-14 + 6 * t + 5 * abs(math.sin(t * math.pi * 3)))            # el borde festoneado
+            z1 = int(9 - 6 * t * t)
+            for z in range(z0, z1):
+                x = s * (6 + i) - (1 if s < 0 else 0)
+                c = MEMB
+                if z >= z1 - 2 or i % 10 == 0: c = BK_L                          # el hueso y los dedos
+                M.put(x, 9, z, part, c)
+                if z >= z1 - 2 or i < 5: M.put(x, 10, z, part, c)
+    piv = {'body': [0, 0, 0], 'head': [0, 10, 12], 'wing_l': [-6, 9, 0], 'wing_r': [6, 9, 0]}
+    n = M.export('models/descarnado.json', piv, jitter=0.0, pivots_in_voxels=True, roughness=0.3, specular=0.7)
+    print('descarnado', n, 'voxels')
+
+
+def larva_otros():
+    """Larva de los Otros Dioses (anim_blob: body, top y bud; 48/m; mira hacia +Z): una masa ciega y blanda,
+    gris violácea, que flota a un palmo del suelo; agujeros como bocas que laten en violeta, pliegues, y una
+    maraña de hilos que le cuelgan por debajo y gotean."""
+    M = cu.new(2330)
+    SK = (0.46, 0.40, 0.52); SK_D = (0.32, 0.26, 0.38); SK_L = (0.62, 0.56, 0.66)
+    HOLE = (0.10, 0.04, 0.12); GLOW = (0.78, 0.45, 1.0)
+    rslab(M, B, SK, 10, 30, 0, 0, 28, 26, r=10, rt=9, rb=7)                      # la masa, sin tocar el suelo
+    rslab(M, 'top', SK, 26, 38, 1, -2, 18, 16, r=7, rt=6, rb=3)
+    rslab(M, 'bud', SK, 12, 24, 0, 0, 14, 12, r=5, rt=4, rb=2)                   # el brote, dentro (anim_blob)
+    for (x, y, z), v in M.V.items():
+        n = M.noise(x, y, z, 4.0)
+        if n > 0.70: v[1] = SK_D                                                  # pliegues
+        elif n < 0.25: v[1] = SK_L
+    for i, (x, y) in enumerate(((-6, 22), (5, 18), (0, 27), (-9, 15), (8, 26), (-2, 13))):
+        z = M.front(x, y)                                                         # las bocas, ciegas
+        if z is None: continue
+        r = 2 if i % 2 == 0 else 1
+        for dx in range(-r, r + 1):
+            for dy in range(-r, r + 1):
+                if dx * dx + dy * dy > r * r + 0.5: continue
+                zz = M.front(x + dx, y + dy)
+                if zz is None: continue
+                edge = dx * dx + dy * dy >= r * r - 0.5
+                M.V[(x + dx, y + dy, zz)] = [M.V[(x + dx, y + dy, zz)][0], GLOW if edge else HOLE, 1 if edge else 0]
+    for i in range(26):                                                           # los hilos que cuelgan
+        a = M.hsh(i, 0, 1) * math.tau
+        r = 4 + M.hsh(i, 1, 1) * 8
+        x, z = int(r * math.cos(a)), int(r * math.sin(a))
+        L = 3 + int(M.hsh(i, 2, 1) * 7)
+        for k in range(L):
+            M.put(x, 10 - k, z, B, SK_D if k < L - 1 else GLOW, 1 if k == L - 1 else 0)
+    piv = {'body': [0, 10, 0], 'top': [1, 27, -2], 'bud': [0, 10, 0]}
+    n = M.export('models/larva_otros.json', piv, jitter=0.0, pivots_in_voxels=True, roughness=0.35, specular=0.6)
+    print('larva_otros', n, 'voxels')
+
+
 ALL = {'zoog': zoog, 'zoog_copas': zoog_copas, 'zoog_anciano': zoog_anciano,
        'mercader_leng': mercader_leng, 'remero_lunar': remero_lunar, 'bestia_lunar_mayor': bestia_lunar_mayor,
        'escotilla': escotilla,
        'shantak': shantak, 'arana_leng': arana_leng, 'arana_madre': arana_madre, 'sacerdote_leng': sacerdote_leng,
-       'telarana': telarana, 'ghast': ghast, 'gug': gug, 'gug_koth': gug_koth}
+       'telarana': telarana, 'ghast': ghast, 'gug': gug, 'gug_koth': gug_koth,
+       'descarnado': descarnado, 'larva_otros': larva_otros}
 
 if __name__ == '__main__':
     for n in (sys.argv[1:] or ALL):

@@ -136,6 +136,15 @@ func is_survival() -> bool:
 @export var ghouls_pickman := 2
 @export var ghouls_life := 12.0
 @export var ghouls_dps := 30.0
+## Nivel 5: las flautas de los Otros Dioses. Cada `flute_every` s, tras `flute_warn` s, suenan `flute_time` s: los
+## enemigos van `flute_haste` veces más deprisa y la cordura baja `flute_sanity` por segundo (a la mitad con un
+## compañero a menos de `flute_near` m).
+@export var flute_every := 0.0                 ## s medios entre veces (0: sin flautas)
+@export var flute_warn := 1.5
+@export var flute_time := 10.0
+@export var flute_haste := 1.3
+@export var flute_sanity := 2.5
+@export var flute_near := 5.0
 @export_group("Dinero (D-31)")
 @export var money_bonus := 100                 ## dólares al superar el nivel
 @export var chest_every := 90.0                ## s medios entre baúles arcanos (0: ninguno)

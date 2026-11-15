@@ -1,7 +1,7 @@
 class_name OozeBehavior
 extends EnemyBehavior
 ## Antiguo mutilado (hito 4.4): persigue despacio y cada `drop_every` s deja un charco del
-## limo de los shoggoths (EnemyZone) que daña a quien lo pisa.
+## limo de los shoggoths (EnemyZone) que daña a quien lo pisa. `slime_color`: otro color de charco.
 var _drop := 0.0
 
 func start(e: Enemy) -> void:
@@ -22,4 +22,5 @@ func _slime(e: Enemy, delta: float) -> void:
 		var z := EnemyZone.new().setup(e.world, e.global_position, float(e.data.param("slime_radius", 1.0)),
 			float(e.data.param("slime_life", 6.0)), float(e.data.param("slime_dps", 4.0)), float(e.data.param("slime_mental", 2.0)))
 		z.who = e.data.id
+		z.color = e.data.param("slime_color", z.color)   # larvas de los Otros Dioses (21.10): violeta
 		e.world.fx.add_child(z)

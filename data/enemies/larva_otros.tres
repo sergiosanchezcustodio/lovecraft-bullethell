@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"larva_otros"
+display_name = "Larva de los Otros Dioses"
+model = "larva_otros"
+model_scale = 1.2
+tier = 3
+spawn_weight = 0.9
+elite = false
+tags = Array[StringName]([&"otros_dioses"])
+max_health = 95.0
+hit_radius = 0.7
+body_radius = 0.6
+move_speed = 1.6
+xp = 4.5
+money = 5
+contact_physical = 3.0
+contact_mental = 8.0
+movement = &"ooze"
+params = {"drop_every": 3.2, "slime_color": Color(0.24, 0.1, 0.32, 1), "slime_dps": 0.0, "slime_life": 5.0, "slime_mental": 5.0, "slime_radius": 0.95}

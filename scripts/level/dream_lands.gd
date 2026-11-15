@@ -18,6 +18,8 @@ extends Node
 ##   faroles de los jugadores y la de los hongos que brillan (`glow_models`, en `glows`). **Los necrófagos de
 ##   Pickman** suben de la cripta (`crypt` en el JSON) cada `ghouls_every` s y cazan un rato (`Reanimated`,
 ##   como los de los lienzos); si juega Pickman, suben más.
+## - Nivel 5, la cima de Kadath: **las flautas de los Otros Dioses** suenan a ratos (`flute_every`): mientras
+##   duran, los enemigos van más deprisa (`haste()`, que lee Enemy) y la cordura baja, menos con un compañero cerca.
 ## En red, la manada la decide el anfitrión (suceso "dream"); los gatos cazan en todos los PC, pero solo
 ## el anfitrión hace daño (los enemigos son suyos).
 
@@ -59,6 +61,9 @@ var crypt_at := Vector3.INF
 var ghouls: Array = []                 ## sin tipo: los que acaban quedan liberados
 var risings := 0                       ## subidas de necrófagos (tests)
 var _ghoul_next := 0.0
+var flutes := 0                        ## veces que han sonado (tests)
+var _flute_next := 0.0
+var _flute_t := -1.0                   ## s desde el aviso de las que suenan (-1: callan)
 var _rng := RandomNumberGenerator.new()
 
 func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node = null) -> DreamLands:
@@ -79,6 +84,7 @@ func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node 
 	var cr: Array = layout.get("crypt", [])
 	if cr.size() >= 2: crypt_at = Vector3(float(cr[0]), 0.0, float(cr[1]))
 	_ghoul_next = level.ghouls_every * 0.5 if level != null else 0.0
+	_flute_next = level.flute_every * 0.6 if level != null else 0.0
 	_next = cats_every() * 0.6
 	var g: Array = layout.get("galley", [])
 	if g.size() >= 2: galley_at = Vector3(float(g[0]), 0.0, float(g[1]))
@@ -93,6 +99,15 @@ func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node 
 
 func _exit_tree() -> void:
 	if current == self: current = null
+
+## Lo que corren los enemigos ahora (las flautas de Kadath; 1 sin ellas).
+static func haste() -> float:
+	if current == null or not is_instance_valid(current) or not current.fluting(): return 1.0
+	return current.level.flute_haste
+
+## ¿Suenan las flautas?
+func fluting() -> bool:
+	return _flute_t >= 0.0 and level != null and _flute_t >= level.flute_warn
 
 ## s hasta la próxima manada (0: sin gatos).
 func cats_every() -> float:
@@ -115,6 +130,7 @@ func _physics_process(delta: float) -> void:
 	if host: _galley_step(delta)
 	_gust_step(delta)
 	if host: _ghoul_step(delta)
+	_flute_step(delta)
 
 # ------------------------------------------------------------------ los gatos de Ulthar
 
@@ -352,6 +368,42 @@ func rise_ghouls(seed_v: int) -> void:
 	world.sfx("rise_stone", crypt_at)
 	if host: _net({"a": "ghouls", "s": seed_v})
 
+# ------------------------------------------------------------------ las flautas de los Otros Dioses
+
+func _flute_step(delta: float) -> void:
+	if level.flute_every <= 0.0: return
+	if host and _flute_t < 0.0:
+		_flute_next -= delta
+		if _flute_next <= 0.0:
+			_flute_next = level.flute_every * _rng.randf_range(0.85, 1.15)
+			play_flutes()
+	if _flute_t < 0.0: return
+	_flute_t += delta
+	if _flute_t >= level.flute_warn + level.flute_time:
+		_flute_t = -1.0
+		if game != null and game.has_method("announce"): game.announce("Callan las flautas", 1.5)
+		return
+	if not fluting(): return
+	for q in world.players:
+		if q.remote or q.health <= 0.0: continue
+		q.sanity = maxf(0.0, q.sanity - level.flute_sanity * delta * (0.5 if company(q) else 1.0))
+
+## ¿Tiene `q` a un compañero vivo cerca? (con él, las flautas quitan menos)
+func company(q: Node3D) -> bool:
+	for o in world.players:
+		if o == q or o.health <= 0.0: continue
+		if o.global_position.distance_to(q.global_position) <= level.flute_near: return true
+	return false
+
+## Empiezan las flautas (en el invitado, cuando lo dice el anfitrión).
+func play_flutes() -> void:
+	flutes += 1
+	_flute_t = 0.0
+	if game != null and game.has_method("announce"): game.announce("Suenan las flautas de los Otros Dioses…", 2.5)
+	var at := world.players[0].global_position if not world.players.is_empty() else Vector3.ZERO
+	Auto.sfx_at("chant", at)
+	if host: _net({"a": "flutes"})
+
 # ------------------------------------------------------------------ los rubíes
 
 ## Vigila a un enemigo que acaba de aparecer: si es de los que llevan rubíes, puede soltar uno al caer.
@@ -375,6 +427,7 @@ func remote(d: Dictionary) -> void:
 		"galley": _say_galley()
 		"gust": gust(float(d.get("r", 0.0)))
 		"ghouls": rise_ghouls(int(d.get("s", 0)))
+		"flutes": play_flutes()
 		"hatch":
 			hatch_broken = true
 			_say_hatch()

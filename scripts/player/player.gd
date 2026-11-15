@@ -353,6 +353,9 @@ func _physics_process_step(delta: float) -> void:
 	if snare > 0.0:                                   # en una red (21.10): quieto hasta que se suelta o esquiva
 		snare = 0.0 if motor.is_dodging() else snare - delta
 		if snare > 0.0: velocity = Vector3.ZERO
+	if carried > 0.0:                                 # colgado de un descarnado (21.10)
+		carried -= delta
+		velocity = Vector3.ZERO
 	velocity += push
 	push = Vector3.ZERO
 	if ss.is_kind(&"huida"): velocity *= rules.flee_speed
@@ -472,6 +475,9 @@ var last_hit := {}
 var hud_lie := Vector2(-1, -1)
 ## Objetivo de la reliquia (hito 13.5, `Objective`): quien la lleva anda más despacio.
 var carry_slow := 1.0
+var carried := 0.0                     ## s que sigue colgado de un descarnado nocturno (GauntBehavior, 21.10): no anda, lo coloca
+                                       ## él y lo renueva en cada paso (si el descarnado muere, cae solo)
+var lift := 0.0                        ## m que lo levanta el descarnado (solo el modelo; baja solo al soltarlo)
 var snare := 0.0                       ## s que sigue atrapado en una red de las arañas de Leng (SpiderWeb, 21.10): no anda; esquivar lo suelta
 var _hp_seen := 0.0                     ## vida del paso anterior (pacto Sin consuelo)
 ## Diario (hito 13.10, `Diary`): vida y cordura perdidas por minuto del nivel, veces que ha
@@ -655,6 +661,9 @@ func _process_step(delta: float) -> void:
 	_keep_above_ground(delta)
 	_wade = move_toward(_wade, 1.0 if in_water() else 0.0, WadeSplash.EASE * delta)
 	visual.position.y -= _wade * WadeSplash.SINK        # metido en el agua hasta los tobillos
+	if lift > 0.0:                                      # colgado de un descarnado (21.10)
+		if carried <= 0.0: lift = move_toward(lift, 0.0, delta * 7.0)   # cae
+		visual.position.y += lift
 	_splash.emitting = _wade > 0.5 and motor.velocity.length() > 0.3
 	_ripple_step()
 	var style := data.dodge_style
