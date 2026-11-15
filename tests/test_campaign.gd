@@ -40,3 +40,12 @@ func test_siguiente_nivel_dentro_de_la_parte() -> void:
 	assert_true(Campaign.part_unlocked(0, []))
 	assert_false(Campaign.part_unlocked(1, ["p1_n1"]))
 	assert_true(Campaign.part_unlocked(1, ["p1_n5"]))
+
+## Los niveles que aún no están en el mapa (la parte 4 hasta el 21.12) se encadenan por el nombre.
+func test_niveles_fuera_del_mapa_por_el_nombre() -> void:
+	assert_eq(Campaign.next_in_part("p4_n1"), "p4_n2")
+	assert_eq(Campaign.next_in_part("p4_n4"), "p4_n5")
+	assert_eq(Campaign.next_in_part("p4_n5"), "", "el último de la parte no tiene siguiente")
+	assert_eq(Campaign.number_of("p4_n4"), 4)
+	assert_eq(Campaign.next_in_part("p3_n5"), "", "los del mapa, como siempre")
+	assert_eq(Campaign.number_of("noche_color"), 1)

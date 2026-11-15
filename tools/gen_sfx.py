@@ -12,6 +12,7 @@ Uso: python tools/gen_sfx.py <carpeta con los packs de Kenney descomprimidos>
      python tools/gen_sfx.py --ambiente   (solo los del ambiente de los escenarios)
      python tools/gen_sfx.py --buzo       (solo la respiración del casco de buzo y la linterna que falla)
      python tools/gen_sfx.py --sueno      (solo el sueño de Kuranes)
+     python tools/gen_sfx.py --kadath     (solo las flautas de los Otros Dioses)
      python tools/gen_sfx.py --fase20     (solo los de Pickman, Ward, Gilman, Tillinghast y Derby)
      python tools/gen_sfx.py --sucesos    (solo los de los sucesos de la noche: augurio, ventisca y estrellas)
 """
@@ -1265,6 +1266,49 @@ def dunwich():
     save('horror_cry', tail(x, 0.8))
 
 
+def kadath():
+    """Las flautas de los Otros Dioses (hito 21.10, nivel 5 de la parte 4): «el redoble sordo y enloquecedor de
+    tambores viles y el gemido fino y monótono de flautas malditas». Tres flautas finas, desafinadas entre sí
+    un cuarto de tono, repiten una figura corta que vacila; debajo, tambores sordos sin compás fijo. Unos 5 s,
+    con un final que se deshace."""
+    r = np.random.default_rng(2110)
+    dur = 5.2
+    n = int(dur * SR)
+    tt = t(dur)
+    out = np.zeros(n)
+    figure = [0, 1, 0, -2, 0, 1, 3, 1]             # semitonos: monótona, da vueltas sobre sí misma
+    base = [740.0, 740.0 * 2 ** (0.5 / 12), 740.0 * 2 ** (-6.5 / 12)]   # tres voces: unísono roto y un trítono
+    for v, f0 in enumerate(base):
+        step = 0.32 + 0.04 * v                      # cada flauta a su paso: se desfasan
+        f = np.zeros(n)
+        for i in range(n):
+            k = int((tt[i] + 0.11 * v) / step) % len(figure)
+            f[i] = f0 * 2 ** (figure[k] / 12)
+        f = lp(f, 18)                               # deslizan de una nota a otra
+        f *= 1 + 0.012 * np.sin(2 * np.pi * (5.2 + v * 0.7) * tt) + 0.006 * r.standard_normal(n).cumsum() / np.sqrt(n)
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        tone = np.sin(ph) + 0.18 * np.sin(2 * ph) + 0.07 * np.sin(3 * ph)
+        breath = bp(r.standard_normal(n), 1800, 6000) * 0.22
+        out += (tone + breath) * (0.5 if v < 2 else 0.32)
+    drum = np.zeros(n)                              # tambores sordos, a destiempo
+    at = 0.05
+    while at < dur - 0.3:
+        d = 0.35
+        k = int(at * SR)
+        m = min(int(d * SR), n - k)
+        tk = t(d)[:m]
+        hit = np.sin(2 * np.pi * (70 + 40 * np.exp(-tk * 25)) * tk) * np.exp(-tk * 9)
+        hit += lp(r.standard_normal(m), 400) * np.exp(-tk * 30) * 0.6
+        drum[k:k + m] += hit * r.uniform(0.6, 1.0)
+        at += r.choice([0.27, 0.41, 0.55, 0.27])
+    out = out * 0.55 + lp(drum, 300) * 1.4
+    fade_in = int(0.4 * SR)
+    out[:fade_in] *= np.linspace(0, 1, fade_in) ** 2
+    fade_out = int(1.4 * SR)
+    out[-fade_out:] *= np.linspace(1, 0, fade_out) ** 1.5
+    save('flutes', out)
+
+
 def pnakotus():
     """La sombra fuera del tiempo (hito 21.15). El pólipo: un silbido hueco y quebrado, como el viento por
     un tubo, que sube y baja con aire alrededor (dos variantes); antes de embestir, uno que sube de golpe.
@@ -1396,6 +1440,8 @@ if __name__ == '__main__':
         dunwich()
     elif '--pnakotus' in sys.argv:                             # solo los de Pnakotus (hito 21.15)
         pnakotus()
+    elif '--kadath' in sys.argv:                               # solo las flautas de los Otros Dioses (hito 21.10)
+        kadath()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)

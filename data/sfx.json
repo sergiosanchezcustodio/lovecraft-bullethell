@@ -944,6 +944,7 @@
 		"polyp_cry": {"db": -5, "pitch": [0.95, 1.03], "voices": 1, "gap": 1.5, "files": ["polyp_cry.wav"]},
 		"polyp_breath": {"db": -7, "pitch": [0.97, 1.03], "voices": 1, "gap": 2.0, "files": ["polyp_breath.wav"]},
 		"polyp_vanish": {"db": -8, "pitch": [0.95, 1.05], "voices": 1, "gap": 1.0, "files": ["polyp_vanish.wav"]},
+		"flutes": {"db": -9, "pitch": [0.97, 1.03], "voices": 1, "gap": 3.0, "files": ["flutes.wav"]},
 		"rise_sand": {"db": -15, "pitch": [0.55, 0.72], "voices": 2, "gap": 0.2, "files": ["step_mud_0.wav", "step_mud_1.wav", "step_mud_2.wav", "step_mud_3.wav"]},
 		"step_sand": {"db": -28, "pitch": [0.9, 1.12], "voices": 3, "gap": 0.05, "files": ["step_sand_0.wav", "step_sand_1.wav", "step_sand_2.wav", "step_sand_3.wav"]},
 		"torch_crackle": {

@@ -45,13 +45,23 @@ static func next_in_part(id: String) -> String:
 	for i in all.size() - 1:
 		if all[i].id == id and all[i + 1].part == all[i].part:
 			return String(all[i + 1].id) if exists(String(all[i + 1].id)) else ""
-	return ""
+	if all.any(func(l: Dictionary) -> bool: return String(l.id) == id): return ""
+	var pn := _by_name(id)                            # aún no está en el mapa (la parte 4 hasta el 21.12):
+	if pn.x == 0 or pn.y >= 5: return ""              # el siguiente por el nombre, si existe
+	var nxt := "p%d_n%d" % [pn.x, pn.y + 1]
+	return nxt if exists(nxt) else ""
 
 ## Número de nivel dentro de su parte (1..5).
 static func number_of(id: String) -> int:
 	for l in levels():
 		if l.id == id: return int(l.number)
-	return 1
+	var pn := _by_name(id)
+	return pn.y if pn.x > 0 else 1
+
+## Parte y número de un id «pX_nY» (0, 0 si no lo es).
+static func _by_name(id: String) -> Vector2i:
+	var m := RegEx.create_from_string("^p([0-9]+)_n([0-9]+)$").search(id)
+	return Vector2i(int(m.get_string(1)), int(m.get_string(2))) if m != null else Vector2i.ZERO
 
 ## Último nivel de la campaña (el de Cthulhu): tras él, el epílogo (hito 13.11).
 static func last_id() -> String:

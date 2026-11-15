@@ -470,7 +470,7 @@ func play_flutes() -> void:
 	_flute_t = 0.0
 	if game != null and game.has_method("announce"): game.announce("Suenan las flautas de los Otros Dioses…", 2.5)
 	var at := world.players[0].global_position if not world.players.is_empty() else Vector3.ZERO
-	Auto.sfx_at("chant", at)
+	Auto.sfx_at("flutes", at)
 	if host: _net({"a": "flutes"})
 
 # ------------------------------------------------------------------ los rubíes
