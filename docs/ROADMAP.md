@@ -729,8 +729,8 @@ Datos de partida (`docs/RENDIMIENTO.md`, 30-10-2026): con 80 enemigos manda la C
 |---|---|---|
 | 21.8 | **Diseño en el GDD:** niveles, criaturas, jefe, relatos y frases de Carter y Kuranes en esta parte. Se aprueba antes de hacer nada | Hecho (14-11-2026): GDD 2.5, aprobado por el autor (D-53): cuarta parte de la campaña, una mecánica propia por nivel, el sumo sacerdote de jefe intermedio en el nivel 3 y algo más de color |
 | 21.9 | **Arenas:** Ulthar y el bosque encantado; el puerto de Dylath-Leen y la galera negra; la meseta de Leng; el mundo inferior de los gugs; Kadath en el yermo frío | Hecho (14-11-2026), pendiente de revisión |
-| 21.10 | **Criaturas:**<br>- Zoogs: pequeños y en enjambre.<br>- Bestias lunares y hombres de Leng.<br>- Gugs: enormes y lentos.<br>- Ghasts: saltan y odian la luz del farol.<br>- Descarnados nocturnos: te agarran y te llevan por el aire | Hecho (14 y 15-11-2026), pendiente de revisión: las criaturas y lo propio de los cinco niveles (`DreamLands`), con los jefes de los niveles 1 a 4 y el sumo sacerdote; el nivel 5 espera a Nyarlathotep (21.11) |
-| 21.11 | **Jefe:** Nyarlathotep, el Caos reptante, que cambia de forma a lo largo del combate (el faraón negro, el ser sin rostro) | Propuesto |
+| 21.10 | **Criaturas:**<br>- Zoogs: pequeños y en enjambre.<br>- Bestias lunares y hombres de Leng.<br>- Gugs: enormes y lentos.<br>- Ghasts: saltan y odian la luz del farol.<br>- Descarnados nocturnos: te agarran y te llevan por el aire | Hecho (14 y 15-11-2026), pendiente de revisión: las criaturas y lo propio de los cinco niveles (`DreamLands`), con los jefes de los niveles 1 a 4 y el sumo sacerdote; y el nivel 5, con Nyarlathotep (21.11) |
+| 21.11 | **Jefe:** Nyarlathotep, el Caos reptante, que cambia de forma a lo largo del combate (el faraón negro, el ser sin rostro) | Hecho (15-11-2026), pendiente de revisión: tres formas (faraón negro, enjambre y ser sin rostro), `NyarlaBehavior`, jefe de p4_n5 |
 | 21.12 | **Lo que la rodea:** relatos, mapa, Biblioteca, bestiario, trofeos y desafíos de la parte | Propuesto |
 
 ### Bloque D: noches sueltas (D-52, frente al bloque C)

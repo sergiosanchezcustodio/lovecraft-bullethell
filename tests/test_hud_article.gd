@@ -3,6 +3,7 @@ extends GutTest
 
 func test_articulos() -> void:
 	assert_eq(Hud.with_article("Primigenio menor"), "el Primigenio menor")
+	assert_eq(Hud.with_article("Nyarlathotep, el Caos reptante"), "Nyarlathotep, el Caos reptante")
 	assert_eq(Hud.with_article("Emanación de la puerta"), "la Emanación de la puerta")
 	assert_eq(Hud.with_article("El viejo Castro"), "El viejo Castro", "ya lo lleva")
 	assert_eq(Hud.with_article("Madre Hydra"), "Madre Hydra", "nombre propio")

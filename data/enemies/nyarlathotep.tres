@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/nyarla_abanico.tres" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/nyarla_anillo.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/nyarla_forma.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"nyarlathotep"
+display_name = "Nyarlathotep, el Caos reptante"
+alive = true
+model = "nyarla_faraon"
+model_scale = 1.5
+unique = true
+tier = 5
+spawn_weight = 1.0
+elite = true
+tags = Array[StringName]([&"otros_dioses"])
+max_health = 5500.0
+hit_radius = 1.3
+body_radius = 1.0
+move_speed = 1.6
+xp = 140.0
+money = 180
+contact_physical = 10.0
+contact_mental = 6.0
+movement = &"nyarla"
+params = {"keep": 7.0, "fan_pattern": ExtResource("2"), "fan_every": 3.5, "ring_pattern": ExtResource("3"), "ring_every": 4.0, "minion": ExtResource("4"), "minion_every": 10.0, "minion_count": 3, "swarm_count": 8, "swarm_cap": 12, "words_every": 9.0, "shift_shield": 3.0, "recompose_every": 7.0, "recompose_warn": 1.3, "recompose_radius": 2.6, "recompose_damage": 14.0, "flame_every": 5.0, "flame_count": 4, "flame_warn": 1.1, "flame_radius": 1.6, "flame_damage": 12.0, "dread": 1.2, "form_1": "nyarla_faraon", "scale_1": 1.5, "form_2": "nyarla_nucleo", "scale_2": 2.0, "form_3": "nyarla_sin_rostro", "scale_3": 3.0, "phase_text_2": "Se deshace en un enjambre de formas…", "phase_text_3": "El ser sin rostro llena el salón de los dioses", "lines": ["Has subido muy alto, soñador.", "Los dioses de la tierra no te esperan aquí.", "Kadath no es para los que despiertan.", "Soy el alma y el mensajero de los Otros Dioses.", "Mira tu ciudad del crepúsculo… y olvídala.", "Azathoth toca la flauta en el centro de todo."]}
+attack_cooldown = 99.0
+attack_range = 0.0

@@ -31,6 +31,11 @@ Nivel 4, las bóvedas de Zin:
 Nivel 5, el yermo frío y Kadath:
   descarnado          descarnado nocturno (anim_volador, 32/m): negro, gomoso, sin cara, cuernos y cola de púa
   larva_otros         larva de los Otros Dioses (anim_blob): masa ciega y flotante que gotea
+El jefe, Nyarlathotep (hito 21.11), una forma por fase:
+  nyarla_faraon       el faraón negro (anim_humano): túnica de colores, nemes y corona que brilla
+  nyarla_nucleo       la forma del centro del enjambre (anim_blob): masa negra de ojos y manos
+  nyarla_forma        una forma del enjambre (anim_volador): un ojo con alas y manos
+  nyarla_sin_rostro   el ser sin rostro (anim_humano): negro, alas enormes y cabeza en cono sin cara
 
 Escribe models/<nombre>.json. Uso: python tools/gen_criaturas_sueno.py [nombres…]
 """
@@ -653,12 +658,210 @@ def larva_otros():
     print('larva_otros', n, 'voxels')
 
 
+# ---------------- el jefe: Nyarlathotep (hito 21.11) ----------------
+
+def nyarla_faraon():
+    """Nyarlathotep, el faraón negro (fase 1 del jefe, anim_humano): alto y delgado, la piel negra como la
+    obsidiana con un brillo de bronce, la túnica larga de colores a franjas (oro, lapislázuli, granate y
+    turquesa) con un pectoral ancho, el nemes a rayas de oro y azul y la corona, una cobra de oro que brilla
+    sobre la frente; los ojos, dos ranuras de luz dorada."""
+    MATS = {}
+    def mat(col, m):
+        MATS[col] = m
+        return col
+    SKIN = mat((0.10, 0.08, 0.08), 'piel'); SKIN_L = (0.30, 0.20, 0.12)
+    GOLD = (0.92, 0.70, 0.22); GOLD_D = (0.62, 0.42, 0.10)
+    LAPIS = mat((0.14, 0.22, 0.62), 'lona'); GARNET = mat((0.55, 0.10, 0.14), 'lona')
+    TURQ = mat((0.18, 0.62, 0.60), 'lona'); LINEN = mat((0.86, 0.82, 0.70), 'lona')
+    EYE = (1.0, 0.85, 0.35); CROWN = (1.0, 0.82, 0.30)
+    STRIPES = (GOLD, LAPIS, GARNET, TURQ, LAPIS, GARNET)
+    M = cu.new(2410)
+    for s_, _, shin, _, _ in cu.sides():
+        slab(M, shin, GOLD_D, 0, 3, 5 * s_, 3, 7, 7, 10, 9, ch=1)                  # sandalias de oro
+    cu.legs(M, SKIN, bottom=3)
+    cu.torso(M, LINEN, b=0, bottom=36)
+    cu.skirt(M, LINEN, 2, top=44, b=0, flare=4, depth=13)
+    for (x, y, z), v in M.V.items():                                               # las franjas de la túnica
+        if v[0] not in (T, 'skirt') or v[1] != LINEN: continue
+        if y < 44:
+            band = (y // 4) % len(STRIPES)
+            v[1] = STRIPES[band] if (y % 4) else GOLD_D
+        elif y >= 54 and z > 0 and math.hypot(x + 0.5, (y - 62) * 1.4) < 11:     # el pectoral, en arcos
+            r = int(math.hypot(x + 0.5, (y - 62) * 1.4))
+            v[1] = (GOLD, LAPIS, TURQ, GOLD, GARNET)[r // 2 % 5]
+    cu.belt(M, GOLD, y=44, b=0, h=2, buckle=GARNET)
+    cu.neck(M, SKIN)
+    cu.arms(M, SKIN, SKIN, b=0, slim=True)
+    for (x, y, z), v in M.V.items():                                               # brazaletes de oro
+        if v[0] in ('fore_l', 'fore_r', 'arm_l', 'arm_r') and y in (31, 32, 47, 48): v[1] = GOLD
+    cu.head(M, SKIN, SKIN, ears=False, nose=True, w=14.0, d=14.0)
+    for (x, y, z), v in M.V.items():
+        if v[0] == H and v[1] == SKIN and M.noise(x, y, z, 3.0) > 0.72: v[1] = SKIN_L
+    for x in range(-5, 5):                                                         # los ojos: ranuras de luz
+        if abs(x + 0.5) < 1.5: continue
+        z = M.front(x, 73)
+        if z is not None: M.V[(x, 73, z)] = [H, EYE, 1]
+    zc = M.front(0, 65)
+    if zc is not None:                                                             # la barba postiza, de oro
+        for x in (-1, 0):
+            for y in range(58, 65): M.put(x, y, zc, H, GOLD if y % 2 else GOLD_D)
+    for (x, y, z), v in list(M.V.items()):                                         # el nemes, a rayas
+        if v[0] != H or y < 77: continue
+        if z < 5 or y >= 80: v[1] = GOLD if (y // 2) % 2 else LAPIS
+    for y in range(58, 80):                                                        # sus faldones, a los lados
+        w = 8 + (80 - y) // 6
+        for s in (-1, 1):
+            for dz in range(-6, 3):
+                x = s * w - (1 if s < 0 else 0)
+                M.put(x, y, dz, H, GOLD if (y // 2) % 2 else LAPIS)
+    for k in range(8):                                                             # la corona
+        r = 5 - k // 2
+        for x in range(-r, r):
+            for z in range(-r, r): M.put(x, 86 + k, z - 1, H, CROWN if k < 6 else GOLD, 1 if k >= 5 else 0)
+    zf = M.front(0, 80)
+    if zf is not None:                                                             # la cobra, sobre la frente
+        for y in range(78, 86):
+            for x in (-1, 0): M.put(x, y, zf + 1, H, CROWN, 1)
+    cu.finish(M, 'nyarla_faraon', dict(MATS), flat=(GOLD, GOLD_D, EYE, CROWN), b=0, skirt=True, top=94.0)
+
+
+def nyarla_nucleo():
+    """Nyarlathotep, el enjambre (fase 2, anim_blob: body, top y bud; 48/m): la forma del centro, una masa
+    negra que hierve de ojos que se abren y manos a medio hacer; por dentro, un fulgor violeta."""
+    M = cu.new(2420)
+    BK = (0.06, 0.05, 0.08); BK_L = (0.18, 0.14, 0.24); HAND = (0.12, 0.10, 0.14)
+    EYE = (1.0, 0.80, 0.35); PUPIL = (0.08, 0.02, 0.02); GLOW = (0.70, 0.35, 1.0)
+    rslab(M, B, BK, 4, 30, 0, 0, 30, 28, r=11, rt=10, rb=8)
+    rslab(M, 'top', BK, 26, 42, 0, -1, 20, 18, r=8, rt=7, rb=3)
+    rslab(M, 'bud', GLOW, 10, 24, 0, 0, 12, 12, r=5, rt=4, rb=2)
+    for (x, y, z), v in M.V.items():
+        if v[1] == BK and M.noise(x, y, z, 3.5) > 0.68: v[1] = BK_L
+    for i in range(18):                                                            # los ojos, por todas partes
+        x = int(-12 + M.hsh(i, 3, 1) * 24)
+        y = 8 + int(M.hsh(i, 4, 1) * 30)
+        z = M.front(x, y)
+        if z is None: continue
+        r = 2 if i % 3 == 0 else 1
+        for dx in range(-r, r + 1):
+            for dy in range(-r, r + 1):
+                if dx * dx + dy * dy > r * r + 0.5: continue
+                zz = M.front(x + dx, y + dy)
+                if zz is None: continue
+                c = PUPIL if dx == 0 and dy == 0 else EYE
+                M.V[(x + dx, y + dy, zz)] = [M.V[(x + dx, y + dy, zz)][0], c, 0 if c == PUPIL else 1]
+    for i in range(7):                                                             # manos que salen de la masa
+        a = i / 7 * math.tau + 0.4
+        bx, bz = 13 * math.cos(a), 12 * math.sin(a)
+        y0 = 10 + (i * 5) % 18
+        for k in range(8):
+            x = int(bx + math.cos(a) * k); z = int(bz + math.sin(a) * k); y = y0 + k // 3
+            M.put(x, y, z, B, HAND); M.put(x, y + 1, z, B, HAND)
+        for f in range(-2, 3):                                                     # los dedos
+            for k in range(3):
+                x = int(bx + math.cos(a) * (8 + k) - math.sin(a) * f)
+                z = int(bz + math.sin(a) * (8 + k) + math.cos(a) * f)
+                M.put(x, y0 + 3 + k, z, B, HAND)
+    piv = {'body': [0, 4, 0], 'top': [0, 27, -1], 'bud': [0, 10, 0]}
+    n = M.export('models/nyarla_nucleo.json', piv, jitter=0.0, pivots_in_voxels=True, roughness=0.35, specular=0.6)
+    print('nyarla_nucleo', n, 'voxels')
+
+
+def nyarla_forma():
+    """Una de las formas del enjambre de Nyarlathotep (anim_volador: body, head, wing_l, wing_r; 32/m): un ojo
+    grande con alas de murciélago y dos manos negras que cuelgan debajo."""
+    M = Model(S=2, seed=2430)
+    UP = 22
+    BK = (0.07, 0.06, 0.09); BK_L = (0.20, 0.16, 0.26); MEMB = (0.12, 0.08, 0.16)
+    EYE = (1.0, 0.80, 0.35); IRIS = (0.85, 0.30, 0.10); PUPIL = (0.04, 0.02, 0.02)
+    rslab(M, B, BK, 3, 13, 0, 0, 12, 12, r=5, rt=5, rb=4)                         # el cuerpo, una bola
+    rslab(M, H, BK, 4, 14, 0, 5, 9, 4, r=4, rt=4, rb=3)                           # la cuenca del ojo
+    for x in range(-4, 4):
+        for y in range(5, 13):
+            d = math.hypot(x + 0.5, y - 8.5)
+            if d > 4.2: continue
+            c = PUPIL if d < 1.2 else (IRIS if d < 2.6 else EYE)
+            M.put(x, y, 7, H, c, 0 if c == PUPIL else 1)
+    for s in (-1, 1):                                                             # dos manos que cuelgan
+        x0 = 3 * s - (1 if s < 0 else 0)
+        for y in range(-4, 4): M.put(x0, y, 0, B, BK)
+        for f in (-1, 0, 1):
+            for y in range(-7, -4): M.put(x0 + f, y, 0, B, BK_L)
+    for (x, y, z), v in M.V.items():
+        if v[1] == BK and M.noise(x, y, z, 2.5) > 0.7: v[1] = BK_L
+    for part, s in (('wing_l', -1), ('wing_r', 1)):
+        span = 22
+        for i in range(span):
+            t_ = i / (span - 1)
+            z0 = int(-8 + 4 * t_ + 3 * abs(math.sin(t_ * math.pi * 2)))
+            z1 = int(5 - 4 * t_ * t_)
+            for z in range(z0, z1):
+                x = s * (5 + i) - (1 if s < 0 else 0)
+                c = BK_L if (z >= z1 - 1 or i % 7 == 0) else MEMB
+                M.put(x, 10, z, part, c)
+    M.V = {(x, y + UP, z): v for (x, y, z), v in M.V.items()}                  # flota: las manos, sobre el suelo
+    piv = {'body': [0, UP, 0], 'head': [0, 8 + UP, 4], 'wing_l': [-5, 10 + UP, 0], 'wing_r': [5, 10 + UP, 0]}
+    n = M.export('models/nyarla_forma.json', piv, jitter=0.0, pivots_in_voxels=True, roughness=0.4, specular=0.5)
+    print('nyarla_forma', n, 'voxels')
+
+
+def nyarla_sin_rostro():
+    """Nyarlathotep, el ser sin rostro (fase 3, anim_humano; escalado mucho en partida): una figura negra y
+    alta, con la cabeza alargada en cono y sin cara ninguna, alas enormes de membrana a la espalda y el borde
+    de la túnica deshecho en jirones; solo brillan, violetas, las grietas del pecho."""
+    MATS = {}
+    def mat(col, m):
+        MATS[col] = m
+        return col
+    BK = mat((0.08, 0.06, 0.10), 'piel'); BK_L = (0.22, 0.17, 0.28); MEMB = (0.13, 0.08, 0.18)
+    CRACK = (0.75, 0.35, 1.0); BONE = (0.36, 0.24, 0.50)
+    M = cu.new(2440)
+    cu.legs(M, BK, bottom=4)
+    cu.torso(M, BK, b=3, bottom=34)
+    cu.skirt(M, BK, 0, top=44, b=3, flare=7, depth=15)
+    for (x, y, z), v in list(M.V.items()):                                         # el borde en jirones
+        if v[0] == T and y < 8 and M.hsh(x, 0, z) < 0.45 + (8 - y) * 0.06: del M.V[(x, y, z)]
+    for s_, _, shin, _, _ in cu.sides():                                          # pies con garras, bajo los jirones
+        slab(M, shin, BK_L, 0, 4, 5 * s_, 4, 8, 7, 12, 10, ch=1)
+    cu.neck(M, BK)
+    cu.arms(M, BK, BK, b=3)
+    for (x, y, z), v in M.V.items():                                               # dedos largos, como garras
+        if v[0] in ('fore_l', 'fore_r') and y <= 24: v[1] = BK_L
+    cu.head(M, BK, BK, ears=False, nose=False, w=14.0, d=15.0)
+    for y in range(84, 104):                                                       # la cabeza, alargada en cono hacia atrás
+        r = 7.0 * (1 - (y - 84) / 21)
+        zc = -(y - 84) * 0.35
+        for x in range(-8, 8):
+            for z in range(-12, 8):
+                if math.hypot(x + 0.5, z + 0.5 - zc) <= r: M.put(x, y, z, H, BK)
+    for (x, y, z), v in M.V.items():
+        if v[1] == BK and M.noise(x, y, z, 3.0) > 0.7: v[1] = BK_L
+    for i in range(16):                                                            # las grietas que brillan
+        x0 = int(-7 + M.hsh(i, 1, 2) * 14); y0 = 40 + int(M.hsh(i, 2, 2) * 20)
+        for k in range(5):
+            x = x0 + ((k if i % 2 else -k) // 2); y = y0 + k
+            z = M.front(x, y)
+            if z is not None and M.V[(x, y, z)][0] == T: M.V[(x, y, z)] = [T, CRACK, 1]
+    for s in (-1, 1):                                                              # las alas, a la espalda
+        for i in range(44):
+            t_ = i / 43
+            y_top = int(84 + 26 * math.sin(t_ * math.pi * 0.6))
+            y_bot = int(56 - 10 * t_ + 6 * abs(math.sin(t_ * math.pi * 3)))
+            x = s * (6 + i) - (1 if s < 0 else 0)
+            for y in range(y_bot, y_top):
+                c = BONE if (y >= y_top - 2 or i % 11 == 0) else MEMB
+                M.put(x, y, -9 - int(t_ * 6), T, c)
+    cu.finish(M, 'nyarla_sin_rostro', dict(MATS), flat=(CRACK, MEMB, BK_L, BONE), b=3, skirt=True, top=106.0,
+              roughness=0.5, specular=0.4)
+
+
 ALL = {'zoog': zoog, 'zoog_copas': zoog_copas, 'zoog_anciano': zoog_anciano,
        'mercader_leng': mercader_leng, 'remero_lunar': remero_lunar, 'bestia_lunar_mayor': bestia_lunar_mayor,
        'escotilla': escotilla,
        'shantak': shantak, 'arana_leng': arana_leng, 'arana_madre': arana_madre, 'sacerdote_leng': sacerdote_leng,
        'telarana': telarana, 'ghast': ghast, 'gug': gug, 'gug_koth': gug_koth,
-       'descarnado': descarnado, 'larva_otros': larva_otros}
+       'descarnado': descarnado, 'larva_otros': larva_otros,
+       'nyarla_faraon': nyarla_faraon, 'nyarla_nucleo': nyarla_nucleo, 'nyarla_forma': nyarla_forma,
+       'nyarla_sin_rostro': nyarla_sin_rostro}
 
 if __name__ == '__main__':
     for n in (sys.argv[1:] or ALL):

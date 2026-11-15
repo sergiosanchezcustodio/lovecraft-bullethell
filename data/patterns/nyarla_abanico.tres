@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"nyarla_abanico"
+shape = 1
+count = 9
+spread_deg = 80.0
+speed = 3.0
+radius = 0.2
+size = 0.3
+damage_physical = 6.0
+damage_mental = 4.0
+lifetime = 7.0
+bursts = 3
+burst_interval = 0.45
+spin_deg = 6.0
+aimed = true

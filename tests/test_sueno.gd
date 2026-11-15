@@ -481,7 +481,7 @@ func test_el_nivel_de_kadath() -> void:
 	assert_true(ids.has("descarnado") and ids.has("larva_otros"))
 	assert_true((load("res://data/enemies/descarnado.tres") as EnemyData).elite, "el descarnado es élite")
 	assert_gt(lv.flute_every, 0.0)
-	assert_true(lv.is_survival() or lv.final_enemy != null, "el nivel se puede superar (si no, el bot juega sin fin)")
+	assert_true(lv.final_enemy != null and String(lv.final_enemy.id) == "nyarlathotep", "el jefe de la parte: Nyarlathotep")
 	for d: EnemyData in lv.pool:
 		assert_true(Anims.script_for(d.model) != null, "%s se anima" % d.model)
 
@@ -601,3 +601,9 @@ func test_la_larva_deja_charcos_que_quitan_cordura() -> void:
 	var z: EnemyZone = zones[0]
 	assert_eq(z.dps, 0.0, "no hace daño a la vida")
 	assert_gt(z.mental_dps, 0.0, "pero sí a la cordura")
+
+func test_las_flautas_tienen_su_sonido() -> void:
+	var ev: Dictionary = (JSON.parse_string(FileAccess.get_file_as_string("res://data/sfx.json")) as Dictionary)["eventos"]
+	assert_true(ev.has("flutes"), "las flautas tienen su sonido")
+	for f in ev.get("flutes", {}).get("files", []):
+		assert_true(ResourceLoader.exists("res://resources/sfx/" + String(f)), "existe " + String(f))

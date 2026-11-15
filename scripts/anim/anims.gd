@@ -94,6 +94,7 @@ static var _lids := {}                  ## malla de la cabeza -> material del pÃ
 ## parpadear: se tapan con un pÃ¡rpado del color medio de la cabeza (ocultarlos dejaba un hueco).
 ## Los ojos y su material se buscan una vez y se guardan en el modelo.
 static func alive(m: Node3D, t: float, look: float, blink: bool) -> void:
+	if not (m.get_meta("part_nodes") as Dictionary).has("torso") or not (m.get_meta("part_nodes") as Dictionary).has("head"): return   # una forma sin cuerpo de persona (Nyarlathotep, 21.11)
 	var br := sin(t * TAU / 4.5)
 	part(m, "torso").scale = Vector3(1.0 + 0.014 * br, 1.0 + 0.006 * br, 1.0 + 0.02 * br)
 	var head := part(m, "head")
@@ -108,7 +109,7 @@ static func alive(m: Node3D, t: float, look: float, blink: bool) -> void:
 		m.set_meta("eyes", eyes)
 		m.set_meta("eye_lid", lid)
 		m.set_meta("eye_mat", eyes[0].material_override if not eyes.is_empty() else null)
-	var want: Material = m.get_meta("eye_lid") if blink and m.get_meta("eye_lid") != null else m.get_meta("eye_mat")
+	var want: Material = m.get_meta("eye_lid", null) if blink and m.get_meta("eye_lid", null) != null else m.get_meta("eye_mat", null)   # sin ojos que brillen, los metas nulos no se guardan
 	for mi: MeshInstance3D in m.get_meta("eyes"):
 		if mi.material_override != want: mi.material_override = want
 

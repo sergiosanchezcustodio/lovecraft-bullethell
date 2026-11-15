@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"nyarla_forma"
+display_name = "Forma del Caos reptante"
+model = "nyarla_forma"
+model_scale = 1.1
+unique = true
+tier = 3
+spawn_weight = 0.0
+ethereal = true
+rise = &"air"
+tags = Array[StringName]([&"otros_dioses"])
+max_health = 60.0
+hit_radius = 0.5
+body_radius = 0.45
+move_speed = 3.4
+xp = 2.0
+money = 1
+contact_physical = 5.0
+contact_mental = 5.0
+movement = &"chase"

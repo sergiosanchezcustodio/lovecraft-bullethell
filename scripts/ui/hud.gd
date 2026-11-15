@@ -30,7 +30,7 @@ var player: Player:
 ## Femeninos de los nombres comunes de las criaturas (los demás, «el»).
 const FEM_NOUNS := ["Emanación", "Híbrida", "Hija", "Pesadilla", "Vecina", "Cosa"]
 ## Nombres propios: sin artículo.
-const PROPER := ["Cthulhu", "Madre", "Padre", "Barnabas", "Gedney", "Pth'thya-l'yi"]
+const PROPER := ["Cthulhu", "Madre", "Padre", "Barnabas", "Gedney", "Pth'thya-l'yi", "Nyarlathotep"]
 
 ## «Acaba con el Primigenio menor»: el artículo que falta a los nombres comunes; los que ya lo
 ## llevan («El viejo Castro») y los propios («Madre Hydra») quedan igual (06-11-2026).
