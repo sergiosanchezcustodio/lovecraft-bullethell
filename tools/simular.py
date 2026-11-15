@@ -5,7 +5,7 @@ resultado (15-10-2026). Lanza varias partidas a la vez, cada una en su ventana p
   python tools/simular.py p2 --n 6 --bots 3        # cooperativo de 4 (J1 y 3 compañeros bot)
   python tools/simular.py p1_n3 --n 4              # un nivel suelto
   opciones: --par N (a la vez, 3), --ts N (timescale, 2: a 4 el bot reacciona tarde y cae el doble de pronto), --skill 0.8, --shop N, --dif N (1..10, 3 por defecto),
-            --char dyer, --extra "clave=valor ..."
+            --char dyer, --extra "clave=valor ...", --limit S (s reales por partida antes de cortarla, 900)
 
 Imprime cada final ("SUPERADO p1_n2 t=…" / "DERROTA p1_n3 t=…") y un resumen por nivel:
 intentos, superados y en qué segundo se cae. En cooperativo, también cada jugador por nivel
@@ -19,7 +19,7 @@ args = sys.argv[1:]
 def opt(k, d):
     return args[args.index(k) + 1] if k in args else d
 target = args[0]
-N = int(opt('--n', '4')); PAR = int(opt('--par', '3')); TS = opt('--ts', '2')
+N = int(opt('--n', '4')); LIMIT = int(opt('--limit', '900')); PAR = int(opt('--par', '3')); TS = opt('--ts', '2')
 chain = re.fullmatch(r'p\d', target) is not None
 level = target + '_n1' if chain else target
 cmd = ['godot', '--path', '.', '--resolution', '640x360', '--',
@@ -37,10 +37,18 @@ lock = threading.Lock()
 
 def run(k):
     t0 = time.time()
-    p = subprocess.run(' '.join(cmd + ['seed=%d' % (1000 + k)]), shell=True, cwd=ROOT, capture_output=True,
-                       text=True, encoding='utf-8', errors='replace', timeout=3600)
+    p = subprocess.Popen(' '.join(cmd + ['seed=%d' % (1000 + k)]), shell=True, cwd=ROOT, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace')
+    try:
+        out, _ = p.communicate(timeout=LIMIT)
+    except subprocess.TimeoutExpired:
+        # 15-11-2026: con shell=True, el tope solo cerraba la consola y Godot seguía (una partida de un nivel
+        # sin final estuvo 6 h): se cierra el árbol entero.
+        subprocess.run('taskkill /T /F /PID %d' % p.pid, shell=True, capture_output=True)
+        out, _ = p.communicate()
+        print('partida %d: cortada a los %d s (¿el nivel no acaba?)' % (k, LIMIT), flush=True)
     ev = []
-    for line in p.stdout.splitlines():
+    for line in out.splitlines():
         m = re.match(r'NIVEL SUPERADO (\S+) t=(\d+).*nivel_j1=(\d+)(?:  vida_min=(\d+))?', line)
         if m: ev.append(('SUPERADO', m.group(1), int(m.group(2)), int(m.group(3)), int(m.group(4) or -1)))
         m = re.match(r'FIN DERROTA (\S+) t=(\d+) abatidos=(\d+) nivel_j1=(\d+)', line)

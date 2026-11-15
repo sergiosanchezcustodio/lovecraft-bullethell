@@ -5,7 +5,7 @@ extends EnemyBehavior
 ## (`grab_warn` s) y bajan: al que siga en la marca (`grab_radius`) lo agarran y se lo llevan por el aire
 ## `carry_dist` m en `carry_time` s, quitándole `carry_mental` de cordura por segundo, y lo dejan caer
 ## (`drop_damage`). Si mientras lo llevan les hacen `free_frac` de su vida (un compañero, o él mismo), lo
-## sueltan antes.
+## sueltan antes, y merece la pena: sueltan gemas y los que estén cerca recuperan cordura (`_reward`).
 ## En red, el anfitrión decide el agarre y vuela; el que va colgado lo coloca su propio PC: la marioneta,
 ## con la animación "carry", se lleva al jugador de ese PC que tenga debajo (`puppet_step`).
 
@@ -15,6 +15,9 @@ const SWOOP_TIME := 0.35
 const HOLD_Y := 1.0                        ## m sobre el que lleva colgado
 const RISE_TIME := 0.6
 const MARK := Color(0.45, 0.3, 0.7, 0.85)
+const FREE_GEMS := 4                       ## gemas que suelta al soltar a alguien
+const FREE_SANITY := 12.0                  ## cordura para los que estén cerca
+const FREE_NEAR := 7.0
 
 var state := State.FLY
 var victim: Player                         ## al que lleva (en su PC, o el remoto en el anfitrión)
@@ -66,6 +69,7 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 			if victim != null and hit >= e.data.max_health * e.health_scale * float(e.data.param("free_frac", 0.25)):
 				freed = true
 				e.world.shout("¡Lo suelta!", e.global_position + Vector3(0, 1.4, 0), Color(0.8, 0.7, 1.0))
+				_reward(e)
 				_release(e, false)
 				return Vector3.ZERO
 			if _t >= ct or victim == null: _release(e, true)
@@ -145,6 +149,18 @@ func _release(e: Enemy, fall: bool) -> void:
 	if fall: drops += 1
 	victim = null
 	_enter(State.RISE)
+
+## Soltarlo merece la pena: suelta gemas y quien esté cerca (también el que iba colgado) recupera cordura.
+func _reward(e: Enemy) -> void:
+	var at := e.global_position * Vector3(1, 0, 1)
+	var game := e.get_tree().current_scene if e.is_inside_tree() else null
+	var gm: Variant = game.get("gems") if game != null else null
+	if gm != null and gm.has_method("drop"):
+		for i in FREE_GEMS: gm.drop(at + Vector3(randf_range(-1.0, 1.0), 0, randf_range(-1.0, 1.0)), 3.0, 2)
+	for q in e.world.players:
+		if q.remote or q.health <= 0.0: continue
+		if q.global_position.distance_to(at) <= FREE_NEAR:
+			q.sanity = minf(q.data.max_sanity, q.sanity + FREE_SANITY)
 
 static func _drop_hurt(e: Enemy, q: Player) -> void:
 	var d := Damage.new(float(e.data.param("drop_damage", 6.0)), 0.0)

@@ -64,6 +64,16 @@ var _ghoul_next := 0.0
 var flutes := 0                        ## veces que han sonado (tests)
 var _flute_next := 0.0
 var _flute_t := -1.0                   ## s desde el aviso de las que suenan (-1: callan)
+var _flute_k := 0.0                    ## lo que se ven las flautas (0..1, con fundido)
+var _notes: Array[Dictionary] = []     ## {node, t, v}: las motas violetas que suben
+var _note_t := 0.0
+var _note_mat: StandardMaterial3D
+var _moon: DirectionalLight3D
+var _env: Environment
+var _moon_base := Color.WHITE
+var _moon_wrote := Color.WHITE
+var _amb_base := Color.WHITE
+var _amb_wrote := Color.WHITE
 var _rng := RandomNumberGenerator.new()
 
 func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node = null) -> DreamLands:
@@ -85,6 +95,10 @@ func setup(p_world: CombatWorld, p_level: LevelData, p_host: bool, p_game: Node 
 	if cr.size() >= 2: crypt_at = Vector3(float(cr[0]), 0.0, float(cr[1]))
 	_ghoul_next = level.ghouls_every * 0.5 if level != null else 0.0
 	_flute_next = level.flute_every * 0.6 if level != null else 0.0
+	if game != null:
+		_moon = game.get("_moon") as DirectionalLight3D
+		_env = game.get("_env") as Environment
+	process_priority = 11                  # después de los sucesos de la noche, que también tiñen la luz
 	_next = cats_every() * 0.6
 	var g: Array = layout.get("galley", [])
 	if g.size() >= 2: galley_at = Vector3(float(g[0]), 0.0, float(g[1]))
@@ -394,6 +408,61 @@ func company(q: Node3D) -> bool:
 		if o == q or o.health <= 0.0: continue
 		if o.global_position.distance_to(q.global_position) <= level.flute_near: return true
 	return false
+
+const FLUTE_MOON := Color(0.72, 0.42, 1.0)
+const FLUTE_AMBIENT := Color(0.42, 0.2, 0.6)
+const FLUTE_FADE := 1.2
+const NOTE_EVERY := 0.12
+const NOTE_LIFE := 2.2
+const NOTE_MAX := 40
+
+## Lo que se ve mientras suenan: la luna y el ambiente se tiñen de violeta y suben motas alrededor de los
+## jugadores (con fundido al empezar y al callar).
+func _process(delta: float) -> void:
+	if level == null or level.flute_every <= 0.0: return
+	var was := _flute_k
+	_flute_k = move_toward(_flute_k, 1.0 if fluting() else 0.0, delta / FLUTE_FADE)
+	if _flute_k > 0.0 or was > 0.0:
+		if _moon != null:
+			if _moon.light_color != _moon_wrote: _moon_base = _moon.light_color   # lo ha reescrito otro
+			_moon_wrote = _moon_base.lerp(FLUTE_MOON, 0.55 * _flute_k)
+			_moon.light_color = _moon_wrote
+		if _env != null:
+			if _env.ambient_light_color != _amb_wrote: _amb_base = _env.ambient_light_color
+			_amb_wrote = _amb_base.lerp(FLUTE_AMBIENT, 0.35 * _flute_k)
+			_env.ambient_light_color = _amb_wrote
+	_note_t -= delta
+	if fluting() and _note_t <= 0.0 and _notes.size() < NOTE_MAX:
+		_note_t = NOTE_EVERY
+		for q in world.players:
+			if q.health > 0.0: _note(q.global_position)
+	for i in range(_notes.size() - 1, -1, -1):
+		var n: Dictionary = _notes[i]
+		n.t += delta
+		var node: MeshInstance3D = n.node
+		if n.t >= NOTE_LIFE or not is_instance_valid(node):
+			if is_instance_valid(node): node.queue_free()
+			_notes.remove_at(i)
+			continue
+		node.position += (n.v as Vector3) * delta
+		node.position.x += sin(n.t * 5.0 + float(n.ph)) * 0.4 * delta          # se mecen al son
+		var k: float = n.t / NOTE_LIFE
+		node.scale = Vector3.ONE * (1.0 - k * k)
+
+func _note(at: Vector3) -> void:
+	if _note_mat == null:
+		_note_mat = VoxelFx.std()
+		_note_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_note_mat.albedo_color = Color(0.82, 0.55, 1.0)
+	var m := MeshInstance3D.new()
+	m.mesh = VoxelFx.box(Vector3.ONE * 0.07)
+	m.material_override = _note_mat
+	m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	m.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	var a := _rng.randf() * TAU
+	m.position = at + Vector3(cos(a), 0.0, sin(a)) * _rng.randf_range(1.0, 5.0) + Vector3(0, _rng.randf_range(0.1, 0.8), 0)
+	world.fx.add_child(m)
+	_notes.append({"node": m, "t": 0.0, "v": Vector3(0, _rng.randf_range(0.5, 0.9), 0), "ph": _rng.randf() * TAU})
 
 ## Empiezan las flautas (en el invitado, cuando lo dice el anfitrión).
 func play_flutes() -> void:

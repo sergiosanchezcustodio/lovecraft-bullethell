@@ -481,6 +481,7 @@ func test_el_nivel_de_kadath() -> void:
 	assert_true(ids.has("descarnado") and ids.has("larva_otros"))
 	assert_true((load("res://data/enemies/descarnado.tres") as EnemyData).elite, "el descarnado es élite")
 	assert_gt(lv.flute_every, 0.0)
+	assert_true(lv.is_survival() or lv.final_enemy != null, "el nivel se puede superar (si no, el bot juega sin fin)")
 	for d: EnemyData in lv.pool:
 		assert_true(Anims.script_for(d.model) != null, "%s se anima" % d.model)
 
@@ -533,10 +534,12 @@ func test_golpearlo_lo_suelta() -> void:
 	var b := _aim_and_swoop(e, p)
 	for k in int((float(e.data.param("grab_warn", 0.9)) + GauntBehavior.SWOOP_TIME) / DT) + 3: b.update(e, p, DT)
 	assert_eq(b.state, GauntBehavior.State.CARRY)
+	var s_before := p.sanity
 	e.take_damage(Damage.new(e.health * 0.3, 0.0))
 	b.update(e, p, DT)
 	assert_true(b.freed, "con un buen golpe, lo suelta")
 	assert_eq(p.carried, 0.0)
+	assert_gt(p.sanity, s_before, "y soltarlo devuelve cordura")
 	assert_eq(b.drops, 0)
 
 func test_en_el_invitado_se_lleva_al_de_su_pc() -> void:
@@ -565,6 +568,9 @@ func test_las_flautas_aceleran_y_quitan_cordura() -> void:
 	var s0 := p.sanity
 	for k in int((dl.level.flute_warn + 1.0) / DT): dl._physics_process(DT)
 	assert_true(dl.fluting())
+	dl._process(0.5)
+	assert_gt(dl._flute_k, 0.0, "se ve: violeta y motas")
+	assert_false(dl._notes.is_empty())
 	assert_almost_eq(DreamLands.haste(), dl.level.flute_haste, 0.001, "los enemigos corren más")
 	assert_almost_eq(s0 - p.sanity, dl.level.flute_sanity, 0.2, "y la cordura baja")
 	for k in int(dl.level.flute_time / DT) + 2: dl._physics_process(DT)
