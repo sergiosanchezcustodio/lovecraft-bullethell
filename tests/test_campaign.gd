@@ -1,10 +1,12 @@
 extends GutTest
-## Mapa de niveles: 15 niveles en orden y apertura al superar el anterior.
+## Mapa de niveles: 20 niveles en orden (la parte 4 desde el 21.12) y apertura al superar el anterior.
 
-func test_quince_niveles_en_tres_partes() -> void:
-	assert_eq(Campaign.parts().size(), 3)
+func test_veinte_niveles_en_cuatro_partes() -> void:
+	assert_eq(Campaign.parts().size(), 4)
 	var all := Campaign.levels()
-	assert_eq(all.size(), 15)
+	assert_eq(all.size(), 20)
+	assert_eq(all[15].id, "p4_n1")
+	assert_eq(all[15].part, 3)
 	assert_eq(all[0].id, "p1_n1")
 	assert_eq(all[5].id, "p2_n1")
 	assert_eq(all[5].part, 1)

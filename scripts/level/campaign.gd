@@ -63,7 +63,21 @@ static func _by_name(id: String) -> Vector2i:
 	var m := RegEx.create_from_string("^p([0-9]+)_n([0-9]+)$").search(id)
 	return Vector2i(int(m.get_string(1)), int(m.get_string(2))) if m != null else Vector2i.ZERO
 
-## Último nivel de la campaña (el de Cthulhu): tras él, el epílogo (hito 13.11).
+## Epílogos (hito 13.11; el de la parte 4 desde el 21.12): el nivel tras el que se cuenta cada uno.
+## El de Cthulhu tiene además la versión de quien no vuelve del todo (`epilogo_locura`).
+const EPILOGUES := {"p3_n5": "epilogo", "p4_n5": "epilogo_kadath"}
+
+## El epílogo que se cuenta al superar `id` ("" si ninguno).
+static func epilogue_of(id: String) -> String:
+	return String(EPILOGUES.get(id, ""))
+
+## Nivel tras el que se cuenta el epílogo `epi` (para el mapa de fondo del relato).
+static func epilogue_level(epi: String) -> String:
+	for k: String in EPILOGUES:
+		if epi == String(EPILOGUES[k]) or (String(EPILOGUES[k]) == "epilogo" and epi == "epilogo_locura"): return k
+	return last_id()
+
+## Último nivel de la campaña.
 static func last_id() -> String:
 	var all := levels()
 	return String(all.back().id) if not all.is_empty() else ""

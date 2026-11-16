@@ -32,6 +32,16 @@ var _then_menu := false
 static var left_usec := 0
 var _go_at := -1.0
 
+const EPILOGUE_TITLES := {"epilogo": "Lo que vino después", "epilogo_locura": "El que no volvió del todo",
+	"epilogo_kadath": "La ciudad del crepúsculo"}
+
+## ¿Juega alguien con el personaje `who`? (los asientos de la partida; en pruebas, `character=`).
+static func plays(who: String, la: LaunchArgs = null) -> bool:
+	if who == "": return true
+	for seat in GameSession.seats:
+		if String(seat.character) == who: return true
+	return la != null and la.get_str("character", "") == who
+
 static func has_relato(level_id: String) -> bool:
 	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json"))
 	return d is Dictionary and (d as Dictionary).has(level_id)
@@ -64,7 +74,7 @@ func _ready() -> void:
 	black.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(black)
 	_add_sky(la.get_str("sky", sky_for(id)))
-	var map := "res://resources/maps/%s.png" % (Campaign.last_id() if id.begins_with("epilogo") else ("p2_n1" if id == Demo.END_RELATO else id))
+	var map := "res://resources/maps/%s.png" % (Campaign.epilogue_level(id) if id.begins_with("epilogo") else ("p2_n1" if id == Demo.END_RELATO else id))
 	if ResourceLoader.exists(map):
 		var bg := TextureRect.new()
 		bg.texture = load(map)
@@ -96,7 +106,7 @@ func _ready() -> void:
 		box.add_child(MenuKit.title(String(Nights.find(id).get("titulo", "")), 46))
 	elif id.begins_with("epilogo"):
 		box.add_child(MenuKit.title("Epílogo", 26, Color(0.75, 0.68, 0.52)))
-		box.add_child(MenuKit.title("El que no volvió del todo" if id == "epilogo_locura" else "Lo que vino después", 46))
+		box.add_child(MenuKit.title(String(EPILOGUE_TITLES.get(id, "Lo que vino después")), 46))
 	else:
 		box.add_child(MenuKit.title("Parte %d · Nivel %d" % [part, num], 26, Color(0.75, 0.68, 0.52)))
 		box.add_child(MenuKit.title(String(info.get("name", "")), 46))
@@ -104,6 +114,9 @@ func _ready() -> void:
 	sep.modulate = Color(MenuKit.INK, 0.4)
 	box.add_child(sep)
 	for s in (d as Dictionary)[id]:
+		if s is Dictionary:                              # frase de un personaje (21.12): solo si alguien lo juega
+			if not plays(String((s as Dictionary).get("si", "")), la): continue
+			s = (s as Dictionary).get("texto", "")
 		var l := UiKit.label(String(s).format(fill), Reading.px(28), Color(1.0, 0.97, 0.9) if Reading.contrast() else Color(0.90, 0.86, 0.78))   # (20.13)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

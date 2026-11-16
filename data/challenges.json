@@ -15,6 +15,11 @@
 		{"level": "p3_n2", "name": "El ritual a oscuras", "text": "Menos luz y el culto llega en masa.", "effects": {"light": 0.7, "lamp": 0.6, "spawn_rate": 1.4}},
 		{"level": "p3_n3", "name": "Cubierta maldita", "text": "Solo armas arcanas nuevas, y la cordura no vuelve sola.", "effects": {"arcane_only": 1, "no_regen": 1}},
 		{"level": "p3_n4", "name": "Ojo de la tormenta", "text": "Mitad de vida y criaturas un 20 % más rápidas.", "effects": {"max_health": 0.5, "enemy_speed": 1.2}},
-		{"level": "p3_n5", "name": "Ante la puerta", "text": "Sin esquive, nada cura y aguantan un 20 % más.", "effects": {"no_dodge": 1, "no_heal": 1, "enemy_health": 1.2}}
+		{"level": "p3_n5", "name": "Ante la puerta", "text": "Sin esquive, nada cura y aguantan un 20 % más.", "effects": {"no_dodge": 1, "no_heal": 1, "enemy_health": 1.2}},
+		{"level": "p4_n1", "name": "El consejo de los zoogs", "text": "Los zoogs llegan en masa y tu compañero no ayuda.", "effects": {"spawn_rate": 1.5, "pet_idle": 1}},
+		{"level": "p4_n2", "name": "Vino de rubí", "text": "La cordura no vuelve sola y las criaturas aguantan un 20 % más.", "effects": {"no_regen": 1, "enemy_health": 1.2}},
+		{"level": "p4_n3", "name": "Sin mirar atrás", "text": "Sin esquive y criaturas un 15 % más rápidas.", "effects": {"no_dodge": 1, "enemy_speed": 1.15}},
+		{"level": "p4_n4", "name": "Sin farol", "text": "Mucha menos luz: en las bóvedas de Zin, el farol lo es todo.", "effects": {"light": 0.6, "lamp": 0.5}},
+		{"level": "p4_n5", "name": "Ante el Caos reptante", "text": "Solo armas arcanas nuevas y las criaturas aguantan un 20 % más.", "effects": {"arcane_only": 1, "enemy_health": 1.2}}
 	]
 }

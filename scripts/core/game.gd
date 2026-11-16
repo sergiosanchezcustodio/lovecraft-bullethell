@@ -1416,7 +1416,10 @@ func _epilogue() -> void:
 		if q.remote: continue
 		var k := q.sanity / maxf(q.data.max_sanity, 1.0)
 		if k < EPILOGUE_MAD and (mad == null or k < mad.sanity / maxf(mad.data.max_sanity, 1.0)): mad = q
-	var id := "epilogo_locura" if mad != null else "epilogo"
+	var id := Campaign.epilogue_of(String(level.id)) if level != null else ""
+	if id == "": id = "epilogo"
+	if id != "epilogo": mad = null                      # solo el de Cthulhu tiene la versión de la locura
+	elif mad != null: id = "epilogo_locura"
 	if Demo.on(): id = Demo.END_RELATO                  # la demo (13.17): tras el shoggoth
 	var who := mad if mad != null else player
 	if Saves.current != null:
@@ -1862,7 +1865,7 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 	_archive(result)
 	if result == "caida" and _replay_frames.size() >= int(DeathReplay.FPS): s.replay = _replay_frames
 	s.burn = result == "caida"                         # la página arde al caer (hito 20.4)
-	s.epilogue = result == "superado" and next_id == "" and level != null and String(level.id) == Demo.last_level()
+	s.epilogue = result == "superado" and next_id == "" and level != null and (String(level.id) == Demo.last_level() if Demo.on() else Campaign.epilogue_of(String(level.id)) != "")   # Cthulhu y Nyarlathotep (21.12)
 	s.epilogue_open.connect(_epilogue)
 	if not s.diary.is_empty(): Saves.save()                # el diario, ya en el hueco
 	if announcer != null: create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS) 		.tween_property(announcer, "modulate:a", 0.0, 0.3)   # un aviso a medias asomaría por encima

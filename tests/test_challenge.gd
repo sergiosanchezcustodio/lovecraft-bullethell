@@ -9,7 +9,7 @@ func after_each() -> void:
 
 func test_un_desafio_por_nivel_y_bien_hecho() -> void:
 	var all := Challenge.all()
-	assert_eq(all.size(), 15)
+	assert_eq(all.size(), 20)                   # 4 partes × 5 (21.12)
 	var seen := {}
 	for c: Dictionary in all:
 		var base := String(c.level)

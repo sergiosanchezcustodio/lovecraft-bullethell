@@ -19,11 +19,11 @@ func test_una_parte_entera_pasa_a_la_siguiente() -> void:
 
 func test_toda_la_campana() -> void:
 	var won: Array = []
-	for p in 3: won.append_array(_ids(p))
+	for p in 4: won.append_array(_ids(p))
 	assert_eq(TitleProgress.fraction(won), 1.0)
-	assert_eq(TitleProgress.part(won), 3)
+	assert_eq(TitleProgress.part(won), 4)
 	assert_almost_eq(TitleProgress.lit(won), 1.0, 0.001)
-	assert_true(TitleProgress.SKIES[3].has("sky_tint"))
+	assert_true(TitleProgress.SKIES[4].has("eyes_color"), "la campaña terminada, el último cielo")
 
 func test_niveles_fuera_de_la_campana_no_cuentan() -> void:
 	assert_eq(TitleProgress.fraction(["desafio:p1_n4", "pesca"]), 0.0)

@@ -1,5 +1,5 @@
 {
-	"_comentario": "Relatos de cada nivel (hito 5.3): se cuentan al elegir el nivel en el mapa (y al pasar al siguiente), antes de jugarlo. Una frase por línea; aparecen una tras otra. Tono de diario de los años 20 y 30.",
+	"_comentario": "Relatos de cada nivel (hito 5.3): se cuentan al elegir el nivel en el mapa (y al pasar al siguiente), antes de jugarlo. Una frase por línea; aparecen una tras otra. Tono de diario de los años 20 y 30. Una frase puede ser {\"si\": personaje, \"texto\": …}: solo sale si alguien juega con ese personaje (hito 21.12: Carter y Kuranes en la parte 4).",
 	"p1_n1": [
 		"Costa del mar de Ross, noviembre de 1930.",
 		"La expedición de la Universidad de Miskatonic ha montado el campamento base al pie de la Barrera de hielo.",
@@ -90,6 +90,78 @@
 		"Al fondo, una puerta colosal, entreabierta, con un resplandor verde en la rendija.",
 		"Los que yacen con Él empiezan a despertar. La puerta se abre del todo. Él sale."
 	],
+	"p4_n1": [
+		{
+			"si": "kuranes",
+			"texto": "Kuranes conocía aquel bosque: lo había cruzado muchas veces, de joven, camino de Celephaïs."
+		},
+		"Tres veces soñó Randolph Carter con una ciudad maravillosa al atardecer, y tres veces se despertó antes de llegar a ella.",
+		"Bajó los setenta escalones hasta la caverna de la llama, donde los sacerdotes Nasht y Kaman-Thah le dejaron pasar sin decir nada.",
+		"Después vinieron los setecientos, hasta la Puerta del Sueño Profundo, y detrás, el bosque encantado.",
+		"Entre los robles enormes brillan los hongos, y en la oscuridad gorjean los zoogs, que lo saben todo y no olvidan nada.",
+		"Más allá, en las colinas, asoman los tejados de Ulthar, donde nadie puede matar a un gato.",
+		{
+			"si": "carter",
+			"texto": "«Esta vez —me dije— no me despertaré antes de verla.»"
+		}
+	],
+	"p4_n2": [
+		{
+			"si": "kuranes",
+			"texto": "En Celephaïs, Kuranes le había aconsejado que no buscara Kadath: que a cada uno le basta su propio sueño."
+		},
+		"Desde Ulthar, el camino bajaba por el río Skai hasta Dylath-Leen, la ciudad de las torres de basalto.",
+		"A su puerto llegaban a veces unas galeras negras que nadie sabía de dónde venían, y bajaban de ellas mercaderes de turbante alto y sonrisa demasiado ancha.",
+		"Pagaban con rubíes, y nadie había visto nunca a sus remeros.",
+		"Carter quiso preguntarles por Kadath. Le ofrecieron vino en una botella tallada de un solo rubí, y bebió.",
+		{
+			"si": "carter",
+			"texto": "«Kuranes tenía razón, como casi siempre. No le hice caso, como casi nunca.»"
+		}
+	],
+	"p4_n3": [
+		{
+			"si": "kuranes",
+			"texto": "Kuranes había oído hablar de Leng en Celephaïs, y nunca había querido ir."
+		},
+		"La galera negra no navegaba hacia el mar, sino hacia la luna; y fueron los gatos de Ulthar quienes lo sacaron de allí.",
+		"Pero los de Leng no olvidan a quien se les escapa.",
+		"La meseta es fría y gris; de noche arden hogueras lejanas y suenan flautas y tambores.",
+		"En el centro hay un monasterio sin ventanas, y dentro, un sumo sacerdote con una máscara de seda amarilla.",
+		"Dicen que lo que hay debajo no debe describirse. Dicen que quien lo ve no lo olvida nunca.",
+		{
+			"si": "carter",
+			"texto": "«Corrí sin mirar atrás. Debajo de la seda, algo se movía.»"
+		}
+	],
+	"p4_n4": [
+		{
+			"si": "kuranes",
+			"texto": "Kuranes nunca había bajado tan hondo, y no soltó el farol ni un momento."
+		},
+		"Para escapar de Leng, Carter bajó al mundo inferior, donde el sueño se vuelve pesadilla.",
+		"Allí viven los gugs, gigantes de cuatro brazos y boca vertical, y los ghasts, que no soportan la luz.",
+		"Pero también viven los necrófagos, y uno de ellos fue en otro tiempo un pintor de Boston llamado Richard Upton Pickman.",
+		"Pickman se acordaba de su amigo de la vigilia. Sus necrófagos, le prometió, subirían de las criptas cuando hiciera falta.",
+		{
+			"si": "carter",
+			"texto": "«Pickman me saludó con una pezuña. Seguía teniendo la misma risa.»"
+		}
+	],
+	"p4_n5": [
+		{
+			"si": "kuranes",
+			"texto": "Kuranes soñó con Kadath una sola vez, de joven, y se despertó llorando."
+		},
+		"Los necrófagos lo sacaron del mundo inferior, y los descarnados nocturnos, que solo obedecen a Nodens, lo llevaron por el aire hasta el yermo frío.",
+		"Allí, sobre una montaña que no sale en ningún mapa, se alza Kadath: un castillo de ónice bajo un cielo de auroras.",
+		"Las escaleras no se acaban nunca. Desde el vacío llega, sin parar, el redoble de unos tambores y el gemido de unas flautas.",
+		"Arriba, en el gran salón de los dioses, alguien le esperaba sonriendo.",
+		{
+			"si": "carter",
+			"texto": "«Lo reconocí al instante, aunque no lo había visto nunca. Él también me reconoció a mí.»"
+		}
+	],
 	"noche_color": [
 		"Al oeste de Arkham, donde van a hacer el pantano nuevo, el viejo Ammi Pierce aún no se acerca de noche.",
 		"Allí cayó una piedra del cielo, junto al pozo de Nahum Gardner. Se encogió, se fundió, y lo que traía dentro se metió en la tierra.",
@@ -121,6 +193,13 @@
 		"En el sanatorio dibuja la misma ciudad una y otra vez, con ángulos que hacen daño a la vista, y sonríe cuando llueve.",
 		"Los médicos anotan que de noche habla en una lengua que nadie le ha enseñado. Las enfermeras dicen que, a veces, algo le responde.",
 		"Él sigue soñando, allá abajo. Y ahora sabe que alguien, aquí arriba, sueña con Él."
+	],
+	"epilogo_kadath": [
+		"Nyarlathotep lo mandó hacia Azathoth a lomos de un shantak, más allá de las estrellas, hacia el caos del centro de todo.",
+		"Pero a mitad del vuelo, Carter recordó: la ciudad del crepúsculo que había buscado tanto tiempo no estaba en ningún sueño.",
+		"Era Boston. Eran sus tejados al atardecer, la colina de Beacon, las ventanas que se encendían; lo que había visto de niño y había querido sin saberlo.",
+		"Saltó del shantak, cayó a través de la noche y se despertó en su cama, en su casa de Boston.",
+		"{nombre} se despertó también, con el canto de los pájaros y la luz de la mañana. Por la ventana, la ciudad seguía allí."
 	],
 	"fin_demo": [
 		"Los que volvieron de las montañas de la locura lo hicieron con lo puesto, y juraron no hablar nunca de lo que vieron.",

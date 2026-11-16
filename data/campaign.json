@@ -1,5 +1,5 @@
 {
-	"_comentario": "Mapa de niveles (GDD sección 2). Cada nivel se abre al superar el anterior de su parte; el primero de cada parte, al superar la anterior. Un nivel sin datos en data/levels/ sale como 'Próximamente'.",
+	"_comentario": "Mapa de niveles (GDD sección 2; la parte 4 desde el hito 21.12). Cada nivel se abre al superar el anterior de su parte; el primero de cada parte, al superar la anterior. Un nivel sin datos en data/levels/ sale como 'Próximamente'.",
 	"parts": [
 		{"title": "En las montañas de la locura", "place": "Antártida", "levels": [
 			{"id": "p1_n1", "name": "Campamento base en la costa del mar de Ross", "creatures": "Pingüinos albinos ciegos · Fragmentos protoplásmicos"},
@@ -21,6 +21,13 @@
 			{"id": "p3_n3", "name": "Los muelles y la cubierta del Alert", "creatures": "Engendros de Cthulhu · Profundos servidores · Ídolos vivos"},
 			{"id": "p3_n4", "name": "La tormenta en el Pacífico", "creatures": "La cosa blanca polipoide · Ángulos devoradores · Sonámbulos de Providence"},
 			{"id": "p3_n5", "name": "R'lyeh emergida: la puerta colosal", "creatures": "Primigenios menores · Emanaciones de la puerta · Cthulhu"}
+		]},
+		{"title": "La búsqueda onírica de la desconocida Kadath", "place": "Las Tierras del Sueño", "levels": [
+			{"id": "p4_n1", "name": "El bosque encantado y las afueras de Ulthar", "creatures": "Zoogs · Zoogs de las copas · Los gatos de Ulthar · El anciano de los zoogs"},
+			{"id": "p4_n2", "name": "El puerto de Dylath-Leen y la galera negra", "creatures": "Mercaderes de Leng · Remeros lunares · La galera negra · El amo de la galera"},
+			{"id": "p4_n3", "name": "La meseta de Leng y el monasterio sin ventanas", "creatures": "Shantaks · Arañas púrpura de Leng · El sumo sacerdote que no debe describirse · La madre de las arañas"},
+			{"id": "p4_n4", "name": "Las bóvedas de Zin y la torre de los gugs", "creatures": "Ghasts · Gugs · Los necrófagos de Pickman · El gran gug de Koth"},
+			{"id": "p4_n5", "name": "La cima de Kadath y el castillo de ónice", "creatures": "Descarnados nocturnos · Larvas de los Otros Dioses · Nyarlathotep"}
 		]}
 	]
 }

@@ -3465,3 +3465,22 @@ Por tramos: nivel 1; nivel 2; nivel 3; niveles 4 y 5. Lo de cada nivel vive en `
   - Sonidos propios (`python tools/gen_sfx.py --nyarla`): la voz del faraón con cada frase (`nyarla_voice`, dos variantes: un murmullo grave de vocales que bajan, doblado una octava abajo, con eco largo); al esfumarse el enjambre, un aleteo que se deshace (`nyarla_scatter`), y en el sitio de llegada otro que se junta y acaba en un golpe sordo justo al recomponerse (`nyarla_gather`, 1,25 s hasta el golpe; el aviso dura 1,3).
   - El ser sin rostro se recorta: lleva su propia luz violeta (`OmniLight3D`, 10 m, sin sombras, algo por delante), en el anfitrión y en la marioneta. Captura: `shots/game_nyarla_b_070.0s.png` y `_080.0s.png`.
   - Tests: 7 en `tests/test_nyarla.gd` (los sonidos existen; la luz sale con la fase 3). Suite: 1031 de 1031.
+
+### 21.12: lo que rodea a la parte 4 (16-11-2026)
+
+- **Campaña:** la parte 4 entra en `data/campaign.json` (título, «Las Tierras del Sueño», los cinco niveles con nombre y criaturas). Se abre al vencer a Cthulhu, como las demás. `Campaign` ya no se apoya en el nombre para encadenarlos, salvo para niveles que aún no estén en el mapa.
+- **Mapa de niveles** (`LevelMap`): con cuatro partes, la ventana pasa a 1720 px y las columnas a 390 (`_col_w`). Los títulos se parten en dos líneas si hace falta y todos ocupan la misma altura, para que los niveles queden alineados. Captura: `shots/seleccion_mapa4_002.0s.png` (`select map=true shots=2`). La ventana de desafíos ya repartía las partes sola: `shots/seleccion_desafios4_002.5s.png`.
+- **Relatos** (`data/library/relatos.json`): p4_n1 a p4_n5, contados desde Carter. Una frase puede ser `{"si": personaje, "texto": …}`, y solo sale si alguien juega con ese personaje (`RelatoScreen.plays`: los asientos de `GameSession` o `character=`). Cada nivel abre con una frase de Kuranes y cierra con una de Carter.
+- **Epílogo de la parte 4:** «La ciudad del crepúsculo» (`epilogo_kadath`), con el despertar en Boston y `{nombre}`. `Campaign.EPILOGUES` dice tras qué nivel se cuenta cada epílogo (`epilogue_of`, `epilogue_level`). `game.gd` lo lanza al vencer a Nyarlathotep, y la versión de la locura sigue siendo solo la de Cthulhu. Está en la Biblioteca («Tras vencer a Nyarlathotep»).
+- **Páginas sueltas:** «El cuaderno de sueños de Randolph Carter» (`data/fragments.json`, historia `carter`), con cinco páginas, una por nivel.
+- **Lugares** (`data/library/textos.json`): los cinco escenarios.
+- **Cielos:** en los relatos, `sueno` para la parte, `aurora_kadath` para el nivel 5 y `amanecer` para el epílogo (`data/relato_skies.json`). En la portada (`TitleProgress.SKIES`), uno violeta para cuando se llega a la parte 4; el de los ojos rojos sigue siendo el último, con toda la campaña (`sky_part=0..4`). `part()` sirve ya para cualquier número de partes.
+- **Trofeos:** la vitrina de los jefes pasa de 7 × 3 a 8 × 3 (`tools/gen_trofeos.py`, `models/vitrina_8x3.json`; se borra la de 7 × 3) para los 24 jefes, con Nyarlathotep el último (captura del hueco 24 de 24: `shots/titulo_trofeos4b_013.0s.png`, con `cursor=41`). El bestiario ya tenía las criaturas de la parte (textos del 21.10 y el 21.11).
+- **Desafíos** (`data/challenges.json`), uno por nivel:
+  - p4_n1 «El consejo de los zoogs»: más apariciones y el compañero quieto.
+  - p4_n2 «Vino de rubí»: sin recuperar cordura y +20 % de vida enemiga.
+  - p4_n3 «Sin mirar atrás»: sin esquive y +15 % de velocidad enemiga.
+  - p4_n4 «Sin farol»: mucha menos luz.
+  - p4_n5 «Ante el Caos reptante»: solo armas arcanas nuevas y +20 % de vida enemiga.
+- **Pendiente:** la música de cada nivel de la parte 4. Cada `.tres` usa ya una pista de otras partes (p. ej. *Hallow Quest* en el bosque y *At the End of Hope* en Kadath), puesta a modo provisional: queda para que el autor elija una propia.
+- **Tests:** `test_relatos` (Carter y Kuranes en la parte 4), `test_fragments` (20 páginas de campaña y tres epílogos), `test_title_progress` (4 partes), `test_trophies` (24 jefes), `test_campaign` (20 niveles) y `test_challenge` (20 desafíos). Suite: 1032 de 1032.

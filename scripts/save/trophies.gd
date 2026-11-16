@@ -10,8 +10,8 @@ extends RefCounted
 ## Cada trofeo: {case, id, name, kind, model, worn, earned, text, facts}.
 
 const CASES: Array[String] = ["Conjuntos completos", "Jefes vencidos", "Logros grandes"]
-const CASE_MODELS: Array[String] = ["vitrina_6x3", "vitrina_7x3", "vitrina_4x3"]
-const CASE_COLS: Array[int] = [6, 7, 4]
+const CASE_MODELS: Array[String] = ["vitrina_6x3", "vitrina_8x3", "vitrina_4x3"]
+const CASE_COLS: Array[int] = [6, 8, 4]                 ## la de los jefes, de 8 con la parte 4 (21.12)
 const BIG_REWARD := 500                         ## un logro es «grande» desde esta recompensa
 ## Modelo del trofeo de cada logro grande (los que no estén, la copa).
 const ACHIEVEMENT_MODELS := {

@@ -2,7 +2,7 @@ extends GutTest
 ## Páginas sueltas y epílogo (hito 13.11).
 
 func test_una_pagina_por_nivel() -> void:
-	assert_eq(Fragments.total(), 15)
+	assert_eq(Fragments.total(), 20)
 	for lv in Campaign.levels():
 		var p := Fragments.page_of(String(lv.id))
 		assert_false(p.is_empty(), "%s: sin página" % lv.id)
@@ -22,7 +22,7 @@ func test_se_guardan_y_completan_su_relato() -> void:
 	var lib := Library.entries(back, "stories")
 	var known := lib.filter(func(e: Dictionary) -> bool: return e.known)
 	assert_eq(known.size(), 3)
-	assert_eq(lib.size(), 15 + 2 + Nights.all().size(), "páginas, epílogos y noches sueltas")
+	assert_eq(lib.size(), 20 + 3 + Nights.all().size(), "páginas, epílogos y noches sueltas")
 
 func test_sitios_libres_y_fijos() -> void:
 	var o := ObstacleMap.new()
@@ -36,14 +36,17 @@ func test_sitios_libres_y_fijos() -> void:
 		assert_true(o.bounds.grow(-3.9).has_point(Vector2(p.x, p.z)))
 
 func test_epilogos() -> void:
-	assert_eq(Campaign.last_id(), "p3_n5")
+	assert_eq(Campaign.last_id(), "p4_n5")
+	assert_eq(Campaign.epilogue_of("p3_n5"), "epilogo")
+	assert_eq(Campaign.epilogue_of("p4_n5"), "epilogo_kadath")
+	assert_eq(Campaign.epilogue_level("epilogo_locura"), "p3_n5", "el mapa del fondo, el de R'lyeh")
 	var d: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json"))
-	for id in ["epilogo", "epilogo_locura"]:
+	for id in ["epilogo", "epilogo_locura", "epilogo_kadath"]:
 		assert_true(d.has(id))
 		assert_true(" ".join(PackedStringArray(d[id])).contains("{nombre}"))
 	var s := SaveData.new()
 	var lib := Library.entries(s, "stories").filter(func(e: Dictionary) -> bool: return e.section == "Epílogos")
-	assert_eq(lib.size(), 2)
+	assert_eq(lib.size(), 3)
 	assert_false(lib[1].text.contains(" de el "), "«del investigador»")
 	s.mark_seen("epilogues", "epilogo_locura")
 	assert_true(Library.entries(s, "stories").filter(func(e: Dictionary) -> bool: return e.id == "epilogo_locura")[0].known)

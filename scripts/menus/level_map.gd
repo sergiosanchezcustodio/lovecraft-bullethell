@@ -19,16 +19,19 @@ var _daily_btn: Button
 var _challenge_btn: Button
 var _nights_btn: Button
 var _madness_row: OptionRow
+var _col_w := 460.0                                   ## ancho de cada columna de parte
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var won: Array = Saves.current.levels_won if Saves.current else []
-	var w: Array = MenuKit.window(self, MenuKit.INK, 1500)
+	var four := Campaign.parts().size() > 3           # la parte 4 (21.12): columnas más estrechas y ventana más ancha
+	_col_w = 390.0 if four else 460.0
+	var w: Array = MenuKit.window(self, MenuKit.INK, 1720 if four else 1500)
 	var box: VBoxContainer = w[1]
 	MenuKit.heading(box, "Elige parte", 50)
 	var dev := OS.is_debug_build()
 	var cols := HBoxContainer.new()
-	cols.add_theme_constant_override("separation", 26)
+	cols.add_theme_constant_override("separation", 20 if four else 26)
 	cols.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_child(cols)
 	var all := Campaign.levels()
@@ -39,10 +42,15 @@ func _ready() -> void:
 		cols.add_child(col)
 		col.add_child(MenuKit.title("Parte %d" % (pi + 1), 22, UiKit.TEXT_DIM))
 		var pt := MenuKit.title(part.title, 28)
-		pt.custom_minimum_size.x = 460
+		pt.custom_minimum_size.x = _col_w
+		pt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART   # «La búsqueda onírica…», en dos líneas: todas a la misma altura
+		pt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		if four: pt.custom_minimum_size.y = 76
 		col.add_child(pt)
 		var place := UiKit.label(part.place, 16, UiKit.TEXT_DIM)
 		place.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		place.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		place.custom_minimum_size.x = _col_w
 		col.add_child(place)
 		col.add_child(_part_button(pi, part, won))
 		for l: Dictionary in all.filter(func(e: Dictionary) -> bool: return e.part == pi):
@@ -168,7 +176,7 @@ func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
 	var open := not demo_out and ((Saves.current != null and Saves.current.unlock_all) or Campaign.part_unlocked(pi, won))
 	var playable := open and Campaign.exists(first)
 	var b := MenuKit.button(Demo.LOCKED if demo_out else ("Jugar esta parte" if playable else ("Próximamente" if open else "Bloqueada")), MenuKit.INK, 24)
-	b.custom_minimum_size = Vector2(460, 62)
+	b.custom_minimum_size = Vector2(_col_w, 62)
 	b.disabled = not playable
 	b.focus_entered.connect(func() -> void:
 		_info_title.text = "Parte %d · %s" % [pi + 1, part.title]
@@ -181,7 +189,7 @@ func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
 func _level_line(l: Dictionary, won: Array) -> Label:
 	var done := "✓ " if won.has(l.id) else ""
 	var lab := UiKit.label("%s%d.  %s" % [done, l.number, l.name], 17, UiKit.TEXT if won.has(l.id) else UiKit.TEXT_DIM)
-	lab.custom_minimum_size = Vector2(460, 34)
+	lab.custom_minimum_size = Vector2(_col_w, 34)
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return lab
 
@@ -192,7 +200,7 @@ func _level_button(l: Dictionary, won: Array) -> Button:
 	var done := "✓ " if won.has(l.id) else ""
 	var b := MenuKit.button("%s%d.  %s%s" % [done, l.number, l.name, tag], MenuKit.INK, 19)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	b.custom_minimum_size = Vector2(460, 58)
+	b.custom_minimum_size = Vector2(_col_w, 58)
 	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	b.disabled = not playable
 	b.add_theme_color_override("font_disabled_color", Color(UiKit.TEXT_DIM, 0.55 if not unlocked else 0.9))

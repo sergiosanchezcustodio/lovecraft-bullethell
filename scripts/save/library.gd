@@ -19,7 +19,7 @@ const TOMES := [
 	{"id": "archive", "title": "Archivo de expediciones", "roman": "X"},
 	{"id": "trophies", "title": "Sala de trofeos", "roman": "XI"},
 ]
-const EPILOGUES := [["epilogo", "Epílogo · Lo que vino después"], ["epilogo_locura", "Epílogo · El que no volvió del todo"]]
+const EPILOGUES := [["epilogo", "Epílogo · Lo que vino después"], ["epilogo_locura", "Epílogo · El que no volvió del todo"], ["epilogo_kadath", "Epílogo · La ciudad del crepúsculo"]]
 const RESULTS := {"won": "Superado", "lost": "Caído", "endless": "La noche eterna"}
 const TEXTS_PATH := "res://data/library/textos.json"
 const CATEGORY := ["Física", "De fuego", "Mágica"]
@@ -125,7 +125,7 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 					var t := l.format({"nombre": "el investigador"}).replace(" de el ", " del ")
 					return t.left(1).to_upper() + t.substr(1))))
 				out.append(_e(String(ep[0]), String(ep[1]), _seen(save, "epilogues", StringName(ep[0])), txt, "", "", null,
-					["Tras vencer a Cthulhu" + (" con menos de un cuarto de la cordura" if ep[0] == "epilogo_locura" else "")], "Epílogos"))
+					["Tras vencer a Nyarlathotep" if ep[0] == "epilogo_kadath" else "Tras vencer a Cthulhu" + (" con menos de un cuarto de la cordura" if ep[0] == "epilogo_locura" else "")], "Epílogos"))
 			for n: Dictionary in Nights.all():              # el relato de cada noche suelta, al jugarla
 				var lines: Array = (rel as Dictionary).get(String(n.id), []) if rel is Dictionary else []
 				out.append(_e(String(n.id), String(n.titulo), _seen(save, "places", StringName(n.id)) or Nights.wins(save, String(n.id)) > 0,

@@ -17,7 +17,7 @@ extends Control
 ##                       open=slots_borrar, además la confirmación de borrado; open=menu (menú
 ##                       principal), open=menu_jugar, open=menu_config tab=0..4, open=menu_tienda tab=0..3, open=menu_logros,
 ##                       open=menu_biblioteca tome=N cursor=N
-##   progress=0..1 sky_part=0..3   velas y cielo como con ese progreso (hito 20.9)
+##   progress=0..1 sky_part=0..4   velas y cielo como con ese progreso (hito 20.9)
 ##                       open=menu_revision (revisión de arte, temporal), open=menu_online,
 ##                       open=menu_libro (Jugar en local: el libro que se abre hacia la selección)
 ##                       (con net_host=true o net_join=<código|IP>: abre la sala o se une)

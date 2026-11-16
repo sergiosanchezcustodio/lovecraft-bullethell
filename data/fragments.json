@@ -37,6 +37,18 @@
 				{"level": "p3_n4", "text": "22 de marzo. La fiebre no baja. El mar del sueño es negro y se levanta en olas más altas que el campanario. Los marineros rezan; yo no puedo, porque cada vez que abro la boca sale la otra lengua. Me han atado a la cama. Hacen bien."},
 				{"level": "p3_n5", "text": "23 de marzo. La puerta está abierta. Lo he visto salir, y no es como yo lo esculpí: es más grande, y mira. Me mira a mí. Si alguien lee esto, que sepa que el sueño no termina al despertar: solo cambia de lado."}
 			]
+		},
+		{
+			"id": "carter",
+			"title": "El cuaderno de sueños de Randolph Carter",
+			"intro": "Páginas de un cuaderno de tapas de piel que Carter llevaba en la mesilla de su casa de Boston, para apuntar lo que soñaba nada más despertarse. En el sueño se le perdían; alguien las fue dejando por el camino.",
+			"pages": [
+				{"level": "p4_n1", "text": "Otra vez la ciudad del crepúsculo: cúpulas de oro, balaustradas de mármol, un parque con fuentes y, al fondo, el mar. La veo desde una terraza y no consigo bajar. Al despertar me duele el pecho, como si hubiera perdido algo que no recuerdo haber tenido."},
+				{"level": "p4_n2", "text": "Kuranes me recibió en Celephaïs. Es rey allí, y en la vigilia está enterrado en un pueblo de Cornualles; no le gusta que se lo recuerden. Me dijo que no buscara Kadath. Me dijo que los dioses de la tierra no quieren ser encontrados. Le di las gracias y bajé a Dylath-Leen."},
+				{"level": "p4_n3", "text": "No sé cuánto tiempo estuve en la bodega. Olía a algo que no era del todo pescado. Los mercaderes reían sin abrir la boca. Recuerdo un monasterio sin ventanas y una máscara amarilla que se volvía hacia mí despacio, como quien no tiene prisa."},
+				{"level": "p4_n4", "text": "Pickman está bien, o lo que él llama estar bien. Ha engordado. Me presentó a los suyos y no se rieron de mí. Abajo, en las bóvedas, he aprendido una cosa: la luz no es para ver, es para que no te vean."},
+				{"level": "p4_n5", "text": "He subido las escaleras de Kadath. Arriba no había dioses: había un hombre joven, moreno, con una corona, que me llamaba por mi nombre. Si estas líneas llegan a la vigilia, que sepa quien las lea que la ciudad que yo buscaba estuvo siempre en mi ventana."}
+			]
 		}
 	]
 }
