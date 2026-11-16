@@ -757,3 +757,40 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 |---|---|---|
 | 21.19 | **Manual del investigador** en la Biblioteca: páginas con animaciones cortas para quien empieza (cordura y crisis, evoluciones, esquives, élites, objetivos). Complementa el primer nivel guiado y los consejos en la partida (13.3) | Hecho (16-11-2026), pendiente de revisión: tomo XII con cinco páginas (`data/manual.json`), cada una con un clip de la partida grabado con bot (`tools/grabar_manual.py`, `resources/manual/*.ogv`) |
 | 21.20 | **Estadísticas de la cuenta** en una página de la Biblioteca, con gráficas en tinta: junta lo que ya se apunta en sitios distintos (tiempo jugado de cada hueco, bajas por criatura del bestiario, récords, archivo de expediciones) y lo que no (daño y bajas por arma de todas las partidas, investigador favorito, minutos en crisis) | Hecho (16-11-2026), pendiente de revisión: tomo XIII con siete páginas (resumen, bajas por criatura, daño por arma, investigadores, lugares, últimas partidas y récords); `AccountStats` apunta lo nuevo al acabar cada nivel y `InkChart` dibuja las gráficas |
+
+## Fase 22: propuesta (16-11-2026)
+
+**Propuesta el 16-11-2026**, al cerrar la fase 21 («continúa»), **pendiente de que la apruebes o elijas bloques**. Lo que queda abierto de antes y depende de ti sigue igual: la música de la parte 4, la subida a itch.io (fase 8, tu cuenta), el `client_id` de la nube (fase 10) y la calibración de la dificultad (D-42).
+
+**Criterio de aceptación de la fase** (para lo que se elija):
+- Todo comprobado en captura y con el bot sin errores, y nada empeora el rendimiento apreciablemente en Alta.
+- Lo jugable va por datos y con tests.
+- El arte nuevo de humanos, a bloques limpios; el pintado, con ComfyUI en local. Replicate, solo con tu permiso y el coste.
+
+### Bloque A: la parte 4 y las noches, a punto
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 22.1 | **Equilibrio de la parte 4 y de las tres noches sueltas** con el bot (`simular.py`, sin compras y con las compras esperables tras la parte 3): que cada nivel cueste algo más que el anterior sin picos, y que el jefe de cada noche no se alargue. Informe con caídas por minuto y causa | Propuesto |
+| 22.2 | **Rendimiento de las cinco arenas del sueño y las noches** en Alta: medir con `comparar.py`, calentar lo que falte (`LevelWarmup`) y bajar en Baja o Media lo que cueste | Propuesto |
+| 22.3 | **Logros de la parte 4 y de las noches** (los gatos de Ulthar, la galera, el gran gug, vencer a las tres formas de Nyarlathotep, cada noche sin caer) y sus trofeos en la sala | Propuesto |
+
+### Bloque B: otro idioma (D-54)
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 22.4 | **Textos traducibles:** sacar todos los textos de la interfaz, los datos y los relatos a tablas (`TranslationServer`, CSV o PO), con una prueba que avise de lo que quede sin pasar | Propuesto |
+| 22.5 | **Inglés completo** (interfaz, fichas de la Biblioteca, relatos, consejos y manual) y selector de idioma en Configuración. Para la página de itch.io, que llega a más gente en inglés | Propuesto |
+
+### Bloque C: una noche suelta más
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 22.6 | ***La música de Erich Zann*:** la rue d'Auseil de París, empinada y con escalones; la viola que suena desde la ventana más alta y empuja a los enemigos al ritmo de la música, que se acelera; lo que hay al otro lado de la ventana, como jefe. Con su arena, sus criaturas, su relato y su desafío | Propuesto |
+
+### Bloque D: para darlo a conocer
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 22.7 | **Tráiler grabado con bots**, con la misma técnica que el manual (`tools/grabar_manual.py`): escenas escogidas de las cuatro partes, cortes al ritmo de la música y título al final. En vídeo para itch.io y en GIF corto para redes | Propuesto |
+| 22.8 | **Capturas y textos para la página de itch.io:** cinco capturas a 1920 × 1080 en Alta, portada de 630 × 500, descripción en español e inglés y requisitos medidos | Propuesto |
