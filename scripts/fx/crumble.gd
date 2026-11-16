@@ -14,10 +14,16 @@ const BIG_LIFE := 1.1
 const MAX_ALIVE := 16
 ## Cuántos empiezan a deshacerse en un mismo fotograma (hito 22.2): una explosión entre zoogs
 ## mataba 25 a la vez y cada uno costaba ~170 µs (el modelo vuelve a la escena). Los demás
-## estallan en trozos sin quedarse; las élites y los únicos, siempre.
+## esperan en cola (`_Pending`) y empiezan en los fotogramas siguientes, de PER_FRAME en
+## PER_FRAME; si llevan más de WAIT_MAX s esperando, estallan sin quedarse. Las élites y los
+## únicos, siempre en el acto. `death_budget=false`: sin topes, para comparar.
 const PER_FRAME := 6
+const WAIT_MAX := 0.12
+const QUEUE_MAX := 24
+static var budgeted := true
 static var _frame := -1
 static var _started := 0
+static var _pending: _Pending
 const CUT_AT := 0.75                           ## en qué punto de la caída empieza a deshacerse
 ## Muertes según el daño (hito 17.9, Damage.how). burn: se queda en pie, se ennegrece con brasas
 ## (CHAR_TIME) y se deshace en ceniza, despacio; blast: las piezas salen volando con su giro y se
@@ -61,7 +67,31 @@ static func start(fx_parent: Node, model: Node3D, ember: Color, big := false, mo
 	if how == &"burn" and not enabled: how = &""                 # calidad Baja: sin el material, a su manera
 	if how == &"burn" or how == &"blast": model_name = ""         # ni caen: arden en pie o revientan
 	if (not enabled and model_name == "") or alive >= MAX_ALIVE or fx_parent == null or model == null or not model.has_meta("meshes"): return false
-	if not big and not budget(): return false
+	if not big and not budget():
+		return _defer(fx_parent, model, ember, model_name, how, frame)
+	_begin(fx_parent, model, ember, big, model_name, how, _frame_of(model, frame))
+	return true
+
+## Dónde colgaba el modelo: el padre que aún tiene o, fuera del árbol (horda), `frame`.
+static func _frame_of(model: Node3D, frame: Node3D) -> Transform3D:
+	if model.get_parent() is Node3D: return (model.get_parent() as Node3D).global_transform
+	if frame != null and frame.is_inside_tree(): return frame.global_transform
+	return Transform3D.IDENTITY
+
+## A la cola: sale de la escena (se va a liberar su enemigo) y espera su turno. Devuelve si cabe.
+static func _defer(fx_parent: Node, model: Node3D, ember: Color, model_name: String, how: StringName,
+		frame: Node3D) -> bool:
+	if _pending == null or not is_instance_valid(_pending) or not _pending.is_inside_tree():
+		_pending = _Pending.new()
+		fx_parent.add_child(_pending)
+	if _pending.items.size() >= QUEUE_MAX: return false
+	var xf := _frame_of(model, frame)
+	if model.get_parent() != null: model.get_parent().remove_child(model)
+	_pending.items.append([fx_parent, model, ember, model_name, how, xf, Time.get_ticks_msec()])
+	return true
+
+static func _begin(fx_parent: Node, model: Node3D, ember: Color, big: bool, model_name: String, how: StringName,
+		xf: Transform3D) -> void:
 	var c := Crumble.new()
 	c._life = BIG_LIFE if big else LIFE
 	c._ember = ember
@@ -82,8 +112,7 @@ static func start(fx_parent: Node, model: Node3D, ember: Color, big := false, mo
 	var holder := Node3D.new()
 	holder.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	c.add_child(holder)
-	if model.get_parent() is Node3D: holder.global_transform = (model.get_parent() as Node3D).global_transform
-	elif frame != null and frame.is_inside_tree(): holder.global_transform = frame.global_transform
+	holder.global_transform = xf
 	if model.get_parent() == null: holder.add_child(model)   # su transformación ya es la de dentro de `frame`
 	else: model.reparent(holder)
 	c._model = model
@@ -95,7 +124,6 @@ static func start(fx_parent: Node, model: Node3D, ember: Color, big := false, mo
 			mi.material_overlay = null                               # sin el destello del último golpe
 			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF   # se ahorra la pasada de sombras, como al deshacerse
 	alive += 1
-	return true
 
 func _dress() -> void:
 	_dressed = true
@@ -256,6 +284,34 @@ static func budget() -> bool:
 	if f != _frame:
 		_frame = f
 		_started = 0
-	if _started >= PER_FRAME: return false
+	if budgeted and _started >= PER_FRAME: return false
 	_started += 1
 	return true
+
+## La cola de los que esperan para deshacerse (hito 22.2). Se va sola cuando se vacía; si se
+## acaba la partida con alguno dentro, lo libera.
+class _Pending extends Node:
+	var items: Array = []
+
+	func _process(_delta: float) -> void:
+		var now := Time.get_ticks_msec()
+		while not items.is_empty():
+			var it: Array = items[0]
+			if not is_instance_valid(it[1]) or not is_instance_valid(it[0]):   # alguien ya lo liberó
+				items.pop_front()
+				continue
+			var model: Node3D = it[1]
+			var late := now - int(it[6]) > int(WAIT_MAX * 1000.0)
+			if late or Crumble.alive >= Crumble.MAX_ALIVE:       # tarde o sin sitio: estalla sin quedarse
+				items.pop_front()
+				model.queue_free()
+				continue
+			if not Crumble.budget(): break
+			items.pop_front()
+			Crumble._begin(it[0], model, it[2], false, it[3], it[4], it[5])
+		if items.is_empty(): queue_free()
+
+	func _exit_tree() -> void:
+		for it: Array in items:
+			if is_instance_valid(it[1]): (it[1] as Node).queue_free()
+		items.clear()

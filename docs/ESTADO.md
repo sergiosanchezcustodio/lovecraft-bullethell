@@ -3622,3 +3622,21 @@ Medido en Alta con el PC libre (`comparar.py`, `--veces 2 --perf 20`, bot `smart
 - **Compilaciones a mitad de partida:** de 0 a 4 por partida, especializaciones del ubershader que coinciden con la primera explosión, como en las demás partes (`p3_n2`, 4,5). No hace falta calentar nada aparte en `LevelWarmup`.
 - **Baja y Media:** nada nuevo que bajar. Lo que marca los tirones es la CPU (la física y las muertes); el dibujo se queda en 3-7 ms incluso en los picos.
 - Suite: 1070 de 1070.
+
+### Mejoras del hito 22.2 (16-11-2026, encargo del autor)
+
+- **Los que pasan del tope también se desmoronan:** en vez de estallar sin quedarse, esperan en una cola (`Crumble._Pending`, fuera de la escena) y empiezan en los fotogramas siguientes, de 6 en 6, en el sitio donde murieron. Si llevan más de 0,12 s esperando, si la cola pasa de 24 o si ya hay 16 deshaciéndose, estallan como antes.
+- **Fallo encontrado:** al borrarse, el enemigo libera su modelo si está fuera de la escena (el de la horda) y se llevaba también los de la cola. Ahora `_death_fx` suelta el modelo una vez que es de `Crumble`.
+- **Opción `death_budget=false`:** quita los dos topes, para comparar.
+- **Medición** (`comparar.py`, tres veces, Alta):
+
+  | Nivel | Topes | 1 % peor | Tirones de más de 25 ms |
+  |---|---|---|---|
+  | `p4_n1` | con | 19,2 ms | 9,3 |
+  | `p4_n1` | sin | 19,2 ms | 13,7 |
+  | `noche_color` | con | 18,6 ms | 11 |
+  | `noche_color` | sin | 17,9 ms | 11 |
+
+  Algo menos de tirones donde las explosiones matan a muchos zoogs; el 1 % peor, igual. La tarjeta gráfica estaba al 16 % antes de medir: compara solo dentro de esta tabla.
+- **Sin hacer:** medir en el escritorio normal (`ver=true`). Abre la ventana en tu pantalla y estabas usando el PC.
+- Suite: 1075 de 1075 (`tests/test_topes_muertes.gd`).

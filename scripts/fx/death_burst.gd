@@ -19,6 +19,7 @@ const PUDDLE_GROW := 0.9
 ## Trozos que saltan en un mismo fotograma (hito 22.2): con muchas muertes a la vez, los demás
 ## esperan al siguiente (de 6 en 6, unos ms: no se nota) en vez de juntarse en un tirón.
 const PER_FRAME := 6
+static var budgeted := true                    ## death_budget=false: sin tope, para comparar
 static var _frame := -1
 static var _bursts := 0
 var _t := 0.0
@@ -91,7 +92,7 @@ func _may_burst() -> bool:
 		_frame = f
 		_bursts = 0
 	if big: return true
-	if _bursts >= PER_FRAME: return false
+	if budgeted and _bursts >= PER_FRAME: return false
 	_bursts += 1
 	return true
 

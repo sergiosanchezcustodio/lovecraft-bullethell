@@ -873,7 +873,8 @@ func _death_fx() -> void:
 	fx.position = global_position
 	if how == &"burn": fx.ashen()
 	# el modelo se queda y se deshace en cubos (hito 11.1); la brasa, de su color más claro
-	if Crumble.start(world.fx, model, light.lerp(Color(1.0, 0.45, 0.15), 0.55), data.elite or data.unique, fall, how, visual):
+	var crumbles := Crumble.start(world.fx, model, light.lerp(Color(1.0, 0.45, 0.15), 0.55), data.elite or data.unique, fall, how, visual)
+	if crumbles:
 		fx.delay = Crumble.delay_for(fall, how)
 	elif model != null and is_instance_valid(model) and model.get_parent() == null:
 		model.queue_free()                            # no cuelga de nadie: no se iría con el enemigo
@@ -882,6 +883,7 @@ func _death_fx() -> void:
 		Ripples.add(world.fx, global_position, 1.4 + data.body_radius * 2.0, 0.8, 1.6)
 		Ripples.add(world.fx, global_position, 0.8 + data.body_radius, 0.6, 1.2)
 	died.emit(self)
+	if crumbles: model = null                         # ya es de Crumble (o espera en su cola, 22.2): que no lo libere al irse
 	queue_free()
 	Prof.stop("muerte", t0)
 
