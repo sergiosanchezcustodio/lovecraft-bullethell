@@ -780,6 +780,8 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 			var src := "bala" if d.source == null else String((d.source as Enemy).data.id) + (" (carga)" if d.physical > 8.0 else "")
 			print("  J%d golpe t=%.1f  -%d vida -%d cordura  de %s  -> vida %d" % [i + 1, director.time if director else 0.0, d.physical, d.mental, src, q.health]))
 	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void: Achievements.add(Saves.current, "crises"))
+	q.sanity_state.crisis_started.connect(func(k: StringName) -> void:   # de qué tipo, para las estadísticas (21.20)
+		if not q.remote: _crisis_kinds[String(k)] = int(_crisis_kinds.get(String(k), 0)) + 1)
 	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void: Rumble.heartbeat(q))   # dos latidos (16.30)
 	q.sanity_state.crisis_started.connect(func(k: StringName) -> void:
 		var what := "Crisis: %s" % SanityState.NAMES.get(k, "locura")
@@ -1587,6 +1589,7 @@ func _game_over() -> void:
 			BossRush.number_of(String(level.id)), BossRush.stages().size()]])
 	_end_screen(title, Color(0.86, 0.22, 0.18), "", "caida")
 
+var _crisis_kinds := {}                          ## crisis de cada tipo en este nivel (21.20)
 var _crisis_time := 0.0                          ## s en crisis de los jugadores de este PC en este nivel (21.20)
 var _challenge_record := false                   ## el desafío se acaba de superar mejorando el récord (diario)
 
@@ -1609,8 +1612,9 @@ func _archive(result: String) -> void:
 	for q in players:                                # estadísticas de la cuenta (21.20)
 		if not q.remote: AccountStats.add_player(Saves.current, String(q.data.id), director.time, world.table_of(q.index))
 	AccountStats.add_level(Saves.current, String(level.id), res == "won")
-	AccountStats.add_crisis(Saves.current, _crisis_time)
+	AccountStats.add_crisis(Saves.current, _crisis_time, _crisis_kinds)
 	_crisis_time = 0.0
+	_crisis_kinds = {}
 	RunArchive.add(Saves.current, {"level": String(level.id), "result": res, "t": director.time,
 		"seed": run_seed if level.daily == "" else 0, "pacts": Pacts.active().duplicate(), "madness": Madness.grade(),
 		"online": net_game != null, "players": ps})

@@ -126,7 +126,7 @@ func _happened(t: Dictionary) -> bool:
 	var time := dir.time if dir != null else 0.0
 	var players: Array = game.get("players") if game.get("players") != null else []
 	match String(t.when):
-		"move", "dodge", "pause", "sheet": return time >= float(t.get("at", 0.0))
+		"move", "dodge", "pause", "sheet", "manual": return time >= float(t.get("at", 0.0))
 		"gem":
 			var gems = game.get("gems")
 			return gems != null and gems.count > 0 and time >= 3.0

@@ -2,6 +2,12 @@
 	"_doc": "Manual del investigador (hito 21.19): tomo de la Biblioteca para quien empieza, una página por tema con un clip corto de la partida (tools/grabar_manual.py, resources/manual/<id>.ogv). 'facts': lo esencial, en rojo; 'text': la explicación. Complementa los consejos de la primera partida (data/tutorial.json).",
 	"pages": [
 		{
+			"id": "nivel",
+			"title": "Gemas y subidas de nivel",
+			"facts": ["Las criaturas sueltan gemas: pasa por encima", "Cada subida: elige una de tres cartas", "Y un punto de atributo para el investigador"],
+			"text": "Cada criatura que cae deja una gema de experiencia. Recógelas pasando por encima y, al llenar la barra, subes de nivel: la partida se para y eliges una de tres cartas. Puede ser mejorar un arma que ya llevas, empuñar una nueva o llevar un objeto que mejora al investigador.\n\nAdemás, cada subida suma un punto a uno de sus atributos, como la constitución o el poder, que se ve arriba de la ventana. Un arma al nivel máximo, con su objeto, puede evolucionar."
+		},
+		{
 			"id": "cordura",
 			"title": "Cordura y crisis",
 			"facts": ["La barra violeta, bajo la de vida", "Baja cerca de las criaturas y con sus ataques violetas", "A cero: una crisis de unos segundos"],

@@ -16,9 +16,11 @@ import os, shutil, subprocess, sys, tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'resources', 'manual')
 FPS = 30
+QUALITY = 4                     # Theora, 0-10: con 4, la mitad que con 6 y casi igual a 640 × 360
 COMMON = 'mute=true god=true cfg_quality=2 res=1280x720 tips=false night_events=false peddler=false bond_talk=false seed=7'
 
-# id: (opciones, segundo en que empieza el clip, segundos que dura)
+# id: (opciones, segundo en que empieza el clip, segundos que dura[, recortar el centro])
+# 'nivel' va sin bot (con bot la subida se elige sola, sin ventana) y sin recorte (la ventana, entera).
 CLIPS = {
     'cordura': ('level=p2_n1 character=varga bot=circle cam=10 crisis_at=6.5 '
                 'foes=profundo,3,1;profundo,-2,2.5;hibrido_h,1,-3', 4.5, 7.0),
@@ -28,11 +30,13 @@ CLIPS = {
                   4.5, 7.0),
     'elite': ('level=p2_n1 character=legrasse bot=idle dodge_every=999 cam=9 traits=escudo,icor '
               'foes=acechador,3.5,-2.5', 4.5, 7.0),
+    'nivel': ('level=p2_n1 character=dyer cam=10 levelup_at=5.5 pick_after=2.6 xp=0 '
+              'foes=profundo,4,1;profundo,-3,3;hibrido_h,1,-4', 4.5, 7.0, False),
     'objetivo': ('level=p2_n1 character=peaslee bot=idle dodge_every=999 cam=10 objective=ritual objective_at=4 objective_near=true', 4.5, 7.0),
 }
 
 
-def record(cid, opts, start, dur, sheet):
+def record(cid, opts, start, dur, sheet, crop=True):
     tmp = tempfile.mkdtemp(prefix='manual_')
     frames = int((start + dur) * FPS) + 10
     cmd = ['godot', '--path', '.', '--write-movie', os.path.join(tmp, 'f.png'), '--fixed-fps', str(FPS),
@@ -46,8 +50,8 @@ def record(cid, opts, start, dur, sheet):
     first = int(start * FPS)
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-framerate', str(FPS), '-start_number', str(first),
                     '-i', os.path.join(tmp, 'f%08d.png'), '-frames:v', str(int(dur * FPS)),
-                    '-vf', 'crop=920:518:180:100,scale=640:360:flags=lanczos,fade=t=in:st=0:d=0.4,fade=t=out:st=%.2f:d=0.4' % (dur - 0.4),
-                    '-c:v', 'libtheora', '-q:v', '6', '-an', dst], check=True)
+                    '-vf', ('crop=920:518:180:100,' if crop else '') + 'scale=640:360:flags=lanczos,fade=t=in:st=0:d=0.4,fade=t=out:st=%.2f:d=0.4' % (dur - 0.4),
+                    '-c:v', 'libtheora', '-q:v', str(QUALITY), '-an', dst], check=True)
     print('  ->', dst, '%d kB' % (os.path.getsize(dst) // 1024), flush=True)
     if sheet:
         from PIL import Image
@@ -55,7 +59,7 @@ def record(cid, opts, start, dur, sheet):
         ims = []
         for k in range(6):
             i = first + int(k * (dur * FPS - 1) / 5)
-            ims.append(Image.open(os.path.join(tmp, 'f%08d.png' % i)).convert('RGB').crop((180, 100, 1100, 618)).resize((640, 360)))
+            ims.append(Image.open(os.path.join(tmp, 'f%08d.png' % i)).convert('RGB').crop((180, 100, 1100, 618) if crop else (0, 0, 1280, 720)).resize((640, 360)))
         o = Image.new('RGB', (1280, 1080))
         for k, im in enumerate(ims): o.paste(im, ((k % 2) * 640, (k // 2) * 360))
         o.save(os.path.join(ROOT, 'tools', 'local', 'manual_%s.png' % cid))
@@ -66,8 +70,8 @@ def main():
     args = sys.argv[1:]
     ids = [a for a in args if a in CLIPS] or list(CLIPS)
     for cid in ids:
-        o, s, d = CLIPS[cid]
-        record(cid, o, s, d, '--hoja' in args)
+        o, s, d = CLIPS[cid][:3]
+        record(cid, o, s, d, '--hoja' in args, CLIPS[cid][3] if len(CLIPS[cid]) > 3 else True)
 
 
 if __name__ == '__main__':

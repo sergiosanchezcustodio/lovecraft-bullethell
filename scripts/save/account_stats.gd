@@ -7,6 +7,7 @@ extends RefCounted
 ##   weapons:    {id: [daño, bajas]}   (de la tabla de daño de cada jugador de este PC)
 ##   characters: {id: [partidas, s]}   (el favorito: el de más tiempo)
 ##   crisis:     s en crisis de los jugadores de este PC
+##   crisis_kinds: {tipo: veces} (parálisis, huida, vagar, paranoia, delirio)
 ##   levels:     {id: [partidas, superadas]}
 ## Solo cuentan las partidas que se apuntan en el archivo (las de una persona en este PC).
 
@@ -46,10 +47,13 @@ static func add_level(save: SaveData, level_id: String, won: bool) -> void:
 	ls[level_id] = [int(l[0]) + 1, int(l[1]) + (1 if won else 0)]
 	a["levels"] = ls
 
-static func add_crisis(save: SaveData, seconds: float) -> void:
-	if save == null or seconds <= 0.0: return
+static func add_crisis(save: SaveData, seconds: float, kinds := {}) -> void:
+	if save == null or (seconds <= 0.0 and kinds.is_empty()): return
 	var a := _all(save)
 	a["crisis"] = snappedf(float(a.get("crisis", 0.0)) + seconds, 0.1)
+	var ks: Dictionary = a.get("crisis_kinds", {})
+	for k: String in kinds: ks[k] = int(ks.get(k, 0)) + int(kinds[k])
+	a["crisis_kinds"] = ks
 
 static func crisis_time(save: SaveData) -> float:
 	return float(_read(save).get("crisis", 0.0))
@@ -77,6 +81,9 @@ static func rows(save: SaveData, what: String, top := TOP) -> Array[Dictionary]:
 				var v: Array = d[k]
 				var main := float(v[1]) if what == "characters" else float(v[0])
 				out.append({"id": k, "value": main, "extra": int(v[0]) if what == "characters" else int(v[1])})
+		"crisis":
+			var ck: Dictionary = _read(save).get("crisis_kinds", {})
+			for k: String in ck: out.append({"id": k, "value": float(ck[k]), "extra": 0})
 		"kills":
 			var b: Dictionary = save.records.get("bestiary", {}) if save != null else {}
 			for k: String in b:

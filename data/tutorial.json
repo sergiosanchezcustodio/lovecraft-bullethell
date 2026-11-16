@@ -16,7 +16,8 @@
 		{"id": "invisible", "when": "unseen", "urgent": true, "text": "No se ve, pero está: sigue sus huellas. Solo con el polvo de Ibn Ghazi se le ve y se le puede dar."},
 		{"id": "color", "when": "blight", "urgent": true, "text": "Estás en el color: te vuelve gris y quebradizo. Pierdes cordura y los golpes te hacen más daño. A los enemigos les pasa lo mismo: llévalos a él y sal tú."},
 		{"id": "pause", "when": "pause", "at": 40.0, "text": "Start o Esc pausa la partida."},
-		{"id": "sheet", "when": "sheet", "at": 75.0, "text": "Select o Tab abre la ficha del investigador; la cruceta abajo o M, el mapa del nivel."}
+		{"id": "sheet", "when": "sheet", "at": 75.0, "text": "Select o Tab abre la ficha del investigador; la cruceta abajo o M, el mapa del nivel."},
+		{"id": "manual", "when": "manual", "at": 110.0, "text": "Para saber más: en la Biblioteca, el tomo XII es el manual del investigador. Cordura, esquives, evoluciones, élites y objetivos, con ejemplos de la partida."}
 	],
 	"warnings": {
 		"fisico": "Golpe: sal del círculo",

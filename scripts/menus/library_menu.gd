@@ -302,12 +302,16 @@ func _show_entry(k: int) -> void:
 ## Página de las estadísticas con su gráfica en tinta (21.20): título, la explicación y la gráfica.
 func _show_chart(e: Dictionary, k: int) -> void:
 	var gap := Control.new()
-	gap.custom_minimum_size.y = 60
+	gap.custom_minimum_size.y = 60 if (e.facts as Array).is_empty() else 30
 	_right.add_child(gap)
 	var n := _ink(String(e.name), 40, INK, true)
 	n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_right.add_child(n)
 	_right.add_child(_rule())
+	for f in e.facts:                              # el resumen: sus cifras, y debajo la gráfica de las crisis
+		var l := _ink(String(f), 19, RED_INK)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_right.add_child(l)
 	var txt := _ink(String(e.text), 22, INK)
 	txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_right.add_child(txt)
@@ -315,6 +319,10 @@ func _show_chart(e: Dictionary, k: int) -> void:
 	g.custom_minimum_size.y = 16
 	_right.add_child(g)
 	var c: Dictionary = e.chart
+	if c.has("title"):
+		var h := _ink(String(c.title), 22, RED_INK, true)
+		h.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_right.add_child(h)
 	var chart := InkChart.line(c.get("points", []), String(c.get("label", "")), k) if String(c.kind) == "line" else InkChart.bars(c.get("rows", []), k)
 	_right.add_child(chart)
 

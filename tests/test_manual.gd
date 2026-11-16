@@ -1,7 +1,7 @@
 extends GutTest
 ## Hito 21.19: el manual del investigador en la Biblioteca.
 
-const TOPICS := ["cordura", "esquive", "evolucion", "elite", "objetivo"]
+const TOPICS := ["nivel", "cordura", "esquive", "evolucion", "elite", "objetivo"]
 
 func test_un_tomo_con_las_cinco_paginas() -> void:
 	var ids := Library.TOMES.map(func(t: Dictionary) -> String: return String(t.id))
@@ -30,7 +30,7 @@ func test_la_pagina_reproduce_el_clip() -> void:
 	m.open_at(Library.TOMES.map(func(t: Dictionary) -> String: return String(t.id)).find("manual"))
 	await wait_process_frames(3)
 	var players := m.find_children("*", "VideoStreamPlayer", true, false)
-	assert_eq(players.size(), 1, "la primera página, con su clip")
+	assert_eq(players.size(), 1, "la página, con su clip")
 	if players.size() == 1:
 		var vp := players[0] as VideoStreamPlayer
 		assert_true(vp.loop, "en bucle")

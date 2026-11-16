@@ -90,3 +90,14 @@ func test_la_pagina_dibuja_su_grafica() -> void:
 	m.open_at(Library.TOMES.map(func(t: Dictionary) -> String: return String(t.id)).find("stats"), 2)
 	await wait_process_frames(4)
 	assert_eq(m.find_children("*", "InkChart", true, false).size(), 1)
+
+func test_crisis_de_cada_tipo_en_el_resumen() -> void:
+	var s := SaveData.new()
+	AccountStats.add_crisis(s, 5.0, {"vagar": 2, "paralisis": 1})
+	AccountStats.add_crisis(s, 4.0, {"vagar": 1})
+	var r := AccountStats.rows(s, "crisis")
+	assert_eq(String(r[0].id), "vagar")
+	assert_eq(int(r[0].value), 3)
+	var resumen: Dictionary = Library.entries(s, "stats")[0]
+	assert_eq(String(resumen.chart.rows[0].label), "Vagar sin rumbo")
+	assert_false(Library.entries(SaveData.new(), "stats")[0].has("chart"), "sin crisis, sin gráfica")

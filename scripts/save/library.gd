@@ -297,8 +297,15 @@ static func stats_entries(save: SaveData) -> Array[Dictionary]:
 		"En crisis: " + SaveData.format_time(AccountStats.crisis_time(save)),
 		"Investigador favorito: " + (fav_c.display_name if fav_c != null else "aún ninguno"),
 	]
-	out.append(_e("resumen", "Resumen", true, "Lo que llevan reunido los investigadores de esta partida guardada, sumando cada noche jugada en este PC.",
-		"", "", null, facts))
+	var re := _e("resumen", "Resumen", true, "Lo que llevan reunido los investigadores de esta partida guardada, sumando cada noche jugada en este PC.",
+		"", "", null, facts)
+	var cr := []                                   # y las crisis de cada tipo, en tinta
+	for r: Dictionary in AccountStats.rows(save, "crisis"):
+		cr.append({"label": _cap(String(SanityState.NAMES.get(StringName(r.id), r.id))),
+			"value": r.value, "text": MenuKit.count(int(r.value), "vez", "veces")})
+	if not cr.is_empty():
+		re["chart"] = {"kind": "bars", "rows": cr, "title": "Crisis de cada tipo"}
+	out.append(re)
 	var kill_rows := []
 	for r: Dictionary in AccountStats.rows(save, "kills"):
 		var ed := "res://data/enemies/%s.tres" % String(r.id)
@@ -344,6 +351,9 @@ static func _chart(id: String, name: String, rows: Array, txt: String) -> Dictio
 	var e := _e(id, name, true, txt if not rows.is_empty() else "Aún no hay nada que contar: se apunta al acabar cada partida.", "", "", null, [])
 	e["chart"] = {"kind": "bars", "rows": rows}
 	return e
+
+static func _cap(t: String) -> String:
+	return t.left(1).to_upper() + t.substr(1)
 
 static func _char(id: String) -> CharacterData:
 	var p := "res://data/characters/%s.tres" % id
