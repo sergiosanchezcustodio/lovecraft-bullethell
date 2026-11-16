@@ -20,6 +20,7 @@ var _challenge_btn: Button
 var _nights_btn: Button
 var _madness_row: OptionRow
 var _col_w := 460.0                                   ## ancho de cada columna de parte
+const ROW_INDENT := 30                                ## sitio para el camino de tinta (21.18)
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -35,6 +36,11 @@ func _ready() -> void:
 	cols.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_child(cols)
 	var all := Campaign.levels()
+	var la0 := LaunchArgs.from_cmdline()
+	var seen := InkPath.Seen.get_seen(Saves.current)  # lo que ya se vio del mapa: eso no se anima
+	if la0.has("ink_seen"): seen = {"open": Array(la0.get_str("ink_seen").split(",", false)), "won": Array(la0.get_str("ink_won_seen", "").split(",", false))}   # capturas
+	var first_look := Saves.current != null and not Saves.current.records.has("map_ink") and not la0.has("ink_seen")   # partidas de antes: sin animar todo
+	var now_open: Array = []
 	var pi := 0
 	for part: Dictionary in Campaign.parts():
 		var col := VBoxContainer.new()
@@ -53,10 +59,30 @@ func _ready() -> void:
 		place.custom_minimum_size.x = _col_w
 		col.add_child(place)
 		col.add_child(_part_button(pi, part, won))
+		var holder := MarginContainer.new()           # el camino de tinta a la izquierda de los niveles (21.18)
+		holder.add_theme_constant_override("margin_left", ROW_INDENT)
+		col.add_child(holder)
+		var rows := VBoxContainer.new()
+		rows.add_theme_constant_override("separation", 8)
+		holder.add_child(rows)
+		var opened: Array[bool] = []
+		var beaten: Array[bool] = []
+		var s_open: Array[bool] = []
+		var s_won: Array[bool] = []
 		for l: Dictionary in all.filter(func(e: Dictionary) -> bool: return e.part == pi):
-			if dev: col.add_child(_level_button(l, won))
-			else: col.add_child(_level_line(l, won))
+			if dev: rows.add_child(_level_button(l, won))
+			else: rows.add_child(_level_line(l, won))
+			opened.append(_is_open(l, won))
+			beaten.append(won.has(l.id))
+			s_open.append(first_look or (seen.open as Array).has(l.id))
+			s_won.append(first_look or (seen.won as Array).has(l.id))
+			if opened.back(): now_open.append(l.id)
+		var ink := InkPath.new()
+		holder.add_child(ink)
+		ink.setup(rows, opened, beaten, s_open, s_won, pi)
+		ink.play.call_deferred(la0.get_bool("ink_instant"))
 		pi += 1
+	if Saves.current != null and InkPath.Seen.mark(Saves.current, now_open, won.duplicate()): Saves.save()
 	var extra := HBoxContainer.new()                 # modos aparte: del día y sin fin
 	extra.add_theme_constant_override("separation", 26)
 	extra.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -188,20 +214,22 @@ func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
 
 ## Nivel de una parte, solo informativo (fuera de las versiones de desarrollo).
 func _level_line(l: Dictionary, won: Array) -> Label:
-	var done := "✓ " if won.has(l.id) else ""
-	var lab := UiKit.label("%s%d.  %s" % [done, l.number, l.name], 17, UiKit.TEXT if won.has(l.id) else UiKit.TEXT_DIM)
-	lab.custom_minimum_size = Vector2(_col_w, 34)
+	var lab := UiKit.label("%d.  %s" % [l.number, l.name], 17, UiKit.TEXT if won.has(l.id) else UiKit.TEXT_DIM)   # el sello de lacre dice si está superado (21.18)
+	lab.custom_minimum_size = Vector2(_col_w - ROW_INDENT, 34)
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return lab
+
+## ¿Abierto el nivel? (el camino de tinta llega hasta él)
+func _is_open(l: Dictionary, won: Array) -> bool:
+	return Saves.current.has_level(l.id) if Saves.current else Campaign.is_unlocked(l.id, won)
 
 func _level_button(l: Dictionary, won: Array) -> Button:
 	var unlocked := Saves.current.has_level(l.id) if Saves.current else Campaign.is_unlocked(l.id, won)
 	var playable := unlocked and Campaign.exists(l.id)
 	var tag := "" if playable else ("  ·  Próximamente" if unlocked else "  ·  Bloqueado")
-	var done := "✓ " if won.has(l.id) else ""
-	var b := MenuKit.button("%s%d.  %s%s" % [done, l.number, l.name, tag], MenuKit.INK, 19)
+	var b := MenuKit.button("%d.  %s%s" % [l.number, l.name, tag], MenuKit.INK, 19)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	b.custom_minimum_size = Vector2(_col_w, 58)
+	b.custom_minimum_size = Vector2(_col_w - ROW_INDENT, 58)
 	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	b.disabled = not playable
 	b.add_theme_color_override("font_disabled_color", Color(UiKit.TEXT_DIM, 0.55 if not unlocked else 0.9))

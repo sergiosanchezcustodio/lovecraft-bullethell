@@ -375,6 +375,19 @@
 				"quill_2.wav"
 			]
 		},
+		"seal": {
+			"db": -9,
+			"pitch": [
+				0.74,
+				0.82
+			],
+			"voices": 1,
+			"gap": 0.12,
+			"files": [
+				"stamp_0.wav",
+				"stamp_1.wav"
+			]
+		},
 		"ui_accept": {
 			"db": -8,
 			"pitch": [

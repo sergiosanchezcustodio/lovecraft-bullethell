@@ -749,7 +749,7 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 |---|---|---|
 | 21.16 | **Retratos pintados de los investigadores** (ComfyUI en local), con el estilo de la portada, para la selección y la tienda. El modelo voxel sigue en la partida | Propuesto |
 | 21.17 | **Final ilustrado de cada parte:** al vencer al jefe, una ilustración con el cierre del relato antes de la pantalla de victoria | Propuesto |
-| 21.18 | **El mapa de niveles, más vivo:** el camino se dibuja con tinta al abrirse un nivel y cada nivel superado deja su sello de lacre | Propuesto |
+| 21.18 | **El mapa de niveles, más vivo:** el camino se dibuja con tinta al abrirse un nivel y cada nivel superado deja su sello de lacre | Hecho (16-11-2026), pendiente de revisión: `InkPath`, una línea de tinta sepia une los niveles abiertos de cada parte y un sello de lacre marca los superados; lo nuevo desde la última vez se dibuja y se estampa al abrir el mapa (`records["map_ink"]`, sonido `seal`) |
 
 ### Bloque F: menús
 
