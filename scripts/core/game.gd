@@ -1587,6 +1587,7 @@ func _game_over() -> void:
 			BossRush.number_of(String(level.id)), BossRush.stages().size()]])
 	_end_screen(title, Color(0.86, 0.22, 0.18), "", "caida")
 
+var _crisis_time := 0.0                          ## s en crisis de los jugadores de este PC en este nivel (21.20)
 var _challenge_record := false                   ## el desafío se acaba de superar mejorando el récord (diario)
 
 ## Archivo de expediciones (hito 16.26): la partida, con quién la jugó, sus armas, la tabla de
@@ -1605,6 +1606,11 @@ func _archive(result: String) -> void:
 			cause = "%s (%s)" % [FallReport.name_of(String(h.get("src", "otro"))), FallReport.via_name(String(h.get("via", "otro")))]
 		ps.append(RunArchive.player_entry(q, world, cause))
 	var res := "endless" if level.endless and result == "caida" else ("won" if result == "superado" else "lost")
+	for q in players:                                # estadísticas de la cuenta (21.20)
+		if not q.remote: AccountStats.add_player(Saves.current, String(q.data.id), director.time, world.table_of(q.index))
+	AccountStats.add_level(Saves.current, String(level.id), res == "won")
+	AccountStats.add_crisis(Saves.current, _crisis_time)
+	_crisis_time = 0.0
 	RunArchive.add(Saves.current, {"level": String(level.id), "result": res, "t": director.time,
 		"seed": run_seed if level.daily == "" else 0, "pacts": Pacts.active().duplicate(), "madness": Madness.grade(),
 		"online": net_game != null, "players": ps})
@@ -2352,6 +2358,9 @@ func _process_step(delta: float) -> void:
 		if not alive.is_empty(): camera.targets = alive
 	# tiempo jugado del hueco: en tiempo real, sin contar pausas ni la velocidad del juego
 	if not get_tree().paused and not _ended: Saves.add_play_time(delta / maxf(Engine.time_scale, 0.001))
+	if not get_tree().paused and not _ended:              # minutos en crisis de los de este PC (estadísticas, 21.20)
+		for q in players:
+			if not q.remote and q.sanity_state != null and q.sanity_state.in_crisis: _crisis_time += delta
 	if args.get_bool("debug") and fmod(_t, 0.5) < delta: print("t=%.1f jugador=%s" % [_t, player.global_position])
 	# cada 30 s del director (21-10-2026: con fmod(time, 30) < delta casi nunca se escribía, porque
 	# el director avanza con su propio paso y rara vez caía dentro del margen)

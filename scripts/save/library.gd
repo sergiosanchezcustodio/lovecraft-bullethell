@@ -19,6 +19,7 @@ const TOMES := [
 	{"id": "archive", "title": "Archivo de expediciones", "roman": "X"},
 	{"id": "trophies", "title": "Sala de trofeos", "roman": "XI"},
 	{"id": "manual", "title": "Manual del investigador", "roman": "XII"},
+	{"id": "stats", "title": "Estadísticas", "roman": "XIII"},
 ]
 const MANUAL_PATH := "res://data/manual.json"     ## (hito 21.19)
 const MANUAL_VIDEO := "res://resources/manual/%s.ogv"
@@ -76,6 +77,8 @@ static func kill_facts(save: SaveData, enemy_id: String) -> Array:
 static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	match tome:
+		"stats":                                       # estadísticas de la cuenta (hito 21.20): páginas con gráficas en tinta
+			out.append_array(stats_entries(save))
 		"manual":                                      # para quien empieza (hito 21.19): siempre abierto, con su clip
 			for pg: Dictionary in manual_pages():
 				var e := _e(String(pg.id), String(pg.title), true, String(pg.get("text", "")), "", "", null, pg.get("facts", []))
@@ -274,6 +277,77 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				out.append(_e(String(p.id), p.display_name, known, text("pets", p.id), p.model, "full", null,
 					[p.description], "Compañeros"))
 	return out
+
+## Tomo XIII (hito 21.20): un resumen, gráficas de barras (bajas por criatura, daño por arma,
+## investigadores, niveles), la línea de las últimas partidas y los récords. Las páginas con gráfica
+## llevan `chart`: {kind: "bars", rows: [{label, value, text}]} o {kind: "line", points, label}.
+static func stats_entries(save: SaveData) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var st: Dictionary = save.stats if save != null else {}
+	var fav := AccountStats.favorite(save)
+	var fav_c := _char(fav)
+	var won := 0
+	for l in Campaign.levels(): if save != null and save.levels_won.has(String(l.id)): won += 1
+	var facts := [
+		"Tiempo jugado: " + SaveData.format_time(save.play_time if save != null else 0.0),
+		"Partidas: %d · caídas: %d" % [int(st.get("runs", 0)), int(st.get("deaths", 0))],
+		"Niveles de la campaña superados: %d de %d" % [won, Campaign.levels().size()],
+		"Criaturas abatidas: " + MenuKit.money(int(st.get("kills", 0))),
+		"Compañeros levantados: %d" % int(st.get("revives", 0)),
+		"En crisis: " + SaveData.format_time(AccountStats.crisis_time(save)),
+		"Investigador favorito: " + (fav_c.display_name if fav_c != null else "aún ninguno"),
+	]
+	out.append(_e("resumen", "Resumen", true, "Lo que llevan reunido los investigadores de esta partida guardada, sumando cada noche jugada en este PC.",
+		"", "", null, facts))
+	var kill_rows := []
+	for r: Dictionary in AccountStats.rows(save, "kills"):
+		var ed := "res://data/enemies/%s.tres" % String(r.id)
+		kill_rows.append({"label": (load(ed) as EnemyData).display_name if ResourceLoader.exists(ed) else String(r.id),
+			"value": r.value, "text": MenuKit.money(int(r.value))})
+	out.append(_chart("criaturas", "Bajas por criatura", kill_rows, "Las criaturas que más han caído ante los investigadores."))
+	var w_rows := []
+	for r: Dictionary in AccountStats.rows(save, "weapons"):
+		var id := String(r.id)
+		w_rows.append({"label": "Compañeros" if id == "mascota" else RunArchive.source_name(id), "value": r.value,
+			"text": "%s · %s" % [MenuKit.money(int(r.value)), MenuKit.count(int(r.extra), "baja")]})
+	out.append(_chart("armas", "Daño por arma", w_rows, "Todo el daño que ha hecho cada arma, y cuántas criaturas ha abatido."))
+	var c_rows := []
+	for r: Dictionary in AccountStats.rows(save, "characters"):
+		var c := _char(String(r.id))
+		c_rows.append({"label": c.display_name if c != null else String(r.id), "value": r.value,
+			"text": "%s · %s" % [SaveData.format_time(float(r.value)), MenuKit.count(int(r.extra), "partida")]})
+	out.append(_chart("investigadores", "Investigadores", c_rows, "Cuánto tiempo ha pasado cada uno en la noche."))
+	var l_rows := []
+	for r: Dictionary in AccountStats.rows(save, "levels"):
+		l_rows.append({"label": RunArchive.place({"level": String(r.id)}), "value": r.value,
+			"text": "%s · %d superadas" % [MenuKit.count(int(r.value), "vez", "veces"), int(r.extra)]})
+	out.append(_chart("niveles", "Lugares más jugados", l_rows, "Dónde se ha vuelto una y otra vez."))
+	var e := _e("ultimas", "Las últimas partidas", true, "Lo que duró cada una de las últimas partidas del archivo, de la más antigua a la más reciente. En rojo, las superadas.",
+		"", "", null, [])
+	e["chart"] = {"kind": "line", "points": AccountStats.recent(save), "label": "minutos"}
+	out.append(e)
+	var rec := []
+	var eb := int(st.get("endless_best", 0))
+	rec.append("La noche eterna: " + (RunArchive.clock(eb) if eb > 0 else "aún sin jugar"))
+	var br := BossRush.best_any(save)
+	rec.append("Desfile de jefes: " + (RunArchive.clock(br) + " entero" if br > 0.0 else "aún sin completar"))
+	rec.append("Desafíos superados: %d de %d" % [Challenge.won_count(save), Challenge.all().size()])
+	var ex := 0
+	for pi in Campaign.parts().size(): ex += Expedition.wins(save, pi)
+	rec.append("Expediciones completadas: %d" % ex)
+	rec.append("Mejor racha de la partida del día: " + MenuKit.count(Daily.best_streak(save), "día"))
+	out.append(_e("records", "Récords", true, "Las mejores marcas de los modos de juego. El archivo de expediciones (tomo X) guarda el detalle de las últimas partidas.",
+		"", "", null, rec))
+	return out
+
+static func _chart(id: String, name: String, rows: Array, txt: String) -> Dictionary:
+	var e := _e(id, name, true, txt if not rows.is_empty() else "Aún no hay nada que contar: se apunta al acabar cada partida.", "", "", null, [])
+	e["chart"] = {"kind": "bars", "rows": rows}
+	return e
+
+static func _char(id: String) -> CharacterData:
+	var p := "res://data/characters/%s.tres" % id
+	return load(p) as CharacterData if id != "" and ResourceLoader.exists(p) else null
 
 static func manual_pages() -> Array:
 	var v: Variant = JSON.parse_string(FileAccess.get_file_as_string(MANUAL_PATH))

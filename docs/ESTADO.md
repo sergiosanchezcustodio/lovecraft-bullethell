@@ -3548,3 +3548,15 @@ Por tramos: nivel 1; nivel 2; nivel 3; niveles 4 y 5. Lo de cada nivel vive en `
 - **Estantería:** con doce tomos, cada fila mide `748 / tomos − 12` px (56 con once), y así sigue sin pisar la esquina.
 - **Capturas:** `title saves=trofeos_saves open=menu_biblioteca tome=11 cursor=2 shots=13` da `shots/titulo_manual_013.0s.png`; la estantería, `shots/titulo_estanteria_013.0s.png`.
 - **Tests:** 4 en `tests/test_manual.gd` (el tomo con las cinco páginas abiertas, un clip por página que se carga como vídeo, la cuenta en la estantería y la página que lo reproduce en bucle). Suite: 1055 de 1055.
+
+## Hito 21.20: estadísticas de la cuenta (16-11-2026)
+
+- **Tomo XIII de la Biblioteca, «Estadísticas»** (`Library.stats_entries`), siete páginas:
+  - Resumen: tiempo jugado, partidas y caídas, niveles de la campaña superados, criaturas abatidas, compañeros levantados, tiempo en crisis e investigador favorito (el de más tiempo).
+  - Bajas por criatura (del bestiario, 15.4), daño por arma (con sus bajas), investigadores (tiempo y partidas) y lugares más jugados (veces y superadas): gráficas de barras, las ocho primeras.
+  - Las últimas partidas: una línea con lo que duró cada una de las del archivo (16.26), con las superadas en rojo.
+  - Récords: la noche eterna, el desfile de jefes, desafíos superados, expediciones completadas y la mejor racha de la partida del día.
+- **Lo nuevo se apunta al acabar cada nivel** (`AccountStats`, en `SaveData.records["account"]`): daño y bajas por arma con la tabla de daño entera de cada jugador de este PC, partidas y segundos por investigador, partidas y victorias por lugar, y los segundos en crisis (`game._crisis_time`, que suma cada fotograma). Va en `game._archive`, así que cuenta lo mismo que el archivo: las partidas de una persona en este PC (con bots, `archive_save=true`). Lo de antes de este hito empieza en cero; el tiempo jugado, las bajas por criatura y los récords ya se apuntaban.
+- **Gráficas en tinta** (`InkChart`, `scripts/ui/ink_chart.gd`): barras como trazos de pluma, con los bordes que tiemblan, la tinta que se va acabando y una gota al final; la primera, en rojo. Al abrir la página la tinta corre: cada barra crece 0,7 s, 0,09 s después de la anterior, y la línea se dibuja de izquierda a derecha.
+- **Prueba de verdad:** tres partidas con bot en una copia de la partida de trofeos (`saves=stats_saves slot=1 archive_save=true character=… level=… bot=smart timescale=3 win_at=70 crisis_at=20`) dejaron armas, investigadores, lugares y 14,9 s en crisis. Capturas: `title saves=stats_saves open=menu_biblioteca tome=12 cursor=N shots=13` da `shots/titulo_stats0_013.0s.png` (resumen), `stats2` (armas) y `stats5` (últimas partidas).
+- **Tests:** 8 en `tests/test_account_stats.gd` (sumas por partida, crisis y lugares, que sobrevive al guardar, bajas del bestiario, orden de las últimas partidas, el tomo con sus siete páginas, la gráfica que crece y la página que la dibuja). Suite: 1063 de 1063.

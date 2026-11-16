@@ -169,6 +169,7 @@ func _show_tome_cover(i: int) -> void:
 	var c := _ink("%s de %s" % [n.x, n.y] + (" conseguidos" if tome.id == "achievements" else " descubiertos"), 28, INK_DIM)
 	if tome.id == "diary": c.text = MenuKit.count(n.x, "entrada") if n.x > 0 else "Aún no hay nada escrito"
 	if tome.id == "trophies": c.text = "%d de %d trofeos en las vitrinas" % [n.x, n.y]
+	if tome.id == "stats": c.text = "Tiempo jugado: " + SaveData.format_time(save.play_time if save != null else 0.0)
 	if tome.id == "manual": c.text = "%d páginas para quien empieza" % n.y
 	if tome.id == "archive": c.text = MenuKit.count(n.x, "partida") + " (las %d últimas)" % RunArchive.MAX if n.x > 0 else "Aún no se ha jugado ninguna"
 	c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -236,6 +237,9 @@ func _open_tome(i: int) -> void:
 func _show_entry(k: int) -> void:
 	for c in _right.get_children(): c.queue_free()
 	var e: Dictionary = _entries[k]
+	if e.has("chart"):
+		_show_chart(e, k)
+		return
 	var known: bool = e.known
 	var tex := _image(e)
 	if e.has("video"):                            # manual del investigador (21.19): su clip, en bucle
@@ -294,6 +298,25 @@ func _show_entry(k: int) -> void:
 		txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		txt.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_right.add_child(txt)
+
+## Página de las estadísticas con su gráfica en tinta (21.20): título, la explicación y la gráfica.
+func _show_chart(e: Dictionary, k: int) -> void:
+	var gap := Control.new()
+	gap.custom_minimum_size.y = 60
+	_right.add_child(gap)
+	var n := _ink(String(e.name), 40, INK, true)
+	n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_right.add_child(n)
+	_right.add_child(_rule())
+	var txt := _ink(String(e.text), 22, INK)
+	txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_right.add_child(txt)
+	var g := Control.new()
+	g.custom_minimum_size.y = 16
+	_right.add_child(g)
+	var c: Dictionary = e.chart
+	var chart := InkChart.line(c.get("points", []), String(c.get("label", "")), k) if String(c.kind) == "line" else InkChart.bars(c.get("rows", []), k)
+	_right.add_child(chart)
 
 ## Un clip del manual (21.19) en un marco de tinta, sin sonido y en bucle.
 const VIDEO_SIZE := Vector2(608, 342)
