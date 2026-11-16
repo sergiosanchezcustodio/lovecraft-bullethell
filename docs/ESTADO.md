@@ -3516,3 +3516,17 @@ Por tramos: nivel 1; nivel 2; nivel 3; niveles 4 y 5. Lo de cada nivel vive en `
   - Derby alterna con Asenath en la selección: el retrato de su segundo cuerpo (`alt_model`, `resources/retratos/asenath.jpg`, semilla 1) va encima y aparece cada 4,5 s, con un fundido de 0,8 s (`ALT_CYCLE`, `ALT_FADE`). Capturas: `shots/seleccion_derby_002.0s.png` (Edward) y `_004.5s.png` (Asenath), con `pick=derby`.
   - La ficha del investigador en la Biblioteca (tomo V) lleva el retrato en lugar del modelo, si se le conoce; si no, sigue la silueta del modelo, para no destapar a los secretos. Captura: `shots/titulo_biblio_retrato_012.0s.png`.
   - Tests: `test_portraits` (Derby tiene también el de Asenath). Suite: 1045 de 1045.
+
+### 21.17: el final ilustrado de cada parte (16-11-2026)
+
+- **Qué se ve:** al superar el último nivel de una parte (p1_n5, p2_n5, p3_n5 y p4_n5), después del tiempo de recoger y antes de la pantalla de victoria, la ilustración de esa parte a pantalla completa. Entra con un fundido desde negro y hace un acercamiento lento (7 % en 16 s). Abajo, sobre un degradado oscuro, el título de la parte en oro y la frase que cierra el relato, en EB Garamond con sombra, y «A o Intro: seguir». Se pasa con A, Start, B, Intro, Espacio, Esc o un clic, a partir de 1,2 s, para no saltarla sin querer al seguir pulsando de la pelea. Después se funde a negro y sale la pantalla de victoria (y, en Cthulhu y Nyarlathotep, su epílogo, como antes).
+- **Las ilustraciones** (`tools/gen_finales.py`, ComfyUI en local, 1344 × 768 llevadas a 1920 × 1080, `resources/finales/p1..p4.jpg`, 1,4 MB las cuatro), en el estilo de los retratos:
+  - Parte 1: el avión que se aleja al amanecer sobre la ciudad de los Antiguos, con el abismo que brilla. Se rehízo: las tres primeras semillas daban templos griegos o un castillo.
+  - Parte 2: el submarino, los torpedos en el Arrecife del Diablo, Innsmouth con su iglesia y alguien mirando desde una roca.
+  - Parte 3: R'lyeh hundiéndose en la tormenta y el Alert alejándose con un farol.
+  - Parte 4: Carter cayendo entre estrellas y auroras hacia el Boston dorado, y el shantak que se va.
+  `generar_local.generate` admite ahora un alto (`height`) para las apaisadas.
+- **Las frases** (`data/part_finales.json`), por ejemplo la de la parte 2: «En febrero de 1928 llegaron los federales, y un submarino torpedeó el Arrecife del Diablo. Innsmouth se quedó vacía. Lo que vivía bajo las aguas, no».
+- **Solo en la campaña:** los desafíos, el desfile y las expediciones llevan otro id y no la muestran. Con bots (`autonext`, `autorestart`) se pasa sola a los 2,5 s; `finale=false` la quita.
+- **Pruebas:** `win_at=s` supera el nivel a los s segundos (nuevo). `finale_shot=s` captura la ilustración (con `halt_shots=true`). Capturas: `level=p2_n5 bot=smart god=true win_at=3 halt_shots=true finale_shot=4` da `shots/game_final_p2_parada1.png`; también `game_final_p4_parada1.png`.
+- **Tests:** 3 en `tests/test_part_finale.gd` (un final por parte con su ilustración y el título de la parte, solo en la campaña, con bots se pasa sola). Suite: 1048 de 1048.

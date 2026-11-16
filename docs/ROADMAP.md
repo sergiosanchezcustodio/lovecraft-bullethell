@@ -748,7 +748,7 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 | Hito | Contenido | Estado |
 |---|---|---|
 | 21.16 | **Retratos pintados de los investigadores** (ComfyUI en local), con el estilo de la portada, para la selección y la tienda. El modelo voxel sigue en la partida | Hecho (16-11-2026), pendiente de revisión: estilo A (óleo) elegido por el autor; 21 retratos (`tools/gen_retratos.py`, `resources/retratos/`, `Portraits`). En la selección sustituyen al modelo, que sale al mantener LB/RB y en el vestuario; en la tienda, en lugar de la cabeza voxel |
-| 21.17 | **Final ilustrado de cada parte:** al vencer al jefe, una ilustración con el cierre del relato antes de la pantalla de victoria | Propuesto |
+| 21.17 | **Final ilustrado de cada parte:** al vencer al jefe, una ilustración con el cierre del relato antes de la pantalla de victoria | Hecho (16-11-2026), pendiente de revisión: `PartFinale`, cuatro ilustraciones al óleo (`tools/gen_finales.py`, `resources/finales/`) con la frase que cierra cada relato (`data/part_finales.json`), antes de la pantalla de victoria |
 | 21.18 | **El mapa de niveles, más vivo:** el camino se dibuja con tinta al abrirse un nivel y cada nivel superado deja su sello de lacre | Hecho (16-11-2026), pendiente de revisión: `InkPath`, una línea de tinta sepia une los niveles abiertos de cada parte y un sello de lacre marca los superados; lo nuevo desde la última vez se dibuja y se estampa al abrir el mapa (`records["map_ink"]`, sonido `seal`) |
 
 ### Bloque F: menús

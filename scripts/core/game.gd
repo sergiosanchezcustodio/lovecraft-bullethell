@@ -398,6 +398,8 @@ func _ready() -> void:
 		_grant_signs()
 		if args.get_bool("log"): print("INICIO %s nivel=%d armas=%s" % [level_id, player.progress.level, player.weapons.weapons.map(func(w: WeaponSystem.Weapon) -> String: return "%s:%d" % [w.data.id, w.level])])
 		if args.has("final_at"): level.final_time = args.get_float("final_at")
+		if args.has("win_at"):                         # pruebas: el nivel, superado a los s segundos (21.17)
+			get_tree().create_timer(args.get_float("win_at"), false).timeout.connect(_on_level_completed)
 		if args.get_bool("boss") and level.final_next != null:      # boss=true: el jefe es el evento final
 			level.final_enemy = level.final_next
 			level.final_next = null
@@ -1793,6 +1795,13 @@ func _on_level_completed() -> void:
 	var next_id := Campaign.next_in_part(String(level.id))
 	if BossRush.is_rush(String(level.id)): next_id = BossRush.next(String(level.id))
 	elif Expedition.is_expedition(String(level.id)): next_id = exp_next
+	if PartFinale.applies(String(level.id), args):  # el final ilustrado de la parte (21.17), antes de la victoria
+		_drop_card()
+		if announcer != null: announcer.modulate.a = 0.0
+		var fin := PartFinale.new(PartFinale.data_for(String(level.id)), args.has("autonext") or args.has("autorestart"))
+		add_child(fin)
+		if args.has("finale_shot"): get_tree().create_timer(args.get_float("finale_shot"), true, false, true).timeout.connect(func() -> void: _halt_shot())   # capturas
+		await fin.done
 	_end_screen(won_title, UiKit.GOLD, next_id, "superado")
 
 ## Expedición (16.21): la bolsa y el tiempo pasan al mapa; tras el jefe, el récord. Devuelve lo

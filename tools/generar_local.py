@@ -31,8 +31,8 @@ TEST = os.path.join(ROOT, 'tools', 'local')
 STEPS = 4                                 # Schnell está hecho para 4 pasos
 
 
-def workflow(prompt, seed, size=1024):
-    """Grafo de ComfyUI: FLUX Schnell GGUF + T5/CLIP + VAE, 4 pasos, cfg 1."""
+def workflow(prompt, seed, size=1024, height=None):
+    """Grafo de ComfyUI: FLUX Schnell GGUF + T5/CLIP + VAE, 4 pasos, cfg 1. `height`: apaisado (size = ancho)."""
     return {
         '1': {'class_type': 'UnetLoaderGGUF', 'inputs': {'unet_name': 'flux1-schnell-Q4_K_S.gguf'}},
         '2': {'class_type': 'DualCLIPLoader', 'inputs': {'clip_name1': 't5xxl_fp8_e4m3fn.safetensors',
@@ -40,7 +40,7 @@ def workflow(prompt, seed, size=1024):
         '3': {'class_type': 'VAELoader', 'inputs': {'vae_name': 'ae.safetensors'}},
         '4': {'class_type': 'CLIPTextEncode', 'inputs': {'text': prompt, 'clip': ['2', 0]}},
         '5': {'class_type': 'CLIPTextEncode', 'inputs': {'text': '', 'clip': ['2', 0]}},
-        '6': {'class_type': 'EmptySD3LatentImage', 'inputs': {'width': size, 'height': size, 'batch_size': 1}},
+        '6': {'class_type': 'EmptySD3LatentImage', 'inputs': {'width': size, 'height': height or size, 'batch_size': 1}},
         '7': {'class_type': 'KSampler', 'inputs': {'model': ['1', 0], 'positive': ['4', 0], 'negative': ['5', 0],
                                                    'latent_image': ['6', 0], 'seed': seed, 'steps': STEPS, 'cfg': 1.0,
                                                    'sampler_name': 'euler', 'scheduler': 'simple', 'denoise': 1.0}},
@@ -54,9 +54,9 @@ def _get(path):
         return r.read()
 
 
-def generate(prompt, seed, size=1024):
+def generate(prompt, seed, size=1024, height=None):
     """Lanza el grafo y espera la imagen (PNG en bytes)."""
-    body = json.dumps({'prompt': workflow(prompt, seed, size)}).encode()
+    body = json.dumps({'prompt': workflow(prompt, seed, size, height)}).encode()
     req = urllib.request.Request(URL + '/prompt', data=body, headers={'Content-Type': 'application/json'})
     try:
         pid = json.loads(urllib.request.urlopen(req, timeout=30).read())['prompt_id']

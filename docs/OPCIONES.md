@@ -46,7 +46,7 @@ godot --path . scenes/bench.tscn --disable-vsync --resolution 1920x1080 -- count
   - `bullet_rain=N`: mantiene N balas enemigas vivas (prueba de carga).
   - `level=p1_n1`: nivel a jugar (por defecto). `nolevel=true` deja el campo de pruebas sin oleadas.
   - `timescale=N`: acelera el juego. Las capturas de `shots=` usan tiempo de juego.
-  - `final_at=s`: adelanta el evento final.
+  - `final_at=s`: adelanta el evento final. `win_at=s`: supera el nivel a los s segundos (hito 21.17; con el último de una parte sale su final ilustrado: `finale_shot=s` lo captura con `halt_shots=true`, `finale=false` lo quita).
   - `seed=N`: semilla de la partida (hito 16.26; sin ella, una nueva). `archive_save=true`: apunta la partida en el archivo de expediciones aunque juegue un bot. `log_ups=true`: escribe la semilla y las opciones de cada subida.
   - `reflections=true|false`: fuerza o quita los reflejos en el agua (hito 16.31; por defecto, los de la calidad: Alta y Ultra). `refl_debug=true` enseña la imagen del reflejo en una esquina y la pone en todo el suelo.
   - `moon_shafts=true|false`: fuerza o quita los haces de luna (hito 16.32; por defecto, los de la calidad: Alta y Ultra). Con `log=true`, cuántos y lo que tardan en montarse.

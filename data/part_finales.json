@@ -1,0 +1,25 @@
+{
+	"_comentario": "Finales ilustrados de cada parte (hito 21.17, PartFinale): al superar el nivel, su ilustración (tools/gen_finales.py) con la frase que cierra el relato, antes de la pantalla de victoria. 'title': el de la parte; 'text': el cierre.",
+	"finales": {
+		"p1_n5": {
+			"image": "res://resources/finales/p1.jpg",
+			"title": "En las montañas de la locura",
+			"text": "El avión dejó atrás la ciudad muerta y las cumbres negras. Danforth miró una sola vez por la ventanilla y no volvió a hablar de lo que vio. Lo que quedaba allí abajo seguiría esperando bajo el hielo."
+		},
+		"p2_n5": {
+			"image": "res://resources/finales/p2.jpg",
+			"title": "La sombra sobre Innsmouth",
+			"text": "En febrero de 1928 llegaron los federales, y un submarino torpedeó el Arrecife del Diablo. Innsmouth se quedó vacía. Lo que vivía bajo las aguas, no."
+		},
+		"p3_n5": {
+			"image": "res://resources/finales/p3.jpg",
+			"title": "La llamada de Cthulhu",
+			"text": "R'lyeh volvió a hundirse antes del amanecer, y el Alert se alejó entre la tormenta. Cthulhu sigue soñando en su casa de las profundidades. Algún día, cuando las estrellas estén en su sitio, volverá a llamar."
+		},
+		"p4_n5": {
+			"image": "res://resources/finales/p4.jpg",
+			"title": "La búsqueda onírica de la desconocida Kadath",
+			"text": "Carter soltó el cuello del shantak y cayó a través de la noche, hacia una ciudad dorada que siempre había estado al otro lado de su ventana."
+		}
+	}
+}
