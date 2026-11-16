@@ -20,11 +20,13 @@ const CAMERA_SIZE := 20.0
 const VOICE := Color(1.0, 0.85, 0.45)
 const DARK := Color(0.45, 0.25, 0.7)
 const FORMS := ["", "nyarla_faraon", "nyarla_nucleo", "nyarla_sin_rostro"]
+const GLOW_COLOR := Color(0.62, 0.38, 1.0)
 
 var phase := 0
 var shown := 0                              ## forma que se ve (también en la marioneta)
 var recomposed := 0                         ## veces que se ha recompuesto (tests)
 var flames := 0                             ## llamas negras lanzadas (tests)
+var glow: OmniLight3D                       ## su luz, en la fase 3
 var _fan := 3.0
 var _ring := 3.0
 var _words := 2.0
@@ -81,6 +83,20 @@ func _show(e: Enemy, p: int) -> void:
 	var model := String(e.data.param("form_%d" % p, FORMS[p]))
 	var scale := float(e.data.param("scale_%d" % p, e.data.model_scale))
 	if e.model_name != model or not is_equal_approx(e.model_scale, scale): e.swap_model(model, scale)
+	if p == 3 and glow == null: _glow(e)
+
+## El ser sin rostro es negro sobre la noche: una luz violeta suya aclara el suelo a su alrededor y lo
+## recorta (en el anfitrión y en la marioneta).
+func _glow(e: Enemy) -> void:
+	glow = OmniLight3D.new()
+	glow.name = "NyarlaGlow"
+	glow.light_color = GLOW_COLOR
+	glow.light_energy = float(e.data.param("glow_energy", 2.2))
+	glow.omni_range = float(e.data.param("glow_range", 10.0))
+	glow.omni_attenuation = 0.8
+	glow.shadow_enabled = false
+	glow.position = Vector3(0, 1.2, 1.5)                      # un poco por delante: recorta las alas
+	e.add_child(glow)
 
 # ------------------------------------------------------------------ 1: el faraón negro
 
@@ -115,6 +131,7 @@ func _speak(e: Enemy) -> void:
 	var text := String(lines[_line % lines.size()])
 	_line += 1
 	e.world.shout(text, e.global_position + Vector3(0, 3.6, 0), VOICE, 52, 0.6, 3.2)
+	e.world.sfx("nyarla_voice", e.global_position)
 
 # ------------------------------------------------------------------ 2: el enjambre
 
@@ -169,7 +186,8 @@ func _vanish(e: Enemy) -> void:
 	var tg := Telegraph.enemy(float(e.data.param("recompose_radius", 2.6)), _away, Color(DARK, 0.85))
 	tg.position = _to
 	e.world.fx.add_child(tg)
-	e.world.sfx("polyp_vanish", e.global_position)
+	e.world.sfx("nyarla_scatter", e.global_position)
+	e.world.sfx("nyarla_gather", _to)                     # se junta allí: su golpe sordo, al llegar (1,25 s)
 
 ## Se recompone: golpea donde llega.
 func _arrive(e: Enemy) -> void:
@@ -184,7 +202,6 @@ func _arrive(e: Enemy) -> void:
 	e.world.strike(_to, r, dm)
 	e.world.ground_hit(_to, r, DARK)
 	e.world.shake(0.35)
-	e.world.sfx("roar", _to)
 
 # ------------------------------------------------------------------ 3: el ser sin rostro
 

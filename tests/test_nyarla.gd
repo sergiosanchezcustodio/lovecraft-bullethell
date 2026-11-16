@@ -58,6 +58,7 @@ func test_cambia_de_forma_por_fases() -> void:
 	assert_eq(b.phase, 3)
 	assert_eq(e.model_name, "nyarla_sin_rostro", "el ser sin rostro")
 	assert_almost_eq(e.model_scale, 3.0, 0.01, "enorme")
+	assert_not_null(b.glow, "con su luz, que lo recorta")
 
 func test_el_faraon_habla_y_dispara() -> void:
 	var p := _player()
@@ -111,3 +112,10 @@ func test_en_el_invitado_cambia_de_forma_por_la_vida() -> void:
 	for i in 30: b.puppet_step(e, DT)
 	assert_eq(e.model_name, "nyarla_sin_rostro", "la marioneta enseña la forma de su vida")
 	assert_lt(p.sanity, s0, "y quita la cordura a los de su PC")
+
+func test_sus_sonidos_existen() -> void:
+	var ev: Dictionary = (JSON.parse_string(FileAccess.get_file_as_string("res://data/sfx.json")) as Dictionary)["eventos"]
+	for id in ["nyarla_voice", "nyarla_gather", "nyarla_scatter"]:
+		assert_true(ev.has(id), "existe " + id)
+		for f in ev.get(id, {}).get("files", []):
+			assert_true(ResourceLoader.exists("res://resources/sfx/" + String(f)), "existe " + String(f))

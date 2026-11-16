@@ -13,6 +13,7 @@ Uso: python tools/gen_sfx.py <carpeta con los packs de Kenney descomprimidos>
      python tools/gen_sfx.py --buzo       (solo la respiración del casco de buzo y la linterna que falla)
      python tools/gen_sfx.py --sueno      (solo el sueño de Kuranes)
      python tools/gen_sfx.py --kadath     (solo las flautas de los Otros Dioses)
+     python tools/gen_sfx.py --nyarla     (solo los de Nyarlathotep)
      python tools/gen_sfx.py --fase20     (solo los de Pickman, Ward, Gilman, Tillinghast y Derby)
      python tools/gen_sfx.py --sucesos    (solo los de los sucesos de la noche: augurio, ventisca y estrellas)
 """
@@ -1309,6 +1310,66 @@ def kadath():
     save('flutes', out)
 
 
+def nyarla():
+    """Nyarlathotep (hito 21.11). La voz del faraón: un murmullo grave y suave, de vocales con tono que bajan
+    al final de cada sílaba, doblado una octava abajo y con un eco largo (dos variantes; suena con cada
+    frase). El enjambre: un aleteo de muchas alas que se junta y acaba en un golpe sordo (al recomponerse),
+    y el mismo al revés, que se deshace (al esfumarse)."""
+    r = np.random.default_rng(2111)
+    VOW = [((650, 5), (1100, 7)), ((420, 5), (800, 7)), ((330, 5), (2100, 8)), ((520, 5), (1600, 7))]
+
+    def echo(x, sec=1.6, decay=0.6, k=0.5):
+        ir = lp(r.standard_normal(int(sec * SR)), 2500) * np.exp(-t(sec) / decay)
+        wet = signal.fftconvolve(x, ir)[:len(x)]
+        return x + wet * np.std(x) / (np.std(wet) + 1e-9) * k
+
+    for k in range(2):
+        dur = 2.4
+        n = int(dur * SR)
+        f = np.full(n, 0.0)
+        env_ = np.zeros(n)
+        out = np.zeros(n)
+        t0 = 0.15
+        while t0 < dur - 0.6:
+            d = r.uniform(0.18, 0.34)
+            a0, m = int(t0 * SR), int(d * SR)
+            x = np.linspace(0, 1, m)
+            f0 = r.uniform(108, 128) * (1 - 0.12 * x)            # cada sílaba baja un poco: habla suave
+            f[a0:a0 + m] = f0
+            env_[a0:a0 + m] = np.sin(np.pi * x) ** 1.2
+            t0 += d + r.uniform(0.02, 0.09)
+        f[f == 0] = 110.0
+        v = _voice(f, 0.05, r, formants=VOW[k % len(VOW)] + VOW[(k + 2) % len(VOW)], harm=10)
+        low = _voice(f * 0.5, 0.08, r, formants=((300, 4),), harm=6)
+        out = (v / (np.std(v) + 1e-9) + 0.6 * low / (np.std(low) + 1e-9)) * env_
+        out += hp(r.standard_normal(n), 3000) * env_ * 0.05     # el aliento
+        out = echo(lp(out, 4200))
+        fade = int(0.5 * SR)
+        out[-fade:] *= np.linspace(1, 0, fade) ** 2
+        save('nyarla_voice_%d' % k, out)
+
+    dur = 1.6
+    n = int(dur * SR)
+    tt = t(dur)
+    out = np.zeros(n)
+    for w in range(40):                                          # muchas alas, cada vez más juntas
+        rate = r.uniform(14, 26)
+        start = r.uniform(0, 0.6)
+        flap = np.maximum(0, np.sin(2 * np.pi * rate * (tt - start))) ** 3
+        flap *= (tt > start) * np.clip((tt - start) / 0.6, 0, 1)
+        out += bp(r.standard_normal(n), r.uniform(300, 900), r.uniform(1500, 3000)) * flap * r.uniform(0.3, 1.0)
+    out *= np.linspace(0.4, 1.0, n) ** 2
+    hit_at = int(1.25 * SR)                                      # se junta: golpe sordo
+    m = n - hit_at
+    tk = np.arange(m) / SR
+    hit = np.sin(2 * np.pi * (55 + 60 * np.exp(-tk * 18)) * tk) * np.exp(-tk * 6)
+    out[hit_at:] = out[hit_at:] * np.exp(-tk * 12) + hit * 3.0 * np.std(out[:hit_at])
+    save('nyarla_gather', out)
+    rev = out[:hit_at][::-1].copy()                              # al revés: se deshace
+    rev[-int(0.3 * SR):] *= np.linspace(1, 0, int(0.3 * SR))
+    save('nyarla_scatter', rev)
+
+
 def pnakotus():
     """La sombra fuera del tiempo (hito 21.15). El pólipo: un silbido hueco y quebrado, como el viento por
     un tubo, que sube y baja con aire alrededor (dos variantes); antes de embestir, uno que sube de golpe.
@@ -1442,6 +1503,8 @@ if __name__ == '__main__':
         pnakotus()
     elif '--kadath' in sys.argv:                               # solo las flautas de los Otros Dioses (hito 21.10)
         kadath()
+    elif '--nyarla' in sys.argv:                               # solo los de Nyarlathotep (hito 21.11)
+        nyarla()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)
