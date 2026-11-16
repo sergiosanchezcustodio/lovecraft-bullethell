@@ -13,6 +13,7 @@ const MIN_TIME := 1.2                              ## s antes de poder pasarla
 const AUTO_TIME := 2.5                             ## s con bots
 const ZOOM := 1.07                                 ## acercamiento al cabo de ZOOM_TIME
 const ZOOM_TIME := 16.0
+const WORD_TIME := 0.11                            ## s por palabra de la frase
 
 var _d: Dictionary
 var _t := 0.0
@@ -93,7 +94,8 @@ func _ready() -> void:
 	line.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
 	line.add_theme_constant_override("shadow_offset_x", 2)
 	line.add_theme_constant_override("shadow_offset_y", 2)
-	line.modulate.a = 0.0
+	line.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING   # las líneas, ya partidas: no saltan
+	line.visible_characters = 0
 	box.add_child(line)
 	_hint = MenuKit.hint("A o Intro: seguir")
 	_hint.modulate.a = 0.0
@@ -101,16 +103,28 @@ func _ready() -> void:
 	_img.pivot_offset = get_viewport().get_visible_rect().size * Vector2(0.5, 0.42)
 	var tw := create_tween()
 	tw.tween_property(_root, "modulate:a", 1.0, 0.9)
-	tw.tween_property(line, "modulate:a", 1.0, 1.2)
+	var ends := word_ends(line.text)                   # palabra a palabra, como si se escribiera con tinta
+	tw.tween_method(func(v: float) -> void: line.visible_characters = ends[mini(int(v), ends.size() - 1)],
+		0.0, float(ends.size()) - 0.001, WORD_TIME * ends.size())
 	tw.tween_property(_hint, "modulate:a", 1.0, 0.5)
 	create_tween().tween_property(_img, "scale", Vector2.ONE * ZOOM, ZOOM_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	Auto.sfx("page")
+	Auto.sfx("part_finale")                             # un acorde grave y largo (gen_sfx.py --finale)
+
+## Dónde acaba cada palabra de `text` (en caracteres; la última, el final).
+static func word_ends(text: String) -> Array[int]:
+	var out: Array[int] = []
+	for i in text.length():
+		if text[i] == " " and i > 0 and text[i - 1] != " ": out.append(i)
+	out.append(text.length())
+	return out
 
 func _process(delta: float) -> void:
 	_t += delta
 	if _auto and _t >= AUTO_TIME: close()
 
 func _input(e: InputEvent) -> void:
+	if (e is InputEventKey or e is InputEventJoypadButton or e is InputEventJoypadMotion or e is InputEventMouseButton) and e.is_pressed():
+		get_viewport().set_input_as_handled()          # nada llega a lo de debajo (la Biblioteca) mientras se ve
 	if _closing or _t < MIN_TIME: return
 	var go := false
 	if e is InputEventKey and e.pressed and not e.echo:

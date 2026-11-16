@@ -26,3 +26,19 @@ func test_se_pasa_sola_con_bots() -> void:
 	await wait_seconds(PartFinale.AUTO_TIME + 0.8)
 	assert_true(got[0], "avisa al acabar")
 	assert_false(is_instance_valid(fin), "y se va")
+
+func test_la_frase_sale_palabra_a_palabra() -> void:
+	assert_eq(PartFinale.word_ends("Lo que vivía"), [2, 6, 12] as Array[int])
+	assert_eq(PartFinale.word_ends("una"), [3] as Array[int])
+
+func test_suena_su_acorde() -> void:
+	var d: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/sfx.json"))
+	assert_true((d.eventos as Dictionary).has("part_finale"))
+	assert_true(FileAccess.file_exists("res://resources/sfx/part_finale.wav"))
+
+func test_los_finales_en_la_biblioteca() -> void:
+	var s := SaveData.new()
+	s.levels_won.append("p2_n5")
+	var fins := Library.entries(s, "stories").filter(func(e: Dictionary) -> bool: return e.has("finale"))
+	assert_eq(fins.size(), Campaign.parts().size(), "uno por parte")
+	for e: Dictionary in fins: assert_eq(bool(e.known), String(e.finale) == "p2_n5", "abierto al vencer a su jefe")

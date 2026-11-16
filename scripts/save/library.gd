@@ -126,6 +126,17 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 					return t.left(1).to_upper() + t.substr(1))))
 				out.append(_e(String(ep[0]), String(ep[1]), _seen(save, "epilogues", StringName(ep[0])), txt, "", "", null,
 					["Tras vencer a Nyarlathotep" if ep[0] == "epilogo_kadath" else "Tras vencer a Cthulhu" + (" con menos de un cuarto de la cordura" if ep[0] == "epilogo_locura" else "")], "Epílogos"))
+			for pi in Campaign.parts().size():              # los finales ilustrados (21.17): al vencer al jefe de la parte
+				var last := ""
+				for l in Campaign.levels(): if int(l.part) == pi: last = String(l.id)
+				var fd := PartFinale.data_for(last)
+				if fd.is_empty(): continue
+				var img: Texture2D = load(String(fd.image)) if ResourceLoader.exists(String(fd.image)) else null
+				var fe := _e("final_" + last, String(fd.title), save != null and (save.unlock_all or save.levels_won.has(last)),
+					String(fd.text), "", "", img, ["Parte %d · Tras vencer a su jefe" % (pi + 1), "A: verla a toda pantalla"], "Finales")
+				fe["wide"] = true
+				fe["finale"] = last
+				out.append(fe)
 			for n: Dictionary in Nights.all():              # el relato de cada noche suelta, al jugarla
 				var lines: Array = (rel as Dictionary).get(String(n.id), []) if rel is Dictionary else []
 				out.append(_e(String(n.id), String(n.titulo), _seen(save, "places", StringName(n.id)) or Nights.wins(save, String(n.id)) > 0,

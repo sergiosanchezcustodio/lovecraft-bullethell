@@ -22,7 +22,7 @@ func test_se_guardan_y_completan_su_relato() -> void:
 	var lib := Library.entries(back, "stories")
 	var known := lib.filter(func(e: Dictionary) -> bool: return e.known)
 	assert_eq(known.size(), 3)
-	assert_eq(lib.size(), 20 + 3 + Nights.all().size(), "páginas, epílogos y noches sueltas")
+	assert_eq(lib.size(), 20 + 3 + Campaign.parts().size() + Nights.all().size(), "páginas, epílogos, finales (21.17) y noches sueltas")
 
 func test_sitios_libres_y_fijos() -> void:
 	var o := ObstacleMap.new()

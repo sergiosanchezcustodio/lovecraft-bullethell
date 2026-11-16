@@ -226,6 +226,7 @@ func _open_tome(i: int) -> void:
 		if not e.known or e.get("dim", false): b.add_theme_color_override("font_color", INK_DIM)
 		b.focus_entered.connect(func() -> void: _show_entry(k))
 		if tome.id == "archive": b.pressed.connect(func() -> void: _ask_replay(e))   # repetir con su semilla (16.26)
+		if e.has("finale"): b.pressed.connect(func() -> void: _show_finale(e))     # a toda pantalla (21.17)
 		list.add_child(b)
 	_left.add_child(_hint("A: repetir con su semilla  ·  B o Esc: volver" if tome.id == "archive" else "Arriba/abajo: recorrer  ·  B o Esc: volver a los tomos"))
 	MenuKit.chain_focus(_rows)
@@ -236,11 +237,11 @@ func _show_entry(k: int) -> void:
 	var e: Dictionary = _entries[k]
 	var known: bool = e.known
 	var tex := _image(e)
-	if _tome == "places":                          # el mapa, a lo ancho de la página
+	if _tome == "places" or e.get("wide", false):  # el mapa (o el final de una parte, 21.17), a lo ancho de la página
 		if tex != null and known:
 			var map := TextureRect.new()
 			map.texture = tex
-			var h := 360.0                         # lo que deja libre el texto sin que crezca la página
+			var h := 360.0 if not e.get("wide", false) else 300.0   # lo que deja libre el texto sin que crezca la página
 			map.custom_minimum_size = Vector2(h * tex.get_width() / tex.get_height(), h)
 			map.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			map.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -289,6 +290,16 @@ func _show_entry(k: int) -> void:
 		txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		txt.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_right.add_child(txt)
+
+## El final ilustrado de una parte (21.17), a toda pantalla; al pasarlo, de vuelta a su fila.
+func _show_finale(e: Dictionary) -> void:
+	if _sub != null or not bool(e.known): return
+	var back := get_viewport().gui_get_focus_owner()
+	var fin := PartFinale.new(PartFinale.data_for(String(e.finale)))
+	add_child(fin)
+	if back != null: back.release_focus()
+	fin.done.connect(func() -> void:
+		if back != null and is_instance_valid(back): back.grab_focus.call_deferred())
 
 ## Archivo de expediciones (hito 16.26): ¿volver a jugarla con la misma semilla?
 func _ask_replay(e: Dictionary) -> void:

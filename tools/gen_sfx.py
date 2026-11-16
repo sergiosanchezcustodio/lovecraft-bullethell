@@ -14,6 +14,7 @@ Uso: python tools/gen_sfx.py <carpeta con los packs de Kenney descomprimidos>
      python tools/gen_sfx.py --sueno      (solo el sueño de Kuranes)
      python tools/gen_sfx.py --kadath     (solo las flautas de los Otros Dioses)
      python tools/gen_sfx.py --nyarla     (solo los de Nyarlathotep)
+     python tools/gen_sfx.py --finale     (solo el acorde de los finales ilustrados, hito 21.17)
      python tools/gen_sfx.py --fase20     (solo los de Pickman, Ward, Gilman, Tillinghast y Derby)
      python tools/gen_sfx.py --sucesos    (solo los de los sucesos de la noche: augurio, ventisca y estrellas)
 """
@@ -1267,6 +1268,29 @@ def dunwich():
     save('horror_cry', tail(x, 0.8))
 
 
+def finale():
+    """El final ilustrado de cada parte (hito 21.17): un acorde grave y largo que entra despacio.
+    Re menor con la novena (re, la, fa, mi) en registro de órgano: cada nota con sus parciales
+    1, 2 y 3, un trémolo lento y desafinada un pelo para que lata; un pedal de re grave debajo,
+    un soplo de aire filtrado y un eco largo. 7 s."""
+    r = np.random.default_rng(2117)
+    d = 7.0
+    tt = t(d)
+    env = np.minimum(tt / 1.6, 1.0) ** 1.6 * np.exp(-np.maximum(tt - 3.5, 0) / 1.6)
+    x = np.zeros(len(tt))
+    for f, a in ((73.42, 1.0), (110.0, 0.7), (174.61, 0.55), (329.63, 0.3), (36.71, 0.8)):
+        for k, (ratio, pa) in enumerate(((1.0, 1.0), (2.0, 0.35), (3.0, 0.12))):
+            det = 1.0 + r.uniform(-0.0025, 0.0025)
+            x += a * pa * np.sin(2 * np.pi * f * ratio * det * tt + r.uniform(0, 6.28))
+    x *= 1.0 + 0.08 * np.sin(2 * np.pi * 0.35 * tt)
+    air = bp(r.standard_normal(len(tt)), 300, 1800) * 0.06 * np.minimum(tt / 2.5, 1.0)
+    x = lp(x, 1800) + air
+    ir = lp(r.standard_normal(int(2.2 * SR)), 3000) * np.exp(-t(2.2) / 0.8)
+    wet = signal.fftconvolve(x, ir)[:len(x)]
+    wet *= np.std(x) / (np.std(wet) + 1e-9)
+    save('part_finale', (x * 0.6 + wet * 0.5) * env)
+
+
 def kadath():
     """Las flautas de los Otros Dioses (hito 21.10, nivel 5 de la parte 4): «el redoble sordo y enloquecedor de
     tambores viles y el gemido fino y monótono de flautas malditas». Tres flautas finas, desafinadas entre sí
@@ -1505,6 +1529,8 @@ if __name__ == '__main__':
         kadath()
     elif '--nyarla' in sys.argv:                               # solo los de Nyarlathotep (hito 21.11)
         nyarla()
+    elif '--finale' in sys.argv:                               # solo el acorde de los finales ilustrados (hito 21.17)
+        finale()
     elif '--avisos' in sys.argv:                               # solo los avisos de fuera de cámara (hito 13.13)
         avisos()
     elif '--olas' in sys.argv:                                 # solo el rumor de la marea (hito 12.13)

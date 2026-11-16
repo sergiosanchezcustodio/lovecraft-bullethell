@@ -375,6 +375,18 @@
 				"quill_2.wav"
 			]
 		},
+		"part_finale": {
+			"db": -7,
+			"pitch": [
+				1.0,
+				1.0
+			],
+			"voices": 1,
+			"gap": 1.0,
+			"files": [
+				"part_finale.wav"
+			]
+		},
 		"seal": {
 			"db": -9,
 			"pitch": [
