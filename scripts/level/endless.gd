@@ -1,7 +1,7 @@
 class_name Endless
 extends Node
 ## Modo sin fin «La noche eterna» (hito 13.8, fase 13): se abre al vencer a Cthulhu. Se elige
-## uno de los 15 escenarios y se aguanta sin final: oleadas con enemigos de las tres partes,
+## uno de los escenarios de la campaña y se aguanta sin final: oleadas con enemigos de todas las partes,
 ## un jefe cada 5 minutos y una dificultad que sube sola. El nivel se monta a partir del de ese
 ## escenario (`make_level`, id «sin_fin:p2_n3»: así viaja igual en red, con START, y se
 ## reintenta); este nodo, en el anfitrión, lo endurece con el tiempo (`step`). Récord de tiempo
@@ -50,13 +50,13 @@ static func make_level(id: String) -> LevelData:
 	var skip: Array = c.get("skip_enemies", [])
 	var pool: Array[EnemyData] = []
 	var seen := {}
-	for p in 3:
-		for n in 5:
-			var l: LevelData = load("res://data/levels/p%d_n%d.tres" % [p + 1, n + 1])
-			for d in l.pool:
-				if d.unique or seen.has(d.id) or skip.has(String(d.id)) or String(d.id).ends_with("_muelle"): continue
-				seen[d.id] = true
-				pool.append(d)
+	for cl: Dictionary in Campaign.levels():          # las cuatro partes (la del sueño desde el 21.12)
+		if not Campaign.exists(String(cl.id)): continue
+		var l: LevelData = load("res://data/levels/%s.tres" % cl.id)
+		for d in l.pool:
+			if d.unique or seen.has(d.id) or skip.has(String(d.id)) or String(d.id).ends_with("_muelle"): continue
+			seen[d.id] = true
+			pool.append(d)
 	lv.pool = pool
 	var rates: Array[Vector2] = []
 	for r: Array in c.get("spawn_rate", [[0, 0.6], [300, 3.0], [900, 5.0], [1800, 7.0], [3600, 9.0]]):

@@ -75,28 +75,29 @@ func _ready() -> void:
 		eb.custom_minimum_size = Vector2(460, 58)
 		eb.focus_entered.connect(func() -> void:
 			_info_title.text = "La noche eterna"
-			_info_text.text = "Modo sin fin: eliges escenario y aguantas oleadas de las tres partes, con un horror cada cinco minutos. Récord por personaje y escenario.")
+			_info_text.text = "Modo sin fin: eliges escenario y aguantas oleadas de todas las partes, con un horror cada cinco minutos. Récord por personaje y escenario.")
 		eb.pressed.connect(func() -> void: _endless(eb))
 		extra.add_child(eb)
 		_endless_btn = eb
-	var exp_open := [0, 1, 2].filter(func(p: int) -> bool: return Expedition.unlocked(Saves.current, p) and Demo.part_ok(p))
+	var all_parts := range(Campaign.parts().size())   # la parte 4 también (21.12, mejoras)
+	var exp_open := all_parts.filter(func(p: int) -> bool: return Expedition.unlocked(Saves.current, p) and Demo.part_ok(p))
 	if (not exp_open.is_empty() or dev) and not Demo.on() and not Net.is_active():   # expedición (hito 16.21): al superar una parte, sin red
 		var xb := MenuKit.button("Expedición" + ("" if not exp_open.is_empty() else "  ·  Desarrollo"), MenuKit.INK, 24)
 		xb.custom_minimum_size = Vector2(460, 58)
 		xb.focus_entered.connect(func() -> void:
 			_info_title.text = "Expedición"
 			_info_text.text = "Una tirada por una parte con un mapa de caminos que se bifurcan: combates, élites, el buhonero, curiosidades y descansos, y el jefe al final. Lo que ganas solo vale en esa expedición. Se abre la de cada parte al superarla. Sin red.")
-		xb.pressed.connect(func() -> void: _expedition(xb, exp_open if not dev else [0, 1, 2]))
+		xb.pressed.connect(func() -> void: _expedition(xb, exp_open if not dev else all_parts))
 		extra.add_child(xb)
 		if LaunchArgs.from_cmdline().get_bool("expedition_open"):   # capturas (recorrido de las ventanas)
-			_expedition.call_deferred(xb, exp_open if not dev else [0, 1, 2])
+			_expedition.call_deferred(xb, exp_open if not dev else all_parts)
 	if (BossRush.unlocked(Saves.current) or dev) and not Demo.on():   # desfile de jefes (hito 16.22): al vencer a Cthulhu
 		var rb := MenuKit.button("Desfile de jefes" + ("" if BossRush.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
 		rb.custom_minimum_size = Vector2(460, 58)
 		rb.focus_entered.connect(func() -> void:
 			_info_title.text = "Desfile de jefes"
 			var best := BossRush.best_any(Saves.current)
-			_info_text.text = "Los jefes de la campaña seguidos, cada uno en su escenario: Gedney, el shoggoth primigenio, Obed Marsh, Madre Hydra y Padre Dagon, el viejo Castro y Cthulhu. Empiezas fuerte y lo que ganas pasa de uno a otro. Sin pactos. Récord del tiempo total por personaje." + ("" if best <= 0.0 else " Tu récord: %s." % Endless.clock(best)))
+			_info_text.text = "Los jefes de la campaña seguidos, cada uno en su escenario: Gedney, el shoggoth primigenio, Obed Marsh, Madre Hydra y Padre Dagon, el viejo Castro, Cthulhu y Nyarlathotep. Empiezas fuerte y lo que ganas pasa de uno a otro. Sin pactos. Récord del tiempo total por personaje." + ("" if best <= 0.0 else " Tu récord: %s." % Endless.clock(best)))
 		rb.pressed.connect(func() -> void:
 			Pacts.set_active([])
 			GameSession.carry.clear()

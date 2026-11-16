@@ -3484,3 +3484,8 @@ Por tramos: nivel 1; nivel 2; nivel 3; niveles 4 y 5. Lo de cada nivel vive en `
   - p4_n5 «Ante el Caos reptante»: solo armas arcanas nuevas y +20 % de vida enemiga.
 - **Pendiente:** la música de cada nivel de la parte 4. Cada `.tres` usa ya una pista de otras partes (p. ej. *Hallow Quest* en el bosque y *At the End of Hope* en Kadath), puesta a modo provisional: queda para que el autor elija una propia.
 - **Tests:** `test_relatos` (Carter y Kuranes en la parte 4), `test_fragments` (20 páginas de campaña y tres epílogos), `test_title_progress` (4 partes), `test_trophies` (24 jefes), `test_campaign` (20 niveles) y `test_challenge` (20 desafíos). Suite: 1032 de 1032.
+- **Mejoras (16-11-2026, encargo del autor):**
+  - Expedición de la parte 4: el mapa de niveles ya ofrece todas las partes (antes, solo las tres primeras). Se abre al vencer a Nyarlathotep, con él al final.
+  - Desfile de jefes: Nyarlathotep es el séptimo, tras Cthulhu (`data/boss_rush.json`). El texto del menú lo nombra.
+  - «La noche eterna»: las criaturas salen de todos los niveles de la campaña, también los de la parte 4 (`Endless.make_level` recorre `Campaign.levels()`). El zoog anciano, la gran bestia lunar y el gran gug de Koth entran en la rueda de horrores (`data/endless.json`). El menú reparte las cuatro columnas como el mapa: `shots/seleccion_sinfin4_002.5s.png`. Probado con un bot en `sin_fin:p4_n2` durante cinco minutos, sin errores y con criaturas mezcladas: `shots/game_sinfin_p4_300.0s.png`.
+  - Tests: `test_endless` (las criaturas del sueño y el gug de Koth), `test_expedition` (la parte 4) y `test_boss_rush` (siete jefes). Suite: 1034 de 1034.

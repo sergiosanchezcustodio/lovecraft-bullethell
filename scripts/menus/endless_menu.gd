@@ -1,6 +1,6 @@
 class_name EndlessMenu
 extends Control
-## «La noche eterna» (hito 13.8): elegir uno de los 15 escenarios para el modo sin fin. Una
+## «La noche eterna» (hito 13.8): elegir uno de los escenarios de la campaña para el modo sin fin. Una
 ## columna por parte; en cada botón, el nivel y el mejor tiempo aguantado en él (con cualquier
 ## personaje). B / Esc vuelve al mapa. `picked` da el nivel base (p. ej. "p2_n3").
 
@@ -9,16 +9,18 @@ signal closed
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var w: Array = MenuKit.window(self, Color(0.3, 0.25, 0.55), 1500)
+	var four := Campaign.parts().size() > 3           # la parte 4 (21.12): columnas más estrechas
+	var col_w := 390.0 if four else 460.0
+	var w: Array = MenuKit.window(self, Color(0.3, 0.25, 0.55), 1720 if four else 1500)
 	var box: VBoxContainer = w[1]
 	MenuKit.heading(box, "La noche eterna", 48, Color(0.72, 0.62, 1.0))
-	var sub := UiKit.label("Elige escenario. Oleadas sin final con criaturas de las tres partes, un horror cada cinco minutos y cada vez más duro.", 19, UiKit.TEXT_DIM)
+	var sub := UiKit.label("Elige escenario. Oleadas sin final con criaturas de todas las partes, un horror cada cinco minutos y cada vez más duro.", 19, UiKit.TEXT_DIM)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	sub.custom_minimum_size.x = 1300
 	box.add_child(sub)
 	var cols := HBoxContainer.new()
-	cols.add_theme_constant_override("separation", 22)
+	cols.add_theme_constant_override("separation", 18 if four else 22)
 	cols.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_child(cols)
 	var grid: Array = []                             # [parte][nivel] -> botón, para mover el foco
@@ -28,7 +30,10 @@ func _ready() -> void:
 		col.add_theme_constant_override("separation", 8)
 		cols.add_child(col)
 		var t := MenuKit.title(String(part.title), 24)
-		t.custom_minimum_size.x = 460
+		t.custom_minimum_size.x = col_w
+		t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		if four: t.custom_minimum_size.y = 66
 		col.add_child(t)
 		var row: Array = []
 		for l: Dictionary in Campaign.levels().filter(func(e: Dictionary) -> bool: return e.part == pi):
@@ -37,7 +42,7 @@ func _ready() -> void:
 			var b := MenuKit.button("%d.  %s%s" % [l.number, l.name, ("\nRécord %s" % Endless.clock(rec)) if rec > 0.0 else ""], MenuKit.INK, 18)
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			b.custom_minimum_size = Vector2(460, 70)
+			b.custom_minimum_size = Vector2(col_w, 70)
 			b.disabled = not Campaign.exists(id)
 			b.pressed.connect(func() -> void:
 				picked.emit(id)

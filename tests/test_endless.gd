@@ -61,3 +61,11 @@ func test_abierto_al_vencer_a_cthulhu() -> void:
 	s.levels_won.append("p3_n5")
 	assert_true(Endless.unlocked(s))
 	assert_false(Endless.unlocked(null))
+
+func test_tambien_las_criaturas_del_sueno() -> void:   # 21.12 (mejoras): la parte 4 en la mezcla
+	var lv := Endless.make_level("sin_fin:p1_n1")
+	var ids := lv.pool.map(func(d: EnemyData) -> String: return String(d.id))
+	for e in ["zoog", "ghast", "descarnado", "pinguino"]: assert_has(ids, e)
+	assert_does_not_have(ids, "nyarlathotep", "los únicos, no")
+	var mids := lv.mid_enemies.map(func(d: EnemyData) -> String: return String(d.id))
+	assert_has(mids, "gug_koth", "y sus horrores en la rueda")

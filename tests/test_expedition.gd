@@ -67,3 +67,13 @@ func test_record_por_parte() -> void:
 	assert_true(Expedition.record(s, 1, 900.0))
 	assert_false(Expedition.record(s, 1, 950.0))
 	assert_eq(Expedition.wins(s, 1), 2)
+
+func test_la_expedicion_de_la_parte_4() -> void:   # 21.12 (mejoras): también por las Tierras del Sueño
+	var rows := Expedition.generate(3, 7)
+	assert_eq(String(rows[-1][0].base), "p4_n5", "con Nyarlathotep al final")
+	for r in rows.size() - 1:
+		for n: Dictionary in rows[r]: assert_true(String(n.base).begins_with("p4_"), String(n.base))
+	var s := SaveData.new()
+	assert_false(Expedition.unlocked(s, 3))
+	s.levels_won.append("p4_n5")
+	assert_true(Expedition.unlocked(s, 3))

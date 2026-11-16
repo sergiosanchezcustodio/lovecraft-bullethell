@@ -12,6 +12,7 @@
 		{"level": "p2_n3", "boss": "obed_marsh", "health": 2.0},
 		{"level": "p2_n5"},
 		{"level": "p3_n2", "boss": "castro", "health": 2.0},
-		{"level": "p3_n5"}
+		{"level": "p3_n5"},
+		{"level": "p4_n5"}
 	]
 }
