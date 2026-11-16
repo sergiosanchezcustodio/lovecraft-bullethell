@@ -162,7 +162,7 @@ for x in range(-WALL_W // 2, WALL_W // 2):
         M.put(x, 0, z, P, c)
 export(M, 'sala_suelo', 0.95, 0.15)
 
-for cols, rows in ((8, 3), (6, 3), (4, 3)):            # la de los jefes, de 8 desde la parte 4 (21.12)
+for cols, rows in ((9, 3), (5, 3), (8, 3), (6, 3), (4, 3)):    # la de los jefes, de 8 desde la parte 4 (21.12) y de 9 con las noches (22.3)
     vitrina(cols, rows)
 
 
@@ -194,6 +194,33 @@ def copa(name, body, sh, hi, glow_col=None):
 
 copa('trofeo_copa', GOLD, GOLD_SH, GOLD_HI)
 copa('trofeo_copa_negra', OBSID, scale3(OBSID, 0.6), OBSID_HI, EERIE)
+# «Las mil formas» (22.3): amatista con el escudo de luz dorada, como el crepúsculo de Kadath
+AMETHYST = (0.36, 0.18, 0.52)
+copa('trofeo_copa_sueno', AMETHYST, scale3(AMETHYST, 0.6), (0.62, 0.42, 0.82), GOLD_HI)
+
+# farol de hierro con una llama verde (las tres noches sueltas, 22.3)
+M = new(10)
+IRON = (0.16, 0.16, 0.17); IRON_HI = (0.30, 0.30, 0.31); GLASS = (0.30, 0.42, 0.34)
+slab(M, P, WOOD_DK, 0, 2, 0, 0, 12, 12, 12, 12, ch=2)
+slab(M, P, IRON, 2, 4, 0, 0, 9, 9, 9, 9, ch=1)
+slab(M, P, GLASS, 4, 16, 0, 0, 8, 8, 8, 8, ch=0)
+for y in range(4, 16):                                                      # postes de las esquinas
+    for x in (-4, 3):
+        for z in (-4, 3): M.put(x, y, z, P, IRON)
+for y in range(6, 14):                                                      # la llama, vista por los cristales
+    for x in range(-2, 2):
+        k = 1.0 - abs(y - 9.5) / 5.0
+        if abs(x + 0.5) < 2.2 * k + 0.3:
+            for z in (M.front(x, y),):
+                if z is not None: M.put(x, y, z, P, EERIE if k > 0.45 else scale3(EERIE, 0.7), 1)
+slab(M, P, IRON, 16, 18, 0, 0, 10, 10, 10, 10, ch=1)
+slab(M, P, IRON_HI, 18, 21, 0, 0, 6, 6, 2, 2, ch=0)
+for t in range(10):                                                         # el asa
+    a = math.pi * t / 9
+    M.put(round(math.cos(a) * 3), 21 + round(math.sin(a) * 3), 0, P, IRON)
+for x in range(-5, 5):                                                      # placa del pie
+    M.put(x, 1, M.front(x, 1) or 6, P, BRASS)
+export(M, 'trofeo_farol', 0.5, 0.5)
 
 # frasco de formol con un tentáculo (cazador de pesadillas)
 M = new(11)

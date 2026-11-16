@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"trampillas"
+display_name = "Lo que duerme debajo"
+description = "Sella 25 trampillas de los pólipos en las ruinas de Pnakotus."
+order = 35
+stat = "traps_sealed"
+target = 25
+reward_money = 400
+icon_model = "polipo"
+icon_mode = "full"

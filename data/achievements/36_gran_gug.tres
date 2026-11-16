@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gran_gug"
+display_name = "El gran gug de Koth"
+description = "Vence al gran gug que guarda la torre de Koth en el mundo subterráneo."
+order = 36
+stat = "kill:gug_koth"
+target = 1
+reward_money = 300
+icon_model = "gug_koth"
+icon_mode = "full"

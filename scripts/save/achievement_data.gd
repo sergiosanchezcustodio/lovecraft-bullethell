@@ -11,7 +11,9 @@ extends Resource
 ## Estadística que mira (ver Achievements.value): kills, runs, levels_won, elites, chests,
 ## crises, revives, coop_runs, best_level, best_time, money, characters, maxed_weapons, flawless,
 ## color_untouched (la noche del color sin pisarlo, 21.13), dunwich_untouched (la de Dunwich sin
-## que te toque un chotacabras, 21.14)…
+## que te toque un chotacabras, 21.14), leng_unsnared (la meseta de Leng sin quedar en una red),
+## traps_sealed (trampillas selladas en Pnakotus), nights_won (noches sueltas distintas superadas) y
+## kill:<criatura> (sus bajas en el bestiario; 22.3)…
 @export var stat := "kills"
 @export var target := 100
 @export_group("Recompensa")

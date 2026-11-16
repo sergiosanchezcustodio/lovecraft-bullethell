@@ -24,6 +24,10 @@ static func value(save: SaveData, a: AchievementData) -> int:
 				var c := int((r as Dictionary).get("caught", 0))
 				n += c if a.stat == "fish_caught" else (1 if c > 0 else 0)
 			return n
+		"nights_won":                                  # noches sueltas superadas, distintas (22.3)
+			return Nights.all().filter(func(n: Dictionary) -> bool: return Nights.wins(save, String(n.id)) > 0).size()
+	if a.stat.begins_with("kill:"):                    # bajas de una criatura, del bestiario (22.3)
+		return int(((save.records.get("bestiary", {}) as Dictionary).get(a.stat.substr(5), {}) as Dictionary).get("kills", 0))
 	return int(save.stats.get(a.stat, 0))
 
 static func is_done(save: SaveData, a: AchievementData) -> bool:

@@ -3568,3 +3568,20 @@ Por tramos: nivel 1; nivel 2; nivel 3; niveles 4 y 5. Lo de cada nivel vive en `
 - **Crisis de cada tipo:** `AccountStats.add_crisis(save, s, kinds)` también cuenta cuántas de cada tipo hubo (`crisis_kinds`, de `SanityState.crisis_started` de los jugadores de este PC). El resumen de las estadísticas añade, bajo sus cifras, la gráfica «Crisis de cada tipo» (sin crisis, no sale). Captura: `shots/titulo_stats0b_013.0s.png`.
 - **Clips más ligeros:** Theora con calidad 4 en lugar de 6 (`QUALITY` en `tools/grabar_manual.py`). Los seis ocupan 3,6 MB; antes, los cinco ocupaban 6,4. A 640 × 360 apenas se nota.
 - **Tests:** `test_manual` con las seis páginas, `test_account_stats` con las crisis de cada tipo y `test_tips` con el disparo nuevo. Suite: 1064 de 1064.
+
+## Hito 22.3: logros de la parte 4 y de las noches (16-11-2026)
+
+- **Seis logros nuevos** (`data/achievements/33…38`):
+  - «La galera varada» (200 $): reventar la escotilla de una galera negra en Dylath-Leen.
+  - «Por encima de las redes» (400 $): superar la meseta de Leng (`p4_n3`) sin que te atrape una red. `game._snared` se enciende si alguien de este PC tiene `snare > 0`.
+  - «Lo que duerme debajo» (400 $): sellar 25 trampillas en Pnakotus. `PolypWinds.seal_door` suma `traps_sealed`.
+  - «El gran gug de Koth» (300 $).
+  - «Las mil formas» (800 $): vencer a Nyarlathotep.
+  - «Tres noches sueltas» (600 $): superar las tres noches distintas.
+- **Estadísticas nuevas de `Achievements.value`:** `kill:<criatura>` (sus bajas en el bestiario, para no repetir un contador por jefe) y `nights_won` (noches distintas superadas, de `Nights.wins`).
+- **Sala de trofeos:**
+  - Vitrina de jefes de 9 × 3 (`vitrina_9x3`), con los tres jefes de las noches al final (el color del pozo, el hermano de Wilbur y el pólipo antiguo): 27 jefes.
+  - Vitrina de logros grandes de 5 × 3 (`vitrina_5x3`): pasan de 12 a 14 con «Las mil formas» y «Tres noches sueltas».
+  - Dos trofeos nuevos en `tools/gen_trofeos.py`: una copa de amatista con el escudo de luz dorada (`trofeo_copa_sueno`) y un farol de hierro con una llama verde (`trofeo_farol`). Hoja: `shots/hoja_trofeos22.png`.
+  - Capturas: `shots/titulo_trofeos22_44_014.0s.png` (el final de la vitrina de jefes) y `titulo_trofeos22_58_014.0s.png` (la de logros).
+- **Tests:** 6 en `tests/test_logros22.gd`; `test_trophies` y `test_logros_mejoras`, al día (27 jefes y 14 logros grandes). Suite: 1070 de 1070.

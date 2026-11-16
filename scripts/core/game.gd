@@ -1589,6 +1589,7 @@ func _game_over() -> void:
 			BossRush.number_of(String(level.id)), BossRush.stages().size()]])
 	_end_screen(title, Color(0.86, 0.22, 0.18), "", "caida")
 
+var _snared := false                             ## alguien de este PC ha caído en una red en este nivel (22.3)
 var _crisis_kinds := {}                          ## crisis de cada tipo en este nivel (21.20)
 var _crisis_time := 0.0                          ## s en crisis de los jugadores de este PC en este nivel (21.20)
 var _challenge_record := false                   ## el desafío se acaba de superar mejorando el récord (diario)
@@ -1781,6 +1782,7 @@ func _on_level_completed() -> void:
 		if unseen != null and unseen.birds_untouched(): Achievements.add(Saves.current, "dunwich_untouched")   # «Ningún alma para los chotacabras»
 	elif Saves.current != null and not Saves.current.levels_won.has(String(level.id)) and not is_guest():
 		Saves.current.levels_won.append(String(level.id))
+	if String(level.id) == "p4_n3" and not _snared: Achievements.add(Saves.current, "leng_unsnared")
 	if not rush:
 		Pacts.record_win(Saves.current, String(level.id), Pacts.active())   # sellos del mapa y logros (13.6)
 		Madness.record_win(Saves.current, String(level.id), Madness.grade())   # 16.14
@@ -2365,6 +2367,7 @@ func _process_step(delta: float) -> void:
 	if not get_tree().paused and not _ended:              # minutos en crisis de los de este PC (estadísticas, 21.20)
 		for q in players:
 			if not q.remote and q.sanity_state != null and q.sanity_state.in_crisis: _crisis_time += delta
+			if not q.remote and q.snare > 0.0: _snared = true     # «Por encima de las redes» (22.3)
 	if args.get_bool("debug") and fmod(_t, 0.5) < delta: print("t=%.1f jugador=%s" % [_t, player.global_position])
 	# cada 30 s del director (21-10-2026: con fmod(time, 30) < delta casi nunca se escribía, porque
 	# el director avanza con su propio paso y rara vez caía dentro del margen)

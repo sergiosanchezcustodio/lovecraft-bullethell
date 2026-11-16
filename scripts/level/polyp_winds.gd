@@ -190,6 +190,7 @@ func seal_door(i: int) -> void:
 	d.state = State.CLOSED
 	d.seal = 0.0
 	sealed += 1
+	Achievements.add(Auto.save(), "traps_sealed")       # «Lo que duerme debajo» (22.3)
 	if host:
 		_net({"a": "seal", "i": i})
 		var gm: Variant = game.get("gems") if game != null else null

@@ -10,8 +10,8 @@ func test_existen_y_no_llenan_la_vitrina() -> void:
 	for id in ["llave_de_plata", "sangre_de_dunwich", "paciencia_de_pescador", "lo_que_guarda_la_marea"]:
 		var a := _ach(id)
 		assert_not_null(a, id)
-		if a != null: assert_lt(a.reward_money, Trophies.BIG_REWARD, "%s no es un logro grande (la vitrina tiene 12 huecos)" % id)
-	assert_eq(Trophies.big_achievements().size(), 12)
+		if a != null: assert_lt(a.reward_money, Trophies.BIG_REWARD, "%s no es un logro grande (la vitrina tiene 15 huecos)" % id)
+	assert_eq(Trophies.big_achievements().size(), 14, "con «Las mil formas» y «Tres noches sueltas» (22.3)")
 
 func test_la_pesca_cuenta_piezas_y_especies() -> void:
 	var s := SaveData.new()

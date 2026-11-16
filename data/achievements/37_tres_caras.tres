@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"tres_caras"
+display_name = "Las mil formas"
+description = "Vence a Nyarlathotep en sus tres formas, a las puertas de Kadath."
+order = 37
+stat = "kill:nyarlathotep"
+target = 1
+reward_money = 800
+icon_model = "nyarla_faraon"
+icon_mode = "full"

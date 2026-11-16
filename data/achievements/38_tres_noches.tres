@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"tres_noches"
+display_name = "Tres noches sueltas"
+description = "Supera las tres noches sueltas: la granja de los Gardner, Sentinel Hill y las ruinas de Pnakotus."
+order = 38
+stat = "nights_won"
+target = 3
+reward_money = 600
+icon_model = "polipo_antiguo"
+icon_mode = "full"
