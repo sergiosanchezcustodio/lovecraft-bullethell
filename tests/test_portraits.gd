@@ -15,3 +15,7 @@ func test_la_tienda_usa_el_retrato() -> void:
 	for e: Shop.Entry in Shop.catalog():
 		if e.section == ShopItem.Section.CHARACTER:
 			assert_eq(e.icon, Portraits.of(e.icon_model), e.id)
+
+func test_derby_tiene_tambien_el_de_asenath() -> void:   # se alternan en la selección
+	var d: CharacterData = load("res://data/characters/derby.tres")
+	assert_not_null(Portraits.of(d.alt_model))

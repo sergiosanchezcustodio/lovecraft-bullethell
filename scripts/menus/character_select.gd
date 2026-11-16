@@ -41,6 +41,8 @@ const VIEW_H := 150.0 * MODEL_ZOOM
 ## Retrato pintado (21.16): su marco en la ficha y lo que sigue el modelo a la vista tras girarlo.
 const PORTRAIT := Vector2(188, 276)              ## entre el recuadro del jugador y el del arma
 const MODEL_LINGER := 1.4
+const ALT_CYCLE := 9.0                           ## s de un cuerpo al otro y vuelta (Derby y Asenath)
+const ALT_FADE := 0.8
 ## Estadísticas de la columna derecha de la ficha, en el orden de sus iconos.
 const STAT_ROWS: Array[String] = ["vida", "cordura", "esquive", "velocidad", "magia", "fisico", "fuego"]
 const STICK := 0.6                          ## umbral del stick para contar como una pulsación
@@ -619,6 +621,8 @@ class _Frame extends Control:
 	var _base_x := 0.0
 	var _portrait_box: PanelContainer          ## retrato pintado (21.16): en lugar del modelo, que sale al girarlo
 	var _portrait: TextureRect
+	var _portrait_alt: TextureRect             ## el del segundo cuerpo (Derby y Asenath), que se alterna
+	var _alt_t := 0.0
 	var _model_hold := 0.0                     ## s que sigue el modelo a la vista tras soltar LB/RB
 	var _model_k := 0.0                        ## 0 retrato, 1 modelo (fundido)
 
@@ -669,6 +673,12 @@ class _Frame extends Control:
 		_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_portrait_box.add_child(_portrait)
+		_portrait_alt = TextureRect.new()                # encima, en el mismo sitio
+		_portrait_alt.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_portrait_alt.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		_portrait_alt.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_portrait_alt.modulate.a = 0.0
+		_portrait_box.add_child(_portrait_alt)
 		for side in [-1, 1]:
 			var a := UiKit.label("◀" if side < 0 else "▶", 34, UiKit.GOLD)
 			a.position = Vector2(26 if side < 0 else FRAME.x - 56, 20 + VIEW_H * 0.5)
@@ -898,6 +908,8 @@ class _Frame extends Control:
 		var tex := Portraits.of(c.model)
 		if tex != _portrait.texture:
 			_portrait.texture = tex
+			_portrait_alt.texture = Portraits.of(c.alt_model) if tex != null else null
+			_alt_t = 0.0
 			if _model_hold < 1e8: _model_hold = 0.0          # otro personaje: vuelve el retrato
 		var locked := st.is_locked(seat.character, index)
 		var holder := st.holder_of(seat.character, index)   # quién lo ha confirmado ya (D-23)
@@ -906,6 +918,8 @@ class _Frame extends Control:
 		var hidden := locked and c.secret != ""            # investigador secreto aún cerrado (16.25): en sombra
 		if hidden: _view.modulate = Color(0.04, 0.04, 0.06)
 		_portrait.modulate = _view.modulate
+		var alt_a := _portrait_alt.modulate.a
+		_portrait_alt.modulate = Color(_view.modulate, alt_a)
 		_name.text = c.display_name if not hidden else "???"
 		_role.text = c.role if not hidden else "Investigador secreto"
 		var wd: WeaponData = null
@@ -1024,6 +1038,13 @@ class _Frame extends Control:
 		var want := 1.0 if (_portrait.texture == null or _model_hold > 0.0 or (seat != null and seat.stage == SelectState.Stage.OUTFIT)) else 0.0
 		_model_k = move_toward(_model_k, want, delta / 0.22)
 		_view.self_modulate.a = _model_k
+		if _portrait_alt.texture != null:                # Derby y Asenath: un cuerpo y otro, cada ALT_CYCLE / 2 s
+			_alt_t = fposmod(_alt_t + delta, ALT_CYCLE)
+			var h := ALT_CYCLE * 0.5
+			var f := clampf((_alt_t - (h - ALT_FADE)) / ALT_FADE, 0.0, 1.0) if _alt_t < h else 1.0 - clampf((_alt_t - (ALT_CYCLE - ALT_FADE)) / ALT_FADE, 0.0, 1.0)
+			_portrait_alt.modulate.a = f
+		else:
+			_portrait_alt.modulate.a = 0.0
 		_portrait_box.modulate.a = 1.0 - _model_k
 		if _shake > 0.0:
 			_shake -= delta

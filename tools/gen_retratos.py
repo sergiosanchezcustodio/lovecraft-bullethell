@@ -9,8 +9,9 @@ descripciones siguen la tabla de personajes de tools/CLAUDE.md (lo que se ve del
   python tools/gen_retratos.py --usar dyer=2 peaslee=1   # copia esas al juego
 
 Elegidos el 16-11-2026 (semilla de cada uno): dyer=1 peaslee=1 olmstead=1 legrasse=1 johansen=1
-varga=3 whipple=2 blake=2 iwanicki=2 elwood=1 malone=2 armitage=1 west=2 carter=1 whateley=3
-pickman=2 ward=1 gilman=1 tillinghast=2 derby=2 kuranes=5 (con el aro, tras rehacerlo).
+varga=3 whipple=2 blake=2 iwanicki=2 elwood=1 malone=2 armitage=1 west=2 carter=1 whateley=16
+pickman=2 ward=1 gilman=1 tillinghast=2 derby=2 kuranes=5 (con el aro, tras rehacerlo); whateley, rehecho sin
+«goat» en la descripción (con la palabra salían cuernos), semillas 11 a 16; asenath=1 (Derby alterna con ella en la selección).
 
 Arrancar ComfyUI antes (tools/comfyui.cmd). Pruebas: tools/local/retrato_<pj>_A_<semilla>.png y la
 hoja tools/local/retratos_hoja.png. Al juego: resources/retratos/<pj>.jpg (512 × 512, calidad 90:
@@ -65,9 +66,11 @@ LOOKS = {
     'carter': "Randolph Carter, a 1920s Boston dreamer: a man in his forties with dark hair greying at the "
               "temples and heavy eyelids, a long midnight blue overcoat, a grey waistcoat and a small bow tie, a "
               "silver key glowing faintly on his chest",
-    'whateley': "Wilbur Whateley, a huge stooping young man from rural 1920s Massachusetts: a goatish face with no "
-                "chin, drooping ears, curly black hair, a short patched brown coat, deeply unsettling inhuman "
-                "features, a dark tentacle tip peeking from under the coat",
+    'whateley': "Wilbur Whateley, a huge stooping young man from rural 1920s Massachusetts with an "
+                "unsettling deformed face: a very long narrow sheeplike face, a receding chin that almost "
+                "melts into the neck, a heavy drooping lower lip, a wide flat nose, long ears that hang down "
+                "beside his cheeks, yellowish leathery skin, coarse curly black hair, large dark wet eyes set "
+                "wide apart, a short patched brown coat, a dark tentacle tip peeking from under the coat",
     'pickman': "Richard Upton Pickman, a thin 1920s Boston painter: long messy very dark hair, unshaven, sunken "
                "dark eyes with dark circles, an off-white linen painter's smock with big oil paint stains in "
                "crimson, ochre and green, a black artist's bow at the neck, a paintbrush in the breast pocket",

@@ -3509,5 +3509,10 @@ Por tramos: nivel 1; nivel 2; nivel 3; niveles 4 y 5. Lo de cada nivel vive en `
 - **Selección:** el retrato va en un marco de latón de 188 × 276 entre el recuadro del jugador y el del arma, donde estaba el modelo. El modelo voxel sale con un fundido de 0,22 s mientras se mantiene LB/RB (Q/E) y 1,4 s después (`MODEL_LINGER`), en el paso del vestuario (las prendas solo se ven en él), con `turn=` (capturas) y en quien aún no tenga retrato. Al cambiar de personaje vuelve el retrato. El retrato se oscurece igual que el modelo: bloqueado, ya elegido por otro o en sombra si es un secreto cerrado.
 - **Tienda:** los personajes llevan su retrato en lugar de la cabeza voxel (`Shop.catalog`, `e.icon`).
 - **Capturas:** `shots/seleccion_retratos4_003.0s.png` (cuatro jugadores), `shots/seleccion_retrato_giro_003.0s.png` (con `turn=90`, el modelo) y `shots/titulo_tienda_retratos_012.0s.png` (tienda, pestaña Personajes).
-- **Para el autor:** Whateley sale con orejas de elfo más que con cara de cabra (ninguna de las tres semillas lo consigue). Si no convence, se puede rehacer con más semillas.
+- **Whateley:** las tres semillas primeras le ponían orejas de elfo. Al pedir «goat-like» salían cabezas de cabra con cuernos (también con «no horns»). Sin la palabra cabra, con la cara descrita («sheeplike», sin barbilla, labio caído, orejas largas) sale bien: semilla 16. Las orejas siguen hacia los lados en vez de colgar.
 - **Tests:** 3 en `tests/test_portraits.gd` (todos tienen retrato cuadrado, sin retrato da null, la tienda lo usa). Suite: 1044 de 1044.
+- **Mejoras (16-11-2026, encargo del autor):**
+  - Whateley, rehecho (arriba).
+  - Derby alterna con Asenath en la selección: el retrato de su segundo cuerpo (`alt_model`, `resources/retratos/asenath.jpg`, semilla 1) va encima y aparece cada 4,5 s, con un fundido de 0,8 s (`ALT_CYCLE`, `ALT_FADE`). Capturas: `shots/seleccion_derby_002.0s.png` (Edward) y `_004.5s.png` (Asenath), con `pick=derby`.
+  - La ficha del investigador en la Biblioteca (tomo V) lleva el retrato en lugar del modelo, si se le conoce; si no, sigue la silueta del modelo, para no destapar a los secretos. Captura: `shots/titulo_biblio_retrato_012.0s.png`.
+  - Tests: `test_portraits` (Derby tiene también el de Asenath). Suite: 1045 de 1045.

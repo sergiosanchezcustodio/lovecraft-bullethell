@@ -246,7 +246,8 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 			chars.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return a.order < b.order)
 			for c: CharacterData in chars:
 				var known := (not c.in_shop and c.secret == "") or (save != null and save.has_character(String(c.id)))   # los secretos, al abrirse (16.25)
-				out.append(_e(String(c.id), c.display_name, known, text("characters", c.id), c.model, "full", null,
+				out.append(_e(String(c.id), c.display_name, known, text("characters", c.id), c.model, "full",
+					Portraits.of(c.model) if known else null,    # el retrato pintado (21.16); sin conocerlo, la silueta del modelo
 					[c.role], "Investigadores"))
 			for p: PetData in _list("res://data/pets"):
 				var known := save != null and save.has_pet(String(p.id))
