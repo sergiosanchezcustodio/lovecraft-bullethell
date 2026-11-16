@@ -44,8 +44,14 @@ func setup(list: Control, opened: Array[bool], beaten: Array[bool], seen_open: A
 	list.resized.connect(queue_redraw)
 	list.sort_children.connect(queue_redraw)
 
-## Anima lo nuevo: primero la tinta, luego los sellos. `instant`: todo de golpe (capturas, pruebas).
-func play(instant := false) -> void:
+## Lo que dura la animación de lo nuevo (0 si no hay nada), para encadenar las partes.
+func duration() -> float:
+	var last := float(maxi(_last_open(open), 0))
+	return SEG_TIME * maxf(last - ink_from, 0.0) + (STAMP_TIME + 0.08) * new_seals.size()
+
+## Anima lo nuevo: el sello del nivel recién superado, la tinta y los demás sellos, tras `delay` s
+## (las partes, una detrás de otra). `instant`: todo de golpe (capturas, pruebas).
+func play(instant := false, delay := 0.0) -> void:
 	var last := float(maxi(_last_open(open), 0))
 	if instant:
 		ink = last
@@ -53,7 +59,7 @@ func play(instant := false) -> void:
 		queue_redraw()
 		return
 	var tw := create_tween()
-	tw.tween_interval(0.35)                        # que se vea la ventana antes
+	tw.tween_interval(0.35 + delay)                # que se vea la ventana antes
 	for i in new_seals:                            # el sello del nivel recién superado, antes que el camino nuevo
 		if float(i) <= ink_from: _stamp(tw, i)
 	if last > ink_from:

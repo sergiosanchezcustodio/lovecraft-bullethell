@@ -39,6 +39,18 @@ static func with_article(n: String) -> String:
 	if first in ["El", "La", "Los", "Las"] or first in PROPER: return n
 	return ("la " if first in FEM_NOUNS else "el ") + n
 
+## «La noche trae al Acechador»: con la «a» personal y el artículo en minúscula («al diácono de la
+## Orden», «a la pesadilla del bajorrelieve», «a Barnabas Marsh») (21.12, mejoras).
+static func with_a(n: String) -> String:
+	var first := n.get_slice(" ", 0).trim_suffix(",")
+	if first in PROPER: return "a " + n
+	var full := with_article(n)
+	if full.begins_with("El "): return "al " + full.substr(3)
+	if full.begins_with("el "): return "al " + full.substr(3)
+	if full.begins_with("La ") or full.begins_with("la "): return "a la " + full.substr(3)
+	if full.begins_with("Los ") or full.begins_with("Las "): return "a " + full.substr(0, 1).to_lower() + full.substr(1)
+	return "a " + full
+
 func setup(p_players: Array[Player], p_director: WaveDirector) -> Hud:
 	players = p_players
 	director = p_director

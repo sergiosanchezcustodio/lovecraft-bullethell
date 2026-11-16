@@ -38,6 +38,9 @@ const PX_PER_M := 1080.0 / 15.0
 const MODEL_ZOOM := 2.0
 ## Alto del visor del personaje.
 const VIEW_H := 150.0 * MODEL_ZOOM
+## Retrato pintado (21.16): su marco en la ficha y lo que sigue el modelo a la vista tras girarlo.
+const PORTRAIT := Vector2(188, 276)              ## entre el recuadro del jugador y el del arma
+const MODEL_LINGER := 1.4
 ## Estadísticas de la columna derecha de la ficha, en el orden de sus iconos.
 const STAT_ROWS: Array[String] = ["vida", "cordura", "esquive", "velocidad", "magia", "fisico", "fuego"]
 const STICK := 0.6                          ## umbral del stick para contar como una pulsación
@@ -614,6 +617,10 @@ class _Frame extends Control:
 	var _pet_note: Label
 	var _shake := 0.0
 	var _base_x := 0.0
+	var _portrait_box: PanelContainer          ## retrato pintado (21.16): en lugar del modelo, que sale al girarlo
+	var _portrait: TextureRect
+	var _model_hold := 0.0                     ## s que sigue el modelo a la vista tras soltar LB/RB
+	var _model_k := 0.0                        ## 0 retrato, 1 modelo (fundido)
 
 	func _init(p_owner: CharacterSelect, p_index: int) -> void:
 		owner_screen = p_owner
@@ -648,6 +655,20 @@ class _Frame extends Control:
 		_view = _Preview.new(Vector2(240, VIEW_H), PX_PER_M * MODEL_ZOOM, index)
 		_view.position = Vector2((FRAME.x - 240) * 0.5, 4)
 		add_child(_view)
+		_portrait_box = PanelContainer.new()            # el retrato, en un marco de latón, donde el modelo
+		_portrait_box.position = Vector2((FRAME.x - PORTRAIT.x) * 0.5, 20)
+		_portrait_box.custom_minimum_size = PORTRAIT
+		_portrait_box.size = PORTRAIT
+		_portrait_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var pf := _frame(Color(0, 0, 0, 0.6), Color(MenuKit.BRASS, 0.8), 2)
+		pf.set_content_margin_all(3)
+		_portrait_box.add_theme_stylebox_override("panel", pf)
+		add_child(_portrait_box)
+		_portrait = TextureRect.new()
+		_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_portrait_box.add_child(_portrait)
 		for side in [-1, 1]:
 			var a := UiKit.label("◀" if side < 0 else "▶", 34, UiKit.GOLD)
 			a.position = Vector2(26 if side < 0 else FRAME.x - 56, 20 + VIEW_H * 0.5)
@@ -848,6 +869,8 @@ class _Frame extends Control:
 	func set_turn(yaw: float) -> void:
 		_view.set_turn(yaw)
 		_pet_view.set_turn(yaw)
+		_model_hold = 1e9                            # capturas con turn=: el modelo, no el retrato
+		_model_k = 1.0
 
 	func shake() -> void:
 		if _shake <= 0.0: _base_x = position.x
@@ -859,7 +882,7 @@ class _Frame extends Control:
 		var color := Devices.COLORS[index]
 		var on := seat != null
 		_empty.visible = not on
-		for c in [_view, _info, _pet, _wbox]: (c as CanvasItem).visible = on
+		for c in [_view, _info, _pet, _wbox, _portrait_box]: (c as CanvasItem).visible = on
 		var ready := on and seat.stage == SelectState.Stage.READY        # el latón se enciende con su color
 		MenuKit.retint(_panel, MenuKit.BRASS.lerp(color, 0.5 if ready else 0.3) * (1.15 if ready else (0.95 if on else 0.5)), 0.95 if on else 0.7)
 		_jbox.visible = on
@@ -872,12 +895,17 @@ class _Frame extends Control:
 		var c: CharacterData = st.characters[seat.character]
 		_head.visible = false
 		_view.set_model(c.model, st.worn_of(index))
+		var tex := Portraits.of(c.model)
+		if tex != _portrait.texture:
+			_portrait.texture = tex
+			if _model_hold < 1e8: _model_hold = 0.0          # otro personaje: vuelve el retrato
 		var locked := st.is_locked(seat.character, index)
 		var holder := st.holder_of(seat.character, index)   # quién lo ha confirmado ya (D-23)
 		var unavailable := seat.stage == SelectState.Stage.CHARACTER and (locked or holder >= 0)
 		_view.modulate = Color(0.25, 0.25, 0.3) if unavailable else Color.WHITE
 		var hidden := locked and c.secret != ""            # investigador secreto aún cerrado (16.25): en sombra
 		if hidden: _view.modulate = Color(0.04, 0.04, 0.06)
+		_portrait.modulate = _view.modulate
 		_name.text = c.display_name if not hidden else "???"
 		_role.text = c.role if not hidden else "Investigador secreto"
 		var wd: WeaponData = null
@@ -989,6 +1017,14 @@ class _Frame extends Control:
 		var spin := seat.spin if seat != null else 0
 		_view.spin = 0 if on_pet else spin
 		_pet_view.spin = spin if on_pet else 0
+		# el retrato (21.16), salvo al girar el modelo con LB/RB (y un poco después), en el vestuario,
+		# que solo se ve en el modelo, o si el personaje aún no tiene retrato
+		if spin != 0 and not on_pet: _model_hold = maxf(_model_hold, MODEL_LINGER)
+		_model_hold = maxf(_model_hold - delta, 0.0)
+		var want := 1.0 if (_portrait.texture == null or _model_hold > 0.0 or (seat != null and seat.stage == SelectState.Stage.OUTFIT)) else 0.0
+		_model_k = move_toward(_model_k, want, delta / 0.22)
+		_view.self_modulate.a = _model_k
+		_portrait_box.modulate.a = 1.0 - _model_k
 		if _shake > 0.0:
 			_shake -= delta
 			position.x = _base_x + (sin(_shake * 80.0) * 6.0 * (_shake / 0.3) if _shake > 0.0 else 0.0)

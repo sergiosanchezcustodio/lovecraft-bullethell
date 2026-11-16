@@ -80,7 +80,7 @@ static func make_level(id: String) -> LevelData:
 		for k in int(c.get("bosses_max", 24)):
 			mids.append(bosses[k % bosses.size()])
 			times.append(every * (k + 1))
-			texts.append("La noche trae %s" % bosses[k % bosses.size()].display_name)
+			texts.append("La noche trae %s" % Hud.with_a(bosses[k % bosses.size()].display_name))
 	lv.mid_enemies = mids
 	lv.mid_times = times
 	lv.mid_texts = texts

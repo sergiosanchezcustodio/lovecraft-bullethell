@@ -41,6 +41,7 @@ func _ready() -> void:
 	if la0.has("ink_seen"): seen = {"open": Array(la0.get_str("ink_seen").split(",", false)), "won": Array(la0.get_str("ink_won_seen", "").split(",", false))}   # capturas
 	var first_look := Saves.current != null and not Saves.current.records.has("map_ink") and not la0.has("ink_seen")   # partidas de antes: sin animar todo
 	var now_open: Array = []
+	var ink_delay := 0.0
 	var pi := 0
 	for part: Dictionary in Campaign.parts():
 		var col := VBoxContainer.new()
@@ -80,7 +81,8 @@ func _ready() -> void:
 		var ink := InkPath.new()
 		holder.add_child(ink)
 		ink.setup(rows, opened, beaten, s_open, s_won, pi)
-		ink.play.call_deferred(la0.get_bool("ink_instant"))
+		ink.play.call_deferred(la0.get_bool("ink_instant"), ink_delay)
+		ink_delay += ink.duration() + (0.15 if ink.duration() > 0.0 else 0.0)   # la parte siguiente, al acabar esta
 		pi += 1
 	if Saves.current != null and InkPath.Seen.mark(Saves.current, now_open, won.duplicate()): Saves.save()
 	var extra := HBoxContainer.new()                 # modos aparte: del día y sin fin

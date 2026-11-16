@@ -54,3 +54,11 @@ func test_el_sello_suena() -> void:
 	var d: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/sfx.json"))
 	var ev: Dictionary = d.eventos
 	assert_true(ev.has("seal"))
+
+func test_dura_lo_que_hay_que_animar() -> void:   # para encadenar las partes
+	var o: Array[bool] = [true, true, false]
+	var w: Array[bool] = [true, false, false]
+	assert_eq(_make(o, w, o, w).duration(), 0.0, "nada nuevo")
+	var none: Array[bool] = [true, false, false]
+	var nw: Array[bool] = [false, false, false]
+	assert_gt(_make(o, w, none, nw).duration(), InkPath.SEG_TIME, "un tramo y un sello")

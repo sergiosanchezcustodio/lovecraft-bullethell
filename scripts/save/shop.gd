@@ -40,6 +40,7 @@ static func catalog() -> Array[Entry]:
 		e.character = c
 		e.icon_model = c.model
 		e.icon_mode = "head"
+		e.icon = Portraits.of(c.model)                # el retrato pintado (21.16); sin él, la cabeza del modelo
 		out.append(e)
 	var pets: Array = DebugOptions.list_resources("res://data/pets")
 	pets.sort_custom(func(a: PetData, b: PetData) -> bool: return a.price < b.price)
