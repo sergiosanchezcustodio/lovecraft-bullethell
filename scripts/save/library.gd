@@ -18,7 +18,10 @@ const TOMES := [
 	{"id": "wardrobe", "title": "Vestuario", "roman": "IX"},
 	{"id": "archive", "title": "Archivo de expediciones", "roman": "X"},
 	{"id": "trophies", "title": "Sala de trofeos", "roman": "XI"},
+	{"id": "manual", "title": "Manual del investigador", "roman": "XII"},
 ]
+const MANUAL_PATH := "res://data/manual.json"     ## (hito 21.19)
+const MANUAL_VIDEO := "res://resources/manual/%s.ogv"
 const EPILOGUES := [["epilogo", "Epílogo · Lo que vino después"], ["epilogo_locura", "Epílogo · El que no volvió del todo"], ["epilogo_kadath", "Epílogo · La ciudad del crepúsculo"]]
 const RESULTS := {"won": "Superado", "lost": "Caído", "endless": "La noche eterna"}
 const TEXTS_PATH := "res://data/library/textos.json"
@@ -73,6 +76,12 @@ static func kill_facts(save: SaveData, enemy_id: String) -> Array:
 static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	match tome:
+		"manual":                                      # para quien empieza (hito 21.19): siempre abierto, con su clip
+			for pg: Dictionary in manual_pages():
+				var e := _e(String(pg.id), String(pg.title), true, String(pg.get("text", "")), "", "", null, pg.get("facts", []))
+				var v := MANUAL_VIDEO % String(pg.id)
+				if ResourceLoader.exists(v): e["video"] = v
+				out.append(e)
 		"wardrobe":                                    # conjuntos del vestuario (fase 14)
 			for s: Dictionary in OutfitSets.all():
 				var done := save != null and (save.unlock_all or OutfitSets.is_complete(save, s))
@@ -265,6 +274,10 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				out.append(_e(String(p.id), p.display_name, known, text("pets", p.id), p.model, "full", null,
 					[p.description], "Compañeros"))
 	return out
+
+static func manual_pages() -> Array:
+	var v: Variant = JSON.parse_string(FileAccess.get_file_as_string(MANUAL_PATH))
+	return (v as Dictionary).get("pages", []) if v is Dictionary else []
 
 static func count_known(save: SaveData, tome: String) -> Vector2i:
 	if tome == "trophies": return Trophies.count(save)          # (hito 16.28)

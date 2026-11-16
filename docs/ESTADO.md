@@ -3535,3 +3535,16 @@ Por tramos: nivel 1; nivel 2; nivel 3; niveles 4 y 5. Lo de cada nivel vive en `
   - Sonido propio (`python tools/gen_sfx.py --finale`, evento `part_finale`): un acorde de re menor con novena en registro de órgano (parciales 1 a 3, algo desafinado para que lata, trémolo lento), con un pedal grave, un soplo de aire y un eco largo. Entra en 1,6 s y dura 7 s. Sustituye al de pasar página.
   - La frase se escribe palabra a palabra (0,11 s cada una, `word_ends`), con las líneas ya partidas para que no salten (`VC_CHARS_AFTER_SHAPING`). Captura a medias: `shots/game_final_p3_parada1.png` (`finale_shot=1.5`).
   - Tests: 6 en `test_part_finale` (con las palabras, el sonido y la Biblioteca); `test_fragments` cuenta los finales. Suite: 1051 de 1051.
+
+## Hito 21.19: manual del investigador (16-11-2026)
+
+- **Tomo XII de la Biblioteca, «Manual del investigador»** (`Library.TOMES`, `Library.manual_pages`, `data/manual.json`): cinco páginas para quien empieza, abiertas desde el principio: cordura y crisis, esquivar, evoluciones, élites y objetivos a mitad de nivel. Cada una tiene tres líneas con lo esencial (en rojo) y una explicación. Complementa los consejos de la primera partida (13.3).
+- **Un clip de la partida en cada página**, en bucle y sin sonido (`LibraryMenu._video`, `VideoStreamPlayer` de 608 × 342 en un marco de tinta). Son partidas de verdad grabadas con bot: `python tools/grabar_manual.py [ids] [--hoja]` monta cada escena con opciones de prueba, la graba a 30 fps con `--write-movie`, descarta el principio (fundido y rótulo), recorta el centro, la pasa a 640 × 360 y la guarda en Theora (`resources/manual/<id>.ogv`, de 0,8 a 1,7 MB; 6,4 MB en total). Necesita ffmpeg con libtheora. Escenas (Innsmouth, `p2_n1`):
+  - Cordura: Varga entre profundos con `crisis_at`, la crisis violeta y la revelación al salir.
+  - Esquive: Olmstead esquivando cada 0,9 s entre las balas de los tres emisores de prueba.
+  - Evolución: Malone con la Thompson al máximo y el oro de Obed; a los 6 s el baúl la convierte en la Thompson de Chicago.
+  - Élite: un acechador con escudo e icor (`foes=`, `traits=`): la burbuja, los iconos, la marca, el salto y el estallido del escudo.
+  - Objetivo: Peaslee dentro del círculo de un ritual (`objective=ritual objective_near=true`), con la barra que avanza y los guardianes.
+- **Estantería:** con doce tomos, cada fila mide `748 / tomos − 12` px (56 con once), y así sigue sin pisar la esquina.
+- **Capturas:** `title saves=trofeos_saves open=menu_biblioteca tome=11 cursor=2 shots=13` da `shots/titulo_manual_013.0s.png`; la estantería, `shots/titulo_estanteria_013.0s.png`.
+- **Tests:** 4 en `tests/test_manual.gd` (el tomo con las cinco páginas abiertas, un clip por página que se carga como vídeo, la cuenta en la estantería y la página que lo reproduce en bucle). Suite: 1055 de 1055.

@@ -1,0 +1,35 @@
+{
+	"_doc": "Manual del investigador (hito 21.19): tomo de la Biblioteca para quien empieza, una página por tema con un clip corto de la partida (tools/grabar_manual.py, resources/manual/<id>.ogv). 'facts': lo esencial, en rojo; 'text': la explicación. Complementa los consejos de la primera partida (data/tutorial.json).",
+	"pages": [
+		{
+			"id": "cordura",
+			"title": "Cordura y crisis",
+			"facts": ["La barra violeta, bajo la de vida", "Baja cerca de las criaturas y con sus ataques violetas", "A cero: una crisis de unos segundos"],
+			"text": "La mente se gasta antes que el cuerpo. Estar cerca de lo que no debería existir, los golpes violetas y algunas armas arcanas te quitan cordura; lejos de los horrores, junto a una luz o a un compañero, se recupera poco a poco.\n\nSi llega a cero entras en crisis: te quedas paralizado a ratos, huyes sin control, vagas sin rumbo o se te invierten los mandos. Dura poco y al acabar recuperas parte de la cordura; a veces, además, lo que viste te deja una revelación. Un compañero a tu lado la acorta."
+		},
+		{
+			"id": "esquive",
+			"title": "Esquivar",
+			"facts": ["A o Espacio", "Mientras esquivas, nada te hace daño", "Tiene una recarga corta: no lo gastes en vano"],
+			"text": "Tus armas disparan solas: lo tuyo es moverte. El esquive te lanza en la dirección en que vas y, mientras dura, ni las balas ni los golpes te alcanzan, así que sirve para cruzar una lluvia de proyectiles o salir de un círculo de aviso en el último momento.\n\nCada investigador esquiva a su manera: voltereta, plancha, salto, deslizamiento o un destello. Unos llegan más lejos y otros se recargan antes."
+		},
+		{
+			"id": "evolucion",
+			"title": "Evoluciones",
+			"facts": ["Arma al nivel máximo + su objeto", "Un baúl arcano la hace evolucionar", "Algunas pueden evolucionar de dos maneras"],
+			"text": "Cada arma tiene un objeto que la acompaña. Cuando la llevas al nivel máximo y además tienes ese objeto, el siguiente baúl arcano que abras la transforma en algo mucho más poderoso.\n\nEl Arsenal de esta Biblioteca dice qué objeto pide cada arma. Si un arma tiene dos ramas, al abrir el baúl eliges una: no hay vuelta atrás en esa partida."
+		},
+		{
+			"id": "elite",
+			"title": "Élites",
+			"facts": ["Más grandes y más duras", "Con su marca a los pies", "Sueltan mejor botín"],
+			"text": "Entre la multitud aparecen a veces criaturas de otro calibre: las élites. Aguantan mucho más, pegan más fuerte y, al caer, dejan mejor recompensa. El evento final de cada nivel suele traer varias a la vez.\n\nMuchas llevan rasgos que se ven en un icono sobre la cabeza: un escudo que para los primeros golpes, sangre que las cura al tocarte, charcos de icor a su paso, más velocidad o un estallido al morir. Aprende a reconocerlos antes de acercarte."
+		},
+		{
+			"id": "objetivo",
+			"title": "Objetivos a mitad de nivel",
+			"facts": ["Opcionales, con recompensa: dinero, experiencia o un baúl", "Una flecha en pantalla te lleva hasta ellos", "Rescatar, cortar un ritual o llevar una reliquia"],
+			"text": "De vez en cuando la noche te ofrece algo más que sobrevivir. Un superviviente al que escoltar hasta un lugar seguro, un ritual que solo se corta quedándose dentro de su círculo mientras te atacan, o una reliquia que pesa y frena a quien la lleva.\n\nNo son obligatorios, y a veces es más sensato dejarlos pasar, pero su recompensa puede decidir el nivel."
+		}
+	]
+}

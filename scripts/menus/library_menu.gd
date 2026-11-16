@@ -133,7 +133,7 @@ func _show_shelf() -> void:
 		var tome: Dictionary = Library.TOMES[i]
 		var n := Library.count_known(save, tome.id)
 		var b := _row("Tomo %s  ·  %s" % [tome.roman, tome.title], 30)
-		b.custom_minimum_size.y = 56                  # once tomos (16.28): sin pisar la esquina
+		b.custom_minimum_size.y = minf(56.0, 748.0 / Library.TOMES.size() - 12.0)   # once tomos (16.28), doce (21.19): sin pisar la esquina
 		var c := _ink("%d / %d" % [n.x, n.y], 22, INK_DIM)
 		c.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT)
 		c.offset_left = -110; c.offset_right = -14
@@ -169,6 +169,7 @@ func _show_tome_cover(i: int) -> void:
 	var c := _ink("%s de %s" % [n.x, n.y] + (" conseguidos" if tome.id == "achievements" else " descubiertos"), 28, INK_DIM)
 	if tome.id == "diary": c.text = MenuKit.count(n.x, "entrada") if n.x > 0 else "Aún no hay nada escrito"
 	if tome.id == "trophies": c.text = "%d de %d trofeos en las vitrinas" % [n.x, n.y]
+	if tome.id == "manual": c.text = "%d páginas para quien empieza" % n.y
 	if tome.id == "archive": c.text = MenuKit.count(n.x, "partida") + " (las %d últimas)" % RunArchive.MAX if n.x > 0 else "Aún no se ha jugado ninguna"
 	c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_right.add_child(c)
@@ -237,7 +238,10 @@ func _show_entry(k: int) -> void:
 	var e: Dictionary = _entries[k]
 	var known: bool = e.known
 	var tex := _image(e)
-	if _tome == "places" or e.get("wide", false):  # el mapa (o el final de una parte, 21.17), a lo ancho de la página
+	if e.has("video"):                            # manual del investigador (21.19): su clip, en bucle
+		_right.add_child(_video(String(e.video)))
+		tex = null
+	elif _tome == "places" or e.get("wide", false):  # el mapa (o el final de una parte, 21.17), a lo ancho de la página
 		if tex != null and known:
 			var map := TextureRect.new()
 			map.texture = tex
@@ -290,6 +294,22 @@ func _show_entry(k: int) -> void:
 		txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		txt.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_right.add_child(txt)
+
+## Un clip del manual (21.19) en un marco de tinta, sin sonido y en bucle.
+const VIDEO_SIZE := Vector2(608, 342)
+func _video(path: String) -> Control:
+	var frame := PanelContainer.new()
+	frame.add_theme_stylebox_override("panel", UiKit.panel(Color(0.08, 0.05, 0.03, 0.9), Color(INK, 0.55), 3))
+	frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var vp := VideoStreamPlayer.new()
+	vp.stream = load(path)
+	vp.custom_minimum_size = VIDEO_SIZE
+	vp.expand = true
+	vp.loop = true
+	vp.volume_db = -80.0
+	vp.autoplay = true
+	frame.add_child(vp)
+	return frame
 
 ## El final ilustrado de una parte (21.17), a toda pantalla; al pasarlo, de vuelta a su fila.
 func _show_finale(e: Dictionary) -> void:
