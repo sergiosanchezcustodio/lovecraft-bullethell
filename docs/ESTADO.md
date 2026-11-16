@@ -3608,3 +3608,17 @@ Todo con `simular.py` (bot `smart`, `--ts 2`, `--par 2`). Datos en `shots/equili
   - Pnakotus, con `shop=4`: 4 de 4 y holgada (84-95 %). Ajuste: `health_mult` 1,0 → 1,5, ritmo ×1,15, dos élites a la vez y oleada final de 18. Después: 4 de 4, vida más baja 53-89 %.
 - **Fallo de las pruebas:** con `quit_on_end` y sin `autonext`, el final ilustrado (21.17) esperaba una pulsación y la simulación de un nivel 5 suelto se quedaba colgada hasta el tope de 900 s. Ahora `quit_on_end` también lo pasa solo.
 - Todo es provisional, pendiente de tu calibración (D-42). Suite: 1070 de 1070.
+
+## Hito 22.2: rendimiento de las arenas del sueño y las noches (16-11-2026)
+
+Medido en Alta con el PC libre (`comparar.py`, `--veces 2 --perf 20`, bot `smart` con 80 vivos). Datos en `shots/equilibrio22/rendimiento.txt`.
+
+- **Las ocho, antes:** media de 8,5-9,0 ms y 1 % peor de 19,9-21,4 ms. La referencia, `p3_n2`, da 9,7 y 19,7 ms: la parte 4 y las noches están a la par en el 1 % peor. Tienen más picos (28-34 por cada 1000 fotogramas, frente a 15) y más tirones de más de 25 ms (13-21 en 20 s, frente a 3,5).
+- **De dónde vienen los tirones** (`spikes=true prof=true` en `p4_n1`):
+  - **Explosiones entre zoogs:** una explosión mata 20-25 a la vez y el fotograma cuesta 14-20 ms. Cada muerte costaba ~420 µs: ~170 µs el desmoronado (`Crumble`, que vuelve a meter en la escena el modelo de la horda) y otros ~170 µs los trozos y la mancha (`DeathBurst`). El golpe en sí (`take_damage`: sonido, chispas, cifra, pose) cuesta ~60 µs y no es el problema.
+  - **Pasos de física lentos sin causa propia:** en la mitad de los tirones, todo el paso va 4-5 veces más lento a la vez (enemigos, jugadores, rejilla), sin nodos nuevos ni nada que lo explique en el código. Parece del sistema; en la parte 3 pasa igual, con menos enemigos.
+- **Cambio:** topes por fotograma. Como mucho 6 empiezan a desmoronarse en un mismo fotograma (`Crumble.PER_FRAME`); los demás estallan en trozos sin quedarse. Como mucho 6 sueltan sus trozos (`DeathBurst.PER_FRAME`); los demás esperan al fotograma siguiente, unos ms que no se notan. Las élites y los únicos, siempre enteros.
+- **Después:** cada muerte cuesta ~285 µs (un 30 % menos) y la explosión media, 3,8 ms (antes, 5,0). El 1 % peor no cambia de forma medible: en `p4_n1`, tres veces cada uno, 20,2 ms antes y 20,5 después, dentro del ruido de una ejecución a otra (19,3-22,3). Lo que lo marca son los pasos de física normales de 80 enemigos, igual que en el resto del juego.
+- **Compilaciones a mitad de partida:** de 0 a 4 por partida, especializaciones del ubershader que coinciden con la primera explosión, como en las demás partes (`p3_n2`, 4,5). No hace falta calentar nada aparte en `LevelWarmup`.
+- **Baja y Media:** nada nuevo que bajar. Lo que marca los tirones es la CPU (la física y las muertes); el dibujo se queda en 3-7 ms incluso en los picos.
+- Suite: 1070 de 1070.

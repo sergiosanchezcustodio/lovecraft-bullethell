@@ -16,6 +16,11 @@ var big := false                               ## élite o ser único
 var delay := 0.0                               ## s hasta que saltan los trozos (mientras cae, hito 12.7)
 var puddle := false                            ## deja un charco que crece (Profundos y masas, hito 12.7)
 const PUDDLE_GROW := 0.9
+## Trozos que saltan en un mismo fotograma (hito 22.2): con muchas muertes a la vez, los demás
+## esperan al siguiente (de 6 en 6, unos ms: no se nota) en vez de juntarse en un tirón.
+const PER_FRAME := 6
+static var _frame := -1
+static var _bursts := 0
 var _t := 0.0
 var _stain_mat: ShaderMaterial
 var _stain: MeshInstance3D
@@ -67,7 +72,7 @@ static func palette_of(p_model: String, root: Node3D) -> Array:
 func _ready() -> void:
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF   # quieto; se crea y se deshace fuera de la física
 	if puddle: _make_puddle()
-	if delay <= 0.0: _burst()
+	if delay <= 0.0 and _may_burst(): _burst()
 
 ## Charco que crece bajo el que se derrumba o se derrite, del color oscuro de su cuerpo, húmedo
 ## y con burbujas lentas (ground_fx, modo limo); luego se queda como las manchas.
@@ -78,6 +83,17 @@ func _make_puddle() -> void:
 	var dark: Color = _cols[1].darkened(0.55)
 	_pool.material_override.set_shader_parameter("tint", Color(dark.r, dark.g, dark.b))
 	add_child(_pool)
+
+## Queda sitio para otro estallido en este fotograma (y lo cuenta). Las élites y los únicos, siempre.
+func _may_burst() -> bool:
+	var f := Engine.get_process_frames()
+	if f != _frame:
+		_frame = f
+		_bursts = 0
+	if big: return true
+	if _bursts >= PER_FRAME: return false
+	_bursts += 1
+	return true
 
 func _burst() -> void:
 	_burst_done = true
@@ -118,7 +134,7 @@ func _process(delta: float) -> void:
 		var pr := radius * (1.9 if big else 1.5) * (0.2 + 0.8 * g)
 		_pool.scale = Vector3(pr, 1.0, pr)
 	if not _burst_done:
-		if _t < delay: return
+		if _t < delay or not _may_burst(): return
 		_burst()
 	var st := _t - delay
 	_stain_mat.set_shader_parameter("age", clampf(st / LIFE, 0.0, 1.0))

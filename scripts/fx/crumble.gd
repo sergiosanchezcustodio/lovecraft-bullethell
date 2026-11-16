@@ -12,6 +12,12 @@ extends Node3D
 const LIFE := 0.55                             ## lo que tarda (las élites y los únicos, BIG_LIFE)
 const BIG_LIFE := 1.1
 const MAX_ALIVE := 16
+## Cuántos empiezan a deshacerse en un mismo fotograma (hito 22.2): una explosión entre zoogs
+## mataba 25 a la vez y cada uno costaba ~170 µs (el modelo vuelve a la escena). Los demás
+## estallan en trozos sin quedarse; las élites y los únicos, siempre.
+const PER_FRAME := 6
+static var _frame := -1
+static var _started := 0
 const CUT_AT := 0.75                           ## en qué punto de la caída empieza a deshacerse
 ## Muertes según el daño (hito 17.9, Damage.how). burn: se queda en pie, se ennegrece con brasas
 ## (CHAR_TIME) y se deshace en ceniza, despacio; blast: las piezas salen volando con su giro y se
@@ -55,6 +61,7 @@ static func start(fx_parent: Node, model: Node3D, ember: Color, big := false, mo
 	if how == &"burn" and not enabled: how = &""                 # calidad Baja: sin el material, a su manera
 	if how == &"burn" or how == &"blast": model_name = ""         # ni caen: arden en pie o revientan
 	if (not enabled and model_name == "") or alive >= MAX_ALIVE or fx_parent == null or model == null or not model.has_meta("meshes"): return false
+	if not big and not budget(): return false
 	var c := Crumble.new()
 	c._life = BIG_LIFE if big else LIFE
 	c._ember = ember
@@ -242,3 +249,13 @@ static func set_char(dressed: Array, k: float) -> void:
 
 func _exit_tree() -> void:
 	alive -= 1
+
+## Quedan desmoronados para este fotograma (y cuenta uno).
+static func budget() -> bool:
+	var f := Engine.get_process_frames()
+	if f != _frame:
+		_frame = f
+		_started = 0
+	if _started >= PER_FRAME: return false
+	_started += 1
+	return true
