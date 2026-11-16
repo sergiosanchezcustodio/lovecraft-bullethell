@@ -3585,3 +3585,26 @@ Por tramos: nivel 1; nivel 2; nivel 3; niveles 4 y 5. Lo de cada nivel vive en `
   - Dos trofeos nuevos en `tools/gen_trofeos.py`: una copa de amatista con el escudo de luz dorada (`trofeo_copa_sueno`) y un farol de hierro con una llama verde (`trofeo_farol`). Hoja: `shots/hoja_trofeos22.png`.
   - Capturas: `shots/titulo_trofeos22_44_014.0s.png` (el final de la vitrina de jefes) y `titulo_trofeos22_58_014.0s.png` (la de logros).
 - **Tests:** 6 en `tests/test_logros22.gd`; `test_trophies` y `test_logros_mejoras`, al día (27 jefes y 14 logros grandes). Suite: 1070 de 1070.
+
+## Hito 22.1: equilibrio de la parte 4 y de las noches sueltas (16-11-2026)
+
+Todo con `simular.py` (bot `smart`, `--ts 2`, `--par 2`). Datos en `shots/equilibrio22/`.
+
+- **Referencia, medida igual:** la parte 3 encadenada con `shop=3` (lo esperable tras dos partes) sale 2 de 4 enteras: el nivel 1, 3 de 4; el 2, 2 de 3, y del 3 al 5, 2 de 2. Vida más baja: 40-46 % en el nivel 1 y 25-94 % en el resto. La tabla antigua del 6.7 era con el bot `circle`, que no esquiva, y no se puede comparar.
+- **Parte 4, antes:**
+  - Sin compras: el nivel 1, 4 de 4; el 2, 0 de 4 (cae a los 122-203 s, casi todo por los dardos de los mercaderes de Leng). Como en la parte 3, sin compras no se espera pasarla.
+  - Con `shop=4` (lo esperable tras tres partes): 20 de 20 y holgado. Vida más baja: N1 90-97 %, N2 31-92 %, N3 23-78 %, N4 78-87 %, N5 11-97 %. Era más fácil que la parte 3 y el nivel 4 costaba menos que el 3.
+- **Ajustes de la parte 4:**
+  - `health_mult`: N1 1,3 → 1,5; N2 1,45 → 1,65; N3 1,6 → 1,7; N4 1,4 → 1,8; N5 1,7 → 2,0.
+  - Ritmo de aparición: N1 ×1,1; N4 y N5 ×1,25, con tope de 80 vivos y oleada final de 16 (antes 70 y 12, como en la parte 3).
+  - Dardos de los mercaderes de Leng: de 5 a 4.
+  - Más vida sola apenas cambiaba nada (segunda ronda: 3 de 4, con N4 y N5 aún al 81-97 %): la presión la da el ritmo.
+- **Parte 4, después** (`shop=4`): 3 de 4 enteras. Vida más baja: N1 91-95 %, N2 36-73 %, N3 40-67 %, N4 58-84 % con una caída, N5 74-90 %. Con N5 a ×2,0 y suelto, 4 de 4 (69-100 %); Nyarlathotep cae entre los 30 y los 120 s.
+- **Noches sueltas**, medidas con las compras de cuando se abren (tras los niveles 5 de las partes 1, 2 y 3):
+  - El color, con `shop=2`: 4 de 4, vida más baja 4-69 %. Sin cambios.
+  - Dunwich, con `shop=3`: al principio, 1 de 4, y el jefe se alargaba hasta 226 s. El hermano de Wilbur hacía casi todo el daño (185 de vida por partida) y no se le ve sin el polvo.
+    - Ajuste: vida 1300 → 850, contacto 16 → 10, y con el jefe vivo un pulverizador cada 7 s (antes 10), hasta 3 a la vez, que descubren 7 s (antes 6).
+    - Después: 4 de 6, y el jefe cae en 25-40 s (una vez, 180).
+  - Pnakotus, con `shop=4`: 4 de 4 y holgada (84-95 %). Ajuste: `health_mult` 1,0 → 1,5, ritmo ×1,15, dos élites a la vez y oleada final de 18. Después: 4 de 4, vida más baja 53-89 %.
+- **Fallo de las pruebas:** con `quit_on_end` y sin `autonext`, el final ilustrado (21.17) esperaba una pulsación y la simulación de un nivel 5 suelto se quedaba colgada hasta el tope de 900 s. Ahora `quit_on_end` también lo pasa solo.
+- Todo es provisional, pendiente de tu calibración (D-42). Suite: 1070 de 1070.

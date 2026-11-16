@@ -1810,7 +1810,7 @@ func _on_level_completed() -> void:
 	if PartFinale.applies(String(level.id), args):  # el final ilustrado de la parte (21.17), antes de la victoria
 		_drop_card()
 		if announcer != null: announcer.modulate.a = 0.0
-		var fin := PartFinale.new(PartFinale.data_for(String(level.id)), args.has("autonext") or args.has("autorestart"))
+		var fin := PartFinale.new(PartFinale.data_for(String(level.id)), args.has("autonext") or args.has("autorestart") or args.get_bool("quit_on_end"))   # bots y pruebas: se pasa solo (con quit_on_end se quedaba esperando, 22.1)
 		add_child(fin)
 		if args.has("finale_shot"): get_tree().create_timer(args.get_float("finale_shot"), true, false, true).timeout.connect(func() -> void: _halt_shot())   # capturas
 		await fin.done

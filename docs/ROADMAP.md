@@ -760,7 +760,7 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 
 ## Fase 22: propuesta (16-11-2026)
 
-**Propuesta el 16-11-2026**, al cerrar la fase 21 («continúa»), **pendiente de que la apruebes o elijas bloques**. Lo que queda abierto de antes y depende de ti sigue igual: la música de la parte 4, la subida a itch.io (fase 8, tu cuenta), el `client_id` de la nube (fase 10) y la calibración de la dificultad (D-42).
+**Propuesta el 16-11-2026**, al cerrar la fase 21 («continúa»), **aprobada entera el 16-11-2026** («apruebo la fase 22 entera, empieza por el bloque A»). Lo que queda abierto de antes y depende de ti sigue igual: la música de la parte 4, la subida a itch.io (fase 8, tu cuenta), el `client_id` de la nube (fase 10) y la calibración de la dificultad (D-42).
 
 **Criterio de aceptación de la fase** (para lo que se elija):
 - Todo comprobado en captura y con el bot sin errores, y nada empeora el rendimiento apreciablemente en Alta.
@@ -771,9 +771,9 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 22.1 | **Equilibrio de la parte 4 y de las tres noches sueltas** con el bot (`simular.py`, sin compras y con las compras esperables tras la parte 3): que cada nivel cueste algo más que el anterior sin picos, y que el jefe de cada noche no se alargue. Informe con caídas por minuto y causa | Propuesto |
+| 22.1 | **Equilibrio de la parte 4 y de las tres noches sueltas** con el bot (`simular.py`, sin compras y con las compras esperables tras la parte 3): que cada nivel cueste algo más que el anterior sin picos, y que el jefe de cada noche no se alargue. Informe con caídas por minuto y causa | Hecho (16-11-2026), pendiente de revisión: la parte 4 era más fácil que la 3 con las compras esperables (20 de 20); ahora, 3 de 4 enteras (la 3, 2 de 4). Dunwich, de 1 de 4 a 4 de 6 con el jefe en 25-40 s; Pnakotus, más dura. Ver `docs/ESTADO.md` |
 | 22.2 | **Rendimiento de las cinco arenas del sueño y las noches** en Alta: medir con `comparar.py`, calentar lo que falte (`LevelWarmup`) y bajar en Baja o Media lo que cueste | Propuesto |
-| 22.3 | **Logros de la parte 4 y de las noches** (los gatos de Ulthar, la galera, el gran gug, vencer a las tres formas de Nyarlathotep, cada noche sin caer) y sus trofeos en la sala | Propuesto |
+| 22.3 | **Logros de la parte 4 y de las noches** (los gatos de Ulthar, la galera, el gran gug, vencer a las tres formas de Nyarlathotep, cada noche sin caer) y sus trofeos en la sala | Hecho (16-11-2026), pendiente de revisión: seis logros (`data/achievements/33…38`), vitrinas de jefes de 9 × 3 (con los de las noches) y de logros de 5 × 3, y dos trofeos nuevos |
 
 ### Bloque B: otro idioma (D-54)
 
