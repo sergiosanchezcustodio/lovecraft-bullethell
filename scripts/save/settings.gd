@@ -86,9 +86,9 @@ func apply_language() -> void:
 	var lang := String(get_value("language"))
 	# las ejecuciones de prueba (bots, medidas, capturas), en español salvo cfg_language=: las
 	# herramientas leen lo que escribe la partida (tools/simular.py, comparar.py)
-	var args := OS.get_cmdline_user_args()
-	if not _overrides.has("language") and args.any(func(a: String) -> bool: return a.begins_with("bot=") or a.begins_with("perf=") or a.begins_with("shots=") or a.begins_with("demo=")):
-		lang = "es"
+	if not _overrides.has("language"):
+		for a in OS.get_cmdline_user_args():
+			if a.begins_with("bot=") or a.begins_with("perf=") or a.begins_with("shots=") or a.begins_with("demo="): lang = "es"
 	if lang == "":
 		lang = L.system_lang()
 		values["language"] = lang
