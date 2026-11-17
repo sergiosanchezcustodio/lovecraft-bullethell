@@ -36,7 +36,7 @@ static var _eye_h := {}                      ## modelo -> altura de sus ojos sin
 static func data() -> Dictionary:
 	if _data.is_empty():
 		var f := FileAccess.open(PATH, FileAccess.READ)
-		var d: Variant = JSON.parse_string(f.get_as_text()) if f != null else null
+		var d: Variant = L.data(JSON.parse_string(f.get_as_text())) if f != null else null
 		_data = d if d is Dictionary else {"revelaciones": []}
 		for r: Dictionary in _data.revelaciones: _by_id[String(r.id)] = r
 	return _data

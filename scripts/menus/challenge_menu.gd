@@ -14,9 +14,9 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var w: Array = MenuKit.window(self, Color(0.55, 0.2, 0.16), 1500)
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "Desafíos", 48, Color(0.95, 0.5, 0.38))
+	MenuKit.heading(box, L.t("Desafíos"), 48, Color(0.95, 0.5, 0.38))
 	var done := Challenge.won_count(Saves.current)
-	var sub := UiKit.label("Cada nivel superado abre su desafío: el mismo escenario con reglas fijas y sin pactos. Superados: %d de %d." % [done, Challenge.all().size()], 19, UiKit.TEXT_DIM)
+	var sub := UiKit.label(L.t("Cada nivel superado abre su desafío: el mismo escenario con reglas fijas y sin pactos. Superados: %d de %d.") % [done, Challenge.all().size()], 19, UiKit.TEXT_DIM)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	sub.custom_minimum_size.x = 1300
@@ -44,8 +44,8 @@ func _ready() -> void:
 			var open := Challenge.unlocked(Saves.current, base) and Demo.part_ok(pi)
 			var tick := "✓ " if Challenge.won(Saves.current, base) else ""
 			var rec := Challenge.best(Saves.current, base)
-			var b := MenuKit.button("%s%d.  %s%s" % [tick, l.number, String(ch.name) if open or dev else "Supera el nivel para abrirlo",
-				("  ·  Récord %s" % Endless.clock(rec)) if rec > 0.0 else ""], MenuKit.INK, 18)
+			var b := MenuKit.button("%s%d.  %s%s" % [tick, l.number, String(ch.name) if open or dev else L.t("Supera el nivel para abrirlo"),
+				(L.t("  ·  Récord %s") % Endless.clock(rec)) if rec > 0.0 else ""], MenuKit.INK, 18)
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			b.custom_minimum_size = Vector2(460, 62)
@@ -69,7 +69,7 @@ func _ready() -> void:
 	_rules.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_rules.custom_minimum_size = Vector2(1300, 56)
 	box.add_child(_rules)
-	box.add_child(MenuKit.hint("A o Intro: jugar  ·  B o Esc: volver al mapa"))
+	box.add_child(MenuKit.hint(L.t("A o Intro: jugar  ·  B o Esc: volver al mapa")))
 	if first != null: first.grab_focus.call_deferred()
 
 func _unhandled_input(event: InputEvent) -> void:

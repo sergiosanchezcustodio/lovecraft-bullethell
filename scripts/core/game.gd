@@ -210,7 +210,7 @@ func _ready() -> void:
 		{} if grade_key == "off" else Atmosphere.grade_for(grade_key))
 	_base_fog = env.fog_density
 	_base_ambient = env.ambient_light_energy
-	_lap("luz y gradación")
+	_lap(L.t("luz y gradación"))
 	world = CombatWorld.new()
 	var size: Vector2 = arena.get_meta("size")
 	world.bounds = Rect2(-size * 0.5 - Vector2(6, 6), size + Vector2(12, 12))
@@ -284,7 +284,7 @@ func _ready() -> void:
 	if args.has("pets"):                            # pets=gato,perro: uno por jugador, en orden (hito 12.9)
 		var ids := args.get_str("pets").split(",")
 		for i in mini(ids.size(), players.size()): _spawn_pet(ids[i], players[i])
-	_lap("compañeros")
+	_lap(L.t("compañeros"))
 	if players.size() > 1:                            # vínculos (hito 21.3): su diálogo al empezar la parte
 		bonds = Bonds.new().setup(world, players, GameSession.carry.is_empty() and args.get_str("bond_talk", "") != "false")
 		add_child(bonds)
@@ -351,7 +351,7 @@ func _ready() -> void:
 	if args.has("items"): player.rebuild_stats()
 	if args.has("evolve_at"):                          # pruebas (16.8): el J1 abre un baúl a los T s
 		get_tree().create_timer(args.get_float("evolve_at"), false).timeout.connect(func() -> void: _try_evolve(player))
-	_lap("tienda y pruebas")
+	_lap(L.t("tienda y pruebas"))
 	camera = GameCamera.new()
 	camera.view_size = args.get_float("cam", 15.0)
 	for q in players:                                 # en red, cada PC sigue a los suyos (D-10)
@@ -369,7 +369,7 @@ func _ready() -> void:
 	arena.set_meta("arena_id", arena_id)
 	if args.get_bool("moon_shafts", bool(Quality.value("moon_shafts", false))) and MoonShafts.has_shafts(arena_id):
 		arena.add_child(MoonShafts.new().setup(arena, arena_id))   # haces de luna (16.32)
-	_lap("cámara y ambiente")
+	_lap(L.t("cámara y ambiente"))
 	_make_announcer()
 	if not args.get_bool("nolevel"):
 		var level_id := LevelPreload.level_id(args)
@@ -424,7 +424,7 @@ func _ready() -> void:
 		enemies_root.name = "Enemies"
 		add_child(enemies_root)
 		director = WaveDirector.new().setup(level, world, arena.get_meta("obstacles"), camera, enemies_root)
-		_lap("nivel y director")
+		_lap(L.t("nivel y director"))
 		if args.has("max_alive"): director.max_alive_override = args.get_int("max_alive")
 		for eid in args.get_str("enemies").split(",", false):    # enemies=profundo: solo esos (probar uno nuevo)
 			director.pool_override.append(load("res://data/enemies/%s.tres" % eid))
@@ -488,7 +488,7 @@ func _ready() -> void:
 				if not is_guest(): _try_evolve(by)         # en red, las armas de todos las lleva el anfitrión
 				if args.get_bool("log"): print("BAUL abierto por J%d" % (by.index + 1))
 				Achievements.add(Saves.current, "chests"))
-			announce("Ha aparecido un baúl arcano", 1.5))
+			announce(L.t("Ha aparecido un baúl arcano"), 1.5))
 		add_child(director)
 		director.spawning_paused = args.get_bool("no_spawn")   # capturas del escenario solo (hito 13.14)
 		if args.get_bool("no_spawn"):
@@ -499,19 +499,19 @@ func _ready() -> void:
 			add_child(hazards)
 		_seed_world()
 		_spawn_fragment(arena.get_meta("obstacles"))
-		_lap("fragmento y peligros")
+		_lap(L.t("fragmento y peligros"))
 		LevelWarmup.enabled = args.get_bool("warmup", true)   # modelos, paletas y shaders de sus enemigos, ya (hito 16.1)
 		ModelPool.enabled = args.get_bool("model_pool", true)  # y modelos de reserva para que aparezcan sin tirón
 		if player != null: LevelWarmup.start(self, level, player.global_position)
 		if ModelPool.enabled:
 			for d in LevelWarmup.enemies_of(level): ModelPool.stock("res://models/%s.json" % d.model)
 			ModelPool.fill_now()                           # mientras sale de negro
-			_lap("calentamiento y reserva")
+			_lap(L.t("calentamiento y reserva"))
 		if (not args.has("shots") or args.get_bool("card")) and args.get_bool("card", true):   # capturas: sin el rótulo, salvo card=true; card=false lo quita
 			_card = LevelCard.enter(self, level_id, level.display_name)
 		Music.play(level.music_path())
 		if args.get_bool("log"): print("MUSICA ", Music.current())
-	_lap("música")
+	_lap(L.t("música"))
 	_start_weather()
 	_lap("clima")
 	apply_speed()
@@ -556,10 +556,10 @@ func _ready() -> void:
 	if Challenge.active() and director != null:                      # desafío (15.2): sus reglas, tras el rótulo
 		var ch := Challenge.find(String(level.id))
 		get_tree().create_timer(4.5, false).timeout.connect(func() -> void:
-			if not _ended: announce("Desafío: " + String(ch.get("text", "")), 4.0))
+			if not _ended: announce(L.t("Desafío: ") + String(ch.get("text", "")), 4.0))
 	if not Pacts.active().is_empty() and director != null:           # pactos sellados (13.6): tras el rótulo del nivel
 		get_tree().create_timer(4.5, false).timeout.connect(func() -> void:
-			if not _ended: announce("Pactos: " + Pacts.names(Pacts.active()), 3.0))
+			if not _ended: announce(L.t("Pactos: ") + Pacts.names(Pacts.active()), 3.0))
 	menus = PlayerMenus.new().setup(self, players)
 	add_child(menus)
 	if args.has("panel"):                            # capturas: panel=sheet|map, panel_player=2, panel_page=1
@@ -572,7 +572,7 @@ func _ready() -> void:
 	pause_watch.set_script(preload("res://scripts/ui/pause_watch.gd"))
 	pause_watch.set("game", self)
 	add_child(pause_watch)
-	_lap("interfaz y menús")
+	_lap(L.t("interfaz y menús"))
 	LevelPreload.release()
 	if args.get_bool("log") or args.get_bool("loadtime"):
 		print("CARGA de la partida: %d ms (desde el arranque del motor: %d ms)" % [Time.get_ticks_msec() - t_start, Time.get_ticks_msec()])
@@ -705,7 +705,7 @@ func net_mark() -> void:
 	Net.marks += 1
 	net_game.mark(Net.marks)
 	mark_shot(Net.marks)
-	announce("Marca %d apuntada en el registro" % Net.marks, 1.2)
+	announce(L.t("Marca %d apuntada en el registro") % Net.marks, 1.2)
 
 ## Captura pequeña de lo que se veía al marcar, junto al registro (<registro>_marca_N.png; la
 ## saca tools/marcas.py). Con la marca de otro PC, la de aquí en ese momento
@@ -769,13 +769,13 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	q.downed.connect(_on_downed.bind(q))
 	q.revived.connect(func() -> void:
 		Achievements.add(Saves.current, "revives")
-		announce("J%d vuelve a la lucha" % (i + 1), 1.5))
+		announce(L.t("J%d vuelve a la lucha") % (i + 1), 1.5))
 	q.downed.connect(func() -> void: _someone_fell = true)
 	q.downed.connect(func() -> void:
 		_downs[q.index] = int(_downs.get(q.index, 0)) + 1
 		q.downs += 1)
 	q.eliminated.connect(func() -> void:
-		announce("J%d, eliminado hasta el siguiente nivel" % (i + 1), 2.0)
+		announce(L.t("J%d, eliminado hasta el siguiente nivel") % (i + 1), 2.0)
 		_check_all_down())
 	if args.get_bool("log"):
 		q.damaged.connect(func(d: Damage) -> void:
@@ -786,7 +786,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 		if not q.remote: _crisis_kinds[String(k)] = int(_crisis_kinds.get(String(k), 0)) + 1)
 	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void: Rumble.heartbeat(q))   # dos latidos (16.30)
 	q.sanity_state.crisis_started.connect(func(k: StringName) -> void:
-		var what := "Crisis: %s" % SanityState.NAMES.get(k, "locura")
+		var what := L.t("Crisis: %s") % SanityState.NAMES.get(k, "locura")
 		announce(what if players.size() == 1 else "J%d · %s" % [i + 1, what], 2.5))
 	q.lights.assign(arena.get_meta("lights"))       # las luces del escenario recuperan cordura
 	q.madness = bool(Settings.get_value("madness"))
@@ -873,7 +873,7 @@ func peddler_buy(q: Player, g: Dictionary, price: int) -> bool:
 	if purse() < price:
 		if Time.get_ticks_msec() - _poor_ms > 1500:
 			_poor_ms = Time.get_ticks_msec()
-			announce("No te llega: faltan %d $" % (price - purse()), 1.5)
+			announce(L.t("No te llega: faltan %d $") % (price - purse()), 1.5)
 			Auto.sfx("ui_back")
 		return false
 	var key := ""
@@ -885,7 +885,7 @@ func peddler_buy(q: Player, g: Dictionary, price: int) -> bool:
 		"baratija":
 			key = trinket_key(q)
 			if key == "":
-				announce("No te cabe ningún objeto más", 1.5)
+				announce(L.t("No te cabe ningún objeto más"), 1.5)
 				return false
 		"libro": key = "lvl"
 	run_spent += price
@@ -983,13 +983,13 @@ func _open_level_up() -> void:
 		return
 	_menu_open = true
 	get_tree().paused = true
-	var title := "Nivel %d" % (q.progress.level - q.progress.pending + 1)
-	if evo: title = "Evolución · %s" % options[0].from.display_name
-	if sign: title = "Signo Mayor"
+	var title := L.t("Nivel %d") % (q.progress.level - q.progress.pending + 1)
+	if evo: title = L.t("Evolución · %s") % options[0].from.display_name
+	if sign: title = L.t("Signo Mayor")
 	if trick: title = "Truco · %s" % (q.pet.data.display_name if q.pet != null else "compañero")
-	if rev: title = "Revelación"
+	if rev: title = L.t("Revelación")
 	if net_game != null: title = "Turno de J%d · %s (%s) · %s" % [q.index + 1, q.data.display_name, _pc_name(_peer_of(q)), title]
-	elif coop: title = "Turno de J%d · %s · %s" % [q.index + 1, q.data.display_name, title]
+	elif coop: title = L.t("Turno de J%d · %s · %s") % [q.index + 1, q.data.display_name, title]
 	var attr := "" if q.progress.attr_gains.is_empty() or evo or sign else String(q.progress.attr_gains[0])  # D-27: lo enseña el rodillo
 	if net_game != null:                          # en red, la partida se para en todos los PC
 		var h := {"k": "lvup", "peer": _peer_of(q), "i": q.index, "title": title, "attr": attr}
@@ -1070,7 +1070,7 @@ func _choose_option(q: Player, o: PlayerProgress.Option) -> String:
 		return "J%d · %s" % [q.index + 1, st] if players.size() > 1 else st
 	if o.kind == PlayerProgress.Option.Kind.REVELATION:   # (21.7)
 		if args.get_bool("log"): print("REVELACION %s" % o.revelation.get("id", ""))
-		var rt := "Revelación · %s: %s" % [o.title(), o.text()]
+		var rt := L.t("Revelación · %s: %s") % [o.title(), o.text()]
 		return "J%d · %s" % [q.index + 1, rt] if players.size() > 1 else rt
 	if o.kind == PlayerProgress.Option.Kind.TRICK:   # (21.5)
 		if args.get_bool("log"): print("TRUCO %s %s" % [q.progress.pet_id, o.trick.get("id", "")])
@@ -1078,7 +1078,7 @@ func _choose_option(q: Player, o: PlayerProgress.Option) -> String:
 		return "J%d · %s" % [q.index + 1, tt] if players.size() > 1 else tt
 	if o.kind != PlayerProgress.Option.Kind.EVOLUTION: return _pick_text(q, o)
 	if args.get_bool("log"): print("EVOLUCION %s" % o.weapon.id)
-	var text := "¡Evolución! %s → %s" % [o.from.display_name, o.weapon.display_name]
+	var text := L.t("¡Evolución! %s → %s") % [o.from.display_name, o.weapon.display_name]
 	return "J%d · %s" % [q.index + 1, text] if players.size() > 1 else text
 
 ## PC que maneja a un jugador (en local, el 1). Si su PC se ha ido, lo lleva un bot de aquí.
@@ -1114,7 +1114,7 @@ func _auto_pause(why: String) -> void:
 func _on_pad_lost(device: int) -> void:
 	for q: Player in players:
 		if not q.remote and JoypadInput.uses(q.input, device):
-			_auto_pause("mando %d" % device)
+			_auto_pause(L.t("mando %d") % device)
 			return
 
 var _card: LevelCard                            ## el rótulo del nivel, mientras se ve
@@ -1192,9 +1192,9 @@ func net_halt(d: Dictionary) -> void:
 		if mine:
 			_open_pause()
 			return
-		var buttons := [["Menú principal", _quit]]
+		var buttons := [[L.t("Menú principal"), _quit]]
 		if not is_guest(): buttons.push_front(["Continuar", func() -> void: net_game.resume_all()])
-		_show_halt("En pausa: la ha puesto %s" % who, buttons)
+		_show_halt(L.t("En pausa: la ha puesto %s") % who, buttons)
 		return
 	var i := int(d.get("i", 0))
 	if i >= players.size(): return
@@ -1202,14 +1202,14 @@ func net_halt(d: Dictionary) -> void:
 	if mine:
 		if is_guest(): _open_net_level_up(q, d)       # en el anfitrión, la ventana ya está abierta
 		return
-	var text := "Turno de J%d · %s (%s)\neligiendo mejora…" % [i + 1, q.data.display_name, who]
+	var text := L.t("Turno de J%d · %s (%s)\neligiendo mejora…") % [i + 1, q.data.display_name, who]
 	_show_halt(text, [])
 	if is_guest(): return
 	# anfitrión: si tarda (se ha ausentado), puede elegir por él
 	var n := int(d.get("n", 0))
 	get_tree().create_timer(args.get_float("afk_pick", NET_AFK_PICK), true).timeout.connect(func() -> void:
 		if int(net_game.halt.get("n", -1)) == n and _halt_ui != null:
-			_show_halt(text, [["Elegir por J%d" % (i + 1), _pick_for.bind(i)]])
+			_show_halt(text, [[L.t("Elegir por J%d") % (i + 1), _pick_for.bind(i)]])
 			if args.get_bool("halt_shots"): _halt_shot()
 			if args.get_bool("afk_press"): get_tree().create_timer(1.5, true).timeout.connect(_pick_for.bind(i)))   # pruebas
 
@@ -1267,7 +1267,7 @@ func net_picked(i: int, d: Dictionary) -> void:
 	var said := ""
 	var by_host := bool(d.get("by_host", false))
 	if o != null:
-		said = _choose_option(q, o) + (" (elegida por el anfitrión)" if by_host else "")
+		said = _choose_option(q, o) + (L.t(" (elegida por el anfitrión)") if by_host else "")
 	else: q.progress.pending = maxi(q.progress.pending - 1, 0)
 	_menu_open = false
 	net_game.resume_all(said, by_host)
@@ -1316,9 +1316,9 @@ func _net_info(q: Player) -> Array:
 		var seat: GameSession.Seat = GameSession.seats[q.index] if q.index < GameSession.seats.size() else null
 		if seat == null or seat.peer == GameSession.my_peer or Net.peers.has(seat.peer): return []
 		var back := GameSession.returning.values().has(seat.peer)
-		return ["%s · %s" % [seat.name, "vuelve en el siguiente nivel" if back else "lo lleva la máquina"], -1]
+		return ["%s · %s" % [seat.name, L.t("vuelve en el siguiente nivel") if back else L.t("lo lleva la máquina")], -1]
 	var peer := _peer_of(q)
-	if not Net.peers.has(peer): return ["sin conexión", -1]
+	if not Net.peers.has(peer): return [L.t("sin conexión"), -1]
 	var mine := int(Net.peers.get(GameSession.my_peer, {}).get("ping", 0))
 	var ms := mine if peer == 1 else int(Net.peers[peer].get("ping", 0)) + (mine if is_guest() else 0)
 	return [_pc_name(peer), ms]
@@ -1355,22 +1355,22 @@ func _open_debug() -> void:
 	if _debug != null: return
 	var dm := DebugMenu.new(self)
 	dm.restart.connect(_restart)
-	_over_pause(dm, "Depuración")
+	_over_pause(dm, L.t("Depuración"))
 
 ## Pausa > Dificultad (temporal, D-42): del 1 al 10 por características.
 func _open_difficulty() -> void:
 	if _debug != null: return
-	_over_pause(DifficultyMenu.new(self), "Dificultad (temporal)")
+	_over_pause(DifficultyMenu.new(self), L.t("Dificultad (temporal)"))
 
 ## Pausa > Modo foto (hito 13.12): cámara libre con la partida congelada.
 func _open_photo() -> void:
 	if _debug != null: return
-	_over_pause(PhotoMode.new(self), "Modo foto")
+	_over_pause(PhotoMode.new(self), L.t("Modo foto"))
 
 ## Pausa > Daño de la partida (hito 16.27): tabla por arma, objeto y compañero.
 func _open_damage() -> void:
 	if _debug != null: return
-	_over_pause(DamageTable.new(self, args.get_int("dmg_player", 1) - 1), "Daño de la partida")
+	_over_pause(DamageTable.new(self, args.get_int("dmg_player", 1) - 1), L.t("Daño de la partida"))
 
 ## Un menú encima de la pausa (con back y close): al volver, el foco en su botón.
 func _over_pause(m: CanvasLayer, button: String) -> void:
@@ -1465,14 +1465,14 @@ func _quit() -> void:
 
 func _summary() -> PackedStringArray:
 	var t := int(director.time) if director != null else 0
-	var lv := "Nivel alcanzado: %d" % player.progress.level
+	var lv := L.t("Nivel alcanzado: %d") % player.progress.level
 	if players.size() > 1:
 		var parts := PackedStringArray()
 		for q in players: parts.append("J%d %d" % [q.index + 1, q.progress.level])
-		lv = "Niveles: " + "  ·  ".join(parts)
-	var out := PackedStringArray(["Tiempo: %02d:%02d" % [t / 60, t % 60], "Enemigos abatidos: %d" % kills, lv,
-		"Dólares ganados: %s $" % MenuKit.money(run_money)])
-	if not Pacts.active().is_empty(): out.append("Pactos: " + Pacts.names(Pacts.active()))
+		lv = L.t("Niveles: ") + "  ·  ".join(parts)
+	var out := PackedStringArray([L.t("Tiempo: %02d:%02d") % [t / 60, t % 60], L.t("Enemigos abatidos: %d") % kills, lv,
+		L.t("Dólares ganados: %s $") % MenuKit.money(run_money)])
+	if not Pacts.active().is_empty(): out.append(L.t("Pactos: ") + Pacts.names(Pacts.active()))
 	if Madness.grade() > 0: out.append(Madness.title(Madness.grade()))
 	return out
 
@@ -1506,7 +1506,7 @@ func _on_downed(q: Player) -> void:
 		if not _rep_falls.has(q.index): _rep_falls[q.index] = []
 		_rep_falls[q.index].append({"t": director.time if director != null else 0.0, "hit": q.last_hit.duplicate()})
 	if players.size() > 1 and players.any(func(c: Player) -> bool: return c.health > 0.0):
-		announce("J%d, derribado: ¡reanimadlo!" % (q.index + 1), 2.0)
+		announce(L.t("J%d, derribado: ¡reanimadlo!") % (q.index + 1), 2.0)
 		if q.remote: _remote_down_sfx(q)
 		return
 	if is_guest(): return                            # la derrota la decide el anfitrión
@@ -1524,7 +1524,7 @@ func _remote_down_sfx(q: Player) -> void:
 func _log_players() -> void:
 	var parts := PackedStringArray()
 	for q in players:
-		parts.append("J%d nv=%d vida_min=%d caidas=%d" % [q.index + 1, q.progress.level, roundi(maxf(q.min_hp, 0.0) * 100), int(_downs.get(q.index, 0))])
+		parts.append(L.t("J%d nv=%d vida_min=%d caidas=%d") % [q.index + 1, q.progress.level, roundi(maxf(q.min_hp, 0.0) * 100), int(_downs.get(q.index, 0))])
 	print("JUGADORES %s  %s" % [level.id, " | ".join(parts)])
 
 func _check_all_down() -> void:
@@ -1562,7 +1562,7 @@ var _replay_frames: Array[Image] = []
 func _game_over() -> void:
 	if _ended: return
 	_ended = true
-	if args.has("perf"): _perf_report("caída")
+	if args.has("perf"): _perf_report(L.t("caída"))
 	if is_net_host(): net_game.send_lost()
 	if args.get_bool("log") and director != null:
 		print("FIN DERROTA %s t=%d abatidos=%d nivel_j1=%d" % [level.id, int(director.time), director.killed_total, player.progress.level])
@@ -1584,7 +1584,7 @@ func _game_over() -> void:
 	var title := "Has caído" if players.size() == 1 else "Habéis caído"
 	if level != null and level.endless: title = "Partida del día" if level.daily != "" else "La noche eterna"
 	if _expedition():                               # expedición (16.21): se acaba aquí
-		_endless_lines = PackedStringArray(["La expedición termina en el paso %d de %d" % [int(Expedition.state().row) + 1, (Expedition.state().rows as Array).size()]])
+		_endless_lines = PackedStringArray([L.t("La expedición termina en el paso %d de %d") % [int(Expedition.state().row) + 1, (Expedition.state().rows as Array).size()]])
 	if level != null and BossRush.is_rush(String(level.id)):   # desfile de jefes (16.22): hasta dónde llegó
 		var bd := BossRush.boss_of(String(level.id))
 		_endless_lines = PackedStringArray(["Caído ante %s (jefe %d de %d)" % [bd.display_name if bd != null else "el jefe",
@@ -1720,15 +1720,15 @@ func _daily_record() -> void:
 	var code := Daily.encode(level.daily, t, director.killed_total, ch, players.size())
 	_endless_lines = PackedStringArray()
 	if counted:
-		_endless_lines.append("Intento del día · racha de %d" % Daily.streak(Saves.current, level.daily))
+		_endless_lines.append(L.t("Intento del día · racha de %d") % Daily.streak(Saves.current, level.daily))
 		var copy := not args.has("bot") and not args.get_bool("halt_shots")
 		if copy: DisplayServer.clipboard_set(code)
-		_endless_lines.append("Código: %s%s" % [code, " (copiado)" if copy else ""])
+		_endless_lines.append(L.t("Código: %s%s") % [code, L.t(" (copiado)") if copy else ""])
 	elif Saves.current != null:
 		var r := Daily.result(Saves.current, level.daily)
-		_endless_lines.append("Práctica · el que cuenta: %s" % Endless.clock(float(r.get("t", 0.0))))
+		_endless_lines.append(L.t("Práctica · el que cuenta: %s") % Endless.clock(float(r.get("t", 0.0))))
 	else:
-		_endless_lines.append("Código: %s" % code)
+		_endless_lines.append(L.t("Código: %s") % code)
 
 ## Sin fin (hito 13.8): el tiempo aguantado y el récord de cada jugador de este PC con su
 ## personaje en este escenario.
@@ -1743,14 +1743,14 @@ func _endless_record() -> void:
 		var who := q.data.display_name + ": " if players.size() > 1 else ""
 		var ch := String(q.data.id)
 		var prev := Endless.best(Saves.current, ch, base)
-		if Endless.record(Saves.current, ch, base, t): _endless_lines.append(who + ("¡Nuevo récord! (antes, %s)" % Endless.clock(prev) if prev > 0.0 else "¡Primer récord!"))
-		else: _endless_lines.append(who + "Récord: %s" % Endless.clock(prev))
+		if Endless.record(Saves.current, ch, base, t): _endless_lines.append(who + (L.t("¡Nuevo récord! (antes, %s)") % Endless.clock(prev) if prev > 0.0 else L.t("¡Primer récord!")))
+		else: _endless_lines.append(who + L.t("Récord: %s") % Endless.clock(prev))
 
 func _on_level_completed() -> void:
 	if _ended: return
 	_ended = true
-	if args.has("perf"): _perf_report("nivel superado")   # con el juego en pausa ya no se mediría
-	Rumble.all(0.5, 1.0, 0.9, "nivel superado")      # el jefe cae (16.30)
+	if args.has("perf"): _perf_report(L.t("nivel superado"))   # con el juego en pausa ya no se mediría
+	Rumble.all(0.5, 1.0, 0.9, L.t("nivel superado"))      # el jefe cae (16.30)
 	for q in players:                                # pose de victoria (hito 17.5)
 		if q.health > 0.0 and not q.is_downed(): q.play_once(q.victory_anim(), true)
 	earn(level.money_bonus)                          # bono por superar el nivel
@@ -1759,7 +1759,7 @@ func _on_level_completed() -> void:
 	if args.get_bool("log"): for q in players: print("ESTADISTICAS J%d %s" % [q.index + 1, world.stats_of(q.index)])
 	if args.get_bool("log"): _log_players()
 	# el avance de la campaña solo cuenta en la partida del anfitrión (D-10)
-	var won_title := "Nivel superado"
+	var won_title := L.t("Nivel superado")
 	var is_exp := _expedition()
 	var rush := BossRush.is_rush(String(level.id)) or is_exp   # ni campaña, ni pactos, ni locura
 	var exp_next := ""
@@ -1767,18 +1767,18 @@ func _on_level_completed() -> void:
 	if BossRush.is_rush(String(level.id)): won_title = _rush_won()                 # desfile de jefes (16.22)
 	elif is_exp: won_title = "Expedición completada" if exp_next == "" else "Superado"
 	elif Challenge.is_challenge(String(level.id)):     # desafío (15.2): aparte, no cuenta como nivel de campaña
-		won_title = "Desafío superado"
+		won_title = L.t("Desafío superado")
 		var prev := Challenge.best(Saves.current, String(level.id))
 		var t := director.time
 		_challenge_record = false
 		if Challenge.record_win(Saves.current, String(level.id), t) and Saves.current != null:   # récord de tiempo
 			_challenge_record = prev > 0.0
-			_endless_lines = PackedStringArray(["¡Nuevo récord! %s%s" % [Endless.clock(t), " (antes, %s)" % Endless.clock(prev) if prev > 0.0 else ""]])
+			_endless_lines = PackedStringArray([L.t("¡Nuevo récord! %s%s") % [Endless.clock(t), L.t(" (antes, %s)") % Endless.clock(prev) if prev > 0.0 else ""]])
 		elif Saves.current != null:
-			_endless_lines = PackedStringArray(["Tiempo: %s  ·  Récord: %s" % [Endless.clock(t), Endless.clock(prev)]])
+			_endless_lines = PackedStringArray([L.t("Tiempo: %s  ·  Récord: %s") % [Endless.clock(t), Endless.clock(prev)]])
 		Achievements.record(Saves.current, "challenges_won", Challenge.won_count(Saves.current))
 	elif Nights.is_night(String(level.id)):          # noche suelta (fase 21, bloque D): aparte de la campaña
-		won_title = "Noche superada"
+		won_title = L.t("Noche superada")
 		if not is_guest(): Nights.record_win(Saves.current, String(level.id))
 		if blight != null and not blight.touched: Achievements.add(Saves.current, "color_untouched")   # «Sin tocar el color»
 		if unseen != null and unseen.birds_untouched(): Achievements.add(Saves.current, "dunwich_untouched")   # «Ningún alma para los chotacabras»
@@ -1823,11 +1823,11 @@ func _on_level_completed() -> void:
 func _expedition_won() -> String:
 	var st := Expedition.state()
 	var next := Expedition.won(String(level.id), purse(), director.time)
-	_endless_lines = PackedStringArray(["Bolsa de la expedición: %d $ · Tiempo: %s" % [int(st.money), Endless.clock(float(st.time))]])
+	_endless_lines = PackedStringArray([L.t("Bolsa de la expedición: %d $ · Tiempo: %s") % [int(st.money), Endless.clock(float(st.time))]])
 	if next == "":
 		var prev := Expedition.wins(Saves.current, int(st.part))
 		if Expedition.record(Saves.current, int(st.part), float(st.time)):
-			_endless_lines.append("¡La más rápida!" if prev > 0 else "¡La primera expedición completada en esta parte!")
+			_endless_lines.append(L.t("¡La más rápida!") if prev > 0 else L.t("¡La primera expedición completada en esta parte!"))
 		GameSession.expedition = {}
 	return next
 
@@ -1840,17 +1840,17 @@ func _rush_won() -> String:
 	var of := BossRush.stages().size()
 	var tt := Endless.clock(total)   # como «Tiempo:» de la misma ventana
 	# con el primer jefe jugado, el total es el mismo «Tiempo:» de debajo: no se repite (06-11-2026)
-	_endless_lines = PackedStringArray(["Jefe %d de %d%s" % [n, of, " · Tiempo total: " + tt if total > director.time + 0.5 else ""]])
+	_endless_lines = PackedStringArray([L.t("Jefe %d de %d%s") % [n, of, L.t(" · Tiempo total: ") + tt if total > director.time + 0.5 else ""]])
 	if BossRush.next(String(level.id)) != "": return "Jefe vencido"
-	_endless_lines = PackedStringArray(["Desfile completo · Tiempo total: %s" % tt])
+	_endless_lines = PackedStringArray([L.t("Desfile completo · Tiempo total: %s") % tt])
 	for q in players:
 		if q.remote or Saves.current == null: continue
 		var who := q.data.display_name + ": " if players.size() > 1 else ""
 		var prev := BossRush.best(Saves.current, String(q.data.id))
 		if BossRush.record(Saves.current, String(q.data.id), total):
-			_endless_lines.append(who + ("¡Nuevo récord! (antes, %s)" % Endless.clock(prev) if prev > 0.0 else "¡Primer récord!"))
-		else: _endless_lines.append(who + "Récord: %s" % Endless.clock(prev))
-	return "Desfile de jefes superado"
+			_endless_lines.append(who + (L.t("¡Nuevo récord! (antes, %s)") % Endless.clock(prev) if prev > 0.0 else L.t("¡Primer récord!")))
+		else: _endless_lines.append(who + L.t("Récord: %s") % Endless.clock(prev))
+	return L.t("Desfile de jefes superado")
 
 ## Tras superar el nivel, LOOT_TIME s para recoger lo que han soltado el jefe y los últimos
 ## enemigos: no aparece nadie más, los que quedan caen (sueltan sus gemas), se deshacen las balas
@@ -1875,13 +1875,13 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 	var lines := _summary()
 	if not _endless_lines.is_empty(): lines = _endless_lines + lines   # sin fin: tiempo y récords (13.8)
 	for c in Secrets.check(Saves.current):          # investigadores secretos (16.25)
-		lines.insert(0, "¡Nuevo investigador: %s! Ya puedes elegirlo." % c.display_name)
+		lines.insert(0, L.t("¡Nuevo investigador: %s! Ya puedes elegirlo.") % c.display_name)
 		Saves.save()
 	var reports := _reports()
 	if net_game != null:
 		lines.append_array(net_game.gone_notes)       # quién se fue y cuándo
 		if net_game.level_marks > 0:                   # para comentarlas antes de seguir
-			lines.append(MenuKit.count(net_game.level_marks, "marca") + " en este nivel (F9 o LB+RB)")
+			lines.append(MenuKit.count(net_game.level_marks, "marca") + L.t(" en este nivel (F9 o LB+RB)"))
 	_drop_card()
 	var s := Menus.EndScreen.new(title, lines, accent)
 	s.diary = _diary(result)
@@ -1905,7 +1905,7 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 	s.fishing.connect(func() -> void: _next_level(next_id, true))
 	if s.fishing_open and args.get_bool("go_fishing"):   # pruebas: a pescar al acabar
 		get_tree().create_timer(1.0, true, false, true).timeout.connect(func() -> void: _next_level(next_id, true))
-	if is_guest(): s.waiting = "El anfitrión decide cómo seguir"   # en red, solo puede salir
+	if is_guest(): s.waiting = L.t("El anfitrión decide cómo seguir")   # en red, solo puede salir
 	s.logs_button = net_game != null and net_game.guest_lost     # se fue alguien: el registro sirve
 	s.next_level.connect(func() -> void: _next_level(next_id))
 	s.restart.connect(_restart)
@@ -1964,7 +1964,7 @@ func _apply_carry() -> void:
 func _fish_curse() -> void:
 	GameSession.fish_curse = false
 	for q in players: q.sanity = q.data.max_sanity * float(Fishing.cfg().get("curse_sanity", 0.5))
-	get_tree().create_timer(2.5, false).timeout.connect(func() -> void: announce("Lo que sacaste del agua te sigue mirando", 3.0))
+	get_tree().create_timer(2.5, false).timeout.connect(func() -> void: announce(L.t("Lo que sacaste del agua te sigue mirando"), 3.0))
 	if args.get_bool("log"): print("MALDICION DE LA PESCA")
 
 ## Expedición (16.21): las subidas del descanso, de las élites y de las curiosidades, y la vida
@@ -2063,7 +2063,7 @@ func _to_next_scene() -> void:
 
 func _restart() -> void:
 	if is_guest():                                   # en red, reintenta el anfitrión
-		announce("Solo el anfitrión puede reintentar", 1.5)
+		announce(L.t("Solo el anfitrión puede reintentar"), 1.5)
 		return
 	if is_net_host(): net_game.send_restart()
 	print("reinicio")
@@ -2107,7 +2107,7 @@ func _try_evolve(q: Player) -> void:
 		return
 	var before := w.data.display_name
 	q.weapons.evolve(w)
-	var text := "¡Evolución! %s → %s" % [before, w.data.display_name]
+	var text := L.t("¡Evolución! %s → %s") % [before, w.data.display_name]
 	if players.size() > 1: text = "J%d · %s" % [q.index + 1, text]
 	announce(text, 3.0)
 	if args.get_bool("log"): print("EVOLUCION %s" % w.data.id)
@@ -2422,11 +2422,11 @@ func _update_info() -> void:
 		_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		layer.add_child(_info)
 	_info.visible = true
-	_info.text = "%d FPS
+	_info.text = L.t("%d FPS
 enemigos %d
 balas %d
 velocidad x%s
-t %.0f s" % [Engine.get_frames_per_second(),
+t %.0f s") % [Engine.get_frames_per_second(),
 		world.enemies.size(), world.bullets.count, String.num(Engine.time_scale, 2), director.time if director else _t]
 
 var _frames: Array[float] = []
@@ -2542,12 +2542,12 @@ func net_lost() -> void:
 ## motivo y el resumen, y de ahí al menú principal.
 func net_closed(reason: String) -> void:
 	if net_game != null and net_game.silence() > NetGame.QUIET:   # llevaba un rato sin noticias: se cayó
-		reason = "Se ha perdido la conexión con el anfitrión"
+		reason = L.t("Se ha perdido la conexión con el anfitrión")
 	elif reason == "El anfitrión ha cerrado la sala":
-		reason = "El anfitrión ha cerrado la partida"
+		reason = L.t("El anfitrión ha cerrado la partida")
 	Saves.save()
 	if args.get_bool("log"): print("RED cerrada: %s" % reason)
-	Net.netlog.line("Pantalla final: %s" % reason)
+	Net.netlog.line(L.t("Pantalla final: %s") % reason)
 	for n in [_pause, _halt_ui, get_node_or_null("NetLevelUp")]:
 		if n != null and is_instance_valid(n): (n as Node).queue_free()
 	_pause = null
@@ -2561,8 +2561,8 @@ func net_closed(reason: String) -> void:
 	var lines := _summary()
 	if Saves.current != null: lines.append("Ahora tienes %s $" % MenuKit.money(Saves.current.money))
 	var s := Menus.EndScreen.new(reason, lines, Color(0.95, 0.55, 0.3))
-	s.waiting = "Lo conseguido queda guardado en tu partida"
-	s.leave_text = "Menú principal"
+	s.waiting = L.t("Lo conseguido queda guardado en tu partida")
+	s.leave_text = L.t("Menú principal")
 	s.logs_button = reason != "El anfitrión ha cerrado la partida"   # un corte: el registro sirve
 	s.quit.connect(_quit)
 	add_child(s)
@@ -2581,5 +2581,5 @@ func _unhandled_input(event: InputEvent) -> void:
 		var next := DODGE_STYLES[(DODGE_STYLES.find(cur) + 1) % DODGE_STYLES.size()]
 		var style: DodgeStyle = load("res://data/dodges/%s.tres" % next)
 		player.apply_dodge_style(style)
-		announce("Esquive: " + style.display_name, 1.2)
+		announce(L.t("Esquive: ") + style.display_name, 1.2)
 		get_viewport().set_input_as_handled()

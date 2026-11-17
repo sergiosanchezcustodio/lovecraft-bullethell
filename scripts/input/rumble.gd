@@ -69,7 +69,7 @@ static func blast(pos: Vector3, radius: float, own: bool) -> void:
 		var d := Vector2((q as Node3D).global_position.x - pos.x, (q as Node3D).global_position.z - pos.z).length()
 		if d > reach: continue
 		var f := (1.0 - d / reach) * (0.45 if own else 1.0)
-		pulse(q, 0.3 * f, 0.55 * f, 0.12 + 0.12 * f, "explosión", 250 if own else GAP_MS)
+		pulse(q, 0.3 * f, 0.55 * f, 0.12 + 0.12 * f, L.t("explosión"), 250 if own else GAP_MS)
 
 ## Crisis de cordura: dos latidos.
 static func heartbeat(q: Node) -> void:

@@ -35,7 +35,7 @@ static func catalog() -> Array[Entry]:
 	for c: CharacterData in chars:
 		var e := Entry.new()
 		e.id = String(c.id); e.name = c.display_name; e.section = ShopItem.Section.CHARACTER
-		e.description = "%s. Rasgo: %s" % [c.role, c.passive_text]
+		e.description = L.t("%s. Rasgo: %s") % [c.role, c.passive_text]
 		e.prices = [c.price] as Array[int]
 		e.character = c
 		e.icon_model = c.model

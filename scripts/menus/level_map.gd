@@ -29,7 +29,7 @@ func _ready() -> void:
 	_col_w = 390.0 if four else 460.0
 	var w: Array = MenuKit.window(self, MenuKit.INK, 1720 if four else 1500)
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "Elige parte", 50)
+	MenuKit.heading(box, L.t("Elige parte"), 50)
 	var dev := OS.is_debug_build()
 	var cols := HBoxContainer.new()
 	cols.add_theme_constant_override("separation", 20 if four else 26)
@@ -47,7 +47,7 @@ func _ready() -> void:
 		var col := VBoxContainer.new()
 		col.add_theme_constant_override("separation", 8)
 		cols.add_child(col)
-		col.add_child(MenuKit.title("Parte %d" % (pi + 1), 22, UiKit.TEXT_DIM))
+		col.add_child(MenuKit.title(L.t("Parte %d") % (pi + 1), 22, UiKit.TEXT_DIM))
 		var pt := MenuKit.title(part.title, 28)
 		pt.custom_minimum_size.x = _col_w
 		pt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART   # «La búsqueda onírica…», en dos líneas: todas a la misma altura
@@ -90,62 +90,62 @@ func _ready() -> void:
 	extra.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_child(extra)
 	if (Daily.unlocked(Saves.current) or dev) and not Demo.on():   # partida del día (hito 13.9): tras el primer nivel
-		var db := MenuKit.button("Partida del día" + ("" if Daily.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
+		var db := MenuKit.button(L.t("Partida del día") + ("" if Daily.unlocked(Saves.current) else L.t("  ·  Desarrollo")), MenuKit.INK, 24)
 		db.custom_minimum_size = Vector2(460, 58)
 		db.focus_entered.connect(func() -> void:
-			_info_title.text = "Partida del día · %s" % Daily.pretty(Daily.today(), false)
-			_info_text.text = "El mismo escenario, investigador, compañero y pactos para todos, sacados de la fecha. El primer intento es el que cuenta.")
+			_info_title.text = L.t("Partida del día · %s") % Daily.pretty(Daily.today(), false)
+			_info_text.text = L.t("El mismo escenario, investigador, compañero y pactos para todos, sacados de la fecha. El primer intento es el que cuenta."))
 		db.pressed.connect(func() -> void: _daily(db))
 		extra.add_child(db)
 		_daily_btn = db
 	if (Endless.unlocked(Saves.current) or dev) and not Demo.on():   # modo sin fin (hito 13.8): al vencer a Cthulhu
-		var eb := MenuKit.button("La noche eterna" + ("" if Endless.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
+		var eb := MenuKit.button(L.t("La noche eterna") + ("" if Endless.unlocked(Saves.current) else L.t("  ·  Desarrollo")), MenuKit.INK, 24)
 		eb.custom_minimum_size = Vector2(460, 58)
 		eb.focus_entered.connect(func() -> void:
-			_info_title.text = "La noche eterna"
-			_info_text.text = "Modo sin fin: eliges escenario y aguantas oleadas de todas las partes, con un horror cada cinco minutos. Récord por personaje y escenario.")
+			_info_title.text = L.t("La noche eterna")
+			_info_text.text = L.t("Modo sin fin: eliges escenario y aguantas oleadas de todas las partes, con un horror cada cinco minutos. Récord por personaje y escenario."))
 		eb.pressed.connect(func() -> void: _endless(eb))
 		extra.add_child(eb)
 		_endless_btn = eb
 	var all_parts := range(Campaign.parts().size())   # la parte 4 también (21.12, mejoras)
 	var exp_open := all_parts.filter(func(p: int) -> bool: return Expedition.unlocked(Saves.current, p) and Demo.part_ok(p))
 	if (not exp_open.is_empty() or dev) and not Demo.on() and not Net.is_active():   # expedición (hito 16.21): al superar una parte, sin red
-		var xb := MenuKit.button("Expedición" + ("" if not exp_open.is_empty() else "  ·  Desarrollo"), MenuKit.INK, 24)
+		var xb := MenuKit.button(L.t("Expedición") + ("" if not exp_open.is_empty() else L.t("  ·  Desarrollo")), MenuKit.INK, 24)
 		xb.custom_minimum_size = Vector2(460, 58)
 		xb.focus_entered.connect(func() -> void:
-			_info_title.text = "Expedición"
-			_info_text.text = "Una tirada por una parte con un mapa de caminos que se bifurcan: combates, élites, el buhonero, curiosidades y descansos, y el jefe al final. Lo que ganas solo vale en esa expedición. Se abre la de cada parte al superarla. Sin red.")
+			_info_title.text = L.t("Expedición")
+			_info_text.text = L.t("Una tirada por una parte con un mapa de caminos que se bifurcan: combates, élites, el buhonero, curiosidades y descansos, y el jefe al final. Lo que ganas solo vale en esa expedición. Se abre la de cada parte al superarla. Sin red."))
 		xb.pressed.connect(func() -> void: _expedition(xb, exp_open if not dev else all_parts))
 		extra.add_child(xb)
 		if LaunchArgs.from_cmdline().get_bool("expedition_open"):   # capturas (recorrido de las ventanas)
 			_expedition.call_deferred(xb, exp_open if not dev else all_parts)
 	if (BossRush.unlocked(Saves.current) or dev) and not Demo.on():   # desfile de jefes (hito 16.22): al vencer a Cthulhu
-		var rb := MenuKit.button("Desfile de jefes" + ("" if BossRush.unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
+		var rb := MenuKit.button(L.t("Desfile de jefes") + ("" if BossRush.unlocked(Saves.current) else L.t("  ·  Desarrollo")), MenuKit.INK, 24)
 		rb.custom_minimum_size = Vector2(460, 58)
 		rb.focus_entered.connect(func() -> void:
-			_info_title.text = "Desfile de jefes"
+			_info_title.text = L.t("Desfile de jefes")
 			var best := BossRush.best_any(Saves.current)
-			_info_text.text = "Los jefes de la campaña seguidos, cada uno en su escenario: Gedney, el shoggoth primigenio, Obed Marsh, Madre Hydra y Padre Dagon, el viejo Castro, Cthulhu y Nyarlathotep. Empiezas fuerte y lo que ganas pasa de uno a otro. Sin pactos. Récord del tiempo total por personaje." + ("" if best <= 0.0 else " Tu récord: %s." % Endless.clock(best)))
+			_info_text.text = L.t("Los jefes de la campaña seguidos, cada uno en su escenario: Gedney, el shoggoth primigenio, Obed Marsh, Madre Hydra y Padre Dagon, el viejo Castro, Cthulhu y Nyarlathotep. Empiezas fuerte y lo que ganas pasa de uno a otro. Sin pactos. Récord del tiempo total por personaje.") + ("" if best <= 0.0 else L.t(" Tu récord: %s.") % Endless.clock(best)))
 		rb.pressed.connect(func() -> void:
 			Pacts.set_active([])
 			GameSession.carry.clear()
 			chosen.emit(BossRush.id_for(1)))
 		extra.add_child(rb)
 	if Challenge.any_unlocked(Saves.current) or dev:   # desafíos (hito 15.2): al superar un nivel
-		var cb := MenuKit.button("Desafíos" + ("" if Challenge.any_unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
+		var cb := MenuKit.button(L.t("Desafíos") + ("" if Challenge.any_unlocked(Saves.current) else L.t("  ·  Desarrollo")), MenuKit.INK, 24)
 		cb.custom_minimum_size = Vector2(460, 58)
 		cb.focus_entered.connect(func() -> void:
-			_info_title.text = "Desafíos"
-			_info_text.text = "Cada nivel superado abre su desafío: el mismo escenario con reglas fijas (sin esquive, una sola arma, a oscuras…). Superados: %d de %d." % [Challenge.won_count(Saves.current), Challenge.all().size()])
+			_info_title.text = L.t("Desafíos")
+			_info_text.text = L.t("Cada nivel superado abre su desafío: el mismo escenario con reglas fijas (sin esquive, una sola arma, a oscuras…). Superados: %d de %d.") % [Challenge.won_count(Saves.current), Challenge.all().size()])
 		cb.pressed.connect(func() -> void: _challenges(cb))
 		extra.add_child(cb)
 		_challenge_btn = cb
 	if (Nights.any_unlocked(Saves.current) or dev) and not Demo.on():   # noches sueltas (fase 21, bloque D)
-		var nb := MenuKit.button("Noches sueltas" + ("" if Nights.any_unlocked(Saves.current) else "  ·  Desarrollo"), MenuKit.INK, 24)
+		var nb := MenuKit.button(L.t("Noches sueltas") + ("" if Nights.any_unlocked(Saves.current) else L.t("  ·  Desarrollo")), MenuKit.INK, 24)
 		nb.custom_minimum_size = Vector2(460, 58)
 		nb.focus_entered.connect(func() -> void:
-			_info_title.text = "Noches sueltas"
-			_info_text.text = "Relatos aparte de la campaña, en una sola noche: un escenario, dos criaturas y su horror. Se abre cada una al superar una parte. Superadas: %d de %d." % [Nights.won_count(Saves.current), Nights.all().size()])
+			_info_title.text = L.t("Noches sueltas")
+			_info_text.text = L.t("Relatos aparte de la campaña, en una sola noche: un escenario, dos criaturas y su horror. Se abre cada una al superar una parte. Superadas: %d de %d.") % [Nights.won_count(Saves.current), Nights.all().size()])
 		nb.pressed.connect(func() -> void: _nights(nb))
 		extra.add_child(nb)
 		_nights_btn = nb
@@ -161,7 +161,7 @@ func _ready() -> void:
 		top = maxi(top, 1)
 		var names: Array[String] = []
 		for g in top + 1: names.append(Madness.title(g))
-		var row := OptionRow.new("Grado de locura", names, mini(GameSession.madness, top), func(i: int) -> void:
+		var row := OptionRow.new(L.t("Grado de locura"), names, mini(GameSession.madness, top), func(i: int) -> void:
 			Madness.set_grade(i)
 			_show_madness(i), Callable())
 		row.custom_minimum_size = Vector2(946, 54)
@@ -178,7 +178,7 @@ func _ready() -> void:
 	_info_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_info_text.custom_minimum_size = Vector2(1300, 56)
 	box.add_child(_info_text)
-	box.add_child(MenuKit.hint(("Desarrollo: también se puede elegir un nivel suelto  ·  " if dev else "") + "A o Intro: jugar  ·  B o Esc: volver a la selección"))
+	box.add_child(MenuKit.hint((L.t("Desarrollo: también se puede elegir un nivel suelto  ·  ") if dev else "") + L.t("A o Intro: jugar  ·  B o Esc: volver a la selección")))
 	if _first: _first.grab_focus.call_deferred()
 	var la := LaunchArgs.from_cmdline()                # capturas: pacts=noche,furia pact_open=true
 	if la.has("pacts"): Pacts.set_active(Array(la.get_str("pacts").split(",", false)))
@@ -194,9 +194,9 @@ func _ready() -> void:
 
 ## Lo que trae el grado de locura señalado (16.14).
 func _show_madness(g: int) -> void:
-	_info_title.text = "Grado de locura · " + Madness.title(g)
-	_info_text.text = ("La campaña de siempre. Al vencer a Cthulhu se abre el grado siguiente." if g <= 0
-		else Madness.describe(g) + " El grado siguiente se abre al vencer a Cthulhu en este.")
+	_info_title.text = L.t("Grado de locura · ") + Madness.title(g)
+	_info_text.text = (L.t("La campaña de siempre. Al vencer a Cthulhu se abre el grado siguiente.") if g <= 0
+		else Madness.describe(g) + L.t(" El grado siguiente se abre al vencer a Cthulhu en este."))
 
 ## Botón de una parte: empieza por su primer nivel.
 func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
@@ -204,12 +204,12 @@ func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
 	var demo_out := not Demo.part_ok(pi)               # la demo (13.17): solo la parte 1
 	var open := not demo_out and ((Saves.current != null and Saves.current.unlock_all) or Campaign.part_unlocked(pi, won))
 	var playable := open and Campaign.exists(first)
-	var b := MenuKit.button(Demo.LOCKED if demo_out else ("Jugar esta parte" if playable else ("Próximamente" if open else "Bloqueada")), MenuKit.INK, 24)
+	var b := MenuKit.button(Demo.LOCKED if demo_out else (L.t("Jugar esta parte") if playable else (L.t("Próximamente") if open else "Bloqueada")), MenuKit.INK, 24)
 	b.custom_minimum_size = Vector2(_col_w, 62)
 	b.disabled = not playable
 	b.focus_entered.connect(func() -> void:
-		_info_title.text = "Parte %d · %s" % [pi + 1, part.title]
-		_info_text.text = "%s. Cinco niveles seguidos: el nivel, las armas y los objetos de cada investigador pasan de uno al siguiente." % part.place)
+		_info_title.text = L.t("Parte %d · %s") % [pi + 1, part.title]
+		_info_text.text = L.t("%s. Cinco niveles seguidos: el nivel, las armas y los objetos de cada investigador pasan de uno al siguiente.") % part.place)
 	b.pressed.connect(func() -> void: _pick(first, b))
 	if playable and _first == null: _first = b
 	return b
@@ -228,7 +228,7 @@ func _is_open(l: Dictionary, won: Array) -> bool:
 func _level_button(l: Dictionary, won: Array) -> Button:
 	var unlocked := Saves.current.has_level(l.id) if Saves.current else Campaign.is_unlocked(l.id, won)
 	var playable := unlocked and Campaign.exists(l.id)
-	var tag := "" if playable else ("  ·  Próximamente" if unlocked else "  ·  Bloqueado")
+	var tag := "" if playable else (L.t("  ·  Próximamente") if unlocked else L.t("  ·  Bloqueado"))
 	var b := MenuKit.button("%d.  %s%s" % [l.number, l.name, tag], MenuKit.INK, 19)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	b.custom_minimum_size = Vector2(_col_w - ROW_INDENT, 58)
@@ -237,7 +237,7 @@ func _level_button(l: Dictionary, won: Array) -> Button:
 	b.add_theme_color_override("font_disabled_color", Color(UiKit.TEXT_DIM, 0.55 if not unlocked else 0.9))
 	b.focus_entered.connect(func() -> void:
 		_info_title.text = l.name
-		_info_text.text = "Criaturas: %s" % l.creatures)
+		_info_text.text = L.t("Criaturas: %s") % l.creatures)
 	b.pressed.connect(func() -> void: _pick(l.id, b))
 	return b
 
@@ -274,13 +274,13 @@ func _expedition(from: Button, parts: Array) -> void:
 	visible = false
 	var w: Array = MenuKit.window(pop, Color(0.42, 0.34, 0.18), 900)
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "Expedición", 42, UiKit.GOLD)
+	MenuKit.heading(box, L.t("Expedición"), 42, UiKit.GOLD)
 	var first: Button = null
 	var pi := 0
 	for part: Dictionary in Campaign.parts():
 		var p := pi
 		var wins := Expedition.wins(Saves.current, p)
-		var b := MenuKit.button("%s%s" % [String(part.title), ("  ·  completadas: %d" % wins) if wins > 0 else ""], MenuKit.INK, 22)
+		var b := MenuKit.button("%s%s" % [String(part.title), (L.t("  ·  completadas: %d") % wins) if wins > 0 else ""], MenuKit.INK, 22)
 		b.custom_minimum_size = Vector2(760, 60)
 		b.disabled = not parts.has(p)
 		b.pressed.connect(func() -> void:
@@ -292,7 +292,7 @@ func _expedition(from: Button, parts: Array) -> void:
 		box.add_child(b)
 		if first == null and not b.disabled: first = b
 		pi += 1
-	box.add_child(MenuKit.hint("A o Intro: empezar  ·  B o Esc: volver al mapa"))
+	box.add_child(MenuKit.hint(L.t("A o Intro: empezar  ·  B o Esc: volver al mapa")))
 	var back := func() -> void:
 		pop.queue_free()
 		visible = true

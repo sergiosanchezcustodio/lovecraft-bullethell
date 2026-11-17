@@ -70,4 +70,4 @@ func catch(p: Player) -> void:
 	var game := get_tree().current_scene if is_inside_tree() else null
 	if Time.get_ticks_msec() - _told_ms > 20000 and game != null and game.has_method("announce"):
 		_told_ms = Time.get_ticks_msec()
-		game.announce("¡Atrapado en una red! Esquiva para soltarte", 2.0)
+		game.announce(L.t("¡Atrapado en una red! Esquiva para soltarte"), 2.0)

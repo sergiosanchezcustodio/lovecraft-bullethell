@@ -182,7 +182,7 @@ func _spray(at: Vector2, r: float, q: Player) -> void:
 		var a := float(i) / 10.0 * TAU
 		VoxelFx.puff(world.fx, p + Vector3(cos(a) * r * 0.7, 0.6, sin(a) * r * 0.7), "dust", 0.9, POWDER, 1.6)
 	if q != null and not q.remote:
-		world._shout("El polvo de Ibn Ghazi", q.global_position + Vector3(0, 2.4, 0), POWDER, 60, 1.0, 1.6)
+		world._shout(L.t("El polvo de Ibn Ghazi"), q.global_position + Vector3(0, 2.4, 0), POWDER, 60, 1.0, 1.6)
 
 ## Invitado: lo que decidió el anfitrión.
 func remote(d: Dictionary) -> void:
@@ -274,7 +274,7 @@ func _souls() -> void:
 func _taken(q: Player) -> void:
 	souls_taken += 1
 	var at := q.global_position
-	world._shout("Los chotacabras se llevan su alma", at + Vector3(0, 2.6, 0), Color(0.82, 0.86, 1.0), 64, 1.6, 2.4)
+	world._shout(L.t("Los chotacabras se llevan su alma"), at + Vector3(0, 2.6, 0), Color(0.82, 0.86, 1.0), 64, 1.6, 2.4)
 	Auto.sfx_at("whippoorwill", at)
 	for i in 6:
 		VoxelFx.puff(world.fx, at + Vector3(0, 0.8 + i * 0.9, 0), "sparkle", 0.4, Color(0.8, 0.86, 1.0), 1.4 + i * 0.2)

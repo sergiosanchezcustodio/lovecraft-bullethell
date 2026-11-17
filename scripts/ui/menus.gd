@@ -50,7 +50,7 @@ class LevelUpMenu extends CanvasLayer:
 			b.pressed.connect(_pick.bind(i))
 			row.add_child(b)
 			_buttons.append(b)
-		var hint := UiKit.label("Flechas o cruceta para elegir · Intro o A para confirmar · 1, 2, 3", 15, UiKit.TEXT_DIM)
+		var hint := UiKit.label(L.t("Flechas o cruceta para elegir · Intro o A para confirmar · 1, 2, 3"), 15, UiKit.TEXT_DIM)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(hint)
 		box.resized.connect(func() -> void: box.position = (get_viewport().get_visible_rect().size - box.size) * 0.5)
@@ -135,7 +135,7 @@ class PauseMenu extends CanvasLayer:
 		dim.add_child(ver)
 		box.add_theme_constant_override("separation", 14)
 		MenuKit.heading(box, "Pausa", 48)
-		var rows := [["Continuar", resume], ["Modo foto", photo], ["Menú principal", quit]] if guest else 			[["Continuar", resume], ["Daño de la partida", damage], ["Modo foto", photo], ["Dificultad (temporal)", difficulty], ["Reiniciar", restart], ["Depuración", debug], ["Menú principal", quit]]
+		var rows := [["Continuar", resume], [L.t("Modo foto"), photo], [L.t("Menú principal"), quit]] if guest else 			[["Continuar", resume], [L.t("Daño de la partida"), damage], [L.t("Modo foto"), photo], [L.t("Dificultad (temporal)"), difficulty], ["Reiniciar", restart], [L.t("Depuración"), debug], [L.t("Menú principal"), quit]]
 		for pair in rows:
 			var b := MenuKit.button(pair[0], MenuKit.INK, 28)
 			b.custom_minimum_size = Vector2(340, 58)
@@ -164,7 +164,7 @@ class PauseMenu extends CanvasLayer:
 	func _show_ping() -> void:
 		var ms := int(ping.call())
 		_ping_dot.add_theme_color_override("font_color", Hud.PlayerPanel.ping_color(ms))
-		_ping_lbl.text = "Conexión con el anfitrión: %d ms" % ms if ms >= 0 else "Sin conexión con el anfitrión"
+		_ping_lbl.text = L.t("Conexión con el anfitrión: %d ms") % ms if ms >= 0 else L.t("Sin conexión con el anfitrión")
 
 	## B en el mando: vuelve al juego (Esc y Start ya los atiende pause_watch). Oculta, con la
 	## depuración encima, no hace nada: B es "volver" en ese menú.
@@ -184,7 +184,7 @@ class PauseMenu extends CanvasLayer:
 ## Fin de partida: caída o nivel superado, con un resumen y reintentar o salir.
 class EndScreen extends CanvasLayer:
 	static func _logs_button() -> Button:
-		var logs := MenuKit.button("Abrir la carpeta de registros de conexión", MenuKit.INK, 20)
+		var logs := MenuKit.button(L.t("Abrir la carpeta de registros de conexión"), MenuKit.INK, 20)
 		logs.custom_minimum_size = Vector2(420, 44)
 		logs.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		logs.pressed.connect(NetLog.open_folder)
@@ -200,7 +200,7 @@ class EndScreen extends CanvasLayer:
 	var pacts_open := false                     ## botón de los pactos del Necronomicón (hito 13.6), tras el de seguir
 	var _first: Button
 	var waiting := ""                           ## en red, un invitado: este aviso y solo "Salir"
-	var leave_text := "Salir de la partida"     ## el botón de salir, con `waiting`
+	var leave_text := L.t("Salir de la partida")     ## el botón de salir, con `waiting`
 	var logs_button := false                    ## botón de la carpeta de registros de red (tras un corte)
 	var title := ""
 	var lines: PackedStringArray = []
@@ -291,19 +291,19 @@ class EndScreen extends CanvasLayer:
 			return
 		var nxt: Button = _epilogue_button(box)
 		if has_next:
-			nxt = MenuKit.button("Siguiente nivel", MenuKit.INK, 28)
+			nxt = MenuKit.button(L.t("Siguiente nivel"), MenuKit.INK, 28)
 			nxt.custom_minimum_size = Vector2(360, 58)
 			nxt.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			nxt.pressed.connect(func() -> void: next_level.emit())
 			box.add_child(nxt)
 		if pacts_open:
-			var pb := MenuKit.button("Pactos del Necronomicón…", MenuKit.INK, 24)
+			var pb := MenuKit.button(L.t("Pactos del Necronomicón…"), MenuKit.INK, 24)
 			pb.custom_minimum_size = Vector2(360, 52)
 			pb.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			pb.pressed.connect(func() -> void: pacts.emit())
 			box.add_child(pb)
 		if fishing_open:
-			var fb := MenuKit.button("Pescar en el muelle…", MenuKit.INK, 24)
+			var fb := MenuKit.button(L.t("Pescar en el muelle…"), MenuKit.INK, 24)
 			fb.custom_minimum_size = Vector2(360, 52)
 			fb.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			fb.pressed.connect(func() -> void: fishing.emit())
@@ -313,7 +313,7 @@ class EndScreen extends CanvasLayer:
 		again.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		again.pressed.connect(func() -> void: restart.emit())
 		box.add_child(again)
-		var out := MenuKit.button("Menú principal", MenuKit.INK, 28)
+		var out := MenuKit.button(L.t("Menú principal"), MenuKit.INK, 28)
 		out.custom_minimum_size = Vector2(360, 58)
 		out.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		out.pressed.connect(func() -> void: quit.emit())
@@ -327,7 +327,7 @@ class EndScreen extends CanvasLayer:
 	## «Epílogo» (hito 13.11): después del último nivel, lo que vino después.
 	func _epilogue_button(box: VBoxContainer) -> Button:
 		if not epilogue: return null
-		var b := MenuKit.button("Fin de la demo" if Demo.on() else "Epílogo", MenuKit.INK, 28)
+		var b := MenuKit.button(L.t("Fin de la demo") if Demo.on() else L.t("Epílogo"), MenuKit.INK, 28)
 		b.custom_minimum_size = Vector2(360, 58)
 		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		b.pressed.connect(func() -> void: epilogue_open.emit())
@@ -350,7 +350,7 @@ class EndScreen extends CanvasLayer:
 
 	func _replay_button(box: VBoxContainer) -> void:
 		if replay.is_empty(): return
-		var b := MenuKit.button("Ver la caída", MenuKit.INK, 22)
+		var b := MenuKit.button(L.t("Ver la caída"), MenuKit.INK, 22)
 		b.custom_minimum_size = Vector2(360, 50)
 		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		b.pressed.connect(func() -> void:

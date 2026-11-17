@@ -34,22 +34,32 @@ const PROPER := ["Cthulhu", "Madre", "Padre", "Barnabas", "Gedney", "Pth'thya-l'
 
 ## «Acaba con el Primigenio menor»: el artículo que falta a los nombres comunes; los que ya lo
 ## llevan («El viejo Castro») y los propios («Madre Hydra») quedan igual (06-11-2026).
-static func with_article(n: String) -> String:
+static func with_article(n: String) -> String:   # i18n: no
+	if L.lang == "en": return _the(n)
 	var first := n.get_slice(" ", 0).trim_suffix(",")
 	if first in ["El", "La", "Los", "Las"] or first in PROPER: return n
-	return ("la " if first in FEM_NOUNS else "el ") + n
+	return ("la " if first in FEM_NOUNS else "el ") + n   # i18n: no
 
 ## «La noche trae al Acechador»: con la «a» personal y el artículo en minúscula («al diácono de la
 ## Orden», «a la pesadilla del bajorrelieve», «a Barnabas Marsh») (21.12, mejoras).
-static func with_a(n: String) -> String:
+static func with_a(n: String) -> String:   # i18n: no
+	if L.lang == "en": return _the(n)          # «The night brings the Lurker»: sin la «a» personal
 	var first := n.get_slice(" ", 0).trim_suffix(",")
 	if first in PROPER: return "a " + n
 	var full := with_article(n)
-	if full.begins_with("El "): return "al " + full.substr(3)
-	if full.begins_with("el "): return "al " + full.substr(3)
-	if full.begins_with("La ") or full.begins_with("la "): return "a la " + full.substr(3)
-	if full.begins_with("Los ") or full.begins_with("Las "): return "a " + full.substr(0, 1).to_lower() + full.substr(1)
+	if full.begins_with("El "): return "al " + full.substr(3)   # i18n: no
+	if full.begins_with("el "): return "al " + full.substr(3)   # i18n: no
+	if full.begins_with("La ") or full.begins_with("la "): return "a la " + full.substr(3)   # i18n: no
+	if full.begins_with("Los ") or full.begins_with("Las "): return "a " + full.substr(0, 1).to_lower() + full.substr(1)   # i18n: no
 	return "a " + full
+
+## En inglés (hito 22.4): «the» delante, salvo los que ya lo llevan y los nombres propios (los
+## de PROPER y los que van en mayúscula tras la primera palabra, como «Obed Marsh»).
+const PROPER_EN := ["Cthulhu", "Mother", "Father", "Barnabas", "Gedney", "Pth'thya-l'yi", "Nyarlathotep", "Old", "Captain"]
+static func _the(n: String) -> String:
+	var first := n.get_slice(" ", 0).trim_suffix(",")
+	if first == "The" or first in PROPER_EN: return n
+	return L.t("the ") + n
 
 func setup(p_players: Array[Player], p_director: WaveDirector) -> Hud:
 	players = p_players
@@ -70,20 +80,20 @@ func _ready() -> void:
 	top.alignment = BoxContainer.ALIGNMENT_BEGIN
 	add_child(top)
 	var lvl_name := "Parte %d · Nivel %d" % [director.level.part, director.level.number] if director != null else "Campo de pruebas"
-	if Madness.grade() > 0: lvl_name += " · Grado %s" % String(Madness.info(Madness.grade()).get("roman", ""))   # 16.14
+	if Madness.grade() > 0: lvl_name += L.t(" · Grado %s") % String(Madness.info(Madness.grade()).get("roman", ""))   # 16.14
 	if director != null and Nights.is_night(String(director.level.id)):   # noche suelta (fase 21, bloque D)
 		lvl_name = Nights.label(String(director.level.id))
 	if director != null and Challenge.is_challenge(String(director.level.id)):   # desafío (15.2)
-		lvl_name = "Desafío · %s" % String(Challenge.find(String(director.level.id)).get("name", ""))
+		lvl_name = L.t("Desafío · %s") % String(Challenge.find(String(director.level.id)).get("name", ""))
 	if director != null and Expedition.is_expedition(String(director.level.id)):   # expedición (16.21)
 		var ek := Expedition.kind_of(String(director.level.id))
-		lvl_name = "Expedición · %s" % String(Expedition.NAMES.get(ek, ek))
+		lvl_name = L.t("Expedición · %s") % String(Expedition.NAMES.get(ek, ek))
 	if director != null and BossRush.is_rush(String(director.level.id)):   # desfile de jefes (16.22)
-		lvl_name = "Desfile de jefes · %d de %d" % [BossRush.number_of(String(director.level.id)), BossRush.stages().size()]
+		lvl_name = L.t("Desfile de jefes · %d de %d") % [BossRush.number_of(String(director.level.id)), BossRush.stages().size()]
 	if director != null and director.level.endless:          # sin fin (hito 13.8): el récord de J1 aquí
-		lvl_name = "La noche eterna"
+		lvl_name = L.t("La noche eterna")
 		if director.level.daily != "":                    # partida del día (13.9): el intento que cuenta
-			lvl_name = "Partida del día"
+			lvl_name = L.t("Partida del día")
 			_endless_best = float(Daily.result(Auto.save(), director.level.daily).get("t", 0.0))
 		elif player != null: _endless_best = Endless.best(Auto.save(), String(player.data.id), Endless.base_of(String(director.level.id)))
 	var title := UiKit.label(lvl_name, 16, UiKit.TEXT_DIM)
@@ -129,26 +139,26 @@ func _process_step(_delta: float) -> void:
 		_time_lbl.text = "%02d:%02d" % [t / 60, t % 60]
 		if director.completed:
 			var l := int(ceil(director.loot_left))
-			var done := "Desafío superado" if Challenge.is_challenge(String(director.level.id)) else "Nivel superado"
-			_objective_lbl.text = "%s · recoge el botín %d" % [done, l] if l > 0 else done
+			var done := L.t("Desafío superado") if Challenge.is_challenge(String(director.level.id)) else L.t("Nivel superado")
+			_objective_lbl.text = L.t("%s · recoge el botín %d") % [done, l] if l > 0 else done
 		elif director.level.is_survival() and director.time >= director.level.final_time:
 			var s := int(ceil(director.survive_left()))
-			_objective_lbl.text = "Resiste a %s · %d:%02d" % [director.level.final_name, s / 60, s % 60]
+			_objective_lbl.text = L.t("Resiste a %s · %d:%02d") % [director.level.final_name, s / 60, s % 60]
 		elif not director.mid_alive.is_empty():
-			_objective_lbl.text = "Acaba con %s" % with_article(director.mid_alive[0].data.display_name)
+			_objective_lbl.text = L.t("Acaba con %s") % with_article(director.mid_alive[0].data.display_name)
 		elif director.time >= director.level.final_time and director.level.final_enemy != null:
 			var f := director.final_target()
 			_objective_lbl.text = "Acaba con %s" % with_article(f.data.display_name if f != null else director.level.final_enemy.display_name)
 		elif director.level.endless:
 			var nxt := director.next_mid_time()
 			var parts := PackedStringArray()
-			if nxt > 0.0: parts.append("Siguiente horror en %s" % Endless.clock(nxt - director.time))
+			if nxt > 0.0: parts.append(L.t("Siguiente horror en %s") % Endless.clock(nxt - director.time))
 			var words := ["El de hoy %s", "¡Mejor que el de hoy! (%s)"] if director.level.daily != "" else ["Récord %s", "¡Récord! (%s)"]
 			if _endless_best > 0.0: parts.append((words[0] if director.time < _endless_best else words[1]) % Endless.clock(_endless_best))
 			_objective_lbl.text = "  ·  ".join(parts)
 		else:
 			var left := int(director.level.final_time - director.time)
-			_objective_lbl.text = "Resiste · %d:%02d para el final" % [left / 60, left % 60]
+			_objective_lbl.text = L.t("Resiste · %d:%02d para el final") % [left / 60, left % 60]
 
 ## Lo que dice ahora el objetivo ("Resiste · 2:10 para el final"), para quien espera a volver.
 func objective_text() -> String:
@@ -340,7 +350,7 @@ class PlayerPanel extends PanelContainer:
 		_crisis_lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 		_crisis_lbl.size_flags_vertical = Control.SIZE_SHRINK_END
 		_crisis_lbl.size_flags_horizontal = Control.SIZE_SHRINK_END
-		_down_lbl = MenuKit.title("Caído", 22, Color(0.95, 0.35, 0.28))
+		_down_lbl = MenuKit.title(L.t("Caído"), 22, Color(0.95, 0.35, 0.28))
 		_down_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		_down_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_down_lbl.visible = false
@@ -447,21 +457,21 @@ class PlayerPanel extends PanelContainer:
 			_items_key = key
 			_paint_items()
 		var ss := p.sanity_state
-		_crisis_lbl.text = ("Crisis: %s" % SanityState.NAMES.get(ss.crisis_kind, "locura")) if ss.in_crisis else ""
+		_crisis_lbl.text = (L.t("Crisis: %s") % SanityState.NAMES.get(ss.crisis_kind, "locura")) if ss.in_crisis else ""
 		var down := p.health <= 0.0
 		_down_lbl.visible = down
 		if p.is_eliminated: _down_lbl.text = "Eliminado"
 		elif down and p.revivable:
 			var pct := int(100.0 * p.revive_progress / p.rules.revive_time)
-			_down_lbl.text = "Derribado · %d s" % ceili(p.down_left) + ("  ·  %d %%" % pct if pct > 0 else "")
-		else: _down_lbl.text = "Caído"
+			_down_lbl.text = L.t("Derribado · %d s") % ceili(p.down_left) + ("  ·  %d %%" % pct if pct > 0 else "")
+		else: _down_lbl.text = L.t("Caído")
 		modulate = Color(0.55, 0.55, 0.6, 0.8) if down else Color.WHITE
 		var ni: Array = _hud.net_info.call(p) if _hud.net_info.is_valid() else []
 		_net_row.visible = not ni.is_empty()
 		if not ni.is_empty():
 			var ms := int(ni[1])
 			_net_dot.add_theme_color_override("font_color", ping_color(ms))
-			_net_lbl.text = String(ni[0]) if ms < 0 else "%s · %d ms" % [ni[0], ms]
+			_net_lbl.text = String(ni[0]) if ms < 0 else L.t("%s · %d ms") % [ni[0], ms]
 
 
 ## Experiencia en 10 casillas en relieve: llenas en azul (en cooperativo, del color de quien

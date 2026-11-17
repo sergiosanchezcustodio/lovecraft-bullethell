@@ -39,4 +39,4 @@ func _found() -> void:
 		var c: ArcaneChest = game.director.spawn_chest()
 		if c != null:
 			c.position = Vector3(_spot.x, c.position.y, _spot.z)
-			pet.popup("¡Un baúl!", Color(0.8, 0.6, 1.0))
+			pet.popup(L.t("¡Un baúl!"), Color(0.8, 0.6, 1.0))

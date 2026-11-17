@@ -3640,3 +3640,29 @@ Medido en Alta con el PC libre (`comparar.py`, `--veces 2 --perf 20`, bot `smart
   Algo menos de tirones donde las explosiones matan a muchos zoogs; el 1 % peor, igual. La tarjeta gráfica estaba al 16 % antes de medir: compara solo dentro de esta tabla.
 - **Sin hacer:** medir en el escritorio normal (`ver=true`). Abre la ventana en tu pantalla y estabas usando el PC.
 - Suite: 1075 de 1075 (`tests/test_topes_muertes.gd`).
+
+## Hito 22.4: textos traducibles (17-11-2026)
+
+D-54 resuelta: sí, el juego entero en inglés antes de itch.io. Este hito monta la base; el 22.5 pone las traducciones y el selector.
+
+- **Tabla:** gettext, con el texto en español tal cual como clave. `locale/textos.pot` los recoge todos y `locale/en.po` guarda la traducción (las vacías se quedan en español). Godot carga el `.po` sin importarlo; `export_presets.cfg` incluye `*.po` y deja fuera el `.pot`.
+- **Cómo se traduce cada cosa** (`scripts/core/l.gd`, clase `L`):
+  - **Palabras sueltas que van tal cual a un `Label`, un `Button` o un `Label3D`:** las traduce Godot solo (auto_translate), sin tocar el código.
+  - **Frases del código:** `L.t("…")`. Las puso `python tools/textos.py envolver --aplicar` en unos 1030 sitios: frases con espacio, tilde o marcador, salvo dentro de `const`, `enum` y anotaciones (no admiten llamadas), registros (`print`, `push_error`…), comparaciones, nombres de nodos y metas, y cabeceras HTTP. Una línea con `# i18n: no` no se toca.
+  - **JSON de `data/`:** `L.data(JSON.parse_string(…))` en las 29 lecturas con textos. Traduce los textos de cualquier clave salvo las que empiezan por `_` y las de `SKIP_KEYS` (id, model, icon…).
+  - **`.tres`:** las propiedades de texto de once clases de datos (`display_name`, `description`, `story`, `role`, `passive_text` y los textos finales del nivel) llevan `get: return L.t(…)`. Así se traducen también los valores por defecto, que los `.tres` no guardan.
+    - Probado y descartado: cargar y traducir todos los `.tres` al arrancar (3,4 s) o hacerlo con un `set` (no ve los valores por defecto).
+  - **Gramática:** `Hud.with_article` y `with_a` (el «al», «a la» del español) tienen su versión inglesa (`_the`, «the» salvo los nombres propios de `PROPER_EN`).
+- **Idioma:** ajuste `language` («es», «en» o vacío). La primera vez, el del sistema; si no es español, inglés. Se aplica al arrancar (`Settings.apply_language`, antes de cargar datos) y cambiarlo pide reiniciar. Para probar: `cfg_language=en`. No vuelve al de fábrica al restablecer la pestaña Juego.
+- **Lo que falta, en el juego:** con `i18n_log=true`, `L` apunta todo lo que se pide traducir y no está en la tabla, también lo que traducen solos los `Label`. Lo guarda al salir en `user://i18n_faltan.txt`, sumado a lo de antes. `python tools/textos.py registro` separa lo que está en la tabla sin traducir de lo que se monta en el código (por ejemplo, un «Resiste · 3:40 para el final» sin `L.t`).
+  - Con `recorrido_ui.py --con "cfg_language=en i18n_log=true" --sufijo en` se recorren las 56 ventanas.
+- **Herramienta** (`tools/textos.py`):
+  - `extraer`: rehace el `.pot` y añade a `en.po` lo nuevo.
+  - `estado`: lo que falta, por origen.
+  - `faltan`: la lista, también en JSON para traducir por lotes.
+  - `poner lote.json`: mete las traducciones y rechaza las que cambian los marcadores (`%s`, `%d`, `{nombre}`, `[b]`).
+  - `comprobar`: que el `.pot` esté al día y los marcadores sean los mismos.
+- **Cuánto hay:** 3256 textos y unas 27 700 palabras. Unas 9 800 son de la Biblioteca, 2 900 de las armas, 2 500 de los menús y 1 100 de los fragmentos.
+- **Prueba** (`tests/test_textos.gd`): `L.t`, `L.data` (sin tocar ids ni comentarios), el `get` de los recursos (también con el valor por defecto), qué cuenta como texto, que la tabla esté al día (`textos.py comprobar`) y cuántos hay traducidos (9 de 3256 por ahora: los del menú principal, para probar la cadena).
+- **Captura:** el menú principal con `cfg_language=en` sale con *Play*, *Shop*, *Library*, *Settings* y *Quit* (`shots/ui_recorrido_en/menu.png`).
+- Suite: 1082 de 1082.

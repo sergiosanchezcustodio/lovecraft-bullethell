@@ -15,7 +15,7 @@ static var _data := {}
 
 static func data() -> Dictionary:
 	if _data.is_empty():
-		var d = JSON.parse_string(FileAccess.get_file_as_string(DATA))
+		var d = L.data(JSON.parse_string(FileAccess.get_file_as_string(DATA)))
 		_data = d if d is Dictionary else {}
 	return _data
 
@@ -101,14 +101,14 @@ static func _one(list: Array, rng: RandomNumberGenerator, fill: Dictionary) -> S
 	return s.left(1).to_upper() + s.substr(1)
 
 static func _times(n: int) -> String:
-	return ["", "una vez", "dos veces", "tres veces"][n] if n < 4 else "%d veces" % n
+	return ["", L.t("una vez"), L.t("dos veces"), L.t("tres veces")][n] if n < 4 else L.t("%d veces") % n
 
 ## "30 de octubre de 1927": el día y el mes de hoy, el año de la historia de la parte.
 static func story_date(date: String, part: int) -> String:
 	var bits := date.split("-")
 	var year := int((data().get("years", {}) as Dictionary).get(str(part), 1927))
 	if bits.size() < 3: return str(year)
-	return "%d de %s de %d" % [int(bits[2]), MONTHS[clampi(int(bits[1]) - 1, 0, 11)], year]
+	return L.t("%d de %s de %d") % [int(bits[2]), MONTHS[clampi(int(bits[1]) - 1, 0, 11)], year]
 
 ## Guarda la entrada en el diario del personaje (la más nueva primero).
 static func add(save: SaveData, character: String, f: Dictionary, entry: Dictionary) -> void:

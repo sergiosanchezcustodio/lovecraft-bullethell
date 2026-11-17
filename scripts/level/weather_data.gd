@@ -13,7 +13,8 @@ extends Resource
 enum Precip { NONE, SNOW, ASH, RAIN }
 
 @export var id := &"nevada"
-@export var display_name := "Nevada"
+@export var display_name := "Nevada":
+	get: return L.t(display_name)          # en el idioma elegido (hito 22.4)
 @export_group("Viento")
 @export var wind_dir := Vector2(1.0, 0.35)       ## rumbo en el suelo (x, z)
 @export var wind := 1.5                         ## m/s de base

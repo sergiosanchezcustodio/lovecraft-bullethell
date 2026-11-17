@@ -114,7 +114,7 @@ func _contents(files: Dictionary) -> Dictionary:
 
 func _headers() -> PackedStringArray:
 	return PackedStringArray(["Accept: application/vnd.github+json", "Authorization: Bearer " + token,
-		"X-GitHub-Api-Version: 2022-11-28", "User-Agent: LovecraftLibrary"])
+		L.t("X-GitHub-Api-Version: 2022-11-28"), "User-Agent: LovecraftLibrary"])
 
 ## Llamada a la API: el JSON de la respuesta o null (con `last_error`).
 func _api(method: int, path: String, body: Variant = null) -> Variant:
@@ -136,7 +136,7 @@ func _form(url: String, fields: Dictionary) -> Variant:
 	var parts := PackedStringArray()
 	for k: String in fields: parts.append("%s=%s" % [k, String(fields[k]).uri_encode()])
 	var headers := PackedStringArray(["Accept: application/json", "User-Agent: LovecraftLibrary",
-		"Content-Type: application/x-www-form-urlencoded"])
+		L.t("Content-Type: application/x-www-form-urlencoded")])
 	var r: Dictionary = await http.request(HTTPClient.METHOD_POST, url, headers, "&".join(parts))
 	var code := int(r.code)
 	if code < 200 or code >= 300:

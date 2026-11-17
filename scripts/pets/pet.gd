@@ -245,7 +245,7 @@ func _trick_step(delta: float) -> void:
 				return
 			_trick_t = float(trick.get("cada", 7.0))
 			act()
-			popup("¡Auuu!", Color(0.85, 0.9, 1.0))
+			popup(L.t("¡Auuu!"), Color(0.85, 0.9, 1.0))
 			Auto.sfx_at("howl", global_position)
 			var wave := Shockwave.new().setup(q, world, r, 0.35, 0.0, 3.0, 0.0, {})
 			wave.color = Color(0.75, 0.85, 1.0, 0.7)

@@ -4,8 +4,10 @@ extends Resource
 ## nivel. Las armas nuevas y las subidas de arma salen de WeaponData.
 
 @export var id := &"velocidad"
-@export var display_name := "Botas de nieve"
-@export var description := "+8 % de velocidad"
+@export var display_name := "Botas de nieve":
+	get: return L.t(display_name)          # en el idioma elegido (hito 22.4)
+@export var description := "+8 % de velocidad":
+	get: return L.t(description)          # en el idioma elegido (hito 22.4)
 @export var stat := "move_speed"           ## propiedad de CharacterData que cambia
 @export var multiply := 1.0                ## factor por nivel (1 = no multiplica)
 @export var add := 0.0                     ## suma por nivel

@@ -106,7 +106,7 @@ func _give(p: Player, money: int) -> void:
 		Kind.FREEZE: world.freeze_time(POWER_TIME)
 		Kind.RUBY:
 			if game != null and game.has_method("earn"): game.earn(money)
-			p.drain_sanity(RUBY_SANITY, "Rubí de Leng", &"peligro")           # en su PC (remote no hace nada)
+			p.drain_sanity(RUBY_SANITY, L.t("Rubí de Leng"), &"peligro")           # en su PC (remote no hace nada)
 	if game != null and game.has_method("announce"): game.announce(NAMES[kind], 1.5)
 	if OS.get_cmdline_user_args().has("log=true"): print("RECOGIDA %s" % Kind.keys()[kind])
 
@@ -115,7 +115,7 @@ static func give_flamer(p: Player) -> void:
 	var base: WeaponData = load("res://data/weapons/flammenwerfer.tres")
 	var d: WeaponData = base.duplicate()
 	d.id = &"lanzallamas_poder"
-	d.display_name = "Lanzallamas potente"
+	d.display_name = L.t("Lanzallamas potente")
 	d.damage = base.damage * 3.0
 	d.cooldown = 0.35
 	d.range = base.range * 1.4

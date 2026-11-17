@@ -3,12 +3,16 @@ extends Resource
 ## Perfil de un personaje jugable. Los valores se ajustan jugando; aquí solo datos.
 
 @export var id := &"dyer"
-@export var display_name := "William Dyer"
+@export var display_name := "William Dyer":
+	get: return L.t(display_name)          # en el idioma elegido (hito 22.4)
 @export var model := "dyer"                  ## nombre en models/ (y su juego de animaciones)
 @export_group("Presentación")
-@export var role := "Geólogo de la Universidad de Miskatonic"   ## debajo del nombre, en la selección
-@export_multiline var passive_text := ""     ## su rasgo, en una frase (selección y ficha)
-@export var story := "En las montañas de la locura"               ## relato del que viene
+@export var role := "Geólogo de la Universidad de Miskatonic":   ## debajo del nombre, en la selección
+	get: return L.t(role)          # en el idioma elegido (hito 22.4)
+@export_multiline var passive_text := "":     ## su rasgo, en una frase (selección y ficha)
+	get: return L.t(passive_text)          # en el idioma elegido (hito 22.4)
+@export var story := "En las montañas de la locura":               ## relato del que viene
+	get: return L.t(story)          # en el idioma elegido (hito 22.4)
 @export var price := 0                       ## en la tienda; 0 = disponible desde el principio
 @export_group("Rasgos")
 ## Cada personaje tiene un único rasgo (D-35); los demás campos se quedan en su valor neutro.

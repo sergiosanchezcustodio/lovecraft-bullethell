@@ -71,7 +71,7 @@ func _summon(e: Enemy) -> void:
 		var a := randf() * TAU
 		game.director.spawn(d, e.global_position + Vector3(cos(a), 0, sin(a)) * 2.5)
 	e.world.sfx("chant", e.global_position)
-	e.world.shout(String(e.data.param("minion_text", "¡Ïa! ¡Dagon!")), e.global_position + Vector3(0, 3.2, 0), Color(0.55, 0.95, 0.75))
+	e.world.shout(String(e.data.param("minion_text", L.t("¡Ïa! ¡Dagon!"))), e.global_position + Vector3(0, 3.2, 0), Color(0.55, 0.95, 0.75))
 
 func _shield(e: Enemy) -> void:
 	var at := float(e.data.param("shield_at", 0.0))

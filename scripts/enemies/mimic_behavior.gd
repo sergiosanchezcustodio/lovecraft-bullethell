@@ -30,7 +30,7 @@ func _reveal(e: Enemy) -> void:
 		e.runner.busy = false
 		e.runner.fire(pat, func() -> Vector3: return e.global_position + e.facing)
 	var l := Label3D.new()                                   # el chillido, que sube y se apaga
-	l.text = "¡Tekeli-li!"
+	l.text = L.t("¡Tekeli-li!")
 	l.font_size = 72
 	l.outline_size = 14
 	l.modulate = Color(0.75, 1.0, 0.6)

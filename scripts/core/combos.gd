@@ -54,7 +54,7 @@ static func attach(w: CombatWorld, p_mirror := false) -> Combos:
 	c.mirror = p_mirror
 	c.name = "Combos"
 	var f := FileAccess.get_file_as_string(DATA)
-	var d = JSON.parse_string(f) if f != "" else null
+	var d = L.data(JSON.parse_string(f)) if f != "" else null
 	c.cfg = d if d is Dictionary else {"combos": {}}
 	var la := LaunchArgs.from_cmdline()
 	c.solo = bool(c.cfg.get("solo", false)) or la.get_bool("combos_solo")

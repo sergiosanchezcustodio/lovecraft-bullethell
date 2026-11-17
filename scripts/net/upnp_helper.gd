@@ -24,18 +24,18 @@ func _work() -> void:
 	var u := UPNP.new()
 	var err := u.discover(2000, 2, "InternetGatewayDevice")
 	if err != UPNP.UPNP_RESULT_SUCCESS or u.get_gateway() == null or not u.get_gateway().is_valid_gateway():
-		_done.call_deferred(false, "", "El router no responde a UPnP")
+		_done.call_deferred(false, "", L.t("El router no responde a UPnP"))
 		return
 	_upnp = u
 	var ext := u.query_external_address()
 	if u.add_port_mapping(_port, _port, DESCRIPTION, "UDP", 0) != UPNP.UPNP_RESULT_SUCCESS:
-		_done.call_deferred(false, ext, "El router no deja abrir el puerto")
+		_done.call_deferred(false, ext, L.t("El router no deja abrir el puerto"))
 		return
 	_mapped = true
 	if ext.is_empty() or RoomCode.is_private(ext):    # router detrás de otro router o CGNAT
-		_done.call_deferred(false, ext, "El router no tiene IP pública (CGNAT o doble router)")
+		_done.call_deferred(false, ext, L.t("El router no tiene IP pública (CGNAT o doble router)"))
 		return
-	_done.call_deferred(true, ext, "Puerto %d abierto" % _port)
+	_done.call_deferred(true, ext, L.t("Puerto %d abierto") % _port)
 
 func _done(ok: bool, ext: String, message: String) -> void:
 	if _thread != null and _thread.is_started(): _thread.wait_to_finish()

@@ -35,7 +35,7 @@ func open(role: String, detail: String) -> void:
 	_known.clear()
 	if _f == null: return
 	line("%s · %s" % [role, detail])
-	line("Versión %s · protocolo %d · %s %s" % [ProjectSettings.get_setting("application/config/version", "?"),
+	line(L.t("Versión %s · protocolo %d · %s %s") % [ProjectSettings.get_setting("application/config/version", "?"),
 		NetSession.PROTOCOL, OS.get_name(), OS.get_version()])
 
 ## Abre la carpeta de registros en el explorador (menú online y pantalla final del invitado).
@@ -80,9 +80,9 @@ func close(reason := "") -> void:
 func roster(peers: Dictionary, me: int) -> void:
 	for id: int in peers:
 		if id != me and not _known.has(id):
-			line("Entra %s (PC %d, versión %s)" % [peers[id].get("name", "?"), id, peers[id].get("ver", "?")])
+			line(L.t("Entra %s (PC %d, versión %s)") % [peers[id].get("name", "?"), id, peers[id].get("ver", "?")])
 	for id: int in _known:
-		if not peers.has(id): line("Se va %s (PC %d)" % [_known[id], id])
+		if not peers.has(id): line(L.t("Se va %s (PC %d)") % [_known[id], id])
 	_known.clear()
 	for id: int in peers:
 		if id != me: _known[id] = String(peers[id].get("name", "?"))

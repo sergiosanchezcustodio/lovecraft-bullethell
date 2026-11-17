@@ -202,7 +202,7 @@ func seal_door(i: int) -> void:
 	var at := Vector3(d.pos.x, 0.0, d.pos.y)
 	Auto.sfx_at("trap_seal", at)
 	VoxelFx.puff(world.fx, at + Vector3(0, 0.3, 0), "steam", 0.9, DUST, 1.2)
-	world._shout("Trampilla sellada", at + Vector3(0, 2.2, 0), SEAL_COLOR, 56, 1.0, 1.5)
+	world._shout(L.t("Trampilla sellada"), at + Vector3(0, 2.2, 0), SEAL_COLOR, 56, 1.0, 1.5)
 
 ## Todas las cerradas, a la vez (el jefe, en su segunda fase).
 func open_all() -> void:

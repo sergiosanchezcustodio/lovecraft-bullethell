@@ -122,13 +122,13 @@ func host(p_port: int = RoomCode.BASE_PORT, use_upnp: bool = true) -> Error:
 			break
 	if err != OK:
 		_enet = null
-		var why := "No se pudo abrir el puerto %d (¿otra copia del juego abierta?)" % p_port
-		netlog.open("Anfitrión", player_name)
+		var why := L.t("No se pudo abrir el puerto %d (¿otra copia del juego abierta?)") % p_port
+		netlog.open(L.t("Anfitrión"), player_name)
 		netlog.close(why)
 		failed.emit(why)
 		return err
 	_start_api()
-	netlog.open("Anfitrión", "%s, puerto %d, %s" % [player_name, port, "con UPnP" if use_upnp else "sin UPnP"])
+	netlog.open(L.t("Anfitrión"), L.t("%s, puerto %d, %s") % [player_name, port, L.t("con UPnP") if use_upnp else L.t("sin UPnP")])
 	state = State.HOSTING
 	my_id = 1
 	accepting = true
@@ -136,7 +136,7 @@ func host(p_port: int = RoomCode.BASE_PORT, use_upnp: bool = true) -> Error:
 	local_ip = RoomCode.local_ip()
 	external_ip = ""
 	upnp_ok = false
-	upnp_status = "Buscando el router…" if use_upnp else "Sin UPnP"
+	upnp_status = L.t("Buscando el router…") if use_upnp else L.t("Sin UPnP")
 	if use_upnp:
 		_upnp = UpnpHelper.new()
 		_upnp.finished.connect(_on_upnp)
@@ -153,11 +153,11 @@ func join(address: String, p_port: int = RoomCode.BASE_PORT) -> Error:
 	var err := _enet.create_client(address, p_port)
 	if err != OK:
 		_enet = null
-		failed.emit("Dirección no válida: %s" % address)
+		failed.emit(L.t("Dirección no válida: %s") % address)
 		return err
 	_enet.host.compress(compression)
 	_start_api()
-	netlog.open("Invitado", "%s → %s, puerto %d" % [player_name, address, p_port])
+	netlog.open("Invitado", L.t("%s → %s, puerto %d") % [player_name, address, p_port])
 	var server := _enet.get_peer(1)
 	if server != null: server.set_timeout(32, 4000, 8000)
 	state = State.CONNECTING
@@ -229,7 +229,7 @@ func _start_api() -> void:
 	_api.peer_disconnected.connect(_on_peer_disconnected)
 	_api.connected_to_server.connect(_on_connected)
 	_api.connection_failed.connect(_on_connection_failed)
-	_api.server_disconnected.connect(func() -> void: _end_later("El anfitrión ha cerrado la sala", false))
+	_api.server_disconnected.connect(func() -> void: _end_later(L.t("El anfitrión ha cerrado la sala"), false))
 	_api.peer_packet.connect(_on_packet)
 
 func _process(delta: float) -> void:
@@ -252,7 +252,7 @@ func _poll(delta: float) -> void:
 		State.CONNECTING:
 			_t_connect += delta
 			if _t_connect > CONNECT_TIMEOUT:
-				var f := "No responde nadie en esa dirección"
+				var f := L.t("No responde nadie en esa dirección")
 				close()
 				failed.emit(f)
 		State.HOSTING:
@@ -289,13 +289,13 @@ func _on_connected() -> void:
 	_send(1, Msg.HELLO, {"proto": protocol, "name": player_name, "locals": locals, "ver": version}, true)
 
 func _on_connection_failed() -> void:
-	_end_later("No se pudo conectar con el anfitrión", true)
+	_end_later(L.t("No se pudo conectar con el anfitrión"), true)
 
 ## Cierra en el siguiente fotograma: las señales llegan dentro del poll de ENet, y cerrar la
 ## conexión ahí mismo no es seguro. `as_failure`: avisa con `failed` (no llegó a entrar).
 func _end_later(reason: String, as_failure: bool) -> void:
 	var go := func() -> void:
-		if as_failure: netlog.line("No se pudo: " + reason)   # si no, lo apunta close()
+		if as_failure: netlog.line(L.t("No se pudo: ") + reason)   # si no, lo apunta close()
 		close("" if as_failure else reason)
 		if as_failure: failed.emit(reason)
 	go.call_deferred()
@@ -304,7 +304,7 @@ func _on_upnp(ok: bool, ext: String, msg: String) -> void:
 	upnp_ok = ok
 	external_ip = ext
 	upnp_status = msg
-	netlog.line("UPnP: %s%s" % [msg, (" · IP externa " + ext) if ok else ""])
+	netlog.line("UPnP: %s%s" % [msg, (L.t(" · IP externa ") + ext) if ok else ""])
 	upnp_done.emit(ok, msg)
 
 func _on_packet(from: int, bytes: PackedByteArray) -> void:
@@ -352,11 +352,11 @@ func _handle(from: int, bytes: PackedByteArray) -> void:
 			if state == State.CONNECTING and data is Dictionary:
 				my_id = _api.get_unique_id()
 				late = bool(data.get("late", false))
-				netlog.line("Dentro de la sala como PC %d%s" % [my_id, " (vuelve con la partida empezada)" if late else ""])
+				netlog.line(L.t("Dentro de la sala como PC %d%s") % [my_id, L.t(" (vuelve con la partida empezada)") if late else ""])
 				state = State.CONNECTED
 				joined.emit()
 		Msg.REJECT:
-			_end_later(String(data) if data is String else "El anfitrión no te ha dejado entrar", true)
+			_end_later(String(data) if data is String else L.t("El anfitrión no te ha dejado entrar"), true)
 		Msg.ROSTER:
 			if state == State.CONNECTED and data is Dictionary:
 				peers = data
@@ -374,14 +374,14 @@ func _on_hello(from: int, data: Variant) -> void:
 	var why := ""
 	var back := 0                                                # puestos que recupera quien vuelve
 	if not data is Dictionary or int(data.get("proto", -1)) != PROTOCOL:
-		why = "Versión distinta del juego: actualizad los dos a la misma"
+		why = L.t("Versión distinta del juego: actualizad los dos a la misma")
 	elif not accepting:
 		if admit.is_valid(): back = int(admit.call(from, String(data.get("name", "")).left(20)))
-		if back <= 0: why = "La partida ya ha empezado: espera a que vuelvan a la sala"
+		if back <= 0: why = L.t("La partida ya ha empezado: espera a que vuelvan a la sala")
 	elif player_count() + 1 > MAX_PLAYERS:                       # con sitio para uno: los demás se unen en la selección
-		why = "La sala está llena"
+		why = L.t("La sala está llena")
 	if why != "":
-		netlog.line("Rechazado %s: %s" % [String(data.get("name", "?")) if data is Dictionary else "?", why])
+		netlog.line(L.t("Rechazado %s: %s") % [String(data.get("name", "?")) if data is Dictionary else "?", why])
 		_send(from, Msg.REJECT, why, true)
 		var kick := func() -> void:
 			if _api != null and _api.get_peers().has(from): _api.disconnect_peer(from)

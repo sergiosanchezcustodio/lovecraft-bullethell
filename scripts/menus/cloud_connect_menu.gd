@@ -20,8 +20,8 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var w: Array = MenuKit.window(self, MenuKit.INK, 820)
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "Conectar con GitHub", 44)
-	box.add_child(_text("1. Abre esta página en el navegador (se abre sola):", UiKit.TEXT))
+	MenuKit.heading(box, L.t("Conectar con GitHub"), 44)
+	box.add_child(_text(L.t("1. Abre esta página en el navegador (se abre sola):"), UiKit.TEXT))
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 28)
@@ -30,7 +30,7 @@ func _ready() -> void:
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_child(col)
 	col.add_child(MenuKit.title("github.com/login/device", 30, UiKit.GOLD))
-	var phone := _text("o, con el móvil, escanea este código", UiKit.TEXT_DIM, 18)
+	var phone := _text(L.t("o, con el móvil, escanea este código"), UiKit.TEXT_DIM, 18)
 	phone.custom_minimum_size.x = 420
 	col.add_child(phone)
 	_qr = TextureRect.new()
@@ -38,23 +38,23 @@ func _ready() -> void:
 	_qr.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
 	row.add_child(_qr)
 	_show_qr(URL)
-	box.add_child(_text("2. Escribe este código y autoriza el juego:", UiKit.TEXT))
-	_code = MenuKit.title("Pidiendo el código…", 72, MenuKit.INK)
+	box.add_child(_text(L.t("2. Escribe este código y autoriza el juego:"), UiKit.TEXT))
+	_code = MenuKit.title(L.t("Pidiendo el código…"), 72, MenuKit.INK)
 	box.add_child(_code)
 	_status = _text("", UiKit.TEXT_DIM)
 	box.add_child(_status)
-	box.add_child(_text("El juego solo pide permiso para los gists: guarda una copia de tus partidas en un gist secreto de tu cuenta.", UiKit.TEXT_DIM, 16))
+	box.add_child(_text(L.t("El juego solo pide permiso para los gists: guarda una copia de tus partidas en un gist secreto de tu cuenta."), UiKit.TEXT_DIM, 16))
 	_buttons = HBoxContainer.new()
 	_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	_buttons.add_theme_constant_override("separation", 20)
 	box.add_child(_buttons)
-	_button("Abrir la página", _open_page)
-	_button("Copiar el código", func() -> void:
+	_button(L.t("Abrir la página"), _open_page)
+	_button(L.t("Copiar el código"), func() -> void:
 		if Cloud.pending.has("user_code"):
 			DisplayServer.clipboard_set(Cloud.pending.user_code)
-			_status.text = "Código copiado. Pégalo en la página de GitHub.")
+			_status.text = L.t("Código copiado. Pégalo en la página de GitHub."))
 	_button("Cancelar", _close)
-	box.add_child(MenuKit.hint("A o Intro: elegir  ·  B o Esc: cancelar"))
+	box.add_child(MenuKit.hint(L.t("A o Intro: elegir  ·  B o Esc: cancelar")))
 	MenuKit.trap_focus(self)
 	_buttons.get_child(0).grab_focus.call_deferred()
 	Cloud.changed.connect(_refresh)
@@ -68,13 +68,13 @@ func _run() -> void:
 		_status.text = Cloud.error_text(Cloud.error) if Cloud.error != "" else "Cancelado."
 		return
 	_code.text = "Conectado"
-	_status.text = "Cuenta de GitHub: %s. Comprobando la nube…" % Cloud.login
+	_status.text = L.t("Cuenta de GitHub: %s. Comprobando la nube…") % Cloud.login
 	var ok_sync: bool = await Cloud.sync()
 	if not is_inside_tree() or _done: return
 	await CloudConflictMenu.resolve_all(self)
 	if not is_inside_tree() or _done: return
 	if ok_sync:                                   # qué ha pasado, antes de cerrar (p. ej. «Se han bajado 2 partidas»)
-		_status.text = "Cuenta de GitHub: %s. %s" % [Cloud.login, Cloud.sync_report()]
+		_status.text = L.t("Cuenta de GitHub: %s. %s") % [Cloud.login, Cloud.sync_report()]
 		await get_tree().create_timer(2.5, true).timeout
 	if is_inside_tree() and not _done: _close()
 
@@ -87,7 +87,7 @@ func _refresh() -> void:
 	if not _opened:
 		_opened = true
 		DisplayServer.clipboard_set(Cloud.pending.user_code)
-		_status.text = "Esperando a que lo autorices en GitHub… (el código ya está copiado)"
+		_status.text = L.t("Esperando a que lo autorices en GitHub… (el código ya está copiado)")
 		_open_page()
 
 func _show_qr(url: String) -> void:

@@ -17,7 +17,7 @@ static var _data := {}
 static func _load() -> void:
 	if not _data.is_empty(): return
 	var f := FileAccess.get_file_as_string(DATA)
-	var d = JSON.parse_string(f) if f != "" else null
+	var d = L.data(JSON.parse_string(f)) if f != "" else null
 	_data = d if d is Dictionary else {"signs": [], "per_part": [1, 3]}
 
 static func all() -> Array:

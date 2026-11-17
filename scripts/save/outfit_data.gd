@@ -15,8 +15,10 @@ const OPTIONAL: Array[int] = [Slot.ACCESSORY, Slot.HANDS, Slot.BACK]
 const DIR := "res://data/outfits"
 
 @export var id := &"bombin"
-@export var display_name := "Bombín"
-@export_multiline var description := ""
+@export var display_name := "Bombín":
+	get: return L.t(display_name)          # en el idioma elegido (hito 22.4)
+@export_multiline var description := "":
+	get: return L.t(description)          # en el idioma elegido (hito 22.4)
 @export var slot := Slot.HEAD
 @export var price := 1500
 @export var order := 0
@@ -55,7 +57,7 @@ static func find(outfit_id: String) -> OutfitData:
 
 ## Nombre de lo que deja un hueco vacío: «Ninguno» o «Lo suyo».
 static func empty_name(slot: int) -> String:
-	return "Ninguno" if OPTIONAL.has(slot) else "Lo suyo"
+	return "Ninguno" if OPTIONAL.has(slot) else L.t("Lo suyo")
 
 static func is_head(outfit_id: String) -> bool:
 	var o := find(outfit_id)

@@ -84,7 +84,7 @@ static func make_level(id: String) -> LevelData:
 	var lv := Endless.make_level(Endless.id_for(base_of(id)))
 	lv.id = StringName(id)
 	lv.daily = date
-	lv.display_name = "Partida del día · %s" % pretty(date, false)
+	lv.display_name = L.t("Partida del día · %s") % pretty(date, false)
 	return lv
 
 ## ¿Está abierta? Tras superar el primer nivel (o con todo desbloqueado).
@@ -95,7 +95,7 @@ static func unlocked(save: SaveData) -> bool:
 static func pretty(date: String, weekday := true) -> String:
 	var d := Time.get_datetime_dict_from_datetime_string(date + "T12:00:00", true)
 	if d.is_empty() or int(d.get("month", 0)) < 1: return date
-	var s := "%d de %s" % [int(d.day), MONTHS[int(d.month) - 1]]
+	var s := L.t("%d de %s") % [int(d.day), MONTHS[int(d.month) - 1]]
 	return ("%s, %s" % [WEEKDAYS[int(d.weekday)], s]) if weekday else s
 
 static func _day_index(date: String) -> int:

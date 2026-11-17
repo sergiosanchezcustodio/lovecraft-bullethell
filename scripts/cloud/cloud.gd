@@ -276,7 +276,7 @@ func sync_report() -> String:
 	var parts: Array[String] = []
 	if last_down > 0: parts.append("se %s %d partida%s de la nube" % ["ha bajado" if last_down == 1 else "han bajado", last_down, "" if last_down == 1 else "s"])
 	if last_up > 0: parts.append("se %s %d de este PC" % ["ha subido" if last_up == 1 else "han subido", last_up])
-	if parts.is_empty(): return "La nube ya estaba al día."
+	if parts.is_empty(): return L.t("La nube ya estaba al día.")
 	var t := " y ".join(parts)
 	return t[0].to_upper() + t.substr(1) + "."
 
@@ -351,21 +351,21 @@ func _on_deleted(slot: int, rev: int) -> void:
 static func error_text(e: String) -> String:
 	match e:
 		"": return ""
-		"net": return "Sin conexión con GitHub. Se intentará otra vez en el siguiente guardado."
-		"auth": return "GitHub ya no reconoce la conexión de este PC. Conecta otra vez."
-		"limit": return "GitHub pide esperar un poco antes de seguir."
-		"no_client": return "Esta versión del juego no trae la conexión con GitHub configurada."
-		"expired_token": return "El código ha caducado. Vuelve a intentarlo."
-		"access_denied": return "Se canceló la autorización en GitHub."
-	return "GitHub ha dado un error. Se intentará otra vez más tarde."
+		"net": return L.t("Sin conexión con GitHub. Se intentará otra vez en el siguiente guardado.")
+		"auth": return L.t("GitHub ya no reconoce la conexión de este PC. Conecta otra vez.")
+		"limit": return L.t("GitHub pide esperar un poco antes de seguir.")
+		"no_client": return L.t("Esta versión del juego no trae la conexión con GitHub configurada.")
+		"expired_token": return L.t("El código ha caducado. Vuelve a intentarlo.")
+		"access_denied": return L.t("Se canceló la autorización en GitHub.")
+	return L.t("GitHub ha dado un error. Se intentará otra vez más tarde.")
 
 ## Estado de la copia de un hueco con partida ("" sin cuenta).
 func slot_status(slot: int, d: SaveData) -> String:
 	if not connected() or d == null: return ""
-	if not conflict_of(slot).is_empty(): return "Ha cambiado aquí y en otro PC"
-	if d.cloud_base < 0: return "Sin copia en la nube"
-	if d.rev > d.cloud_base: return "Por subir a la nube"
-	return "Copia en la nube al día"
+	if not conflict_of(slot).is_empty(): return L.t("Ha cambiado aquí y en otro PC")
+	if d.cloud_base < 0: return L.t("Sin copia en la nube")
+	if d.rev > d.cloud_base: return L.t("Por subir a la nube")
+	return L.t("Copia en la nube al día")
 
 ## Fecha de guardado para el jugador: "26-10-2026 18:05".
 static func when(iso: String) -> String:

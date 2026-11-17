@@ -38,7 +38,7 @@ static func set_lift(env: Environment, gamma: float) -> void:
 static func grade_for(key: String) -> Dictionary:
 	var f := FileAccess.open("res://data/grades.json", FileAccess.READ)
 	if f == null: return {}
-	var all: Variant = JSON.parse_string(f.get_as_text())
+	var all: Variant = L.data(JSON.parse_string(f.get_as_text()))
 	return (all as Dictionary).get(key, {}) if all is Dictionary else {}
 
 ## La curva de set_lift y, encima, la gradación de la parte: cada canal se desplaza en las sombras

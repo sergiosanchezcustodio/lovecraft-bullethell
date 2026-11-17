@@ -31,7 +31,7 @@ func _ready() -> void:
 	box.add_theme_constant_override("separation", 14)
 	add_child(box)
 	MenuKit.fit_screen(box)                            # el vídeo es de 1280×720: con la interfaz Grande o Muy grande no cabría
-	MenuKit.heading(box, "La caída", 44, Color(0.86, 0.22, 0.18))
+	MenuKit.heading(box, L.t("La caída"), 44, Color(0.86, 0.22, 0.18))
 	var frame := PanelContainer.new()
 	frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	MenuKit.dress(frame)
@@ -62,7 +62,7 @@ func _ready() -> void:
 	if LaunchArgs.from_cmdline().get_bool("replay_gif"): save_gif.call_deferred()   # pruebas
 
 func _hint_text() -> String:
-	return "Los últimos %d segundos, a media velocidad  ·  Y o G: guardar como GIF  ·  A o B para volver" % roundi(frames.size() / DeathReplay.FPS)
+	return L.t("Los últimos %d segundos, a media velocidad  ·  Y o G: guardar como GIF  ·  A o B para volver") % roundi(frames.size() / DeathReplay.FPS)
 
 ## Carpeta de las fotos (la del modo foto): Imágenes/Lovecraft Library, o `photo_dir=`.
 static func gif_dir() -> String:
@@ -76,7 +76,7 @@ func save_gif() -> void:
 	var dir := gif_dir()
 	DirAccess.make_dir_recursive_absolute(dir)
 	_gif_path = dir.path_join("caida_%s.gif" % Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_"))
-	_hint.text = "Guardando el GIF…"
+	_hint.text = L.t("Guardando el GIF…")
 	var fr := frames
 	var path := _gif_path
 	_task = WorkerThreadPool.add_task(func() -> void:
@@ -96,7 +96,7 @@ func _process(delta: float) -> void:
 	if _task >= 0 and WorkerThreadPool.is_task_completed(_task):
 		WorkerThreadPool.wait_for_task_completion(_task)
 		_task = -1
-		_hint.text = ("Guardado: %s  ·  X o F: abrir la carpeta  ·  A o B para volver" % _gif_path.get_file()) if _gif_ok else "No se pudo guardar el GIF  ·  A o B para volver"
+		_hint.text = (L.t("Guardado: %s  ·  X o F: abrir la carpeta  ·  A o B para volver") % _gif_path.get_file()) if _gif_ok else L.t("No se pudo guardar el GIF  ·  A o B para volver")
 		Auto.sfx("page")
 		print("GIF de la caída: ", _gif_path if _gif_ok else "error")
 	var length := frames.size() / DeathReplay.FPS

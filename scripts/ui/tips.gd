@@ -34,7 +34,7 @@ func _init(p_game: Node) -> void:
 	game = p_game
 	layer = 11                                 # encima del HUD (5), debajo de la ficha (12) y los menús
 	var f := FileAccess.get_file_as_string(DATA)
-	var d = JSON.parse_string(f) if f != "" else null
+	var d = L.data(JSON.parse_string(f)) if f != "" else null
 	if d is Dictionary:
 		_tips = d.get("tips", [])
 		_warnings = d.get("warnings", {})

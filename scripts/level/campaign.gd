@@ -10,7 +10,7 @@ static var _parts: Array = []
 
 static func parts() -> Array:
 	if _parts.is_empty():
-		var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+		var d: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string(PATH)))
 		_parts = (d as Dictionary).get("parts", []) if d is Dictionary else []
 	return _parts
 

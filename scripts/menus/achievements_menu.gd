@@ -18,7 +18,7 @@ func _ready() -> void:
 	var list := Achievements.all()
 	var done := list.filter(func(a: AchievementData) -> bool: return Achievements.is_done(save, a)).size()
 	MenuKit.heading(box, "Logros", 48)
-	var sub := UiKit.label("%d de %d conseguidos" % [done, list.size()], 22, UiKit.GOLD)
+	var sub := UiKit.label(L.t("%d de %d conseguidos") % [done, list.size()], 22, UiKit.GOLD)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(sub)
 	var scroll := ScrollContainer.new()
@@ -40,7 +40,7 @@ func _ready() -> void:
 		col.add_child(r)
 		rows.append(r)
 	MenuKit.chain_focus(rows)
-	box.add_child(MenuKit.hint("Arriba/abajo: recorrer  ·  B o Esc: volver"))
+	box.add_child(MenuKit.hint(L.t("Arriba/abajo: recorrer  ·  B o Esc: volver")))
 	if not rows.is_empty(): (rows[0] as Control).grab_focus.call_deferred()
 
 func _row(a: AchievementData) -> Button:

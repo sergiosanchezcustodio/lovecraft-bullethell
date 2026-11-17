@@ -31,7 +31,7 @@ static func met(save: SaveData, c: CharacterData) -> bool:
 ## Lo que dice la selección mientras está cerrado.
 static func hint(save: SaveData, c: CharacterData) -> String:
 	var p := progress(save, c)
-	return "%s (%d de %d)" % [String(HINTS.get(c.secret, "Secreto")), p.x, p.y]
+	return L.t("%s (%d de %d)") % [String(HINTS.get(c.secret, "Secreto")), p.x, p.y]
 
 ## Armas de los secretos aún cerrados: no salen en la subida de nivel hasta abrir a su dueño
 ## (que no se descubra antes de tiempo). Sin partida (pruebas), ninguna.

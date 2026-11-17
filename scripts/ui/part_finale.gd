@@ -27,7 +27,7 @@ static var _all := {}
 
 static func data_for(level_id: String) -> Dictionary:
 	if _all.is_empty():
-		var v: Variant = JSON.parse_string(FileAccess.get_file_as_string(DATA))
+		var v: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string(DATA)))
 		_all = (v as Dictionary).get("finales", {}) if v is Dictionary else {}
 	var d: Variant = _all.get(level_id, {})
 	return d if d is Dictionary else {}
@@ -97,7 +97,7 @@ func _ready() -> void:
 	line.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING   # las líneas, ya partidas: no saltan
 	line.visible_characters = 0
 	box.add_child(line)
-	_hint = MenuKit.hint("A o Intro: seguir")
+	_hint = MenuKit.hint(L.t("A o Intro: seguir"))
 	_hint.modulate.a = 0.0
 	box.add_child(_hint)
 	_img.pivot_offset = get_viewport().get_visible_rect().size * Vector2(0.5, 0.42)

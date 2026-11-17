@@ -30,7 +30,7 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 				var tg := Telegraph.enemy(float(p.get("gaze_r", 13.0)), float(p.get("unmask_warn", 1.2)), Color(1.0, 0.85, 0.25, 0.35), false)
 				tg.position = Vector3(e.global_position.x, 0.0, e.global_position.z)
 				e.world.fx.add_child(tg)
-				e.world.shout("¡Aparta la vista!", e.global_position + Vector3(0, 2.6, 0), Color(1.0, 0.85, 0.3))
+				e.world.shout(L.t("¡Aparta la vista!"), e.global_position + Vector3(0, 2.6, 0), Color(1.0, 0.85, 0.3))
 				e.world.sfx("chant", e.global_position)
 		State.WARN:
 			e.anim = "idle"

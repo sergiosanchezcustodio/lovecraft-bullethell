@@ -65,7 +65,7 @@ func _ready() -> void:
 	box.add_child(_vp)
 	_t0 = t0
 	_build_ui()
-	_loading = UiKit.label("Encendiendo las lámparas…", 24, UiKit.TEXT_DIM)
+	_loading = UiKit.label(L.t("Encendiendo las lámparas…"), 24, UiKit.TEXT_DIM)
 	_loading.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	_loading.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_loading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -255,14 +255,14 @@ func _build_ui() -> void:
 	top.position.y = 36
 	top.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	add_child(top)
-	var t := MenuKit.title("Sala de trofeos", 46, UiKit.GOLD)
+	var t := MenuKit.title(L.t("Sala de trofeos"), 46, UiKit.GOLD)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	top.add_child(t)
 	_count = UiKit.label("", 19, UiKit.TEXT_DIM)
 	_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	top.add_child(_count)
 	var n := Trophies.count(save)
-	_count.text = "%d de %d trofeos" % [n.x, n.y]
+	_count.text = L.t("%d de %d trofeos") % [n.x, n.y]
 	var panel := PanelContainer.new()                # placa de tamaño fijo, abajo en el centro
 	panel.theme = MenuKit.theme()
 	panel.anchor_left = 0.5; panel.anchor_right = 0.5
@@ -289,7 +289,7 @@ func _build_ui() -> void:
 	_facts.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_facts.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(_facts)
-	var hint := UiKit.label("Flechas: recorrer  ·  LB/RB o Q/E: otra vitrina  ·  B o Esc: volver", 15, UiKit.TEXT_DIM)
+	var hint := UiKit.label(L.t("Flechas: recorrer  ·  LB/RB o Q/E: otra vitrina  ·  B o Esc: volver"), 15, UiKit.TEXT_DIM)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(hint)
 	var fill := Control.new()
@@ -303,7 +303,7 @@ func _show(i: int) -> void:
 	var t: Dictionary = _items[i]
 	var c := int(t.case)
 	var place := (_cases[c] as Array).find(i) + 1
-	_kind.text = "%s  ·  %d de %d" % [Trophies.CASES[c], place, (_cases[c] as Array).size()]
+	_kind.text = L.t("%s  ·  %d de %d") % [Trophies.CASES[c], place, (_cases[c] as Array).size()]
 	if t.earned:
 		_name.text = String(t.name)
 		_text.text = String(t.text)
@@ -319,9 +319,9 @@ func _show(i: int) -> void:
 
 func _missing(t: Dictionary) -> String:
 	match int(t.case):
-		0: return "Peana vacía. Completa un conjunto del vestuario para que su maniquí ocupe este sitio."
-		1: return "Peana vacía. Aquí irá la figura del próximo jefe que caiga."
-	return "Peana vacía. " + String(t.text)
+		0: return L.t("Peana vacía. Completa un conjunto del vestuario para que su maniquí ocupe este sitio.")
+		1: return L.t("Peana vacía. Aquí irá la figura del próximo jefe que caiga.")
+	return L.t("Peana vacía. ") + String(t.text)
 
 func _focus_point(i: int) -> Vector3:
 	if _slots.is_empty(): return Vector3(0, 1, 0)

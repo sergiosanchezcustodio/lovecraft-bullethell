@@ -393,8 +393,8 @@ class Picker extends PanelContainer:
 		var n := player.rerolls_left() if player != null else 0
 		var b := player.banishes_left() if player != null else 0
 		var extra := PackedStringArray()
-		if b > 0: extra.append("LB o Q: descartar (%d)" % b)
-		if n > 0: extra.append("RB o E: otras opciones (%d)" % n)
+		if b > 0: extra.append(L.t("LB o Q: descartar (%d)") % b)
+		if n > 0: extra.append(L.t("RB o E: otras opciones (%d)") % n)
 		return HINT + ("\n" + " · ".join(extra) if not extra.is_empty() else "")
 
 	## Cartas del tarot (tienda): la opción marcada se descarta (no vuelve a salir en este
@@ -529,7 +529,7 @@ class Picker extends PanelContainer:
 	func mark(i: int) -> void:
 		cursor = i
 		done = true
-		_status.text = "Elegido: %s · esperando a los demás" % options[i].title()
+		_status.text = L.t("Elegido: %s · esperando a los demás") % options[i].title()
 		_status.add_theme_color_override("font_color", UiKit.GOLD)
 		_paint()
 

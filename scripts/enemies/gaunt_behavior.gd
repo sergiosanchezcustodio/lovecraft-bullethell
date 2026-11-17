@@ -68,7 +68,7 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 			var hit := _hp0 - e.health
 			if victim != null and hit >= e.data.max_health * e.health_scale * float(e.data.param("free_frac", 0.25)):
 				freed = true
-				e.world.shout("¡Lo suelta!", e.global_position + Vector3(0, 1.4, 0), Color(0.8, 0.7, 1.0))
+				e.world.shout(L.t("¡Lo suelta!"), e.global_position + Vector3(0, 1.4, 0), Color(0.8, 0.7, 1.0))
 				_reward(e)
 				_release(e, false)
 				return Vector3.ZERO

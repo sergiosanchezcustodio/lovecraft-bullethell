@@ -51,7 +51,7 @@ static func ghoul_data() -> EnemyData:
 	if _ghoul == null:
 		_ghoul = EnemyData.new()
 		_ghoul.id = &"necrofago"
-		_ghoul.display_name = "Necrófago de Pickman"
+		_ghoul.display_name = L.t("Necrófago de Pickman")
 		_ghoul.model = "necrofago"
 		_ghoul.max_health = GHOUL_HEALTH
 		_ghoul.body_radius = 0.42

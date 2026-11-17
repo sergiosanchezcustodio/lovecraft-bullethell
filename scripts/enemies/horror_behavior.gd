@@ -125,7 +125,7 @@ func _thunder(e: Enemy) -> void:
 	if Unseen.current != null: Unseen.current.bolt(at)
 	e.world.sfx("thunder", at)
 	e.world.shake(0.8)
-	e.world.shout(String(e.data.param("death_text", "¡Padre! ¡Padre! ¡Yog-Sothoth!")), at + Vector3(0, 6.0, 0), BOLT, 110, 1.8, 2.8)
+	e.world.shout(String(e.data.param("death_text", L.t("¡Padre! ¡Padre! ¡Yog-Sothoth!"))), at + Vector3(0, 6.0, 0), BOLT, 110, 1.8, 2.8)
 
 func can_shoot(_e: Enemy) -> bool:
 	return false                                   # dispara por su cuenta (_fire)

@@ -41,19 +41,19 @@ func _ready() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	panel.add_child(box)
-	MenuKit.heading(box, "Dificultad (temporal)", 40, ACCENT)
-	var note := UiKit.label("Para calibrar el juego: el 3 es la de siempre; el 1, casi Investigador; el 6, algo más que Pesadilla.", 16, UiKit.TEXT_DIM)
+	MenuKit.heading(box, L.t("Dificultad (temporal)"), 40, ACCENT)
+	var note := UiKit.label(L.t("Para calibrar el juego: el 3 es la de siempre; el 1, casi Investigador; el 6, algo más que Pesadilla."), 16, UiKit.TEXT_DIM)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(note)
 	_list = VBoxContainer.new()
 	_list.custom_minimum_size = Vector2(900, 0)
 	_list.add_theme_constant_override("separation", 2)
 	box.add_child(_list)
-	_status = UiKit.label("Se nota al seguir jugando; la vida, en los enemigos que salgan después.", 16, ACCENT)
+	_status = UiKit.label(L.t("Se nota al seguir jugando; la vida, en los enemigos que salgan después."), 16, ACCENT)
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_status)
 	_build()
-	var hint := UiKit.label("Arriba/abajo: elegir · Izquierda/derecha: cambiar · B o Esc: volver · Start: seguir jugando", 15, UiKit.TEXT_DIM)
+	var hint := UiKit.label(L.t("Arriba/abajo: elegir · Izquierda/derecha: cambiar · B o Esc: volver · Start: seguir jugando"), 15, UiKit.TEXT_DIM)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(hint)
 	MenuKit.dress(panel, MenuKit.BRASS, Vector2(36, 26), 120.0)
@@ -75,7 +75,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _build() -> void:
 	var nums: Array[String] = []
 	for i in Difficulty.LEVELS: nums.append(str(i + 1))
-	_general = OptionRow.new("Dificultad general", nums, maxi(Difficulty.general(), 1) - 1, func(i: int) -> void:
+	_general = OptionRow.new(L.t("Dificultad general"), nums, maxi(Difficulty.general(), 1) - 1, func(i: int) -> void:
 		_change("general", i + 1), Callable(), ACCENT)
 	_list.add_child(_general)
 	_line(" ")
@@ -86,12 +86,12 @@ func _build() -> void:
 		_rows[c] = row
 		_line("      " + String(Difficulty.CATS[c].help))
 	_line(" ")
-	_list.add_child(OptionRow.new("Volver al 3 (la de siempre)", [] as Array[String], 0, Callable(), func() -> void:
+	_list.add_child(OptionRow.new(L.t("Volver al 3 (la de siempre)"), [] as Array[String], 0, Callable(), func() -> void:
 		_change("general", Difficulty.BASE), ACCENT))
 	var hist := history()
 	if not hist.is_empty():
-		var h := OptionRow.new("Partidas jugadas", [] as Array[String], 0, Callable(), _show_history, ACCENT)
-		h.set_value_text(MenuKit.count(hist.size(), "combinación", "combinaciones"))
+		var h := OptionRow.new(L.t("Partidas jugadas"), [] as Array[String], 0, Callable(), _show_history, ACCENT)
+		h.set_value_text(MenuKit.count(hist.size(), L.t("combinación"), "combinaciones"))
 		_list.add_child(h)
 	_show_general()
 
@@ -117,26 +117,26 @@ func _show_history() -> void:
 		var lv: Dictionary = h.levels
 		var g := general_of(lv)
 		var now := Difficulty.describe(lv) == Difficulty.describe()
-		var row := OptionRow.new((("%d en todo" % g) if g > 0 else "Personalizada") + ("  (la de ahora)" if now else ""),
+		var row := OptionRow.new(((L.t("%d en todo") % g) if g > 0 else "Personalizada") + (L.t("  (la de ahora)") if now else ""),
 			[] as Array[String], 0, Callable(), func() -> void: _pick(lv), ACCENT)
 		row.set_value_text(results_text(h))
 		_list.add_child(row)
 		if first == null: first = row
 		var d := String(h.date)                                     # "2026-10-29 19:30:55" -> "29-10 19:30"
-		var info := "última, %s-%s %s en %s" % [d.substr(8, 2), d.substr(5, 2), d.substr(11, 5), h.level]
+		var info := L.t("última, %s-%s %s en %s") % [d.substr(8, 2), d.substr(5, 2), d.substr(11, 5), h.level]
 		_line("      " + (info if g > 0 else differences(lv) + "  ·  " + info))
 	_line(" ")
 	var back_row := OptionRow.new("Volver", [] as Array[String], 0, Callable(), _show_main, ACCENT)
 	_list.add_child(back_row)
 	(first if first != null else back_row).grab_focus.call_deferred()
-	_status.text = "A: jugar con esa combinación · B: volver"
+	_status.text = L.t("A: jugar con esa combinación · B: volver")
 
 func _pick(lv: Dictionary) -> void:
 	var before := Difficulty.describe()
 	Difficulty.set_levels(lv)
 	if Difficulty.describe() != before: _log("historial", 0)
 	_show_main()
-	_status.text = "Vuelves a: %s" % Difficulty.describe()
+	_status.text = L.t("Vuelves a: %s") % Difficulty.describe()
 
 ## Nombre corto de cada característica (el historial).
 const TINY := {"numero": "número", "vida": "vida", "jefes": "jefes", "dano": "daño", "cordura": "cordura",
@@ -154,7 +154,7 @@ static func differences(lv: Dictionary) -> String:
 	for c in Difficulty.CATS:
 		var v := int(lv.get(c, Difficulty.BASE))
 		if v != common: parts.append("%s %d" % [TINY[c], v])
-	return "%s; el resto, %d" % [", ".join(parts), common]
+	return L.t("%s; el resto, %d") % [", ".join(parts), common]
 
 ## La general de unos niveles: la de todas si coinciden; -1 si no.
 static func general_of(lv: Dictionary) -> int:
@@ -172,7 +172,7 @@ static func results_text(h: Dictionary) -> String:
 	if not falls.is_empty():
 		var ts := PackedStringArray()
 		for t in falls.slice(0, 3): ts.append("%d:%02d" % [int(t) / 60, int(t) % 60])
-		out += "  ·  caídas " + ", ".join(ts) + ("…" if falls.size() > 3 else "")
+		out += L.t("  ·  caídas ") + ", ".join(ts) + ("…" if falls.size() > 3 else "")
 	return out
 
 ## Del registro de partidas (`FallReport.RUNS`): cada combinación jugada, la más reciente
@@ -239,7 +239,7 @@ func _show_general() -> void:
 		_general.index = g - 1
 		_general._show()
 	else:
-		_general.set_value_text("◀  Personalizada  ▶")
+		_general.set_value_text(L.t("◀  Personalizada  ▶"))
 
 ## Una línea al registro de dificultad (también la del informe de cada partida, `FallReport`).
 static func append_log(line: String) -> void:
@@ -255,4 +255,4 @@ func _log(cat: String, lv: int) -> void:
 		where = "%s · %02d:%02d · " % [String(d.level.id) if d.level != null else "?", t / 60, t % 60]
 	var line := "%s · %s%s → %d · %s" % [Time.get_datetime_string_from_system(false, true), where, cat, lv, Difficulty.describe()]
 	append_log(line)
-	_status.text = "Apuntado en el registro de dificultad (%s)." % ProjectSettings.globalize_path(LOG).get_file()
+	_status.text = L.t("Apuntado en el registro de dificultad (%s).") % ProjectSettings.globalize_path(LOG).get_file()

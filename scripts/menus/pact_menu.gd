@@ -22,7 +22,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var w: Array = MenuKit.window(self, Color(0.55, 0.12, 0.12), 1180)
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "Pactos del Necronomicón", 46, Color(0.85, 0.25, 0.2))
+	MenuKit.heading(box, L.t("Pactos del Necronomicón"), 46, Color(0.85, 0.25, 0.2))
 	_count = UiKit.label("", 20, UiKit.TEXT_DIM)
 	_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_count)
@@ -69,7 +69,7 @@ func _ready() -> void:
 	box.add_child(_go)
 	buttons.append(_go)
 	MenuKit.chain_focus(buttons)
-	box.add_child(MenuKit.hint("A o Intro: sellar o romper  ·  B o Esc: volver"))
+	box.add_child(MenuKit.hint(L.t("A o Intro: sellar o romper  ·  B o Esc: volver")))
 	_refresh()
 	(buttons[0] as Control).grab_focus.call_deferred()
 
@@ -90,9 +90,9 @@ func _refresh() -> void:
 		var name_l: Label = b.get_meta("name_l")
 		name_l.text = "%s%s%s" % ["✦  " if on else "○  ", p.name, "   · superado aquí" if bool(b.get_meta("won")) else ""]
 		name_l.add_theme_color_override("font_color", Color(1.0, 0.5, 0.4) if on else UiKit.TEXT)
-	_count.text = "Hasta %d maldiciones, cada una con su premio. Duran hasta que las cambies.  ·  Selladas: %d de %d" % [
+	_count.text = L.t("Hasta %d maldiciones, cada una con su premio. Duran hasta que las cambies.  ·  Selladas: %d de %d") % [
 		Pacts.max_count(), picked.size(), Pacts.max_count()]
-	_go.text = "Jugar sin pactos" if picked.is_empty() else "Sellar y jugar"
+	_go.text = L.t("Jugar sin pactos") if picked.is_empty() else L.t("Sellar y jugar")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):

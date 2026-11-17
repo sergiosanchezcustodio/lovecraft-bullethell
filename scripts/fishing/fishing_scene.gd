@@ -203,7 +203,7 @@ func _build_ui() -> void:
 
 func _refresh_top() -> void:
 	var left := int(_cfg.get("casts", 5)) - _casts
-	_top.text = "El muelle de Innsmouth  ·  %s  ·  %s $" % [MenuKit.count(left, "lance"), MenuKit.money(_money)]
+	_top.text = L.t("El muelle de Innsmouth  ·  %s  ·  %s $") % [MenuKit.count(left, "lance"), MenuKit.money(_money)]
 
 ## Barra de fuerza al lanzar, o de tensión y de hilo recogido al recoger.
 class _Gauge extends Control:
@@ -220,9 +220,9 @@ class _Gauge extends Control:
 		else:
 			var tc := Color(0.80, 0.18, 0.12) if a > 0.75 else Color(0.85, 0.62, 0.25)
 			if alarm and fmod(Time.get_ticks_msec() / 1000.0, 0.3) < 0.15: tc = Color(1.0, 0.4, 0.3)
-			draw_string(font, Vector2(0, 18), "Tensión del sedal", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(0.9, 0.85, 0.7))
+			draw_string(font, Vector2(0, 18), L.t("Tensión del sedal"), HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(0.9, 0.85, 0.7))
 			_bar(Rect2(0, 24, w, 20), a, tc)
-			draw_string(font, Vector2(0, 68), "Hilo recogido", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(0.9, 0.85, 0.7))
+			draw_string(font, Vector2(0, 68), L.t("Hilo recogido"), HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(0.9, 0.85, 0.7))
 			_bar(Rect2(0, 74, w, 14), b, Color(0.45, 0.70, 0.62))
 	func _bar(r: Rect2, v: float, c: Color) -> void:
 		draw_rect(r.grow(3), Color(0.08, 0.05, 0.03, 0.85))
@@ -241,7 +241,7 @@ func _enter(s: int) -> void:
 			_bobber.visible = false
 			_gauge.mode = 0
 			_gauge.visible = false
-			_prompt.text = "Mantén A (o Intro) para lanzar; suéltalo con la fuerza que quieras  ·  B: dejar de pescar"
+			_prompt.text = L.t("Mantén A (o Intro) para lanzar; suéltalo con la fuerza que quieras  ·  B: dejar de pescar")
 		FLY:
 			_casts += 1
 			_refresh_top()
@@ -259,16 +259,16 @@ func _enter(s: int) -> void:
 			_nibbles.clear()
 			var nb: Array = _cfg.get("nibbles", [0, 2])
 			for k in _rng.randi_range(int(nb[0]), int(nb[1])): _nibbles.append(_rng.randf_range(0.8, _bite_at - 0.6))
-			_prompt.text = "Espera a que se hunda el corcho…"
+			_prompt.text = L.t("Espera a que se hunda el corcho…")
 		BITE:
-			_prompt.text = "¡Pica!  ·  A"
+			_prompt.text = L.t("¡Pica!  ·  A")
 			Auto.sfx("splash")
 			_ring(_bobber.global_position, 1.4)
 		REEL:
 			_line = Fishing.Line.new(_fish, _rng)
 			_gauge.mode = 1
 			_gauge.visible = true
-			_prompt.text = "Mantén A para recoger  ·  suelta cuando tire, o se parte el sedal"
+			_prompt.text = L.t("Mantén A para recoger  ·  suelta cuando tire, o se parte el sedal")
 		LANDED:
 			_gauge.visible = false
 			_prompt.text = ""
@@ -328,13 +328,13 @@ func _process(delta: float) -> void:
 						Auto.sfx("drip")
 			_bobber.global_position = Vector3(_target.x, y, _target.z)
 			if pressed and _st < _bite_at:                # demasiado pronto: se espanta
-				_missed("Demasiado pronto: lo has espantado")
+				_missed(L.t("Demasiado pronto: lo has espantado"))
 				return
 			if _st >= _bite_at: _enter(BITE)
 		BITE:
 			_bobber.global_position = Vector3(_target.x, _sea_y - 0.12 - sin(_st * 30.0) * 0.02, _target.z)
 			if pressed: _enter(REEL)
-			elif _st > float(_cfg.get("strike_window", 0.9)): _missed("Se ha soltado")
+			elif _st > float(_cfg.get("strike_window", 0.9)): _missed(L.t("Se ha soltado"))
 		REEL:
 			var st := _line.step(delta, down)
 			_gauge.a = _line.tension
@@ -351,7 +351,7 @@ func _process(delta: float) -> void:
 			if st == Fishing.Line.CAUGHT: _enter(LANDED)
 			elif st == Fishing.Line.BROKE:
 				Auto.sfx("ice_crack")
-				_missed("¡Se ha partido el sedal!")
+				_missed(L.t("¡Se ha partido el sedal!"))
 		LANDED:
 			var k := minf(1.0, _st / 0.9)
 			var to := SPOT + Vector3(0.15, 1.15, 0.75)
@@ -480,21 +480,21 @@ func _card() -> void:
 	img.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	box.add_child(img)
 	var info := PackedStringArray([String(Fishing.RARITY_NAMES.get(rarity, rarity))])
-	if first: info.append("Nueva en el bestiario")
+	if first: info.append(L.t("Nueva en el bestiario"))
 	var l := UiKit.label("  ·  ".join(info), 24, Color(0.55, 0.85, 0.65) if rarity == "maldito" else UiKit.GOLD)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(l)
 	if rarity == "maldito":
-		var c := UiKit.label("Lo que has sacado no debería haber salido del agua. Si te lo quedas o lo vendes, empezarás el siguiente nivel con la cordura a la mitad.", 22, Color(0.85, 0.82, 0.74))
+		var c := UiKit.label(L.t("Lo que has sacado no debería haber salido del agua. Si te lo quedas o lo vendes, empezarás el siguiente nivel con la cordura a la mitad."), 22, Color(0.85, 0.82, 0.74))
 		c.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		c.custom_minimum_size.x = 680
 		c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(c)
 	var options: Array = []                         # [texto, vendida, a la Biblioteca, maldición]
 	match rarity:
-		"comun": options = [["Venderla en la lonja (+%d $)" % price, true, false, false]]
-		"raro": options = [["Llevarla a la Biblioteca (su ficha del bestiario)", false, true, false], ["Venderla (+%d $)" % price, true, false, false]]
-		_: options = [["Devolverla al agua", false, false, false], ["Llevarla a la Biblioteca (su ficha del bestiario)", false, true, true], ["Venderla (+%d $)" % price, true, false, true]]
+		"comun": options = [[L.t("Venderla en la lonja (+%d $)") % price, true, false, false]]
+		"raro": options = [[L.t("Llevarla a la Biblioteca (su ficha del bestiario)"), false, true, false], [L.t("Venderla (+%d $)") % price, true, false, false]]
+		_: options = [[L.t("Devolverla al agua"), false, false, false], [L.t("Llevarla a la Biblioteca (su ficha del bestiario)"), false, true, true], [L.t("Venderla (+%d $)") % price, true, false, true]]
 	var firstb: Button = null
 	var bi := 0
 	for o: Array in options:
@@ -520,7 +520,7 @@ func _choose(o: Array, card: Control) -> void:
 		_money += int(_fish.price)
 		if Saves.current != null: Saves.current.money += int(_fish.price)
 	if o[3]: GameSession.fish_curse = true
-	var what := "vendida" if sold else ("a la Biblioteca" if kept else "devuelta al agua")
+	var what := "vendida" if sold else (L.t("a la Biblioteca") if kept else L.t("devuelta al agua"))
 	_log.append("%s, %s%s" % [String(_fish.name), what, (" (+%d $)" % int(_fish.price)) if sold else ""])
 	print("PESCA ", id, " ", what)
 	_refresh_top()
@@ -539,21 +539,21 @@ func _summary() -> void:
 	Saves.save()
 	var w: Array = MenuKit.window(_ui, MenuKit.INK, 760)
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "Fin de la pesca", 40)
-	for s in (_log if not _log.is_empty() else ["No has sacado nada"] as Array[String]):
+	MenuKit.heading(box, L.t("Fin de la pesca"), 40)
+	for s in (_log if not _log.is_empty() else [L.t("No has sacado nada")] as Array[String]):
 		var l := UiKit.label(s, 22, Color(0.88, 0.84, 0.74))
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(l)
-	var tot := UiKit.label("En total: +%s $" % MenuKit.money(_money), 26, UiKit.GOLD)
+	var tot := UiKit.label(L.t("En total: +%s $") % MenuKit.money(_money), 26, UiKit.GOLD)
 	tot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(tot)
 	if GameSession.fish_curse:
-		var c := UiKit.label("Algo te sigue mirando desde el agua: el siguiente nivel empieza con la cordura a la mitad.", 22, Color(0.55, 0.85, 0.65))
+		var c := UiKit.label(L.t("Algo te sigue mirando desde el agua: el siguiente nivel empieza con la cordura a la mitad."), 22, Color(0.55, 0.85, 0.65))
 		c.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		c.custom_minimum_size.x = 680
 		c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(c)
-	var b := MenuKit.button("Seguir al siguiente nivel", MenuKit.INK, 28)
+	var b := MenuKit.button(L.t("Seguir al siguiente nivel"), MenuKit.INK, 28)
 	b.custom_minimum_size = Vector2(680, 60)
 	b.pressed.connect(_leave)
 	box.add_child(b)

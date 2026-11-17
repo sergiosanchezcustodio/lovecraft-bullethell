@@ -91,14 +91,14 @@ func _focus(c: Control) -> void:
 func _show_choice() -> void:
 	_clear()
 	_view = ""
-	MenuKit.heading(_box, "Jugar online", 46)
-	_text("Hasta cuatro jugadores en total, en uno o varios PC.", 20, UiKit.TEXT_DIM)
-	var create := _button("Crear sala", _host)
-	_button("Unirse a una sala", _show_join)
-	_text("La primera vez, Windows puede preguntar si deja pasar la conexión: acepta en redes privadas y públicas.", 17, UiKit.TEXT_DIM)
-	_text("Si ves algo raro jugando, pulsa F9 o mantén LB+RB: queda una marca en los registros de conexión de todos.", 17, UiKit.TEXT_DIM)
+	MenuKit.heading(_box, L.t("Jugar online"), 46)
+	_text(L.t("Hasta cuatro jugadores en total, en uno o varios PC."), 20, UiKit.TEXT_DIM)
+	var create := _button(L.t("Crear sala"), _host)
+	_button(L.t("Unirse a una sala"), _show_join)
+	_text(L.t("La primera vez, Windows puede preguntar si deja pasar la conexión: acepta en redes privadas y públicas."), 17, UiKit.TEXT_DIM)
+	_text(L.t("Si ves algo raro jugando, pulsa F9 o mantén LB+RB: queda una marca en los registros de conexión de todos."), 17, UiKit.TEXT_DIM)
 	if DirAccess.dir_exists_absolute(NetLog.DIR):     # registros de partidas anteriores (para enviarlos si algo falló)
-		var logs := MenuKit.button("Abrir la carpeta de registros de conexión", MenuKit.INK, 18)
+		var logs := MenuKit.button(L.t("Abrir la carpeta de registros de conexión"), MenuKit.INK, 18)
 		logs.custom_minimum_size = Vector2(420, 42)
 		logs.pressed.connect(NetLog.open_folder)
 		var row := CenterContainer.new()
@@ -106,13 +106,13 @@ func _show_choice() -> void:
 		_box.add_child(row)
 		var shot := NetLog.latest_shot()
 		if shot != "":                                # lo que se veía en la última marca
-			var see := MenuKit.button("Ver la captura de la última marca", MenuKit.INK, 18)
+			var see := MenuKit.button(L.t("Ver la captura de la última marca"), MenuKit.INK, 18)
 			see.custom_minimum_size = Vector2(420, 42)
 			see.pressed.connect(func() -> void: OS.shell_open(ProjectSettings.globalize_path(shot)))
 			var row2 := CenterContainer.new()
 			row2.add_child(see)
 			_box.add_child(row2)
-	_box.add_child(MenuKit.hint("B o Esc: volver"))
+	_box.add_child(MenuKit.hint(L.t("B o Esc: volver")))
 	_focus(create)
 
 ## Abre la sala y pasa a la selección (que hace de sala). Si no se puede, `failed` dice por qué.
@@ -124,8 +124,8 @@ func _host() -> void:
 func _show_join() -> void:
 	_clear()
 	_view = "join"
-	MenuKit.heading(_box, "Unirse a una sala", 44)
-	_text("Escribe el código que te ha dado el anfitrión (o su IP).", 20, UiKit.TEXT_DIM)
+	MenuKit.heading(_box, L.t("Unirse a una sala"), 44)
+	_text(L.t("Escribe el código que te ha dado el anfitrión (o su IP)."), 20, UiKit.TEXT_DIM)
 	_field = LineEdit.new()
 	_field.placeholder_text = "K7Q2-M9XA   o   83.45.201.7"
 	_field.alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -149,7 +149,7 @@ func _show_join() -> void:
 	_field.focus_neighbor_bottom = _field.get_path_to(_picker)
 	_connect_btn.focus_neighbor_top = _connect_btn.get_path_to(_picker)
 	_status = _text("", 20, UiKit.TEXT_DIM)
-	_box.add_child(MenuKit.hint("Mando: cruceta para las letras · A: conectar · X: pegar  ·  Teclado: Intro conecta · Ctrl+V pega  ·  B o Esc: volver"))
+	_box.add_child(MenuKit.hint(L.t("Mando: cruceta para las letras · A: conectar · X: pegar  ·  Teclado: Intro conecta · Ctrl+V pega  ·  B o Esc: volver")))
 	_focus(_picker if Devices.last_device != Devices.KEYBOARD else _field)
 
 # ---------------------------------------------------------------- acciones
@@ -158,16 +158,16 @@ func _connect() -> void:
 	if _field == null or Net.state == NetSession.State.CONNECTING: return
 	var a := RoomCode.parse(_field.text)
 	if a.is_empty():
-		_status.text = "No reconozco ese código: revisa las letras (8, con o sin guion) o escribe la IP."
+		_status.text = L.t("No reconozco ese código: revisa las letras (8, con o sin guion) o escribe la IP.")
 		_status.add_theme_color_override("font_color", MenuKit.DANGER)
 		return
 	_status.remove_theme_color_override("font_color")
-	_status.text = "Conectando con %s:%d…" % [a.ip, a.port]
+	_status.text = L.t("Conectando con %s:%d…") % [a.ip, a.port]
 	if Net.join(a.ip, a.port) == OK: _connect_btn.disabled = true
 
 func _on_joined() -> void:
 	if _view != "join": return
-	_status.text = "Dentro. Entrando en la sala…"
+	_status.text = L.t("Dentro. Entrando en la sala…")
 	_go_to_select()
 
 func _go_to_select() -> void:

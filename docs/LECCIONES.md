@@ -272,3 +272,11 @@ En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra c
 
 - `flat` (como `smooth` y `noperspective`) es un calificador de interpolación de GLSL: un `uniform bool flat` da «Expected an identifier or '['» y el sombreador entero no compila. El modo haz de `FxShade` usa `across`.
 - Un haz en una caja vista desde arriba: si la distancia al eje se mide en las dos direcciones del corte (`max(|x|, |y|)`), en todas las caras sale «borde» y el centro no se ve nunca. Para lo que se ve desde la cámara, mide solo a lo ancho.
+
+## Textos traducibles (hito 22.4, 17-11-2026)
+
+- **Un `Label`, un `Button` o un `Label3D` traducen solos su texto** si coincide entero con una clave de la tabla del idioma (auto_translate, activo por defecto). Lo que se monta con `%` o `+` no coincide: el formato tiene que pasar antes por `tr()` o `L.t()`.
+- **Traducir un recurso al leerlo, no al cargarlo:** un `set` en la propiedad no se llama con los valores por defecto de la clase, que el `.tres` no guarda (el pingüino se quedaba en español). Con `get: return L.t(x)` sí.
+- **Ni `const` ni las anotaciones (`@export_group("…")`) admiten llamadas a funciones:** un `L.t()` dentro da «isn't a constant expression» o, en las anotaciones, un error del analizador que deja la suite colgada.
+- **Un `Translation` propio con `_get_message`** (añadido al `TranslationServer` con el mismo locale) ve todo lo que se pide traducir, también lo que traducen solos los controles. Si devuelve `&""`, no cambia el resultado.
+- **Las entradas de un `.po` con `msgstr ""` cuentan en `get_message_count()`:** para saber cuántas hay traducidas, recórrelas con `get_message_list()` y mira que `get_message` no esté vacío.

@@ -235,7 +235,7 @@ func _candle(at: Vector3) -> void:
 ## círculo y su precio encima) y un farol de luz cálida.
 func _stand() -> void:
 	if goods.is_empty():
-		var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(PEDDLER_CFG))
+		var d: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string(PEDDLER_CFG)))
 		if d is Dictionary: goods = ((d as Dictionary).get("peddler", {}) as Dictionary).get("goods", [])
 	var root := Node3D.new()
 	root.rotation.y = FACE
@@ -563,20 +563,20 @@ func hud_text() -> String:
 	match kind:
 		"rescue":
 			if state == State.WAIT: return "Rescata al superviviente herido"
-			return "Escolta al superviviente hasta la bengala"
+			return L.t("Escolta al superviviente hasta la bengala")
 		"ritual":
-			return "Corta el ritual: quédate dentro del círculo · %d/%d s" % [floori(progress), roundi(need)]
+			return L.t("Corta el ritual: quédate dentro del círculo · %d/%d s") % [floori(progress), roundi(need)]
 		"relic":
-			if carrier < 0: return "Recoge la reliquia"
-			return "Lleva la reliquia al círculo (J%d la lleva, va más lento)" % (carrier + 1)
+			if carrier < 0: return L.t("Recoge la reliquia")
+			return L.t("Lleva la reliquia al círculo (J%d la lleva, va más lento)") % (carrier + 1)
 		"peddler":
 			var purse: int = purse_hook.call() if purse_hook.is_valid() else 0
-			return "El buhonero: quédate sobre lo que quieras comprar · tienes %d $" % purse
+			return L.t("El buhonero: quédate sobre lo que quieras comprar · tienes %d $") % purse
 	return ""
 
 static func reward_text(r: Array) -> String:
 	match String(r[0]):
 		"money": return "%d $" % int(r[1])
-		"chest": return "un baúl arcano"
+		"chest": return L.t("un baúl arcano")
 		"xp": return "experiencia"
 	return ""

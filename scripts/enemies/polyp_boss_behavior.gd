@@ -115,7 +115,7 @@ func update(e: Enemy, target: Player, delta: float) -> Vector3:
 		_t = float(e.data.param("void_time", 4.0)) * (0.8 if phase == 3 else 1.0)
 		set_hidden(e, true)
 		e.world.sfx("polyp_vanish", e.global_position)
-		e.world.shout(String(e.data.param("void_text", "Se deshace en el viento…")), e.global_position + Vector3(0, 4.0, 0), WIND, 64, 1.0, 1.4)
+		e.world.shout(String(e.data.param("void_text", L.t("Se deshace en el viento…"))), e.global_position + Vector3(0, 4.0, 0), WIND, 64, 1.0, 1.4)
 		return Vector3.ZERO
 	e.anim = "burst" if e.runner != null and e.runner.busy else "walk"
 	if target == null: return Vector3.ZERO
@@ -148,7 +148,7 @@ func _breathe(e: Enemy) -> void:
 	_breathing = tell + t
 	e.windup(tell)
 	e.world.sfx("polyp_breath", e.global_position)
-	e.world.shout(String(e.data.param("breath_text", "Toma aliento…")), e.global_position + Vector3(0, 4.6, 0), WIND, 60, 1.0, 1.3)
+	e.world.shout(String(e.data.param("breath_text", L.t("Toma aliento…"))), e.global_position + Vector3(0, 4.6, 0), WIND, 60, 1.0, 1.3)
 	var eid := e.get_instance_id()
 	e.get_tree().create_timer(tell, false, true).timeout.connect(func() -> void:
 		var e2 := instance_from_id(eid) as Enemy
@@ -168,7 +168,7 @@ func _on_death(e: Enemy) -> void:
 	var at := Vector3(e.global_position.x, 0.0, e.global_position.z)
 	e.world.sfx("polyp_cry", at)
 	e.world.shake(0.7)
-	e.world.shout(String(e.data.param("death_text", "El silbido se apaga bajo la arena…")), at + Vector3(0, 5.5, 0), WIND, 100, 1.8, 2.8)
+	e.world.shout(String(e.data.param("death_text", L.t("El silbido se apaga bajo la arena…"))), at + Vector3(0, 5.5, 0), WIND, 100, 1.8, 2.8)
 
 func can_shoot(_e: Enemy) -> bool:
 	return false                                   # dispara por su cuenta (_fire)

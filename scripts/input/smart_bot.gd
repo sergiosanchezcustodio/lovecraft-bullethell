@@ -288,4 +288,4 @@ static func pick(options: Array, p: Player, rng: RandomNumberGenerator) -> Playe
 	return best
 
 func device_name() -> String:
-	return "bot (smart %.1f)" % skill
+	return L.t("bot (smart %.1f)") % skill

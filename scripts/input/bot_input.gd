@@ -74,4 +74,4 @@ func _read_action(action: StringName) -> bool:
 	return false
 
 func device_name() -> String:
-	return "bot (%s)" % pattern
+	return L.t("bot (%s)") % pattern

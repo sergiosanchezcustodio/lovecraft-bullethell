@@ -170,6 +170,6 @@ static func migrate(d: Dictionary) -> Dictionary:
 ## Tiempo jugado como texto: "3 h 05 min", "12 min" o "menos de 1 min".
 static func format_time(seconds: float) -> String:
 	var m := int(seconds) / 60
-	if m < 1: return "menos de 1 min"
-	if m < 60: return "%d min" % m
-	return "%d h %02d min" % [m / 60, m % 60]
+	if m < 1: return L.t("menos de 1 min")
+	if m < 60: return L.t("%d min") % m
+	return L.t("%d h %02d min") % [m / 60, m % 60]

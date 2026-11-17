@@ -66,7 +66,7 @@ func test_cada_clave_tiene_su_pestana() -> void:
 			assert_true(settings.defaults.has(k), "%s existe" % k)
 			grouped[k] = true
 	for k: String in settings.defaults:
-		if k in ["keys", "joy", "controls_rev", "controls_base", "intro_seen", "dif_levels", "profile", "profiles"]: continue
+		if k in ["keys", "joy", "controls_rev", "controls_base", "intro_seen", "dif_levels", "profile", "profiles", "language"]: continue   # el idioma no vuelve al de fábrica con su pestaña (22.4)
 		assert_true(grouped.has(k), "%s está en alguna pestaña" % k)
 
 ## Hito 20.16: el contador detallado y el «Sí» de antes.

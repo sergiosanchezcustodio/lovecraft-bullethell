@@ -87,25 +87,25 @@ static func lines(r: Dictionary) -> PackedStringArray:
 	var falls: Array = r.falls
 	if falls.size() == 1:
 		var h: Dictionary = falls[0].hit
-		out.append("Te abatió %s (%s, %d) a los %s" % [name_of(String(h.get("src", "otro"))),
+		out.append(L.t("Te abatió %s (%s, %d) a los %s") % [name_of(String(h.get("src", "otro"))),
 			via_name(String(h.get("via", "otro"))), roundi(float(h.get("ph", 0.0))), _clock(float(falls[0].t))])
 	elif falls.size() > 1:
 		var parts := PackedStringArray()
 		for f: Dictionary in falls:
 			var h: Dictionary = f.hit
 			parts.append("%s %s (%s)" % [_clock(float(f.t)), name_of(String(h.get("src", "otro"))), via_name(String(h.get("via", "otro")))])
-		out.append("Caídas: " + "  ·  ".join(parts))
+		out.append(L.t("Caídas: ") + "  ·  ".join(parts))
 	if r.hp >= 0.5:
 		var parts := PackedStringArray()
 		for row: Dictionary in r.top_hp: parts.append(_who(row, 0))
-		out.append("Vida perdida %d:  %s" % [roundi(r.hp), "  ·  ".join(parts)])
-		out.append("Por vía:  " + _shares(r.by_via, 0, r.hp))
+		out.append(L.t("Vida perdida %d:  %s") % [roundi(r.hp), "  ·  ".join(parts)])
+		out.append(L.t("Por vía:  ") + _shares(r.by_via, 0, r.hp))
 	else:
-		out.append("Sin daño a la vida")
+		out.append(L.t("Sin daño a la vida"))
 	if r.san >= 0.5:
 		var parts := PackedStringArray()
 		for row: Dictionary in r.top_san: parts.append(_who(row, 1))
-		out.append("Cordura perdida %d:  %s" % [roundi(r.san), "  ·  ".join(parts)])
+		out.append(L.t("Cordura perdida %d:  %s") % [roundi(r.san), "  ·  ".join(parts)])
 	return out
 
 ## "Fragmento protoplásmico 36 (balas 24, contacto 12)": un origen con lo que quitó (k: 0 vida,
@@ -135,10 +135,10 @@ static func _shares(by_via: Dictionary, k: int, total: float) -> String:
 static func common_lines(reports: Array) -> PackedStringArray:
 	var out := PackedStringArray()
 	if not reports.is_empty():
-		out.append("Enemigos vivos a la vez: %d de media, %d como mucho" % [roundi(float(reports[0].alive_avg)), int(reports[0].alive_max)])
+		out.append(L.t("Enemigos vivos a la vez: %d de media, %d como mucho") % [roundi(float(reports[0].alive_avg)), int(reports[0].alive_max)])
 	var g := Difficulty.general()
-	out.append("Dificultad: %s" % (("%d en todo" % g) if g > 0 else Difficulty.describe()))
-	if not Pacts.active().is_empty(): out.append("Pactos: " + Pacts.names(Pacts.active()))   # hito 13.6
+	out.append(L.t("Dificultad: %s") % ((L.t("%d en todo") % g) if g > 0 else Difficulty.describe()))
+	if not Pacts.active().is_empty(): out.append(L.t("Pactos: ") + Pacts.names(Pacts.active()))   # hito 13.6
 	return out
 
 ## El panel: un bloque por jugador (en dos columnas con tres o cuatro) y lo común debajo.
@@ -196,7 +196,7 @@ class Graph extends Control:
 			var word := "vida" if k == 0 else "cordura"
 			draw_string(font, Vector2(x0 + 21, y), word, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1, 1, 1, 0.7))
 			x0 += 21 + font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 18
-		var span := "último minuto" if hist.size() >= HIST else "%d s" % hist.size()
+		var span := L.t("último minuto") if hist.size() >= HIST else "%d s" % hist.size()
 		draw_string(font, Vector2(x0, y), "·  " + span, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1, 1, 1, 0.5))
 		if hist.size() < 2: return
 		# donde vida y cordura van juntas (sin daño, las dos al máximo) la violeta tapaba la roja:
@@ -223,7 +223,7 @@ static func log_run(result: String, level_id: String, t: float, reports: Array) 
 			var h: Dictionary = (r.falls as Array).back().hit
 			fell = "%s|%s" % [h.get("src", ""), h.get("via", "")]
 		people.append({"who": r.who, "hp": roundi(r.hp), "san": roundi(r.san), "fell": fell})
-	var pacts := "" if Pacts.active().is_empty() else " · pactos: " + ", ".join(Pacts.active())
+	var pacts := "" if Pacts.active().is_empty() else L.t(" · pactos: ") + ", ".join(Pacts.active())
 	DifficultyMenu.append_log("%s · %s · %s · %s · %s%s · %s" % [stamp, level_id, _clock(t), result,
 		Difficulty.describe(), pacts, " | ".join(text)])
 	var rec := {"date": stamp, "level": level_id, "t": roundi(t), "result": result,

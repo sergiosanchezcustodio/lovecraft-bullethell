@@ -75,11 +75,11 @@ static func place(run: Dictionary) -> String:
 	var id := String(run.get("level", ""))
 	var base := Endless.base_of(id)
 	var name := DailyMenu._level_name(base) if base != "" else id
-	if Challenge.is_challenge(id): return "Desafío · " + String(Challenge.find(id).get("name", name))
-	if Daily.is_daily(id): return "Partida del día · " + name
-	if Endless.is_endless(id): return "Noche eterna · " + name
-	if Expedition.is_expedition(id): return "Expedición · " + name
-	if BossRush.is_rush(id): return "Desfile de jefes"
+	if Challenge.is_challenge(id): return L.t("Desafío · ") + String(Challenge.find(id).get("name", name))
+	if Daily.is_daily(id): return L.t("Partida del día · ") + name
+	if Endless.is_endless(id): return L.t("Noche eterna · ") + name
+	if Expedition.is_expedition(id): return L.t("Expedición · ") + name
+	if BossRush.is_rush(id): return L.t("Desfile de jefes")
 	return name
 
 ## "15,7": una cifra decimal, con coma.

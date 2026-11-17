@@ -131,8 +131,8 @@ func _show_tab(i: int) -> void:
 	var outfits := i == OUTFIT_TAB
 	_subs.visible = outfits
 	_fitting_box.visible = outfits
-	_hint.text = ("Arriba/abajo: elegir  ·  Izquierda/derecha: sección  ·  A o Intro: comprar  ·  X o R: investigador  ·  LB/RB: pestaña  ·  B: volver" if outfits
-		else "Arriba/abajo: elegir  ·  A o Intro: comprar  ·  LB/RB o Q/E: pestaña  ·  B o Esc: volver")
+	_hint.text = (L.t("Arriba/abajo: elegir  ·  Izquierda/derecha: sección  ·  A o Intro: comprar  ·  X o R: investigador  ·  LB/RB: pestaña  ·  B: volver") if outfits
+		else L.t("Arriba/abajo: elegir  ·  A o Intro: comprar  ·  LB/RB o Q/E: pestaña  ·  B o Esc: volver"))
 	var entries := Shop.in_section(i)
 	if outfits:
 		var counts := {}
@@ -145,7 +145,7 @@ func _show_tab(i: int) -> void:
 			for e in entries:
 				if int(e.outfit.slot) == k and Shop.is_maxed(save, e): mine += 1
 			if k == SETS_SUB:
-				_sub_btns[k].text = "Conjuntos %d/%d" % [sets_done, OutfitSets.all().size()]
+				_sub_btns[k].text = L.t("Conjuntos %d/%d") % [sets_done, OutfitSets.all().size()]
 			else:
 				_sub_btns[k].text = "%s %d/%d" % [OutfitData.SECTION_NAMES[k], mine, int(counts.get(k, 0))]
 			_sub_btns[k].visible = counts.has(k) or (k == SETS_SUB and not OutfitSets.all().is_empty())
@@ -166,20 +166,20 @@ func _show_tab(i: int) -> void:
 		if e.id == _focus_id: focus = row
 		if e.id in Shop.TOGGLES and Shop.level_of(save, e) > 0:   # el Pacto se rompe y se renueva
 			var on := Shop.is_active(save, e.id)
-			var tb := MenuKit.button(("Activo: sí (pulsa para romperlo)" if on else "Activo: no (pulsa para renovarlo)"),
+			var tb := MenuKit.button((L.t("Activo: sí (pulsa para romperlo)") if on else L.t("Activo: no (pulsa para renovarlo)")),
 				Color(0.85, 0.35, 0.95) if on else UiKit.TEXT_DIM, 20)
 			tb.custom_minimum_size = Vector2(810, 44)
 			tb.pressed.connect(func() -> void:
 				save.toggles[e.id] = not Shop.is_active(save, e.id)
 				Saves.save()
 				_focus_id = e.id + ":toggle"
-				_say("Pacto %s." % ("renovado" if Shop.is_active(save, e.id) else "roto"))
+				_say(L.t("Pacto %s.") % ("renovado" if Shop.is_active(save, e.id) else "roto"))
 				_show_tab(_tab))
 			_list.add_child(tb)
 			rows.append(tb)
 			if _focus_id == e.id + ":toggle": focus = tb
 	MenuKit.chain_focus(rows)                                 # arriba y abajo no salen de la lista
-	_money.text = "Dinero: %s $" % MenuKit.money(save.money if save else 0)
+	_money.text = L.t("Dinero: %s $") % MenuKit.money(save.money if save else 0)
 	var target := focus if focus != null else _first
 	if target: target.grab_focus.call_deferred()
 
@@ -239,14 +239,14 @@ func _row(e: Shop.Entry) -> Button:
 	if compact and not maxed:                                 # la que completa un conjunto (14.8)
 		var sets := OutfitSets.completes(save, String(e.outfit.id))
 		if not sets.is_empty():
-			col.add_child(UiKit.label("Completa el conjunto «%s»" % "», «".join(sets), 15, UiKit.GOLD))
+			col.add_child(UiKit.label(L.t("Completa el conjunto «%s»") % "», «".join(sets), 15, UiKit.GOLD))
 	if compact:
 		var slot_key: String = OutfitData.KEYS[int(e.outfit.slot)]
 		b.focus_entered.connect(func() -> void: _fitting.show_worn({slot_key: String(e.outfit.id)}))
 	var tag := ""
 	var color := UiKit.GOLD
 	if Demo.shop_locked(e):                                   # la demo (13.17)
-		tag = "Juego completo"
+		tag = L.t("Juego completo")
 		color = UiKit.TEXT_DIM
 	elif maxed:
 		tag = "Comprado" if e.prices.size() == 1 else "Completo"
@@ -304,7 +304,7 @@ func _set_row(s: Dictionary) -> Button:
 	d.custom_minimum_size.x = 520
 	col.add_child(d)
 	if missing.size() == 1:
-		col.add_child(UiKit.label("Solo te falta una prenda", 15, UiKit.GOLD))
+		col.add_child(UiKit.label(L.t("Solo te falta una prenda"), 15, UiKit.GOLD))
 	d.resized.connect(func() -> void: b.custom_minimum_size.y = maxf(96.0, col.get_combined_minimum_size().y + 20.0))
 	var tag := "Completo"
 	var color := Color(0.45, 0.9, 0.35)
@@ -324,11 +324,11 @@ func _set_row(s: Dictionary) -> Button:
 func _try_buy_set(s: Dictionary) -> void:
 	_focus_id = "set:" + String(s.id)
 	if OutfitSets.is_complete(save, s):
-		_say("Ya tienes todo el conjunto.")
+		_say(L.t("Ya tienes todo el conjunto."))
 		return
 	var price := OutfitSets.price(save, s)
 	if not OutfitSets.can_buy(save, s):
-		_say("Te faltan %s $." % MenuKit.money(price - save.money))
+		_say(L.t("Te faltan %s $.") % MenuKit.money(price - save.money))
 		return
 	var n := OutfitSets.missing(save, s).size()
 	var c := MenuKit.Confirm.new("¿Comprar %s (%d %s) por %s $?" % [String(s.name), n, "prenda" if n == 1 else "prendas", MenuKit.money(price)],
@@ -337,7 +337,7 @@ func _try_buy_set(s: Dictionary) -> void:
 	c.answered.connect(func(yes: bool) -> void:
 		if yes and OutfitSets.buy(save, s):
 			Saves.save()
-			_say("Comprado: %s." % String(s.name))
+			_say(L.t("Comprado: %s.") % String(s.name))
 		_show_tab(_tab))
 
 ## El artículo marcado, vivo (hito 20.7): su modelo respira con su reposo y mira a los lados (un
@@ -376,19 +376,19 @@ func _try_buy(e: Shop.Entry) -> void:
 		_say(Demo.LOCKED + ".")
 		return
 	if Shop.is_maxed(save, e):
-		_say("Ya lo tienes.")
+		_say(L.t("Ya lo tienes."))
 		return
 	var price := Shop.next_price(save, e)
 	if not Shop.can_buy(save, e):
-		_say("Te faltan %s $." % MenuKit.money(price - save.money))
+		_say(L.t("Te faltan %s $.") % MenuKit.money(price - save.money))
 		return
 	var what := e.name if e.prices.size() == 1 else "%s (nivel %d)" % [e.name, Shop.level_of(save, e) + 1]
-	var c := MenuKit.Confirm.new("¿Comprar %s por %s $?" % [what, MenuKit.money(price)], "Comprar", "Cancelar", UiKit.GOLD)
+	var c := MenuKit.Confirm.new(L.t("¿Comprar %s por %s $?") % [what, MenuKit.money(price)], "Comprar", "Cancelar", UiKit.GOLD)
 	add_child(c)
 	c.answered.connect(func(yes: bool) -> void:
 		if yes and Shop.buy(save, e):
 			Saves.save()
-			_say("Comprado: %s." % e.name)
+			_say(L.t("Comprado: %s.") % e.name)
 		_show_tab(_tab))
 
 func _say(text: String) -> void:

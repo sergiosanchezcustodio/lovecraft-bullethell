@@ -58,7 +58,7 @@ func _feed(p: Player) -> void:
 	p.sanity = minf(p.data.max_sanity, p.sanity + p.data.max_sanity * k)
 	pet.act()
 	pet.hits += 1
-	pet.popup("¡Pescado!", Color(0.55, 1.0, 0.6))
+	pet.popup(L.t("¡Pescado!"), Color(0.55, 1.0, 0.6))
 
 ## Chillido: la primera vez que ve cada élite cerca, la marca con un anillo.
 func _watch(delta: float) -> void:
@@ -70,7 +70,7 @@ func _watch(delta: float) -> void:
 		var id := e.get_instance_id()
 		if _seen.has(id): continue
 		_seen[id] = true
-		pet.popup("¡Kiii!", Color(1.0, 0.95, 0.8))
+		pet.popup(L.t("¡Kiii!"), Color(1.0, 0.95, 0.8))
 		var tg := Telegraph.new().setup(1.4, 1.5, Color(1.0, 0.9, 0.3, 0.6), false)
 		tg.position = Vector3(e.global_position.x, 0.0, e.global_position.z)
 		pet.world.fx.add_child(tg)

@@ -19,7 +19,7 @@ static var _cache := {}
 static func _load() -> void:
 	if not _data.is_empty(): return
 	var f := FileAccess.get_file_as_string(DATA)
-	var d = JSON.parse_string(f) if f != "" else null
+	var d = L.data(JSON.parse_string(f)) if f != "" else null
 	_data = d if d is Dictionary else {"grades": []}
 
 static func grades() -> Array:
@@ -65,13 +65,13 @@ static func describe(g: int) -> String:
 	var lines := PackedStringArray()
 	for x: Dictionary in grades():
 		if int(x.grade) <= g: lines.append(String(x.text))
-	if g > 0: lines.append("Dólares ×%s." % str(snappedf(value("money", g), 0.1)).replace(".", ","))
+	if g > 0: lines.append(L.t("Dólares ×%s.") % str(snappedf(value("money", g), 0.1)).replace(".", ","))
 	return " ".join(lines)
 
 static func title(g: int) -> String:
-	if g <= 0: return "Sin locura"
+	if g <= 0: return L.t("Sin locura")
 	var x := info(g)
-	return "Grado %s · %s" % [x.get("roman", str(g)), x.get("name", "")]
+	return L.t("Grado %s · %s") % [x.get("roman", str(g)), x.get("name", "")]
 
 ## El grado más alto que se puede elegir con esta partida: 0 hasta vencer a Cthulhu; después, uno
 ## más que el mejor con el que se ha vencido a Cthulhu.

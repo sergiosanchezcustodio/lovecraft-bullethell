@@ -5,9 +5,12 @@ extends Resource
 ## de `kind` (un PetBehavior por tipo, en scripts/pets/behaviors/).
 
 @export var id := &"perro"
-@export var display_name := "Perro de trineo"
-@export var story := "En las montañas de la locura"
-@export_multiline var description := ""
+@export var display_name := "Perro de trineo":
+	get: return L.t(display_name)          # en el idioma elegido (hito 22.4)
+@export var story := "En las montañas de la locura":
+	get: return L.t(story)          # en el idioma elegido (hito 22.4)
+@export_multiline var description := "":
+	get: return L.t(description)          # en el idioma elegido (hito 22.4)
 @export var price := 0
 @export var model := ""                      ## en models/ (vacío: sin modelo todavía)
 ## BITE: corre a morder a los enemigos cercanos (perro). CLAW: araña a los que se acercan y se

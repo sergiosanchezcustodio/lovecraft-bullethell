@@ -44,7 +44,7 @@ func _ready() -> void:
 	add_child(_bg)
 	_build_ficha()
 	_build_intro()
-	_skip_lbl = UiKit.label("Pulsa para seguir · mantén pulsado para saltar", 18, Color(0.7, 0.66, 0.56, 0.6))
+	_skip_lbl = UiKit.label(L.t("Pulsa para seguir · mantén pulsado para saltar"), 18, Color(0.7, 0.66, 0.56, 0.6))
 	_skip_lbl.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	_skip_lbl.position = Vector2(-260, -56)
 	_skip_lbl.size = Vector2(520, 30)
@@ -53,7 +53,7 @@ func _ready() -> void:
 	_show(0)
 
 func _json(path: String) -> Dictionary:
-	var v: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var v: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string(path)))
 	return v if v is Dictionary else {}
 
 func _centered_box(width: float) -> VBoxContainer:
@@ -85,7 +85,7 @@ func _build_ficha() -> void:
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 12)
 	box.add_child(gap)
-	box.add_child(MenuKit.title("Uso de inteligencia artificial", 30))
+	box.add_child(MenuKit.title(L.t("Uso de inteligencia artificial"), 30))
 	box.add_child(_para(String(d.get("ia", "")), 21, Color(0.80, 0.78, 0.72)))
 	box.add_child(gap.duplicate())
 	box.add_child(_para(String(d.get("licencia", "")), 20, Color(0.66, 0.62, 0.54)))

@@ -14,7 +14,7 @@ static var _cfg := {}
 
 static func cfg() -> Dictionary:
 	if _cfg.is_empty():
-		var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+		var d: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string(PATH)))
 		_cfg = d if d is Dictionary else {}
 	return _cfg
 

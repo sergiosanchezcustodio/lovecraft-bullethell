@@ -376,7 +376,7 @@ func rise_ghouls(seed_v: int) -> void:
 		world.fx.add_child(g)
 		ghouls.append(g)
 	ghouls = ghouls.filter(func(g: Variant) -> bool: return is_instance_valid(g))
-	var txt := "Suben los necrófagos de las criptas: Pickman les ha hablado de ti" if pickman_plays() 		else "Suben los necrófagos de las criptas a echar una mano"
+	var txt := L.t("Suben los necrófagos de las criptas: Pickman les ha hablado de ti") if pickman_plays() 		else L.t("Suben los necrófagos de las criptas a echar una mano")
 	if game != null and game.has_method("announce"): game.announce(txt, 2.5)
 	world.sfx("growl", crypt_at)
 	world.sfx("rise_stone", crypt_at)

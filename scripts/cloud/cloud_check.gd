@@ -20,7 +20,7 @@ func _run(delete_after: bool) -> bool:
 	var id: String = await Cloud.ensure_gist()
 	print("Nube: gist %s (%d ms)" % [id, Time.get_ticks_msec() - t0])
 	if id == "": return false
-	var text := JSON.stringify({"prueba": Time.get_datetime_string_from_system(), "ñ": "¿Iä! Cthulhu fhtagn"})
+	var text := JSON.stringify({"prueba": Time.get_datetime_string_from_system(), "ñ": L.t("¿Iä! Cthulhu fhtagn")})
 	t0 = Time.get_ticks_msec()
 	if not await Cloud.push({"prueba.json": text}): return false
 	print("Nube: escrito (%d ms)" % (Time.get_ticks_msec() - t0))

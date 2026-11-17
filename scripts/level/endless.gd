@@ -30,7 +30,7 @@ static func id_for(base: String) -> String:
 
 static func cfg() -> Dictionary:
 	var f := FileAccess.get_file_as_string(DATA)
-	var d = JSON.parse_string(f) if f != "" else null
+	var d = L.data(JSON.parse_string(f)) if f != "" else null
 	return d if d is Dictionary else {}
 
 ## ¿Está abierto? Al vencer a Cthulhu (o con todo desbloqueado).
@@ -44,7 +44,7 @@ static func make_level(id: String) -> LevelData:
 	var src: LevelData = load("res://data/levels/%s.tres" % base)
 	var lv: LevelData = src.duplicate()
 	lv.id = StringName(id)
-	lv.display_name = "La noche eterna · %s" % src.display_name
+	lv.display_name = L.t("La noche eterna · %s") % src.display_name
 	lv.endless = true
 	lv.number = 1
 	var skip: Array = c.get("skip_enemies", [])
@@ -80,7 +80,7 @@ static func make_level(id: String) -> LevelData:
 		for k in int(c.get("bosses_max", 24)):
 			mids.append(bosses[k % bosses.size()])
 			times.append(every * (k + 1))
-			texts.append("La noche trae %s" % Hud.with_a(bosses[k % bosses.size()].display_name))
+			texts.append(L.t("La noche trae %s") % Hud.with_a(bosses[k % bosses.size()].display_name))
 	lv.mid_enemies = mids
 	lv.mid_times = times
 	lv.mid_texts = texts

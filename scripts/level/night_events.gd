@@ -44,7 +44,7 @@ var _star_mat: StandardMaterial3D
 
 static func data() -> Dictionary:
 	if _data.is_empty():
-		var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+		var d: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string(PATH)))
 		_data = d if d is Dictionary else {"sucesos": []}
 	return _data
 

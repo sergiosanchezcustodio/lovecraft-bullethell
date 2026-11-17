@@ -30,8 +30,8 @@ func _ready() -> void:
 	var c := Cloud.conflict_of(slot)
 	var w: Array = MenuKit.window(self, MenuKit.DANGER, 1100)
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "La Partida %d ha cambiado en dos sitios" % (slot + 1), 42)
-	var l := UiKit.label("Se ha jugado en este PC y en otro sin pasar por la nube. Elige con cuál te quedas: de la otra se guarda una copia aparte en este PC, por si acaso.", 20, UiKit.TEXT)
+	MenuKit.heading(box, L.t("La Partida %d ha cambiado en dos sitios") % (slot + 1), 42)
+	var l := UiKit.label(L.t("Se ha jugado en este PC y en otro sin pasar por la nube. Elige con cuál te quedas: de la otra se guarda una copia aparte en este PC, por si acaso."), 20, UiKit.TEXT)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.custom_minimum_size.x = 1000
@@ -57,7 +57,7 @@ func _ready() -> void:
 	_status = UiKit.label("", 18, UiKit.TEXT_DIM)
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_status)
-	box.add_child(MenuKit.hint("Izquierda/derecha: elegir  ·  A o Intro: quedarse con esa  ·  B o Esc: decidir luego"))
+	box.add_child(MenuKit.hint(L.t("Izquierda/derecha: elegir  ·  A o Intro: quedarse con esa  ·  B o Esc: decidir luego")))
 	MenuKit.trap_focus(self)
 	_cards[0].grab_focus.call_deferred()
 
@@ -72,16 +72,16 @@ func _card(head: String, d: SaveData, other: SaveData) -> Button:
 	b.add_child(v)
 	v.add_child(MenuKit.title(head, 34))
 	var who := "en este PC" if d.device == "" or d.device == Cloud.device_name else "en %s" % d.device
-	var when := UiKit.label("Guardada el %s %s" % [Cloud.when(d.updated), who], 17, UiKit.TEXT_DIM)
+	var when := UiKit.label(L.t("Guardada el %s %s") % [Cloud.when(d.updated), who], 17, UiKit.TEXT_DIM)
 	when.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(when)
 	var lines := [
-		["Tiempo jugado", SaveData.format_time(d.play_time), d.play_time > other.play_time + 30.0],
-		["Niveles superados", str(d.levels_won.size()), d.levels_won.size() > other.levels_won.size()],
-		["Desafíos superados", str(Challenge.won_count(d)), Challenge.won_count(d) > Challenge.won_count(other)],
+		[L.t("Tiempo jugado"), SaveData.format_time(d.play_time), d.play_time > other.play_time + 30.0],
+		[L.t("Niveles superados"), str(d.levels_won.size()), d.levels_won.size() > other.levels_won.size()],
+		[L.t("Desafíos superados"), str(Challenge.won_count(d)), Challenge.won_count(d) > Challenge.won_count(other)],
 		["Dinero", MenuKit.money(d.money) + " $", d.money > other.money],
-		["Objetos comprados", str(d.items_bought()), d.items_bought() > other.items_bought()],
-		["Compañeros", str(d.pets.size()), d.pets.size() > other.pets.size()]]
+		[L.t("Objetos comprados"), str(d.items_bought()), d.items_bought() > other.items_bought()],
+		[L.t("Compañeros"), str(d.pets.size()), d.pets.size() > other.pets.size()]]
 	for line: Array in lines:
 		var h := HBoxContainer.new()
 		var a := UiKit.label(line[0], 20, UiKit.TEXT_DIM)
@@ -96,8 +96,8 @@ func _card(head: String, d: SaveData, other: SaveData) -> Button:
 func _choose(keep_cloud: bool) -> void:
 	if _busy: return
 	_busy = true
-	var q := MenuKit.Confirm.new("¿Quedarte con la de %s?\n\nLa de %s deja de usarse (queda una copia aparte en la carpeta de partidas de este PC)." % [
-		"la nube" if keep_cloud else "este PC", "este PC" if keep_cloud else "la nube"], "Quedarme con esta", "Cancelar", MenuKit.INK)
+	var q := MenuKit.Confirm.new(L.t("¿Quedarte con la de %s?\n\nLa de %s deja de usarse (queda una copia aparte en la carpeta de partidas de este PC).") % [
+		L.t("la nube") if keep_cloud else L.t("este PC"), L.t("este PC") if keep_cloud else L.t("la nube")], L.t("Quedarme con esta"), "Cancelar", MenuKit.INK)
 	add_child(q)
 	var yes: bool = await q.answered
 	if not yes:

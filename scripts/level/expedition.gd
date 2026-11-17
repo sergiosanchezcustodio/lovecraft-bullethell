@@ -28,7 +28,7 @@ static var _cfg := {}
 
 static func cfg() -> Dictionary:
 	if _cfg.is_empty():
-		var d = JSON.parse_string(FileAccess.get_file_as_string(DATA))
+		var d = L.data(JSON.parse_string(FileAccess.get_file_as_string(DATA)))
 		_cfg = d if d is Dictionary else {}
 	return _cfg
 
@@ -197,7 +197,7 @@ static func make_level(id: String) -> LevelData:
 	var src: LevelData = load("res://data/levels/%s.tres" % base_of(id))
 	var lv: LevelData = src.duplicate()
 	lv.id = StringName(id)
-	lv.display_name = "Expedición · %s · %s" % [String(NAMES.get(kind, kind)), src.display_name]
+	lv.display_name = L.t("Expedición · %s · %s") % [String(NAMES.get(kind, kind)), src.display_name]
 	lv.money_bonus = 0
 	lv.mid_enemies = []
 	lv.mid_times = []
@@ -215,7 +215,7 @@ static func make_level(id: String) -> LevelData:
 			lv.final_next = null
 			lv.final_survive = 12.0                       # al final, una horda corta y se acaba
 			lv.final_rate = 2.0
-			lv.final_name = "los que siguen al buhonero"
+			lv.final_name = L.t("los que siguen al buhonero")
 			var rates: Array[Vector2] = []
 			for v: Vector2 in lv.spawn_rate: rates.append(Vector2(v.x, v.y * 0.4))
 			lv.spawn_rate = rates

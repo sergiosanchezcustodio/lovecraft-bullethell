@@ -148,7 +148,7 @@ func _build() -> void:
 	stage.size = DESIGN
 	add_child(stage)
 	_stage = stage
-	var t := MenuKit.title("Elige a tu investigador", 50)
+	var t := MenuKit.title(L.t("Elige a tu investigador"), 50)
 	t.size = Vector2(DESIGN.x, 70)
 	t.position = Vector2(0, 18)
 	stage.add_child(t)
@@ -164,7 +164,7 @@ func _build() -> void:
 		l.modulate.a = 0.0
 		stage.add_child(l)
 	if Saves.current:
-		var m := UiKit.label("Dinero  %s $" % MenuKit.money(Saves.current.money), 22, UiKit.GOLD)
+		var m := UiKit.label(L.t("Dinero  %s $") % MenuKit.money(Saves.current.money), 22, UiKit.GOLD)
 		m.position = Vector2(DESIGN.x - 260, 22)
 		stage.add_child(m)
 	var total := FRAME.x * 4 + GAP * 3
@@ -173,7 +173,7 @@ func _build() -> void:
 		f.position = Vector2((DESIGN.x - total) * 0.5 + i * (FRAME.x + GAP), TOP)
 		stage.add_child(f)
 		_frames.append(f)
-	var hint := MenuKit.hint("Start o Intro: unirse  ·  Izquierda/derecha: cambiar  ·  Arriba/abajo: ficha o prenda  ·  LB/RB o Q/E: girar  ·  A o Intro: elegir  ·  B o Esc: atrás")
+	var hint := MenuKit.hint(L.t("Start o Intro: unirse  ·  Izquierda/derecha: cambiar  ·  Arriba/abajo: ficha o prenda  ·  LB/RB o Q/E: girar  ·  A o Intro: elegir  ·  B o Esc: atrás"))
 	hint.size = Vector2(DESIGN.x, 30)
 	hint.position = Vector2(0, DESIGN.y - 44)
 	stage.add_child(hint)
@@ -218,7 +218,7 @@ func _show_bond() -> void:
 	if not on: return
 	var b: Dictionary = _bond_list[_bond_i % _bond_list.size()]
 	tw.tween_callback(func() -> void:
-		_bond_head.text = "Vínculo · %s: %s" % [String(b.get("titulo", "")), String(b.get("pareja", ""))]
+		_bond_head.text = L.t("Vínculo · %s: %s") % [String(b.get("titulo", "")), String(b.get("pareja", ""))]
 		_bond_text.text = String(b.get("texto", "")))
 	tw.tween_property(_bond_head, "modulate:a", 1.0, 0.3)
 	if net_select == null: tw.parallel().tween_property(_bond_text, "modulate:a", 1.0, 0.3)   # en red, ahí va la sala
@@ -395,8 +395,8 @@ func _leave_screen() -> void:
 		_back_to_menu()
 		return
 	var host := net_select.is_host()
-	_modal = MenuKit.Confirm.new("¿Cerrar la sala? Los demás volverán al menú." if host else "¿Salir de la sala?",
-		"Cerrar la sala" if host else "Salir")
+	_modal = MenuKit.Confirm.new(L.t("¿Cerrar la sala? Los demás volverán al menú.") if host else L.t("¿Salir de la sala?"),
+		L.t("Cerrar la sala") if host else "Salir")
 	add_child(_modal)
 	_modal.answered.connect(func(yes: bool) -> void:
 		_modal = null
@@ -411,9 +411,9 @@ func _start_net(mine: SelectState.Profile, all_pets: Array) -> void:
 	net_select = NetSelect.new(Net, state, all_pets)
 	net_select.apply_action = _apply
 	net_select.map_changed.connect(func(open: bool) -> void:
-		if not net_select.is_host(): _show_wait("El anfitrión está eligiendo nivel…" if open else ""))
+		if not net_select.is_host(): _show_wait(L.t("El anfitrión está eligiendo nivel…") if open else ""))
 	net_select.late_info.connect(func(where: String, goal: String) -> void:   # quien vuelve: cómo va la partida
-		if Net.late and not _leaving: _show_wait(LATE_WAIT, "Ahora: %s · %s" % [where, goal]))
+		if Net.late and not _leaving: _show_wait(LATE_WAIT, L.t("Ahora: %s · %s") % [where, goal]))
 	net_select.started.connect(func(level_id: String, players: Array) -> void:
 		if not _leaving: _enter(level_id, players))
 	add_child(net_select)
@@ -519,11 +519,11 @@ func _fill_room() -> void:
 		var bits := PackedStringArray()
 		if c.internet != "" and c.lan != "": bits.append("en casa: %s" % c.lan)
 		bits.append(Net.upnp_status)
-		bits.append("Select o C: copiar")
+		bits.append(L.t("Select o C: copiar"))
 		_room_status.text = "  ·  ".join(bits)
 		var others := Net.other_versions()
 		if not others.is_empty():
-			_room_status.text = "No se puede empezar: %s %s otra versión (tú, la v%s)" % [
+			_room_status.text = L.t("No se puede empezar: %s %s otra versión (tú, la v%s)") % [
 				", ".join(others), "tiene" if others.size() == 1 else "tienen", Net.version]
 	else:
 		var host_name := String(Net.peers.get(1, {}).get("name", ""))
@@ -531,10 +531,10 @@ func _fill_room() -> void:
 		_room_code_val.text = ""
 		var ping := int(Net.peers.get(Net.my_id, {}).get("ping", 0))
 		_room_status.text = ("Ping %d ms" % ping) if ping > 0 else ("Conectando…" if Net.state != NetSession.State.CONNECTED else "Midiendo el ping…")
-		if ping > Hud.PlayerPanel.PING_FAIR_MS: _room_status.text += "  ·  conexión lenta: se notará algo de retraso"
+		if ping > Hud.PlayerPanel.PING_FAIR_MS: _room_status.text += L.t("  ·  conexión lenta: se notará algo de retraso")
 		var host_ver := String(Net.peers.get(1, {}).get("ver", Net.version))
 		if host_ver != Net.version:                      # se entienden, pero el juego puede ser otro
-			_room_status.text = "Otra versión (anfitrión v%s, tú v%s): no se puede empezar" % [host_ver, Net.version]
+			_room_status.text = L.t("Otra versión (anfitrión v%s, tú v%s): no se puede empezar") % [host_ver, Net.version]
 	var ids := Net.peers.keys()
 	ids.sort()
 	var names := PackedStringArray()
@@ -543,12 +543,12 @@ func _fill_room() -> void:
 		var who := String(p.name).replace("[", "(") + (" (tú)" if id == Net.my_id else "")
 		var ms := int(p.ping)
 		if id != 1 and ms > 0:                           # con el color de los paneles; lenta, dicho
-			who += " [color=#%s]%d ms%s[/color]" % [Hud.PlayerPanel.ping_color(ms).to_html(false), ms,
-				" (lenta)" if ms > Hud.PlayerPanel.PING_FAIR_MS else ""]
+			who += L.t(" [color=#%s]%d ms%s[/color]") % [Hud.PlayerPanel.ping_color(ms).to_html(false), ms,
+				L.t(" (lenta)") if ms > Hud.PlayerPanel.PING_FAIR_MS else ""]
 		var ver := String(p.get("ver", Net.version))
 		if ver != Net.version: who += " [color=#%s](v%s)[/color]" % [Hud.PlayerPanel.PING_BAD.to_html(false), ver]
 		names.append(who)
-	_room_list.text = "[right]En la sala: %s  ·  v%s[/right]" % ["  ·  ".join(names), Net.version]
+	_room_list.text = L.t("[right]En la sala: %s  ·  v%s[/right]") % ["  ·  ".join(names), Net.version]
 
 func _is_copy(event: InputEvent) -> bool:
 	if event is InputEventJoypadButton:
@@ -563,7 +563,7 @@ func _copy_code() -> void:
 	var code: String = c.internet if c.internet != "" else c.lan
 	if code == "": return
 	DisplayServer.clipboard_set(code)
-	_room_status.text = "Copiado: %s" % code
+	_room_status.text = L.t("Copiado: %s") % code
 
 ## Capturas: jugadores de prueba con dispositivos ficticios.
 func _demo_from_args() -> void:
@@ -710,7 +710,7 @@ class _Frame extends Control:
 		_role = _slot(UiKit.label("", 16, UiKit.TEXT_DIM), 340, 24)
 		_passive = _slot(UiKit.label("", 16, UiKit.TEXT), 364, 50)       # hasta dos líneas
 		_passive.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_sheet_title = _slot(MenuKit.title("Características y habilidades", 22, UiKit.GOLD), 418, 30)
+		_sheet_title = _slot(MenuKit.title(L.t("Características y habilidades"), 22, UiKit.GOLD), 418, 30)
 		var cols := HBoxContainer.new()
 		_sheet_cols = cols
 		cols.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -753,9 +753,9 @@ class _Frame extends Control:
 		_empty.size = Vector2(FRAME.x, 0)
 		_empty.position = Vector2(0, FRAME.y * 0.4)
 		add_child(_empty)
-		var join := MenuKit.title("Pulsa Start", 30, color)
+		var join := MenuKit.title(L.t("Pulsa Start"), 30, color)
 		_empty.add_child(join)
-		var join2 := UiKit.label("para unirte  ·  Intro con el teclado", 18, UiKit.TEXT_DIM)
+		var join2 := UiKit.label(L.t("para unirte  ·  Intro con el teclado"), 18, UiKit.TEXT_DIM)
 		join2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_empty.add_child(join2)
 		# compañero, debajo del marco: título, ◀ nombre ▶, el modelo girando y el estado
@@ -765,7 +765,7 @@ class _Frame extends Control:
 		add_child(_pet)
 		MenuKit.dress(_pet, MenuKit.BRASS, Vector2.ZERO, 60.0)
 		# todo entre los 20 px de arriba y de abajo: el filete fino va a 15-17 px del borde
-		_pet_title = MenuKit.title("Elige compañero", 22, UiKit.GOLD)
+		_pet_title = MenuKit.title(L.t("Elige compañero"), 22, UiKit.GOLD)
 		_pet_title.size = Vector2(FRAME.x, 30)
 		_pet_title.position = Vector2(0, 18)
 		_pet.add_child(_pet_title)
@@ -921,15 +921,15 @@ class _Frame extends Control:
 		var alt_a := _portrait_alt.modulate.a
 		_portrait_alt.modulate = Color(_view.modulate, alt_a)
 		_name.text = c.display_name if not hidden else "???"
-		_role.text = c.role if not hidden else "Investigador secreto"
+		_role.text = c.role if not hidden else L.t("Investigador secreto")
 		var wd: WeaponData = null
 		if not c.starting_weapons.is_empty(): wd = load("res://data/weapons/%s.tres" % c.starting_weapons[0])
 		if hidden: wd = null
-		_weapon.set_icon(wd.get_icon() if wd else null, wd.display_name if wd else ("???" if hidden else "Sin arma"), wd.description if wd else "")
-		_passive.text = "Rasgo: " + (c.passive_text if not hidden else "???")
+		_weapon.set_icon(wd.get_icon() if wd else null, wd.display_name if wd else ("???" if hidden else L.t("Sin arma")), wd.description if wd else "")
+		_passive.text = L.t("Rasgo: ") + (c.passive_text if not hidden else "???")
 		var rec := Endless.best_of(Auto.save(), String(c.id))
-		_record.text = "Noche eterna
-%s" % Endless.clock(rec) if rec > 0.0 else ""
+		_record.text = L.t("Noche eterna
+%s") % Endless.clock(rec) if rec > 0.0 else ""
 		_fit_line(_name, 32, 24)
 		_fit_line(_role, 16, 13)
 		var at := Attributes.initial(c)
@@ -941,7 +941,7 @@ class _Frame extends Control:
 			var uses := PackedStringArray()
 			for fs in Attributes.FORMULAS:
 				if n in Attributes.FORMULAS[fs]: uses.append(String(STAT_NAMES[fs]).to_lower())
-			(cell["icon"] as TipIcon).set_icon(load(ICONS % n), Attributes.LONG[n], "%s\nSube: %s." % [Attributes.DESC[n], ", ".join(uses)])
+			(cell["icon"] as TipIcon).set_icon(load(ICONS % n), Attributes.LONG[n], L.t("%s\nSube: %s.") % [Attributes.DESC[n], ", ".join(uses)])
 		for n in STAT_ROWS:
 			var sk: String = STAT_KEYS[n]
 			var m := Attributes.mult(at, sk)
@@ -951,51 +951,51 @@ class _Frame extends Control:
 			match sk:
 				"health":
 					l.text = str(roundi(c.max_health * m))
-					text = "Puntos de vida al empezar."
+					text = L.t("Puntos de vida al empezar.")
 				"sanity":
 					l.text = str(roundi(c.max_sanity * m))
-					text = "Cordura al empezar. A cero, crisis de parálisis."
+					text = L.t("Cordura al empezar. A cero, crisis de parálisis.")
 				"dodge":
 					l.text = _bonus(m / c.dodge_cooldown_mult)
-					text = "Rapidez con la que se recarga el esquive."
+					text = L.t("Rapidez con la que se recarga el esquive.")
 				"speed":
 					l.text = _bonus(m)
-					text = "Velocidad al andar."
+					text = L.t("Velocidad al andar.")
 				"magic":
 					l.text = _bonus(m)
-					text = "Daño de las armas arcanas y de los Mitos."
+					text = L.t("Daño de las armas arcanas y de los Mitos.")
 				"physical":
 					l.text = _bonus(m)
-					text = "Daño de las armas cuerpo a cuerpo y lanzadas."
+					text = L.t("Daño de las armas cuerpo a cuerpo y lanzadas.")
 				"firearm":
 					l.text = _bonus(m)
-					text = "Daño de las armas de fuego."
+					text = L.t("Daño de las armas de fuego.")
 			l.add_theme_color_override("font_color", UiKit.TEXT_DIM if l.text == "+0 %" else UiKit.GOLD)
 			(cell["icon"] as TipIcon).set_icon(load(ICONS % n), STAT_NAMES[sk], "%s (%s)." % [text.trim_suffix("."), _pair(sk)])
 		var choosing := seat.stage == SelectState.Stage.CHARACTER
 		for a in _arrows: a.visible = choosing and st.choices(index).size() > 1
 		match seat.stage:
 			SelectState.Stage.CHARACTER:
-				if holder >= 0: _status.text = "Lo lleva J%d" % (holder + 1)
+				if holder >= 0: _status.text = L.t("Lo lleva J%d") % (holder + 1)
 				elif locked and not Demo.character_ok(c): _status.text = Demo.LOCKED
 				elif hidden: _status.text = Secrets.hint(Auto.save(), c)
-				elif locked: _status.text = "Se compra en la tienda (%s)" % MenuKit.money(c.price)
-				else: _status.text = "A: elegir"
+				elif locked: _status.text = L.t("Se compra en la tienda (%s)") % MenuKit.money(c.price)
+				else: _status.text = L.t("A: elegir")
 				_status.add_theme_color_override("font_color", MenuKit.DANGER if unavailable else UiKit.TEXT_DIM)
 			SelectState.Stage.OUTFIT:
-				_status.text = "Vestuario · A: confirmar"
+				_status.text = L.t("Vestuario · A: confirmar")
 				_status.add_theme_color_override("font_color", color)
 			SelectState.Stage.PET:
-				_status.text = "A: confirmar"
+				_status.text = L.t("A: confirmar")
 				_status.add_theme_color_override("font_color", color)
 			SelectState.Stage.READY:
-				_status.text = "¡Listo!"
+				_status.text = L.t("¡Listo!")
 				_status.add_theme_color_override("font_color", color)
 		_paint_outfit(seat, color)
 		var pets := st.pets_of(index)
 		var pet: PetData = pets[seat.pet] if seat.pet < pets.size() else null
 		var picking := seat.stage == SelectState.Stage.PET
-		_pet_name.text = pet.display_name if pet else "Sin compañero"
+		_pet_name.text = pet.display_name if pet else L.t("Sin compañero")
 		for a in _pet_arrows: a.visible = picking and pets.size() > 1
 		_pet_view.set_model(pet.model if pet else "")
 		_pet_note.text = "" if pet else ("Se consiguen en la tienda" if pets.size() == 1 else "Irás solo")

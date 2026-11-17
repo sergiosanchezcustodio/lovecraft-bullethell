@@ -43,7 +43,7 @@ static func plays(who: String, la: LaunchArgs = null) -> bool:
 	return la != null and la.get_str("character", "") == who
 
 static func has_relato(level_id: String) -> bool:
-	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json"))
+	var d: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json")))
 	return d is Dictionary and (d as Dictionary).has(level_id)
 
 func _ready() -> void:
@@ -53,7 +53,7 @@ func _ready() -> void:
 	_go_at = la.get_float("relato_go", -1.0)
 	var id := la.get_str("level", String(GameSession.level)) if la.has("level") else String(GameSession.level)
 	var fill: Dictionary = {}
-	if la.has("epilogue"): next = {"id": la.get_str("epilogue"), "fill": {"nombre": la.get_str("nombre", "William Dyer")}, "menu": true}   # capturas
+	if la.has("epilogue"): next = {"id": la.get_str("epilogue"), "fill": {"nombre": la.get_str("nombre", L.t("William Dyer"))}, "menu": true}   # capturas
 	if not next.is_empty():
 		id = String(next.id)
 		fill = next.get("fill", {})
@@ -62,7 +62,7 @@ func _ready() -> void:
 	if Expedition.is_map(id):                             # expedición (16.21): entre nivel y nivel, su mapa
 		get_tree().change_scene_to_file.call_deferred(Expedition.SCENE)
 		return
-	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json"))
+	var d: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json")))
 	if not (d is Dictionary) or not (d as Dictionary).has(id) or la.get_bool("skip_relato"):   # pruebas: skip_relato=true
 		_go()
 		return
@@ -99,16 +99,16 @@ func _ready() -> void:
 		if String(lv.get("id", "")) == id: info = lv
 	var part := int(id.substr(1, 1)); var num := int(id.substr(4, 1))
 	if id == Demo.END_RELATO:                            # la demo (13.17): lo que viene después
-		box.add_child(MenuKit.title("Fin de la demo", 26, Color(0.75, 0.68, 0.52)))
-		box.add_child(MenuKit.title("Continúa en el juego completo", 46))
+		box.add_child(MenuKit.title(L.t("Fin de la demo"), 26, Color(0.75, 0.68, 0.52)))
+		box.add_child(MenuKit.title(L.t("Continúa en el juego completo"), 46))
 	elif Nights.is_night(id):                            # noche suelta (fase 21, bloque D)
-		box.add_child(MenuKit.title("Noche suelta · " + String(Nights.find(id).get("lugar", "")), 26, Color(0.75, 0.68, 0.52)))
+		box.add_child(MenuKit.title(L.t("Noche suelta · ") + String(Nights.find(id).get("lugar", "")), 26, Color(0.75, 0.68, 0.52)))
 		box.add_child(MenuKit.title(String(Nights.find(id).get("titulo", "")), 46))
 	elif id.begins_with("epilogo"):
-		box.add_child(MenuKit.title("Epílogo", 26, Color(0.75, 0.68, 0.52)))
-		box.add_child(MenuKit.title(String(EPILOGUE_TITLES.get(id, "Lo que vino después")), 46))
+		box.add_child(MenuKit.title(L.t("Epílogo"), 26, Color(0.75, 0.68, 0.52)))
+		box.add_child(MenuKit.title(String(EPILOGUE_TITLES.get(id, L.t("Lo que vino después"))), 46))
 	else:
-		box.add_child(MenuKit.title("Parte %d · Nivel %d" % [part, num], 26, Color(0.75, 0.68, 0.52)))
+		box.add_child(MenuKit.title(L.t("Parte %d · Nivel %d") % [part, num], 26, Color(0.75, 0.68, 0.52)))
 		box.add_child(MenuKit.title(String(info.get("name", "")), 46))
 	var sep := HSeparator.new()
 	sep.modulate = Color(MenuKit.INK, 0.4)
@@ -123,7 +123,7 @@ func _ready() -> void:
 		l.modulate.a = 0.0
 		box.add_child(l)
 		_lines.append(l)
-	var hint := UiKit.label("Pulsa para seguir · mantén pulsado para saltar", 18, Color(0.7, 0.66, 0.56, 0.6))
+	var hint := UiKit.label(L.t("Pulsa para seguir · mantén pulsado para saltar"), 18, Color(0.7, 0.66, 0.56, 0.6))
 	hint.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	hint.position = Vector2(-260, -56)
 	hint.size = Vector2(520, 30)

@@ -5,7 +5,8 @@ extends Resource
 ## parte el evento final es el jefe; en los demás, una élite y una última oleada.
 
 @export var id := &"p1_n1"
-@export var display_name := "Campamento base en la costa del mar de Ross"
+@export var display_name := "Campamento base en la costa del mar de Ross":
+	get: return L.t(display_name)          # en el idioma elegido (hito 22.4)
 @export var part := 1
 @export var number := 1                        ## N: aparecen enemigos de escalón 1..N
 @export var arena := "res://data/arenas/campamento.json"
@@ -30,7 +31,8 @@ extends Resource
 @export var final_wave := 25                   ## enemigos extra que acompañan al evento
 @export var final_spawn_scale := 0.3           ## tras el evento, el ritmo normal se multiplica por esto
                                                ## (el duelo con la élite no debe ahogarse en la horda)
-@export var final_text := "Algo acecha entre las tiendas…"
+@export var final_text := "Algo acecha entre las tiendas…":
+	get: return L.t(final_text)          # en el idioma elegido (hito 22.4)
 ## Evento de supervivencia (hito 6.3, la horda del Arrecife): si final_survive > 0, al llegar a
 ## final_time no aparece un ser único; llega una horda durante final_survive s (final_rate
 ## enemigos/s, de final_pool o, vacío, del pool del nivel, hasta final_cap vivos; 0 = max_alive)
@@ -39,14 +41,16 @@ extends Resource
 @export var final_rate := 3.0
 @export var final_cap := 0
 @export var final_pool: Array[EnemyData] = []
-@export var final_name := "la horda"           ## para el HUD: "Resiste a la horda · 0:42"
+@export var final_name := "la horda":           ## para el HUD: "Resiste a la horda · 0:42"
+	get: return L.t(final_name)          # en el idioma elegido (hito 22.4)
 
 func is_survival() -> bool:
 	return final_survive > 0.0
 ## Jefe que sale al morir el enemigo final (hito 6.6, Padre Dagon tras Madre Hydra): el nivel
 ## se supera al matarlo a él.
 @export var final_next: EnemyData
-@export var final_next_text := ""
+@export var final_next_text := "":
+	get: return L.t(final_next_text)          # en el idioma elegido (hito 22.4)
 @export_group("Peligros del escenario")
 ## Ángulos devoradores (hito 7.4; Hazards): 0 en angle_every, sin ellos.
 @export var angle_every := 0.0

@@ -31,7 +31,7 @@ var _mat: StandardMaterial3D
 
 static func defs() -> Dictionary:
 	if _defs.is_empty():
-		var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+		var d: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string(PATH)))
 		_defs = d if d is Dictionary else {"vinculos": []}
 	return _defs
 

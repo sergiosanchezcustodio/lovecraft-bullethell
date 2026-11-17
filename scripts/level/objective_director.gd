@@ -31,7 +31,7 @@ func setup(p_game: Node) -> ObjectiveDirector:
 	game = p_game
 	name = "Objectives"
 	var f := FileAccess.get_file_as_string(DATA)
-	var d = JSON.parse_string(f) if f != "" else null
+	var d = L.data(JSON.parse_string(f)) if f != "" else null
 	cfg = d if d is Dictionary else {}
 	_rng.randomize()
 	var args = game.get("args")
@@ -214,30 +214,30 @@ func adopt(o: Objective) -> void:
 		o.price_mult = 1.0 + float(pc.get("part_price", 0.6)) * ((level.part if level != null else 1) - 1)
 		o.buy_hook = game.peddler_buy
 		o.purse_hook = game.purse
-		game.announce("Ha llegado el buhonero: %s" % String(vendor(pc)[1]), 3.0)
+		game.announce(L.t("Ha llegado el buhonero: %s") % String(vendor(pc)[1]), 3.0)
 		Auto.sfx("bell")
 		if game.args.get_bool("log"): print("BUHONERO %s t=%.0f" % [o.model_name, (game.director as WaveDirector).time])
 		return
-	game.announce("Objetivo: %s (recompensa: %s)" % [_title(o.kind), Objective.reward_text(o.reward)], 3.0)
+	game.announce(L.t("Objetivo: %s (recompensa: %s)") % [_title(o.kind), Objective.reward_text(o.reward)], 3.0)
 	Auto.sfx("page")
 	if game.args.get_bool("log"): print("OBJETIVO %s t=%.0f recompensa=%s" % [o.kind, (game.director as WaveDirector).time, o.reward])
 
 func _title(kind: String) -> String:
-	return {"rescue": "rescata al superviviente", "ritual": "corta el ritual", "relic": "lleva la reliquia"}.get(kind, kind)
+	return {"rescue": L.t("rescata al superviviente"), "ritual": L.t("corta el ritual"), "relic": L.t("lleva la reliquia")}.get(kind, kind)
 
 func _on_finished(o: Objective, ok: bool) -> void:
 	if o == current: current = null
 	_hud.show_objective(null)
 	if game.args.get_bool("log"): print("OBJETIVO %s %s t=%.1f" % [o.kind, "cumplido" if ok else "fallido", o.t])
 	if o.kind == "peddler":
-		game.announce("El buhonero se ha ido", 2.0)
+		game.announce(L.t("El buhonero se ha ido"), 2.0)
 		return
 	if not ok:
 		failed += 1
-		game.announce("Objetivo fallido", 2.0)
+		game.announce(L.t("Objetivo fallido"), 2.0)
 		return
 	done += 1
-	game.announce("Objetivo cumplido: %s" % Objective.reward_text(o.reward), 2.5)
+	game.announce(L.t("Objetivo cumplido: %s") % Objective.reward_text(o.reward), 2.5)
 	Auto.sfx("level_up")
 	var at := o.b if o.kind != "ritual" else o.a
 	match String(o.reward[0]):

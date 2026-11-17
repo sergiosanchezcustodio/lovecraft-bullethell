@@ -28,7 +28,7 @@ func _init() -> void:
 
 static func data() -> Dictionary:
 	if _data.is_empty():
-		var d = JSON.parse_string(FileAccess.get_file_as_string(DATA))
+		var d = L.data(JSON.parse_string(FileAccess.get_file_as_string(DATA)))
 		_data = d if d is Dictionary else {}
 	return _data
 
@@ -143,7 +143,7 @@ func _take(q: Player) -> void:
 	Auto.sfx("page")
 	var game := get_tree().current_scene
 	if game != null and game.has_method("announce"):
-		game.call("announce", "J%d encuentra una página: «%s» (%d de %d)" % [q.index + 1, String(p.story.title), maxi(n, p.index + 1),
+		game.call("announce", L.t("J%d encuentra una página: «%s» (%d de %d)") % [q.index + 1, String(p.story.title), maxi(n, p.index + 1),
 			(p.story.pages as Array).size()], 3.0)
 	var tw := create_tween().set_parallel(true)
 	tw.tween_property(_paper, "position:y", 2.2, 0.8).set_trans(Tween.TRANS_SINE)

@@ -67,9 +67,9 @@ static func all(save: SaveData, case := -1) -> Array[Dictionary]:
 			var done := all_open or (save != null and OutfitSets.is_complete(save, s))
 			var facts: Array[String] = []
 			var won := OutfitSets.levels_with(save, OutfitSets.as_worn(s))
-			if won > 0: facts.append(MenuKit.count(won, "nivel superado", "niveles superados") + " con él puesto")
-			elif done: facts.append("Aún sin estrenar en una partida")
-			out.append(_t(0, String(s.id), String(s.name), "Conjunto del vestuario", String(s.get("shown", "dyer")),
+			if won > 0: facts.append(MenuKit.count(won, L.t("nivel superado"), L.t("niveles superados")) + L.t(" con él puesto"))
+			elif done: facts.append(L.t("Aún sin estrenar en una partida"))
+			out.append(_t(0, String(s.id), String(s.name), L.t("Conjunto del vestuario"), String(s.get("shown", "dyer")),
 				OutfitSets.as_worn(s), done, String(s.description), facts))
 	if case < 0 or case == 1:
 		for e in bosses():
@@ -77,15 +77,15 @@ static func all(save: SaveData, case := -1) -> Array[Dictionary]:
 			var n := int(r.get("kills", 0))
 			var facts: Array[String] = []
 			var kf := Library.kill_facts(save, String(e.id))
-			if n > 0: facts.append("Vencido " + MenuKit.count(n, "vez", "veces"))
+			if n > 0: facts.append(L.t("Vencido ") + MenuKit.count(n, "vez", "veces"))
 			if kf.size() > 1: facts.append(String(kf[1]))
-			out.append(_t(1, String(e.id), e.display_name, "Jefe" if e.tier >= 5 else "Jefe intermedio", e.model, {},
+			out.append(_t(1, String(e.id), e.display_name, "Jefe" if e.tier >= 5 else L.t("Jefe intermedio"), e.model, {},
 				all_open or n > 0, _first_sentence(Library.text("enemies", String(e.id))), facts))
 	if case < 0 or case == 2:
 		for a in big_achievements():
-			var facts: Array[String] = ["Recompensa: " + Achievements.reward_text(a)]
+			var facts: Array[String] = [L.t("Recompensa: ") + Achievements.reward_text(a)]
 			var done := all_open or Achievements.is_done(save, a)
-			if not done and a.target > 1: facts.append("Llevas %s de %s" % [MenuKit.money(mini(Achievements.value(save, a), a.target)), MenuKit.money(a.target)])
+			if not done and a.target > 1: facts.append(L.t("Llevas %s de %s") % [MenuKit.money(mini(Achievements.value(save, a), a.target)), MenuKit.money(a.target)])
 			out.append(_t(2, String(a.id), a.display_name, "Logro", String(ACHIEVEMENT_MODELS.get(String(a.id), "trofeo_copa")), {},
 				done, a.description, facts))
 	return out

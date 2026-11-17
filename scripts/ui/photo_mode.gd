@@ -74,7 +74,7 @@ func _ready() -> void:
 	_env = game.get("_env") as Environment
 	if _env != null:
 		_env_saved = {"on": _env.adjustment_enabled, "cc": _env.adjustment_color_correction, "sat": _env.adjustment_saturation}
-	_grades = [["La de la partida", null], ["Sin gradación", {}]]
+	_grades = [[L.t("La de la partida"), null], [L.t("Sin gradación"), {}]]
 	for k in ["p1", "p2", "p3"]:
 		var g := Atmosphere.grade_for(k)
 		if not g.is_empty(): _grades.append([String(g.get("name", k)).get_slice(",", 0), g])
@@ -274,19 +274,19 @@ func _build_ui() -> void:
 	box.add_theme_constant_override("separation", 4)
 	box.custom_minimum_size = Vector2(560, 0)
 	_panel.add_child(box)
-	MenuKit.heading(box, "Modo foto", 36, ACCENT)
+	MenuKit.heading(box, L.t("Modo foto"), 36, ACCENT)
 	var rows: Array[OptionRow] = []
 	var gn: Array[String] = []
 	for g in _grades: gn.append(String(g[0]))
-	rows.append(OptionRow.new("Gradación", gn, grade, func(i: int) -> void: grade = i; _apply_grade(), Callable(), ACCENT))
-	rows.append(OptionRow.new("Profundidad de campo", DOF_NAMES, dof, func(i: int) -> void: dof = i; _apply_dof(), Callable(), ACCENT))
-	rows.append(OptionRow.new("Viñeta", VIGNETTE_NAMES, vignette, func(i: int) -> void: vignette = i; _apply_vignette(), Callable(), ACCENT))
-	rows.append(OptionRow.new("Proyección", ["Isométrica", "Perspectiva"] as Array[String], 1 if persp else 0,
+	rows.append(OptionRow.new(L.t("Gradación"), gn, grade, func(i: int) -> void: grade = i; _apply_grade(), Callable(), ACCENT))
+	rows.append(OptionRow.new(L.t("Profundidad de campo"), DOF_NAMES, dof, func(i: int) -> void: dof = i; _apply_dof(), Callable(), ACCENT))
+	rows.append(OptionRow.new(L.t("Viñeta"), VIGNETTE_NAMES, vignette, func(i: int) -> void: vignette = i; _apply_vignette(), Callable(), ACCENT))
+	rows.append(OptionRow.new(L.t("Proyección"), [L.t("Isométrica"), "Perspectiva"] as Array[String], 1 if persp else 0,
 		func(i: int) -> void: persp = i == 1; _place(), Callable(), ACCENT))
-	rows.append(OptionRow.new("Investigadores", ["A la vista", "Sin anillos", "Ocultos"] as Array[String], hide_players,
+	rows.append(OptionRow.new("Investigadores", [L.t("A la vista"), L.t("Sin anillos"), "Ocultos"] as Array[String], hide_players,
 		func(i: int) -> void: hide_players = i; _apply_hide(), Callable(), ACCENT))
-	rows.append(OptionRow.new("Volver a la vista del juego", [] as Array[String], 0, Callable(), _reset_view, ACCENT))
-	rows.append(OptionRow.new("Abrir la carpeta de fotos", [] as Array[String], 0, Callable(),
+	rows.append(OptionRow.new(L.t("Volver a la vista del juego"), [] as Array[String], 0, Callable(), _reset_view, ACCENT))
+	rows.append(OptionRow.new(L.t("Abrir la carpeta de fotos"), [] as Array[String], 0, Callable(),
 		func() -> void: OS.shell_open(ProjectSettings.globalize_path(photo_dir())), ACCENT))
 	for r in rows:
 		r.focus_mode = Control.FOCUS_ALL
@@ -294,7 +294,7 @@ func _build_ui() -> void:
 	_note = UiKit.label("", 16, ACCENT)
 	_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_note)
-	_hint = UiKit.label("Mover: stick izq. / WASD  ·  Girar e inclinar: stick der. / Q-E, R-F\nAcercar: LT-RT / Z-X / rueda  ·  A / Espacio: foto  ·  Y / Tab: ocultar el panel\nB / Esc: a la pausa  ·  Start: a jugar", 15, UiKit.TEXT_DIM)
+	_hint = UiKit.label(L.t("Mover: stick izq. / WASD  ·  Girar e inclinar: stick der. / Q-E, R-F\nAcercar: LT-RT / Z-X / rueda  ·  A / Espacio: foto  ·  Y / Tab: ocultar el panel\nB / Esc: a la pausa  ·  Start: a jugar"), 15, UiKit.TEXT_DIM)
 	box.add_child(_hint)
 	MenuKit.dress(_panel, MenuKit.BRASS, Vector2(30, 22), 90.0)
 	_panel.resized.connect(func() -> void: _panel.position = Vector2(40, get_viewport().get_visible_rect().size.y - _panel.size.y - 40))

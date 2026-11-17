@@ -13,8 +13,8 @@ func _ready() -> void:
 	var col_w := 390.0 if four else 460.0
 	var w: Array = MenuKit.window(self, Color(0.3, 0.25, 0.55), 1720 if four else 1500)
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "La noche eterna", 48, Color(0.72, 0.62, 1.0))
-	var sub := UiKit.label("Elige escenario. Oleadas sin final con criaturas de todas las partes, un horror cada cinco minutos y cada vez más duro.", 19, UiKit.TEXT_DIM)
+	MenuKit.heading(box, L.t("La noche eterna"), 48, Color(0.72, 0.62, 1.0))
+	var sub := UiKit.label(L.t("Elige escenario. Oleadas sin final con criaturas de todas las partes, un horror cada cinco minutos y cada vez más duro."), 19, UiKit.TEXT_DIM)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	sub.custom_minimum_size.x = 1300
@@ -39,7 +39,7 @@ func _ready() -> void:
 		for l: Dictionary in Campaign.levels().filter(func(e: Dictionary) -> bool: return e.part == pi):
 			var id := String(l.id)
 			var rec := best_any(Saves.current, id)
-			var b := MenuKit.button("%d.  %s%s" % [l.number, l.name, ("\nRécord %s" % Endless.clock(rec)) if rec > 0.0 else ""], MenuKit.INK, 18)
+			var b := MenuKit.button("%d.  %s%s" % [l.number, l.name, (L.t("\nRécord %s") % Endless.clock(rec)) if rec > 0.0 else ""], MenuKit.INK, 18)
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			b.custom_minimum_size = Vector2(col_w, 70)
@@ -56,7 +56,7 @@ func _ready() -> void:
 			var b: Button = grid[c][r]
 			if c > 0: b.focus_neighbor_left = b.get_path_to(grid[c - 1][mini(r, grid[c - 1].size() - 1)])
 			if c < grid.size() - 1: b.focus_neighbor_right = b.get_path_to(grid[c + 1][mini(r, grid[c + 1].size() - 1)])
-	box.add_child(MenuKit.hint("A o Intro: elegir  ·  B o Esc: volver al mapa"))
+	box.add_child(MenuKit.hint(L.t("A o Intro: elegir  ·  B o Esc: volver al mapa")))
 	if not grid.is_empty() and not (grid[0] as Array).is_empty(): (grid[0][0] as Control).grab_focus.call_deferred()
 
 ## Mejor tiempo en ese escenario con cualquier personaje.

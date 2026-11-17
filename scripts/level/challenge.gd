@@ -16,7 +16,7 @@ static var _fx := {}                           ## efectos del desafío en juego 
 static func _load() -> void:
 	if not _data.is_empty(): return
 	var f := FileAccess.get_file_as_string(DATA)
-	var d = JSON.parse_string(f) if f != "" else null
+	var d = L.data(JSON.parse_string(f)) if f != "" else null
 	_data = d if d is Dictionary else {"challenges": []}
 
 static func all() -> Array:
@@ -75,7 +75,7 @@ static func make_level(id: String) -> LevelData:
 	var src: LevelData = load("res://data/levels/%s.tres" % base_of(id))
 	var lv: LevelData = src.duplicate()
 	lv.id = StringName(id)
-	lv.display_name = "Desafío · %s" % String(find(id).get("name", src.display_name))
+	lv.display_name = L.t("Desafío · %s") % String(find(id).get("name", src.display_name))
 	return lv
 
 ## Activa los efectos del nivel que empieza (vacío si no es un desafío).

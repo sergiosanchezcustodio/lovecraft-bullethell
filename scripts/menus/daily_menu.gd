@@ -19,7 +19,7 @@ func _ready() -> void:
 	var save := Auto.save()
 	var w: Array = MenuKit.window(self, Color(0.55, 0.42, 0.2), 1100)
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "La partida del día", 46)
+	MenuKit.heading(box, L.t("La partida del día"), 46)
 	box.add_child(_center(UiKit.label(_cap(Daily.pretty(date)), 22, UiKit.TEXT_DIM)))
 	var grid := GridContainer.new()
 	grid.columns = 2
@@ -37,27 +37,27 @@ func _ready() -> void:
 		grid.add_child(k)
 		grid.add_child(UiKit.label(String(row[1]), 20, MenuKit.INK))
 	var r := Daily.result(save, date)
-	var mine := "Aún no la has jugado: el primer intento es el que cuenta." if r.is_empty() \
-		else "Tu intento: %s · %d bajas" % [Endless.clock(float(r.t)), int(r.kills)]
+	var mine := L.t("Aún no la has jugado: el primer intento es el que cuenta.") if r.is_empty() \
+		else L.t("Tu intento: %s · %d bajas") % [Endless.clock(float(r.t)), int(r.kills)]
 	box.add_child(_center(UiKit.label(mine, 21, UiKit.TEXT)))
 	var st := Daily.streak(save, date)
 	box.add_child(_center(UiKit.label("Racha: %d %s  ·  la mejor: %d" % [st, "día" if st == 1 else "días", Daily.best_streak(save)], 19, UiKit.TEXT_DIM)))
 	if not r.is_empty():
-		box.add_child(_center(UiKit.label("Tu código: %s" % Daily.encode(date, float(r.t), int(r.kills), String(r.character), int(r.get("players", 1))), 19, UiKit.TEXT_DIM)))
+		box.add_child(_center(UiKit.label(L.t("Tu código: %s") % Daily.encode(date, float(r.t), int(r.kills), String(r.character), int(r.get("players", 1))), 19, UiKit.TEXT_DIM)))
 	_friends = VBoxContainer.new()
 	_friends.add_theme_constant_override("separation", 2)
 	box.add_child(_friends)
 	_fill_friends()
 	_note = _center(UiKit.label("", 18, UiKit.TEXT_DIM))
 	box.add_child(_note)
-	var b_play := MenuKit.button("Jugar" if r.is_empty() else "Jugar (práctica)", MenuKit.INK, 26)
+	var b_play := MenuKit.button("Jugar" if r.is_empty() else L.t("Jugar (práctica)"), MenuKit.INK, 26)
 	b_play.custom_minimum_size = Vector2(520, 58)
 	b_play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b_play.pressed.connect(func() -> void:
 		play.emit(Daily.id_for(date))
 		queue_free())
 	box.add_child(b_play)
-	box.add_child(_center(UiKit.label("Código de un amigo", 19, UiKit.TEXT_DIM)))
+	box.add_child(_center(UiKit.label(L.t("Código de un amigo"), 19, UiKit.TEXT_DIM)))
 	_picker = RoomCodePicker.new(12, Daily.ALPHABET)   # con el mando, letra a letra (o X para pegar)
 	_picker.submitted.connect(_compare)
 	box.add_child(_picker)
@@ -68,7 +68,7 @@ func _ready() -> void:
 	box.add_child(b_cmp)
 	b_play.focus_neighbor_bottom = b_play.get_path_to(_picker)
 	b_cmp.focus_neighbor_top = b_cmp.get_path_to(_picker)
-	box.add_child(MenuKit.hint("Casillas: cruceta o teclado para las letras · X o Ctrl+V: pegar · A: comparar (vacías: lo que haya en el portapapeles)  ·  B o Esc: volver"))
+	box.add_child(MenuKit.hint(L.t("Casillas: cruceta o teclado para las letras · X o Ctrl+V: pegar · A: comparar (vacías: lo que haya en el portapapeles)  ·  B o Esc: volver")))
 	b_play.grab_focus.call_deferred()
 	var la := LaunchArgs.from_cmdline()               # capturas: daily_code=7K2M-QX4A-90BD
 	if la.has("daily_code"): _compare_code.call_deferred(la.get_str("daily_code"))
@@ -98,10 +98,10 @@ func _compare() -> void:
 func _compare_code(code: String) -> void:
 	var d := Daily.decode(code)
 	if d.is_empty():
-		_note.text = "No es un código válido (12 letras, como 7K2M-QX4A-90BD): revisa las letras."
+		_note.text = L.t("No es un código válido (12 letras, como 7K2M-QX4A-90BD): revisa las letras.")
 		return
 	if String(d.date) != date:
-		_note.text = "Ese código es de la partida del %s, no de la de hoy." % Daily.pretty(String(d.date), false)
+		_note.text = L.t("Ese código es de la partida del %s, no de la de hoy.") % Daily.pretty(String(d.date), false)
 		return
 	Daily.add_friend(Auto.save(), d)
 	if Auto.save() != null: Auto.node("Saves").call("save")
@@ -114,11 +114,11 @@ func _fill_friends() -> void:
 	for code: String in Daily.friends(Auto.save(), date):
 		var d := Daily.decode(code)
 		if d.is_empty(): continue
-		var line := "Amigo (%s%s): %s · %d bajas" % [_res_name("characters", String(d.character)),
-			", %d jugadores" % d.players if int(d.players) > 1 else "", Endless.clock(float(d.t)), int(d.kills)]
+		var line := L.t("Amigo (%s%s): %s · %d bajas") % [_res_name("characters", String(d.character)),
+			L.t(", %d jugadores") % d.players if int(d.players) > 1 else "", Endless.clock(float(d.t)), int(d.kills)]
 		if not mine.is_empty():
 			var diff := float(mine.t) - float(d.t)
-			line += "  —  " + ("le sacas %s" % Endless.clock(diff) if diff > 0.0 else ("te saca %s" % Endless.clock(-diff) if diff < 0.0 else "empate"))
+			line += "  —  " + (L.t("le sacas %s") % Endless.clock(diff) if diff > 0.0 else (L.t("te saca %s") % Endless.clock(-diff) if diff < 0.0 else "empate"))
 		_friends.add_child(_center(UiKit.label(line, 19, Color(0.85, 0.78, 0.62))))
 
 func _unhandled_input(event: InputEvent) -> void:

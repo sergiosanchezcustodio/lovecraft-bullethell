@@ -60,7 +60,7 @@ func _ready() -> void:
 	_vp.add_child(we)
 	_name = MenuKit.title("", 24, UiKit.TEXT)
 	box.add_child(_name)
-	box.add_child(MenuKit.hint("X o R: otro investigador"))
+	box.add_child(MenuKit.hint(L.t("X o R: otro investigador")))
 	MenuKit.dress(self, MenuKit.BRASS, Vector2(34, 30), 110.0)   # después: mete lo de dentro en su margen
 	for c: CharacterData in DebugOptions.list_resources("res://data/characters"):
 		if Demo.character_ok(c): _chars.append(c)

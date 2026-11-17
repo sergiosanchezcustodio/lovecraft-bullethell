@@ -13,7 +13,7 @@ static var _sets: Array = []
 ## Todos los conjuntos: {id, name, description, pieces: {hueco: prenda}}.
 static func all() -> Array:
 	if _sets.is_empty():
-		var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+		var d: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string(PATH)))
 		if d is Dictionary: _sets = (d as Dictionary).get("sets", [])
 	return _sets
 

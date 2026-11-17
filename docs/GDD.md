@@ -717,4 +717,4 @@ Detectados al redactar este documento. Se avisan en lugar de resolverlos (regla 
 6. **Vial de reactivo de West:** es un "objeto raro", pero no hay sistema de objetos o botín aparte de la experiencia. Hay que definir cómo se obtiene antes de implementarlo. No bloquea las fases 1 y 2.
 7. **Modelos de los demás personajes:** la fase 5 trae la selección de personaje, pero ninguna fase asigna el modelado de Legrasse, Johansen, Armitage y West. No bloquea las fases 1 y 2.
 
-- **D-54 — Otro idioma (fase 22, bloque B, 16-11-2026).** *Abierta:* ¿traducir el juego al inglés antes de publicarlo en itch.io? Recomendación: sí, al menos la interfaz, el manual y los consejos; los relatos y las fichas de la Biblioteca, si da tiempo. Bloquea los hitos 22.4 y 22.5.
+- **D-54 — Otro idioma (fase 22, bloque B, 16-11-2026).** *Resuelta el 17-11-2026: sí, todo (interfaz, manual, consejos, relatos y Biblioteca).* Pregunta original: ¿traducir el juego al inglés antes de publicarlo en itch.io? Recomendación: sí, al menos la interfaz, el manual y los consejos; los relatos y las fichas de la Biblioteca, si da tiempo. Bloquea los hitos 22.4 y 22.5.

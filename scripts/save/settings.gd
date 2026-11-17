@@ -36,6 +36,7 @@ var defaults := {
 	"profiles": {},                         ## lo guardado de cada perfil: "0"/"1" -> {clave: valor} (profile_keys)
 	"bullet_palette": 0,                    ## 0 normal, 1 alto contraste (daltonismo)
 	"flashes": 1,                           ## destellos (golpes, rayos): 0 reducidos, 1 normales
+	"language": "",                         ## idioma (hito 22.4): "es", "en" o "" (el del sistema la primera vez)
 	"shake": 1.0,                           ## temblor de cámara (0..1)
 	"damage_numbers": 2,                    ## cifras de daño: 0 no, 1 solo los golpes fuertes, 2 todas (hito 11.2)
 	"quality": 2,                           ## calidad gráfica: 0 baja, 1 media, 2 alta, 3 ultra (Quality, hito 11.5)
@@ -76,6 +77,22 @@ func _ready() -> void:
 			var kv := a.substr(4).split("=", true, 1)
 			_overrides[kv[0]] = str_to_var(kv[1]) if str_to_var(kv[1]) != null else kv[1]
 	apply_audio()
+	apply_language()
+
+## Idioma (hito 22.4): antes de que se cargue ningún dato. Cambiarlo pide reiniciar el juego.
+## `i18n_log=true` apunta los textos que se piden sin traducción y los guarda al salir en
+## user://i18n_faltan.txt (para `python tools/textos.py`).
+func apply_language() -> void:
+	var lang := String(get_value("language"))
+	if lang == "":
+		lang = L.system_lang()
+		values["language"] = lang
+		save_file()
+	L.log_missing = OS.get_cmdline_user_args().has("i18n_log=true")
+	L.apply(lang)
+
+func _exit_tree() -> void:
+	if L.log_missing: L.save_missing("user://i18n_faltan.txt")
 
 func get_value(key: String) -> Variant:
 	if _overrides.has(key): return _overrides[key]
@@ -338,12 +355,12 @@ const JOY_NAMES := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_X: "X", JOY
 	JOY_BUTTON_DPAD_LEFT: "Cruceta izquierda", JOY_BUTTON_DPAD_RIGHT: "Cruceta derecha"}
 
 static func joy_name(b: int) -> String:
-	return JOY_NAMES.get(b, "Botón %d" % b)
+	return JOY_NAMES.get(b, L.t("Botón %d") % b)
 
 static func key_name(k: int) -> String:
 	var names := {KEY_SPACE: "Espacio", KEY_ESCAPE: "Esc", KEY_ENTER: "Intro", KEY_TAB: "Tab",
-		KEY_UP: "Flecha arriba", KEY_DOWN: "Flecha abajo", KEY_LEFT: "Flecha izquierda", KEY_RIGHT: "Flecha derecha",
-		KEY_SHIFT: "Mayús", KEY_CTRL: "Ctrl", KEY_ALT: "Alt", KEY_BACKSPACE: "Retroceso"}
+		KEY_UP: L.t("Flecha arriba"), KEY_DOWN: L.t("Flecha abajo"), KEY_LEFT: L.t("Flecha izquierda"), KEY_RIGHT: L.t("Flecha derecha"),
+		KEY_SHIFT: L.t("Mayús"), KEY_CTRL: "Ctrl", KEY_ALT: "Alt", KEY_BACKSPACE: "Retroceso"}
 	return names.get(k, OS.get_keycode_string(k))
 
 # ---------------------------------------------------------------- juego
@@ -395,4 +412,4 @@ static func perf_text(frames_us: PackedInt64Array, fps: float) -> String:
 	for f in sorted: total += f
 	var mean := total / 1000.0 / sorted.size()
 	var worst := sorted[mini(int(sorted.size() * 0.99), sorted.size() - 1)] / 1000.0   # como `perf=` (Game._perf_report)
-	return ("%d FPS  ·  media %.1f ms  ·  1 %% peor %.1f ms" % [fps, mean, worst]).replace(".", ",")
+	return (L.t("%d FPS  ·  media %.1f ms  ·  1 %% peor %.1f ms") % [fps, mean, worst]).replace(".", ",")

@@ -122,17 +122,17 @@ func _row(text: String, size := 26) -> Button:
 func _show_shelf() -> void:
 	_clear()
 	_tome = ""
-	var t := _ink("Biblioteca Lovecraft", 54, INK, true)
+	var t := _ink(L.t("Biblioteca Lovecraft"), 54, INK, true)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_left.add_child(t)
-	var s := _ink("Notas y fichas reunidas por los investigadores", 20, INK_DIM)
+	var s := _ink(L.t("Notas y fichas reunidas por los investigadores"), 20, INK_DIM)
 	s.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_left.add_child(s)
 	_left.add_child(_rule())
 	for i in Library.TOMES.size():
 		var tome: Dictionary = Library.TOMES[i]
 		var n := Library.count_known(save, tome.id)
-		var b := _row("Tomo %s  ·  %s" % [tome.roman, tome.title], 30)
+		var b := _row(L.t("Tomo %s  ·  %s") % [tome.roman, tome.title], 30)
 		b.custom_minimum_size.y = minf(56.0, 748.0 / Library.TOMES.size() - 12.0)   # once tomos (16.28), doce (21.19): sin pisar la esquina
 		var c := _ink("%d / %d" % [n.x, n.y], 22, INK_DIM)
 		c.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT)
@@ -147,7 +147,7 @@ func _show_shelf() -> void:
 	var fill := Control.new()
 	fill.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_left.add_child(fill)
-	_left.add_child(_hint("A: abrir  ·  B o Esc: cerrar"))
+	_left.add_child(_hint(L.t("A: abrir  ·  B o Esc: cerrar")))
 	MenuKit.chain_focus(_rows)
 	_rows[_shelf_focus].grab_focus.call_deferred()
 
@@ -158,7 +158,7 @@ func _show_tome_cover(i: int) -> void:
 	var fill := Control.new()
 	fill.custom_minimum_size.y = 150
 	_right.add_child(fill)
-	var r := _ink("Tomo %s" % tome.roman, 40, RED_INK, true)
+	var r := _ink(L.t("Tomo %s") % tome.roman, 40, RED_INK, true)
 	r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_right.add_child(r)
 	var t := _ink(tome.title, 58, INK, true)
@@ -201,7 +201,7 @@ func _open_tome(i: int) -> void:
 	_clear()
 	_tome = tome.id
 	_entries = Library.entries(save, tome.id)
-	var t := _ink("Tomo %s  ·  %s" % [tome.roman, tome.title], 38, INK, true)
+	var t := _ink(L.t("Tomo %s  ·  %s") % [tome.roman, tome.title], 38, INK, true)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_left.add_child(t)
 	_left.add_child(_rule())
@@ -358,10 +358,10 @@ func _ask_replay(e: Dictionary) -> void:
 	var run: Dictionary = e.get("run", {})
 	var back := get_viewport().gui_get_focus_owner()
 	if not RunArchive.replayable(run):
-		_sub = MenuKit.Confirm.new("Esta no se puede repetir: la partida del día, la expedición y el desfile de jefes dependen de algo que ya no está.", "Entendido", "Volver")
+		_sub = MenuKit.Confirm.new(L.t("Esta no se puede repetir: la partida del día, la expedición y el desfile de jefes dependen de algo que ya no está."), "Entendido", "Volver")
 	else:
-		var co := " Se juega en solitario, con el J1." if (run.get("players", []) as Array).size() > 1 else ""
-		_sub = MenuKit.Confirm.new("¿Repetir esta partida con la misma semilla? Las mismas oleadas, baúles y subidas, desde el principio del nivel." + co, "Repetir")
+		var co := L.t(" Se juega en solitario, con el J1.") if (run.get("players", []) as Array).size() > 1 else ""
+		_sub = MenuKit.Confirm.new(L.t("¿Repetir esta partida con la misma semilla? Las mismas oleadas, baúles y subidas, desde el principio del nivel.") + co, "Repetir")
 	add_child(_sub)
 	_sub.answered.connect(func(yes: bool) -> void:
 		_sub = null
@@ -374,12 +374,12 @@ func _ask_replay(e: Dictionary) -> void:
 func _unknown_text(e := {}) -> String:
 	if String(e.get("section", "")) == Library.SECTION_FISH: return "Todavía no ha picado ninguna. Quizá en el muelle de Innsmouth, entre nivel y nivel."
 	match _tome:
-		"enemies": return "Aún no se ha visto. Las páginas están en blanco."
-		"weapons": return "Nadie la ha empuñado todavía."
-		"items": return "Nadie lo ha llevado todavía."
-		"places": return "Ningún investigador ha estado allí."
-		"stories": return "Esta página sigue perdida en algún lugar. Quizá brille en el suelo la próxima vez que pases por allí."
-	return "Aún no se ha unido a la expedición."
+		"enemies": return L.t("Aún no se ha visto. Las páginas están en blanco.")
+		"weapons": return L.t("Nadie la ha empuñado todavía.")
+		"items": return L.t("Nadie lo ha llevado todavía.")
+		"places": return L.t("Ningún investigador ha estado allí.")
+		"stories": return L.t("Esta página sigue perdida en algún lugar. Quizá brille en el suelo la próxima vez que pases por allí.")
+	return L.t("Aún no se ha unido a la expedición.")
 
 func _image(e: Dictionary) -> Texture2D:
 	if e.icon != null: return e.icon

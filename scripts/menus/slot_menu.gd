@@ -24,7 +24,7 @@ func _ready() -> void:
 ## Sincroniza con la nube y redibuja los huecos; después, los conflictos.
 func _sync_cloud() -> void:
 	if not Cloud.connected(): return
-	_cloud_line = "Comprobando la nube…"
+	_cloud_line = L.t("Comprobando la nube…")
 	_build(_focused())
 	var ok: bool = await Cloud.sync()
 	if not is_inside_tree(): return
@@ -51,7 +51,7 @@ func _build(focus_slot: int) -> void:
 	var w: Array = MenuKit.window(self)
 	_root = w[0]
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "Elige partida", 52)
+	MenuKit.heading(box, L.t("Elige partida"), 52)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 28)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -77,7 +77,7 @@ func _build(focus_slot: int) -> void:
 		var cl := UiKit.label(_cloud_line, 18, UiKit.TEXT_DIM)
 		cl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(cl)
-	box.add_child(MenuKit.hint("Flechas o cruceta: moverse  ·  A o Intro: elegir  ·  B o Esc: volver"))
+	box.add_child(MenuKit.hint(L.t("Flechas o cruceta: moverse  ·  A o Intro: elegir  ·  B o Esc: volver")))
 	_cards[clampi(focus_slot, 0, _cards.size() - 1)].grab_focus.call_deferred()
 
 func _card(i: int, d: SaveData) -> Button:
@@ -98,18 +98,18 @@ func _card(i: int, d: SaveData) -> Button:
 	if d == null:
 		var gap := Control.new(); gap.custom_minimum_size.y = 40
 		v.add_child(gap)
-		var e := UiKit.label("Vacía", 26, UiKit.TEXT_DIM)
+		var e := UiKit.label(L.t("Vacía"), 26, UiKit.TEXT_DIM)
 		e.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(e)
-		var n := UiKit.label("Empezar una partida nueva", 19, UiKit.TEXT_DIM)
+		var n := UiKit.label(L.t("Empezar una partida nueva"), 19, UiKit.TEXT_DIM)
 		n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(n)
 	else:
-		for pair in [["Tiempo jugado", SaveData.format_time(d.play_time)], ["Objetos comprados", str(d.items_bought())],
-				["Compañeros", str(d.pets.size())], ["Dinero", MenuKit.money(d.money) + " $"]]:
+		for pair in [[L.t("Tiempo jugado"), SaveData.format_time(d.play_time)], [L.t("Objetos comprados"), str(d.items_bought())],
+				[L.t("Compañeros"), str(d.pets.size())], ["Dinero", MenuKit.money(d.money) + " $"]]:
 			v.add_child(_line(pair[0], pair[1]))
 		if d.from_newer_game():                          # se jugó con una build más nueva: puede faltar algo
-			var nv := UiKit.label("Guardada con la v%s (esta es la v%s)" % [d.saved_with, SaveData.game_version()], 16, UiKit.TEXT_DIM)
+			var nv := UiKit.label(L.t("Guardada con la v%s (esta es la v%s)") % [d.saved_with, SaveData.game_version()], 16, UiKit.TEXT_DIM)
 			nv.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			v.add_child(nv)
 		var cs := Cloud.slot_status(i, d)
@@ -135,9 +135,9 @@ func _line(label: String, value: String) -> HBoxContainer:
 func _ask_delete(i: int, d: SaveData) -> void:
 	if _busy or d == null: return
 	_busy = true
-	var c := MenuKit.Confirm.new("¿Borrar la Partida %d?\n\nSe perderá todo su progreso: %s de juego, %s $, %s y %s." % [
+	var c := MenuKit.Confirm.new(L.t("¿Borrar la Partida %d?\n\nSe perderá todo su progreso: %s de juego, %s $, %s y %s.") % [
 		i + 1, SaveData.format_time(d.play_time), MenuKit.money(d.money), MenuKit.count(d.items_bought(), "objeto"),
-		MenuKit.count(d.pets.size(), "compañero")], "Borrar")
+		MenuKit.count(d.pets.size(), L.t("compañero"))], "Borrar")
 	add_child(c)
 	c.answered.connect(func(yes: bool) -> void:
 		_busy = false

@@ -7,8 +7,10 @@ extends Resource
 enum Section { POWERUP, CHARACTER, PET, UPGRADE, OUTFIT }
 
 @export var id := &"vitalidad"
-@export var display_name := "Vitalidad"
-@export_multiline var description := ""
+@export var display_name := "Vitalidad":
+	get: return L.t(display_name)          # en el idioma elegido (hito 22.4)
+@export_multiline var description := "":
+	get: return L.t(description)          # en el idioma elegido (hito 22.4)
 @export var section := Section.POWERUP
 @export var order := 0                          ## orden dentro de su sección
 @export var icon: Texture2D                     ## imagen del artículo

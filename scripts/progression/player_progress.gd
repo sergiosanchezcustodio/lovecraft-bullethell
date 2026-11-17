@@ -266,7 +266,7 @@ func mark_hint(o: Option, weapons: WeaponSystem) -> void:
 			for w in weapons.weapons:
 				if w.data.evolved or w.data.evolves_with != o.upgrade.id or w.data.branches().is_empty(): continue
 				o.evo_ready = w.level >= w.data.max_level
-				o.evo_hint = ("Evoluciona: %s" if o.evo_ready else "Con %s al nivel %d, evoluciona") % (
+				o.evo_hint = (L.t("Evoluciona: %s") if o.evo_ready else L.t("Con %s al nivel %d, evoluciona")) % (
 					[w.data.display_name] if o.evo_ready else [w.data.display_name, w.data.max_level])
 				if o.evo_ready: return
 		Option.Kind.WEAPON_LEVEL, Option.Kind.NEW_WEAPON:
@@ -274,7 +274,7 @@ func mark_hint(o: Option, weapons: WeaponSystem) -> void:
 			if wd.branches().is_empty() or int(passives.get(wd.evolves_with, 0)) <= 0: return
 			var item := _upgrade_name(wd.evolves_with)
 			o.evo_ready = o.kind == Option.Kind.WEAPON_LEVEL and o.to_level >= wd.max_level
-			o.evo_hint = ("Evoluciona con %s" if o.evo_ready else "Evolucionará con %s") % item
+			o.evo_hint = (L.t("Evoluciona con %s") if o.evo_ready else L.t("Evolucionará con %s")) % item
 
 func _upgrade_name(id: StringName) -> String:
 	for up in upgrade_pool:

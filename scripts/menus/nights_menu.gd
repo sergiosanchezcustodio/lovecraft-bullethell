@@ -19,8 +19,8 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var w: Array = MenuKit.window(self, Color(0.36, 0.26, 0.5), 1300)
 	var box: VBoxContainer = w[1]
-	MenuKit.heading(box, "Noches sueltas", 48, ACCENT.lightened(0.2))
-	var sub := UiKit.label("Relatos aparte de la campaña: un escenario, sus criaturas y su horror, en una sola noche. Se empieza de cero. Superadas: %d de %d." % [Nights.won_count(Saves.current), Nights.all().size()], 19, UiKit.TEXT_DIM)
+	MenuKit.heading(box, L.t("Noches sueltas"), 48, ACCENT.lightened(0.2))
+	var sub := UiKit.label(L.t("Relatos aparte de la campaña: un escenario, sus criaturas y su horror, en una sola noche. Se empieza de cero. Superadas: %d de %d.") % [Nights.won_count(Saves.current), Nights.all().size()], 19, UiKit.TEXT_DIM)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	sub.custom_minimum_size.x = 1150
@@ -35,9 +35,9 @@ func _ready() -> void:
 		var open := Nights.unlocked(Saves.current, id)
 		var wins := Nights.wins(Saves.current, id)
 		var need := Campaign.levels().filter(func(l: Dictionary) -> bool: return String(l.id) == String(n.get("abre", "")))
-		var lock := "Supera «%s» para abrirla" % String(need[0].name) if not need.is_empty() else "Cerrada"
+		var lock := L.t("Supera «%s» para abrirla") % String(need[0].name) if not need.is_empty() else "Cerrada"
 		var b := MenuKit.button("%s%s\n%s" % ["✓ " if wins > 0 else "", String(n.titulo) if open or dev else lock,
-			String(n.lugar) + ("  ·  Desarrollo" if dev and not open else "")], MenuKit.INK, 22)
+			String(n.lugar) + (L.t("  ·  Desarrollo") if dev and not open else "")], MenuKit.INK, 22)
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		b.custom_minimum_size = Vector2(1150, 84)
@@ -74,7 +74,7 @@ func _ready() -> void:
 	_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text.custom_minimum_size = Vector2(770, 236)
 	row.add_child(_text)
-	box.add_child(MenuKit.hint("A o Intro: jugar  ·  B o Esc: volver al mapa"))
+	box.add_child(MenuKit.hint(L.t("A o Intro: jugar  ·  B o Esc: volver al mapa")))
 	if first != null: first.grab_focus.call_deferred()
 
 ## La miniatura de la noche (oscurecida si aún está cerrada).

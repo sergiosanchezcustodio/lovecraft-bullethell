@@ -13,7 +13,7 @@ static var _data := {}
 
 static func all() -> Array:
 	if _data.is_empty():
-		var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+		var d: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string(PATH)))
 		_data = d if d is Dictionary else {"noches": []}
 	return _data.get("noches", [])
 
@@ -27,7 +27,7 @@ static func is_night(id: String) -> bool:
 
 ## «Noche suelta · El color que cayó del cielo» (para el HUD, la tarjeta y la red).
 static func label(id: String) -> String:
-	return "Noche suelta · " + String(find(id).get("titulo", ""))
+	return L.t("Noche suelta · ") + String(find(id).get("titulo", ""))
 
 ## ¿Abierta? Al superar su nivel de la campaña (o con todo desbloqueado).
 static func unlocked(save: SaveData, id: String) -> bool:

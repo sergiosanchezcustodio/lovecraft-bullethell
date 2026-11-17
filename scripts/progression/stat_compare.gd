@@ -76,11 +76,11 @@ static func option(p: Player, o: PlayerProgress.Option) -> Array[Dictionary]:
 				var n := 0
 				for id in p.progress.passives:
 					if int(p.progress.passives[id]) > 0: n += 1
-				out.append(_row("Objetos", "%d" % n, "%d de %d" % [n + 1, p.progress.item_slots], true))
+				out.append(_row("Objetos", "%d" % n, L.t("%d de %d") % [n + 1, p.progress.item_slots], true))
 			out.append_array(upgrade(p.data, o.upgrade))
 		PlayerProgress.Option.Kind.NEW_WEAPON:
 			var have := p.weapons.weapons.size() if p.weapons != null else 0
-			out.append(_row("Armas", "%d" % have, "%d de %d" % [have + 1, p.progress.weapon_slots if p.progress else 4], true))
+			out.append(_row("Armas", "%d" % have, L.t("%d de %d") % [have + 1, p.progress.weapon_slots if p.progress else 4], true))
 		PlayerProgress.Option.Kind.WEAPON_LEVEL:
 			var w: WeaponSystem.Weapon = p.weapons.get_weapon(o.weapon.id) if p.weapons != null else null
 			if w != null: out.append_array(weapon_level(p, w.data, w.level, o.to_level))
@@ -165,7 +165,7 @@ static func bbcode(rows: Array[Dictionary], sep := "    ") -> String:
 	var parts := PackedStringArray()
 	for r: Dictionary in rows:
 		var c: Color = GOOD if r.good else BAD
-		parts.append(_nobreak("%s %s → [color=#%s]%s[/color]" % [r.name, r.before, c.to_html(false), r.after]))
+		parts.append(_nobreak(L.t("%s %s → [color=#%s]%s[/color]") % [r.name, r.before, c.to_html(false), r.after]))
 	return sep.join(parts)
 
 ## Una estadística no se parte entre dos líneas: se rompe solo entre una y otra (05-11-2026: «15,12/»

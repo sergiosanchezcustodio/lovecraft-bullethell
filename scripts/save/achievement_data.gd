@@ -5,8 +5,10 @@ extends Resource
 ## un compañero (D-30, D-31: algunos se desbloquean jugando, además de en la tienda).
 
 @export var id := &"cazador_100"
-@export var display_name := "Cazador"
-@export_multiline var description := ""
+@export var display_name := "Cazador":
+	get: return L.t(display_name)          # en el idioma elegido (hito 22.4)
+@export_multiline var description := "":
+	get: return L.t(description)          # en el idioma elegido (hito 22.4)
 @export var order := 0
 ## Estadística que mira (ver Achievements.value): kills, runs, levels_won, elites, chests,
 ## crises, revives, coop_runs, best_level, best_time, money, characters, maxed_weapons, flawless,

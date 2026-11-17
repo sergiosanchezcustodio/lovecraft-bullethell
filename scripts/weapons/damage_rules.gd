@@ -48,7 +48,7 @@ static func traits(w: WeaponData) -> Dictionary:
 	elif reach >= LONG_REACH: t["alcance"] = ["largo", 0.85]
 	var area := w.delivery in AREA or w.pierce > 0.0 or w.zone != WeaponData.Zone.NONE \
 		or (w.delivery == D.THROWN and w.aoe_radius > 0.0)
-	t["objetivo"] = ["área", 0.8] if area else ["uno", 1.15]
+	t["objetivo"] = [L.t("área"), 0.8] if area else ["uno", 1.15]
 	if not w.delivery in NO_PROJECTILE:
 		var multi := w.count > 1.0 or w.split_count > 0.0
 		t["proyectiles"] = ["varios", 0.85] if multi else ["uno", 1.15]
@@ -57,7 +57,7 @@ static func traits(w: WeaponData) -> Dictionary:
 	if w.sanity_cost > 0.0: t["coste"] = ["cordura", 1.2]
 	if w.homing > 0.0 or w.delivery == D.CHAIN: t["apuntado"] = ["teledirigida", 0.8]
 	elif w.jitter_deg > 0.0 or w.targeting in [WeaponData.Targeting.MOVE_DIR, WeaponData.Targeting.FRONT_BACK]:
-		t["apuntado"] = ["al azar", 1.15]
+		t["apuntado"] = [L.t("al azar"), 1.15]
 	if is_control(w): t["control"] = ["control", 0.6]
 	return t
 

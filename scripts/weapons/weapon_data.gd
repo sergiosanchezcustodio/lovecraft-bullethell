@@ -71,8 +71,10 @@ enum Zone { NONE, FIRE, ACID, DUST, GAS }
 enum Category { PHYSICAL, FIREARM, MAGIC }
 
 @export var id := &"revolver"
-@export var display_name := "Revólver .38"
-@export_multiline var description := ""      ## qué hace, en una frase (descripciones emergentes)
+@export var display_name := "Revólver .38":
+	get: return L.t(display_name)          # en el idioma elegido (hito 22.4)
+@export_multiline var description := "":      ## qué hace, en una frase (descripciones emergentes)
+	get: return L.t(description)          # en el idioma elegido (hito 22.4)
 ## Aspecto de sus balas (04-10-2026): "" trazadora pesada (pistolas), "pellet" (perdigón),
 ## "rifle" (estela larga), "smg" (trazadora corta), "blade" (hoja que gira), "spark" (chispa
 ## de colores), "harpoon" (arpón), "dart" (dardo). Las teledirigidas y las de Yith, las suyas.

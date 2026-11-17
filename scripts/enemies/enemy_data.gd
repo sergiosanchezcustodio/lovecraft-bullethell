@@ -5,7 +5,8 @@ extends Resource
 ## ataques, patrones de balas reutilizables.
 
 @export var id := &"pinguino"
-@export var display_name := "Pingüino albino ciego"
+@export var display_name := "Pingüino albino ciego":
+	get: return L.t(display_name)          # en el idioma elegido (hito 22.4)
 @export var model := "pinguino"            ## nombre en models/ y juego de animaciones
 @export var tier := 1                      ## escalón (1-5); 4 y 5 son élites
 @export var elite := false

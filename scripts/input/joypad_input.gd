@@ -59,7 +59,7 @@ func _read_action(action: StringName) -> bool:
 	return false
 
 func device_name() -> String:
-	return "mando %d (%s)" % [device, Input.get_joy_name(device)]
+	return L.t("mando %d (%s)") % [device, Input.get_joy_name(device)]
 
 func joy_device() -> int:
 	return device

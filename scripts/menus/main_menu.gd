@@ -19,8 +19,8 @@ func _ready() -> void:
 	col.custom_minimum_size = Vector2(380, 0)
 	add_child(col)
 	var opts := [["Jugar", _open_play], ["Tienda", _open_shop], ["Biblioteca", _open_library],
-			["Configuración", _open_settings], ["Salir", _ask_quit]]
-	if Review.available(): opts.insert(4, ["Revisión de arte (temporal)", _open_review])   # solo en desarrollo
+			[L.t("Configuración"), _open_settings], ["Salir", _ask_quit]]
+	if Review.available(): opts.insert(4, [L.t("Revisión de arte (temporal)"), _open_review])   # solo en desarrollo
 	for pair in opts:
 		var b := MenuKit.plain_button(pair[0], 34)        # sin caja, sobre la ilustración (27-10-2026)
 		b.custom_minimum_size = Vector2(380, 52)
@@ -48,7 +48,7 @@ func _ready() -> void:
 	ver.offset_top = -44
 	ver.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	add_child(ver)
-	var h := MenuKit.hint("A o Intro: elegir  ·  B o Esc: cambiar de partida")
+	var h := MenuKit.hint(L.t("A o Intro: elegir  ·  B o Esc: cambiar de partida"))
 	h.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	h.offset_top = -40
 	h.offset_left = -400
@@ -68,7 +68,7 @@ var _hint: Label                          ## ayuda de abajo: se esconde con una 
 
 func _refresh_money() -> void:
 	if _money_lbl != null and Saves.current != null:
-		_money_lbl.text = "Partida %d  ·  %s $" % [Saves.slot + 1, MenuKit.money(Saves.current.money)]
+		_money_lbl.text = L.t("Partida %d  ·  %s $") % [Saves.slot + 1, MenuKit.money(Saves.current.money)]
 
 ## Abre una ventana encima; al cerrarse, el foco vuelve al botón que la abrió.
 const LOGO_CLEAR := 560.0                       ## px de arriba que ocupa el logo (a 1080 de alto)
@@ -112,18 +112,18 @@ func _open_play() -> void:
 	below_logo(w[0], LOGO_CLEAR)
 	var box: VBoxContainer = w[1]
 	MenuKit.heading(box, "Jugar", 46)
-	var local := MenuKit.button("Jugar en local", MenuKit.INK, 30)
+	var local := MenuKit.button(L.t("Jugar en local"), MenuKit.INK, 30)
 	local.custom_minimum_size = Vector2(480, 64)
 	local.pressed.connect(func() -> void: play_local.emit())
 	box.add_child(local)
-	var online := MenuKit.button("Jugar online" + ("  ·  " + Demo.LOCKED if Demo.on() else ""), MenuKit.INK, 24 if Demo.on() else 30)
+	var online := MenuKit.button(L.t("Jugar online") + ("  ·  " + Demo.LOCKED if Demo.on() else ""), MenuKit.INK, 24 if Demo.on() else 30)
 	online.custom_minimum_size = Vector2(480, 64)
 	online.disabled = Demo.on()                     # la demo (13.17): solo en local
 	online.pressed.connect(func() -> void:          # sustituye a esta ventana al cerrarse
 		p.tree_exited.connect(_open_online, CONNECT_ONE_SHOT)
 		p.queue_free())
 	box.add_child(online)
-	box.add_child(MenuKit.hint("B o Esc: volver"))
+	box.add_child(MenuKit.hint(L.t("B o Esc: volver")))
 	_closes_with_cancel(p)
 	_push(p, 0)
 	local.grab_focus.call_deferred()
@@ -169,19 +169,19 @@ func open_settings_tab(tab: int) -> void:
 func _offer_crash_report() -> void:
 	if not CrashReport.pending() or _popup != null: return
 	CrashReport.dismiss()
-	var c := MenuKit.Confirm.new("La última vez el juego se cerró de golpe. ¿Guardar en Documentos un informe con el registro y la configuración? Así puedes enviárselo al autor; no sale nada del PC si no lo envías tú.", "Guardar", "No, gracias", UiKit.GOLD)
+	var c := MenuKit.Confirm.new(L.t("La última vez el juego se cerró de golpe. ¿Guardar en Documentos un informe con el registro y la configuración? Así puedes enviárselo al autor; no sale nada del PC si no lo envías tú."), "Guardar", L.t("No, gracias"), UiKit.GOLD)
 	c.answered.connect(func(yes: bool) -> void:
 		if not yes: return
 		var path := CrashReport.save()
 		var text := ("Guardado en %s" % path) if path != "" else "No se ha podido guardar el informe."
-		var done := MenuKit.Confirm.new(text, "Abrir la carpeta", "Cerrar", UiKit.GOLD)
+		var done := MenuKit.Confirm.new(text, L.t("Abrir la carpeta"), "Cerrar", UiKit.GOLD)
 		done.answered.connect(func(open: bool) -> void:
 			if open and path != "": OS.shell_show_in_file_manager(path))
 		_push.call_deferred(done, 0))
 	_push(c, 0)
 
 func _ask_quit() -> void:
-	var c := MenuKit.Confirm.new("¿Salir del juego?", "Salir")
+	var c := MenuKit.Confirm.new(L.t("¿Salir del juego?"), "Salir")
 	c.answered.connect(func(yes: bool) -> void:
 		if yes:
 			Saves.save()

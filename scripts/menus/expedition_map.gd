@@ -52,7 +52,7 @@ func _build() -> void:
 	var part: Dictionary = Campaign.parts()[int(st.part)]
 	var w: Array = MenuKit.window(self, Color(0.42, 0.34, 0.18), 1640)
 	_box = w[1]
-	MenuKit.heading(_box, "Expedición · %s" % String(part.title), 42, UiKit.GOLD)
+	MenuKit.heading(_box, L.t("Expedición · %s") % String(part.title), 42, UiKit.GOLD)
 	_purse = UiKit.label(_purse_text(), 20, UiKit.TEXT_DIM)
 	_purse.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_box.add_child(_purse)
@@ -89,7 +89,7 @@ func _build() -> void:
 	_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_info.custom_minimum_size = Vector2(1400, 56)
 	_box.add_child(_info)
-	_box.add_child(MenuKit.hint("Arriba/abajo: elegir camino  ·  A o Intro: ir  ·  B o Esc: abandonar la expedición"))
+	_box.add_child(MenuKit.hint(L.t("Arriba/abajo: elegir camino  ·  A o Intro: ir  ·  B o Esc: abandonar la expedición")))
 	var ch := open.map(func(x: Array) -> Button: return _buttons[Vector2i(int(x[0]), int(x[1]))])
 	for i in ch.size():                                # arriba y abajo, entre los caminos abiertos
 		var b: Button = ch[i]
@@ -127,10 +127,10 @@ func _draw_paths() -> void:
 
 func _purse_text() -> String:
 	var st := Expedition.state()
-	var parts := PackedStringArray(["Bolsa de la expedición: %d $" % int(st.money)])
-	if int(st.bonus) > 0: parts.append(MenuKit.count(int(st.bonus), "subida") + " al empezar el siguiente nivel")
-	if float(st.hurt) < 0.999: parts.append("el siguiente nivel, con un %d %% menos de vida" % roundi((1.0 - float(st.hurt)) * 100.0))
-	if float(st.time) > 0.0: parts.append("tiempo: %s" % Endless.clock(float(st.time)))
+	var parts := PackedStringArray([L.t("Bolsa de la expedición: %d $") % int(st.money)])
+	if int(st.bonus) > 0: parts.append(MenuKit.count(int(st.bonus), "subida") + L.t(" al empezar el siguiente nivel"))
+	if float(st.hurt) < 0.999: parts.append(L.t("el siguiente nivel, con un %d %% menos de vida") % roundi((1.0 - float(st.hurt)) * 100.0))
+	if float(st.time) > 0.0: parts.append(L.t("tiempo: %s") % Endless.clock(float(st.time)))
 	return "  ·  ".join(parts)
 
 func _describe(r: int, c: int) -> void:
@@ -150,7 +150,7 @@ func _go(r: int, c: int) -> void:
 		return
 	if kind == "descanso":
 		Expedition.rest()
-		_message("Descanso", "Hogueras, café y un rato sin mirar atrás. Al empezar el siguiente nivel, %s." % MenuKit.count(int(Expedition.cfg().get("rest_bonus", 2)), "subida"))
+		_message("Descanso", L.t("Hogueras, café y un rato sin mirar atrás. Al empezar el siguiente nivel, %s.") % MenuKit.count(int(Expedition.cfg().get("rest_bonus", 2)), "subida"))
 	else:
 		_curiosity(r)
 
@@ -192,7 +192,7 @@ func _popup_open(title: String, text: String, options: Array, on_pick: Callable)
 func _unhandled_input(event: InputEvent) -> void:
 	if _popup != null or not event.is_action_pressed("ui_cancel"): return
 	get_viewport().set_input_as_handled()
-	var c := MenuKit.Confirm.new("¿Abandonar la expedición? Lo ganado en ella se pierde.", "Abandonar")
+	var c := MenuKit.Confirm.new(L.t("¿Abandonar la expedición? Lo ganado en ella se pierde."), "Abandonar")
 	add_child(c)
 	c.answered.connect(func(yes: bool) -> void:
 		if not yes: return

@@ -6,7 +6,8 @@ extends Resource
 ## en la ficha del personaje (las mejoras pasivas los modifican después).
 
 @export var id := &"deslizar"
-@export var display_name := "Deslizamiento"
+@export var display_name := "Deslizamiento":
+	get: return L.t(display_name)          # en el idioma elegido (hito 22.4)
 @export var anim := "slide"                  ## animación en scripts/anim/anim_humano.gd
 @export var speed := 11.5                    ## m/s al empezar (frena hasta la de andar)
 @export var duration := 0.32                 ## s de impulso

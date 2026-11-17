@@ -46,8 +46,8 @@ func _ready() -> void:
 	_box.custom_minimum_size = Vector2(1180, 0)
 	_box.add_theme_constant_override("separation", 4)
 	outer.add_child(_box)
-	var hint := UiKit.label(("Izquierda/derecha: otro jugador  ·  " if _players().size() > 1 else "") \
-		+ "B o Esc: volver  ·  Start: seguir jugando", 15, UiKit.TEXT_DIM)
+	var hint := UiKit.label((L.t("Izquierda/derecha: otro jugador  ·  ") if _players().size() > 1 else "") \
+		+ L.t("B o Esc: volver  ·  Start: seguir jugando"), 15, UiKit.TEXT_DIM)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	outer.add_child(hint)
 	MenuKit.dress(panel, MenuKit.BRASS, Vector2(40, 28), 120.0)
@@ -84,12 +84,12 @@ func _source(p: Player, id: String) -> Array:
 	if id == "mascota" and p.pet != null and is_instance_valid(p.pet):
 		var pd: PetData = (p.pet as Pet).data
 		if not _icons.has(pd.model): _icons[pd.model] = ModelIcon.make(self, pd.model, "full", 96, 0.0) if pd.model != "" else null
-		return [pd.display_name, _icons[pd.model], "Compañero"]
+		return [pd.display_name, _icons[pd.model], L.t("Compañero")]
 	if id == "combo": return ["Combinaciones", null, "Lo que hacen tus armas juntas, o con las de otros"]   # (hito 21.6)
 	if id == "revelacion":                           # «La mirada que hiere» (21.7)
 		var ids: Array = p.progress.revelations if p.progress != null else []
 		var rid := "mirada" if ids.is_empty() else String(Revelations.with_effect(ids, "aura").get("id", "mirada"))
-		return ["Revelaciones", Revelations.icon(rid), "Lo que te enseñó la locura"]
+		return ["Revelaciones", Revelations.icon(rid), L.t("Lo que te enseñó la locura")]
 	var wp := "res://data/weapons/%s.tres" % id
 	if ResourceLoader.exists(wp):
 		var w: WeaponData = load(wp)
@@ -97,7 +97,7 @@ func _source(p: Player, id: String) -> Array:
 		if p.weapons != null:
 			for x: WeaponSystem.Weapon in p.weapons.weapons:
 				if x.data.id == w.id: lv = "  ·  Nv %d" % x.level
-		return [w.display_name + lv, w.get_icon(), ("Evolución" if w.evolved else "Arma") + " " + ["física", "de fuego", "mágica"][int(w.category)],
+		return [w.display_name + lv, w.get_icon(), (L.t("Evolución") if w.evolved else "Arma") + " " + [L.t("física"), L.t("de fuego"), L.t("mágica")][int(w.category)],
 			FxAccent.ui_color(w.id)]
 	var up := "res://data/upgrades/%s.tres" % id
 	if ResourceLoader.exists(up):
@@ -111,13 +111,13 @@ func _build() -> void:
 	if ps.is_empty(): return
 	player_index = clampi(player_index, 0, ps.size() - 1)
 	var p: Player = ps[player_index]
-	_title.text = ("J%d  ·  " % (p.index + 1) if ps.size() > 1 else "") + "Daño de la partida  ·  " + p.data.display_name
+	_title.text = ("J%d  ·  " % (p.index + 1) if ps.size() > 1 else "") + L.t("Daño de la partida  ·  ") + p.data.display_name
 	_title.add_theme_color_override("font_color", p.color if ps.size() > 1 else UiKit.GOLD)
 	var w: CombatWorld = p.world
 	var rows: Array[Dictionary] = w.table_of(p.index) if w != null else []
-	_box.add_child(_row(null, "Fuente", "", -1.0, "Parte", "Daño", "Por segundo", "Abatidos", true))
+	_box.add_child(_row(null, "Fuente", "", -1.0, "Parte", L.t("Daño"), L.t("Por segundo"), "Abatidos", true))
 	if rows.is_empty():
-		var none := UiKit.label("Todavía no has hecho daño.", 18, UiKit.TEXT_DIM)
+		var none := UiKit.label(L.t("Todavía no has hecho daño."), 18, UiKit.TEXT_DIM)
 		none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_box.add_child(none)
 		return
@@ -133,13 +133,13 @@ func _build() -> void:
 		var d := 0.0; var k := 0; var sh := 0.0
 		for r: Dictionary in rest:
 			d += float(r.damage); k += int(r.kills); sh += float(r.share)
-		_box.add_child(_row(null, "Otros (%d)" % rest.size(), "", d / maxf(top, 1.0), "%d %%" % roundi(sh * 100.0), MenuKit.money(roundi(d)), "", str(k)))
+		_box.add_child(_row(null, L.t("Otros (%d)") % rest.size(), "", d / maxf(top, 1.0), "%d %%" % roundi(sh * 100.0), MenuKit.money(roundi(d)), "", str(k)))
 	_box.add_child(HSeparator.new())
 	var total := 0.0; var kills := 0
 	for r: Dictionary in rows:
 		total += float(r.damage); kills += int(r.kills)
 	var t := int(w.clock)
-	_box.add_child(_row(null, "Total", "%02d:%02d de partida" % [t / 60, t % 60], -1.0, "", MenuKit.money(roundi(total)),
+	_box.add_child(_row(null, "Total", L.t("%02d:%02d de partida") % [t / 60, t % 60], -1.0, "", MenuKit.money(roundi(total)),
 		RunArchive.decimal(total / maxf(w.clock, 1.0)), str(kills), true))
 
 ## Una fila: imagen, nombre (y debajo, qué es), barra de la parte del total y cuatro cifras.

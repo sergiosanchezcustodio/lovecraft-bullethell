@@ -61,7 +61,7 @@ func _ready() -> void:
 	_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text.custom_minimum_size.x = 700 if Reading.k() < 1.3 else 860
 	box.add_child(_text)
-	var hint := UiKit.label(("Izquierda/derecha: otro investigador  ·  " if entries.size() > 1 else "") + "A, B o Esc: cerrar", 16, ink_dim, false)
+	var hint := UiKit.label((L.t("Izquierda/derecha: otro investigador  ·  ") if entries.size() > 1 else "") + L.t("A, B o Esc: cerrar"), 16, ink_dim, false)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(hint)
 	_show()
@@ -73,7 +73,7 @@ func _ready() -> void:
 func _show() -> void:
 	if entries.is_empty(): return
 	var e: Dictionary = entries[_k]
-	_who.text = "Diario de %s%s" % [String(e.who).get_slice("· ", 1) if "· " in String(e.who) else String(e.who),
+	_who.text = L.t("Diario de %s%s") % [String(e.who).get_slice("· ", 1) if "· " in String(e.who) else String(e.who),
 		"  (%d / %d)" % [_k + 1, entries.size()] if entries.size() > 1 else ""]
 	_title.text = String(e.title)
 	_text.text = String(e.text)

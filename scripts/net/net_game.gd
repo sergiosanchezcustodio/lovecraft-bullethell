@@ -156,12 +156,12 @@ func _ready() -> void:
 	var seats := PackedStringArray()
 	for q: Player in game.players: seats.append("J%d %s (%s)" % [q.index + 1, q.data.id, _seat_name(q.index)])
 	var lv: Variant = game.get("level")
-	_say("partida: %s · %s" % [String((lv as LevelData).id) if lv is LevelData else "?", ", ".join(seats)])
+	_say(L.t("partida: %s · %s") % [String((lv as LevelData).id) if lv is LevelData else "?", ", ".join(seats)])
 	if host:
 		net.admit = _admit
 		_release_gone(false)                           # los de un PC que no ha vuelto: la máquina, desde el principio
 	if host and la is LaunchArgs and (la as LaunchArgs).has("snap_gap"): _gap = (la as LaunchArgs).get_floats("snap_gap")
-	_wait_overlay("Esperando a los demás jugadores…" if host else "Esperando al anfitrión…")
+	_wait_overlay(L.t("Esperando a los demás jugadores…") if host else L.t("Esperando al anfitrión…"))
 	if pause_tree: get_tree().paused = true
 	if host: _check_all_ready()
 	else: _send_ready()
@@ -255,7 +255,7 @@ func _show_quiet(s: float) -> void:
 		if _quiet != null:
 			_quiet.queue_free()
 			_quiet = null
-			_say("vuelven las fotos")
+			_say(L.t("vuelven las fotos"))
 		return
 	if _quiet == null:
 		_quiet = CanvasLayer.new()
@@ -269,7 +269,7 @@ func _show_quiet(s: float) -> void:
 		_quiet_lbl = UiKit.label("", 24, UiKit.TEXT)
 		_quiet_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		col.add_child(_quiet_lbl)
-		_quiet_btn = UiKit.button("Salir al menú principal")
+		_quiet_btn = UiKit.button(L.t("Salir al menú principal"))
 		_quiet_btn.custom_minimum_size = Vector2(320, 50)
 		_quiet_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		_quiet_btn.visible = false
@@ -278,12 +278,12 @@ func _show_quiet(s: float) -> void:
 		_quiet.add_child(panel)
 		panel.resized.connect(func() -> void: panel.position = Vector2((panel.get_viewport_rect().size.x - panel.size.x) * 0.5, 215.0))   # bajo los anuncios
 		add_child(_quiet)
-		_say("sin noticias del anfitrión")
-	_quiet_lbl.text = "  Sin noticias del anfitrión… %d s  " % int(s)
+		_say(L.t("sin noticias del anfitrión"))
+	_quiet_lbl.text = L.t("  Sin noticias del anfitrión… %d s  ") % int(s)
 	if s > QUIET_LEAVE and not _quiet_btn.visible:   # la partida está parada: ofrece salir (con el foco, para el mando)
 		_quiet_btn.visible = true
 		_quiet_btn.grab_focus()
-		_say("botón de salir")
+		_say(L.t("botón de salir"))
 
 ## Apunta algo en el registro de red (y en la consola, con log=true, con "RED" delante).
 func _say(text: String) -> void:
@@ -319,14 +319,14 @@ func _log(delta: float) -> void:
 		var r := (int(net.sent_to[id]) - int(_log_sent.get(id, 0))) / _log_t / 1024.0
 		total += r
 		if net.peers.has(id):
-			per.append("%s %.1f%s" % [net.peers[id].get("name", id), r, (" %d ms" % int(net.peers[id].get("ping", 0))) if host else ""])
+			per.append("%s %.1f%s" % [net.peers[id].get("name", id), r, (L.t(" %d ms") % int(net.peers[id].get("ping", 0))) if host else ""])
 			var b: Array = _bw.get(id, [0.0, 0, 0.0, ""])
 			_bw[id] = [b[0] + r, b[1] + 1, maxf(b[2], r), String(net.peers[id].get("name", id))]
 	_log_sent = net.sent_to.duplicate()
 	var wire := (net.wire_sent - _log_wire) / _log_t / 1024.0   # lo que sale de verdad (comprimido)
 	_log_wire = net.wire_sent
 	_wire_bw = [_wire_bw[0] + wire, _wire_bw[1] + 1, maxf(_wire_bw[2], wire)]
-	_say("%s t=%.1f enemigos=%d abatidos=%d xp=%.0f balas=%d gemas=%d %s  sale=%.1f kB/s%s real=%.1f  ping=%d" % ["anfitrion" if host else "invitado",
+	_say(L.t("%s t=%.1f enemigos=%d abatidos=%d xp=%.0f balas=%d gemas=%d %s  sale=%.1f kB/s%s real=%.1f  ping=%d") % ["anfitrion" if host else "invitado",
 		game.director.time if game.director != null else 0.0, n, game.kills, team.xp if team != null else 0.0,
 		game.world.bullets.count, game.gems.count, " ".join(pos), total,
 		" (" + ", ".join(per) + ")" if per.size() > 1 else "", wire, int(net.peers.get(net.my_id, {}).get("ping", 0)) if not host else 0])
@@ -338,7 +338,7 @@ func _exit_tree() -> void:
 	var per := PackedStringArray()
 	for id: int in _bw:
 		var b: Array = _bw[id]
-		per.append("%s media %.1f pico %.1f" % [b[3], b[0] / maxf(b[1], 1), b[2]])
+		per.append(L.t("%s media %.1f pico %.1f") % [b[3], b[0] / maxf(b[1], 1), b[2]])
 	var by_type := {}                                  # en este nivel
 	var all := 0
 	for t: int in net.sent_type:
@@ -350,9 +350,9 @@ func _exit_tree() -> void:
 	for t: int in types.slice(0, 6):
 		var tn: Variant = TYPE_NAMES.get(t, NetSession.Msg.find_key(t))
 		share.append("%s %d %%" % [tn if tn != null else str(t), roundi(100.0 * int(by_type[t]) / maxf(all, 1))])
-	_say("ancho de banda (kB/s por PC, sin comprimir): %s | comprimido, en total: media %.1f pico %.1f | por tipo: %s%s" % [
+	_say(L.t("ancho de banda (kB/s por PC, sin comprimir): %s | comprimido, en total: media %.1f pico %.1f | por tipo: %s%s") % [
 		", ".join(per), _wire_bw[0] / maxf(_wire_bw[1], 1), _wire_bw[2], ", ".join(share),
-		(" | MARCAS en este nivel: %d" % level_marks) if level_marks > 0 else ""])
+		(L.t(" | MARCAS en este nivel: %d") % level_marks) if level_marks > 0 else ""])
 
 func _physics_process(_delta: float) -> void:
 	var t0 := Prof.start()
@@ -567,7 +567,7 @@ func send_lost() -> void:
 	_event({"k": "lost"})
 
 func send_next(level_id: String) -> void:
-	_say("siguiente nivel: %s" % level_id)
+	_say(L.t("siguiente nivel: %s") % level_id)
 	var back := GameSession.apply_returns(net.peers)
 	net.send(0, NEXT, {"level": level_id, "carry": GameSession.carry.duplicate(true),
 		"team_xp": GameSession.team_xp, "team_turn": GameSession.team_turn, "peers": seat_peers(), "pacts": Pacts.active(),
@@ -596,7 +596,7 @@ func _send_start(back: Array) -> void:
 		net.send(id, NetSelect.START, {"level": String(GameSession.level), "players": GameSession.seats_to_wire(),
 			"carry": GameSession.carry.duplicate(true), "team_xp": GameSession.team_xp, "team_turn": GameSession.team_turn,
 			"pacts": Pacts.active(), "madness": GameSession.madness})
-		_say("vuelve el PC %d" % id)
+		_say(L.t("vuelve el PC %d") % id)
 
 # ---------------------------------------------------------------- mensajes
 
@@ -685,7 +685,7 @@ func _on_message(from: int, type: int, data: Variant) -> void:
 		HALT:
 			if data is Dictionary:
 				halt = data
-				_say("parada: %s" % _halt_text(halt))
+				_say(L.t("parada: %s") % _halt_text(halt))
 				if pause_tree: get_tree().paused = true
 				if game.has_method("net_halt"): game.net_halt(halt)
 		RESUME:
@@ -1089,7 +1089,7 @@ func halt_all(d: Dictionary) -> void:
 		_prog_sig.erase(int(d.get("i", -1)))
 		_send_progress()
 	halt = d
-	_say("parada: %s" % _halt_text(d))
+	_say(L.t("parada: %s") % _halt_text(d))
 	net.send(0, HALT, d)
 	if pause_tree: get_tree().paused = true
 	if game.has_method("net_halt"): game.net_halt(d)
@@ -1156,14 +1156,14 @@ func _seat_name(i: int) -> String:
 ## Qué ha parado la partida, en pocas palabras (registro).
 func _halt_text(d: Dictionary) -> String:
 	if d.get("k") == "lvup": return "subida de J%d · %s" % [int(d.get("i", 0)) + 1, where()]
-	return "pausa de %s · %s" % [_seat_name_of_peer(int(d.get("peer", 1))), where()]
+	return L.t("pausa de %s · %s") % [_seat_name_of_peer(int(d.get("peer", 1))), where()]
 
 ## Marca de un jugador de este PC (F9 o LB+RB): en el registro de este PC y en el de los demás,
 ## para que coincidan al revisarlos.
 func mark(n: int) -> void:
 	level_marks += 1
 	var d := [net.player_name, n, where()]
-	_say("marca %d del jugador · %s" % [n, d[2]])
+	_say(L.t("marca %d del jugador · %s") % [n, d[2]])
 	net.send(0 if host else 1, MARK, d)
 
 var level_marks := 0                        ## marcas de todos los PC en este nivel (resumen)
@@ -1172,7 +1172,7 @@ func _say_mark(d: Array) -> void:
 	level_marks += 1
 	if game.has_method("announce"): game.announce("%s ha puesto una marca" % String(d[0]).left(20), 1.5)
 	if game.has_method("mark_shot"): game.mark_shot(int(d[1]), String(d[0]).left(20))   # lo que se veía aquí
-	_say("marca %d de %s · %s (aquí: %s)" % [int(d[1]), String(d[0]).left(20), String(d[2]).left(24), where()])
+	_say(L.t("marca %d de %s · %s (aquí: %s)") % [int(d[1]), String(d[0]).left(20), String(d[2]).left(24), where()])
 
 ## Nivel y minuto de partida ("p1_n3 2:14"): para encontrar en el registro lo que cuenta un jugador.
 func where() -> String:
@@ -1187,7 +1187,7 @@ func _admit(id: int, pc_name: String) -> int:
 	var n := GameSession.claim(id, pc_name, net.peers)
 	if n > 0:
 		if game.has_method("announce"): game.announce("%s ha vuelto: entrará en el siguiente nivel" % pc_name, 2.5)
-		_say("vuelve %s (PC %d) a %d puestos" % [pc_name, id, n])
+		_say(L.t("vuelve %s (PC %d) a %d puestos") % [pc_name, id, n])
 	return n
 
 ## Anfitrión: los jugadores de un PC que no está los lleva la máquina (un bot que sigue a otro).
@@ -1196,7 +1196,7 @@ func _release_gone(say: bool) -> void:
 		if q.remote and not net.peers.has(_peer_of(q)):
 			if say:
 				guest_lost = true
-				var note := "%s se desconectó en el %s" % [_seat_name(q.index), where().get_slice(" ", 1)]
+				var note := L.t("%s se desconectó en el %s") % [_seat_name(q.index), where().get_slice(" ", 1)]
 				if not gone_notes.has(note): gone_notes.append(note)
 			var bot := BotInput.new("follow", 3.0 + q.index * 0.7)
 			bot.phase = TAU * (q.index + 1) / 4.0
@@ -1206,7 +1206,7 @@ func _release_gone(say: bool) -> void:
 					bot.leader = r
 					break
 			q.net_release(bot)
-			_say("J%d lo lleva la máquina (se fue su PC)" % (q.index + 1))
+			_say(L.t("J%d lo lleva la máquina (se fue su PC)") % (q.index + 1))
 			if say and game.has_method("announce"): game.announce("J%d se ha desconectado: lo lleva la máquina" % (q.index + 1), 2.5)
 
 ## La sesión se ha cerrado (se fue el anfitrión, o este PC salió): de vuelta al menú online.
