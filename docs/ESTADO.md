@@ -3686,3 +3686,57 @@ Sobre la base del 22.4. Hecho, pendiente de revisión.
 - **Revisión:** el recorrido de las 56 ventanas en inglés (`recorrido_ui.py --con "cfg_language=en i18n_log=true" --sufijo en`), con `textos.py registro`. Lo que queda en español es el menú de depuración y el de revisión, que son para el autor. El rasgo de Peaslee se acortó en inglés porque rozaba el filete. Queda un aviso de `ui_check` en Configuración › Vídeo (la ayuda, a ras del panel de la vista previa) que en la captura no se nota.
 - **Herramientas:** `python tools/textos.py envolver` da 0 pendientes y `comprobar` da OK. En el scratchpad de la sesión quedaron los lotes de traducción (JSON); la tabla es `locale/en.po`.
 - Suite: 1082 de 1082.
+
+## Hito 22.6: *La música de Erich Zann*, noche suelta (17-11-2026)
+
+Bloque C de la fase 22. Hecho, pendiente de revisión.
+
+- **La noche** (`data/nights.json`, `noche_zann`; se abre al superar el 4.5): la rue d'Auseil de París, sus vecinos, los jirones de la noche y lo que hay tras la ventana. Relato de cuatro párrafos con el cielo `luna_baja`, textos del lugar y del bestiario en la Biblioteca, y el mapa en `resources/maps/noche_zann.png`.
+- **Arena** (`tools/gen_arena_auseil.py` → `data/arenas/auseil.json`; atrezo en `tools/gen_atrezo_auseil.py`, `aus_*`):
+  - Casas altas, estrechas e inclinadas, con entramado, contraventanas y buhardillas, solo en los bordes norte y oeste, para que no tapen el juego. Muros con hiedra al norte, el río con su pretil al sur y al este.
+  - La empinada calle, con franjas de escalones bajos que se pisan (`walkable`).
+  - La casa de Zann al fondo (-7, -30), la más alta, con la buhardilla encendida. Su ventana va en la clave `"viola"` de la arena (x, z y altura).
+  - Niebla baja del río (`data/weather/niebla_rio.tres`) y ambiente `auseil`.
+- **La viola** (`ZannViola`, `scripts/level/zann_viola.gd`; `LevelData.viola_*`):
+  - En cada compás sale de la ventana una onda por la calle: un pentagrama de cinco líneas que se abre (`ground_fx` modo 13).
+  - La onda aparta a los enemigos, más cerca de la ventana que lejos. A lo que viene de fuera (`"outer": true` en sus parámetros) además le hace daño y lo aturde un momento.
+  - El compás se acelera de 1,5 s a 0,7 s hasta el evento final, y con el jefe suelto va a 0,45 s.
+  - Por debajo de 0,8 s es frenesí: la onda sale roja y quita cordura (menos lejos de la ventana; el esquive la salta).
+  - Una luz de vela en la ventana destella con cada compás.
+  - El anfitrión decide lo que hace a los enemigos, y también cuándo calla la viola y cuándo sopla el viento (suceso de red `"viola"`). Cada PC aplica la onda a sus jugadores.
+- **Criaturas** (`tools/gen_noche_zann.py`):
+  - **Vecino de la rue d'Auseil**: viejo encorvado en levita, con pelo blanco y candelabro (`anim_humano`, `crawl`).
+  - **Jirón de la noche**: un sudario oscuro con estrellas que flota (`polyp`, sin la transparencia de Pnakotus). Dispara tres estrellas y embiste. Es de fuera.
+  - **Lo que hay tras la ventana** (jefe, `VoidBehavior`, `void`):
+    - Un remolino vertical de noche con estrellas y dos brazos de viento, siempre de cara a la cámara (`face_camera`). Antes giraba hacia donde iba y se veía de canto, como una mancha oscura en el suelo.
+    - Sale por la ventana sin cuerpo durante 2,5 s y flota a 7 m del jugador.
+    - Lanza estrellas en espiral. Cada 10 s, el viento de la ventana tira de todos hacia él.
+    - Por debajo del 60 %, anillos con huecos y dos jirones cada 11 s. Por debajo del 25 %, la viola calla a ratos y él va más deprisa.
+    - Al morir, la ventana se cierra.
+- **Sonidos** (`python tools/gen_sfx.py --zann`):
+  - `viola`: seis frases de arco de dos notas.
+  - `viola_frenzy`: cuatro de dobles cuerdas en tritono.
+  - `void_howl` y `void_wind`.
+- **Consejos:** `viola` (al segundo compás) y `frenesi`.
+- **Desafío «Allegro furioso»** (`data/challenges.json`): la viola va un 30 % más deprisa desde el principio (palanca nueva `viola_tempo`, que adelanta el frenesí de unos 210 s a unos 108 s) y las criaturas aguantan un 15 % más.
+  - Los desafíos de las noches se abren al superar la noche (`Challenge.unlocked` mira también `Nights.wins`).
+  - Van en una fila «Noches sueltas» bajo las columnas de la ventana de desafíos.
+- **Trofeos:** el jefe es el número 28 de la vitrina de jefes, que pasa a 10 × 3 (`vitrina_10x3`, `gen_trofeos.py`).
+- **Arreglos de paso:**
+  - **Textos de los parámetros de los enemigos.** Los gritos de fase, los avisos de los jefes y los de las llamadas (`phase_text_2`, `minion_text`, `breath_text`…) no se traducían en ningún jefe. Ahora `textos.py` los extrae (claves con `_text` en `params`) y `EnemyData.param` los traduce al leerlos. Son 26 textos más en inglés.
+  - **Artículo de los nombres que empiezan por «Lo».** `Hud.with_article` daba «Acaba con el Lo que hay tras la ventana»; ahora da «Acaba con lo que hay tras la ventana», y en inglés «Finish off what lies beyond the window».
+- **Equilibrio** (`simular.py noche_zann --n 4 --ts 2 --par 2`, dificultad 3):
+  - Al principio, 4 de 4 con el jefe en 23-40 s y la vida mínima entre el 69 y el 96 %.
+  - Subir vida y daño apenas cambió nada: lo que más protegía al bot era el empuje de la viola.
+  - Cambios: jefe con 3600 de vida (de 2000); jirón con 44 de vida (de 34), que dispara cada 2,6 s; vecino con 36 de vida (de 26) y 9 de golpe; aparición un 15-20 % más rápida y tope de 90; empuje 1,5 (de 2,4); daño de la viola a lo de fuera 5 (de 7); frenesí 2,5 de cordura. Con todo eso, 3 de 4 superadas (una caída a los 166 s) y vida mínima del 14 al 54 %.
+  - Referencia: Pnakotus, medida igual el mismo día, da 4 de 4 con la vida mínima del 3 al 34 %. Provisional (D-42).
+- **Comprobado en partida** (`cfg_quality=2`):
+  - El pentagrama baja por la calle, dorado y después rojo en el frenesí.
+  - Los vecinos con su candelabro y los jirones con estrellas.
+  - El jefe sale por la ventana y se ve de frente.
+  - «Acaba con lo que hay tras la ventana», también en inglés.
+  - La ventana de las noches con la cuarta y su mapa (`nights_row=3`), y la de los desafíos con la fila nueva.
+- **Tests** (`tests/test_zann.gd`, 13): la noche y su nivel; la ventana sale de la arena y los escalones se pisan; sin viola no suena; cada compás aparta y solo hiere a lo de fuera; lejos empuja menos; el invitado no mueve a los enemigos; el compás; el frenesí quita cordura y el compás corriente no; calla; el viento tira; el jefe y sus fases; el desafío se abre con la noche y acelera la viola; el artículo.
+- **Suite:** 1095 de 1095.
+- **Visto de paso, sin arreglar:** con `i18n_log=true`, Godot se cae al salir (señal 11) después de guardar `i18n_faltan.txt`. Pasa también en Pnakotus, así que viene del 22.5. Sin esa opción no se cae.
+- **Capturas:** `shots/game_zann1_020.0s.png` y `_060.0s.png` (la viola), `shots/game_zann3_040.0s.png` (el jefe), `shots/game_zann_en_016.0s.png` (en inglés), `shots/seleccion_noches_zann_002.5s.png` y `shots/seleccion_desafios_zann_002.5s.png`.

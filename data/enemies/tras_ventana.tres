@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/patterns/vacio_estrellas.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/jiron_noche.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = &"tras_ventana"
+display_name = "Lo que hay tras la ventana"
+model = "tras_ventana"
+model_scale = 2.4
+unique = true
+tier = 5
+spawn_weight = 1.0
+elite = true
+ethereal = true
+max_health = 3600.0
+hit_radius = 1.9
+body_radius = 1.7
+move_speed = 1.7
+xp = 60.0
+money = 150
+contact_physical = 12.0
+contact_mental = 8.0
+aura_radius = 4.5
+aura_drain = 1.4
+movement = &"void"
+params = {"face_camera": true, "death_text": "La ventana se cierra de golpe. Silencio.", "fly": 1.4, "hush_every": 9.0, "hush_text": "La viola calla…", "hush_time": 3.5, "keep": 7.0, "outer": true, "phase_text_2": "La noche se desborda por la ventana", "phase_text_3": "Zann ya no puede seguir tocando", "ring": "res://data/patterns/vacio_anillo.tres", "ring_every": 6.0, "rise_time": 2.5, "spawn": ExtResource("3"), "spawn_count": 2, "spawn_every": 11.0, "stars_every": 4.5, "wind_every": 10.0, "wind_force": 2.4, "wind_tell": 1.0, "wind_text": "Sopla el viento de la ventana…", "wind_time": 2.5}
+attack = ExtResource("2")
+attack_cooldown = 99.0
+attack_range = 0.0
+attack_anim = "burst"

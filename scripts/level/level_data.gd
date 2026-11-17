@@ -105,6 +105,22 @@ func is_survival() -> bool:
 @export var trap_spawn_every := 4.0            ## s entre pólipos que salen de una abierta
 @export var trap_spawn_cap := 4                ## pólipos que suelta cada vez que se abre, como mucho
 @export var trap_enemy: EnemyData              ## lo que sale
+@export_group("La viola de Zann (hito 22.6)")
+## La música que sale de la ventana más alta (`viola` en el JSON de la arena; ZannViola): en cada compás,
+## una onda que se abre por la calle y aparta a los enemigos (más cerca de la ventana, más fuerte); a lo
+## que viene del otro lado (`outer` en sus parámetros) además le duele. El compás se acelera de
+## `viola_period` a `viola_period_end` hasta el evento final, y con el jefe suelto va a `viola_period_boss`;
+## por debajo de `viola_frenzy` la música ya es frenesí y la onda quita cordura a quien alcanza.
+@export var viola_period := 0.0                ## s entre compases al empezar (0: sin viola)
+@export var viola_period_end := 0.7            ## al llegar el evento final
+@export var viola_period_boss := 0.45          ## con el jefe suelto
+@export var viola_radius := 34.0               ## m hasta donde llega la onda
+@export var viola_speed := 16.0                ## m/s a los que se abre
+@export var viola_push := 2.4                  ## empujón junto a la ventana (como el de las ondas de las armas)
+@export var viola_push_far := 0.5              ## y en el borde (fracción)
+@export var viola_hurt := 7.0                  ## daño a lo que viene de fuera
+@export var viola_frenzy := 0.8                ## s: con compases más cortos, frenesí
+@export var viola_sanity := 1.5                ## cordura que quita la onda en frenesí
 @export_group("Las Tierras del Sueño (hito 21.10)")
 ## Lo propio de cada nivel de la parte 4 (DreamLands). Nivel 1: los gatos de Ulthar bajan del pueblo a
 ## barrer a los zoogs y los hongos devuelven cordura.

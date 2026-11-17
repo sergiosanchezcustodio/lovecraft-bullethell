@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WeatherData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/weather_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"niebla_rio"
+display_name = "Niebla baja del río"
+wind_dir = Vector2(-0.4, -1)
+wind = 0.35
+gusts = 0.2
+precip = 0
+drift = 0.12
+drift_color = Color(0.42, 0.43, 0.48, 0.28)
+mist = 0.32
+mist_color = Color(0.34, 0.35, 0.42, 1.0)
+clouds = 0.25

@@ -288,3 +288,9 @@ En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra c
 - **Una clave que se salta por ser ids puede tener debajo textos:** `levels` en `campaign.json` es una lista de niveles con nombre y criaturas. Recorre las listas de diccionarios aunque su clave esté en `SKIP_KEYS`.
 - **Lo que se lee de un recurso como array no pasa por el `get`** de las propiedades `String`: `level_text` y `mid_texts` se traducen donde se usan.
 - **El registro del juego (`i18n_log=true`) se suma entre ejecuciones:** bórralo (`user://i18n_faltan.txt`) antes de repetir el recorrido, o saldrá lo que ya se arregló.
+
+## Noche de Zann (hito 22.6, 17-11-2026)
+
+- **Los textos que van dentro de un diccionario de un `.tres` no pasan por nada:** los gritos de los jefes en `params` («phase_text_2», «minion_text»…) se quedaron en español en inglés hasta el 22.6. Ahora `textos.py` saca las claves con `_text` de `params` y `EnemyData.param` las traduce: si añades un texto a los parámetros, ponle una clave con `_text`.
+- **Un modelo plano y vertical se ve de canto si gira con su marcha:** el jefe de la ventana, un disco, parecía una mancha en el suelo. Con `"face_camera": true` en sus parámetros, `Enemy` lo deja siempre mirando a la cámara isométrica (`FACE_CAMERA`, 45° en Y).
+- **Para equilibrar, mira primero lo que protege al bot:** subir la vida y el daño de la noche de Zann apenas cambió nada; lo que la hacía fácil era el empuje de la viola, que mantenía lejos a la horda. Mide una noche de referencia el mismo día (Pnakotus) antes de comparar.

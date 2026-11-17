@@ -467,6 +467,9 @@ func _ready() -> void:
 			polyps = PolypWinds.new().setup(world, level, not is_guest(), self)
 			add_child(polyps)
 			if args.has("trap_here"): _trap_here.call_deferred(args.get_float("trap_here", 1.0))
+		if level.viola_period > 0.0:                         # la viola de Erich Zann (22.6)
+			zann = ZannViola.new().setup(world, level, not is_guest(), self)
+			add_child(zann)
 		if level.cats_every > 0.0 or level.mushroom_sanity > 0.0 or level.galley_every > 0.0 or level.ruby_chance > 0.0 or level.gust_every > 0.0 				or level.ghouls_every > 0.0 or not level.glow_models.is_empty() or level.flute_every > 0.0:   # las Tierras del Sueño (21.10)
 			dream = DreamLands.new().setup(world, level, not is_guest(), self)
 			add_child(dream)
@@ -1670,6 +1673,7 @@ func _powder_here(every: float) -> void:
 		await get_tree().create_timer(maxf(every, 0.5), false).timeout
 
 var polyps: PolypWinds                           ## las trampillas de la Gran Raza y los pólipos (21.15)
+var zann: ZannViola                              ## la viola de Erich Zann (22.6)
 var dream: DreamLands                            ## lo propio de cada nivel de la parte 4 (21.10)
 func _level_polyps() -> bool:
 	for ed: EnemyData in level.pool + level.final_pool + level.mid_enemies + ([level.final_enemy] if level.final_enemy else []):

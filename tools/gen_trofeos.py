@@ -162,7 +162,7 @@ for x in range(-WALL_W // 2, WALL_W // 2):
         M.put(x, 0, z, P, c)
 export(M, 'sala_suelo', 0.95, 0.15)
 
-for cols, rows in ((9, 3), (5, 3), (8, 3), (6, 3), (4, 3)):    # la de los jefes, de 8 desde la parte 4 (21.12) y de 9 con las noches (22.3)
+for cols, rows in ((10, 3), (9, 3), (5, 3), (8, 3), (6, 3), (4, 3)):    # la de los jefes, de 8 desde la parte 4 (21.12), de 9 con las noches (22.3) y de 10 con la de Zann (22.6)
     vitrina(cols, rows)
 
 

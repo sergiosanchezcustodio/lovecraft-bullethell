@@ -14,6 +14,7 @@ Uso: python tools/gen_sfx.py <carpeta con los packs de Kenney descomprimidos>
      python tools/gen_sfx.py --sueno      (solo el sueño de Kuranes)
      python tools/gen_sfx.py --kadath     (solo las flautas de los Otros Dioses)
      python tools/gen_sfx.py --nyarla     (solo los de Nyarlathotep)
+     python tools/gen_sfx.py --zann       (solo los de la noche de Erich Zann: la viola, su frenesí y la ventana)
      python tools/gen_sfx.py --finale     (solo el acorde de los finales ilustrados, hito 21.17)
      python tools/gen_sfx.py --fase20     (solo los de Pickman, Ward, Gilman, Tillinghast y Derby)
      python tools/gen_sfx.py --sucesos    (solo los de los sucesos de la noche: augurio, ventisca y estrellas)
@@ -1394,6 +1395,67 @@ def nyarla():
     save('nyarla_scatter', rev)
 
 
+def zann():
+    """La música de Erich Zann (hito 22.6). La viola: notas de arco (diente de sierra con vibrato, el
+    cuerpo de la caja en tres resonancias y el roce del arco), seis frases cortas de dos notas en una
+    escala rara, con su sala; el frenesí: dobles cuerdas en tritono, arco áspero y deprisa (cuatro).
+    Lo que hay tras la ventana: un aullido hondo de viento con un gemido que no afina, y el viento
+    de la ventana, que sopla y tira."""
+    r = np.random.default_rng(2206)
+
+    def tail(x, sec=0.3):
+        n = min(len(x) // 3, int(sec * SR))
+        x[-n:] *= np.linspace(1, 0, n) ** 2
+        return x
+
+    def verb(dry, sec=1.4, decay=0.5, k=0.4, cut=3000):
+        ir = lp(r.standard_normal(int(sec * SR)), cut) * np.exp(-t(sec) / decay)
+        wet = signal.fftconvolve(dry, ir)[:len(dry)]
+        wet *= np.std(dry) / (np.std(wet) + 1e-9)
+        return dry + wet * k
+
+    def bow(f, d, rough=0.15, vib=5.5, depth=0.012):
+        """Una nota de arco de d s a f Hz (f puede ser un array)."""
+        tt = t(d)
+        f = np.broadcast_to(np.asarray(f, dtype=np.float64), tt.shape)
+        f = f * (1 + depth * np.sin(2 * np.pi * vib * tt) * np.clip(tt / 0.12, 0, 1))
+        ph = np.cumsum(f) / SR
+        saw = 2 * (ph - np.floor(ph + 0.5))
+        body = bp(saw, 250, 1100) * 1.0 + bp(saw, 1800, 3200) * 0.5 + lp(saw, 400) * 0.6
+        hair = bp(r.standard_normal(len(tt)), 2000, 7000) * rough
+        e = np.minimum(tt / 0.04, 1) * np.exp(-np.maximum(tt - d * 0.6, 0) / (d * 0.25))
+        return (body + hair) * e
+
+    scale = [293.7, 311.1, 370.0, 392.0, 440.0, 466.2, 554.4, 587.3]   # re menor con segunda y cuarta raras
+    for k in range(6):
+        a, b = scale[(k * 3) % 8], scale[(k * 5 + 2) % 8]
+        x = np.concatenate([bow(a, 0.32, 0.12), bow(b, 0.42, 0.12)])
+        save('viola_%d' % k, tail(verb(x, 1.3, 0.45, 0.35, 4000), 0.2))
+    for k in range(4):
+        a = scale[(k * 3 + 1) % 8] * (1 + k % 2)
+        x = np.zeros(int(0.42 * SR))
+        for i in range(3):
+            n = bow(a * (1 + 0.06 * i), 0.14, 0.45, 9.0, 0.03) + bow(a * 1.414 * (1 + 0.06 * i), 0.14, 0.45, 9.0, 0.03) * 0.8
+            o = int(i * 0.13 * SR)
+            x[o:o + len(n)] += n[:len(x) - o]
+        save('viola_frenzy_%d' % k, tail(verb(x, 1.0, 0.35, 0.3, 5000), 0.12))
+
+    d = 3.0
+    tt = t(d)
+    e = np.minimum(tt / 0.5, 1) * np.exp(-np.maximum(tt - 2.0, 0) / 0.4)
+    wind = lp(r.standard_normal(len(tt)), 500, 3) * (1 + 0.5 * np.sin(2 * np.pi * 0.7 * tt)) * 1.6
+    moan = bow(110 * (1 + 0.04 * np.sin(2 * np.pi * 0.3 * tt)) * (1 + 0.15 * np.clip(tt / d, 0, 1)), d, 0.6, 3.0, 0.03) * 0.5
+    whine = np.sin(2 * np.pi * np.cumsum(740 * (1 + 0.07 * np.sin(2 * np.pi * 0.9 * tt))) / SR) * 0.12
+    save('void_howl', tail(verb((wind + moan + whine) * e, 2.4, 0.9, 0.5, 2000), 0.5))
+
+    d = 3.6
+    tt = t(d)
+    e = np.clip(tt / 0.4, 0, 1) * np.exp(-np.maximum(tt - 2.8, 0) / 0.3) * (1 + 0.6 * lp(r.standard_normal(len(tt)), 4))
+    gust = bp(r.standard_normal(len(tt)), 180, 1600) * 1.2 + bp(r.standard_normal(len(tt)), 1800, 5000) * 0.25
+    x = gust * e
+    save('void_wind', tail(verb(x, 1.6, 0.6, 0.35), 0.4))
+
+
 def pnakotus():
     """La sombra fuera del tiempo (hito 21.15). El pólipo: un silbido hueco y quebrado, como el viento por
     un tubo, que sube y baja con aire alrededor (dos variantes); antes de embestir, uno que sube de golpe.
@@ -1523,6 +1585,8 @@ if __name__ == '__main__':
         color()
     elif '--dunwich' in sys.argv:                              # solo los de Dunwich (hito 21.14)
         dunwich()
+    elif '--zann' in sys.argv:                                 # solo los de la noche de Erich Zann (hito 22.6)
+        zann()
     elif '--pnakotus' in sys.argv:                             # solo los de Pnakotus (hito 21.15)
         pnakotus()
     elif '--kadath' in sys.argv:                               # solo las flautas de los Otros Dioses (hito 21.10)

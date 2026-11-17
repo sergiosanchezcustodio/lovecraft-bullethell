@@ -38,7 +38,7 @@ func test_las_trampillas_suman() -> void:
 
 func test_la_vitrina_de_jefes_con_las_noches() -> void:
 	var ids := Trophies.bosses().map(func(e: EnemyData) -> String: return String(e.id))
-	for id in ["color_pozo", "hermano_wilbur", "polipo_antiguo"]: assert_true(ids.has(id), "el jefe de la noche: %s" % id)
+	for id in ["color_pozo", "hermano_wilbur", "polipo_antiguo", "tras_ventana"]: assert_true(ids.has(id), "el jefe de la noche: %s" % id)
 	assert_lte(ids.size(), Trophies.CASE_COLS[1] * 3, "caben en la vitrina")
 	assert_true(FileAccess.file_exists("res://models/%s.json" % Trophies.CASE_MODELS[1]))
 

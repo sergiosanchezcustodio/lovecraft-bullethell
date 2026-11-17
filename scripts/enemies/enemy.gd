@@ -35,6 +35,7 @@ var _detour_t := 0.0                         ## s yendo por el flujo aunque haya
 var _path_clear := true                      ## s de invulnerabilidad (cambio de fase de un jefe)
 var velocity := Vector3.ZERO
 var facing := Vector3(0, 0, 1)
+const FACE_CAMERA := Vector3(0.7071, 0.0, 0.7071)   ## hacia la cámara isométrica (45° en Y)
 var anim := "walk"
 var anim_t := 0.0                        ## fase de la animación (0..1)
 ## Hordas menos clónicas (hito 17.12): cada uno algo distinto, solo en lo que se ve (la vida, la
@@ -1099,7 +1100,9 @@ func _physics_process(delta: float) -> void:
 			np = Vector2(clampf(np.x, b.position.x, b.end.x), clampf(np.y, b.position.y, b.end.y))
 		elif obstacles != null: np = obstacles.push_out(np, data.body_radius)
 		position = Vector3(np.x, position.y, np.y)
-	if velocity.length() > 0.1:
+	if data.params.get("face_camera", false):           # siempre de cara a la cámara (lo de tras la ventana, 22.6)
+		facing = FACE_CAMERA
+	elif velocity.length() > 0.1:
 		facing = turn_flat(facing, velocity, 1.0 - exp(-float(data.params.get("turn", 10.0)) * delta))   # turn: el guardián gira despacio (16.17)
 	if guard_ring != null: guard_ring.rotation.y += 0.05
 	if traits != 0: EliteTraits.step(self, delta)

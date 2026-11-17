@@ -39,9 +39,9 @@ static func find(id: String) -> Dictionary:
 		if String(c.level) == base: return c
 	return {}
 
-## ¿Abierto? Al superar su nivel (o con todo desbloqueado).
+## ¿Abierto? Al superar su nivel, o su noche suelta (o con todo desbloqueado).
 static func unlocked(save: SaveData, base: String) -> bool:
-	return save != null and (save.unlock_all or save.levels_won.has(base))
+	return save != null and (save.unlock_all or save.levels_won.has(base) or Nights.wins(save, base) > 0)
 
 static func any_unlocked(save: SaveData) -> bool:
 	return all().any(func(c: Dictionary) -> bool: return unlocked(save, String(c.level)))

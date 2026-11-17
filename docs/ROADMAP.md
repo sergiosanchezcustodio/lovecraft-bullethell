@@ -786,7 +786,7 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 22.6 | ***La música de Erich Zann*:** la rue d'Auseil de París, empinada y con escalones; la viola que suena desde la ventana más alta y empuja a los enemigos al ritmo de la música, que se acelera; lo que hay al otro lado de la ventana, como jefe. Con su arena, sus criaturas, su relato y su desafío | Propuesto |
+| 22.6 | ***La música de Erich Zann*:** la rue d'Auseil de París, empinada y con escalones; la viola que suena desde la ventana más alta y empuja a los enemigos al ritmo de la música, que se acelera; lo que hay al otro lado de la ventana, como jefe. Con su arena, sus criaturas, su relato y su desafío | Hecho (17-11-2026), pendiente de revisión: rue d'Auseil, la viola (`ZannViola`) con su frenesí, vecinos, jirones y el jefe (`VoidBehavior`), relato, desafío «Allegro furioso» y sonidos |
 
 ### Bloque D: para darlo a conocer
 

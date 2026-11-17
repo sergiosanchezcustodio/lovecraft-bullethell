@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"vecino_auseil"
+display_name = "Vecino de la rue d'Auseil"
+model = "vecino_auseil"
+tier = 1
+spawn_weight = 1.0
+elite = false
+tags = Array[StringName]([&"humana"])
+max_health = 36.0
+hit_radius = 0.45
+body_radius = 0.45
+move_speed = 1.8
+xp = 1.4
+money = 2
+contact_physical = 9.0
+contact_mental = 2.0
+movement = &"crawl"
+attack_anim = ""

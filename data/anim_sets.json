@@ -141,6 +141,9 @@
 		"nadador": "anim_profundo",
 		"polipo_volador": "anim_fragmento",
 		"polipo_antiguo": "anim_fragmento",
-		"poseido_yith": "anim_humano"
+		"poseido_yith": "anim_humano",
+		"vecino_auseil": "anim_humano",
+		"jiron_noche": "anim_fragmento",
+		"tras_ventana": "anim_fragmento"
 	}
 }

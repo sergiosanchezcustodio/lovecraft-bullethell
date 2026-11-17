@@ -24,6 +24,14 @@
 			"criaturas": "Poseídos de la Gran Raza · Pólipos voladores · El pólipo antiguo",
 			"texto": "Bajo la arena hay una ciudad más vieja que el hombre. La Gran Raza encerró allí, tras trampillas selladas, a unos seres a medias materiales que no se ven: solo se oyen sus silbidos y se siente su viento. Las trampillas se están abriendo. Séllalas, de pie en medio, antes de que salgan todos.",
 			"abre": "p3_n5"
+		},
+		{
+			"id": "noche_zann",
+			"titulo": "La música de Erich Zann",
+			"lugar": "La rue d'Auseil, en París",
+			"criaturas": "Vecinos de la rue d'Auseil · Jirones de la noche · Lo que hay tras la ventana",
+			"texto": "En la buhardilla más alta de una calle que ya no sale en los mapas, un viejo mudo toca la viola cada noche, cada vez más deprisa. Su música aparta lo que viene de fuera y le hace daño; pero cuando se vuelve frenesí, también te hiere a ti. No dejes que pare.",
+			"abre": "p4_n5"
 		}
 	]
 }

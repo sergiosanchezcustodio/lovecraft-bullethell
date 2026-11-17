@@ -20,6 +20,7 @@
 		{"level": "p4_n2", "name": "Vino de rubí", "text": "La cordura no vuelve sola y las criaturas aguantan un 20 % más.", "effects": {"no_regen": 1, "enemy_health": 1.2}},
 		{"level": "p4_n3", "name": "Sin mirar atrás", "text": "Sin esquive y criaturas un 15 % más rápidas.", "effects": {"no_dodge": 1, "enemy_speed": 1.15}},
 		{"level": "p4_n4", "name": "Sin farol", "text": "Mucha menos luz: en las bóvedas de Zin, el farol lo es todo.", "effects": {"light": 0.6, "lamp": 0.5}},
-		{"level": "p4_n5", "name": "Ante el Caos reptante", "text": "Solo armas arcanas nuevas y las criaturas aguantan un 20 % más.", "effects": {"arcane_only": 1, "enemy_health": 1.2}}
+		{"level": "p4_n5", "name": "Ante el Caos reptante", "text": "Solo armas arcanas nuevas y las criaturas aguantan un 20 % más.", "effects": {"arcane_only": 1, "enemy_health": 1.2}},
+		{"level": "noche_zann", "name": "Allegro furioso", "text": "La viola empieza ya deprisa y el frenesí llega mucho antes. Las criaturas aguantan un 15 % más.", "effects": {"viola_tempo": 0.7, "enemy_health": 1.15}}
 	]
 }

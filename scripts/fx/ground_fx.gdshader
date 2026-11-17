@@ -16,6 +16,7 @@ render_mode unshaded, cull_disabled, depth_draw_never, shadows_disabled;
 // rectas en ángulos que no cuadran y luz verde que late en ellas; 12 sueño (Kuranes, hito
 // 20.22): nubes de colores pastel que giran despacio sobre un cielo de noche, estrellas doradas
 // que titilan y un borde claro; se abre desde el centro con `age`.
+// 13 música (Zann, hito 22.6): pentagrama en anillo que se abre con `wave_r`, de grosor `age`.
 
 uniform int mode = 0;
 uniform float fade = 1.0;
@@ -56,7 +57,28 @@ void fragment() {
 	float r = length(q);
 	vec2 n = cw + seed * 17.0;
 	// borde irregular: el radio cambia con el ángulo y con el ruido
-	if (mode == 3) {
+	if (mode == 13) {
+		// la música de Zann (hito 22.6): un pentagrama en anillo que se abre (`wave_r`, 0..1) con su
+		// grosor fijo en el mundo (`age`, en las mismas unidades), cinco líneas finas, notas sueltas y
+		// el frente más claro; se apaga hacia el borde
+		float band = wave_r - r;
+		float w = max(age, 0.01);
+		if (band < 0.0 || band > w || r > 1.0) discard;
+		float u = band / w;                                   // 0 en el frente, 1 detrás
+		float line = step(abs(fract(u * 5.0) - 0.5), 0.16);  // las cinco líneas
+		float ang = atan(q.y, q.x);
+		float slot = floor(ang * 64.0 / 6.2831853);
+		float pick = hash(vec2(slot, floor(wave_r * 9.0)) + seed);
+		float nh = floor(pick * 5.0) / 5.0 + 0.1;             // en qué línea va la nota
+		float note = step(0.72, pick) * step(abs(u - nh), 0.09)
+			* step(abs(fract(ang * 64.0 / 6.2831853) - 0.5), 0.28);
+		float front = step(u, 0.12);
+		float alpha = (line * 0.55 + note + front * 0.7) * (1.0 - smoothstep(0.55, 1.0, r));
+		if (alpha < 0.05) discard;
+		ALBEDO = tint * 0.6;
+		EMISSION = tint * (0.5 + 0.8 * max(note, front));
+		ALPHA = clamp(alpha, 0.0, 1.0) * fade;
+	} else if (mode == 3) {
 		// onda: banda de celdas en el radio `ring`, con un frente brillante, runas que
 		// parpadean dentro de la banda y una estela tenue detrás
 		float ang = atan(q.y, q.x);

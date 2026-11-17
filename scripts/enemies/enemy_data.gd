@@ -54,5 +54,7 @@ extends Resource
 @export var attack_range := 9.0
 @export var attack_anim := ""              ## animación al disparar (opcional)
 
+## Los textos («phase_text_2», «minion_text»…) salen ya traducidos (22.6).
 func param(key: String, default: Variant) -> Variant:
-	return params.get(key, default)
+	var v: Variant = params.get(key, default)
+	return L.t(v) if v is String and key.contains("_text") else v

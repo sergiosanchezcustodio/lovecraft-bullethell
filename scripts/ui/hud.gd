@@ -37,6 +37,7 @@ const PROPER := ["Cthulhu", "Madre", "Padre", "Barnabas", "Gedney", "Pth'thya-l'
 static func with_article(n: String) -> String:   # i18n: no
 	if L.lang == "en": return _the(n)
 	var first := n.get_slice(" ", 0).trim_suffix(",")
+	if first == "Lo": return "lo" + n.substr(2)        # «Acaba con lo que hay tras la ventana» (22.6)   # i18n: no
 	if first in ["El", "La", "Los", "Las"] or first in PROPER: return n
 	return ("la " if first in FEM_NOUNS else "el ") + n   # i18n: no
 
@@ -46,6 +47,7 @@ static func with_a(n: String) -> String:   # i18n: no
 	if L.lang == "en": return _the(n)          # «The night brings the Lurker»: sin la «a» personal
 	var first := n.get_slice(" ", 0).trim_suffix(",")
 	if first in PROPER: return "a " + n
+	if first == "Lo": return "a lo" + n.substr(2)   # i18n: no
 	var full := with_article(n)
 	if full.begins_with("El "): return "al " + full.substr(3)   # i18n: no
 	if full.begins_with("el "): return "al " + full.substr(3)   # i18n: no
@@ -58,6 +60,7 @@ static func with_a(n: String) -> String:   # i18n: no
 const PROPER_EN := ["Cthulhu", "Mother", "Father", "Barnabas", "Gedney", "Pth'thya-l'yi", "Nyarlathotep", "Old", "Captain"]
 static func _the(n: String) -> String:
 	var first := n.get_slice(" ", 0).trim_suffix(",")
+	if first == "What": return "w" + n.substr(1)          # «Finish off what lies beyond the window» (22.6)   # i18n: no
 	if first == "The" or first in PROPER_EN: return n
 	return L.t("the ") + n
 

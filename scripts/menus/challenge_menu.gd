@@ -59,6 +59,43 @@ func _ready() -> void:
 			if first == null and not b.disabled: first = b
 		grid.append(row)
 		pi += 1
+	var nights := Nights.all().filter(func(n: Dictionary) -> bool: return not Challenge.find(String(n.id)).is_empty())
+	if not nights.is_empty():                        # los de las noches sueltas, en una fila debajo (22.6)
+		var nt := MenuKit.title(L.t("Noches sueltas"), 24)
+		box.add_child(nt)
+		var nrow := HBoxContainer.new()
+		nrow.add_theme_constant_override("separation", 22)
+		nrow.alignment = BoxContainer.ALIGNMENT_CENTER
+		box.add_child(nrow)
+		var row: Array = []
+		for n: Dictionary in nights:
+			var base := String(n.id)
+			var ch := Challenge.find(base)
+			var open := Challenge.unlocked(Saves.current, base)
+			var tick := "✓ " if Challenge.won(Saves.current, base) else ""
+			var rec := Challenge.best(Saves.current, base)
+			var b := MenuKit.button("%s%s%s" % [tick, String(ch.name) if open or dev else L.t("Supera la noche para abrirlo"),
+				(L.t("  ·  Récord %s") % Endless.clock(rec)) if rec > 0.0 else ""], MenuKit.INK, 18)
+			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			b.custom_minimum_size = Vector2(460, 62)
+			b.disabled = not (open or dev) or not ResourceLoader.exists("res://data/levels/%s.tres" % base)
+			b.focus_entered.connect(func() -> void: _rules.text = "%s · %s" % [String(n.titulo), ch.text])
+			b.pressed.connect(func() -> void:
+				picked.emit(Challenge.id_for(base))
+				queue_free())
+			nrow.add_child(b)
+			row.append(b)
+			if first == null and not b.disabled: first = b
+		for b: Button in row:                          # arriba, al último de la columna más cercana
+			var c := mini(row.find(b), grid.size() - 1)
+			if c >= 0 and not (grid[c] as Array).is_empty():
+				var up: Button = grid[c][-1]
+				b.focus_neighbor_top = b.get_path_to(up)
+				up.focus_neighbor_bottom = up.get_path_to(b)
+		for i in row.size():
+			if i > 0: row[i].focus_neighbor_left = row[i].get_path_to(row[i - 1])
+			if i < row.size() - 1: row[i].focus_neighbor_right = row[i].get_path_to(row[i + 1])
 	for c in grid.size():                             # izquierda y derecha cambian de parte
 		for r in (grid[c] as Array).size():
 			var b: Button = grid[c][r]

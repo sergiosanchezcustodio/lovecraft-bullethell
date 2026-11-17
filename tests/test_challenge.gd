@@ -2,20 +2,20 @@ extends GutTest
 ## Modo desafío (hito 15.2): datos, nivel, reglas y registro.
 
 const KNOWN := ["no_dodge", "one_weapon", "arcane_only", "max_health", "spawn_rate", "enemy_health",
-	"enemy_speed", "light", "lamp", "split_elites", "no_heal", "no_regen", "bullet_trail", "pet_idle"]
+	"enemy_speed", "light", "lamp", "split_elites", "no_heal", "no_regen", "bullet_trail", "pet_idle", "viola_tempo"]
 
 func after_each() -> void:
 	Challenge.begin("")
 
 func test_un_desafio_por_nivel_y_bien_hecho() -> void:
 	var all := Challenge.all()
-	assert_eq(all.size(), 20)                   # 4 partes × 5 (21.12)
+	assert_eq(all.size(), 21)                   # 4 partes × 5 (21.12) y la noche de Zann (22.6)
 	var seen := {}
 	for c: Dictionary in all:
 		var base := String(c.level)
 		assert_false(seen.has(base), "repetido: " + base)
 		seen[base] = true
-		assert_true(Campaign.exists(base), base)
+		assert_true(Campaign.exists(base) or Nights.is_night(base), base)
 		assert_ne(String(c.get("name", "")), "", base)
 		assert_ne(String(c.get("text", "")), "", base)
 		for k: String in c.effects: assert_true(KNOWN.has(k), "%s: efecto desconocido %s" % [base, k])

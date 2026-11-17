@@ -69,6 +69,9 @@ TRES_PROPS = {'display_name', 'description', 'story', 'passive_text', 'role', 'f
 _TRES_STR = re.compile(r'^(\w+) = "((?:[^"\\]|\\.)*)"', re.M | re.S)
 _TRES_ARR = re.compile(r'^(\w+) = (?:PackedStringArray|Array\[String\])\((.*?)\)$', re.M | re.S)
 _TRES_ITEM = re.compile(r'"((?:[^"\\]|\\.)*)"', re.S)
+# Los gritos y avisos de los enemigos en sus parámetros («phase_text_2», «minion_text»…; 22.6), que
+# EnemyData.param traduce al leerlos.
+_TRES_PARAM_TEXT = re.compile(r'"(\w*_text\w*)": "((?:[^"\\]|\\.)*)"')
 
 def unescape_godot(s):
     out = []; i = 0
@@ -86,6 +89,11 @@ def tres_texts(path, rel, out):
     for k, v in _TRES_STR.findall(t):
         v = unescape_godot(v)
         if k in TRES_PROPS and human(v): out.setdefault(v, []).append(rel)
+    for line in t.splitlines():
+        if not line.startswith('params = '): continue
+        for k, v in _TRES_PARAM_TEXT.findall(line):
+            v = unescape_godot(v)
+            if human(v): out.setdefault(v, []).append(rel)
     for k, body in _TRES_ARR.findall(t):
         if k not in TRES_PROPS: continue
         for v in _TRES_ITEM.findall(body):

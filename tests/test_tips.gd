@@ -1,7 +1,7 @@
 extends GutTest
 ## Consejos de la primera partida y leyenda de los avisos (hito 13.3).
 
-const WHENS := ["manual", "move", "dodge", "pause", "sheet", "gem", "levelup", "sanity", "chest", "elite", "final", "down", "blight", "powder", "unseen", "trapdoor", "polyp"]
+const WHENS := ["manual", "move", "dodge", "pause", "sheet", "gem", "levelup", "sanity", "chest", "elite", "final", "down", "blight", "powder", "unseen", "trapdoor", "polyp", "viola", "viola_frenzy"]
 
 func test_los_datos_cargan_y_cada_consejo_tiene_su_disparo() -> void:
 	var t := Tips.new(null)

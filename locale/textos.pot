@@ -319,6 +319,10 @@ msgstr ""
 msgid "El Arrecife del Diablo y Y'ha-nthlei"
 msgstr ""
 
+#: data/arenas/auseil.json data/levels/noche_zann.tres
+msgid "La rue d'Auseil"
+msgstr ""
+
 #: data/arenas/bosque.json
 msgid "El bosque encantado"
 msgstr ""
@@ -720,6 +724,10 @@ msgid "Aguantan más, y las élites se parten en dos al morir."
 msgstr ""
 
 #: data/challenges.json
+msgid "Allegro furioso"
+msgstr ""
+
+#: data/challenges.json
 msgid "Ante el Caos reptante"
 msgstr ""
 
@@ -761,6 +769,10 @@ msgstr ""
 
 #: data/challenges.json
 msgid "La fe de la Orden"
+msgstr ""
+
+#: data/challenges.json
+msgid "La viola empieza ya deprisa y el frenesí llega mucho antes. Las criaturas aguantan un 15 % más."
 msgstr ""
 
 #: data/challenges.json
@@ -1572,11 +1584,23 @@ msgid "Araña púrpura de Leng"
 msgstr ""
 
 #: data/enemies/arana_madre.tres
+msgid "De las grietas bajan sus crías"
+msgstr ""
+
+#: data/enemies/arana_madre.tres
 msgid "La madre de las arañas de Leng"
 msgstr ""
 
 #: data/enemies/barnabas.tres
 msgid "Barnabas Marsh, transformado"
+msgstr ""
+
+#: data/enemies/barnabas.tres
+msgid "¡Y'ha-nthlei!"
+msgstr ""
+
+#: data/enemies/bestia_lunar_mayor.tres
+msgid "El amo de la galera llama a sus remeros"
 msgstr ""
 
 #: data/enemies/bestia_lunar_mayor.tres
@@ -1587,12 +1611,20 @@ msgstr ""
 msgid "El viejo Castro"
 msgstr ""
 
+#: data/enemies/castro.tres
+msgid "¡Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn!"
+msgstr ""
+
 #: data/enemies/chotacabras.tres
 msgid "Chotacabras de Dunwich"
 msgstr ""
 
 #: data/enemies/color_pozo.tres
 msgid "El color que sube del pozo"
+msgstr ""
+
+#: data/enemies/color_pozo.tres
+msgid "El color se retuerce…"
 msgstr ""
 
 #: data/enemies/cthulhu.tres scripts/ui/hud.gd
@@ -1631,12 +1663,20 @@ msgstr ""
 msgid "El diácono de la Orden"
 msgstr ""
 
+#: data/enemies/diacono.tres
+msgid "¡Ïa! ¡Ïa! ¡Dagon!"
+msgstr ""
+
 #: data/enemies/emanacion.tres
 msgid "Emanación de la puerta"
 msgstr ""
 
 #: data/enemies/engendro.tres
 msgid "Engendro de Cthulhu"
+msgstr ""
+
+#: data/enemies/engendro.tres data/enemies/engendro_mayor.tres
+msgid "¡Ïa! Cthulhu fhtagn!"
 msgstr ""
 
 #: data/enemies/engendro_mayor.tres
@@ -1657,6 +1697,10 @@ msgstr ""
 
 #: data/enemies/gedney.tres
 msgid "Gedney, lo que queda de él"
+msgstr ""
+
+#: data/enemies/gedney.tres
+msgid "¡Tekeli-li! ¡Tekeli-li!"
 msgstr ""
 
 #: data/enemies/ghast.tres
@@ -1683,6 +1727,10 @@ msgstr ""
 msgid "El gran gug de la torre de Koth"
 msgstr ""
 
+#: data/enemies/gug_koth.tres
+msgid "El gran gug ruge: los ghasts saltan de las bóvedas"
+msgstr ""
+
 #: data/enemies/habitante_mujer.tres
 msgid "Vecina de Innsmouth"
 msgstr ""
@@ -1697,6 +1745,18 @@ msgstr ""
 
 #: data/enemies/hermano_wilbur.tres
 msgid "El hermano de Wilbur"
+msgstr ""
+
+#: data/enemies/hermano_wilbur.tres
+msgid "Ygnaiih… thflthkh'ngha… ¡Yog-Sothoth!"
+msgstr ""
+
+#: data/enemies/hermano_wilbur.tres
+msgid "¡Ayuda! ¡Ayuda!…"
+msgstr ""
+
+#: data/enemies/hermano_wilbur.tres scripts/enemies/horror_behavior.gd
+msgid "¡Padre! ¡Padre! ¡Yog-Sothoth!"
 msgstr ""
 
 #: data/enemies/hibrido_h.tres
@@ -1715,8 +1775,16 @@ msgstr ""
 msgid "Madre Hydra"
 msgstr ""
 
+#: data/enemies/hydra.tres
+msgid "¡Madre Hydra!"
+msgstr ""
+
 #: data/enemies/idolo_vivo.tres
 msgid "Ídolo vivo"
+msgstr ""
+
+#: data/enemies/jiron_noche.tres
+msgid "Jirón de la noche"
 msgstr ""
 
 #: data/enemies/larva_otros.tres
@@ -1736,15 +1804,31 @@ msgid "Forma del Caos reptante"
 msgstr ""
 
 #: data/enemies/nyarlathotep.tres
+msgid "El ser sin rostro llena el salón de los dioses"
+msgstr ""
+
+#: data/enemies/nyarlathotep.tres
 msgid "Nyarlathotep, el Caos reptante"
+msgstr ""
+
+#: data/enemies/nyarlathotep.tres
+msgid "Se deshace en un enjambre de formas…"
 msgstr ""
 
 #: data/enemies/obed_marsh.tres
 msgid "El capitán Obed Marsh"
 msgstr ""
 
+#: data/enemies/obed_marsh.tres
+msgid "¡Ïa! ¡Dagón paga bien!"
+msgstr ""
+
 #: data/enemies/pesadilla.tres
 msgid "Pesadilla de la oleada de sueños"
+msgstr ""
+
+#: data/enemies/pesadilla_relieve.tres
+msgid "Cthulhu fhtagn…"
 msgstr ""
 
 #: data/enemies/pesadilla_relieve.tres
@@ -1763,8 +1847,32 @@ msgstr ""
 msgid "El pólipo antiguo"
 msgstr ""
 
+#: data/enemies/polipo_antiguo.tres scripts/enemies/polyp_boss_behavior.gd
+msgid "El silbido se apaga bajo la arena…"
+msgstr ""
+
+#: data/enemies/polipo_antiguo.tres
+msgid "El viento aúlla en los pasadizos de abajo"
+msgstr ""
+
+#: data/enemies/polipo_antiguo.tres
+msgid "Se abren todas las trampillas"
+msgstr ""
+
+#: data/enemies/polipo_antiguo.tres scripts/enemies/polyp_boss_behavior.gd
+msgid "Se deshace en el viento…"
+msgstr ""
+
+#: data/enemies/polipo_antiguo.tres scripts/enemies/polyp_boss_behavior.gd
+msgid "Toma aliento…"
+msgstr ""
+
 #: data/enemies/polipo_madre.tres
 msgid "La cosa blanca del lago oculto"
+msgstr ""
+
+#: data/enemies/polipo_madre.tres
+msgid "La masa blanca se divide…"
 msgstr ""
 
 #: data/enemies/polipo_volador.tres
@@ -1773,6 +1881,10 @@ msgstr ""
 
 #: data/enemies/poseido_yith.tres
 msgid "Poseído de la Gran Raza"
+msgstr ""
+
+#: data/enemies/primigenio_menor.tres
+msgid "Despierta uno de los que yacen con él…"
 msgstr ""
 
 #: data/enemies/primigenio_menor.tres
@@ -1799,6 +1911,10 @@ msgstr ""
 msgid "Pth'thya-l'yi, la antepasada"
 msgstr ""
 
+#: data/enemies/pththya.tres
+msgid "¡Ïa! ¡Ïa! Hijos del Arrecife…"
+msgstr ""
+
 #: data/enemies/remero_lunar.tres
 msgid "Remero lunar"
 msgstr ""
@@ -1813,6 +1929,10 @@ msgstr ""
 
 #: data/enemies/sacerdote_culto.tres
 msgid "El sacerdote del ritual"
+msgstr ""
+
+#: data/enemies/sacerdote_culto.tres
+msgid "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn!"
 msgstr ""
 
 #: data/enemies/sacerdote_leng.tres
@@ -1855,12 +1975,48 @@ msgstr ""
 msgid "El sumo sacerdote de la Orden"
 msgstr ""
 
+#: data/enemies/sumo_sacerdote.tres
+msgid "¡Ph'nglui mglw'nafh!"
+msgstr ""
+
 #: data/enemies/tamborilero.tres
 msgid "Tamborilero del pantano"
 msgstr ""
 
+#: data/enemies/tras_ventana.tres
+msgid "La noche se desborda por la ventana"
+msgstr ""
+
+#: data/enemies/tras_ventana.tres scripts/enemies/void_behavior.gd
+msgid "La ventana se cierra de golpe. Silencio."
+msgstr ""
+
+#: data/enemies/tras_ventana.tres scripts/enemies/void_behavior.gd
+msgid "La viola calla…"
+msgstr ""
+
+#: data/enemies/tras_ventana.tres
+msgid "Lo que hay tras la ventana"
+msgstr ""
+
+#: data/enemies/tras_ventana.tres scripts/enemies/void_behavior.gd
+msgid "Sopla el viento de la ventana…"
+msgstr ""
+
+#: data/enemies/tras_ventana.tres
+msgid "Zann ya no puede seguir tocando"
+msgstr ""
+
+#: data/enemies/vecino_auseil.tres
+msgid "Vecino de la rue d'Auseil"
+msgstr ""
+
 #: data/enemies/zoog.tres
 msgid "Zoog"
+msgstr ""
+
+#: data/enemies/zoog_anciano.tres
+msgid "El anciano chilla: el consejo de los zoogs acude"
 msgstr ""
 
 #: data/enemies/zoog_anciano.tres
@@ -2177,6 +2333,10 @@ msgstr ""
 
 #: data/levels/noche_pnakotus.tres
 msgid "La gran trampilla del archivo se abre. Sube un silbido…"
+msgstr ""
+
+#: data/levels/noche_zann.tres
+msgid "La ventana de Zann se abre de par en par. Detrás no está París…"
 msgstr ""
 
 #: data/levels/p1_n1.tres scripts/level/level_data.gd
@@ -2504,6 +2664,10 @@ msgid "En la antigua logia masónica ahora reza la Orden Esotérica de Dagon."
 msgstr ""
 
 #: data/library/relatos.json
+msgid "En la buhardilla más alta vivía Erich Zann, un viejo alemán mudo que tocaba la viola en la orquesta de un teatro barato. De noche tocaba otra cosa: melodías que no eran de este mundo, frente a la única ventana desde la que se veía por encima del muro del final de la calle."
+msgstr ""
+
+#: data/library/relatos.json
 msgid "En la nieve quedaban huellas en forma de estrella de cinco puntas."
 msgstr ""
 
@@ -2521,6 +2685,10 @@ msgstr ""
 
 #: data/library/relatos.json
 msgid "Era Boston. Eran sus tejados al atardecer, la colina de Beacon, las ventanas que se encendían; lo que había visto de niño y había querido sin saberlo."
+msgstr ""
+
+#: data/library/relatos.json
+msgid "Era una calle muy empinada, con escalones, al otro lado de un río oscuro que olía mal. Las casas se inclinaban hacia delante como si fueran a juntarse sobre la calle. Casi todos los vecinos eran muy viejos."
 msgstr ""
 
 #: data/library/relatos.json
@@ -2544,7 +2712,15 @@ msgid "Esta noche sus puertas están abiertas, y el sumo sacerdote me ha visto."
 msgstr ""
 
 #: data/library/relatos.json
+msgid "Esta noche toca más deprisa que nunca. La ventana tiembla, y del otro lado no llegan las luces de París: llega un viento frío, y la oscuridad, y algo que escucha."
+msgstr ""
+
+#: data/library/relatos.json
 msgid "Esta noche, en su estudio, los sueños han empezado a salir de las paredes."
+msgstr ""
+
+#: data/library/relatos.json
+msgid "He buscado en todos los planos de París y no encuentro la rue d'Auseil. Y sin embargo viví allí, un año, cuando estudiaba metafísica y era pobre."
 msgstr ""
 
 #: data/library/relatos.json
@@ -3492,6 +3668,10 @@ msgid "La recortada del matadero de Innsmouth, cargada con balas para reses. Lo 
 msgstr ""
 
 #: data/library/textos.json
+msgid "La rue d'Auseil, en un París que no sale en los mapas: una calle muy empinada, empedrada y con escalones, entre casas altas y estrechas que se inclinan unas hacia otras, con entramado de madera y contraventanas. Al sur, el río oscuro con su pretil. Al fondo, la casa de Erich Zann, la más alta, con la buhardilla encendida."
+msgstr ""
+
+#: data/library/textos.json
 msgid "La tablilla de Eltdown nombra a las Mil Crías una a una. Cada nombre leído es un tentáculo más que brota."
 msgstr ""
 
@@ -4354,7 +4534,19 @@ msgid "El color que cayó del cielo"
 msgstr ""
 
 #: data/nights.json
+msgid "En la buhardilla más alta de una calle que ya no sale en los mapas, un viejo mudo toca la viola cada noche, cada vez más deprisa. Su música aparta lo que viene de fuera y le hace daño; pero cuando se vuelve frenesí, también te hiere a ti. No dejes que pare."
+msgstr ""
+
+#: data/nights.json
 msgid "La granja de los Gardner, al oeste de Arkham"
+msgstr ""
+
+#: data/nights.json
+msgid "La música de Erich Zann"
+msgstr ""
+
+#: data/nights.json
+msgid "La rue d'Auseil, en París"
 msgstr ""
 
 #: data/nights.json
@@ -4375,6 +4567,10 @@ msgstr ""
 
 #: data/nights.json
 msgid "Un meteorito cayó junto al pozo de Nahum Gardner. Desde entonces, un color que no tiene nombre se extiende por la tierra, y lo que toca se vuelve gris y quebradizo. También tú. También ellos."
+msgstr ""
+
+#: data/nights.json
+msgid "Vecinos de la rue d'Auseil · Jirones de la noche · Lo que hay tras la ventana"
 msgstr ""
 
 #: data/nights.json
@@ -6135,6 +6331,14 @@ msgstr ""
 
 #: data/tutorial.json
 msgid "Ha aparecido un baúl arcano: ábrelo para conseguir un objeto o hacer evolucionar un arma."
+msgstr ""
+
+#: data/tutorial.json
+msgid "La música se ha vuelto frenesí: las ondas rojas también te quitan cordura. Aléjate de la ventana o esquívalas."
+msgstr ""
+
+#: data/tutorial.json
+msgid "La viola de Zann suena desde la buhardilla: cada compás baja por la calle, aparta a los enemigos y quema a lo que viene de fuera. Cuanto más cerca de la ventana, más fuerte."
 msgstr ""
 
 #: data/tutorial.json
@@ -8753,6 +8957,10 @@ msgstr ""
 msgid "Niebla del pantano"
 msgstr ""
 
+#: data/weather/niebla_rio.tres
+msgid "Niebla baja del río"
+msgstr ""
+
 #: data/weather/tormenta.tres
 msgid "Tormenta"
 msgstr ""
@@ -9432,10 +9640,6 @@ msgstr ""
 msgid "¡Lo suelta!"
 msgstr ""
 
-#: scripts/enemies/horror_behavior.gd
-msgid "¡Padre! ¡Padre! ¡Yog-Sothoth!"
-msgstr ""
-
 #: scripts/enemies/keep_behavior.gd
 msgid "¡Ïa! ¡Dagon!"
 msgstr ""
@@ -9446,18 +9650,6 @@ msgstr ""
 
 #: scripts/enemies/mimic_behavior.gd
 msgid "¡Tekeli-li!"
-msgstr ""
-
-#: scripts/enemies/polyp_boss_behavior.gd
-msgid "El silbido se apaga bajo la arena…"
-msgstr ""
-
-#: scripts/enemies/polyp_boss_behavior.gd
-msgid "Se deshace en el viento…"
-msgstr ""
-
-#: scripts/enemies/polyp_boss_behavior.gd
-msgid "Toma aliento…"
 msgstr ""
 
 #: scripts/fishing/fishing.gd
@@ -9865,6 +10057,10 @@ msgid "Eventos intermedios"
 msgstr ""
 
 #: scripts/level/level_data.gd
+msgid "La viola de Zann (hito 22.6)"
+msgstr ""
+
+#: scripts/level/level_data.gd
 msgid "Las Tierras del Sueño (hito 21.10)"
 msgstr ""
 
@@ -10036,6 +10232,10 @@ msgstr ""
 msgid "Viento"
 msgstr ""
 
+#: scripts/level/zann_viola.gd
+msgid "La viola de Zann"
+msgstr ""
+
 #: scripts/menus/achievements_menu.gd
 msgid "%d de %d conseguidos"
 msgstr ""
@@ -10072,8 +10272,16 @@ msgstr ""
 msgid "Desafíos"
 msgstr ""
 
+#: scripts/menus/challenge_menu.gd scripts/menus/level_map.gd scripts/menus/nights_menu.gd scripts/save/library.gd
+msgid "Noches sueltas"
+msgstr ""
+
 #: scripts/menus/challenge_menu.gd
 msgid "Supera el nivel para abrirlo"
+msgstr ""
+
+#: scripts/menus/challenge_menu.gd
+msgid "Supera la noche para abrirlo"
 msgstr ""
 
 #: scripts/menus/character_select.gd
@@ -10715,10 +10923,6 @@ msgstr ""
 
 #: scripts/menus/level_map.gd
 msgid "Modo sin fin: eliges escenario y aguantas oleadas de todas las partes, con un horror cada cinco minutos. Récord por personaje y escenario."
-msgstr ""
-
-#: scripts/menus/level_map.gd scripts/menus/nights_menu.gd scripts/save/library.gd
-msgid "Noches sueltas"
 msgstr ""
 
 #: scripts/menus/level_map.gd

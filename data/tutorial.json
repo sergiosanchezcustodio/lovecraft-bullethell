@@ -13,6 +13,8 @@
 		{"id": "polvo", "when": "powder", "urgent": true, "text": "Un pulverizador con el polvo de Ibn Ghazi: pásale por encima y lo que no es de este mundo se verá unos segundos, y le harás más daño."},
 		{"id": "trampilla", "when": "trapdoor", "urgent": true, "text": "Una trampilla silba: de ahí salen los pólipos. Ponte en medio del círculo dorado hasta sellarla; su viento te aparta, pero en el centro hay calma."},
 		{"id": "polipos", "when": "polyp", "urgent": true, "text": "Los pólipos casi no se ven: escucha su silbido y busca su remolino de arena. Cuando silban más fuerte, van a embestir."},
+		{"id": "viola", "when": "viola", "urgent": true, "text": "La viola de Zann suena desde la buhardilla: cada compás baja por la calle, aparta a los enemigos y quema a lo que viene de fuera. Cuanto más cerca de la ventana, más fuerte."},
+		{"id": "frenesi", "when": "viola_frenzy", "urgent": true, "text": "La música se ha vuelto frenesí: las ondas rojas también te quitan cordura. Aléjate de la ventana o esquívalas."},
 		{"id": "invisible", "when": "unseen", "urgent": true, "text": "No se ve, pero está: sigue sus huellas. Solo con el polvo de Ibn Ghazi se le ve y se le puede dar."},
 		{"id": "color", "when": "blight", "urgent": true, "text": "Estás en el color: te vuelve gris y quebradizo. Pierdes cordura y los golpes te hacen más daño. A los enemigos les pasa lo mismo: llévalos a él y sal tú."},
 		{"id": "pause", "when": "pause", "at": 40.0, "text": "Start o Esc pausa la partida."},
