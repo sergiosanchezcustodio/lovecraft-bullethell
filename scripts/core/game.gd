@@ -1524,7 +1524,7 @@ func _remote_down_sfx(q: Player) -> void:
 func _log_players() -> void:
 	var parts := PackedStringArray()
 	for q in players:
-		parts.append(L.t("J%d nv=%d vida_min=%d caidas=%d") % [q.index + 1, q.progress.level, roundi(maxf(q.min_hp, 0.0) * 100), int(_downs.get(q.index, 0))])
+		parts.append("J%d nv=%d vida_min=%d caidas=%d" % [q.index + 1, q.progress.level, roundi(maxf(q.min_hp, 0.0) * 100), int(_downs.get(q.index, 0))])   # i18n: no (lo lee tools/simular.py)
 	print("JUGADORES %s  %s" % [level.id, " | ".join(parts)])
 
 func _check_all_down() -> void:

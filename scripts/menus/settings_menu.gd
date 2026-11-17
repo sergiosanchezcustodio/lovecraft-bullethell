@@ -162,6 +162,19 @@ func _controls() -> void:
 		_show_tab(2))
 
 func _game() -> void:
+	# Idioma (hito 22.5): en los dos idiomas a la vez, para encontrarlo aunque no se entienda el otro.
+	# Se aplica al reiniciar (los datos ya están cargados): ofrece hacerlo en el momento.
+	var langs: Array[String] = []
+	for l: String in L.LANGS: langs.append(L.NAMES[l])
+	_choice("Idioma · Language", langs, maxi(0, L.LANGS.find(String(Settings.get_value("language")))), func(i: int) -> void:   # i18n: no
+		Settings.set_value("language", L.LANGS[i])
+		if L.LANGS[i] == L.lang: return
+		var c := MenuKit.Confirm.new("Reiniciar el juego para cambiar el idioma · Restart the game to change the language", "OK")   # i18n: no
+		add_child(c)
+		c.answered.connect(func(yes: bool) -> void:
+			if not yes: return
+			OS.set_restart_on_exit(true, OS.get_cmdline_args())
+			get_tree().quit()))
 	var dist: Array[String] = ["Desactivadas", "25 %", "50 %", "75 %", "100 %"]
 	_choice(L.t("Distorsiones de pantalla (cordura baja)"), dist, int(round(float(Settings.get_value("distortion")) * 4.0)), func(i: int) -> void:
 		Settings.set_value("distortion", i / 4.0))

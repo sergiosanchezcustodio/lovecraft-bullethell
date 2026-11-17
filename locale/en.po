@@ -17,7 +17,7 @@ msgstr ""
 
 #: data/achievements/01_cazador_100.tres scripts/save/achievement_data.gd
 msgid "Cazador"
-msgstr ""
+msgstr "Hunter"
 
 #: data/achievements/02_cazador_1000.tres
 msgid "Abate a 1.000 criaturas."
@@ -65,7 +65,7 @@ msgstr ""
 
 #: data/achievements/07_baul_1.tres scripts/level/expedition.gd scripts/menus/expedition_map.gd
 msgid "Curiosidad"
-msgstr ""
+msgstr "Curiosity"
 
 #: data/achievements/08_baules_50.tres
 msgid "Abre 50 baúles arcanos."
@@ -181,7 +181,7 @@ msgstr ""
 
 #: data/achievements/22_no_volvio.tres scripts/title/relato_screen.gd
 msgid "El que no volvió del todo"
-msgstr ""
+msgstr "The one who never fully came back"
 
 #: data/achievements/22_no_volvio.tres
 msgid "Vence a Cthulhu con menos de un cuarto de la cordura."
@@ -589,7 +589,7 @@ msgstr ""
 
 #: data/campaign.json data/characters/dyer.tres data/part_finales.json data/pets/perro.tres
 msgid "En las montañas de la locura"
-msgstr ""
+msgstr "At the Mountains of Madness"
 
 #: data/campaign.json data/part_finales.json
 msgid "La búsqueda onírica de la desconocida Kadath"
@@ -841,11 +841,11 @@ msgstr ""
 
 #: data/characters/dyer.tres scripts/player/character_data.gd
 msgid "Geólogo de la Universidad de Miskatonic"
-msgstr ""
+msgstr "Geologist at Miskatonic University"
 
 #: data/characters/dyer.tres scripts/player/character_data.gd scripts/title/relato_screen.gd
 msgid "William Dyer"
-msgstr ""
+msgstr "William Dyer"
 
 #: data/characters/elwood.tres data/characters/gilman.tres data/characters/iwanicki.tres
 msgid "Los sueños en la casa de la bruja"
@@ -1109,7 +1109,7 @@ msgstr ""
 
 #: data/combos.json data/outfit_sets.json scripts/ui/hud.gd
 msgid "Pesadilla"
-msgstr ""
+msgstr "Nightmare"
 
 #: data/combos.json
 msgid "Polvo ardiente"
@@ -1389,7 +1389,7 @@ msgstr ""
 
 #: data/dodges/deslizar.tres scripts/player/dodge_style.gd
 msgid "Deslizamiento"
-msgstr ""
+msgstr "Slide"
 
 #: data/dodges/destello.tres
 msgid "Destello"
@@ -1497,7 +1497,7 @@ msgstr ""
 
 #: data/enemies/cthulhu.tres scripts/ui/hud.gd
 msgid "Cthulhu"
-msgstr ""
+msgstr "Cthulhu"
 
 #: data/enemies/cthulhu_recompuesto.tres
 msgid "Cthulhu, recompuesto"
@@ -2081,7 +2081,7 @@ msgstr ""
 
 #: data/levels/p1_n1.tres scripts/level/level_data.gd
 msgid "Algo acecha entre las tiendas…"
-msgstr ""
+msgstr "Something lurks among the tents…"
 
 #: data/levels/p1_n2.tres
 msgid "Algo silba entre las mesas de disección…"
@@ -2109,7 +2109,7 @@ msgstr ""
 
 #: data/levels/p2_n3.tres scripts/level/level_data.gd
 msgid "la horda"
-msgstr ""
+msgstr "the horde"
 
 #: data/levels/p2_n3.tres
 msgid "¡La horda del Arrecife del Diablo sube por las escaleras!"
@@ -4081,7 +4081,7 @@ msgstr ""
 
 #: data/manual.json scripts/save/settings.gd
 msgid "Esquivar"
-msgstr ""
+msgstr "Dodge"
 
 #: data/manual.json
 msgid "Evoluciones"
@@ -4155,7 +4155,7 @@ msgstr ""
 
 #: data/manual.json scripts/core/difficulty.gd scripts/level/expedition.gd
 msgid "Élites"
-msgstr ""
+msgstr "Elites"
 
 #: data/night_events.json
 msgid "Amaina el viento"
@@ -4223,7 +4223,7 @@ msgstr ""
 
 #: data/night_events.json data/weather/ventisca.tres scripts/level/weather_data.gd
 msgid "Ventisca"
-msgstr ""
+msgstr "Blizzard"
 
 #: data/night_events.json
 msgid "¡Una horda!"
@@ -4495,7 +4495,7 @@ msgstr ""
 
 #: data/outfits/bombin.tres scripts/save/outfit_data.gd
 msgid "Bombín"
-msgstr ""
+msgstr "Bowler hat"
 
 #: data/outfits/bombin.tres
 msgid "Bombín negro con cinta, de oficinista de Boston."
@@ -4543,7 +4543,7 @@ msgstr ""
 
 #: data/outfits/botas_nieve.tres data/upgrades/velocidad.tres scripts/progression/upgrade_data.gd
 msgid "Botas de nieve"
-msgstr ""
+msgstr "Snow boots"
 
 #: data/outfits/botas_nieve.tres
 msgid "Lona encerada con vuelta de borreguillo."
@@ -5919,7 +5919,7 @@ msgstr ""
 
 #: data/shop/vitalidad.tres scripts/save/shop_item.gd
 msgid "Vitalidad"
-msgstr ""
+msgstr "Vitality"
 
 #: data/signs.json
 msgid "Al recoger una gema, las de alrededor vienen todas a ti."
@@ -7751,7 +7751,7 @@ msgstr ""
 
 #: data/weapons/signo_mayor.tres scripts/core/game.gd
 msgid "Signo Mayor"
-msgstr ""
+msgstr "Elder Sign"
 
 #: data/weapons/signo_mayor.tres
 msgid "Un signo mucho mayor que frena aún más las balas enemigas."
@@ -7943,7 +7943,7 @@ msgstr ""
 
 #: data/weather/nevada.tres scripts/level/weather_data.gd
 msgid "Nevada"
-msgstr ""
+msgstr "Snowfall"
 
 #: data/weather/nevada_kadath.tres
 msgid "Nevada de Kadath"
@@ -7995,87 +7995,87 @@ msgstr ""
 
 #: scripts/bullets/bullet_manager.gd
 msgid "Bullets"
-msgstr ""
+msgstr "Bullets"
 
 #: scripts/cloud/cloud.gd
 msgid "Copia en la nube al día"
-msgstr ""
+msgstr "Cloud copy up to date"
 
 #: scripts/cloud/cloud.gd
 msgid "El código ha caducado. Vuelve a intentarlo."
-msgstr ""
+msgstr "The code has expired. Try again."
 
 #: scripts/cloud/cloud.gd
 msgid "Esta versión del juego no trae la conexión con GitHub configurada."
-msgstr ""
+msgstr "This version of the game doesn't have the GitHub connection set up."
 
 #: scripts/cloud/cloud.gd
 msgid "GitHub ha dado un error. Se intentará otra vez más tarde."
-msgstr ""
+msgstr "GitHub returned an error. It will be tried again later."
 
 #: scripts/cloud/cloud.gd
 msgid "GitHub pide esperar un poco antes de seguir."
-msgstr ""
+msgstr "GitHub asks to wait a little before continuing."
 
 #: scripts/cloud/cloud.gd
 msgid "GitHub ya no reconoce la conexión de este PC. Conecta otra vez."
-msgstr ""
+msgstr "GitHub no longer recognises this PC's connection. Connect again."
 
 #: scripts/cloud/cloud.gd
 msgid "Ha cambiado aquí y en otro PC"
-msgstr ""
+msgstr "It has changed here and on another PC"
 
 #: scripts/cloud/cloud.gd
 msgid "Http"
-msgstr ""
+msgstr "Http"
 
 #: scripts/cloud/cloud.gd
 msgid "La nube ya estaba al día."
-msgstr ""
+msgstr "The cloud was already up to date."
 
 #: scripts/cloud/cloud.gd
 msgid "Por subir a la nube"
-msgstr ""
+msgstr "Waiting to upload to the cloud"
 
 #: scripts/cloud/cloud.gd
 msgid "Se canceló la autorización en GitHub."
-msgstr ""
+msgstr "The authorisation was cancelled on GitHub."
 
 #: scripts/cloud/cloud.gd
 msgid "Sin conexión con GitHub. Se intentará otra vez en el siguiente guardado."
-msgstr ""
+msgstr "No connection to GitHub. It will be tried again on the next save."
 
 #: scripts/cloud/cloud.gd
 msgid "Sin copia en la nube"
-msgstr ""
+msgstr "No cloud copy"
 
 #: scripts/cloud/cloud.gd
 msgid "ha bajado"
-msgstr ""
+msgstr "was downloaded"
 
 #: scripts/cloud/cloud.gd
 msgid "ha subido"
-msgstr ""
+msgstr "was uploaded"
 
 #: scripts/cloud/cloud.gd
 msgid "han bajado"
-msgstr ""
+msgstr "were downloaded"
 
 #: scripts/cloud/cloud.gd
 msgid "han subido"
-msgstr ""
+msgstr "were uploaded"
 
 #: scripts/cloud/cloud.gd
 msgid "se %s %d de este PC"
-msgstr ""
+msgstr "%s %d from this PC"
 
 #: scripts/cloud/cloud.gd
 msgid "se %s %d partida%s de la nube"
-msgstr ""
+msgstr "%s %d save%s from the cloud"
 
 #: scripts/cloud/cloud_check.gd
 msgid "¿Iä! Cthulhu fhtagn"
-msgstr ""
+msgstr "Iä! Cthulhu fhtagn"
 
 #: scripts/cloud/github_gist.gd
 msgid "Accept: application/json"
@@ -8099,7 +8099,7 @@ msgstr ""
 
 #: scripts/cloud/github_gist.gd
 msgid "Lovecraft Library: Surviving Cthulhu · partidas guardadas"
-msgstr ""
+msgstr "Lovecraft Library: Surviving Cthulhu · saved games"
 
 #: scripts/cloud/github_gist.gd
 msgid "User-Agent: LovecraftLibrary"
@@ -8111,115 +8111,115 @@ msgstr ""
 
 #: scripts/core/auto.gd scripts/menus/daily_menu.gd scripts/save/outfit_data.gd scripts/title/title_progress.gd
 msgid "Saves"
-msgstr ""
+msgstr "Saves"
 
 #: scripts/core/auto.gd scripts/core/difficulty.gd scripts/fx/weather.gd
 msgid "Settings"
-msgstr ""
+msgstr "Settings"
 
 #: scripts/core/auto.gd scripts/fx/weather.gd scripts/level/ambient.gd scripts/menus/menu_kit.gd
 msgid "Sfx"
-msgstr ""
+msgstr "Sfx"
 
 #: scripts/core/bonds.gd
 msgid "Bonds"
-msgstr ""
+msgstr "Bonds"
 
 #: scripts/core/combos.gd
 msgid "Combos"
-msgstr ""
+msgstr "Combos"
 
 #: scripts/core/difficulty.gd
 msgid "Agresividad"
-msgstr ""
+msgstr "Aggressiveness"
 
 #: scripts/core/difficulty.gd
 msgid "Ataques mentales y la cordura que roban de cerca"
-msgstr ""
+msgstr "Mental attacks and the sanity they steal up close"
 
 #: scripts/core/difficulty.gd
 msgid "Balas enemigas"
-msgstr ""
+msgstr "Enemy bullets"
 
 #: scripts/core/difficulty.gd
 msgid "Cada cuánto disparan y cuánto avisan en el suelo"
-msgstr ""
+msgstr "How often they fire and how long the ground warning lasts"
 
 #: scripts/core/difficulty.gd
 msgid "Cuántas puede haber a la vez"
-msgstr ""
+msgstr "How many there can be at once"
 
 #: scripts/core/difficulty.gd
 msgid "Daño a la cordura"
-msgstr ""
+msgstr "Sanity damage"
 
 #: scripts/core/difficulty.gd
 msgid "Daño de los enemigos"
-msgstr ""
+msgstr "Enemy damage"
 
 #: scripts/core/difficulty.gd
 msgid "Hordas y élites (los jefes, aparte)"
-msgstr ""
+msgstr "Hordes and elites (bosses, separately)"
 
 #: scripts/core/difficulty.gd
 msgid "Jefes del final y minijefes"
-msgstr ""
+msgstr "Final bosses and mid-bosses"
 
 #: scripts/core/difficulty.gd
 msgid "La vida que quitan"
-msgstr ""
+msgstr "The health they take away"
 
 #: scripts/core/difficulty.gd
 msgid "Los de cuerpo a cuerpo y, desde el 4, los que disparan"
-msgstr ""
+msgstr "The melee ones and, from 4 up, the shooters"
 
 #: scripts/core/difficulty.gd
 msgid "Número de enemigos"
-msgstr ""
+msgstr "Number of enemies"
 
 #: scripts/core/difficulty.gd
 msgid "Ritmo de aparición y enemigos vivos a la vez"
-msgstr ""
+msgstr "Spawn rate and enemies alive at once"
 
 #: scripts/core/difficulty.gd
 msgid "Velocidad de los enemigos"
-msgstr ""
+msgstr "Enemy speed"
 
 #: scripts/core/difficulty.gd
 msgid "Velocidad de sus balas"
-msgstr ""
+msgstr "The speed of their bullets"
 
 #: scripts/core/difficulty.gd
 msgid "Vida de los enemigos"
-msgstr ""
+msgstr "Enemy health"
 
 #: scripts/core/difficulty.gd
 msgid "Vida de los jefes"
-msgstr ""
+msgstr "Boss health"
 
 #: scripts/core/game.gd
 msgid " (antes, %s)"
-msgstr ""
+msgstr " (before, %s)"
 
 #: scripts/core/game.gd
 msgid " (carga)"
-msgstr ""
+msgstr " (charge)"
 
 #: scripts/core/game.gd
 msgid " (copiado)"
-msgstr ""
+msgstr " (copied)"
 
 #: scripts/core/game.gd
 msgid " (elegida por el anfitrión)"
-msgstr ""
+msgstr " (chosen by the host)"
 
 #: scripts/core/game.gd
 msgid " en este nivel (F9 o LB+RB)"
-msgstr ""
+msgstr " on this level (F9 or LB+RB)"
 
 #: scripts/core/game.gd
 msgid " · Tiempo total: "
-msgstr ""
+msgstr " · Total time: "
 
 #: scripts/core/game.gd
 msgid ""
@@ -8229,178 +8229,179 @@ msgid ""
 "velocidad x%s\n"
 "t %.0f s"
 msgstr ""
+"%d FPS\n"
+"enemies %d\n"
+"bullets %d\n"
+"speed x%s\n"
+"t %.0f s"
 
 #: scripts/core/game.gd
 msgid "%s aprende %s: %s"
-msgstr ""
+msgstr "%s learns %s: %s"
 
 #: scripts/core/game.gd
 msgid "Ahora tienes %s $"
-msgstr ""
+msgstr "You now have %s $"
 
 #: scripts/core/game.gd
 msgid "Bolsa de la expedición: %d $ · Tiempo: %s"
-msgstr ""
+msgstr "Expedition purse: %d $ · Time: %s"
 
 #: scripts/core/game.gd
 msgid "Caído ante %s (jefe %d de %d)"
-msgstr ""
+msgstr "Fell to %s (boss %d of %d)"
 
 #: scripts/core/game.gd scripts/ui/menus.gd
 msgid "Continuar"
-msgstr ""
+msgstr "Continue"
 
 #: scripts/core/game.gd scripts/ui/hud.gd
 msgid "Crisis: %s"
-msgstr ""
+msgstr "Crisis: %s"
 
 #: scripts/core/game.gd
 msgid "Código: %s"
-msgstr ""
+msgstr "Code: %s"
 
 #: scripts/core/game.gd
 msgid "Código: %s%s"
-msgstr ""
+msgstr "Code: %s%s"
 
 #: scripts/core/game.gd scripts/ui/menus.gd
 msgid "Daño de la partida"
-msgstr ""
+msgstr "Damage this run"
 
 #: scripts/core/game.gd scripts/ui/menus.gd
 msgid "Depuración"
-msgstr ""
+msgstr "Debug"
 
 #: scripts/core/game.gd scripts/ui/hud.gd
 msgid "Desafío superado"
-msgstr ""
+msgstr "Challenge cleared"
 
 #: scripts/core/game.gd
 msgid "Desafío: "
-msgstr ""
+msgstr "Challenge: "
 
 #: scripts/core/game.gd
 msgid "Desfile completo · Tiempo total: %s"
-msgstr ""
+msgstr "Parade complete · Total time: %s"
 
 #: scripts/core/game.gd
 msgid "Desfile de jefes superado"
-msgstr ""
+msgstr "Boss parade cleared"
 
 #: scripts/core/game.gd scripts/ui/difficulty_menu.gd scripts/ui/menus.gd
 msgid "Dificultad (temporal)"
-msgstr ""
+msgstr "Difficulty (temporary)"
 
 #: scripts/core/game.gd
 msgid "Dólares ganados: %s $"
-msgstr ""
+msgstr "Dollars earned: %s $"
 
 #: scripts/core/game.gd
 msgid "El anfitrión decide cómo seguir"
-msgstr ""
+msgstr "The host decides how to continue"
 
 #: scripts/core/game.gd
 msgid "El anfitrión ha cerrado la partida"
-msgstr ""
+msgstr "The host has closed the game"
 
 #: scripts/core/game.gd scripts/net/net_session.gd
 msgid "El anfitrión ha cerrado la sala"
-msgstr ""
+msgstr "The host has closed the room"
 
 #: scripts/core/game.gd
 msgid "Elegir por J%d"
-msgstr ""
+msgstr "Choose for P%d"
 
 #: scripts/core/game.gd
 msgid "En pausa: la ha puesto %s"
-msgstr ""
+msgstr "Paused by %s"
 
 #: scripts/core/game.gd scripts/net/net_game.gd
 msgid "Enemies"
-msgstr ""
+msgstr "Enemies"
 
 #: scripts/core/game.gd
 msgid "Enemigos abatidos: %d"
-msgstr ""
+msgstr "Enemies killed: %d"
 
 #: scripts/core/game.gd
 msgid "Esquive: "
-msgstr ""
+msgstr "Dodge: "
 
 #: scripts/core/game.gd
 msgid "Evolución · %s"
-msgstr ""
+msgstr "Evolution · %s"
 
 #: scripts/core/game.gd
 msgid "Expedición completada"
-msgstr ""
+msgstr "Expedition completed"
 
 #: scripts/core/game.gd
 msgid "Ha aparecido un baúl arcano"
-msgstr ""
+msgstr "An arcane chest has appeared"
 
 #: scripts/core/game.gd
 msgid "Habéis caído"
-msgstr ""
+msgstr "You have all fallen"
 
 #: scripts/core/game.gd
 msgid "Has caído"
-msgstr ""
+msgstr "You have fallen"
 
 #: scripts/core/game.gd scripts/level/hazards.gd
 msgid "Hazards"
-msgstr ""
+msgstr "Hazards"
 
 #: scripts/core/game.gd
 msgid "Intento del día · racha de %d"
-msgstr ""
-
-#: scripts/core/game.gd
-msgid "J%d nv=%d vida_min=%d caidas=%d"
-msgstr ""
+msgstr "Today's attempt · %d-day streak"
 
 #: scripts/core/game.gd
 msgid "J%d vuelve a la lucha"
-msgstr ""
+msgstr "P%d is back in the fight"
 
 #: scripts/core/game.gd
 msgid "J%d, derribado: ¡reanimadlo!"
-msgstr ""
+msgstr "P%d is down: revive them!"
 
 #: scripts/core/game.gd
 msgid "J%d, eliminado hasta el siguiente nivel"
-msgstr ""
+msgstr "P%d is out until the next level"
 
 #: scripts/core/game.gd
 msgid "Jefe %d de %d%s"
-msgstr ""
+msgstr "Boss %d of %d%s"
 
 #: scripts/core/game.gd
 msgid "Jefe vencido"
-msgstr ""
+msgstr "Boss defeated"
 
 #: scripts/core/game.gd
 msgid "La expedición termina en el paso %d de %d"
-msgstr ""
+msgstr "The expedition ends at step %d of %d"
 
 #: scripts/core/game.gd scripts/menus/endless_menu.gd scripts/menus/level_map.gd scripts/save/library.gd
 msgid "La noche eterna"
-msgstr ""
+msgstr "The endless night"
 
 #: scripts/core/game.gd
 msgid "Lo conseguido queda guardado en tu partida"
-msgstr ""
+msgstr "What you earned is kept in your save"
 
 #: scripts/core/game.gd
 msgid "Lo que sacaste del agua te sigue mirando"
-msgstr ""
+msgstr "What you pulled out of the water is still watching you"
 
 #: scripts/core/game.gd scripts/fishing/fishing_scene.gd
 msgid "Logro: %s%s"
-msgstr ""
+msgstr "Achievement: %s%s"
 
 #: scripts/core/game.gd
 msgid "Marca %d apuntada en el registro"
-msgstr ""
+msgstr "Mark %d noted in the log"
 
 #: scripts/core/game.gd scripts/ui/menus.gd
 msgid "Menú principal"
@@ -8408,1061 +8409,1067 @@ msgstr "Main menu"
 
 #: scripts/core/game.gd scripts/ui/menus.gd scripts/ui/photo_mode.gd
 msgid "Modo foto"
-msgstr ""
+msgstr "Photo mode"
 
 #: scripts/core/game.gd
 msgid "Moon"
-msgstr ""
+msgstr "Moon"
 
 #: scripts/core/game.gd scripts/ui/player_menus.gd
 msgid "Nivel %d"
-msgstr ""
+msgstr "Level %d"
 
 #: scripts/core/game.gd
 msgid "Nivel alcanzado: %d"
-msgstr ""
+msgstr "Level reached: %d"
 
 #: scripts/core/game.gd scripts/ui/hud.gd
 msgid "Nivel superado"
-msgstr ""
+msgstr "Level cleared"
 
 #: scripts/core/game.gd
 msgid "Niveles: "
-msgstr ""
+msgstr "Levels: "
 
 #: scripts/core/game.gd
 msgid "No te cabe ningún objeto más"
-msgstr ""
+msgstr "You can't carry any more items"
 
 #: scripts/core/game.gd
 msgid "No te llega: faltan %d $"
-msgstr ""
+msgstr "Not enough: %d $ short"
 
 #: scripts/core/game.gd
 msgid "Noche superada"
-msgstr ""
+msgstr "Night cleared"
 
 #: scripts/core/game.gd scripts/save/library.gd scripts/ui/fall_report.gd
 msgid "Pactos: "
-msgstr ""
+msgstr "Pacts: "
 
 #: scripts/core/game.gd
 msgid "Pantalla final: %s"
-msgstr ""
+msgstr "Final screen: %s"
 
 #: scripts/core/game.gd scripts/menus/level_map.gd scripts/ui/hud.gd
 msgid "Partida del día"
-msgstr ""
+msgstr "Daily run"
 
 #: scripts/core/game.gd
 msgid "Práctica · el que cuenta: %s"
-msgstr ""
+msgstr "Practice · the one that counts: %s"
 
 #: scripts/core/game.gd
 msgid "Revelación"
-msgstr ""
+msgstr "Revelation"
 
 #: scripts/core/game.gd
 msgid "Revelación · %s: %s"
-msgstr ""
+msgstr "Revelation · %s: %s"
 
 #: scripts/core/game.gd
 msgid "Récord: %s"
-msgstr ""
+msgstr "Record: %s"
 
 #: scripts/core/game.gd
 msgid "Se ha perdido la conexión con el anfitrión"
-msgstr ""
+msgstr "The connection to the host has been lost"
 
 #: scripts/core/game.gd
 msgid "Solo el anfitrión puede reintentar"
-msgstr ""
+msgstr "Only the host can retry"
 
 #: scripts/core/game.gd scripts/save/library.gd
 msgid "Superado"
-msgstr ""
+msgstr "Cleared"
 
 #: scripts/core/game.gd
 msgid "Tiempo: %02d:%02d"
-msgstr ""
+msgstr "Time: %02d:%02d"
 
 #: scripts/core/game.gd
 msgid "Tiempo: %s  ·  Récord: %s"
-msgstr ""
+msgstr "Time: %s  ·  Record: %s"
 
 #: scripts/core/game.gd
 msgid "Truco · %s"
-msgstr ""
+msgstr "Trick · %s"
 
 #: scripts/core/game.gd
 msgid "Tu compañero"
-msgstr ""
+msgstr "Your companion"
 
 #: scripts/core/game.gd
 msgid ""
 "Turno de J%d · %s (%s)\n"
 "eligiendo mejora…"
 msgstr ""
+"P%d's turn · %s (%s)\n"
+"choosing an upgrade…"
 
 #: scripts/core/game.gd
 msgid "Turno de J%d · %s (%s) · %s"
-msgstr ""
+msgstr "P%d's turn · %s (%s) · %s"
 
 #: scripts/core/game.gd
 msgid "Turno de J%d · %s · %s"
-msgstr ""
+msgstr "P%d's turn · %s · %s"
 
 #: scripts/core/game.gd
 msgid "calentamiento y reserva"
-msgstr ""
+msgstr "warm-up and pool"
 
 #: scripts/core/game.gd
 msgid "caída"
-msgstr ""
+msgstr "fall"
 
 #: scripts/core/game.gd scripts/menus/slot_menu.gd
 msgid "compañero"
-msgstr ""
+msgstr "companion"
 
 #: scripts/core/game.gd
 msgid "compañeros"
-msgstr ""
+msgstr "companions"
 
 #: scripts/core/game.gd
 msgid "cámara y ambiente"
-msgstr ""
+msgstr "camera and ambience"
 
 #: scripts/core/game.gd
 msgid "el jefe"
-msgstr ""
+msgstr "the boss"
 
 #: scripts/core/game.gd
 msgid "fragmento y peligros"
-msgstr ""
+msgstr "fragment and hazards"
 
 #: scripts/core/game.gd
 msgid "interfaz y menús"
-msgstr ""
+msgstr "interface and menus"
 
 #: scripts/core/game.gd
 msgid "lo lleva la máquina"
-msgstr ""
+msgstr "the computer is playing them"
 
 #: scripts/core/game.gd
 msgid "luz y gradación"
-msgstr ""
+msgstr "light and grading"
 
 #: scripts/core/game.gd
 msgid "mando %d"
-msgstr ""
+msgstr "gamepad %d"
 
 #: scripts/core/game.gd
 msgid "música"
-msgstr ""
+msgstr "music"
 
 #: scripts/core/game.gd scripts/net/net_game.gd scripts/save/library.gd scripts/save/trophies.gd
 msgid "nivel superado"
-msgstr ""
+msgstr "level cleared"
 
 #: scripts/core/game.gd
 msgid "nivel y director"
-msgstr ""
+msgstr "level and director"
 
 #: scripts/core/game.gd
 msgid "otro jugador"
-msgstr ""
+msgstr "another player"
 
 #: scripts/core/game.gd
 msgid "sin conexión"
-msgstr ""
+msgstr "offline"
 
 #: scripts/core/game.gd
 msgid "tienda y pruebas"
-msgstr ""
+msgstr "shop and tests"
 
 #: scripts/core/game.gd
 msgid "vuelve en el siguiente nivel"
-msgstr ""
+msgstr "returns on the next level"
 
 #: scripts/core/game.gd
 msgid "¡Evolución! %s → %s"
-msgstr ""
+msgstr "Evolution! %s → %s"
 
 #: scripts/core/game.gd
 msgid "¡La más rápida!"
-msgstr ""
+msgstr "The fastest!"
 
 #: scripts/core/game.gd
 msgid "¡La primera expedición completada en esta parte!"
-msgstr ""
+msgstr "The first expedition completed in this part!"
 
 #: scripts/core/game.gd
 msgid "¡Nuevo investigador: %s! Ya puedes elegirlo."
-msgstr ""
+msgstr "New investigator: %s! You can now choose them."
 
 #: scripts/core/game.gd
 msgid "¡Nuevo récord! %s%s"
-msgstr ""
+msgstr "New record! %s%s"
 
 #: scripts/core/game.gd
 msgid "¡Nuevo récord! (antes, %s)"
-msgstr ""
+msgstr "New record! (before, %s)"
 
 #: scripts/core/game.gd
 msgid "¡Primer récord!"
-msgstr ""
+msgstr "First record!"
 
 #: scripts/core/madness.gd
 msgid "Dólares ×%s."
-msgstr ""
+msgstr "Dollars ×%s."
 
 #: scripts/core/madness.gd
 msgid "Grado %s · %s"
-msgstr ""
+msgstr "Grade %s · %s"
 
 #: scripts/core/madness.gd
 msgid "Sin locura"
-msgstr ""
+msgstr "No madness"
 
 #: scripts/core/revelations.gd
 msgid "Revelations"
-msgstr ""
+msgstr "Revelations"
 
 #: scripts/core/sfx.gd scripts/menus/settings_menu.gd
 msgid "Efectos"
-msgstr ""
+msgstr "Effects"
 
 #: scripts/core/sfx.gd scripts/fx/weather.gd scripts/level/ambient.gd
 msgid "Master"
-msgstr ""
+msgstr "Master"
 
 #: scripts/enemies/enemy_data.gd
 msgid "Ataque a distancia"
-msgstr ""
+msgstr "Ranged attack"
 
 #: scripts/enemies/enemy_data.gd
 msgid "Comportamiento"
-msgstr ""
+msgstr "Behaviour"
 
 #: scripts/enemies/enemy_data.gd
 msgid "Contacto"
-msgstr ""
+msgstr "Contact"
 
 #: scripts/enemies/enemy_data.gd scripts/save/outfit_data.gd
 msgid "Cuerpo"
-msgstr ""
+msgstr "Body"
 
 #: scripts/enemies/gaunt_behavior.gd
 msgid "¡Lo suelta!"
-msgstr ""
+msgstr "It lets go!"
 
 #: scripts/enemies/horror_behavior.gd
 msgid "¡Padre! ¡Padre! ¡Yog-Sothoth!"
-msgstr ""
+msgstr "Father! Father! Yog-Sothoth!"
 
 #: scripts/enemies/keep_behavior.gd
 msgid "¡Ïa! ¡Dagon!"
-msgstr ""
+msgstr "Iä! Dagon!"
 
 #: scripts/enemies/mask_behavior.gd
 msgid "¡Aparta la vista!"
-msgstr ""
+msgstr "Look away!"
 
 #: scripts/enemies/mimic_behavior.gd
 msgid "¡Tekeli-li!"
-msgstr ""
+msgstr "Tekeli-li!"
 
 #: scripts/enemies/polyp_boss_behavior.gd
 msgid "El silbido se apaga bajo la arena…"
-msgstr ""
+msgstr "The whistling dies away under the sand…"
 
 #: scripts/enemies/polyp_boss_behavior.gd
 msgid "Se deshace en el viento…"
-msgstr ""
+msgstr "It comes apart in the wind…"
 
 #: scripts/enemies/polyp_boss_behavior.gd
 msgid "Toma aliento…"
-msgstr ""
+msgstr "It draws breath…"
 
 #: scripts/fishing/fishing.gd
 msgid "Común"
-msgstr ""
+msgstr "Common"
 
 #: scripts/fishing/fishing.gd
 msgid "No debería haber salido del agua"
-msgstr ""
+msgstr "It should never have left the water"
 
 #: scripts/fishing/fishing.gd
 msgid "Rara"
-msgstr ""
+msgstr "Rare"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Algo te sigue mirando desde el agua: el siguiente nivel empieza con la cordura a la mitad."
-msgstr ""
+msgstr "Something is still watching you from the water: the next level starts with half your sanity."
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Demasiado pronto: lo has espantado"
-msgstr ""
+msgstr "Too soon: you scared it off"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Devolverla al agua"
-msgstr ""
+msgstr "Throw it back"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "El muelle de Innsmouth  ·  %s  ·  %s $"
-msgstr ""
+msgstr "The Innsmouth wharf  ·  %s  ·  %s $"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "En total: +%s $"
-msgstr ""
+msgstr "In total: +%s $"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Espera a que se hunda el corcho…"
-msgstr ""
+msgstr "Wait for the float to sink…"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Fin de la pesca"
-msgstr ""
+msgstr "Done fishing"
 
 #: scripts/fishing/fishing_scene.gd scripts/player/attributes.gd
 msgid "Fuerza"
-msgstr ""
+msgstr "Strength"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Hilo recogido"
-msgstr ""
+msgstr "Line reeled in"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Llevarla a la Biblioteca (su ficha del bestiario)"
-msgstr ""
+msgstr "Take it to the Library (its bestiary entry)"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Lo que has sacado no debería haber salido del agua. Si te lo quedas o lo vendes, empezarás el siguiente nivel con la cordura a la mitad."
-msgstr ""
+msgstr "What you've caught should never have left the water. If you keep it or sell it, you'll start the next level with half your sanity."
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Mantén A (o Intro) para lanzar; suéltalo con la fuerza que quieras  ·  B: dejar de pescar"
-msgstr ""
+msgstr "Hold A (or Enter) to cast; release it at the strength you want  ·  B: stop fishing"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Mantén A para recoger  ·  suelta cuando tire, o se parte el sedal"
-msgstr ""
+msgstr "Hold A to reel in  ·  let go when it pulls, or the line snaps"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "No has sacado nada"
-msgstr ""
+msgstr "You caught nothing"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Nueva en el bestiario"
-msgstr ""
+msgstr "New in the bestiary"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Se ha soltado"
-msgstr ""
+msgstr "It got away"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Seguir al siguiente nivel"
-msgstr ""
+msgstr "On to the next level"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Tensión del sedal"
-msgstr ""
+msgstr "Line tension"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Venderla (+%d $)"
-msgstr ""
+msgstr "Sell it (+%d $)"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "Venderla en la lonja (+%d $)"
-msgstr ""
+msgstr "Sell it at the fish market (+%d $)"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "a la Biblioteca"
-msgstr ""
+msgstr "to the Library"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "devuelta al agua"
-msgstr ""
+msgstr "thrown back"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "¡Pica!  ·  A"
-msgstr ""
+msgstr "A bite!  ·  A"
 
 #: scripts/fishing/fishing_scene.gd
 msgid "¡Se ha partido el sedal!"
-msgstr ""
+msgstr "The line snapped!"
 
 #: scripts/fx/casings.gd
 msgid "Casings"
-msgstr ""
+msgstr "Casings"
 
 #: scripts/fx/debris.gd
 msgid "Debris"
-msgstr ""
+msgstr "Debris"
 
 #: scripts/fx/footprints.gd
 msgid "Footprints"
-msgstr ""
+msgstr "Footprints"
 
 #: scripts/fx/gusts.gd
 msgid "Gusts"
-msgstr ""
+msgstr "Gusts"
 
 #: scripts/fx/hallucinations.gd
 msgid "Hallucinations"
-msgstr ""
+msgstr "Hallucinations"
 
 #: scripts/fx/moon_shafts.gd scripts/level/ambient.gd scripts/level/arena_builder.gd scripts/level/decor_break.gd
 msgid "Props"
-msgstr ""
+msgstr "Props"
 
 #: scripts/fx/ripples.gd
 msgid "Ripples"
-msgstr ""
+msgstr "Ripples"
 
 #: scripts/fx/spider_web.gd
 msgid "¡Atrapado en una red! Esquiva para soltarte"
-msgstr ""
+msgstr "Caught in a web! Dodge to break free"
 
 #: scripts/fx/water_reflection.gd scripts/level/ambient.gd scripts/level/arena_builder.gd
 msgid "Ground"
-msgstr ""
+msgstr "Ground"
 
 #: scripts/fx/water_reflection.gd scripts/level/ambient.gd scripts/level/arena_builder.gd
 msgid "Sea"
-msgstr ""
+msgstr "Sea"
 
 #: scripts/fx/weather.gd scripts/level/ambient.gd
 msgid "Ambiente"
-msgstr ""
+msgstr "Ambience"
 
 #: scripts/fx/weather.gd
 msgid "Weather"
-msgstr ""
+msgstr "Weather"
 
 #: scripts/input/bot_input.gd
 msgid "bot (%s)"
-msgstr ""
+msgstr "bot (%s)"
 
 #: scripts/input/device_manager.gd
 msgid "Mando %d"
-msgstr ""
+msgstr "Gamepad %d"
 
 #: scripts/input/device_manager.gd scripts/menus/settings_menu.gd
 msgid "Teclado"
-msgstr ""
+msgstr "Keyboard"
 
 #: scripts/input/joypad_input.gd
 msgid "mando %d (%s)"
-msgstr ""
+msgstr "gamepad %d (%s)"
 
 #: scripts/input/rumble.gd scripts/ui/photo_mode.gd
 msgid "Fuerte"
-msgstr ""
+msgstr "Strong"
 
 #: scripts/input/rumble.gd scripts/menus/settings_menu.gd scripts/ui/reading.gd
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: scripts/input/rumble.gd scripts/ui/photo_mode.gd
 msgid "Suave"
-msgstr ""
+msgstr "Soft"
 
 #: scripts/input/rumble.gd
 msgid "explosión"
-msgstr ""
+msgstr "explosion"
 
 #: scripts/input/smart_bot.gd
 msgid "bot (smart %.1f)"
-msgstr ""
+msgstr "bot (smart %.1f)"
 
 #: scripts/level/ambient.gd
 msgid "Ambient"
-msgstr ""
+msgstr "Ambient"
 
 #: scripts/level/ambient.gd scripts/level/arena_builder.gd
 msgid "Barrier"
-msgstr ""
+msgstr "Barrier"
 
 #: scripts/level/ambient.gd
 msgid "Pool"
-msgstr ""
+msgstr "Pool"
 
 #: scripts/level/arena_builder.gd
 msgid "Arena"
-msgstr ""
+msgstr "Arena"
 
 #: scripts/level/arena_builder.gd
 msgid "Coast"
-msgstr ""
+msgstr "Coast"
 
 #: scripts/level/arena_builder.gd
 msgid "Lamp"
-msgstr ""
+msgstr "Lamp"
 
 #: scripts/level/arena_builder.gd
 msgid "Plateau"
-msgstr ""
+msgstr "Plateau"
 
 #: scripts/level/arena_builder.gd
 msgid "Smoke"
-msgstr ""
+msgstr "Smoke"
 
 #: scripts/level/arena_builder.gd
 msgid "Walls"
-msgstr ""
+msgstr "Walls"
 
 #: scripts/level/boss_rush.gd
 msgid "Desfile de jefes · %s"
-msgstr ""
+msgstr "Boss parade · %s"
 
 #: scripts/level/breakable_spawner.gd
 msgid "Breakables"
-msgstr ""
+msgstr "Breakables"
 
 #: scripts/level/challenge.gd scripts/ui/hud.gd
 msgid "Desafío · %s"
-msgstr ""
+msgstr "Challenge · %s"
 
 #: scripts/level/color_blight.gd
 msgid "Manchas"
-msgstr ""
+msgstr "Stains"
 
 #: scripts/level/daily.gd
 msgid "%d de %s"
-msgstr ""
+msgstr "%d of %s"
 
 #: scripts/level/daily.gd scripts/menus/level_map.gd
 msgid "Partida del día · %s"
-msgstr ""
+msgstr "Daily run · %s"
 
 #: scripts/level/daily.gd
 msgid "miércoles"
-msgstr ""
+msgstr "Wednesday"
 
 #: scripts/level/daily.gd
 msgid "sábado"
-msgstr ""
+msgstr "Saturday"
 
 #: scripts/level/dream_lands.gd
 msgid "Atraca la galera negra: bajan los remeros lunares"
-msgstr ""
+msgstr "The black galley docks: the moon rowers come ashore"
 
 #: scripts/level/dream_lands.gd
 msgid "Bajan los gatos de Ulthar…"
-msgstr ""
+msgstr "The cats of Ulthar come down…"
 
 #: scripts/level/dream_lands.gd
 msgid "Callan las flautas"
-msgstr ""
+msgstr "The flutes fall silent"
 
 #: scripts/level/dream_lands.gd
 msgid "Revienta la escotilla: la galera ya no desembarca"
-msgstr ""
+msgstr "The hatch bursts: the galley lands no more"
 
 #: scripts/level/dream_lands.gd
 msgid "Se levanta el viento de Leng…"
-msgstr ""
+msgstr "The wind of Leng rises…"
 
 #: scripts/level/dream_lands.gd
 msgid "Suben los necrófagos de las criptas a echar una mano"
-msgstr ""
+msgstr "The ghouls climb up from the crypts to lend a hand"
 
 #: scripts/level/dream_lands.gd
 msgid "Suben los necrófagos de las criptas: Pickman les ha hablado de ti"
-msgstr ""
+msgstr "The ghouls climb up from the crypts: Pickman has told them about you"
 
 #: scripts/level/dream_lands.gd
 msgid "Suenan las flautas de los Otros Dioses…"
-msgstr ""
+msgstr "The flutes of the Other Gods are playing…"
 
 #: scripts/level/endless.gd
 msgid "Endless"
-msgstr ""
+msgstr "Endless"
 
 #: scripts/level/endless.gd
 msgid "La noche eterna · %s"
-msgstr ""
+msgstr "The endless night · %s"
 
 #: scripts/level/endless.gd
 msgid "La noche trae %s"
-msgstr ""
+msgstr "The night brings %s"
 
 #: scripts/level/expedition.gd
 msgid "Algo os sale al paso. Elegís qué hacer."
-msgstr ""
+msgstr "Something crosses your path. You choose what to do."
 
 #: scripts/level/expedition.gd scripts/ui/player_menus.gd
 msgid "Combate"
-msgstr ""
+msgstr "Fight"
 
 #: scripts/level/expedition.gd scripts/menus/expedition_map.gd
 msgid "Descanso"
-msgstr ""
+msgstr "Rest"
 
 #: scripts/level/expedition.gd
 msgid "El buhonero"
-msgstr ""
+msgstr "The peddler"
 
 #: scripts/level/expedition.gd
 msgid "El campamento: dos subidas al empezar el siguiente nivel."
-msgstr ""
+msgstr "The camp: two level-ups when the next level starts."
 
 #: scripts/level/expedition.gd
 msgid "El horror de la parte. Si cae, la expedición está hecha."
-msgstr ""
+msgstr "The part's horror. If it falls, the expedition is done."
 
 #: scripts/level/expedition.gd scripts/ui/level_card.gd
 msgid "Expedición · %s · %s"
-msgstr ""
+msgstr "Expedition · %s · %s"
 
 #: scripts/level/expedition.gd scripts/save/trophies.gd
 msgid "Jefe"
-msgstr ""
+msgstr "Boss"
 
 #: scripts/level/expedition.gd
 msgid "Más élites, todas con rasgos. Una subida de premio."
-msgstr ""
+msgstr "More elites, all with traits. A level-up as a reward."
 
 #: scripts/level/expedition.gd
 msgid "Un nivel de la parte, más corto."
-msgstr ""
+msgstr "A level of the part, shorter."
 
 #: scripts/level/expedition.gd
 msgid "Una parada corta con el buhonero: gasta la bolsa de la expedición."
-msgstr ""
+msgstr "A short stop with the peddler: spend the expedition purse."
 
 #: scripts/level/expedition.gd
 msgid "los que siguen al buhonero"
-msgstr ""
+msgstr "the peddler's followers"
 
 #: scripts/level/fragments.gd
 msgid "Fragmento"
-msgstr ""
+msgstr "Fragment"
 
 #: scripts/level/fragments.gd
 msgid "J%d encuentra una página: «%s» (%d de %d)"
-msgstr ""
+msgstr "P%d finds a page: “%s” (%d of %d)"
 
 #: scripts/level/level_data.gd scripts/progression/progression_data.gd
 msgid "Cooperativo"
-msgstr ""
+msgstr "Co-op"
 
 #: scripts/level/level_data.gd
 msgid "Dinero (D-31)"
-msgstr ""
+msgstr "Money (D-31)"
 
 #: scripts/level/level_data.gd
 msgid "El color (hito 21.13)"
-msgstr ""
+msgstr "The colour (milestone 21.13)"
 
 #: scripts/level/level_data.gd
 msgid "Evento final"
-msgstr ""
+msgstr "Final event"
 
 #: scripts/level/level_data.gd
 msgid "Eventos intermedios"
-msgstr ""
+msgstr "Intermediate events"
 
 #: scripts/level/level_data.gd
 msgid "Las Tierras del Sueño (hito 21.10)"
-msgstr ""
+msgstr "The Dreamlands (milestone 21.10)"
 
 #: scripts/level/level_data.gd
 msgid "Las trampillas de la Gran Raza (hito 21.15)"
-msgstr ""
+msgstr "The trapdoors of the Great Race (milestone 21.15)"
 
 #: scripts/level/level_data.gd
 msgid "Lo que no se ve (hito 21.14)"
-msgstr ""
+msgstr "The unseen (milestone 21.14)"
 
 #: scripts/level/level_data.gd
 msgid "Oleadas"
-msgstr ""
+msgstr "Waves"
 
 #: scripts/level/level_data.gd
 msgid "Peligros del escenario"
-msgstr ""
+msgstr "Stage hazards"
 
 #: scripts/level/nights.gd scripts/save/library.gd scripts/title/relato_screen.gd
 msgid "Noche suelta · "
-msgstr ""
+msgstr "Standalone night · "
 
 #: scripts/level/objective.gd
 msgid "Corta el ritual: quédate dentro del círculo · %d/%d s"
-msgstr ""
+msgstr "Break the ritual: stay inside the circle · %d/%d s"
 
 #: scripts/level/objective.gd
 msgid "El buhonero: quédate sobre lo que quieras comprar · tienes %d $"
-msgstr ""
+msgstr "The peddler: stand on whatever you want to buy · you have %d $"
 
 #: scripts/level/objective.gd
 msgid "Escolta al superviviente hasta la bengala"
-msgstr ""
+msgstr "Escort the survivor to the flare"
 
 #: scripts/level/objective.gd
 msgid "Lleva la reliquia al círculo (J%d la lleva, va más lento)"
-msgstr ""
+msgstr "Carry the relic to the circle (P%d has it and moves slower)"
 
 #: scripts/level/objective.gd
 msgid "Recoge la reliquia"
-msgstr ""
+msgstr "Pick up the relic"
 
 #: scripts/level/objective.gd
 msgid "Rescata al superviviente herido"
-msgstr ""
+msgstr "Rescue the wounded survivor"
 
 #: scripts/level/objective.gd
 msgid "Vendido"
-msgstr ""
+msgstr "Sold"
 
 #: scripts/level/objective.gd
 msgid "un baúl arcano"
-msgstr ""
+msgstr "an arcane chest"
 
 #: scripts/level/objective_director.gd
 msgid "El buhonero se ha ido"
-msgstr ""
+msgstr "The peddler has left"
 
 #: scripts/level/objective_director.gd
 msgid "Ha llegado el buhonero: %s"
-msgstr ""
+msgstr "The peddler has arrived: %s"
 
 #: scripts/level/objective_director.gd
 msgid "Objectives"
-msgstr ""
+msgstr "Objectives"
 
 #: scripts/level/objective_director.gd
 msgid "Objetivo cumplido: %s"
-msgstr ""
+msgstr "Objective complete: %s"
 
 #: scripts/level/objective_director.gd
 msgid "Objetivo fallido"
-msgstr ""
+msgstr "Objective failed"
 
 #: scripts/level/objective_director.gd
 msgid "Objetivo: %s (recompensa: %s)"
-msgstr ""
+msgstr "Objective: %s (reward: %s)"
 
 #: scripts/level/objective_director.gd
 msgid "corta el ritual"
-msgstr ""
+msgstr "break the ritual"
 
 #: scripts/level/objective_director.gd
 msgid "el buhonero"
-msgstr ""
+msgstr "the peddler"
 
 #: scripts/level/objective_director.gd
 msgid "lleva la reliquia"
-msgstr ""
+msgstr "carry the relic"
 
 #: scripts/level/objective_director.gd
 msgid "rescata al superviviente"
-msgstr ""
+msgstr "rescue the survivor"
 
 #: scripts/level/pickup.gd
 msgid "Comida: +30 % de vida"
-msgstr ""
+msgstr "Food: +30 % health"
 
 #: scripts/level/pickup.gd scripts/progression/stat_compare.gd
 msgid "Dólares"
-msgstr ""
+msgstr "Dollars"
 
 #: scripts/level/pickup.gd
 msgid "Lanzallamas potente"
-msgstr ""
+msgstr "Powerful flamethrower"
 
 #: scripts/level/pickup.gd
 msgid "Poción: +30 % de cordura"
-msgstr ""
+msgstr "Potion: +30 % sanity"
 
 #: scripts/level/pickup.gd
 msgid "Rubí de Leng"
-msgstr ""
+msgstr "Ruby of Leng"
 
 #: scripts/level/pickup.gd
 msgid "Rubí de Leng: dólares… y un escalofrío"
-msgstr ""
+msgstr "Ruby of Leng: dollars… and a shiver"
 
 #: scripts/level/pickup.gd
 msgid "¡Lanzallamas!"
-msgstr ""
+msgstr "Flamethrower!"
 
 #: scripts/level/pickup.gd
 msgid "¡Tiempo congelado!"
-msgstr ""
+msgstr "Time frozen!"
 
 #: scripts/level/polyp_winds.gd
 msgid "Remolinos"
-msgstr ""
+msgstr "Whirlwinds"
 
 #: scripts/level/polyp_winds.gd
 msgid "Tapa"
-msgstr ""
+msgstr "Lid"
 
 #: scripts/level/polyp_winds.gd
 msgid "Trampilla sellada"
-msgstr ""
+msgstr "Trapdoor sealed"
 
 #: scripts/level/unseen.gd
 msgid "El polvo de Ibn Ghazi"
-msgstr ""
+msgstr "The powder of Ibn Ghazi"
 
 #: scripts/level/unseen.gd
 msgid "Huellas"
-msgstr ""
+msgstr "Footprints"
 
 #: scripts/level/unseen.gd
 msgid "Los chotacabras se llevan su alma"
-msgstr ""
+msgstr "The whippoorwills take their soul"
 
 #: scripts/level/unseen.gd
 msgid "Pulverizador"
-msgstr ""
+msgstr "Sprayer"
 
 #: scripts/level/unseen.gd
 msgid "Unseen"
-msgstr ""
+msgstr "Unseen"
 
 #: scripts/level/weather_data.gd
 msgid "Niebla"
-msgstr ""
+msgstr "Fog"
 
 #: scripts/level/weather_data.gd
 msgid "Nubes y rayos"
-msgstr ""
+msgstr "Clouds and lightning"
 
 #: scripts/level/weather_data.gd
 msgid "Precipitación"
-msgstr ""
+msgstr "Precipitation"
 
 #: scripts/level/weather_data.gd
 msgid "Viento"
-msgstr ""
+msgstr "Wind"
 
 #: scripts/menus/achievements_menu.gd
 msgid "%d de %d conseguidos"
-msgstr ""
+msgstr "%d of %d earned"
 
 #: scripts/menus/achievements_menu.gd
 msgid "Arriba/abajo: recorrer  ·  B o Esc: volver"
-msgstr ""
+msgstr "Up/down: browse  ·  B or Esc: back"
 
 #: scripts/menus/achievements_menu.gd
 msgid "Conseguido"
-msgstr ""
+msgstr "Earned"
 
 #: scripts/menus/achievements_menu.gd scripts/save/library.gd
 msgid "Logros"
-msgstr ""
+msgstr "Achievements"
 
 #: scripts/menus/achievements_menu.gd scripts/save/trophies.gd
 msgid "Recompensa: "
-msgstr ""
+msgstr "Reward: "
 
 #: scripts/menus/challenge_menu.gd
 msgid "  ·  Récord %s"
-msgstr ""
+msgstr "  ·  Record %s"
 
 #: scripts/menus/challenge_menu.gd scripts/menus/nights_menu.gd
 msgid "A o Intro: jugar  ·  B o Esc: volver al mapa"
-msgstr ""
+msgstr "A or Enter: play  ·  B or Esc: back to the map"
 
 #: scripts/menus/challenge_menu.gd
 msgid "Cada nivel superado abre su desafío: el mismo escenario con reglas fijas y sin pactos. Superados: %d de %d."
-msgstr ""
+msgstr "Each level you clear opens its challenge: the same stage with fixed rules and no pacts. Cleared: %d of %d."
 
 #: scripts/menus/challenge_menu.gd scripts/menus/level_map.gd
 msgid "Desafíos"
-msgstr ""
+msgstr "Challenges"
 
 #: scripts/menus/challenge_menu.gd
 msgid "Supera el nivel para abrirlo"
-msgstr ""
+msgstr "Clear the level to open it"
 
 #: scripts/menus/character_select.gd
 msgid "  ·  conexión lenta: se notará algo de retraso"
-msgstr ""
+msgstr "  ·  slow connection: expect some lag"
 
 #: scripts/menus/character_select.gd
 msgid " (lenta)"
-msgstr ""
+msgstr " (slow)"
 
 #: scripts/menus/character_select.gd
 msgid " (tú)"
-msgstr ""
+msgstr " (you)"
 
 #: scripts/menus/character_select.gd
 msgid " [color=#%s]%d ms%s[/color]"
-msgstr ""
+msgstr " [color=#%s]%d ms%s[/color]"
 
 #: scripts/menus/character_select.gd
 msgid " [color=#%s](v%s)[/color]"
-msgstr ""
+msgstr " [color=#%s](v%s)[/color]"
 
 #: scripts/menus/character_select.gd
 msgid ""
 "%s\n"
 "Sube: %s."
 msgstr ""
+"%s\n"
+"Raises: %s."
 
 #: scripts/menus/character_select.gd
 msgid "A: confirmar"
-msgstr ""
+msgstr "A: confirm"
 
 #: scripts/menus/character_select.gd
 msgid "A: elegir"
-msgstr ""
+msgstr "A: choose"
 
 #: scripts/menus/character_select.gd scripts/ui/player_menus.gd
 msgid "Acción de esquiva"
-msgstr ""
+msgstr "Dodge action"
 
 #: scripts/menus/character_select.gd
 msgid "Ahora: %s · %s"
-msgstr ""
+msgstr "Now: %s · %s"
 
 #: scripts/menus/character_select.gd scripts/ui/damage_table.gd
 msgid "Arma"
-msgstr ""
+msgstr "Weapon"
 
 #: scripts/menus/character_select.gd scripts/ui/player_menus.gd
 msgid "Ataques balísticos"
-msgstr ""
+msgstr "Ballistic attacks"
 
 #: scripts/menus/character_select.gd scripts/ui/player_menus.gd
 msgid "Ataques físicos"
-msgstr ""
+msgstr "Physical attacks"
 
 #: scripts/menus/character_select.gd scripts/ui/player_menus.gd
 msgid "Ataques mágicos"
-msgstr ""
+msgstr "Magic attacks"
 
 #: scripts/menus/character_select.gd
 msgid "Características y habilidades"
-msgstr ""
+msgstr "Characteristics and skills"
 
 #: scripts/menus/character_select.gd
 msgid "Cerrar la sala"
-msgstr ""
+msgstr "Close the room"
 
 #: scripts/menus/character_select.gd
 msgid "Conectando…"
-msgstr ""
+msgstr "Connecting…"
 
 #: scripts/menus/character_select.gd scripts/ui/player_menus.gd
 msgid "Conjunto: "
-msgstr ""
+msgstr "Set: "
 
 #: scripts/menus/character_select.gd
 msgid "Copiado: %s"
-msgstr ""
+msgstr "Copied: %s"
 
 #: scripts/menus/character_select.gd
 msgid "Cordura al empezar. A cero, crisis de parálisis."
-msgstr ""
+msgstr "Sanity at the start. At zero, a paralysis crisis."
 
 #: scripts/menus/character_select.gd
 msgid "Daño de las armas arcanas y de los Mitos."
-msgstr ""
+msgstr "Damage of arcane and Mythos weapons."
 
 #: scripts/menus/character_select.gd
 msgid "Daño de las armas cuerpo a cuerpo y lanzadas."
-msgstr ""
+msgstr "Damage of melee and thrown weapons."
 
 #: scripts/menus/character_select.gd
 msgid "Daño de las armas de fuego."
-msgstr ""
+msgstr "Damage of firearms."
 
 #: scripts/menus/character_select.gd
 msgid "De vuelta: entrarás al empezar el siguiente nivel"
-msgstr ""
+msgstr "Back again: you will join when the next level starts"
 
 #: scripts/menus/character_select.gd
 msgid "Dinero  %s $"
-msgstr ""
+msgstr "Money  %s $"
 
 #: scripts/menus/character_select.gd
 msgid "El anfitrión está eligiendo nivel…"
-msgstr ""
+msgstr "The host is choosing a level…"
 
 #: scripts/menus/character_select.gd
 msgid "Elige a tu investigador"
-msgstr ""
+msgstr "Choose your investigator"
 
 #: scripts/menus/character_select.gd
 msgid "Elige compañero"
-msgstr ""
+msgstr "Choose a companion"
 
 #: scripts/menus/character_select.gd
 msgid "Investigador secreto"
-msgstr ""
+msgstr "Secret investigator"
 
 #: scripts/menus/character_select.gd
 msgid "Irás solo"
-msgstr ""
+msgstr "You will go alone"
 
 #: scripts/menus/character_select.gd
 msgid "Lo lleva J%d"
-msgstr ""
+msgstr "P%d has it"
 
 #: scripts/menus/character_select.gd
 msgid "Midiendo el ping…"
-msgstr ""
+msgstr "Measuring the ping…"
 
 #: scripts/menus/character_select.gd
 msgid "No se puede empezar: %s %s otra versión (tú, la v%s)"
-msgstr ""
+msgstr "Can't start: %s %s a different version (you have v%s)"
 
 #: scripts/menus/character_select.gd
 msgid ""
 "Noche eterna\n"
 "%s"
 msgstr ""
+"Endless night\n"
+"%s"
 
 #: scripts/menus/character_select.gd
 msgid "Otra versión (anfitrión v%s, tú v%s): no se puede empezar"
-msgstr ""
+msgstr "Different version (host v%s, you v%s): can't start"
 
 #: scripts/menus/character_select.gd
 msgid "Ping %d ms"
-msgstr ""
+msgstr "Ping %d ms"
 
 #: scripts/menus/character_select.gd scripts/title/title_screen_config.gd
 msgid "Pulsa Start"
-msgstr ""
+msgstr "Press Start"
 
 #: scripts/menus/character_select.gd scripts/ui/player_menus.gd
 msgid "Puntos de cordura"
-msgstr ""
+msgstr "Sanity points"
 
 #: scripts/menus/character_select.gd scripts/ui/player_menus.gd
 msgid "Puntos de vida"
-msgstr ""
+msgstr "Hit points"
 
 #: scripts/menus/character_select.gd
 msgid "Puntos de vida al empezar."
-msgstr ""
+msgstr "Hit points at the start."
 
 #: scripts/menus/character_select.gd
 msgid "Rapidez con la que se recarga el esquive."
-msgstr ""
+msgstr "How quickly the dodge recharges."
 
 #: scripts/menus/character_select.gd scripts/ui/player_menus.gd
 msgid "Rasgo: "
-msgstr ""
+msgstr "Trait: "
 
 #: scripts/menus/character_select.gd
 msgid "Sala"
-msgstr ""
+msgstr "Room"
 
 #: scripts/menus/character_select.gd
 msgid "Sala abierta"
-msgstr ""
+msgstr "Room open"
 
 #: scripts/menus/character_select.gd
 msgid "Sala de %s"
-msgstr ""
+msgstr "%s's room"
 
 #: scripts/menus/character_select.gd scripts/menus/main_menu.gd
 msgid "Salir"
@@ -9470,151 +9477,151 @@ msgstr "Quit"
 
 #: scripts/menus/character_select.gd
 msgid "Se compra en la tienda (%s)"
-msgstr ""
+msgstr "Bought in the shop (%s)"
 
 #: scripts/menus/character_select.gd
 msgid "Se consiguen en la tienda"
-msgstr ""
+msgstr "Found in the shop"
 
 #: scripts/menus/character_select.gd
 msgid "Select o C: copiar"
-msgstr ""
+msgstr "Select or C: copy"
 
 #: scripts/menus/character_select.gd
 msgid "Sin arma"
-msgstr ""
+msgstr "No weapon"
 
 #: scripts/menus/character_select.gd
 msgid "Sin compañero"
-msgstr ""
+msgstr "No companion"
 
 #: scripts/menus/character_select.gd
 msgid "Start o Intro: unirse  ·  Izquierda/derecha: cambiar  ·  Arriba/abajo: ficha o prenda  ·  LB/RB o Q/E: girar  ·  A o Intro: elegir  ·  B o Esc: atrás"
-msgstr ""
+msgstr "Start or Enter: join  ·  Left/right: change  ·  Up/down: sheet or garment  ·  LB/RB or Q/E: turn  ·  A or Enter: choose  ·  B or Esc: back"
 
 #: scripts/menus/character_select.gd scripts/progression/stat_compare.gd scripts/ui/player_menus.gd
 msgid "Velocidad"
-msgstr ""
+msgstr "Speed"
 
 #: scripts/menus/character_select.gd
 msgid "Velocidad al andar."
-msgstr ""
+msgstr "Walking speed."
 
 #: scripts/menus/character_select.gd scripts/save/library.gd scripts/save/shop.gd
 msgid "Vestuario"
-msgstr ""
+msgstr "Wardrobe"
 
 #: scripts/menus/character_select.gd
 msgid "Vestuario · A: confirmar"
-msgstr ""
+msgstr "Wardrobe · A: confirm"
 
 #: scripts/menus/character_select.gd
 msgid "Vínculo · %s: %s"
-msgstr ""
+msgstr "Bond · %s: %s"
 
 #: scripts/menus/character_select.gd
 msgid "[right]En la sala: %s  ·  v%s[/right]"
-msgstr ""
+msgstr "[right]In the room: %s  ·  v%s[/right]"
 
 #: scripts/menus/character_select.gd
 msgid "en casa: %s"
-msgstr ""
+msgstr "at home: %s"
 
 #: scripts/menus/character_select.gd
 msgid "para unirte  ·  Intro con el teclado"
-msgstr ""
+msgstr "to join  ·  Enter on the keyboard"
 
 #: scripts/menus/character_select.gd
 msgid "¡Listo!"
-msgstr ""
+msgstr "Ready!"
 
 #: scripts/menus/character_select.gd
 msgid "¿Cerrar la sala? Los demás volverán al menú."
-msgstr ""
+msgstr "Close the room? The others will go back to the menu."
 
 #: scripts/menus/character_select.gd
 msgid "¿Salir de la sala?"
-msgstr ""
+msgstr "Leave the room?"
 
 #: scripts/menus/cloud_conflict_menu.gd scripts/menus/cloud_connect_menu.gd scripts/menus/menu_kit.gd scripts/menus/shop_menu.gd
 msgid "Cancelar"
-msgstr ""
+msgstr "Cancel"
 
 #: scripts/menus/cloud_conflict_menu.gd scripts/menus/slot_menu.gd scripts/save/library.gd scripts/save/shop.gd
 msgid "Compañeros"
-msgstr ""
+msgstr "Companions"
 
 #: scripts/menus/cloud_conflict_menu.gd scripts/menus/menu_kit.gd
 msgid "Control"
-msgstr ""
+msgstr "Controls"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "Desafíos superados"
-msgstr ""
+msgstr "Challenges cleared"
 
 #: scripts/menus/cloud_conflict_menu.gd scripts/menus/slot_menu.gd
 msgid "Dinero"
-msgstr ""
+msgstr "Money"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "Este PC"
-msgstr ""
+msgstr "This PC"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "Guardada el %s %s"
-msgstr ""
+msgstr "Saved on %s %s"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "Guardando…"
-msgstr ""
+msgstr "Saving…"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "Izquierda/derecha: elegir  ·  A o Intro: quedarse con esa  ·  B o Esc: decidir luego"
-msgstr ""
+msgstr "Left/right: choose  ·  A or Enter: keep that one  ·  B or Esc: decide later"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "La Partida %d ha cambiado en dos sitios"
-msgstr ""
+msgstr "Save %d has changed in two places"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "La nube"
-msgstr ""
+msgstr "The cloud"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "Niveles superados"
-msgstr ""
+msgstr "Levels cleared"
 
 #: scripts/menus/cloud_conflict_menu.gd scripts/menus/slot_menu.gd
 msgid "Objetos comprados"
-msgstr ""
+msgstr "Items bought"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "Quedarme con esta"
-msgstr ""
+msgstr "Keep this one"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "Se ha jugado en este PC y en otro sin pasar por la nube. Elige con cuál te quedas: de la otra se guarda una copia aparte en este PC, por si acaso."
-msgstr ""
+msgstr "It has been played on this PC and on another without going through the cloud. Choose which one to keep: a separate copy of the other is kept on this PC, just in case."
 
 #: scripts/menus/cloud_conflict_menu.gd scripts/menus/slot_menu.gd
 msgid "Tiempo jugado"
-msgstr ""
+msgstr "Time played"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "en %s"
-msgstr ""
+msgstr "on %s"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "en este PC"
-msgstr ""
+msgstr "on this PC"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "este PC"
-msgstr ""
+msgstr "this PC"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid "la nube"
-msgstr ""
+msgstr "the cloud"
 
 #: scripts/menus/cloud_conflict_menu.gd
 msgid ""
@@ -9622,110 +9629,113 @@ msgid ""
 "\n"
 "La de %s deja de usarse (queda una copia aparte en la carpeta de partidas de este PC)."
 msgstr ""
+"Keep the one from %s?\n"
+"\n"
+"The one from %s will no longer be used (a separate copy stays in this PC's saves folder)."
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "1. Abre esta página en el navegador (se abre sola):"
-msgstr ""
+msgstr "1. Open this page in your browser (it opens by itself):"
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "2. Escribe este código y autoriza el juego:"
-msgstr ""
+msgstr "2. Type this code and authorise the game:"
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "A o Intro: elegir  ·  B o Esc: cancelar"
-msgstr ""
+msgstr "A or Enter: choose  ·  B or Esc: cancel"
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "Abrir la página"
-msgstr ""
+msgstr "Open the page"
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "Cancelado."
-msgstr ""
+msgstr "Cancelled."
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "Conectado"
-msgstr ""
+msgstr "Connected"
 
 #: scripts/menus/cloud_connect_menu.gd scripts/menus/settings_menu.gd
 msgid "Conectar con GitHub"
-msgstr ""
+msgstr "Connect to GitHub"
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "Copiar el código"
-msgstr ""
+msgstr "Copy the code"
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "Cuenta de GitHub: %s. %s"
-msgstr ""
+msgstr "GitHub account: %s. %s"
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "Cuenta de GitHub: %s. Comprobando la nube…"
-msgstr ""
+msgstr "GitHub account: %s. Checking the cloud…"
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "Código copiado. Pégalo en la página de GitHub."
-msgstr ""
+msgstr "Code copied. Paste it on the GitHub page."
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "El juego solo pide permiso para los gists: guarda una copia de tus partidas en un gist secreto de tu cuenta."
-msgstr ""
+msgstr "The game only asks for permission to use gists: it keeps a copy of your saves in a secret gist on your account."
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "Esperando a que lo autorices en GitHub…"
-msgstr ""
+msgstr "Waiting for you to authorise it on GitHub…"
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "Esperando a que lo autorices en GitHub… (el código ya está copiado)"
-msgstr ""
+msgstr "Waiting for you to authorise it on GitHub… (the code is already copied)"
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "Pidiendo el código…"
-msgstr ""
+msgstr "Requesting the code…"
 
 #: scripts/menus/cloud_connect_menu.gd
 msgid "o, con el móvil, escanea este código"
-msgstr ""
+msgstr "or scan this code with your phone"
 
 #: scripts/menus/daily_menu.gd
 msgid ", %d jugadores"
-msgstr ""
+msgstr ", %d players"
 
 #: scripts/menus/daily_menu.gd
 msgid "Amigo (%s%s): %s · %d bajas"
-msgstr ""
+msgstr "Friend (%s%s): %s · %d kills"
 
 #: scripts/menus/daily_menu.gd
 msgid "Aún no la has jugado: el primer intento es el que cuenta."
-msgstr ""
+msgstr "You haven't played it yet: the first attempt is the one that counts."
 
 #: scripts/menus/daily_menu.gd
 msgid "Casillas: cruceta o teclado para las letras · X o Ctrl+V: pegar · A: comparar (vacías: lo que haya en el portapapeles)  ·  B o Esc: volver"
-msgstr ""
+msgstr "Boxes: d-pad or keyboard for the letters · X or Ctrl+V: paste · A: compare (empty: whatever is on the clipboard)  ·  B or Esc: back"
 
 #: scripts/menus/daily_menu.gd
 msgid "Comparar"
-msgstr ""
+msgstr "Compare"
 
 #: scripts/menus/daily_menu.gd scripts/progression/stat_compare.gd scripts/save/run_archive.gd scripts/ui/damage_table.gd
 msgid "Compañero"
-msgstr ""
+msgstr "Companion"
 
 #: scripts/menus/daily_menu.gd
 msgid "Código de un amigo"
-msgstr ""
+msgstr "A friend's code"
 
 #: scripts/menus/daily_menu.gd
 msgid "Escenario"
-msgstr ""
+msgstr "Stage"
 
 #: scripts/menus/daily_menu.gd
 msgid "Ese código es de la partida del %s, no de la de hoy."
-msgstr ""
+msgstr "That code is from the run of %s, not today's."
 
 #: scripts/menus/daily_menu.gd scripts/net/net_session.gd
 msgid "Investigador"
-msgstr ""
+msgstr "Investigator"
 
 #: scripts/menus/daily_menu.gd scripts/menus/main_menu.gd
 msgid "Jugar"
@@ -9733,345 +9743,347 @@ msgstr "Play"
 
 #: scripts/menus/daily_menu.gd
 msgid "Jugar (práctica)"
-msgstr ""
+msgstr "Play (practice)"
 
 #: scripts/menus/daily_menu.gd
 msgid "La partida del día"
-msgstr ""
+msgstr "The daily run"
 
 #: scripts/menus/daily_menu.gd
 msgid "No es un código válido (12 letras, como 7K2M-QX4A-90BD): revisa las letras."
-msgstr ""
+msgstr "Not a valid code (12 characters, like 7K2M-QX4A-90BD): check the letters."
 
 #: scripts/menus/daily_menu.gd
 msgid "Pactos"
-msgstr ""
+msgstr "Pacts"
 
 #: scripts/menus/daily_menu.gd
 msgid "Racha: %d %s  ·  la mejor: %d"
-msgstr ""
+msgstr "Streak: %d %s  ·  best: %d"
 
 #: scripts/menus/daily_menu.gd
 msgid "Tu código: %s"
-msgstr ""
+msgstr "Your code: %s"
 
 #: scripts/menus/daily_menu.gd
 msgid "Tu intento: %s · %d bajas"
-msgstr ""
+msgstr "Your attempt: %s · %d kills"
 
 #: scripts/menus/daily_menu.gd scripts/save/library.gd
 msgid "día"
-msgstr ""
+msgstr "day"
 
 #: scripts/menus/daily_menu.gd
 msgid "días"
-msgstr ""
+msgstr "days"
 
 #: scripts/menus/daily_menu.gd
 msgid "le sacas %s"
-msgstr ""
+msgstr "you lead by %s"
 
 #: scripts/menus/daily_menu.gd
 msgid "te saca %s"
-msgstr ""
+msgstr "they lead by %s"
 
 #: scripts/menus/endless_menu.gd
 msgid ""
 "\n"
 "Récord %s"
 msgstr ""
+"\n"
+"Record %s"
 
 #: scripts/menus/endless_menu.gd
 msgid "A o Intro: elegir  ·  B o Esc: volver al mapa"
-msgstr ""
+msgstr "A or Enter: choose  ·  B or Esc: back to the map"
 
 #: scripts/menus/endless_menu.gd
 msgid "Elige escenario. Oleadas sin final con criaturas de todas las partes, un horror cada cinco minutos y cada vez más duro."
-msgstr ""
+msgstr "Choose a stage. Endless waves with creatures from every part, a horror every five minutes, each harder than the last."
 
 #: scripts/menus/expedition_map.gd
 msgid " al empezar el siguiente nivel"
-msgstr ""
+msgstr " when the next level starts"
 
 #: scripts/menus/expedition_map.gd
 msgid "Abandonar"
-msgstr ""
+msgstr "Give up"
 
 #: scripts/menus/expedition_map.gd
 msgid "Arriba/abajo: elegir camino  ·  A o Intro: ir  ·  B o Esc: abandonar la expedición"
-msgstr ""
+msgstr "Up/down: choose a path  ·  A or Enter: go  ·  B or Esc: abandon the expedition"
 
 #: scripts/menus/expedition_map.gd
 msgid "Bolsa de la expedición: %d $"
-msgstr ""
+msgstr "Expedition purse: %d $"
 
 #: scripts/menus/expedition_map.gd scripts/ui/hud.gd
 msgid "Expedición · %s"
-msgstr ""
+msgstr "Expedition · %s"
 
 #: scripts/menus/expedition_map.gd
 msgid "Hogueras, café y un rato sin mirar atrás. Al empezar el siguiente nivel, %s."
-msgstr ""
+msgstr "Campfires, coffee and a while without looking back. When the next level starts, %s."
 
 #: scripts/menus/expedition_map.gd
 msgid "Seguir"
-msgstr ""
+msgstr "Continue"
 
 #: scripts/menus/expedition_map.gd
 msgid "el siguiente nivel, con un %d %% menos de vida"
-msgstr ""
+msgstr "the next level, with %d %% less health"
 
 #: scripts/menus/expedition_map.gd
 msgid "tiempo: %s"
-msgstr ""
+msgstr "time: %s"
 
 #: scripts/menus/expedition_map.gd
 msgid "¿Abandonar la expedición? Lo ganado en ella se pierde."
-msgstr ""
+msgstr "Abandon the expedition? Everything earned on it is lost."
 
 #: scripts/menus/level_map.gd
 msgid "  ·  Bloqueado"
-msgstr ""
+msgstr "  ·  Locked"
 
 #: scripts/menus/level_map.gd scripts/menus/nights_menu.gd
 msgid "  ·  Desarrollo"
-msgstr ""
+msgstr "  ·  Development"
 
 #: scripts/menus/level_map.gd
 msgid "  ·  Próximamente"
-msgstr ""
+msgstr "  ·  Coming soon"
 
 #: scripts/menus/level_map.gd
 msgid "  ·  completadas: %d"
-msgstr ""
+msgstr "  ·  completed: %d"
 
 #: scripts/menus/level_map.gd
 msgid " El grado siguiente se abre al vencer a Cthulhu en este."
-msgstr ""
+msgstr " The next grade opens when you defeat Cthulhu on this one."
 
 #: scripts/menus/level_map.gd
 msgid " Tu récord: %s."
-msgstr ""
+msgstr " Your record: %s."
 
 #: scripts/menus/level_map.gd
 msgid "%s. Cinco niveles seguidos: el nivel, las armas y los objetos de cada investigador pasan de uno al siguiente."
-msgstr ""
+msgstr "%s. Five levels in a row: each investigator's level, weapons and items carry over from one to the next."
 
 #: scripts/menus/level_map.gd
 msgid "A o Intro: empezar  ·  B o Esc: volver al mapa"
-msgstr ""
+msgstr "A or Enter: start  ·  B or Esc: back to the map"
 
 #: scripts/menus/level_map.gd
 msgid "A o Intro: jugar  ·  B o Esc: volver a la selección"
-msgstr ""
+msgstr "A or Enter: play  ·  B or Esc: back to the selection"
 
 #: scripts/menus/level_map.gd
 msgid "Bloqueada"
-msgstr ""
+msgstr "Locked"
 
 #: scripts/menus/level_map.gd
 msgid "Cada nivel superado abre su desafío: el mismo escenario con reglas fijas (sin esquive, una sola arma, a oscuras…). Superados: %d de %d."
-msgstr ""
+msgstr "Each level you clear opens its challenge: the same stage with fixed rules (no dodging, a single weapon, in the dark…). Cleared: %d of %d."
 
 #: scripts/menus/level_map.gd
 msgid "Criaturas: %s"
-msgstr ""
+msgstr "Creatures: %s"
 
 #: scripts/menus/level_map.gd
 msgid "Desarrollo: también se puede elegir un nivel suelto  ·  "
-msgstr ""
+msgstr "Development: you can also pick a single level  ·  "
 
 #: scripts/menus/level_map.gd scripts/save/run_archive.gd
 msgid "Desfile de jefes"
-msgstr ""
+msgstr "Boss parade"
 
 #: scripts/menus/level_map.gd
 msgid "El mismo escenario, investigador, compañero y pactos para todos, sacados de la fecha. El primer intento es el que cuenta."
-msgstr ""
+msgstr "The same stage, investigator, companion and pacts for everyone, drawn from the date. The first attempt is the one that counts."
 
 #: scripts/menus/level_map.gd
 msgid "Elige parte"
-msgstr ""
+msgstr "Choose a part"
 
 #: scripts/menus/level_map.gd
 msgid "Expedición"
-msgstr ""
+msgstr "Expedition"
 
 #: scripts/menus/level_map.gd
 msgid "Grado de locura"
-msgstr ""
+msgstr "Madness grade"
 
 #: scripts/menus/level_map.gd
 msgid "Grado de locura · "
-msgstr ""
+msgstr "Madness grade · "
 
 #: scripts/menus/level_map.gd
 msgid "Jugar esta parte"
-msgstr ""
+msgstr "Play this part"
 
 #: scripts/menus/level_map.gd
 msgid "La campaña de siempre. Al vencer a Cthulhu se abre el grado siguiente."
-msgstr ""
+msgstr "The usual campaign. Defeating Cthulhu opens the next grade."
 
 #: scripts/menus/level_map.gd
 msgid "Los jefes de la campaña seguidos, cada uno en su escenario: Gedney, el shoggoth primigenio, Obed Marsh, Madre Hydra y Padre Dagon, el viejo Castro, Cthulhu y Nyarlathotep. Empiezas fuerte y lo que ganas pasa de uno a otro. Sin pactos. Récord del tiempo total por personaje."
-msgstr ""
+msgstr "The campaign bosses one after another, each on its own stage: Gedney, the primordial shoggoth, Obed Marsh, Mother Hydra and Father Dagon, old Castro, Cthulhu and Nyarlathotep. You start strong and what you earn carries over. No pacts. Total time record per character."
 
 #: scripts/menus/level_map.gd
 msgid "Modo sin fin: eliges escenario y aguantas oleadas de todas las partes, con un horror cada cinco minutos. Récord por personaje y escenario."
-msgstr ""
+msgstr "Endless mode: choose a stage and hold out against waves from every part, with a horror every five minutes. Record per character and stage."
 
 #: scripts/menus/level_map.gd scripts/menus/nights_menu.gd scripts/save/library.gd
 msgid "Noches sueltas"
-msgstr ""
+msgstr "Standalone nights"
 
 #: scripts/menus/level_map.gd
 msgid "Parte %d"
-msgstr ""
+msgstr "Part %d"
 
 #: scripts/menus/level_map.gd
 msgid "Parte %d · %s"
-msgstr ""
+msgstr "Part %d · %s"
 
 #: scripts/menus/level_map.gd
 msgid "Próximamente"
-msgstr ""
+msgstr "Coming soon"
 
 #: scripts/menus/level_map.gd
 msgid "Relatos aparte de la campaña, en una sola noche: un escenario, dos criaturas y su horror. Se abre cada una al superar una parte. Superadas: %d de %d."
-msgstr ""
+msgstr "Tales outside the campaign, in a single night: one stage, two creatures and their horror. Each opens when you clear a part. Cleared: %d of %d."
 
 #: scripts/menus/level_map.gd
 msgid "Una tirada por una parte con un mapa de caminos que se bifurcan: combates, élites, el buhonero, curiosidades y descansos, y el jefe al final. Lo que ganas solo vale en esa expedición. Se abre la de cada parte al superarla. Sin red."
-msgstr ""
+msgstr "A run through one part on a map of forking paths: fights, elites, the peddler, curiosities and rests, and the boss at the end. What you earn only counts on that expedition. Each part's opens when you clear it. Offline only."
 
 #: scripts/menus/library_menu.gd
 msgid " (las %d últimas)"
-msgstr ""
+msgstr " (the last %d)"
 
 #: scripts/menus/library_menu.gd
 msgid " Se juega en solitario, con el J1."
-msgstr ""
+msgstr " Played solo, with P1."
 
 #: scripts/menus/library_menu.gd
 msgid " conseguidos"
-msgstr ""
+msgstr " earned"
 
 #: scripts/menus/library_menu.gd
 msgid " descubiertos"
-msgstr ""
+msgstr " discovered"
 
 #: scripts/menus/library_menu.gd
 msgid "%d de %d trofeos en las vitrinas"
-msgstr ""
+msgstr "%d of %d trophies in the cases"
 
 #: scripts/menus/library_menu.gd
 msgid "%d páginas para quien empieza"
-msgstr ""
+msgstr "%d pages for beginners"
 
 #: scripts/menus/library_menu.gd
 msgid "%s de %s"
-msgstr ""
+msgstr "%s of %s"
 
 #: scripts/menus/library_menu.gd
 msgid "A: abrir  ·  B o Esc: cerrar"
-msgstr ""
+msgstr "A: open  ·  B or Esc: close"
 
 #: scripts/menus/library_menu.gd
 msgid "A: repetir con su semilla  ·  B o Esc: volver"
-msgstr ""
+msgstr "A: replay with its seed  ·  B or Esc: back"
 
 #: scripts/menus/library_menu.gd
 msgid "Arriba/abajo: recorrer  ·  B o Esc: volver a los tomos"
-msgstr ""
+msgstr "Up/down: browse  ·  B or Esc: back to the tomes"
 
 #: scripts/menus/library_menu.gd
 msgid "Aún no hay nada escrito"
-msgstr ""
+msgstr "Nothing written yet"
 
 #: scripts/menus/library_menu.gd
 msgid "Aún no se ha jugado ninguna"
-msgstr ""
+msgstr "None played yet"
 
 #: scripts/menus/library_menu.gd
 msgid "Aún no se ha unido a la expedición."
-msgstr ""
+msgstr "Has not joined the expedition yet."
 
 #: scripts/menus/library_menu.gd
 msgid "Aún no se ha visto. Las páginas están en blanco."
-msgstr ""
+msgstr "Not seen yet. The pages are blank."
 
 #: scripts/menus/library_menu.gd
 msgid "Biblioteca Lovecraft"
-msgstr ""
+msgstr "Lovecraft Library"
 
 #: scripts/menus/library_menu.gd
 msgid "Entendido"
-msgstr ""
+msgstr "Understood"
 
 #: scripts/menus/library_menu.gd
 msgid "Esta no se puede repetir: la partida del día, la expedición y el desfile de jefes dependen de algo que ya no está."
-msgstr ""
+msgstr "This one can't be replayed: the daily run, the expedition and the boss parade depend on something that is gone."
 
 #: scripts/menus/library_menu.gd
 msgid "Esta página sigue perdida en algún lugar. Quizá brille en el suelo la próxima vez que pases por allí."
-msgstr ""
+msgstr "This page is still lost somewhere. Perhaps it will glint on the ground the next time you pass that way."
 
 #: scripts/menus/library_menu.gd
 msgid "Nadie la ha empuñado todavía."
-msgstr ""
+msgstr "Nobody has wielded it yet."
 
 #: scripts/menus/library_menu.gd
 msgid "Nadie lo ha llevado todavía."
-msgstr ""
+msgstr "Nobody has carried it yet."
 
 #: scripts/menus/library_menu.gd
 msgid "Ningún investigador ha estado allí."
-msgstr ""
+msgstr "No investigator has been there."
 
 #: scripts/menus/library_menu.gd
 msgid "Notas y fichas reunidas por los investigadores"
-msgstr ""
+msgstr "Notes and records gathered by the investigators"
 
 #: scripts/menus/library_menu.gd
 msgid "Repetir"
-msgstr ""
+msgstr "Replay"
 
 #: scripts/menus/library_menu.gd scripts/save/library.gd
 msgid "Tiempo jugado: "
-msgstr ""
+msgstr "Time played: "
 
 #: scripts/menus/library_menu.gd
 msgid "Todavía no ha picado ninguna. Quizá en el muelle de Innsmouth, entre nivel y nivel."
-msgstr ""
+msgstr "None has bitten yet. Perhaps at the Innsmouth wharf, between levels."
 
 #: scripts/menus/library_menu.gd
 msgid "Tomo %s"
-msgstr ""
+msgstr "Tome %s"
 
 #: scripts/menus/library_menu.gd
 msgid "Tomo %s  ·  %s"
-msgstr ""
+msgstr "Tome %s  ·  %s"
 
 #: scripts/menus/library_menu.gd scripts/ui/difficulty_menu.gd
 msgid "Volver"
-msgstr ""
+msgstr "Back"
 
 #: scripts/menus/library_menu.gd
 msgid "¿Repetir esta partida con la misma semilla? Las mismas oleadas, baúles y subidas, desde el principio del nivel."
-msgstr ""
+msgstr "Replay this run with the same seed? The same waves, chests and level-ups, from the start of the level."
 
 #: scripts/menus/main_menu.gd
 msgid "A o Intro: elegir  ·  B o Esc: cambiar de partida"
-msgstr ""
+msgstr "A or Enter: choose  ·  B or Esc: change save"
 
 #: scripts/menus/main_menu.gd
 msgid "Abrir la carpeta"
-msgstr ""
+msgstr "Open the folder"
 
 #: scripts/menus/main_menu.gd scripts/menus/online_menu.gd
 msgid "B o Esc: volver"
-msgstr ""
+msgstr "B or Esc: back"
 
 #: scripts/menus/main_menu.gd
 msgid "Biblioteca"
@@ -10079,7 +10091,7 @@ msgstr "Library"
 
 #: scripts/menus/main_menu.gd
 msgid "Cerrar"
-msgstr ""
+msgstr "Close"
 
 #: scripts/menus/main_menu.gd scripts/menus/settings_menu.gd
 msgid "Configuración"
@@ -10087,39 +10099,39 @@ msgstr "Settings"
 
 #: scripts/menus/main_menu.gd
 msgid "Guardado en %s"
-msgstr ""
+msgstr "Saved to %s"
 
 #: scripts/menus/main_menu.gd
 msgid "Guardar"
-msgstr ""
+msgstr "Save"
 
 #: scripts/menus/main_menu.gd
 msgid "Jugar en local"
-msgstr ""
+msgstr "Play locally"
 
 #: scripts/menus/main_menu.gd scripts/menus/online_menu.gd
 msgid "Jugar online"
-msgstr ""
+msgstr "Play online"
 
 #: scripts/menus/main_menu.gd
 msgid "La última vez el juego se cerró de golpe. ¿Guardar en Documentos un informe con el registro y la configuración? Así puedes enviárselo al autor; no sale nada del PC si no lo envías tú."
-msgstr ""
+msgstr "Last time the game closed suddenly. Save a report with the log and settings to Documents? That way you can send it to the author; nothing leaves your PC unless you send it."
 
 #: scripts/menus/main_menu.gd
 msgid "No se ha podido guardar el informe."
-msgstr ""
+msgstr "The report could not be saved."
 
 #: scripts/menus/main_menu.gd
 msgid "No, gracias"
-msgstr ""
+msgstr "No, thanks"
 
 #: scripts/menus/main_menu.gd
 msgid "Partida %d  ·  %s $"
-msgstr ""
+msgstr "Save %d  ·  %s $"
 
 #: scripts/menus/main_menu.gd
 msgid "Revisión de arte (temporal)"
-msgstr ""
+msgstr "Art review (temporary)"
 
 #: scripts/menus/main_menu.gd scripts/menus/shop_menu.gd
 msgid "Tienda"
@@ -10127,519 +10139,519 @@ msgstr "Shop"
 
 #: scripts/menus/main_menu.gd
 msgid "¿Salir del juego?"
-msgstr ""
+msgstr "Quit the game?"
 
 #: scripts/menus/nights_menu.gd
 msgid "Cerrada"
-msgstr ""
+msgstr "Closed"
 
 #: scripts/menus/nights_menu.gd
 msgid "Relatos aparte de la campaña: un escenario, sus criaturas y su horror, en una sola noche. Se empieza de cero. Superadas: %d de %d."
-msgstr ""
+msgstr "Tales outside the campaign: one stage, its creatures and its horror, in a single night. You start from scratch. Cleared: %d of %d."
 
 #: scripts/menus/nights_menu.gd
 msgid "Supera «%s» para abrirla"
-msgstr ""
+msgstr "Clear “%s” to open it"
 
 #: scripts/menus/online_menu.gd scripts/ui/menus.gd
 msgid "Abrir la carpeta de registros de conexión"
-msgstr ""
+msgstr "Open the connection logs folder"
 
 #: scripts/menus/online_menu.gd
 msgid "Conectando con %s:%d…"
-msgstr ""
+msgstr "Connecting to %s:%d…"
 
 #: scripts/menus/online_menu.gd
 msgid "Conectar"
-msgstr ""
+msgstr "Connect"
 
 #: scripts/menus/online_menu.gd
 msgid "Crear sala"
-msgstr ""
+msgstr "Create a room"
 
 #: scripts/menus/online_menu.gd
 msgid "Dentro. Entrando en la sala…"
-msgstr ""
+msgstr "In. Entering the room…"
 
 #: scripts/menus/online_menu.gd
 msgid "Escribe el código que te ha dado el anfitrión (o su IP)."
-msgstr ""
+msgstr "Type the code the host gave you (or their IP)."
 
 #: scripts/menus/online_menu.gd
 msgid "Hasta cuatro jugadores en total, en uno o varios PC."
-msgstr ""
+msgstr "Up to four players in total, on one or more PCs."
 
 #: scripts/menus/online_menu.gd
 msgid "La primera vez, Windows puede preguntar si deja pasar la conexión: acepta en redes privadas y públicas."
-msgstr ""
+msgstr "The first time, Windows may ask whether to allow the connection: accept on private and public networks."
 
 #: scripts/menus/online_menu.gd
 msgid "Mando: cruceta para las letras · A: conectar · X: pegar  ·  Teclado: Intro conecta · Ctrl+V pega  ·  B o Esc: volver"
-msgstr ""
+msgstr "Gamepad: d-pad for the letters · A: connect · X: paste  ·  Keyboard: Enter connects · Ctrl+V pastes  ·  B or Esc: back"
 
 #: scripts/menus/online_menu.gd
 msgid "No reconozco ese código: revisa las letras (8, con o sin guion) o escribe la IP."
-msgstr ""
+msgstr "I don't recognise that code: check the letters (8, with or without a hyphen) or type the IP."
 
 #: scripts/menus/online_menu.gd
 msgid "Si ves algo raro jugando, pulsa F9 o mantén LB+RB: queda una marca en los registros de conexión de todos."
-msgstr ""
+msgstr "If you see something odd while playing, press F9 or hold LB+RB: a mark is left in everyone's connection logs."
 
 #: scripts/menus/online_menu.gd
 msgid "Unirse a una sala"
-msgstr ""
+msgstr "Join a room"
 
 #: scripts/menus/online_menu.gd
 msgid "Ver la captura de la última marca"
-msgstr ""
+msgstr "View the screenshot of the last mark"
 
 #: scripts/menus/outfit_fitting.gd
 msgid "Probador"
-msgstr ""
+msgstr "Fitting room"
 
 #: scripts/menus/outfit_fitting.gd
 msgid "X o R: otro investigador"
-msgstr ""
+msgstr "X or R: another investigator"
 
 #: scripts/menus/pact_menu.gd
 msgid "   · superado aquí"
-msgstr ""
+msgstr "   · cleared here"
 
 #: scripts/menus/pact_menu.gd
 msgid "A o Intro: sellar o romper  ·  B o Esc: volver"
-msgstr ""
+msgstr "A or Enter: seal or break  ·  B or Esc: back"
 
 #: scripts/menus/pact_menu.gd
 msgid "Hasta %d maldiciones, cada una con su premio. Duran hasta que las cambies.  ·  Selladas: %d de %d"
-msgstr ""
+msgstr "Up to %d curses, each with its reward. They last until you change them.  ·  Sealed: %d of %d"
 
 #: scripts/menus/pact_menu.gd
 msgid "Jugar sin pactos"
-msgstr ""
+msgstr "Play without pacts"
 
 #: scripts/menus/pact_menu.gd
 msgid "Pactos del Necronomicón"
-msgstr ""
+msgstr "Pacts of the Necronomicon"
 
 #: scripts/menus/pact_menu.gd
 msgid "Sellar y jugar"
-msgstr ""
+msgstr "Seal and play"
 
 #: scripts/menus/settings_menu.gd
 msgid "  %s por decidir."
-msgstr ""
+msgstr "  %s to decide."
 
 #: scripts/menus/settings_menu.gd
 msgid "  Sincronizando…"
-msgstr ""
+msgstr "  Syncing…"
 
 #: scripts/menus/settings_menu.gd
 msgid "  Última copia: %s."
-msgstr ""
+msgstr "  Last copy: %s."
 
 #: scripts/menus/settings_menu.gd
 msgid "Accesibilidad"
-msgstr ""
+msgstr "Accessibility"
 
 #: scripts/menus/settings_menu.gd
 msgid "Ajusta hasta que el ojo de la izquierda apenas se vea y el de la derecha se vea bien."
-msgstr ""
+msgstr "Adjust until the left eye is barely visible and the right one is clearly visible."
 
 #: scripts/menus/settings_menu.gd
 msgid "Ajustes para Steam Deck y portátiles"
-msgstr ""
+msgstr "Settings for Steam Deck and laptops"
 
 #: scripts/menus/settings_menu.gd
 msgid "Al recibir golpes, con las explosiones cercanas, los jefes, las subidas de nivel y las crisis de cordura."
-msgstr ""
+msgstr "When you take hits, with nearby explosions, bosses, level-ups and sanity crises."
 
 #: scripts/menus/settings_menu.gd
 msgid "Alto contraste"
-msgstr ""
+msgstr "High contrast"
 
 #: scripts/menus/settings_menu.gd
 msgid "Alto contraste: físicas en amarillo y blanco, mentales en cian. Se distinguen también por la forma: bola maciza o anillo. Los efectos de tus armas, más grises y tenues."
-msgstr ""
+msgstr "High contrast: physical in yellow and white, mental in cyan. They also differ in shape: solid ball or ring. Your weapons' effects, greyer and fainter."
 
 #: scripts/menus/settings_menu.gd
 msgid "Alucinaciones (cordura baja)"
-msgstr ""
+msgstr "Hallucinations (low sanity)"
 
 #: scripts/menus/settings_menu.gd
 msgid "Ambiente de los escenarios"
-msgstr ""
+msgstr "Stage ambience"
 
 #: scripts/menus/settings_menu.gd
 msgid "Apagado"
-msgstr ""
+msgstr "Off"
 
 #: scripts/menus/settings_menu.gd
 msgid "Aparte del tamaño de la interfaz, que se suma encima."
-msgstr ""
+msgstr "Separate from the interface size, which is added on top."
 
 #: scripts/menus/settings_menu.gd
 msgid "Armas e impactos"
-msgstr ""
+msgstr "Weapons and impacts"
 
 #: scripts/menus/settings_menu.gd
 msgid "Arriba/abajo: elegir  ·  Izquierda/derecha o A: cambiar  ·  LB/RB o Q/E: pestaña  ·  B o Esc: volver"
-msgstr ""
+msgstr "Up/down: choose  ·  Left/right or A: change  ·  LB/RB or Q/E: tab  ·  B or Esc: back"
 
 #: scripts/menus/settings_menu.gd
 msgid "Audio"
-msgstr ""
+msgstr "Audio"
 
 #: scripts/menus/settings_menu.gd
 msgid "Automático"
-msgstr ""
+msgstr "Automatic"
 
 #: scripts/menus/settings_menu.gd
 msgid "Avisos de lo que llega de fuera de la pantalla"
-msgstr ""
+msgstr "Warnings for what comes from off-screen"
 
 #: scripts/menus/settings_menu.gd
 msgid "Brillo"
-msgstr ""
+msgstr "Brightness"
 
 #: scripts/menus/settings_menu.gd
 msgid "Cada perfil guarda lo de esta pestaña y el tamaño de la interfaz: cámbialo al pasar de la tele o el monitor a un portátil o a la Steam Deck."
-msgstr ""
+msgstr "Each profile keeps this tab and the interface size: switch it when you move from the TV or monitor to a laptop or the Steam Deck."
 
 #: scripts/menus/settings_menu.gd
 msgid "Calidad gráfica"
-msgstr ""
+msgstr "Graphics quality"
 
 #: scripts/menus/settings_menu.gd
 msgid "Clima (nieve, lluvia, niebla…)"
-msgstr ""
+msgstr "Weather (snow, rain, fog…)"
 
 #: scripts/menus/settings_menu.gd
 msgid "Colores de las balas"
-msgstr ""
+msgstr "Bullet colours"
 
 #: scripts/menus/settings_menu.gd scripts/menus/shop_menu.gd scripts/save/library.gd
 msgid "Completo"
-msgstr ""
+msgstr "Full"
 
 #: scripts/menus/settings_menu.gd
 msgid "Conectado como %s."
-msgstr ""
+msgstr "Connected as %s."
 
 #: scripts/menus/settings_menu.gd
 msgid "Consejos en la partida"
-msgstr ""
+msgstr "In-game tips"
 
 #: scripts/menus/settings_menu.gd
 msgid "Controles"
-msgstr ""
+msgstr "Controls"
 
 #: scripts/menus/settings_menu.gd
 msgid "Copia en la nube con GitHub"
-msgstr ""
+msgstr "Cloud copy with GitHub"
 
 #: scripts/menus/settings_menu.gd
 msgid "Desactivadas"
-msgstr ""
+msgstr "Off"
 
 #: scripts/menus/settings_menu.gd
 msgid "Desconectar"
-msgstr ""
+msgstr "Disconnect"
 
 #: scripts/menus/settings_menu.gd
 msgid "Desconectar este PC"
-msgstr ""
+msgstr "Disconnect this PC"
 
 #: scripts/menus/settings_menu.gd
 msgid "Destellos (golpes y rayos)"
-msgstr ""
+msgstr "Flashes (hits and lightning)"
 
 #: scripts/menus/settings_menu.gd
 msgid "Detallado"
-msgstr ""
+msgstr "Detailed"
 
 #: scripts/menus/settings_menu.gd
 msgid "Detallado: también lo que tarda cada fotograma, de media y en el 1 % peor (los tirones), de los últimos 300."
-msgstr ""
+msgstr "Detailed: also how long each frame takes, on average and in the worst 1 % (the stutters), over the last 300."
 
 #: scripts/menus/settings_menu.gd
 msgid "Distorsiones de pantalla (cordura baja)"
-msgstr ""
+msgstr "Screen distortions (low sanity)"
 
 #: scripts/menus/settings_menu.gd
 msgid "Efectos de las armas"
-msgstr ""
+msgstr "Weapon effects"
 
 #: scripts/menus/settings_menu.gd
 msgid "El gist es secreto: no aparece en tu perfil, pero lo puede abrir quien tenga su enlace. Las partidas no llevan datos personales."
-msgstr ""
+msgstr "The gist is secret: it doesn't appear on your profile, but anyone with its link can open it. Saves contain no personal data."
 
 #: scripts/menus/settings_menu.gd
 msgid "El mando se mueve con el stick izquierdo o con la cruceta."
-msgstr ""
+msgstr "With a gamepad you move with the left stick or the d-pad."
 
 #: scripts/menus/settings_menu.gd
 msgid "Enteros"
-msgstr ""
+msgstr "Full"
 
 #: scripts/menus/settings_menu.gd
 msgid "Estelas, chispas, casquillos y acentos de las evoluciones. «Automático»: enteros con uno o dos jugadores y mínimos con tres o cuatro, para leer mejor la pantalla y que vaya más fluido. Nunca pasan de lo que permite la calidad gráfica."
-msgstr ""
+msgstr "Trails, sparks, shell casings and evolution accents. “Automatic”: full with one or two players and minimal with three or four, so the screen reads better and runs smoother. Never more than the graphics quality allows."
 
 #: scripts/menus/settings_menu.gd
 msgid "Ficha e intro al arrancar"
-msgstr ""
+msgstr "Credits and intro at startup"
 
 #: scripts/menus/settings_menu.gd scripts/ui/reading.gd
 msgid "Grande"
-msgstr ""
+msgstr "Large"
 
 #: scripts/menus/settings_menu.gd
 msgid "Guarda una copia de tus tres partidas y de tus controles en un gist secreto de tu cuenta de GitHub, para seguir jugando en otro PC. Las partidas siguen guardándose aquí como siempre: sin conexión se juega igual."
-msgstr ""
+msgstr "Keeps a copy of your three saves and your controls in a secret gist on your GitHub account, so you can keep playing on another PC. Saves are still stored here as always: offline, you play just the same."
 
 #: scripts/menus/settings_menu.gd
 msgid "Hace falta una cuenta de GitHub (gratis). El juego solo pide permiso para los gists."
-msgstr ""
+msgstr "You need a GitHub account (free). The game only asks for permission to use gists."
 
 #: scripts/menus/settings_menu.gd
 msgid "Juego"
-msgstr ""
+msgstr "Game"
 
 #: scripts/menus/settings_menu.gd
 msgid "Las flechas también mueven, sea cual sea la tecla elegida."
-msgstr ""
+msgstr "The arrow keys also move you, whatever key you choose."
 
 #: scripts/menus/settings_menu.gd
 msgid "Las élites y los ataques fuertes que no se ven suenan por su lado y se marcan en el borde."
-msgstr ""
+msgstr "Elites and heavy attacks you can't see sound from their side and are marked on the edge."
 
 #: scripts/menus/settings_menu.gd
 msgid "Locura acumulada (cada crisis baja la cordura máxima)"
-msgstr ""
+msgstr "Accumulated madness (each crisis lowers maximum sanity)"
 
 #: scripts/menus/settings_menu.gd
 msgid "Límite de FPS"
-msgstr ""
+msgstr "FPS limit"
 
 #: scripts/menus/settings_menu.gd
 msgid "Mando"
-msgstr ""
+msgstr "Gamepad"
 
 #: scripts/menus/settings_menu.gd
 msgid "Mostrar FPS"
-msgstr ""
+msgstr "Show FPS"
 
 #: scripts/menus/settings_menu.gd scripts/ui/reading.gd
 msgid "Muy grande"
-msgstr ""
+msgstr "Very large"
 
 #: scripts/menus/settings_menu.gd
 msgid "Más contraste en los relatos y el diario"
-msgstr ""
+msgstr "More contrast in the tales and the diary"
 
 #: scripts/menus/settings_menu.gd
 msgid "Mínimos"
-msgstr ""
+msgstr "Minimal"
 
 #: scripts/menus/settings_menu.gd scripts/title/title_screen_config.gd
 msgid "Música"
-msgstr ""
+msgstr "Music"
 
 #: scripts/menus/settings_menu.gd
 msgid "Música que crece con el combate"
-msgstr ""
+msgstr "Music that grows with the fight"
 
 #: scripts/menus/settings_menu.gd
 msgid "Normales"
-msgstr ""
+msgstr "Normal"
 
 #: scripts/menus/settings_menu.gd
 msgid "Nube"
-msgstr ""
+msgstr "Cloud"
 
 #: scripts/menus/settings_menu.gd
 msgid "Nunca ocultan ni falsean las balas. Desactívalas si te marean."
-msgstr ""
+msgstr "They never hide or fake the bullets. Turn them off if they make you dizzy."
 
 #: scripts/menus/settings_menu.gd
 msgid "Números de daño"
-msgstr ""
+msgstr "Damage numbers"
 
 #: scripts/menus/settings_menu.gd
 msgid "Pantalla completa"
-msgstr ""
+msgstr "Fullscreen"
 
 #: scripts/menus/settings_menu.gd
 msgid "Pasa al perfil Portátil y le pone pantalla completa, 40 fps con sincronía, calidad Baja e interfaz Grande. En una Steam Deck se ponen solos la primera vez."
-msgstr ""
+msgstr "Switches to the Handheld profile and sets fullscreen, 40 fps with vsync, Low quality and Large interface. On a Steam Deck they are set automatically the first time."
 
 #: scripts/menus/settings_menu.gd
 msgid "Pausa al perder el foco o desconectar un mando"
-msgstr ""
+msgstr "Pause when losing focus or disconnecting a gamepad"
 
 #: scripts/menus/settings_menu.gd
 msgid "Pequeño (desde 1080 de alto)"
-msgstr ""
+msgstr "Small (from 1080 high)"
 
 #: scripts/menus/settings_menu.gd
 msgid "Perfil de ajustes"
-msgstr ""
+msgstr "Settings profile"
 
 #: scripts/menus/settings_menu.gd
 msgid "Por debajo del 30 % de cordura ves criaturas y gemas que no están y tu panel miente un momento. No hacen daño."
-msgstr ""
+msgstr "Below 30 % sanity you see creatures and gems that aren't there and your panel lies for a moment. They do no harm."
 
 #: scripts/menus/settings_menu.gd
 msgid "Pulsa un botón del mando…  (Esc: cancelar)"
-msgstr ""
+msgstr "Press a gamepad button…  (Esc: cancel)"
 
 #: scripts/menus/settings_menu.gd
 msgid "Pulsa una tecla…  (Esc: cancelar)"
-msgstr ""
+msgstr "Press a key…  (Esc: cancel)"
 
 #: scripts/menus/settings_menu.gd
 msgid "Rebajados"
-msgstr ""
+msgstr "Reduced"
 
 #: scripts/menus/settings_menu.gd
 msgid "Reducido"
-msgstr ""
+msgstr "Reduced"
 
 #: scripts/menus/settings_menu.gd
 msgid "Reducidos"
-msgstr ""
+msgstr "Reduced"
 
 #: scripts/menus/settings_menu.gd
 msgid "Resolución del 3D (rendimiento)"
-msgstr ""
+msgstr "3D resolution (performance)"
 
 #: scripts/menus/settings_menu.gd
 msgid "Restablecer"
-msgstr ""
+msgstr "Reset"
 
 #: scripts/menus/settings_menu.gd
 msgid "Restablecer esta pestaña"
-msgstr ""
+msgstr "Reset this tab"
 
 #: scripts/menus/settings_menu.gd
 msgid "Restablecer los controles de fábrica"
-msgstr ""
+msgstr "Reset the controls to default"
 
 #: scripts/menus/settings_menu.gd
 msgid "Restablecer toda la configuración"
-msgstr ""
+msgstr "Reset all settings"
 
 #: scripts/menus/settings_menu.gd
 msgid "Se suben las tres partidas y los controles; el vídeo y el audio son de cada PC. Al abrir la elección de partida se baja lo jugado en otros PC. Si una partida ha cambiado aquí y en otro PC, el juego pregunta con cuál quedarse."
-msgstr ""
+msgstr "The three saves and the controls are uploaded; video and audio belong to each PC. Opening the save selection downloads what was played on other PCs. If a save has changed here and on another PC, the game asks which one to keep."
 
 #: scripts/menus/settings_menu.gd
 msgid "Siempre"
-msgstr ""
+msgstr "Always"
 
 #: scripts/menus/settings_menu.gd
 msgid "Sin conectar."
-msgstr ""
+msgstr "Not connected."
 
 #: scripts/menus/settings_menu.gd
 msgid "Sin límite"
-msgstr ""
+msgstr "Unlimited"
 
 #: scripts/menus/settings_menu.gd
 msgid "Sin temblor"
-msgstr ""
+msgstr "No shake"
 
 #: scripts/menus/settings_menu.gd
 msgid "Sincronización vertical"
-msgstr ""
+msgstr "Vertical sync"
 
 #: scripts/menus/settings_menu.gd
 msgid "Sincronizando…"
-msgstr ""
+msgstr "Syncing…"
 
 #: scripts/menus/settings_menu.gd
 msgid "Sincronizar ahora"
-msgstr ""
+msgstr "Sync now"
 
 #: scripts/menus/settings_menu.gd
 msgid "Solo la primera vez"
-msgstr ""
+msgstr "Only the first time"
 
 #: scripts/menus/settings_menu.gd
 msgid "Solo los golpes fuertes"
-msgstr ""
+msgstr "Only the heavy hits"
 
 #: scripts/menus/settings_menu.gd
 msgid "Suavizado, sombras, oclusión ambiental (Ultra), niebla de los faroles, enemigos que se desmoronan y manchas. Lo de la partida cambia al empezar el siguiente nivel."
-msgstr ""
+msgstr "Anti-aliasing, shadows, ambient occlusion (Ultra), lantern fog, crumbling enemies and stains. In-game changes apply when the next level starts."
 
 #: scripts/menus/settings_menu.gd
 msgid "Subir cada partida al guardarla"
-msgstr ""
+msgstr "Upload each save when it is saved"
 
 #: scripts/menus/settings_menu.gd
 msgid "Suma percusión y coros a la pista cuantos más enemigos hay; con el jefe, solo los coros."
-msgstr ""
+msgstr "Adds percussion and choirs to the track the more enemies there are; with the boss, only the choirs."
 
 #: scripts/menus/settings_menu.gd
 msgid "Tamaño de la interfaz"
-msgstr ""
+msgstr "Interface size"
 
 #: scripts/menus/settings_menu.gd
 msgid "Tamaño de la ventana"
-msgstr ""
+msgstr "Window size"
 
 #: scripts/menus/settings_menu.gd
 msgid "Temblor de la cámara"
-msgstr ""
+msgstr "Camera shake"
 
 #: scripts/menus/settings_menu.gd
 msgid "Texto de los relatos y el diario"
-msgstr ""
+msgstr "Text of the tales and the diary"
 
 #: scripts/menus/settings_menu.gd
 msgid "Todo va más despacio o más deprisa: enemigos, balas y tú. En la partida online, siempre al 100 %."
-msgstr ""
+msgstr "Everything goes slower or faster: enemies, bullets and you. Online, always at 100 %."
 
 #: scripts/menus/settings_menu.gd
 msgid "Todos"
-msgstr ""
+msgstr "All"
 
 #: scripts/menus/settings_menu.gd
 msgid "Velocidad del juego"
-msgstr ""
+msgstr "Game speed"
 
 #: scripts/menus/settings_menu.gd
 msgid "Ver la copia en GitHub"
-msgstr ""
+msgstr "View the copy on GitHub"
 
 #: scripts/menus/settings_menu.gd
 msgid "Vibración del mando"
-msgstr ""
+msgstr "Gamepad vibration"
 
 #: scripts/menus/settings_menu.gd
 msgid "Volumen general"
-msgstr ""
+msgstr "Master volume"
 
 #: scripts/menus/settings_menu.gd
 msgid "Volver a ver los consejos"
-msgstr ""
+msgstr "Show the tips again"
 
 #: scripts/menus/settings_menu.gd
 msgid "Vídeo"
-msgstr ""
+msgstr "Video"
 
 #: scripts/menus/settings_menu.gd
 msgid "el audio"
-msgstr ""
+msgstr "the audio"
 
 #: scripts/menus/settings_menu.gd
 msgid "el vídeo"
-msgstr ""
+msgstr "the video"
 
 #: scripts/menus/settings_menu.gd
 msgid "lo de esta pestaña (juego y accesibilidad)"
-msgstr ""
+msgstr "this tab (game and accessibility)"
 
 #: scripts/menus/settings_menu.gd
 msgid ""
@@ -10647,126 +10659,129 @@ msgid ""
 "\n"
 "La copia se queda en la nube y tus partidas, aquí."
 msgstr ""
+"Disconnect the GitHub account from this PC?\n"
+"\n"
+"The copy stays in the cloud and your saves stay here."
 
 #: scripts/menus/settings_menu.gd
 msgid "¿Restablecer toda la configuración (vídeo, audio, controles y juego)?"
-msgstr ""
+msgstr "Reset all settings (video, audio, controls and game)?"
 
 #: scripts/menus/settings_menu.gd
 msgid "¿Volver a dejar %s como de fábrica?"
-msgstr ""
+msgstr "Reset %s to default?"
 
 #: scripts/menus/shop_menu.gd
 msgid "%s (nivel %d)"
-msgstr ""
+msgstr "%s (level %d)"
 
 #: scripts/menus/shop_menu.gd
 msgid "Activo: no (pulsa para renovarlo)"
-msgstr ""
+msgstr "Active: no (press to renew it)"
 
 #: scripts/menus/shop_menu.gd
 msgid "Activo: sí (pulsa para romperlo)"
-msgstr ""
+msgstr "Active: yes (press to break it)"
 
 #: scripts/menus/shop_menu.gd
 msgid "Arriba/abajo: elegir  ·  A o Intro: comprar  ·  LB/RB o Q/E: pestaña  ·  B o Esc: volver"
-msgstr ""
+msgstr "Up/down: choose  ·  A or Enter: buy  ·  LB/RB or Q/E: tab  ·  B or Esc: back"
 
 #: scripts/menus/shop_menu.gd
 msgid "Arriba/abajo: elegir  ·  Izquierda/derecha: sección  ·  A o Intro: comprar  ·  X o R: investigador  ·  LB/RB: pestaña  ·  B: volver"
-msgstr ""
+msgstr "Up/down: choose  ·  Left/right: section  ·  A or Enter: buy  ·  X or R: investigator  ·  LB/RB: tab  ·  B: back"
 
 #: scripts/menus/shop_menu.gd
 msgid "Completa el conjunto «%s»"
-msgstr ""
+msgstr "Complete the “%s” set"
 
 #: scripts/menus/shop_menu.gd
 msgid "Comprado"
-msgstr ""
+msgstr "Bought"
 
 #: scripts/menus/shop_menu.gd
 msgid "Comprado: %s."
-msgstr ""
+msgstr "Bought: %s."
 
 #: scripts/menus/shop_menu.gd
 msgid "Comprar"
-msgstr ""
+msgstr "Buy"
 
 #: scripts/menus/shop_menu.gd
 msgid "Conjuntos %d/%d"
-msgstr ""
+msgstr "Sets %d/%d"
 
 #: scripts/menus/shop_menu.gd
 msgid "Dinero: %s $"
-msgstr ""
+msgstr "Money: %s $"
 
 #: scripts/menus/shop_menu.gd
 msgid "Juego completo"
-msgstr ""
+msgstr "Complete set"
 
 #: scripts/menus/shop_menu.gd
 msgid "Pacto %s."
-msgstr ""
+msgstr "Pact %s."
 
 #: scripts/menus/shop_menu.gd
 msgid "Solo te falta una prenda"
-msgstr ""
+msgstr "Just one garment to go"
 
 #: scripts/menus/shop_menu.gd
 msgid "Te faltan %s $."
-msgstr ""
+msgstr "You are %s $ short."
 
 #: scripts/menus/shop_menu.gd
 msgid "Ya lo tienes."
-msgstr ""
+msgstr "You already have it."
 
 #: scripts/menus/shop_menu.gd
 msgid "Ya tienes todo el conjunto."
-msgstr ""
+msgstr "You already have the whole set."
 
 #: scripts/menus/shop_menu.gd
 msgid "¿Comprar %s (%d %s) por %s $?"
-msgstr ""
+msgstr "Buy %s (%d %s) for %s $?"
 
 #: scripts/menus/shop_menu.gd
 msgid "¿Comprar %s por %s $?"
-msgstr ""
+msgstr "Buy %s for %s $?"
 
 #: scripts/menus/slot_menu.gd
 msgid "  ·  Pruebas"
-msgstr ""
+msgstr "  ·  Tests"
 
 #: scripts/menus/slot_menu.gd
 msgid "Borrar"
-msgstr ""
+msgstr "Delete"
 
 #: scripts/menus/slot_menu.gd
 msgid "Comprobando la nube…"
-msgstr ""
+msgstr "Checking the cloud…"
 
 #: scripts/menus/slot_menu.gd
 msgid "Elige partida"
-msgstr ""
+msgstr "Choose a save"
 
 #: scripts/menus/slot_menu.gd
 msgid "Empezar una partida nueva"
-msgstr ""
+msgstr "Start a new save"
 
 #: scripts/menus/slot_menu.gd
 msgid "Flechas o cruceta: moverse  ·  A o Intro: elegir  ·  B o Esc: volver"
-msgstr ""
+msgstr "Arrows or d-pad: move  ·  A or Enter: choose  ·  B or Esc: back"
 
 #: scripts/menus/slot_menu.gd
 msgid "Guardada con la v%s (esta es la v%s)"
-msgstr ""
+msgstr "Saved with v%s (this is v%s)"
 
 #: scripts/menus/slot_menu.gd
 msgid "Partida %d%s"
-msgstr ""
+msgstr "Save %d%s"
 
 #: scripts/menus/slot_menu.gd
 msgid "Vacía"
-msgstr ""
+msgstr "Empty"
 
 #: scripts/menus/slot_menu.gd
 msgid ""
@@ -10774,46 +10789,49 @@ msgid ""
 "\n"
 "Se perderá todo su progreso: %s de juego, %s $, %s y %s."
 msgstr ""
+"Delete Save %d?\n"
+"\n"
+"All its progress will be lost: %s of play, %s $, %s and %s."
 
 #: scripts/menus/trophy_room.gd
 msgid "%d de %d trofeos"
-msgstr ""
+msgstr "%d of %d trophies"
 
 #: scripts/menus/trophy_room.gd
 msgid "%s  ·  %d de %d"
-msgstr ""
+msgstr "%s  ·  %d of %d"
 
 #: scripts/menus/trophy_room.gd
 msgid "Encendiendo las lámparas…"
-msgstr ""
+msgstr "Lighting the lamps…"
 
 #: scripts/menus/trophy_room.gd
 msgid "Flechas: recorrer  ·  LB/RB o Q/E: otra vitrina  ·  B o Esc: volver"
-msgstr ""
+msgstr "Arrows: browse  ·  LB/RB or Q/E: another case  ·  B or Esc: back"
 
 #: scripts/menus/trophy_room.gd
 msgid "Peana vacía. "
-msgstr ""
+msgstr "Empty pedestal. "
 
 #: scripts/menus/trophy_room.gd
 msgid "Peana vacía. Aquí irá la figura del próximo jefe que caiga."
-msgstr ""
+msgstr "Empty pedestal. The figure of the next boss to fall will go here."
 
 #: scripts/menus/trophy_room.gd
 msgid "Peana vacía. Completa un conjunto del vestuario para que su maniquí ocupe este sitio."
-msgstr ""
+msgstr "Empty pedestal. Complete a wardrobe set for its mannequin to take this place."
 
 #: scripts/menus/trophy_room.gd scripts/save/library.gd
 msgid "Sala de trofeos"
-msgstr ""
+msgstr "Trophy room"
 
 #: scripts/net/net_game.gd
 msgid "  Sin noticias del anfitrión… %d s  "
-msgstr ""
+msgstr "  No news from the host… %d s  "
 
 #: scripts/net/net_game.gd
 msgid " %d ms"
-msgstr ""
+msgstr " %d ms"
 
 #: scripts/net/net_game.gd
 msgid " | MARCAS en este nivel: %d"
@@ -10821,11 +10839,11 @@ msgstr ""
 
 #: scripts/net/net_game.gd
 msgid "%s ha puesto una marca"
-msgstr ""
+msgstr "%s has placed a mark"
 
 #: scripts/net/net_game.gd
 msgid "%s ha vuelto: entrará en el siguiente nivel"
-msgstr ""
+msgstr "%s is back: they will join on the next level"
 
 #: scripts/net/net_game.gd
 msgid "%s media %.1f pico %.1f"
@@ -10833,7 +10851,7 @@ msgstr ""
 
 #: scripts/net/net_game.gd
 msgid "%s se desconectó en el %s"
-msgstr ""
+msgstr "%s disconnected at %s"
 
 #: scripts/net/net_game.gd
 msgid "%s t=%.1f enemigos=%d abatidos=%d xp=%.0f balas=%d gemas=%d %s  sale=%.1f kB/s%s real=%.1f  ping=%d"
@@ -10845,27 +10863,27 @@ msgstr ""
 
 #: scripts/net/net_game.gd
 msgid "Esperando a los demás jugadores…"
-msgstr ""
+msgstr "Waiting for the other players…"
 
 #: scripts/net/net_game.gd
 msgid "Esperando al anfitrión…"
-msgstr ""
+msgstr "Waiting for the host…"
 
 #: scripts/net/net_game.gd
 msgid "J%d lo lleva la máquina (se fue su PC)"
-msgstr ""
+msgstr "The computer is playing P%d (their PC left)"
 
 #: scripts/net/net_game.gd
 msgid "J%d se ha desconectado: lo lleva la máquina"
-msgstr ""
+msgstr "P%d has disconnected: the computer is playing them"
 
 #: scripts/net/net_game.gd scripts/title/relato_screen.gd scripts/ui/hud.gd
 msgid "Parte %d · Nivel %d"
-msgstr ""
+msgstr "Part %d · Level %d"
 
 #: scripts/net/net_game.gd
 msgid "Salir al menú principal"
-msgstr ""
+msgstr "Quit to the main menu"
 
 #: scripts/net/net_game.gd
 msgid "ancho de banda (kB/s por PC, sin comprimir): %s | comprimido, en total: media %.1f pico %.1f | por tipo: %s%s"
@@ -10949,1752 +10967,1733 @@ msgstr ""
 
 #: scripts/net/net_session.gd
 msgid " (vuelve con la partida empezada)"
-msgstr ""
+msgstr " (rejoining a game in progress)"
 
 #: scripts/net/net_session.gd
 msgid " · IP externa "
-msgstr ""
+msgstr " · external IP "
 
 #: scripts/net/net_session.gd
 msgid "%s → %s, puerto %d"
-msgstr ""
+msgstr "%s → %s, port %d"
 
 #: scripts/net/net_session.gd
 msgid "%s, puerto %d, %s"
-msgstr ""
+msgstr "%s, port %d, %s"
 
 #: scripts/net/net_session.gd
 msgid "Anfitrión"
-msgstr ""
+msgstr "Host"
 
 #: scripts/net/net_session.gd
 msgid "Buscando el router…"
-msgstr ""
+msgstr "Looking for the router…"
 
 #: scripts/net/net_session.gd
 msgid "Dentro de la sala como PC %d%s"
-msgstr ""
+msgstr "In the room as PC %d%s"
 
 #: scripts/net/net_session.gd
 msgid "Dirección no válida: %s"
-msgstr ""
+msgstr "Invalid address: %s"
 
 #: scripts/net/net_session.gd
 msgid "El anfitrión no te ha dejado entrar"
-msgstr ""
+msgstr "The host didn't let you in"
 
 #: scripts/net/net_session.gd
 msgid "Invitado"
-msgstr ""
+msgstr "Guest"
 
 #: scripts/net/net_session.gd
 msgid "Jugador"
-msgstr ""
+msgstr "Player"
 
 #: scripts/net/net_session.gd
 msgid "La partida ya ha empezado: espera a que vuelvan a la sala"
-msgstr ""
+msgstr "The game has already started: wait for them to return to the room"
 
 #: scripts/net/net_session.gd
 msgid "La sala está llena"
-msgstr ""
+msgstr "The room is full"
 
 #: scripts/net/net_session.gd
 msgid "No responde nadie en esa dirección"
-msgstr ""
+msgstr "Nobody answers at that address"
 
 #: scripts/net/net_session.gd
 msgid "No se pudo abrir el puerto %d (¿otra copia del juego abierta?)"
-msgstr ""
+msgstr "Port %d could not be opened (another copy of the game running?)"
 
 #: scripts/net/net_session.gd
 msgid "No se pudo conectar con el anfitrión"
-msgstr ""
+msgstr "Could not connect to the host"
 
 #: scripts/net/net_session.gd
 msgid "No se pudo: "
-msgstr ""
+msgstr "Failed: "
 
 #: scripts/net/net_session.gd
 msgid "Rechazado %s: %s"
-msgstr ""
+msgstr "Rejected %s: %s"
 
 #: scripts/net/net_session.gd
 msgid "Sin UPnP"
-msgstr ""
+msgstr "No UPnP"
 
 #: scripts/net/net_session.gd
 msgid "Versión distinta del juego: actualizad los dos a la misma"
-msgstr ""
+msgstr "Different game version: update both to the same one"
 
 #: scripts/net/net_session.gd
 msgid "con UPnP"
-msgstr ""
+msgstr "with UPnP"
 
 #: scripts/net/net_session.gd
 msgid "sin UPnP"
-msgstr ""
+msgstr "without UPnP"
 
 #: scripts/net/upnp_helper.gd
 msgid "El router no deja abrir el puerto"
-msgstr ""
+msgstr "The router won't let the port be opened"
 
 #: scripts/net/upnp_helper.gd
 msgid "El router no responde a UPnP"
-msgstr ""
+msgstr "The router doesn't answer UPnP"
 
 #: scripts/net/upnp_helper.gd
 msgid "El router no tiene IP pública (CGNAT o doble router)"
-msgstr ""
+msgstr "The router has no public IP (CGNAT or double router)"
 
 #: scripts/net/upnp_helper.gd scripts/ui/photo_mode.gd
 msgid "Lovecraft Library"
-msgstr ""
+msgstr "Lovecraft Library"
 
 #: scripts/net/upnp_helper.gd
 msgid "Puerto %d abierto"
-msgstr ""
+msgstr "Port %d open"
 
 #: scripts/pets/behaviors/pet_forage.gd
 msgid "¡Un baúl!"
-msgstr ""
+msgstr "A chest!"
 
 #: scripts/pets/behaviors/pet_heal.gd
 msgid "¡Kiii!"
-msgstr ""
+msgstr "Kiii!"
 
 #: scripts/pets/behaviors/pet_heal.gd
 msgid "¡Pescado!"
-msgstr ""
+msgstr "Fish!"
 
 #: scripts/pets/pet.gd
 msgid "Zzz"
-msgstr ""
+msgstr "Zzz"
 
 #: scripts/pets/pet.gd
 msgid "¡Auuu!"
-msgstr ""
+msgstr "Awooo!"
 
 #: scripts/pets/pet_data.gd
 msgid "Perro de trineo"
-msgstr ""
+msgstr "Sled dog"
 
 #: scripts/player/attributes.gd
 msgid "Agilidad, reflejos y rapidez de manos para esquivar zarpas y escurrirse entre la horda."
-msgstr ""
+msgstr "Agility, reflexes and quick hands to dodge claws and slip through the horde."
 
 #: scripts/player/attributes.gd
 msgid "Agudeza para razonar y atar cabos. Una mente despierta resiste mejor lo incomprensible, aunque también comprende antes lo terrible."
-msgstr ""
+msgstr "Sharpness to reason and connect the dots. An alert mind better withstands the incomprehensible, though it also grasps the terrible sooner."
 
 #: scripts/player/attributes.gd
 msgid "Constitución"
-msgstr ""
+msgstr "Constitution"
 
 #: scripts/player/attributes.gd
 msgid "Cultura"
-msgstr ""
+msgstr "Education"
 
 #: scripts/player/attributes.gd
 msgid "Destreza"
-msgstr ""
+msgstr "Dexterity"
 
 #: scripts/player/attributes.gd
 msgid "Fuerza de voluntad y afinidad con lo oculto. Quien tiene mucho Poder sostiene la mirada de lo que no debería existir y doblega los ritos a su favor."
-msgstr ""
+msgstr "Willpower and affinity with the occult. Whoever has great Power can hold the gaze of what should not exist and bend the rites in their favour."
 
 #: scripts/player/attributes.gd
 msgid "Inteligencia"
-msgstr ""
+msgstr "Intelligence"
 
 #: scripts/player/attributes.gd
 msgid "Lo aprendido en aulas, bibliotecas y caminos: años de estudio, lecturas voraces, viajes a tierras remotas y leyendas escuchadas junto al fuego. Quien reconoce un signo antiguo o recuerda el nombre olvidado de un dios sabe cómo usar lo arcano contra él."
-msgstr ""
+msgstr "What was learned in lecture halls, libraries and on the road: years of study, voracious reading, journeys to remote lands and legends heard by the fire. Whoever recognises an ancient sign or remembers the forgotten name of a god knows how to turn the arcane against it."
 
 #: scripts/player/attributes.gd
 msgid "Poder"
-msgstr ""
+msgstr "Power"
 
 #: scripts/player/attributes.gd
 msgid "Salud y aguante del cuerpo. Soportar el frío, la fatiga y las heridas, y mantener el pulso firme al disparar."
-msgstr ""
+msgstr "The body's health and endurance. Bearing cold, fatigue and wounds, and keeping a steady hand when shooting."
 
 #: scripts/player/attributes.gd
 msgid "Tenacidad"
-msgstr ""
+msgstr "Tenacity"
 
 #: scripts/player/attributes.gd
 msgid "Terquedad de quien se niega a caer. Seguir en pie cuando el cuerpo y la razón piden rendirse."
-msgstr ""
+msgstr "The stubbornness of someone who refuses to fall. Staying on your feet when body and reason beg you to give up."
 
 #: scripts/player/attributes.gd
 msgid "Vigor físico: golpear, cargar, arrojar y abrirse paso a la fuerza entre lo que se arrastra."
-msgstr ""
+msgstr "Physical vigour: striking, carrying, throwing and forcing a way through whatever crawls."
 
 #: scripts/player/character_data.gd scripts/ui/player_menus.gd
 msgid "Atributos"
-msgstr ""
+msgstr "Attributes"
 
 #: scripts/player/character_data.gd
 msgid "Esquive"
-msgstr ""
+msgstr "Dodge"
 
 #: scripts/player/character_data.gd
 msgid "Movimiento"
-msgstr ""
+msgstr "Movement"
 
 #: scripts/player/character_data.gd
 msgid "Objetos (D-38: los cambian los objetos de la subida de nivel)"
-msgstr ""
+msgstr "Items (D-38: changed by level-up items)"
 
 #: scripts/player/character_data.gd scripts/ui/fall_report.gd
 msgid "Otros"
-msgstr ""
+msgstr "Others"
 
 #: scripts/player/character_data.gd
 msgid "Presentación"
-msgstr ""
+msgstr "Presentation"
 
 #: scripts/player/character_data.gd
 msgid "Rasgos"
-msgstr ""
+msgstr "Traits"
 
 #: scripts/player/character_data.gd
 msgid "Recursos (base: los atributos la escalan)"
-msgstr ""
+msgstr "Resources (base: scaled by the attributes)"
 
 #: scripts/player/player.gd scripts/voxel_builder.gd
 msgid "Beam"
-msgstr ""
+msgstr "Beam"
 
 #: scripts/player/player.gd
 msgid "El ankh de Nephren te devuelve a la vida"
-msgstr ""
+msgstr "The ankh of Nephren brings you back to life"
 
 #: scripts/player/player.gd
 msgid "La medalla de San Cristóbal te protege"
-msgstr ""
+msgstr "The St Christopher medal protects you"
 
 #: scripts/player/player.gd
 msgid "Ring"
-msgstr ""
+msgstr "Ring"
 
 #: scripts/player/player.gd
 msgid "Visual"
-msgstr ""
+msgstr "Visual"
 
 #: scripts/player/sanity_state.gd
 msgid "huida histérica"
-msgstr ""
+msgstr "hysterical flight"
 
 #: scripts/player/sanity_state.gd
 msgid "parálisis"
-msgstr ""
+msgstr "paralysis"
 
 #: scripts/player/sanity_state.gd
 msgid "vagar sin rumbo"
-msgstr ""
+msgstr "aimless wandering"
 
 #: scripts/progression/gem_manager.gd
 msgid "Gems"
-msgstr ""
+msgstr "Gems"
 
 #: scripts/progression/player_progress.gd
 msgid "Arma nueva"
-msgstr ""
+msgstr "New weapon"
 
 #: scripts/progression/player_progress.gd
 msgid "Con %s al nivel %d, evoluciona"
-msgstr ""
+msgstr "With %s at level %d, it evolves"
 
 #: scripts/progression/player_progress.gd
 msgid "Evoluciona con %s"
-msgstr ""
+msgstr "Evolves with %s"
 
 #: scripts/progression/player_progress.gd
 msgid "Evoluciona: %s"
-msgstr ""
+msgstr "Evolves: %s"
 
 #: scripts/progression/player_progress.gd
 msgid "Evolucionará con %s"
-msgstr ""
+msgstr "Will evolve with %s"
 
 #: scripts/progression/player_progress.gd
 msgid "Mejora"
-msgstr ""
+msgstr "Upgrade"
 
 #: scripts/progression/progression_data.gd scripts/progression/stat_compare.gd
 msgid "Cordura"
-msgstr ""
+msgstr "Sanity"
 
 #: scripts/progression/stat_compare.gd
 msgid "%d de %d"
-msgstr ""
+msgstr "%d of %d"
 
 #: scripts/progression/stat_compare.gd
 msgid "%s %s → [color=#%s]%s[/color]"
-msgstr ""
+msgstr "%s %s → [color=#%s]%s[/color]"
 
 #: scripts/progression/stat_compare.gd
 msgid "Abertura"
-msgstr ""
+msgstr "Spread"
 
 #: scripts/progression/stat_compare.gd
 msgid "Ahora"
-msgstr ""
+msgstr "Now"
 
 #: scripts/progression/stat_compare.gd
 msgid "Alcance"
-msgstr ""
+msgstr "Range"
 
 #: scripts/progression/stat_compare.gd
 msgid "Ancho"
-msgstr ""
+msgstr "Width"
 
 #: scripts/progression/stat_compare.gd
 msgid "Armadura"
-msgstr ""
+msgstr "Armour"
 
 #: scripts/progression/stat_compare.gd
 msgid "Armas"
-msgstr ""
+msgstr "Weapons"
 
 #: scripts/progression/stat_compare.gd
 msgid "Atrae"
-msgstr ""
+msgstr "Pull"
 
 #: scripts/progression/stat_compare.gd
 msgid "Atrapa"
-msgstr ""
+msgstr "Snare"
 
 #: scripts/progression/stat_compare.gd
 msgid "Atraviesa"
-msgstr ""
+msgstr "Pierce"
 
 #: scripts/progression/stat_compare.gd
 msgid "Atraviesan"
-msgstr ""
+msgstr "Pierce"
 
 #: scripts/progression/stat_compare.gd
 msgid "Aturde"
-msgstr ""
+msgstr "Stun"
 
 #: scripts/progression/stat_compare.gd
 msgid "Baúles arcanos"
-msgstr ""
+msgstr "Arcane chests"
 
 #: scripts/progression/stat_compare.gd
 msgid "Cada"
-msgstr ""
+msgstr "Every"
 
 #: scripts/progression/stat_compare.gd
 msgid "Calma por segundo"
-msgstr ""
+msgstr "Calm per second"
 
 #: scripts/progression/stat_compare.gd
 msgid "Cambios de opciones"
-msgstr ""
+msgstr "Rerolls"
 
 #: scripts/progression/stat_compare.gd
 msgid "Cantidad"
-msgstr ""
+msgstr "Amount"
 
 #: scripts/progression/stat_compare.gd
 msgid "Carga al esquivar"
-msgstr ""
+msgstr "Dodge charge"
 
 #: scripts/progression/stat_compare.gd
 msgid "Chispas"
-msgstr ""
+msgstr "Sparks"
 
 #: scripts/progression/stat_compare.gd
 msgid "Cordura de las mágicas"
-msgstr ""
+msgstr "Sanity cost of magic weapons"
 
 #: scripts/progression/stat_compare.gd
 msgid "Cordura por baja"
-msgstr ""
+msgstr "Sanity per kill"
 
 #: scripts/progression/stat_compare.gd
 msgid "Cordura por disparo"
-msgstr ""
+msgstr "Sanity per shot"
 
 #: scripts/progression/stat_compare.gd
 msgid "Cordura por segundo"
-msgstr ""
+msgstr "Sanity per second"
 
 #: scripts/progression/stat_compare.gd
 msgid "Crítico"
-msgstr ""
+msgstr "Critical"
 
 #: scripts/progression/stat_compare.gd
 msgid "Curación de la comida"
-msgstr ""
+msgstr "Food healing"
 
 #: scripts/progression/stat_compare.gd scripts/ui/damage_table.gd
 msgid "Daño"
-msgstr ""
+msgstr "Damage"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño a los ilesos"
-msgstr ""
+msgstr "Damage to the unhurt"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño a los revelados"
-msgstr ""
+msgstr "Damage to the revealed"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño a élites"
-msgstr ""
+msgstr "Damage to elites"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño balístico"
-msgstr ""
+msgstr "Ballistic damage"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño con poca vida"
-msgstr ""
+msgstr "Damage at low health"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño de la maldición"
-msgstr ""
+msgstr "Curse damage"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño de la zona"
-msgstr ""
+msgstr "Zone damage"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño de los aliados"
-msgstr ""
+msgstr "Ally damage"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño del crítico"
-msgstr ""
+msgstr "Critical damage"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño físico"
-msgstr ""
+msgstr "Physical damage"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño mental recibido"
-msgstr ""
+msgstr "Mental damage taken"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño mágico"
-msgstr ""
+msgstr "Magic damage"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño por golpe"
-msgstr ""
+msgstr "Damage per hit"
 
 #: scripts/progression/stat_compare.gd
 msgid "Daño tras esquivar"
-msgstr ""
+msgstr "Damage after dodging"
 
 #: scripts/progression/stat_compare.gd
 msgid "Duración"
-msgstr ""
+msgstr "Duration"
 
 #: scripts/progression/stat_compare.gd
 msgid "Duración de la zona"
-msgstr ""
+msgstr "Zone duration"
 
 #: scripts/progression/stat_compare.gd
 msgid "Duración de las crisis"
-msgstr ""
+msgstr "Crisis duration"
 
 #: scripts/progression/stat_compare.gd
 msgid "Duración de los aliados"
-msgstr ""
+msgstr "Ally duration"
 
 #: scripts/progression/stat_compare.gd
 msgid "Empuje"
-msgstr ""
+msgstr "Knockback"
 
 #: scripts/progression/stat_compare.gd
 msgid "Enemigos, experiencia y dólares"
-msgstr ""
+msgstr "Enemies, experience and dollars"
 
 #: scripts/progression/stat_compare.gd
 msgid "Entre disparos"
-msgstr ""
+msgstr "Between shots"
 
 #: scripts/progression/stat_compare.gd
 msgid "Espinas"
-msgstr ""
+msgstr "Thorns"
 
 #: scripts/progression/stat_compare.gd
 msgid "Esquives seguidos"
-msgstr ""
+msgstr "Dodges in a row"
 
 #: scripts/progression/stat_compare.gd
 msgid "Estallido al abatir"
-msgstr ""
+msgstr "Burst on kill"
 
 #: scripts/progression/stat_compare.gd
 msgid "Estasis"
-msgstr ""
+msgstr "Stasis"
 
 #: scripts/progression/stat_compare.gd
 msgid "Experiencia"
-msgstr ""
+msgstr "Experience"
 
 #: scripts/progression/stat_compare.gd
 msgid "Frenar al impactar"
-msgstr ""
+msgstr "Slow on hit"
 
 #: scripts/progression/stat_compare.gd
 msgid "Freno de los enemigos"
-msgstr ""
+msgstr "Enemy slowdown"
 
 #: scripts/progression/stat_compare.gd
 msgid "Impulso del esquive"
-msgstr ""
+msgstr "Dodge impulse"
 
 #: scripts/progression/stat_compare.gd
 msgid "Invulnerable al esquivar"
-msgstr ""
+msgstr "Invulnerable while dodging"
 
 #: scripts/progression/stat_compare.gd
 msgid "Invulnerable tras un golpe"
-msgstr ""
+msgstr "Invulnerable after a hit"
 
 #: scripts/progression/stat_compare.gd
 msgid "Largo"
-msgstr ""
+msgstr "Length"
 
 #: scripts/progression/stat_compare.gd
 msgid "Levantarse al caer"
-msgstr ""
+msgstr "Get up after falling"
 
 #: scripts/progression/stat_compare.gd
 msgid "Nodens"
-msgstr ""
+msgstr "Nodens"
 
 #: scripts/progression/stat_compare.gd scripts/save/library.gd
 msgid "Objetos"
-msgstr ""
+msgstr "Items"
 
 #: scripts/progression/stat_compare.gd
 msgid "Prender al impactar"
-msgstr ""
+msgstr "Ignite on hit"
 
 #: scripts/progression/stat_compare.gd
 msgid "Proyectiles extra"
-msgstr ""
+msgstr "Extra projectiles"
 
 #: scripts/progression/stat_compare.gd
 msgid "Radio de recogida"
-msgstr ""
+msgstr "Pickup radius"
 
 #: scripts/progression/stat_compare.gd
 msgid "Recarga"
-msgstr ""
+msgstr "Cooldown"
 
 #: scripts/progression/stat_compare.gd
 msgid "Recarga de las armas"
-msgstr ""
+msgstr "Weapon cooldown"
 
 #: scripts/progression/stat_compare.gd
 msgid "Recarga de las mágicas"
-msgstr ""
+msgstr "Magic weapon cooldown"
 
 #: scripts/progression/stat_compare.gd
 msgid "Recarga del esquive"
-msgstr ""
+msgstr "Dodge cooldown"
 
 #: scripts/progression/stat_compare.gd
 msgid "Señuelo"
-msgstr ""
+msgstr "Lure"
 
 #: scripts/progression/stat_compare.gd
 msgid "Suerte"
-msgstr ""
+msgstr "Luck"
 
 #: scripts/progression/stat_compare.gd
 msgid "Tamaño de las balas"
-msgstr ""
+msgstr "Bullet size"
 
 #: scripts/progression/stat_compare.gd
 msgid "Velocidad de los proyectiles"
-msgstr ""
+msgstr "Projectile speed"
 
 #: scripts/progression/stat_compare.gd
 msgid "Vida"
-msgstr ""
+msgstr "Health"
 
 #: scripts/progression/stat_compare.gd
 msgid "Vida por baja"
-msgstr ""
+msgstr "Health per kill"
 
 #: scripts/progression/stat_compare.gd
 msgid "Vida por segundo"
-msgstr ""
+msgstr "Health per second"
 
 #: scripts/progression/stat_compare.gd
 msgid "Vulnerables"
-msgstr ""
+msgstr "Vulnerable"
 
 #: scripts/progression/stat_compare.gd
 msgid "Área"
-msgstr ""
+msgstr "Area"
 
 #: scripts/progression/stat_compare.gd
 msgid "Área de la zona"
-msgstr ""
+msgstr "Zone area"
 
 #: scripts/progression/upgrade_data.gd
 msgid "+8 % de velocidad"
-msgstr ""
+msgstr "+8 % speed"
 
 #: scripts/save/achievement_data.gd
 msgid "Imagen"
-msgstr ""
+msgstr "Image"
 
 #: scripts/save/achievement_data.gd
 msgid "Recompensa"
-msgstr ""
+msgstr "Reward"
 
 #: scripts/save/diary.gd
 msgid "%d de %s de %d"
-msgstr ""
+msgstr "%d of %s of %d"
 
 #: scripts/save/diary.gd
 msgid "%d veces"
-msgstr ""
+msgstr "%d times"
 
 #: scripts/save/diary.gd
 msgid "caído"
-msgstr ""
+msgstr "fallen"
 
 #: scripts/save/diary.gd
 msgid "dos veces"
-msgstr ""
+msgstr "twice"
 
 #: scripts/save/diary.gd
 msgid "noche eterna"
-msgstr ""
+msgstr "endless night"
 
 #: scripts/save/diary.gd
 msgid "tres veces"
-msgstr ""
+msgstr "three times"
 
 #: scripts/save/diary.gd
 msgid "una vez"
-msgstr ""
+msgstr "once"
 
 #: scripts/save/library.gd
 msgid " con menos de un cuarto de la cordura"
-msgstr ""
-
-#: scripts/save/library.gd
-msgid " de el "
-msgstr ""
-
-#: scripts/save/library.gd
-msgid " del "
-msgstr ""
+msgstr " with less than a quarter of their sanity"
 
 #: scripts/save/library.gd
 msgid " entero"
-msgstr ""
+msgstr " in full"
 
 #: scripts/save/library.gd
 msgid " o en "
-msgstr ""
+msgstr " or in "
 
 #: scripts/save/library.gd
 msgid " · se vende por %d $"
-msgstr ""
+msgstr " · sells for %d $"
 
 #: scripts/save/library.gd
 msgid " · élite"
-msgstr ""
+msgstr " · elite"
 
 #: scripts/save/library.gd
 msgid "%d %s con él"
-msgstr ""
+msgstr "%d %s with them"
 
 #: scripts/save/library.gd
 msgid "%d de %s de %s"
-msgstr ""
+msgstr "%d of %s of %s"
 
 #: scripts/save/library.gd
 msgid "%s en el minuto %d (%s)"
-msgstr ""
+msgstr "%s at minute %d (%s)"
 
 #: scripts/save/library.gd
 msgid "%s · %d superadas"
-msgstr ""
+msgstr "%s · %d cleared"
 
 #: scripts/save/library.gd
 msgid "A: verla a toda pantalla"
-msgstr ""
+msgstr "A: view it full screen"
 
 #: scripts/save/library.gd
 msgid "Abatidos: %d"
-msgstr ""
+msgstr "Kills: %d"
 
 #: scripts/save/library.gd
 msgid "Al nivel %d con %s, un baúl arcano la convierte en %s"
-msgstr ""
+msgstr "At level %d with %s, an arcane chest turns it into %s"
 
 #: scripts/save/library.gd
 msgid "Archivo de expediciones"
-msgstr ""
+msgstr "Expedition archive"
 
 #: scripts/save/library.gd
 msgid "Armas: "
-msgstr ""
+msgstr "Weapons: "
 
 #: scripts/save/library.gd
 msgid "Arsenal"
-msgstr ""
+msgstr "Arsenal"
 
 #: scripts/save/library.gd
 msgid "Aura: −%.1f de cordura por segundo"
-msgstr ""
+msgstr "Aura: −%.1f sanity per second"
 
 #: scripts/save/library.gd
 msgid "Aún no hay nada que contar: se apunta al acabar cada partida."
-msgstr ""
+msgstr "Nothing to tell yet: it is noted at the end of each run."
 
 #: scripts/save/library.gd
 msgid "Aún no se ha traído ninguna a la Biblioteca"
-msgstr ""
+msgstr "None has been brought to the Library yet"
 
 #: scripts/save/library.gd
 msgid "Aún no tienes ninguna de sus prendas: están en la tienda."
-msgstr ""
+msgstr "You don't have any of its garments yet: they are in the shop."
 
 #: scripts/save/library.gd
 msgid "Bajas por criatura"
-msgstr ""
+msgstr "Kills by creature"
 
 #: scripts/save/library.gd
 msgid "Bestiario"
-msgstr ""
+msgstr "Bestiary"
 
 #: scripts/save/library.gd scripts/ui/hud.gd
 msgid "Caído"
-msgstr ""
+msgstr "Down"
 
 #: scripts/save/library.gd
 msgid "Compañeros levantados: %d"
-msgstr ""
+msgstr "Companions raised: %d"
 
 #: scripts/save/library.gd
 msgid "Con "
-msgstr ""
+msgstr "With "
 
 #: scripts/save/library.gd
 msgid "Conjuntos"
-msgstr ""
+msgstr "Sets"
 
 #: scripts/save/library.gd
 msgid "Criaturas abatidas: "
-msgstr ""
+msgstr "Creatures killed: "
 
 #: scripts/save/library.gd
 msgid "Criaturas: "
-msgstr ""
+msgstr "Creatures: "
 
 #: scripts/save/library.gd
 msgid "Crisis de cada tipo"
-msgstr ""
+msgstr "Crises of each kind"
 
 #: scripts/save/library.gd
 msgid "Cuesta %s de cordura"
-msgstr ""
+msgstr "Costs %s sanity"
 
 #: scripts/save/library.gd
 msgid "Cuánto tiempo ha pasado cada uno en la noche."
-msgstr ""
+msgstr "How long each one has spent in the night."
 
 #: scripts/save/library.gd
 msgid "Daño %s · cada %.2f s · alcance %d m"
-msgstr ""
+msgstr "Damage %s · every %.2f s · range %d m"
 
 #: scripts/save/library.gd
 msgid ""
 "Daño de la partida:\n"
 msgstr ""
+"Damage this run:\n"
 
 #: scripts/save/library.gd
 msgid "Daño por arma"
-msgstr ""
+msgstr "Damage by weapon"
 
 #: scripts/save/library.gd scripts/ui/player_menus.gd
 msgid "De fuego"
-msgstr ""
+msgstr "Fire"
 
 #: scripts/save/library.gd
 msgid "De la tienda"
-msgstr ""
+msgstr "From the shop"
 
 #: scripts/save/library.gd
 msgid "Desafíos superados: %d de %d"
-msgstr ""
+msgstr "Challenges cleared: %d of %d"
 
 #: scripts/save/library.gd
 msgid "Desfile de jefes: "
-msgstr ""
+msgstr "Boss parade: "
 
 #: scripts/save/library.gd
 msgid "Diarios"
-msgstr ""
+msgstr "Diaries"
 
 #: scripts/save/library.gd
 msgid "Dónde se ha vuelto una y otra vez."
-msgstr ""
+msgstr "Where they have gone back again and again."
 
 #: scripts/save/library.gd
 msgid "En crisis: "
-msgstr ""
+msgstr "In crisis: "
 
 #: scripts/save/library.gd
 msgid "En la Biblioteca: %d"
-msgstr ""
+msgstr "In the Library: %d"
 
 #: scripts/save/library.gd
 msgid "En la partida"
-msgstr ""
+msgstr "In the run"
 
 #: scripts/save/library.gd
 msgid "En la tienda"
-msgstr ""
+msgstr "In the shop"
 
 #: scripts/save/library.gd
 msgid "Epílogo · El que no volvió del todo"
-msgstr ""
+msgstr "Epilogue · The one who never fully came back"
 
 #: scripts/save/library.gd
 msgid "Epílogo · La ciudad del crepúsculo"
-msgstr ""
+msgstr "Epilogue · The sunset city"
 
 #: scripts/save/library.gd
 msgid "Epílogo · Lo que vino después"
-msgstr ""
+msgstr "Epilogue · What came after"
 
 #: scripts/save/library.gd
 msgid "Epílogos"
-msgstr ""
+msgstr "Epilogues"
 
 #: scripts/save/library.gd
 msgid "Escalón %d%s"
-msgstr ""
+msgstr "Tier %d%s"
 
 #: scripts/save/library.gd scripts/ui/player_menus.gd
 msgid "Estadísticas"
-msgstr ""
+msgstr "Statistics"
 
 #: scripts/save/library.gd scripts/ui/damage_table.gd
 msgid "Evolución"
-msgstr ""
+msgstr "Evolution"
 
 #: scripts/save/library.gd
 msgid "Expediciones completadas: %d"
-msgstr ""
+msgstr "Expeditions completed: %d"
 
 #: scripts/save/library.gd
 msgid "Finales"
-msgstr ""
+msgstr "Endings"
 
 #: scripts/save/library.gd scripts/ui/player_menus.gd
 msgid "Física"
-msgstr ""
+msgstr "Physical"
 
 #: scripts/save/library.gd
 msgid "Investigador favorito: "
-msgstr ""
+msgstr "Favourite investigator: "
 
 #: scripts/save/library.gd scripts/ui/photo_mode.gd
 msgid "Investigadores"
-msgstr ""
+msgstr "Investigators"
 
 #: scripts/save/library.gd
 msgid "Investigadores y compañeros"
-msgstr ""
+msgstr "Investigators and companions"
 
 #: scripts/save/library.gd
 msgid "La noche eterna: "
-msgstr ""
+msgstr "The endless night: "
 
 #: scripts/save/library.gd
 msgid "Las criaturas que más han caído ante los investigadores."
-msgstr ""
+msgstr "The creatures that have fallen most often before the investigators."
 
 #: scripts/save/library.gd
 msgid "Las mejores marcas de los modos de juego. El archivo de expediciones (tomo X) guarda el detalle de las últimas partidas."
-msgstr ""
+msgstr "The best marks in each game mode. The expedition archive (tome X) keeps the details of the latest runs."
 
 #: scripts/save/library.gd
 msgid "Las últimas partidas"
-msgstr ""
+msgstr "The latest runs"
 
 #: scripts/save/library.gd
 msgid "Le abatió: "
-msgstr ""
+msgstr "Killed by: "
 
 #: scripts/save/library.gd
 msgid "Lo que duró cada una de las últimas partidas del archivo, de la más antigua a la más reciente. En rojo, las superadas."
-msgstr ""
+msgstr "How long each of the latest runs in the archive lasted, from oldest to newest. In red, the ones cleared."
 
 #: scripts/save/library.gd
 msgid "Lo que llevan reunido los investigadores de esta partida guardada, sumando cada noche jugada en este PC."
-msgstr ""
+msgstr "What the investigators of this save have gathered so far, adding up every night played on this PC."
 
 #: scripts/save/library.gd
 msgid "Lugares"
-msgstr ""
+msgstr "Places"
 
 #: scripts/save/library.gd
 msgid "Lugares más jugados"
-msgstr ""
+msgstr "Most played places"
 
 #: scripts/save/library.gd
 msgid "Manual del investigador"
-msgstr ""
+msgstr "Investigator's manual"
 
 #: scripts/save/library.gd
 msgid "Mejor racha de la partida del día: "
-msgstr ""
+msgstr "Best daily run streak: "
 
 #: scripts/save/library.gd scripts/ui/player_menus.gd
 msgid "Mágica"
-msgstr ""
+msgstr "Magic"
 
 #: scripts/save/library.gd
 msgid "Niveles de la campaña superados: %d de %d"
-msgstr ""
+msgstr "Campaign levels cleared: %d of %d"
 
 #: scripts/save/library.gd
 msgid "No llegó a hacer daño."
-msgstr ""
+msgstr "It never got to deal damage."
 
 #: scripts/save/library.gd
 msgid "Objetos: "
-msgstr ""
+msgstr "Items: "
 
 #: scripts/save/library.gd
 msgid "Parte %d · %s (%s) · Nivel %d"
-msgstr ""
+msgstr "Part %d · %s (%s) · Level %d"
 
 #: scripts/save/library.gd
 msgid "Parte %d · Tras vencer a su jefe"
-msgstr ""
+msgstr "Part %d · After defeating its boss"
 
 #: scripts/save/library.gd
 msgid "Partidas: %d · caídas: %d"
-msgstr ""
+msgstr "Runs: %d · falls: %d"
 
 #: scripts/save/library.gd
 msgid "Pescadas: %d"
-msgstr ""
+msgstr "Caught: %d"
 
 #: scripts/save/library.gd
 msgid "Pescado en el muelle de Innsmouth"
-msgstr ""
+msgstr "Caught at the Innsmouth wharf"
 
 #: scripts/save/library.gd
 msgid "Prendas · "
-msgstr ""
+msgstr "Garments · "
 
 #: scripts/save/library.gd
 msgid "Página %d"
-msgstr ""
+msgstr "Page %d"
 
 #: scripts/save/library.gd
 msgid "Página %d de %d · %s"
-msgstr ""
+msgstr "Page %d of %d · %s"
 
 #: scripts/save/library.gd
 msgid "Quien más: %s (%d)"
-msgstr ""
+msgstr "Most: %s (%d)"
 
 #: scripts/save/library.gd
 msgid "Relatos"
-msgstr ""
+msgstr "Tales"
 
 #: scripts/save/library.gd
 msgid "Resumen"
-msgstr ""
+msgstr "Summary"
 
 #: scripts/save/library.gd
 msgid "Récords"
-msgstr ""
+msgstr "Records"
 
 #: scripts/save/library.gd
 msgid "Se vendió en la lonja antes de que nadie la estudiara. Si vuelve a picar, quizá convenga traerla aquí."
-msgstr ""
+msgstr "It was sold at the fish market before anyone could study it. If it bites again, it may be worth bringing it here."
 
 #: scripts/save/library.gd
 msgid "Te falta: "
-msgstr ""
+msgstr "Still missing: "
 
 #: scripts/save/library.gd
 msgid "Todo el daño que ha hecho cada arma, y cuántas criaturas ha abatido."
-msgstr ""
+msgstr "All the damage each weapon has dealt, and how many creatures it has killed."
 
 #: scripts/save/library.gd
 msgid "Tras vencer a Cthulhu"
-msgstr ""
+msgstr "After defeating Cthulhu"
 
 #: scripts/save/library.gd
 msgid "Tras vencer a Nyarlathotep"
-msgstr ""
+msgstr "After defeating Nyarlathotep"
 
 #: scripts/save/library.gd
 msgid "Tuya"
-msgstr ""
+msgstr "Yours"
 
 #: scripts/save/library.gd
 msgid "Velocidad %.1f m/s"
-msgstr ""
+msgstr "Speed %.1f m/s"
 
 #: scripts/save/library.gd
 msgid "Vida %d"
-msgstr ""
+msgstr "Health %d"
 
 #: scripts/save/library.gd
 msgid "aún ninguno"
-msgstr ""
+msgstr "none yet"
 
 #: scripts/save/library.gd
 msgid "aún sin completar"
-msgstr ""
+msgstr "not completed yet"
 
 #: scripts/save/library.gd
 msgid "aún sin jugar"
-msgstr ""
-
-#: scripts/save/library.gd
-msgid "el investigador"
-msgstr ""
+msgstr "not played yet"
 
 #: scripts/save/library.gd scripts/save/trophies.gd scripts/ui/player_menus.gd
 msgid "niveles superados"
-msgstr ""
+msgstr "levels cleared"
 
 #: scripts/save/outfit_data.gd
 msgid "Cabeza"
-msgstr ""
+msgstr "Head"
 
 #: scripts/save/outfit_data.gd
 msgid "Complemento"
-msgstr ""
+msgstr "Accessory"
 
 #: scripts/save/outfit_data.gd
 msgid "Complementos"
-msgstr ""
+msgstr "Accessories"
 
 #: scripts/save/outfit_data.gd
 msgid "Espalda"
-msgstr ""
+msgstr "Back"
 
 #: scripts/save/outfit_data.gd
 msgid "Lo suyo"
-msgstr ""
+msgstr "Their own"
 
 #: scripts/save/outfit_data.gd
 msgid "Manos"
-msgstr ""
+msgstr "Hands"
 
 #: scripts/save/outfit_data.gd
 msgid "Ninguno"
-msgstr ""
+msgstr "None"
 
 #: scripts/save/outfit_data.gd
 msgid "Pies"
-msgstr ""
+msgstr "Feet"
 
 #: scripts/save/run_archive.gd scripts/ui/damage_table.gd
 msgid "Combinaciones"
-msgstr ""
+msgstr "Combinations"
 
 #: scripts/save/run_archive.gd scripts/ui/level_card.gd
 msgid "Desafío · "
-msgstr ""
+msgstr "Challenge · "
 
 #: scripts/save/run_archive.gd
 msgid "Expedición · "
-msgstr ""
+msgstr "Expedition · "
 
 #: scripts/save/run_archive.gd
 msgid "Noche eterna · "
-msgstr ""
+msgstr "Endless night · "
 
 #: scripts/save/run_archive.gd
 msgid "Partida del día · "
-msgstr ""
+msgstr "Daily run · "
 
 #: scripts/save/run_archive.gd scripts/ui/damage_table.gd
 msgid "Revelaciones"
-msgstr ""
+msgstr "Revelations"
 
 #: scripts/save/save_data.gd
 msgid "%d h %02d min"
-msgstr ""
+msgstr "%d h %02d min"
 
 #: scripts/save/save_data.gd
 msgid "%d min"
-msgstr ""
+msgstr "%d min"
 
 #: scripts/save/save_data.gd
 msgid "menos de 1 min"
-msgstr ""
+msgstr "less than 1 min"
 
 #: scripts/save/secrets.gd
 msgid "%s (%d de %d)"
-msgstr ""
+msgstr "%s (%d of %d)"
 
 #: scripts/save/secrets.gd
 msgid "Reúne las páginas sueltas"
-msgstr ""
+msgstr "Gather the loose pages"
 
 #: scripts/save/secrets.gd
 msgid "Secreto"
-msgstr ""
+msgstr "Secret"
 
 #: scripts/save/secrets.gd
 msgid "Supera los desafíos"
-msgstr ""
+msgstr "Clear the challenges"
 
 #: scripts/save/settings.gd
 msgid "%d FPS  ·  media %.1f ms  ·  1 %% peor %.1f ms"
-msgstr ""
+msgstr "%d FPS  ·  average %.1f ms  ·  worst 1 %% %.1f ms"
 
 #: scripts/save/settings.gd
 msgid "Alt"
-msgstr ""
+msgstr "Alt"
 
 #: scripts/save/settings.gd
 msgid "Botón %d"
-msgstr ""
+msgstr "Button %d"
 
 #: scripts/save/settings.gd
 msgid "Cruceta abajo"
-msgstr ""
+msgstr "D-pad down"
 
 #: scripts/save/settings.gd
 msgid "Cruceta arriba"
-msgstr ""
+msgstr "D-pad up"
 
 #: scripts/save/settings.gd
 msgid "Cruceta derecha"
-msgstr ""
+msgstr "D-pad right"
 
 #: scripts/save/settings.gd
 msgid "Cruceta izquierda"
-msgstr ""
+msgstr "D-pad left"
 
 #: scripts/save/settings.gd
 msgid "Ctrl"
-msgstr ""
+msgstr "Ctrl"
 
 #: scripts/save/settings.gd
 msgid "Esc"
-msgstr ""
+msgstr "Esc"
 
 #: scripts/save/settings.gd
 msgid "Espacio"
-msgstr ""
+msgstr "Space"
 
 #: scripts/save/settings.gd
 msgid "Ficha del jugador"
-msgstr ""
+msgstr "Player sheet"
 
 #: scripts/save/settings.gd
 msgid "Flecha abajo"
-msgstr ""
+msgstr "Down arrow"
 
 #: scripts/save/settings.gd
 msgid "Flecha arriba"
-msgstr ""
+msgstr "Up arrow"
 
 #: scripts/save/settings.gd
 msgid "Flecha derecha"
-msgstr ""
+msgstr "Right arrow"
 
 #: scripts/save/settings.gd
 msgid "Flecha izquierda"
-msgstr ""
+msgstr "Left arrow"
 
 #: scripts/save/settings.gd
 msgid "Guía"
-msgstr ""
+msgstr "Guide"
 
 #: scripts/save/settings.gd
 msgid "Intro"
-msgstr ""
+msgstr "Enter"
 
 #: scripts/save/settings.gd
 msgid "Mapa"
-msgstr ""
+msgstr "Map"
 
 #: scripts/save/settings.gd
 msgid "Mayús"
-msgstr ""
+msgstr "Shift"
 
 #: scripts/save/settings.gd
 msgid "Moverse a la derecha"
-msgstr ""
+msgstr "Move right"
 
 #: scripts/save/settings.gd
 msgid "Moverse a la izquierda"
-msgstr ""
+msgstr "Move left"
 
 #: scripts/save/settings.gd
 msgid "Moverse abajo"
-msgstr ""
+msgstr "Move down"
 
 #: scripts/save/settings.gd
 msgid "Moverse arriba"
-msgstr ""
+msgstr "Move up"
 
 #: scripts/save/settings.gd scripts/ui/menus.gd
 msgid "Pausa"
-msgstr ""
+msgstr "Pause"
 
 #: scripts/save/settings.gd
 msgid "Portátil"
-msgstr ""
+msgstr "Handheld"
 
 #: scripts/save/settings.gd
 msgid "Página anterior de la ficha"
-msgstr ""
+msgstr "Previous sheet page"
 
 #: scripts/save/settings.gd
 msgid "Página siguiente de la ficha"
-msgstr ""
+msgstr "Next sheet page"
 
 #: scripts/save/settings.gd
 msgid "Retroceso"
-msgstr ""
+msgstr "Backspace"
 
 #: scripts/save/settings.gd
 msgid "Select"
-msgstr ""
+msgstr "Select"
 
 #: scripts/save/settings.gd
 msgid "Sobremesa"
-msgstr ""
+msgstr "Desktop"
 
 #: scripts/save/settings.gd
 msgid "Start"
-msgstr ""
+msgstr "Start"
 
 #: scripts/save/settings.gd
 msgid "Stick derecho"
-msgstr ""
+msgstr "Right stick"
 
 #: scripts/save/settings.gd
 msgid "Stick izquierdo"
-msgstr ""
+msgstr "Left stick"
 
 #: scripts/save/settings.gd
 msgid "Tab"
-msgstr ""
+msgstr "Tab"
 
 #: scripts/save/shop.gd
 msgid "%s. Rasgo: %s"
-msgstr ""
+msgstr "%s. Trait: %s"
 
 #: scripts/save/shop.gd
 msgid "Mejoras"
-msgstr ""
+msgstr "Upgrades"
 
 #: scripts/save/shop.gd
 msgid "Personajes"
-msgstr ""
+msgstr "Characters"
 
 #: scripts/save/shop.gd
 msgid "Potenciadores"
-msgstr ""
+msgstr "Boosts"
 
 #: scripts/save/trophies.gd
 msgid " con él puesto"
-msgstr ""
+msgstr " while wearing it"
 
 #: scripts/save/trophies.gd
 msgid "Aún sin estrenar en una partida"
-msgstr ""
+msgstr "Not yet worn in a run"
 
 #: scripts/save/trophies.gd
 msgid "Conjunto del vestuario"
-msgstr ""
+msgstr "Wardrobe set"
 
 #: scripts/save/trophies.gd
 msgid "Conjuntos completos"
-msgstr ""
+msgstr "Complete sets"
 
 #: scripts/save/trophies.gd
 msgid "Jefe intermedio"
-msgstr ""
+msgstr "Mid-boss"
 
 #: scripts/save/trophies.gd
 msgid "Jefes vencidos"
-msgstr ""
+msgstr "Bosses defeated"
 
 #: scripts/save/trophies.gd
 msgid "Llevas %s de %s"
-msgstr ""
+msgstr "You have %s of %s"
 
 #: scripts/save/trophies.gd
 msgid "Logro"
-msgstr ""
+msgstr "Achievement"
 
 #: scripts/save/trophies.gd
 msgid "Logros grandes"
-msgstr ""
+msgstr "Major achievements"
 
 #: scripts/save/trophies.gd
 msgid "Vencido "
-msgstr ""
+msgstr "Defeated "
 
 #: scripts/title/intro_screen.gd scripts/title/relato_screen.gd
 msgid "Pulsa para seguir · mantén pulsado para saltar"
-msgstr ""
+msgstr "Press to continue · hold to skip"
 
 #: scripts/title/intro_screen.gd
 msgid "Uso de inteligencia artificial"
-msgstr ""
+msgstr "Use of artificial intelligence"
 
 #: scripts/title/relato_screen.gd
 msgid "Continúa en el juego completo"
-msgstr ""
+msgstr "Continues in the full game"
 
 #: scripts/title/relato_screen.gd scripts/ui/menus.gd
 msgid "Epílogo"
-msgstr ""
+msgstr "Epilogue"
 
 #: scripts/title/relato_screen.gd scripts/ui/menus.gd
 msgid "Fin de la demo"
-msgstr ""
+msgstr "End of the demo"
 
 #: scripts/title/relato_screen.gd
 msgid "La ciudad del crepúsculo"
-msgstr ""
+msgstr "The sunset city"
 
 #: scripts/title/relato_screen.gd
 msgid "Lo que vino después"
-msgstr ""
+msgstr "What came after"
 
 #: scripts/title/title_screen_config.gd
 msgid "Acercamiento lento"
-msgstr ""
+msgstr "Slow zoom"
 
 #: scripts/title/title_screen_config.gd
 msgid "Aviso de pulsar"
-msgstr ""
+msgstr "Press prompt"
 
 #: scripts/title/title_screen_config.gd
 msgid "Ceniza"
-msgstr ""
+msgstr "Ash"
 
 #: scripts/title/title_screen_config.gd
 msgid "Cuervo"
-msgstr ""
+msgstr "Raven"
 
 #: scripts/title/title_screen_config.gd
 msgid "Farolillos"
-msgstr ""
+msgstr "Lanterns"
 
 #: scripts/title/title_screen_config.gd
 msgid "Gotas"
-msgstr ""
+msgstr "Drops"
 
 #: scripts/title/title_screen_config.gd
 msgid "Halo de la luna"
-msgstr ""
+msgstr "Moon halo"
 
 #: scripts/title/title_screen_config.gd
 msgid "Niebla del suelo"
-msgstr ""
+msgstr "Ground fog"
 
 #: scripts/title/title_screen_config.gd
 msgid "Nubes del ventanal"
-msgstr ""
+msgstr "Window clouds"
 
 #: scripts/title/title_screen_config.gd
 msgid "Ojos de Cthulhu"
-msgstr ""
+msgstr "Eyes of Cthulhu"
 
 #: scripts/title/title_screen_config.gd
 msgid "Polillas"
-msgstr ""
+msgstr "Moths"
 
 #: scripts/title/title_screen_config.gd
 msgid "Relámpago en el ventanal"
-msgstr ""
+msgstr "Lightning in the window"
 
 #: scripts/title/title_screen_config.gd
 msgid "Ráfaga de aire"
-msgstr ""
+msgstr "Gust of wind"
 
 #: scripts/title/title_screen_config.gd
 msgid "Título"
-msgstr ""
+msgstr "Title"
 
 #: scripts/title/title_screen_config.gd
 msgid "Velas"
-msgstr ""
+msgstr "Candles"
 
 #: scripts/ui/coop_level_up.gd
 msgid "Arriba y abajo para elegir · A o Intro para confirmar"
-msgstr ""
+msgstr "Up and down to choose · A or Enter to confirm"
 
 #: scripts/ui/coop_level_up.gd
 msgid "Elegido: %s · esperando a los demás"
-msgstr ""
+msgstr "Chosen: %s · waiting for the others"
 
 #: scripts/ui/coop_level_up.gd
 msgid "LB o Q: descartar (%d)"
-msgstr ""
+msgstr "LB or Q: discard (%d)"
 
 #: scripts/ui/coop_level_up.gd
 msgid "RB o E: otras opciones (%d)"
-msgstr ""
+msgstr "RB or E: other options (%d)"
 
 #: scripts/ui/damage_table.gd
 msgid "%02d:%02d de partida"
-msgstr ""
+msgstr "%02d:%02d into the run"
 
 #: scripts/ui/damage_table.gd
 msgid "Abatidos"
-msgstr ""
+msgstr "Kills"
 
 #: scripts/ui/damage_table.gd
 msgid "B o Esc: volver  ·  Start: seguir jugando"
-msgstr ""
+msgstr "B or Esc: back  ·  Start: keep playing"
 
 #: scripts/ui/damage_table.gd
 msgid "Daño de la partida  ·  "
-msgstr ""
+msgstr "Damage this run  ·  "
 
 #: scripts/ui/damage_table.gd
 msgid "Fuente"
-msgstr ""
+msgstr "Source"
 
 #: scripts/ui/damage_table.gd
 msgid "Izquierda/derecha: otro jugador  ·  "
-msgstr ""
+msgstr "Left/right: another player  ·  "
 
 #: scripts/ui/damage_table.gd
 msgid "Lo que hacen tus armas juntas, o con las de otros"
-msgstr ""
+msgstr "What your weapons do together, or with other players'"
 
 #: scripts/ui/damage_table.gd
 msgid "Lo que te enseñó la locura"
-msgstr ""
+msgstr "What madness taught you"
 
 #: scripts/ui/damage_table.gd
 msgid "Objeto"
-msgstr ""
+msgstr "Item"
 
 #: scripts/ui/damage_table.gd
 msgid "Otros (%d)"
-msgstr ""
+msgstr "Others (%d)"
 
 #: scripts/ui/damage_table.gd
 msgid "Parte"
-msgstr ""
+msgstr "Part"
 
 #: scripts/ui/damage_table.gd
 msgid "Por segundo"
-msgstr ""
+msgstr "Per second"
 
 #: scripts/ui/damage_table.gd
 msgid "Todavía no has hecho daño."
-msgstr ""
+msgstr "You haven't dealt any damage yet."
 
 #: scripts/ui/damage_table.gd
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 #: scripts/ui/damage_table.gd
 msgid "de fuego"
-msgstr ""
+msgstr "fire"
 
 #: scripts/ui/damage_table.gd
 msgid "física"
-msgstr ""
+msgstr "physical"
 
 #: scripts/ui/damage_table.gd
 msgid "mágica"
-msgstr ""
+msgstr "magic"
 
 #: scripts/ui/diary_page.gd
 msgid "A, B o Esc: cerrar"
-msgstr ""
+msgstr "A, B or Esc: close"
 
 #: scripts/ui/diary_page.gd
 msgid "Diario de %s%s"
-msgstr ""
+msgstr "%s's diary%s"
 
 #: scripts/ui/diary_page.gd
 msgid "Izquierda/derecha: otro investigador  ·  "
-msgstr ""
+msgstr "Left/right: another investigator  ·  "
 
 #: scripts/ui/difficulty_menu.gd
 msgid "  (la de ahora)"
-msgstr ""
+msgstr "  (the current one)"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "  ·  caídas "
-msgstr ""
+msgstr "  ·  falls "
 
 #: scripts/ui/difficulty_menu.gd scripts/ui/fall_report.gd
 msgid "%d en todo"
-msgstr ""
+msgstr "%d across the board"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "%s; el resto, %d"
-msgstr ""
+msgstr "%s; the rest, %d"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "A: jugar con esa combinación · B: volver"
-msgstr ""
+msgstr "A: play with that combination · B: back"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "Apuntado en el registro de dificultad (%s)."
-msgstr ""
+msgstr "Noted in the difficulty log (%s)."
 
 #: scripts/ui/difficulty_menu.gd
 msgid "Arriba/abajo: elegir · Izquierda/derecha: cambiar · B o Esc: volver · Start: seguir jugando"
-msgstr ""
+msgstr "Up/down: choose · Left/right: change · B or Esc: back · Start: keep playing"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "Dificultad general"
-msgstr ""
+msgstr "Overall difficulty"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "Para calibrar el juego: el 3 es la de siempre; el 1, casi Investigador; el 6, algo más que Pesadilla."
-msgstr ""
+msgstr "To calibrate the game: 3 is the usual; 1, almost Investigator; 6, a bit more than Nightmare."
 
 #: scripts/ui/difficulty_menu.gd
 msgid "Partidas jugadas"
-msgstr ""
+msgstr "Runs played"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "Personalizada"
-msgstr ""
+msgstr "Custom"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "Se nota al seguir jugando; la vida, en los enemigos que salgan después."
-msgstr ""
+msgstr "It takes effect as you keep playing; health, on the enemies that appear afterwards."
 
 #: scripts/ui/difficulty_menu.gd
 msgid "Volver al 3 (la de siempre)"
-msgstr ""
+msgstr "Back to 3 (the usual)"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "Vuelves a: %s"
-msgstr ""
+msgstr "Back to: %s"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "combinación"
-msgstr ""
+msgstr "combination"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "daño"
-msgstr ""
+msgstr "damage"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "número"
-msgstr ""
+msgstr "number"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "élites"
-msgstr ""
+msgstr "elites"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "última, %s-%s %s en %s"
-msgstr ""
+msgstr "last, %s-%s %s on %s"
 
 #: scripts/ui/difficulty_menu.gd
 msgid "◀  Personalizada  ▶"
-msgstr ""
+msgstr "◀  Custom  ▶"
 
 #: scripts/ui/fall_report.gd
 msgid " · pactos: "
-msgstr ""
+msgstr " · pacts: "
 
 #: scripts/ui/fall_report.gd
 msgid "Caídas: "
-msgstr ""
+msgstr "Falls: "
 
 #: scripts/ui/fall_report.gd
 msgid "Cordura perdida %d:  %s"
-msgstr ""
+msgstr "Sanity lost %d:  %s"
 
 #: scripts/ui/fall_report.gd
 msgid "Dificultad: %s"
-msgstr ""
+msgstr "Difficulty: %s"
 
 #: scripts/ui/fall_report.gd
 msgid "El icor del pacto"
-msgstr ""
+msgstr "The ichor of the pact"
 
 #: scripts/ui/fall_report.gd
 msgid "Enemigos vivos a la vez: %d de media, %d como mucho"
-msgstr ""
+msgstr "Enemies alive at once: %d on average, %d at most"
 
 #: scripts/ui/fall_report.gd
 msgid "Informe"
-msgstr ""
+msgstr "Report"
 
 #: scripts/ui/fall_report.gd
 msgid "La ola"
-msgstr ""
+msgstr "The wave"
 
 #: scripts/ui/fall_report.gd
 msgid "La paranoia de un compañero"
-msgstr ""
+msgstr "A companion's paranoia"
 
 #: scripts/ui/fall_report.gd
 msgid "La presencia de las criaturas"
-msgstr ""
+msgstr "The presence of the creatures"
 
 #: scripts/ui/fall_report.gd
 msgid "Los ángulos devoradores"
-msgstr ""
+msgstr "The devouring angles"
 
 #: scripts/ui/fall_report.gd
 msgid "Por vía:  "
-msgstr ""
+msgstr "By source:  "
 
 #: scripts/ui/fall_report.gd
 msgid "Sin daño a la vida"
-msgstr ""
+msgstr "No damage to health"
 
 #: scripts/ui/fall_report.gd
 msgid "Te abatió %s (%s, %d) a los %s"
-msgstr ""
+msgstr "Killed by %s (%s, %d) at %s"
 
 #: scripts/ui/fall_report.gd
 msgid "Vida perdida %d:  %s"
-msgstr ""
+msgstr "Health lost %d:  %s"
 
 #: scripts/ui/fall_report.gd
 msgid "el escenario"
-msgstr ""
+msgstr "the stage"
 
 #: scripts/ui/fall_report.gd
 msgid "un compañero"
-msgstr ""
+msgstr "a companion"
 
 #: scripts/ui/fall_report.gd
 msgid "último minuto"
-msgstr ""
+msgstr "last minute"
 
 #: scripts/ui/hud.gd
 msgid " · Grado %s"
-msgstr ""
+msgstr " · Grade %s"
 
 #: scripts/ui/hud.gd
 msgid "%s · %d ms"
-msgstr ""
+msgstr "%s · %d ms"
 
 #: scripts/ui/hud.gd
 msgid "%s · recoge el botín %d"
-msgstr ""
+msgstr "%s · collect the loot %d"
 
 #: scripts/ui/hud.gd
 msgid "Acaba con %s"
-msgstr ""
+msgstr "Finish off %s"
 
 #: scripts/ui/hud.gd
 msgid "Barnabas"
-msgstr ""
+msgstr "Barnabas"
 
 #: scripts/ui/hud.gd
 msgid "Campo de pruebas"
-msgstr ""
+msgstr "Testing ground"
 
 #: scripts/ui/hud.gd
 msgid "Captain"
-msgstr ""
+msgstr "Captain"
 
 #: scripts/ui/hud.gd
 msgid "Cosa"
-msgstr ""
+msgstr "Cosa"
 
 #: scripts/ui/hud.gd
 msgid "Derribado · %d s"
-msgstr ""
+msgstr "Downed · %d s"
 
 #: scripts/ui/hud.gd scripts/ui/level_card.gd
 msgid "Desfile de jefes · %d de %d"
-msgstr ""
+msgstr "Boss parade · %d of %d"
 
 #: scripts/ui/hud.gd
 msgid "El de hoy %s"
-msgstr ""
+msgstr "Today's %s"
 
 #: scripts/ui/hud.gd
 msgid "Eliminado"
-msgstr ""
+msgstr "Eliminated"
 
 #: scripts/ui/hud.gd
 msgid "Emanación"
-msgstr ""
+msgstr "Emanación"
 
 #: scripts/ui/hud.gd
 msgid "Father"
-msgstr ""
+msgstr "Father"
 
 #: scripts/ui/hud.gd
 msgid "Gedney"
-msgstr ""
+msgstr "Gedney"
 
 #: scripts/ui/hud.gd
 msgid "Hija"
-msgstr ""
+msgstr "Hija"
 
 #: scripts/ui/hud.gd
 msgid "Híbrida"
-msgstr ""
+msgstr "Híbrida"
 
 #: scripts/ui/hud.gd
 msgid "Las"
-msgstr ""
-
-#: scripts/ui/hud.gd
-msgid "Las "
-msgstr ""
+msgstr "Las"
 
 #: scripts/ui/hud.gd
 msgid "Los"
-msgstr ""
-
-#: scripts/ui/hud.gd
-msgid "Los "
-msgstr ""
+msgstr "Los"
 
 #: scripts/ui/hud.gd
 msgid "Madre"
-msgstr ""
+msgstr "Madre"
 
 #: scripts/ui/hud.gd
 msgid "Mother"
-msgstr ""
+msgstr "Mother"
 
 #: scripts/ui/hud.gd
 msgid "Nyarlathotep"
-msgstr ""
+msgstr "Nyarlathotep"
 
 #: scripts/ui/hud.gd
 msgid "Old"
-msgstr ""
+msgstr "Old"
 
 #: scripts/ui/hud.gd
 msgid "Padre"
-msgstr ""
+msgstr "Padre"
 
 #: scripts/ui/hud.gd
 msgid "Resiste a %s · %d:%02d"
-msgstr ""
+msgstr "Hold out against %s · %d:%02d"
 
 #: scripts/ui/hud.gd
 msgid "Resiste · %d:%02d para el final"
@@ -12702,143 +12701,127 @@ msgstr "Hold out · %d:%02d to go"
 
 #: scripts/ui/hud.gd
 msgid "Récord %s"
-msgstr ""
+msgstr "Record %s"
 
 #: scripts/ui/hud.gd
 msgid "Siguiente horror en %s"
-msgstr ""
+msgstr "Next horror in %s"
 
 #: scripts/ui/hud.gd
 msgid "The"
-msgstr ""
+msgstr "The"
 
 #: scripts/ui/hud.gd
 msgid "Vecina"
-msgstr ""
-
-#: scripts/ui/hud.gd
-msgid "a la "
-msgstr ""
-
-#: scripts/ui/hud.gd
-msgid "al "
-msgstr ""
-
-#: scripts/ui/hud.gd
-msgid "el "
-msgstr ""
-
-#: scripts/ui/hud.gd
-msgid "la "
-msgstr ""
+msgstr "Vecina"
 
 #: scripts/ui/hud.gd
 msgid "the "
-msgstr ""
+msgstr "the "
 
 #: scripts/ui/hud.gd
 msgid "¡Mejor que el de hoy! (%s)"
-msgstr ""
+msgstr "Better than today's! (%s)"
 
 #: scripts/ui/hud.gd
 msgid "¡Récord! (%s)"
-msgstr ""
+msgstr "Record! (%s)"
 
 #: scripts/ui/level_card.gd
 msgid "Parte %d · Nivel %d%s"
-msgstr ""
+msgstr "Part %d · Level %d%s"
 
 #: scripts/ui/menus.gd
 msgid "Conexión con el anfitrión: %d ms"
-msgstr ""
+msgstr "Connection to the host: %d ms"
 
 #: scripts/ui/menus.gd
 msgid "Diario del investigador"
-msgstr ""
+msgstr "Investigator's diary"
 
 #: scripts/ui/menus.gd
 msgid "Diarios de los investigadores"
-msgstr ""
+msgstr "Investigators' diaries"
 
 #: scripts/ui/menus.gd
 msgid "Flechas o cruceta para elegir · Intro o A para confirmar · 1, 2, 3"
-msgstr ""
+msgstr "Arrows or d-pad to choose · Enter or A to confirm · 1, 2, 3"
 
 #: scripts/ui/menus.gd
 msgid "Pactos del Necronomicón…"
-msgstr ""
+msgstr "Pacts of the Necronomicon…"
 
 #: scripts/ui/menus.gd
 msgid "Pescar en el muelle…"
-msgstr ""
+msgstr "Fish at the wharf…"
 
 #: scripts/ui/menus.gd
 msgid "Reiniciar"
-msgstr ""
+msgstr "Restart"
 
 #: scripts/ui/menus.gd
 msgid "Reintentar"
-msgstr ""
+msgstr "Retry"
 
 #: scripts/ui/menus.gd
 msgid "Salir de la partida"
-msgstr ""
+msgstr "Leave the run"
 
 #: scripts/ui/menus.gd
 msgid "Siguiente nivel"
-msgstr ""
+msgstr "Next level"
 
 #: scripts/ui/menus.gd
 msgid "Sin conexión con el anfitrión"
-msgstr ""
+msgstr "No connection to the host"
 
 #: scripts/ui/menus.gd
 msgid "Ver la caída"
-msgstr ""
+msgstr "Watch the fall"
 
 #: scripts/ui/model_icon.gd
 msgid "Settle"
-msgstr ""
+msgstr "Settle"
 
 #: scripts/ui/model_icon.gd
 msgid "Turn"
-msgstr ""
+msgstr "Turn"
 
 #: scripts/ui/part_finale.gd
 msgid "A o Intro: seguir"
-msgstr ""
+msgstr "A or Enter: continue"
 
 #: scripts/ui/photo_mode.gd
 msgid "A la vista"
-msgstr ""
+msgstr "Shown"
 
 #: scripts/ui/photo_mode.gd
 msgid "Abrir la carpeta de fotos"
-msgstr ""
+msgstr "Open the photos folder"
 
 #: scripts/ui/photo_mode.gd
 msgid "Blanco y negro"
-msgstr ""
+msgstr "Black and white"
 
 #: scripts/ui/photo_mode.gd
 msgid "Foto guardada: %s"
-msgstr ""
+msgstr "Photo saved: %s"
 
 #: scripts/ui/photo_mode.gd
 msgid "Gradación"
-msgstr ""
+msgstr "Grading"
 
 #: scripts/ui/photo_mode.gd
 msgid "Isométrica"
-msgstr ""
+msgstr "Isometric"
 
 #: scripts/ui/photo_mode.gd
 msgid "La de la partida"
-msgstr ""
+msgstr "The run's"
 
 #: scripts/ui/photo_mode.gd
 msgid "Luna fría"
-msgstr ""
+msgstr "Cold moon"
 
 #: scripts/ui/photo_mode.gd
 msgid ""
@@ -12846,227 +12829,230 @@ msgid ""
 "Acercar: LT-RT / Z-X / rueda  ·  A / Espacio: foto  ·  Y / Tab: ocultar el panel\n"
 "B / Esc: a la pausa  ·  Start: a jugar"
 msgstr ""
+"Move: left stick / WASD  ·  Turn and tilt: right stick / Q-E, R-F\n"
+"Zoom: LT-RT / Z-X / wheel  ·  A / Space: photo  ·  Y / Tab: hide the panel\n"
+"B / Esc: to the pause menu  ·  Start: back to playing"
 
 #: scripts/ui/photo_mode.gd
 msgid "No se ha podido guardar la foto (%s)"
-msgstr ""
+msgstr "The photo could not be saved (%s)"
 
 #: scripts/ui/photo_mode.gd
 msgid "Ocultos"
-msgstr ""
+msgstr "Hidden"
 
 #: scripts/ui/photo_mode.gd
 msgid "Perspectiva"
-msgstr ""
+msgstr "Perspective"
 
 #: scripts/ui/photo_mode.gd
 msgid "Profundidad de campo"
-msgstr ""
+msgstr "Depth of field"
 
 #: scripts/ui/photo_mode.gd
 msgid "Proyección"
-msgstr ""
+msgstr "Projection"
 
 #: scripts/ui/photo_mode.gd
 msgid "Sepia"
-msgstr ""
+msgstr "Sepia"
 
 #: scripts/ui/photo_mode.gd
 msgid "Sin anillos"
-msgstr ""
+msgstr "No rings"
 
 #: scripts/ui/photo_mode.gd
 msgid "Sin gradación"
-msgstr ""
+msgstr "No grading"
 
 #: scripts/ui/photo_mode.gd
 msgid "Viñeta"
-msgstr ""
+msgstr "Vignette"
 
 #: scripts/ui/photo_mode.gd
 msgid "Volver a la vista del juego"
-msgstr ""
+msgstr "Back to the game view"
 
 #: scripts/ui/player_menus.gd
 msgid "  ·  locura acumulada"
-msgstr ""
+msgstr "  ·  accumulated madness"
 
 #: scripts/ui/player_menus.gd
 msgid " · %d %s con él"
-msgstr ""
+msgstr " · %d %s with them"
 
 #: scripts/ui/player_menus.gd
 msgid "Abatidos %d"
-msgstr ""
+msgstr "Kills %d"
 
 #: scripts/ui/player_menus.gd
 msgid "Armas  %d / %d"
-msgstr ""
+msgstr "Weapons  %d / %d"
 
 #: scripts/ui/player_menus.gd
 msgid "Arriba/abajo: leer entero un arma u objeto  ·  "
-msgstr ""
+msgstr "Up/down: read a weapon or item in full  ·  "
 
 #: scripts/ui/player_menus.gd
 msgid "Aún no llevas ninguno: salen al subir de nivel."
-msgstr ""
+msgstr "You don't have any yet: they appear when you level up."
 
 #: scripts/ui/player_menus.gd
 msgid "Bonificación %s"
-msgstr ""
+msgstr "Bonus %s"
 
 #: scripts/ui/player_menus.gd
 msgid "Características"
-msgstr ""
+msgstr "Characteristics"
 
 #: scripts/ui/player_menus.gd
 msgid "Crisis sufridas: %d%s"
-msgstr ""
+msgstr "Crises suffered: %d%s"
 
 #: scripts/ui/player_menus.gd
 msgid "Daño %d"
-msgstr ""
+msgstr "Damage %d"
 
 #: scripts/ui/player_menus.gd
 msgid "Daño %s  ·  Abatidos %d"
-msgstr ""
+msgstr "Damage %s  ·  Kills %d"
 
 #: scripts/ui/player_menus.gd
 msgid "Daño %s  ·  Abatidos %d  ·  %s por golpe"
-msgstr ""
+msgstr "Damage %s  ·  Kills %d  ·  %s per hit"
 
 #: scripts/ui/player_menus.gd
 msgid "Daño total %s  ·  Abatidos %d"
-msgstr ""
+msgstr "Total damage %s  ·  Kills %d"
 
 #: scripts/ui/player_menus.gd
 msgid "Gatillos o + y −: zoom  ·  Cruceta abajo o M, B o Esc: cerrar"
-msgstr ""
+msgstr "Triggers or + and −: zoom  ·  D-pad down or M, B or Esc: close"
 
 #: scripts/ui/player_menus.gd
 msgid "Golpe %d"
-msgstr ""
+msgstr "Hit %d"
 
 #: scripts/ui/player_menus.gd
 msgid "J%d  ·  Ficha del investigador"
-msgstr ""
+msgstr "P%d  ·  Investigator sheet"
 
 #: scripts/ui/player_menus.gd
 msgid "J%d · Mapa del nivel"
-msgstr ""
+msgstr "P%d · Level map"
 
 #: scripts/ui/player_menus.gd
 msgid "LB/RB o Q/E: página  ·  "
-msgstr ""
+msgstr "LB/RB or Q/E: page  ·  "
 
 #: scripts/ui/player_menus.gd
 msgid "Objetos  %d / %d"
-msgstr ""
+msgstr "Items  %d / %d"
 
 #: scripts/ui/player_menus.gd
 msgid "Personaje"
-msgstr ""
+msgstr "Character"
 
 #: scripts/ui/player_menus.gd
 msgid "Revelaciones: "
-msgstr ""
+msgstr "Revelations: "
 
 #: scripts/ui/player_menus.gd
 msgid "Select, B o Esc: cerrar"
-msgstr ""
+msgstr "Select, B or Esc: close"
 
 #: scripts/ui/player_menus.gd
 msgid "Sin compañero. Se consiguen en la tienda."
-msgstr ""
+msgstr "No companion. They are found in the shop."
 
 #: scripts/ui/replay_view.gd
 msgid "Guardado: %s  ·  X o F: abrir la carpeta  ·  A o B para volver"
-msgstr ""
+msgstr "Saved: %s  ·  X or F: open the folder  ·  A or B to go back"
 
 #: scripts/ui/replay_view.gd
 msgid "Guardando el GIF…"
-msgstr ""
+msgstr "Saving the GIF…"
 
 #: scripts/ui/replay_view.gd
 msgid "La caída"
-msgstr ""
+msgstr "The fall"
 
 #: scripts/ui/replay_view.gd
 msgid "Los últimos %d segundos, a media velocidad  ·  Y o G: guardar como GIF  ·  A o B para volver"
-msgstr ""
+msgstr "The last %d seconds, at half speed  ·  Y or G: save as GIF  ·  A or B to go back"
 
 #: scripts/ui/replay_view.gd
 msgid "No se pudo guardar el GIF  ·  A o B para volver"
-msgstr ""
+msgstr "The GIF could not be saved  ·  A or B to go back"
 
 #: scripts/ui/tips.gd
 msgid "Consejo"
-msgstr ""
+msgstr "Tip"
 
 #: scripts/ui/video_preview.gd
 msgid "Vista previa · %s (con la calidad Alta)"
-msgstr ""
+msgstr "Preview · %s (at High quality)"
 
 #: scripts/ui/video_preview.gd
 msgid "Vista previa · %s · %s"
-msgstr ""
+msgstr "Preview · %s · %s"
 
 #: scripts/ui/video_preview.gd
 msgid "clima completo"
-msgstr ""
+msgstr "full weather"
 
 #: scripts/ui/video_preview.gd
 msgid "clima reducido"
-msgstr ""
+msgstr "reduced weather"
 
 #: scripts/ui/video_preview.gd
 msgid "efectos enteros"
-msgstr ""
+msgstr "full effects"
 
 #: scripts/ui/video_preview.gd
 msgid "efectos mínimos"
-msgstr ""
+msgstr "minimal effects"
 
 #: scripts/ui/video_preview.gd
 msgid "efectos rebajados"
-msgstr ""
+msgstr "reduced effects"
 
 #: scripts/ui/video_preview.gd
 msgid "sin clima"
-msgstr ""
+msgstr "no weather"
 
 #: scripts/weapons/canvas.gd
 msgid "Necrófago de Pickman"
-msgstr ""
+msgstr "Pickman's ghoul"
 
 #: scripts/weapons/damage_rules.gd
 msgid "al azar"
-msgstr ""
+msgstr "random"
 
 #: scripts/weapons/damage_rules.gd
 msgid "área"
-msgstr ""
+msgstr "area"
 
 #: scripts/weapons/migo_drones.gd
 msgid "Core"
-msgstr ""
+msgstr "Core"
 
 #: scripts/weapons/weapon_data.gd
 msgid "Arsenal III"
-msgstr ""
+msgstr "Arsenal III"
 
 #: scripts/weapons/weapon_data.gd
 msgid "Base (nivel 1)"
-msgstr ""
+msgstr "Base (level 1)"
 
 #: scripts/weapons/weapon_data.gd
 msgid "Progresión"
-msgstr ""
+msgstr "Progression"
 
 #: scripts/weapons/weapon_data.gd
 msgid "Revólver .38"
-msgstr ""
+msgstr ".38 revolver"
 
 #: scripts/weapons/weapon_system.gd
 msgid "Weapons"
-msgstr ""
+msgstr "Weapons"

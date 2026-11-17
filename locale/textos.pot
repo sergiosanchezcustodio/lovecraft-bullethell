@@ -8355,10 +8355,6 @@ msgid "Intento del día · racha de %d"
 msgstr ""
 
 #: scripts/core/game.gd
-msgid "J%d nv=%d vida_min=%d caidas=%d"
-msgstr ""
-
-#: scripts/core/game.gd
 msgid "J%d vuelve a la lucha"
 msgstr ""
 
@@ -11588,14 +11584,6 @@ msgid " con menos de un cuarto de la cordura"
 msgstr ""
 
 #: scripts/save/library.gd
-msgid " de el "
-msgstr ""
-
-#: scripts/save/library.gd
-msgid " del "
-msgstr ""
-
-#: scripts/save/library.gd
 msgid " entero"
 msgstr ""
 
@@ -11966,10 +11954,6 @@ msgstr ""
 
 #: scripts/save/library.gd
 msgid "aún sin jugar"
-msgstr ""
-
-#: scripts/save/library.gd
-msgid "el investigador"
 msgstr ""
 
 #: scripts/save/library.gd scripts/save/trophies.gd scripts/ui/player_menus.gd
@@ -12661,15 +12645,7 @@ msgid "Las"
 msgstr ""
 
 #: scripts/ui/hud.gd
-msgid "Las "
-msgstr ""
-
-#: scripts/ui/hud.gd
 msgid "Los"
-msgstr ""
-
-#: scripts/ui/hud.gd
-msgid "Los "
 msgstr ""
 
 #: scripts/ui/hud.gd
@@ -12714,22 +12690,6 @@ msgstr ""
 
 #: scripts/ui/hud.gd
 msgid "Vecina"
-msgstr ""
-
-#: scripts/ui/hud.gd
-msgid "a la "
-msgstr ""
-
-#: scripts/ui/hud.gd
-msgid "al "
-msgstr ""
-
-#: scripts/ui/hud.gd
-msgid "el "
-msgstr ""
-
-#: scripts/ui/hud.gd
-msgid "la "
 msgstr ""
 
 #: scripts/ui/hud.gd

@@ -123,6 +123,7 @@ def code_texts(path, rel, out):
         if pre in '&^' or not human(s): continue
         line = line_of(src, a)
         if re.search(r'\b(print|printerr|print_rich|push_error|push_warning|assert)\s*\(', line): continue
+        if 'i18n: no' in line: continue
         out.setdefault(s, []).append(rel)
 
 def tscn_texts(path, rel, out):
@@ -205,7 +206,7 @@ def write_po(path, entries, lang, refs=None):
             f.write('msgid %s\nmsgstr %s\n' % (po_quote(mid), po_quote(mstr)))
 
 # ---------------------------------------------------------------- marcadores
-_PH = re.compile(r'%(?:[-+ 0#]*\d*(?:\.\d+)?[sdfxXcv%])|\{\w*\}|\[/?\w+[^\]]*\]')
+_PH = re.compile(r'%(?:[-+0#]*\d*(?:\.\d+)?[sdfxXcv%])|\{\w*\}|\[/?\w+[^\]]*\]')
 
 def placeholders(s):
     return sorted(m for m in _PH.findall(s) if m != '%%')
@@ -261,8 +262,15 @@ def cmd_poner(args):
     lote = json.load(open(args[0], encoding='utf-8'))
     texts = collect(); po = read_po(PO)
     bad = []; unknown = []; n = 0
+    # los espacios de no separación (delante de $, %, », ?…) se pierden al copiar: se casan sin
+    # ellos y la traducción los recupera delante de los mismos signos
+    norm = {s.replace('\xa0', ' ').replace(' ', ' '): s for s in texts}
     for es, en in lote.items():
         if not en: continue
+        if es not in texts and es in norm:
+            es = norm[es]
+            for ch in '$%»?!:;':
+                if '\xa0' + ch in es: en = en.replace(' ' + ch, '\xa0' + ch)
         if es not in texts: unknown.append(es); continue
         if placeholders(es) != placeholders(en): bad.append((es, en)); continue
         po[es] = en; n += 1
