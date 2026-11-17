@@ -479,7 +479,7 @@ func _card() -> void:
 	img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	img.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	box.add_child(img)
-	var info := PackedStringArray([String(Fishing.RARITY_NAMES.get(rarity, rarity))])
+	var info := PackedStringArray([L.t(String(Fishing.RARITY_NAMES.get(rarity, rarity)))])
 	if first: info.append(L.t("Nueva en el bestiario"))
 	var l := UiKit.label("  ·  ".join(info), 24, Color(0.55, 0.85, 0.65) if rarity == "maldito" else UiKit.GOLD)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -535,7 +535,7 @@ func _summary() -> void:
 	_prompt.text = ""
 	for a in Achievements.check(Saves.current):        # «Paciencia de pescador», «Lo que guarda la marea»
 		var reward := Achievements.reward_text(a)
-		_log.append("Logro: %s%s" % [a.display_name, ("  ·  " + reward) if reward != "" else ""])
+		_log.append(L.t("Logro: %s%s") % [a.display_name, ("  ·  " + reward) if reward != "" else ""])
 	Saves.save()
 	var w: Array = MenuKit.window(_ui, MenuKit.INK, 760)
 	var box: VBoxContainer = w[1]

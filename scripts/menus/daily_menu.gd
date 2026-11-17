@@ -31,7 +31,7 @@ func _ready() -> void:
 	var lv := _level_name(String(p.level))
 	var pacts := Pacts.names(p.pacts)
 	for row: Array in [["Escenario", lv], ["Investigador", _res_name("characters", String(p.character))],
-			["Compañero", _res_name("pets", String(p.pet))], ["Pactos", pacts if pacts != "" else "ninguno"]]:
+			[L.t("Compañero"), _res_name("pets", String(p.pet))], ["Pactos", pacts if pacts != "" else "ninguno"]]:
 		var k := UiKit.label(String(row[0]), 20, UiKit.TEXT_DIM)
 		k.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		grid.add_child(k)
@@ -41,7 +41,7 @@ func _ready() -> void:
 		else L.t("Tu intento: %s · %d bajas") % [Endless.clock(float(r.t)), int(r.kills)]
 	box.add_child(_center(UiKit.label(mine, 21, UiKit.TEXT)))
 	var st := Daily.streak(save, date)
-	box.add_child(_center(UiKit.label("Racha: %d %s  ·  la mejor: %d" % [st, "día" if st == 1 else "días", Daily.best_streak(save)], 19, UiKit.TEXT_DIM)))
+	box.add_child(_center(UiKit.label(L.t("Racha: %d %s  ·  la mejor: %d") % [st, L.t("día") if st == 1 else L.t("días"), Daily.best_streak(save)], 19, UiKit.TEXT_DIM)))
 	if not r.is_empty():
 		box.add_child(_center(UiKit.label(L.t("Tu código: %s") % Daily.encode(date, float(r.t), int(r.kills), String(r.character), int(r.get("players", 1))), 19, UiKit.TEXT_DIM)))
 	_friends = VBoxContainer.new()

@@ -8202,10 +8202,6 @@ msgid " (antes, %s)"
 msgstr ""
 
 #: scripts/core/game.gd
-msgid " (carga)"
-msgstr ""
-
-#: scripts/core/game.gd
 msgid " (copiado)"
 msgstr ""
 
@@ -8516,11 +8512,11 @@ msgstr ""
 msgid "caída"
 msgstr ""
 
-#: scripts/core/game.gd scripts/menus/slot_menu.gd
+#: scripts/core/game.gd scripts/menus/menu_kit.gd scripts/menus/slot_menu.gd
 msgid "compañero"
 msgstr ""
 
-#: scripts/core/game.gd
+#: scripts/core/game.gd scripts/menus/menu_kit.gd
 msgid "compañeros"
 msgstr ""
 
@@ -8556,7 +8552,7 @@ msgstr ""
 msgid "música"
 msgstr ""
 
-#: scripts/core/game.gd scripts/net/net_game.gd scripts/save/library.gd scripts/save/trophies.gd
+#: scripts/core/game.gd scripts/menus/menu_kit.gd scripts/net/net_game.gd scripts/save/library.gd
 msgid "nivel superado"
 msgstr ""
 
@@ -9142,10 +9138,6 @@ msgstr ""
 
 #: scripts/level/objective_director.gd
 msgid "corta el ritual"
-msgstr ""
-
-#: scripts/level/objective_director.gd
-msgid "el buhonero"
 msgstr ""
 
 #: scripts/level/objective_director.gd
@@ -9755,11 +9747,11 @@ msgstr ""
 msgid "Tu intento: %s · %d bajas"
 msgstr ""
 
-#: scripts/menus/daily_menu.gd scripts/save/library.gd
+#: scripts/menus/daily_menu.gd scripts/menus/menu_kit.gd scripts/save/library.gd
 msgid "día"
 msgstr ""
 
-#: scripts/menus/daily_menu.gd
+#: scripts/menus/daily_menu.gd scripts/menus/menu_kit.gd
 msgid "días"
 msgstr ""
 
@@ -10123,6 +10115,98 @@ msgstr ""
 
 #: scripts/menus/main_menu.gd
 msgid "¿Salir del juego?"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "abatido"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "abatidos"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "baja"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "bajas"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "combinaciones"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd scripts/ui/difficulty_menu.gd
+msgid "combinación"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "entrada"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "entradas"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "marca"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "marcas"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd scripts/save/library.gd scripts/save/trophies.gd scripts/ui/player_menus.gd
+msgid "niveles superados"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "objeto"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "objetos"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "partida"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "partidas"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "prenda"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "prendas"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "subida"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "subidas"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "superada"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "superadas"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "veces"
+msgstr ""
+
+#: scripts/menus/menu_kit.gd
+msgid "vez"
 msgstr ""
 
 #: scripts/menus/nights_menu.gd
@@ -10836,10 +10920,6 @@ msgid "%s t=%.1f enemigos=%d abatidos=%d xp=%.0f balas=%d gemas=%d %s  sale=%.1f
 msgstr ""
 
 #: scripts/net/net_game.gd
-msgid "%s · t=%.1f abatidos=%d"
-msgstr ""
-
-#: scripts/net/net_game.gd
 msgid "Esperando a los demás jugadores…"
 msgstr ""
 
@@ -10853,10 +10933,6 @@ msgstr ""
 
 #: scripts/net/net_game.gd
 msgid "J%d se ha desconectado: lo lleva la máquina"
-msgstr ""
-
-#: scripts/net/net_game.gd scripts/title/relato_screen.gd scripts/ui/hud.gd
-msgid "Parte %d · Nivel %d"
 msgstr ""
 
 #: scripts/net/net_game.gd
@@ -10908,10 +10984,6 @@ msgid "sin noticias del anfitrión"
 msgstr ""
 
 #: scripts/net/net_game.gd
-msgid "subida de J%d · %s"
-msgstr ""
-
-#: scripts/net/net_game.gd
 msgid "suceso de la noche"
 msgstr ""
 
@@ -10929,10 +11001,6 @@ msgstr ""
 
 #: scripts/net/net_log.gd
 msgid "Entra %s (PC %d, versión %s)"
-msgstr ""
-
-#: scripts/net/net_log.gd
-msgid "Fin de la sesión"
 msgstr ""
 
 #: scripts/net/net_log.gd
@@ -11180,7 +11248,15 @@ msgid "Visual"
 msgstr ""
 
 #: scripts/player/sanity_state.gd
+msgid "delirio"
+msgstr ""
+
+#: scripts/player/sanity_state.gd
 msgid "huida histérica"
+msgstr ""
+
+#: scripts/player/sanity_state.gd
+msgid "paranoia"
 msgstr ""
 
 #: scripts/player/sanity_state.gd
@@ -11560,7 +11636,19 @@ msgid "%d veces"
 msgstr ""
 
 #: scripts/save/diary.gd
+msgid "abril"
+msgstr ""
+
+#: scripts/save/diary.gd
+msgid "agosto"
+msgstr ""
+
+#: scripts/save/diary.gd
 msgid "caído"
+msgstr ""
+
+#: scripts/save/diary.gd
+msgid "diciembre"
 msgstr ""
 
 #: scripts/save/diary.gd
@@ -11568,7 +11656,47 @@ msgid "dos veces"
 msgstr ""
 
 #: scripts/save/diary.gd
+msgid "enero"
+msgstr ""
+
+#: scripts/save/diary.gd
+msgid "febrero"
+msgstr ""
+
+#: scripts/save/diary.gd
+msgid "julio"
+msgstr ""
+
+#: scripts/save/diary.gd
+msgid "junio"
+msgstr ""
+
+#: scripts/save/diary.gd
+msgid "marzo"
+msgstr ""
+
+#: scripts/save/diary.gd
+msgid "mayo"
+msgstr ""
+
+#: scripts/save/diary.gd
 msgid "noche eterna"
+msgstr ""
+
+#: scripts/save/diary.gd
+msgid "noviembre"
+msgstr ""
+
+#: scripts/save/diary.gd
+msgid "octubre"
+msgstr ""
+
+#: scripts/save/diary.gd
+msgid "septiembre"
+msgstr ""
+
+#: scripts/save/diary.gd
+msgid "superado"
 msgstr ""
 
 #: scripts/save/diary.gd
@@ -11956,10 +12084,6 @@ msgstr ""
 msgid "aún sin jugar"
 msgstr ""
 
-#: scripts/save/library.gd scripts/save/trophies.gd scripts/ui/player_menus.gd
-msgid "niveles superados"
-msgstr ""
-
 #: scripts/save/outfit_data.gd
 msgid "Cabeza"
 msgstr ""
@@ -12264,6 +12388,10 @@ msgstr ""
 msgid "Lo que vino después"
 msgstr ""
 
+#: scripts/title/relato_screen.gd scripts/ui/hud.gd
+msgid "Parte %d · Nivel %d"
+msgstr ""
+
 #: scripts/title/title_screen_config.gd
 msgid "Acercamiento lento"
 msgstr ""
@@ -12477,10 +12605,6 @@ msgid "Vuelves a: %s"
 msgstr ""
 
 #: scripts/ui/difficulty_menu.gd
-msgid "combinación"
-msgstr ""
-
-#: scripts/ui/difficulty_menu.gd
 msgid "daño"
 msgstr ""
 
@@ -12561,7 +12685,35 @@ msgid "Vida perdida %d:  %s"
 msgstr ""
 
 #: scripts/ui/fall_report.gd
+msgid "aura"
+msgstr ""
+
+#: scripts/ui/fall_report.gd
+msgid "balas"
+msgstr ""
+
+#: scripts/ui/fall_report.gd
+msgid "charcos"
+msgstr ""
+
+#: scripts/ui/fall_report.gd
+msgid "contacto"
+msgstr ""
+
+#: scripts/ui/fall_report.gd
 msgid "el escenario"
+msgstr ""
+
+#: scripts/ui/fall_report.gd
+msgid "golpes"
+msgstr ""
+
+#: scripts/ui/fall_report.gd
+msgid "otros"
+msgstr ""
+
+#: scripts/ui/fall_report.gd
+msgid "presencia"
 msgstr ""
 
 #: scripts/ui/fall_report.gd
@@ -12762,6 +12914,14 @@ msgstr ""
 
 #: scripts/ui/model_icon.gd
 msgid "Turn"
+msgstr ""
+
+#: scripts/ui/option_row.gd
+msgid "No"
+msgstr ""
+
+#: scripts/ui/option_row.gd
+msgid "Sí"
 msgstr ""
 
 #: scripts/ui/part_finale.gd

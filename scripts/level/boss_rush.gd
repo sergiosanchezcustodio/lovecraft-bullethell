@@ -62,7 +62,7 @@ static func make_level(id: String) -> LevelData:
 	var lv: LevelData = src.duplicate()
 	lv.id = StringName(id)
 	var boss := boss_of(id)
-	lv.display_name = "Desfile de jefes · %s" % (boss.display_name if boss != null else src.display_name)
+	lv.display_name = L.t("Desfile de jefes · %s") % (boss.display_name if boss != null else src.display_name)
 	lv.final_time = float(c.get("boss_at", 6.0))
 	lv.final_survive = 0.0
 	lv.final_wave = int(c.get("final_wave", 6))

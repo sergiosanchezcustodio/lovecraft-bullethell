@@ -337,7 +337,7 @@ class EndScreen extends CanvasLayer:
 	## «Diario del investigador» (hito 13.10): abre las entradas de este nivel encima.
 	func _diary_button(box: VBoxContainer, back: Button) -> void:
 		if diary.is_empty(): return
-		var b := MenuKit.button("Diario del investigador" if diary.size() == 1 else "Diarios de los investigadores", MenuKit.INK, 22)
+		var b := MenuKit.button(L.t("Diario del investigador") if diary.size() == 1 else L.t("Diarios de los investigadores"), MenuKit.INK, 22)
 		b.custom_minimum_size = Vector2(360, 50)
 		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		b.pressed.connect(func() -> void:

@@ -92,7 +92,7 @@ func _card(i: int, d: SaveData) -> Button:
 	v.add_theme_constant_override("separation", 10)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(v)
-	var t := MenuKit.title("Partida %d%s" % [i + 1, "  ·  Pruebas" if d != null and d.unlock_all else ""], 34)
+	var t := MenuKit.title(L.t("Partida %d%s") % [i + 1, L.t("  ·  Pruebas") if d != null and d.unlock_all else ""], 34)
 	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.add_child(t)
 	if d == null:

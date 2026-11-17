@@ -97,7 +97,7 @@ CODE_SKIP = {'scripts/core/bench.gd', 'scripts/core/spike_log.gd', 'scripts/core
 LINE_SKIP = re.compile(r'\b(print|printerr|print_rich|push_error|push_warning|assert|prints|printt|OS\.execute|'
                        r'get_node|get_node_or_null|has_node|find_child|add_to_group|is_in_group|has_method|'
                        r'emit_signal|set_meta|get_meta|has_meta|Prof\.|SpikeLog|_log\(|log_line|DebugOptions)\b|Accept: |User-Agent|Authorization|'
-                       r'^\s*(const|enum|match|signal|class_name|extends)\b|^\s*@\w+|==|!=|\bmatch\b')
+                       r'^\s*(const|enum|match|signal|class_name|extends)\b|^\s*@\w+|Content-Type')
 # Una cadena de GDScript: normal, con comillas simples o triple; las &"…" y ^"…" no son texto.
 _GD_TOKEN = re.compile(r'("""(?:.|\n)*?"""|"(?:[^"\\]|\\.)*"|\'(?:[^\'\\\n]|\\.)*\'|#[^\n]*)')
 
@@ -119,8 +119,14 @@ def line_of(src, pos):
 
 def code_texts(path, rel, out):
     src = open(path, encoding='utf-8').read()
+    # `# i18n: sí` en la primera línea de una constante: todos sus valores son texto, también
+    # las palabras sueltas en minúscula ("balas", "enero") que human() no reconoce.
+    marked = [(x, y) for x, y in _const_spans(src) if 'i18n: sí' in line_of(src, x)]
     for a, b, s, pre in gd_strings(src):
-        if pre in '&^' or not human(s): continue
+        if pre in '&^': continue
+        forced = any(x <= a < y for x, y in marked) and re.search("[a-záéíóúñü]", s) and not re.search(r'://|\.[a-z]{2,8}$', s) \
+            and not re.match(r'\s*:', src[b:b + 3])
+        if not forced and not human(s): continue
         line = line_of(src, a)
         if re.search(r'\b(print|printerr|print_rich|push_error|push_warning|assert)\s*\(', line): continue
         if 'i18n: no' in line: continue
@@ -344,6 +350,8 @@ def cmd_envolver(args):
             if re.match(r'\s*:', after) and not re.match(r'\s*:=', after): continue
             if re.search(r'\bfunc\b', line) and re.search(r'\bfunc\b[^(]*\([^)]*' + re.escape(src[a:b][:20]), line): continue
             if any(x <= a < y for x, y in spans): continue
+            # el texto comparado directamente (`x == "…"`, `"…" in lista`) no se traduce
+            if re.search(r'(==|!=)\s*$', src[max(0, a - 6):a]) or re.match(r'\s*(==|!=|in\b)', src[b:b + 5]): continue
             edits.append((a, b))
         if not edits: continue
         total += len(edits)

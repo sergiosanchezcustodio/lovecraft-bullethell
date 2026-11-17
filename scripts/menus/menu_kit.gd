@@ -292,7 +292,12 @@ static func money(n: int) -> String:
 
 ## "1 objeto", "4 objetos". `plural` vacío: se añade una "s".
 static func count(n: int, singular: String, plural: String = "") -> String:
-	return "%d %s" % [n, singular if n == 1 else (plural if plural != "" else singular + "s")]
+	return "%d %s" % [n, L.t(singular if n == 1 else (plural if plural != "" else singular + "s"))]
+## Las palabras que pasan por count() y otros plurales sueltos, para que estén en la tabla de textos.
+const PLURALS := ["abatido", "abatidos", "baja", "bajas", "entrada", "entradas", "marca", "marcas",   # i18n: sí
+	"objeto", "objetos", "partida", "partidas", "subida", "subidas", "superada", "superadas", "vez", "veces",
+	"combinación", "combinaciones", "compañero", "compañeros", "día", "días", "nivel superado", "niveles superados",
+	"prenda", "prendas"]
 
 ## Ventana centrada: fondo oscurecido que tapa la pantalla y un panel con su contenido.
 ## Devuelve [capa, caja vertical del contenido].

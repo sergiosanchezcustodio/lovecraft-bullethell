@@ -8,7 +8,8 @@ extends RefCounted
 
 const DATA := "res://data/diary.json"
 const MAX := 40
-const MONTHS := ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+const MONTHS := [   # i18n: sí
+	"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
 	"septiembre", "octubre", "noviembre", "diciembre"]
 
 static var _data := {}
@@ -108,7 +109,7 @@ static func story_date(date: String, part: int) -> String:
 	var bits := date.split("-")
 	var year := int((data().get("years", {}) as Dictionary).get(str(part), 1927))
 	if bits.size() < 3: return str(year)
-	return L.t("%d de %s de %d") % [int(bits[2]), MONTHS[clampi(int(bits[1]) - 1, 0, 11)], year]
+	return L.t("%d de %s de %d") % [int(bits[2]), L.t(MONTHS[clampi(int(bits[1]) - 1, 0, 11)]), year]
 
 ## Guarda la entrada en el diario del personaje (la más nueva primero).
 static func add(save: SaveData, character: String, f: Dictionary, entry: Dictionary) -> void:
@@ -121,11 +122,11 @@ static func add(save: SaveData, character: String, f: Dictionary, entry: Diction
 	save.records.diary[character] = list
 
 ## Para la lista de la Biblioteca: "30 oct. · El campamento destruido de Lake · caído".
-const SHORT_RESULT := {"won": "superado", "lost": "caído", "endless": "noche eterna"}
+const SHORT_RESULT := {"won": "superado", "lost": "caído", "endless": "noche eterna"}   # i18n: sí
 static func short_title(d: Dictionary) -> String:
 	var bits := String(d.get("date", "")).split("-")
-	var day := "%d %s." % [int(bits[2]), MONTHS[clampi(int(bits[1]) - 1, 0, 11)].left(3)] if bits.size() >= 3 else ""
-	var parts := [day, String(d.get("place", "")), String(SHORT_RESULT.get(String(d.get("result", "")), ""))]
+	var day := "%d %s." % [int(bits[2]), L.t(MONTHS[clampi(int(bits[1]) - 1, 0, 11)]).left(3)] if bits.size() >= 3 else ""
+	var parts := [day, String(d.get("place", "")), L.t(String(SHORT_RESULT.get(String(d.get("result", "")), "")))]
 	return " · ".join(PackedStringArray(parts.filter(func(s: String) -> bool: return s != "")))
 
 static func entries(save: SaveData, character: String) -> Array:

@@ -83,7 +83,7 @@ func _refresh() -> void:
 	_code.text = Cloud.pending.user_code
 	var uri := String(Cloud.pending.get("verification_uri", URL))
 	if uri != _qr.get_meta("url", ""): _show_qr(uri)
-	if _status.text == "": _status.text = "Esperando a que lo autorices en GitHub…"
+	if _status.text == "": _status.text = L.t("Esperando a que lo autorices en GitHub…")
 	if not _opened:
 		_opened = true
 		DisplayServer.clipboard_set(Cloud.pending.user_code)

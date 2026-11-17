@@ -363,7 +363,7 @@ func _shoot() -> void:
 	var path := dir.path_join(fname)
 	var err := img.save_png(path)
 	_panel.visible = was
-	_note.text = ("Foto guardada: %s" % fname) if err == OK else "No se ha podido guardar la foto (%s)" % error_string(err)
+	_note.text = (L.t("Foto guardada: %s") % fname) if err == OK else L.t("No se ha podido guardar la foto (%s)") % error_string(err)
 	if err == OK and game.get("args") != null and (game.get("args") as LaunchArgs).get_bool("log"): print("FOTO ", ProjectSettings.globalize_path(path))
 	Auto.sfx("ui_accept")
 	_flash.color.a = 0.55

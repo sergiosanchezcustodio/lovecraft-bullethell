@@ -16,7 +16,8 @@ static func runs_path() -> String:
 	return RUNS
 const HIST := 60                              ## s de vida y cordura que se dibujan
 ## Cómo se llama cada vía en el informe.
-const VIAS := {"bala": "balas", "contacto": "contacto", "golpe": "golpes", "zona": "charcos",
+const VIAS := {   # i18n: sí
+	"bala": "balas", "contacto": "contacto", "golpe": "golpes", "zona": "charcos",
 	"peligro": "el escenario", "presencia": "presencia", "aura": "aura", "aliado": "un compañero", "otro": "otros"}
 ## Orígenes que no son enemigos.
 const OTHERS := {"presencia": "La presencia de las criaturas", "angulo": "Los ángulos devoradores",
@@ -28,7 +29,7 @@ static var _names := {}
 
 ## Nombre de un enemigo (o de lo que hizo daño) por su id.
 static func name_of(id: String) -> String:
-	if OTHERS.has(id): return OTHERS[id]
+	if OTHERS.has(id): return L.t(OTHERS[id])
 	if _names.is_empty():
 		var dir := DirAccess.open("res://data/enemies")
 		if dir != null:
@@ -40,7 +41,7 @@ static func name_of(id: String) -> String:
 	return String(_names.get(id, id.capitalize()))
 
 static func via_name(via: String) -> String:
-	return String(VIAS.get(via, via))
+	return L.t(String(VIAS.get(via, via)))
 
 ## Los datos de un jugador: `received_via` ("origen|vía" -> [vida, cordura]), sus caídas
 ## ([{t, hit}]), su vida y cordura por segundo (fracciones) y los vivos por segundo.

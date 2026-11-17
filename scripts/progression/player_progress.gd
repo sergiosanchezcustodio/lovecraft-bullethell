@@ -34,7 +34,7 @@ class Option:
 		return "%s  %d" % [upgrade.display_name, to_level]
 	func text() -> String:
 		match kind:
-			Kind.NEW_WEAPON, Kind.EVOLUTION: return weapon.description if weapon.description != "" else "Arma nueva"
+			Kind.NEW_WEAPON, Kind.EVOLUTION: return weapon.description if weapon.description != "" else L.t("Arma nueva")
 			Kind.SIGN: return String(sign.get("text", ""))
 			Kind.TRICK: return String(trick.get("texto", ""))
 			Kind.REVELATION: return String(revelation.get("texto", ""))

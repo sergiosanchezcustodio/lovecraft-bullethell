@@ -164,7 +164,7 @@ func make_peddler() -> Objective:
 func vendor(pc: Dictionary) -> Array:
 	var level: LevelData = game.get("level")
 	var by_part: Dictionary = pc.get("vendors", {})
-	return by_part.get("p%d" % (level.part if level != null else 1), by_part.get("p1", ["anciano", "el buhonero"]))
+	return by_part.get("p%d" % (level.part if level != null else 1), by_part.get("p1", ["anciano", "el buhonero"]))   # i18n: no
 
 func _pick_reward(list: Array) -> Array:
 	var r: Dictionary = list[_rng.randi() % list.size()]

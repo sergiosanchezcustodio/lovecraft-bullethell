@@ -107,7 +107,7 @@ func _give(p: Player, money: int) -> void:
 		Kind.RUBY:
 			if game != null and game.has_method("earn"): game.earn(money)
 			p.drain_sanity(RUBY_SANITY, L.t("Rubí de Leng"), &"peligro")           # en su PC (remote no hace nada)
-	if game != null and game.has_method("announce"): game.announce(NAMES[kind], 1.5)
+	if game != null and game.has_method("announce"): game.announce(L.t(NAMES[kind]), 1.5)
 	if OS.get_cmdline_user_args().has("log=true"): print("RECOGIDA %s" % Kind.keys()[kind])
 
 ## Lanzallamas potente durante POWER_TIME s: un arma temporal fuera de los huecos.

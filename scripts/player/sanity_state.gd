@@ -16,7 +16,8 @@ signal crisis_started(kind: StringName)
 signal crisis_ended
 
 const KINDS: Array[StringName] = [&"paralisis", &"huida", &"vagar", &"paranoia", &"delirio"]
-const NAMES := {&"paralisis": "parálisis", &"huida": "huida histérica", &"vagar": "vagar sin rumbo",
+const NAMES := {   # i18n: sí
+	&"paralisis": "parálisis", &"huida": "huida histérica", &"vagar": "vagar sin rumbo",
 	&"paranoia": "paranoia", &"delirio": "delirio"}
 
 var rules: ProgressionData

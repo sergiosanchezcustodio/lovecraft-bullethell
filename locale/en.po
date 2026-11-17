@@ -8220,10 +8220,6 @@ msgid " (antes, %s)"
 msgstr " (before, %s)"
 
 #: scripts/core/game.gd
-msgid " (carga)"
-msgstr " (charge)"
-
-#: scripts/core/game.gd
 msgid " (copiado)"
 msgstr " (copied)"
 
@@ -8541,11 +8537,11 @@ msgstr "warm-up and pool"
 msgid "caída"
 msgstr "fall"
 
-#: scripts/core/game.gd scripts/menus/slot_menu.gd
+#: scripts/core/game.gd scripts/menus/menu_kit.gd scripts/menus/slot_menu.gd
 msgid "compañero"
 msgstr "companion"
 
-#: scripts/core/game.gd
+#: scripts/core/game.gd scripts/menus/menu_kit.gd
 msgid "compañeros"
 msgstr "companions"
 
@@ -8581,7 +8577,7 @@ msgstr "gamepad %d"
 msgid "música"
 msgstr "music"
 
-#: scripts/core/game.gd scripts/net/net_game.gd scripts/save/library.gd scripts/save/trophies.gd
+#: scripts/core/game.gd scripts/menus/menu_kit.gd scripts/net/net_game.gd scripts/save/library.gd
 msgid "nivel superado"
 msgstr "level cleared"
 
@@ -8951,7 +8947,7 @@ msgstr "Stains"
 
 #: scripts/level/daily.gd
 msgid "%d de %s"
-msgstr "%d of %s"
+msgstr "%d %s"
 
 #: scripts/level/daily.gd scripts/menus/level_map.gd
 msgid "Partida del día · %s"
@@ -9168,10 +9164,6 @@ msgstr "Objective: %s (reward: %s)"
 #: scripts/level/objective_director.gd
 msgid "corta el ritual"
 msgstr "break the ritual"
-
-#: scripts/level/objective_director.gd
-msgid "el buhonero"
-msgstr "the peddler"
 
 #: scripts/level/objective_director.gd
 msgid "lleva la reliquia"
@@ -9787,11 +9779,11 @@ msgstr "Your code: %s"
 msgid "Tu intento: %s · %d bajas"
 msgstr "Your attempt: %s · %d kills"
 
-#: scripts/menus/daily_menu.gd scripts/save/library.gd
+#: scripts/menus/daily_menu.gd scripts/menus/menu_kit.gd scripts/save/library.gd
 msgid "día"
 msgstr "day"
 
-#: scripts/menus/daily_menu.gd
+#: scripts/menus/daily_menu.gd scripts/menus/menu_kit.gd
 msgid "días"
 msgstr "days"
 
@@ -10158,6 +10150,98 @@ msgstr "Shop"
 #: scripts/menus/main_menu.gd
 msgid "¿Salir del juego?"
 msgstr "Quit the game?"
+
+#: scripts/menus/menu_kit.gd
+msgid "abatido"
+msgstr "killed"
+
+#: scripts/menus/menu_kit.gd
+msgid "abatidos"
+msgstr "killed"
+
+#: scripts/menus/menu_kit.gd
+msgid "baja"
+msgstr "kill"
+
+#: scripts/menus/menu_kit.gd
+msgid "bajas"
+msgstr "kills"
+
+#: scripts/menus/menu_kit.gd
+msgid "combinaciones"
+msgstr "combinations"
+
+#: scripts/menus/menu_kit.gd scripts/ui/difficulty_menu.gd
+msgid "combinación"
+msgstr "combination"
+
+#: scripts/menus/menu_kit.gd
+msgid "entrada"
+msgstr "entry"
+
+#: scripts/menus/menu_kit.gd
+msgid "entradas"
+msgstr "entries"
+
+#: scripts/menus/menu_kit.gd
+msgid "marca"
+msgstr "mark"
+
+#: scripts/menus/menu_kit.gd
+msgid "marcas"
+msgstr "marks"
+
+#: scripts/menus/menu_kit.gd scripts/save/library.gd scripts/save/trophies.gd scripts/ui/player_menus.gd
+msgid "niveles superados"
+msgstr "levels cleared"
+
+#: scripts/menus/menu_kit.gd
+msgid "objeto"
+msgstr "item"
+
+#: scripts/menus/menu_kit.gd
+msgid "objetos"
+msgstr "items"
+
+#: scripts/menus/menu_kit.gd
+msgid "partida"
+msgstr "run"
+
+#: scripts/menus/menu_kit.gd
+msgid "partidas"
+msgstr "runs"
+
+#: scripts/menus/menu_kit.gd
+msgid "prenda"
+msgstr "garment"
+
+#: scripts/menus/menu_kit.gd
+msgid "prendas"
+msgstr "garments"
+
+#: scripts/menus/menu_kit.gd
+msgid "subida"
+msgstr "level-up"
+
+#: scripts/menus/menu_kit.gd
+msgid "subidas"
+msgstr "level-ups"
+
+#: scripts/menus/menu_kit.gd
+msgid "superada"
+msgstr "cleared"
+
+#: scripts/menus/menu_kit.gd
+msgid "superadas"
+msgstr "cleared"
+
+#: scripts/menus/menu_kit.gd
+msgid "veces"
+msgstr "times"
+
+#: scripts/menus/menu_kit.gd
+msgid "vez"
+msgstr "time"
 
 #: scripts/menus/nights_menu.gd
 msgid "Cerrada"
@@ -10876,10 +10960,6 @@ msgid "%s t=%.1f enemigos=%d abatidos=%d xp=%.0f balas=%d gemas=%d %s  sale=%.1f
 msgstr ""
 
 #: scripts/net/net_game.gd
-msgid "%s · t=%.1f abatidos=%d"
-msgstr ""
-
-#: scripts/net/net_game.gd
 msgid "Esperando a los demás jugadores…"
 msgstr "Waiting for the other players…"
 
@@ -10894,10 +10974,6 @@ msgstr "The computer is playing P%d (their PC left)"
 #: scripts/net/net_game.gd
 msgid "J%d se ha desconectado: lo lleva la máquina"
 msgstr "P%d has disconnected: the computer is playing them"
-
-#: scripts/net/net_game.gd scripts/title/relato_screen.gd scripts/ui/hud.gd
-msgid "Parte %d · Nivel %d"
-msgstr "Part %d · Level %d"
 
 #: scripts/net/net_game.gd
 msgid "Salir al menú principal"
@@ -10948,10 +11024,6 @@ msgid "sin noticias del anfitrión"
 msgstr ""
 
 #: scripts/net/net_game.gd
-msgid "subida de J%d · %s"
-msgstr ""
-
-#: scripts/net/net_game.gd
 msgid "suceso de la noche"
 msgstr ""
 
@@ -10969,10 +11041,6 @@ msgstr ""
 
 #: scripts/net/net_log.gd
 msgid "Entra %s (PC %d, versión %s)"
-msgstr ""
-
-#: scripts/net/net_log.gd
-msgid "Fin de la sesión"
 msgstr ""
 
 #: scripts/net/net_log.gd
@@ -11220,8 +11288,16 @@ msgid "Visual"
 msgstr "Visual"
 
 #: scripts/player/sanity_state.gd
+msgid "delirio"
+msgstr "delirium"
+
+#: scripts/player/sanity_state.gd
 msgid "huida histérica"
 msgstr "hysterical flight"
+
+#: scripts/player/sanity_state.gd
+msgid "paranoia"
+msgstr "paranoia"
 
 #: scripts/player/sanity_state.gd
 msgid "parálisis"
@@ -11593,23 +11669,75 @@ msgstr "Reward"
 
 #: scripts/save/diary.gd
 msgid "%d de %s de %d"
-msgstr "%d of %s of %d"
+msgstr "%d %s %d"
 
 #: scripts/save/diary.gd
 msgid "%d veces"
 msgstr "%d times"
 
 #: scripts/save/diary.gd
+msgid "abril"
+msgstr "April"
+
+#: scripts/save/diary.gd
+msgid "agosto"
+msgstr "August"
+
+#: scripts/save/diary.gd
 msgid "caído"
 msgstr "fallen"
+
+#: scripts/save/diary.gd
+msgid "diciembre"
+msgstr "December"
 
 #: scripts/save/diary.gd
 msgid "dos veces"
 msgstr "twice"
 
 #: scripts/save/diary.gd
+msgid "enero"
+msgstr "January"
+
+#: scripts/save/diary.gd
+msgid "febrero"
+msgstr "February"
+
+#: scripts/save/diary.gd
+msgid "julio"
+msgstr "July"
+
+#: scripts/save/diary.gd
+msgid "junio"
+msgstr "June"
+
+#: scripts/save/diary.gd
+msgid "marzo"
+msgstr "March"
+
+#: scripts/save/diary.gd
+msgid "mayo"
+msgstr "May"
+
+#: scripts/save/diary.gd
 msgid "noche eterna"
 msgstr "endless night"
+
+#: scripts/save/diary.gd
+msgid "noviembre"
+msgstr "November"
+
+#: scripts/save/diary.gd
+msgid "octubre"
+msgstr "October"
+
+#: scripts/save/diary.gd
+msgid "septiembre"
+msgstr "September"
+
+#: scripts/save/diary.gd
+msgid "superado"
+msgstr "cleared"
 
 #: scripts/save/diary.gd
 msgid "tres veces"
@@ -11645,7 +11773,7 @@ msgstr "%d %s with them"
 
 #: scripts/save/library.gd
 msgid "%d de %s de %s"
-msgstr "%d of %s of %s"
+msgstr "%d %s %s"
 
 #: scripts/save/library.gd
 msgid "%s en el minuto %d (%s)"
@@ -11997,10 +12125,6 @@ msgstr "not completed yet"
 msgid "aún sin jugar"
 msgstr "not played yet"
 
-#: scripts/save/library.gd scripts/save/trophies.gd scripts/ui/player_menus.gd
-msgid "niveles superados"
-msgstr "levels cleared"
-
 #: scripts/save/outfit_data.gd
 msgid "Cabeza"
 msgstr "Head"
@@ -12305,6 +12429,10 @@ msgstr "The sunset city"
 msgid "Lo que vino después"
 msgstr "What came after"
 
+#: scripts/title/relato_screen.gd scripts/ui/hud.gd
+msgid "Parte %d · Nivel %d"
+msgstr "Part %d · Level %d"
+
 #: scripts/title/title_screen_config.gd
 msgid "Acercamiento lento"
 msgstr "Slow zoom"
@@ -12518,10 +12646,6 @@ msgid "Vuelves a: %s"
 msgstr "Back to: %s"
 
 #: scripts/ui/difficulty_menu.gd
-msgid "combinación"
-msgstr "combination"
-
-#: scripts/ui/difficulty_menu.gd
 msgid "daño"
 msgstr "damage"
 
@@ -12602,8 +12726,36 @@ msgid "Vida perdida %d:  %s"
 msgstr "Health lost %d:  %s"
 
 #: scripts/ui/fall_report.gd
+msgid "aura"
+msgstr "aura"
+
+#: scripts/ui/fall_report.gd
+msgid "balas"
+msgstr "bullets"
+
+#: scripts/ui/fall_report.gd
+msgid "charcos"
+msgstr "puddles"
+
+#: scripts/ui/fall_report.gd
+msgid "contacto"
+msgstr "contact"
+
+#: scripts/ui/fall_report.gd
 msgid "el escenario"
 msgstr "the stage"
+
+#: scripts/ui/fall_report.gd
+msgid "golpes"
+msgstr "blows"
+
+#: scripts/ui/fall_report.gd
+msgid "otros"
+msgstr "others"
+
+#: scripts/ui/fall_report.gd
+msgid "presencia"
+msgstr "presence"
 
 #: scripts/ui/fall_report.gd
 msgid "un compañero"
@@ -12804,6 +12956,14 @@ msgstr "Settle"
 #: scripts/ui/model_icon.gd
 msgid "Turn"
 msgstr "Turn"
+
+#: scripts/ui/option_row.gd
+msgid "No"
+msgstr "No"
+
+#: scripts/ui/option_row.gd
+msgid "Sí"
+msgstr "Yes"
 
 #: scripts/ui/part_finale.gd
 msgid "A o Intro: seguir"

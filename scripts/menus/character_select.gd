@@ -514,10 +514,10 @@ func _fill_room() -> void:
 	if Net.is_host():
 		var c := Net.codes()
 		var code: String = c.internet if c.internet != "" else c.lan
-		_room_code.text = "Sala" if code != "" else "Sala abierta"
+		_room_code.text = "Sala" if code != "" else L.t("Sala abierta")
 		_room_code_val.text = code
 		var bits := PackedStringArray()
-		if c.internet != "" and c.lan != "": bits.append("en casa: %s" % c.lan)
+		if c.internet != "" and c.lan != "": bits.append(L.t("en casa: %s") % c.lan)
 		bits.append(Net.upnp_status)
 		bits.append(L.t("Select o C: copiar"))
 		_room_status.text = "  ·  ".join(bits)
@@ -527,10 +527,10 @@ func _fill_room() -> void:
 				", ".join(others), "tiene" if others.size() == 1 else "tienen", Net.version]
 	else:
 		var host_name := String(Net.peers.get(1, {}).get("name", ""))
-		_room_code.text = ("Sala de %s" % host_name) if host_name != "" else "Sala"
+		_room_code.text = (L.t("Sala de %s") % host_name) if host_name != "" else "Sala"
 		_room_code_val.text = ""
 		var ping := int(Net.peers.get(Net.my_id, {}).get("ping", 0))
-		_room_status.text = ("Ping %d ms" % ping) if ping > 0 else ("Conectando…" if Net.state != NetSession.State.CONNECTED else "Midiendo el ping…")
+		_room_status.text = (L.t("Ping %d ms") % ping) if ping > 0 else ("Conectando…" if Net.state != NetSession.State.CONNECTED else L.t("Midiendo el ping…"))
 		if ping > Hud.PlayerPanel.PING_FAIR_MS: _room_status.text += L.t("  ·  conexión lenta: se notará algo de retraso")
 		var host_ver := String(Net.peers.get(1, {}).get("ver", Net.version))
 		if host_ver != Net.version:                      # se entienden, pero el juego puede ser otro
@@ -540,13 +540,13 @@ func _fill_room() -> void:
 	var names := PackedStringArray()
 	for id in ids:
 		var p: Dictionary = Net.peers[id]
-		var who := String(p.name).replace("[", "(") + (" (tú)" if id == Net.my_id else "")
+		var who := String(p.name).replace("[", "(") + (L.t(" (tú)") if id == Net.my_id else "")
 		var ms := int(p.ping)
 		if id != 1 and ms > 0:                           # con el color de los paneles; lenta, dicho
 			who += L.t(" [color=#%s]%d ms%s[/color]") % [Hud.PlayerPanel.ping_color(ms).to_html(false), ms,
 				L.t(" (lenta)") if ms > Hud.PlayerPanel.PING_FAIR_MS else ""]
 		var ver := String(p.get("ver", Net.version))
-		if ver != Net.version: who += " [color=#%s](v%s)[/color]" % [Hud.PlayerPanel.PING_BAD.to_html(false), ver]
+		if ver != Net.version: who += L.t(" [color=#%s](v%s)[/color]") % [Hud.PlayerPanel.PING_BAD.to_html(false), ver]
 		names.append(who)
 	_room_list.text = L.t("[right]En la sala: %s  ·  v%s[/right]") % ["  ·  ".join(names), Net.version]
 
@@ -738,7 +738,7 @@ class _Frame extends Control:
 		for k in OutfitData.KEYS.size():
 			var row := VBoxContainer.new()
 			row.add_theme_constant_override("separation", -3)
-			var tag := UiKit.label(OutfitData.SLOT_NAMES[k], 14, UiKit.TEXT_DIM)
+			var tag := UiKit.label(L.t(OutfitData.SLOT_NAMES[k]), 14, UiKit.TEXT_DIM)
 			tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			row.add_child(tag)
 			var val := MenuKit.title("", 18, UiKit.TEXT)
@@ -823,7 +823,7 @@ class _Frame extends Control:
 			row.add_child(icon)
 			_tips.append(icon)
 			var is_attr: bool = n in Attributes.NAMES
-			var tag := MenuKit.title(n if is_attr else STAT_NAMES[STAT_KEYS[n]], 17 if is_attr else 16, UiKit.GOLD)
+			var tag := MenuKit.title(n if is_attr else L.t(STAT_NAMES[STAT_KEYS[n]]), 17 if is_attr else 16, UiKit.GOLD)
 			tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 			tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			tag.size_flags_vertical = Control.SIZE_FILL
@@ -868,7 +868,7 @@ class _Frame extends Control:
 	## Qué atributos forman una estadística, para las descripciones.
 	static func _pair(stat: String) -> String:
 		var p: Array = Attributes.FORMULAS[stat]
-		return "%s + %s" % [Attributes.LONG[p[0]], Attributes.LONG[p[1]]]
+		return "%s + %s" % [L.t(Attributes.LONG[p[0]]), L.t(Attributes.LONG[p[1]])]
 
 	## Potenciador respecto a la base: +20 %, −5 % o +0 %.
 	static func _bonus(mult: float) -> String:
@@ -940,8 +940,8 @@ class _Frame extends Control:
 			l.add_theme_color_override("font_color", UiKit.GOLD if int(at[n]) > Attributes.BASE else UiKit.TEXT_DIM)
 			var uses := PackedStringArray()
 			for fs in Attributes.FORMULAS:
-				if n in Attributes.FORMULAS[fs]: uses.append(String(STAT_NAMES[fs]).to_lower())
-			(cell["icon"] as TipIcon).set_icon(load(ICONS % n), Attributes.LONG[n], L.t("%s\nSube: %s.") % [Attributes.DESC[n], ", ".join(uses)])
+				if n in Attributes.FORMULAS[fs]: uses.append(L.t(String(STAT_NAMES[fs])).to_lower())
+			(cell["icon"] as TipIcon).set_icon(load(ICONS % n), L.t(Attributes.LONG[n]), L.t("%s\nSube: %s.") % [L.t(Attributes.DESC[n]), ", ".join(uses)])
 		for n in STAT_ROWS:
 			var sk: String = STAT_KEYS[n]
 			var m := Attributes.mult(at, sk)
@@ -971,7 +971,7 @@ class _Frame extends Control:
 					l.text = _bonus(m)
 					text = L.t("Daño de las armas de fuego.")
 			l.add_theme_color_override("font_color", UiKit.TEXT_DIM if l.text == "+0 %" else UiKit.GOLD)
-			(cell["icon"] as TipIcon).set_icon(load(ICONS % n), STAT_NAMES[sk], "%s (%s)." % [text.trim_suffix("."), _pair(sk)])
+			(cell["icon"] as TipIcon).set_icon(load(ICONS % n), L.t(STAT_NAMES[sk]), "%s (%s)." % [text.trim_suffix("."), _pair(sk)])
 		var choosing := seat.stage == SelectState.Stage.CHARACTER
 		for a in _arrows: a.visible = choosing and st.choices(index).size() > 1
 		match seat.stage:
@@ -998,7 +998,7 @@ class _Frame extends Control:
 		_pet_name.text = pet.display_name if pet else L.t("Sin compañero")
 		for a in _pet_arrows: a.visible = picking and pets.size() > 1
 		_pet_view.set_model(pet.model if pet else "")
-		_pet_note.text = "" if pet else ("Se consiguen en la tienda" if pets.size() == 1 else "Irás solo")
+		_pet_note.text = "" if pet else (L.t("Se consiguen en la tienda") if pets.size() == 1 else L.t("Irás solo"))
 		var active := picking or seat.stage == SelectState.Stage.READY
 		_pet_title.add_theme_color_override("font_color", UiKit.GOLD if active else Color(UiKit.GOLD, 0.45))
 		_pet_name.add_theme_color_override("font_color", color if active else UiKit.TEXT_DIM)
@@ -1011,7 +1011,7 @@ class _Frame extends Control:
 		_sheet_cols.visible = not _outfit.visible
 		if not _outfit.visible: return
 		var set_name := OutfitSets.worn_name(seat.worn)          # conjunto entero (14.8)
-		_outfit_title.text = "Vestuario" if set_name == "" else "Conjunto: " + set_name
+		_outfit_title.text = "Vestuario" if set_name == "" else L.t("Conjunto: ") + set_name
 		if set_name != "" and seat.peer == owner_screen._me:       # niveles superados con él (los de este PC)
 			var won := OutfitSets.levels_with(Saves.current, seat.worn)
 			if won > 0: _outfit_title.text += " · %d %s" % [won, "nivel" if won == 1 else "niveles"]

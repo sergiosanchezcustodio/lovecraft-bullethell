@@ -143,7 +143,7 @@ static func _wstat(p: Player, wd: WeaponData, s: String, lv: int) -> float:
 
 static func _stat(info: Array, a: float, b: float) -> Dictionary:
 	var better := b < a if bool(info[3]) else b > a
-	return _row(String(info[0]), fmt(a, String(info[1])) + String(info[2]), fmt(b, String(info[1])) + String(info[2]), better)
+	return _row(L.t(String(info[0])), fmt(a, String(info[1])) + String(info[2]), fmt(b, String(info[1])) + String(info[2]), better)
 
 static func _row(name: String, before: String, after: String, good: bool) -> Dictionary:
 	return {"name": name, "before": before, "after": after, "good": good}

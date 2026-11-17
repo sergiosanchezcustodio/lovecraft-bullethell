@@ -173,7 +173,7 @@ func _offer_crash_report() -> void:
 	c.answered.connect(func(yes: bool) -> void:
 		if not yes: return
 		var path := CrashReport.save()
-		var text := ("Guardado en %s" % path) if path != "" else "No se ha podido guardar el informe."
+		var text := (L.t("Guardado en %s") % path) if path != "" else L.t("No se ha podido guardar el informe.")
 		var done := MenuKit.Confirm.new(text, L.t("Abrir la carpeta"), "Cerrar", UiKit.GOLD)
 		done.answered.connect(func(open: bool) -> void:
 			if open and path != "": OS.shell_show_in_file_manager(path))

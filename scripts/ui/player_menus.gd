@@ -379,7 +379,7 @@ class Sheet extends Control:
 		if p.outfit_set != "":                   # conjunto del vestuario entero (14.8)
 			var won := OutfitSets.levels_with(Saves.current, p.outfit_worn)
 			var t := L.t("Conjunto: ") + p.outfit_set
-			if won > 0: t += " · %d %s con él" % [won, "nivel superado" if won == 1 else "niveles superados"]
+			if won > 0: t += L.t(" · %d %s con él") % [won, L.t("nivel superado") if won == 1 else L.t("niveles superados")]
 			col.add_child(_label(t, 15, UiKit.GOLD, true))
 		# la imagen, centrada en lo que queda entre los datos y el compañero
 		var pic := _img(_model(p.data.model, 360, p.outfit_worn), 300, Color(p.color, 0.5))
@@ -443,7 +443,7 @@ class Sheet extends Control:
 		bottom.add_child(crisis)
 		_dyn.append(func() -> void:
 			var c := p.sanity_state.crises
-			crisis.text = "" if c == 0 else "Crisis sufridas: %d%s" % [c, "  ·  locura acumulada" if p.madness else ""])
+			crisis.text = "" if c == 0 else L.t("Crisis sufridas: %d%s") % [c, L.t("  ·  locura acumulada") if p.madness else ""])
 
 	# ------------------------------------------------------------ 3. combate
 

@@ -44,7 +44,7 @@ func _ready() -> void:
 	var cloud: SaveData = c.get("cloud")
 	for k in 2:
 		var d := local if k == 0 else cloud
-		var card := _card("Este PC" if k == 0 else "La nube", d, cloud if k == 0 else local)
+		var card := _card(L.t("Este PC") if k == 0 else L.t("La nube"), d, cloud if k == 0 else local)
 		card.pressed.connect(_choose.bind(k == 1))
 		row.add_child(card)
 		_cards.append(card)
@@ -71,7 +71,7 @@ func _card(head: String, d: SaveData, other: SaveData) -> Button:
 	v.add_theme_constant_override("separation", 8)
 	b.add_child(v)
 	v.add_child(MenuKit.title(head, 34))
-	var who := "en este PC" if d.device == "" or d.device == Cloud.device_name else "en %s" % d.device
+	var who := L.t("en este PC") if d.device == "" or d.device == Cloud.device_name else L.t("en %s") % d.device
 	var when := UiKit.label(L.t("Guardada el %s %s") % [Cloud.when(d.updated), who], 17, UiKit.TEXT_DIM)
 	when.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(when)

@@ -10,6 +10,8 @@ var index := 0
 var on_change: Callable
 var run: Callable
 var _value: Label
+## Valores cortos de las filas, para la tabla de textos (los demás ya están en ella).
+const WORDS := ["Sí", "No"]   # i18n: sí
 
 func _init(p_title: String, p_names: Array[String], p_index: int, p_on_change: Callable, p_run: Callable,
 		accent: Color = UiKit.GOLD, action_accent: Color = Color(0.45, 0.9, 0.75)) -> void:
@@ -53,7 +55,7 @@ func set_value_text(t: String) -> void:
 	_value.text = t
 
 func _show() -> void:
-	_value.text = "" if names.is_empty() else "◀  %s  ▶" % names[index]
+	_value.text = "" if names.is_empty() else "◀  %s  ▶" % L.t(names[index])
 
 ## Nombres de una lista de números: `pattern` con %d (entero) o %s (hasta dos decimales).
 static func fmt(vals: Array, pattern: String, k: float = 1.0) -> Array[String]:

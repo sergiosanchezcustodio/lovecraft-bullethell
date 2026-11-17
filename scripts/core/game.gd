@@ -779,14 +779,14 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 		_check_all_down())
 	if args.get_bool("log"):
 		q.damaged.connect(func(d: Damage) -> void:
-			var src := "bala" if d.source == null else String((d.source as Enemy).data.id) + (" (carga)" if d.physical > 8.0 else "")
+			var src := "bala" if d.source == null else String((d.source as Enemy).data.id) + (" (carga)" if d.physical > 8.0 else "")   # i18n: no
 			print("  J%d golpe t=%.1f  -%d vida -%d cordura  de %s  -> vida %d" % [i + 1, director.time if director else 0.0, d.physical, d.mental, src, q.health]))
 	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void: Achievements.add(Saves.current, "crises"))
 	q.sanity_state.crisis_started.connect(func(k: StringName) -> void:   # de qué tipo, para las estadísticas (21.20)
 		if not q.remote: _crisis_kinds[String(k)] = int(_crisis_kinds.get(String(k), 0)) + 1)
 	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void: Rumble.heartbeat(q))   # dos latidos (16.30)
 	q.sanity_state.crisis_started.connect(func(k: StringName) -> void:
-		var what := L.t("Crisis: %s") % SanityState.NAMES.get(k, "locura")
+		var what := L.t("Crisis: %s") % L.t(SanityState.NAMES.get(k, "locura"))
 		announce(what if players.size() == 1 else "J%d · %s" % [i + 1, what], 2.5))
 	q.lights.assign(arena.get_meta("lights"))       # las luces del escenario recuperan cordura
 	q.madness = bool(Settings.get_value("madness"))
@@ -986,9 +986,9 @@ func _open_level_up() -> void:
 	var title := L.t("Nivel %d") % (q.progress.level - q.progress.pending + 1)
 	if evo: title = L.t("Evolución · %s") % options[0].from.display_name
 	if sign: title = L.t("Signo Mayor")
-	if trick: title = "Truco · %s" % (q.pet.data.display_name if q.pet != null else "compañero")
+	if trick: title = L.t("Truco · %s") % (q.pet.data.display_name if q.pet != null else L.t("compañero"))
 	if rev: title = L.t("Revelación")
-	if net_game != null: title = "Turno de J%d · %s (%s) · %s" % [q.index + 1, q.data.display_name, _pc_name(_peer_of(q)), title]
+	if net_game != null: title = L.t("Turno de J%d · %s (%s) · %s") % [q.index + 1, q.data.display_name, _pc_name(_peer_of(q)), title]
 	elif coop: title = L.t("Turno de J%d · %s · %s") % [q.index + 1, q.data.display_name, title]
 	var attr := "" if q.progress.attr_gains.is_empty() or evo or sign else String(q.progress.attr_gains[0])  # D-27: lo enseña el rodillo
 	if net_game != null:                          # en red, la partida se para en todos los PC
@@ -1074,7 +1074,7 @@ func _choose_option(q: Player, o: PlayerProgress.Option) -> String:
 		return "J%d · %s" % [q.index + 1, rt] if players.size() > 1 else rt
 	if o.kind == PlayerProgress.Option.Kind.TRICK:   # (21.5)
 		if args.get_bool("log"): print("TRUCO %s %s" % [q.progress.pet_id, o.trick.get("id", "")])
-		var tt := "%s aprende %s: %s" % [q.pet.data.display_name if q.pet != null else "Tu compañero", o.title(), o.text()]
+		var tt := L.t("%s aprende %s: %s") % [q.pet.data.display_name if q.pet != null else L.t("Tu compañero"), o.title(), o.text()]
 		return "J%d · %s" % [q.index + 1, tt] if players.size() > 1 else tt
 	if o.kind != PlayerProgress.Option.Kind.EVOLUTION: return _pick_text(q, o)
 	if args.get_bool("log"): print("EVOLUCION %s" % o.weapon.id)
@@ -1325,7 +1325,7 @@ func _net_info(q: Player) -> Array:
 
 ## Nombre del PC en la sala.
 func _pc_name(peer: int) -> String:
-	return String(Net.peers.get(peer, {}).get("name", "otro jugador")) if Net != null else "otro jugador"
+	return String(Net.peers.get(peer, {}).get("name", L.t("otro jugador"))) if Net != null else L.t("otro jugador")
 
 ## Aviso de una parada puesta por otro PC, con sus botones ([texto, Callable]).
 func _show_halt(text: String, buttons: Array) -> void:
@@ -1581,13 +1581,13 @@ func _game_over() -> void:
 	apply_speed()
 	if _replay != null: _replay_frames = _replay.freeze()
 	get_tree().paused = true
-	var title := "Has caído" if players.size() == 1 else "Habéis caído"
-	if level != null and level.endless: title = "Partida del día" if level.daily != "" else "La noche eterna"
+	var title := L.t("Has caído") if players.size() == 1 else L.t("Habéis caído")
+	if level != null and level.endless: title = L.t("Partida del día") if level.daily != "" else L.t("La noche eterna")
 	if _expedition():                               # expedición (16.21): se acaba aquí
 		_endless_lines = PackedStringArray([L.t("La expedición termina en el paso %d de %d") % [int(Expedition.state().row) + 1, (Expedition.state().rows as Array).size()]])
 	if level != null and BossRush.is_rush(String(level.id)):   # desfile de jefes (16.22): hasta dónde llegó
 		var bd := BossRush.boss_of(String(level.id))
-		_endless_lines = PackedStringArray(["Caído ante %s (jefe %d de %d)" % [bd.display_name if bd != null else "el jefe",
+		_endless_lines = PackedStringArray([L.t("Caído ante %s (jefe %d de %d)") % [bd.display_name if bd != null else L.t("el jefe"),
 			BossRush.number_of(String(level.id)), BossRush.stages().size()]])
 	_end_screen(title, Color(0.86, 0.22, 0.18), "", "caida")
 
@@ -1765,7 +1765,7 @@ func _on_level_completed() -> void:
 	var exp_next := ""
 	if is_exp: exp_next = _expedition_won()         # expedición (16.21)
 	if BossRush.is_rush(String(level.id)): won_title = _rush_won()                 # desfile de jefes (16.22)
-	elif is_exp: won_title = "Expedición completada" if exp_next == "" else "Superado"
+	elif is_exp: won_title = L.t("Expedición completada") if exp_next == "" else "Superado"
 	elif Challenge.is_challenge(String(level.id)):     # desafío (15.2): aparte, no cuenta como nivel de campaña
 		won_title = L.t("Desafío superado")
 		var prev := Challenge.best(Saves.current, String(level.id))
@@ -1841,7 +1841,7 @@ func _rush_won() -> String:
 	var tt := Endless.clock(total)   # como «Tiempo:» de la misma ventana
 	# con el primer jefe jugado, el total es el mismo «Tiempo:» de debajo: no se repite (06-11-2026)
 	_endless_lines = PackedStringArray([L.t("Jefe %d de %d%s") % [n, of, L.t(" · Tiempo total: ") + tt if total > director.time + 0.5 else ""]])
-	if BossRush.next(String(level.id)) != "": return "Jefe vencido"
+	if BossRush.next(String(level.id)) != "": return L.t("Jefe vencido")
 	_endless_lines = PackedStringArray([L.t("Desfile completo · Tiempo total: %s") % tt])
 	for q in players:
 		if q.remote or Saves.current == null: continue
@@ -2304,7 +2304,7 @@ func _check_achievements() -> void:
 	var done := Achievements.check(save)
 	for a in done:
 		var reward := Achievements.reward_text(a)
-		announce("Logro: %s%s" % [a.display_name, ("  ·  " + reward) if reward != "" else ""], 3.0)
+		announce(L.t("Logro: %s%s") % [a.display_name, ("  ·  " + reward) if reward != "" else ""], 3.0)
 		if args.get_bool("log"): print("LOGRO %s" % a.id)
 	if not done.is_empty(): Saves.save()
 
@@ -2559,7 +2559,7 @@ func net_closed(reason: String) -> void:
 	Engine.time_scale = 1.0
 	get_tree().paused = true
 	var lines := _summary()
-	if Saves.current != null: lines.append("Ahora tienes %s $" % MenuKit.money(Saves.current.money))
+	if Saves.current != null: lines.append(L.t("Ahora tienes %s $") % MenuKit.money(Saves.current.money))
 	var s := Menus.EndScreen.new(reason, lines, Color(0.95, 0.55, 0.3))
 	s.waiting = L.t("Lo conseguido queda guardado en tu partida")
 	s.leave_text = L.t("Menú principal")

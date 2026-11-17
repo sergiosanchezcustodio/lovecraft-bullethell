@@ -71,7 +71,7 @@ static func kill_facts(save: SaveData, enemy_id: String) -> Array:
 			best = k
 	if best != "":
 		var c := load("res://data/characters/%s.tres" % best) as CharacterData if ResourceLoader.exists("res://data/characters/%s.tres" % best) else null
-		out.append("Quien más: %s (%d)" % [c.display_name if c != null else best, most])
+		out.append(L.t("Quien más: %s (%d)") % [c.display_name if c != null else best, most])
 	return out
 
 static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
@@ -99,8 +99,8 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				var facts := [", ".join(names)]
 				if done: facts.append("Completo")
 				var won := OutfitSets.levels_with(save, OutfitSets.as_worn(s))
-				if won > 0: facts.append("%d %s con él" % [won, "nivel superado" if won == 1 else "niveles superados"])
-				elif lack.size() == names.size(): facts.append("Aún no tienes ninguna de sus prendas: están en la tienda.")
+				if won > 0: facts.append(L.t("%d %s con él") % [won, L.t("nivel superado") if won == 1 else L.t("niveles superados")])
+				elif lack.size() == names.size(): facts.append(L.t("Aún no tienes ninguna de sus prendas: están en la tienda."))
 				else: facts.append(L.t("Te falta: ") + ", ".join(lack))
 				var e := _e(String(s.id), String(s.name), true, String(s.description), String(s.get("shown", "dyer")), "full",
 					null, facts, "Conjuntos")
@@ -112,8 +112,8 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 			for o in all:
 				var mine := save != null and (save.unlock_all or save.has_outfit(String(o.id)))
 				var e := _e(String(o.id), o.display_name, true, o.description, o.icon_char, "full", null,
-					["%s · %s $" % [OutfitData.SECTION_NAMES[o.slot], MenuKit.money(o.price)], "Tuya" if mine else L.t("En la tienda")],
-					L.t("Prendas · ") + OutfitData.SECTION_NAMES[o.slot])
+					["%s · %s $" % [L.t(OutfitData.SECTION_NAMES[o.slot]), MenuKit.money(o.price)], L.t("Tuya") if mine else L.t("En la tienda")],
+					L.t("Prendas · ") + L.t(OutfitData.SECTION_NAMES[o.slot]))
 				e["dim"] = not mine
 				e["worn"] = {OutfitData.KEYS[o.slot]: String(o.id)}       # puesta en un investigador
 				out.append(e)
@@ -124,7 +124,7 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 					var lv := String(pages[i].level)
 					var facts := [String(s.intro)] if i == 0 else []
 					facts.append(L.t("Página %d de %d · %s") % [i + 1, pages.size(), DailyMenu._level_name(lv)])
-					var e := _e(lv, "Página %d" % (i + 1), save != null and (save.unlock_all or Fragments.has(save, lv)),
+					var e := _e(lv, L.t("Página %d") % (i + 1), save != null and (save.unlock_all or Fragments.has(save, lv)),
 						String(pages[i].text), "", "", null, facts, String(s.title))
 					e["title"] = String(s.title)                # en la página, el relato
 					out.append(e)
@@ -137,7 +137,7 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 					var t := l.format({"nombre": L.t("el investigador")}).replace(" de el ", " del ")   # i18n: no (el «del» es del español)
 					return t.left(1).to_upper() + t.substr(1))))
 				out.append(_e(String(ep[0]), String(ep[1]), _seen(save, "epilogues", StringName(ep[0])), txt, "", "", null,
-					["Tras vencer a Nyarlathotep" if ep[0] == "epilogo_kadath" else "Tras vencer a Cthulhu" + (" con menos de un cuarto de la cordura" if ep[0] == "epilogo_locura" else "")], "Epílogos"))
+					[L.t("Tras vencer a Nyarlathotep") if ep[0] == "epilogo_kadath" else L.t("Tras vencer a Cthulhu") + (L.t(" con menos de un cuarto de la cordura") if ep[0] == "epilogo_locura" else "")], L.t("Epílogos")))
 			for pi in Campaign.parts().size():              # los finales ilustrados (21.17): al vencer al jefe de la parte
 				var last := ""
 				for l in Campaign.levels(): if int(l.part) == pi: last = String(l.id)
@@ -165,7 +165,7 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				var res := String(RESULTS.get(String(r.get("result", "")), ""))
 				var facts := ["%s · %s · %s" % [_date(String(r.get("date", ""))), String(r.get("time", "")), String(p.get("name", ""))],
 					L.t("%s en el minuto %d (%s)") % [res, int(float(r.get("t", 0.0)) / 60.0) + 1, RunArchive.clock(float(r.get("t", 0.0)))]]
-				if String(p.get("cause", "")) != "": facts.append("Le abatió: " + String(p.cause))
+				if String(p.get("cause", "")) != "": facts.append(L.t("Le abatió: ") + String(p.cause))
 				var ws := PackedStringArray()
 				for w: Array in p.get("weapons", []): ws.append("%s %d" % [RunArchive.source_name(String(w[0])), int(w[1])])
 				if not ws.is_empty(): facts.append(L.t("Armas: ") + ", ".join(ws))
@@ -216,9 +216,9 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				var id := String(c.id)
 				var n := Fishing.caught(save, id)
 				var full := Fishing.full_entry(save, c)
-				var facts := [String(Fishing.RARITY_NAMES.get(String(c.rarity), "")) + L.t(" · se vende por %d $") % int(c.price)]
+				var facts := [L.t(String(Fishing.RARITY_NAMES.get(String(c.rarity), ""))) + L.t(" · se vende por %d $") % int(c.price)]
 				if n > 0: facts.append(L.t("Pescadas: %d") % n)
-				if String(c.rarity) != "comun": facts.append("En la Biblioteca: %d" % Fishing.kept(save, id) if full else "Aún no se ha traído ninguna a la Biblioteca")
+				if String(c.rarity) != "comun": facts.append(L.t("En la Biblioteca: %d") % Fishing.kept(save, id) if full else L.t("Aún no se ha traído ninguna a la Biblioteca"))
 				out.append(_e("pesca_" + id, String(c.name), n > 0 or (save != null and save.unlock_all),
 					String(c.text) if full else L.t("Se vendió en la lonja antes de que nadie la estudiara. Si vuelve a picar, quizá convenga traerla aquí."),
 					String(c.model), "full", null, facts, SECTION_FISH))
@@ -289,19 +289,19 @@ static func stats_entries(save: SaveData) -> Array[Dictionary]:
 	var won := 0
 	for l in Campaign.levels(): if save != null and save.levels_won.has(String(l.id)): won += 1
 	var facts := [
-		"Tiempo jugado: " + SaveData.format_time(save.play_time if save != null else 0.0),
+		L.t("Tiempo jugado: ") + SaveData.format_time(save.play_time if save != null else 0.0),
 		L.t("Partidas: %d · caídas: %d") % [int(st.get("runs", 0)), int(st.get("deaths", 0))],
 		L.t("Niveles de la campaña superados: %d de %d") % [won, Campaign.levels().size()],
 		L.t("Criaturas abatidas: ") + MenuKit.money(int(st.get("kills", 0))),
 		L.t("Compañeros levantados: %d") % int(st.get("revives", 0)),
 		L.t("En crisis: ") + SaveData.format_time(AccountStats.crisis_time(save)),
-		"Investigador favorito: " + (fav_c.display_name if fav_c != null else "aún ninguno"),
+		L.t("Investigador favorito: ") + (fav_c.display_name if fav_c != null else L.t("aún ninguno")),
 	]
 	var re := _e("resumen", "Resumen", true, L.t("Lo que llevan reunido los investigadores de esta partida guardada, sumando cada noche jugada en este PC."),
 		"", "", null, facts)
 	var cr := []                                   # y las crisis de cada tipo, en tinta
 	for r: Dictionary in AccountStats.rows(save, "crisis"):
-		cr.append({"label": _cap(String(SanityState.NAMES.get(StringName(r.id), r.id))),
+		cr.append({"label": _cap(L.t(String(SanityState.NAMES.get(StringName(r.id), r.id)))),
 			"value": r.value, "text": MenuKit.count(int(r.value), "vez", "veces")})
 	if not cr.is_empty():
 		re["chart"] = {"kind": "bars", "rows": cr, "title": L.t("Crisis de cada tipo")}
@@ -315,7 +315,7 @@ static func stats_entries(save: SaveData) -> Array[Dictionary]:
 	var w_rows := []
 	for r: Dictionary in AccountStats.rows(save, "weapons"):
 		var id := String(r.id)
-		w_rows.append({"label": "Compañeros" if id == "mascota" else RunArchive.source_name(id), "value": r.value,
+		w_rows.append({"label": L.t("Compañeros") if id == "mascota" else RunArchive.source_name(id), "value": r.value,
 			"text": "%s · %s" % [MenuKit.money(int(r.value)), MenuKit.count(int(r.extra), "baja")]})
 	out.append(_chart("armas", L.t("Daño por arma"), w_rows, L.t("Todo el daño que ha hecho cada arma, y cuántas criaturas ha abatido.")))
 	var c_rows := []
@@ -375,7 +375,7 @@ static func count_known(save: SaveData, tome: String) -> Vector2i:
 static func _date(d: String) -> String:
 	var p := d.split("-")
 	if p.size() != 3: return d
-	return L.t("%d de %s de %s") % [int(p[2]), Diary.MONTHS[clampi(int(p[1]) - 1, 0, 11)], p[0]]
+	return L.t("%d de %s de %s") % [int(p[2]), L.t(Diary.MONTHS[clampi(int(p[1]) - 1, 0, 11)]), p[0]]
 
 static func _e(id: String, name: String, known: bool, txt: String, model: String, mode: String,
 		icon: Texture2D, facts: Array, section := "") -> Dictionary:

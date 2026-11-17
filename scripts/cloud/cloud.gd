@@ -274,8 +274,8 @@ func _sync_controls(files: Dictionary, out: Dictionary, after: Array[Callable]) 
 ## Lo que hizo la última sincronización, en una frase («Se han bajado 2 partidas de la nube.»).
 func sync_report() -> String:
 	var parts: Array[String] = []
-	if last_down > 0: parts.append("se %s %d partida%s de la nube" % ["ha bajado" if last_down == 1 else "han bajado", last_down, "" if last_down == 1 else "s"])
-	if last_up > 0: parts.append("se %s %d de este PC" % ["ha subido" if last_up == 1 else "han subido", last_up])
+	if last_down > 0: parts.append(L.t("se %s %d partida%s de la nube") % [L.t("ha bajado") if last_down == 1 else L.t("han bajado"), last_down, "" if last_down == 1 else "s"])
+	if last_up > 0: parts.append(L.t("se %s %d de este PC") % [L.t("ha subido") if last_up == 1 else L.t("han subido"), last_up])
 	if parts.is_empty(): return L.t("La nube ya estaba al día.")
 	var t := " y ".join(parts)
 	return t[0].to_upper() + t.substr(1) + "."

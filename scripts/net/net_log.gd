@@ -72,7 +72,7 @@ func line(text: String) -> void:
 
 func close(reason := "") -> void:
 	if _f == null: return
-	line("Fin de la sesión" + (": " + reason if reason != "" else ""))
+	line("Fin de la sesión" + (": " + reason if reason != "" else ""))   # i18n: no
 	_f.close()
 	_f = null
 

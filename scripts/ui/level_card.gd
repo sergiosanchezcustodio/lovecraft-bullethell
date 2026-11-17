@@ -134,5 +134,5 @@ static func _over_line(id: String) -> String:
 		if String(l.id) != id: continue
 		var parts := Campaign.parts()
 		var title := String((parts[int(l.part)] as Dictionary).get("title", "")) if int(l.part) < parts.size() else ""
-		return "Parte %d · Nivel %d%s" % [int(l.part) + 1, int(l.number), (" · " + title) if title != "" else ""]
+		return L.t("Parte %d · Nivel %d%s") % [int(l.part) + 1, int(l.number), (" · " + title) if title != "" else ""]
 	return ""

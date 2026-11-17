@@ -197,7 +197,7 @@ static func make_level(id: String) -> LevelData:
 	var src: LevelData = load("res://data/levels/%s.tres" % base_of(id))
 	var lv: LevelData = src.duplicate()
 	lv.id = StringName(id)
-	lv.display_name = L.t("Expedición · %s · %s") % [String(NAMES.get(kind, kind)), src.display_name]
+	lv.display_name = L.t("Expedición · %s · %s") % [L.t(String(NAMES.get(kind, kind))), src.display_name]
 	lv.money_bonus = 0
 	lv.mid_enemies = []
 	lv.mid_times = []

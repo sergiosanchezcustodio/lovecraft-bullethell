@@ -63,7 +63,7 @@ func find_by_guid(g: String) -> int:
 	return -2
 
 func device_name(device: int) -> String:
-	return "Teclado" if device == KEYBOARD else "Mando %d" % (device + 1)
+	return "Teclado" if device == KEYBOARD else L.t("Mando %d") % (device + 1)
 
 ## Entrada de partida para un dispositivo, con los controles de la configuración.
 func make_input(device: int) -> PlayerInput:

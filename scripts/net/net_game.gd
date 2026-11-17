@@ -560,7 +560,7 @@ const EVENT_TEXT := {"night": "suceso de la noche", "won": "nivel superado", "lo
 func _say_event(d: Dictionary) -> void:
 	var k := String(d.get("k", ""))
 	if EVENT_TEXT.has(k):
-		_say("%s · t=%.1f abatidos=%d" % [EVENT_TEXT[k], game.director.time if game.director != null else 0.0, game.kills])
+		_say("%s · t=%.1f abatidos=%d" % [EVENT_TEXT[k], game.director.time if game.director != null else 0.0, game.kills])   # i18n: no
 
 ## Anfitrión: derrota (la decide él, con la vida que le llega de cada PC).
 func send_lost() -> void:
@@ -1141,7 +1141,7 @@ func _on_roster() -> void:
 
 ## Anfitrión: a quien espera para volver, en qué nivel va la partida y el objetivo del HUD.
 func _send_late() -> void:
-	var where := "Parte %d · Nivel %d" % [game.level.part, game.level.number] if game.level != null else ""
+	var where := "Parte %d · Nivel %d" % [game.level.part, game.level.number] if game.level != null else ""   # i18n: no
 	if game.level != null and Nights.is_night(String(game.level.id)): where = Nights.label(String(game.level.id))
 	var goal: String = game.hud.objective_text() if game.hud != null else ""
 	for id in GameSession.returning:
@@ -1155,7 +1155,7 @@ func _seat_name(i: int) -> String:
 
 ## Qué ha parado la partida, en pocas palabras (registro).
 func _halt_text(d: Dictionary) -> String:
-	if d.get("k") == "lvup": return "subida de J%d · %s" % [int(d.get("i", 0)) + 1, where()]
+	if d.get("k") == "lvup": return "subida de J%d · %s" % [int(d.get("i", 0)) + 1, where()]   # i18n: no
 	return L.t("pausa de %s · %s") % [_seat_name_of_peer(int(d.get("peer", 1))), where()]
 
 ## Marca de un jugador de este PC (F9 o LB+RB): en el registro de este PC y en el de los demás,

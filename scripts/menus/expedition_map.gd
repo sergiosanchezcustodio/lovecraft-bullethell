@@ -71,7 +71,7 @@ func _build() -> void:
 			var kind := String(n.kind)
 			var done := (st.done as Array).any(func(x: Array) -> bool: return int(x[0]) == r and int(x[1]) == c)
 			var here := open.any(func(x: Array) -> bool: return int(x[0]) == r and int(x[1]) == c)
-			var b := MenuKit.button(("✓ " if done else "") + String(Expedition.NAMES.get(kind, kind)), COLORS.get(kind, MenuKit.INK), 17)
+			var b := MenuKit.button(("✓ " if done else "") + L.t(String(Expedition.NAMES.get(kind, kind))), COLORS.get(kind, MenuKit.INK), 17)
 			b.custom_minimum_size = NODE
 			b.size = NODE
 			b.position = _pos(r, c, row.size()) - NODE * 0.5
@@ -136,10 +136,10 @@ func _purse_text() -> String:
 func _describe(r: int, c: int) -> void:
 	var n := Expedition.node_at(r, c)
 	var kind := String(n.kind)
-	_info_title.text = String(Expedition.NAMES.get(kind, kind))
+	_info_title.text = L.t(String(Expedition.NAMES.get(kind, kind)))
 	var where := ""
 	for l: Dictionary in Campaign.levels(): if String(l.id) == String(n.base): where = String(l.name)
-	_info.text = String(Expedition.INFO.get(kind, "")) + ("" if kind in ["curiosidad", "descanso"] else "  " + where + ".")
+	_info.text = L.t(String(Expedition.INFO.get(kind, ""))) + ("" if kind in ["curiosidad", "descanso"] else "  " + where + ".")
 
 func _go(r: int, c: int) -> void:
 	var id := Expedition.enter(r, c)

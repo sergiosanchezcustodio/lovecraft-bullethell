@@ -93,7 +93,7 @@ static func clock(t: float) -> String:
 static func source_name(id: String, pet := "") -> String:
 	if id == "mascota":
 		var pp := "res://data/pets/%s.tres" % pet
-		return (load(pp) as PetData).display_name if pet != "" and ResourceLoader.exists(pp) else "Compañero"
+		return (load(pp) as PetData).display_name if pet != "" and ResourceLoader.exists(pp) else L.t("Compañero")
 	if id == "combo": return "Combinaciones"           # (hito 21.6)
 	if id == "revelacion": return "Revelaciones"       # (hito 21.7)
 	for dir in ["weapons", "upgrades"]:

@@ -95,7 +95,7 @@ func _video() -> void:
 		Settings.set_value("vsync", on)
 		Settings.apply_video())
 	var fps: Array[String] = []
-	for f in Settings.FPS_LIMITS: fps.append("Sin límite" if f == 0 else str(f))
+	for f in Settings.FPS_LIMITS: fps.append(L.t("Sin límite") if f == 0 else str(f))
 	_choice(L.t("Límite de FPS"), fps, OptionRow.idx(Settings.FPS_LIMITS, int(Settings.get_value("fps_limit")), 0), func(i: int) -> void:
 		Settings.set_value("fps_limit", Settings.FPS_LIMITS[i])
 		Settings.apply_video())
@@ -300,11 +300,11 @@ func _on_cloud_changed() -> void:
 func _cloud_text() -> String:
 	if not Cloud.connected():
 		var e := Cloud.error_text(Cloud.error)
-		return "Sin conectar." + ("  " + e if e != "" else "")
+		return L.t("Sin conectar.") + ("  " + e if e != "" else "")
 	var t := L.t("Conectado como %s.") % Cloud.login
 	if Cloud.syncing: t += L.t("  Sincronizando…")
 	elif Cloud.error != "": t += "  " + Cloud.error_text(Cloud.error)
-	elif Cloud.last_sync != "": t += "  Última copia: %s." % Cloud.when(Cloud.last_sync)
+	elif Cloud.last_sync != "": t += L.t("  Última copia: %s.") % Cloud.when(Cloud.last_sync)
 	if not Cloud.conflicts.is_empty(): t += L.t("  %s por decidir.") % MenuKit.count(Cloud.conflicts.size(), "partida")
 	return t
 

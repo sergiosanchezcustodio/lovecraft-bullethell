@@ -79,7 +79,7 @@ func _ready() -> void:
 	top.position.y = 12
 	top.alignment = BoxContainer.ALIGNMENT_BEGIN
 	add_child(top)
-	var lvl_name := "Parte %d · Nivel %d" % [director.level.part, director.level.number] if director != null else "Campo de pruebas"
+	var lvl_name := L.t("Parte %d · Nivel %d") % [director.level.part, director.level.number] if director != null else L.t("Campo de pruebas")
 	if Madness.grade() > 0: lvl_name += L.t(" · Grado %s") % String(Madness.info(Madness.grade()).get("roman", ""))   # 16.14
 	if director != null and Nights.is_night(String(director.level.id)):   # noche suelta (fase 21, bloque D)
 		lvl_name = Nights.label(String(director.level.id))
@@ -148,12 +148,12 @@ func _process_step(_delta: float) -> void:
 			_objective_lbl.text = L.t("Acaba con %s") % with_article(director.mid_alive[0].data.display_name)
 		elif director.time >= director.level.final_time and director.level.final_enemy != null:
 			var f := director.final_target()
-			_objective_lbl.text = "Acaba con %s" % with_article(f.data.display_name if f != null else director.level.final_enemy.display_name)
+			_objective_lbl.text = L.t("Acaba con %s") % with_article(f.data.display_name if f != null else director.level.final_enemy.display_name)
 		elif director.level.endless:
 			var nxt := director.next_mid_time()
 			var parts := PackedStringArray()
 			if nxt > 0.0: parts.append(L.t("Siguiente horror en %s") % Endless.clock(nxt - director.time))
-			var words := ["El de hoy %s", "¡Mejor que el de hoy! (%s)"] if director.level.daily != "" else ["Récord %s", "¡Récord! (%s)"]
+			var words := [L.t("El de hoy %s"), L.t("¡Mejor que el de hoy! (%s)")] if director.level.daily != "" else [L.t("Récord %s"), L.t("¡Récord! (%s)")]
 			if _endless_best > 0.0: parts.append((words[0] if director.time < _endless_best else words[1]) % Endless.clock(_endless_best))
 			_objective_lbl.text = "  ·  ".join(parts)
 		else:

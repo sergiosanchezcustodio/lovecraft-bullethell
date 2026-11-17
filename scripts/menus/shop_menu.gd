@@ -147,7 +147,7 @@ func _show_tab(i: int) -> void:
 			if k == SETS_SUB:
 				_sub_btns[k].text = L.t("Conjuntos %d/%d") % [sets_done, OutfitSets.all().size()]
 			else:
-				_sub_btns[k].text = "%s %d/%d" % [OutfitData.SECTION_NAMES[k], mine, int(counts.get(k, 0))]
+				_sub_btns[k].text = "%s %d/%d" % [L.t(OutfitData.SECTION_NAMES[k]), mine, int(counts.get(k, 0))]
 			_sub_btns[k].visible = counts.has(k) or (k == SETS_SUB and not OutfitSets.all().is_empty())
 			_sub_btns[k].add_theme_color_override("font_color", UiKit.GOLD if k == _sub else UiKit.TEXT_DIM)
 			_sub_btns[k].add_theme_stylebox_override("normal", MenuKit.box(Color(0.16, 0.1, 0.05, 0.9) if k == _sub else Color(0.04, 0.03, 0.025, 0.6),
@@ -331,7 +331,7 @@ func _try_buy_set(s: Dictionary) -> void:
 		_say(L.t("Te faltan %s $.") % MenuKit.money(price - save.money))
 		return
 	var n := OutfitSets.missing(save, s).size()
-	var c := MenuKit.Confirm.new("¿Comprar %s (%d %s) por %s $?" % [String(s.name), n, "prenda" if n == 1 else "prendas", MenuKit.money(price)],
+	var c := MenuKit.Confirm.new(L.t("¿Comprar %s (%d %s) por %s $?") % [String(s.name), n, L.t("prenda" if n == 1 else "prendas"), MenuKit.money(price)],
 		"Comprar", "Cancelar", UiKit.GOLD)
 	add_child(c)
 	c.answered.connect(func(yes: bool) -> void:
@@ -382,7 +382,7 @@ func _try_buy(e: Shop.Entry) -> void:
 	if not Shop.can_buy(save, e):
 		_say(L.t("Te faltan %s $.") % MenuKit.money(price - save.money))
 		return
-	var what := e.name if e.prices.size() == 1 else "%s (nivel %d)" % [e.name, Shop.level_of(save, e) + 1]
+	var what := e.name if e.prices.size() == 1 else L.t("%s (nivel %d)") % [e.name, Shop.level_of(save, e) + 1]
 	var c := MenuKit.Confirm.new(L.t("¿Comprar %s por %s $?") % [what, MenuKit.money(price)], "Comprar", "Cancelar", UiKit.GOLD)
 	add_child(c)
 	c.answered.connect(func(yes: bool) -> void:

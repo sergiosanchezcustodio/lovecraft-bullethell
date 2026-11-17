@@ -166,12 +166,12 @@ func _show_tome_cover(i: int) -> void:
 	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_right.add_child(t)
 	_right.add_child(_rule())
-	var c := _ink("%s de %s" % [n.x, n.y] + (" conseguidos" if tome.id == "achievements" else " descubiertos"), 28, INK_DIM)
-	if tome.id == "diary": c.text = MenuKit.count(n.x, "entrada") if n.x > 0 else "Aún no hay nada escrito"
-	if tome.id == "trophies": c.text = "%d de %d trofeos en las vitrinas" % [n.x, n.y]
-	if tome.id == "stats": c.text = "Tiempo jugado: " + SaveData.format_time(save.play_time if save != null else 0.0)
-	if tome.id == "manual": c.text = "%d páginas para quien empieza" % n.y
-	if tome.id == "archive": c.text = MenuKit.count(n.x, "partida") + " (las %d últimas)" % RunArchive.MAX if n.x > 0 else "Aún no se ha jugado ninguna"
+	var c := _ink(L.t("%s de %s") % [n.x, n.y] + (L.t(" conseguidos") if tome.id == "achievements" else L.t(" descubiertos")), 28, INK_DIM)
+	if tome.id == "diary": c.text = MenuKit.count(n.x, "entrada") if n.x > 0 else L.t("Aún no hay nada escrito")
+	if tome.id == "trophies": c.text = L.t("%d de %d trofeos en las vitrinas") % [n.x, n.y]
+	if tome.id == "stats": c.text = L.t("Tiempo jugado: ") + SaveData.format_time(save.play_time if save != null else 0.0)
+	if tome.id == "manual": c.text = L.t("%d páginas para quien empieza") % n.y
+	if tome.id == "archive": c.text = MenuKit.count(n.x, "partida") + L.t(" (las %d últimas)") % RunArchive.MAX if n.x > 0 else L.t("Aún no se ha jugado ninguna")
 	c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_right.add_child(c)
 	var bar := UiKit.Bar.new(RED_INK, 420, 10)
@@ -230,7 +230,7 @@ func _open_tome(i: int) -> void:
 		if tome.id == "archive": b.pressed.connect(func() -> void: _ask_replay(e))   # repetir con su semilla (16.26)
 		if e.has("finale"): b.pressed.connect(func() -> void: _show_finale(e))     # a toda pantalla (21.17)
 		list.add_child(b)
-	_left.add_child(_hint("A: repetir con su semilla  ·  B o Esc: volver" if tome.id == "archive" else "Arriba/abajo: recorrer  ·  B o Esc: volver a los tomos"))
+	_left.add_child(_hint(L.t("A: repetir con su semilla  ·  B o Esc: volver") if tome.id == "archive" else L.t("Arriba/abajo: recorrer  ·  B o Esc: volver a los tomos")))
 	MenuKit.chain_focus(_rows)
 	if not _rows.is_empty(): _rows[0].grab_focus.call_deferred()
 
@@ -372,7 +372,7 @@ func _ask_replay(e: Dictionary) -> void:
 		elif back != null and is_instance_valid(back): back.grab_focus.call_deferred())
 
 func _unknown_text(e := {}) -> String:
-	if String(e.get("section", "")) == Library.SECTION_FISH: return "Todavía no ha picado ninguna. Quizá en el muelle de Innsmouth, entre nivel y nivel."
+	if String(e.get("section", "")) == Library.SECTION_FISH: return L.t("Todavía no ha picado ninguna. Quizá en el muelle de Innsmouth, entre nivel y nivel.")
 	match _tome:
 		"enemies": return L.t("Aún no se ha visto. Las páginas están en blanco.")
 		"weapons": return L.t("Nadie la ha empuñado todavía.")

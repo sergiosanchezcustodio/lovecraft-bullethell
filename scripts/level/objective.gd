@@ -562,7 +562,7 @@ func _carried_by_none_else(p: Player) -> bool:
 func hud_text() -> String:
 	match kind:
 		"rescue":
-			if state == State.WAIT: return "Rescata al superviviente herido"
+			if state == State.WAIT: return L.t("Rescata al superviviente herido")
 			return L.t("Escolta al superviviente hasta la bengala")
 		"ritual":
 			return L.t("Corta el ritual: quédate dentro del círculo · %d/%d s") % [floori(progress), roundi(need)]
