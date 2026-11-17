@@ -637,7 +637,7 @@ class _Frame extends Control:
 		_panel.size = FRAME
 		add_child(_panel)
 		MenuKit.dress(_panel, MenuKit.BRASS, Vector2.ZERO, 72.0)   # madera y latón; refresh() lo tiñe
-		_head = MenuKit.title("J%d" % (index + 1), 26, color)   # puesto vacío: arriba, centrado
+		_head = MenuKit.title(L.player(index + 1), 26, color)   # puesto vacío: arriba, centrado
 		_head.size = Vector2(FRAME.x, 40)
 		_head.position = Vector2(0, 22)                    # dentro del filete fino (15-17 px del borde)
 		add_child(_head)
@@ -646,7 +646,7 @@ class _Frame extends Control:
 		_jbox.custom_minimum_size = Vector2(92, 92)
 		_jbox.add_theme_stylebox_override("panel", _frame(Color(0, 0, 0, 0.5), Color(MenuKit.BRASS.lerp(color, 0.6), 0.85), 2))
 		add_child(_jbox)
-		var jl := MenuKit.title("J%d" % (index + 1), 54, color)
+		var jl := MenuKit.title(L.player(index + 1), 54, color)
 		jl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		jl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_jbox.add_child(jl)
@@ -823,7 +823,7 @@ class _Frame extends Control:
 			row.add_child(icon)
 			_tips.append(icon)
 			var is_attr: bool = n in Attributes.NAMES
-			var tag := MenuKit.title(n if is_attr else L.t(STAT_NAMES[STAT_KEYS[n]]), 17 if is_attr else 16, UiKit.GOLD)
+			var tag := MenuKit.title(Attributes.abbr(n) if is_attr else L.t(STAT_NAMES[STAT_KEYS[n]]), 17 if is_attr else 16, UiKit.GOLD)
 			tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 			tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			tag.size_flags_vertical = Control.SIZE_FILL

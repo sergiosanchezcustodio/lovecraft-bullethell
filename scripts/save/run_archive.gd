@@ -84,7 +84,7 @@ static func place(run: Dictionary) -> String:
 
 ## "15,7": una cifra decimal, con coma.
 static func decimal(v: float) -> String:
-	return ("%.1f" % v).replace(".", ",")
+	return ("%.1f" % v).replace(".", L.dec)
 
 static func clock(t: float) -> String:
 	return "%d:%02d" % [int(t) / 60, int(t) % 60]

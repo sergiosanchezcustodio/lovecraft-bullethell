@@ -300,10 +300,10 @@ class PlayerPanel extends PanelContainer:
 		box.custom_minimum_size = SIZE
 		add_child(box)
 		# izquierda: J1 y nivel, busto, experiencia
-		var j := MenuKit.title("J%d" % (p.index + 1), 20, p.color)
+		var j := MenuKit.title(L.player(p.index + 1), 20, p.color)
 		j.position = Vector2(0, -4)
 		box.add_child(j)
-		_level_lbl = UiKit.label("Nv. 1", 16, UiKit.GOLD)       # 14 hasta el 06-11-2026
+		_level_lbl = UiKit.label(L.lv() + ". 1", 16, UiKit.GOLD)       # 14 hasta el 06-11-2026
 		_level_lbl.position = Vector2(28, -2)
 		box.add_child(_level_lbl)
 		var portrait := TextureRect.new()
@@ -444,7 +444,7 @@ class PlayerPanel extends PanelContainer:
 		_xp.value = p.progress.xp_fraction()
 		_xp.fill = p.progress.xp_color()                 # cooperativo: color de quien sube la próxima vez
 		_xp.mine = p.progress.is_next()                  # y su barra, enmarcada
-		_level_lbl.text = "Nv. %d" % p.progress.level
+		_level_lbl.text = L.lv() + ". %d" % p.progress.level
 		_dodge.value = p.motor.dodge_ready_fraction()
 		var key := ""
 		if p.weapons != null:

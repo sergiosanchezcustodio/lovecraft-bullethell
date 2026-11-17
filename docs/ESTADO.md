@@ -3666,3 +3666,23 @@ D-54 resuelta: sí, el juego entero en inglés antes de itch.io. Este hito monta
 - **Prueba** (`tests/test_textos.gd`): `L.t`, `L.data` (sin tocar ids ni comentarios), el `get` de los recursos (también con el valor por defecto), qué cuenta como texto, que la tabla esté al día (`textos.py comprobar`) y cuántos hay traducidos (9 de 3256 por ahora: los del menú principal, para probar la cadena).
 - **Captura:** el menú principal con `cfg_language=en` sale con *Play*, *Shop*, *Library*, *Settings* y *Quit* (`shots/ui_recorrido_en/menu.png`).
 - Suite: 1082 de 1082.
+
+## Hito 22.5: el juego entero en inglés y selector de idioma (17-11-2026)
+
+Sobre la base del 22.4. Hecho, pendiente de revisión.
+
+- **Selector:** «Idioma · Language» en la pestaña Juego, con los nombres en los dos idiomas para encontrarlo aunque no se entienda el otro. Cambiarlo pide reiniciar, porque los datos ya están cargados. Las ejecuciones de prueba (`bot=`, `perf=`, `shots=`, `demo=`) van siempre en español salvo `cfg_language=`, porque las herramientas leen lo que escribe la partida.
+- **Traducción:** 3474 de 3502 textos, unas 29 200 palabras: interfaz, Biblioteca, relatos, consejos, manual, armas (también el texto de cada mejora), objetos, enemigos, logros, diarios, noches y tienda. Sin traducir a propósito, 28: registros de la red y cabeceras HTTP.
+- **Textos montados en el código:**
+  - **`# i18n: sí`** en la primera línea de un `const`: todas sus cadenas van a la tabla, también las palabras sueltas en minúscula que `human()` rechaza (meses, días, crisis, vías de daño, «Sí»/«No»…). Sus usos llevan `L.t(…)`.
+  - Las líneas con comparaciones ya no se saltan enteras: solo la cadena que se compara (`== "x"`, `"x" in`). Lo mismo con `has_method` y `has_meta`: había avisos de partida (`game.has_method("announce"): game.announce("…")`) que nunca se traducían.
+  - `MenuKit.count` traduce el singular y el plural (`MenuKit.PLURALS`). `OptionRow` traduce sus valores. Las migas de pan se traducen por partes.
+  - Las etiquetas en mayúsculas («MEJORA DE ARMA», «OBJETO»…) se traducen antes de pasarlas a mayúsculas: `L.t("Objeto").to_upper()`.
+- **Números y formatos:** `L.dec` es el separador decimal (`,` o `.`), y `MenuKit.money` usa `.` o `,` para los miles. Las fechas, en inglés, van sin «de» («17 November 2026»). En el diario, el marcador de género `{o}` sale vacío en inglés.
+- **Jugadores y niveles:** `L.player(n)` da «J1» o «P1» y `L.lv()` da «Nv» o «Lv»; se usan en el HUD, la ficha, las flechas, la selección, la tabla de daño y los avisos. Las siglas de los atributos, con `Attributes.abbr`: POW, INT, STR, CON, TEN, DEX y EDU. Las claves internas siguen siendo las españolas.
+- **Fallos de la base que salieron al recorrerlo:**
+  - `L.data` y `textos.py` se saltaban la clave `levels` entera, así que los nombres y las criaturas de los niveles de `campaign.json` seguían en español. Ahora una lista de diccionarios se recorre aunque su clave esté en `SKIP_KEYS`.
+  - `level_text` (la mejora de cada nivel de arma) y `mid_texts` (avisos de los jefes intermedios) no se extraían. Se traducen donde se leen (`PlayerProgress`, `WaveDirector`).
+- **Revisión:** el recorrido de las 56 ventanas en inglés (`recorrido_ui.py --con "cfg_language=en i18n_log=true" --sufijo en`), con `textos.py registro`. Lo que queda en español es el menú de depuración y el de revisión, que son para el autor. El rasgo de Peaslee se acortó en inglés porque rozaba el filete. Queda un aviso de `ui_check` en Configuración › Vídeo (la ayuda, a ras del panel de la vista previa) que en la captura no se nota.
+- **Herramientas:** `python tools/textos.py envolver` da 0 pendientes y `comprobar` da OK. En el scratchpad de la sesión quedaron los lotes de traducción (JSON); la tabla es `locale/en.po`.
+- Suite: 1082 de 1082.

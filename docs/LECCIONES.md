@@ -280,3 +280,11 @@ En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra c
 - **Ni `const` ni las anotaciones (`@export_group("…")`) admiten llamadas a funciones:** un `L.t()` dentro da «isn't a constant expression» o, en las anotaciones, un error del analizador que deja la suite colgada.
 - **Un `Translation` propio con `_get_message`** (añadido al `TranslationServer` con el mismo locale) ve todo lo que se pide traducir, también lo que traducen solos los controles. Si devuelve `&""`, no cambia el resultado.
 - **Las entradas de un `.po` con `msgstr ""` cuentan en `get_message_count()`:** para saber cuántas hay traducidas, recórrelas con `get_message_list()` y mira que `get_message` no esté vacío.
+
+## Traducción: lo que no se ve en la tabla (hito 22.5, 17-11-2026)
+
+- **Las palabras sueltas en minúscula no parecen texto** para `human()` («martes», «balas», «Sí»): si van en una constante, márcala con `# i18n: sí` en su primera línea y envuelve el uso con `L.t()`. Las que están en mayúsculas («OBJETO») tampoco: tradúcelas en minúscula y pasa a mayúsculas después.
+- **Saltarse una línea entera por una palabra clave esconde textos:** `if game.has_method("announce"): game.announce("…")` o una línea con `==` dejaban sin traducir el aviso que iba detrás. Salta solo la cadena afectada (la que se compara o el argumento de `has_method`), no la línea.
+- **Una clave que se salta por ser ids puede tener debajo textos:** `levels` en `campaign.json` es una lista de niveles con nombre y criaturas. Recorre las listas de diccionarios aunque su clave esté en `SKIP_KEYS`.
+- **Lo que se lee de un recurso como array no pasa por el `get`** de las propiedades `String`: `level_text` y `mid_texts` se traducen donde se usan.
+- **El registro del juego (`i18n_log=true`) se suma entre ejecuciones:** bórralo (`user://i18n_faltan.txt`) antes de repetir el recorrido, o saldrá lo que ya se arregló.

@@ -18,6 +18,8 @@ const SKIP_KEYS := ["id", "model", "icon", "icon_model", "path", "image", "sfx",
 	"texture", "shader", "file", "video", "clip", "color", "kind", "type", "mode", "key", "action",
 	"autor", "author"]
 static var lang := "es"
+## Separador decimal de las cifras que se escriben a mano: coma en español, punto en inglés.
+static var dec := ","
 static var missing := {}                     ## textos sin traducir que se han pedido (i18n_log=true)
 static var log_missing := false
 static var _table: Translation
@@ -35,6 +37,7 @@ static func system_lang() -> String:
 ## Pone el idioma (al arrancar, antes de cargar datos).
 static func apply(p_lang: String) -> void:
 	lang = p_lang if LANGS.has(p_lang) else "es"
+	dec = "," if lang == "es" else "."
 	if lang != "es" and _table == null and ResourceLoader.exists(PO.get(lang, "")):
 		_table = load(PO[lang]) as Translation
 		if _table != null: TranslationServer.add_translation(_table)
@@ -80,8 +83,8 @@ static func _walk(v: Variant) -> Variant:
 		return t(v) if human(v) else v
 	if v is Dictionary:
 		for k in v.keys():
-			if k is String and (k.begins_with("_") or SKIP_KEYS.has(k)): continue
 			var x: Variant = v[k]
+			if k is String and (k.begins_with("_") or (SKIP_KEYS.has(k) and not _dict_list(x))): continue
 			if x is String or x is Dictionary or x is Array: v[k] = _walk(x)
 		return v
 	if v is Array:
@@ -90,6 +93,21 @@ static func _walk(v: Variant) -> Variant:
 			if x is String or x is Dictionary or x is Array: v[i] = _walk(x)
 		return v
 	return v
+
+## «J1» en español, «P1» en inglés: la marca de cada jugador.
+static func player(n: int) -> String:
+	return ("J%d" if lang == "es" else "P%d") % n
+
+## «Nv 3», «Lv 3»: el nivel abreviado.
+static func lv() -> String:
+	return "Nv" if lang == "es" else "Lv"
+
+## Una lista de diccionarios (los niveles de campaign.json) se recorre aunque su clave se salte.
+static func _dict_list(x: Variant) -> bool:
+	if not (x is Array) or (x as Array).is_empty(): return false
+	for e: Variant in x:
+		if not (e is Dictionary): return false
+	return true
 
 ## Lee y traduce un JSON de `data/` (null si no está o no se entiende).
 static func json(path: String) -> Variant:

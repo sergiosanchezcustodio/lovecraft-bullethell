@@ -315,7 +315,7 @@ msgstr ""
 msgid "Tres noches sueltas"
 msgstr ""
 
-#: data/arenas/arrecife.json data/levels/p2_n5.tres
+#: data/arenas/arrecife.json data/campaign.json data/levels/p2_n5.tres
 msgid "El Arrecife del Diablo y Y'ha-nthlei"
 msgstr ""
 
@@ -323,19 +323,19 @@ msgstr ""
 msgid "El bosque encantado"
 msgstr ""
 
-#: data/arenas/calles.json data/levels/p2_n2.tres
+#: data/arenas/calles.json data/campaign.json data/levels/p2_n2.tres
 msgid "Las calles de Innsmouth y el templo de la Orden"
 msgstr ""
 
-#: data/arenas/campamento.json data/levels/p1_n1.tres scripts/level/level_data.gd
+#: data/arenas/campamento.json data/campaign.json data/levels/p1_n1.tres scripts/level/level_data.gd
 msgid "Campamento base en la costa del mar de Ross"
 msgstr ""
 
-#: data/arenas/carretera.json data/levels/p2_n1.tres
+#: data/arenas/carretera.json data/campaign.json data/levels/p2_n1.tres
 msgid "Newburyport y la carretera a Innsmouth"
 msgstr ""
 
-#: data/arenas/ciudad.json data/levels/p1_n4.tres
+#: data/arenas/ciudad.json data/campaign.json data/levels/p1_n4.tres
 msgid "La ciudad ciclópea de los Antiguos"
 msgstr ""
 
@@ -347,7 +347,7 @@ msgstr ""
 msgid "El puerto de Dylath-Leen"
 msgstr ""
 
-#: data/arenas/estudio.json data/levels/p3_n1.tres
+#: data/arenas/estudio.json data/campaign.json data/levels/p3_n1.tres
 msgid "Providence: el estudio del escultor Wilcox"
 msgstr ""
 
@@ -359,7 +359,7 @@ msgstr ""
 msgid "La cima de Kadath"
 msgstr ""
 
-#: data/arenas/lake.json data/levels/p1_n2.tres
+#: data/arenas/lake.json data/campaign.json data/levels/p1_n2.tres
 msgid "El campamento destruido de Lake"
 msgstr ""
 
@@ -367,15 +367,15 @@ msgstr ""
 msgid "La meseta de Leng"
 msgstr ""
 
-#: data/arenas/muelle.json data/levels/p3_n3.tres
+#: data/arenas/muelle.json data/campaign.json data/levels/p3_n3.tres
 msgid "Los muelles y la cubierta del Alert"
 msgstr ""
 
-#: data/arenas/pantano.json data/levels/p2_n4.tres
+#: data/arenas/pantano.json data/campaign.json data/levels/p2_n4.tres
 msgid "Los pantanos y la vía muerta del tren a Rowley"
 msgstr ""
 
-#: data/arenas/paso.json data/levels/p1_n3.tres
+#: data/arenas/paso.json data/campaign.json data/levels/p1_n3.tres
 msgid "El paso de la cordillera y sus cavernas"
 msgstr ""
 
@@ -399,23 +399,23 @@ msgstr ""
 msgid "Prueba de suelo: rlyeh"
 msgstr ""
 
-#: data/arenas/ritual.json data/levels/p3_n2.tres
+#: data/arenas/ritual.json data/campaign.json data/levels/p3_n2.tres
 msgid "Los pantanos de Luisiana: el ritual del culto"
 msgstr ""
 
-#: data/arenas/rlyeh.json data/levels/p3_n5.tres
+#: data/arenas/rlyeh.json data/campaign.json data/levels/p3_n5.tres
 msgid "R'lyeh emergida: la puerta colosal"
 msgstr ""
 
-#: data/arenas/tejados.json data/levels/p2_n3.tres
+#: data/arenas/tejados.json data/campaign.json data/levels/p2_n3.tres
 msgid "El hotel Gilman House y la huida por los tejados"
 msgstr ""
 
-#: data/arenas/tormenta.json data/levels/p3_n4.tres
+#: data/arenas/tormenta.json data/campaign.json data/levels/p3_n4.tres
 msgid "La tormenta en el Pacífico"
 msgstr ""
 
-#: data/arenas/tuneles.json data/levels/p1_n5.tres
+#: data/arenas/tuneles.json data/campaign.json data/levels/p1_n5.tres
 msgid "Los túneles y el abismo del mar subterráneo"
 msgstr ""
 
@@ -584,19 +584,75 @@ msgid "Yo vi la ciudad de la que salió su dios."
 msgstr ""
 
 #: data/campaign.json
+msgid "Antiguos guerreros · Antiguos mutilados · Antiguos sembradores"
+msgstr ""
+
+#: data/campaign.json
+msgid "Antiguos revividos · Antiguos alados · Expedicionarios de Lake"
+msgstr ""
+
+#: data/campaign.json
 msgid "Antártida"
+msgstr ""
+
+#: data/campaign.json
+msgid "Barnabas Marsh · Profundos ancianos de Y'ha-nthlei · Nadadores de la marea · Hijas de los Marsh"
+msgstr ""
+
+#: data/campaign.json
+msgid "Descarnados nocturnos · Larvas de los Otros Dioses · Nyarlathotep"
+msgstr ""
+
+#: data/campaign.json
+msgid "Diablos con alas de murciélago · Cultistas del Alert · Tamborileros del pantano · Ídolos vivos · El viejo Castro"
+msgstr ""
+
+#: data/campaign.json data/levels/p4_n1.tres
+msgid "El bosque encantado y las afueras de Ulthar"
+msgstr ""
+
+#: data/campaign.json data/levels/p4_n2.tres
+msgid "El puerto de Dylath-Leen y la galera negra"
 msgstr ""
 
 #: data/campaign.json data/characters/dyer.tres data/part_finales.json data/pets/perro.tres
 msgid "En las montañas de la locura"
 msgstr ""
 
+#: data/campaign.json
+msgid "Engendros de Cthulhu · Profundos servidores · Ídolos vivos"
+msgstr ""
+
+#: data/campaign.json
+msgid "Ghasts · Gugs · Los necrófagos de Pickman · El gran gug de Koth"
+msgstr ""
+
+#: data/campaign.json
+msgid "Habitantes de Innsmouth · Acólitos de la Orden de Dagon"
+msgstr ""
+
+#: data/campaign.json
+msgid "Híbridos avanzados · Sacerdotes de la tiara · Guardianes de la Orden"
+msgstr ""
+
 #: data/campaign.json data/part_finales.json
 msgid "La búsqueda onírica de la desconocida Kadath"
 msgstr ""
 
+#: data/campaign.json data/levels/p4_n5.tres
+msgid "La cima de Kadath y el castillo de ónice"
+msgstr ""
+
+#: data/campaign.json
+msgid "La cosa blanca polipoide · Ángulos devoradores · Sonámbulos de Providence"
+msgstr ""
+
 #: data/campaign.json data/characters/johansen.tres data/characters/legrasse.tres data/part_finales.json
 msgid "La llamada de Cthulhu"
+msgstr ""
+
+#: data/campaign.json data/levels/p4_n3.tres
+msgid "La meseta de Leng y el monasterio sin ventanas"
 msgstr ""
 
 #: data/campaign.json data/characters/olmstead.tres data/part_finales.json data/pets/gaviota.tres
@@ -607,12 +663,56 @@ msgstr ""
 msgid "Las Tierras del Sueño"
 msgstr ""
 
+#: data/campaign.json data/levels/p4_n4.tres
+msgid "Las bóvedas de Zin y la torre de los gugs"
+msgstr ""
+
+#: data/campaign.json
+msgid "Mercaderes de Leng · Remeros lunares · La galera negra · El amo de la galera"
+msgstr ""
+
 #: data/campaign.json
 msgid "Nueva Inglaterra"
 msgstr ""
 
 #: data/campaign.json
+msgid "Pesadillas de la oleada de sueños · Cultistas · Sonámbulos de Providence"
+msgstr ""
+
+#: data/campaign.json
+msgid "Pingüinos albinos ciegos · Fragmentos protoplásmicos"
+msgstr ""
+
+#: data/campaign.json
+msgid "Primigenios menores · Emanaciones de la puerta · Cthulhu"
+msgstr ""
+
+#: data/campaign.json
+msgid "Profundos · Guardianes de la Orden · Hijas de los Marsh · La horda del Arrecife del Diablo · El capitán Obed Marsh"
+msgstr ""
+
+#: data/campaign.json
 msgid "Providence, Luisiana y el Pacífico"
+msgstr ""
+
+#: data/campaign.json
+msgid "Pth'thya-l'yi · Madre Hydra · Padre Dagon"
+msgstr ""
+
+#: data/campaign.json
+msgid "Shantaks · Arañas púrpura de Leng · El sumo sacerdote que no debe describirse · La madre de las arañas"
+msgstr ""
+
+#: data/campaign.json
+msgid "Shoggoths de ojos luminosos · Antiguos del mar abisal · Shoggoths excavadores · Antiguos sembradores · El shoggoth primigenio"
+msgstr ""
+
+#: data/campaign.json
+msgid "Shoggoths esclavos · Shoggoths miméticos · Shoggoths excavadores · Gedney"
+msgstr ""
+
+#: data/campaign.json
+msgid "Zoogs · Zoogs de las copas · Los gatos de Ulthar · El anciano de los zoogs"
 msgstr ""
 
 #: data/challenges.json
@@ -2091,6 +2191,10 @@ msgstr ""
 msgid "Tekeli-li… tekeli-li… resuena en las cavernas"
 msgstr ""
 
+#: data/levels/p1_n3.tres
+msgid "Una parka de la expedición de Lake avanza entre la ventisca. Dentro ya no hay solo un hombre…"
+msgstr ""
+
 #: data/levels/p1_n4.tres
 msgid "El guardián de la ciudad baja de su muro…"
 msgstr ""
@@ -2107,6 +2211,10 @@ msgstr ""
 msgid "Las puertas del templo se abren de par en par…"
 msgstr ""
 
+#: data/levels/p2_n3.tres
+msgid "Por los tejados se acerca un capitán de levita azul. Joven. Demasiado joven para ser Obed Marsh…"
+msgstr ""
+
 #: data/levels/p2_n3.tres scripts/level/level_data.gd
 msgid "la horda"
 msgstr ""
@@ -2117,6 +2225,10 @@ msgstr ""
 
 #: data/levels/p2_n4.tres
 msgid "Algo enorme se alza de la ciénaga con la levita hecha jirones…"
+msgstr ""
+
+#: data/levels/p2_n5.tres
+msgid "Del agua negra sale ella: la antepasada, Pth'thya-l'yi…"
 msgstr ""
 
 #: data/levels/p2_n5.tres
@@ -2132,7 +2244,15 @@ msgid "El bajorrelieve de arcilla se mueve. Lo que soñaba Wilcox se levanta de 
 msgstr ""
 
 #: data/levels/p3_n2.tres
+msgid "Entre los tambores, una voz cascada empieza el canto. El viejo Castro sabe las palabras…"
+msgstr ""
+
+#: data/levels/p3_n2.tres
 msgid "Los tambores callan. El sacerdote se alza junto al ídolo y empieza la invocación…"
+msgstr ""
+
+#: data/levels/p3_n3.tres
+msgid "Algo sube del agua por los pilotes del muelle…"
 msgstr ""
 
 #: data/levels/p3_n3.tres
@@ -2148,11 +2268,15 @@ msgid "La puerta negra se abre del todo. Cthulhu sale de R'lyeh."
 msgstr ""
 
 #: data/levels/p3_n5.tres
+msgid "Otro de los que yacen con él se levanta…"
+msgstr ""
+
+#: data/levels/p3_n5.tres
 msgid "Se deshace en una nube verde… y vuelve a juntarse."
 msgstr ""
 
-#: data/levels/p4_n1.tres
-msgid "El bosque encantado y las afueras de Ulthar"
+#: data/levels/p3_n5.tres
+msgid "Una de las figuras de piedra abre los ojos…"
 msgstr ""
 
 #: data/levels/p4_n1.tres
@@ -2163,28 +2287,16 @@ msgstr ""
 msgid "Algo enorme y pálido ha bajado de la galera negra. Los remeros se apartan a su paso…"
 msgstr ""
 
-#: data/levels/p4_n2.tres
-msgid "El puerto de Dylath-Leen y la galera negra"
-msgstr ""
-
 #: data/levels/p4_n3.tres
 msgid "Algo se descuelga de las grietas del monasterio, enorme y púrpura, y tiende sus redes por la meseta…"
 msgstr ""
 
 #: data/levels/p4_n3.tres
-msgid "La meseta de Leng y el monasterio sin ventanas"
-msgstr ""
-
-#: data/levels/p4_n4.tres
-msgid "Las bóvedas de Zin y la torre de los gugs"
+msgid "Suenan flautas y tambores: sale del monasterio el sumo sacerdote de la máscara amarilla"
 msgstr ""
 
 #: data/levels/p4_n4.tres
 msgid "Retumban las bóvedas: baja de la torre de Koth el gran gug, y los ghasts se apartan a su paso…"
-msgstr ""
-
-#: data/levels/p4_n5.tres
-msgid "La cima de Kadath y el castillo de ónice"
 msgstr ""
 
 #: data/levels/p4_n5.tres
@@ -6553,8 +6665,24 @@ msgstr ""
 msgid "Un chorro más largo y más ancho que deja fuego en el suelo durante más tiempo."
 msgstr ""
 
+#: data/weapons/ancla.tres data/weapons/angulos_imposibles.tres data/weapons/antitanque.tres data/weapons/arpon.tres
+msgid "+25 % de daño"
+msgstr ""
+
 #: data/weapons/ancla.tres
 msgid "Ancla del Alert"
+msgstr ""
+
+#: data/weapons/ancla.tres
+msgid "Dos anclas"
+msgstr ""
+
+#: data/weapons/ancla.tres data/weapons/lampara.tres
+msgid "Gira un 30 % más de tiempo"
+msgstr ""
+
+#: data/weapons/ancla.tres
+msgid "Más lejos y más deprisa"
 msgstr ""
 
 #: data/weapons/ancla.tres
@@ -6570,7 +6698,19 @@ msgid "Dos anclas más grandes y pesadas que giran más lejos."
 msgstr ""
 
 #: data/weapons/angulos_imposibles.tres
+msgid "+20 % de daño y un ángulo más"
+msgstr ""
+
+#: data/weapons/angulos_imposibles.tres
+msgid "Atraviesan a dos más"
+msgstr ""
+
+#: data/weapons/angulos_imposibles.tres
 msgid "Lanza ángulos que salen torcidos y doblan esquinas en ángulo recto hasta dar con el enemigo. Atraviesan paredes, árboles y a varios enemigos."
+msgstr ""
+
+#: data/weapons/angulos_imposibles.tres
+msgid "Un ángulo más"
 msgstr ""
 
 #: data/weapons/angulos_imposibles.tres
@@ -6582,11 +6722,31 @@ msgid "Antitanque Mauser"
 msgstr ""
 
 #: data/weapons/antitanque.tres
+msgid "Bala más gruesa y más empuje"
+msgstr ""
+
+#: data/weapons/antitanque.tres
 msgid "Disparo muy lento que atraviesa a todos los enemigos de la línea."
+msgstr ""
+
+#: data/weapons/antitanque.tres data/weapons/cthugha.tres data/weapons/gas.tres data/weapons/latigo.tres
+msgid "Recarga un 15 % más rápido"
 msgstr ""
 
 #: data/weapons/arpon.tres
 msgid "Arpón ballenero"
+msgstr ""
+
+#: data/weapons/arpon.tres
+msgid "Arrastra más y atraviesa a dos más"
+msgstr ""
+
+#: data/weapons/arpon.tres
+msgid "Dos arpones y +20 % de daño"
+msgstr ""
+
+#: data/weapons/arpon.tres data/weapons/granada.tres
+msgid "Lanza un 20 % más rápido"
 msgstr ""
 
 #: data/weapons/arpon.tres
@@ -6602,7 +6762,19 @@ msgid "Dos arpones lastrados que atraviesan a todos los de la línea y los arras
 msgstr ""
 
 #: data/weapons/ballesta.tres
+msgid "Atraviesa un enemigo más"
+msgstr ""
+
+#: data/weapons/ballesta.tres
 msgid "Ballesta"
+msgstr ""
+
+#: data/weapons/ballesta.tres
+msgid "Clava un 50 % más de tiempo"
+msgstr ""
+
+#: data/weapons/ballesta.tres
+msgid "Dos virotes por disparo"
 msgstr ""
 
 #: data/weapons/ballesta.tres
@@ -6627,6 +6799,18 @@ msgstr ""
 
 #: data/weapons/bar.tres
 msgid "Ráfagas cuyas balas rebotan hacia otro enemigo cercano."
+msgstr ""
+
+#: data/weapons/bar.tres
+msgid "Un rebote más"
+msgstr ""
+
+#: data/weapons/bar.tres
+msgid "Un rebote más y algo más de cadencia"
+msgstr ""
+
+#: data/weapons/bar.tres
+msgid "Una bala más por ráfaga"
 msgstr ""
 
 #: data/weapons/bar_asalto.tres
@@ -6670,7 +6854,23 @@ msgid "Tres bengalas que atraen menos tiempo, pero su fogonazo deja clavados a l
 msgstr ""
 
 #: data/weapons/bengalas.tres
+msgid "+40 % de daño y más radio"
+msgstr ""
+
+#: data/weapons/bengalas.tres
 msgid "Bengala que ilumina y atrae a los enemigos cercanos (las élites no caen)."
+msgstr ""
+
+#: data/weapons/bengalas.tres data/weapons/mauser.tres
+msgid "Dispara un 20 % más rápido"
+msgstr ""
+
+#: data/weapons/bengalas.tres
+msgid "Dos bengalas que arden más"
+msgstr ""
+
+#: data/weapons/bengalas.tres
+msgid "La bengala arde más tiempo"
 msgstr ""
 
 #: data/weapons/bengalas.tres
@@ -6690,7 +6890,23 @@ msgid "Abanico de hojas que atraviesan."
 msgstr ""
 
 #: data/weapons/bisturis.tres
+msgid "Atraviesan a un enemigo más"
+msgstr ""
+
+#: data/weapons/bisturis.tres
 msgid "Bisturís"
+msgstr ""
+
+#: data/weapons/bisturis.tres
+msgid "Dos bisturís más y lanza un 15 % más rápido"
+msgstr ""
+
+#: data/weapons/bisturis.tres
+msgid "Lanza un 4 % más rápido"
+msgstr ""
+
+#: data/weapons/bisturis.tres
+msgid "Un bisturí más"
 msgstr ""
 
 #: data/weapons/bobina_nikola.tres
@@ -6717,8 +6933,24 @@ msgstr ""
 msgid "Dos frascos por disparo; charcos más grandes que dejan vulnerables más tiempo."
 msgstr ""
 
+#: data/weapons/bumeran.tres data/weapons/cepos.tres data/weapons/daga.tres data/weapons/ensueno_celephais.tres
+msgid "+30 % de daño"
+msgstr ""
+
 #: data/weapons/bumeran.tres
 msgid "Bumerán"
+msgstr ""
+
+#: data/weapons/bumeran.tres
+msgid "Dos bumeranes"
+msgstr ""
+
+#: data/weapons/bumeran.tres
+msgid "Llega más lejos y vuela más rápido"
+msgstr ""
+
+#: data/weapons/bumeran.tres
+msgid "Tres bumeranes y +20 % de daño"
 msgstr ""
 
 #: data/weapons/bumeran.tres
@@ -6806,11 +7038,19 @@ msgid "Un solo cepo enorme que atrapa a todos los de alrededor."
 msgstr ""
 
 #: data/weapons/cepos.tres
+msgid "Atrapan más tiempo y desde más lejos"
+msgstr ""
+
+#: data/weapons/cepos.tres
 msgid "Cepos"
 msgstr ""
 
 #: data/weapons/cepos.tres
 msgid "Deja cepos en el suelo: el primero que los pisa queda atrapado y herido."
+msgstr ""
+
+#: data/weapons/cepos.tres
+msgid "Un cepo más a la vez"
 msgstr ""
 
 #: data/weapons/cepos_cazador.tres
@@ -6862,6 +7102,14 @@ msgid "Ogthrod ai'f geb'l-ee'h: los levantados vuelven a ser polvo de golpe y re
 msgstr ""
 
 #: data/weapons/corredera.tres
+msgid "Cuatro perdigones más y más empuje"
+msgstr ""
+
+#: data/weapons/corredera.tres data/weapons/recortada.tres
+msgid "Dos perdigones más"
+msgstr ""
+
+#: data/weapons/corredera.tres
 msgid "Escopeta de corredera"
 msgstr ""
 
@@ -6869,8 +7117,20 @@ msgstr ""
 msgid "Perdigones que se abren en anillo alrededor del personaje."
 msgstr ""
 
+#: data/weapons/corredera.tres
+msgid "Recarga un 20 % más rápido"
+msgstr ""
+
 #: data/weapons/cthugha.tres
 msgid "Bola de fuego vivo que atraviesa a los enemigos y deja un rastro ardiendo."
+msgstr ""
+
+#: data/weapons/cthugha.tres
+msgid "Bola más grande"
+msgstr ""
+
+#: data/weapons/cthugha.tres
+msgid "El rastro arde un 30 % más"
 msgstr ""
 
 #: data/weapons/cthugha.tres
@@ -6882,7 +7142,19 @@ msgid "Apuñala al enemigo más cercano y lo maldice: pierde vida poco a poco y,
 msgstr ""
 
 #: data/weapons/daga.tres
+msgid "Apuñala antes y la maldición daña más"
+msgstr ""
+
+#: data/weapons/daga.tres
 msgid "Daga ritual"
+msgstr ""
+
+#: data/weapons/daga.tres
+msgid "La maldición daña un 50 % más"
+msgstr ""
+
+#: data/weapons/daga.tres
+msgid "Salta a uno más y llega más lejos"
 msgstr ""
 
 #: data/weapons/daga_obsidiana.tres
@@ -6902,7 +7174,19 @@ msgid "La maldición dura más, quema más y salta a cuatro enemigos al morir el
 msgstr ""
 
 #: data/weapons/el_umbral.tres
+msgid "+30 % de daño y más a menudo"
+msgstr ""
+
+#: data/weapons/el_umbral.tres
+msgid "Asenath, una mirada más"
+msgstr ""
+
+#: data/weapons/el_umbral.tres
 msgid "Depende de quién esté en el cuerpo. Edward da un golpe alrededor, de cerca y fuerte (físico); Asenath lanza dos miradas verdes que buscan al enemigo (mágicas, cuestan cordura). Cada esquive los cambia."
+msgstr ""
+
+#: data/weapons/el_umbral.tres
+msgid "El golpe de Edward, un 20 % más amplio"
 msgstr ""
 
 #: data/weapons/el_umbral.tres
@@ -6918,7 +7202,19 @@ msgid "Enjambre de Yuggoth"
 msgstr ""
 
 #: data/weapons/ensueno_celephais.tres
+msgid "+25 % de daño y sueña más tiempo"
+msgstr ""
+
+#: data/weapons/ensueno_celephais.tres
 msgid "Ensueño de Celephaïs"
+msgstr ""
+
+#: data/weapons/ensueno_celephais.tres
+msgid "Los de dentro, aún más lentos"
+msgstr ""
+
+#: data/weapons/ensueno_celephais.tres
+msgid "Sueño un 15 % más amplio"
 msgstr ""
 
 #: data/weapons/ensueno_celephais.tres
@@ -6942,11 +7238,23 @@ msgid "Un anillo de perdigones el doble de denso que barre todo alrededor y empu
 msgstr ""
 
 #: data/weapons/estoque.tres
+msgid "+30 % de daño y más ancha"
+msgstr ""
+
+#: data/weapons/estoque.tres
 msgid "Bastón estoque"
 msgstr ""
 
 #: data/weapons/estoque.tres
 msgid "Estocada larga y rápida hacia el enemigo más cercano que atraviesa todo lo que hay en la línea. Espera a tener a alguien a su alcance."
+msgstr ""
+
+#: data/weapons/estoque.tres
+msgid "Estocada un 25 % más larga"
+msgstr ""
+
+#: data/weapons/estoque.tres
+msgid "Estocadas un 20 % más rápidas"
 msgstr ""
 
 #: data/weapons/estoque_duelista.tres
@@ -6974,11 +7282,27 @@ msgid "Un haz mucho más largo que gira despacio y dura más."
 msgstr ""
 
 #: data/weapons/farolero.tres
+msgid "Buscan mejor y vuelan más deprisa"
+msgstr ""
+
+#: data/weapons/farolero.tres
 msgid "Báculo del Farolero"
 msgstr ""
 
 #: data/weapons/farolero.tres
+msgid "Dos fuegos más y +15 % de daño"
+msgstr ""
+
+#: data/weapons/farolero.tres
 msgid "Suelta fuegos fatuos que zigzaguean y buscan solos a los enemigos. Cuesta cordura."
+msgstr ""
+
+#: data/weapons/farolero.tres
+msgid "Un fuego fatuo más"
+msgstr ""
+
+#: data/weapons/flammenwerfer.tres
+msgid "+30 % de daño y el fuego dura más"
 msgstr ""
 
 #: data/weapons/flammenwerfer.tres
@@ -6986,7 +7310,15 @@ msgid "Chorro de fuego en cono que deja el suelo ardiendo."
 msgstr ""
 
 #: data/weapons/flammenwerfer.tres
+msgid "Chorro más largo"
+msgstr ""
+
+#: data/weapons/flammenwerfer.tres
 msgid "Flammenwerfer"
+msgstr ""
+
+#: data/weapons/flammenwerfer.tres
+msgid "Llega más lejos y más ancho"
 msgstr ""
 
 #: data/weapons/formula.tres
@@ -6994,7 +7326,19 @@ msgid "Fórmula de expulsión"
 msgstr ""
 
 #: data/weapons/formula.tres
+msgid "Onda más amplia y +30 % de daño"
+msgstr ""
+
+#: data/weapons/formula.tres
 msgid "Onda que se expande desde el personaje, empuja y aturde. Cuesta cordura."
+msgstr ""
+
+#: data/weapons/formula.tres data/weapons/maquina_mas_alla.tres
+msgid "Onda un 15 % más amplia"
+msgstr ""
+
+#: data/weapons/formula.tres
+msgid "Recita un 20 % más rápido y aturde más"
 msgstr ""
 
 #: data/weapons/fosgeno.tres
@@ -7018,7 +7362,19 @@ msgid "Cohetes erráticos que estallan en chispas."
 msgstr ""
 
 #: data/weapons/fuegos.tres
+msgid "Dos chispas más al estallar"
+msgstr ""
+
+#: data/weapons/fuegos.tres
 msgid "Fuegos artificiales"
+msgstr ""
+
+#: data/weapons/fuegos.tres
+msgid "Tres chispas más y +20 % de daño"
+msgstr ""
+
+#: data/weapons/fuegos.tres
+msgid "Un cohete más"
 msgstr ""
 
 #: data/weapons/fusil_cazacarros.tres
@@ -7037,12 +7393,20 @@ msgstr ""
 msgid "Tres lienzos a la vez, que atraen desde más lejos y sueltan necrófagos que cazan más tiempo."
 msgstr ""
 
+#: data/weapons/gas.tres data/weapons/yog.tres
+msgid "Dura un 25 % más"
+msgstr ""
+
 #: data/weapons/gas.tres
 msgid "Gas de cloro"
 msgstr ""
 
 #: data/weapons/gas.tres
 msgid "Nube tóxica que deriva lentamente hacia los enemigos y los envenena."
+msgstr ""
+
+#: data/weapons/gas.tres
+msgid "Nube un 15 % más grande"
 msgstr ""
 
 #: data/weapons/gas_mostaza.tres
@@ -7070,11 +7434,23 @@ msgid "Una onda mayor que deshace las balas más lejos y más a menudo."
 msgstr ""
 
 #: data/weapons/granada.tres
+msgid "Explosión un 15 % más amplia"
+msgstr ""
+
+#: data/weapons/granada.tres
 msgid "Granada de palo lanzada a la zona más densa; gran explosión al impactar."
 msgstr ""
 
 #: data/weapons/granada.tres
+msgid "Lanza dos granadas"
+msgstr ""
+
+#: data/weapons/granada.tres
 msgid "Stielhandgranate"
+msgstr ""
+
+#: data/weapons/granada.tres
+msgid "Una granada más y +25 % de daño"
 msgstr ""
 
 #: data/weapons/huellas_dunwich.tres
@@ -7082,7 +7458,19 @@ msgid "El hermano de Wilbur, que nadie ve, avanza en línea recta hacia el grupo
 msgstr ""
 
 #: data/weapons/huellas_dunwich.tres
+msgid "Las pisadas llegan un 30 % más lejos"
+msgstr ""
+
+#: data/weapons/huellas_dunwich.tres
+msgid "Pisa antes y +25 % de daño"
+msgstr ""
+
+#: data/weapons/huellas_dunwich.tres
 msgid "Pisadas de lo invisible"
+msgstr ""
+
+#: data/weapons/huellas_dunwich.tres
+msgid "Pisadas más anchas y aturde más"
 msgstr ""
 
 #: data/weapons/huellas_gemelo.tres
@@ -7114,7 +7502,23 @@ msgid "Aliento de Ithaqua"
 msgstr ""
 
 #: data/weapons/ithaqua.tres
+msgid "Cono más ancho"
+msgstr ""
+
+#: data/weapons/ithaqua.tres
+msgid "Sopla un 30 % más"
+msgstr ""
+
+#: data/weapons/ithaqua.tres data/weapons/lampara.tres
+msgid "Un 15 % más de alcance"
+msgstr ""
+
+#: data/weapons/ithaqua.tres
 msgid "Viento helado en cono que frena a los enemigos y congela a los que siguen dentro."
+msgstr ""
+
+#: data/weapons/lampara.tres
+msgid "Gira un 30 % más deprisa"
 msgstr ""
 
 #: data/weapons/lampara.tres
@@ -7149,12 +7553,32 @@ msgstr ""
 msgid "Un chorro estrecho y larguísimo que se recarga antes; deja menos fuego en el suelo."
 msgstr ""
 
+#: data/weapons/lanzaquimicos.tres data/weapons/molotov.tres
+msgid "Charco un 20 % más amplio"
+msgstr ""
+
+#: data/weapons/lanzaquimicos.tres
+msgid "El ácido dura más y cubre más"
+msgstr ""
+
 #: data/weapons/lanzaquimicos.tres
 msgid "Frasco de ácido: los enemigos del charco reciben un 25 % más de daño."
 msgstr ""
 
 #: data/weapons/lanzaquimicos.tres
+msgid "Lanza dos frascos"
+msgstr ""
+
+#: data/weapons/lanzaquimicos.tres
 msgid "Lanzaquímicos"
+msgstr ""
+
+#: data/weapons/lanzaquimicos.tres
+msgid "Vulnerables más tiempo y más daño"
+msgstr ""
+
+#: data/weapons/latigo.tres
+msgid "Arco más ancho"
 msgstr ""
 
 #: data/weapons/latigo.tres
@@ -7163,6 +7587,10 @@ msgstr ""
 
 #: data/weapons/latigo.tres
 msgid "Látigo"
+msgstr ""
+
+#: data/weapons/latigo.tres
+msgid "Un 15 % más largo"
 msgstr ""
 
 #: data/weapons/latigo_domador.tres
@@ -7182,7 +7610,19 @@ msgid "Un chasquido estrecho que llega casi el doble de lejos, más seguido."
 msgstr ""
 
 #: data/weapons/lente.tres
+msgid "El daño crece más deprisa"
+msgstr ""
+
+#: data/weapons/lente.tres
+msgid "El rayo dura un segundo más"
+msgstr ""
+
+#: data/weapons/lente.tres
 msgid "Lente del Éter"
+msgstr ""
+
+#: data/weapons/lente.tres
+msgid "Más alcance, +20 % de daño y hasta el cuádruple"
 msgstr ""
 
 #: data/weapons/lente.tres
@@ -7202,7 +7642,31 @@ msgid "Ametralladora Lewis"
 msgstr ""
 
 #: data/weapons/lewis.tres
+msgid "Dispara 3 s más"
+msgstr ""
+
+#: data/weapons/lewis.tres
+msgid "Dispara un 25 % más rápido"
+msgstr ""
+
+#: data/weapons/lewis.tres
 msgid "Monta la ametralladora en su trípode, en el suelo; dispara sola al más cercano durante 8 segundos."
+msgstr ""
+
+#: data/weapons/lewis.tres
+msgid "Se monta antes y +20 % de daño"
+msgstr ""
+
+#: data/weapons/lienzos.tres
+msgid "+25 % de daño y atraen desde más lejos"
+msgstr ""
+
+#: data/weapons/lienzos.tres
+msgid "Dos lienzos a la vez"
+msgstr ""
+
+#: data/weapons/lienzos.tres
+msgid "El necrófago caza 2 s más"
 msgstr ""
 
 #: data/weapons/lienzos.tres
@@ -7238,11 +7702,23 @@ msgid "Llave de la ignota Kadath"
 msgstr ""
 
 #: data/weapons/llave_suenos.tres
+msgid "Adormece más y llega más lejos"
+msgstr ""
+
+#: data/weapons/llave_suenos.tres
+msgid "Dos llaves"
+msgstr ""
+
+#: data/weapons/llave_suenos.tres
 msgid "La llave de plata de Randolph Carter va hasta su alcance y vuelve, y deja adormilado un momento a todo lo que toca."
 msgstr ""
 
 #: data/weapons/llave_suenos.tres
 msgid "Llave de los sueños"
+msgstr ""
+
+#: data/weapons/llave_suenos.tres
+msgid "Tres llaves y +20 % de daño"
 msgstr ""
 
 #: data/weapons/llave_ulthar.tres
@@ -7270,7 +7746,19 @@ msgid "Una onda mucho más amplia: revela más tiempo y lo revelado recibe aún 
 msgstr ""
 
 #: data/weapons/lugers.tres
+msgid "Disparan un 20 % más rápido"
+msgstr ""
+
+#: data/weapons/lugers.tres
+msgid "Dos balas por lado"
+msgstr ""
+
+#: data/weapons/lugers.tres
 msgid "Lugers a dos manos"
+msgstr ""
+
+#: data/weapons/lugers.tres
+msgid "Tres balas por lado y +20 % de daño"
 msgstr ""
 
 #: data/weapons/lugers.tres
@@ -7294,11 +7782,23 @@ msgid "Lugers de feria"
 msgstr ""
 
 #: data/weapons/machete.tres
+msgid "+30 % de daño y tajo más amplio"
+msgstr ""
+
+#: data/weapons/machete.tres
+msgid "Golpea un 20 % más rápido"
+msgstr ""
+
+#: data/weapons/machete.tres
 msgid "Machete"
 msgstr ""
 
 #: data/weapons/machete.tres
 msgid "Tajo circular alrededor del personaje; solo golpea si hay alguien cerca."
+msgstr ""
+
+#: data/weapons/machete.tres
+msgid "Tajo un 20 % más amplio"
 msgstr ""
 
 #: data/weapons/machete_canaveral.tres
@@ -7318,6 +7818,14 @@ msgid "Tajos el doble de seguidos, que apenas empujan: no dejan respirar."
 msgstr ""
 
 #: data/weapons/maquina_mas_alla.tres
+msgid "+25 % de daño y vibra más a menudo"
+msgstr ""
+
+#: data/weapons/maquina_mas_alla.tres
+msgid "Los revelados reciben un 10 % más"
+msgstr ""
+
+#: data/weapons/maquina_mas_alla.tres
 msgid "Máquina del más allá"
 msgstr ""
 
@@ -7326,7 +7834,19 @@ msgid "Una onda violeta que revela lo que nos rodea: los alcanzados reciben un 3
 msgstr ""
 
 #: data/weapons/martillo.tres
+msgid "Golpea antes y +25 % de daño"
+msgstr ""
+
+#: data/weapons/martillo.tres
 msgid "Golpea el suelo y abre una grieta que avanza en línea recta, daña y aturde un momento a todo lo que encuentra."
+msgstr ""
+
+#: data/weapons/martillo.tres
+msgid "Grieta más ancha y aturde más"
+msgstr ""
+
+#: data/weapons/martillo.tres
+msgid "La grieta llega un 30 % más lejos"
 msgstr ""
 
 #: data/weapons/martillo.tres
@@ -7342,11 +7862,19 @@ msgid "Una grieta más larga y más ancha que aturde más tiempo."
 msgstr ""
 
 #: data/weapons/mauser.tres
+msgid "+30 % de daño y atraviesan a un enemigo"
+msgstr ""
+
+#: data/weapons/mauser.tres
 msgid "Pistola Mauser C96"
 msgstr ""
 
 #: data/weapons/mauser.tres
 msgid "Ráfagas cortas de tres trazadoras."
+msgstr ""
+
+#: data/weapons/mauser.tres
+msgid "Ráfagas de cuatro"
 msgstr ""
 
 #: data/weapons/mauser_tillinghast.tres
@@ -7366,11 +7894,23 @@ msgid "Medusas del más allá"
 msgstr ""
 
 #: data/weapons/migo.tres
+msgid "Duran 3 s más y disparan más rápido"
+msgstr ""
+
+#: data/weapons/migo.tres
 msgid "Orbe Mi-Go"
 msgstr ""
 
 #: data/weapons/migo.tres
+msgid "Otro orbe y +20 % de daño"
+msgstr ""
+
+#: data/weapons/migo.tres
 msgid "Un orbe de los hongos de Yuggoth vuela solo a tu alrededor y dispara al enemigo más cercano. Cuesta cordura."
+msgstr ""
+
+#: data/weapons/migo.tres
+msgid "Un orbe más"
 msgstr ""
 
 #: data/weapons/mil_crias.tres
@@ -7398,11 +7938,31 @@ msgid "Un ancla que gira muy deprisa y muy cerca, golpeando más a menudo."
 msgstr ""
 
 #: data/weapons/molotov.tres
+msgid "+30 % de daño del fuego"
+msgstr ""
+
+#: data/weapons/molotov.tres
+msgid "Arde más tiempo y +25 % de daño"
+msgstr ""
+
+#: data/weapons/molotov.tres
 msgid "Botella en arco que crea un charco en llamas."
 msgstr ""
 
 #: data/weapons/molotov.tres
 msgid "Cóctel Molotov"
+msgstr ""
+
+#: data/weapons/molotov.tres
+msgid "Lanza dos botellas"
+msgstr ""
+
+#: data/weapons/mortero.tres
+msgid "Dos proyectiles por disparo"
+msgstr ""
+
+#: data/weapons/mortero.tres
+msgid "Explosión un 15 % más grande"
 msgstr ""
 
 #: data/weapons/mortero.tres
@@ -7422,7 +7982,15 @@ msgid "Un proyectil enorme que deja el suelo ardiendo, algo menos seguido."
 msgstr ""
 
 #: data/weapons/nagant.tres
+msgid "Dos balas por disparo"
+msgstr ""
+
+#: data/weapons/nagant.tres
 msgid "Nagant de Danforth"
+msgstr ""
+
+#: data/weapons/nagant.tres
+msgid "Recarga un 10 % más rápido"
 msgstr ""
 
 #: data/weapons/nagant.tres
@@ -7446,11 +8014,23 @@ msgid "Su cadencia llega a cuatro veces la inicial y acelera antes."
 msgstr ""
 
 #: data/weapons/necronomicon.tres
+msgid "Dos páginas más y +20 % de daño"
+msgstr ""
+
+#: data/weapons/necronomicon.tres
+msgid "Duran más y giran más lejos"
+msgstr ""
+
+#: data/weapons/necronomicon.tres
 msgid "Necronomicón"
 msgstr ""
 
 #: data/weapons/necronomicon.tres
 msgid "Páginas que orbitan alrededor del personaje. Cuesta cordura."
+msgstr ""
+
+#: data/weapons/necronomicon.tres
+msgid "Una página más"
 msgstr ""
 
 #: data/weapons/necronomicon_completo.tres
@@ -7494,11 +8074,27 @@ msgid "Valle de Ooth-Nargai"
 msgstr ""
 
 #: data/weapons/palanca.tres
+msgid "Atraviesa a otro más y dispara un 10 % más rápido"
+msgstr ""
+
+#: data/weapons/palanca.tres
+msgid "Atraviesa a un enemigo más"
+msgstr ""
+
+#: data/weapons/palanca.tres
+msgid "Dispara un 15 % más rápido"
+msgstr ""
+
+#: data/weapons/palanca.tres
 msgid "Disparos rápidos que atraviesan a varios enemigos."
 msgstr ""
 
 #: data/weapons/palanca.tres
 msgid "Rifle de palanca"
+msgstr ""
+
+#: data/weapons/palanca.tres
+msgid "Un segundo disparo"
 msgstr ""
 
 #: data/weapons/piolet_pabodie.tres
@@ -7510,7 +8106,23 @@ msgid "Piolet de Pabodie"
 msgstr ""
 
 #: data/weapons/polvo.tres
+msgid "Doble daño y frena más"
+msgstr ""
+
+#: data/weapons/polvo.tres
 msgid "Esparce una nube sobre el grupo más denso: dentro, los enemigos van un 40 % más lentos y hacen un 30 % menos de daño. Cuesta cordura."
+msgstr ""
+
+#: data/weapons/polvo.tres
+msgid "La nube dura 2 s más"
+msgstr ""
+
+#: data/weapons/polvo.tres
+msgid "Nube más amplia y más frecuente"
+msgstr ""
+
+#: data/weapons/polvo.tres
+msgid "Nube un 20 % más amplia"
 msgstr ""
 
 #: data/weapons/polvo.tres
@@ -7605,6 +8217,10 @@ msgstr ""
 msgid "Recortada"
 msgstr ""
 
+#: data/weapons/recortada.tres
+msgid "Un tercer disparo y más empuje"
+msgstr ""
+
 #: data/weapons/recortada_contrabandista.tres
 msgid "Recortada del contrabandista"
 msgstr ""
@@ -7622,11 +8238,27 @@ msgid "Un solo disparo de tres balas gruesas que atraviesan y lanzan lejos."
 msgstr ""
 
 #: data/weapons/red.tres
+msgid "Dos redes y más amplias"
+msgstr ""
+
+#: data/weapons/red.tres
+msgid "Inmoviliza 1 s más"
+msgstr ""
+
+#: data/weapons/red.tres
 msgid "Lanza una red sobre el grupo más denso: los de debajo se quedan inmóviles 2 segundos. Las élites solo se frenan."
 msgstr ""
 
 #: data/weapons/red.tres
 msgid "Red de pesca"
+msgstr ""
+
+#: data/weapons/red.tres
+msgid "Red un 20 % más amplia"
+msgstr ""
+
+#: data/weapons/red.tres
+msgid "Se lanza antes y hace más daño"
 msgstr ""
 
 #: data/weapons/red_innsmouth.tres
@@ -7646,11 +8278,27 @@ msgid "Tres redes más pequeñas a la vez."
 msgstr ""
 
 #: data/weapons/resonador.tres
+msgid "+50 % de daño"
+msgstr ""
+
+#: data/weapons/resonador.tres
+msgid "Pulso más amplio y más frecuente"
+msgstr ""
+
+#: data/weapons/resonador.tres
+msgid "Pulso un 15 % más amplio"
+msgstr ""
+
+#: data/weapons/resonador.tres
 msgid "Resonador"
 msgstr ""
 
 #: data/weapons/resonador.tres
 msgid "Vibra cada poco y su pulso deshace las balas enemigas cercanas; hace poco daño. Solo vibra si hay balas o enemigos cerca. Cuesta cordura."
+msgstr ""
+
+#: data/weapons/resonador.tres
+msgid "Vibra un 15 % más a menudo"
 msgstr ""
 
 #: data/weapons/resonador_crawford.tres
@@ -7702,7 +8350,19 @@ msgid "Una estocada ancha y pesada que echa atrás a toda la línea."
 msgstr ""
 
 #: data/weapons/sales_esenciales.tres
+msgid "+20 % de daño y un círculo más ancho"
+msgstr ""
+
+#: data/weapons/sales_esenciales.tres
 msgid "Esparce las sales donde más enemigos han caído y recita la fórmula: daña a los de alrededor y levanta a dos de los caídos, que luchan por él un rato. Cuesta cordura."
+msgstr ""
+
+#: data/weapons/sales_esenciales.tres
+msgid "Levanta a uno más"
+msgstr ""
+
+#: data/weapons/sales_esenciales.tres
+msgid "Los levantados duran 1,5 s más"
 msgstr ""
 
 #: data/weapons/sales_esenciales.tres
@@ -7725,12 +8385,48 @@ msgstr ""
 msgid "Tentáculos que brotan del suelo, tras un aviso, bajo enemigos al azar."
 msgstr ""
 
+#: data/weapons/shub.tres
+msgid "Un 20 % más grandes"
+msgstr ""
+
+#: data/weapons/shub.tres
+msgid "Un tentáculo más"
+msgstr ""
+
+#: data/weapons/signo.tres data/weapons/trapezoedro.tres
+msgid "+35 % de daño"
+msgstr ""
+
+#: data/weapons/signo.tres
+msgid "Dura más y frena más las balas"
+msgstr ""
+
+#: data/weapons/signo.tres
+msgid "Se traza antes y es más amplio"
+msgstr ""
+
 #: data/weapons/signo.tres
 msgid "Signo Arcano"
 msgstr ""
 
 #: data/weapons/signo.tres
+msgid "Signo un 15 % más amplio"
+msgstr ""
+
+#: data/weapons/signo.tres
 msgid "Traza bajo sus pies un signo que daña y empuja hacia fuera a los enemigos; las balas enemigas que lo cruzan van a la mitad de velocidad. Cuesta cordura."
+msgstr ""
+
+#: data/weapons/signo_amarillo.tres
+msgid "Atacan un 30 % más fuerte"
+msgstr ""
+
+#: data/weapons/signo_amarillo.tres
+msgid "Dura un 30 % más"
+msgstr ""
+
+#: data/weapons/signo_amarillo.tres
+msgid "Enloquece a uno más"
 msgstr ""
 
 #: data/weapons/signo_amarillo.tres
@@ -7758,7 +8454,19 @@ msgid "Un signo mucho mayor que frena aún más las balas enemigas."
 msgstr ""
 
 #: data/weapons/springfield.tres
+msgid "+30 % de daño y críticos cuádruples"
+msgstr ""
+
+#: data/weapons/springfield.tres
+msgid "Dispara antes y atraviesa a uno más"
+msgstr ""
+
+#: data/weapons/springfield.tres
 msgid "Disparo lento y fuerte que busca primero a la élite o al enemigo con más vida; a veces es un crítico triple. Atraviesa a uno."
+msgstr ""
+
+#: data/weapons/springfield.tres
+msgid "Más críticos"
 msgstr ""
 
 #: data/weapons/springfield.tres
@@ -7797,12 +8505,36 @@ msgstr ""
 msgid "Descarga un rayo al enemigo más cercano que salta a los siguientes, hasta cuatro; cada salto hace un poco menos."
 msgstr ""
 
+#: data/weapons/tesla.tres
+msgid "Dos saltos más y +20 % de daño"
+msgstr ""
+
+#: data/weapons/tesla.tres
+msgid "Salta a un enemigo más"
+msgstr ""
+
+#: data/weapons/tesla.tres
+msgid "Saltos más largos y descarga antes"
+msgstr ""
+
+#: data/weapons/thompson.tres
+msgid "Cuatro balas más y +20 % de daño"
+msgstr ""
+
+#: data/weapons/thompson.tres
+msgid "Dispara un 20 % más a menudo"
+msgstr ""
+
 #: data/weapons/thompson.tres
 msgid "Ráfagas cerradas de proyectiles pequeños."
 msgstr ""
 
 #: data/weapons/thompson.tres
 msgid "Thompson M1928"
+msgstr ""
+
+#: data/weapons/thompson.tres
+msgid "Tres balas más por ráfaga"
 msgstr ""
 
 #: data/weapons/thompson_chicago.tres
@@ -7822,7 +8554,15 @@ msgid "Thompson del agente federal"
 msgstr ""
 
 #: data/weapons/trapezoedro.tres
+msgid "Brilla un 20 % más a menudo"
+msgstr ""
+
+#: data/weapons/trapezoedro.tres
 msgid "Rayo de luz concentrada que daña todo lo que atraviesa. Cuesta cordura."
+msgstr ""
+
+#: data/weapons/trapezoedro.tres
+msgid "Rayo más largo y más ancho"
 msgstr ""
 
 #: data/weapons/trapezoedro.tres
@@ -7870,6 +8610,18 @@ msgid "Un aliento helado estrecho que llega muy lejos."
 msgstr ""
 
 #: data/weapons/webly.tres
+msgid "Atraviesa a un enemigo"
+msgstr ""
+
+#: data/weapons/webly.tres
+msgid "Atraviesa a un enemigo más y +20 % de daño"
+msgstr ""
+
+#: data/weapons/webly.tres
+msgid "Dos disparos seguidos"
+msgstr ""
+
+#: data/weapons/webly.tres
 msgid "Proyectiles pesados que hacen retroceder a los enemigos."
 msgstr ""
 
@@ -7894,11 +8646,23 @@ msgid "Un viento helado más largo y ancho que congela antes."
 msgstr ""
 
 #: data/weapons/west.tres
+msgid "Dispara antes y los aliados duran más"
+msgstr ""
+
+#: data/weapons/west.tres
 msgid "Dispara dardos de suero: el enemigo que muere con el suero dentro se levanta 6 segundos como aliado y ataca a los suyos."
 msgstr ""
 
 #: data/weapons/west.tres
+msgid "Dos dardos a la vez"
+msgstr ""
+
+#: data/weapons/west.tres
 msgid "Inyector de West"
+msgstr ""
+
+#: data/weapons/west.tres
+msgid "Los aliados duran 3 s más"
 msgstr ""
 
 #: data/weapons/yith.tres
@@ -7906,7 +8670,23 @@ msgid "Congela al enemigo en el tiempo 1,5 s; el daño que recibe mientras tanto
 msgstr ""
 
 #: data/weapons/yith.tres
+msgid "Dispara antes y congela más"
+msgstr ""
+
+#: data/weapons/yith.tres
+msgid "Dos rayos a la vez"
+msgstr ""
+
+#: data/weapons/yith.tres
+msgid "La estasis dura 0,5 s más"
+msgstr ""
+
+#: data/weapons/yith.tres
 msgid "Rayo de Yith"
+msgstr ""
+
+#: data/weapons/yog.tres
+msgid "Atrae un 30 % más"
 msgstr ""
 
 #: data/weapons/yog.tres
@@ -7915,6 +8695,10 @@ msgstr ""
 
 #: data/weapons/yog.tres
 msgid "Orbe lento que atrae a los enemigos hacia su centro y los tritura."
+msgstr ""
+
+#: data/weapons/yog.tres
+msgid "Un 15 % más grande"
 msgstr ""
 
 #: data/weather/bruma_gruta.tres
@@ -8450,7 +9234,7 @@ msgstr ""
 msgid "Práctica · el que cuenta: %s"
 msgstr ""
 
-#: scripts/core/game.gd
+#: scripts/core/game.gd scripts/ui/coop_level_up.gd
 msgid "Revelación"
 msgstr ""
 
@@ -8777,6 +9561,10 @@ msgid "devuelta al agua"
 msgstr ""
 
 #: scripts/fishing/fishing_scene.gd
+msgid "vendida en la lonja"
+msgstr ""
+
+#: scripts/fishing/fishing_scene.gd
 msgid "¡Pica!  ·  A"
 msgstr ""
 
@@ -8929,11 +9717,31 @@ msgid "Partida del día · %s"
 msgstr ""
 
 #: scripts/level/daily.gd
+msgid "domingo"
+msgstr ""
+
+#: scripts/level/daily.gd
+msgid "jueves"
+msgstr ""
+
+#: scripts/level/daily.gd
+msgid "lunes"
+msgstr ""
+
+#: scripts/level/daily.gd
+msgid "martes"
+msgstr ""
+
+#: scripts/level/daily.gd
 msgid "miércoles"
 msgstr ""
 
 #: scripts/level/daily.gd
 msgid "sábado"
+msgstr ""
+
+#: scripts/level/daily.gd
+msgid "viernes"
 msgstr ""
 
 #: scripts/level/dream_lands.gd
@@ -9310,7 +10118,7 @@ msgstr ""
 msgid "Ahora: %s · %s"
 msgstr ""
 
-#: scripts/menus/character_select.gd scripts/ui/damage_table.gd
+#: scripts/menus/character_select.gd scripts/ui/coop_level_up.gd
 msgid "Arma"
 msgstr ""
 
@@ -11271,7 +12079,7 @@ msgstr ""
 msgid "Gems"
 msgstr ""
 
-#: scripts/progression/player_progress.gd
+#: scripts/progression/player_progress.gd scripts/ui/coop_level_up.gd scripts/ui/menus.gd
 msgid "Arma nueva"
 msgstr ""
 
@@ -11904,7 +12712,7 @@ msgstr ""
 msgid "Estadísticas"
 msgstr ""
 
-#: scripts/save/library.gd scripts/ui/damage_table.gd
+#: scripts/save/library.gd scripts/ui/coop_level_up.gd
 msgid "Evolución"
 msgstr ""
 
@@ -12082,6 +12890,10 @@ msgstr ""
 
 #: scripts/save/library.gd
 msgid "aún sin jugar"
+msgstr ""
+
+#: scripts/save/library.gd
+msgid "el investigador"
 msgstr ""
 
 #: scripts/save/outfit_data.gd
@@ -12464,8 +13276,24 @@ msgstr ""
 msgid "LB o Q: descartar (%d)"
 msgstr ""
 
+#: scripts/ui/coop_level_up.gd scripts/ui/menus.gd
+msgid "Mejora de arma"
+msgstr ""
+
+#: scripts/ui/coop_level_up.gd scripts/ui/damage_table.gd
+msgid "Objeto"
+msgstr ""
+
 #: scripts/ui/coop_level_up.gd
 msgid "RB o E: otras opciones (%d)"
+msgstr ""
+
+#: scripts/ui/coop_level_up.gd
+msgid "Signo mayor"
+msgstr ""
+
+#: scripts/ui/coop_level_up.gd
+msgid "Truco"
 msgstr ""
 
 #: scripts/ui/damage_table.gd
@@ -12477,11 +13305,19 @@ msgid "Abatidos"
 msgstr ""
 
 #: scripts/ui/damage_table.gd
+msgid "Arma %s"
+msgstr ""
+
+#: scripts/ui/damage_table.gd
 msgid "B o Esc: volver  ·  Start: seguir jugando"
 msgstr ""
 
 #: scripts/ui/damage_table.gd
 msgid "Daño de la partida  ·  "
+msgstr ""
+
+#: scripts/ui/damage_table.gd
+msgid "Evolución %s"
 msgstr ""
 
 #: scripts/ui/damage_table.gd
@@ -12498,10 +13334,6 @@ msgstr ""
 
 #: scripts/ui/damage_table.gd
 msgid "Lo que te enseñó la locura"
-msgstr ""
-
-#: scripts/ui/damage_table.gd
-msgid "Objeto"
 msgstr ""
 
 #: scripts/ui/damage_table.gd
@@ -12605,11 +13437,43 @@ msgid "Vuelves a: %s"
 msgstr ""
 
 #: scripts/ui/difficulty_menu.gd
+msgid "ataques"
+msgstr ""
+
+#: scripts/ui/difficulty_menu.gd
+msgid "aviso"
+msgstr ""
+
+#: scripts/ui/difficulty_menu.gd
+msgid "cuerpo"
+msgstr ""
+
+#: scripts/ui/difficulty_menu.gd
 msgid "daño"
 msgstr ""
 
 #: scripts/ui/difficulty_menu.gd
+msgid "disparo"
+msgstr ""
+
+#: scripts/ui/difficulty_menu.gd
+msgid "mental"
+msgstr ""
+
+#: scripts/ui/difficulty_menu.gd
 msgid "número"
+msgstr ""
+
+#: scripts/ui/difficulty_menu.gd scripts/ui/fall_report.gd
+msgid "presencia"
+msgstr ""
+
+#: scripts/ui/difficulty_menu.gd
+msgid "ritmo"
+msgstr ""
+
+#: scripts/ui/difficulty_menu.gd
+msgid "vivos"
 msgstr ""
 
 #: scripts/ui/difficulty_menu.gd
@@ -12710,10 +13574,6 @@ msgstr ""
 
 #: scripts/ui/fall_report.gd
 msgid "otros"
-msgstr ""
-
-#: scripts/ui/fall_report.gd
-msgid "presencia"
 msgstr ""
 
 #: scripts/ui/fall_report.gd
@@ -12878,6 +13738,10 @@ msgstr ""
 
 #: scripts/ui/menus.gd
 msgid "Pactos del Necronomicón…"
+msgstr ""
+
+#: scripts/ui/menus.gd
+msgid "Pasiva"
 msgstr ""
 
 #: scripts/ui/menus.gd

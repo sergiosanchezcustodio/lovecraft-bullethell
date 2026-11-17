@@ -76,11 +76,11 @@ static func option(p: Player, o: PlayerProgress.Option) -> Array[Dictionary]:
 				var n := 0
 				for id in p.progress.passives:
 					if int(p.progress.passives[id]) > 0: n += 1
-				out.append(_row("Objetos", "%d" % n, L.t("%d de %d") % [n + 1, p.progress.item_slots], true))
+				out.append(_row(L.t("Objetos"), "%d" % n, L.t("%d de %d") % [n + 1, p.progress.item_slots], true))
 			out.append_array(upgrade(p.data, o.upgrade))
 		PlayerProgress.Option.Kind.NEW_WEAPON:
 			var have := p.weapons.weapons.size() if p.weapons != null else 0
-			out.append(_row("Armas", "%d" % have, L.t("%d de %d") % [have + 1, p.progress.weapon_slots if p.progress else 4], true))
+			out.append(_row(L.t("Armas"), "%d" % have, L.t("%d de %d") % [have + 1, p.progress.weapon_slots if p.progress else 4], true))
 		PlayerProgress.Option.Kind.WEAPON_LEVEL:
 			var w: WeaponSystem.Weapon = p.weapons.get_weapon(o.weapon.id) if p.weapons != null else null
 			if w != null: out.append_array(weapon_level(p, w.data, w.level, o.to_level))
@@ -111,7 +111,7 @@ static func shop(save: SaveData, e: Shop.Entry) -> Array[Dictionary]:
 	var nxt := now + e.item.per_level
 	var kind := "pct" if e.item.stat in SHOP_PCT else ("mult" if float(Shop.DEFAULTS[e.item.stat]) == 1.0 else ("num" if e.item.stat == "regen" else "int"))
 	var unit := "/s" if e.item.stat == "regen" else ""
-	out.append(_row("Ahora", fmt(now, kind) + unit, fmt(nxt, kind) + unit, true))
+	out.append(_row(L.t("Ahora"), fmt(now, kind) + unit, fmt(nxt, kind) + unit, true))
 	return out
 
 ## Lo que cambia en un arma al pasar de `from_lv` a `to_lv` (las estadísticas de su mejora).
@@ -158,7 +158,7 @@ static func fmt(v: float, kind: String) -> String:
 		"int": return str(roundi(v))
 	if absf(v - roundf(v)) < 0.005: return str(roundi(v))
 	var t := ("%.2f" % v).rstrip("0").rstrip(".")
-	return t.replace(".", ",")
+	return t.replace(".", L.dec)
 
 ## Las filas en una línea para un RichTextLabel: «Velocidad 4,5 → [verde]4,86 m/s[/verde]».
 static func bbcode(rows: Array[Dictionary], sep := "    ") -> String:

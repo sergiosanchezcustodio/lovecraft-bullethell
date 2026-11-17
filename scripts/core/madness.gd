@@ -65,7 +65,7 @@ static func describe(g: int) -> String:
 	var lines := PackedStringArray()
 	for x: Dictionary in grades():
 		if int(x.grade) <= g: lines.append(String(x.text))
-	if g > 0: lines.append(L.t("Dólares ×%s.") % str(snappedf(value("money", g), 0.1)).replace(".", ","))
+	if g > 0: lines.append(L.t("Dólares ×%s.") % str(snappedf(value("money", g), 0.1)).replace(".", L.dec))
 	return " ".join(lines)
 
 static func title(g: int) -> String:

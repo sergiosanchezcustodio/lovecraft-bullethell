@@ -96,13 +96,13 @@ func _source(p: Player, id: String) -> Array:
 		var lv := ""
 		if p.weapons != null:
 			for x: WeaponSystem.Weapon in p.weapons.weapons:
-				if x.data.id == w.id: lv = "  ·  Nv %d" % x.level
-		return [w.display_name + lv, w.get_icon(), (L.t("Evolución") if w.evolved else "Arma") + " " + [L.t("física"), L.t("de fuego"), L.t("mágica")][int(w.category)],
+				if x.data.id == w.id: lv = "  ·  %s %d" % [L.lv(), x.level]
+		return [w.display_name + lv, w.get_icon(), (L.t("Evolución %s") if w.evolved else L.t("Arma %s")) % [L.t("física"), L.t("de fuego"), L.t("mágica")][int(w.category)],
 			FxAccent.ui_color(w.id)]
 	var up := "res://data/upgrades/%s.tres" % id
 	if ResourceLoader.exists(up):
 		var u: UpgradeData = load(up)
-		return [u.display_name, u.icon, "Objeto"]
+		return [u.display_name, u.icon, L.t("Objeto")]
 	return [id.capitalize(), null, ""]
 
 func _build() -> void:

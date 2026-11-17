@@ -150,12 +150,12 @@ func _audio() -> void:
 func _controls() -> void:
 	_header("Teclado")
 	for pair in Settings.REMAP_ACTIONS:
-		_remap_row(pair[0], pair[1], false)
+		_remap_row(pair[0], L.t(pair[1]), false)
 	_note(L.t("Las flechas también mueven, sea cual sea la tecla elegida."))
 	_header("Mando")
 	for pair in Settings.REMAP_ACTIONS:
 		if pair[0] in [&"up", &"down", &"left", &"right"]: continue
-		_remap_row(pair[0], pair[1], true)
+		_remap_row(pair[0], L.t(pair[1]), true)
 	_note(L.t("El mando se mueve con el stick izquierdo o con la cruceta."))
 	_action(L.t("Restablecer los controles de fábrica"), func() -> void:
 		Settings.reset_controls()

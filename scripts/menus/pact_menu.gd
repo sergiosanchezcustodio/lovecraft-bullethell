@@ -88,7 +88,7 @@ func _refresh() -> void:
 		var p: Dictionary = b.get_meta("pact")
 		var on := picked.has(id)
 		var name_l: Label = b.get_meta("name_l")
-		name_l.text = "%s%s%s" % ["✦  " if on else "○  ", p.name, "   · superado aquí" if bool(b.get_meta("won")) else ""]
+		name_l.text = "%s%s%s" % ["✦  " if on else "○  ", p.name, L.t("   · superado aquí") if bool(b.get_meta("won")) else ""]
 		name_l.add_theme_color_override("font_color", Color(1.0, 0.5, 0.4) if on else UiKit.TEXT)
 	_count.text = L.t("Hasta %d maldiciones, cada una con su premio. Duran hasta que las cambies.  ·  Selladas: %d de %d") % [
 		Pacts.max_count(), picked.size(), Pacts.max_count()]

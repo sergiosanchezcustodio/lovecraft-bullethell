@@ -15,7 +15,8 @@ signal close
 const ACCENT := Color(0.95, 0.72, 0.4)
 const LOG := "user://logs/dificultad.txt"
 ## Nombre corto de cada valor, cuando la característica tiene más de uno.
-const SHORT := {"rate": "ritmo", "cap": "vivos", "mental": "mental", "horror": "presencia",
+const SHORT := {   # i18n: sí
+	"rate": "ritmo", "cap": "vivos", "mental": "mental", "horror": "presencia",
 	"melee": "cuerpo", "shooter": "disparo", "attack": "ataques", "warn": "aviso"}
 
 var game: Node
@@ -80,11 +81,11 @@ func _build() -> void:
 	_list.add_child(_general)
 	_line(" ")
 	for c in Difficulty.CATS:
-		var row := OptionRow.new(String(Difficulty.CATS[c].name), names_for(c), int(Difficulty.levels()[c]) - 1,
+		var row := OptionRow.new(L.t(String(Difficulty.CATS[c].name)), names_for(c), int(Difficulty.levels()[c]) - 1,
 			func(i: int) -> void: _change(c, i + 1), Callable(), ACCENT)
 		_list.add_child(row)
 		_rows[c] = row
-		_line("      " + String(Difficulty.CATS[c].help))
+		_line("      " + L.t(String(Difficulty.CATS[c].help)))
 	_line(" ")
 	_list.add_child(OptionRow.new(L.t("Volver al 3 (la de siempre)"), [] as Array[String], 0, Callable(), func() -> void:
 		_change("general", Difficulty.BASE), ACCENT))
@@ -210,8 +211,8 @@ static func names_for(cat: String) -> Array[String]:
 	for i in Difficulty.LEVELS:
 		var parts: Array[String] = [str(i + 1)]
 		for k in keys:
-			var x := "×" + String.num(float(Difficulty.CATS[cat][k][i]), 2).replace(".", ",")
-			parts.append((String(SHORT[k]) + " " + x) if keys.size() > 1 else x)
+			var x := "×" + String.num(float(Difficulty.CATS[cat][k][i]), 2).replace(".", L.dec)
+			parts.append((L.t(String(SHORT[k])) + " " + x) if keys.size() > 1 else x)
 		out.append("  ·  ".join(parts))
 	return out
 

@@ -265,6 +265,7 @@ static func _crumb_text(t: Label, tail: String) -> void:
 	parts.append_array(m[1])
 	parts.append(String(m[2]))
 	if tail != "": parts.append(tail)
+	for i in parts.size(): parts[i] = L.t(parts[i])     # cada tramo, traducido
 	var l: Label = m[0]
 	l.text = CRUMB_SEP.join(parts) if parts.size() > 1 else ""
 	l.visible = parts.size() > 1
@@ -286,7 +287,7 @@ static func money(n: int) -> String:
 	var s := str(absi(n))
 	var out := ""
 	while s.length() > 3:
-		out = "." + s.substr(s.length() - 3) + out
+		out = ("," if L.lang == "en" else ".") + s.substr(s.length() - 3) + out
 		s = s.substr(0, s.length() - 3)
 	return ("-" if n < 0 else "") + s + out
 

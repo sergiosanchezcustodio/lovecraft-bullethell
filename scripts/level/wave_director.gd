@@ -192,7 +192,7 @@ func _keep_alive(delta: float) -> void:
 func _mid_step() -> void:
 	while _mid_done < level.mid_enemies.size() and _mid_done < level.mid_times.size() and time >= level.mid_times[_mid_done]:
 		var d := level.mid_enemies[_mid_done]
-		var text := level.mid_texts[_mid_done] if _mid_done < level.mid_texts.size() else ""
+		var text := L.t(level.mid_texts[_mid_done]) if _mid_done < level.mid_texts.size() else ""
 		_mid_done += 1
 		var e := spawn(d, spawn_point(d.body_radius))
 		mid_alive.append(e)

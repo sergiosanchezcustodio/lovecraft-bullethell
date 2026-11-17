@@ -132,7 +132,7 @@ func _show_shelf() -> void:
 	for i in Library.TOMES.size():
 		var tome: Dictionary = Library.TOMES[i]
 		var n := Library.count_known(save, tome.id)
-		var b := _row(L.t("Tomo %s  ·  %s") % [tome.roman, tome.title], 30)
+		var b := _row(L.t("Tomo %s  ·  %s") % [tome.roman, L.t(String(tome.title))], 30)
 		b.custom_minimum_size.y = minf(56.0, 748.0 / Library.TOMES.size() - 12.0)   # once tomos (16.28), doce (21.19): sin pisar la esquina
 		var c := _ink("%d / %d" % [n.x, n.y], 22, INK_DIM)
 		c.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT)
@@ -161,7 +161,7 @@ func _show_tome_cover(i: int) -> void:
 	var r := _ink(L.t("Tomo %s") % tome.roman, 40, RED_INK, true)
 	r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_right.add_child(r)
-	var t := _ink(tome.title, 58, INK, true)
+	var t := _ink(L.t(String(tome.title)), 58, INK, true)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_right.add_child(t)
@@ -201,7 +201,7 @@ func _open_tome(i: int) -> void:
 	_clear()
 	_tome = tome.id
 	_entries = Library.entries(save, tome.id)
-	var t := _ink(L.t("Tomo %s  ·  %s") % [tome.roman, tome.title], 38, INK, true)
+	var t := _ink(L.t("Tomo %s  ·  %s") % [tome.roman, L.t(String(tome.title))], 38, INK, true)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_left.add_child(t)
 	_left.add_child(_rule())

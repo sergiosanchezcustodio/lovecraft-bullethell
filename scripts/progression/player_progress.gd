@@ -38,7 +38,7 @@ class Option:
 			Kind.SIGN: return String(sign.get("text", ""))
 			Kind.TRICK: return String(trick.get("texto", ""))
 			Kind.REVELATION: return String(revelation.get("texto", ""))
-			Kind.WEAPON_LEVEL: return weapon.level_text[to_level - 2] if to_level - 2 < weapon.level_text.size() else "Mejora"
+			Kind.WEAPON_LEVEL: return L.t(weapon.level_text[to_level - 2]) if to_level - 2 < weapon.level_text.size() else L.t("Mejora")
 		return upgrade.description
 
 var rules: ProgressionData

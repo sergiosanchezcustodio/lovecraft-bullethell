@@ -130,11 +130,12 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 					out.append(e)
 			var rel: Variant = L.data(JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json")))
 			for ep: Array in EPILOGUES:
+				var who := L.t("el investigador")
 				var lines: Array = (rel as Dictionary).get(ep[0], []) if rel is Dictionary else []
 				var txt := "
 
 ".join(PackedStringArray(lines.map(func(l: String) -> String:
-					var t := l.format({"nombre": L.t("el investigador")}).replace(" de el ", " del ")   # i18n: no (el «del» es del español)
+					var t := l.format({"nombre": who}).replace(" de el ", " del ")   # i18n: no (el «del» es del español)
 					return t.left(1).to_upper() + t.substr(1))))
 				out.append(_e(String(ep[0]), String(ep[1]), _seen(save, "epilogues", StringName(ep[0])), txt, "", "", null,
 					[L.t("Tras vencer a Nyarlathotep") if ep[0] == "epilogo_kadath" else L.t("Tras vencer a Cthulhu") + (L.t(" con menos de un cuarto de la cordura") if ep[0] == "epilogo_locura" else "")], L.t("Epílogos")))
@@ -174,7 +175,7 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				if not its.is_empty(): facts.append(L.t("Objetos: ") + ", ".join(its))
 				if ps.size() > 1:
 					var others := PackedStringArray()
-					for k in range(1, ps.size()): others.append("J%d %s" % [k + 1, String((ps[k] as Dictionary).get("name", ""))])
+					for k in range(1, ps.size()): others.append("%s %s" % [L.player(k + 1), String((ps[k] as Dictionary).get("name", ""))])
 					facts.append(L.t("Con ") + ", ".join(others))
 				if not (r.get("pacts", []) as Array).is_empty(): facts.append(L.t("Pactos: ") + Pacts.names(r.pacts))
 				var lines := PackedStringArray()
@@ -224,7 +225,7 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 					String(c.model), "full", null, facts, SECTION_FISH))
 		"weapons":
 			for w in DamageRules.all_weapons():
-				var facts := ["%s · %s" % [CATEGORY[w.category], w.description], L.t("Daño %s · cada %.2f s · alcance %d m") % [
+				var facts := ["%s · %s" % [L.t(CATEGORY[w.category]), w.description], L.t("Daño %s · cada %.2f s · alcance %d m") % [
 					str(snappedf(w.damage, 0.1)), w.cooldown, int(w.range)]]
 				if w.sanity_cost > 0.0: facts.append(L.t("Cuesta %s de cordura") % str(snappedf(w.sanity_cost, 0.1)))
 				if w.evolution != &"":                        # D-06

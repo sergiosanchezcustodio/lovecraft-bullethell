@@ -787,7 +787,7 @@ func _spawn_player(character: String, input: PlayerInput) -> Player:
 	q.sanity_state.crisis_started.connect(func(_k: StringName) -> void: Rumble.heartbeat(q))   # dos latidos (16.30)
 	q.sanity_state.crisis_started.connect(func(k: StringName) -> void:
 		var what := L.t("Crisis: %s") % L.t(SanityState.NAMES.get(k, "locura"))
-		announce(what if players.size() == 1 else "J%d · %s" % [i + 1, what], 2.5))
+		announce(what if players.size() == 1 else "%s · %s" % [L.player(i + 1), what], 2.5))
 	q.lights.assign(arena.get_meta("lights"))       # las luces del escenario recuperan cordura
 	q.madness = bool(Settings.get_value("madness"))
 	q.weapons = WeaponSystem.new().setup(q, world)
@@ -890,7 +890,7 @@ func peddler_buy(q: Player, g: Dictionary, price: int) -> bool:
 		"libro": key = "lvl"
 	run_spent += price
 	if Saves.current != null: Saves.current.money = maxi(Saves.current.money - price, 0)
-	var said := "%s: %s (−%d $)" % [("J%d · " % (q.index + 1)) if players.size() > 1 else "", String(g.get("name", id)), price]
+	var said := "%s: %s (−%d $)" % [(L.player(q.index + 1) + " · ") if players.size() > 1 else "", String(g.get("name", id)), price]
 	if key.begins_with("u:"):
 		said += " → %s" % _upgrade_title(key)
 	announce(said.trim_prefix(": "), 2.5)
@@ -1059,7 +1059,7 @@ func _watch_crises() -> void:
 		_in_crisis[q.index] = now
 
 static func _pick_text(q: Player, o: PlayerProgress.Option) -> String:
-	return "J%d · %s: %s" % [q.index + 1, q.data.display_name, o.title()]
+	return "%s · %s: %s" % [L.player(q.index + 1), q.data.display_name, o.title()]
 
 ## Aplica una opción de la ventana (mejora o rama de evolución) y da el texto que se anuncia.
 func _choose_option(q: Player, o: PlayerProgress.Option) -> String:
@@ -1067,19 +1067,19 @@ func _choose_option(q: Player, o: PlayerProgress.Option) -> String:
 	if o.kind == PlayerProgress.Option.Kind.SIGN:
 		if args.get_bool("log"): print("SIGNO %s" % o.sign.get("id", ""))
 		var st := "%s: %s" % [o.title(), o.text()]
-		return "J%d · %s" % [q.index + 1, st] if players.size() > 1 else st
+		return "%s · %s" % [L.player(q.index + 1), st] if players.size() > 1 else st
 	if o.kind == PlayerProgress.Option.Kind.REVELATION:   # (21.7)
 		if args.get_bool("log"): print("REVELACION %s" % o.revelation.get("id", ""))
 		var rt := L.t("Revelación · %s: %s") % [o.title(), o.text()]
-		return "J%d · %s" % [q.index + 1, rt] if players.size() > 1 else rt
+		return "%s · %s" % [L.player(q.index + 1), rt] if players.size() > 1 else rt
 	if o.kind == PlayerProgress.Option.Kind.TRICK:   # (21.5)
 		if args.get_bool("log"): print("TRUCO %s %s" % [q.progress.pet_id, o.trick.get("id", "")])
 		var tt := L.t("%s aprende %s: %s") % [q.pet.data.display_name if q.pet != null else L.t("Tu compañero"), o.title(), o.text()]
-		return "J%d · %s" % [q.index + 1, tt] if players.size() > 1 else tt
+		return "%s · %s" % [L.player(q.index + 1), tt] if players.size() > 1 else tt
 	if o.kind != PlayerProgress.Option.Kind.EVOLUTION: return _pick_text(q, o)
 	if args.get_bool("log"): print("EVOLUCION %s" % o.weapon.id)
 	var text := L.t("¡Evolución! %s → %s") % [o.from.display_name, o.weapon.display_name]
-	return "J%d · %s" % [q.index + 1, text] if players.size() > 1 else text
+	return "%s · %s" % [L.player(q.index + 1), text] if players.size() > 1 else text
 
 ## PC que maneja a un jugador (en local, el 1). Si su PC se ha ido, lo lleva un bot de aquí.
 func _peer_of(q: Player) -> int:
@@ -1468,7 +1468,7 @@ func _summary() -> PackedStringArray:
 	var lv := L.t("Nivel alcanzado: %d") % player.progress.level
 	if players.size() > 1:
 		var parts := PackedStringArray()
-		for q in players: parts.append("J%d %d" % [q.index + 1, q.progress.level])
+		for q in players: parts.append("%s %d" % [L.player(q.index + 1), q.progress.level])
 		lv = L.t("Niveles: ") + "  ·  ".join(parts)
 	var out := PackedStringArray([L.t("Tiempo: %02d:%02d") % [t / 60, t % 60], L.t("Enemigos abatidos: %d") % kills, lv,
 		L.t("Dólares ganados: %s $") % MenuKit.money(run_money)])
@@ -1493,7 +1493,7 @@ func _reports() -> Array:
 	if director == null: return out
 	for q in players:
 		if q.remote: continue
-		var who := "J%d · %s" % [q.index + 1, q.data.display_name]
+		var who := "%s · %s" % [L.player(q.index + 1), q.data.display_name]
 		out.append(FallReport.build(who, q.color, q.received_via, _rep_falls.get(q.index, []),
 			_rep_hist.get(q.index, PackedVector2Array()), _rep_alive))
 	return out
@@ -1637,7 +1637,7 @@ func _diary(result: String) -> Array:
 			f["record"] = _challenge_record
 		var e := Diary.compose(f, hash("%s|%s|%d|%d" % [f.date, f.level, q.index, director.killed_total]))
 		if not (q.input is BotInput) or args.get_bool("diary_save"): Diary.add(Saves.current, String(q.data.id), f, e)
-		out.append({"who": "J%d · %s" % [q.index + 1, q.data.display_name], "color": q.color, "title": e.title, "text": e.text})
+		out.append({"who": "%s · %s" % [L.player(q.index + 1), q.data.display_name], "color": q.color, "title": e.title, "text": e.text})
 	return out
 
 ## Partida del día (hito 13.9): el azar de la partida sale de la fecha (oleadas, baúles,
@@ -2108,7 +2108,7 @@ func _try_evolve(q: Player) -> void:
 	var before := w.data.display_name
 	q.weapons.evolve(w)
 	var text := L.t("¡Evolución! %s → %s") % [before, w.data.display_name]
-	if players.size() > 1: text = "J%d · %s" % [q.index + 1, text]
+	if players.size() > 1: text = "%s · %s" % [L.player(q.index + 1), text]
 	announce(text, 3.0)
 	if args.get_bool("log"): print("EVOLUCION %s" % w.data.id)
 

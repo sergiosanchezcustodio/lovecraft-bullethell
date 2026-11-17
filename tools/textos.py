@@ -48,19 +48,24 @@ SKIP_KEYS = {'id', 'model', 'icon', 'icon_model', 'path', 'image', 'sfx', 'sound
 # ---------------------------------------------------------------- fuentes
 DATA_SKIP_FILES = {'cloud.json', 'quality.json', 'sfx.json', 'musica.json', 'anim_sets.json'}
 
+def _dict_list(v):
+    """Una lista de diccionarios (los niveles de campaign.json) sí se recorre aunque su clave se salte."""
+    return isinstance(v, list) and bool(v) and all(isinstance(x, dict) for x in v)
+
 def json_texts(obj, where, out, key=''):
     if isinstance(obj, str):
         if human(obj): out.setdefault(obj, []).append(where)
     elif isinstance(obj, dict):
         for k, v in obj.items():
-            if k.startswith('_') or k in SKIP_KEYS: continue
+            if k.startswith('_') or (k in SKIP_KEYS and not _dict_list(v)): continue
             json_texts(v, where, out, k)
     elif isinstance(obj, list):
         for v in obj: json_texts(v, where, out, key)
 
 # Propiedades String de los .tres que se ven (las demás son ids, rutas, animaciones…).
 # Las que llevan `get: return L.t(…)` en su clase (scripts/*/…_data.gd).
-TRES_PROPS = {'display_name', 'description', 'story', 'passive_text', 'role', 'final_text', 'final_name', 'final_next_text'}
+TRES_PROPS = {'display_name', 'description', 'story', 'passive_text', 'role', 'final_text', 'final_name', 'final_next_text',
+              'level_text', 'mid_texts'}   # estas dos, con L.t donde se leen
 _TRES_STR = re.compile(r'^(\w+) = "((?:[^"\\]|\\.)*)"', re.M | re.S)
 _TRES_ARR = re.compile(r'^(\w+) = (?:PackedStringArray|Array\[String\])\((.*?)\)$', re.M | re.S)
 _TRES_ITEM = re.compile(r'"((?:[^"\\]|\\.)*)"', re.S)
@@ -95,8 +100,8 @@ CODE_SKIP = {'scripts/core/bench.gd', 'scripts/core/spike_log.gd', 'scripts/core
              'scripts/menus/review_menu.gd', 'scripts/ui/debug_menu.gd'}
 # Líneas que no se tocan: registros, comparaciones, claves y nombres de nodos.
 LINE_SKIP = re.compile(r'\b(print|printerr|print_rich|push_error|push_warning|assert|prints|printt|OS\.execute|'
-                       r'get_node|get_node_or_null|has_node|find_child|add_to_group|is_in_group|has_method|'
-                       r'emit_signal|set_meta|get_meta|has_meta|Prof\.|SpikeLog|_log\(|log_line|DebugOptions)\b|Accept: |User-Agent|Authorization|'
+                       r'get_node|get_node_or_null|has_node|find_child|add_to_group|is_in_group|'
+                       r'emit_signal|set_meta|get_meta|Prof\.|SpikeLog|_log\(|log_line|DebugOptions)\b|Accept: |User-Agent|Authorization|'
                        r'^\s*(const|enum|match|signal|class_name|extends)\b|^\s*@\w+|Content-Type')
 # Una cadena de GDScript: normal, con comillas simples o triple; las &"…" y ^"…" no son texto.
 _GD_TOKEN = re.compile(r'("""(?:.|\n)*?"""|"(?:[^"\\]|\\.)*"|\'(?:[^\'\\\n]|\\.)*\'|#[^\n]*)')

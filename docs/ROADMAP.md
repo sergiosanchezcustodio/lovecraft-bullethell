@@ -780,7 +780,7 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 | Hito | Contenido | Estado |
 |---|---|---|
 | 22.4 | **Textos traducibles:** sacar todos los textos de la interfaz, los datos y los relatos a tablas (`TranslationServer`, CSV o PO), con una prueba que avise de lo que quede sin pasar | Hecho (17-11-2026), pendiente de revisión: gettext (`locale/en.po`, clave = el texto en español), `L.t` en el código, `L.data` en los JSON y `get` en las propiedades de texto de los recursos; `tools/textos.py` y `i18n_log=true` para ver lo que falta. 3256 textos, unas 27 700 palabras. Ver `docs/ESTADO.md` |
-| 22.5 | **Inglés completo** (interfaz, fichas de la Biblioteca, relatos, consejos y manual) y selector de idioma en Configuración. Para la página de itch.io, que llega a más gente en inglés | Propuesto |
+| 22.5 | **Inglés completo** (interfaz, fichas de la Biblioteca, relatos, consejos y manual) y selector de idioma en Configuración. Para la página de itch.io, que llega a más gente en inglés | Hecho (17-11-2026), pendiente de revisión: 3474 de 3502 textos traducidos (los 28 que faltan son registros de red y cabeceras HTTP), selector «Idioma · Language» en Juego (pide reiniciar), `# i18n: sí` para constantes, `L.dec`, `L.player`, `L.lv` y `Attributes.abbr`; recorrido de las 56 ventanas en inglés. Ver `docs/ESTADO.md` |
 
 ### Bloque C: una noche suelta más
 

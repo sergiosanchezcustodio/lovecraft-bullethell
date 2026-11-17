@@ -1170,7 +1170,7 @@ var level_marks := 0                        ## marcas de todos los PC en este ni
 
 func _say_mark(d: Array) -> void:
 	level_marks += 1
-	if game.has_method("announce"): game.announce("%s ha puesto una marca" % String(d[0]).left(20), 1.5)
+	if game.has_method("announce"): game.announce(L.t("%s ha puesto una marca") % String(d[0]).left(20), 1.5)
 	if game.has_method("mark_shot"): game.mark_shot(int(d[1]), String(d[0]).left(20))   # lo que se veía aquí
 	_say(L.t("marca %d de %s · %s (aquí: %s)") % [int(d[1]), String(d[0]).left(20), String(d[2]).left(24), where()])
 
@@ -1186,7 +1186,7 @@ func _seat_name_of_peer(peer: int) -> String:
 func _admit(id: int, pc_name: String) -> int:
 	var n := GameSession.claim(id, pc_name, net.peers)
 	if n > 0:
-		if game.has_method("announce"): game.announce("%s ha vuelto: entrará en el siguiente nivel" % pc_name, 2.5)
+		if game.has_method("announce"): game.announce(L.t("%s ha vuelto: entrará en el siguiente nivel") % pc_name, 2.5)
 		_say(L.t("vuelve %s (PC %d) a %d puestos") % [pc_name, id, n])
 	return n
 
@@ -1207,7 +1207,7 @@ func _release_gone(say: bool) -> void:
 					break
 			q.net_release(bot)
 			_say(L.t("J%d lo lleva la máquina (se fue su PC)") % (q.index + 1))
-			if say and game.has_method("announce"): game.announce("J%d se ha desconectado: lo lleva la máquina" % (q.index + 1), 2.5)
+			if say and game.has_method("announce"): game.announce(L.t("J%d se ha desconectado: lo lleva la máquina") % (q.index + 1), 2.5)
 
 ## La sesión se ha cerrado (se fue el anfitrión, o este PC salió): de vuelta al menú online.
 func _on_closed(reason: String) -> void:

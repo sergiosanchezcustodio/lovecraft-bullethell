@@ -211,7 +211,7 @@ class Sheet extends Control:
 	func _show_page() -> void:
 		if not paged: return
 		for i in _frames.size(): _frames[i].visible = i == page
-		_title.text = "J%d  ·  %s  (%d/3)" % [p.index + 1, PAGE_NAMES[page], page + 1]
+		_title.text = "%s  ·  %s  (%d/3)" % [L.player(p.index + 1), L.t(PAGE_NAMES[page]), page + 1]
 
 	func _process(delta: float) -> void:
 		_t += delta
@@ -420,7 +420,7 @@ class Sheet extends Control:
 		var top := _half(col, "Atributos")
 		for n in Attributes.NAMES:
 			var nn: String = n
-			_stat_row(top, load(ICONS % nn), "%s  ·  %s" % [nn, Attributes.LONG[nn]], func() -> String:
+			_stat_row(top, load(ICONS % nn), "%s  ·  %s" % [Attributes.abbr(nn), L.t(Attributes.LONG[nn])], func() -> String:
 				var now := int(p.attrs.get(nn, Attributes.BASE))
 				var gain := now - int(p.attrs_level1.get(nn, Attributes.BASE))
 				return "%d%s" % [now, ("  (+%d)" % gain) if gain > 0 else ""],
@@ -460,10 +460,10 @@ class Sheet extends Control:
 			var t: Array = world_stats().total
 			tot.text = L.t("Daño total %s  ·  Abatidos %d") % [MenuKit.money(roundi(t[0])), int(t[1])])
 		for w: WeaponSystem.Weapon in ws:
-			var ls := _item_row(top, w.data.get_icon(), Color(UiKit.GOLD, 0.45), "%s. %s" % [CATEGORY[int(w.data.category)], w.data.description])
+			var ls := _item_row(top, w.data.get_icon(), Color(UiKit.GOLD, 0.45), "%s. %s" % [L.t(CATEGORY[int(w.data.category)]), w.data.description])
 			var ww := w
 			_dyn.append(func() -> void:
-				(ls[0] as Label).text = "%s  ·  Nv %d/%d" % [ww.data.display_name, ww.level, ww.data.max_level]
+				(ls[0] as Label).text = "%s  ·  %s %d/%d" % [ww.data.display_name, L.lv(), ww.level, ww.data.max_level]
 				var s: Array = (world_stats().weapons as Dictionary).get(String(ww.data.id), [0.0, 0])
 				(ls[1] as Label).text = L.t("Daño %s  ·  Abatidos %d  ·  %s por golpe") % [MenuKit.money(roundi(s[0])), int(s[1]), str(snappedf(ww.stat("damage") * p.damage_mult(ww.data.category), 0.1))])
 		col.add_child(HSeparator.new())
@@ -476,7 +476,7 @@ class Sheet extends Control:
 			var ls := _item_row(bottom, up.icon, Color(up.color, 0.5), up.description)
 			var uu: UpgradeData = up
 			_dyn.append(func() -> void:
-				(ls[0] as Label).text = "%s  ·  Nv %d/%d" % [uu.display_name, int(p.progress.passives.get(uu.id, 0)), uu.max_level]
+				(ls[0] as Label).text = "%s  ·  %s %d/%d" % [uu.display_name, L.lv(), int(p.progress.passives.get(uu.id, 0)), uu.max_level]
 				var s: Array = (world_stats().weapons as Dictionary).get(String(uu.id), [0.0, 0])
 				(ls[1] as Label).text = (L.t("Daño %s  ·  Abatidos %d") % [MenuKit.money(roundi(s[0])), int(s[1])]) if s[0] > 0.0 else "")
 

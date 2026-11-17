@@ -36,6 +36,13 @@ const RATE := 0.025                 ## +2,5 % por punto por encima de 20
 const RATE_SPEED := 0.0125          ## la velocidad, la mitad: si no, se dispara
 
 ## Atributos de nivel 1 de un personaje: 10 cada uno más su reparto.
+## Siglas en inglés (hito 22.5): las claves siguen siendo las españolas.
+const ABBR_EN := {"POD": "POW", "INT": "INT", "FUE": "STR", "CON": "CON", "TEN": "TEN", "DES": "DEX", "CUL": "EDU"}
+
+## La sigla que se ve, en el idioma elegido.
+static func abbr(n: String) -> String:
+	return n if L.lang == "es" else String(ABBR_EN.get(n, n))
+
 static func initial(c: CharacterData) -> Dictionary:
 	var a := {}
 	for n in NAMES: a[n] = BASE + int(c.attr_bonus.get(n, 0))

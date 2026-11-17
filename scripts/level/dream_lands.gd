@@ -164,7 +164,7 @@ func release_cats(seed_v: int) -> void:
 		world.fx.add_child(holder)
 		cats.append({"node": holder, "model": m, "target": null, "t": 0.0, "life": level.cats_life * rng.randf_range(0.9, 1.1),
 			"home": holder.position, "scratch": 0.0, "ph": rng.randf()})
-	if game != null and game.has_method("announce"): game.announce("Bajan los gatos de Ulthar…", 2.5)
+	if game != null and game.has_method("announce"): game.announce(L.t("Bajan los gatos de Ulthar…"), 2.5)
 	world.sfx("growl", cats_from)
 	if host: _net({"a": "cats", "s": seed_v})
 
@@ -274,7 +274,7 @@ func land() -> void:
 	_net({"a": "galley"})
 
 func _say_galley() -> void:
-	if game != null and game.has_method("announce"): game.announce("Atraca la galera negra: bajan los remeros lunares", 2.5)
+	if game != null and game.has_method("announce"): game.announce(L.t("Atraca la galera negra: bajan los remeros lunares"), 2.5)
 	world.sfx("slam", galley_at)
 
 ## La escotilla, en su sitio de la cubierta.
@@ -296,7 +296,7 @@ func _on_hatch_died(_e: Enemy) -> void:
 	_net({"a": "hatch"})
 
 func _say_hatch() -> void:
-	if game != null and game.has_method("announce"): game.announce("Revienta la escotilla: la galera ya no desembarca", 2.5)
+	if game != null and game.has_method("announce"): game.announce(L.t("Revienta la escotilla: la galera ya no desembarca"), 2.5)
 	world.sfx("slam", hatch_at)
 	world.ground_hit(Vector3(hatch_at.x, 0.0, hatch_at.z), 1.6, Color(0.45, 1.0, 0.45))
 
@@ -335,7 +335,7 @@ func gust(a: float) -> void:
 	gusts += 1
 	gust_dir = Vector3(cos(a), 0.0, sin(a))
 	_gust_t = 0.0
-	if game != null and game.has_method("announce"): game.announce("Se levanta el viento de Leng…", 2.0)
+	if game != null and game.has_method("announce"): game.announce(L.t("Se levanta el viento de Leng…"), 2.0)
 	var at := world.players[0].global_position if not world.players.is_empty() else Vector3.ZERO
 	Auto.sfx_at("trap_wind", at)
 	if host: _net({"a": "gust", "r": a})
@@ -395,7 +395,7 @@ func _flute_step(delta: float) -> void:
 	_flute_t += delta
 	if _flute_t >= level.flute_warn + level.flute_time:
 		_flute_t = -1.0
-		if game != null and game.has_method("announce"): game.announce("Callan las flautas", 1.5)
+		if game != null and game.has_method("announce"): game.announce(L.t("Callan las flautas"), 1.5)
 		return
 	if not fluting(): return
 	for q in world.players:
@@ -468,7 +468,7 @@ func _note(at: Vector3) -> void:
 func play_flutes() -> void:
 	flutes += 1
 	_flute_t = 0.0
-	if game != null and game.has_method("announce"): game.announce("Suenan las flautas de los Otros Dioses…", 2.5)
+	if game != null and game.has_method("announce"): game.announce(L.t("Suenan las flautas de los Otros Dioses…"), 2.5)
 	var at := world.players[0].global_position if not world.players.is_empty() else Vector3.ZERO
 	Auto.sfx_at("flutes", at)
 	if host: _net({"a": "flutes"})

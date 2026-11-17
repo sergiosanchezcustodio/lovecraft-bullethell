@@ -61,11 +61,11 @@ func refresh(fade := true) -> void:
 	var q := int(Settings.get_value("quality"))
 	var path := video_file(q, int(Settings.get_value("weapon_fx")))
 	var text := L.t("Vista previa · %s · %s") % [Quality.names()[clampi(q, 0, Quality.names().size() - 1)] if not Quality.names().is_empty() else "",
-		FX_NAMES[effective_fx(q, int(Settings.get_value("weapon_fx")))]]
+		L.t(FX_NAMES[effective_fx(q, int(Settings.get_value("weapon_fx")))])]
 	if mode == "weather":
 		var w := clampi(int(Settings.get_value("weather")), 0, 2)
 		path = weather_file(w)
-		text = L.t("Vista previa · %s (con la calidad Alta)") % WEATHER_NAMES[w]
+		text = L.t("Vista previa · %s (con la calidad Alta)") % L.t(WEATHER_NAMES[w])
 	_caption.text = text
 	_mat.set_shader_parameter("gamma", Settings.brightness_gamma())
 	var tex: Texture2D = load(path) if ResourceLoader.exists(path) else null

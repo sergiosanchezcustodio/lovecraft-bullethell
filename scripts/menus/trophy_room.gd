@@ -303,7 +303,7 @@ func _show(i: int) -> void:
 	var t: Dictionary = _items[i]
 	var c := int(t.case)
 	var place := (_cases[c] as Array).find(i) + 1
-	_kind.text = L.t("%s  ·  %d de %d") % [Trophies.CASES[c], place, (_cases[c] as Array).size()]
+	_kind.text = L.t("%s  ·  %d de %d") % [L.t(Trophies.CASES[c]), place, (_cases[c] as Array).size()]
 	if t.earned:
 		_name.text = String(t.name)
 		_text.text = String(t.text)

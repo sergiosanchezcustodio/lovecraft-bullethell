@@ -1490,7 +1490,7 @@ func take_damage(d: Damage) -> void:
 		health = data.max_health * ANKH_HEALTH
 		Auto.sfx("level_up")
 		var game := get_tree().current_scene if is_inside_tree() else null
-		if game != null and game.has_method("announce"): game.announce("El ankh de Nephren te devuelve a la vida", 2.0)
+		if game != null and game.has_method("announce"): game.announce(L.t("El ankh de Nephren te devuelve a la vida"), 2.0)
 		return
 	if health <= 0.0 and second_lives_used < int(shop.get("second_life", 0.0)):   # Medalla de San Cristóbal (tienda)
 		second_lives_used += 1
@@ -1498,7 +1498,7 @@ func take_damage(d: Damage) -> void:
 		_hurt_time = 0.0
 		Auto.sfx("level_up")
 		var game2 := get_tree().current_scene if is_inside_tree() else null
-		if game2 != null and game2.has_method("announce"): game2.announce("La medalla de San Cristóbal te protege", 2.0)
+		if game2 != null and game2.has_method("announce"): game2.announce(L.t("La medalla de San Cristóbal te protege"), 2.0)
 		return
 	if health <= 0.0:
 		motor.locked = true

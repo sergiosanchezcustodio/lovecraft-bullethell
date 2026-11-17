@@ -520,7 +520,7 @@ func _choose(o: Array, card: Control) -> void:
 		_money += int(_fish.price)
 		if Saves.current != null: Saves.current.money += int(_fish.price)
 	if o[3]: GameSession.fish_curse = true
-	var what := "vendida" if sold else (L.t("a la Biblioteca") if kept else L.t("devuelta al agua"))
+	var what := L.t("vendida en la lonja") if sold else (L.t("a la Biblioteca") if kept else L.t("devuelta al agua"))
 	_log.append("%s, %s%s" % [String(_fish.name), what, (" (+%d $)" % int(_fish.price)) if sold else ""])
 	print("PESCA ", id, " ", what)
 	_refresh_top()

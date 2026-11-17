@@ -17,7 +17,7 @@ const BUS_SFX := &"Efectos"
 const BUS_AMBIENT := &"Ambiente"               ## sonido de los escenarios (16-10-2026), dentro de Efectos
 
 ## Acciones que se pueden reasignar, con su nombre en el menú.
-const REMAP_ACTIONS := [
+const REMAP_ACTIONS := [   # i18n: sí
 	[&"up", "Moverse arriba"], [&"down", "Moverse abajo"], [&"left", "Moverse a la izquierda"],
 	[&"right", "Moverse a la derecha"], [InputBindings.DODGE, "Esquivar"], [InputBindings.PAUSE, "Pausa"],
 	[InputBindings.SHEET, "Ficha del jugador"], [InputBindings.MAP, "Mapa"],
@@ -417,4 +417,4 @@ static func perf_text(frames_us: PackedInt64Array, fps: float) -> String:
 	for f in sorted: total += f
 	var mean := total / 1000.0 / sorted.size()
 	var worst := sorted[mini(int(sorted.size() * 0.99), sorted.size() - 1)] / 1000.0   # como `perf=` (Game._perf_report)
-	return (L.t("%d FPS  ·  media %.1f ms  ·  1 %% peor %.1f ms") % [fps, mean, worst]).replace(".", ",")
+	return (L.t("%d FPS  ·  media %.1f ms  ·  1 %% peor %.1f ms") % [fps, mean, worst]).replace(".", L.dec)

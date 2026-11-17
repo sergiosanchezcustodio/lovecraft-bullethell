@@ -14,7 +14,8 @@ const EPOCH := "2026-01-01"
 const SALT := 0x2F
 const MONTHS := ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
 	"septiembre", "octubre", "noviembre", "diciembre"]
-const WEEKDAYS := ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"]
+const WEEKDAYS := [   # i18n: sí
+	"domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"]
 
 ## Fecha de hoy (la del PC, "AAAA-MM-DD"); daily_date= la cambia (pruebas).
 static func today() -> String:
@@ -96,7 +97,7 @@ static func pretty(date: String, weekday := true) -> String:
 	var d := Time.get_datetime_dict_from_datetime_string(date + "T12:00:00", true)
 	if d.is_empty() or int(d.get("month", 0)) < 1: return date
 	var s := L.t("%d de %s") % [int(d.day), L.t(MONTHS[int(d.month) - 1])]
-	return ("%s, %s" % [WEEKDAYS[int(d.weekday)], s]) if weekday else s
+	return ("%s, %s" % [L.t(WEEKDAYS[int(d.weekday)]), s]) if weekday else s
 
 static func _day_index(date: String) -> int:
 	return int(round((Time.get_unix_time_from_datetime_string(date + "T12:00:00") - Time.get_unix_time_from_datetime_string(EPOCH + "T12:00:00")) / 86400.0))

@@ -84,11 +84,11 @@ static func nav_dir(inp: PlayerInput) -> int:
 static func filler() -> Array[Dictionary]:
 	if _filler.is_empty():
 		for w in DamageRules.all_weapons():
-			_filler.append({"icon": w.get_icon(), "title": w.display_name, "kind": "ARMA", "accent": UiKit.GOLD})
+			_filler.append({"icon": w.get_icon(), "title": w.display_name, "kind": L.t("Arma").to_upper(), "accent": UiKit.GOLD})
 		for f in DirAccess.get_files_at("res://data/upgrades"):
 			if not f.ends_with(".tres"): continue
 			var u: UpgradeData = load("res://data/upgrades/" + f)
-			_filler.append({"icon": u.icon, "title": u.display_name, "kind": "OBJETO", "accent": u.color})
+			_filler.append({"icon": u.icon, "title": u.display_name, "kind": L.t("Objeto").to_upper(), "accent": u.color})
 	return _filler
 
 func _process(delta: float) -> void:
@@ -453,7 +453,7 @@ class Picker extends PanelContainer:
 
 	func _show_attr(n: String) -> void:
 		_attr_tex.texture = load("res://resources/PantallasMenus/iconos/ficha_%s.png" % n)
-		_attr_name.text = Attributes.LONG[n]
+		_attr_name.text = L.t(Attributes.LONG[n])
 
 	func _show_filler(i: int) -> void:
 		var f: Dictionary = _filler[randi() % _filler.size()]
@@ -513,13 +513,13 @@ class Picker extends PanelContainer:
 
 	static func _kind(o: PlayerProgress.Option) -> String:
 		match o.kind:
-			PlayerProgress.Option.Kind.NEW_WEAPON: return "ARMA NUEVA"
-			PlayerProgress.Option.Kind.WEAPON_LEVEL: return "MEJORA DE ARMA"
-			PlayerProgress.Option.Kind.EVOLUTION: return "EVOLUCIÓN"
-			PlayerProgress.Option.Kind.SIGN: return "SIGNO MAYOR"
-			PlayerProgress.Option.Kind.TRICK: return "TRUCO"
-			PlayerProgress.Option.Kind.REVELATION: return "REVELACIÓN"
-		return "OBJETO"
+			PlayerProgress.Option.Kind.NEW_WEAPON: return L.t("Arma nueva").to_upper()
+			PlayerProgress.Option.Kind.WEAPON_LEVEL: return L.t("Mejora de arma").to_upper()
+			PlayerProgress.Option.Kind.EVOLUTION: return L.t("Evolución").to_upper()
+			PlayerProgress.Option.Kind.SIGN: return L.t("Signo mayor").to_upper()
+			PlayerProgress.Option.Kind.TRICK: return L.t("Truco").to_upper()
+			PlayerProgress.Option.Kind.REVELATION: return L.t("Revelación").to_upper()
+		return L.t("Objeto").to_upper()
 
 	func move(step: int) -> void:
 		if done: return

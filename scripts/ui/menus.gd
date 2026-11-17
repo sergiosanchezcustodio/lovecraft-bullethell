@@ -68,9 +68,9 @@ class LevelUpMenu extends CanvasLayer:
 
 	func _kind(o: PlayerProgress.Option) -> String:
 		match o.kind:
-			PlayerProgress.Option.Kind.NEW_WEAPON: return "ARMA NUEVA"
-			PlayerProgress.Option.Kind.WEAPON_LEVEL: return "MEJORA DE ARMA"
-		return "PASIVA"
+			PlayerProgress.Option.Kind.NEW_WEAPON: return L.t("Arma nueva").to_upper()
+			PlayerProgress.Option.Kind.WEAPON_LEVEL: return L.t("Mejora de arma").to_upper()
+		return L.t("Pasiva").to_upper()
 
 	func _unhandled_input(event: InputEvent) -> void:
 		if event is InputEventKey and event.pressed and not event.echo:

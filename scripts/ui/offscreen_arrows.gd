@@ -66,7 +66,7 @@ func _draw() -> void:
 		for v in pts: shade.append(v + (v - pos).normalized() * 3.0)
 		draw_colored_polygon(shade, Color(0, 0, 0, 0.7 * col.a))
 		draw_colored_polygon(pts, col)
-		var text := "J%d" % (q.index + 1)
+		var text := L.player(q.index + 1)
 		if mine > 0: text += " · %d m" % roundi((me / mine).distance_to(q.global_position))
 		var tsz := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT)
 		var tp := pos - dir * (SIZE + tsz.length() * 0.45) - Vector2(tsz.x * 0.5, -FONT * 0.35)
