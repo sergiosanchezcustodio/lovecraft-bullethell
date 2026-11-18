@@ -3740,3 +3740,49 @@ Bloque C de la fase 22. Hecho, pendiente de revisión.
 - **Suite:** 1095 de 1095.
 - **Visto de paso, sin arreglar:** con `i18n_log=true`, Godot se cae al salir (señal 11) después de guardar `i18n_faltan.txt`. Pasa también en Pnakotus, así que viene del 22.5. Sin esa opción no se cae.
 - **Capturas:** `shots/game_zann1_020.0s.png` y `_060.0s.png` (la viola), `shots/game_zann3_040.0s.png` (el jefe), `shots/game_zann_en_016.0s.png` (en inglés), `shots/seleccion_noches_zann_002.5s.png` y `shots/seleccion_desafios_zann_002.5s.png`.
+
+- **Hito 22.7: tráiler de las cuatro partes (17-11-2026), pendiente de tu revisión.** El de la fase 13 (13.16), puesto al día con las mismas herramientas (`tools/trailer.py`, `tools/trailer_guion.json`).
+  - **Resultado** (`shots/videos/`):
+    - `trailer.mp4` y `trailer_en.mp4`: 1080p, 60 fps, 84,6 s, unos 238 MB cada uno, a −13 LUFS.
+    - `trailer_720p.mp4` y `trailer_en_720p.mp4`: unos 50 MB, para revisarlos o pasarlos.
+    - `trailer.gif`: 7 s a 480 px y 12 fps, 5,9 MB, sin rótulos, así que vale para los dos idiomas.
+    - Hojas de un fotograma por toma: `shots/trailer/hoja.png` y `hoja_en.png`.
+  - **Montaje al ritmo:** `trailer.py` mide el pulso de la música: flujo espectral, autocorrelación y la fase que más ataques suma, con numpy (`pulse`).
+    - Tu música de la portada (`Musica_Intro.mp3`) va a 130,09 pulsos por minuto, y su gran subida cae justo en un compás (36,9 s).
+    - Las tomas se miden en `compases` y cada corte cae en uno. Los fotogramas se acumulan, así que los cortes no se separan del compás.
+    - La música empieza en el compás 12 (`desde_compas`), de modo que la subida coincide con la primera toma de acción.
+  - **Estructura:**
+    - **Parte tranquila** (8 compases): la portada, el libro y la selección de cuatro con los retratos al óleo.
+    - **Subida** (15 compases, cortes secos): el campamento de Lake con cuatro jugadores, las armas, Innsmouth con poca cordura, el ritual, Padre Dagon y Cthulhu.
+    - **Respiro de un compás:** cartón «Más allá del muro del sueño…».
+    - **Segunda subida** (17 compases):
+      - parte 4: Carter con los gatos de Ulthar, Kuranes y sus zonas de sueño en el muelle de Dylath-Leen, Gilman en Leng, Pickman con los gugs y sus necrófagos, la entrada de Nyarlathotep;
+      - una toma por noche: el color con Tillinghast, Dunwich con Armitage y el polvo, Pnakotus con Peaslee y Zann con Derby y las ondas rojas.
+    - **Final:** el título se condensa cuando baja la música.
+  - **Rótulos nuevos** (en el guion, con `rotulo_en`): «Veintiún investigadores, cada uno con su arma», «57 armas. 117 evoluciones» (antes, «Cincuenta armas»), «Las Tierras del Sueño» y «Y cuatro noches sueltas, fuera de la campaña». Los textos son míos: cámbialos en el guion y `python tools/trailer.py --montar` lo vuelve a montar en un par de minutos.
+  - **Novedades de `trailer.py`:**
+    - Duración en `compases` o `pulsos`.
+    - `fundido` por toma (0 es corte seco).
+    - Cartones negros con texto (`"partida": "negro"`, `rotulo_centro`).
+    - `--idioma en`: todas las tomas menos los cartones se graban aparte con `cfg_language=en`, porque los avisos del juego salen aunque se quite la interfaz («Bajan los gatos de Ulthar…», las entradas de los jefes, la selección).
+    - `--gif`: tramos del guion con una paleta común.
+    - Versión de 720p y sonido normalizado (`loudnorm`).
+  - **Comunes de partida nuevas:** `tips=false bond_talk=false night_events=false peddler=false`.
+  - **Tiempos:** grabar las 20 tomas cuesta unos 20 minutos por idioma. Las pruebas de corte, con `--prueba <toma> --s 15`.
+  - **Para itch.io:** la página solo admite el tráiler como enlace de YouTube o Vimeo. Hay que subir allí `trailer_en.mp4` o `trailer.mp4`; el GIF sí se sube como captura.
+  - **Visto de paso:** los bots no hacen siempre lo mismo entre grabaciones, aunque las opciones sean las mismas. En Dunwich, la entrada del jefe salió en la prueba y no en la toma, así que su corte se movió a la pelea con el polvo.
+
+
+## Hito 22.8: capturas y textos para la página de itch.io (18-11-2026)
+
+Todo en `docs/itchio/` (las instrucciones de la página, en `pagina.md`).
+
+- **Capturas:** cinco por idioma a 1920 × 1080 en Alta, con la interfaz de partida: el campamento de Lake a cuatro con compañeros, la horda en Innsmouth, la llegada de Cthulhu, la de Nyarlathotep (con su rótulo) y lo que hay tras la ventana en la noche de Zann. En `capturas/` (español) y `capturas_en/` (inglés, con `cfg_language=en`), más `capturas/trailer.gif`. Quitadas las siete de octubre (siguen en git).
+  - `sh tools/capturas_itch.sh es|en`: seis partidas con bots invulnerables, varias capturas en cada una, y la portada (solo con `es`). `python tools/montar_itch.py --hoja es|en`: hoja de candidatas en `shots/itch_hoja_<idioma>.png`; sin opciones, copia las elegidas (`ELEGIDAS`, por idioma: los bots no juegan igual cada vez) y recorta la portada.
+  - **Visto de paso:** en la primera tanda en inglés, Cthulhu salió naranja entero por el tinte de la quemadura (el bot había cogido los Fósforos de Cthugha). El guion lleva ahora `tints=false`, como el tráiler.
+- **Portada (630 × 500):** recorte de la pantalla de título en vivo (niebla, velas y el título ya entrado, segundo 8). Muy parecida a la de octubre, que era la ilustración sola: queda como `portada_630x500_ilustracion.png` por si la prefieres. La cabecera, la de siempre.
+- **Textos:** `pagina.md` con la página en inglés y en español (primero el inglés): descripción corta, descripción con las cuatro partes y las cuatro noches, características al día (21 investigadores, 57 armas con 117 evoluciones, 58 objetos, más de 90 criaturas, 16 compañeros con trucos, vínculos, revelaciones, Signos Mayores, sucesos, desfile, expediciones, 21 desafíos, manual y estadísticas), controles, requisitos y créditos (añadidos los retratos y los finales con FLUX y las fuentes). Etiquetas con `online-co-op`; idiomas, español e inglés; Linux, mejor no marcarlo hasta probarlo con pantalla. Texto de la demo también en inglés.
+- **Requisitos medidos** con la build de Windows de la 0.9.0 (`sh tools/exportar.sh`), en 1920 × 1080, cuatro jugadores contra Nyarlathotep y hasta 120 enemigos, 110 s (`tools/medir_memoria.ps1`: lanza el `.exe` en el escritorio aparte y lee la RAM del proceso y los contadores «GPU Process Memory» de Windows):
+  - Alta: 983 MB de RAM y 869 MB de memoria de vídeo dedicada; Baja: 1105 MB y 614 MB (con más memoria compartida).
+  - `.exe` de 520 MB (248 en octubre), unos 410 MB comprimido. Los modelos comprimidos ocupan 244 MB de eso (1,4 GB en JSON). La demo, lo mismo.
+  - En la página: Windows 10/11 de 64 bits o macOS 11+, gráfica Vulkan con 2 GB (4 en Alta), 4 GB de RAM (8 recomendados), 4 núcleos, 1 GB de disco. Los mínimos de gráfica y procesador son estimados: no hay otra máquina en la que probar.
