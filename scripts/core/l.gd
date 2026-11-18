@@ -58,6 +58,13 @@ static func save_missing(path: String) -> void:
 	for k in keys: f.store_line(String(k).c_escape())
 	print("i18n: %d textos sin traducir en %s" % [keys.size(), ProjectSettings.globalize_path(path)])
 
+## Al salir: quita del servidor el apuntador (una Translation hecha en GDScript). Si sigue ahí
+## cuando Godot cierra los scripts, al liberarlo se cae (señal 11; visto en el 22.7).
+static func shutdown() -> void:
+	if _catcher != null:
+		TranslationServer.remove_translation(_catcher)
+		_catcher = null
+
 ## Apunta todo lo que se pide traducir (también lo que traducen solos los Label y los Button) y
 ## no está en la tabla.
 class _Catcher extends Translation:

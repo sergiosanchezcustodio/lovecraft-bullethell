@@ -794,3 +794,43 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 |---|---|---|
 | 22.7 | **Tráiler grabado con bots**, con la misma técnica que el manual (`tools/grabar_manual.py`): escenas escogidas de las cuatro partes, cortes al ritmo de la música y título al final. En vídeo para itch.io y en GIF corto para redes | Hecho (17-11-2026), pendiente de revisión: 84,6 s con 20 tomas de las cuatro partes, las cuatro noches y los personajes nuevos; cortes en los compases de tu música de la portada (130 pulsos por minuto, medidos con `trailer.py`), en español y en inglés (`--idioma en`), a 1080p y 720p, y GIF de 7 s (5,9 MB). Ver `docs/ESTADO.md` |
 | 22.8 | **Capturas y textos para la página de itch.io:** cinco capturas a 1920 × 1080 en Alta, portada de 630 × 500, descripción en español e inglés y requisitos medidos | Hecho (18-11-2026), pendiente de revisión: cinco capturas por idioma (`tools/capturas_itch.sh`, `tools/montar_itch.py`), portada de la pantalla de título en vivo, `docs/itchio/pagina.md` en inglés y español al día y requisitos medidos con la build (`tools/medir_memoria.ps1`). Ver `docs/ESTADO.md` |
+
+## Fase 23: propuesta (18-11-2026)
+
+**Propuesta el 18-11-2026**, al cerrar la fase 22 («continúa»), **pendiente de tu aprobación**. Elige bloques o hitos sueltos; el orden de los bloques es el recomendado. Lo que queda abierto de antes y depende de ti sigue igual: la música de la parte 4, la subida a itch.io (fase 8, tu cuenta; la página ya está al día con el 22.8), el `client_id` de la nube (fase 10) y la calibración de la dificultad (D-42).
+
+**Criterio de aceptación de la fase** (para lo que se elija): como el de la fase 22. Todo comprobado en captura y con el bot, sin errores, y nada empeora el rendimiento apreciablemente en Alta. Lo jugable va por datos y con tests. El arte nuevo de humanos, a bloques limpios; lo pintado, con ComfyUI en local.
+
+### Bloque A: antes de subirlo
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 23.1 | **Una build más ligera.** El `.exe` ha pasado de 248 a 520 MB y los modelos comprimidos ocupan 244 MB. Hay que buscar los JSON de `models/` que nada usa (variantes viejas como `rly_puerta_v1`, pruebas, prendas retiradas) y sacarlos de la build con una lista que se rehaga sola al exportar. Se mide lo que baja | Propuesto |
+| 23.2 | **Demo de verdad pequeña.** Hoy pesa lo mismo que el juego completo porque lo lleva todo y lo cierra por la etiqueta. Se trata de exportarla solo con lo de la parte 1 (modelos, arenas, música y relatos), con una prueba de que no le falta nada: la parte 1 entera con el bot | Propuesto |
+| 23.3 | **Créditos y licencia al día:** retratos y finales ilustrados con FLUX en `data/credits.json`, la ficha en inglés y un repaso de `LICENCIA.md` y del README con lo de las fases 20 a 22 | Propuesto |
+
+### Bloque B: la primera hora
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 23.4 | **Recorrido de un jugador nuevo** con el bot desde una partida vacía (`simular.py`, comprando como un jugador): cuándo se desbloquea cada cosa, si el dinero de las primeras partidas da para algo en la tienda y cuántas caídas hay hasta superar la parte 1. Informe y ajustes en los datos si sale una pared | Propuesto |
+| 23.5 | **Primeras veces de lo nuevo:** consejos y tutorial para lo que entró en las fases 20 a 22 (vínculos, revelaciones, Signos Mayores, sucesos, noches sueltas, la viola de Zann), que hoy aparecen sin explicar, y una vuelta al manual (tomo XII) con sus clips | Propuesto |
+
+### Bloque C: el procesador
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 23.6 | **Los pasos de física de los enemigos**, que marcan el 1 % peor en todas las partes (22.2). Hay que medir con `prof=true` qué cuesta por enemigo (separación, rejilla, comportamiento) y bajarlo un 20-30 % sin cambiar cómo se mueven, comparando con `comparar.py` | Propuesto |
+| 23.7 | **Portátiles flojos:** medir en Baja a 1280 × 800 con el procesador limitado (afinidad a 4 núcleos) para comprobar los requisitos mínimos de la página, y ajustar el perfil Portátil con lo que salga | Propuesto |
+
+### Bloque D: una quinta noche suelta
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 23.8 | ***El que acecha en la oscuridad*:** la iglesia abandonada de Federal Hill, en Providence, con el Trapezoedro Resplandeciente. El Acechador solo avanza a oscuras: la luz es el escudo, y la tormenta corta la corriente de las farolas. Con arena, dos criaturas, jefe, relato, desafío y sonidos. Blake, que ya es jugable, tiene aquí su noche | Propuesto |
+
+### Bloque E: compartir
+
+| Hito | Contenido | Estado |
+|---|---|---|
+| 23.9 | **Códigos de partida:** un texto corto (semilla, nivel, personajes y pacto) que se copia desde el archivo de expediciones o la pantalla final. Quien lo pegue juega la misma noche, con los mismos enemigos y los mismos cofres, para comparar con un amigo sin servidor | Propuesto |

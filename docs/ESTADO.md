@@ -3738,7 +3738,7 @@ Bloque C de la fase 22. Hecho, pendiente de revisión.
   - La ventana de las noches con la cuarta y su mapa (`nights_row=3`), y la de los desafíos con la fila nueva.
 - **Tests** (`tests/test_zann.gd`, 13): la noche y su nivel; la ventana sale de la arena y los escalones se pisan; sin viola no suena; cada compás aparta y solo hiere a lo de fuera; lejos empuja menos; el invitado no mueve a los enemigos; el compás; el frenesí quita cordura y el compás corriente no; calla; el viento tira; el jefe y sus fases; el desafío se abre con la noche y acelera la viola; el artículo.
 - **Suite:** 1095 de 1095.
-- **Visto de paso, sin arreglar:** con `i18n_log=true`, Godot se cae al salir (señal 11) después de guardar `i18n_faltan.txt`. Pasa también en Pnakotus, así que viene del 22.5. Sin esa opción no se cae.
+- **Visto de paso:** con `i18n_log=true`, Godot se caía al salir (señal 11) después de guardar `i18n_faltan.txt`. *Arreglado el 18-11-2026:* el apuntador (`L._Catcher`, una `Translation` hecha en GDScript) seguía en el `TranslationServer` cuando Godot cerraba los scripts; ahora `Settings._exit_tree` llama a `L.shutdown()`, que lo quita antes. Comprobado en la portada y en Pnakotus; suite, 1095 de 1095.
 - **Capturas:** `shots/game_zann1_020.0s.png` y `_060.0s.png` (la viola), `shots/game_zann3_040.0s.png` (el jefe), `shots/game_zann_en_016.0s.png` (en inglés), `shots/seleccion_noches_zann_002.5s.png` y `shots/seleccion_desafios_zann_002.5s.png`.
 
 - **Hito 22.7: tráiler de las cuatro partes (17-11-2026), pendiente de tu revisión.** El de la fase 13 (13.16), puesto al día con las mismas herramientas (`tools/trailer.py`, `tools/trailer_guion.json`).

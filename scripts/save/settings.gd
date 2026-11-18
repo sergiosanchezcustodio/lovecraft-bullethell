@@ -98,6 +98,7 @@ func apply_language() -> void:
 
 func _exit_tree() -> void:
 	if L.log_missing: L.save_missing("user://i18n_faltan.txt")
+	L.shutdown()
 
 func get_value(key: String) -> Variant:
 	if _overrides.has(key): return _overrides[key]
