@@ -204,7 +204,7 @@ func _part_button(pi: int, part: Dictionary, won: Array) -> Button:
 	var demo_out := not Demo.part_ok(pi)               # la demo (13.17): solo la parte 1
 	var open := not demo_out and ((Saves.current != null and Saves.current.unlock_all) or Campaign.part_unlocked(pi, won))
 	var playable := open and Campaign.exists(first)
-	var b := MenuKit.button(Demo.LOCKED if demo_out else (L.t("Jugar esta parte") if playable else (L.t("Próximamente") if open else "Bloqueada")), MenuKit.INK, 24)
+	var b := MenuKit.button(Demo.locked() if demo_out else (L.t("Jugar esta parte") if playable else (L.t("Próximamente") if open else "Bloqueada")), MenuKit.INK, 24)
 	b.custom_minimum_size = Vector2(_col_w, 62)
 	b.disabled = not playable
 	b.focus_entered.connect(func() -> void:

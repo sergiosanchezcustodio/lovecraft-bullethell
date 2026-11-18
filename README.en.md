@@ -11,7 +11,8 @@
 ![Windows](https://img.shields.io/badge/Windows-x86__64-0078D6?logo=windows&logoColor=white)
 ![macOS](https://img.shields.io/badge/macOS-universal-000000?logo=apple&logoColor=white)
 ![Players](https://img.shields.io/badge/players-1%E2%80%934%20local%20%26%20online-8e44ad)
-![Tests](https://img.shields.io/badge/tests-GUT%20%C2%B7%20393%20passing-2e7d32)
+![Languages](https://img.shields.io/badge/languages-English%20%C2%B7%20Spanish-c0392b)
+![Tests](https://img.shields.io/badge/tests-GUT%20%C2%B7%201095%20passing-2e7d32)
 ![Version](https://img.shields.io/badge/version-0.9.0-e0a100)
 [![License: code GPLv3, assets reserved](https://img.shields.io/badge/license-code%20GPLv3%20%C2%B7%20assets%20reserved-blue)](LICENCIA.md)
 
@@ -24,22 +25,22 @@
 > *"The most merciful thing in the world, I think, is the inability of the human mind to correlate all its contents."*
 > — H. P. Lovecraft, *The Call of Cthulhu*
 
-In the Library of Miskatonic University, a handful of investigators have begun to correlate them. From Antarctica to Innsmouth, and from Innsmouth to R'lyeh, something very old is waking up.
+In the Library of Miskatonic University, a handful of investigators have begun to correlate them. From Antarctica to Innsmouth, from Innsmouth to R'lyeh and from R'lyeh to the Dreamlands, something very old is waking up.
 
-**Lovecraft Library** follows three of Lovecraft's stories (*At the Mountains of Madness*, *The Shadow over Innsmouth* and *The Call of Cthulhu*) across fifteen levels and three colossal bosses. Your weapons fire on their own: the skill lies in **moving and dodging** through hordes and curtains of bullets that drain your **health** or your **sanity**. When sanity hits zero, madness follows.
+**Lovecraft Library** follows four of Lovecraft's stories (*At the Mountains of Madness*, *The Shadow over Innsmouth*, *The Call of Cthulhu* and *The Dream-Quest of Unknown Kadath*) across twenty levels and four colossal bosses, plus four more stories as standalone nights. Your weapons fire on their own: the skill lies in **moving and dodging** through hordes and curtains of bullets that drain your **health** or your **sanity**. When sanity hits zero, madness follows.
 
 <div align="center">
 
 <img src="docs/img/partida.gif" alt="A four-player game in the streets of Innsmouth, in the rain, among hybrids, acolytes and tiara priests" width="100%">
 
-| 15 | 3 | 13 | 50 + 50 | 50 | 16 | 47 | 1–4 |
+| 20 + 4 | 4 + 4 | 21 | 58 + 116 | 58 | 16 | 90+ | 1–4 |
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| levels | colossal bosses | investigators | weapons and their evolutions | items | companions | creatures | players, local or networked |
+| levels and standalone nights | campaign and night bosses | investigators | weapons and their evolutions | items | companions | creatures | players, local or networked |
 
 </div>
 
 > [!NOTE]
-> **Version 0.9.0, in development.** The full campaign can be played from start to finish: all three parts, solo, in local co-op or over the network. Still to come: the online test between different homes, final balancing with real players, the itch.io release and switching on cloud saves, which are already built. The detailed status is in the [roadmap](#roadmap).
+> **Version 0.9.0, in development.** The full campaign can be played from start to finish: all four parts and the four standalone nights, solo, in local co-op or over the network, in English or Spanish. Still to come: part 4's own music, the online test between different homes, final balancing with real players, the itch.io release and switching on cloud saves, which are already built. The detailed status is in the [roadmap](#roadmap).
 
 > [!IMPORTANT]
 > **The game is currently in Spanish only.** The names of characters, weapons, items and creatures on this page are translated; the screenshots show them as they appear in the game.
@@ -65,15 +66,16 @@ In the Library of Miskatonic University, a handful of investigators have begun t
 
 ### Gameplay
 
-- **Bullet hell with *survivors* progression:** hordes that pour in from off-screen, bullet patterns telegraphed on the ground and weapons that fire on their own. Each level lasts about five minutes and ends with a final event: a unique being, a horde to survive or one of the three bosses.
+- **Bullet hell with *survivors* progression:** hordes that pour in from off-screen, bullet patterns telegraphed on the ground and weapons that fire on their own. Each level lasts about five minutes and ends with a final event: a unique being, a horde to survive or one of the four bosses.
 - **Health and sanity:** physical attacks (red, orange and yellow) take health; mental attacks (purple and lilac) take sanity; mixed ones take both. Being near the horrors wears the mind down too.
-- **Madness crises:** at zero sanity, the investigator suffers one of five crises (paralysis, hysterical flight, aimless wandering, delirium with inverted controls, or paranoia), with a purple aura and a panicked face.
-- **50 weapons with evolutions:** firearms, physical and magic, four at once (six with the holsters from the shop). Each one levels from 1 to 5 and, at max level and with its paired item, evolves into a new weapon when you open an arcane chest. Magic weapons cost sanity.
-- **50 items** that bend the rules: projectiles, range, criticals, double dodges, shields, decoys, resurrection…
-- **13 investigators** with seven attributes, a starting weapon, a trait of their own and their own dodge style: slide, roll, dive, jump or flash.
-- **16 companions** that bite, heal, steal, swallow bullets or teleport.
+- **Madness crises:** at zero sanity, the investigator suffers one of five crises (paralysis, hysterical flight, aimless wandering, delirium with inverted controls, or paranoia), with a purple aura and a panicked face. Coming out of a crisis, you pick a **revelation** that lasts for the rest of the level.
+- **58 weapons with two evolutions each:** firearms, physical and magic, four at once (six with the holsters from the shop). Each one levels from 1 to 5 and, at max level and with its paired item, the next arcane chest lets you choose between its two evolutions. Magic weapons cost sanity, and weapons from different players (or your own) **combine** when they meet.
+- **58 items** that bend the rules: projectiles, range, criticals, double dodges, shields, decoys, resurrection…
+- **21 investigators** with seven attributes, a starting weapon, a trait of their own and their own dodge style (slide, roll, dive, jump, flash, Pickman's painting, Gilman's angles…), an oil portrait and a victory pose. Two are secret. Pairs who know each other in the stories share **bonds**: a small bonus while they stay close.
+- **16 companions** that bite, heal, steal, swallow bullets or teleport, and learn two tricks at level 5.
 - **Living levels:** snowfall, blizzards, fog, rain and thunderstorms; water that slows you down, waves that sweep the deck, devouring Angles that swallow whoever stays inside, arcane chests and breakable scenery; birds, bats and critters that react to the battle.
-- **Three difficulties:** Investigator, Normal and Nightmare.
+- **More than surviving:** elites with traits, mid-level bosses, Necronomicon pacts, Elder Signs, mid-level objectives, events in the night (blood moon, fog, tide…), a peddler and loose diary pages.
+- **Difficulty from 1 to 10**, adjustable game speed and, after beating Cthulhu, five **degrees of madness** that make the campaign harder one after another.
 
 ### Co-op, local and online
 
@@ -85,11 +87,13 @@ In the Library of Miskatonic University, a handful of investigators have begun t
 ### Progress and menus
 
 - **Three save slots**, each with its own money, unlocks and achievements, plus a **cloud copy** in your GitHub account (a secret gist) to carry on from another PC; if a save has changed on two PCs, the game asks which one to keep ([guide](docs/GUARDADO_NUBE.md), in Spanish).
-- **Antique shop:** permanent boosts, characters, companions and **outfits** (26 pieces shown on the model).
-- **The Library:** bestiary, arsenal and places, with 1920s journal notes and maps of every level.
-- **18 achievements** with rewards, an intro and **stories** that tell each level before you play it.
+- **Antique shop:** permanent boosts, characters, companions and **outfits** (83 pieces shown on the model).
+- **The Library:** a living bestiary, the arsenal, the places, the trophy room, the expedition archive, the investigator's manual (with clips from the game) and your account's statistics, with 1920s journal notes.
+- **39 achievements** with rewards, an intro, **stories** that tell each level before you play it and an illustrated ending for each part.
+- **More modes:** the endless night, the daily run, the boss rush, expeditions, 21 challenges and fishing on the Innsmouth pier.
 - **Four-player selection screen:** each player joins with Start, picks a character and a companion, and rotates them to see every side.
-- **Accessibility:** interface size, high-contrast bullets, fewer flashes and adjustable camera shake. Remappable gamepad and keyboard controls.
+- **Accessibility:** interface size, high-contrast bullets, fewer flashes, adjustable camera shake and vibration. Remappable gamepad and keyboard controls.
+- **In English and Spanish**, with a selector in Settings.
 
 ### Tech
 
@@ -113,89 +117,142 @@ In the Library of Miskatonic University, a handful of investigators have begun t
 | **Part 3 · Wilcox's studio.** Sculptures, easels and nightmares from the wave of dreams, in Providence. | **Part 3 · The swamp ritual.** Bonfires, armed cultists from the *Alert* and bat-winged devils. |
 | ![The storm in the Pacific](docs/img/p3_tormenta.jpg) | ![R'lyeh risen](docs/img/p3_rlyeh.jpg) |
 | **Part 3 · The storm in the Pacific.** A wave sweeps the deck as the white polypous thing rises. | **Part 3 · R'lyeh risen.** Flagstones that don't add up, lesser Old Ones and emanations of the colossal door. |
+| ![The enchanted wood and the outskirts of Ulthar](docs/img/p4_bosque.jpg) | ![The plateau of Leng](docs/img/p4_leng.jpg) |
+| **Part 4 · The enchanted wood.** Zoogs among the oaks and mushrooms, and the cats of Ulthar coming down to help. | **Part 4 · The plateau of Leng.** Shantaks, purple spiders and their webs, and the icy wind of Leng. |
+| ![The Gardner farm](docs/img/noche_color.jpg) | ![The Rue d'Auseil](docs/img/noche_zann.jpg) |
+| **Standalone night · The Colour Out of Space.** The Gardner farm withers around the well. | **Standalone night · The Music of Erich Zann.** The viol holds back what is outside while it plays; behind the window there is no Paris. |
 
 ### The bosses
 
-| The primordial shoggoth | Father Dagon | Cthulhu |
-|:---:|:---:|:---:|
-| ![The primordial shoggoth](docs/img/jefe_shoggoth.jpg) | ![Father Dagon](docs/img/jefe_dagon.jpg) | ![Cthulhu](docs/img/jefe_cthulhu.jpg) |
-| Chases you through the tunnels of the underground sea, crying "Tekeli-li!". | Rises from the depths of Devil Reef, slams with his hands and calls the Deep Ones. | Looms through the door of R'lyeh, sweeps with his tentacles and, when he falls, re-forms once. |
+| The primordial shoggoth | Father Dagon | Cthulhu | Nyarlathotep |
+|:---:|:---:|:---:|:---:|
+| ![The primordial shoggoth](docs/img/jefe_shoggoth.jpg) | ![Father Dagon](docs/img/jefe_dagon.jpg) | ![Cthulhu](docs/img/jefe_cthulhu.jpg) | ![Nyarlathotep](docs/img/jefe_nyarla.jpg) |
+| Chases you through the tunnels of the underground sea, crying "Tekeli-li!". | Rises from the depths of Devil Reef, slams with his hands and calls the Deep Ones. | Looms through the door of R'lyeh, sweeps with his tentacles and, when he falls, re-forms once. | Waits atop Kadath in three shapes: the black pharaoh, the swarm and the faceless one. |
 
 ### Menus
 
 | | |
 |:---:|:---:|
 | ![Four-player character selection](docs/img/seleccion.jpg) | ![Campaign map](docs/img/mapa.jpg) |
-| **Selection.** Up to four players pick character, outfit and companion at the same time, each with their own gamepad. | **The map.** Three parts of five levels that open as you beat the previous one. |
+| **Selection.** Up to four players pick character, outfit and companion at the same time, each with their own gamepad. | **The map.** Four parts of five levels joined by a path of ink, with the standalone nights on the side. |
 | ![Level story](docs/img/relato.jpg) | ![Character sheet](docs/img/ficha.jpg) |
 | **Stories.** Each level is told before you play it, over a map of the place. | **The character sheet** in-game: attributes, weapons and items. |
 | ![Antique shop](docs/img/tienda.jpg) | ![The Library](docs/img/biblioteca.jpg) |
-| **The antique shop,** with the old man behind the counter. | **The Library:** bestiary, arsenal and places, with journal notes. |
+| **The antique shop,** with the old man behind the counter. | **The Library:** living bestiary, arsenal, places, trophies, manual and statistics. |
 | ![Achievements](docs/img/logros.jpg) | ![Play online](docs/img/online.jpg) |
 | **Achievements,** with their reward and progress. | **Play online:** create a room or join one with its code. |
 
 ## The campaign
 
-Three parts of five levels. Each level opens when you beat the previous one, and each part when you beat the previous part. Every part starts again with the weakest creatures, but is harder than the last one, counting what you have bought in the shop.
+Four parts of five levels. Each level opens when you beat the previous one, and each part when you beat the previous part. Every part starts again with the weakest creatures, but is harder than the last one, counting what you have bought in the shop.
 
 ### Part 1 · *At the Mountains of Madness* (Antarctica)
 
-| Level | Creatures | Final event |
-|---|---|---|
-| 1. Base camp on the Ross Sea coast | Blind albino penguins, protoplasmic fragments | The Lurker |
-| 2. Lake's ruined camp | Revived Elder Things, winged Elder Things | The first to awaken |
-| 3. The mountain pass and its caverns | Slave shoggoths, mimic shoggoths | The cavern shoggoth |
-| 4. The Cyclopean city of the Elder Things | Elder Thing warriors, mutilated Elder Things | The city's guardian |
-| 5. The tunnels and the abyss of the underground sea | Glowing-eyed shoggoths, Elder Things of the abyssal sea | **Boss: the primordial shoggoth** |
+<!-- tabla:parte1 -->
+| Level | Creatures | Mid-level | Final event |
+|---|---|---|---|
+| 1. Base camp on the Ross Sea coast | Blind albino penguin, Protoplasmic fragment | — | Lurker |
+| 2. Lake's ruined camp | Blind albino penguin, Protoplasmic fragment, Revived Elder Thing, Winged Elder Thing, Lake's expedition member | — | The first to wake |
+| 3. The mountain pass and its caverns | Blind albino penguin, Protoplasmic fragment, Revived Elder Thing, Winged Elder Thing, Slave shoggoth, Mimic shoggoth, Burrowing shoggoth | Gedney, what's left of him | The shoggoth of the cavern |
+| 4. The cyclopean city of the Elder Things | Blind albino penguin, Protoplasmic fragment, Revived Elder Thing, Winged Elder Thing, Slave shoggoth, Elder Thing warrior, Mutilated Elder Thing, Elder Thing sower | — | The guardian of the city |
+| 5. The tunnels and the abyss of the underground sea | Blind albino penguin, Protoplasmic fragment, Slave shoggoth, Mutilated Elder Thing, Glowing-eyed shoggoth, Elder Thing of the abyssal sea, Burrowing shoggoth, Elder Thing sower | — | **Boss: The primordial shoggoth** |
+<!-- /tabla -->
 
 ### Part 2 · *The Shadow over Innsmouth* (New England)
 
-| Level | Creatures | Final event |
-|---|---|---|
-| 1. Newburyport and the road to Innsmouth | Innsmouth townsfolk, acolytes of the Order of Dagon | The Order's deacon |
-| 2. The streets of Innsmouth and the Order's temple | Advanced hybrids, tiara priests | The Order's high priest |
-| 3. The Gilman House and the rooftop escape | Deep Ones, spitting Deep Ones, the Lurker | Survive the Devil Reef horde |
-| 4. The marshes and the abandoned railway to Rowley | Elder Deep Ones of Y'ha-nthlei, marsh Deep Ones | Barnabas Marsh, transformed |
-| 5. Devil Reef and Y'ha-nthlei | Pth'thya-l'yi, Mother Hydra | **Boss: Father Dagon** |
+<!-- tabla:parte2 -->
+| Level | Creatures | Mid-level | Final event |
+|---|---|---|---|
+| 1. Newburyport and the road to Innsmouth | Innsmouth fisherman, Innsmouth townswoman, Innsmouth old man, Acolyte of the Order of Dagon | — | The deacon of the Order |
+| 2. The streets of Innsmouth and the Order's temple | Innsmouth fisherman, Innsmouth townswoman, Innsmouth old man, Acolyte of the Order of Dagon, Advanced hybrid, Advanced hybrid, Priest of the tiara, Guardian of the Order of Dagon | — | The high priest of the Order |
+| 3. The Gilman House hotel and the rooftop escape | Deep One, Spitting Deep One, Advanced hybrid, Advanced hybrid, Rooftop lurker, Guardian of the Order of Dagon, Daughter of the Marshes | Captain Obed Marsh | Hold out 60 s against the horde |
+| 4. The marshes and the abandoned Rowley line | Deep One, Swamp Deep One, Spitting Deep One, Advanced hybrid, Advanced hybrid, Elder Deep One of Y'ha-nthlei, Tide swimmer, Daughter of the Marshes | — | Barnabas Marsh, transformed |
+| 5. Devil Reef and Y'ha-nthlei | Deep One, Swamp Deep One, Spitting Deep One, Elder Deep One of Y'ha-nthlei, Advanced hybrid, Tide swimmer | Pth'thya-l'yi, the ancestor | **Boss: Mother Hydra → Father Dagon** |
+<!-- /tabla -->
 
 ### Part 3 · *The Call of Cthulhu* (Providence, Louisiana and the Pacific)
 
-| Level | Creatures | Final event |
-|---|---|---|
-| 1. Providence: the sculptor Wilcox's studio | Nightmares from the wave of dreams, cultists | The nightmare of the bas-relief |
-| 2. The Louisiana swamps: the cult's ritual | Bat-winged devils, armed cultists from the *Alert* | The ritual's priest |
-| 3. The docks and the deck of the *Alert* | Spawn of Cthulhu, Deep One servants | The greater spawn |
-| 4. The storm in the Pacific | The white polypous thing, devouring Angles | The white thing of the hidden lake |
-| 5. R'lyeh risen: the colossal door | Lesser Old Ones, emanations of the door | **Boss: Cthulhu** |
+<!-- tabla:parte3 -->
+| Level | Creatures | Mid-level | Final event |
+|---|---|---|---|
+| 1. Providence: the sculptor Wilcox's studio | Nightmare of the dream wave, Cthulhu cultist, Providence sleepwalker | — | The nightmare of the bas-relief |
+| 2. The Louisiana swamps: the cult's ritual | Cthulhu cultist, Armed cultist of the Alert, Bat-winged devil, Swamp drummer, Living idol | Old Castro | The priest of the ritual |
+| 3. The docks and the deck of the Alert | Deep One, Spitting Deep One, Cthulhu cultist, Armed cultist of the Alert, Living idol | Spawn of Cthulhu | The greater spawn |
+| 4. The storm in the Pacific | The white polypous thing, Deep One, Armed cultist of the Alert, Bat-winged devil, Providence sleepwalker | — | The white thing of the hidden lake |
+| 5. R'lyeh risen: the colossal door | Emanation of the door, Deep One, Cthulhu cultist | Lesser Great Old One | **Boss: Cthulhu → Cthulhu, reformed** |
+<!-- /tabla -->
+
+### Part 4 · *The Dream-Quest of Unknown Kadath* (the Dreamlands)
+
+It opens when you beat Cthulhu. More colour than the earlier parts, without leaving the night, and each level with something of its own: the cats of Ulthar, the black galley that lands its crew, the spiders' webs, the ghasts that hate the light, the night-gaunts that carry you through the air and the flutes of the Other Gods.
+
+<!-- tabla:parte4 -->
+| Level | Creatures | Mid-level | Final event |
+|---|---|---|---|
+| 1. The enchanted wood and the outskirts of Ulthar | Zoog, Treetop zoog, Nightmare of the dream wave | — | The elder of the zoogs' council |
+| 2. The port of Dylath-Leen and the black galley | Merchant of Leng, Moon rower, Nightmare of the dream wave | — | The master of the black galley |
+| 3. The plateau of Leng and the windowless monastery | Shantak, Purple spider of Leng, Merchant of Leng | The high priest not to be described | The mother of the spiders of Leng |
+| 4. The vaults of Zin and the tower of the gugs | Ghast, Gug | — | The great gug of the Tower of Koth |
+| 5. The summit of Kadath and the onyx castle | Larva of the Other Gods, Night-gaunt | — | **Boss: Nyarlathotep, the Crawling Chaos** |
+<!-- /tabla -->
+
+### Standalone nights
+
+Four more stories, outside the campaign, from the map's "Standalone nights" button: one level with its two creatures, its boss, its story and its own rules.
+
+<!-- tabla:noches -->
+| Level | Creatures | Mid-level | Final event |
+|---|---|---|---|
+| The Gardner farm | Grey cow, Withered farmer | — | **Boss: The colour rising from the well** |
+| Sentinel Hill | Dunwich whippoorwill, Devotee of the hills | — | **Boss: Wilbur's brother** |
+| The ruins of Pnakotus | Possessed by the Great Race, Flying polyp | — | **Boss: The ancient polyp** |
+| The Rue d'Auseil | Rue d'Auseil lodger, Shred of the night | — | **Boss: What lies beyond the window** |
+<!-- /tabla -->
+
+- ***The Colour Out of Space*:** the Gardner farm withers around the well, and whatever the colour touches drains health.
+- ***The Dunwich Horror*:** the unseen thing on Sentinel Hill only leaves footprints; the powder of Ibn Ghazi shows it for a moment.
+- ***The Shadow Out of Time*:** the almost invisible polyps rise from the trapdoors of Pnakotus, which are sealed by standing on them.
+- ***The Music of Erich Zann*:** the viol at the highest window pushes back and burns what is outside, and speeds up into a frenzy.
 
 ## Characters
 
-All of them come from Lovecraft's stories or are invented relatives and acquaintances of his characters. You start with four (Dyer, Olmstead, Peaslee and Whipple); the rest are bought in the shop.
+All of them come from Lovecraft's stories or are invented relatives and acquaintances of his characters. You start with four (Dyer, Olmstead, Peaslee and Whipple); the rest are bought in the shop, except two secret ones you have to discover.
 
 Each investigator has **seven attributes** (Power, Intelligence, Strength, Constitution, Tenacity, Dexterity and Culture), at 10 plus 20 points spread according to their background. They determine health, sanity, dodge, speed and the damage of each weapon type, and each level-up adds one more point.
 
 ![Dyer, Olmstead, Legrasse, Johansen, Peaslee, Varga and Whipple](docs/img/personajes_1.jpg)
 ![Blake, Iwanicki, Elwood, Malone, Armitage and West](docs/img/personajes_2.jpg)
+![Carter, Whateley, Pickman, Ward, Gilman, Tillinghast, Derby, Asenath and Kuranes](docs/img/personajes_3.jpg)
 
 The faces are drawn by hand, voxel by voxel, on the model's own head: eyebrows, eyes with irises, raised noses, moustaches, glasses, freckles and lips.
 
-![The thirteen faces up close](docs/img/cabezas.jpg)
+![The faces up close](docs/img/cabezas.jpg)
 
-| Character | Starting weapon | Trait | Dodge | Source story |
+<!-- tabla:personajes -->
+| Character | Starting weapon | Trait | Dodge | Story |
 |---|---|---|---|---|
-| **William Dyer**, Miskatonic geologist | Stielhandgranate | Explosions 25 % bigger | Slide | *At the Mountains of Madness* |
-| **Robert Olmstead**, traveller and narrator of Innsmouth | Webly Mk VI | Dodge 30 % longer | Roll | *The Shadow over Innsmouth* |
-| **Amelia Peaslee**, archaeologist | Lever-action rifle | More luck: sometimes a fourth upgrade to choose from | Roll | *The Shadow out of Time* |
-| **Dr. Marian Whipple**, physician | Scalpels | Revives teammates 50 % faster | Jump | *The Shunned House* |
-| **John R. Legrasse**, New Orleans police inspector | Pump-action shotgun | 25 % more damage against cultists and humans | Jump | *The Call of Cthulhu* |
-| **Gustaf Johansen**, second mate of the *Emma* | Machete | 25 % more melee damage | Dive | *The Call of Cthulhu* |
-| **Madame Ludmila Varga**, Arkham medium | Necronomicon | Arcane weapons cost her half the sanity | Flash | Arkham medium |
-| **Henrietta Blake**, writer | Trapezohedron | 15 % more experience per gem | Slide | *The Haunter of the Dark* |
-| **Father Iwanicki**, priest of St. Stanislaus | Banishing formula | Calming aura: he and nearby teammates recover sanity | Roll | *The Dreams in the Witch House* |
-| **Sergeant Frank Elwood**, Great War veteran | Mauser C96 pistol | 15 % less physical damage | Dive | *The Dreams in the Witch House* |
-| **Vera Malone**, Red Hook smuggler | Thompson M1928 | Up to 50 % more damage the closer the enemy is | Slide | *The Horror at Red Hook* |
-| **Professor Henry Armitage**, Miskatonic librarian | Powder of Ibn-Ghazi | Magic weapons recharge 20 % faster | Flash | *The Dunwich Horror* |
-| **Herbert West**, reanimator | West's injector | On level-up, heals nearby teammates for 15 % of their health | Roll | *Herbert West—Reanimator* |
+| **William Dyer**, geologist at Miskatonic University *(starter)* | Stielhandgranate | Explosions 25 % bigger | Slide | *At the Mountains of Madness* |
+| **Robert Olmstead**, traveller and narrator of Innsmouth *(starter)* | Webley Mk VI | 30 % longer dodge | Roll | *The Shadow over Innsmouth* |
+| **Amelia Peaslee**, archaeologist, niece of Professor Peaslee *(starter)* | Lever-action rifle | Luckier: sometimes a fourth upgrade option | Roll | *The Shadow Out of Time* |
+| **Dr Marian Whipple**, doctor, niece of Dr Elihu Whipple *(starter)* | Scalpels | Revives teammates 50 % faster | Leap | *The Shunned House* |
+| **John R. Legrasse**, new Orleans police inspector | Pump-action shotgun | 25 % more damage against cultists and human enemies | Leap | *The Call of Cthulhu* |
+| **Gustaf Johansen**, second mate of the Emma | Machete | 25 % more melee damage | Penguin belly-slide | *The Call of Cthulhu* |
+| **Madame Ludmila Varga**, spiritualist and medium of Arkham | Necronomicon | Arcane weapons cost her half the sanity | Flash | *Arkham medium* |
+| **Henrietta Blake**, writer, sister of Robert Blake | Trapezohedron | 15 % more experience per gem | Slide | *The Haunter of the Dark* |
+| **Father Iwanicki**, priest of St Stanislaus' church | Banishing formula | A calming aura: he and nearby teammates recover sanity | Roll | *The Dreams in the Witch House* |
+| **Sergeant Frank Elwood**, great War veteran | Mauser C96 pistol | Takes 15 % less physical damage | Penguin belly-slide | *The Dreams in the Witch House* |
+| **Vera Malone**, red Hook bootlegger | Thompson M1928 | Up to 50 % more damage the closer the enemy is | Slide | *The Horror at Red Hook* |
+| **Professor Henry Armitage**, librarian of Miskatonic University | Powder of Ibn-Ghazi | Magic weapons recharge 20 % sooner | Flash | *The Dunwich Horror* |
+| **Herbert West**, physician, reanimator | West's injector | On level-up, heals nearby teammates for 15 % of their health | Roll | *Herbert West–Reanimator* |
+| **Randolph Carter**, boston dreamer *(secret)* | Key of dreams | Madness crises last half as long for him: he knows how to wake up | Flash | *The Silver Key* |
+| **Wilbur Whateley**, son of Lavinia, of Dunwich *(secret)* | Footsteps of the unseen | Half from another world: mental damage affects him 40 % less | Leap | *The Dunwich Horror* |
+| **Richard Upton Pickman**, boston painter | Pickman's canvases | He has painted worse things: loses 30 % less sanity | Painting | *Pickman's Model* |
+| **Charles Dexter Ward**, providence antiquarian | Essential salts | Curwen's shadow: up to 40 % more damage the less sanity he has left | Dust | *The Case of Charles Dexter Ward* |
+| **Walter Gilman**, miskatonic mathematics student | Impossible angles | Between the angles: bullets hit him less (his hitbox is 30 % smaller) | Angle | *The Dreams in the Witch House* |
+| **Crawford Tillinghast**, physicist and philosopher of Providence | Machine from beyond | Sees beyond: his weapons reach 15 % further | Beyond | *From Beyond* |
+| **Edward Derby**, arkham poet (and Asenath Waite) | The threshold | Two souls in two bodies: every dodge swaps them. Edward strikes up close; Asenath glares from afar. Each swap restores 3 health and sanity | Body swap | *The Thing on the Doorstep* |
+| **Kuranes**, london dreamer, king of Celephaïs | Reverie of Celephaïs | Half asleep: recovers 0.4 sanity per second, even among the horrors | Dream | *Celephaïs* |
+<!-- /tabla -->
 
 ## Companions
 
@@ -207,174 +264,214 @@ Each player can bring one. They level up with you and are bought in the shop.
 <details>
 <summary><b>The 16 companions</b></summary>
 
+<!-- tabla:companeros -->
 | Companion | What it does |
 |---|---|
-| Lake's sled dog | Runs at nearby enemies and bites them, harder the higher your level. |
-| Cat of Ulthar | Scratches anything that comes close; if you get hurt, it bristles and attacks twice as fast. |
-| Rat in the Walls | Digs up dollars; sometimes, an arcane chest. |
-| Innsmouth toad | Spits venomous slime that leaves a pool that damages and weakens. |
-| Dream owl | 12 % more experience, up to 30 % as it levels up. |
-| Baby shoggoth | Sticks to you and swallows enemy bullets that pass nearby. |
-| Mini-Byakhee | Flies high and dives: an area hit that pushes. |
-| Arkham raven | Brings you distant gems and steals a few coins on the way. |
-| Moth of Leng | Its dust confuses groups: they wander aimlessly and don't shoot. |
-| Innsmouth gull | Brings fish that restores health and sanity to whoever needs it most; screeches when it spots an elite. |
-| Mini-Mi-Go | Fires beams at the nearest enemy. |
-| Spider of Tindalos | Teleports behind an enemy, bites hard and stuns. |
-| Serpent of Yig | Bites and poisons. |
-| Innsmouth fish | Takes a run-up and rams whatever is in its path. |
-| Mini-Dhole | Burrows and surfaces under groups of enemies: hits, pushes and stuns them. |
-| Woodland goat | A charge that pushes and stuns. |
+| Rat in the Walls | A huge, ill-mannered rat. Every so often it digs and finds dollars; sometimes, an arcane chest |
+| Innsmouth fish | A fish with legs that thinks it's human. It takes a run-up and rams the enemies in its way |
+| Lake's sled dog | It runs at nearby enemies and bites them; the higher your level, the harder it bites |
+| Arkham raven | A thieving raven. It flies off for distant gems and brings them to you; on the way it steals a few coins, from whoever |
+| Goat of the woods | A seemingly innocent little goat. It rams the enemies: pushing and stunning them |
+| Innsmouth toad | Hideous but adorable. It spits poisonous slime: it leaves a puddle that damages and weakens enemies |
+| Dream owl | It looks wise. It flies beside you and gives you 12 % more experience, up to 30 % as it levels up |
+| Innsmouth gull | A noisy scavenger. It goes off for fish and brings it back: it heals 8 % health and sanity (up to 15 %) to whoever needs it most. It screeches when it spots an elite |
+| Cat of Ulthar | A seemingly ordinary black cat... until it gets angry. It scratches enemies that come close; if you get hurt, its fur bristles and it attacks twice as fast |
+| Moth of Leng | Pretty... until it opens its wings. It shakes its dust over groups of enemies: they wander about confused and don't shoot |
+| Serpent of Yig | A snake that stares far too intently. It bites and poisons: the poison keeps doing damage for a few seconds |
+| Mini-Byakhee | An alien bat with an unfriendly face. It flies high and dives onto the enemies: an area blow that pushes them back |
+| Baby shoggoth | A little black ball full of eyes. It sticks close to you and swallows enemy bullets that pass nearby |
+| Mini-Mi-Go | A tiny space crustacean. It fires rays at the nearest enemy |
+| Mini-Dhole | A gigantic worm reduced to a pet. It burrows and surfaces under groups of enemies: striking, pushing and stunning them |
+| Spider of Tindalos | A spider that doesn't respect the laws of geometry. It teleports behind an enemy, bites hard and stuns it |
+<!-- /tabla -->
 
 </details>
 
 ## Weapons and items
 
-**50 weapons** (16 physical, 17 firearms and 17 magic), each with its evolution:
+**58 weapons** (16 physical, 17 firearms and 25 magic), each with two evolutions:
 
-![Icons of the 50 weapons](docs/img/armas.jpg)
+![Icons of the 58 weapons](docs/img/armas.jpg)
 
-They all fire on their own, and each one's data decides how it aims: at the nearest enemy, at the densest area, at elites, around the character… They level from 1 to 5 and their damage grows with the attributes of their type. With the weapon at level 5 and its paired item, an arcane chest turns it into its **evolution**:
+They all fire on their own, and each one's data decides how it aims: at the nearest enemy, at the densest area, at elites, around the character… They level from 1 to 5 and their damage grows with the attributes of their type. With the weapon at level 5 and its paired item, an arcane chest turns it into one of its two **evolutions**, your choice:
 
-![Icons of the 50 evolutions](docs/img/evoluciones.jpg)
+![Icons of the 116 evolutions](docs/img/evoluciones.jpg)
 
 <details>
-<summary><b>The 50 weapons and their evolutions</b></summary>
+<summary><b>The 58 weapons and their evolutions</b></summary>
 
-| Weapon | Type | How it works | Evolution (with) |
+<!-- tabla:armas -->
+| Weapon | Type | How it works | Evolutions (with) |
 |---|---|---|---|
-| The *Alert*'s anchor | Physical | An anchor on a chain that circles the character at long range, slow and heavy. | Johansen's anchor (Sealskin cuirass) |
-| Whaling harpoon | Physical | Pierces and drags lesser enemies. | Nantucket harpoon (Plumb bob) |
-| Crossbow | Physical | Bolts that pierce and pin the enemy for an instant. | Crossbow of fortune (Bone die) |
-| Sword cane | Physical | A long thrust that pierces everything in its line. | Duelist's rapier (Whetstone) |
-| Scalpels | Physical | A fan of piercing blades. | Surgical kit (Reindeer coat) |
-| Boomerang | Physical | Flies out to its range and back, hitting both ways. | Bone boomerang (Pabodie's skis) |
-| Leg-hold traps | Physical | Traps on the ground: the first enemy to step on one is caught and hurt. | Hunter's traps (Fang necklace) |
-| Molotov cocktail | Physical | A bottle thrown in an arc that leaves a burning pool. | The *Emma*'s cocktail (Rum flask) |
-| Chlorine gas | Physical | A toxic cloud that drifts toward enemies and poisons them. | Mustard gas (Curwen's elixir) |
-| West's injector | Physical | An enemy killed with the serum rises as an ally for 6 s. | Perfected reagent (First-aid kit) |
-| Chemical launcher | Physical | An acid flask: enemies in the pool take 25 % more damage. | Arkham apothecary (Laudanum) |
-| Whip | Physical | A long lash in an arc ahead. | Tamer's whip (Lake's whistle) |
-| Machete | Physical | A circular slash around the character. | Cane-field machete (Stevedore's gloves) |
-| Geologist's hammer | Physical | A crack in a straight line that damages and stuns. | Ice Barrier hammer (Crampons) |
-| Fishing net | Physical | Pins the densest group for 2 s; elites are only slowed. | Innsmouth net (Deep One scales) |
-| Stielhandgranate | Physical | A stick grenade at the densest area; big explosion. | Shaped charge (Reflexes) |
-| Lewis gun | Firearm | A tripod turret that fires at the nearest enemy on its own for 8 s. | Machine-gun nest (Marksmanship manual) |
-| Mauser anti-tank rifle | Firearm | A very slow shot that pierces everyone in its line. | Anti-tank gun (Hunter's medallion) |
-| BAR M1918 | Firearm | Bursts whose bullets ricochet to another enemy. | Assault BAR (Snow boots) |
-| Tesla coil | Firearm | Lightning that jumps from enemy to enemy, up to four. | Nikola's coil (Dowsing rod) |
-| Pump-action shotgun | Firearm | Pellets that spread in a ring around the character. | Trench shotgun (Bandolier) |
-| Flammenwerfer | Firearm | A cone of fire that leaves the ground burning. | Breath of Moloch (Matches of Cthugha) |
-| Fireworks | Firearm | Erratic rockets that burst into sparks. | Grand fireworks display (Firecrackers) |
-| Dual Lugers | Firearm | Fire both where you're walking and behind you. | The ace's Lugers (Aviator goggles) |
-| Stokes mortar | Firearm | A high-arc shell at the densest group; big explosion. | Mortar battery (Ponape powder) |
-| Danforth's Nagant | Firearm | Fires faster and faster while it has targets. | Lookout's Nagant (Magnifying glass) |
-| Mauser C96 pistol | Firearm | Short bursts of three tracers. | Tillinghast's Mauser (Tillinghast's watch) |
-| Flare gun | Firearm | A flare that lures nearby enemies. | Lighthouse flare (Cloak of the Black Man) |
-| Sawn-off shotgun | Firearm | Two blasts of pellets in a short cone with heavy knockback. | Smuggler's sawn-off (Shoggoth tooth) |
-| Lever-action rifle | Firearm | Fast shots that pierce several enemies. | Miskatonic rifle (Field journal) |
-| Springfield M1903 | Firearm | A slow shot that seeks out elites; sometimes, a triple critical. | Sniper's Springfield (Pickman's eye) |
-| Thompson M1928 | Firearm | Tight bursts of small projectiles. | Chicago Thompson (Obed's gold) |
-| Webly Mk VI | Firearm | Heavy rounds with knockback. | Lookout's revolver (Lake's compass) |
-| Breath of Ithaqua | Magic | An icy wind in a cone that slows and freezes. | Breath of the Wendigo (Pemmican) |
-| Lamplighter's staff | Magic | Will-o'-the-wisps that seek out enemies on their own. | Lantern of the wisps (Meerschaum pipe) |
-| Ritual dagger | Magic | A curse that jumps to its neighbours if the enemy dies cursed. | Sacrificial dagger (Ghoul fang) |
-| Sphere of Yog-Sothoth | Magic | A slow orb that pulls enemies into its centre and grinds them. | The Gate and the Key (Silver key) |
-| Banishing formula | Magic | A wave that pushes and stuns. | Greater exorcism (Elder Sign) |
-| Aether lens | Magic | A sustained beam whose damage grows up to threefold. | Eye of the Aether (Spyglass) |
-| Flame of Cthugha | Magic | A living fireball that pierces and leaves a burning trail. | Cult flame (Esoteric talisman) |
-| Lamp of Alhazred | Magic | A beam of light that sweeps in a circle around the character. | Lamp of the Mad Arab (Ankh of Nephren) |
-| Necronomicon | Magic | Pages that orbit the character. | Complete Necronomicon (Pnakotic manuscripts) |
-| Mi-Go orb | Magic | An orb from Yuggoth that flies around you and fires on its own. | Swarm of Yuggoth (Crystal of Ithaqua) |
-| Powder of Ibn-Ghazi | Magic | A cloud that slows and weakens those inside. | Powder of the Elder Things (Map of Leng) |
-| Ray of Yith | Magic | Freezes in time; the damage lands at the end, 50 % higher. | Ray of the Great Race (Clepsydra of Yith) |
-| Resonator | Magic | Its pulse dissolves nearby enemy bullets. | Great resonator (Shield of Nodens) |
-| Yellow Sign | Magic | Those who look at it go mad and attack their own. | The King in Yellow (Psalter) |
-| Arcane Sign | Magic | A sign on the ground that damages, pushes and slows enemy bullets. | Greater Sign (Scapular) |
-| Tentacles of Shub | Magic | Tentacles that burst from the ground beneath random enemies. | The Thousand Young (Eltdown tablet) |
-| Trapezohedron | Magic | A ray of concentrated light that damages everything it passes through. | Awakened trapezohedron (Idol of Cthulhu) |
+| Anchor of the Alert | Physical | An anchor on a chain that swings around the character at a great distance, slow and heavy | Johansen's anchor / Windlass of the Alert (Sealskin cuirass) |
+| Boomerang | Physical | It flies out to its range and comes back to your hands, hitting on the way out and on the way back | Bone boomerang / War boomerang (Pabodie's skis) |
+| Chemical thrower | Physical | Acid flask: enemies in the puddle take 25 % more damage | Arkham apothecary / Aqua regia (Laudanum) |
+| Chlorine gas | Physical | A toxic cloud that drifts slowly towards the enemies and poisons them | Mustard gas / Phosgene (Curwen's elixir) |
+| Crossbow | Physical | Bolts that pierce and pin the enemy in place for a moment | Crossbow of fortune / Cranequin crossbow (Bone die) |
+| Fishing net | Physical | Throws a net over the densest group: those underneath are held still for 2 seconds. Elites are only slowed | Innsmouth net / Trawl nets (Deep One scales) |
+| Geologist's hammer | Physical | Strikes the ground and opens a crack that runs in a straight line, damaging and briefly stunning everything in its path | Hammer of the Barrier / Pabodie's ice axe (Crampons) |
+| Machete | Physical | A circular slash around the character; it only strikes if someone is close | Canefield machete / Harvest machetes (Stevedore's gloves) |
+| Molotov cocktail | Physical | A bottle thrown in an arc that makes a pool of flames | The Emma's cocktail / Kerosene bomb (Rum flask) |
+| Scalpels | Physical | A fan of piercing blades | Surgical kit / Anatomist's scalpel (Reindeer coat) |
+| Stielhandgranate | Physical | A stick grenade thrown at the densest area; a big explosion on impact | Bundled charge / Grenade cluster (Reflexes) |
+| Sword cane | Physical | A long, quick thrust at the nearest enemy that pierces everything in the line. It waits until someone is within reach | Duellist's rapier / Hussar's sabre (Whetstone) |
+| Traps | Physical | Leaves traps on the ground: the first one to step on them is caught and wounded | Hunter's traps / Bear trap (Fang necklace) |
+| West's injector | Physical | Fires serum darts: an enemy that dies with the serum inside rises for 6 seconds as an ally and attacks its own | Perfected reagent / Halsey's serum (Medical kit) |
+| Whaling harpoon | Physical | A heavy projectile that pierces and drags lesser enemies along | Nantucket harpoon / Bomb lance (Sinker) |
+| Whip | Physical | A long lash in an arc ahead that hits everyone in the arc | Tamer's whip / Overseer's whip (Lake's whistle) |
+| BAR M1918 | Firearm | Bursts whose bullets bounce to another nearby enemy | Assault BAR / Marksman's BAR (Snow boots) |
+| Danforth's Nagant | Firearm | A revolver whose rate of fire speeds up while it has someone to shoot at, up to two and a half times | Lookout's Nagant / Seven-shot Nagant (Magnifying glass) |
+| Fireworks | Firearm | Erratic rockets that burst into sparks | Grand fireworks display / Fairground rocket (Firecrackers) |
+| Flammenwerfer | Firearm | A cone of fire that leaves the ground burning | Breath of Moloch / Thermal lance (Matches of Cthugha) |
+| Flare gun | Firearm | A flare that lights up and lures nearby enemies (elites don't fall for it) | Lighthouse flare / Magnesium flare (Cloak of the Black Man) |
+| Lever-action rifle | Firearm | Fast shots that pierce several enemies | Miskatonic rifle / Big-game rifle (Field diary) |
+| Lewis gun | Firearm | Sets the machine gun on its tripod on the ground; it fires on its own at the nearest enemy for 8 seconds | Machine-gun nest / Firing posts (Marksmanship manual) |
+| Mauser anti-tank rifle | Firearm | A very slow shot that pierces every enemy in the line | Anti-tank gun / Tank hunter's rifle (Hunter's medallion) |
+| Mauser C96 pistol | Firearm | Short bursts of three tracers | Tillinghast's Mauser / Mauser carbine (Tillinghast's watch) |
+| Pump-action shotgun | Firearm | Pellets that spread in a ring around the character | Trench shotgun / Buckshot shotgun (Bandolier) |
+| Sawn-off shotgun | Firearm | Two shots in a row of pellets in a short, wide cone that pushes hard | Smuggler's sawn-off / Slaughterhouse sawn-off (Shoggoth tooth) |
+| Springfield M1903 | Firearm | A slow, powerful shot that targets the elite or the enemy with the most health first; sometimes it is a triple critical hit. Pierces one | Sniper's Springfield / Belleau Springfield (Pickman's eye) |
+| Stokes mortar | Firearm | A shell in a high arc at the densest group at range; a big explosion | Mortar battery / Incendiary mortar (Ponape powder) |
+| Tesla coil | Firearm | Discharges a bolt at the nearest enemy that jumps to the next ones, up to four; each jump deals a little less | Nikola's coil / Wardenclyffe bolt (Dowsing rod) |
+| Thompson M1928 | Firearm | Tight bursts of small projectiles | Chicago Thompson / Federal agent's Thompson (Obed's gold) |
+| Twin Lugers | Firearm | A pistol in each hand: they fire at once where you are heading and behind you, without seeking a target | The ace's Lugers / Trick-shot Lugers (Aviator goggles) |
+| Webley Mk VI | Firearm | Heavy projectiles that knock enemies back | Lookout's revolver / Six-shot Webley (Lake's compass) |
+| Aether lens | Magic | A beam held on one enemy: its damage grows while it stays on it, up to three times. If the enemy falls, it jumps to another. Costs sanity | Aether eye / Aether prism (Spyglass) |
+| Arcane Sign | Magic | Draws a sign beneath their feet that damages enemies and pushes them outwards; enemy bullets crossing it move at half speed. Costs sanity | Elder Sign / Sign of Koth (Scapular) |
+| Banishing formula | Magic | A wave that spreads out from the character, pushing and stunning. Costs sanity | Greater exorcism / Banishing litany (Elder Sign) |
+| Breath of Ithaqua | Magic | A cone of icy wind that slows enemies and freezes those who stay inside | Breath of the Wendigo / The one who walks on the wind (Pemmican) |
+| Essential salts | Magic | Scatters the salts where most enemies have fallen and recites the formula: it damages those around and raises two of the fallen, who fight for him for a while. Costs sanity | Dragon's Head / Dragon's Tail (Jar of the Custodes) |
+| Flame of Cthugha | Magic | A ball of living fire that pierces enemies and leaves a burning trail | Flame of the cult / Sparks of Fomalhaut (Esoteric talisman) |
+| Footsteps of the unseen | Magic | Wilbur's brother, whom no one can see, advances in a straight line towards the densest group: it crushes and stuns whatever it treads on | What came down from Sentinel Hill / Wilbur's twin (Wilbur's cipher diary) |
+| Impossible angles | Magic | Throws angles that fly out crooked and turn corners at right angles until they find the enemy. They pass through walls, trees and several enemies | The witch's geometry / The throne of Azathoth (Balustrade figurine) |
+| Key of dreams | Magic | Randolph Carter's silver key flies out to its range and back, leaving everything it touches drowsy for a moment | Key of unknown Kadath / Keys of Ulthar (Map of the Dreamlands) |
+| Lamp of Alhazred | Magic | A beam of light that sweeps in a circle around the character | Lamp of the Mad Arab / Beacon of Irem (Ankh of Nephren) |
+| Lamplighter's staff | Magic | Releases will-o'-the-wisps that zigzag and seek out enemies on their own. Costs sanity | Will-o'-the-wisp lantern / St Elmo's fire (Meerschaum pipe) |
+| Machine from beyond | Magic | A violet wave that reveals what surrounds us: those it reaches take 30 % more damage from everything for a few seconds, and the hidden come out. Each pulse in a row heats up the machine and takes more sanity from the whole group nearby | What surrounds us / Jellyfish from beyond (Machine valve) |
+| Mi-Go orb | Magic | An orb of the fungi from Yuggoth flies around you on its own and shoots the nearest enemy. Costs sanity | Swarm of Yuggoth / Mi-Go cylinder (Crystal of Ithaqua) |
+| Necronomicon | Magic | Pages that orbit around the character. Costs sanity | Complete Necronomicon / Al Azif (Pnakotic Manuscripts) |
+| Pickman's canvases | Magic | Plants a painting among the enemies that lures them and leaves them vulnerable. When they break it, it bursts and a ghoul comes out of it to hunt for a while | North End gallery / Pickman's model (Photograph of the model) |
+| Powder of Ibn-Ghazi | Magic | Spreads a cloud over the densest group: inside, enemies move 40 % slower and deal 30 % less damage. Costs sanity | Powder of the Elder Things / Powder of Ibn Schacabao (Map of Leng) |
+| Ray of Yith | Magic | Freezes the enemy in time for 1.5 s; the damage it takes meanwhile is applied at the end, 50 % greater. Costs sanity | Ray of the Great Race / Ray of Pnakotus (Hourglass of Yith) |
+| Resonator | Magic | It hums every so often and its pulse dissolves nearby enemy bullets; it deals little damage. It only hums if bullets or enemies are close. Costs sanity | Great resonator / Crawford's resonator (Shield of Nodens) |
+| Reverie of Celephaïs | Magic | A piece of the sky of Celephaïs where the enemies are thickest: inside, they dream and move ever more slowly, their bullets slow down and the investigators recover sanity | Valley of Ooth-Nargai / Serannian (Poppy of Ooth-Nargai) |
+| Ritual dagger | Magic | Stabs the nearest enemy and curses it: it slowly loses health and, if it dies cursed, the curse jumps to those beside it. Costs sanity | Sacrificial dagger / Obsidian dagger (Ghoul's fang) |
+| Sphere of Yog-Sothoth | Magic | A slow orb that pulls enemies into its centre and grinds them up | The Gate and the Key / Umr at-Tawil (Silver key) |
+| Tentacles of Shub | Magic | Tentacles that burst from the ground, after a warning, beneath random enemies | The Thousand Young / The Black Goat (Eltdown shard) |
+| The threshold | Magic | It depends on who is in the body. Edward strikes all around, close and hard (physical); Asenath casts two green glares that seek out the enemy (magic, they cost sanity). Each dodge swaps them | The thing on the doorstep / The eyes of Ephraim (Knocker of the Derby house) |
+| Trapezohedron | Magic | A ray of concentrated light that damages everything it passes through. Costs sanity | Awakened Trapezohedron / Blake's Trapezohedron (Idol of Cthulhu) |
+| Yellow Sign | Magic | Enemies who look at it go mad and attack their own for a few seconds | The King in Yellow / Carcosa (Psalter) |
+<!-- /tabla -->
 
 </details>
 
-**50 items**, from level-ups (permanent boosts are bought in the shop):
+**58 items**, from level-ups (permanent boosts are bought in the shop):
 
-![Icons of the 50 items](docs/img/objetos.jpg)
+![Icons of the 58 items](docs/img/objetos.jpg)
 
 <details>
-<summary><b>The 50 items</b></summary>
+<summary><b>The 58 items</b></summary>
 
+<!-- tabla:objetos -->
 | Item | Effect |
 |---|---|
-| Reindeer coat | +20 max health |
 | Ankh of Nephren | Once per level, when you fall you get back up with 30 % health |
-| Bandolier | +1 projectile for bullet and thrown weapons |
-| Snow boots | +8 % walking speed |
-| First-aid kit | Recovers 0.5 health per second |
-| Lake's compass | +30 % experience pickup radius |
-| Cloak of the Black Man | Dodging leaves a decoy that lures enemies |
-| Spyglass | +10 % weapon range |
-| Clepsydra of Yith | +15 % duration of zones, orbits, beams and turrets |
-| Fang necklace | +25 % critical damage |
-| Ghoul fang | Each kill heals 0.15 health |
-| Sealskin cuirass | −2 physical damage from each hit |
-| Crampons | +15 % dodge distance |
-| Crystal of Ithaqua | 6 % chance for a hit to slow the enemy for 1.5 s |
-| Bone die | +15 % luck: sometimes one more option on level-up |
-| Field journal | +20 max sanity |
-| Shoggoth tooth | +20 % damage below 30 % health |
-| Curwen's elixir | +15 % damage for 2 s after dodging |
-| Deep One scales | Returns 30 % of contact damage |
-| Scapular | +25 % invulnerability after taking a hit |
-| Shield of Nodens | Absorbs an entire hit every 25 s |
-| Pabodie's skis | +1 consecutive dodge before recharging |
-| Matches of Cthugha | 6 % chance for a hit to set the enemy on fire for 3 s |
 | Aviator goggles | +0.08 s of invulnerability when dodging |
-| Stevedore's gloves | +12 % physical damage and +10 % knockback |
-| Silver key | New options on a level-up, once per level |
-| Magnifying glass | +10 % experience |
-| Laudanum | Madness crises last 20 % less |
-| Marksmanship manual | +12 % firearm damage |
-| Pnakotic manuscripts | +12 % magic weapon damage |
-| Map of Leng | +10 % area for explosions, zones, waves and slashes |
-| Hunter's medallion | +30 % damage to elites and unique beings |
-| Pickman's eye | +8 % critical chance (×1.5 damage) |
-| Obed's gold | +15 % dollars for the team |
-| Pemmican | Food and potions heal 30 % more |
-| Rum flask | +8 % damage |
-| Firecrackers | Dodging sets off a charge where you were |
-| Whetstone | Bullets pierce 1 more enemy |
-| Meerschaum pipe | Recovers 0.6 sanity per second |
-| Plumb bob | +25 % knockback |
-| Ponape powder | +12 % projectile speed |
-| Reflexes | Dodge recharges 10 % faster |
-| Tillinghast's watch | Weapons recharge 6 % faster |
-| Psalter | Each kill restores 0.12 sanity |
-| Elder Sign | −10 % mental damage, auras included |
-| Lake's whistle | +20 % companion damage and speed |
-| Eltdown tablet | 8 % chance for a killed enemy to explode and damage those nearby |
-| Esoteric talisman | Magic weapons cost 12 % less sanity |
+| Balustrade figurine | Your weapons' bullets are 12 % bigger: they hit sooner and are easier to see |
+| Bandolier | +1 projectile for bullet and thrown weapons |
+| Bone die | +15 % luck: sometimes one more option when levelling up |
+| Cloak of the Black Man | When you dodge you leave a lure that draws enemies for 1 s per level |
+| Crampons | +15 % dodge distance |
+| Crystal of Ithaqua | 6 % chance that a hit slows the enemy for 1.5 s |
+| Curwen's elixir | +15 % damage for 2 s after dodging |
+| Deep One scales | Returns 30 % of contact damage to whoever hits you |
 | Dowsing rod | Arcane chests appear 15 % more often |
+| Elder Sign | −10 % mental damage, including from auras |
+| Eltdown shard | 8 % chance that a killed enemy bursts and damages those around it |
+| Esoteric talisman | Magic weapons cost 12 % less sanity |
+| Fang necklace | +25 % critical damage |
+| Field diary | +20 maximum sanity |
+| Firecrackers | When you dodge, a charge explodes where you were |
+| Ghoul's fang | Each enemy killed heals 0.15 health |
+| Hourglass of Yith | +15 % duration of zones, orbits, beams and turrets |
+| Hunter's medallion | +30 % damage to elites and unique beings |
 | Idol of Cthulhu | +12 % enemies, experience and dollars |
+| Jar of the Custodes | Allies raised by your weapons (risen, ghouls, reanimated) hit 15 % harder |
+| Knocker of the Derby house | Three knocks and then two: the first damage to an unhurt enemy is 12 % higher |
+| Lake's compass | +30 % experience pickup radius |
+| Lake's whistle | +20 % companion damage and speed |
+| Laudanum | Madness crises last 20 % less |
+| Machine valve | Revealed enemies take 8 % more damage |
+| Magnifying glass | +10 % experience |
+| Map of Leng | +10 % area of explosions, zones, waves and slashes |
+| Map of the Dreamlands | Magic weapons recharge 7 % sooner |
+| Marksmanship manual | +12 % firearm damage |
+| Matches of Cthugha | 6 % chance that a hit sets the enemy on fire for 3 s |
+| Medical kit | Recovers 0.5 health per second |
+| Meerschaum pipe | Recovers 0.6 sanity per second |
+| Obed's gold | +15 % dollars for the team |
+| Pabodie's skis | +1 dodge in a row before recharging |
+| Pemmican | Food and potions heal 30 % more |
+| Photograph of the model | Allies raised by your weapons (ghouls, reanimated) last 12 % longer |
+| Pickman's eye | +8 % critical chance (damage ×1.5) |
+| Pnakotic Manuscripts | +12 % magic weapon damage |
+| Ponape powder | +12 % projectile speed |
+| Poppy of Ooth-Nargai | Enemies slowed by your weapons move 6 % slower |
+| Psalter | Each enemy killed restores 0.12 sanity |
+| Reflexes | Dodge recharges 10 % sooner |
+| Reindeer coat | +20 maximum health |
+| Rum flask | +8 % damage |
+| Scapular | +25 % invulnerability after being hit |
+| Sealskin cuirass | −2 physical damage from each hit |
+| Shield of Nodens | Every 25 s it absorbs a whole hit (3 s sooner per level) |
+| Shoggoth tooth | +20 % damage below 30 % health |
+| Silver key | RB or E on level-up: different options, once per level |
+| Sinker | +25 % knockback |
+| Snow boots | +8 % walking speed |
+| Spyglass | +10 % weapon range |
+| Stevedore's gloves | +12 % physical weapon damage and +10 % knockback |
+| Tillinghast's watch | Weapons recharge 6 % sooner |
+| Whetstone | Bullets pierce 1 more enemy |
+| Wilbur's cipher diary | You recover 0.25 sanity per second, and so do companions within 4 m |
+<!-- /tabla -->
 
 </details>
 
 ## Bestiary
 
-47 creatures, 18 of them unique beings (mini-bosses and bosses). Each has its tier (1 to 5), its behaviour and its attack pattern, all in data. Low-tier creatures make up the bulk of the horde; tiers 4 and 5 are elites.
+More than 90 creatures, among them the unique beings at the end of each level, the mid-level bosses and the eight bosses. Each has its tier (1 to 5), its behaviour and its attack pattern, all in data. Low-tier creatures make up the bulk of the horde; tiers 4 and 5 are elites.
 
-**Part 1:** blind albino penguin, protoplasmic fragment, revived Elder Thing, winged Elder Thing, slave shoggoth, Elder Thing warrior, mutilated Elder Thing, glowing-eyed shoggoth and Elder Thing of the abyssal sea.
+<!-- tabla:bestiario_p1 -->
+**Part 1:** Blind albino penguin · Protoplasmic fragment · Lurker · Revived Elder Thing · Winged Elder Thing · Lake's expedition member · The first to wake · Slave shoggoth · Mimic shoggoth · Burrowing shoggoth · Gedney, what's left of him · The shoggoth of the cavern · Elder Thing warrior · Mutilated Elder Thing · Elder Thing sower · The guardian of the city · Glowing-eyed shoggoth · Elder Thing of the abyssal sea · The primordial shoggoth.
+<!-- /tabla -->
 
 ![Creatures from part 1](docs/img/bestiario_1.jpg)
 
-**Part 2:** old man and woman of Innsmouth, acolyte of the Order of Dagon, advanced hybrids, tiara priest, Deep One, spitting Deep One, elder Deep One of Y'ha-nthlei and the Lurker.
+<!-- tabla:bestiario_p2 -->
+**Part 2:** Innsmouth fisherman · Innsmouth townswoman · Innsmouth old man · Acolyte of the Order of Dagon · The deacon of the Order · Advanced hybrid · Advanced hybrid · Priest of the tiara · Guardian of the Order of Dagon · The high priest of the Order · Deep One · Spitting Deep One · Rooftop lurker · Daughter of the Marshes · Captain Obed Marsh · Swamp Deep One · Elder Deep One of Y'ha-nthlei · Tide swimmer · Barnabas Marsh, transformed · Pth'thya-l'yi, the ancestor · Mother Hydra · Father Dagon.
+<!-- /tabla -->
 
 ![Creatures from part 2](docs/img/bestiario_2.jpg)
 
-**Part 3:** Cthulhu cultist, armed cultist from the *Alert*, nightmare from the wave of dreams, bat-winged devil, spawn of Cthulhu, the white polypous thing, emanation of the door and lesser Old One.
+<!-- tabla:bestiario_p3 -->
+**Part 3:** Nightmare of the dream wave · Cthulhu cultist · Providence sleepwalker · The nightmare of the bas-relief · Armed cultist of the Alert · Bat-winged devil · Swamp drummer · Living idol · Old Castro · The priest of the ritual · Spawn of Cthulhu · The greater spawn · The white polypous thing · The white thing of the hidden lake · Emanation of the door · Lesser Great Old One · Cthulhu · Cthulhu, reformed.
+<!-- /tabla -->
 
 ![Creatures from part 3](docs/img/bestiario_3.jpg)
 
-Some have behaviours of their own: the blind penguin heads to where it last heard the player, the mimic shoggoth disguises itself as an Elder Thing and transforms as you approach, nightmares pass through scenery, devils dive from above and marsh Deep Ones rise out of the water. The devouring Angles of R'lyeh can't be killed: they must be dodged.
+<!-- tabla:bestiario_p4 -->
+**Part 4:** Zoog · Treetop zoog · The elder of the zoogs' council · Merchant of Leng · Moon rower · The master of the black galley · Shantak · Purple spider of Leng · The high priest not to be described · The mother of the spiders of Leng · Ghast · Gug · The great gug of the Tower of Koth · Larva of the Other Gods · Night-gaunt · Nyarlathotep, the Crawling Chaos.
+<!-- /tabla -->
+
+![Creatures from part 4](docs/img/bestiario_4.jpg)
+
+<!-- tabla:bestiario_noche -->
+**Standalone nights:** Grey cow · Withered farmer · The colour rising from the well · Dunwich whippoorwill · Devotee of the hills · Wilbur's brother · Possessed by the Great Race · Flying polyp · The ancient polyp · Rue d'Auseil lodger · Shred of the night · What lies beyond the window.
+<!-- /tabla -->
+
+![Creatures from the standalone nights](docs/img/bestiario_noches.jpg)
+
+Some have behaviours of their own: the blind penguin heads to where it last heard the player, the mimic shoggoth disguises itself as an Elder Thing and transforms as you approach, nightmares pass through scenery, devils dive from above and marsh Deep Ones rise out of the water. The devouring Angles of R'lyeh can't be killed: they must be dodged. In the Dreamlands, ghasts flee from the light, the spiders of Leng spin webs that trap you and night-gaunts carry off whoever they catch. Elites roll one or two random traits (vampiric, explodes on death, ichor trail, fast or shielded), with their icon above the head.
 
 ## How to play
 
@@ -540,7 +637,7 @@ Details in [`docs/RENDIMIENTO.md`](docs/RENDIMIENTO.md) and in the journal.
 
 ### Images in this README
 
-They come from automatic in-game screenshots: `sh tools/capturas_readme.sh` plays the games with bots and captures menus and models, and `python tools/montar_readme.py` scales them to 960 px, assembles the model, face and icon sheets (reading the same data the game uses) and uses ffmpeg to make the GIF and an MP4 video with sound. It also writes `docs/img/vista_previa.jpg` (1280 × 640), the image GitHub shows when the repository link is shared.
+They come from automatic in-game screenshots: `sh tools/capturas_readme.sh` plays the games with bots and captures menus and models, and `python tools/montar_readme.py` scales them to 960 px, assembles the model, face and icon sheets (reading the same data the game uses) and uses ffmpeg to make the GIF and an MP4 video with sound. It also writes `docs/img/vista_previa.jpg` (1280 × 640), the image GitHub shows when the repository link is shared. The character, companion, weapon, item, level and creature tables come from the game's data: `python tools/tablas_readme.py` rebuilds them in both READMEs (between the `<!-- tabla:… -->` markers), the English one with the same translation the game uses.
 
 ## Roadmap
 
@@ -557,6 +654,16 @@ They come from automatic in-game screenshots: `sh tools/capturas_readme.sh` play
 | 8 | Polish and release: sound, music, accessibility, 50 weapons and 50 items, rebuilt levels, voxel effects, difficulties, living ambience, turn-based level-ups, new faces | 🔨 In progress: final balancing with real games and the itch.io release remain |
 | 9 | Online play: room, selection and networked game, pause and level-ups for everyone, disconnections and rejoining | ✅ Done, pending the internet test |
 | 10 | Cloud saves: saves and controls copied to a GitHub gist, conflicts between PCs | ✅ Done, waiting to be switched on (GitHub app) and for the two-PC test |
+| 11-14 | Hit feel, death report, endless mode, daily run, photo mode, trailer and part 1 demo | ✅ Done |
+| 15 | Death replay, challenges, a new enemy per part and a living bestiary | ✅ Done |
+| 16 | Performance (instanced hordes, loading during the story), two evolution branches, Elder Signs, peddler, degrees of madness, new enemies and mid-level bosses, elites with traits, game speed, boss rush, expeditions, fishing, secret characters, trophy room and livelier levels | ✅ Done |
+| 17 | Animation and living levels: gestures, celebrations, victory poses, deaths by damage type, reactive scenery and distant events | ✅ Done |
+| 18 | Voxel weapon effects with gradients: trails, impacts, casings, arcs, zones and evolution accents | ✅ Done |
+| 19 | Performance, effect accessibility, Linux build and crash reports | ✅ Done |
+| 20 | Menus, transitions and settings; six new characters: Pickman, Ward, Gilman, Tillinghast, Derby and Kuranes | ✅ Done |
+| 21 | Bonds, night events, companion tricks, combos and revelations; part 4 (*Kadath*) and three standalone nights; illustrated endings, ink path, oil portraits, manual and statistics | ✅ Done, part 4's music still to come |
+| 22 | Part 4 balance and performance, new achievements, the game in English, the fourth night (*The Music of Erich Zann*), trailer and itch.io page | ✅ Done |
+| 23 | Lighter build, small demo, credits up to date; proposed: the first hour, the processor, a fifth night and run codes | 🔨 In progress |
 
 ## Rights and credits
 
@@ -568,7 +675,7 @@ They come from automatic in-game screenshots: `sh tools/capturas_readme.sh` play
 - **Sound effects:** [Kenney](https://kenney.nl/) (CC0) and synthesized for the game.
 - **Music:** by the author (title screen and first level) and CC0 tracks from [OpenGameArt](https://opengameart.org/) by Eldritch Grim, Juhani Junkala, isaiah658 and others; the full list, with authors and links, is in [`data/musica.json`](data/musica.json).
 - **Design, title screen and shop illustrations:** Sergio Sánchez Custodio.
-- **Use of AI:** the code, the voxel models (generated by programs) and the texts are developed with [Claude Code](https://claude.com/claude-code) (Anthropic), under the author's direction. The weapon and item icons and the design references were generated with FLUX (Black Forest Labs), on [Replicate](https://replicate.com/) and locally with ComfyUI.
+- **Use of AI:** the code, the voxel models (generated by programs) and the texts are developed with [Claude Code](https://claude.com/claude-code) (Anthropic), under the author's direction. The weapon and item icons, the menu ornaments, the investigators' portraits, the illustrated ending of each part and the design references were generated with FLUX (Black Forest Labs), on [Replicate](https://replicate.com/) and locally with ComfyUI.
 
 ## License
 

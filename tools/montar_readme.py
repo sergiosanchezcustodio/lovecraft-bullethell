@@ -174,8 +174,10 @@ def video(src, dst, secs, w=W, kbps=2350):
                            '-movflags', '+faststart', os.path.join(SHOTS, 'videos', dst)], check=True)
 
 
-JEFES = ['game_readme_jefe1_008.0s.png', 'game_readme_jefe2_016.0s.png', 'game_readme_jefe3_030.0s.png']
-JEFES_CROP = [(0.0, 0.2, 0.6, 1.0), (0.4, 0.02, 1.0, 0.82), (0.4, 0.02, 1.0, 0.82)]   # el jefe y el jugador, en 4:3
+JEFES = ['game_readme_jefe1_008.0s.png', 'game_readme_jefe2_016.0s.png', 'game_readme_jefe3_030.0s.png',
+         'game_readme_jefe4_044.0s.png']
+JEFES_CROP = [(0.0, 0.2, 0.6, 1.0), (0.4, 0.02, 1.0, 0.82), (0.4, 0.02, 1.0, 0.82),
+              (0.2, 0.2, 0.66, 0.81)]   # el jefe y el jugador, en 4:3
 
 os.makedirs(OUT, exist_ok=True)
 for f in glob.glob(os.path.join(OUT, '*.jpg')): os.remove(f)
@@ -190,10 +192,16 @@ shot('game_readme_p3n1_110.0s.png', 'p3_estudio.jpg')
 shot('game_readme_p3n2_110.0s.png', 'p3_ritual.jpg')
 shot('game_readme_p3n4_110.0s.png', 'p3_tormenta.jpg')
 shot('game_readme_p3n5_150.0s.png', 'p3_rlyeh.jpg')
+# Parte 4 y noches sueltas (hito 23.3)
+shot('game_readme_p4n1_110.0s.png', 'p4_bosque.jpg')
+shot('game_readme_p4n3_110.0s.png', 'p4_leng.jpg')
+shot('game_readme_color_110.0s.png', 'noche_color.jpg')
+shot('game_readme_zann_100.0s.png', 'noche_zann.jpg')
 # Jefes: recortados al centro, en tres columnas
 shot(JEFES[0], 'jefe_shoggoth.jpg', 640, JEFES_CROP[0])
 shot(JEFES[1], 'jefe_dagon.jpg', 640, JEFES_CROP[1])
 shot(JEFES[2], 'jefe_cthulhu.jpg', 640, JEFES_CROP[2])
+shot(JEFES[3], 'jefe_nyarla.jpg', 640, JEFES_CROP[3])
 # Menús
 shot('seleccion_readme_sel_003.0s.png', 'seleccion.jpg')
 shot('seleccion_readme_mapa_002.0s.png', 'mapa.jpg')
@@ -206,16 +214,22 @@ shot('titulo_readme_online_014.0s.png', 'online.jpg')
 # Modelos
 lineup([['dyer-olmstead-legrasse-johansen-peaslee-varga-whipple_0_readme.png']], 'personajes_1.jpg')
 lineup([['blake-iwanicki-elwood-malone-armitage-west_0_readme.png']], 'personajes_2.jpg')
+lineup([['carter-whateley-pickman-ward_0_readme.png', 'gilman-tillinghast-derby-asenath-kuranes_0_readme.png']], 'personajes_3.jpg')
 faces(['dyer', 'olmstead', 'legrasse', 'johansen', 'peaslee', 'varga', 'whipple',
-       'blake', 'iwanicki', 'elwood', 'malone', 'armitage', 'west'], 'readme', 'cabezas.jpg')
+       'blake', 'iwanicki', 'elwood', 'malone', 'armitage', 'west',
+       'carter', 'whateley', 'pickman', 'ward', 'gilman', 'tillinghast', 'derby', 'kuranes'], 'readme', 'cabezas.jpg', cols=7)
 lineup([['perro-gato-rata-sapo_0_readme.png', 'buho-shoggoth-byakhee-cuervo_0_readme.png']], 'companeros_1.jpg')
 lineup([['polilla-gaviota-migo-tindalos_0_readme.png', 'yig-pez-dhole-cabra_0_readme.png']], 'companeros_2.jpg')
-lineup([['pinguino-fragmento-antiguo-antiguo_alado-shoggoth_grande_0_readme.png'],
-        ['antiguo_guerrero-antiguo_mutilado-shoggoth_ojos-antiguo_abisal_0_readme.png']], 'bestiario_1.jpg')
-lineup([['habitante_viejo-habitante_mujer-acolito-hibrido_h-hibrido_m_0_readme.png'],
-        ['sacerdote-profundo-profundo_lanzador-profundo_anciano-acechador_0_readme.png']], 'bestiario_2.jpg')
-lineup([['cultista-cultista_alert-pesadilla-diablo_0_readme.png'],
-        ['engendro-polipo-emanacion-primigenio_menor_0_readme.png']], 'bestiario_3.jpg')
+# Bestiario (hito 23.3: todas las de cada parte, sin los jefes)
+lineup([['pinguino-fragmento-acechador-antiguo_0_readme.png', 'antiguo_alado-expedicionario-antiguo_despierto-gedney_0_readme.png'],
+        ['shoggoth_grande-shoggoth_excavador-shoggoth_caverna-shoggoth_ojos_0_readme.png', 'antiguo_guerrero-antiguo_mutilado-antiguo_sembrador-antiguo_abisal_0_readme.png']], 'bestiario_1.jpg')
+lineup([['habitante_pescador-habitante_mujer-habitante_viejo-acolito-diacono_0_readme.png', 'hibrido_h-hibrido_m-sacerdote-guardian_orden-sumo_sacerdote_0_readme.png'],
+        ['profundo-profundo_lanzador-hija_marsh-obed_marsh-nadador_0_readme.png', 'profundo_anciano-barnabas-pththya-acechador_0_readme.png']], 'bestiario_2.jpg')
+lineup([['pesadilla-cultista-sonambulo-pesadilla_relieve_0_readme.png', 'cultista_alert-diablo-tamborilero-idolo_vivo-castro_0_readme.png'],
+        ['sacerdote_culto-engendro-polipo-polipo_madre_0_readme.png', 'emanacion-primigenio_menor_0_readme.png']], 'bestiario_3.jpg')
+lineup([['zoog-zoog_copas-zoog_anciano-mercader_leng_0_readme.png', 'remero_lunar-bestia_lunar_mayor-shantak_0_readme.png'],
+        ['arana_leng-sacerdote_leng-arana_madre_0_readme.png', 'ghast-gug-gug_koth_0_readme.png', 'larva_otros-descarnado_0_readme.png']], 'bestiario_4.jpg')
+lineup([['res_gris-granjero_gris-chotacabras-devota_colinas_0_readme.png', 'poseido_yith-polipo_volador-vecino_auseil-jiron_noche_0_readme.png']], 'bestiario_noches.jpg')
 # Iconos
 weapons, evolutions = weapon_icons()
 icons(weapons, 'armas.jpg')

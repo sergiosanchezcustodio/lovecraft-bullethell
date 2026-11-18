@@ -797,7 +797,7 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 
 ## Fase 23: propuesta (18-11-2026)
 
-**Propuesta el 18-11-2026**, al cerrar la fase 22 («continúa»), **pendiente de tu aprobación**. Elige bloques o hitos sueltos; el orden de los bloques es el recomendado. Lo que queda abierto de antes y depende de ti sigue igual: la música de la parte 4, la subida a itch.io (fase 8, tu cuenta; la página ya está al día con el 22.8), el `client_id` de la nube (fase 10) y la calibración de la dificultad (D-42).
+**Propuesta el 18-11-2026**, al cerrar la fase 22 («continúa»). **Bloque A aprobado el 18-11-2026** («adelante bloque A») y hecho, pendiente de revisión; los demás, pendientes de tu aprobación. Elige bloques o hitos sueltos; el orden de los bloques es el recomendado. Lo que queda abierto de antes y depende de ti sigue igual: la música de la parte 4, la subida a itch.io (fase 8, tu cuenta; la página ya está al día con el 22.8), el `client_id` de la nube (fase 10) y la calibración de la dificultad (D-42).
 
 **Criterio de aceptación de la fase** (para lo que se elija): como el de la fase 22. Todo comprobado en captura y con el bot, sin errores, y nada empeora el rendimiento apreciablemente en Alta. Lo jugable va por datos y con tests. El arte nuevo de humanos, a bloques limpios; lo pintado, con ComfyUI en local.
 
@@ -805,9 +805,9 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 23.1 | **Una build más ligera.** El `.exe` ha pasado de 248 a 520 MB y los modelos comprimidos ocupan 244 MB. Hay que buscar los JSON de `models/` que nada usa (variantes viejas como `rly_puerta_v1`, pruebas, prendas retiradas) y sacarlos de la build con una lista que se rehaga sola al exportar. Se mide lo que baja | Propuesto |
-| 23.2 | **Demo de verdad pequeña.** Hoy pesa lo mismo que el juego completo porque lo lleva todo y lo cierra por la etiqueta. Se trata de exportarla solo con lo de la parte 1 (modelos, arenas, música y relatos), con una prueba de que no le falta nada: la parte 1 entera con el bot | Propuesto |
-| 23.3 | **Créditos y licencia al día:** retratos y finales ilustrados con FLUX en `data/credits.json`, la ficha en inglés y un repaso de `LICENCIA.md` y del README con lo de las fases 20 a 22 | Propuesto |
+| 23.1 | **Una build más ligera.** El `.exe` ha pasado de 248 a 520 MB y los modelos comprimidos ocupan 244 MB. Hay que buscar los JSON de `models/` que nada usa (variantes viejas como `rly_puerta_v1`, pruebas, prendas retiradas) y sacarlos de la build con una lista que se rehaga sola al exportar. Se mide lo que baja | Hecho, pendiente de revisión (18-11-2026): 91 modelos sin uso fuera y ZSTD al 19; modelos de 244 a 167 MB, `.exe` de 520 a 440 MB |
+| 23.2 | **Demo de verdad pequeña.** Hoy pesa lo mismo que el juego completo porque lo lleva todo y lo cierra por la etiqueta. Se trata de exportarla solo con lo de la parte 1 (modelos, arenas, música y relatos), con una prueba de que no le falta nada: la parte 1 entera con el bot | Hecho, pendiente de revisión (18-11-2026): `tools/demo_fuera.py` y `Demo.has_model`; la demo, de 520 a 267 MB; prueba con `tools/probar_demo.sh` |
+| 23.3 | **Créditos y licencia al día:** retratos y finales ilustrados con FLUX en `data/credits.json`, la ficha en inglés y un repaso de `LICENCIA.md` y del README con lo de las fases 20 a 22 | Hecho, pendiente de revisión (18-11-2026): créditos, `LICENCIA.md`, tráiler (58 y 116) y los dos README, con las tablas desde los datos (`tools/tablas_readme.py`) |
 
 ### Bloque B: la primera hora
 

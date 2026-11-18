@@ -11,7 +11,8 @@
 ![Windows](https://img.shields.io/badge/Windows-x86__64-0078D6?logo=windows&logoColor=white)
 ![macOS](https://img.shields.io/badge/macOS-universal-000000?logo=apple&logoColor=white)
 ![Jugadores](https://img.shields.io/badge/jugadores-1%E2%80%934%20local%20y%20online-8e44ad)
-![Tests](https://img.shields.io/badge/tests-GUT%20%C2%B7%20393%20en%20verde-2e7d32)
+![Idiomas](https://img.shields.io/badge/idiomas-espa%C3%B1ol%20%C2%B7%20ingl%C3%A9s-c0392b)
+![Tests](https://img.shields.io/badge/tests-GUT%20%C2%B7%201095%20en%20verde-2e7d32)
 ![Versión](https://img.shields.io/badge/versi%C3%B3n-0.9.0-e0a100)
 [![Licencia: código GPLv3, recursos reservados](https://img.shields.io/badge/licencia-c%C3%B3digo%20GPLv3%20%C2%B7%20recursos%20reservados-blue)](LICENCIA.md)
 
@@ -24,22 +25,22 @@
 > *«Lo más misericordioso del mundo es la incapacidad de la mente humana para relacionar todo lo que contiene.»*
 > — H. P. Lovecraft, *La llamada de Cthulhu*
 
-En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores han empezado a relacionarlo. De la Antártida a Innsmouth, y de Innsmouth a R'lyeh, algo muy antiguo ha empezado a despertar.
+En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores han empezado a relacionarlo. De la Antártida a Innsmouth, de Innsmouth a R'lyeh y de R'lyeh a las Tierras del Sueño, algo muy antiguo ha empezado a despertar.
 
-**Lovecraft Library** recorre tres relatos de Lovecraft (*En las montañas de la locura*, *La sombra sobre Innsmouth* y *La llamada de Cthulhu*) en quince niveles y tres jefes colosales. Las armas disparan solas: la habilidad está en **moverse y esquivar** entre hordas y cortinas de balas que dañan la **vida** o la **cordura**. Si la cordura llega a cero, llega la locura.
+**Lovecraft Library** recorre cuatro relatos de Lovecraft (*En las montañas de la locura*, *La sombra sobre Innsmouth*, *La llamada de Cthulhu* y *La búsqueda onírica de la desconocida Kadath*) en veinte niveles y cuatro jefes colosales, y cuatro relatos más en noches sueltas. Las armas disparan solas: la habilidad está en **moverse y esquivar** entre hordas y cortinas de balas que dañan la **vida** o la **cordura**. Si la cordura llega a cero, llega la locura.
 
 <div align="center">
 
 <img src="docs/img/partida.gif" alt="Partida a cuatro jugadores en las calles de Innsmouth, bajo la lluvia, entre híbridos, acólitos y sacerdotes de la tiara" width="100%">
 
-| 15 | 3 | 13 | 50 + 50 | 50 | 16 | 47 | 1–4 |
+| 20 + 4 | 4 + 4 | 21 | 58 + 116 | 58 | 16 | 90+ | 1–4 |
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| niveles | jefes colosales | investigadores | armas y sus evoluciones | objetos | compañeros | criaturas | jugadores, en local o por red |
+| niveles y noches sueltas | jefes de la campaña y de las noches | investigadores | armas y sus evoluciones | objetos | compañeros | criaturas | jugadores, en local o por red |
 
 </div>
 
 > [!NOTE]
-> **Versión 0.9.0, en desarrollo.** La campaña completa se juega de principio a fin: las tres partes, solo, en cooperativo local o por red. Quedan la prueba por internet entre casas distintas, el equilibrio final con partidas de jugadores reales, la publicación en itch.io y activar el guardado en la nube, ya programado. El estado detallado está en la [hoja de ruta](#hoja-de-ruta).
+> **Versión 0.9.0, en desarrollo.** La campaña completa se juega de principio a fin: las cuatro partes y las cuatro noches sueltas, solo, en cooperativo local o por red, en español o en inglés. Quedan la música propia de la parte 4, la prueba por internet entre casas distintas, el equilibrio final con partidas de jugadores reales, la publicación en itch.io y activar el guardado en la nube, ya programado. El estado detallado está en la [hoja de ruta](#hoja-de-ruta).
 
 ## Índice
 
@@ -62,15 +63,16 @@ En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores ha
 
 ### Jugabilidad
 
-- **Bullet hell con progresión *survivors*:** hordas que llegan desde fuera de la pantalla, patrones de balas con aviso en el suelo y armas que disparan solas. Cada nivel dura unos cinco minutos y termina con un evento final: un ser único, una horda a la que sobrevivir o uno de los tres jefes.
+- **Bullet hell con progresión *survivors*:** hordas que llegan desde fuera de la pantalla, patrones de balas con aviso en el suelo y armas que disparan solas. Cada nivel dura unos cinco minutos y termina con un evento final: un ser único, una horda a la que sobrevivir o uno de los cuatro jefes.
 - **Vida y cordura:** los ataques físicos (rojos, naranjas y amarillos) quitan vida; los mentales (morados y lilas), cordura; los mixtos, las dos. La cercanía de los horrores también desgasta la mente.
-- **Crisis de locura:** con la cordura a cero, el investigador sufre una de cinco crisis (parálisis, huida histérica, vagar sin rumbo, delirio con los controles invertidos o paranoia), con un aura morada y cara de pánico.
-- **50 armas con evolución:** de fuego, físicas y mágicas, cuatro a la vez (seis con las fundas de la tienda). Cada una sube del nivel 1 al 5 y, al máximo y con su objeto pareja, evoluciona en un arma nueva al abrir un baúl arcano. Las mágicas cuestan cordura.
-- **50 objetos** que cambian las reglas: proyectiles, alcance, críticos, esquives dobles, escudos, señuelos, resurrección…
-- **13 investigadores** con siete atributos, arma inicial, un rasgo propio y su estilo de esquive: deslizamiento, voltereta, plancha, salto o destello.
-- **16 compañeros** que muerden, curan, roban, se tragan balas o se teletransportan.
+- **Crisis de locura:** con la cordura a cero, el investigador sufre una de cinco crisis (parálisis, huida histérica, vagar sin rumbo, delirio con los controles invertidos o paranoia), con un aura morada y cara de pánico. Al salir de una crisis se elige una **revelación**, que dura lo que queda del nivel.
+- **58 armas con dos evoluciones cada una:** de fuego, físicas y mágicas, cuatro a la vez (seis con las fundas de la tienda). Cada una sube del nivel 1 al 5 y, al máximo y con su objeto pareja, el siguiente baúl arcano deja elegir entre sus dos evoluciones. Las mágicas cuestan cordura, y las armas de distintos jugadores (o las tuyas entre sí) se **combinan** cuando coinciden.
+- **58 objetos** que cambian las reglas: proyectiles, alcance, críticos, esquives dobles, escudos, señuelos, resurrección…
+- **21 investigadores** con siete atributos, arma inicial, un rasgo propio y su estilo de esquive (deslizamiento, voltereta, plancha, salto, destello, el cuadro de Pickman, los ángulos de Gilman…), retrato al óleo y pose de victoria. Dos son secretos. Las parejas que se conocen en los relatos tienen **vínculos**: una pequeña ventaja mientras están cerca.
+- **16 compañeros** que muerden, curan, roban, se tragan balas o se teletransportan, y aprenden dos trucos al nivel 5.
 - **Escenarios vivos:** nevada, ventisca, niebla, lluvia y tormenta con rayos; agua que frena, olas que barren la cubierta, Ángulos devoradores que engullen a quien se queda dentro, baúles arcanos y decorado que se rompe; pájaros, murciélagos y bichos que reaccionan a la batalla.
-- **Tres dificultades:** Investigador, Normal y Pesadilla.
+- **Más que sobrevivir:** élites con rasgos, jefes a mitad de nivel, pactos del Necronomicón, Signos Mayores, objetivos a mitad de nivel, sucesos de la noche (luna de sangre, niebla, marea…), un buhonero y páginas sueltas del diario.
+- **Dificultad del 1 al 10**, velocidad del juego regulable y, al vencer a Cthulhu, cinco **grados de locura** que endurecen la campaña uno tras otro.
 
 ### Cooperativo, local y online
 
@@ -82,11 +84,13 @@ En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores ha
 ### Progreso y menús
 
 - **Tres huecos de guardado**, con dinero, desbloqueos y logros por hueco, y **copia en la nube** con tu cuenta de GitHub (un gist secreto) para seguir en otro PC; si una partida ha cambiado en dos PC, el juego pregunta con cuál quedarse ([guía](docs/GUARDADO_NUBE.md)).
-- **Tienda de antigüedades:** potenciadores permanentes, personajes, compañeros y **vestuario** (26 prendas que se ven sobre el modelo).
-- **La Biblioteca:** bestiario, arsenal y lugares, con notas de diario de los años 20 y los mapas de cada escenario.
-- **18 logros** con recompensa, intro y **relatos** que cuentan cada nivel antes de jugarlo.
+- **Tienda de antigüedades:** potenciadores permanentes, personajes, compañeros y **vestuario** (83 prendas que se ven sobre el modelo).
+- **La Biblioteca:** bestiario vivo, arsenal, lugares, la sala de trofeos, el archivo de expediciones, el manual del investigador (con clips del juego) y las estadísticas de la cuenta, con notas de diario de los años 20.
+- **39 logros** con recompensa, intro, **relatos** que cuentan cada nivel antes de jugarlo y un final ilustrado al acabar cada parte.
+- **Más modos:** la noche eterna (sin fin), la partida del día, el desfile de jefes, las expediciones, 21 desafíos y la pesca en el muelle de Innsmouth.
 - **Selección para cuatro a la vez:** cada uno se une con Start, elige personaje y compañero y los gira para verlos por todos lados.
-- **Accesibilidad:** tamaño de la interfaz, balas de alto contraste, menos destellos y temblor de cámara regulable. Controles reasignables en mando y teclado.
+- **Accesibilidad:** tamaño de la interfaz, balas de alto contraste, menos destellos, temblor de cámara y vibración regulables. Controles reasignables en mando y teclado.
+- **En español y en inglés**, con selector en Configuración.
 
 ### Técnica
 
@@ -110,89 +114,142 @@ En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores ha
 | **Parte 3 · El estudio de Wilcox.** Esculturas, caballetes y pesadillas de la oleada de sueños, en Providence. | **Parte 3 · El ritual del pantano.** Hogueras, cultistas armados del *Alert* y diablos con alas de murciélago. |
 | ![La tormenta en el Pacífico](docs/img/p3_tormenta.jpg) | ![R'lyeh emergida](docs/img/p3_rlyeh.jpg) |
 | **Parte 3 · La tormenta en el Pacífico.** Una ola barre la cubierta mientras sube la cosa blanca polipoide. | **Parte 3 · R'lyeh emergida.** Losas que no cuadran, primigenios menores y emanaciones de la puerta colosal. |
+| ![El bosque encantado y las afueras de Ulthar](docs/img/p4_bosque.jpg) | ![La meseta de Leng](docs/img/p4_leng.jpg) |
+| **Parte 4 · El bosque encantado.** Zoogs entre los robles y los hongos, y los gatos de Ulthar que bajan a ayudar. | **Parte 4 · La meseta de Leng.** Shantaks, arañas púrpura y sus redes, y el viento helado de Leng. |
+| ![La granja de los Gardner](docs/img/noche_color.jpg) | ![La rue d'Auseil](docs/img/noche_zann.jpg) |
+| **Noche suelta · El color que cayó del cielo.** La granja de los Gardner se agosta alrededor del pozo. | **Noche suelta · La música de Erich Zann.** La viola aparta a lo de fuera mientras suene; detrás de la ventana no está París. |
 
 ### Los jefes
 
-| El shoggoth primigenio | Padre Dagon | Cthulhu |
-|:---:|:---:|:---:|
-| ![El shoggoth primigenio](docs/img/jefe_shoggoth.jpg) | ![Padre Dagon](docs/img/jefe_dagon.jpg) | ![Cthulhu](docs/img/jefe_cthulhu.jpg) |
-| Persigue por los túneles del mar subterráneo gritando «¡Tekeli-li!». | Emerge de las simas del Arrecife del Diablo, golpea con las manos y llama a los Profundos. | Asoma por la puerta de R'lyeh, barre con los tentáculos y, al caer, se recompone una vez. |
+| El shoggoth primigenio | Padre Dagon | Cthulhu | Nyarlathotep |
+|:---:|:---:|:---:|:---:|
+| ![El shoggoth primigenio](docs/img/jefe_shoggoth.jpg) | ![Padre Dagon](docs/img/jefe_dagon.jpg) | ![Cthulhu](docs/img/jefe_cthulhu.jpg) | ![Nyarlathotep](docs/img/jefe_nyarla.jpg) |
+| Persigue por los túneles del mar subterráneo gritando «¡Tekeli-li!». | Emerge de las simas del Arrecife del Diablo, golpea con las manos y llama a los Profundos. | Asoma por la puerta de R'lyeh, barre con los tentáculos y, al caer, se recompone una vez. | Espera en lo alto de Kadath con tres formas: el faraón negro, el enjambre y el ser sin rostro. |
 
 ### Menús
 
 | | |
 |:---:|:---:|
 | ![Selección de personaje a cuatro](docs/img/seleccion.jpg) | ![Mapa de la campaña](docs/img/mapa.jpg) |
-| **Selección.** Hasta cuatro jugadores eligen a la vez personaje, vestuario y compañero, cada uno con su mando. | **El mapa.** Tres partes de cinco niveles que se abren al superar el anterior. |
+| **Selección.** Hasta cuatro jugadores eligen a la vez personaje, vestuario y compañero, cada uno con su mando. | **El mapa.** Cuatro partes de cinco niveles unidas por un camino de tinta, y las noches sueltas aparte. |
 | ![Relato del nivel](docs/img/relato.jpg) | ![Ficha del personaje](docs/img/ficha.jpg) |
 | **Relatos.** Cada nivel se cuenta antes de jugarlo, sobre el mapa del lugar. | **La ficha** del personaje en partida: atributos, armas y objetos. |
 | ![Tienda de antigüedades](docs/img/tienda.jpg) | ![La Biblioteca](docs/img/biblioteca.jpg) |
-| **La tienda de antigüedades,** con el anciano tras el mostrador. | **La Biblioteca:** bestiario, arsenal y lugares, con notas de diario. |
+| **La tienda de antigüedades,** con el anciano tras el mostrador. | **La Biblioteca:** bestiario vivo, arsenal, lugares, trofeos, manual y estadísticas. |
 | ![Logros](docs/img/logros.jpg) | ![Jugar online](docs/img/online.jpg) |
 | **Logros,** con su recompensa y su progreso. | **Jugar online:** crear una sala o unirse con su código. |
 
 ## La campaña
 
-Tres partes de cinco niveles. Cada nivel se abre al superar el anterior, y cada parte, al superar la anterior. Cada parte vuelve a empezar por las criaturas más débiles, pero es más difícil que la anterior contando con lo comprado en la tienda.
+Cuatro partes de cinco niveles. Cada nivel se abre al superar el anterior, y cada parte, al superar la anterior. Cada parte vuelve a empezar por las criaturas más débiles, pero es más difícil que la anterior contando con lo comprado en la tienda.
 
 ### Parte 1 · *En las montañas de la locura* (la Antártida)
 
-| Nivel | Criaturas | Evento final |
-|---|---|---|
-| 1. Campamento base en la costa del mar de Ross | Pingüinos albinos ciegos, fragmentos protoplásmicos | El Acechador |
-| 2. El campamento destruido de Lake | Antiguos revividos, Antiguos alados | El primero en despertar |
-| 3. El paso de la cordillera y sus cavernas | Shoggoths esclavos, shoggoths miméticos | El shoggoth de la caverna |
-| 4. La ciudad ciclópea de los Antiguos | Antiguos guerreros, Antiguos mutilados | El guardián de la ciudad |
-| 5. Los túneles y el abismo del mar subterráneo | Shoggoths de ojos luminosos, Antiguos del mar abisal | **Jefe: el shoggoth primigenio** |
+<!-- tabla:parte1 -->
+| Nivel | Criaturas | A mitad del nivel | Evento final |
+|---|---|---|---|
+| 1. Campamento base en la costa del mar de Ross | Pingüino albino ciego, Fragmento protoplásmico | — | Acechador |
+| 2. El campamento destruido de Lake | Pingüino albino ciego, Fragmento protoplásmico, Antiguo revivido, Antiguo alado, Expedicionario de Lake | — | El primero en despertar |
+| 3. El paso de la cordillera y sus cavernas | Pingüino albino ciego, Fragmento protoplásmico, Antiguo revivido, Antiguo alado, Shoggoth esclavo, Shoggoth mimético, Shoggoth excavador | Gedney, lo que queda de él | El shoggoth de la caverna |
+| 4. La ciudad ciclópea de los Antiguos | Pingüino albino ciego, Fragmento protoplásmico, Antiguo revivido, Antiguo alado, Shoggoth esclavo, Antiguo guerrero, Antiguo mutilado, Antiguo sembrador | — | El guardián de la ciudad |
+| 5. Los túneles y el abismo del mar subterráneo | Pingüino albino ciego, Fragmento protoplásmico, Shoggoth esclavo, Antiguo mutilado, Shoggoth de ojos luminosos, Antiguo del mar abisal, Shoggoth excavador, Antiguo sembrador | — | **Jefe: El shoggoth primigenio** |
+<!-- /tabla -->
 
 ### Parte 2 · *La sombra sobre Innsmouth* (Nueva Inglaterra)
 
-| Nivel | Criaturas | Evento final |
-|---|---|---|
-| 1. Newburyport y la carretera a Innsmouth | Habitantes de Innsmouth, acólitos de la Orden de Dagon | El diácono de la Orden |
-| 2. Las calles de Innsmouth y el templo de la Orden | Híbridos avanzados, sacerdotes de la tiara | El sumo sacerdote de la Orden |
-| 3. El hotel Gilman House y la huida por los tejados | Profundos, Profundos escupidores, el Acechador | Sobrevivir a la horda del Arrecife del Diablo |
-| 4. Los pantanos y la vía muerta del tren a Rowley | Profundos ancianos de Y'ha-nthlei, Profundos de la ciénaga | Barnabas Marsh, transformado |
-| 5. El Arrecife del Diablo y Y'ha-nthlei | Pth'thya-l'yi, Madre Hydra | **Jefe: Padre Dagon** |
+<!-- tabla:parte2 -->
+| Nivel | Criaturas | A mitad del nivel | Evento final |
+|---|---|---|---|
+| 1. Newburyport y la carretera a Innsmouth | Pescador de Innsmouth, Vecina de Innsmouth, Viejo de Innsmouth, Acólito de la Orden de Dagon | — | El diácono de la Orden |
+| 2. Las calles de Innsmouth y el templo de la Orden | Pescador de Innsmouth, Vecina de Innsmouth, Viejo de Innsmouth, Acólito de la Orden de Dagon, Híbrido avanzado, Híbrida avanzada, Sacerdote de la tiara, Guardián de la Orden de Dagón | — | El sumo sacerdote de la Orden |
+| 3. El hotel Gilman House y la huida por los tejados | Profundo, Profundo escupidor, Híbrido avanzado, Híbrida avanzada, Acechador de los tejados, Guardián de la Orden de Dagón, Hija de los Marsh | El capitán Obed Marsh | Resistir 60 s a la horda |
+| 4. Los pantanos y la vía muerta del tren a Rowley | Profundo, Profundo de la ciénaga, Profundo escupidor, Híbrido avanzado, Híbrida avanzada, Profundo anciano de Y'ha-nthlei, Nadador de la marea, Hija de los Marsh | — | Barnabas Marsh, transformado |
+| 5. El Arrecife del Diablo y Y'ha-nthlei | Profundo, Profundo de la ciénaga, Profundo escupidor, Profundo anciano de Y'ha-nthlei, Híbrido avanzado, Nadador de la marea | Pth'thya-l'yi, la antepasada | **Jefe: Madre Hydra → Padre Dagon** |
+<!-- /tabla -->
 
 ### Parte 3 · *La llamada de Cthulhu* (Providence, Luisiana y el Pacífico)
 
-| Nivel | Criaturas | Evento final |
-|---|---|---|
-| 1. Providence: el estudio del escultor Wilcox | Pesadillas de la oleada de sueños, cultistas | La pesadilla del bajorrelieve |
-| 2. Los pantanos de Luisiana: el ritual del culto | Diablos con alas de murciélago, cultistas armados del *Alert* | El sacerdote del ritual |
-| 3. Los muelles y la cubierta del *Alert* | Engendros de Cthulhu, Profundos servidores | El engendro mayor |
-| 4. La tormenta en el Pacífico | La cosa blanca polipoide, Ángulos devoradores | La cosa blanca del lago oculto |
-| 5. R'lyeh emergida: la puerta colosal | Primigenios menores, emanaciones de la puerta | **Jefe: Cthulhu** |
+<!-- tabla:parte3 -->
+| Nivel | Criaturas | A mitad del nivel | Evento final |
+|---|---|---|---|
+| 1. Providence: el estudio del escultor Wilcox | Pesadilla de la oleada de sueños, Cultista de Cthulhu, Sonámbulo de Providence | — | La pesadilla del bajorrelieve |
+| 2. Los pantanos de Luisiana: el ritual del culto | Cultista de Cthulhu, Cultista armado del Alert, Diablo con alas de murciélago, Tamborilero del pantano, Ídolo vivo | El viejo Castro | El sacerdote del ritual |
+| 3. Los muelles y la cubierta del Alert | Profundo, Profundo escupidor, Cultista de Cthulhu, Cultista armado del Alert, Ídolo vivo | Engendro de Cthulhu | El engendro mayor |
+| 4. La tormenta en el Pacífico | La cosa blanca polipoide, Profundo, Cultista armado del Alert, Diablo con alas de murciélago, Sonámbulo de Providence | — | La cosa blanca del lago oculto |
+| 5. R'lyeh emergida: la puerta colosal | Emanación de la puerta, Profundo, Cultista de Cthulhu | Primigenio menor | **Jefe: Cthulhu → Cthulhu, recompuesto** |
+<!-- /tabla -->
+
+### Parte 4 · *La búsqueda onírica de la desconocida Kadath* (las Tierras del Sueño)
+
+Se abre al vencer a Cthulhu. Más color que las partes anteriores, sin dejar la noche, y cada nivel con lo suyo: los gatos de Ulthar, la galera negra que desembarca, las redes de las arañas, los ghasts que odian la luz, los descarnados que te llevan por el aire y las flautas de los Otros Dioses.
+
+<!-- tabla:parte4 -->
+| Nivel | Criaturas | A mitad del nivel | Evento final |
+|---|---|---|---|
+| 1. El bosque encantado y las afueras de Ulthar | Zoog, Zoog de las copas, Pesadilla de la oleada de sueños | — | El anciano del consejo de los zoogs |
+| 2. El puerto de Dylath-Leen y la galera negra | Mercader de Leng, Remero lunar, Pesadilla de la oleada de sueños | — | El amo de la galera negra |
+| 3. La meseta de Leng y el monasterio sin ventanas | Shantak, Araña púrpura de Leng, Mercader de Leng | El sumo sacerdote que no debe describirse | La madre de las arañas de Leng |
+| 4. Las bóvedas de Zin y la torre de los gugs | Ghast, Gug | — | El gran gug de la torre de Koth |
+| 5. La cima de Kadath y el castillo de ónice | Larva de los Otros Dioses, Descarnado nocturno | — | **Jefe: Nyarlathotep, el Caos reptante** |
+<!-- /tabla -->
+
+### Noches sueltas
+
+Cuatro relatos más, fuera de la campaña, desde el botón «Noches sueltas» del mapa: un nivel con sus dos criaturas, su jefe, su relato y sus propias reglas.
+
+<!-- tabla:noches -->
+| Nivel | Criaturas | A mitad del nivel | Evento final |
+|---|---|---|---|
+| La granja de los Gardner | Res gris, Granjero consumido | — | **Jefe: El color que sube del pozo** |
+| Sentinel Hill | Chotacabras de Dunwich, Devota de las colinas | — | **Jefe: El hermano de Wilbur** |
+| Las ruinas de Pnakotus | Poseído de la Gran Raza, Pólipo volador | — | **Jefe: El pólipo antiguo** |
+| La rue d'Auseil | Vecino de la rue d'Auseil, Jirón de la noche | — | **Jefe: Lo que hay tras la ventana** |
+<!-- /tabla -->
+
+- ***El color que cayó del cielo*:** la granja de los Gardner se agosta alrededor del pozo, y lo tocado por el color quita vida.
+- ***El horror de Dunwich*:** lo que no se ve en Sentinel Hill solo deja huellas; el polvo de Ibn Ghazi lo descubre un momento.
+- ***La sombra fuera del tiempo*:** los pólipos casi invisibles salen de las trampillas de Pnakotus, que se sellan de pie encima.
+- ***La música de Erich Zann*:** la viola de la ventana más alta aparta y quema a lo de fuera, y se acelera hasta el frenesí.
 
 ## Personajes
 
-Todos proceden de los relatos de Lovecraft o son parientes y allegados inventados de sus personajes. Se empieza con cuatro (Dyer, Olmstead, Peaslee y Whipple); el resto se compra en la tienda.
+Todos proceden de los relatos de Lovecraft o son parientes y allegados inventados de sus personajes. Se empieza con cuatro (Dyer, Olmstead, Peaslee y Whipple); el resto se compra en la tienda, salvo dos secretos que hay que descubrir.
 
 Cada investigador tiene **siete atributos** (Poder, Inteligencia, Fuerza, Constitución, Tenacidad, Destreza y Cultura), a 10 más un reparto de 20 puntos según su historia. De ellos salen la vida, la cordura, el esquive, la velocidad y el daño de cada tipo de arma, y al subir de nivel ganan un punto más.
 
 ![Dyer, Olmstead, Legrasse, Johansen, Peaslee, Varga y Whipple](docs/img/personajes_1.jpg)
 ![Blake, Iwanicki, Elwood, Malone, Armitage y West](docs/img/personajes_2.jpg)
+![Carter, Whateley, Pickman, Ward, Gilman, Tillinghast, Derby, Asenath y Kuranes](docs/img/personajes_3.jpg)
 
 Las caras están dibujadas a mano, voxel a voxel, en la propia cabeza del modelo: cejas, ojos con iris, nariz en relieve, bigotes, gafas, pecas y labios.
 
-![Las trece caras de cerca](docs/img/cabezas.jpg)
+![Las caras de cerca](docs/img/cabezas.jpg)
 
+<!-- tabla:personajes -->
 | Personaje | Arma inicial | Rasgo | Esquive | Relato de origen |
 |---|---|---|---|---|
-| **William Dyer**, geólogo de la Miskatonic | Stielhandgranate | Explosiones un 25 % más grandes | Deslizamiento | *En las montañas de la locura* |
-| **Robert Olmstead**, viajero y narrador de Innsmouth | Webly Mk VI | Esquive un 30 % más largo | Voltereta | *La sombra sobre Innsmouth* |
-| **Amelia Peaslee**, arqueóloga | Rifle de palanca | Más suerte: a veces, una cuarta mejora para elegir | Voltereta | *La sombra fuera del tiempo* |
-| **Dra. Marian Whipple**, doctora | Bisturís | Reanima a los compañeros un 50 % más rápido | Salto | *La casa maldita* |
-| **John R. Legrasse**, inspector de Nueva Orleans | Escopeta de corredera | 25 % más de daño contra cultistas y humanos | Salto | *La llamada de Cthulhu* |
-| **Gustaf Johansen**, segundo oficial del *Emma* | Machete | 25 % más de daño cuerpo a cuerpo | Plancha | *La llamada de Cthulhu* |
-| **Madame Ludmila Varga**, médium de Arkham | Necronomicón | Las armas arcanas le cuestan la mitad de cordura | Destello | Médium de Arkham |
-| **Henrietta Blake**, escritora | Trapezoedro | 15 % más de experiencia por gema | Deslizamiento | *El morador de las tinieblas* |
-| **Padre Iwanicki**, sacerdote de San Estanislao | Fórmula de expulsión | Aura que calma: él y los compañeros cercanos recuperan cordura | Voltereta | *Los sueños en la casa de la bruja* |
-| **Sargento Frank Elwood**, veterano de la Gran Guerra | Pistola Mauser C96 | 15 % menos de daño físico | Plancha | *Los sueños en la casa de la bruja* |
+| **William Dyer**, geólogo de la Universidad de Miskatonic *(de inicio)* | Stielhandgranate | Explosiones un 25 % más grandes | Deslizamiento | *En las montañas de la locura* |
+| **Robert Olmstead**, viajero y narrador de Innsmouth *(de inicio)* | Webly Mk VI | Esquive un 30 % más largo | Voltereta | *La sombra sobre Innsmouth* |
+| **Amelia Peaslee**, arqueóloga, sobrina del profesor Peaslee *(de inicio)* | Rifle de palanca | Más suerte: a veces, una cuarta mejora para elegir | Voltereta | *La sombra fuera del tiempo* |
+| **Dra. Marian Whipple**, doctora, sobrina del Dr. Elihu Whipple *(de inicio)* | Bisturís | Reanima a los compañeros un 50 % más rápido | Salto | *La casa maldita* |
+| **John R. Legrasse**, inspector de la policía de Nueva Orleans | Escopeta de corredera | 25 % más daño contra cultistas y enemigos humanos | Salto | *La llamada de Cthulhu* |
+| **Gustaf Johansen**, segundo oficial del Emma | Machete | Un 25 % más de daño cuerpo a cuerpo | Plancha de pingüino | *La llamada de Cthulhu* |
+| **Madame Ludmila Varga**, espiritista y médium de Arkham | Necronomicón | Las armas arcanas le cuestan la mitad de cordura | Destello | *Médium de Arkham* |
+| **Henrietta Blake**, escritora, hermana de Robert Blake | Trapezoedro | Un 15 % más de experiencia por gema | Deslizamiento | *El morador de las tinieblas* |
+| **Padre Iwanicki**, sacerdote de la iglesia de San Estanislao | Fórmula de expulsión | Aura que calma: él y los compañeros cercanos recuperan cordura | Voltereta | *Los sueños en la casa de la bruja* |
+| **Sargento Frank Elwood**, veterano de la Gran Guerra | Pistola Mauser C96 | Recibe un 15 % menos de daño físico | Plancha de pingüino | *Los sueños en la casa de la bruja* |
 | **Vera Malone**, contrabandista de Red Hook | Thompson M1928 | Hasta un 50 % más de daño cuanto más cerca está el enemigo | Deslizamiento | *El horror de Red Hook* |
-| **Profesor Henry Armitage**, bibliotecario de la Miskatonic | Polvo de Ibn-Ghazi | Las armas mágicas se recargan un 20 % antes | Destello | *El horror de Dunwich* |
-| **Herbert West**, médico reanimador | Inyector de West | Al subir de nivel cura un 15 % de vida a los compañeros cercanos | Voltereta | *Herbert West, reanimador* |
+| **Profesor Henry Armitage**, bibliotecario de la Universidad de Miskatonic | Polvo de Ibn-Ghazi | Las armas mágicas se recargan un 20 % antes | Destello | *El horror de Dunwich* |
+| **Herbert West**, médico, reanimador | Inyector de West | Al subir de nivel cura un 15 % de la vida a los compañeros cercanos | Voltereta | *Herbert West, reanimador* |
+| **Randolph Carter**, soñador de Boston *(secreto)* | Llave de los sueños | Las crisis de locura le duran la mitad: sabe despertar | Destello | *La llave de plata* |
+| **Wilbur Whateley**, hijo de Lavinia, de Dunwich *(secreto)* | Pisadas de lo invisible | Medio de otro mundo: el daño mental le hace un 40 % menos | Salto | *El horror de Dunwich* |
+| **Richard Upton Pickman**, pintor de Boston | Lienzos de Pickman | Ha pintado cosas peores: pierde un 30 % menos de cordura | Cuadro | *El modelo de Pickman* |
+| **Charles Dexter Ward**, anticuario de Providence | Sales esenciales | La sombra de Curwen: hasta un 40 % más de daño cuanto menos cordura le queda | Polvo | *El caso de Charles Dexter Ward* |
+| **Walter Gilman**, estudiante de matemáticas de Miskatonic | Ángulos imposibles | Entre los ángulos: las balas le alcanzan menos (su blanco es un 30 % más pequeño) | Ángulo | *Los sueños en la casa de la bruja* |
+| **Crawford Tillinghast**, físico y filósofo de Providence | Máquina del más allá | Ve más allá: sus armas llegan un 15 % más lejos | Más allá | *Desde el más allá* |
+| **Edward Derby**, poeta de Arkham (y Asenath Waite) | El umbral | Dos almas en dos cuerpos: cada esquive los cambia. Edward golpea de cerca; Asenath mira de lejos. Cada cambio le devuelve 3 de vida y de cordura | Cambio de cuerpo | *El ser en el umbral* |
+| **Kuranes**, soñador de Londres, rey de Celephaïs | Ensueño de Celephaïs | Medio dormido: recupera 0,4 de cordura por segundo, también entre los horrores | Sueño | *Celephaïs* |
+<!-- /tabla -->
 
 ## Compañeros
 
@@ -204,111 +261,126 @@ Cada jugador puede llevar uno. Suben de nivel con él y se compran en la tienda.
 <details>
 <summary><b>Los 16 compañeros</b></summary>
 
+<!-- tabla:companeros -->
 | Compañero | Qué hace |
 |---|---|
-| Perro de trineo de Lake | Corre hacia los enemigos cercanos y los muerde, más fuerte cuanto más nivel tienes. |
-| Gato de Ulthar | Araña a los que se acercan; si te hieren, se eriza y ataca el doble de rápido. |
-| Rata de las Paredes | Escarba y encuentra dólares; a veces, un baúl arcano. |
-| Sapo de Innsmouth | Escupe baba venenosa que deja un charco que daña y debilita. |
-| Búho de los sueños | Un 12 % más de experiencia, hasta un 30 % con el nivel. |
-| Shoggoth bebé | Va pegado a ti y se traga las balas enemigas que pasan cerca. |
-| Mini-Byakhee | Vuela alto y cae en picado: golpe en área que empuja. |
-| Cuervo de Arkham | Te trae las gemas lejanas y, de paso, roba unas monedas. |
-| Polilla de Leng | Su polvo confunde a los grupos: vagan sin rumbo y no disparan. |
-| Gaviota de Innsmouth | Trae pescado que cura vida y cordura a quien más lo necesita; chilla al ver una élite. |
-| Mini-Mi-Go | Dispara rayos al enemigo más cercano. |
-| Araña de Tíndalos | Se teletransporta detrás de un enemigo, muerde fuerte y aturde. |
-| Serpiente de Yig | Muerde y envenena. |
-| Pez de Innsmouth | Toma carrerilla y embiste a los que encuentra en el camino. |
-| Mini-Dhole | Excava y sale bajo los grupos de enemigos: los golpea, los empuja y los aturde. |
-| Cabra de los bosques | Embestida que empuja y aturde. |
+| Rata de las Paredes | Una rata enorme y maleducada. Escarba cada poco y encuentra dólares; a veces, un baúl arcano |
+| Perro de trineo de Lake | Corre hacia los enemigos cercanos y los muerde; muerde más fuerte cuanto más nivel tienes |
+| Pez de Innsmouth | Pez con patas que se cree humano. Toma carrerilla y embiste a los enemigos que encuentra en el camino |
+| Cabra de los bosques | Cabrita aparentemente inocente. Embiste a los enemigos: los empuja y los aturde |
+| Cuervo de Arkham | Cuervo ladrón. Vuela a por las gemas lejanas y te las trae; de paso roba unas monedas, a quien sea |
+| Sapo de Innsmouth | Feísimo pero adorable. Escupe baba venenosa: deja un charco que daña y debilita a los enemigos |
+| Búho de los sueños | Parece sabio. Vuela a tu lado y te da un 12 % más de experiencia, hasta un 30 % con el nivel |
+| Gaviota de Innsmouth | Carroñera y chillona. Se va a por pescado y te lo trae: cura un 8 % de vida y cordura (hasta un 15 %) a quien más lo necesite. Chilla cuando ve una élite |
+| Gato de Ulthar | Gato negro aparentemente normal... hasta que se enfada. Araña a los enemigos que se acercan; si te hieren, se eriza y ataca el doble de rápido |
+| Polilla de Leng | Bonita... hasta que abre las alas. Sacude su polvo sobre los grupos de enemigos: vagan confundidos y no disparan |
+| Serpiente de Yig | Serpiente que mira demasiado fijamente. Muerde y envenena: el veneno sigue dañando unos segundos |
+| Mini-Byakhee | Murciélago alienígena con cara de pocos amigos. Vuela alto y cae en picado sobre los enemigos: golpe en área que los empuja |
+| Mini-Mi-Go | Crustáceo espacial diminuto. Dispara rayos al enemigo más cercano |
+| Shoggoth bebé | Una bolita negra llena de ojos. Va pegado a ti y se traga las balas enemigas que pasan cerca |
+| Araña de Tíndalos | Una araña que no respeta las leyes de la geometría. Se teletransporta detrás de un enemigo, le muerde fuerte y lo aturde |
+| Mini-Dhole | Gusano gigantesco reducido a mascota. Excava y sale bajo los grupos de enemigos: los golpea, los empuja y los aturde |
+<!-- /tabla -->
 
 </details>
 
 ## Armas y objetos
 
-**50 armas** (16 físicas, 17 de fuego y 17 mágicas), cada una con su evolución:
+**58 armas** (16 físicas, 17 de fuego y 25 mágicas), cada una con dos evoluciones:
 
-![Iconos de las 50 armas](docs/img/armas.jpg)
+![Iconos de las 58 armas](docs/img/armas.jpg)
 
-Todas disparan solas y cada una decide en sus datos cómo apunta: al más cercano, a la zona más densa, a la élite, alrededor del personaje… Suben de nivel del 1 al 5 y su daño crece con los atributos de su tipo. Con el arma al nivel 5 y su objeto pareja, un baúl arcano la convierte en su **evolución**:
+Todas disparan solas y cada una decide en sus datos cómo apunta: al más cercano, a la zona más densa, a la élite, alrededor del personaje… Suben de nivel del 1 al 5 y su daño crece con los atributos de su tipo. Con el arma al nivel 5 y su objeto pareja, un baúl arcano la convierte en una de sus dos **evoluciones**, a elegir:
 
-![Iconos de las 50 evoluciones](docs/img/evoluciones.jpg)
+![Iconos de las 116 evoluciones](docs/img/evoluciones.jpg)
 
 <details>
-<summary><b>Las 50 armas y sus evoluciones</b></summary>
+<summary><b>Las 58 armas y sus evoluciones</b></summary>
 
-| Arma | Tipo | Cómo funciona | Evolución (con) |
+<!-- tabla:armas -->
+| Arma | Tipo | Cómo funciona | Evoluciones (con) |
 |---|---|---|---|
-| Ancla del *Alert* | Física | Un ancla con cadena que gira alrededor del personaje a mucha distancia, lenta y pesada. | Ancla de Johansen (Coraza de foca) |
-| Arpón ballenero | Física | Atraviesa y arrastra a los enemigos menores. | Arpón de Nantucket (Plomada) |
-| Ballesta | Física | Virotes que atraviesan y dejan clavado al enemigo un instante. | Ballesta de la fortuna (Dado de hueso) |
-| Bastón estoque | Física | Estocada larga que atraviesa todo lo que hay en la línea. | Estoque del duelista (Piedra de afilar) |
-| Bisturís | Física | Abanico de hojas que atraviesan. | Instrumental (Abrigo de reno) |
-| Bumerán | Física | Va hasta su alcance y vuelve, golpeando a la ida y a la vuelta. | Bumerán de hueso (Esquís de Pabodie) |
-| Cepos | Física | Cepos en el suelo: el primero que los pisa queda atrapado y herido. | Cepos del cazador (Collar de colmillos) |
-| Cóctel Molotov | Física | Botella en arco que deja un charco en llamas. | Cóctel del *Emma* (Petaca de ron) |
-| Gas de cloro | Física | Nube tóxica que deriva hacia los enemigos y los envenena. | Gas mostaza (Elixir de Curwen) |
-| Inyector de West | Física | El enemigo que muere con el suero se levanta 6 s como aliado. | Reactivo perfeccionado (Botiquín) |
-| Lanzaquímicos | Física | Frasco de ácido: los del charco reciben un 25 % más de daño. | Botica de Arkham (Láudano) |
-| Látigo | Física | Latigazo largo en arco por delante. | Látigo del domador (Silbato de Lake) |
-| Machete | Física | Tajo circular alrededor del personaje. | Machete del cañaveral (Guantes de estibador) |
-| Martillo de geólogo | Física | Grieta en línea recta que daña y aturde. | Martillo de la Barrera (Crampones) |
-| Red de pesca | Física | Inmoviliza al grupo más denso 2 s; las élites solo se frenan. | Red de Innsmouth (Escamas de Profundo) |
-| Stielhandgranate | Física | Granada de palo a la zona más densa; gran explosión. | Carga concentrada (Reflejos) |
-| Ametralladora Lewis | De fuego | Torreta en trípode que dispara sola al más cercano durante 8 s. | Nido de ametralladoras (Manual de tiro) |
-| Antitanque Mauser | De fuego | Disparo muy lento que atraviesa a todos los de la línea. | Cañón antitanque (Medallón del cazador) |
-| BAR M1918 | De fuego | Ráfagas cuyas balas rebotan hacia otro enemigo. | BAR de asalto (Botas de nieve) |
-| Bobina Tesla | De fuego | Rayo que salta de un enemigo a otro, hasta cuatro. | Bobina de Nikola (Vara de zahorí) |
-| Escopeta de corredera | De fuego | Perdigones que se abren en anillo alrededor del personaje. | Escopeta de trinchera (Bandolera) |
-| Flammenwerfer | De fuego | Chorro de fuego en cono que deja el suelo ardiendo. | Aliento de Moloch (Fósforos de Cthugha) |
-| Fuegos artificiales | De fuego | Cohetes erráticos que estallan en chispas. | Gran castillo de fuegos (Petardos) |
-| Lugers a dos manos | De fuego | Disparan a la vez hacia donde andas y hacia atrás. | Lugers del as (Gafas de aviador) |
-| Mortero Stokes | De fuego | Proyectil en arco alto al grupo más denso; explosión grande. | Batería de morteros (Pólvora de Ponape) |
-| Nagant de Danforth | De fuego | Su cadencia se acelera mientras tiene a quién disparar. | Nagant del vigía (Lupa) |
-| Pistola Mauser C96 | De fuego | Ráfagas cortas de tres trazadoras. | Mauser de Tillinghast (Reloj de Tillinghast) |
-| Pistola de bengalas | De fuego | Bengala que atrae a los enemigos cercanos. | Bengala del faro (Capa del Hombre Negro) |
-| Recortada | De fuego | Dos disparos de perdigones en un cono corto que empuja mucho. | Recortada del contrabandista (Diente de shoggoth) |
-| Rifle de palanca | De fuego | Disparos rápidos que atraviesan a varios enemigos. | Rifle Miskatonic (Diario de campo) |
-| Springfield M1903 | De fuego | Disparo lento que busca a la élite; a veces, crítico triple. | Springfield del francotirador (Ojo de Pickman) |
-| Thompson M1928 | De fuego | Ráfagas cerradas de proyectiles pequeños. | Thompson de Chicago (Oro de Obed) |
-| Webly Mk VI | De fuego | Proyectiles pesados que hacen retroceder. | Revólver del vigía (Brújula de Lake) |
-| Aliento de Ithaqua | Mágica | Viento helado en cono que frena y congela. | Aliento del Wendigo (Pemmican) |
-| Báculo del Farolero | Mágica | Fuegos fatuos que buscan solos a los enemigos. | Linterna de los fatuos (Pipa de espuma) |
-| Daga ritual | Mágica | Maldición que salta a los de al lado si el enemigo muere maldito. | Daga del sacrificio (Colmillo de ghoul) |
-| Esfera de Yog-Sothoth | Mágica | Orbe lento que atrae a los enemigos a su centro y los tritura. | La Puerta y la Llave (Llave de plata) |
-| Fórmula de expulsión | Mágica | Onda que empuja y aturde. | Exorcismo mayor (Signo Primigenio) |
-| Lente del Éter | Mágica | Rayo sostenido cuyo daño crece hasta el triple. | Ojo del Éter (Catalejo) |
-| Llama de Cthugha | Mágica | Bola de fuego vivo que atraviesa y deja un rastro ardiendo. | Llama del culto (Talismán esotérico) |
-| Lámpara de Alhazred | Mágica | Haz de luz que barre en círculo alrededor del personaje. | Lámpara del Árabe Loco (Ankh de Nephren) |
-| Necronomicón | Mágica | Páginas que orbitan alrededor del personaje. | Necronomicón completo (Manuscritos pnakóticos) |
-| Orbe Mi-Go | Mágica | Orbe de Yuggoth que vuela a tu alrededor y dispara solo. | Enjambre de Yuggoth (Cristal de Ithaqua) |
-| Polvo de Ibn-Ghazi | Mágica | Nube que ralentiza y debilita a los de dentro. | Polvo de los Antiguos (Mapa de Leng) |
-| Rayo de Yith | Mágica | Congela en el tiempo; el daño se aplica al final, un 50 % mayor. | Rayo de la Gran Raza (Clepsidra de Yith) |
-| Resonador | Mágica | Su pulso deshace las balas enemigas cercanas. | Gran resonador (Escudo de Nodens) |
-| Signo Amarillo | Mágica | Los que lo miran enloquecen y atacan a los suyos. | El Rey de Amarillo (Salterio) |
-| Signo Arcano | Mágica | Signo en el suelo que daña, empuja y frena las balas enemigas. | Signo Mayor (Escapulario) |
-| Tentáculos de Shub | Mágica | Tentáculos que brotan del suelo bajo enemigos al azar. | Las Mil Crías (Tablilla de Eltdown) |
-| Trapezoedro | Mágica | Rayo de luz concentrada que daña todo lo que atraviesa. | Trapezoedro despierto (Ídolo de Cthulhu) |
+| Ancla del Alert | Física | Un ancla con cadena que gira alrededor del personaje a mucha distancia, lenta y pesada | Ancla de Johansen / Molinete del Alert (Coraza de foca) |
+| Arpón ballenero | Física | Proyectil pesado que atraviesa y arrastra a los enemigos menores | Arpón de Nantucket / Lanza bomba (Plomada) |
+| Ballesta | Física | Virotes que atraviesan y dejan clavado al enemigo un instante | Ballesta de la fortuna / Ballesta de cranequín (Dado de hueso) |
+| Bastón estoque | Física | Estocada larga y rápida hacia el enemigo más cercano que atraviesa todo lo que hay en la línea. Espera a tener a alguien a su alcance | Estoque del duelista / Sable del húsar (Piedra de afilar) |
+| Bisturís | Física | Abanico de hojas que atraviesan | Instrumental / Bisturí del anatomista (Abrigo de reno) |
+| Bumerán | Física | Va hasta su alcance y vuelve a tus manos, golpeando a la ida y a la vuelta | Bumerán de hueso / Bumerán de guerra (Esquís de Pabodie) |
+| Cepos | Física | Deja cepos en el suelo: el primero que los pisa queda atrapado y herido | Cepos del cazador / Cepo de oso (Collar de colmillos) |
+| Cóctel Molotov | Física | Botella en arco que crea un charco en llamas | Cóctel del Emma / Bomba de queroseno (Petaca de ron) |
+| Gas de cloro | Física | Nube tóxica que deriva lentamente hacia los enemigos y los envenena | Gas mostaza / Fosgeno (Elixir de Curwen) |
+| Inyector de West | Física | Dispara dardos de suero: el enemigo que muere con el suero dentro se levanta 6 segundos como aliado y ataca a los suyos | Reactivo perfeccionado / Suero de Halsey (Botiquín) |
+| Lanzaquímicos | Física | Frasco de ácido: los enemigos del charco reciben un 25 % más de daño | Botica de Arkham / Agua regia (Láudano) |
+| Látigo | Física | Latigazo largo en arco por delante que golpea a todos los del arco | Látigo del domador / Látigo del mayoral (Silbato de Lake) |
+| Machete | Física | Tajo circular alrededor del personaje; solo golpea si hay alguien cerca | Machete del cañaveral / Machetes de zafra (Guantes de estibador) |
+| Martillo de geólogo | Física | Golpea el suelo y abre una grieta que avanza en línea recta, daña y aturde un momento a todo lo que encuentra | Martillo de la Barrera / Piolet de Pabodie (Crampones) |
+| Red de pesca | Física | Lanza una red sobre el grupo más denso: los de debajo se quedan inmóviles 2 segundos. Las élites solo se frenan | Red de Innsmouth / Redes de arrastre (Escamas de Profundo) |
+| Stielhandgranate | Física | Granada de palo lanzada a la zona más densa; gran explosión al impactar | Carga concentrada / Racimo de granadas (Reflejos) |
+| Ametralladora Lewis | De fuego | Monta la ametralladora en su trípode, en el suelo; dispara sola al más cercano durante 8 segundos | Nido de ametralladoras / Puestos de tiro (Manual de tiro) |
+| Antitanque Mauser | De fuego | Disparo muy lento que atraviesa a todos los enemigos de la línea | Cañón antitanque / Fusil del cazacarros (Medallón del cazador) |
+| BAR M1918 | De fuego | Ráfagas cuyas balas rebotan hacia otro enemigo cercano | BAR de asalto / BAR del tirador (Botas de nieve) |
+| Bobina Tesla | De fuego | Descarga un rayo al enemigo más cercano que salta a los siguientes, hasta cuatro; cada salto hace un poco menos | Bobina de Nikola / Rayo de Wardenclyffe (Vara de zahorí) |
+| Escopeta de corredera | De fuego | Perdigones que se abren en anillo alrededor del personaje | Escopeta de trinchera / Escopeta de postas (Bandolera) |
+| Flammenwerfer | De fuego | Chorro de fuego en cono que deja el suelo ardiendo | Aliento de Moloch / Lanza térmica (Fósforos de Cthugha) |
+| Fuegos artificiales | De fuego | Cohetes erráticos que estallan en chispas | Gran castillo de fuegos / Cohete de la feria (Petardos) |
+| Lugers a dos manos | De fuego | Una pistola en cada mano: disparan a la vez hacia donde andas y hacia atrás, sin buscar objetivo | Lugers del as / Lugers de feria (Gafas de aviador) |
+| Mortero Stokes | De fuego | Proyectil en arco alto al grupo más denso a distancia; explosión grande | Batería de morteros / Mortero incendiario (Pólvora de Ponape) |
+| Nagant de Danforth | De fuego | Revólver cuya cadencia se acelera mientras tiene a quién disparar, hasta dos veces y media | Nagant del vigía / Nagant de siete tiros (Lupa) |
+| Pistola de bengalas | De fuego | Bengala que ilumina y atrae a los enemigos cercanos (las élites no caen) | Bengala del faro / Bengala de magnesio (Capa del Hombre Negro) |
+| Pistola Mauser C96 | De fuego | Ráfagas cortas de tres trazadoras | Mauser de Tillinghast / Carabina Mauser (Reloj de Tillinghast) |
+| Recortada | De fuego | Dos disparos seguidos de perdigones en un cono corto y ancho que empuja mucho | Recortada del contrabandista / Recortada del matadero (Diente de shoggoth) |
+| Rifle de palanca | De fuego | Disparos rápidos que atraviesan a varios enemigos | Rifle Miskatonic / Rifle de caza mayor (Diario de campo) |
+| Springfield M1903 | De fuego | Disparo lento y fuerte que busca primero a la élite o al enemigo con más vida; a veces es un crítico triple. Atraviesa a uno | Springfield del francotirador / Springfield de Belleau (Ojo de Pickman) |
+| Thompson M1928 | De fuego | Ráfagas cerradas de proyectiles pequeños | Thompson de Chicago / Thompson del agente federal (Oro de Obed) |
+| Webly Mk VI | De fuego | Proyectiles pesados que hacen retroceder a los enemigos | Revólver del vigía / Webly de seis tiros (Brújula de Lake) |
+| Aliento de Ithaqua | Mágica | Viento helado en cono que frena a los enemigos y congela a los que siguen dentro | Aliento del Wendigo / El que camina con el viento (Pemmican) |
+| Báculo del Farolero | Mágica | Suelta fuegos fatuos que zigzaguean y buscan solos a los enemigos. Cuesta cordura | Linterna de los fatuos / Fuego de San Telmo (Pipa de espuma) |
+| Daga ritual | Mágica | Apuñala al enemigo más cercano y lo maldice: pierde vida poco a poco y, si muere maldito, la maldición salta a los de al lado. Cuesta cordura | Daga del sacrificio / Daga de obsidiana (Colmillo de ghoul) |
+| El umbral | Mágica | Depende de quién esté en el cuerpo. Edward da un golpe alrededor, de cerca y fuerte (físico); Asenath lanza dos miradas verdes que buscan al enemigo (mágicas, cuestan cordura). Cada esquive los cambia | Lo que llamó a la puerta / Los ojos de Ephraim (Aldaba de la casa Derby) |
+| Ensueño de Celephaïs | Mágica | Un trozo del cielo de Celephaïs donde más enemigos hay: dentro sueñan y van cada vez más despacio, sus balas se frenan y los investigadores recuperan cordura | Valle de Ooth-Nargai / Serannian (Adormidera de Ooth-Nargai) |
+| Esfera de Yog-Sothoth | Mágica | Orbe lento que atrae a los enemigos hacia su centro y los tritura | La Puerta y la Llave / Umr at-Tawil (Llave de plata) |
+| Fórmula de expulsión | Mágica | Onda que se expande desde el personaje, empuja y aturde. Cuesta cordura | Exorcismo mayor / Letanía de expulsión (Signo Primigenio) |
+| Lente del Éter | Mágica | Rayo sostenido sobre un enemigo: su daño crece mientras sigue sobre él, hasta el triple. Si el enemigo cae, salta a otro. Cuesta cordura | Ojo del Éter / Prisma del Éter (Catalejo) |
+| Lienzos de Pickman | Mágica | Planta un cuadro entre los enemigos que los atrae y los deja vulnerables. Cuando lo rompen, revienta y sale de él un necrófago que caza un rato | Galería de North End / El modelo del natural (Fotografía del modelo) |
+| Llama de Cthugha | Mágica | Bola de fuego vivo que atraviesa a los enemigos y deja un rastro ardiendo | Llama del culto / Chispas de Fomalhaut (Talismán esotérico) |
+| Llave de los sueños | Mágica | La llave de plata de Randolph Carter va hasta su alcance y vuelve, y deja adormilado un momento a todo lo que toca | Llave de la ignota Kadath / Llaves de Ulthar (Mapa de las Tierras del Sueño) |
+| Lámpara de Alhazred | Mágica | Haz de luz que barre en círculo alrededor del personaje | Lámpara del Árabe Loco / Faro de Irem (Ankh de Nephren) |
+| Máquina del más allá | Mágica | Una onda violeta que revela lo que nos rodea: los alcanzados reciben un 30 % más de daño de todo durante unos segundos, y los ocultos salen. Cada pulso seguido calienta la máquina y quita más cordura a todo el grupo cercano | Lo que nos rodea / Medusas del más allá (Válvula de la máquina) |
+| Necronomicón | Mágica | Páginas que orbitan alrededor del personaje. Cuesta cordura | Necronomicón completo / Al Azif (Manuscritos pnakóticos) |
+| Orbe Mi-Go | Mágica | Un orbe de los hongos de Yuggoth vuela solo a tu alrededor y dispara al enemigo más cercano. Cuesta cordura | Enjambre de Yuggoth / Cilindro de los Mi-Go (Cristal de Ithaqua) |
+| Pisadas de lo invisible | Mágica | El hermano de Wilbur, que nadie ve, avanza en línea recta hacia el grupo más denso: aplasta y aturde lo que pisa | Lo que bajó de Sentinel Hill / El gemelo de Wilbur (Diario cifrado de Wilbur) |
+| Polvo de Ibn-Ghazi | Mágica | Esparce una nube sobre el grupo más denso: dentro, los enemigos van un 40 % más lentos y hacen un 30 % menos de daño. Cuesta cordura | Polvo de los Antiguos / Polvo de Ibn Schacabao (Mapa de Leng) |
+| Rayo de Yith | Mágica | Congela al enemigo en el tiempo 1,5 s; el daño que recibe mientras tanto se aplica al final, un 50 % mayor. Cuesta cordura | Rayo de la Gran Raza / Rayo de Pnakotus (Clepsidra de Yith) |
+| Resonador | Mágica | Vibra cada poco y su pulso deshace las balas enemigas cercanas; hace poco daño. Solo vibra si hay balas o enemigos cerca. Cuesta cordura | Gran resonador / Resonador de Crawford (Escudo de Nodens) |
+| Sales esenciales | Mágica | Esparce las sales donde más enemigos han caído y recita la fórmula: daña a los de alrededor y levanta a dos de los caídos, que luchan por él un rato. Cuesta cordura | Cabeza del Dragón / Cola del Dragón (Frasco de los Custodes) |
+| Signo Amarillo | Mágica | Los enemigos que lo miran enloquecen y atacan a los suyos unos segundos | El Rey de Amarillo / Carcosa (Salterio) |
+| Signo Arcano | Mágica | Traza bajo sus pies un signo que daña y empuja hacia fuera a los enemigos; las balas enemigas que lo cruzan van a la mitad de velocidad. Cuesta cordura | Signo Mayor / Signo de Koth (Escapulario) |
+| Tentáculos de Shub | Mágica | Tentáculos que brotan del suelo, tras un aviso, bajo enemigos al azar | Las Mil Crías / La Cabra Negra (Tablilla de Eltdown) |
+| Trapezoedro | Mágica | Rayo de luz concentrada que daña todo lo que atraviesa. Cuesta cordura | Trapezoedro despierto / Trapezoedro de Blake (Ídolo de Cthulhu) |
+| Ángulos imposibles | Mágica | Lanza ángulos que salen torcidos y doblan esquinas en ángulo recto hasta dar con el enemigo. Atraviesan paredes, árboles y a varios enemigos | La geometría de la bruja / El trono de Azathoth (Estatuilla de la balaustrada) |
+<!-- /tabla -->
 
 </details>
 
-**50 objetos**, de la subida de nivel (los potenciadores permanentes se compran en la tienda):
+**58 objetos**, de la subida de nivel (los potenciadores permanentes se compran en la tienda):
 
-![Iconos de los 50 objetos](docs/img/objetos.jpg)
+![Iconos de los 58 objetos](docs/img/objetos.jpg)
 
 <details>
-<summary><b>Los 50 objetos</b></summary>
+<summary><b>Los 58 objetos</b></summary>
 
+<!-- tabla:objetos -->
 | Objeto | Efecto |
 |---|---|
 | Abrigo de reno | +20 de vida máxima |
+| Adormidera de Ooth-Nargai | Los enemigos que frenan tus armas van un 6 % más lentos |
+| Aldaba de la casa Derby | Tres golpes y luego dos: el primer daño a un enemigo ileso es un 12 % mayor |
 | Ankh de Nephren | Una vez por nivel, al caer te levantas con el 30 % de vida |
 | Bandolera | +1 proyectil en las armas de balas y lanzados |
 | Botas de nieve | +8 % de velocidad al andar |
 | Botiquín | Recupera 0,5 de vida por segundo |
 | Brújula de Lake | +30 % de radio para recoger experiencia |
-| Capa del Hombre Negro | Al esquivar dejas un señuelo que atrae a los enemigos |
+| Capa del Hombre Negro | Al esquivar dejas un señuelo que atrae a los enemigos 1 s por nivel |
 | Catalejo | +10 % de alcance de las armas |
 | Clepsidra de Yith | +15 % de duración de zonas, órbitas, rayos y torretas |
 | Collar de colmillos | +25 % de daño de los críticos |
@@ -317,21 +389,26 @@ Todas disparan solas y cada una decide en sus datos cómo apunta: al más cercan
 | Crampones | +15 % de distancia del esquive |
 | Cristal de Ithaqua | 6 % de que el impacto frene al enemigo 1,5 s |
 | Dado de hueso | +15 % de suerte: a veces una opción más al subir de nivel |
+| Diario cifrado de Wilbur | Recuperas 0,25 de cordura por segundo, y los compañeros a menos de 4 m también |
 | Diario de campo | +20 de cordura máxima |
 | Diente de shoggoth | +20 % de daño con menos del 30 % de vida |
 | Elixir de Curwen | +15 % de daño durante 2 s tras esquivar |
-| Escamas de Profundo | Devuelve el 30 % del daño de contacto |
+| Escamas de Profundo | Devuelve el 30 % del daño de contacto al que te golpea |
 | Escapulario | +25 % de invulnerabilidad tras recibir un golpe |
-| Escudo de Nodens | Cada 25 s absorbe un golpe entero |
+| Escudo de Nodens | Cada 25 s absorbe un golpe entero (3 s antes por nivel) |
 | Esquís de Pabodie | +1 esquive seguido antes de recargar |
+| Estatuilla de la balaustrada | Las balas de tus armas son un 12 % más grandes: tocan antes y se ven mejor |
+| Fotografía del modelo | Los aliados que levantan tus armas (necrófagos, reanimados) duran un 12 % más |
+| Frasco de los Custodes | Los aliados que levantan tus armas (levantados, necrófagos, reanimados) golpean un 15 % más fuerte |
 | Fósforos de Cthugha | 6 % de que el impacto prenda al enemigo 3 s |
 | Gafas de aviador | +0,08 s de invulnerabilidad al esquivar |
-| Guantes de estibador | +12 % de daño físico y +10 % de empuje |
-| Llave de plata | Otras opciones en la subida de nivel, una vez por nivel |
+| Guantes de estibador | +12 % de daño de las armas físicas y +10 % de empuje |
+| Llave de plata | RB o E en la subida de nivel: otras opciones, una vez por nivel |
 | Lupa | +10 % de experiencia |
 | Láudano | Las crisis de locura duran un 20 % menos |
 | Manual de tiro | +12 % de daño de las armas de fuego |
 | Manuscritos pnakóticos | +12 % de daño de las armas mágicas |
+| Mapa de las Tierras del Sueño | Las armas mágicas se recargan un 7 % antes |
 | Mapa de Leng | +10 % de área de explosiones, zonas, ondas y tajos |
 | Medallón del cazador | +30 % de daño a élites y seres únicos |
 | Ojo de Pickman | +8 % de probabilidad de crítico (daño ×1,5) |
@@ -351,27 +428,47 @@ Todas disparan solas y cada una decide en sus datos cómo apunta: al más cercan
 | Tablilla de Eltdown | 8 % de que el enemigo abatido estalle y dañe alrededor |
 | Talismán esotérico | Las armas mágicas cuestan un 12 % menos de cordura |
 | Vara de zahorí | Los baúles arcanos aparecen un 15 % más a menudo |
+| Válvula de la máquina | Los enemigos revelados reciben un 8 % más de daño |
 | Ídolo de Cthulhu | +12 % de enemigos, de experiencia y de dólares |
+<!-- /tabla -->
 
 </details>
 
 ## Bestiario
 
-47 criaturas, entre ellas 18 seres únicos (minijefes y jefes). Cada una tiene su escalón (del 1 al 5), su comportamiento y su patrón de ataque, todo en datos. Las de escalón bajo forman la masa de la horda; los escalones 4 y 5 son élites.
+Más de 90 criaturas, entre ellas los seres únicos del final de cada nivel, los jefes intermedios y los ocho jefes. Cada una tiene su escalón (del 1 al 5), su comportamiento y su patrón de ataque, todo en datos. Las de escalón bajo forman la masa de la horda; los escalones 4 y 5 son élites.
 
-**Parte 1:** pingüino albino ciego, fragmento protoplásmico, Antiguo revivido, Antiguo alado, shoggoth esclavo, Antiguo guerrero, Antiguo mutilado, shoggoth de ojos luminosos y Antiguo del mar abisal.
+<!-- tabla:bestiario_p1 -->
+**Parte 1:** Pingüino albino ciego · Fragmento protoplásmico · Acechador · Antiguo revivido · Antiguo alado · Expedicionario de Lake · El primero en despertar · Shoggoth esclavo · Shoggoth mimético · Shoggoth excavador · Gedney, lo que queda de él · El shoggoth de la caverna · Antiguo guerrero · Antiguo mutilado · Antiguo sembrador · El guardián de la ciudad · Shoggoth de ojos luminosos · Antiguo del mar abisal · El shoggoth primigenio.
+<!-- /tabla -->
 
 ![Criaturas de la parte 1](docs/img/bestiario_1.jpg)
 
-**Parte 2:** viejo y vecina de Innsmouth, acólito de la Orden de Dagon, híbridos avanzados, sacerdote de la tiara, Profundo, Profundo escupidor, Profundo anciano de Y'ha-nthlei y el Acechador.
+<!-- tabla:bestiario_p2 -->
+**Parte 2:** Pescador de Innsmouth · Vecina de Innsmouth · Viejo de Innsmouth · Acólito de la Orden de Dagon · El diácono de la Orden · Híbrido avanzado · Híbrida avanzada · Sacerdote de la tiara · Guardián de la Orden de Dagón · El sumo sacerdote de la Orden · Profundo · Profundo escupidor · Acechador de los tejados · Hija de los Marsh · El capitán Obed Marsh · Profundo de la ciénaga · Profundo anciano de Y'ha-nthlei · Nadador de la marea · Barnabas Marsh, transformado · Pth'thya-l'yi, la antepasada · Madre Hydra · Padre Dagon.
+<!-- /tabla -->
 
 ![Criaturas de la parte 2](docs/img/bestiario_2.jpg)
 
-**Parte 3:** cultista de Cthulhu, cultista armado del *Alert*, pesadilla de la oleada de sueños, diablo con alas de murciélago, engendro de Cthulhu, la cosa blanca polipoide, emanación de la puerta y primigenio menor.
+<!-- tabla:bestiario_p3 -->
+**Parte 3:** Pesadilla de la oleada de sueños · Cultista de Cthulhu · Sonámbulo de Providence · La pesadilla del bajorrelieve · Cultista armado del Alert · Diablo con alas de murciélago · Tamborilero del pantano · Ídolo vivo · El viejo Castro · El sacerdote del ritual · Engendro de Cthulhu · El engendro mayor · La cosa blanca polipoide · La cosa blanca del lago oculto · Emanación de la puerta · Primigenio menor · Cthulhu · Cthulhu, recompuesto.
+<!-- /tabla -->
 
 ![Criaturas de la parte 3](docs/img/bestiario_3.jpg)
 
-Algunas tienen comportamientos propios: el pingüino ciego va hacia donde oyó al jugador, el shoggoth mimético se disfraza de Antiguo y se transforma al acercarse, las pesadillas atraviesan el decorado, los diablos caen en picado y los Profundos de la ciénaga salen del agua. Los Ángulos devoradores de R'lyeh no se matan: se esquivan.
+<!-- tabla:bestiario_p4 -->
+**Parte 4:** Zoog · Zoog de las copas · El anciano del consejo de los zoogs · Mercader de Leng · Remero lunar · El amo de la galera negra · Shantak · Araña púrpura de Leng · El sumo sacerdote que no debe describirse · La madre de las arañas de Leng · Ghast · Gug · El gran gug de la torre de Koth · Larva de los Otros Dioses · Descarnado nocturno · Nyarlathotep, el Caos reptante.
+<!-- /tabla -->
+
+![Criaturas de la parte 4](docs/img/bestiario_4.jpg)
+
+<!-- tabla:bestiario_noche -->
+**Noches sueltas:** Res gris · Granjero consumido · El color que sube del pozo · Chotacabras de Dunwich · Devota de las colinas · El hermano de Wilbur · Poseído de la Gran Raza · Pólipo volador · El pólipo antiguo · Vecino de la rue d'Auseil · Jirón de la noche · Lo que hay tras la ventana.
+<!-- /tabla -->
+
+![Criaturas de las noches sueltas](docs/img/bestiario_noches.jpg)
+
+Algunas tienen comportamientos propios: el pingüino ciego va hacia donde oyó al jugador, el shoggoth mimético se disfraza de Antiguo y se transforma al acercarse, las pesadillas atraviesan el decorado, los diablos caen en picado y los Profundos de la ciénaga salen del agua. Los Ángulos devoradores de R'lyeh no se matan: se esquivan. En las Tierras del Sueño, los ghasts huyen de la luz, las arañas de Leng tienden redes que atrapan y los descarnados se llevan por el aire a quien atrapan. Las élites sacan uno o dos rasgos al azar (vampírica, estalla al morir, rastro de icor, rápida o con escudo), con su icono sobre la cabeza.
 
 ## Cómo se juega
 
@@ -543,7 +640,7 @@ El detalle está en [`docs/RENDIMIENTO.md`](docs/RENDIMIENTO.md) y en el diario.
 
 ### Imágenes de este README
 
-Salen de capturas automáticas del juego: `sh tools/capturas_readme.sh` juega las partidas con bots y fotografía menús y modelos, y `python tools/montar_readme.py` las reduce a 960 px, monta las láminas de modelos, caras e iconos (leyendo los mismos datos que usa el juego) y hace con ffmpeg el GIF y un vídeo MP4 con sonido. También deja `docs/img/vista_previa.jpg` (1280 × 640), la imagen que enseña GitHub al compartir el enlace del repositorio.
+Salen de capturas automáticas del juego: `sh tools/capturas_readme.sh` juega las partidas con bots y fotografía menús y modelos, y `python tools/montar_readme.py` las reduce a 960 px, monta las láminas de modelos, caras e iconos (leyendo los mismos datos que usa el juego) y hace con ffmpeg el GIF y un vídeo MP4 con sonido. También deja `docs/img/vista_previa.jpg` (1280 × 640), la imagen que enseña GitHub al compartir el enlace del repositorio. Las tablas de personajes, compañeros, armas, objetos, niveles y criaturas salen de los datos del juego: `python tools/tablas_readme.py` las rehace en los dos README (entre las marcas `<!-- tabla:… -->`), el inglés con la misma traducción que usa el juego.
 
 ## Hoja de ruta
 
@@ -560,6 +657,16 @@ Salen de capturas automáticas del juego: `sh tools/capturas_readme.sh` juega la
 | 8 | Pulido y distribución: sonido, música, accesibilidad, 50 armas y 50 objetos, escenarios rehechos, efectos en cubitos, dificultades, ambiente vivo, subidas por turnos, caras nuevas | 🔨 En curso: falta el equilibrio final con partidas reales y subir a itch.io |
 | 9 | Juego online: sala, selección y partida en red, pausa y subidas para todos, desconexiones y vuelta | ✅ Hecha, pendiente de la prueba por internet |
 | 10 | Guardado en la nube: copia de las partidas y los controles en un gist de GitHub, conflictos entre PC | ✅ Hecha, pendiente de activarla (aplicación de GitHub) y de la prueba con dos PC |
+| 11-14 | Sensación de impacto, informe al caer, modo sin fin, partida del día, modo foto, tráiler y demo de la parte 1 | ✅ Hecha |
+| 15 | Repetición de la caída, desafíos, un enemigo nuevo por parte y bestiario vivo | ✅ Hecha |
+| 16 | Rendimiento (hordas con instancias, carga durante el relato), dos ramas de evolución, Signos Mayores, buhonero, grados de locura, enemigos y jefes intermedios, élites con rasgos, velocidad del juego, desfile de jefes, expediciones, pesca, personajes secretos, sala de trofeos y escenarios más vivos | ✅ Hecha |
+| 17 | Animación y vida de los escenarios: gestos, celebraciones, poses de victoria, muertes según el daño, decorado que reacciona y sucesos lejanos | ✅ Hecha |
+| 18 | Efectos de las armas en voxel con degradados: estelas, impactos, casquillos, arcos, zonas y acentos de las evoluciones | ✅ Hecha |
+| 19 | Rendimiento, accesibilidad de los efectos, build de Linux e informe de errores | ✅ Hecha |
+| 20 | Menús, transiciones y configuración; seis personajes nuevos: Pickman, Ward, Gilman, Tillinghast, Derby y Kuranes | ✅ Hecha |
+| 21 | Vínculos, sucesos de la noche, trucos de los compañeros, combinaciones y revelaciones; la parte 4 (*Kadath*) y tres noches sueltas; finales ilustrados, camino de tinta, retratos al óleo, manual y estadísticas | ✅ Hecha, falta la música de la parte 4 |
+| 22 | Equilibrio y rendimiento de la parte 4, logros nuevos, el juego en inglés, la cuarta noche (*La música de Erich Zann*), tráiler y página de itch.io | ✅ Hecha |
+| 23 | Build más ligera, demo pequeña, créditos al día; propuestos la primera hora, el procesador, una quinta noche y códigos de partida | 🔨 En curso |
 
 ## Derechos y créditos
 
@@ -571,7 +678,7 @@ Salen de capturas automáticas del juego: `sh tools/capturas_readme.sh` juega la
 - **Efectos de sonido:** [Kenney](https://kenney.nl/) (CC0) y sintetizados para el juego.
 - **Música:** del autor (portada y primer nivel) y pistas CC0 de [OpenGameArt](https://opengameart.org/) de Eldritch Grim, Juhani Junkala, isaiah658 y otros; la lista completa, con autor y enlace, está en [`data/musica.json`](data/musica.json).
 - **Diseño, ilustraciones de la portada y la tienda:** Sergio Sánchez Custodio.
-- **Uso de IA:** el código, los modelos voxel (generados por programas) y los textos se desarrollan con [Claude Code](https://claude.com/claude-code) (Anthropic), bajo la dirección del autor. Los iconos de armas y objetos y las referencias de diseño se generaron con FLUX (Black Forest Labs), en [Replicate](https://replicate.com/) y en local con ComfyUI.
+- **Uso de IA:** el código, los modelos voxel (generados por programas) y los textos se desarrollan con [Claude Code](https://claude.com/claude-code) (Anthropic), bajo la dirección del autor. Los iconos de armas y objetos, los adornos de los menús, los retratos de los investigadores, los finales ilustrados de cada parte y las referencias de diseño se generaron con FLUX (Black Forest Labs), en [Replicate](https://replicate.com/) y en local con ComfyUI.
 
 ## Licencia
 

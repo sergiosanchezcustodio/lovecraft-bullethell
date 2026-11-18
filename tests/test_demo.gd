@@ -63,3 +63,39 @@ func test_hay_relato_del_fin_de_la_demo() -> void:
 	var d: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/library/relatos.json"))
 	assert_true(d.has(Demo.END_RELATO))
 	assert_true(ResourceLoader.exists("res://resources/maps/p2_n1.png"))
+
+## Hito 23.2: la demo se exporta sin lo de las otras partes, y la Biblioteca lo enseña cerrado.
+func test_la_biblioteca_de_la_demo_cierra_lo_de_las_otras_partes() -> void:
+	Demo.force(1)
+	var s := SaveData.create()
+	s.unlock_all = true
+	var by_id := {}
+	for e in Library.entries(s, "places"): by_id[String(e.id)] = e
+	assert_false(by_id["p1_n3"].get("demo", false), "el paso de montaña está en la demo")
+	assert_true(by_id["p2_n1"].get("demo", false), "Innsmouth, en el juego completo")
+	assert_false(by_id["p2_n1"].known)
+	assert_null(by_id["noche_zann"].icon, "sin pedir su mapa")
+	for e in Library.entries(s, "stories"):
+		if String(e.id) == "final_p1_n5": assert_false(e.get("demo", false))
+		if String(e.id) == "final_p2_n5": assert_true(e.get("demo", false))
+
+func test_en_el_juego_completo_no_se_cierra_nada() -> void:
+	Demo.force(0)
+	var s := SaveData.create()
+	s.unlock_all = true
+	for e in Library.entries(s, "places"): assert_false(e.get("demo", false))
+	assert_true(Demo.has_model("vest_no_existe_dyer"), "fuera de la demo no se mira")
+
+func test_el_bestiario_de_la_demo_solo_abre_las_criaturas_de_la_parte_1() -> void:
+	Demo.force(1)
+	var s := SaveData.create()
+	s.unlock_all = true
+	for id in ["pinguino", "fragmento", "acechador", "habitante_pescador", "zoog", "dagon"]:
+		s.mark_seen("enemies", id)
+	var by_id := {}
+	for e in Library.entries(s, "enemies"): by_id[String(e.id)] = e
+	assert_true(by_id["pinguino"].known, "el pingüino es de la parte 1")
+	assert_false(by_id["pinguino"].get("demo", false))
+	for id in ["habitante_pescador", "zoog", "dagon"]:
+		assert_true(by_id[id].get("demo", false), id + ": en el juego completo")
+		assert_eq(String(by_id[id].model), "", id + ": sin pedir su modelo")

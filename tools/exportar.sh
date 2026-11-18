@@ -32,6 +32,8 @@ if [ -t 0 ]; then
 	read -r r
 	if [ "$r" = "s" ]; then python tools/medir_niveles.py; fi
 fi
+python tools/modelos_sin_uso.py      # lo que no va en la build (hito 23.1)
+python tools/demo_fuera.py           # lo que no va en la demo (hito 23.2)
 godot --headless --path . -s tools/empaquetar_modelos.gd
 mkdir -p builds/windows builds/macos builds/demo/windows builds/demo/macos
 godot --headless --path . --export-release "Windows Desktop" builds/windows/LovecraftLibrary.exe

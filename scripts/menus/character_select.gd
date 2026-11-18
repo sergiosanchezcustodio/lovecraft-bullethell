@@ -209,9 +209,12 @@ func _refresh_bonds() -> void:
 	_show_bond()
 
 ## Funde el título con el vínculo que toca (o vuelve al título si no hay ninguno).
+var _bond_tween: Tween
 func _show_bond() -> void:
 	var on := not _bond_list.is_empty()
+	if _bond_tween != null: _bond_tween.kill()   # si no, el fundido anterior volvía a encender el vínculo sobre el título
 	var tw := create_tween()
+	_bond_tween = tw
 	tw.tween_property(_bond_head, "modulate:a", 0.0, 0.18)
 	tw.parallel().tween_property(_bond_text, "modulate:a", 0.0, 0.18)
 	tw.parallel().tween_property(_title, "modulate:a", 0.0 if on else 1.0, 0.3)
@@ -977,7 +980,7 @@ class _Frame extends Control:
 		match seat.stage:
 			SelectState.Stage.CHARACTER:
 				if holder >= 0: _status.text = L.t("Lo lleva J%d") % (holder + 1)
-				elif locked and not Demo.character_ok(c): _status.text = Demo.LOCKED
+				elif locked and not Demo.character_ok(c): _status.text = Demo.locked()
 				elif hidden: _status.text = Secrets.hint(Auto.save(), c)
 				elif locked: _status.text = L.t("Se compra en la tienda (%s)") % MenuKit.money(c.price)
 				else: _status.text = L.t("A: elegir")

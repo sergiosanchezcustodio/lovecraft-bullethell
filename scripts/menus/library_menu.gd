@@ -372,6 +372,7 @@ func _ask_replay(e: Dictionary) -> void:
 		elif back != null and is_instance_valid(back): back.grab_focus.call_deferred())
 
 func _unknown_text(e := {}) -> String:
+	if e.get("demo", false): return Demo.locked() + "."           # la demo (23.2)
 	if String(e.get("section", "")) == Library.SECTION_FISH: return L.t("Todavía no ha picado ninguna. Quizá en el muelle de Innsmouth, entre nivel y nivel.")
 	match _tome:
 		"enemies": return L.t("Aún no se ha visto. Las páginas están en blanco.")

@@ -103,7 +103,7 @@ def tres_texts(path, rel, out):
 # ---------------------------------------------------------------- código
 # Archivos sin textos que se ven (registros, medidas, herramientas de prueba).
 CODE_SKIP = {'scripts/core/bench.gd', 'scripts/core/spike_log.gd', 'scripts/core/prof.gd', 'scripts/core/launch_args.gd',
-             'scripts/core/shot_taker.gd', 'scripts/core/demo.gd', 'scripts/core/crash_report.gd', 'scripts/core/l.gd',
+             'scripts/core/shot_taker.gd', 'scripts/core/crash_report.gd', 'scripts/core/l.gd',
              'scripts/core/debug_options.gd', 'scripts/ui/ui_overlap_check.gd', 'scripts/save/review.gd',
              'scripts/menus/review_menu.gd', 'scripts/ui/debug_menu.gd'}
 # Líneas que no se tocan: registros, comparaciones, claves y nombres de nodos.

@@ -290,6 +290,9 @@ static func model_exists(path: String) -> bool:
 
 static func read_text(path: String) -> String:
 	var src := source_file(path)
+	if not FileAccess.file_exists(src):          # hito 23.1: que se vea si a la build le falta uno
+		push_error("Modelo que no está: " + path)
+		return ""
 	if src.ends_with(".z"):
 		var f := FileAccess.open_compressed(src, FileAccess.READ, FileAccess.COMPRESSION_ZSTD)
 		return f.get_as_text() if f != null else ""

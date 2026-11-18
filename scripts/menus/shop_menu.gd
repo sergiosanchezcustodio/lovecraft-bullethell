@@ -373,7 +373,7 @@ func _icon(e: Shop.Entry) -> Texture2D:
 func _try_buy(e: Shop.Entry) -> void:
 	_focus_id = e.id
 	if Demo.shop_locked(e):
-		_say(Demo.LOCKED + ".")
+		_say(Demo.locked() + ".")
 		return
 	if Shop.is_maxed(save, e):
 		_say(L.t("Ya lo tienes."))

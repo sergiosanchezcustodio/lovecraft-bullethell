@@ -85,9 +85,7 @@ static func filler() -> Array[Dictionary]:
 	if _filler.is_empty():
 		for w in DamageRules.all_weapons():
 			_filler.append({"icon": w.get_icon(), "title": w.display_name, "kind": L.t("Arma").to_upper(), "accent": UiKit.GOLD})
-		for f in DirAccess.get_files_at("res://data/upgrades"):
-			if not f.ends_with(".tres"): continue
-			var u: UpgradeData = load("res://data/upgrades/" + f)
+		for u: UpgradeData in ResList.load_all("res://data/upgrades"):   # en la build exportada, «.tres.remap» (23.2)
 			_filler.append({"icon": u.icon, "title": u.display_name, "kind": L.t("Objeto").to_upper(), "accent": u.color})
 	return _filler
 

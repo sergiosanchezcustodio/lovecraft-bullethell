@@ -46,8 +46,7 @@ func icon() -> Texture2D:
 
 static func all() -> Array[OutfitData]:
 	var out: Array[OutfitData] = []
-	for f in DirAccess.get_files_at(DIR):
-		if f.ends_with(".tres"): out.append(load(DIR.path_join(f)))
+	for o in ResList.load_all(DIR): out.append(o)   # en la build exportada, «.tres.remap» (23.2)
 	out.sort_custom(func(a: OutfitData, b: OutfitData) -> bool: return a.slot < b.slot or (a.slot == b.slot and a.order < b.order))
 	return out
 
@@ -107,7 +106,7 @@ const UNDER_BODY := ["stole", "shawl", "shawl_l", "shawl_r", "gear"]
 static func apply(root: Node3D, character_model: String, worn: Dictionary) -> void:
 	for k in worn:
 		var o := find(String(worn[k]))
-		if o == null: continue
+		if o == null or not Demo.has_model("vest_%s_%s" % [o.id, character_model]): continue   # la demo (23.2): sin las prendas de los demás
 		VoxelBuilder.dress(root, o.model_path(character_model), o.slot == Slot.HEAD)
 		cover(root, o)
 

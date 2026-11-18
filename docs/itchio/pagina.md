@@ -44,7 +44,7 @@ In the Library of Miskatonic University, a handful of investigators have begun t
 
 **Features**
 - 21 investigators, each with their own weapon, dodge and trait: Dyer, Armitage, Herbert West, Pickman, Kuranes, Edward Derby (and Asenath)… and two secret ones.
-- 57 firearms, physical and magical weapons with 117 evolutions, and 58 items; the arcane ones cost sanity.
+- 58 firearms, physical and magical weapons with 116 evolutions, and 58 items; the arcane ones cost sanity.
 - Health and sanity: madness crises freeze you, make you flee or invert your controls, and coming out of one can bring a revelation.
 - Local or online co-op with shared experience, reviving your partners, bonds between investigators and combos between everyone's weapons.
 - More than 90 creatures, elites with traits and mid-level bosses; 16 animal companions that learn tricks.
@@ -97,7 +97,7 @@ En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores ha
 
 **Características**
 - 21 investigadores, cada uno con su arma, su esquive y su rasgo: Dyer, Armitage, Herbert West, Pickman, Kuranes, Edward Derby (y Asenath)… y dos secretos.
-- 57 armas de fuego, físicas y mágicas con 117 evoluciones, y 58 objetos; las arcanas cuestan cordura.
+- 58 armas de fuego, físicas y mágicas con 116 evoluciones, y 58 objetos; las arcanas cuestan cordura.
 - Vida y cordura: las crisis de locura te paralizan, te hacen huir o invierten los controles, y al salir de una puede llegar una revelación.
 - Cooperativo local o en línea con experiencia compartida, reanimación de compañeros, vínculos entre investigadores y combinaciones entre las armas de unos y otros.
 - Más de 90 criaturas, élites con rasgos y jefes a mitad de nivel; 16 compañeros animales que aprenden trucos.

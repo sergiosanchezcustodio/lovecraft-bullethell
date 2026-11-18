@@ -26,6 +26,9 @@ func _process(delta: float) -> void:
 	_next += 1
 	await RenderingServer.frame_post_draw
 	var path := "%s_%05.1fs.png" % [prefix, t]
+	if OS.has_feature("template"):                # en una build exportada res:// no se escribe (23.2): a user://shots
+		DirAccess.make_dir_recursive_absolute("user://shots")
+		path = "user://shots/" + path.get_file()
 	get_viewport().get_texture().get_image().save_png(path)
 	print("captura: ", ProjectSettings.globalize_path(path))
 	if _next >= times.size():

@@ -125,7 +125,6 @@ static func deviation(w: WeaponData) -> float:
 
 static func all_weapons() -> Array[WeaponData]:
 	var out: Array[WeaponData] = []
-	for f in DirAccess.get_files_at("res://data/weapons"):
-		if f.ends_with(".tres"): out.append(load("res://data/weapons/" + f))
+	for w in ResList.load_all("res://data/weapons"): out.append(w)   # en la build exportada, «.tres.remap» (23.2)
 	out.sort_custom(func(a: WeaponData, b: WeaponData) -> bool: return int(a.evolved) < int(b.evolved))
 	return out

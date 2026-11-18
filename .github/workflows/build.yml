@@ -109,6 +109,8 @@ jobs:
 
       - name: Comprimir los modelos y exportar
         run: |
+          python3 tools/modelos_sin_uso.py
+          python3 tools/demo_fuera.py
           "$GODOT" --headless --path . -s tools/empaquetar_modelos.gd
           mkdir -p builds/windows builds/macos
           "$GODOT" --headless --path . --export-release "Windows Desktop" builds/windows/LovecraftLibrary.exe 2>&1 | tee export.log

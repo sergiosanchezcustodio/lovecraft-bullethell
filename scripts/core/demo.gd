@@ -10,6 +10,10 @@ extends RefCounted
 ## Pruebas sin exportar: `demo_build=true`.
 
 const LOCKED := "En el juego completo"
+
+## El cartel, en el idioma del juego.
+static func locked() -> String:
+	return L.t("En el juego completo")
 const PARTS := 1                          ## partes que se juegan (la primera)
 const END_RELATO := "fin_demo"
 
@@ -53,3 +57,33 @@ static func last_level() -> String:
 ## Versión para los menús: «v0.9.0» o «v0.9.0 · demo».
 static func version_text() -> String:
 	return "v" + String(ProjectSettings.get_setting("application/config/version", "?")) + ("  ·  demo" if on() else "")
+
+## ¿Está este modelo en la build? (hito 23.2) La demo se exporta sin lo que solo usan las partes 2 a
+## 4 y las noches (tools/demo_fuera.py): las criaturas, las arenas y el vestuario de los demás
+## investigadores. Lo que lo enseñaría (la Biblioteca, el vestuario de un personaje cerrado) lo mira
+## aquí antes. En el juego completo, siempre.
+static func has_model(model: String) -> bool:
+	return not on() or model == "" or VoxelBuilder.model_exists("res://models/%s.json" % model)
+
+## ¿Entra en la demo este nivel o noche? (las páginas de los lugares y los finales de la Biblioteca)
+static func level_in_demo(id: String) -> bool:
+	return not on() or level_ok(id)
+
+## ¿Sale esta criatura en la demo? Las de los niveles de la parte 1 (su grupo, las de mitad de
+## nivel, el evento final…). En la Biblioteca de la demo, las demás salen cerradas aunque su
+## modelo esté en la build (algunos se quedan, porque el código los nombra).
+static var _enemies := {}
+static func enemy_ok(id: String) -> bool:
+	if not on(): return true
+	if _enemies.is_empty():
+		for l in Campaign.levels():
+			if int(l.part) >= PARTS: continue
+			var p := "res://data/levels/%s.tres" % String(l.id)
+			var ld := load(p) as LevelData if ResourceLoader.exists(p) else null
+			if ld == null: continue
+			for prop in ld.get_property_list():
+				var v: Variant = ld.get(prop.name)
+				for e in (v if v is Array else [v]):
+					if e is EnemyData: _enemies[String((e as EnemyData).id)] = true
+		_enemies[""] = true
+	return _enemies.has(id)

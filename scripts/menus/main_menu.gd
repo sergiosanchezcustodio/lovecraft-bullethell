@@ -116,7 +116,7 @@ func _open_play() -> void:
 	local.custom_minimum_size = Vector2(480, 64)
 	local.pressed.connect(func() -> void: play_local.emit())
 	box.add_child(local)
-	var online := MenuKit.button(L.t("Jugar online") + ("  ·  " + Demo.LOCKED if Demo.on() else ""), MenuKit.INK, 24 if Demo.on() else 30)
+	var online := MenuKit.button(L.t("Jugar online") + ("  ·  " + Demo.locked() if Demo.on() else ""), MenuKit.INK, 24 if Demo.on() else 30)
 	online.custom_minimum_size = Vector2(480, 64)
 	online.disabled = Demo.on()                     # la demo (13.17): solo en local
 	online.pressed.connect(func() -> void:          # sustituye a esta ventana al cerrarse

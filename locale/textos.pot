@@ -1304,7 +1304,7 @@ msgid "Basado en los relatos de H. P. Lovecraft (dominio público en la Unión E
 msgstr ""
 
 #: data/credits.json
-msgid "Desarrollado con ayuda de inteligencia artificial: el código, los modelos voxel (generados por programas) y los textos se hicieron con Claude (Anthropic), bajo la dirección del autor. Los iconos de armas y objetos y los adornos de los menús se generaron con FLUX (Black Forest Labs). Las ilustraciones de la portada y de la tienda son del autor."
+msgid "Desarrollado con ayuda de inteligencia artificial: el código, los modelos voxel (generados por programas) y los textos se hicieron con Claude (Anthropic), bajo la dirección del autor. Los iconos de armas y objetos, los adornos de los menús, los retratos de los investigadores y los finales ilustrados de cada parte se generaron con FLUX (Black Forest Labs). Las ilustraciones de la portada y de la tienda son del autor."
 msgstr ""
 
 #: data/credits.json
@@ -1321,6 +1321,10 @@ msgstr ""
 
 #: data/credits.json
 msgid "Lovecraft Library: Surviving Cthulhu"
+msgstr ""
+
+#: data/credits.json
+msgid "Música: del autor y pistas CC0 de OpenGameArt (Eldritch Grim, Juhani Junkala, isaiah658 y otros)."
 msgstr ""
 
 #: data/credits.json
@@ -9119,6 +9123,14 @@ msgstr ""
 
 #: scripts/core/combos.gd
 msgid "Combos"
+msgstr ""
+
+#: scripts/core/demo.gd
+msgid "  ·  demo"
+msgstr ""
+
+#: scripts/core/demo.gd
+msgid "En el juego completo"
 msgstr ""
 
 #: scripts/core/difficulty.gd

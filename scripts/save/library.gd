@@ -277,7 +277,25 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 				var known := save != null and save.has_pet(String(p.id))
 				out.append(_e(String(p.id), p.display_name, known, text("pets", p.id), p.model, "full", null,
 					[p.description], L.t("Compañeros")))
+	if Demo.on(): _demo_locks(out, tome)
 	return out
+
+## La demo (23.2): lo que no viene en ella (criaturas, lugares y finales de las otras partes) sale
+## cerrado, con el cartel «En el juego completo», y sin pedir su modelo ni su imagen.
+static func _demo_locks(out: Array[Dictionary], tome: String) -> void:
+	for e in out:
+		var out_of_demo := not Demo.has_model(String(e.model))
+		if tome == "enemies":                         # la pesca es del muelle de Innsmouth (parte 2)
+			out_of_demo = out_of_demo or String(e.section) == SECTION_FISH or not Demo.enemy_ok(String(e.id))
+		if tome == "places": out_of_demo = not Demo.level_in_demo(String(e.id))
+		elif String(e.id).begins_with("final_"): out_of_demo = not Demo.level_in_demo(String(e.id).trim_prefix("final_"))
+		if out_of_demo:
+			e.known = false
+			e.model = ""
+			e.icon = null
+			e["demo"] = true
+		elif e.has("worn") and not Demo.has_model(String(e.model)):
+			e.erase("worn")
 
 ## Tomo XIII (hito 21.20): un resumen, gráficas de barras (bajas por criatura, daño por arma,
 ## investigadores, niveles), la línea de las últimas partidas y los récords. Las páginas con gráfica
@@ -387,7 +405,4 @@ static func _seen(save: SaveData, kind: String, id: StringName) -> bool:
 	return save != null and (save.unlock_all or save.has_seen(kind, String(id)))
 
 static func _list(dir: String) -> Array:
-	var out := []
-	for f in DirAccess.get_files_at(dir):
-		if f.ends_with(".tres"): out.append(load(dir.path_join(f)))
-	return out
+	return ResList.load_all(dir)                  # en la build exportada, «.tres.remap» (23.2)

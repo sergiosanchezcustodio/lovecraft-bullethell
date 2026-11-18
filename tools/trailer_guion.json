@@ -24,7 +24,7 @@
 		 "rotulo_en": "One to four players, on the same couch or online.", "rotulo_desde": 0.5, "rotulo_hasta": 6.8},
 		{"id": "armas", "args": "level=p1_n4 bot=smart character=legrasse weapons=necronomicon_completo,tesla,castillo_fuegos,thompson_chicago wlevel=8 max_alive=90 spawn_rate=24 cam=13",
 		 "desde": 8.0, "compases": 2, "fundido": 0,
-		 "rotulo": "57 armas. 117 evoluciones.", "rotulo_en": "57 weapons. 117 evolutions.", "rotulo_desde": 0.3, "rotulo_hasta": 3.6},
+		 "rotulo": "58 armas. 116 evoluciones.", "rotulo_en": "58 weapons. 116 evolutions.", "rotulo_desde": 0.3, "rotulo_hasta": 3.6},
 		{"id": "innsmouth", "args": "level=p2_n2 bot=smart character=olmstead san=8 max_alive=50 spawn_rate=14",
 		 "desde": 5.0, "compases": 2, "fundido": 0,
 		 "rotulo": "Cuando la cordura se rompe, ya no sabes qué es real.",
