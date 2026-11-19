@@ -4320,6 +4320,16 @@ msgid "A cero: una crisis de unos segundos"
 msgstr "At zero: a crisis lasting a few seconds"
 
 #: data/manual.json
+msgid ""
+"A mitad de algunas noches aparece un buhonero que extiende su manta con tres mercancías: un remedio que te devuelve media vida y media cordura, una baratija (sube un objeto que lleves o te da uno nuevo) y un libro que vale una subida de nivel.\n"
+"\n"
+"Para comprar, quédate un momento encima de lo que quieras; se paga con los dólares ganados en ese nivel, no con los ahorros. Cada jugador puede llevarse una de cada, y al cabo de un rato el buhonero recoge y se va."
+msgstr ""
+"Halfway through some nights a peddler turns up and spreads his blanket with three wares: a remedy that gives back half your health and half your sanity, a trinket (it raises an item you carry or gives you a new one) and a book worth one level-up.\n"
+"\n"
+"To buy, stand on what you want for a moment; you pay with the dollars earned in that level, not with your savings. Each player can take one of each, and after a while the peddler packs up and leaves."
+
+#: data/manual.json
 msgid "A o Espacio"
 msgstr "A or Space"
 
@@ -4402,6 +4412,14 @@ msgstr "It lasts for the rest of the level"
 #: data/manual.json
 msgid "Durante unos 30 s cambian las reglas"
 msgstr "For about 30 s the rules change"
+
+#: data/manual.json scripts/level/expedition.gd
+msgid "El buhonero"
+msgstr "The peddler"
+
+#: data/manual.json
+msgid "En el segundo y el cuarto nivel de cada parte"
+msgstr "On the second and fourth level of each part"
 
 #: data/manual.json
 msgid ""
@@ -4500,6 +4518,10 @@ msgid "Opcionales, con recompensa: dinero, experiencia o un baúl"
 msgstr "Optional, with a reward: money, experience or a chest"
 
 #: data/manual.json
+msgid "Paga con los dólares de ese nivel"
+msgstr "Pay with that level's dollars"
+
+#: data/manual.json
 msgid ""
 "Quien vuelve de una crisis no vuelve igual. Al salir de ella eliges una revelación entre dos: ver brillar los ojos de lo que acecha, que tus balas atraviesen las paredes, hacer más daño a cambio de una mente más frágil…\n"
 "\n"
@@ -4508,6 +4530,10 @@ msgstr ""
 "No one comes back from a crisis unchanged. As it ends you pick one of two revelations: seeing the eyes of what lurks glow, bullets that pass through walls, more damage in exchange for a frailer mind…\n"
 "\n"
 "It lasts until the end of the level, and none repeats within the same level. That is why letting your sanity drop on purpose sometimes pays off."
+
+#: data/manual.json
+msgid "Quédate sobre lo que quieras comprar"
+msgstr "Stand on whatever you want to buy"
 
 #: data/manual.json
 msgid "Rescatar, cortar un ritual o llevar una reliquia"
@@ -10160,10 +10186,6 @@ msgstr "Fight"
 #: scripts/level/expedition.gd scripts/menus/expedition_map.gd
 msgid "Descanso"
 msgstr "Rest"
-
-#: scripts/level/expedition.gd
-msgid "El buhonero"
-msgstr "The peddler"
 
 #: scripts/level/expedition.gd
 msgid "El campamento: dos subidas al empezar el siguiente nivel."

@@ -39,6 +39,8 @@ CLIPS = {
     'sucesos': ('level=p1_n2 character=peaslee bot=circle cam=12 night_events=true night_event=estrellas night_at=5 objectives=false', 4.5, 7.0, False),
     'revelaciones': ('level=p2_n1 character=varga cam=10 crisis_at=5 pick_after=2.6 '
                      'foes=profundo,3,1;profundo,-2,2.5;hibrido_h,1,-3', 4.5, 8.0, False),
+    'buhonero': ('level=p1_n2 character=peaslee bot=idle dodge_every=999 cam=10 peddler=true peddler_at=5.5 '
+                 'objective_near=true peddler_stall=0 purse=400', 4.5, 7.0),
     'objetivo': ('level=p2_n1 character=peaslee bot=idle dodge_every=999 cam=10 objective=ritual objective_at=4 objective_near=true', 4.5, 7.0),
 }
 

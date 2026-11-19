@@ -60,6 +60,12 @@
 			"title": "Revelaciones",
 			"facts": ["Al salir de una crisis, elige una de dos", "Dura lo que queda del nivel", "La locura también tiene premio"],
 			"text": "Quien vuelve de una crisis no vuelve igual. Al salir de ella eliges una revelación entre dos: ver brillar los ojos de lo que acecha, que tus balas atraviesen las paredes, hacer más daño a cambio de una mente más frágil…\n\nTe dura hasta el final del nivel, y en el mismo nivel no se repiten. Por eso, a veces, bajar la cordura a propósito sale a cuenta."
+		},
+		{
+			"id": "buhonero",
+			"title": "El buhonero",
+			"facts": ["En el segundo y el cuarto nivel de cada parte", "Quédate sobre lo que quieras comprar", "Paga con los dólares de ese nivel"],
+			"text": "A mitad de algunas noches aparece un buhonero que extiende su manta con tres mercancías: un remedio que te devuelve media vida y media cordura, una baratija (sube un objeto que lleves o te da uno nuevo) y un libro que vale una subida de nivel.\n\nPara comprar, quédate un momento encima de lo que quieras; se paga con los dólares ganados en ese nivel, no con los ahorros. Cada jugador puede llevarse una de cada, y al cabo de un rato el buhonero recoge y se va."
 		}
 	]
 }

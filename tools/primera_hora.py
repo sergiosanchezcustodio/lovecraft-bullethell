@@ -8,7 +8,7 @@ o caída y en qué segundo, dinero antes y después, compras) y al final cuánto
 tiempo de juego hace falta para superar la parte 1.
 
 Uso: python tools/primera_hora.py [--n 2] [--par 2] [--max 15] [--dif 3] [--skill 0.8] [--ts 2]
-     [--parte p1] [--json salida.json]
+     [--parte p1|p1,p2] [--json salida.json]
 """
 import json
 import os
@@ -29,9 +29,9 @@ def opt(k, d):
     return args[args.index(k) + 1] if k in args else d
 
 
-N = int(opt('--n', '2')); PAR = min(int(opt('--par', '2')), 2); MAX = int(opt('--max', '15'))
-PART = opt('--parte', 'p1')
-LEVELS = ['%s_n%d' % (PART, i) for i in range(1, 6)]
+N = int(opt('--n', '2')); PAR = min(int(opt('--par', '2')), 2); MAX = int(opt('--max', '30'))
+PARTS = opt('--parte', 'p1').split(',')         # «p1,p2»: una parte tras otra, con el dinero y lo comprado
+LEVELS = ['%s_n%d' % (pt, i) for pt in PARTS for i in range(1, 6)]
 LIMIT = 900
 lock = threading.Lock()
 report = {}
@@ -94,6 +94,13 @@ for k in range(N):
     time.sleep(3)
 for th in threads: th.join()
 
+for k in sorted(report):
+    for pt in PARTS:
+        tr = [r for r in report[k] if r['level'].startswith(pt + '_')]
+        if len(PARTS) > 1 and tr:
+            print('recorrido %d, %s: %d intentos, %d caídas, %.1f min (%s)' % (k, pt, len(tr),
+                  sum(1 for r in tr if r['result'] == 'caída'), sum(r['t'] for r in tr) / 60.0,
+                  ', '.join('%s %d' % (lv[3:], sum(1 for r in tr if r['level'] == lv)) for lv in dict.fromkeys(r['level'] for r in tr))))
 print('\nrecorrido  intentos  caídas  tiempo de juego  superada')
 for k in sorted(report):
     tr = report[k]

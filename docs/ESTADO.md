@@ -3838,6 +3838,9 @@ Parte 1, dos recorridos con cada habilidad del bot:
 - **Desbloqueos:** el nivel siguiente se abre al superar el anterior; no hay nada más que pare a quien empieza en la parte 1.
 - **Sin pared, y sin ajustes en los datos.** Si acaso, al revés: la parte 1 es generosa. Un jugador de verdad caerá más que el bot (que esquiva solo), pero el dinero que trae cada caída y lo barato de los primeros niveles de la tienda suavizan la curva. Si el autor la nota fácil al probarla, la palanca es la dificultad de fábrica (D-42, pendiente de su calibración), no la tienda.
 
+- **Partes 1 y 2 seguidas** (`--parte p1,p2`, mejora del mismo día; el dinero y lo comprado pasan de una a otra), dos recorridos con `skill=0.5`: la parte 2 en 6 y 7 intentos, con 1 y 2 caídas (en el 2.3, el 2.4 y el 2.5). En total, unos 12 intentos y 51-54 min de juego para las dos partes. **Tampoco hay pared en la parte 2.**
+  - Lo que sí se ve: **el 2.5 paga mucho más que los demás niveles**, incluso al caer. Una caída a los 391 s dejó unos 8.000 $, cuando un nivel normal deja 1.000-1.700 $. Comprobado repitiéndolo con la misma semilla: es solo de las criaturas (1.536 abatidas, a unos 6,6 $ cada una con Codicia 3; el nivel del jefe es largo y viene a hordas), no un fallo. Caer en el 2.5 sale más a cuenta que superar el 2.4: si el autor quiere quitar esa granja, la palanca sería `money` de las criaturas que llegan en hordas en ese nivel, o un tope de dólares por caída. No lo he tocado.
+
 ## Hito 23.5: primeras veces de lo nuevo (19-11-2026)
 
 Lo que entró en las fases 16 a 21 salía en la partida sin que nada lo explicase. Ahora:
@@ -3852,4 +3855,5 @@ Lo que entró en las fases 16 a 21 salía en la partida sin que nada lo explicas
 
   Probados con `tips=true` y las opciones que fuerzan cada cosa (`peddler=true`, `night_event=`, `revelation=`, `signs=`, `madness=1`, `weapons=ancla wlevel=5 items=coraza evolve_at=3`, `character=legrasse bots=1 bot_chars=johansen`): salen todos, en este orden de cola. El de los vínculos manda a la selección de personaje, que es donde se ve cuál es (la ficha no lo dice).
 - **El manual del investigador (tomo XII) pasa de 6 a 10 páginas:** Signos Mayores, Vínculos, Sucesos de la noche y Revelaciones, cada una con su clip (`python tools/grabar_manual.py signos vinculos sucesos revelaciones`; Dyer con granadas y el Signo de Cthugha, Legrasse y Johansen hablando, la lluvia de estrellas a pantalla entera y la crisis de Varga hasta la ventana de la revelación). Revisado en español y en inglés.
+- **Y una quinta página, El buhonero** (mejora del mismo día): dónde sale, cómo se compra y con qué dinero; el clip, con Peaslee comprando el remedio (`python tools/grabar_manual.py buhonero`).
 - Textos en inglés, en `locale/en.po` (el Signo Mayor es «Elder Sign», como en el resto del juego).

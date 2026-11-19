@@ -4320,6 +4320,13 @@ msgid "A cero: una crisis de unos segundos"
 msgstr ""
 
 #: data/manual.json
+msgid ""
+"A mitad de algunas noches aparece un buhonero que extiende su manta con tres mercancías: un remedio que te devuelve media vida y media cordura, una baratija (sube un objeto que lleves o te da uno nuevo) y un libro que vale una subida de nivel.\n"
+"\n"
+"Para comprar, quédate un momento encima de lo que quieras; se paga con los dólares ganados en ese nivel, no con los ahorros. Cada jugador puede llevarse una de cada, y al cabo de un rato el buhonero recoge y se va."
+msgstr ""
+
+#: data/manual.json
 msgid "A o Espacio"
 msgstr ""
 
@@ -4389,6 +4396,14 @@ msgstr ""
 
 #: data/manual.json
 msgid "Durante unos 30 s cambian las reglas"
+msgstr ""
+
+#: data/manual.json scripts/level/expedition.gd
+msgid "El buhonero"
+msgstr ""
+
+#: data/manual.json
+msgid "En el segundo y el cuarto nivel de cada parte"
 msgstr ""
 
 #: data/manual.json
@@ -4476,10 +4491,18 @@ msgid "Opcionales, con recompensa: dinero, experiencia o un baúl"
 msgstr ""
 
 #: data/manual.json
+msgid "Paga con los dólares de ese nivel"
+msgstr ""
+
+#: data/manual.json
 msgid ""
 "Quien vuelve de una crisis no vuelve igual. Al salir de ella eliges una revelación entre dos: ver brillar los ojos de lo que acecha, que tus balas atraviesen las paredes, hacer más daño a cambio de una mente más frágil…\n"
 "\n"
 "Te dura hasta el final del nivel, y en el mismo nivel no se repiten. Por eso, a veces, bajar la cordura a propósito sale a cuenta."
+msgstr ""
+
+#: data/manual.json
+msgid "Quédate sobre lo que quieras comprar"
 msgstr ""
 
 #: data/manual.json
@@ -10122,10 +10145,6 @@ msgstr ""
 
 #: scripts/level/expedition.gd scripts/menus/expedition_map.gd
 msgid "Descanso"
-msgstr ""
-
-#: scripts/level/expedition.gd
-msgid "El buhonero"
 msgstr ""
 
 #: scripts/level/expedition.gd
