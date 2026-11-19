@@ -1720,7 +1720,7 @@ msgid "El guardián de la ciudad"
 msgstr ""
 
 #: data/enemies/guardian_orden.tres
-msgid "Guardián de la Orden de Dagón"
+msgid "Guardián de la Orden de Dagon"
 msgstr ""
 
 #: data/enemies/gug.tres
@@ -1824,7 +1824,7 @@ msgid "El capitán Obed Marsh"
 msgstr ""
 
 #: data/enemies/obed_marsh.tres
-msgid "¡Ïa! ¡Dagón paga bien!"
+msgid "¡Ïa! ¡Dagon paga bien!"
 msgstr ""
 
 #: data/enemies/pesadilla.tres
@@ -2308,7 +2308,7 @@ msgid "Querida Ruth: el autobús a Innsmouth sale a las diez, y el conductor tie
 msgstr ""
 
 #: data/fragments.json
-msgid "Ruth: el pueblo huele a pescado, y a algo más viejo que el pescado. Las calles están casi vacías, y los pocos que veo caminan de un modo raro, como si las piernas no les cupieran en los pantalones. Hay una iglesia que ya no es iglesia: la llaman la Orden de Dagón. Esta noche se canta allí, y el canto no termina."
+msgid "Ruth: el pueblo huele a pescado, y a algo más viejo que el pescado. Las calles están casi vacías, y los pocos que veo caminan de un modo raro, como si las piernas no les cupieran en los pantalones. Hay una iglesia que ya no es iglesia: la llaman la Orden de Dagon. Esta noche se canta allí, y el canto no termina."
 msgstr ""
 
 #: data/fragments.json
@@ -4324,7 +4324,18 @@ msgid "A o Espacio"
 msgstr ""
 
 #: data/manual.json
+msgid "Al salir de una crisis, elige una de dos"
+msgstr ""
+
+#: data/manual.json
 msgid "Algunas pueden evolucionar de dos maneras"
+msgstr ""
+
+#: data/manual.json
+msgid ""
+"Algunos investigadores ya se cruzaron en los relatos: Legrasse y Johansen, Carter y Kuranes, West y la doctora Whipple… Si juegan juntos, al empezar la parte se dicen lo que tengan pendiente y al subir de nivel se saludan.\n"
+"\n"
+"Mientras estén a pocos metros, un lazo dorado los une y les da una ventaja pequeña que depende de la pareja: más experiencia, crisis más cortas, más daño a cierta clase de criaturas, levantar con más vida a un caído… Separarse la apaga."
 msgstr ""
 
 #: data/manual.json
@@ -4354,6 +4365,10 @@ msgid "Cada subida: elige una de tres cartas"
 msgstr ""
 
 #: data/manual.json
+msgid "Cambian una regla a tu favor"
+msgstr ""
+
+#: data/manual.json
 msgid "Con su marca a los pies"
 msgstr ""
 
@@ -4366,6 +4381,14 @@ msgid ""
 "De vez en cuando la noche te ofrece algo más que sobrevivir. Un superviviente al que escoltar hasta un lugar seguro, un ritual que solo se corta quedándose dentro de su círculo mientras te atacan, o una reliquia que pesa y frena a quien la lleva.\n"
 "\n"
 "No son obligatorios, y a veces es más sensato dejarlos pasar, pero su recompensa puede decidir el nivel."
+msgstr ""
+
+#: data/manual.json
+msgid "Dura lo que queda del nivel"
+msgstr ""
+
+#: data/manual.json
+msgid "Durante unos 30 s cambian las reglas"
 msgstr ""
 
 #: data/manual.json
@@ -4388,7 +4411,19 @@ msgid "Gemas y subidas de nivel"
 msgstr ""
 
 #: data/manual.json
+msgid "Investigadores que se conocen en los relatos"
+msgstr ""
+
+#: data/manual.json
+msgid "Juntos y cerca: un lazo dorado y una ventaja"
+msgstr ""
+
+#: data/manual.json
 msgid "La barra violeta, bajo la de vida"
+msgstr ""
+
+#: data/manual.json
+msgid "La locura también tiene premio"
 msgstr ""
 
 #: data/manual.json
@@ -4399,7 +4434,29 @@ msgid ""
 msgstr ""
 
 #: data/manual.json
+msgid ""
+"La noche no es siempre igual. A veces sale la luna de sangre (más élites, el doble de dólares), baja una niebla espesa (ves menos y ganas más experiencia), caen estrellas que son gemas, o todo se queda en silencio… hasta que llega una horda.\n"
+"\n"
+"El aviso sale arriba, en grande, antes de empezar. Lee lo que trae y decide: aprovecharlo o aguantar a que pase."
+msgstr ""
+
+#: data/manual.json
+msgid "La selección de personaje dice cuál"
+msgstr ""
+
+#: data/manual.json
 msgid "Las criaturas sueltan gemas: pasa por encima"
+msgstr ""
+
+#: data/manual.json
+msgid "Los logros abren más"
+msgstr ""
+
+#: data/manual.json
+msgid ""
+"Los pactos castigan; los Signos Mayores, al revés, tuercen una regla a tu favor durante toda la parte: las explosiones dejan fuego en el suelo, las gemas devuelven cordura, los baúles traen más dólares…\n"
+"\n"
+"Al empezar una parte eliges uno entre tres, y otro al llegar a su tercer nivel. Al principio tienes pocos donde escoger: cada logro que consigues abre alguno más."
 msgstr ""
 
 #: data/manual.json
@@ -4419,7 +4476,26 @@ msgid "Opcionales, con recompensa: dinero, experiencia o un baúl"
 msgstr ""
 
 #: data/manual.json
+msgid ""
+"Quien vuelve de una crisis no vuelve igual. Al salir de ella eliges una revelación entre dos: ver brillar los ojos de lo que acecha, que tus balas atraviesen las paredes, hacer más daño a cambio de una mente más frágil…\n"
+"\n"
+"Te dura hasta el final del nivel, y en el mismo nivel no se repiten. Por eso, a veces, bajar la cordura a propósito sale a cuenta."
+msgstr ""
+
+#: data/manual.json
 msgid "Rescatar, cortar un ritual o llevar una reliquia"
+msgstr ""
+
+#: data/manual.json scripts/save/run_archive.gd scripts/ui/damage_table.gd
+msgid "Revelaciones"
+msgstr ""
+
+#: data/manual.json
+msgid "Signos Mayores"
+msgstr ""
+
+#: data/manual.json
+msgid "Sucesos de la noche"
 msgstr ""
 
 #: data/manual.json
@@ -4443,6 +4519,22 @@ msgstr ""
 
 #: data/manual.json
 msgid "Una flecha en pantalla te lleva hasta ellos"
+msgstr ""
+
+#: data/manual.json
+msgid "Una o dos veces por nivel, con aviso"
+msgstr ""
+
+#: data/manual.json
+msgid "Uno al empezar cada parte y otro en su tercer nivel"
+msgstr ""
+
+#: data/manual.json
+msgid "Unos dan premio; otros, peligro"
+msgstr ""
+
+#: data/manual.json
+msgid "Vínculos"
 msgstr ""
 
 #: data/manual.json
@@ -6266,7 +6358,7 @@ msgid "Signo de Cthugha"
 msgstr ""
 
 #: data/signs.json
-msgid "Signo de Dagón"
+msgid "Signo de Dagon"
 msgstr ""
 
 #: data/signs.json
@@ -6298,6 +6390,10 @@ msgid "Un 10 % más de críticos, y las balas críticas atraviesan a dos enemigo
 msgstr ""
 
 #: data/tutorial.json
+msgid "Al salir de la crisis has visto algo: una revelación te dura lo que queda del nivel. La locura también tiene premio."
+msgstr ""
+
+#: data/tutorial.json
 msgid "Algo va a salir de aquí"
 msgstr ""
 
@@ -6310,11 +6406,19 @@ msgid "Cada subida mejora un arma, te da una nueva o mejora al investigador. Las
 msgstr ""
 
 #: data/tutorial.json
+msgid "El buhonero ha puesto su manta: quédate sobre lo que quieras para comprarlo con los dólares de este nivel. Se va al cabo de un rato."
+msgstr ""
+
+#: data/tutorial.json
 msgid "El enemigo final del nivel: acaba con él para superarlo."
 msgstr ""
 
 #: data/tutorial.json
 msgid "Esquiva con A o con Espacio: mientras esquivas, nada te hace daño."
+msgstr ""
+
+#: data/tutorial.json
+msgid "Estos dos investigadores se conocen: mientras estén cerca, el lazo dorado que los une les da una pequeña ventaja: la selección de personaje dice cuál."
 msgstr ""
 
 #: data/tutorial.json
@@ -6338,6 +6442,10 @@ msgid "Ha aparecido un baúl arcano: ábrelo para conseguir un objeto o hacer ev
 msgstr ""
 
 #: data/tutorial.json
+msgid "Juegas en un grado de locura: los enemigos son más duros y algunos llevan escudo de icor o se parten al morir, pero los dólares rinden más."
+msgstr ""
+
+#: data/tutorial.json
 msgid "La música se ha vuelto frenesí: las ondas rojas también te quitan cordura. Aléjate de la ventana o esquívalas."
 msgstr ""
 
@@ -6347,6 +6455,10 @@ msgstr ""
 
 #: data/tutorial.json
 msgid "Las criaturas sueltan gemas de experiencia: pasa por encima para recogerlas y subir de nivel."
+msgstr ""
+
+#: data/tutorial.json
+msgid "Llevas un Signo Mayor: cambia una regla a tu favor durante toda la parte. Elegirás otro al empezar el tercer nivel; los logros abren más."
 msgstr ""
 
 #: data/tutorial.json
@@ -6374,6 +6486,10 @@ msgid "Start o Esc pausa la partida."
 msgstr ""
 
 #: data/tutorial.json
+msgid "Tu arma ha evolucionado. Cada evolución tiene dos ramas: la próxima vez puedes probar la otra. Las dos están en el tomo de armas de la Biblioteca."
+msgstr ""
+
+#: data/tutorial.json
 msgid "Tu cordura (la barra violeta) baja cerca de las criaturas y con sus ataques violetas. A cero, entras en crisis: aléjate para recuperarla."
 msgstr ""
 
@@ -6383,6 +6499,10 @@ msgstr ""
 
 #: data/tutorial.json
 msgid "Un pulverizador con el polvo de Ibn Ghazi: pásale por encima y lo que no es de este mundo se verá unos segundos, y le harás más daño."
+msgstr ""
+
+#: data/tutorial.json
+msgid "Un suceso de la noche: durante unos segundos cambian las reglas. Lee el aviso de arriba: unos dan más premio y otros traen más peligro."
 msgstr ""
 
 #: data/tutorial.json
@@ -13162,10 +13282,6 @@ msgstr ""
 
 #: scripts/save/run_archive.gd
 msgid "Partida del día · "
-msgstr ""
-
-#: scripts/save/run_archive.gd scripts/ui/damage_table.gd
-msgid "Revelaciones"
 msgstr ""
 
 #: scripts/save/save_data.gd

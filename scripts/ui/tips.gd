@@ -4,7 +4,8 @@ extends CanvasLayer
 ## en el centro, cuando pasa algo por primera vez (moverse, esquivar, la primera gema, la primera
 ## subida, la cordura baja, el primer baúl, la primera élite, el enemigo final, un compañero
 ## caído, la pausa, la ficha, la primera vez en el color de la noche suelta del 21.13, el polvo de
-## Ibn Ghazi y lo que no se ve del 21.14); y, junto al primer aviso en el suelo de cada tipo (golpe, cordura,
+## Ibn Ghazi y lo que no se ve del 21.14; y desde el 23.5 el buhonero, los vínculos, los sucesos de la
+## noche, las revelaciones, los Signos Mayores, las ramas de evolución y los grados de locura); y, junto al primer aviso en el suelo de cada tipo (golpe, cordura,
 ## los dos, algo que va a salir, grieta), una etiqueta corta. Cada uno, una vez por hueco
 ## (`SaveData.seen["tips"]`). Textos en `data/tutorial.json`. Configuración > Juego > «Consejos»
 ## los quita y «Volver a ver los consejos» los repone. Los que llevan `"urgent": true` (lo propio de
@@ -161,6 +162,26 @@ func _happened(t: Dictionary) -> bool:
 			return PolypWinds.current != null and PolypWinds.current.polyp_near(9.0)
 		"unseen":                                            # lo que no se ve, ya suelto
 			return Unseen.current != null and Unseen.current.unseen_alive()
+		# lo que entró en las fases 16 a 21 y salía sin explicar (hito 23.5)
+		"peddler":                                           # el buhonero pone su manta
+			var od = game.get("objectives")
+			return od != null and od.current != null and od.current.kind == "peddler"
+		"bond":                                              # dos que se conocen, juntos y cerca
+			var bo = game.get("bonds")
+			if bo != null:
+				for pr: Dictionary in bo.pairs:
+					if pr.near: return true
+		"night_event": return not NightEvents.current.is_empty()
+		"revelation", "sign", "branch":
+			for q: Player in players:
+				if q.remote or q.progress == null: continue
+				if String(t.when) == "revelation" and not q.progress.revelations.is_empty(): return true
+				if String(t.when) == "sign" and not q.progress.signs.is_empty(): return true
+				if String(t.when) == "branch" and q.weapons != null:   # la primera evolución, ya hecha
+					for w in q.weapons.weapons:
+						if w.data.evolved: return true
+		"madness":
+			return Madness.enabled and Madness.grade() > 0 and time >= float(t.get("at", 0.0))
 	return false
 
 func _show(id: String) -> void:

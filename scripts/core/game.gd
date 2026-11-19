@@ -288,6 +288,9 @@ func _ready() -> void:
 	if players.size() > 1:                            # vínculos (hito 21.3): su diálogo al empezar la parte
 		bonds = Bonds.new().setup(world, players, GameSession.carry.is_empty() and args.get_str("bond_talk", "") != "false")
 		add_child(bonds)
+	if args.get_bool("autobuy") and Saves.current != null:   # recorrido de un jugador nuevo (23.4): compra antes de jugar
+		for e in Shop.autobuy(Saves.current): print("COMPRA %s nv=%d" % e)
+		Saves.save()
 	var bonus := Shop.bonuses(Saves.current)          # lo comprado en la tienda (D-31)
 	if args.has("shop"):                              # pruebas: N niveles en cada potenciador, sin tocar la partida
 		var n := args.get_int("shop")

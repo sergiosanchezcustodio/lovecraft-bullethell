@@ -252,9 +252,28 @@ static func _curve(points: Array) -> CurveTexture:
 ## misma receta y radio (crearlo con sus texturas en cada muerte costaba fotogramas): quien
 ## vaya a cambiarlo (caja, dispersión…) pide `own = true` y recibe una copia. `tint` tiñe la
 ## receta (forma parte de la clave de la caché).
+##
+## Fuera del hilo principal (la arena que se monta durante el relato, LevelPreload) el emisor sale
+## vacío y se rellena al entrar en la escena: un ParticleProcessMaterial rellenado en otro hilo se
+## cruzaba con Godot generando su sombreador en el principal, y salía a medias («Unknown identifier
+## in expression: 'color_ramp'»): esas partículas no se dibujaban. Lo que quien llama le cambie
+## antes (posición, giro, `emitting = false`, `local_coords = true`) se respeta.
 static func emitter(recipe: String, r: float, one_shot := false, own := false,
 		tint := Color.WHITE) -> GPUParticles3D:
 	var p := GPUParticles3D.new()
+	if OS.get_thread_caller_id() != OS.get_main_thread_id():
+		p.ready.connect(func() -> void:
+			var local := p.local_coords
+			var want := p.emitting
+			_fill(p, recipe, r, one_shot, own, tint)
+			if local: p.local_coords = true
+			if want: p.restart(), CONNECT_ONE_SHOT)
+		return p
+	_fill(p, recipe, r, one_shot, own, tint)
+	p.ready.connect(p.restart, CONNECT_DEFERRED | CONNECT_ONE_SHOT)
+	return p
+
+static func _fill(p: GPUParticles3D, recipe: String, r: float, one_shot: bool, own: bool, tint: Color) -> void:
 	var m := ParticleProcessMaterial.new()
 	p.process_material = m
 	p.one_shot = one_shot
@@ -1483,5 +1502,3 @@ static func emitter(recipe: String, r: float, one_shot := false, own := false,
 	# empieza ya colocado en la escena: emitiendo desde antes, la primera partícula salía en
 	# el origen del mundo (un cubo suelto lejos del efecto)
 	p.emitting = false
-	p.ready.connect(p.restart, CONNECT_DEFERRED | CONNECT_ONE_SHOT)
-	return p

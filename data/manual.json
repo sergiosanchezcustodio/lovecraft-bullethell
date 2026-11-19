@@ -36,6 +36,30 @@
 			"title": "Objetivos a mitad de nivel",
 			"facts": ["Opcionales, con recompensa: dinero, experiencia o un baúl", "Una flecha en pantalla te lleva hasta ellos", "Rescatar, cortar un ritual o llevar una reliquia"],
 			"text": "De vez en cuando la noche te ofrece algo más que sobrevivir. Un superviviente al que escoltar hasta un lugar seguro, un ritual que solo se corta quedándose dentro de su círculo mientras te atacan, o una reliquia que pesa y frena a quien la lleva.\n\nNo son obligatorios, y a veces es más sensato dejarlos pasar, pero su recompensa puede decidir el nivel."
+		},
+		{
+			"id": "signos",
+			"title": "Signos Mayores",
+			"facts": ["Uno al empezar cada parte y otro en su tercer nivel", "Cambian una regla a tu favor", "Los logros abren más"],
+			"text": "Los pactos castigan; los Signos Mayores, al revés, tuercen una regla a tu favor durante toda la parte: las explosiones dejan fuego en el suelo, las gemas devuelven cordura, los baúles traen más dólares…\n\nAl empezar una parte eliges uno entre tres, y otro al llegar a su tercer nivel. Al principio tienes pocos donde escoger: cada logro que consigues abre alguno más."
+		},
+		{
+			"id": "vinculos",
+			"title": "Vínculos",
+			"facts": ["Investigadores que se conocen en los relatos", "Juntos y cerca: un lazo dorado y una ventaja", "La selección de personaje dice cuál"],
+			"text": "Algunos investigadores ya se cruzaron en los relatos: Legrasse y Johansen, Carter y Kuranes, West y la doctora Whipple… Si juegan juntos, al empezar la parte se dicen lo que tengan pendiente y al subir de nivel se saludan.\n\nMientras estén a pocos metros, un lazo dorado los une y les da una ventaja pequeña que depende de la pareja: más experiencia, crisis más cortas, más daño a cierta clase de criaturas, levantar con más vida a un caído… Separarse la apaga."
+		},
+		{
+			"id": "sucesos",
+			"title": "Sucesos de la noche",
+			"facts": ["Una o dos veces por nivel, con aviso", "Durante unos 30 s cambian las reglas", "Unos dan premio; otros, peligro"],
+			"text": "La noche no es siempre igual. A veces sale la luna de sangre (más élites, el doble de dólares), baja una niebla espesa (ves menos y ganas más experiencia), caen estrellas que son gemas, o todo se queda en silencio… hasta que llega una horda.\n\nEl aviso sale arriba, en grande, antes de empezar. Lee lo que trae y decide: aprovecharlo o aguantar a que pase."
+		},
+		{
+			"id": "revelaciones",
+			"title": "Revelaciones",
+			"facts": ["Al salir de una crisis, elige una de dos", "Dura lo que queda del nivel", "La locura también tiene premio"],
+			"text": "Quien vuelve de una crisis no vuelve igual. Al salir de ella eliges una revelación entre dos: ver brillar los ojos de lo que acecha, que tus balas atraviesen las paredes, hacer más daño a cambio de una mente más frágil…\n\nTe dura hasta el final del nivel, y en el mismo nivel no se repiten. Por eso, a veces, bajar la cordura a propósito sale a cuenta."
 		}
 	]
 }

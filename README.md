@@ -161,8 +161,8 @@ Cuatro partes de cinco niveles. Cada nivel se abre al superar el anterior, y cad
 | Nivel | Criaturas | A mitad del nivel | Evento final |
 |---|---|---|---|
 | 1. Newburyport y la carretera a Innsmouth | Pescador de Innsmouth, Vecina de Innsmouth, Viejo de Innsmouth, Acólito de la Orden de Dagon | — | El diácono de la Orden |
-| 2. Las calles de Innsmouth y el templo de la Orden | Pescador de Innsmouth, Vecina de Innsmouth, Viejo de Innsmouth, Acólito de la Orden de Dagon, Híbrido avanzado, Híbrida avanzada, Sacerdote de la tiara, Guardián de la Orden de Dagón | — | El sumo sacerdote de la Orden |
-| 3. El hotel Gilman House y la huida por los tejados | Profundo, Profundo escupidor, Híbrido avanzado, Híbrida avanzada, Acechador de los tejados, Guardián de la Orden de Dagón, Hija de los Marsh | El capitán Obed Marsh | Resistir 60 s a la horda |
+| 2. Las calles de Innsmouth y el templo de la Orden | Pescador de Innsmouth, Vecina de Innsmouth, Viejo de Innsmouth, Acólito de la Orden de Dagon, Híbrido avanzado, Híbrida avanzada, Sacerdote de la tiara, Guardián de la Orden de Dagon | — | El sumo sacerdote de la Orden |
+| 3. El hotel Gilman House y la huida por los tejados | Profundo, Profundo escupidor, Híbrido avanzado, Híbrida avanzada, Acechador de los tejados, Guardián de la Orden de Dagon, Hija de los Marsh | El capitán Obed Marsh | Resistir 60 s a la horda |
 | 4. Los pantanos y la vía muerta del tren a Rowley | Profundo, Profundo de la ciénaga, Profundo escupidor, Híbrido avanzado, Híbrida avanzada, Profundo anciano de Y'ha-nthlei, Nadador de la marea, Hija de los Marsh | — | Barnabas Marsh, transformado |
 | 5. El Arrecife del Diablo y Y'ha-nthlei | Profundo, Profundo de la ciénaga, Profundo escupidor, Profundo anciano de Y'ha-nthlei, Híbrido avanzado, Nadador de la marea | Pth'thya-l'yi, la antepasada | **Jefe: Madre Hydra → Padre Dagon** |
 <!-- /tabla -->
@@ -445,7 +445,7 @@ Más de 90 criaturas, entre ellas los seres únicos del final de cada nivel, los
 ![Criaturas de la parte 1](docs/img/bestiario_1.jpg)
 
 <!-- tabla:bestiario_p2 -->
-**Parte 2:** Pescador de Innsmouth · Vecina de Innsmouth · Viejo de Innsmouth · Acólito de la Orden de Dagon · El diácono de la Orden · Híbrido avanzado · Híbrida avanzada · Sacerdote de la tiara · Guardián de la Orden de Dagón · El sumo sacerdote de la Orden · Profundo · Profundo escupidor · Acechador de los tejados · Hija de los Marsh · El capitán Obed Marsh · Profundo de la ciénaga · Profundo anciano de Y'ha-nthlei · Nadador de la marea · Barnabas Marsh, transformado · Pth'thya-l'yi, la antepasada · Madre Hydra · Padre Dagon.
+**Parte 2:** Pescador de Innsmouth · Vecina de Innsmouth · Viejo de Innsmouth · Acólito de la Orden de Dagon · El diácono de la Orden · Híbrido avanzado · Híbrida avanzada · Sacerdote de la tiara · Guardián de la Orden de Dagon · El sumo sacerdote de la Orden · Profundo · Profundo escupidor · Acechador de los tejados · Hija de los Marsh · El capitán Obed Marsh · Profundo de la ciénaga · Profundo anciano de Y'ha-nthlei · Nadador de la marea · Barnabas Marsh, transformado · Pth'thya-l'yi, la antepasada · Madre Hydra · Padre Dagon.
 <!-- /tabla -->
 
 ![Criaturas de la parte 2](docs/img/bestiario_2.jpg)

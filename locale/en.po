@@ -1720,7 +1720,7 @@ msgid "El guardián de la ciudad"
 msgstr "The guardian of the city"
 
 #: data/enemies/guardian_orden.tres
-msgid "Guardián de la Orden de Dagón"
+msgid "Guardián de la Orden de Dagon"
 msgstr "Guardian of the Order of Dagon"
 
 #: data/enemies/gug.tres
@@ -1824,7 +1824,7 @@ msgid "El capitán Obed Marsh"
 msgstr "Captain Obed Marsh"
 
 #: data/enemies/obed_marsh.tres
-msgid "¡Ïa! ¡Dagón paga bien!"
+msgid "¡Ïa! ¡Dagon paga bien!"
 msgstr "Iä! Dagon pays well!"
 
 #: data/enemies/pesadilla.tres
@@ -2308,7 +2308,7 @@ msgid "Querida Ruth: el autobús a Innsmouth sale a las diez, y el conductor tie
 msgstr "Dear Ruth: the bus to Innsmouth leaves at ten, and the driver has a face I couldn't describe to you without frightening you. In Newburyport nobody wants to talk about the town; an old man in the bar crossed himself when I told him where I was going. I'll sell my cloth and be back on Thursday. With love, Harold."
 
 #: data/fragments.json
-msgid "Ruth: el pueblo huele a pescado, y a algo más viejo que el pescado. Las calles están casi vacías, y los pocos que veo caminan de un modo raro, como si las piernas no les cupieran en los pantalones. Hay una iglesia que ya no es iglesia: la llaman la Orden de Dagón. Esta noche se canta allí, y el canto no termina."
+msgid "Ruth: el pueblo huele a pescado, y a algo más viejo que el pescado. Las calles están casi vacías, y los pocos que veo caminan de un modo raro, como si las piernas no les cupieran en los pantalones. Hay una iglesia que ya no es iglesia: la llaman la Orden de Dagon. Esta noche se canta allí, y el canto no termina."
 msgstr "Ruth: the town smells of fish, and of something older than fish. The streets are almost empty, and the few people I see walk strangely, as if their legs didn't fit in their trousers. There is a church that is no longer a church: they call it the Order of Dagon. Tonight there is singing there, and the singing doesn't stop."
 
 #: data/fragments.json
@@ -4324,8 +4324,22 @@ msgid "A o Espacio"
 msgstr "A or Space"
 
 #: data/manual.json
+msgid "Al salir de una crisis, elige una de dos"
+msgstr "When a crisis ends, pick one of two"
+
+#: data/manual.json
 msgid "Algunas pueden evolucionar de dos maneras"
 msgstr "Some can evolve in two ways"
+
+#: data/manual.json
+msgid ""
+"Algunos investigadores ya se cruzaron en los relatos: Legrasse y Johansen, Carter y Kuranes, West y la doctora Whipple… Si juegan juntos, al empezar la parte se dicen lo que tengan pendiente y al subir de nivel se saludan.\n"
+"\n"
+"Mientras estén a pocos metros, un lazo dorado los une y les da una ventaja pequeña que depende de la pareja: más experiencia, crisis más cortas, más daño a cierta clase de criaturas, levantar con más vida a un caído… Separarse la apaga."
+msgstr ""
+"Some investigators already crossed paths in the stories: Legrasse and Johansen, Carter and Kuranes, West and Dr Whipple… If they play together, they say what they owe each other when the part begins, and they greet each other on level up.\n"
+"\n"
+"While they stay within a few metres of each other, a golden thread joins them and gives them a small edge that depends on the pair: more experience, shorter crises, more damage to a certain kind of creature, raising a fallen friend with more health… Drifting apart breaks it."
 
 #: data/manual.json
 msgid "Arma al nivel máximo + su objeto"
@@ -4360,6 +4374,10 @@ msgid "Cada subida: elige una de tres cartas"
 msgstr "Each level-up: choose one of three cards"
 
 #: data/manual.json
+msgid "Cambian una regla a tu favor"
+msgstr "They bend one rule in your favour"
+
+#: data/manual.json
 msgid "Con su marca a los pies"
 msgstr "With their mark at their feet"
 
@@ -4376,6 +4394,14 @@ msgstr ""
 "Now and then the night offers you something more than survival. A survivor to escort to safety, a ritual that can only be broken by staying inside its circle while you're attacked, or a relic that is heavy and slows down whoever carries it.\n"
 "\n"
 "They aren't compulsory, and sometimes it's wiser to let them go, but their reward can decide the level."
+
+#: data/manual.json
+msgid "Dura lo que queda del nivel"
+msgstr "It lasts for the rest of the level"
+
+#: data/manual.json
+msgid "Durante unos 30 s cambian las reglas"
+msgstr "For about 30 s the rules change"
 
 #: data/manual.json
 msgid ""
@@ -4400,8 +4426,20 @@ msgid "Gemas y subidas de nivel"
 msgstr "Gems and level-ups"
 
 #: data/manual.json
+msgid "Investigadores que se conocen en los relatos"
+msgstr "Investigators who met in the stories"
+
+#: data/manual.json
+msgid "Juntos y cerca: un lazo dorado y una ventaja"
+msgstr "Together and close: a golden thread and an edge"
+
+#: data/manual.json
 msgid "La barra violeta, bajo la de vida"
 msgstr "The violet bar, below the health bar"
+
+#: data/manual.json
+msgid "La locura también tiene premio"
+msgstr "Madness has its reward too"
 
 #: data/manual.json
 msgid ""
@@ -4414,8 +4452,36 @@ msgstr ""
 "If it reaches zero you have a crisis: you freeze at times, flee out of control, wander aimlessly or your controls are reversed. It doesn't last long and when it ends you recover some sanity; sometimes, what you saw also leaves you with a revelation. A teammate at your side shortens it."
 
 #: data/manual.json
+msgid ""
+"La noche no es siempre igual. A veces sale la luna de sangre (más élites, el doble de dólares), baja una niebla espesa (ves menos y ganas más experiencia), caen estrellas que son gemas, o todo se queda en silencio… hasta que llega una horda.\n"
+"\n"
+"El aviso sale arriba, en grande, antes de empezar. Lee lo que trae y decide: aprovecharlo o aguantar a que pase."
+msgstr ""
+"The night is never quite the same. Sometimes the blood moon rises (more elites, double dollars), a thick fog comes down (you see less and earn more experience), stars fall that are gems, or everything goes silent… until a horde arrives.\n"
+"\n"
+"The warning appears at the top, large, before it begins. Read what it brings and decide: make the most of it or hold out until it passes."
+
+#: data/manual.json
+msgid "La selección de personaje dice cuál"
+msgstr "The character select screen tells you which"
+
+#: data/manual.json
 msgid "Las criaturas sueltan gemas: pasa por encima"
 msgstr "Creatures drop gems: walk over them"
+
+#: data/manual.json
+msgid "Los logros abren más"
+msgstr "Achievements unlock more"
+
+#: data/manual.json
+msgid ""
+"Los pactos castigan; los Signos Mayores, al revés, tuercen una regla a tu favor durante toda la parte: las explosiones dejan fuego en el suelo, las gemas devuelven cordura, los baúles traen más dólares…\n"
+"\n"
+"Al empezar una parte eliges uno entre tres, y otro al llegar a su tercer nivel. Al principio tienes pocos donde escoger: cada logro que consigues abre alguno más."
+msgstr ""
+"Pacts punish; Elder Signs do the opposite and bend one rule in your favour for the whole part: explosions leave fire on the ground, gems give back sanity, chests bring more dollars…\n"
+"\n"
+"When a part begins you pick one of three, and another when you reach its third level. At first you have few to choose from: every achievement you earn unlocks more."
 
 #: data/manual.json
 msgid "Mientras esquivas, nada te hace daño"
@@ -4434,8 +4500,30 @@ msgid "Opcionales, con recompensa: dinero, experiencia o un baúl"
 msgstr "Optional, with a reward: money, experience or a chest"
 
 #: data/manual.json
+msgid ""
+"Quien vuelve de una crisis no vuelve igual. Al salir de ella eliges una revelación entre dos: ver brillar los ojos de lo que acecha, que tus balas atraviesen las paredes, hacer más daño a cambio de una mente más frágil…\n"
+"\n"
+"Te dura hasta el final del nivel, y en el mismo nivel no se repiten. Por eso, a veces, bajar la cordura a propósito sale a cuenta."
+msgstr ""
+"No one comes back from a crisis unchanged. As it ends you pick one of two revelations: seeing the eyes of what lurks glow, bullets that pass through walls, more damage in exchange for a frailer mind…\n"
+"\n"
+"It lasts until the end of the level, and none repeats within the same level. That is why letting your sanity drop on purpose sometimes pays off."
+
+#: data/manual.json
 msgid "Rescatar, cortar un ritual o llevar una reliquia"
 msgstr "Rescue someone, break a ritual or carry a relic"
+
+#: data/manual.json scripts/save/run_archive.gd scripts/ui/damage_table.gd
+msgid "Revelaciones"
+msgstr "Revelations"
+
+#: data/manual.json
+msgid "Signos Mayores"
+msgstr "Elder Signs"
+
+#: data/manual.json
+msgid "Sucesos de la noche"
+msgstr "Events of the night"
 
 #: data/manual.json
 msgid "Sueltan mejor botín"
@@ -4462,6 +4550,22 @@ msgstr "An arcane chest makes it evolve"
 #: data/manual.json
 msgid "Una flecha en pantalla te lleva hasta ellos"
 msgstr "An on-screen arrow guides you to them"
+
+#: data/manual.json
+msgid "Una o dos veces por nivel, con aviso"
+msgstr "Once or twice per level, with a warning"
+
+#: data/manual.json
+msgid "Uno al empezar cada parte y otro en su tercer nivel"
+msgstr "One when each part begins and another on its third level"
+
+#: data/manual.json
+msgid "Unos dan premio; otros, peligro"
+msgstr "Some bring reward; others, danger"
+
+#: data/manual.json
+msgid "Vínculos"
+msgstr "Bonds"
 
 #: data/manual.json
 msgid "Y un punto de atributo para el investigador"
@@ -6284,7 +6388,7 @@ msgid "Signo de Cthugha"
 msgstr "Sign of Cthugha"
 
 #: data/signs.json
-msgid "Signo de Dagón"
+msgid "Signo de Dagon"
 msgstr "Sign of Dagon"
 
 #: data/signs.json
@@ -6316,6 +6420,10 @@ msgid "Un 10 % más de críticos, y las balas críticas atraviesan a dos enemigo
 msgstr "10 % more critical hits, and critical bullets pierce two more enemies."
 
 #: data/tutorial.json
+msgid "Al salir de la crisis has visto algo: una revelación te dura lo que queda del nivel. La locura también tiene premio."
+msgstr "Coming out of the crisis you saw something: a revelation lasts for the rest of the level. Madness has its reward too."
+
+#: data/tutorial.json
 msgid "Algo va a salir de aquí"
 msgstr "Something is about to come out of here"
 
@@ -6328,12 +6436,20 @@ msgid "Cada subida mejora un arma, te da una nueva o mejora al investigador. Las
 msgstr "Each level-up improves a weapon, gives you a new one or improves the investigator. Weapons at max level evolve with their item."
 
 #: data/tutorial.json
+msgid "El buhonero ha puesto su manta: quédate sobre lo que quieras para comprarlo con los dólares de este nivel. Se va al cabo de un rato."
+msgstr "The peddler has laid out his blanket: stand on whatever you want to buy it with this level's dollars. He leaves after a while."
+
+#: data/tutorial.json
 msgid "El enemigo final del nivel: acaba con él para superarlo."
 msgstr "The level's final enemy: defeat it to clear the level."
 
 #: data/tutorial.json
 msgid "Esquiva con A o con Espacio: mientras esquivas, nada te hace daño."
 msgstr "Dodge with A or Space: while you dodge, nothing can hurt you."
+
+#: data/tutorial.json
+msgid "Estos dos investigadores se conocen: mientras estén cerca, el lazo dorado que los une les da una pequeña ventaja: la selección de personaje dice cuál."
+msgstr "These two investigators know each other: while they stay close, the golden thread between them gives a small edge. The character select screen tells you which."
 
 #: data/tutorial.json
 msgid "Estás en el color: te vuelve gris y quebradizo. Pierdes cordura y los golpes te hacen más daño. A los enemigos les pasa lo mismo: llévalos a él y sal tú."
@@ -6356,6 +6472,10 @@ msgid "Ha aparecido un baúl arcano: ábrelo para conseguir un objeto o hacer ev
 msgstr "An arcane chest has appeared: open it to get an item or evolve a weapon."
 
 #: data/tutorial.json
+msgid "Juegas en un grado de locura: los enemigos son más duros y algunos llevan escudo de icor o se parten al morir, pero los dólares rinden más."
+msgstr "You are playing a degree of madness: enemies are tougher and some carry an ichor shield or split when they die, but dollars go further."
+
+#: data/tutorial.json
 msgid "La música se ha vuelto frenesí: las ondas rojas también te quitan cordura. Aléjate de la ventana o esquívalas."
 msgstr "The music has turned to frenzy: the red waves drain your sanity too. Get away from the window or dodge through them."
 
@@ -6366,6 +6486,10 @@ msgstr "Zann's viol plays from the garret: each beat rolls down the street, push
 #: data/tutorial.json
 msgid "Las criaturas sueltan gemas de experiencia: pasa por encima para recogerlas y subir de nivel."
 msgstr "Creatures drop experience gems: walk over them to collect them and level up."
+
+#: data/tutorial.json
+msgid "Llevas un Signo Mayor: cambia una regla a tu favor durante toda la parte. Elegirás otro al empezar el tercer nivel; los logros abren más."
+msgstr "You carry an Elder Sign: it bends one rule in your favour for the whole part. You'll pick another when the third level starts; achievements unlock more."
 
 #: data/tutorial.json
 msgid "Los pólipos casi no se ven: escucha su silbido y busca su remolino de arena. Cuando silban más fuerte, van a embestir."
@@ -6392,6 +6516,10 @@ msgid "Start o Esc pausa la partida."
 msgstr "Start or Esc pauses the game."
 
 #: data/tutorial.json
+msgid "Tu arma ha evolucionado. Cada evolución tiene dos ramas: la próxima vez puedes probar la otra. Las dos están en el tomo de armas de la Biblioteca."
+msgstr "Your weapon has evolved. Each evolution has two branches: next time you can try the other. Both are in the weapons tome of the Library."
+
+#: data/tutorial.json
 msgid "Tu cordura (la barra violeta) baja cerca de las criaturas y con sus ataques violetas. A cero, entras en crisis: aléjate para recuperarla."
 msgstr "Your sanity (the violet bar) drops near creatures and from their violet attacks. At zero, you have a crisis: get away to recover it."
 
@@ -6402,6 +6530,10 @@ msgstr "A teammate is down: stay at their side to revive them before their time 
 #: data/tutorial.json
 msgid "Un pulverizador con el polvo de Ibn Ghazi: pásale por encima y lo que no es de este mundo se verá unos segundos, y le harás más daño."
 msgstr "A sprayer with the powder of Ibn Ghazi: walk over it and what is not of this world will be visible for a few seconds, and you'll deal it more damage."
+
+#: data/tutorial.json
+msgid "Un suceso de la noche: durante unos segundos cambian las reglas. Lee el aviso de arriba: unos dan más premio y otros traen más peligro."
+msgstr "An event of the night: for a few seconds the rules change. Read the notice at the top: some bring more reward and others more danger."
 
 #: data/tutorial.json
 msgid "Una trampilla silba: de ahí salen los pólipos. Ponte en medio del círculo dorado hasta sellarla; su viento te aparta, pero en el centro hay calma."
@@ -13204,10 +13336,6 @@ msgstr "Endless night · "
 #: scripts/save/run_archive.gd
 msgid "Partida del día · "
 msgstr "Daily run · "
-
-#: scripts/save/run_archive.gd scripts/ui/damage_table.gd
-msgid "Revelaciones"
-msgstr "Revelations"
 
 #: scripts/save/save_data.gd
 msgid "%d h %02d min"

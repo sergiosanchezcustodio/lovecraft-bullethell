@@ -797,7 +797,7 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 
 ## Fase 23: propuesta (18-11-2026)
 
-**Propuesta el 18-11-2026**, al cerrar la fase 22 («continúa»). **Bloque A aprobado el 18-11-2026** («adelante bloque A») y hecho, pendiente de revisión; los demás, pendientes de tu aprobación. Elige bloques o hitos sueltos; el orden de los bloques es el recomendado. Lo que queda abierto de antes y depende de ti sigue igual: la música de la parte 4, la subida a itch.io (fase 8, tu cuenta; la página ya está al día con el 22.8), el `client_id` de la nube (fase 10) y la calibración de la dificultad (D-42).
+**Propuesta el 18-11-2026**, al cerrar la fase 22 («continúa»). **Bloque A aprobado el 18-11-2026** («adelante bloque A») y hecho, pendiente de revisión. **Bloque B aprobado el 19-11-2026** («haz las dos cosas y luego continúa») y hecho, pendiente de revisión; los demás, pendientes de tu aprobación. Elige bloques o hitos sueltos; el orden de los bloques es el recomendado. Lo que queda abierto de antes y depende de ti sigue igual: la música de la parte 4, la subida a itch.io (fase 8, tu cuenta; la página ya está al día con el 22.8), el `client_id` de la nube (fase 10) y la calibración de la dificultad (D-42).
 
 **Criterio de aceptación de la fase** (para lo que se elija): como el de la fase 22. Todo comprobado en captura y con el bot, sin errores, y nada empeora el rendimiento apreciablemente en Alta. Lo jugable va por datos y con tests. El arte nuevo de humanos, a bloques limpios; lo pintado, con ComfyUI en local.
 
@@ -813,8 +813,8 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 23.4 | **Recorrido de un jugador nuevo** con el bot desde una partida vacía (`simular.py`, comprando como un jugador): cuándo se desbloquea cada cosa, si el dinero de las primeras partidas da para algo en la tienda y cuántas caídas hay hasta superar la parte 1. Informe y ajustes en los datos si sale una pared | Propuesto |
-| 23.5 | **Primeras veces de lo nuevo:** consejos y tutorial para lo que entró en las fases 20 a 22 (vínculos, revelaciones, Signos Mayores, sucesos, noches sueltas, la viola de Zann), que hoy aparecen sin explicar, y una vuelta al manual (tomo XII) con sus clips | Propuesto |
+| 23.4 | **Recorrido de un jugador nuevo** con el bot desde una partida vacía (`simular.py`, comprando como un jugador): cuándo se desbloquea cada cosa, si el dinero de las primeras partidas da para algo en la tienda y cuántas caídas hay hasta superar la parte 1. Informe y ajustes en los datos si sale una pared | Hecho, pendiente de revisión |
+| 23.5 | **Primeras veces de lo nuevo:** consejos y tutorial para lo que entró en las fases 20 a 22 (vínculos, revelaciones, Signos Mayores, sucesos, noches sueltas, la viola de Zann), que hoy aparecen sin explicar, y una vuelta al manual (tomo XII) con sus clips | Hecho, pendiente de revisión |
 
 ### Bloque C: el procesador
 

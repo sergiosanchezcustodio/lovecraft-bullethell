@@ -150,7 +150,7 @@ func _idol() -> float:
 func _chest_step(delta: float) -> void:
 	if level.chest_every <= 0.0: return
 	var every := level.chest_every * Pacts.value("chest_every")      # La noche más cerrada, Susurros (hito 13.6)
-	if Signs.any(world.players, &"dagon"): every *= Signs.value("dagon")   # Signo de Dagón (16.9)
+	if Signs.any(world.players, &"dagon"): every *= Signs.value("dagon")   # Signo de Dagon (16.9)
 	if _chest_t < 0.0: _chest_t = every * rng.randf_range(0.75, 1.25)
 	_chest_t -= delta * team_item("chest_mult")             # Vara de zahorí
 	if _chest_t > 0.0: return

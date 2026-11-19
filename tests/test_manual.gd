@@ -1,7 +1,7 @@
 extends GutTest
 ## Hito 21.19: el manual del investigador en la Biblioteca.
 
-const TOPICS := ["nivel", "cordura", "esquive", "evolucion", "elite", "objetivo"]
+const TOPICS := ["nivel", "cordura", "esquive", "evolucion", "elite", "objetivo", "signos", "vinculos", "sucesos", "revelaciones"]   # cuatro más en el hito 23.5
 
 func test_un_tomo_con_las_cinco_paginas() -> void:
 	var ids := Library.TOMES.map(func(t: Dictionary) -> String: return String(t.id))

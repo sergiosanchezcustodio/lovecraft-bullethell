@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 id = &"guardian_orden"
-display_name = "Guardián de la Orden de Dagón"
+display_name = "Guardián de la Orden de Dagon"
 model = "guardian_orden"
 tier = 3
 spawn_weight = 0.45

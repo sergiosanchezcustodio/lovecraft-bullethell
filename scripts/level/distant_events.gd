@@ -6,7 +6,7 @@ extends Node3D
 ##
 ## Tipos (`kind`):
 ## - `rise`: un modelo sube del agua en uno de sus `spots` ([x, z]), se queda meciéndose y se hunde
-##   (el tentáculo del arrecife, Dagón junto al arrecife del Diablo).
+##   (el tentáculo del arrecife, Dagon junto al arrecife del Diablo).
 ## - `flash`: una silueta negra en un `spot` que solo se ve mientras dura el relámpago (`chance` de
 ##   cada rayo; la tormenta).
 ## - `cross`: un modelo cruza la pantalla de lado a lado, `back` m más allá del jugador y a `h` m de

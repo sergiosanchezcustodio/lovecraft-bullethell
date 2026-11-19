@@ -5,7 +5,7 @@
 		{"id": "cthugha", "name": "Signo de Cthugha", "text": "Las explosiones de tus armas dejan fuego en el suelo.", "unlock": "elite_1", "value": 0.2},
 		{"id": "hypnos", "name": "Signo de Hypnos", "text": "Cada gema que recoges te devuelve un poco de cordura.", "unlock": "crisis_10", "value": 0.6},
 		{"id": "nodens", "name": "Signo de Nodens", "text": "Al subir de nivel, una onda deshace las balas enemigas de alrededor.", "unlock": "nivel_20", "value": 6.0},
-		{"id": "dagon", "name": "Signo de Dagón", "text": "Los baúles arcanos salen más a menudo y traen el doble de dólares.", "unlock": "baules_50", "value": 0.7},
+		{"id": "dagon", "name": "Signo de Dagon", "text": "Los baúles arcanos salen más a menudo y traen el doble de dólares.", "unlock": "baules_50", "value": 0.7},
 		{"id": "yog", "name": "Signo de Yog-Sothoth", "text": "Al recoger una gema, las de alrededor vienen todas a ti.", "unlock": "cazador_100", "value": 7.0},
 		{"id": "hastur", "name": "Signo de Hastur", "text": "Cada 25 criaturas que abates, un viento empuja y aturde a las de alrededor.", "unlock": "cazador_1000", "value": 25},
 		{"id": "nyarlathotep", "name": "Signo de Nyarlathotep", "text": "Un 10 % más de críticos, y las balas críticas atraviesan a dos enemigos más.", "unlock": "arsenal", "value": 0.1},

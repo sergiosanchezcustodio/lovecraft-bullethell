@@ -32,6 +32,13 @@ CLIPS = {
               'foes=acechador,3.5,-2.5', 4.5, 7.0),
     'nivel': ('level=p2_n1 character=dyer cam=10 levelup_at=5.5 pick_after=2.6 xp=0 '
               'foes=profundo,4,1;profundo,-3,3;hibrido_h,1,-4', 4.5, 7.0, False),
+    # hito 23.5: lo de las fases 16 a 21
+    'signos': ('level=p1_n2 character=dyer bot=circle cam=10 signs=cthugha weapons=granada wlevel=4 '
+               'foes=pinguino,4,1;pinguino,-3,3;pinguino,1,-4;pinguino,-4,-2;pinguino,3,-3', 4.5, 7.0),
+    'vinculos': ('level=p2_n1 character=legrasse bots=1 bot_chars=johansen bot=circle cam=10 bond_talk=true objectives=false', 4.5, 7.0),
+    'sucesos': ('level=p1_n2 character=peaslee bot=circle cam=12 night_events=true night_event=estrellas night_at=5 objectives=false', 4.5, 7.0, False),
+    'revelaciones': ('level=p2_n1 character=varga cam=10 crisis_at=5 pick_after=2.6 '
+                     'foes=profundo,3,1;profundo,-2,2.5;hibrido_h,1,-3', 4.5, 8.0, False),
     'objetivo': ('level=p2_n1 character=peaslee bot=idle dodge_every=999 cam=10 objective=ritual objective_at=4 objective_near=true', 4.5, 7.0),
 }
 

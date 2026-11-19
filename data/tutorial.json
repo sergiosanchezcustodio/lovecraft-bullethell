@@ -17,6 +17,13 @@
 		{"id": "frenesi", "when": "viola_frenzy", "urgent": true, "text": "La música se ha vuelto frenesí: las ondas rojas también te quitan cordura. Aléjate de la ventana o esquívalas."},
 		{"id": "invisible", "when": "unseen", "urgent": true, "text": "No se ve, pero está: sigue sus huellas. Solo con el polvo de Ibn Ghazi se le ve y se le puede dar."},
 		{"id": "color", "when": "blight", "urgent": true, "text": "Estás en el color: te vuelve gris y quebradizo. Pierdes cordura y los golpes te hacen más daño. A los enemigos les pasa lo mismo: llévalos a él y sal tú."},
+		{"id": "buhonero", "when": "peddler", "urgent": true, "text": "El buhonero ha puesto su manta: quédate sobre lo que quieras para comprarlo con los dólares de este nivel. Se va al cabo de un rato."},
+		{"id": "vinculo", "when": "bond", "text": "Estos dos investigadores se conocen: mientras estén cerca, el lazo dorado que los une les da una pequeña ventaja: la selección de personaje dice cuál."},
+		{"id": "suceso", "when": "night_event", "urgent": true, "text": "Un suceso de la noche: durante unos segundos cambian las reglas. Lee el aviso de arriba: unos dan más premio y otros traen más peligro."},
+		{"id": "revelacion", "when": "revelation", "text": "Al salir de la crisis has visto algo: una revelación te dura lo que queda del nivel. La locura también tiene premio."},
+		{"id": "signo", "when": "sign", "text": "Llevas un Signo Mayor: cambia una regla a tu favor durante toda la parte. Elegirás otro al empezar el tercer nivel; los logros abren más."},
+		{"id": "rama", "when": "branch", "text": "Tu arma ha evolucionado. Cada evolución tiene dos ramas: la próxima vez puedes probar la otra. Las dos están en el tomo de armas de la Biblioteca."},
+		{"id": "locura", "when": "madness", "at": 5.0, "text": "Juegas en un grado de locura: los enemigos son más duros y algunos llevan escudo de icor o se parten al morir, pero los dólares rinden más."},
 		{"id": "pause", "when": "pause", "at": 40.0, "text": "Start o Esc pausa la partida."},
 		{"id": "sheet", "when": "sheet", "at": 75.0, "text": "Select o Tab abre la ficha del investigador; la cruceta abajo o M, el mapa del nivel."},
 		{"id": "manual", "when": "manual", "at": 110.0, "text": "Para saber más: en la Biblioteca, el tomo XII es el manual del investigador. Cordura, esquives, evoluciones, élites y objetivos, con ejemplos de la partida."}

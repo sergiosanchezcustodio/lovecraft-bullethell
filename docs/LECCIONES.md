@@ -296,3 +296,10 @@ En `VoxelFx.emitter` añadí una receta `"bubbles"` sin ver que ya había otra c
 - **Para equilibrar, mira primero lo que protege al bot:** subir la vida y el daño de la noche de Zann apenas cambió nada; lo que la hacía fácil era el empuje de la viola, que mantenía lejos a la horda. Mide una noche de referencia el mismo día (Pnakotus) antes de comparar.
 
 - **Una `Translation` hecha en GDScript y añadida al `TranslationServer` hay que quitarla al salir** (`TranslationServer.remove_translation`). Si sigue registrada cuando Godot cierra los scripts, al liberarla se cae (señal 11, sin mensaje). Visto con el apuntador de textos sin traducir (`L._Catcher`, 18-11-2026).
+
+## Builds exportadas y hilos (hitos 23.2 y siguientes, 18 y 19-11-2026)
+
+- **En una build exportada, los `.tres` de una carpeta se listan como `x.tres.remap`:** un `DirAccess.get_files_at(dir)` con `ends_with(".tres")` da una lista vacía, y en el editor se ve bien. Usa `ResList.paths(dir)` o `ResList.load_all(dir)`, que quitan el `.remap`; `load()` con la ruta del `.tres` sigue la redirección solo. Prueba lo que liste datos con la build exportada (`sh tools/probar_demo.sh <exe>`).
+- **No rellenes un `ParticleProcessMaterial` fuera del hilo principal:** Godot genera su sombreador en el hilo principal cuando le parece, y si lo hace a mitad de los cambios del otro hilo sale a medias («Unknown identifier in expression: 'color_ramp'») y esas partículas no se dibujan. Pasa poco y no siempre: en la arena que se monta durante el relato, una de cada pocas veces. `VoxelFx.emitter` ya lo deja para cuando el emisor entra en la escena; lo que cree partículas por su cuenta en un hilo, igual.
+- **En la build exportada `res://` no se escribe:** las capturas de prueba van a `user://shots` (`ShotTaker`).
+- **La portada abre el menú pedido con `open=` al acabar su entrada (unos 11 s):** una prueba que cierre antes (`quit_at=10`) solo ve la portada, sin errores, y parece que todo va bien. Saca una captura de lo que pruebes.

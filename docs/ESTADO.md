@@ -3820,4 +3820,36 @@ Todo en `docs/itchio/` (las instrucciones de la página, en `pagina.md`).
   - **Selección:** si los vínculos cambiaban con el fundido anterior en marcha (al elegir personaje), el vínculo viejo volvía a encenderse encima del título. `_show_bond` para el tween anterior.
   - **Capturas en la build exportada:** `ShotTaker` guarda en `user://shots` (en `res://` no se puede escribir).
   - **Partida de prueba del juego completo:** `python tools/partida_completa.py [carpeta]` (por defecto `user://demo_completa`): todo visto, ganado y comprado, y prendas puestas a Dyer y a Pickman. La usa `probar_demo.sh`, que también sirve para la build completa (`sh tools/probar_demo.sh builds/windows/LovecraftLibrary.exe`).
-- **Visto de paso, sin arreglar:** en la pantalla del relato, un `ParticleProcessMaterial` no compila («Unknown identifier in expression: 'color_ramp'», en el sombreador que genera Godot); pasa también en el editor y no tiene que ver con la demo. Además, desde el editor, `relato … quit_at=N` no se cierra solo (en la build exportada, sí).
+- **Partículas que no se dibujaban tras el relato** (arreglado el 19-11-2026): la arena se monta en otro hilo durante el relato (`LevelPreload`), y ahí `Ambient.dress` y `ArenaBuilder._smoke` creaban sus emisores (faroles, polvo de diamante, humo de chimenea…). Godot genera el sombreador de un `ParticleProcessMaterial` en el hilo principal, y si lo hacía mientras el otro hilo aún lo rellenaba salía a medias («Unknown identifier in expression: 'color_ramp'» o `'emission_sphere_radius'»): esas partículas no se veían en la partida. Ahora `VoxelFx.emitter`, fuera del hilo principal, devuelve el emisor vacío y lo rellena (`_fill`) al entrar en la escena, respetando lo que le haya cambiado quien llama (`emitting = false`, `local_coords`). Tres relatos seguidos sin errores (antes, siempre desde el editor) y, en la partida que viene del relato, las llamas de los faroles y el polvo de diamante como sin precarga. Lección en `docs/LECCIONES.md`. Aparte: desde el editor, `relato … quit_at=N` no se cierra solo (en la build exportada, sí).
+- **«Dagón» con tilde** en ocho textos (el guardián de la Orden, Obed Marsh, el Signo, una página de Ruth…), cuando el resto del juego dice «Dagon»: igualado a «Dagon» en los datos, las claves de `locale/en.po` y `textos.pot` (las traducciones siguen casando: faltan las 29 técnicas de siempre) y los comentarios; tablas del README rehechas.
+
+## Hito 23.4: recorrido de un jugador nuevo (19-11-2026)
+
+`python tools/primera_hora.py` juega una parte desde una partida vacía, como alguien que empieza. Cada recorrido va en su hueco (`user://primera_hora_<k>`). Cada intento juega el primer nivel aún sin superar y, antes de empezar, compra con `autobuy=true` (`Shop.autobuy`): el potenciador más barato que alcance, en empate el primero de la tienda, y las mejoras de huecos cuando lleguen; ni el Pacto, ni personajes, compañeros o prendas. Con Dyer, dificultad 3 (la de fábrica) y `--ts 2`. Test en `test_shop.gd`.
+
+Parte 1, dos recorridos con cada habilidad del bot:
+
+| `skill` | intentos | caídas | tiempo de juego |
+|---|---|---|---|
+| 0,8 | 5 y 5 | 0 y 0 | 21 min |
+| 0,5 | 5 y 6 | 0 y 1 (en el 1.1, a los 232 s) | 21 y 25 min |
+
+- **Dinero:** de 1.100 a 1.750 $ por nivel (una caída a los 4 min ya da 1.100). Tras el primer nivel alcanza para siete o diez potenciadores a nivel 1 (150-200 $), y antes del 1.5 ya están casi todos a nivel 2. La tienda da para algo desde la primera partida.
+- **Desbloqueos:** el nivel siguiente se abre al superar el anterior; no hay nada más que pare a quien empieza en la parte 1.
+- **Sin pared, y sin ajustes en los datos.** Si acaso, al revés: la parte 1 es generosa. Un jugador de verdad caerá más que el bot (que esquiva solo), pero el dinero que trae cada caída y lo barato de los primeros niveles de la tienda suavizan la curva. Si el autor la nota fácil al probarla, la palanca es la dificultad de fábrica (D-42, pendiente de su calibración), no la tienda.
+
+## Hito 23.5: primeras veces de lo nuevo (19-11-2026)
+
+Lo que entró en las fases 16 a 21 salía en la partida sin que nada lo explicase. Ahora:
+- **Siete consejos más** (`data/tutorial.json`, `Tips._happened`), uno por hueco como los demás:
+  - `buhonero` (el buhonero pone su manta, urgente: se va pronto);
+  - `vinculo` (dos que se conocen, juntos y cerca);
+  - `suceso` (un suceso de la noche, urgente);
+  - `revelacion` (ya tienes una revelación);
+  - `signo` (llevas un Signo Mayor);
+  - `rama` (la primera evolución hecha: la otra rama, la próxima vez);
+  - `locura` (juegas en un grado de locura, a los 5 s).
+
+  Probados con `tips=true` y las opciones que fuerzan cada cosa (`peddler=true`, `night_event=`, `revelation=`, `signs=`, `madness=1`, `weapons=ancla wlevel=5 items=coraza evolve_at=3`, `character=legrasse bots=1 bot_chars=johansen`): salen todos, en este orden de cola. El de los vínculos manda a la selección de personaje, que es donde se ve cuál es (la ficha no lo dice).
+- **El manual del investigador (tomo XII) pasa de 6 a 10 páginas:** Signos Mayores, Vínculos, Sucesos de la noche y Revelaciones, cada una con su clip (`python tools/grabar_manual.py signos vinculos sucesos revelaciones`; Dyer con granadas y el Signo de Cthugha, Legrasse y Johansen hablando, la lluvia de estrellas a pantalla entera y la crisis de Varga hasta la ventana de la revelación). Revisado en español y en inglés.
+- Textos en inglés, en `locale/en.po` (el Signo Mayor es «Elder Sign», como en el resto del juego).

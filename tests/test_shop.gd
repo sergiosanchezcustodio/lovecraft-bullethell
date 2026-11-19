@@ -195,3 +195,17 @@ func test_la_tienda_muestra_el_boton_del_pacto_y_lo_rompe() -> void:
 	toggle.pressed.emit()
 	assert_false(Shop.is_active(s, "pacto"), "roto")
 	Saves.current = old
+
+## Recorrido de un jugador nuevo (hito 23.4, `autobuy=true`): compra lo más barato, sin Pacto ni personajes.
+func test_autobuy_compra_lo_mas_barato_sin_pacto() -> void:
+	var s := _save(700)
+	var got := Shop.autobuy(s)
+	assert_eq(got.size(), 4, "con 700 $: cuatro potenciadores de 150 (quedan 100)")
+	for g: Array in got: assert_eq(_entry(g[0]).prices[0], 150, "%s es de los de 150" % g[0])
+	assert_eq(s.money, 100)
+	assert_false(s.purchases.has("pacto"), "nunca el Pacto")
+	var rich := _save(1000000)
+	Shop.autobuy(rich)
+	assert_false(rich.purchases.has("pacto"), "ni con todo el dinero")
+	assert_eq(rich.characters, SaveData.create().characters, "ni personajes")
+	assert_true(int(rich.purchases.get("sexta_arma", 0)) == 1, "las mejoras de huecos, sí")

@@ -111,6 +111,26 @@ static func buy(save: SaveData, e: Entry) -> bool:
 		_: save.purchases[e.id] = level_of(save, e) + 1
 	return true
 
+## Compra como un jugador que empieza (hito 23.4, `autobuy=true`): con lo que tenga, el potenciador
+## más barato (en empate, el primero de la tienda) y, cuando alcance, las mejoras de huecos; ni
+## personajes, ni compañeros, ni prendas, ni el Pacto (que pone la noche más difícil).
+## Devuelve [[id, nivel], ...] de lo comprado.
+static func autobuy(save: SaveData) -> Array:
+	var out := []
+	var pool: Array[Entry] = []
+	for e in catalog():
+		if e.id == "pacto": continue
+		if e.section == ShopItem.Section.POWERUP or e.section == ShopItem.Section.UPGRADE: pool.append(e)
+	while true:
+		var best: Entry = null
+		for e in pool:
+			if not can_buy(save, e): continue
+			if best == null or next_price(save, e) < next_price(save, best): best = e
+		if best == null: break
+		buy(save, best)
+		out.append([best.id, level_of(save, best)])
+	return out
+
 ## Valor de cada efecto sin comprar nada: los multiplicadores parten de 1 y lo que se suma
 ## (huecos, armadura en %, regeneración, crítico, mejoras de un nivel), de 0.
 const DEFAULTS := {"health": 1.0, "sanity": 1.0, "damage": 1.0, "speed": 1.0, "money": 1.0,

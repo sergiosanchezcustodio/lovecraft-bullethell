@@ -66,7 +66,7 @@ static func icon(id: String) -> Texture2D:
 	var path := "res://resources/signs/%s.png" % id
 	return load(path) if ResourceLoader.exists(path) else null
 
-## ¿Lo lleva alguno de estos jugadores? (Efectos de todo el equipo: los baúles de Dagón.)
+## ¿Lo lleva alguno de estos jugadores? (Efectos de todo el equipo: los baúles de Dagon.)
 static func any(players: Array, id: StringName) -> bool:
 	for q: Variant in players:
 		if q is Player and (q as Player).has_sign(id): return true
