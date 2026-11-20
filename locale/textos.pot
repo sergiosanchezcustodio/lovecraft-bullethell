@@ -315,6 +315,14 @@ msgstr ""
 msgid "Tres noches sueltas"
 msgstr ""
 
+#: data/achievements/39_sombras_quemadas.tres
+msgid "Deja que la luz queme a 40 sombras del campanario en Federal Hill."
+msgstr ""
+
+#: data/achievements/39_sombras_quemadas.tres
+msgid "Hágase la luz"
+msgstr ""
+
 #: data/arenas/arrecife.json data/campaign.json data/levels/p2_n5.tres
 msgid "El Arrecife del Diablo y Y'ha-nthlei"
 msgstr ""
@@ -353,6 +361,10 @@ msgstr ""
 
 #: data/arenas/estudio.json data/campaign.json data/levels/p3_n1.tres
 msgid "Providence: el estudio del escultor Wilcox"
+msgstr ""
+
+#: data/arenas/federal.json data/levels/noche_acecha.tres
+msgid "Federal Hill"
 msgstr ""
 
 #: data/arenas/granja.json data/levels/noche_color.tres
@@ -740,6 +752,10 @@ msgid "Casi a oscuras, y tu farol apenas alumbra."
 msgstr ""
 
 #: data/challenges.json
+msgid "Corriente cortada"
+msgstr ""
+
+#: data/challenges.json
 msgid "Cubierta maldita"
 msgstr ""
 
@@ -769,6 +785,10 @@ msgstr ""
 
 #: data/challenges.json
 msgid "La fe de la Orden"
+msgstr ""
+
+#: data/challenges.json
+msgid "La tormenta corta la luz el doble de a menudo y las criaturas aguantan un 15 % más."
 msgstr ""
 
 #: data/challenges.json
@@ -1799,6 +1819,30 @@ msgstr ""
 msgid "Mercader de Leng"
 msgstr ""
 
+#: data/enemies/morador_tinieblas.tres scripts/enemies/haunter_behavior.gd
+msgid "La cosa se deshace en la luz."
+msgstr ""
+
+#: data/enemies/morador_tinieblas.tres
+msgid "La tormenta está de su parte"
+msgstr ""
+
+#: data/enemies/morador_tinieblas.tres
+msgid "Las farolas no lo detendrán mucho más"
+msgstr ""
+
+#: data/enemies/morador_tinieblas.tres
+msgid "Morador de las Tinieblas"
+msgstr ""
+
+#: data/enemies/morador_tinieblas.tres scripts/enemies/haunter_behavior.gd
+msgid "Revienta una farola…"
+msgstr ""
+
+#: data/enemies/morador_tinieblas.tres scripts/enemies/haunter_behavior.gd
+msgid "Se va la luz en toda la colina…"
+msgstr ""
+
 #: data/enemies/nadador.tres
 msgid "Nadador de la marea"
 msgstr ""
@@ -1943,6 +1987,10 @@ msgstr ""
 msgid "El sumo sacerdote que no debe describirse"
 msgstr ""
 
+#: data/enemies/sectario_estrellado.tres
+msgid "Sectario de la Sabiduría Estrellada"
+msgstr ""
+
 #: data/enemies/shantak.tres
 msgid "Shantak"
 msgstr ""
@@ -1969,6 +2017,10 @@ msgstr ""
 
 #: data/enemies/shoggoth_primigenio.tres
 msgid "El shoggoth primigenio"
+msgstr ""
+
+#: data/enemies/sombra_alada.tres
+msgid "Sombra del campanario"
 msgstr ""
 
 #: data/enemies/sonambulo.tres
@@ -2327,6 +2379,10 @@ msgstr ""
 msgid "R'lyeh, violeta"
 msgstr ""
 
+#: data/levels/noche_acecha.tres
+msgid "El Trapezoedro arde en el campanario. Algo despliega las alas…"
+msgstr ""
+
 #: data/levels/noche_color.tres
 msgid "Del pozo sube una luz que no es de este mundo…"
 msgstr ""
@@ -2588,6 +2644,10 @@ msgid "Desde Ulthar, el camino bajaba por el río Skai hasta Dylath-Leen, la ciu
 msgstr ""
 
 #: data/library/relatos.json
+msgid "Desde su ventana se veía la iglesia: una mole negra de piedra en lo alto de la colina, abandonada desde 1877, cuando se marchó la secta de la Sabiduría Estrellada. Los vecinos italianos no se acercan, y en las noches sin luz encienden velas en las ventanas que dan a ella."
+msgstr ""
+
+#: data/library/relatos.json
 msgid "Después vinieron los setecientos, hasta la Puerta del Sueño Profundo, y detrás, el bosque encantado."
 msgstr ""
 
@@ -2649,6 +2709,10 @@ msgstr ""
 
 #: data/library/relatos.json
 msgid "En Dunwich no se habla de los Whateley. El viejo encendía hogueras en Sentinel Hill la víspera de mayo y por Todos los Santos, y algo le contestaba desde debajo de la tierra."
+msgstr ""
+
+#: data/library/relatos.json
+msgid "En el campanario, Blake encontró el Trapezoedro Resplandeciente en su caja de metal, y al mirarlo despertó a lo que lo habita: algo que no soporta la luz. Mientras duraba la corriente, las farolas lo encerraban allí arriba."
 msgstr ""
 
 #: data/library/relatos.json
@@ -2729,6 +2793,10 @@ msgstr ""
 
 #: data/library/relatos.json
 msgid "He vuelto. Mi propia sangre me ha traído hasta aquí: mi bisabuela era una Marsh."
+msgstr ""
+
+#: data/library/relatos.json
+msgid "Henrietta Blake ha subido a Federal Hill con el diario de su hermano y un farol. Esta noche vuelve la tormenta. Cada vez que se apagan las farolas, algo se mueve en el campanario."
 msgstr ""
 
 #: data/library/relatos.json
@@ -2909,6 +2977,10 @@ msgstr ""
 
 #: data/library/relatos.json
 msgid "Pth'thya-l'yi, mi antepasada, lleva ochenta mil años esperándome."
+msgstr ""
+
+#: data/library/relatos.json
+msgid "Robert Blake murió en agosto de 1935, sentado junto a la ventana de su estudio en College Hill, mirando hacia Federal Hill. Tenía los ojos abiertos y una expresión de horror que el forense no supo explicar. La noche antes, una tormenta había dejado sin luz a media Providence."
 msgstr ""
 
 #: data/library/relatos.json
@@ -3445,6 +3517,10 @@ msgstr ""
 
 #: data/library/textos.json
 msgid "Estrella de cinco puntas con un ojo en llamas, tallada en piedra gris. Algunas cosas no se acercan a ella."
+msgstr ""
+
+#: data/library/textos.json
+msgid "Federal Hill, en Providence, una noche de tormenta de 1935: un barrio de casas de tablas sobre la colina y, en lo alto, la iglesia negra de la Sabiduría Estrellada con su campanario cuadrado y su aguja, tras una verja y un atrio de lápidas. Las farolas eléctricas de las calles son lo único que mantiene a raya lo que vive en el campanario, y la tormenta corta la corriente."
 msgstr ""
 
 #: data/library/textos.json
@@ -4652,8 +4728,20 @@ msgstr ""
 msgid "El color que cayó del cielo"
 msgstr ""
 
+#: data/nights.json data/pets/cuervo.tres
+msgid "El que acecha en la oscuridad"
+msgstr ""
+
+#: data/nights.json
+msgid "En el campanario de una iglesia abandonada de Federal Hill brilla el Trapezoedro Resplandeciente, y lo que llama no soporta la luz. Las farolas son tu escudo; pero la tormenta corta la corriente, los sectarios las apagan y, a oscuras, la cosa baja del campanario."
+msgstr ""
+
 #: data/nights.json
 msgid "En la buhardilla más alta de una calle que ya no sale en los mapas, un viejo mudo toca la viola cada noche, cada vez más deprisa. Su música aparta lo que viene de fuera y le hace daño; pero cuando se vuelve frenesí, también te hiere a ti. No dejes que pare."
+msgstr ""
+
+#: data/nights.json
+msgid "Federal Hill, en Providence (1935)"
 msgstr ""
 
 #: data/nights.json
@@ -4678,6 +4766,10 @@ msgstr ""
 
 #: data/nights.json
 msgid "Reses grises · Granjeros consumidos · El color que sube del pozo"
+msgstr ""
+
+#: data/nights.json
+msgid "Sectarios de la Sabiduría Estrellada · Sombras del campanario · El Morador de las Tinieblas"
 msgstr ""
 
 #: data/nights.json
@@ -5936,10 +6028,6 @@ msgstr ""
 msgid "Cuervo ladrón. Vuela a por las gemas lejanas y te las trae; de paso roba unas monedas, a quien sea"
 msgstr ""
 
-#: data/pets/cuervo.tres
-msgid "El que acecha en la oscuridad"
-msgstr ""
-
 #: data/pets/dhole.tres
 msgid "A través de las puertas de la llave de plata"
 msgstr ""
@@ -6473,6 +6561,10 @@ msgid "La música se ha vuelto frenesí: las ondas rojas también te quitan cord
 msgstr ""
 
 #: data/tutorial.json
+msgid "La tormenta ha cortado la corriente: a oscuras tu farol alumbra menos, pierdes cordura y las sombras se acercan. Aguanta hasta que vuelva la luz; el destello de un rayo también las espanta."
+msgstr ""
+
+#: data/tutorial.json
 msgid "La viola de Zann suena desde la buhardilla: cada compás baja por la calle, aparta a los enemigos y quema a lo que viene de fuera. Cuanto más cerca de la ventana, más fuerte."
 msgstr ""
 
@@ -6482,6 +6574,10 @@ msgstr ""
 
 #: data/tutorial.json
 msgid "Llevas un Signo Mayor: cambia una regla a tu favor durante toda la parte. Elegirás otro al empezar el tercer nivel; los logros abren más."
+msgstr ""
+
+#: data/tutorial.json
+msgid "Lo que vive en el campanario no soporta la luz: no entra en la de las farolas ni en la de tu farol, y se quema si lo alcanza. Quédate cerca de una farola encendida y no dejes que los sectarios las apaguen."
 msgstr ""
 
 #: data/tutorial.json
@@ -9116,6 +9212,10 @@ msgstr ""
 msgid "Tormenta sobre Sentinel Hill"
 msgstr ""
 
+#: data/weather/tormenta_providence.tres
+msgid "Tormenta sobre Federal Hill"
+msgstr ""
+
 #: data/weather/ventisca_ligera.tres
 msgid "Ventisca ligera"
 msgstr ""
@@ -10039,6 +10139,10 @@ msgstr ""
 msgid "Walls"
 msgstr ""
 
+#: scripts/level/blackout.gd
+msgid "La oscuridad"
+msgstr ""
+
 #: scripts/level/boss_rush.gd
 msgid "Desfile de jefes · %s"
 msgstr ""
@@ -10205,6 +10309,10 @@ msgstr ""
 
 #: scripts/level/level_data.gd
 msgid "Eventos intermedios"
+msgstr ""
+
+#: scripts/level/level_data.gd
+msgid "La luz de Federal Hill (hito 23.8)"
 msgstr ""
 
 #: scripts/level/level_data.gd

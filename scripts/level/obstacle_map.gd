@@ -232,8 +232,17 @@ func push_out(pos: Vector2, r: float) -> Vector2:
 	return Vector2(clampf(pos.x, b.position.x, b.end.x), clampf(pos.y, b.position.y, b.end.y))
 
 ## Con el mapa: sube por la pendiente de la distancia hasta estar a r de lo bloqueado.
+## Atajo (hito 23.6): casi siempre se está lejos de todo. Entre celdas vecinas la distancia cambia
+## como mucho una diagonal (y su redondeo), así que si la celda propia está a más de r + 1 m de lo
+## bloqueado, la distancia interpolada también pasa de r y la posición se queda como está: lo
+## mismo que daba el bucle, sin las cuatro lecturas de `distance`. Y la primera, una sola vez.
 func _push_mask(pos: Vector2, r: float) -> Vector2:
-	if distance(pos) <= 0.0: pos = _nearest_free(pos, r)     # dentro de algo: no hay pendiente, se busca
+	var ci := int(floor((pos.x - _origin.x) / _cell)); var cj := int(floor((pos.y - _origin.y) / _cell))
+	if ci > 0 and cj > 0 and ci < _n - 1 and cj < _n - 1 and _mask[(cj * _n + ci) * 3 + 2] * _dist_step >= r + 1.0:
+		return pos
+	var d0 := distance(pos)
+	if d0 >= r and d0 > 0.0: return pos
+	if d0 <= 0.0: pos = _nearest_free(pos, r)     # dentro de algo: no hay pendiente, se busca
 	for k in 4:
 		var d := distance(pos)
 		if d >= r: return pos

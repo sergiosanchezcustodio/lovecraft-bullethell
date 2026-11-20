@@ -315,6 +315,14 @@ msgstr "Clear the three standalone nights: the Gardner farm, Sentinel Hill and t
 msgid "Tres noches sueltas"
 msgstr "Three standalone nights"
 
+#: data/achievements/39_sombras_quemadas.tres
+msgid "Deja que la luz queme a 40 sombras del campanario en Federal Hill."
+msgstr "Let the light burn 40 shadows of the steeple on Federal Hill."
+
+#: data/achievements/39_sombras_quemadas.tres
+msgid "Hágase la luz"
+msgstr "Let There Be Light"
+
 #: data/arenas/arrecife.json data/campaign.json data/levels/p2_n5.tres
 msgid "El Arrecife del Diablo y Y'ha-nthlei"
 msgstr "Devil Reef and Y'ha-nthlei"
@@ -354,6 +362,10 @@ msgstr "The port of Dylath-Leen"
 #: data/arenas/estudio.json data/campaign.json data/levels/p3_n1.tres
 msgid "Providence: el estudio del escultor Wilcox"
 msgstr "Providence: the sculptor Wilcox's studio"
+
+#: data/arenas/federal.json data/levels/noche_acecha.tres
+msgid "Federal Hill"
+msgstr "Federal Hill"
 
 #: data/arenas/granja.json data/levels/noche_color.tres
 msgid "La granja de los Gardner"
@@ -740,6 +752,10 @@ msgid "Casi a oscuras, y tu farol apenas alumbra."
 msgstr "Almost in darkness, and your lantern barely shines."
 
 #: data/challenges.json
+msgid "Corriente cortada"
+msgstr "Power Cut"
+
+#: data/challenges.json
 msgid "Cubierta maldita"
 msgstr "Cursed deck"
 
@@ -770,6 +786,10 @@ msgstr "Sanity doesn't come back by itself and creatures are 20 % tougher."
 #: data/challenges.json
 msgid "La fe de la Orden"
 msgstr "The faith of the Order"
+
+#: data/challenges.json
+msgid "La tormenta corta la luz el doble de a menudo y las criaturas aguantan un 15 % más."
+msgstr "The storm cuts the power twice as often and creatures are 15% tougher."
 
 #: data/challenges.json
 msgid "La viola empieza ya deprisa y el frenesí llega mucho antes. Las criaturas aguantan un 15 % más."
@@ -1799,6 +1819,30 @@ msgstr "Larva of the Other Gods"
 msgid "Mercader de Leng"
 msgstr "Merchant of Leng"
 
+#: data/enemies/morador_tinieblas.tres scripts/enemies/haunter_behavior.gd
+msgid "La cosa se deshace en la luz."
+msgstr "The thing comes apart in the light."
+
+#: data/enemies/morador_tinieblas.tres
+msgid "La tormenta está de su parte"
+msgstr "The storm is on its side"
+
+#: data/enemies/morador_tinieblas.tres
+msgid "Las farolas no lo detendrán mucho más"
+msgstr "The streetlamps won't hold it much longer"
+
+#: data/enemies/morador_tinieblas.tres
+msgid "Morador de las Tinieblas"
+msgstr "Haunter of the Dark"
+
+#: data/enemies/morador_tinieblas.tres scripts/enemies/haunter_behavior.gd
+msgid "Revienta una farola…"
+msgstr "It bursts a streetlamp…"
+
+#: data/enemies/morador_tinieblas.tres scripts/enemies/haunter_behavior.gd
+msgid "Se va la luz en toda la colina…"
+msgstr "The power fails across the whole hill…"
+
 #: data/enemies/nadador.tres
 msgid "Nadador de la marea"
 msgstr "Tide swimmer"
@@ -1943,6 +1987,10 @@ msgstr ""
 msgid "El sumo sacerdote que no debe describirse"
 msgstr "The high priest not to be described"
 
+#: data/enemies/sectario_estrellado.tres
+msgid "Sectario de la Sabiduría Estrellada"
+msgstr "Starry Wisdom Cultist"
+
 #: data/enemies/shantak.tres
 msgid "Shantak"
 msgstr "Shantak"
@@ -1970,6 +2018,10 @@ msgstr "Glowing-eyed shoggoth"
 #: data/enemies/shoggoth_primigenio.tres
 msgid "El shoggoth primigenio"
 msgstr "The primordial shoggoth"
+
+#: data/enemies/sombra_alada.tres
+msgid "Sombra del campanario"
+msgstr "Shadow of the Steeple"
 
 #: data/enemies/sonambulo.tres
 msgid "Sonámbulo de Providence"
@@ -2327,6 +2379,10 @@ msgstr "Innsmouth, murky green"
 msgid "R'lyeh, violeta"
 msgstr "R'lyeh, violet"
 
+#: data/levels/noche_acecha.tres
+msgid "El Trapezoedro arde en el campanario. Algo despliega las alas…"
+msgstr "The Trapezohedron blazes in the steeple. Something spreads its wings…"
+
 #: data/levels/noche_color.tres
 msgid "Del pozo sube una luz que no es de este mundo…"
 msgstr "A light not of this world rises from the well…"
@@ -2588,6 +2644,10 @@ msgid "Desde Ulthar, el camino bajaba por el río Skai hasta Dylath-Leen, la ciu
 msgstr "From Ulthar, the road ran down the river Skai to Dylath-Leen, the city of basalt towers."
 
 #: data/library/relatos.json
+msgid "Desde su ventana se veía la iglesia: una mole negra de piedra en lo alto de la colina, abandonada desde 1877, cuando se marchó la secta de la Sabiduría Estrellada. Los vecinos italianos no se acercan, y en las noches sin luz encienden velas en las ventanas que dan a ella."
+msgstr "From his window he could see the church: a black stone mass at the top of the hill, abandoned since 1877, when the Starry Wisdom sect left. The Italian neighbours keep away from it, and on nights without power they light candles in the windows that face it."
+
+#: data/library/relatos.json
 msgid "Después vinieron los setecientos, hasta la Puerta del Sueño Profundo, y detrás, el bosque encantado."
 msgstr "Then came the seven hundred, down to the Gate of Deeper Slumber, and beyond it, the enchanted wood."
 
@@ -2650,6 +2710,10 @@ msgstr "In Celephaïs, Kuranes had advised him not to seek Kadath: that each man
 #: data/library/relatos.json
 msgid "En Dunwich no se habla de los Whateley. El viejo encendía hogueras en Sentinel Hill la víspera de mayo y por Todos los Santos, y algo le contestaba desde debajo de la tierra."
 msgstr "In Dunwich, nobody talks about the Whateleys. The old man lit bonfires on Sentinel Hill on May Eve and at Hallowmass, and something answered him from under the ground."
+
+#: data/library/relatos.json
+msgid "En el campanario, Blake encontró el Trapezoedro Resplandeciente en su caja de metal, y al mirarlo despertó a lo que lo habita: algo que no soporta la luz. Mientras duraba la corriente, las farolas lo encerraban allí arriba."
+msgstr "In the steeple, Blake found the Shining Trapezohedron in its metal box, and by looking into it he woke what dwells there: something that cannot bear the light. While the power lasted, the streetlamps kept it shut up there."
 
 #: data/library/relatos.json
 msgid "En el centro hay un monasterio sin ventanas, y dentro, un sumo sacerdote con una máscara de seda amarilla."
@@ -2730,6 +2794,10 @@ msgstr "I have searched every map of Paris and cannot find the Rue d'Auseil. And
 #: data/library/relatos.json
 msgid "He vuelto. Mi propia sangre me ha traído hasta aquí: mi bisabuela era una Marsh."
 msgstr "I have come back. My own blood has brought me here: my great-grandmother was a Marsh."
+
+#: data/library/relatos.json
+msgid "Henrietta Blake ha subido a Federal Hill con el diario de su hermano y un farol. Esta noche vuelve la tormenta. Cada vez que se apagan las farolas, algo se mueve en el campanario."
+msgstr "Henrietta Blake has climbed Federal Hill with her brother's diary and a lantern. Tonight the storm returns. Every time the streetlamps go out, something stirs in the steeple."
 
 #: data/library/relatos.json
 msgid "Innsmouth se cae a pedazos: casas georgianas hundidas, ventanas tapiadas, el puerto lleno de barcas podridas."
@@ -2910,6 +2978,10 @@ msgstr "Providence, March 1925. The sculptor Wilcox brought my uncle a clay bas-
 #: data/library/relatos.json
 msgid "Pth'thya-l'yi, mi antepasada, lleva ochenta mil años esperándome."
 msgstr "Pth'thya-l'yi, my ancestor, has been waiting for me for eighty thousand years."
+
+#: data/library/relatos.json
+msgid "Robert Blake murió en agosto de 1935, sentado junto a la ventana de su estudio en College Hill, mirando hacia Federal Hill. Tenía los ojos abiertos y una expresión de horror que el forense no supo explicar. La noche antes, una tormenta había dejado sin luz a media Providence."
+msgstr "Robert Blake died in August 1935, sitting at the window of his study on College Hill, looking towards Federal Hill. His eyes were open, and his face wore a look of horror the coroner could not explain. The night before, a storm had blacked out half of Providence."
 
 #: data/library/relatos.json
 msgid "Salto por la ventana a los tejados."
@@ -3446,6 +3518,10 @@ msgstr "Short skis that Pabodie made for the expedition. With them you can link 
 #: data/library/textos.json
 msgid "Estrella de cinco puntas con un ojo en llamas, tallada en piedra gris. Algunas cosas no se acercan a ella."
 msgstr "A five-pointed star with a flaming eye, carved in grey stone. Some things will not come near it."
+
+#: data/library/textos.json
+msgid "Federal Hill, en Providence, una noche de tormenta de 1935: un barrio de casas de tablas sobre la colina y, en lo alto, la iglesia negra de la Sabiduría Estrellada con su campanario cuadrado y su aguja, tras una verja y un atrio de lápidas. Las farolas eléctricas de las calles son lo único que mantiene a raya lo que vive en el campanario, y la tormenta corta la corriente."
+msgstr "Federal Hill, in Providence, on a stormy night in 1935: a neighbourhood of clapboard houses on the hill and, at the top, the black church of the Starry Wisdom with its square tower and spire, behind a railing and a yard of gravestones. The electric streetlamps are all that keeps what lives in the steeple at bay, and the storm cuts the power."
 
 #: data/library/textos.json
 msgid "Flores de adormidera de los campos de Ooth-Nargai, que no se marchitan. Basta su olor para que el paso se haga lento y pesado, como el de los sueños en que se corre sin avanzar."
@@ -4685,9 +4761,21 @@ msgstr "Whippoorwills · Devotees of the hills · Wilbur's brother"
 msgid "El color que cayó del cielo"
 msgstr "The Colour Out of Space"
 
+#: data/nights.json data/pets/cuervo.tres
+msgid "El que acecha en la oscuridad"
+msgstr "The Haunter of the Dark"
+
+#: data/nights.json
+msgid "En el campanario de una iglesia abandonada de Federal Hill brilla el Trapezoedro Resplandeciente, y lo que llama no soporta la luz. Las farolas son tu escudo; pero la tormenta corta la corriente, los sectarios las apagan y, a oscuras, la cosa baja del campanario."
+msgstr "In the steeple of an abandoned church on Federal Hill gleams the Shining Trapezohedron, and what it calls cannot bear the light. The streetlamps are your shield; but the storm cuts the power, the cultists put them out and, in the dark, the thing comes down from the steeple."
+
 #: data/nights.json
 msgid "En la buhardilla más alta de una calle que ya no sale en los mapas, un viejo mudo toca la viola cada noche, cada vez más deprisa. Su música aparta lo que viene de fuera y le hace daño; pero cuando se vuelve frenesí, también te hiere a ti. No dejes que pare."
 msgstr "In the highest garret of a street that is no longer on any map, a mute old man plays the viol every night, faster and faster. His music drives back what comes from outside and hurts it; but when it turns to frenzy, it hurts you too. Don't let it stop."
+
+#: data/nights.json
+msgid "Federal Hill, en Providence (1935)"
+msgstr "Federal Hill, Providence (1935)"
 
 #: data/nights.json
 msgid "La granja de los Gardner, al oeste de Arkham"
@@ -4712,6 +4800,10 @@ msgstr "Possessed by the Great Race · Flying polyps · The ancient polyp"
 #: data/nights.json
 msgid "Reses grises · Granjeros consumidos · El color que sube del pozo"
 msgstr "Grey cattle · Withered farmers · The colour rising from the well"
+
+#: data/nights.json
+msgid "Sectarios de la Sabiduría Estrellada · Sombras del campanario · El Morador de las Tinieblas"
+msgstr "Starry Wisdom cultists · Shadows of the steeple · The Haunter of the Dark"
 
 #: data/nights.json
 msgid "Sentinel Hill, sobre Dunwich"
@@ -5969,10 +6061,6 @@ msgstr "Arkham raven"
 msgid "Cuervo ladrón. Vuela a por las gemas lejanas y te las trae; de paso roba unas monedas, a quien sea"
 msgstr "A thieving raven. It flies off for distant gems and brings them to you; on the way it steals a few coins, from whoever"
 
-#: data/pets/cuervo.tres
-msgid "El que acecha en la oscuridad"
-msgstr "The Haunter of the Dark"
-
 #: data/pets/dhole.tres
 msgid "A través de las puertas de la llave de plata"
 msgstr "Through the Gates of the Silver Key"
@@ -6506,6 +6594,10 @@ msgid "La música se ha vuelto frenesí: las ondas rojas también te quitan cord
 msgstr "The music has turned to frenzy: the red waves drain your sanity too. Get away from the window or dodge through them."
 
 #: data/tutorial.json
+msgid "La tormenta ha cortado la corriente: a oscuras tu farol alumbra menos, pierdes cordura y las sombras se acercan. Aguanta hasta que vuelva la luz; el destello de un rayo también las espanta."
+msgstr "The storm has cut the power: in the dark your lantern shines less, you lose sanity and the shadows close in. Hold on until the light returns; a lightning flash also scares them off."
+
+#: data/tutorial.json
 msgid "La viola de Zann suena desde la buhardilla: cada compás baja por la calle, aparta a los enemigos y quema a lo que viene de fuera. Cuanto más cerca de la ventana, más fuerte."
 msgstr "Zann's viol plays from the garret: each beat rolls down the street, pushes enemies back and burns what comes from outside. The closer to the window, the stronger."
 
@@ -6516,6 +6608,10 @@ msgstr "Creatures drop experience gems: walk over them to collect them and level
 #: data/tutorial.json
 msgid "Llevas un Signo Mayor: cambia una regla a tu favor durante toda la parte. Elegirás otro al empezar el tercer nivel; los logros abren más."
 msgstr "You carry an Elder Sign: it bends one rule in your favour for the whole part. You'll pick another when the third level starts; achievements unlock more."
+
+#: data/tutorial.json
+msgid "Lo que vive en el campanario no soporta la luz: no entra en la de las farolas ni en la de tu farol, y se quema si lo alcanza. Quédate cerca de una farola encendida y no dejes que los sectarios las apaguen."
+msgstr "What lives in the steeple cannot bear the light: it won't enter the light of the streetlamps or your lantern, and it burns if the light reaches it. Stay near a lit streetlamp and don't let the cultists put them out."
 
 #: data/tutorial.json
 msgid "Los pólipos casi no se ven: escucha su silbido y busca su remolino de arena. Cuando silban más fuerte, van a embestir."
@@ -9149,6 +9245,10 @@ msgstr "Storm"
 msgid "Tormenta sobre Sentinel Hill"
 msgstr "Storm over Sentinel Hill"
 
+#: data/weather/tormenta_providence.tres
+msgid "Tormenta sobre Federal Hill"
+msgstr "Storm over Federal Hill"
+
 #: data/weather/ventisca_ligera.tres
 msgid "Ventisca ligera"
 msgstr "Light blizzard"
@@ -10079,6 +10179,10 @@ msgstr "Smoke"
 msgid "Walls"
 msgstr "Walls"
 
+#: scripts/level/blackout.gd
+msgid "La oscuridad"
+msgstr "The darkness"
+
 #: scripts/level/boss_rush.gd
 msgid "Desfile de jefes · %s"
 msgstr "Boss parade · %s"
@@ -10246,6 +10350,10 @@ msgstr "Final event"
 #: scripts/level/level_data.gd
 msgid "Eventos intermedios"
 msgstr "Intermediate events"
+
+#: scripts/level/level_data.gd
+msgid "La luz de Federal Hill (hito 23.8)"
+msgstr "The light of Federal Hill (milestone 23.8)"
 
 #: scripts/level/level_data.gd
 msgid "La viola de Zann (hito 22.6)"

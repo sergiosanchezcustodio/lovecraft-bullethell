@@ -143,6 +143,22 @@ static var wounds_force := -1.0             ## wounds=0.7: grietas fijas a ese n
 static var _wound_mat: ShaderMaterial
 static var _elite_glow := {}                ## material de luz -> su copia más brillante
 static var _wounded := {}                   ## material del modelo -> su copia con las grietas (una para todos)
+
+## Multiplicadores que valen igual para todos los enemigos en un paso de física (hito 23.6): la
+## dificultad, los pactos y las flautas de Kadath se miraban en cada enemigo, con cadenas y
+## diccionarios por medio; ahora, una vez por paso.
+static var _mul_frame := -1
+static var _mul_melee := 1.0
+static var _mul_shooter := 1.0
+static var _mul_attack := 1.0
+static func _frame_mults() -> void:
+	var f := Engine.get_physics_frames()
+	if f == _mul_frame: return
+	_mul_frame = f
+	var common := Pacts.value("enemy_speed") * DreamLands.haste()
+	_mul_melee = Difficulty.melee_speed() * common
+	_mul_shooter = Difficulty.shooter_speed() * common
+	_mul_attack = Difficulty.attack()
 var _wound_meshes: Array = []
 var _look := 0.0                            ## jefes vivos (hito 12.8): giro de la cabeza hacia el jugador más cercano
 var _blink_at := 3.0                        ## s de _spawn_t en que parpadea
@@ -1046,7 +1062,8 @@ func _physics_process(delta: float) -> void:
 	if (_far or world.enemies.size() > CROWD) and (Engine.get_physics_frames() + get_instance_id()) % 2 == 1:
 		velocity = _ai_vel
 	else:
-		velocity = behavior.update(self, target, delta) * pace_mult 			* (Difficulty.melee_speed() if data.attack == null else Difficulty.shooter_speed()) * Pacts.value("enemy_speed") * NightEvents.speed_of(data) * DreamLands.haste()   # en vivo (D-42; Furia del abismo, hito 13.6; sucesos, 21.4; flautas de Kadath, 21.10)
+		_frame_mults()
+		velocity = behavior.update(self, target, delta) * pace_mult 			* (_mul_melee if data.attack == null else _mul_shooter) * NightEvents.speed_of(data)   # en vivo (D-42; Furia del abismo, hito 13.6; sucesos, 21.4; flautas de Kadath, 21.10)
 		_ai_vel = velocity
 	if Engine.get_physics_frames() % 15 == get_instance_id() % 15: _far = _far_from_players()
 	if _slow_t > 0.0: velocity *= _slow_k
@@ -1119,7 +1136,8 @@ func _physics_process(delta: float) -> void:
 			p.take_damage(cd.scaled(_weak_k) if _weak_t > 0.0 else cd)
 	# Ataque a distancia
 	if data.attack != null and target != null and _stun <= 0.0 and _confuse_t <= 0.0 and _madden_t <= 0.0 and behavior.can_shoot(self):
-		_attack_timer -= delta * Difficulty.attack()                 # agresividad (D-42)
+		_frame_mults()
+		_attack_timer -= delta * _mul_attack                         # agresividad (D-42)
 		if _attack_timer <= 0.0 and not runner.busy and target.global_position.distance_to(global_position) < data.attack_range:
 			runner.fire(data.attack, func() -> Vector3: return target.global_position if is_instance_valid(target) else global_position)
 			if data.attack_anim != "": behavior.play_attack_anim(self, data.attack_anim)

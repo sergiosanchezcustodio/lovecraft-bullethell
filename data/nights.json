@@ -32,6 +32,14 @@
 			"criaturas": "Vecinos de la rue d'Auseil · Jirones de la noche · Lo que hay tras la ventana",
 			"texto": "En la buhardilla más alta de una calle que ya no sale en los mapas, un viejo mudo toca la viola cada noche, cada vez más deprisa. Su música aparta lo que viene de fuera y le hace daño; pero cuando se vuelve frenesí, también te hiere a ti. No dejes que pare.",
 			"abre": "p4_n5"
+		},
+		{
+			"id": "noche_acecha",
+			"titulo": "El que acecha en la oscuridad",
+			"lugar": "Federal Hill, en Providence (1935)",
+			"criaturas": "Sectarios de la Sabiduría Estrellada · Sombras del campanario · El Morador de las Tinieblas",
+			"texto": "En el campanario de una iglesia abandonada de Federal Hill brilla el Trapezoedro Resplandeciente, y lo que llama no soporta la luz. Las farolas son tu escudo; pero la tormenta corta la corriente, los sectarios las apagan y, a oscuras, la cosa baja del campanario.",
+			"abre": "p4_n5"
 		}
 	]
 }

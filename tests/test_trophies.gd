@@ -4,9 +4,9 @@ extends GutTest
 func test_jefes_en_orden_de_campana() -> void:
 	var b := Trophies.bosses()
 	var ids := b.map(func(e: EnemyData) -> String: return String(e.id))
-	assert_eq(ids.size(), 28, "con la madre de las arañas, el gran gug y Nyarlathotep (21.12), los tres de las noches (22.3) y el de Zann (22.6)")
-	assert_eq(ids[ids.size() - 5], "nyarlathotep", "el último de la campaña")
-	assert_eq(ids[ids.size() - 1], "tras_ventana", "y al final, los de las noches")
+	assert_eq(ids.size(), 29, "con la madre de las arañas, el gran gug y Nyarlathotep (21.12), los tres de las noches (22.3), el de Zann (22.6) y el Morador (23.8)")
+	assert_eq(ids[ids.size() - 6], "nyarlathotep", "el último de la campaña")
+	assert_eq(ids[ids.size() - 1], "morador_tinieblas", "y al final, los de las noches")
 	assert_eq(ids[0], "antiguo_despierto", "el primero del 1.2")
 	assert_true(ids.find("gedney") < ids.find("obed_marsh"))
 	assert_has(ids, "cthulhu")

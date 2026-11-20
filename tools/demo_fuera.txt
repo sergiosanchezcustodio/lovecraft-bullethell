@@ -16,6 +16,8 @@ data/arenas/dylath.json
 data/arenas/dylath_mapa.bin
 data/arenas/estudio.json
 data/arenas/estudio_mapa.bin
+data/arenas/federal.json
+data/arenas/federal_mapa.bin
 data/arenas/granja.json
 data/arenas/granja_mapa.bin
 data/arenas/kadath.json
@@ -83,6 +85,8 @@ models/dun_menhir_3.json.z
 models/dun_roble.json.z
 models/dun_roca.json.z
 models/emanacion.json.z
+models/fed_iglesia.json.z
+models/fed_verja.json.z
 models/ghast.json.z
 models/granja_abrevadero.json.z
 models/granja_cerca.json.z
@@ -123,6 +127,7 @@ models/lui_cipres_2.json.z
 models/lui_hoguera.json.z
 models/lui_monolito.json.z
 models/mercader_leng.json.z
+models/morador_tinieblas.json.z
 models/nadador.json.z
 models/nyarla_forma.json.z
 models/obed_marsh.json.z
@@ -169,7 +174,9 @@ models/rly_escalera.json.z
 models/rly_puerta.json.z
 models/sacerdote.json.z
 models/sacerdote_leng.json.z
+models/sectario_estrellado.json.z
 models/shantak.json.z
+models/sombra_alada.json.z
 models/sonambulo.json.z
 models/sue_almacen.json.z
 models/sue_anforas.json.z
@@ -1750,6 +1757,7 @@ resources/Music/cc0/p3_n5_the_9th_circle.ogg
 resources/finales/p2.jpg
 resources/finales/p3.jpg
 resources/finales/p4.jpg
+resources/maps/noche_acecha.png
 resources/maps/noche_color.png
 resources/maps/noche_dunwich.png
 resources/maps/noche_pnakotus.png

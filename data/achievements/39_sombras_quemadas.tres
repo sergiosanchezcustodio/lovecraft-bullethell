@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AchievementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/achievement_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sombras_quemadas"
+display_name = "Hágase la luz"
+description = "Deja que la luz queme a 40 sombras del campanario en Federal Hill."
+order = 39
+stat = "shadows_burned"
+target = 40
+reward_money = 400
+icon_model = "sombra_alada"
+icon_mode = "full"

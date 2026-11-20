@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/level_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/sectario_estrellado.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/sombra_alada.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/morador_tinieblas.tres" id="4"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+[ext_resource type="Resource" path="res://data/weather/tormenta_providence.tres" id="weather"]
+
+[resource]
+script = ExtResource("1")
+weather = ExtResource("weather")
+id = &"noche_acecha"
+display_name = "Federal Hill"
+part = 4
+number = 5
+arena = "res://data/arenas/federal.json"
+health_mult = 1.7
+duration = 300.0
+music = "res://resources/Music/cc0/p2_n1_unsolved_investigation.ogg"
+boss_music = "res://resources/Music/cc0/jefe_heavy_battle.ogg"
+pool = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3")])
+spawn_rate = Array[Vector2]([Vector2(0, 0.48), Vector2(45, 0.78), Vector2(90, 1.12), Vector2(150, 1.7), Vector2(210, 2.25), Vector2(300, 2.7)])
+max_alive = 90
+elite_cap = 1
+final_time = 240.0
+final_enemy = ExtResource("4")
+final_wave = 14
+final_spawn_scale = 0.35
+final_text = "El Trapezoedro arde en el campanario. Algo despliega las alas…"
+money_bonus = 150
+blackout_on = 22.0
+blackout_on_end = 13.0
+blackout_on_boss = 11.0
+blackout_off = 5.0
+blackout_off_end = 8.0
+blackout_lamp_r = 4.5

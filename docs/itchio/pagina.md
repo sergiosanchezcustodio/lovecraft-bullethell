@@ -40,7 +40,7 @@ In the Library of Miskatonic University, a handful of investigators have begun t
 - *The Call of Cthulhu*: Wilcox's studio, the ritual in the Louisiana swamps, the docks of the *Alert*, the storm on the Pacific… and R'lyeh.
 - *The Dream-Quest of Unknown Kadath*: the enchanted wood and the cats of Ulthar, the black galleys of Dylath-Leen, the plateau of Leng, the vaults of Zin and the onyx castle of Kadath, where Nyarlathotep takes three shapes.
 
-**And four standalone nights**, outside the campaign: *The Colour Out of Space*, *The Dunwich Horror*, *The Shadow Out of Time* and *The Music of Erich Zann*, each with its own rules.
+**And five standalone nights**, outside the campaign: *The Colour Out of Space*, *The Dunwich Horror*, *The Shadow Out of Time*, *The Music of Erich Zann* and *The Haunter of the Dark*, each with its own rules.
 
 **Features**
 - 21 investigators, each with their own weapon, dodge and trait: Dyer, Armitage, Herbert West, Pickman, Kuranes, Edward Derby (and Asenath)… and two secret ones.
@@ -93,7 +93,7 @@ En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores ha
 - *La llamada de Cthulhu*: el estudio de Wilcox, el ritual en los pantanos de Luisiana, los muelles del *Alert*, la tormenta en el Pacífico… y R'lyeh.
 - *La búsqueda onírica de la desconocida Kadath*: el bosque encantado y los gatos de Ulthar, las galeras negras de Dylath-Leen, la meseta de Leng, las bóvedas de Zin y el castillo de ónice de Kadath, donde Nyarlathotep toma tres formas.
 
-**Y cuatro noches sueltas**, fuera de la campaña: *El color que cayó del cielo*, *El horror de Dunwich*, *La sombra fuera del tiempo* y *La música de Erich Zann*, cada una con sus propias reglas.
+**Y cinco noches sueltas**, fuera de la campaña: *El color que cayó del cielo*, *El horror de Dunwich*, *La sombra fuera del tiempo*, *La música de Erich Zann* y *El que acecha en la oscuridad*, cada una con sus propias reglas.
 
 **Características**
 - 21 investigadores, cada uno con su arma, su esquive y su rasgo: Dyer, Armitage, Herbert West, Pickman, Kuranes, Edward Derby (y Asenath)… y dos secretos.
@@ -113,7 +113,7 @@ En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores ha
 - **Sistema:** Windows 10 u 11 de 64 bits, o macOS 11 o posterior (Apple Silicon o Intel). La build de macOS no lleva la firma de Apple: la primera vez, clic derecho → Abrir.
 - **Gráfica:** compatible con Vulkan, con 2 GB de memoria de vídeo en calidad Baja (4 GB en Alta).
 - **Memoria:** 4 GB de RAM (8 GB recomendados). El juego usa como mucho 1,1 GB.
-- **Procesador:** de 4 núcleos y de los últimos diez años. Con 80 criaturas o más en pantalla, el juego tira más del procesador que de la gráfica.
+- **Procesador:** de 4 núcleos y de los últimos diez años. Con 80 criaturas o más en pantalla, el juego tira más del procesador que de la gráfica, y más de la velocidad de cada núcleo que de cuántos tenga.
 - **Espacio:** 1 GB (la descarga, unos 410 MB).
 - **Controles:** mando recomendado (de Xbox, PlayStation o parecido); también teclado. En cooperativo local, un mando por cada jugador de más.
 - La primera vez tarda unos segundos más en arrancar, mientras prepara los modelos.
@@ -147,6 +147,7 @@ Build de Windows de la versión 0.9.0 (`sh tools/exportar.sh`), en 1920 × 1080,
 - En Baja, la RAM sale algo más alta: la gráfica tira de memoria compartida. Lo mismo en una gráfica con poca memoria propia o integrada.
 - **Tamaño:** el `.exe` ocupa 520 MB (en octubre, 248; desde entonces han entrado la parte 4, las noches, los retratos, los finales y la música). Comprimido, unos 410 MB, que es lo que bajará quien lo descargue con la app de itch.io o desde la página. La demo pesa lo mismo: lleva todo y el resto se cierra por la etiqueta `demo`.
 - **Rendimiento** (hito 22.2, Alta, PC libre, 80 enemigos): de 8,5 a 9,7 ms por fotograma de media (más de 100 fps) y unos 20 ms en el 1 % peor. El dibujo se queda en 3-7 ms y el resto es la lógica (CPU); de ahí, el procesador de 4 núcleos y la gráfica modesta.
+- **Con 4 núcleos (hito 23.7, 19-11-2026):** en Baja a 1280 × 800, limitando el juego a cuatro núcleos (`tools/afinidad.py`), el 1 % peor queda en 19-23 ms (también en cooperativo de cuatro), igual que con los 16: el número de núcleos no es lo que limita. Detalle en `docs/ESTADO.md`.
 - **Lo que no se ha medido:** el juego no se ha probado en una gráfica más débil que esta ni en un Mac. Los mínimos de gráfica y procesador son una estimación a partir de esas cifras. Si alguien juega con menos, sus datos (Opciones → Vídeo → rendimiento detallado) dirán si hay que cambiarlos.
 
 ## Subida con butler

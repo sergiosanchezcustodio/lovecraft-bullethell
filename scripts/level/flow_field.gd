@@ -54,6 +54,7 @@ var _queue := PackedInt32Array()
 func rebuild(targets: Array[Vector2]) -> void:
 	_dist.fill(INF_D)
 	built = true
+	_gen += 1                                   # las direcciones guardadas ya no valen
 	if _queue.size() != w * h: _queue.resize(w * h)
 	var tail := 0
 	for t in targets:
@@ -81,9 +82,29 @@ func rebuild(targets: Array[Vector2]) -> void:
 			_dist[k - w] = nd; _queue[tail] = k - w; tail += 1
 
 ## Dirección (en el plano) hacia el jugador por el camino libre; ZERO si no hay camino.
+## La celda vecina a la que bajar solo cambia al rehacer las distancias: se guarda por celda
+## hasta la pasada siguiente (hito 23.6: era la mitad de lo que costaba ir hacia el jugador).
+var _gen := 1                            ## pasada de las distancias (sube en cada `rebuild`)
+var _best := PackedInt32Array()          ## celda vecina a la que bajar (-1: ninguna)
+var _best_gen := PackedInt32Array()      ## en qué pasada se calculó
 func direction(from: Vector2) -> Vector2:
-	var c := cell_of(from)
-	if not _inside(c): return Vector2.ZERO
+	var ci := int(floor((from.x - origin.x) / CELL))
+	var cj := int(floor((from.y - origin.y) / CELL))
+	if ci < 0 or cj < 0 or ci >= w or cj >= h: return Vector2.ZERO
+	var k := cj * w + ci
+	if _best.size() != w * h:
+		_best.resize(w * h)
+		_best_gen.resize(w * h)
+		_best_gen.fill(0)
+	if _best_gen[k] != _gen:
+		_best_gen[k] = _gen
+		_best[k] = _best_from(Vector2i(ci, cj))
+	var b := _best[k]
+	if b < 0: return Vector2.ZERO
+	return (center(b % w, b / w) - from).normalized()
+
+## La celda vecina con menos distancia (en diagonal, +0,414), o -1 si ninguna mejora la propia.
+func _best_from(c: Vector2i) -> int:
 	var best := _dist[c.y * w + c.x] if _free[c.y * w + c.x] == 1 else INF_D
 	var best_c := c
 	for dv: Vector2i in DIRS:
@@ -95,8 +116,7 @@ func direction(from: Vector2) -> Vector2:
 		if cost < best:
 			best = cost
 			best_c = n
-	if best_c == c: return Vector2.ZERO
-	return (center(best_c.x, best_c.y) - from).normalized()
+	return -1 if best_c == c else best_c.y * w + best_c.x
 
 ## Distancia andando hasta el jugador más cercano (INF_D si desde ahí no se llega).
 func distance_at(p: Vector2) -> float:

@@ -385,7 +385,7 @@ func _sanity_context() -> void:
 	var k := 1.0
 	var here := global_position
 	for l in lights:
-		if is_instance_valid(l) and Vector2(l.global_position.x - here.x, l.global_position.z - here.z).length() <= rules.light_radius:
+		if is_instance_valid(l) and l.visible and Vector2(l.global_position.x - here.x, l.global_position.z - here.z).length() <= rules.light_radius:
 			k *= rules.regen_near_light
 			break
 	if float(shop.get("lantern", 0.0)) > 0.0: k *= LANTERN_SANITY         # Linterna de queroseno (tienda)

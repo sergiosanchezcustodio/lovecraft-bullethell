@@ -470,6 +470,10 @@ func _ready() -> void:
 			polyps = PolypWinds.new().setup(world, level, not is_guest(), self)
 			add_child(polyps)
 			if args.has("trap_here"): _trap_here.call_deferred(args.get_float("trap_here", 1.0))
+		if level.blackout_on > 0.0:                          # la luz de Federal Hill (23.8)
+			blackout = Blackout.new().setup(world, level, not is_guest(), self, arena)
+			add_child(blackout)
+			if args.has("cut_here"): blackout._t = args.get_float("cut_here", 2.0)   # pruebas: apagón a los t s
 		if level.viola_period > 0.0:                         # la viola de Erich Zann (22.6)
 			zann = ZannViola.new().setup(world, level, not is_guest(), self)
 			add_child(zann)
@@ -1676,6 +1680,7 @@ func _powder_here(every: float) -> void:
 		await get_tree().create_timer(maxf(every, 0.5), false).timeout
 
 var polyps: PolypWinds                           ## las trampillas de la Gran Raza y los pólipos (21.15)
+var blackout: Blackout                          ## la luz de Federal Hill (23.8)
 var zann: ZannViola                              ## la viola de Erich Zann (22.6)
 var dream: DreamLands                            ## lo propio de cada nivel de la parte 4 (21.10)
 func _level_polyps() -> bool:

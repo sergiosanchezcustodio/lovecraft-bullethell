@@ -121,6 +121,20 @@ func is_survival() -> bool:
 @export var viola_hurt := 7.0                  ## daño a lo que viene de fuera
 @export var viola_frenzy := 0.8                ## s: con compases más cortos, frenesí
 @export var viola_sanity := 1.5                ## cordura que quita la onda en frenesí
+@export_group("La luz de Federal Hill (hito 23.8)")
+## Las farolas eléctricas (`blackout_lamp`, el modelo) son el escudo contra lo de la oscuridad (Blackout).
+## La tormenta corta la corriente cada `blackout_on` s (hasta `blackout_on_end` al evento final y
+## `blackout_on_boss` con el jefe suelto) durante `blackout_off` s (hasta `blackout_off_end`); a oscuras,
+## los faroles de los jugadores alumbran `blackout_lantern` y se pierde `blackout_sanity` de cordura por s.
+@export var blackout_on := 0.0                 ## s con corriente al empezar (0: sin apagones)
+@export var blackout_on_end := 12.0
+@export var blackout_on_boss := 10.0
+@export var blackout_off := 5.0                ## s a oscuras al empezar
+@export var blackout_off_end := 8.0
+@export var blackout_lamp := "fed_farola"      ## el modelo de las farolas
+@export var blackout_lamp_r := 4.0             ## m que alumbra cada una
+@export var blackout_lantern := 0.55           ## lo que alumbra el farol de un jugador a oscuras
+@export var blackout_sanity := 0.6             ## cordura por segundo a oscuras
 @export_group("Las Tierras del Sueño (hito 21.10)")
 ## Lo propio de cada nivel de la parte 4 (DreamLands). Nivel 1: los gatos de Ulthar bajan del pueblo a
 ## barrer a los zoogs y los hongos devuelven cordura.

@@ -14,6 +14,7 @@ Uso: python tools/gen_sfx.py <carpeta con los packs de Kenney descomprimidos>
      python tools/gen_sfx.py --sueno      (solo el sueño de Kuranes)
      python tools/gen_sfx.py --kadath     (solo las flautas de los Otros Dioses)
      python tools/gen_sfx.py --nyarla     (solo los de Nyarlathotep)
+     python tools/gen_sfx.py --acecha     (solo los de la noche de Federal Hill: el apagón, las farolas, las alas y el Morador)
      python tools/gen_sfx.py --zann       (solo los de la noche de Erich Zann: la viola, su frenesí y la ventana)
      python tools/gen_sfx.py --finale     (solo el acorde de los finales ilustrados, hito 21.17)
      python tools/gen_sfx.py --fase20     (solo los de Pickman, Ward, Gilman, Tillinghast y Derby)
@@ -1456,6 +1457,73 @@ def zann():
     save('void_wind', tail(verb(x, 1.6, 0.6, 0.35), 0.4))
 
 
+def acecha():
+    """El que acecha en la oscuridad (hito 23.8). La corriente que se va: un chasquido eléctrico, el
+    zumbido de la red que baja de tono y se apaga; la que vuelve: zumbido que sube con un parpadeo de
+    chasquidos; una farola que revienta: cristal y chispas. Las alas de las sombras: dos o tres
+    batidas de membrana; el chillido del Morador: un grito agudo y rasposo con un gemido hondo."""
+    r = np.random.default_rng(2308)
+
+    def tail(x, sec=0.3):
+        n = min(len(x) // 3, int(sec * SR))
+        x[-n:] *= np.linspace(1, 0, n) ** 2
+        return x
+
+    def verb(dry, sec=1.2, decay=0.4, k=0.35, cut=3000):
+        ir = lp(r.standard_normal(int(sec * SR)), cut) * np.exp(-t(sec) / decay)
+        wet = signal.fftconvolve(dry, ir)[:len(dry)]
+        wet *= np.std(dry) / (np.std(wet) + 1e-9)
+        return dry + wet * k
+
+    def hum(f, tt):
+        ph = np.cumsum(f) / SR
+        return np.sin(2 * np.pi * ph) + 0.5 * np.sin(4 * np.pi * ph) + 0.3 * np.sign(np.sin(6 * np.pi * ph)) * 0.3
+
+    def snap(n, spread, amp=1.0):
+        x = np.zeros(int(spread * SR) + int(0.05 * SR))
+        for i in range(n):
+            o = int(r.uniform(0, spread) * SR)
+            b = hp(r.standard_normal(int(0.012 * SR)), 1500) * np.exp(-t(0.012) / 0.003) * amp * r.uniform(0.4, 1.0)
+            x[o:o + len(b)] += b
+        return x
+
+    d = 1.6; tt = t(d)                                               # se va la luz
+    f = 120 * np.exp(-tt / 0.5) + 30
+    x = hum(f, tt) * np.exp(-tt / 0.45) * 0.6
+    x[:len(snap(6, 0.3))] += snap(6, 0.3, 1.4)
+    save('power_out', tail(verb(x, 0.8, 0.25, 0.25), 0.3))
+    d = 1.2; tt = t(d)                                               # vuelve
+    f = 30 + 90 * np.clip(tt / 0.6, 0, 1)
+    x = hum(f, tt) * np.clip(tt / 0.5, 0, 1) * np.exp(-np.maximum(tt - 0.8, 0) / 0.15) * 0.5
+    x[:len(snap(8, 0.6))] += snap(8, 0.6, 0.8)
+    save('power_on', tail(x, 0.2))
+    d = 0.9; tt = t(d)                                               # una farola que revienta
+    glass = np.zeros(len(tt))
+    for i in range(14):
+        o = int(r.uniform(0, 0.35) * SR)
+        fq = r.uniform(2500, 6000)
+        g = np.sin(2 * np.pi * fq * t(0.08)) * np.exp(-t(0.08) / 0.02) * r.uniform(0.3, 1.0)
+        glass[o:o + len(g)] += g[:len(glass) - o]
+    pop = lp(r.standard_normal(len(tt)), 900) * np.exp(-tt / 0.04) * 2.0
+    x = glass * 0.6 + pop
+    x[:len(snap(10, 0.5))] += snap(10, 0.5, 1.0)
+    save('lamp_break', tail(verb(x, 0.9, 0.3, 0.3, 5000), 0.2))
+    for k in range(3):                                               # las alas
+        d = 0.55; x = np.zeros(int(d * SR))
+        for i in range(2 + k % 2):
+            o = int(i * 0.16 * SR)
+            bt = t(0.13)
+            flap = lp(r.standard_normal(len(bt)), 700 + 150 * k) * np.sin(np.pi * bt / 0.13) ** 2
+            x[o:o + len(flap)] += flap[:len(x) - o]
+        save('shadow_wing_%d' % k, tail(x, 0.1))
+    d = 1.8; tt = t(d)                                               # el chillido del Morador
+    e = np.minimum(tt / 0.05, 1) * np.exp(-np.maximum(tt - 0.9, 0) / 0.3)
+    f = 1500 * (1 + 0.25 * np.sin(2 * np.pi * 7 * tt)) * (1 - 0.35 * tt / d)
+    scream = np.sign(np.sin(2 * np.pi * np.cumsum(f) / SR)) * 0.3 + bp(r.standard_normal(len(tt)), 1500, 4500) * 0.8
+    moan = np.sin(2 * np.pi * np.cumsum(70 * (1 + 0.1 * np.sin(2 * np.pi * 0.8 * tt))) / SR) * 0.8
+    save('haunter_screech', tail(verb((bp(scream, 700, 5000) + moan) * e, 2.0, 0.7, 0.5, 2500), 0.4))
+
+
 def pnakotus():
     """La sombra fuera del tiempo (hito 21.15). El pólipo: un silbido hueco y quebrado, como el viento por
     un tubo, que sube y baja con aire alrededor (dos variantes); antes de embestir, uno que sube de golpe.
@@ -1585,6 +1653,8 @@ if __name__ == '__main__':
         color()
     elif '--dunwich' in sys.argv:                              # solo los de Dunwich (hito 21.14)
         dunwich()
+    elif '--acecha' in sys.argv:                               # solo los de Federal Hill (hito 23.8)
+        acecha()
     elif '--zann' in sys.argv:                                 # solo los de la noche de Erich Zann (hito 22.6)
         zann()
     elif '--pnakotus' in sys.argv:                             # solo los de Pnakotus (hito 21.15)

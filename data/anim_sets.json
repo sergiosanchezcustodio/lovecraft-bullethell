@@ -144,6 +144,9 @@
 		"poseido_yith": "anim_humano",
 		"vecino_auseil": "anim_humano",
 		"jiron_noche": "anim_fragmento",
-		"tras_ventana": "anim_fragmento"
+		"tras_ventana": "anim_fragmento",
+		"sectario_estrellado": "anim_humano",
+		"sombra_alada": "anim_fragmento",
+		"morador_tinieblas": "anim_fragmento"
 	}
 }

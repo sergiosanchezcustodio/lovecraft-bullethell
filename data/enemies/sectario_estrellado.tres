@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sectario_estrellado"
+display_name = "Sectario de la Sabiduría Estrellada"
+model = "sectario_estrellado"
+tier = 1
+spawn_weight = 1.0
+elite = false
+tags = Array[StringName]([&"humana"])
+max_health = 38.0
+hit_radius = 0.45
+body_radius = 0.45
+move_speed = 1.9
+xp = 1.4
+money = 2
+contact_physical = 9.0
+contact_mental = 2.0
+movement = &"douse"
+params = {"douse_off": 9.0, "douse_range": 1.6, "douse_seek": 5.0, "douse_time": 1.4}
+attack_anim = ""

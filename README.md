@@ -40,7 +40,7 @@ En la Biblioteca de la Universidad de Miskatonic, unos cuantos investigadores ha
 </div>
 
 > [!NOTE]
-> **Versión 0.9.0, en desarrollo.** La campaña completa se juega de principio a fin: las cuatro partes y las cuatro noches sueltas, solo, en cooperativo local o por red, en español o en inglés. Quedan la música propia de la parte 4, la prueba por internet entre casas distintas, el equilibrio final con partidas de jugadores reales, la publicación en itch.io y activar el guardado en la nube, ya programado. El estado detallado está en la [hoja de ruta](#hoja-de-ruta).
+> **Versión 0.9.0, en desarrollo.** La campaña completa se juega de principio a fin: las cuatro partes y las cinco noches sueltas, solo, en cooperativo local o por red, en español o en inglés. Quedan la música propia de la parte 4, la prueba por internet entre casas distintas, el equilibrio final con partidas de jugadores reales, la publicación en itch.io y activar el guardado en la nube, ya programado. El estado detallado está en la [hoja de ruta](#hoja-de-ruta).
 
 ## Índice
 
@@ -200,6 +200,7 @@ Cuatro relatos más, fuera de la campaña, desde el botón «Noches sueltas» de
 <!-- tabla:noches -->
 | Nivel | Criaturas | A mitad del nivel | Evento final |
 |---|---|---|---|
+| Federal Hill | Sectario de la Sabiduría Estrellada, Sombra del campanario | — | **Jefe: Morador de las Tinieblas** |
 | La granja de los Gardner | Res gris, Granjero consumido | — | **Jefe: El color que sube del pozo** |
 | Sentinel Hill | Chotacabras de Dunwich, Devota de las colinas | — | **Jefe: El hermano de Wilbur** |
 | Las ruinas de Pnakotus | Poseído de la Gran Raza, Pólipo volador | — | **Jefe: El pólipo antiguo** |
@@ -463,7 +464,7 @@ Más de 90 criaturas, entre ellas los seres únicos del final de cada nivel, los
 ![Criaturas de la parte 4](docs/img/bestiario_4.jpg)
 
 <!-- tabla:bestiario_noche -->
-**Noches sueltas:** Res gris · Granjero consumido · El color que sube del pozo · Chotacabras de Dunwich · Devota de las colinas · El hermano de Wilbur · Poseído de la Gran Raza · Pólipo volador · El pólipo antiguo · Vecino de la rue d'Auseil · Jirón de la noche · Lo que hay tras la ventana.
+**Noches sueltas:** Sectario de la Sabiduría Estrellada · Sombra del campanario · Morador de las Tinieblas · Res gris · Granjero consumido · El color que sube del pozo · Chotacabras de Dunwich · Devota de las colinas · El hermano de Wilbur · Poseído de la Gran Raza · Pólipo volador · El pólipo antiguo · Vecino de la rue d'Auseil · Jirón de la noche · Lo que hay tras la ventana.
 <!-- /tabla -->
 
 ![Criaturas de las noches sueltas](docs/img/bestiario_noches.jpg)

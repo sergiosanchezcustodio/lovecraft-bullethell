@@ -797,7 +797,7 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 
 ## Fase 23: propuesta (18-11-2026)
 
-**Propuesta el 18-11-2026**, al cerrar la fase 22 («continúa»). **Bloque A aprobado el 18-11-2026** («adelante bloque A») y hecho, pendiente de revisión. **Bloque B aprobado el 19-11-2026** («haz las dos cosas y luego continúa») y hecho, pendiente de revisión; los demás, pendientes de tu aprobación. Elige bloques o hitos sueltos; el orden de los bloques es el recomendado. Lo que queda abierto de antes y depende de ti sigue igual: la música de la parte 4, la subida a itch.io (fase 8, tu cuenta; la página ya está al día con el 22.8), el `client_id` de la nube (fase 10) y la calibración de la dificultad (D-42).
+**Propuesta el 18-11-2026**, al cerrar la fase 22 («continúa»). **Bloque A aprobado el 18-11-2026** («adelante bloque A») y hecho, pendiente de revisión. **Bloque B aprobado el 19-11-2026** («haz las dos cosas y luego continúa») y hecho, pendiente de revisión. **Bloque C hecho el 19-11-2026** («commit y continúa»), pendiente de revisión. **Bloque D hecho el 19-11-2026** («continúa»), pendiente de revisión; E, pendiente de tu aprobación. Elige bloques o hitos sueltos; el orden de los bloques es el recomendado. Lo que queda abierto de antes y depende de ti sigue igual: la música de la parte 4, la subida a itch.io (fase 8, tu cuenta; la página ya está al día con el 22.8), el `client_id` de la nube (fase 10) y la calibración de la dificultad (D-42).
 
 **Criterio de aceptación de la fase** (para lo que se elija): como el de la fase 22. Todo comprobado en captura y con el bot, sin errores, y nada empeora el rendimiento apreciablemente en Alta. Lo jugable va por datos y con tests. El arte nuevo de humanos, a bloques limpios; lo pintado, con ComfyUI en local.
 
@@ -820,14 +820,14 @@ Más corto que C. Niveles sueltos que se abren desde la Biblioteca, cada uno con
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 23.6 | **Los pasos de física de los enemigos**, que marcan el 1 % peor en todas las partes (22.2). Hay que medir con `prof=true` qué cuesta por enemigo (separación, rejilla, comportamiento) y bajarlo un 20-30 % sin cambiar cómo se mueven, comparando con `comparar.py` | Propuesto |
-| 23.7 | **Portátiles flojos:** medir en Baja a 1280 × 800 con el procesador limitado (afinidad a 4 núcleos) para comprobar los requisitos mínimos de la página, y ajustar el perfil Portátil con lo que salga | Propuesto |
+| 23.6 | **Los pasos de física de los enemigos**, que marcan el 1 % peor en todas las partes (22.2). Hay que medir con `prof=true` qué cuesta por enemigo (separación, rejilla, comportamiento) y bajarlo un 20-30 % sin cambiar cómo se mueven, comparando con `comparar.py` | Hecho, pendiente de revisión |
+| 23.7 | **Portátiles flojos:** medir en Baja a 1280 × 800 con el procesador limitado (afinidad a 4 núcleos) para comprobar los requisitos mínimos de la página, y ajustar el perfil Portátil con lo que salga | Hecho, pendiente de revisión |
 
 ### Bloque D: una quinta noche suelta
 
 | Hito | Contenido | Estado |
 |---|---|---|
-| 23.8 | ***El que acecha en la oscuridad*:** la iglesia abandonada de Federal Hill, en Providence, con el Trapezoedro Resplandeciente. El Acechador solo avanza a oscuras: la luz es el escudo, y la tormenta corta la corriente de las farolas. Con arena, dos criaturas, jefe, relato, desafío y sonidos. Blake, que ya es jugable, tiene aquí su noche | Propuesto |
+| 23.8 | ***El que acecha en la oscuridad*:** la iglesia abandonada de Federal Hill, en Providence, con el Trapezoedro Resplandeciente. El Acechador solo avanza a oscuras: la luz es el escudo, y la tormenta corta la corriente de las farolas. Con arena, dos criaturas, jefe, relato, desafío y sonidos. Blake, que ya es jugable, tiene aquí su noche | Hecho, pendiente de revisión |
 
 ### Bloque E: compartir
 

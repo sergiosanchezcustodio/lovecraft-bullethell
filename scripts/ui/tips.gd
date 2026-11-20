@@ -154,6 +154,10 @@ func _happened(t: Dictionary) -> bool:
 			return Unseen.current != null and not Unseen.current.sprayers.is_empty()
 		"trapdoor":                                          # Pnakotus (21.15): la primera trampilla que silba
 			return PolypWinds.current != null and PolypWinds.current.open_count() > 0
+		"blackout_lamps":                                    # Federal Hill (23.8): al empezar
+			return Blackout.current != null and Blackout.current.time() >= 3.0
+		"blackout":                                          # el primer apagón
+			return Blackout.current != null and Blackout.current.cuts >= 1
 		"viola":                                             # la rue d'Auseil (22.6): el primer compás
 			return ZannViola.current != null and ZannViola.current.beats >= 2
 		"viola_frenzy":                                      # la viola ya es frenesí

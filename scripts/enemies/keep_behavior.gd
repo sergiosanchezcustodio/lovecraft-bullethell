@@ -27,40 +27,61 @@ var _dive_t := 0.0                          ## > 0: bajo el agua
 var _rise: Vector3                          ## por dónde saldrá
 var _rng := RandomNumberGenerator.new()
 var _slam := 3.0
+## Parámetros que no cambian, leídos una vez (hito 23.6: `param` en cada paso era lo más caro
+## de este comportamiento). Las subclases que tienen su `start` no llaman al de aquí: se leen
+## la primera vez que se usan.
+var _p_read := false
+var _p_shield_at := 0.0
+var _p_dive_at: Array = []
+var _p_extra: BulletPattern
+var _p_slam_every := 0.0
+var _p_minion: EnemyData
+var _p_keep := 6.0
+var _p_strafe := 0.45
+func _read(e: Enemy) -> void:
+	_p_read = true
+	_p_shield_at = float(e.data.param("shield_at", 0.0))
+	_p_dive_at = e.data.param("dive_at", [])
+	_p_extra = e.data.param("extra_pattern", null)
+	_p_slam_every = float(e.data.param("slam_every", 0.0))
+	_p_minion = e.data.param("minion", null)
+	_p_keep = float(e.data.param("keep", 6.0))
+	_p_strafe = float(e.data.param("strafe", 0.45))
 
 func start(e: Enemy) -> void:
 	_side = 1.0 if e.get_instance_id() % 2 == 0 else -1.0
 
 func update(e: Enemy, target: Player, delta: float) -> Vector3:
 	e.anim = "walk"
+	if not _p_read: _read(e)
 	_shield(e)
 	if _dive(e, target, delta): return Vector3.ZERO
 	if target == null: return Vector3.ZERO
 	_extra -= delta
 	_minion -= delta
-	var pat: BulletPattern = e.data.param("extra_pattern", null)
+	var pat := _p_extra
 	if pat != null and _extra <= 0.0 and not e.runner.busy:
 		_extra = float(e.data.param("extra_every", 6.0))
 		e.runner.fire(pat, func() -> Vector3: return target.global_position if is_instance_valid(target) else e.global_position)
 		super.play_attack_anim(e, "throw")
 	_slam -= delta
-	if float(e.data.param("slam_every", 0.0)) > 0.0 and _slam <= 0.0:
+	if _p_slam_every > 0.0 and _slam <= 0.0:
 		_slam = float(e.data.param("slam_every", 5.0))
 		_slam_at(e, target)
-	if e.data.param("minion", null) != null and _minion <= 0.0:
+	if _p_minion != null and _minion <= 0.0:
 		_minion = float(e.data.param("minion_every", 8.0))
 		_summon(e)
 	var to := target.global_position - e.global_position
 	to.y = 0.0
 	var d := to.length()
-	var keep := float(e.data.param("keep", 6.0))
+	var keep := _p_keep
 	var dir := toward(e, target)
 	var side := Vector3(-dir.z, 0, dir.x) * _side
 	var speed := e.data.move_speed
 	if d > keep + 1.0: return shape_path(e, dir, speed)
 	if d < keep - 1.5: return (-dir * 0.9 + side * 0.3).normalized() * speed * 0.8
 	if randf() < delta * 0.15: _side = -_side                  # cambia de lado de vez en cuando
-	return side * speed * float(e.data.param("strafe", 0.45))
+	return side * speed * _p_strafe
 
 func _summon(e: Enemy) -> void:
 	var game := e.get_tree().current_scene
@@ -74,7 +95,8 @@ func _summon(e: Enemy) -> void:
 	e.world.shout(String(e.data.param("minion_text", L.t("¡Ïa! ¡Dagon!"))), e.global_position + Vector3(0, 3.2, 0), Color(0.55, 0.95, 0.75))
 
 func _shield(e: Enemy) -> void:
-	var at := float(e.data.param("shield_at", 0.0))
+	if not _p_read: _read(e)
+	var at := _p_shield_at
 	if at <= 0.0: return
 	if not _shield_done and e.health <= e.data.max_health * e.health_scale * at:
 		_shield_done = true
@@ -106,7 +128,8 @@ func can_shoot(_e: Enemy) -> bool:
 
 ## Zambullida: true mientras está bajo el agua (ni se mueve, ni toca, ni dispara).
 func _dive(e: Enemy, target: Player, delta: float) -> bool:
-	var at: Array = e.data.param("dive_at", [])
+	if not _p_read: _read(e)
+	var at: Array = _p_dive_at
 	if _dive_t <= 0.0:
 		if _dives >= at.size() or e.health > e.data.max_health * e.health_scale * float(at[_dives]): return false
 		_dives += 1

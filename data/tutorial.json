@@ -15,6 +15,8 @@
 		{"id": "polipos", "when": "polyp", "urgent": true, "text": "Los pólipos casi no se ven: escucha su silbido y busca su remolino de arena. Cuando silban más fuerte, van a embestir."},
 		{"id": "viola", "when": "viola", "urgent": true, "text": "La viola de Zann suena desde la buhardilla: cada compás baja por la calle, aparta a los enemigos y quema a lo que viene de fuera. Cuanto más cerca de la ventana, más fuerte."},
 		{"id": "frenesi", "when": "viola_frenzy", "urgent": true, "text": "La música se ha vuelto frenesí: las ondas rojas también te quitan cordura. Aléjate de la ventana o esquívalas."},
+		{"id": "farolas", "when": "blackout_lamps", "urgent": true, "text": "Lo que vive en el campanario no soporta la luz: no entra en la de las farolas ni en la de tu farol, y se quema si lo alcanza. Quédate cerca de una farola encendida y no dejes que los sectarios las apaguen."},
+		{"id": "apagon", "when": "blackout", "urgent": true, "text": "La tormenta ha cortado la corriente: a oscuras tu farol alumbra menos, pierdes cordura y las sombras se acercan. Aguanta hasta que vuelva la luz; el destello de un rayo también las espanta."},
 		{"id": "invisible", "when": "unseen", "urgent": true, "text": "No se ve, pero está: sigue sus huellas. Solo con el polvo de Ibn Ghazi se le ve y se le puede dar."},
 		{"id": "color", "when": "blight", "urgent": true, "text": "Estás en el color: te vuelve gris y quebradizo. Pierdes cordura y los golpes te hacen más daño. A los enemigos les pasa lo mismo: llévalos a él y sal tú."},
 		{"id": "buhonero", "when": "peddler", "urgent": true, "text": "El buhonero ha puesto su manta: quédate sobre lo que quieras para comprarlo con los dólares de este nivel. Se va al cabo de un rato."},

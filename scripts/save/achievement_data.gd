@@ -14,7 +14,8 @@ extends Resource
 ## crises, revives, coop_runs, best_level, best_time, money, characters, maxed_weapons, flawless,
 ## color_untouched (la noche del color sin pisarlo, 21.13), dunwich_untouched (la de Dunwich sin
 ## que te toque un chotacabras, 21.14), leng_unsnared (la meseta de Leng sin quedar en una red),
-## traps_sealed (trampillas selladas en Pnakotus), nights_won (noches sueltas distintas superadas) y
+## traps_sealed (trampillas selladas en Pnakotus), shadows_burned (sombras del campanario que quema la luz,
+## 23.8), nights_won (noches sueltas distintas superadas) y
 ## kill:<criatura> (sus bajas en el bestiario; 22.3)…
 @export var stat := "kills"
 @export var target := 100

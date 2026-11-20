@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sombra_alada"
+display_name = "Sombra del campanario"
+model = "sombra_alada"
+model_scale = 1.1
+tier = 2
+spawn_weight = 0.8
+elite = false
+max_health = 30.0
+hit_radius = 0.5
+body_radius = 0.45
+move_speed = 2.6
+xp = 2.0
+money = 3
+contact_physical = 7.0
+contact_mental = 5.0
+movement = &"dark"
+params = {"burn": 0.4, "dark": true, "dive_every": 6.0, "dive_range": 6.0, "dive_speed": 2.6, "dive_time": 0.9, "edge": 0.6, "fly": 1.2, "light_k": 0.5}
+attack_anim = ""

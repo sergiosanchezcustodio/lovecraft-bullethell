@@ -1,7 +1,7 @@
 extends GutTest
 ## Modo desafío (hito 15.2): datos, nivel, reglas y registro.
 
-const KNOWN := ["no_dodge", "one_weapon", "arcane_only", "max_health", "spawn_rate", "enemy_health",
+const KNOWN := ["blackout_on", "no_dodge", "one_weapon", "arcane_only", "max_health", "spawn_rate", "enemy_health",
 	"enemy_speed", "light", "lamp", "split_elites", "no_heal", "no_regen", "bullet_trail", "pet_idle", "viola_tempo"]
 
 func after_each() -> void:
@@ -9,7 +9,7 @@ func after_each() -> void:
 
 func test_un_desafio_por_nivel_y_bien_hecho() -> void:
 	var all := Challenge.all()
-	assert_eq(all.size(), 21)                   # 4 partes × 5 (21.12) y la noche de Zann (22.6)
+	assert_eq(all.size(), 22)                   # 4 partes × 5 (21.12), la noche de Zann (22.6) y la de Federal Hill (23.8)
 	var seen := {}
 	for c: Dictionary in all:
 		var base := String(c.level)

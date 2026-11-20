@@ -3857,3 +3857,87 @@ Lo que entró en las fases 16 a 21 salía en la partida sin que nada lo explicas
 - **El manual del investigador (tomo XII) pasa de 6 a 10 páginas:** Signos Mayores, Vínculos, Sucesos de la noche y Revelaciones, cada una con su clip (`python tools/grabar_manual.py signos vinculos sucesos revelaciones`; Dyer con granadas y el Signo de Cthugha, Legrasse y Johansen hablando, la lluvia de estrellas a pantalla entera y la crisis de Varga hasta la ventana de la revelación). Revisado en español y en inglés.
 - **Y una quinta página, El buhonero** (mejora del mismo día): dónde sale, cómo se compra y con qué dinero; el clip, con Peaslee comprando el remedio (`python tools/grabar_manual.py buhonero`).
 - Textos en inglés, en `locale/en.po` (el Signo Mayor es «Elder Sign», como en el resto del juego).
+
+## Hito 23.6: los pasos de física de los enemigos (19-11-2026)
+
+Medido en Alta (`cfg_quality=2`, como `comparar.py`) con el PC libre, bot `smart`, 80 vivos y `prof=true`.
+
+- **Reparto por enemigo y paso** (`p3_n2`, unos 34 µs; medido por tramos con `Prof`):
+  - comportamiento: 18-25 µs. De ellos, `toward` 9 µs (7 de `FlowField.direction`, que recorría las 8 vecinas con `Vector2i`). `KeepBehavior` leía siete `param()` en cada paso. Y la línea de los multiplicadores de velocidad miraba en cada enemigo la dificultad (con una cadena), los pactos (comparando arrays), el desafío, la locura y las flautas.
+  - mover: 10 µs, 6 de ellos de `ObstacleMap.push_out`, que leía `distance` dos veces aunque no hubiera nada cerca.
+  - separación 4, estados 3, contacto y ataque 3, objetivo 2 y vadear 2 µs.
+- **Cambios, sin tocar cómo se mueven:**
+  - `FlowField.direction` guarda la celda vecina a la que bajar hasta la siguiente pasada de distancias (`_best` y `_gen`). Solo cambia al rehacerse, cada 0,8 s.
+  - `Enemy._frame_mults`: los multiplicadores comunes (dificultad, pactos, flautas y agresividad), una vez por paso de física para todos. El del suceso de la noche, que depende de la criatura, sigue siendo por enemigo.
+  - `KeepBehavior._read`: sus parámetros, una vez; perezoso, porque las subclases con su propio `start` no llaman al de la base.
+  - `ObstacleMap._push_mask`: si la celda propia está a más de r + 1 m de lo bloqueado, la posición se queda como está sin interpolar (entre celdas vecinas la distancia cambia como mucho una diagonal más el redondeo). Y la primera lectura de `distance`, una sola vez.
+- **Equivalencia:** `tests/test_pasos_enemigos.gd` repite el cálculo de antes y lo compara con el nuevo en miles de puntos al azar de cinco arenas reales (también tras tres pasadas del flujo): todos iguales.
+- **Antes y después**, alternados (antes, en un `git worktree` de 5dc22bd), tres veces cada uno:
+
+  | Nivel | Por enemigo | Física de enemigos por fotograma | Media | 1 % peor |
+  |---|---|---|---|---|
+  | `p1_n2` | 36 → 28 µs (−23 %) | 1,59 → 1,23 ms | 8,71 → 8,64 ms | 20,8 → 20,5 ms |
+  | `p3_n2` | 34 → 24 µs (−28 %) | 1,63 → 1,11 ms | 9,57 → 9,08 ms | 18,8 → 19,0 ms |
+  | `p4_n1` | 33 → 25 µs (−24 %) | 1,35 → 1,01 ms | 8,65 → 8,57 ms | 20,1 → 20,1 ms |
+
+- **El 1 % peor no cambia.** Los enemigos cuestan un cuarto menos y la media baja hasta medio ms, pero los peores fotogramas no vienen del paso medio de un enemigo. Son los pasos de física que van varias veces más lentos a la vez en todo (lo que se vio en el 22.2) y las muertes en masa. El 22.2 dio por hecho que eran los pasos normales de 80 enemigos, y no lo son. Bajar más el 1 % peor pasaría por averiguar qué para esos pasos (¿recolección de memoria de Godot, el sistema?), que queda fuera de este hito.
+- Suite: 1102 de 1102.
+
+## Hito 23.7: portátiles flojos (19-11-2026)
+
+Calidad Baja (`cfg_quality=0`, la del perfil Portátil), ventana de 1280 × 800, bot `smart` con 80 vivos, sin sincronía. Dos veces cada caso, alternando. Los núcleos se limitan con `python tools/afinidad.py N -- <comando>`: pone la afinidad a los procesos de Godot en cuanto aparecen. `4` son cuatro núcleos físicos (0, 2, 4 y 6); `4l`, los cuatro primeros lógicos, es decir, dos físicos con hyperthreading, como un portátil flojo de 2+2.
+
+| Caso | Núcleos | Media | 1 % peor |
+|---|---|---|---|
+| `p3_n2` | todos (16) | 8,6 ms | 20,8 ms |
+| `p3_n2` | 4 | 8,7 ms | 20,1 ms |
+| `p3_n2` | 2+2 | 8,6 ms | 19,9 ms |
+| `p4_n1` | todos | 8,6 ms | 19,6 ms |
+| `p4_n1` | 4 | 8,6 ms | 19,4 ms |
+| `p4_n1` | 2+2 | 8,5 ms | 19,1 ms |
+| `p3_n2`, cuatro jugadores | todos | 11,2 ms | 20,8 ms |
+| `p3_n2`, cuatro jugadores | 4 | 12,3 ms | 22,8 ms |
+| `p3_n2`, cuatro jugadores | 2+2 | 12,1 ms | 22,0 ms |
+
+- **Cuántos núcleos apenas importa:** la partida es casi toda de un hilo (la física, los enemigos y el dibujo se esperan entre sí). Con cuatro jugadores, lo que más se nota con menos núcleos es la física de los enemigos (de 1,0-1,6 a 1,5-1,7 ms por fotograma), y aun así el 1 % peor queda por debajo de los 25 ms de los 40 fps del perfil Portátil.
+- **Lo que no se puede medir aquí es la velocidad de cada núcleo,** que es lo que de verdad separa un portátil de este i7-10700K (a unos 4,7 GHz). Un portátil de hace unos años, con la mitad de rendimiento por núcleo, iría a unos 17 ms de media y 40-45 ms en el 1 % peor en cooperativo: jugable a 40 fps casi siempre, con tirones en las peleas grandes. Bajar los relojes de Windows (estado máximo del procesador) cambia la configuración de energía del PC del autor, y no lo he hecho.
+- **El perfil Portátil, igual:** ya va en Baja, a 40 fps y 1280 × 800. Ninguna de sus palancas (calidad, resolución 3D) baja la CPU, que es lo que manda.
+- **Requisitos de la página:** «4 núcleos» se sostiene. Añadido en `docs/itchio/pagina.md` que importa más la velocidad de cada núcleo que su número, con estas cifras.
+
+## Hito 23.8: *El que acecha en la oscuridad*, quinta noche suelta (19-11-2026)
+
+Bloque D de la fase 23 («continúa»). Hecho, pendiente de revisión.
+
+- **La noche** (`data/nights.json`, `noche_acecha`; se abre al superar el 4.5, como la de Zann): Federal Hill, en Providence, una noche de tormenta de 1935. Relato de cuatro párrafos (la muerte de Robert Blake, la iglesia, el Trapezoedro y Henrietta Blake, que sube con el diario de su hermano) con el cielo `tormenta`, textos del lugar y del bestiario en la Biblioteca y el mapa en `resources/maps/noche_acecha.png`.
+- **Arena** (`tools/gen_arena_federal.py` → `data/arenas/federal.json`; atrezo nuevo en `tools/gen_atrezo_federal.py`, `fed_*`):
+  - Arriba, la iglesia negra de la Sabiduría Estrellada (`fed_iglesia`, 251 000 voxels, hueca): nave de piedra ennegrecida con ventanas ojivales cegadas o rotas, tejado de pizarra con huecos, el campanario cuadrado delante con la puerta tapiada y el rosetón, el cuerpo de campanas con persianas y, dentro, el Trapezoedro que brilla rojo (punto `steeple`, que va a la clave `"steeple"` de la arena), y la aguja con la cruz torcida.
+  - El atrio con verja (`fed_verja`), lápidas (`sue_lapida_*`) y árboles partidos (`dun_arbol_partido`).
+  - Las casas de tablas del puerto (`prt_casa_*`) al norte y al oeste; al sur y al este, la verja del borde de la colina.
+  - Quince farolas eléctricas (`fed_farola`): fuste estriado y globo de cristal en una parte aparte (`globe`), que es lo que se apaga. Luz fría (`lamp`: 0,86 / 0,90 / 1,0, energía 2,8, alcance 7).
+  - Tormenta propia (`data/weather/tormenta_providence.tres`, un rayo cada 16 s de media) y ambiente `federal` (murciélagos).
+- **La luz** (`Blackout`, `scripts/level/blackout.gd`; `LevelData.blackout_*`):
+  - Las farolas encendidas (4,5 m) y el farol de cada jugador son el escudo: lo de la oscuridad (`"dark": true`) no entra en su luz y se quema si queda dentro. El destello de un rayo lo alumbra todo un instante.
+  - La tormenta corta la corriente cada 22 s al principio y cada 13 s al llegar el final (11 con el jefe), durante 5 s que suben hasta 8: un rayo, las farolas parpadean y se apagan. A oscuras, el farol de los jugadores alumbra el 55 % y se pierden 0,6 de cordura por segundo. Las farolas apagadas tampoco devuelven cordura (`Player._sanity_context` mira `visible`).
+  - El farol de Blake alumbra un 30 % más en esta noche (`Blackout.BLAKE`: conoce la iglesia por su hermano).
+  - Si el juego rehace el alcance del farol (al subir de nivel, una revelación), el apagón lo toma como el nuevo normal.
+  - El anfitrión decide los apagones y las farolas apagadas (suceso de red `"blackout"`). Prueba: `cut_here=T` (el primer apagón a los T s).
+- **Criaturas** (`tools/gen_noche_acecha.py`):
+  - **Sectario de la Sabiduría Estrellada** (`DouseBehavior`, `douse`): túnica morada con la capucha, la estrella de plata en el pecho y una pértiga de apagar farolas. Va a por una farola encendida a menos de 5 m, se para 1,4 s junto a ella y la apaga 9 s.
+  - **Sombra del campanario** (`DarkBehavior`, `dark`): humo negro con alas de murciélago y un ojo rojo. Ronda al borde de la luz del farol y cada 6 s una se lanza en picado (solo entonces toca, o a oscuras). La luz la quema (40 % de su vida por segundo) y la hace huir.
+  - **Morador de las Tinieblas** (jefe, `HaunterBehavior`, `haunter`, de cara a la cámara): una negrura alada con el ojo de tres lóbulos.
+    - Baja del campanario sin cuerpo durante 2,5 s y vuela a 6,5 m de su presa, siempre a oscuras. En la luz se quema (1,2 % por segundo), chilla y sale sin atacar. El destello de un rayo lo deja quieto 0,8 s.
+    - Los ojos (abanico de cinco, tres veces) cada 3,5 s. A oscuras, un picado cada 4 s con aviso.
+    - Por debajo del 60 %, revienta la farola encendida más cerca (a menos de 14 m; queda apagada 25 s) cada 9 s y llama a tres sombras cada 12 s. Por debajo del 25 %, corta la corriente 6 s cada 14 s y va más deprisa.
+    - Al morir se deshace en humo y vuelve la luz.
+- **Sonidos** (`python tools/gen_sfx.py --acecha`): `power_out` (chasquido y zumbido que baja), `power_on`, `lamp_break` (cristal y chispas), `shadow_wing` (tres) y `haunter_screech`.
+- **Consejos:** `farolas` (a los 3 s) y `apagon` (en el primer apagón), los dos urgentes.
+- **Desafío «Corriente cortada»** (`data/challenges.json`): la tormenta corta la luz el doble de a menudo (palanca nueva `blackout_on`) y las criaturas aguantan un 15 % más.
+- **Logro «Hágase la luz»** (`39_sombras_quemadas`): que la luz queme a 40 sombras (`shadows_burned`). 400 $, sin trofeo propio.
+- **Trofeos:** el Morador es el 29 de la vitrina de jefes (10 × 3; queda un hueco).
+- **Textos:** 27 nuevos en inglés (los del bestiario, como los de las demás criaturas, siguen sin traducir). El jefe se llama «Morador de las Tinieblas», sin artículo, para que el aviso diga «Acaba con el Morador de las Tinieblas»; en inglés, *Haunter of the Dark*.
+- **Tests** (`tests/test_acecha.gd`, 20): la noche y su nivel; el campanario y las farolas de la arena; la farola alumbra y el apagón la quita; la tormenta corta sola; el invitado no corta por su cuenta; una farola apagada vuelve sola; el farol del jugador también alumbra; a oscuras se pierde cordura y el farol se acorta; el de Blake alumbra más; la sombra se quema en la luz y huye; a oscuras no se quema y toca; el rayo lo alumbra todo; el sectario apaga la farola y va a por la que tiene cerca; el Morador baja del campanario y la luz lo quema; a oscuras se lanza; el rayo lo deslumbra; sus fases; el desafío; el logro.
+- **Equilibrio** (`simular.py noche_acecha --n 4 --ts 2 --par 2`, dificultad 3; las simulaciones van sin clima, así que sin los destellos que deslumbran al jefe): 3 de 4 superadas (una caída a los 192 s), con el jefe muerto a los 268-350 s y la vida mínima del 20 al 84 %. Lo que más daño hace son los sectarios (101 de vida y 27 de cordura en la partida perdida), luego las sombras (49 y 43) y la oscuridad (25 de cordura). Parecido a Zann (3 de 4, del 14 al 54 %); se queda así, provisional (D-42).
+- **Comprobado en partida** (`cfg_quality=2`): el apagón a los 12 s (`cut_here=10`) apaga las farolas y sus globos; los sectarios apagan las que pillan; las sombras con su ojo rojo rondan el farol; el Morador sale del campanario y se ve de frente con las alas abiertas; «Finish off the Haunter of the Dark» en inglés con Blake; la ventana de las noches con la quinta y su mapa (`nights_row=4`).
+- **Capturas:** `shots/game_acecha1_008.0s.png` (con luz) y `_012.0s.png` (el apagón), `shots/game_acecha2_016.0s.png` y `shots/game_acecha3_012.0s.png` (el jefe), `shots/seleccion_noches_acecha_002.5s.png`, `shots/hoja_federal.png` y `shots/hoja_acecha.png` (los modelos).
+- **Suite:** 1122 de 1122.
+

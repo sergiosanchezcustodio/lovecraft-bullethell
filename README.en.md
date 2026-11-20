@@ -40,7 +40,7 @@ In the Library of Miskatonic University, a handful of investigators have begun t
 </div>
 
 > [!NOTE]
-> **Version 0.9.0, in development.** The full campaign can be played from start to finish: all four parts and the four standalone nights, solo, in local co-op or over the network, in English or Spanish. Still to come: part 4's own music, the online test between different homes, final balancing with real players, the itch.io release and switching on cloud saves, which are already built. The detailed status is in the [roadmap](#roadmap).
+> **Version 0.9.0, in development.** The full campaign can be played from start to finish: all four parts and the five standalone nights, solo, in local co-op or over the network, in English or Spanish. Still to come: part 4's own music, the online test between different homes, final balancing with real players, the itch.io release and switching on cloud saves, which are already built. The detailed status is in the [roadmap](#roadmap).
 
 > [!IMPORTANT]
 > **The game is currently in Spanish only.** The names of characters, weapons, items and creatures on this page are translated; the screenshots show them as they appear in the game.
@@ -203,6 +203,7 @@ Four more stories, outside the campaign, from the map's "Standalone nights" butt
 <!-- tabla:noches -->
 | Level | Creatures | Mid-level | Final event |
 |---|---|---|---|
+| Federal Hill | Starry Wisdom Cultist, Shadow of the Steeple | — | **Boss: Haunter of the Dark** |
 | The Gardner farm | Grey cow, Withered farmer | — | **Boss: The colour rising from the well** |
 | Sentinel Hill | Dunwich whippoorwill, Devotee of the hills | — | **Boss: Wilbur's brother** |
 | The ruins of Pnakotus | Possessed by the Great Race, Flying polyp | — | **Boss: The ancient polyp** |
@@ -466,7 +467,7 @@ More than 90 creatures, among them the unique beings at the end of each level, t
 ![Creatures from part 4](docs/img/bestiario_4.jpg)
 
 <!-- tabla:bestiario_noche -->
-**Standalone nights:** Grey cow · Withered farmer · The colour rising from the well · Dunwich whippoorwill · Devotee of the hills · Wilbur's brother · Possessed by the Great Race · Flying polyp · The ancient polyp · Rue d'Auseil lodger · Shred of the night · What lies beyond the window.
+**Standalone nights:** Starry Wisdom Cultist · Shadow of the Steeple · Haunter of the Dark · Grey cow · Withered farmer · The colour rising from the well · Dunwich whippoorwill · Devotee of the hills · Wilbur's brother · Possessed by the Great Race · Flying polyp · The ancient polyp · Rue d'Auseil lodger · Shred of the night · What lies beyond the window.
 <!-- /tabla -->
 
 ![Creatures from the standalone nights](docs/img/bestiario_noches.jpg)
