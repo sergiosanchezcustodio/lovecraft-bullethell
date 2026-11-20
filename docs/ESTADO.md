@@ -3941,3 +3941,22 @@ Bloque D de la fase 23 («continúa»). Hecho, pendiente de revisión.
 - **Capturas:** `shots/game_acecha1_008.0s.png` (con luz) y `_012.0s.png` (el apagón), `shots/game_acecha2_016.0s.png` y `shots/game_acecha3_012.0s.png` (el jefe), `shots/seleccion_noches_acecha_002.5s.png`, `shots/hoja_federal.png` y `shots/hoja_acecha.png` (los modelos).
 - **Suite:** 1122 de 1122.
 
+
+## Fase 23, hito 23.9: códigos de partida (20-11-2026)
+
+Bloque E de la fase 23 («commit y continúa»). Hecho, pendiente de revisión. Con él, la fase 23 queda completa.
+
+`scripts/save/run_code.gd` (`RunCode`), `scripts/menus/run_code_menu.gd` (`RunCodeMenu`); toca `Menus.EndScreen`, `Game._run_code`, `Library` (tomo «archive») y `LibraryMenu`.
+
+- **El código:** 20 letras en cinco grupos, «8000-GJB9-3Y20-SHG0-0CND», con el alfabeto de la partida del día (al leerlo, O vale 0 e I y L valen 1; guiones, espacios y minúsculas no cuentan). Lleva 100 bits: versión (2), semilla (31), nivel (18), investigador (12) y compañero (10) del J1, pactos (8, uno por pacto en el orden de `data/pacts.json`) y grado de locura (4), más una comprobación de 15 bits (módulo un primo: cualquier letra cambiada se nota, comprobado en el test).
+  - Nivel, investigador y compañero van por una huella md5 de su id, no por su posición: añadir niveles o personajes no cambia los códigos ya dados. Con 12 y 8 bits había huellas repetidas (`sin_fin:p2_n4` y `p1_n5`; Johansen y Elwood), por eso son 18, 12 y 10, y el test `test_sin_huellas_repetidas` avisará si algo nuevo choca.
+  - Niveles que nombra: la campaña, las noches sueltas, el desafío de cada uno y la noche eterna sobre cada escenario de la campaña. No hay código para la partida del día (tiene el suyo), la expedición, el desfile de jefes ni las partidas en red.
+- **Dónde se copia:**
+  - En la pantalla final, «Copiar el código» (al portapapeles) con el código debajo, en la letra del texto: en la de los títulos el 0 parece una o.
+  - En el archivo de expediciones, la página de cada partida dice «Código: … (X o C: copiar)», y X en el mando o C en el teclado lo copian.
+- **Dónde se pega:** en el archivo, la primera fila es «Jugar el código de un amigo…», con una página que explica los códigos. Abre una ventana con las 20 casillas (`RoomCodePicker`: cruceta o teclado, X o Ctrl+V para pegar; vacías, lee el portapapeles). Al leerlo dice qué trae («Campamento base… · William Dyer», pactos y locura) y, si el nivel está abierto en este hueco (`RunCode.open_for`, las mismas reglas que el mapa; nada de lo que la demo no tiene), «Jugar esta noche». Si no, «Aún no has llegado a ese nivel».
+- **Al jugarlo**, como al repetir una del archivo (`RunArchive.prepare`): en solitario con el J1, con su investigador, compañero y vestuario de este hueco, los pactos y la locura del código, desde el principio del nivel (sin lo que se traía del anterior: en mitad de una parte, las subidas de ventaja de `_apply_carry`, que también salen de la semilla). El investigador vale aunque no lo tengas comprado, como en la partida del día.
+- **Comprobado:** la misma partida (`seed=4242`, p1_n1, Dyer) da el mismo código dos veces; jugado desde la Biblioteca con el código escrito en minúsculas y con oes, sale «SEMILLA 4242 p1_n1 dyer», igual que con `seed=4242`.
+- **Textos:** 25 nuevos en inglés.
+- **Pruebas:** `tests/test_run_code.gd` (10): ida y vuelta con compañero, pactos y locura; sin compañero ni pactos; noches, desafíos y noche eterna; la del día, no; erratas de forma; cada letra cambiada se nota; sin huellas repetidas; abierto según el hueco; la sesión que prepara; el código en la página del archivo. Suite: 1132 de 1132.
+- **Capturas:** `shots/game_codigo_parada1.png` (la pantalla final, ya copiado), `shots/titulo_archivo_codigo_013.0s.png` (la página del archivo) y `shots/titulo_codigo_amigo_013.0s.png` (la ventana con el código leído).

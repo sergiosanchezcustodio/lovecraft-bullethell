@@ -178,6 +178,8 @@ static func entries(save: SaveData, tome: String) -> Array[Dictionary]:
 					for k in range(1, ps.size()): others.append("%s %s" % [L.player(k + 1), String((ps[k] as Dictionary).get("name", ""))])
 					facts.append(L.t("Con ") + ", ".join(others))
 				if not (r.get("pacts", []) as Array).is_empty(): facts.append(L.t("Pactos: ") + Pacts.names(r.pacts))
+				var rc := RunCode.of_run(r) if not bool(r.get("online", false)) else ""   # código de partida (23.9)
+				if rc != "": facts.append(L.t("Código: %s (X o C: copiar)") % rc)
 				var lines := PackedStringArray()
 				for row: Dictionary in p.get("table", []):
 					lines.append("%s: %s (%d %%), %s/s, %s" % [RunArchive.source_name(String(row.id), String(p.get("pet", ""))),

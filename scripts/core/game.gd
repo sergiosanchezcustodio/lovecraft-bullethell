@@ -1723,6 +1723,14 @@ func _seed_world() -> void:
 	director.rng.seed = run_seed + 2
 	if hazards != null: hazards.rng.seed = run_seed + 3
 
+## Código de partida (23.9) de esta noche, para compartirla; "" en red (cada PC tiene su azar) o
+## en los modos que no se repiten.
+func _run_code() -> String:
+	if net_game != null or level == null or players.is_empty(): return ""
+	var q := players[0]
+	var pet := String((q.pet as Pet).data.id) if q.pet != null and is_instance_valid(q.pet) else ""
+	return RunCode.encode(String(level.id), run_seed, String(q.data.id), pet, Pacts.active(), Madness.grade())
+
 ## El primer intento del día cuenta: se apunta y sale su código para compartir (copiado al
 ## portapapeles); los demás son de práctica.
 func _daily_record() -> void:
@@ -1897,6 +1905,7 @@ func _end_screen(title: String, accent: Color, next_id := "", result := "") -> v
 	_drop_card()
 	var s := Menus.EndScreen.new(title, lines, accent)
 	s.diary = _diary(result)
+	s.code = _run_code()                                # código de partida (23.9)
 	_archive(result)
 	if result == "caida" and _replay_frames.size() >= int(DeathReplay.FPS): s.replay = _replay_frames
 	s.burn = result == "caida"                         # la página arde al caer (hito 20.4)

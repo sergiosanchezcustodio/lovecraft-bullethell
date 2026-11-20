@@ -208,6 +208,7 @@ class EndScreen extends CanvasLayer:
 	var report: Control = null                  ## informe al caer (hito 13.1, `FallReport.panel`), a la derecha
 	var diary: Array = []                       ## entradas del diario (hito 13.10): {who, color, title, text}
 	var replay: Array[Image] = []               ## los últimos segundos antes de caer (hito 15.1, `DeathReplay`)
+	var code := ""                              ## código de partida (hito 23.9, `RunCode`): botón para copiarlo
 	var epilogue := false                       ## al vencer el final de la campaña: «Epílogo», el primero (13.11)
 	signal epilogue_open
 	var burn := false                           ## al caer: los bordes arden (hito 20.4, `burn_edges.gdshader`)
@@ -320,6 +321,7 @@ class EndScreen extends CanvasLayer:
 		box.add_child(out)
 		_diary_button(box, out)
 		_replay_button(box)
+		_code_button(box)
 		if logs_button: box.add_child(_logs_button())
 		_first = nxt if nxt != null else again
 		_first.grab_focus.call_deferred()
@@ -347,6 +349,22 @@ class EndScreen extends CanvasLayer:
 			page.tree_exited.connect(func() -> void: if is_inside_tree(): b.grab_focus.call_deferred()))
 		box.add_child(b)
 		if LaunchArgs.from_cmdline().get_bool("diary_open"): b.pressed.emit.call_deferred()   # capturas
+
+	## «Código: 7K2M-…» (hito 23.9): al pulsarlo, al portapapeles, para que un amigo juegue la misma noche.
+	func _code_button(box: VBoxContainer) -> void:
+		if code == "": return
+		var l := UiKit.label(L.t("Código: %s") % code, 19, UiKit.TEXT_DIM)   # no la de los títulos: su 0 parece una o
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var b := MenuKit.button(L.t("Copiar el código"), MenuKit.INK, 22)
+		b.custom_minimum_size = Vector2(360, 46)
+		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		b.tooltip_text = L.t("Cópialo y pásaselo a un amigo: con él juega la misma noche (Biblioteca, Archivo de expediciones).")
+		b.pressed.connect(func() -> void:
+			DisplayServer.clipboard_set(code)
+			b.text = L.t("Copiado"))
+		box.add_child(b)
+		box.add_child(l)
+		if LaunchArgs.from_cmdline().get_bool("code_copy"): b.pressed.emit.call_deferred()   # capturas
 
 	func _replay_button(box: VBoxContainer) -> void:
 		if replay.is_empty(): return

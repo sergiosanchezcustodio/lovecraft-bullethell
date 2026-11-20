@@ -39,6 +39,7 @@ var _entries: Array[Dictionary] = []
 var _icons := {}
 var _live := LaunchArgs.from_cmdline().get_bool("library_live", true)   ## bestiario: modelos que giran (hito 15.4)
 var _shelf_focus := 0
+var _entry_at := -1                           ## entrada señalada (archivo: para copiar su código, 23.9)
 var _sub: Control                              ## logros abiertos encima
 
 func _ready() -> void:
@@ -214,6 +215,13 @@ func _open_tome(i: int) -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 2)
 	scroll.add_child(list)
+	if tome.id == "archive":                         # jugar el código de un amigo (23.9), lo primero
+		var cb := _row(L.t("Jugar el código de un amigo…"), 24)
+		cb.custom_minimum_size.x = PAGE.x - 130
+		cb.add_theme_color_override("font_color", RED_INK)
+		cb.focus_entered.connect(_show_code_help)
+		cb.pressed.connect(_open_run_code)
+		list.add_child(cb)
 	var section := ""
 	for k in _entries.size():
 		var e: Dictionary = _entries[k]
@@ -230,11 +238,12 @@ func _open_tome(i: int) -> void:
 		if tome.id == "archive": b.pressed.connect(func() -> void: _ask_replay(e))   # repetir con su semilla (16.26)
 		if e.has("finale"): b.pressed.connect(func() -> void: _show_finale(e))     # a toda pantalla (21.17)
 		list.add_child(b)
-	_left.add_child(_hint(L.t("A: repetir con su semilla  ·  B o Esc: volver") if tome.id == "archive" else L.t("Arriba/abajo: recorrer  ·  B o Esc: volver a los tomos")))
+	_left.add_child(_hint(L.t("A: repetir con su semilla  ·  X o C: copiar su código  ·  B o Esc: volver") if tome.id == "archive" else L.t("Arriba/abajo: recorrer  ·  B o Esc: volver a los tomos")))
 	MenuKit.chain_focus(_rows)
 	if not _rows.is_empty(): _rows[0].grab_focus.call_deferred()
 
 func _show_entry(k: int) -> void:
+	_entry_at = k
 	for c in _right.get_children(): c.queue_free()
 	var e: Dictionary = _entries[k]
 	if e.has("chart"):
@@ -371,6 +380,42 @@ func _ask_replay(e: Dictionary) -> void:
 			get_tree().change_scene_to_file("res://scenes/relato.tscn")
 		elif back != null and is_instance_valid(back): back.grab_focus.call_deferred())
 
+## Archivo (23.9): la página de la fila «Jugar el código de un amigo».
+func _show_code_help() -> void:
+	_entry_at = -1
+	for c in _right.get_children(): c.queue_free()
+	var gap := Control.new()
+	gap.custom_minimum_size.y = 40
+	_right.add_child(gap)
+	var n := _ink(L.t("Códigos de partida"), 40, INK, true)
+	n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_right.add_child(n)
+	_right.add_child(_rule())
+	var t := _ink(L.t("Cada partida tiene su código: sale en la pantalla final y en la página de cada una de este archivo. Pásaselo a un amigo y jugará la misma noche que tú: el mismo nivel, investigador, compañero, pactos y locura, con las mismas oleadas, baúles y subidas. Luego comparáis cuánto aguantó cada uno.
+
+No valen los de la partida del día (tiene los suyos), la expedición ni el desfile de jefes, ni los de las partidas en red. Para jugar uno, el nivel tiene que estar abierto en tu partida."), 22, INK)
+	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_right.add_child(t)
+
+func _open_run_code() -> void:
+	if _sub != null: return
+	var back := get_viewport().gui_get_focus_owner()
+	_sub = RunCodeMenu.new()
+	add_child(_sub)
+	_sub.tree_exited.connect(func() -> void:
+		_sub = null
+		if is_inside_tree() and back != null and is_instance_valid(back): back.grab_focus.call_deferred())
+
+## Archivo (23.9): copia el código de la partida señalada.
+func _copy_code() -> void:
+	if _entry_at < 0 or _entry_at >= _entries.size(): return
+	var run: Dictionary = _entries[_entry_at].get("run", {})
+	var code := RunCode.of_run(run) if not bool(run.get("online", false)) else ""
+	if code == "": return
+	DisplayServer.clipboard_set(code)
+	for c in _right.get_children():
+		if c is Label and (c as Label).text.contains(code): (c as Label).text = L.t("Código: %s (copiado)") % code
+
 func _unknown_text(e := {}) -> String:
 	if e.get("demo", false): return Demo.locked() + "."           # la demo (23.2)
 	if String(e.get("section", "")) == Library.SECTION_FISH: return L.t("Todavía no ha picado ninguna. Quizá en el muelle de Innsmouth, entre nivel y nivel.")
@@ -442,12 +487,19 @@ func open_at(tome: int, cursor := 0) -> void:
 	_open_tome(tome)
 	if _sub == null and cursor > 0 and cursor < _rows.size(): _rows[cursor].grab_focus.call_deferred()
 	var lr := LaunchArgs.from_cmdline()
+	if _tome == "archive" and lr.get_bool("run_code_open"): _open_run_code.call_deferred()   # capturas (23.9)
 	if _tome == "archive" and lr.has("lib_replay") and not _entries.is_empty():   # pruebas (16.26): repite esa
 		get_tree().create_timer(1.0).timeout.connect(func() -> void:
 			_ask_replay(_entries[clampi(lr.get_int("lib_replay", 0), 0, _entries.size() - 1)])
 			if _sub != null: (_sub as MenuKit.Confirm).answered.emit(true))
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _sub == null and _tome == "archive" and event.is_pressed() and not event.is_echo() and (
+			(event is InputEventJoypadButton and (event as InputEventJoypadButton).button_index == JOY_BUTTON_X)
+			or (event is InputEventKey and (event as InputEventKey).keycode == KEY_C and not (event as InputEventKey).ctrl_pressed)):
+		get_viewport().set_input_as_handled()
+		_copy_code()
+		return
 	if _sub != null or not event.is_action_pressed("ui_cancel"): return
 	get_viewport().set_input_as_handled()
 	if _tome != "":

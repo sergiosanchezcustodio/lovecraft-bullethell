@@ -9381,7 +9381,7 @@ msgstr ""
 msgid "X-GitHub-Api-Version: 2022-11-28"
 msgstr ""
 
-#: scripts/core/auto.gd scripts/menus/daily_menu.gd scripts/save/outfit_data.gd scripts/title/title_progress.gd
+#: scripts/core/auto.gd scripts/menus/daily_menu.gd scripts/menus/run_code_menu.gd scripts/save/outfit_data.gd
 msgid "Saves"
 msgstr "Saves"
 
@@ -9535,7 +9535,7 @@ msgstr "Continue"
 msgid "Crisis: %s"
 msgstr "Crisis: %s"
 
-#: scripts/core/game.gd
+#: scripts/core/game.gd scripts/ui/menus.gd
 msgid "Código: %s"
 msgstr "Code: %s"
 
@@ -9719,7 +9719,7 @@ msgstr "Not enough: %d $ short"
 msgid "Noche superada"
 msgstr "Night cleared"
 
-#: scripts/core/game.gd scripts/save/library.gd scripts/ui/fall_report.gd
+#: scripts/core/game.gd scripts/save/library.gd scripts/save/run_code.gd scripts/ui/fall_report.gd
 msgid "Pactos: "
 msgstr "Pacts: "
 
@@ -10961,7 +10961,7 @@ msgstr "Connected"
 msgid "Conectar con GitHub"
 msgstr "Connect to GitHub"
 
-#: scripts/menus/cloud_connect_menu.gd
+#: scripts/menus/cloud_connect_menu.gd scripts/ui/menus.gd
 msgid "Copiar el código"
 msgstr "Copy the code"
 
@@ -11286,8 +11286,8 @@ msgid "A: abrir  ·  B o Esc: cerrar"
 msgstr "A: open  ·  B or Esc: close"
 
 #: scripts/menus/library_menu.gd
-msgid "A: repetir con su semilla  ·  B o Esc: volver"
-msgstr "A: replay with its seed  ·  B or Esc: back"
+msgid "A: repetir con su semilla  ·  X o C: copiar su código  ·  B o Esc: volver"
+msgstr "A: replay with its seed  ·  X or C: copy its code  ·  B or Esc: back"
 
 #: scripts/menus/library_menu.gd
 msgid "Arriba/abajo: recorrer  ·  B o Esc: volver a los tomos"
@@ -11314,6 +11314,24 @@ msgid "Biblioteca Lovecraft"
 msgstr "Lovecraft Library"
 
 #: scripts/menus/library_menu.gd
+msgid ""
+"Cada partida tiene su código: sale en la pantalla final y en la página de cada una de este archivo. Pásaselo a un amigo y jugará la misma noche que tú: el mismo nivel, investigador, compañero, pactos y locura, con las mismas oleadas, baúles y subidas. Luego comparáis cuánto aguantó cada uno.\n"
+"\n"
+"No valen los de la partida del día (tiene los suyos), la expedición ni el desfile de jefes, ni los de las partidas en red. Para jugar uno, el nivel tiene que estar abierto en tu partida."
+msgstr ""
+"Every run has its code: it appears on the end screen and on each run's page in this archive. Give it to a friend and they will play the same night you did: the same level, investigator, companion, pacts and madness, with the same waves, chests and level-ups. Then compare how long each of you lasted.\n"
+"\n"
+"Codes don't exist for the daily run (it has its own), the expedition, the boss parade or online games. To play one, the level must be open in your save."
+
+#: scripts/menus/library_menu.gd
+msgid "Código: %s (copiado)"
+msgstr "Code: %s (copied)"
+
+#: scripts/menus/library_menu.gd
+msgid "Códigos de partida"
+msgstr "Run codes"
+
+#: scripts/menus/library_menu.gd
 msgid "Entendido"
 msgstr "Understood"
 
@@ -11324,6 +11342,10 @@ msgstr "This one can't be replayed: the daily run, the expedition and the boss p
 #: scripts/menus/library_menu.gd
 msgid "Esta página sigue perdida en algún lugar. Quizá brille en el suelo la próxima vez que pases por allí."
 msgstr "This page is still lost somewhere. Perhaps it will glint on the ground the next time you pass that way."
+
+#: scripts/menus/library_menu.gd
+msgid "Jugar el código de un amigo…"
+msgstr "Play a friend's code…"
 
 #: scripts/menus/library_menu.gd
 msgid "Nadie la ha empuñado todavía."
@@ -11624,6 +11646,34 @@ msgstr "Pacts of the Necronomicon"
 #: scripts/menus/pact_menu.gd
 msgid "Sellar y jugar"
 msgstr "Seal and play"
+
+#: scripts/menus/run_code_menu.gd
+msgid "Aún no has llegado a ese nivel: ábrelo en la campaña y vuelve con el código."
+msgstr "You haven't reached that level yet: open it in the campaign and come back with the code."
+
+#: scripts/menus/run_code_menu.gd
+msgid "Casillas: cruceta o teclado para las letras · X o Ctrl+V: pegar · A: leer (vacías: lo que haya en el portapapeles)  ·  B o Esc: volver"
+msgstr "Boxes: d-pad or keyboard for the letters · X or Ctrl+V: paste · A: read (empty: whatever is on the clipboard)  ·  B or Esc: back"
+
+#: scripts/menus/run_code_menu.gd
+msgid "Con su código juegas la misma noche que jugó: el mismo nivel, investigador, compañero, pactos y locura, y las mismas oleadas, baúles y subidas. Luego comparáis cuánto aguantó cada uno."
+msgstr "With their code you play the same night they played: the same level, investigator, companion, pacts and madness, and the same waves, chests and level-ups. Then compare how long each of you lasted."
+
+#: scripts/menus/run_code_menu.gd
+msgid "El código de un amigo"
+msgstr "A friend's code"
+
+#: scripts/menus/run_code_menu.gd
+msgid "Jugar esta noche"
+msgstr "Play this night"
+
+#: scripts/menus/run_code_menu.gd
+msgid "Leer el código"
+msgstr "Read the code"
+
+#: scripts/menus/run_code_menu.gd
+msgid "Semilla %d. En solitario, desde el principio del nivel."
+msgstr "Seed %d. Solo, from the start of the level."
 
 #: scripts/menus/settings_menu.gd
 msgid "  %s por decidir."
@@ -13154,6 +13204,10 @@ msgid "Cuánto tiempo ha pasado cada uno en la noche."
 msgstr "How long each one has spent in the night."
 
 #: scripts/save/library.gd
+msgid "Código: %s (X o C: copiar)"
+msgstr "Code: %s (X or C: copy)"
+
+#: scripts/save/library.gd
 msgid "Daño %s · cada %.2f s · alcance %d m"
 msgstr "Damage %s · every %.2f s · range %d m"
 
@@ -13466,6 +13520,34 @@ msgstr "Endless night · "
 #: scripts/save/run_archive.gd
 msgid "Partida del día · "
 msgstr "Daily run · "
+
+#: scripts/save/run_code.gd
+msgid " con "
+msgstr " with "
+
+#: scripts/save/run_code.gd
+msgid "Alguna letra no cuadra: revisa el código."
+msgstr "Some letter doesn't match: check the code."
+
+#: scripts/save/run_code.gd
+msgid "Ese código es de otra versión del juego."
+msgstr "That code is from another version of the game."
+
+#: scripts/save/run_code.gd
+msgid "Ese código es de un investigador que este juego no tiene."
+msgstr "That code is for an investigator this game doesn't have."
+
+#: scripts/save/run_code.gd
+msgid "Ese código es de un nivel que este juego no tiene."
+msgstr "That code is for a level this game doesn't have."
+
+#: scripts/save/run_code.gd
+msgid "Locura: "
+msgstr "Madness: "
+
+#: scripts/save/run_code.gd
+msgid "No es un código de partida (20 letras, como 7K2M-QX4A-90BD-R5TE-W3HN): revisa las letras."
+msgstr "That isn't a run code (20 letters, like 7K2M-QX4A-90BD-R5TE-W3HN): check the letters."
 
 #: scripts/save/save_data.gd
 msgid "%d h %02d min"
@@ -14238,6 +14320,14 @@ msgstr "Part %d · Level %d%s"
 #: scripts/ui/menus.gd
 msgid "Conexión con el anfitrión: %d ms"
 msgstr "Connection to the host: %d ms"
+
+#: scripts/ui/menus.gd
+msgid "Copiado"
+msgstr "Copied"
+
+#: scripts/ui/menus.gd
+msgid "Cópialo y pásaselo a un amigo: con él juega la misma noche (Biblioteca, Archivo de expediciones)."
+msgstr "Copy it and give it to a friend: with it they play the same night (Library, Expedition archive)."
 
 #: scripts/ui/menus.gd
 msgid "Diario del investigador"
